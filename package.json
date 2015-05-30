@@ -30,6 +30,7 @@
     "validator": "^3.39.0"
   },
   "scripts": {
+    "preinstall": "gem install github-pages",
     "start": "node app.js",
     "debug": "node debug app.js",
     "test": "mocha test/bootstrap.test.js test/unit/**/*.test.js"
