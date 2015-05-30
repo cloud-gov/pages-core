@@ -18,8 +18,8 @@ module.exports = {
     },
     engine: {
       type: 'string',
-      defaultsTo: '',
-      enum: ['jekyll', 'hugo', '']
+      defaultsTo: 'static',
+      enum: ['jekyll', 'hugo', 'static']
     },
     defaultBranch: {
       type: 'string',
