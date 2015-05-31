@@ -16,7 +16,8 @@ module.exports = {
       'mkdir -p ${source}',
       'git clone -b ${branch} --single-branch ' +
         'https://${token}@github.com/${owner}/${repository}.git ${source}',
-      'echo "baseurl: /${owner}/${repository}" > ${source}/_config_base.yml',
+      'echo "baseurl: /${root}/${owner}/${repository}/${branch}" > ' +
+        '${source}/_config_base.yml',
       'jekyll build --config ${source}/_config.yml,${source}/_config_base.yml ' +
         '--source ${source} --destination ${source}/_site',
       'rm -rf ${destination}',
@@ -35,7 +36,7 @@ module.exports = {
       'mkdir -p ${source}',
       'git clone -b ${branch} --single-branch ' +
         'https://${token}@github.com/${owner}/${repository}.git ${source}',
-      'hugo --baseUrl=/${owner}/${repository} ' +
+      'hugo --baseUrl=/${root}/${owner}/${repository}/${branch} ' +
         '--source=${source}',
       'rm -rf ${destination}',
       'mkdir -p ${destination}',
@@ -77,7 +78,10 @@ module.exports = {
    */
   _run: function(cmd, model, done) {
 
-    var tokens = { branch: model.branch },
+    var tokens = {
+          branch: model.branch,
+          root: sails.config.build.destinationRoot.replace('assets/', '')
+        },
         template = _.template(cmd.join(' && '));
 
     // Populate user's passport
