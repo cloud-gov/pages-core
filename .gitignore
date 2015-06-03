@@ -6,11 +6,11 @@
 #
 # Files which match the splat patterns below will
 # be ignored by git.  This keeps random crap and
-# and sensitive credentials from being uploaded to 
+# and sensitive credentials from being uploaded to
 # your repository.  It allows you to configure your
 # app for your machine without accidentally
-# committing settings which will smash the local 
-# settings of  other developers on your team. 
+# committing settings which will smash the local
+# settings of  other developers on your team.
 #
 # Some reasonable defaults are included below,
 # but, of course, you should modify/extend/prune
@@ -31,24 +31,26 @@
 #
 # 2. Environment-specific configuration
 #    Basically, anything that would be annoying
-#    to have to change every time you do a 
+#    to have to change every time you do a
 #    `git pull`
 #    e.g., your local development database, or
 #    the S3 bucket you're using for file uploads
 #    development.
-# 
+#
 ################################################
 
 config/local.js
 
-
+# Site builds
+assets/preview
+assets/site
 
 
 
 ################################################
 # Dependencies
 #
-# When releasing a production app, you may 
+# When releasing a production app, you may
 # consider including your node_modules and
 # bower_components directory in your git repo,
 # but during development, its best to exclude it,
@@ -63,7 +65,7 @@ config/local.js
 # About bower_components dir, you can see this:
 # http://addyosmani.com/blog/checking-in-front-end-dependencies/
 # (credit Addy Osmani, @addyosmani)
-# 
+#
 ################################################
 
 node_modules

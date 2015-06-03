@@ -6,6 +6,38 @@ Federalist is a unified interface for publishing static government websites. It 
 
 This project will receive funding through GSA's Great Pitch, a "pilot program to support the exploration and testing of new, good-for-government product or service ideas that positively impact Citizen Experience, Smarter IT Delivery, Open Government, or Secure Cloud, which can prove their value by end of the fiscal year."
 
+## Getting started
+
+To run the server, you'll need Node.js and Ruby installed. The setup process will automatically install Jekyll and its dependencies based on the `github-pages` gem.
+
+To build sites using Hugo, install [Hugo](http://gohugo.io/overview/installing/) and make sure it's available in your path.
+
+### Build the server
+
+* Download or clone this repository
+* Run `npm install` from the root of the repository to load modules and install Jekyll dependencies
+* Set up an application on GitHub and set its keys in `config/local.js`
+
+  ```js
+  passport: {
+    github: {
+      options: {
+        clientID: '7FboUL8Iaj',
+        clientSecret: 'LWmz1tdnZrDHarNzPLIs'
+      }
+    }
+  }
+  ```
+* Set webhook settings for a public endpoint and secret
+
+  ```js
+  webhook: {
+    endpoint: 'https://Vncr0qo2Yx.ngrok.io/webhook/github',
+    secret: 'testSecret'
+  }
+  ```
+* Run the server with `npm start` or `node app.js`
+
 ## Architecture
 
 This application is primarily a JSON API server based on the [Sails.js](http://sailsjs.org/) framework. It handles authentication, managing users, sites, and builds, and receives webhook requests from GitHub.
@@ -32,13 +64,13 @@ Regardless of the system generating the content, all websites benefit from the s
 
 From a technical perspective, a modern web publishing platform should follow the “small pieces loosely joined” API-driven approach. Three distinct functions operate together under a unified user interface:
 
-1. Look & Feel of the Website
+1. **Look & feel of the website**
 Templates for common use-cases like a departmental website, a single page report site, API / developer documentation, project dashboard, and internal collaboration hub can be developed and shared as open source repositories on GitHub. Agencies wishing to use a template simply create a cloned copy of the template, add their own content, and modify it to suit their needs. Social, analytics, and accessibility components will all be baked in, so all templates are in compliance with the guidelines put forth by SocialGov and Section 508.
 
-2. Content editing
+2. **Content editing**
 Content editing should be a separate application rather than built into the web server. This allows the same editing interface to be used across projects. The editing interface only needs to scale to match the load from *editors*, not *visitors*.
 
-3. Publishing infrastructure
+3. **Publishing infrastructure**
 Our solution is to provide scalable, fast, and affordable static hosting for all websites. Using a website generator like Jekyll allows for these sites to be built dynamically and served statically.
 
 ## Related reading
