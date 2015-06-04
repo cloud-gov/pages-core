@@ -36,7 +36,7 @@ To build sites using Hugo, install [Hugo](http://gohugo.io/overview/installing/)
     secret: 'testSecret'
   }
   ```
-* Run the server with `npm start` or `node app.js`
+* Run the server with `npm start` or `node app.js` (You can use `npm run watch` for the server to restart when you save file changes)
 
 ## Architecture
 
