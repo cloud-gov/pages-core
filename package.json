@@ -36,7 +36,9 @@
     "preinstall": "gem install github-pages",
     "start": "node app.js",
     "debug": "node debug app.js",
+    "dev": "npm run watch & npm run watchify",
     "watch": "nodemon app.js",
+    "watchify": "watchify -t brfs assets/app/app.js -o assets/js/bundle.js",
     "test": "mocha test/bootstrap.test.js test/unit/**/*.test.js"
   },
   "main": "app.js",
@@ -48,6 +50,8 @@
   "license": "Public Domain",
   "devDependencies": {
     "mocha": "^2.2.5",
-    "nodemon": "^1.3.7"
+    "nodemon": "^1.3.7",
+    "brfs": "^1.4.0",
+    "watchify": "^3.2.2"
   }
 }
