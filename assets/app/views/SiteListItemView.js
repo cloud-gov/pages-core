@@ -12,7 +12,8 @@ var SiteListItemView = Backbone.View.extend({
   model: SiteModel,
   template: _.template(templateHtml),
   events: {
-    'click a.delete': 'onDelete'
+    'click a.delete': 'onDelete',
+    'click a.view': 'onView'
   },
   initialize: function initializeSiteView() {
     this.render();
@@ -23,13 +24,20 @@ var SiteListItemView = Backbone.View.extend({
   },
 
   onDelete: function onDelete() {
-    this.model.destroy({succes: this.onDeleteSuccess.bind(this), error: this.onDeleteError.bind(this)});
+    var opts = {
+      succes: this.onDeleteSuccess.bind(this),
+      error: this.onDeleteError.bind(this)
+    };
+    this.model.destroy(opts);
   },
   onDeleteSuccess: function onDeleteSuccess() {
     console.log('delete success');
   },
   onDeleteError: function onDeleteError() {
     console.log('delete failure');
+  },
+  onView: function onView() {
+    console.log('once we urls for the built projects then this will go there');
   }
 });
 
