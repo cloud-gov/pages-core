@@ -38,7 +38,7 @@
     "debug": "node debug app.js",
     "dev": "npm run watch & npm run watchify",
     "watch": "nodemon app.js",
-    "watchify": "watchify -t brfs assets/app/app.js -o assets/js/bundle.js",
+    "watchify": "watchify --debug -t brfs assets/app/app.js -o assets/js/bundle.js",
     "test": "mocha test/bootstrap.test.js test/unit/**/*.test.js"
   },
   "main": "app.js",
