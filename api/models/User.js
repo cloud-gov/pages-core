@@ -20,6 +20,13 @@ var User = {
     builds: {
       collection: 'build',
       via: 'user'
+    },
+
+    // Method to return JSON to the API
+    toJSON: function() {
+      var obj = this.toObject();
+      delete obj.passports;
+      return obj;
     }
   }
 };
