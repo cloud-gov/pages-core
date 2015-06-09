@@ -5,16 +5,21 @@ var _ = require('underscore');
 
 var AddSiteView = require('./AddSiteView');
 var SiteListItemView = require('./SiteListItemView');
+var templateHtml = fs.readFileSync(__dirname + '/../templates/SiteListTemplate.html').toString();
 
 var SiteListView = Backbone.View.extend({
-  el: '#site-listing',
+  el: 'main',
+  template: _.template(templateHtml),
   events: {
-    'click #new-site': 'onAddSite'
+    'click .add-site': 'onAddSite'
   },
-  initialize: function initializeSiteListView() {
+  initialize: function initializeSiteListView(opts) {
+    this.user = opts.user;
     this.listenTo(this.collection, 'sync', this.render);
+    this.listenTo(this.user, 'change', this.render);
   },
   render: function renderSiteListView() {
+    this.$el.html(this.template({authenticated: this.user.isAuthenticated()}));
     var $list = this.$('ul');
     $list.empty();
 
