@@ -16,6 +16,15 @@ To build sites using Hugo, install [Hugo](http://gohugo.io/overview/installing/)
 
 * Download or clone this repository
 * Run `npm install` from the root of the repository to load modules and install Jekyll dependencies
+
+Together these commands will looks something like the following:
+
+```
+$ git clone git@github.com:18F/federalist.git
+$ cd federalist
+$ npm install
+```
+
 * Set up an application on GitHub and set its keys in `config/local.js`
 
   ```js
