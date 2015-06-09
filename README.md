@@ -59,6 +59,8 @@ This application is primarily a JSON API server based on the [Sails.js](http://s
 
 It automatically applies a webhook to the repository new sites and creates a new build on validated webhook requests.
 
+The front end of the application is a [Backbone](http://backbonejs.org) based application, that uses [browserify](http://www.browserify.org) in the build process. It is a very lightweight consumer of the Sails API.
+
 ### Proof of concept
 
 The proof of concept application will have a web-based front-end to interface with the API and allow users to add new sites, configure them, and open them in Prose for editing.
