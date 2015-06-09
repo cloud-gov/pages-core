@@ -30,7 +30,7 @@ module.exports = {
 
   hugo: function(model, done) {
 
-    // TODO: test hugo build
+    // Run command template
     this._run([
       'rm -rf ${source}',
       'mkdir -p ${source}',
@@ -107,10 +107,6 @@ module.exports = {
       // Set up source and destination paths
       tokens.source = sails.config.build.sourceRoot + '/' +
         tokens.owner + '/' + tokens.repository + '/' + tokens.branch;
-
-      // TODO: Set up destination outside of .tmp for persistence
-      // TODO: Figure out routing for main branch vs previews
-      //       (if branch === default branch...)
       tokens.destination = sails.config.build.destinationRoot + '/' +
         tokens.owner + '/' + tokens.repository + '/' + tokens.branch;
 
