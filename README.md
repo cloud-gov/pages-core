@@ -12,6 +12,8 @@ To run the server, you'll need Node.js and Ruby installed. The setup process wil
 
 To build sites using Hugo, install [Hugo](http://gohugo.io/overview/installing/) and make sure it's available in your path.
 
+We use `ngrok` to form a local tunnel and expose our local app to webhooks. Install from the [ngrok website](https://ngrok.com/).
+
 ### Build the server
 
 * Download or clone this repository
