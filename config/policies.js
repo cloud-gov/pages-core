@@ -49,6 +49,10 @@ module.exports.policies = {
 		// feed : ['isNiceToAnimals', 'hasRabbitFood']
 	// }
 
+  BuildController: ['passport', 'sessionAuth', 'filterCurrentUser'],
+  SiteController: ['passport', 'sessionAuth', 'filterCurrentUser'],
+  UserController: ['passport', 'sessionAuth', 'filterSelfOnly'],
+
   WebhookController: true
 
 };
