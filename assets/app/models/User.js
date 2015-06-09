@@ -10,12 +10,14 @@ var UserModel = Backbone.Model.extend({
     'sites': [],
     'builds': []
   },
-  initialize: function() {
+  initialize: function () {
     this.fetch();
   },
-  parse: function(data) {
-    var userData = data[0];
-    return userData;
+  isAuthenticated: function isAuthenticated() {
+    if (this.get('id') != undefined) {
+      return true;
+    }
+    return false;
   }
 });
 
