@@ -25,18 +25,19 @@ $ cd federalist
 $ npm install
 ```
 
-* Set up an application on GitHub and set its keys in `config/local.js`
+* Set up [an application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a Client ID and Client Secret. Use those  values in `config/local.js`
 
-  ```js
-  passport: {
-    github: {
-      options: {
-        clientID: '7FboUL8Iaj',
-        clientSecret: 'LWmz1tdnZrDHarNzPLIs'
-      }
-    }
-  }
-  ```
+ ```js
+ passport: {
+   github: {
+     options: {
+       clientID: '<<use the value from Github here>>',
+       clientSecret: '<<085aac67e9ca3a58f91517244c1ba33762d093cb-ish>>'
+     }
+   }
+ }
+ ```
+ 
 * Set webhook settings for a public endpoint and secret
 
   ```js
