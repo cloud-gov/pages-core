@@ -29,7 +29,7 @@ $ npm install
 
 * Set up [an application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a Client ID and Client Secret. Use those  values in `config/local.js`
 
- ```js
+ ```
  passport: {
    github: {
      options: {
@@ -42,12 +42,15 @@ $ npm install
  
 * Set webhook settings for a public endpoint and secret
 
-  ```js
+  ```
   webhook: {
     endpoint: 'https://Vncr0qo2Yx.ngrok.io/webhook/github',
     secret: 'testSecret'
   }
   ```
+
+In the end, your `local.js` file should look [something like this](https://github.com/18F/federalist/wiki/Sample-local.js-setup).
+
 * Run the server with `npm start` or `node app.js` (You can use `npm run watch` for the server to restart when you save file changes)
 
 ## Architecture
