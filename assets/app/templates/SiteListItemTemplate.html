@@ -1,0 +1,21 @@
+<p>repository: <%= repository %></p>
+<p>branch: <%= branch %></p>
+<p>owner: <%= owner %></p>
+<p>engine: <%= engine %></p>
+<p>builds: <%= builds.length %></p>
+
+<ul>
+<% builds.forEach(function(build) { %>
+
+  <li>
+    <p>build id: <%= build.id %></p>
+    <p>current state: <%= build.state %></p>
+    <p>updated at: <%= build.updatedAt %></p>
+  </li>
+
+<% }) %>
+</ul>
+
+<a href="http://prose.io/#<%= owner %>/<%= repository %>" target="_blank" class="edit">edit in prose.io</a>
+<a href="#" class="delete">delete this site</a>
+<a href="#" class="view">go to site</a>
