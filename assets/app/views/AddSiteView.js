@@ -24,7 +24,10 @@ var AddSiteView = Backbone.View.extend({
       data[d.name] = d.value;
     });
     var newSite = new SiteModel();
-    newSite.save(data, {success: this.onSuccess.bind(this), error: this.onError.bind(this)});
+    newSite.save(data, {
+      success: this.onSuccess.bind(this),
+      error: this.onError.bind(this)
+    });
   },
   onSuccess: function onSuccess() {
     console.log('winning');

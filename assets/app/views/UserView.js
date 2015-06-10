@@ -10,7 +10,7 @@ var UserView = Backbone.View.extend({
   el: '.user',
   template: _.template(templateHtml),
   initialize: function initializeUserView() {
-    this.listenTo(this.model, "change", this.render);
+    this.listenTo(this.model, 'change', this.render);
     this.render();
   },
   render: function renderUserView() {

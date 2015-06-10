@@ -1,5 +1,3 @@
-console.log('yo from up top');
-
 var UserModel = require('./models/User');
 var UserView = require('./views/UserView');
 var SiteListView = require('./views/SiteListView');
@@ -9,7 +7,7 @@ var user = new UserModel();
 var loginView = new UserView({model: user});
 
 var sites = new SiteCollection();
-var listView = new SiteListView({collection: sites, user: user})
+var listView = new SiteListView({collection: sites, user: user});
 
 listView.render();
 

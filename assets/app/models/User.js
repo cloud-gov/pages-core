@@ -14,7 +14,7 @@ var UserModel = Backbone.Model.extend({
     this.fetch();
   },
   isAuthenticated: function isAuthenticated() {
-    if (this.get('id') != undefined) {
+    if (this.get('id') !== undefined) {
       return true;
     }
     return false;
