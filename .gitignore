@@ -45,6 +45,8 @@ config/local.js
 assets/preview
 assets/site
 
+# Browserify bundle
+assets/js/bundle.js
 
 
 ################################################
