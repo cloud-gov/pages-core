@@ -29,19 +29,17 @@
 //
 // etc.
 
-body {
-  background-color: PeachPuff;
-}
+// for materialize sticky footer
+// http://materializecss.com/footer.html
 
-nav {
+body {
   display: flex;
-  align-items: center;
-  position: relative;
+  min-height: 100vh;
+  flex-direction: column;
 }
-nav h1 {
-  padding: 0;
-  margin: 0;
+nav {
+  margin-bottom: 20px;
 }
-nav .user {
-  right: 0;
+main {
+  flex: 1 0 auto;
 }

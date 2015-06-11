@@ -1,9 +1,18 @@
-<p>repository: <%= repository %></p>
-<p>branch: <%= branch %></p>
-<p>owner: <%= owner %></p>
-<p>engine: <%= engine %></p>
-<p>builds: <%= builds.length %></p>
+<div class="collapsible-header active"><%= repository %>
+  <span class="right">
+    <a href="http://prose.io/#<%= owner %>/<%= repository %>" target="_blank" class="edit" alt="edit the site <%= repository %> using prose.io"><i class="mdi-editor-mode-edit"></i></a>
+    <a href="#" class="delete" alt="delete the site <%= repository %>"><i class="mdi-action-delete"></i></a>
+    <a href="#" class="view" alt="go to the site <%= repository %> in a new tab"><i class="mdi-action-open-in-new"></i></a>
+  </span>
+</div>
+<div class="collapsible-body">
+  <p>This is uses <%= engine %> as a build engine and has been built <%= builds.length %> times</p>
 
+</div>
+
+
+
+<!--
 <ul>
 <% builds.forEach(function(build) { %>
 
@@ -14,8 +23,4 @@
   </li>
 
 <% }) %>
-</ul>
-
-<a href="http://prose.io/#<%= owner %>/<%= repository %>" target="_blank" class="edit">edit in prose.io</a>
-<a href="#" class="delete">delete this site</a>
-<a href="#" class="view">go to site</a>
+</ul> -->
