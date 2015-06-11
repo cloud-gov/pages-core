@@ -34,8 +34,9 @@
   },
   "scripts": {
     "preinstall": "gem install github-pages",
-    "start": "node app.js",
+    "start": "npm run browserify && node app.js",
     "debug": "node debug app.js",
+    "browserify": "browserify -t brfs assets/app/app.js -o assets/js/bundle.js",
     "dev": "npm run watch & npm run watchify",
     "watch": "nodemon app.js",
     "watchify": "watchify --debug -t brfs assets/app/app.js -o assets/js/bundle.js",
