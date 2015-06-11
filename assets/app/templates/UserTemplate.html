@@ -1,7 +1,8 @@
+<ul id="nav-mobile">
 <% if(username) {%>
-  <p>hey <%= username %>!</p>
-  <a href="/logout">logout</a>
-
+  <li>hey <%= username %>!</li>
+  <li><a href="/logout">logout</a></li>
 <% } else { %>
-  <a href="/auth/github">login</a>
+  <li><a href="/auth/github">login</a></li>
 <% } %>
+</ul>

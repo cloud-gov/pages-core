@@ -1,3 +1,6 @@
+var Backbone = require('backbone');
+var $ = window.jQuery = window.$ = Backbone.$;
+
 var UserModel = require('./models/User');
 var UserView = require('./views/UserView');
 var SiteListView = require('./views/SiteListView');

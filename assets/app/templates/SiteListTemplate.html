@@ -1,7 +1,27 @@
 <% if(authenticated) { %>
-  <h1>Your current sites</h1>
-  <a href="#" class="add-site-action">Add a site</a>
-  <ul></ul>
+  <div class="row">
+    <div class="col s6"><h5>Your current sites</h5></div>
+    <div class="col s6">
+      <a id="add-site" class="right btn-floating btn-large waves-effect waves-light red" alt="add a new site"><i class="mdi-content-add"></i></a>
+    </div>
+  </div>
+  <div class="row">
+    <ul class="collapsible" data-collapsible="accordion"></ul>
+  </div>
 <% } else { %>
-  <h1>Please <a href="/auth/github">authenticate with GitHub</a> to continue</h1>
+  <div class="row">
+      <h5>Welcome to Federalist</h5>
+      <p>Federalist is super cool and useful for publishing websites. But first, we need access to your Github account.</p>
+      <div class="center">
+        <a class="waves-effect waves-light btn-large" href="/auth/github">Authenticate with GitHub</a>
+      </div>
+      <!--
+      <div class="row">
+        <div class="col s12 m4">Feature 1 cool thing</div>
+        <div class="col s12 m4">Feature 2 cool thing</div>
+        <div class="col s12 m4">Feature 3 cool thing</div>
+      </div>
+      -->
+    </ul>
+  </div>
 <% } %>

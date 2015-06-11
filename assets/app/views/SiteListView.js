@@ -39,6 +39,8 @@ var SiteListView = Backbone.View.extend({
       $list.append(site.$el);
     }, this);
 
+    $('.collapsible').collapsible();
+
     return this;
   },
   toggleAddSiteView: function toggleAddSiteView() {

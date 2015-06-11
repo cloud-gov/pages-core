@@ -8,7 +8,6 @@ var templateHtml = fs.readFileSync(__dirname + '/../templates/SiteListItemTempla
 
 var SiteListItemView = Backbone.View.extend({
   tagName: 'li',
-  className: 'site',
   model: SiteModel,
   template: _.template(templateHtml),
   events: {
