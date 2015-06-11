@@ -8,7 +8,7 @@ var templateHtml = fs.readFileSync(__dirname + '/../templates/AddSiteTemplate.ht
 
 var AddSiteView = Backbone.View.extend({
   tagName: 'div',
-  className: 'add-site',
+  className: 'add-site-form',
   events: {
     'click .submit': 'onSubmit',
   },
