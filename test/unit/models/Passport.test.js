@@ -21,7 +21,23 @@ describe('Passport Model', function() {
   });
 
   describe('record.validatePassword', function() {
-
+    it('should validate password', function(done) {
+      User.findOrCreate({ id: 1 }, {}, function(err) {
+        if (err) throw err;
+        Passport.create({
+          protocol: 'test',
+          password: 'password',
+          user: 1
+        }, function(err, passport) {
+          if (err) throw err;
+          passport.validatePassword('password', function(err, valid) {
+            assert.equal(err, null);
+            assert(valid);
+            done();
+          });
+        });
+      });
+    });
   });
 
 });
