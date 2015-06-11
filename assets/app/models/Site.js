@@ -1,5 +1,7 @@
 var Backbone = require('backbone');
 
+var siteUrl = '/v0/site';
+
 var SiteModel = Backbone.Model.extend({
   defaults: {
     'builds': [],
@@ -7,12 +9,12 @@ var SiteModel = Backbone.Model.extend({
     'engine': 'jekyll',
     'branch': 'master'
   },
-  urlRoot: '/v0/site'
+  urlRoot: siteUrl
 });
 
 var SiteCollection = Backbone.Collection.extend({
   model: SiteModel,
-  url: '/v0/site',
+  url: siteUrl,
 
   initialize: function() {
     this.fetch();
