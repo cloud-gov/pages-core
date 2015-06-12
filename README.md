@@ -8,16 +8,21 @@ This project will receive funding through GSA's Great Pitch, a "pilot program to
 
 ## Getting started
 
-To run the server, you'll need Node.js and Ruby installed. The setup process will automatically install Jekyll and its dependencies based on the `github-pages` gem.
+To run the server, you'll need [Node.js](https://nodejs.org/download/) and [Ruby](https://www.ruby-lang.org/en/documentation/installation/) installed. The setup process will automatically install Jekyll and its dependencies based on the `github-pages` gem.
 
 To build sites using Hugo, install [Hugo](http://gohugo.io/overview/installing/) and make sure it's available in your path.
 
-We use `ngrok` to form a local tunnel and expose our local app to webhooks. Install from the [ngrok website](https://ngrok.com/).
+We use `ngrok` to form a local tunnel and expose our local app to webhooks. Install ngrok by typing the following in a command line interface, E.g. Terminal for Mac OSX: 
+
+```
+$ brew install ngrok
+```
 
 ### Build the server
 
-* Download or clone this repository
-* Run `npm install` from the root of the repository to load modules and install Jekyll dependencies
+* Download or Clone this repository from Github either by using the command line or repo's website on Github. On the right side of the repo's page, there is a button that states "Clone in Desktop".
+* 
+* Run `npm install` from the root(the directory that houses the projects files on your computer) of the repository to load modules and install Jekyll dependencies
 
 Together these commands will looks something like the following:
 
@@ -27,14 +32,14 @@ $ cd federalist
 $ npm install
 ```
 
-* Set up [an application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a Client ID and Client Secret. Use those  values in `config/local.js`
+* Set up [an application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a Client ID and Client Secret. You'll need to create a JavaScript file and label it local.js. Save this file to the config folder located in the project you downloaded. Use those  values in `config/local.js`
 
  ```
  passport: {
    github: {
      options: {
        clientID: '<<use the value from Github here>>',
-       clientSecret: '<<085aac67e9ca3a58f91517244c1ba33762d093cb-ish>>'
+       clientSecret: '<<use the value from Github here>>'
      }
    }
  }
@@ -49,9 +54,26 @@ $ npm install
   }
   ```
 
-In the end, your `local.js` file should look [something like this](https://github.com/18F/federalist/wiki/Sample-local.js-setup).
+In the end, your `local.js` file should look something like this:
 
-* Run the server with `npm start` or `node app.js` (You can use `npm run watch` for the server to restart when you save file changes)
+```
+module.exports = {
+  passport: {
+    github: {
+      options: {
+        clientID: '<<get from github>>',
+        clientSecret: '<<get from github>>'
+      }
+    }
+  },
+  webhook: {
+    endpoint: '<<your ngrok url>>/webhook/github',
+    secret: 'test secret'
+  }
+};
+```
+
+* Run the server with `npm start` or `node app.js` (You can use `npm run watch` for the server to restart when you save file changes) at the directory of the project on your local computer. 
 
 ## Architecture
 
