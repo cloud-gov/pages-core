@@ -28,3 +28,33 @@
 // @import 'pages/signup.less';
 //
 // etc.
+
+// for materialize sticky footer
+// http://materializecss.com/footer.html
+
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+nav {
+  margin-bottom: 20px;
+}
+main {
+  flex: 1 0 auto;
+}
+.stage-bug {
+  display: block;
+  background: #f3f3f3;
+  color: #333;
+  border: 1px solid #d9d9d9;
+  border-top: none;
+  text-align: center;
+  padding: .5em 0;
+}
+.add-site-form {
+  display: none;
+}
+.add-site-form.show {
+  display: block;
+}

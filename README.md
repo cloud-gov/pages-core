@@ -75,6 +75,18 @@ module.exports = {
 
 * Run the server with `npm start` or `node app.js` (You can use `npm run watch` for the server to restart when you save file changes) at the directory of the project on your local computer. 
 
+
+#### Build the server and the front-end
+There are really two applications in one repo here. Right now we're OK with that because we're moving quick to get done with the prototypal phase of the project.
+
+If you are working on the front-end of the application, the things you need to know are:
+
+0. It is a Backbone based application
+0. It is built with `browserify` and uses `watchify` to build on changes
+0. It lives in `/assets/app`
+
+You can use `npm run dev` to get the project built and running. This will set up `watchify` to run when front end files change and will set up the server to reload on any file change (front end included)
+
 ## Architecture
 
 This application is primarily a JSON API server based on the [Sails.js](http://sailsjs.org/) framework. It handles authentication, managing users, sites, and builds, and receives webhook requests from GitHub.
