@@ -7,22 +7,29 @@ var SiteModel = require('../models/Site').model;
 var templateHtml = fs.readFileSync(__dirname + '/../templates/AddSiteTemplate.html').toString();
 
 var AddSiteView = Backbone.View.extend({
-  tagName: 'div',
-  className: 'add-site-form',
+  el: 'div.form',
+  template: _.template(templateHtml),
   events: {
-    'click .submit': 'onSubmit',
+    'click #submit': 'onSubmit'
   },
-  initialize: function initializeSiteView() {
-    this.render();
+  initialize: function initializeSiteView(opts) {
+    this.user = opts.user;
+    this.listenTo(this.user, 'change', this.render);
   },
   render: function renderSiteView() {
-    this.$el.html(templateHtml);
+    this.$el.html(this.template(this.user.toJSON()));
+  },
+  toggleDisplay: function toggleDisplay(e) {
+    this.$el.toggleClass('show');
   },
   onSubmit: function onSubmit() {
     var data = {};
     this.$('form').serializeArray().map(function(d) {
       data[d.name] = d.value;
     });
+
+    console.log('data', data);
+
     var newSite = new SiteModel();
     newSite.save(data, {
       success: this.onSuccess.bind(this),
@@ -31,12 +38,12 @@ var AddSiteView = Backbone.View.extend({
   },
   onSuccess: function onSuccess() {
     console.log('winning');
-    this.$el.html('yay! new site');
+    this.toggleDisplay();
     this.trigger('success');
   },
   onError: function onError() {
     console.log('failing');
-    this.$el.html('oh noes!');
+    this.trigger('failure');
   }
 });
 
