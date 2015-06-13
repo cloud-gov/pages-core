@@ -4,6 +4,9 @@ var Sails = require('sails'),
 before(function(done) {
   Sails.lift({
     // configuration for testing purposes
+    // Use memory for data store
+    models: { connection: 'memory' },
+    log: { level: 'info' }
   }, function(err, server) {
     sails = server;
     if (err) return done(err);
