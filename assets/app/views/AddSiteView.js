@@ -3,6 +3,10 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 
+/* this bit require looks gross but it enables us to have one place
+to set template data that is available to the front and back end apps */
+var SiteTemplates = require('../../../config/templates');
+
 var SiteModel = require('../models/Site').model;
 var templateHtml = fs.readFileSync(__dirname + '/../templates/AddSiteTemplate.html').toString();
 
@@ -10,19 +14,22 @@ var AddSiteView = Backbone.View.extend({
   el: 'div.form',
   template: _.template(templateHtml),
   events: {
-    'click #submit': 'onSubmit'
+    'click #submit': 'onSubmitGithubRepo',
+    'click .cancel-add-action': 'toggleDisplay',
+    'click .card-action .btn': 'onTemplateSelection'
   },
   initialize: function initializeSiteView(opts) {
     this.user = opts.user;
     this.listenTo(this.user, 'change', this.render);
   },
   render: function renderSiteView() {
-    this.$el.html(this.template(this.user.toJSON()));
+    var html = this.template({user: this.user.toJSON(), templates: SiteTemplates });
+    this.$el.html(html);
   },
   toggleDisplay: function toggleDisplay(e) {
     this.$el.toggleClass('show');
   },
-  onSubmit: function onSubmit() {
+  onSubmitGithubRepo: function onSubmitGithubRepo() {
     var data = {};
     this.$('form').serializeArray().map(function(d) {
       data[d.name] = d.value;
@@ -44,6 +51,10 @@ var AddSiteView = Backbone.View.extend({
   onError: function onError() {
     console.log('failing');
     this.trigger('failure');
+  },
+  onTemplateSelection: function onTemplateSelection(e) {
+    var templateId = $(e.target).parents('.col').attr('data-template');
+    console.log('we will do something with', templateId);
   }
 });
 
