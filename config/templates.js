@@ -1,4 +1,4 @@
-module.exports = {
+module.exports.templates = {
   'microsite': {
     repo: 'https://github.com/USG-Website-Templates/microsite-template',
     example: 'https://usg-website-templates.github.io/microsite-template/',
