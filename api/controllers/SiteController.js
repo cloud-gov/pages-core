@@ -6,5 +6,7 @@
  */
 
 module.exports = {
-
+  forkSiteFromTemplate: function forkSiteFromTemplate(req, res) {
+    return GitHub.forkRepository(req, res);
+  }
 };
