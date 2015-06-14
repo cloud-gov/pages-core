@@ -6,7 +6,6 @@ var crypto = require('crypto');
 module.exports = {
 
   github: function(req, res) {
-
     var sig = req.headers['x-hub-signature'],
         event = req.headers['x-github-event'],
         id = req.headers['x-github-delivery'],

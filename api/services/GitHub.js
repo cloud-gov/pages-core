@@ -1,24 +1,27 @@
 /*
  * Service for interfacing with GitHub
  */
-var url = require('url');
-
-var Client = require('github'),
+var url = require('url'),
+    Client = require('github'),
     github = new Client({ version: '3.0.0' });
 
 module.exports = {
 
   /*
-   * Set a webhook on a repository
-   * @param {Site} site model to apply the webhook
+   * fork a repository template repository
+   * @param {User} user model to own new template fork
+   * @param {string} name of template to fork (from sails.config.templates)
    * @param {Function} callback function
    */
-  forkRepository: function(req, res) {
-    Passport.findOne({ user: req.user.id }).exec(function(err, passport) {
-      var templateId = req.body.templateId,
-          repoUrl = url.parse(sails.config.templates[templateId].repo),
+  forkRepository: function(user, templateId, done) {
+    Passport.findOne({ user: user.id }).exec(function(err, passport) {
+      var repoUrl = url.parse(sails.config.templates[templateId].repo),
           repoOwner = repoUrl.pathname.split('/')[1],
-          repoName = repoUrl.pathname.split('/')[2];
+          repoName = repoUrl.pathname.split('/')[2],
+          data = {
+            user: repoOwner,
+            repo: repoName
+          };
 
       // Authenticate request with user's oauth token
       github.authenticate({
@@ -26,29 +29,30 @@ module.exports = {
         token: passport.tokens.accessToken
       });
 
-      var data = {};
-      data['user'] = repoOwner;
-      data['repo'] = repoName
-
       github.repos.fork(data, function(err, suc) {
-        if (err) { return res.status(400).send(err); }
+        if (err) return done(err);
 
         var values = {
-          'owner': req.user.username,
+          'owner': user.username,
           'repository': repoName,
-          'defaultBranch': suc['default_branch'],
+          'defaultBranch': suc.default_branch,
           'engine': 'jekyll',
-          'user': req.user.id
+          'user': user.id
         };
 
         Site.create(values).exec(function createCB(err, created) {
-          if (err) { return res.status(400).send(err); }
-
-          return res.json(created);
+          if (err) return done(err);
+          return done(null, created);
         });
       });
     });
   },
+
+  /*
+   * Set a webhook on a repository
+   * @param {Site} site model to apply the webhook
+   * @param {Function} callback function
+   */
   setWebhook: function(site, done) {
     Passport.findOne({ user: site.user }).exec(function(err, passport) {
       if (err) return done(err);
