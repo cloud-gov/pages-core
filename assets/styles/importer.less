@@ -58,6 +58,10 @@ main {
 .form.show {
   display: block;
 }
+// this might look weird but it hides the main element when there is a sibling that is .form.show
+.form.show ~ main {
+  display: none;
+}
 
 /* over write some of material.css */
 select {
@@ -65,4 +69,7 @@ select {
 }
 .collapsible-body {
   display: block;
+}
+.card .card-action a {
+  margin-right: 0;
 }

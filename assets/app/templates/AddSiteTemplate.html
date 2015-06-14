@@ -1,20 +1,56 @@
-<form>
-  <input type="hidden" name="owner" value="<%= username %>"></input>
-  </br >
+<div class="row">
+  <div class="col s6">
+    <h5>Make a new site</h5>
+  </div>
+  <div class="col s6 right-align">
+    <a href="#" class="cancel-add-action btn red accent-3">Cancel</a>
+  </div>
+</div>
+<div class="row">
+  <div class="col s12">
+    <p>There are a few different ways you can add sites to Federalist. You can start with a brand new site by selecting one of our template sites below. Or you the Github repository where your site's code lives.</p>
+  </div>
+  <section>
+    <h5>Choose from one of our templates</h5>
+    <% for (var template in templates) { %>
+      <div class="col s12 m6" data-template="<%= template %>">
+      <% template = templates[template]; %>
+        <div class="card pink lighten-5">
+          <div class="card-content">
+            <span class="card-title"><%= template.title %></span>
+            <a href="<%= template.example %>" target="_blank">Example</a>
+            <p><%= template.description %></p>
+          </div>
+          <div class="card-action center">
+            <a class="btn">Use this template</a>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </section>
+</div>
+<div class="row">
+  <section>
+    <h5>Or add your own Github repository</h5>
+    <form>
+      <input type="hidden" name="owner" value="<%= user.username %>"></input>
+      </br >
 
-  <input type="hidden" name="user" value="<%= id %>"></input>
-  </br >
+      <input type="hidden" name="user" value="<%= user.id %>"></input>
+      </br >
 
-  <label for="repository">repository</label>
-  <input type="text" name="repository" id="repository"></input>
-  </br >
+      <label for="repository">repository name</label>
+      <input type="text" name="repository" id="repository"></input>
+      </br >
 
-  <label for="engine">engine</label>
-  <select name="engine" id="engine">
-    <option value="jekyll">Jekyll</option>
-    <option value="hugo">Hugo</option>
-  </select>
-  </br >
+      <label for="engine">engine</label>
+      <select name="engine" id="engine">
+        <option value="jekyll">Jekyll</option>
+        <option value="hugo">Hugo</option>
+      </select>
+      </br >
 
-  <a class="btn" id="submit" href="#">add site</a>
-</form>
+      <a class="btn" id="submit" href="#">Submit repository-based site</a>
+    </form>
+  </section>
+</div>
