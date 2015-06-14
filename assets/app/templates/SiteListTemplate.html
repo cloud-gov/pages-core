@@ -2,12 +2,22 @@
   <div class="row">
     <div class="col s6"><h5>Your current sites</h5></div>
     <div class="col s6">
-      <a id="add-site" class="right btn-floating btn-large waves-effect waves-light red" alt="add a new site"><i class="mdi-content-add"></i></a>
+      <a class="add-site-action right btn-floating btn-large waves-effect waves-light red" alt="add a new site"><i class="mdi-content-add"></i></a>
     </div>
   </div>
-  <div class="row">
-    <ul class="collapsible" data-collapsible="accordion"></ul>
-  </div>
+  <% if (sitesCount === 0) { %>
+    <div class="row">
+      <p>Welcome! You don't have any sites registered with Federalist just yet. Let's go ahead and change that.</p>
+      <div class="center">
+        <a class="add-site-action waves-effect waves-light btn-large" href="#">Add your first site now.</a>
+      </div>
+    </div>
+  <% } else { %>
+    <div class="row">
+      <ul class="collapsible"></ul>
+    </div>
+  <% } %>
+
 <% } else { %>
   <div class="row">
       <h5>Welcome to Federalist</h5>
