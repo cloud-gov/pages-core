@@ -33,7 +33,6 @@ module.exports.routes = {
   ***************************************************************************/
 
   'post /webhook/github': 'WebhookController.github',
-  'post /v0/site/fork': 'SiteController.forkSiteFromTemplate',
 
   /*
   *
