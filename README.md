@@ -8,35 +8,73 @@ This project will receive funding through GSA's Great Pitch, a "pilot program to
 
 ## Getting started
 
-To run the server, you'll need Node.js and Ruby installed. The setup process will automatically install Jekyll and its dependencies based on the `github-pages` gem.
+To run the server, you'll need [Node.js](https://nodejs.org/download/) and [Ruby](https://www.ruby-lang.org/en/documentation/installation/) installed. The setup process will automatically install Jekyll and its dependencies based on the `github-pages` gem.
 
 To build sites using Hugo, install [Hugo](http://gohugo.io/overview/installing/) and make sure it's available in your path.
 
+We use `ngrok` to form a local tunnel and expose our local app to webhooks. Install ngrok by typing the following in a command line interface, E.g. Terminal for Mac OSX: 
+
+```
+$ brew install ngrok
+```
+
 ### Build the server
 
-* Download or clone this repository
-* Run `npm install` from the root of the repository to load modules and install Jekyll dependencies
-* Set up an application on GitHub and set its keys in `config/local.js`
+* Download or Clone this repository from Github either by using the command line or repo's website on Github. On the right side of the repo's page, there is a button that states "Clone in Desktop".
+* 
+* Run `npm install` from the root(the directory that houses the projects files on your computer) of the repository to load modules and install Jekyll dependencies
 
-  ```js
-  passport: {
-    github: {
-      options: {
-        clientID: '7FboUL8Iaj',
-        clientSecret: 'LWmz1tdnZrDHarNzPLIs'
-      }
-    }
-  }
-  ```
+Together these commands will looks something like the following:
+
+```
+$ git clone git@github.com:18F/federalist.git
+$ cd federalist
+$ npm install
+```
+
+* Set up [an application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a Client ID and Client Secret. You'll need to create a JavaScript file and label it local.js. Save this file to the config folder located in the project you downloaded. Use those  values in `config/local.js`
+
+ ```
+ passport: {
+   github: {
+     options: {
+       clientID: '<<use the value from Github here>>',
+       clientSecret: '<<use the value from Github here>>'
+     }
+   }
+ }
+ ```
+ 
 * Set webhook settings for a public endpoint and secret
 
-  ```js
+  ```
   webhook: {
     endpoint: 'https://Vncr0qo2Yx.ngrok.io/webhook/github',
     secret: 'testSecret'
   }
   ```
-* Run the server with `npm start` or `node app.js`. Use `npm run watch` to have the server reload on file changes.
+
+In the end, your `local.js` file should look something like this:
+
+```
+module.exports = {
+  passport: {
+    github: {
+      options: {
+        clientID: '<<get from github>>',
+        clientSecret: '<<get from github>>'
+      }
+    }
+  },
+  webhook: {
+    endpoint: '<<your ngrok url>>/webhook/github',
+    secret: 'test secret'
+  }
+};
+```
+
+* Run the server with `npm start` or `node app.js` (You can use `npm run watch` for the server to restart when you save file changes) at the directory of the project on your local computer. 
+
 
 #### Build the server and the front-end
 There are really two applications in one repo here. Right now we're OK with that because we're moving quick to get done with the prototypal phase of the project.
@@ -54,6 +92,8 @@ You can use `npm run dev` to get the project built and running. This will set up
 This application is primarily a JSON API server based on the [Sails.js](http://sailsjs.org/) framework. It handles authentication, managing users, sites, and builds, and receives webhook requests from GitHub.
 
 It automatically applies a webhook to the repository new sites and creates a new build on validated webhook requests.
+
+The front end of the application is a [Backbone](http://backbonejs.org) based application, that uses [browserify](http://www.browserify.org) in the build process. It is a very lightweight consumer of the Sails API.
 
 ### Proof of concept
 
