@@ -48,7 +48,9 @@ module.exports = {
       if (err) {
         var ghErr, hookMessage = 'Hook already exists on this repository';
         try { ghErr = JSON.parse(err.message).errors[0].message; } catch(e) {}
-        if (ghErr !== hookMessage) return done(err);
+        if (ghErr === hookMessage) return done();
+        if (JSON.parse(err.message)) return done(JSON.parse(err.message));
+        return done(err);
       }
       done();
     });
