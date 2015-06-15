@@ -1,13 +1,13 @@
-<div class="collapsible-header active"><%= repository %>
+<div class="collapsible-header active"><%- repository %>
   <span class="right">
-    <a href="http://prose.io/#<%= owner %>/<%= repository %>" target="_blank" class="edit" alt="edit the site <%= repository %> using prose.io"><i class="mdi-editor-mode-edit"></i></a>
-    <a href="#" class="delete" alt="delete the site <%= repository %>"><i class="mdi-action-delete"></i></a>
+    <a href="http://prose.io/#<%- owner %>/<%- repository %>" target="_blank" class="edit" alt="edit the site <%- repository %> using prose.io"><i class="mdi-editor-mode-edit"></i></a>
+    <a href="#" class="delete" alt="delete the site <%- repository %>"><i class="mdi-action-delete"></i></a>
     <% if (builds.length != 0) { %>
-      <a href="/site/<%= owner %>/<%= repository %>/<%= defaultBranch %>" class="view" alt="go to the site <%= repository %> in a new tab" target="_blank"><i class="mdi-action-open-in-new"></i></a>
+      <a href="/site/<%- owner %>/<%- repository %>/<%- defaultBranch %>" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank"><i class="mdi-action-open-in-new"></i></a>
     <% } %>
   </span>
 </div>
 <div class="collapsible-body">
-  <p>This is uses <%= engine %> as a build engine and has been built <%= builds.length %> times</p>
+  <p>This is uses <%- engine %> as a build engine and has been built <%= builds.length %> times</p>
 
 </div>
