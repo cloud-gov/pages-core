@@ -115,7 +115,7 @@ module.exports = {
       model.state = (err) ? 'error' : (skip) ? 'skipped' : 'success';
 
       // Add error message if it exists
-      if (err) model.error = err;
+      if (err) model.error = err.message || err;
 
       // Save updated model
       model.save();
