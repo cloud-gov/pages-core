@@ -77,5 +77,34 @@ module.exports = {
       }, done);
 
     });
+  },
+
+  /*
+   * Validate that a user is part of an approved Organization
+   * @param {object} values to become a user model
+   * @param {Function} callback function
+   */
+  validateUser: function(accessToken, done) {
+    var approved = sails.config.passport.github.organizations || [];
+
+    // Authenticate request with user's oauth token
+    github.authenticate({
+      type: 'oauth',
+      token: accessToken
+    });
+
+    // Get user's organizations
+    github.user.getOrgs({}, function(err, organizations) {
+      if (err) return done(new Error(JSON.parse(err.message)));
+
+      // Do the user's organizations in any on the approved list?
+      var hasApproval = _(organizations)
+            .pluck('id')
+            .intersection(approved)
+            .value().length > 0;
+      if (hasApproval) return done();
+      done(new Error('Unauthorized'));
+    });
   }
+
 };

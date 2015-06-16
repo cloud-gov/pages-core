@@ -1,3 +1,5 @@
+/* jshint laxcomma:true */
+
 var path     = require('path')
   , url      = require('url')
   , passport = require('passport');
@@ -109,31 +111,25 @@ passport.connect = function (req, query, profile, next) {
       //           authentication provider.
       // Action:   Create a new user and assign them a passport.
       if (!passport) {
-        User.create(user, function (err, user) {
-          if (err) {
-            if (err.code === 'E_VALIDATION') {
-              if (err.invalidAttributes.email) {
-                req.flash('error', 'Error.Passport.Email.Exists');
-              }
-              else {
-                req.flash('error', 'Error.Passport.User.Exists');
-              }
-            }
 
-            return next(err);
-          }
+        // Validate user should have access
+        GitHub.validateUser(query.tokens.accessToken, function(err) {
+          if (err) return next(err);
 
-          query.user = user.id;
+          User.create(user, function (err, user) {
+            if (err) return next(err);
 
-          Passport.create(query, function (err, passport) {
-            // If a passport wasn't created, bail out
-            if (err) {
-              return next(err);
-            }
+            query.user = user.id;
 
-            next(err, user);
+            Passport.create(query, function (err, passport) {
+              // If a passport wasn't created, bail out
+              if (err) return next(err);
+
+              next(err, user);
+            });
           });
         });
+
       }
       // Scenario: An existing user is trying to log in using an already
       //           connected passport.
@@ -144,14 +140,16 @@ passport.connect = function (req, query, profile, next) {
           passport.tokens = query.tokens;
         }
 
-        // Save any updates to the Passport before moving on
-        passport.save(function (err, passport) {
-          if (err) {
-            return next(err);
-          }
+        GitHub.validateUser(query.tokens.accessToken, function(err) {
+          if (err) return next(err);
 
-          // Fetch the user associated with the Passport
-          User.findOne(passport.user.id, next);
+          // Save any updates to the Passport before moving on
+          passport.save(function (err, passport) {
+            if (err) return next(err);
+
+            // Fetch the user associated with the Passport
+            User.findOne(passport.user.id, next);
+          });
         });
       }
     } else {
@@ -161,16 +159,17 @@ passport.connect = function (req, query, profile, next) {
       if (!passport) {
         query.user = req.user.id;
 
-        Passport.create(query, function (err, passport) {
-          // If a passport wasn't created, bail out
-          if (err) {
-            return next(err);
-          }
+        GitHub.validateUser(query.tokens.accessToken, function(err) {
+          if (err) return next(err);
 
-          next(err, req.user);
+          Passport.create(query, function (err, passport) {
+            // If a passport wasn't created, bail out
+            if (err) return next(err);
+            next(err, req.user);
+          });
         });
       }
-      // Scenario: The user is a nutjob or spammed the back-button.
+      // Scenario: The user is already logged in or pushed the back-button.
       // Action:   Simply pass along the already established session.
       else {
         next(null, req.user);
@@ -196,7 +195,7 @@ passport.endpoint = function (req, res) {
   // If a provider doesn't exist for this endpoint, send the user back to the
   // login page
   if (!strategies.hasOwnProperty(provider)) {
-    return res.redirect('/login');
+    return res.notFound('Provider does not exist');
   }
 
   // Attach scope if it has been set in the config
