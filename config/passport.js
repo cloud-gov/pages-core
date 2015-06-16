@@ -40,8 +40,9 @@ module.exports.passport = {
     options: {
       clientID: 'your-client-id',
       clientSecret: 'your-client-secret',
-      scope: ['user', 'repo'] 
-    }
+      scope: ['user', 'repo']
+    },
+    organizations: [] // IDs for approved organizations
   },
   //
   // facebook: {
