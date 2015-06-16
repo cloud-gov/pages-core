@@ -1,3 +1,5 @@
+/* jshint laxcomma:true */
+
 var path     = require('path')
   , url      = require('url')
   , passport = require('passport');
@@ -109,31 +111,25 @@ passport.connect = function (req, query, profile, next) {
       //           authentication provider.
       // Action:   Create a new user and assign them a passport.
       if (!passport) {
-        User.create(user, function (err, user) {
-          if (err) {
-            if (err.code === 'E_VALIDATION') {
-              if (err.invalidAttributes.email) {
-                req.flash('error', 'Error.Passport.Email.Exists');
-              }
-              else {
-                req.flash('error', 'Error.Passport.User.Exists');
-              }
-            }
 
-            return next(err);
-          }
+        // Validate user should have access
+        GitHub.validateUser(query.tokens.accessToken, function(err) {
+          if (err) return next(err);
 
-          query.user = user.id;
+          User.create(user, function (err, user) {
+            if (err) return next(err);
 
-          Passport.create(query, function (err, passport) {
-            // If a passport wasn't created, bail out
-            if (err) {
-              return next(err);
-            }
+            query.user = user.id;
 
-            next(err, user);
+            Passport.create(query, function (err, passport) {
+              // If a passport wasn't created, bail out
+              if (err) return next(err);
+
+              next(err, user);
+            });
           });
         });
+
       }
       // Scenario: An existing user is trying to log in using an already
       //           connected passport.
