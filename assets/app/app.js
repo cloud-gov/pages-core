@@ -29,7 +29,7 @@ dispatcher.listenTo(sites, 'change', function () {
 
 dispatcher.listenTo(newSiteView, 'success', function () {
   listView.collection.fetch();
-})
+});
 
 dispatcher.listenTo(listView, 'newsite', function () {
   newSiteView.toggleDisplay();

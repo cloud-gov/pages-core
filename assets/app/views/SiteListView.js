@@ -27,7 +27,10 @@ var SiteListView = Backbone.View.extend({
       authenticated = opts.authenticated || false;
       this.authenticated = authenticated;
     }
-    html = this.template({ authenticated: this.authenticated , sitesCount: sitesCount});
+    html = this.template({
+      authenticated: this.authenticated,
+      sitesCount: sitesCount
+    });
     this.$el.html(html);
 
     if (sitesCount > 0) {
