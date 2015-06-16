@@ -62,14 +62,19 @@ var AuthController = {
       // Only certain error messages are returned via req.flash('error', someError)
       // because we shouldn't expose internal authorization errors to the user.
       // We do return a generic error and the original request body.
-      var flashError = req.flash('error')[0];
+      var flashError = req.flash('error')[0],
+          queryParam;
 
-      if (err && !flashError ) {
+      if (err && err.message === 'Unauthorized') {
+        req.flash('error', 'Error.Passport.Unauthorized');
+      } else if (err && !flashError) {
         req.flash('error', 'Error.Passport.Generic');
       } else if (flashError) {
         req.flash('error', flashError);
       }
-      req.flash('form', req.body);
+
+      queryParam = req.flash('error')[0];
+      if (queryParam) queryParam = '?error=' + queryParam;
 
       // If an error was thrown, redirect the user to the
       // login, register or disconnect action initiator view.
@@ -78,20 +83,19 @@ var AuthController = {
 
       switch (action) {
         case 'register':
-          res.redirect('/register');
+          res.redirect('/register' + queryParam);
           break;
         case 'disconnect':
           res.redirect('back');
           break;
         default:
-          res.redirect('/login');
+          res.redirect('/' + queryParam);
       }
     }
 
     passport.callback(req, res, function (err, user, challenges, statuses) {
-      if (err || !user) {
-        return tryAgain(challenges);
-      }
+      if (err) return tryAgain(err);
+      if (!user) return tryAgain(challenges);
 
       req.login(user, function (err) {
         if (err) {
