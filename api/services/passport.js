@@ -140,14 +140,16 @@ passport.connect = function (req, query, profile, next) {
           passport.tokens = query.tokens;
         }
 
-        // Save any updates to the Passport before moving on
-        passport.save(function (err, passport) {
-          if (err) {
-            return next(err);
-          }
+        GitHub.validateUser(query.tokens.accessToken, function(err) {
+          if (err) return next(err);
 
-          // Fetch the user associated with the Passport
-          User.findOne(passport.user.id, next);
+          // Save any updates to the Passport before moving on
+          passport.save(function (err, passport) {
+            if (err) return next(err);
+
+            // Fetch the user associated with the Passport
+            User.findOne(passport.user.id, next);
+          });
         });
       }
     } else {
@@ -157,16 +159,17 @@ passport.connect = function (req, query, profile, next) {
       if (!passport) {
         query.user = req.user.id;
 
-        Passport.create(query, function (err, passport) {
-          // If a passport wasn't created, bail out
-          if (err) {
-            return next(err);
-          }
+        GitHub.validateUser(query.tokens.accessToken, function(err) {
+          if (err) return next(err);
 
-          next(err, req.user);
+          Passport.create(query, function (err, passport) {
+            // If a passport wasn't created, bail out
+            if (err) return next(err);
+            next(err, req.user);
+          });
         });
       }
-      // Scenario: The user is a nutjob or spammed the back-button.
+      // Scenario: The user is already logged in or pushed the back-button.
       // Action:   Simply pass along the already established session.
       else {
         next(null, req.user);
