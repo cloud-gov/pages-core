@@ -53,8 +53,8 @@ module.exports = {
    * @param {Site} site model to apply the webhook
    * @param {Function} callback function
    */
-  setWebhook: function(site, done) {
-    Passport.findOne({ user: site.user }).exec(function(err, passport) {
+  setWebhook: function(site, user, done) {
+    Passport.findOne({ user: user }).exec(function(err, passport) {
       if (err) return done(err);
 
       // Authenticate request with user's oauth token

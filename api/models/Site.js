@@ -44,7 +44,7 @@ module.exports = {
   registerSite: function(values, done) {
     async.parallel({
       // Set up GitHub webhook
-      hook: GitHub.setWebhook.bind(this, values)
+      hook: GitHub.setWebhook.bind(this, values, values.users[0])
     }, function(err, res) {
       // Ignore error if hook already exists; otherwise, return error
       if (err) {

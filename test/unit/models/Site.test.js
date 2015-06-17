@@ -23,7 +23,7 @@ describe('Site Model', function() {
         GitHub.setWebhook = setWebhook;
         done();
       });
-      Site.registerSite({});
+      Site.registerSite({ users: [] });
     });
   });
 
