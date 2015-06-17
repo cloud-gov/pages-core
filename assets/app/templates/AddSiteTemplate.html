@@ -15,9 +15,9 @@
     <% for (var template in templates) { %>
       <div class="col s12 m6" data-template="<%= template %>">
       <% template = templates[template]; %>
-        <div class="card pink lighten-5">
+        <div class="card grey lighten-3">
           <div class="card-content">
-            <span class="card-title"><%= template.title %></span>
+            <div class="card-title"><%= template.title %></div>
             <a href="<%= template.example %>" target="_blank">Example</a>
             <p><%= template.description %></p>
           </div>

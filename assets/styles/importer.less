@@ -64,8 +64,25 @@ main {
 }
 
 /* over write some of material.css */
+a {
+  text-transform: capitalize !important; // if we're gonna do it, we're gonna do it
+}
+input[type=text] {
+  border: 1px solid black;
+}
 select {
   display: block;
+}
+.card .card-title {
+  color: black;
+  font-size: 18px;
+  font-weight: 400;
+}
+.card .card-content .card-title {
+  line-height: 1em;
+}
+.card .card-action a {
+  color: white;
 }
 .collapsible-body {
   display: block;
