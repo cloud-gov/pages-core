@@ -26,7 +26,7 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  '*': ['passport'],
+  '*': false,
 
   /***************************************************************************
   *                                                                          *
@@ -49,12 +49,29 @@ module.exports.policies = {
 		// feed : ['isNiceToAnimals', 'hasRabbitFood']
 	// }
 
-  BuildController: ['passport', 'sessionAuth', 'filterCurrentUser'],
-  SiteController: {
-    '*': ['passport', 'sessionAuth', 'filterCurrentUser'],
-    'fork': ['passport', 'sessionAuth']
+  AuthController: {
+    '*': ['passport']
   },
-  UserController: ['passport', 'sessionAuth', 'filterSelfOnly'],
+
+  BuildController: {
+    'find': ['passport', 'sessionAuth', 'filterCurrentUser'],
+    'findOne': ['passport', 'sessionAuth', 'filterCurrentUser']
+  },
+
+  SiteController: {
+    'create': ['passport', 'sessionAuth'],
+    'destroy': ['passport', 'sessionAuth', 'filterCurrentUser'],
+    'find': ['passport', 'sessionAuth', 'filterCurrentUser'],
+    'findOne': ['passport', 'sessionAuth', 'filterCurrentUser'],
+    'fork': ['passport', 'sessionAuth'],
+    'update': ['passport', 'sessionAuth', 'filterCurrentUser']
+  },
+
+  UserController: {
+    'find': ['passport', 'sessionAuth', 'filterSelfOnly'],
+    'findOne': ['passport', 'sessionAuth', 'filterSelfOnly'],
+    'populate': ['passport', 'sessionAuth', 'filterSelfOnly']
+  },
 
   WebhookController: true
 
