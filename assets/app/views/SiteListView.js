@@ -15,11 +15,6 @@ var SiteListView = Backbone.View.extend({
   },
   initialize: function initializeSiteListView() {
     this.listenTo(this.collection, 'update', this.render);
-    this.listenTo(this.collection, '', function (a, b, c) {
-      console.log('a', a);
-      console.log('b', b);
-      console.log('c', c);
-    });
     return this;
   },
   render: function renderSiteListView(opts) {
