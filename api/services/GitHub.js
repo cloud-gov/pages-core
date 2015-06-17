@@ -14,8 +14,12 @@ module.exports = {
    * @param {Function} callback function
    */
   forkRepository: function(user, templateId, done) {
+    var template = sails.config.templates[templateId];
+
+    if (!template) return done(new Error('Invalid template ID'));
+
     Passport.findOne({ user: user.id }).exec(function(err, passport) {
-      var repoUrl = url.parse(sails.config.templates[templateId].repo),
+      var repoUrl = url.parse(template.repo),
           repoOwner = repoUrl.pathname.split('/')[1],
           repoName = repoUrl.pathname.split('/')[2],
           data = {
