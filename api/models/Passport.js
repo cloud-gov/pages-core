@@ -32,6 +32,9 @@ function hashPassword (passport, next) {
  * the user, but not the authentication data, to and from the session.
  */
 var Passport = {
+  // Enforce model schema in the case of schemaless databases
+  schema: true,
+
   attributes: {
     // Required field: Protocol
     //
