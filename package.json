@@ -39,7 +39,7 @@
     "debug": "node debug app.js",
     "browserify": "browserify -t brfs assets/app/app.js -o assets/js/bundle.js",
     "dev": "npm run watch & npm run watchify",
-    "watch": "nodemon app.js",
+    "watch": "nodemon app.js --ignore assets/ --ignore .tmp/",
     "watchify": "watchify --debug -t brfs assets/app/app.js -o assets/js/bundle.js",
     "test": "mocha test/bootstrap.test.js test/unit/**/*.test.js",
     "materialize": "cp node_modules/materialize-css/bin/materialize.css assets/styles/ && cp -R node_modules/materialize-css/font assets/ && cp node_modules/materialize-css/bin/materialize.js assets/js/dependencies/"
