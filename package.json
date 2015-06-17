@@ -34,7 +34,7 @@
     "validator": "^3.39.0"
   },
   "scripts": {
-    "install": "gem install github-pages && npm run materialize",
+    "install": "npm run materialize",
     "start": "npm run browserify && node app.js",
     "debug": "node debug app.js",
     "browserify": "browserify -t brfs assets/app/app.js -o assets/js/bundle.js",
