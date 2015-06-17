@@ -14,8 +14,7 @@ var SiteListView = Backbone.View.extend({
     'click .add-site-action': 'triggerNewSite'
   },
   initialize: function initializeSiteListView() {
-    this.listenTo(this.collection, 'sync', this.render);
-
+    this.listenTo(this.collection, 'update', this.render);
     return this;
   },
   render: function renderSiteListView(opts) {
