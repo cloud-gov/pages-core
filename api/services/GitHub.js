@@ -37,7 +37,7 @@ module.exports = {
           'repository': repoName,
           'defaultBranch': suc.default_branch,
           'engine': 'jekyll',
-          'user': user.id
+          'users': [user.id]
         };
 
         Site.create(values).exec(function createCB(err, created) {

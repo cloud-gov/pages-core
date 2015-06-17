@@ -32,6 +32,7 @@ var AddSiteView = Backbone.View.extend({
   onSubmitGithubRepo: function onSubmitGithubRepo() {
     var data = {};
     this.$('form').serializeArray().map(function(d) {
+      if (d.name === 'users') d.value = [+d.value];
       data[d.name] = d.value;
     });
 
