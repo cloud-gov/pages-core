@@ -50,7 +50,10 @@ module.exports.policies = {
 	// }
 
   BuildController: ['passport', 'sessionAuth', 'filterCurrentUser'],
-  SiteController: ['passport', 'sessionAuth', 'filterCurrentUser'],
+  SiteController: {
+    '*': ['passport', 'sessionAuth', 'filterCurrentUser'],
+    'fork': ['passport', 'sessionAuth']
+  },
   UserController: ['passport', 'sessionAuth', 'filterSelfOnly'],
 
   WebhookController: true
