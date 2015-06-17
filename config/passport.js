@@ -42,7 +42,9 @@ module.exports.passport = {
       clientSecret: 'your-client-secret',
       scope: ['user', 'repo']
     },
-    organizations: [] // IDs for approved organizations
+    // IDs for approved organizations
+    // Includes the 18F organization by default
+    organizations: [6233994]
   },
   //
   // facebook: {

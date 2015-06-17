@@ -14,7 +14,8 @@ var User = {
       collection: 'Passport',
       via: 'user'
     },
-    sites: { collection: 'site',
+    sites: {
+      collection: 'site',
       via: 'users'
     },
     builds: {

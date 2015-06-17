@@ -5,6 +5,7 @@ var siteUrl = '/v0/site';
 var SiteModel = Backbone.Model.extend({
   defaults: {
     'builds': [],
+    'users': [],
     'repository': 'Repo goes here',
     'engine': 'jekyll',
     'branch': 'master'
