@@ -1,5 +1,3 @@
-var cfenv = require('cfenv'),
-    appEnv = cfenv.getAppEnv();
 
 /**
  * Production environment settings
@@ -16,7 +14,7 @@ var cfenv = require('cfenv'),
 module.exports = {
 
   webhook: {
-    endpoint: appEnv ? appEnv.url + '/webhook/github' : '',
+    endpoint: process.env.GITHUB_WEBHOOK_URL || '',
     secret: process.env.GITHUB_WEBHOOK_SECRET || 'testingSecret'
   }
 
