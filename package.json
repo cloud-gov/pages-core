@@ -10,6 +10,7 @@
     "brfs": "^1.4.0",
     "browserify": "^10.2.4",
     "ejs": "~0.8.4",
+    "express-force-ssl": "^0.2.12",
     "github": "^0.2.4",
     "grunt": "0.4.2",
     "grunt-contrib-clean": "~0.5.0",

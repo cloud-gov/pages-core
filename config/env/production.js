@@ -16,6 +16,12 @@ module.exports = {
   webhook: {
     endpoint: process.env.GITHUB_WEBHOOK_URL || '',
     secret: process.env.GITHUB_WEBHOOK_SECRET || 'testingSecret'
+  },
+
+  http: {
+    middleware: {
+      forceSSL: require('express-force-ssl')
+    }
   }
 
   /***************************************************************************
