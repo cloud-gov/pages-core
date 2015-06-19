@@ -1,3 +1,6 @@
+var cfenv = require('cfenv'),
+    appEnv = cfenv.getAppEnv();
+
 /**
  * Production environment settings
  *
@@ -11,6 +14,11 @@
  */
 
 module.exports = {
+
+  webhook: {
+    endpoint: appEnv ? appEnv.url + '/webhook/github' : '',
+    secret: process.env.GITHUB_WEBHOOK_SECRET || 'testingSecret'
+  }
 
   /***************************************************************************
    * Set the default database connection for models in the production        *
