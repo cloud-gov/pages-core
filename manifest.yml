@@ -1,0 +1,4 @@
+---
+applications:
+- name: federalist
+  domain: 18f.gov
