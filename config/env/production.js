@@ -1,7 +1,7 @@
 var cfenv = require('cfenv'),
     appEnv = cfenv.getAppEnv();
     dbURL = appEnv.getServiceURL('federalist-database');
-console.log(dbURL);
+
 /**
  * Production environment settings
  *

@@ -39,7 +39,8 @@
     "validator": "^3.39.0"
   },
   "scripts": {
-    "install": "(bundler -v || gem install bundler) && bundler install && npm run materialize",
+    "install": "npm run install-jekyll & npm run materialize",
+    "install-jekyll": "(bundler -v || sudo gem install bundler) && bundler install",
     "start": "npm run browserify && node app.js",
     "debug": "node debug app.js",
     "browserify": "browserify -t brfs assets/app/app.js -o assets/js/bundle.js",
