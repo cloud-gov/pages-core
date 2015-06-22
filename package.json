@@ -9,6 +9,7 @@
     "bcryptjs": "^2.1.0",
     "brfs": "^1.4.0",
     "browserify": "^10.2.4",
+    "cfenv": "^1.0.0",
     "ejs": "~0.8.4",
     "express-force-ssl": "^0.2.12",
     "github": "^0.2.4",
