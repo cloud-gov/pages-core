@@ -1,4 +1,5 @@
 var Backbone = require('backbone');
+var _ = require('underscore');
 
 var siteUrl = '/v0/site';
 
@@ -10,7 +11,10 @@ var SiteModel = Backbone.Model.extend({
     'engine': 'jekyll',
     'branch': 'master'
   },
-  urlRoot: siteUrl
+  urlRoot: siteUrl,
+  initialize: function() {
+    this.set('builds', _.where(this.collection.builds, { site: this.id }));
+  }
 });
 
 var SiteCollection = Backbone.Collection.extend({
@@ -18,7 +22,11 @@ var SiteCollection = Backbone.Collection.extend({
   url: siteUrl,
 
   initialize: function() {
-    this.fetch();
+    var collection = this;
+    $.getJSON('/v0/build', function(builds) {
+      collection.builds = builds;
+      collection.fetch();
+    });
   }
 });
 
