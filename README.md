@@ -63,7 +63,8 @@ module.exports = {
     github: {
       options: {
         clientID: '<<get from github>>',
-        clientSecret: '<<get from github>>'
+        clientSecret: '<<get from github>>',
+        callbackUrl: 'http://localhost:1337/auth/github/callback'
       }
     }
   },
