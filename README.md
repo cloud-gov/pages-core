@@ -39,13 +39,14 @@ $ npm install
    github: {
      options: {
        clientID: '<<use the value from Github here>>',
-       clientSecret: '<<use the value from Github here>>'
+       clientSecret: '<<use the value from Github here>>',
+       callbackUrl: 'http://localhost:1337/auth/github/callback',
      }
    }
  }
  ```
  
-* Set webhook settings for a public endpoint and secret
+* Set webhook settings for a public endpoint and secret. Note that your ngrok subdomain (the `Vncr0qo2Yx` bit below) will be different.
 
   ```
   webhook: {

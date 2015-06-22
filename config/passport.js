@@ -38,8 +38,9 @@ module.exports.passport = {
     protocol: 'oauth2',
     strategy: require('passport-github').Strategy,
     options: {
-      clientID: 'your-client-id',
-      clientSecret: 'your-client-secret',
+      clientID: process.env.GITHUB_CLIENT_ID || 'not_set',
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || 'not_set',
+      callbackURL: process.env.GITHUB_CLIENT_CALLBACK_URL || 'not_set',
       scope: ['user', 'repo']
     },
     // IDs for approved organizations
