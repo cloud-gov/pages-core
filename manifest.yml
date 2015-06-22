@@ -1,4 +1,5 @@
 ---
 applications:
 - name: federalist
+  buildpack: https://github.com/cloudfoundry/nodejs-buildpack
   domain: 18f.gov
