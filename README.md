@@ -35,15 +35,15 @@ $ npm install
 * Set up [an application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a Client ID and Client Secret. You'll need to create a JavaScript file and label it local.js. Save this file to the config folder located in the project you downloaded. Use those  values in `config/local.js`
 
  ```
- passport: {
-   github: {
-     options: {
-       clientID: '<<use the value from Github here>>',
-       clientSecret: '<<use the value from Github here>>',
-       callbackUrl: 'http://localhost:1337/auth/github/callback',
-     }
-   }
- }
+  passport: {
+    github: {
+      options: {
+        clientID: '<<use the value from Github here>>',
+        clientSecret: '<<use the value from Github here>>',
+        callbackUrl: 'http://localhost:1337/auth/github/callback'
+      }
+    }
+  }
  ```
  
 * Set webhook settings for a public endpoint and secret. Note that your ngrok subdomain (the `Vncr0qo2Yx` bit below) will be different.
