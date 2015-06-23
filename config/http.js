@@ -9,6 +9,11 @@
  * http://sailsjs.org/#/documentation/reference/sails.config/sails.config.http.html
  */
 
+// Serve the assets directory live instead of from .tmp/public
+module.exports.paths =  {
+  public: 'assets'
+};
+
 module.exports.http = {
 
   /****************************************************************************
