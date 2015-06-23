@@ -50,12 +50,7 @@ module.exports = {
               site: model.id,
               branch: model.defaultBranch
           };
-          Build.create(build).exec(function(err, build) {
-            console.log('err', err);
-            console.log('build', build);
-            if (err) return done(err);
-            return done(null, build);
-          });
+          Build.create(build, done);
         });
   },
 
