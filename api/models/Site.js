@@ -45,13 +45,14 @@ module.exports = {
     User.findOne({username: model.owner})
         .exec(function(err, user){
           if (err) return done(err);
-
           var build = {
               user: user.id,
               site: model.id,
               branch: model.defaultBranch
           };
-          Build.create(build).exec(function(err, buid) {
+          Build.create(build).exec(function(err, build) {
+            console.log('err', err);
+            console.log('build', build);
             if (err) return done(err);
             return done(null, build);
           });
