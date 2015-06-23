@@ -7,13 +7,20 @@ exports.up = function(db, callback) {
     models: {
       connection: 'postgres',
       migrate: 'alter'
+    },
+    hooks: {
+      grunt: false,
+      http: false,
+      pubsub: false,
+      sockets: false,
+      views: false
     }
   }, function(err, sails) {
     if (err) throw err;
-    setTimeout(sails.lower.bind(this, callback), 0);
+    sails.lower(callback);
   });
 };
 
 exports.down = function(db, callback) {
-  callback();
+  db.runSql('drop schema public cascade; create schema public;', callback);
 };
