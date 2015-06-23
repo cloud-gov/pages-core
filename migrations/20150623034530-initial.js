@@ -14,11 +14,16 @@ exports.up = function(db, callback) {
 };
 
 exports.down = function(db, callback) {
-  async.series([
-    db.dropTable.bind(db, 'build'),
-    db.dropTable.bind(db, 'passport'),
-    db.dropTable.bind(db, 'site'),
-    db.dropTable.bind(db, 'site_users__user_sites'),
-    db.dropTable.bind(db, 'user')
-  ], callback);
+  var q = async.queue(db.dropTable.bind(db));
+  q.drain = callback;
+
+  db.runSql('DELETE FROM migrations', function(err) {
+    if (err) throw err;
+    q.push('build');
+    q.push('passport');
+    q.push('site');
+    q.push('site_users__user_sites');
+    q.push('user');
+  });
+
 };
