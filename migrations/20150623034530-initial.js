@@ -1,23 +1,15 @@
 var dbm = global.dbm || require('db-migrate');
 var type = dbm.dataType;
-var Sails = require('sails');
+var fs = require('fs');
 
 exports.up = function(db, callback) {
-  Sails.lift({
-    models: {
-      connection: 'postgres',
-      migrate: 'alter'
-    },
-    hooks: {
-      grunt: false,
-      http: false,
-      pubsub: false,
-      sockets: false,
-      views: false
-    }
-  }, function(err, sails) {
+  fs.readFile(__dirname + '/initial.sql', { encoding: 'utf-8' }, function(err, data) {
     if (err) throw err;
-    sails.lower(callback);
+    console.log(data);
+    db.runSql(data, function() {
+      if (err) throw err;
+      callback();
+    });
   });
 };
 
