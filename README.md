@@ -1,4 +1,5 @@
-# Federalist
+# Federalist 
+[![Build Status](https://travis-ci.org/18F/federalist.svg?branch=master)](https://travis-ci.org/18F/federalist)
 
 ***Under active development. Everything is subject to change.***
 
@@ -88,6 +89,25 @@ If you are working on the front-end of the application, the things you need to k
 0. It lives in `/assets/app`
 
 You can use `npm run dev` to get the project built and running. This will set up `watchify` to run when front end files change and will set up the server to reload on any file change (front end included)
+
+#### Using Postgres
+By default, the application should use local disk storage in place of a database. This is easier to get started and isn't a problem for local development. In production, the app uses Postgres as the data store. To use Postgres in your local dev environment:
+
+0. First, you'll need to [install Postgres](http://www.postgresql.org/download/).
+0. Next, you'll have to create the `federalist` database for the application. `$ createdb federalist` should do the trick
+0. Add postgres to your `/config/local.js` file
+
+```
+connections: {
+	postgres: { 
+		adapter: 'sails-postgresql', 
+		database: 'federalist'
+	}
+}, 
+models: { 
+	connection: 'postgres' 
+}
+```
 
 ## Architecture
 
