@@ -42,15 +42,19 @@ module.exports = {
   },
 
   afterCreate: function(model, done) {
-    User.findOne()
-        .where({username: model.owner})
-        .then(function(user){
+    User.findOne({username: model.owner})
+        .exec(function(err, user){
+          if (err) return done(err);
+
           var build = {
-              user: user.id, 
+              user: user.id,
               site: model.id,
               branch: model.defaultBranch
           };
-          Build.create(build).exec(console.log);
+          Build.create(build).exec(function(err, buid) {
+            if (err) return done(err);
+            return done(null, build);
+          });
         });
   },
 
