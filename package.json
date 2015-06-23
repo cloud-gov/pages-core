@@ -53,7 +53,7 @@
     "test": "mocha test/bootstrap.test.js test/unit/**/*.test.js",
     "materialize": "cp node_modules/materialize-css/bin/materialize.css assets/styles/ && cp -R node_modules/materialize-css/font assets/ && cp node_modules/materialize-css/bin/materialize.js assets/js/dependencies/",
     "migrate:create": "grunt db:migrate:create",
-    "migrate:up": "grunt db:migrate:up",
+    "migrate:up": "grunt db:migrate:up || true",
     "migrate:down": "grunt db:migrate:down"
   },
   "main": "app.js",
