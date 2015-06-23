@@ -1,4 +1,5 @@
-# Federalist
+# Federalist 
+[![Build Status](https://travis-ci.org/18F/federalist.svg?branch=master)](https://travis-ci.org/18F/federalist)
 
 ***Under active development. Everything is subject to change.***
 
