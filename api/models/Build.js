@@ -35,7 +35,7 @@ module.exports = {
 
   afterCreate: function(model, done) {
     this.addJob(model);
-    done();
+    if (done) return done();
   },
 
   /**
