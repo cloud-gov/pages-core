@@ -1,65 +1,112 @@
+/// <reference path="../../typings/node/node.d.ts"/>
+
 var exec = require('child_process').exec;
+var path = require('path');
+var isWindows = /^win/.test(process.platform);
 
 /**
  * A service to managing build processes. Each engine gets its own method,
  * which takes a model, runs a shell process, and then returns the model
  * and any error message.
+ * 
+ * NOTE: On Windows, run commands should include a check for directory
+ * existence prior to RMDIR execution but IF EXIST statements don't concatenate
+ * in one line with '&&' which results in 'The system cannot find the path specified' error.
  */
 
 module.exports = {
-
   jekyll: function(model, done) {
 
-    // Run command template
-    this._run([
-      'rm -rf ${source}',
-      'mkdir -p ${source}',
-      'git clone -b ${branch} --single-branch ' +
-        'https://${token}@github.com/${owner}/${repository}.git ${source}',
-      'echo "baseurl: /${root}/${owner}/${repository}${branchURL}" > ' +
-        '${source}/_config_base.yml',
-      'jekyll build --safe --config ${source}/_config.yml,${source}/_config_base.yml ' +
-        '--source ${source} --destination ${source}/_site',
-      'rm -rf ${destination}',
-      'mkdir -p ${destination}',
-      'cp -r ${source}/_site/* ${destination}',
-      'rm -rf ${source}'
-    ], model, done);
-
+    // Run command template based on OS
+    if (isWindows) {
+      this._run([
+        'RMDIR ${source} /S /Q',
+        'MKDIR ${source}',
+        'git clone -b ${branch} --single-branch ' +
+          'https://${token}@github.com/${owner}/${repository}.git ${source}',
+        'echo baseurl: /${root}/${owner}/${repository}/${branch} > ' +
+          '${source}\\_config_base.yml',
+        'jekyll build --safe --config ${source}\\_config.yml,${source}\\_config_base.yml ' +
+          '--source ${source} --destination ${source}\\_site',
+        'RMDIR ${destination} /S /Q',
+        'MKDIR ${destination}',
+        'XCOPY ${source}\\_site ${destination} /E /I',
+        'RMDIR ${source} /S /Q',
+      ], model, done);
+    } else {
+      this._run([
+        'rm -rf ${source}',
+        'mkdir -p ${source}',
+        'git clone -b ${branch} --single-branch ' +
+          'https://${token}@github.com/${owner}/${repository}.git ${source}',
+        'echo "baseurl: /${root}/${owner}/${repository}/${branch}" > ' +
+          '${source}/_config_base.yml',
+        'jekyll build --safe --config ${source}/_config.yml,${source}/_config_base.yml ' +
+          '--source ${source} --destination ${source}/_site',
+        'rm -rf ${destination}',
+        'mkdir -p ${destination}',
+        'cp -r ${source}/_site/* ${destination}',
+        'rm -rf ${source}'
+      ], model, done);
+    }
   },
 
   hugo: function(model, done) {
-
-    // Run command template
-    this._run([
-      'rm -rf ${source}',
-      'mkdir -p ${source}',
-      'git clone -b ${branch} --single-branch ' +
-        'https://${token}@github.com/${owner}/${repository}.git ${source}',
-      'hugo --baseUrl=/${root}/${owner}/${repository}${branchURL} ' +
-        '--source=${source}',
-      'rm -rf ${destination}',
-      'mkdir -p ${destination}',
-      'cp -r ${source}/public/* ${destination}',
-      'rm -rf ${source}'
-    ], model, done);
-
+    
+    // Run command template based on OS
+    if (isWindows) {
+      this._run([
+        'RMDIR ${source} /S /Q',
+        'MKDIR ${source}',
+        'git clone -b ${branch} --single-branch ' +
+          'https://${token}@github.com/${owner}/${repository}.git ${source}',
+        'hugo --baseUrl=/${root}/${owner}/${repository}/${branch} ' +
+          '--source=${source}',
+        'RMDIR ${destination} /S /Q',
+        'MKDIR ${destination}',
+        'XCOPY ${source}\\public ${destination} /E /I',
+        'RMDIR ${source} /S /Q',
+      ], model, done);
+    } else {
+      this._run([
+        'rm -rf ${source}',
+        'mkdir -p ${source}',
+        'git clone -b ${branch} --single-branch ' +
+          'https://${token}@github.com/${owner}/${repository}.git ${source}',
+        'hugo --baseUrl=/${root}/${owner}/${repository}/${branch} ' +
+          '--source=${source}',
+        'rm -rf ${destination}',
+        'mkdir -p ${destination}',
+        'cp -r ${source}/public/* ${destination}',
+        'rm -rf ${source}'
+      ], model, done);
+    }
   },
 
   static: function(model, done) {
 
-    // Run command template
-    this._run([
-      'rm -rf ${source}',
-      'mkdir -p ${source}',
-      'git clone -b ${branch} --single-branch ' +
-        'https://${token}@github.com/${owner}/${repository}.git ${source}',
-      'rm -rf ${destination}',
-      'mkdir -p ${destination}',
-      'cp -r ${source}/* ${destination}',
-      'rm -rf ${source}'
-    ], model, done);
-
+    // Run command template based on OS
+    if (isWindows) {
+      this._run([
+        'RMDIR ${source} /S /Q',
+        'MKDIR ${source}',
+        'git clone -b ${branch} --single-branch https://${token}@github.com/${owner}/${repository}.git ${source}',
+        'RMDIR ${destination} /S /Q',
+        'XCOPY ${source} ${destination} /E /I',
+        'RMDIR ${source} /S /Q'
+      ], model, done);
+    } else {
+      this._run([
+        'rm -rf ${source}',
+        'mkdir -p ${source}',
+        'git clone -b ${branch} --single-branch ' +
+          'https://${token}@github.com/${owner}/${repository}.git ${source}',
+        'rm -rf ${destination}',
+        'mkdir -p ${destination}',
+        'cp -r ${source}/* ${destination}',
+        'rm -rf ${source}'
+      ], model, done);
+    }
   },
 
   /*
@@ -84,7 +131,8 @@ module.exports = {
           branchURL: defaultBranch ? '' : '/' + model.branch,
           root: defaultBranch ? 'site' : 'preview'
         },
-        template = _.template(cmd.join(' && '));
+        // Temporary until workaround for single line IF EXIST logic is implemented
+        template = isWindows ? _.template(cmd.join(' & ')) : _.template(cmd.join(' && '));
 
     // Populate user's passport
     Passport.findOne({ user: model.user.id }).exec(function(err, passport) {
@@ -115,6 +163,13 @@ module.exports = {
       tokens.publish = sails.config.build.publishDir + '/' + tokens.root + '/' +
         tokens.owner + '/' + tokens.repository + tokens.branchURL;
 
+      // Remove leading slash and normalize path for Windows
+      if (isWindows) {
+        tokens.source = path.normalize(tokens.source.replace(/^\//, ''));
+        tokens.destination = path.normalize(tokens.destination.replace(/^\//, ''));
+        tokens.publish = path.normalize(tokens.publish.replace(/^\//, ''));
+      }
+
       // Run command in child process and
       // call callback with error and model
       exec(template(tokens), function(err, stdout, stderr) {
@@ -138,34 +193,47 @@ module.exports = {
    */
   publish: function(tokens, model, done) {
 
-    // If an S3 bucket is defined, sync the site to it
-    if (sails.config.build.s3Bucket) {
-      var syncConfig = {
+    // Switch on publish environment
+    // Need to include "azure" case
+    switch (Object.keys(sails.config.build)) {
+      
+      // If an S3 bucket is defined, sync the site to it
+      case "s3Bucket":
+        var syncConfig = {
             prefix: tokens.root + '/' +
               tokens.owner + '/' +
               tokens.repository +
               tokens.branchURL,
             directory: tokens.destination
           };
-      sails.log.verbose('Publishing job: ', model.id,
-        ' => ', sails.config.build.s3Bucket);
-      S3(syncConfig, function(err) {
-        done(err, model);
-      });
-
-    // Or else copy the site to a local directory
-    } else {
-      var cmd = _.template(['rm -r ${publish} || true',
-            'mkdir -p ${publish}',
-            'cp -r ${destination}/ ${publish}',
-          ].join(' && '));
-      sails.log.verbose('Publishing job: ', model.id,
-        ' => ', tokens.publish);
-      exec(cmd(tokens), function(err, stdout, stderr) {
-        if (stdout) sails.log.verbose('stdout: ' + stdout);
-        if (stderr) sails.log.verbose('stderr: ' + stderr);
-        done(err, model);
-      });
+        sails.log.verbose('Publishing job: ', model.id,
+          ' => ', sails.config.build.s3Bucket);
+        S3(syncConfig, function(err) {
+          done(err, model);
+        });
+      
+      // Or else copy the site to a local directory
+      default:
+        var cmd;
+        if (isWindows) {
+          cmd = _.template([
+              'RMDIR ${publish} /S /Q',
+              'MKDIR ${publish}',
+              'XCOPY ${destination} ${publish} /E /I'
+            ].join(' & '));
+        } else {
+          cmd = _.template(['rm -r ${publish} || true',
+              'mkdir -p ${publish}',
+              'cp -r ${destination}/ ${publish}',
+            ].join(' && '));
+        }
+        sails.log.verbose('Publishing job: ', model.id,
+          ' => ', tokens.publish);
+        exec(cmd(tokens), function(err, stdout, stderr) {
+          if (stdout) sails.log.verbose('stdout: ' + stdout);
+          if (stderr) sails.log.verbose('stderr: ' + stderr);
+          done(err, model);
+        });
     }
 
   }
