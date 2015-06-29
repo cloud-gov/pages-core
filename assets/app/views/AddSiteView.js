@@ -52,8 +52,8 @@ var AddSiteView = Backbone.View.extend({
     $.ajax('/v0/site/fork', {
       method: 'POST',
       data: data,
-      error: this.onSuccess.bind(this),
-      success: this.onSuccess.bind(this)
+      success: this.onSuccess.bind(this),
+      error: this.onError.bind(this)
     });
   },
   onSuccess: function onSuccess(e) {

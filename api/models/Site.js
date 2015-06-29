@@ -41,6 +41,19 @@ module.exports = {
     this.registerSite(values, done);
   },
 
+  afterCreate: function(model, done) {
+    User.findOne({username: model.owner})
+        .exec(function(err, user){
+          if (err) return done(err);
+          var build = {
+              user: user.id,
+              site: model.id,
+              branch: model.defaultBranch
+          };
+          Build.create(build, done);
+        });
+  },
+
   registerSite: function(values, done) {
     async.parallel({
       // Set up GitHub webhook
