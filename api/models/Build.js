@@ -67,7 +67,7 @@ module.exports = {
                 directory: tokens.destination
               };
 
-          sails.log.verbose('Syncing job: ', model.id, syncConfig);
+          sails.log.verbose('Syncing job: ', model.id);
 
           S3(syncConfig, function(err) {
             done(err, model);
