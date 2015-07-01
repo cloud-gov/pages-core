@@ -113,7 +113,8 @@ module.exports = {
       // Run command in child process and
       // call callback with error and model
       exec(template(tokens), function(err) {
-        done(err, model);
+        sails.log.verbose(arguments);
+        done(err, tokens);
       });
 
     }

@@ -55,7 +55,24 @@ module.exports = {
         sails.log.verbose('Starting job: ', model.id);
 
         // Run the build with the appropriate engine and the model
-        buildEngines[model.site.engine](model, done);
+        buildEngines[model.site.engine](model, function(err, tokens) {
+          if (err) return done(err, model);
+          if (!sails.config.build.s3Bucket) return done(null, model);
+
+          var syncConfig = {
+                prefix: 'site/' +
+                  tokens.owner + '/' +
+                  tokens.repository + '/' +
+                  tokens.branch,
+                directory: tokens.destination
+              };
+
+          sails.log.verbose('Syncing job: ', model.id, syncConfig);
+
+          S3(syncConfig, function(err) {
+            done(err, model);
+          });
+        });
 
       });
 
