@@ -12,6 +12,39 @@ var fs = require('fs'),
 
 module.exports = function(config, done) {
 
+  config.compress = 'html|css|js|json';
+
+  // Loop through all files and selectively encode them
+  walk(config.directory, function(err, results) {
+    if (err) return done(err);
+
+    async.each(results, encode.bind(this, config), function(err) {
+      if (err) return done(err);
+
+      // After encoding, sync to S3
+      sync(config, done);
+    });
+  });
+
+};
+
+function encode(config, file, done) {
+  var contentType = mime.lookup(file),
+      ext = mime.extension(contentType),
+      match = new RegExp(config.compress);
+
+  if (!match.test(ext)) return done();
+
+  fs.readFile(file, function(err, data) {
+    if (err) return done(err);
+    zlib.gzip(data, function(err, data) {
+      if (err) return done(err);
+      fs.writeFile(file, data, done);
+    });
+  });
+}
+
+function sync(config, done) {
   var params = {
         localDir: config.directory,
         deleteRemoved: true,
@@ -19,7 +52,7 @@ module.exports = function(config, done) {
           Prefix: config.prefix || '',
           CacheControl: 'max-age=60'
         },
-        //getS3Params: setParams
+        getS3Params: setEncoding
       },
       uploader = s3Ext.uploadDir(params).on('error', function(err) {
         sails.log.error('unable to sync:', err.stack);
@@ -28,32 +61,36 @@ module.exports = function(config, done) {
         done();
       });
 
-  config.compress = 'html|css|js|json';
-
-  function setParams(file, stat, callback) {
+  function setEncoding(file, stat, done) {
     var s3Params = {},
         contentType = mime.lookup(file),
-        extension = mime.extension(contentType);
-
-    if (config.cache) s3Params.CacheControl = config.cache;
-
-    if ((new RegExp(config.compress)).test(extension)) {
-      var gzip = zlib.createGzip(),
-          inp = fs.createReadStream(file),
-          out = fs.createWriteStream(file);
-
-      s3Params.ContentEncoding = 'gzip';
-      console.log(s3Params);
-      out.on('finish', function() {
-        callback(null, s3Params);
-      });
-      inp.pipe(gzip).pipe(out);
-
-    } else {
-      console.log(s3Params);
-      callback(null, s3Params);
-    }
-
+        ext = mime.extension(contentType),
+        match = new RegExp(config.compress);
+    if (match.test(ext)) s3Params.ContentEncoding = 'gzip';
+    sails.log.verbose('syncing file: ', file);
+    done(null, s3Params);
   }
+}
 
-};
+function walk(dir, done) {
+  var results = [];
+  fs.readdir(dir, function(err, list) {
+    if (err) return done(err);
+    var pending = list.length;
+    if (!pending) return done(null, results);
+    list.forEach(function(file) {
+      file = dir + '/' + file;
+      fs.stat(file, function(err, stat) {
+        if (stat && stat.isDirectory()) {
+          walk(file, function(err, res) {
+            results = results.concat(res);
+            if (!--pending) done(null, results);
+          });
+        } else {
+          results.push(file);
+          if (!--pending) done(null, results);
+        }
+      });
+    });
+  });
+}
