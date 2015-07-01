@@ -41,7 +41,7 @@ $ npm install
       options: {
         clientID: '<<use the value from Github here>>',
         clientSecret: '<<use the value from Github here>>',
-        callbackUrl: 'http://localhost:1337/auth/github/callback'
+        callbackURL: 'http://localhost:1337/auth/github/callback'
       }
     }
   }
@@ -65,7 +65,7 @@ module.exports = {
       options: {
         clientID: '<<get from github>>',
         clientSecret: '<<get from github>>',
-        callbackUrl: 'http://localhost:1337/auth/github/callback'
+        callbackURL: 'http://localhost:1337/auth/github/callback'
       }
     }
   },
