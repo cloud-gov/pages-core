@@ -118,15 +118,18 @@ module.exports = {
 
     // Load model if only attributes are present
     if (typeof model.save === 'function') {
-      next(model);
+      if (err) return next(err, model);
+      next(null, model);
     } else {
       Build.findOne(model.id).exec(function(error, model) {
-        if (error) return sails.log.error(err);
-        next(model);
+        if (err) return next(err, model);
+        if (error) return next(error, model);
+        next(null, model);
       });
     }
 
-    function next(model) {
+    function next(err, model) {
+      if (err) sails.log.error('Build error: ', err);
 
       // Set job completion timestamp
       model.completedAt = new Date();
