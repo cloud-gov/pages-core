@@ -32,24 +32,34 @@
 <div class="row">
   <section>
     <h5>Or add your own Github repository</h5>
-    <form id="new-repo">
-      <input type="hidden" name="owner" value="<%- user.username %>"></input>
-      </br >
+    <form id="new-repo" class="col s12">
+      <div class="row">
+        <div class="col s6">
+          <label for="owner">owner name</label>
+          <input type="text" id="owner" name="owner" value="<%- user.username %>">
+        </div>
+        <div class="col s6">
+          <label for="repository">repository name</label>
+          <input type="text" name="repository" id="repository"></input>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col s6">
+          <label for="engine">engine</label>
+          <select name="engine" id="engine">
+            <option selected value="jekyll">Jekyll</option>
+            <option value="hugo">Hugo</option>
+            <option value="static">Static (just publish the files in the repository)</option>
+          </select>
+        </div>
+        <div class="col s6">
+          <label for="defaultBranch">default branch</label>
+          <input type="text" id="defaultBranch" name="defaultBranch" value="master">
+        </div>
+      </div>
 
       <input type="hidden" name="users" value="<%- user.id %>"></input>
-      </br >
-
-      <label for="repository">repository name</label>
-      <input type="text" name="repository" id="repository"></input>
-      </br >
-
-      <label for="engine">engine</label>
-      <select name="engine" id="engine">
-        <option value="jekyll">Jekyll</option>
-        <option value="hugo">Hugo</option>
-      </select>
-      </br >
-
       <input type="submit" class="btn" value="Submit repository-based site">
     </form>
   </section>
