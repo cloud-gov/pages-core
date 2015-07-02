@@ -126,3 +126,4 @@ nbproject
 .idea
 .node_history
 cf-ssh.yml
+.env
