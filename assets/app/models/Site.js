@@ -23,7 +23,7 @@ var SiteCollection = Backbone.Collection.extend({
 
   initialize: function() {
     var collection = this;
-    $.getJSON('/v0/build', function(builds) {
+    $.getJSON('/v0/build?sort=id%20DESC', function(builds) {
       collection.builds = builds;
       collection.fetch();
     });

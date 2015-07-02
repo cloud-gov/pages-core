@@ -1,3 +1,4 @@
+var querystring = require('querystring');
 /**
  * Filter Current User Policy
  * Filters requested items to those matching the current user
@@ -31,7 +32,8 @@ module.exports = function (req, res, next) {
 
     // Find route to populated listing, such as /v0/site => /v0/user/1/sites
     if (User.attributes[model + 's']) {
-      path = [req.options.prefix, 'user', req.user.id, model + 's'].join('/');
+      path = [req.options.prefix, 'user', req.user.id, model + 's'].join('/') +
+        '?' + querystring.stringify(req.query);
     }
 
     // Redirect to current user if requested model list
