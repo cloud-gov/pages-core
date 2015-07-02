@@ -3,5 +3,6 @@
  */
 module.exports.build = {
   sourceRoot: '/tmp/federalist',
-  destinationRoot: 'assets/site'
+  destinationRoot: 'assets/site',
+  s3Bucket: process.env.S3_BUCKET
 };

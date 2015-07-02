@@ -12,8 +12,8 @@ var dispatcher = _.clone(Backbone.Events);
 
 var user = new UserModel();
 var loginView = new UserView({model: user});
-var newSiteView = new AddSiteView({user: user});
 var sites = new SiteCollection();
+var newSiteView = new AddSiteView({user: user, collection: sites});
 var listView = new SiteListView({collection: sites});
 
 listView.render({authenticated: user.isAuthenticated()});

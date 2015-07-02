@@ -14,7 +14,7 @@ var AddSiteView = Backbone.View.extend({
   el: 'div.form',
   template: _.template(templateHtml),
   events: {
-    'click #submit': 'onSubmitGithubRepo',
+    'submit': 'onSubmitGithubRepo',
     'click .cancel-add-action': 'toggleDisplay',
     'click .card-action .btn': 'onTemplateSelection'
   },
@@ -29,7 +29,8 @@ var AddSiteView = Backbone.View.extend({
   toggleDisplay: function toggleDisplay() {
     this.$el.toggleClass('show');
   },
-  onSubmitGithubRepo: function onSubmitGithubRepo() {
+  onSubmitGithubRepo: function onSubmitGithubRepo(e) {
+    e.preventDefault();
     var data = {};
     this.$('form').serializeArray().map(function(d) {
       if (d.name === 'users') d.value = [+d.value];
@@ -38,8 +39,7 @@ var AddSiteView = Backbone.View.extend({
 
     console.log('data', data);
 
-    var newSite = new SiteModel();
-    newSite.save(data, {
+    new SiteModel(data, { collection: this.collection }).save(null, {
       success: this.onSuccess.bind(this),
       error: this.onError.bind(this)
     });

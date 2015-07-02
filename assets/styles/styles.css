@@ -39,10 +39,13 @@ a {
   text-transform: capitalize !important; /* if we're gonna do it, we're gonna do it */
 }
 input[type=text] {
-  border: 1px solid black;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding-left: 5px;
 }
 select {
   display: block;
+  border: 1px solid #ccc;
 }
 .card .card-title {
   color: black;
