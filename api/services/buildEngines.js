@@ -112,8 +112,10 @@ module.exports = {
 
       // Run command in child process and
       // call callback with error and model
-      exec(template(tokens), function(err) {
-        done(err, model);
+      exec(template(tokens), function(err, stdout, stderr) {
+        if (stdout) sails.log.verbose('stdout: ' + stdout);
+        if (stderr) sails.log.verbose('stderr: ' + stderr);
+        done(err, tokens);
       });
 
     }
