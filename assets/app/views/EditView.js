@@ -5,9 +5,6 @@ var _ = require('underscore');
 var SirTrevor = require('sir-trevor');
 var mdToHTML = require('markdown').markdown.toHTML;
 
-var markdownBlock = require('/Users/jeremiakimelman/code/sir-trevor-playground/markdownBlockByType');
-var markupBlock = require('/Users/jeremiakimelman/code/sir-trevor-playground/markupBlockByType');
-
 var Block = require('../models/Block').model;
 var Blocks = require('../models/Block').collection;
 
