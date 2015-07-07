@@ -23,16 +23,6 @@ main {
   text-align: center;
   padding: .5em 0;
 }
-.form {
-  display: none;
-}
-.form.show {
-  display: block;
-}
-/* this might look weird but it hides the main element when there is a sibling that is .form.show */
-.form.show ~ main {
-  display: none;
-}
 
 /* over write some of material.css */
 a {
