@@ -2,48 +2,56 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 var $ = window.jQuery = window.$ = Backbone.$;
 
+var MainContainerView = require('./views/MainContainerView');
+var AuthenticateView = require('./views/AuthenticateView');
 var AddSiteView = require('./views/AddSiteView');
-var UserModel = require('./models/User');
 var UserView = require('./views/UserView');
 var SiteListView = require('./views/SiteListView');
+var EditView = require('./views/EditView');
+
+var UserModel = require('./models/User');
 var SiteCollection = require('./models/Site').collection;
 
 var dispatcher = _.clone(Backbone.Events);
 
-var user = new UserModel();
-var loginView = new UserView({model: user});
-var sites = new SiteCollection();
-var newSiteView = new AddSiteView({user: user, collection: sites});
-var listView = new SiteListView({collection: sites});
-
-listView.render({authenticated: user.isAuthenticated()});
-
-dispatcher.listenTo(user, 'change', function() {
-  renderListView();
-  renderNewView();
-});
-
 dispatcher.listenTo(sites, 'change', function () {
-  renderListView();
+  router.navigate('', { trigger: true });
 });
 
-dispatcher.listenTo(newSiteView, 'success', function () {
-  listView.collection.fetch();
+var Router = Backbone.Router.extend({
+  routes: {
+    '': 'home',
+    'new': 'new',
+    'edit/*path': 'edit'
+  },
+  home: function () {
+    var authed = true; //user.isAuthenticated();
+    console.log('authed', authed);
+    if (authed) {
+      var listView = new SiteListView({collection: sites});
+      appView.pageSwitcher.set(listView);
+    }
+    else {
+      var authView = new AuthenticateView();
+      appView.pageSwitcher.set(authView);
+    }
+  },
+  new: function () {
+    var addSiteView = new AddSiteView({ user: user });
+    appView.pageSwitcher.set(addSiteView);
+  },
+  edit: function (path) {
+    console.log('editoring for', path);
+    var editView = new EditView({ path: path });
+    appView.pageSwitcher.set(editView);
+  }
 });
 
-dispatcher.listenTo(listView, 'newsite', function () {
-  newSiteView.toggleDisplay();
-});
+var user = new UserModel();
+var sites = new SiteCollection();
 
-function renderListView() {
-  listView.render({authenticated: user.isAuthenticated()});
-}
+var router = new Router();
+var appView = new MainContainerView({ user: user });
+var navbarView = new UserView({ model: user });
 
-function renderNewView() {
-  newSiteView.render({user: user});
-}
-
-window.d = dispatcher;
-window.u = user;
-window.l = listView;
-window.v = newSiteView;
+Backbone.history.start();
