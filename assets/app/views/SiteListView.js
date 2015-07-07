@@ -3,31 +3,22 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 
-var AddSiteView = require('./AddSiteView');
 var SiteListItemView = require('./SiteListItemView');
 var templateHtml = fs.readFileSync(__dirname + '/../templates/SiteListTemplate.html').toString();
 
 var SiteListView = Backbone.View.extend({
-  el: 'main',
+  tagName: 'div',
+  className: 'list',
   template: _.template(templateHtml),
-  events: {
-    'click .add-site-action': 'triggerNewSite'
-  },
-  initialize: function initializeSiteListView() {
+  initialize: function initializeSiteListView(opts) {
     this.listenTo(this.collection, 'update', this.render);
     return this;
   },
   render: function renderSiteListView(opts) {
-    var authenticated,
-        html,
+    var html,
         sitesCount = this.collection.length;
 
-    if (!this.authenticated) {
-      authenticated = opts.authenticated || false;
-      this.authenticated = authenticated;
-    }
     html = this.template({
-      authenticated: this.authenticated,
       sitesCount: sitesCount
     });
     this.$el.html(html);
@@ -43,9 +34,6 @@ var SiteListView = Backbone.View.extend({
     }
 
     return this;
-  },
-  triggerNewSite: function triggerNewSite() {
-    this.trigger('newsite');
   }
 });
 

@@ -3,7 +3,7 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 
-/* this bit require looks gross but it enables us to have one place
+/* this require looks gross but it enables us to have one place
 to set template data that is available to the front and back end apps */
 var SiteTemplates = require('../../../config/templates').templates;
 
@@ -11,23 +11,19 @@ var SiteModel = require('../models/Site').model;
 var templateHtml = fs.readFileSync(__dirname + '/../templates/AddSiteTemplate.html').toString();
 
 var AddSiteView = Backbone.View.extend({
-  el: 'div.form',
+  tagName: 'div',
+  className: 'form',
   template: _.template(templateHtml),
   events: {
     'submit': 'onSubmitGithubRepo',
-    'click .cancel-add-action': 'toggleDisplay',
     'click .card-action .btn': 'onTemplateSelection'
   },
   initialize: function initializeSiteView(opts) {
     this.user = opts.user;
-    this.listenTo(this.user, 'change', this.render);
   },
-  render: function renderSiteView() {
-    var html = this.template({user: this.user.toJSON(), templates: SiteTemplates });
+  render: function renderAddSiteView() {
+    var html = this.template({user: this.user.toJSON(), siteTemplates: SiteTemplates });
     this.$el.html(html);
-  },
-  toggleDisplay: function toggleDisplay() {
-    this.$el.toggleClass('show');
   },
   onSubmitGithubRepo: function onSubmitGithubRepo(e) {
     e.preventDefault();
@@ -47,8 +43,6 @@ var AddSiteView = Backbone.View.extend({
   onTemplateSelection: function onTemplateSelection(e) {
     var templateId = $(e.target).parents('.col').attr('data-template');
     var data = { templateId: templateId };
-    console.log('we will do something with', templateId);
-
     $.ajax('/v0/site/fork', {
       method: 'POST',
       data: data,
@@ -58,14 +52,12 @@ var AddSiteView = Backbone.View.extend({
   },
   onSuccess: function onSuccess(e) {
     console.log('winning', e);
-    this.toggleDisplay();
-    this.trigger('success');
+    this.trigger('site:save:success');
   },
   onError: function onError(e) {
     console.log('failing', e);
-    this.trigger('failure');
+    this.trigger('site:save:failure');
   }
 });
-
 
 module.exports = AddSiteView;
