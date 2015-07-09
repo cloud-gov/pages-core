@@ -20,7 +20,11 @@ var EditView = Backbone.View.extend({
     this.path = opts.path || false;
   },
   render: function () {
-    var html = this.template({ path: this.path });
+    var path = {
+      repo: this.path.split('/').slice(0, 2).join('/'),
+      file: this.path.split('/').slice(2, 4).join('/')
+    }
+    var html = this.template({ path: path });
     this.$el.html(html);
 
     if (!this.path) return this;
