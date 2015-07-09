@@ -4,9 +4,9 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 
 var UserModel = require('../models/User');
-var templateHtml = fs.readFileSync(__dirname + '/../templates/UserTemplate.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../templates/NavbarTemplate.html').toString();
 
-var UserView = Backbone.View.extend({
+var NavbarView = Backbone.View.extend({
   el: '.user',
   template: _.template(templateHtml),
   initialize: function initializeUserView() {
@@ -21,4 +21,4 @@ var UserView = Backbone.View.extend({
   }
 });
 
-module.exports = UserView;
+module.exports = NavbarView;
