@@ -4,9 +4,9 @@ var $ = window.jQuery = window.$ = Backbone.$;
 
 var MainContainerView = require('./views/MainContainerView');
 var AuthenticateView = require('./views/AuthenticateView');
+var SiteListView = require('./views/SiteListView');
 var AddSiteView = require('./views/AddSiteView');
 var UserView = require('./views/UserView');
-var SiteListView = require('./views/SiteListView');
 var EditView = require('./views/EditView');
 
 var UserModel = require('./models/User');
@@ -14,44 +14,42 @@ var SiteCollection = require('./models/Site').collection;
 
 var dispatcher = _.clone(Backbone.Events);
 
-dispatcher.listenTo(sites, 'change', function () {
-  router.navigate('', { trigger: true });
-});
-
 var Router = Backbone.Router.extend({
+  initialize: function () {
+    this.sites = new SiteCollection();
+    this.user = window.u = new UserModel();
+
+    this.navbarView = new UserView({ model: this.user });
+    this.app = new MainContainerView({ user: this.user, collection: this.sites });
+
+    this.listenTo(this.user, 'change', function () {
+      var authed = this.user.isAuthenticated();
+      if(authed) {
+        var listView = new SiteListView({ collection: this.sites });
+        this.app.pageSwitcher.set(listView);
+      }
+    });
+  },
   routes: {
     '': 'home',
     'new': 'new',
     'edit/*path': 'edit'
   },
   home: function () {
-    var authed = true; //user.isAuthenticated();
-    console.log('authed', authed);
-    if (authed) {
-      var listView = new SiteListView({collection: sites});
-      appView.pageSwitcher.set(listView);
-    }
-    else {
-      var authView = new AuthenticateView();
-      appView.pageSwitcher.set(authView);
-    }
+    var authView = new AuthenticateView();
+    this.app.pageSwitcher.set(authView);
   },
   new: function () {
     var addSiteView = new AddSiteView({ user: user });
-    appView.pageSwitcher.set(addSiteView);
+    this.app.pageSwitcher.set(addSiteView);
   },
   edit: function (path) {
     console.log('editoring for', path);
     var editView = new EditView({ path: path });
-    appView.pageSwitcher.set(editView);
+    this.app.pageSwitcher.set(editView);
   }
 });
 
-var user = new UserModel();
-var sites = new SiteCollection();
-
-var router = new Router();
-var appView = new MainContainerView({ user: user });
-var navbarView = new UserView({ model: user });
+var router = window.r = new Router();
 
 Backbone.history.start();
