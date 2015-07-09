@@ -41,8 +41,6 @@ var AppView = Backbone.View.extend({
     return this;
   },
   edit: function (path) {
-    console.log('editoring for', path);
-
     var editView = new EditView({ path: path });
     this.pageSwitcher.set(editView);
 
