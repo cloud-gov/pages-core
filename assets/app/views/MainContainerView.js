@@ -12,10 +12,6 @@ var AppView = Backbone.View.extend({
     this.user = opts.user;
     this.sites = opts.collection;
 
-    this.listenTo(this.user, 'change', function() {
-      this.home();
-    }.bind(this));
-
     this.render();
   },
   render: function () {

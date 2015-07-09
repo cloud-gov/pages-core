@@ -1,4 +1,4 @@
-var Backbone = require('backbone');
+var Backbone = window.Backbone = require('backbone');
 var _ = require('underscore');
 var $ = window.jQuery = window.$ = Backbone.$;
 
@@ -8,16 +8,17 @@ var NavbarView = require('./views/NavbarView');
 var UserModel = require('./models/User');
 var SiteCollection = require('./models/Site').collection;
 
-var dispatcher = _.clone(Backbone.Events);
-
 var Router = Backbone.Router.extend({
   initialize: function () {
     this.sites = new SiteCollection();
     this.user = window.u = new UserModel();
 
     this.navbarView = new NavbarView({ model: this.user });
-    this.app = new MainContainerView({ user: this.user, collection: this.sites });
+    this.mainView = new MainContainerView({ user: this.user, collection: this.sites });
 
+    this.listenTo(this.user, 'change', function () {
+      Backbone.history.loadUrl();
+    });
   },
   routes: {
     '': 'home',
@@ -25,18 +26,18 @@ var Router = Backbone.Router.extend({
     'edit(/)*path': 'edit'
   },
   home: function () {
-    this.app.home();
+    this.mainView.home();
     return this;
   },
   new: function () {
-    this.app.new();
+    this.mainView.new();
     return this;
   },
   edit: function (path) {
-    this.app.edit(path);
+    this.mainView.edit(path);
     return this;
   }
 });
 
-var router = window.r = new Router();
+window.federalist = new Router();
 Backbone.history.start();

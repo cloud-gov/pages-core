@@ -12,6 +12,8 @@ var NavbarView = Backbone.View.extend({
   initialize: function initializeUserView() {
     this.listenTo(this.model, 'change', this.render);
     this.render();
+
+    return this;
   },
   render: function renderUserView() {
     var user = this.model.toJSON();
