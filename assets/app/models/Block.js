@@ -84,7 +84,8 @@ var BlockCollection = Backbone.Collection.extend({
 })
 
 function markdownTextBlock (block) {
-  return markdown(block.html);
+  var text = markdown(block.html);
+  return text;
 }
 
 function markdownListBlock (block) {
@@ -97,6 +98,8 @@ function markdownListBlock (block) {
 function markdownHeadingBlock (block) {
   var div = document.createElement('div');
   div.innerHTML = block.html;
+  // 
+  // console.log('block', block);
 
   return '# ' + div.innerText;
 }

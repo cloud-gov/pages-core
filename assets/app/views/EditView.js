@@ -23,6 +23,8 @@ var EditView = Backbone.View.extend({
     var html = this.template({ path: this.path });
     this.$el.html(html);
 
+    if (!this.path) return this;
+
     var editorConfig = {
       el: this.$('.js-st-instance'),
       blockTypes: ["Heading", "Text", "List"]
@@ -30,6 +32,10 @@ var EditView = Backbone.View.extend({
 
     getMarkdownFromUrl(this.path, function () {
       this.editor = new SirTrevor.Editor(editorConfig);
+
+      this.$('.editor-preload').hide();
+      this.$('.editor').show();
+
       window.scroll(0,0);
     }.bind(this));
 
@@ -40,13 +46,16 @@ var EditView = Backbone.View.extend({
     var blockData = this.editor.store.retrieve();
     var blocks = new Blocks();
     blockData.data.map(function(b) {
-      console.log('b', b);
-      var block = new Block(b);
+      var opts = {
+        type: b.type,
+        html: b.data.text
+      };
+      var block = new Block(opts);
       blocks.add(block);
     });
 
     console.log('md', blocks.toMarkdown());
-    return blocks.toMarkdown();
+    return
   }
 });
 
