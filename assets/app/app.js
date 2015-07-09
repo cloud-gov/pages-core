@@ -1,6 +1,6 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
-var $ = window.jQuery = window.$ = Backbone.$;
+window.jQuery = window.$ = Backbone.$;
 
 var MainContainerView = require('./views/MainContainerView');
 var NavbarView = require('./views/NavbarView');
@@ -11,7 +11,7 @@ var SiteCollection = require('./models/Site').collection;
 var Router = Backbone.Router.extend({
   initialize: function () {
     this.sites = new SiteCollection();
-    this.user = window.u = new UserModel();
+    this.user = new UserModel();
 
     this.navbarView = new NavbarView({ model: this.user });
     this.mainView = new MainContainerView({ user: this.user, collection: this.sites });
