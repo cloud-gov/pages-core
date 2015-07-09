@@ -1,4 +1,4 @@
-var Backbone = window.Backbone = require('backbone');
+var Backbone = require('backbone');
 var _ = require('underscore');
 var $ = window.jQuery = window.$ = Backbone.$;
 
