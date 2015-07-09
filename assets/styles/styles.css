@@ -25,7 +25,7 @@ main {
 }
 
 /* over write some of material.css */
-a {
+.btn, .btn-large {
   text-transform: capitalize !important; /* if we're gonna do it, we're gonna do it */
 }
 input[type=text] {
@@ -53,4 +53,18 @@ select {
 }
 .card .card-action a {
   margin-right: 0;
+}
+
+/* get to actual app specific styling */
+.editor-preload {
+  margin: 0 auto;
+}
+.editor-preload > .col {
+  text-align: center;
+}
+.preloader-wrapper {
+  margin: 0 auto;
+}
+.editor {
+  display: none;
 }

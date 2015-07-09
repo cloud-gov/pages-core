@@ -1,12 +1,39 @@
-<div class="row">
-  <div class="col s6"><h5>Edit page</h5></div>
-  <div class="col s6"><p><a href="https://github.com/<%- path %>" target="_blank"><%- path %></a></p></div>
-</div>
-<div class="row">
+<% if (path) { %>
+<div class="row editor-preload">
   <div class="col s12">
-    <button id="markdown">save blocks</button>
-    <form>
-      <textarea class="js-st-instance"></textarea>
-    </form>
+    <div class="preloader-wrapper big active">
+     <div class="spinner-layer spinner-blue-only">
+       <div class="circle-clipper left">
+         <div class="circle"></div>
+       </div><div class="gap-patch">
+         <div class="circle"></div>
+       </div><div class="circle-clipper right">
+         <div class="circle"></div>
+       </div>
+     </div>
+    </div>
+  </div>
+  <div class="col s12">
+    <p>Loading file from Github</p>
   </div>
 </div>
+
+<div class="editor">
+  <div class="row">
+    <div class="col s6"><h5>Edit page</h5></div>
+    <div class="col s6"><p><a href="https://github.com/<%- path %>" target="_blank"><%- path %></a></p></div>
+  </div>
+  <div class="row">
+    <div class="col s12">
+      <button id="markdown">save blocks</button>
+      <form>
+        <textarea class="js-st-instance"></textarea>
+      </form>
+    </div>
+  </div>
+</div>
+<% } else { %>
+<div class="row">
+  <p>Please supply a route for now. Go ahead and try this <a href="#edit/18f/federalist/master/README.md">one</a></p>
+</div>
+<% } %>
