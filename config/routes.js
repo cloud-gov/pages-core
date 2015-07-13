@@ -34,6 +34,9 @@ module.exports.routes = {
 
   'post /webhook/github': 'WebhookController.github',
 
+  'get /preview/:owner/:repo/:branch': 'PreviewController.proxy',
+  'get /preview/:owner/:repo/:branch/*': 'PreviewController.proxy',
+
   /*
   *
   * Passport routes
