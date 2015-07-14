@@ -1,6 +1,8 @@
-var cfenv = require('cfenv'),
-    appEnv = cfenv.getAppEnv();
-    dbURL = appEnv.getServiceURL('federalist-database');
+var AWS = require('aws-sdk'),
+    cfenv = require('cfenv'),
+    appEnv = cfenv.getAppEnv(),
+    dbURL = appEnv.getServiceURL('federalist-database'),
+    s3Creds = appEnv.getServiceCreds('s3-sb-federalist.18f.gov');
 
 /**
  * Production environment settings
@@ -40,4 +42,12 @@ if (dbURL) {
   module.exports.models = {
     connection: 'postgres'
   };
+}
+
+// If running in Cloud Foundry with an S3 credential service available
+if (s3Creds) {
+  AWS.config.update({
+    accessKeyId: s3Creds.access_key,
+    secretAccessKey: s3Creds.secret_key
+  });
 }
