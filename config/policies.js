@@ -73,6 +73,10 @@ module.exports.policies = {
     'populate': ['passport', 'sessionAuth', 'filterSelfOnly']
   },
 
+  PreviewController: {
+    '*': ['passport', 'sessionAuth', 'previewProxy']
+  },
+
   WebhookController: true
 
 };
