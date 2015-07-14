@@ -22,14 +22,18 @@
   <p><em>Recent branches</em></p>
   <% } %>
   <ul>
-    <% _(builds).filter(function(build) {
+    <%
+    _(builds).chain().filter(function(build) {
       return build.branch !== defaultBranch;
-    }).forEach(function(build, index) {
-        if (index > 4) return;
+    }).unique(function(build) {
+      return build.branch;
+    }).first(5).forEach(function(build, index) {
     %>
     <li><p>
       <%- build.branch %>
       <% if (build.state === 'success') { %>
+      <a href="http://prose.io/#<%- owner %>/<%- repository %>/tree/<%- build.branch %>" target="_blank" class="edit" alt="edit the site <%- repository %> using prose.io"><i class="mdi-editor-mode-edit"></i></a>
+
       <a href="/preview/<%- owner %>/<%- repository %>/<%- build.branch %>/" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank"><i class="mdi-action-open-in-new"></i></a>
       <% } else if (build.status === 'error') { %>
       <code><%- build.error %></code>
