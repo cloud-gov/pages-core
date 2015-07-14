@@ -18,6 +18,9 @@ module.exports = {
           res.set(headers);
         }),
         stream = object.createReadStream().on('error', function(error) {
+          var file = key.split('/').pop().indexOf('.') !== -1,
+              notFound = error.statusCode === 404;
+          if (!file && notFound) return res.redirect(req.path + '/');
           res.send(error.statusCode, error.message);
         }).pipe(res);
   }
