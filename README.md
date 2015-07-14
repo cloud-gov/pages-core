@@ -76,7 +76,7 @@ module.exports = {
 };
 ```
 
-* Run the server with `npm start` or `node app.js` (You can use `npm run watch` for the server to restart when you save file changes) at the directory of the project on your local computer. 
+* Run the server with `npm start` or `node app.js` (You can use `npm run watch:server` for the server to restart when you save file changes) at the directory of the project on your local computer. 
 
 
 #### Build the server and the front-end
@@ -88,7 +88,7 @@ If you are working on the front-end of the application, the things you need to k
 0. It is built with `browserify` and uses `watchify` to build on changes
 0. It lives in `/assets/app`
 
-You can use `npm run dev` to get the project built and running. This will set up `watchify` to run when front end files change and will set up the server to reload on any file change (front end included)
+You can use `npm run watch` to get the project built and running. This will set up `watchify` to run when front end files change and will set up the server to reload on any file change (front end included)
 
 #### Using Postgres
 By default, the application should use local disk storage in place of a database. This is easier to get started and isn't a problem for local development. In production, the app uses Postgres as the data store. To use Postgres in your local dev environment:
