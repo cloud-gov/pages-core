@@ -4,10 +4,14 @@ var AWS = require('aws-sdk'),
 module.exports = {
 
   /*
-   * Proxies requires from S3 for so those requests can be authenticated
-   *
+   * Proxies requests so they can be authenticated
    */
-  proxy: function(req, res) {
+  proxy: function(req, res, next) {
+
+    // If not using S3, pass through to static asset middleware
+    if (!sails.config.build.s3Bucket) return next();
+
+    // For S3, proxy requests from S3 bucket
     var key = req.path.slice(1);
     if ((key).slice(-1) === '/') key = key + 'index.html';
 
