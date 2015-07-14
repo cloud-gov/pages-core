@@ -2,12 +2,45 @@
   <span class="right">
     <a href="/#edit/<%- owner %>/<%- repository %>/<%- defaultBranch %>/README.md" class="edit" alt="edit the site <%- repository %> using prose.io"><i class="mdi-editor-mode-edit"></i></a>
     <a href="#" class="delete" alt="delete the site <%- repository %>"><i class="mdi-action-delete"></i></a>
-    <% if (builds.length != 0) { %>
-      <a href="<%- siteRoot %>/site/<%- owner %>/<%- repository %>/<%- defaultBranch %>" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank"><i class="mdi-action-open-in-new"></i></a>
+    <% if (builds.length) { %>
+    <a href="<%- siteRoot %>/site/<%- owner %>/<%- repository %>/" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank"><i class="mdi-action-open-in-new"></i></a>
     <% } %>
   </span>
 </div>
 <div class="collapsible-body">
-  <p>This is uses <%- engine %> as a build engine and has been built <%= builds.length %> times</p>
+  <% if (!builds.length) { %>
+  <p>This site has not been built yet. Please refresh the page to see new builds.</p>
+  <% } else { %>
+  <%
+    var lastBuildTime = new Date(_(builds).findWhere({branch: defaultBranch}).completedAt);
+  %>
+  <p> This site was last built at <%- lastBuildTime %></p>
+  <% if (_(builds).filter(function(build) {
+      return build.branch !== defaultBranch;
+    }).length) {
+  %>
+  <p><em>Recent branches</em></p>
+  <% } %>
+  <ul>
+    <%
+    _(builds).chain().filter(function(build) {
+      return build.branch !== defaultBranch;
+    }).unique(function(build) {
+      return build.branch;
+    }).first(5).forEach(function(build, index) {
+    %>
+    <li><p>
+      <%- build.branch %>
+      <% if (build.state === 'success') { %>
+      <a href="http://prose.io/#<%- owner %>/<%- repository %>/tree/<%- build.branch %>" target="_blank" class="edit" alt="edit the site <%- repository %> using prose.io"><i class="mdi-editor-mode-edit"></i></a>
+
+      <a href="/preview/<%- owner %>/<%- repository %>/<%- build.branch %>/" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank"><i class="mdi-action-open-in-new"></i></a>
+      <% } else if (build.status === 'error') { %>
+      <code><%- build.error %></code>
+      <% } %>
+    </p></li>
+    <% }); %>
+  </ul>
+  <% } %>
 
 </div>
