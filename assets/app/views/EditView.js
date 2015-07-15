@@ -2,11 +2,19 @@ var fs = require('fs');
 
 var Backbone = require('backbone');
 var _ = require('underscore');
-var SirTrevor = require('sir-trevor');
+var SirTrevor = window.s = require('sir-trevor');
 var mdToHTML = require('markdown').markdown.toHTML;
 
 var Block = require('../models/Block').model;
 var Blocks = require('../models/Block').collection;
+
+var headings = require('./blocks/heading');
+SirTrevor.Blocks.H1 = headings.h1;
+SirTrevor.Blocks.H2 = headings.h2;
+SirTrevor.Blocks.H3 = headings.h3;
+SirTrevor.Blocks.Ordered = require('./blocks/ol');
+SirTrevor.Blocks.Unordered = require('./blocks/ul');
+SirTrevor.Blocks.Code = require('./blocks/code');
 
 var templateHtml = fs.readFileSync(__dirname + '/../templates/EditTemplate.html').toString();
 
@@ -31,7 +39,7 @@ var EditView = Backbone.View.extend({
 
     var editorConfig = {
       el: this.$('.js-st-instance'),
-      blockTypes: ["Heading", "Text", "List"]
+      blockTypes: ["H1", "H2", "H3", "Text", "Unordered", "Ordered", "Code"]
     };
 
     getMarkdownFromUrl(this.path, function () {
@@ -50,11 +58,8 @@ var EditView = Backbone.View.extend({
     var blockData = this.editor.store.retrieve();
     var blocks = new Blocks();
     blockData.data.map(function(b) {
-      var opts = {
-        type: b.type,
-        html: b.data.text
-      };
-      var block = new Block(opts);
+      console.log('b', b);
+      var block = new Block(b);
       blocks.add(block);
     });
 
@@ -71,9 +76,18 @@ function getMarkdownFromUrl (url, cb) {
   $.ajax(u, {
     complete: function (res, response) {
       if (res.status === 200) {
+        var blocks = window.b = new Blocks();
         var htmlString = mdToHTML(res.responseText);
-        var blocks = new Blocks().fromHTML(htmlString);
-        $('.js-st-instance').text(blocks.toJSON());
+        var htmlNodes = $(htmlString).filter(function(i, x) {
+          return x.nodeName !== '#text';
+        }).map(function(i, n) {
+          // if we pass in an HTML node as the html value the block
+          // can create itself properly
+          blocks.add({ html: n });
+        });
+
+        var jsonBlocks = JSON.stringify(blocks.toJSON());
+        $('.js-st-instance').text(jsonBlocks); // load JSON blocks into editor
         cb();
       }
       else {
