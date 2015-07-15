@@ -25,6 +25,12 @@ main {
 }
 
 /* over write some of material.css */
+ul, ul li {
+  list-style-type: disc;
+}
+ol, ol li {
+  list-style-type: decimal;
+}
 .btn, .btn-large {
   text-transform: capitalize !important; /* if we're gonna do it, we're gonna do it */
 }
@@ -53,6 +59,14 @@ select {
 }
 .card .card-action a {
   margin-right: 0;
+}
+
+/* extend or override parts of Sir Trevor CSS */
+.st-text-block--heading.heading-two {
+  font-size: 1.7em;
+}
+.st-text-block--heading.heading-three {
+  font-size: 1.2em;
 }
 
 /* get to actual app specific styling */
