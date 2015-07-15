@@ -3,48 +3,68 @@ var _ = require('underscore');
 var markdown = require('html2markdown');
 
 var typesToBlocks = {
-  'h1': 'heading',
-  'h2': 'heading',
-  'h3': 'heading',
+  'h1': 'h1',
+  'h2': 'h2',
+  'h3': 'h3',
   'p': 'text',
-  'ul': 'list',
-  'ol': 'list'
+  'ul': 'unordered',
+  'ol': 'ordered'
 };
 
 var BlockModel = Backbone.Model.extend({
   initialize: function (opts) {
-    // supply type or tagname
-    if (opts.type) {
-      // using for now since we'll need new blocks for all the header types we want to support
+    this.data = opts;
+
+    if (opts.html) {
+      // creating a block straight from an HTML element
+      // will need to look and check to see type of block
+      var el = opts.html;
+      this.initializeFromHTMLEl(el);
+    }
+    else if (opts.type) {
+      // this is a block that comes straight from
+      // the Sir Trevor editor.
       this.tagName = _.invert(typesToBlocks)[opts.type];
       this.type = opts.type;
+      this.data = opts.data
+
+      return this;
+    }
+  },
+  initializeFromHTMLEl: function (el) {
+    this.tagName = el.nodeName.toLowerCase();
+    this.type = typesToBlocks[this.tagName];
+    this.data = {};
+    this.data['format'] = 'html';
+
+    if (_.contains(['ul', 'ol'], this.tagName)) {
+      this.data.listItems = _.map(el.children, function (child) {
+        return {
+          content: child.innerHTML
+        };
+      });
     }
     else {
-      this.tagName = opts.tagName.toLowerCase();
-      this.type = typesToBlocks[this.tagName];
+      this.data['text'] = el.innerHTML;
     }
-    this.html = opts.html;
 
     return this;
-  },
-  toHTML: function () {
-    console.log('convert model to html');
   },
   toJSON: function () {
     return {
       'type': typesToBlocks[this.tagName],
-      'data': { 'text': this.html }
+      'data': this.data
     };
   },
   toMarkdown: function () {
-    if (this.type === 'heading') {
+    if (_.contains(['h1', 'h2', 'h3'], this.type)) {
       return markdownHeadingBlock(this);
+    }
+    else if (_.contains(['unordered', 'ordered'], this.type)) {
+      return markdownListBlock(this);
     }
     else if (this.type === 'text') {
       return markdownTextBlock(this);
-    }
-    else if (this.type === 'list') {
-      return markdownListBlock(this);
     }
     else {
       console.log('lost', this);
@@ -57,53 +77,53 @@ var BlockCollection = Backbone.Collection.extend({
   initialize: function (opts) {
     return this;
   },
-  fromHTML: function (htmlString) {
-    var collection = this;
-    var div = document.createElement('div');
-    div.innerHTML = htmlString;
-
-    var children = Array.prototype.slice.call(div.children);
-    children.forEach(function (el) {
-      var child = { tagName: el.tagName, html: el.innerHTML };
-      collection.add(child);
-    });
-
-    return this;
-  },
   toJSON: function () {
     var modelsJson = this.models.map(function (model) {
       return model.toJSON();
     });
-    return JSON.stringify({ data: modelsJson });
+    return { data: modelsJson };
   },
   toMarkdown: function () {
     return this.models.map(function (model) {
       return model.toMarkdown();
     }).join('\n');
   }
-})
+});
 
 function markdownTextBlock (block) {
-  var text = markdown(block.html);
+  var text = markdown(block.data.text);
   return text;
 }
 
 function markdownListBlock (block) {
-  // var listItems = block.listItems.map(function(li) {
-  //   return '* ' + markdown(li.content);
-  // });
-  return ''//listItems.join('\n');
+  var symbol,
+      listItems;
+  block.type === 'unordered' ? symbol = '* ' : symbol = '0. ';
+
+  listItems = block.data.listItems.map(function(li) {
+    return symbol + markdown(li.content);
+  });
+  return listItems.join('\n');
 }
 
 function markdownHeadingBlock (block) {
-  var div = document.createElement('div');
-  div.innerHTML = block.html;
-  // 
-  // console.log('block', block);
+  var symbol,
+      div = document.createElement('div'),
+      numberOfOctothorpes = {
+        'h1': 1,
+        'h2': 2,
+        'h3': 3,
+        'h4': 4,
+        'h5': 5,
+        'h6': 6
+      };
 
-  return '# ' + div.innerText;
+  div.innerHTML = block.data.text;
+  // make a string w/ the right number of # signs to use
+  // and add a space at the end
+  symbol = Array(numberOfOctothorpes[block.tagName] + 1).join('#') + ' ';
+  return symbol + div.innerText;
 }
-
 
 module.exports.model = BlockModel;
 module.exports.collection = BlockCollection;
