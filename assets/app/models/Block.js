@@ -66,6 +66,9 @@ var BlockModel = Backbone.Model.extend({
     else if (this.type === 'text') {
       return markdownTextBlock(this);
     }
+    else if (this.type === 'code') {
+      return markdownCodeBlock(this);
+    }
     else {
       console.log('lost', this);
     }
@@ -93,6 +96,11 @@ var BlockCollection = Backbone.Collection.extend({
 function markdownTextBlock (block) {
   var text = markdown(block.data.text);
   return text;
+}
+
+function markdownCodeBlock (block) {
+  var template = _.template('```\n <%- content %> \n```')
+  return template({content: block.data.text})
 }
 
 function markdownListBlock (block) {
