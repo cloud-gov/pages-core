@@ -5,7 +5,7 @@
 
 Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub, [Prose](https://github.com/prose/prose), and Amazon Web Services to provide a simple way for developers to launch new websites or more easily manage existing ones.
 
-This project will receive funding through GSA's Great Pitch, a "pilot program to support the exploration and testing of new, good-for-government product or service ideas that positively impact Citizen Experience, Smarter IT Delivery, Open Government, or Secure Cloud, which can prove their value by end of the fiscal year."
+This project received funding through GSA's Great Pitch, a "pilot program to support the exploration and testing of new, good-for-government product or service ideas that positively impact Citizen Experience, Smarter IT Delivery, Open Government, or Secure Cloud, which can prove their value by end of the fiscal year."
 
 ## Getting started
 
