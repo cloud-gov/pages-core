@@ -58,7 +58,6 @@ var EditView = Backbone.View.extend({
     var blockData = this.editor.store.retrieve();
     var blocks = new Blocks();
     blockData.data.map(function(b) {
-      console.log('b', b);
       var block = new Block(b);
       blocks.add(block);
     });
