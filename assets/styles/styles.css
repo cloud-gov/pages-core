@@ -23,19 +23,9 @@ main {
   text-align: center;
   padding: .5em 0;
 }
-.form {
-  display: none;
-}
-.form.show {
-  display: block;
-}
-/* this might look weird but it hides the main element when there is a sibling that is .form.show */
-.form.show ~ main {
-  display: none;
-}
 
 /* over write some of material.css */
-a {
+.btn, .btn-large {
   text-transform: capitalize !important; /* if we're gonna do it, we're gonna do it */
 }
 input[type=text] {
@@ -63,6 +53,36 @@ select {
 }
 .card .card-action a {
   margin-right: 0;
+}
+
+/* override material.css for special editor styles */
+.st-outer ul, .st-outer ul li {
+  list-style-type: disc;
+}
+.st-outer ol, .st-outer ol li {
+  list-style-type: decimal;
+}
+
+/* extend or override parts of Sir Trevor CSS */
+.st-text-block--heading.heading-two {
+  font-size: 1.7em;
+}
+.st-text-block--heading.heading-three {
+  font-size: 1.2em;
+}
+
+/* get to actual app specific styling */
+.editor-preload {
+  margin: 0 auto;
+}
+.editor-preload > .col {
+  text-align: center;
+}
+.preloader-wrapper {
+  margin: 0 auto;
+}
+.editor {
+  display: none;
 }
 .collapsible-body p {
   margin: 20px;

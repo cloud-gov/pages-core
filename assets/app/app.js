@@ -1,49 +1,43 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
-var $ = window.jQuery = window.$ = Backbone.$;
+window.jQuery = window.$ = Backbone.$;
 
-var AddSiteView = require('./views/AddSiteView');
+var MainContainerView = require('./views/MainContainerView');
+var NavbarView = require('./views/NavbarView');
+
 var UserModel = require('./models/User');
-var UserView = require('./views/UserView');
-var SiteListView = require('./views/SiteListView');
 var SiteCollection = require('./models/Site').collection;
 
-var dispatcher = _.clone(Backbone.Events);
+var Router = Backbone.Router.extend({
+  initialize: function () {
+    this.sites = new SiteCollection();
+    this.user = new UserModel();
 
-var user = new UserModel();
-var loginView = new UserView({model: user});
-var sites = new SiteCollection();
-var newSiteView = new AddSiteView({user: user, collection: sites});
-var listView = new SiteListView({collection: sites});
+    this.navbarView = new NavbarView({ model: this.user });
+    this.mainView = new MainContainerView({ user: this.user, collection: this.sites });
 
-listView.render({authenticated: user.isAuthenticated()});
-
-dispatcher.listenTo(user, 'change', function() {
-  renderListView();
-  renderNewView();
+    this.listenTo(this.user, 'change', function () {
+      Backbone.history.loadUrl();
+    });
+  },
+  routes: {
+    '': 'home',
+    'new': 'new',
+    'edit(/)*path': 'edit'
+  },
+  home: function () {
+    this.mainView.home();
+    return this;
+  },
+  new: function () {
+    this.mainView.new();
+    return this;
+  },
+  edit: function (path) {
+    this.mainView.edit(path);
+    return this;
+  }
 });
 
-dispatcher.listenTo(sites, 'change', function () {
-  renderListView();
-});
-
-dispatcher.listenTo(newSiteView, 'success', function () {
-  listView.collection.fetch();
-});
-
-dispatcher.listenTo(listView, 'newsite', function () {
-  newSiteView.toggleDisplay();
-});
-
-function renderListView() {
-  listView.render({authenticated: user.isAuthenticated()});
-}
-
-function renderNewView() {
-  newSiteView.render({user: user});
-}
-
-window.d = dispatcher;
-window.u = user;
-window.l = listView;
-window.v = newSiteView;
+window.federalist = new Router();
+Backbone.history.start();

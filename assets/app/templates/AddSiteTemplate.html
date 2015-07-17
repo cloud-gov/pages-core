@@ -12,9 +12,9 @@
   </div>
   <section>
     <h5>Choose from one of our templates</h5>
-    <% for (var template in templates) { %>
+    <% for (var template in siteTemplates) { %>
       <div class="col s12 m6" data-template="<%= template %>">
-      <% template = templates[template]; %>
+      <% template = siteTemplates[template]; %>
         <div class="card grey lighten-3">
           <div class="card-content">
             <div class="card-title"><%= template.title %></div>
