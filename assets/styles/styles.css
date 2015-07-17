@@ -25,12 +25,6 @@ main {
 }
 
 /* over write some of material.css */
-ul, ul li {
-  list-style-type: disc;
-}
-ol, ol li {
-  list-style-type: decimal;
-}
 .btn, .btn-large {
   text-transform: capitalize !important; /* if we're gonna do it, we're gonna do it */
 }
@@ -59,6 +53,14 @@ select {
 }
 .card .card-action a {
   margin-right: 0;
+}
+
+/* override material.css for special editor styles */
+.st-outer ul, .st-outer ul li {
+  list-style-type: disc;
+}
+.st-outer ol, .st-outer ol li {
+  list-style-type: decimal;
 }
 
 /* extend or override parts of Sir Trevor CSS */
