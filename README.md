@@ -19,6 +19,22 @@ We use `ngrok` to form a local tunnel and expose our local app to webhooks. Inst
 $ brew install ngrok
 ```
 
+### env variables
+
+We have a few environment variables that the application uses, here is a list of the environment variables that the application will use if present:
+
+* `GITHUB_CLIENT_ID` **required** - get this when you register your app with Github
+* `GITHUB_CLIENT_SECRET` **required** - you'll also get this when you register your app
+* `GITHUB_CLIENT_CALLBACK_URL` - for dev you'll probably want to use http://localhost:1337/auth/github/callback
+* `FEDERALIST_TEMP_DIR` - where files will be temporarily built
+* `FEDERALIST_PUBLISH_DIR` - where to publish files if not S3
+* `FEDERALIST_S3_BUCKET` - bucket ID to push files to on S3
+* `GITHUB_WEBHOOK_URL` - should be full url; for dev: http://localhost:1337/webhook/github
+* `GITHUB_WEBHOOK_SECRET` - random string used to protect webhook messages
+
+You'll notice that we talk about a `/config/local.js` file below, particularly for setting up the Github app information. For local development either approach is fine, but for production environments you'll want to set these env vars instead of commit `local.js` to your history.
+
+
 ### Build the server
 
 * Download or Clone this repository from Github either by using the command line or repo's website on Github. On the right side of the repo's page, there is a button that states "Clone in Desktop".
