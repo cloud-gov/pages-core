@@ -29,6 +29,8 @@ We have a few environment variables that the application uses, here is a list of
 * `FEDERALIST_TEMP_DIR` - where files will be temporarily built
 * `FEDERALIST_PUBLISH_DIR` - where to publish files if not S3
 * `FEDERALIST_S3_BUCKET` - bucket ID to push files to on S3
+* `process.env.GITHUB_WEBHOOK_URL` - should be full url; for dev: http://localhost:1337/webhook/github
+* `process.env.GITHUB_WEBHOOK_SECRET` - random string used to protect webhook messages
 
 You'll notice that we talk about a `/config/local.js` file below, particularly for setting up the Github app information. For local development either approach is fine, but for production environments you'll want to set these env vars instead of commit `local.js` to your history.
 
