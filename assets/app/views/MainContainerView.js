@@ -31,7 +31,10 @@ var AppView = Backbone.View.extend({
     return this;
   },
   new: function () {
-    var addSiteView = new AddSiteView({ user: this.user });
+    var addSiteView = new AddSiteView({
+          user: this.user,
+          collection: this.sites
+        });
     this.pageSwitcher.set(addSiteView);
 
     this.listenToOnce(addSiteView, 'site:save:success', function () {
