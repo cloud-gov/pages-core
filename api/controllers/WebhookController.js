@@ -36,9 +36,8 @@ module.exports = {
 
       // Find a matching user
       user: function(next) {
-        User.findOne({
-          username: payload.sender.login
-        }, next);
+        var record = { username: payload.sender.login };
+        User.findOrCreate(record, record, next);
       },
 
       // Find a matching site

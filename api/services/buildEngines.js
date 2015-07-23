@@ -104,7 +104,8 @@ module.exports = {
       // Set populated token values
       tokens.repository = model.site.repository;
       tokens.owner = model.site.owner;
-      tokens.token = model.user.passport.tokens.accessToken;
+      tokens.token = (model.user.passport) ?
+        model.user.passport.tokens.accessToken : '';
 
       // Set up source and destination paths
       tokens.source = sails.config.build.tempDir + '/source/' +
