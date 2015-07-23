@@ -18,6 +18,7 @@ var AppView = Backbone.View.extend({
     this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.el);
   },
   home: function () {
+    federalist.navigate('');
     var authed = this.user.isAuthenticated();
     if(authed) {
       var listView = new SiteListView({ collection: this.sites });
@@ -31,7 +32,10 @@ var AppView = Backbone.View.extend({
     return this;
   },
   new: function () {
-    var addSiteView = new AddSiteView({ user: this.user });
+    var addSiteView = new AddSiteView({
+          user: this.user,
+          collection: this.sites
+        });
     this.pageSwitcher.set(addSiteView);
 
     this.listenToOnce(addSiteView, 'site:save:success', function () {
