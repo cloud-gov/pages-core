@@ -51,6 +51,7 @@ var AddSiteView = Backbone.View.extend({
     });
   },
   onSuccess: function onSuccess(e) {
+    this.collection.add(e);
     console.log('winning', e);
     this.trigger('site:save:success');
   },
