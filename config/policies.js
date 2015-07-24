@@ -74,7 +74,7 @@ module.exports.policies = {
   },
 
   PreviewController: {
-    '*': ['passport', 'sessionAuth', 'previewProxy']
+    '*': ['passport', 'sessionAuth']
   },
 
   WebhookController: true
