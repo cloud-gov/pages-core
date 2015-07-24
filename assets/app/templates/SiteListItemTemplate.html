@@ -12,13 +12,6 @@
   <% if (!builds.length) { %>
   <p>This site has not been built yet. Please refresh the page to see new builds.</p>
   <% } else { %>
-  <%
-    var lastBuildTime = new Date(_(builds).chain().where({
-          branch: defaultBranch
-        }).filter(function(build) {
-          return build.completedAt;
-        }).last().value().completedAt);
-  %>
   <p> This site was last built at <%- lastBuildTime %></p>
   <% if (_(builds).filter(function(build) {
       return build.branch !== defaultBranch;
