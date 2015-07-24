@@ -11,10 +11,7 @@ var SiteModel = Backbone.Model.extend({
     'engine': 'jekyll',
     'branch': 'master'
   },
-  urlRoot: siteUrl,
-  initialize: function() {
-    this.set('builds', _.where(this.collection.builds, { site: this.id }));
-  }
+  urlRoot: siteUrl
 });
 
 var SiteCollection = Backbone.Collection.extend({
@@ -23,10 +20,7 @@ var SiteCollection = Backbone.Collection.extend({
 
   initialize: function() {
     var collection = this;
-    $.getJSON('/v0/build?sort=id%20DESC', function(builds) {
-      collection.builds = builds;
-      collection.fetch();
-    });
+    collection.fetch();
   }
 });
 

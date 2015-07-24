@@ -13,7 +13,11 @@
   <p>This site has not been built yet. Please refresh the page to see new builds.</p>
   <% } else { %>
   <%
-    var lastBuildTime = new Date(_(builds).findWhere({branch: defaultBranch}).completedAt);
+    var lastBuildTime = new Date(_(builds).chain().where({
+          branch: defaultBranch
+        }).filter(function(build) {
+          return build.completedAt;
+        }).last().value().completedAt);
   %>
   <p> This site was last built at <%- lastBuildTime %></p>
   <% if (_(builds).filter(function(build) {
@@ -28,7 +32,7 @@
       return build.branch !== defaultBranch;
     }).unique(function(build) {
       return build.branch;
-    }).first(5).forEach(function(build, index) {
+    }).last(5).value().reverse().forEach(function(build, index) {
     %>
     <li><p>
       <%- build.branch %>
