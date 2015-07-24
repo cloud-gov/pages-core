@@ -40,7 +40,6 @@ module.exports = function (req, res, next) {
         req.query.where = JSON.stringify({
           id: _.pluck(user[model + 's'], 'id')
         });
-        console.log(req.query.where);
         return next();
       });
     } else {
