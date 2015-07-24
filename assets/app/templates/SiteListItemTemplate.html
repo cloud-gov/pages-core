@@ -1,7 +1,7 @@
 <div class="collapsible-header active"><%- repository %>
   <span class="right">
     <!-- <a href="/#edit/<%- owner %>/<%- repository %>/<%- defaultBranch %>/README.md" class="edit" alt="edit the site <%- repository %> using prose.io"><i class="mdi-editor-mode-edit"></i></a> -->
-    <a href="http://prose.io/#<%- owner %>/<%- repository %>/tree/<%- defaultBranch %>/README.md" class="edit" alt="edit the site <%- repository %> using prose.io"><i class="mdi-editor-mode-edit"></i></a>
+    <a href="http://prose.io/#<%- owner %>/<%- repository %>/tree/<%- defaultBranch %>" target="_blank" class="edit" alt="edit the site <%- repository %> using prose.io"><i class="mdi-editor-mode-edit"></i></a>
     <a href="#" class="delete" alt="delete the site <%- repository %>"><i class="mdi-action-delete"></i></a>
     <% if (builds.length) { %>
     <a href="<%- siteRoot %>/site/<%- owner %>/<%- repository %>/" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank"><i class="mdi-action-open-in-new"></i></a>
