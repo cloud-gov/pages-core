@@ -30,18 +30,23 @@ module.exports = function (req, res, next) {
 
   } else {
 
-    // Find route to populated listing, such as /v0/site => /v0/user/1/sites
+    // If requested model is associated with a user, get the records
+    // associated with the request user
     if (User.attributes[model + 's']) {
-      path = [req.options.prefix, 'user', req.user.id, model + 's'].join('/') +
-        '?' + querystring.stringify(req.query);
+      User.findOne({
+        id: req.user.id
+      }).populate(model + 's').exec(function(err, user) {
+        if (err) return res.forbidden('Forbidden');
+        req.query.where = JSON.stringify({
+          id: _.pluck(user[model + 's'], 'id')
+        });
+        return next();
+      });
+    } else {
+
+      // Reject all other requests
+      res.forbidden('Forbidden');
     }
-
-    // Redirect to current user if requested model list
-    if (req.options.action === 'find' && path) return res.redirect(path);
-
-    // Reject all other requests
-    res.forbidden('Forbidden');
-
   }
 
 };

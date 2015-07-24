@@ -116,7 +116,7 @@ passport.connect = function (req, query, profile, next) {
         GitHub.validateUser(query.tokens.accessToken, function(err) {
           if (err) return next(err);
 
-          User.create(user, function (err, user) {
+          User.findOrCreate({ username: user.username }, user, function (err, user) {
             if (err) return next(err);
 
             query.user = user.id;
