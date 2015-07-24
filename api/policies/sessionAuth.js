@@ -9,10 +9,14 @@
  */
 module.exports = function(req, res, next) {
 
-  // User is allowed, proceed to the next policy, 
+  // User is allowed, proceed to the next policy,
   // or if this is the last policy, the controller
   if (req.session.authenticated) {
     return next();
+  }
+
+  if (req.path.indexOf('/preview/') === 0) {
+    return res.redirect('/');
   }
 
   // User is not allowed
