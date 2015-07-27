@@ -10,7 +10,7 @@ module.exports = {
   schema: true,
 
   attributes: {
-    // The name of the GitHub user or organization that owns the site's repository 
+    // The name of the GitHub user or organization that owns the site's repository
     owner: {
       type:'string',
       required: true
@@ -38,6 +38,12 @@ module.exports = {
       collection: 'build',
       via: 'site'
     },
+    domain: {
+      type: 'string'
+    },
+    config: {
+      type: 'string'
+    },
     toJSON: function() {
       var obj = this.toObject(),
           config = sails.config.build || {};
@@ -63,6 +69,10 @@ module.exports = {
           };
           Build.create(build, done);
         });
+  },
+
+  afterUpdate: function() {
+    Site.afterCreate.apply(this, _.toArray(arguments));
   },
 
   registerSite: function(values, done) {

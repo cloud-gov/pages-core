@@ -16,7 +16,7 @@ module.exports = {
       'mkdir -p ${source}',
       'git clone -b ${branch} --single-branch ' +
         'https://${token}@github.com/${owner}/${repository}.git ${source}',
-      'echo "baseurl: /${root}/${owner}/${repository}${branchURL}" > ' +
+      'echo "baseurl: ${baseurl}\n${config}" > ' +
         '${source}/_config_base.yml',
       'jekyll build --safe --config ${source}/_config.yml,${source}/_config_base.yml ' +
         '--source ${source} --destination ${source}/_site',
@@ -36,7 +36,7 @@ module.exports = {
       'mkdir -p ${source}',
       'git clone -b ${branch} --single-branch ' +
         'https://${token}@github.com/${owner}/${repository}.git ${source}',
-      'hugo --baseUrl=/${root}/${owner}/${repository}${branchURL} ' +
+      'hugo --baseUrl=${baseurl} ' +
         '--source=${source}',
       'rm -rf ${destination}',
       'mkdir -p ${destination}',
@@ -82,7 +82,8 @@ module.exports = {
         tokens = {
           branch: model.branch,
           branchURL: defaultBranch ? '' : '/' + model.branch,
-          root: defaultBranch ? 'site' : 'preview'
+          root: defaultBranch ? 'site' : 'preview',
+          config: model.site.config
         },
         template = _.template(cmd.join(' && '));
 
@@ -106,6 +107,8 @@ module.exports = {
       tokens.owner = model.site.owner;
       tokens.token = (model.user.passport) ?
         model.user.passport.tokens.accessToken : '';
+      tokens.baseurl = '/' + tokens.root + '/' + tokens.owner +
+        '/' + tokens.repository + tokens.branchURL;
 
       // Set up source and destination paths
       tokens.source = sails.config.build.tempDir + '/source/' +

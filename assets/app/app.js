@@ -23,6 +23,7 @@ var Router = Backbone.Router.extend({
   routes: {
     '': 'home',
     'new': 'new',
+    'site/:id/edit': 'siteEdit',
     'edit(/)*path': 'edit'
   },
   home: function () {
@@ -31,6 +32,10 @@ var Router = Backbone.Router.extend({
   },
   new: function () {
     this.mainView.new();
+    return this;
+  },
+  siteEdit: function(id) {
+    this.mainView.siteEdit(id);
     return this;
   },
   edit: function (path) {
