@@ -34,11 +34,22 @@ We have a few environment variables that the application uses, here is a list of
 
 You'll notice that we talk about a `/config/local.js` file below, particularly for setting up the Github app information. For local development either approach is fine, but for production environments you'll want to set these env vars instead of commit `local.js` to your history.
 
+### Windows
+
+If developing on Windows, you'll need to ensure that you have the following components installed:
+
+* [Ruby 2.1.x (32-bit)](http://rubyinstaller.org/downloads/)
+* [Ruby 2.0+ Development Kit (32-bit)](http://rubyinstaller.org/downloads/) - Instructions for installing the dev kit can be found [here](https://github.
+com/oneclick/rubyinstaller/wiki/Development-Kit)
+* [Python 2.7.x](https://www.python.org/)
+* [Visual Studio 2013+](https://www.visualstudio.com/) - Community/Express Edition is sufficient
+  * Common Tools for Visual C++ feature is required
+  
+If you have previously installed Ruby, it is recommended that you keep your Gems updated by running `gem update` and `gem cleanup`. Additional guidance for running Jekyll on Windows can be found [here](http://jekyll-windows.juthilo.com/).
 
 ### Build the server
 
-* Download or Clone this repository from Github either by using the command line or repo's website on Github. On the right side of the repo's page, there is a button that states "Clone in Desktop".
-* 
+* Download or Clone this repository from Github either by using the command line or repo's website on Github. On the right side of the repo's page, there is a button that states "Clone in Desktop". 
 * Run `npm install` from the root(the directory that houses the projects files on your computer) of the repository to load modules and install Jekyll dependencies
 
 Together these commands will looks something like the following:
