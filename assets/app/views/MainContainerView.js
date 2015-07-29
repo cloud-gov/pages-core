@@ -4,7 +4,7 @@ var ViewSwitcher = require('ampersand-view-switcher');
 var AuthenticateView = require('./AuthenticateView');
 var SiteListView = require('./SiteListView');
 var AddSiteView = require('./AddSiteView');
-var EditView = require('./EditView');
+var EditorContainerView = require('./EditorContainerView');
 
 var AppView = Backbone.View.extend({
   el: 'main',
@@ -44,8 +44,14 @@ var AppView = Backbone.View.extend({
 
     return this;
   },
-  edit: function (path) {
-    var editView = new EditView({ path: path });
+  edit: function (owner, repo, branch, file) {
+    var path = {
+      owner: owner,
+      repo: repo,
+      branch: branch,
+      file: file
+    };
+    var editView = new EditorContainerView({ path: path });
     this.pageSwitcher.set(editView);
 
     return this;
