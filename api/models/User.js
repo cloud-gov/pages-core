@@ -26,7 +26,7 @@ var User = {
     // Method to return JSON to the API
     toJSON: function() {
       var obj = this.toObject();
-      delete obj.passports;
+      // delete obj.passports;
       return obj;
     }
   }
