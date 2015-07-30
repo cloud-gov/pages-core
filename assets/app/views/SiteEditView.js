@@ -25,8 +25,14 @@ var SiteEditView = Backbone.View.extend({
     var data = _(this.$('form').serializeArray()).reduce(function(memo, value) {
           memo[value.name] = value.value;
           return memo;
-        }, {});
-    this.model.save(data, { attrs: data });
+        }, {}),
+        view = this;
+    this.model.save(data, {
+      attrs: data,
+      success: function() {
+        view.trigger('site:save:success');
+      }
+    });
   }
 
 });

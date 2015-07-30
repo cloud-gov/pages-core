@@ -48,6 +48,9 @@ var AppView = Backbone.View.extend({
   siteEdit: function(id) {
     var siteEditView = new SiteEditView({ model: this.sites.get(id) });
     this.pageSwitcher.set(siteEditView);
+    this.listenToOnce(siteEditView, 'site:save:success', function () {
+      this.home();
+    }.bind(this));
     return this;
   },
   edit: function (path) {

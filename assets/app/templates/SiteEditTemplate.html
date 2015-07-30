@@ -24,8 +24,8 @@
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <input name="domain" type="text" value="<%- model.domain %>">
-          <label for="domain">Custom domain</label>
+          <input name="domain" type="text" placeholder="https://example.com" value="<%- model.domain %>">
+          <label class="active" for="domain">Custom domain</label>
         </div>
       </div>
       <% if (model.engine === 'jekyll') { %>
@@ -43,7 +43,8 @@
       <div class="card grey lighten-1">
          <div class="card-content">
            <span class="card-title">Custom domain</span>
-           <p>Tell us your custom domain, such as: <code>https://example.com</code></p>
+           <p>Use a custom domain by setting an <code>ALIAS</code> record with your DNS provider that points this origin:
+             <input readonly type="text" value="<%- model.siteRoot || window.location.origin %>/site/<%- model.owner %>/<%- model.repository %>/"></p>
          </div>
          <div class="card-action">
            <a href="#">Detailed instructions</a>

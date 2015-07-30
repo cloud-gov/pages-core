@@ -62,6 +62,7 @@ module.exports = {
     Site.findOne({id: model.id }).populate('users')
         .exec(function(err, site) {
           if (err) return done(err);
+          if (!site.users[0]) return done();
           var build = {
               user: site.users[0].id,
               site: model.id,

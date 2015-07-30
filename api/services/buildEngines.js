@@ -107,7 +107,8 @@ module.exports = {
       tokens.owner = model.site.owner;
       tokens.token = (model.user.passport) ?
         model.user.passport.tokens.accessToken : '';
-      tokens.baseurl = '/' + tokens.root + '/' + tokens.owner +
+      tokens.baseurl = (model.site.domain && defaultBranch) ? "''" :
+        '/' + tokens.root + '/' + tokens.owner +
         '/' + tokens.repository + tokens.branchURL;
 
       // Set up source and destination paths
