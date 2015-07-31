@@ -36,7 +36,9 @@ var SiteListItemView = Backbone.View.extend({
       succes: this.onDeleteSuccess.bind(this),
       error: this.onDeleteError.bind(this)
     };
-    this.model.destroy(opts);
+    if (window.confirm('Are you sure you want to delete this site?')) {
+      this.model.destroy(opts);
+    }
   },
   onDeleteSuccess: function onDeleteSuccess() {
     console.log('delete success');
