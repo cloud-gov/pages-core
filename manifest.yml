@@ -1,5 +1,8 @@
 ---
 applications:
 - name: federalist
-  buildpack: https://github.com/cloudfoundry/nodejs-buildpack
-  domain: 18f.gov
+buildpack: https://github.com/ozzyjohnson/heroku-buildpack-multi
+domain: 18f.gov
+services:
+- federalist-database
+- s3-sb-federalist.18f.gov
