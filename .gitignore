@@ -127,3 +127,4 @@ nbproject
 .node_history
 cf-ssh.yml
 .env
+Configure_AzureEnvironment.ps1

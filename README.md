@@ -34,6 +34,29 @@ We have a few environment variables that the application uses, here is a list of
 
 You'll notice that we talk about a `/config/local.js` file below, particularly for setting up the Github app information. For local development either approach is fine, but for production environments you'll want to set these env vars instead of commit `local.js` to your history.
 
+#### Azure
+
+Below is a list of environment variables specific to static site publishing to an Azure Subscription:
+
+* `FEDERALIST_AZURE_SUBSCRIPTION_ID` - Azure Subscription ID
+* `FEDERALIST_AZURE_TENANT_ID` - Azure Active Directory tenant ID associated with Azure Subscription
+* `FEDERALIST_AZURE_USERNAME` - Organizational account username (cannot be a Microsoft account [e.g. outlook.com, live.com, etc])
+* `FEDERALIST_AZURE_PASSWORD` - Organizational account password
+* `FEDERALIST_AZURE_CLIENT_ID` - Azure Active Directory application client ID
+
+THE VALUES BELOW ARE FOR TESTING PURPOSES ONLY - THESE WILL NOT BE FINAL AS THESE VALUES WILL BE SPECIFIED BY THE BUILD ENGINE AND NOT BY ENVIRONMENT VARIABLES
+
+* `FEDERALIST_AZURE_REGION` - Region in to which Resource Group and Web App are deployed
+* `FEDERALIST_AZURE_RG_NAME` - Azure Resource Group
+* `FEDERALIST_AZURE_RG_TEMPLATE_PATH` - Local path to Resource Group Manager template file
+* `FEDERALIST_AZURE_RG_DEPLOYMENT_NAME` - Name for Resource Group Deployment
+* `FEDERALIST_AZURE_WEBAPP_NAME` - Name for Azure Web App
+* `FEDERALIST_AZURE_APPHOSTINGPLAN_NAME` - Name for Azure App Hosting Plan
+* `FEDERALIST_AZURE_LOCAL_SITE_DIRECTORY` - Local path to static site content to publish
+
+The `Configure_AzureEnvironment_Sample.ps1` sample PowerShell script has been included for setting these environment variables in your development execution environment.
+
+In addition, an `azureTest.js` application has been included for testing content publishing to Azure. This is for development purposes only.
 
 ### Build the server
 
