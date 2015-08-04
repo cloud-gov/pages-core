@@ -1,15 +1,16 @@
 <div class="collapsible-header active"><%- repository %>
   <span class="right">
     <!-- <a href="/#edit/<%- owner %>/<%- repository %>/<%- defaultBranch %>/README.md" class="edit" alt="edit the site <%- repository %> using prose.io"><i class="mdi-editor-mode-edit"></i></a> -->
+    <a href="#site/<%- id %>/edit" class="settings" alt="change settings for <%- repository %>"><i class="mdi-action-settings"></i></a>
     <a href="http://prose.io/#<%- owner %>/<%- repository %>/tree/<%- defaultBranch %>" target="_blank" class="edit" alt="edit the site <%- repository %> using prose.io"><i class="mdi-editor-mode-edit"></i></a>
     <a href="#" class="delete" alt="delete the site <%- repository %>"><i class="mdi-action-delete"></i></a>
     <% if (builds.length) { %>
-    <a href="<%- siteRoot %>/site/<%- owner %>/<%- repository %>/" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank"><i class="mdi-action-open-in-new"></i></a>
+    <a href="<%- viewLink %>" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank"><i class="mdi-action-open-in-new"></i></a>
     <% } %>
   </span>
 </div>
 <div class="collapsible-body">
-  <% if (!builds.length) { %>
+  <% if (!builds.length || !lastBuildTime) { %>
   <p>This site has not been built yet. Please refresh the page to see new builds.</p>
   <% } else { %>
   <p> This site was last built at <%- lastBuildTime %></p>

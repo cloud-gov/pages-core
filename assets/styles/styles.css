@@ -14,6 +14,9 @@ nav {
 main {
   flex: 1 0 auto;
 }
+.monospace {
+  font-family: monospace;
+}
 .stage-bug {
   display: block;
   background: #f3f3f3;
@@ -28,21 +31,16 @@ main {
 .btn, .btn-large {
   text-transform: capitalize !important; /* if we're gonna do it, we're gonna do it */
 }
-input[type=text] {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding-left: 5px;
-}
 select {
   display: block;
-  border: 1px solid #ccc;
+  border: 1px solid #9e9e9e;
 }
-.card .card-title {
+.card.grey .card-title {
   color: black;
   font-size: 18px;
   font-weight: 400;
 }
-.card .card-content .card-title {
+.card.grey .card-content .card-title {
   line-height: 1em;
 }
 .card .card-action a {
@@ -51,7 +49,7 @@ select {
 .collapsible-body {
   display: block;
 }
-.card .card-action a {
+.card.grey .card-action a {
   margin-right: 0;
 }
 

@@ -19,12 +19,15 @@ var SiteListItemView = Backbone.View.extend({
   },
   render: function renderSiteView() {
     var data = this.model.toJSON(),
-        lastBuildTime = new Date(_(data.builds).chain().where({
+        lastBuild = _(data.builds).chain().where({
           branch: data.defaultBranch
         }).filter(function(build) {
           return build.completedAt;
-        }).last().value().completedAt);
-    data.lastBuildTime = moment(lastBuildTime).format('L LT');
+        }).last().value();
+    data.lastBuildTime = lastBuild ? moment(new Date(lastBuild.completedAt))
+      .format('L LT') : '';
+    data.viewLink = data.domain ||
+      data.siteRoot + '/site/' + data.owner + '/' + data.repository + '/';
     this.$el.html(this.template(data));
   },
 
@@ -33,7 +36,9 @@ var SiteListItemView = Backbone.View.extend({
       succes: this.onDeleteSuccess.bind(this),
       error: this.onDeleteError.bind(this)
     };
-    this.model.destroy(opts);
+    if (window.confirm('Are you sure you want to delete this site?')) {
+      this.model.destroy(opts);
+    }
   },
   onDeleteSuccess: function onDeleteSuccess() {
     console.log('delete success');
