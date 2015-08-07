@@ -1,12 +1,12 @@
 var exec = require('child_process').exec;
 
 /**
- * A service to managing build processes. Each engine gets its own method,
+ * A hook to managing build processes. Each engine gets its own method,
  * which takes a model, runs a shell process, and then returns the model
  * and any error message.
  */
 
-module.exports = {
+var hook = {
 
   jekyll: function(model, done) {
 
@@ -174,4 +174,9 @@ module.exports = {
 
   }
 
+};
+
+module.exports = function(sails) {
+  _.extend(this, hook);
+  return this;
 };
