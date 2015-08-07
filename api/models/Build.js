@@ -55,7 +55,7 @@ module.exports = {
         sails.log.verbose('Starting job: ', model.id);
 
         // Run the build with the appropriate engine and the model
-        sails.hooks.buildengine[model.site.engine](model, done);
+        sails.hooks[sails.config.build.engine][model.site.engine](model, done);
 
       });
 
