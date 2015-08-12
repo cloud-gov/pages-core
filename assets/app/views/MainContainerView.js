@@ -2,6 +2,7 @@ var Backbone = require('backbone');
 var ViewSwitcher = require('ampersand-view-switcher');
 
 var AuthenticateView = require('./AuthenticateView');
+var SiteEditView = require('./SiteEditView');
 var SiteListView = require('./SiteListView');
 var AddSiteView = require('./AddSiteView');
 var EditorContainerView = require('./EditorContainerView');
@@ -54,6 +55,14 @@ var AppView = Backbone.View.extend({
     var editView = new EditorContainerView({ path: path });
     this.pageSwitcher.set(editView);
 
+    return this;
+  },
+  siteEdit: function(id) {
+    var siteEditView = new SiteEditView({ model: this.sites.get(id) });
+    this.pageSwitcher.set(siteEditView);
+    this.listenToOnce(siteEditView, 'site:save:success', function () {
+      this.home();
+    }.bind(this));
     return this;
   }
 });

@@ -27,7 +27,8 @@ var Router = Backbone.Router.extend({
   routes: {
     '': 'home',
     'new': 'new',
-    'edit/:owner/:repo/:branch(/)*file': 'edit'
+    'edit/:owner/:repo/:branch(/)*file': 'edit',
+    'site/:id/edit': 'siteEdit',
   },
   home: function () {
     this.mainView.home();
@@ -39,6 +40,10 @@ var Router = Backbone.Router.extend({
   },
   edit: function (owner, repo, branch, file) {
     this.mainView.edit(owner, repo, branch, file);
+    return this;
+  },
+  siteEdit: function(id) {
+    this.mainView.siteEdit(id);
     return this;
   }
 });
