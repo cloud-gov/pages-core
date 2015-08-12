@@ -47,6 +47,7 @@
     "sails-disk": "~0.10.0",
     "sails-postgresql": "^0.10.15",
     "sir-trevor": "git://github.com/madebymany/sir-trevor-js.git",
+    "to-markdown": "^1.2.1",
     "underscore": "^1.8.3",
     "validator": "^3.39.0"
   },
