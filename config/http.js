@@ -37,7 +37,6 @@ module.exports.http = {
 
   order: [
     'forceSSL',
-    'addHeaders',
     'startRequestTimer',
     'cookieParser',
     'session',
@@ -53,20 +52,6 @@ module.exports.http = {
     '404',
     '500'
   ],
-
-  /*
-   * Adds security headers to all requests
-   * from https://github.com/fisma-ready/nginx/blob/master/nginx.conf#L34-L36
-   */
-  addHeaders: function(req, res, next) {
-    res.set({
-      'X-Frame-Options': 'DENY',
-      'X-Content-Type-Options': 'nosniff',
-      'X-XSS-Protection': '1; mode=block'
-    });
-    res.removeHeader('X-Powered-By');
-    next();
-  },
 
   /***************************************************************************
   *                                                                          *
