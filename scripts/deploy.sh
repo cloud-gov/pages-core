@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Blue-green deployment script. Usage:
 #
