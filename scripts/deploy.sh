@@ -10,7 +10,6 @@
 #   https://github.com/dlapiduz/step-cloud-foundry-deploy/blob/master/run.sh
 
 set -e
-set -o pipefail
 set -x
 
 BLUE=$1

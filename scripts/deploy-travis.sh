@@ -1,7 +1,6 @@
 #!/bin/sh
 
 set -e
-set -o pipefail
 
 wget http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-cli_amd64.deb -qO temp.deb && sudo dpkg -i temp.deb
 
