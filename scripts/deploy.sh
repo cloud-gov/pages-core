@@ -5,6 +5,7 @@
 #   ./cf-blue-green <appname>
 
 set -e
+set -o pipefail
 set -x
 
 
@@ -54,7 +55,7 @@ curl --fail -I "https://${GREEN}.${DOMAIN}"
 
 # add the GREEN application to each BLUE route to be load-balanced
 # TODO this output parsing seems a bit fragile...find a way to use more structured output
-cf routes | grep $BLUE | awk '{print $3" -n "$2}' | xargs -n 3 cf map-route $GREEN
+cf routes | tail -n +4 | grep $BLUE | awk '{print $3" -n "$2}' | xargs -n 3 cf map-route $GREEN
 
 # cleanup
 # TODO consider 'stop'-ing the BLUE instead of deleting it, so that depedencies are cached for next time
