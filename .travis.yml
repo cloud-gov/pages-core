@@ -4,6 +4,7 @@ node_js:
 - stable
 env:
   global:
+  - CF_APP=federalist
   - CF_API=https://api.18f.gov
   - CF_USERNAME=deploy-federalist
   - CF_ORGANIZATION=federalist
