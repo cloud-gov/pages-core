@@ -7,9 +7,6 @@ var UserModel = require('../models/User');
 var templateHtml = fs.readFileSync(__dirname + '/../templates/NavbarTemplate.html').toString();
 
 var NavbarView = Backbone.View.extend({
-  events: {
-    'click #logout': 'logout'
-  },
   el: '.user',
   template: _.template(templateHtml),
   initialize: function initializeUserView() {
@@ -23,11 +20,6 @@ var NavbarView = Backbone.View.extend({
     this.$el.html(this.template(user));
 
     return this;
-  },
-  logout: function (e) {
-    e.preventDefault();
-    window.localStorage.removeItem('token');
-    window.location = '/logout';
   }
 });
 
