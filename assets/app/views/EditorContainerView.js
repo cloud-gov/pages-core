@@ -30,6 +30,8 @@ var EditView = Backbone.View.extend({
         params      = { access_token: this.token, ref: branch },
         html, editorConfig;
 
+    this.ghUrl = ghUrl;
+
     this.$el.html(this.template());
     this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.$('#edit-content')[0]);
 
@@ -45,27 +47,11 @@ var EditView = Backbone.View.extend({
         if (json.type === 'file') {
           // if Github's API tells us this is a file, use the editor
           var editorView = new EditorView({
+            file: file,
             content: decodeB64(json.content)
           });
-          self.listenTo(editorView, 'edit:save', function (save) {
-            $.ajax(ghUrl, {
-              method: 'PUT',
-              headers: {
-                'Authorization': 'token ' + self.token,
-                'Content-Type': 'application/json'
-              },
-              data: JSON.stringify({
-                path: file,
-                message: save.msg || 'Attempted commit',
-                content: encodeB64(save.md),
-                sha: json.sha,
-                branch: branch
-              }),
-              complete: function (res) {
-                console.log('res', res);
-              }
-            });
-          });
+          self.path.sha = json.sha;
+          self.listenTo(editorView, 'edit:save', self.saveFile);
           self.pageSwitcher.set(editorView);
         }
         else {
@@ -84,20 +70,46 @@ var EditView = Backbone.View.extend({
   updateCurrentPath: function (pathText) {
     this.$('#edit-current-path').text(pathText);
     return this;
+  },
+  saveFile: function (save) {
+    var self = this,
+        ghUrl = self.ghUrl + '/' + self.path.file;
+    $.ajax(ghUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + self.token,
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify({
+        path: self.path.file,
+        message: save.msg || 'Some changes to ' + self.path.file,
+        content: encodeB64(save.md),
+        sha: self.path.sha,
+        branch: self.path.branch
+      }),
+      complete: function (res) {
+        var responseText = {
+          0:   'The internet is not connected. Please check your connection.',
+          200: 'Yay, the save was successful!',
+          404: 'Whoops, looks like this page can not be found.',
+          409: 'Uh oh, there was a conflict when saving'
+        };
+        $('#save-status-result').text(responseText[res.status]);
+
+        if (res.status === 200) {
+          setTimeout(function() {
+            $('#save-status-result').text('');
+          }, 3000);
+        }
+      }
+    });
   }
 });
 
 function getToken() {
-  var t = {};
-  document.cookie.split('; ').forEach(function(i) {
-    var s     = i.split('='),
-        key   = s[0],
-        value = s[1];
-
-    t[key] = value;
-  });
-
-  return decodeB64(t.token);
+  var token = window.localStorage.getItem('token') || false;
+  if (!token) return false;
+  return decodeB64(token);
 }
 
 module.exports = EditView;
