@@ -1,3 +1,17 @@
 language: node_js
+sudo: true
 node_js:
-  - "stable"
+- stable
+env:
+  global:
+  - CF_APP=federalist
+  - CF_API=https://api.18f.gov
+  - CF_USERNAME=deploy-federalist
+  - CF_ORGANIZATION=federalist
+  - CF_SPACE=prod
+  - secure: CqvnebsMoS4IVKFzK1SKC96XhrbJM8ipiNTYSc3aLJf4onESJDV6waZdC/f5XDb/1Q1N41VHSmjqTQwP+QfQPheTyT/RFq0/aoQdvr4Ym1PZ0S2KHc1Y3CHHrVLntQELi8Pe1nhPPSfaO9b/S/6wRbCyqYCSIYDpGLaSeskm8WrzQiSEJbOfHBBEqJRh8JUjD/T9yEp4zhzL3wviTjPpMB6zqsRE4FtGJmUESYaHlsT1t0hjw3M48KfIgzTRatVnhOTTTnVbMEGnyY6xqNvBm9x8q2DWAGCUevnaVRLqN34lfr2LtC0678fQ2YJ8l8MZ1e0hKsZySi5z/eUgefdZ2bceNomrIXf3anx7cACljyqHuDnRAGMeNhKaulgesAyc+w+ipo/1Exs3KrGLpEm+5OCnMNGSFE8CLWKP7fi6NmFMm2gHkcyWKsME4Ljenoo/Jueq8C56EODg+w38Pg+qTDSxiIXWbC0z9d7+eEGqAyG/CdzHKppGuyoZeutILG6HOvgcW4ejENXjqZHr7n5RPaHTS8HdzJRzgPauxzmtL9Y2AzLidz0WcTfnpUisnBEBv0xcsnVgFBtZwrWibV0E/CiJs9H7aP3G61gZUePXMXesqt/Om2EccSUmThNwCug+tOhoj3HFIZ75FWUWnxmZmZqYw1ZBDkrZUPwlnvcuocE=
+deploy:
+  provider: script
+  script: scripts/deploy-travis.sh
+  on:
+    branch: master

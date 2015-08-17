@@ -1,17 +1,19 @@
-#!/bin/sh
+#!/bin/bash
 
 # Blue-green deployment script. Usage:
 #
-#   ./script/deploy <appname>
-#
-# Based on
-#   http://www.cloudfoundry.rocks/blue-green-deployment-with-cloudfoundry/
-#   http://docs.pivotal.io/pivotalcf/devguide/deploy-apps/blue-green.html
-#   https://github.com/dlapiduz/step-cloud-foundry-deploy/blob/master/run.sh
+#   ./cf-blue-green <appname>
 
 set -e
 set -o pipefail
 set -x
+
+
+if [ $# -ne 1 ]; then
+	echo "Usage:\n\n\t./cf-blue-green <appname>\n"
+	exit 1
+fi
+
 
 BLUE=$1
 GREEN="${BLUE}-B"
@@ -29,8 +31,15 @@ on_fail () {
 }
 
 
+CF_VERSION=$(cf --version)
+# http://stackoverflow.com/a/229606/358804
+if [[ "$CF_VERSION" != *"6.12.0-"* ]] && [[ "$CF_VERSION" != *"6.12.1-"* ]]; then
+  echo "CF CLI version is not compatible. See\n\n\thttps://github.com/18F/cf-blue-green#cf-cli\n"
+  exit 1
+fi
+
 # pull the up-to-date manifest from the BLUE (existing) application
-MANIFEST=$(mktemp -t "${BLUE}_manifest")
+MANIFEST=$(mktemp -t "${BLUE}_manifest.XXXXXXXXXX")
 cf create-app-manifest $BLUE -p $MANIFEST
 
 # set up try/catch
@@ -46,7 +55,7 @@ curl --fail -I "https://${GREEN}.${DOMAIN}"
 
 # add the GREEN application to each BLUE route to be load-balanced
 # TODO this output parsing seems a bit fragile...find a way to use more structured output
-cf routes | grep $BLUE | awk '{print $3" -n "$2}' | xargs -n 3 cf map-route $GREEN
+cf routes | tail -n +4 | grep $BLUE | awk '{print $3" -n "$2}' | xargs -n 3 cf map-route $GREEN
 
 # cleanup
 # TODO consider 'stop'-ing the BLUE instead of deleting it, so that depedencies are cached for next time
