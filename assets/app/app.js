@@ -20,7 +20,7 @@ var Router = Backbone.Router.extend({
 
     this.listenTo(this.user, 'change', function () {
       var token = this.user.attributes.passports[0].tokens.accessToken;
-      document.cookie = 'token=' + encodeB64(token);
+      window.localStorage.setItem('token', encodeB64(token));
       Backbone.history.loadUrl();
     });
   },
