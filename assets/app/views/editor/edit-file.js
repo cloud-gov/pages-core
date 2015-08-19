@@ -19,7 +19,7 @@ SirTrevor.Blocks.Ordered = require('./blocks/ol');
 SirTrevor.Blocks.Unordered = require('./blocks/ul');
 SirTrevor.Blocks.Code = require('./blocks/code');
 
-var templateHtml = fs.readFileSync(__dirname + '/../templates/EditorTemplate.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '../../templates/editor/edit-file.html').toString();
 
 var EditorView = Backbone.View.extend({
   tagName: 'div',
