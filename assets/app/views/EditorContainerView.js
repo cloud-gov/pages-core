@@ -82,7 +82,7 @@ var EditView = Backbone.View.extend({
       },
       data: JSON.stringify({
         path: self.path.file,
-        message: save.msg || 'Some changes to ' + self.path.file,
+        message: save.msg,
         content: encodeB64(save.md),
         sha: self.path.sha,
         branch: self.path.branch
