@@ -25,7 +25,7 @@ var EditorView = Backbone.View.extend({
   },
   initialize: function (opts) {
     this.doc = new Document({ markdown: opts.content });
-    this.file = opts.file;
+    this.fileName = opts.file;
     return this;
   },
   render: function () {
@@ -33,7 +33,7 @@ var EditorView = Backbone.View.extend({
         blocks  = [],
         editor, mdTree;
 
-    this.$el.html(_.template(templateHtml)({ file: this.file }));
+    this.$el.html(_.template(templateHtml)({ fileName: this.fileName }));
     this.editor = new SirTrevor.Editor({
       el: this.$('.js-st-instance'),
       blockTypes: ["H1", "H2", "H3", "Text", "Unordered", "Ordered"]
