@@ -25,7 +25,7 @@ var EditView = Backbone.View.extend({
         repo        = this.path.repo,
         branch      = this.path.branch,
         file        = this.path.file,
-        ghBaseUrl   = 'https://api-github-com-gwqynjms41pa.runscope.net/repos',
+        ghBaseUrl   = 'https://api.github.com/repos',
         ghUrl       = [ghBaseUrl, owner, repo, 'contents'].join('/'),
         params      = { access_token: this.token, ref: branch },
         html, editorConfig;
