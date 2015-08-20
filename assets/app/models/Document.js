@@ -2,7 +2,7 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 var markdown = require('markdown').markdown;
 var htmlToMarkdown = require('to-markdown');
-var yaml = window.y = require('js-yaml');
+var yaml = require('js-yaml');
 
 var DocumentModel = Backbone.Model.extend({
   initialize: function (opts) {

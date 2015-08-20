@@ -2,7 +2,6 @@ var fs = require('fs');
 
 var Backbone = require('backbone');
 var _ = require('underscore');
-var toMarkdown = window.TM = require('to-markdown');
 var SirTrevor = require('sir-trevor');
 
 var Document = require('../models/Document');
