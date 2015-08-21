@@ -46,7 +46,7 @@
     "sails-db-migrate": "^0.7.0",
     "sails-disk": "~0.10.0",
     "sails-postgresql": "^0.10.15",
-    "sir-trevor": "git://github.com/madebymany/sir-trevor-js.git",
+    "sir-trevor": "git://github.com/madebymany/sir-trevor-js.git#a2716f64438b83e41b85d6e3f878d5e20005b8bd",
     "to-markdown": "^1.2.1",
     "underscore": "^1.8.3",
     "validator": "^3.39.0"
@@ -57,7 +57,7 @@
     "debug": "node debug app.js",
     "browserify": "browserify -t brfs assets/app/app.js -o assets/js/bundle.js",
     "watch": "npm run watch:server & npm run watch:client",
-    "watch:server": "nodemon app.js --ignore assets/ --ignore .tmp/",
+    "watch:server": "nodemon app.js --ignore assets/ --ignore .tmp/ --ignore node_modules/",
     "watch:client": "watchify --debug -t brfs assets/app/app.js -o assets/js/bundle.js",
     "test": "mocha test/bootstrap.test.js test/unit/**/*.test.js",
     "materialize": "cp node_modules/materialize-css/bin/materialize.css assets/styles/ && cp -R node_modules/materialize-css/font assets/ && cp node_modules/materialize-css/bin/materialize.js assets/js/dependencies/",
