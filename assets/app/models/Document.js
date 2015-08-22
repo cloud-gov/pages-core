@@ -22,7 +22,7 @@ var DocumentModel = Backbone.Model.extend({
   toMarkdown: function () {
     var y = yaml.safeDump(this.frontMatter),
         x = '---\n';
-    return [x, y, x + '\n', this.content].join('');
+    return [x, y, x, this.content].join('');
   },
   toSirTrevorJson: function () {
     var blocks = [],
@@ -43,6 +43,11 @@ var DocumentModel = Backbone.Model.extend({
       return htmlString;
     }).join('\n');
     this.content = htmlToMarkdown(result);
+  },
+  updateFrontMatter: function (frontMatter) {
+    if (!frontMatter) return this;
+    this.frontMatter = frontMatter;
+    return this;
   }
 });
 
