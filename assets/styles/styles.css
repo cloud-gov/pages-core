@@ -79,9 +79,6 @@ select {
 .preloader-wrapper {
   margin: 0 auto;
 }
-.editor {
-  display: none;
-}
 .collapsible-body p {
   margin: 20px;
   padding: 0;

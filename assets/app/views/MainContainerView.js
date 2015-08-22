@@ -5,7 +5,7 @@ var AuthenticateView = require('./AuthenticateView');
 var SiteEditView = require('./SiteEditView');
 var SiteListView = require('./SiteListView');
 var AddSiteView = require('./AddSiteView');
-var EditView = require('./EditView');
+var EditorContainerView = require('./EditorContainerView');
 
 var AppView = Backbone.View.extend({
   el: 'main',
@@ -45,18 +45,24 @@ var AppView = Backbone.View.extend({
 
     return this;
   },
+  edit: function (owner, repo, branch, file) {
+    var path = {
+      owner: owner,
+      repo: repo,
+      branch: branch,
+      file: file
+    };
+    var editView = new EditorContainerView({ path: path });
+    this.pageSwitcher.set(editView);
+
+    return this;
+  },
   siteEdit: function(id) {
     var siteEditView = new SiteEditView({ model: this.sites.get(id) });
     this.pageSwitcher.set(siteEditView);
     this.listenToOnce(siteEditView, 'site:save:success', function () {
       this.home();
     }.bind(this));
-    return this;
-  },
-  edit: function (path) {
-    var editView = new EditView({ path: path });
-    this.pageSwitcher.set(editView);
-
     return this;
   }
 });
