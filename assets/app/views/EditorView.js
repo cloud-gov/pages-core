@@ -27,7 +27,7 @@ var EditorView = Backbone.View.extend({
     'click #add-front-matter-row': 'addMetaDataRow'
   },
   initialize: function (opts) {
-    this.doc = window.d = new Document({ markdown: opts.content });
+    this.doc = new Document({ markdown: opts.content });
     this.fileName = opts.file;
     return this;
   },
