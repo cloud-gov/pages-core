@@ -3,8 +3,8 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 
-var SiteListItemView = require('./SiteListItemView');
-var templateHtml = fs.readFileSync(__dirname + '/../templates/SiteListTemplate.html').toString();
+var SiteListItemView = require('./list-item');
+var templateHtml = fs.readFileSync(__dirname + '/../../templates/site/list.html').toString();
 
 var SiteListView = Backbone.View.extend({
   tagName: 'div',

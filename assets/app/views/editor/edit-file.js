@@ -4,7 +4,7 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 var SirTrevor = require('sir-trevor');
 
-var Document = require('../models/Document');
+var Document = require('../../models/Document');
 // var Block = require('../models/Block').model;
 // var Blocks = require('../models/Block').collection;
 
@@ -16,7 +16,7 @@ SirTrevor.Blocks.Ordered = require('./blocks/ol');
 SirTrevor.Blocks.Unordered = require('./blocks/ul');
 SirTrevor.Blocks.Code = require('./blocks/code');
 
-var templateHtml = fs.readFileSync(__dirname + '/../templates/EditorTemplate.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/edit-file.html').toString();
 
 var EditorView = Backbone.View.extend({
   tagName: 'div',
