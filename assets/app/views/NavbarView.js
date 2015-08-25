@@ -7,7 +7,7 @@ var UserModel = require('../models/User');
 var templateHtml = fs.readFileSync(__dirname + '/../templates/NavbarTemplate.html').toString();
 
 var NavbarView = Backbone.View.extend({
-  el: '.user',
+  el: '.navbar-links',
   events: {
     'click #logout': 'logout'
   },
