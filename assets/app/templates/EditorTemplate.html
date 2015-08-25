@@ -1,16 +1,15 @@
 <div class="editor">
-  <div class="row">
-    <div class="col s8">
-      <input type="text" id="save-content-message" value="Some changes to <%= fileName %>">
-      <a class="waves-effect waves-light btn" id="save-content-action">Save</a>
-      <span id="save-status-result"></span>
-    </div>
-    <div class="col s4">
-      <div class="card grey lighten-1">
-         <div class="card-content">
-           <p>Make this a helpful save message for yourself and future collaborators.</p>
-         </div>
-       </div>
+  <div class="panel panel-info">
+    <div class="panel-heading">Save your changes</div>
+    <div class="panel-body">
+      <form>
+        <div class="form-group">
+          <label for="save-content-message">Make this a helpful save message for yourself and future collaborators.</label>
+          <input type="text" class="form-control" id="save-content-message" value="Some changes to <%= fileName %>">
+        </div>
+        <a class="btn btn-primary" id="save-content-action" role="button">Save</a>
+        <span id="save-status-result"></span>
+      </form>
     </div>
   </div>
   <div class="row">
