@@ -17,22 +17,21 @@ var EditView = Backbone.View.extend({
   initialize: function (opts) {
     this.path = opts.path || false;
     this.token = getToken();
+    this.$el.html(this.template());
     return this;
   },
   render: function () {
-    var self        = this,
+    var self        = window.t = this,
         owner       = this.path.owner,
         repo        = this.path.repo,
         branch      = this.path.branch,
         file        = this.path.file,
-        ghBaseUrl   = 'https://api-github-com-gwqynjms41pa.runscope.net/repos',
+        ghBaseUrl   = 'https://api.github.com/repos',
         ghUrl       = [ghBaseUrl, owner, repo, 'contents'].join('/'),
-        params      = { access_token: this.token, ref: branch },
+        params      = { access_token: this.token, ref: branch, z: parseInt(Math.random() * 10000) },
         html, editorConfig;
 
     this.ghUrl = ghUrl;
-
-    this.$el.html(this.template());
     this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.$('#edit-content')[0]);
 
     if (!this.path) return this;
@@ -74,6 +73,7 @@ var EditView = Backbone.View.extend({
   saveFile: function (save) {
     var self = this,
         ghUrl = self.ghUrl + '/' + self.path.file;
+
     $.ajax(ghUrl, {
       method: 'PUT',
       headers: {
@@ -82,12 +82,13 @@ var EditView = Backbone.View.extend({
       },
       data: JSON.stringify({
         path: self.path.file,
-        message: save.msg || 'Some changes to ' + self.path.file,
+        message: save.msg,
         content: encodeB64(save.md),
         sha: self.path.sha,
         branch: self.path.branch
       }),
       complete: function (res) {
+        var json = res.responseJSON;
         var responseText = {
           0:   'The internet is not connected. Please check your connection.',
           200: 'Yay, the save was successful!',
@@ -97,6 +98,7 @@ var EditView = Backbone.View.extend({
         $('#save-status-result').text(responseText[res.status]);
 
         if (res.status === 200) {
+          self.path.sha = json.content.sha;
           setTimeout(function() {
             $('#save-status-result').text('');
           }, 3000);
