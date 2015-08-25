@@ -5,7 +5,7 @@ var AuthenticateView = require('./authenticate');
 var SiteEditView = require('./site/edit');
 var SiteListView = require('./site/list');
 var AddSiteView = require('./site/add');
-var EditorContainerView = require('./edit-main');
+var EditorContainerView = require('./editor/edit-main');
 
 var AppView = Backbone.View.extend({
   el: 'main',
