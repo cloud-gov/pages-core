@@ -7,7 +7,7 @@
           <label for="save-content-message">Make this a helpful save message for yourself and future collaborators.</label>
           <input type="text" class="form-control" id="save-content-message" value="Some changes to <%= fileName %>">
         </div>
-        <a class="btn btn-primary" id="save-content-action" role="button">Save</a>
+        <a class="btn btn-primary" data-action="save-content" role="button">Save</a>
         <span class="label" id="save-status-result"></span>
       </form>
     </div>
@@ -22,10 +22,11 @@
     <h2>Settings</h2>
     <div id="meta-data-rows">
     </div>
-    <button type="button" class="btn btn-default" id="add-front-matter-row" role="button">Add setting</button>
+    <button type="button" class="btn btn-primary" data-action="add-row" role="button">Add setting</button>
   </form>
 
   <form id="content">
+    <h2>Content</h2>
     <textarea class="js-st-instance"></textarea>
   </form>
 

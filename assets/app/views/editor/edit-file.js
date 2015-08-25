@@ -21,9 +21,9 @@ var EditorView = Backbone.View.extend({
   tagName: 'div',
   events: {
     'click [data-tab]': 'toggleAreas',
-    'click #save-content-action': 'saveDocument',
-    'click [front-matter-delete]': 'deleteMetaDataRow',
-    'click #add-front-matter-row': 'addMetaDataRow'
+    'click [data-action=save-content]': 'saveDocument',
+    'click [data-action=delete-row]': 'deleteMetaDataRow',
+    'click [data-action=add-row]': 'addMetaDataRow'
   },
   initialize: function (opts) {
     this.doc = new Document({ markdown: opts.content });
@@ -90,13 +90,13 @@ var EditorView = Backbone.View.extend({
   },
   deleteMetaDataRow: function (e) {
     e.preventDefault();
-    $(e.target).parents('.meta-data-rows .row').remove();
+    $(e.target).parents('.row').remove();
 
     return this;
   },
   addMetaDataRow: function (e) {
     e.preventDefault();
-    var rowTemplate = _.template(metadataHtml)();
+    var rowTemplate = _.template(metadataHtml)({});
     $('#meta-data-rows').append(rowTemplate);
 
     return this;
