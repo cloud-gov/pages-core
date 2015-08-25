@@ -17,18 +17,9 @@ var AWS = require('aws-sdk'),
  */
 
 module.exports = {
-
-  webhook: {
-    endpoint: process.env.GITHUB_WEBHOOK_URL || '',
-    secret: process.env.GITHUB_WEBHOOK_SECRET || 'testingSecret'
-  },
-
-  http: {
-    middleware: {
-      forceSSL: require('express-force-ssl')
-    }
+  grunt: {
+    _hookTimeout: 60 * 1000
   }
-
 };
 
 // If running in Cloud Foundry with a service database avaible, use it
