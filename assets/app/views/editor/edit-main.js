@@ -6,8 +6,8 @@ var _ = require('underscore');
 var encodeB64 = window.btoa;
 var decodeB64 = window.atob;
 
-var EditorFileListView = require('./EditorFileListView');
-var EditorView = require('./EditorView');
+var EditorFileListView = require('./edit-list');
+var EditorView = require('./edit-file');
 
 var templateHtml = fs.readFileSync(__dirname + '/../templates/EditTemplate.html').toString();
 var breadcrumbHtml = '<li><a href="<%- link %>"><%- text %></a></li>';

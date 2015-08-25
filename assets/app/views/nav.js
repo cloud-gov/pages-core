@@ -4,7 +4,7 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 
 var UserModel = require('../models/User');
-var templateHtml = fs.readFileSync(__dirname + '/../templates/NavbarTemplate.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../templates/nav.html').toString();
 
 var NavbarView = Backbone.View.extend({
   el: '.navbar-links',

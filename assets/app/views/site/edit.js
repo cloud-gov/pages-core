@@ -3,7 +3,7 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 
-var templateHtml = fs.readFileSync(__dirname + '/../templates/SiteEditTemplate.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../templates/site/edit.html').toString();
 
 var SiteEditView = Backbone.View.extend({
 

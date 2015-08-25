@@ -4,8 +4,8 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 var moment = require('moment');
 
-var SiteModel = require('../models/Site').model;
-var templateHtml = fs.readFileSync(__dirname + '/../templates/SiteListItemTemplate.html').toString();
+var SiteModel = require('../../models/Site').model;
+var templateHtml = fs.readFileSync(__dirname + '/../../templates/site/list-item.html').toString();
 
 var SiteListItemView = Backbone.View.extend({
   tagName: 'li',

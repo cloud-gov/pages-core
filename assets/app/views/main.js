@@ -1,11 +1,11 @@
 var Backbone = require('backbone');
 var ViewSwitcher = require('ampersand-view-switcher');
 
-var AuthenticateView = require('./AuthenticateView');
-var SiteEditView = require('./SiteEditView');
-var SiteListView = require('./SiteListView');
-var AddSiteView = require('./AddSiteView');
-var EditorContainerView = require('./EditorContainerView');
+var AuthenticateView = require('./authenticate');
+var SiteEditView = require('./site/edit');
+var SiteListView = require('./site/list');
+var AddSiteView = require('./site/add');
+var EditorContainerView = require('./editor/edit-main');
 
 var AppView = Backbone.View.extend({
   el: 'main',
