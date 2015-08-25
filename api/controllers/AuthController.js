@@ -1,3 +1,5 @@
+var request = require('request');
+
 /**
  * Authentication Controller
  *
@@ -37,7 +39,40 @@ var AuthController = {
    * @param {Object} res
    */
   provider: function (req, res) {
-    passport.endpoint(req, res);
+    // If token present, override oauth login
+    if (process.env.GITHUB_TOKEN) {
+      request.get({
+        url: 'https://api.github.com/user?access_token=' +
+          process.env.GITHUB_TOKEN,
+        json: true,
+        headers: {
+          'User-Agent': 'request'
+        }
+      }, function(err, clientReq, ghUser) {
+        var record = { username: ghUser.login };
+        User.findOrCreate(record, record, function(err, user) {
+          if (err) return res.badRequest('Unable to log in with token');
+          user = user.length ? user[0] : user;
+          Passport.create({
+            identifier: ghUser.id,
+            protocol: 'oauth2',
+            tokens: { accessToken: process.env.GITHUB_TOKEN },
+            provider: 'github',
+            user: user.id
+          }, function(err, passport) {
+            if (err) return res.badRequest('Unable to log in with token');
+            user.passport = [passport];
+            req.login(user, function (err) {
+              if (err) return res.badRequest('Unable to log in with token');
+              req.session.authenticated = true;
+              res.redirect('/');
+            });
+          });
+        });
+      });
+    } else {
+      passport.endpoint(req, res);
+    }
   },
 
   /**
