@@ -5,8 +5,6 @@ var _ = require('underscore');
 var SirTrevor = require('sir-trevor');
 
 var Document = require('../models/Document');
-// var Block = require('../models/Block').model;
-// var Blocks = require('../models/Block').collection;
 
 var headings = require('./blocks/heading');
 SirTrevor.Blocks.H1 = headings.h1;
