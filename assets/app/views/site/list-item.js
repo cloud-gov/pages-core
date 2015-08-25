@@ -2,39 +2,50 @@ var fs = require('fs');
 
 var Backbone = require('backbone');
 var _ = require('underscore');
+var moment = require('moment');
 
-var SiteListItemView = require('./list-item');
-var templateHtml = fs.readFileSync(__dirname + '/../../templates/site/list.html').toString();
+var SiteModel = require('../../models/Site').model;
+var templateHtml = fs.readFileSync(__dirname + '/../../templates/site/list-item.html').toString();
 
-var SiteListView = Backbone.View.extend({
-  tagName: 'div',
-  className: 'list',
+var SiteListItemView = Backbone.View.extend({
+  tagName: 'li',
+  model: SiteModel,
   template: _.template(templateHtml),
-  initialize: function initializeSiteListView(opts) {
-    this.listenTo(this.collection, 'update', this.render);
-    return this;
+  events: {
+    'click a.delete': 'onDelete'
   },
-  render: function renderSiteListView(opts) {
-    var html,
-        sitesCount = this.collection.length;
+  initialize: function initializeSiteView() {
+    this.render();
+  },
+  render: function renderSiteView() {
+    var data = this.model.toJSON(),
+        lastBuild = _(data.builds).chain().where({
+          branch: data.defaultBranch
+        }).filter(function(build) {
+          return build.completedAt;
+        }).last().value();
+    data.lastBuildTime = lastBuild ? moment(new Date(lastBuild.completedAt))
+      .format('L LT') : '';
+    data.viewLink = data.domain ||
+      data.siteRoot + '/site/' + data.owner + '/' + data.repository + '/';
+    this.$el.html(this.template(data));
+  },
 
-    html = this.template({
-      sitesCount: sitesCount
-    });
-    this.$el.html(html);
-
-    if (sitesCount > 0) {
-      var $list = this.$('ul');
-      $list.empty();
-
-      this.collection.each(function(model) {
-        var site = new SiteListItemView({model: model});
-        $list.append(site.$el);
-      }, this);
+  onDelete: function onDelete() {
+    var opts = {
+      succes: this.onDeleteSuccess.bind(this),
+      error: this.onDeleteError.bind(this)
+    };
+    if (window.confirm('Are you sure you want to delete this site?')) {
+      this.model.destroy(opts);
     }
-
-    return this;
+  },
+  onDeleteSuccess: function onDeleteSuccess() {
+    console.log('delete success');
+  },
+  onDeleteError: function onDeleteError() {
+    console.log('delete failure');
   }
 });
 
-module.exports = SiteListView;
+module.exports = SiteListItemView;
