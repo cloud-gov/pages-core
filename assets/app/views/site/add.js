@@ -16,7 +16,7 @@ var AddSiteView = Backbone.View.extend({
   template: _.template(templateHtml),
   events: {
     'submit': 'onSubmitGithubRepo',
-    'click .card-action .btn': 'onTemplateSelection'
+    'click [data-action=fork-template]': 'onTemplateSelection'
   },
   initialize: function initializeSiteView(opts) {
     this.user = opts.user;
@@ -33,15 +33,13 @@ var AddSiteView = Backbone.View.extend({
       data[d.name] = d.value;
     });
 
-    console.log('data', data);
-
     new SiteModel(data, { collection: this.collection }).save(null, {
       success: this.onSuccess.bind(this),
       error: this.onError.bind(this)
     });
   },
   onTemplateSelection: function onTemplateSelection(e) {
-    var templateId = $(e.target).parents('.col').attr('data-template');
+    var templateId = $(e.target).parents('.col-md-4').data('template');
     var data = { templateId: templateId };
     $.ajax('/v0/site/fork', {
       method: 'POST',
