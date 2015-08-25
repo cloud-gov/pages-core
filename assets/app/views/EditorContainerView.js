@@ -10,6 +10,7 @@ var EditorFileListView = require('./EditorFileListView');
 var EditorView = require('./EditorView');
 
 var templateHtml = fs.readFileSync(__dirname + '/../templates/EditTemplate.html').toString();
+var breadcrumbHtml = '<li><a href="<%- link %>"><%- text %></a></li>';
 
 var EditView = Backbone.View.extend({
   tagName: 'div',
@@ -42,7 +43,7 @@ var EditView = Backbone.View.extend({
       complete: function (res) {
         if (res.status !== 200) return;
         var json = res.responseJSON;
-        self.updateCurrentPath([owner, repo, file].join('/'));
+        self.updateCurrentPath(owner, repo, file);
         if (json.type === 'file') {
           // if Github's API tells us this is a file, use the editor
           var editorView = new EditorView({
@@ -66,8 +67,25 @@ var EditView = Backbone.View.extend({
 
     return this;
   },
-  updateCurrentPath: function (pathText) {
-    this.$('#edit-current-path').text(pathText);
+  updateCurrentPath: function (owner, repo, file) {
+    var bcEl = this.$('ol.breadcrumb');
+    var template = _.template(breadcrumbHtml);
+    var branch  = this.path.branch;
+    var filePath;
+    bcEl.empty();
+    bcEl.append(template({ text: owner, link: '/' }));
+    bcEl.append(template({ text: repo, link: ['#edit', owner, repo, branch].join('/') }));
+
+    if (!file) return this;
+
+    filePath = file.split('/');
+    filePath.forEach(function(file, i) {
+      var repoHref = [owner, repo, branch].join('/');
+      var fileHref = filePath.slice(0, i + 1).join('/');
+      var link = ['#edit', repoHref, fileHref].join('/');
+      bcEl.append(template({ text: file, link: link }));
+    })
+
     return this;
   },
   saveFile: function (save) {
