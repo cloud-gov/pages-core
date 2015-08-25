@@ -14,7 +14,6 @@ ENV BRANCH= \
   SAILS_LOG_LEVEL= \
   PORT=3000
 
-
 # Run additional npm install scripts
 RUN npm run install --unsafe-perm
 
