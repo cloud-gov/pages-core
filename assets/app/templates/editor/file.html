@@ -1,0 +1,32 @@
+<div class="editor">
+  <div class="panel panel-info">
+    <div class="panel-heading">Save your changes</div>
+    <div class="panel-body">
+      <form>
+        <div class="form-group">
+          <label for="save-content-message">Make this a helpful save message for yourself and future collaborators.</label>
+          <input type="text" class="form-control" id="save-content-message" value="Some changes to <%= fileName %>">
+        </div>
+        <a class="btn btn-primary" id="save-content-action" role="button">Save</a>
+        <span class="label" id="save-status-result"></span>
+      </form>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs">
+    <li role="presentation" data-tab class="active"><a id="showContent">Content</a></li>
+    <li role="presentation" data-tab><a id="showMetadata">Settings</a></li>
+  </ul>
+
+  <form id="metadata" style="display: none;">
+    <h2>Settings</h2>
+    <div id="meta-data-rows">
+    </div>
+    <button type="button" class="btn btn-default" id="add-front-matter-row" role="button">Add setting</button>
+  </form>
+
+  <form id="content">
+    <textarea class="js-st-instance"></textarea>
+  </form>
+
+</div>
