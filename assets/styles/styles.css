@@ -1,3 +1,7 @@
+body {
+  margin-bottom: 4em;
+}
+
 .stage-bug {
   display: block;
   background: #f3f3f3;
@@ -13,6 +17,9 @@
   padding-left: 0; /* reset from Bootstrap */
 }
 
+.list-group .glyphicon {
+  font-size: 3em;
+}
 /* override material.css for special editor styles */
 .st-outer ul, .st-outer ul li {
   list-style-type: disc;
