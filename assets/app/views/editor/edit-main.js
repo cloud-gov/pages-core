@@ -9,7 +9,7 @@ var decodeB64 = window.atob;
 var EditorFileListView = require('./edit-list');
 var EditorView = require('./edit-file');
 
-var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/edit-main.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/main.html').toString();
 var breadcrumbHtml = '<li><a href="<%- link %>"><%- text %></a></li>';
 
 var EditView = Backbone.View.extend({
@@ -113,6 +113,14 @@ var EditView = Backbone.View.extend({
           404: 'Whoops, looks like this page can not be found.',
           409: 'Uh oh, there was a conflict when saving'
         };
+        if (res.status === 200) {
+          $('#save-status-result').removeClass('label-danger');
+          $('#save-status-result').addClass('label-success');
+        }
+        else {
+          $('#save-status-result').removeClass('label-success');
+          $('#save-status-result').addClass('label-danger');
+        }
         $('#save-status-result').text(responseText[res.status]);
 
         if (res.status === 200) {
