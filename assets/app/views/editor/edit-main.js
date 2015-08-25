@@ -9,7 +9,7 @@ var decodeB64 = window.atob;
 var EditorFileListView = require('./edit-list');
 var EditorView = require('./edit-file');
 
-var templateHtml = fs.readFileSync(__dirname + '/../templates/EditTemplate.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/edit-main.html').toString();
 var breadcrumbHtml = '<li><a href="<%- link %>"><%- text %></a></li>';
 
 var EditView = Backbone.View.extend({
