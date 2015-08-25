@@ -1,20 +1,16 @@
-<div class="row">
-  <div class="col s6"><h5>Your current sites</h5></div>
-  <div class="col s6">
-    <% if (sitesCount !== 0) { %>
-    <a class="add-site-action right btn-floating btn-large waves-effect waves-light red" alt="add a new site" href="#new"><i class="mdi-content-add"></i></a>
-    <% } %>
-  </div>
+<div class="page-header">
+  <h1>Your current sites</h1>
 </div>
 <% if (sitesCount === 0) { %>
-  <div class="row">
+  <div class="row center-block">
     <p>Welcome! You don't have any sites registered with Federalist just yet. Let's go ahead and change that.</p>
-    <div class="center">
-      <a class="add-site-action waves-effect waves-light btn-large" href="#new">Add your first site now.</a>
-    </div>
+    <a class="btn btn-primary" href="#new" role="button">Add your first site now</a>
   </div>
 <% } else { %>
   <div class="row">
-    <ul class="collapsible"></ul>
+    <div class="col-md-12">
+      <ul class="sites"></ul>
+      <a href="#new" class="btn btn-primary" alt="add a new site" role="button">Add a new site</a>
+    </div>
   </div>
 <% } %>

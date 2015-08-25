@@ -1,66 +1,72 @@
-<div class="row">
-  <div class="col s6">
-    <h5>Make a new site</h5>
-  </div>
-  <div class="col s6 right-align">
-    <a href="#" class="cancel-add-action btn red accent-3">Cancel</a>
-  </div>
+<div class="page-header">
+  <h1>Make a new site</h1>
 </div>
 <div class="row">
-  <div class="col s12">
+  <div class="col-md-12">
     <p>There are a few different ways you can add sites to Federalist. You can start with a brand new site by selecting one of our template sites below. Or you the Github repository where your site's code lives.</p>
   </div>
-  <section>
-    <h5>Choose from one of our templates</h5>
-    <% for (var template in siteTemplates) { %>
-      <div class="col s12 m6" data-template="<%= template %>">
-      <% template = siteTemplates[template]; %>
-        <div class="card grey lighten-3">
-          <div class="card-content">
-            <div class="card-title"><%= template.title %></div>
-            <a href="<%= template.example %>" target="_blank">Example</a>
-            <p><%= template.description %></p>
-          </div>
-          <div class="card-action center">
-            <a class="btn">Use this template</a>
-          </div>
-        </div>
-      </div>
-    <% } %>
-  </section>
 </div>
 <div class="row">
-  <section>
-    <h5>Or add your own Github repository</h5>
-    <form id="new-repo" class="col s12">
-      <div class="row">
-        <div class="col s6">
-          <label for="owner">owner name</label>
-          <input type="text" id="owner" name="owner" value="<%- user.username %>">
-        </div>
-        <div class="col s6">
-          <label for="repository">repository name</label>
-          <input type="text" name="repository" id="repository"></input>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col s6">
-          <label for="engine">engine</label>
-          <select name="engine" id="engine" class="browser-default">
-            <option selected value="jekyll">Jekyll</option>
-            <option value="hugo">Hugo</option>
-            <option value="static">Static (just publish the files in the repository)</option>
-          </select>
-        </div>
-        <div class="col s6">
-          <label for="defaultBranch">default branch</label>
-          <input type="text" id="defaultBranch" name="defaultBranch" value="master">
-        </div>
-      </div>
-
-      <input type="hidden" name="users" value="<%- user.id %>"></input>
-      <input type="submit" class="btn" value="Submit repository-based site">
-    </form>
-  </section>
+  <div class="col-md-12">
+    <h2>Choose from one of our templates</h2>
+  </div>
 </div>
+<div class="row">
+  <% for (var template in siteTemplates) { %>
+    <div class="col-md-4" data-template="<%= template %>">
+    <% template = siteTemplates[template]; %>
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <h3 class="panel-title"><%= template.title %></h3>
+        </div>
+        <div class="panel-body">
+          <a href="#" class="thumbnail">
+            <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMTcxIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE3MSAxODAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjwhLS0KU291cmNlIFVSTDogaG9sZGVyLmpzLzEwMCV4MTgwCkNyZWF0ZWQgd2l0aCBIb2xkZXIuanMgMi42LjAuCkxlYXJuIG1vcmUgYXQgaHR0cDovL2hvbGRlcmpzLmNvbQooYykgMjAxMi0yMDE1IEl2YW4gTWFsb3BpbnNreSAtIGh0dHA6Ly9pbXNreS5jbwotLT48ZGVmcz48c3R5bGUgdHlwZT0idGV4dC9jc3MiPjwhW0NEQVRBWyNob2xkZXJfMTRmNjFkZjM2YzIgdGV4dCB7IGZpbGw6I0FBQUFBQTtmb250LXdlaWdodDpib2xkO2ZvbnQtZmFtaWx5OkFyaWFsLCBIZWx2ZXRpY2EsIE9wZW4gU2Fucywgc2Fucy1zZXJpZiwgbW9ub3NwYWNlO2ZvbnQtc2l6ZToxMHB0IH0gXV0+PC9zdHlsZT48L2RlZnM+PGcgaWQ9ImhvbGRlcl8xNGY2MWRmMzZjMiI+PHJlY3Qgd2lkdGg9IjE3MSIgaGVpZ2h0PSIxODAiIGZpbGw9IiNFRUVFRUUiLz48Zz48dGV4dCB4PSI1OS41NDY4NzUiIHk9Ijk0LjUiPjE3MXgxODA8L3RleHQ+PC9nPjwvZz48L3N2Zz4=" alt="Thumbnail screenshot for the <%= template.title %> template">
+          </a>
+          <p><%= template.description %></p>
+          <a class="btn btn-info" href="<%= template.example %>" target="_blank" role="button">Example</a>
+          <a class="btn btn-primary" role="button">Use this template</a>
+        </div>
+      </div>
+    </div>
+  <% } %>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <h2>Or add your own Github repository</h2>
+  </div>
+</div>
+<form>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-group">
+        <label for="owner">Repository owner's Github username</label>
+        <input type="text" id="owner" class="form-control" name="owner" value="<%- user.username %>">
+      </div>
+      <div class="form-group">
+        <label for="repository">Name of repository</label>
+        <input type="text" class="form-control" name="repository" id="repository"></input>
+      </div>
+      <div class="form-group">
+        <label for="engine">Static site engine</label>
+        <select name="engine" id="engine" class="form-control">
+          <option selected value="jekyll">Jekyll</option>
+          <option value="hugo">Hugo</option>
+          <option value="static">Static (just publish the files in the repository)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="defaultBranch">Default branch</label>
+        <input type="text" id="defaultBranch" class="form-control" name="defaultBranch" value="master">
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <input type="hidden" name="users" value="<%- user.id %>"></input>
+    <a href="#" class="btn btn-danger" role="button">Cancel</a>
+    <button type="submit" class="btn btn-primary">Submit repository-based site</button>
+  </div>
+</div>
+</form>
