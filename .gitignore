@@ -48,11 +48,9 @@ assets/site
 # Browserify bundle
 assets/js/bundle.js
 
-# Materialize assets
-assets/font/
-assets/js/dependencies/materialize.js
-assets/styles/materialize.css
-
+# Bootstrap assets
+assets/styles/bootstrap.min.css
+assets/fonts
 
 ################################################
 # Dependencies

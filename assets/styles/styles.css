@@ -1,22 +1,7 @@
-/*
- * for materialize sticky footer
- * http://materializecss.com/footer.html
- */
-
 body {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
+  margin-bottom: 4em;
 }
-nav {
-  margin-bottom: 20px;
-}
-main {
-  flex: 1 0 auto;
-}
-.monospace {
-  font-family: monospace;
-}
+
 .stage-bug {
   display: block;
   background: #f3f3f3;
@@ -27,32 +12,14 @@ main {
   padding: .5em 0;
 }
 
-/* over write some of material.css */
-.btn, .btn-large {
-  text-transform: capitalize !important; /* if we're gonna do it, we're gonna do it */
-}
-select {
-  display: block;
-  border: 1px solid #9e9e9e;
-}
-.card.grey .card-title {
-  color: black;
-  font-size: 18px;
-  font-weight: 400;
-}
-.card.grey .card-content .card-title {
-  line-height: 1em;
-}
-.card .card-action a {
-  color: white;
-}
-.collapsible-body {
-  display: block;
-}
-.card.grey .card-action a {
-  margin-right: 0;
+.sites {
+  list-style-type: none;
+  padding-left: 0; /* reset from Bootstrap */
 }
 
+.list-group .glyphicon {
+  font-size: 3em;
+}
 /* override material.css for special editor styles */
 .st-outer ul, .st-outer ul li {
   list-style-type: disc;
@@ -67,19 +34,4 @@ select {
 }
 .st-text-block--heading.heading-three {
   font-size: 1.2em;
-}
-
-/* get to actual app specific styling */
-.editor-preload {
-  margin: 0 auto;
-}
-.editor-preload > .col {
-  text-align: center;
-}
-.preloader-wrapper {
-  margin: 0 auto;
-}
-.collapsible-body p {
-  margin: 20px;
-  padding: 0;
 }

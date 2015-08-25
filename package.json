@@ -9,6 +9,7 @@
     "aws-sdk": "^2.1.36",
     "backbone": "^1.2.1",
     "bcryptjs": "^2.1.0",
+    "bootstrap": "^3.3.5",
     "brfs": "^1.4.0",
     "browserify": "^10.2.4",
     "cfenv": "^1.0.0",
@@ -34,7 +35,6 @@
     "jquery": "^2.1.4",
     "js-yaml": "^3.3.1",
     "markdown": "^0.5.0",
-    "materialize-css": "^0.96.1",
     "mime": "^1.3.4",
     "moment": "^2.10.3",
     "passport": "^0.2.1",
@@ -53,7 +53,7 @@
     "validator": "^3.39.0"
   },
   "scripts": {
-    "install": "npm run materialize && npm run migrate:up",
+    "install": "npm run bootstrap && npm run migrate:up",
     "start": "npm run browserify && node app.js",
     "debug": "node debug app.js",
     "browserify": "browserify -t brfs assets/app/app.js -o assets/js/bundle.js",
@@ -61,10 +61,10 @@
     "watch:server": "nodemon app.js --ignore assets/ --ignore .tmp/ --ignore node_modules/",
     "watch:client": "watchify --debug -t brfs assets/app/app.js -o assets/js/bundle.js",
     "test": "mocha test/bootstrap.test.js test/unit/**/*.test.js",
-    "materialize": "cp node_modules/materialize-css/bin/materialize.css assets/styles/ && cp -R node_modules/materialize-css/font assets/ && cp node_modules/materialize-css/bin/materialize.js assets/js/dependencies/",
     "migrate:create": "grunt db:migrate:create",
     "migrate:up": "grunt db:migrate:up || true",
-    "migrate:down": "grunt db:migrate:down"
+    "migrate:down": "grunt db:migrate:down",
+    "bootstrap": "cp node_modules/bootstrap/dist/css/bootstrap.min.css assets/styles/ && mkdir -p assets/fonts && cp node_modules/bootstrap/fonts/* assets/fonts"
   },
   "main": "app.js",
   "repository": {

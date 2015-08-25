@@ -1,0 +1,55 @@
+<div class="panel panel-default">
+  <div class="panel-heading"><%- repository %></div>
+  <div class="panel-body">
+    <% if (!builds.length || !lastBuildTime) { %>
+    <p>This site has not been built yet. Please refresh the page to see new builds.</p>
+    <% } else { %>
+    <div class="row">
+      <div class="col-md-6">
+        <p>The production version of this site was last built at <%- lastBuildTime %></p>
+      </div>
+      <div class="col-md-6">
+        <div class="pull-right">
+          <a href="#site/<%- id %>/edit" class="btn btn-default btn-xs" data-action="edit-site-settings" alt="change settings for <%- repository %>">Settings</a>
+          <a href="/#edit/<%- owner %>/<%- repository %>/<%- defaultBranch %>" class="btn btn-default btn-xs" data-action="edit-site-content" alt="edit the site <%- repository %>">Edit</a>
+          <a href="#" class="btn btn-danger btn-xs" data-action="delete-site" alt="delete the site <%- repository %>">Delete</a>
+          <% if (builds.length) { %>
+          <a href="<%- viewLink %>" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank">View</a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <% if (_(builds).filter(function(build) {
+        return build.branch !== defaultBranch;
+      }).length) {
+    %>
+    <p><em>Recent drafts</em></p>
+    <% } %>
+    <ul>
+      <%
+      _(builds).chain().filter(function(build) {
+        return build.branch !== defaultBranch;
+      }).unique(function(build) {
+        return build.branch;
+      }).last(5).value().reverse().forEach(function(build, index) {
+      %>
+      <div class="row">
+        <li>
+          <div class="col-md-6"><%- build.branch %></div>
+          <div class="col-md-6">
+            <% if (build.state === 'success') { %>
+            <a href="/#edit/<%- owner %>/<%- repository %>/<%- build.branch %>" class="btn btn-default btn-xs" alt="edit the site <%- repository %>">Edit draft</a>
+
+            <a href="/preview/<%- owner %>/<%- repository %>/<%- build.branch %>/" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank">View draft</a>
+            <% } else if (build.status === 'error') { %>
+            <code><%- build.error %></code>
+            <% } %>
+          </div>
+        </li>
+      </div>
+      <% }); %>
+    </ul>
+    <% } %>
+
+  </div>
+</div>

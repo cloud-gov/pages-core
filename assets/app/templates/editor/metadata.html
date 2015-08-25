@@ -1,0 +1,23 @@
+<div class="row">
+  <div class="col-md-5">
+    <div class="form-group">
+      <% if (!obj.key) { %>
+        <input type="text" class="form-control front-matter-key" placeholder="Key">
+      <% } else { %>
+        <input type="text" class="form-control front-matter-key" value="<%- key %>">
+      <% } %>
+    </div>
+  </div>
+  <div class="col-md-5">
+    <div class="form-group">
+      <% if (!obj.key) { %>
+        <input type="text" class="form-control front-matter-value" placeholder="Value">
+      <% } else { %>
+        <input type="text" class="form-control front-matter-value" value="<%- value %>">
+      <% } %>
+    </div>
+  </div>
+  <div class="col-md-1">
+    <button class="btn btn-danger" data-action="delete-row">Delete</button>
+  </div>
+</div>

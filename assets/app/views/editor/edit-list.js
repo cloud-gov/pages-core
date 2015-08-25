@@ -3,12 +3,12 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 
-var templateHtml = fs.readFileSync(__dirname + '/../templates/AuthenticateTemplate.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/list-item.html').toString();
 
 var EditorFileListView = Backbone.View.extend({
   tagName: 'ul',
-  className: 'collection',
-  template: _.template('<li class="collection-item avatar"><a href="<%- fileUrl %>"><i class="material-icons circle"><%- type %></i><p class="title"><%- fileName %></p></a></li>'),
+  className: 'list-group',
+  template: _.template(templateHtml),
   initialize: function initializeEditorFileListView(opts) {
     this.path = opts.path;
     this.files = opts.files || [];
@@ -26,10 +26,17 @@ var EditorFileListView = Backbone.View.extend({
 
     this.files.forEach(function(file) {
       var newHash = ['#edit', owner, repo, branch, file.path].join('/'),
-          type    = (file.type == 'dir') ? 'folder' : 'insert_drive_file',
-          li      = self.template({ fileUrl: newHash, fileName: file.name, type: type });
+          type    = (file.type == 'dir') ? 'glyphicon-folder-close' : 'glyphicon-file',
+          fileExt = file.name.split('.').slice(-1)[0],
+          ghExts = ['html', 'css', 'scss', 'js'];
 
-      self.$el.append(li);
+      if (_.contains(ghExts, fileExt) && type != 'folder') {
+        newHash = ['https://github.com/', owner, repo, 'edit', branch, file.path].join('/');
+      }
+      self.$el.append(self.template({ fileUrl: newHash,
+        fileName: file.name,
+        type: type
+      }));
     });
 
     return this;

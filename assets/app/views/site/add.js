@@ -5,10 +5,10 @@ var _ = require('underscore');
 
 /* this require looks gross but it enables us to have one place
 to set template data that is available to the front and back end apps */
-var SiteTemplates = require('../../../config/templates').templates;
+var SiteTemplates = require('../../../../config/templates').templates;
 
-var SiteModel = require('../models/Site').model;
-var templateHtml = fs.readFileSync(__dirname + '/../templates/AddSiteTemplate.html').toString();
+var SiteModel = require('../../models/Site').model;
+var templateHtml = fs.readFileSync(__dirname + '/../../templates/site/add.html').toString();
 
 var AddSiteView = Backbone.View.extend({
   tagName: 'div',
@@ -16,7 +16,7 @@ var AddSiteView = Backbone.View.extend({
   template: _.template(templateHtml),
   events: {
     'submit': 'onSubmitGithubRepo',
-    'click .card-action .btn': 'onTemplateSelection'
+    'click [data-action=fork-template]': 'onTemplateSelection'
   },
   initialize: function initializeSiteView(opts) {
     this.user = opts.user;
@@ -33,15 +33,13 @@ var AddSiteView = Backbone.View.extend({
       data[d.name] = d.value;
     });
 
-    console.log('data', data);
-
     new SiteModel(data, { collection: this.collection }).save(null, {
       success: this.onSuccess.bind(this),
       error: this.onError.bind(this)
     });
   },
   onTemplateSelection: function onTemplateSelection(e) {
-    var templateId = $(e.target).parents('.col').attr('data-template');
+    var templateId = $(e.target).parents('.col-md-4').data('template');
     var data = { templateId: templateId };
     $.ajax('/v0/site/fork', {
       method: 'POST',

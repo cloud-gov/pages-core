@@ -4,8 +4,8 @@ window.jQuery = window.$ = Backbone.$;
 var encodeB64 = window.btoa;
 var decodeB64 = window.atob;
 
-var MainContainerView = require('./views/MainContainerView');
-var NavbarView = require('./views/NavbarView');
+var MainContainerView = require('./views/main');
+var NavbarView = require('./views/nav');
 
 var UserModel = require('./models/User');
 var SiteCollection = require('./models/Site').collection;
