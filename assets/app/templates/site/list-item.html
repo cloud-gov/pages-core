@@ -19,11 +19,11 @@
         </div>
       </div>
     </div>
-    <!-- <% if (_(builds).filter(function(build) {
+    <% if (_(builds).filter(function(build) {
         return build.branch !== defaultBranch;
       }).length) {
     %>
-    <p><em>Recent branches</em></p>
+    <p><em>Recent drafts</em></p>
     <% } %>
     <ul>
       <%
@@ -38,9 +38,9 @@
           <div class="col-md-6"><%- build.branch %></div>
           <div class="col-md-6">
             <% if (build.state === 'success') { %>
-            <a href="/#edit/<%- owner %>/<%- repository %>/<%- build.branch %>" class="edit" alt="edit the site <%- repository %>">Edit branch</a>
+            <a href="/#edit/<%- owner %>/<%- repository %>/<%- build.branch %>" class="btn btn-default btn-xs" alt="edit the site <%- repository %>">Edit draft</a>
 
-            <a href="/preview/<%- owner %>/<%- repository %>/<%- build.branch %>/" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank">View branch</a>
+            <a href="/preview/<%- owner %>/<%- repository %>/<%- build.branch %>/" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank">View draft</a>
             <% } else if (build.status === 'error') { %>
             <code><%- build.error %></code>
             <% } %>
@@ -49,7 +49,7 @@
       </div>
       <% }); %>
     </ul>
-    <% } %> -->
+    <% } %>
 
   </div>
 </div>
