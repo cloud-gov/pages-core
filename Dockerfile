@@ -1,5 +1,6 @@
 FROM node:0.10-onbuild
 
+# Expose environment variables
 ENV BRANCH= \
   GITHUB_TOKEN= \
   GITHUB_CLIENT_ID= \
@@ -13,7 +14,9 @@ ENV BRANCH= \
   SAILS_LOG_LEVEL= \
   PORT=3000
 
-RUN npm run materialize
+
+# Run additional npm install scripts
+RUN npm run install --unsafe-perm
 
 # Set up Jekyll
 RUN apt-get update && \
@@ -21,6 +24,8 @@ RUN apt-get update && \
   gem install bundler && \
   bundle install
 
+# Make internal port available to host
 EXPOSE 3000
 
+# Start script
 ENTRYPOINT ["./scripts/docker-start.sh"]
