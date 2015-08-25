@@ -12,7 +12,7 @@ var SiteListItemView = Backbone.View.extend({
   model: SiteModel,
   template: _.template(templateHtml),
   events: {
-    'click a.delete': 'onDelete'
+    'click [data-action=delete-site]': 'onDelete'
   },
   initialize: function initializeSiteView() {
     this.render();
