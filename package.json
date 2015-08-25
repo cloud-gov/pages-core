@@ -64,7 +64,7 @@
     "migrate:create": "grunt db:migrate:create",
     "migrate:up": "grunt db:migrate:up || true",
     "migrate:down": "grunt db:migrate:down",
-    "bootstrap": "cp node_modules/bootstrap/dist/css/bootstrap.min.css assets/styles/"
+    "bootstrap": "cp node_modules/bootstrap/dist/css/bootstrap.min.css assets/styles/ && mkdir -p assets/fonts && cp node_modules/bootstrap/fonts/* assets/fonts"
   },
   "main": "app.js",
   "repository": {

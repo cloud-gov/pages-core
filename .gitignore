@@ -50,7 +50,7 @@ assets/js/bundle.js
 
 # Bootstrap assets
 assets/styles/bootstrap.min.css
-
+assets/fonts
 
 ################################################
 # Dependencies
