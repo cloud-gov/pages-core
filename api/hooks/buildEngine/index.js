@@ -161,7 +161,7 @@ var hook = {
     } else {
       var cmd = _.template(['rm -r ${publish} || true',
             'mkdir -p ${publish}',
-            'cp -r ${destination}/ ${publish}',
+            'cp -r ${destination}/* ${publish}',
           ].join(' && '));
       sails.log.verbose('Publishing job: ', model.id,
         ' => ', tokens.publish);
