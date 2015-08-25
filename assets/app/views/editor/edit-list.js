@@ -3,7 +3,7 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 
-var templateHtml = '<li class="list-group-item"><a href="<%- fileUrl %>"><%- type %><p class="title"><%- fileName %></p></a></li>';
+var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/list-item.html').toString();
 
 var EditorFileListView = Backbone.View.extend({
   tagName: 'ul',
@@ -26,14 +26,17 @@ var EditorFileListView = Backbone.View.extend({
 
     this.files.forEach(function(file) {
       var newHash = ['#edit', owner, repo, branch, file.path].join('/'),
-          type    = (file.type == 'dir') ? 'folder' : 'file',
+          type    = (file.type == 'dir') ? 'glyphicon-folder-close' : 'glyphicon-file',
           fileExt = file.name.split('.').slice(-1)[0],
           ghExts = ['html', 'css', 'scss', 'js'];
 
       if (_.contains(ghExts, fileExt) && type != 'folder') {
         newHash = ['https://github.com/', owner, repo, 'edit', branch, file.path].join('/');
       }
-      self.$el.append(self.template({ fileUrl: newHash, fileName: file.name, type: type }));
+      self.$el.append(self.template({ fileUrl: newHash,
+        fileName: file.name,
+        type: type
+      }));
     });
 
     return this;

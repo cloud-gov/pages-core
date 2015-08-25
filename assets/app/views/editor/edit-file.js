@@ -14,14 +14,15 @@ SirTrevor.Blocks.Ordered = require('./blocks/ol');
 SirTrevor.Blocks.Unordered = require('./blocks/ul');
 SirTrevor.Blocks.Code = require('./blocks/code');
 
-var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/edit-file.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/file.html').toString();
+var metadataHtml = fs.readFileSync(__dirname + '/../../templates/editor/metadata.html').toString();
 
 var EditorView = Backbone.View.extend({
   tagName: 'div',
   events: {
-    'click [data-show-area]': 'toggleAreas',
+    'click [data-tab]': 'toggleAreas',
     'click #save-content-action': 'saveDocument',
-    'click .front-matter-delete': 'deleteMetaDataRow',
+    'click [front-matter-delete]': 'deleteMetaDataRow',
     'click #add-front-matter-row': 'addMetaDataRow'
   },
   initialize: function (opts) {
@@ -30,24 +31,41 @@ var EditorView = Backbone.View.extend({
     return this;
   },
   render: function () {
-    var doc     = this.doc,
-        blocks  = [],
-        editor, mdTree;
+    var self        = this,
+        template    = _.template(templateHtml),
+        rowTemplate = _.template(metadataHtml),
+        doc         = this.doc;
 
-    this.$el.html(_.template(templateHtml)({ fileName: this.fileName, frontMatter: this.doc.frontMatter }));
+    this.$el.html(template({ fileName: this.fileName }));
     this.editor = new SirTrevor.Editor({
       el: this.$('.js-st-instance'),
       blockTypes: ["H1", "H2", "H3", "Text", "Unordered", "Ordered"]
     });
 
+    _.each(doc.frontMatter, function (value, key) {
+      var row = rowTemplate({ key: key, value: value });
+      self.$('#meta-data-rows').append(row);
+    });
+
     this.$('.js-st-instance').text(doc.toSirTrevorJsonString());
     this.editor.reinitialize();
+
     $('form#metadata').hide();
     return this;
   },
-  toggleAreas: function () {
-    $('form#metadata').toggle();
-    $('form#content').toggle();
+  toggleAreas: function (e) {
+    var target = e.target.id;
+    $('#'+target).parents('li').addClass('active');
+    if (target === 'showMetadata') {
+      $('#showContent').parents('li').removeClass('active');
+      $('form#content').hide();
+      $('form#metadata').show();
+    }
+    else {
+      $('#showMetadata').parents('li').removeClass('active');
+      $('form#metadata').hide();
+      $('form#content').show();
+    }
   },
   saveDocument: function (e) {
     var formFrontMatter = {};
@@ -78,8 +96,8 @@ var EditorView = Backbone.View.extend({
   },
   addMetaDataRow: function (e) {
     e.preventDefault();
-    var rowTemplate = _.template('<div class="row"><div class="col s5"><input type="text" class="front-matter-key" placeholder="key"></div><div class="col s5"><input type="text" class="front-matter-value" placeholder="value"></div><div class="col s2"><button class="front-matter-delete">Delete</button></div></div>')();
-    $('.meta-data-rows').append(rowTemplate);
+    var rowTemplate = _.template(metadataHtml)();
+    $('#meta-data-rows').append(rowTemplate);
 
     return this;
   }
