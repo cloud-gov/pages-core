@@ -22,5 +22,17 @@ module.exports.bootstrap = function(cb) {
   */
   sails.services.passport.loadStrategies();
 
-  cb();
+  // Use local tunnel for development
+  if (sails.config.environment === 'development') {
+    var localtunnel = require('localtunnel'), tunnel;
+    tunnel = localtunnel(sails.config.port, function(err, tunnel) {
+      if (err) console.error(new Error('Failed to start tunnel'));
+      sails.config.webhook.endpoint = tunnel.url + '/webhook/github';
+      sails.log.verbose('Development: using localtunnel for webhook: ',
+        sails.config.webhook.endpoint);
+      cb();
+    });
+  } else {
+    cb();
+  }
 };
