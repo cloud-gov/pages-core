@@ -18,7 +18,7 @@ var hook = {
         'https://${token}@github.com/${owner}/${repository}.git ${source}',
       'echo "baseurl: ${baseurl}\nbranch: ${branch}\n${config}" > ' +
         '${source}/_config_base.yml',
-      'jekyll build --safe --config ${source}/_config.yml,${source}/_config_base.yml ' +
+      'bundle exec jekyll build --safe --config ${source}/_config.yml,${source}/_config_base.yml ' +
         '--source ${source} --destination ${source}/_site',
       'rm -rf ${destination}',
       'mkdir -p ${destination}',
@@ -161,7 +161,7 @@ var hook = {
     } else {
       var cmd = _.template(['rm -r ${publish} || true',
             'mkdir -p ${publish}',
-            'cp -r ${destination}/ ${publish}',
+            'cp -r ${destination}/* ${publish}',
           ].join(' && '));
       sails.log.verbose('Publishing job: ', model.id,
         ' => ', tokens.publish);
