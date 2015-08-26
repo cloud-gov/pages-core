@@ -10,7 +10,8 @@ var SiteEditView = Backbone.View.extend({
   template: _.template(templateHtml, { variable: 'model' }),
 
   events: {
-    'submit': 'save'
+    'submit': 'save',
+    'click [data-action=delete-site]': 'onDelete'
   },
 
   render: function renderSiteEditView() {
@@ -33,6 +34,22 @@ var SiteEditView = Backbone.View.extend({
         view.trigger('site:save:success');
       }
     });
+  },
+
+  onDelete: function onDelete() {
+    var opts = {
+      success: this.onDeleteSuccess.bind(this),
+      error: this.onDeleteError.bind(this)
+    };
+    if (window.confirm('Are you sure you want to delete this site?')) {
+      this.model.destroy(opts);
+    }
+  },
+  onDeleteSuccess: function onDeleteSuccess() {
+    console.log('delete success');
+  },
+  onDeleteError: function onDeleteError() {
+    console.log('delete failure');
   }
 
 });

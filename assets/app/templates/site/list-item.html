@@ -10,9 +10,9 @@
       </div>
       <div class="col-md-6">
         <div class="pull-right">
+          <a href="#site/<%- id %>/builds" class="btn btn-default btn-xs" data-action="site-builds" alt="show log of builds for <%- repository %>">Builds</a>
           <a href="#site/<%- id %>/edit" class="btn btn-default btn-xs" data-action="edit-site-settings" alt="change settings for <%- repository %>">Settings</a>
           <a href="/#edit/<%- owner %>/<%- repository %>/<%- defaultBranch %>" class="btn btn-default btn-xs" data-action="edit-site-content" alt="edit the site <%- repository %>">Edit</a>
-          <a href="#" class="btn btn-danger btn-xs" data-action="delete-site" alt="delete the site <%- repository %>">Delete</a>
           <% if (builds.length) { %>
           <a href="<%- viewLink %>" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank">View</a>
           <% } %>
@@ -25,7 +25,7 @@
     %>
     <p><em>Recent drafts</em></p>
     <% } %>
-    <ul>
+    <ul class="list-unstyled">
       <%
       _(builds).chain().filter(function(build) {
         return build.branch !== defaultBranch;

@@ -1,16 +1,20 @@
 <div class="page-header">
-  <h1>Your current sites</h1>
+  <h1>
+    Your sites
+    <% if (sitesCount) { %>
+      <a href="#new" class="btn btn-primary pull-right" alt="add a new site" role="button">Add a new site</a>
+    <% } %>
+  </h1>
 </div>
 <% if (sitesCount === 0) { %>
   <div class="row center-block">
     <p>Welcome! You don't have any sites registered with Federalist just yet. Let's go ahead and change that.</p>
-    <a class="btn btn-primary" href="#new" role="button">Add your first site now</a>
+    <a class="btn btn-primary btn-lg" href="#new" role="button">Add your first site now</a>
   </div>
 <% } else { %>
   <div class="row">
     <div class="col-md-12">
       <ul class="sites"></ul>
-      <a href="#new" class="btn btn-primary" alt="add a new site" role="button">Add a new site</a>
     </div>
   </div>
 <% } %>

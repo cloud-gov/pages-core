@@ -11,9 +11,6 @@ var SiteListItemView = Backbone.View.extend({
   tagName: 'li',
   model: SiteModel,
   template: _.template(templateHtml),
-  events: {
-    'click [data-action=delete-site]': 'onDelete'
-  },
   initialize: function initializeSiteView() {
     this.render();
   },
@@ -29,22 +26,6 @@ var SiteListItemView = Backbone.View.extend({
     data.viewLink = data.domain ||
       data.siteRoot + '/site/' + data.owner + '/' + data.repository + '/';
     this.$el.html(this.template(data));
-  },
-
-  onDelete: function onDelete() {
-    var opts = {
-      succes: this.onDeleteSuccess.bind(this),
-      error: this.onDeleteError.bind(this)
-    };
-    if (window.confirm('Are you sure you want to delete this site?')) {
-      this.model.destroy(opts);
-    }
-  },
-  onDeleteSuccess: function onDeleteSuccess() {
-    console.log('delete success');
-  },
-  onDeleteError: function onDeleteError() {
-    console.log('delete failure');
   }
 });
 
