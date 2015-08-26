@@ -1,3 +1,6 @@
+<div class="page-header">
+  <h1>Recent builds for your site</h1>
+</div>
 <% _.each(site.builds, function(build) { %>
 <% var panelClass = build.state === 'error' ? 'danger' :
   build.state === 'success' ? 'success' : 'info'; %>
