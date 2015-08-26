@@ -6,5 +6,16 @@
  */
 
 module.exports = {
-
+  /*
+   * Return an object of usernames
+   */
+  usernames: function(req, res) {
+    User.find({}).exec(function(err, users) {
+      if (err) return res.serverError(err);
+      res.send(_.reduce(users, function(memo, user) {
+        memo[user.id] = user.username;
+        return memo;
+      }, {}));
+    });
+  }
 };

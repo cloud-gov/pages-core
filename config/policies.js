@@ -70,7 +70,8 @@ module.exports.policies = {
   UserController: {
     'find': ['passport', 'sessionAuth', 'filterSelfOnly'],
     'findOne': ['passport', 'sessionAuth', 'filterSelfOnly'],
-    'populate': ['passport', 'sessionAuth', 'filterSelfOnly']
+    'populate': ['passport', 'sessionAuth', 'filterSelfOnly'],
+    'usernames': ['passport', 'sessionAuth']
   },
 
   PreviewController: {

@@ -5,6 +5,7 @@ var AuthenticateView = require('./authenticate');
 var SiteEditView = require('./site/edit');
 var SiteListView = require('./site/list');
 var AddSiteView = require('./site/add');
+var BuildsView = require('./site/builds');
 var EditorContainerView = require('./editor/edit-main');
 
 var AppView = Backbone.View.extend({
@@ -63,6 +64,11 @@ var AppView = Backbone.View.extend({
     this.listenToOnce(siteEditView, 'site:save:success', function () {
       this.home();
     }.bind(this));
+    return this;
+  },
+  builds: function(id) {
+    var buildsView = new BuildsView({ model: this.sites.get(id) });
+    this.pageSwitcher.set(buildsView);
     return this;
   }
 });

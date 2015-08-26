@@ -1,0 +1,15 @@
+<% _.each(site.builds, function(build) { %>
+<% var panelClass = build.state === 'error' ? 'danger' :
+  build.state === 'success' ? 'success' : 'info'; %>
+<div class="panel panel-<%- panelClass %>">
+  <div class="panel-heading">
+    <%- build.branch %> (<%- build.username %>)
+    <span class="pull-right"><%- build.completedAtFormatted || 'Processing' %></span>
+  </div>
+  <div class="panel-body"><%
+    build.state === 'error' ?
+    print(build.error) :
+    print('The build completed successfully.')
+  %></div>
+</div>
+<% }); %>
