@@ -6,29 +6,47 @@ var yaml = require('js-yaml');
 
 var DocumentModel = Backbone.Model.extend({
   initialize: function (opts) {
-    var self          = this,
-        parts         = opts.markdown.split('---\n');
-    this.content      = '';
-    this.frontMatter  = {};
+    var parts;
 
-    if (parts[0] !== '') {
-      this.content = opts.markdown;
-      return this;
+    if (opts.markdown) {
+      parts = opts.markdown.split('---\n');
+      if (parts[0] === '') {
+      /* if the markdown has yml */
+        this.frontMatter = yaml.safeLoad(parts[1]);
+        this.content = parts[2];
+      }
+      else {
+      /* if the markdown does not have yml */
+       console.log('yo');
+        this.frontMatter = false;
+        this.content = opts.markdown;
+      }
     }
-    this.frontMatter = yaml.safeLoad(parts[1]);
-    this.content = parts[2];
+    else if (opts.yml) {
+      this.frontMatter = yaml.safeLoad(opts.yml);
+      this.content = false;
+    }
+
+    window.x = this;
     return this;
   },
   toMarkdown: function () {
-    var y = yaml.safeDump(this.frontMatter),
-        x = '---\n';
-    return [x, y, x, this.content].join('');
+    if (!this.frontMatter) return this.content;
+    if (!this.content) return yaml.safeDump(this.frontMatter);
+
+    return [
+      '---\n',
+      yaml.safeDump(this.frontMatter),
+      '---\n',
+      this.content
+    ].join('');
   },
   toSirTrevorJson: function () {
     var blocks = [],
+        content = this.content ? this.content : '',
         mdTree;
 
-    mdTree = markdown.parse(this.content).slice(1);
+    mdTree = markdown.parse(content).slice(1);
     for (var i = 0; i < mdTree.length; i++) {
       blocks.push(jsonMLToBlock(mdTree[i]));
     }
