@@ -26,8 +26,13 @@ var EditorView = Backbone.View.extend({
     'click [data-action=add-row]': 'addMetaDataRow'
   },
   initialize: function (opts) {
-    this.doc = new Document({ markdown: opts.content });
-    this.fileName = opts.file;
+    this.path = opts.path;
+    if (this.path.fileExt === 'yml') {
+      this.doc = new Document({ yml: opts.content })
+    }
+    else if (this.path.fileExt === 'md') {
+      this.doc = new Document({ markdown: opts.content });
+    }
     return this;
   },
   render: function () {
@@ -36,7 +41,7 @@ var EditorView = Backbone.View.extend({
         rowTemplate = _.template(metadataHtml),
         doc         = this.doc;
 
-    this.$el.html(template({ fileName: this.fileName }));
+    this.$el.html(template({ fileName: this.path.fileName }));
     this.editor = new SirTrevor.Editor({
       el: this.$('.js-st-instance'),
       blockTypes: ["H1", "H2", "H3", "Text", "Unordered", "Ordered"]
@@ -50,12 +55,18 @@ var EditorView = Backbone.View.extend({
     this.$('.js-st-instance').text(doc.toSirTrevorJsonString());
     this.editor.reinitialize();
 
-    $('form#metadata').hide();
+    if (this.doc.content) {
+      this.setActiveTab('showContent');
+    }
+    else if (this.doc.frontMatter) {
+      this.setActiveTab('showMetadata');
+    }
     return this;
   },
-  toggleAreas: function (e) {
-    var target = e.target.id;
+  setActiveTab: function (target) {
+    console.log('setting', target);
     $('#'+target).parents('li').addClass('active');
+
     if (target === 'showMetadata') {
       $('#showContent').parents('li').removeClass('active');
       $('form#content').hide();
@@ -67,9 +78,19 @@ var EditorView = Backbone.View.extend({
       $('form#content').show();
     }
   },
+  toggleAreas: function (e) {
+    var target = e.target.id;
+    this.setActiveTab(target);
+
+    return this;
+  },
   saveDocument: function (e) {
-    var formFrontMatter = {};
+    var formFrontMatter = {},
+        formContent;
+
     SirTrevor.onBeforeSubmit();
+    formContent = this.editor.store.retrieve();
+
     $('form#metadata .row').each(function(index, row) {
       var key   = $(row).find('.front-matter-key').val(),
           value = $(row).find('.front-matter-value').val();
@@ -79,13 +100,19 @@ var EditorView = Backbone.View.extend({
       }
     });
 
-    this.doc.updateFrontMatter(formFrontMatter);
-    this.doc.updateContentFromSirTrevorJson(this.editor.store.retrieve());
+    if (!_.isEmpty(formFrontMatter)) {
+      this.doc.updateFrontMatter(formFrontMatter);
+    }
+    if (!_.isEmpty(formContent.data)) {
+      this.doc.updateContentFromSirTrevorJson(formContent);
+    }
 
-    this.trigger('edit:save', {
-        md: this.doc.toMarkdown(),
-        msg: this.$('#save-content-message').val()
-    });
+    window.z = this.doc;
+
+    // this.trigger('edit:save', {
+    //     md: this.doc.toMarkdown(),
+    //     msg: this.$('#save-content-message').val()
+    // });
     return this;
   },
   deleteMetaDataRow: function (e) {
