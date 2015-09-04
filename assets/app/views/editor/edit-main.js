@@ -3,8 +3,13 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var ViewSwitcher = require('ampersand-view-switcher');
 var _ = require('underscore');
-var encodeB64 = window.btoa;
-var decodeB64 = window.atob;
+
+var encodeB64 = function (s) {
+  return window.btoa(unescape(encodeURIComponent(s)));
+};
+var decodeB64 = function (s) {
+  return decodeURIComponent(escape(window.atob(s)));
+};
 
 var EditorFileListView = require('./edit-list');
 var EditorView = require('./edit-file');
