@@ -31,7 +31,7 @@ description: Federalist is a unified interface for publishing static government 
 
 # Should be 'true' if the project has a continuous build (required)
 # values: true, false
-testable: false
+testable: true
 
 # Team members contributing to the project (required)
 # Items:
@@ -53,15 +53,20 @@ partners:
 - GSA
 
 # Brief descriptions of significant project developments
-milestones:
--
+#milestones:
+#-
 
 # Technologies used to build the project
 stack:
-- Node, Sails.js/Express, Backbone, browserify, AWS
+- Node
+- Sails.js
+- Express
+- Backbone
+- browserify
+- AWS
 
 # Brief description of the project's outcomes
-impact:
+#impact:
 
 # Services used to supply project status information
 # Items:
@@ -84,16 +89,17 @@ licenses:
   name: Public Domain
 
 # Blogs or websites associated with project development
-blog:
--
+#blog:
+#-
 
 # Links to project artifacts
 # Items:
 # - url: URL for the link
 #   text: Anchor text for the link
-links: https://federalist.18f.gov
--
+links:
+- url: https://federalist.18f.gov
+  text: Federalist site
 
 # Email addresses of points-of-contact
-contact: david.cole@gsa.gov
--
+contact:
+- david.cole@gsa.gov
