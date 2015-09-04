@@ -13,21 +13,31 @@
     </div>
   </div>
 
+  <% if (showContent) { %>
   <ul class="nav nav-tabs">
-    <li role="presentation" data-tab class="active"><a id="showContent">Content</a></li>
-    <li role="presentation" data-tab><a id="showMetadata">Settings</a></li>
+    <li role="presentation"
+        data-tab <% if (activeTab == 'content') { %> class="active" <% } %> >
+      <a data-tab-show="content">Content</a>
+    </li>
+    <li role="presentation"
+        data-tab <% if (activeTab == 'metadata') { %> class="active" <% } %> >
+      <a data-tab-show="metadata">Settings</a>
+    </li>
   </ul>
 
-  <form id="metadata" style="display: none;">
-    <h2>Settings</h2>
-    <div id="meta-data-rows">
-    </div>
-    <button type="button" class="btn btn-primary" data-action="add-row" role="button">Add setting</button>
-  </form>
-
-  <form id="content">
+  <form id="content" <% if (activeTab != 'content') { %> style="display: none;" <% } %> >
     <h2>Content</h2>
     <textarea class="js-st-instance"></textarea>
   </form>
+
+  <% } %>
+
+  <form id="metadata" <% if (activeTab != 'metadata') { %> style="display: none;" <% } %> >
+    <h2>Settings</h2>
+    <div data-target="metadata">
+    </div>
+  </form>
+
+
 
 </div>

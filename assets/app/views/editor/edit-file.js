@@ -3,6 +3,9 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 var SirTrevor = require('sir-trevor');
+var yaml = window.y = require('js-yaml');
+
+var cm = window.cm = require('codemirror');
 
 var Document = require('../../models/Document');
 
@@ -39,47 +42,55 @@ var EditorView = Backbone.View.extend({
     var self        = this,
         template    = _.template(templateHtml),
         rowTemplate = _.template(metadataHtml),
-        doc         = this.doc;
+        doc         = this.doc,
+        showContent = true,
+        activeTab   = 'content';
 
-    this.$el.html(template({ fileName: this.path.fileName }));
-    this.editor = new SirTrevor.Editor({
-      el: this.$('.js-st-instance'),
-      blockTypes: ["H1", "H2", "H3", "Text", "Unordered", "Ordered"]
-    });
-
-    _.each(doc.frontMatter, function (value, key) {
-      var row = rowTemplate({ key: key, value: value });
-      self.$('#meta-data-rows').append(row);
-    });
-
-    this.$('.js-st-instance').text(doc.toSirTrevorJsonString());
-    this.editor.reinitialize();
-
-    if (this.doc.content) {
-      this.setActiveTab('showContent');
+    if (this.path.fileExt === 'yml') {
+      showContent = false;
+      activeTab = 'metadata';
     }
-    else if (this.doc.frontMatter) {
-      this.setActiveTab('showMetadata');
+    console.log('showContent', showContent);
+    console.log('activeTab', activeTab);
+
+    this.$el.html(template({
+      fileName: this.path.file,
+      showContent: showContent,
+      activeTab: activeTab
+     }));
+
+    this.$('[data-target=metadata]')
+      .html(rowTemplate({ yml: yaml.safeDump(doc.frontMatter) }));
+
+    if (showContent) {
+      this.editor = new SirTrevor.Editor({
+        el: this.$('.js-st-instance'),
+        blockTypes: ["H1", "H2", "H3", "Text", "Unordered", "Ordered"]
+      });
+
+      this.$('.js-st-instance').text(doc.toSirTrevorJsonString());
+      this.editor.reinitialize();
     }
+
     return this;
   },
   setActiveTab: function (target) {
-    console.log('setting', target);
-    $('#'+target).parents('li').addClass('active');
+    var t = '[data-tab-show=' + target + ']';
+    $(t).parents('li').addClass('active');
 
-    if (target === 'showMetadata') {
-      $('#showContent').parents('li').removeClass('active');
+    if (target === 'metadata') {
+      $('[data-tab-show=content]').parents('li').removeClass('active');
       $('form#content').hide();
       $('form#metadata').show();
     }
     else {
-      $('#showMetadata').parents('li').removeClass('active');
+      $('[data-tab-show=metadata]').parents('li').removeClass('active');
       $('form#metadata').hide();
       $('form#content').show();
     }
   },
   toggleAreas: function (e) {
-    var target = e.target.id;
+    var target = e.target.dataset.tabShow;
     this.setActiveTab(target);
 
     return this;
@@ -91,14 +102,19 @@ var EditorView = Backbone.View.extend({
     SirTrevor.onBeforeSubmit();
     formContent = this.editor.store.retrieve();
 
-    $('form#metadata .row').each(function(index, row) {
-      var key   = $(row).find('.front-matter-key').val(),
-          value = $(row).find('.front-matter-value').val();
+    if ($('form#metadata .row').length !== 0) {
+      $('form#metadata .row').each(function(index, row) {
+        var key   = $(row).find('.front-matter-key').val(),
+            value = $(row).find('.front-matter-value').val();
 
-      if (key) {
-        formFrontMatter[key] = value;
-      }
-    });
+        if (key) {
+          formFrontMatter[key] = value;
+        }
+      });
+    }
+    else {
+      formFrontMatter = yaml.safeLoad($('#metadata textarea').val());
+    }
 
     if (!_.isEmpty(formFrontMatter)) {
       this.doc.updateFrontMatter(formFrontMatter);

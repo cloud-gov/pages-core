@@ -1,3 +1,6 @@
+<% if (yml) { %>
+<textarea><%= yml %></textarea>
+<% } else { %>
 <div class="row">
   <div class="col-md-5">
     <div class="form-group">
@@ -21,3 +24,4 @@
     <button class="btn btn-danger" data-action="delete-row">Delete</button>
   </div>
 </div>
+<% } %>

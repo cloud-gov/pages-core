@@ -20,6 +20,14 @@ body {
 .list-group .glyphicon {
   font-size: 3em;
 }
+
+[data-target=metadata] textarea {
+  font-family: monospace;
+  min-height: 500px;
+  padding: .4em;
+  width: 100%;
+}
+
 /* override material.css for special editor styles */
 .st-outer ul, .st-outer ul li {
   list-style-type: disc;
