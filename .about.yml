@@ -70,7 +70,10 @@ impact:
 #   url: URL for detailed information
 #   badge: URL for the status badge
 services:
--
+- name: travis
+  category: continuous deployment
+  url: https://travis-ci.org/18F/federalist
+  badge: https://travis-ci.org/18F/federalist.svg?branch=master
 
 # Licenses that apply to the project and/or its components (required)
 # Items by property name pattern:
@@ -88,7 +91,7 @@ blog:
 # Items:
 # - url: URL for the link
 #   text: Anchor text for the link
-links:
+links: https://federalist.18f.gov
 -
 
 # Email addresses of points-of-contact
