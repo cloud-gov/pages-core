@@ -128,17 +128,21 @@ models: {
 }
 ```
 
-### Building on Windows
+### Building and Running on Windows
 
 The same dependencies and steps as described above can be used to install and run Federalist on Windows. Running the platform on Windows also requires the installation of the [sails-hook-federalist-ms](https://github.com/Microsoft/sails-hook-federalist-ms) installable hook which can be done by executing the following command:
 
 `npm install sails-hook-federalist-ms`
 
-When using this hook, be sure to set the `FEDERALIST_BUILD_ENGINE` environment variable to *'federalist-ms'* prior to starting the application. Additional instructions for configuring the required Node.js, Jekyll, and Hugo dependencies on Windows can be found [here](https://github.com/Microsoft/sails-hook-federalist-ms).
+When using this hook, be sure to set the `FEDERALIST_BUILD_ENGINE` environment variable to *'federalist-ms'* prior to starting the application. Additional instructions for configuring the required Node.js, Jekyll, and Hugo dependencies on Windows can be found [here](https://github.com/Microsoft/sails-hook-federalist-ms#running-federalist-on-windows).
+
+### Building and Running on Azure
+
+The [sails-hook-federalist-ms](https://github.com/Microsoft/sails-hook-federalist-ms) package enables Federalist to run on an [Azure Web App](http://azure.microsoft.com/en-us/services/app-service/web/). Instructions for configuring a Web App for Federalist using this package can be found [here](https://github.com/Microsoft/sails-hook-federalist-ms#running-federalist-on-azure).
 
 ### Publishing to Azure
 
-The [sails-hook-federalist-ms](https://github.com/Microsoft/sails-hook-federalist-ms) package also enables site publishing to Microsoft Azure in addition to or in place of local or AWS S3 publishing. Instructions for configuring the hook to publish content to Azure can be found on GitHub [here](https://github.com/Microsoft/sails-hook-federalist-ms).
+The [sails-hook-federalist-ms](https://github.com/Microsoft/sails-hook-federalist-ms) hook also supports static site publishing to Microsoft Azure in addition to or in place of local or AWS S3 publishing. Instructions for configuring the hook to publish content to Azure can be found on GitHub [here](https://github.com/Microsoft/sails-hook-federalist-ms).
 
 ## Architecture
 
