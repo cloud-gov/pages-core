@@ -42,10 +42,6 @@ var AppView = Backbone.View.extend({
       $('.alert-container').html(
         '<div class="alert alert-danger" role="alert">' + message + '</div>'
       );
-      console.log(1, window.location.pathname + window.location.hash);
-      federalist.navigate(window.location.pathname + window.location.hash, {
-        trigger: true
-      });
     }
 
     var authenticateView = new AuthenticateView();
