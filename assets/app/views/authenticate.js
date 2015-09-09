@@ -3,7 +3,7 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 
-var templateHtml = fs.readFileSync(__dirname + '/../templates/authenticate.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../templates/home.html').toString();
 
 var AuthenticateView = Backbone.View.extend({
   tagName: 'div',

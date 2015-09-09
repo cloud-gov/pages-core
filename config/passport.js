@@ -45,7 +45,11 @@ module.exports.passport = {
     },
     // IDs for approved organizations
     // Includes the 18F organization by default
-    organizations: [6233994]
+    organizations: [
+      6233994,  // 18f
+      14109682, // federalist-users
+      14080592  // us-federal-sbst
+    ]
   },
   //
   // facebook: {
