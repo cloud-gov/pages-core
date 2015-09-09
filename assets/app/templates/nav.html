@@ -1,8 +1,8 @@
 <ul class="nav navbar-nav navbar-right" id="nav-mobile">
 <% if(username) {%>
-  <li><a>hey <%- username %>!</a></li>
-  <li><a id="logout">logout</a></li>
+  <li><p class="navbar-text">Welcome <%- username %>!</p></li>
+  <li><a href="#" id="logout">Done? Log out</a></li>
 <% } else { %>
-  <li><a href="/auth/github">login</a></li>
+  <li><a href="/auth/github">Have an account? Log in now</a></li>
 <% } %>
 </ul>
