@@ -1,7 +1,7 @@
 language: node_js
 sudo: true
 node_js:
-- stable
+- "0.10"
 env:
   global:
   - CF_APP=federalist
