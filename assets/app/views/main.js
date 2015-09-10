@@ -14,6 +14,12 @@ var AppView = Backbone.View.extend({
     this.user = opts.user;
     this.sites = opts.collection;
 
+    // Initiate websocket subscription and fetch sites on build message
+    io.socket.get('/v0/build?limit=0');
+    io.socket.on('build', function() {
+      this.sites.fetch();
+    }.bind(this));
+
     this.render();
   },
   render: function () {
