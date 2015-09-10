@@ -1,16 +1,19 @@
-<div class="panel panel-default">
-  <div class="panel-heading"><%- repository %></div>
+<div class="panel panel-default %>">
+  <div class="panel-heading">
+    <%- repository %>
+    <%= statusLabel %>
+  </div>
   <div class="panel-body">
     <% if (!builds.length || !lastBuildTime) { %>
-    <p>This site has not been built yet. Please refresh the page to see new builds.</p>
+    <p>This site has not been published yet. Please wait while the site is built.</p>
     <% } else { %>
     <div class="row">
       <div class="col-md-6">
-        <p>The production version of this site was last built at <%- lastBuildTime %></p>
+        <p>This site was last published at <%- lastBuildTime %></p>
       </div>
       <div class="col-md-6">
         <div class="pull-right">
-          <a href="#site/<%- id %>/builds" class="btn btn-default btn-xs" data-action="site-builds" alt="show log of builds for <%- repository %>">Builds</a>
+          <a href="#site/<%- id %>/builds" class="btn btn-default btn-xs" data-action="site-builds" alt="show log of builds for <%- repository %>">Log</a>
           <a href="#site/<%- id %>/edit" class="btn btn-default btn-xs" data-action="edit-site-settings" alt="change settings for <%- repository %>">Settings</a>
           <a href="/#edit/<%- owner %>/<%- repository %>/<%- defaultBranch %>" class="btn btn-default btn-xs" data-action="edit-site-content" alt="edit the site <%- repository %>">Edit</a>
           <% if (builds.length) { %>
