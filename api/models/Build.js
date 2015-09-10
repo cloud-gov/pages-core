@@ -34,8 +34,13 @@ module.exports = {
   },
 
   afterCreate: function(model, done) {
+    Build.publishCreate(model);
     this.addJob(model);
     if (done) return done();
+  },
+
+  afterUpdate: function(model) {
+    Build.publishUpdate(model.id, model);
   },
 
   /**
