@@ -27,10 +27,18 @@ var DocumentModel = Backbone.Model.extend({
     return this;
   },
   toMarkdown: function () {
+    var lastCharIndex;
     if (!this.frontMatter) return this.content;
     if (!this.content) return this.frontMatter;
 
-    return ['---\n', this.frontMatter, '\n---\n', this.content]
+    // add a new line at the end if there isn't one already
+    // this is so the front matter dashes are on the next line
+    lastCharIndex = this.frontMatter.length - 1;
+    if (this.frontMatter[lastCharIndex] !== '\n') {
+      this.frontMatter += '\n';
+    }
+
+    return ['---\n', this.frontMatter, '---\n', this.content]
       .join('');
   },
   toSirTrevorJson: function () {
