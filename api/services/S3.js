@@ -25,7 +25,7 @@ AWS.util.update(AWS.S3.prototype, {
 
 module.exports = function(config, done) {
 
-  config.compress = 'html|css|js|json';
+  config.compress = 'html|css|js|json|svg';
 
   // Loop through all files and selectively encode them
   walk(config.directory, function(err, results) {
