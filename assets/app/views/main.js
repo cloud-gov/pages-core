@@ -31,7 +31,7 @@ var AppView = Backbone.View.extend({
     var authed = this.user.isAuthenticated(),
         error = querystring.parse(window.location.search.slice(1)).error,
         messages = {
-          'Error.Passport.Unauthorized': 'Your account is not set up to access Federalist. Have you signed up as a beta user? If have signed up and should have access, please let us know.',
+          'Error.Passport.Unauthorized': 'Your account is not set up to access Federalist. Have you signed up as a beta user? If you have signed up and should have access, please let us know.',
           'default': 'An unexpected error occured. Please try again. If you continue to see this message, please let us know.'
         },
         message = error && (messages[error] || messages['default']);
