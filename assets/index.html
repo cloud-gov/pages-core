@@ -25,6 +25,15 @@
     </nav>
     <main class="container"></main>
     <footer class="page-footer orange"></footer>
+    <script src="/js/dependencies/sails.io.js"></script>
+    <script>
+      io.sails.transports = ['websocket'];
+      io.sails.useCORSRouteToGetCookie = false;
+      // CloudFoundry only accepts websockets over port 4443
+      if (/\.18f\.gov$/.test(location.hostname)) {
+        io.sails.url = location.protocol + '//' + location.hostname + ':4443';
+      }
+    </script>
     <script src="/js/bundle.js"></script>
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
