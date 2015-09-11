@@ -1,4 +1,6 @@
 var fs = require('fs'),
+    http = require('http'),
+    https = require('https'),
     zlib = require('zlib'),
     mime = require('mime'),
     AWS = require('aws-sdk'),
@@ -10,9 +12,20 @@ var fs = require('fs'),
       s3Client: s3
     });
 
+// Increase sockets to avoid S3 sync errors
+http.globalAgent.maxSockets = https.globalAgent.maxSockets = 20;
+
+// Work around upload bug for files > 1mb
+AWS.util.update(AWS.S3.prototype, {
+  addExpect100Continue: function addExpect100Continue(req) {
+    sails.log.verbose('Depreciating this workaround, because introduced a bug');
+    sails.log.verbose('Check: https://github.com/andrewrk/node-s3-client/issues/74');
+  }
+});
+
 module.exports = function(config, done) {
 
-  config.compress = 'html|css|js|json';
+  config.compress = 'html|css|js|json|svg';
 
   // Loop through all files and selectively encode them
   walk(config.directory, function(err, results) {
@@ -54,12 +67,14 @@ function sync(config, done) {
         },
         getS3Params: setEncoding
       },
-      uploader = s3Ext.uploadDir(params).on('error', function(err) {
-        sails.log.error('unable to sync:', err.stack);
-        done(err);
-      }).on('end', function() {
-        done();
-      });
+      uploader = s3Ext.uploadDir(params);
+
+  uploader.on('error', function(err) {
+    sails.log.error('unable to sync:', err.stack);
+  });
+  uploader.on('end', function() {
+    return done();
+  });
 
   function setEncoding(file, stat, done) {
     var s3Params = {},
