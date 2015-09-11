@@ -21,6 +21,10 @@ body {
   font-size: 3em;
 }
 
+.editor .panel {
+  margin-top: 2em;
+}
+
 .CodeMirror {
   height: auto;
 }
