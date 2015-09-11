@@ -13,6 +13,7 @@
     "brfs": "^1.4.0",
     "browserify": "^10.2.4",
     "cfenv": "^1.0.0",
+    "codemirror": "^5.6.0",
     "db-migrate": "^0.9.17",
     "ejs": "~0.8.4",
     "express-force-ssl": "^0.2.12",
@@ -56,7 +57,7 @@
     "validator": "^3.39.0"
   },
   "scripts": {
-    "install": "npm run bootstrap && npm run migrate:up",
+    "install": "npm run bootstrap && npm run codemirror && npm run migrate:up",
     "start": "npm run browserify && node app.js",
     "debug": "node debug app.js",
     "browserify": "browserify -t brfs assets/app/app.js -o assets/js/bundle.js",
@@ -67,7 +68,8 @@
     "migrate:create": "grunt db:migrate:create",
     "migrate:up": "grunt db:migrate:up || true",
     "migrate:down": "grunt db:migrate:down",
-    "bootstrap": "cp node_modules/bootstrap/dist/css/bootstrap.min.css assets/styles/ && mkdir -p assets/fonts && cp node_modules/bootstrap/fonts/* assets/fonts"
+    "bootstrap": "cp node_modules/bootstrap/dist/css/bootstrap.min.css assets/styles/ && mkdir -p assets/fonts && cp node_modules/bootstrap/fonts/* assets/fonts",
+    "codemirror": "cp node_modules/codemirror/lib/codemirror.css assets/styles/"
   },
   "main": "app.js",
   "repository": {

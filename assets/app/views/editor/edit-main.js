@@ -3,8 +3,13 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var ViewSwitcher = require('ampersand-view-switcher');
 var _ = require('underscore');
-var encodeB64 = window.btoa;
-var decodeB64 = window.atob;
+
+var encodeB64 = function (s) {
+  return window.btoa(unescape(encodeURIComponent(s)));
+};
+var decodeB64 = function (s) {
+  return decodeURIComponent(escape(window.atob(s)));
+};
 
 var EditorFileListView = require('./edit-list');
 var EditorView = require('./edit-file');
@@ -22,11 +27,12 @@ var EditView = Backbone.View.extend({
     return this;
   },
   render: function () {
-    var self        = window.t = this,
+    var self        = this,
         owner       = this.path.owner,
         repo        = this.path.repo,
         branch      = this.path.branch,
         file        = this.path.file,
+        ghExts      = ['html', 'css', 'scss', 'js'],
         ghBaseUrl   = 'https://api.github.com/repos',
         ghUrl       = [ghBaseUrl, owner, repo, 'contents'].join('/'),
         params      = { access_token: this.token, ref: branch, z: parseInt(Math.random() * 10000) },
@@ -36,7 +42,11 @@ var EditView = Backbone.View.extend({
     this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.$('#edit-content')[0]);
 
     if (!this.path) return this;
-    if (file) ghUrl += '/' + file;
+
+    if (file) {
+      this.path.fileExt = file.split('.').slice(-1)[0];
+      ghUrl += '/' + file;
+    }
 
     $.ajax(ghUrl, {
       data: params,
@@ -47,7 +57,7 @@ var EditView = Backbone.View.extend({
         if (json.type === 'file') {
           // if Github's API tells us this is a file, use the editor
           var editorView = new EditorView({
-            file: file,
+            path: self.path,
             content: decodeB64(json.content)
           });
           self.path.sha = json.sha;
@@ -68,10 +78,10 @@ var EditView = Backbone.View.extend({
     return this;
   },
   updateCurrentPath: function (owner, repo, file) {
-    var bcEl = this.$('ol.breadcrumb');
-    var template = _.template(breadcrumbHtml);
-    var branch  = this.path.branch;
-    var filePath;
+    var bcEl     = this.$('ol.breadcrumb'),
+        template = _.template(breadcrumbHtml),
+        branch   = this.path.branch,
+        filePath;
     bcEl.empty();
     bcEl.append(template({ text: owner, link: '/' }));
     bcEl.append(template({ text: repo, link: ['#edit', owner, repo, branch].join('/') }));

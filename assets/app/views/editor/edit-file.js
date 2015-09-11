@@ -4,6 +4,9 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 var SirTrevor = require('sir-trevor');
 
+var CodeMirror = require('codemirror');
+require('codemirror/mode/yaml/yaml');
+
 var Document = require('../../models/Document');
 
 var headings = require('./blocks/heading');
@@ -15,90 +18,116 @@ SirTrevor.Blocks.Unordered = require('./blocks/ul');
 SirTrevor.Blocks.Code = require('./blocks/code');
 
 var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/file.html').toString();
-var metadataHtml = fs.readFileSync(__dirname + '/../../templates/editor/metadata.html').toString();
 
 var EditorView = Backbone.View.extend({
   tagName: 'div',
   events: {
     'click [data-tab]': 'toggleAreas',
-    'click [data-action=save-content]': 'saveDocument',
-    'click [data-action=delete-row]': 'deleteMetaDataRow',
-    'click [data-action=add-row]': 'addMetaDataRow'
+    'click [data-action=save-content]': 'saveDocument'
   },
+  template: _.template(templateHtml),
   initialize: function (opts) {
-    this.doc = new Document({ markdown: opts.content });
-    this.fileName = opts.file;
+    var self      = this,
+        activeTab = 'content';
+
+    this.editors = {};
+    this.path = opts.path;
+    this.showContent = true;
+
+    if (this.path.fileExt === 'yml') {
+      this.doc = new Document({ yml: opts.content });
+      this.showContent = false;
+      activeTab = 'metadata';
+    }
+    else if (this.path.fileExt === 'md') {
+      this.doc = new Document({ markdown: opts.content });
+    }
+
+    this.$el.html(this.template({
+      fileName: this.path.file,
+      showContent: this.showContent,
+      activeTab: activeTab
+    }));
+
+    this.editors.settings = CodeMirror(this.$('[data-target=metadata]')[0], {
+      lineNumbers: true,
+      mode:  "yaml",
+      tabSize: 2
+    });
+
+    if (this.doc.frontMatter) {
+      this.editors.settings.doc.setValue(this.doc.frontMatter);
+    }
+
     return this;
   },
   render: function () {
     var self        = this,
-        template    = _.template(templateHtml),
-        rowTemplate = _.template(metadataHtml),
         doc         = this.doc;
 
-    this.$el.html(template({ fileName: this.fileName }));
-    this.editor = new SirTrevor.Editor({
-      el: this.$('.js-st-instance'),
-      blockTypes: ["H1", "H2", "H3", "Text", "Unordered", "Ordered"]
-    });
+    window.setTimeout(function() {
+      self.editors.settings.refresh();
+    }, 0);
 
-    _.each(doc.frontMatter, function (value, key) {
-      var row = rowTemplate({ key: key, value: value });
-      self.$('#meta-data-rows').append(row);
-    });
+    if (this.showContent) {
+      this.editor = new SirTrevor.Editor({
+        el: this.$('.js-st-instance'),
+        blockTypes: ["H1", "H2", "H3", "Text", "Unordered", "Ordered"]
+      });
 
-    this.$('.js-st-instance').text(doc.toSirTrevorJsonString());
-    this.editor.reinitialize();
+      this.$('.js-st-instance').text(doc.toSirTrevorJsonString());
+      this.editor.reinitialize();
+    }
 
-    $('form#metadata').hide();
     return this;
   },
-  toggleAreas: function (e) {
-    var target = e.target.id;
-    $('#'+target).parents('li').addClass('active');
-    if (target === 'showMetadata') {
-      $('#showContent').parents('li').removeClass('active');
+  setActiveTab: function (target) {
+    var t = '[data-tab-show=' + target + ']';
+    $(t).parents('li').addClass('active');
+
+    if (target === 'metadata') {
+      $('[data-tab-show=content]').parents('li').removeClass('active');
       $('form#content').hide();
       $('form#metadata').show();
+      this.editors.settings.refresh();
     }
     else {
-      $('#showMetadata').parents('li').removeClass('active');
+      $('[data-tab-show=metadata]').parents('li').removeClass('active');
       $('form#metadata').hide();
       $('form#content').show();
     }
   },
+  toggleAreas: function (e) {
+    var target = e.target.dataset.tabShow;
+    this.setActiveTab(target);
+
+    return this;
+  },
   saveDocument: function (e) {
-    var formFrontMatter = {};
-    SirTrevor.onBeforeSubmit();
-    $('form#metadata .row').each(function(index, row) {
-      var key   = $(row).find('.front-matter-key').val(),
-          value = $(row).find('.front-matter-value').val();
+    var settings,
+        content;
 
-      if (key) {
-        formFrontMatter[key] = value;
-      }
-    });
+    if (this.editor) {
+      SirTrevor.onBeforeSubmit();
+      content = this.editor.store.retrieve();
+    }
 
-    this.doc.updateFrontMatter(formFrontMatter);
-    this.doc.updateContentFromSirTrevorJson(this.editor.store.retrieve());
+    settings = this.editors.settings.doc.getValue();
+
+    if (settings) {
+      this.doc.frontMatter = settings;
+    }
+    else {
+      this.doc.frontMatter = false;
+    }
+    if (content) {
+      this.doc.updateContentFromSirTrevorJson(content);
+    }
 
     this.trigger('edit:save', {
         md: this.doc.toMarkdown(),
         msg: this.$('#save-content-message').val()
     });
-    return this;
-  },
-  deleteMetaDataRow: function (e) {
-    e.preventDefault();
-    $(e.target).parents('.row').remove();
-
-    return this;
-  },
-  addMetaDataRow: function (e) {
-    e.preventDefault();
-    var rowTemplate = _.template(metadataHtml)({});
-    $('#meta-data-rows').append(rowTemplate);
-
     return this;
   }
 });

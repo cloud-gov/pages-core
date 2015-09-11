@@ -20,6 +20,15 @@ body {
 .list-group .glyphicon {
   font-size: 3em;
 }
+
+.editor .panel {
+  margin-top: 2em;
+}
+
+.CodeMirror {
+  height: auto;
+}
+
 /* override material.css for special editor styles */
 .st-outer ul, .st-outer ul li {
   list-style-type: disc;
