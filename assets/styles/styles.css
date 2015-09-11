@@ -21,11 +21,8 @@ body {
   font-size: 3em;
 }
 
-[data-target=metadata] textarea {
-  font-family: monospace;
-  min-height: 500px;
-  padding: .4em;
-  width: 100%;
+.CodeMirror {
+  height: auto;
 }
 
 /* override material.css for special editor styles */

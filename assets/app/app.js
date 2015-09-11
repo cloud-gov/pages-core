@@ -12,15 +12,18 @@ var SiteCollection = require('./models/Site').collection;
 
 var Router = Backbone.Router.extend({
   initialize: function () {
+    var self = this;
+
     this.sites = new SiteCollection();
     this.user = new UserModel();
 
     this.navbarView = new NavbarView({ model: this.user });
     this.mainView = new MainContainerView({ user: this.user, collection: this.sites });
 
-    this.listenTo(this.user, 'change', function () {
+    this.listenToOnce(this.user, 'change', function () {
       var token = this.user.attributes.passports[0].tokens.accessToken;
       window.localStorage.setItem('token', encodeB64(token));
+      self.navbarView.render();
       Backbone.history.loadUrl();
     });
   },
