@@ -2,7 +2,6 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 var markdown = require('markdown').markdown;
 var htmlToMarkdown = require('to-markdown');
-var yaml = require('js-yaml');
 
 var DocumentModel = Backbone.Model.extend({
   initialize: function (opts) {
@@ -12,34 +11,27 @@ var DocumentModel = Backbone.Model.extend({
       parts = opts.markdown.split('---\n');
       if (parts[0] === '') {
       /* if the markdown has yml */
-        this.frontMatter = yaml.safeLoad(parts[1]);
+        this.frontMatter = parts[1];
         this.content = parts[2];
       }
       else {
       /* if the markdown does not have yml */
-       console.log('yo');
         this.frontMatter = false;
         this.content = opts.markdown;
       }
     }
     else if (opts.yml) {
-      this.frontMatter = yaml.safeLoad(opts.yml);
+      this.frontMatter = opts.yml;
       this.content = false;
     }
-
-    window.x = this;
     return this;
   },
   toMarkdown: function () {
     if (!this.frontMatter) return this.content;
-    if (!this.content) return yaml.safeDump(this.frontMatter);
+    if (!this.content) return this.frontMatter;
 
-    return [
-      '---\n',
-      yaml.safeDump(this.frontMatter),
-      '---\n',
-      this.content
-    ].join('');
+    return ['---\n', this.frontMatter, '---\n', this.content]
+      .join('');
   },
   toSirTrevorJson: function () {
     var blocks = [],
@@ -61,11 +53,6 @@ var DocumentModel = Backbone.Model.extend({
       return htmlString;
     }).join('\n');
     this.content = htmlToMarkdown(result);
-  },
-  updateFrontMatter: function (frontMatter) {
-    if (!frontMatter) return this;
-    this.frontMatter = frontMatter;
-    return this;
   }
 });
 
