@@ -55,7 +55,9 @@ var EditorView = Backbone.View.extend({
       tabSize: 2
     });
 
-    this.editors.settings.doc.setValue(this.doc.frontMatter);
+    if (this.doc.frontMatter) {
+      this.editors.settings.doc.setValue(this.doc.frontMatter);
+    }
 
     return this;
   },
@@ -114,6 +116,9 @@ var EditorView = Backbone.View.extend({
 
     if (settings) {
       this.doc.frontMatter = settings;
+    }
+    else {
+      this.doc.frontMatter = false;
     }
     if (content) {
       this.doc.updateContentFromSirTrevorJson(content);

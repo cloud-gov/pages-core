@@ -30,7 +30,7 @@ var DocumentModel = Backbone.Model.extend({
     if (!this.frontMatter) return this.content;
     if (!this.content) return this.frontMatter;
 
-    return ['---\n', this.frontMatter, '---\n', this.content]
+    return ['---\n', this.frontMatter, '\n---\n', this.content]
       .join('');
   },
   toSirTrevorJson: function () {
