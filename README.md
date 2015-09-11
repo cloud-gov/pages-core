@@ -1,4 +1,4 @@
-# Federalist 
+# Federalist
 [![Build Status](https://travis-ci.org/18F/federalist.svg?branch=master)](https://travis-ci.org/18F/federalist)
 
 ***Under active development. Everything is subject to change.***
@@ -13,7 +13,7 @@ To run the server, you'll need [Node.js](https://nodejs.org/download/) and [Ruby
 
 To build sites using Hugo, install [Hugo](http://gohugo.io/overview/installing/) and make sure it's available in your path.
 
-We use `ngrok` to form a local tunnel and expose our local app to webhooks. Install ngrok by typing the following in a command line interface, E.g. Terminal for Mac OSX: 
+We use `ngrok` to form a local tunnel and expose our local app to webhooks. Install ngrok by typing the following in a command line interface, E.g. Terminal for Mac OSX:
 
 ```
 $ brew install ngrok
@@ -31,6 +31,8 @@ We have a few environment variables that the application uses, here is a list of
 * `FEDERALIST_S3_BUCKET` - bucket ID to push files to on S3
 * `GITHUB_WEBHOOK_URL` - should be full url; for dev: http://localhost:1337/webhook/github
 * `GITHUB_WEBHOOK_SECRET` - random string used to protect webhook messages
+* `NEW_RELIC_APP_NAME` - application name to report to New Relic
+* `NEW_RELIC_LICENSE_KEY` - license key for New Relic
 
 You'll notice that we talk about a `/config/local.js` file below, particularly for setting up the Github app information. For local development either approach is fine, but for production environments you'll want to set these env vars instead of commit `local.js` to your history.
 
@@ -38,7 +40,7 @@ You'll notice that we talk about a `/config/local.js` file below, particularly f
 ### Build the server
 
 * Download or Clone this repository from Github either by using the command line or repo's website on Github. On the right side of the repo's page, there is a button that states "Clone in Desktop".
-* 
+*
 * Run `npm install` from the root(the directory that houses the projects files on your computer) of the repository to load modules and install Jekyll dependencies
 
 Together these commands will looks something like the following:
@@ -62,7 +64,7 @@ $ npm install
     }
   }
  ```
- 
+
 * Set webhook settings for a public endpoint and secret. Note that your ngrok subdomain (the `Vncr0qo2Yx` bit below) will be different.
 
   ```
@@ -92,7 +94,7 @@ module.exports = {
 };
 ```
 
-* Run the server with `npm start` or `node app.js` (You can use `npm run watch:server` for the server to restart when you save file changes) at the directory of the project on your local computer. 
+* Run the server with `npm start` or `node app.js` (You can use `npm run watch:server` for the server to restart when you save file changes) at the directory of the project on your local computer.
 
 
 #### Build the server and the front-end
@@ -115,13 +117,13 @@ By default, the application should use local disk storage in place of a database
 
 ```
 connections: {
-	postgres: { 
-		adapter: 'sails-postgresql', 
+	postgres: {
+		adapter: 'sails-postgresql',
 		database: 'federalist'
 	}
-}, 
-models: { 
-	connection: 'postgres' 
+},
+models: {
+	connection: 'postgres'
 }
 ```
 
