@@ -5,7 +5,7 @@ var _ = require('underscore');
 var SirTrevor = require('sir-trevor');
 
 var CodeMirror = require('codemirror');
-var cmMode = require('codemirror/mode/yaml/yaml');
+require('codemirror/mode/yaml/yaml');
 
 var Document = require('../../models/Document');
 
