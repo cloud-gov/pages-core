@@ -56,7 +56,7 @@
     "validator": "^3.39.0"
   },
   "scripts": {
-    "install": "npm run bootstrap && && npm run codemirror && npm run migrate:up",
+    "install": "npm run bootstrap && npm run codemirror && npm run migrate:up",
     "start": "npm run browserify && node app.js",
     "debug": "node debug app.js",
     "browserify": "browserify -t brfs assets/app/app.js -o assets/js/bundle.js",
