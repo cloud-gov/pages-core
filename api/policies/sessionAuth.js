@@ -15,7 +15,7 @@ module.exports = function(req, res, next) {
     return next();
   }
 
-  if (req.path.indexOf('/preview/') === 0) {
+  if (req.path && req.path.indexOf('/preview/') === 0) {
     return res.redirect('/');
   }
 
