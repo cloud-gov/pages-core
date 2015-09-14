@@ -149,7 +149,8 @@ var hook = {
               tokens.owner + '/' +
               tokens.repository +
               tokens.branchURL,
-            directory: tokens.destination
+            directory: tokens.destination,
+            baseurl: tokens.baseurl === "''" ? '' : tokens.baseurl
           };
       sails.log.verbose('Publishing job: ', model.id,
         ' => ', sails.config.build.s3Bucket);
