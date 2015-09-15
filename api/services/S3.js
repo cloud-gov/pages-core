@@ -17,10 +17,7 @@ http.globalAgent.maxSockets = https.globalAgent.maxSockets = 20;
 
 // Work around upload bug for files > 1mb
 AWS.util.update(AWS.S3.prototype, {
-  addExpect100Continue: function addExpect100Continue(req) {
-    sails.log.verbose('Depreciating this workaround, because introduced a bug');
-    sails.log.verbose('Check: https://github.com/andrewrk/node-s3-client/issues/74');
-  }
+  addExpect100Continue: function addExpect100Continue(req) {}
 });
 
 module.exports = function(config, done) {
@@ -28,14 +25,14 @@ module.exports = function(config, done) {
   config.compress = 'html|css|js|json|svg';
 
   // Loop through all files and selectively encode them
-  walk(config.directory, function(err, results) {
+  walk(config.directory, function(err, files, directories) {
     if (err) return done(err);
 
-    async.each(results, encode.bind(this, config), function(err) {
+    async.each(files, encode.bind(this, config), function(err) {
       if (err) return done(err);
 
       // After encoding, sync to S3
-      sync(config, done);
+      sync(config, directories, done);
     });
   });
 
@@ -57,7 +54,7 @@ function encode(config, file, done) {
   });
 }
 
-function sync(config, done) {
+function sync(config, directories, done) {
   var params = {
         localDir: config.directory,
         deleteRemoved: true,
@@ -69,12 +66,8 @@ function sync(config, done) {
       },
       uploader = s3Ext.uploadDir(params);
 
-  uploader.on('error', function(err) {
-    sails.log.error('unable to sync:', err.stack);
-  });
-  uploader.on('end', function() {
-    return done();
-  });
+  uploader.on('error', logError);
+  uploader.on('end', setRedirects);
 
   function setEncoding(file, stat, done) {
     var s3Params = {},
@@ -85,25 +78,46 @@ function sync(config, done) {
     sails.log.verbose('syncing file: ', file);
     done(null, s3Params);
   }
+
+  function logError(err) {
+    sails.log.error('unable to sync:', err.stack);
+  }
+
+  function setRedirects() {
+    var queue = async.queue(redirect, 20);
+    queue.drain = done;
+    queue.push(directories, console.log);
+  }
+
+  function redirect(directory, next) {
+    s3.putObject({
+      CacheControl: params.s3Params.CacheControl,
+      Key: params.s3Params.Prefix + '/' + directory,
+      WebsiteRedirectLocation: config.baseurl + '/' + directory + '/'
+    }, next);
+  }
+
 }
 
 function walk(dir, done) {
-  var results = [];
+  var files = [],
+      directories = [];
   fs.readdir(dir, function(err, list) {
     if (err) return done(err);
     var pending = list.length;
-    if (!pending) return done(null, results);
-    list.forEach(function(file) {
-      file = dir + '/' + file;
+    if (!pending) return done(null, files, directories);
+    list.forEach(function(path) {
+      var file = dir + '/' + path;
       fs.stat(file, function(err, stat) {
         if (stat && stat.isDirectory()) {
+          directories.push(path);
           walk(file, function(err, res) {
-            results = results.concat(res);
-            if (!--pending) done(null, results);
+            files = files.concat(res);
+            if (!--pending) done(null, files, directories);
           });
         } else {
-          results.push(file);
-          if (!--pending) done(null, results);
+          files.push(file);
+          if (!--pending) done(null, files, directories);
         }
       });
     });
