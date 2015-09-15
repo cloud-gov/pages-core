@@ -6,7 +6,7 @@ var _ = require('underscore');
 var CodeMirror = require('codemirror');
 require('codemirror/mode/yaml/yaml');
 
-var createProseMirror = window.b = require('./prosemirror').create;
+var createProseMirror = require('./prosemirror').create;
 
 var Document = require('../../models/Document');
 
@@ -44,7 +44,7 @@ var EditorView = Backbone.View.extend({
 
     this.editors.settings = CodeMirror(this.$('[data-target=metadata]')[0], {
       lineNumbers: true,
-      mode:  "yaml",
+      mode: "yaml",
       tabSize: 2
     });
 
@@ -56,8 +56,6 @@ var EditorView = Backbone.View.extend({
     if (this.doc.frontMatter) {
       this.editors.settings.doc.setValue(this.doc.frontMatter);
     }
-
-    window.t = this;
 
     return this;
   },
@@ -116,8 +114,8 @@ var EditorView = Backbone.View.extend({
     }
 
     this.trigger('edit:save', {
-        md: this.doc.toMarkdown(),
-        msg: this.$('#save-content-message').val()
+      md: this.doc.toMarkdown(),
+      msg: this.$('#save-content-message').val()
     });
     return this;
   }
