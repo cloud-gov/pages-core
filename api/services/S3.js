@@ -28,6 +28,10 @@ module.exports = function(config, done) {
   walk(config.directory, function(err, files, directories) {
     if (err) return done(err);
 
+    directories = directories.map(function(dir) {
+      return dir.replace(config.directory + '/', '');
+    });
+
     async.each(files, encode.bind(this, config), function(err) {
       if (err) return done(err);
 
@@ -86,7 +90,7 @@ function sync(config, directories, done) {
   function setRedirects() {
     var queue = async.queue(redirect, 20);
     queue.drain = done;
-    queue.push(directories, console.log);
+    queue.push(directories);
   }
 
   function redirect(directory, next) {
@@ -110,9 +114,10 @@ function walk(dir, done) {
       var file = dir + '/' + path;
       fs.stat(file, function(err, stat) {
         if (stat && stat.isDirectory()) {
-          directories.push(path);
-          walk(file, function(err, res) {
-            files = files.concat(res);
+          directories.push(file);
+          walk(file, function(err, newFiles, newDirectories) {
+            files = files.concat(newFiles);
+            directories = directories.concat(newDirectories);
             if (!--pending) done(null, files, directories);
           });
         } else {
