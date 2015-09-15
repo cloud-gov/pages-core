@@ -7,6 +7,7 @@
   "dependencies": {
     "ampersand-view-switcher": "^2.0.0",
     "aws-sdk": "^2.1.36",
+    "babel": "^5.8.23",
     "backbone": "^1.2.1",
     "bcryptjs": "^2.1.0",
     "bootstrap": "^3.3.5",
