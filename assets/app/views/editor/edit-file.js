@@ -2,20 +2,13 @@ var fs = require('fs');
 
 var Backbone = require('backbone');
 var _ = require('underscore');
-var SirTrevor = require('sir-trevor');
 
 var CodeMirror = require('codemirror');
 require('codemirror/mode/yaml/yaml');
 
-var Document = require('../../models/Document');
+var createProseMirror = require('./prosemirror').create;
 
-var headings = require('./blocks/heading');
-SirTrevor.Blocks.H1 = headings.h1;
-SirTrevor.Blocks.H2 = headings.h2;
-SirTrevor.Blocks.H3 = headings.h3;
-SirTrevor.Blocks.Ordered = require('./blocks/ol');
-SirTrevor.Blocks.Unordered = require('./blocks/ul');
-SirTrevor.Blocks.Code = require('./blocks/code');
+var Document = require('../../models/Document');
 
 var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/file.html').toString();
 
@@ -51,9 +44,14 @@ var EditorView = Backbone.View.extend({
 
     this.editors.settings = CodeMirror(this.$('[data-target=metadata]')[0], {
       lineNumbers: true,
-      mode:  "yaml",
+      mode: "yaml",
       tabSize: 2
     });
+
+    if (this.showContent) {
+      this.editors.content = this.editors.content || createProseMirror(this.$('[data-target=content]')[0]);
+      this.editors.content.setContent(this.doc.content, 'markdown');
+    }
 
     if (this.doc.frontMatter) {
       this.editors.settings.doc.setValue(this.doc.frontMatter);
@@ -68,16 +66,6 @@ var EditorView = Backbone.View.extend({
     window.setTimeout(function() {
       self.editors.settings.refresh();
     }, 0);
-
-    if (this.showContent) {
-      this.editor = new SirTrevor.Editor({
-        el: this.$('.js-st-instance'),
-        blockTypes: ["H1", "H2", "H3", "Text", "Unordered", "Ordered"]
-      });
-
-      this.$('.js-st-instance').text(doc.toSirTrevorJsonString());
-      this.editor.reinitialize();
-    }
 
     return this;
   },
@@ -113,6 +101,7 @@ var EditorView = Backbone.View.extend({
     }
 
     settings = this.editors.settings.doc.getValue();
+    content = this.editors.content.getContent('markdown');
 
     if (settings) {
       this.doc.frontMatter = settings;
@@ -121,12 +110,12 @@ var EditorView = Backbone.View.extend({
       this.doc.frontMatter = false;
     }
     if (content) {
-      this.doc.updateContentFromSirTrevorJson(content);
+      this.doc.content = content;
     }
 
     this.trigger('edit:save', {
-        md: this.doc.toMarkdown(),
-        msg: this.$('#save-content-message').val()
+      md: this.doc.toMarkdown(),
+      msg: this.$('#save-content-message').val()
     });
     return this;
   }
