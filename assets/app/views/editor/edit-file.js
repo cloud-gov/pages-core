@@ -21,7 +21,8 @@ var EditorView = Backbone.View.extend({
   template: _.template(templateHtml),
   initialize: function (opts) {
     var self      = this,
-        activeTab = 'content';
+        activeTab = 'content',
+        settingsEditorEl, contentEditorEl;
 
     this.editors = {};
     this.path = opts.path;
@@ -42,15 +43,29 @@ var EditorView = Backbone.View.extend({
       activeTab: activeTab
     }));
 
-    this.editors.settings = CodeMirror(this.$('[data-target=metadata]')[0], {
+    settingsEditorEl = this.$('[data-target=metadata]')[0];
+    this.editors.settings = CodeMirror(settingsEditorEl, {
       lineNumbers: true,
       mode: "yaml",
       tabSize: 2
     });
 
+    contentEditorEl = window.e = this.$('[data-target=content]')[0];
     if (this.showContent) {
-      this.editors.content = this.editors.content || createProseMirror(this.$('[data-target=content]')[0]);
-      this.editors.content.setContent(this.doc.content, 'markdown');
+      try {
+        // try to load content into prosemirror
+        this.editors.content = this.editors.content || createProseMirror(contentEditorEl);
+        this.editors.content.setContent(this.doc.content, 'markdown');
+      }
+      catch (e) {
+        // if prosemirror errors out, use codemirror
+        $(contentEditorEl).empty(); // remove prosemirror
+        this.editors.content = CodeMirror(contentEditorEl, {
+          lineNumbers: true,
+          lineWrapping: true
+        });
+        this.editors.content.doc.setValue(this.doc.content);
+      }
     }
 
     if (this.doc.frontMatter) {
@@ -65,6 +80,7 @@ var EditorView = Backbone.View.extend({
 
     window.setTimeout(function() {
       self.editors.settings.refresh();
+      if (self.editors.content.refresh) self.editors.content.refresh();
     }, 0);
 
     return this;
@@ -95,13 +111,16 @@ var EditorView = Backbone.View.extend({
     var settings,
         content;
 
-    if (this.editor) {
-      SirTrevor.onBeforeSubmit();
-      content = this.editor.store.retrieve();
+    settings = this.editors.settings.doc.getValue();
+    if (this.editors.content.content) {
+      // ProseMirror is loaded as content editor
+      content = this.editors.content.getContent('markdown');
+    }
+    else {
+      // CodeMirror is loaded as content editor
+      content = this.editors.content.doc.getValue();
     }
 
-    settings = this.editors.settings.doc.getValue();
-    content = this.editors.content.getContent('markdown');
 
     if (settings) {
       this.doc.frontMatter = settings;
