@@ -50,7 +50,7 @@ var EditorView = Backbone.View.extend({
       tabSize: 2
     });
 
-    contentEditorEl = window.e = this.$('[data-target=content]')[0];
+    contentEditorEl = this.$('[data-target=content]')[0];
     if (this.showContent) {
       try {
         // try to load content into prosemirror
@@ -80,7 +80,7 @@ var EditorView = Backbone.View.extend({
 
     window.setTimeout(function() {
       self.editors.settings.refresh();
-      if (self.editors.content.refresh) self.editors.content.refresh();
+      if (self.editors.content && self.editors.content.refresh) self.editors.content.refresh();
     }, 0);
 
     return this;
@@ -112,11 +112,11 @@ var EditorView = Backbone.View.extend({
         content;
 
     settings = this.editors.settings.doc.getValue();
-    if (this.editors.content.content) {
+    if (this.editors.content && this.editors.content.content) {
       // ProseMirror is loaded as content editor
       content = this.editors.content.getContent('markdown');
     }
-    else {
+    else if (this.editors.content) {
       // CodeMirror is loaded as content editor
       content = this.editors.content.doc.getValue();
     }
