@@ -1,4 +1,4 @@
-node_env: production
+node_env: azure
 loggingEnabled: true
 logDirectory: iisnode
 

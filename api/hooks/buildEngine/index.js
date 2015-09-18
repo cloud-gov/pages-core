@@ -18,7 +18,7 @@ var hook = {
           "Federalist will not launch until these tasks are completed");
       } else {
         sails.on('hook:federalist-ms:loaded', function onFederalistMsHookLoaded() {
-          return cb()
+          return cb();
         });
       }
     } else {
