@@ -15,6 +15,7 @@
     "browserify": "^10.2.4",
     "cfenv": "^1.0.0",
     "codemirror": "^5.6.0",
+    "connect-redis": "1.4.5",
     "db-migrate": "^0.9.17",
     "ejs": "~0.8.4",
     "express-force-ssl": "^0.2.12",
@@ -54,6 +55,7 @@
     "sails-db-migrate": "^0.7.0",
     "sails-disk": "~0.10.0",
     "sails-postgresql": "^0.10.15",
+    "socket.io-redis": "^0.1.4",
     "to-markdown": "^1.2.1",
     "underscore": "^1.8.3",
     "validator": "^3.39.0"

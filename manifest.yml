@@ -6,3 +6,4 @@ domain: 18f.gov
 services:
 - federalist-database
 - s3-sb-federalist.18f.gov
+- federalist-redis
