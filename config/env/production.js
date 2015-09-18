@@ -2,7 +2,8 @@ var AWS = require('aws-sdk'),
     cfenv = require('cfenv'),
     appEnv = cfenv.getAppEnv(),
     dbURL = appEnv.getServiceURL('federalist-database'),
-    s3Creds = appEnv.getServiceCreds('s3-sb-federalist.18f.gov');
+    s3Creds = appEnv.getServiceCreds('s3-sb-federalist.18f.gov'),
+    redisCreds = appEnv.getServiceCreds('federalist-redis');
 
 /**
  * Production environment settings
@@ -41,4 +42,22 @@ if (s3Creds) {
     accessKeyId: s3Creds.access_key,
     secretAccessKey: s3Creds.secret_key
   });
+}
+
+// If running in Cloud Foundry with a redis service
+if (redisCreds) {
+  module.exports.session = {
+    adapter: 'redis',
+    host: redisCreds.hostname,
+    port: redisCreds.port,
+    db: 0,
+    pass: redisCreds.password
+  };
+  module.exports.sockets = {
+    adapter: 'socket.io-redis',
+    host: redisCreds.hostname,
+    port: redisCreds.port,
+    db: 1,
+    pass: redisCreds.password
+  };
 }
