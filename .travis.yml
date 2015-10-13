@@ -5,7 +5,7 @@ node_js:
 env:
   global:
   - CF_APP=federalist
-  - CF_API=https://api.18f.gov
+  - CF_API=https://api.cloud.gov
   - CF_USERNAME=deploy-federalist
   - CF_ORGANIZATION=federalist
   - CF_SPACE=prod
