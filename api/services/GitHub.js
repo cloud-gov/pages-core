@@ -43,10 +43,16 @@ module.exports = {
           'engine': 'jekyll',
           'users': [user.id]
         };
-
-        Site.create(values).exec(function createCB(err, created) {
-          if (err) return done(err);
-          return done(null, created);
+        Site.count({
+          'owner': user.username,
+          'repository': repoName
+        }, function(err, count) {
+          if (err) return done('Unable to create a fork of this template');
+          if (count) return done('You already have a copy of this template');
+          Site.create(values).exec(function createCB(err, created) {
+            if (err) return done(err);
+            return done(null, created);
+          });
         });
       });
     });
