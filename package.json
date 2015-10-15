@@ -47,7 +47,7 @@
     "passport-github": "^0.1.5",
     "passport-local": "^1.0.0",
     "pg": "^4.4.0",
-    "prosemirror": "git+https://github.com/ProseMirror/prosemirror.git",
+    "prosemirror": "git+https://github.com/18f/prosemirror.git",
     "rc": "~0.5.0",
     "request": "^2.61.0",
     "s3": "^4.4.0",
