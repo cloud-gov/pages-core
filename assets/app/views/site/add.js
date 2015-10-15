@@ -32,8 +32,9 @@ var AddSiteView = Backbone.View.extend({
       if (d.name === 'users') d.value = [+d.value];
       data[d.name] = d.value;
     });
-
-    new SiteModel(data, { collection: this.collection }).save(null, {
+    $.ajax('/v0/user/add-site', {
+      method: 'POST',
+      data: data,
       success: this.onSuccess.bind(this),
       error: this.onError.bind(this)
     });
