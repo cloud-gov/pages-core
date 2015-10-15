@@ -115,6 +115,36 @@ module.exports = {
       if (hasApproval) return done();
       done(new Error('Unauthorized'));
     });
-  }
+  },
+
+  /*
+   * Check user permissions
+   * @param {object} user model
+   * @param {string} repository owner
+   * @param {string} repository name
+   * @param {Function} callback function
+   */
+   checkPermissions: function(user, owner, repository, done) {
+     Passport.findOne({ user: user.id }).exec(function(err, passport) {
+       if (err) return done(err);
+
+       // Authenticate request with user's oauth token
+       github.authenticate({
+         type: 'oauth',
+         token: passport.tokens.accessToken
+       });
+
+       // Create the webhook for the site repository
+       github.repos.get({
+         user: owner,
+         repo: repository
+       }, function(err, repo) {
+         if (err) return done('Unable to access the repository');
+         if (!repo) return done('The repository does not exist');
+         return done(null, repo.permissions);
+       });
+
+     });
+   }
 
 };
