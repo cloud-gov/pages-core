@@ -50,11 +50,16 @@ var AddSiteView = Backbone.View.extend({
   },
   onSuccess: function onSuccess(e) {
     this.collection.add(e);
-    console.log('winning', e);
     this.trigger('site:save:success');
   },
   onError: function onError(e) {
-    console.log('failing', e);
+    var message = (e && e.responseJSON && e.responseJSON.raw) ?
+          e.responseJSON.raw : e.responseText;
+    $('.alert-container').html(
+      '<div class="alert alert-danger new-site-error" role="alert">' +
+        message +
+      '</div>'
+    )[0].scrollIntoView();
     this.trigger('site:save:failure');
   }
 });

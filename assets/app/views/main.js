@@ -65,7 +65,7 @@ var AppView = Backbone.View.extend({
     this.pageSwitcher.set(addSiteView);
 
     this.listenToOnce(addSiteView, 'site:save:success', function () {
-      this.home();
+      federalist.navigate('', { trigger: true });
     }.bind(this));
 
     return this;
