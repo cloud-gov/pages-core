@@ -27,14 +27,17 @@ var AppView = Backbone.View.extend({
     this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.el);
   },
   home: function () {
-    federalist.navigate('');
     var authed = this.user.isAuthenticated(),
         error = querystring.parse(window.location.search.slice(1)).error,
         messages = {
           'Error.Passport.Unauthorized': 'Your account is not set up to access Federalist. Have you signed up as a beta user? If you have signed up and should have access, please let us know.',
+          'preview.login': 'Please log in to preview this site',
           'default': 'An unexpected error occured. Please try again. If you continue to see this message, please let us know.'
         },
         message = error && (messages[error] || messages['default']);
+
+    // Clear any existing errors
+    $('.alert-container').html('');
 
     if(authed) {
       var listView = new SiteListView({ collection: this.sites });
