@@ -134,7 +134,7 @@ module.exports = {
          token: passport.tokens.accessToken
        });
 
-       // Create the webhook for the site repository
+       // Retrieve the permissions for the repository
        github.repos.get({
          user: owner,
          repo: repository
