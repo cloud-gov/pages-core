@@ -22,23 +22,28 @@ var EditorView = Backbone.View.extend({
   initialize: function (opts) {
     var self      = this,
         activeTab = 'content',
+        fileExt = this.model.get('file').split('.')[1],
+        content = decodeB64(this.model.attributes.json.content),
         settingsEditorEl, contentEditorEl;
 
     this.editors = {};
     this.path = opts.path;
     this.showContent = true;
 
-    if (this.path.fileExt === 'yml') {
-      this.doc = new Document({ yml: opts.content });
+    this.model.on('model:save:success', this.saveSuccess.bind(this));
+    this.model.on('model:save:error', this.saveFailure.bind(this));
+
+    if (fileExt === 'yml') {
+      this.doc = new Document({ yml: content });
       this.showContent = false;
       activeTab = 'metadata';
     }
-    else if (this.path.fileExt === 'md') {
-      this.doc = new Document({ markdown: opts.content });
+    else if (fileExt === 'md') {
+      this.doc = new Document({ markdown: content });
     }
 
     this.$el.html(this.template({
-      fileName: this.path.file,
+      fileName: this.model.get('file'),
       showContent: this.showContent,
       activeTab: activeTab
     }));
@@ -75,12 +80,13 @@ var EditorView = Backbone.View.extend({
     return this;
   },
   render: function () {
-    var self        = this,
-        doc         = this.doc;
+    var self = this;
 
     window.setTimeout(function() {
       self.editors.settings.refresh();
-      if (self.editors.content && self.editors.content.refresh) self.editors.content.refresh();
+      if (self.editors.content && self.editors.content.refresh) {
+        self.editors.content.refresh();
+      }
     }, 0);
 
     return this;
@@ -107,6 +113,28 @@ var EditorView = Backbone.View.extend({
 
     return this;
   },
+  saveSuccess: function (e) {
+    this.$('#save-status-result').removeClass('label-danger');
+    this.$('#save-status-result').addClass('label-success');
+    this.$('#save-status-result').text('Yay, the save was successful!');
+
+    setTimeout(function() {
+      $('#save-status-result').text('');
+    }, 3000);
+  },
+  saveFailure: function (e) {
+    var messages = {
+          0:   'The internet is not connected. Please check your connection.',
+          404: 'Whoops, looks like this page can not be found.',
+          409: 'Uh oh, there was a conflict when saving'
+        },
+        status = responseText[e.status];
+
+    this.$('#save-status-result').removeClass('label-success');
+    this.$('#save-status-result').addClass('label-danger');
+
+    this.$('#save-status-result').text(status);
+  },
   saveDocument: function (e) {
     var settings,
         content;
@@ -132,10 +160,11 @@ var EditorView = Backbone.View.extend({
       this.doc.content = content;
     }
 
-    this.trigger('edit:save', {
-      md: this.doc.toMarkdown(),
-      msg: this.$('#save-content-message').val()
+    this.model.commit({
+      content: this.doc.toMarkdown(),
+      message: this.$('#save-content-message').val()
     });
+
     return this;
   }
 });
