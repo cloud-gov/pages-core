@@ -83,9 +83,13 @@ module.exports = {
     }, function(err, res) {
       // Ignore error if hook already exists; otherwise, return error
       if (err) {
-        var ghErr, hookMessage = 'Hook already exists on this repository';
+        var ghErr,
+            hookMessage = 'Hook already exists on this repository',
+            noAccessMessage = 'Not Found';
         try { ghErr = JSON.parse(err.message).errors[0].message; } catch(e) {}
         if (ghErr === hookMessage) return done();
+        try { ghErr = JSON.parse(err.message).message; } catch(e) {}
+        if (ghErr === noAccessMessage) return done('You do not have admin access to this repository');
         if (JSON.parse(err.message)) return done(JSON.parse(err.message));
         return done(err);
       }

@@ -32,8 +32,9 @@ var AddSiteView = Backbone.View.extend({
       if (d.name === 'users') d.value = [+d.value];
       data[d.name] = d.value;
     });
-
-    new SiteModel(data, { collection: this.collection }).save(null, {
+    $.ajax('/v0/user/add-site', {
+      method: 'POST',
+      data: data,
       success: this.onSuccess.bind(this),
       error: this.onError.bind(this)
     });
@@ -50,11 +51,16 @@ var AddSiteView = Backbone.View.extend({
   },
   onSuccess: function onSuccess(e) {
     this.collection.add(e);
-    console.log('winning', e);
     this.trigger('site:save:success');
   },
   onError: function onError(e) {
-    console.log('failing', e);
+    var message = (e && e.responseJSON && e.responseJSON.raw) ?
+          e.responseJSON.raw : e.responseText;
+    $('.alert-container').html(
+      '<div class="alert alert-danger new-site-error" role="alert">' +
+        message +
+      '</div>'
+    )[0].scrollIntoView();
     this.trigger('site:save:failure');
   }
 });
