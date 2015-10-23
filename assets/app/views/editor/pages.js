@@ -32,8 +32,8 @@ var PagesView = Backbone.View.extend({
 
       if (page.children) {
         var ul = $('<ul></ul>');
-        page.children.forEach(function(page) {
-          addToList(ul, { text: page.title, href: page.path })
+        page.children.forEach(function(childPage) {
+          addToList(ul, { text: childPage.title, href: childPage.href })
         });
         self.$el.append($('<li class="list-group-item"></li>').append(ul));
       }
