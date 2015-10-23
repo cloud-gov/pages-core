@@ -57,4 +57,11 @@ var Router = Backbone.Router.extend({
 });
 
 window.federalist = new Router();
+window.encodeB64 = function(s) {
+  return window.btoa(unescape(encodeURIComponent(s)));
+};
+
+window.decodeB64 = function(s) {
+  return decodeURIComponent(escape(window.atob(s)));
+};
 Backbone.history.start();

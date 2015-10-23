@@ -56,10 +56,6 @@ body {
   padding-left: 0; /* reset from Bootstrap */
 }
 
-.list-group .glyphicon {
-  font-size: 3em;
-}
-
 .editor .panel {
   margin-top: 2em;
 }
@@ -68,18 +64,6 @@ body {
   height: auto;
 }
 
-/* override material.css for special editor styles */
-.st-outer ul, .st-outer ul li {
-  list-style-type: disc;
-}
-.st-outer ol, .st-outer ol li {
-  list-style-type: decimal;
-}
-
-/* extend or override parts of Sir Trevor CSS */
-.st-text-block--heading.heading-two {
-  font-size: 1.7em;
-}
-.st-text-block--heading.heading-three {
-  font-size: 1.2em;
+.list-group-item ul {
+  padding-left:0;
 }

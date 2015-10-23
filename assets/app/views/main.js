@@ -71,13 +71,12 @@ var AppView = Backbone.View.extend({
     return this;
   },
   edit: function (owner, repo, branch, file) {
-    var path = {
+    var editView = new EditorContainerView({
       owner: owner,
       repo: repo,
       branch: branch,
       file: file
-    };
-    var editView = new EditorContainerView({ path: path });
+    });
     this.pageSwitcher.set(editView);
 
     return this;
