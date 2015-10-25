@@ -13,6 +13,7 @@ var GithubModel = Backbone.Model.extend({
     this.branch = opts.branch;
     this.token = opts.token;
     this.file = opts.file;
+    this.site = opts.site;
 
     this.once('model:getConfig:success', function () {
       self.fetch();
@@ -91,7 +92,13 @@ var GithubModel = Backbone.Model.extend({
         files = ['_navigation.json'];
 
     var getFiles = files.map(function(file) {
-      var url = ['', 'site', self.owner, self.name, file].join('/');
+      var url = [
+            self.site.get('siteRoot'),
+            'site',
+            self.owner,
+            self.name,
+            file
+          ].join('/');
 
       return function(callback) {
         $.ajax({

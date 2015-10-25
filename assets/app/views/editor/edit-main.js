@@ -26,7 +26,8 @@ var EditView = Backbone.View.extend({
       owner: opts.owner,
       repoName: opts.repo,
       branch: opts.branch,
-      file: opts.file
+      file: opts.file,
+      site: opts.site
     });
 
     this.breadcrumb = new BreadcrumbView({
