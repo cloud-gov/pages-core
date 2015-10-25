@@ -48,7 +48,7 @@ module.exports = {
       var obj = this.toObject(),
           config = sails.config.build || {};
       // Add siteRoot to the API response for previews
-      obj.siteRoot = config.s3Bucket ? 'http://' + config.s3Bucket +
+      obj.siteRoot = config.s3Bucket ? 'https://' + config.s3Bucket +
         '.s3-website-us-east-1.amazonaws.com': '';
       return obj;
     }
