@@ -75,7 +75,8 @@ var AppView = Backbone.View.extend({
       owner: owner,
       repo: repo,
       branch: branch,
-      file: file
+      file: file,
+      site: this.sites.findWhere({ owner: owner, repository: repo })
     });
     this.pageSwitcher.set(editView);
 
