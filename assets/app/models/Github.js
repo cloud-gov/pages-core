@@ -17,7 +17,11 @@ var GithubModel = Backbone.Model.extend({
 
     this.once('model:getConfig:success', function () {
       self.fetch();
-    })
+    });
+
+    this.on('model:getConfig:error', function (err) {
+      console.log('model:getConfig:error', err);
+    });
 
     this.checkForConfig();
 
@@ -93,7 +97,7 @@ var GithubModel = Backbone.Model.extend({
 
     var getFiles = files.map(function(file) {
       var bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com\//,
-          siteRoot = self.site.get('siteRoot'),
+          siteRoot = (self.site) ? self.site.get('siteRoot') : '',
           match = siteRoot.match(bucketPath),
           bucket = match && match[1],
           root = bucket ? 'https://s3.amazonaws.com/' + bucket :
@@ -122,7 +126,7 @@ var GithubModel = Backbone.Model.extend({
     });
 
     a.parallel(getFiles, function (err, results) {
-      if (err) return self.trigger('model:getConfig:error');
+      if (err) return self.trigger('model:getConfig:error', err);
 
       self.configFiles = {};
       results.forEach(function(r) {
