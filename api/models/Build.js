@@ -119,7 +119,7 @@ module.exports = {
     function next(err, model) {
       if (err) sails.log.error('Build error: ', err);
 
-      var error = err.message || err || '';
+      var error = err ? (err.message || err) : '';
 
       // Set job completion timestamp
       model.completedAt = new Date();
@@ -128,7 +128,7 @@ module.exports = {
       model.state = (err) ? 'error' : (skip) ? 'skipped' : 'success';
 
       // Sanitize error message
-      error.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
+      error = error.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
 
       // Add error message if it exists
       model.error = error;
