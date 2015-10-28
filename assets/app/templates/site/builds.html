@@ -7,12 +7,12 @@
 <div class="panel panel-<%- panelClass %>">
   <div class="panel-heading">
     <%- build.branch %> (<%- build.username %>)
-    <span class="pull-right"><%- build.completedAtFormatted || 'Processing' %></span>
+    <span class="pull-right"><%- build.completedAtFormatted || 'Publishing...' %></span>
   </div>
   <div class="panel-body"><%
-    build.state === 'error' ?
-    print(build.error) :
-    print('The build completed successfully.')
+    build.state === 'error' ? print(build.error) :
+    build.state === 'processing' ? print('This build is in progress.') :
+    print('This build completed successfully.')
   %></div>
 </div>
 <% }); %>

@@ -17,7 +17,7 @@ var BuildsView = Backbone.View.extend({
     $.getJSON('/v0/user/usernames', function(users) {
       data.builds = _(data.builds).chain().map(function(build) {
         build.username = users[build.user];
-        build.completedAtFormatted = new Date(build.completedAt) ?
+        build.completedAtFormatted = build.completedAt ?
           moment(new Date(build.completedAt)).format('L LT') : undefined;
         return build;
       }).sortBy('createdAt').value().reverse();
