@@ -87,18 +87,8 @@ var hook = {
         },
         template = _.template(cmd.join(' && '));
 
-    // Populate user's passport
-    Passport.findOne({ user: model.user.id }).exec(function(err, passport) {
-
-      // End early if error
-      if (err) return done(err, model);
-
-      model.user.passport = passport;
-
-      // Continue run process with populated model
-      next(model);
-
-    });
+    // Continue run process with populated model
+    next(model);
 
     function next(model) {
 
