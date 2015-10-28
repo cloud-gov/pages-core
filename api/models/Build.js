@@ -119,7 +119,7 @@ module.exports = {
     function next(err, model) {
       if (err) sails.log.error('Build error: ', err);
 
-      var error = err.message || err || '';
+      var error = err ? (err.message || err) : '';
 
       // Set job completion timestamp
       model.completedAt = new Date();
