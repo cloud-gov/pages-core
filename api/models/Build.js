@@ -128,7 +128,7 @@ module.exports = {
       model.state = (err) ? 'error' : (skip) ? 'skipped' : 'success';
 
       // Sanitize error message
-      error.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
+      error = error.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
 
       // Add error message if it exists
       model.error = error;
