@@ -3,7 +3,7 @@
 
 ***Under active development. Everything is subject to change. Interested in talking to us? [Join our public chat](https://chat.18f.gov/) room (select `federalist-public` from the dropdown).***
 
-Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub, [Prose](https://github.com/prose/prose), and Amazon Web Services to provide a simple way for developers to launch new websites or more easily manage existing ones.
+Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub, [Prose](https://github.com/prose/prose), Amazon Web Services and Microsoft Azure to provide a simple way for developers to launch new websites or more easily manage existing ones.
 
 ## Getting started
 
@@ -24,6 +24,7 @@ We have a few environment variables that the application uses, here is a list of
 * `GITHUB_CLIENT_ID` **required** - get this when you register your app with Github
 * `GITHUB_CLIENT_SECRET` **required** - you'll also get this when you register your app
 * `GITHUB_CLIENT_CALLBACK_URL` - for dev you'll probably want to use http://localhost:1337/auth/github/callback
+* `FEDERALIST_BUILD_ENGINE` - defines an alternate build engine to use if running Federalist on Windows
 * `FEDERALIST_TEMP_DIR` - where files will be temporarily built
 * `FEDERALIST_PUBLISH_DIR` - where to publish files if not S3
 * `FEDERALIST_S3_BUCKET` - bucket ID to push files to on S3
@@ -125,6 +126,22 @@ models: {
 }
 ```
 
+### Building and Running on Windows
+
+The same dependencies and steps as described above can be used to install and run Federalist on Windows. Running the platform on Windows also requires the installation of the [sails-hook-federalist-ms](https://github.com/Microsoft/sails-hook-federalist-ms) installable hook which can be done by executing the following command:
+
+`npm install sails-hook-federalist-ms`
+
+When using this hook, be sure to set the `FEDERALIST_BUILD_ENGINE` environment variable to *'federalist-ms'* prior to starting the application. Additional instructions for configuring the required Node.js, Jekyll, and Hugo dependencies on Windows can be found [here](https://github.com/Microsoft/sails-hook-federalist-ms#running-federalist-on-windows).
+
+### Building and Running on Azure
+
+The [sails-hook-federalist-ms](https://github.com/Microsoft/sails-hook-federalist-ms) package enables Federalist to run on an [Azure Web App](http://azure.microsoft.com/en-us/services/app-service/web/). Instructions for configuring a Web App for Federalist using this package can be found [here](https://github.com/Microsoft/sails-hook-federalist-ms#running-federalist-on-azure).
+
+### Publishing to Azure
+
+The [sails-hook-federalist-ms](https://github.com/Microsoft/sails-hook-federalist-ms) hook also supports static site publishing to Microsoft Azure in addition to or in place of local or AWS S3 publishing. Instructions for configuring the hook to publish content to Azure can be found on GitHub [here](https://github.com/Microsoft/sails-hook-federalist-ms).
+
 ## Architecture
 
 This application is primarily a JSON API server based on the [Sails.js](http://sailsjs.org/) framework. It handles authentication, managing users, sites, and builds, and receives webhook requests from GitHub.
@@ -141,7 +158,7 @@ It will also route requests to the published static websites, including preview 
 
 ### Future goals
 
-After the initial proof of concept, development will focus on scalability by moving to the AWS platform, using S3 for publishing, SQS for managing the publishing queue, and running publishing tasks on separate servers.
+After the initial proof of concept, development will focus on scalability by moving to the AWS platform, using S3 for publishing, SQS for managing the publishing queue, and running publishing tasks on separate servers. Enablement for other cloud platforms including Microsoft Azure will also be developed by way of community plugins to Federalist.
 
 Additional development will focus on improved collaboration features, such as built-in support for forking and merging branches for drafts of changes, and automatic configuration of Prose settings.
 

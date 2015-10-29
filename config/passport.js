@@ -48,7 +48,8 @@ module.exports.passport = {
     organizations: [
       6233994,  // 18f
       14109682, // federalist-users
-      14080592  // us-federal-sbst
+      14080592,  // us-federal-sbst
+      6154722  // microsoft
     ]
   },
   //

@@ -1,0 +1,8 @@
+node_env: azure
+loggingEnabled: true
+logDirectory: iisnode
+
+maxLogFileSizeInKB: 128
+maxTotalLogFileSizeInKB: 1024
+maxLogFiles: 20
+devErrorsEnabled: false

@@ -8,14 +8,34 @@ var exec = require('child_process').exec;
 
 var hook = {
 
-  jekyll: function(model, done) {
+  // Check platform
+  initialize: function (cb) {
+    
+    if (/^win/.test(process.platform)) {
+      if (process.env.FEDERALIST_BUILD_ENGINE !== 'federalist-ms') {
+        sails.log.error("Federalist detected platform as Windows. The sails-hook-federalist-ms hook must be installed " +
+          "and the FEDERALIST_BUILD_ENGINE environment variable must be set to 'federalist-ms'. " +
+          "Federalist will not launch until these tasks are completed");
+      } else {
+        sails.on('hook:federalist-ms:loaded', function onFederalistMsHookLoaded() {
+          return cb();
+        });
+      }
+    } else {
+      return cb(); 
+    }
+    
+  },
+
+
+  jekyll: function (model, done) {
 
     // Run command template
     this._run([
       'rm -rf ${source}',
       'mkdir -p ${source}',
       'git clone -b ${branch} --single-branch ' +
-        'https://${token}@github.com/${owner}/${repository}.git ${source}',
+      'https://${token}@github.com/${owner}/${repository}.git ${source}',
       'echo "baseurl: ${baseurl}\nbranch: ${branch}\n${config}" > ' +
         '${source}/_config_base.yml',
       'bundle exec jekyll build --safe --config ${source}/_config.yml,${source}/_config_base.yml ' +
@@ -28,16 +48,16 @@ var hook = {
 
   },
 
-  hugo: function(model, done) {
+  hugo: function (model, done) {
 
     // Run command template
     this._run([
       'rm -rf ${source}',
       'mkdir -p ${source}',
       'git clone -b ${branch} --single-branch ' +
-        'https://${token}@github.com/${owner}/${repository}.git ${source}',
+      'https://${token}@github.com/${owner}/${repository}.git ${source}',
       'hugo --baseUrl=${baseurl} ' +
-        '--source=${source}',
+      '--source=${source}',
       'rm -rf ${destination}',
       'mkdir -p ${destination}',
       'cp -r ${source}/public/* ${destination}',
@@ -46,14 +66,14 @@ var hook = {
 
   },
 
-  static: function(model, done) {
+  static: function (model, done) {
 
     // Run command template
     this._run([
       'rm -rf ${source}',
       'mkdir -p ${source}',
       'git clone -b ${branch} --single-branch ' +
-        'https://${token}@github.com/${owner}/${repository}.git ${source}',
+      'https://${token}@github.com/${owner}/${repository}.git ${source}',
       'rm -rf ${destination}',
       'mkdir -p ${destination}',
       'cp -r ${source}/* ${destination}',
@@ -76,19 +96,19 @@ var hook = {
    * @param {Build} build model to parse
    * @param {Function} callback function
    */
-  _run: function(cmd, model, done) {
+  _run: function (cmd, model, done) {
     var service = this,
-        defaultBranch = model.branch === model.site.defaultBranch,
-        tokens = {
-          branch: model.branch,
-          branchURL: defaultBranch ? '' : '/' + model.branch,
-          root: defaultBranch ? 'site' : 'preview',
-          config: model.site.config
-        },
-        template = _.template(cmd.join(' && '));
+      defaultBranch = model.branch === model.site.defaultBranch,
+      tokens = {
+        branch: model.branch,
+        branchURL: defaultBranch ? '' : '/' + model.branch,
+        root: defaultBranch ? 'site' : 'preview',
+        config: model.site.config
+      },
+      template = _.template(cmd.join(' && '));
 
     // Populate user's passport
-    Passport.findOne({ user: model.user.id }).exec(function(err, passport) {
+    Passport.findOne({ user: model.user.id }).exec(function (err, passport) {
 
       // End early if error
       if (err) return done(err, model);
@@ -113,15 +133,15 @@ var hook = {
 
       // Set up source and destination paths
       tokens.source = sails.config.build.tempDir + '/source/' +
-        tokens.owner + '/' + tokens.repository + '/' + tokens.branch;
+      tokens.owner + '/' + tokens.repository + '/' + tokens.branch;
       tokens.destination = sails.config.build.tempDir + '/destination/' +
-        tokens.owner + '/' + tokens.repository + '/' + tokens.branch;
+      tokens.owner + '/' + tokens.repository + '/' + tokens.branch;
       tokens.publish = sails.config.build.publishDir + '/' + tokens.root + '/' +
-        tokens.owner + '/' + tokens.repository + tokens.branchURL;
+      tokens.owner + '/' + tokens.repository + tokens.branchURL;
 
       // Run command in child process and
       // call callback with error and model
-      exec(template(tokens), function(err, stdout, stderr) {
+      exec(template(tokens), function (err, stdout, stderr) {
         if (stdout) sails.log.verbose('stdout: ' + stdout);
         if (stderr) sails.log.verbose('stderr: ' + stderr);
         if (err) return done(err, model);
@@ -140,7 +160,7 @@ var hook = {
    * @param {Build} build model to parse
    * @param {Function} callback function
    */
-  publish: function(tokens, model, done) {
+  publish: function (tokens, model, done) {
 
     // If an S3 bucket is defined, sync the site to it
     if (sails.config.build.s3Bucket) {
@@ -154,11 +174,11 @@ var hook = {
           };
       sails.log.verbose('Publishing job: ', model.id,
         ' => ', sails.config.build.s3Bucket);
-      S3(syncConfig, function(err) {
+      S3(syncConfig, function (err) {
         done(err, model);
       });
 
-    // Or else copy the site to a local directory
+      // Or else copy the site to a local directory
     } else {
       var cmd = _.template(['rm -r ${publish} || true',
             'mkdir -p ${publish}',
@@ -166,7 +186,7 @@ var hook = {
           ].join(' && '));
       sails.log.verbose('Publishing job: ', model.id,
         ' => ', tokens.publish);
-      exec(cmd(tokens), function(err, stdout, stderr) {
+      exec(cmd(tokens), function (err, stdout, stderr) {
         if (stdout) sails.log.verbose('stdout: ' + stdout);
         if (stderr) sails.log.verbose('stderr: ' + stderr);
         done(err, model);
@@ -177,7 +197,7 @@ var hook = {
 
 };
 
-module.exports = function(sails) {
+module.exports = function (sails) {
   _.extend(this, hook);
   return this;
 };
