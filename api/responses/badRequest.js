@@ -34,9 +34,9 @@ module.exports = function badRequest(data, options) {
   // Only include errors in response if application environment
   // is not set to 'production'.  In production, we shouldn't
   // send back any identifying information about errors.
-  if (sails.config.environment === 'production') {
-    data = undefined;
-  }
+  // if (sails.config.environment === 'production') {
+  //   data = undefined;
+  // }
 
   // If the user-agent wants JSON, always respond with JSON
   if (req.wantsJSON) {
