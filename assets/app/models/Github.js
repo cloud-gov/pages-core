@@ -1,6 +1,8 @@
-var a = require('async');
+var async = require('async');
 var Backbone = require('backbone');
 var $ = require('jquery');
+
+var encodeB64 = require('../helpers/encoding').encodeB64;
 
 var GithubModel = Backbone.Model.extend({
   initialize: function (opts) {
@@ -31,7 +33,7 @@ var GithubModel = Backbone.Model.extend({
         qs = $.param({
           access_token: this.token,
           ref: this.branch,
-          z: parseInt(Math.random() * 10000)
+          z: 6543
         });
 
     if (opts.root) return [baseUrl.join('/'), qs].join('?');
@@ -53,19 +55,16 @@ var GithubModel = Backbone.Model.extend({
   },
   commit: function (opts) {
     var self = this,
-        data;
+        data = {
+          path: opts.path || this.file,
+          message: opts.message,
+          content: encodeB64(opts.content),
+          branch: this.branch
+        };
 
-    if (this.get('type') !== 'file') throw new Error('Can only commit file changes');
+    if (this.attributes.json && this.attributes.json.sha) data.sha = this.attributes.json.sha;
 
-    data = {
-      path: this.file,
-      message: opts.message,
-      content: encodeB64(opts.content),
-      sha: this.attributes.json.sha,
-      branch: this.branch
-    };
-
-    $.ajax(this.url(), {
+    $.ajax(self.url({ path: data.path }), {
       method: 'PUT',
       headers: {
         'Authorization': 'token ' + self.token,
@@ -74,10 +73,11 @@ var GithubModel = Backbone.Model.extend({
       data: JSON.stringify(data),
       complete: function (res) {
         var e = {
-          status: res.status
+          request: data,
+          response: res.status
         };
 
-        if (res.status === 200) {
+        if (res.status === 200 || res.status === 201) {
           self.attributes.json.sha = res.responseJSON.content.sha;
           self.trigger('model:save:success', e);
         }
@@ -89,16 +89,16 @@ var GithubModel = Backbone.Model.extend({
   },
   checkForConfig: function () {
     var self  = this,
-        files = ['_navigation.json'];
+        files = ['_navigation.json', '_defaults.yml'],
+        bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/,
+        siteRoot = (self.site) ? self.site.get('siteRoot') : '',
+        match = siteRoot.match(bucketPath),
+        bucket = match && match[1],
+        root = bucket ? 'https://s3.amazonaws.com/' + bucket :
+               siteRoot ? siteRoot : '';
 
     var getFiles = files.map(function(file) {
-      var bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/,
-          siteRoot = self.site.get('siteRoot'),
-          match = siteRoot.match(bucketPath),
-          bucket = match && match[1],
-          root = bucket ? 'https://s3.amazonaws.com/' + bucket :
-                 siteRoot ? siteRoot : '',
-          url = [
+        var url = [
             root,
             'site',
             self.owner,
@@ -121,10 +121,11 @@ var GithubModel = Backbone.Model.extend({
       }
     });
 
-    a.parallel(getFiles, function (err, results) {
+    async.parallel(getFiles, function (err, results) {
       if (err) return self.trigger('model:getConfig:error');
 
       self.configFiles = {};
+
       results.forEach(function(r) {
         self.configFiles[r.file] = {
           present: r.present,
@@ -136,6 +137,15 @@ var GithubModel = Backbone.Model.extend({
     });
 
     return this;
+  },
+  addPage: function (opts) {
+    opts = opts || {};
+    var commitOpts = {
+      path: opts.path,
+      message: opts.message || 'A new file at ' + opts.path,
+      content: opts.content || this.configFiles['_defaults.yml'] || ''
+    };
+    this.commit(commitOpts);
   }
 });
 
