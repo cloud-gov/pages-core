@@ -4,6 +4,8 @@ var Backbone = require('backbone');
 var ViewSwitcher = require('ampersand-view-switcher');
 var _ = require('underscore');
 
+var decodeB64 = require('./../../helpers/encoding').decodeB64;
+
 var BreadcrumbView = require('./breadcrumb');
 var FileListView = require('./files');
 var PagesView = require('./pages');
