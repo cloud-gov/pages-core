@@ -68,8 +68,7 @@ var EditView = Backbone.View.extend({
     var self = this,
         path = prompt('Please the new file path', 'pages/thing.md'),
         opts = {
-          path: path,
-          content: '---\nyo: dude\nlayout: page\n---\n'
+          path: path
         };
 
     e.preventDefault();
