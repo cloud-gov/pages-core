@@ -8,6 +8,8 @@ var NavbarView = require('./views/nav');
 var UserModel = require('./models/User');
 var SiteCollection = require('./models/Site').collection;
 
+var encodeB64 = require('./helpers/encoding').encodeB64;
+
 var Router = Backbone.Router.extend({
   initialize: function () {
     var self = this;
