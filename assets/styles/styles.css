@@ -64,7 +64,7 @@ body {
   height: auto;
 }
 
-.ProseMirror {
+.ProseMirror-content {
   min-height: 30em;
 }
 
