@@ -92,8 +92,14 @@ var GithubModel = Backbone.Model.extend({
         files = ['_navigation.json'];
 
     var getFiles = files.map(function(file) {
-      var url = [
-            self.site.get('siteRoot'),
+      var bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/,
+          siteRoot = self.site.get('siteRoot'),
+          match = siteRoot.match(bucketPath),
+          bucket = match && match[1],
+          root = bucket ? 'https://s3.amazonaws.com/' + bucket :
+                 siteRoot ? siteRoot : '',
+          url = [
+            root,
             'site',
             self.owner,
             self.name,

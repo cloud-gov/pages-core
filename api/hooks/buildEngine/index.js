@@ -145,7 +145,12 @@ var hook = {
       sails.log.verbose('Publishing job: ', model.id,
         ' => ', sails.config.build.s3Bucket);
       S3(syncConfig, function(err) {
-        done(err, model);
+        var cmd = _.template('rm -r ${destination} || true');
+        exec(cmd(tokens), function(err, stdout, stderr) {
+          if (stdout) sails.log.verbose('stdout: ' + stdout);
+          if (stderr) sails.log.verbose('stderr: ' + stderr);
+          done(err, model);
+        });
       });
 
     // Or else copy the site to a local directory
@@ -153,6 +158,7 @@ var hook = {
       var cmd = _.template(['rm -r ${publish} || true',
             'mkdir -p ${publish}',
             'cp -r ${destination}/* ${publish}',
+            'rm -r ${destination} || true'
           ].join(' && '));
       sails.log.verbose('Publishing job: ', model.id,
         ' => ', tokens.publish);
