@@ -140,10 +140,11 @@ var GithubModel = Backbone.Model.extend({
   },
   addPage: function (opts) {
     opts = opts || {};
+    var content = (this.configFiles['_defaults.yml'].present) ? this.configFiles['_defaults.yml'].json : '\n';
     var commitOpts = {
       path: opts.path,
-      message: opts.message || 'A new file at ' + opts.path,
-      content: opts.content || this.configFiles['_defaults.yml'] || ''
+      message: opts.message || 'The file ' + opts.path + ' was created',
+      content: opts.content || content
     };
     this.commit(commitOpts);
   }
