@@ -8,6 +8,8 @@ require('codemirror/mode/yaml/yaml');
 
 var createProseMirror = require('./prosemirror').create;
 
+var decodeB64 = require('../../helpers/encoding').decodeB64;
+
 var Document = require('../../models/Document');
 
 var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/file.html').toString();

@@ -1,14 +1,14 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
 window.jQuery = window.$ = Backbone.$;
-var encodeB64 = window.btoa;
-var decodeB64 = window.atob;
 
 var MainContainerView = require('./views/main');
 var NavbarView = require('./views/nav');
 
 var UserModel = require('./models/User');
 var SiteCollection = require('./models/Site').collection;
+
+var encodeB64 = require('./helpers/encoding').encodeB64;
 
 var Router = Backbone.Router.extend({
   initialize: function () {
@@ -29,25 +29,25 @@ var Router = Backbone.Router.extend({
   },
   routes: {
     '': 'home',
-    'new': 'new',
+    'new': 'newSite',
     'edit/:owner/:repo/:branch(/)*file': 'edit',
-    'site/:id/edit': 'siteEdit',
+    'site/:id/edit': 'editSite',
     'site/:id/builds': 'builds'
   },
   home: function () {
     this.mainView.home();
     return this;
   },
-  new: function () {
-    this.mainView.new();
+  newSite: function () {
+    this.mainView.newSite();
     return this;
   },
   edit: function (owner, repo, branch, file) {
     this.mainView.edit(owner, repo, branch, file);
     return this;
   },
-  siteEdit: function(id) {
-    this.mainView.siteEdit(id);
+  editSite: function(id) {
+    this.mainView.editSite(id);
     return this;
   },
   builds: function(id) {
@@ -57,11 +57,4 @@ var Router = Backbone.Router.extend({
 });
 
 window.federalist = new Router();
-window.encodeB64 = function(s) {
-  return window.btoa(unescape(encodeURIComponent(s)));
-};
-
-window.decodeB64 = function(s) {
-  return decodeURIComponent(escape(window.atob(s)));
-};
 Backbone.history.start();

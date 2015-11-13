@@ -1,7 +1,5 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
-var markdown = require('markdown').markdown;
-var htmlToMarkdown = require('to-markdown');
 
 var DocumentModel = Backbone.Model.extend({
   initialize: function (opts) {
@@ -29,7 +27,7 @@ var DocumentModel = Backbone.Model.extend({
   toMarkdown: function () {
     var lastCharIndex;
     if (!this.frontMatter) return this.content;
-    if (!this.content) return this.frontMatter;
+    else if (!this.content) return this.frontMatter;
 
     // add a new line at the end if there isn't one already
     // this is so the front matter dashes are on the next line
