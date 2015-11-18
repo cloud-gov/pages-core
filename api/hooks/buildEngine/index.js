@@ -12,7 +12,8 @@ var hook = {
 
     // Run command template
     this._run([
-      'rm -rf ${source}',
+      'rm -rf ${source} || true',
+      'rm -rf ${destination} || true',
       'mkdir -p ${source}',
       'git clone -b ${branch} --single-branch ' +
         'https://${token}@github.com/${owner}/${repository}.git ${source}',
@@ -20,7 +21,6 @@ var hook = {
         '${source}/_config_base.yml',
       'bundle exec jekyll build --safe --config ${source}/_config.yml,${source}/_config_base.yml ' +
         '--source ${source} --destination ${source}/_site',
-      'rm -rf ${destination}',
       'mkdir -p ${destination}',
       'cp -r ${source}/_site/* ${destination}',
       'rm -rf ${source}'
@@ -32,13 +32,13 @@ var hook = {
 
     // Run command template
     this._run([
-      'rm -rf ${source}',
+      'rm -rf ${source} || true',
+      'rm -rf ${destination} || true',
       'mkdir -p ${source}',
       'git clone -b ${branch} --single-branch ' +
         'https://${token}@github.com/${owner}/${repository}.git ${source}',
       'hugo --baseUrl=${baseurl} ' +
         '--source=${source}',
-      'rm -rf ${destination}',
       'mkdir -p ${destination}',
       'cp -r ${source}/public/* ${destination}',
       'rm -rf ${source}'
@@ -50,11 +50,11 @@ var hook = {
 
     // Run command template
     this._run([
-      'rm -rf ${source}',
+      'rm -rf ${source} || true',
+      'rm -rf ${destination} || true',
       'mkdir -p ${source}',
       'git clone -b ${branch} --single-branch ' +
         'https://${token}@github.com/${owner}/${repository}.git ${source}',
-      'rm -rf ${destination}',
       'mkdir -p ${destination}',
       'cp -r ${source}/* ${destination}',
       'rm -rf ${source}'
@@ -155,7 +155,7 @@ var hook = {
       sails.log.verbose('Publishing job: ', model.id,
         ' => ', sails.config.build.s3Bucket);
       S3(syncConfig, function(err) {
-        var cmd = _.template('rm -r ${destination} || true');
+        var cmd = _.template('rm -rf ${destination} || true');
         exec(cmd(tokens), function(err, stdout, stderr) {
           if (stdout) sails.log.verbose('stdout: ' + stdout);
           if (stderr) sails.log.verbose('stderr: ' + stderr);
@@ -168,7 +168,7 @@ var hook = {
       var cmd = _.template(['rm -r ${publish} || true',
             'mkdir -p ${publish}',
             'cp -r ${destination}/* ${publish}',
-            'rm -r ${destination} || true'
+            'rm -rf ${destination} || true'
           ].join(' && '));
       sails.log.verbose('Publishing job: ', model.id,
         ' => ', tokens.publish);
