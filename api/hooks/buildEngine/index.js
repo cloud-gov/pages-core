@@ -124,8 +124,14 @@ var hook = {
       exec(template(tokens), function(err, stdout, stderr) {
         if (stdout) sails.log.verbose('stdout: ' + stdout);
         if (stderr) sails.log.verbose('stderr: ' + stderr);
-        if (err) return done(err, model);
-        service.publish(tokens, model, done);
+        if (err) {
+          var cmd = _.template('rm -rf ${destination} && rm -rf ${source}');
+          exec(cmd(tokens), function() {
+            done(err, model);
+          });
+        } else {
+          service.publish(tokens, model, done);
+        }
       });
 
     }
