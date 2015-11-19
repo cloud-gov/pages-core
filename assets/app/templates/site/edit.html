@@ -14,6 +14,21 @@
     </div>
   </div>
   <div class="row">
+    <div class="col-md-12">
+      <div class="form-group">
+        <label>Draft previews</label>
+        <div class="radio">
+          <input type="radio" name="publicPreview" id="public" value="true" <% model.publicPreview && print('checked="true"') %>>
+          <label for="public">Allow anyone to see previews of draft sites</label>
+        </div>
+        <div class="radio">
+          <input type="radio" name="publicPreview" id="private" value="" <% model.publicPreview || print('checked="true"') %>>
+          <label for="private">Only users with Federalist accounts can see previews</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
     <div class="col-md-8">
       <div class="form-group">
         <label class="active" for="domain">Custom domain</label>
