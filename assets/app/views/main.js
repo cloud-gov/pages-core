@@ -86,7 +86,7 @@ var AppView = Backbone.View.extend({
     var siteEditView = new SiteEditView({ model: this.sites.get(id) });
     this.pageSwitcher.set(siteEditView);
     this.listenToOnce(siteEditView, 'site:save:success', function () {
-      this.home();
+      federalist.navigate('', { trigger: true });
     }.bind(this));
     return this;
   },

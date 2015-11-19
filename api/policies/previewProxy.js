@@ -8,7 +8,8 @@ module.exports = function(req, res, next) {
     repository: req.param('repo')
   }).populate('users').exec(function(err, site) {
     if (err || !site) return res.badRequest();
-    var userHasAccess = _(site.users).pluck('id').contains(req.user.id);
+    var userHasAccess = site.publicPreview ||
+          _(site.users).pluck('id').contains(req.user.id);
     if (!userHasAccess) return res.badRequest();
     next();
   });

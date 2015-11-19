@@ -44,6 +44,10 @@ module.exports = {
     config: {
       type: 'string'
     },
+    publicPreview: {
+      type: 'boolean',
+      defaultsTo: false
+    },
     toJSON: function() {
       var obj = this.toObject(),
           config = sails.config.build || {};
