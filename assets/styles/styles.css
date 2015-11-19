@@ -64,6 +64,10 @@ body {
   height: auto;
 }
 
+.ProseMirror-content {
+  min-height: 30em;
+}
+
 .list-group-item ul {
   padding-left:0;
 }

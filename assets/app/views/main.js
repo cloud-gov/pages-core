@@ -57,7 +57,7 @@ var AppView = Backbone.View.extend({
     this.pageSwitcher.set(authenticateView);
     return this;
   },
-  new: function () {
+  newSite: function () {
     var addSiteView = new AddSiteView({
           user: this.user,
           collection: this.sites
@@ -82,7 +82,7 @@ var AppView = Backbone.View.extend({
 
     return this;
   },
-  siteEdit: function(id) {
+  editSite: function(id) {
     var siteEditView = new SiteEditView({ model: this.sites.get(id) });
     this.pageSwitcher.set(siteEditView);
     this.listenToOnce(siteEditView, 'site:save:success', function () {
