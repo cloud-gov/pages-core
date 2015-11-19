@@ -43,6 +43,7 @@ module.exports = {
       .exec(function(err, model) {
         if (err && done) return done(err, model);
         if (err) return sails.log.error(err);
+        if (!model && done) return done();
         // Additional query since we need to populate a 2nd level association
         Passport.findOne({ user: model.user.id })
           .exec(function(err, passport) {
