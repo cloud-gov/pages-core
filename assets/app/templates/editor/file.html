@@ -1,3 +1,18 @@
+<div class="panel panel-info" id="save-panel" style="display: none;">
+  <div class="panel-heading">Save your changes</div>
+  <div class="panel-body">
+    <form>
+      <div class="form-group">
+        <label for="save-content-message">Make this a helpful save message for yourself and future collaborators.</label>
+        <input type="text" class="form-control" id="save-content-message" value="Some changes to <%= fileName %>">
+      </div>
+      <a class="btn btn-danger" data-action="save-cancel" role="button">Cancel</a>
+      <a class="btn btn-primary" data-action="save-confirm" role="button">Save</a>
+      <span class="label" id="save-status-result"></span>
+    </form>
+  </div>
+</div>
+
 <div class="editor">
 
   <% if (showContent) { %>
@@ -23,19 +38,5 @@
     <h2>Settings</h2>
     <div data-target="metadata"></div>
   </form>
-
-  <div class="panel panel-info">
-    <div class="panel-heading">Save your changes</div>
-    <div class="panel-body">
-      <form>
-        <div class="form-group">
-          <label for="save-content-message">Make this a helpful save message for yourself and future collaborators.</label>
-          <input type="text" class="form-control" id="save-content-message" value="Some changes to <%= fileName %>">
-        </div>
-        <a class="btn btn-primary" data-action="save-content" role="button">Save</a>
-        <span class="label" id="save-status-result"></span>
-      </form>
-    </div>
-  </div>
 
 </div>

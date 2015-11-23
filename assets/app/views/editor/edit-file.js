@@ -18,7 +18,8 @@ var EditorView = Backbone.View.extend({
   tagName: 'div',
   events: {
     'click [data-tab]': 'toggleAreas',
-    'click [data-action=save-content]': 'saveDocument'
+    'click [data-action=save-confirm]': 'saveDocument',
+    'click [data-action=save-cancel]': 'cancelSave'
   },
   template: _.template(templateHtml),
   initialize: function (opts) {
@@ -32,6 +33,7 @@ var EditorView = Backbone.View.extend({
     this.path = opts.path;
     this.showContent = true;
 
+    this.on('click:save', this.promptSave.bind(this));
     this.model.on('model:save:success', this.saveSuccess.bind(this));
     this.model.on('model:save:error', this.saveFailure.bind(this));
 
@@ -40,7 +42,7 @@ var EditorView = Backbone.View.extend({
       this.showContent = false;
       activeTab = 'metadata';
     }
-    else if (fileExt === 'md') {
+    else if (fileExt === 'md' || fileExt === 'markdown') {
       this.doc = new Document({ markdown: content });
     }
 
@@ -158,6 +160,7 @@ var EditorView = Backbone.View.extend({
     else {
       this.doc.frontMatter = false;
     }
+
     if (content) {
       this.doc.content = content;
     }
@@ -168,6 +171,12 @@ var EditorView = Backbone.View.extend({
     });
 
     return this;
+  },
+  promptSave: function() {
+    this.$('#save-panel').show();
+  },
+  cancelSave: function () {
+    this.$('#save-panel').hide();
   }
 });
 

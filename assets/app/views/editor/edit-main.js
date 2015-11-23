@@ -18,7 +18,8 @@ var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/main.htm
 var EditView = Backbone.View.extend({
   tagName: 'div',
   events: {
-    'click #add-page': 'newPage'
+    'click #add-page': 'newPage',
+    'click #save-page': 'savePage'
   },
   initialize: function (opts) {
     if (!opts) return this;
@@ -49,10 +50,16 @@ var EditView = Backbone.View.extend({
         config = model.configFiles || {},
         childView, pages;
 
+    this.$('#edit-button').empty();
+
     if (model.get('type') === 'file') {
+      var saveButton = $('<a class="btn btn-primary pull-right" id="save-page" alt="Save this page" href="#" role="button">Save this page</a>');
+      this.$('#edit-button').append(saveButton);
       childView = new EditorView({ model: model });
     }
     else {
+      var editButton = $('<a class="btn btn-primary pull-right" id="add-page" alt="Add a new page" href="#" role="button">Add a new page</a>');
+      this.$('#edit-button').append(editButton);
       if (config['_navigation.json'] && config['_navigation.json'].present) {
         pages = config['_navigation.json'].json;
         childView = new PagesView({ model: model, pages: pages });
@@ -65,6 +72,10 @@ var EditView = Backbone.View.extend({
     this.pageSwitcher.set(childView);
 
     return this;
+  },
+  savePage: function (e) {
+    e.preventDefault();
+    this.pageSwitcher.current.trigger('click:save');
   },
   newPage: function(e) {
     var self = this,
