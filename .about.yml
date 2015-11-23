@@ -102,4 +102,5 @@ links:
 
 # Email addresses of points-of-contact
 contact:
-- david.cole@gsa.gov
+- url: mailto:david.cole@gsa.gov
+  text: David Cole
