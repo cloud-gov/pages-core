@@ -20,7 +20,7 @@ parent: federalist
 
 # Maturity stage of the project (required)
 # values: discovery, alpha, beta, live
-stage: alpha
+stage: beta
 
 # Whether or not the project is actively maintained (required)
 # values: active, deprecated
@@ -86,7 +86,7 @@ services:
 #     name: Name of the license from the Software Package Data Exchange (SPDX): https://spdx.org/licenses/
 #     url: URL for the text of the license
 licenses:
-  federalist: 
+  federalist:
     name: CC0
     url: https://github.com/18F/federalist/blob/master/LICENSE.md
 
