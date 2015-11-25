@@ -1,18 +1,20 @@
-<div class="page-header">
-  <h1>Recent builds for your site</h1>
+<div class="usa-grid">
+  <h1>Recent builds for <%- site.owner %> / <%- site.repository %></h1>
 </div>
 <% _.each(site.builds, function(build) { %>
-<% var panelClass = build.state === 'error' ? 'danger' :
+<% var panelClass = build.state === 'error' ? 'error' :
   build.state === 'success' ? 'success' : 'info'; %>
-<div class="panel panel-<%- panelClass %>">
-  <div class="panel-heading">
-    <%- build.branch %> (<%- build.username %>)
-    <span class="pull-right"><%- build.completedAtFormatted || 'Processing' %></span>
+  <div class="usa-grid">
+    <div class="usa-alert usa-alert-<%- panelClass %>">
+       <div class="usa-alert-body">
+         <h3 class="usa-alert-heading"><%- build.branch %> (<%- build.username %>)</h3>
+         <p class="usa-alert-text"><%- build.completedAtFormatted || 'Processing' %></p>
+         <p class="usa-alert-text"><%
+           build.state === 'error' ?
+           print(build.error) :
+           print('The build completed successfully.')
+         %></p>
+       </div>
+     </div>
   </div>
-  <div class="panel-body"><%
-    build.state === 'error' ?
-    print(build.error) :
-    print('The build completed successfully.')
-  %></div>
-</div>
 <% }); %>
