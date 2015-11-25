@@ -25,11 +25,11 @@ var SiteListItemView = Backbone.View.extend({
       .format('L LT') : '';
     data.viewLink = data.domain ||
       data.siteRoot + '/site/' + data.owner + '/' + data.repository + '/';
-    data.statusLabel = !lastBuild ? '<span class="label label-warning">Publishing...</span>' :
-      lastBuild.state === 'error' ? '<span class="label label-danger">Error: see log for more information</span>' :
-      lastBuild.state === 'success' ? '<span class="label label-success">Published</span>' :
-      lastBuild.state === 'skipped' ? '<span class="label label-success">Published</span>' :
-      '<span class="label label-warning">Publishing...</span>';
+    data.statusLabel = !lastBuild ? '<span class="usa-label label-warning">Publishing...</span>' :
+      lastBuild.state === 'error' ? '<span class="usa-label label-danger">Error: see log for more information</span>' :
+      lastBuild.state === 'success' ? '<span class="usa-label label-success">Published</span>' :
+      lastBuild.state === 'skipped' ? '<span class="usa-label label-success">Published</span>' :
+      '<span class="usa-label label-warning">Publishing...</span>';
     this.$el.html(this.template(data));
   }
 });

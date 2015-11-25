@@ -13,7 +13,7 @@ var EditorView = require('./edit-file');
 
 var Github = require('./../../models/Github');
 
-var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/main.html').toString();
+var template = _.template(fs.readFileSync(__dirname + '/../../templates/editor/main.html').toString());
 
 var EditView = Backbone.View.extend({
   tagName: 'div',
@@ -22,8 +22,9 @@ var EditView = Backbone.View.extend({
   },
   initialize: function (opts) {
     if (!opts) return this;
+    var html = template({ owner: opts.owner, repo: opts.repo });
 
-    this.$el.html(_.template(templateHtml));
+    this.$el.html(html);
     this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.$('#edit-content')[0]);
 
     this.model = new Github({
