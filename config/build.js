@@ -11,5 +11,6 @@ module.exports.build = {
   awsBuildKey: process.env.FEDERALIST_AWS_BUILD_KEY,
   awsBuildSecret: process.env.FEDERALIST_AWS_BUILD_SECRET,
   s3Bucket: process.env.FEDERALIST_S3_BUCKET,
-  sqsQueue: process.env.FEDERALIST_SQS_QUEUE
+  sqsQueue: process.env.FEDERALIST_SQS_QUEUE,
+  containerName: process.env.FEDERALIST_ECS_CONTAINER
 };

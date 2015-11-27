@@ -9,8 +9,7 @@ var fs = require('fs'),
 module.exports = {
 
   addJob: function(model) {
-    var defaultBranch = model.branch === model.site.defaultBranch,
-        tokens = {
+    var tokensBase = {
           engine: model.site.engine,
           branch: model.branch,
           branchURL: defaultBranch ? '' : '/' + model.branch,
@@ -19,17 +18,20 @@ module.exports = {
           repository: model.site.repository,
           owner: model.site.owner,
           token: (model.user.passport) ?
-            model.user.passport.tokens.accessToken : '',
+            model.user.passport.tokens.accessToken : ''
+        },
+        defaultBranch = model.branch === model.site.defaultBranch,
+        tokens = _.extend(tokensBase, {
           baseurl: (model.site.domain && defaultBranch) ? '' :
-            '/' + tokens.root + '/' + tokens.owner +
-            '/' + tokens.repository + tokens.branchURL,
-          prefix: tokens.root + '/' +
-            tokens.owner + '/' +
-            tokens.repository +
-            tokens.branchURL,
+            '/' + tokensBase.root + '/' + tokensBase.owner +
+            '/' + tokensBase.repository + tokensBase.branchURL,
+          prefix: tokensBase.root + '/' +
+            tokensBase.owner + '/' +
+            tokensBase.repository +
+            tokensBase.branchURL,
           callback: url.resolve(sails.config.build.callback,
             '/' + model.id + '/' + sails.config.build.token)
-        },
+        }),
         body = {
           environment: [
             { "name": "AWS_ACCESS_KEY_ID", "value": awsKey },
@@ -46,16 +48,21 @@ module.exports = {
             { "name": "GITHUB_TOKEN", "value": tokens.token },
             { "name": "GENERATOR", "value": tokens.engine }
           ],
-          name: model.id + '-' + model.site.owner + '-' + model.site.repository
+          name: sails.config.build.containterName
         },
         params = {
           QueueUrl: queueUrl,
           MessageBody: JSON.stringify(body)
         };
+    console.log(params);
     sqs.sendMessage(params, function(err, data) {
-      if (err) error(err);
+      if (err) error(err, model);
     });
 
   }
 
 };
+
+function error(err, model) {
+  Build.completeJob(err, model);
+}
