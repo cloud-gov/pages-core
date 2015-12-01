@@ -86,7 +86,9 @@ services:
 #     name: Name of the license from the Software Package Data Exchange (SPDX): https://spdx.org/licenses/
 #     url: URL for the text of the license
 licenses:
-  name: Public Domain
+  federalist: 
+    name: CC0
+    url: https://github.com/18F/federalist/blob/master/LICENSE.md
 
 # Blogs or websites associated with project development
 #blog:
@@ -102,4 +104,5 @@ links:
 
 # Email addresses of points-of-contact
 contact:
-- david.cole@gsa.gov
+- url: mailto:david.cole@gsa.gov
+  text: David Cole
