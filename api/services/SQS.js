@@ -9,7 +9,8 @@ var fs = require('fs'),
 module.exports = {
 
   addJob: function(model) {
-    var tokensBase = {
+    var defaultBranch = model.branch === model.site.defaultBranch,
+        tokensBase = {
           engine: model.site.engine,
           branch: model.branch,
           branchURL: defaultBranch ? '' : '/' + model.branch,
@@ -20,7 +21,6 @@ module.exports = {
           token: (model.user.passport) ?
             model.user.passport.tokens.accessToken : ''
         },
-        defaultBranch = model.branch === model.site.defaultBranch,
         tokens = _.extend(tokensBase, {
           baseurl: (model.site.domain && defaultBranch) ? '' :
             '/' + tokensBase.root + '/' + tokensBase.owner +
@@ -30,7 +30,7 @@ module.exports = {
             tokensBase.repository +
             tokensBase.branchURL,
           callback: url.resolve(sails.config.build.callback,
-            '/' + model.id + '/' + sails.config.build.token)
+            model.id + '/' + sails.config.build.token)
         }),
         body = {
           environment: [
@@ -48,13 +48,13 @@ module.exports = {
             { "name": "GITHUB_TOKEN", "value": tokens.token },
             { "name": "GENERATOR", "value": tokens.engine }
           ],
-          name: sails.config.build.containterName
+          name: sails.config.build.containerName
         },
         params = {
           QueueUrl: queueUrl,
           MessageBody: JSON.stringify(body)
         };
-    console.log(params);
+
     sqs.sendMessage(params, function(err, data) {
       if (err) error(err, model);
     });
