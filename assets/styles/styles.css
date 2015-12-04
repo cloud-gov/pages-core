@@ -244,6 +244,9 @@ h1, h2, h3, h4, h5, h6 {
 .breadcrumb {
   list-style-type: none;
 }
+.breadcrumb a {
+  text-decoration: underline;
+}
 .breadcrumb li:before {
   content: "";
   display: inherit;
