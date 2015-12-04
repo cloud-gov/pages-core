@@ -1,9 +1,8 @@
-<ul class="nav navbar-nav navbar-right" id="nav-mobile">
+<ul class="usa-button-list usa-unstyled-list" id="nav-mobile">
 <% if(username) {%>
-  <li><p class="navbar-text">Welcome <%- username %>!</p></li>
-  <li><a href="https://github.com/18F/federalist/issues/new" target="_blank">Need help? Report an issue</a></li>
-  <li><a href="#" id="logout">Done? Log out</a></li>
+  <li><a class="usa-button usa-button-outline" href="https://github.com/18F/federalist/issues/new" target="_blank">Need help? Report an issue</a></li>
+  <li><a class="usa-button usa-button-gray" href="#" id="logout">Done? Log out</a></li>
 <% } else { %>
-  <li><a href="/auth/github">Have an account? Log in now</a></li>
+  <li><a class="usa-button" href="/auth/github">Have an account? Log in now</a></li>
 <% } %>
 </ul>
