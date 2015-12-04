@@ -1,15 +1,51 @@
+var _ = require('underscore');
+
 var ProseMirror = require("prosemirror/dist/edit").ProseMirror
+var elt = require('prosemirror/dist/dom').elt;
 require("prosemirror/dist/menu/menubar") // Load menubar module
 require('prosemirror/dist/parse/markdown');
 require('prosemirror/dist/serialize/markdown');
 
 var ProseMirrorModel = require('prosemirror/dist/model');
 var Schema = ProseMirrorModel.Schema;
+var Attribute = ProseMirrorModel.Attribute;
 var defaultSchema = ProseMirrorModel.defaultSchema;
 
 var AddImageView = require('../add-image');
 
 var defaultImageNode = defaultSchema.spec.nodes.image.type;
+var defaults = { default: '' }
+defaultImageNode.attributes['repo'] = new Attribute(defaults);
+defaultImageNode.attributes['branch'] = new Attribute(defaults);
+defaultImageNode.attributes['filePath'] = new Attribute(defaults);
+
+defaultImageNode.prototype.parseMarkdown = [];
+defaultImageNode.register("parseMarkdown", {
+  token: "image",
+  parse: function parse(state, tok) {
+    var filePath = state.getAttr(tok, "src")
+                    .replace('https://raw.githubusercontent.com/', '')
+                    .split('/').slice(-2).join('/');
+
+    state.addInline(this, null, {
+      filePath: filePath,
+      src: state.getAttr(tok, "src"),
+      title: state.getAttr(tok, "title") || null,
+      alt: tok.children[0] && tok.children[0].content || null
+    });
+  }
+});
+
+defaultImageNode.prototype.serializeMarkdown = function (state, node) {
+  var imageMd = _.template(" ![<%- alt %>](<%- src %>)");
+  var md = imageMd({
+    alt: (node.attrs.alt || ""),
+    src: ['{{ site.baseurl }}', node.attrs.filePath].join('/'),
+    title: node.attrs.title
+  });
+  state.write(md);
+}
+
 defaultImageNode.prototype.commands = [];
 defaultImageNode.attachCommand("insertImage", function(nodeType) {
   return {
@@ -45,7 +81,7 @@ var customNodes = {};
 var federalistSchema = new Schema(defaultSchema.spec.updateNodes(customNodes));
 
 module.exports = function create(placeEl) {
-  var editor = window.pm = new ProseMirror({
+  var editor = window.federalist.pm = new ProseMirror({
     place: placeEl,
     menuBar: true,
     schema: federalistSchema
