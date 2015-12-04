@@ -6,8 +6,7 @@ var encodeB64 = require('../helpers/encoding').encodeB64;
 
 var GithubModel = Backbone.Model.extend({
   initialize: function (opts) {
-    var opts = opts || {},
-        self = this;
+    var opts = opts || {};
     if (!opts.token) throw new Error('Must provide Github OAuth token');
 
     this.owner = opts.owner;
@@ -16,18 +15,20 @@ var GithubModel = Backbone.Model.extend({
     this.token = opts.token;
     this.file = opts.file;
     this.site = opts.site;
+    this.assets = [];
+    this.uploadDir = opts.uploadRoot || 'uploads';
 
     this.once('model:getConfig:success', function () {
-      self.fetch();
-    })
+      this.getAssets();
+      this.fetch();
+    }.bind(this));
 
     this.checkForConfig();
 
     return this;
   },
   url: function (opts) {
-    var self = this,
-        opts = opts || {},
+    var opts = opts || {},
         ghUrl = 'https://api.github.com/repos',
         baseUrl   = [ghUrl, this.owner, this.name, 'contents'],
         qs = $.param({
@@ -50,7 +51,6 @@ var GithubModel = Backbone.Model.extend({
     };
 
     if (res.type) attrs.type = res.type;
-
     return attrs;
   },
   commit: function (opts) {
@@ -58,28 +58,35 @@ var GithubModel = Backbone.Model.extend({
         data = {
           path: opts.path || this.file,
           message: opts.message,
-          content: encodeB64(opts.content),
+          content: opts.base64 || encodeB64(opts.content),
           branch: this.branch
         };
 
-    if (this.attributes.json && this.attributes.json.sha) data.sha = this.attributes.json.sha;
+    if (this.attributes.json && this.attributes.json.sha) {
+      data.sha = this.attributes.json.sha;
+    }
 
-    $.ajax(self.url({ path: data.path }), {
+    $.ajax(this.url({ path: data.path }), {
       method: 'PUT',
       headers: {
-        'Authorization': 'token ' + self.token,
+        'Authorization': 'token ' + this.token,
         'Content-Type': 'application/json'
       },
       data: JSON.stringify(data),
       complete: function (res) {
-        var e = {
-          request: data,
-          response: res.status
-        };
+        var e = { request: data, response: res.status };
 
         if (res.status === 200 || res.status === 201) {
           self.attributes.json.sha = res.responseJSON.content.sha;
-          self.trigger('model:save:success', e);
+
+          // if this is an uploaded asset
+          if (data.path.match(self.uploadDir)) {
+            // refresh internal store of assets
+            self.getAssets.call(self);
+            window.federalist.dispatcher.trigger('asset:upload:uploaded', res.responseJSON);
+          } else {
+            self.trigger('model:save:success', e);
+          }
         }
         else {
           self.trigger('model:save:error', e);
@@ -91,20 +98,20 @@ var GithubModel = Backbone.Model.extend({
     var self  = this,
         files = ['_navigation.json', '_defaults.yml'],
         bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/,
-        siteRoot = (self.site) ? self.site.get('siteRoot') : '',
+        siteRoot = (this.site) ? this.site.get('siteRoot') : '',
         match = siteRoot.match(bucketPath),
         bucket = match && match[1],
         root = bucket ? 'https://s3.amazonaws.com/' + bucket :
                siteRoot ? siteRoot : '';
 
     var getFiles = files.map(function(file) {
-        var url = [
-            root,
-            'site',
-            self.owner,
-            self.name,
-            file
-          ].join('/');
+      var url = [
+          root,
+          'site',
+          self.owner,
+          self.name,
+          file
+        ].join('/');
 
       return function(callback) {
         $.ajax({
@@ -137,6 +144,23 @@ var GithubModel = Backbone.Model.extend({
     });
 
     return this;
+  },
+  getAssets: function () {
+    var self = this;
+
+    $.ajax({
+      url: this.url({ path: 'uploads' }),
+      method: 'GET',
+      complete: function (res) {
+        if (res.status === 200) {
+          self.assets = res.responseJSON;
+          self.trigger('model:getAssets:success', self.assets);
+        }
+        else {
+          self.trigger('model:getAssets:error', res.status);
+        }
+      }
+    });
   },
   addPage: function (opts) {
     opts = opts || {};

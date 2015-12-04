@@ -27,7 +27,7 @@ var EditView = Backbone.View.extend({
     this.$el.html(_.template(templateHtml));
     this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.$('#edit-content')[0]);
 
-    this.model = new Github({
+    this.model = window.federalist.github = new Github({
       token: getToken(),
       owner: opts.owner,
       repoName: opts.repo,
@@ -43,6 +43,8 @@ var EditView = Backbone.View.extend({
 
     this.model.on('sync', this.update.bind(this));
 
+    window.federalist.dispatcher.on('asset:upload:selected', this.uploadAsset.bind(this));
+
     return this;
   },
   update: function () {
@@ -53,12 +55,12 @@ var EditView = Backbone.View.extend({
     this.$('#edit-button').empty();
 
     if (model.get('type') === 'file') {
-      var saveButton = $('<a class="btn btn-primary pull-right" id="save-page" alt="Save this page" href="#" role="button">Save this page</a>');
+      var saveButton = $('<a class="btn btn-primary pull-right" id="save-page" href="#" role="button">Save this page</a>');
       this.$('#edit-button').append(saveButton);
       childView = new EditorView({ model: model });
     }
     else {
-      var editButton = $('<a class="btn btn-primary pull-right" id="add-page" alt="Add a new page" href="#" role="button">Add a new page</a>');
+      var editButton = $('<a class="btn btn-primary pull-right" id="add-page" href="#" role="button">Add a new page</a>');
       this.$('#edit-button').append(editButton);
       if (config['_navigation.json'] && config['_navigation.json'].present) {
         pages = config['_navigation.json'].json;
@@ -96,6 +98,24 @@ var EditView = Backbone.View.extend({
     });
 
     this.model.addPage(opts);
+  },
+  uploadAsset: function (e) {
+    var self = this,
+        fileReader = new FileReader();
+
+    fileReader.onload = function () {
+      var r = /data:\w+\/\w+;base64,/,
+          path = [self.model.uploadDir, e.name].join('/'),
+          commit = {
+            path: path,
+            message: 'Uploading ' + e.name,
+            base64: fileReader.result.replace(r, '')
+          };
+
+      self.model.commit(commit);
+    }
+
+    fileReader.readAsDataURL(e);
   }
 });
 
