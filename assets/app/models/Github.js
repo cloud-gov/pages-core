@@ -18,12 +18,12 @@ var GithubModel = Backbone.Model.extend({
     this.assets = [];
     this.uploadDir = opts.uploadRoot || 'uploads';
 
-    this.once('model:getConfig:success', function () {
-      this.getAssets();
+    this.once('github:fetchConfig:success', function () {
+      this.fetchAssets();
       this.fetch();
     }.bind(this));
 
-    this.checkForConfig();
+    this.fetchConfig();
 
     return this;
   },
@@ -76,25 +76,26 @@ var GithubModel = Backbone.Model.extend({
       complete: function (res) {
         var e = { request: data, response: res.status };
 
-        if (res.status === 200 || res.status === 201) {
-          self.attributes.json.sha = res.responseJSON.content.sha;
+        if (res.status !== 200 || res.status !== 201) {
+          self.trigger('github:commit:error', e);
+          return;
+        }
 
-          // if this is an uploaded asset
-          if (data.path.match(self.uploadDir)) {
-            // refresh internal store of assets
-            self.getAssets.call(self);
-            window.federalist.dispatcher.trigger('asset:upload:uploaded', res.responseJSON);
-          } else {
-            self.trigger('model:save:success', e);
-          }
+        self.attributes.json.sha = res.responseJSON.content.sha;
+
+        // if this is an uploaded asset
+        if (data.path.match(self.uploadDir)) {
+          // refresh internal store of assets
+          self.fetchAssets.call(self);
+          window.federalist.dispatcher.trigger('github:upload:success', res.responseJSON);
+        } else {
+          self.trigger('github:commit:success', e);
         }
-        else {
-          self.trigger('model:save:error', e);
-        }
+
       }
     });
   },
-  checkForConfig: function () {
+  fetchConfig: function () {
     var self  = this,
         files = ['_navigation.json', '_defaults.yml'],
         bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/,
@@ -129,7 +130,7 @@ var GithubModel = Backbone.Model.extend({
     });
 
     async.parallel(getFiles, function (err, results) {
-      if (err) return self.trigger('model:getConfig:error');
+      if (err) return self.trigger('github:fetchConfig:error');
 
       self.configFiles = {};
 
@@ -140,12 +141,12 @@ var GithubModel = Backbone.Model.extend({
         };
       });
 
-      self.trigger('model:getConfig:success')
+      self.trigger('github:fetchConfig:success')
     });
 
     return this;
   },
-  getAssets: function () {
+  fetchAssets: function () {
     var self = this;
 
     $.ajax({
@@ -154,12 +155,25 @@ var GithubModel = Backbone.Model.extend({
       complete: function (res) {
         if (res.status === 200) {
           self.assets = res.responseJSON;
-          self.trigger('model:getAssets:success', self.assets);
+          self.trigger('github:fetchAssets:success', self.assets);
         }
         else {
-          self.trigger('model:getAssets:error', res.status);
+          self.trigger('github:fetchAssets:error', res.status);
         }
       }
+    });
+  },
+  filterAssets: function (type) {
+    var regexByType = {
+      'images': /\.jpg|\.jpeg|\.png|\.gif/,
+      'documents': /\.doc|\.docx|\.pdf/
+    };
+
+    if (type === 'image') type = 'images';
+
+    return this.assets.filter(function(a) {
+      var isOfType = a.name.match(regexByType[type]);
+      return isOfType;
     });
   },
   addPage: function (opts) {

@@ -43,7 +43,7 @@ var EditView = Backbone.View.extend({
 
     this.model.on('sync', this.update.bind(this));
 
-    window.federalist.dispatcher.on('asset:upload:selected', this.uploadAsset.bind(this));
+    window.federalist.dispatcher.on('github:upload:selected', this.uploadAsset.bind(this));
 
     return this;
   },
@@ -88,7 +88,7 @@ var EditView = Backbone.View.extend({
 
     e.preventDefault();
 
-    this.listenToOnce(this.model, 'model:save:success', function(m){
+    this.listenToOnce(this.model, 'github:commit:success', function(m){
       var owner = self.model.get('owner'),
           repoName  = self.model.get('repoName'),
           branch = self.model.get('branch'),

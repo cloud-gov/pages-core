@@ -26,7 +26,7 @@ var EditorView = Backbone.View.extend({
     var self      = this,
         activeTab = 'content',
         fileExt = this.model.get('file').split('.')[1],
-        content = decodeB64(this.model.attributes.json.content),
+        content = this.cleanContent(decodeB64(this.model.attributes.json.content)),
         settingsEditorEl, contentEditorEl;
 
     this.editors = {};
@@ -34,8 +34,8 @@ var EditorView = Backbone.View.extend({
     this.showContent = true;
 
     this.on('click:save', this.promptSave.bind(this));
-    this.model.on('model:save:success', this.saveSuccess.bind(this));
-    this.model.on('model:save:error', this.saveFailure.bind(this));
+    this.model.on('github:commit:success', this.saveSuccess.bind(this));
+    this.model.on('github:commit:error', this.saveFailure.bind(this));
 
     if (fileExt === 'yml') {
       this.doc = new Document({ yml: content });
@@ -94,6 +94,22 @@ var EditorView = Backbone.View.extend({
     }, 0);
 
     return this;
+  },
+  /**
+   * Replace {{ site.baseurl }} with Github URL so assets load
+   *
+   * @param {string} content
+   * @return {string} content - with replaced baseUrls
+   */
+  cleanContent: function (content) {
+    var baseUrl = ["https://raw.githubusercontent.com",
+                    this.model.owner,
+                    this.model.name,
+                    this.model.branch
+                  ].join('/');
+
+    content = content.replace(/{{ site.baseurl }}/g, baseUrl);
+    return content;
   },
   setActiveTab: function (target) {
     var t = '[data-tab-show=' + target + ']';

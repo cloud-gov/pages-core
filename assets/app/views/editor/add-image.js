@@ -13,20 +13,15 @@ var AddImageView = Backbone.View.extend({
     'click [data-action=image-cancel]': 'remove'
   },
   initialize: function () {
-    var github = window.federalist.github,
-        assets = github.assets.filter(function(a) {
-          var isImage = a.name.match(/\.jpg|\.jpeg|\.png|\.gif/);
-          return isImage;
-        });
-
+    this.github = window.federalist.github;
     this.selectedImage = false;
-    this.el.innerHTML = html({ assets: assets });
+    this.el.innerHTML = html({ assets: this.github.filterAssets('images') });
   },
   uploadNewAsset: function (file) {
     var sizeLimit = (1024 * 1024) * 5; // 5 megabytes
 
     if (file.size < sizeLimit) {
-      window.federalist.dispatcher.trigger('asset:upload:selected', file);
+      window.federalist.dispatcher.trigger('github:upload:selected', file);
     }
     else {
       alert('the file is too big, look at console for more info');
@@ -41,15 +36,21 @@ var AddImageView = Backbone.View.extend({
 
     var self = this,
         selectedImage = $(this.selectedImage).children('img'),
-        selectedFiles = $(this.selectedImage).children('[type=file]');
+        selectedFiles = $(this.selectedImage).children('[type=file]'),
+        repo = [this.github.owner, this.github.name].join('/'),
+        branch = this.github.branch,
+        fileName = selectedImage.attr('src').split('/' + this.github.uploadDir + '/')[1]
+        filePath = [this.github.uploadDir, fileName].join('/');
 
     if (selectedFiles.length > 0) {
       var file = $('#asset')[0].files[0];
       this.uploadNewAsset(file);
-      window.federalist.dispatcher.once('asset:upload:uploaded', function(json){
+      window.federalist.dispatcher.once('github:upload:success', function(json){
         var path = json.content['download_url'];
         self.trigger('asset:selected', {
           src: path,
+          repo: repo,
+          branch: branch,
           title: 'Freshly uploaded'
         });
       });
@@ -57,6 +58,9 @@ var AddImageView = Backbone.View.extend({
     else {
       this.trigger('asset:selected', {
         src: selectedImage.attr('src'),
+        repo: repo,
+        branch: branch,
+        filePath: filePath,
         title: selectedImage.attr('title')
       });
     }

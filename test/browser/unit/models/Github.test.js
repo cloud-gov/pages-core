@@ -42,12 +42,12 @@ describe('Github model', function () {
       message: 'Testing add page'
     };
 
-    github.once('model:save:error', function (e){
+    github.once('github:commit:error', function (e){
       assert.equal(true, false); // if model throws an error fail test
       done();
     });
 
-    github.once('model:save:success', function (e){
+    github.once('github:commit:success', function (e){
       assert.equal(true, true); // if success event is triggered pass test
       done();
     });
