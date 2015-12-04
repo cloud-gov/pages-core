@@ -6,7 +6,7 @@ var _ = require('underscore');
 var CodeMirror = require('codemirror');
 require('codemirror/mode/yaml/yaml');
 
-var createProseMirror = require('./prosemirror').create;
+var createProseMirror = require('./prosemirror/create');
 
 var decodeB64 = require('../../helpers/encoding').decodeB64;
 
@@ -130,9 +130,10 @@ var EditorView = Backbone.View.extend({
     var messages = {
           0:   'The internet is not connected. Please check your connection.',
           404: 'Whoops, looks like this page can not be found.',
-          409: 'Uh oh, there was a conflict when saving'
+          409: 'Uh oh, there was a conflict when saving',
+          422: 'Github is missing something'
         },
-        status = responseText[e.status];
+        status = messages[status] || 'That hasn\'t happened before';
 
     this.$('#save-status-result').removeClass('label-success');
     this.$('#save-status-result').addClass('label-danger');
