@@ -58,10 +58,11 @@
     "socket.io-redis": "^0.1.4",
     "to-markdown": "^1.2.1",
     "underscore": "^1.8.3",
+    "uswds": "git+https://github.com/18F/web-design-standards.git#v0.9.x",
     "validator": "^3.39.0"
   },
   "scripts": {
-    "install": "npm run codemirror && npm run prosemirror && npm run migrate:up",
+    "install": "npm run uswds && npm run codemirror && npm run prosemirror && npm run migrate:up",
     "start": "npm run browserify && node app.js",
     "debug": "node debug app.js",
     "browserify": "browserify -t brfs assets/app/app.js -o assets/js/bundle.js",
@@ -74,6 +75,10 @@
     "migrate:create": "grunt db:migrate:create",
     "migrate:up": "grunt db:migrate:up || true",
     "migrate:down": "grunt db:migrate:down",
+    "uswds": "npm run uswds:css && npm run uswds:images && npm run uswds:fonts",
+    "uswds:css": "cp node_modules/uswds/assets/css/uswds.css assets/styles/",
+    "uswds:images": "cp -r node_modules/uswds/assets/img/ ./assets/images/uswds",
+    "uswds:fonts": "cp -r node_modules/uswds/assets/fonts/ ./assets/fonts",
     "codemirror": "cp node_modules/codemirror/lib/codemirror.css assets/styles/",
     "prosemirror": "cd node_modules/prosemirror && npm run dist"
   },
