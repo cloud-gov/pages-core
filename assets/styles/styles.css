@@ -71,3 +71,30 @@ body {
 .list-group-item ul {
   padding-left:0;
 }
+
+
+.uploaded-images {
+  overflow-x: scroll;
+  width: 100%;
+}
+
+.uploaded-images .scroll{
+  display: flex;
+}
+
+.uploaded-images .form-group {
+  background-color: gray;
+  margin-right: 1em;
+  min-height: 150px;
+  width: 150px;
+}
+
+.uploaded-images .selected {
+  border: 2px solid black;
+}
+
+.uploaded-images .form-group img {
+  flex-basis:
+  display: inline;
+  width: 74%;
+}

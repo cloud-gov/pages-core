@@ -1,0 +1,28 @@
+<div class="panel panel-info" id="upload-panel">
+  <div class="panel-heading">Select an image</div>
+  <div class="panel-body">
+    <div class="uploaded-images">
+      <% var scrollWidth = (assets.length + 1) * 300; %>
+      <div class="scroll" style="width: <%- scrollWidth %>px;">
+        <div class="form-group" id="upload-card">
+          <label for="file">Upload a new one.</label>
+          <input type="file" id="asset" name="asset">
+        </div>
+        <% if (assets.length > 0) { %>
+          <% _.forEach(assets, function (a) { %>
+            <div class="form-group image">
+              <img src="<%- a.download_url %>" title="<%- a.name %>">
+              <span><%- a.name %></span>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+    <form>
+
+      <a class="btn btn-danger" data-action="image-cancel" role="button">Cancel</a>
+      <a class="btn btn-primary" data-action="image-confirm" role="button">Use Image</a>
+      <span class="label" id="save-status-result"></span>
+    </form>
+  </div>
+</div>
