@@ -8,7 +8,7 @@ var html = _.template(fs.readFileSync(__dirname + '/../../templates/editor/add-i
 var AddImageView = Backbone.View.extend({
   events: {
     'change [type=file]': 'uploadFileSelected',
-    'click .form-group.image': 'existingSelected',
+    'click .image-card.existing': 'existingSelected',
     'click [data-action=image-confirm]': 'useAsset',
     'click [data-action=image-cancel]': 'remove'
   },
@@ -36,6 +36,8 @@ var AddImageView = Backbone.View.extend({
   },
   useAsset: function (e) {
     e.preventDefault(); e.stopPropagation();
+
+    if (!this.selectedImage) return this.remove();
 
     var self = this,
         selectedImage = $(this.selectedImage).children('img'),
@@ -73,9 +75,14 @@ var AddImageView = Backbone.View.extend({
   existingSelected: function (e) {
     e.preventDefault(); e.stopPropagation();
     var tagName = e.target.tagName.toLowerCase(),
-        target = e.target; window.z = e.target;
+        target;
 
-    if (tagName === 'img') target = $(z).parents('.image')[0];
+    if (tagName === 'img' || tagName === 'span') {
+      target = $(e.target).parents('.image-card')[0];
+    }
+    else if (tagName === 'div') {
+      target = e.target;
+    }
 
     if (this.selectedImage == target) {
       this.deselectCurrentCard();

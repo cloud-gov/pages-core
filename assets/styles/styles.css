@@ -73,28 +73,42 @@ body {
 }
 
 
-.uploaded-images {
+.image-cards {
+  margin-bottom: 1em;
   overflow-x: scroll;
   width: 100%;
 }
 
-.uploaded-images .scroll{
+.image-cards .scroll{
   display: flex;
 }
 
-.uploaded-images .form-group {
-  background-color: gray;
+.image-card {
+  background-color: #ccc;
   margin-right: 1em;
-  min-height: 150px;
+  min-height: 200px;
+  position: relative;
   width: 150px;
 }
 
-.uploaded-images .selected {
-  border: 2px solid black;
+.image-cards .selected {
+  border: 7px solid black;
 }
 
-.uploaded-images .form-group img {
-  flex-basis:
-  display: inline;
-  width: 74%;
+.image-card img {
+  margin-left: 5%;
+  margin-top: 5%;
+  width: 90%;
+}
+
+.image-card span {
+  background-color: pink;
+  bottom: .5em;
+  display: inline-block;
+  left: 0;
+  padding-top: .3em;
+  padding-bottom: .3em;
+  position: absolute;
+  text-align: center;
+  width: 100%;
 }
