@@ -3,10 +3,8 @@ var _ = require('underscore');
 
 var DocumentModel = Backbone.Model.extend({
   initialize: function (opts) {
-    var ext = opts.fileExt,
-        parts;
-
-    if (ext === 'md' || ext === 'markdown') {
+    var parts;
+    if (opts.fileExt === 'md' || opts.fileExt === 'markdown') {
       parts = opts.content.split('---\n');
       if (parts[0] === '') {
       /* if the markdown has yml */
@@ -19,8 +17,8 @@ var DocumentModel = Backbone.Model.extend({
         this.content = opts.content;
       }
     }
-    else if (ext === 'yml') {
-      this.frontMatter = opts.yml;
+    else if (opts.fileExt === 'yml' || opts.fileExt === 'yaml') {
+      this.frontMatter = opts.content;
       this.content = false;
     }
     return this;
