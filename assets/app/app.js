@@ -57,4 +57,5 @@ var Router = Backbone.Router.extend({
 });
 
 window.federalist = new Router();
+window.federalist.dispatcher = _.clone(Backbone.Events);
 Backbone.history.start();

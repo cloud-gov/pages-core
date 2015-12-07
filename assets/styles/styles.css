@@ -237,3 +237,50 @@ h1, h2, h3, h4, h5, h6 {
 .ProseMirror-content {
   min-height: 30em;
 }
+.ProseMirror-content:focus {
+  border: none;
+  outline: none;
+}
+.upload-alert {
+  margin-bottom: 1.5em;
+}
+
+.image-cards {
+  margin-bottom: 1em;
+  overflow-x: scroll;
+  width: 100%;
+}
+
+.image-cards .scroll{
+  display: flex;
+}
+
+.image-card {
+  background-color: #ccc;
+  margin-right: 1em;
+  min-height: 200px;
+  position: relative;
+  width: 150px;
+}
+
+.image-cards .selected {
+  border: 7px solid black;
+}
+
+.image-card img {
+  margin-left: 5%;
+  margin-top: 5%;
+  width: 90%;
+}
+
+.image-card span {
+  background-color: pink;
+  bottom: .5em;
+  display: inline-block;
+  left: 0;
+  padding-top: .3em;
+  padding-bottom: .3em;
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
