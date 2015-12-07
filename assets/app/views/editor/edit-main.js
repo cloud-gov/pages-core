@@ -18,7 +18,8 @@ var template = _.template(fs.readFileSync(__dirname + '/../../templates/editor/m
 var EditView = Backbone.View.extend({
   tagName: 'div',
   events: {
-    'click #add-page': 'newPage'
+    'click #add-page': 'newPage',
+    'click #save-page': 'savePage'
   },
   initialize: function (opts) {
     if (!opts) return this;
@@ -27,7 +28,7 @@ var EditView = Backbone.View.extend({
     this.$el.html(html);
     this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.$('#edit-content')[0]);
 
-    this.model = new Github({
+    this.model = window.federalist.github = new Github({
       token: getToken(),
       owner: opts.owner,
       repoName: opts.repo,
@@ -43,6 +44,8 @@ var EditView = Backbone.View.extend({
 
     this.model.on('sync', this.update.bind(this));
 
+    window.federalist.dispatcher.on('github:upload:selected', this.uploadAsset.bind(this));
+
     return this;
   },
   update: function () {
@@ -50,10 +53,16 @@ var EditView = Backbone.View.extend({
         config = model.configFiles || {},
         childView, pages;
 
+    this.$('#edit-button').empty();
+
     if (model.get('type') === 'file') {
+      var saveButton = $('<a class="btn btn-primary pull-right" id="save-page" href="#" role="button">Save this page</a>');
+      this.$('#edit-button').append(saveButton);
       childView = new EditorView({ model: model });
     }
     else {
+      var editButton = $('<a class="btn btn-primary pull-right" id="add-page" href="#" role="button">Add a new page</a>');
+      this.$('#edit-button').append(editButton);
       if (config['_navigation.json'] && config['_navigation.json'].present) {
         pages = config['_navigation.json'].json;
         childView = new PagesView({ model: model, pages: pages });
@@ -67,6 +76,10 @@ var EditView = Backbone.View.extend({
 
     return this;
   },
+  savePage: function (e) {
+    e.preventDefault();
+    this.pageSwitcher.current.trigger('click:save');
+  },
   newPage: function(e) {
     var self = this,
         path = prompt('Please the new file path', 'pages/thing.md'),
@@ -76,7 +89,7 @@ var EditView = Backbone.View.extend({
 
     e.preventDefault();
 
-    this.listenToOnce(this.model, 'model:save:success', function(m){
+    this.listenToOnce(this.model, 'github:commit:success', function(m){
       var owner = self.model.get('owner'),
           repoName  = self.model.get('repoName'),
           branch = self.model.get('branch'),
@@ -86,6 +99,24 @@ var EditView = Backbone.View.extend({
     });
 
     this.model.addPage(opts);
+  },
+  uploadAsset: function (e) {
+    var self = this,
+        fileReader = new FileReader();
+
+    fileReader.onload = function () {
+      var r = /data:\w+\/\w+;base64,/,
+          path = [self.model.uploadDir, e.name].join('/'),
+          commit = {
+            path: path,
+            message: 'Uploading ' + e.name,
+            base64: fileReader.result.replace(r, '')
+          };
+
+      self.model.commit(commit);
+    }
+
+    fileReader.readAsDataURL(e);
   }
 });
 

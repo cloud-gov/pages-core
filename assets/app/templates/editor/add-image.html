@@ -1,0 +1,34 @@
+<div class="usa-alert usa-alert-info upload-alert" id="upload-panel">
+  <div class="panel-heading">Select an image</div>
+  <div class="panel-body">
+    <div class="image-cards">
+      <% var scrollWidth = (assets.length + 1) * 160; %>
+      <div class="scroll" style="width: <%- scrollWidth %>px;">
+        <div class="image-card" id="upload-card">
+          <a class="usa-button">Upload a new image</a>
+          <label for="file" style="visibility: hidden;">Upload a new file from your computer.</label>
+          <input type="file" id="asset" name="asset" style="visibility: hidden;">
+        </div>
+        <% if (assets.length > 0) { %>
+          <% _.forEach(assets, function (a) { %>
+            <% var x = a.name.split('.'); %>
+            <div class="image-card existing">
+              <img src="<%- a.download_url %>" title="<%- a.name %>">
+              <% if (x[0].length > 12) { %>
+                <% var name = [x[0].slice(0, 6), '...', x[0].slice(-4), '.', x[1]].join(''); %>
+                <span><%- name %></span>
+              <% } else { %>
+                <span><%- a.name %></span>
+              <% } %>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+    <div>
+      <a class="usa-button usa-button-secondary" data-action="image-cancel" role="button">Cancel</a>
+      <a class="usa-button usa-button-primary" data-action="image-confirm" role="button">Use Image</a>
+      <span class="usa-label" id="upload-status-result" style="display:none" ></span>
+    </div>
+  </div>
+</div>

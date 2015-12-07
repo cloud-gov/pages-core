@@ -6,8 +6,7 @@ var encodeB64 = require('../helpers/encoding').encodeB64;
 
 var GithubModel = Backbone.Model.extend({
   initialize: function (opts) {
-    var opts = opts || {},
-        self = this;
+    var opts = opts || {};
     if (!opts.token) throw new Error('Must provide Github OAuth token');
 
     this.owner = opts.owner;
@@ -16,18 +15,20 @@ var GithubModel = Backbone.Model.extend({
     this.token = opts.token;
     this.file = opts.file;
     this.site = opts.site;
+    this.assets = [];
+    this.uploadDir = opts.uploadRoot || 'uploads';
 
-    this.once('model:getConfig:success', function () {
-      self.fetch();
-    })
+    this.once('github:fetchConfig:success', function () {
+      this.fetchAssets();
+      this.fetch();
+    }.bind(this));
 
-    this.checkForConfig();
+    this.fetchConfig();
 
     return this;
   },
   url: function (opts) {
-    var self = this,
-        opts = opts || {},
+    var opts = opts || {},
         ghUrl = 'https://api.github.com/repos',
         baseUrl   = [ghUrl, this.owner, this.name, 'contents'],
         qs = $.param({
@@ -50,7 +51,6 @@ var GithubModel = Backbone.Model.extend({
     };
 
     if (res.type) attrs.type = res.type;
-
     return attrs;
   },
   commit: function (opts) {
@@ -58,55 +58,60 @@ var GithubModel = Backbone.Model.extend({
         data = {
           path: opts.path || this.file,
           message: opts.message,
-          content: encodeB64(opts.content),
+          content: opts.base64 || encodeB64(opts.content),
           branch: this.branch
         };
 
-    if (this.attributes.json && this.attributes.json.sha) data.sha = this.attributes.json.sha;
+    if (this.attributes.json && this.attributes.json.sha) {
+      data.sha = this.attributes.json.sha;
+    }
 
-    $.ajax(self.url({ path: data.path }), {
+    $.ajax(this.url({ path: data.path }), {
       method: 'PUT',
       headers: {
-        'Authorization': 'token ' + self.token,
+        'Authorization': 'token ' + this.token,
         'Content-Type': 'application/json'
       },
       data: JSON.stringify(data),
       complete: function (res) {
-        var e = {
-          request: data,
-          response: res.status
-        };
+        var e = { request: data, response: res.status };
 
-        if (res.status === 200 || res.status === 201) {
-          self.attributes.json.sha = res.responseJSON.content.sha;
-          self.trigger('model:save:success', e);
+        if (res.status !== 200 && res.status !== 201) {
+          self.trigger('github:commit:error', e);
+          return;
         }
-        else {
-          self.trigger('model:save:error', e);
+
+        self.attributes.json.sha = res.responseJSON.content.sha;
+
+        // if this is an uploaded asset
+        if (data.path.match(self.uploadDir)) {
+          // refresh internal store of assets
+          self.fetchAssets.call(self);
+          window.federalist.dispatcher.trigger('github:upload:success', res.responseJSON);
+        } else {
+          self.trigger('github:commit:success', e);
         }
+
       }
     });
   },
-  checkForConfig: function () {
-    var self  = this,
-        files = ['_navigation.json', '_defaults.yml'],
-        bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/,
-        siteRoot = (self.site) ? self.site.get('siteRoot') : '',
+  configUrl: function (file) {
+    var bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/,
+        siteRoot = (this.site) ? this.site.get('siteRoot') : '',
         match = siteRoot.match(bucketPath),
         bucket = match && match[1],
         root = bucket ? 'https://s3.amazonaws.com/' + bucket :
                siteRoot ? siteRoot : '';
 
-    var getFiles = files.map(function(file) {
-        var url = [
-            root,
-            'site',
-            self.owner,
-            self.name,
-            file
-          ].join('/');
+    return [root, 'site', this.owner, this.name, file].join('/');
+  },
+  fetchConfig: function () {
+    var self  = this,
+        files = ['_navigation.json', '_defaults.yml'];
 
+    var getFiles = files.map(function(file) {
       return function(callback) {
+        var url = self.configUrl(file);
         $.ajax({
           url: url,
           complete: function(res) {
@@ -122,7 +127,7 @@ var GithubModel = Backbone.Model.extend({
     });
 
     async.parallel(getFiles, function (err, results) {
-      if (err) return self.trigger('model:getConfig:error');
+      if (err) return self.trigger('github:fetchConfig:error');
 
       self.configFiles = {};
 
@@ -133,19 +138,50 @@ var GithubModel = Backbone.Model.extend({
         };
       });
 
-      self.trigger('model:getConfig:success')
+      self.trigger('github:fetchConfig:success')
     });
 
     return this;
   },
+  fetchAssets: function () {
+    var self = this;
+
+    $.ajax({
+      url: this.url({ path: 'uploads' }),
+      method: 'GET',
+      complete: function (res) {
+        if (res.status === 200) {
+          self.assets = res.responseJSON;
+          self.trigger('github:fetchAssets:success', self.assets);
+        }
+        else {
+          self.trigger('github:fetchAssets:error', res.status);
+        }
+      }
+    });
+  },
+  filterAssets: function (type) {
+    var regexByType = {
+      'images': /\.jpg|\.jpeg|\.png|\.gif/,
+      'documents': /\.doc|\.docx|\.pdf/
+    };
+
+    if (type === 'image') type = 'images';
+
+    return this.assets.filter(function(a) {
+      var isOfType = a.name.match(regexByType[type]);
+      return isOfType;
+    });
+  },
   addPage: function (opts) {
     opts = opts || {};
-    var content = (this.configFiles['_defaults.yml'].present) ? this.configFiles['_defaults.yml'].json : '\n';
-    var commitOpts = {
-      path: opts.path,
-      message: opts.message || 'The file ' + opts.path + ' was created',
-      content: opts.content || content
-    };
+    var content = (this.configFiles['_defaults.yml'].present) ?
+                    this.configFiles['_defaults.yml'].json : '\n',
+      commitOpts = {
+        path: opts.path,
+        message: opts.message || 'The file ' + opts.path + ' was created',
+        content: opts.content || content
+      };
     this.commit(commitOpts);
   }
 });

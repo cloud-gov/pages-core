@@ -22,24 +22,24 @@ describe('Document model', function () {
   });
 
   it('should create a model with just YML', function() {
-    var document = new Document({ yml: data.yml });
+    var document = new Document({ content: data.yml, fileExt: 'yml' });
     assert.equal(document.content, false);
   });
 
   it('should export YML just fine', function() {
-    var document = new Document({ yml: data.yml });
+    var document = new Document({ content: data.yml, fileExt: 'yml' });
     var exported = document.toMarkdown();
     assert.equal(exported, data.yml);
   });
 
   it('should create a model with YML & markdown', function() {
-    var document = new Document({ markdown: data.markdown });
+    var document = new Document({ content: data.markdown, fileExt: 'md' });
     assert.notEqual(document.frontMatter, false);
     assert.notEqual(document.content, false);
   });
 
   it('should export YML & markdown just fine', function() {
-    var document = new Document({ markdown: data.markdown });
+    var document = new Document({ content: data.markdown, fileExt: 'md' });
     var exported = document.toMarkdown();
     assert.equal(exported, data.markdown);
   });

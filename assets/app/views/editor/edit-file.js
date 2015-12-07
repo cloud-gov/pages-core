@@ -6,7 +6,7 @@ var _ = require('underscore');
 var CodeMirror = require('codemirror');
 require('codemirror/mode/yaml/yaml');
 
-var createProseMirror = require('./prosemirror').create;
+var createProseMirror = require('./prosemirror/create');
 
 var decodeB64 = require('../../helpers/encoding').decodeB64;
 
@@ -22,29 +22,22 @@ var EditorView = Backbone.View.extend({
   template: _.template(templateHtml),
   initialize: function (opts) {
     var self      = this,
-        activeTab = 'content',
-        fileExt = this.model.get('file').split('.')[1],
-        content = decodeB64(this.model.attributes.json.content),
+        raw       = decodeB64(this.model.attributes.json.content),
+        content   = this.cleanContent(raw),
         settingsEditorEl, contentEditorEl;
 
     this.editors = {};
     this.path = opts.path;
 
-    this.model.on('model:save:success', this.saveSuccess.bind(this));
-    this.model.on('model:save:error', this.saveFailure.bind(this));
+    this.model.on('github:commit:success', this.saveSuccess.bind(this));
+    this.model.on('github:commit:error', this.saveFailure.bind(this));
 
-    if (fileExt === 'yml') {
-      this.doc = new Document({ yml: content });
-      activeTab = 'metadata';
-    }
-    else if (fileExt === 'md') {
-      this.doc = new Document({ markdown: content });
-    }
+    this.doc = new Document({
+      fileExt: this.model.get('file').split('.')[1],
+      content: content
+    });
 
-    this.$el.html(this.template({
-      fileName: this.model.get('file'),
-      activeTab: activeTab
-    }));
+    this.$el.html(this.template({ fileName: this.model.get('file') }));
 
     settingsEditorEl = this.$('[data-target=metadata]')[0];
     this.editors.settings = CodeMirror(settingsEditorEl, {
@@ -87,11 +80,26 @@ var EditorView = Backbone.View.extend({
 
     return this;
   },
+  /**
+   * Replace {{ site.baseurl }} with Github URL so assets load
+   *
+   * @param {string} content
+   * @return {string} content - with replaced baseUrls
+   */
+  cleanContent: function (content) {
+    var baseUrl = ["https://raw.githubusercontent.com",
+                    this.model.owner,
+                    this.model.name,
+                    this.model.branch
+                  ].join('/');
+
+    content = content.replace(/{{ site.baseurl }}/g, baseUrl);
+    return content;
+  },
   saveSuccess: function (e) {
     this.$('#save-status-result').removeClass('label-danger');
     this.$('#save-status-result').addClass('label-success');
     this.$('#save-status-result').text('Yay, the save was successful!');
-    this.$('#save-status-result').show();
 
     setTimeout(function() {
       $('#save-status-result').hide();
@@ -101,21 +109,27 @@ var EditorView = Backbone.View.extend({
     var messages = {
           0:   'The internet is not connected. Please check your connection.',
           404: 'Whoops, looks like this page can not be found.',
-          409: 'Uh oh, there was a conflict when saving'
+          409: 'Uh oh, there was a conflict when saving',
+          422: 'Github is missing something'
         },
-        status = responseText[e.status];
+        status = messages[e.response] || 'That hasn\'t happened before';
 
     this.$('#save-status-result').removeClass('label-success');
     this.$('#save-status-result').addClass('label-danger');
 
     this.$('#save-status-result').text(status);
-    this.$('#save-status-result').show();
   },
   saveDocument: function (e) {
-    var settings,
-        content;
+    var settings, content;
 
-    settings = this.editors.settings.doc.getValue();
+    e.preventDefault(); e.stopPropagation();
+
+    this.doc.frontMatter = false;
+    this.$('#save-status-result').show();
+    this.$('#save-status-result').removeClass('label-success');
+    this.$('#save-status-result').removeClass('label-danger');
+    this.$('#save-status-result').text('Saving...');
+
     if (this.editors.content && this.editors.content.content) {
       // ProseMirror is loaded as content editor
       content = this.editors.content.getContent('markdown');
@@ -125,16 +139,9 @@ var EditorView = Backbone.View.extend({
       content = this.editors.content.doc.getValue();
     }
 
-
-    if (settings) {
-      this.doc.frontMatter = settings;
-    }
-    else {
-      this.doc.frontMatter = false;
-    }
-    if (content) {
-      this.doc.content = content;
-    }
+    settings = this.editors.settings.doc.getValue();
+    if (settings) this.doc.frontMatter = settings;
+    if (content) this.doc.content = content;
 
     this.model.commit({
       content: this.doc.toMarkdown(),
