@@ -38,8 +38,6 @@ describe('Build Model', function() {
         done();
       });
       Build.addJob({ id: 1 });
-
-      done();
     });
   });
 
