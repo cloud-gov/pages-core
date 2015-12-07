@@ -1,43 +1,45 @@
-<div class="page-header">
-  <h1>Make a new site</h1>
+<div class="usa-grid">
+  <div class="usa-width-one-whole">
+    <h1>Make a new site</h1>
+  </div>
 </div>
-<div class="row">
-  <div class="col-md-12">
+<div class="usa-grid">
+  <div class="usa-width-one-whole">
     <p>There are a few different ways you can add sites to Federalist. You can start with a brand new site by selecting one of our template sites below. Or you the Github repository where your site's code lives.</p>
   </div>
 </div>
-<div class="row">
-  <div class="col-md-12">
+<div class="usa-grid">
+  <div class="usa-width-one-whole">
     <h2>Choose from one of our templates</h2>
   </div>
 </div>
-<div class="row">
+<div class="usa-grid">
   <% for (var templateKey in siteTemplates) { %>
-    <div class="col-md-4" data-template="<%- templateKey %>">
+    <div class="usa-width-one-third" data-template="<%- templateKey %>">
     <% template = siteTemplates[templateKey]; %>
-      <div class="panel panel-info">
-        <div class="panel-heading">
-          <h3 class="panel-title"><%= template.title %></h3>
+      <div class="usa-alert usa-alert-info">
+        <div class="usa-alert-heading">
+          <h3><%= template.title %></h3>
         </div>
-        <div class="panel-body">
+        <div class="usa-alert-text">
           <a href="#" data-action="fork-template" class="thumbnail">
             <img src="/images/<%= templateKey %>.thumb.png" alt="Thumbnail screenshot for the <%= template.title %> template">
           </a>
           <p><%= template.description %></p>
-          <a class="btn btn-info" href="<%= template.example %>" target="_blank" role="button">Example</a>
-          <a class="btn btn-primary" data-action="fork-template" role="button">Use this template</a>
+          <a class="usa-button usa-button-outline" href="<%= template.example %>" target="_blank" role="button">Example</a>
+          <a class="usa-button usa-button-primary" data-action="fork-template" role="button">Use this template</a>
         </div>
       </div>
     </div>
   <% } %>
 </div>
-<div class="row">
+<div class="usa-grid">
   <div class="col-md-12">
     <h2>Or add your own Github repository</h2>
   </div>
 </div>
 <form>
-  <div class="row">
+  <div class="usa-grid">
     <div class="col-md-12">
       <div class="form-group">
         <label for="owner">Repository owner's Github username</label>
@@ -62,11 +64,11 @@
     </div>
   </div>
 </div>
-<div class="row">
-  <div class="col-md-12">
+<div class="usa-grid">
+  <div class="usa-width-one-whole">
     <input type="hidden" name="users" value="<%- user.id %>"></input>
-    <a href="#" class="btn btn-default" role="button">Cancel</a>
-    <button type="submit" class="btn btn-primary">Submit repository-based site</button>
+    <a href="#" class="usa-button usa-button-secondary" role="button">Cancel</a>
+    <a href="#" type="submit" class="usa-button usa-button-primary">Submit repository-based site</a>
   </div>
 </div>
 </form>

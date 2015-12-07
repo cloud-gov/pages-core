@@ -1,37 +1,48 @@
-<div class="page-header">
-  <h1>Edit settings for <%- model.owner %> / <%- model.repository %></h1>
+<div class="usa-grid">
+  <h1>Settings for <%- model.owner %> / <%- model.repository %></h1>
 </div>
 <form id="site-edit">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="form-group">
-        <label for="defaultBranch"
-          class="<%- model.defaultBranch ? 'active' : '' %>">
-          Default branch</label>
-        <input name="defaultBranch" class="form-control" type="text"
-          value="<%- model.defaultBranch %>">
+  <div class="usa-grid">
+    <div class="usa-width-one-whole">
+      <label for="defaultBranch"
+        class="<%- model.defaultBranch ? 'active' : '' %>">
+        Default branch</label>
+      <input name="defaultBranch" class="form-control" type="text"
+        value="<%- model.defaultBranch %>">
+    </div>
+  </div>
+  <div class="usa-grid">
+    <div class="usa-width-one-whole">
+      <label>Draft previews</label>
+      <div class="radio">
+        <input type="radio" name="publicPreview" id="public" value="true" <% model.publicPreview && print('checked="true"') %>>
+        <label for="public">Allow anyone to see previews of draft sites</label>
+      </div>
+      <div class="radio">
+        <input type="radio" name="publicPreview" id="private" value="" <% model.publicPreview || print('checked="true"') %>>
+        <label for="private">Only users with Federalist accounts can see previews</label>
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-md-8">
+  <div class="usa-grid">
+    <div class="usa-width-two-thirds">
       <div class="form-group">
         <label class="active" for="domain">Custom domain</label>
         <input name="domain" class="form-control" type="text" placeholder="https://example.com" value="<%- model.domain %>">
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="panel panel-info">
-        <div class="panel-heading">Custom Domain</div>
-        <div class="panel-body">
-          <p>Use a custom domain by setting an <code>ALIAS</code> record with your DNS provider that points this origin:</p>
+    <div class="usa-width-one-third">
+      <div class="usa-alert usa-alert-info">
+        <div class="usa-alert-body">
+          <h3 class="usa-alert-heading">Custom Domain</h3>
+          <p class="usa-alert-text">Use a custom domain by setting an <code>ALIAS</code> record with your DNS provider that points this origin:</p>
           <input readonly type="text" value="<%- model.siteRoot || window.location.origin %>/site/<%- model.owner %>/<%- model.repository %>/">
         </div>
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-md-8">
+  <div class="usa-grid">
+    <div class="usa-width-two-thirds">
       <% if (model.engine === 'jekyll') { %>
       <div class="form-group">
          <label for="config"
@@ -40,26 +51,27 @@
       </div>
       <% } %>
     </div>
-    <div class="col-md-4">
-      <div class="panel panel-info">
-        <div class="panel-heading">Configuration</div>
-        <div class="panel-body">
-          <p>Add additional configuration in yaml to be added to your <code>_config.yml</code> file when we render your site.</p>
+    <div class="usa-width-one-third">
+      <div class="usa-alert usa-alert-info">
+        <div class="usa-alert-body">
+          <h3 class="usa-alert-heading">Configuration</h3>
+          <p class="usa-alert-text">Add additional configuration in yaml to be added to your <code>_config.yml</code> file when we render your site.</p>
         </div>
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-md-12">
-      <a href="#" class="btn btn-default" role="button">Cancel</a>
-      <button class="btn btn-primary" data-action="save-site-settings">Save</button>
+  <div class="usa-grid">
+    <div class="usa-width-one-whole">
+      <a href="#" class="usa-button usa-button-gray" role="button">Cancel</a>
+      <button class="usa-button usa-button-primary" data-action="save-site-settings">Save</button>
     </div>
   </div>
   </form>
-  <hr>
-  <div class="alert alert-danger" role="alert">
-    Delete this site from Federalist?
-    <a href="#" class="btn btn-danger" data-action="delete-site" alt="delete the site <%- model.repository %>">Delete</a>
+  <div class="usa-grid">
+    <div class="usa-alert usa-alert-error" role="alert">
+      Delete this site from Federalist?
+      <a href="#" class="usa-button usa-button-secondary" data-action="delete-site" alt="delete the site <%- model.repository %>">Delete</a>
+    </div>
   </div>
 
 </div>

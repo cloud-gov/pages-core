@@ -17,9 +17,7 @@ var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/file.htm
 var EditorView = Backbone.View.extend({
   tagName: 'div',
   events: {
-    'click [data-tab]': 'toggleAreas',
-    'click [data-action=save-confirm]': 'saveDocument',
-    'click [data-action=save-cancel]': 'cancelSave'
+    'click [data-action=save-content]': 'saveDocument'
   },
   template: _.template(templateHtml),
   initialize: function (opts) {
@@ -31,7 +29,6 @@ var EditorView = Backbone.View.extend({
 
     this.editors = {};
     this.path = opts.path;
-    this.showContent = true;
 
     this.on('click:save', this.promptSave.bind(this));
     this.model.on('github:commit:success', this.saveSuccess.bind(this));
@@ -39,7 +36,6 @@ var EditorView = Backbone.View.extend({
 
     if (fileExt === 'yml') {
       this.doc = new Document({ yml: content });
-      this.showContent = false;
       activeTab = 'metadata';
     }
     else if (fileExt === 'md' || fileExt === 'markdown') {
@@ -48,7 +44,6 @@ var EditorView = Backbone.View.extend({
 
     this.$el.html(this.template({
       fileName: this.model.get('file'),
-      showContent: this.showContent,
       activeTab: activeTab
     }));
 
@@ -60,21 +55,19 @@ var EditorView = Backbone.View.extend({
     });
 
     contentEditorEl = this.$('[data-target=content]')[0];
-    if (this.showContent) {
-      try {
-        // try to load content into prosemirror
-        this.editors.content = this.editors.content || createProseMirror(contentEditorEl);
-        this.editors.content.setContent(this.doc.content, 'markdown');
-      }
-      catch (e) {
-        // if prosemirror errors out, use codemirror
-        $(contentEditorEl).empty(); // remove prosemirror
-        this.editors.content = CodeMirror(contentEditorEl, {
-          lineNumbers: true,
-          lineWrapping: true
-        });
-        this.editors.content.doc.setValue(this.doc.content);
-      }
+    try {
+      // try to load content into prosemirror
+      this.editors.content = this.editors.content || createProseMirror(contentEditorEl);
+      this.editors.content.setContent(this.doc.content, 'markdown');
+    }
+    catch (e) {
+      // if prosemirror errors out, use codemirror
+      $(contentEditorEl).empty(); // remove prosemirror
+      this.editors.content = CodeMirror(contentEditorEl, {
+        lineNumbers: true,
+        lineWrapping: true
+      });
+      this.editors.content.doc.setValue(this.doc.content);
     }
 
     if (this.doc.frontMatter) {
@@ -137,9 +130,10 @@ var EditorView = Backbone.View.extend({
     this.$('#save-status-result').removeClass('label-danger');
     this.$('#save-status-result').addClass('label-success');
     this.$('#save-status-result').text('Yay, the save was successful!');
+    this.$('#save-status-result').show();
 
     setTimeout(function() {
-      $('#save-status-result').text('');
+      $('#save-status-result').hide();
     }, 3000);
   },
   saveFailure: function (e) {
@@ -155,6 +149,7 @@ var EditorView = Backbone.View.extend({
     this.$('#save-status-result').addClass('label-danger');
 
     this.$('#save-status-result').text(status);
+    this.$('#save-status-result').show();
   },
   saveDocument: function (e) {
     var settings,

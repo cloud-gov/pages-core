@@ -16,10 +16,25 @@ module.exports = function(req, res, next) {
   }
 
   if (req.path && req.path.indexOf('/preview/') === 0) {
-    return res.redirect('/?error=preview.login');
-  }
 
-  // User is not allowed
-  // (default res.forbidden() behavior can be overridden in `config/403.js`)
-  return res.forbidden('You are not permitted to perform this action. Are you sure you are logged in?');
+    if (!req.param('owner') || !req.param('repo') || !req.param('branch')) {
+      return res.redirect('/?error=preview.login');
+    }
+
+    Site.findOne({
+      owner: req.param('owner'),
+      repository: req.param('repo')
+    }).exec(function(err, site) {
+      if (err || !site) return res.badRequest();
+      if (!site.publicPreview) return res.redirect('/?error=preview.login');
+      next();
+    });
+
+  } else {
+
+    // User is not allowed
+    // (default res.forbidden() behavior can be overridden in `config/403.js`)
+    return res.forbidden('You are not permitted to perform this action. Are you sure you are logged in?');
+
+  }
 };
