@@ -5,8 +5,9 @@
       <% var scrollWidth = (assets.length + 1) * 160; %>
       <div class="scroll" style="width: <%- scrollWidth %>px;">
         <div class="image-card" id="upload-card">
-          <label for="file">Upload a new one.</label>
-          <input type="file" id="asset" name="asset">
+          <a class="usa-button">Upload a new image</a>
+          <label for="file" style="visibility: hidden;">Upload a new file from your computer.</label>
+          <input type="file" id="asset" name="asset" style="visibility: hidden;">
         </div>
         <% if (assets.length > 0) { %>
           <% _.forEach(assets, function (a) { %>

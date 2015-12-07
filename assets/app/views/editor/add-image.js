@@ -7,6 +7,7 @@ var html = _.template(fs.readFileSync(__dirname + '/../../templates/editor/add-i
 
 var AddImageView = Backbone.View.extend({
   events: {
+    'click #upload-card a': 'triggerFilePicker',
     'change [type=file]': 'uploadFileSelected',
     'click .image-card.existing': 'existingSelected',
     'click [data-action=image-confirm]': 'useAsset',
@@ -25,8 +26,9 @@ var AddImageView = Backbone.View.extend({
     }
     else {
       alert('the file is too big, look at console for more info');
-      console.log('size limit', sizeLimit);
-      console.log('file size', file.size);
+      console.log('you are trying to upload a file that is too big');
+      console.log('\tsize limit (mbs)', (sizeLimit / (1024 * 1024)));
+      console.log('\tfile size (mbs)', (file.size / (1024 * 1024)));
     }
   },
   useAsset: function (e) {
@@ -39,8 +41,7 @@ var AddImageView = Backbone.View.extend({
         selectedFiles = $(this.selectedImage).children('[type=file]'),
         repo = [this.github.owner, this.github.name].join('/'),
         branch = this.github.branch,
-        fileName = selectedImage.attr('src').split('/' + this.github.uploadDir + '/')[1]
-        filePath = [this.github.uploadDir, fileName].join('/');
+        fileName;
 
     if (selectedFiles.length > 0) {
       var file = $('#asset')[0].files[0];
@@ -56,11 +57,12 @@ var AddImageView = Backbone.View.extend({
       });
     }
     else {
+      fileName = selectedImage.attr('src').split('/' + this.github.uploadDir + '/')[1];
       this.trigger('asset:selected', {
         src: selectedImage.attr('src'),
         repo: repo,
         branch: branch,
-        filePath: filePath,
+        filePath: [this.github.uploadDir, fileName].join('/'),
         title: selectedImage.attr('title')
       });
     }
@@ -68,7 +70,7 @@ var AddImageView = Backbone.View.extend({
   },
   triggerFilePicker: function (e) {
     e.preventDefault(); e.stopPropagation();
-    //this.$('[type=file]').click();
+    this.$('[type=file]').click();
   },
   uploadFileSelected: function (e) {
     e.preventDefault(); e.stopPropagation();
