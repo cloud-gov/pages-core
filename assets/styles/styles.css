@@ -271,7 +271,10 @@ h1, h2, h3, h4, h5, h6 {
 .ProseMirror-content {
   min-height: 30em;
 }
-
+.ProseMirror-content:focus {
+  border: none;
+  outline: none;
+}
 .upload-alert {
   margin-bottom: 1.5em;
 }
