@@ -1,80 +1,239 @@
-@font-face {
-  font-family: 'Source Sans Pro';
-  font-style: normal;
-  font-weight: 400;
-  src: url('../fonts/sourcesanspro-regular-webfont.eot');
-  src: url('../fonts/sourcesanspro-regular-webfont.eot?#iefix') format('embedded-opentype'),
-     url('../fonts/sourcesanspro-regular-webfont.woff2') format('woff2'),
-     url('../fonts/sourcesanspro-regular-webfont.woff') format('woff'),
-     url('../fonts/sourcesanspro-regular-webfont.ttf') format('truetype'),
-     url('../fonts/sourcesanspro-regular-webfont.svg#source_sans_proregular') format('svg');
-}
-@font-face {
-  font-family: 'Source Sans Pro';
-  font-style: italic;
-  font-weight: 400;
-  src: url('../fonts/sourcesanspro-italic-webfont.eot');
-  src: url('../fonts/sourcesanspro-italic-webfont.eot?#iefix') format('embedded-opentype'),
-     url('../fonts/sourcesanspro-italic-webfont.woff2') format('woff2'),
-     url('../fonts/sourcesanspro-italic-webfont.woff') format('woff'),
-     url('../fonts/sourcesanspro-italic-webfont.ttf') format('truetype'),
-     url('../fonts/sourcesanspro-italic-webfont.svg#source_sans_proitalic') format('svg');
-}
-@font-face {
-  font-family: 'Source Sans Pro';
-  font-style: normal;
-  font-weight: 700;
-  src: url('../fonts/sourcesanspro-bold-webfont.eot');
-  src: url('../fonts/sourcesanspro-bold-webfont.eot?#iefix') format('embedded-opentype'),
-       url('../fonts/sourcesanspro-bold-webfont.woff2') format('woff2'),
-       url('../fonts/sourcesanspro-bold-webfont.woff') format('woff'),
-       url('../fonts/sourcesanspro-bold-webfont.ttf') format('truetype'),
-       url('../fonts/sourcesanspro-bold-webfont.svg#source_sans_probold') format('svg');
-}
-
 body {
-  margin-bottom: 4em;
   font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
 }
 
-.stage-bug {
-  display: block;
-  background: #f3f3f3;
-  color: #333;
-  border: 1px solid #d9d9d9;
-  border-top: none;
+footer {
+  margin-top: 5em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+  margin-top: .5em;
+}
+
+.align-text-right {
+  text-align: right;
+}
+
+.usa-grid {
+  padding: 0;
+}
+
+.usa-site-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #aeb0b5;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
+.usa-site-header a {
+  border-bottom: none;
+}
+.usa-site-header .usa-site-navbar {
+  margin-top: 4px;
+}
+@media screen and (min-width: 850px) {
+  .usa-site-header .usa-site-navbar {
+    height: 6rem;
+    margin-bottom: 1rem;
+    margin-top: 2.7rem;
+  }
+}
+.usa-site-header .usa-site-navbar .logo {
+  float: left;
   text-align: center;
-  padding: .5em 0;
+  padding-top: 1.3rem;
+  width: 70%;
+}
+@media screen and (min-width: 850px) {
+  .usa-site-header .usa-site-navbar .logo {
+    padding-left: 3rem;
+    text-align: left;
+    padding-top: 0;
+    width: auto;
+  }
+}
+.usa-site-header .usa-site-navbar .logo a {
+  color: #5b616b;
+}
+.usa-site-header .usa-site-navbar .logo a:hover {
+  color: #323a45;
+  text-decoration: none;
+}
+.usa-site-header .usa-site-navbar h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+@media screen and (min-width: 850px) {
+  .usa-site-header .usa-site-navbar h1 {
+    display: block;
+    font-size: 2rem;
+    margin-top: .9rem;
+  }
+}
+.usa-site-header .usa-site-navbar .usa-button-list {
+  float: right;
+  display: none;
+  margin-top: -5px;
+}
+@media screen and (min-width: 850px) {
+  .usa-site-header .usa-site-navbar .usa-button-list {
+    display: block;
+    padding-right: 3rem;
+  }
+}
+.usa-site-header .usa-site-navbar .usa-button-list li {
+  display: inline;
+  font-family: "Source Sans Pro", "Helvetica", "Arial", sans-serif;
+}
+.usa-site-header .usa-site-navbar .usa-button-list li:last-child .usa-button {
+  margin-right: 0;
+}
+.usa-site-header .disclaimer {
+  padding: .5rem 2rem;
+  color: white;
+  text-align: center;
+  font-size: 1.36rem;
+  border-bottom: 1px solid #616161;
+  font-weight: 100;
+}
+.usa-site-header .disclaimer .us-official {
+  margin: 0;
+}
+.usa-site-header .disclaimer .stage {
+  float: none;
+  display: block;
+  padding-top: 5px;
+}
+.usa-site-header .disclaimer .stage a {
+  text-decoration: underline;
+}
+@media screen and (min-width: 850px) {
+  .usa-site-header .disclaimer .us-official {
+    margin-left: 177px;
+  }
+  .usa-site-header .disclaimer .stage {
+    float: right;
+    padding: 0;
+  }
+}
+.usa-disclaimer-stage {
+  padding-right: 3rem;
 }
 
-.jumbotron {
-  background-color: transparent;
+.usa-disclaimer-official {
+  padding-left: 2rem;
+}
+@media screen and (min-width: 600px) {
+  .usa-disclaimer-official {
+    padding-left: 3rem;
+  }
 }
 
-.sites {
+.site-title {
+  background-color: #f1f1f1;
+  color: #212121;
+  display: inline-block;
+  margin: 0;
+  padding-bottom: 1.5rem;
+  padding-left: 3rem;
+  padding-right: 5.5rem;
+  padding-top: 1.5rem;
+  width: 70%;
+}
+
+.site-publishing-status {
+  display: inline-block;
+  text-align: right;
+  width: 25%
+}
+
+.recent-drafts {
+  width: 100%;
+}
+
+.pull-right {
+  float: right;
+}
+.pull-right::after {
+  content: "";
+  clear: both;
+  display: table-cell;
+}
+
+@media screen and (min-width: 600px) {
+  form {
+    max-width: 100%;
+  }
+}
+
+.usa-label {
+  text-transform: capitalize;
+}
+
+.label-success {
+  background-color: #2e8540;
+}
+.label-danger {
+  background-color: #e31c3d;
+}
+.label-warning {
+  background-color: #fdb81e;
+}
+
+.list-group {
+  width: 100%;
+}
+.list-group li:before {
+  content: "";
+}
+.list-group li {
+  box-sizing: border-box;
+  border-bottom: 2px solid black;
+  display: list-item;
+}
+.list-group li:last-child {
+  border-width: 0;
+}
+.list-group-item {
+  line-height: 3em;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.list-group ul {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: 2em;
+}
+
+.breadcrumb {
   list-style-type: none;
-  padding-left: 0; /* reset from Bootstrap */
 }
-
-.editor .panel {
-  margin-top: 2em;
+.breadcrumb a {
+  text-decoration: underline;
+}
+.breadcrumb li:before {
+  content: "";
+  display: inherit;
+  padding-right: 0.4em;
+  text-align: right;
+}
+.breadcrumb li:not(:last-child):after {
+  content: '/';
+  display: inherit;
+  padding-left: 1em;
+}
+.breadcrumb.files li {
+  display: inline-block;
 }
 
 .CodeMirror {
+  border: 1px solid #ccc;
   height: auto;
+  margin-top: 2em;
 }
 
 .ProseMirror-content {
   min-height: 30em;
-}
-
-.list-group-item ul {
-  padding-left:0;
-}
-
-.checkbox input[type=checkbox],
-.checkbox-inline input[type=checkbox],
-.radio input[type=radio],
-.radio-inline input[type=radio] {
-  margin-left: 0;
 }

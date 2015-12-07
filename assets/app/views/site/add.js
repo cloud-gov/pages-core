@@ -15,7 +15,7 @@ var AddSiteView = Backbone.View.extend({
   className: 'form',
   template: _.template(templateHtml),
   events: {
-    'submit': 'onSubmitGithubRepo',
+    'click a[type=submit]': 'onSubmitGithubRepo',
     'click [data-action=fork-template]': 'onTemplateSelection'
   },
   initialize: function initializeSiteView(opts) {

@@ -48,8 +48,12 @@ assets/site
 # Browserify bundle
 assets/js/bundle.js
 
-# Bootstrap assets
-assets/styles/bootstrap.min.css
+# USWDS assets
+assets/images/uswds
+assets/styles/uswds.css
+assets/styles/google-fonts.css
+assets/fonts/merriweather*
+assets/fonts/sourcesanspro*
 
 ################################################
 # Dependencies

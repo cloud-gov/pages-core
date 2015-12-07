@@ -1,34 +1,35 @@
-<div class="panel panel-default" data-site-id="<%- id %>">
-  <div class="panel-heading">
+<li data-site-id="<%- id %>">
+  <div class="site-title">
     <%- owner %> / <%- repository %>
+  </div>
+  <div class="site-publishing-status">
     <%= statusLabel %>
   </div>
-  <div class="panel-body">
+  <div class="usa-accordion-content">
     <% if (!builds.length || !lastBuildTime) { %>
     <p>This site has not been published yet. Please wait while the site is built.</p>
     <% } else { %>
-    <div class="row">
-      <div class="col-md-6">
+    <div class="usa-grid">
+      <div class="usa-width-one-half">
         <p>This site was last published at <%- lastBuildTime %></p>
       </div>
-      <div class="col-md-6">
+      <div class="usa-width-one-half">
         <div class="pull-right">
-          <a href="#site/<%- id %>/builds" class="btn btn-default btn-xs" data-action="site-builds" alt="show log of builds for <%- repository %>">Log</a>
-          <a href="#site/<%- id %>/edit" class="btn btn-default btn-xs" data-action="edit-site-settings" alt="change settings for <%- repository %>">Settings</a>
-          <a href="/#edit/<%- owner %>/<%- repository %>/<%- defaultBranch %>" class="btn btn-default btn-xs" data-action="edit-site-content" alt="edit the site <%- repository %>">Edit</a>
+          <a href="#site/<%- id %>/builds" class="usa-button usa-button-outline" data-action="site-builds" alt="show log of builds for <%- repository %>">Log</a>
+          <a href="#site/<%- id %>/edit" class="usa-button usa-button-outline" data-action="edit-site-settings" alt="change settings for <%- repository %>">Settings</a>
+          <a href="/#edit/<%- owner %>/<%- repository %>/<%- defaultBranch %>" class="usa-button usa-button-outline" data-action="edit-site-content" alt="edit the site <%- repository %>">Edit</a>
           <% if (builds.length) { %>
-          <a href="<%- viewLink %>" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank">View</a>
+          <a href="<%- viewLink %>" class="usa-button usa-button-outline" alt="go to the site <%- repository %> in a new tab" target="_blank">View</a>
           <% } %>
         </div>
       </div>
     </div>
     <% if (_(builds).filter(function(build) {
         return build.branch !== defaultBranch;
-      }).length) {
-    %>
-    <p><em>Recent drafts</em></p>
+      }).length) { %>
+    <h3>Recent drafts</h3>
     <% } %>
-    <ul class="list-unstyled">
+    <ul class="list-unstyled recent-drafts">
       <%
       _(builds).chain().filter(function(build) {
         return build.branch !== defaultBranch;
@@ -36,23 +37,24 @@
         return build.branch;
       }).last(5).value().reverse().forEach(function(build, index) {
       %>
-      <div class="row">
+      <div class="usa-grid">
         <li>
-          <div class="col-md-6"><%- build.branch %></div>
-          <div class="col-md-6">
-            <% if (build.state === 'success') { %>
-            <a href="/#edit/<%- owner %>/<%- repository %>/<%- build.branch %>" class="btn btn-default btn-xs" alt="edit the site <%- repository %>">Edit draft</a>
+          <div class="usa-width-one-half"><%- build.branch %></div>
+          <div class="usa-width-one-half">
+            <div class="pull-right">
+              <% if (build.state === 'success') { %>
+              <a href="/#edit/<%- owner %>/<%- repository %>/<%- build.branch %>" class="usa-button usa-button-outline" alt="edit the site <%- repository %>">Edit draft</a>
 
-            <a href="/preview/<%- owner %>/<%- repository %>/<%- build.branch %>/" class="view" alt="go to the site <%- repository %> in a new tab" target="_blank">View draft</a>
-            <% } else if (build.status === 'error') { %>
-            <code><%- build.error %></code>
-            <% } %>
+              <a href="/preview/<%- owner %>/<%- repository %>/<%- build.branch %>/" class="usa-button usa-button-outline" alt="go to the site <%- repository %> in a new tab" target="_blank">View draft</a>
+              <% } else if (build.status === 'error') { %>
+              <code><%- build.error %></code>
+              <% } %>
+            </div>
           </div>
         </li>
       </div>
       <% }); %>
     </ul>
     <% } %>
-
   </div>
-</div>
+</li>

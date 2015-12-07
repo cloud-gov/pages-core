@@ -37,7 +37,7 @@ var FileListView = Backbone.View.extend({
         repo    = this.model.get('repoName'),
         branch  = this.model.get('branch'),
         newHash = ['#edit', owner, repo, branch, file.path].join('/'),
-        type    = (file.type == 'dir') ? 'glyphicon-folder-close' : 'glyphicon-file',
+        type    = file.type,
         fileExt = file.name.split('.').slice(-1)[0],
         ghExts  = ['html', 'css', 'scss', 'js', 'json'];
 

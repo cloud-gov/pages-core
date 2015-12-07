@@ -1,7 +1,8 @@
 <!doctype html>
 <html>
   <head>
-    <link rel="stylesheet" href="/styles/bootstrap.min.css">
+    <link rel="stylesheet" href="/styles/google-fonts.css">
+    <link rel="stylesheet" href="/styles/uswds.css">
     <link rel="stylesheet" href="/styles/codemirror.css">
     <link rel="stylesheet" href="/styles/styles.css">
 
@@ -10,22 +11,42 @@
     <title>Federalist</title>
   </head>
   <body>
-    <!-- stage notice -->
-    <div class="stage-bug">
-      <span>This site is in <a href="https://18f.gsa.gov/dashboard/stages/">beta</a>. The content contained is not final.</span>
-    </div>
-    <nav class="navbar navbar-default navbar-static-top">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="#">Federalist</a>
+    <header class="usa-site-header" role="banner">
+      <div class="usa-disclaimer">
+        <span class="usa-disclaimer-official">
+          <img class="usa-flag_icon" alt="US flag signifying that this is a United States Federal Government website" src="/images/uswds/us_flag_small.png">
+          An official website of the United States Government
+        </span>
+        <span class="usa-disclaimer-stage">This site is currently in alpha. <a href="https://18f.gsa.gov/dashboard/stages/#alpha">Learn more.</a></span>
+      </div>
+
+      <nav class="usa-site-navbar">
+        <div class="logo" id="logo">
+          <h1>
+            <a href="/" accesskey="1" title="Home" aria-label="Home">
+            Federalist</a>
+          </h1>
         </div>
         <div class="navbar-links">
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
+
     <div class="alert-container container"></div>
     <main class="container"></main>
-    <footer class="page-footer orange"></footer>
+
+    <footer role="contentinfo">
+      <div class="usa-footer-secondary_section">
+        <div class="usa-grid">
+          <div class="usa-footer-logo">
+            <a href="https://18f.gsa.gov" target="_blank">
+              <img class="usa-footer-slim-logo-img" src="/images/logo-18f.png" alt="Logo image">
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
     <script src="/js/dependencies/sails.io.js"></script>
     <script>
       io.sails.transports = ['websocket'];

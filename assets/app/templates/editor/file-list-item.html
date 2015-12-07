@@ -1,10 +1,12 @@
 <li class="list-group-item">
-  <a href="<%- fileUrl %>">
-    <div class="media-left">
-      <span class="glyphicon <%- type %>" aria-hidden="true"></span>
+  <div class="usa-grid">
+    <div class="usa-width-two-thirds">
+      <%- fileName %>
     </div>
-    <div class="media-body">
-      <h4 class="media-heading"><%- fileName %></h4>
+    <div class="usa-width-one-third align-text-right">
+      <a class="usa-button usa-button-outline" href="<%- fileUrl %>">
+        <% if (type === 'dir') { %> Open <% } else { %> Edit <% } %>
+      </a>
     </div>
-  </a>
+  </div>
 </li>
