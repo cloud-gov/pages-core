@@ -18,10 +18,19 @@ var AddImageView = Backbone.View.extend({
     this.selectedImage = false;
     this.el.innerHTML = html({ assets: this.github.filterAssets('images') });
   },
+  disableButton: function (selector) {
+    var button = this.$(selector)
+    button.attr('disabled', true);
+    button.removeClass('usa-button-secondary');
+    button.addClass('usa-button-disabled');
+  },
   uploadNewAsset: function (file) {
     var sizeLimit = (1024 * 1024) * 5; // 5 megabytes
 
     if (file.size < sizeLimit) {
+      $('#upload-status-result').show().text('Uploading...');
+      this.disableButton('[data-action=image-confirm]');
+      this.disableButton('[data-action=image-cancel]');
       window.federalist.dispatcher.trigger('github:upload:selected', file);
     }
     else {
