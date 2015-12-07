@@ -76,7 +76,7 @@ var GithubModel = Backbone.Model.extend({
       complete: function (res) {
         var e = { request: data, response: res.status };
 
-        if (res.status !== 200 || res.status !== 201) {
+        if (res.status !== 200 && res.status !== 201) {
           self.trigger('github:commit:error', e);
           return;
         }
@@ -95,26 +95,23 @@ var GithubModel = Backbone.Model.extend({
       }
     });
   },
-  fetchConfig: function () {
-    var self  = this,
-        files = ['_navigation.json', '_defaults.yml'],
-        bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/,
+  configUrl: function (file) {
+    var bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/,
         siteRoot = (this.site) ? this.site.get('siteRoot') : '',
         match = siteRoot.match(bucketPath),
         bucket = match && match[1],
         root = bucket ? 'https://s3.amazonaws.com/' + bucket :
                siteRoot ? siteRoot : '';
 
-    var getFiles = files.map(function(file) {
-      var url = [
-          root,
-          'site',
-          self.owner,
-          self.name,
-          file
-        ].join('/');
+    return [root, 'site', this.owner, this.name, file].join('/');
+  },
+  fetchConfig: function () {
+    var self  = this,
+        files = ['_navigation.json', '_defaults.yml'];
 
+    var getFiles = files.map(function(file) {
       return function(callback) {
+        var url = self.configUrl(file);
         $.ajax({
           url: url,
           complete: function(res) {
@@ -178,12 +175,13 @@ var GithubModel = Backbone.Model.extend({
   },
   addPage: function (opts) {
     opts = opts || {};
-    var content = (this.configFiles['_defaults.yml'].present) ? this.configFiles['_defaults.yml'].json : '\n';
-    var commitOpts = {
-      path: opts.path,
-      message: opts.message || 'The file ' + opts.path + ' was created',
-      content: opts.content || content
-    };
+    var content = (this.configFiles['_defaults.yml'].present) ?
+                    this.configFiles['_defaults.yml'].json : '\n',
+      commitOpts = {
+        path: opts.path,
+        message: opts.message || 'The file ' + opts.path + ' was created',
+        content: opts.content || content
+      };
     this.commit(commitOpts);
   }
 });
