@@ -1,6 +1,7 @@
 ---
 applications:
 - name: federalist
+buildpack: https://github.com/cloudfoundry/nodejs-buildpack#v1.5.4
 domain: 18f.gov
 disk_quota: 2G
 memory: 1G
@@ -9,3 +10,4 @@ services:
 - federalist-database
 - federalist-builder-creds
 - federalist-redis
+- federalist-aws-user
