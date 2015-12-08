@@ -40,7 +40,7 @@ var AddSiteView = Backbone.View.extend({
     });
   },
   onTemplateSelection: function onTemplateSelection(e) {
-    var templateId = $(e.target).parents('.col-md-4').data('template');
+    var templateId = $(e.target).parents('.template-block').data('template');
     var data = { templateId: templateId };
     $.ajax('/v0/site/fork', {
       method: 'POST',
