@@ -1,6 +1,7 @@
+var $ = require('jquery');
 var async = require('async');
 var Backbone = require('backbone');
-var $ = require('jquery');
+var yaml = require('yamljs');
 
 var encodeB64 = require('../helpers/encoding').encodeB64;
 
@@ -95,7 +96,7 @@ var GithubModel = Backbone.Model.extend({
       }
     });
   },
-  configUrl: function (file) {
+  s3ConfigUrl: function (file) {
     var bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/,
         siteRoot = (this.site) ? this.site.get('siteRoot') : '',
         match = siteRoot.match(bucketPath),
@@ -105,9 +106,21 @@ var GithubModel = Backbone.Model.extend({
 
     return [root, 'site', this.owner, this.name, file].join('/');
   },
+  githubConfigUrl: function (file) {
+    var ghBase = 'https://raw.githubusercontent.com';
+    return [ghBase, this.owner, this.name, this.branch, file].join('/');
+  },
+  configUrl: function (opts) {
+    var file = opts.name,
+        source = opts.source || 's3',
+        url = (source === 's3') ? this.s3ConfigUrl(file) : this.githubConfigUrl(file);
+
+    return url;
+  },
   fetchConfig: function () {
     var self  = this,
-        files = ['_navigation.json', '_defaults.yml'];
+        files = [{ name: '_config.yml', source: 'github' },
+                { name: '_navigation.json', source: 's3' }];
 
     var getFiles = files.map(function(file) {
       return function(callback) {
@@ -116,9 +129,9 @@ var GithubModel = Backbone.Model.extend({
           url: url,
           complete: function(res) {
             var r = {
-              file: file,
+              file: file.name,
               present: (res.status === 200) ? true : false,
-              json: res.responseJSON || []
+              json: res.responseJSON || yaml.parse(res.responseText)
             };
             callback(null, r);
           }
@@ -175,14 +188,18 @@ var GithubModel = Backbone.Model.extend({
   },
   addPage: function (opts) {
     opts = opts || {};
-    var content = (this.configFiles['_defaults.yml'].present) ?
-                    this.configFiles['_defaults.yml'].json : '\n',
-      commitOpts = {
-        path: opts.path,
-        message: opts.message || 'The file ' + opts.path + ' was created',
-        content: opts.content || content
-      };
-    this.commit(commitOpts);
+    var config = this.configFiles['_config.yml'].present,
+        defaultConfigs = (config) ? config.json.defaults : [],
+        defaults = defaultConfigs.filter(function (c) {
+          return c.scope.path === "";
+        }),
+        content = (defaults.length > 0) ? yaml.dump(defaults[0].values) : '\n';
+
+    this.commit({
+      path: opts.path,
+      message: opts.message || 'The file ' + opts.path + ' was created',
+      content: opts.content || content
+    });
   }
 });
 
