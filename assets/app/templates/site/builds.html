@@ -8,11 +8,11 @@
     <div class="usa-alert usa-alert-<%- panelClass %>">
        <div class="usa-alert-body">
          <h3 class="usa-alert-heading"><%- build.branch %> (<%- build.username %>)</h3>
-         <p class="usa-alert-text"><%- build.completedAtFormatted || 'Processing' %></p>
+         <p class="usa-alert-text"><%- build.completedAtFormatted || 'Publishing' %></p>
          <p class="usa-alert-text"><%
-           build.state === 'error' ?
-           print(build.error) :
-           print('The build completed successfully.')
+           build.state === 'error' ? print(build.error) :
+           build.state === 'processing' ? print('This build is in progress.') :
+           print('This build completed successfully.')
          %></p>
        </div>
      </div>
