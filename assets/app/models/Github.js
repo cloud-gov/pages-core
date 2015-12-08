@@ -186,20 +186,15 @@ var GithubModel = Backbone.Model.extend({
       return isOfType;
     });
   },
-  addPage: function (opts) {
-    opts = opts || {};
-    var config = this.configFiles['_config.yml'].present,
-        defaultConfigs = (config) ? config.json.defaults : [],
+  getDefaults: function () {
+    var config = this.configFiles['_config.yml'],
+        defaultConfigs = (config.present && config.json) ? config.json.defaults : [],
         defaults = defaultConfigs.filter(function (c) {
           return c.scope.path === "";
         }),
-        content = (defaults.length > 0) ? yaml.dump(defaults[0].values) : '\n';
+        d = (defaults.length > 0) ? yaml.dump(defaults[0].values) : '\n';
 
-    this.commit({
-      path: opts.path,
-      message: opts.message || 'The file ' + opts.path + ' was created',
-      content: opts.content || content
-    });
+    return d;
   }
 });
 
