@@ -155,7 +155,7 @@ var EditorView = Backbone.View.extend({
 
     if (this.isNewPage) {
       pageTitle = fileNameFromTitle(yaml.parse(settings)['title']);
-      pageTitle = pageTitle.toLowerCase().replace(/\s/g, '-');
+      pageTitle = [pageTitle.replace(/\W/g, '-'), 'md'].join('.');
 
       this.listenToOnce(this.model, 'github:commit:success', function(m){
         var owner = self.model.get('owner'),
@@ -189,7 +189,7 @@ function fileNameFromTitle (title) {
   var unique = (new Date()).valueOf();
   title = title || new String(unique);
 
-  return [title.toLowerCase(), 'md'].join('.');
+  return title.toLowerCase()
 }
 
 module.exports = EditorView;
