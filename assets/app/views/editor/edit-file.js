@@ -134,7 +134,6 @@ var EditorView = Backbone.View.extend({
 
     e.preventDefault(); e.stopPropagation();
 
-    this.doc.frontMatter = false;
     this.$('#save-status-result').show();
     this.$('#save-status-result').removeClass('label-success');
     this.$('#save-status-result').removeClass('label-danger');
@@ -149,6 +148,7 @@ var EditorView = Backbone.View.extend({
       content = this.editors.content.doc.getValue();
     }
 
+    this.doc.frontMatter = false;
     settings = this.editors.settings.doc.getValue();
     if (settings) this.doc.frontMatter = settings;
     if (content) this.doc.content = content;
@@ -162,8 +162,6 @@ var EditorView = Backbone.View.extend({
             repoName  = self.model.get('repoName'),
             branch = self.model.get('branch'),
             url = ['#edit', owner, repoName, branch, m.request.path].join('/');
-
-        console.log('url', url);
 
         window.location.hash = url;
       });
