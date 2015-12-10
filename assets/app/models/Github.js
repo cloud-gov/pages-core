@@ -130,9 +130,14 @@ var GithubModel = Backbone.Model.extend({
           complete: function(res) {
             var r = {
               file: file.name,
-              present: (res.status === 200) ? true : false,
-              json: res.responseJSON || yaml.parse(res.responseText)
+              present: (res.status === 200) ? true : false
+              //json: res.responseJSON || yaml.parse(res.responseText)
             };
+            try {
+              r.json = res.responseJSON || yaml.parse(res.responseText)
+            } catch (e) {
+              r.json = []
+            }
             callback(null, r);
           }
         });
@@ -188,7 +193,8 @@ var GithubModel = Backbone.Model.extend({
   },
   getDefaults: function () {
     var config = this.configFiles['_config.yml'],
-        defaultConfigs = (config.present && config.json) ? config.json.defaults : [],
+        hasDefaults = config.present && config.json && config.json.defaults,
+        defaultConfigs = (hasDefaults) ? config.json.defaults : [],
         defaults = defaultConfigs.filter(function (c) {
           return c.scope.path === "";
         }),
