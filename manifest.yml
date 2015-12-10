@@ -1,12 +1,13 @@
 ---
 applications:
 - name: federalist
-buildpack: https://github.com/ozzyjohnson/heroku-buildpack-multi
+buildpack: https://github.com/cloudfoundry/nodejs-buildpack#v1.5.4
 domain: 18f.gov
 disk_quota: 2G
 memory: 1G
 instances: 2
 services:
 - federalist-database
-- s3-sb-federalist.18f.gov
+- federalist-builder-creds
 - federalist-redis
+- federalist-aws-user

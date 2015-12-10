@@ -2,7 +2,7 @@ var AWS = require('aws-sdk'),
     cfenv = require('cfenv'),
     appEnv = cfenv.getAppEnv(),
     dbURL = appEnv.getServiceURL('federalist-database'),
-    s3Creds = appEnv.getServiceCreds('s3-sb-federalist.18f.gov'),
+    AWSCreds = appEnv.getServiceCreds('federalist-aws-user'),
     redisCreds = appEnv.getServiceCreds('federalist-redis');
 
 /**
@@ -37,10 +37,11 @@ if (dbURL) {
 }
 
 // If running in Cloud Foundry with an S3 credential service available
-if (s3Creds) {
+if (AWSCreds) {
   AWS.config.update({
-    accessKeyId: s3Creds.access_key,
-    secretAccessKey: s3Creds.secret_key
+    accessKeyId: AWSCreds.access_key,
+    secretAccessKey: AWSCreds.secret_key,
+    region: AWSCreds.region || 'us-east-1'
   });
 }
 

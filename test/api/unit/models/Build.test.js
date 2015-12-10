@@ -5,13 +5,11 @@ describe('Build Model', function() {
 
   describe('.afterCreate', function() {
     it('should add job to queue', function(done) {
-      var addJob = Build.addJob;
-      Build.addJob = sinon.spy(function() {
-        assert(Build.addJob.called);
-        Build.addJob = addJob;
+      sinon.spy(Build, 'addJob');
+      Build.afterCreate({ id: 1 }, function() {
+        Build.addJob.restore();
         done();
       });
-      Build.afterCreate({});
     });
   });
 
@@ -24,13 +22,10 @@ describe('Build Model', function() {
 
   describe('.addJob', function() {
     it('should add job to queue', function(done) {
-      var findOne = Build.findOne;
-      Build.findOne = sinon.spy(function() {
-        assert(Build.findOne.called);
-        Build.findOne = findOne;
-        done();
-      });
-      Build.addJob({ id: 1 });
+      sinon.spy(Build.queue, 'push');
+      Build.addJob({ id: 1, site: { engine: 'jekyll' }, user: {}});
+      Build.queue.push.restore();
+      done();
     });
   });
 
@@ -43,8 +38,6 @@ describe('Build Model', function() {
         done();
       });
       Build.addJob({ id: 1 });
-
-      done();
     });
   });
 

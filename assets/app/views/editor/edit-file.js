@@ -46,11 +46,15 @@ var EditorView = Backbone.View.extend({
       tabSize: 2
     });
 
+    if (this.doc.frontMatter) {
+      this.editors.settings.doc.setValue(this.doc.frontMatter);
+    }
+
     contentEditorEl = this.$('[data-target=content]')[0];
     try {
       // try to load content into prosemirror
       this.editors.content = this.editors.content || createProseMirror(contentEditorEl);
-      this.editors.content.setContent(this.doc.content, 'markdown');
+      this.editors.content.setContent(this.doc.content || '', 'markdown');
     }
     catch (e) {
       // if prosemirror errors out, use codemirror
@@ -59,12 +63,10 @@ var EditorView = Backbone.View.extend({
         lineNumbers: true,
         lineWrapping: true
       });
-      this.editors.content.doc.setValue(this.doc.content);
+      this.editors.content.doc.setValue(this.doc.content || '');
     }
 
-    if (this.doc.frontMatter) {
-      this.editors.settings.doc.setValue(this.doc.frontMatter);
-    }
+    if (!this.doc.content) $(contentEditorEl).hide();
 
     return this;
   },
