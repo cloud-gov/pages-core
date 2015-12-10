@@ -156,7 +156,12 @@ var EditorView = Backbone.View.extend({
     if (content) this.doc.content = content;
 
     if (this.isNewPage) {
-      pageTitle = fileNameFromTitle(yaml.parse(settings)['title']);
+      try {
+        pageTitle = fileNameFromTitle(yaml.parse(settings)['title']);
+      } catch (e) {
+        pageTitle = (new Date()).getTime().toString();
+      }
+
       pageTitle = [pageTitle.replace(/\W/g, '-'), 'md'].join('.');
 
       this.listenToOnce(this.model, 'github:commit:success', function(m){
