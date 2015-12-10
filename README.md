@@ -21,18 +21,33 @@ $ brew install ngrok
 
 We have a few environment variables that the application uses, here is a list of the environment variables that the application will use if present:
 
+* `FEDERALIST_AWS_BUILD_KEY` - the AWS key for container builds
+* `FEDERALIST_AWS_BUILD_SECRET` - the AWS secret for container builds
+* `FEDERALIST_BUILD_CALLBACK` - the endpoint for build status, defaults to 'http://localhost:1337/build/status'
+* `FEDERALIST_BUILD_ENGINE` - the build engine to use, defaults to 'buildengine'
+* `FEDERALIST_BUILD_TOKEN` - random token used to protect the build status endpoint
+* `FEDERALIST_CACHE_CONTROL` - 'max-age=60'
+* `FEDERALIST_PUBLISH_DIR` - where to publish files if not S3, defaults to './assets'
+* `FEDERALIST_S3_BUCKET` - bucket ID to push files to on S3
+* `FEDERALIST_SQS_QUEUE` - the name of an SQS queue. If defined, Federalist will send build messages to this queue and expect an external build service
+* `FEDERALIST_TEMP_DIR` - where files will be temporarily built, defaults to './.tmp'
+
+* `GITHUB_CLIENT_CALLBACK_URL` - for dev you'll probably want to use http://localhost:1337/auth/github/callback
 * `GITHUB_CLIENT_ID` **required** - get this when you register your app with Github
 * `GITHUB_CLIENT_SECRET` **required** - you'll also get this when you register your app
-* `GITHUB_CLIENT_CALLBACK_URL` - for dev you'll probably want to use http://localhost:1337/auth/github/callback
-* `FEDERALIST_TEMP_DIR` - where files will be temporarily built
-* `FEDERALIST_PUBLISH_DIR` - where to publish files if not S3
-* `FEDERALIST_S3_BUCKET` - bucket ID to push files to on S3
-* `GITHUB_WEBHOOK_URL` - should be full url; for dev: http://localhost:1337/webhook/github
-* `GITHUB_WEBHOOK_SECRET` - random string used to protect webhook messages
+* `GITHUB_TOKEN` - A GitHub oauth token that will be used in place of authentication
+* `GITHUB_WEBHOOK_SECRET` - random token used to protect webhook messages, defaults to 'testingSecret'
+* `GITHUB_WEBHOOK_URL` - should be full url, defaults to  'http://localhost:1337/webhook/github'
+
 * `NEW_RELIC_APP_NAME` - application name to report to New Relic
 * `NEW_RELIC_LICENSE_KEY` - license key for New Relic
 
-You'll notice that we talk about a `/config/local.js` file below, particularly for setting up the Github app information. For local development either approach is fine, but for production environments you'll want to set these env vars instead of commit `local.js` to your history.
+* `NODE_ENV` - Node.js environment setting, defaults to 'development'
+* `PORT` - Server port, defaults to  1337
+
+* `SAILS_LOG_LEVEL` - Log level, defaults to 'info'
+
+You'll notice that we talk about a `/config/local.js` file below, particularly for setting up the Github app information. For local development either approach is fine, but for production environments you'll want to set these env vars instead of committing `local.js` to your git history.
 
 
 ### Build the server
@@ -92,7 +107,7 @@ module.exports = {
 };
 ```
 
-* Run the server with `npm start` or `node app.js` (You can use `npm run watch:server` for the server to restart when you save file changes) at the directory of the project on your local computer.
+* Run the server with `npm start` (You can use `npm run watch:server` for the server to restart when you save file changes and `npm run watch:client` to rebuild front-end files on each save) at the directory of the project on your local computer.
 
 
 #### Build the server and the front-end

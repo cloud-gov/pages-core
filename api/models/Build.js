@@ -35,8 +35,25 @@ module.exports = {
 
   afterCreate: function(model, done) {
     if (Build.publishCreate) Build.publishCreate(model);
-    this.addJob(model);
-    if (done) return done();
+    // Use SQS for queue if available
+    var queue = sails.config.build.sqsQueue ? SQS : this;
+    Build.findOne(model.id)
+      .populate('site')
+      .populate('user')
+      .exec(function(err, model) {
+        if (err && done) return done(err, model);
+        if (err) return sails.log.error(err);
+        if (!model && done) return done();
+        // Additional query since we need to populate a 2nd level association
+        Passport.findOne({ user: model.user.id })
+          .exec(function(err, passport) {
+            if (err && done) return done(err, model);
+            if (err) return sails.log.error(err);
+            model.user.passport = passport;
+            queue.addJob(model);
+            if (done) return done();
+          });
+    });
   },
 
   afterUpdate: function(model) {
@@ -48,22 +65,9 @@ module.exports = {
    * An instance of [async.queue](https://github.com/caolan/async#queue)
    */
   queue: async.queue(function(model, done) {
-
-    // Populate associated models
-    Build.findOne(model.id)
-      .populate('site').populate('user')
-      .exec(function(err, model) {
-
-        // End early if error
-        if (err) return done(err, model);
-
-        sails.log.verbose('Starting job: ', model.id);
-
-        // Run the build with the appropriate engine and the model
-        sails.hooks[sails.config.build.engine][model.site.engine](model, done);
-
-      });
-
+    sails.log.verbose('Starting job: ', model.id);
+    // Run the build with the appropriate engine and the model
+    sails.hooks[sails.config.build.engine][model.site.engine](model, done);
   }),
 
   /**

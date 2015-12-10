@@ -40,7 +40,7 @@ var AddSiteView = Backbone.View.extend({
     });
   },
   onTemplateSelection: function onTemplateSelection(e) {
-    var templateId = $(e.target).parents('.col-md-4').data('template');
+    var templateId = $(e.target).parents('.template-block').data('template');
     var data = { templateId: templateId };
     $.ajax('/v0/site/fork', {
       method: 'POST',
@@ -57,9 +57,9 @@ var AddSiteView = Backbone.View.extend({
     var message = (e && e.responseJSON && e.responseJSON.raw) ?
           e.responseJSON.raw : e.responseText;
     $('.alert-container').html(
-      '<div class="alert alert-danger new-site-error" role="alert">' +
+      '<div class="usa-grid"><div class="usa-alert usa-alert-error new-site-error" role="alert">' +
         message +
-      '</div>'
+      '</div></div>'
     )[0].scrollIntoView();
     this.trigger('site:save:failure');
   }

@@ -1,8 +1,8 @@
 var _ = require('underscore');
 
-var ProseMirror = require("prosemirror/dist/edit").ProseMirror
+var ProseMirror = require('prosemirror/dist/edit').ProseMirror
 var elt = require('prosemirror/dist/dom').elt;
-require("prosemirror/dist/menu/menubar") // Load menubar module
+require('prosemirror/dist/menu/menubar'); // Load menubar module
 require('prosemirror/dist/parse/markdown');
 require('prosemirror/dist/serialize/markdown');
 
@@ -37,13 +37,14 @@ defaultImageNode.register("parseMarkdown", {
 });
 
 defaultImageNode.prototype.serializeMarkdown = function (state, node) {
-  var imageMd = _.template(" ![<%- alt %>](<%- src %>)");
-  var md = imageMd({
-    alt: (node.attrs.alt || ""),
-    src: ['{{ site.baseurl }}', node.attrs.filePath].join('/'),
-    title: node.attrs.title
-  });
-  state.write(md);
+  var imageMd = _.template("![<%- alt %>](<%- src %>)"),
+      leadingSpace = (state.out.match(/\s$/g)) ? '' : ' ',
+      md = imageMd({
+        alt: (node.attrs.alt || ""),
+        src: ['{{ site.baseurl }}', node.attrs.filePath].join('/'),
+        title: node.attrs.title
+      });
+  state.write(leadingSpace + md);
 }
 
 defaultImageNode.prototype.commands = [];
@@ -58,8 +59,12 @@ defaultImageNode.attachCommand("insertImage", function(nodeType) {
       parent.empty();
       parent.append(addImage.el);
 
+      window.scrollTo(0, parent.position().top - 30);
+
       addImage.once('asset:selected', function (attrs) {
         var i = nodeType.create(attrs);
+        var top = $(pm.sel.lastHeadNode.parentElement).position().top;
+        window.scrollTo(0, top);
         pm.tr.insertInline(pm.selection.head, i).apply();
         addImage.remove();
       });
@@ -83,7 +88,9 @@ var federalistSchema = new Schema(defaultSchema.spec.updateNodes(customNodes));
 module.exports = function create(placeEl) {
   var editor = window.federalist.pm = new ProseMirror({
     place: placeEl,
-    menuBar: true,
+    menuBar: {
+      float: true
+    },
     schema: federalistSchema
   });
 
