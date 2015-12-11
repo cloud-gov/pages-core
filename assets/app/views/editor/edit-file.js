@@ -1,7 +1,8 @@
 var fs = require('fs');
 
-var Backbone = require('backbone');
+var Backbone = window.B = require('backbone');
 var _ = require('underscore');
+var yaml = require('yamljs');
 
 var CodeMirror = require('codemirror');
 require('codemirror/mode/yaml/yaml');
@@ -22,20 +23,29 @@ var EditorView = Backbone.View.extend({
   template: _.template(templateHtml),
   initialize: function (opts) {
     var self      = this,
-        raw       = decodeB64(this.model.attributes.json.content),
-        content   = this.cleanContent(raw),
-        settingsEditorEl, contentEditorEl;
+        raw, content, settingsEditorEl, contentEditorEl;
 
     this.editors = {};
     this.path = opts.path;
+    this.isNewPage = opts.isNewPage || false;
 
     this.model.on('github:commit:success', this.saveSuccess.bind(this));
     this.model.on('github:commit:error', this.saveFailure.bind(this));
 
-    this.doc = new Document({
-      fileExt: this.model.get('file').split('.')[1],
-      content: content
-    });
+    if (!this.isNewPage) {
+      raw = decodeB64(this.model.attributes.json.content);
+      content = this.cleanContent(raw);
+      this.doc = new Document({
+        fileExt: this.model.get('file').split('.')[1],
+        content: content
+      });
+    }
+    else {
+      this.doc = new Document({
+        fileExt: 'md',
+        content: ['---', this.model.getDefaults(), '---', '\n'].join('\n')
+      })
+    }
 
     this.$el.html(this.template({ fileName: this.model.get('file') }));
 
@@ -122,11 +132,10 @@ var EditorView = Backbone.View.extend({
     this.$('#save-status-result').text(status);
   },
   saveDocument: function (e) {
-    var settings, content;
+    var self = this, settings, content, pageTitle;
 
     e.preventDefault(); e.stopPropagation();
 
-    this.doc.frontMatter = false;
     this.$('#save-status-result').show();
     this.$('#save-status-result').removeClass('label-success');
     this.$('#save-status-result').removeClass('label-danger');
@@ -141,17 +150,51 @@ var EditorView = Backbone.View.extend({
       content = this.editors.content.doc.getValue();
     }
 
+    this.doc.frontMatter = false;
     settings = this.editors.settings.doc.getValue();
     if (settings) this.doc.frontMatter = settings;
     if (content) this.doc.content = content;
 
-    this.model.commit({
-      content: this.doc.toMarkdown(),
-      message: this.$('#save-content-message').val()
-    });
+    if (this.isNewPage) {
+      try {
+        pageTitle = fileNameFromTitle(yaml.parse(settings)['title']);
+      } catch (e) {
+        pageTitle = (new Date()).getTime().toString();
+      }
+
+      pageTitle = [pageTitle.replace(/\W/g, '-'), 'md'].join('.');
+
+      this.listenToOnce(this.model, 'github:commit:success', function(m){
+        var owner = self.model.get('owner'),
+            repoName  = self.model.get('repoName'),
+            branch = self.model.get('branch'),
+            url = ['#edit', owner, repoName, branch, m.request.path].join('/');
+
+        window.location.hash = url;
+      });
+
+      this.model.commit({
+        path: ['pages', pageTitle].join('/'),
+        content: this.doc.toMarkdown(),
+        message: 'Created ' + ['pages', pageTitle].join('/')
+      });
+    }
+    else {
+      this.model.commit({
+        content: this.doc.toMarkdown(),
+        message: this.$('#save-content-message').val()
+      });
+    }
 
     return this;
   }
 });
+
+function fileNameFromTitle (title) {
+  var unique = (new Date()).valueOf();
+  title = title || new String(unique);
+
+  return title.toLowerCase()
+}
 
 module.exports = EditorView;

@@ -39,7 +39,8 @@ describe('Github model', function () {
 
     var commitOpts = {
       path: 'test.md',
-      message: 'Testing add page'
+      message: 'Testing add page',
+      content: 'yo'
     };
 
     github.once('github:commit:error', function (e){
@@ -52,7 +53,7 @@ describe('Github model', function () {
       done();
     });
 
-    github.addPage(commitOpts);
+    github.commit(commitOpts);
     server.respondWith('PUT', makeUrl('test.md'), mockResponse(mockCommitResponse, 201));
     server.respond();
   });
