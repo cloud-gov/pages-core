@@ -1,4 +1,4 @@
-FROM node:0.10-onbuild
+FROM node:4.2.3-onbuild
 
 # Expose environment variables
 ENV BRANCH= \
