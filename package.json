@@ -7,6 +7,7 @@
   "dependencies": {
     "ampersand-view-switcher": "^2.0.0",
     "async": "^1.4.2",
+    "autoprefixer": "^6.1.2",
     "aws-sdk": "^2.1.36",
     "babel": "^5.8.23",
     "backbone": "^1.2.1",
@@ -48,6 +49,7 @@
     "passport-github": "^0.1.5",
     "passport-local": "^1.0.0",
     "pg": "^4.4.0",
+    "postcss-cli": "^2.3.2",
     "prosemirror": "git+https://github.com/18f/prosemirror.git",
     "rc": "~0.5.0",
     "request": "^2.61.0",
@@ -64,14 +66,16 @@
   },
   "scripts": {
     "install": "npm run uswds && npm run codemirror && npm run prosemirror && npm run migrate:up",
-    "start": "npm run browserify && npm run sass && node app.js",
+    "start": "npm run browserify && npm run sass && npm run autoprefixer && node app.js",
     "debug": "node debug app.js",
     "browserify": "browserify -t brfs assets/app/app.js -o assets/js/bundle.js",
     "sass": "node-sass assets/styles/styles.scss -o assets/styles",
+    "autoprefixer": "postcss --use autoprefixer -r assets/styles/styles.css",
     "watch": "npm run watch:server & npm run watch:client",
     "watch:server": "nodemon app.js --ignore assets/app --ignore .tmp/ --ignore node_modules/",
-    "watch:client": "npm run watch:client:sass & npm run watch:client:js",
-    "watch:client:sass": "node-sass -w -r assets/styles -o assets/styles",
+    "watch:client": "npm run watch:client:sass & npm run watch:client:autoprefix & npm run watch:client:js",
+    "watch:client:sass": "node-sass -w -r assets/styles/*.scss -o assets/styles",
+    "watch:client:autoprefix": "postcss --use autoprefixer -r -w assets/styles/styles.css assets/styles/styles.css",
     "watch:client:js": "watchify --debug -t brfs assets/app/app.js -o assets/js/bundle.js",
     "test": "npm run test:server && npm run test:client",
     "test:server": "mocha --timeout 60000 test/api/bootstrap.test.js test/api/unit/**/*.test.js",
@@ -98,13 +102,12 @@
   "devDependencies": {
     "jsdom": "^3.1.2",
     "mocha": "^2.2.5",
-    "node-sass": "^3.4.2",
     "nodemon": "^1.3.7",
     "sinon": "^1.14.1",
     "watchify": "^3.2.2"
   },
   "engines": {
-    "node": "0.10.41",
-    "npm": "2.1.x"
+    "node": "4.2.x",
+    "npm": "2.14.x"
   }
 }
