@@ -1,27 +1,12 @@
 @import "sass/_variables";
+@import "sass/_text";
 @import "sass/_header";
+@import "sass/_home";
 @import "sass/_breadcrumb";
 @import "sass/_editors";
 
-body {
-  font-family: $sans-serif;
-}
-
 footer {
   margin-top: 5em;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: $sans-serif;
-  margin-top: .5em;
-}
-
-.align-text-right {
-  text-align: right;
-}
-
-.usa-grid {
-  padding: 0;
 }
 
 .site-title {
@@ -49,8 +34,9 @@ h1, h2, h3, h4, h5, h6 {
 .pull-right {
   float: right;
 }
+
 .pull-right::after {
-  content: "";
+  content: '';
   clear: both;
   display: table-cell;
 }
@@ -66,37 +52,44 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .label-success {
-  background-color: #2e8540;
+  background-color: $label-success-bg-color;
 }
+
 .label-danger {
-  background-color: #e31c3d;
+  background-color: $label-danger-bg-color;
 }
+
 .label-warning {
-  background-color: #fdb81e;
+  background-color: $label-warning-bg-color;
 }
 
 .list-group {
   width: 100%;
 }
+
 .list-group li:before {
-  content: "";
+  content: '';
 }
+
 .list-group li {
   box-sizing: border-box;
   border-bottom: 2px solid black;
   display: list-item;
 }
+
 .list-group li:last-child {
   border-width: 0;
 }
+
 .list-group-item {
   line-height: 3em;
-  margin-top: 0;
   margin-bottom: 0;
+  margin-top: 0;
 }
+
 .list-group ul {
-  margin-top: 0;
   margin-bottom: 0;
+  margin-top: 0;
   padding-left: 2em;
 }
 
