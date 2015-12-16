@@ -1,7 +1,7 @@
 language: node_js
 sudo: true
 node_js:
-- "0.10"
+- "4.2"
 env:
   global:
   - CF_APP=federalist
@@ -10,6 +10,13 @@ env:
   - CF_ORGANIZATION=federalist
   - CF_SPACE=prod
   - secure: "dQnuUVyWtfYtjXuMXZJ48IN14M+FnbJ/euMOrBolxBnqKbQkLbnKY+BsGsgM1Lj9r611gczWIkt1Lv487gc2Z1LSWnTMrwgFLG4C7B+n7nRkhZGo8aisp+KjzeJljVkj7XoMNJ23qYkkAZ40/TpCj8C2CVGDvf2H9L0O0NlEkZCTmSWyvBSJ/+FHZVFICM8sm4qrGjDKTlPEaPS+ZHBHp3Ow6irpgCYfFPGyODEIkGfAzAu7t3Ta4cOaC7ha1hr+ayj9W6ImGvFvK1hFWQkpDiJanK+42keCk8KPJAwmP6a0r4BJ6UtzmNlN7N4+BL8WhvS3QrgWiEWjEVSli3Y3IUUS66hPOo0YrzbPK5TBscgh9HyWpPooKz8se5J8ehvhCR/vOzjJpg1AVeegCJczWe4t/XWNZKHtqu7z6e0Ft7DuDAUvY1BSObNSPPCP6Omx69nfeRENj5QEZNM7hFMxBQxBHmUdFroogN2jAXx4i8sTLfMUr0sDFyslX8FRrQtCUIKSvHzBwLb57riRnv3YfI9MNG2hOqN0aeQFQ2v65+Q02f6Ms6Jrj5YQV6B8dJ9RkwCXoDKN+FOtjepYaQCZbBWqnJJlULYVp/fVkHaU4COxUt3t86/w2ymYuLBvgeLEpYC8JIoM6T0V8dfE6kH3OvvYNEW4L2+w8rZU25St1Xs="
+  - CXX=g++-4.8
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
 deploy:
   provider: script
   script: scripts/deploy-travis.sh

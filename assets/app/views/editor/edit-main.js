@@ -81,24 +81,10 @@ var EditView = Backbone.View.extend({
     this.pageSwitcher.current.trigger('click:save');
   },
   newPage: function(e) {
-    var self = this,
-        path = prompt('Please the new file path', 'pages/thing.md'),
-        opts = {
-          path: path
-        };
+    e.preventDefault();e.stopPropagation();
+    var editView = new EditorView({ model: this.model , isNewPage: true });
 
-    e.preventDefault();
-
-    this.listenToOnce(this.model, 'github:commit:success', function(m){
-      var owner = self.model.get('owner'),
-          repoName  = self.model.get('repoName'),
-          branch = self.model.get('branch'),
-          url = ['#edit', owner, repoName, branch, m.request.path].join('/');
-
-      Backbone.history.loadUrl(url, { trigger: true });
-    });
-
-    this.model.addPage(opts);
+    this.pageSwitcher.set(editView);
   },
   uploadAsset: function (e) {
     var self = this,
