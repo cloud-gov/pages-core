@@ -44,7 +44,6 @@
     "mime": "^1.3.4",
     "moment": "^2.10.3",
     "newrelic": "^1.22.0",
-    "node-sass": "^3.4.2",
     "passport": "^0.2.1",
     "passport-github": "^0.1.5",
     "passport-local": "^1.0.0",
@@ -61,7 +60,7 @@
     "socket.io-redis": "^0.1.4",
     "to-markdown": "^1.2.1",
     "underscore": "^1.8.3",
-    "uswds": "git+https://github.com/18F/web-design-standards.git#v0.9.x",
+    "uswds": "git+https://github.com/18f/web-design-standards.git#npm-changes",
     "validator": "^3.39.0"
   },
   "scripts": {
@@ -75,7 +74,7 @@
     "watch:server": "nodemon app.js --ignore assets/app --ignore .tmp/ --ignore node_modules/",
     "watch:client": "npm run watch:client:sass & npm run watch:client:autoprefix & npm run watch:client:js",
     "watch:client:sass": "node-sass -w -r assets/styles/*.scss -o assets/styles",
-    "watch:client:autoprefix": "postcss --use autoprefixer -r -w assets/styles/styles.css assets/styles/styles.css",
+    "watch:client:autoprefix": "npm run sass && postcss --use autoprefixer -r -w assets/styles/styles.css assets/styles/styles.css",
     "watch:client:js": "watchify --debug -t brfs assets/app/app.js -o assets/js/bundle.js",
     "test": "npm run test:server && npm run test:client",
     "test:server": "mocha --timeout 60000 test/api/bootstrap.test.js test/api/unit/**/*.test.js",
@@ -84,7 +83,8 @@
     "migrate:up": "grunt db:migrate:up || true",
     "migrate:down": "grunt db:migrate:down",
     "uswds": "npm run uswds:css && npm run uswds:images && npm run uswds:fonts",
-    "uswds:css": "npm run uswds:css:uswds && npm run uswds:css:gfonts",
+    "uswds:css": "npm run uswds:css:sass && npm run uswds:css:uswds && npm run uswds:css:gfonts",
+    "uswds:css:sass": "cd node_modules/uswds && npm run build-sass && cd ../..",
     "uswds:css:uswds": "cp node_modules/uswds/assets/css/uswds.css assets/styles/",
     "uswds:css:gfonts": "cp node_modules/uswds/assets/css/google-fonts.css assets/styles/",
     "uswds:images": "cp -r node_modules/uswds/assets/img/ ./assets/images/uswds",
@@ -102,12 +102,13 @@
   "devDependencies": {
     "jsdom": "^3.1.2",
     "mocha": "^2.2.5",
+    "node-sass": "^3.4.2",
     "nodemon": "^1.3.7",
     "sinon": "^1.14.1",
     "watchify": "^3.2.2"
   },
   "engines": {
-    "node": "4.2.x",
+    "node": "4.2.3",
     "npm": "2.14.x"
   }
 }
