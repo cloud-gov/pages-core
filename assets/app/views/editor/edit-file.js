@@ -24,6 +24,12 @@ var EditorView = Backbone.View.extend({
     var self      = this,
         raw       = decodeB64(this.model.attributes.json.content),
         content   = this.cleanContent(raw),
+        file      = [
+                      self.model.get('owner'),
+                      self.model.get('repoName'),
+                      self.model.get('branch'),
+                      self.model.get('file')
+                    ].join('/'),
         settingsEditorEl, contentEditorEl;
 
     this.editors = {};
@@ -66,8 +72,39 @@ var EditorView = Backbone.View.extend({
       this.editors.settings.doc.setValue(this.doc.frontMatter);
     }
 
+    io.socket.get('/v0/site/lock', { file: file }, function(data) {
+      self.socket = data.id;
+      io.socket.on('change', self.lockContent.bind(self));
+      federalist.once('route', function() {
+        io.socket.get('/v0/site/unlock', { file: file });
+      });
+    });
+
     return this;
   },
+
+  lockContent: function(data) {
+    if (data.subscribers && data.subscribers[0] !== this.socket) {
+      var message = 'Another user is editing this file. Once they finish, this page will unlock and you will be able to edit it.';
+
+      this.locked = true;
+
+      $('.alert-container').html(
+        '<div class="usa-grid"><div class="usa-alert usa-alert-error" role="alert">' +
+          message +
+        '</div></div>'
+      )[0].scrollIntoView();
+      console.log('locked');
+    } else {
+      if (this.locked) {
+        this.locked = false;
+        Backbone.history.loadUrl();
+      }
+      $('.alert-container').html('');
+      console.log('unlocked');
+    }
+  },
+
   render: function () {
     var self = this;
 

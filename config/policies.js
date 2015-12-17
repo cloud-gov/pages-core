@@ -64,6 +64,8 @@ module.exports.policies = {
     'find': ['passport', 'sessionAuth', 'filterCurrentUser'],
     'findOne': ['passport', 'sessionAuth', 'filterCurrentUser'],
     'fork': ['passport', 'sessionAuth'],
+    'lock': ['passport', 'sessionAuth'],
+    'unlock': ['passport', 'sessionAuth'],
     'update': ['passport', 'sessionAuth', 'filterCurrentUser']
   },
 
