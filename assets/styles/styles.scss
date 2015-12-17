@@ -137,3 +137,9 @@ footer {
   text-align: center;
   width: 100%;
 }
+
+.disabled,
+button[disabled].disabled {
+  cursor: not-allowed;
+  background: #f9dede;
+}
