@@ -1,0 +1,90 @@
+#secure-svg:hover #secure {
+  animation: shakeLock .3s 2.3s 1 ease both;
+}
+
+#secure-svg:hover #shackle {
+  animation: raiseShackle 2.7s 0s 1 ease both;
+}
+
+@keyframes shakeLock {
+  0% {
+    transform: rotate(0deg);
+  }
+  33% {
+    transform: rotate(-10deg);
+  }
+  66% {
+    transform: rotate(10deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes raiseShackle {
+  0%, 10% {
+    transform: translateY(0px);
+  }
+  20% {
+    transform: translateY(5px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+  80% {
+    transform: translateY(5px);
+  }
+  90%, 100% {
+    transform: translateY(0px);
+  }
+}
+
+#wheel {
+  transform-origin: center center;
+}
+
+#wheel:hover {
+  animation: spinWheel 6s 0s 1 cubic-bezier(0.645, 0.045, 0.355, 1) both;
+}
+
+@keyframes spinWheel {
+  from, 10% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(250deg);
+  }
+  to, 90% {
+    transform: rotate(0deg);
+  }
+}
+
+#custom-svg:hover #top-slider {
+  animation: moveSliderRight 1.4s 0s 2 alternate ease both;
+}
+
+#custom-svg:hover #mid-slider {
+  animation: moveSliderLeft 2s 0s 2 alternate ease both;
+}
+
+#custom-svg:hover #bottom-slider {
+  animation: moveSliderMoreRight 2s 0s 2 alternate ease both;
+}
+
+@keyframes moveSliderRight {
+  to {
+    transform: translateX(38px);
+  }
+}
+
+@keyframes moveSliderMoreRight {
+  to {
+    transform: translateX(45px);
+  }
+}
+
+@keyframes moveSliderLeft {
+  from {
+    transform: translateX(-37px);
+  }
+}

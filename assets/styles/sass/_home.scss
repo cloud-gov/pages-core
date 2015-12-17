@@ -1,0 +1,73 @@
+.hero {
+  background-color: $hero-bg-color;
+  background-image: url('/images/essay-blue.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: $hero-text-color;
+}
+
+.hero .usa-grid {
+  padding-top: 3em;
+  padding-bottom: 3em;
+  text-align: center;
+}
+
+.hero h1 {
+  margin-top: 0;
+}
+
+.hero .usa-button.usa-button-outline {
+  background-color: transparent;
+  border: 1px solid $hero-text-color;
+  box-shadow: none;
+  color: $hero-text-color;
+}
+
+.hero .usa-button.usa-button-outline:hover {
+  background-color: $hero-text-color;
+  color: $hero-bg-color;
+}
+
+$home-feature-margin: 3em;
+
+.home-feature {
+  display: flex;
+  margin-bottom: $home-feature-margin;
+  margin-top: $home-feature-margin;
+
+  @media screen and (max-width: 600px) {
+    display: block;
+    text-align: center;
+  }
+}
+
+.home-feature:last-of-type {
+  margin-bottom: 2em;
+}
+
+.home-feature:nth-child(2n+1) {
+  flex-direction: row-reverse;
+}
+
+$feature-img-size: 150px;
+$feature-img-margin: 3em;
+
+.home-feature svg {
+  height: $feature-img-size;
+  width: $feature-img-size;
+
+  @media screen and (max-width: 600px) {
+    display: block;
+    margin: 0 auto;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  .home-feature:nth-child(2n+0) svg {
+    margin-right: $feature-img-margin;
+  }
+
+  .home-feature:nth-child(2n+1) svg {
+    margin-left: $feature-img-margin;
+  }
+}

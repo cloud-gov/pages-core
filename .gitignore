@@ -45,6 +45,9 @@ config/local.js
 assets/preview
 assets/site
 
+# Generated CSS
+assets/styles/styles.css
+
 # Browserify bundle
 assets/js/bundle.js
 
@@ -128,3 +131,4 @@ nbproject
 .node_history
 cf-ssh.yml
 .env
+.sass-cache
