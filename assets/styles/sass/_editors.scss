@@ -1,0 +1,14 @@
+.CodeMirror {
+  border: 1px solid #ccc;
+  height: auto;
+  margin-top: 2em;
+}
+
+.ProseMirror-content {
+  min-height: 30em;
+}
+
+.ProseMirror-content:focus {
+  border: none;
+  outline: none;
+}

@@ -1,0 +1,139 @@
+@import "sass/_variables";
+@import "sass/_text";
+@import "sass/_header";
+@import "sass/_home";
+@import "sass/_breadcrumb";
+@import "sass/_editors";
+@import "sass/_animations";
+
+footer {
+  margin-top: 5em;
+}
+
+.site-title {
+  background-color: #f1f1f1;
+  color: #212121;
+  display: inline-block;
+  margin: 0;
+  padding-bottom: 1.5rem;
+  padding-left: 3rem;
+  padding-right: 5.5rem;
+  padding-top: 1.5rem;
+  width: 70%;
+}
+
+.site-publishing-status {
+  display: inline-block;
+  text-align: right;
+  width: 25%
+}
+
+.recent-drafts {
+  width: 100%;
+}
+
+.pull-right {
+  float: right;
+}
+
+.pull-right::after {
+  content: '';
+  clear: both;
+  display: table-cell;
+}
+
+@media screen and (min-width: 600px) {
+  form {
+    max-width: 100%;
+  }
+}
+
+.usa-label {
+  text-transform: capitalize;
+}
+
+.label-success {
+  background-color: $label-success-bg-color;
+}
+
+.label-danger {
+  background-color: $label-danger-bg-color;
+}
+
+.label-warning {
+  background-color: $label-warning-bg-color;
+}
+
+.list-group {
+  width: 100%;
+}
+
+.list-group li:before {
+  content: '';
+}
+
+.list-group li {
+  box-sizing: border-box;
+  border-bottom: 2px solid black;
+  display: list-item;
+}
+
+.list-group li:last-child {
+  border-width: 0;
+}
+
+.list-group-item {
+  line-height: 3em;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.list-group ul {
+  margin-bottom: 0;
+  margin-top: 0;
+  padding-left: 2em;
+}
+
+.upload-alert {
+  margin-bottom: 1.5em;
+}
+
+.image-cards {
+  margin-bottom: 1em;
+  overflow-x: scroll;
+  width: 100%;
+}
+
+.image-cards .scroll{
+  display: flex;
+}
+
+.image-card {
+  background-color: #ccc;
+  margin-right: 1em;
+  min-height: 200px;
+  position: relative;
+  width: 150px;
+}
+
+.image-cards .selected {
+  border: 7px solid black;
+}
+
+.image-card img {
+  margin-left: 5%;
+  margin-top: 5%;
+  width: 90%;
+}
+
+.image-card span {
+  background-color: pink;
+  bottom: .5em;
+  display: inline-block;
+  left: 0;
+  padding-top: .3em;
+  padding-bottom: .3em;
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}

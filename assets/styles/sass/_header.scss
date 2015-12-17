@@ -1,0 +1,69 @@
+header {
+  background-color: $header-bg-color;
+}
+
+$nav-padding: .2em;
+
+nav {
+  padding-bottom: $nav-padding;
+  padding-top: $nav-padding;
+}
+
+.nav-elements {
+  display: flex;
+}
+
+.logo {
+  flex-grow: 2;
+}
+
+.navbar-links {
+  flex-grow: 1;
+}
+
+nav ul {
+  display: flex;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+@media screen and (max-width: 600px) {
+  nav li:first-of-type {
+    display: none;
+  }
+}
+
+nav li:before {
+  content: "";
+  display: none;
+}
+
+nav li {
+  display: inline-block;
+  flex-grow: 1;
+  list-style-type: none;
+  text-align: right;
+}
+
+nav li a,
+nav li a:visited {
+  color: white;
+}
+
+$logo-width: 140px;
+$logo-height: $logo-width * .25;
+
+.logo {
+  align-items: center;
+  display: flex;
+}
+
+.logo a {
+  background-image: url('/images/logo.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  color: transparent;
+  display: inline-block;
+  height: $logo-height;
+  width: $logo-width;
+}
