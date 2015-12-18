@@ -125,17 +125,8 @@ var EditorView = Backbone.View.extend({
       );
 
       // Disable / style form elements
-      $('[contenteditable]')
-        .attr('contenteditable', false)
-        .addClass('disabled');
-      $('.CodeMirror, .CodeMirror-line')
-        .addClass('disabled');
-      $('.CodeMirror textarea, .save-button')
-        .addClass('disabled')
-        .attr('disabled', true);
-      $('#save-content-message')
-        .addClass('disabled')
-        .attr('readonly', true);
+      $('.CodeMirror, .ProseMirror').append('<div class="mask"></div>');
+      $('.save-panel, .ProseMirror-menubar').remove();
 
     } else {
 
