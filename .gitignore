@@ -47,6 +47,7 @@ assets/site
 
 # Generated CSS
 assets/styles/styles.css
+assets/styles/google-fonts.css
 
 # Browserify bundle
 assets/js/bundle.js

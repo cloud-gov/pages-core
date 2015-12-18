@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-var Backbone = window.B = require('backbone');
+var Backbone = require('backbone');
 var _ = require('underscore');
 var yaml = require('yamljs');
 
@@ -23,6 +23,12 @@ var EditorView = Backbone.View.extend({
   template: _.template(templateHtml),
   initialize: function (opts) {
     var self      = this,
+        file      = [
+                      self.model.get('owner'),
+                      self.model.get('repoName'),
+                      self.model.get('branch'),
+                      self.model.get('file')
+                    ].join('/'),
         raw, content, settingsEditorEl, contentEditorEl;
 
     this.editors = {};
@@ -44,7 +50,7 @@ var EditorView = Backbone.View.extend({
       this.doc = new Document({
         fileExt: 'md',
         content: ['---', this.model.getDefaults(), '---', '\n'].join('\n')
-      })
+      });
     }
 
     this.$el.html(this.template({ fileName: this.model.get('file') }));
@@ -78,8 +84,61 @@ var EditorView = Backbone.View.extend({
 
     if (!this.doc.content) $(contentEditorEl).hide();
 
+    io.socket.get('/v0/site/lock', { file: file }, function(data) {
+
+      // Store the socket ID for future reference
+      self.socket = data.id;
+
+      // Apply the lock
+      self.lockContent.bind(self);
+
+      // On any change events (others open or leave the page), reapply the lock
+      io.socket.on('change', self.lockContent.bind(self));
+
+      // If the user navigates away from the page, remove the lock
+      // The server will do this automatically if the socket session breaks
+      federalist.once('route', function() {
+        $('.alert-container').html('');
+        io.socket.get('/v0/site/unlock', { file: file });
+      });
+
+    });
+
     return this;
   },
+
+  lockContent: function(data) {
+    var first = (data.subscribers && data.subscribers[0]) ||
+                      (this.socket.subscribers && this.socket.subscribers[0]);
+
+    if (first !== this.socket) {
+      var message = 'Another user is editing this file. Once they finish, this page will unlock and you will be able to edit it.';
+
+      // This is so we can tell if a user is unlocked for the first time
+      this.locked = true;
+
+      // Add error message
+      $('.alert-container').html(
+        '<div class="usa-grid"><div class="usa-alert usa-alert-error" role="alert">' +
+          message +
+        '</div></div>'
+      );
+
+      // Disable / style form elements
+      $('.CodeMirror, .ProseMirror').append('<div class="mask"></div>');
+      $('.save-panel, .ProseMirror-menubar').remove();
+
+    } else {
+
+      // If unlocking for the first time, refresh the view
+      if (this.locked) {
+        this.locked = false;
+        Backbone.history.loadUrl();
+      }
+
+    }
+  },
+
   render: function () {
     var self = this;
 
@@ -157,8 +216,8 @@ var EditorView = Backbone.View.extend({
 
     if (this.isNewPage) {
       try {
-        pageTitle = fileNameFromTitle(yaml.parse(settings)['title']);
-      } catch (e) {
+        pageTitle = fileNameFromTitle(yaml.parse(settings).title);
+      } catch (error) {
         pageTitle = (new Date()).getTime().toString();
       }
 
@@ -192,9 +251,9 @@ var EditorView = Backbone.View.extend({
 
 function fileNameFromTitle (title) {
   var unique = (new Date()).valueOf();
-  title = title || new String(unique);
+  title = title || unique.toString();
 
-  return title.toLowerCase()
+  return title.toLowerCase();
 }
 
 module.exports = EditorView;
