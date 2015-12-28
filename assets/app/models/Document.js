@@ -5,14 +5,12 @@ var DocumentModel = Backbone.Model.extend({
   initialize: function (opts) {
     var parts;
     if (opts.fileExt === 'md' || opts.fileExt === 'markdown') {
-      parts = opts.content.split('---\n');
-      if (parts[0] === '') {
-      /* if the markdown has yml */
-        this.frontMatter = parts[1];
-        this.content = parts[2];
+      if (this.hasYmlFrontmatter(opts.content)) {
+        parts = this.splitYmlMarkdown(opts.content);
+        this.frontMatter = parts.yml;
+        this.content = parts.md;
       }
       else {
-      /* if the markdown does not have yml */
         this.frontMatter = false;
         this.content = opts.content;
       }
@@ -22,6 +20,26 @@ var DocumentModel = Backbone.Model.extend({
       this.content = false;
     }
     return this;
+  },
+  hasYmlFrontmatter: function (content) {
+    var r = /^---/;
+    if (content.match(r)) {
+      return true;
+    }
+    return false;
+  },
+  splitYmlMarkdown: function (content) {
+    var r = /^---\n([\s\S]*?)---\n/,
+        matches = content.match(r),
+        yml, md, x;
+
+    if (!matches) return false;
+
+    x = matches[0];
+    yml = matches[1];
+    md = content.slice(x.length);
+
+    return { yml: yml, md: md};
   },
   toMarkdown: function () {
     var lastCharIndex;
