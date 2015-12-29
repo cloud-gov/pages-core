@@ -3,6 +3,8 @@ var mocha = require('mocha');
 var querystring = require('querystring');
 var sinon = require('sinon');
 
+var helpers = require('./githubHelpers');
+
 var mockData = JSON.stringify(require('../data/repoResponse.json'));
 var mockCommitResponse = JSON.stringify(require('../data/commitResponse.json'));
 
@@ -23,18 +25,18 @@ describe('Github model', function () {
   });
 
   it('should create with token and repo', function () {
-    var github = new Github(getOpts());
+    var github = new Github(helpers.getOpts());
 
-    server.respondWith('GET', makeUrl(), mockResponse(mockData));
+    server.respondWith('GET', helpers.makeUrl(), helpers.mockResponse(mockData));
     server.respond();
 
     assert.equal(github.get('owner'), '18f');
   });
 
   it('should add a page', function (done) {
-    var github = new Github(getOpts());
+    var github = new Github(helpers.getOpts());
 
-    server.respondWith('GET', makeUrl(), mockResponse(mockData));
+    server.respondWith('GET', helpers.makeUrl(), helpers.mockResponse(mockData));
     server.respond();
 
     var commitOpts = {
@@ -54,7 +56,7 @@ describe('Github model', function () {
     });
 
     github.commit(commitOpts);
-    server.respondWith('PUT', makeUrl('test.md'), mockResponse(mockCommitResponse, 201));
+    server.respondWith('PUT', helpers.makeUrl('test.md'), helpers.mockResponse(mockCommitResponse, 201));
     server.respond();
   });
 
@@ -63,55 +65,3 @@ describe('Github model', function () {
 afterEach(function () {
   server.restore();
 });
-
-/**
- * Get config opts for the 18f/federalist repository
- */
-function getOpts() {
-  var opts = {
-    token: 'FAKETOKEN',
-    owner: '18f',
-    repoName: 'federalist',
-    branch: 'master'
-  };
-
-  return opts;
-}
-
-/**
- * Makes a consistent GH API URL for the 18f/federalist repository
- * @param {string} path - the path within the repo; defaults to root
- */
-function makeUrl(path) {
-  var opts = getOpts();
-  var qs = {
-    'access_token': opts.token,
-    ref: opts.branch,
-    z: 6543
-  };
-  var baseUrl = [
-    'https://api.github.com/repos',
-    '18f',
-    'federalist',
-    'contents'
-  ];
-
-  if (path) baseUrl.push(path);
-  return [baseUrl.join('/'), querystring.stringify(qs)].join('?');
-}
-
-/**
- * Makes a consistent mocked HTTP response for Sinon
- * @param {string} data - the body of the response
- * @param {integer} status (optional) - HTTP status code to return
- */
-function mockResponse(data, status) {
-  status = status || 200;
-  var headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*"
-  };
-  var req = [status, headers, data];
-
-  return req;
-}

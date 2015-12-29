@@ -1,14 +1,28 @@
-var jsdom = require('jsdom');
+var jsdom = require('jsdom').jsdom;
 
 // window object for jQuery
-global.window = jsdom.jsdom().parentWindow;
+var document = global.document = jsdom();
+global.window = global.document.defaultView;
+global.navigator = 'gecko';
+
+document.createRange = function() {
+  return {
+    setEnd: function(){},
+    setStart: function(){},
+    getBoundingClientRect: function(){
+        return {right: 0};
+    }
+  }
+};
 
 // Gets around a really annoying "No Transport" error
 // related to CORS
-global.XMLHttpRequest = global.window.XMLHttpRequest;
+if (global.window.XMLHttpRequest) {
+  global.XMLHttpRequest = global.window.XMLHttpRequest;
+}
 
 // use jsdom window for jQuery
-global.$ = global.jQuery = require('jquery')(window);
+global.window.$ = global.window.jQuery = require('jquery');
 
 // attach base64 string encoding/decoding functions
 // to global window for tests

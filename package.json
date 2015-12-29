@@ -79,7 +79,7 @@
     "watch:client:js": "watchify --debug -t brfs assets/app/app.js -o assets/js/bundle.js",
     "test": "npm run test:server && npm run test:client",
     "test:server": "mocha --timeout 60000 test/api/bootstrap.test.js test/api/unit/**/*.test.js",
-    "test:client": "mocha test/browser/bootstrap.test.js test/browser/unit/**/*.test.js",
+    "test:client": "mocha test/browser/bootstrap.test.js \"test/browser/unit/**/*.test.js\"",
     "migrate:create": "grunt db:migrate:create",
     "migrate:up": "grunt db:migrate:up || true",
     "migrate:down": "grunt db:migrate:down",
