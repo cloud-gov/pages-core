@@ -24,8 +24,8 @@ deploy:
     branch: master
 notifications:
   slack:
-    on_success: change # default: always
-    on_failure: change # default: always
+    on_success: never # default: always
+    on_failure: always # default: always
     on_start: never # default: always
     on_pull_requests: false
     secure: Eqyu9MVlzDtdFgc/Wv89Br2yuvuh0HRoLMjbpS1KDgZ4si0/aBggV67MaVNiRpEH5Q3Sr01K3M0UfJBU2nJzVlmqkF1zEMVqz0Kox8Qn4EaUSog2DS0X8quU1HAvaqIu+HtwXchcBEhiK1agd79pN3djvr2kGGPdZLqkz4XT+zsRcPgiUcp1oyzCpmqKXv16+7F5RX+pA+CgsawRzOY39qe44HIixxRzJeOxaB+16ccaauqTqxIuBUqlNn1wmlxbYYzTeniF7lJULNMkHcz16pRs6w4vssjUJRsdoKvnyRY33sKKRaWPitzEjAjQNiZeLEym3DG1569xPXjKcvp42Vax5sA20pF92a8E0BQckADSk8wcq3G8Ak58LEg1CvAxp6vQvrcTB1k+/QSg2Y1mzHoEH9d2gebgVZIgn6iqSgHjYxNjCREUhE/SC9pOuaGuJuMhaeCHW/7Ucr0IPwAvzpvKWa1qzDgHLGVlFEI8rTstSnFif0oR7bM7pqdZLEQkpfrE/rV5II19O1c4/hN0JHE6bLNHrULmmYTz/cWqUkuR69OwnifQZGdU06tMrE8u5sdKWbjKMjlRhGHhhsQCW7VQ0NJp7GLJwz9mL8Aq0TH9J4pItGDW++3PfaJpaSHv8UhCCg0GRWEhve2P9JMHldLuij0qR73KjrV2HyER9LA=
