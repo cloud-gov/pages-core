@@ -1,12 +1,13 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
 
+
 var DocumentModel = Backbone.Model.extend({
   initialize: function (opts) {
     var parts;
     if (opts.fileExt === 'md' || opts.fileExt === 'markdown') {
-      if (this.hasYmlFrontmatter(opts.content)) {
-        parts = this.splitYmlMarkdown(opts.content);
+      parts = this.splitYmlMarkdown(opts.content);
+      if (parts) {
         this.frontMatter = parts.yml;
         this.content = parts.md;
       }
@@ -20,13 +21,6 @@ var DocumentModel = Backbone.Model.extend({
       this.content = false;
     }
     return this;
-  },
-  hasYmlFrontmatter: function (content) {
-    var r = /^---/;
-    if (content.match(r)) {
-      return true;
-    }
-    return false;
   },
   splitYmlMarkdown: function (content) {
     var r = /^---\n([\s\S]*?)---\n/,
