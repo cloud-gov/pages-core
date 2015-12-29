@@ -1,0 +1,22 @@
+<% if (type === 'text') { %>
+  <label for="<%- name %>"><%- label %></label>
+  <input type="text" name="<%- name %>" value="<%- value %>">
+<% } else if (type === 'boolean') { %>
+  <fieldset class="usa-fieldset-inputs">
+    <legend><%- label %></legend>
+    <ul class="usa-unstyled-list">
+      <li>
+        <input type="radio" name="<%- name %>" id="<%- name %>"
+            value="true" <% if (value) { %> checked <% } %> >
+        <label for="<%- name %>">True</label>
+      </li>
+      <li>
+        <input type="radio" name="<%- name %>"
+            value="false" <% if (!value) { %> checked <% } %> >
+        <label for="<%- name %>">False</label>
+      </li>
+    </ul>
+  </fieldset>
+<% } else { %>
+  <% console.log('unknown type', type); %>
+<% } %>

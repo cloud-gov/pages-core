@@ -14,6 +14,7 @@ var decodeB64 = require('../../helpers/encoding').decodeB64;
 var Document = require('../../models/Document');
 
 var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/file.html').toString();
+var whitelistFieldHtml = fs.readFileSync(__dirname + '/../../templates/editor/whitelist-field.html').toString();
 
 var EditorView = Backbone.View.extend({
   tagName: 'div',
@@ -23,17 +24,19 @@ var EditorView = Backbone.View.extend({
   template: _.template(templateHtml),
   initialize: function (opts) {
     var self      = this,
-        file      = [
-                      self.model.get('owner'),
-                      self.model.get('repoName'),
-                      self.model.get('branch'),
-                      self.model.get('file')
-                    ].join('/'),
-        raw, content, settingsEditorEl, contentEditorEl;
+        file      = filePathFromModel(self.model),
+        raw, content;
 
     this.editors = {};
     this.path = opts.path;
     this.isNewPage = opts.isNewPage || false;
+    this.settingsFields = {
+      title: 'text',
+      fake: 'boolean',
+      layout: 'text',
+      permalink: 'text',
+      author: 'text'
+    };
 
     this.model.on('github:commit:success', this.saveSuccess.bind(this));
     this.model.on('github:commit:error', this.saveFailure.bind(this));
@@ -55,34 +58,8 @@ var EditorView = Backbone.View.extend({
 
     this.$el.html(this.template({ fileName: this.model.get('file') }));
 
-    settingsEditorEl = this.$('[data-target=metadata]')[0];
-    this.editors.settings = CodeMirror(settingsEditorEl, {
-      lineNumbers: true,
-      mode: "yaml",
-      tabSize: 2
-    });
-
-    if (this.doc.frontMatter) {
-      this.editors.settings.doc.setValue(this.doc.frontMatter);
-    }
-
-    contentEditorEl = this.$('[data-target=content]')[0];
-    try {
-      // try to load content into prosemirror
-      this.editors.content = this.editors.content || createProseMirror(contentEditorEl);
-      this.editors.content.setContent(this.doc.content || '', 'markdown');
-    }
-    catch (e) {
-      // if prosemirror errors out, use codemirror
-      $(contentEditorEl).empty(); // remove prosemirror
-      this.editors.content = CodeMirror(contentEditorEl, {
-        lineNumbers: true,
-        lineWrapping: true
-      });
-      this.editors.content.doc.setValue(this.doc.content || '');
-    }
-
-    if (!this.doc.content) $(contentEditorEl).hide();
+    this.initializeSettingsEditor(this.doc);
+    this.initializeContentEditor(this.doc);
 
     io.socket.get('/v0/site/lock', { file: file }, function(data) {
 
@@ -105,6 +82,63 @@ var EditorView = Backbone.View.extend({
     });
 
     return this;
+  },
+  initializeSettingsEditor: function (doc) {
+    var settings, settingsEditorEl;
+
+    settingsEditorEl = this.$('[data-target=settings]')[0];
+    this.editors.settings = CodeMirror(settingsEditorEl, {
+      lineNumbers: true,
+      mode: "yaml",
+      tabSize: 2
+    });
+
+    if (doc.frontMatter) {
+      this.settings = this.parseSettings(doc);
+      this.editors.settings.doc.setValue(this.settings.remaining);
+    }
+  },
+  parseSettings: function (doc) {
+    var self = this,
+        y = yaml.parse(doc.frontMatter),
+        whitelist;
+
+    whitelist = Object.keys(y).filter(function(k) {
+      return self.settingsFields[k];
+    }).map(function(k) {
+      var r = {
+        name: k,
+        label: k,
+        type: self.settingsFields[k],
+        value: y[k]
+      };
+      delete y[k];
+      return r;
+    });
+
+    return {
+      whitelist: whitelist,
+      remaining: yaml.dump(y)
+    }
+  },
+  initializeContentEditor: function (doc) {
+    var contentEditorEl = this.$('[data-target=content]')[0];
+    try {
+      // try to load content into prosemirror
+      this.editors.content = this.editors.content || createProseMirror(contentEditorEl);
+      this.editors.content.setContent(doc.content || '', 'markdown');
+    }
+    catch (e) {
+      // if prosemirror errors out, use codemirror
+      $(contentEditorEl).empty(); // remove prosemirror
+      this.editors.content = CodeMirror(contentEditorEl, {
+        lineNumbers: true,
+        lineWrapping: true
+      });
+      this.editors.content.doc.setValue(this.doc.content || '');
+    }
+
+    if (!doc.content) $(contentEditorEl).hide();
   },
 
   lockContent: function(data) {
@@ -138,10 +172,9 @@ var EditorView = Backbone.View.extend({
 
     }
   },
-
   render: function () {
     var self = this;
-
+    this.renderSettings();
     window.setTimeout(function() {
       self.editors.settings.refresh();
       if (self.editors.content && self.editors.content.refresh) {
@@ -151,17 +184,29 @@ var EditorView = Backbone.View.extend({
 
     return this;
   },
+  renderSettings: function () {
+    var self = this,
+        html = _.template(whitelistFieldHtml),
+        target = this.$('#whitelist');
+
+    target.empty();
+    this.settings.whitelist.forEach(function(w) {
+      var el = html(w)
+      target.append(el);
+    });
+  },
   /**
    * Replace {{ site.baseurl }} with Github URL so assets load
    *
    * @param {string} content
    * @return {string} content - with replaced baseUrls
    */
-  cleanContent: function (content) {
+  cleanContent: function (content, model) {
+    model = model || this.model;
     var baseUrl = ["https://raw.githubusercontent.com",
-                    this.model.owner,
-                    this.model.name,
-                    this.model.branch
+                    model.owner,
+                    model.name,
+                    model.branch
                   ].join('/');
 
     content = content.replace(/{{ site.baseurl }}/g, baseUrl);
@@ -191,7 +236,10 @@ var EditorView = Backbone.View.extend({
     this.$('#save-status-result').text(status);
   },
   saveDocument: function (e) {
-    var self = this, settings, content, pageTitle;
+    var self = this,
+        settings = this.getSettingsFromEditor(),
+        content = this.getContentFromEditor(),
+        pageTitle;
 
     e.preventDefault(); e.stopPropagation();
 
@@ -199,6 +247,67 @@ var EditorView = Backbone.View.extend({
     this.$('#save-status-result').removeClass('label-success');
     this.$('#save-status-result').removeClass('label-danger');
     this.$('#save-status-result').text('Saving...');
+
+    this.doc.frontMatter = false;
+
+    if (settings) this.doc.frontMatter = settings;
+    if (content) this.doc.content = content;
+
+    if (this.isNewPage) {
+      this.saveNewDocument();
+    }
+    else {
+      this.model.commit({
+        content: this.doc.toMarkdown(),
+        message: this.$('#save-content-message').val()
+      });
+    }
+
+    return this;
+  },
+  saveNewDocument: function () {
+    var self = this;
+
+    try {
+      pageTitle = fileNameFromTitle(yaml.parse(settings).title);
+    } catch (error) {
+      pageTitle = (new Date()).getTime().toString();
+    }
+
+    pageTitle = [pageTitle.replace(/\W/g, '-'), 'md'].join('.');
+
+    this.listenToOnce(this.model, 'github:commit:success', function(m){
+      var owner = self.model.get('owner'),
+          repoName  = self.model.get('repoName'),
+          branch = self.model.get('branch'),
+          url = ['#edit', owner, repoName, branch, m.request.path].join('/');
+
+      window.location.hash = url;
+    });
+
+    this.model.commit({
+      path: ['pages', pageTitle].join('/'),
+      content: this.doc.toMarkdown(),
+      message: 'Created ' + ['pages', pageTitle].join('/')
+    });
+  },
+  getSettingsFromEditor: function () {
+    var self = this,
+        remaining = this.editors.settings.doc.getValue(),
+        whitelist = this.settings.whitelist.map(function (v) {
+          var sel = '[name=' + v.name + ']', value;
+          if (v.type === 'boolean') {
+            sel += ':checked';
+          }
+
+          value = self.$(sel).val();
+          return [v.name, value].join(': ');
+        }).join('\n');
+
+    return [whitelist, remaining].join('\n');
+  },
+  getContentFromEditor: function () {
+    var content;
 
     if (this.editors.content && this.editors.content.content) {
       // ProseMirror is loaded as content editor
@@ -209,45 +318,18 @@ var EditorView = Backbone.View.extend({
       content = this.editors.content.doc.getValue();
     }
 
-    this.doc.frontMatter = false;
-    settings = this.editors.settings.doc.getValue();
-    if (settings) this.doc.frontMatter = settings;
-    if (content) this.doc.content = content;
-
-    if (this.isNewPage) {
-      try {
-        pageTitle = fileNameFromTitle(yaml.parse(settings).title);
-      } catch (error) {
-        pageTitle = (new Date()).getTime().toString();
-      }
-
-      pageTitle = [pageTitle.replace(/\W/g, '-'), 'md'].join('.');
-
-      this.listenToOnce(this.model, 'github:commit:success', function(m){
-        var owner = self.model.get('owner'),
-            repoName  = self.model.get('repoName'),
-            branch = self.model.get('branch'),
-            url = ['#edit', owner, repoName, branch, m.request.path].join('/');
-
-        window.location.hash = url;
-      });
-
-      this.model.commit({
-        path: ['pages', pageTitle].join('/'),
-        content: this.doc.toMarkdown(),
-        message: 'Created ' + ['pages', pageTitle].join('/')
-      });
-    }
-    else {
-      this.model.commit({
-        content: this.doc.toMarkdown(),
-        message: this.$('#save-content-message').val()
-      });
-    }
-
-    return this;
+    return content;
   }
 });
+
+function filePathFromModel (model) {
+  return path = [
+    model.get('owner'),
+    model.get('repoName'),
+    model.get('branch'),
+    model.get('file')
+  ].join('/')
+}
 
 function fileNameFromTitle (title) {
   var unique = (new Date()).valueOf();
