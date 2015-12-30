@@ -16,10 +16,24 @@ var BuildsView = Backbone.View.extend({
         view = this;
     $.getJSON('/v0/user/usernames', function(users) {
       data.builds = _(data.builds).chain().map(function(build) {
-        build.username = users[build.user];
-        build.completedAtFormatted = build.completedAt ?
-          moment(new Date(build.completedAt)).format('L LT') : undefined;
-        return build;
+        var completedAt = build.completedAt && new Date(build.completedAt),
+            createdAt = build.createdAt && new Date(build.createdAt),
+            base = completedAt || new Date(),
+            duration = moment.duration(moment(base).diff(createdAt)),
+            item = _.clone(build);
+
+        item.username = users[build.user];
+        item.duration = duration.seconds();
+        item.durationFormatted = duration.humanize();
+        item.panelClass = build.state === 'error' ? 'error' :
+          build.state === 'success' ? '' : 'info';
+
+        if (completedAt) {
+          item.completedAt = moment(completedAt).format('L LT');
+          item.completedAtFormatted = moment(completedAt).fromNow();
+        }
+
+        return item;
       }).sortBy('createdAt').value().reverse();
       view.$el.html(view.template(data));
     });
