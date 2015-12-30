@@ -148,3 +148,7 @@ footer {
   bottom: 0;
   z-index: 10;
 }
+
+.build-log-table td:last-child {
+    word-break: break-word;
+}
