@@ -34,9 +34,6 @@ var EditorView = Backbone.View.extend({
       title: {
         type: 'text'
       },
-      fake: {
-        type: 'boolean'
-      },
       layout: {
         type: 'select',
         options: self.model.getLayouts()
