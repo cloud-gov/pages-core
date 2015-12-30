@@ -39,7 +39,7 @@ var EditorView = Backbone.View.extend({
       },
       layout: {
         type: 'select',
-        options: ['defaults']
+        options: self.model.getLayouts()
       },
       author: {
         type: 'text'
