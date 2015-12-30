@@ -1,3 +1,11 @@
-label {
+label,
+legend {
+  font-size: inherit;
+  font-weight: 800;
   text-transform: capitalize;
+}
+
+label,
+fieldset {
+  margin-top: 2rem;
 }

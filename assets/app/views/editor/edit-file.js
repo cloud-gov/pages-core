@@ -24,19 +24,30 @@ var EditorView = Backbone.View.extend({
   template: _.template(templateHtml),
   initialize: function (opts) {
     var self      = this,
-        file      = filePathFromModel(self.model),
+        file      = filePathFromModel(this.model),
         raw, content;
 
     this.editors = {};
     this.path = opts.path;
     this.isNewPage = opts.isNewPage || false;
-    this.settingsFields = {
-      title: 'text',
-      fake: 'boolean',
-      layout: 'text',
-      permalink: 'text',
-      author: 'text'
-    };
+    this.settingsFields = _.extend({
+      title: {
+        type: 'text'
+      },
+      fake: {
+        type: 'boolean'
+      },
+      layout: {
+        type: 'select',
+        options: ['defaults']
+      },
+      author: {
+        type: 'text'
+      },
+      published: {
+        type: 'date'
+      }
+    }, opts.settingsFields || {});
 
     this.model.on('github:commit:success', this.saveSuccess.bind(this));
     this.model.on('github:commit:error', this.saveFailure.bind(this));
@@ -109,9 +120,10 @@ var EditorView = Backbone.View.extend({
       var r = {
         name: k,
         label: k,
-        type: self.settingsFields[k],
+        type: self.settingsFields[k].type,
         value: y[k]
       };
+      if (r.type === 'select') r.options = self.settingsFields[k].options;
       delete y[k];
       return r;
     });
@@ -191,6 +203,7 @@ var EditorView = Backbone.View.extend({
 
     target.empty();
     this.settings.whitelist.forEach(function(w) {
+      if (w.type === 'date') w.value = toIsoDateString(w.value);
       var el = html(w)
       target.append(el);
     });
@@ -321,6 +334,11 @@ var EditorView = Backbone.View.extend({
     return content;
   }
 });
+
+function toIsoDateString (date) {
+  var d = date || new Date();
+  return d.toISOString().substring(0, 10)
+}
 
 function filePathFromModel (model) {
   return path = [

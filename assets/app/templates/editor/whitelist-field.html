@@ -6,17 +6,29 @@
     <legend><%- label %></legend>
     <ul class="usa-unstyled-list">
       <li>
-        <input type="radio" name="<%- name %>" id="<%- name %>"
-            value="true" <% if (value) { %> checked <% } %> >
-        <label for="<%- name %>">True</label>
+        <input type="radio" name="<%- name %>" id="true-<%- name %>"
+            value="true" <% if (value) { %> checked="" <% } %> >
+        <label for="true-<%- name %>">True</label>
       </li>
       <li>
-        <input type="radio" name="<%- name %>"
-            value="false" <% if (!value) { %> checked <% } %> >
-        <label for="<%- name %>">False</label>
+        <input type="radio" name="<%- name %>" id="false-<%- name %>"
+            value="false" <% if (!value) { %> checked="" <% } %> >
+        <label for="false-<%- name %>">False</label>
       </li>
     </ul>
   </fieldset>
+<% } else if (type === 'select') { %>
+  <label for="<%- name %>"><%- label %></label>
+  <select name="<%- name %>" id="<%- name %>">
+    <% options.forEach(function(o) { %>
+      <option value="<%- o %>" <% if (o === value) { %>selected<% } %> ><%- o %></option>
+    <% }); %>
+  </select>
+<% } else if (type === 'date') { %>
+  <label for="<%- name %>"><%- label %></label>
+  <input type="date" name="<%- name %>" id="<%- name %>"
+  <% if (value) { %> value="<%- value %>"
+  <% } else { var today = new Date().toISOString().substring(0, 10); %> value="<%- today %>" <% } %> >
 <% } else { %>
-  <% console.log('unknown type', type); %>
+  <% console.log('unknown field type', type); %>
 <% } %>
