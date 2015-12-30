@@ -2,7 +2,7 @@ header {
   background-color: $header-bg-color;
 }
 
-$nav-padding: .2em;
+$nav-padding: .45em;
 
 nav {
   padding-bottom: $nav-padding;
@@ -19,6 +19,10 @@ nav {
 
 .navbar-links {
   flex-grow: 1;
+}
+
+.navbar-links li:after {
+  margin-bottom: 0;
 }
 
 nav ul {
@@ -51,7 +55,7 @@ nav li a:visited {
 }
 
 $logo-width: 140px;
-$logo-height: $logo-width * .25;
+$logo-height: 29px;
 
 .logo {
   align-items: center;
