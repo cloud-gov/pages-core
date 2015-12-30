@@ -60,7 +60,7 @@
     "socket.io-redis": "^0.1.4",
     "to-markdown": "^1.2.1",
     "underscore": "^1.8.3",
-    "uswds": "git+https://github.com/18f/web-design-standards.git#npm-changes",
+    "uswds": "git+https://github.com/18f/web-design-standards.git#18f-pages-staging",
     "validator": "^3.39.0",
     "yamljs": "^0.2.4"
   },
