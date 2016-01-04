@@ -2,6 +2,7 @@ var assert = require('assert');
 var mocha = require('mocha');
 var querystring = require('querystring');
 var sinon = require('sinon');
+var async = require('async');
 
 var mockData = JSON.stringify(require('../data/repoResponse.json'));
 var mockCommitResponse = JSON.stringify(require('../data/commitResponse.json'));
@@ -58,6 +59,111 @@ describe('Github model', function () {
     server.respond();
   });
 
+  it('should format URLs correctly', function(done) {
+    var root = 'https://api.github.com/',
+        github = new Github(getOpts());
+
+    function url(o) { return github.url(o).replace(root, '').split('?')[0]; }
+
+    // content URL with path
+    assert.equal('repos/18f/federalist/contents/test.md', url({ path: 'test.md' }));
+
+    // root repo URL
+    assert.equal('repos/18f/federalist', url({ root: true }));
+
+    // user/repo URL (non-repo route)
+    assert.equal('user/repos', url({ route: 'user', method: 'repos' }));
+
+    // change owner and repo
+    assert.equal('repos/own/repo', url({
+      root: true,
+      owner: 'own',
+      repository: 'repo'
+    }));
+
+    done();
+  });
+
+  it('should clone a repository', function(done) {
+    server.restore();
+    var github = new Github(getOpts());
+
+    // validate function call
+    async.series([
+      function(done) {
+        github.clone(null, null, function(err) { assert(err); done(); });
+      },
+      function(done) {
+        github.clone({ owner: '' }, '', function(err) {
+          assert(err);
+          done();
+        });
+      },
+      function(done) {
+        github.clone({ owner: '', repository: '' }, '', function(err) {
+          assert(err);
+          done();
+        });
+      },
+      checkSource,
+      createRepo,
+      //cloneSite
+    ], done);
+
+    function checkSource(done) {
+
+      // test method.checkSource
+      async.series([
+
+        // Should fail for unavailable repo
+        function(done) {
+          var source = { owner: '18f', repository: 'federalist-none' },
+              destination = 'test-repo';
+
+          github.clone(source, destination);
+
+          github.clone.checkSource(function(err, res) {
+            assert(err);
+            done();
+          });
+        },
+
+        // Should pass for available repo
+        function(done) {
+          var source = { owner: '18f', repository: 'federalist' },
+              destination = 'test-repo';
+
+          github.clone(source, destination);
+
+          github.clone.checkSource(function(err, res) {
+            assert.ifError(err);
+            assert(res);
+            assert(res.permissions.pull);
+            done();
+          });
+        }
+      ], done);
+    }
+
+    function createRepo(done) {
+
+      // test method.createRepo
+      var source = { owner: '18f', repository: 'federalist-none' },
+          destination = 'test-repo-auto';
+
+      github.clone(source, destination);
+
+      github.clone.createRepo(function(err, res) {
+        assert.ifError(err);
+        assert(res);
+        assert.equal(res.status, 201);
+        done();
+      });
+
+    }
+
+  });
+
 });
 
 afterEach(function () {
@@ -86,8 +192,7 @@ function makeUrl(path) {
   var opts = getOpts();
   var qs = {
     'access_token': opts.token,
-    ref: opts.branch,
-    z: 6543
+    ref: opts.branch
   };
   var baseUrl = [
     'https://api.github.com/repos',

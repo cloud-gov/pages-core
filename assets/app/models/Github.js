@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var $ = require('jquery');
 var async = require('async');
 var Backbone = require('backbone');
@@ -29,16 +30,20 @@ var GithubModel = Backbone.Model.extend({
     return this;
   },
   url: function (opts) {
-    var ghUrl = 'https://api.github.com/repos',
-        baseUrl   = [ghUrl, this.owner, this.name, 'contents'],
-        qs = $.param({
-          access_token: this.token,
-          ref: this.branch,
-          z: 6543
-        });
     opts = opts || {};
+    var ghUrl = 'https://api.github.com',
+        route = opts.route || 'repos',
+        owner = opts.owner || this.owner,
+        repository = opts.repository || this.name,
+        baseUrl = [ghUrl, route],
+        qs = $.param(_.extend({
+          access_token: this.token,
+          ref: this.branch
+        }, opts.params || {}));
 
-    if (opts.root) return [baseUrl.join('/'), qs].join('?');
+    if (opts.method) baseUrl.push(opts.method);
+    else if (opts.root) baseUrl.push(owner, repository);
+    else baseUrl.push(owner, repository, 'contents');
 
     if (opts.path) baseUrl.push(opts.path);
     else if (this.file) baseUrl.push(this.file);
@@ -95,6 +100,62 @@ var GithubModel = Backbone.Model.extend({
 
       }
     });
+  },
+  /*
+   * Clone a repository to the user's account.
+   * @param {Object} source - The source repo to clone.
+   * @param {string} source.owner - The source repo's owner.
+   * @param {string} source.repository - The source repo's name.
+   * @param {string} destination - The destination repo's name.
+   * @param {function} done - The callback function.
+   */
+  clone: function clone(source, destination, done) {
+    var model = this,
+        method = model.clone,
+        err;
+
+    if (!source || !source.owner || !source.repository || !destination) {
+      err = new Error('Missing source or destination');
+      return done ? done(err) : err;
+    }
+
+    method.checkSource = function checkDestination(done) {
+      var url = model.url({
+            root: true, owner: source.owner, repository: source.repository
+          });
+
+      $.ajax({
+        dataType: 'json',
+        url: url,
+        success: done.bind(this, null),
+        error: done
+      });
+    };
+
+    method.createRepo = function createRepo(done) {
+      var url = model.url({ route: 'user', method: 'repos' }),
+          data = { name: destination };
+
+      $.ajax({
+        method: 'POST',
+        dataType: 'json',
+        data: JSON.stringify(data),
+        url: url,
+        success: done.bind(this, null),
+        error: done
+      });
+
+    };
+
+    method.cloneRepo = function cloneRepo(done) {
+      done();
+    };
+
+    if (done) async.series([
+      method.checkSource,
+      method.createRepo,
+      method.cloneRepo
+    ], done);
   },
   s3ConfigUrl: function (file) {
     var bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/,
