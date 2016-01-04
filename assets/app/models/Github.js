@@ -7,7 +7,7 @@ var encodeB64 = require('../helpers/encoding').encodeB64;
 
 var GithubModel = Backbone.Model.extend({
   initialize: function (opts) {
-    var opts = opts || {};
+    opts = opts || {};
     if (!opts.token) throw new Error('Must provide Github OAuth token');
 
     this.owner = opts.owner;
@@ -29,14 +29,14 @@ var GithubModel = Backbone.Model.extend({
     return this;
   },
   url: function (opts) {
-    var opts = opts || {},
-        ghUrl = 'https://api.github.com/repos',
+    var ghUrl = 'https://api.github.com/repos',
         baseUrl   = [ghUrl, this.owner, this.name, 'contents'],
         qs = $.param({
           access_token: this.token,
           ref: this.branch,
           z: 6543
         });
+    opts = opts || {};
 
     if (opts.root) return [baseUrl.join('/'), qs].join('?');
 
@@ -134,14 +134,14 @@ var GithubModel = Backbone.Model.extend({
               //json: res.responseJSON || yaml.parse(res.responseText)
             };
             try {
-              r.json = res.responseJSON || yaml.parse(res.responseText)
+              r.json = res.responseJSON || yaml.parse(res.responseText);
             } catch (e) {
-              r.json = []
+              r.json = [];
             }
             callback(null, r);
           }
         });
-      }
+      };
     });
 
     async.parallel(getFiles, function (err, results) {
@@ -156,7 +156,7 @@ var GithubModel = Backbone.Model.extend({
         };
       });
 
-      self.trigger('github:fetchConfig:success')
+      self.trigger('github:fetchConfig:success');
     });
 
     return this;
