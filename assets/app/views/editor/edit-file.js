@@ -23,51 +23,31 @@ var EditorView = Backbone.View.extend({
   },
   template: _.template(templateHtml),
   initialize: function (opts) {
-    var self      = this,
-        file      = filePathFromModel(this.model),
-        raw, content;
+    var self      = window.z = this,
+        file      = this.filePathFromModel(this.model),
+        fileExt   = this.model.get('file').split('.')[1],
+        html      = {
+          fileName: this.model.get('file')
+        };
 
     this.editors = {};
     this.path = opts.path;
     this.isNewPage = opts.isNewPage || false;
-    this.settingsFields = _.extend({
-      title: {
-        type: 'text'
-      },
-      layout: {
-        type: 'select',
-        options: self.model.getLayouts()
-      },
-      author: {
-        type: 'text'
-      },
-      published: {
-        type: 'date'
-      }
-    }, opts.settingsFields || {});
+    this.settingsFields = this.extendSettingFields(opts.settingsFields);
 
     this.model.on('github:commit:success', this.saveSuccess.bind(this));
     this.model.on('github:commit:error', this.saveFailure.bind(this));
 
-    if (!this.isNewPage) {
-      raw = decodeB64(this.model.attributes.json.content);
-      content = this.cleanContent(raw);
-      this.doc = new Document({
-        fileExt: this.model.get('file').split('.')[1],
-        content: content
-      });
-    }
-    else {
-      this.doc = new Document({
-        fileExt: 'md',
-        content: ['---', this.model.getDefaults(), '---', '\n'].join('\n')
-      });
-    }
+    this.doc = this.initializeDocument({
+      fileExt: fileExt,
+      isNewPage: this.isNewPage
+    });
 
-    this.$el.html(this.template({ fileName: this.model.get('file') }));
+    html.settingsDisplayStyle = this.getSettingsDisplayStyle(this.doc);
 
+    this.$el.html(this.template(html));
     this.initializeSettingsEditor(this.doc);
-    this.initializeContentEditor(this.doc);
+    this.initializeContentEditor(this.doc, fileExt);
 
     io.socket.get('/v0/site/lock', { file: file }, function(data) {
 
@@ -91,6 +71,27 @@ var EditorView = Backbone.View.extend({
 
     return this;
   },
+  initializeDocument: function (opts) {
+    var fileExt = opts.fileExt,
+        content, doc, raw;
+
+    if (!opts.isNewPage) {
+      raw = decodeB64(this.model.attributes.json.content);
+      content = this.cleanContent(raw);
+      doc = new Document({
+        fileExt: fileExt,
+        content: content
+      });
+    }
+    else {
+      doc = new Document({
+        fileExt: 'md',
+        content: ['---', this.model.getDefaults(), '---', '\n'].join('\n')
+      });
+    }
+
+    return doc;
+  },
   initializeSettingsEditor: function (doc) {
     var settings, settingsEditorEl;
 
@@ -101,14 +102,33 @@ var EditorView = Backbone.View.extend({
       tabSize: 2
     });
 
-    if (doc.frontMatter) {
+    if (doc.frontMatter || doc.frontMatter === '') {
       this.settings = this.parseSettings(doc);
       this.editors.settings.doc.setValue(this.settings.remaining);
     }
   },
+  extendSettingFields: function (fields) {
+    var f = _.extend({
+      title: {
+        type: 'text'
+      },
+      layout: {
+        type: 'select',
+        options: this.model.getLayouts()
+      },
+      author: {
+        type: 'text'
+      },
+      published: {
+        type: 'date'
+      }
+    }, fields || {});
+
+    return f;
+  },
   parseSettings: function (doc) {
     var self = this,
-        y = yaml.parse(doc.frontMatter),
+        y = yaml.parse(doc.frontMatter) || {},
         whitelist;
 
     whitelist = Object.keys(y).filter(function(k) {
@@ -130,7 +150,7 @@ var EditorView = Backbone.View.extend({
       remaining: yaml.dump(y)
     }
   },
-  initializeContentEditor: function (doc) {
+  initializeContentEditor: function (doc, fileExt) {
     var contentEditorEl = this.$('[data-target=content]')[0];
     try {
       // try to load content into prosemirror
@@ -147,7 +167,9 @@ var EditorView = Backbone.View.extend({
       this.editors.content.doc.setValue(this.doc.content || '');
     }
 
-    if (!doc.content) $(contentEditorEl).hide();
+    if (fileExt != 'md' && fileExt != 'markdown') {
+      $(contentEditorEl).parents('.usa-grid').first().hide();
+    }
   },
 
   lockContent: function(data) {
@@ -182,8 +204,11 @@ var EditorView = Backbone.View.extend({
     }
   },
   render: function () {
-    var self = this;
-    this.renderSettings();
+    var self = this,
+        settingsDisplayStyle = this.getSettingsDisplayStyle(this.doc);
+
+    if (settingsDisplayStyle === 'whitelist') this.renderWhitelistSettings();
+
     window.setTimeout(function() {
       self.editors.settings.refresh();
       if (self.editors.content && self.editors.content.refresh) {
@@ -193,14 +218,14 @@ var EditorView = Backbone.View.extend({
 
     return this;
   },
-  renderSettings: function () {
+  renderWhitelistSettings: function () {
     var self = this,
         html = _.template(whitelistFieldHtml),
         target = this.$('#whitelist');
 
     target.empty();
     this.settings.whitelist.forEach(function(w) {
-      if (w.type === 'date') w.value = toIsoDateString(w.value);
+      if (w.type === 'date') w.value = this.toIsoDateString(w.value);
       var el = html(w)
       target.append(el);
     });
@@ -279,7 +304,7 @@ var EditorView = Backbone.View.extend({
     var self = this;
 
     try {
-      pageTitle = fileNameFromTitle(yaml.parse(settings).title);
+      pageTitle = this.fileNameFromTitle(yaml.parse(this.settings).title);
     } catch (error) {
       pageTitle = (new Date()).getTime().toString();
     }
@@ -329,28 +354,32 @@ var EditorView = Backbone.View.extend({
     }
 
     return content;
+  },
+  getSettingsDisplayStyle: function (doc) {
+    if (doc.fileExt == 'md' || doc.fileExt == 'markdown') {
+      if (doc.frontMatter == '') return 'regular';
+      else return 'whitelist';
+    }
+    return 'only';
+  },
+  toIsoDateString: function (date) {
+    var d = (date) ? new Date(date) : new Date();
+    return d.toISOString().substring(0, 10)
+  },
+  filePathFromModel: function (model) {
+    return path = [
+      model.get('owner'),
+      model.get('repoName'),
+      model.get('branch'),
+      model.get('file')
+    ].join('/')
+  },
+  fileNameFromTitle: function (title) {
+    var unique = (new Date()).valueOf();
+    title = title || unique.toString();
+
+    return title.toLowerCase();
   }
 });
-
-function toIsoDateString (date) {
-  var d = date || new Date();
-  return d.toISOString().substring(0, 10)
-}
-
-function filePathFromModel (model) {
-  return path = [
-    model.get('owner'),
-    model.get('repoName'),
-    model.get('branch'),
-    model.get('file')
-  ].join('/')
-}
-
-function fileNameFromTitle (title) {
-  var unique = (new Date()).valueOf();
-  title = title || unique.toString();
-
-  return title.toLowerCase();
-}
 
 module.exports = EditorView;

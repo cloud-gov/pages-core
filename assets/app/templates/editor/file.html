@@ -4,6 +4,7 @@
 <div class="editor">
 
   <div class="usa-grid">
+    <% if (settingsDisplayStyle == 'whitelist') { %>
     <div class="usa-width-one-half">
       <form id="whitelist">
       </form>
@@ -14,6 +15,14 @@
         <div data-target="settings"></div>
       </form>
     </div>
+    <% } else { %>
+    <div class="usa-width-one-whole">
+      <label for="settings">Page settings</label>
+      <form id="settings">
+        <div data-target="settings"></div>
+      </form>
+    </div>
+    <% } %>
   </div>
 
   <div class="usa-grid">

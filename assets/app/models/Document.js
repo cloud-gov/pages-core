@@ -1,10 +1,11 @@
-var Backbone = require('backbone');
 var _ = require('underscore');
-
+var Backbone = require('backbone');
+var yaml = require('yamljs');
 
 var DocumentModel = Backbone.Model.extend({
   initialize: function (opts) {
     var parts;
+    this.fileExt = opts.fileExt;
     if (opts.fileExt === 'md' || opts.fileExt === 'markdown') {
       parts = this.splitYmlMarkdown(opts.content);
       if (parts) {
@@ -12,7 +13,7 @@ var DocumentModel = Backbone.Model.extend({
         this.content = parts.md;
       }
       else {
-        this.frontMatter = false;
+        this.frontMatter = '';
         this.content = opts.content;
       }
     }

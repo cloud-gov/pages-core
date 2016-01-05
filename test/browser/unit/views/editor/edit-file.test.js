@@ -20,7 +20,7 @@ describe('edit-file view', function () {
     });
   });
 
-  describe('cleanContent class method', function () {
+  describe('cleanContent()', function () {
     it('should not alter text unncessarily', function () {
       var model = {
             owner: '18f',
@@ -46,7 +46,7 @@ describe('edit-file view', function () {
     });
   });
 
-  describe('parseSettings class method', function () {
+  describe('parseSettings()', function () {
     it('should do nothing with no settingsFields', function () {
       EditFileView.prototype.settingsFields = {};
       var doc = {
@@ -69,6 +69,65 @@ describe('edit-file view', function () {
       assert.equal(actual.whitelist.length, 1);
       assert.equal(actual.whitelist[0].name, 'title');
       assert.equal(actual.remaining, expectedRemaining);
+    });
+  });
+
+  describe('getSettingsDisplayStyle()', function () {
+    it('should return "only" for .yml documents', function () {
+      var doc = {
+            fileExt: 'yml'
+          },
+          expected = 'only',
+          actual = EditFileView.prototype.getSettingsDisplayStyle(doc);
+
+      assert.equal(actual, expected);
+    });
+
+    it('should return "whitelist" for .md documents with settings', function () {
+      var doc = {
+            fileExt: 'md',
+            frontMatter: 'foo: bar'
+          },
+          expected = 'whitelist',
+          actual = EditFileView.prototype.getSettingsDisplayStyle(doc);
+
+      assert.equal(actual, expected);
+    });
+
+    it('should return "regular" for .md documents without settings', function () {
+      var doc = {
+            fileExt: 'md',
+            frontMatter: ''
+          },
+          expected = 'regular',
+          actual = EditFileView.prototype.getSettingsDisplayStyle(doc);
+
+      assert.equal(actual, expected);
+    });
+
+  });
+
+  describe('toIsoDateString()', function () {
+    it('should return a date string', function () {
+      var expected = '2016-01-05',
+          actual = EditFileView.prototype.toIsoDateString(expected);
+
+      assert.equal(actual, expected);
+    });
+  });
+
+  describe('fileNameFromTitle()', function () {
+    it('should return a title if supplied nothing', function () {
+      assert.doesNotThrow(function () {
+        var title = EditFileView.prototype.fileNameFromTitle();
+      });
+    });
+
+    it('should return the same title if supplied', function () {
+      var expected = 'title-things',
+          actual = EditFileView.prototype.fileNameFromTitle(expected);
+
+      assert.equal(actual, expected);
     });
   });
 
