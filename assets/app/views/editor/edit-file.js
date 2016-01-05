@@ -148,7 +148,7 @@ var EditorView = Backbone.View.extend({
     return {
       whitelist: whitelist,
       remaining: yaml.dump(y)
-    }
+    };
   },
   initializeContentEditor: function (doc, fileExt) {
     var contentEditorEl = this.$('[data-target=content]')[0];
@@ -225,8 +225,8 @@ var EditorView = Backbone.View.extend({
 
     target.empty();
     this.settings.whitelist.forEach(function(w) {
-      if (w.type === 'date') w.value = this.toIsoDateString(w.value);
-      var el = html(w)
+      if (w.type === 'date') w.value = self.toIsoDateString(w.value);
+      var el = html(w);
       target.append(el);
     });
   },
@@ -364,7 +364,7 @@ var EditorView = Backbone.View.extend({
   },
   toIsoDateString: function (date) {
     var d = (date) ? new Date(date) : new Date();
-    return d.toISOString().substring(0, 10)
+    return d.toISOString().substring(0, 10);
   },
   filePathFromModel: function (model) {
     return path = [
@@ -372,7 +372,7 @@ var EditorView = Backbone.View.extend({
       model.get('repoName'),
       model.get('branch'),
       model.get('file')
-    ].join('/')
+    ].join('/');
   },
   fileNameFromTitle: function (title) {
     var unique = (new Date()).valueOf();
