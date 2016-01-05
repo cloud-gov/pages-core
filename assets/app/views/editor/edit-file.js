@@ -25,7 +25,7 @@ var EditorView = Backbone.View.extend({
   initialize: function (opts) {
     var self      = window.z = this,
         file      = this.filePathFromModel(this.model),
-        fileExt   = this.model.get('file').split('.')[1],
+        fileExt   = this.fileExtensionFromName(this.model.get('file')),
         html      = {
           fileName: this.model.get('file')
         };
@@ -379,6 +379,13 @@ var EditorView = Backbone.View.extend({
     title = title || unique.toString();
 
     return title.toLowerCase();
+  },
+  fileExtensionFromName: function (name) {
+    var r = /\.[0-9a-z]+$/i,
+        match = name.match(r);
+        ext = (match) ? match[0].split('.')[1] : false;
+
+    return ext;
   }
 });
 
