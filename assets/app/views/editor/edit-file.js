@@ -119,7 +119,7 @@ var EditorView = Backbone.View.extend({
       author: {
         type: 'text'
       },
-      published: {
+      date: {
         type: 'date'
       }
     }, fields || {});
@@ -357,7 +357,7 @@ var EditorView = Backbone.View.extend({
   },
   getSettingsDisplayStyle: function (doc) {
     if (doc.fileExt == 'md' || doc.fileExt == 'markdown') {
-      if (doc.frontMatter == '') return 'regular';
+      if (!doc.frontMatter) return 'regular';
       else return 'whitelist';
     }
     return 'only';
@@ -367,7 +367,7 @@ var EditorView = Backbone.View.extend({
     return d.toISOString().substring(0, 10);
   },
   filePathFromModel: function (model) {
-    return path = [
+    return [
       model.get('owner'),
       model.get('repoName'),
       model.get('branch'),
