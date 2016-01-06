@@ -13,7 +13,7 @@ var DocumentModel = Backbone.Model.extend({
         this.content = parts.md;
       }
       else {
-        this.frontMatter = '';
+        this.frontMatter = false;
         this.content = opts.content;
       }
     }
