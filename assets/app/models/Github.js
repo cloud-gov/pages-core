@@ -106,13 +106,15 @@ var GithubModel = Backbone.Model.extend({
    * @param {Object} source - The source repo to clone.
    * @param {string} source.owner - The source repo's owner.
    * @param {string} source.repository - The source repo's name.
-   * @param {string} destination - The destination repo's name.
+   * @param {Object} destination - The destination repository.
+   * @param {string} destination.repository - The destination repo's name.
+   * @param {string} destination.organization - The destination repo's owner org (optional).
    * @param {function} done - The callback function.
    */
   clone: function clone(source, destination, done) {
-    var model = this,
-        method = model.clone,
-        err;
+    var model = this;
+    var method = model.clone;
+    var err;
 
     if (!source || !source.owner || !source.repository || !destination) {
       err = new Error('Missing source or destination');
@@ -121,8 +123,8 @@ var GithubModel = Backbone.Model.extend({
 
     method.checkSource = function checkDestination(done) {
       var url = model.url({
-            root: true, owner: source.owner, repository: source.repository
-          });
+        root: true, owner: source.owner, repository: source.repository
+      });
 
       $.ajax({
         dataType: 'json',
@@ -133,8 +135,10 @@ var GithubModel = Backbone.Model.extend({
     };
 
     method.createRepo = function createRepo(done) {
-      var url = model.url({ route: 'user', method: 'repos' }),
-          data = { name: destination };
+      var route = destination.organization ?
+        'orgs/' + destination.organization : 'user';
+      var url = model.url({ route: route, method: 'repos' });
+      var data = { name: destination.repository };
 
       $.ajax({
         method: 'POST',
@@ -148,7 +152,23 @@ var GithubModel = Backbone.Model.extend({
     };
 
     method.cloneRepo = function cloneRepo(done) {
-      done();
+      var url = '/v0/site/clone';
+      var data = {
+        sourceOwner: source.owner,
+        sourceRepo: source.repository,
+        destinationOrg: destination.organization,
+        destinationRepo: destination.repository
+      };
+
+      $.ajax({
+        method: 'POST',
+        dataType: 'json',
+        data: JSON.stringify(data),
+        url: url,
+        success: done.bind(this, null),
+        error: done
+      });
+
     };
 
     if (done) async.series([
