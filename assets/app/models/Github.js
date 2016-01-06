@@ -204,7 +204,7 @@ var GithubModel = Backbone.Model.extend({
   },
   getLayouts: function () {
     var defaultString = this.getDefaults(),
-        defaults = yaml.parse(defaultString || ''),
+        defaults = yaml.parse(defaultString) || '',
         layouts = defaults.layout || ['default'];
 
     return layouts;
