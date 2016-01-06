@@ -64,6 +64,7 @@ describe('Github model', function () {
         github = new Github(getOpts());
 
     function url(o) { return github.url(o).replace(root, '').split('?')[0]; }
+    function param(o) { return querystring.parse(github.url(o).split('?')[1]); }
 
     // content URL with path
     assert.equal('repos/18f/federalist/contents/test.md', url({ path: 'test.md' }));
@@ -80,6 +81,9 @@ describe('Github model', function () {
       owner: 'own',
       repository: 'repo'
     }));
+
+    // add a param
+    assert.equal('bar', param({ path: 'test.md', params: { foo: 'bar'} }).foo);
 
     done();
   });
