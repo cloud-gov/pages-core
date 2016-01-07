@@ -184,7 +184,11 @@ describe('Github model', function () {
     var url = '/v0/site/clone';
     var github = new Github(getOpts());
     var source = { owner: '18f', repository: 'federalist' },
-        destination = { repository: 'test-repo' },
+        destination = {
+          repository: 'test-repo',
+          branch: 'test-branch',
+          engine: 'static'
+        },
         data;
 
     server.respondWith('POST', url, [200, {}, '{}']);
@@ -198,7 +202,9 @@ describe('Github model', function () {
       assert.deepEqual(json, {
         sourceOwner: source.owner,
         sourceRepo: source.repository,
-        destinationRepo: destination.repository
+        destinationRepo: destination.repository,
+        destinationBranch: destination.branch,
+        engine: destination.engine
       });
       assert(!json.destinationOrg);
       done();
@@ -211,7 +217,11 @@ describe('Github model', function () {
     var url = '/v0/site/clone';
     var github = new Github(getOpts());
     var source = { owner: '18f', repository: 'federalist' },
-        destination = { organization: '18f', repository: 'test-repo' },
+        destination = {
+          organization: '18f',
+          repository: 'test-repo',
+          branch: 'test-branch'
+        },
         data;
 
     server.respondWith('POST', url, [200, {}, '{}']);
@@ -226,7 +236,9 @@ describe('Github model', function () {
         sourceOwner: source.owner,
         sourceRepo: source.repository,
         destinationOrg: destination.organization,
-        destinationRepo: destination.repository
+        destinationRepo: destination.repository,
+        destinationBranch: destination.branch,
+        engine: 'jekyll'
       });
       done();
     });

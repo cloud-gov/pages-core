@@ -7,6 +7,32 @@
 
 module.exports = {
 
+  clone: function cloneSite(req, res) {
+    var data = {
+      owner: req.body.destinationOrg || req.user.username,
+      repository: req.body.destinationRepo,
+      defaultBranch: req.body.destinationBranch,
+      engine: req.body.engine,
+      user: req.user
+    };
+    Site.create(data).populate('users').exec(function(err, site) {
+      if (err) return res.serverError(err);
+      var build = {
+        user: site.users[0].id,
+        site: model.id,
+        branch: model.defaultBranch,
+        source: {
+          repository: req.body.sourceRepo,
+          owner: req.body.sourceOwner
+        }
+      };
+      Build.create(build, function(err) {
+        if (err) return res.serverError(err);
+        res.send(site);
+      });
+    });
+  },
+
   fork: function forkSiteFromTemplate(req, res) {
     if (!req.param('templateId')) return res.notFound();
 

@@ -30,6 +30,9 @@ module.exports = {
     user: {
       model: 'user',
       required: true
+    },
+    source: {
+      type: 'json'
     }
   },
 

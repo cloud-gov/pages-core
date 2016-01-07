@@ -9,14 +9,20 @@ var exec = require('child_process').exec;
 var hook = {
 
   jekyll: function(model, done) {
+    var clone = (model.source) ?
+      'git clone -b ${branch} --single-branch ' +
+        'https://${token}@github.com/${source_owner}/${source_repo}.git ${source} && ' +
+        'git remote add destination https://${token}@github.com/${owner}/${repository}.git && ' +
+        'git push destination ${branch}' :
+      'git clone -b ${branch} --single-branch ' +
+        'https://${token}@github.com/${owner}/${repository}.git ${source}';
 
     // Run command template
     this._run([
       'rm -rf ${source} || true',
       'rm -rf ${destination} || true',
       'mkdir -p ${source}',
-      'git clone -b ${branch} --single-branch ' +
-        'https://${token}@github.com/${owner}/${repository}.git ${source}',
+      clone,
       'echo "baseurl: ${baseurl}\nbranch: ${branch}\n${config}" > ' +
         '${source}/_config_base.yml',
       'bundle exec jekyll build --safe --config ${source}/_config.yml,${source}/_config_base.yml ' +
@@ -100,6 +106,9 @@ var hook = {
       tokens.baseurl = (model.site.domain && defaultBranch) ? "''" :
         '/' + tokens.root + '/' + tokens.owner +
         '/' + tokens.repository + tokens.branchURL;
+
+      tokens.source_repo = model.source && model.source.repository;
+      tokens.source_owner = model.source && model.source.owner;
 
       // Set up source and destination paths
       tokens.source = sails.config.build.tempDir + '/source/' +

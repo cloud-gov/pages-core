@@ -18,6 +18,8 @@ module.exports = {
           config: model.site.config,
           repository: model.site.repository,
           owner: model.site.owner,
+          sourceRepo: model.source.repository,
+          sourceOwner: model.source.owner,
           token: (model.user.passport) ?
             model.user.passport.tokens.accessToken : ''
         },
@@ -46,6 +48,8 @@ module.exports = {
             { "name": "OWNER", "value": tokens.owner },
             { "name": "PREFIX", "value": tokens.prefix },
             { "name": "GITHUB_TOKEN", "value": tokens.token },
+            { "name": "SOURCE_REPO", "value": tokens.sourceRepo },
+            { "name": "SOURCE_OWNER", "value": tokens.sourceOwner },
             { "name": "GENERATOR", "value": tokens.engine }
           ],
           name: sails.config.build.containerName

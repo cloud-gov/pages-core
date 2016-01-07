@@ -157,7 +157,9 @@ var GithubModel = Backbone.Model.extend({
         sourceOwner: source.owner,
         sourceRepo: source.repository,
         destinationOrg: destination.organization,
-        destinationRepo: destination.repository
+        destinationRepo: destination.repository,
+        destinationBranch: destination.branch,
+        engine: destination.engine || 'jekyll'
       };
 
       $.ajax({
