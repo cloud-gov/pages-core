@@ -16,7 +16,8 @@ var AddSiteView = Backbone.View.extend({
   template: _.template(templateHtml),
   events: {
     'click a[type=submit]': 'onSubmitGithubRepo',
-    'click [data-action=fork-template]': 'onTemplateSelection'
+    'submit .new-site-form': 'onTemplateSelection',
+    'click [data-action=name-site]': 'showNewSiteForm'
   },
   initialize: function initializeSiteView(opts) {
     this.user = opts.user;
@@ -40,14 +41,20 @@ var AddSiteView = Backbone.View.extend({
     });
   },
   onTemplateSelection: function onTemplateSelection(e) {
-    var templateId = $(e.target).parents('.template-block').data('template');
-    var data = { templateId: templateId };
-    $.ajax('/v0/site/fork', {
-      method: 'POST',
-      data: data,
-      success: this.onSuccess.bind(this),
-      error: this.onError.bind(this)
-    });
+    e.preventDefault();
+    var data = $(e.target).parents('.template-block').data('template');
+    // initialize GitHub Model
+    // call github.clone()
+    // handle errors
+  },
+  showNewSiteForm: function showNewSiteForm(e) {
+    var $form = $('.new-site-form', $(e.target).parents('.template-block'));
+    var state = $form.attr('aria-hidden') === 'true';
+    $('.new-site-form').attr('aria-hidden', 'true');
+    if (state) {
+      $form.attr('aria-hidden', 'false');
+      $('[name="site-name"]', $(e.target).parents('.template-block')).focus();
+    }
   },
   onSuccess: function onSuccess(e) {
     this.collection.add(e);
