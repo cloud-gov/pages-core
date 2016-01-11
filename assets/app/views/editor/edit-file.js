@@ -99,7 +99,10 @@ var EditorView = Backbone.View.extend({
     this.editors.settings = CodeMirror(settingsEditorEl, {
       lineNumbers: true,
       mode: "yaml",
-      tabSize: 2
+      tabSize: 2,
+      extraKeys: {
+        Tab: false
+      }
     });
 
     if (doc.frontMatter || doc.frontMatter === '') {
@@ -162,7 +165,10 @@ var EditorView = Backbone.View.extend({
       $(contentEditorEl).empty(); // remove prosemirror
       this.editors.content = CodeMirror(contentEditorEl, {
         lineNumbers: true,
-        lineWrapping: true
+        lineWrapping: true,
+        extraKeys: {
+          Tab: false
+        }
       });
       this.editors.content.doc.setValue(this.doc.content || '');
     }
