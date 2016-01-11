@@ -9,23 +9,35 @@ module.exports = {
 
   clone: function cloneSite(req, res) {
     var data = {
-      owner: req.body.destinationOrg || req.user.username,
-      repository: req.body.destinationRepo,
-      defaultBranch: req.body.destinationBranch,
-      engine: req.body.engine,
-      user: req.user
+      owner: req.param('destinationOrg') || req.user.username,
+      repository: req.param('destinationRepo'),
+      defaultBranch: req.param('destinationBranch'),
+      engine: req.param('engine'),
+      users: [req.user.id]
     };
-    Site.create(data).populate('users').exec(function(err, site) {
+    Site.create(data).exec(function(err, site) {
       if (err) return res.serverError(err);
       var build = {
-        user: site.users[0].id,
-        site: model.id,
-        branch: model.defaultBranch,
+        user: req.user.id,
+        site: site.id,
+        branch: site.defaultBranch,
         source: {
-          repository: req.body.sourceRepo,
-          owner: req.body.sourceOwner
+          repository: req.param('sourceRepo'),
+          owner: req.param('sourceOwner')
         }
       };
+
+      // Delete the build that runs automatically when the site is created
+      Build.findOne({
+        where: { site: site.id },
+        sort: 'id ASC'
+      }).exec(function(err, model) {
+        Build.destroy({ id: model.id }).exec(function(err) {
+          if (err) sails.log.error(err);
+        });
+      });
+
+      // Create build with clone repo
       Build.create(build, function(err) {
         if (err) return res.serverError(err);
         res.send(site);

@@ -8,7 +8,11 @@ to set template data that is available to the front and back end apps */
 var SiteTemplates = require('../../../../config/templates').templates;
 
 var SiteModel = require('../../models/Site').model;
+var Github = require('./../../models/Github');
+
 var templateHtml = fs.readFileSync(__dirname + '/../../templates/site/add.html').toString();
+
+var decodeB64 = require('./../../helpers/encoding').decodeB64;
 
 var AddSiteView = Backbone.View.extend({
   tagName: 'div',
@@ -43,9 +47,21 @@ var AddSiteView = Backbone.View.extend({
   onTemplateSelection: function onTemplateSelection(e) {
     e.preventDefault();
     var data = $(e.target).parents('.template-block').data('template');
-    // initialize GitHub Model
-    // call github.clone()
-    // handle errors
+    var repo = $('[name="site-name"]', e.target).val();
+    this.github = new Github({
+      token: getToken(),
+      owner: data.owner,
+      repoName: data.repo,
+      branch: data.branch
+    }).clone({
+      owner: data.owner,
+      repository: data.repo
+    }, {
+      repository: repo
+    }, function(err, model) {
+      if (err) return this.onError(err);
+      this.onSuccess(model);
+    }.bind(this));
   },
   showNewSiteForm: function showNewSiteForm(e) {
     var $form = $('.new-site-form', $(e.target).parents('.template-block'));
@@ -57,7 +73,6 @@ var AddSiteView = Backbone.View.extend({
     }
   },
   onSuccess: function onSuccess(e) {
-    this.collection.add(e);
     this.trigger('site:save:success');
   },
   onError: function onError(e) {
@@ -73,3 +88,9 @@ var AddSiteView = Backbone.View.extend({
 });
 
 module.exports = AddSiteView;
+
+function getToken() {
+  var token = window.localStorage.getItem('token') || false;
+  if (!token) return false;
+  return decodeB64(token);
+}

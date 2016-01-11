@@ -18,8 +18,8 @@ module.exports = {
           config: model.site.config,
           repository: model.site.repository,
           owner: model.site.owner,
-          sourceRepo: model.source.repository,
-          sourceOwner: model.source.owner,
+          sourceRepo: model.source && model.source.repository,
+          sourceOwner: model.source && model.source.owner,
           token: (model.user.passport) ?
             model.user.passport.tokens.accessToken : ''
         },
@@ -48,8 +48,6 @@ module.exports = {
             { "name": "OWNER", "value": tokens.owner },
             { "name": "PREFIX", "value": tokens.prefix },
             { "name": "GITHUB_TOKEN", "value": tokens.token },
-            { "name": "SOURCE_REPO", "value": tokens.sourceRepo },
-            { "name": "SOURCE_OWNER", "value": tokens.sourceOwner },
             { "name": "GENERATOR", "value": tokens.engine }
           ],
           name: sails.config.build.containerName
@@ -58,6 +56,15 @@ module.exports = {
           QueueUrl: queueUrl,
           MessageBody: JSON.stringify(body)
         };
+
+    if (tokens.sourceRepo) body.environment.push({
+      "name": "SOURCE_REPO",
+      "value": tokens.sourceRepo
+    });
+    if (tokens.sourceOwner) body.environment.push({
+      "name": "SOURCE_OWNER",
+      "value": tokens.sourceOwner
+    });
 
     sqs.sendMessage(params, function(err, data) {
       if (err) error(err, model);

@@ -141,7 +141,9 @@ module.exports = {
       model.error = error;
 
       // Save updated model
-      model.save();
+      model.save(function(err) {
+        // We expect an error on first build after clone so do nothing
+      });
 
     }
 

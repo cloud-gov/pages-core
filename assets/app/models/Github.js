@@ -109,6 +109,8 @@ var GithubModel = Backbone.Model.extend({
    * @param {Object} destination - The destination repository.
    * @param {string} destination.repository - The destination repo's name.
    * @param {string} destination.organization - The destination repo's owner org (optional).
+   * @param {string} destination.branch - The destination repo's branch (optional).
+   * @param {string} destination.engine - The destination repo's build engine (optional).
    * @param {function} done - The callback function.
    */
   clone: function clone(source, destination, done) {
@@ -158,26 +160,26 @@ var GithubModel = Backbone.Model.extend({
         sourceRepo: source.repository,
         destinationOrg: destination.organization,
         destinationRepo: destination.repository,
-        destinationBranch: destination.branch,
+        destinationBranch: destination.branch || this.branch,
         engine: destination.engine || 'jekyll'
       };
-
       $.ajax({
         method: 'POST',
         dataType: 'json',
-        data: JSON.stringify(data),
+        data: data,
         url: url,
         success: done.bind(this, null),
         error: done
       });
-
     };
 
     if (done) async.series([
-      method.checkSource,
-      method.createRepo,
-      method.cloneRepo
+      method.checkSource.bind(this),
+      method.createRepo.bind(this),
+      method.cloneRepo.bind(this)
     ], done);
+
+    return this;
   },
   s3ConfigUrl: function (file) {
     var bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/,

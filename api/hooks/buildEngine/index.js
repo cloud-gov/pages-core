@@ -10,10 +10,10 @@ var hook = {
 
   jekyll: function(model, done) {
     var clone = (model.source) ?
-      'git clone -b ${branch} --single-branch ' +
-        'https://${token}@github.com/${source_owner}/${source_repo}.git ${source} && ' +
+      'cd ${source} && git clone -b ${branch} --single-branch ' +
+        'https://${token}@github.com/${source_owner}/${source_repo}.git . && ' +
         'git remote add destination https://${token}@github.com/${owner}/${repository}.git && ' +
-        'git push destination ${branch}' :
+        'git push destination ${branch} && cd -' :
       'git clone -b ${branch} --single-branch ' +
         'https://${token}@github.com/${owner}/${repository}.git ${source}';
 
