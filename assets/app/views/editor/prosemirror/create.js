@@ -1,6 +1,6 @@
 var _ = require('underscore');
 
-var ProseMirror = require('prosemirror/dist/edit').ProseMirror
+var ProseMirror = require('prosemirror/dist/edit').ProseMirror;
 var elt = require('prosemirror/dist/dom').elt;
 require('prosemirror/dist/menu/menubar'); // Load menubar module
 require('prosemirror/dist/parse/markdown');
@@ -14,10 +14,10 @@ var defaultSchema = ProseMirrorModel.defaultSchema;
 var AddImageView = require('../add-image');
 
 var defaultImageNode = defaultSchema.spec.nodes.image.type;
-var defaults = { default: '' }
-defaultImageNode.attributes['repo'] = new Attribute(defaults);
-defaultImageNode.attributes['branch'] = new Attribute(defaults);
-defaultImageNode.attributes['filePath'] = new Attribute(defaults);
+var defaults = { default: '' };
+defaultImageNode.attributes.repo = new Attribute(defaults);
+defaultImageNode.attributes.branch = new Attribute(defaults);
+defaultImageNode.attributes.filePath = new Attribute(defaults);
 
 defaultImageNode.prototype.parseMarkdown = [];
 defaultImageNode.register("parseMarkdown", {
@@ -45,7 +45,7 @@ defaultImageNode.prototype.serializeMarkdown = function (state, node) {
         title: node.attrs.title
       });
   state.write(leadingSpace + md);
-}
+};
 
 defaultImageNode.prototype.commands = [];
 defaultImageNode.attachCommand("insertImage", function(nodeType) {
@@ -79,7 +79,7 @@ defaultImageNode.attachCommand("insertImage", function(nodeType) {
     display: "icon",
     menuGroup: "inline",
     menuRank: 99
-  }
+  };
 });
 
 var customNodes = {};
@@ -95,4 +95,4 @@ module.exports = function create(placeEl) {
   });
 
   return editor;
-}
+};
