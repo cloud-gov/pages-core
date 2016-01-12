@@ -7,7 +7,8 @@ var Document = require('./../../../../assets/app/models/Document');
 
 var data = {
   yml: fs.readFileSync(path.resolve(__dirname, '../data/settings.yml')).toString(),
-  markdown: fs.readFileSync(path.resolve(__dirname, '../data/document.md')).toString()
+  markdown: fs.readFileSync(path.resolve(__dirname, '../data/document.md')).toString(),
+  hr: fs.readFileSync(path.resolve(__dirname, '../data/horizontal-rule.md')).toString()
 };
 
 before(function() {
@@ -43,6 +44,12 @@ describe('Document model', function () {
     var exported = document.toMarkdown();
     assert.equal(exported, data.markdown);
   });
+
+  it('should handle horizontal rules in body text', function () {
+    var document = new Document({ content: data.hr, fileExt: 'md' });
+    var exported = document.toMarkdown();
+    assert.equal(exported, data.hr);
+  })
 
 
 });

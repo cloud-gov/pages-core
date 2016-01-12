@@ -4,6 +4,8 @@ var querystring = require('querystring');
 var sinon = require('sinon');
 var async = require('async');
 
+var helpers = require('./githubHelpers');
+
 var mockData = JSON.stringify(require('../data/repoResponse.json'));
 var mockCommitResponse = JSON.stringify(require('../data/commitResponse.json'));
 
@@ -24,18 +26,18 @@ describe('Github model', function () {
   });
 
   it('should create with token and repo', function () {
-    var github = new Github(getOpts());
+    var github = new Github(helpers.getOpts());
 
-    server.respondWith('GET', makeUrl(), mockResponse(mockData));
+    server.respondWith('GET', helpers.makeUrl(), helpers.mockResponse(mockData));
     server.respond();
 
     assert.equal(github.get('owner'), '18f');
   });
 
   it('should add a page', function (done) {
-    var github = new Github(getOpts());
+    var github = new Github(helpers.getOpts());
 
-    server.respondWith('GET', makeUrl(), mockResponse(mockData));
+    server.respondWith('GET', helpers.makeUrl(), helpers.mockResponse(mockData));
     server.respond();
 
     var commitOpts = {
@@ -55,13 +57,13 @@ describe('Github model', function () {
     });
 
     github.commit(commitOpts);
-    server.respondWith('PUT', makeUrl('test.md'), mockResponse(mockCommitResponse, 201));
+    server.respondWith('PUT', helpers.makeUrl('test.md'), helpers.mockResponse(mockCommitResponse, 201));
     server.respond();
   });
 
   it('should format URLs correctly', function(done) {
     var root = 'https://api.github.com/',
-        github = new Github(getOpts());
+        github = new Github(helpers.getOpts());
 
     function url(o) { return github.url(o).replace(root, '').split('?')[0]; }
     function param(o) { return querystring.parse(github.url(o).split('?')[1]); }
@@ -89,7 +91,7 @@ describe('Github model', function () {
   });
 
   it('should reject malformed requests to clone a repository', function(done) {
-    var github = new Github(getOpts());
+    var github = new Github(helpers.getOpts());
 
     // validate function call
     async.series([
@@ -112,11 +114,11 @@ describe('Github model', function () {
   });
 
   it('should check source repo permissions before cloning', function(done) {
-    var github = new Github(getOpts());
+    var github = new Github(helpers.getOpts());
     var source = { owner: '18f', repository: 'federalist' };
     var destination = { repository: 'test-repo' };
     var url = 'https://api.github.com/repos/18f/federalist' +
-      '?access_token=' + getOpts().token + '&ref=master';
+      '?access_token=' + helpers.getOpts().token + '&ref=master';
 
     server.respondWith('GET', url, [200, {}, '{}']);
 
@@ -135,11 +137,11 @@ describe('Github model', function () {
   });
 
   it('should create a new repo before cloning', function(done) {
-    var github = new Github(getOpts());
+    var github = new Github(helpers.getOpts());
     var source = { owner: '18f', repository: 'federalist' };
     var destination =  { repository: 'test-repo' };
     var url = 'https://api.github.com/user/repos' +
-      '?access_token=' + getOpts().token + '&ref=master';
+      '?access_token=' + helpers.getOpts().token + '&ref=master';
 
     server.respondWith('POST', url, [200, {}, '{}']);
 
@@ -158,11 +160,11 @@ describe('Github model', function () {
   });
 
   it('should create a new org repo before cloning', function(done) {
-    var github = new Github(getOpts());
+    var github = new Github(helpers.getOpts());
     var source = { owner: '18f', repository: 'federalist' };
     var destination = { organization: '18f', repository: 'test-repo' };
     var url = 'https://api.github.com/orgs/18f/repos' +
-      '?access_token=' + getOpts().token + '&ref=master';
+      '?access_token=' + helpers.getOpts().token + '&ref=master';
 
     server.respondWith('POST', url, [200, {}, '{}']);
 
@@ -182,7 +184,7 @@ describe('Github model', function () {
 
   it('should submit a request to clone a repo', function(done) {
     var url = '/v0/site/clone';
-    var github = new Github(getOpts());
+    var github = new Github(helpers.getOpts());
     var source = { owner: '18f', repository: 'federalist' },
         destination = {
           repository: 'test-repo',
@@ -216,7 +218,7 @@ describe('Github model', function () {
 
   it('should submit a request to clone a repo to an org', function(done) {
     var url = '/v0/site/clone';
-    var github = new Github(getOpts());
+    var github = new Github(helpers.getOpts());
     var source = { owner: '18f', repository: 'federalist' },
         destination = {
           organization: '18f',
@@ -252,54 +254,3 @@ describe('Github model', function () {
 afterEach(function () {
   server.restore();
 });
-
-/**
- * Get config opts for the 18f/federalist repository
- */
-function getOpts() {
-  var opts = {
-    token: 'FAKETOKEN',
-    owner: '18f',
-    repoName: 'federalist',
-    branch: 'master'
-  };
-
-  return opts;
-}
-
-/**
- * Makes a consistent GH API URL for the 18f/federalist repository
- * @param {string} path - the path within the repo; defaults to root
- */
-function makeUrl(path) {
-  var opts = getOpts();
-  var qs = {
-    'access_token': opts.token,
-    ref: opts.branch
-  };
-  var baseUrl = [
-    'https://api.github.com/repos',
-    '18f',
-    'federalist',
-    'contents'
-  ];
-
-  if (path) baseUrl.push(path);
-  return [baseUrl.join('/'), querystring.stringify(qs)].join('?');
-}
-
-/**
- * Makes a consistent mocked HTTP response for Sinon
- * @param {string} data - the body of the response
- * @param {integer} status (optional) - HTTP status code to return
- */
-function mockResponse(data, status) {
-  status = status || 200;
-  var headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*"
-  };
-  var req = [status, headers, data];
-
-  return req;
-}

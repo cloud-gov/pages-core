@@ -1,0 +1,18 @@
+{
+  "name": "README.md",
+  "path": "README.md",
+  "sha": "6100501af1e672bff77dff5c828a797762a52e85",
+  "size": 1166,
+  "url": "https://api.github.com/repos/18f/federalist/contents/README.md?ref=master",
+  "html_url": "https://github.com/18f/federalist/blob/master/README.md",
+  "git_url": "https://api.github.com/repos/18f/federalist/git/blobs/6100501af1e672bff77dff5c828a797762a52e85",
+  "download_url": "https://raw.githubusercontent.com/18f/federalist/master/README.md",
+  "type": "file",
+  "content": "LS0tCmZvbzogYmFyCnRpdGxlOiBSRUFETUUKb3RoZXI6IHRoaW5ncwotLS0K\nIyBPcGVuICoqU291cmNlKiogUHJvZ3JhbSBUZW1wbGF0ZQoKVGhpcyBpcyBh\nIHRlbXBsYXRlIGZvciBhbiBhZHZhbmNlZCBtaWNyb3NpdGUuCgotLS0KCiMj\nIyBEZXBlbmRlbmNpZXMKCiogW0pla3lsbF0oaHR0cDovL2pla3lsbHJiLmNv\nbS8pIGFzIHRoZSByZW5kZXJpbmcgYW5kIHBhcnNpbmcgZW5naW5lLCBhbmQK\nCiogW0RPQ3Rlcl0oaHR0cHM6Ly9naXRodWIuY29tL0NGUEIvRE9DdGVyKSBh\ncyB0aGUgdGVtcGxhdGUgYW5kIHRoZW1lCgpQbGVhc2UgcmVmZXIgdG8gdGhv\nc2Ugc2l0ZXMgZm9yIGluZm9ybWF0aW9uIG9uIGdldHRpbmcgc3RhcnRlZCBh\nbmQgY29uZmlndXJhdGlvbi4gV2UnbGwgYWRkcmVzcwoqc29tZSogY29uZmln\ndXJhdGlvbiBoZXJlIGFuZCwgd2hlcmUgcHJhY3RpY2FsLCB3aWxsIHJlZmVy\nIHlvdSB0byBkZXRhaWxzLgoKIyMjIEdldHRpbmcgc3RhcnRlZAoKKiBDbG9u\nZSB0aGlzIHJlcG8KCiogU2V0IGBnaC1wYWdlc2AgYXMgdGhlIGRlZmF1bHQg\nYnJhbmNoCgoqIFBvaW50IHlvdXIgd2ViIGJyb3dzZXIgdG8gaHR0cDovL3Vz\nZXJuYW1lLmdpdGh1Yi5pby9taWNyb3NpdGUtdGVtcGxhdGUKCiogVGhlICJI\nb3cgdG8gQ29uZmlndXJlIFRoaXMgU2l0ZSIgcGFnZSBoYXMgZGV0YWlsZWQg\naW5zdHJ1Y3Rpb25cfnMgb24gY29uZmlndXJpbmcgdGhlIHNpdGUKCiogRWRp\ndCBjb250ZW50IHdpdGggeW91ciBmYXZvcml0ZSBlZGl0b3Igb3IgcHJvc2Uu\naW8KCi0tLQoKIyMgTGljZW5zZQoKVGhlIHByb2plY3QgaXMgaW4gdGhlIHB1\nYmxpYyBkb21haW4sIGFuZCBhbGwgY29udHJpYnV0aW9ucyB0byBpdCB3aWxs\nIGJlIHJlbGVhc2VkIGFzIHN1Y2guIEJ5IHN1Ym1pdHRpbmcgYSBwdWxsIHJl\ncXVlc3QsIHlvdSBhcmUgYWdyZWVpbmcgdG8gd2FpdmUgYWxsIHJpZ2h0cyB0\nbyB5b3VyIGNvbnRyaWJ1dGlvbiB1bmRlciB0aGUgdGVybXMgb2YgdGhlIFtD\nQzAgUHVibGljIERvbWFpbiBEZWRpY2F0aW9uXShodHRwOi8vY3JlYXRpdmVj\nb21tb25zLm9yZy9wdWJsaWNkb21haW4vemVyby8xLjAvKS4KCklmIHlvdSBj\nb250cmlidXRlIHRoZSBvcGVuIHNvdXJjZSB3b3JrIG9mIG90aGVycywgcGxl\nYXNlIG1hcmsgaXQgY2xlYXJseSBpbiB5b3VyIHB1bGwgcmVxdWVzdC4=\n",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/18f/federalist/contents/README.md?ref=master",
+    "git": "https://api.github.com/repos/18f/federalist/git/blobs/6100501af1e672bff77dff5c828a797762a52e85",
+    "html": "https://github.com/18f/federalist/blob/master/README.md"
+  }
+}

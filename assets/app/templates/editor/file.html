@@ -3,19 +3,33 @@
 
 <div class="editor">
 
-
   <div class="usa-grid">
-    <div class="usa-grid-one-whole">
-      <form id="content">
-        <div data-target="content"></div>
+    <% if (settingsDisplayStyle == 'whitelist') { %>
+    <div class="usa-width-one-half">
+      <form id="whitelist">
       </form>
     </div>
+    <div class="usa-width-one-half">
+      <label for="settings">Other settings</label>
+      <form id="settings">
+        <div data-target="settings"></div>
+      </form>
+    </div>
+    <% } else { %>
+    <div class="usa-width-one-whole">
+      <label for="settings">Page settings</label>
+      <form id="settings">
+        <div data-target="settings"></div>
+      </form>
+    </div>
+    <% } %>
   </div>
 
   <div class="usa-grid">
-    <div class="usa-grid-one-whole">
-      <form id="metadata">
-        <div data-target="metadata"></div>
+    <div class="usa-width-one-whole">
+      <label for="content">Page Content</label>
+      <form id="content">
+        <div data-target="content"></div>
       </form>
     </div>
   </div>
