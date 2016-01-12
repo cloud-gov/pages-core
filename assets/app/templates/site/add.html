@@ -15,26 +15,19 @@
 </div>
 <div class="usa-grid">
   <% for (var templateKey in siteTemplates) { %>
+    <div class="usa-width-one-third template-block" data-template="<%- templateKey %>">
     <% template = siteTemplates[templateKey]; %>
-    <div class="usa-width-one-third template-block" data-template='<% print(JSON.stringify(template)) %>'>
       <div class="usa-alert usa-alert-info">
         <div class="usa-alert-heading">
           <h3><%= template.title %></h3>
         </div>
         <div class="usa-alert-text">
-          <a data-action="name-site" class="thumbnail">
+          <a href="#" data-action="fork-template" class="thumbnail">
             <img src="/images/<%= templateKey %>.thumb.png" alt="Thumbnail screenshot for the <%= template.title %> template">
           </a>
           <p><%= template.description %></p>
-          <div class="button_wrapper">
-            <a class="usa-button usa-button-outline" href="<%= template.example %>" target="_blank" role="button">Example</a>
-            <a class="usa-button" data-action="name-site" role="button">Use this template</a>
-          </div>
-          <form class="new-site-form" aria-hidden="true">
-            <label for="site-name">Name your new site</label>
-            <input name="site-name" type="text">
-            <input type="submit" value="Create site">
-          </form>
+          <a class="usa-button usa-button-outline" href="<%= template.example %>" target="_blank" role="button">Example</a>
+          <a class="usa-button usa-button-primary" data-action="fork-template" role="button">Use this template</a>
         </div>
       </div>
     </div>

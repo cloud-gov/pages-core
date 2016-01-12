@@ -100,7 +100,7 @@ var EditView = Backbone.View.extend({
           };
 
       self.model.commit(commit);
-    };
+    }
 
     fileReader.readAsDataURL(e);
   }

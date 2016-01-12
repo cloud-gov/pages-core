@@ -30,7 +30,8 @@ function makeUrl(path) {
   var opts = getOpts();
   var qs = {
     'access_token': opts.token,
-    ref: opts.branch
+    ref: opts.branch,
+    z: 6543
   };
   var baseUrl = [
     'https://api.github.com/repos',
