@@ -1,4 +1,3 @@
-var _ = require('underscore');
 var $ = require('jquery');
 var async = require('async');
 var Backbone = require('backbone');
@@ -8,7 +7,7 @@ var encodeB64 = require('../helpers/encoding').encodeB64;
 
 var GithubModel = Backbone.Model.extend({
   initialize: function (opts) {
-    opts = opts || {};
+    var opts = opts || {};
     if (!opts.token) throw new Error('Must provide Github OAuth token');
 
     this.owner = opts.owner;
@@ -30,20 +29,16 @@ var GithubModel = Backbone.Model.extend({
     return this;
   },
   url: function (opts) {
-    opts = opts || {};
-    var ghUrl = 'https://api.github.com',
-        route = opts.route || 'repos',
-        owner = opts.owner || this.owner,
-        repository = opts.repository || this.name,
-        baseUrl = [ghUrl, route],
-        qs = $.param(_.extend({
+    var opts = opts || {},
+        ghUrl = 'https://api.github.com/repos',
+        baseUrl   = [ghUrl, this.owner, this.name, 'contents'],
+        qs = $.param({
           access_token: this.token,
-          ref: this.branch
-        }, opts.params || {}));
+          ref: this.branch,
+          z: 6543
+        });
 
-    if (opts.method) baseUrl.push(opts.method);
-    else if (opts.root) baseUrl.push(owner, repository);
-    else baseUrl.push(owner, repository, 'contents');
+    if (opts.root) return [baseUrl.join('/'), qs].join('?');
 
     if (opts.path) baseUrl.push(opts.path);
     else if (this.file) baseUrl.push(this.file);
@@ -101,86 +96,6 @@ var GithubModel = Backbone.Model.extend({
       }
     });
   },
-  /*
-   * Clone a repository to the user's account.
-   * @param {Object} source - The source repo to clone.
-   * @param {string} source.owner - The source repo's owner.
-   * @param {string} source.repository - The source repo's name.
-   * @param {Object} destination - The destination repository.
-   * @param {string} destination.repository - The destination repo's name.
-   * @param {string} destination.organization - The destination repo's owner org (optional).
-   * @param {string} destination.branch - The destination repo's branch (optional).
-   * @param {string} destination.engine - The destination repo's build engine (optional).
-   * @param {function} done - The callback function.
-   */
-  clone: function clone(source, destination, done) {
-    var model = this;
-    var method = model.clone;
-    var err;
-
-    if (!source || !source.owner || !source.repository || !destination) {
-      err = new Error('Missing source or destination');
-      return done ? done(err) : err;
-    }
-
-    method.checkSource = function checkDestination(done) {
-      var url = model.url({
-        root: true, owner: source.owner, repository: source.repository
-      });
-
-      $.ajax({
-        dataType: 'json',
-        url: url,
-        success: done.bind(this, null),
-        error: done
-      });
-    };
-
-    method.createRepo = function createRepo(done) {
-      var route = destination.organization ?
-        'orgs/' + destination.organization : 'user';
-      var url = model.url({ route: route, method: 'repos' });
-      var data = { name: destination.repository };
-
-      $.ajax({
-        method: 'POST',
-        dataType: 'json',
-        data: JSON.stringify(data),
-        url: url,
-        success: done.bind(this, null),
-        error: done
-      });
-
-    };
-
-    method.cloneRepo = function cloneRepo(done) {
-      var url = '/v0/site/clone';
-      var data = {
-        sourceOwner: source.owner,
-        sourceRepo: source.repository,
-        destinationOrg: destination.organization,
-        destinationRepo: destination.repository,
-        destinationBranch: destination.branch || this.branch,
-        engine: destination.engine || 'jekyll'
-      };
-      $.ajax({
-        method: 'POST',
-        dataType: 'json',
-        data: data,
-        url: url,
-        success: done.bind(this, null),
-        error: done
-      });
-    };
-
-    if (done) async.series([
-      method.checkSource.bind(this),
-      method.createRepo.bind(this),
-      method.cloneRepo.bind(this)
-    ], done);
-
-    return this;
-  },
   s3ConfigUrl: function (file) {
     var bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/,
         siteRoot = (this.site) ? this.site.get('siteRoot') : '',
@@ -219,14 +134,14 @@ var GithubModel = Backbone.Model.extend({
               //json: res.responseJSON || yaml.parse(res.responseText)
             };
             try {
-              r.json = res.responseJSON || yaml.parse(res.responseText);
+              r.json = res.responseJSON || yaml.parse(res.responseText)
             } catch (e) {
-              r.json = [];
+              r.json = []
             }
             callback(null, r);
           }
         });
-      };
+      }
     });
 
     async.parallel(getFiles, function (err, results) {
@@ -241,7 +156,7 @@ var GithubModel = Backbone.Model.extend({
         };
       });
 
-      self.trigger('github:fetchConfig:success');
+      self.trigger('github:fetchConfig:success')
     });
 
     return this;

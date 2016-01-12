@@ -22,11 +22,10 @@ describe('Build Model', function() {
 
   describe('.addJob', function() {
     it('should add job to queue', function(done) {
-      var original = Build.queue;
-      sails.hooks[sails.config.build.engine].jekyll = function() {
-        return done();
-      };
+      sinon.spy(Build.queue, 'push');
       Build.addJob({ id: 1, site: { engine: 'jekyll' }, user: {}});
+      Build.queue.push.restore();
+      done();
     });
   });
 
@@ -37,9 +36,8 @@ describe('Build Model', function() {
         assert(Build.findOne.called);
         Build.findOne = findOne;
         done();
-        return { exec: function() { } };
       });
-      Build.completeJob(null, { id: 1, user: {}, site: {} });
+      Build.addJob({ id: 1 });
     });
   });
 

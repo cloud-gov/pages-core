@@ -30,9 +30,6 @@ module.exports = {
     user: {
       model: 'user',
       required: true
-    },
-    source: {
-      type: 'json'
     }
   },
 
@@ -141,9 +138,7 @@ module.exports = {
       model.error = error;
 
       // Save updated model
-      model.save(function(err) {
-        // We expect an error on first build after clone so do nothing
-      });
+      model.save();
 
     }
 

@@ -63,7 +63,6 @@ module.exports.policies = {
     'destroy': ['passport', 'sessionAuth', 'filterCurrentUser'],
     'find': ['passport', 'sessionAuth', 'filterCurrentUser'],
     'findOne': ['passport', 'sessionAuth', 'filterCurrentUser'],
-    'clone': ['passport', 'sessionAuth'],
     'fork': ['passport', 'sessionAuth'],
     'lock': ['passport', 'sessionAuth'],
     'unlock': ['passport', 'sessionAuth'],
