@@ -104,7 +104,7 @@ module.exports = {
    * @param {Boolean} skipped build?
    */
   completeJob: function(err, model, skip) {
-
+    if (!model) return;
     sails.log.verbose('Completed job: ', model.id);
 
     // Reset associated models to ids
