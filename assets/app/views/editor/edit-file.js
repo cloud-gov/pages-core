@@ -14,6 +14,7 @@ var decodeB64 = require('../../helpers/encoding').decodeB64;
 var Document = require('../../models/Document');
 
 var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/file.html').toString();
+var whitelistFieldHtml = fs.readFileSync(__dirname + '/../../templates/editor/whitelist-field.html').toString();
 
 var EditorView = Backbone.View.extend({
   tagName: 'div',
@@ -22,67 +23,31 @@ var EditorView = Backbone.View.extend({
   },
   template: _.template(templateHtml),
   initialize: function (opts) {
-    var self      = this,
-        file      = [
-                      self.model.get('owner'),
-                      self.model.get('repoName'),
-                      self.model.get('branch'),
-                      self.model.get('file')
-                    ].join('/'),
-        raw, content, settingsEditorEl, contentEditorEl;
+    var self      = window.z = this,
+        file      = this.filePathFromModel(this.model),
+        fileExt   = this.fileExtensionFromName(this.model.get('file')),
+        html      = {
+          fileName: this.model.get('file')
+        };
 
     this.editors = {};
     this.path = opts.path;
     this.isNewPage = opts.isNewPage || false;
+    this.settingsFields = this.extendSettingFields(opts.settingsFields);
 
     this.model.on('github:commit:success', this.saveSuccess.bind(this));
     this.model.on('github:commit:error', this.saveFailure.bind(this));
 
-    if (!this.isNewPage) {
-      raw = decodeB64(this.model.attributes.json.content);
-      content = this.cleanContent(raw);
-      this.doc = new Document({
-        fileExt: this.model.get('file').split('.')[1],
-        content: content
-      });
-    }
-    else {
-      this.doc = new Document({
-        fileExt: 'md',
-        content: ['---', this.model.getDefaults(), '---', '\n'].join('\n')
-      });
-    }
-
-    this.$el.html(this.template({ fileName: this.model.get('file') }));
-
-    settingsEditorEl = this.$('[data-target=metadata]')[0];
-    this.editors.settings = CodeMirror(settingsEditorEl, {
-      lineNumbers: true,
-      mode: "yaml",
-      tabSize: 2
+    this.doc = this.initializeDocument({
+      fileExt: fileExt,
+      isNewPage: this.isNewPage
     });
 
-    if (this.doc.frontMatter) {
-      this.editors.settings.doc.setValue(this.doc.frontMatter);
-    }
+    html.settingsDisplayStyle = this.getSettingsDisplayStyle(this.doc);
 
-    contentEditorEl = this.$('[data-target=content]')[0];
-    try {
-      // try to load content into prosemirror
-      this.editors.content = this.editors.content || createProseMirror(contentEditorEl);
-      this.editors.content.setContent(this.doc.content || '', 'markdown');
-    }
-    catch (e) {
-      // if prosemirror errors out, use codemirror
-      $(contentEditorEl).empty(); // remove prosemirror
-      this.editors.content = CodeMirror(contentEditorEl, {
-        lineNumbers: true,
-        lineWrapping: true
-      });
-      this.editors.content.doc.setValue(this.doc.content || '');
-    }
-
-    if (!this.doc.content) $(contentEditorEl).hide();
+    this.$el.html(this.template(html));
+    this.initializeSettingsEditor(this.doc);
+    this.initializeContentEditor(this.doc, fileExt);
 
     io.socket.get('/v0/site/lock', { file: file }, function(data) {
 
@@ -105,6 +70,112 @@ var EditorView = Backbone.View.extend({
     });
 
     return this;
+  },
+  initializeDocument: function (opts) {
+    var fileExt = opts.fileExt,
+        content, doc, raw;
+
+    if (!opts.isNewPage) {
+      raw = decodeB64(this.model.attributes.json.content);
+      content = this.cleanContent(raw);
+      doc = new Document({
+        fileExt: fileExt,
+        content: content
+      });
+    }
+    else {
+      doc = new Document({
+        fileExt: 'md',
+        content: ['---', this.model.getDefaults(), '---', '\n'].join('\n')
+      });
+    }
+
+    return doc;
+  },
+  initializeSettingsEditor: function (doc) {
+    var settings, settingsEditorEl;
+
+    settingsEditorEl = this.$('[data-target=settings]')[0];
+    this.editors.settings = CodeMirror(settingsEditorEl, {
+      lineNumbers: true,
+      mode: "yaml",
+      tabSize: 2,
+      extraKeys: {
+        Tab: false
+      }
+    });
+
+    if (doc.frontMatter || doc.frontMatter === '') {
+      this.settings = this.parseSettings(doc);
+      this.editors.settings.doc.setValue(this.settings.remaining);
+    }
+  },
+  extendSettingFields: function (fields) {
+    var f = _.extend({
+      title: {
+        type: 'text'
+      },
+      layout: {
+        type: 'select',
+        options: this.model.getLayouts()
+      },
+      author: {
+        type: 'text'
+      },
+      date: {
+        type: 'date'
+      }
+    }, fields || {});
+
+    return f;
+  },
+  parseSettings: function (doc) {
+    var self = this,
+        y = yaml.parse(doc.frontMatter) || {},
+        whitelist;
+
+    whitelist = Object.keys(y).filter(function(k) {
+      return self.settingsFields[k];
+    }).map(function(k) {
+      var r = {
+        name: k,
+        label: k,
+        type: self.settingsFields[k].type,
+        value: y[k]
+      };
+      if (r.type === 'select') r.options = self.settingsFields[k].options;
+      delete y[k];
+      return r;
+    });
+
+    return {
+      whitelist: whitelist,
+      remaining: yaml.dump(y)
+    };
+  },
+  initializeContentEditor: function (doc, fileExt) {
+    var contentEditorEl = this.$('[data-target=content]')[0];
+    try {
+      // try to load content into prosemirror
+      this.editors.content = this.editors.content || createProseMirror(contentEditorEl);
+      this.editors.content.setContent(doc.content || '', 'markdown');
+    }
+    catch (e) {
+      // if prosemirror errors out, use codemirror
+      $(contentEditorEl).empty(); // remove prosemirror
+      this.editors.content = CodeMirror(contentEditorEl, {
+        lineNumbers: true,
+        lineWrapping: true,
+        extraKeys: {
+          Tab: false
+        }
+      });
+      this.editors.content.doc.setValue(this.doc.content || '');
+    }
+
+    if (fileExt != 'md' && fileExt != 'markdown') {
+      $(contentEditorEl).parents('.usa-grid').first().hide();
+    }
   },
 
   lockContent: function(data) {
@@ -138,9 +209,11 @@ var EditorView = Backbone.View.extend({
 
     }
   },
-
   render: function () {
-    var self = this;
+    var self = this,
+        settingsDisplayStyle = this.getSettingsDisplayStyle(this.doc);
+
+    if (settingsDisplayStyle === 'whitelist') this.renderWhitelistSettings();
 
     window.setTimeout(function() {
       self.editors.settings.refresh();
@@ -151,17 +224,30 @@ var EditorView = Backbone.View.extend({
 
     return this;
   },
+  renderWhitelistSettings: function () {
+    var self = this,
+        html = _.template(whitelistFieldHtml),
+        target = this.$('#whitelist');
+
+    target.empty();
+    this.settings.whitelist.forEach(function(w) {
+      if (w.type === 'date') w.value = self.toIsoDateString(w.value);
+      var el = html(w);
+      target.append(el);
+    });
+  },
   /**
    * Replace {{ site.baseurl }} with Github URL so assets load
    *
    * @param {string} content
    * @return {string} content - with replaced baseUrls
    */
-  cleanContent: function (content) {
+  cleanContent: function (content, model) {
+    model = model || this.model;
     var baseUrl = ["https://raw.githubusercontent.com",
-                    this.model.owner,
-                    this.model.name,
-                    this.model.branch
+                    model.owner,
+                    model.name,
+                    model.branch
                   ].join('/');
 
     content = content.replace(/{{ site.baseurl }}/g, baseUrl);
@@ -191,7 +277,10 @@ var EditorView = Backbone.View.extend({
     this.$('#save-status-result').text(status);
   },
   saveDocument: function (e) {
-    var self = this, settings, content, pageTitle;
+    var self = this,
+        settings = this.getSettingsFromEditor(),
+        content = this.getContentFromEditor(),
+        pageTitle;
 
     e.preventDefault(); e.stopPropagation();
 
@@ -199,6 +288,67 @@ var EditorView = Backbone.View.extend({
     this.$('#save-status-result').removeClass('label-success');
     this.$('#save-status-result').removeClass('label-danger');
     this.$('#save-status-result').text('Saving...');
+
+    this.doc.frontMatter = false;
+
+    if (settings) this.doc.frontMatter = settings;
+    if (content) this.doc.content = content;
+
+    if (this.isNewPage) {
+      this.saveNewDocument();
+    }
+    else {
+      this.model.commit({
+        content: this.doc.toMarkdown(),
+        message: this.$('#save-content-message').val()
+      });
+    }
+
+    return this;
+  },
+  saveNewDocument: function () {
+    var self = this;
+
+    try {
+      pageTitle = this.fileNameFromTitle(yaml.parse(this.settings).title);
+    } catch (error) {
+      pageTitle = (new Date()).getTime().toString();
+    }
+
+    pageTitle = [pageTitle.replace(/\W/g, '-'), 'md'].join('.');
+
+    this.listenToOnce(this.model, 'github:commit:success', function(m){
+      var owner = self.model.get('owner'),
+          repoName  = self.model.get('repoName'),
+          branch = self.model.get('branch'),
+          url = ['#edit', owner, repoName, branch, m.request.path].join('/');
+
+      window.location.hash = url;
+    });
+
+    this.model.commit({
+      path: ['pages', pageTitle].join('/'),
+      content: this.doc.toMarkdown(),
+      message: 'Created ' + ['pages', pageTitle].join('/')
+    });
+  },
+  getSettingsFromEditor: function () {
+    var self = this,
+        remaining = this.editors.settings.doc.getValue(),
+        whitelist = this.settings.whitelist.map(function (v) {
+          var sel = '[name=' + v.name + ']', value;
+          if (v.type === 'boolean') {
+            sel += ':checked';
+          }
+
+          value = self.$(sel).val();
+          return [v.name, value].join(': ');
+        }).join('\n');
+
+    return [whitelist, remaining].join('\n');
+  },
+  getContentFromEditor: function () {
+    var content;
 
     if (this.editors.content && this.editors.content.content) {
       // ProseMirror is loaded as content editor
@@ -209,51 +359,40 @@ var EditorView = Backbone.View.extend({
       content = this.editors.content.doc.getValue();
     }
 
-    this.doc.frontMatter = false;
-    settings = this.editors.settings.doc.getValue();
-    if (settings) this.doc.frontMatter = settings;
-    if (content) this.doc.content = content;
-
-    if (this.isNewPage) {
-      try {
-        pageTitle = fileNameFromTitle(yaml.parse(settings).title);
-      } catch (error) {
-        pageTitle = (new Date()).getTime().toString();
-      }
-
-      pageTitle = [pageTitle.replace(/\W/g, '-'), 'md'].join('.');
-
-      this.listenToOnce(this.model, 'github:commit:success', function(m){
-        var owner = self.model.get('owner'),
-            repoName  = self.model.get('repoName'),
-            branch = self.model.get('branch'),
-            url = ['#edit', owner, repoName, branch, m.request.path].join('/');
-
-        window.location.hash = url;
-      });
-
-      this.model.commit({
-        path: ['pages', pageTitle].join('/'),
-        content: this.doc.toMarkdown(),
-        message: 'Created ' + ['pages', pageTitle].join('/')
-      });
+    return content;
+  },
+  getSettingsDisplayStyle: function (doc) {
+    if (doc.fileExt == 'md' || doc.fileExt == 'markdown') {
+      if (!doc.frontMatter) return 'regular';
+      else return 'whitelist';
     }
-    else {
-      this.model.commit({
-        content: this.doc.toMarkdown(),
-        message: this.$('#save-content-message').val()
-      });
-    }
+    return 'only';
+  },
+  toIsoDateString: function (date) {
+    var d = (date) ? new Date(date) : new Date();
+    return d.toISOString().substring(0, 10);
+  },
+  filePathFromModel: function (model) {
+    return [
+      model.get('owner'),
+      model.get('repoName'),
+      model.get('branch'),
+      model.get('file')
+    ].join('/');
+  },
+  fileNameFromTitle: function (title) {
+    var unique = (new Date()).valueOf();
+    title = title || unique.toString();
 
-    return this;
+    return title.toLowerCase();
+  },
+  fileExtensionFromName: function (name) {
+    var r = /\.[0-9a-z]+$/i,
+        match = name.match(r);
+        ext = (match) ? match[0].split('.')[1] : false;
+
+    return ext;
   }
 });
-
-function fileNameFromTitle (title) {
-  var unique = (new Date()).valueOf();
-  title = title || unique.toString();
-
-  return title.toLowerCase();
-}
 
 module.exports = EditorView;
