@@ -19,6 +19,9 @@ module.exports = {
           Bucket: sails.config.build.s3Bucket,
           Key: key
         }).on('httpHeaders', function(statusCode, headers) {
+          var redirect = headers['x-amz-website-redirect-location'] ||
+            headers['X-Amz-Website-Redirect-Location'];
+          if (redirect) return res.redirect(redirect);
           res.set(headers);
         }),
         stream = object.createReadStream().on('error', function(error) {
