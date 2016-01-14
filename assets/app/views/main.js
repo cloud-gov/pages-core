@@ -24,7 +24,11 @@ var AppView = Backbone.View.extend({
     this.render();
   },
   render: function () {
-    this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.el);
+    this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.el, {
+      show: function(view) {
+        document.body.scrollTop = 0;
+      }
+    });
   },
   home: function () {
     var authed = this.user.isAuthenticated(),
@@ -35,6 +39,8 @@ var AppView = Backbone.View.extend({
           'default': 'An unexpected error occured. Please try again. If you continue to see this message, please let us know.'
         },
         message = error && (messages[error] || messages['default']);
+
+    federalist.navigate('');
 
     // Clear any existing errors
     $('.alert-container').html('');
@@ -64,9 +70,7 @@ var AppView = Backbone.View.extend({
         });
     this.pageSwitcher.set(addSiteView);
 
-    this.listenToOnce(addSiteView, 'site:save:success', function () {
-      federalist.navigate('', { trigger: true });
-    }.bind(this));
+    this.listenToOnce(addSiteView, 'site:save:success', this.home);
 
     return this;
   },
@@ -85,9 +89,7 @@ var AppView = Backbone.View.extend({
   editSite: function(id) {
     var siteEditView = new SiteEditView({ model: this.sites.get(id) });
     this.pageSwitcher.set(siteEditView);
-    this.listenToOnce(siteEditView, 'site:save:success', function () {
-      federalist.navigate('', { trigger: true });
-    }.bind(this));
+    this.listenToOnce(siteEditView, 'site:save:success', this.home);
     return this;
   },
   builds: function(id) {
