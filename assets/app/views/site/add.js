@@ -48,6 +48,14 @@ var AddSiteView = Backbone.View.extend({
     e.preventDefault();
     var data = $(e.target).parents('.template-block').data('template');
     var repo = $('[name="site-name"]', e.target).val();
+
+    // Make repo name safe for github
+    repo = repo
+      .replace(/[^\w\.]+/g, '-')
+      .replace(/^-+/g, '')
+      .replace(/-+$/g, '');
+    $('[name="site-name"]', e.target).val(repo);
+
     this.github = new Github({
       token: getToken(),
       owner: data.owner,
