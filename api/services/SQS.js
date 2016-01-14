@@ -52,10 +52,7 @@ module.exports = {
           ],
           name: sails.config.build.containerName
         },
-        params = {
-          QueueUrl: queueUrl,
-          MessageBody: JSON.stringify(body)
-        };
+        params = { QueueUrl: queueUrl };
 
     if (tokens.sourceRepo) body.environment.push({
       "name": "SOURCE_REPO",
@@ -65,6 +62,8 @@ module.exports = {
       "name": "SOURCE_OWNER",
       "value": tokens.sourceOwner
     });
+
+    params.MessageBody = JSON.stringify(body);
 
     sqs.sendMessage(params, function(err, data) {
       if (err) error(err, model);
