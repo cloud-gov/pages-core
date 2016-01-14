@@ -143,7 +143,10 @@ var EditorView = Backbone.View.extend({
         type: self.settingsFields[k].type,
         value: y[k]
       };
-      if (r.type === 'select') r.options = self.settingsFields[k].options;
+      if (r.type === 'select') {
+        r.options = self.settingsFields[k].options;
+        if (!_(r.options).contains(r.value)) r.options.push(r.value);
+      }
       delete y[k];
       return r;
     });
