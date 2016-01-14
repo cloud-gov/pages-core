@@ -27,20 +27,22 @@ module.exports = {
         }
       };
 
-      // Delete the build that runs automatically when the site is created
-      Build.findOne({
-        where: { site: site.id },
-        sort: 'id ASC'
-      }).exec(function(err, model) {
-        Build.destroy({ id: model.id }).exec(function(err) {
-          if (err) sails.log.error(err);
-        });
-      });
-
-      // Create build with clone repo
-      Build.create(build, function(err) {
+      Site.findOne({
+        id: site.id
+      }).populate('builds').exec(function(err, site) {
         if (err) return res.serverError(err);
-        res.send(site);
+
+        // Delete the build that runs automatically when the site is created
+        Build.destroy({ id: site.builds[0].id }).exec(function(err) {
+          console.log('build destroyed');
+          if (err) return res.serverError(err);
+        });
+
+        // Create build with clone repo
+        Build.create(build, function(err, model) {
+          if (err) return res.serverError(err);
+          res.send(site);
+        });
       });
     });
   },
