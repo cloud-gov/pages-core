@@ -28,6 +28,9 @@ module.exports = {
     // Send OK status to webhook
     res.ok();
 
+    // Ignore empty commits and deleted branches
+    if (!payload.commits || !payload.commits.length) return;
+
     // Log request payload (only if verbose logging is enabled)
     sails.log.verbose('Received GitHub webhook payload: ', payload);
 
