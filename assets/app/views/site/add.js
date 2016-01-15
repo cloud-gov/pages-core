@@ -8,7 +8,11 @@ to set template data that is available to the front and back end apps */
 var SiteTemplates = require('../../../../config/templates').templates;
 
 var SiteModel = require('../../models/Site').model;
+var Github = require('./../../models/Github');
+
 var templateHtml = fs.readFileSync(__dirname + '/../../templates/site/add.html').toString();
+
+var decodeB64 = require('./../../helpers/encoding').decodeB64;
 
 var AddSiteView = Backbone.View.extend({
   tagName: 'div',
@@ -16,7 +20,8 @@ var AddSiteView = Backbone.View.extend({
   template: _.template(templateHtml),
   events: {
     'click a[type=submit]': 'onSubmitGithubRepo',
-    'click [data-action=fork-template]': 'onTemplateSelection'
+    'submit .new-site-form': 'onTemplateSelection',
+    'click [data-action=name-site]': 'showNewSiteForm'
   },
   initialize: function initializeSiteView(opts) {
     this.user = opts.user;
@@ -40,17 +45,42 @@ var AddSiteView = Backbone.View.extend({
     });
   },
   onTemplateSelection: function onTemplateSelection(e) {
-    var templateId = $(e.target).parents('.template-block').data('template');
-    var data = { templateId: templateId };
-    $.ajax('/v0/site/fork', {
-      method: 'POST',
-      data: data,
-      success: this.onSuccess.bind(this),
-      error: this.onError.bind(this)
-    });
+    e.preventDefault();
+    var data = $(e.target).parents('.template-block').data('template');
+    var repo = $('[name="site-name"]', e.target).val();
+
+    // Make repo name safe for github
+    repo = repo
+      .replace(/[^\w\.]+/g, '-')
+      .replace(/^-+/g, '')
+      .replace(/-+$/g, '');
+    $('[name="site-name"]', e.target).val(repo);
+
+    this.github = new Github({
+      token: getToken(),
+      owner: data.owner,
+      repoName: data.repo,
+      branch: data.branch
+    }).clone({
+      owner: data.owner,
+      repository: data.repo
+    }, {
+      repository: repo
+    }, function(err, model) {
+      if (err) return this.onError(err);
+      this.onSuccess(model);
+    }.bind(this));
+  },
+  showNewSiteForm: function showNewSiteForm(e) {
+    var $form = $('.new-site-form', $(e.target).parents('.template-block'));
+    var state = $form.attr('aria-hidden') === 'true';
+    $('.new-site-form').attr('aria-hidden', 'true');
+    if (state) {
+      $form.attr('aria-hidden', 'false');
+      $('[name="site-name"]', $(e.target).parents('.template-block')).focus();
+    }
   },
   onSuccess: function onSuccess(e) {
-    this.collection.add(e);
     this.trigger('site:save:success');
   },
   onError: function onError(e) {
@@ -66,3 +96,9 @@ var AddSiteView = Backbone.View.extend({
 });
 
 module.exports = AddSiteView;
+
+function getToken() {
+  var token = window.localStorage.getItem('token') || false;
+  if (!token) return false;
+  return decodeB64(token);
+}
