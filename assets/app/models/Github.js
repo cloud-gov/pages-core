@@ -5,6 +5,7 @@ var Backbone = require('backbone');
 var yaml = require('yamljs');
 
 var encodeB64 = require('../helpers/encoding').encodeB64;
+var decodeB64 = require('../helpers/encoding').decodeB64;
 
 var GithubModel = Backbone.Model.extend({
   initialize: function (opts) {
@@ -21,6 +22,10 @@ var GithubModel = Backbone.Model.extend({
     this.uploadDir = opts.uploadRoot || 'uploads';
 
     this.once('github:fetchConfig:success', function () {
+      this.fetchDrafts();
+    }.bind(this));
+
+    this.once('github:fetchDrafts:success', function () {
       this.fetchAssets();
       this.fetch();
     }.bind(this));
@@ -260,6 +265,24 @@ var GithubModel = Backbone.Model.extend({
         else {
           self.trigger('github:fetchAssets:error', res.status);
         }
+      }
+    });
+  },
+  fetchDrafts: function() {
+    var self = this;
+    var url = this.url({ root: true, path: 'branches' });
+    $.ajax({
+      url: url,
+      success: function(data) {
+        self.drafts = _(data).chain().filter(function(branch) {
+          return branch.name.indexOf('_draft-') === 0;
+        }).map(function(branch) {
+          return decodeB64(branch.name.replace('_draft-', ''));
+        }).compact().value();
+        self.trigger('github:fetchDrafts:success');
+      },
+      error: function(res) {
+        self.trigger('github:fetchDrafts:error', res.status);
       }
     });
   },
