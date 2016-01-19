@@ -4,6 +4,7 @@ var Backbone = require('backbone');
 var ViewSwitcher = require('ampersand-view-switcher');
 var _ = require('underscore');
 
+var encodeB64 = require('../../helpers/encoding').encodeB64;
 var decodeB64 = require('./../../helpers/encoding').decodeB64;
 
 var BreadcrumbView = require('./breadcrumb');
@@ -52,6 +53,19 @@ var EditView = Backbone.View.extend({
     var model = this.model,
         config = model.configFiles || {},
         childView, pages;
+
+    var isDraft = _.contains(this.model.get('drafts'), this.model.get('file'));
+
+    if (isDraft) {
+      var draftBranch = '_draft-' + encodeB64(model.file);
+      var url = [
+        '#edit', model.owner, model.name, draftBranch, model.file
+      ].join('/');
+      window.Backbone = Backbone;
+      if (url !== '#' + Backbone.history.getFragment()) return federalist.navigate([
+        '#edit', model.owner, model.name, draftBranch, model.file
+      ].join('/'), { trigger: true });
+    }
 
     this.$('#edit-button').empty();
 
