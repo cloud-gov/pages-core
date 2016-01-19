@@ -23,7 +23,11 @@ var PagesView = Backbone.View.extend({
     function addToList(list, item) {
       var m = self.model,
           href = ['/#edit', m.owner, m.name, m.branch, item.href].join('/'),
-          html = template({ text: item.text, href: href });
+          html = template({
+            text: item.text,
+            href: href,
+            draft: _.contains(m.get('drafts'), item.href)
+          });
       list.append(html);
     }
 

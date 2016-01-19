@@ -274,11 +274,12 @@ var GithubModel = Backbone.Model.extend({
     $.ajax({
       url: url,
       success: function(data) {
-        self.drafts = _(data).chain().filter(function(branch) {
+        var drafts = _(data).chain().filter(function(branch) {
           return branch.name && branch.name.indexOf('_draft-') === 0;
         }).map(function(branch) {
           return decodeB64(branch.name.replace('_draft-', ''));
         }).compact().value();
+        self.set('drafts', drafts);
         self.trigger('github:fetchDrafts:success');
       },
       error: function(res) {
