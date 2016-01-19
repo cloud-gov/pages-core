@@ -27,7 +27,8 @@ var EditorView = Backbone.View.extend({
         file      = this.filePathFromModel(this.model),
         fileExt   = this.fileExtensionFromName(this.model.get('file')),
         html      = {
-          fileName: this.model.get('file')
+          fileName: this.model.get('file'),
+          draft: this.model.get('isDraft')
         };
 
     this.editors = {};
@@ -37,7 +38,6 @@ var EditorView = Backbone.View.extend({
 
     this.model.on('github:commit:success', this.saveSuccess.bind(this));
     this.model.on('github:commit:error', this.saveFailure.bind(this));
-
     this.doc = this.initializeDocument({
       fileExt: fileExt,
       isNewPage: this.isNewPage
