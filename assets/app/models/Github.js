@@ -275,7 +275,7 @@ var GithubModel = Backbone.Model.extend({
       url: url,
       success: function(data) {
         self.drafts = _(data).chain().filter(function(branch) {
-          return branch.name.indexOf('_draft-') === 0;
+          return branch.name && branch.name.indexOf('_draft-') === 0;
         }).map(function(branch) {
           return decodeB64(branch.name.replace('_draft-', ''));
         }).compact().value();

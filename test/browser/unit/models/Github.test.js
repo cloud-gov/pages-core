@@ -56,6 +56,9 @@ describe('Github model', function () {
       done();
     });
 
+    server.respondWith('GET', 'https://api.github.com/repos/18f/federalist/branches?access_token=FAKETOKEN&ref=master', helpers.mockResponse(JSON.stringify({}), 200));
+    server.respond();
+
     github.commit(commitOpts);
     server.respondWith('PUT', helpers.makeUrl('test.md'), helpers.mockResponse(mockCommitResponse, 201));
     server.respond();
