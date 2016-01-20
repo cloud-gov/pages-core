@@ -36,8 +36,6 @@ var EditorView = Backbone.View.extend({
     this.isNewPage = opts.isNewPage || false;
     this.settingsFields = this.extendSettingFields(opts.settingsFields);
 
-    this.model.on('github:commit:success', this.saveSuccess.bind(this));
-    this.model.on('github:commit:error', this.saveFailure.bind(this));
     this.doc = this.initializeDocument({
       fileExt: fileExt,
       isNewPage: this.isNewPage
@@ -256,7 +254,9 @@ var EditorView = Backbone.View.extend({
     content = content.replace(/{{ site.baseurl }}/g, baseUrl);
     return content;
   },
-  saveSuccess: function (e) {
+  saveSuccess: function (err, e) {
+    if (err) return this.saveFailure(err);
+
     this.$('#save-status-result').removeClass('label-danger');
     this.$('#save-status-result').addClass('label-success');
     this.$('#save-status-result').text('Yay, the save was successful!');
@@ -264,6 +264,16 @@ var EditorView = Backbone.View.extend({
     setTimeout(function() {
       $('#save-status-result').hide();
     }, 3000);
+
+    var url = [
+      '#edit',
+      this.model.get('owner'),
+      this.model.get('repoName'),
+      this.model.get('branch'),
+      this.model.get('file')
+    ].join('/');
+
+    federalist.navigate(url, { trigger: true });
   },
   saveFailure: function (e) {
     var messages = {
@@ -301,10 +311,10 @@ var EditorView = Backbone.View.extend({
       this.saveNewDocument();
     }
     else {
-      this.model.commit({
+      this.model.save({
         content: this.doc.toMarkdown(),
         message: this.$('#save-content-message').val()
-      });
+      }, this.saveSuccess.bind(this));
     }
 
     return this;
@@ -320,20 +330,11 @@ var EditorView = Backbone.View.extend({
 
     pageTitle = [pageTitle.replace(/\W/g, '-'), 'md'].join('.');
 
-    this.listenToOnce(this.model, 'github:commit:success', function(m){
-      var owner = self.model.get('owner'),
-          repoName  = self.model.get('repoName'),
-          branch = self.model.get('branch'),
-          url = ['#edit', owner, repoName, branch, m.request.path].join('/');
-
-      window.location.hash = url;
-    });
-
-    this.model.commit({
+    this.model.save({
       path: ['pages', pageTitle].join('/'),
       content: this.doc.toMarkdown(),
       message: 'Created ' + ['pages', pageTitle].join('/')
-    });
+    }, this.saveSuccess.bind(this));
   },
   getSettingsFromEditor: function () {
     var self = this,

@@ -64,7 +64,7 @@ var GithubModel = Backbone.Model.extend({
     if (res.type) attrs.type = res.type;
     return attrs;
   },
-  commit: function (opts) {
+  commit: function (opts, done) {
     var self = this,
         data = {
           path: opts.path || this.file,
@@ -72,6 +72,7 @@ var GithubModel = Backbone.Model.extend({
           content: opts.base64 || encodeB64(opts.content),
           branch: this.branch
         };
+    done = done || _.noop;
 
     if (this.attributes.json && this.attributes.json.sha) {
       data.sha = this.attributes.json.sha;
@@ -89,7 +90,7 @@ var GithubModel = Backbone.Model.extend({
 
         if (res.status !== 200 && res.status !== 201) {
           self.trigger('github:commit:error', e);
-          return;
+          return done(e);
         }
 
         self.attributes.json.sha = res.responseJSON.content.sha;
@@ -101,10 +102,132 @@ var GithubModel = Backbone.Model.extend({
           window.federalist.dispatcher.trigger('github:upload:success', res.responseJSON);
         } else {
           self.trigger('github:commit:success', e);
+          return done(null, e);
         }
 
       }
     });
+  },
+  createDraftBranch: function(done) {
+    var branchName = '_draft-' + encodeB64(this.get('file'));
+    var url = this.url({ root: true, path: 'git/refs' });
+    var sha = (this.get('json') || {}).sha;
+
+    if (!sha) return done('No SHA available');
+
+    $.ajax({
+      method: 'POST',
+      url: url,
+      data: {
+        ref: 'refs/heads/' + branchName,
+        sha: sha
+      },
+      success: function(res) {
+        this.set('branch', branchName);
+        done(null, res);
+      }.bind(this),
+      error: done
+    });
+
+  },
+  createPR: function(done) {
+    var url = this.url({ root: true, path: 'pulls' });
+
+    $.ajax({
+      method: 'POST',
+      url: url,
+      data: {
+        title: 'Draft updates for ' + this.get('file'),
+        body: '',
+        head: this.get('branch'),
+        base: this.get('defaultBranch')
+      },
+      success: function(res) {
+        done(null, res);
+      }.bind(this),
+      error: done
+    });
+
+  },
+  getPR: function(done) {
+    var url = this.url({ root: true, path: 'pulls' });
+
+    $.ajax({
+      url: url,
+      data: {
+        head: this.get('branch')
+      },
+      success: function(res) {
+        this.set('pr', res[0].number);
+        done(null, res);
+      }.bind(this),
+      error: done
+    });
+
+  },
+  save: function(opts, done) {
+    done = done || _.noop;
+
+    // if on a branch, pass through to commit
+    if (this.get('branch') !== this.get('defaultBranch')) {
+      return this.commit(opts, done);
+    }
+
+    async.series([
+      this.createDraftBranch,
+      this.commit.bind(this, opts),
+      this.createPR
+    ], done);
+
+  },
+  publish: function(opts, done) {
+    async.series([
+      this.save.bind(this, opts),
+      this.getPR,
+      this.mergePR,
+      this.deleteBranch
+    ], done);
+  },
+  mergePR: function(done) {
+    if (!this.get('pr')) return done('PR not available');
+
+    var url = this.url({
+      root: true,
+      path: 'pulls/' + this.get('pr') + '/merge'
+    });
+
+    $.ajax({
+      method: 'PUT',
+      url: url,
+      success: function(res) {
+        this.set('pr', undefined);
+        done(null, res);
+      }.bind(this),
+      error: done
+    });
+
+  },
+  deleteBranch: function(done) {
+    if (this.get('branch') === this.get('defaultBranch')) {
+      return done('Unable to delete default branch');
+    }
+
+    var ref = 'heads/' + this.get('branch');
+    var url = this.url({
+      root: true,
+      path: 'git/refs/' + ref
+    });
+
+    $.ajax({
+      method: 'DELETE',
+      url: url,
+      success: function(res) {
+        this.set('branch', this.get('defaultBranch'));
+        done(null, res);
+      }.bind(this),
+      error: done
+    });
+
   },
   /*
    * Clone a repository to the user's account.

@@ -32,6 +32,8 @@ var BreadcrumbView = Backbone.View.extend({
           repository: repo
         }).get('defaultBranch');
 
+    this.model.set('defaultBranch', defaultBranch);
+
     this.$el.empty();
 
     if (!file) return this;
