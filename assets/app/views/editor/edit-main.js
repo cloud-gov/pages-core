@@ -24,10 +24,6 @@ var EditView = Backbone.View.extend({
   },
   initialize: function (opts) {
     if (!opts) return this;
-    var html = template({ owner: opts.owner, repo: opts.repo });
-
-    this.$el.html(html);
-    this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.$('#edit-content')[0]);
 
     this.model = window.federalist.github = new Github({
       token: getToken(),
@@ -36,11 +32,6 @@ var EditView = Backbone.View.extend({
       branch: opts.branch,
       file: opts.file,
       site: opts.site
-    });
-
-    this.breadcrumb = new BreadcrumbView({
-      $el: this.$('ol.breadcrumb'),
-      model: this.model
     });
 
     this.model.on('sync', this.update.bind(this));
@@ -69,6 +60,23 @@ var EditView = Backbone.View.extend({
         '#edit', model.owner, model.name, draftBranch, model.file
       ].join('/'), { trigger: true });
     }
+
+    var html = template({
+      owner: model.get('owner'),
+      repo: model.get('repoName'),
+      draft: model.get('isDraft'),
+      file: model.get('file'),
+      branch: model.get('branch')
+    });
+
+    this.$el.html(html);
+    this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.$('#edit-content')[0]);
+    this.breadcrumb = new BreadcrumbView({
+      $el: this.$('ol.breadcrumb'),
+      model: this.model
+    }).render();
+
+
 
     this.$('#edit-button').empty();
 

@@ -19,7 +19,9 @@ var whitelistFieldHtml = fs.readFileSync(__dirname + '/../../templates/editor/wh
 var EditorView = Backbone.View.extend({
   tagName: 'div',
   events: {
-    'click [data-action=save-content]': 'saveDocument'
+    'click [data-action=save-content]': 'saveDocument',
+    'click [data-action=delete-draft]': 'deleteDraft',
+    'click [data-action=publish-content]': 'publishContent'
   },
   template: _.template(templateHtml),
   initialize: function (opts) {
@@ -40,6 +42,10 @@ var EditorView = Backbone.View.extend({
       fileExt: fileExt,
       isNewPage: this.isNewPage
     });
+
+    // On builds, toggle preview button
+    federalist.sites.on('sync', this.previewButton.bind(this));
+    this.previewButton(federalist.sites);
 
     html.settingsDisplayStyle = this.getSettingsDisplayStyle(this.doc);
 
@@ -68,6 +74,17 @@ var EditorView = Backbone.View.extend({
     });
 
     return this;
+  },
+  previewButton: function(sites) {
+    var build = _.chain(federalist.github
+      .get('site')
+      .get('builds'))
+      .sortBy('id')
+      .reverse()
+      .findWhere({ branch: this.model.get('branch') })
+      .value();
+
+    $('.preview-buttons').toggleClass('processing', !build.completedAt);
   },
   initializeDocument: function (opts) {
     var fileExt = opts.fileExt,
@@ -256,6 +273,7 @@ var EditorView = Backbone.View.extend({
   },
   saveSuccess: function (err, e) {
     if (err) return this.saveFailure(err);
+    document.body.scrollTop = 0;
 
     this.$('#save-status-result').removeClass('label-danger');
     this.$('#save-status-result').addClass('label-success');
@@ -289,13 +307,40 @@ var EditorView = Backbone.View.extend({
 
     this.$('#save-status-result').text(status);
   },
-  saveDocument: function (e) {
+  deleteDraft: function(e) {
+    e.preventDefault();
+    this.model.deleteBranch(function(err) {
+      if (err) return this.saveFailure(err);
+      federalist.navigate([
+        '#edit',
+        this.model.get('owner'),
+        this.model.get('repoName'),
+        this.model.get('defaultBranch')
+      ].join('/'), { trigger: true });
+    }.bind(this));
+  },
+  publishContent: function(e) {
+    e.preventDefault();
+    this.saveDocument(e, 'publish', function(err) {
+      if (err) return this.saveFailure(err);
+      federalist.navigate([
+        '#edit',
+        this.model.get('owner'),
+        this.model.get('repoName'),
+        this.model.get('defaultBranch')
+      ].join('/'), { trigger: true });
+    }.bind(this));
+  },
+  saveDocument: function (e, method, done) {
     var self = this,
         settings = this.getSettingsFromEditor(),
         content = this.getContentFromEditor(),
         pageTitle;
 
     e.preventDefault(); e.stopPropagation();
+
+    method = method || 'save';
+    done = done || this.saveSuccess;
 
     this.$('#save-status-result').show();
     this.$('#save-status-result').removeClass('label-success');
@@ -311,10 +356,10 @@ var EditorView = Backbone.View.extend({
       this.saveNewDocument();
     }
     else {
-      this.model.save({
+      this.model[method]({
         content: this.doc.toMarkdown(),
         message: this.$('#save-content-message').val()
-      }, this.saveSuccess.bind(this));
+      }, done.bind(this));
     }
 
     return this;
@@ -330,11 +375,11 @@ var EditorView = Backbone.View.extend({
 
     pageTitle = [pageTitle.replace(/\W/g, '-'), 'md'].join('.');
 
-    this.model.save({
+    this.model[method]({
       path: ['pages', pageTitle].join('/'),
       content: this.doc.toMarkdown(),
       message: 'Created ' + ['pages', pageTitle].join('/')
-    }, this.saveSuccess.bind(this));
+    }, done.bind(this));
   },
   getSettingsFromEditor: function () {
     var self = this,

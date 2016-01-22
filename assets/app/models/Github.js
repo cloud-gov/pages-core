@@ -110,19 +110,26 @@ var GithubModel = Backbone.Model.extend({
   },
   createDraftBranch: function(done) {
     var branchName = '_draft-' + encodeB64(this.get('file'));
-    var url = this.url({ root: true, path: 'git/refs' });
-    var sha = (this.get('json') || {}).sha;
+    var url = this.url({
+      root: true,
+      path: 'git/refs',
+      params: { ref: undefined }
+    });
+    var sha = this.get('defaultSHA');
 
     if (!sha) return done('No SHA available');
 
     $.ajax({
       method: 'POST',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
       url: url,
-      data: {
+      data: JSON.stringify({
         ref: 'refs/heads/' + branchName,
         sha: sha
-      },
+      }),
       success: function(res) {
+        this.branch = branchName;
         this.set('branch', branchName);
         done(null, res);
       }.bind(this),
@@ -135,13 +142,15 @@ var GithubModel = Backbone.Model.extend({
 
     $.ajax({
       method: 'POST',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
       url: url,
-      data: {
+      data: JSON.stringify({
         title: 'Draft updates for ' + this.get('file'),
         body: '',
         head: this.get('branch'),
         base: this.get('defaultBranch')
-      },
+      }),
       success: function(res) {
         done(null, res);
       }.bind(this),
@@ -174,18 +183,18 @@ var GithubModel = Backbone.Model.extend({
     }
 
     async.series([
-      this.createDraftBranch,
+      this.createDraftBranch.bind(this),
       this.commit.bind(this, opts),
-      this.createPR
+      this.createPR.bind(this)
     ], done);
 
   },
   publish: function(opts, done) {
     async.series([
       this.save.bind(this, opts),
-      this.getPR,
-      this.mergePR,
-      this.deleteBranch
+      this.getPR.bind(this),
+      this.mergePR.bind(this),
+      this.deleteBranch.bind(this)
     ], done);
   },
   mergePR: function(done) {
@@ -198,6 +207,11 @@ var GithubModel = Backbone.Model.extend({
 
     $.ajax({
       method: 'PUT',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
+      data: JSON.stringify({
+        commit_message: 'Merged via Federalist'
+      }),
       url: url,
       success: function(res) {
         this.set('pr', undefined);
@@ -273,6 +287,7 @@ var GithubModel = Backbone.Model.extend({
       $.ajax({
         method: 'POST',
         dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(data),
         url: url,
         success: done.bind(this, null),
@@ -294,7 +309,8 @@ var GithubModel = Backbone.Model.extend({
       $.ajax({
         method: 'POST',
         dataType: 'json',
-        data: data,
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
         url: url,
         success: done.bind(this, null),
         error: done
@@ -402,7 +418,12 @@ var GithubModel = Backbone.Model.extend({
         }).map(function(branch) {
           return decodeB64(branch.name.replace('_draft-', ''));
         }).compact().value();
+        if (!self.site) return;
+        var defaultSHA = _.findWhere(data, {
+          name: self.site.get('defaultBranch')
+        }).commit.sha;
         self.set('drafts', drafts);
+        self.set('defaultSHA', defaultSHA);
         self.trigger('github:fetchDrafts:success');
       },
       error: function(res) {

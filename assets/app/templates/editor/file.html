@@ -31,12 +31,6 @@
       <form id="content">
         <div data-target="content"></div>
       </form>
-      <% if (draft) { %>
-      <div>
-        <span class="usa-label">Draft</span>
-      </div>
-      <% } %>
-
     </div>
   </div>
 
@@ -48,7 +42,11 @@
           <label for="save-content-message">Make this a helpful save message for yourself and future collaborators.</label>
           <input type="text" class="form-control" id="save-content-message" value="Some changes to <%= fileName %>">
         </div>
-        <button class="usa-button usa-button-primary save-button" data-action="save-content">Save as Draft</button>
+        <% if (draft) { %>
+        <button class="usa-button-outline delete-button" data-action="delete-draft">Delete Draft</button>
+        <% } %>
+        <button class="usa-button-outline save-button" data-action="save-content">Save as Draft</button>
+        <button class="usa-button-primary publish-button" data-action="publish-content">Save & Publish</button>
         <span class="usa-label" id="save-status-result" style="display:none" ></span>
       </form>
     </div>
