@@ -83,8 +83,9 @@ var EditorView = Backbone.View.extend({
       .reverse()
       .findWhere({ branch: this.model.get('branch') })
       .value();
+    var processing = (!build || !build.completedAt);
 
-    $('.preview-buttons').toggleClass('processing', !build.completedAt);
+    $('.preview-buttons').toggleClass('processing', processing);
   },
   initializeDocument: function (opts) {
     var fileExt = opts.fileExt,
