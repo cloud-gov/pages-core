@@ -93,6 +93,7 @@ var GithubModel = Backbone.Model.extend({
           return done(e);
         }
 
+        self.attributes.json = self.attributes.json || {};
         self.attributes.json.sha = res.responseJSON.content.sha;
 
         // if this is an uploaded asset
