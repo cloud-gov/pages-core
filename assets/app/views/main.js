@@ -78,6 +78,7 @@ var AppView = Backbone.View.extend({
     return this;
   },
   edit: function (owner, repo, branch, file) {
+    $('.alert-container').html('');
     if (!file) return this.sites.fetch({ success: loadView.bind(this) });
     loadView.call(this);
     return this;

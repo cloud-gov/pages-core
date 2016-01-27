@@ -293,6 +293,11 @@ var EditorView = Backbone.View.extend({
     ].join('/');
 
     federalist.navigate(url, { trigger: true });
+    $('.alert-container').html(
+      '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
+        'Your draft was saved.' +
+      '</div></div>'
+    );
   },
   saveFailure: function (e) {
     var messages = {
@@ -318,6 +323,11 @@ var EditorView = Backbone.View.extend({
         this.model.get('repoName'),
         this.model.get('defaultBranch')
       ].join('/'), { trigger: true });
+      $('.alert-container').html(
+        '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
+          'Your draft was deleted.' +
+        '</div></div>'
+      );
     }.bind(this));
   },
   publishContent: function(e) {
@@ -330,6 +340,11 @@ var EditorView = Backbone.View.extend({
         this.model.get('repoName'),
         this.model.get('defaultBranch')
       ].join('/'), { trigger: true });
+      $('.alert-container').html(
+        '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
+          'Your draft is being published.' +
+        '</div></div>'
+      );
     }.bind(this));
   },
   saveDocument: function (e, method, done) {
