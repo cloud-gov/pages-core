@@ -276,14 +276,6 @@ var EditorView = Backbone.View.extend({
     if (err) return this.saveFailure(err);
     document.body.scrollTop = 0;
 
-    this.$('#save-status-result').removeClass('label-danger');
-    this.$('#save-status-result').addClass('label-success');
-    this.$('#save-status-result').text('Yay, the save was successful!');
-
-    setTimeout(function() {
-      $('#save-status-result').hide();
-    }, 3000);
-
     var url = [
       '#edit',
       this.model.get('owner'),
@@ -308,10 +300,12 @@ var EditorView = Backbone.View.extend({
         },
         status = messages[e.response] || 'That hasn\'t happened before';
 
-    this.$('#save-status-result').removeClass('label-success');
-    this.$('#save-status-result').addClass('label-danger');
-
-    this.$('#save-status-result').text(status);
+    document.body.scrollTop = 0;
+    $('.alert-container').html(
+      '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
+        status +
+      '</div></div>'
+    );
   },
   deleteDraft: function(e) {
     e.preventDefault();
