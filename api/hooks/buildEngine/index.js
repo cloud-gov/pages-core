@@ -23,7 +23,9 @@ var hook = {
       'rm -rf ${destination} || true',
       'mkdir -p ${source}',
       clone,
-      'echo "baseurl: ${baseurl}\nbranch: ${branch}\n${config}" > ' +
+      'git log -1 --pretty=format:\'commit: {%n "commit": "%H",%n "author": "%an <%ae>",%n "date": "%ad",%n "message": "%s"%n}\' > ' +
+        '${source}/_config_base.yml',
+      'echo "\nbaseurl: ${baseurl}\nbranch: ${branch}\n${config}" >> ' +
         '${source}/_config_base.yml',
       'bundle exec jekyll build --safe --config ${source}/_config.yml,${source}/_config_base.yml ' +
         '--source ${source} --destination ${source}/_site',
