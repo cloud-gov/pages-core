@@ -160,7 +160,13 @@ var GithubModel = Backbone.Model.extend({
 
   },
   getPR: function(done) {
-    var url = this.url({ root: true, path: 'pulls' });
+    var url = this.url({
+      root: true,
+      path: 'pulls',
+      params: {
+        per_page: 100
+      }
+    });
 
     $.ajax({
       url: url,
@@ -410,7 +416,13 @@ var GithubModel = Backbone.Model.extend({
   },
   fetchDrafts: function() {
     var self = this;
-    var url = this.url({ root: true, path: 'branches' });
+    var url = this.url({
+      root: true,
+      path: 'branches',
+      params: {
+        per_page: 100
+      }
+    });
     $.ajax({
       url: url,
       success: function(data) {
