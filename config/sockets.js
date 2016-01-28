@@ -126,7 +126,7 @@ module.exports.sockets = {
   // },
 
 
-
+  transports: ['polling']
 
 
   // More configuration options for Sails+Socket.io:
