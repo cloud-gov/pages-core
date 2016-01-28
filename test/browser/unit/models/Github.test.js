@@ -56,6 +56,9 @@ describe('Github model', function () {
       done();
     });
 
+    server.respondWith('GET', 'https://api.github.com/repos/18f/federalist/branches?access_token=FAKETOKEN&ref=master', helpers.mockResponse(JSON.stringify({}), 200));
+    server.respond();
+
     github.commit(commitOpts);
     server.respondWith('PUT', helpers.makeUrl('test.md'), helpers.mockResponse(mockCommitResponse, 201));
     server.respond();
@@ -199,7 +202,7 @@ describe('Github model', function () {
 
     github.clone.cloneRepo(function(err) {
 
-      var json = querystring.parse(data.requestBody);
+      var json = JSON.parse(data.requestBody);
       assert.ifError(err);
       assert.equal(data.url, url);
       assert.deepEqual(json, {
@@ -232,7 +235,7 @@ describe('Github model', function () {
     github.clone(source, destination);
 
     github.clone.cloneRepo(function(err) {
-      var body = querystring.parse(data.requestBody);
+      var body = JSON.parse(data.requestBody);
       assert.ifError(err);
       assert.equal(data.url, url);
       assert.deepEqual(body, {

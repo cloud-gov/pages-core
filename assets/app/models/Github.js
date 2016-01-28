@@ -5,6 +5,7 @@ var Backbone = require('backbone');
 var yaml = require('yamljs');
 
 var encodeB64 = require('../helpers/encoding').encodeB64;
+var decodeB64 = require('../helpers/encoding').decodeB64;
 
 var GithubModel = Backbone.Model.extend({
   initialize: function (opts) {
@@ -21,6 +22,10 @@ var GithubModel = Backbone.Model.extend({
     this.uploadDir = opts.uploadRoot || 'uploads';
 
     this.once('github:fetchConfig:success', function () {
+      this.fetchDrafts();
+    }.bind(this));
+
+    this.once('github:fetchDrafts:success', function () {
       this.fetchAssets();
       this.fetch();
     }.bind(this));
@@ -59,7 +64,7 @@ var GithubModel = Backbone.Model.extend({
     if (res.type) attrs.type = res.type;
     return attrs;
   },
-  commit: function (opts) {
+  commit: function (opts, done) {
     var self = this,
         data = {
           path: opts.path || this.file,
@@ -67,6 +72,7 @@ var GithubModel = Backbone.Model.extend({
           content: opts.base64 || encodeB64(opts.content),
           branch: this.branch
         };
+    done = done || _.noop;
 
     if (this.attributes.json && this.attributes.json.sha) {
       data.sha = this.attributes.json.sha;
@@ -84,9 +90,10 @@ var GithubModel = Backbone.Model.extend({
 
         if (res.status !== 200 && res.status !== 201) {
           self.trigger('github:commit:error', e);
-          return;
+          return done(e);
         }
 
+        self.attributes.json = self.attributes.json || {};
         self.attributes.json.sha = res.responseJSON.content.sha;
 
         // if this is an uploaded asset
@@ -96,10 +103,146 @@ var GithubModel = Backbone.Model.extend({
           window.federalist.dispatcher.trigger('github:upload:success', res.responseJSON);
         } else {
           self.trigger('github:commit:success', e);
+          return done(null, e);
         }
 
       }
     });
+  },
+  createDraftBranch: function(done) {
+    var branchName = '_draft-' + encodeB64(this.get('file'));
+    var url = this.url({
+      root: true,
+      path: 'git/refs',
+      params: { ref: undefined }
+    });
+    var sha = this.get('defaultSHA');
+
+    if (!sha) return done('No SHA available');
+
+    $.ajax({
+      method: 'POST',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
+      url: url,
+      data: JSON.stringify({
+        ref: 'refs/heads/' + branchName,
+        sha: sha
+      }),
+      success: function(res) {
+        this.branch = branchName;
+        this.set('branch', branchName);
+        done(null, res);
+      }.bind(this),
+      error: done
+    });
+
+  },
+  createPR: function(done) {
+    var url = this.url({ root: true, path: 'pulls' });
+
+    $.ajax({
+      method: 'POST',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
+      url: url,
+      data: JSON.stringify({
+        title: 'Draft updates for ' + this.get('file'),
+        body: '',
+        head: this.get('branch'),
+        base: this.get('defaultBranch')
+      }),
+      success: function(res) {
+        done(null, res);
+      }.bind(this),
+      error: done
+    });
+
+  },
+  getPR: function(done) {
+    var url = this.url({ root: true, path: 'pulls' });
+
+    $.ajax({
+      url: url,
+      data: {
+        head: this.get('branch')
+      },
+      success: function(res) {
+        this.set('pr', res[0].number);
+        done(null, res);
+      }.bind(this),
+      error: done
+    });
+
+  },
+  save: function(opts, done) {
+    done = done || _.noop;
+
+    // if on a branch, pass through to commit
+    if (this.get('branch') !== this.get('defaultBranch')) {
+      return this.commit(opts, done);
+    }
+
+    async.series([
+      this.createDraftBranch.bind(this),
+      this.commit.bind(this, opts),
+      this.createPR.bind(this)
+    ], done);
+
+  },
+  publish: function(opts, done) {
+    async.series([
+      this.save.bind(this, opts),
+      this.getPR.bind(this),
+      this.mergePR.bind(this),
+      this.deleteBranch.bind(this)
+    ], done);
+  },
+  mergePR: function(done) {
+    if (!this.get('pr')) return done('PR not available');
+
+    var url = this.url({
+      root: true,
+      path: 'pulls/' + this.get('pr') + '/merge'
+    });
+
+    $.ajax({
+      method: 'PUT',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
+      data: JSON.stringify({
+        commit_message: 'Merged via Federalist'
+      }),
+      url: url,
+      success: function(res) {
+        this.set('pr', undefined);
+        done(null, res);
+      }.bind(this),
+      error: done
+    });
+
+  },
+  deleteBranch: function(done) {
+    if (this.get('branch') === this.get('defaultBranch')) {
+      return done('Unable to delete default branch');
+    }
+
+    var ref = 'heads/' + this.get('branch');
+    var url = this.url({
+      root: true,
+      path: 'git/refs/' + ref
+    });
+
+    $.ajax({
+      method: 'DELETE',
+      url: url,
+      success: function(res) {
+        this.set('branch', this.get('defaultBranch'));
+        done(null, res);
+      }.bind(this),
+      error: done
+    });
+
   },
   /*
    * Clone a repository to the user's account.
@@ -145,6 +288,7 @@ var GithubModel = Backbone.Model.extend({
       $.ajax({
         method: 'POST',
         dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(data),
         url: url,
         success: done.bind(this, null),
@@ -166,7 +310,8 @@ var GithubModel = Backbone.Model.extend({
       $.ajax({
         method: 'POST',
         dataType: 'json',
-        data: data,
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
         url: url,
         success: done.bind(this, null),
         error: done
@@ -260,6 +405,30 @@ var GithubModel = Backbone.Model.extend({
         else {
           self.trigger('github:fetchAssets:error', res.status);
         }
+      }
+    });
+  },
+  fetchDrafts: function() {
+    var self = this;
+    var url = this.url({ root: true, path: 'branches' });
+    $.ajax({
+      url: url,
+      success: function(data) {
+        var drafts = _(data).chain().filter(function(branch) {
+          return branch.name && branch.name.indexOf('_draft-') === 0;
+        }).map(function(branch) {
+          return decodeB64(branch.name.replace('_draft-', ''));
+        }).compact().value();
+        if (!self.site) return;
+        var defaultSHA = _.findWhere(data, {
+          name: self.site.get('defaultBranch')
+        }).commit.sha;
+        self.set('drafts', drafts);
+        self.set('defaultSHA', defaultSHA);
+        self.trigger('github:fetchDrafts:success');
+      },
+      error: function(res) {
+        self.trigger('github:fetchDrafts:error', res.status);
       }
     });
   },

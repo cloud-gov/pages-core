@@ -18,7 +18,10 @@ var AppView = Backbone.View.extend({
     // Initiate websocket subscription and fetch sites on build message
     io.socket.get('/v0/build?limit=0');
     io.socket.on('build', function() {
-      this.sites.fetch({ data: $.param({ limit: 50 }) });
+      this.sites.fetch({
+        data: $.param({ limit: 50 }),
+        success: function() {}
+      });
     }.bind(this));
 
     this.render();
@@ -75,16 +78,20 @@ var AppView = Backbone.View.extend({
     return this;
   },
   edit: function (owner, repo, branch, file) {
-    var editView = new EditorContainerView({
-      owner: owner,
-      repo: repo,
-      branch: branch,
-      file: file,
-      site: this.sites.findWhere({ owner: owner, repository: repo })
-    });
-    this.pageSwitcher.set(editView);
-
+    $('.alert-container').html('');
+    if (!file) return this.sites.fetch({ success: loadView.bind(this) });
+    loadView.call(this);
     return this;
+    function loadView() {
+      var editView = new EditorContainerView({
+        owner: owner,
+        repo: repo,
+        branch: branch,
+        file: file,
+        site: this.sites.findWhere({ owner: owner, repository: repo })
+      });
+      this.pageSwitcher.set(editView);
+    }
   },
   editSite: function(id) {
     var siteEditView = new SiteEditView({ model: this.sites.get(id) });

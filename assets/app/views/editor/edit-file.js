@@ -19,7 +19,9 @@ var whitelistFieldHtml = fs.readFileSync(__dirname + '/../../templates/editor/wh
 var EditorView = Backbone.View.extend({
   tagName: 'div',
   events: {
-    'click [data-action=save-content]': 'saveDocument'
+    'click [data-action=save-content]': 'saveDocument',
+    'click [data-action=delete-draft]': 'deleteDraft',
+    'click [data-action=publish-content]': 'publishContent'
   },
   template: _.template(templateHtml),
   initialize: function (opts) {
@@ -27,7 +29,8 @@ var EditorView = Backbone.View.extend({
         file      = this.filePathFromModel(this.model),
         fileExt   = this.fileExtensionFromName(this.model.get('file')),
         html      = {
-          fileName: this.model.get('file')
+          fileName: this.model.get('file'),
+          draft: this.model.get('isDraft')
         };
 
     this.editors = {};
@@ -35,13 +38,14 @@ var EditorView = Backbone.View.extend({
     this.isNewPage = opts.isNewPage || false;
     this.settingsFields = this.extendSettingFields(opts.settingsFields);
 
-    this.model.on('github:commit:success', this.saveSuccess.bind(this));
-    this.model.on('github:commit:error', this.saveFailure.bind(this));
-
     this.doc = this.initializeDocument({
       fileExt: fileExt,
       isNewPage: this.isNewPage
     });
+
+    // On builds, toggle preview button
+    federalist.sites.on('sync', this.previewButton.bind(this));
+    this.previewButton(federalist.sites);
 
     html.settingsDisplayStyle = this.getSettingsDisplayStyle(this.doc);
 
@@ -70,6 +74,18 @@ var EditorView = Backbone.View.extend({
     });
 
     return this;
+  },
+  previewButton: function(sites) {
+    var build = _.chain(federalist.github
+      .get('site')
+      .get('builds'))
+      .sortBy('id')
+      .reverse()
+      .findWhere({ branch: this.model.get('branch') })
+      .value();
+    var processing = (!build || !build.completedAt);
+
+    $('.preview-buttons').toggleClass('processing', processing);
   },
   initializeDocument: function (opts) {
     var fileExt = opts.fileExt,
@@ -256,14 +272,24 @@ var EditorView = Backbone.View.extend({
     content = content.replace(/{{ site.baseurl }}/g, baseUrl);
     return content;
   },
-  saveSuccess: function (e) {
-    this.$('#save-status-result').removeClass('label-danger');
-    this.$('#save-status-result').addClass('label-success');
-    this.$('#save-status-result').text('Yay, the save was successful!');
+  saveSuccess: function (err, e) {
+    if (err) return this.saveFailure(err);
+    document.body.scrollTop = 0;
 
-    setTimeout(function() {
-      $('#save-status-result').hide();
-    }, 3000);
+    var url = [
+      '#edit',
+      this.model.get('owner'),
+      this.model.get('repoName'),
+      this.model.get('branch'),
+      this.model.get('file')
+    ].join('/');
+
+    federalist.navigate(url, { trigger: true });
+    $('.alert-container').html(
+      '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
+        'Your draft was saved.' +
+      '</div></div>'
+    );
   },
   saveFailure: function (e) {
     var messages = {
@@ -274,18 +300,57 @@ var EditorView = Backbone.View.extend({
         },
         status = messages[e.response] || 'That hasn\'t happened before';
 
-    this.$('#save-status-result').removeClass('label-success');
-    this.$('#save-status-result').addClass('label-danger');
-
-    this.$('#save-status-result').text(status);
+    document.body.scrollTop = 0;
+    $('.alert-container').html(
+      '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
+        status +
+      '</div></div>'
+    );
   },
-  saveDocument: function (e) {
+  deleteDraft: function(e) {
+    e.preventDefault();
+    this.model.deleteBranch(function(err) {
+      if (err) return this.saveFailure(err);
+      federalist.navigate([
+        '#edit',
+        this.model.get('owner'),
+        this.model.get('repoName'),
+        this.model.get('defaultBranch')
+      ].join('/'), { trigger: true });
+      $('.alert-container').html(
+        '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
+          'Your draft was deleted.' +
+        '</div></div>'
+      );
+    }.bind(this));
+  },
+  publishContent: function(e) {
+    e.preventDefault();
+    this.saveDocument(e, 'publish', function(err) {
+      if (err) return this.saveFailure(err);
+      federalist.navigate([
+        '#edit',
+        this.model.get('owner'),
+        this.model.get('repoName'),
+        this.model.get('defaultBranch')
+      ].join('/'), { trigger: true });
+      $('.alert-container').html(
+        '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
+          'Your draft is being published.' +
+        '</div></div>'
+      );
+    }.bind(this));
+  },
+  saveDocument: function (e, method, done) {
     var self = this,
         settings = this.getSettingsFromEditor(),
         content = this.getContentFromEditor(),
         pageTitle;
 
     e.preventDefault(); e.stopPropagation();
+
+    method = method || 'save';
+    done = done || this.saveSuccess;
 
     this.$('#save-status-result').show();
     this.$('#save-status-result').removeClass('label-success');
@@ -301,10 +366,10 @@ var EditorView = Backbone.View.extend({
       this.saveNewDocument();
     }
     else {
-      this.model.commit({
+      this.model[method]({
         content: this.doc.toMarkdown(),
         message: this.$('#save-content-message').val()
-      });
+      }, done.bind(this));
     }
 
     return this;
@@ -320,20 +385,11 @@ var EditorView = Backbone.View.extend({
 
     pageTitle = [pageTitle.replace(/\W/g, '-'), 'md'].join('.');
 
-    this.listenToOnce(this.model, 'github:commit:success', function(m){
-      var owner = self.model.get('owner'),
-          repoName  = self.model.get('repoName'),
-          branch = self.model.get('branch'),
-          url = ['#edit', owner, repoName, branch, m.request.path].join('/');
-
-      window.location.hash = url;
-    });
-
-    this.model.commit({
+    this.model[method]({
       path: ['pages', pageTitle].join('/'),
       content: this.doc.toMarkdown(),
       message: 'Created ' + ['pages', pageTitle].join('/')
-    });
+    }, done.bind(this));
   },
   getSettingsFromEditor: function () {
     var self = this,

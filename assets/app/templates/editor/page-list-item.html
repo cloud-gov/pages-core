@@ -2,6 +2,9 @@
   <div class="usa-grid">
     <div class="usa-width-two-thirds">
       <%- text %>
+      <% if (draft) { %>
+        <span class="usa-label">Draft</span>
+      <% } %>
     </div>
     <div class="usa-width-one-third">
       <a class="usa-button usa-button-outline file-list-item-button" href="<%- href %>">Edit</a>

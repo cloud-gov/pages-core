@@ -11,3 +11,21 @@
   border: none;
   outline: none;
 }
+
+.preview-buttons {
+  .preview-button {
+    display: block;;
+  }
+  .preview-button-disabled {
+    display: none;
+  }
+}
+.preview-buttons.processing {
+  .preview-button {
+    display: none;
+  }
+  .preview-button-disabled {
+    display: block;
+  }
+
+}

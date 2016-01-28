@@ -26,9 +26,13 @@ var BreadcrumbView = Backbone.View.extend({
         branch  = this.model.get('branch'),
         file    = this.model.get('file'),
         type    = (this.model.configFiles['_navigation.json'].present) ? 'pages' : 'files',
-        filePath;
+        filePath,
+        defaultBranch = federalist.sites.findWhere({
+          owner: owner,
+          repository: repo
+        }).get('defaultBranch');
 
-    console.log('type', type);
+    this.model.set('defaultBranch', defaultBranch);
 
     this.$el.empty();
 
@@ -52,7 +56,7 @@ var BreadcrumbView = Backbone.View.extend({
     else {
       this.$el.append(html({
         text: 'All pages',
-        link: ['#edit', owner, repo, branch].join('/')
+        link: ['#edit', owner, repo, defaultBranch].join('/')
       }));
     }
     return this;
