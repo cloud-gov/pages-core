@@ -66,10 +66,15 @@ var GithubModel = Backbone.Model.extend({
   },
   commit: function (opts, done) {
     var self = this,
+        // ProseMirror encodes these characters, so this decodes them
+        // https://github.com/18F/federalist/issues/299
+        content = opts.content && opts.content
+          .replace(/%7B/g, '{')
+          .replace(/%7D/g, '}'),
         data = {
           path: opts.path || this.file,
           message: opts.message,
-          content: opts.base64 || encodeB64(opts.content),
+          content: opts.base64 || encodeB64(content),
           branch: this.branch
         };
     done = done || _.noop;
