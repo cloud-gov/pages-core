@@ -27,6 +27,7 @@ var AppView = Backbone.View.extend({
     this.render();
   },
   render: function () {
+    this.$el.empty();
     this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.el, {
       show: function(view) {
         document.body.scrollTop = 0;

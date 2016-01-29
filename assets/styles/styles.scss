@@ -7,6 +7,7 @@
 @import "sass/_forms";
 @import "sass/_editors";
 @import "sass/_animations";
+@import "sass/_loader";
 
 footer {
   margin-top: 5em;
@@ -153,4 +154,11 @@ footer {
 
 .build-log-table td:last-child {
   word-break: break-word;
+}
+
+.main-loader {
+  text-align: center;
+  min-height: 200px;
+  margin: 40px 0;
+  color: #5b616b;
 }
