@@ -19,8 +19,6 @@ var SiteCollection = Backbone.Collection.extend({
   url: siteUrl,
 
   initialize: function() {
-    var collection = this;
-    collection.fetch({ data: $.param({ limit: 50 }) });
   }
 });
 

@@ -12,20 +12,36 @@ var encodeB64 = require('./helpers/encoding').encodeB64;
 
 var Router = Backbone.Router.extend({
   initialize: function () {
-    var self = this;
 
-    this.sites = new SiteCollection();
     this.user = new UserModel();
 
-    this.navbarView = new NavbarView({ model: this.user });
-    this.mainView = new MainContainerView({ user: this.user, collection: this.sites });
-
-    this.listenToOnce(this.user, 'change', function () {
+    this.listenToOnce(this.user, 'sync', function (user) {
       var token = this.user.attributes.passports[0].tokens.accessToken;
       window.localStorage.setItem('token', encodeB64(token));
-      self.navbarView.render();
-      Backbone.history.loadUrl();
-    });
+      this.sites = new SiteCollection();
+      this.sites.fetch({
+        data: $.param({ limit: 50 }),
+        success: function (sites) {
+          this.navbarView = new NavbarView({ model: this.user });
+          this.mainView = new MainContainerView({
+            user: this.user,
+            collection: this.sites
+          });
+          this.navbarView.render();
+          Backbone.history.start();
+        }.bind(this)
+      });
+    }.bind(this));
+
+    this.listenToOnce(this.user, 'error', function (error) {
+      window.localStorage.setItem('token', '');
+      window.location.hash = '#';
+      this.navbarView = new NavbarView({ model: this.user });
+      this.mainView = new MainContainerView({ user: this.user });
+      this.navbarView.render();
+      Backbone.history.start();
+    }.bind(this));
+
   },
   routes: {
     '': 'home',
@@ -58,4 +74,3 @@ var Router = Backbone.Router.extend({
 
 window.federalist = new Router();
 window.federalist.dispatcher = _.clone(Backbone.Events);
-Backbone.history.start();
