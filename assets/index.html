@@ -76,12 +76,7 @@
 
     <script src="/js/dependencies/sails.io.js"></script>
     <script>
-      io.sails.transports = ['websocket'];
-      io.sails.useCORSRouteToGetCookie = false;
-      // CloudFoundry only accepts websockets over port 4443
-      if (/\.18f\.gov$/.test(location.hostname)) {
-        io.sails.url = location.protocol + '//' + location.hostname + ':4443';
-      }
+      io.sails.transports = ['polling'];
     </script>
     <script src="/js/bundle.js"></script>
     <script>

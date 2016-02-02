@@ -59,7 +59,7 @@ var EditorView = Backbone.View.extend({
       self.socket = data.id;
 
       // Apply the lock
-      self.lockContent.bind(self);
+      self.lockContent.call(self, data);
 
       // On any change events (others open or leave the page), reapply the lock
       io.socket.on('change', self.lockContent.bind(self));
