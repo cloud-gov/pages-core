@@ -2,7 +2,6 @@ var Backbone = require('backbone');
 var ViewSwitcher = require('ampersand-view-switcher');
 var querystring = require('querystring');
 
-var AuthenticateView = require('./authenticate');
 var SiteEditView = require('./site/edit');
 var SiteListView = require('./site/list');
 var AddSiteView = require('./site/add');
@@ -63,8 +62,6 @@ var AppView = Backbone.View.extend({
       );
     }
 
-    var authenticateView = new AuthenticateView();
-    this.pageSwitcher.set(authenticateView);
     return this;
   },
   newSite: function () {
