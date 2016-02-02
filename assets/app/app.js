@@ -15,6 +15,12 @@ var Router = Backbone.Router.extend({
 
     this.user = new UserModel();
 
+
+    if (window.localStorage.getItem('token')) {
+      $('#home').hide();
+      $('#main-loader').show();
+    }
+
     this.listenToOnce(this.user, 'sync', function (user) {
       var token = this.user.attributes.passports[0].tokens.accessToken;
       window.localStorage.setItem('token', encodeB64(token));
@@ -36,9 +42,6 @@ var Router = Backbone.Router.extend({
     this.listenToOnce(this.user, 'error', function (error) {
       window.localStorage.setItem('token', '');
       window.location.hash = '#';
-      this.navbarView = new NavbarView({ model: this.user });
-      this.mainView = new MainContainerView({ user: this.user });
-      this.navbarView.render();
       Backbone.history.start();
     }.bind(this));
 
