@@ -17,6 +17,13 @@ We use `ngrok` to form a local tunnel and expose our local app to webhooks. Inst
 $ brew install ngrok
 ```
 
+You'll need [Selenium](http://www.seleniumhq.org/) to run the integration tests
+(and [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+for Selenium).
+
+    $ brew install selenium-server-standalone
+
+
 ### env variables
 
 We have a few environment variables that the application uses, here is a list of the environment variables that the application will use if present:
