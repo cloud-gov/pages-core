@@ -66,7 +66,8 @@
   },
   "scripts": {
     "install": "npm run uswds && npm run codemirror && npm run prosemirror && npm run migrate:up",
-    "start": "npm run browserify && npm run sass && npm run autoprefixer && node app.js",
+    "build": "npm run browserify && npm run sass && npm run autoprefixer",
+    "start": "npm run build && node app.js",
     "debug": "node debug app.js",
     "browserify": "browserify -t brfs assets/app/app.js -o assets/js/bundle.js",
     "sass": "node-sass assets/styles/styles.scss -o assets/styles",
@@ -77,7 +78,7 @@
     "watch:client:sass": "node-sass -w -r assets/styles/*.scss -o assets/styles",
     "watch:client:autoprefix": "npm run sass && postcss --use autoprefixer -r -w assets/styles/styles.css assets/styles/styles.css",
     "watch:client:js": "watchify --debug -t brfs assets/app/app.js -o assets/js/bundle.js",
-    "test": "npm run test:server && npm run test:client",
+    "test": "npm run build && npm run test:server && npm run test:client && npm run test:integration",
     "test:server": "mocha --timeout 60000 test/api/bootstrap.test.js test/api/unit/**/*.test.js",
     "test:client": "mocha test/browser/bootstrap.test.js \"test/browser/unit/**/*.test.js\"",
     "test:integration": "wdio wdio.conf.js",

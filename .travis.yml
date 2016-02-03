@@ -1,7 +1,7 @@
 language: node_js
 sudo: true
 node_js:
-- "4.2.3"
+- 4.2.3
 env:
   global:
   - CF_APP=federalist
@@ -9,14 +9,16 @@ env:
   - CF_USERNAME=deploy-federalist
   - CF_ORGANIZATION=federalist
   - CF_SPACE=prod
-  - secure: "dQnuUVyWtfYtjXuMXZJ48IN14M+FnbJ/euMOrBolxBnqKbQkLbnKY+BsGsgM1Lj9r611gczWIkt1Lv487gc2Z1LSWnTMrwgFLG4C7B+n7nRkhZGo8aisp+KjzeJljVkj7XoMNJ23qYkkAZ40/TpCj8C2CVGDvf2H9L0O0NlEkZCTmSWyvBSJ/+FHZVFICM8sm4qrGjDKTlPEaPS+ZHBHp3Ow6irpgCYfFPGyODEIkGfAzAu7t3Ta4cOaC7ha1hr+ayj9W6ImGvFvK1hFWQkpDiJanK+42keCk8KPJAwmP6a0r4BJ6UtzmNlN7N4+BL8WhvS3QrgWiEWjEVSli3Y3IUUS66hPOo0YrzbPK5TBscgh9HyWpPooKz8se5J8ehvhCR/vOzjJpg1AVeegCJczWe4t/XWNZKHtqu7z6e0Ft7DuDAUvY1BSObNSPPCP6Omx69nfeRENj5QEZNM7hFMxBQxBHmUdFroogN2jAXx4i8sTLfMUr0sDFyslX8FRrQtCUIKSvHzBwLb57riRnv3YfI9MNG2hOqN0aeQFQ2v65+Q02f6Ms6Jrj5YQV6B8dJ9RkwCXoDKN+FOtjepYaQCZbBWqnJJlULYVp/fVkHaU4COxUt3t86/w2ymYuLBvgeLEpYC8JIoM6T0V8dfE6kH3OvvYNEW4L2+w8rZU25St1Xs="
+  - secure: dQnuUVyWtfYtjXuMXZJ48IN14M+FnbJ/euMOrBolxBnqKbQkLbnKY+BsGsgM1Lj9r611gczWIkt1Lv487gc2Z1LSWnTMrwgFLG4C7B+n7nRkhZGo8aisp+KjzeJljVkj7XoMNJ23qYkkAZ40/TpCj8C2CVGDvf2H9L0O0NlEkZCTmSWyvBSJ/+FHZVFICM8sm4qrGjDKTlPEaPS+ZHBHp3Ow6irpgCYfFPGyODEIkGfAzAu7t3Ta4cOaC7ha1hr+ayj9W6ImGvFvK1hFWQkpDiJanK+42keCk8KPJAwmP6a0r4BJ6UtzmNlN7N4+BL8WhvS3QrgWiEWjEVSli3Y3IUUS66hPOo0YrzbPK5TBscgh9HyWpPooKz8se5J8ehvhCR/vOzjJpg1AVeegCJczWe4t/XWNZKHtqu7z6e0Ft7DuDAUvY1BSObNSPPCP6Omx69nfeRENj5QEZNM7hFMxBQxBHmUdFroogN2jAXx4i8sTLfMUr0sDFyslX8FRrQtCUIKSvHzBwLb57riRnv3YfI9MNG2hOqN0aeQFQ2v65+Q02f6Ms6Jrj5YQV6B8dJ9RkwCXoDKN+FOtjepYaQCZbBWqnJJlULYVp/fVkHaU4COxUt3t86/w2ymYuLBvgeLEpYC8JIoM6T0V8dfE6kH3OvvYNEW4L2+w8rZU25St1Xs=
   - CXX=g++-4.8
+  # FederalistTestingUser github account
+  - secure: hhxV5/X2WLMPqnPLSwxX4LR3oS0YdKJaXcXlJxvokbenIno640C3IeRIr798i9ObHMX+E5rHLWPbOvyUgQf2DZv92mNRStitmSy33JTP/YjOJDIp7e+HO5KSZMHXJ+NbQcJGoxIVUseZjyn63J7lAjzpGKLn1rUkbp41yRqU3MS5cxP6e696u3TURoLFGAVso4DRLSnVbTqAuv3c4H9WFialMW1gg6+OtgSGv/EZ/tbvu/B1TdO9uEqZmZ0v7mjg6yJOEn31bCKR47CFXtXKEiZEvnyhXCSq/lOmd736O4CwPFrLUtMAbr3mnhqioJ6X998gMuiHfB9R2K+K+owU0aKJ8ggGHJ2MtkKeo1K314kW96SyAfyhcswtI/pzc056IvMpjwvKxXTvny++WY4a8tnUkEzazrJWWLirRaJby5NJiIKkCod/K//C6N4MTAgzX4mm4pP3TAIY27NhV6GMIzCYZTtoBLoRh7udp4QlJrmy2bVdRavg8GLkeljPRG/aXY+ZWwllPZYrcs7NLXJl7NfBLmmfWvmgASPCNexNo63/MTiUIkrKalEj5m9wuPIHfHRrfLuq6CTTHjglnpSvsXCkdHOWiLncnmxJHja707ABnkVGso5x1JqfxaqMpRhNCRuZYhBvtPjp9LsYOUOQiNh12JcZE3hYlSbW6DlI+QM=
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+    - ubuntu-toolchain-r-test
     packages:
-      - g++-4.8
+    - g++-4.8
 deploy:
   provider: script
   script: scripts/deploy-travis.sh
@@ -24,8 +26,8 @@ deploy:
     branch: master
 notifications:
   slack:
-    on_success: never # default: always
-    on_failure: always # default: always
-    on_start: never # default: always
+    on_success: never
+    on_failure: always
+    on_start: never
     on_pull_requests: false
     secure: Eqyu9MVlzDtdFgc/Wv89Br2yuvuh0HRoLMjbpS1KDgZ4si0/aBggV67MaVNiRpEH5Q3Sr01K3M0UfJBU2nJzVlmqkF1zEMVqz0Kox8Qn4EaUSog2DS0X8quU1HAvaqIu+HtwXchcBEhiK1agd79pN3djvr2kGGPdZLqkz4XT+zsRcPgiUcp1oyzCpmqKXv16+7F5RX+pA+CgsawRzOY39qe44HIixxRzJeOxaB+16ccaauqTqxIuBUqlNn1wmlxbYYzTeniF7lJULNMkHcz16pRs6w4vssjUJRsdoKvnyRY33sKKRaWPitzEjAjQNiZeLEym3DG1569xPXjKcvp42Vax5sA20pF92a8E0BQckADSk8wcq3G8Ak58LEg1CvAxp6vQvrcTB1k+/QSg2Y1mzHoEH9d2gebgVZIgn6iqSgHjYxNjCREUhE/SC9pOuaGuJuMhaeCHW/7Ucr0IPwAvzpvKWa1qzDgHLGVlFEI8rTstSnFif0oR7bM7pqdZLEQkpfrE/rV5II19O1c4/hN0JHE6bLNHrULmmYTz/cWqUkuR69OwnifQZGdU06tMrE8u5sdKWbjKMjlRhGHhhsQCW7VQ0NJp7GLJwz9mL8Aq0TH9J4pItGDW++3PfaJpaSHv8UhCCg0GRWEhve2P9JMHldLuij0qR73KjrV2HyER9LA=
