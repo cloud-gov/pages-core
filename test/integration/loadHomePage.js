@@ -3,11 +3,15 @@ var mocha = require('mocha');
 var webdriverio = require('webdriverio');
 
 var options = {
-  desiredCapabilities: {
-    browserName: 'chrome'
+  'desiredCapabilities': {
+    'browserName': 'chrome'
   },
-  baseUrl: 'http://localhost:1337',
-  waitforTimeout: 1000
+  'user': process.env.SAUCE_USERNAME,
+  'key': process.env.SAUCE_ACCESS_KEY,
+  'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
+  'name': 'integration',
+  'baseUrl': 'http://localhost:1337',
+  'waitforTimeout': 1000
 };
 
 var client;
@@ -26,6 +30,10 @@ describe('home page integration tests', function () {
       .getTitle().then(function(title) {
         assert.equal(title, 'Federalist');
       })
+  });
+
+  it('has FEDERALIST_TEST_PASSWORD set', function () {
+      assert.ok(process.env.FEDERALIST_TEST_PASSWORD, 'You must set the github test user password.')
   });
 
   it('should load the authenticated site listing', function () {
