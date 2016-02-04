@@ -81,7 +81,7 @@
     "test": "npm run build && npm run test:server && npm run test:client && npm run test:integration",
     "test:server": "mocha --timeout 60000 test/api/bootstrap.test.js test/api/unit/**/*.test.js",
     "test:client": "mocha test/browser/bootstrap.test.js \"test/browser/unit/**/*.test.js\"",
-    "test:integration": "wdio wdio.conf.js",
+    "test:integration": "mocha test/integration/bootstrap.test.js \"test/integration/**/*.js\"",
     "migrate:create": "grunt db:migrate:create",
     "migrate:up": "grunt db:migrate:up || true",
     "migrate:down": "grunt db:migrate:down",

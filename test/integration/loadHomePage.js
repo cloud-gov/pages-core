@@ -5,30 +5,31 @@ var webdriverio = require('webdriverio');
 var options = {
   desiredCapabilities: {
     browserName: 'chrome'
-  }
+  },
+  baseUrl: 'http://localhost:1337',
+  waitforTimeout: 1000
 };
 
 var client;
 
-beforeEach(function () {
+beforeEach(function (done) {
   client = webdriverio.remote(options);
+  client.init(done);
 });
 
 describe('home page integration tests', function () {
+  this.timeout(8000);
 
-  it('should load the unauthenticated homepage', function (done) {
+  it('should load the unauthenticated homepage', function () {
     return client
-      .init()
       .url('http://localhost:1337')
       .getTitle().then(function(title) {
         assert.equal(title, 'Federalist');
       })
-      .end(done);
   });
 
   it('should load the authenticated site listing', function () {
     return client
-      .init()
       .url('http://localhost:1337')
       .click('[href="/auth/github"]')
       .waitForExist('#login')
@@ -46,6 +47,6 @@ describe('home page integration tests', function () {
 
 });
 
-// afterEach(function (done) {
-//   // client.end(done);
-// });
+afterEach(function (done) {
+  client.end(done);
+});
