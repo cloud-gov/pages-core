@@ -19,6 +19,10 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
+  sauce_connect:
+    username: "jeremiak"
+    access_key:
+      secure: "mcMrwbvXThiE2OHZOH22mBmXXB9EGLmhwfrVm2uCf0p6oLW5UXueeDSacDwEN6qdbcCIXS7A3luW1fr1bUkMwIK3ArDRIPxQ1WMkVGWLwM0/C8TzQe94xcUeU5/7ESYweEZiPJG3y4eLo6V0LYmrylayPOPZg8OhSBPE14kii8ou7kCcJ0Svtu3dFODNqWFIdAfkm6EI1gCJwCu3LOKjwL4UwkkwwSd0dvmm1CUayjrPyNkpnOdTDe2EIk6jeAHn5gIN0qqDleoX5pKuXcemXPbnAvvxc8a49YBoogyKtobEi72o4wWGK0kmEHjwiG0Yh4ZxWQ3WzMtOcXAcW7n79ukSMsQ03GT3pUHxurl5pguG/yCJPKQe7y9PWEqTDRy4KVG0/GKnG5gT8Eqp4L7Ougi9PY4RNQsrjapxsbwm2CYbWmjA50Y6NVV0uuspPqnpvMSRAAVZRFg4ReVPh5WjfdicZNMbE7fMcvuQPct69o5JOWzVzUhSdxvAFDMKKGFLWG9W8C5C55LVqCG/GvHV+Si90ojWs7fQug8EMjAK61hInIo/LB106fVlkgERTzmK3eu1MyD3DpHY9Af2Pg6hnvxZERBifEi8f56C3shFl7YZxC7Mnb+ApZLRk/6Su/En3fHNhu+YRaNdk4x8Kc/O5FaejPeJJEjTsQdU99Tk6MM="
 deploy:
   provider: script
   script: scripts/deploy-travis.sh
