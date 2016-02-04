@@ -96,6 +96,9 @@ module.exports = {
    */
   validateUser: function(accessToken, done) {
     var approved = sails.config.passport.github.organizations || [];
+    if (process.env.NODE_ENV === 'test' && process.env.FEDERALIST_TEST_ORG) {
+      approved.push(parseInt(process.env.FEDERALIST_TEST_ORG));
+    }
 
     // Authenticate request with user's oauth token
     github.authenticate({
