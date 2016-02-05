@@ -11,11 +11,12 @@ function BaseFederalistPage(driver) {
     throw new Error('You must pass an instance of a webdriverio client.');
   }
 
+  this.url = '/';
   this.driver = driver;
 }
 
 BaseFederalistPage.prototype.open = function (url) {
-  return this.driver.url(url);
+  return this.driver.url(url || this.url);
 };
 
 BaseFederalistPage.prototype.init = function () {

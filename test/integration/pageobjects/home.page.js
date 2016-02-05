@@ -1,4 +1,8 @@
-
+/**
+ * HomePage
+ *
+ * An API to interact with the Federalist Home Page.
+ */
 
 var BaseFederalistPage = require('./baseFederalist.page');
 

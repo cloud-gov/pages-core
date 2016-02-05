@@ -1,6 +1,4 @@
 var assert = require('assert');
-var mocha = require('mocha');
-var webdriverio = require('webdriverio');
 var HomePage = require('./pageobjects/home.page');
 
 var homePage;
