@@ -1,6 +1,8 @@
 var Sails = require('sails'),
   sails;
 
+GLOBAL.helpers = require('./helpers');
+
 before(function(done) {
   this.timeout(15000);
 

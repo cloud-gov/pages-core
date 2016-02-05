@@ -81,7 +81,7 @@
     "test": "npm run build && npm run test:server && npm run test:client && npm run test:integration",
     "test:server": "NODE_ENV=test mocha --timeout 60000 test/api/bootstrap.test.js test/api/unit/**/*.test.js",
     "test:client": "NODE_ENV=test mocha test/browser/bootstrap.test.js \"test/browser/unit/**/*.test.js\"",
-    "test:integration": "NODE_ENV=test mocha test/integration/bootstrap.test.js \"test/integration/**/*.js\"",
+    "test:integration": "NODE_ENV=test mocha test/integration/bootstrap.test.js \"test/integration/**/*.test.js\"",
     "migrate:create": "grunt db:migrate:create",
     "migrate:up": "grunt db:migrate:up || true",
     "migrate:down": "grunt db:migrate:down",
