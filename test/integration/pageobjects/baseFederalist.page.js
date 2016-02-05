@@ -1,7 +1,9 @@
 /**
  * BaseFederalistPage
  *
- * Page object to provide an API for common actions on most Federalist web pages.
+ * [Page](http://martinfowler.com/bliki/PageObject.html)
+ * [object](https://code.google.com/p/selenium/wiki/PageObjects) to provide an
+ * API for common actions on most Federalist web pages.
  */
 
 var webdriverio = require('webdriverio');

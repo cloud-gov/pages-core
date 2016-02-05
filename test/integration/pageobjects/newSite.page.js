@@ -5,6 +5,7 @@
  */
 
 var BaseFederalistPage = require('./baseFederalist.page');
+var NewSiteFromTemplateElement = require('./newSiteFromTemplate.element');
 
 function NewSitePage () {
   BaseFederalistPage.apply(this, arguments);
@@ -13,6 +14,12 @@ function NewSitePage () {
 }
 
 NewSitePage.prototype = Object.create(BaseFederalistPage.prototype);
+
+var selectors = NewSitePage.selectors = {
+  flashMessage: '.alert-container .new-site-error',
+  newSiteForm: 'form.new-site-form',
+  templates: '.template-block'
+}
 
 NewSitePage.prototype.getOwner = function () {
   return this.driver.getValue('#owner');
@@ -39,10 +46,20 @@ NewSitePage.prototype.submit = function () {
 };
 
 NewSitePage.prototype.flashMessage = function () {
-  var flashMessageSelector = '.alert-container .new-site-error';
   return this.driver
-    .waitForVisible(flashMessageSelector)
-    .getText(flashMessageSelector);
+    .waitForVisible(selectors.flashMessage)
+    .getText(selectors.flashMessage);
 };
+
+NewSitePage.prototype.templateElements = function () {
+  var driver = this.driver;
+  return driver.elements(selectors.templates)
+    .then(function (webElements) {
+      return webElements.value.map(function (webElement) {
+        return new NewSiteFromTemplateElement(driver, webElement.ELEMENT);
+      });
+    });
+};
+
 
 module.exports = NewSitePage;
