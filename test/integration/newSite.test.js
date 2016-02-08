@@ -1,4 +1,5 @@
 var assert = require('assert');
+var _ = require('underscore');
 var NewSitePage = require('./pageobjects/newSite.page');
 
 var newSitePage;
@@ -94,6 +95,52 @@ describe('new site page integration tests', function () {
         });
 
         it('flashes an error message', function() {
+          return newSitePage.flashMessage()
+            .then(function (message) {
+              assert.equal(message, 'We encountered an error while making your website: name already exists on this account');
+            });
+        });
+      });
+
+      describe('for a new repo', function () {
+        var repoName;
+        before(function () {
+          var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+          repoName = 'foo-' + _.range(10)
+            .map(function () {
+              // _.sample(x, 10), only returns combinations, not permutations,
+              // so repeat the sample call as many times as we want.
+              return _.sample(characters);
+            })
+            .join('');
+        });
+
+        after(function () {
+          // TODO Figure out how to delete the test repo
+        });
+
+        it('opens new site', function () {
+          return newSitePage.open();
+        });
+
+        it('clicks the the first one', function () {
+          return templateElement
+            .useThisTemplateElement()
+            .click();
+        });
+
+        it('enters name of the new site', function () {
+          return templateElement
+            .setNewSiteName(repoName);
+        });
+
+        it('submits the new site form', function () {
+          return templateElement
+            .submitNewSiteName();
+        });
+
+        //TODO this is the success case, we expect a redirect, not a flash message
+        it.skip('flashes an error message', function() {
           return newSitePage.flashMessage()
             .then(function (message) {
               assert.equal(message, 'We encountered an error while making your website: name already exists on this account');
