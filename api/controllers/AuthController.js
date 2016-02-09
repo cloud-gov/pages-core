@@ -40,7 +40,7 @@ var AuthController = {
    */
   provider: function (req, res) {
     // If token present, override oauth login
-    if (process.env.GITHUB_TOKEN) {
+    if (process.env.TEST_AUTH && process.env.GITHUB_TOKEN) {
       request.get({
         url: 'https://api.github.com/user?access_token=' +
           process.env.GITHUB_TOKEN,
