@@ -4,7 +4,7 @@ var HomePage = require('./pageobjects/home.page');
 var homePage;
 
 before(function () {
-  this.timeout(8000);
+  this.timeout(15000);
   homePage = new HomePage(helpers.webdriver.createDriver());
   return homePage.init();
 });
@@ -14,7 +14,7 @@ after(function () {
 });
 
 describe('home page integration tests', function () {
-  this.timeout(8000);
+  this.timeout(15000);
 
   it('loads the homepage', function () {
     return homePage.driver.url('/');
