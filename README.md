@@ -17,12 +17,6 @@ We use `ngrok` to form a local tunnel and expose our local app to webhooks. Inst
 $ brew install ngrok
 ```
 
-You'll need [Selenium](http://www.seleniumhq.org/) to run the integration tests
-(and [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-for Selenium).
-
-    $ brew install selenium-server-standalone
-
 
 ### env variables
 
@@ -38,6 +32,9 @@ We have a few environment variables that the application uses, here is a list of
 * `FEDERALIST_S3_BUCKET` - bucket ID to push files to on S3
 * `FEDERALIST_SQS_QUEUE` - the name of an SQS queue. If defined, Federalist will send build messages to this queue and expect an external build service
 * `FEDERALIST_TEMP_DIR` - where files will be temporarily built, defaults to './.tmp'
+* `FEDERALIST_TEST_ORG` - A github org to authorize the test user against
+* `FEDERALIST_TEST_PASSWORD` **required for tests** - A github user password to run the tests with
+* `FEDERALIST_TEST_USER` **required for tests** - A github user to run the tests with
 
 * `GITHUB_CLIENT_CALLBACK_URL` - for dev you'll probably want to use http://localhost:1337/auth/github/callback
 * `GITHUB_CLIENT_ID` **required** - get this when you register your app with Github
@@ -147,6 +144,27 @@ models: {
 }
 ```
 
+#### Integration tests
+
+To run the integration tests you'll need:
+
+- [Selenium](http://www.seleniumhq.org/) (and [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
+- [chromedriver](https://sites.google.com/a/chromium.org/chromedriver/)
+
+    $ brew install selenium-server-standalone
+    $ brew install chromedriver
+
+You'll need a user to test against, (ping your fellow developers for an existing
+test user).
+
+    $ export FEDERALIST_TEST_USER=<test user>
+    $ export FEDERALIST_TEST_PASSWORD=<test user password>
+
+And then run the tests:
+
+    $ npm run test:integration
+
+
 ## Architecture
 
 This application is primarily a JSON API server based on the [Sails.js](http://sailsjs.org/) framework. It handles authentication, managing users, sites, and builds, and receives webhook requests from GitHub.
@@ -169,7 +187,7 @@ Additional development will focus on improved collaboration features, such as bu
 
 ## Initial proposal
 
-Federalist is new open source publishing system based on proven open source components and techniques. Once the text has been written, images uploaded, and a page is published, the outward-facing site will act like a simple web site -- fast, reliable, and easily scalable. Administrative tools, which require authentication and additional interactive components, can be responsive with far fewer users.  
+Federalist is new open source publishing system based on proven open source components and techniques. Once the text has been written, images uploaded, and a page is published, the outward-facing site will act like a simple web site -- fast, reliable, and easily scalable. Administrative tools, which require authentication and additional interactive components, can be responsive with far fewer users.
 
 Regardless of the system generating the content, all websites benefit from the shared editor and static hosting, which alleviates the most expensive requirements of traditional CMS-based websites and enables shared hosting for modern web applications.
 
