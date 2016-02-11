@@ -11,11 +11,7 @@ To run the server, you'll need [Node.js](https://nodejs.org/download/) and [Ruby
 
 To build sites using Hugo, install [Hugo](http://gohugo.io/overview/installing/) and make sure it's available in your path.
 
-We use `ngrok` to form a local tunnel and expose our local app to webhooks. Install ngrok by typing the following in a command line interface, E.g. Terminal for Mac OSX:
 
-```
-$ brew install ngrok
-```
 
 
 ### env variables
@@ -68,7 +64,11 @@ $ cd federalist
 $ npm install
 ```
 
-* Set up [an application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a Client ID and Client Secret. You'll need to create a JavaScript file and label it local.js. Save this file to the config folder located in the project you downloaded. Use those  values in `config/local.js`
+* Copy `config/local.sample.js` to `config/local.js`.
+
+    $ cp config/local.sample.js config/local.js
+
+* Set up [an application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a Client ID and Client Secret. Add these values to `config/local.js`.
 
  ```
   passport: {
@@ -82,15 +82,6 @@ $ npm install
   }
  ```
 
-* Set webhook settings for a public endpoint and secret. Note that your ngrok subdomain (the `Vncr0qo2Yx` bit below) will be different.
-
-  ```
-  webhook: {
-    endpoint: 'https://Vncr0qo2Yx.ngrok.io/webhook/github',
-    secret: 'testSecret'
-  }
-  ```
-
 In the end, your `local.js` file should look something like this:
 
 ```
@@ -98,15 +89,11 @@ module.exports = {
   passport: {
     github: {
       options: {
-        clientID: '<<get from github>>',
-        clientSecret: '<<get from github>>',
+        clientID: 'abcdef123456',
+        clientSecret: 'aabbccddeeff112233445566',
         callbackURL: 'http://localhost:1337/auth/github/callback'
       }
     }
-  },
-  webhook: {
-    endpoint: '<<your ngrok url>>/webhook/github',
-    secret: 'test secret'
   }
 };
 ```
