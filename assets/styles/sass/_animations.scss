@@ -72,12 +72,18 @@
 }
 
 @keyframes moveSliderRight {
+  from {
+    transform: translateX(0px);
+  }
   to {
     transform: translateX(38px);
   }
 }
 
 @keyframes moveSliderMoreRight {
+  from {
+    transform: translateX(0px);
+  }
   to {
     transform: translateX(45px);
   }
@@ -85,6 +91,9 @@
 
 @keyframes moveSliderLeft {
   from {
+    transform: translateX(0px);
+  }
+  to {
     transform: translateX(-37px);
   }
 }

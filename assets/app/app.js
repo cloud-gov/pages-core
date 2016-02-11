@@ -13,19 +13,37 @@ var encodeB64 = require('./helpers/encoding').encodeB64;
 var Router = Backbone.Router.extend({
   initialize: function () {
     var self = this;
-
-    this.sites = new SiteCollection();
     this.user = new UserModel();
 
-    this.navbarView = new NavbarView({ model: this.user });
-    this.mainView = new MainContainerView({ user: this.user, collection: this.sites });
+    if (window.localStorage.getItem('token')) {
+      $('#home').hide();
+      $('#main-loader').show();
+    }
 
-    this.listenToOnce(this.user, 'change', function () {
-      var token = this.user.attributes.passports[0].tokens.accessToken;
+    this.listenToOnce(this.user, 'sync', function (user) {
+      var token = self.user.attributes.passports[0].tokens.accessToken;
       window.localStorage.setItem('token', encodeB64(token));
-      self.navbarView.render();
-      Backbone.history.loadUrl();
+      self.sites = new SiteCollection();
+      self.sites.fetch({
+        data: $.param({ limit: 50 }),
+        success: function (sites) {
+          self.navbarView = new NavbarView({ model: self.user });
+          self.mainView = new MainContainerView({
+            user: self.user,
+            collection: self.sites
+          });
+          self.navbarView.render();
+          Backbone.history.start();
+        }
+      });
     });
+
+    this.listenToOnce(this.user, 'error', function (error) {
+      window.localStorage.setItem('token', '');
+      window.location.hash = '#';
+      Backbone.history.start();
+    });
+
   },
   routes: {
     '': 'home',
@@ -58,4 +76,3 @@ var Router = Backbone.Router.extend({
 
 window.federalist = new Router();
 window.federalist.dispatcher = _.clone(Backbone.Events);
-Backbone.history.start();
