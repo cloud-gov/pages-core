@@ -1,5 +1,8 @@
 var Sails = require('sails'),
+  _ = require('underscore'),
   sails;
+
+GLOBAL.helpers = require('./helpers');
 
 before(function(done) {
   this.timeout(15000);
@@ -18,6 +21,6 @@ before(function(done) {
 });
 
 after(function(done) {
-  // here you can clear fixtures, etc.
-  sails.lower(done);
+  // sails.lower sometimes calls done twice https://github.com/balderdashy/sails/issues/3303
+  sails.lower(_.once(done));
 });

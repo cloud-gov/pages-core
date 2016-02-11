@@ -1,3 +1,5 @@
+process.env.TEST_AUTH = 1; // Use alternative auth to avoid interactive user auth
+
 var Sails = require('sails'),
   sails;
 
