@@ -11,9 +11,8 @@ describe('generic repository file listing tests', function () {
   before(function () {
     var engine = sails.hooks[sails.config.build.engine];
     engine.jekyll = function (model, done) {
-      engine._run(["echo 'hi'"], model, done);
+      done();
     };
-
     fileListingPage = new FileListingPage(helpers.webdriver.createDriver());
 
     return fileListingPage.init();
@@ -33,7 +32,6 @@ describe('generic repository file listing tests', function () {
 
   describe('for a repository', function () {
     var site;
-
     before(function (done) {
       User.find({ username: 'FederalistTestingUser' }).exec(function (err, u) {
         var data = {
@@ -64,5 +62,27 @@ describe('generic repository file listing tests', function () {
           assert.notEqual(listLength, 0);
         });
     });
+
+    it('clicks on folder button and loads new directory', function () {
+      return fileListingPage.clickOpenOnFolder()
+        .then(function () {
+          return fileListingPage.driver.url();
+        })
+        .then(function(url){
+          var r = /\/microsite-template\/gh-pages\/pages/;
+          assert(url.value.match(r));
+        });
+    });
+
+    it('clicks on file button to access editor', function () {
+      return fileListingPage.clickOpenOnFile()
+        .then(function () {
+          return fileListingPage.driver.element('#edit-content');
+        })
+        .then(function (el) {
+          assert(el);
+        });
+    });
+
   });
 });

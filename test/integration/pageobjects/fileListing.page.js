@@ -14,16 +14,29 @@ function FileListingPage () {
 
 FileListingPage.prototype = Object.create(BaseFederalistPage.prototype);
 
+FileListingPage.prototype.load = function () {
+  var sel = '.list-group-item';
+  return this.open()
+    .waitForVisible(sel);
+};
+
 FileListingPage.prototype.getListItems = function () {
   var sel = '.list-group-item';
-  return this.driver
-    .waitForVisible(sel)
+  return this.load()
     .elements(sel);
 };
 
 FileListingPage.prototype.clickOpenOnFolder = function () {
-  var sel = "$('[href^=\"#edit/jeremiak/microsite-template/gh-pages/pages\"]')";
-  return this.driver.click(sel);
+  var sel = 'a[href$=\'/gh-pages/pages\']';
+  return this.load()
+    .click(sel);
+};
+
+FileListingPage.prototype.clickOpenOnFile = function () {
+  var sel = 'a[href$=\'/gh-pages/README.md\']';
+  return this.load()
+    .click(sel)
+    .waitForVisible('#edit-content');
 };
 
 module.exports = FileListingPage;
