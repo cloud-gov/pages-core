@@ -1,7 +1,9 @@
 /**
  * FileListingPage
  *
- * A page object API around the New Site page.
+ * A page object API around the File Listing page for repos
+ * that aren't configured to use the Federalist navigation
+ * configuration feature.
  */
 
 var BaseFederalistPage = require('./baseFederalist.page');
@@ -13,7 +15,7 @@ function FileListingPage () {
 
   this.url = [
     '/#edit',
-    FEDERALIST_TEST_USER, 
+    FEDERALIST_TEST_USER,
     'microsite-template',
     'gh-pages'
   ].join('/');
