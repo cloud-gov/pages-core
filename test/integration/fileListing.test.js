@@ -3,6 +3,7 @@ var _ = require('underscore');
 
 var FileListingPage = require('./pageobjects/fileListing.page');
 
+var FEDERALIST_TEST_USER = process.env.FEDERALIST_TEST_USER;
 var fileListingPage;
 
 describe('generic repository file listing tests', function () {
@@ -33,9 +34,9 @@ describe('generic repository file listing tests', function () {
   describe('for a repository', function () {
     var site;
     before(function (done) {
-      User.find({ username: 'FederalistTestingUser' }).exec(function (err, u) {
+      User.find({ username: FEDERALIST_TEST_USER }).exec(function (err, u) {
         var data = {
-          owner: 'FederalistTestingUser',
+          owner: FEDERALIST_TEST_USER,
           repository: 'microsite-template',
           users: [u[0].id]
         };

@@ -6,10 +6,17 @@
 
 var BaseFederalistPage = require('./baseFederalist.page');
 
+var FEDERALIST_TEST_USER = process.env.FEDERALIST_TEST_USER;
+
 function FileListingPage () {
   BaseFederalistPage.apply(this, arguments);
 
-  this.url = '/#edit/FederalistTestingUser/microsite-template/gh-pages';
+  this.url = [
+    '/#edit',
+    FEDERALIST_TEST_USER, 
+    'microsite-template',
+    'gh-pages'
+  ].join('/');
 }
 
 FileListingPage.prototype = Object.create(BaseFederalistPage.prototype);
