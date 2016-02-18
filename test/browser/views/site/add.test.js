@@ -1,7 +1,7 @@
 var assert = require('assert');
 var mocha = require('mocha');
 
-var AddSiteView = require('./../../../../../assets/app/views/site/add');
+var AddSiteView = require('./../../../../assets/app/views/site/add');
 
 describe('add site view', function () {
   var view;

@@ -3,7 +3,7 @@ var path = require('path');
 
 var assert = require('assert');
 
-var Document = require('./../../../../assets/app/models/Document');
+var Document = require('./../../../assets/app/models/Document');
 
 var data = {
   yml: fs.readFileSync(path.resolve(__dirname, '../data/settings.yml')).toString(),

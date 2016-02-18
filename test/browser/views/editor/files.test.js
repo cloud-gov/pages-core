@@ -4,10 +4,10 @@ var sinon = require('sinon');
 
 var mockData = JSON.stringify(require('../../data/repoResponse.json'));
 
-var Github = require('./../../../../../assets/app/models/Github');
+var Github = require('./../../../../assets/app/models/Github');
 var githubHelpers = require('../../models/githubHelpers');
 
-var FilesView = require('./../../../../../assets/app/views/editor/files');
+var FilesView = require('./../../../../assets/app/views/editor/files');
 
 var server;
 
