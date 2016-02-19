@@ -3,9 +3,9 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 
-var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/file-list-item.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../../templates/editor/file-list-item.html').toString();
 
-var FileListView = Backbone.View.extend({
+var FileBrowserView = Backbone.View.extend({
   tagName: 'ul',
   className: 'list-group',
   initialize: function (opts) {
@@ -53,4 +53,4 @@ var FileListView = Backbone.View.extend({
   }
 });
 
-module.exports = FileListView;
+module.exports = FileBrowserView;

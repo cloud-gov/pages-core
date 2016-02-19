@@ -4,17 +4,17 @@ var Backbone = require('backbone');
 var ViewSwitcher = require('ampersand-view-switcher');
 var _ = require('underscore');
 
-var encodeB64 = require('../../helpers/encoding').encodeB64;
-var decodeB64 = require('./../../helpers/encoding').decodeB64;
+var encodeB64 = require('../../../helpers/encoding').encodeB64;
+var decodeB64 = require('../../../helpers/encoding').decodeB64;
 
 var BreadcrumbView = require('./breadcrumb');
-var FileListView = require('./files');
-var PagesView = require('./pages');
-var EditorView = require('./edit-file');
+var FileBrowserView = require('./file-browser');
+var NavBuilderView = require('./nav-builder');
+var EditorView = require('./editor/editor');
 
-var Github = require('./../../models/Github');
+var Github = require('../../../models/Github');
 
-var template = _.template(fs.readFileSync(__dirname + '/../../templates/editor/main.html').toString());
+var template = _.template(fs.readFileSync(__dirname + '/../../../templates/editor/main.html').toString());
 
 var EditView = Backbone.View.extend({
   tagName: 'div',
@@ -90,10 +90,10 @@ var EditView = Backbone.View.extend({
       this.$('#edit-button').append(editButton);
       if (config['_navigation.json'] && config['_navigation.json'].present) {
         pages = config['_navigation.json'].json;
-        childView = new PagesView({ model: model, pages: pages });
+        childView = new NavBuilderView({ model: model, pages: pages });
       }
       else {
-        childView = new FileListView({ model: model });
+        childView = new FileBrowserView({ model: model });
       }
     }
 

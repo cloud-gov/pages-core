@@ -3,9 +3,9 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 
-var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/page-list-item.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../../templates/editor/page-list-item.html').toString();
 
-var PagesView = Backbone.View.extend({
+var NavBuilderView = Backbone.View.extend({
   tagName: 'ul',
   className: 'list-group',
   initialize: function (opts) {
@@ -47,4 +47,4 @@ var PagesView = Backbone.View.extend({
   }
 });
 
-module.exports = PagesView;
+module.exports = NavBuilderView;

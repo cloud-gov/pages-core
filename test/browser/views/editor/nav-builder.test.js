@@ -5,18 +5,14 @@ var sinon = require('sinon');
 var mockData = JSON.stringify(require('../../data/repoResponse.json'));
 var mockCommitResponse = JSON.stringify(require('../../data/commitResponse.json'));
 
-var Github = require('./../../../../assets/app/models/Github');
+var Github = require('./../../../../../assets/app/models/Github');
 var githubHelpers = require('../../models/githubHelpers');
 
-<<<<<<< HEAD:test/browser/views/editor/breadcrumb.test.js
-var BreadcrumbView = require('./../../../../assets/app/views/editor/breadcrumb');
-=======
-var BreadcrumbView = require('./../../../../../assets/app/views/site/pages/breadcrumb');
->>>>>>> Reorganize front end code:test/browser/unit/views/editor/breadcrumb.test.js
+var NavBuilderView = require('./../../../../../assets/app/views/site/pages/nav-builder');
 
 var server;
 
-describe('breadcrumb view', function () {
+describe('nav-builder view', function () {
   var model;
 
   beforeEach(function () {
@@ -34,15 +30,23 @@ describe('breadcrumb view', function () {
     describe('without model', function () {
       it('should throw exception', function () {
         assert.throws(function () {
-          new BreadcrumbView();
+          new NavBuilderView();
         });
       });
     });
 
-    describe('with a model', function () {
+    describe('with a model but without a pages option', function () {
+      it('should throw exception', function () {
+        assert.throws(function () {
+          new NavBuilderView({ model: model });
+        });
+      });
+    });
+
+    describe('with a model and a pages option', function () {
       it('should not throw exception', function () {
         assert.doesNotThrow(function () {
-          new BreadcrumbView({ model: model });
+          new NavBuilderView({ model: model, pages: [] });
         });
       });
     });
