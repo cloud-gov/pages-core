@@ -5,14 +5,14 @@ var _ = require('underscore');
 
 /* this require looks gross but it enables us to have one place
 to set template data that is available to the front and back end apps */
-var SiteTemplates = require('../../../../config/templates').templates;
+var SiteTemplates = require('../../../config/templates').templates;
 
-var SiteModel = require('../../models/Site').model;
-var Github = require('./../../models/Github');
+var SiteModel = require('../models/Site').model;
+var Github = require('../models/Github');
 
-var templateHtml = fs.readFileSync(__dirname + '/../../templates/site/add.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../templates/site/add.html').toString();
 
-var decodeB64 = require('./../../helpers/encoding').decodeB64;
+var decodeB64 = require('../helpers/encoding').decodeB64;
 
 var AddSiteView = Backbone.View.extend({
   tagName: 'div',

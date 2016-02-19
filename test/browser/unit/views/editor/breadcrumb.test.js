@@ -8,7 +8,7 @@ var mockCommitResponse = JSON.stringify(require('../../data/commitResponse.json'
 var Github = require('./../../../../../assets/app/models/Github');
 var githubHelpers = require('../../models/githubHelpers');
 
-var BreadcrumbView = require('./../../../../../assets/app/views/editor/breadcrumb');
+var BreadcrumbView = require('./../../../../../assets/app/views/site/pages/breadcrumb');
 
 var server;
 

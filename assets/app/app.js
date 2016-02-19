@@ -49,8 +49,8 @@ var Router = Backbone.Router.extend({
     '': 'home',
     'new': 'newSite',
     'edit/:owner/:repo/:branch(/)*file': 'edit',
-    'site/:id/edit': 'editSite',
-    'site/:id/builds': 'builds'
+    'site/:id/settings': 'editSite',
+    'site/:id/logs': 'builds'
   },
   home: function () {
     this.mainView.home();

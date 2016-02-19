@@ -3,9 +3,10 @@ var fs = require('fs');
 var _ = require('underscore');
 var Backbone = require('backbone');
 
-var html = _.template(fs.readFileSync(__dirname + '/../../templates/editor/add-image.html').toString());
+var templateHtml = fs.readFileSync(__dirname + '/../../../../templates/editor/add-image.html').toString();
 
 var AddImageView = Backbone.View.extend({
+  template: _.template(templateHtml),
   events: {
     'click #upload-card a': 'triggerFilePicker',
     'change [type=file]': 'uploadFileSelected',
@@ -16,10 +17,12 @@ var AddImageView = Backbone.View.extend({
   initialize: function () {
     this.github = window.federalist.github;
     this.selectedImage = false;
-    this.el.innerHTML = html({ assets: this.github.filterAssets('images') });
+    this.el.innerHTML = this.template({
+      assets: this.github.filterAssets('images')
+    });
   },
   disableButton: function (selector) {
-    var button = this.$(selector)
+    var button = this.$(selector);
     button.attr('disabled', true);
     button.removeClass('usa-button-secondary');
     button.addClass('usa-button-disabled');
