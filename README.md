@@ -135,8 +135,10 @@ models: {
 
 To run the integration tests you'll need:
 
-- [Selenium](http://www.seleniumhq.org/) (and [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
+- [Selenium](http://www.seleniumhq.org/) (and [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html)).
 - [chromedriver](https://sites.google.com/a/chromium.org/chromedriver/)
+
+On a mac, you can install them via Homebrew:
 
     $ brew install selenium-server-standalone
     $ brew install chromedriver
