@@ -59,7 +59,8 @@ var SiteView = Backbone.View.extend({
     return this;
   },
   onSettingSaveSuccess: function (e) {
-    this.showPages();
+    var url = ['#site', this.model.get('id')].join('/');
+    federalist.navigate(url, { trigger: true });
   }
 });
 
