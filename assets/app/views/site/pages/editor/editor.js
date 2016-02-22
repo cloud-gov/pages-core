@@ -52,9 +52,13 @@ var EditorView = Backbone.View.extend({
     this.$el.html(this.template(html));
     this.initializeSettingsEditor(this.doc);
     this.initializeContentEditor(this.doc, fileExt);
+    this.initializeSockets(file);
 
+    return this;
+  },
+  initializeSockets: function (file) {
+    var self = this;
     io.socket.get('/v0/site/lock', { file: file }, function(data) {
-
       // Store the socket ID for future reference
       self.socket = data.id;
 
@@ -70,12 +74,9 @@ var EditorView = Backbone.View.extend({
         $('.alert-container').html('');
         io.socket.get('/v0/site/unlock', { file: file });
       });
-
     });
-
-    return this;
   },
-  previewButton: function(sites) {
+  previewButton: function (sites) {
     var build = _.chain(federalist.github
       .get('site')
       .get('builds'))
@@ -341,6 +342,12 @@ var EditorView = Backbone.View.extend({
       );
     }.bind(this));
   },
+  showSavingStatusResult: function () {
+    this.$('#save-status-result').show();
+    this.$('#save-status-result').removeClass('label-success');
+    this.$('#save-status-result').removeClass('label-danger');
+    this.$('#save-status-result').text('Saving...');
+  },
   saveDocument: function (e, method, done) {
     var self = this,
         settings = this.getSettingsFromEditor(),
@@ -352,11 +359,7 @@ var EditorView = Backbone.View.extend({
     method = method || 'save';
     done = done || this.saveSuccess;
 
-    this.$('#save-status-result').show();
-    this.$('#save-status-result').removeClass('label-success');
-    this.$('#save-status-result').removeClass('label-danger');
-    this.$('#save-status-result').text('Saving...');
-
+    this.showSavingStatusResult();
     this.doc.frontMatter = false;
 
     if (settings) this.doc.frontMatter = settings;
