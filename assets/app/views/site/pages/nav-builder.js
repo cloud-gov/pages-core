@@ -22,7 +22,7 @@ var NavBuilderView = Backbone.View.extend({
 
     function addToList(list, item) {
       var m = self.model,
-          href = ['/#edit', m.owner, m.name, m.branch, item.href].join('/'),
+          href = ['#site', m.site.id, 'edit', m.get('branch'), item.href].join('/'),
           html = template({
             text: item.text,
             href: href,
