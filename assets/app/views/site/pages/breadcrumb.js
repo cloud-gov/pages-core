@@ -21,6 +21,7 @@ var BreadcrumbView = Backbone.View.extend({
   render: function () {
     var self    = this,
         model   = this.model,
+        siteId  = this.model.site.id,
         owner   = this.model.get('owner'),
         repo    = this.model.get('repoName'),
         branch  = this.model.get('branch'),
@@ -42,21 +43,21 @@ var BreadcrumbView = Backbone.View.extend({
       this.$el.addClass('files');
       this.$el.append(html({
         text: 'All files',
-        link: ['#edit', owner, repo, branch].join('/')
+        link: ['#site', siteId].join('/')
       }));
 
       filePath = file.split('/');
       filePath.forEach(function(file, i) {
         var repoHref = [owner, repo, branch].join('/');
         var fileHref = filePath.slice(0, i + 1).join('/');
-        var link = ['#edit', repoHref, fileHref].join('/');
+        var link = ['#site', siteId, branch, fileHref].join('/');
         self.$el.append(html({ text: file, link: link }));
       });
     }
     else {
       this.$el.append(html({
         text: 'All pages',
-        link: ['#edit', owner, repo, defaultBranch].join('/')
+        link: ['#site', siteId].join('/')
       }));
     }
     return this;
