@@ -1,15 +1,20 @@
 @import "sass/_variables";
-@import "sass/_text";
+
 @import "sass/_actions";
+@import "sass/_alerts";
+@import "sass/_animations";
+@import "sass/_breadcrumb";
+@import "sass/_dashboard";
+@import "sass/_editors";
+@import "sass/_forms";
 @import "sass/_header";
 @import "sass/_home";
-@import "sass/_breadcrumb";
-@import "sass/_forms";
-@import "sass/_editors";
-@import "sass/_animations";
-@import "sass/_loader";
 @import "sass/_icons";
+@import "sass/_image-manager";
 @import "sass/_labels";
+@import "sass/_loader";
+@import "sass/_logs";
+@import "sass/_text";
 
 html,
 body,
@@ -17,41 +22,6 @@ main,
 main > div,
 .usa-grid.site {
   height: 100%;
-}
-
-.sites-list {
-  width: 100%;
-}
-
-.sites-list .sites-list-item:before {
-  content: "";
-}
-
-.sites-list .sites-list-item {
-  align-items: center;
-  background-color: #e6e6e6;
-  display: flex;
-  margin-bottom: .2em;
-  padding: 1em;
-  width: 100%;
-}
-
-.sites-list-item-text,
-.sites-list-item-actions {
-  flex-grow: 1;
-}
-
-.sites-list-item-text p {
-  margin: 0;
-}
-
-.sites-list-item-actions {
-  padding-right: 2em;
-  text-align: right;
-}
-
-.usa-footer-secondary_section {
-  background-color: $secondary-background-color;
 }
 
 .recent-drafts {
@@ -66,12 +36,6 @@ main > div,
   content: '';
   clear: both;
   display: table-cell;
-}
-
-@media screen and (min-width: 600px) {
-  form {
-    max-width: 100%;
-  }
 }
 
 .list-group {
@@ -104,65 +68,6 @@ main > div,
   padding-left: 2em;
 }
 
-.upload-alert {
-  margin-bottom: 1.5em;
-}
-
-.image-cards {
-  margin-bottom: 1em;
-  overflow-x: scroll;
-  width: 100%;
-}
-
-.image-cards .scroll{
-  display: flex;
-}
-
-.image-card {
-  background-color: #ccc;
-  margin-right: 1em;
-  min-height: 200px;
-  position: relative;
-  width: 150px;
-}
-
-.image-cards .selected {
-  border: 7px solid black;
-}
-
-.image-card img {
-  margin-left: 5%;
-  margin-top: 5%;
-  width: 90%;
-}
-
-.image-card span {
-  background-color: pink;
-  bottom: .5em;
-  display: inline-block;
-  left: 0;
-  padding-top: .3em;
-  padding-bottom: .3em;
-  position: absolute;
-  text-align: center;
-  width: 100%;
-}
-
-.mask {
-  cursor: not-allowed;
-  background: rgba(255,255,255,0.5);
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-}
-
-.build-log-table td:last-child {
-  word-break: break-word;
-}
-
 .main-loader {
   text-align: center;
   min-height: 200px;
@@ -170,46 +75,13 @@ main > div,
   color: #5b616b;
 }
 
-.dashboard--empty {
-  margin-top: 2em;
-  text-align: center;
-}
-
-.dashboard--empty img {
-  width: 100px;
-  margin: 0 auto;
-}
-
-.header {
-  margin-top: 1.5em;
-  margin-bottom: 1.5em;
-}
-
-.header-icon {
-  width: 90px;
-}
-
-.header-title {
-  display: inline-block;
-  margin-left: 1em;
-}
-
-.header-title h1 {
-  margin: 0;
-}
-
-.header-title p {
-  line-height: 1em;
-  margin: 0;
-}
-
 .site {
-  background-color: $secondary-background-color;
   padding-right: 0;
 }
 
 .site-main {
   background-color: white;
+  min-height: 100%;
   padding-bottom: 3em;
 }
 

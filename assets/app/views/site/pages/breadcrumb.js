@@ -5,7 +5,7 @@ var html = _.template('<li> <% if (link) { %> <a href="<%- link %>"><% } %> <%- 
 
 var BreadcrumbView = Backbone.View.extend({
   initialize: function(opts) {
-    var opts = opts || {};
+    opts = opts || {};
 
     if (!opts.model) throw new Error('');
 
