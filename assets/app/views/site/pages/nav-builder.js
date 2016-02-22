@@ -3,7 +3,7 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 
-var templateHtml = fs.readFileSync(__dirname + '/../../../templates/editor/page-list-item.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../../templates/site/pages/page-list-item.html').toString();
 
 var NavBuilderView = Backbone.View.extend({
   tagName: 'ul',

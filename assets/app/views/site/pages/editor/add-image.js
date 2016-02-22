@@ -3,7 +3,7 @@ var fs = require('fs');
 var _ = require('underscore');
 var Backbone = require('backbone');
 
-var templateHtml = fs.readFileSync(__dirname + '/../../../../templates/editor/add-image.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../../../templates/site/pages/editor/add-image.html').toString();
 
 var AddImageView = Backbone.View.extend({
   template: _.template(templateHtml),

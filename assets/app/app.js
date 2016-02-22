@@ -4,11 +4,12 @@ window.jQuery = window.$ = Backbone.$;
 
 var MainContainerView = require('./views/main');
 var NavbarView = require('./views/nav');
+var AddSiteView = require('./views/add');
 
 var UserModel = require('./models/User');
 var SiteCollection = require('./models/Site').collection;
 
-var encodeB64 = require('./helpers/encoding').encodeB64;
+var encodingHelpers = require('./helpers/encoding');
 
 var Router = Backbone.Router.extend({
   initialize: function () {
@@ -22,7 +23,7 @@ var Router = Backbone.Router.extend({
 
     this.listenToOnce(this.user, 'sync', function (user) {
       var token = self.user.attributes.passports[0].tokens.accessToken;
-      window.localStorage.setItem('token', encodeB64(token));
+      window.localStorage.setItem('token', encodingHelpers.encodeB64(token));
       self.sites = new SiteCollection();
       self.sites.fetch({
         data: $.param({ limit: 50 }),
@@ -46,33 +47,50 @@ var Router = Backbone.Router.extend({
 
   },
   routes: {
-    '': 'home',
+    '': 'dashboard',
     'new': 'newSite',
     'edit/:owner/:repo/:branch(/)*file': 'edit',
-    'site/:id/settings': 'editSite',
-    'site/:id/logs': 'builds'
+    'site/:id(/)': 'sitePages',
+    'site/:id/edit/:branch(/)*file': 'sitePages',
+    'site/:id/settings': 'siteSettings',
+    'site/:id/logs': 'siteLogs'
   },
-  home: function () {
-    this.mainView.home();
+  dashboard: function () {
+    this.mainView.dashboard();
     return this;
   },
   newSite: function () {
-    this.mainView.newSite();
+    var addSiteView = new AddSiteView({
+      user: this.user,
+      collection: this.sites
+    });
+    this.mainView.pageSwitcher.set(addSiteView);
+    this.listenToOnce(addSiteView, 'site:save:success', this.onAddSiteSuccess);
     return this;
   },
   edit: function (owner, repo, branch, file) {
     this.mainView.edit(owner, repo, branch, file);
     return this;
   },
-  editSite: function(id) {
-    this.mainView.editSite(id);
+  sitePages: function (id, branch, file) {
+    this.mainView.sitePages(id, branch, file);
     return this;
   },
-  builds: function(id) {
-    this.mainView.builds(id);
+  siteSettings: function(id) {
+    this.mainView.siteSettings(id);
     return this;
+  },
+  siteLogs: function(id) {
+    this.mainView.siteLogs(id);
+    return this;
+  },
+  onAddSiteSuccess: function (e) {
+    this.dashboard();
   }
 });
 
 window.federalist = new Router();
 window.federalist.dispatcher = _.clone(Backbone.Events);
+window.federalist.helpers = {
+  encoding: encodingHelpers
+};

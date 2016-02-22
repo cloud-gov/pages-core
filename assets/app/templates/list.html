@@ -1,0 +1,32 @@
+<% if (sitesCount === 0) { %>
+  <div class="usa-grid dashboard--empty">
+    <img src="/images/website.svg" alt="Website icon">
+    <h1>Welcome to Federalist!</h1>
+    <p>It looks like you don't have any websites yet. Add a website and let's get started.</p>
+    <a class="usa-button usa-button-big icon icon-new icon-white" href="#new" alt="Add a new website" role="button">Add Website</a>
+  </div>
+<% } else { %>
+  <div class="usa-grid dashboard header">
+    <div class="usa-width-two-thirds">
+      <img class="header-icon" src="/images/websites.svg" alt="Websites icon">
+      <div class="header-title">
+        <h1>Your Websites</h1>
+        <p>Dashboard</p>
+      </div>
+    </div>
+    <div class="usa-width-one-third">
+      <a class="usa-button usa-button-big pull-right icon icon-new icon-white" href="#new"  alt="Add a new website" role="button">Add Website</a>
+    </div>
+  </div>
+
+  <div class="usa-grid">
+    <h2>Websites</h2>
+    <ul class="sites-list"></ul>
+  </div>
+
+  <div class="usa-grid">
+    <div class="usa-width-one-whole" style="text-align: center;">
+      <a class="usa-button usa-button-big icon icon-new icon-white" href="#new"  alt="Add a new website" role="button">Add Website</a>
+    </div>
+  </div>
+<% } %>

@@ -21,9 +21,15 @@ describe('files view', function () {
     sinon.xhr.supportsCORS = true;
 
     model = new Github(githubHelpers.getOpts());
+    model.site = {
+      id: 28,
+      get: function (attr) {
+        return this[attr];
+      }
+    };
     server.respondWith('GET', githubHelpers.makeUrl(), githubHelpers.mockResponse(mockData));
     server.respond();
-  })
+  });
 
   describe('when view is initialized', function () {
     describe('without model', function () {
@@ -59,7 +65,7 @@ describe('files view', function () {
       });
 
       it('should link to the editor for .md files', function () {
-        var r = /(github.com.+)/,
+        var r = /#site.*md$/,
             view = new FileBrowserView({ model: model }),
             link = view.link({
               type: 'file',
@@ -68,11 +74,11 @@ describe('files view', function () {
             }),
             match = link.match(r);
 
-        assert.equal(match, null);
+        assert.equal(match);
       });
 
       it('should link to itself for folders', function () {
-        var r = /#edit/,
+        var r = /#site/,
             view = new FileBrowserView({ model: model }),
             link = view.link({
               type: 'folder',

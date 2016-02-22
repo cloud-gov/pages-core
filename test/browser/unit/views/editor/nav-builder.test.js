@@ -24,7 +24,7 @@ describe('nav-builder view', function () {
     model = new Github(githubHelpers.getOpts());
     server.respondWith('GET', githubHelpers.makeUrl(), githubHelpers.mockResponse(mockData));
     server.respond();
-  })
+  });
 
   describe('when view is initialized', function () {
     describe('without model', function () {

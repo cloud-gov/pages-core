@@ -1,5 +1,16 @@
-<div class="usa-grid">
-  <h1>Settings for <%- model.owner %> / <%- model.repository %></h1>
+<div class="usa-grid header">
+  <div class="usa-width-two-thirds">
+    <img class="header-icon" src="/images/website.svg" alt="Websites icon">
+    <div class="header-title">
+      <h1><%- model.repository %></h1>
+      <p>Settings</p>
+    </div>
+  </div>
+  <div class="usa-width-one-third">
+    <a class="usa-button usa-button-big pull-right icon icon-view icon-white"
+        href="/site/<%- model.owner %>/<%- model.repository %>/"
+        alt="View this website" role="button" target="_blank">View Website</a>
+  </div>
 </div>
 <form id="site-edit">
   <div class="usa-grid">
@@ -25,13 +36,11 @@
     </div>
   </div>
   <div class="usa-grid">
-    <div class="usa-width-two-thirds">
+    <div class="usa-width-one-whole">
       <div class="form-group">
         <label class="active" for="domain">Custom domain</label>
         <input name="domain" class="form-control" type="text" placeholder="https://example.com" value="<%- model.domain %>">
       </div>
-    </div>
-    <div class="usa-width-one-third">
       <div class="usa-alert usa-alert-info">
         <div class="usa-alert-body">
           <h3 class="usa-alert-heading">Custom Domain</h3>
@@ -42,7 +51,7 @@
     </div>
   </div>
   <div class="usa-grid">
-    <div class="usa-width-two-thirds">
+    <div class="usa-width-one-whole">
       <% if (model.engine === 'jekyll') { %>
       <div class="form-group">
          <label for="config"
@@ -50,8 +59,6 @@
         <textarea name="config" class="form-control"><%- model.config %></textarea>
       </div>
       <% } %>
-    </div>
-    <div class="usa-width-one-third">
       <div class="usa-alert usa-alert-info">
         <div class="usa-alert-body">
           <h3 class="usa-alert-heading">Configuration</h3>
@@ -66,12 +73,10 @@
       <button class="usa-button usa-button-primary" data-action="save-site-settings">Save</button>
     </div>
   </div>
-  </form>
-  <div class="usa-grid">
-    <div class="usa-alert usa-alert-error" role="alert">
-      Delete this site from Federalist?
-      <a href="#" class="usa-button usa-button-secondary" data-action="delete-site" alt="delete the site <%- model.repository %>">Delete</a>
-    </div>
+</form>
+<div class="usa-grid">
+  <div class="usa-alert usa-alert-error" role="alert">
+    Delete this site from Federalist?
+    <a href="#" class="usa-button usa-button-secondary" data-action="delete-site" alt="delete the site <%- model.repository %>">Delete</a>
   </div>
-
 </div>

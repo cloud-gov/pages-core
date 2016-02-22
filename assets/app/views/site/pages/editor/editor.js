@@ -13,8 +13,8 @@ var decodeB64 = require('../../../../helpers/encoding').decodeB64;
 
 var Document = require('../../../../models/Document');
 
-var templateHtml = fs.readFileSync(__dirname + '/../../../../templates/editor/file.html').toString();
-var whitelistFieldHtml = fs.readFileSync(__dirname + '/../../../../templates/editor/whitelist-field.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../../../templates/site/pages/editor/file.html').toString();
+var whitelistFieldHtml = fs.readFileSync(__dirname + '/../../../../templates/site/pages/editor/whitelist-field.html').toString();
 
 var EditorView = Backbone.View.extend({
   tagName: 'div',
