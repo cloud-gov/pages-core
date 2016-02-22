@@ -9,3 +9,9 @@ label,
 fieldset {
   margin-top: 2rem;
 }
+
+@media screen and (min-width: 600px) {
+  form {
+    max-width: 100%;
+  }
+}

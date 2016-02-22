@@ -15,7 +15,7 @@ nav {
 }
 
 .logo {
-  flex-grow: 2;
+  flex-grow: 3;
 }
 
 .navbar-links {
@@ -71,4 +71,27 @@ $logo-height: 29px;
   display: inline-block;
   height: $logo-height;
   width: $logo-width;
+}
+
+.header {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.header-icon {
+  width: 90px;
+}
+
+.header-title {
+  display: inline-block;
+  margin-left: 1em;
+}
+
+.header-title h1 {
+  margin: 0;
+}
+
+.header-title p {
+  line-height: 1em;
+  margin: 0;
 }
