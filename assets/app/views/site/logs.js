@@ -4,9 +4,9 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 var moment = require('moment');
 
-var templateHtml = fs.readFileSync(__dirname + '/../../templates/site/builds.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../templates/site/logs.html').toString();
 
-var BuildsView = Backbone.View.extend({
+var SiteLogsView = Backbone.View.extend({
   tagName: 'div',
   className: 'list',
   template: _.template(templateHtml, { variable: 'site' }),
@@ -40,4 +40,4 @@ var BuildsView = Backbone.View.extend({
     return this;
   }
 });
-module.exports = BuildsView;
+module.exports = SiteLogsView;

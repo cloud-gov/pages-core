@@ -59,7 +59,7 @@ describe('edit-file view', function () {
     });
 
     it('should whitelist settingsFields', function () {
-      EditorView.prototype.settingsFields = {'title': 'text'}
+      EditorView.prototype.settingsFields = {'title': 'text'};
       var doc = {
             frontMatter: "title: Test\nlayout: test-layout\nfoo: bar\n"
           },

@@ -5,8 +5,8 @@ var _ = require('underscore');
 var moment = require('moment');
 
 var SiteModel = require('../models/Site').model;
-var listTemplateHtml = fs.readFileSync(__dirname + '/../templates/site/list.html').toString();
-var listItemTemplateHtml = fs.readFileSync(__dirname + '/../templates/site/list-item.html').toString();
+var listTemplateHtml = fs.readFileSync(__dirname + '/../templates/list.html').toString();
+var listItemTemplateHtml = fs.readFileSync(__dirname + '/../templates/list-item.html').toString();
 
 var SiteListView = Backbone.View.extend({
   tagName: 'div',
@@ -42,6 +42,7 @@ var SiteListView = Backbone.View.extend({
 
 var SiteListItemView = Backbone.View.extend({
   tagName: 'li',
+  className: 'sites-list-item',
   model: SiteModel,
   template: _.template(listItemTemplateHtml),
   initialize: function initializeSiteView() {
@@ -64,6 +65,8 @@ var SiteListItemView = Backbone.View.extend({
       lastBuild.state === 'skipped' ? '<span class="usa-label label-success">Published</span>' :
       '<span class="usa-label label-warning">Publishing...</span>';
     this.$el.html(this.template(data));
+
+    this.$el.attr('data-site-id', data.id);
   }
 });
 

@@ -1,6 +1,6 @@
 @import "sass/_variables";
 @import "sass/_text";
-@import "sass/_buttons";
+@import "sass/_actions";
 @import "sass/_header";
 @import "sass/_home";
 @import "sass/_breadcrumb";
@@ -8,27 +8,50 @@
 @import "sass/_editors";
 @import "sass/_animations";
 @import "sass/_loader";
+@import "sass/_icons";
+@import "sass/_labels";
 
-footer {
-  margin-top: 5em;
+html,
+body,
+main,
+main > div,
+.usa-grid.site {
+  height: 100%;
 }
 
-.site-title {
-  background-color: #f1f1f1;
-  color: #212121;
-  display: inline-block;
+.sites-list {
+  width: 100%;
+}
+
+.sites-list .sites-list-item:before {
+  content: "";
+}
+
+.sites-list .sites-list-item {
+  align-items: center;
+  background-color: #e6e6e6;
+  display: flex;
+  margin-bottom: .2em;
+  padding: 1em;
+  width: 100%;
+}
+
+.sites-list-item-text,
+.sites-list-item-actions {
+  flex-grow: 1;
+}
+
+.sites-list-item-text p {
   margin: 0;
-  padding-bottom: 1.5rem;
-  padding-left: 3rem;
-  padding-right: 5.5rem;
-  padding-top: 1.5rem;
-  width: 70%;
 }
 
-.site-publishing-status {
-  display: inline-block;
+.sites-list-item-actions {
+  padding-right: 2em;
   text-align: right;
-  width: 25%
+}
+
+.usa-footer-secondary_section {
+  background-color: $secondary-background-color;
 }
 
 .recent-drafts {
@@ -49,22 +72,6 @@ footer {
   form {
     max-width: 100%;
   }
-}
-
-.usa-label {
-  text-transform: capitalize;
-}
-
-.label-success {
-  background-color: $label-success-bg-color;
-}
-
-.label-danger {
-  background-color: $label-danger-bg-color;
-}
-
-.label-warning {
-  background-color: $label-warning-bg-color;
 }
 
 .list-group {
@@ -161,4 +168,78 @@ footer {
   min-height: 200px;
   margin: 40px 0;
   color: #5b616b;
+}
+
+.dashboard--empty {
+  margin-top: 2em;
+  text-align: center;
+}
+
+.dashboard--empty img {
+  width: 100px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.header-icon {
+  width: 90px;
+}
+
+.header-title {
+  display: inline-block;
+  margin-left: 1em;
+}
+
+.header-title h1 {
+  margin: 0;
+}
+
+.header-title p {
+  line-height: 1em;
+  margin: 0;
+}
+
+.site {
+  background-color: $secondary-background-color;
+  padding-right: 0;
+}
+
+.site-main {
+  background-color: white;
+  padding-bottom: 3em;
+}
+
+.site-actions {
+  list-style-type: none;
+}
+
+.site-actions li:before {
+  content: '';
+}
+
+.site-actions li {
+  margin-bottom: .5em;
+}
+
+.site-actions a {
+  color: $text-color;
+}
+
+.site-actions a:hover {
+  color: $link-color;
+}
+
+.usa-grid.site:before {
+  background-color: $secondary-background-color;
+  bottom: 0;
+  content: '';
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 50%;
+  z-index: -1;
 }

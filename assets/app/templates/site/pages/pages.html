@@ -1,0 +1,26 @@
+<div class="usa-grid header">
+  <div class="usa-width-two-thirds">
+    <img class="header-icon" src="/images/website.svg" alt="Websites icon">
+    <div class="header-title">
+      <h1><%- repository %></h1>
+      <p>Pages</p>
+    </div>
+  </div>
+  <div class="usa-width-one-third">
+    <% if (!false) { %>
+    <a class="usa-button usa-button-big pull-right icon icon-new icon-white" id="add-page" alt="Add a new page" href="#" role="button">Add a new page</a>
+    <% } else if (draft) { %>
+    <div class="preview-buttons">
+      <a class="usa-button usa-button-big pull-right preview-button" href="/preview/<%- owner %>/<%- repository %>/<%- branch %>/" role="button">Preview Draft</a>
+      <button class="usa-button usa-button-disabled usa-button-big pull-right preview-button-disabled">Generating Preview...</button>
+    </div>
+    <% } %>
+  </div>
+</div>
+<div class="usa-grid">
+  <ol class="breadcrumb">
+  </ol>
+</div>
+
+<div class="usa-grid" id="edit-content">
+</div>

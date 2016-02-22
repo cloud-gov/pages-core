@@ -10,7 +10,7 @@ var SiteTemplates = require('../../../config/templates').templates;
 var SiteModel = require('../models/Site').model;
 var Github = require('../models/Github');
 
-var templateHtml = fs.readFileSync(__dirname + '/../templates/site/add.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../templates/add.html').toString();
 
 var decodeB64 = require('../helpers/encoding').decodeB64;
 

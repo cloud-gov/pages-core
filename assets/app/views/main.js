@@ -2,11 +2,8 @@ var Backbone = require('backbone');
 var ViewSwitcher = require('ampersand-view-switcher');
 var querystring = require('querystring');
 
-var SiteEditView = require('./site/settings');
 var SiteListView = require('./list');
-var AddSiteView = require('./add');
-var BuildsView = require('./site/logs');
-var EditorContainerView = require('./site/pages/pages');
+var SiteView = require('./site/site');
 
 var AppView = Backbone.View.extend({
   el: 'main',
@@ -33,22 +30,32 @@ var AppView = Backbone.View.extend({
       }
     });
   },
-  home: function () {
-    var authed = this.user.isAuthenticated(),
-        error = querystring.parse(window.location.search.slice(1)).error,
-        messages = {
-          'Error.Passport.Unauthorized': 'Your account is not set up to access Federalist. Have you signed up as a beta user? If you have signed up and should have access, please let us know.',
-          'preview.login': 'Please log in to preview this site',
-          'default': 'An unexpected error occured. Please try again. If you continue to see this message, please let us know.'
-        },
-        message = error && (messages[error] || messages['default']);
+  clearAlerts: function () {
+    $('.alert-container').html('');
+  },
+  setAlert: function (text) {
+    $('.alert-container').html(
+      '<div class="alert alert-danger" role="alert">' + text + '</div>'
+    );
+  },
+  parseDashboardErrorFromURL: function (url) {
+    var messages = {
+      'Error.Passport.Unauthorized': 'Your account is not set up to access Federalist. Have you signed up as a beta user? If you have signed up and should have access, please let us know.',
+      'preview.login': 'Please log in to preview this site',
+      'default': 'An unexpected error occured. Please try again. If you continue to see this message, please let us know.'
+    };
+    var error = querystring.parse(url.search.slice(1)).error;
+    var message = error && (messages[error] || messages['default']);
+
+    return message;
+  },
+  dashboard: function () {
+    var error = this.parseDashboardErrorFromURL(window.location);
 
     federalist.navigate('');
+    this.clearAlerts();
 
-    // Clear any existing errors
-    $('.alert-container').html('');
-
-    if(authed) {
+    if(this.user.isAuthenticated()) {
       var listView = new SiteListView({ collection: this.sites });
       this.pageSwitcher.set(listView);
 
@@ -56,50 +63,66 @@ var AppView = Backbone.View.extend({
     }
 
     // Show alert message
-    if (message) {
-      $('.alert-container').html(
-        '<div class="alert alert-danger" role="alert">' + message + '</div>'
-      );
-    }
+    if (message) this.setAlert(message);
 
     return this;
   },
-  newSite: function () {
-    var addSiteView = new AddSiteView({
-          user: this.user,
-          collection: this.sites
-        });
-    this.pageSwitcher.set(addSiteView);
-
-    this.listenToOnce(addSiteView, 'site:save:success', this.home);
-
-    return this;
-  },
-  edit: function (owner, repo, branch, file) {
+  main: function (id) {
     $('.alert-container').html('');
-    if (!file) return this.sites.fetch({ success: loadView.bind(this) });
-    loadView.call(this);
-    return this;
-    function loadView() {
-      var editView = new EditorContainerView({
-        owner: owner,
-        repo: repo,
-        branch: branch,
-        file: file,
-        site: this.sites.findWhere({ owner: owner, repository: repo })
-      });
-      this.pageSwitcher.set(editView);
-    }
+    var site = this.sites.get(id);
+    var owner = site.get('owner');
+    var repository = site.get('repository');
+    var branch = site.get('branch');
+    var file = site.get('file', '');
+    //this.edit(owner, repository, branch, file, site);
   },
-  editSite: function(id) {
-    var siteEditView = new SiteEditView({ model: this.sites.get(id) });
-    this.pageSwitcher.set(siteEditView);
-    this.listenToOnce(siteEditView, 'site:save:success', this.home);
+  // edit: function (owner, repo, branch, file, site) {
+  //   if (!file) return this.sites.fetch({ success: loadView.bind(this) });
+  //   loadView.call(this);
+  //   return this;
+  //   function loadView() {
+  //     var s = site || this.sites.findWhere({ owner: owner, repository: repo });
+  //     console.log('ss', s);
+  //     var editView = new EditorContainerView({
+  //       owner: owner,
+  //       repo: repo,
+  //       branch: branch,
+  //       file: file,
+  //       site: s
+  //     });
+  //     this.pageSwitcher.set(editView);
+  //   }
+  // },
+  getOrCreateSiteView: function (id) {
+    var view = this.siteView;
+    if (view && view.model && view.model.id === parseInt(id)) return view;
+
+    this.siteView = new SiteView({ model: this.sites.get(id) });
+    return this.siteView;
+  },
+  sitePages: function (id, branch, file) {
+    var siteView = this.getOrCreateSiteView(id);
+    this.pageSwitcher.set(siteView);
+    siteView.showPages(branch, file);
     return this;
   },
-  builds: function(id) {
-    var buildsView = new BuildsView({ model: this.sites.get(id) });
-    this.pageSwitcher.set(buildsView);
+  siteEditContent: function (id, branch, file) {
+    console.log('siteEditContent() args', arguments);
+    var siteView = this.getOrCreateSiteView(id);
+    this.pageSwitcher.set(siteView);
+    siteView.showPages(branch, file);
+    return this;
+  },
+  siteSettings: function(id) {
+    var siteView = this.getOrCreateSiteView(id);
+    this.pageSwitcher.set(siteView);
+    siteView.showSettings();
+    return this;
+  },
+  siteLogs: function(id) {
+    var siteView = this.getOrCreateSiteView(id);
+    this.pageSwitcher.set(siteView);
+    siteView.showLogs();
     return this;
   }
 });

@@ -14,10 +14,11 @@ var EditorView = require('./editor/editor');
 
 var Github = require('../../../models/Github');
 
-var template = _.template(fs.readFileSync(__dirname + '/../../../templates/editor/main.html').toString());
+var templateHtml = fs.readFileSync(__dirname + '/../../../templates/site/pages/pages.html').toString();
 
 var EditView = Backbone.View.extend({
   tagName: 'div',
+  template: _.template(templateHtml),
   events: {
     'click #add-page': 'newPage',
     'click #save-page': 'savePage'
@@ -61,13 +62,7 @@ var EditView = Backbone.View.extend({
       ].join('/'), { trigger: true });
     }
 
-    var html = template({
-      owner: model.get('owner'),
-      repo: model.get('repoName'),
-      draft: model.get('isDraft'),
-      file: model.get('file'),
-      branch: model.get('branch')
-    });
+    var html = this.template(this.getTemplateData(model));
 
     this.$el.html(html);
     this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.$('#edit-content')[0]);
@@ -75,8 +70,6 @@ var EditView = Backbone.View.extend({
       $el: this.$('ol.breadcrumb'),
       model: this.model
     }).render();
-
-
 
     this.$('#edit-button').empty();
 
@@ -101,12 +94,23 @@ var EditView = Backbone.View.extend({
 
     return this;
   },
+  getTemplateData: function (model) {
+    model = model || this.model;
+    return {
+      id: model.site.id,
+      owner: model.get('owner'),
+      repository: model.get('repoName'),
+      draft: model.get('isDraft'),
+      file: model.get('file'),
+      branch: model.get('branch')
+    };
+  },
   savePage: function (e) {
     e.preventDefault();
     this.pageSwitcher.current.trigger('click:save');
   },
   newPage: function(e) {
-    e.preventDefault();e.stopPropagation();
+    e.preventDefault();
     var editView = new EditorView({ model: this.model , isNewPage: true });
 
     this.pageSwitcher.set(editView);

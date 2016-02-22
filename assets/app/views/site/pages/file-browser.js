@@ -3,7 +3,7 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 
-var templateHtml = fs.readFileSync(__dirname + '/../../../templates/editor/file-list-item.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../../templates/site/pages/file-list-item.html').toString();
 
 var FileBrowserView = Backbone.View.extend({
   tagName: 'ul',
@@ -32,11 +32,12 @@ var FileBrowserView = Backbone.View.extend({
     return this;
   },
   link: function (file, opts) {
-    var opts    = opts || {},
-        owner   = this.model.get('owner'),
-        repo    = this.model.get('repoName'),
-        branch  = this.model.get('branch'),
-        newHash = ['#edit', owner, repo, branch, file.path].join('/'),
+    opts    = opts || {};
+    var id = this.model.site.id;
+    var owner = this.model.get('owner');
+    var repo = this.model.get('repoName');
+    var branch  = this.model.get('branch'),
+        newHash = ['#site', id, 'edit', branch, file.path].join('/'),
         type    = file.type,
         fileExt = file.name.split('.').slice(-1)[0],
         ghExts  = ['html', 'css', 'scss', 'js', 'json'];
