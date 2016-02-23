@@ -4,6 +4,7 @@ var _ = require('underscore');
 var ContentEditorPage = require('./pageobjects/contentEditor.page');
 
 var FEDERALIST_TEST_USER = process.env.FEDERALIST_TEST_USER;
+var FEDERALIST_TEST_REPOSITORY = process.env.FEDERALIST_TEST_REPOSITORY;
 var contentEditorPage;
 
 describe('content editor integration tests', function () {
@@ -37,7 +38,7 @@ describe('content editor integration tests', function () {
       User.find({ username: FEDERALIST_TEST_USER }).exec(function (err, u) {
         var data = {
           owner: FEDERALIST_TEST_USER,
-          repository: 'microsite-template',
+          repository: FEDERALIST_TEST_REPOSITORY,
           users: [u[0].id]
         };
 

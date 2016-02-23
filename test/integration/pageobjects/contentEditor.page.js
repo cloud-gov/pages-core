@@ -7,6 +7,8 @@
 var BaseFederalistPage = require('./baseFederalist.page');
 
 var FEDERALIST_TEST_USER = process.env.FEDERALIST_TEST_USER;
+var FEDERALIST_TEST_REPOSITORY = process.env.FEDERALIST_TEST_REPOSITORY;
+var FEDERALIST_TEST_REPOSITORY_BRANCH = process.env.FEDERALIST_TEST_REPOSITORY_BRANCH;
 
 function ContentEditorPage () {
   BaseFederalistPage.apply(this, arguments);
@@ -14,8 +16,8 @@ function ContentEditorPage () {
   this.url = [
     '/#edit',
     FEDERALIST_TEST_USER,
-    'microsite-template',
-    'gh-pages'
+    FEDERALIST_TEST_REPOSITORY,
+    FEDERALIST_TEST_REPOSITORY_BRANCH
   ].join('/');
 }
 
