@@ -4,7 +4,7 @@ var _ = require('underscore');
 var ContentEditorPage = require('./pageobjects/contentEditor.page');
 
 var FEDERALIST_TEST_USER = process.env.FEDERALIST_TEST_USER;
-var FEDERALIST_TEST_REPOSITORY = process.env.FEDERALIST_TEST_REPOSITORY;
+var FEDERALIST_TEST_REPOSITORY = process.env.FEDERALIST_TEST_REPOSITORY || 'microsite-template';
 var contentEditorPage;
 
 describe('content editor integration tests', function () {
