@@ -14,9 +14,7 @@ describe('generic repository file listing tests', function () {
     engine.jekyll = function (model, done) {
       done();
     };
-    fileListingPage = new FileListingPage(helpers.webdriver.createDriver());
-
-    return fileListingPage.init();
+    fileListingPage = new FileListingPage(webdriver);
   });
 
   after(function () {

@@ -15,9 +15,8 @@ describe('content editor integration tests', function () {
     engine.jekyll = function (model, done) {
       done();
     };
-    contentEditorPage = new ContentEditorPage(helpers.webdriver.createDriver());
 
-    return contentEditorPage.init();
+    contentEditorPage = new ContentEditorPage(webdriver);
   });
 
   after(function () {

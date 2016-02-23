@@ -6,6 +6,7 @@
 
 var _ = require('underscore');
 var webdriverio = require('webdriverio');
+var Promise = require('bluebird');
 
 module.exports.webdriver = {
   createDriver: function (options) {
@@ -23,5 +24,23 @@ module.exports.webdriver = {
       },
       options || {}
     ));
+  },
+  clearSession: function () {
+    // If there's no webdriver initialized, there's nothing to cleanup
+    if (!webdriver) {
+      return Promise.reject(new Error('webdriver was never initialized.'));
+    }
+
+    return webdriver
+      .deleteCookie()
+      .localStorage('DELETE')
+      .sessionStorage('DELETE')
+      //TODO we can alternatively remove the login step from each test suite,
+      //we should work toward a better test auth strategy to avoid github.
+      // Log out from github
+      .url('https://github.com/logout')
+      .waitForVisible('input[type="submit"]')
+      .click('input[type="submit"]')
+      .url('/');
   }
 };
