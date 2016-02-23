@@ -84,7 +84,11 @@ var AddSiteView = Backbone.View.extend({
     this.trigger('site:save:success');
   },
   errorMessage: function (e) {
-    var message = (e && e.responseJSON) ? e.responseJSON.raw : e.responseText;
+    var message;
+    if (e && e.responseJSON && e.responseJSON.raw) message = e.responseJSON.raw;
+    else if (e && e.responseJSON) message = e.responseJSON;
+    else message = e.responseText;
+
     if (message && message.errors && message.errors.length > 0) {
       message = 'We encountered an error while making your website: ' + _.chain(message.errors).pluck('message').compact().value().join(', ');
     }

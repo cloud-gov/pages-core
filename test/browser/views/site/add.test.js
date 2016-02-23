@@ -37,6 +37,19 @@ describe('add site view', function () {
 
       assert.equal(view.errorMessage(error), expected);
     });
+
+    it('if the site name is already used', function () {
+      var expected = 'We encountered an error while making your website: name already exists on this account';
+      var error = {
+        responseJSON: {
+          errors: [{
+            message: 'name already exists on this account'
+          }]
+        }
+      };
+
+      assert.equal(view.errorMessage(error), expected);
+    });
   });
 
 });
