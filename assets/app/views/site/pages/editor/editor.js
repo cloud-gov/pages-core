@@ -197,7 +197,10 @@ var EditorView = Backbone.View.extend({
       $(contentEditorEl).parents('.usa-grid').first().hide();
     }
   },
-
+  fileUrl: function (file) {
+    var model = this.model;
+    return ['#site', model.site.id, 'edit', model.get('branch'), file].join('/');
+  },
   lockContent: function(data) {
     var first = (data.subscribers && data.subscribers[0]) ||
                       (this.socket.subscribers && this.socket.subscribers[0]);
@@ -277,13 +280,7 @@ var EditorView = Backbone.View.extend({
     if (err) return this.saveFailure(err);
     document.body.scrollTop = 0;
 
-    var url = [
-      '#edit',
-      this.model.get('owner'),
-      this.model.get('repoName'),
-      this.model.get('branch'),
-      this.model.get('file')
-    ].join('/');
+    var url = this.fileUrl(this.model.file);
 
     federalist.navigate(url, { trigger: true });
     $('.alert-container').html(
@@ -312,12 +309,8 @@ var EditorView = Backbone.View.extend({
     e.preventDefault();
     this.model.deleteBranch(function(err) {
       if (err) return this.saveFailure(err);
-      federalist.navigate([
-        '#edit',
-        this.model.get('owner'),
-        this.model.get('repoName'),
-        this.model.get('defaultBranch')
-      ].join('/'), { trigger: true });
+      var url = this.fileUrl(this.model.file);
+      federalist.navigate(url, { trigger: true });
       $('.alert-container').html(
         '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
           'Your draft was deleted.' +
@@ -329,12 +322,8 @@ var EditorView = Backbone.View.extend({
     e.preventDefault();
     this.saveDocument(e, 'publish', function(err) {
       if (err) return this.saveFailure(err);
-      federalist.navigate([
-        '#edit',
-        this.model.get('owner'),
-        this.model.get('repoName'),
-        this.model.get('defaultBranch')
-      ].join('/'), { trigger: true });
+      var url = this.fileUrl(this.model.file);
+      federalist.navigate(url, { trigger: true });
       $('.alert-container').html(
         '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
           'Your draft is being published.' +

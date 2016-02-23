@@ -54,11 +54,11 @@ var EditView = Backbone.View.extend({
     if (model.get('isDraft')) {
       var draftBranch = '_draft-' + encodeB64(model.file);
       var url = [
-        '#edit', model.owner, model.name, draftBranch, model.file
+        '#site', model.site.id, 'edit', draftBranch, model.file
       ].join('/');
 
       if (url !== '#' + Backbone.history.getFragment()) return federalist.navigate([
-        '#edit', model.owner, model.name, draftBranch, model.file
+        '#site', model.site.id, 'edit', draftBranch, model.file
       ].join('/'), { trigger: true });
     }
 

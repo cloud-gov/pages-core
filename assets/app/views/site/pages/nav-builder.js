@@ -8,8 +8,9 @@ var templateHtml = fs.readFileSync(__dirname + '/../../../templates/site/pages/p
 var NavBuilderView = Backbone.View.extend({
   tagName: 'ul',
   className: 'list-group',
+  template: _.template(templateHtml),
   initialize: function (opts) {
-    var opts  = opts || {};
+    opts  = opts || {};
     this.pages = opts.pages;
 
     if (!this.pages) throw new Error('Supply pages');
@@ -17,33 +18,35 @@ var NavBuilderView = Backbone.View.extend({
     return this;
   },
   render: function () {
-    var self = this,
-        template = _.template(templateHtml);
-
-    function addToList(list, item) {
-      var m = self.model,
-          href = ['#site', m.site.id, 'edit', m.get('branch'), item.href].join('/'),
-          html = template({
-            text: item.text,
-            href: href,
-            draft: _.contains(m.get('drafts'), item.href)
-          });
-      list.append(html);
-    }
-
+    var self = this;
     this.pages.forEach(function(page) {
-      addToList(self.$el, { text: page.title, href: page.href })
+      self.addToList(self.$el, { text: page.title, href: page.href });
 
       if (page.children) {
         var ul = $('<ul class="list-group"></ul>');
         page.children.forEach(function(childPage) {
-          addToList(ul, { text: childPage.title, href: childPage.href })
+          self.addToList(ul, { text: childPage.title, href: childPage.href });
         });
         self.$el.append($('<li class="list-group-item"></li>').append(ul));
       }
     });
 
     return this;
+  },
+  createListItemHtml: function (item) {
+    var siteId = this.model.site.id;
+    var branch = this.model.get('branch');
+    var href = ['#site', siteId, 'edit', branch, item.href].join('/');
+
+    return this.template({
+      text: item.text,
+      href: href,
+      draft: _.contains(this.model.get('drafts'), item.href)
+    });
+  },
+  addToList: function (list, item) {
+    var html = this.createListItemHtml(item);
+    list.append(html);
   }
 });
 
