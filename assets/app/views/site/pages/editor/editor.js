@@ -25,7 +25,7 @@ var EditorView = Backbone.View.extend({
   },
   template: _.template(templateHtml),
   initialize: function (opts) {
-    var self      = window.z = this,
+    var self      = this,
         file      = this.filePathFromModel(this.model),
         fileExt   = this.fileExtensionFromName(this.model.get('file')),
         html      = {
