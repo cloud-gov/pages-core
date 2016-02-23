@@ -24,6 +24,7 @@ describe('content editor integration tests', function () {
   });
 
   it('logs in', function () {
+    this.timeout(20000);
     return contentEditorPage.login();
   });
 

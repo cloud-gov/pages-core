@@ -22,6 +22,7 @@ describe('generic repository file listing tests', function () {
   });
 
   it('logs in', function () {
+    this.timeout(20000);
     return fileListingPage.login();
   });
 

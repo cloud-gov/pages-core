@@ -32,6 +32,7 @@ describe('home page integration tests', function () {
   });
 
   it('logs in', function () {
+    this.timeout(20000);
     return homePage.login(process.env.FEDERALIST_TEST_USER, process.env.FEDERALIST_TEST_PASSWORD);
   });
 

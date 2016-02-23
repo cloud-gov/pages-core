@@ -16,6 +16,7 @@ describe('new site page integration tests', function () {
   });
 
   it('logs in', function () {
+    this.timeout(20000);
     return newSitePage.login();
   });
 
