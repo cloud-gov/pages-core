@@ -135,11 +135,14 @@ models: {
 
 To run the integration tests you'll need:
 
-- [Selenium](http://www.seleniumhq.org/) (and [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
+- [Selenium](http://www.seleniumhq.org/) (and [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html)).
 - [chromedriver](https://sites.google.com/a/chromium.org/chromedriver/)
+
+On a mac, you can install them via Homebrew:
 
     $ brew install selenium-server-standalone
     $ brew install chromedriver
+    $ selenium-server &
 
 You'll need a user to test against, (ping your fellow developers for an existing
 test user).
@@ -150,6 +153,40 @@ test user).
 And then run the tests:
 
     $ npm run test:integration
+
+
+##### Running against Sauce Labs
+
+Sauce Labs can be a bit flakey sometimes and failures on Travis might not be
+reproducible locally. If you're just looking for details of the last Travis run,
+ping the [account holder for
+access](https://github.com/18F/federalist/blob/523aceb9885f248dd60189f9c13c834c3ba0947e/.travis.yml#L24).
+Otherwise, request a Sauce Labs account from #devops.
+
+Once you have an account, you'll need your access key. It's available in the
+Sauce Labs account settings and looks like a GUID e.g.
+`abcdef78-1234-1234-1234-abcdef789012`.
+
+    $ export SAUCE_USERNAME=<username> SAUCE_ACCESS_KEY=<sauce access key>
+
+Use [Sauce
+Connect](https://wiki.saucelabs.com/display/DOCS/Setting+Up+Sauce+Connect) to
+open a tunnel between your localhost and Sauce Labs (because your dev server is
+running on localhost).
+
+    $ brew install sauce-connect
+    $ sc -u $SAUCE_USERNAME -k $SAUCE_ACCESS_KEY &
+
+Then run your tests.
+
+    $ SAUCE_USERNAME=$SAUCE_USERNAME SAUCE_ACCESS_KEY=$SAUCE_ACCESS_KEY npm run test:integration
+
+You shouldn't see Chrome launch locally because the tests are launched in on
+a Sauce Labs VM. Instead, you can watch the tests run live through the Sauce
+Labs UI.
+
+_Note: the environment variable names are important here because these are what
+webdriverio will be looking for._
 
 
 ## Architecture
