@@ -7,6 +7,10 @@
   min-height: 30em;
 }
 
+.ProseMirror-content p {
+  font-style: normal;
+}
+
 .ProseMirror-content:focus {
   border: none;
   outline: none;
