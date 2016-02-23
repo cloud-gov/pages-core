@@ -49,7 +49,6 @@ var Router = Backbone.Router.extend({
   routes: {
     '': 'dashboard',
     'new': 'newSite',
-    'edit/:owner/:repo/:branch(/)*file': 'edit',
     'site/:id(/)': 'sitePages',
     'site/:id/edit/:branch(/)*file': 'sitePages',
     'site/:id/settings': 'siteSettings',
@@ -66,10 +65,6 @@ var Router = Backbone.Router.extend({
     });
     this.mainView.pageSwitcher.set(addSiteView);
     this.listenToOnce(addSiteView, 'site:save:success', this.onAddSiteSuccess);
-    return this;
-  },
-  edit: function (owner, repo, branch, file) {
-    this.mainView.edit(owner, repo, branch, file);
     return this;
   },
   sitePages: function (id, branch, file) {

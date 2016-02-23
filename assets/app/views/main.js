@@ -76,23 +76,6 @@ var AppView = Backbone.View.extend({
     var file = site.get('file', '');
     //this.edit(owner, repository, branch, file, site);
   },
-  // edit: function (owner, repo, branch, file, site) {
-  //   if (!file) return this.sites.fetch({ success: loadView.bind(this) });
-  //   loadView.call(this);
-  //   return this;
-  //   function loadView() {
-  //     var s = site || this.sites.findWhere({ owner: owner, repository: repo });
-  //     console.log('ss', s);
-  //     var editView = new EditorContainerView({
-  //       owner: owner,
-  //       repo: repo,
-  //       branch: branch,
-  //       file: file,
-  //       site: s
-  //     });
-  //     this.pageSwitcher.set(editView);
-  //   }
-  // },
   getOrCreateSiteView: function (id) {
     var view = this.siteView;
     if (view && view.model && view.model.id === parseInt(id)) return view;
@@ -107,7 +90,6 @@ var AppView = Backbone.View.extend({
     return this;
   },
   siteEditContent: function (id, branch, file) {
-    console.log('siteEditContent() args', arguments);
     var siteView = this.getOrCreateSiteView(id);
     this.pageSwitcher.set(siteView);
     siteView.showPages(branch, file);
