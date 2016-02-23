@@ -29,7 +29,7 @@ ContentEditorPage.prototype.loadAndWait = function (url) {
 };
 
 ContentEditorPage.prototype.openMarkdownFileWithoutYAMLFrontmatter = function () {
-  return this.loadAndWait(this.url + '/CONTRIBUTING.md');
+  return this.loadAndWait(this.url + '/TERMS.md');
 };
 
 ContentEditorPage.prototype.openMarkdownFileWithYAMLFrontmatter = function () {
