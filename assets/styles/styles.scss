@@ -87,6 +87,7 @@ main > div,
 
 .site-actions {
   list-style-type: none;
+  margin-top: 0.7em;
 }
 
 .site-actions li:before {
@@ -94,7 +95,8 @@ main > div,
 }
 
 .site-actions li {
-  margin-bottom: .5em;
+  display: block;
+  margin-bottom: 1.2em;
 }
 
 .site-actions a {
