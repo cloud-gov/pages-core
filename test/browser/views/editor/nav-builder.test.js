@@ -5,10 +5,10 @@ var sinon = require('sinon');
 var mockData = JSON.stringify(require('../../data/repoResponse.json'));
 var mockCommitResponse = JSON.stringify(require('../../data/commitResponse.json'));
 
-var Github = require('./../../../../../assets/app/models/Github');
+var Github = require('./../../../../assets/app/models/Github');
 var githubHelpers = require('../../models/githubHelpers');
 
-var NavBuilderView = require('./../../../../../assets/app/views/site/pages/nav-builder');
+var NavBuilderView = require('./../../../../assets/app/views/site/pages/nav-builder');
 
 var server;
 
