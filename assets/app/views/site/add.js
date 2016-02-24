@@ -83,11 +83,19 @@ var AddSiteView = Backbone.View.extend({
   onSuccess: function onSuccess(e) {
     this.trigger('site:save:success');
   },
-  onError: function onError(e) {
-    var message = (e && e.responseJSON) ? e.responseJSON : e.responseText;
+  errorMessage: function (e) {
+    var message;
+    if (e && e.responseJSON && e.responseJSON.raw) message = e.responseJSON.raw;
+    else if (e && e.responseJSON) message = e.responseJSON;
+    else message = e.responseText;
+
     if (message && message.errors && message.errors.length > 0) {
       message = 'We encountered an error while making your website: ' + _.chain(message.errors).pluck('message').compact().value().join(', ');
     }
+    return message;
+  },
+  onError: function onError(e) {
+    var message = this.errorMessage(e);
     $('.alert-container').html(
       '<div class="usa-grid"><div class="usa-alert usa-alert-error new-site-error" role="alert">' +
         message +

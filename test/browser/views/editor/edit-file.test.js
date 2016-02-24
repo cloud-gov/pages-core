@@ -2,7 +2,7 @@ var _ = require('underscore');
 var assert = require('assert');
 var mocha = require('mocha');
 
-var EditFileView = require('./../../../../../assets/app/views/editor/edit-file');
+var EditFileView = require('./../../../../assets/app/views/editor/edit-file');
 
 describe('edit-file view', function () {
 
