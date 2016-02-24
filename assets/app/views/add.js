@@ -32,11 +32,7 @@ var AddSiteView = Backbone.View.extend({
   },
   onSubmitGithubRepo: function onSubmitGithubRepo(e) {
     e.preventDefault();
-    var data = {};
-    this.$('form').serializeArray().map(function(d) {
-      if (d.name === 'users') d.value = [+d.value];
-      data[d.name] = d.value;
-    });
+    var data = this.getFormData('form');
     $.ajax('/v0/user/add-site', {
       method: 'POST',
       data: data,
@@ -44,17 +40,22 @@ var AddSiteView = Backbone.View.extend({
       error: this.onError.bind(this)
     });
   },
+  getFormData: function (sel) {
+    var data = {};
+    this.$(sel).serializeArray().map(function(d) {
+      if (d.name === 'users') d.value = [+d.value];
+      data[d.name] = d.value;
+    });
+
+    return data;
+  },
   onTemplateSelection: function onTemplateSelection(e) {
     e.preventDefault();
     var data = $(e.target).parents('.template-block').data('template');
-    var repo = $('[name="site-name"]', e.target).val();
+    var originalRepo = $('[name="site-name"]', e.target).val();
+    var githubSafeRepositoryName = this.formatGithubSafeRepositoryName(originalRepo);
 
-    // Make repo name safe for github
-    repo = repo
-      .replace(/[^\w\.]+/g, '-')
-      .replace(/^-+/g, '')
-      .replace(/-+$/g, '');
-    $('[name="site-name"]', e.target).val(repo);
+    $('[name="site-name"]', e.target).val(githubSafeRepositoryName);
 
     this.github = new Github({
       token: getToken(),
@@ -71,6 +72,13 @@ var AddSiteView = Backbone.View.extend({
       this.onSuccess(model);
     }.bind(this));
   },
+  formatGithubSafeRepositoryName: function (repo) {
+    // Make repo name safe for github
+    return repo
+      .replace(/[^\w\.]+/g, '-')
+      .replace(/^-+/g, '')
+      .replace(/-+$/g, '');
+  },
   showNewSiteForm: function showNewSiteForm(e) {
     var $form = $('.new-site-form', $(e.target).parents('.template-block'));
     var state = $form.attr('aria-hidden') === 'true';
@@ -83,16 +91,23 @@ var AddSiteView = Backbone.View.extend({
   onSuccess: function onSuccess(e) {
     this.trigger('site:save:success');
   },
-  onError: function onError(e) {
+  formatErrorMessage: function (e) {
     var message = (e && e.responseJSON) ? e.responseJSON : e.responseText;
     if (message && message.errors && message.errors.length > 0) {
       message = 'We encountered an error while making your website: ' + _.chain(message.errors).pluck('message').compact().value().join(', ');
     }
-    $('.alert-container').html(
-      '<div class="usa-grid"><div class="usa-alert usa-alert-error new-site-error" role="alert">' +
-        message +
-      '</div></div>'
-    )[0].scrollIntoView();
+    return message;
+  },
+  setAlert: function (message) {
+    var html = '<div class="usa-grid"><div class="usa-alert usa-alert-error new-site-error" role="alert">' +
+      message +
+    '</div></div>';
+    $('.alert-container').html(html);
+  },
+  onError: function onError(e) {
+    var message = this.formatErrorMessage(e);
+    this.setAlert(message);
+    $('.alert-container')[0].scrollIntoView();
     this.trigger('site:save:failure');
   }
 });
