@@ -28,10 +28,6 @@ describe('content editor integration tests', function () {
     return contentEditorPage.login();
   });
 
-  it('opens', function () {
-    return contentEditorPage.open();
-  });
-
   describe('accesses Github content through editor', function () {
     var site;
     before(function (done) {
@@ -55,6 +51,10 @@ describe('content editor integration tests', function () {
         if (err) throw err;
         done();
       });
+    });
+
+    it('opens', function () {
+      return contentEditorPage.open();
     });
 
     describe('opens md file without frontmatter', function () {
