@@ -28,12 +28,12 @@ var SiteLogsView = Backbone.View.extend({
         view = this;
 
     data.builds = _(data.builds).chain().map(function(build) {
-      return view.processBuild(build, users);
+      return view.formatBuild(build, users);
     }).sortBy('createdAt').value().reverse();
 
     return data;
   },
-  processBuild: function (build, users) {
+  formatBuild: function (build, users) {
     var completedAt = build.completedAt && new Date(build.completedAt),
         createdAt = build.createdAt && new Date(build.createdAt),
         base = completedAt || new Date(),
