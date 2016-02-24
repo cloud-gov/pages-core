@@ -7,6 +7,7 @@
  */
 
 var webdriverio = require('webdriverio');
+var Promise = require('bluebird');
 
 function BaseFederalistPage(driver) {
   if (!driver) {
@@ -22,11 +23,12 @@ BaseFederalistPage.prototype.open = function (url) {
 };
 
 BaseFederalistPage.prototype.init = function () {
-  return this.driver.init();
+  // Noop
+  return Promise.resolve();
 };
 
 BaseFederalistPage.prototype.end = function () {
-  return this.driver.end();
+  return helpers.webdriver.clearSession();
 };
 
 BaseFederalistPage.prototype.login = function (user, password) {

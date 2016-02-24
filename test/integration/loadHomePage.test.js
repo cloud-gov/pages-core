@@ -3,18 +3,16 @@ var HomePage = require('./pageobjects/home.page');
 
 var homePage;
 
-before(function () {
-  this.timeout(15000);
-  homePage = new HomePage(helpers.webdriver.createDriver());
-  return homePage.init();
-});
-
-after(function () {
-  return homePage.end();
-});
-
 describe('home page integration tests', function () {
   this.timeout(15000);
+
+  before(function () {
+    homePage = new HomePage(webdriver);
+  });
+
+  after(function () {
+    return homePage.end();
+  });
 
   it('loads the homepage', function () {
     return homePage.driver.url('/');
@@ -34,6 +32,7 @@ describe('home page integration tests', function () {
   });
 
   it('logs in', function () {
+    this.timeout(20000);
     return homePage.login(process.env.FEDERALIST_TEST_USER, process.env.FEDERALIST_TEST_PASSWORD);
   });
 

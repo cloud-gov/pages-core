@@ -4,20 +4,19 @@ var NewSitePage = require('./pageobjects/newSite.page');
 
 var newSitePage;
 
-before(function () {
-  this.timeout(15000);
-  newSitePage = new NewSitePage(helpers.webdriver.createDriver());
-  return newSitePage.init();
-});
-
-after(function () {
-  return newSitePage.end();
-});
-
 describe('new site page integration tests', function () {
   this.timeout(15000);
 
+  before(function () {
+    newSitePage = new NewSitePage(webdriver);
+  });
+
+  after(function () {
+    return newSitePage.end();
+  });
+
   it('logs in', function () {
+    this.timeout(20000);
     return newSitePage.login();
   });
 
