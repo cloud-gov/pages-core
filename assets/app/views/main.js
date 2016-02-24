@@ -67,15 +67,6 @@ var AppView = Backbone.View.extend({
 
     return this;
   },
-  main: function (id) {
-    $('.alert-container').html('');
-    var site = this.sites.get(id);
-    var owner = site.get('owner');
-    var repository = site.get('repository');
-    var branch = site.get('branch');
-    var file = site.get('file', '');
-    //this.edit(owner, repository, branch, file, site);
-  },
   getOrCreateSiteView: function (id) {
     var view = this.siteView;
     if (view && view.model && view.model.id === parseInt(id)) return view;
