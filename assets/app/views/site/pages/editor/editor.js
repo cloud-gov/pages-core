@@ -36,7 +36,7 @@ var EditorView = Backbone.View.extend({
     this.editors = {};
     this.path = opts.path;
     this.isNewPage = opts.isNewPage || false;
-    this.settingsFields = this.extendSettingFields(opts.settingsFields);
+    this.settingsFields = this.extendSettingFields(opts.settingsFields, this.model.getLayouts());
 
     this.doc = this.initializeDocument({
       fileExt: fileExt,
@@ -127,14 +127,14 @@ var EditorView = Backbone.View.extend({
       this.editors.settings.doc.setValue(this.settings.remaining);
     }
   },
-  extendSettingFields: function (fields) {
+  extendSettingFields: function (fields, layouts) {
     var f = _.extend({
       title: {
         type: 'text'
       },
       layout: {
         type: 'select',
-        options: this.model.getLayouts()
+        options: layouts
       },
       author: {
         type: 'text'
@@ -197,8 +197,8 @@ var EditorView = Backbone.View.extend({
       $(contentEditorEl).parents('.usa-grid').first().hide();
     }
   },
-  fileUrl: function (file) {
-    var model = this.model;
+  fileUrl: function (file, model) {
+    model = model || this.model;
     return ['#site', model.site.id, 'edit', model.get('branch'), file].join('/');
   },
   lockContent: function(data) {
@@ -212,11 +212,7 @@ var EditorView = Backbone.View.extend({
       this.locked = true;
 
       // Add error message
-      $('.alert-container').html(
-        '<div class="usa-grid"><div class="usa-alert usa-alert-error" role="alert">' +
-          message +
-        '</div></div>'
-      );
+      this.setAlert(message);
 
       // Disable / style form elements
       $('.CodeMirror, .ProseMirror').append('<div class="mask"></div>');
@@ -259,6 +255,13 @@ var EditorView = Backbone.View.extend({
       target.append(el);
     });
   },
+  setAlert: function (message) {
+    $('.alert-container').html(
+      '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
+        messages +
+      '</div></div>'
+    );
+  },
   /**
    * Replace {{ site.baseurl }} with Github URL so assets load
    *
@@ -283,11 +286,7 @@ var EditorView = Backbone.View.extend({
     var url = this.fileUrl(this.model.file);
 
     federalist.navigate(url, { trigger: true });
-    $('.alert-container').html(
-      '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
-        'Your draft was saved.' +
-      '</div></div>'
-    );
+    this.setAlert('Your draft was saved.');
   },
   saveFailure: function (e) {
     var messages = {
@@ -299,11 +298,7 @@ var EditorView = Backbone.View.extend({
         status = messages[e.response] || 'That hasn\'t happened before';
 
     document.body.scrollTop = 0;
-    $('.alert-container').html(
-      '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
-        status +
-      '</div></div>'
-    );
+    this.setAlert(status);
   },
   deleteDraft: function(e) {
     e.preventDefault();
@@ -311,11 +306,7 @@ var EditorView = Backbone.View.extend({
       if (err) return this.saveFailure(err);
       var url = this.fileUrl(this.model.file);
       federalist.navigate(url, { trigger: true });
-      $('.alert-container').html(
-        '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
-          'Your draft was deleted.' +
-        '</div></div>'
-      );
+      this.setAlert('Your draft was deleted.');
     }.bind(this));
   },
   publishContent: function(e) {
@@ -324,11 +315,7 @@ var EditorView = Backbone.View.extend({
       if (err) return this.saveFailure(err);
       var url = this.fileUrl(this.model.file);
       federalist.navigate(url, { trigger: true });
-      $('.alert-container').html(
-        '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
-          'Your draft is being published.' +
-        '</div></div>'
-      );
+      this.setAlert('Your draft is being published.');
     }.bind(this));
   },
   showSavingStatusResult: function () {
@@ -343,7 +330,7 @@ var EditorView = Backbone.View.extend({
         content = this.getContentFromEditor(),
         pageTitle;
 
-    e.preventDefault(); e.stopPropagation();
+    e.preventDefault();
 
     method = method || 'save';
     done = done || this.saveSuccess;
