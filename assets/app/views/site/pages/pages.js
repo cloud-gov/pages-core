@@ -26,7 +26,16 @@ var EditView = Backbone.View.extend({
   initialize: function (opts) {
     if (!opts) return this;
 
-    this.model = window.federalist.github = new Github({
+    this.model = window.federalist.github = this.initializeModel(opts);
+
+    this.model.on('sync', this.update.bind(this));
+
+    window.federalist.dispatcher.on('github:upload:selected', this.uploadAsset.bind(this));
+
+    return this;
+  },
+  initializeModel: function (opts) {
+    var model = new Github({
       token: getToken(),
       owner: opts.owner,
       repoName: opts.repo,
@@ -35,67 +44,55 @@ var EditView = Backbone.View.extend({
       site: opts.site
     });
 
-    this.model.on('sync', this.update.bind(this));
-
-    window.federalist.dispatcher.on('github:upload:selected', this.uploadAsset.bind(this));
-
-    return this;
+    return model;
+  },
+  initializeBreadcrumbView: function (sel, model) {
+    return new BreadcrumbView({
+      $el: this.$(sel),
+      model: this.model
+    });
   },
   update: function () {
     var model = this.model,
         config = model.configFiles || {},
-        childView, pages;
+        childView;
 
-    model.set('isDraft', _.contains(
+    this.model.set('isDraft', _.contains(
       this.model.get('drafts'),
       this.model.get('file'))
     );
 
     if (model.get('isDraft')) {
-      var draftBranch = '_draft-' + encodeB64(model.file);
-      var url = [
-        '#site', model.site.id, 'edit', draftBranch, model.file
-      ].join('/');
-
-      if (url !== '#' + Backbone.history.getFragment()) return federalist.navigate([
-        '#site', model.site.id, 'edit', draftBranch, model.file
-      ].join('/'), { trigger: true });
+      this.redirectToDraft(model);
     }
 
     var html = this.template(this.getTemplateData(model));
-
     this.$el.html(html);
+
     this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.$('#edit-content')[0]);
-    this.breadcrumb = new BreadcrumbView({
-      $el: this.$('ol.breadcrumb'),
-      model: this.model
-    }).render();
+    this.breadcrumb = this.initializeBreadcrumbView('ol.breadcrumb', this.model);
+    this.breadcrumb.render();
 
-    this.$('#edit-button').empty();
-
-    if (model.get('type') === 'file') {
-      var saveButton = $('<a class="btn btn-primary pull-right" id="save-page" href="#" role="button">Save this page</a>');
-      this.$('#edit-button').append(saveButton);
-      childView = new EditorView({ model: model });
-    }
-    else {
-      var editButton = $('<a class="btn btn-primary pull-right" id="add-page" href="#" role="button">Add a new page</a>');
-      this.$('#edit-button').append(editButton);
-      if (config['_navigation.json'] && config['_navigation.json'].present) {
-        pages = config['_navigation.json'].json;
-        childView = new NavBuilderView({ model: model, pages: pages });
-      }
-      else {
-        childView = new FileBrowserView({ model: model });
-      }
-    }
-
+    childView = this.getChildView(model);
     this.pageSwitcher.set(childView);
 
     return this;
   },
+  getChildView: function (model) {
+    var config = model.configFiles || {};
+    if (model.get('type') === 'file') {
+      return new EditorView({ model: model });
+    }
+
+    if (config['_navigation.json'] && config['_navigation.json'].present) {
+      pages = config['_navigation.json'].json;
+      return new NavBuilderView({ model: model, pages: pages });
+    }
+    else {
+      return new FileBrowserView({ model: model });
+    }
+  },
   getTemplateData: function (model) {
-    model = model || this.model;
     return {
       id: model.site.id,
       owner: model.get('owner'),
@@ -114,6 +111,14 @@ var EditView = Backbone.View.extend({
     var editView = new EditorView({ model: this.model , isNewPage: true });
 
     this.pageSwitcher.set(editView);
+  },
+  redirectToDraft: function (model) {
+    var draftBranch = '_draft-' + encodeB64(model.file);
+    var url = ['#site', model.site.id, 'edit', draftBranch, model.file].join('/');
+
+    if (url !== '#' + Backbone.history.getFragment()) {
+      return federalist.navigate(url, { trigger: true });
+    }
   },
   uploadAsset: function (e) {
     var self = this,
