@@ -26,10 +26,6 @@ describe('generic repository file listing tests', function () {
     return fileListingPage.login();
   });
 
-  it('opens', function () {
-    return fileListingPage.open();
-  });
-
   describe('for a repository', function () {
     var site;
     before(function (done) {
@@ -37,12 +33,14 @@ describe('generic repository file listing tests', function () {
         var data = {
           owner: FEDERALIST_TEST_USER,
           repository: 'microsite-template',
+          defaultBranch: 'master',
           users: [u[0].id]
         };
 
         Site.create(data).exec(function (err, s) {
           if (err) throw err;
           site = s;
+          fileListingPage.siteId = site.id;
           done();
         });
       });
@@ -53,6 +51,10 @@ describe('generic repository file listing tests', function () {
         if (err) throw err;
         done();
       });
+    });
+
+    it('opens', function () {
+      return fileListingPage.open();
     });
 
     it('loads the listing', function () {
@@ -69,7 +71,7 @@ describe('generic repository file listing tests', function () {
           return fileListingPage.driver.url();
         })
         .then(function(url){
-          var r = /\/microsite-template\/gh-pages\/pages/;
+          var r = /\master\/pages/;
           assert(url.value.match(r));
         });
     });
