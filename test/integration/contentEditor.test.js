@@ -41,6 +41,7 @@ describe('content editor integration tests', function () {
         Site.create(data).exec(function (err, s) {
           if (err) throw err;
           site = s;
+          contentEditorPage.setSiteUrl(site.id);
           done();
         });
       });
@@ -59,6 +60,7 @@ describe('content editor integration tests', function () {
 
     describe('opens md file without frontmatter', function () {
       it('loads content', function() {
+        console.log('contentEditorPage.url', contentEditorPage.url);
         return contentEditorPage.openMarkdownFileWithoutYAMLFrontmatter();
       });
 
