@@ -66,7 +66,7 @@ var AddSiteView = Backbone.View.extend({
       owner: data.owner,
       repository: data.repo
     }, {
-      repository: repo
+      repository: githubSafeRepositoryName
     }, function(err, model) {
       if (err) return this.onError(err);
       this.onSuccess(model);
