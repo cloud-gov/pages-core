@@ -98,6 +98,17 @@ module.exports = {
 };
 ```
 
+* Federalist grants access according to the organizations a user is a part of. Find your organization's ID by visiting `https://api.github.com/orgs/<your-org-name>` and copying the `id` into the whitelist of `organizations` in `config/passport.js`, for example:
+
+```
+organizations: [
+  6233994,  // 18f
+  14109682, // federalist-users
+  14080592,  // us-federal-sbst
+  99999999 // your org added here
+]
+```
+
 * Run the server with `npm start` (You can use `npm run watch:server` for the server to restart when you save file changes and `npm run watch:client` to rebuild front-end files on each save) at the directory of the project on your local computer.
 
 
