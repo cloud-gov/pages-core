@@ -40,9 +40,9 @@ var AppView = Backbone.View.extend({
   },
   parseDashboardErrorFromURL: function (url) {
     var messages = {
-      'Error.Passport.Unauthorized': 'Your account is not set up to access Federalist. Have you signed up as a beta user? If you have signed up and should have access, please let us know.',
+      'Error.Passport.Unauthorized': 'Your account is not set up to access Federalist. Have you signed up as a beta user? If you have signed up and should have access, please let us know. You can reach us in our public chat room. Please select "federalist-public" from the drop-down menu at https://chat.18f.gov',
       'preview.login': 'Please log in to preview this site',
-      'default': 'An unexpected error occured. Please try again. If you continue to see this message, please let us know.'
+      'default': 'An unexpected error occured. Please try again. If you continue to see this message, please let us know. You can reach us in our public chat room. Please select "federalist-public" from the drop-down menu at https://chat.18f.gov'
     };
     var error = querystring.parse(url.search.slice(1)).error;
     var message = error && (messages[error] || messages['default']);
