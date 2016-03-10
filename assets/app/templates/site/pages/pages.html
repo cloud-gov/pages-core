@@ -7,13 +7,13 @@
     </div>
   </div>
   <div class="usa-width-one-third">
-    <% if (!false) { %>
-    <a class="usa-button usa-button-big pull-right icon icon-new icon-white" id="add-page" alt="Add a new page" href="#" role="button">Add a new page</a>
-    <% } else if (draft) { %>
-    <div class="preview-buttons">
-      <a class="usa-button usa-button-big pull-right preview-button" href="/preview/<%- owner %>/<%- repository %>/<%- branch %>/" role="button">Preview Draft</a>
-      <button class="usa-button usa-button-disabled usa-button-big pull-right preview-button-disabled">Generating Preview...</button>
-    </div>
+    <% if (draft) { %>
+      <div class="preview-buttons">
+        <a class="usa-button usa-button-big pull-right preview-button" href="/preview/<%- owner %>/<%- repository %>/<%- branch %>/<%- permalink %>" role="button">Preview Draft</a>
+        <button class="usa-button usa-button-disabled usa-button-big pull-right preview-button-disabled">Generating Preview...</button>
+      </div>
+    <% } else if (!draft) { %>
+      <a class="usa-button usa-button-big pull-right icon icon-new icon-white" id="add-page" alt="Add a new page" href="#" role="button">Add a new page</a>
     <% } %>
   </div>
 </div>

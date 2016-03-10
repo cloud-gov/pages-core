@@ -55,7 +55,7 @@ var EditView = Backbone.View.extend({
   update: function () {
     var model = this.model,
         config = model.configFiles || {},
-        childView;
+        childView, html;
 
     this.model.set('isDraft', _.contains(
       this.model.get('drafts'),
@@ -66,7 +66,7 @@ var EditView = Backbone.View.extend({
       this.redirectToDraft(model);
     }
 
-    var html = this.template(this.getTemplateData(model));
+    html = this.template(this.getTemplateData(model));
     this.$el.html(html);
 
     this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.$('#edit-content')[0]);
@@ -93,7 +93,7 @@ var EditView = Backbone.View.extend({
     }
   },
   getTemplateData: function (model) {
-    return {
+    var data =  {
       id: model.site.id,
       owner: model.get('owner'),
       repository: model.get('repoName'),
@@ -101,6 +101,19 @@ var EditView = Backbone.View.extend({
       file: model.get('file'),
       branch: model.get('branch')
     };
+    var r = new RegExp(/\//g);
+    var n;
+
+    if (data.draft) {
+      data.draftBranch = model.formatDraftBranchName(data.file);
+    }
+
+    if (model.configFiles['_navigation.json'].present) {
+      n = _.where(model.configFiles['_navigation.json'].json, { href: data.file });
+      data.permalink = n.length ? n[0].permalink.replace(r, '') : n;
+    }
+
+    return data;
   },
   savePage: function (e) {
     e.preventDefault();
@@ -113,7 +126,7 @@ var EditView = Backbone.View.extend({
     this.pageSwitcher.set(editView);
   },
   redirectToDraft: function (model) {
-    var draftBranch = '_draft-' + encodeB64(model.file);
+    var draftBranch = model.formatDraftBranchName(model.file);
     var url = ['#site', model.site.id, 'edit', draftBranch, model.file].join('/');
 
     if (url !== '#' + Backbone.history.getFragment()) {
