@@ -258,7 +258,7 @@ var EditorView = Backbone.View.extend({
   setAlert: function (message) {
     $('.alert-container').html(
       '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
-        messages +
+        message +
       '</div></div>'
     );
   },
