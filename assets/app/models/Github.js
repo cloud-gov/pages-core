@@ -114,8 +114,13 @@ var GithubModel = Backbone.Model.extend({
       }
     });
   },
+  formatDraftBranchName: function (filename) {
+    var branchName = '_draft-' + encodeB64(filename);
+
+    return branchName;
+  },
   createDraftBranch: function(done) {
-    var branchName = '_draft-' + encodeB64(this.get('file'));
+    var branchName = this.formatDraftBranchName(this.get('file'));
     var url = this.url({
       root: true,
       path: 'git/refs',
