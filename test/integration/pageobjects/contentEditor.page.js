@@ -12,16 +12,13 @@ var FEDERALIST_TEST_REPOSITORY_BRANCH = process.env.FEDERALIST_TEST_REPOSITORY_B
 
 function ContentEditorPage () {
   BaseFederalistPage.apply(this, arguments);
-
-  this.url = [
-    '/#edit',
-    FEDERALIST_TEST_USER,
-    FEDERALIST_TEST_REPOSITORY,
-    FEDERALIST_TEST_REPOSITORY_BRANCH
-  ].join('/');
 }
 
 ContentEditorPage.prototype = Object.create(BaseFederalistPage.prototype);
+
+ContentEditorPage.prototype.setSiteUrl = function (siteId) {
+  this.url = ['/#site', siteId, 'edit', FEDERALIST_TEST_REPOSITORY_BRANCH].join('/');
+};
 
 ContentEditorPage.prototype.loadAndWait = function (url) {
   return this.open(url)

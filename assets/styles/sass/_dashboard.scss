@@ -1,0 +1,40 @@
+.dashboard--empty {
+  margin-top: 2em;
+  text-align: center;
+}
+
+.dashboard--empty img {
+  width: 100px;
+  margin: 0 auto;
+}
+
+.sites-list {
+  width: 100%;
+}
+
+.sites-list .sites-list-item:before {
+  content: "";
+}
+
+.sites-list .sites-list-item {
+  align-items: center;
+  background-color: $secondary-background-color;
+  display: flex;
+  margin-bottom: .2em;
+  padding: 1em;
+  width: 100%;
+}
+
+.sites-list-item-text,
+.sites-list-item-actions {
+  flex-grow: 1;
+}
+
+.sites-list-item-text p {
+  margin: 0;
+}
+
+.sites-list-item-actions {
+  padding-right: 2em;
+  text-align: right;
+}

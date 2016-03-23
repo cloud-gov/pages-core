@@ -1,7 +1,7 @@
 var assert = require('assert');
 var mocha = require('mocha');
 
-var AddSiteView = require('./../../../../assets/app/views/site/add');
+var AddSiteView = require('./../../../../assets/app/views/add');
 
 describe('add site view', function () {
   var view;
@@ -26,7 +26,7 @@ describe('add site view', function () {
         }
       };
 
-      assert.equal(view.errorMessage(error), expected);
+      assert.equal(view.formatErrorMessage(error), expected);
     });
 
     it('if the site is already added', function () {
@@ -35,7 +35,7 @@ describe('add site view', function () {
         responseText: expected
       };
 
-      assert.equal(view.errorMessage(error), expected);
+      assert.equal(view.formatErrorMessage(error), expected);
     });
 
     it('if the site name is already used', function () {
@@ -48,7 +48,7 @@ describe('add site view', function () {
         }
       };
 
-      assert.equal(view.errorMessage(error), expected);
+      assert.equal(view.formatErrorMessage(error), expected);
     });
   });
 
