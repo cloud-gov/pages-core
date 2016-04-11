@@ -8,7 +8,7 @@ var mockCommitResponse = JSON.stringify(require('../../data/commitResponse.json'
 var Github = require('./../../../../assets/app/models/Github');
 var githubHelpers = require('../../models/githubHelpers');
 
-var BreadcrumbView = require('./../../../../assets/app/views/editor/breadcrumb');
+var BreadcrumbView = require('./../../../../assets/app/views/site/pages/breadcrumb');
 
 var server;
 
@@ -24,7 +24,7 @@ describe('breadcrumb view', function () {
     model = new Github(githubHelpers.getOpts());
     server.respondWith('GET', githubHelpers.makeUrl(), githubHelpers.mockResponse(mockData));
     server.respond();
-  })
+  });
 
   describe('when view is initialized', function () {
     describe('without model', function () {

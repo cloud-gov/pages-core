@@ -7,7 +7,7 @@ var mockData = JSON.stringify(require('../../data/repoResponse.json'));
 var Github = require('./../../../../assets/app/models/Github');
 var githubHelpers = require('../../models/githubHelpers');
 
-var FilesView = require('./../../../../assets/app/views/editor/files');
+var FileBrowserView = require('./../../../../assets/app/views/site/pages/file-browser');
 
 var server;
 
@@ -21,15 +21,21 @@ describe('files view', function () {
     sinon.xhr.supportsCORS = true;
 
     model = new Github(githubHelpers.getOpts());
+    model.site = {
+      id: 28,
+      get: function (attr) {
+        return this[attr];
+      }
+    };
     server.respondWith('GET', githubHelpers.makeUrl(), githubHelpers.mockResponse(mockData));
     server.respond();
-  })
+  });
 
   describe('when view is initialized', function () {
     describe('without model', function () {
       it('should throw exception', function () {
         assert.throws(function () {
-          new FilesView();
+          new FileBrowserView();
         });
       });
     });
@@ -37,7 +43,7 @@ describe('files view', function () {
     describe('with a model', function () {
       it('should not throw exception', function () {
         assert.doesNotThrow(function () {
-          new FilesView({ model: model });
+          new FileBrowserView({ model: model });
         });
       });
     });
@@ -47,7 +53,7 @@ describe('files view', function () {
     describe('link()', function () {
       it('should link to github for certain files', function () {
         var r = /(github.com.+)/,
-            view = new FilesView({ model: model }),
+            view = new FileBrowserView({ model: model }),
             link = view.link({
               type: 'file',
               path: 'index.html',
@@ -59,8 +65,8 @@ describe('files view', function () {
       });
 
       it('should link to the editor for .md files', function () {
-        var r = /(github.com.+)/,
-            view = new FilesView({ model: model }),
+        var r = /#site.*md$/,
+            view = new FileBrowserView({ model: model }),
             link = view.link({
               type: 'file',
               path: 'README.md',
@@ -68,12 +74,12 @@ describe('files view', function () {
             }),
             match = link.match(r);
 
-        assert.equal(match, null);
+        assert.equal(match);
       });
 
       it('should link to itself for folders', function () {
-        var r = /#edit/,
-            view = new FilesView({ model: model }),
+        var r = /#site/,
+            view = new FileBrowserView({ model: model }),
             link = view.link({
               type: 'folder',
               path: 'pages',

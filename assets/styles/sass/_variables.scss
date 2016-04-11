@@ -1,11 +1,28 @@
 $sans-serif: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$serif: 'Merriweather', serif;
 
-$header-bg-color: rgb(21, 61, 100);
-$header-text-color: rgb(255, 255, 255);
+$background-color: white;
+$secondary-background-color: #f7f8f9; /*#e6e6e6;*/
+
+$text-color: #414141;
+
+$header-bg-color: #2d476a;
+$header-text-color: white;
 
 $hero-bg-color: rgb(97, 142, 200);
 $hero-text-color: $header-text-color;
 
+$contrast: #f05b4e;
+
+$link-color: #03c0e9;
+$link-color-active: #017aa7;
+
+$button-color: #017aa7;
+$button-color-active: #03c0e9;
+$button-text-color: white;
+
+$secondary-button-color: $contrast;
+
 $label-success-bg-color: #2e8540;
-$label-danger-bg-color: #e31c3d;
+$label-danger-bg-color: $contrast;
 $label-warning-bg-color: #fdb81e;

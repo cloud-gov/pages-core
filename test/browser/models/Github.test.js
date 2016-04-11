@@ -252,6 +252,14 @@ describe('Github model', function () {
     server.respond();
   });
 
+  it('should properly format draft branch names', function(){
+    var filename = 'pages/home.md';
+    var expected = '_draft-cGFnZXMvaG9tZS5tZA==';
+    var actual = Github.prototype.formatDraftBranchName(filename);
+
+    assert.equal(actual, expected);
+  });
+
 });
 
 afterEach(function () {
