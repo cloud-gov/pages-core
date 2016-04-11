@@ -9,12 +9,12 @@ require('codemirror/mode/yaml/yaml');
 
 var createProseMirror = require('./prosemirror/create');
 
-var decodeB64 = require('../../helpers/encoding').decodeB64;
+var decodeB64 = require('../../../../helpers/encoding').decodeB64;
 
-var Document = require('../../models/Document');
+var Document = require('../../../../models/Document');
 
-var templateHtml = fs.readFileSync(__dirname + '/../../templates/editor/file.html').toString();
-var whitelistFieldHtml = fs.readFileSync(__dirname + '/../../templates/editor/whitelist-field.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../../../templates/site/pages/editor/file.html').toString();
+var whitelistFieldHtml = fs.readFileSync(__dirname + '/../../../../templates/site/pages/editor/whitelist-field.html').toString();
 
 var EditorView = Backbone.View.extend({
   tagName: 'div',
@@ -25,7 +25,7 @@ var EditorView = Backbone.View.extend({
   },
   template: _.template(templateHtml),
   initialize: function (opts) {
-    var self      = window.z = this,
+    var self      = this,
         file      = this.filePathFromModel(this.model),
         fileExt   = this.fileExtensionFromName(this.model.get('file')),
         html      = {
@@ -36,7 +36,7 @@ var EditorView = Backbone.View.extend({
     this.editors = {};
     this.path = opts.path;
     this.isNewPage = opts.isNewPage || false;
-    this.settingsFields = this.extendSettingFields(opts.settingsFields);
+    this.settingsFields = this.extendSettingFields(opts.settingsFields, this.model.getLayouts());
 
     this.doc = this.initializeDocument({
       fileExt: fileExt,
@@ -52,9 +52,13 @@ var EditorView = Backbone.View.extend({
     this.$el.html(this.template(html));
     this.initializeSettingsEditor(this.doc);
     this.initializeContentEditor(this.doc, fileExt);
+    this.initializeSockets(file);
 
+    return this;
+  },
+  initializeSockets: function (file) {
+    var self = this;
     io.socket.get('/v0/site/lock', { file: file }, function(data) {
-
       // Store the socket ID for future reference
       self.socket = data.id;
 
@@ -70,12 +74,9 @@ var EditorView = Backbone.View.extend({
         $('.alert-container').html('');
         io.socket.get('/v0/site/unlock', { file: file });
       });
-
     });
-
-    return this;
   },
-  previewButton: function(sites) {
+  previewButton: function (sites) {
     var build = _.chain(federalist.github
       .get('site')
       .get('builds'))
@@ -126,14 +127,14 @@ var EditorView = Backbone.View.extend({
       this.editors.settings.doc.setValue(this.settings.remaining);
     }
   },
-  extendSettingFields: function (fields) {
+  extendSettingFields: function (fields, layouts) {
     var f = _.extend({
       title: {
         type: 'text'
       },
       layout: {
         type: 'select',
-        options: this.model.getLayouts()
+        options: layouts
       },
       author: {
         type: 'text'
@@ -196,7 +197,10 @@ var EditorView = Backbone.View.extend({
       $(contentEditorEl).parents('.usa-grid').first().hide();
     }
   },
-
+  fileUrl: function (file, model) {
+    model = model || this.model;
+    return ['#site', model.site.id, 'edit', model.get('branch'), file].join('/');
+  },
   lockContent: function(data) {
     var first = (data.subscribers && data.subscribers[0]) ||
                       (this.socket.subscribers && this.socket.subscribers[0]);
@@ -208,11 +212,7 @@ var EditorView = Backbone.View.extend({
       this.locked = true;
 
       // Add error message
-      $('.alert-container').html(
-        '<div class="usa-grid"><div class="usa-alert usa-alert-error" role="alert">' +
-          message +
-        '</div></div>'
-      );
+      this.setAlert(message);
 
       // Disable / style form elements
       $('.CodeMirror, .ProseMirror').append('<div class="mask"></div>');
@@ -255,6 +255,13 @@ var EditorView = Backbone.View.extend({
       target.append(el);
     });
   },
+  setAlert: function (message) {
+    $('.alert-container').html(
+      '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
+        message +
+      '</div></div>'
+    );
+  },
   /**
    * Replace {{ site.baseurl }} with Github URL so assets load
    *
@@ -276,20 +283,10 @@ var EditorView = Backbone.View.extend({
     if (err) return this.saveFailure(err);
     document.body.scrollTop = 0;
 
-    var url = [
-      '#edit',
-      this.model.get('owner'),
-      this.model.get('repoName'),
-      this.model.get('branch'),
-      this.model.get('file')
-    ].join('/');
+    var url = this.fileUrl(this.model.file);
 
     federalist.navigate(url, { trigger: true });
-    $('.alert-container').html(
-      '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
-        'Your draft was saved.' +
-      '</div></div>'
-    );
+    this.setAlert('Your draft was saved.');
   },
   saveFailure: function (e) {
     var messages = {
@@ -301,45 +298,31 @@ var EditorView = Backbone.View.extend({
         status = messages[e.response] || 'That hasn\'t happened before';
 
     document.body.scrollTop = 0;
-    $('.alert-container').html(
-      '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
-        status +
-      '</div></div>'
-    );
+    this.setAlert(status);
   },
   deleteDraft: function(e) {
     e.preventDefault();
     this.model.deleteBranch(function(err) {
       if (err) return this.saveFailure(err);
-      federalist.navigate([
-        '#edit',
-        this.model.get('owner'),
-        this.model.get('repoName'),
-        this.model.get('defaultBranch')
-      ].join('/'), { trigger: true });
-      $('.alert-container').html(
-        '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
-          'Your draft was deleted.' +
-        '</div></div>'
-      );
+      var url = this.fileUrl(this.model.file);
+      federalist.navigate(url, { trigger: true });
+      this.setAlert('Your draft was deleted.');
     }.bind(this));
   },
   publishContent: function(e) {
     e.preventDefault();
     this.saveDocument(e, 'publish', function(err) {
       if (err) return this.saveFailure(err);
-      federalist.navigate([
-        '#edit',
-        this.model.get('owner'),
-        this.model.get('repoName'),
-        this.model.get('defaultBranch')
-      ].join('/'), { trigger: true });
-      $('.alert-container').html(
-        '<div class="usa-grid"><div class="usa-alert usa-alert-info" role="alert">' +
-          'Your draft is being published.' +
-        '</div></div>'
-      );
+      var url = this.fileUrl(this.model.file);
+      federalist.navigate(url, { trigger: true });
+      this.setAlert('Your draft is being published.');
     }.bind(this));
+  },
+  showSavingStatusResult: function () {
+    this.$('#save-status-result').show();
+    this.$('#save-status-result').removeClass('label-success');
+    this.$('#save-status-result').removeClass('label-danger');
+    this.$('#save-status-result').text('Saving...');
   },
   saveDocument: function (e, method, done) {
     var self = this,
@@ -347,16 +330,12 @@ var EditorView = Backbone.View.extend({
         content = this.getContentFromEditor(),
         pageTitle;
 
-    e.preventDefault(); e.stopPropagation();
+    e.preventDefault();
 
     method = method || 'save';
     done = done || this.saveSuccess;
 
-    this.$('#save-status-result').show();
-    this.$('#save-status-result').removeClass('label-success');
-    this.$('#save-status-result').removeClass('label-danger');
-    this.$('#save-status-result').text('Saving...');
-
+    this.showSavingStatusResult();
     this.doc.frontMatter = false;
 
     if (settings) this.doc.frontMatter = settings;

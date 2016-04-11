@@ -9,3 +9,28 @@ label,
 fieldset {
   margin-top: 2rem;
 }
+
+input[type="text"],
+textarea {
+  background-color: $secondary-background-color;
+  border: 0;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+  background-color: white;
+  border: 1px solid $button-color;
+  box-shadow: 0;
+}
+
+select {
+  background-color: $secondary-background-color;
+  background-image: url('/images/uswds/arrow-down.png');
+  border: 0;
+}
+
+@media screen and (min-width: 600px) {
+  form {
+    max-width: 100%;
+  }
+}

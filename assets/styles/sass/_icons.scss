@@ -1,0 +1,99 @@
+@mixin icon() {
+  background-image: url('/images/sprites.svg');
+  background-repeat: no-repeat;
+  background-size: 14.5em 10.5em;
+  display: inline-block;
+  height: .9em;
+  margin-right: .3em;
+  overflow: hidden;
+  text-indent: 1em;
+  white-space: nowrap;
+  width: 1em;
+}
+
+$first-row: -.1em;
+$second-row: -1.3em;
+$third-row: -2.5em;
+$fourth-row: -3.6em;
+$fifth-row: -4.7em;
+$sixth-row: -5.9em;
+
+$first-column: -0.35em;
+$second-column: 0;
+$third-column: 0;
+$fourth-column: -3.85em;
+$fifth-column: -5.0em;
+$sixth-column: 0;
+$seventh-column: 0;
+$eighth-column: 0;
+$ninth-column: 0;
+$tenth-column: 0;
+$eleventh-column: -12em;
+$twelfth-column: 0;
+
+.icon.icon-new:before {
+  @include icon();
+
+  background-position: -13em 0em;
+  content: 'Add a new site icon';
+}
+
+.icon.icon-new.icon-white:before {
+  background-position: $eleventh-column $first-row;
+}
+
+.icon.icon-view:before {
+  @include icon();
+
+  background-position: $fifth-column $sixth-row;
+  content: 'Visit site icon';
+  height: 1em;
+}
+
+.icon.icon-view.icon-white:before {
+  background-position: $eleventh-column $sixth-row;
+}
+
+.icon.icon-pages:before {
+  @include icon();
+
+  background-position: $first-column $first-row;
+  content: 'Edit site content icon';
+}
+
+.icon.icon-pages:hover:before {
+  background-position-x: $fourth-column;
+}
+
+.icon.icon-media:before {
+  @include icon();
+
+  background-position: $first-column $second-row;
+  content: 'Manage site media icon';
+}
+
+.icon.icon-media:hover:before {
+  background-position-x: $fourth-column;
+}
+
+.icon.icon-settings:before {
+  @include icon();
+
+  background-position: $first-column $third-row;
+  content: 'Edit site settings icon';
+}
+
+.icon.icon-settings:hover:before {
+  background-position-x: $fourth-column;
+}
+
+.icon.icon-logs:before {
+  @include icon();
+
+  background-position: $first-column $fourth-row;
+  content: 'View site logs icon';
+}
+
+.icon.icon-logs:hover:before {
+  background-position-x: $fourth-column;
+}

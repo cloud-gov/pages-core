@@ -1,5 +1,18 @@
+<div class="usa-grid  header">
+  <div class="usa-width-two-thirds">
+    <img class="header-icon" src="/images/website.svg" alt="Websites icon">
+    <div class="header-title">
+      <h1><%- site.repository %></h1>
+      <p>Logs</p>
+    </div>
+  </div>
+  <div class="usa-width-one-third">
+    <a class="usa-button usa-button-big pull-right icon icon-view icon-white"
+        href="/site/<%- site.owner %>/<%- site.repository %>/"
+        alt="View this website" role="button" target="_blank">View Website</a>
+  </div>
+</div>
 <div class="usa-grid">
-  <h1>Recent builds for <%- site.owner %> / <%- site.repository %></h1>
   <table class="usa-table-borderless build-log-table">
     <thead>
       <tr>

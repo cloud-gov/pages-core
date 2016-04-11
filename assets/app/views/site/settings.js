@@ -3,31 +3,36 @@ var fs = require('fs');
 var Backbone = require('backbone');
 var _ = require('underscore');
 
-var templateHtml = fs.readFileSync(__dirname + '/../../templates/site/edit.html').toString();
+var templateHtml = fs.readFileSync(__dirname + '/../../templates/site/settings.html').toString();
 
-var SiteEditView = Backbone.View.extend({
-
+var SiteSettingsView = Backbone.View.extend({
   template: _.template(templateHtml, { variable: 'model' }),
-
   events: {
-    'submit': 'save',
+    'submit': 'onSave',
     'click [data-action=delete-site]': 'onDelete'
   },
-
   render: function renderSiteEditView() {
     if (!this.model) return this;
     var data = this.model.toJSON();
     this.$el.html(this.template(data));
     return this;
   },
+  getFormData: function (sel) {
+    var $el = this.$(sel);
+    var data = this.formatFormData($el.serializeArray());
 
-  save: function saveSiteEditView(e) {
+    return data;
+  },
+  formatFormData: function (serializedArray) {
+    return _(serializedArray).reduce(function(memo, value) {
+        memo[value.name] = value.value;
+        return memo;
+      }, {});
+  },
+  onSave: function saveSiteEditView(e) {
     e.preventDefault();
-    var data = _(this.$('form').serializeArray()).reduce(function(memo, value) {
-          memo[value.name] = value.value;
-          return memo;
-        }, {}),
-        view = this;
+    var view = this;
+    var data = this.getFormData('form');
     this.model.save(data, {
       attrs: data,
       success: function() {
@@ -35,7 +40,6 @@ var SiteEditView = Backbone.View.extend({
       }
     });
   },
-
   onDelete: function onDelete() {
     var opts = {
       success: this.onDeleteSuccess.bind(this),
@@ -54,4 +58,4 @@ var SiteEditView = Backbone.View.extend({
 
 });
 
-module.exports = SiteEditView;
+module.exports = SiteSettingsView;
