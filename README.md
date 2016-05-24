@@ -1,7 +1,7 @@
 # Federalist
 [![Build Status](https://travis-ci.org/18F/federalist.svg?branch=master)](https://travis-ci.org/18F/federalist)
 
-***Under active development. Everything is subject to change. Interested in talking to us? [Join our public chat](https://chat.18f.gov/) room (select `federalist-public` from the dropdown).***
+***Under active development. Everything is subject to change. Interested in talking to us? [Join our public chat room](https://chat.18f.gov/?channel=federalist-public).***
 
 Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub, [Prose](https://github.com/prose/prose), and Amazon Web Services to provide a simple way for developers to launch new websites or more easily manage existing ones.
 
