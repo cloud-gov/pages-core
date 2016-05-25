@@ -193,7 +193,7 @@ Sauce Labs can be a bit flakey sometimes and failures on Travis might not be
 reproducible locally. If you're just looking for details of the last Travis run,
 ping the [account holder for
 access](https://github.com/18F/federalist/blob/523aceb9885f248dd60189f9c13c834c3ba0947e/.travis.yml#L24).
-Otherwise, request a Sauce Labs account from #devops.
+Otherwise, 18F personnel can request a Sauce Labs account in Slack.
 
 Once you have an account, you'll need your access key. It's available in the
 Sauce Labs account settings and looks like a GUID e.g.
