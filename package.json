@@ -81,7 +81,7 @@
     "test": "npm run build && npm run test:server && npm run test:browser && npm run test:integration",
     "test:server": "NODE_ENV=test mocha --timeout 60000 test/api/bootstrap.test.js test/api/unit/**/*.test.js",
     "test:browser": "NODE_ENV=test mocha test/browser/bootstrap.test.js \"test/browser/**/*.test.js\"",
-    "test:integration": "NODE_ENV=test mocha test/integration/bootstrap.test.js \"test/integration/**/*.test.js\"",
+    "test:integration": "if [ ! -z \"$SAUCE_ACCESS_KEY\" ]; then NODE_ENV=test mocha test/integration/bootstrap.test.js \"test/integration/**/*.test.js\";fi;",
     "test:selenium:install": "node_modules/selenium-standalone/bin/selenium-standalone install",
     "test:selenium:start": "node_modules/selenium-standalone/bin/selenium-standalone start",
     "lint": "eslint ./**",
