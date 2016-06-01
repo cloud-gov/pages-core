@@ -42,6 +42,7 @@ var Router = Backbone.Router.extend({
     this.listenToOnce(this.user, 'error', function (error) {
       window.localStorage.setItem('token', '');
       window.location.hash = '#';
+      self.mainView = new MainContainerView({user: self.user});
       Backbone.history.start();
     });
 

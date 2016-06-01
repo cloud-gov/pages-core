@@ -4,10 +4,13 @@ var querystring = require('querystring');
 
 var SiteListView = require('./list');
 var SiteView = require('./site/site');
+var HomeView = require('./home');
 
-var AppView = Backbone.View.extend({
+var MainView = Backbone.View.extend({
   el: 'main',
   initialize: function (opts) {
+    opts = (typeof opts === 'object' && opts) || {};
+
     this.user = opts.user;
     this.sites = opts.collection;
 
@@ -34,8 +37,13 @@ var AppView = Backbone.View.extend({
     $('.alert-container').html('');
   },
   setAlert: function (text) {
+    var newAlert = $('<div/>', {
+      class: 'usa-alert usa-alert-error',
+      role: 'alert'
+    });
+
     $('.alert-container').html(
-      '<div class="alert alert-danger" role="alert">' + text + '</div>'
+      newAlert.html('<div class="usa-alert-body">' + text + '</div>')
     );
   },
   parseDashboardErrorFromURL: function (url) {
@@ -63,7 +71,9 @@ var AppView = Backbone.View.extend({
     }
 
     // Show alert message
-    if (message) this.setAlert(message);
+    if (error) this.setAlert(error);
+
+    this.pageSwitcher.set(new HomeView());
 
     return this;
   },
@@ -100,4 +110,4 @@ var AppView = Backbone.View.extend({
   }
 });
 
-module.exports = AppView;
+module.exports = MainView;
