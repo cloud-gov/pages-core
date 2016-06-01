@@ -141,19 +141,48 @@ To run the integration tests you'll need:
 - [Selenium](http://www.seleniumhq.org/) (and [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html)).
 - [chromedriver](https://sites.google.com/a/chromium.org/chromedriver/)
 
-On a mac, you can install them via Homebrew:
+##### Installing all of that and getting it running
 
-    $ brew install selenium-server-standalone
-    $ brew install chromedriver
-    $ selenium-server &
+We're going to use `selenium-standalone` to make installing all of those tools
+just a bit easier to manage and install and we have some `npm` scripts to help
+out.
 
-You'll need a user to test against, (ping your fellow developers for an existing
-test user).
+    $ npm run test:selenium:install
+    $ npm run test:selenium:start
+
+Make sure to run both of these commands, and install Java if it asks you to do so.
+It is required for selenium. After the second command is run successfully you
+should see something like
+
+    09:47:12.342 INFO - Selenium Server is up and running
+    Selenium started
+
+##### Setting up the test Github user
+
+The integration tests rely on a test Github user to ensure that data is
+appropriately displayed in the application. You can use any Github user, but
+18F uses [@FederalistTestingUser](https://github.com/FederalistTestingUser).
+
+First you need to give your app permission to access the user's data, but that
+is not part of the integration test at this time. Thus, you should do this just
+the first time you are setting up a new Github application.
+
+Ensure that you have a Federalist application running (locally is fine). Open
+an Incognito browser window and login to Github.com with your test user. If you
+are on the 18F team, please ask in the Slack room for the test user credentials.
+
+Once you have logged into Github, open your application
+([http://127.0.0.1:1337](http://127.0.0.1:1337) if you're running locally) and
+login. You should grant the application permission to access the test user's
+data in the OAuth authorization view.
+
+Now that your application can access Github on behalf of the test user, set the
+environment variables for the integration tests.
 
     $ export FEDERALIST_TEST_USER=<test user>
     $ export FEDERALIST_TEST_PASSWORD=<test user password>
 
-And then run the tests:
+And now you can run the tests:
 
     $ npm run test:integration
 
