@@ -28,6 +28,7 @@ module.exports.http = {
 
   middleware: {
 
+  xframe: require('lusca').xframe('SAMEORIGIN'),
   /***************************************************************************
   *                                                                          *
   * The order in which middleware should be run for HTTP request. (the Sails *
@@ -37,6 +38,7 @@ module.exports.http = {
 
   order: [
     'forceSSL',
+    'xframe',
     'startRequestTimer',
     'cookieParser',
     'session',
