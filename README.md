@@ -8,7 +8,7 @@ Federalist is a unified interface for publishing static government websites. It 
 ## Getting started
 
 To run the server, you'll need [Node.js](https://nodejs.org/download/) and [Ruby](https://www.ruby-lang.org/en/documentation/installation/) installed. The setup process will automatically install Jekyll and its dependencies based on the `github-pages` gem.
-
+You'll also need [nvm](https://github.com/creationix/nvm).
 To build sites using Hugo, install [Hugo](http://gohugo.io/overview/installing/) and make sure it's available in your path.
 
 
@@ -54,6 +54,7 @@ You'll notice that we talk about a `/config/local.js` file below, particularly f
 
 * Download or Clone this repository from Github either by using the command line or repo's website on Github. On the right side of the repo's page, there is a button that states "Clone in Desktop".
 *
+* Run `nvm use` to ensure you are using the correct version of node
 * Run `npm install` from the root(the directory that houses the projects files on your computer) of the repository to load modules and install Jekyll dependencies
 
 Together these commands will looks something like the following:
@@ -61,6 +62,7 @@ Together these commands will looks something like the following:
 ```
 $ git clone git@github.com:18F/federalist.git
 $ cd federalist
+$ nvm use
 $ npm install
 ```
 
