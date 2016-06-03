@@ -1,0 +1,3 @@
+exclude_paths:
+- "assets/js/dependencies/**/*.js"
+- "tasks/config/sails-linker.js"
