@@ -11,6 +11,10 @@ var AppView = Backbone.View.extend({
     this.user = opts.user;
     this.sites = opts.collection;
 
+    this.render();
+  },
+
+  initializeSocket: function() {
     // Initiate websocket subscription and fetch sites on build message
     io.socket.get('/v0/build?limit=0');
     io.socket.on('build', function() {
@@ -19,9 +23,8 @@ var AppView = Backbone.View.extend({
         success: function() {}
       });
     }.bind(this));
-
-    this.render();
   },
+
   render: function () {
     this.$el.empty();
     this.pageSwitcher = this.pageSwitcher || new ViewSwitcher(this.el, {
