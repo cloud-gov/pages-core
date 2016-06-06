@@ -5,6 +5,13 @@ var AWS = require('aws-sdk'),
     AWSCreds = appEnv.getServiceCreds('federalist-aws-user'),
     redisCreds = appEnv.getServiceCreds('federalist-redis');
 
+var _ = require('underscore');
+var session = {
+  cookie: {
+    secure: true
+  }
+};
+
 /**
  * Production environment settings
  *
@@ -47,13 +54,14 @@ if (AWSCreds) {
 
 // If running in Cloud Foundry with a redis service
 if (redisCreds) {
-  module.exports.session = {
+  session = _.extend({}, session, {
     adapter: 'redis',
     host: redisCreds.hostname,
     port: redisCreds.port,
     db: 0,
     pass: redisCreds.password
-  };
+  });
+
   module.exports.sockets = {
     adapter: 'socket.io-redis',
     host: redisCreds.hostname,
@@ -62,3 +70,5 @@ if (redisCreds) {
     pass: redisCreds.password
   };
 }
+
+module.exports.session = session;
