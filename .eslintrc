@@ -1,3 +1,7 @@
 {
   "extends": "airbnb/legacy",
+  "rules": {
+    "func-names": 0,
+    "space-before-function-paren": 0
+  }
 }

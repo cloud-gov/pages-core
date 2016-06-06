@@ -1,7 +1,7 @@
 /* jshint laxcomma:true */
 
-var path     = require('path')
-  , url      = require('url')
+var path = require('path')
+  , url = require('url')
   , passport = require('passport');
 
 /**
@@ -189,8 +189,8 @@ passport.connect = function (req, query, profile, next) {
  */
 passport.endpoint = function (req, res) {
   var strategies = sails.config.passport
-    , provider   = req.param('provider')
-    , options    = {};
+    , provider = req.param('provider')
+    , options = {};
 
   // If a provider doesn't exist for this endpoint, send the user back to the
   // login page
