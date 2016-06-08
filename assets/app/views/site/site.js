@@ -54,6 +54,7 @@ var SiteView = Backbone.View.extend({
     return this;
   },
   showLogs: function(id) {
+
     var siteLogsView = new SiteLogsView({ model: this.model });
     this.update(siteLogsView, '.icon-logs');
     return this;

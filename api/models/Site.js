@@ -54,6 +54,8 @@ module.exports = {
       // Add siteRoot to the API response for previews
       obj.siteRoot = config.s3Bucket ? 'http://' + config.s3Bucket +
         '.s3-website-us-east-1.amazonaws.com': '';
+      obj.viewLink = obj.domain || [obj.siteRoot, 'site', obj.owner, obj.repository].join('/');
+
       return obj;
     }
   },
