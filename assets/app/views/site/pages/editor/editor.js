@@ -25,34 +25,48 @@ var EditorView = Backbone.View.extend({
   },
   template: _.template(templateHtml),
   initialize: function (opts) {
-    var self      = this,
-        file      = this.filePathFromModel(this.model),
-        fileExt   = this.fileExtensionFromName(this.model.get('file')),
-        html      = {
-          fileName: this.model.get('file'),
-          draft: this.model.get('isDraft')
-        };
+    var self      = this;
 
     this.editors = {};
     this.path = opts.path;
     this.isNewPage = opts.isNewPage || false;
     this.settingsFields = this.extendSettingFields(opts.settingsFields, this.model.getLayouts());
 
-    this.doc = this.initializeDocument({
-      fileExt: fileExt,
-      isNewPage: this.isNewPage
-    });
+    if (this.isNewPage) {
+      this.doc = new Document();
+    } else {
+      this.doc = new Document({
+        fileName: this.model.get('file'),
+        content: this.cleanContent(decodeB64(this.model.attributes.json.content))
+      });
+    }
+
+        // file      = this.filePathFromModel(this.model),
+        // fileExt   =
+        // html      = {
+        //   fileName: this.model.get('file'),
+        //   draft: this.model.get('isDraft')
+        // };
+
+
+
+    // this.doc = this.initializeDocument({
+    //   fileExt: fileExt,
+    //   isNewPage: this.isNewPage
+    // });
 
     // On builds, toggle preview button
     federalist.sites.on('sync', this.previewButton.bind(this));
     this.previewButton(federalist.sites);
 
-    html.settingsDisplayStyle = this.getSettingsDisplayStyle(this.doc);
 
-    this.$el.html(this.template(html));
+    this.$el.html(this.template(Object.assign({}, this.doc.toJSON(), {
+      settingsDisplayStyle: this.getSettingsDisplayStyle(this.doc),
+      draft: false
+    })));
     this.initializeSettingsEditor(this.doc);
-    this.initializeContentEditor(this.doc, fileExt);
-    this.initializeSockets(file);
+    this.initializeContentEditor(this.doc, this.doc.fileExt);
+    //this.initializeSockets(file);
 
     return this;
   },
