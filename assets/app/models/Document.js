@@ -20,7 +20,7 @@ var DocumentModel = Backbone.Model.extend({
       this.initializeYamlDocument(opts.content);
     }
     else {
-      this.initializeMarkdownDocument(['---', 'key: value','---', 'whatever content'].join('\n'))
+      this.initializeMarkdownDocument(['---','---'].join('\n'))
     }
 
     return this;

@@ -25,35 +25,22 @@ var EditorView = Backbone.View.extend({
   },
   template: _.template(templateHtml),
   initialize: function (opts) {
-    var self      = this;
+    var self = this;
+    var documentOptions = {};
 
     this.editors = {};
     this.path = opts.path;
-    this.isNewPage = opts.isNewPage || false;
     this.settingsFields = this.extendSettingFields(opts.settingsFields, this.model.getLayouts());
+    this.isNewPage = opts.isNewPage;
 
-    if (this.isNewPage) {
-      this.doc = new Document();
-    } else {
-      this.doc = new Document({
+    if (!opts.isNewPage) {
+      documentOptions = _.extend({}, documentOptions, {
         fileName: this.model.get('file'),
-        content: this.cleanContent(decodeB64(this.model.attributes.json.content))
+        content: this.cleanContent(decodeB64(this.model.get('json').content))
       });
     }
 
-        // file      = this.filePathFromModel(this.model),
-        // fileExt   =
-        // html      = {
-        //   fileName: this.model.get('file'),
-        //   draft: this.model.get('isDraft')
-        // };
-
-
-
-    // this.doc = this.initializeDocument({
-    //   fileExt: fileExt,
-    //   isNewPage: this.isNewPage
-    // });
+    this.doc = new Document(documentOptions);
 
     // On builds, toggle preview button
     federalist.sites.on('sync', this.previewButton.bind(this));
@@ -64,14 +51,19 @@ var EditorView = Backbone.View.extend({
       settingsDisplayStyle: this.getSettingsDisplayStyle(this.doc),
       draft: false
     })));
-    this.initializeSettingsEditor(this.doc);
-    this.initializeContentEditor(this.doc, this.doc.fileExt);
-    //this.initializeSockets(file);
+    this.initializeSettingsEditor();
+    this.initializeContentEditor();
+    this.initializeSockets(this.model.get('file'));
 
     return this;
   },
   initializeSockets: function (file) {
     var self = this;
+
+    if (!file) {
+      return;
+    }
+
     io.socket.get('/v0/site/lock', { file: file }, function(data) {
       // Store the socket ID for future reference
       self.socket = data.id;
@@ -102,28 +94,8 @@ var EditorView = Backbone.View.extend({
 
     $('.preview-buttons').toggleClass('processing', processing);
   },
-  initializeDocument: function (opts) {
-    var fileExt = opts.fileExt,
-        content, doc, raw;
 
-    if (!opts.isNewPage) {
-      raw = decodeB64(this.model.attributes.json.content);
-      content = this.cleanContent(raw);
-      doc = new Document({
-        fileExt: fileExt,
-        content: content
-      });
-    }
-    else {
-      doc = new Document({
-        fileExt: 'md',
-        content: ['---', this.model.getDefaults(), '---', '\n'].join('\n')
-      });
-    }
-
-    return doc;
-  },
-  initializeSettingsEditor: function (doc) {
+  initializeSettingsEditor: function () {
     var settings, settingsEditorEl;
 
     settingsEditorEl = this.$('[data-target=settings]')[0];
@@ -136,8 +108,8 @@ var EditorView = Backbone.View.extend({
       }
     });
 
-    if (doc.frontMatter || doc.frontMatter === '') {
-      this.settings = this.parseSettings(doc);
+    if (this.doc.get('frontMatter') || this.doc.get('frontMatter') === '') {
+      this.settings = this.parseSettings(this.doc);
       this.editors.settings.doc.setValue(this.settings.remaining);
     }
   },
@@ -160,9 +132,9 @@ var EditorView = Backbone.View.extend({
 
     return f;
   },
-  parseSettings: function (doc) {
+  parseSettings: function () {
     var self = this,
-        y = yaml.parse(doc.frontMatter) || {},
+        y = yaml.parse(this.doc.get('frontMatter')) || {},
         whitelist;
 
     whitelist = Object.keys(y).filter(function(k) {
@@ -187,12 +159,15 @@ var EditorView = Backbone.View.extend({
       remaining: yaml.dump(y)
     };
   },
-  initializeContentEditor: function (doc, fileExt) {
+  initializeContentEditor: function () {
     var contentEditorEl = this.$('[data-target=content]')[0];
+    var documentContent = this.doc.get('content') || '';
+    var fileExt = this.doc.get('fileExt');
+
     try {
       // try to load content into prosemirror
       this.editors.content = this.editors.content || createProseMirror(contentEditorEl);
-      this.editors.content.setContent(doc.content || '', 'markdown');
+      this.editors.content.setContent(documentContent, 'markdown');
     }
     catch (e) {
       // if prosemirror errors out, use codemirror
@@ -204,10 +179,10 @@ var EditorView = Backbone.View.extend({
           Tab: false
         }
       });
-      this.editors.content.doc.setValue(this.doc.content || '');
+      this.editors.content.doc.setValue(documentContent);
     }
 
-    if (fileExt != 'md' && fileExt != 'markdown') {
+    if (fileExt !== 'md' && fileExt !== 'markdown') {
       $(contentEditorEl).parents('.usa-grid').first().hide();
     }
   },
