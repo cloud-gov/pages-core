@@ -132,9 +132,9 @@ var EditorView = Backbone.View.extend({
 
     return f;
   },
-  parseSettings: function () {
+  parseSettings: function (doc) {
     var self = this,
-        y = yaml.parse(this.doc.get('frontMatter')) || {},
+        y = yaml.parse(doc.get('frontMatter')) || {},
         whitelist;
 
     whitelist = Object.keys(y).filter(function(k) {
@@ -325,15 +325,14 @@ var EditorView = Backbone.View.extend({
     done = done || this.saveSuccess;
 
     this.showSavingStatusResult();
-    this.doc.frontMatter = false;
+    this.doc.set('frontMatter', false);
 
-    if (settings) this.doc.frontMatter = settings;
-    if (content) this.doc.content = content;
+    if (settings) this.doc.set('frontMatter', settings);
+    if (content) this.doc.set('content', content);
 
     if (this.isNewPage) {
-      this.saveNewDocument();
-    }
-    else {
+      this.saveNewDocument(method, done);
+    } else {
       this.model[method]({
         content: this.doc.toMarkdown(),
         message: this.$('#save-content-message').val()
@@ -342,21 +341,16 @@ var EditorView = Backbone.View.extend({
 
     return this;
   },
-  saveNewDocument: function () {
+  saveNewDocument: function (method, done) {
     var self = this;
+    var fileName = this.doc.get('fileName');
 
-    try {
-      pageTitle = this.fileNameFromTitle(yaml.parse(this.settings).title);
-    } catch (error) {
-      pageTitle = (new Date()).getTime().toString();
-    }
-
-    pageTitle = [pageTitle.replace(/\W/g, '-'), 'md'].join('.');
+    this.model.set('file', fileName);
 
     this.model[method]({
-      path: ['pages', pageTitle].join('/'),
+      path: ['pages', fileName].join('/'),
       content: this.doc.toMarkdown(),
-      message: 'Created ' + ['pages', pageTitle].join('/')
+      message: 'Created ' + ['pages', fileName].join('/')
     }, done.bind(this));
   },
   getSettingsFromEditor: function () {
@@ -389,36 +383,17 @@ var EditorView = Backbone.View.extend({
     return content;
   },
   getSettingsDisplayStyle: function (doc) {
-    if (doc.fileExt == 'md' || doc.fileExt == 'markdown') {
-      if (!doc.frontMatter) return 'regular';
-      else return 'whitelist';
+    var displayStyle = 'only';
+
+    if (doc.get('fileExt') === 'md' || doc.get('fileExt') === 'markdown') {
+      displayStyle = (!doc.get('frontMatter')) ? 'regular' : 'whitelist';
     }
-    return 'only';
+
+    return displayStyle;
   },
   toIsoDateString: function (date) {
     var d = (date) ? new Date(date) : new Date();
     return d.toISOString().substring(0, 10);
-  },
-  filePathFromModel: function (model) {
-    return [
-      model.get('owner'),
-      model.get('repoName'),
-      model.get('branch'),
-      model.get('file')
-    ].join('/');
-  },
-  fileNameFromTitle: function (title) {
-    var unique = (new Date()).valueOf();
-    title = title || unique.toString();
-
-    return title.toLowerCase();
-  },
-  fileExtensionFromName: function (name) {
-    var r = /\.[0-9a-z]+$/i,
-        match = name.match(r);
-        ext = (match) ? match[0].split('.')[1] : false;
-
-    return ext;
   }
 });
 

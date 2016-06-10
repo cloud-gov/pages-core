@@ -7,6 +7,14 @@ var fileTypes = {
   'yml': ['yml', 'yaml']
 };
 
+var yamlDefaults = [
+  "layout:",
+  "- home",
+  "- page",
+  "- project-list",
+  "- project"
+].join('\n');
+
 var DocumentModel = Backbone.Model.extend({
   initialize: function (opts) {
     opts = opts || {};
@@ -20,7 +28,7 @@ var DocumentModel = Backbone.Model.extend({
       this.initializeYamlDocument(opts.content);
     }
     else {
-      this.initializeMarkdownDocument(['---','---'].join('\n'))
+      this.initializeMarkdownDocument(['---', yamlDefaults, '---', ''].join('\n'));
     }
 
     return this;
@@ -71,17 +79,27 @@ var DocumentModel = Backbone.Model.extend({
   },
   toMarkdown: function () {
     var lastCharIndex;
-    if (!this.frontMatter) return this.content;
-    else if (!this.content) return this.frontMatter;
+    var frontMatter = this.get('frontMatter');
+    var content = this.get('content');
+
+    if (!frontMatter) {
+      return content;
+    }
+
+    if (!content) {
+      return frontMatter;
+    }
 
     // add a new line at the end if there isn't one already
     // this is so the front matter dashes are on the next line
-    lastCharIndex = this.frontMatter.length - 1;
-    if (this.frontMatter[lastCharIndex] !== '\n') {
-      this.frontMatter += '\n';
+    lastCharIndex = frontMatter.length - 1;
+
+    if (frontMatter[lastCharIndex] !== '\n') {
+      frontMatter += '\n';
+      this.set('frontMatter', frontMatter);
     }
 
-    return ['---\n', this.frontMatter, '---\n', this.content]
+    return ['---\n', frontMatter, '---\n', content]
       .join('');
   }
 });
