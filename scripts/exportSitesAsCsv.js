@@ -35,12 +35,13 @@ function consolidateOnSiteId(sites) {
     return site.id;
   });
 
-  return ids.map(function(id) {
+  return ids.map(function(id, i) {
     var sitesById = _.where(sites, { id: id });
     var users = sitesById.map(function(site) {
       return site.users[0];
     });
-    return Object.assign({}, sites[0], { users: users });
+
+    return Object.assign({}, sites[i], { users: users });
   });
 }
 
