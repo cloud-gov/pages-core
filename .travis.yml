@@ -1,3 +1,6 @@
+branches:
+  except:
+    - /react-redux.*/
 language: node_js
 sudo: true
 node_js:

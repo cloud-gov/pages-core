@@ -1,18 +1,16 @@
-import http from 'axios';
-
+import fetch from './fetch';
 import errorActions from '../actions/errorActions';
 
 const API = '/v0';
 
 export default {
-  fetch(url, ...params) {
-    let u = `${API}/${url}`;
-    return http.get(u).then((res) => {
-      if (res.status === 200) return res.data;
+  fetch(endpoint, params) {
+    const url = `${API}/${endpoint}`;
 
-      Promise.reject(res.statusText);
+    return fetch(url, params).then((data) => {
+      return data;
     }).catch((err) => {
-      errorActions.httpError(err);
+      errorActions.httpError(err.response.statusText);
     });
   },
 
