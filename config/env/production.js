@@ -9,7 +9,8 @@ var _ = require('underscore');
 var session = {
   cookie: {
     secure: true
-  }
+  },
+  proxy: true
 };
 
 /**
