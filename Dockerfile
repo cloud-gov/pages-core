@@ -1,4 +1,4 @@
-FROM node:4.2.3-onbuild
+FROM node:argon-onbuild
 
 # Expose environment variables
 ENV BRANCH= \
