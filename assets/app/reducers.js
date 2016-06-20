@@ -47,7 +47,7 @@ export function navigation(state = {}, action) {
 export function sites(state = [], action) {
   switch (action.type) {
     case siteActionTypes.SITES_RECEIVED:
-      return action.sites
+      return action.sites || []
     case siteActionTypes.SITE_ADDED:
       return [...state, action.site];
     case siteActionTypes.SITE_DELETED:

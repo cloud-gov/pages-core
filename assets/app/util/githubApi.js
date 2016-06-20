@@ -1,4 +1,5 @@
 import http from 'axios';
+import fetch from './fetch';
 
 import store from '../store';
 import { encodeB64, decodeB64 } from './encoding';
@@ -15,49 +16,47 @@ function getToken() {
   return github.tokens.accessToken;
 }
 
+function getRepoFor(site) {
+  return `repos/${site.owner}/${site.repository}`;
+}
+
 export default {
-  fetch(url, params) {
-    let u = `${API}/${url}`;
-    return http.get(u, { params }).then((res) => {
-      if (res.status === 200) return res.data;
-;
-      return Promise.reject(res.statusText);
+  fetch(path, params) {
+    const url = `${API}/${path}`;
+
+    return fetch(url, params).then((data) => {
+      return data;
     }).catch((err) => {
-      errorActions.httpError(err);
+      errorActions.httpError(err.response.statusText);
     });
   },
 
-  push(url, data, method = 'POST') {
-    const u = `${API}/${url}`;
-    const c = {
-      url: u,
-      method,
-      data,
+  createCommit(site, path, commit) {
+    let url = `${getRepoFor(site)}/contents/${path}`;
+
+    return this.fetch(url, {
+      method: 'PUT',
       headers: {
-        'Authorization': 'token ' + getToken(),
-        'Content-Type': 'application/json'
-      }
-    }
-    http(c).then((res) => {
-      console.log('res', res);
-      return res;
-    }).catch((err) => {
-      errorActions.httpError(err);
+        'Authorization': `token ${getToken()}`
+      },
+      data: commit
     });
-  },
-
-  commitToRepository(site, path, commit) {
-    let url = `repos/${site.owner}/${site.repository}/contents/${path}`;
-    return this.push(url, commit, 'PUT');
   },
 
   createBranch(site, branch, sha) {
-    const url = `/repos/${site.owner}/${site.repository}/git/refs`;
+    const url = `${getRepoFor(site)}/git/refs`;
     const data = {
       ref: `refs/head/${branch}`,
       sha
     };
-    return this.push(url, data);
+
+    return this.fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `token ${getToken()}`
+      },
+      data,
+    });
   },
 
   createPullRequest(site, branch, base) {
@@ -65,12 +64,17 @@ export default {
   },
 
   deleteBranch(site, branch) {
-    const url = `repos/${site.owner}/${site.repository}/git/refs/heads/${branch}`;
-    return this.push(url, {}, 'DELETE');
+    const url = `${getRepoFor(site)}/git/refs/heads/${branch}`;
+    return this.fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `token ${getToken()}`
+      }
+    });
   },
 
   fetchPullRequests(site) {
-    const url = `repos/${site.owner}/${site.repository}/pulls`;
+    const url = `${getRepoFor(site)}/pulls`;
     return this.fetch(url);
   },
 
@@ -81,15 +85,14 @@ export default {
     });
 
     return Promise.all(configFetches).then((configs) => {
-      return configs.map((c) => {
-        return Object.assign({}, c, { content: decodeB64(c.content)});
+      return configs.map((config) => {
+        return Object.assign({}, config, { content: decodeB64(config.content)});
       });
     }).then((configs) => {
-      let result = {};
-      configFiles.forEach((c, i) => {
-        result[c] = configs[i];
-      });
-      return result;
+      return configFiles.reduce((result, configFile, index) => {
+        result[configFile] = configs[index]
+        return result;
+      }, {});
     });
   },
 
@@ -99,7 +102,8 @@ export default {
       access_token: getToken(),
       ref: site.branch
     };
-    return this.fetch(url, params);
+
+    return this.fetch(url, { params });
   }
 
 }

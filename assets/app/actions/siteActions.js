@@ -36,9 +36,9 @@ export default {
   fetchSiteAssets(site) {
     const config = site['_config.yml'];
     const assetPath = (config && config.assetPath) || 'assets';
-    return github.fetchRepositoryContent(site, assetPath).then((assets) => {
-      return assets.filter((a) => {
-        return a.type === 'file';
+    github.fetchRepositoryContent(site, assetPath).then((assets) => {
+      return assets.filter((asset) => {
+        return asset.type === 'file';
       });
     }).then((assets) => {
       store.dispatch({
@@ -46,7 +46,7 @@ export default {
         siteId: site.id,
         assets
       });
-      
+
       return Promise.resolve(site);
     });
   },
