@@ -36,7 +36,7 @@ export default {
   fetchSiteAssets(site) {
     const config = site['_config.yml'];
     const assetPath = (config && config.assetPath) || 'assets';
-    github.fetchRepositoryContent(site, assetPath).then((assets) => {
+    return github.fetchRepositoryContent(site, assetPath).then((assets) => {
       return assets.filter((a) => {
         return a.type === 'file';
       });
@@ -46,16 +46,26 @@ export default {
         siteId: site.id,
         assets
       });
+      
+      return Promise.resolve(site);
     });
   },
 
   fetchSiteConfigs(site) {
-    github.fetchRepositoryConfigs(site).then((configs) => {
+    return github.fetchRepositoryConfigs(site).then((configs) => {
       store.dispatch({
         type: siteActionTypes.SITE_CONFIGS_RECEIVED,
         siteId: site.id,
         configs
       });
+
+      return Promise.resolve(site);
     });
+  },
+
+  fetchSiteConfigsAndAssets(site) {
+    return this.fetchSiteConfigs(site).then((site) => {
+      return this.fetchSiteAssets(site);
+    })
   }
 }

@@ -1,28 +1,46 @@
-import { buildActionTypes, siteActionTypes, userActionTypes, viewActionTypes, viewTypes } from './constants';
+import { buildActionTypes, navigationTypes, iteActionTypes, siteActionTypes, userActionTypes } from './constants';
 
-const initialCurrentViewState = {
-  id: viewTypes.HOME,
-  siteId: 0
-}
-
-export function currentView(state = initialCurrentViewState, action) {
+export function assets(state = [], action) {
   switch (action.type) {
-    case viewActionTypes.CURRENT_VIEW_SET:
-      return {
-        id: action.view,
-        siteId: action.siteId
-      }
+    case siteActionTypes.SITE_ASSETS_RECEIVED:
+      let assets = action.assets.map((asset) => {
+        return Object.assign({}, asset, { site: action.siteId });
+      });
+      let oldAssetUrls = state.map((asset) => {
+        return asset.url;
+      });
+      let newAssets = assets.filter((asset) => {
+        let url = asset.url;
+        let hasNewUrl = (oldAssetUrls.indexOf(url) < 0) ? true : false;
+        return hasNewUrl;
+      })
+      return [ ...state, ...newAssets ];
     default:
-      return state
+      return state;
   }
 }
 
 export function builds(state = [], action) {
   switch (action.type) {
     case buildActionTypes.BUILDS_RECEIVED:
-      return action.builds
+      return action.builds;
     default:
-      return state
+      return state;
+  }
+}
+
+export function navigation(state = {}, action) {
+  switch (action.type) {
+    case navigationTypes.ROUTE_CHANGED:
+      if (!action.location.options.id) return action.location;
+
+      return Object.assign({}, action.location, {
+        options: {
+          id: +action.location.options.id
+        }
+      });
+    default:
+      return state;
   }
 }
 
@@ -52,13 +70,14 @@ export function sites(state = [], action) {
 export function user(state = false, action) {
   switch (action.type) {
     case userActionTypes.USER_RECEIVED:
-      return Object.assign({}, action.user, {
-        passports: [
-          {
-            accessToken: 'd2995e2edfdd97b4039aa58fcfb9468eda781c26'
-          }
-        ]
-      });
+      return {
+        id: action.user.id,
+        username: action.user.username,
+        email: action.user.email,
+        passports: action.user.passports,
+        createdAt: action.user.createdAt,
+        updatedAt: action.user.updatedAt
+      };
     default:
       return state
   }

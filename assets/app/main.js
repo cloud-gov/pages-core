@@ -1,46 +1,38 @@
 
-import { Router } from 'director';
-
-import render from './app';
-import routes from './routes';
-import store from './store';
+import ReactDOM from 'react-dom';
+import React from 'react';
 
 import buildActions from './actions/buildActions';
 import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
 
-import { viewTypes } from './constants';
+import App from './components/app';
+import Header from './components/header';
 
-const router = Router(routes);
+import router from './router';
+import store from './store';
+
+const mainEl = document.querySelector('#js-app');
+
+store.subscribe(() => {
+  const state = store.getState();
+  const isLoggedIn = (state.user) ? true : false;
+  if (!isLoggedIn) return;
+
+  ReactDOM.render(
+    <div>
+      <Header isLoggedIn={ isLoggedIn } />
+      <App state={ state } />
+    </div>
+    , mainEl
+  );
+});
+
 router.init();
-
-let authed = false;
-let previousState = store.getState();
-
-const mainEl = document.querySelector('main');
-const loginEl = document.querySelector('[href="/auth/github"]');
-
-render(store.getState(), mainEl);
 
 userActions.fetchUser();
 siteActions.fetchSites();
 // buildActions.fetchBuilds();
 
-store.subscribe(() => {
-  let state = store.getState();
-  if (state === previousState) return;
-  if (state.user && !authed) {
-    authed = true;
-    updateLoginElement();
-    if (state.currentView.id === viewTypes.HOME) router.setRoute('/dashboard');
-  }
-  previousState = state;
-  render(state, mainEl);
-  return;
-});
-
-const updateLoginElement = (loggedIn = true) => {
-  if (loggedIn) return loginEl.innerHTML = `<a>Logout</a>`;
-};
-
+window.router = router;
 window.store = store;

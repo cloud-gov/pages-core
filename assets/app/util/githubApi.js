@@ -8,7 +8,11 @@ const API = 'https://api.github.com';
 
 function getToken() {
   let state = store.getState();
-  return state.user.passports[0].accessToken;
+  let passports = state.user.passports;
+  let github = passports.filter((passport) => {
+    return passport.provider === 'github';
+  }).pop();
+  return github.tokens.accessToken;
 }
 
 export default {

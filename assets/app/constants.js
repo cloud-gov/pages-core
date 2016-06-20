@@ -12,6 +12,28 @@ export const errorActionTypes = keymirror({
   HTTP_ERROR: null
 });
 
+export const navigationTypes = keymirror({
+  // Action when route has changed
+  ROUTE_CHANGED: null
+});
+
+export const routeTypes = keymirror({
+  // Represents dashboard/site listing page
+  DASHBOARD: null,
+  // Represents page to add new sites
+  NEW_SITE: null,
+  // Represents the main page for a site
+  SITE: null,
+  // Represents a site content editor page
+  SITE_CONTENT: null,
+  // Represents a site media page
+  SITE_MEDIA: null,
+  // Represents a site log page
+  SITE_LOGS: null,
+  // Represents a site setting page
+  SITE_SETTINGS: null
+});
+
 export const siteActionTypes = keymirror({
   // Action for rece  iving the sites
   SITES_RECEIVED: null,
@@ -33,25 +55,3 @@ export const userActionTypes = keymirror({
   // Logout user
   USER_LOGOUT: null
 });
-
-export const viewActionTypes = keymirror({
-  // Action for changing the view
-  CURRENT_VIEW_SET: null
-})
-
-export const viewTypes = keymirror({
-  // Represents home page
-  HOME: null,
-  // Represents dashboard/site listing page
-  DASHBOARD: null,
-  // Represents page to add new sites
-  NEW_SITE: null,
-  // Represents the main page for a site
-  SITE: null,
-  // Represents a site media page
-  MEDIA: null,
-  // Represents a site log page
-  LOGS: null,
-  // Represents a site setting page
-  SETTINGS: null
-})
