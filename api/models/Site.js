@@ -5,6 +5,8 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
+var DEFAULT_BUCKET = 'federalist.18f.gov.s3-website-us-east-1.amazonaws.com';
+
 module.exports = {
   // Enforce model schema in the case of schemaless databases
   schema: true,
@@ -52,8 +54,9 @@ module.exports = {
       var obj = this.toObject(),
           config = sails.config.build || {};
       // Add siteRoot to the API response for previews
-      obj.siteRoot = config.s3Bucket ? 'http://' + config.s3Bucket +
-        '.s3-website-us-east-1.amazonaws.com': '';
+      obj.siteRoot = 'http://' + (config.s3Bucket ? config.s3Bucket +
+        '.s3-website-us-east-1.amazonaws.com': DEFAULT_BUCKET);
+
       obj.viewLink = obj.domain || [obj.siteRoot, 'site', obj.owner, obj.repository].join('/');
 
       return obj;
