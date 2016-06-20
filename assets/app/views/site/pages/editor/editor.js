@@ -52,7 +52,6 @@ var EditorView = Backbone.View.extend({
     this.$el.html(this.template(html));
     this.initializeSettingsEditor(this.doc);
     this.initializeContentEditor(this.doc, fileExt);
-    this.initializeSockets(file);
 
     return this;
   },
