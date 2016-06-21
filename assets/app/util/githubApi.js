@@ -1,4 +1,4 @@
-import http from 'axios';
+
 import fetch from './fetch';
 
 import store from '../store';
@@ -13,6 +13,7 @@ function getToken() {
   let github = passports.filter((passport) => {
     return passport.provider === 'github';
   }).pop();
+
   return github.tokens.accessToken;
 }
 
@@ -96,11 +97,11 @@ export default {
     });
   },
 
-  fetchRepositoryContent(site, path) {
-    let url = `repos/${site.owner}/${site.repository}/contents/${path}`;
-    let params = {
+  fetchRepositoryContent(site, path = '') {
+    const url = `repos/${site.owner}/${site.repository}/contents/${path}`;
+    const params = {
       access_token: getToken(),
-      ref: site.branch
+      ref: site.branch || site.defaultBranch
     };
 
     return this.fetch(url, { params });

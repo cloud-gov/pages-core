@@ -62,6 +62,13 @@ export function sites(state = [], action) {
         if (s.id !== action.siteId) return s;
         return Object.assign({}, s, { assets: action.assets });
       });
+    case siteActionTypes.SITE_CONTENTS_RECEIVED:
+      return state.map((s) => {
+        if (s.id !== action.siteId) return s;
+        return Object.assign({}, s, {
+          files: action.files
+        });
+      });
     default:
       return state
   }
