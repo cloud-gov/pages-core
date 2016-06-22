@@ -24,34 +24,38 @@ class SiteContainer extends React.Component {
   }
 
   render () {
-    let state = this.props.state;
-    let navigation = state.navigation;
-    let site =  state.sites.filter((site) => {
-      return site.id === navigation.options.id;
-    }).pop();
-    let assets = state.assets.filter((asset) => {
-      return asset.site === navigation.options.id;
+    let state = this.props.storeState;
+    const site = state.sites.filter((site) => {
+      return site.id === this.props.params.id;
     });
 
-    let vl = this.getViewLink(site);
-    let content;
+    //let navigation = state.navigation;
+    // let site =  state.sites.filter((site) => {
+    //   return site.id === navigation.options.id;
+    // }).pop();
+    // let assets = state.assets.filter((asset) => {
+    //   return asset.site === navigation.options.id;
+    // });
 
-    switch (navigation.name) {
-      case routeTypes.SITE:
-        content = <SiteContentContainer site={ site } />
-        break;
-      case routeTypes.SITE_LOGS:
-        content = <SiteLogs builds={ site.builds } repository={ site.repository } viewLink={ vl } />
-        break;
-      case routeTypes.SITE_MEDIA:
-        content = <SiteMediaContainer assets={ assets } site={ site } viewLink={ vl } />
-        break;
-      case routeTypes.SITE_SETTINGS:
-        content = <SiteSettings site={ site } viewLink={ vl } />
-        break;
-      default:
-        break;
-    }
+    let vl = this.getViewLink(site);
+    let content = <SiteContentContainer site={ site } />;
+
+    // switch (navigation.name) {
+    //   case routeTypes.SITE:
+    //     content = <SiteContentContainer site={ site } />
+    //     break;
+    //   case routeTypes.SITE_LOGS:
+    //     content = <SiteLogs builds={ site.builds } repository={ site.repository } viewLink={ vl } />
+    //     break;
+    //   case routeTypes.SITE_MEDIA:
+    //     content = <SiteMediaContainer assets={ assets } site={ site } viewLink={ vl } />
+    //     break;
+    //   case routeTypes.SITE_SETTINGS:
+    //     content = <SiteSettings site={ site } viewLink={ vl } />
+    //     break;
+    //   default:
+    //     break;
+    // }
 
     return (
       <div className="usa-grid site">
