@@ -101,16 +101,23 @@ var EditView = Backbone.View.extend({
       file: model.get('file'),
       branch: model.get('branch')
     };
-    var r = new RegExp(/\//g);
-    var n;
+    var navigationJSON = model.configFiles['_navigation.json'];
+    // matches all '/' in a string.
+    var matchSlashes = new RegExp(/\//g);
+    var currentPageObj;
 
     if (data.draft) {
       data.draftBranch = model.formatDraftBranchName(data.file);
     }
 
-    if (model.configFiles['_navigation.json'].present) {
-      n = _.where(model.configFiles['_navigation.json'].json, { href: data.file });
-      data.permalink = n.length ? n[0].permalink.replace(r, '') : n;
+    // If there is no file, we are on the tree page, and there won't be any
+    // permalink to compare to.
+    if (navigationJSON.present && data.file) {
+      var permalink;
+
+      currentPageObj = _.findWhere(navigationJSON.json, { href: data.file });
+      permalink = (currentPageObj && currentPageObj.permalink) || '';
+      data.permalink = permalink.replace(matchSlashes, '');
     }
 
     return data;
