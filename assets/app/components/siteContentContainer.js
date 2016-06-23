@@ -31,7 +31,11 @@ class SiteContentContainer extends React.Component {
           </div>
         </div>
         <div className="usa-grid">
-          <Pages pages={site.files} />
+          <Pages
+            siteId={site.id}
+            branch={site.branch || site.defaultBranch}
+            pages={site.files}
+          />
         </div>
       </div>
     )
