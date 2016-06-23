@@ -55,10 +55,9 @@ var SiteListItemView = Backbone.View.extend({
         }).filter(function(build) {
           return build.completedAt;
         }).last().value();
+
     data.lastBuildTime = lastBuild ? moment(new Date(lastBuild.completedAt))
       .format('L LT') : '';
-    data.viewLink = data.domain ||
-      data.siteRoot + '/site/' + data.owner + '/' + data.repository + '/';
     data.statusLabel = !lastBuild ? '<span class="usa-label label-warning">Publishing...</span>' :
       lastBuild.state === 'error' ? '<span class="usa-label label-danger">Error: see log for more information</span>' :
       lastBuild.state === 'success' ? '<span class="usa-label label-success">Published</span>' :
