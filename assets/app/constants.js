@@ -57,3 +57,11 @@ export const userActionTypes = keymirror({
   // Logout user
   USER_LOGOUT: null
 });
+
+//TODO: Is there a way to generate this dynamically with a loop?
+export const sideNavPaths = {
+  MEDIA: 'media',
+  PAGES: 'pages',
+  SETTINGS: 'settings',
+  LOGS: 'logs'
+};

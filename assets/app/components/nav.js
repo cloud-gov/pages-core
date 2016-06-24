@@ -14,7 +14,7 @@ class Nav extends React.Component {
         <div className="usa-grid">
           <div className="nav-elements">
             <div className="logo" id="logo">
-              <a href="/#/" accesskey="1" title="Home" aria-label="Home">Federalist logo</a>
+              <a href="/" accesskey="1" title="Home" aria-label="Home">Federalist logo</a>
             </div>
             <div className="navbar-links" id="navbar-links">
               <ul className="" id="nav-mobile">

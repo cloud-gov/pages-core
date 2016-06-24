@@ -27,6 +27,7 @@ class Provider extends React.Component {
     return React.Children.only(this.props.children)
   }
 }
+
 Provider.childContextTypes = {
   state: React.PropTypes.object
 };

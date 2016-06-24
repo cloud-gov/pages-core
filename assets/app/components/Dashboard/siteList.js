@@ -5,8 +5,6 @@ import SiteListItem from './siteListItem';
 class SiteList extends React.Component {
   constructor(props) {
     super(props);
-
-    console.log('props', props);
   }
 
   getNewSiteUrl() {
@@ -23,7 +21,7 @@ class SiteList extends React.Component {
       </div>
     );
 
-    if (store.sites.length > 1) {
+    if (store.sites.length) {
       content = (
         <div className="usa-grid">
           <h2>Websites</h2>

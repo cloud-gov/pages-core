@@ -6,10 +6,14 @@ const propTypes = {
   href: React.PropTypes.string
 }
 
-const LinkButton = ({className, text, href}) =>
-  <a href={href} className={className}>
-    {text}
-  </a>;
+// TODO: ...props should work in this fn call, figure out why it doesn't
+const LinkButton = ({ className, text, href, alt, target }) =>
+  <a role="button"
+    href={href}
+    className={`usa-button ${className}`}
+    alt={alt}
+    target={target}
+  >{text}</a>;
 
 LinkButton.propTypes = propTypes;
 

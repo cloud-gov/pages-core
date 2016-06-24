@@ -8,20 +8,6 @@ class SiteLogs extends React.Component {
   render() {
     return (
       <div>
-        <div className="usa-grid header">
-          <div className="usa-width-two-thirds">
-            <img className="header-icon" src="/images/website.svg" alt="Websites icon" />
-            <div className="header-title">
-              <h1>{ this.props.repository }</h1>
-              <p>Logs</p>
-            </div>
-          </div>
-          <div className="usa-width-one-third">
-            <a className="usa-button usa-button-big pull-right icon icon-view icon-white"
-                href={ this.props.viewLink }
-                alt="View this website" role="button" target="_blank">View Website</a>
-          </div>
-        </div>
         <div className="usa-grid">
           <table className="usa-table-borderless build-log-table">
             <thead>
@@ -67,10 +53,13 @@ class SiteLogs extends React.Component {
   }
 }
 
+SiteLogs.defaultProps = {
+  builds: []
+};
+
 SiteLogs.propTypes = {
   builds: React.PropTypes.array,
-  repository: React.PropTypes.string,
-  viewLink: React.PropTypes.string
+  repository: React.PropTypes.string
 };
 
 export default SiteLogs;

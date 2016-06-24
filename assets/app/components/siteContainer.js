@@ -1,90 +1,81 @@
 import React from 'react';
-
+import { Link } from 'react-router';
 import { routeTypes } from '../constants';
 
 import siteActions from '../actions/siteActions';
 
-import SiteContentContainer from './siteContentContainer';
-import SiteLogs from './siteLogs';
-import SiteMediaContainer from './siteMediaContainer';
-import SiteSettings from './siteSettings';
-
+import SideNav from './site/SideNav/sideNav';
+import PagesHeader from './site/pagesHeader';
+import PagesContainer from './site/pagesContainer';
 
 class SiteContainer extends React.Component {
   constructor(props) {
     super(props);
   }
 
-  getUrl(id, path='') {
-    return `#/sites/${id}/${path}`;
-  }
+  getPageTitle(pathname) {
+    const currentPath = pathname.split('/').pop();
+    const isPathSiteId = /^[0-9]+$/;
 
-  getViewLink(site) {
-    return `fake-view-site-link-for-site-${site.id}`;
+    // If the currentPath is only a site ID, we can safely return 'Pages' as
+    // the title.
+    // TODO: this might change as we incorporate the editor view, title might
+    // be derived higher on the props chain.
+    return isPathSiteId.test(currentPath) ? 'pages' : currentPath;
   }
 
   render () {
-    let state = this.props.storeState;
+    const state = this.props.storeState;
+    const children = this.props.children;
     const site = state.sites.filter((site) => {
-      return site.id === this.props.params.id;
-    });
+      // force type coersion
+      return site.id == this.props.params.id;
+    }).shift();
+    const pageTitle = this.getPageTitle(this.props.location.pathname);
 
-    //let navigation = state.navigation;
-    // let site =  state.sites.filter((site) => {
-    //   return site.id === navigation.options.id;
-    // }).pop();
-    // let assets = state.assets.filter((asset) => {
-    //   return asset.site === navigation.options.id;
-    // });
+    let childConfigs;
 
-    let vl = this.getViewLink(site);
-    let content = <SiteContentContainer site={ site } />;
-
-    // switch (navigation.name) {
-    //   case routeTypes.SITE:
-    //     content = <SiteContentContainer site={ site } />
-    //     break;
-    //   case routeTypes.SITE_LOGS:
-    //     content = <SiteLogs builds={ site.builds } repository={ site.repository } viewLink={ vl } />
-    //     break;
-    //   case routeTypes.SITE_MEDIA:
-    //     content = <SiteMediaContainer assets={ assets } site={ site } viewLink={ vl } />
-    //     break;
-    //   case routeTypes.SITE_SETTINGS:
-    //     content = <SiteSettings site={ site } viewLink={ vl } />
-    //     break;
-    //   default:
-    //     break;
-    // }
+    // TODO: I dont like the switch in the render method.
+    // Ideally we can derive these configs using constants from the name/path
+    // of the route we are on. I'm also not crazy about tying these to route paths
+    // as it makes it harder to change things.
+    switch(pageTitle) {
+      case 'media':
+        childConfigs = {
+          assets: state.assets,
+          site
+        };
+        break;
+      case 'logs':
+        childConfigs = {
+          builds: site.builds,
+          repository: site.repository
+        };
+        break;
+      case 'pages':
+      case 'settings':
+        childConfigs = {
+          site
+        };
+        break;
+      default:
+        childConfigs = {};
+    }
 
     return (
       <div className="usa-grid site">
         <div className="usa-width-one-sixth" id="fool">
-          <ul className="site-actions">
-            <li>
-              <a className="icon icon-pages" href={ this.getUrl(site.id) }>
-                Pages
-              </a>
-            </li>
-            <li>
-              <a className="icon icon-media" href={ this.getUrl(site.id, 'media') }>
-                Media
-              </a>
-            </li>
-            <li>
-              <a className="icon icon-settings" href={ this.getUrl(site.id, 'settings') }>
-                Settings
-              </a>
-            </li>
-            <li>
-              <a className="icon icon-logs" href={ this.getUrl(site.id, 'logs') }>
-                Logs
-              </a>
-            </li>
-          </ul>
+          <SideNav siteId={site.id} />
         </div>
         <div className="usa-width-five-sixths site-main" id="pages-container">
-          { content }
+          <PagesHeader
+            repository={site.repository}
+            title={pageTitle}
+            isPages={pageTitle === 'Pages'}
+          />
+          {children &&
+            React.cloneElement(children, childConfigs)
+          }
         </div>
       </div>
     )
