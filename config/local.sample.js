@@ -5,7 +5,10 @@ module.exports = {
   //      clientID: '<<get from github>>',
   //      clientSecret: '<<get from github>>',
   //      callbackURL: 'http://localhost:1337/auth/github/callback'
-  //    }
+  //    },
+  //    organizations: [
+  //      << get id from https://api.github.com/orgs/<your-org-name> >>
+  //    ]
   //  }
   //},
   //connections: {
