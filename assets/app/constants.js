@@ -46,7 +46,9 @@ export const siteActionTypes = keymirror({
   // Config files retrieved from github
   SITE_CONFIGS_RECEIVED: null,
   // Asset files retrieved from github
-  SITE_ASSETS_RECEIVED: null
+  SITE_ASSETS_RECEIVED: null,
+  // All files that aren't config or assets retrieved from github
+  SITE_CONTENTS_RECEIVED: null
 });
 
 export const userActionTypes = keymirror({

@@ -1,7 +1,9 @@
 
 import React from 'react';
-
+import Pages from './site/pages';
 import siteActions from '../actions/siteActions';
+
+var yaml = require('yamljs');
 
 class SiteContentContainer extends React.Component {
   constructor(props) {
@@ -12,6 +14,7 @@ class SiteContentContainer extends React.Component {
   render () {
     let site = this.props.site;
     let navigationJson = site['_navigation.json'] || {};
+
     return (
       <div>
         <div className="usa-grid header">
@@ -28,8 +31,11 @@ class SiteContentContainer extends React.Component {
           </div>
         </div>
         <div className="usa-grid">
-          <h1>Yo</h1>
-          <code>{ JSON.stringify(navigationJson) }</code>
+          <Pages
+            siteId={site.id}
+            branch={site.branch || site.defaultBranch}
+            pages={site.files}
+          />
         </div>
       </div>
     )

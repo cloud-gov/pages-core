@@ -30,23 +30,23 @@ function parseJSON(response) {
   return response.json();
 }
 
-function _fetch(url, params = {}) {
+function _fetch(url, configs = {}) {
   const baseConfigs = {
-    credentials: params.credentials || credentials,
-    headers: Object.assign({}, defaultHeaders, params.headers || {}),
-    method: params.method || defaultMethod
+    credentials: configs.credentials || credentials,
+    headers: Object.assign({}, defaultHeaders, configs.headers || {}),
+    method: configs.method || defaultMethod
   };
 
   let requestConfigs;
   let requestUrl;
 
-  if (params.method && !(/get/i).test(params.method)) {
-    requestConfigs = Object.assign(baseConfigs, {}, {data: params.data});
+  if (configs.method && !(/get/i).test(configs.method)) {
+    requestConfigs = Object.assign(baseConfigs, {}, {data: configs.data});
   } else {
     requestConfigs = baseConfigs;
   }
 
-  requestUrl = params.params ? mergeParams(url, params) : url;
+  requestUrl = configs.params ? mergeParams(url, configs.params) : url;
 
   return fetch(requestUrl, requestConfigs)
     .then(checkStatus)
