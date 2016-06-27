@@ -5,7 +5,6 @@ import SiteListItem from './siteListItem';
 class SiteList extends React.Component {
   constructor(props) {
     super(props);
-    console.log('props', props);
   }
 
   getNewSiteUrl() {
@@ -13,6 +12,8 @@ class SiteList extends React.Component {
   }
 
   render () {
+    const store = this.props.storeState;
+
     let content = (
       <div className="usa-grid">
         <h1>No sites yet.</h1>
@@ -20,12 +21,12 @@ class SiteList extends React.Component {
       </div>
     );
 
-    if (this.props.sites.length > 1) {
+    if (store.sites.length) {
       content = (
         <div className="usa-grid">
           <h2>Websites</h2>
           <ul className="sites-list">
-            { this.props.sites.map((site) => {
+            { store.sites.map((site) => {
                 return <SiteListItem key={ site.id } site={ site } />
             })}
           </ul>
@@ -61,8 +62,8 @@ class SiteList extends React.Component {
   }
 }
 
-SiteList.propTypes = {
-  sites: React.PropTypes.array
-};
+// SiteList.propTypes = {
+//   sites: React.PropTypes.array
+// };
 
 export default SiteList;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 
 class SiteListItem extends React.Component {
   constructor(props) {
@@ -17,7 +18,7 @@ class SiteListItem extends React.Component {
   }
 
   getSiteUrl(siteId) {
-    return `#/sites/${siteId}`;
+    return `/sites/${siteId}`;
   }
 
   getViewLink(site) {
@@ -25,7 +26,7 @@ class SiteListItem extends React.Component {
   }
 
   render () {
-    let site = this.props.site;
+    let { site } = this.props;
     let viewLink;
 
     let lastPublished = <p>This site has not been published yet. Please wait while the site is built.</p>;
@@ -38,9 +39,9 @@ class SiteListItem extends React.Component {
     return (
       <li className="sites-list-item">
         <div className="sites-list-item-text">
-          <a href={ this.getSiteUrl(site.id) }>
+          <Link to={this.getSiteUrl(site.id)}>
             { site.owner } / { site.repository }
-          </a>
+          </Link>
           { lastPublished }
         </div>
         <div className="sites-list-item-actions">

@@ -33,21 +33,6 @@ class SiteSettings extends React.Component {
 
     return (
     <div>
-      <div className="usa-grid header">
-        <div className="usa-width-two-thirds">
-          <img className="header-icon" src="/images/website.svg" alt="Websites icon" />
-          <div className="header-title">
-            <h1>{ site.repository }</h1>
-            <p>Settings</p>
-          </div>
-        </div>
-        <div className="usa-width-one-third">
-          <a className="usa-button usa-button-big pull-right icon icon-view icon-white"
-              href={ this.props.viewLink } alt="View this website" role="button" target="_blank">
-              View Website
-          </a>
-        </div>
-      </div>
       <form id="site-edit">
         <div className="usa-grid">
           <div className="usa-width-one-whole">
