@@ -15,6 +15,6 @@ module.exports = {
   //  }
   //},
   //models: {
-  //  connection: 'postgres'
+  //  connection: 'localDiskDb'
   //}
 };
