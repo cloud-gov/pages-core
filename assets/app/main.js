@@ -8,14 +8,15 @@ import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
 
 import routes from './routes';
-
-import router from './router';
 import store from './store';
 
 const mainEl = document.querySelector('#js-app');
+
 class Provider extends React.Component {
   getChildContext() {
-    return { state: this.state }
+    return {
+      state: this.state
+    };
   }
 
   constructor(props, context) {
@@ -37,7 +38,7 @@ store.subscribe(() => {
   if (!!!state.user) return;
 
   render((
-    <Provider state={state}>
+    <Provider state={{get: store.getState}}>
       <Router history={browserHistory}>
         {routes}
       </Router>
@@ -45,11 +46,9 @@ store.subscribe(() => {
   ), mainEl);
 });
 
-router.init();
 
 userActions.fetchUser();
 siteActions.fetchSites();
 // buildActions.fetchBuilds();
 
-window.router = router;
 window.store = store;

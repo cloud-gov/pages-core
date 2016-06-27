@@ -9,6 +9,6 @@ const Disclaimer = () =>
       </span>
       <span className="usa-disclaimer-stage">This site is currently in beta. <a href="https://18f.gsa.gov/dashboard/stages/#beta">Learn more.</a></span>
     </div>
-  </div>
+  </div>;
 
 export default Disclaimer;

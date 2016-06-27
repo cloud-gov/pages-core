@@ -1,4 +1,10 @@
-import { buildActionTypes, navigationTypes, iteActionTypes, siteActionTypes, userActionTypes } from './constants';
+import {
+  buildActionTypes,
+  navigationTypes,
+  iteActionTypes,
+  siteActionTypes,
+  userActionTypes
+} from './constants';
 
 export function assets(state = [], action) {
   switch (action.type) {

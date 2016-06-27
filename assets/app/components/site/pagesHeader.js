@@ -2,8 +2,9 @@ import React from 'react';
 import LinkButton from '../linkButton';
 
 const propTypes = {
-  repository: React.PropTypes.string,
-  title: React.PropTypes.string
+  repository: React.PropTypes.string, // Name of the repo
+  title: React.PropTypes.string, // Title of the section we are on
+  isPages: React.PropTypes.bool // Are we on the 'Pages' or index section
 };
 
 class PagesHeader extends React.Component {//({repository, title}) =>

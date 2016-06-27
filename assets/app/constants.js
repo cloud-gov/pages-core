@@ -31,7 +31,9 @@ export const routeTypes = keymirror({
   // Represents a site log page
   SITE_LOGS: null,
   // Represents a site setting page
-  SITE_SETTINGS: null
+  SITE_SETTINGS: null,
+  // Represents an edit page
+  PAGE_EDIT: null
 });
 
 export const siteActionTypes = keymirror({

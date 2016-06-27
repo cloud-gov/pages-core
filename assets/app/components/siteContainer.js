@@ -1,16 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { routeTypes } from '../constants';
 
 import siteActions from '../actions/siteActions';
 
 import SideNav from './site/SideNav/sideNav';
 import PagesHeader from './site/pagesHeader';
-import PagesContainer from './site/pagesContainer';
 
 class SiteContainer extends React.Component {
   constructor(props) {
     super(props);
+
+    const { storeState, params } = props;
+    const currentSite = this.getCurrentSite(storeState.sites, params.id);
+
+    siteActions.fetchSiteConfigsAndAssets(currentSite);
   }
 
   getPageTitle(pathname) {
@@ -24,13 +27,23 @@ class SiteContainer extends React.Component {
     return isPathSiteId.test(currentPath) ? 'pages' : currentPath;
   }
 
+  // TODO: is this something that should be derived in a reducer and passed
+  // down explicitely?
+  getCurrentSite(sites, siteId) {
+    return sites.filter((site) => {
+      // force type coersion
+      return site.id == siteId;
+    }).shift();
+  }
+
+  componentWillReceiveProps() {
+    console.log('props!', arguments)
+  }
+
   render () {
     const state = this.props.storeState;
     const children = this.props.children;
-    const site = state.sites.filter((site) => {
-      // force type coersion
-      return site.id == this.props.params.id;
-    }).shift();
+    const site = this.getCurrentSite(state.sites, this.props.params.id);
     const pageTitle = this.getPageTitle(this.props.location.pathname);
 
     let childConfigs;
@@ -53,6 +66,13 @@ class SiteContainer extends React.Component {
         };
         break;
       case 'pages':
+        console.log('site files!', site.files)
+        childConfigs = {
+          siteId: site.id,
+          branch: site.branch || site.defaultBranch,
+          pages: site.files
+        };
+        break;
       case 'settings':
         childConfigs = {
           site

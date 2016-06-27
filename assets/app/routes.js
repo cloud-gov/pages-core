@@ -4,7 +4,7 @@ import { Route, Link, IndexRedirect, IndexRoute, Redirect } from 'react-router';
 import App from './components/app';
 import Dashboard from './components/Dashboard/siteList';
 import SiteContainer from './components/SiteContainer';
-import PagesContainer from './components/site/pagesContainer';
+import SitePagesContainer from './components/site/pages/pagesContainer';
 import SiteLogs from './components/site/siteLogs';
 import SiteMediaContainer from './components/site/siteMediaContainer';
 import SiteSettings from './components/site/siteSettings';
@@ -19,7 +19,7 @@ export default (
     <Route path="sites">
       <IndexRoute component={Dashboard}/>
       <Route path=":id" component={SiteContainer}>
-        <IndexRoute component={PagesContainer}/>
+        <IndexRoute component={SitePagesContainer}/>
         <Route path="settings" component={SiteSettings}/>
         <Route path="media" component={SiteMediaContainer}/>
         <Route path="logs" component={SiteLogs}/>

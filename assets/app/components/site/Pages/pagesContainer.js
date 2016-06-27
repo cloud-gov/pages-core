@@ -1,14 +1,16 @@
 import React from 'react';
 import PageListItem from './pageListItem';
-import LinkButton from '../linkButton';
+import LinkButton from '../../linkButton';
 
 const propTypes = {
+  siteId: React.PropTypes.number,
+  branch: React.PropTypes.string,
   pages: React.PropTypes.array
-}
+};
 
 class Pages extends React.Component {
   getClasses() {
-    return 'usa-button usa-button-outline file-list-item-button';
+    return 'usa-button-outline file-list-item-button';
   }
 
   getLinkFor(page) {
@@ -22,6 +24,10 @@ class Pages extends React.Component {
 
   render() {
     const { pages } = this.props;
+
+    if (!pages) {
+      return null;
+    }
 
     return (
       <ul className="list-group">
@@ -40,9 +46,10 @@ class Pages extends React.Component {
   }
 }
 
-Pages.defaultProps = {
-  pages: []
-};
+// Pages.defaultProps = {
+//   pages: []
+// };
+
 Pages.propTypes = propTypes;
 
 export default Pages;
