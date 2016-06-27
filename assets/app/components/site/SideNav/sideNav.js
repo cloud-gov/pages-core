@@ -19,18 +19,22 @@ class SideNav extends React.Component {
       <ul className="site-actions">
         <SideNavItem
           href={this.getUrl(siteId)}
+          icon='pages'
           linkText={sideNavPaths.PAGES}
         />
         <SideNavItem
           href={this.getUrl(siteId, sideNavPaths.MEDIA)}
+          icon='media'
           linkText={sideNavPaths.MEDIA}
         />
         <SideNavItem
           href={this.getUrl(siteId, sideNavPaths.SETTINGS)}
+          icon='settings'
           linkText={sideNavPaths.SETTINGS}
         />
         <SideNavItem
           href={this.getUrl(siteId, sideNavPaths.LOGS)}
+          icon='logs'
           linkText={sideNavPaths.LOGS}
         />
       </ul>

@@ -2,12 +2,13 @@ import React from 'react';
 import { Link } from 'react-router';
 
 const propTypes = {
-  href: React.PropTypes.string
+  href: React.PropTypes.string,
+  icon: React.PropTypes.string
 };
 
-const SideNavItem = ({ href, linkText }) =>
+const SideNavItem = ({ href, icon, linkText }) =>
   <li>
-    <Link className="icon icon-media" to={href}>
+    <Link className={'icon icon-' + icon} to={href}>
       {linkText}
     </Link>
   </li>;
