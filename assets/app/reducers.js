@@ -75,6 +75,18 @@ export function sites(state = [], action) {
           files: action.files
         });
       });
+    case siteActionTypes.SITE_CHILD_CONTENT_RECEIVED:
+      const currentMap = state.childDirectoriesMap || {};
+      const nextMap = {};
+      nextMap[action.path] = action.files || [];
+
+      return state.map((site) => {
+        if (site.id !== action.siteId) return site;
+
+        return Object.assign({}, site, {
+          childDirectoriesMap: Object.assign({}, currentMap, nextMap)
+        });
+      });
     default:
       return state
   }

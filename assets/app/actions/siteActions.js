@@ -2,6 +2,7 @@ import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
 import { siteActionTypes } from '../constants';
 import store from '../store';
+import { httpError } from './errorActions';
 
 export default {
   fetchSites() {
@@ -75,6 +76,23 @@ export default {
           });
         });
       });
-    })
+    });
+  },
+
+  fetchContent(site, path) {
+    function dispatchChildContent(site, path, files) {
+      store.dispatch({
+        type: siteActionTypes.SITE_CHILD_CONTENT_RECEIVED,
+        siteId: 1,
+        path,
+        files
+      });
+    }
+
+    return github.fetchRepositoryContent(site, path)
+      .then(
+        dispatchChildContent.bind(null, site, path)
+      ).catch(err => httpError(err));
   }
+
 }

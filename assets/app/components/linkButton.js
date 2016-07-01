@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router';
+
 
 const propTypes = {
   className: React.PropTypes.string,
@@ -6,14 +8,13 @@ const propTypes = {
   href: React.PropTypes.string
 }
 
-// TODO: ...props should work in this fn call, figure out why it doesn't
-const LinkButton = ({ className, text, href, alt, target }) =>
-  <a role="button"
-    href={href}
+const LinkButton = ({ className, children, href, alt, target }) =>
+  <Link role="button"
+    to={href}
     className={`usa-button ${className}`}
     alt={alt}
     target={target}
-  >{text}</a>;
+  >{children}</Link>;
 
 LinkButton.propTypes = propTypes;
 
