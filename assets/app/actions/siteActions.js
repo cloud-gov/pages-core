@@ -23,6 +23,16 @@ export default {
     });
   },
 
+  updateSite(site, data) {
+    federalist.updateSite(site, data).then((site) => {
+      store.dispatch({
+        type: siteActionTypes.SITE_UPDATED,
+        siteId: site.id,
+        site
+      })
+    });
+  },
+
   deleteSite(siteId) {
     federalist.deleteSite(siteId);
   },

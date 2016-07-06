@@ -41,7 +41,9 @@ function _fetch(url, configs = {}) {
   let requestUrl;
 
   if (configs.method && !(/get/i).test(configs.method)) {
-    requestConfigs = Object.assign(baseConfigs, {}, {data: configs.data});
+    requestConfigs = Object.assign(baseConfigs, {}, {
+      body: JSON.stringify(configs.data)
+    });
   } else {
     requestConfigs = baseConfigs;
   }

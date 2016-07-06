@@ -43,6 +43,7 @@ export const siteActionTypes = keymirror({
   SITE_ADD: null,
   // Action after a site has successfully been added
   SITE_ADDED: null,
+  SITE_UPDATED: null,
   // Action for after a site has been deleted
   SITE_DELETED: null,
   // Config files retrieved from github
