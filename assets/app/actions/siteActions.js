@@ -1,6 +1,6 @@
 import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
-import { siteActionTypes } from '../constants';
+import { siteActionTypes, navigationTypes } from '../constants';
 import store from '../store';
 import { httpError } from './errorActions';
 
@@ -35,10 +35,15 @@ export default {
 
   deleteSite(siteId) {
     federalist.deleteSite(siteId).then((site) => {
-      console.log('is there a deleted site?', site, arguments);
       store.dispatch({
         type: siteActionTypes.SITE_DELETED,
         siteId
+      });
+
+      store.dispatch({
+        type: navigationTypes.UPDATE_ROUTER,
+        method: 'push',
+        arguments: [`/sites/${siteId}`]
       });
     });
   },

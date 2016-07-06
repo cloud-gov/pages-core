@@ -132,7 +132,11 @@ class SiteSettings extends React.Component {
               href={this.getSiteUrl()}
               className="usa-button-gray"
               text="Cancel" />
-            <button type="submit" className="usa-button usa-button-primary">
+            <button
+              type="submit"
+              className="usa-button usa-button-primary"
+              style={{display: 'inline'}}
+            >
               Save
             </button>
           </div>

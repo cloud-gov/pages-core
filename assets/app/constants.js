@@ -14,7 +14,8 @@ export const errorActionTypes = keymirror({
 
 export const navigationTypes = keymirror({
   // Action when route has changed
-  ROUTE_CHANGED: null
+  ROUTE_CHANGED: null,
+  UPDATE_ROUTER: null
 });
 
 export const routeTypes = keymirror({
