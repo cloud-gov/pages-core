@@ -63,7 +63,7 @@ export function sites(state = [], action) {
         return Object.assign({}, site, action.site);
       });
     case siteActionTypes.SITE_DELETED:
-      return state.filter((s) => s.id !== action.siteId);
+      return state.filter((site) => site.id !== action.siteId);
     case siteActionTypes.SITE_CONFIGS_RECEIVED:
       return state.map((s) => {
         if (s.id !== action.siteId) return s;

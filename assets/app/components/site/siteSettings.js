@@ -18,6 +18,7 @@ class SiteSettings extends React.Component {
     };
 
     this.onSubmit = this.onSubmit.bind(this);
+    this.onDelete = this.onDelete.bind(this);
     this.onChange = this.onChange.bind(this);
   }
 
@@ -36,6 +37,14 @@ class SiteSettings extends React.Component {
 
   onSubmit(event) {
     siteActions.updateSite(this.props.site, this.state);
+    event.preventDefault();
+  }
+
+  onDelete(event) {
+    if (confirm('Are you sure you want to delete this site?')) {
+      siteActions.deleteSite(this.props.params.id);
+    }
+
     event.preventDefault();
   }
 
@@ -131,7 +140,11 @@ class SiteSettings extends React.Component {
         <div className="usa-grid">
           <div className="usa-alert usa-alert-error" role="alert">
             Delete this site from Federalist?
-            <button className="usa-button usa-button-secondary" alt="delete the site { site.repository }">Delete</button>
+            <button
+              className="usa-button usa-button-secondary"
+              alt="delete the site { site.repository }"
+              onClick={this.onDelete}
+            >Delete</button>
           </div>
         </div>
       </form>

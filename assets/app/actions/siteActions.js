@@ -34,13 +34,12 @@ export default {
   },
 
   deleteSite(siteId) {
-    federalist.deleteSite(siteId);
-  },
-
-  deletedSite(siteId) {
-    store.dispatch({
-      type: siteActionTypes.SITE_DELETED,
-      siteId
+    federalist.deleteSite(siteId).then((site) => {
+      console.log('is there a deleted site?', site, arguments);
+      store.dispatch({
+        type: siteActionTypes.SITE_DELETED,
+        siteId
+      });
     });
   },
 

@@ -47,6 +47,8 @@ export default {
   },
 
   deleteSite(siteId) {
-    // TODO: Send delete request
+    return this.fetch(`site/${siteId}`, {
+      method: 'DELETE'
+    });
   }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router';
+import { Link, withRouter } from 'react-router';
 
 import siteActions from '../actions/siteActions';
 
@@ -15,11 +15,15 @@ class SiteContainer extends React.Component {
     super(props);
   }
 
-  componentDidMount() {
+  componentWillMount() {
     const { storeState, params } = this.props;
     const currentSite = this.getCurrentSite(storeState.sites, params.id);
 
-    siteActions.fetchSiteConfigsAndAssets(currentSite);
+    if (!currentSite) {
+      this.props.router.push('/sites');
+    } else {
+      siteActions.fetchSiteConfigsAndAssets(currentSite);
+    }
   }
 
   getPageTitle(pathname) {
@@ -65,6 +69,10 @@ class SiteContainer extends React.Component {
         childConfigs = { site };
     }
 
+    if (!site) {
+      return null;
+    }
+
     return (
       <div className="usa-grid site">
         <SideNav siteId={site.id} />
@@ -87,4 +95,4 @@ class SiteContainer extends React.Component {
 
 SiteContainer.propTypes = propTypes;
 
-export default SiteContainer;
+export default withRouter(SiteContainer);
