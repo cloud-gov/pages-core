@@ -9,8 +9,9 @@ export default {
 
     return fetch(url, params).then((data) => {
       return data;
-    }).catch((err) => {
-      errorActions.httpError(err.response.statusText);
+    }).catch((error) => {
+      console.log('error!', error.response.body);
+      errorActions.httpError(error.response.statusText);
     });
   },
 
@@ -36,7 +37,10 @@ export default {
   },
 
   addSite(site) {
-    // TODO: Send post request
+    return this.fetch(`user/add-site`, {
+      method: 'POST',
+      data: site
+    });
   },
 
   updateSite(site, data) {

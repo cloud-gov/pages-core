@@ -3,7 +3,8 @@ import {
   navigationTypes,
   iteActionTypes,
   siteActionTypes,
-  userActionTypes
+  userActionTypes,
+  errorActionTypes
 } from './constants';
 
 export function assets(state = [], action) {
@@ -97,6 +98,16 @@ export function sites(state = [], action) {
       return state
   }
 }
+
+export function error(state = '', action) {
+  switch (action.type) {
+    case errorActionTypes.HTTP_ERROR:
+      state = action.error;
+      return state;
+    default:
+      return state;
+  }
+};
 
 export function user(state = false, action) {
   switch (action.type) {

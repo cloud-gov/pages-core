@@ -1,14 +1,11 @@
 import React from 'react';
 
 import SiteListItem from './siteListItem';
+import LinkButton from '../linkButton';
 
 class SiteList extends React.Component {
   constructor(props) {
     super(props);
-  }
-
-  getNewSiteUrl() {
-    return `#/sites/new`;
   }
 
   render () {
@@ -45,15 +42,21 @@ class SiteList extends React.Component {
             </div>
           </div>
           <div className="usa-width-one-third">
-            <a className="usa-button usa-button-big pull-right icon icon-new icon-white" href={ this.getNewSiteUrl() }  alt="Add a new website" role="button">Add Website</a>
+            <LinkButton
+              className="usa-button-big pull-right icon icon-new icon-white"
+              href={'/sites/new'}
+              alt="Add a new website"
+              text="Add Website" />
           </div>
         </div>
-
         { content }
-
         <div className="usa-grid">
           <div className="usa-width-one-whole">
-            <a className="usa-button usa-button-big icon icon-new icon-white" href={ this.getNewSiteUrl() }  alt="Add a new website" role="button">Add Website</a>
+            <LinkButton
+              className="usa-button-big pull-right icon icon-new icon-white"
+              href={'/sites/new'}
+              alt="Add a new website"
+              text="Add Website" />
           </div>
         </div>
 
