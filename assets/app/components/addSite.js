@@ -15,7 +15,6 @@ class AddSite extends React.Component {
   onClickAddSite(e) {
     e.preventDefault();
     let site = {};
-    console.log('yo');
     // siteActions.addSite(site);
   }
 

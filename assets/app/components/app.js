@@ -8,11 +8,19 @@ import Header from './header';
 class App extends React.Component {
   constructor(props, context) {
     super(props, context);
+    this.state = this.getStateFromStore();
+  }
+
+  getStateFromStore() {
+    return this.context.state.get();
+  }
+  componentWillReceiveProps() {
+    this.setState(this.getStateFromStore());
   }
 
   render() {
     const { children } = this.props;
-    const storeState = this.context.state;
+    const storeState = this.state;
 
     return (
       <div>

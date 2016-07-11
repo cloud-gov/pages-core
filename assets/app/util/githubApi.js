@@ -106,7 +106,6 @@ export default {
 
     return this.fetch(url, { params });
   }
-
 }
 
 // var GithubModel = Backbone.Model.extend({

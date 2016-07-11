@@ -1,16 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { routeTypes } from '../constants';
 
 import siteActions from '../actions/siteActions';
 
 import SideNav from './site/SideNav/sideNav';
 import PagesHeader from './site/pagesHeader';
-import PagesContainer from './site/pagesContainer';
+
+const propTypes = {
+  storeState: React.PropTypes.object
+};
 
 class SiteContainer extends React.Component {
   constructor(props) {
     super(props);
+  }
+
+  componentDidMount() {
+    const { storeState, params } = this.props;
+    const currentSite = this.getCurrentSite(storeState.sites, params.id);
+
+    siteActions.fetchSiteConfigsAndAssets(currentSite);
   }
 
   getPageTitle(pathname) {
@@ -24,14 +33,17 @@ class SiteContainer extends React.Component {
     return isPathSiteId.test(currentPath) ? 'pages' : currentPath;
   }
 
-  render () {
-    const state = this.props.storeState;
-    const children = this.props.children;
-    const site = state.sites.filter((site) => {
+  getCurrentSite(sites, siteId) {
+    return sites.filter((site) => {
       // force type coersion
-      return site.id == this.props.params.id;
+      return site.id == siteId;
     }).shift();
-    const pageTitle = this.getPageTitle(this.props.location.pathname);
+  }
+
+  render () {
+    const { storeState, children, params, location } = this.props;
+    const site = this.getCurrentSite(storeState.sites, params.id);
+    const pageTitle = this.getPageTitle(location.pathname);
 
     let childConfigs;
 
@@ -42,48 +54,37 @@ class SiteContainer extends React.Component {
     switch(pageTitle) {
       case 'media':
         childConfigs = {
-          assets: state.assets,
+          assets: storeState.assets,
           site
         };
         break;
-      case 'logs':
-        childConfigs = {
-          builds: site.builds,
-          repository: site.repository
-        };
-        break;
-      case 'pages':
       case 'settings':
-        childConfigs = {
-          site
-        };
-        break;
+      case 'pages':
+      case 'logs':
       default:
-        childConfigs = {};
+        childConfigs = { site };
     }
 
     return (
       <div className="usa-grid site">
-        <div className="usa-width-one-sixth" id="fool">
-          <SideNav siteId={site.id} />
-        </div>
+        <SideNav siteId={site.id} />
         <div className="usa-width-five-sixths site-main" id="pages-container">
           <PagesHeader
             repository={site.repository}
             title={pageTitle}
             isPages={pageTitle === 'Pages'}
           />
-          {children &&
-            React.cloneElement(children, childConfigs)
-          }
+          <div className="usa-grid">
+            {children &&
+              React.cloneElement(children, childConfigs)
+            }
+          </div>
         </div>
       </div>
     )
   }
 }
 
-SiteContainer.propTypes = {
-  state: React.PropTypes.object
-};
+SiteContainer.propTypes = propTypes;
 
 export default SiteContainer;

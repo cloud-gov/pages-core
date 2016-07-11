@@ -31,7 +31,9 @@ export const routeTypes = keymirror({
   // Represents a site log page
   SITE_LOGS: null,
   // Represents a site setting page
-  SITE_SETTINGS: null
+  SITE_SETTINGS: null,
+  // Represents an edit page
+  PAGE_EDIT: null
 });
 
 export const siteActionTypes = keymirror({
@@ -48,7 +50,8 @@ export const siteActionTypes = keymirror({
   // Asset files retrieved from github
   SITE_ASSETS_RECEIVED: null,
   // All files that aren't config or assets retrieved from github
-  SITE_CONTENTS_RECEIVED: null
+  SITE_CONTENTS_RECEIVED: null,
+  SITE_CHILD_CONTENT_RECEIVED: null
 });
 
 export const userActionTypes = keymirror({

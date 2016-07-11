@@ -20,8 +20,8 @@ class SiteMediaContainer extends React.Component {
     else {
       content = <ul>
         {
-          assets.map((asset) => {
-            return <MediaThumbnail asset={ asset } />
+          assets.map((asset, index) => {
+            return <MediaThumbnail key={index} asset={ asset } />
           })
         }
       </ul>

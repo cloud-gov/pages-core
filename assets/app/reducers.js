@@ -1,4 +1,10 @@
-import { buildActionTypes, navigationTypes, iteActionTypes, siteActionTypes, userActionTypes } from './constants';
+import {
+  buildActionTypes,
+  navigationTypes,
+  iteActionTypes,
+  siteActionTypes,
+  userActionTypes
+} from './constants';
 
 export function assets(state = [], action) {
   switch (action.type) {
@@ -67,6 +73,18 @@ export function sites(state = [], action) {
         if (s.id !== action.siteId) return s;
         return Object.assign({}, s, {
           files: action.files
+        });
+      });
+    case siteActionTypes.SITE_CHILD_CONTENT_RECEIVED:
+      const currentMap = state.childDirectoriesMap || {};
+      const nextMap = {};
+      nextMap[action.path] = action.files || [];
+
+      return state.map((site) => {
+        if (site.id !== action.siteId) return site;
+
+        return Object.assign({}, site, {
+          childDirectoriesMap: Object.assign({}, currentMap, nextMap)
         });
       });
     default:

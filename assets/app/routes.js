@@ -4,7 +4,7 @@ import { Route, Link, IndexRedirect, IndexRoute, Redirect } from 'react-router';
 import App from './components/app';
 import Dashboard from './components/Dashboard/siteList';
 import SiteContainer from './components/SiteContainer';
-import PagesContainer from './components/site/pagesContainer';
+import SitePagesContainer from './components/site/pages/pagesContainer';
 import SiteLogs from './components/site/siteLogs';
 import SiteMediaContainer from './components/site/siteMediaContainer';
 import SiteSettings from './components/site/siteSettings';
@@ -15,18 +15,20 @@ const Stub = () =>
 
 export default (
   <Route path="/" component={App}>
-    <IndexRedirect to="sites" />
+    <IndexRedirect to="sites"/>
     <Route path="sites">
       <IndexRoute component={Dashboard}/>
       <Route path=":id" component={SiteContainer}>
-        <IndexRoute component={PagesContainer}/>
+        <IndexRoute component={SitePagesContainer}/>
+        <Route path="tree/:fileName" component={SitePagesContainer}/>
         <Route path="settings" component={SiteSettings}/>
         <Route path="media" component={SiteMediaContainer}/>
         <Route path="logs" component={SiteLogs}/>
-        <Route path="edit/:branch/:fileName" component={Stub} />
+        <Route path="edit/:branch/:fileName" component={Stub}/>
       </Route>
+      <Redirect from="*" to="/not-found"/>
     </Route>
-    <Route path="/not-found" component={NotFound} />
-    <Redirect from="*" to="/not-found" />
+    <Route path="/not-found" component={NotFound}/>
+    <Redirect from="*" to="/sites"/>
   </Route>
 );
