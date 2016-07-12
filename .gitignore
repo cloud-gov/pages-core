@@ -59,6 +59,9 @@ assets/styles/google-fonts.css
 assets/fonts/merriweather*
 assets/fonts/sourcesanspro*
 
+# test coverage reports
+coverage
+
 ################################################
 # Dependencies
 #
