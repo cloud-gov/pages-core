@@ -24,14 +24,15 @@ module.exports = {
         repository = req.param('repository'),
         user = req.user;
 
-    if (!owner || !repository) sails.log.info('hi'); return res.badRequest('Please specify a repository owner and name.');
+    if (!owner || !repository) {
+      return res.badRequest('Please specify a repository owner and name.')
+    }
 
     async.series([
       checkPermissions,
       checkSite
     ], function(err) {
       if (err) {
-        sails.log.info('an error!', err);
         return res.badRequest(err);
       }
     });

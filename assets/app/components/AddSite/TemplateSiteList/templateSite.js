@@ -1,6 +1,7 @@
 import React from 'react';
 
 const propTypes = {
+  name: React.PropTypes.string.isRequired,
   owner: React.PropTypes.string.isRequired,
   branch: React.PropTypes.string.isRequired,
   repo: React.PropTypes.string.isRequired,
@@ -10,6 +11,7 @@ const propTypes = {
   thumb: React.PropTypes.string.isRequired,
   active: React.PropTypes.number.isRequired,
   handleChooseActive: React.PropTypes.func.isRequired,
+  handleSubmit: React.PropTypes.func.isRequired,
   index: React.PropTypes.number.isRequired
 };
 
@@ -17,7 +19,12 @@ class TemplateSite extends React.Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      siteName: ''
+    };
+
     this.handleChooseActive = this.handleChooseActive.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -25,8 +32,24 @@ class TemplateSite extends React.Component {
     this.props.handleChooseActive(this.props.index);
   }
 
+  getSafeRepoName(name) {
+    return name
+      .replace(/[^\w\.]+/g, '-')
+      .replace(/^-+/g, '')
+      .replace(/-+$/g, '');
+  }
+
   handleSubmit(event) {
     event.preventDefault();
+    const safeName = this.getSafeRepoName(this.state.siteName);
+
+    this.props.handleSubmit(safeName, this.props.name);
+  }
+
+  handleChange(event) {
+    this.setState({
+      siteName: event.target.value
+    });
   }
 
   getFormVisible() {
@@ -47,11 +70,18 @@ class TemplateSite extends React.Component {
             <a data-action="name-site" className="thumbnail">
               <img
                 src={`/images/${props.thumb}.thumb.png`}
-                alt={`Thumbnail screenshot for the ${props.title} template`}  />
+                alt={`Thumbnail screenshot for the ${props.title} template`} />
             </a>
             <p>{props.description}</p>
             <div className="button_wrapper">
-              <a className="usa-button usa-button-outline" href={props.example} target="_blank" role="button">Example</a>
+              <a
+                className="usa-button usa-button-outline"
+                href={props.example}
+                target="_blank"
+                role="button"
+              >
+                Example
+              </a>
               <button
                 className="usa-button"
                 onClick={this.handleChooseActive}
@@ -65,7 +95,11 @@ class TemplateSite extends React.Component {
               onSubmit={this.handleSubmit}
             >
               <label for="site-name">Name your new site</label>
-              <input name="site-name" type="text" />
+              <input
+                name="site-name"
+                type="text"
+                value={this.state.siteName}
+                onChange={this.handleChange} />
               <input type="submit" value="Create site" />
             </form>
           </div>

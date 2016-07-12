@@ -16,14 +16,17 @@ function mergeParams(url, params) {
 }
 
 function checkStatus(response) {
-  if (response.status >= 200 && response.status < 300) {
+  if (response.ok) {
     return response;
-  } else {
-    var error = new Error(response.statusText);
+  }
+
+  // All API error responses are returned as plain text
+  return response.text().then((errorText) => {
+    const error = new Error(errorText);
     error.response = response;
 
     throw error;
-  }
+  });
 }
 
 function parseJSON(response) {

@@ -4,7 +4,7 @@ import TemplateSite from './templateSite';
 
 const propTypes = {
   templates: React.PropTypes.object.isRequired,
-  handleTemplateSelect: React.PropTypes.func
+  handleSubmitTemplate: React.PropTypes.func.isRequired
 }
 
 class TemplateList extends React.Component {
@@ -40,11 +40,13 @@ class TemplateList extends React.Component {
 
             return (
               <TemplateSite
+                name={templateName}
                 key={index}
                 index={index}
                 thumb={templateName}
                 active={this.state.activeChildId}
                 handleChooseActive={this.handleChooseActive}
+                handleSubmit={this.props.handleSubmitTemplate}
                 {...template} />
             );
           })}

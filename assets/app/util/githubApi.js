@@ -21,14 +21,22 @@ function getRepoFor(site) {
   return `repos/${site.owner}/${site.repository}`;
 }
 
-export default {
+const github = {
   fetch(path, params) {
     const url = `${API}/${path}`;
 
     return fetch(url, params).then((data) => {
       return data;
     }).catch((err) => {
-      errorActions.httpError(err.response.statusText);
+      let formattedError;
+
+      try {
+        formattedError = JSON.parse(err.message).message;
+      } catch (error) {
+        formatterError = err.message;
+      }
+
+      errorActions.httpError(formattedError);
     });
   },
 
@@ -105,6 +113,68 @@ export default {
     };
 
     return this.fetch(url, { params });
+  },
+
+  /**
+   * creates a new github repo at the user's account
+   * @param  {Object} destination Repo ro be created
+   *                              keys:
+   *                              	repo: String:required
+   *                              	organization: String (default to 'user')
+   *                              	branch: String (default to 'master')
+   *                              	engine: String (default to 'jekyll')
+   *
+   * }
+   * @param  {Object} source      Repo to be cloned
+   *                              keys:
+   *                              	owner: String:required
+   *                              	repo: String:required
+   * @return {Promise}
+   */
+  createRepo(destination, source) {
+    const token = getToken();
+    /**
+     * Issue an OPTIONS request to determine if the source repository to be
+     * cloned exists on github.
+     * @param  {String} owner Github username associated with the repo
+     * @param  {String} repo  Name of the repository to be cloned
+     * @return {Promise}
+     */
+    function checkSourceRepo(owner, repo) {
+      const params = {
+        access_token: token
+      };
+      const sourceUrl = `repos/${owner}/${repo}`;
+
+      return github.fetch(sourceUrl, { params });
+    }
+
+    /**
+     * Issue a POST request to github to create a new repository for the user
+     * @param  {Object} destination keys:
+     *                              	repo:String required
+     *                              	organization:String
+     * @return {Promise}
+     */
+    function createRepo(destination) {
+      const org = destination.organization ?
+        `orgs/${destination.organization}` : 'user';
+
+      const repoUrl = `${org}/repos`;
+
+      return github.fetch(repoUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `token ${token}`
+        },
+        data: {
+          name: destination.repo
+        }
+      });
+    }
+
+    return checkSourceRepo(source.owner, source.repo)
+      .then(() => createRepo(destination));
   }
 }
 
@@ -230,89 +300,6 @@ export default {
 //     });
 //
 //   },
-//   },
-//   /*
-//    * Clone a repository to the user's account.
-//    * @param {Object} source - The source repo to clone.
-//    * @param {string} source.owner - The source repo's owner.
-//    * @param {string} source.repository - The source repo's name.
-//    * @param {Object} destination - The destination repository.
-//    * @param {string} destination.repository - The destination repo's name.
-//    * @param {string} destination.organization - The destination repo's owner org (optional).
-//    * @param {string} destination.branch - The destination repo's branch (optional).
-//    * @param {string} destination.engine - The destination repo's build engine (optional).
-//    * @param {function} done - The callback function.
-//    */
-//   clone: function clone(source, destination, done) {
-//     var model = this;
-//     var method = model.clone;
-//     var err;
-//
-//     if (!source || !source.owner || !source.repository || !destination) {
-//       err = new Error('Missing source or destination');
-//       return done ? done(err) : err;
-//     }
-//
-//     method.checkSource = function checkDestination(done) {
-//       var url = model.url({
-//         root: true, owner: source.owner, repository: source.repository
-//       });
-//
-//       $.ajax({
-//         dataType: 'json',
-//         url: url,
-//         success: done.bind(this, null),
-//         error: done
-//       });
-//     };
-//
-//     method.createRepo = function createRepo(done) {
-//       var route = destination.organization ?
-//         'orgs/' + destination.organization : 'user';
-//       var url = model.url({ route: route, method: 'repos' });
-//       var data = { name: destination.repository };
-//
-//       $.ajax({
-//         method: 'POST',
-//         dataType: 'json',
-//         contentType: 'application/json; charset=utf-8',
-//         data: JSON.stringify(data),
-//         url: url,
-//         success: done.bind(this, null),
-//         error: done
-//       });
-//
-//     };
-//
-//     method.cloneRepo = function cloneRepo(done) {
-//       var url = '/v0/site/clone';
-//       var data = {
-//         sourceOwner: source.owner,
-//         sourceRepo: source.repository,
-//         destinationOrg: destination.organization,
-//         destinationRepo: destination.repository,
-//         destinationBranch: destination.branch || this.branch,
-//         engine: destination.engine || 'jekyll'
-//       };
-//       $.ajax({
-//         method: 'POST',
-//         dataType: 'json',
-//         contentType: 'application/json; charset=utf-8',
-//         data: JSON.stringify(data),
-//         url: url,
-//         success: done.bind(this, null),
-//         error: done
-//       });
-//     };
-//
-//     if (done) async.series([
-//       method.checkSource.bind(this),
-//       method.createRepo.bind(this),
-//       method.cloneRepo.bind(this)
-//     ], done);
-//
-//     return this;
-//   },
 //   fetchDrafts: function() {
 //     var self = this;
 //     var url = this.url({
@@ -364,3 +351,5 @@ export default {
 // });
 //
 // module.exports = GithubModel;
+//
+export default github;

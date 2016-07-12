@@ -10,8 +10,7 @@ export default {
     return fetch(url, params).then((data) => {
       return data;
     }).catch((error) => {
-      console.log('error!', error.response.body);
-      errorActions.httpError(error.response.statusText);
+      errorActions.httpError(error.message);
     });
   },
 
@@ -40,6 +39,20 @@ export default {
     return this.fetch(`user/add-site`, {
       method: 'POST',
       data: site
+    });
+  },
+
+  cloneRepo(destination, source) {
+    return this.fetch('site/clone', {
+      method: 'POST',
+      data: {
+        sourceOwner: source.owner,
+        sourceRepo: source.repo,
+        destinationOrg: destination.organization,
+        destinationRepo: destination.repo,
+        destinationBranch: destination.branch || 'master',
+        engine: destination.engine || 'jekyll'
+      }
     });
   },
 

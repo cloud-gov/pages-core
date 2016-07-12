@@ -2,7 +2,7 @@ import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
 import { siteActionTypes, navigationTypes } from '../constants';
 import store from '../store';
-import { httpError } from './errorActions';
+import errorActions from './errorActions';
 
 export default {
   fetchSites() {
@@ -43,7 +43,7 @@ export default {
       store.dispatch({
         type: navigationTypes.UPDATE_ROUTER,
         method: 'push',
-        arguments: [`/sites/${siteId}`]
+        arguments: [`/sites`]
       });
     });
   },
@@ -106,7 +106,25 @@ export default {
     return github.fetchRepositoryContent(site, path)
       .then(
         dispatchChildContent.bind(null, site, path)
-      ).catch(err => httpError(err));
-  }
+      ).catch(err => errorActions.httpError(err));
+  },
 
+  cloneRepo(destination, source) {
+    return github.createRepo(destination, source).then(() => {
+      return federalist.cloneRepo(destination, source).then((site) => {
+        store.dispatch({
+          type: siteActionTypes.SITE_ADDED,
+          site
+        });
+
+        store.dispatch({
+          type: navigationTypes.UPDATE_ROUTER,
+          method: 'push',
+          arguments: [`/sites/${site.id}`]
+        });
+      });
+    }).catch((err) => {
+      errorActions.httpError(err);
+    });
+  }
 }

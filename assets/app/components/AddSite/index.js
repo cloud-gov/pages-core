@@ -1,10 +1,8 @@
-
 import React from 'react';
 
 import TemplateSiteList from './TemplateSiteList';
 import LinkButton from '../linkButton';
 import AlertBanner from '../alertBanner';
-
 
 import siteActions from '../../actions/siteActions';
 
@@ -28,8 +26,6 @@ class AddSite extends React.Component {
       users: [+user.id]
     };
 
-    console.log('storestate', this.props.storeState)
-
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
@@ -37,6 +33,12 @@ class AddSite extends React.Component {
   onSubmit(event) {
     event.preventDefault();
     siteActions.addSite(this.state);
+  }
+
+  onSubmitTemplate(siteName, templateName) {
+    siteActions.cloneRepo({
+      repo: siteName
+    }, templates[templateName]);
   }
 
   onChange(event) {
@@ -59,11 +61,13 @@ class AddSite extends React.Component {
         <div className="usa-grid">
           <div className="usa-width-one-whole">
             <p>
-              There are a few different ways you can add sites to Federalist. You can start with a brand new site by selecting one of our template sites below. Or you can specify the Github repository where your site's code lives.
+              There are a few different ways you can add sites to Federalist. You can start with a brand new site by selecting one of our template sites below. Or you can specify the Github repository where your site&#39;s code lives.
             </p>
           </div>
         </div>
-        <TemplateSiteList templates={templates} />
+        <TemplateSiteList
+          templates={templates}
+          handleSubmitTemplate={this.onSubmitTemplate} />
         <div className="usa-grid">
           <div className="col-md-12">
             <h2>Or add your own Github repository</h2>
@@ -73,7 +77,7 @@ class AddSite extends React.Component {
           <div className="usa-grid">
             <div className="col-md-12">
               <div className="form-group">
-                <label for="owner">Repository owner's Github username</label>
+                <label for="owner">Repository owner&#39;s Github username</label>
                 <input
                   type="text"
                   id="owner"
@@ -131,8 +135,8 @@ class AddSite extends React.Component {
             </div>
           </div>
         </form>
-    </div>
-  );
+      </div>
+    );
   }
 }
 

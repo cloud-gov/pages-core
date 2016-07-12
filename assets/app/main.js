@@ -27,7 +27,6 @@ store.subscribe(() => {
   ), mainEl);
 });
 
-
 userActions.fetchUser();
 siteActions.fetchSites();
 // buildActions.fetchBuilds();

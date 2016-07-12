@@ -36,27 +36,14 @@ export function builds(state = [], action) {
   }
 }
 
-export function navigation(state = {}, action) {
-  switch (action.type) {
-    case navigationTypes.ROUTE_CHANGED:
-      if (!action.location.options.id) return action.location;
-
-      return Object.assign({}, action.location, {
-        options: {
-          id: +action.location.options.id
-        }
-      });
-    default:
-      return state;
-  }
-}
-
 export function sites(state = [], action) {
   switch (action.type) {
     case siteActionTypes.SITES_RECEIVED:
       return action.sites || []
     case siteActionTypes.SITE_ADDED:
-      return [...state, action.site];
+      // if a site hasn't been properly added, return the existing state
+      // TODO: why is this getting called if there is an error
+      return action.site ? [...state, action.site] : state;
     case siteActionTypes.SITE_UPDATED:
       return state.map((site) => {
         if (site.id !== action.siteId) return site;
@@ -64,7 +51,7 @@ export function sites(state = [], action) {
         return Object.assign({}, site, action.site);
       });
     case siteActionTypes.SITE_DELETED:
-      return state.filter((site) => site.id !== action.siteId);
+      return state.filter((site) => site.id != action.siteId);
     case siteActionTypes.SITE_CONFIGS_RECEIVED:
       return state.map((s) => {
         if (s.id !== action.siteId) return s;
