@@ -8,7 +8,6 @@
     "async": "^1.4.2",
     "autoprefixer": "^6.1.2",
     "aws-sdk": "^2.1.36",
-    "babel": "^5.8.23",
     "bcryptjs": "^2.1.0",
     "browserify": "^10.2.4",
     "cfenv": "^1.0.0",
