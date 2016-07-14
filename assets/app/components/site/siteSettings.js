@@ -114,7 +114,8 @@ class SiteSettings extends React.Component {
               <textarea
                 name="config"
                 className="form-control"
-                value={state.config} />
+                value={state.config}
+                onChange={this.onChange} />
             </div>
             <div className="usa-alert usa-alert-info">
               <div className="usa-alert-body">
