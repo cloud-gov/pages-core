@@ -75,7 +75,7 @@
     "watch:client:sass": "node-sass -w -r assets/styles/*.scss -o assets/styles",
     "watch:client:autoprefix": "npm run sass && postcss --use autoprefixer -r -w assets/styles/styles.css assets/styles/styles.css",
     "watch:client:js": "watchify assets/app/main.js -o assets/js/bundle.js -t [ babelify --presets [ es2015 react ] ]",
-    "test": "npm run build && npm run test:server && npm run test:client && npm run test:integration",
+    "test": "npm run build && npm run test:server && npm run test:client",
     "test:server": "NODE_ENV=test mocha --timeout 60000 test/api/bootstrap.test.js test/api/unit/**/*.test.js",
     "test:integration": "NODE_ENV=test mocha test/integration/bootstrap.test.js \"test/integration/**/*.test.js\"",
     "test:selenium:install": "node_modules/selenium-standalone/bin/selenium-standalone install",
