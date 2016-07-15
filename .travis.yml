@@ -33,7 +33,6 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
-  sauce_connect: true
 deploy:
   provider: script
   script: scripts/deploy-travis.sh
