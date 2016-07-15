@@ -3,8 +3,8 @@ import { Route, Link, IndexRedirect, IndexRoute, Redirect } from 'react-router';
 
 import App from './components/app';
 import Dashboard from './components/Dashboard/siteList';
-import SiteContainer from './components/SiteContainer';
-import SitePagesContainer from './components/site/pages/pagesContainer';
+import SiteContainer from './components/siteContainer';
+import SitePagesContainer from './components/site/Pages/pagesContainer';
 import SiteLogs from './components/site/siteLogs';
 import SiteMediaContainer from './components/site/siteMediaContainer';
 import SiteSettings from './components/site/siteSettings';
