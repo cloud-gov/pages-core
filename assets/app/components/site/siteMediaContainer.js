@@ -1,9 +1,7 @@
 
 import React from 'react';
-
 import siteActions from '../../actions/siteActions';
-
-import MediaThumbnail from '../MediaThumbnail';
+import MediaThumbnail from '../mediaThumbnail';
 
 class SiteMediaContainer extends React.Component {
   constructor(props) {
