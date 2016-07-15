@@ -23,7 +23,7 @@ module.exports.bootstrap = function(cb) {
   sails.services.passport.loadStrategies();
 
   // Use local tunnel for development
-  if (sails.config.environment === 'development') {
+  //if (sails.config.environment === 'development') {
   //   var localtunnel = require('localtunnel'), tunnel;
   //   tunnel = localtunnel(sails.config.port, function(err, tunnel) {
   //     if (err) console.error(new Error('Failed to start tunnel'));
@@ -34,6 +34,7 @@ module.exports.bootstrap = function(cb) {
   //   });
   // } else {
   //   cb();
+  //}
+
   cb();
-  }
 };
