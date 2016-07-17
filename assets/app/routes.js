@@ -5,6 +5,7 @@ import App from './components/app';
 import Dashboard from './components/Dashboard/siteList';
 import SiteContainer from './components/siteContainer';
 import SitePagesContainer from './components/site/Pages/pagesContainer';
+import SiteEditorContainer from './components/site/editor/editorContainer';
 import SiteLogs from './components/site/siteLogs';
 import SiteMediaContainer from './components/site/siteMediaContainer';
 import SiteSettings from './components/site/siteSettings';
@@ -24,7 +25,7 @@ export default (
         <Route path="settings" component={SiteSettings}/>
         <Route path="media" component={SiteMediaContainer}/>
         <Route path="logs" component={SiteLogs}/>
-        <Route path="edit/:branch/:fileName" component={Stub}/>
+        <Route path="edit/:branch/:fileName" component={SiteEditorContainer}/>
       </Route>
       <Redirect from="*" to="/not-found"/>
     </Route>
