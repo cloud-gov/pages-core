@@ -11,6 +11,7 @@ class SiteSettings extends React.Component {
     const { site } = props;
 
     this.state = {
+      enableSave: false,
       config: site.config || '',
       defaultBranch: site.defaultBranch || '',
       domain: site.domain || '',
@@ -28,9 +29,11 @@ class SiteSettings extends React.Component {
 
   onChange(event) {
     const { name, value } = event.target;
-    const newState = {};
+    const newState = {
+      enableSave: true
+    };
 
-    newState[name] = value
+    newState[name] = value;
 
     this.setState(newState);
   }
@@ -38,6 +41,7 @@ class SiteSettings extends React.Component {
   onSubmit(event) {
     siteActions.updateSite(this.props.site, this.state);
     event.preventDefault();
+    this.setState({ enableSave: false })
   }
 
   onDelete(event) {
@@ -51,7 +55,7 @@ class SiteSettings extends React.Component {
   render() {
     const { state } = this;
     const { id, defaultBranch } = this.props.site;
-    const defaultBranchClass = defaultBranch ? 'active': ''
+    const defaultBranchClass = defaultBranch ? 'active': '';
 
     return (
       <form id="site-edit" onSubmit={this.onSubmit}>
@@ -136,6 +140,7 @@ class SiteSettings extends React.Component {
             <button
               type="submit"
               className="usa-button usa-button-primary"
+              disabled={ !this.state.enableSave }
               style={{display: 'inline'}}
             >
               Save
