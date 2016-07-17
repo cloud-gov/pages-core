@@ -1,71 +1,112 @@
 
 import React from 'react';
+import RadioInput from '../radioInput';
+import LinkButton from '../linkButton';
+import siteActions from '../../actions/siteActions';
 
 class SiteSettings extends React.Component {
   constructor(props) {
     super(props);
 
-    this.onChange = this._onChange.bind(this);
+    const { site } = props;
+
+    this.state = {
+      enableSave: false,
+      config: site.config || '',
+      defaultBranch: site.defaultBranch || '',
+      domain: site.domain || '',
+      publicPreview: site.publicPreview
+    };
+
+    this.onSubmit = this.onSubmit.bind(this);
+    this.onDelete = this.onDelete.bind(this);
+    this.onChange = this.onChange.bind(this);
   }
 
-  getSiteUrl(id) {
-    return `#/sites/${id}`;
+  getSiteUrl() {
+    return `/sites/${this.props.params.id}`;
   }
 
-  _onChange(e) {
-    let target = e.target;
-    let name = target.name;
-    let value = target.value;
-    this.setState({
-      name: value
-    });
+  onChange(event) {
+    const { name, value } = event.target;
+    const newState = {
+      enableSave: true
+    };
+
+    newState[name] = value;
+
+    this.setState(newState);
   }
 
-  onSubmit(e) {
-    console.log('e', e);
-    e.preventDefault();
-    console.log('state', this.state);
+  onSubmit(event) {
+    siteActions.updateSite(this.props.site, this.state);
+    event.preventDefault();
+    this.setState({ enableSave: false })
+  }
+
+  onDelete(event) {
+    if (confirm('Are you sure you want to delete this site?')) {
+      siteActions.deleteSite(this.props.params.id);
+    }
+
+    event.preventDefault();
   }
 
   render() {
-    let site = this.props.site;
-    let defaultBranchClass = (site.defaultBranch) ? 'active': ''
+    const { state } = this;
+    const { id, defaultBranch } = this.props.site;
+    const defaultBranchClass = defaultBranch ? 'active': '';
 
     return (
-    <div>
-      <form id="site-edit">
+      <form id="site-edit" onSubmit={this.onSubmit}>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
             <label for="defaultBranch" className={ defaultBranchClass }>
               Default branch</label>
-            <input name="defaultBranch" className="form-control" onChange={ this.onChange } type="text"
-              value={ site.defaultBranch } />
+            <input
+              name="defaultBranch"
+              className="form-control"
+              onChange={ this.onChange }
+              type="text"
+              value={ state.defaultBranch } />
           </div>
         </div>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
             <label>Draft previews</label>
-            <div className="radio">
-              <input type="radio" name="publicPreview" id="public" value="true" />
-              <label for="public">Allow anyone to see previews of draft sites</label>
-            </div>
-            <div className="radio">
-              <input type="radio" name="publicPreview" id="private" value="" />
-              <label for="private">Only users with Federalist accounts can see previews</label>
-            </div>
+            <RadioInput
+              name="publicPreview"
+              id="public"
+              value={true}
+              checked={state.publicPreview}
+              handleChange={this.onChange}
+              labelText="Allow anyone to see previews of draft sites" />
+            <RadioInput
+              name="publicPreview"
+              id="public"
+              value={false}
+              checked={!state.publicPreview}
+              handleChange={this.onChange}
+              labelText="Only users with Federalist accounts can see previews" />
           </div>
         </div>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
             <div className="form-group">
               <label className="active" for="domain">Custom domain</label>
-              <input name="domain" className="form-control" type="text" placeholder="https://example.com" value={ site.domain } />
+              <input
+                name="domain"
+                className="form-control"
+                type="text"
+                placeholder="https://example.com"
+                value={ state.domain }
+                onChange={this.onChange} />
             </div>
             <div className="usa-alert usa-alert-info">
               <div className="usa-alert-body">
                 <h3 className="usa-alert-heading">Custom Domain</h3>
                 <p className="usa-alert-text">Use a custom domain by setting an <code>ALIAS</code> record with your DNS provider that points this origin:</p>
-                <input readonly type="text" value="" />
+                <input readOnly type="text" value="" />
               </div>
             </div>
           </div>
@@ -74,35 +115,50 @@ class SiteSettings extends React.Component {
           <div className="usa-width-one-whole">
             <div className="form-group">
                <label for="config" className="">Custom configuration</label>
-              <textarea name="config" className="form-control">
-                { site.config }
-              </textarea>
+              <textarea
+                name="config"
+                className="form-control"
+                value={state.config}
+                onChange={this.onChange} />
             </div>
             <div className="usa-alert usa-alert-info">
               <div className="usa-alert-body">
                 <h3 className="usa-alert-heading">Configuration</h3>
-                <p className="usa-alert-text">Add additional configuration in yaml to be added to your <code>_config.yml</code> file when we render your site.</p>
+                <p className="usa-alert-text">
+                  Add additional configuration in yaml to be added to your <code>_config.yml</code> file when we render your site.
+                </p>
               </div>
             </div>
           </div>
         </div>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
-            <a href={ this.getSiteUrl(site.id) } className="usa-button usa-button-gray" role="button">Cancel</a>
-            <a className="usa-button usa-button-primary" onClick={ this.onSubmit } role="submit">
+            <LinkButton
+              href={this.getSiteUrl()}
+              className="usa-button-gray"
+              text="Cancel" />
+            <button
+              type="submit"
+              className="usa-button usa-button-primary"
+              disabled={ !this.state.enableSave }
+              style={{display: 'inline'}}
+            >
               Save
-            </a>
+            </button>
+          </div>
+        </div>
+        <div className="usa-grid">
+          <div className="usa-alert usa-alert-error" role="alert">
+            Delete this site from Federalist?
+            <button
+              className="usa-button usa-button-secondary"
+              alt="delete the site { site.repository }"
+              onClick={this.onDelete}
+            >Delete</button>
           </div>
         </div>
       </form>
-      <div className="usa-grid">
-        <div className="usa-alert usa-alert-error" role="alert">
-          Delete this site from Federalist?
-          <a href="#" className="usa-button usa-button-secondary" data-action="delete-site" alt="delete the site { site.repository }">Delete</a>
-        </div>
-      </div>
-    </div>
-    )
+    );
   }
 }
 

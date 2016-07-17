@@ -14,7 +14,8 @@ export const errorActionTypes = keymirror({
 
 export const navigationTypes = keymirror({
   // Action when route has changed
-  ROUTE_CHANGED: null
+  ROUTE_CHANGED: null,
+  UPDATE_ROUTER: null
 });
 
 export const routeTypes = keymirror({
@@ -43,6 +44,7 @@ export const siteActionTypes = keymirror({
   SITE_ADD: null,
   // Action after a site has successfully been added
   SITE_ADDED: null,
+  SITE_UPDATED: null,
   // Action for after a site has been deleted
   SITE_DELETED: null,
   // Config files retrieved from github

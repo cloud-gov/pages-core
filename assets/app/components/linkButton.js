@@ -8,13 +8,13 @@ const propTypes = {
   href: React.PropTypes.string
 }
 
-const LinkButton = ({ className, children, href, alt, target }) =>
+const LinkButton = ({ className, children, text, href, alt, target }) =>
   <Link role="button"
     to={href}
     className={`usa-button ${className}`}
     alt={alt}
     target={target}
-  >{children}</Link>;
+  >{text || children}</Link>;
 
 LinkButton.propTypes = propTypes;
 

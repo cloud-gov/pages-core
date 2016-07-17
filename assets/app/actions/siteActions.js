@@ -1,6 +1,6 @@
 import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
-import { siteActionTypes } from '../constants';
+import { siteActionTypes, navigationTypes } from '../constants';
 import store from '../store';
 import { httpError } from './errorActions';
 
@@ -23,14 +23,28 @@ export default {
     });
   },
 
-  deleteSite(siteId) {
-    federalist.deleteSite(siteId);
+  updateSite(site, data) {
+    federalist.updateSite(site, data).then((site) => {
+      store.dispatch({
+        type: siteActionTypes.SITE_UPDATED,
+        siteId: site.id,
+        site
+      })
+    });
   },
 
-  deletedSite(siteId) {
-    store.dispatch({
-      type: siteActionTypes.SITE_DELETED,
-      siteId
+  deleteSite(siteId) {
+    federalist.deleteSite(siteId).then((site) => {
+      store.dispatch({
+        type: siteActionTypes.SITE_DELETED,
+        siteId
+      });
+
+      store.dispatch({
+        type: navigationTypes.UPDATE_ROUTER,
+        method: 'push',
+        arguments: [`/sites/${siteId}`]
+      });
     });
   },
 

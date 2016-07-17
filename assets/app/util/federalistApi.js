@@ -39,7 +39,16 @@ export default {
     // TODO: Send post request
   },
 
+  updateSite(site, data) {
+    return this.fetch(`site/${site.id}`, {
+      method: 'PUT',
+      data: data
+    });
+  },
+
   deleteSite(siteId) {
-    // TODO: Send delete request
+    return this.fetch(`site/${siteId}`, {
+      method: 'DELETE'
+    });
   }
 }
