@@ -11,14 +11,16 @@ const menu = buildMenuItems(schema);
 class Prosemirror extends React.Component {
   constructor(props) {
     super(props);
-
+    this.state = {
+      doc: null
+    };
     this.toMarkdown = this.toMarkdown.bind(this);
   }
 
   componentDidMount() {
     this.editor = new prosemirror.ProseMirror({
       doc: defaultMarkdownParser.parse(this.props.initialMarkdownContent),
-      place: document.querySelector('#js-prosemirror-target'),
+      place: document.getElementById('js-prosemirror-target'),
       schema: schema,
       plugins: [
         menuBar.config({ content: menu.fullMenu })
@@ -28,6 +30,13 @@ class Prosemirror extends React.Component {
     this.editor.on.change.add(() => {
       const doc = this.editor.doc.toJSON();
       this.setState({ doc });
+    });
+  }
+
+  componentWillUnmount() {
+    const changeHandlers = this.editor.on.change.handlers;
+    changeHandlers.forEach((handler) => {
+      this.editor.on.change.remove(handler.fn);
     });
   }
 
