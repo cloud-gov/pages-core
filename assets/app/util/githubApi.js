@@ -95,7 +95,8 @@ const github = {
 
     return Promise.all(configFetches).then((configs) => {
       return configs.map((config) => {
-        return Object.assign({}, config, { content: decodeB64(config.content)});
+        const content = (config) ? decodeB64(config.content) : false
+        return Object.assign({}, config, { content });
       });
     }).then((configs) => {
       return configFiles.reduce((result, configFile, index) => {
