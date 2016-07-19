@@ -9,6 +9,7 @@ import SiteEditorContainer from './components/site/editor/editorContainer';
 import SiteLogs from './components/site/siteLogs';
 import SiteMediaContainer from './components/site/siteMediaContainer';
 import SiteSettings from './components/site/siteSettings';
+import NewSite from './components/AddSite';
 import NotFound from './components/NotFound';
 
 const Stub = () =>
@@ -19,11 +20,12 @@ export default (
     <IndexRedirect to="sites"/>
     <Route path="sites">
       <IndexRoute component={Dashboard}/>
+      <Route path="new" component={NewSite} />
       <Route path=":id" component={SiteContainer}>
         <IndexRoute component={SitePagesContainer}/>
         <Route path="tree/:fileName" component={SitePagesContainer}/>
-        <Route path="settings" component={SiteSettings}/>
         <Route path="media" component={SiteMediaContainer}/>
+        <Route path="settings" component={SiteSettings}/>
         <Route path="logs" component={SiteLogs}/>
         <Route path="edit/:branch/:fileName" component={SiteEditorContainer}/>
       </Route>

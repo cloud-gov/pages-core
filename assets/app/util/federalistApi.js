@@ -9,8 +9,8 @@ export default {
 
     return fetch(url, params).then((data) => {
       return data;
-    }).catch((err) => {
-      errorActions.httpError(err.response.statusText);
+    }).catch((error) => {
+      errorActions.httpError(error.message);
     });
   },
 
@@ -36,7 +36,24 @@ export default {
   },
 
   addSite(site) {
-    // TODO: Send post request
+    return this.fetch(`user/add-site`, {
+      method: 'POST',
+      data: site
+    });
+  },
+
+  cloneRepo(destination, source) {
+    return this.fetch('site/clone', {
+      method: 'POST',
+      data: {
+        sourceOwner: source.owner,
+        sourceRepo: source.repo,
+        destinationOrg: destination.organization,
+        destinationRepo: destination.repo,
+        destinationBranch: destination.branch || 'master',
+        engine: destination.engine || 'jekyll'
+      }
+    });
   },
 
   updateSite(site, data) {

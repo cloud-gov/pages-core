@@ -5,6 +5,7 @@ import siteActions from '../actions/siteActions';
 
 import SideNav from './site/SideNav/sideNav';
 import PagesHeader from './site/pagesHeader';
+import AlertBanner from './alertBanner';
 
 const propTypes = {
   storeState: React.PropTypes.object
@@ -77,6 +78,7 @@ class SiteContainer extends React.Component {
       <div className="usa-grid site">
         <SideNav siteId={site.id} />
         <div className="usa-width-five-sixths site-main" id="pages-container">
+          <AlertBanner message={storeState.error} />
           <PagesHeader
             repository={site.repository}
             title={pageTitle}

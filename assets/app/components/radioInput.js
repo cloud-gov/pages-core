@@ -53,19 +53,4 @@ class RadioInput extends React.Component {
 
 RadioInput.propTypes = propTypes;
 
-
-class RadioGroup extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      checked: ''
-    }
-  }
-
-  render() {
-
-  }
-}
-
 export default RadioInput;

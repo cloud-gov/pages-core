@@ -31,7 +31,7 @@ class SiteListItem extends React.Component {
 
     let lastPublished = <p>This site has not been published yet. Please wait while the site is built.</p>;
 
-    if (site.builds.length) {
+    if (site.builds && site.builds.length) {
       lastPublished = <p>This site was last published at { this.getLastBuildTime(site.builds) }</p>
       viewLink = <a className="icon icon-view" href={ this.getViewLink(site) } alt="View the { site.repository } site" target="_blank">Visit Site</a>;
     }

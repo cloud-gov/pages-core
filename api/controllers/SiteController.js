@@ -34,7 +34,7 @@ module.exports = {
 
         // Delete the build that runs automatically when the site is created
         Build.destroy({ id: site.builds[0].id }).exec(function(err) {
-          console.log('build destroyed');
+          sails.log.info('build destroyed');
           if (err) return res.serverError(err);
         });
 
