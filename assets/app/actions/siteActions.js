@@ -20,6 +20,12 @@ export default {
         type: siteActionTypes.SITE_ADDED,
         site
       });
+
+      store.dispatch({
+        type: navigationTypes.UPDATE_ROUTER,
+        method: 'push',
+        arguments: [`/sites`]
+      });
     });
   },
 
