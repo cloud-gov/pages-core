@@ -83,7 +83,7 @@ class AddSite extends React.Component {
                   id="owner"
                   className="form-control"
                   name="owner"
-                  value={ this.props.githubUsername }
+                  value={this.state.owner}
                   onChange={this.onChange} />
               </div>
               <div className="form-group">
