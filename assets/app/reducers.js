@@ -20,7 +20,7 @@ export function assets(state = [], action) {
         let url = asset.url;
         let hasNewUrl = (oldAssetUrls.indexOf(url) < 0) ? true : false;
         return hasNewUrl;
-      })
+      });
       return [ ...state, ...newAssets ];
     default:
       return state;
@@ -39,36 +39,21 @@ export function builds(state = [], action) {
 export function sites(state = [], action) {
   switch (action.type) {
     case siteActionTypes.SITES_RECEIVED:
-      return action.sites || []
+      return action.sites || [];
     case siteActionTypes.SITE_ADDED:
       // if a site hasn't been properly added, return the existing state
       // TODO: why is this getting called if there is an error
       return action.site ? [...state, action.site] : state;
     case siteActionTypes.SITE_UPDATED:
-      return state.map((site) => {
-        if (site.id !== action.siteId) return site;
-
-        return Object.assign({}, site, action.site);
-      });
+      return mapPropertyToMatchingSite(state, action.siteId, action.site);
+    case siteActionTypes.SITE_CONFIGS_RECEIVED:
+      return mapPropertyToMatchingSite(state, action.siteId, action.configs);
+    case siteActionTypes.SITE_ASSETS_RECEIVED:
+      return mapPropertyToMatchingSite(state, action.siteId, { assets: action.assets });
+    case siteActionTypes.SITE_CONTENTS_RECEIVED:
+      return mapPropertyToMatchingSite(state, action.siteId, { files: action.files });
     case siteActionTypes.SITE_DELETED:
       return state.filter((site) => site.id != action.siteId);
-    case siteActionTypes.SITE_CONFIGS_RECEIVED:
-      return state.map((s) => {
-        if (s.id !== action.siteId) return s;
-        return Object.assign({}, s, action.configs);
-      });
-    case siteActionTypes.SITE_ASSETS_RECEIVED:
-      return state.map((s) => {
-        if (s.id !== action.siteId) return s;
-        return Object.assign({}, s, { assets: action.assets });
-      });
-    case siteActionTypes.SITE_CONTENTS_RECEIVED:
-      return state.map((s) => {
-        if (s.id !== action.siteId) return s;
-        return Object.assign({}, s, {
-          files: action.files
-        });
-      });
     case siteActionTypes.SITE_CHILD_CONTENT_RECEIVED:
       const currentMap = state.childDirectoriesMap || {};
       const nextMap = {};
@@ -82,9 +67,16 @@ export function sites(state = [], action) {
         });
       });
     default:
-      return state
+      return state;
   }
 }
+
+const mapPropertyToMatchingSite = (state, siteId, properties) => {
+  return state.map((site) => {
+    if (site.id !== siteId) return site;
+    return Object.assign({}, site, properties);
+  });
+};
 
 export function error(state = '', action) {
   switch (action.type) {
@@ -94,7 +86,7 @@ export function error(state = '', action) {
     default:
       return state;
   }
-};
+}
 
 export function user(state = false, action) {
   switch (action.type) {
@@ -108,6 +100,6 @@ export function user(state = false, action) {
         updatedAt: action.user.updatedAt
       };
     default:
-      return state
+      return state;
   }
 }
