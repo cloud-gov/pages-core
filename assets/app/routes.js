@@ -23,6 +23,7 @@ export default (
       <Route path="new" component={NewSite} />
       <Route path=":id" component={SiteContainer}>
         <IndexRoute component={SitePagesContainer}/>
+        <Route path="new" component={SiteEditorContainer} isNewPage={true} />
         <Route path="tree/:fileName" component={SitePagesContainer}/>
         <Route path="media" component={SiteMediaContainer}/>
         <Route path="settings" component={SiteSettings}/>

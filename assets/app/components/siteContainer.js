@@ -82,7 +82,7 @@ class SiteContainer extends React.Component {
           <PagesHeader
             repository={site.repository}
             title={pageTitle}
-            isPages={pageTitle === 'Pages'}
+            isPages={/pages/i.test(pageTitle)}
           />
           <div className="usa-grid">
             {children &&
