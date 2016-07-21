@@ -12,8 +12,6 @@ import SiteSettings from './components/site/siteSettings';
 import NewSite from './components/AddSite';
 import NotFound from './components/NotFound';
 
-const Stub = () =>
-  <div>hi</div>;
 
 export default (
   <Route path="/" component={App}>
@@ -22,13 +20,15 @@ export default (
       <IndexRoute component={Dashboard}/>
       <Route path="new" component={NewSite} />
       <Route path=":id" component={SiteContainer}>
-        <IndexRoute component={SitePagesContainer}/>
-        <Route path="new" component={SiteEditorContainer} isNewPage={true} />
-        <Route path="tree/:fileName" component={SitePagesContainer}/>
+        <IndexRedirect to="tree" />
+        <Route path="tree" component={SitePagesContainer}>
+          <Route path=":fileName" component={SitePagesContainer} />
+        </Route>
+        <Route path="new/:branch(/:fileName)" component={SiteEditorContainer} isNewPage={true} />
+        <Route path="edit/:branch/:fileName" component={SiteEditorContainer}/>
         <Route path="media" component={SiteMediaContainer}/>
         <Route path="settings" component={SiteSettings}/>
         <Route path="logs" component={SiteLogs}/>
-        <Route path="edit/:branch/:fileName" component={SiteEditorContainer}/>
       </Route>
       <Redirect from="*" to="/not-found"/>
     </Route>

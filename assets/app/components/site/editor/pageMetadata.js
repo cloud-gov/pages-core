@@ -1,26 +1,21 @@
 import React from 'react';
 
 const propTypes = {
-  isNew: React.PropTypes.bool,
-  fileName: React.PropTypes.string
+  fileName: React.PropTypes.string.isRequired,
+  handleChange: React.PropTypes.func.isRequired
 };
 
 class PageMetadata extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      fileName: props.fileName || ''
-    };
-
-    this.handleChange = this.handleCHange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
   handleChange(event) {
     const { name, value } = event.target;
-    this.setState({
-      name: value
-    });
+
+    this.props.handleChange(name, value);
   }
 
   render() {

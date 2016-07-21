@@ -13,6 +13,16 @@ const propTypes = {
 class Editor extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      content: '',
+      pageSettings: '',
+      pageTitle: '',
+      fileName: ''
+    }
+
+    this.submitFile = this.submitFile.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
   getNewPage() {
@@ -20,7 +30,32 @@ class Editor extends React.Component {
     // to the react-router route property
     const newPage = this.props.isNewPage || this.props.route.isNewPage;
 
-    return newPage ? <PageMetadata isNew={newPage} /> : null;
+    if (newPage) {
+      return (
+        <PageMetadata
+          fileName={this.state.fileName}
+          handleChange={this.handleChange}/>
+      );
+    }
+
+    return null;
+  }
+
+  submitFile() {
+    const { site } = this.props;
+    const { fileName, content, pageSettings, pageTitle } = this.state;
+    //some magic function to mash all these ^^^ together?
+    const fileContents = '---\ntitle: hello\n---';
+    const normalizedFilename = fileName + '.md';
+
+    siteActions.createCommit(site, normalizedFilename, fileContents);
+  }
+
+  handleChange(name, value) {
+    const nextState = {};
+    nextState[name] = value;
+
+    this.setState(nextState);
   }
 
   render() {
@@ -29,6 +64,7 @@ class Editor extends React.Component {
         {this.getNewPage()}
         <Codemirror />
         <Prosemirror />
+        <button onClick={this.submitFile}>Submit</button>
       </div>
     );
   }

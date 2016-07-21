@@ -64,7 +64,7 @@ const github = {
       headers: {
         'Authorization': `token ${getToken()}`
       },
-      data,
+      data
     });
   },
 

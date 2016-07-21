@@ -1,6 +1,7 @@
 import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
 import { siteActionTypes, navigationTypes } from '../constants';
+import { encodeB64 } from '../util/encoding';
 import store from '../store';
 import errorActions from './errorActions';
 
@@ -51,6 +52,18 @@ export default {
         method: 'push',
         arguments: [`/sites`]
       });
+    });
+  },
+
+  createCommit(site, path, fileData) {
+    const b64EncodedFileContents = encodeB64(fileData);
+    const commit = {
+      message: `Adds ${path} to project`,
+      content: b64EncodedFileContents
+    };
+
+    github.createCommit(site, path, commit).then((commitObj) => {
+      console.log(commitObj);
     });
   },
 
