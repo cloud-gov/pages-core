@@ -576,7 +576,7 @@ describe("sitesReducer", () => {
     expect(actual).to.deep.equal(existingSites);    
   });
 
-  it("sets a site's 'childDirectoriesMap' property to map the action's path to the action's files when given a child content received action and the new site's id is found and the state doesn't have a root childDirectoriesMap (however that's assigned because it looks like that never happens)", () => {
+  it("sets a site's 'childDirectoriesMap' property to map the action's path to the action's files when given a child content received action and the new site's id is found, without an existing childDirectoriesMap", () => {
     const siteOne = {
       id: "siteToKeep",
       oldData: true
@@ -614,7 +614,87 @@ describe("sitesReducer", () => {
     expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);    
   });
 
-  it("sets a site's 'childDirectoriesMap' property to map the action's path to an empty array when given a child content received action and the new site's id is found and the state doesn't have a root childDirectoriesMap (however that's assigned because it looks like that never happens)... and the action doesn't have a files attribute", () => {
+  it("sets a site's 'childDirectoriesMap' property to map the action's path to the action's files when given a child content received action and the new site's id is found, with an existing childDirectoriesMap", () => {
+    const path = "/go/here/or/not";
+    const existingPath = "/already/home";
+    const existingFiles = [ "previously on something something", "format TBD" ];
+    const existingChildDirectoriesMap = { };
+    existingChildDirectoriesMap[existingPath] = existingFiles;
+      
+    const siteOne = {
+      id: "siteToKeep",
+      oldData: true,
+      childDirectoriesMap: existingChildDirectoriesMap
+    };
+
+    const siteTwo = {
+      id: "anotherSiteToKeep",
+      oldData: true
+    };
+
+    const existingSites = [ siteOne, siteTwo ];
+
+    const files = [ "whatever", "punk",  "huh?" ];
+
+    const actual = fixture(existingSites, {
+      type: SITE_CHILD_CONTENT_RECEIVED,
+      siteId: "siteToKeep",
+      files: files,
+      path: path
+    });
+
+    const updatedSiteOne = {
+      id: "siteToKeep",
+      oldData: true,
+      childDirectoriesMap: {
+        "/already/home": existingFiles,
+        "/go/here/or/not": files
+      }
+    };
+    
+    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);    
+  });
+
+  it("updates a site's 'childDirectoriesMap' property to map the action's path to the action's files when given a child content received action and the new site's id is found, with an existing childDirectoriesMap containing the path", () => {
+    const path = "/go/here/or/not";
+    const existingFiles = [ "previously on something something", "format TBD" ];
+    const existingChildDirectoriesMap = { };
+    existingChildDirectoriesMap[path] = existingFiles;
+      
+    const siteOne = {
+      id: "siteToKeep",
+      oldData: true,
+      childDirectoriesMap: existingChildDirectoriesMap
+    };
+
+    const siteTwo = {
+      id: "anotherSiteToKeep",
+      oldData: true
+    };
+
+    const existingSites = [ siteOne, siteTwo ];
+
+    const files = [ "whatever", "punk",  "huh?" ];
+
+    const actual = fixture(existingSites, {
+      type: SITE_CHILD_CONTENT_RECEIVED,
+      siteId: "siteToKeep",
+      files: files,
+      path: path
+    });
+
+    const updatedSiteOne = {
+      id: "siteToKeep",
+      oldData: true,
+      childDirectoriesMap: {
+        "/go/here/or/not": files
+      }
+    };
+    
+    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);    
+  });
+
+  it("sets a site's 'childDirectoriesMap' property to map the action's path to an empty array when given a child content received action and the new site's id is found... and the action doesn't have a files attribute", () => {
     const siteOne = {
       id: "siteToKeep",
       oldData: true

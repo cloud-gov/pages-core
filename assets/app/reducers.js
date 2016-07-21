@@ -55,12 +55,13 @@ export function sites(state = [], action) {
     case siteActionTypes.SITE_DELETED:
       return state.filter((site) => site.id != action.siteId);
     case siteActionTypes.SITE_CHILD_CONTENT_RECEIVED:
-      const currentMap = state.childDirectoriesMap || {};
       const nextMap = {};
       nextMap[action.path] = action.files || [];
 
       return state.map((site) => {
         if (site.id !== action.siteId) return site;
+
+        const currentMap = site.childDirectoriesMap || {};
 
         return Object.assign({}, site, {
           childDirectoriesMap: Object.assign({}, currentMap, nextMap)
