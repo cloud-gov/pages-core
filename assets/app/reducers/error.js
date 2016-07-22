@@ -1,6 +1,8 @@
 import { errorActionTypes } from '../constants';
 
-export function error(state = '', action) {
+const initialState = '';
+
+export function error(state = initialState, action) {
   switch (action.type) {
   case errorActionTypes.HTTP_ERROR:
     state = action.error;

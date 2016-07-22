@@ -9,6 +9,10 @@ const propTypes = {
 };
 
 class Pages extends React.Component {
+  componentDidMount() {
+    const currentDirectory = this.props.params.fileName;
+    siteActions.fetchContent(this.props.site, currentDirectory);
+  }
 
   getClasses() {
     return 'usa-button-outline file-list-item-button';
@@ -37,7 +41,7 @@ class Pages extends React.Component {
 
     // User is on the pages index, return all files at the top level
     if (!currentDirectory) {
-      return files;
+      return childDirectoriesMap['/'] || files;
     }
 
     directoryContents = childDirectoriesMap[currentDirectory];

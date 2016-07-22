@@ -61,9 +61,20 @@ export default {
       message: `Adds ${path} to project`,
       content: b64EncodedFileContents
     };
+    const siteId = site.id;
 
     github.createCommit(site, path, commit).then((commitObj) => {
-      console.log(commitObj);
+      store.dispatch({
+        type: siteActionTypes.SITE_FILE_ADDED,
+        siteId,
+        file: commitObj.content
+      });
+
+      store.dispatch({
+        type: navigationTypes.UPDATE_ROUTER,
+        method: 'push',
+        arguments: [`/sites/${siteId}`]
+      });
     });
   },
 
