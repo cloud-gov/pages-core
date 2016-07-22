@@ -1,40 +1,44 @@
 import { expect } from "chai";
 import proxyquire from "proxyquire";
+
 proxyquire.noCallThru();
 
-describe("buildsReducer", () => {
+describe("maps reducers", () => {
   let fixture;
-  const BUILDS_RECEIVED = "builds received!";
+  const ASSETS = "assets are here";
+  const BUILDS = "builds are here";
+  const ERROR = "error is here";
+  const SITES = "sites are here";
+  const USER = "user is here";
   
   beforeEach(() => {
     fixture = proxyquire("../../../assets/app/reducers.js", {
-      "./constants": {
-        buildActionTypes: {
-          BUILDS_RECEIVED: BUILDS_RECEIVED
-        }
-      }
-    }).builds;
+      "./reducers/assets": ASSETS,
+      "./reducers/builds": BUILDS,
+      "./reducers/error": ERROR,
+      "./reducers/sites": SITES,
+      "./reducers/user": USER
+    }).default;
+  });
+  
+  it("maps assets reducer", () => {
+    expect(fixture.assets).to.equal(ASSETS);
+  });
+  
+  it("maps builds reducer", () => {
+    expect(fixture.builds).to.equal(BUILDS);
+  });
+  
+  it("maps error reducer", () => {
+    expect(fixture.error).to.equal(ERROR);
+  });
+  
+  it("maps sites reducer", () => {
+    expect(fixture.sites).to.equal(SITES);
+  });
+  
+  it("maps user reducer", () => {
+    expect(fixture.user).to.equal(USER);
   });
 
-  it("records the builds received in the action", () => {
-    const BUILDS = [ "build a", "build b" ];
-    
-    const actual = fixture([], {
-      type: BUILDS_RECEIVED,
-      builds: BUILDS
-    });
-
-    expect(actual).to.deep.equal(BUILDS);
-  });
-
-  it("ignores other action types", () => {
-    const BUILDS = [ "build a", "build b" ];
-    
-    const actual = fixture([], {
-      type: "Ignore me because I am not the one",
-      builds: BUILDS
-    });
-
-    expect(actual).to.deep.equal([]);
-  });
 });

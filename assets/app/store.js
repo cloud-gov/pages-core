@@ -1,9 +1,9 @@
 import { combineReducers, createStore, applyMiddleware } from 'redux';
 import { browserHistory } from 'react-router';
 import { navigationTypes } from './constants';
-import * as reducers from './reducers'
+import reducers from './reducers';
 
-const app = combineReducers(reducers)
+const app = combineReducers(reducers);
 
 const logger = store => next => action => {
   console.log('::dispatching::', action);
