@@ -79,7 +79,9 @@ class SiteContainer extends React.Component {
       <div className="usa-grid site">
         <SideNav siteId={site.id} />
         <div className="usa-width-five-sixths site-main" id="pages-container">
-          <AlertBanner message={storeState.error} />
+          <AlertBanner
+            message={storeState.alert.message}
+            status={storeState.alert.status}/>
           <PagesHeader
             repository={site.repository}
             title={pageTitle}

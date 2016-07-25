@@ -3,7 +3,7 @@ import fetch from './fetch';
 
 import store from '../store';
 import { encodeB64, decodeB64 } from './encoding';
-import errorActions from '../actions/errorActions';
+import alertActions from '../actions/alertActions';
 
 const API = 'https://api.github.com';
 
@@ -36,7 +36,7 @@ const github = {
         formatterError = err.message;
       }
 
-      errorActions.httpError(formattedError);
+      alertActions.httpError(formattedError);
     });
   },
 

@@ -3,7 +3,7 @@ import github from '../util/githubApi';
 import { siteActionTypes, navigationTypes } from '../constants';
 import { encodeB64 } from '../util/encoding';
 import store from '../store';
-import errorActions from './errorActions';
+import alertActions from './alertActions';
 
 export default {
   fetchSites() {
@@ -64,6 +64,8 @@ export default {
     const siteId = site.id;
 
     github.createCommit(site, path, commit).then((commitObj) => {
+      alertActions.alertSuccess('File added successfully');
+
       store.dispatch({
         type: siteActionTypes.SITE_FILE_ADDED,
         siteId,
@@ -136,7 +138,7 @@ export default {
     return github.fetchRepositoryContent(site, path)
       .then(
         dispatchChildContent.bind(null, site, path)
-      ).catch(err => errorActions.httpError(err));
+      ).catch(err => alertActions.httpError(err));
   },
 
   cloneRepo(destination, source) {
@@ -154,7 +156,7 @@ export default {
         });
       });
     }).catch((err) => {
-      errorActions.httpError(err);
+      alertActions.httpError(err);
     });
   }
 }

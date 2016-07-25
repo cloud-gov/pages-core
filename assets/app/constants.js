@@ -5,11 +5,12 @@ export const buildActionTypes = keymirror({
   BUILDS_RECEIVED: null,
 });
 
-export const errorActionTypes = keymirror({
+export const alertActionTypes = keymirror({
   // Action for failed auth attempts
   AUTH_ERROR: null,
   // Action for failed http requests
-  HTTP_ERROR: null
+  HTTP_ERROR: null,
+  HTTP_SUCCESS: null
 });
 
 export const navigationTypes = keymirror({

@@ -10,7 +10,7 @@ describe("errorReducer", () => {
   beforeEach(() => {
     fixture = proxyquire("../../../../assets/app/reducers/error", {
       "../constants": {
-        errorActionTypes: {
+        alertActionTypes: {
           HTTP_ERROR: HTTP_ERROR
         }
       }
