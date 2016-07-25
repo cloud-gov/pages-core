@@ -2,7 +2,7 @@ import { siteActionTypes } from '../constants';
 
 const initialState = [];
 
-export function sites(state = initialState, action) {
+export default function sites(state = initialState, action) {
   switch (action.type) {
   case siteActionTypes.SITES_RECEIVED:
     return action.sites || initialState;

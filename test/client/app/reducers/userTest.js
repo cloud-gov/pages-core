@@ -6,7 +6,7 @@ proxyquire.noCallThru();
 describe("userReducer", () => {
   let fixture;
   const USER_RECEIVED = "hi, user!";
-  
+
   beforeEach(() => {
     fixture = proxyquire("../../../../assets/app/reducers/user", {
       "../constants": {
@@ -14,7 +14,7 @@ describe("userReducer", () => {
           USER_RECEIVED: USER_RECEIVED
         }
       }
-    }).user;
+    }).default;
   });
 
   it("defaults to false and ignores other actions", () => {
@@ -35,7 +35,7 @@ describe("userReducer", () => {
       createdAt: "Monday morning.",
       updatedAt: "Thursday, late in the afternoon."
     };
-    
+
     const actual = fixture({ anything: "goes here" }, {
       type: USER_RECEIVED,
       user: user

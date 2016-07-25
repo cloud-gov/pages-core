@@ -5,7 +5,7 @@ const initialState = {
   status: ''
 };
 
-export function alert(state = initialState, action) {
+export default function alert(state = initialState, action) {
   switch (action.type) {
   case alertActionTypes.HTTP_ERROR:
     return Object.assign({}, state, {

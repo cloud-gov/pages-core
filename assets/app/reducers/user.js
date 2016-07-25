@@ -1,6 +1,6 @@
 import { userActionTypes } from '../constants';
 
-export function user(state = false, action) {
+export default function user(state = false, action) {
   switch (action.type) {
   case userActionTypes.USER_RECEIVED:
     return {

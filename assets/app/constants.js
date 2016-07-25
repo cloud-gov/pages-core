@@ -10,12 +10,14 @@ export const alertActionTypes = keymirror({
   AUTH_ERROR: null,
   // Action for failed http requests
   HTTP_ERROR: null,
+  // Action for successful HTTP requests
   HTTP_SUCCESS: null
 });
 
 export const navigationTypes = keymirror({
   // Action when route has changed
   ROUTE_CHANGED: null,
+  // Tell react-router to navigate to a new path programatically
   UPDATE_ROUTER: null
 });
 

@@ -1,6 +1,6 @@
 import { siteActionTypes } from "../constants";
 
-export function assets(state = [], action) {
+export default function assets(state = [], action) {
   switch (action.type) {
   case siteActionTypes.SITE_ASSETS_RECEIVED:
     let assets = action.assets.map((asset) => {
