@@ -12,6 +12,7 @@ import SiteSettings from './components/site/siteSettings';
 import NewSite from './components/AddSite';
 import NotFound from './components/NotFound';
 
+import alertActions from './actions/alertActions';
 
 export default (
   <Route path="/" component={App}>

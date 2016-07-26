@@ -3,6 +3,8 @@ import React from 'react';
 import { routeTypes } from '../constants';
 import store from '../store';
 
+import alertActions from '../actions/alertActions';
+
 import Header from './header';
 
 class App extends React.Component {
@@ -14,8 +16,28 @@ class App extends React.Component {
   getStateFromStore() {
     return this.context.state.get();
   }
-  componentWillReceiveProps() {
-    this.setState(this.getStateFromStore());
+
+  shouldClearAlert(alert) {
+    const { key: lastKey } = this.props.location;
+    const { key: nextKey } = nextProps.location;
+
+    // clear an existing alert message if stale, or flag it to be removed on
+    // the next route transition
+    if (lastKey !== nextKey) {
+      if (alert.message && alert.stale) {
+        alertActions.clear();
+      } else {
+        alertActions.setStale();
+      }
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const state = this.getStateFromStore();
+    const { alert } = state;
+
+    this.shouldClearAlert(alert);
+    this.setState(state);
   }
 
   render() {

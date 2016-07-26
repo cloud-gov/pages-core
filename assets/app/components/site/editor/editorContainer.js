@@ -4,6 +4,7 @@ import PageMetadata from './pageMetadata';
 import Codemirror from './codemirror';
 import Prosemirror from './prosemirror';
 
+import alertActions from '../../../actions/alertActions';
 import siteActions from '../../../actions/siteActions';
 
 const propTypes = {
@@ -48,7 +49,11 @@ class Editor extends React.Component {
     const fileContents = '---\ntitle: hello\n---';
     const normalizedFilename = fileName + '.md';
 
-    siteActions.createCommit(site, normalizedFilename, fileContents);
+    if (!fileName) {
+      alertActions.httpError('File must have a name');
+    } else {
+      siteActions.createCommit(site, normalizedFilename, fileContents);
+    }
   }
 
   handleChange(name, value) {

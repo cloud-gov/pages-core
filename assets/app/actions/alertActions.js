@@ -22,5 +22,17 @@ export default {
       status: 'info',
       message
     });
+  },
+
+  setStale() {
+    store.dispatch({
+      type: alertActionTypes.SET_STALE
+    });
+  },
+
+  clear() {
+    store.dispatch({
+      type: alertActionTypes.CLEAR
+    });
   }
-}
+};

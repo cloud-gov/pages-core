@@ -12,7 +12,7 @@ export default {
         type: siteActionTypes.SITES_RECEIVED,
         sites
       });
-    });
+    }).catch(err => alertActions.httpError(err));
   },
 
   addSite(siteToAdd) {
@@ -27,7 +27,7 @@ export default {
         method: 'push',
         arguments: [`/sites`]
       });
-    });
+    }).catch(err => alertActions.httpError(err));
   },
 
   updateSite(site, data) {
@@ -37,7 +37,7 @@ export default {
         siteId: site.id,
         site
       })
-    });
+    }).catch(err => alertActions.httpError(err));
   },
 
   deleteSite(siteId) {
@@ -52,7 +52,7 @@ export default {
         method: 'push',
         arguments: [`/sites`]
       });
-    });
+    }).catch(err => alertActions.httpError(err));
   },
 
   createCommit(site, path, fileData) {
@@ -77,7 +77,7 @@ export default {
         method: 'push',
         arguments: [`/sites/${siteId}`]
       });
-    });
+    }).catch(error => alertActions.httpError(error.message));
   },
 
   fetchSiteAssets(site) {
@@ -96,7 +96,7 @@ export default {
       });
 
       return Promise.resolve(site);
-    });
+    }).catch(err => alertActions.httpError(err));
   },
 
   fetchSiteConfigs(site) {
@@ -108,7 +108,7 @@ export default {
       });
 
       return Promise.resolve(site);
-    });
+    }).catch(err => alertActions.httpError(err));
   },
 
   fetchSiteConfigsAndAssets(site) {
@@ -122,7 +122,7 @@ export default {
           });
         });
       });
-    });
+    }).catch(err => alertActions.httpError(err));
   },
 
   fetchContent(site, path) {

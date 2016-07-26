@@ -2,7 +2,8 @@ import { alertActionTypes } from '../constants';
 
 const initialState = {
   message: '',
-  status: ''
+  status: '',
+  stale: false
 };
 
 export default function alert(state = initialState, action) {
@@ -17,6 +18,12 @@ export default function alert(state = initialState, action) {
       message: action.message,
       status: action.status
     });
+  case alertActionTypes.SET_STALE:
+    return Object.assign({}, state, {
+      stale: true
+    });
+  case alertActionTypes.CLEAR:
+    return initialState;
   default:
     return state;
   }

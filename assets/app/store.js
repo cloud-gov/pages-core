@@ -2,7 +2,6 @@ import { combineReducers, createStore, applyMiddleware } from 'redux';
 import { browserHistory } from 'react-router';
 import { navigationTypes } from './constants';
 import reducers from './reducers';
-console.log(reducers);
 
 const app = combineReducers(reducers);
 

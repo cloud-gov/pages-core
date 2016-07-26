@@ -11,7 +11,11 @@ export const alertActionTypes = keymirror({
   // Action for failed http requests
   HTTP_ERROR: null,
   // Action for successful HTTP requests
-  HTTP_SUCCESS: null
+  HTTP_SUCCESS: null,
+  // Remove alerts from state
+  CLEAR: null,
+  // Whether the message can be safely removed from the UI
+  SET_STALE: null
 });
 
 export const navigationTypes = keymirror({

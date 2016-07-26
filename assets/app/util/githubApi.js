@@ -8,8 +8,8 @@ import alertActions from '../actions/alertActions';
 const API = 'https://api.github.com';
 
 function getToken() {
-  let state = store.getState();
-  let passports = state.user.passports;
+  const state = store.getState();
+  const passports = state.user.passports;
   let github = passports.filter((passport) => {
     return passport.provider === 'github';
   }).pop();
@@ -33,10 +33,10 @@ const github = {
       try {
         formattedError = JSON.parse(err.message).message;
       } catch (error) {
-        formatterError = err.message;
+        formattedError = err.message;
       }
 
-      alertActions.httpError(formattedError);
+      throw new Error(formattedError);
     });
   },
 
