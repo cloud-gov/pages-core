@@ -16,7 +16,7 @@ class SiteContainer extends React.Component {
     super(props);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { storeState, params } = this.props;
     const currentSite = this.getCurrentSite(storeState.sites, params.id);
 

@@ -17,7 +17,7 @@ class App extends React.Component {
     return this.context.state.get();
   }
 
-  shouldClearAlert(alert) {
+  shouldClearAlert(alert, nextProps) {
     const { key: lastKey } = this.props.location;
     const { key: nextKey } = nextProps.location;
 
@@ -36,7 +36,7 @@ class App extends React.Component {
     const state = this.getStateFromStore();
     const { alert } = state;
 
-    this.shouldClearAlert(alert);
+    this.shouldClearAlert(alert, nextProps);
     this.setState(state);
   }
 

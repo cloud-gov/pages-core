@@ -27,16 +27,6 @@ const github = {
 
     return fetch(url, params).then((data) => {
       return data;
-    }).catch((err) => {
-      let formattedError;
-
-      try {
-        formattedError = JSON.parse(err.message).message;
-      } catch (error) {
-        formattedError = err.message;
-      }
-
-      throw new Error(formattedError);
     });
   },
 
@@ -89,6 +79,7 @@ const github = {
 
   fetchRepositoryConfigs(site) {
     const configFiles = ['_config.yml', '_navigation.json'];
+
     const configFetches = configFiles.map((path) => {
       return this.fetchRepositoryContent(site, path);
     });

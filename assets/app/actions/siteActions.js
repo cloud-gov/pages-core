@@ -12,7 +12,7 @@ export default {
         type: siteActionTypes.SITES_RECEIVED,
         sites
       });
-    }).catch(err => alertActions.httpError(err));
+    }).catch(error => alertActions.httpError(error.message));
   },
 
   addSite(siteToAdd) {
@@ -27,7 +27,7 @@ export default {
         method: 'push',
         arguments: [`/sites`]
       });
-    }).catch(err => alertActions.httpError(err));
+    }).catch(error => alertActions.httpError(error.message));
   },
 
   updateSite(site, data) {
@@ -37,7 +37,7 @@ export default {
         siteId: site.id,
         site
       })
-    }).catch(err => alertActions.httpError(err));
+    }).catch(error => alertActions.httpError(error.message));
   },
 
   deleteSite(siteId) {
@@ -52,7 +52,7 @@ export default {
         method: 'push',
         arguments: [`/sites`]
       });
-    }).catch(err => alertActions.httpError(err));
+    }).catch(error => alertActions.httpError(error.message));
   },
 
   createCommit(site, path, fileData) {
@@ -96,7 +96,7 @@ export default {
       });
 
       return Promise.resolve(site);
-    }).catch(err => alertActions.httpError(err));
+    }).catch(error => alertActions.httpError(error.message));
   },
 
   fetchSiteConfigs(site) {
@@ -107,22 +107,22 @@ export default {
         configs
       });
 
-      return Promise.resolve(site);
-    }).catch(err => alertActions.httpError(err));
+      return site;
+    });
   },
 
   fetchSiteConfigsAndAssets(site) {
     return this.fetchSiteConfigs(site).then((site) => {
-      return this.fetchSiteAssets(site).then((site) => {
-        return github.fetchRepositoryContent(site).then((files) => {
-          store.dispatch({
-            type: siteActionTypes.SITE_CONTENTS_RECEIVED,
-            siteId: site.id,
-            files
-          });
-        });
+      return this.fetchSiteAssets(site);
+    }).then((site) => {
+      return github.fetchRepositoryContent(site);
+    }).then((files) => {
+      store.dispatch({
+        type: siteActionTypes.SITE_CONTENTS_RECEIVED,
+        siteId: site.id,
+        files
       });
-    }).catch(err => alertActions.httpError(err));
+    }).catch((error) => alertActions.httpError(error.message));
   },
 
   fetchContent(site, path) {
@@ -138,25 +138,23 @@ export default {
     return github.fetchRepositoryContent(site, path)
       .then(
         dispatchChildContent.bind(null, site, path)
-      ).catch(err => alertActions.httpError(err));
+      ).catch(error => alertActions.httpError(error.message));
   },
 
   cloneRepo(destination, source) {
     return github.createRepo(destination, source).then(() => {
-      return federalist.cloneRepo(destination, source).then((site) => {
-        store.dispatch({
-          type: siteActionTypes.SITE_ADDED,
-          site
-        });
-
-        store.dispatch({
-          type: navigationTypes.UPDATE_ROUTER,
-          method: 'push',
-          arguments: [`/sites/${site.id}`]
-        });
+      return federalist.cloneRepo(destination, source);
+    }).then((site) => {
+      store.dispatch({
+        type: siteActionTypes.SITE_ADDED,
+        site
       });
-    }).catch((err) => {
-      alertActions.httpError(err);
-    });
+
+      store.dispatch({
+        type: navigationTypes.UPDATE_ROUTER,
+        method: 'push',
+        arguments: [`/sites/${site.id}`]
+      });
+    }).catch((error) => alertActions.httpError(error.message));
   }
 }
