@@ -33,6 +33,17 @@ export default function sites(state = initialState, action) {
         childDirectoriesMap: Object.assign({}, currentMap, nextMap)
       });
     });
+  case siteActionTypes.SITE_FILE_CONTENT_RECEIVED:
+    const currentSite = state.filter((site) => site.id === action.siteId).pop();
+    const siteFiles = currentSite.files || [];
+    const files = siteFiles.map((file) => {
+      if (file.sha !== action.file.sha) return file;
+      return Object.assign({}, file, action.file);
+    });
+    const alreadyHaveFile = files.find((file) => file.sha === action.file.sha);
+
+    if (!alreadyHaveFile) files.push(action.file);
+    return mapPropertyToMatchingSite(state, action.siteId, {files})
   default:
     return state;
   }
