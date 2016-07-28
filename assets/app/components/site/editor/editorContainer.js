@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { decodeB64 } from '../../../util/encoding'
+
 import PageMetadata from './pageMetadata';
 import Codemirror from './codemirror';
 import Prosemirror from './prosemirror';
@@ -63,12 +65,56 @@ class Editor extends React.Component {
     this.setState(nextState);
   }
 
+  splitContent(content) {
+    const frontmatterDelimiterRegexMatch = /^---\n([\s\S]*?)---\n/;
+    const matches = content.match(frontmatterDelimiterRegexMatch);
+
+    if (!matches) return { markdown: content };
+
+    let frontmatter = matches[1];
+    let markdown = content.slice(matches[0].length);
+
+    return { frontmatter, markdown };
+  }
+
+  get path() {
+    const params = this.props.params;
+    if (params.splat) {
+      return `${params.splat}/${params.fileName}`;
+    }
+    return params.fileName;
+  }
+
+  get currentFileContent() {
+    const files = this.props.site.files || [];
+    const currentFile = files.find((file) => {
+      return file.path === this.path;
+    });
+
+    if (currentFile && currentFile.content) {
+      return decodeB64(currentFile.content);
+    }
+    return '';
+  }
+
+  get currentFileMarkdownContent() {
+    const { markdown } = this.splitContent(this.currentFileContent);
+
+    return markdown;
+  }
+
+  get currentFileFrontmatter() {
+    const { frontmatter } = this.splitContent(this.currentFileContent);
+
+    return frontmatter;
+  }
+
   render() {
     return (
       <div>
         {this.getNewPage()}
-        <Codemirror />
-        <Prosemirror />
+        <Codemirror initialFrontmatterContent={ this.currentFileFrontmatter }/>
+        <Prosemirror initialMarkdownContent={ this.currentFileMarkdownContent }/>
         <button onClick={this.submitFile}>Submit</button>
       </div>
     );

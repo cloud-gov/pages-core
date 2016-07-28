@@ -33,6 +33,11 @@ class Prosemirror extends React.Component {
     });
   }
 
+  componentDidUpdate() {
+    const doc = defaultMarkdownParser.parse(this.props.initialMarkdownContent);
+    this.editor.setDoc(doc);
+  }
+
   componentWillUnmount() {
     const changeHandlers = this.editor.on.change.handlers;
     changeHandlers.forEach((handler) => {
