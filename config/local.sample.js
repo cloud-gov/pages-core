@@ -16,5 +16,11 @@ module.exports = {
   //},
   //models: {
   //  connection: 'postgres'
-  //}
+  //},
+  // // enable locally for development with redis to make sessions persist
+  // // between app restarts
+  // session: {
+  //   adapter: 'redis',
+  //   db: 0
+  // }
 };
