@@ -17,13 +17,18 @@ class SiteContainer extends React.Component {
   }
 
   componentDidMount() {
-    const { storeState, params } = this.props;
+    const { storeState, params, routeParams } = this.props;
     const currentSite = this.getCurrentSite(storeState.sites, params.id);
 
     if (!currentSite) {
       this.props.router.push('/sites');
     } else {
-      siteActions.fetchSiteConfigsAndAssets(currentSite);
+      siteActions.fetchSiteConfigsAndAssets(currentSite).then(() => {
+        const path = params.fileName;
+        const splat = params.splat;
+        const file = (splat) ? `${splat}/${path}` : path;
+        siteActions.fetchFileContent(currentSite, file);
+      });
     }
   }
 
