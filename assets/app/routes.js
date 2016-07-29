@@ -26,7 +26,7 @@ export default (
           <Route path=":fileName" component={SitePagesContainer} />
         </Route>
         <Route path="new/:branch(/:fileName)" component={SiteEditorContainer} isNewPage={true} />
-        <Route path="edit/:branch/:fileName" component={SiteEditorContainer}/>
+        <Route path="edit/:branch/(**/):fileName" component={SiteEditorContainer}/>
         <Route path="media" component={SiteMediaContainer}/>
         <Route path="settings" component={SiteSettings}/>
         <Route path="logs" component={SiteLogs}/>

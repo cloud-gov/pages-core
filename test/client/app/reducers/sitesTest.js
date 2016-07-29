@@ -13,6 +13,7 @@ describe("sitesReducer", () => {
   const SITE_DELETED = "bye, site.";
   const SITE_UPDATED = "change the site, please";
   const SITES_RECEIVED = "hey, sites!";
+  const SITE_FILE_CONTENT_RECEIVED = "cool, files!";
 
   beforeEach(() => {
     fixture = proxyquire("../../../../assets/app/reducers/sites", {
@@ -25,7 +26,8 @@ describe("sitesReducer", () => {
           SITE_CONTENTS_RECEIVED: SITE_CONTENTS_RECEIVED,
           SITE_DELETED: SITE_DELETED,
           SITE_UPDATED: SITE_UPDATED,
-          SITES_RECEIVED: SITES_RECEIVED
+          SITES_RECEIVED: SITES_RECEIVED,
+          SITE_FILE_CONTENT_RECEIVED: SITE_FILE_CONTENT_RECEIVED
         }
       }
     }).default;
@@ -522,6 +524,58 @@ describe("sitesReducer", () => {
     };
 
     expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
+  });
+
+  it("updates a site's file with a content attribute if it is found", function() {
+    const fileSha = "this is a cool sha";
+    const fileContent = "yo dude, here's some content";
+    const siteOne = {
+      id: "siteToKeep",
+      files: [
+        {
+          sha: fileSha,
+          oldData: "this should make it all the way through"
+        }
+      ]
+    };
+
+    const existingSites = [ siteOne ];
+
+    const actual = fixture(existingSites, {
+      type: SITE_FILE_CONTENT_RECEIVED,
+      siteId: "siteToKeep",
+      file: {
+        sha: fileSha,
+        content: fileContent
+      }
+    });
+
+    const expectedFile = Object.assign({}, siteOne.files.pop(), {
+      content: fileContent
+    });
+
+    expect(actual.pop().files.pop()).to.deep.equal(expectedFile);
+  });
+
+  it("adds a file to a site if it is not found in the state when the request for content comes back from the github api", function() {
+    const file = {
+      sha: "this is a cool sha",
+      content: "yo dude, here's some content"
+    }
+    const siteOne = {
+      id: "siteToKeep",
+      files: []
+    };
+
+    const existingSites = [ siteOne ];
+
+    const actual = fixture(existingSites, {
+      type: SITE_FILE_CONTENT_RECEIVED,
+      siteId: "siteToKeep",
+      file
+    });
+
+    expect(actual.pop().files.pop()).to.deep.equal(file);
   });
 
 });

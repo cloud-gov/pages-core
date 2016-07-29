@@ -3,11 +3,11 @@ import React from 'react';
 import codemirror from 'codemirror';
 
 const propTypes = {
-  initialYmlContent: React.PropTypes.string
+  initialFrontmatterContent: React.PropTypes.string
 };
 
 const defaultProps = {
-  initialYmlContent: ''
+  initialFrontmatterContent: ''
 };
 
 class Codemirror extends React.Component {
@@ -16,12 +16,16 @@ class Codemirror extends React.Component {
     this.editor = codemirror(target, {
       lineNumbers: true,
       mode: 'yaml',
-      value: this.props.initialYmlContent
+      value: this.props.initialFrontmatterContent
     });
 
     this.editor.on('change', (event) => {
       console.log('change event from codemirror', event);
     });
+  }
+
+  componentDidUpdate() {
+    this.editor.setValue(this.props.initialFrontmatterContent);
   }
 
   componentWillUnmount() {

@@ -113,18 +113,21 @@ export default {
 
   fetchSiteConfigsAndAssets(site) {
     return this.fetchSiteConfigs(site).then((site) => {
-      return this.fetchSiteAssets(site);
-    }).then((site) => {
-      return github.fetchRepositoryContent(site);
-    }).then((files) => {
-      store.dispatch({
-        type: siteActionTypes.SITE_CONTENTS_RECEIVED,
-        siteId: site.id,
-        files
+      return this.fetchSiteAssets(site).then((site) => {
+        return github.fetchRepositoryContent(site).then((files) => {
+          store.dispatch({
+            type: siteActionTypes.SITE_CONTENTS_RECEIVED,
+            siteId: site.id,
+            files
+          });
+
+          return files;
+        });
       });
     }).catch((error) => alertActions.httpError(error.message));
   },
 
+  // todo rename to something like fetchTree
   fetchContent(site, path) {
     function dispatchChildContent(site, path, files) {
       store.dispatch({
@@ -139,6 +142,17 @@ export default {
       .then(
         dispatchChildContent.bind(null, site, path)
       ).catch(error => alertActions.httpError(error.message));
+  },
+
+  fetchFileContent(site, path) {
+    return github.fetchRepositoryContent(site, path)
+      .then((file) => {
+        store.dispatch({
+          type: siteActionTypes.SITE_FILE_CONTENT_RECEIVED,
+          siteId: site.id,
+          file
+        });
+      });
   },
 
   cloneRepo(destination, source) {
