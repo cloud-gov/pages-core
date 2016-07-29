@@ -6,7 +6,7 @@ proxyquire.noCallThru();
 describe("assetsReducer", () => {
   let fixture;
   const SITE_ASSETS_RECEIVED = "hey, assets!";
-  
+
   beforeEach(() => {
     fixture = proxyquire("../../../../assets/app/reducers/assets.js", {
       "../constants": {
@@ -14,7 +14,7 @@ describe("assetsReducer", () => {
           SITE_ASSETS_RECEIVED: SITE_ASSETS_RECEIVED
         }
       }
-    }).assets;
+    }).default;
   });
 
   it("defaults to empty array and ignores other actions", () => {
@@ -30,9 +30,9 @@ describe("assetsReducer", () => {
     const SITE_1 = "site one";
     const URL_1 = "url one";
     const URL_2 = "url two";
-    
+
     const assets = [{ url: URL_1 }, { url: URL_2 }];
-    
+
     const actual = fixture([], {
       type: SITE_ASSETS_RECEIVED,
       assets: assets,
@@ -52,9 +52,9 @@ describe("assetsReducer", () => {
     const SITE_1 = "site one";
     const URL_1 = "url one";
     const URL_2 = "url two";
-    
+
     const assets = [{ url: URL_1 }];
-    
+
     const actual = fixture([{ site: SITE_1, url: URL_2 }], {
       type: SITE_ASSETS_RECEIVED,
       assets: assets,
@@ -74,9 +74,9 @@ describe("assetsReducer", () => {
     const SITE_1 = "site one";
     const URL_1 = "url one";
     const REPEAT_URL_1 = "url one";
-    
+
     const assets = [{ url: REPEAT_URL_1 }];
-    
+
     const actual = fixture([{ site: SITE_1, url: URL_1 }], {
       type: SITE_ASSETS_RECEIVED,
       assets: assets,
@@ -89,15 +89,15 @@ describe("assetsReducer", () => {
     }]);
   });
 
-  
+
   it("IS THIS A BUG??? does not append data to state if a site has an overlap in urls", () => {
     const SITE_1 = "site one";
     const SITE_2 = "site two";
     const URL_1 = "url one";
     const REPEAT_URL_1 = "url one";
-    
+
     const assets = [{ url: REPEAT_URL_1 }];
-    
+
     const actual = fixture([{ site: SITE_1, url: URL_1 }], {
       type: SITE_ASSETS_RECEIVED,
       assets: assets,

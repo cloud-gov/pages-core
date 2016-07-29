@@ -1,9 +1,11 @@
 import { siteActionTypes } from '../constants';
 
-export function sites(state = [], action) {
+const initialState = [];
+
+export default function sites(state = initialState, action) {
   switch (action.type) {
   case siteActionTypes.SITES_RECEIVED:
-    return action.sites || [];
+    return action.sites || initialState;
   case siteActionTypes.SITE_ADDED:
     // if a site hasn't been properly added, return the existing state
     // TODO: why is this getting called if there is an error
@@ -20,7 +22,7 @@ export function sites(state = [], action) {
     return state.filter((site) => site.id != action.siteId);
   case siteActionTypes.SITE_CHILD_CONTENT_RECEIVED:
     const nextMap = {};
-    nextMap[action.path] = action.files || [];
+    nextMap[action.path || '/'] = action.files || [];
 
     return state.map((site) => {
       if (site.id !== action.siteId) return site;

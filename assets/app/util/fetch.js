@@ -22,7 +22,15 @@ function checkStatus(response) {
 
   // All API error responses are returned as plain text
   return response.text().then((errorText) => {
-    const error = new Error(errorText);
+    let formattedError;
+
+    try {
+      formattedError = JSON.parse(errorText).message;
+    } catch(error) {
+      formattedError = errorText;
+    }
+
+    const error = new Error(formattedError);
     error.response = response;
 
     throw error;

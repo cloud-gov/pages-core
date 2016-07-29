@@ -1,8 +1,9 @@
 import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
 import { siteActionTypes, navigationTypes } from '../constants';
+import { encodeB64 } from '../util/encoding';
 import store from '../store';
-import errorActions from './errorActions';
+import alertActions from './alertActions';
 
 export default {
   fetchSites() {
@@ -11,7 +12,7 @@ export default {
         type: siteActionTypes.SITES_RECEIVED,
         sites
       });
-    });
+    }).catch(error => alertActions.httpError(error.message));
   },
 
   addSite(siteToAdd) {
@@ -26,7 +27,7 @@ export default {
         method: 'push',
         arguments: [`/sites`]
       });
-    });
+    }).catch(error => alertActions.httpError(error.message));
   },
 
   updateSite(site, data) {
@@ -36,7 +37,7 @@ export default {
         siteId: site.id,
         site
       })
-    });
+    }).catch(error => alertActions.httpError(error.message));
   },
 
   deleteSite(siteId) {
@@ -51,7 +52,32 @@ export default {
         method: 'push',
         arguments: [`/sites`]
       });
-    });
+    }).catch(error => alertActions.httpError(error.message));
+  },
+
+  createCommit(site, path, fileData) {
+    const b64EncodedFileContents = encodeB64(fileData);
+    const commit = {
+      message: `Adds ${path} to project`,
+      content: b64EncodedFileContents
+    };
+    const siteId = site.id;
+
+    github.createCommit(site, path, commit).then((commitObj) => {
+      alertActions.alertSuccess('File added successfully');
+
+      store.dispatch({
+        type: siteActionTypes.SITE_FILE_ADDED,
+        siteId,
+        file: commitObj.content
+      });
+
+      store.dispatch({
+        type: navigationTypes.UPDATE_ROUTER,
+        method: 'push',
+        arguments: [`/sites/${siteId}`]
+      });
+    }).catch(error => alertActions.httpError(error.message));
   },
 
   fetchSiteAssets(site) {
@@ -70,7 +96,7 @@ export default {
       });
 
       return Promise.resolve(site);
-    });
+    }).catch(error => alertActions.httpError(error.message));
   },
 
   fetchSiteConfigs(site) {
@@ -81,22 +107,22 @@ export default {
         configs
       });
 
-      return Promise.resolve(site);
+      return site;
     });
   },
 
   fetchSiteConfigsAndAssets(site) {
     return this.fetchSiteConfigs(site).then((site) => {
-      return this.fetchSiteAssets(site).then((site) => {
-        return github.fetchRepositoryContent(site).then((files) => {
-          store.dispatch({
-            type: siteActionTypes.SITE_CONTENTS_RECEIVED,
-            siteId: site.id,
-            files
-          });
-        });
+      return this.fetchSiteAssets(site);
+    }).then((site) => {
+      return github.fetchRepositoryContent(site);
+    }).then((files) => {
+      store.dispatch({
+        type: siteActionTypes.SITE_CONTENTS_RECEIVED,
+        siteId: site.id,
+        files
       });
-    });
+    }).catch((error) => alertActions.httpError(error.message));
   },
 
   fetchContent(site, path) {
@@ -112,25 +138,23 @@ export default {
     return github.fetchRepositoryContent(site, path)
       .then(
         dispatchChildContent.bind(null, site, path)
-      ).catch(err => errorActions.httpError(err));
+      ).catch(error => alertActions.httpError(error.message));
   },
 
   cloneRepo(destination, source) {
     return github.createRepo(destination, source).then(() => {
-      return federalist.cloneRepo(destination, source).then((site) => {
-        store.dispatch({
-          type: siteActionTypes.SITE_ADDED,
-          site
-        });
-
-        store.dispatch({
-          type: navigationTypes.UPDATE_ROUTER,
-          method: 'push',
-          arguments: [`/sites/${site.id}`]
-        });
+      return federalist.cloneRepo(destination, source);
+    }).then((site) => {
+      store.dispatch({
+        type: siteActionTypes.SITE_ADDED,
+        site
       });
-    }).catch((err) => {
-      errorActions.httpError(err);
-    });
+
+      store.dispatch({
+        type: navigationTypes.UPDATE_ROUTER,
+        method: 'push',
+        arguments: [`/sites/${site.id}`]
+      });
+    }).catch((error) => alertActions.httpError(error.message));
   }
 }

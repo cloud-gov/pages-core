@@ -3,13 +3,13 @@ import fetch from './fetch';
 
 import store from '../store';
 import { encodeB64, decodeB64 } from './encoding';
-import errorActions from '../actions/errorActions';
+import alertActions from '../actions/alertActions';
 
 const API = 'https://api.github.com';
 
 function getToken() {
-  let state = store.getState();
-  let passports = state.user.passports;
+  const state = store.getState();
+  const passports = state.user.passports;
   let github = passports.filter((passport) => {
     return passport.provider === 'github';
   }).pop();
@@ -27,16 +27,6 @@ const github = {
 
     return fetch(url, params).then((data) => {
       return data;
-    }).catch((err) => {
-      let formattedError;
-
-      try {
-        formattedError = JSON.parse(err.message).message;
-      } catch (error) {
-        formatterError = err.message;
-      }
-
-      errorActions.httpError(formattedError);
     });
   },
 
@@ -64,7 +54,7 @@ const github = {
       headers: {
         'Authorization': `token ${getToken()}`
       },
-      data,
+      data
     });
   },
 
@@ -89,6 +79,7 @@ const github = {
 
   fetchRepositoryConfigs(site) {
     const configFiles = ['_config.yml', '_navigation.json'];
+
     const configFetches = configFiles.map((path) => {
       return this.fetchRepositoryContent(site, path);
     });

@@ -16,7 +16,7 @@ class SiteContainer extends React.Component {
     super(props);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { storeState, params } = this.props;
     const currentSite = this.getCurrentSite(storeState.sites, params.id);
 
@@ -29,13 +29,14 @@ class SiteContainer extends React.Component {
 
   getPageTitle(pathname) {
     const currentPath = pathname.split('/').pop();
-    const isPathSiteId = /^[0-9]+$/;
 
-    // If the currentPath is only a site ID, we can safely return 'Pages' as
-    // the title.
-    // TODO: this might change as we incorporate the editor view, title might
-    // be derived higher on the props chain.
-    return isPathSiteId.test(currentPath) ? 'pages' : currentPath;
+    // If the currentPath has only 'tree' as it's last parameter,
+    // we can safely return 'pages' as the title.
+    return currentPath === 'tree' ? 'pages' : currentPath;
+  }
+
+  isPages(path) {
+    return path.indexOf('tree') !== -1;
   }
 
   getCurrentSite(sites, siteId) {
@@ -78,11 +79,16 @@ class SiteContainer extends React.Component {
       <div className="usa-grid site">
         <SideNav siteId={site.id} />
         <div className="usa-width-five-sixths site-main" id="pages-container">
-          <AlertBanner message={storeState.error} />
+          <AlertBanner
+            message={storeState.alert.message}
+            status={storeState.alert.status}/>
           <PagesHeader
             repository={site.repository}
             title={pageTitle}
-            isPages={pageTitle === 'Pages'}
+            isPages={this.isPages(location.pathname)}
+            siteId={site.id}
+            branch={site.defaultBranch}
+            fileName={params.fileName}
           />
           <div className="usa-grid">
             {children &&

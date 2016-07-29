@@ -5,16 +5,23 @@ export const buildActionTypes = keymirror({
   BUILDS_RECEIVED: null,
 });
 
-export const errorActionTypes = keymirror({
+export const alertActionTypes = keymirror({
   // Action for failed auth attempts
   AUTH_ERROR: null,
   // Action for failed http requests
-  HTTP_ERROR: null
+  HTTP_ERROR: null,
+  // Action for successful HTTP requests
+  HTTP_SUCCESS: null,
+  // Remove alerts from state
+  CLEAR: null,
+  // Whether the message can be safely removed from the UI
+  SET_STALE: null
 });
 
 export const navigationTypes = keymirror({
   // Action when route has changed
   ROUTE_CHANGED: null,
+  // Tell react-router to navigate to a new path programatically
   UPDATE_ROUTER: null
 });
 
@@ -53,7 +60,8 @@ export const siteActionTypes = keymirror({
   SITE_ASSETS_RECEIVED: null,
   // All files that aren't config or assets retrieved from github
   SITE_CONTENTS_RECEIVED: null,
-  SITE_CHILD_CONTENT_RECEIVED: null
+  SITE_CHILD_CONTENT_RECEIVED: null,
+  SITE_FILE_ADDED: null
 });
 
 export const userActionTypes = keymirror({

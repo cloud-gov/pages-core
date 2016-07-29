@@ -13,7 +13,7 @@ describe("sitesReducer", () => {
   const SITE_DELETED = "bye, site.";
   const SITE_UPDATED = "change the site, please";
   const SITES_RECEIVED = "hey, sites!";
-  
+
   beforeEach(() => {
     fixture = proxyquire("../../../../assets/app/reducers/sites", {
       "../constants": {
@@ -28,7 +28,7 @@ describe("sitesReducer", () => {
           SITES_RECEIVED: SITES_RECEIVED
         }
       }
-    }).sites;
+    }).default;
   });
 
   it("defaults to empty array and ignores other actions", () => {
@@ -42,7 +42,7 @@ describe("sitesReducer", () => {
 
   it("replaces anything it has when it gets a 'sites received' action", () => {
     const sites = [{ hello: "world"}, { how: "are you?" }];
-    
+
     const actual = fixture([{ oldData: "to be lost" }], {
       type: SITES_RECEIVED,
       sites: sites
@@ -51,10 +51,10 @@ describe("sitesReducer", () => {
     expect(actual).to.deep.equal(sites);
   });
 
-  
+
   it("ignores a malformed 'sites received' action", () => {
     const sites = [{ hello: "world"}, { how: "are you?" }];
-    
+
     const actual = fixture([{ oldData: "to be lost" }], {
       type: SITES_RECEIVED
     });
@@ -65,23 +65,23 @@ describe("sitesReducer", () => {
   it("adds a site if action has a site", () => {
     const existingSites = [{ existing: "siteToKeep" }];
     const site = { hereIs: "something" };
-    
+
     const actual = fixture(existingSites, {
       type: SITE_ADDED,
       site: site
     });
-    
+
     expect(actual).to.deep.equal(existingSites.concat(site));
   });
-  
+
   it("does not add a site if action has no site", () => {
     const existingSites = [{ existing: "siteToKeep" }];
     const site = { hereIs: "something" };
-    
+
     const actual = fixture(existingSites, {
       type: SITE_ADDED
     });
-    
+
     expect(actual).to.deep.equal(existingSites);
   });
 
@@ -93,16 +93,16 @@ describe("sitesReducer", () => {
       id: "anotherSiteToKeep",
       oldData: true
     }];
-    
+
     const site = { id: "something", oldData: false };
-    
+
     const actual = fixture(existingSites, {
       type: SITE_UPDATED,
       siteId: "something",
       site: site
     });
-    
-    expect(actual).to.deep.equal(existingSites);    
+
+    expect(actual).to.deep.equal(existingSites);
   });
 
   it("updates existing site data when given an update action and the new site's id is found", () => {
@@ -119,14 +119,14 @@ describe("sitesReducer", () => {
     const existingSites = [ siteOne, siteTwo ];
 
     const newSite = { id: "siteToKeep", oldData: false, hi: "there" };
-    
+
     const actual = fixture(existingSites, {
       type: SITE_UPDATED,
       siteId: "siteToKeep",
       site: newSite
     });
-    
-    expect(actual).to.deep.equal([ newSite, siteTwo ]);    
+
+    expect(actual).to.deep.equal([ newSite, siteTwo ]);
   });
 
   it("ignores delete request if site id is not found", () => {
@@ -146,13 +146,13 @@ describe("sitesReducer", () => {
       type: SITE_DELETED,
       siteId: "i'm not here."
     });
-    
+
     expect(actual).to.deep.equal(existingSites);
   });
-  
+
   it("deletes site if site id is found", () => {
     const siteToLoseId = "site to lose";
-    
+
     const siteOne = {
       id: "siteToKeep",
       oldData: true
@@ -169,7 +169,7 @@ describe("sitesReducer", () => {
       type: SITE_DELETED,
       siteId: siteToLoseId
     });
-    
+
     expect(actual).to.deep.equal([ siteOne ]);
   });
 
@@ -190,7 +190,7 @@ describe("sitesReducer", () => {
       type: SITE_CONFIGS_RECEIVED,
       siteId: "i'm not here."
     });
-    
+
     expect(actual).to.deep.equal(existingSites);
   });
 
@@ -211,7 +211,7 @@ describe("sitesReducer", () => {
       whatever: "punk",
       what: "huh?"
     };
-    
+
     const actual = fixture(existingSites, {
       type: SITE_CONFIGS_RECEIVED,
       siteId: "siteToKeep",
@@ -224,8 +224,8 @@ describe("sitesReducer", () => {
       whatever: "punk",
       what: "huh?"
     };
-    
-    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);    
+
+    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
   });
 
   it("does nothing when given an assets received action and the new site's id is not found", () => {
@@ -245,14 +245,14 @@ describe("sitesReducer", () => {
       whatever: "punk",
       what: "huh?"
     };
-    
+
     const actual = fixture(existingSites, {
       type: SITE_ASSETS_RECEIVED,
       siteId: "siteToKeepCEOWIOIIJV",
       assets: assets
     });
 
-    expect(actual).to.deep.equal(existingSites);    
+    expect(actual).to.deep.equal(existingSites);
   });
 
   it("sets a site's 'assets' property when given an assets received action and the new site's id is found", () => {
@@ -272,7 +272,7 @@ describe("sitesReducer", () => {
       whatever: "punk",
       what: "huh?"
     };
-    
+
     const actual = fixture(existingSites, {
       type: SITE_ASSETS_RECEIVED,
       siteId: "siteToKeep",
@@ -284,10 +284,10 @@ describe("sitesReducer", () => {
       oldData: true,
       assets: assets
     };
-    
-    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);    
+
+    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
   });
-  
+
   it("does nothing when given a contents received action and the new site's id is not found", () => {
     const siteOne = {
       id: "siteToKeep",
@@ -305,14 +305,14 @@ describe("sitesReducer", () => {
       whatever: "punk",
       what: "huh?"
     };
-    
+
     const actual = fixture(existingSites, {
       type: SITE_CONTENTS_RECEIVED,
       siteId: "siteToKeepCEOWIOIIJV",
       files: files
     });
 
-    expect(actual).to.deep.equal(existingSites);    
+    expect(actual).to.deep.equal(existingSites);
   });
 
   it("sets a site's 'files' property when given a contents received action and the new site's id is found", () => {
@@ -332,7 +332,7 @@ describe("sitesReducer", () => {
       whatever: "punk",
       what: "huh?"
     };
-    
+
     const actual = fixture(existingSites, {
       type: SITE_CONTENTS_RECEIVED,
       siteId: "siteToKeep",
@@ -344,10 +344,10 @@ describe("sitesReducer", () => {
       oldData: true,
       files: files
     };
-    
-    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);    
+
+    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
   });
-  
+
   it("does nothing when given a child contents received action and the new site's id is not found", () => {
     const siteOne = {
       id: "siteToKeep",
@@ -365,13 +365,13 @@ describe("sitesReducer", () => {
       whatever: "punk",
       what: "huh?"
     };
-    
+
     const actual = fixture(existingSites, {
       type: SITE_CHILD_CONTENT_RECEIVED,
       siteId: "siteToKeepCEOWIOIIJV"
     });
-    
-    expect(actual).to.deep.equal(existingSites);    
+
+    expect(actual).to.deep.equal(existingSites);
   });
 
   it("sets a site's 'childDirectoriesMap' property to map the action's path to the action's files when given a child content received action and the new site's id is found, without an existing childDirectoriesMap", () => {
@@ -393,7 +393,7 @@ describe("sitesReducer", () => {
     };
 
     const path = "/go/here/or/not";
-    
+
     const actual = fixture(existingSites, {
       type: SITE_CHILD_CONTENT_RECEIVED,
       siteId: "siteToKeep",
@@ -408,8 +408,8 @@ describe("sitesReducer", () => {
         "/go/here/or/not": files
       }
     };
-    
-    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);    
+
+    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
   });
 
   it("sets a site's 'childDirectoriesMap' property to map the action's path to the action's files when given a child content received action and the new site's id is found, with an existing childDirectoriesMap", () => {
@@ -418,7 +418,7 @@ describe("sitesReducer", () => {
     const existingFiles = [ "previously on something something", "format TBD" ];
     const existingChildDirectoriesMap = { };
     existingChildDirectoriesMap[existingPath] = existingFiles;
-    
+
     const siteOne = {
       id: "siteToKeep",
       oldData: true,
@@ -449,8 +449,8 @@ describe("sitesReducer", () => {
         "/go/here/or/not": files
       }
     };
-    
-    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);    
+
+    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
   });
 
   it("updates a site's 'childDirectoriesMap' property to map the action's path to the action's files when given a child content received action and the new site's id is found, with an existing childDirectoriesMap containing the path", () => {
@@ -458,7 +458,7 @@ describe("sitesReducer", () => {
     const existingFiles = [ "previously on something something", "format TBD" ];
     const existingChildDirectoriesMap = { };
     existingChildDirectoriesMap[path] = existingFiles;
-    
+
     const siteOne = {
       id: "siteToKeep",
       oldData: true,
@@ -488,8 +488,8 @@ describe("sitesReducer", () => {
         "/go/here/or/not": files
       }
     };
-    
-    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);    
+
+    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
   });
 
   it("sets a site's 'childDirectoriesMap' property to map the action's path to an empty array when given a child content received action and the new site's id is found... and the action doesn't have a files attribute", () => {
@@ -506,7 +506,7 @@ describe("sitesReducer", () => {
     const existingSites = [ siteOne, siteTwo ];
 
     const path = "/go/here/or/not";
-    
+
     const actual = fixture(existingSites, {
       type: SITE_CHILD_CONTENT_RECEIVED,
       siteId: "siteToKeep",
@@ -520,8 +520,8 @@ describe("sitesReducer", () => {
         "/go/here/or/not": []
       }
     };
-    
-    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);    
+
+    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
   });
 
 });

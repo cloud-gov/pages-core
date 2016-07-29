@@ -1,5 +1,5 @@
 import fetch from './fetch';
-import errorActions from '../actions/errorActions';
+import alertActions from '../actions/alertActions';
 
 const API = '/v0';
 
@@ -10,7 +10,7 @@ export default {
     return fetch(url, params).then((data) => {
       return data;
     }).catch((error) => {
-      errorActions.httpError(error.message);
+      alertActions.httpError(error.message);
     });
   },
 
