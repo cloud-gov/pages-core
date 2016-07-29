@@ -69,7 +69,7 @@
     "browserify": "browserify assets/app/main.js -o assets/js/bundle.js -t [ babelify --presets [ es2015 react ] ]",
     "sass": "node-sass assets/styles/styles.scss -o assets/styles",
     "autoprefixer": "postcss --use autoprefixer -r assets/styles/styles.css",
-    "watch": "npm run uswds && npm run watch:server & npm run watch:client",
+    "watch": "npm run uswds && node app.js & npm run watch:client",
     "watch:server": "nodemon app.js --ignore assets/app --ignore .tmp/ --ignore node_modules/",
     "watch:client": "npm run watch:client:sass & npm run watch:client:autoprefix & npm run watch:client:js",
     "watch:client:sass": "node-sass -w -r assets/styles/*.scss -o assets/styles",
