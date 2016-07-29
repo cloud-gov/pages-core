@@ -6,9 +6,6 @@
  */
 
 module.exports = {
-  delete: function(req, res) {
-    return res.serverError('howdy');
-  },
   clone: function cloneSite(req, res) {
     var data = {
       owner: req.param('destinationOrg') || req.user.username,
