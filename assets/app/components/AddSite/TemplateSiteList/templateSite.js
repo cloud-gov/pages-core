@@ -100,6 +100,12 @@ class TemplateSite extends React.Component {
                 type="text"
                 value={this.state.siteName}
                 onChange={this.handleChange} />
+              <label for="site-org">Repository Location</label>
+              <input
+                name="site-org"
+                type="text"
+                value={this.state.orgName}
+                onChange={this.handleChange} />
               <input type="submit" value="Create site" />
             </form>
           </div>
