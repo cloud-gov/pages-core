@@ -17,15 +17,37 @@ class Editor extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      content: '',
-      pageSettings: '',
-      pageTitle: '',
-      fileName: ''
-    }
-
+    this.state = this.getStateWithProps(props);
     this.submitFile = this.submitFile.bind(this);
     this.handleChange = this.handleChange.bind(this);
+  }
+
+  componentDidMount() {
+    // trigger the fetch file content action for the case
+    // when a user first loads this view. That could be
+    // a changing of the route to a site for the first time
+    // or directly loading the url
+    siteActions.fetchFileContent(this.props.site, this.path);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const nextState = this.getStateWithProps(nextProps);
+    this.setState(nextState);
+  }
+
+  getStateWithProps(props) {
+    const file = this.getCurrentFile(props);
+    const content = (file && file.content) ? decodeB64(file.content) : false;
+    const { frontmatter, markdown } = this.splitContent(content)
+
+    return {
+      encoded: (file && file.content) ? file.content : false,
+      frontmatter,
+      markdown,
+      path: (file) ? file.path : false,
+      raw: content,
+      sha: (file) ? file.sha : false
+    };
   }
 
   getNewPage() {
@@ -46,26 +68,43 @@ class Editor extends React.Component {
 
   submitFile() {
     const { site } = this.props;
-    const { fileName, content, pageSettings, pageTitle } = this.state;
-    //some magic function to mash all these ^^^ together?
-    const fileContents = '---\ntitle: hello\n---';
-    const normalizedFilename = fileName + '.md';
+    const { frontmatter, markdown, message, path, sha } = this.state;
+    let content = markdown;
 
-    if (!fileName) {
-      alertActions.httpError('File must have a name');
-    } else {
-      siteActions.createCommit(site, normalizedFilename, fileContents);
+    if (frontmatter) {
+      content = `---\n${frontmatter}\n---\n${markdown}`;
     }
+    else if (frontmatter && !markdown) {
+      content = frontmatter;
+    }
+    // const normalizedFilename = fileName + '.md';
+
+    console.log(`submitting ${path} with a message of ${message}`);
+    console.log('content\n', content);
+
+    // if (!path) {
+    //   alertActions.httpError('File must have a name');
+    // } else {
+    //   siteActions.createCommit(site, path, fileContents);
+    // }
   }
 
   handleChange(name, value) {
     const nextState = {};
     nextState[name] = value;
-
     this.setState(nextState);
   }
 
+  getCurrentFile(props) {
+    props = props || { site: {} };
+    const files = props.site.files || [];
+    return files.find((file) => {
+      return file.path === this.path;
+    });
+  }
+
   splitContent(content) {
+    if (!content) return {};
     const frontmatterDelimiterRegexMatch = /^---\n([\s\S]*?)---\n/;
     const matches = content.match(frontmatterDelimiterRegexMatch);
 
@@ -85,36 +124,26 @@ class Editor extends React.Component {
     return params.fileName;
   }
 
-  get currentFileContent() {
-    const files = this.props.site.files || [];
-    const currentFile = files.find((file) => {
-      return file.path === this.path;
-    });
-
-    if (currentFile && currentFile.content) {
-      return decodeB64(currentFile.content);
-    }
-    return '';
-  }
-
-  get currentFileMarkdownContent() {
-    const { markdown } = this.splitContent(this.currentFileContent);
-
-    return markdown;
-  }
-
-  get currentFileFrontmatter() {
-    const { frontmatter } = this.splitContent(this.currentFileContent);
-
-    return frontmatter;
-  }
-
   render() {
+    let message = this.state.message || `Changes made to ${this.state.path}`;
     return (
       <div>
         {this.getNewPage()}
-        <Codemirror initialFrontmatterContent={ this.currentFileFrontmatter }/>
-        <Prosemirror initialMarkdownContent={ this.currentFileMarkdownContent }/>
+        <Codemirror
+          initialFrontmatterContent={ this.state.frontmatter }
+          onChange={ (frontmatter) => {
+            this.handleChange('frontmatter', frontmatter)
+          }}
+        />
+        <Prosemirror
+          initialMarkdownContent={ this.state.markdown }
+          onChange={ (markdown) => {
+            this.handleChange('markdown', markdown);
+          }}
+        />
+        <input type="text" name="message"
+          onChange={ this.handleChange } value={ message }
+        />
         <button onClick={this.submitFile}>Submit</button>
       </div>
     );
