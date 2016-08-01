@@ -3,11 +3,13 @@ import React from 'react';
 import codemirror from 'codemirror';
 
 const propTypes = {
-  initialFrontmatterContent: React.PropTypes.string
+  initialFrontmatterContent: React.PropTypes.string,
+  onChange: React.PropTypes.func
 };
 
 const defaultProps = {
-  initialFrontmatterContent: ''
+  initialFrontmatterContent: '',
+  onChange: () => {}
 };
 
 class Codemirror extends React.Component {
@@ -19,13 +21,17 @@ class Codemirror extends React.Component {
       value: this.props.initialFrontmatterContent
     });
 
-    this.editor.on('change', (event) => {
-      console.log('change event from codemirror', event);
+    this.editor.on('change', (cm) => {
+      this.props.onChange(cm.getValue());
     });
   }
 
-  componentDidUpdate() {
-    this.editor.setValue(this.props.initialFrontmatterContent);
+  componentWillReceiveProps(nextProps) {
+    const frontmatter = this.editor.getValue();
+    const sameContent = (frontmatter === nextProps.initialFrontmatterContent);
+
+    if (sameContent) return;
+    this.editor.setValue(nextProps.initialFrontmatterContent);
   }
 
   componentWillUnmount() {
