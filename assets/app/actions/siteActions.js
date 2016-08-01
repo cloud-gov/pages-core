@@ -124,7 +124,13 @@ export default {
           return files;
         });
       });
-    }).catch((error) => alertActions.httpError(error.message));
+    }).catch((error) => {
+      // TODO: make a generic catch handler that will only
+      // trigger an http error action for an actual http
+      // error.
+      throwRuntime(throwRuntime);
+      alertActions.httpError(error.message)
+    });
   },
 
   // todo rename to something like fetchTree
@@ -170,5 +176,13 @@ export default {
         arguments: [`/sites/${site.id}`]
       });
     }).catch((error) => alertActions.httpError(error.message));
+  }
+}
+
+function throwRuntime(error) {
+  const runtimeErrors = ['TypeError'];
+  const isRuntimeError = runtimeErrors.find((e) => e === error.name);
+  if (isRuntimeError) {
+    throw error;
   }
 }
