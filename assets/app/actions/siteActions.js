@@ -55,13 +55,16 @@ export default {
     }).catch(error => alertActions.httpError(error.message));
   },
 
-  createCommit(site, path, fileData) {
+
+  createCommit(site, path, fileData, message = false, sha = false) {
     const b64EncodedFileContents = encodeB64(fileData);
-    const commit = {
-      message: `Adds ${path} to project`,
+    const siteId = site.id;
+    let commit = {
+      message: (message) ? message : `Adds ${path} to project`,
       content: b64EncodedFileContents
     };
-    const siteId = site.id;
+
+    if (sha) commit = Object.assign({}, commit, { sha });
 
     github.createCommit(site, path, commit).then((commitObj) => {
       alertActions.alertSuccess('File added successfully');

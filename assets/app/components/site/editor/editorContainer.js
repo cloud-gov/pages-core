@@ -37,6 +37,7 @@ class Editor extends React.Component {
 
   getStateWithProps(props) {
     const file = this.getCurrentFile(props);
+    const path = (file) ? file.path : false;
     const content = (file && file.content) ? decodeB64(file.content) : false;
     const { frontmatter, markdown } = this.splitContent(content)
 
@@ -44,32 +45,25 @@ class Editor extends React.Component {
       encoded: (file && file.content) ? file.content : false,
       frontmatter,
       markdown,
-      path: (file) ? file.path : false,
+      message: false,
+      path,
       raw: content,
       sha: (file) ? file.sha : false
     };
   }
 
-  getNewPage() {
-    // TODO: would love to know if there is a way to pass props without typing it
-    // to the react-router route property
-    const newPage = this.props.isNewPage || this.props.route.isNewPage;
-
-    if (newPage) {
-      return (
-        <PageMetadata
-          fileName={this.state.fileName}
-          handleChange={this.handleChange}/>
-      );
-    }
-
-    return null;
-  }
-
   submitFile() {
     const { site } = this.props;
-    const { frontmatter, markdown, message, path, sha } = this.state;
+    let { frontmatter, markdown, message, path, sha } = this.state;
     let content = markdown;
+
+    if (!path) {
+      return alertActions.alertError('File must have a name');
+    }
+
+    if (message === '') {
+      return alertActions.alertError('You must supply a commit message');
+    }
 
     if (frontmatter) {
       content = `---\n${frontmatter}\n---\n${markdown}`;
@@ -77,16 +71,12 @@ class Editor extends React.Component {
     else if (frontmatter && !markdown) {
       content = frontmatter;
     }
-    // const normalizedFilename = fileName + '.md';
 
-    console.log(`submitting ${path} with a message of ${message}`);
-    console.log('content\n', content);
+    if (this.props.route.isNewPage) {
+      path = `${path}.md`;
+    }
 
-    // if (!path) {
-    //   alertActions.httpError('File must have a name');
-    // } else {
-    //   siteActions.createCommit(site, path, fileContents);
-    // }
+    siteActions.createCommit(site, path, content, message, sha);
   }
 
   handleChange(name, value) {
@@ -124,8 +114,32 @@ class Editor extends React.Component {
     return params.fileName;
   }
 
+  getComputedMessage() {
+    const newPage = this.props.route.isNewPage;
+    const hasMessage = this.state.message || this.state.message === '';
+    if (hasMessage) return this.state.message;
+    if (newPage) return `New page added at ${this.state.path}`;
+    return `Changes made to ${this.state.path}`;
+  }
+
+  getNewPage() {
+    // TODO: would love to know if there is a way to pass props without typing it
+    // to the react-router route property
+    const newPage = this.props.route.isNewPage;
+
+    if (newPage) {
+      return (
+        <PageMetadata
+          path={this.state.path}
+          handleChange={this.handleChange}/>
+      );
+    }
+
+    return null;
+  }
+
   render() {
-    let message = this.state.message || `Changes made to ${this.state.path}`;
+    const computedMessage = this.getComputedMessage();
     return (
       <div>
         {this.getNewPage()}
@@ -141,10 +155,19 @@ class Editor extends React.Component {
             this.handleChange('markdown', markdown);
           }}
         />
-        <input type="text" name="message"
-          onChange={ this.handleChange } value={ message }
-        />
-        <button onClick={this.submitFile}>Submit</button>
+        <div className="usa-alert usa-alert-info">
+          <div className="usa-alert-body">
+            <h3 className="usa-alert-heading"></h3>
+            <p className="usa-alert-text">Make this a helpful save message for yourself and future collaborators.</p>
+            <input type="text" name="message"
+              value={ computedMessage }
+              onChange={ (event) => {
+                this.handleChange('message', event.target.value);
+              }}
+            />
+            <button onClick={this.submitFile}>Submit</button>
+          </div>
+        </div>
       </div>
     );
   }
