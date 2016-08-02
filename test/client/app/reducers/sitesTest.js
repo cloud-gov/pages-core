@@ -655,6 +655,80 @@ describe("sitesReducer", () => {
     expect(actual.pop().files.pop()).to.deep.equal(expectedFile);
   });
 
+  it("sets a site's files to match the specified params if the site has no files at all", function() {
+    const fileSha = "this is a cool sha";
+    const fileContent = "yo dude, here's some content";
+    const siteOne = {
+      id: "siteToKeep"
+    };
+
+    const existingSites = [ siteOne ];
+
+    const actual = fixture(existingSites, {
+      type: SITE_FILE_CONTENT_RECEIVED,
+      siteId: "siteToKeep",
+      file: {
+        sha: fileSha,
+        content: fileContent
+      }
+    });
+
+    expect(actual).to.deep.equal([{
+      id: "siteToKeep",
+      files: [{
+        sha: fileSha,
+        content: fileContent
+      }]
+    }]);
+  });
+
+  it("updates a site's file with a content attribute if its matching path is found, leaving unmatched files for the site unchanged", function() {
+    const fileSha = "this is a cool sha";
+    const revisedFileSha = "this is an even more cool sha";
+    const otherSha = "this sha is less cool";
+    const fileContent = "yo dude, here's some content";
+    const pathOne = "/here/is/path/one";
+    const pathTwo = "/here/is/path/two";
+    
+    const fileOne = {
+      sha: fileSha,
+      path: pathOne,
+      oldData: "this should make it all the way through"
+    };
+    const fileTwo = {
+      sha: otherSha,
+      path: pathTwo,
+      moreData: "hi, bub."
+    };
+
+    const siteOne = {
+      id: "siteToKeep",
+      files: [ fileOne, fileTwo ]
+    };
+
+    const existingSites = [ siteOne ];
+
+    const actual = fixture(existingSites, {
+      type: SITE_FILE_CONTENT_RECEIVED,
+      siteId: "siteToKeep",
+      file: {
+        sha: revisedFileSha,
+        path: pathOne,
+        content: fileContent
+      }
+    });
+
+    expect(actual).to.deep.equal([{
+      id: "siteToKeep",
+      files: [ {
+        sha: revisedFileSha,
+        path: pathOne,
+        oldData: "this should make it all the way through",
+        content: fileContent
+      }, fileTwo ]
+    }]);
+  });
+
   it("adds a file to a site if it is not found in the state when the request for content comes back from the github api", function() {
     const file = {
       sha: "this is a cool sha",
