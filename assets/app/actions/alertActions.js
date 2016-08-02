@@ -16,6 +16,10 @@ export default {
     });
   },
 
+  alertError(message) {
+    this.httpError(message);
+  },
+
   alertSuccess(message) {
     store.dispatch({
       type: alertActionTypes.HTTP_SUCCESS,
