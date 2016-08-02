@@ -64,9 +64,10 @@ class Prosemirror extends React.Component {
   render() {
     return (
       <div>
-        <div id="js-prosemirror-target"></div>
+        <strong>ProseMirror instance</strong>
+        <div id="js-prosemirror-target" className="editor"></div>
       </div>
-    )
+    );
   }
 }
 

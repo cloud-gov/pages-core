@@ -41,9 +41,10 @@ class Codemirror extends React.Component {
   render() {
     return (
       <div>
-        <div id="js-codemirror-target"></div>
+        <strong>CodeMirror instance</strong>
+        <div id="js-codemirror-target" className="editor"></div>
       </div>
-    )
+    );
   }
 }
 
