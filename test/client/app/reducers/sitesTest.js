@@ -403,6 +403,51 @@ describe("sitesReducer", () => {
     expect(site.files.length).to.equal(updatedSiteOne.files.length);
   });
 
+  it("adds files to a site's 'files' property when given a contents received action and the new site's id is found and it already has some files, one of which matches the action's path", () => {
+    const siteOne = {
+      id: "siteToKeep",
+      oldData: true,
+      files: [
+        {
+          path: "hey"
+        }
+      ]
+    };
+
+    const siteTwo = {
+      id: "anotherSiteToKeep",
+      oldData: true
+    };
+
+    const existingSites = [ siteOne, siteTwo ];
+
+    const files = [
+      {
+        path: "hey"
+      },
+      {
+        path: "huh?"
+      }
+    ];
+
+    const actual = fixture(existingSites, {
+      type: SITE_CONTENTS_RECEIVED,
+      siteId: "siteToKeep",
+      files: files
+    });
+
+    const updatedSiteOne = {
+      id: "siteToKeep",
+      oldData: true,
+      files: files
+    };
+
+    const site = actual.find((s) => s.id === updatedSiteOne.id);
+
+    expect(actual.length).to.equal(2);
+    expect(site.files.length).to.equal(updatedSiteOne.files.length);
+  });
+  
   it("does nothing when given a child contents received action and the new site's id is not found", () => {
     const siteOne = {
       id: "siteToKeep",
