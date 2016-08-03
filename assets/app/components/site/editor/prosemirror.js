@@ -8,12 +8,20 @@ import { schema } from 'prosemirror/dist/schema-basic';
 
 const menu = buildMenuItems(schema);
 
+const propTypes = {
+  initialMarkdownContent: React.PropTypes.string,
+  onChange: React.PropTypes.func
+};
+
+const defaultProps = {
+  initialMarkdownContent: '',
+  onChange: () => {}
+};
+
 class Prosemirror extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      doc: null
-    };
+
     this.toMarkdown = this.toMarkdown.bind(this);
   }
 
@@ -28,13 +36,17 @@ class Prosemirror extends React.Component {
     });
 
     this.editor.on.change.add(() => {
-      const doc = this.editor.doc.toJSON();
-      this.setState({ doc });
+      this.props.onChange(this.toMarkdown());
     });
   }
 
-  componentDidUpdate() {
-    const doc = defaultMarkdownParser.parse(this.props.initialMarkdownContent);
+  componentWillReceiveProps(nextProps) {
+    const markdown = this.toMarkdown();
+    const sameContent = (markdown === nextProps.initialMarkdownContent);
+
+    if (sameContent) return;
+
+    const doc = defaultMarkdownParser.parse(nextProps.initialMarkdownContent);
     this.editor.setDoc(doc);
   }
 
@@ -52,18 +64,14 @@ class Prosemirror extends React.Component {
   render() {
     return (
       <div>
-        <div id="js-prosemirror-target"></div>
+        <strong>ProseMirror instance</strong>
+        <div id="js-prosemirror-target" className="editor"></div>
       </div>
-    )
+    );
   }
 }
 
-Prosemirror.defaultProps = {
-  initialMarkdownContent: '*yo*\nhey there'
-};
-
-Prosemirror.propTypes = {
-  initialMarkdownContent: React.PropTypes.string
-};
+Prosemirror.defaultProps = defaultProps;
+Prosemirror.propTypes = propTypes;
 
 export default Prosemirror;

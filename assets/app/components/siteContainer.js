@@ -23,12 +23,7 @@ class SiteContainer extends React.Component {
     if (!currentSite) {
       this.props.router.push('/sites');
     } else {
-      siteActions.fetchSiteConfigsAndAssets(currentSite).then(() => {
-        const path = params.fileName;
-        const splat = params.splat;
-        const file = (splat) ? `${splat}/${path}` : path;
-        siteActions.fetchFileContent(currentSite, file);
-      });
+      siteActions.fetchSiteConfigsAndAssets(currentSite);
     }
   }
 

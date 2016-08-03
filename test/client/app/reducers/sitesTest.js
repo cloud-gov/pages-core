@@ -303,10 +303,14 @@ describe("sitesReducer", () => {
 
     const existingSites = [ siteOne, siteTwo ];
 
-    const files = {
-      whatever: "punk",
-      what: "huh?"
-    };
+    const files = [
+      {
+        whatever: "punk"
+      },
+      {
+        what: "huh?"
+      }
+    ];
 
     const actual = fixture(existingSites, {
       type: SITE_CONTENTS_RECEIVED,
@@ -317,7 +321,7 @@ describe("sitesReducer", () => {
     expect(actual).to.deep.equal(existingSites);
   });
 
-  it("sets a site's 'files' property when given a contents received action and the new site's id is found", () => {
+  it("sets a site's 'files' property when given a contents received action and the new site's id is found and it does not yet have a 'files' value", () => {
     const siteOne = {
       id: "siteToKeep",
       oldData: true
@@ -330,10 +334,14 @@ describe("sitesReducer", () => {
 
     const existingSites = [ siteOne, siteTwo ];
 
-    const files = {
-      whatever: "punk",
-      what: "huh?"
-    };
+    const files = [
+      {
+        whatever: "punk"
+      },
+      {
+        what: "huh?"
+      }
+    ];
 
     const actual = fixture(existingSites, {
       type: SITE_CONTENTS_RECEIVED,
@@ -350,6 +358,96 @@ describe("sitesReducer", () => {
     expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
   });
 
+  it("adds files to a site's 'files' property when given a contents received action and the new site's id is found and it already has some files", () => {
+    const siteOne = {
+      id: "siteToKeep",
+      oldData: true,
+      files: [
+        {
+          path: "hey"
+        }
+      ]
+    };
+
+    const siteTwo = {
+      id: "anotherSiteToKeep",
+      oldData: true
+    };
+
+    const existingSites = [ siteOne, siteTwo ];
+
+    const files = [
+      {
+        path: "punk"
+      },
+      {
+        path: "huh?"
+      }
+    ];
+
+    const actual = fixture(existingSites, {
+      type: SITE_CONTENTS_RECEIVED,
+      siteId: "siteToKeep",
+      files: files
+    });
+
+    const updatedSiteOne = {
+      id: "siteToKeep",
+      oldData: true,
+      files: siteOne.files.concat(files)
+    };
+
+    const site = actual.find((s) => s.id === updatedSiteOne.id);
+
+    expect(actual.length).to.equal(2);
+    expect(site.files.length).to.equal(updatedSiteOne.files.length);
+  });
+
+  it("adds files to a site's 'files' property when given a contents received action and the new site's id is found and it already has some files, one of which matches the action's path", () => {
+    const siteOne = {
+      id: "siteToKeep",
+      oldData: true,
+      files: [
+        {
+          path: "hey"
+        }
+      ]
+    };
+
+    const siteTwo = {
+      id: "anotherSiteToKeep",
+      oldData: true
+    };
+
+    const existingSites = [ siteOne, siteTwo ];
+
+    const files = [
+      {
+        path: "hey"
+      },
+      {
+        path: "huh?"
+      }
+    ];
+
+    const actual = fixture(existingSites, {
+      type: SITE_CONTENTS_RECEIVED,
+      siteId: "siteToKeep",
+      files: files
+    });
+
+    const updatedSiteOne = {
+      id: "siteToKeep",
+      oldData: true,
+      files: files
+    };
+
+    const site = actual.find((s) => s.id === updatedSiteOne.id);
+
+    expect(actual.length).to.equal(2);
+    expect(site.files.length).to.equal(updatedSiteOne.files.length);
+  });
+  
   it("does nothing when given a child contents received action and the new site's id is not found", () => {
     const siteOne = {
       id: "siteToKeep",
@@ -555,6 +653,80 @@ describe("sitesReducer", () => {
     });
 
     expect(actual.pop().files.pop()).to.deep.equal(expectedFile);
+  });
+
+  it("sets a site's files to match the specified params if the site has no files at all", function() {
+    const fileSha = "this is a cool sha";
+    const fileContent = "yo dude, here's some content";
+    const siteOne = {
+      id: "siteToKeep"
+    };
+
+    const existingSites = [ siteOne ];
+
+    const actual = fixture(existingSites, {
+      type: SITE_FILE_CONTENT_RECEIVED,
+      siteId: "siteToKeep",
+      file: {
+        sha: fileSha,
+        content: fileContent
+      }
+    });
+
+    expect(actual).to.deep.equal([{
+      id: "siteToKeep",
+      files: [{
+        sha: fileSha,
+        content: fileContent
+      }]
+    }]);
+  });
+
+  it("updates a site's file with a content attribute if its matching path is found, leaving unmatched files for the site unchanged", function() {
+    const fileSha = "this is a cool sha";
+    const revisedFileSha = "this is an even more cool sha";
+    const otherSha = "this sha is less cool";
+    const fileContent = "yo dude, here's some content";
+    const pathOne = "/here/is/path/one";
+    const pathTwo = "/here/is/path/two";
+    
+    const fileOne = {
+      sha: fileSha,
+      path: pathOne,
+      oldData: "this should make it all the way through"
+    };
+    const fileTwo = {
+      sha: otherSha,
+      path: pathTwo,
+      moreData: "hi, bub."
+    };
+
+    const siteOne = {
+      id: "siteToKeep",
+      files: [ fileOne, fileTwo ]
+    };
+
+    const existingSites = [ siteOne ];
+
+    const actual = fixture(existingSites, {
+      type: SITE_FILE_CONTENT_RECEIVED,
+      siteId: "siteToKeep",
+      file: {
+        sha: revisedFileSha,
+        path: pathOne,
+        content: fileContent
+      }
+    });
+
+    expect(actual).to.deep.equal([{
+      id: "siteToKeep",
+      files: [ {
+        sha: revisedFileSha,
+        path: pathOne,
+        oldData: "this should make it all the way through",
+        content: fileContent
+      }, fileTwo ]
+    }]);
   });
 
   it("adds a file to a site if it is not found in the state when the request for content comes back from the github api", function() {

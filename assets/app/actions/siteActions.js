@@ -55,13 +55,16 @@ export default {
     }).catch(error => alertActions.httpError(error.message));
   },
 
-  createCommit(site, path, fileData) {
+
+  createCommit(site, path, fileData, message = false, sha = false) {
     const b64EncodedFileContents = encodeB64(fileData);
-    const commit = {
-      message: `Adds ${path} to project`,
+    const siteId = site.id;
+    let commit = {
+      message: (message) ? message : `Adds ${path} to project`,
       content: b64EncodedFileContents
     };
-    const siteId = site.id;
+
+    if (sha) commit = Object.assign({}, commit, { sha });
 
     github.createCommit(site, path, commit).then((commitObj) => {
       alertActions.alertSuccess('File added successfully');
@@ -124,7 +127,13 @@ export default {
           return files;
         });
       });
-    }).catch((error) => alertActions.httpError(error.message));
+    }).catch((error) => {
+      // TODO: make a generic catch handler that will only
+      // trigger an http error action for an actual http
+      // error.
+      throwRuntime(throwRuntime);
+      alertActions.httpError(error.message)
+    });
   },
 
   // todo rename to something like fetchTree
@@ -170,5 +179,13 @@ export default {
         arguments: [`/sites/${site.id}`]
       });
     }).catch((error) => alertActions.httpError(error.message));
+  }
+}
+
+function throwRuntime(error) {
+  const runtimeErrors = ['TypeError'];
+  const isRuntimeError = runtimeErrors.find((e) => e === error.name);
+  if (isRuntimeError) {
+    throw error;
   }
 }

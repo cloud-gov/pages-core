@@ -12,8 +12,7 @@ fieldset {
 
 input[type="text"],
 textarea {
-  background-color: $secondary-background-color;
-  border: 0;
+  border: 3px solid #ccc;
 }
 
 input[type="text"]:focus,

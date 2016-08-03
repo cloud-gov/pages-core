@@ -1,8 +1,15 @@
 import React from 'react';
 
 const propTypes = {
-  fileName: React.PropTypes.string.isRequired,
+  path: React.PropTypes.oneOfType([
+    React.PropTypes.string,
+    React.PropTypes.bool
+  ]).isRequired,
   handleChange: React.PropTypes.func.isRequired
+};
+
+const defaultProps = {
+  path: ''
 };
 
 class PageMetadata extends React.Component {
@@ -19,14 +26,14 @@ class PageMetadata extends React.Component {
   }
 
   render() {
-    const { fileName } = this.props;
+    const { path } = this.props;
 
     return (
       <div className="form-group">
-        <label htmlFor="fileName">Enter a filename for this page</label>
+        <label htmlFor="path">Enter a path for this page</label>
         <input
-          name="fileName"
-          value={fileName}
+          name="path"
+          value={path}
           onChange={this.handleChange} />
       </div>
     );
@@ -34,5 +41,6 @@ class PageMetadata extends React.Component {
 }
 
 PageMetadata.propTypes = propTypes;
+PageMetadata.defaultProps = defaultProps;
 
 export default PageMetadata;
