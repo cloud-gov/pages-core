@@ -1,11 +1,38 @@
 import React from 'react';
 import PageListItem from './pageListItem';
 import LinkButton from '../../linkButton';
+import NavigationJsonContent from "./navigationJsonContent";
 
 import siteActions from '../../../actions/siteActions';
 
 const propTypes = {
   site: React.PropTypes.object
+};
+
+const getFilesByPath = (files = [], startingPath = '') => {
+  const isRoot = (startingPath === '');
+  const path = (!isRoot) ? `${startingPath}/` : '((?!/).)*$';
+  const startsWithPath = new RegExp(`^${path}`);
+  
+  return files.filter((file) => startsWithPath.test(file.path));
+};
+
+const hasNavigationJsonContent = (site) => {
+  return site["_navigation.json"] && site["_navigation.json"].content;
+};
+
+const getPath = (routeParams) => {
+  const { splat, fileName } = routeParams;
+  let path = '';
+
+  if (splat) {
+    path = `${splat}/${fileName}`;
+  }
+  else if (fileName) {
+    path = fileName;
+  }
+
+  return path;
 };
 
 class Pages extends React.Component {
@@ -14,17 +41,17 @@ class Pages extends React.Component {
   }
 
   componentDidMount() {
-    siteActions.fetchFiles(this.props.site, this.getPath(this.props.params));
+    siteActions.fetchFiles(this.props.site, getPath(this.props.params));
   }
 
   componentWillReceiveProps(nextProps) {
     const { params, site } = nextProps;
-    const nextFiles = this.getFilesByPath(site.files, this.getPath(params));
-    const files = this.getFilesByPath(site.files, this.getPath(params));
+    const nextFiles = getFilesByPath(site.files, getPath(params));
+    const files = getFilesByPath(site.files, getPath(params));
 
     if (files.length && nextFiles.length === files.length) return;
 
-    siteActions.fetchFiles(site, this.getPath(params));
+    siteActions.fetchFiles(site, getPath(params));
   }
 
   getLinkFor(page, id, branch) {
@@ -32,29 +59,6 @@ class Pages extends React.Component {
 
     return this.isDir(page) ?
       `/sites/${id}/tree/${path}` : `/sites/${id}/edit/${branch}/${path}`;
-  }
-
-  getPath(routeParams) {
-    const { splat, fileName } = routeParams;
-    let path = '';
-
-    if (splat) {
-      path = `${splat}/${fileName}`;
-    }
-    else if (fileName) {
-      path = fileName;
-    }
-
-    return path;
-  }
-
-
-  getFilesByPath(files = [], startingPath = '') {
-    const isRoot = (startingPath === '');
-    const path = (!isRoot) ? `${startingPath}/` : '((?!/).)*$';
-    const startsWithPath = new RegExp(`^${path}`);
-
-    return files.filter((file) => startsWithPath.test(file.path));
   }
 
   getButtonCopy(file) {
@@ -74,8 +78,12 @@ class Pages extends React.Component {
       return null;
     }
 
-    files = this.getFilesByPath(site.files, this.getPath(params)) || [];
+    files = getFilesByPath(site.files, getPath(params)) || [];
 
+    // TODO: if there's a navigation.json, use it instead
+    if (hasNavigationJsonContent(site)) {
+      return <NavigationJsonContent site={ site } />;
+    }
     return (
       <ul className="list-group">
         {files.map((page, index) => {
