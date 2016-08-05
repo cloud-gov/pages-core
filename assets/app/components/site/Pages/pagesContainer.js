@@ -19,10 +19,10 @@ class Pages extends React.Component {
   }
 
   getLinkFor(page, id, branch) {
-    const pageName = page.name;
+    const path = page.path;
 
     return this.isDir(page) ?
-      `/sites/${id}/tree/${pageName}` : `/sites/${id}/edit/${branch}/${pageName}`;
+      `/sites/${id}/tree/${path}` : `/sites/${id}/edit/${branch}/${path}`;
   }
 
   getButtonCopy(page) {
