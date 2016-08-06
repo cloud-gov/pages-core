@@ -1,6 +1,5 @@
 import React from 'react';
 import PageListItem from './pageListItem';
-import LinkButton from '../../linkButton';
 import NavigationJsonContent from "./navigationJsonContent";
 
 import siteActions from '../../../actions/siteActions';
@@ -80,7 +79,6 @@ class Pages extends React.Component {
 
     files = getFilesByPath(site.files, getPath(params)) || [];
 
-    // TODO: if there's a navigation.json, use it instead
     if (hasNavigationJsonContent(site)) {
       return <NavigationJsonContent site={ site } />;
     }
@@ -88,13 +86,11 @@ class Pages extends React.Component {
       <ul className="list-group">
         {files.map((page, index) => {
           const { id, branch, defaultBranch } = site;
-
+          const href = this.getLinkFor(page, id, branch || defaultBranch);
+          const buttonText = this.getButtonCopy(page);
           return (
-            <PageListItem key={index} pageName={page.name}>
-              <LinkButton href={this.getLinkFor(page, id, branch || defaultBranch)}
-                className="usa-button-outline file-list-item-button"
-                text={this.getButtonCopy(page)} />
-            </PageListItem>
+            <PageListItem key={ index } pageName={ page.name } href={ href }
+                          editButtonText={ buttonText }/>
           );
         })}
       </ul>
