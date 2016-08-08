@@ -8,8 +8,8 @@ const propTypes = {
   site: React.PropTypes.object
 };
 
-const filterByPath = (files = [], startingPath = '/') => {
-  const isRoot = (startingPath === '/');
+const filterByPath = (files = [], startingPath = '') => {
+  const isRoot = (startingPath === '');
   const path = (!isRoot) ? `${startingPath}/` : '((?!/).)*$';
   const startsWithPath = new RegExp(`^${path}`);
   const f = files.filter((file) => startsWithPath.test(file.path));
@@ -19,7 +19,7 @@ const filterByPath = (files = [], startingPath = '/') => {
 
 const getPath = (routeParams) => {
   const { splat, fileName } = routeParams;
-  let path = '/';
+  let path = '';
 
   if (splat) {
     path = `${splat}/${fileName}`;
@@ -36,13 +36,17 @@ class Pages extends React.Component {
     super(props);
   }
 
+  componentDidMount() {
+    siteActions.fetchFiles(this.props.site, getPath(this.props.params));
+  }
+
   componentWillReceiveProps(nextProps) {
     const { params, site } = nextProps;
     const nextFiles = filterByPath(site.files, params.fileName);
     const files = filterByPath(this.props.site.files, this.props.params.fileName);
     if (nextFiles.length === files.length) return;
 
-    siteActions.fetchFiles(site, params.fileName);
+    siteActions.fetchFiles(site, getPath(params));
   }
 
   getLinkFor(page, id, branch) {
