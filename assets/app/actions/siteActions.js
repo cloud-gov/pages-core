@@ -140,9 +140,8 @@ export default {
   fetchContent(site, path) {
     function dispatchChildContent(site, path, files) {
       store.dispatch({
-        type: siteActionTypes.SITE_CHILD_CONTENT_RECEIVED,
-        siteId: 1,
-        path,
+        type: siteActionTypes.SITE_CONTENTS_RECEIVED,
+        siteId: site.id,
         files
       });
     }
