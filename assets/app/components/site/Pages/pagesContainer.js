@@ -8,43 +8,39 @@ const propTypes = {
   site: React.PropTypes.object
 };
 
-const filterByPath = (files, startingPath = '/') => {
+const filterByPath = (files = [], startingPath = '/') => {
   const isRoot = (startingPath === '/');
   const path = (!isRoot) ? `${startingPath}/` : '((?!/).)*$';
   const startsWithPath = new RegExp(`^${path}`);
-  const f = files.filter((file) => file.path.match(startsWithPath));
+  const f = files.filter((file) => startsWithPath.test(file.path));
+
   return f;
+};
+
+const getPath = (routeParams) => {
+  const { splat, fileName } = routeParams;
+  let path = '/';
+
+  if (splat) {
+    path = `${splat}/${fileName}`;
+  }
+  else if (fileName) {
+    path = fileName;
+  }
+
+  return path;
 };
 
 class Pages extends React.Component {
   constructor(props) {
     super(props);
-    let path = '/';
-
-    if (props.params.splat) {
-      path = `${props.params.splat}/${props.params.fileName}`;
-    }
-    else if (props.params.fileName) {
-      path = props.params.fileName;
-    }
-
-    this.state = {
-      path,
-      files: []
-    }
-  }
-  componentDidMount() {
-    siteActions.fetchContent(this.props.site, this.state.path);
   }
 
   componentWillReceiveProps(nextProps) {
     const { params, site } = nextProps;
-    const files = filterByPath(site.files, params.fileName);
-    if (files.length === this.state.files.length) return;
-
-    this.setState({
-      files
-    });
+    const nextFiles = filterByPath(site.files, params.fileName);
+    const files = filterByPath(this.props.site.files, this.props.params.fileName);
+    if (nextFiles.length === files.length) return;
 
     siteActions.fetchContent(site, params.fileName);
   }
@@ -66,14 +62,17 @@ class Pages extends React.Component {
 
   render() {
     const { fileName } = this.props.params;
+    const { site } = this.props;
 
-    if (!this.props.site) {
+    if (!site) {
       return null;
     }
 
+    const files = filterByPath(site.files, getPath(this.props.params)) || [];
+
     return (
       <ul className="list-group">
-        {this.state.files.map((page, index) => {
+        {files.map((page, index) => {
           const { id, branch, defaultBranch } = this.props.site;
 
           return (

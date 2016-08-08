@@ -33,6 +33,7 @@ export default function sites(state = initialState, action) {
     let newFiles = action.files.map((file) => {
       const exists = site.files.find((f) => f.path === file.path);
       if (!exists) return file;
+
       return Object.assign({}, exists, file);
     });
 
