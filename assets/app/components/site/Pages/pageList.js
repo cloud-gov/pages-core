@@ -13,10 +13,10 @@ const emitPages = (files, site) => {
   return files.map((page, index) => {
     const { id, branch, defaultBranch } = site;
     const href = getLinkFor(page, id, branch || defaultBranch);
-    const buttonText = getButtonCopy(page);
+    const isPageDirectory = isDir(page);
     return (
       <PageListItem key={ index } pageName={ page.name } href={ href }
-                    editButtonText={ buttonText }/>
+                    isPageDirectory={ isPageDirectory }/>
     );
   });
 };

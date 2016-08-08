@@ -7,19 +7,22 @@ const propTypes = {
 
 const cssClasses = 'usa-button-outline file-list-item-button';
 
-// FIXME: passing in the edit button text is clearly an abstraction failure.
-const PageListItem = ({ pageName, href, editButtonText, children }) => (
+const PageListItem = ({ pageName, href, isPageDirectory, children }) => (
   <li className="list-group-item">
     <div className="usa-grid">
       <div className="usa-width-two-thirds">{ pageName }</div>
       <div className="usa-width-one-third">
         <LinkButton href={ href }
                     className={ cssClasses }
-                    text={ editButtonText } />
+                    text={ getButtonText(isPageDirectory) } />
       </div>
     </div>
     { children }
   </li>);
+
+const getButtonText = (isPageDirectory) => {
+  return (isPageDirectory) ? 'Open' : 'Edit';
+};
 
 PageListItem.propTypes = propTypes;
 
