@@ -8,73 +8,81 @@ const propTypes = {
   site: React.PropTypes.object
 };
 
-class Pages extends React.Component {
-  componentDidMount() {
-    const currentDirectory = this.props.params.fileName;
-    siteActions.fetchContent(this.props.site, currentDirectory);
+const filterByPath = (files = [], startingPath = '') => {
+  const isRoot = (startingPath === '');
+  const path = (!isRoot) ? `${startingPath}/` : '((?!/).)*$';
+  const startsWithPath = new RegExp(`^${path}`);
+  const f = files.filter((file) => startsWithPath.test(file.path));
+
+  return f;
+};
+
+const getPath = (routeParams) => {
+  const { splat, fileName } = routeParams;
+  let path = '';
+
+  if (splat) {
+    path = `${splat}/${fileName}`;
+  }
+  else if (fileName) {
+    path = fileName;
   }
 
-  getClasses() {
-    return 'usa-button-outline file-list-item-button';
+  return path;
+};
+
+class Pages extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount() {
+    siteActions.fetchFiles(this.props.site, getPath(this.props.params));
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { params, site } = nextProps;
+    const nextFiles = filterByPath(site.files, params.fileName);
+    const files = filterByPath(this.props.site.files, this.props.params.fileName);
+    if (nextFiles.length === files.length) return;
+
+    siteActions.fetchFiles(site, getPath(params));
   }
 
   getLinkFor(page, id, branch) {
-    const pageName = page.name;
+    const path = page.path;
 
     return this.isDir(page) ?
-      `/sites/${id}/tree/${pageName}` : `/sites/${id}/edit/${branch}/${pageName}`;
+      `/sites/${id}/tree/${path}` : `/sites/${id}/edit/${branch}/${path}`;
   }
 
-  getButtonCopy(page) {
-    return this.isDir(page) ? 'Open' : 'Edit';
+  getButtonCopy(file) {
+    return this.isDir(file) ? 'Open' : 'Edit';
   }
 
-  isDir(page) {
-    return page.type === 'dir';
-  }
-
-  getPagesFor(site) {
-    const currentDirectory = this.props.params.fileName;
-    const { files, childDirectoriesMap = {} } = site;
-
-    let directoryContents;
-
-    // User is on the pages index, return all files at the top level
-    if (!currentDirectory) {
-      return childDirectoriesMap['/'] || files;
-    }
-
-    directoryContents = childDirectoriesMap[currentDirectory];
-
-    // There is no entry in the child directories map for the supplied folder
-    // so fetch its content
-    if (!directoryContents) {
-      siteActions.fetchContent(site, currentDirectory);
-      return [];
-    }
-
-    return directoryContents;
+  isDir(file) {
+    return file.type === 'dir';
   }
 
   render() {
+    const { fileName } = this.props.params;
     const { site } = this.props;
-    let pages;
 
     if (!site) {
       return null;
     }
 
-    pages = this.getPagesFor(site) || [];
+    const files = filterByPath(site.files, getPath(this.props.params)) || [];
 
     return (
       <ul className="list-group">
-        {pages.map((page, index) => {
-          const { id, branch, defaultBranch } = site;
+        {files.map((page, index) => {
+          const { id, branch, defaultBranch } = this.props.site;
 
           return (
             <PageListItem key={index} pageName={page.name}>
               <LinkButton href={this.getLinkFor(page, id, branch || defaultBranch)}
-                className={this.getClasses()}
+                className="usa-button-outline file-list-item-button"
                 text={this.getButtonCopy(page)} />
             </PageListItem>
           );

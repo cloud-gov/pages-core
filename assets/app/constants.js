@@ -59,8 +59,7 @@ export const siteActionTypes = keymirror({
   // Asset files retrieved from github
   SITE_ASSETS_RECEIVED: null,
   // All files that aren't config or assets retrieved from github
-  SITE_CONTENTS_RECEIVED: null,
-  SITE_CHILD_CONTENT_RECEIVED: null, // is this the tree?
+  SITE_FILES_RECEIVED: null,
   SITE_FILE_ADDED: null,
   // When an individual file/path is received
   SITE_FILE_CONTENT_RECEIVED: null

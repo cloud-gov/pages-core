@@ -23,7 +23,7 @@ export default (
       <Route path=":id" component={SiteContainer}>
         <IndexRedirect to="tree" />
         <Route path="tree" component={SitePagesContainer}>
-          <Route path=":fileName" component={SitePagesContainer} />
+          <Route path="(**/):fileName" component={SitePagesContainer} />
         </Route>
         <Route path="new/:branch(/:fileName)" component={SiteEditorContainer} isNewPage={true} />
         <Route path="edit/:branch/(**/):fileName" component={SiteEditorContainer}/>

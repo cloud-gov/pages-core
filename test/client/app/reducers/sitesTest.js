@@ -7,9 +7,8 @@ describe("sitesReducer", () => {
   let fixture;
   const SITE_ADDED = "hey, new site!";
   const SITE_ASSETS_RECEIVED = "Whoa. Assets.";
-  const SITE_CHILD_CONTENT_RECEIVED = "kids have contents.";
   const SITE_CONFIGS_RECEIVED = "Tasty configs!";
-  const SITE_CONTENTS_RECEIVED = "contents? we have contents!";
+  const SITE_FILES_RECEIVED = "contents? we have contents!";
   const SITE_DELETED = "bye, site.";
   const SITE_UPDATED = "change the site, please";
   const SITES_RECEIVED = "hey, sites!";
@@ -21,9 +20,8 @@ describe("sitesReducer", () => {
         siteActionTypes: {
           SITE_ADDED: SITE_ADDED,
           SITE_ASSETS_RECEIVED: SITE_ASSETS_RECEIVED,
-          SITE_CHILD_CONTENT_RECEIVED: SITE_CHILD_CONTENT_RECEIVED,
           SITE_CONFIGS_RECEIVED: SITE_CONFIGS_RECEIVED,
-          SITE_CONTENTS_RECEIVED: SITE_CONTENTS_RECEIVED,
+          SITE_FILES_RECEIVED: SITE_FILES_RECEIVED,
           SITE_DELETED: SITE_DELETED,
           SITE_UPDATED: SITE_UPDATED,
           SITES_RECEIVED: SITES_RECEIVED,
@@ -313,7 +311,7 @@ describe("sitesReducer", () => {
     ];
 
     const actual = fixture(existingSites, {
-      type: SITE_CONTENTS_RECEIVED,
+      type: SITE_FILES_RECEIVED,
       siteId: "siteToKeepCEOWIOIIJV",
       files: files
     });
@@ -344,7 +342,7 @@ describe("sitesReducer", () => {
     ];
 
     const actual = fixture(existingSites, {
-      type: SITE_CONTENTS_RECEIVED,
+      type: SITE_FILES_RECEIVED,
       siteId: "siteToKeep",
       files: files
     });
@@ -386,7 +384,7 @@ describe("sitesReducer", () => {
     ];
 
     const actual = fixture(existingSites, {
-      type: SITE_CONTENTS_RECEIVED,
+      type: SITE_FILES_RECEIVED,
       siteId: "siteToKeep",
       files: files
     });
@@ -431,7 +429,7 @@ describe("sitesReducer", () => {
     ];
 
     const actual = fixture(existingSites, {
-      type: SITE_CONTENTS_RECEIVED,
+      type: SITE_FILES_RECEIVED,
       siteId: "siteToKeep",
       files: files
     });
@@ -447,8 +445,8 @@ describe("sitesReducer", () => {
     expect(actual.length).to.equal(2);
     expect(site.files.length).to.equal(updatedSiteOne.files.length);
   });
-  
-  it("does nothing when given a child contents received action and the new site's id is not found", () => {
+
+  it("does nothing when given a files_received action and the new site's id is not found", () => {
     const siteOne = {
       id: "siteToKeep",
       oldData: true
@@ -461,164 +459,131 @@ describe("sitesReducer", () => {
 
     const existingSites = [ siteOne, siteTwo ];
 
-    const files = {
-      whatever: "punk",
-      what: "huh?"
-    };
+    const files = [
+      {path: "punk"},
+      {path: "huh?"}
+    ];
 
     const actual = fixture(existingSites, {
-      type: SITE_CHILD_CONTENT_RECEIVED,
+      type: SITE_FILES_RECEIVED,
       siteId: "siteToKeepCEOWIOIIJV"
     });
 
     expect(actual).to.deep.equal(existingSites);
   });
 
-  it("sets a site's 'childDirectoriesMap' property to map the action's path to the action's files when given a child content received action and the new site's id is found, without an existing childDirectoriesMap", () => {
+  it("returns files from action if no files are set on site", () => {
     const siteOne = {
-      id: "siteToKeep",
-      oldData: true
+      id: "siteToKeep"
     };
 
     const siteTwo = {
-      id: "anotherSiteToKeep",
-      oldData: true
+      id: "anotherSiteToKeep"
     };
 
     const existingSites = [ siteOne, siteTwo ];
 
-    const files = {
-      whatever: "punk",
-      what: "huh?"
-    };
-
-    const path = "/go/here/or/not";
+    const files = [
+      {path: "punk"},
+      {path: "huh?"}
+    ];
 
     const actual = fixture(existingSites, {
-      type: SITE_CHILD_CONTENT_RECEIVED,
+      type: SITE_FILES_RECEIVED,
       siteId: "siteToKeep",
-      files: files,
-      path: path
+      files: files
     });
 
     const updatedSiteOne = {
       id: "siteToKeep",
-      oldData: true,
-      childDirectoriesMap: {
-        "/go/here/or/not": files
-      }
+      files: files
     };
 
     expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
   });
 
-  it("sets a site's 'childDirectoriesMap' property to map the action's path to the action's files when given a child content received action and the new site's id is found, with an existing childDirectoriesMap", () => {
-    const path = "/go/here/or/not";
-    const existingPath = "/already/home";
-    const existingFiles = [ "previously on something something", "format TBD" ];
-    const existingChildDirectoriesMap = { };
-    existingChildDirectoriesMap[existingPath] = existingFiles;
+  it("returns a new files array with the union of the new and existing files", () => {
+    const existingFiles = [
+      { path: "previously on something something" },
+      { path: "format TBD" }
+    ];
 
     const siteOne = {
       id: "siteToKeep",
-      oldData: true,
-      childDirectoriesMap: existingChildDirectoriesMap
+      files: existingFiles
     };
 
     const siteTwo = {
-      id: "anotherSiteToKeep",
-      oldData: true
+      id: "anotherSiteToKeep"
     };
 
     const existingSites = [ siteOne, siteTwo ];
 
-    const files = [ "whatever", "punk",  "huh?" ];
+    const newFiles = [
+      {path: "punk"},
+      {path: "huh?"}
+    ];
 
     const actual = fixture(existingSites, {
-      type: SITE_CHILD_CONTENT_RECEIVED,
+      type: SITE_FILES_RECEIVED,
       siteId: "siteToKeep",
-      files: files,
-      path: path
+      files: newFiles
     });
 
     const updatedSiteOne = {
       id: "siteToKeep",
-      oldData: true,
-      childDirectoriesMap: {
-        "/already/home": existingFiles,
-        "/go/here/or/not": files
-      }
+      files: existingFiles.concat(newFiles)
+    };
+
+    const actualSiteOne = actual.find((site) => site.id === siteOne.id);
+
+    expect(actualSiteOne.files.length).to.equal(updatedSiteOne.files.length);
+  });
+
+  it("returns an empty array if action.files is missing and site has no files", () => {
+    const siteOne = {
+      id: "siteToKeep"
+    };
+
+    const siteTwo = {
+      id: "anotherSiteToKeep"
+    };
+
+    const existingSites = [ siteOne, siteTwo ];
+
+    const actual = fixture(existingSites, {
+      type: SITE_FILES_RECEIVED,
+      siteId: "siteToKeep"
+    });
+
+    const updatedSiteOne = {
+      id: "siteToKeep",
+      files: []
     };
 
     expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
   });
 
-  it("updates a site's 'childDirectoriesMap' property to map the action's path to the action's files when given a child content received action and the new site's id is found, with an existing childDirectoriesMap containing the path", () => {
-    const path = "/go/here/or/not";
-    const existingFiles = [ "previously on something something", "format TBD" ];
-    const existingChildDirectoriesMap = { };
-    existingChildDirectoriesMap[path] = existingFiles;
-
+  it("returns site's exisiting files if action.files is missing and site has files", () => {
     const siteOne = {
       id: "siteToKeep",
-      oldData: true,
-      childDirectoriesMap: existingChildDirectoriesMap
+      files: [{path: 'test'}]
     };
 
     const siteTwo = {
-      id: "anotherSiteToKeep",
-      oldData: true
+      id: "anotherSiteToKeep"
     };
 
     const existingSites = [ siteOne, siteTwo ];
 
-    const files = [ "whatever", "punk",  "huh?" ];
-
     const actual = fixture(existingSites, {
-      type: SITE_CHILD_CONTENT_RECEIVED,
-      siteId: "siteToKeep",
-      files: files,
-      path: path
+      type: SITE_FILES_RECEIVED,
+      siteId: "siteToKeep"
     });
 
     const updatedSiteOne = {
       id: "siteToKeep",
-      oldData: true,
-      childDirectoriesMap: {
-        "/go/here/or/not": files
-      }
-    };
-
-    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
-  });
-
-  it("sets a site's 'childDirectoriesMap' property to map the action's path to an empty array when given a child content received action and the new site's id is found... and the action doesn't have a files attribute", () => {
-    const siteOne = {
-      id: "siteToKeep",
-      oldData: true
-    };
-
-    const siteTwo = {
-      id: "anotherSiteToKeep",
-      oldData: true
-    };
-
-    const existingSites = [ siteOne, siteTwo ];
-
-    const path = "/go/here/or/not";
-
-    const actual = fixture(existingSites, {
-      type: SITE_CHILD_CONTENT_RECEIVED,
-      siteId: "siteToKeep",
-      path: path
-    });
-
-    const updatedSiteOne = {
-      id: "siteToKeep",
-      oldData: true,
-      childDirectoriesMap: {
-        "/go/here/or/not": []
-      }
+      files: [{path: 'test'}]
     };
 
     expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
@@ -689,7 +654,7 @@ describe("sitesReducer", () => {
     const fileContent = "yo dude, here's some content";
     const pathOne = "/here/is/path/one";
     const pathTwo = "/here/is/path/two";
-    
+
     const fileOne = {
       sha: fileSha,
       path: pathOne,
