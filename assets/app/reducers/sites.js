@@ -21,16 +21,19 @@ export default function sites(state = initialState, action) {
   case siteActionTypes.SITE_ASSETS_RECEIVED:
     return mapPropertyToMatchingSite(state, action.siteId, { assets: action.assets });
 
-  case siteActionTypes.SITE_CONTENTS_RECEIVED:
+  case siteActionTypes.SITE_FILES_RECEIVED:
+    const nextFiles = action.files || [];
     const site = state.find((site) => site.id === action.siteId);
+
     if (!site) return state;
+
     if (!site.files) {
       return mapPropertyToMatchingSite(state, action.siteId, {
-        files: action.files
+        files: nextFiles
       });
     }
 
-    let newFiles = action.files.map((file) => {
+    let newFiles = nextFiles.map((file) => {
       const exists = site.files.find((f) => f.path === file.path);
       if (!exists) return file;
 
@@ -48,20 +51,6 @@ export default function sites(state = initialState, action) {
 
   case siteActionTypes.SITE_DELETED:
     return state.filter((site) => site.id != action.siteId);
-
-  case siteActionTypes.SITE_CHILD_CONTENT_RECEIVED:
-    const nextMap = {};
-    nextMap[action.path || '/'] = action.files || [];
-
-    return state.map((site) => {
-      if (site.id !== action.siteId) return site;
-
-      const currentMap = site.childDirectoriesMap || {};
-
-      return Object.assign({}, site, {
-        childDirectoriesMap: Object.assign({}, currentMap, nextMap)
-      });
-    });
 
   case siteActionTypes.SITE_FILE_CONTENT_RECEIVED:
     const currentSite = state.find((site) => site.id === action.siteId);

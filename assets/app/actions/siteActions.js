@@ -119,7 +119,7 @@ export default {
       return this.fetchSiteAssets(site).then((site) => {
         return github.fetchRepositoryContent(site).then((files) => {
           store.dispatch({
-            type: siteActionTypes.SITE_CONTENTS_RECEIVED,
+            type: siteActionTypes.SITE_FILES_RECEIVED,
             siteId: site.id,
             files
           });
@@ -137,10 +137,10 @@ export default {
   },
 
   // todo rename to something like fetchTree
-  fetchContent(site, path) {
+  fetchFiles(site, path) {
     function dispatchChildContent(site, path, files) {
       store.dispatch({
-        type: siteActionTypes.SITE_CONTENTS_RECEIVED,
+        type: siteActionTypes.SITE_FILES_RECEIVED,
         siteId: site.id,
         files
       });

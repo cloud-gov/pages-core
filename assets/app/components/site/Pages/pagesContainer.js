@@ -42,7 +42,7 @@ class Pages extends React.Component {
     const files = filterByPath(this.props.site.files, this.props.params.fileName);
     if (nextFiles.length === files.length) return;
 
-    siteActions.fetchContent(site, params.fileName);
+    siteActions.fetchFiles(site, params.fileName);
   }
 
   getLinkFor(page, id, branch) {
