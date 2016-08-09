@@ -50,6 +50,10 @@ main {
   display: list-item;
 }
 
+li.list-group-item ul.list-group {
+  border-top: 2px solid black;
+}
+
 .list-group li:last-child {
   border-width: 0;
 }
