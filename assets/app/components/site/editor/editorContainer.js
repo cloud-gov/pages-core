@@ -5,6 +5,7 @@ import { decodeB64 } from '../../../util/encoding'
 import PageMetadata from './pageMetadata';
 import Codemirror from './codemirror';
 import Prosemirror from './prosemirror';
+import ImagePicker from './imagePicker';
 
 import documentStrategy from '../../../util/documentStrategy';
 
@@ -22,6 +23,8 @@ class Editor extends React.Component {
     this.state = {};
     this.submitFile = this.submitFile.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.onInsertImage = this.onInsertImage.bind(this);
+    this.onCancelInsertImage = this.onCancelInsertImage.bind(this);
   }
 
   componentDidMount() {
@@ -37,9 +40,21 @@ class Editor extends React.Component {
     this.setState(nextState);
   }
 
+  onInsertImage() {
+    this.setState({
+      imagePicker: true
+    });
+  }
+
+  onCancelInsertImage() {
+    this.setState({
+      imagePicker: false
+    });
+  }
+
   getStateWithProps(props) {
-    const file = this.getCurrentFile(props);
-    const path = file ? file.path : false;
+    const file = this.getCurrentFile(props) || {};
+    const path = file.path || false;
     const { frontmatter, markdown, raw, content } = documentStrategy(file);
 
     return {
@@ -49,7 +64,8 @@ class Editor extends React.Component {
       message: false,
       path,
       raw: content,
-      sha: file.sha || false
+      sha: file.sha || false,
+      imagePicker: false
     };
   }
 
@@ -126,11 +142,21 @@ class Editor extends React.Component {
     return null;
   }
 
+  getImagePicker() {
+    return !this.state.imagePicker ? null :
+      <ImagePicker
+        handleConfirm={function() {}}
+        handleUpload={function() {}}
+        handleCancel={this.onCancelInsertImage}
+        assets={this.props.site.assets}/>;
+  }
+
   render() {
     const computedMessage = this.getComputedMessage();
     return (
       <div>
         {this.getNewPage()}
+        {this.getImagePicker()}
         <Codemirror
           initialFrontmatterContent={ this.state.frontmatter }
           onChange={ (frontmatter) => {
@@ -142,6 +168,7 @@ class Editor extends React.Component {
           onChange={ (markdown) => {
             this.handleChange('markdown', markdown);
           }}
+          handleToggleImages={this.onInsertImage}
         />
         <div className="usa-alert usa-alert-info">
           <div className="usa-alert-body">

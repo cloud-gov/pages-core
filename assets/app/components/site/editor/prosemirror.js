@@ -2,14 +2,14 @@
 import React from 'react';
 import prosemirror from 'prosemirror';
 import { exampleSetup, buildMenuItems } from 'prosemirror/dist/example-setup'
-import { defaultMarkdownParser, defaultMarkdownSerializer } from 'prosemirror/dist/markdown';
-import { menuBar } from 'prosemirror/dist/menu';
+import { defaultMarkdownParser, defaultMarkdownSerializer, MarkdownParser } from 'prosemirror/dist/markdown';
+import { menuBar, insertItem, wrapListItem } from 'prosemirror/dist/menu';
 import { schema } from 'prosemirror/dist/schema-basic';
-
-const menu = buildMenuItems(schema);
+import {fedImageSchema, fedImageMenuItem} from './pmImageExtension';
 
 const propTypes = {
   initialMarkdownContent: React.PropTypes.string,
+  handleToggleImages: React.PropTypes.func.isRequired,
   onChange: React.PropTypes.func
 };
 
@@ -26,12 +26,35 @@ class Prosemirror extends React.Component {
   }
 
   componentDidMount() {
+    const { handleToggleImages } = this.props;
+    const customNodes = Object.assign({}, defaultMarkdownSerializer.nodes, {
+      image: (state, node) => {
+        const alt = state.esc(node.attrs.alt || '');
+        const src = state.esc(['{{ site.baseurl }}', node.attrs.src].join('/'));
+        const title = node.attrs.title;
+
+        state.write(`![${alt}](${src})`);
+      }
+    });
+
+    const newImage = insertItem(schema.nodes.image, {
+      label: 'Image',
+      attrs: (pm, callback) => {
+        handleToggleImages();
+      }
+    });
+
+    defaultMarkdownSerializer.nodes = customNodes;
+    const menu = buildMenuItems(schema);
+    menu.insertMenu.content[0] = newImage;
+
+
     this.editor = new prosemirror.ProseMirror({
       doc: defaultMarkdownParser.parse(this.props.initialMarkdownContent),
       place: document.getElementById('js-prosemirror-target'),
       schema: schema,
       plugins: [
-        menuBar.config({ content: menu.fullMenu })
+        exampleSetup.config({menuBar: {float: true, content: menu.fullMenu}})
       ]
     });
 
