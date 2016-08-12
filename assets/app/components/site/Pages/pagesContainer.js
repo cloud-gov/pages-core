@@ -16,7 +16,7 @@ class Pages extends React.Component {
   }
 
   componentDidMount() {
-    siteActions.fetchFiles(this.props.site, getPath(this.props.params));
+    fetchFiles(this.props.site, this.props.params);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -26,7 +26,7 @@ class Pages extends React.Component {
 
     if (files.length && nextFiles.length === files.length) return;
 
-    siteActions.fetchFiles(site, getPath(params));
+    fetchFiles(site, params);
   }
 
   render() {
@@ -46,6 +46,10 @@ class Pages extends React.Component {
   }
 }
 
+const fetchFiles = (site, params) => {
+  siteActions.fetchFiles(site, getPath(params));
+};
+
 const getPath = (routeParams) => {
   const { splat, fileName } = routeParams;
   let path = '';
@@ -64,7 +68,7 @@ const getFilesByPath = (files = [], startingPath = '') => {
   const isRoot = (startingPath === '');
   const path = (!isRoot) ? `${startingPath}/` : '((?!/).)*$';
   const startsWithPath = new RegExp(`^${path}`);
-  
+
   return files.filter((file) => startsWithPath.test(file.path));
 };
 
