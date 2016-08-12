@@ -25,6 +25,7 @@ class Editor extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.onInsertImage = this.onInsertImage.bind(this);
     this.onCancelInsertImage = this.onCancelInsertImage.bind(this);
+    this.onUpload = this.onUpload.bind(this);
   }
 
   componentDidMount() {
@@ -146,9 +147,13 @@ class Editor extends React.Component {
     return !this.state.imagePicker ? null :
       <ImagePicker
         handleConfirm={function() {}}
-        handleUpload={function() {}}
+        handleUpload={this.onUpload}
         handleCancel={this.onCancelInsertImage}
         assets={this.props.site.assets}/>;
+  }
+
+  onUpload(file) {
+    console.log('A file', file);
   }
 
   render() {

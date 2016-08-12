@@ -1,4 +1,5 @@
 import React from 'react';
+import FileInput from './fileInput';
 
 const propTypes = {
   assets: React.PropTypes.array,
@@ -10,10 +11,26 @@ const propTypes = {
 class ImagePicker extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      openDialog: false
+    };
+
+    this.handleFileDialog = this.handleFileDialog.bind(this);
+  }
+
+  handleFileDialog() {
+    this.setState({
+      openDialog: true
+    });
   }
 
   render() {
-    const { assets, handleCancel, handleConfirm, handleUpload } = this.props;
+    const {
+      assets,
+      handleCancel,
+      handleConfirm,
+      handleUpload } = this.props;
 
     return (
       <div>
@@ -22,10 +39,16 @@ class ImagePicker extends React.Component {
           <div className="panel-body">
             <div className="image-cards">
               <div className="image-card">
-                <a className="usa-button">Upload a new image</a>
+                <a className="usa-button"
+                  onClick={this.handleFileDialog}
+                >Upload a new image</a>
                 <label htmlFor="file" style={{visibility: "hidden"}}>
                   Upload a new file from your computer.
                 </label>
+                <FileInput
+                  open={this.state.openDialog}
+                  onFileSelect={handleUpload}
+                />
                 <input type="file" id="asset" name="asset" style={{visibility: "hidden"}}/>
               </div>
             </div>
