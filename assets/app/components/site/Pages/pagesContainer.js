@@ -8,45 +8,23 @@ const propTypes = {
   site: React.PropTypes.object
 };
 
-const filterByPath = (files = [], startingPath = '') => {
-  const isRoot = (startingPath === '');
-  const path = (!isRoot) ? `${startingPath}/` : '((?!/).)*$';
-  const startsWithPath = new RegExp(`^${path}`);
-  const f = files.filter((file) => startsWithPath.test(file.path));
-
-  return f;
-};
-
-const getPath = (routeParams) => {
-  const { splat, fileName } = routeParams;
-  let path = '';
-
-  if (splat) {
-    path = `${splat}/${fileName}`;
-  }
-  else if (fileName) {
-    path = fileName;
-  }
-
-  return path;
-};
-
 class Pages extends React.Component {
   constructor(props) {
     super(props);
   }
 
   componentDidMount() {
-    siteActions.fetchFiles(this.props.site, getPath(this.props.params));
+    siteActions.fetchFiles(this.props.site, this.getPath(this.props.params));
   }
 
   componentWillReceiveProps(nextProps) {
     const { params, site } = nextProps;
-    const nextFiles = filterByPath(site.files, params.fileName);
-    const files = filterByPath(this.props.site.files, this.props.params.fileName);
-    if (nextFiles.length === files.length) return;
+    const nextFiles = this.getFilesByPath(site.files, this.getPath(params));
+    const files = this.getFilesByPath(site.files, this.getPath(params));
 
-    siteActions.fetchFiles(site, getPath(params));
+    if (files.length && nextFiles.length === files.length) return;
+
+    siteActions.fetchFiles(site, this.getPath(params));
   }
 
   getLinkFor(page, id, branch) {
@@ -54,6 +32,29 @@ class Pages extends React.Component {
 
     return this.isDir(page) ?
       `/sites/${id}/tree/${path}` : `/sites/${id}/edit/${branch}/${path}`;
+  }
+
+  getPath(routeParams) {
+    const { splat, fileName } = routeParams;
+    let path = '';
+
+    if (splat) {
+      path = `${splat}/${fileName}`;
+    }
+    else if (fileName) {
+      path = fileName;
+    }
+
+    return path;
+  }
+
+
+  getFilesByPath(files = [], startingPath = '') {
+    const isRoot = (startingPath === '');
+    const path = (!isRoot) ? `${startingPath}/` : '((?!/).)*$';
+    const startsWithPath = new RegExp(`^${path}`);
+
+    return files.filter((file) => startsWithPath.test(file.path));
   }
 
   getButtonCopy(file) {
@@ -65,19 +66,20 @@ class Pages extends React.Component {
   }
 
   render() {
-    const { fileName } = this.props.params;
-    const { site } = this.props;
+    const { site, params } = this.props;
+    const { fileName } = params;
+    let files;
 
     if (!site) {
       return null;
     }
 
-    const files = filterByPath(site.files, getPath(this.props.params)) || [];
+    files = this.getFilesByPath(site.files, this.getPath(params)) || [];
 
     return (
       <ul className="list-group">
         {files.map((page, index) => {
-          const { id, branch, defaultBranch } = this.props.site;
+          const { id, branch, defaultBranch } = site;
 
           return (
             <PageListItem key={index} pageName={page.name}>
