@@ -23,12 +23,10 @@ class App extends React.Component {
 
     // clear an existing alert message if stale, or flag it to be removed on
     // the next route transition
-    if (lastKey !== nextKey) {
-      if (alert.message && alert.stale) {
-        alertActions.clear();
-      } else {
-        alertActions.setStale();
-      }
+    if (lastKey === nextKey) return;
+
+    if (alert.message) {
+      alertActions[alert.stale ? 'clear' : 'setStale']();
     }
   }
 
