@@ -64,6 +64,15 @@ export default function sites(state = initialState, action) {
     if (!exists) files.push(action.file);
     return mapPropertyToMatchingSite(state, action.siteId, {files});
 
+  case siteActionTypes.SITE_UPLOAD_RECEIVED:
+    const aSite = state.find((site) => site.id === action.siteId);
+    const uploads = aSite.uploads || [];
+    const nextUploads = uploads.concat(Array.isArray(action.files) ? action.files : [action.files]);
+
+    return mapPropertyToMatchingSite(state, action.siteId, {
+      uploads: nextUploads
+    });
+
   default:
     return state;
   }

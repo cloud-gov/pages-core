@@ -12,6 +12,8 @@ import documentStrategy from '../../../util/documentStrategy';
 import alertActions from '../../../actions/alertActions';
 import siteActions from '../../../actions/siteActions';
 
+import convertImageToData from '../../../util/convertImageToData';
+
 const propTypes = {
   site: React.PropTypes.object
 };
@@ -29,10 +31,9 @@ class Editor extends React.Component {
   }
 
   componentDidMount() {
-    // trigger the fetch file content action for the case
-    // when a user first loads this view. That could be
-    // a changing of the route to a site for the first time
-    // or directly loading the url
+    // This action should be triggered when a user first loads this view,
+    // either visiting it directly from the url bar or navigating here
+    // with react router
     siteActions.fetchFileContent(this.props.site, this.path);
   }
 
@@ -153,15 +154,34 @@ class Editor extends React.Component {
   }
 
   onUpload(file) {
-    console.log('A file', file);
+    const { site, routeParams } = this.props;
+
+    // TODO: should an action creator do this? Do we want a seperate action for
+    // uploading images (and possibly other file types in the future) that
+    // conforms to the createCommit interface in the github api service?
+    convertImageToData(file).then(function (fileData) {
+      const fileName = file.name;
+      // TODO: hardcoded for now, will need to parse the _config.yml file
+      // at some point in the future to dtermine if the federalist user has
+      // specified a different content directory
+      const path = `uploads/${fileName}`;
+      const message = `Uploads ${fileName} to project`;
+
+      siteActions.createCommit(site, path, fileData, message);
+    });
   }
 
+  // TODO: break up this component. We need an intermediate form component that
+  // handles submission of the form content. This container should just render
+  // the form and the image picker, and probably call actions after content has
+  // been verified.
   render() {
     const computedMessage = this.getComputedMessage();
+
     return (
       <div>
-        {this.getNewPage()}
         {this.getImagePicker()}
+        {this.getNewPage()}
         <Codemirror
           initialFrontmatterContent={ this.state.frontmatter }
           onChange={ (frontmatter) => {

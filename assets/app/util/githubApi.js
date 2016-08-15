@@ -109,7 +109,7 @@ const github = {
 
   /**
    * creates a new github repo at the user's account
-   * @param  {Object} destination Repo ro be created
+   * @param  {Object} destination Repo to be created
    *                              keys:
    *                              	repo: String:required
    *                              	organization: String (default to 'user')
