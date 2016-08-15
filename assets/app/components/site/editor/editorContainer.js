@@ -164,7 +164,7 @@ class Editor extends React.Component {
       // TODO: hardcoded for now, will need to parse the _config.yml file
       // at some point in the future to dtermine if the federalist user has
       // specified a different content directory
-      const path = `uploads/${fileName}`;
+      const path = `assets/${fileName}`;
       const message = `Uploads ${fileName} to project`;
 
       siteActions.createCommit(site, path, fileData, message);

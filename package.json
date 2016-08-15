@@ -11,6 +11,7 @@
     "bcryptjs": "^2.1.0",
     "browserify": "^10.2.4",
     "cfenv": "^1.0.0",
+    "classname": "0.0.0",
     "codemirror": "^5.6.0",
     "connect-redis": "1.4.5",
     "db-migrate": "^0.9.17",

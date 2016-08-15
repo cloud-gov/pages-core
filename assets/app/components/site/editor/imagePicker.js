@@ -1,5 +1,6 @@
 import React from 'react';
 import FileInput from './fileInput';
+import ImageCard from './imageCard';
 
 const propTypes = {
   assets: React.PropTypes.array,
@@ -13,10 +14,33 @@ class ImagePicker extends React.Component {
     super(props);
 
     this.state = {
-      openDialog: false
+      openDialog: false,
+      selected: null
     };
 
+    this.handleSelect = this.handleSelect.bind(this);
     this.handleFileDialog = this.handleFileDialog.bind(this);
+  }
+
+  getImageCards() {
+    const { assets } = this.props;
+    const { selected } = this.state;
+
+    return assets.map((asset, index) => {
+      return (
+        <ImageCard
+          asset={asset}
+          key={index}
+          handleSelect={this.handleSelect}
+          selected={selected} />
+      );
+    });
+  }
+
+  handleSelect(fileName) {
+    this.setState({
+      selected: fileName
+    });
   }
 
   handleFileDialog() {
@@ -27,7 +51,6 @@ class ImagePicker extends React.Component {
 
   render() {
     const {
-      assets,
       handleCancel,
       handleConfirm,
       handleUpload } = this.props;
@@ -38,18 +61,21 @@ class ImagePicker extends React.Component {
           <div className="panel-heading">Select an image</div>
           <div className="panel-body">
             <div className="image-cards">
-              <div className="image-card">
-                <a className="usa-button"
-                  onClick={this.handleFileDialog}
-                >Upload a new image</a>
-                <label htmlFor="file" style={{visibility: "hidden"}}>
-                  Upload a new file from your computer.
-                </label>
-                <FileInput
-                  open={this.state.openDialog}
-                  onFileSelect={handleUpload}
-                />
-                <input type="file" id="asset" name="asset" style={{visibility: "hidden"}}/>
+              <div className="scroll">
+                <div className="image-card">
+                  <a className="usa-button"
+                    onClick={this.handleFileDialog}
+                  >Upload a new image</a>
+                  <label htmlFor="file" style={{visibility: "hidden"}}>
+                    Upload a new file from your computer.
+                  </label>
+                  <FileInput
+                    open={this.state.openDialog}
+                    onFileSelect={handleUpload}
+                  />
+                  <input type="file" id="asset" name="asset" style={{visibility: "hidden"}}/>
+                </div>
+                {this.getImageCards(this.props, this.state)}
               </div>
             </div>
 

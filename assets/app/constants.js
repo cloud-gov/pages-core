@@ -62,8 +62,7 @@ export const siteActionTypes = keymirror({
   SITE_FILES_RECEIVED: null,
   SITE_FILE_ADDED: null,
   // When an individual file/path is received
-  SITE_FILE_CONTENT_RECEIVED: null,
-  SITE_UPLOAD_RECEIVED: null
+  SITE_FILE_CONTENT_RECEIVED: null
 
 });
 

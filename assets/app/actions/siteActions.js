@@ -133,16 +133,14 @@ export default {
   fetchSiteConfigsAndAssets(site) {
     return this.fetchSiteConfigs(site).then((site) => {
       return this.fetchSiteAssets(site).then((site) => {
-        return this.fetchUploads(site).then((site) => {
-          return github.fetchRepositoryContent(site).then((files) => {
-            store.dispatch({
-              type: siteActionTypes.SITE_FILES_RECEIVED,
-              siteId: site.id,
-              files
-            });
-
-            return files;
+        return github.fetchRepositoryContent(site).then((files) => {
+          store.dispatch({
+            type: siteActionTypes.SITE_FILES_RECEIVED,
+            siteId: site.id,
+            files
           });
+
+          return files;
         });
       });
     }).catch((error) => {
@@ -168,19 +166,6 @@ export default {
       .then(
         dispatchChildContent.bind(null, site, path)
       ).catch(error => alertActions.httpError(error.message));
-  },
-
-  fetchUploads(site) {
-    const siteId = site.id;
-    return github.fetchRepositoryContent(site, 'uploads').then((files) => {
-      store.dispatch({
-        type: siteActionTypes.SITE_UPLOAD_RECEIVED,
-        siteId,
-        files
-      });
-
-      return site;
-    });
   },
 
   fetchFileContent(site, path) {
