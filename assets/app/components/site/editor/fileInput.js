@@ -33,6 +33,12 @@ class FileInput extends React.Component {
   handleChange(event) {
     const file = event.target.files[0];
 
+    // TODO: do we want this file size logic etc to be passed in via props?
+    // do we want the parent to handle validation? Should one file input be
+    // responsible for multiple file types, and, if so, where does that validation logic live?
+    // Maybe just a util file with a fileTypeValdiation object that looks up
+    // the type of file and sees if the uploaded file is one that is whitelisted
+    // and the size is within filesize limits
     if (file.size <= MAX_FILE_SIZE) {
       this.props.onFileSelect(file);
     } else {

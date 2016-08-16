@@ -2,11 +2,10 @@
 import React from 'react';
 import prosemirror from 'prosemirror';
 import { exampleSetup, buildMenuItems } from 'prosemirror/dist/example-setup'
-import { defaultMarkdownParser, defaultMarkdownSerializer, MarkdownParser } from 'prosemirror/dist/markdown';
-import { menuBar, insertItem, wrapListItem } from 'prosemirror/dist/menu';
+import { markdownParser, markdownSerializer } from '../../../util/pmParserExtension';
+import menuImageExtension from '../../../util/pmImageExtension';
 import { schema } from 'prosemirror/dist/schema-basic';
-import {fedImageSchema, fedImageMenuItem} from './pmImageExtension';
-
+debugger
 const propTypes = {
   initialMarkdownContent: React.PropTypes.string,
   handleToggleImages: React.PropTypes.func.isRequired,
@@ -27,30 +26,10 @@ class Prosemirror extends React.Component {
 
   componentDidMount() {
     const { handleToggleImages } = this.props;
-    const customNodes = Object.assign({}, defaultMarkdownSerializer.nodes, {
-      image: (state, node) => {
-        const alt = state.esc(node.attrs.alt || '');
-        const src = state.esc(['{{ site.baseurl }}', node.attrs.src].join('/'));
-        const title = node.attrs.title;
-
-        state.write(`![${alt}](${src})`);
-      }
-    });
-
-    const newImage = insertItem(schema.nodes.image, {
-      label: 'Image',
-      attrs: (pm, callback) => {
-        handleToggleImages();
-      }
-    });
-
-    defaultMarkdownSerializer.nodes = customNodes;
-    const menu = buildMenuItems(schema);
-    menu.insertMenu.content[0] = newImage;
-
+    const menu = menuImageExtension(handleToggleImages);
 
     this.editor = new prosemirror.ProseMirror({
-      doc: defaultMarkdownParser.parse(this.props.initialMarkdownContent),
+      doc: markdownParser.parse(this.props.initialMarkdownContent),
       place: document.getElementById('js-prosemirror-target'),
       schema: schema,
       plugins: [
@@ -59,6 +38,7 @@ class Prosemirror extends React.Component {
     });
 
     this.editor.on.change.add(() => {
+      console.log('change')
       this.props.onChange(this.toMarkdown());
     });
   }
@@ -66,10 +46,20 @@ class Prosemirror extends React.Component {
   componentWillReceiveProps(nextProps) {
     const markdown = this.toMarkdown();
     const sameContent = (markdown === nextProps.initialMarkdownContent);
+    const { selected } = nextProps;
 
     if (sameContent) return;
 
-    const doc = defaultMarkdownParser.parse(nextProps.initialMarkdownContent);
+    if (selected) {
+      const imgNode = this.editor.schema.nodeType('image').create({
+        src: selected.download_url,
+        title: selected.name,
+        alt: selected.name
+      });
+      this.editor.tr.insertInline(this.editor.selection.head, imgNode).apply();
+    }
+
+    const doc = markdownParser.parse(nextProps.initialMarkdownContent);
     this.editor.setDoc(doc);
   }
 
@@ -81,7 +71,7 @@ class Prosemirror extends React.Component {
   }
 
   toMarkdown() {
-    return defaultMarkdownSerializer.serialize(this.editor.doc);
+    return markdownSerializer.serialize(this.editor.doc);
   }
 
   render() {

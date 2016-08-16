@@ -27,6 +27,7 @@ class Editor extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.onInsertImage = this.onInsertImage.bind(this);
     this.onCancelInsertImage = this.onCancelInsertImage.bind(this);
+    this.onConfirmInsertImage = this.onConfirmInsertImage.bind(this);
     this.onUpload = this.onUpload.bind(this);
   }
 
@@ -45,6 +46,12 @@ class Editor extends React.Component {
   onInsertImage() {
     this.setState({
       imagePicker: true
+    });
+  }
+
+  onConfirmInsertImage(fileName) {
+    this.setState({
+      selected: this.props.site.assets.find((asset) => asset.path === fileName)
     });
   }
 
@@ -99,14 +106,14 @@ class Editor extends React.Component {
   }
 
   handleChange(name, value) {
-    const nextState = {};
+    const nextState = {};//{selected: null};
     nextState[name] = value;
     this.setState(nextState);
   }
 
   getCurrentFile(props) {
-    props = props || { site: {} };
     const files = props.site.files || [];
+
     return files.find((file) => {
       return file.path === this.path;
     });
@@ -147,7 +154,7 @@ class Editor extends React.Component {
   getImagePicker() {
     return !this.state.imagePicker ? null :
       <ImagePicker
-        handleConfirm={function() {}}
+        handleConfirm={this.onConfirmInsertImage}
         handleUpload={this.onUpload}
         handleCancel={this.onCancelInsertImage}
         assets={this.props.site.assets}/>;
@@ -194,6 +201,7 @@ class Editor extends React.Component {
             this.handleChange('markdown', markdown);
           }}
           handleToggleImages={this.onInsertImage}
+          selected={this.state.selected}
         />
         <div className="usa-alert usa-alert-info">
           <div className="usa-alert-body">

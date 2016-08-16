@@ -6,7 +6,8 @@ const propTypes = {
   assets: React.PropTypes.array,
   handleCancel: React.PropTypes.func.isRequired,
   handleConfirm: React.PropTypes.func.isRequired,
-  handleUpload: React.PropTypes.func.isRequired
+  handleUpload: React.PropTypes.func.isRequired,
+  handleConfirm: React.PropTypes.func.isRequired
 };
 
 class ImagePicker extends React.Component {
@@ -20,6 +21,7 @@ class ImagePicker extends React.Component {
 
     this.handleSelect = this.handleSelect.bind(this);
     this.handleFileDialog = this.handleFileDialog.bind(this);
+    this.handleConfirm = this.handleConfirm.bind(this);
   }
 
   getImageCards() {
@@ -41,6 +43,14 @@ class ImagePicker extends React.Component {
     this.setState({
       selected: fileName
     });
+
+
+  }
+
+  handleConfirm() {
+    if (this.state.selected) {
+      this.props.handleConfirm(this.state.selected);
+    }
   }
 
   handleFileDialog() {
@@ -52,7 +62,6 @@ class ImagePicker extends React.Component {
   render() {
     const {
       handleCancel,
-      handleConfirm,
       handleUpload } = this.props;
 
     return (
@@ -85,7 +94,7 @@ class ImagePicker extends React.Component {
                 role="button"
               >Cancel</a>
               <a className="usa-button usa-button-primary"
-                onClick={handleConfirm}
+                onClick={this.handleConfirm}
                 role="button"
               >Use Image</a>
               <span className="usa-label" id="upload-status-result" style={{display: "none"}}></span>
