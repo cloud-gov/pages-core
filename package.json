@@ -64,9 +64,12 @@
   "scripts": {
     "install": "npm run uswds && npm run codemirror && npm run migrate:up",
     "build": "npm run browserify && npm run sass && npm run autoprefixer",
+    "dev:build": "npm run dev:browserify && npm run sass && npm run autoprefixer",
     "start": "npm run build && node app.js",
+    "dev:start": "npm run dev:build && node app.js",
     "debug": "node debug app.js",
     "browserify": "browserify assets/app/main.js -o assets/js/bundle.js -t [ babelify --presets [ es2015 react ] ]",
+    "dev:browserify": "NODE_ENV=development browserify --debug assets/app/main.js -o assets/js/bundle.js -t [ babelify --presets [ es2015 react ] ]",
     "sass": "node-sass assets/styles/styles.scss -o assets/styles",
     "autoprefixer": "postcss --use autoprefixer -r assets/styles/styles.css",
     "watch": "npm run uswds && node app.js & npm run watch:client",
