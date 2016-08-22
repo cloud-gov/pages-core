@@ -10,6 +10,8 @@ const propTypes = {
   selected: React.PropTypes.object
 };
 
+let rendered = false;
+
 class EditorContents extends React.Component {
   constructor(props) {
     super(props);

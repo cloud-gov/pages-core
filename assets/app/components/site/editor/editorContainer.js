@@ -5,6 +5,8 @@ import { decodeB64 } from '../../../util/encoding'
 import PageMetadata from './pageMetadata';
 import EditorContents from './editorContents';
 import ImagePicker from './imagePicker';
+import Codemirror from './codemirror';
+import Prosemirror from './prosemirror';
 
 import documentStrategy from '../../../util/documentStrategy';
 
@@ -17,6 +19,8 @@ const propTypes = {
   site: React.PropTypes.object
 };
 
+let insertFn;
+
 class Editor extends React.Component {
   constructor(props) {
     super(props);
@@ -24,8 +28,8 @@ class Editor extends React.Component {
     this.state = {};
     this.submitFile = this.submitFile.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.onInsertImage = this.onInsertImage.bind(this);
-    this.onCancelInsertImage = this.onCancelInsertImage.bind(this);
+    this.onSelectImagePicker = this.onSelectImagePicker.bind(this);
+    this.onCloseImagePicker = this.onCloseImagePicker.bind(this);
     this.onConfirmInsertImage = this.onConfirmInsertImage.bind(this);
     this.onUpload = this.onUpload.bind(this);
   }
@@ -42,19 +46,22 @@ class Editor extends React.Component {
     this.setState(nextState);
   }
 
-  onInsertImage() {
+  registerInsertImageFn(fn) {
+    insertFn = fn;
+  }
+
+  onSelectImagePicker() {
     this.setState({
       imagePicker: true
     });
   }
 
   onConfirmInsertImage(fileName) {
-    this.setState({
-      selected: this.props.site.assets.find((asset) => asset.path === fileName)
-    });
+    const asset = this.props.site.assets.find((asset) => asset.path === fileName);
+    insertFn(asset);
   }
 
-  onCancelInsertImage() {
+  onCloseImagePicker() {
     this.setState({
       imagePicker: false
     });
@@ -105,7 +112,7 @@ class Editor extends React.Component {
   }
 
   handleChange(name, value) {
-    const nextState = {};//{selected: null};
+    const nextState = {};
     nextState[name] = value;
     this.setState(nextState);
   }
@@ -115,7 +122,7 @@ class Editor extends React.Component {
 
     return files.find((file) => {
       return file.path === this.path;
-    });
+    }) || {};
   }
 
   get path() {
@@ -135,7 +142,7 @@ class Editor extends React.Component {
   }
 
   getNewPage() {
-    // TODO: would love to know if there is a way to pass props without typing it
+    // TODO: would love to know if there is a way to pass props without tying it
     // to the react-router route property
     const newPage = this.props.route.isNewPage;
 
@@ -155,8 +162,9 @@ class Editor extends React.Component {
       <ImagePicker
         handleConfirm={this.onConfirmInsertImage}
         handleUpload={this.onUpload}
-        handleCancel={this.onCancelInsertImage}
-        assets={this.props.site.assets}/>;
+        handleCancel={this.onCloseImagePicker}
+        assets={this.props.site.assets}
+      />;
   }
 
   onUpload(file) {
@@ -182,18 +190,30 @@ class Editor extends React.Component {
   // the form and the image picker, and probably call actions after content has
   // been verified.
   render() {
+    const { props } = this;
     const computedMessage = this.getComputedMessage();
+    const file = this.getCurrentFile(props);
+    const content = decodeB64(file.content);
+    const { frontmatter, markdown } = this.splitContent(content);
 
     return (
       <div>
         {this.getImagePicker()}
         {this.getNewPage()}
-        <EditorContents
-          frontmatter={ this.state.frontmatter }
-          handleChange={this.handleChange}
-          markdown={ this.state.markdown }
-          handleToggleImages={this.onInsertImage}
-          selected={this.state.selected}
+
+        <Codemirror
+          initialFrontmatterContent={ frontmatter }
+          onChange={ (frontmatter) => {
+            this.handleChange('frontmatter', frontmatter)
+          }}
+        />
+        <Prosemirror
+          initialMarkdownContent={ markdown }
+          onChange={ (markdown) => {
+            this.handleChange('markdown', markdown);
+          }}
+          handleToggleImages={this.onSelectImagePicker}
+          registerInsertImage={this.registerInsertImageFn}
         />
         <div className="usa-alert usa-alert-info">
           <div className="usa-alert-body">
