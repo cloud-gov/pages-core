@@ -3,8 +3,7 @@ import React from 'react';
 import { decodeB64 } from '../../../util/encoding'
 
 import PageMetadata from './pageMetadata';
-import Codemirror from './codemirror';
-import Prosemirror from './prosemirror';
+import EditorContents from './editorContents';
 import ImagePicker from './imagePicker';
 
 import documentStrategy from '../../../util/documentStrategy';
@@ -189,17 +188,10 @@ class Editor extends React.Component {
       <div>
         {this.getImagePicker()}
         {this.getNewPage()}
-        <Codemirror
-          initialFrontmatterContent={ this.state.frontmatter }
-          onChange={ (frontmatter) => {
-            this.handleChange('frontmatter', frontmatter)
-          }}
-        />
-        <Prosemirror
-          initialMarkdownContent={ this.state.markdown }
-          onChange={ (markdown) => {
-            this.handleChange('markdown', markdown);
-          }}
+        <EditorContents
+          frontmatter={ this.state.frontmatter }
+          handleChange={this.handleChange}
+          markdown={ this.state.markdown }
           handleToggleImages={this.onInsertImage}
           selected={this.state.selected}
         />

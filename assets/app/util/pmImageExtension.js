@@ -2,11 +2,18 @@ import { buildMenuItems } from 'prosemirror/dist/example-setup'
 import { insertItem } from 'prosemirror/dist/menu';
 import { schema } from 'prosemirror/dist/schema-basic';
 
-const menuImageExtension = (callback) => {
+const menuImageExtension = (onMenuItemSelect) => {
+  if (typeof onMenuItemSelect !== 'function') {
+    console.warn('menuImageExtension expects a function as it\'s sole argument.');
+  }
+
+  const onSelect = typeof onMenuItemSelect === 'function' && onMenuItemSelect ||
+    function () {};
+
   const newImage = insertItem(schema.nodes.image, {
     label: 'Image',
     attrs: (pm, callback) => {
-      handleToggleImages();
+      onSelect();
     }
   });
 

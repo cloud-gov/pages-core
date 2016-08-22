@@ -1,11 +1,11 @@
 
 import React from 'react';
 import prosemirror from 'prosemirror';
-import { exampleSetup, buildMenuItems } from 'prosemirror/dist/example-setup'
+import { exampleSetup } from 'prosemirror/dist/example-setup'
 import { markdownParser, markdownSerializer } from '../../../util/pmParserExtension';
 import menuImageExtension from '../../../util/pmImageExtension';
 import { schema } from 'prosemirror/dist/schema-basic';
-debugger
+
 const propTypes = {
   initialMarkdownContent: React.PropTypes.string,
   handleToggleImages: React.PropTypes.func.isRequired,
@@ -38,26 +38,25 @@ class Prosemirror extends React.Component {
     });
 
     this.editor.on.change.add(() => {
-      console.log('change')
       this.props.onChange(this.toMarkdown());
     });
   }
 
   componentWillReceiveProps(nextProps) {
-    const markdown = this.toMarkdown();
+    const markdown = this.props.initialMarkdownContent;
     const sameContent = (markdown === nextProps.initialMarkdownContent);
     const { selected } = nextProps;
 
     if (sameContent) return;
 
-    if (selected) {
-      const imgNode = this.editor.schema.nodeType('image').create({
-        src: selected.download_url,
-        title: selected.name,
-        alt: selected.name
-      });
-      this.editor.tr.insertInline(this.editor.selection.head, imgNode).apply();
-    }
+      //  if (selected) {
+      //    const imgNode = this.editor.schema.nodeType('image').create({
+      //      src: selected.download_url,
+      //      title: selected.name,
+      //      alt: selected.name
+      //    });
+      //    this.editor.tr.insertInline(this.editor.selection.head, imgNode).apply();
+      //  }
 
     const doc = markdownParser.parse(nextProps.initialMarkdownContent);
     this.editor.setDoc(doc);
