@@ -34,13 +34,20 @@ module.exports.http = {
   * router is invoked by the "router" middleware below.)                     *
   *                                                                          *
   ***************************************************************************/
+  requestLogger: function(req, res, next) {
+    if (sails.config.environment === 'development') {
+      console.log("Requested :: ", req.method, req.url);
+    }
+
+    next();
+  },
 
   order: [
     'forceSSL',
     'startRequestTimer',
     'cookieParser',
     'session',
-    'myRequestLogger',
+    'requestLogger',
     'bodyParser',
     'handleBodyParserError',
     'compress',

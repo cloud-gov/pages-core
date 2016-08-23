@@ -18,9 +18,7 @@
 
 html,
 body,
-main,
-main > div,
-.usa-grid.site {
+main {
   height: 100%;
 }
 
@@ -50,6 +48,10 @@ main > div,
   box-sizing: border-box;
   border-bottom: 2px solid black;
   display: list-item;
+}
+
+li.list-group-item ul.list-group {
+  border-top: 2px solid black;
 }
 
 .list-group li:last-child {

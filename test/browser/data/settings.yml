@@ -1,8 +1,0 @@
----
-title: 'Fake document'
-layout: 'fake'
-settings:
-  - console
-  - colors
-testing: true
----

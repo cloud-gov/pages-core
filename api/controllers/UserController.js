@@ -24,7 +24,9 @@ module.exports = {
         repository = req.param('repository'),
         user = req.user;
 
-    if (!owner || !repository) return res.badRequest('Please specify a repository owner and name.');
+    if (!owner || !repository) {
+      return res.badRequest('Please specify a repository owner and name.')
+    }
 
     async.series([
       checkPermissions,
