@@ -1,16 +1,17 @@
 
 .image-cards {
   margin-bottom: 1em;
-  overflow-x: scroll;
   width: 100%;
 }
 
 .image-cards .scroll{
   display: flex;
+  flex-wrap: wrap;
 }
 
 .image-card {
   background-color: #ccc;
+  margin-bottom: 1em;
   margin-right: 1em;
   min-height: 200px;
   position: relative;

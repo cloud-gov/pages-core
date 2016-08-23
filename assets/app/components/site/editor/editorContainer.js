@@ -25,7 +25,10 @@ class Editor extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = Object.assign({}, {
+      imagePicker: false
+    }, this.getStateWithProps(props));
+
     this.submitFile = this.submitFile.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.onOpenImagePicker = this.onOpenImagePicker.bind(this);
@@ -79,8 +82,7 @@ class Editor extends React.Component {
       message: false,
       path,
       raw: content,
-      sha: file.sha || false,
-      imagePicker: false
+      sha: file.sha || false
     };
   }
 
@@ -179,7 +181,7 @@ class Editor extends React.Component {
       const path = `assets/${fileName}`;
       const message = `Uploads ${fileName} to project`;
 
-      siteActions.createCommit(site, path, fileData, message);
+      siteActions.uploadFile(site, path, fileData, message);
     });
   }
 

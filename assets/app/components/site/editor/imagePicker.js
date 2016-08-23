@@ -84,7 +84,7 @@ class ImagePicker extends React.Component {
                   />
                   <input type="file" id="asset" name="asset" style={{visibility: "hidden"}}/>
                 </div>
-                {this.getImageCards(this.props, this.state)}
+                {this.getImageCards()}
               </div>
             </div>
 

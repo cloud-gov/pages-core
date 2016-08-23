@@ -3,7 +3,7 @@ import prosemirror from 'prosemirror';
 import { exampleSetup } from 'prosemirror/dist/example-setup'
 import { markdownParser, markdownSerializer } from '../../../util/pmParserExtension';
 import { schema } from 'prosemirror/dist/schema-basic';
-import menuImageMenuExtension from '../../../util/pmImageMenuExtension';
+import menuImageExtension from '../../../util/pmImageMenuExtension';
 
 const propTypes = {
   initialMarkdownContent: React.PropTypes.string,

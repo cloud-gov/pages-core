@@ -60,6 +60,7 @@ export default {
       content: fileData,
       message: message
     };
+    const siteId = site.id;
 
     github.createCommit(site, path, commit).then((commitObj) => {
       alertActions.alertSuccess('File uploaded successfully');
@@ -67,9 +68,9 @@ export default {
       store.dispatch({
         type: siteActionTypes.SITE_UPLOAD_RECEIVED,
         siteId,
-        file: commitObj
+        file: commitObj.content
       });
-    }).catch(error => alertAction.alertError(error.message));
+    }).catch(error => alertActions.alertError(error.message));
   },
 
   createCommit(site, path, fileData, message = false, sha = false) {
