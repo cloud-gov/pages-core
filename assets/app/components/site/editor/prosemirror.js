@@ -1,14 +1,14 @@
-
 import React from 'react';
 import prosemirror from 'prosemirror';
 import { exampleSetup } from 'prosemirror/dist/example-setup'
 import { markdownParser, markdownSerializer } from '../../../util/pmParserExtension';
-import menuImageExtension from '../../../util/pmImageExtension';
 import { schema } from 'prosemirror/dist/schema-basic';
+import menuImageMenuExtension from '../../../util/pmImageMenuExtension';
 
 const propTypes = {
   initialMarkdownContent: React.PropTypes.string,
   handleToggleImages: React.PropTypes.func.isRequired,
+  registerInsertImage: React.PropTypes.func,
   onChange: React.PropTypes.func
 };
 
@@ -68,10 +68,14 @@ class Prosemirror extends React.Component {
 
   shouldComponentUpdate(nextProps) {
     if (nextProps.initialMarkdownContent && !rendered) {
+      // We force an update here to ensure the component gets rendered
+      // no more than once with the supplied initialMarkdownContent
       this.forceUpdate();
       rendered = true;
     }
 
+    // This component should never rerender as prosemirror provides
+    // it's own rendering
     return rendered ? false : true;
   }
 

@@ -1,4 +1,4 @@
-export default function convertImageToData(imageFile) {
+export default function convertFileToData(file) {
   return new Promise((resolve, reject) => {
     const fileReader = new FileReader();
 
@@ -11,6 +11,6 @@ export default function convertImageToData(imageFile) {
       return resolve(fileReader.result.replace(fileHeaderRegex, ''));
     };
 
-    fileReader.readAsDataURL(imageFile);
+    fileReader.readAsDataURL(file);
   });
 };

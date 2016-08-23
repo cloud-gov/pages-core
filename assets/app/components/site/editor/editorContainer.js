@@ -13,7 +13,7 @@ import documentStrategy from '../../../util/documentStrategy';
 import alertActions from '../../../actions/alertActions';
 import siteActions from '../../../actions/siteActions';
 
-import convertImageToData from '../../../util/convertImageToData';
+import convertFileToData from '../../../util/convertFileToData';
 
 const propTypes = {
   site: React.PropTypes.object
@@ -28,7 +28,7 @@ class Editor extends React.Component {
     this.state = {};
     this.submitFile = this.submitFile.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.onSelectImagePicker = this.onSelectImagePicker.bind(this);
+    this.onOpenImagePicker = this.onOpenImagePicker.bind(this);
     this.onCloseImagePicker = this.onCloseImagePicker.bind(this);
     this.onConfirmInsertImage = this.onConfirmInsertImage.bind(this);
     this.onUpload = this.onUpload.bind(this);
@@ -50,21 +50,21 @@ class Editor extends React.Component {
     insertFn = fn;
   }
 
-  onSelectImagePicker() {
+  onOpenImagePicker() {
     this.setState({
       imagePicker: true
     });
-  }
-
-  onConfirmInsertImage(fileName) {
-    const asset = this.props.site.assets.find((asset) => asset.path === fileName);
-    insertFn(asset);
   }
 
   onCloseImagePicker() {
     this.setState({
       imagePicker: false
     });
+  }
+
+  onConfirmInsertImage(fileName) {
+    const asset = this.props.site.assets.find((asset) => asset.path === fileName);
+    insertFn(asset);
   }
 
   getStateWithProps(props) {
@@ -142,19 +142,17 @@ class Editor extends React.Component {
   }
 
   getNewPage() {
-    // TODO: would love to know if there is a way to pass props without tying it
-    // to the react-router route property
     const newPage = this.props.route.isNewPage;
 
-    if (newPage) {
-      return (
-        <PageMetadata
-          path={this.state.path}
-          handleChange={this.handleChange}/>
-      );
+    if (!newPage) {
+      return null;
     }
 
-    return null;
+    return (
+      <PageMetadata
+        path={this.state.path}
+        handleChange={this.handleChange}/>
+    );
   }
 
   getImagePicker() {
@@ -168,12 +166,12 @@ class Editor extends React.Component {
   }
 
   onUpload(file) {
-    const { site, routeParams } = this.props;
+    const { site } = this.props;
 
     // TODO: should an action creator do this? Do we want a seperate action for
     // uploading images (and possibly other file types in the future) that
     // conforms to the createCommit interface in the github api service?
-    convertImageToData(file).then(function (fileData) {
+    convertFileToData(file).then(function (fileData) {
       const fileName = file.name;
       // TODO: hardcoded for now, will need to parse the _config.yml file
       // at some point in the future to dtermine if the federalist user has
@@ -212,7 +210,7 @@ class Editor extends React.Component {
           onChange={ (markdown) => {
             this.handleChange('markdown', markdown);
           }}
-          handleToggleImages={this.onSelectImagePicker}
+          handleToggleImages={this.onOpenImagePicker}
           registerInsertImage={this.registerInsertImageFn}
         />
         <div className="usa-alert usa-alert-info">
