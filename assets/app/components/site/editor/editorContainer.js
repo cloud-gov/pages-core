@@ -6,6 +6,8 @@ import PageMetadata from './pageMetadata';
 import Codemirror from './codemirror';
 import Prosemirror from './prosemirror';
 
+import documentStrategy from '../../../util/documentStrategy';
+
 import alertActions from '../../../actions/alertActions';
 import siteActions from '../../../actions/siteActions';
 
@@ -17,7 +19,7 @@ class Editor extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = this.getStateWithProps(props);
+    this.state = {};
     this.submitFile = this.submitFile.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
@@ -37,18 +39,17 @@ class Editor extends React.Component {
 
   getStateWithProps(props) {
     const file = this.getCurrentFile(props);
-    const path = (file) ? file.path : false;
-    const content = (file && file.content) ? decodeB64(file.content) : false;
-    const { frontmatter, markdown } = this.splitContent(content)
+    const path = file ? file.path : false;
+    const { frontmatter, markdown, raw, content } = documentStrategy(file);
 
     return {
-      encoded: (file && file.content) ? file.content : false,
+      encoded: file.content || false,
       frontmatter,
       markdown,
       message: false,
       path,
       raw: content,
-      sha: (file) ? file.sha : false
+      sha: file.sha || false
     };
   }
 
@@ -91,19 +92,6 @@ class Editor extends React.Component {
     return files.find((file) => {
       return file.path === this.path;
     });
-  }
-
-  splitContent(content) {
-    if (!content) return {};
-    const frontmatterDelimiterRegexMatch = /^---\n([\s\S]*?)---\n/;
-    const matches = content.match(frontmatterDelimiterRegexMatch);
-
-    if (!matches) return { markdown: content };
-
-    let frontmatter = matches[1];
-    let markdown = content.slice(matches[0].length);
-
-    return { frontmatter, markdown };
   }
 
   get path() {
