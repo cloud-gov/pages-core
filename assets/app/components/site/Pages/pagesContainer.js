@@ -1,8 +1,8 @@
 import React from 'react';
-
-import PageList from "./pageList";
+import isEqual from 'lodash.isequal';
+import PageList from './pageList';
 import PageListItem from './pageListItem';
-import NavigationJsonPageList from "./navigationJsonPageList";
+import NavigationJsonPageList from './navigationJsonPageList';
 
 import siteActions from '../../../actions/siteActions';
 
@@ -21,10 +21,12 @@ class Pages extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { params, site } = nextProps;
+    const { params: oldParams, site: oldSite } = this.props;
     const nextFiles = getFilesByPath(site.files, getPath(params));
-    const files = getFilesByPath(site.files, getPath(params));
+    const files = getFilesByPath(oldSite.files, getPath(oldParams));
+    const filesAreTheSame = isEqual(files, nextFiles);
 
-    if (files.length && nextFiles.length === files.length) return;
+    if (filesAreTheSame) return;
 
     fetchFiles(site, params);
   }
