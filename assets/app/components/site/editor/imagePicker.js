@@ -22,6 +22,7 @@ class ImagePicker extends React.Component {
     this.handleSelect = this.handleSelect.bind(this);
     this.handleFileDialog = this.handleFileDialog.bind(this);
     this.handleConfirm = this.handleConfirm.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
   }
 
   getImageCards() {
@@ -43,14 +44,20 @@ class ImagePicker extends React.Component {
     this.setState({
       selected: fileName
     });
-
-
   }
 
   handleConfirm() {
     if (this.state.selected) {
       this.props.handleConfirm(this.state.selected);
     }
+  }
+
+  handleCancel() {
+    this.setState({
+      selected: null
+    },() => {
+      this.props.handleCancel();
+    });
   }
 
   handleFileDialog() {
@@ -60,9 +67,7 @@ class ImagePicker extends React.Component {
   }
 
   render() {
-    const {
-      handleCancel,
-      handleUpload } = this.props;
+    const { handleUpload } = this.props;
 
     return (
       <div>
@@ -90,7 +95,7 @@ class ImagePicker extends React.Component {
 
             <div>
               <a className="usa-button usa-button-secondary"
-                onClick={handleCancel}
+                onClick={this.handleCancel}
                 role="button"
               >Cancel</a>
               <a className="usa-button usa-button-primary"

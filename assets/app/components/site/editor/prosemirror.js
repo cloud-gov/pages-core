@@ -40,19 +40,11 @@ class Prosemirror extends React.Component {
       ]
     });
 
-  this.props.registerInsertImage(this.insertImage);
+    this.props.registerInsertImage(this.insertImage);
+
     this.editor.on.change.add(() => {
       this.props.onChange(this.toMarkdown());
     });
-  }
-
-  insertImage(image) {
-    const imgNode = this.editor.schema.nodeType('image').create({
-      src: image.download_url,
-      title: image.name,
-      alt: image.name
-    });
-    this.editor.tr.insertInline(this.editor.selection.head, imgNode).apply();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -84,6 +76,16 @@ class Prosemirror extends React.Component {
     changeHandlers.forEach((handler) => {
       this.editor.on.change.remove(handler.fn);
     });
+  }
+
+  insertImage(image) {
+    const imgNode = this.editor.schema.nodeType('image').create({
+      src: image.download_url,
+      title: image.name,
+      alt: image.name
+    });
+
+    this.editor.tr.insertInline(this.editor.selection.head, imgNode).apply();
   }
 
   toMarkdown() {

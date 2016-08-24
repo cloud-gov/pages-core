@@ -3,7 +3,6 @@ import React from 'react';
 import { decodeB64 } from '../../../util/encoding'
 
 import PageMetadata from './pageMetadata';
-import EditorContents from './editorContents';
 import ImagePicker from './imagePicker';
 import Codemirror from './codemirror';
 import Prosemirror from './prosemirror';
@@ -146,11 +145,7 @@ class Editor extends React.Component {
   getNewPage() {
     const newPage = this.props.route.isNewPage;
 
-    if (!newPage) {
-      return null;
-    }
-
-    return (
+    return !newPage ? null : (
       <PageMetadata
         path={this.state.path}
         handleChange={this.handleChange}/>

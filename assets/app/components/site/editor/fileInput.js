@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import siteActions from '../../../actions/siteActions';
 
 const propTypes = {
+  // is the OS file dialog is open?
   open: React.PropTypes.bool,
   onFileSelect: React.PropTypes.func.isRequired
 };
