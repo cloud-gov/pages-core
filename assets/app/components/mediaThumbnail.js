@@ -1,5 +1,10 @@
-
 import React from 'react';
+
+const propTypes = {
+  asset: React.PropTypes.object
+};
+
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'gif', 'png'];
 
 class MediaThumbnail extends React.Component {
   constructor(props) {
@@ -7,39 +12,31 @@ class MediaThumbnail extends React.Component {
   }
 
   isImage(assetName) {
-    let imageFileExtensions = ['jpg', 'jpeg', 'gif', 'png'];
-    let assetExtension = assetName.split('.')[1];
+    let assetExtension = assetName.split('.').pop();
 
-    console.log('assetExtension', assetExtension);
-
-    if (imageFileExtensions.indexOf(assetExtension) > 0) {
-      return true;
-    }
-
-    return false;
+    return IMAGE_EXTENSIONS.indexOf(assetExtension) > 0 ? true : false;
   }
 
   render () {
-    let asset = this.props.asset;
+    const { asset } = this.props;
     let content;
+    const style = { "width": "calc(50% - 4px)", "marginRight": "1em", display: "inline-block"};
 
     if (this.isImage(asset.name)) {
-      content = <img src={ asset.download_url } />
+      content = <img src={ asset.download_url }/>;
     }
     else {
-      content = <p>Content can be found at { asset.download_url }</p>
+      content = <p>Content can be found at { asset.download_url }</p>;
     }
 
     return (
-      <li key={ asset.url }>
+      <div className="thumbnail">
         { content }
-      </li>
-    )
+      </div>
+    );
   }
 }
 
-MediaThumbnail.propTypes = {
-  asset: React.PropTypes.object
-};
+MediaThumbnail.propTypes = propTypes;
 
 export default MediaThumbnail;

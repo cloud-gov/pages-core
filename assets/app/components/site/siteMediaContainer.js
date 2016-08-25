@@ -11,27 +11,25 @@ class SiteMediaContainer extends React.Component {
   render () {
     let assets = this.props.assets;
     let content;
+    const css = {
+      "display": "flex",
+      "flexWrap": "wrap"
+    };
 
     if (!assets.length) {
       content = <h1>No media uploaded yet.</h1>
     }
     else {
-      content = <ul>
+      content = <div className="media-assets">
         {
           assets.map((asset, index) => {
-            return <MediaThumbnail key={index} asset={ asset } />
+            return <MediaThumbnail key={ index } asset={ asset } />
           })
         }
-      </ul>
+      </div>
     }
 
-    return (
-      <div>
-        <div className="usa-grid">
-          { content }
-        </div>
-      </div>
-    )
+    return content;
   }
 }
 
