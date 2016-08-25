@@ -9,12 +9,8 @@ class SiteMediaContainer extends React.Component {
   }
 
   render () {
-    let assets = this.props.assets;
+    const { assets } = this.props;
     let content;
-    const css = {
-      "display": "flex",
-      "flexWrap": "wrap"
-    };
 
     if (!assets.length) {
       content = <h1>No media uploaded yet.</h1>

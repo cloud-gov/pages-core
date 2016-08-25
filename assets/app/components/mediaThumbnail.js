@@ -13,14 +13,12 @@ class MediaThumbnail extends React.Component {
 
   isImage(assetName) {
     let assetExtension = assetName.split('.').pop();
-
-    return IMAGE_EXTENSIONS.indexOf(assetExtension) > 0 ? true : false;
+    return IMAGE_EXTENSIONS.indexOf(assetExtension) !== -1 ? true : false;
   }
 
   render () {
     const { asset } = this.props;
     let content;
-    const style = { "width": "calc(50% - 4px)", "marginRight": "1em", display: "inline-block"};
 
     if (this.isImage(asset.name)) {
       content = <img src={ asset.download_url }/>;
