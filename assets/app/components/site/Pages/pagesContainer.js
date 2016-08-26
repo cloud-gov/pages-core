@@ -43,7 +43,7 @@ class Pages extends React.Component {
     }
 
     const path = getPath(params);
-    const files = getFilesByPath(site.files, path) || [];
+    const files = getFilesByPath(site.files, path);
     return <PageList site={ site } files={ files }/>;
   }
 }
@@ -75,7 +75,13 @@ const getFilesByPath = (files = [], startingPath = '') => {
 };
 
 const hasNavigationJsonContent = (site) => {
-  return site["_navigation.json"] && site["_navigation.json"].content;
+  const navigationJSON = site['_navigation.json'];
+
+  try {
+    return !!JSON.parse(navigationJSON.content);
+  } catch(error) {
+    return false;
+  }
 };
 
 Pages.propTypes = propTypes;
