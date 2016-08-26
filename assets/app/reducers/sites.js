@@ -15,6 +15,10 @@ export default function sites(state = initialState, action) {
   case siteActionTypes.SITE_UPDATED:
     return mapPropertyToMatchingSite(state, action.siteId, action.site);
 
+  case siteActionTypes.SITE_BRANCHES_RECEIVED:
+    const branches = action.branches;
+    return mapPropertyToMatchingSite(state, action.siteId, { branches });
+
   case siteActionTypes.SITE_CONFIGS_RECEIVED:
     return mapPropertyToMatchingSite(state, action.siteId, action.configs);
 

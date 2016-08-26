@@ -193,6 +193,17 @@ export default {
         arguments: [`/sites/${site.id}`]
       });
     }).catch((error) => alertActions.httpError(error.message));
+  },
+
+  getBranches(site) {
+    return github.fetchBranches(site).then((branches) => {
+
+      store.dispatch({
+        type: siteActionTypes.SITE_BRANCHES_RECEIVED,
+        siteId: site.id,
+        branches
+      });
+    });
   }
 }
 

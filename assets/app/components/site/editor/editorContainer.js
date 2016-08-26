@@ -196,6 +196,10 @@ class Editor extends React.Component {
     return (
       <div>
         {this.getImagePicker()}
+        <button onClick={ (ev) => {
+            siteActions.getBranches(this.props.site)
+          }}
+        />
         {this.getNewPage()}
 
         <Codemirror

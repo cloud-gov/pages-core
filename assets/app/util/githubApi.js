@@ -72,9 +72,22 @@ const github = {
     });
   },
 
+  fetchBranches(site) {
+    const url = `${getRepoFor(site)}/branches`;
+    const params = {
+      access_token: getToken()
+    };
+
+    return this.fetch(url, { params });
+  },
+
   fetchPullRequests(site) {
     const url = `${getRepoFor(site)}/pulls`;
-    return this.fetch(url);
+    const params = {
+      access_token: getToken()
+    };
+
+    return this.fetch(url, { params });
   },
 
   fetchRepositoryConfigs(site) {
@@ -98,13 +111,29 @@ const github = {
   },
 
   fetchRepositoryContent(site, path = '') {
-    const url = `repos/${site.owner}/${site.repository}/contents/${path}`;
+    const url = `${getRepoFor(site)}/contents/${path}`;
     const params = {
       access_token: getToken(),
       ref: site.branch || site.defaultBranch
     };
 
     return this.fetch(url, { params });
+  },
+
+  mergePullRequest(site, pr) {
+    const url = `${getRepoFor(site)}/pulls/${pr.number}/merge`;
+    const data = {
+      commit_message: 'Merged by Federalist',
+      sha: `${pr.head.sha}`
+    };
+
+    return this.fetch(url, {
+      headers: {
+        'Authorization': `token ${getToken()}`
+      },
+      method: 'PUT',
+      data
+    });
   },
 
   /**
