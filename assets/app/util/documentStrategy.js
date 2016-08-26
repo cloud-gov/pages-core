@@ -48,3 +48,7 @@ const documentStrategy = file => {
 };
 
 export default documentStrategy;
+export {
+  initializeYml,
+  initializeMD
+};
