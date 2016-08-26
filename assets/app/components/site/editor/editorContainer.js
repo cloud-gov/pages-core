@@ -8,9 +8,11 @@ import Codemirror from './codemirror';
 import Prosemirror from './prosemirror';
 
 import documentStrategy from '../../../util/documentStrategy';
+import { formatDraftBranchName, pathHasDraft } from '../../../util/branchFormatter';
 
 import alertActions from '../../../actions/alertActions';
 import siteActions from '../../../actions/siteActions';
+import routeActions from '../../../actions/routeActions';
 
 const propTypes = {
   site: React.PropTypes.object
@@ -27,6 +29,8 @@ class Editor extends React.Component {
     }, this.getStateWithProps(props));
 
     this.submitFile = this.submitFile.bind(this);
+    this.submitDraft = this.submitDraft.bind(this);
+    this.deleteDraft = this.deleteDraft.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.onOpenImagePicker = this.onOpenImagePicker.bind(this);
     this.onCloseImagePicker = this.onCloseImagePicker.bind(this);
@@ -35,10 +39,21 @@ class Editor extends React.Component {
   }
 
   componentDidMount() {
-    // This action should be triggered when a user first loads this view,
-    // either visiting it directly from the url bar or navigating here
-    // with react router
-    siteActions.fetchFileContent(this.props.site, this.path);
+    // trigger the fetch file content action for the case
+    // when a user first loads this view. That could be
+    // a changing of the route to a site for the first time
+    // or directly loading the url
+    const fileName = this.props.params.fileName;
+    const currentBranch = this.props.params.branch;
+    const branches = this.props.site.branches || [];
+    const hasDraft = pathHasDraft(fileName, branches);
+    const isNotCurrentBranch = (formatDraftBranchName(fileName) !== currentBranch);
+
+    if (hasDraft && isNotCurrentBranch) {
+      routeActions.redirect(`/sites/${this.props.site.id}/edit/${formatDraftBranchName(fileName)}/${fileName}`);
+    } else {
+      siteActions.fetchFileContent(this.props.site, this.path);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -82,9 +97,8 @@ class Editor extends React.Component {
     };
   }
 
-  submitFile() {
-    const { site } = this.props;
-    let { frontmatter, markdown, message, path, sha } = this.state;
+  buildFile() {
+    let { frontmatter, markdown, path, message } = this.state;
     let content = markdown;
 
     if (!path) {
@@ -106,8 +120,30 @@ class Editor extends React.Component {
       path = `${path}.md`;
     }
 
-    siteActions.createCommit(site, path, content, message, sha);
+    return { content, path, message };
   }
+
+  submitFile(branch = this.props.site.defaultBranch) {
+    const { site } = this.props;
+    const { sha } = this.state;
+    const {content, path, message} = this.buildFile();
+    const nextSite = Object.assign({}, site, {
+      branch
+    });
+
+    siteActions.createCommit(nextSite, path, content, message, sha);
+  }
+
+  submitDraft() {
+    const { site } = this.props;
+    const { path } = this.state;
+
+    siteActions.createDraftBranch(site, path).then((branchName) => {
+      this.submitFile(branchName);
+    });
+  }
+
+  deleteDraft(){}
 
   handleChange(name, value) {
     const nextState = {};
@@ -227,7 +263,16 @@ class Editor extends React.Component {
                 this.handleChange('message', event.target.value);
               }}
             />
-            <button onClick={this.submitFile}>Submit</button>
+            <button
+              className="usa-button-outline"
+              onClick={this.submitDraft}
+            >Save as Draft</button>
+            <button
+              className="usa-button-outline"
+              onClick={this.deleteBranch}
+            >Delete Draft</button>
+
+            <button onClick={this.submitFile}>Save &amp; Publish</button>
           </div>
         </div>
       </div>

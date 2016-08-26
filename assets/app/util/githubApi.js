@@ -45,7 +45,7 @@ const github = {
   createBranch(site, branch, sha) {
     const url = `${getRepoFor(site)}/git/refs`;
     const data = {
-      ref: `refs/head/${branch}`,
+      ref: `refs/heads/${branch}`,
       sha
     };
 

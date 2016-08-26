@@ -81,20 +81,30 @@ export default {
     const b64EncodedFileContents = encodeB64(fileData);
     const siteId = site.id;
     let commit = {
-      message: message ? message : `Adds ${path} to project`,
-      content: b64EncodedFileContents
+      path,
+      message: (message) ? message : `Adds ${path} to project`,
+      content: b64EncodedFileContents,
+      branch: `${site.branch || site.defaultBranch}`,
+
     };
 
     if (sha) commit = Object.assign({}, commit, { sha });
 
     github.createCommit(site, path, commit).then((commitObj) => {
-      alertActions.alertSuccess('File added successfully');
+      alertActions.alertSuccess('File committed successfully');
 
       store.dispatch({
         type: siteActionTypes.SITE_FILE_ADDED,
         siteId,
         file: commitObj.content
       });
+
+      //
+      // store.dispatch({
+      //   type: navigationTypes.UPDATE_ROUTER,
+      //   method: 'push',
+      //   arguments: [`/sites/${siteId}`]
+      // });
     }).catch(error => alertActions.httpError(error.message));
   },
 
@@ -131,17 +141,19 @@ export default {
 
   fetchSiteConfigsAndAssets(site) {
     return this.fetchSiteConfigs(site).then((site) => {
-      return this.fetchSiteAssets(site).then((site) => {
-        return github.fetchRepositoryContent(site).then((files) => {
-          store.dispatch({
-            type: siteActionTypes.SITE_FILES_RECEIVED,
-            siteId: site.id,
-            files
-          });
-
-          return files;
-        });
+      return this.fetchBranches(site);
+    }).then((site) => {
+      return this.fetchSiteAssets(site);
+    }).then((site) => {
+      return github.fetchRepositoryContent(site);
+    }).then((files) => {
+      store.dispatch({
+        type: siteActionTypes.SITE_FILES_RECEIVED,
+        siteId: site.id,
+        files
       });
+
+      return files;
     }).catch((error) => {
       // TODO: make a generic catch handler that will only
       // trigger an http error action for an actual http
@@ -195,7 +207,7 @@ export default {
     }).catch((error) => alertActions.httpError(error.message));
   },
 
-  getBranches(site) {
+  fetchBranches(site) {
     return github.fetchBranches(site).then((branches) => {
 
       store.dispatch({
@@ -203,6 +215,20 @@ export default {
         siteId: site.id,
         branches
       });
+
+      return site;
+    });
+  },
+
+  createDraftBranch(site, path) {
+    const branchName = `_draft-${encodeB64(path)}`;
+    const sha = site.branches.find((branch) => {
+      return branch.name === site.defaultBranch;
+    }).commit.sha;
+
+    return github.createBranch(site, branchName, sha).then(() => {
+      this.fetchBranches(site);
+      return branchName;
     });
   }
 }

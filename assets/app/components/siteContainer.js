@@ -40,10 +40,10 @@ class SiteContainer extends React.Component {
   }
 
   getCurrentSite(sites, siteId) {
-    return sites.filter((site) => {
+    return sites.find((site) => {
       // force type coersion
       return site.id == siteId;
-    }).shift();
+    });
   }
 
   render () {
@@ -73,7 +73,7 @@ class SiteContainer extends React.Component {
 
     if (!site) {
       return null;
-    }
+    }else if (!site.branches) {return null;}
 
     return (
       <div className="usa-grid site">
