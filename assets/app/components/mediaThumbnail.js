@@ -13,7 +13,7 @@ class MediaThumbnail extends React.Component {
 
   isImage(assetName) {
     let assetExtension = assetName.split('.').pop();
-    return IMAGE_EXTENSIONS.indexOf(assetExtension) !== -1 ? true : false;
+    return IMAGE_EXTENSIONS.indexOf(assetExtension) !== -1;
   }
 
   render () {
