@@ -2,6 +2,7 @@ import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
 import { siteActionTypes, navigationTypes } from '../constants';
 import { encodeB64 } from '../util/encoding';
+import convertFileToData from '../util/convertFileToData';
 import store from '../store';
 import alertActions from './alertActions';
 
@@ -55,21 +56,27 @@ export default {
     }).catch(error => alertActions.httpError(error.message));
   },
 
-  uploadFile(site, path, fileData, message) {
-    const commit = {
-      content: fileData,
-      message: message
-    };
+  uploadFile(site, file) {
     const siteId = site.id;
+    const { name } = file;
 
-    github.createCommit(site, path, commit).then((commitObj) => {
-      alertActions.alertSuccess('File uploaded successfully');
+    convertFileToData(file).then(function (fileData) {
+      const path = `assets/${name}`;
+      const message = `Uploads ${name} to project`;
+      const commit = {
+        content: fileData,
+        message: message
+      };
 
-      store.dispatch({
-        type: siteActionTypes.SITE_UPLOAD_RECEIVED,
-        siteId,
-        file: commitObj.content
-      });
+      return github.createCommit(site, path, commit);
+    }).then((commitObj) => {
+        alertActions.alertSuccess('File uploaded successfully');
+
+        store.dispatch({
+          type: siteActionTypes.SITE_UPLOAD_RECEIVED,
+          siteId,
+          file: commitObj.content
+        });
     }).catch(error => alertActions.alertError(error.message));
   },
 
@@ -77,7 +84,7 @@ export default {
     const b64EncodedFileContents = encodeB64(fileData);
     const siteId = site.id;
     let commit = {
-      message: (message) ? message : `Adds ${path} to project`,
+      message: message ? message : `Adds ${path} to project`,
       content: b64EncodedFileContents
     };
 
@@ -90,12 +97,6 @@ export default {
         type: siteActionTypes.SITE_FILE_ADDED,
         siteId,
         file: commitObj.content
-      });
-
-      store.dispatch({
-        type: navigationTypes.UPDATE_ROUTER,
-        method: 'push',
-        arguments: [`/sites/${siteId}`]
       });
     }).catch(error => alertActions.httpError(error.message));
   },

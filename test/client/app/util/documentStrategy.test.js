@@ -1,12 +1,12 @@
 import { expect } from "chai";
 import proxyquire from "proxyquire";
 
-const decodeB64 = function (str) {
-  var b = new Buffer(str, 'base64')
+const decodeB64 = str => {
+  var b = new Buffer(str, 'base64');
   return b.toString();
 }
 
-describe('documentStrategy', function () {
+describe('documentStrategy', () => {
   let fixture;
 
   beforeEach(function() {
@@ -17,7 +17,18 @@ describe('documentStrategy', function () {
     })
   });
 
-  it('should handle files with a .yml file extension', function () {
+  it('should return a formatted object if no file is provided', () => {
+    const expected = {
+      path: false,
+      raw: false,
+      markdown: '',
+      frontmatter: ''
+    };
+
+    expect(fixture.default(null)).to.deep.equal(expected);
+  });
+
+  it('should handle files with a .yml file extension', () => {
     const content = 'fake-content';
     const ymlFile = {
       path: 'fake-file.yml',
@@ -34,56 +45,40 @@ describe('documentStrategy', function () {
     expect(actual).to.deep.equal(expected);
   });
 
-  it('should handle files with a .md file extension', function () {
-    const content = 'fake-content';
-    const mdFile = {
-      path: 'fake-file.md',
-      content: 'ZmFrZS1jb250ZW50'
-    };
-    const expected = {
-      path: mdFile.path,
-      raw: mdFile.content,
-      frontmatter: '',
-      markdown: content
-    };
-    const actual = fixture.default(mdFile);
-
-    expect(actual).to.deep.equal(expected);
-  });
-
-  describe('initializeYml()', function () {
-    it('should return an object', function () {
-      const content = 'test content';
-      const expected = {
-        frontmatter: content,
-        markdown: ''
+  describe('markdown parsing', () => {
+    it('should handle files with a .md file extension', () => {
+      const mdFile = {
+        path: 'fake-file.md',
+        content: 'ZmFrZS1jb250ZW50'
       };
-      const actual = fixture.initializeYml(content);
-
-      expect(actual).to.deep.equal(expected);
-    });
-  });
-
-  describe('initializeMD()', function () {
-    it('should return an empty string as frontmatter if there is not frontmatter in the content', function () {
-      const content = 'test-content';
+      const content = 'fake-content';
       const expected = {
+        path: mdFile.path,
+        raw: mdFile.content,
         frontmatter: '',
         markdown: content
       };
-      const actual = fixture.initializeMD(content);
+
+
+      const actual = fixture.default(mdFile);
 
       expect(actual).to.deep.equal(expected);
     });
 
-    it('should return separated frontmatter and markdown', function () {
-      const content = '---\ntest: key\n---\ntest-content';
+    it('should return separated frontmatter and markdown', () => {
+      const file =  {
+        path: 'file.md',
+        content: 'LS0tCnRlc3Q6IGtleQotLS0KdGVzdC1jb250ZW50'
+      };
+
       const expected = {
+        path: file.path,
+        raw: file.content,
         frontmatter: 'test: key\n',
         markdown: 'test-content'
       };
-      const actual = fixture.initializeMD(content);
 
+      const actual = fixture.default(file);
       expect(actual).to.deep.equal(expected);
     });
   });

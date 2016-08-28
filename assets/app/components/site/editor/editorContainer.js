@@ -12,8 +12,6 @@ import documentStrategy from '../../../util/documentStrategy';
 import alertActions from '../../../actions/alertActions';
 import siteActions from '../../../actions/siteActions';
 
-import convertFileToData from '../../../util/convertFileToData';
-
 const propTypes = {
   site: React.PropTypes.object
 };
@@ -71,16 +69,15 @@ class Editor extends React.Component {
 
   getStateWithProps(props) {
     const file = this.getCurrentFile(props) || {};
-    const path = file.path || false;
-    const { frontmatter, markdown, raw, content } = documentStrategy(file);
+    const { frontmatter, markdown, raw, path } = documentStrategy(file);
 
     return {
-      encoded: file.content || false,
+      encoded: raw || false,
       frontmatter,
       markdown,
       message: false,
       path,
-      raw: content,
+      raw: raw,
       sha: file.sha || false
     };
   }
@@ -165,19 +162,7 @@ class Editor extends React.Component {
   onUpload(file) {
     const { site } = this.props;
 
-    // TODO: should an action creator do this? Do we want a seperate action for
-    // uploading images (and possibly other file types in the future) that
-    // conforms to the createCommit interface in the github api service?
-    convertFileToData(file).then(function (fileData) {
-      const fileName = file.name;
-      // TODO: hardcoded for now, will need to parse the _config.yml file
-      // at some point in the future to dtermine if the federalist user has
-      // specified a different content directory
-      const path = `assets/${fileName}`;
-      const message = `Uploads ${fileName} to project`;
-
-      siteActions.uploadFile(site, path, fileData, message);
-    });
+    siteActions.uploadFile(site, file);
   }
 
   // TODO: break up this component. We need an intermediate form component that
@@ -188,8 +173,7 @@ class Editor extends React.Component {
     const { props } = this;
     const computedMessage = this.getComputedMessage();
     const file = this.getCurrentFile(props);
-    const content = decodeB64(file.content);
-    const { frontmatter, markdown } = this.splitContent(content);
+    const { frontmatter, markdown } = documentStrategy(file);
 
     return (
       <div>
