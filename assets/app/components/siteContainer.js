@@ -71,9 +71,9 @@ class SiteContainer extends React.Component {
         childConfigs = { site };
     }
 
-    if (!site) {
+    if (!site || !site.branches) {
       return null;
-    }else if (!site.branches) {return null;}
+    }
 
     return (
       <div className="usa-grid site">

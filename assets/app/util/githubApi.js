@@ -42,6 +42,10 @@ const github = {
     });
   },
 
+  createPullRequest(site, branch, base) {
+
+  },
+
   createBranch(site, branch, sha) {
     const url = `${getRepoFor(site)}/git/refs`;
     const data = {
@@ -58,8 +62,19 @@ const github = {
     });
   },
 
-  createPullRequest(site, branch, base) {
+  updateBranch(site, branch, sha) {
+    const url = `${getRepoFor(site)}/git/refs/${branch}`;
+    const data = {
+      sha
+    };
 
+    return this.fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `token ${getToken()}`
+      },
+      data
+    });
   },
 
   deleteBranch(site, branch) {

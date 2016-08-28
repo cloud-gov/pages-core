@@ -43,16 +43,18 @@ class Editor extends React.Component {
     // when a user first loads this view. That could be
     // a changing of the route to a site for the first time
     // or directly loading the url
-    const fileName = this.props.params.fileName;
-    const currentBranch = this.props.params.branch;
-    const branches = this.props.site.branches || [];
+    const { fileName, branch: currentBranch } = this.props.params;
+    const { site } = this.props;
+    const branches = site.branches || [];
     const hasDraft = pathHasDraft(fileName, branches);
     const isNotCurrentBranch = (formatDraftBranchName(fileName) !== currentBranch);
 
     if (hasDraft && isNotCurrentBranch) {
-      routeActions.redirect(`/sites/${this.props.site.id}/edit/${formatDraftBranchName(fileName)}/${fileName}`);
+      routeActions.redirect(`/sites/${site.id}/edit/${formatDraftBranchName(fileName)}/${fileName}`);
     } else {
-      siteActions.fetchFileContent(this.props.site, this.path);
+      // we probably want a container to fetch the file information regardless of
+      // whether or not a redirect occurs?
+      siteActions.fetchFileContent(site, this.path);
     }
   }
 

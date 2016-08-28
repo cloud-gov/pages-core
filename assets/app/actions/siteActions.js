@@ -222,11 +222,23 @@ export default {
 
   createDraftBranch(site, path) {
     const branchName = `_draft-${encodeB64(path)}`;
-    const sha = site.branches.find((branch) => {
-      return branch.name === site.defaultBranch;
-    }).commit.sha;
+    const existingDraftBranch = site.branches.find(branch => {
+      return branch.name === branchName;
+    });
+    let githubMethod;
+    let sha;
 
-    return github.createBranch(site, branchName, sha).then(() => {
+    if (existingDraftBranch) {
+      githubMethod = 'updateBranch';
+      sha = existingDraftBranch.commit.sha;
+    } else {
+      githubMethod = 'createBranch';
+      sha = site.branches.find((branch) => {
+        return branch.name === site.defaultBranch;
+      }).commit.sha;
+    }
+
+    return github[githubMethod](site, branchName, sha).then(() => {
       this.fetchBranches(site);
       return branchName;
     });
