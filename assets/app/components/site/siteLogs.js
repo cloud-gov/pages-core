@@ -45,7 +45,7 @@ const SiteLogs = ({site}) =>
             <td scope="row">{ build.branch }</td>
             <td>{ username }</td>
             <td>{ timeFrom(build.completedAt) }</td>
-            <td>{ duration(build.completedAt, build.createdAt) }</td>
+            <td>{ duration(build.createdAt, build.completedAt) }</td>
             <td>{ message }</td>
           </tr>
         )

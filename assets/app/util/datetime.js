@@ -1,12 +1,19 @@
 import moment from 'moment';
 
+const NO_TIME = '-';
+
+
 /**
  * Return a human-readable duration between two date strings
  * @param  {String | Date} endTime    format "YYYY-DD-DDT00:00:00.000Z"
  * @param  {String | Date} startTime  format "YYYY-DD-DDT00:00:00.000Z"
  * @return {String}                   human readable duration
  */
-export const duration = (endTime, startTime) => {
+export const duration = (startTime, endTime) => {
+  if (!startTime) {
+    return NO_TIME;
+  }
+
   const baseTime = endTime || new Date();
   return moment.duration(moment(baseTime).diff(startTime)).humanize();
 };
@@ -17,8 +24,10 @@ export const duration = (endTime, startTime) => {
  * @param  {String | Date} date format "YYYY-DD-DDT00:00:00.000Z"
  * @return {String}
  */
-export const timeFrom = (date) => {
-  if (!date) return '-';
+export const timeFrom = date => {
+  if (!date) {
+    return NO_TIME;
+  }
 
   return moment(date).fromNow();
 }
