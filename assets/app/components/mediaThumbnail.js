@@ -6,24 +6,23 @@ const propTypes = {
 
 const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'gif', 'png'];
 
-const isImage = (assetName) => {
+const emitContentTag = (asset) => {
+  if (hasImageExtension(asset.name)) {
+    return <img src={ asset.download_url }/>;
+  }
+  
+  return <p>Content can be found at { asset.download_url }</p>;
+};
+
+const hasImageExtension = (assetName) => {
   let assetExtension = assetName.split('.').pop();
   return IMAGE_EXTENSIONS.indexOf(assetExtension) !== -1;
 };
 
-const MediaThumbnail = ({ asset }) => {
-  let content;
-  
-  if (isImage(asset.name)) {
-    content = <img src={ asset.download_url }/>;
-  }
-  else {
-    content = <p>Content can be found at { asset.download_url }</p>;
-  }
-  
+const MediaThumbnail = ({ asset }) => {  
   return (
     <div className="thumbnail">
-      { content }
+      { emitContentTag(asset) }
     </div>
   );
 };
