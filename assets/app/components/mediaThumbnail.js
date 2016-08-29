@@ -6,34 +6,26 @@ const propTypes = {
 
 const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'gif', 'png'];
 
-class MediaThumbnail extends React.Component {
-  constructor(props) {
-    super(props);
+const emitContentTag = (asset) => {
+  if (hasImageExtension(asset.name)) {
+    return <img src={ asset.download_url }/>;
   }
+  
+  return <p>Content can be found at { asset.download_url }</p>;
+};
 
-  isImage(assetName) {
-    let assetExtension = assetName.split('.').pop();
-    return IMAGE_EXTENSIONS.indexOf(assetExtension) !== -1 ? true : false;
-  }
+const hasImageExtension = (assetName) => {
+  let assetExtension = assetName.split('.').pop();
+  return IMAGE_EXTENSIONS.indexOf(assetExtension) !== -1;
+};
 
-  render () {
-    const { asset } = this.props;
-    let content;
-
-    if (this.isImage(asset.name)) {
-      content = <img src={ asset.download_url }/>;
-    }
-    else {
-      content = <p>Content can be found at { asset.download_url }</p>;
-    }
-
-    return (
-      <div className="thumbnail">
-        { content }
-      </div>
-    );
-  }
-}
+const MediaThumbnail = ({ asset }) => {  
+  return (
+    <div className="thumbnail">
+      { emitContentTag(asset) }
+    </div>
+  );
+};
 
 MediaThumbnail.propTypes = propTypes;
 
