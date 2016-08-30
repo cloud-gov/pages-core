@@ -42,7 +42,8 @@ class ImagePicker extends React.Component {
 
   handleSelect(fileName) {
     this.setState({
-      selected: fileName
+      selected: fileName,
+      openDialog: false
     });
   }
 

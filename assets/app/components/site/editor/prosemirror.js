@@ -6,6 +6,7 @@ import { schema } from 'prosemirror/dist/schema-basic';
 import menuImageExtension from '../../../util/pmImageMenuExtension';
 
 const propTypes = {
+  assetPath: React.PropTypes.string,
   initialMarkdownContent: React.PropTypes.string,
   handleToggleImages: React.PropTypes.func.isRequired,
   registerInsertImage: React.PropTypes.func,
@@ -93,7 +94,8 @@ class Prosemirror extends React.Component {
   }
 
   fromMarkdown(content) {
-    const cleanContent = content.replace(/{{ site.baseurl }}\//g, '');
+    const { assetPath } = this.props;
+    const cleanContent = content.replace(/{{ site.baseurl }}\//g, assetPath);
 
     return markdownParser.parse(cleanContent);
   }

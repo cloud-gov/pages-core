@@ -159,6 +159,18 @@ class Editor extends React.Component {
       />;
   }
 
+  getAssetPath() {
+    const { site } = this.props;
+
+    return [
+      'https://raw.githubusercontent.com',
+      site.owner,
+      site.repository,
+      site.branch || site.defaultBranch,
+      ''
+    ].join('/');
+  }
+
   onUpload(file) {
     const { site } = this.props;
 
@@ -188,6 +200,7 @@ class Editor extends React.Component {
         />
         <Prosemirror
           initialMarkdownContent={ markdown }
+          assetPath={this.getAssetPath()}
           onChange={ (markdown) => {
             this.handleChange('markdown', markdown);
           }}
