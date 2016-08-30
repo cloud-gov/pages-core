@@ -8,8 +8,6 @@ export default function sites(state = initialState, action) {
     return action.sites || initialState;
 
   case siteActionTypes.SITE_ADDED:
-    // if a site hasn't been properly added, return the existing state
-    // TODO: why is this getting called if there is an error
     return action.site ? [...state, action.site] : state;
 
   case siteActionTypes.SITE_UPDATED:

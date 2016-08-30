@@ -8,7 +8,7 @@ import Codemirror from './codemirror';
 import Prosemirror from './prosemirror';
 
 import documentStrategy from '../../../util/documentStrategy';
-import { formatDraftBranchName, pathHasDraft } from '../../../util/branchFormatter';
+import { formatDraftBranchName, pathHasDraft, getDraft } from '../../../util/branchFormatter';
 
 import alertActions from '../../../actions/alertActions';
 import siteActions from '../../../actions/siteActions';
@@ -139,13 +139,25 @@ class Editor extends React.Component {
   submitDraft() {
     const { site } = this.props;
     const { path } = this.state;
+    const draftBranch = getDraft(path, site.branches);
 
-    siteActions.createDraftBranch(site, path).then((branchName) => {
-      this.submitFile(branchName);
-    });
+    if (draftBranch) {
+      this.submitFile(draftBranch.name);
+    } else {
+      siteActions.createDraftBranch(site, path).then((branchName) => {
+        this.submitFile(branchName);
+      });
+    }
   }
 
-  deleteDraft(){}
+  deleteDraft() {
+    const { site } = this.props;
+    const { path } = this.state;
+
+    siteActions.deleteBranch(site, formatDraftBranchName(path)).then(() => {
+      routeActions.redirect(`/sites/${site.id}`);
+    });
+  }
 
   handleChange(name, value) {
     const nextState = {};
@@ -163,9 +175,11 @@ class Editor extends React.Component {
 
   get path() {
     const params = this.props.params;
+
     if (params.splat) {
       return `${params.splat}/${params.fileName}`;
     }
+
     return params.fileName;
   }
 
@@ -237,7 +251,7 @@ class Editor extends React.Component {
         <button onClick={ (ev) => {
             siteActions.getBranches(this.props.site)
           }}
-        />
+        >debug: get branches</button>
         {this.getNewPage()}
 
         <Codemirror
@@ -271,10 +285,10 @@ class Editor extends React.Component {
             >Save as Draft</button>
             <button
               className="usa-button-outline"
-              onClick={this.deleteBranch}
+              onClick={this.deleteDraft}
             >Delete Draft</button>
 
-            <button onClick={this.submitFile}>Save &amp; Publish</button>
+            <button onClick={ () => this.submitFile }>Save &amp; Publish</button>
           </div>
         </div>
       </div>

@@ -56,6 +56,8 @@ export const siteActionTypes = keymirror({
   SITE_DELETED: null,
   // Branches retrieved from github
   SITE_BRANCHES_RECEIVED: null,
+  // Remove a branch from a site
+  SITE_BRANCH_DELETED: null,
   // Config files retrieved from github
   SITE_CONFIGS_RECEIVED: null,
   // Asset files retrieved from github
