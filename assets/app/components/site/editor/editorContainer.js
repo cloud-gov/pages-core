@@ -46,16 +46,22 @@ class Editor extends React.Component {
     const { fileName, branch: currentBranch } = this.props.params;
     const { site } = this.props;
     const branches = site.branches || [];
+    const draftBranchName = formatDraftBranchName(fileName)
     const hasDraft = pathHasDraft(fileName, branches);
-    const isNotCurrentBranch = (formatDraftBranchName(fileName) !== currentBranch);
+    const isNotCurrentBranch = (draftBranchName !== currentBranch);
+    let nextSite = site;
 
-    if (hasDraft && isNotCurrentBranch) {
-      routeActions.redirect(`/sites/${site.id}/edit/${formatDraftBranchName(fileName)}/${fileName}`);
-    } else {
-      // we probably want a container to fetch the file information regardless of
-      // whether or not a redirect occurs?
-      siteActions.fetchFileContent(site, this.path);
+    if (hasDraft) {
+      nextSite = Object.assign({}, site, {
+        branch: draftBranchName
+      });
     }
+
+    siteActions.fetchFileContent(nextSite, this.path).then(() => {
+      if (hasDraft && isNotCurrentBranch) {
+        routeActions.redirect(`/sites/${nextSite.id}/edit/${formatDraftBranchName(fileName)}/${fileName}`);
+      }
+    });
   }
 
   componentWillReceiveProps(nextProps) {
