@@ -76,7 +76,7 @@ class Editor extends React.Component {
       frontmatter,
       markdown,
       message: false,
-      path,
+      path: path || '',
       raw: raw,
       sha: file.sha || false
     };
@@ -91,8 +91,8 @@ class Editor extends React.Component {
       return alertActions.alertError('File must have a name');
     }
 
-    if (message === '') {
-      return alertActions.alertError('You must supply a commit message');
+    if (!message) {
+      message = this.getComputedMessage();
     }
 
     if (frontmatter) {
@@ -190,7 +190,6 @@ class Editor extends React.Component {
   // been verified.
   render() {
     const { props } = this;
-    const computedMessage = this.getComputedMessage();
     const file = this.getCurrentFile(props);
     const { frontmatter, markdown } = documentStrategy(file);
 
@@ -219,7 +218,7 @@ class Editor extends React.Component {
             <h3 className="usa-alert-heading"></h3>
             <p className="usa-alert-text">Make this a helpful save message for yourself and future collaborators.</p>
             <input type="text" name="message"
-              value={ computedMessage }
+              value={ this.getComputedMessage() }
               onChange={ (event) => {
                 this.handleChange('message', event.target.value);
               }}
