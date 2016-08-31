@@ -1,7 +1,13 @@
 import React from 'react';
+import { duration, timeFrom } from '../../util/datetime';
 
 const propTypes = {
   site: React.PropTypes.object
+};
+
+const getUsername = (site, id) => {
+  const user = site.users.find(user => user.id === id);
+  return user.username;
 };
 
 const SiteLogs = ({site}) =>
@@ -17,8 +23,11 @@ const SiteLogs = ({site}) =>
     </thead>
     <tbody>
       {site.builds.map((build) => {
+        const rowClass = `usa-alert-${build.state}`;
+        const username = getUsername(site, build.user);
+
         let message;
-        let rowClass = `usa-alert-${build.state}`;
+
         switch (build.state) {
           case 'error':
             message = build.error;
@@ -34,8 +43,9 @@ const SiteLogs = ({site}) =>
         return (
           <tr key={ build.id } className={ rowClass }>
             <td scope="row">{ build.branch }</td>
-            <td>{ build.user }</td>
-            <td>{ build.completedAt }</td>
+            <td>{ username }</td>
+            <td>{ timeFrom(build.completedAt) }</td>
+            <td>{ duration(build.createdAt, build.completedAt) }</td>
             <td>{ message }</td>
           </tr>
         )
