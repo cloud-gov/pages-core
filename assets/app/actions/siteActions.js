@@ -235,7 +235,7 @@ export default {
 
   deleteBranch(site, branch) {
     return github.deleteBranch(site, branch).then(() => {
-      this.fetchBranches(site);
+      return this.fetchBranches(site);
     }).catch((error) => alertActions.httpError(error.message));
   }
 }

@@ -60,6 +60,8 @@ class Editor extends React.Component {
     siteActions.fetchFileContent(nextSite, this.path).then(() => {
       if (hasDraft && isNotCurrentBranch) {
         routeActions.redirect(`/sites/${nextSite.id}/edit/${formatDraftBranchName(fileName)}/${fileName}`);
+      } else {
+        routeActions.redirect(`/sites/${nextSite.id}/edit/${nextSite.defaultBranch}/${fileName}`);
       }
     });
   }
@@ -151,7 +153,12 @@ class Editor extends React.Component {
       this.submitFile(draftBranch.name);
     } else {
       siteActions.createDraftBranch(site, path).then((branchName) => {
-        this.submitFile(branchName);
+        return this.submitFile(branchName);
+      }).then(() => {
+        const fileName = path.split('/').pop();
+        const branch = formatDraftBranchName(path);
+
+        routeActions.redirect(`/sites/${site.id}/edit/${branch}/${fileName}`);
       });
     }
   }
@@ -161,6 +168,7 @@ class Editor extends React.Component {
     const { path } = this.state;
 
     siteActions.deleteBranch(site, formatDraftBranchName(path)).then(() => {
+      alertActions.alertSuccess('Draft successfully deleted');
       routeActions.redirect(`/sites/${site.id}`);
     });
   }
