@@ -20,7 +20,20 @@ const initializeMD = content => {
   return { frontmatter, markdown };
 };
 
+const isFileObject = maybeFile => {
+  return maybeFile && maybeFile.path;
+};
+
 const documentStrategy = file => {
+  if (!isFileObject(file)) {
+    return {
+      path: false,
+      raw: false,
+      frontmatter: '',
+      markdown: ''
+    };
+  }
+
   const fileType = file.path.split('.').pop();
   const contents = decodeB64(file.content);
   const baseOutput = {
@@ -48,7 +61,3 @@ const documentStrategy = file => {
 };
 
 export default documentStrategy;
-export {
-  initializeYml,
-  initializeMD
-};

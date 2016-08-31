@@ -2,6 +2,7 @@ import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
 import { siteActionTypes, navigationTypes } from '../constants';
 import { encodeB64 } from '../util/encoding';
+import convertFileToData from '../util/convertFileToData';
 import store from '../store';
 import alertActions from './alertActions';
 
@@ -55,12 +56,32 @@ export default {
     }).catch(error => alertActions.httpError(error.message));
   },
 
+  uploadFile(site, file, sha = false) {
+    const siteId = site.id;
+    const { name } = file;
+
+    convertFileToData(file).then((fileData) => {
+      const path = `assets/${name}`;
+      const message = `Uploads ${name} to project`;
+      let commit = {
+        content: fileData,
+        message: message
+      };
+
+      if (sha) commit = Object.assign({}, commit, { sha });
+
+      return github.createCommit(site, path, commit);
+    }).then((commitObj) => {
+        alertActions.alertSuccess('File uploaded successfully');
+        this.fetchSiteAssets(site);
+    }).catch(error => alertActions.alertError(error.message));
+  },
 
   createCommit(site, path, fileData, message = false, sha = false) {
     const b64EncodedFileContents = encodeB64(fileData);
     const siteId = site.id;
     let commit = {
-      message: (message) ? message : `Adds ${path} to project`,
+      message: message ? message : `Adds ${path} to project`,
       content: b64EncodedFileContents
     };
 
@@ -73,12 +94,6 @@ export default {
         type: siteActionTypes.SITE_FILE_ADDED,
         siteId,
         file: commitObj.content
-      });
-
-      store.dispatch({
-        type: navigationTypes.UPDATE_ROUTER,
-        method: 'push',
-        arguments: [`/sites/${siteId}`]
       });
     }).catch(error => alertActions.httpError(error.message));
   },

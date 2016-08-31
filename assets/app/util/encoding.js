@@ -6,6 +6,6 @@ export function decodeB64(s) {
   try {
     return decodeURIComponent(escape(window.atob(s)));
   } catch (e) {
-    return;
+    return false;
   }
 };

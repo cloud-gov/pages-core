@@ -21,6 +21,13 @@ export default function sites(state = initialState, action) {
   case siteActionTypes.SITE_ASSETS_RECEIVED:
     return mapPropertyToMatchingSite(state, action.siteId, { assets: action.assets });
 
+  case siteActionTypes.SITE_UPLOAD_RECEIVED: {
+    const site = state.find((site) => site.id === action.siteId);
+    return mapPropertyToMatchingSite(state, action.siteId, {
+      assets: site.assets.concat([action.file])
+    });
+  }
+
   case siteActionTypes.SITE_FILES_RECEIVED:
     const nextFiles = action.files || [];
     const site = state.find((site) => site.id === action.siteId);

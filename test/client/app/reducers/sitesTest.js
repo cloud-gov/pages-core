@@ -12,7 +12,8 @@ describe("sitesReducer", () => {
   const SITE_DELETED = "bye, site.";
   const SITE_UPDATED = "change the site, please";
   const SITES_RECEIVED = "hey, sites!";
-  const SITE_FILE_CONTENT_RECEIVED = "cool, files!";
+  const SITE_UPLOAD_RECEIVED = 'uploaded!';
+  const SITE_FILE_CONTENT_RECEIVED = "cool files!";
 
   beforeEach(() => {
     fixture = proxyquire("../../../../assets/app/reducers/sites", {
@@ -25,6 +26,7 @@ describe("sitesReducer", () => {
           SITE_DELETED: SITE_DELETED,
           SITE_UPDATED: SITE_UPDATED,
           SITES_RECEIVED: SITES_RECEIVED,
+          SITE_UPLOAD_RECEIVED: SITE_UPLOAD_RECEIVED,
           SITE_FILE_CONTENT_RECEIVED: SITE_FILE_CONTENT_RECEIVED
         }
       }
@@ -286,6 +288,29 @@ describe("sitesReducer", () => {
     };
 
     expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
+  });
+
+  it('adds an uploaded file to the site\'s assets array when the site is found', () => {
+    const siteId = 'site-id';
+    const existingFile = {
+      id: 'old-file'
+    };
+    const existingSites = [
+      {
+        id: siteId,
+        assets: [existingFile]
+      }
+    ];
+    const actual = fixture(existingSites, {
+      type: SITE_UPLOAD_RECEIVED,
+      siteId: siteId,
+      file: { id: 'uploaded-file' }
+    });
+
+    const siteAssets = actual[0].assets;
+
+    expect(siteAssets.length).to.equal(2);
+    expect(siteAssets[1].id).to.equal('uploaded-file');
   });
 
   it("does nothing when given a contents received action and the new site's id is not found", () => {

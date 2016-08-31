@@ -11,6 +11,7 @@
     "bcryptjs": "^2.1.0",
     "browserify": "^10.2.4",
     "cfenv": "^1.0.0",
+    "classname": "0.0.0",
     "codemirror": "^5.6.0",
     "connect-redis": "1.4.5",
     "db-migrate": "^0.9.17",
@@ -85,6 +86,7 @@
     "test:selenium:install": "node_modules/selenium-standalone/bin/selenium-standalone install",
     "test:selenium:start": "node_modules/selenium-standalone/bin/selenium-standalone start",
     "test:client": "mocha --compilers js:babel-register --recursive ./test/client",
+    "test:client:watch": "watch 'npm run test:client' ./assets/app ./test/client",
     "coverage:client": "istanbul cover _mocha -- --compilers js:babel-register --recursive ./test/client",
     "lint": "eslint ./**",
     "migrate:create": "grunt db:migrate:create",
@@ -132,6 +134,7 @@
     "selenium-standalone": "^4.9.0",
     "sinon": "1.17.2",
     "uniloc": "^0.3.0",
+    "watch": "^0.19.2",
     "watchify": "^3.2.2",
     "webdriverio": "^3.4.0"
   },

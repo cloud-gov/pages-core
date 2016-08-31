@@ -1,15 +1,15 @@
-
 import React from 'react';
 import prosemirror from 'prosemirror';
-import { exampleSetup, buildMenuItems } from 'prosemirror/dist/example-setup'
-import { defaultMarkdownParser, defaultMarkdownSerializer } from 'prosemirror/dist/markdown';
-import { menuBar } from 'prosemirror/dist/menu';
+import { exampleSetup } from 'prosemirror/dist/example-setup'
+import { markdownParser, markdownSerializer } from '../../../util/pmParserExtension';
 import { schema } from 'prosemirror/dist/schema-basic';
-
-const menu = buildMenuItems(schema);
+import menuImageExtension from '../../../util/pmImageMenuExtension';
 
 const propTypes = {
+  assetPath: React.PropTypes.string,
   initialMarkdownContent: React.PropTypes.string,
+  handleToggleImages: React.PropTypes.func.isRequired,
+  registerInsertImage: React.PropTypes.func,
   onChange: React.PropTypes.func
 };
 
@@ -18,22 +18,30 @@ const defaultProps = {
   onChange: () => {}
 };
 
+let rendered = false;
+
 class Prosemirror extends React.Component {
   constructor(props) {
     super(props);
 
     this.toMarkdown = this.toMarkdown.bind(this);
+    this.insertImage = this.insertImage.bind(this);
   }
 
   componentDidMount() {
+    const { handleToggleImages, initialMarkdownContent } = this.props;
+    const menu = menuImageExtension(handleToggleImages);
+
     this.editor = new prosemirror.ProseMirror({
-      doc: defaultMarkdownParser.parse(this.props.initialMarkdownContent),
+      doc: this.fromMarkdown(initialMarkdownContent),
       place: document.getElementById('js-prosemirror-target'),
       schema: schema,
       plugins: [
-        menuBar.config({ content: menu.fullMenu })
+        exampleSetup.config({menuBar: {float: true, content: menu.fullMenu}})
       ]
     });
+
+    this.props.registerInsertImage(this.insertImage);
 
     this.editor.on.change.add(() => {
       this.props.onChange(this.toMarkdown());
@@ -41,13 +49,27 @@ class Prosemirror extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const markdown = this.toMarkdown();
+    const markdown = this.props.initialMarkdownContent;
     const sameContent = (markdown === nextProps.initialMarkdownContent);
+    const { selected } = nextProps;
 
     if (sameContent) return;
 
-    const doc = defaultMarkdownParser.parse(nextProps.initialMarkdownContent);
+    const doc = this.fromMarkdown(nextProps.initialMarkdownContent);
     this.editor.setDoc(doc);
+  }
+
+  shouldComponentUpdate(nextProps) {
+    if (nextProps.initialMarkdownContent && !rendered) {
+      // We force an update here to ensure the component gets rendered
+      // no more than once with the supplied initialMarkdownContent
+      this.forceUpdate();
+      rendered = true;
+    }
+
+    // This component should never rerender as prosemirror provides
+    // it's own rendering
+    return rendered ? false : true;
   }
 
   componentWillUnmount() {
@@ -57,8 +79,25 @@ class Prosemirror extends React.Component {
     });
   }
 
+  insertImage(image) {
+    const imgNode = this.editor.schema.nodeType('image').create({
+      src: image.download_url,
+      title: image.name,
+      alt: image.name
+    });
+
+    this.editor.tr.insertInline(this.editor.selection.head, imgNode).apply();
+  }
+
   toMarkdown() {
-    return defaultMarkdownSerializer.serialize(this.editor.doc);
+    return markdownSerializer.serialize(this.editor.doc);
+  }
+
+  fromMarkdown(content) {
+    const { assetPath } = this.props;
+    const cleanContent = content.replace(/{{ site.baseurl }}\//g, assetPath);
+
+    return markdownParser.parse(cleanContent);
   }
 
   render() {
