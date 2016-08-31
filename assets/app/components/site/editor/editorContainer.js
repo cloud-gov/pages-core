@@ -48,7 +48,7 @@ class Editor extends React.Component {
     const branches = site.branches || [];
     const draftBranchName = formatDraftBranchName(fileName)
     const hasDraft = pathHasDraft(fileName, branches);
-    const isNotCurrentBranch = (draftBranchName !== currentBranch);
+    const draftBranchIsNotCurrent = (draftBranchName !== currentBranch);
     let nextSite = site;
 
     if (hasDraft) {
@@ -58,10 +58,13 @@ class Editor extends React.Component {
     }
 
     siteActions.fetchFileContent(nextSite, this.path).then(() => {
-      if (hasDraft && isNotCurrentBranch) {
-        routeActions.redirect(`/sites/${nextSite.id}/edit/${formatDraftBranchName(fileName)}/${fileName}`);
+      if (hasDraft) {
+        if (draftBranchIsNotCurrent) {
+          routeActions.redirect(`/sites/${nextSite.id}/edit/${formatDraftBranchName(fileName)}/${fileName}`);
+        }
       } else {
-        routeActions.redirect(`/sites/${nextSite.id}/edit/${nextSite.defaultBranch}/${fileName}`);
+        console.log('is this always redirecting');
+        routeActions.redirect(`/sites/${nextSite.id}/edit/${nextSite.defaultBranch}/${this.path}`);
       }
     });
   }

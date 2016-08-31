@@ -85,7 +85,6 @@ export default {
       message: (message) ? message : `Adds ${path} to project`,
       content: b64EncodedFileContents,
       branch: `${site.branch || site.defaultBranch}`,
-
     };
 
     if (sha) commit = Object.assign({}, commit, { sha });
@@ -94,17 +93,10 @@ export default {
       alertActions.alertSuccess('File committed successfully');
 
       store.dispatch({
-        type: siteActionTypes.SITE_FILE_ADDED,
+        type: siteActionTypes.SITE_FILE_CONTENT_RECEIVED,
         siteId,
         file: commitObj.content
       });
-
-      //
-      // store.dispatch({
-      //   type: navigationTypes.UPDATE_ROUTER,
-      //   method: 'push',
-      //   arguments: [`/sites/${siteId}`]
-      // });
     }).catch(error => alertActions.httpError(error.message));
   },
 

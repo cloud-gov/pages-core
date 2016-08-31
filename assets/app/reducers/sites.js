@@ -30,26 +30,28 @@ export default function sites(state = initialState, action) {
     });
   }
 
-  case siteActionTypes.SITE_FILES_RECEIVED:
+  case siteActionTypes.SITE_FILES_RECEIVED: {
     const nextFiles = action.files || [];
     const site = state.find((site) => site.id === action.siteId);
+    const siteFiles = site.files || [];
 
     if (!site) return state;
 
-    if (!site.files) {
-      return mapPropertyToMatchingSite(state, action.siteId, {
-        files: nextFiles
-      });
-    }
-
     let newFiles = nextFiles.map((file) => {
-      const exists = site.files.find((f) => f.path === file.path);
+      const exists = siteFiles.find((f) => f.path === file.path);
+
       if (!exists) return file;
+
+      // New file doesnt have the same ref, and is therefore on a
+      // different branch, return original file
+      if (!checkFileRefEquality(file, exists)) {
+        return exists;
+      }
 
       return Object.assign({}, exists, file);
     });
 
-    let leftBehind = site.files.filter((file) => {
+    let leftBehind = siteFiles.filter((file) => {
       const added = newFiles.find((f) => f.path === file.path);
       return !added
     });
@@ -57,26 +59,40 @@ export default function sites(state = initialState, action) {
     return mapPropertyToMatchingSite(state, action.siteId, {
       files: newFiles.concat(leftBehind)
     });
+  }
 
   case siteActionTypes.SITE_DELETED:
     return state.filter((site) => site.id != action.siteId);
 
   case siteActionTypes.SITE_FILE_CONTENT_RECEIVED:
+    // get site we want to check files for from the list of user's sites
     const currentSite = state.find((site) => site.id === action.siteId);
+    // get list of files associated with the current site
     const siteFiles = currentSite.files || [];
-    const files = siteFiles.map((file) => {
+
+    let files = siteFiles.map((file) => {
       if (file.path !== action.file.path) return file;
+      // if the path of the fetched file is equivalent to a path of an existing file,
+      // replace it.
       return Object.assign({}, file, action.file);
     });
-    const exists = files.find((file) => file.path === action.file.path);
 
-    if (!exists) files.push(action.file);
+    if (!files.length) files = [action.file];
+
     return mapPropertyToMatchingSite(state, action.siteId, {files});
 
   default:
     return state;
   }
 }
+
+const checkFileRefEquality = (fileA, fileB) => {
+  const refMatchingRegexp = new RegExp(/(ref=)?=(.+)/);
+  const refA = fileA.url.match(refMatchingRegexp)[2];
+  const refB = fileB.url.match(refMatchingRegexp)[2];
+
+  return refA === refB;
+};
 
 const mapPropertyToMatchingSite = (state, siteId, properties) => {
   return state.map((site) => {
