@@ -173,8 +173,15 @@ class Editor extends React.Component {
 
   onUpload(file) {
     const { site } = this.props;
+    const existingUpload =  site.assets.find(asset => asset.name === file.name);
 
-    siteActions.uploadFile(site, file);
+    let uploadOptions = [site, file];
+
+    if (existingUpload) {
+      uploadOptions.push(existingUpload.sha);
+    }
+
+    siteActions.uploadFile.apply(siteActions, uploadOptions);
   }
 
   // TODO: break up this component. We need an intermediate form component that

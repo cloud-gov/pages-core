@@ -56,27 +56,24 @@ export default {
     }).catch(error => alertActions.httpError(error.message));
   },
 
-  uploadFile(site, file) {
+  uploadFile(site, file, sha = false) {
     const siteId = site.id;
     const { name } = file;
 
-    convertFileToData(file).then(function (fileData) {
+    convertFileToData(file).then((fileData) => {
       const path = `assets/${name}`;
       const message = `Uploads ${name} to project`;
-      const commit = {
+      let commit = {
         content: fileData,
         message: message
       };
 
+      if (sha) commit = Object.assign({}, commit, { sha });
+
       return github.createCommit(site, path, commit);
     }).then((commitObj) => {
         alertActions.alertSuccess('File uploaded successfully');
-
-        store.dispatch({
-          type: siteActionTypes.SITE_UPLOAD_RECEIVED,
-          siteId,
-          file: commitObj.content
-        });
+        this.fetchSiteAssets(site);
     }).catch(error => alertActions.alertError(error.message));
   },
 
