@@ -33,9 +33,11 @@ export default function sites(state = initialState, action) {
   case siteActionTypes.SITE_FILES_RECEIVED: {
     const nextFiles = action.files || [];
     const site = state.find((site) => site.id === action.siteId);
-    const siteFiles = site.files || [];
+    let siteFiles;
 
     if (!site) return state;
+
+    siteFiles = site.files || [];
 
     let newFiles = nextFiles.map((file) => {
       const exists = siteFiles.find((f) => f.path === file.path);

@@ -432,7 +432,8 @@ describe("sitesReducer", () => {
       oldData: true,
       files: [
         {
-          path: "hey"
+          path: "hey",
+          url: 'http://url.biz?ref=master'
         }
       ]
     };
@@ -446,10 +447,12 @@ describe("sitesReducer", () => {
 
     const files = [
       {
-        path: "hey"
+        path: "hey",
+        url: 'http://url.biz?ref=master'
       },
       {
-        path: "huh?"
+        path: "huh?",
+        url: 'http://url.biz?ref=master'
       }
     ];
 
@@ -469,6 +472,38 @@ describe("sitesReducer", () => {
 
     expect(actual.length).to.equal(2);
     expect(site.files.length).to.equal(updatedSiteOne.files.length);
+  });
+
+  it('does not update a file when receiving a file with the same path, but different branch ref', () => {
+    const initialContent = 'who is dankey kang?';
+    const sites = [
+      {
+        id: 1,
+        files: [
+          {
+            path: 'file_path.md',
+            url: 'http://biz.biz?ref=master',
+            content: initialContent
+          }
+        ]
+      }
+    ];
+
+    const nextFile = {
+      path: 'file_path.md',
+      url: 'http://biz.biz?ref=draft',
+      content: 'hello world'
+    }
+
+    const actual = fixture(sites, {
+      type: SITE_FILES_RECEIVED,
+      siteId: 1,
+      files: [nextFile]
+    });
+
+    const nextSite = actual[0];
+
+    expect(nextSite.files[0].content).to.equal(initialContent);
   });
 
   it("does nothing when given a files_received action and the new site's id is not found", () => {
