@@ -1,7 +1,13 @@
 import React from 'react';
 import PageListItem from './pageListItem';
 
-const navigationJsonContent = ({ site }) => {
+import { pathHasDraft } from '../../../util/branchFormatter';
+
+const propTypes = {
+  site: React.PropTypes.object.isRequired
+};
+
+const NavigationJsonContent = ({ site }) => {
   const pagesConfigurationString = site["_navigation.json"].content;
   const pagesConfiguration = JSON.parse(pagesConfigurationString);
   const siteId = site.id;
@@ -16,12 +22,17 @@ const navigationJsonContent = ({ site }) => {
 
 const emitPages = (pages, siteId, defaultBranch) => {
   const emitPage = (page, index) => {
-    const { title, permalink, href, children } = page;
+    const { title, permalink, href, children, path } = page;
     const pageListItemHref = getLinkFor(href, siteId, defaultBranch);
 
     return (
-      <PageListItem key={ index } pageName={ title } href={ pageListItemHref }
-                    isPageDirectory={ false }>
+      <PageListItem
+        key={ index }
+        pageName={ title }
+        href={ pageListItemHref }
+        isPageDirectory={ false }
+        hasDraft={ pathHasDraft(page.path, site.branches) }
+      >
         { emitChildren(children, siteId, defaultBranch) }
       </PageListItem>
     );
@@ -44,4 +55,6 @@ const emitChildren = (children, siteId, defaultBranch) => {
   }
 };
 
-export default navigationJsonContent;
+NavigationJsonContent.propTypes = propTypes;
+
+export default NavigationJsonContent;

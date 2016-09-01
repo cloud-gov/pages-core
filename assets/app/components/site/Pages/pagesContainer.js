@@ -39,11 +39,12 @@ class Pages extends React.Component {
     }
 
     if (hasNavigationJsonContent(site)) {
-      return <NavigationJsonPageList site={ site } />;
+      return <NavigationJsonPageList site={ site }/>;
     }
 
     const path = getPath(params);
     const files = getFilesByPath(site.files, path);
+
     return <PageList site={ site } files={ files }/>;
   }
 }
