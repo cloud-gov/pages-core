@@ -76,14 +76,12 @@ class SiteSettings extends React.Component {
             <label>Draft previews</label>
             <RadioInput
               name="publicPreview"
-              id="public"
               value={true}
               checked={state.publicPreview}
               handleChange={this.onChange}
               labelText="Allow anyone to see previews of draft sites" />
             <RadioInput
               name="publicPreview"
-              id="public"
               value={false}
               checked={!state.publicPreview}
               handleChange={this.onChange}
