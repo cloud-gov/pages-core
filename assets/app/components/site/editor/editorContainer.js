@@ -28,6 +28,7 @@ class Editor extends React.Component {
       imagePicker: false
     }, this.getStateWithProps(props));
 
+    this.commitOrPR = this.commitOrPR.bind(this);
     this.submitFile = this.submitFile.bind(this);
     this.submitDraft = this.submitDraft.bind(this);
     this.deleteDraft = this.deleteDraft.bind(this);
@@ -60,10 +61,10 @@ class Editor extends React.Component {
     siteActions.fetchFileContent(nextSite, this.path).then(() => {
       if (hasDraft) {
         if (draftBranchIsNotCurrent) {
-          routeActions.redirect(`/sites/${nextSite.id}/edit/${formatDraftBranchName(fileName)}/${fileName}`);
+          routeActions.redirect(`/sites/${nextSite.id}/edit/${formatDraftBranchName(fileName)}/${this.path}`);
         }
       } else {
-        console.log('is this always redirecting');
+        // currently this always redirects
         routeActions.redirect(`/sites/${nextSite.id}/edit/${nextSite.defaultBranch}/${this.path}`);
       }
     });
@@ -103,7 +104,6 @@ class Editor extends React.Component {
       encoded: raw || false,
       frontmatter,
       markdown,
-      message: false,
       path: path || '',
       raw: raw,
       sha: file.sha || false
@@ -136,6 +136,22 @@ class Editor extends React.Component {
     return { content, path, message };
   }
 
+  commitOrPR() {
+    const { site } = this.props;
+    const { path } = this.state;
+    const draftBranch = getDraft(path, site.branches);
+
+    if (!draftBranch) {
+      this.submitFile();
+    }
+
+    this.submitFile(draftBranch.name).then(() => {
+      return siteActions.createPR(site, draftBranch.name, site.defaultBranch);
+    }).then(() => {
+      routeActions.redirect(`/sites/${site.id}`);
+    });
+  }
+
   submitFile(branch = this.props.site.defaultBranch) {
     const { site } = this.props;
     const { sha } = this.state;
@@ -144,7 +160,7 @@ class Editor extends React.Component {
       branch
     });
 
-    siteActions.createCommit(nextSite, path, content, message, sha);
+    return siteActions.createCommit(nextSite, path, content, message, sha);
   }
 
   submitDraft() {
@@ -265,10 +281,6 @@ class Editor extends React.Component {
     return (
       <div>
         {this.getImagePicker()}
-        <button onClick={ (ev) => {
-            siteActions.getBranches(this.props.site)
-          }}
-        >debug: get branches</button>
         {this.getNewPage()}
 
         <Codemirror
@@ -305,7 +317,7 @@ class Editor extends React.Component {
               onClick={this.deleteDraft}
             >Delete Draft</button>
 
-            <button onClick={ () => this.submitFile }>Save &amp; Publish</button>
+            <button onClick={this.commitOrPR}>Save &amp; Publish</button>
           </div>
         </div>
       </div>

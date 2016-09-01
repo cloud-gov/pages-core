@@ -77,6 +77,18 @@ export default {
     }).catch(error => alertActions.alertError(error.message));
   },
 
+  createPR(site, head, base) {
+    return github.createPullRequest(site, head, base).then((pr) => {
+      return github.mergePullRequest(site, pr);
+    }).then(() => {
+      return github.deleteBranch(site, head);
+    }).then(() => {
+      this.fetchBranches(site);
+    }).then(() => {
+      return alertActions.alertSuccess(`${head} merged successfully`);
+    }).catch(error => alertActions.httpError(error.message));
+  },
+
   createCommit(site, path, fileData, message = false, sha = false) {
     const b64EncodedFileContents = encodeB64(fileData);
     const siteId = site.id;
@@ -89,7 +101,7 @@ export default {
 
     if (sha) commit = Object.assign({}, commit, { sha });
 
-    github.createCommit(site, path, commit).then((commitObj) => {
+    return github.createCommit(site, path, commit).then((commitObj) => {
       alertActions.alertSuccess('File committed successfully');
 
       store.dispatch({
