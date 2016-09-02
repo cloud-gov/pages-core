@@ -6,54 +6,97 @@ import convertFileToData from '../util/convertFileToData';
 import store from '../store';
 import alertActions from './alertActions';
 
+const alertError = error => {
+  alertActions.httpError(error.message);
+};
+
+const updateRouterToSitesUri = () => {
+  store.dispatch({
+    type: navigationTypes.UPDATE_ROUTER,
+    method: 'push',
+    arguments: [`/sites`]
+  });
+};
+
 export default {
   fetchSites() {
-    federalist.fetchSites().then((sites) => {
+    return federalist.fetchSites().then((sites) => {
       store.dispatch({
         type: siteActionTypes.SITES_RECEIVED,
         sites
       });
-    }).catch(error => alertActions.httpError(error.message));
+    }).catch(alertError);
   },
 
   addSite(siteToAdd) {
-    federalist.addSite(siteToAdd).then((site) => {
+    return federalist.addSite(siteToAdd).then((site) => {
       store.dispatch({
         type: siteActionTypes.SITE_ADDED,
         site
       });
 
-      store.dispatch({
-        type: navigationTypes.UPDATE_ROUTER,
-        method: 'push',
-        arguments: [`/sites`]
-      });
-    }).catch(error => alertActions.httpError(error.message));
+      updateRouterToSitesUri();
+    }).catch(alertError);
   },
 
   updateSite(site, data) {
-    federalist.updateSite(site, data).then((site) => {
+    return federalist.updateSite(site, data).then((site) => {
       store.dispatch({
         type: siteActionTypes.SITE_UPDATED,
         siteId: site.id,
         site
-      })
-    }).catch(error => alertActions.httpError(error.message));
+      });
+    }).catch(alertError);
   },
 
   deleteSite(siteId) {
-    federalist.deleteSite(siteId).then((site) => {
+    return federalist.deleteSite(siteId).then((site) => {
       store.dispatch({
         type: siteActionTypes.SITE_DELETED,
         siteId
       });
 
+      updateRouterToSitesUri();
+    }).catch(alertError);
+  },
+
+  // todo rename to something like fetchTree
+  fetchFiles(site, path) {
+    function dispatchChildContent(site, path, files) {
       store.dispatch({
-        type: navigationTypes.UPDATE_ROUTER,
-        method: 'push',
-        arguments: [`/sites`]
+        type: siteActionTypes.SITE_FILES_RECEIVED,
+        siteId: site.id,
+        files
       });
-    }).catch(error => alertActions.httpError(error.message));
+    }
+
+    return github.fetchRepositoryContent(site, path)
+      .then(
+        dispatchChildContent.bind(null, site, path)
+      ).catch(alertError);
+  },
+
+  fetchFileContent(site, path) {
+    return github.fetchRepositoryContent(site, path)
+      .then((file) => {
+        store.dispatch({
+          type: siteActionTypes.SITE_FILE_CONTENT_RECEIVED,
+          siteId: site.id,
+          file
+        });
+      });
+  },
+
+  fetchSiteConfigs(site) {
+    return github.fetchRepositoryConfigs(site).then((configs) => {
+      store.dispatch({
+        type: siteActionTypes.SITE_CONFIGS_RECEIVED,
+        siteId: site.id,
+        configs
+      });
+      
+      return site;
+    });
   },
 
   uploadFile(site, file, sha = false) {
@@ -109,7 +152,7 @@ export default {
         siteId,
         file: commitObj.content
       });
-    }).catch(error => alertActions.httpError(error.message));
+    }).catch(alertError);
   },
 
   fetchSiteAssets(site) {
@@ -128,19 +171,7 @@ export default {
       });
 
       return Promise.resolve(site);
-    }).catch(error => alertActions.httpError(error.message));
-  },
-
-  fetchSiteConfigs(site) {
-    return github.fetchRepositoryConfigs(site).then((configs) => {
-      store.dispatch({
-        type: siteActionTypes.SITE_CONFIGS_RECEIVED,
-        siteId: site.id,
-        configs
-      });
-
-      return site;
-    });
+    }).catch(alertError);
   },
 
   fetchSiteConfigsAndAssets(site) {
@@ -163,35 +194,8 @@ export default {
       // trigger an http error action for an actual http
       // error.
       throwRuntime(throwRuntime);
-      alertActions.httpError(error.message)
+      alertActions.httpError(error.message);
     });
-  },
-
-  // todo rename to something like fetchTree
-  fetchFiles(site, path) {
-    function dispatchChildContent(site, path, files) {
-      store.dispatch({
-        type: siteActionTypes.SITE_FILES_RECEIVED,
-        siteId: site.id,
-        files
-      });
-    }
-
-    return github.fetchRepositoryContent(site, path)
-      .then(
-        dispatchChildContent.bind(null, site, path)
-      ).catch(error => alertActions.httpError(error.message));
-  },
-
-  fetchFileContent(site, path) {
-    return github.fetchRepositoryContent(site, path)
-      .then((file) => {
-        store.dispatch({
-          type: siteActionTypes.SITE_FILE_CONTENT_RECEIVED,
-          siteId: site.id,
-          file
-        });
-      });
   },
 
   cloneRepo(destination, source) {
@@ -208,6 +212,7 @@ export default {
         method: 'push',
         arguments: [`/sites/${site.id}`]
       });
+<<<<<<< HEAD
     }).catch((error) => alertActions.httpError(error.message));
   },
 
@@ -240,9 +245,9 @@ export default {
   deleteBranch(site, branch) {
     return github.deleteBranch(site, branch).then(() => {
       return this.fetchBranches(site);
-    }).catch((error) => alertActions.httpError(error.message));
+    }).catch(alertError);
   }
-}
+};
 
 function throwRuntime(error) {
   const runtimeErrors = ['TypeError'];
