@@ -8,57 +8,6 @@ var url = require('url'),
 module.exports = {
 
   /*
-   * fork a repository template repository
-   * @param {User} user model to own new template fork
-   * @param {string} name of template to fork (from sails.config.templates)
-   * @param {Function} callback function
-   */
-  forkRepository: function(user, templateId, done) {
-    var template = sails.config.templates[templateId];
-
-    if (!template) return done(new Error('Invalid template ID'));
-
-    Passport.findOne({ user: user.id }).exec(function(err, passport) {
-      var repoUrl = url.parse(template.repo),
-          repoOwner = repoUrl.pathname.split('/')[1],
-          repoName = repoUrl.pathname.split('/')[2],
-          data = {
-            user: repoOwner,
-            repo: repoName
-          };
-
-      // Authenticate request with user's oauth token
-      github.authenticate({
-        type: 'oauth',
-        token: passport.tokens.accessToken
-      });
-
-      github.repos.fork(data, function(err, suc) {
-        if (err) return done(err);
-
-        var values = {
-          'owner': user.username,
-          'repository': repoName,
-          'defaultBranch': suc.default_branch,
-          'engine': 'jekyll',
-          'users': [user.id]
-        };
-        Site.count({
-          'owner': user.username,
-          'repository': repoName
-        }, function(err, count) {
-          if (err) return done('Unable to create a fork of this template');
-          if (count) return done('You already have a copy of this template');
-          Site.create(values).exec(function createCB(err, created) {
-            if (err) return done(err);
-            return done(null, created);
-          });
-        });
-      });
-    });
-  },
-
-  /*
    * Set a webhook on a repository
    * @param {Site} site model to apply the webhook
    * @param {Function} callback function

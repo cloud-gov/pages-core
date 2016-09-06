@@ -1,5 +1,4 @@
 .CodeMirror {
-  border: 1px solid #ccc;
   height: auto;
 }
 
@@ -43,4 +42,9 @@
   right: 0;
   bottom: 0;
   z-index: 10;
+}
+
+.editor {
+  border: 3px solid #ccc;
+  margin-bottom: 3em;
 }

@@ -49,6 +49,10 @@ module.exports.policies = {
 		// feed : ['isNiceToAnimals', 'hasRabbitFood']
 	// }
 
+  MainController: {
+    '*': ['hasAuth']
+  },
+
   AuthController: {
     '*': ['passport']
   },

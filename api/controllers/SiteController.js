@@ -6,7 +6,6 @@
  */
 
 module.exports = {
-
   clone: function cloneSite(req, res) {
     var data = {
       owner: req.param('destinationOrg') || req.user.username,
@@ -34,7 +33,7 @@ module.exports = {
 
         // Delete the build that runs automatically when the site is created
         Build.destroy({ id: site.builds[0].id }).exec(function(err) {
-          console.log('build destroyed');
+          sails.log.info('build destroyed');
           if (err) return res.serverError(err);
         });
 
@@ -44,17 +43,6 @@ module.exports = {
           res.send(site);
         });
       });
-    });
-  },
-
-  fork: function forkSiteFromTemplate(req, res) {
-    if (!req.param('templateId')) return res.notFound();
-
-    var user = req.user,
-        templateId = req.param('templateId');
-    GitHub.forkRepository(user, templateId, function(err, newSite) {
-      if (err) return res.serverError(err);
-      res.send(newSite);
     });
   },
 
