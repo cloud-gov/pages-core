@@ -49,7 +49,7 @@
     "passport-local": "^1.0.0",
     "pg": "^4.4.0",
     "postcss-cli": "^2.3.2",
-    "prosemirror": "git+https://github.com/18f/prosemirror.git",
+    "prosemirror": "git+https://github.com/18f/prosemirror.git#b679cb362aa5a4e03ac47c1eab01939544dab87d",
     "rc": "~0.5.0",
     "request": "^2.61.0",
     "s3": "^4.4.0",
@@ -117,7 +117,7 @@
     "webdriverio": "^3.4.0"
   },
   "engines": {
-    "node": "4.4.6",
+    "node": "4.2.3",
     "npm": "2.15.9"
   }
 }
