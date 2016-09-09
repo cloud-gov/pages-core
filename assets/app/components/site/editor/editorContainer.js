@@ -8,13 +8,36 @@ import Codemirror from './codemirror';
 import Prosemirror from './prosemirror';
 
 import documentStrategy from '../../../util/documentStrategy';
+import {
+  formatDraftBranchName,
+  pathHasDraft,
+  getDraft } from '../../../util/branchFormatter';
 
 import alertActions from '../../../actions/alertActions';
 import siteActions from '../../../actions/siteActions';
+import routeActions from '../../../actions/routeActions';
 
 const propTypes = {
   site: React.PropTypes.object
 };
+
+const redirectToFileOnBranch = (siteId, branch, filePath) => {
+  routeActions.redirect(`/sites/${siteId}/edit/${branch}/${filePath}`);
+};
+
+const alertAndRedirect = (message, uri) => {
+  alertActions.alertSuccess(message);
+  routeActions.redirect(uri);
+};
+
+const openPRWithHead = (branchName, site) => {
+  return this.submitFile(branchName).then(() => {
+    return siteActions.createPR(site, branchName, site.defaultBranch);
+  }).then(() => {
+    routeActions.redirect(`/sites/${site.id}`);
+  });
+}
+
 
 let insertFn;
 
@@ -26,7 +49,10 @@ class Editor extends React.Component {
       imagePicker: false
     }, this.getStateWithProps(props));
 
+    this.commitOrPR = this.commitOrPR.bind(this);
     this.submitFile = this.submitFile.bind(this);
+    this.submitDraft = this.submitDraft.bind(this);
+    this.deleteDraft = this.deleteDraft.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.onOpenImagePicker = this.onOpenImagePicker.bind(this);
     this.onCloseImagePicker = this.onCloseImagePicker.bind(this);
@@ -35,10 +61,34 @@ class Editor extends React.Component {
   }
 
   componentDidMount() {
-    // This action should be triggered when a user first loads this view,
-    // either visiting it directly from the url bar or navigating here
-    // with react router
-    siteActions.fetchFileContent(this.props.site, this.path);
+    // trigger the fetch file content action for the case
+    // when a user first loads this view. That could be
+    // a changing of the route to a site for the first time
+    // or directly loading the url
+    const { fileName, branch: currentBranch } = this.props.params;
+    const { site } = this.props;
+    const branches = site.branches || [];
+    const draftBranchName = formatDraftBranchName(fileName)
+    const hasDraft = pathHasDraft(fileName, branches);
+    const draftBranchIsNotCurrent = (draftBranchName !== currentBranch);
+    let nextSite = site;
+
+    if (hasDraft) {
+      nextSite = Object.assign({}, site, {
+        branch: draftBranchName
+      });
+    }
+
+    siteActions.fetchFileContent(nextSite, this.path).then(() => {
+      if (hasDraft) {
+        if (draftBranchIsNotCurrent) {
+          redirectToFileOnBranch(nextSite.id, formatDraftBranchName(fileName), this.path);
+        }
+      } else {
+        // currently this always redirects
+        redirectToFileOnBranch(nextSite.id, nextSite.defaultBranch, this.path);
+      }
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -75,16 +125,14 @@ class Editor extends React.Component {
       encoded: raw || false,
       frontmatter,
       markdown,
-      message: false,
       path: path || '',
       raw: raw,
       sha: file.sha || false
     };
   }
 
-  submitFile() {
-    const { site } = this.props;
-    let { frontmatter, markdown, message, path, sha } = this.state;
+  buildFile() {
+    let { frontmatter, markdown, path, message } = this.state;
     let content = markdown;
 
     if (!path) {
@@ -106,7 +154,59 @@ class Editor extends React.Component {
       path = `${path}.md`;
     }
 
-    siteActions.createCommit(site, path, content, message, sha);
+    return { content, path, message };
+  }
+
+  commitOrPR() {
+    const { site } = this.props;
+    const { path } = this.state;
+    const draftBranch = getDraft(path, site.branches);
+
+    if (!draftBranch) {
+      // Just commit the edited file
+      return this.submitFile();
+    }
+
+    // All federalist draft branch PRs are opened against master
+    openPRWithHead(draftBranch.name, site);
+  }
+
+  submitFile(branch = this.props.site.defaultBranch) {
+    const { site } = this.props;
+    const { sha } = this.state;
+    const {content, path, message} = this.buildFile();
+    const nextSite = Object.assign({}, site, {
+      branch
+    });
+
+    return siteActions.createCommit(nextSite, path, content, message, sha);
+  }
+
+  submitDraft() {
+    const { site } = this.props;
+    const { path } = this.state;
+    const draftBranch = getDraft(path, site.branches);
+
+    if (draftBranch) {
+      this.submitFile(draftBranch.name);
+    } else {
+      siteActions.createDraftBranch(site, path).then((branchName) => {
+        return this.submitFile(branchName);
+      }).then(() => {
+        const fileName = path.split('/').pop();
+        const branch = formatDraftBranchName(path);
+        redirectToFileOnBranch(site.id, branch, fileName);
+      });
+    }
+  }
+
+  deleteDraft() {
+    const { site } = this.props;
+    const { path } = this.state;
+
+    siteActions.deleteBranch(site, formatDraftBranchName(path)).then(() => {
+      alertAndRedirect('Draft successfully deleted', `/sites/${site.id}`);
+    });
   }
 
   handleChange(name, value) {
@@ -125,9 +225,11 @@ class Editor extends React.Component {
 
   get path() {
     const params = this.props.params;
+
     if (params.splat) {
       return `${params.splat}/${params.fileName}`;
     }
+
     return params.fileName;
   }
 
@@ -223,7 +325,16 @@ class Editor extends React.Component {
                 this.handleChange('message', event.target.value);
               }}
             />
-            <button onClick={this.submitFile}>Submit</button>
+            <button
+              className="usa-button-outline"
+              onClick={this.submitDraft}
+            >Save as Draft</button>
+            <button
+              className="usa-button-outline"
+              onClick={this.deleteDraft}
+            >Delete Draft</button>
+
+            <button onClick={this.commitOrPR}>Save &amp; Publish</button>
           </div>
         </div>
       </div>

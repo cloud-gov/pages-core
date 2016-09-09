@@ -77,21 +77,35 @@ export default {
     }).catch(error => alertActions.alertError(error.message));
   },
 
+  createPR(site, head, base) {
+    return github.createPullRequest(site, head, base).then((pr) => {
+      return github.mergePullRequest(site, pr);
+    }).then(() => {
+      return github.deleteBranch(site, head);
+    }).then(() => {
+      this.fetchBranches(site);
+    }).then(() => {
+      return alertActions.alertSuccess(`${head} merged successfully`);
+    }).catch(error => alertActions.httpError(error.message));
+  },
+
   createCommit(site, path, fileData, message = false, sha = false) {
     const b64EncodedFileContents = encodeB64(fileData);
     const siteId = site.id;
     let commit = {
-      message: message ? message : `Adds ${path} to project`,
-      content: b64EncodedFileContents
+      path,
+      message: (message) ? message : `Adds ${path} to project`,
+      content: b64EncodedFileContents,
+      branch: `${site.branch || site.defaultBranch}`,
     };
 
     if (sha) commit = Object.assign({}, commit, { sha });
 
-    github.createCommit(site, path, commit).then((commitObj) => {
-      alertActions.alertSuccess('File added successfully');
+    return github.createCommit(site, path, commit).then((commitObj) => {
+      alertActions.alertSuccess('File committed successfully');
 
       store.dispatch({
-        type: siteActionTypes.SITE_FILE_ADDED,
+        type: siteActionTypes.SITE_FILE_CONTENT_RECEIVED,
         siteId,
         file: commitObj.content
       });
@@ -131,17 +145,19 @@ export default {
 
   fetchSiteConfigsAndAssets(site) {
     return this.fetchSiteConfigs(site).then((site) => {
-      return this.fetchSiteAssets(site).then((site) => {
-        return github.fetchRepositoryContent(site).then((files) => {
-          store.dispatch({
-            type: siteActionTypes.SITE_FILES_RECEIVED,
-            siteId: site.id,
-            files
-          });
-
-          return files;
-        });
+      return this.fetchBranches(site);
+    }).then((site) => {
+      return this.fetchSiteAssets(site);
+    }).then((site) => {
+      return github.fetchRepositoryContent(site);
+    }).then((files) => {
+      store.dispatch({
+        type: siteActionTypes.SITE_FILES_RECEIVED,
+        siteId: site.id,
+        files
       });
+
+      return files;
     }).catch((error) => {
       // TODO: make a generic catch handler that will only
       // trigger an http error action for an actual http
@@ -192,6 +208,38 @@ export default {
         method: 'push',
         arguments: [`/sites/${site.id}`]
       });
+    }).catch((error) => alertActions.httpError(error.message));
+  },
+
+  fetchBranches(site) {
+    return github.fetchBranches(site).then((branches) => {
+
+      store.dispatch({
+        type: siteActionTypes.SITE_BRANCHES_RECEIVED,
+        siteId: site.id,
+        branches
+      });
+
+      return site;
+    });
+  },
+
+  createDraftBranch(site, path) {
+    const branchName = `_draft-${encodeB64(path)}`;
+    const sha = site.branches.find((branch) => {
+      return branch.name === site.defaultBranch;
+    }).commit.sha;
+
+    return github.createBranch(site, branchName, sha).then(() => {
+      // Update the site object with new branches from github
+      this.fetchBranches(site);
+      return branchName;
+    });
+  },
+
+  deleteBranch(site, branch) {
+    return github.deleteBranch(site, branch).then(() => {
+      return this.fetchBranches(site);
     }).catch((error) => alertActions.httpError(error.message));
   }
 }

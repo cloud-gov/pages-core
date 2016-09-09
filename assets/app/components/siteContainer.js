@@ -40,10 +40,10 @@ class SiteContainer extends React.Component {
   }
 
   getCurrentSite(sites, siteId) {
-    return sites.filter((site) => {
+    return sites.find((site) => {
       // force type coersion
       return site.id == siteId;
-    }).shift();
+    });
   }
 
   render () {
@@ -71,7 +71,7 @@ class SiteContainer extends React.Component {
         childConfigs = { site };
     }
 
-    if (!site) {
+    if (!site || !site.branches) {
       return null;
     }
 

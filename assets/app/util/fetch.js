@@ -38,6 +38,10 @@ function checkStatus(response) {
 }
 
 function parseJSON(response) {
+  if (response.status === 204) {
+    return response;
+  }
+
   return response.json();
 }
 
@@ -51,7 +55,7 @@ function _fetch(url, configs = {}) {
   let requestConfigs;
   let requestUrl;
 
-  if (configs.method && !(/get/i).test(configs.method)) {
+  if (configs.method && !(/get|delete/i).test(configs.method)) {
     requestConfigs = Object.assign(baseConfigs, {}, {
       body: JSON.stringify(configs.data)
     });

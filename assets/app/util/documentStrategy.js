@@ -35,7 +35,7 @@ const documentStrategy = file => {
   }
 
   const fileType = file.path.split('.').pop();
-  const contents = decodeB64(file.content);
+  const contents = decodeB64(file.content) || '';
   const baseOutput = {
     path: file.path,
     raw: file.content

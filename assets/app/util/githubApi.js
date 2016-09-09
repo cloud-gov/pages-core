@@ -45,7 +45,7 @@ const github = {
   createBranch(site, branch, sha) {
     const url = `${getRepoFor(site)}/git/refs`;
     const data = {
-      ref: `refs/head/${branch}`,
+      ref: `refs/heads/${branch}`,
       sha
     };
 
@@ -58,8 +58,19 @@ const github = {
     });
   },
 
-  createPullRequest(site, branch, base) {
+  updateBranch(site, branch, sha) {
+    const url = `${getRepoFor(site)}/git/refs/${branch}`;
+    const data = {
+      sha
+    };
 
+    return this.fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `token ${getToken()}`
+      },
+      data
+    });
   },
 
   deleteBranch(site, branch) {
@@ -72,9 +83,22 @@ const github = {
     });
   },
 
+  fetchBranches(site) {
+    const url = `${getRepoFor(site)}/branches`;
+    const params = {
+      access_token: getToken()
+    };
+
+    return this.fetch(url, { params });
+  },
+
   fetchPullRequests(site) {
     const url = `${getRepoFor(site)}/pulls`;
-    return this.fetch(url);
+    const params = {
+      access_token: getToken()
+    };
+
+    return this.fetch(url, { params });
   },
 
   fetchRepositoryConfigs(site) {
@@ -98,13 +122,45 @@ const github = {
   },
 
   fetchRepositoryContent(site, path = '') {
-    const url = `repos/${site.owner}/${site.repository}/contents/${path}`;
+    const url = `${getRepoFor(site)}/contents/${path}`;
     const params = {
       access_token: getToken(),
       ref: site.branch || site.defaultBranch
     };
 
     return this.fetch(url, { params });
+  },
+
+  createPullRequest(site, branch, base) {
+    const url = `${getRepoFor(site)}/pulls`;
+
+    return this.fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `token ${getToken()}`
+      },
+      data: {
+        title: `Merging ${branch} into ${base}`,
+        head: branch,
+        base: base
+      }
+    });
+  },
+
+  mergePullRequest(site, pr) {
+    const url = `${getRepoFor(site)}/pulls/${pr.number}/merge`;
+    const data = {
+      commit_message: 'Merged by Federalist',
+      sha: `${pr.head.sha}`
+    };
+
+    return this.fetch(url, {
+      headers: {
+        'Authorization': `token ${getToken()}`
+      },
+      method: 'PUT',
+      data
+    });
   },
 
   /**
@@ -170,178 +226,4 @@ const github = {
   }
 }
 
-// var GithubModel = Backbone.Model.extend({
-//   initialize: function (opts) {
-//     opts = opts || {};
-//     if (!opts.token) throw new Error('Must provide Github OAuth token');
-//
-//     this.owner = opts.owner;
-//     this.name = opts.repoName;
-//     this.branch = opts.branch;
-//     this.token = opts.token;
-//     this.file = opts.file;
-//     this.site = opts.site;
-//     this.assets = [];
-//     this.uploadDir = opts.uploadRoot || 'uploads';
-//
-//     this.once('github:fetchConfig:success', function () {
-//       this.fetchDrafts();
-//     }.bind(this));
-//
-//     this.once('github:fetchDrafts:success', function () {
-//       this.fetchAssets();
-//       this.fetch();
-//     }.bind(this));
-//
-//     this.fetchConfig();
-//
-//     return this;
-//   },
-//   formatDraftBranchName: function (filename) {
-//     var branchName = '_draft-' + encodeB64(filename);
-//
-//     return branchName;
-//   },
-//   createPR: function(done) {
-//     var url = this.url({ root: true, path: 'pulls' });
-//
-//     $.ajax({
-//       method: 'POST',
-//       dataType: 'json',
-//       contentType: 'application/json; charset=utf-8',
-//       url: url,
-//       data: JSON.stringify({
-//         title: 'Draft updates for ' + this.get('file'),
-//         body: '',
-//         head: this.get('branch'),
-//         base: this.get('defaultBranch')
-//       }),
-//       success: function(res) {
-//         done(null, res);
-//       }.bind(this),
-//       error: done
-//     });
-//
-//   },
-//   getPR: function(done) {
-//     var url = this.url({
-//       root: true,
-//       path: 'pulls',
-//       params: {
-//         per_page: 100
-//       }
-//     });
-//
-//     $.ajax({
-//       url: url,
-//       data: {
-//         head: this.get('branch')
-//       },
-//       success: function(res) {
-//         this.set('pr', res[0].number);
-//         done(null, res);
-//       }.bind(this),
-//       error: done
-//     });
-//
-//   },
-//   save: function(opts, done) {
-//     done = done || _.noop;
-//
-//     // if on a branch, pass through to commit
-//     if (this.get('branch') !== this.get('defaultBranch')) {
-//       return this.commit(opts, done);
-//     }
-//
-//     async.series([
-//       this.createDraftBranch.bind(this),
-//       this.commit.bind(this, opts),
-//       this.createPR.bind(this)
-//     ], done);
-//
-//   },
-//   publish: function(opts, done) {
-//     async.series([
-//       this.save.bind(this, opts),
-//       this.getPR.bind(this),
-//       this.mergePR.bind(this),
-//       this.deleteBranch.bind(this)
-//     ], done);
-//   },
-//   mergePR: function(done) {
-//     if (!this.get('pr')) return done('PR not available');
-//
-//     var url = this.url({
-//       root: true,
-//       path: 'pulls/' + this.get('pr') + '/merge'
-//     });
-//
-//     $.ajax({
-//       method: 'PUT',
-//       dataType: 'json',
-//       contentType: 'application/json; charset=utf-8',
-//       data: JSON.stringify({
-//         commit_message: 'Merged via Federalist'
-//       }),
-//       url: url,
-//       success: function(res) {
-//         this.set('pr', undefined);
-//         done(null, res);
-//       }.bind(this),
-//       error: done
-//     });
-//
-//   },
-//   fetchDrafts: function() {
-//     var self = this;
-//     var url = this.url({
-//       root: true,
-//       path: 'branches',
-//       params: {
-//         per_page: 100
-//       }
-//     });
-//     $.ajax({
-//       url: url,
-//       success: function(data) {
-//         var drafts = _(data).chain().filter(function(branch) {
-//           return branch.name && branch.name.indexOf('_draft-') === 0;
-//         }).map(function(branch) {
-//           return decodeB64(branch.name.replace('_draft-', ''));
-//         }).compact().value();
-//         if (!self.site) return;
-//         var defaultSHA = _.findWhere(data, {
-//           name: self.site.get('defaultBranch')
-//         }).commit.sha;
-//         self.set('drafts', drafts);
-//         self.set('defaultSHA', defaultSHA);
-//         self.trigger('github:fetchDrafts:success');
-//       },
-//       error: function(res) {
-//         self.trigger('github:fetchDrafts:error', res.status);
-//       }
-//     });
-//   },
-//   getDefaults: function () {
-//     var config = this.configFiles['_config.yml'],
-//         hasDefaults = config.present && config.json && config.json.defaults,
-//         defaultConfigs = (hasDefaults) ? config.json.defaults : [],
-//         defaults = defaultConfigs.filter(function (c) {
-//           return c.scope.path === "";
-//         }),
-//         d = (defaults.length > 0) ? yaml.dump(defaults[0].values) : '\n';
-//
-//     return d;
-//   },
-//   getLayouts: function () {
-//     var defaultString = this.getDefaults(),
-//         defaults = yaml.parse(defaultString) || '',
-//         layouts = defaults.layout || ['default'];
-//
-//     return layouts;
-//   }
-// });
-//
-// module.exports = GithubModel;
-//
 export default github;
