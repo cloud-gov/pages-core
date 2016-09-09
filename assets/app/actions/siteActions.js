@@ -99,39 +99,6 @@ export default {
     });
   },
 
-  uploadFile(site, file, sha = false) {
-    const siteId = site.id;
-    const { name } = file;
-
-    convertFileToData(file).then((fileData) => {
-      const path = `assets/${name}`;
-      const message = `Uploads ${name} to project`;
-      let commit = {
-        content: fileData,
-        message: message
-      };
-
-      if (sha) commit = Object.assign({}, commit, { sha });
-
-      return github.createCommit(site, path, commit);
-    }).then((commitObj) => {
-        alertActions.alertSuccess('File uploaded successfully');
-        this.fetchSiteAssets(site);
-    }).catch(error => alertActions.alertError(error.message));
-  },
-
-  createPR(site, head, base) {
-    return github.createPullRequest(site, head, base).then((pr) => {
-      return github.mergePullRequest(site, pr);
-    }).then(() => {
-      return github.deleteBranch(site, head);
-    }).then(() => {
-      this.fetchBranches(site);
-    }).then(() => {
-      return alertActions.alertSuccess(`${head} merged successfully`);
-    }).catch(error => alertActions.httpError(error.message));
-  },
-
   createCommit(site, path, fileData, message = false, sha = false) {
     const b64EncodedFileContents = encodeB64(fileData);
     const siteId = site.id;
@@ -169,9 +136,41 @@ export default {
         siteId: site.id,
         assets
       });
-
       return Promise.resolve(site);
     }).catch(alertError);
+  },
+
+  createPR(site, head, base) {
+    return github.createPullRequest(site, head, base).then((pr) => {
+      return github.mergePullRequest(site, pr);
+    }).then(() => {
+      return github.deleteBranch(site, head);
+    }).then(() => {
+      this.fetchBranches(site);
+    }).then(() => {
+      return alertActions.alertSuccess(`${head} merged successfully`);
+    }).catch(error => alertActions.httpError(error.message));
+  },
+
+  uploadFile(site, file, sha = false) {
+    const siteId = site.id;
+    const { name } = file;
+
+    convertFileToData(file).then((fileData) => {
+      const path = `assets/${name}`;
+      const message = `Uploads ${name} to project`;
+      let commit = {
+        content: fileData,
+        message: message
+      };
+
+      if (sha) commit = Object.assign({}, commit, { sha });
+
+      return github.createCommit(site, path, commit);
+    }).then((commitObj) => {
+        alertActions.alertSuccess('File uploaded successfully');
+        this.fetchSiteAssets(site);
+    }).catch(error => alertActions.alertError(error.message));
   },
 
   fetchSiteConfigsAndAssets(site) {
@@ -212,8 +211,7 @@ export default {
         method: 'push',
         arguments: [`/sites/${site.id}`]
       });
-<<<<<<< HEAD
-    }).catch((error) => alertActions.httpError(error.message));
+    }).catch(alertError);
   },
 
   fetchBranches(site) {
