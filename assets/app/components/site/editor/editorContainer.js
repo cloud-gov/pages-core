@@ -8,7 +8,10 @@ import Codemirror from './codemirror';
 import Prosemirror from './prosemirror';
 
 import documentStrategy from '../../../util/documentStrategy';
-import { formatDraftBranchName, pathHasDraft, getDraft } from '../../../util/branchFormatter';
+import {
+  formatDraftBranchName,
+  pathHasDraft,
+  getDraft } from '../../../util/branchFormatter';
 
 import alertActions from '../../../actions/alertActions';
 import siteActions from '../../../actions/siteActions';
@@ -17,6 +20,24 @@ import routeActions from '../../../actions/routeActions';
 const propTypes = {
   site: React.PropTypes.object
 };
+
+const redirectToFileOnBranch = (siteId, branch, filePath) => {
+  routeActions.redirect(`/sites/${siteId}/edit/${branch}/${filePath}`);
+};
+
+const alertAndRedirect = (message, uri) => {
+  alertActions.alertSuccess(message);
+  routeActions.redirect(uri);
+};
+
+const openPRWithHead = (branchName, site) => {
+  return this.submitFile(branchName).then(() => {
+    return siteActions.createPR(site, branchName, site.defaultBranch);
+  }).then(() => {
+    routeActions.redirect(`/sites/${site.id}`);
+  });
+}
+
 
 let insertFn;
 
@@ -61,11 +82,11 @@ class Editor extends React.Component {
     siteActions.fetchFileContent(nextSite, this.path).then(() => {
       if (hasDraft) {
         if (draftBranchIsNotCurrent) {
-          routeActions.redirect(`/sites/${nextSite.id}/edit/${formatDraftBranchName(fileName)}/${this.path}`);
+          redirectToFileOnBranch(nextSite.id, formatDraftBranchName(fileName), this.path);
         }
       } else {
         // currently this always redirects
-        routeActions.redirect(`/sites/${nextSite.id}/edit/${nextSite.defaultBranch}/${this.path}`);
+        redirectToFileOnBranch(nextSite.id, nextSite.defaultBranch, this.path);
       }
     });
   }
@@ -142,14 +163,12 @@ class Editor extends React.Component {
     const draftBranch = getDraft(path, site.branches);
 
     if (!draftBranch) {
-      this.submitFile();
+      // Just commit the edited file
+      return this.submitFile();
     }
 
-    this.submitFile(draftBranch.name).then(() => {
-      return siteActions.createPR(site, draftBranch.name, site.defaultBranch);
-    }).then(() => {
-      routeActions.redirect(`/sites/${site.id}`);
-    });
+    // All federalist draft branch PRs are opened against master
+    openPRWithHead(draftBranch.name, site);
   }
 
   submitFile(branch = this.props.site.defaultBranch) {
@@ -176,8 +195,7 @@ class Editor extends React.Component {
       }).then(() => {
         const fileName = path.split('/').pop();
         const branch = formatDraftBranchName(path);
-
-        routeActions.redirect(`/sites/${site.id}/edit/${branch}/${fileName}`);
+        redirectToFileOnBranch(site.id, branch, fileName);
       });
     }
   }
@@ -187,8 +205,7 @@ class Editor extends React.Component {
     const { path } = this.state;
 
     siteActions.deleteBranch(site, formatDraftBranchName(path)).then(() => {
-      alertActions.alertSuccess('Draft successfully deleted');
-      routeActions.redirect(`/sites/${site.id}`);
+      alertAndRedirect('Draft successfully deleted', `/sites/${site.id}`);
     });
   }
 

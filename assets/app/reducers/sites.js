@@ -24,7 +24,7 @@ export default function sites(state = initialState, action) {
     return mapPropertyToMatchingSite(state, action.siteId, { assets: action.assets });
 
   case siteActionTypes.SITE_UPLOAD_RECEIVED: {
-    const site = state.find((site) => site.id === action.siteId);
+    const site = getSiteWithId(state, action.siteId);
     return mapPropertyToMatchingSite(state, action.siteId, {
       assets: site.assets.concat([action.file])
     });
@@ -32,12 +32,12 @@ export default function sites(state = initialState, action) {
 
   case siteActionTypes.SITE_FILES_RECEIVED: {
     const nextFiles = action.files || [];
-    const site = state.find((site) => site.id === action.siteId);
+    const site = getSiteWithId(state, action.siteId);
     let siteFiles;
 
     if (!site) return state;
 
-    siteFiles = site.files || [];
+    siteFiles = getFilesForSite(site);
 
     let newFiles = nextFiles.map((file) => {
       const exists = siteFiles.find((f) => f.path === file.path);
@@ -67,10 +67,9 @@ export default function sites(state = initialState, action) {
     return state.filter((site) => site.id != action.siteId);
 
   case siteActionTypes.SITE_FILE_CONTENT_RECEIVED:
-    // get site we want to check files for from the list of user's sites
-    const currentSite = state.find((site) => site.id === action.siteId);
+    const currentSite = getSiteWithId(state, action.siteId);
     // get list of files associated with the current site
-    const siteFiles = currentSite.files || [];
+    const siteFiles = getFilesForSite(currentSite);
 
     let files = siteFiles.map((file) => {
       if (file.path !== action.file.path) return file;
@@ -88,6 +87,7 @@ export default function sites(state = initialState, action) {
   }
 }
 
+// ref is github specific, refers to the branch on which a file lives
 const checkFileRefEquality = (fileA, fileB) => {
   const refMatchingRegexp = new RegExp(/(ref=)?=(.+)/);
   const refA = fileA.url.match(refMatchingRegexp)[2];
@@ -101,4 +101,12 @@ const mapPropertyToMatchingSite = (state, siteId, properties) => {
     if (site.id !== siteId) return site;
     return Object.assign({}, site, properties);
   });
+};
+
+const getSiteWithId = (state, id) => {
+  return state.find((site) => site.id === id);
+};
+
+const getFilesForSite = (site) => {
+  return site.files || [];
 };
