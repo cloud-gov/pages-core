@@ -8,6 +8,7 @@ describe("siteActions", () => {
   let fixture;
   let dispatch, httpErrorAlertAction, fetchSites, addSite, updateSite, deleteSite, fetchRepositoryContent,
       fetchRepositoryConfigs, createCommit, encodeB64, alertSuccess;
+  let sitesReceivedActionCreator, updateRouterActionCreator;
   const SITES_RECEIVED = "sites received, bucko";
   const SITE_ADDED = "site added, bucko";
   const SITE_UPDATED = "site updated";
@@ -17,8 +18,6 @@ describe("siteActions", () => {
   const SITE_CONFIGS_RECEIVED = "my kingdom for a config!";
   const SITE_FILE_ADDED = "site file added";
   const SITE_ASSETS_RECEIVED = "i have an asset or two for you to peruse";
-  
-  const UPDATE_ROUTER = "main router turn on";
   
   beforeEach(() => {
     dispatch = spy();
@@ -32,12 +31,19 @@ describe("siteActions", () => {
     createCommit = stub();
     encodeB64 = stub();
     alertSuccess = stub();
+    sitesReceivedActionCreator = stub();
+    updateRouterActionCreator = stub();
     
     // FIXME: complex dependency wiring a smell
     fixture = proxyquire("../../../../assets/app/actions/siteActions", {
+      "./actionCreators/siteActions": {
+        sitesReceived: sitesReceivedActionCreator
+      },
+      "./actionCreators/navigationActions": {
+        updateRouter: updateRouterActionCreator
+      },
       "../constants": {
         siteActionTypes: {
-          SITES_RECEIVED: SITES_RECEIVED,
           SITE_ADDED: SITE_ADDED,
           SITE_UPDATED: SITE_UPDATED,
           SITE_DELETED: SITE_DELETED,
@@ -46,9 +52,6 @@ describe("siteActions", () => {
           SITE_CONFIGS_RECEIVED: SITE_CONFIGS_RECEIVED,
           SITE_FILE_ADDED: SITE_FILE_ADDED,
           SITE_ASSETS_RECEIVED: SITE_ASSETS_RECEIVED
-        },
-        navigationTypes: {
-          UPDATE_ROUTER: UPDATE_ROUTER
         }
       },
       "../store": {
@@ -76,20 +79,21 @@ describe("siteActions", () => {
   });
 
   it("triggers the fetching of sites and dispatches a sites received action to the store when successful", () => {
+    const action = {
+      hi: "you"
+    };
     const sites = {
       hi: "mom"
     };
     const sitesPromise = Promise.resolve(sites);
     fetchSites.withArgs().returns(sitesPromise);
+    sitesReceivedActionCreator.withArgs(sites).returns(action);
 
     const actual = fixture.fetchSites();
     
     return actual.then(() => {
       expect(dispatch.calledOnce).to.be.true;
-      expect(dispatch.calledWith({
-        type: SITES_RECEIVED,
-        sites
-      })).to.be.true;
+      expect(dispatch.calledWith(action)).to.be.true;
     });
   });
   
@@ -116,23 +120,23 @@ describe("siteActions", () => {
       hi: "mom"
     };
     const sitePromise = Promise.resolve(site);
+    const routerAction = {
+      whatever: "bub"
+    };
     addSite.withArgs(siteToAdd).returns(sitePromise);
+    updateRouterActionCreator.withArgs("/sites").returns(routerAction);
 
     const actual = fixture.addSite(siteToAdd);
     
     return actual.then(() => {
       expect(dispatch.callCount).to.equal(2);
-
+      
       // FIXME: this seems super coupled.
       expect(dispatch.calledWith({
         type: SITE_ADDED,
         site
       }));
-      expect(dispatch.calledWith({
-        type: UPDATE_ROUTER,
-        method: 'push',
-        arguments: [`/sites`]
-      }));
+      expect(dispatch.calledWith(routerAction)).to.be.true;
     });
   });
 
@@ -208,7 +212,11 @@ describe("siteActions", () => {
       completely: "ignored"
     };
     const sitePromise = Promise.resolve(site);
+    const routerAction = {
+      whatever: "bub"
+    };
     deleteSite.withArgs(siteId).returns(sitePromise);
+    updateRouterActionCreator.withArgs("/sites").returns(routerAction);
 
     const actual = fixture.deleteSite(siteId);
     
@@ -220,11 +228,7 @@ describe("siteActions", () => {
         type: SITE_DELETED,
         siteId
       }));
-      expect(dispatch.calledWith({
-        type: UPDATE_ROUTER,
-        method: 'push',
-        arguments: [`/sites`]
-      }));
+      expect(dispatch.calledWith(routerAction)).to.be.true;
     });
   });
 

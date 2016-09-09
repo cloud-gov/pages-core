@@ -6,37 +6,43 @@ import convertFileToData from '../util/convertFileToData';
 import store from '../store';
 import alertActions from './alertActions';
 
+import { sitesReceived as sitesReceivedActionCreator } from "./actionCreators/siteActions";
+import { updateRouter as updateRouterActionCreator } from "./actionCreators/navigationActions";
+
+
 const alertError = error => {
   alertActions.httpError(error.message);
 };
 
 const updateRouterToSitesUri = () => {
+  const action = updateRouterActionCreator(`/sites`);
+  store.dispatch(action);
+};
+
+const dispatchSitesReceivedAction = sites => {
+  const action = sitesReceivedActionCreator(sites);
+  store.dispatch(action);
+};
+
+const dispatchSiteAddedAction = site => {
   store.dispatch({
-    type: navigationTypes.UPDATE_ROUTER,
-    method: 'push',
-    arguments: [`/sites`]
+    type: siteActionTypes.SITE_ADDED,
+    site
   });
 };
 
 export default {
   fetchSites() {
-    return federalist.fetchSites().then((sites) => {
-      store.dispatch({
-        type: siteActionTypes.SITES_RECEIVED,
-        sites
-      });
-    }).catch(alertError);
+    return federalist.fetchSites()
+      .then(dispatchSitesReceivedAction)
+      .catch(alertError);
   },
 
   addSite(siteToAdd) {
-    return federalist.addSite(siteToAdd).then((site) => {
-      store.dispatch({
-        type: siteActionTypes.SITE_ADDED,
-        site
-      });
-
-      updateRouterToSitesUri();
-    }).catch(alertError);
+    return federalist.addSite(siteToAdd)
+      .then(dispatchSiteAddedAction)
+      .then(updateRouterToSitesUri)
+      .catch(alertError);
   },
 
   updateSite(site, data) {
@@ -55,9 +61,9 @@ export default {
         type: siteActionTypes.SITE_DELETED,
         siteId
       });
-
-      updateRouterToSitesUri();
-    }).catch(alertError);
+    })
+      .then(updateRouterToSitesUri)
+      .catch(alertError);
   },
 
   // todo rename to something like fetchTree
