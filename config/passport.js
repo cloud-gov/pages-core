@@ -14,6 +14,11 @@
  * http://passportjs.org/guide/providers/
  */
 
+var cfenv = require('cfenv');
+var appEnv = cfenv.getAppEnv();
+var federalistCreds = appEnv.getServiceCreds('federalist-staging-env');
+var process = federalistCreds || process.env;
+
 module.exports.passport = {
   local: {
     strategy: require('passport-local').Strategy
@@ -38,9 +43,9 @@ module.exports.passport = {
     protocol: 'oauth2',
     strategy: require('passport-github').Strategy,
     options: {
-      clientID: process.env.GITHUB_CLIENT_ID || 'not_set',
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || 'not_set',
-      callbackURL: process.env.GITHUB_CLIENT_CALLBACK_URL || 'not_set',
+      clientID: process.GITHUB_CLIENT_ID || 'not_set',
+      clientSecret: process.GITHUB_CLIENT_SECRET || 'not_set',
+      callbackURL: process.GITHUB_CLIENT_CALLBACK_URL || 'not_set',
       scope: ['user', 'repo']
     },
     // IDs for approved organizations
