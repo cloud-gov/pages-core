@@ -17,7 +17,7 @@
 var cfenv = require('cfenv');
 var appEnv = cfenv.getAppEnv();
 var federalistCreds = appEnv.getServiceCreds('federalist-staging-env');
-var process = federalistCreds || process.env;
+var p = federalistCreds || process.env;
 
 module.exports.passport = {
   local: {
@@ -43,9 +43,9 @@ module.exports.passport = {
     protocol: 'oauth2',
     strategy: require('passport-github').Strategy,
     options: {
-      clientID: process.GITHUB_CLIENT_ID || 'not_set',
-      clientSecret: process.GITHUB_CLIENT_SECRET || 'not_set',
-      callbackURL: process.GITHUB_CLIENT_CALLBACK_URL || 'not_set',
+      clientID: p.GITHUB_CLIENT_ID || 'not_set',
+      clientSecret: p.GITHUB_CLIENT_SECRET || 'not_set',
+      callbackURL: p.GITHUB_CLIENT_CALLBACK_URL || 'not_set',
       scope: ['user', 'repo']
     },
     // IDs for approved organizations
