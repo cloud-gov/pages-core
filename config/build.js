@@ -1,7 +1,7 @@
 /*
  * Settings the build process
  */
-var env = require('./environment.js')();
+var env = require('../services/environment.js')();
 
 module.exports.build = {
   tempDir: env.FEDERALIST_TEMP_DIR || './.tmp',

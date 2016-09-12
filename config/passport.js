@@ -14,7 +14,7 @@
  * http://passportjs.org/guide/providers/
  */
 
-var env = require('./environment.js')();
+var env = require('../services/environment.js')();
 
 module.exports.passport = {
   local: {

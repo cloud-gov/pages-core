@@ -1,5 +1,5 @@
 // Defaults for all environments
-var env = require('./environment.js')();
+var env = require('../services/environment.js')();
 
 module.exports.webhook = {
   endpoint: env.GITHUB_WEBHOOK_URL || 'http://localhost:1337/webhook/github',
