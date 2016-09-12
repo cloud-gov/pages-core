@@ -5,7 +5,7 @@ buildpack: https://github.com/cloudfoundry/nodejs-buildpack#v1.5.4
 domain: 18f.gov
 disk_quota: 2G
 memory: 1G
-instances: 2
+instances: 1
 services:
 - federalist-staging-rds
 - federalist-staging-redis
