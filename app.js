@@ -1,6 +1,8 @@
 // If settings present, start New Relic
-if (process.env.NEW_RELIC_APP_NAME && process.env.NEW_RELIC_LICENSE_KEY) {
-  console.log('Activating New Relic: ', process.env.NEW_RELIC_APP_NAME);
+var env = require('./environment.js')();
+
+if (env.NEW_RELIC_APP_NAME && env.NEW_RELIC_LICENSE_KEY) {
+  console.log('Activating New Relic: ', env.NEW_RELIC_APP_NAME);
   require('newrelic');
 }
 
