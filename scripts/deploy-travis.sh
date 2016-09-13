@@ -9,6 +9,6 @@ rm temp.deb
 cf api $CF_API
 cf login --u $CF_USERNAME --p $CF_PASSWORD --o $CF_ORGANIZATION --s $CF_SPACE
 
-./scripts/deploy.sh $CF_APP
+cf zero-downtime-push $CF_APP -f manifest.yml
 
 cf logout
