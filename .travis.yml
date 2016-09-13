@@ -43,6 +43,7 @@ before_deploy:
 deploy:
   provider: script
   script: scripts/deploy-travis.sh
+  skip_cleanup: true
   on:
     branch: staging-test
 notifications:
