@@ -1,6 +1,6 @@
 // Defaults for all environments
-
+var env = require('../services/environment.js')();
 module.exports.webhook = {
-  endpoint: process.env.GITHUB_WEBHOOK_URL || 'http://localhost:1337/webhook/github',
-  secret: process.env.GITHUB_WEBHOOK_SECRET || 'testingSecret'
+  endpoint: env.GITHUB_WEBHOOK_URL || 'http://localhost:1337/webhook/github',
+  secret: env.GITHUB_WEBHOOK_SECRET || 'testingSecret'
 };
