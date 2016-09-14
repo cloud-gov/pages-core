@@ -1,21 +1,16 @@
 import React from 'react';
 
 const propTypes = {
-  id: React.PropTypes.string,
-  name: React.PropTypes.string,
+  name: React.PropTypes.string.isRequired,
   value: React.PropTypes.bool,
   checked: React.PropTypes.bool,
   labelText: React.PropTypes.string,
-  handleChange: React.PropTypes.func
+  handleChange: React.PropTypes.func.isRequired
 };
 
 class RadioInput extends React.Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      selected: false
-    };
 
     this.onChange = this.onChange.bind(this);
   }
@@ -23,6 +18,8 @@ class RadioInput extends React.Component {
   onChange(event) {
     const { props } = this;
 
+    // the actual event occurs on the parent div, so we pass a fake 'event'
+    // object with just the info we care about to the parent component
     props.handleChange({
       target: {
         name: props.name,
@@ -32,19 +29,17 @@ class RadioInput extends React.Component {
   }
 
   render() {
-    const { props } = this;
+    const { name, checked, labelText } = this.props;
 
     return (
       <div className="radio" onClick={this.onChange}>
         <input
           readOnly={true}
           type="radio"
-          id={props.id}
-          name={props.name}
-          checked={props.checked}
-          value={props.value} />
-        <label for={props.id}>
-          {props.labelText}
+          checked={checked}
+          name={name} />
+        <label htmlFor={name}>
+          {labelText}
         </label>
       </div>
     );
