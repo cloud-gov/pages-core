@@ -21,7 +21,7 @@ We have a few environment variables that the application uses, here is a list of
 
 * `FEDERALIST_AWS_BUILD_KEY` - the AWS key for container builds
 * `FEDERALIST_AWS_BUILD_SECRET` - the AWS secret for container builds
-* `FEDERALIST_BUILD_CALLBACK` - the endpoint for build status, defaults to 'http://localhost:1337/build/status'
+* `FEDERALIST_BUILD_CALLBACK` - the endpoint for build status, defaults to 'http://localhost:1337/build/status/'. **This URL *must* include the trailing slash**
 * `FEDERALIST_BUILD_ENGINE` - the build engine to use, defaults to 'buildengine'
 * `FEDERALIST_BUILD_TOKEN` - random token used to protect the build status endpoint
 * `FEDERALIST_CACHE_CONTROL` - 'max-age=60'
