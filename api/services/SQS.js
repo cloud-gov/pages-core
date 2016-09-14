@@ -31,8 +31,8 @@ module.exports = {
             tokensBase.owner + '/' +
             tokensBase.repository +
             tokensBase.branchURL,
-          callback: url.resolve(sails.config.build.callback,
-            model.id + '/' + sails.config.build.token)
+          callback: [sails.config.build.callback,
+            model.id + '/' + sails.config.build.token].join('/')
         }),
         body = {
           environment: [
