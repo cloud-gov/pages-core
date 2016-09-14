@@ -7,26 +7,11 @@ node_js:
 - 4
 env:
   global:
-  - CF_APP=federalist
   - CF_API=https://api.cloud.gov
   - CF_USERNAME=deploy-federalist
   - CF_ORGANIZATION=federalist
-  - CF_SPACE=staging
   - secure:  "JOCdomBbmT85bMwGvuJSpTcI0Z3cFIqi051EHp+g4ti5++DAamb6ah/o7NtR0j/TA7GpLUYGTI61O2InpdrJx3qQI11FE+QmtQpT5I2Ja9zeN3QzG15liQVxyyQAroXMvkhzZuI3AbSSG+TEeXHVLd7mmUdvJdOvT2KKIym2FKFdql6bOa+0//9TMv/JqSV8S50FDqd+zxb3YdxjkRjMWlidGHYFOsau6aAzNwvLNvjQNAJczJZvllTzqITWmL3hLQd1OMdnJFhb+5vo2uQNVJPDtM0b2wQ5hahwhZi+RY3a26yVPwV5zAy8tCIB8PdZN5i0vfBoVqt8J6oNMVv5aih9jgAsjefamTCPBmVPEVmr2vueTOdgCjWeZ7GylK90073mAHPpjX0EA7cu4w3dhD76MLN1Vc5ckfwv+P4s4gT9d2CPftyiUsTj2IeRngVb8xgdyzwCvDzx85lFbP6gvIl8CptEHpfMiHYIWzfm9RD9WkXt3WXFKZoZVTq2665YyzByK6BgcwlXQDTEUdqqqlaLd4tob5UOGhaFDEmM8f7vENz58alFkXgW2KJtEfKmsFYF2fDzV5MyeWuBAXbuEL2pAnjiZcJcSu8jiPpjvlonPxPxjESBtK24lUhdckq5OeElNCywRhUamnWu7UvShXEgQ//9W6OZB/z0941rJtc="
   - CXX=g++-4.8
-  - FEDERALIST_TEST_USER=federalist-test
-  - FEDERALIST_TEST_ORG=17072414
-  - FEDERALIST_TEST_REPOSITORY=microsite-template
-  - FEDERALIST_TEST_REPOSITORY_BRANCH=gh-pages
-  # FEDERALIST_TEST_PASSWORD
-  - secure: "ua7C5YzIRnpsOzOp9bPFQ1rGm4ZQh0aNu2wlaVfDYHwT7EC4Ag9bbn370GgtCXnwv1STQmjxKw6CRZNSy0mrLrS/aJ/l0zOaTb8fqvPjzfLPLNLHNRUcPwOU5/hBtQOvGbcFnkc5IrCgIUCuBHZYPRy7F7RygpFECEqI/743YuAxStY/5SY1S//+4oBS30KNpkaXmSVYOSIU4XXn6FUi+Qll//zwURezPXlDo7dVoaEJnPwQ5FdkGsA6OhGuo/8AFGPpSNNDUShZxZf1HQXvCdNRSmtxUyWSjlR7QKsLxNUADKd3ZAQ3u4jL6kjHFAb27fYXAZ3SCTv7A983wqR3g8ssp09b+VFIw4+kDhsbJ+70K/X1hwGLrIoXGorzlahiDJJMNBVkRfP07OW67iuZamc7kUpq93OVYTaSm9Kv81ZPe0vdZ7IwylHHfRNelCAs7YCGVgtYKW2CnqvFqxZL3XZmpH1NmJRkD5SnkZ028OILBCU/9Tx1dT1saX+vRe/+is0I96CmYv3PO8kUH1fswbmuGzko7cHM0qsZr8iN/za11oXg1lvywJpFO7/ORlx71HTbbzgY6R7SIBNwwgnrqakhLaERuAm/0it68625QJpQUQOllrGECLIMl1hpgpcAljqKYN6vd1VG+cg77uwQIrDlB2OrdeHUkNknSKb/Lt8="
-  - GITHUB_CLIENT_CALLBACK_URL=http://localhost:1337/auth/github/callback
-  - GITHUB_CLIENT_ID=e1546b0daa6206853e16
-  - secure: "MQGJswr9OxHGgPiheKO69iFe2s9ikcQkniN3xaA9dqb+oJdAxxENDV+rHtPGzXOdJ9Yy1G1CKQkyWFjoFPy9Ifl/C+VkEHa6BygNS6uGbSV2bzKPOFQr3qYqKXY7tCX+ldclltm26ird36tIQTdtum3BHja4JvjqFrtwWBp/rIG18RVtLZ8du37NX0PAUUvMgfQI8fmCo/rl6uquDc/DZiCqByKWJieCsEtXfYkE2nNH1AfgsLJC4ulnJZfzfycpU8hCLVprL9Yk+rGfqdyKHfKuNGR5HbaVUWUxLwi+X0ym1jShRp5hK+moDEVhcSs0xCip8kE/7z6KgLgw3ynsdZzmzzYs6xMtsSAaJ6VQFnJhO6RP036IcxBIEUHeJbjz6ELm0MN/1jpIj5S1PhHVTc4Dxqe/4vBCGsjAkP+r8DfrS8j3ke/HfAdntVFlCGl1FG0nmpqSZWpxTkBftpUG5ksU9nnLLzfeOh+i8Vksdr7a5cvUY7CP+OpfOlBgmppfU1gohcmIF9YgxF8T6IlNU00ZQEbi8eqXu89xt7ltblr6qvZIiiZcqW1nA8Xt+RNvYdY8WPf/Vtu6cFnz5PFAWqcKvcg7V9U9TnKaBw2HzeYczG1o6w+GwJ88mXIDBW1dY4KxhBJlygKz+dFIrlR0GCmMC4f8k2QtHW892ObC1pw=" # GITHUB_CLIENT_SECRET
-  # GITHUB_TOKEN
-  - secure: KcpUNUJkps0vsFeMuYizvZlkrlBeUHkMs+32m3IHpvVtVzN7jVnera8ZCtyR9tK1IHmY9hpwer4dGQaclikECzwe0gdc/JTUCL9BAbN/FV8lXZQXaNmuT2np4FFRD4WoKs2PA/qGhKfsq2GkXEmyrFiwH2xsD4XFzjLYqcAbjK1tNVxldTe/QDMB7Q1gh/YNTqexWUPfLTsr/iZJbDJab2iiTNw7NssirzGeYZEkabsUN2BOzY2tZjyx8Yp4ce4n+IL5nKho05cMAZ7AOhPbHzy2MKUTJos2LxpcC2cYY/uSZfwD3MPy2MZKlpf+ncCGHW7cYEFOnxmXhSHyG8ocJYyF2uhON66EoiqiKcAzOGHDAJGHAuevJgF1227IVzurEoPTkkQgL+FZFXb+HP0YHRO9Xq7S2wdPUpH8KpNH1tfWSaXb6f08aTB8F6So4EcSj6Bf7Rm8S5vKlHF6B7PGDKFgBFcMmUftWCNsrvzQfwqEpOEJLsb9q9dNkg7QS0D6LsCmMLtPC9IUMTfb/iy3ati0fBKFZOA6F4MueqXniWpmuJJu4ZHArWd342lD/tzvmJu39ddiwbhTXbqYyqxvsfMOf9ZrZK6mEWB7WlBAuoc+689OHuuEVkmTBneu+YO8u40Lx2FX2FtbFx0L2fyja/W4tN0V0uBsr5hd2GeQhuk=
-  - secure: "Q9s4W4sdG/yTsB90dVR4+ttMB+Sgxry7PWqkJBwOWze8H+tICjaM+gxEfKHdoAMak/Gj6oR5IhXyMAq0Imua2Lu+G1TIR0Z3udgpxr7INLW74rt4W/zm+lJaFo8U//RRvwGc9yEE4/UeRZuJsEhrnNLooJFnhJYtSV03feJJc+4aj0be4/2X7f6IqyHowrMBOhDni8XFvpTr36AwpkoP26wRwSSJzWnkEEcRXr3zCiOmtSvoo7czhp7mI1tQauECPuQ9zdjdKoRCm6EzIVMLQ648D2CsMONynUPlD1T65/rOThsjCnBXQVzCC4IVb/W/RZitu/jLlA8R3x/1VKlOVwgueFRiBt7ShhRQdBIoD+nnjEME3fzeqGMWmOr7YwnZvMekC0SMjvHKrWyfvuZrMEONjTUSr1EQUXG8TSGCv6tWWsCZOkLES4E+qERWTbegxUSgamkMCP0wKvchhoYZBYVean1txrh1Rfhxlaz55bCI++544QCxy54uxgWKpkqGIp5tn0k3Fny01WP1rjv7yiwtALq7hcj3m73CCcGe45AuhkQot1m+jzQfoOHacANMZ2hut18s4EZ8jxFGcSROndk9Ye+lZiVSmMwrIfjl7dMp9AHLiddc715x3fDvtcEEmtfb84OSiLY/NcdqBMlsfbz5ZaBjPDIxrwnpW2HPBqk=" # SAUCE_ACCESS_KEY
-  - SAUCE_USERNAME=aborden-18f
 addons:
   apt:
     sources:
@@ -41,11 +26,16 @@ before_deploy:
   - npm install
   - npm run build
 deploy:
-  provider: script
-  script: scripts/deploy-travis.sh
-  skip_cleanup: true
-  on:
-    branch: staging-test
+  - provider: script
+    script: scripts/deploy-travis.sh
+    skip_cleanup: true
+    on:
+      branch: staging-test
+  # - provider: script
+  #   script: scripts/deploy-travis.sh
+  #   skip_cleanup: true
+  #   on:
+  #     branch: make_deploys_work_again
 notifications:
   slack:
     on_success: never

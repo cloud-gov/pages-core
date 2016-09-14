@@ -8,15 +8,9 @@ memory: 512MB
 instances: 2
 services:
 - federalist-database
-- federalist-builder-creds
 - federalist-redis
 - federalist-aws-user
+- federalist-production-env
 env:
-  FEDERALIST_BUILD_CALLBACK: https://federalist.18f.gov/build/status
-  FEDERALIST_CACHE_CONTROL: "max-age=60"
-  FEDERALIST_S3_BUCKET: federalist.18f.gov
-  FEDERALIST_SQS_QUEUE: federalist-builds
-  GITHUB_CLIENT_CALLBACK_URL: https://federalist.18f.gov/auth/github/callback
-  GITHUB_WEBHOOK_URL: https://federalist.18f.gov/webhook/github
   NEW_RELIC_APP_NAME: federalist-prod
   NODE_ENV: production

@@ -13,4 +13,3 @@ services:
 env:
   NODE_ENV: staging
   SAILS_LOG_LEVEL: verbose
-  FEDERALIST_BUILD_TOKEN: token
