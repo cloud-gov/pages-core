@@ -12,3 +12,4 @@ services:
 - federalist-staging-env
 env:
   NODE_ENV: staging
+  SAILS_LOG_LEVEL: verbose
