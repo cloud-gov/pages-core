@@ -37,6 +37,7 @@ module.exports = {
   },
 
   afterCreate: function(model, done) {
+    sails.log.verbose('after create hook called for Build');
     if (Build.publishCreate) Build.publishCreate(model);
     // Use SQS for queue if available
     var queue = sails.config.build.sqsQueue ? SQS : this;
@@ -44,15 +45,20 @@ module.exports = {
       .populate('site')
       .populate('user')
       .exec(function(err, model) {
+        sails.log.verbose('Build exists?', err, model);
         if (err && done) return done(err, model);
         if (err) return sails.log.error(err);
         if (!model && done) return done();
         // Additional query since we need to populate a 2nd level association
         Passport.findOne({ user: model.user.id })
           .exec(function(err, passport) {
+            sails.log.verbose('User exists?', err, model);
             if (err && done) return done(err, model);
             if (err) return sails.log.error(err);
             model.user.passport = passport;
+
+            sails.log.verbose('Adding job to sqs queue with build: ', model);
+
             queue.addJob(model);
             if (done) return done();
           });

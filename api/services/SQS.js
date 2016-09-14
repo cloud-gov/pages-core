@@ -65,7 +65,10 @@ module.exports = {
 
     params.MessageBody = JSON.stringify(body);
 
+    sails.log.verbose('SQS payload build');
+
     sqs.sendMessage(params, function(err, data) {
+      sails.log.verbose('message sent with error? and data', err, data);
       if (err) error(err, model);
     });
 
@@ -74,5 +77,6 @@ module.exports = {
 };
 
 function error(err, model) {
+  sails.log.verbose('There was an error, adding the job to SQS');
   Build.completeJob(err, model);
 }
