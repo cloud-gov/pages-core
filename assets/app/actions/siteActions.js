@@ -61,8 +61,7 @@ export default {
         type: siteActionTypes.SITE_DELETED,
         siteId
       });
-    })
-      .then(updateRouterToSitesUri)
+    }).then(updateRouterToSitesUri)
       .catch(alertError);
   },
 
@@ -112,7 +111,7 @@ export default {
       path,
       message: (message) ? message : `Adds ${path} to project`,
       content: b64EncodedFileContents,
-      branch: `${site.branch || site.defaultBranch}`,
+      branch: `${site.branch || site.defaultBranch}`
     };
 
     if (sha) commit = Object.assign({}, commit, { sha });
