@@ -1,7 +1,7 @@
 var AWS = require('aws-sdk'),
     cfenv = require('cfenv'),
     appEnv = cfenv.getAppEnv(),
-    dbURL = appEnv.getServiceURL('federalist-staging-database'),
+    dbURL = appEnv.getServiceURL('federalist-staging-rds'),
     AWSCreds = appEnv.getServiceCreds('federalist-staging-env'),
     redisCreds = appEnv.getServiceCreds('federalist-staging-redis');
 
