@@ -8,15 +8,11 @@ describe("siteActions", () => {
   let fixture;
   let dispatch, httpErrorAlertAction, fetchSites, addSite, updateSite, deleteSite, fetchRepositoryContent,
       fetchRepositoryConfigs, createCommit, encodeB64, alertSuccess;
-  let sitesReceivedActionCreator, updateRouterActionCreator;
-  const SITES_RECEIVED = "sites received, bucko";
-  const SITE_ADDED = "site added, bucko";
-  const SITE_UPDATED = "site updated";
-  const SITE_DELETED = "site deleted nothing to see here";
-  const SITE_FILES_RECEIVED = "site files received";
-  const SITE_FILE_CONTENT_RECEIVED = "site file content received, if you say so";
+  let sitesReceivedActionCreator, siteAddedActionCreator, siteDeletedActionCreator,
+      siteUpdatedActionCreator, siteFileContentReceivedActionCreator, siteAssetsReceivedActionCreator,
+      siteFilesReceivedActionCreator,
+      updateRouterActionCreator;
   const SITE_CONFIGS_RECEIVED = "my kingdom for a config!";
-  const SITE_ASSETS_RECEIVED = "i have an asset or two for you to peruse";
   
   beforeEach(() => {
     dispatch = spy();
@@ -32,24 +28,30 @@ describe("siteActions", () => {
     alertSuccess = stub();
     sitesReceivedActionCreator = stub();
     updateRouterActionCreator = stub();
+    siteAddedActionCreator = stub();
+    siteUpdatedActionCreator = stub();
+    siteDeletedActionCreator = stub();
+    siteFileContentReceivedActionCreator = stub();
+    siteAssetsReceivedActionCreator = stub();
+    siteFilesReceivedActionCreator = stub();
     
     // FIXME: complex dependency wiring a smell
     fixture = proxyquire("../../../../assets/app/actions/siteActions", {
       "./actionCreators/siteActions": {
-        sitesReceived: sitesReceivedActionCreator
+        sitesReceived: sitesReceivedActionCreator,
+        siteAdded: siteAddedActionCreator,
+        siteUpdated: siteUpdatedActionCreator,
+        siteDeleted: siteDeletedActionCreator,
+        siteFileContentReceived: siteFileContentReceivedActionCreator,
+        siteAssetsReceived: siteAssetsReceivedActionCreator,
+        siteFilesReceived: siteFilesReceivedActionCreator
       },
       "./actionCreators/navigationActions": {
         updateRouter: updateRouterActionCreator
       },
       "../constants": {
         siteActionTypes: {
-          SITE_ADDED: SITE_ADDED,
-          SITE_UPDATED: SITE_UPDATED,
-          SITE_DELETED: SITE_DELETED,
-          SITE_FILES_RECEIVED: SITE_FILES_RECEIVED,
-          SITE_FILE_CONTENT_RECEIVED: SITE_FILE_CONTENT_RECEIVED,
-          SITE_CONFIGS_RECEIVED: SITE_CONFIGS_RECEIVED,
-          SITE_ASSETS_RECEIVED: SITE_ASSETS_RECEIVED
+          SITE_CONFIGS_RECEIVED: SITE_CONFIGS_RECEIVED
         }
       },
       "../store": {
@@ -124,19 +126,19 @@ describe("siteActions", () => {
       const routerAction = {
         whatever: "bub"
       };
+      const siteAddedAction = {
+        action: "yep"
+      };
       addSite.withArgs(siteToAdd).returns(sitePromise);
       updateRouterActionCreator.withArgs("/sites").returns(routerAction);
+      siteAddedActionCreator.withArgs(site).returns(siteAddedAction);
 
       const actual = fixture.addSite(siteToAdd);
       
       return actual.then(() => {
         expect(dispatch.callCount).to.equal(2);
         
-        // FIXME: this seems super coupled.
-        expect(dispatch.calledWith({
-          type: SITE_ADDED,
-          site
-        }));
+        expect(dispatch.calledWith(siteAddedAction)).to.be.true;
         expect(dispatch.calledWith(routerAction)).to.be.true;
       });
     });
@@ -173,18 +175,18 @@ describe("siteActions", () => {
         id: id,
         could: "be anything"
       };
+      const siteUpdatedAction = {
+        action: "wait, what's my queue?"
+      };
       const sitePromise = Promise.resolve(site);
       updateSite.withArgs(siteToUpdate, data).returns(sitePromise);
-
+      siteUpdatedActionCreator.withArgs(site).returns(siteUpdatedAction);
+      
       const actual = fixture.updateSite(siteToUpdate, data);
       
       return actual.then(() => {
         expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith({
-          type: SITE_UPDATED,
-          siteId: id,
-          site
-        })).to.be.true;
+        expect(dispatch.calledWith(siteUpdatedAction)).to.be.true;
       });
     });
 
@@ -220,19 +222,18 @@ describe("siteActions", () => {
       const routerAction = {
         whatever: "bub"
       };
+      const siteDeletedAction = {
+        delete: "site action"
+      };
       deleteSite.withArgs(siteId).returns(sitePromise);
       updateRouterActionCreator.withArgs("/sites").returns(routerAction);
+      siteDeletedActionCreator.withArgs(siteId).returns(siteDeletedAction);
 
       const actual = fixture.deleteSite(siteId);
       
       return actual.then(() => {
         expect(dispatch.callCount).to.equal(2);
-
-        // FIXME: this seems super coupled.
-        expect(dispatch.calledWith({
-          type: SITE_DELETED,
-          siteId
-        }));
+        expect(dispatch.calledWith(siteDeletedAction)).to.be.true
         expect(dispatch.calledWith(routerAction)).to.be.true;
       });
     });
@@ -268,16 +269,16 @@ describe("siteActions", () => {
       };
       const filePromise = Promise.resolve(files);
       fetchRepositoryContent.withArgs(site, path).returns(filePromise);
+      const siteFilesReceivedAction = {
+        action: "files have received, make your time"
+      };
+      siteFilesReceivedActionCreator.withArgs(id, files).returns(siteFilesReceivedAction);
 
       const actual = fixture.fetchFiles(site, path);
       
       return actual.then(() => {
         expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith({
-          type: SITE_FILES_RECEIVED,
-          siteId: id,
-          files
-        })).to.be.true;
+        expect(dispatch.calledWith(siteFilesReceivedAction)).to.be.true;
       });
     });
 
@@ -316,17 +317,17 @@ describe("siteActions", () => {
         fo: "fum"
       };
       const filePromise = Promise.resolve(file);
+      const siteFileContentReceivedAction = {
+        action: "reaction"
+      };
       fetchRepositoryContent.withArgs(site, path).returns(filePromise);
+      siteFileContentReceivedActionCreator.withArgs(id, file).returns(siteFileContentReceivedAction);
 
       const actual = fixture.fetchFileContent(site, path);
       
       return actual.then(() => {
         expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith({
-          type: SITE_FILE_CONTENT_RECEIVED,
-          siteId: id,
-          file
-        })).to.be.true;
+        expect(dispatch.calledWith(siteFileContentReceivedAction)).to.be.true;
       });
     });
 
@@ -430,19 +431,18 @@ describe("siteActions", () => {
         content: encodedContent,
         branch: branch
       };
+      const siteFileContentReceivedAction = {
+        action: "reaction"
+      };
+      siteFileContentReceivedActionCreator.withArgs(id, content).returns(siteFileContentReceivedAction);
       createCommit.withArgs(site, path, expectedCommit).returns(commitObjectPromise);
-
       const actual = fixture.createCommit(site, path, content);
       
       return actual.then(() => {
         expect(alertSuccess.calledWith("File committed successfully")).to.be.true;
         expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith({
-          type: SITE_FILE_CONTENT_RECEIVED,
-          siteId: id,
-          file: content
-        })).to.be.true;
-      });    
+        expect(dispatch.calledWith(siteFileContentReceivedAction)).to.be.true;
+      });
     });
     
     it("creates a commit with the specified message, no sha, and default branch and dispatches a site file added action to the store when successful", () => {
@@ -474,6 +474,10 @@ describe("siteActions", () => {
         content: encodedContent,
         branch: branch
       };
+      const siteFileContentReceivedAction = {
+        action: "reaction"
+      };
+      siteFileContentReceivedActionCreator.withArgs(id, content).returns(siteFileContentReceivedAction);
       createCommit.withArgs(site, path, expectedCommit).returns(commitObjectPromise);
 
       const actual = fixture.createCommit(site, path, content, message);
@@ -481,11 +485,7 @@ describe("siteActions", () => {
       return actual.then(() => {
         expect(alertSuccess.calledWith("File committed successfully")).to.be.true;
         expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith({
-          type: SITE_FILE_CONTENT_RECEIVED,
-          siteId: id,
-          file: content
-        })).to.be.true;
+        expect(dispatch.calledWith(siteFileContentReceivedAction)).to.be.true;
       });    
     });
 
@@ -519,6 +519,10 @@ describe("siteActions", () => {
         sha: sha,
         branch: branch
       };
+      const siteFileContentReceivedAction = {
+        action: "reaction"
+      };
+      siteFileContentReceivedActionCreator.withArgs(id, content).returns(siteFileContentReceivedAction);
       createCommit.withArgs(site, path, expectedCommit).returns(commitObjectPromise);
 
       const actual = fixture.createCommit(site, path, content, false, sha);
@@ -526,11 +530,7 @@ describe("siteActions", () => {
       return actual.then(() => {
         expect(alertSuccess.calledWith("File committed successfully")).to.be.true;
         expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith({
-          type: SITE_FILE_CONTENT_RECEIVED,
-          siteId: id,
-          file: content
-        })).to.be.true;
+        expect(dispatch.calledWith(siteFileContentReceivedAction)).to.be.true;
       });    
     });
   });
@@ -561,17 +561,17 @@ describe("siteActions", () => {
       ];
       
       const assetsPromise = Promise.resolve(assets);
+      const siteAssetsReceivedAction = {
+        assets: "negative"
+      };
       fetchRepositoryContent.withArgs(site, "assets").returns(assetsPromise);
+      siteAssetsReceivedActionCreator.withArgs(id, [ bAsset ]).returns(siteAssetsReceivedAction);
 
       const actual = fixture.fetchSiteAssets(site);
       
       return actual.then((result) => {
         expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith({
-          type: SITE_ASSETS_RECEIVED,
-          siteId: id,
-          assets: [ bAsset ]
-        })).to.be.true;
+        expect(dispatch.calledWith(siteAssetsReceivedAction)).to.be.true;
         expect(result).to.equal(site);
       });
     });
@@ -602,17 +602,17 @@ describe("siteActions", () => {
       ];
       
       const assetsPromise = Promise.resolve(assets);
+      const siteAssetsReceivedAction = {
+        assets: "negative"
+      };
       fetchRepositoryContent.withArgs(site, assetPath).returns(assetsPromise);
+      siteAssetsReceivedActionCreator.withArgs(id, [ bAsset ]).returns(siteAssetsReceivedAction);
 
       const actual = fixture.fetchSiteAssets(site);
       
       return actual.then((result) => {
         expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith({
-          type: SITE_ASSETS_RECEIVED,
-          siteId: id,
-          assets: [ bAsset ]
-        })).to.be.true;
+        expect(dispatch.calledWith(siteAssetsReceivedAction)).to.be.true;
         expect(result).to.equal(site);
       });
     });

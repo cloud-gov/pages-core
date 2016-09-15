@@ -6,7 +6,16 @@ import convertFileToData from '../util/convertFileToData';
 import store from '../store';
 import alertActions from './alertActions';
 
-import { sitesReceived as sitesReceivedActionCreator } from "./actionCreators/siteActions";
+import {
+  sitesReceived as sitesReceivedActionCreator,
+  siteAdded as siteAddedActionCreator,
+  siteUpdated as siteUpdatedActionCreator,
+  siteDeleted as siteDeletedActionCreator,
+  siteFileContentReceived as siteFileContentReceivedActionCreator,
+  siteAssetsReceived as siteAssetsReceivedActionCreator,
+  siteFilesReceived as siteFilesReceivedActionCreator
+} from "./actionCreators/siteActions";
+
 import { updateRouter as updateRouterActionCreator } from "./actionCreators/navigationActions";
 
 
@@ -19,17 +28,46 @@ const updateRouterToSitesUri = () => {
   store.dispatch(action);
 };
 
+const updateRouterToSpecificSiteUri = siteId => {
+  const action = updateRouterActionCreator(`/sites/${siteId}`);
+  store.dispatch(action);
+};
+
 const dispatchSitesReceivedAction = sites => {
   const action = sitesReceivedActionCreator(sites);
   store.dispatch(action);
 };
 
 const dispatchSiteAddedAction = site => {
-  store.dispatch({
-    type: siteActionTypes.SITE_ADDED,
-    site
-  });
+  const action = siteAddedActionCreator(site);
+  store.dispatch(action);
 };
+
+const dispatchSiteUpdatedAction = site => {
+  const action = siteUpdatedActionCreator(site);
+  store.dispatch(action);
+};
+
+const dispatchSiteDeletedAction = siteId => {
+  const action = siteDeletedActionCreator(siteId);
+  store.dispatch(action);
+};
+
+const dispatchSiteFileContentReceivedAction = (siteId, fileContent) => {
+  const action = siteFileContentReceivedActionCreator(siteId, fileContent);
+  store.dispatch(action);
+};
+
+const dispatchSiteAssetsReceivedAction = (siteId, assets) => {
+  const action = siteAssetsReceivedActionCreator(siteId, assets);
+  store.dispatch(action);
+};
+
+const dispatchSiteFilesReceivedAction = (siteId, files) => {
+  const action = siteFilesReceivedActionCreator(siteId, files);
+  store.dispatch(action);
+};
+
 
 export default {
   fetchSites() {
@@ -46,49 +84,29 @@ export default {
   },
 
   updateSite(site, data) {
-    return federalist.updateSite(site, data).then((site) => {
-      store.dispatch({
-        type: siteActionTypes.SITE_UPDATED,
-        siteId: site.id,
-        site
-      });
-    }).catch(alertError);
+    return federalist.updateSite(site, data)
+      .then(dispatchSiteUpdatedAction)
+      .catch(alertError);
   },
 
   deleteSite(siteId) {
-    return federalist.deleteSite(siteId).then((site) => {
-      store.dispatch({
-        type: siteActionTypes.SITE_DELETED,
-        siteId
-      });
-    }).then(updateRouterToSitesUri)
+    return federalist.deleteSite(siteId)
+      .then(dispatchSiteDeletedAction.bind(null, siteId))
+      .then(updateRouterToSitesUri)
       .catch(alertError);
   },
 
   // todo rename to something like fetchTree
   fetchFiles(site, path) {
-    function dispatchChildContent(site, path, files) {
-      store.dispatch({
-        type: siteActionTypes.SITE_FILES_RECEIVED,
-        siteId: site.id,
-        files
-      });
-    }
-
     return github.fetchRepositoryContent(site, path)
-      .then(
-        dispatchChildContent.bind(null, site, path)
-      ).catch(alertError);
+      .then(dispatchSiteFilesReceivedAction.bind(null, site.id))
+      .catch(alertError);
   },
 
   fetchFileContent(site, path) {
     return github.fetchRepositoryContent(site, path)
       .then((file) => {
-        store.dispatch({
-          type: siteActionTypes.SITE_FILE_CONTENT_RECEIVED,
-          siteId: site.id,
-          file
-        });
+        dispatchSiteFileContentReceivedAction(site.id, file);
       });
   },
 
@@ -118,12 +136,7 @@ export default {
 
     return github.createCommit(site, path, commit).then((commitObj) => {
       alertActions.alertSuccess('File committed successfully');
-
-      store.dispatch({
-        type: siteActionTypes.SITE_FILE_CONTENT_RECEIVED,
-        siteId,
-        file: commitObj.content
-      });
+      dispatchSiteFileContentReceivedAction(siteId, commitObj.content);
     }).catch(alertError);
   },
 
@@ -136,11 +149,7 @@ export default {
         return asset.type === 'file';
       });
     }).then((assets) => {
-      store.dispatch({
-        type: siteActionTypes.SITE_ASSETS_RECEIVED,
-        siteId: site.id,
-        assets
-      });
+      dispatchSiteAssetsReceivedAction(site.id, assets);
       return Promise.resolve(site);
     }).catch(alertError);
   },
@@ -186,11 +195,7 @@ export default {
     }).then((site) => {
       return github.fetchRepositoryContent(site);
     }).then((files) => {
-      store.dispatch({
-        type: siteActionTypes.SITE_FILES_RECEIVED,
-        siteId: site.id,
-        files
-      });
+      dispatchSiteFilesReceivedAction(site.id, files);
 
       return files;
     }).catch((error) => {
@@ -206,16 +211,8 @@ export default {
     return github.createRepo(destination, source).then(() => {
       return federalist.cloneRepo(destination, source);
     }).then((site) => {
-      store.dispatch({
-        type: siteActionTypes.SITE_ADDED,
-        site
-      });
-
-      store.dispatch({
-        type: navigationTypes.UPDATE_ROUTER,
-        method: 'push',
-        arguments: [`/sites/${site.id}`]
-      });
+      dispatchSiteAddedAction(site);
+      updateRouterToSpecificSiteUri(site.id);
     }).catch(alertError);
   },
 
