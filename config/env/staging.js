@@ -31,8 +31,9 @@ module.exports = {
   }
 };
 
-// If running in Cloud Foundry with a service database avaible, use it
+// If running in Cloud Foundry with a service database available, use it
 if (dbURL) {
+  console.log("WE HAVE A DB URL\n\n\n\n\n\n\n\n\n\n");
   module.exports.connections = {
     postgres: {
       adapter: 'sails-postgresql',
