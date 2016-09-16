@@ -93,6 +93,7 @@ var AuthController = {
    */
   callback: function (req, res) {
     function tryAgain (err) {
+      sails.log.verbose('OAuth callback: ', err);
 
       if (err) sails.log.error(err);
 
