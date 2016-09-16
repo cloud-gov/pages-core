@@ -1,12 +1,9 @@
-import { navigationTypes } from '../constants';
 import store from '../store';
+import { updateRouter as updateRouterActionCreator } from "./actionCreators/navigationActions";
 
 export default {
   redirect(path) {
-    store.dispatch({
-      type: navigationTypes.UPDATE_ROUTER,
-      method: 'push',
-      arguments: [path]
-    });
+    const action = updateRouterActionCreator(path);
+    store.dispatch(action);
   }
-}
+};
