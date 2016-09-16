@@ -6,13 +6,15 @@ proxyquire.noCallThru();
 
 describe("siteActions", () => {
   let fixture;
-  let dispatch, httpErrorAlertAction, fetchSites, addSite, updateSite, deleteSite, fetchRepositoryContent,
-      fetchRepositoryConfigs, createCommit, encodeB64, alertSuccess;
+  let dispatch;
+  let fetchRepositoryContent, fetchRepositoryConfigs, createCommit, fetchBranches,
+      deleteBranch, createRepo;
+  let fetchSites, addSite, updateSite, deleteSite, cloneRepo;
+  let encodeB64, httpErrorAlertAction, alertSuccess;
   let sitesReceivedActionCreator, siteAddedActionCreator, siteDeletedActionCreator,
       siteUpdatedActionCreator, siteFileContentReceivedActionCreator, siteAssetsReceivedActionCreator,
-      siteFilesReceivedActionCreator,
+      siteFilesReceivedActionCreator, siteConfigsReceivedActionCreator, siteBranchesReceivedActionCreator,
       updateRouterActionCreator;
-  const SITE_CONFIGS_RECEIVED = "my kingdom for a config!";
   
   beforeEach(() => {
     dispatch = spy();
@@ -21,9 +23,13 @@ describe("siteActions", () => {
     addSite = stub();
     updateSite = stub();
     deleteSite = stub();
+    cloneRepo = stub();
     fetchRepositoryContent = stub();
     fetchRepositoryConfigs = stub();
     createCommit = stub();
+    fetchBranches = stub();
+    deleteBranch = stub();
+    createRepo = stub();
     encodeB64 = stub();
     alertSuccess = stub();
     sitesReceivedActionCreator = stub();
@@ -34,6 +40,8 @@ describe("siteActions", () => {
     siteFileContentReceivedActionCreator = stub();
     siteAssetsReceivedActionCreator = stub();
     siteFilesReceivedActionCreator = stub();
+    siteConfigsReceivedActionCreator = stub();
+    siteBranchesReceivedActionCreator = stub();
     
     // FIXME: complex dependency wiring a smell
     fixture = proxyquire("../../../../assets/app/actions/siteActions", {
@@ -44,15 +52,12 @@ describe("siteActions", () => {
         siteDeleted: siteDeletedActionCreator,
         siteFileContentReceived: siteFileContentReceivedActionCreator,
         siteAssetsReceived: siteAssetsReceivedActionCreator,
-        siteFilesReceived: siteFilesReceivedActionCreator
+        siteFilesReceived: siteFilesReceivedActionCreator,
+        siteConfigsReceived: siteConfigsReceivedActionCreator,
+        siteBranchesReceived: siteBranchesReceivedActionCreator
       },
       "./actionCreators/navigationActions": {
         updateRouter: updateRouterActionCreator
-      },
-      "../constants": {
-        siteActionTypes: {
-          SITE_CONFIGS_RECEIVED: SITE_CONFIGS_RECEIVED
-        }
       },
       "../store": {
         dispatch: dispatch
@@ -65,12 +70,16 @@ describe("siteActions", () => {
         fetchSites: fetchSites,
         addSite: addSite,
         updateSite: updateSite,
-        deleteSite: deleteSite
+        deleteSite: deleteSite,
+        cloneRepo: cloneRepo
       },
       "../util/githubApi": {
         fetchRepositoryContent: fetchRepositoryContent,
         fetchRepositoryConfigs: fetchRepositoryConfigs,
-        createCommit: createCommit
+        createCommit: createCommit,
+        fetchBranches: fetchBranches,
+        deleteBranch: deleteBranch,
+        createRepo: createRepo
       },
       "../util/encoding": {
         encodeB64: encodeB64
@@ -365,17 +374,17 @@ describe("siteActions", () => {
         fo: "fum"
       };
       const configsPromise = Promise.resolve(configs);
+      const siteConfigsReceivedAction = {
+        foo: "bar"
+      };
       fetchRepositoryConfigs.withArgs(site).returns(configsPromise);
+      siteConfigsReceivedActionCreator.withArgs(id, configs).returns(siteConfigsReceivedAction);
 
       const actual = fixture.fetchSiteConfigs(site);
       
       return actual.then((result) => {
         expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith({
-          type: SITE_CONFIGS_RECEIVED,
-          siteId: id,
-          configs
-        })).to.be.true;
+        expect(dispatch.calledWith(siteConfigsReceivedAction)).to.be.true;
         expect(result).to.equal(site);
       });
     });
@@ -635,6 +644,194 @@ describe("siteActions", () => {
       fetchRepositoryContent.withArgs(site, assetPath).returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchSiteAssets(site);
+      
+      return actual.then(() => {
+        dispatchesAnAlertError(errorMessage);
+      });
+    });
+  });
+  
+  describe("fetch(Site)Branches", () => {
+    it("fetches a site's branches and dispatches a site branches received action to the store when successful, returning the same site given", () => {
+      const id = "kuaw8fsru8hwugfw";
+      const site = {
+        id: id,
+        could: "be anything"
+      };
+      const branches = {
+        blurry: "vision",
+        get: "glasses"
+      };
+      
+      const branchesPromise = Promise.resolve(branches);
+      const siteBranchesReceivedAction = {
+        branches: "r us"
+      };
+      fetchBranches.withArgs(site).returns(branchesPromise);
+      siteBranchesReceivedActionCreator.withArgs(id, branches).returns(siteBranchesReceivedAction);
+
+      const actual = fixture.fetchBranches(site);
+      
+      return actual.then((result) => {
+        expect(dispatch.calledOnce).to.be.true;
+        expect(dispatch.calledWith(siteBranchesReceivedAction)).to.be.true;
+        expect(result).to.equal(site);
+      });
+    });
+    
+    it("does nothing when fetching a site's branches fails", () => {
+      const id = "kuaw8fsru8hwugfw";
+      const site = {
+        id: id,
+        could: "be anything"
+      };
+      const errorMessage = "it failed.";
+      const error = {
+        message: errorMessage
+      };
+      const rejectedWithErrorPromise = Promise.reject(error);
+      fetchBranches.withArgs(site).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.fetchBranches(site);
+      
+      return actual.catch(() => {
+        expect(dispatch.called).to.be.false;
+      });
+    });
+  });
+
+  describe("delete(Site)Branch", () => {
+    it("deletes a branch for a site's branches and, if successful, then fetches the site's branches again and dispatches a site branches received action to the store when successful, returning the same site given", () => {
+      const id = "kuaw8fsru8hwugfw";
+      const site = {
+        id: id,
+        could: "be anything"
+      };
+      const branch = "hi";
+      const branches = {
+        blurry: "vision",
+        get: "glasses"
+      };
+      const deleteBranchPromise = Promise.resolve("ig-nored");
+      const branchesPromise = Promise.resolve(branches);
+      const siteBranchesReceivedAction = {
+        branches: "r us"
+      };
+      deleteBranch.withArgs(site, branch).returns(deleteBranchPromise);
+      fetchBranches.withArgs(site).returns(branchesPromise);
+      siteBranchesReceivedActionCreator.withArgs(id, branches).returns(siteBranchesReceivedAction);
+
+      const actual = fixture.deleteBranch(site, branch);
+      
+      return actual.then((result) => {
+        expect(dispatch.calledOnce).to.be.true;
+        expect(dispatch.calledWith(siteBranchesReceivedAction)).to.be.true;
+        expect(result).to.equal(site);
+      });
+    });
+    
+    it("alerts an error when deleting a site's branch fails", () => {
+      const id = "kuaw8fsru8hwugfw";
+      const site = {
+        id: id,
+        could: "be anything"
+      };
+      const branch = "hello";
+      const errorMessage = "it failed.";
+      const error = {
+        message: errorMessage
+      };
+      const rejectedWithErrorPromise = Promise.reject(error);
+      deleteBranch.withArgs(site, branch).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.deleteBranch(site, branch);
+      
+      return actual.then(() => {
+        dispatchesAnAlertError(errorMessage);
+      });
+    });
+    
+    it("alerts an error when fetching branches fails after successfully deleting a site's branch", () => {
+      const id = "kuaw8fsru8hwugfw";
+      const site = {
+        id: id,
+        could: "be anything"
+      };
+      const branch = "hello";
+      const errorMessage = "it failed.";
+      const error = {
+        message: errorMessage
+      };
+      const deleteBranchPromise = Promise.resolve("ig-nored");
+      deleteBranch.withArgs(site, branch).returns(deleteBranchPromise);
+      const rejectedWithErrorPromise = Promise.reject(error);
+      fetchBranches.withArgs(site).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.deleteBranch(site, branch);
+      
+      return actual.then(() => {
+        dispatchesAnAlertError(errorMessage);
+      });
+    });    
+  });
+
+  describe("cloneRepo", () => {
+    const destination = "destination";
+    const source = "source";
+
+    it("dispatches a site added action and redirects to a site uri if we successfully create and clone a repo", () => {
+      const id = "824j2j";
+      const site = {
+        hi: "mom",
+        id: id
+      };
+      const sitePromise = Promise.resolve(site);
+      const siteAddedAction = {
+        action: "yep"
+      };
+      const routerAction = {
+        whatever: "bub"
+      };
+      createRepo.withArgs(destination, source).returns(Promise.resolve("ignored"));
+      cloneRepo.withArgs(destination, source).returns(sitePromise);
+      updateRouterActionCreator.withArgs(`/sites/${id}`).returns(routerAction);
+      siteAddedActionCreator.withArgs(site).returns(siteAddedAction);
+
+      const actual = fixture.cloneRepo(destination, source);
+
+      return actual.then(() => {
+        expect(dispatch.callCount).to.equal(2);
+        
+        expect(dispatch.calledWith(siteAddedAction)).to.be.true;
+        expect(dispatch.calledWith(routerAction)).to.be.true;
+      });
+    });
+    
+    it("alerts an error if createRepo fails", () => {
+      const errorMessage = "it failed.";
+      const error = {
+        message: errorMessage
+      };
+      const rejectedWithErrorPromise = Promise.reject(error);
+      createRepo.withArgs(destination, source).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.cloneRepo(destination, source);
+      
+      return actual.then(() => {
+        dispatchesAnAlertError(errorMessage);
+      });
+    });
+    
+    it("alerts an error if cloneRepo fails", () => {
+      const errorMessage = "it failed.";
+      const error = {
+        message: errorMessage
+      };
+      const rejectedWithErrorPromise = Promise.reject(error);
+      createRepo.withArgs(destination, source).returns(Promise.resolve("ignored"));
+      cloneRepo.withArgs(destination, source).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.cloneRepo(destination, source);
       
       return actual.then(() => {
         dispatchesAnAlertError(errorMessage);

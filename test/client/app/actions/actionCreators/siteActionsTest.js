@@ -6,7 +6,9 @@ import {
   siteDeleted, siteDeletedType,
   siteFileContentReceived, siteFileContentReceivedType,
   siteAssetsReceived, siteAssetsReceivedType,
-  siteFilesReceived, siteFilesReceivedType
+  siteFilesReceived, siteFilesReceivedType,
+  siteConfigsReceived, siteConfigsReceivedType,
+  siteBranchesReceived, siteBranchesReceivedType
 } from "../../../../../assets/app/actions/actionCreators/siteActions";
 
 describe("siteActions action creators", () => {
@@ -127,4 +129,50 @@ describe("siteActions action creators", () => {
       expect(siteAssetsReceivedType).to.equal("SITE_ASSETS_RECEIVED");
     });
   });
+
+  describe("siteConfigsReceived", () => {
+    it("constructs properly", () => {
+      const siteId = "tk421";
+      const configs = {
+        something: "could be anything",
+        except: "when it isn't"
+      };
+      
+      const actual = siteConfigsReceived(siteId, configs);
+
+      expect(actual).to.deep.equal({
+        type: siteConfigsReceivedType,
+        siteId,
+        configs
+      });
+    });
+
+    it("exports its type", () => {
+      expect(siteConfigsReceivedType).to.equal("SITE_CONFIGS_RECEIVED");
+    });
+  });
+
+  
+  describe("siteBranchesReceived", () => {
+    it("constructs properly", () => {
+      const siteId = "tk421";
+      const branches = {
+        something: "could be anything",
+        except: "when it isn't"
+      };
+      
+      const actual = siteBranchesReceived(siteId, branches);
+
+      expect(actual).to.deep.equal({
+        type: siteBranchesReceivedType,
+        siteId,
+        branches
+      });
+    });
+
+    it("exports its type", () => {
+      expect(siteBranchesReceivedType).to.equal("SITE_BRANCHES_RECEIVED");
+    });
+  });
+
 });

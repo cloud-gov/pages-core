@@ -1,6 +1,5 @@
 import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
-import { siteActionTypes, navigationTypes } from '../constants';
 import { encodeB64 } from '../util/encoding';
 import convertFileToData from '../util/convertFileToData';
 import store from '../store';
@@ -13,7 +12,9 @@ import {
   siteDeleted as siteDeletedActionCreator,
   siteFileContentReceived as siteFileContentReceivedActionCreator,
   siteAssetsReceived as siteAssetsReceivedActionCreator,
-  siteFilesReceived as siteFilesReceivedActionCreator
+  siteFilesReceived as siteFilesReceivedActionCreator,
+  siteConfigsReceived as siteConfigsReceivedActionCreator,
+  siteBranchesReceived as siteBranchesReceivedActionCreator
 } from "./actionCreators/siteActions";
 
 import { updateRouter as updateRouterActionCreator } from "./actionCreators/navigationActions";
@@ -68,6 +69,30 @@ const dispatchSiteFilesReceivedAction = (siteId, files) => {
   store.dispatch(action);
 };
 
+const dispatchSiteConfigsReceivedAction = (siteId, configs) => {
+  const action = siteConfigsReceivedActionCreator(siteId, configs);
+  store.dispatch(action);
+};    
+
+const dispatchSiteBranchesReceivedAction = (siteId, branches) => {
+  const action = siteBranchesReceivedActionCreator(siteId, branches);
+  store.dispatch(action);
+};    
+
+const makeCommit = (site, path, fileData, message, sha) => {
+  const b64EncodedFileContents = encodeB64(fileData);
+  let commit = {
+    path,
+    message: (message) ? message : `Adds ${path} to project`,
+    content: b64EncodedFileContents,
+    branch: `${site.branch || site.defaultBranch}`
+  };
+  
+  if (sha) commit = Object.assign({}, commit, { sha });
+  
+  return commit;
+};
+
 
 export default {
   fetchSites() {
@@ -105,38 +130,21 @@ export default {
 
   fetchFileContent(site, path) {
     return github.fetchRepositoryContent(site, path)
-      .then((file) => {
-        dispatchSiteFileContentReceivedAction(site.id, file);
-      });
+      .then(dispatchSiteFileContentReceivedAction.bind(null, site.id));
   },
 
   fetchSiteConfigs(site) {
-    return github.fetchRepositoryConfigs(site).then((configs) => {
-      store.dispatch({
-        type: siteActionTypes.SITE_CONFIGS_RECEIVED,
-        siteId: site.id,
-        configs
-      });
-      
-      return site;
-    });
+    return github.fetchRepositoryConfigs(site)
+      .then(dispatchSiteConfigsReceivedAction.bind(null, site.id))
+      .then(() => site);
   },
 
   createCommit(site, path, fileData, message = false, sha = false) {
-    const b64EncodedFileContents = encodeB64(fileData);
-    const siteId = site.id;
-    let commit = {
-      path,
-      message: (message) ? message : `Adds ${path} to project`,
-      content: b64EncodedFileContents,
-      branch: `${site.branch || site.defaultBranch}`
-    };
-
-    if (sha) commit = Object.assign({}, commit, { sha });
-
+    const commit = makeCommit(site, path, fileData, message, sha);
+    
     return github.createCommit(site, path, commit).then((commitObj) => {
       alertActions.alertSuccess('File committed successfully');
-      dispatchSiteFileContentReceivedAction(siteId, commitObj.content);
+      dispatchSiteFileContentReceivedAction(site.id, commitObj.content);
     }).catch(alertError);
   },
 
@@ -144,13 +152,37 @@ export default {
     const config = site['_config.yml'];
     const assetPath = (config && config.assetPath) || 'assets';
 
-    return github.fetchRepositoryContent(site, assetPath).then((assets) => {
+    const filterAssetsWithTypeOfFile = (assets) => {
       return assets.filter((asset) => {
         return asset.type === 'file';
       });
-    }).then((assets) => {
-      dispatchSiteAssetsReceivedAction(site.id, assets);
-      return Promise.resolve(site);
+    };
+    
+    return github.fetchRepositoryContent(site, assetPath)
+      .then(filterAssetsWithTypeOfFile)
+      .then(dispatchSiteAssetsReceivedAction.bind(null, site.id))
+      .then(() => Promise.resolve(site))
+      .catch(alertError);
+  },
+
+  fetchBranches(site) {
+    return github.fetchBranches(site)
+      .then(dispatchSiteBranchesReceivedAction.bind(null, site.id))
+      .then(() => site);
+  },
+
+  deleteBranch(site, branch) {
+    return github.deleteBranch(site, branch).then(() => {
+      return this.fetchBranches(site);
+    }).catch(alertError);
+  },
+
+  cloneRepo(destination, source) {
+    return github.createRepo(destination, source).then(() => {
+      return federalist.cloneRepo(destination, source);
+    }).then((site) => {
+      dispatchSiteAddedAction(site);
+      updateRouterToSpecificSiteUri(site.id);
     }).catch(alertError);
   },
 
@@ -207,28 +239,6 @@ export default {
     });
   },
 
-  cloneRepo(destination, source) {
-    return github.createRepo(destination, source).then(() => {
-      return federalist.cloneRepo(destination, source);
-    }).then((site) => {
-      dispatchSiteAddedAction(site);
-      updateRouterToSpecificSiteUri(site.id);
-    }).catch(alertError);
-  },
-
-  fetchBranches(site) {
-    return github.fetchBranches(site).then((branches) => {
-
-      store.dispatch({
-        type: siteActionTypes.SITE_BRANCHES_RECEIVED,
-        siteId: site.id,
-        branches
-      });
-
-      return site;
-    });
-  },
-
   createDraftBranch(site, path) {
     const branchName = `_draft-${encodeB64(path)}`;
     const sha = site.branches.find((branch) => {
@@ -240,12 +250,6 @@ export default {
       this.fetchBranches(site);
       return branchName;
     });
-  },
-
-  deleteBranch(site, branch) {
-    return github.deleteBranch(site, branch).then(() => {
-      return this.fetchBranches(site);
-    }).catch(alertError);
   }
 };
 
