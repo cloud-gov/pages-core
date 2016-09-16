@@ -30,15 +30,6 @@ const alertAndRedirect = (message, uri) => {
   routeActions.redirect(uri);
 };
 
-const openPRWithHead = (branchName, site) => {
-  return this.submitFile(branchName).then(() => {
-    return siteActions.createPR(site, branchName, site.defaultBranch);
-  }).then(() => {
-    routeActions.redirect(`/sites/${site.id}`);
-  });
-}
-
-
 let insertFn;
 
 class Editor extends React.Component {
@@ -157,6 +148,14 @@ class Editor extends React.Component {
     return { content, path, message };
   }
 
+  openPRWithHead(branchName, site) {
+    return this.submitFile(branchName).then(() => {
+      return siteActions.createPR(site, branchName, site.defaultBranch);
+    }).then(() => {
+      routeActions.redirect(`/sites/${site.id}`);
+    });
+  }
+
   commitOrPR() {
     const { site } = this.props;
     const { path } = this.state;
@@ -168,7 +167,7 @@ class Editor extends React.Component {
     }
 
     // All federalist draft branch PRs are opened against master
-    openPRWithHead(draftBranch.name, site);
+    this.openPRWithHead(draftBranch.name, site);
   }
 
   submitFile(branch = this.props.site.defaultBranch) {
