@@ -43,31 +43,31 @@ module.exports = function(grunt) {
 	 * that, when run, should either load/configure or register
 	 * a Grunt task.
 	 */
-	// function loadTasks(relPath) {
-	// 	return includeAll({
-	// 		dirname: require('path').resolve(__dirname, relPath),
-	// 		filter: /(.+)\.js$/
-	// 	}) || {};
-	// }
+	function loadTasks(relPath) {
+		return includeAll({
+			dirname: require('path').resolve(__dirname, relPath),
+			filter: /(.+)\.js$/
+		}) || {};
+	}
 
 	/**
 	 * Invokes the function from a Grunt configuration module with
 	 * a single argument - the `grunt` object.
 	 */
-	// function invokeConfigFn(tasks) {
-	// 	for (var taskName in tasks) {
-	// 		if (tasks.hasOwnProperty(taskName)) {
-	// 			tasks[taskName](grunt);
-	// 		}
-	// 	}
-	// }
+	function invokeConfigFn(tasks) {
+		for (var taskName in tasks) {
+			if (tasks.hasOwnProperty(taskName)) {
+				tasks[taskName](grunt);
+			}
+		}
+	}
 
 
 
 
 	// Load task functions
 	// var taskConfigurations = loadTasks('./tasks/config'),
-	// 	registerDefinitions = loadTasks('./tasks/register');
+	registerDefinitions = loadTasks('./tasks/register');
 
 	// (ensure that a default task exists)
 	if (!registerDefinitions.default) {
@@ -76,6 +76,6 @@ module.exports = function(grunt) {
 
 	// Run task functions to configure Grunt.
 	// invokeConfigFn(taskConfigurations);
-	// invokeConfigFn(registerDefinitions);
+	invokeConfigFn(registerDefinitions);
 
 };
