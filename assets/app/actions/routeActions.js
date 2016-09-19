@@ -1,9 +1,8 @@
-import store from '../store';
-import { updateRouter as updateRouterActionCreator } from "./actionCreators/navigationActions";
+import { dispatch } from '../store';
+import { updateRouter as createUpdateRouterAction } from "./actionCreators/navigationActions";
 
 export default {
   redirect(path) {
-    const action = updateRouterActionCreator(path);
-    store.dispatch(action);
+    dispatch(createUpdateRouterAction(path));
   }
 };

@@ -2,22 +2,22 @@ import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
 import { encodeB64 } from '../util/encoding';
 import convertFileToData from '../util/convertFileToData';
-import store from '../store';
+import { dispatch } from '../store';
 import alertActions from './alertActions';
 
 import {
-  sitesReceived as sitesReceivedActionCreator,
-  siteAdded as siteAddedActionCreator,
-  siteUpdated as siteUpdatedActionCreator,
-  siteDeleted as siteDeletedActionCreator,
-  siteFileContentReceived as siteFileContentReceivedActionCreator,
-  siteAssetsReceived as siteAssetsReceivedActionCreator,
-  siteFilesReceived as siteFilesReceivedActionCreator,
-  siteConfigsReceived as siteConfigsReceivedActionCreator,
-  siteBranchesReceived as siteBranchesReceivedActionCreator
+  sitesReceived as createSitesReceivedAction,
+  siteAdded as createSiteAddedAction,
+  siteUpdated as createSiteUpdatedAction,
+  siteDeleted as createSiteDeletedAction,
+  siteFileContentReceived as createSiteFileContentReceivedAction,
+  siteAssetsReceived as createSiteAssetsReceivedAction,
+  siteFilesReceived as createSiteFilesReceivedAction,
+  siteConfigsReceived as createSiteConfigsReceivedAction,
+  siteBranchesReceived as createSiteBranchesReceivedAction
 } from "./actionCreators/siteActions";
 
-import { updateRouter as updateRouterActionCreator } from "./actionCreators/navigationActions";
+import { updateRouter as createUpdateRouterAction } from "./actionCreators/navigationActions";
 
 
 const alertError = error => {
@@ -25,58 +25,47 @@ const alertError = error => {
 };
 
 const updateRouterToSitesUri = () => {
-  const action = updateRouterActionCreator(`/sites`);
-  store.dispatch(action);
+  dispatch(createUpdateRouterAction(`/sites`));
 };
 
 const updateRouterToSpecificSiteUri = siteId => {
-  const action = updateRouterActionCreator(`/sites/${siteId}`);
-  store.dispatch(action);
+  dispatch(createUpdateRouterAction(`/sites/${siteId}`));
 };
 
 const dispatchSitesReceivedAction = sites => {
-  const action = sitesReceivedActionCreator(sites);
-  store.dispatch(action);
+  dispatch(createSitesReceivedAction(sites));
 };
 
 const dispatchSiteAddedAction = site => {
-  const action = siteAddedActionCreator(site);
-  store.dispatch(action);
+  dispatch(createSiteAddedAction(site));
 };
 
 const dispatchSiteUpdatedAction = site => {
-  const action = siteUpdatedActionCreator(site);
-  store.dispatch(action);
+  dispatch(createSiteUpdatedAction(site));
 };
 
 const dispatchSiteDeletedAction = siteId => {
-  const action = siteDeletedActionCreator(siteId);
-  store.dispatch(action);
+  dispatch(createSiteDeletedAction(siteId));
 };
 
 const dispatchSiteFileContentReceivedAction = (siteId, fileContent) => {
-  const action = siteFileContentReceivedActionCreator(siteId, fileContent);
-  store.dispatch(action);
+  dispatch(createSiteFileContentReceivedAction(siteId, fileContent));
 };
 
 const dispatchSiteAssetsReceivedAction = (siteId, assets) => {
-  const action = siteAssetsReceivedActionCreator(siteId, assets);
-  store.dispatch(action);
+  dispatch(createSiteAssetsReceivedAction(siteId, assets));
 };
 
 const dispatchSiteFilesReceivedAction = (siteId, files) => {
-  const action = siteFilesReceivedActionCreator(siteId, files);
-  store.dispatch(action);
+  dispatch(createSiteFilesReceivedAction(siteId, files));
 };
 
 const dispatchSiteConfigsReceivedAction = (siteId, configs) => {
-  const action = siteConfigsReceivedActionCreator(siteId, configs);
-  store.dispatch(action);
+  dispatch(createSiteConfigsReceivedAction(siteId, configs));
 };    
 
 const dispatchSiteBranchesReceivedAction = (siteId, branches) => {
-  const action = siteBranchesReceivedActionCreator(siteId, branches);
-  store.dispatch(action);
+  dispatch(createSiteBranchesReceivedAction(siteId, branches));
 };    
 
 const makeCommit = (site, path, fileData, message, sha) => {
