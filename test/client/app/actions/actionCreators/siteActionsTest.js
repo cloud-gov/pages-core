@@ -11,7 +11,7 @@ import {
   siteBranchesReceived, siteBranchesReceivedType
 } from "../../../../../assets/app/actions/actionCreators/siteActions";
 
-describe("siteActions action creators", () => {
+describe("siteActions actionCreators", () => {
   describe("sitesReceived", () => {
     it("constructs properly", () => {
       const sites = [{

@@ -1,19 +1,20 @@
-import { alertActionTypes } from '../constants';
-import store from '../store';
+import { dispatch } from '../store';
+
+import {
+  authError as createAuthErrorAction,
+  httpError as createHttpErrorAction,
+  httpSuccess as createHttpSuccessAction,
+  setStale as createSetStaleAction,
+  clear as createClearAction
+} from "./actionCreators/alertActions";
 
 export default {
-  authError(err) {
-    store.dispatch({
-      type: alertActionTypes.AUTH_ERROR,
-    });
+  authError() {
+    dispatch(createAuthErrorAction());
   },
 
   httpError(message) {
-    store.dispatch({
-      type: alertActionTypes.HTTP_ERROR,
-      status: 'error',
-      message
-    });
+    dispatch(createHttpErrorAction(message));
   },
 
   alertError(message) {
@@ -21,22 +22,14 @@ export default {
   },
 
   alertSuccess(message) {
-    store.dispatch({
-      type: alertActionTypes.HTTP_SUCCESS,
-      status: 'info',
-      message
-    });
+    dispatch(createHttpSuccessAction(message));
   },
 
   setStale() {
-    store.dispatch({
-      type: alertActionTypes.SET_STALE
-    });
+    dispatch(createSetStaleAction());
   },
 
   clear() {
-    store.dispatch({
-      type: alertActionTypes.CLEAR
-    });
+    dispatch(createClearAction());
   }
 };

@@ -1,14 +1,17 @@
 import api from '../util/federalistApi';
-import { buildActionTypes } from '../constants';
-import store from '../store';
+import { dispatch } from '../store';
+
+import {
+  buildsReceived as createBuildsReceivedAction
+} from "./actionCreators/buildActions";
+
+const dispatchBuildsReceivedAction = builds => {
+  dispatch(createBuildsReceivedAction(builds));
+};
 
 export default {
   fetchBuilds() {
-    api.fetchBuilds().then((builds) => {
-      store.dispatch({
-        type: buildActionTypes.BUILDS_RECEIVED,
-        builds
-      });
-    });
+    return api.fetchBuilds()
+      .then(dispatchBuildsReceivedAction);
   }
-}
+};
