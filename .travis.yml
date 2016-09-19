@@ -1,6 +1,7 @@
 branches:
   except:
     - /react-.*/
+cache: false
 language: node_js
 sudo: true
 node_js:
