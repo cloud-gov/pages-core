@@ -14,3 +14,4 @@ env:
   NODE_ENV: staging
   SAILS_LOG_LEVEL: verbose
   NPM_CONFIG_PRODUCTION: false
+  NODE_MODULES_CACHE: false
