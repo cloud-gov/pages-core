@@ -7,7 +7,8 @@ const propTypes = {
   siteId: React.PropTypes.number.isRequired,
   branch: React.PropTypes.string.isRequired,
   isPages: React.PropTypes.bool, // Are we on the 'Pages' or index section
-  fileName: React.PropTypes.string
+  fileName: React.PropTypes.string,
+  viewLink: React.PropTypes.string
 };
 
 const defaultPropTypes = {
@@ -16,7 +17,7 @@ const defaultPropTypes = {
 
 class PagesHeader extends React.Component {
   getLinkButtonConfigs() {
-    const { isPages, siteId, branch, fileName } = this.props;
+    const { isPages, siteId, branch, fileName, viewLink } = this.props;
     const configs = {
       text: 'View Website',
       alt: 'View this website',
@@ -26,7 +27,7 @@ class PagesHeader extends React.Component {
     if (!isPages) {
       return Object.assign({}, configs, {
         target: '_blank',
-        href: ''
+        href: viewLink
       });
     }
 

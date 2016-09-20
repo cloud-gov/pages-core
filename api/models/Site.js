@@ -5,7 +5,11 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
-var DEFAULT_BUCKET = 'federalist.18f.gov.s3-website-us-east-1.amazonaws.com';
+var env = process.env.NODE_ENV;
+
+var DEFAULT_BUCKET = env === 'staging' ?
+  'federalist-staging.18f.gov.s3-website-us-east-1.amazonaws.com' :
+  'federalist.18f.gov.s3-website-us-east-1.amazonaws.com';
 
 module.exports = {
   // Enforce model schema in the case of schemaless databases
