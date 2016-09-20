@@ -15,7 +15,19 @@ describe("siteActions", () => {
       siteUpdatedActionCreator, siteFileContentReceivedActionCreator, siteAssetsReceivedActionCreator,
       siteFilesReceivedActionCreator, siteConfigsReceivedActionCreator, siteBranchesReceivedActionCreator,
       updateRouterActionCreator;
-  
+
+  const siteId = "kuaw8fsru8hwugfw";
+  const site = {
+    id: siteId,
+    could: "be anything"
+  };
+
+  const errorMessage = "it failed.";
+  const error = {
+    message: errorMessage
+  };
+  const rejectedWithErrorPromise = Promise.reject(error);
+
   beforeEach(() => {
     dispatch = spy();
     httpErrorAlertAction = spy();
@@ -102,24 +114,16 @@ describe("siteActions", () => {
       const actual = fixture.fetchSites();
       
       return actual.then(() => {
-        expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith(action)).to.be.true;
+        expectDispatchOfSingleAction(dispatch, action);
       });
     });
     
     it("triggers an error when fetching of sites fails", () => {
-      const errorMessage = "it failed.";
-      const error = {
-        message: errorMessage
-      };
-      const rejectedWithErrorPromise = Promise.reject(error);
       fetchSites.withArgs().returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchSites();
       
-      return actual.then(() => {
-        dispatchesAnAlertError(errorMessage);
-      });
+      return validateResultDispatchesAlertError(actual, errorMessage);
     });
   });
 
@@ -127,9 +131,6 @@ describe("siteActions", () => {
     it("triggers the adding of a site and dispatches site added and update router actions to the store when successful", () => {
       const siteToAdd = {
         hey: "you"
-      };
-      const site = {
-        hi: "mom"
       };
       const sitePromise = Promise.resolve(site);
       const routerAction = {
@@ -156,33 +157,21 @@ describe("siteActions", () => {
       const siteToAdd = {
         hey: "you"
       };
-      const errorMessage = "it failed.";
-      const error = {
-        message: errorMessage
-      };
-      const rejectedWithErrorPromise = Promise.reject(error);
       addSite.withArgs(siteToAdd).returns(rejectedWithErrorPromise);
 
       const actual = fixture.addSite(siteToAdd);
       
-      return actual.then(() => {
-        dispatchesAnAlertError(errorMessage);
-      });
+      return validateResultDispatchesAlertError(actual, errorMessage);
     });
   });
 
   describe("updateSite", () => {
     it("triggers the updating of a site and dispatches a site updated action to the store when successful", () => {
-      const id = "kuaw8fsru8hwugfw";
       const siteToUpdate = {
         hi: "pal"
       };
       const data = {
         who: "knows"
-      };
-      const site = {
-        id: id,
-        could: "be anything"
       };
       const siteUpdatedAction = {
         action: "wait, what's my queue?"
@@ -194,8 +183,7 @@ describe("siteActions", () => {
       const actual = fixture.updateSite(siteToUpdate, data);
       
       return actual.then(() => {
-        expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith(siteUpdatedAction)).to.be.true;
+        expectDispatchOfSingleAction(dispatch, siteUpdatedAction);
       });
     });
 
@@ -206,24 +194,16 @@ describe("siteActions", () => {
       const data = {
         who: "knows"
       };
-      const errorMessage = "it failed.";
-      const error = {
-        message: errorMessage
-      };
-      const rejectedWithErrorPromise = Promise.reject(error);
       updateSite.withArgs(siteToUpdate, data).returns(rejectedWithErrorPromise);
 
       const actual = fixture.updateSite(siteToUpdate, data);
       
-      return actual.then(() => {
-        dispatchesAnAlertError(errorMessage);
-      });
+      return validateResultDispatchesAlertError(actual, errorMessage);
     });
   });
 
   describe("deleteSite", () => {
     it("triggers the deletion of a site and dispatches a site deleted update router actions to the store when successful", () => {
-      const siteId = "fohjf892unsfkgh3874t249ofmlsfjngu";
       const site = {
         completely: "ignored"
       };
@@ -248,29 +228,16 @@ describe("siteActions", () => {
     });
 
     it("triggers an error when deleting a site fails", () => {
-      const siteId = "fohjf892unsfkgh3874t249ofmlsfjngu";
-      const errorMessage = "it failed.";
-      const error = {
-        message: errorMessage
-      };
-      const rejectedWithErrorPromise = Promise.reject(error);
       deleteSite.withArgs(siteId).returns(rejectedWithErrorPromise);
 
       const actual = fixture.deleteSite(siteId);
       
-      return actual.then(() => {
-        dispatchesAnAlertError(errorMessage);
-      });
+      return validateResultDispatchesAlertError(actual, errorMessage);
     });
   });
 
   describe("fetchFiles", () => {
     it("triggers the fetching of a site's files for a path and dispatches a site files received action to the store when successful", () => {
-      const id = "kuaw8fsru8hwugfw";
-      const site = {
-        id: id,
-        could: "be anything"
-      };
       const path = "/lookee/here";
       const files = {
         fee: "fie",
@@ -281,45 +248,27 @@ describe("siteActions", () => {
       const siteFilesReceivedAction = {
         action: "files have received, make your time"
       };
-      siteFilesReceivedActionCreator.withArgs(id, files).returns(siteFilesReceivedAction);
+      siteFilesReceivedActionCreator.withArgs(siteId, files).returns(siteFilesReceivedAction);
 
       const actual = fixture.fetchFiles(site, path);
       
       return actual.then(() => {
-        expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith(siteFilesReceivedAction)).to.be.true;
+        expectDispatchOfSingleAction(dispatch, siteFilesReceivedAction);
       });
     });
 
     it("triggers an error when fetching a site's files for a path fails", () => {
-      const id = "kuaw8fsru8hwugfw";
-      const site = {
-        id: id,
-        could: "be anything"
-      };
       const path = "/lookee/here";
-      const errorMessage = "it failed.";
-      const error = {
-        message: errorMessage
-      };
-      const rejectedWithErrorPromise = Promise.reject(error);
       fetchRepositoryContent.withArgs(site, path).returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchFiles(site, path);
       
-      return actual.then(() => {
-        dispatchesAnAlertError(errorMessage);
-      });
+      return validateResultDispatchesAlertError(actual, errorMessage);
     });
   });
 
   describe("fetchFileContent", () => {
     it("triggers the fetching of a site's file content for a path and dispatches a site files received action to the store when successful", () => {
-      const id = "kuaw8fsru8hwugfw";
-      const site = {
-        id: id,
-        could: "be anything"
-      };
       const path = "/lookee/here";
       const file = {
         fee: "fie",
@@ -330,45 +279,27 @@ describe("siteActions", () => {
         action: "reaction"
       };
       fetchRepositoryContent.withArgs(site, path).returns(filePromise);
-      siteFileContentReceivedActionCreator.withArgs(id, file).returns(siteFileContentReceivedAction);
+      siteFileContentReceivedActionCreator.withArgs(siteId, file).returns(siteFileContentReceivedAction);
 
       const actual = fixture.fetchFileContent(site, path);
       
       return actual.then(() => {
-        expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith(siteFileContentReceivedAction)).to.be.true;
+        expectDispatchOfSingleAction(dispatch, siteFileContentReceivedAction);
       });
     });
 
     it("does nothing when fetching a site's file content for a path fails", () => {
-      const id = "kuaw8fsru8hwugfw";
-      const site = {
-        id: id,
-        could: "be anything"
-      };
       const path = "/lookee/here";
-      const errorMessage = "it failed.";
-      const error = {
-        message: errorMessage
-      };
-      const rejectedWithErrorPromise = Promise.reject(error);
       fetchRepositoryContent.withArgs(site, path).returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchFileContent(site, path);
-      
-      return actual.catch(() => {
-        expect(dispatch.called).to.be.false;
-      });
+
+      expectDispatchToNotBeCalled(actual);
     });
   });
 
   describe("fetchSiteConfigs", () => {
     it("triggers the fetching of a site's configs and dispatches a site configs received action to the store when successful", () => {
-      const id = "kuaw8fsru8hwugfw";
-      const site = {
-        id: id,
-        could: "be anything"
-      };
       const configs = {
         fee: "fie",
         fo: "fum"
@@ -378,47 +309,35 @@ describe("siteActions", () => {
         foo: "bar"
       };
       fetchRepositoryConfigs.withArgs(site).returns(configsPromise);
-      siteConfigsReceivedActionCreator.withArgs(id, configs).returns(siteConfigsReceivedAction);
+      siteConfigsReceivedActionCreator.withArgs(siteId, configs).returns(siteConfigsReceivedAction);
 
       const actual = fixture.fetchSiteConfigs(site);
       
       return actual.then((result) => {
-        expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith(siteConfigsReceivedAction)).to.be.true;
+        expectDispatchOfSingleAction(dispatch, siteConfigsReceivedAction);
         expect(result).to.equal(site);
       });
     });
 
     it("does nothing when fetching a site's configs fails", () => {
-      const id = "kuaw8fsru8hwugfw";
-      const site = {
-        id: id,
-        could: "be anything"
-      };
       const path = "/lookee/here";
-      const errorMessage = "it failed.";
-      const error = {
-        message: errorMessage
-      };
-      const rejectedWithErrorPromise = Promise.reject(error);
       fetchRepositoryConfigs.withArgs(site).returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchSiteConfigs(site);
       
-      return actual.catch(() => {
-        expect(dispatch.called).to.be.false;
-      });
+      expectDispatchToNotBeCalled(actual);
     });
   });
 
   describe("createCommit", () => {
+    // FIXME: these are particularly complicated test whose creation
+    // comes very directly from looking at the implementation. Neither
+    // of those are good things.
+
     it("creates a commit with the default message, no sha, and the specified branch and dispatches a site file added action to the store when successful", () => {
-      // FIXME: this is a particularly complicated test whose creation comes very directly
-      // from looking at the implementation. Neither of those are good things.
-      const id = "kuaw8fsru8hwugfw";
       const branch = "branch-o-rama";
       const site = {
-        id: id,
+        id: siteId,
         branch: branch,
         could: "be anything"
       };
@@ -443,25 +362,22 @@ describe("siteActions", () => {
       const siteFileContentReceivedAction = {
         action: "reaction"
       };
-      siteFileContentReceivedActionCreator.withArgs(id, content).returns(siteFileContentReceivedAction);
+      siteFileContentReceivedActionCreator.withArgs(siteId, content).returns(siteFileContentReceivedAction);
       createCommit.withArgs(site, path, expectedCommit).returns(commitObjectPromise);
       const actual = fixture.createCommit(site, path, content);
       
       return actual.then(() => {
         expect(alertSuccess.calledWith("File committed successfully")).to.be.true;
-        expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith(siteFileContentReceivedAction)).to.be.true;
+        expectDispatchOfSingleAction(dispatch, siteFileContentReceivedAction);
       });
     });
     
     it("creates a commit with the specified message, no sha, and default branch and dispatches a site file added action to the store when successful", () => {
-      // FIXME: this is a particularly complicated test whose creation comes very directly
-      // from looking at the implementation. Neither of those are good things.
       const message = "twinkle twinkle little star";
-      const id = "kuaw8fsru8hwugfw";
+      const siteId = "kuaw8fsru8hwugfw";
       const branch = "default-branch-o-rama";
       const site = {
-        id: id,
+        id: siteId,
         defaultBranch: branch,
         could: "be anything"
       };
@@ -486,26 +402,23 @@ describe("siteActions", () => {
       const siteFileContentReceivedAction = {
         action: "reaction"
       };
-      siteFileContentReceivedActionCreator.withArgs(id, content).returns(siteFileContentReceivedAction);
+      siteFileContentReceivedActionCreator.withArgs(siteId, content).returns(siteFileContentReceivedAction);
       createCommit.withArgs(site, path, expectedCommit).returns(commitObjectPromise);
 
       const actual = fixture.createCommit(site, path, content, message);
       
       return actual.then(() => {
         expect(alertSuccess.calledWith("File committed successfully")).to.be.true;
-        expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith(siteFileContentReceivedAction)).to.be.true;
+        expectDispatchOfSingleAction(dispatch, siteFileContentReceivedAction);
       });    
     });
 
     it("creates a commit with the default message, a sha, and the specified branch and dispatches a site file added action to the store when successful", () => {
-      // FIXME: this is a particularly complicated test whose creation comes very directly
-      // from looking at the implementation. Neither of those are good things.
       const sha = "euvuhvauy2498u0294fjerhv98ewyg0942jviuehgiorefjhviofdsjv";
-      const id = "kuaw8fsru8hwugfw";
+      const siteId = "kuaw8fsru8hwugfw";
       const branch = "branch-o-rama";
       const site = {
-        id: id,
+        id: siteId,
         branch: branch,
         could: "be anything"
       };
@@ -531,133 +444,102 @@ describe("siteActions", () => {
       const siteFileContentReceivedAction = {
         action: "reaction"
       };
-      siteFileContentReceivedActionCreator.withArgs(id, content).returns(siteFileContentReceivedAction);
+      siteFileContentReceivedActionCreator.withArgs(siteId, content).returns(siteFileContentReceivedAction);
       createCommit.withArgs(site, path, expectedCommit).returns(commitObjectPromise);
 
       const actual = fixture.createCommit(site, path, content, false, sha);
       
       return actual.then(() => {
         expect(alertSuccess.calledWith("File committed successfully")).to.be.true;
-        expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith(siteFileContentReceivedAction)).to.be.true;
+        expectDispatchOfSingleAction(dispatch, siteFileContentReceivedAction);
       });    
     });
   });
 
   describe("fetchSiteAssets", () => {
+    const bAsset = {
+      name: "you should pay attention to me",
+      type: "file"
+    };
+    const assets = [
+      {
+        name: "fie",
+        type: "nothing"
+      },
+      bAsset,
+      {
+        whatever: "you say, no type"
+      }
+    ];
+
     it("fetches a site's assets with no configed asset path and dispatches a site assets received action to the store when successful, returning the same site given", () => {
-      const id = "kuaw8fsru8hwugfw";
       const site = {
-        id: id,
+        id: siteId,
         "_config.yml": {
           blank: "blank blank blank"
         },
         could: "be anything"
       };
-      const bAsset = {
-        name: "you should pay attention to me",
-        type: "file"
-      };
-      const assets = [
-        {
-          name: "fie",
-          type: "nothing"
-        },
-        bAsset,
-        {
-          whatever: "you say, no type"
-        }
-      ];
       
       const assetsPromise = Promise.resolve(assets);
       const siteAssetsReceivedAction = {
         assets: "negative"
       };
       fetchRepositoryContent.withArgs(site, "assets").returns(assetsPromise);
-      siteAssetsReceivedActionCreator.withArgs(id, [ bAsset ]).returns(siteAssetsReceivedAction);
+      siteAssetsReceivedActionCreator.withArgs(siteId, [ bAsset ]).returns(siteAssetsReceivedAction);
 
       const actual = fixture.fetchSiteAssets(site);
       
       return actual.then((result) => {
-        expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith(siteAssetsReceivedAction)).to.be.true;
+        expectDispatchOfSingleAction(dispatch, siteAssetsReceivedAction);
         expect(result).to.equal(site);
       });
     });
     
     it("fetches a site's assets with a configed asset path and dispatches a site assets received action to the store when successful, returning the same site given", () => {
       const assetPath = "/go/directly/here";
-      const id = "kuaw8fsru8hwugfw";
       const site = {
-        id: id,
+        id: siteId,
         "_config.yml": {
           assetPath: assetPath
         },
         could: "be anything"
       };
-      const bAsset = {
-        name: "you should pay attention to me",
-        type: "file"
-      };
-      const assets = [
-        {
-          name: "fie",
-          type: "nothing"
-        },
-        bAsset,
-        {
-          whatever: "you say, no type"
-        }
-      ];
       
       const assetsPromise = Promise.resolve(assets);
       const siteAssetsReceivedAction = {
         assets: "negative"
       };
       fetchRepositoryContent.withArgs(site, assetPath).returns(assetsPromise);
-      siteAssetsReceivedActionCreator.withArgs(id, [ bAsset ]).returns(siteAssetsReceivedAction);
+      siteAssetsReceivedActionCreator.withArgs(siteId, [ bAsset ]).returns(siteAssetsReceivedAction);
 
       const actual = fixture.fetchSiteAssets(site);
       
       return actual.then((result) => {
-        expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith(siteAssetsReceivedAction)).to.be.true;
+        expectDispatchOfSingleAction(dispatch, siteAssetsReceivedAction);
         expect(result).to.equal(site);
       });
     });
 
     it("triggers an error when fetching the site assets fails", () => {
       const assetPath = "/go/directly/here";
-      const id = "kuaw8fsru8hwugfw";
       const site = {
-        id: id,
+        id: siteId,
         "_config.yml": {
           assetPath: assetPath
         },
         could: "be anything"
       };
-      const errorMessage = "it failed.";
-      const error = {
-        message: errorMessage
-      };
-      const rejectedWithErrorPromise = Promise.reject(error);
       fetchRepositoryContent.withArgs(site, assetPath).returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchSiteAssets(site);
       
-      return actual.then(() => {
-        dispatchesAnAlertError(errorMessage);
-      });
+      return validateResultDispatchesAlertError(actual, errorMessage);
     });
   });
   
   describe("fetch(Site)Branches", () => {
     it("fetches a site's branches and dispatches a site branches received action to the store when successful, returning the same site given", () => {
-      const id = "kuaw8fsru8hwugfw";
-      const site = {
-        id: id,
-        could: "be anything"
-      };
       const branches = {
         blurry: "vision",
         get: "glasses"
@@ -668,46 +550,29 @@ describe("siteActions", () => {
         branches: "r us"
       };
       fetchBranches.withArgs(site).returns(branchesPromise);
-      siteBranchesReceivedActionCreator.withArgs(id, branches).returns(siteBranchesReceivedAction);
+      siteBranchesReceivedActionCreator.withArgs(siteId, branches).returns(siteBranchesReceivedAction);
 
       const actual = fixture.fetchBranches(site);
       
       return actual.then((result) => {
-        expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith(siteBranchesReceivedAction)).to.be.true;
+        expectDispatchOfSingleAction(dispatch, siteBranchesReceivedAction);
         expect(result).to.equal(site);
       });
     });
     
     it("does nothing when fetching a site's branches fails", () => {
-      const id = "kuaw8fsru8hwugfw";
-      const site = {
-        id: id,
-        could: "be anything"
-      };
-      const errorMessage = "it failed.";
-      const error = {
-        message: errorMessage
-      };
-      const rejectedWithErrorPromise = Promise.reject(error);
       fetchBranches.withArgs(site).returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchBranches(site);
       
-      return actual.catch(() => {
-        expect(dispatch.called).to.be.false;
-      });
+      expectDispatchToNotBeCalled(actual);
     });
   });
 
   describe("delete(Site)Branch", () => {
+    const branch = "hi";
+
     it("deletes a branch for a site's branches and, if successful, then fetches the site's branches again and dispatches a site branches received action to the store when successful, returning the same site given", () => {
-      const id = "kuaw8fsru8hwugfw";
-      const site = {
-        id: id,
-        could: "be anything"
-      };
-      const branch = "hi";
       const branches = {
         blurry: "vision",
         get: "glasses"
@@ -719,59 +584,32 @@ describe("siteActions", () => {
       };
       deleteBranch.withArgs(site, branch).returns(deleteBranchPromise);
       fetchBranches.withArgs(site).returns(branchesPromise);
-      siteBranchesReceivedActionCreator.withArgs(id, branches).returns(siteBranchesReceivedAction);
+      siteBranchesReceivedActionCreator.withArgs(siteId, branches).returns(siteBranchesReceivedAction);
 
       const actual = fixture.deleteBranch(site, branch);
       
       return actual.then((result) => {
-        expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith(siteBranchesReceivedAction)).to.be.true;
+        expectDispatchOfSingleAction(dispatch, siteBranchesReceivedAction);
         expect(result).to.equal(site);
       });
     });
     
     it("alerts an error when deleting a site's branch fails", () => {
-      const id = "kuaw8fsru8hwugfw";
-      const site = {
-        id: id,
-        could: "be anything"
-      };
-      const branch = "hello";
-      const errorMessage = "it failed.";
-      const error = {
-        message: errorMessage
-      };
-      const rejectedWithErrorPromise = Promise.reject(error);
       deleteBranch.withArgs(site, branch).returns(rejectedWithErrorPromise);
 
       const actual = fixture.deleteBranch(site, branch);
       
-      return actual.then(() => {
-        dispatchesAnAlertError(errorMessage);
-      });
+      return validateResultDispatchesAlertError(actual, errorMessage);
     });
     
     it("alerts an error when fetching branches fails after successfully deleting a site's branch", () => {
-      const id = "kuaw8fsru8hwugfw";
-      const site = {
-        id: id,
-        could: "be anything"
-      };
-      const branch = "hello";
-      const errorMessage = "it failed.";
-      const error = {
-        message: errorMessage
-      };
       const deleteBranchPromise = Promise.resolve("ig-nored");
       deleteBranch.withArgs(site, branch).returns(deleteBranchPromise);
-      const rejectedWithErrorPromise = Promise.reject(error);
       fetchBranches.withArgs(site).returns(rejectedWithErrorPromise);
 
       const actual = fixture.deleteBranch(site, branch);
       
-      return actual.then(() => {
-        dispatchesAnAlertError(errorMessage);
-      });
+      return validateResultDispatchesAlertError(actual, errorMessage);
     });    
   });
 
@@ -780,11 +618,6 @@ describe("siteActions", () => {
     const source = "source";
 
     it("dispatches a site added action and redirects to a site uri if we successfully create and clone a repo", () => {
-      const id = "824j2j";
-      const site = {
-        hi: "mom",
-        id: id
-      };
       const sitePromise = Promise.resolve(site);
       const siteAddedAction = {
         action: "yep"
@@ -794,7 +627,7 @@ describe("siteActions", () => {
       };
       createRepo.withArgs(destination, source).returns(Promise.resolve("ignored"));
       cloneRepo.withArgs(destination, source).returns(sitePromise);
-      updateRouterActionCreator.withArgs(`/sites/${id}`).returns(routerAction);
+      updateRouterActionCreator.withArgs(`/sites/${siteId}`).returns(routerAction);
       siteAddedActionCreator.withArgs(site).returns(siteAddedAction);
 
       const actual = fixture.cloneRepo(destination, source);
@@ -808,38 +641,41 @@ describe("siteActions", () => {
     });
     
     it("alerts an error if createRepo fails", () => {
-      const errorMessage = "it failed.";
-      const error = {
-        message: errorMessage
-      };
-      const rejectedWithErrorPromise = Promise.reject(error);
       createRepo.withArgs(destination, source).returns(rejectedWithErrorPromise);
 
       const actual = fixture.cloneRepo(destination, source);
       
-      return actual.then(() => {
-        dispatchesAnAlertError(errorMessage);
-      });
+      return validateResultDispatchesAlertError(actual, errorMessage);
     });
     
     it("alerts an error if cloneRepo fails", () => {
-      const errorMessage = "it failed.";
-      const error = {
-        message: errorMessage
-      };
-      const rejectedWithErrorPromise = Promise.reject(error);
       createRepo.withArgs(destination, source).returns(Promise.resolve("ignored"));
       cloneRepo.withArgs(destination, source).returns(rejectedWithErrorPromise);
 
       const actual = fixture.cloneRepo(destination, source);
-      
-      return actual.then(() => {
-        dispatchesAnAlertError(errorMessage);
-      });
+
+      return validateResultDispatchesAlertError(actual, errorMessage);
     });
   });
+
+  const expectDispatchToNotBeCalled = (promise, dispatch) => {
+    promise.catch(() => {
+      expect(dispatch.called).to.be.false;
+    });
+  };
+
+  const validateResultDispatchesAlertError = (promise, errorMessage) => {
+    return promise.then(() => {
+      expectDispatchOfAlertError(errorMessage);
+    });
+  };
   
-  const dispatchesAnAlertError = (errorMessage) => {
+  const expectDispatchOfSingleAction = (dispatch, action) => {
+    expect(dispatch.calledOnce).to.be.true;
+    expect(dispatch.calledWith(action)).to.be.true;
+  };
+  
+  const expectDispatchOfAlertError = errorMessage => {
     expect(dispatch.called).to.be.false;
     expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
   };
