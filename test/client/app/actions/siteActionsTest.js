@@ -10,7 +10,7 @@ describe("siteActions", () => {
   let fetchRepositoryContent, fetchRepositoryConfigs, createCommit, fetchBranches,
       deleteBranch, createRepo;
   let fetchSites, addSite, updateSite, deleteSite, cloneRepo;
-  let encodeB64, httpErrorAlertAction, alertSuccess;
+  let encodeB64, addPathToSite, httpErrorAlertAction, alertSuccess;
   let sitesReceivedActionCreator, siteAddedActionCreator, siteDeletedActionCreator,
       siteUpdatedActionCreator, siteFileContentReceivedActionCreator, siteAssetsReceivedActionCreator,
       siteFilesReceivedActionCreator, siteConfigsReceivedActionCreator, siteBranchesReceivedActionCreator,
@@ -43,6 +43,7 @@ describe("siteActions", () => {
     deleteBranch = stub();
     createRepo = stub();
     encodeB64 = stub();
+    addPathToSite = stub();
     alertSuccess = stub();
     sitesReceivedActionCreator = stub();
     updateRouterActionCreator = stub();
@@ -54,7 +55,7 @@ describe("siteActions", () => {
     siteFilesReceivedActionCreator = stub();
     siteConfigsReceivedActionCreator = stub();
     siteBranchesReceivedActionCreator = stub();
-    
+
     // FIXME: complex dependency wiring a smell
     fixture = proxyquire("../../../../assets/app/actions/siteActions", {
       "./actionCreators/siteActions": {
@@ -95,6 +96,9 @@ describe("siteActions", () => {
       },
       "../util/encoding": {
         encodeB64: encodeB64
+      },
+      "./makeCommitData": {
+        addPathToSite: addPathToSite
       }
     }).default;
   });
@@ -330,15 +334,10 @@ describe("siteActions", () => {
   });
 
   describe("createCommit", () => {
-    // FIXME: these are particularly complicated test whose creation
-    // comes very directly from looking at the implementation. Neither
-    // of those are good things.
-
-    it("creates a commit with the default message, no sha, and the specified branch and dispatches a site file added action to the store when successful", () => {
-      const branch = "branch-o-rama";
+    it("creates a commit with no message or sha and dispatches a site file added action to the store when successful", () => {
+      const siteId = "kuaw8fsru8hwugfw";
       const site = {
         id: siteId,
-        branch: branch,
         could: "be anything"
       };
       const path = "/what/is/this/path/of/which/you/speak";
@@ -347,113 +346,85 @@ describe("siteActions", () => {
         might: "be",
         or: "maybe not"
       };
-      const encodedContent = "blah";
       const commitObject = {
         content: content
       };
-      encodeB64.withArgs(content).returns(encodedContent);
       const commitObjectPromise = Promise.resolve(commitObject);
       const expectedCommit = {
-        path: path,
-        message: `Adds ${path} to project`,
-        content: encodedContent,
-        branch: branch
+        you: "get something to represent your commit"
       };
       const siteFileContentReceivedAction = {
         action: "reaction"
       };
-      siteFileContentReceivedActionCreator.withArgs(siteId, content).returns(siteFileContentReceivedAction);
+      addPathToSite.withArgs(site, path, content, false, false).returns(expectedCommit);
       createCommit.withArgs(site, path, expectedCommit).returns(commitObjectPromise);
+      siteFileContentReceivedActionCreator.withArgs(siteId, content).returns(siteFileContentReceivedAction);
+
       const actual = fixture.createCommit(site, path, content);
       
       return actual.then(() => {
         expect(alertSuccess.calledWith("File committed successfully")).to.be.true;
         expectDispatchOfSingleAction(dispatch, siteFileContentReceivedAction);
-      });
-    });
-    
-    it("creates a commit with the specified message, no sha, and default branch and dispatches a site file added action to the store when successful", () => {
-      const message = "twinkle twinkle little star";
-      const siteId = "kuaw8fsru8hwugfw";
-      const branch = "default-branch-o-rama";
-      const site = {
-        id: siteId,
-        defaultBranch: branch,
-        could: "be anything"
-      };
-      const path = "/what/is/this/path/of/which/you/speak";
-      const content = {
-        something: "here",
-        might: "be",
-        or: "maybe not"
-      };
-      const encodedContent = "blah";
-      const commitObject = {
-        content: content
-      };
-      encodeB64.withArgs(content).returns(encodedContent);
-      const commitObjectPromise = Promise.resolve(commitObject);
-      const expectedCommit = {
-        path: path,
-        message: message,
-        content: encodedContent,
-        branch: branch
-      };
-      const siteFileContentReceivedAction = {
-        action: "reaction"
-      };
-      siteFileContentReceivedActionCreator.withArgs(siteId, content).returns(siteFileContentReceivedAction);
-      createCommit.withArgs(site, path, expectedCommit).returns(commitObjectPromise);
-
-      const actual = fixture.createCommit(site, path, content, message);
-      
-      return actual.then(() => {
-        expect(alertSuccess.calledWith("File committed successfully")).to.be.true;
-        expectDispatchOfSingleAction(dispatch, siteFileContentReceivedAction);
       });    
     });
 
-    it("creates a commit with the default message, a sha, and the specified branch and dispatches a site file added action to the store when successful", () => {
+    it("creates a commit with the specified message and a sha and dispatches a site file added action to the store when successful", () => {
       const sha = "euvuhvauy2498u0294fjerhv98ewyg0942jviuehgiorefjhviofdsjv";
       const siteId = "kuaw8fsru8hwugfw";
-      const branch = "branch-o-rama";
       const site = {
         id: siteId,
-        branch: branch,
         could: "be anything"
       };
+      const message = "this one goes out to the one i compile";
       const path = "/what/is/this/path/of/which/you/speak";
       const content = {
         something: "here",
         might: "be",
         or: "maybe not"
       };
-      const encodedContent = "blah";
       const commitObject = {
         content: content
       };
-      encodeB64.withArgs(content).returns(encodedContent);
       const commitObjectPromise = Promise.resolve(commitObject);
       const expectedCommit = {
-        path: path,
-        message: `Adds ${path} to project`,
-        content: encodedContent,
-        sha: sha,
-        branch: branch
+        you: "get something to represent your commit"
       };
       const siteFileContentReceivedAction = {
         action: "reaction"
       };
-      siteFileContentReceivedActionCreator.withArgs(siteId, content).returns(siteFileContentReceivedAction);
+      addPathToSite.withArgs(site, path, content, message, sha).returns(expectedCommit);
       createCommit.withArgs(site, path, expectedCommit).returns(commitObjectPromise);
+      siteFileContentReceivedActionCreator.withArgs(siteId, content).returns(siteFileContentReceivedAction);
 
-      const actual = fixture.createCommit(site, path, content, false, sha);
+      const actual = fixture.createCommit(site, path, content, message, sha);
       
       return actual.then(() => {
         expect(alertSuccess.calledWith("File committed successfully")).to.be.true;
         expectDispatchOfSingleAction(dispatch, siteFileContentReceivedAction);
       });    
     });
+        
+    it("triggers an error when creating a commit fails", () => {
+      const sha = "euvuhvauy2498u0294fjerhv98ewyg0942jviuehgiorefjhviofdsjv";
+      const message = "this one goes out to the one i compile";
+      const path = "/what/is/this/path/of/which/you/speak";
+      const content = {
+        something: "here",
+        might: "be",
+        or: "maybe not"
+      };
+      const expectedCommit = {
+        you: "get something to represent your commit"
+      };
+      addPathToSite.withArgs(site, path, content, message, sha).returns(expectedCommit);
+      createCommit.withArgs(site, path, expectedCommit).returns(rejectedWithErrorPromise);
+      fetchSites.withArgs().returns(rejectedWithErrorPromise);
+
+      const actual = fixture.createCommit(site, path, content, message, sha);
+      
+      return validateResultDispatchesAlertError(actual, errorMessage);
+    });
+
   });
 
   describe("fetchSiteAssets", () => {

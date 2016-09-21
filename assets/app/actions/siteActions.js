@@ -4,6 +4,8 @@ import { encodeB64 } from '../util/encoding';
 import convertFileToData from '../util/convertFileToData';
 import { dispatch } from '../store';
 import alertActions from './alertActions';
+import { addPathToSite } from "./makeCommitData";
+
 
 import {
   sitesReceived as createSitesReceivedAction,
@@ -68,21 +70,6 @@ const dispatchSiteBranchesReceivedAction = (siteId, branches) => {
   dispatch(createSiteBranchesReceivedAction(siteId, branches));
 };    
 
-const makeCommit = (site, path, fileData, message, sha) => {
-  const b64EncodedFileContents = encodeB64(fileData);
-  let commit = {
-    path,
-    message: (message) ? message : `Adds ${path} to project`,
-    content: b64EncodedFileContents,
-    branch: `${site.branch || site.defaultBranch}`
-  };
-  
-  if (sha) commit = Object.assign({}, commit, { sha });
-  
-  return commit;
-};
-
-
 export default {
   fetchSites() {
     return federalist.fetchSites()
@@ -129,8 +116,8 @@ export default {
   },
 
   createCommit(site, path, fileData, message = false, sha = false) {
-    const commit = makeCommit(site, path, fileData, message, sha);
-    
+    const commit = addPathToSite(site, path, fileData, message, sha);
+
     return github.createCommit(site, path, commit).then((commitObj) => {
       alertActions.alertSuccess('File committed successfully');
       dispatchSiteFileContentReceivedAction(site.id, commitObj.content);
