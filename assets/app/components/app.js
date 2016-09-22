@@ -44,7 +44,10 @@ class App extends React.Component {
 
     return (
       <div>
-        <Header isLoggedIn={ !!storeState.user } />
+        <Header
+          isLoggedIn={ !!storeState.user }
+          username={storeState.user.username}
+        />
         {children && React.cloneElement(children, {
           storeState: storeState
         })}

@@ -15,7 +15,10 @@ describe('<Header/>', () => {
 
     it('has props for isLoggedIn', () => {
       expect(wrapper.instance().props.isLoggedIn).to.be.defined;
+    });
 
+    it('has props for username', () => {
+      expect(wrapper.instance().props.username).to.be.defined;
     });
 
     it('sets isLoggedIn to false if a value is not provided', () => {
