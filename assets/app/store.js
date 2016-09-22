@@ -23,4 +23,7 @@ const reroute = store => next => action => {
 
 const _store = createStore(app, applyMiddleware(logger, reroute));
 
+const dispatch = _store.dispatch;
+
+export { dispatch };
 export default _store;
