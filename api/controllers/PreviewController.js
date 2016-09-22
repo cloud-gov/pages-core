@@ -16,20 +16,19 @@ module.exports = {
     if ((key).slice(-1) === '/') key = key + 'index.html';
 
     var object = s3.getObject({
-          Bucket: sails.config.build.s3Bucket,
-          Key: key
-        }).on('httpHeaders', function(statusCode, headers) {
-          var redirect = headers['x-amz-website-redirect-location'] ||
-            headers['X-Amz-Website-Redirect-Location'];
-          if (redirect) return res.redirect(redirect);
-          res.set(headers);
-        }),
-        stream = object.createReadStream().on('error', function(error) {
-          var file = key.split('/').pop().indexOf('.') !== -1,
-              notFound = error.statusCode === 404;
-          if (!file && notFound) return res.redirect(req.path + '/');
-          res.send(error.statusCode, error.message);
-        }).pipe(res);
+      Bucket: sails.config.build.s3Bucket,
+      Key: key
+    }).on('httpHeaders', function(statusCode, headers) {
+      var redirect = headers['x-amz-website-redirect-location'] ||
+        headers['X-Amz-Website-Redirect-Location'];
+      if (redirect) return res.redirect(redirect);
+      res.set(headers);
+    }),
+    stream = object.createReadStream().on('error', function(error) {
+      var file = key.split('/').pop().indexOf('.') !== -1,
+          notFound = error.statusCode === 404;
+      if (!file && notFound) return res.redirect(req.path + '/');
+      res.send(error.statusCode, error.message);
+    }).pipe(res);
   }
-
 };

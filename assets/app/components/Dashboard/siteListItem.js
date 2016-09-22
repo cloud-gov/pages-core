@@ -3,16 +3,22 @@ import { Link } from 'react-router';
 import PublishedState from './publishedState';
 
 const propTypes = {
-  site: React.PropTypes.object
+  site: React.PropTypes.shape({
+    repository: React.PropTypes.string,
+    owner: React.PropTypes.string,
+    id: React.PropTypes.number,
+    builds: React.PropTypes.array,
+    viewLink: React.PropTypes.string
+  })
 };
 
-const getViewLink = (viewLink) => {
-  if (!viewLink) return null;
+const getViewLink = (hasLink, viewLink, repo) => {
+  if (!hasLink) return null;
 
   return <a
     className="icon icon-view"
     href={ viewLink }
-    alt="View the { site.repository } site"
+    alt={`View the ${repo} site`}
     target="_blank">Visit Site</a>;
 }
 
@@ -25,7 +31,7 @@ const SiteListItem = ({ site }) =>
       <PublishedState builds={ site.builds } />
     </div>
     <div className="sites-list-item-actions">
-      { getViewLink(site.builds && site.builds.length && site.viewLink) }
+      { getViewLink(!!site.builds.length, site.viewLink, site.repository) }
     </div>
   </li>
 

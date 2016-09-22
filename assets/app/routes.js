@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, Link, IndexRedirect, IndexRoute, Redirect } from 'react-router';
 
 import App from './components/app';
-import Dashboard from './components/Dashboard/siteList';
+import SiteList from './components/Dashboard/siteList';
 import SiteContainer from './components/siteContainer';
 import SitePagesContainer from './components/site/Pages/pagesContainer';
 import SiteEditorContainer from './components/site/editor/editorContainer';
@@ -18,7 +18,7 @@ export default (
   <Route path="/" component={App}>
     <IndexRedirect to="sites"/>
     <Route path="sites">
-      <IndexRoute component={Dashboard}/>
+      <IndexRoute component={SiteList}/>
       <Route path="new" component={NewSite} />
       <Route path=":id" component={SiteContainer}>
         <IndexRedirect to="tree" />
