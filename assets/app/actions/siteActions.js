@@ -1,11 +1,11 @@
 import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
-import { encodeB64 } from '../util/encoding';
 import convertFileToData from '../util/convertFileToData';
 import { dispatch } from '../store';
 import alertActions from './alertActions';
-import { addPathToSite } from "./makeCommitData";
-
+import { addPathToSite, uploadFileToSite } from "./makeCommitData";
+import createDraftBranchName from "./createDraftBranchName";
+import findShaForDefaultBranch from "./findShaForDefaultBranch";
 
 import {
   sitesReceived as createSitesReceivedAction,
@@ -162,6 +162,17 @@ export default {
     }).catch(alertError);
   },
 
+  createDraftBranch(site, path) {
+    const branchName = createDraftBranchName(path);
+    const sha = findShaForDefaultBranch(site);
+
+    return github.createBranch(site, branchName, sha).then(() => {
+      // Update the site object with new branches from github
+      this.fetchBranches(site);
+      return branchName;
+    });
+  },
+
   createPR(site, head, base) {
     return github.createPullRequest(site, head, base).then((pr) => {
       return github.mergePullRequest(site, pr);
@@ -180,14 +191,7 @@ export default {
 
     convertFileToData(file).then((fileData) => {
       const path = `assets/${name}`;
-      const message = `Uploads ${name} to project`;
-      let commit = {
-        content: fileData,
-        message: message
-      };
-
-      if (sha) commit = Object.assign({}, commit, { sha });
-
+      const commit = uploadFileToSite(name, fileData, sha);
       return github.createCommit(site, path, commit);
     }).then((commitObj) => {
         alertActions.alertSuccess('File uploaded successfully');
@@ -212,19 +216,6 @@ export default {
       // error.
       throwRuntime(throwRuntime);
       alertActions.httpError(error.message);
-    });
-  },
-
-  createDraftBranch(site, path) {
-    const branchName = `_draft-${encodeB64(path)}`;
-    const sha = site.branches.find((branch) => {
-      return branch.name === site.defaultBranch;
-    }).commit.sha;
-
-    return github.createBranch(site, branchName, sha).then(() => {
-      // Update the site object with new branches from github
-      this.fetchBranches(site);
-      return branchName;
     });
   }
 };

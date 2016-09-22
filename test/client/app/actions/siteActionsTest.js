@@ -9,8 +9,9 @@ describe("siteActions", () => {
   let dispatch;
   let fetchRepositoryContent, fetchRepositoryConfigs, createCommit, fetchBranches,
       deleteBranch, createRepo;
-  let fetchSites, addSite, updateSite, deleteSite, cloneRepo;
-  let encodeB64, addPathToSite, httpErrorAlertAction, alertSuccess;
+  let fetchSites, addSite, updateSite, deleteSite, cloneRepo, createBranch;
+  let addPathToSite, createDraftBranchName, findShaForDefaultBranch;
+  let httpErrorAlertAction, alertSuccess;
   let sitesReceivedActionCreator, siteAddedActionCreator, siteDeletedActionCreator,
       siteUpdatedActionCreator, siteFileContentReceivedActionCreator, siteAssetsReceivedActionCreator,
       siteFilesReceivedActionCreator, siteConfigsReceivedActionCreator, siteBranchesReceivedActionCreator,
@@ -36,13 +37,13 @@ describe("siteActions", () => {
     updateSite = stub();
     deleteSite = stub();
     cloneRepo = stub();
+    createBranch = stub();
     fetchRepositoryContent = stub();
     fetchRepositoryConfigs = stub();
     createCommit = stub();
     fetchBranches = stub();
     deleteBranch = stub();
     createRepo = stub();
-    encodeB64 = stub();
     addPathToSite = stub();
     alertSuccess = stub();
     sitesReceivedActionCreator = stub();
@@ -55,7 +56,9 @@ describe("siteActions", () => {
     siteFilesReceivedActionCreator = stub();
     siteConfigsReceivedActionCreator = stub();
     siteBranchesReceivedActionCreator = stub();
-
+    createDraftBranchName = stub();
+    findShaForDefaultBranch = stub();
+    
     // FIXME: complex dependency wiring a smell
     fixture = proxyquire("../../../../assets/app/actions/siteActions", {
       "./actionCreators/siteActions": {
@@ -92,14 +95,14 @@ describe("siteActions", () => {
         createCommit: createCommit,
         fetchBranches: fetchBranches,
         deleteBranch: deleteBranch,
-        createRepo: createRepo
-      },
-      "../util/encoding": {
-        encodeB64: encodeB64
+        createRepo: createRepo,
+        createBranch: createBranch
       },
       "./makeCommitData": {
         addPathToSite: addPathToSite
-      }
+      },
+      "./createDraftBranchName": createDraftBranchName,
+      "./findShaForDefaultBranch": findShaForDefaultBranch
     }).default;
   });
 
@@ -626,6 +629,45 @@ describe("siteActions", () => {
       const actual = fixture.cloneRepo(destination, source);
 
       return validateResultDispatchesAlertError(actual, errorMessage);
+    });
+  });
+
+  describe("createDraftBranch", () => {
+    const path = "everybody/get/up";
+    const sha = "sha sha sha";
+    const draftBranchName = "hi";
+
+    it("creates a draft branch, if successful, then fetches the site's branches again and dispatches a site branches received action to the store when successful, returning the new draft branch name created", () => {
+      const branches = {
+        whatever: "dude"
+      };
+      const createBranchPromise = Promise.resolve("ig-nored");
+      const branchesPromise = Promise.resolve(branches);
+      const siteBranchesReceivedAction = {
+        branches: "r us"
+      };
+      createDraftBranchName.withArgs(path).returns(draftBranchName);
+      findShaForDefaultBranch.withArgs(site).returns(sha);
+      createBranch.withArgs(site, draftBranchName, sha).returns(createBranchPromise);
+      fetchBranches.withArgs(site).returns(branchesPromise);
+      siteBranchesReceivedActionCreator.withArgs(siteId, branches).returns(siteBranchesReceivedAction);
+
+      const actual = fixture.createDraftBranch(site, path);
+      
+      return actual.then((result) => {
+        expectDispatchOfSingleAction(dispatch, siteBranchesReceivedAction);
+        expect(result).to.equal(draftBranchName);
+      });
+    });
+    
+    it("does nothing when creating a branch fails", () => {
+      createDraftBranchName.withArgs(path).returns(draftBranchName);
+      findShaForDefaultBranch.withArgs(site).returns(sha);
+      createBranch.withArgs(site, draftBranchName, sha).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.createDraftBranch(site, path);
+      
+      expectDispatchToNotBeCalled(actual);
     });
   });
 

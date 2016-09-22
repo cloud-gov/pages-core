@@ -1,7 +1,7 @@
 import { encodeB64 } from '../util/encoding';
 
-const addPathToSite = (site, path, fileData, message, sha) => {
-  const b64EncodedFileContents = encodeB64(fileData);
+const addPathToSite = (site, path, fileContent, message, sha) => {
+  const b64EncodedFileContents = encodeB64(fileContent);
   let commit = {
     path,
     message: (message) ? message : `Adds ${path} to project`,
@@ -14,4 +14,16 @@ const addPathToSite = (site, path, fileData, message, sha) => {
   return commit;
 };
 
-export { addPathToSite };
+const uploadFileToSite = (filename, fileContent, sha) => {
+  const message = `Uploads ${filename} to project`;
+  let commit = {
+    content: fileContent,
+    message: message
+  };
+  
+  if (sha) commit = Object.assign({}, commit, { sha });
+
+  return commit;
+};
+
+export { addPathToSite, uploadFileToSite };
