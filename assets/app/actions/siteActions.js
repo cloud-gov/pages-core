@@ -70,6 +70,13 @@ const dispatchSiteBranchesReceivedAction = (siteId, branches) => {
   dispatch(createSiteBranchesReceivedAction(siteId, branches));
 };    
 
+const uploadFileAsCommit = (site, filename, fileData, sha) => {
+  const path = `assets/${filename}`;
+  const commit = uploadFileToSite(filename, fileData, sha);
+  return github.createCommit(site, path, commit);
+};
+
+
 export default {
   fetchSites() {
     return federalist.fetchSites()
@@ -173,6 +180,18 @@ export default {
     });
   },
 
+  uploadFile(site, file, sha = false) {
+    const siteId = site.id;
+    const { name } = file;
+
+    return convertFileToData(file).then((fileData) => {
+      return uploadFileAsCommit(site, name, fileData, sha);
+    }).then(() => {
+      alertActions.alertSuccess('File uploaded successfully');
+      this.fetchSiteAssets(site);
+    }).catch(error => alertActions.alertError(error.message));
+  },
+
   createPR(site, head, base) {
     return github.createPullRequest(site, head, base).then((pr) => {
       return github.mergePullRequest(site, pr);
@@ -183,20 +202,6 @@ export default {
     }).then(() => {
       return alertActions.alertSuccess(`${head} merged successfully`);
     }).catch(error => alertActions.httpError(error.message));
-  },
-
-  uploadFile(site, file, sha = false) {
-    const siteId = site.id;
-    const { name } = file;
-
-    convertFileToData(file).then((fileData) => {
-      const path = `assets/${name}`;
-      const commit = uploadFileToSite(name, fileData, sha);
-      return github.createCommit(site, path, commit);
-    }).then((commitObj) => {
-        alertActions.alertSuccess('File uploaded successfully');
-        this.fetchSiteAssets(site);
-    }).catch(error => alertActions.alertError(error.message));
   },
 
   fetchSiteConfigsAndAssets(site) {

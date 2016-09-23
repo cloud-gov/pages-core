@@ -10,8 +10,8 @@ describe("siteActions", () => {
   let fetchRepositoryContent, fetchRepositoryConfigs, createCommit, fetchBranches,
       deleteBranch, createRepo;
   let fetchSites, addSite, updateSite, deleteSite, cloneRepo, createBranch;
-  let addPathToSite, createDraftBranchName, findShaForDefaultBranch;
-  let httpErrorAlertAction, alertSuccess;
+  let addPathToSite, uploadFileToSite, createDraftBranchName, findShaForDefaultBranch, convertFileToData;
+  let httpErrorAlertAction, alertSuccess, alertError;
   let sitesReceivedActionCreator, siteAddedActionCreator, siteDeletedActionCreator,
       siteUpdatedActionCreator, siteFileContentReceivedActionCreator, siteAssetsReceivedActionCreator,
       siteFilesReceivedActionCreator, siteConfigsReceivedActionCreator, siteBranchesReceivedActionCreator,
@@ -45,7 +45,9 @@ describe("siteActions", () => {
     deleteBranch = stub();
     createRepo = stub();
     addPathToSite = stub();
+    uploadFileToSite = stub();
     alertSuccess = stub();
+    alertError = stub();
     sitesReceivedActionCreator = stub();
     updateRouterActionCreator = stub();
     siteAddedActionCreator = stub();
@@ -58,6 +60,7 @@ describe("siteActions", () => {
     siteBranchesReceivedActionCreator = stub();
     createDraftBranchName = stub();
     findShaForDefaultBranch = stub();
+    convertFileToData = stub();
     
     // FIXME: complex dependency wiring a smell
     fixture = proxyquire("../../../../assets/app/actions/siteActions", {
@@ -80,7 +83,8 @@ describe("siteActions", () => {
       },
       "./alertActions": {
         httpError: httpErrorAlertAction,
-        alertSuccess: alertSuccess
+        alertSuccess: alertSuccess,
+        alertError: alertError
       },
       "../util/federalistApi": {
         fetchSites: fetchSites,
@@ -99,10 +103,12 @@ describe("siteActions", () => {
         createBranch: createBranch
       },
       "./makeCommitData": {
-        addPathToSite: addPathToSite
+        addPathToSite: addPathToSite,
+        uploadFileToSite: uploadFileToSite
       },
       "./createDraftBranchName": createDraftBranchName,
-      "./findShaForDefaultBranch": findShaForDefaultBranch
+      "./findShaForDefaultBranch": findShaForDefaultBranch,
+      '../util/convertFileToData': convertFileToData
     }).default;
   });
 
@@ -130,7 +136,7 @@ describe("siteActions", () => {
 
       const actual = fixture.fetchSites();
       
-      return validateResultDispatchesAlertError(actual, errorMessage);
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
 
@@ -168,7 +174,7 @@ describe("siteActions", () => {
 
       const actual = fixture.addSite(siteToAdd);
       
-      return validateResultDispatchesAlertError(actual, errorMessage);
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
 
@@ -205,7 +211,7 @@ describe("siteActions", () => {
 
       const actual = fixture.updateSite(siteToUpdate, data);
       
-      return validateResultDispatchesAlertError(actual, errorMessage);
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
 
@@ -239,7 +245,7 @@ describe("siteActions", () => {
 
       const actual = fixture.deleteSite(siteId);
       
-      return validateResultDispatchesAlertError(actual, errorMessage);
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
 
@@ -270,7 +276,7 @@ describe("siteActions", () => {
 
       const actual = fixture.fetchFiles(site, path);
       
-      return validateResultDispatchesAlertError(actual, errorMessage);
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
 
@@ -368,7 +374,7 @@ describe("siteActions", () => {
       return actual.then(() => {
         expect(alertSuccess.calledWith("File committed successfully")).to.be.true;
         expectDispatchOfSingleAction(dispatch, siteFileContentReceivedAction);
-      });    
+      });
     });
 
     it("creates a commit with the specified message and a sha and dispatches a site file added action to the store when successful", () => {
@@ -425,7 +431,7 @@ describe("siteActions", () => {
 
       const actual = fixture.createCommit(site, path, content, message, sha);
       
-      return validateResultDispatchesAlertError(actual, errorMessage);
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
 
   });
@@ -508,7 +514,7 @@ describe("siteActions", () => {
 
       const actual = fixture.fetchSiteAssets(site);
       
-      return validateResultDispatchesAlertError(actual, errorMessage);
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
   
@@ -573,7 +579,7 @@ describe("siteActions", () => {
 
       const actual = fixture.deleteBranch(site, branch);
       
-      return validateResultDispatchesAlertError(actual, errorMessage);
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
     
     it("alerts an error when fetching branches fails after successfully deleting a site's branch", () => {
@@ -583,7 +589,7 @@ describe("siteActions", () => {
 
       const actual = fixture.deleteBranch(site, branch);
       
-      return validateResultDispatchesAlertError(actual, errorMessage);
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });    
   });
 
@@ -619,7 +625,7 @@ describe("siteActions", () => {
 
       const actual = fixture.cloneRepo(destination, source);
       
-      return validateResultDispatchesAlertError(actual, errorMessage);
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
     
     it("alerts an error if cloneRepo fails", () => {
@@ -628,7 +634,7 @@ describe("siteActions", () => {
 
       const actual = fixture.cloneRepo(destination, source);
 
-      return validateResultDispatchesAlertError(actual, errorMessage);
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
 
@@ -671,15 +677,90 @@ describe("siteActions", () => {
     });
   });
 
+  describe("uploadFile", () => {
+    const filename = "files need a name, you see"; 
+    const file = {
+      name: filename
+    };
+
+    it("alerts an error when it fails to convert a file to data", () => {
+      convertFileToData.withArgs(file).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.uploadFile(site, file);
+      
+      return validateResultDispatchesAlertError(actual, errorMessage);
+    });
+
+    it("alerts an error when it fails to create a commit with github", () => {
+      const content = {
+        something: "here"
+      };
+      const contentPromise = Promise.resolve(content);
+      const expectedCommit = {
+        something: "else"
+      };
+      // FIXME: this seems a little strange for us to know at this level
+      const expectedPath = `assets/${filename}`;
+      convertFileToData.withArgs(file).returns(contentPromise);
+      uploadFileToSite.withArgs(filename, content).returns(expectedCommit);
+      createCommit.withArgs(site, expectedPath, expectedCommit).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.uploadFile(site, file);
+      
+      return validateResultDispatchesAlertError(actual, errorMessage);
+    });
+
+    it("alerts a success and fetches assets when it successfully create a commit with github", () => {
+      const content = {
+        something: "here"
+      };
+      const contentPromise = Promise.resolve(content);
+      const expectedCommit = {
+        something: "else"
+      };
+      // FIXME: this seems a little strange for us to know at this level
+      const expectedPath = `assets/${filename}`;
+      const ignoredPromise = Promise.resolve("whatever.");
+      convertFileToData.withArgs(file).returns(contentPromise);
+      uploadFileToSite.withArgs(filename, content).returns(expectedCommit);
+      createCommit.withArgs(site, expectedPath, expectedCommit).returns(ignoredPromise);
+
+      const actual = fixture.uploadFile(site, file);
+
+      return actual.then(() => {
+        expect(alertSuccess.calledWith("File uploaded successfully")).to.be.true;
+        expect(fetchRepositoryContent.calledWith(site, "assets"));
+      });    
+    });
+
+    it("alerts a success and fetches assets when it successfully create a commit with github, with a sha", () => {
+      const sha = "sha sha sha!";
+      const content = {
+        something: "here"
+      };
+      const contentPromise = Promise.resolve(content);
+      const expectedCommit = {
+        something: "else"
+      };
+      // FIXME: this seems a little strange for us to know at this level
+      const expectedPath = `assets/${filename}`;
+      const ignoredPromise = Promise.resolve("whatever.");
+      convertFileToData.withArgs(file).returns(contentPromise);
+      uploadFileToSite.withArgs(filename, content, sha).returns(expectedCommit);
+      createCommit.withArgs(site, expectedPath, expectedCommit).returns(ignoredPromise);
+
+      const actual = fixture.uploadFile(site, file, sha);
+
+      return actual.then(() => {
+        expect(alertSuccess.calledWith("File uploaded successfully")).to.be.true;
+        expect(fetchRepositoryContent.calledWith(site, "assets"));
+      });    
+    });
+  });
+  
   const expectDispatchToNotBeCalled = (promise, dispatch) => {
     promise.catch(() => {
       expect(dispatch.called).to.be.false;
-    });
-  };
-
-  const validateResultDispatchesAlertError = (promise, errorMessage) => {
-    return promise.then(() => {
-      expectDispatchOfAlertError(errorMessage);
     });
   };
   
@@ -687,9 +768,27 @@ describe("siteActions", () => {
     expect(dispatch.calledOnce).to.be.true;
     expect(dispatch.calledWith(action)).to.be.true;
   };
+
+  const validateResultDispatchesHttpAlertError = (promise, errorMessage) => {
+    return promise.then(() => {
+      expectDispatchOfHttpErrorAlert(errorMessage);
+    });
+  };
   
-  const expectDispatchOfAlertError = errorMessage => {
+  const expectDispatchOfHttpErrorAlert = errorMessage => {
     expect(dispatch.called).to.be.false;
     expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
   };
+    
+  const validateResultDispatchesAlertError = (promise, errorMessage) => {
+    return promise.then(() => {
+      expectDispatchOfErrorAlert(errorMessage);
+    });
+  };
+  
+  const expectDispatchOfErrorAlert = errorMessage => {
+    expect(dispatch.called).to.be.false;
+    expect(alertError.calledWith(errorMessage)).to.be.true;
+  };
+
 });
