@@ -9,7 +9,7 @@ describe("siteActions", () => {
   let dispatch;
   let fetchRepositoryContent, fetchRepositoryConfigs, createCommit, fetchBranches,
       deleteBranch, createRepo;
-  let fetchSites, addSite, updateSite, deleteSite, cloneRepo, createBranch;
+  let fetchSites, addSite, updateSite, deleteSite, cloneRepo, createBranch, createPullRequest, mergePullRequest;
   let addPathToSite, uploadFileToSite, createDraftBranchName, findShaForDefaultBranch, convertFileToData;
   let httpErrorAlertAction, alertSuccess, alertError;
   let sitesReceivedActionCreator, siteAddedActionCreator, siteDeletedActionCreator,
@@ -38,6 +38,8 @@ describe("siteActions", () => {
     deleteSite = stub();
     cloneRepo = stub();
     createBranch = stub();
+    createPullRequest = stub();
+    mergePullRequest = stub();
     fetchRepositoryContent = stub();
     fetchRepositoryConfigs = stub();
     createCommit = stub();
@@ -100,7 +102,9 @@ describe("siteActions", () => {
         fetchBranches: fetchBranches,
         deleteBranch: deleteBranch,
         createRepo: createRepo,
-        createBranch: createBranch
+        createBranch: createBranch,
+        createPullRequest: createPullRequest,
+        mergePullRequest: mergePullRequest
       },
       "./makeCommitData": {
         addPathToSite: addPathToSite,
@@ -757,7 +761,89 @@ describe("siteActions", () => {
       });    
     });
   });
-  
+
+  describe("createPR", () => {        
+    const head = "head";
+    const base = "base";
+    const pr = {
+      go: "team!"
+    };
+
+    it("triggers an error when creating a pull request fails", () => {
+      createPullRequest.withArgs(site, head, base).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.createPR(site, head, base);
+      
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
+    });
+
+    it("triggers an error when merging a pull request fails", () => {
+      const prPromise = Promise.resolve(pr);
+      createPullRequest.withArgs(site, head, base).returns(prPromise);
+      mergePullRequest.withArgs(site, pr).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.createPR(site, head, base);
+      
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
+    });
+
+    it("triggers an error when deleting a branch fails", () => {
+      const prPromise = Promise.resolve(pr);
+      createPullRequest.withArgs(site, head, base).returns(prPromise);
+      mergePullRequest.withArgs(site, pr).returns("whatever");
+      deleteBranch.withArgs(site, head).returns(rejectedWithErrorPromise);
+      
+      const actual = fixture.createPR(site, head, base);
+
+      return validateResultDispatchesHttpAlertError(actual, errorMessage)
+        .then(() => {
+          expect(mergePullRequest.calledWith(site, pr)).to.be.true;
+        });
+    });    
+
+    it("triggers an error when fetching a branch fails", () => {
+      const prPromise = Promise.resolve(pr);
+      createPullRequest.withArgs(site, head, base).returns(prPromise);
+      mergePullRequest.withArgs(site, pr).returns("whatever");
+      deleteBranch.withArgs(site, head).returns("ignored, too");
+      fetchBranches.withArgs(site).throws(error);
+
+      const actual = fixture.createPR(site, head, base);
+
+      return validateResultDispatchesHttpAlertError(actual, errorMessage)
+        .then(() => {
+          expect(mergePullRequest.calledWith(site, pr)).to.be.true;
+          expect(deleteBranch.calledWith(site, head)).to.be.true;
+        });
+    });
+    
+    it("alerts a successful message and returns it when everything works fine", () => {
+      const prPromise = Promise.resolve(pr);
+      const expected = "expected thing you might want";
+      createPullRequest.withArgs(site, head, base).returns(prPromise);
+      mergePullRequest.withArgs(site, pr).returns("whatever");
+      deleteBranch.withArgs(site, head).returns("ignored, too");
+      const siteBranchesReceivedAction = {
+        branches: "r us"
+      };
+      const branches = "branches";
+      fetchBranches.withArgs(site).returns(Promise.resolve(branches));
+      siteBranchesReceivedActionCreator.withArgs(siteId, branches).returns(siteBranchesReceivedAction);
+      alertSuccess.withArgs(`${head} merged successfully`).returns(expected);
+      
+      const actual = fixture.createPR(site, head, base);
+
+      return actual
+        .then((result) => {
+          expect(mergePullRequest.calledWith(site, pr)).to.be.true;
+          expect(deleteBranch.calledWith(site, head)).to.be.true;
+          expect(fetchBranches.calledWith(site)).to.be.true;
+          expect(alertSuccess.calledWith(`${head} merged successfully`)).to.be.true;
+          expect(result).to.equal(expected);
+        });
+    });
+
+  });
   const expectDispatchToNotBeCalled = (promise, dispatch) => {
     promise.catch(() => {
       expect(dispatch.called).to.be.false;
