@@ -1,74 +1,29 @@
 import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
 import convertFileToData from '../util/convertFileToData';
-import { dispatch } from '../store';
 import alertActions from './alertActions';
 import { addPathToSite, uploadFileToSite } from "./makeCommitData";
 import createDraftBranchName from "./createDraftBranchName";
 import findShaForDefaultBranch from "./findShaForDefaultBranch";
 
 import {
-  sitesReceived as createSitesReceivedAction,
-  siteAdded as createSiteAddedAction,
-  siteUpdated as createSiteUpdatedAction,
-  siteDeleted as createSiteDeletedAction,
-  siteFileContentReceived as createSiteFileContentReceivedAction,
-  siteAssetsReceived as createSiteAssetsReceivedAction,
-  siteFilesReceived as createSiteFilesReceivedAction,
-  siteConfigsReceived as createSiteConfigsReceivedAction,
-  siteBranchesReceived as createSiteBranchesReceivedAction
-} from "./actionCreators/siteActions";
-
-import { updateRouter as createUpdateRouterAction } from "./actionCreators/navigationActions";
+  updateRouterToSitesUri,
+  updateRouterToSpecificSiteUri,
+  dispatchSitesReceivedAction,
+  dispatchSiteAddedAction,
+  dispatchSiteUpdatedAction,
+  dispatchSiteDeletedAction,
+  dispatchSiteFileContentReceivedAction,
+  dispatchSiteAssetsReceivedAction,
+  dispatchSiteFilesReceivedAction,
+  dispatchSiteConfigsReceivedAction,
+  dispatchSiteBranchesReceivedAction
+} from "./dispatchActions";
 
 
 const alertError = error => {
   alertActions.httpError(error.message);
 };
-
-const updateRouterToSitesUri = () => {
-  dispatch(createUpdateRouterAction(`/sites`));
-};
-
-const updateRouterToSpecificSiteUri = siteId => {
-  dispatch(createUpdateRouterAction(`/sites/${siteId}`));
-};
-
-const dispatchSitesReceivedAction = sites => {
-  dispatch(createSitesReceivedAction(sites));
-};
-
-const dispatchSiteAddedAction = site => {
-  dispatch(createSiteAddedAction(site));
-};
-
-const dispatchSiteUpdatedAction = site => {
-  dispatch(createSiteUpdatedAction(site));
-};
-
-const dispatchSiteDeletedAction = siteId => {
-  dispatch(createSiteDeletedAction(siteId));
-};
-
-const dispatchSiteFileContentReceivedAction = (siteId, fileContent) => {
-  dispatch(createSiteFileContentReceivedAction(siteId, fileContent));
-};
-
-const dispatchSiteAssetsReceivedAction = (siteId, assets) => {
-  dispatch(createSiteAssetsReceivedAction(siteId, assets));
-};
-
-const dispatchSiteFilesReceivedAction = (siteId, files) => {
-  dispatch(createSiteFilesReceivedAction(siteId, files));
-};
-
-const dispatchSiteConfigsReceivedAction = (siteId, configs) => {
-  dispatch(createSiteConfigsReceivedAction(siteId, configs));
-};    
-
-const dispatchSiteBranchesReceivedAction = (siteId, branches) => {
-  dispatch(createSiteBranchesReceivedAction(siteId, branches));
-};    
 
 const uploadFileAsCommit = (site, filename, fileData, sha) => {
   const path = `assets/${filename}`;
