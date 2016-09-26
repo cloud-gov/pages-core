@@ -22,7 +22,7 @@ const propTypes = {
 };
 
 const redirectToFileOnBranch = (siteId, branch, filePath) => {
-  routeActions.redirect(`/sites/${siteId}/edit/${branch}/${filePath}`);
+  routeActions.redirect(`/sites/${siteId}/edit/${branch}/${filePath}`, 'replace');
 };
 
 const alertAndRedirect = (message, uri) => {
@@ -56,11 +56,11 @@ class Editor extends React.Component {
     // when a user first loads this view. That could be
     // a changing of the route to a site for the first time
     // or directly loading the url
-    const { fileName, branch: currentBranch } = this.props.params;
+    const { branch: currentBranch } = this.props.params;
     const { site } = this.props;
     const branches = site.branches || [];
-    const draftBranchName = formatDraftBranchName(fileName)
-    const hasDraft = pathHasDraft(fileName, branches);
+    const draftBranchName = formatDraftBranchName(this.path);
+    const hasDraft = pathHasDraft(this.path, branches);
     const draftBranchIsNotCurrent = (draftBranchName !== currentBranch);
     let nextSite = site;
 
@@ -73,7 +73,7 @@ class Editor extends React.Component {
     siteActions.fetchFileContent(nextSite, this.path).then(() => {
       if (hasDraft) {
         if (draftBranchIsNotCurrent) {
-          redirectToFileOnBranch(nextSite.id, formatDraftBranchName(fileName), this.path);
+          redirectToFileOnBranch(nextSite.id, draftBranchName, this.path);
         }
       } else {
         // currently this always redirects
@@ -192,9 +192,8 @@ class Editor extends React.Component {
       siteActions.createDraftBranch(site, path).then((branchName) => {
         return this.submitFile(branchName);
       }).then(() => {
-        const fileName = path.split('/').pop();
         const branch = formatDraftBranchName(path);
-        redirectToFileOnBranch(site.id, branch, fileName);
+        redirectToFileOnBranch(site.id, branch, path);
       });
     }
   }

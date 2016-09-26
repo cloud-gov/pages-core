@@ -1,8 +1,8 @@
 const updateRouterType = "UPDATE_ROUTER";
 
-const updateRouter = path => ({
+const updateRouter = (path, method) => ({
   type: updateRouterType,
-  method: 'push',
+  method: method,
   arguments: [ path ]
 });
 
