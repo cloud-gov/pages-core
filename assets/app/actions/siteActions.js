@@ -174,7 +174,7 @@ export default {
       // TODO: make a generic catch handler that will only
       // trigger an http error action for an actual http
       // error.
-      throwRuntime(throwRuntime);
+      throwRuntime(error);
       alertActions.httpError(error.message);
     });
   }

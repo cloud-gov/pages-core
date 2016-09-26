@@ -300,7 +300,6 @@ describe("siteActions", () => {
     });
 
     it("does nothing when fetching a site's configs fails", () => {
-      const path = "/lookee/here";
       fetchRepositoryConfigs.withArgs(site).returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchSiteConfigs(site);
@@ -687,7 +686,7 @@ describe("siteActions", () => {
     });
   });
 
-  describe("createPR", () => {        
+  describe("createPR", () => {
     const head = "head";
     const base = "base";
     const pr = {
@@ -767,9 +766,52 @@ describe("siteActions", () => {
           expect(result).to.equal(expected);
         });
     });
-
   });
   
+  describe("fetchSiteConfigsAndAssets", () => {
+    it("triggers an error when fetching site configs fails without a runtime error", () => {
+      fetchRepositoryConfigs.withArgs(site).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.fetchSiteConfigsAndAssets(site);
+      
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
+    });
+
+    it("triggers an error when fetching site configs fails with a runtime error", () => {
+      // FIXME: not sure what the point of this is
+      const fakeRuntimeError = {
+        name: "TypeError",
+        test: "YES!"
+      };
+      const fakeRuntimeErrorPromise = Promise.reject(fakeRuntimeError);
+      fetchRepositoryConfigs.withArgs(site).returns(fakeRuntimeErrorPromise);
+
+      const actual = fixture.fetchSiteConfigsAndAssets(site);
+      
+      return actual.catch((error) => {
+        expect(error).to.equal(fakeRuntimeError);
+      });
+    });
+
+    it("fetches configs, branches, assets, content and does all the things", () => {
+      const files = [{
+        hi: "there"
+      }];
+      const sitePromise = Promise.resolve(site);
+      const filesPromise = Promise.resolve(files);
+      fetchRepositoryConfigs.withArgs(site).returns(sitePromise);
+      fetchBranches.withArgs(site).returns(sitePromise);
+      fetchRepositoryContent.withArgs(site).returns(filesPromise);
+
+      const actual = fixture.fetchSiteConfigsAndAssets(site);
+      
+      return actual.then((result) => {
+        expect(dispatchSiteFilesReceivedAction.calledWith(siteId, files)).to.be.true;
+        expect(result).to.equal(files);
+      });
+    });
+  });
+
   const expectDispatchToNotBeCalled = (promise, dispatchFunction) => {
     promise.catch(() => {
       expect(dispatchFunction.called).to.be.false;
