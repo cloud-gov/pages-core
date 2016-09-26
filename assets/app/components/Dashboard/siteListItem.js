@@ -1,59 +1,40 @@
 import React from 'react';
 import { Link } from 'react-router';
+import PublishedState from './publishedState';
 
-class SiteListItem extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+const propTypes = {
+  site: React.PropTypes.shape({
+    repository: React.PropTypes.string,
+    owner: React.PropTypes.string,
+    id: React.PropTypes.number,
+    builds: React.PropTypes.array,
+    viewLink: React.PropTypes.string
+  })
+};
 
-  getLastBuildTime(builds = []) {
-    let sorted = builds.sort((a, b) => {
-      let aCompletedAt = new Date(a.completedAt);
-      let bCompletedAt = new Date(b.completedAt);
-      return aCompletedAt > bCompletedAt;
-    });
-    let last = sorted.pop();
+const getViewLink = (hasLink, viewLink, repo) => {
+  if (!hasLink) return null;
 
-    return last.completedAt || 'forever ago';
-  }
-
-  getSiteUrl(siteId) {
-    return `/sites/${siteId}`;
-  }
-
-  getViewLink(site) {
-    return `#/`;
-  }
-
-  render () {
-    let { site } = this.props;
-    let viewLink;
-
-    let lastPublished = <p>This site has not been published yet. Please wait while the site is built.</p>;
-
-    if (site.builds && site.builds.length) {
-      lastPublished = <p>This site was last published at { this.getLastBuildTime(site.builds) }</p>
-      viewLink = <a className="icon icon-view" href={ this.getViewLink(site) } alt="View the { site.repository } site" target="_blank">Visit Site</a>;
-    }
-
-    return (
-      <li className="sites-list-item">
-        <div className="sites-list-item-text">
-          <Link to={this.getSiteUrl(site.id)}>
-            { site.owner } / { site.repository }
-          </Link>
-          { lastPublished }
-        </div>
-        <div className="sites-list-item-actions">
-          { viewLink }
-        </div>
-      </li>
-    );
-  }
+  return <a
+    className="icon icon-view"
+    href={ viewLink }
+    alt={`View the ${repo} site`}
+    target="_blank">Visit Site</a>;
 }
 
-SiteListItem.propTypes = {
-  site: React.PropTypes.object
-};
+const SiteListItem = ({ site }) =>
+  <li className="sites-list-item">
+    <div className="sites-list-item-text">
+      <Link to={`/sites/${site.id}`}>
+        { site.owner } / { site.repository }
+      </Link>
+      <PublishedState builds={ site.builds } />
+    </div>
+    <div className="sites-list-item-actions">
+      { getViewLink(!!site.builds.length, site.viewLink, site.repository) }
+    </div>
+  </li>
+
+SiteListItem.propTypes = propTypes;
 
 export default SiteListItem;

@@ -89,6 +89,7 @@ class SiteContainer extends React.Component {
             siteId={site.id}
             branch={site.defaultBranch}
             fileName={params.fileName}
+            viewLink={site.viewLink}
           />
           <div className="usa-grid">
             {children &&
