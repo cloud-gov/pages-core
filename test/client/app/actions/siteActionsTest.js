@@ -9,7 +9,7 @@ describe("siteActions", () => {
   let fetchRepositoryContent, fetchRepositoryConfigs, createCommit, fetchBranches,
       deleteBranch, createRepo;
   let fetchSites, addSite, updateSite, deleteSite, cloneRepo, createBranch, createPullRequest, mergePullRequest;
-  let addPathToSite, uploadFileToSite, createDraftBranchName, findShaForDefaultBranch, convertFileToData;
+  let addPathToSite, uploadFileToSite, formatDraftBranchName, findShaForDefaultBranch, convertFileToData;
   let httpErrorAlertAction, alertSuccess, alertError;
 
   let updateRouterToSitesUri, updateRouterToSpecificSiteUri, dispatchSitesReceivedAction,
@@ -63,7 +63,7 @@ describe("siteActions", () => {
     dispatchSiteConfigsReceivedAction = stub();
     dispatchSiteBranchesReceivedAction = stub();
 
-    createDraftBranchName = stub();
+    formatDraftBranchName = stub();
     findShaForDefaultBranch = stub();
     convertFileToData = stub();
     
@@ -109,7 +109,9 @@ describe("siteActions", () => {
         addPathToSite: addPathToSite,
         uploadFileToSite: uploadFileToSite
       },
-      "./createDraftBranchName": createDraftBranchName,
+      "../util/branchFormatter": {
+        formatDraftBranchName: formatDraftBranchName
+      },
       "./findShaForDefaultBranch": findShaForDefaultBranch,
       '../util/convertFileToData': convertFileToData
     }).default;
@@ -581,7 +583,7 @@ describe("siteActions", () => {
       };
       const createBranchPromise = Promise.resolve("ig-nored");
       const branchesPromise = Promise.resolve(branches);
-      createDraftBranchName.withArgs(path).returns(draftBranchName);
+      formatDraftBranchName.withArgs(path).returns(draftBranchName);
       findShaForDefaultBranch.withArgs(site).returns(sha);
       createBranch.withArgs(site, draftBranchName, sha).returns(createBranchPromise);
       fetchBranches.withArgs(site).returns(branchesPromise);
@@ -595,7 +597,7 @@ describe("siteActions", () => {
     });
     
     it("does nothing when creating a branch fails", () => {
-      createDraftBranchName.withArgs(path).returns(draftBranchName);
+      formatDraftBranchName.withArgs(path).returns(draftBranchName);
       findShaForDefaultBranch.withArgs(site).returns(sha);
       createBranch.withArgs(site, draftBranchName, sha).returns(rejectedWithErrorPromise);
 

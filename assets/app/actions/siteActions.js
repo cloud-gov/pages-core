@@ -3,7 +3,7 @@ import github from '../util/githubApi';
 import convertFileToData from '../util/convertFileToData';
 import alertActions from './alertActions';
 import { addPathToSite, uploadFileToSite } from "./makeCommitData";
-import createDraftBranchName from "./createDraftBranchName";
+import { formatDraftBranchName } from "../util/branchFormatter";
 import findShaForDefaultBranch from "./findShaForDefaultBranch";
 
 import {
@@ -125,7 +125,7 @@ export default {
   },
 
   createDraftBranch(site, path) {
-    const branchName = createDraftBranchName(path);
+    const branchName = formatDraftBranchName(path);
     const sha = findShaForDefaultBranch(site);
 
     return github.createBranch(site, branchName, sha).then(() => {
