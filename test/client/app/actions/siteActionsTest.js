@@ -105,14 +105,14 @@ describe("siteActions", () => {
         createPullRequest: createPullRequest,
         mergePullRequest: mergePullRequest
       },
-      "./makeCommitData": {
+      "../util/makeCommitData": {
         addPathToSite: addPathToSite,
         uploadFileToSite: uploadFileToSite
       },
       "../util/branchFormatter": {
         formatDraftBranchName: formatDraftBranchName
       },
-      "./findShaForDefaultBranch": findShaForDefaultBranch,
+      "../util/findShaForDefaultBranch": findShaForDefaultBranch,
       '../util/convertFileToData': convertFileToData
     }).default;
   });

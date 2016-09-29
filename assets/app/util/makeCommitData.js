@@ -1,4 +1,4 @@
-import { encodeB64 } from '../util/encoding';
+import { encodeB64 } from './encoding';
 
 const addPathToSite = (site, path, fileContent, message, sha) => {
   const b64EncodedFileContents = encodeB64(fileContent);

@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import fixture from "../../../../assets/app/actions/findShaForDefaultBranch";
+import fixture from "../../../../assets/app/util/findShaForDefaultBranch";
 
 describe("findShaForDefaultBranch", () => {
   it("finds the sha associated with the commit associated with the default branch of a site.", () => {

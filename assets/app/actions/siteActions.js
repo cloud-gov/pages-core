@@ -2,9 +2,9 @@ import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
 import convertFileToData from '../util/convertFileToData';
 import alertActions from './alertActions';
-import { addPathToSite, uploadFileToSite } from "./makeCommitData";
+import { addPathToSite, uploadFileToSite } from "../util/makeCommitData";
 import { formatDraftBranchName } from "../util/branchFormatter";
-import findShaForDefaultBranch from "./findShaForDefaultBranch";
+import findShaForDefaultBranch from "../util/findShaForDefaultBranch";
 
 import {
   updateRouterToSitesUri,

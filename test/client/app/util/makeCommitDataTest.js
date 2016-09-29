@@ -20,8 +20,8 @@ describe("makeCommitData", () => {
 
   beforeEach(() => {
     encodeB64 = stub();
-    const fixture = proxyquire("../../../../assets/app/actions/makeCommitData", {
-      "../util/encoding": {
+    const fixture = proxyquire("../../../../assets/app/util/makeCommitData", {
+      "./encoding": {
         encodeB64: encodeB64
       }
     });
