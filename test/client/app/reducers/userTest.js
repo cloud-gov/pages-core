@@ -9,11 +9,9 @@ describe("userReducer", () => {
 
   beforeEach(() => {
     fixture = proxyquire("../../../../assets/app/reducers/user", {
-      "../constants": {
-        userActionTypes: {
-          USER_RECEIVED: USER_RECEIVED
-        }
-      }
+      "../actions/actionCreators/userActions": {
+        userReceivedType: USER_RECEIVED
+      } 
     }).default;
   });
 

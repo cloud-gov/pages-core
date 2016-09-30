@@ -10,10 +10,8 @@ describe("buildsReducer", () => {
 
   beforeEach(() => {
     fixture = proxyquire("../../../../assets/app/reducers/builds.js", {
-      "../constants": {
-        buildActionTypes: {
-          BUILDS_RECEIVED: BUILDS_RECEIVED
-        }
+      "../actions/actionCreators/buildActions": {
+        buildsReceivedType: BUILDS_RECEIVED
       }
     }).default;
   });

@@ -1,6 +1,6 @@
 import { combineReducers, createStore, applyMiddleware } from 'redux';
 import { browserHistory } from 'react-router';
-import { navigationTypes } from './constants';
+import { updateRouterType as UPDATE_ROUTER } from './actions/actionCreators/navigationActions';
 import reducers from './reducers';
 
 const app = combineReducers(reducers);
@@ -13,7 +13,7 @@ const logger = store => next => action => {
 };
 
 const reroute = store => next => action => {
-  if (action.type !== navigationTypes.UPDATE_ROUTER) {
+  if (action.type !== UPDATE_ROUTER) {
     return next(action);
   }
 

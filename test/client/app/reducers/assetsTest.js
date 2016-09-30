@@ -9,10 +9,8 @@ describe("assetsReducer", () => {
 
   beforeEach(() => {
     fixture = proxyquire("../../../../assets/app/reducers/assets.js", {
-      "../constants": {
-        siteActionTypes: {
-          SITE_ASSETS_RECEIVED: SITE_ASSETS_RECEIVED
-        }
+      '../actions/actionCreators/siteActions': {
+        siteAssetsReceivedType: SITE_ASSETS_RECEIVED
       }
     }).default;
   });

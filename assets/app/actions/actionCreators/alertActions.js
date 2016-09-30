@@ -1,10 +1,8 @@
-import { alertActionTypes as types } from '../../constants';
-
-const authErrorType = types.AUTH_ERROR;
-const httpErrorType = types.HTTP_ERROR;
-const httpSuccessType = types.HTTP_SUCCESS;
-const setStaleType = types.SET_STALE;
-const clearType = types.CLEAR;
+const authErrorType = "AUTH_ERROR";
+const httpErrorType = "HTTP_ERROR";
+const httpSuccessType = "HTTP_SUCCESS";
+const setStaleType = "SET_STALE";
+const clearType = "CLEAR";
 
 const authError = () => ({
   type: authErrorType

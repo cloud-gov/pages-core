@@ -1,13 +1,12 @@
-import { userActionTypes as types } from '../../constants';
-
-const userReceivedType = types.USER_RECEIVED;
-const userLogoutType = types.USER_LOGOUT;
+const userReceivedType = "USER_RECEIVED";
+const userLogoutType = "USER_LOGOUT";
 
 const userReceived = user => ({
   type: userReceivedType,
   user
 });
 
+// FIXME: nobody appears to listen to this-- should we drop it?
 const userLogout = () => ({
   type: userLogoutType
 });

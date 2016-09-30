@@ -1,26 +1,37 @@
 import { siteActionTypes } from '../constants';
+import {
+  sitesReceivedType as SITES_RECEIVED,
+  siteAddedType as SITE_ADDED,
+  siteUpdatedType as SITE_UPDATED,
+  siteDeletedType as SITE_DELETED,
+  siteFileContentReceivedType as SITE_FILE_CONTENT_RECEIVED,
+  siteAssetsReceivedType as SITE_ASSETS_RECEIVED,
+  siteConfigsReceivedType as SITE_CONFIGS_RECEIVED,
+  siteBranchesReceivedType as SITE_BRANCHES_RECEIVED
+} from '../actions/actionCreators/siteActions';
+
 
 const initialState = [];
 
 export default function sites(state = initialState, action) {
   switch (action.type) {
-  case siteActionTypes.SITES_RECEIVED:
+  case SITES_RECEIVED:
     return action.sites || initialState;
 
-  case siteActionTypes.SITE_ADDED:
+  case SITE_ADDED:
     return action.site ? [...state, action.site] : state;
 
-  case siteActionTypes.SITE_UPDATED:
+  case SITE_UPDATED:
     return mapPropertyToMatchingSite(state, action.siteId, action.site);
 
-  case siteActionTypes.SITE_BRANCHES_RECEIVED:
+  case SITE_BRANCHES_RECEIVED:
     const branches = action.branches;
     return mapPropertyToMatchingSite(state, action.siteId, { branches });
 
-  case siteActionTypes.SITE_CONFIGS_RECEIVED:
+  case SITE_CONFIGS_RECEIVED:
     return mapPropertyToMatchingSite(state, action.siteId, action.configs);
 
-  case siteActionTypes.SITE_ASSETS_RECEIVED:
+  case SITE_ASSETS_RECEIVED:
     return mapPropertyToMatchingSite(state, action.siteId, { assets: action.assets });
 
   case siteActionTypes.SITE_UPLOAD_RECEIVED: {
@@ -63,10 +74,10 @@ export default function sites(state = initialState, action) {
     });
   }
 
-  case siteActionTypes.SITE_DELETED:
+  case SITE_DELETED:
     return state.filter((site) => site.id != action.siteId);
 
-  case siteActionTypes.SITE_FILE_CONTENT_RECEIVED:
+  case SITE_FILE_CONTENT_RECEIVED:
     const currentSite = getSiteWithId(state, action.siteId);
     // get list of files associated with the current site
     const siteFiles = getFilesForSite(currentSite);

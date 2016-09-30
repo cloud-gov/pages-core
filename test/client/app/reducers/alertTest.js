@@ -31,13 +31,11 @@ describe("alertReducer", () => {
 
   beforeEach(() => {
     fixture = proxyquire("../../../../assets/app/reducers/alert", {
-      "../constants": {
-        alertActionTypes: {
-          HTTP_ERROR: HTTP_ERROR,
-          HTTP_SUCCESS: HTTP_SUCCESS,
-          CLEAR: CLEAR,
-          SET_STALE: SET_STALE
-        }
+      "../actions/actionCreators/alertActions": {
+        httpErrorType: HTTP_ERROR,
+        httpSuccessType: HTTP_SUCCESS,
+        clearType: CLEAR,
+        setStaleType: SET_STALE
       }
     }).default;
   });
