@@ -1,4 +1,9 @@
-import { alertActionTypes } from '../constants';
+import {
+  httpErrorType as HTTP_ERROR,
+  httpSuccessType as HTTP_SUCCESS,
+  setStaleType as SET_STALE,
+  clearType as CLEAR
+} from '../actions/actionCreators/alertActions';
 
 const initialState = {
   message: '',
@@ -8,21 +13,21 @@ const initialState = {
 
 export default function alert(state = initialState, action) {
   switch (action.type) {
-  case alertActionTypes.HTTP_ERROR:
+  case HTTP_ERROR:
     return Object.assign({}, state, {
       message: action.message,
       status: action.status
     });
-  case alertActionTypes.HTTP_SUCCESS:
+  case HTTP_SUCCESS:
     return Object.assign({}, state, {
       message: action.message,
       status: action.status
     });
-  case alertActionTypes.SET_STALE:
+  case SET_STALE:
     return Object.assign({}, state, {
       stale: true
     });
-  case alertActionTypes.CLEAR:
+  case CLEAR:
     return initialState;
   default:
     return state;

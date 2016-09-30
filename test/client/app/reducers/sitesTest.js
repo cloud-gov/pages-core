@@ -8,27 +8,29 @@ describe("sitesReducer", () => {
   const SITE_ADDED = "hey, new site!";
   const SITE_ASSETS_RECEIVED = "Whoa. Assets.";
   const SITE_CONFIGS_RECEIVED = "Tasty configs!";
-  const SITE_FILES_RECEIVED = "contents? we have contents!";
   const SITE_DELETED = "bye, site.";
   const SITE_UPDATED = "change the site, please";
   const SITES_RECEIVED = "hey, sites!";
-  const SITE_UPLOAD_RECEIVED = 'uploaded!';
   const SITE_FILE_CONTENT_RECEIVED = "cool files!";
+  const SITE_UPLOAD_RECEIVED = 'uploaded!';
+  const SITE_FILES_RECEIVED = "contents? we have contents!";
 
   beforeEach(() => {
     fixture = proxyquire("../../../../assets/app/reducers/sites", {
       "../constants": {
         siteActionTypes: {
-          SITE_ADDED: SITE_ADDED,
-          SITE_ASSETS_RECEIVED: SITE_ASSETS_RECEIVED,
-          SITE_CONFIGS_RECEIVED: SITE_CONFIGS_RECEIVED,
-          SITE_FILES_RECEIVED: SITE_FILES_RECEIVED,
-          SITE_DELETED: SITE_DELETED,
-          SITE_UPDATED: SITE_UPDATED,
-          SITES_RECEIVED: SITES_RECEIVED,
           SITE_UPLOAD_RECEIVED: SITE_UPLOAD_RECEIVED,
-          SITE_FILE_CONTENT_RECEIVED: SITE_FILE_CONTENT_RECEIVED
+          SITE_FILES_RECEIVED: SITE_FILES_RECEIVED
         }
+      },
+      "../actions/actionCreators/siteActions": {
+        sitesReceivedType: SITES_RECEIVED,
+        siteAddedType: SITE_ADDED,
+        siteUpdatedType: SITE_UPDATED,
+        siteDeletedType: SITE_DELETED,
+        siteFileContentReceivedType: SITE_FILE_CONTENT_RECEIVED,
+        siteAssetsReceivedType: SITE_ASSETS_RECEIVED,
+        siteConfigsReceivedType: SITE_CONFIGS_RECEIVED
       }
     }).default;
   });

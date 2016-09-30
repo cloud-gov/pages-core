@@ -1,8 +1,10 @@
-import { userActionTypes } from '../constants';
+import {
+  userReceivedType as USER_RECEIVED
+} from '../actions/actionCreators/userActions';
 
 export default function user(state = false, action) {
   switch (action.type) {
-  case userActionTypes.USER_RECEIVED:
+  case USER_RECEIVED:
     return {
       id: action.user.id,
       username: action.user.username,

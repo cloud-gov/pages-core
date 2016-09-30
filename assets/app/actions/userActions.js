@@ -1,20 +1,21 @@
 import federalist from '../util/federalistApi';
-import { userActionTypes } from '../constants';
-import store from '../store';
+import { dispatch } from '../store';
+import {
+  userReceived as createUserReceivedAction,
+  userLogout as createUserLogoutAction
+} from "./actionCreators/userActions";
+
+const dispatchUserReceivedAction = user => {
+  dispatch(createUserReceivedAction(user));
+};
 
 export default {
   fetchUser() {
-    federalist.fetchUser().then((user) => {
-      store.dispatch({
-        type: userActionTypes.USER_RECEIVED,
-        user
-      });
-    });
+    return federalist.fetchUser()
+      .then(dispatchUserReceivedAction);
   },
 
   logout() {
-    store.dispatch({
-      type: userActionTypes.USER_LOGOUT
-    });
+    dispatch(createUserLogoutAction());
   }
-}
+};

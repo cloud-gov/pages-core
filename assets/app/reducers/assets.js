@@ -1,8 +1,8 @@
-import { siteActionTypes } from "../constants";
+import { siteAssetsReceivedType as SITE_ASSETS_RECEIVED } from '../actions/actionCreators/siteActions';
 
 export default function assets(state = [], action) {
   switch (action.type) {
-  case siteActionTypes.SITE_ASSETS_RECEIVED:
+  case SITE_ASSETS_RECEIVED:
     let assets = action.assets.map((asset) => {
       return Object.assign({}, asset, { site: action.siteId });
     });
