@@ -7,7 +7,8 @@ import {
   siteFileContentReceivedType as SITE_FILE_CONTENT_RECEIVED,
   siteAssetsReceivedType as SITE_ASSETS_RECEIVED,
   siteConfigsReceivedType as SITE_CONFIGS_RECEIVED,
-  siteBranchesReceivedType as SITE_BRANCHES_RECEIVED
+  siteBranchesReceivedType as SITE_BRANCHES_RECEIVED,
+  siteFilesReceivedType as SITE_FILES_RECEIVED
 } from '../actions/actionCreators/siteActions';
 
 
@@ -41,7 +42,7 @@ export default function sites(state = initialState, action) {
     });
   }
 
-  case siteActionTypes.SITE_FILES_RECEIVED: {
+  case SITE_FILES_RECEIVED: {
     const nextFiles = action.files || [];
     const site = getSiteWithId(state, action.siteId);
     let siteFiles;

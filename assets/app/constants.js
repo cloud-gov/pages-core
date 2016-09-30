@@ -28,8 +28,6 @@ export const siteActionTypes = keymirror({
   // Action to add a site
   SITE_ADD: null,
   SITE_BRANCH_DELETED: null,
-  // All files that aren't config or assets retrieved from github
-  SITE_FILES_RECEIVED: null,
   SITE_FILE_ADDED: null,
   // When an individual file/path is received
   SITE_FILE_CONTENT_RECEIVED: null,

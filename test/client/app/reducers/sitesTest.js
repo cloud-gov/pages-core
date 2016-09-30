@@ -19,8 +19,7 @@ describe("sitesReducer", () => {
     fixture = proxyquire("../../../../assets/app/reducers/sites", {
       "../constants": {
         siteActionTypes: {
-          SITE_UPLOAD_RECEIVED: SITE_UPLOAD_RECEIVED,
-          SITE_FILES_RECEIVED: SITE_FILES_RECEIVED
+          SITE_UPLOAD_RECEIVED: SITE_UPLOAD_RECEIVED
         }
       },
       "../actions/actionCreators/siteActions": {
@@ -30,7 +29,8 @@ describe("sitesReducer", () => {
         siteDeletedType: SITE_DELETED,
         siteFileContentReceivedType: SITE_FILE_CONTENT_RECEIVED,
         siteAssetsReceivedType: SITE_ASSETS_RECEIVED,
-        siteConfigsReceivedType: SITE_CONFIGS_RECEIVED
+        siteConfigsReceivedType: SITE_CONFIGS_RECEIVED,
+        siteFilesReceivedType: SITE_FILES_RECEIVED
       }
     }).default;
   });
