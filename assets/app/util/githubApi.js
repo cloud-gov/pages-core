@@ -1,4 +1,3 @@
-
 import fetch from './fetch';
 
 import store from '../store';
@@ -7,7 +6,7 @@ import alertActions from '../actions/alertActions';
 
 const API = 'https://api.github.com';
 
-function getToken() {
+const getToken = () => {
   const state = store.getState();
   const passports = state.user.passports;
   let github = passports.filter((passport) => {
@@ -17,9 +16,16 @@ function getToken() {
   return github.tokens.accessToken;
 }
 
-function getRepoFor(site) {
+const getRepoFor = (site) => {
   return `repos/${site.owner}/${site.repository}`;
-}
+};
+
+// Overwrite the original base64 content returned from github with
+// plaintext, and add a json representation of it when applicable
+const decodeAndSetConfigContent = (config) => {
+  const content = decodeB64(config.content);
+  return Object.assign({}, config, { content });
+};
 
 const github = {
   fetch(path, params) {
@@ -108,15 +114,13 @@ const github = {
       return this.fetchRepositoryContent(site, path);
     });
 
+    // TODO: Move this into another file? This block breaks the consistency of
+    // what this file does, by introducing a data transform in what is otherwise
+    // an API interface
     return Promise.all(configFetches).then((configs) => {
-      return configs.map((config) => {
-        const content = (config) ? decodeB64(config.content) : false
-        return Object.assign({}, config, { content });
-      });
-    }).then((configs) => {
-      return configFiles.reduce((result, configFile, index) => {
-        result[configFile] = configs[index]
-        return result;
+      return configFiles.reduce((memo, configFile, index) => {
+        memo[configFile] = decodeAndSetConfigContent(configs[index]);
+        return memo;
       }, {});
     });
   },
@@ -194,7 +198,7 @@ const github = {
       };
       const sourceUrl = `repos/${owner}/${repo}`;
 
-      return github.fetch(sourceUrl, { params });
+      return this.fetch(sourceUrl, { params });
     }
 
     /**
@@ -210,7 +214,7 @@ const github = {
 
       const repoUrl = `${org}/repos`;
 
-      return github.fetch(repoUrl, {
+      return this.fetch(repoUrl, {
         method: 'POST',
         headers: {
           'Authorization': `token ${token}`

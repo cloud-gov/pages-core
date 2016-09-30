@@ -4,7 +4,7 @@ import { decodeB64 } from '../../../util/encoding'
 
 import PageMetadata from './pageMetadata';
 import ImagePicker from './imagePicker';
-import Codemirror from './codemirror';
+import PageSettings from './configs/pageSettings';
 import Prosemirror from './prosemirror';
 
 import documentStrategy from '../../../util/documentStrategy';
@@ -18,7 +18,17 @@ import siteActions from '../../../actions/siteActions';
 import routeActions from '../../../actions/routeActions';
 
 const propTypes = {
-  site: React.PropTypes.object
+  site: React.PropTypes.shape({
+    assets: React.PropTypes.array,
+    branch: React.PropTypes.string,
+    branches: React.PropTypes.array,
+    '_config.yml': React.PropTypes.object,
+    defaultBranch: React.PropTypes.string,
+    files: React.PropTypes.array,
+    id: React.PropTypes.number,
+    owner: React.PropTypes.string,
+    repository: React.PropTypes.string
+  })
 };
 
 const redirectToFileOnBranch = (siteId, branch, filePath) => {
@@ -37,7 +47,7 @@ class Editor extends React.Component {
     super(props);
 
     this.state = Object.assign({}, {
-      imagePicker: false
+      imagePicker: false,
     }, this.getStateWithProps(props));
 
     this.commitOrPR = this.commitOrPR.bind(this);
@@ -136,8 +146,7 @@ class Editor extends React.Component {
 
     if (frontmatter) {
       content = `---\n${frontmatter}\n---\n${markdown}`;
-    }
-    else if (frontmatter && !markdown) {
+    } else if (frontmatter && !markdown) {
       content = frontmatter;
     }
 
@@ -289,21 +298,20 @@ class Editor extends React.Component {
   // the form and the image picker, and probably call actions after content has
   // been verified.
   render() {
-    const { props } = this;
-    const file = this.getCurrentFile(props);
-    const { frontmatter, markdown } = documentStrategy(file);
+    const { props, state } = this;
+    const { frontmatter, markdown } = state;
 
     return (
       <div>
         {this.getImagePicker()}
         {this.getNewPage()}
 
-        <Codemirror
-          initialFrontmatterContent={ frontmatter }
+        <PageSettings
+          templateConfig={ props.site['_config.yml'].content }
+          frontmatter={ frontmatter }
           onChange={ (frontmatter) => {
-            this.handleChange('frontmatter', frontmatter)
-          }}
-        />
+            this.handleChange('frontmatter', frontmatter);
+          }} />
         <Prosemirror
           initialMarkdownContent={ markdown }
           assetPath={this.getAssetPath()}
