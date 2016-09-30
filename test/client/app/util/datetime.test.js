@@ -2,8 +2,6 @@ import { expect } from 'chai';
 import { duration, timeFrom } from '../../../../assets/app/util/datetime';
 
 const DURATION = 'a few seconds';
-const TIME_FROM = '4 months ago';
-
 const NO_DURATION = '-';
 
 
@@ -20,14 +18,14 @@ describe('datetime', function() {
       expect(duration(+new Date)).to.equal(DURATION);
     });
 
-    it('works if startTime isnt defined', () => {
+    it('provides a fallback if startTime isnt defined', () => {
       expect(duration()).to.equal(NO_DURATION);
     });
   });
 
   describe('timeFrom()', () => {
-    it('shows a human readable elapsed time from start date', () => {
-      expect(timeFrom(endTime)).to.equal(TIME_FROM);
+    it('shows a human readable elapsed time from end date', () => {
+      expect(timeFrom(+new Date)).to.equal(`${DURATION} ago`);
     });
 
     it('provides a fallback if no initial time is supplied', () => {
