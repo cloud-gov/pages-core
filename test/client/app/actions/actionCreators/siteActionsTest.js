@@ -17,7 +17,7 @@ describe("siteActions actionCreators", () => {
       const sites = [{
         something: "here"
       }];
-      
+
       const actual = sitesReceived(sites);
 
       expect(actual).to.deep.equal({
@@ -36,7 +36,7 @@ describe("siteActions actionCreators", () => {
       const site = {
         something: "here"
       };
-      
+
       const actual = siteAdded(site);
 
       expect(actual).to.deep.equal({
@@ -49,7 +49,7 @@ describe("siteActions actionCreators", () => {
       expect(siteAddedType).to.equal("SITE_ADDED");
     });
   });
-  
+
   describe("siteUpdated", () => {
     it("constructs properly", () => {
       const id = "tk421";
@@ -57,7 +57,7 @@ describe("siteActions actionCreators", () => {
         something: "here",
         id: id
       };
-      
+
       const actual = siteUpdated(site);
 
       expect(actual).to.deep.equal({
@@ -71,11 +71,11 @@ describe("siteActions actionCreators", () => {
       expect(siteUpdatedType).to.equal("SITE_UPDATED");
     });
   });
-  
+
   describe("siteUpdated", () => {
     it("constructs properly", () => {
       const siteId = "tk421";
-      
+
       const actual = siteDeleted(siteId);
 
       expect(actual).to.deep.equal({
@@ -88,12 +88,31 @@ describe("siteActions actionCreators", () => {
       expect(siteDeletedType).to.equal("SITE_DELETED");
     });
   });
-  
+
+  describe("siteFilesReceived", () => {
+    it("constructs properly", () => {
+      const siteId = "tk421";
+      const files = [{name: 'fileA'},{name: 'radfile1'}];
+
+      const actual = siteFilesReceived(siteId, files);
+
+      expect(actual).to.deep.equal({
+        type: siteFilesReceivedType,
+        siteId,
+        files
+      });
+    });
+
+    it("exports its type", () => {
+      expect(siteFilesReceivedType).to.equal("SITE_FILES_RECEIVED");
+    });
+  });
+
   describe("siteFileContentReceived", () => {
     it("constructs properly", () => {
       const siteId = "tk421";
       const fileContent = "this is something coming from a commit response, I hope.";
-      
+
       const actual = siteFileContentReceived(siteId, fileContent);
 
       expect(actual).to.deep.equal({
@@ -115,7 +134,7 @@ describe("siteActions actionCreators", () => {
         something: "could be anything",
         except: "when it isn't"
       };
-      
+
       const actual = siteAssetsReceived(siteId, assets);
 
       expect(actual).to.deep.equal({
@@ -137,7 +156,7 @@ describe("siteActions actionCreators", () => {
         something: "could be anything",
         except: "when it isn't"
       };
-      
+
       const actual = siteConfigsReceived(siteId, configs);
 
       expect(actual).to.deep.equal({
@@ -152,7 +171,7 @@ describe("siteActions actionCreators", () => {
     });
   });
 
-  
+
   describe("siteBranchesReceived", () => {
     it("constructs properly", () => {
       const siteId = "tk421";
@@ -160,7 +179,7 @@ describe("siteActions actionCreators", () => {
         something: "could be anything",
         except: "when it isn't"
       };
-      
+
       const actual = siteBranchesReceived(siteId, branches);
 
       expect(actual).to.deep.equal({
