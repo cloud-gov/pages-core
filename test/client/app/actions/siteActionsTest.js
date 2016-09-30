@@ -9,7 +9,8 @@ describe("siteActions", () => {
   let fetchRepositoryContent, fetchRepositoryConfigs, createCommit, fetchBranches,
       deleteBranch, createRepo;
   let fetchSites, addSite, updateSite, deleteSite, cloneRepo, createBranch, createPullRequest, mergePullRequest;
-  let addPathToSite, uploadFileToSite, formatDraftBranchName, findShaForDefaultBranch, convertFileToData;
+  let addPathToSite, uploadFileToSite, formatDraftBranchName, findShaForDefaultBranch, convertFileToData,
+      filterAssetsWithTypeOfFile;
   let httpErrorAlertAction, alertSuccess, alertError;
 
   let updateRouterToSitesUri, updateRouterToSpecificSiteUri, dispatchSitesReceivedAction,
@@ -66,8 +67,8 @@ describe("siteActions", () => {
     formatDraftBranchName = stub();
     findShaForDefaultBranch = stub();
     convertFileToData = stub();
+    filterAssetsWithTypeOfFile = stub();
     
-    // FIXME: complex dependency wiring a smell
     fixture = proxyquire("../../../../assets/app/actions/siteActions", {
       "./dispatchActions": {
         updateRouterToSitesUri: updateRouterToSitesUri,
@@ -113,7 +114,8 @@ describe("siteActions", () => {
         formatDraftBranchName: formatDraftBranchName
       },
       "../util/findShaForDefaultBranch": findShaForDefaultBranch,
-      '../util/convertFileToData': convertFileToData
+      "../util/convertFileToData": convertFileToData,
+      "../util/filterAssetsWithTypeOfFile": filterAssetsWithTypeOfFile
     }).default;
   });
 
@@ -397,20 +399,19 @@ describe("siteActions", () => {
   });
 
   describe("fetchSiteAssets", () => {
-    const bAsset = {
-      name: "you should pay attention to me",
-      type: "file"
-    };
     const assets = [
       {
         name: "fie",
         type: "nothing"
       },
-      bAsset,
       {
         whatever: "you say, no type"
       }
     ];
+    const filteredAssets = [{
+      name: "you should pay attention to me",
+      type: "file"
+    }];
 
     it("fetches a site's assets with no configed asset path and dispatches a site assets received action to the store when successful, returning the same site given", () => {
       const site = {
@@ -423,11 +424,12 @@ describe("siteActions", () => {
       
       const assetsPromise = Promise.resolve(assets);
       fetchRepositoryContent.withArgs(site, "assets").returns(assetsPromise);
-
+      filterAssetsWithTypeOfFile.withArgs(assets).returns(filteredAssets);
+      
       const actual = fixture.fetchSiteAssets(site);
       
       return actual.then((result) => {
-        expect(dispatchSiteAssetsReceivedAction.calledWith(siteId, [ bAsset ])).to.be.true;
+        expect(dispatchSiteAssetsReceivedAction.calledWith(siteId, filteredAssets)).to.be.true;
         expect(result).to.equal(site);
       });
     });
@@ -444,11 +446,12 @@ describe("siteActions", () => {
       
       const assetsPromise = Promise.resolve(assets);
       fetchRepositoryContent.withArgs(site, assetPath).returns(assetsPromise);
+      filterAssetsWithTypeOfFile.withArgs(assets).returns(filteredAssets);
 
       const actual = fixture.fetchSiteAssets(site);
       
       return actual.then((result) => {
-        expect(dispatchSiteAssetsReceivedAction.calledWith(siteId, [ bAsset ])).to.be.true;
+        expect(dispatchSiteAssetsReceivedAction.calledWith(siteId, filteredAssets)).to.be.true;
         expect(result).to.equal(site);
       });
     });

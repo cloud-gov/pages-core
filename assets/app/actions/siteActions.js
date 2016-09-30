@@ -5,6 +5,7 @@ import alertActions from './alertActions';
 import { addPathToSite, uploadFileToSite } from "../util/makeCommitData";
 import { formatDraftBranchName } from "../util/branchFormatter";
 import findShaForDefaultBranch from "../util/findShaForDefaultBranch";
+import filterAssetsWithTypeOfFile from "../util/filterAssetsWithTypeOfFile";
 
 import {
   updateRouterToSitesUri,
@@ -90,12 +91,6 @@ export default {
     const config = site['_config.yml'];
     const assetPath = (config && config.assetPath) || 'assets';
 
-    const filterAssetsWithTypeOfFile = (assets) => {
-      return assets.filter((asset) => {
-        return asset.type === 'file';
-      });
-    };
-    
     return github.fetchRepositoryContent(site, assetPath)
       .then(filterAssetsWithTypeOfFile)
       .then(dispatchSiteAssetsReceivedAction.bind(null, site.id))
