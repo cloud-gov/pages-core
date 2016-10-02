@@ -6,4 +6,7 @@ const updateRouter = (path, method) => ({
   arguments: [ path ]
 });
 
-export { updateRouterType, updateRouter };
+const pushRouterHistory = (path) => updateRouter(path, 'push');
+const replaceRouterHistory = path => updateRouter(path, 'replace');
+
+export { updateRouterType, pushRouterHistory, replaceRouterHistory };

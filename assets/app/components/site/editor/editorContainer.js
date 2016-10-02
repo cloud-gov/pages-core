@@ -22,12 +22,12 @@ const propTypes = {
 };
 
 const redirectToFileOnBranch = (siteId, branch, filePath) => {
-  routeActions.redirect(`/sites/${siteId}/edit/${branch}/${filePath}`, 'replace');
+  routeActions.replaceHistory(`/sites/${siteId}/edit/${branch}/${filePath}`);
 };
 
 const alertAndRedirect = (message, uri) => {
   alertActions.alertSuccess(message);
-  routeActions.redirect(uri);
+  routeActions.pushHistory(uri);
 };
 
 let insertFn;
@@ -152,7 +152,7 @@ class Editor extends React.Component {
     return this.submitFile(branchName).then(() => {
       return siteActions.createPR(site, branchName, site.defaultBranch);
     }).then(() => {
-      routeActions.redirect(`/sites/${site.id}`);
+      routeActions.pushHistory(`/sites/${site.id}`);
     });
   }
 
