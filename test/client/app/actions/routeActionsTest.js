@@ -7,14 +7,17 @@ proxyquire.noCallThru();
 describe("routeActions", () => {
   let fixture;
   let dispatch;
-  let updateRouterActionCreator;
-  
+  let pushRouterActionCreator;
+  let replaceRouterActionCreator;
+
   beforeEach(() => {
     dispatch = spy();
-    updateRouterActionCreator = stub();
+    pushRouterActionCreator = stub();
+    replaceRouterActionCreator = stub();
     fixture = proxyquire("../../../../assets/app/actions/routeActions", {
       "./actionCreators/navigationActions": {
-        updateRouter: updateRouterActionCreator
+        pushRouterHistory: pushRouterActionCreator,
+        replaceRouterHistory: replaceRouterActionCreator
       },
       "../store": {
         dispatch: dispatch
@@ -22,17 +25,20 @@ describe("routeActions", () => {
     }).default;
   });
 
-  describe("redirect", () => {
+  describe("pushHistory, replaceHistory", () => {
     it("sends an update router action to the store", () => {
       const path = "/somewhere/out/there";
       const routerAction = {
         foo: "quux"
       };
-      updateRouterActionCreator.withArgs(path).returns(routerAction);
 
-      fixture.redirect(path);
+      pushRouterActionCreator.withArgs(path).returns(routerAction);
+      replaceRouterActionCreator.withArgs(path).returns(routerAction);
 
-      expect(dispatch.calledOnce).to.be.true;
+      fixture.pushHistory(path);
+      fixture.replaceHistory(path);
+
+      expect(dispatch.calledTwice).to.be.true;
       expect(dispatch.calledWith(routerAction)).to.be.true;
     });
   });

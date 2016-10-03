@@ -1,9 +1,12 @@
 const updateRouterType = "UPDATE_ROUTER";
 
-const updateRouter = path => ({
+const updateRouter = (path, method) => ({
   type: updateRouterType,
-  method: 'push',
+  method: method,
   arguments: [ path ]
 });
 
-export { updateRouterType, updateRouter };
+const pushRouterHistory = (path) => updateRouter(path, 'push');
+const replaceRouterHistory = path => updateRouter(path, 'replace');
+
+export { updateRouterType, pushRouterHistory, replaceRouterHistory };
