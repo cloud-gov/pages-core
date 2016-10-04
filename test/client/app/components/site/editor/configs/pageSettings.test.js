@@ -89,7 +89,7 @@ describe('<PageSettings />', () => {
   describe('change handler', () => {
     const updateText = 'paper';
     beforeEach(() => {
-      wrapper.instance().handleChange(`layout: ${updateText}`);
+      wrapper.instance().handleChange(`layout:${updateText}`);
     });
 
     it('calls its onChange function from props when content is updated', () => {
