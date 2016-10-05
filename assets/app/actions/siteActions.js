@@ -143,7 +143,17 @@ export default {
   },
 
   createPR(site, head, base) {
-    return github.createPullRequest(site, head, base).then((pr) => {
+    return github.fetchPullRequests(site).then((openPrs) => {
+      const existingPr = openPrs.find((pr) => {
+        return pr.head.ref === head;
+      });
+
+      if (!existingPr) {
+        return github.createPullRequest(site, head, base);
+      }
+
+      return existingPr;
+    }).then((pr) => {
       return github.mergePullRequest(site, pr);
     }).then(() => {
       return github.deleteBranch(site, head);

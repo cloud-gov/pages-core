@@ -8,7 +8,8 @@ describe("siteActions", () => {
   let fixture;
   let fetchRepositoryContent, fetchRepositoryConfigs, createCommit, fetchBranches,
       deleteBranch, createRepo;
-  let fetchSites, addSite, updateSite, deleteSite, cloneRepo, createBranch, createPullRequest, mergePullRequest;
+  let fetchSites, addSite, updateSite, deleteSite, cloneRepo, createBranch,
+      createPullRequest, mergePullRequest, fetchPullRequests;
   let addPathToSite, uploadFileToSite, formatDraftBranchName, findShaForDefaultBranch, convertFileToData,
       filterAssetsWithTypeOfFile;
   let httpErrorAlertAction, alertSuccess, alertError;
@@ -39,6 +40,7 @@ describe("siteActions", () => {
     deleteSite = stub();
     cloneRepo = stub();
     createBranch = stub();
+    fetchPullRequests = stub();
     createPullRequest = stub();
     mergePullRequest = stub();
     fetchRepositoryContent = stub();
@@ -68,7 +70,7 @@ describe("siteActions", () => {
     findShaForDefaultBranch = stub();
     convertFileToData = stub();
     filterAssetsWithTypeOfFile = stub();
-    
+
     fixture = proxyquire("../../../../assets/app/actions/siteActions", {
       "./dispatchActions": {
         updateRouterToSitesUri: updateRouterToSitesUri,
@@ -100,6 +102,7 @@ describe("siteActions", () => {
         fetchRepositoryConfigs: fetchRepositoryConfigs,
         createCommit: createCommit,
         fetchBranches: fetchBranches,
+        fetchPullRequests: fetchPullRequests,
         deleteBranch: deleteBranch,
         createRepo: createRepo,
         createBranch: createBranch,
@@ -131,17 +134,17 @@ describe("siteActions", () => {
       fetchSites.withArgs().returns(sitesPromise);
 
       const actual = fixture.fetchSites();
-      
+
       return actual.then(() => {
         expect(dispatchSitesReceivedAction.calledWith(sites)).to.be.true;
       });
     });
-    
+
     it("triggers an error when fetching of sites fails", () => {
       fetchSites.withArgs().returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchSites();
-      
+
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
@@ -155,7 +158,7 @@ describe("siteActions", () => {
       addSite.withArgs(siteToAdd).returns(sitePromise);
 
       const actual = fixture.addSite(siteToAdd);
-      
+
       return actual.then(() => {
         expect(updateRouterToSitesUri.calledOnce).to.be.true;
         expect(dispatchSiteAddedAction.calledWith(site)).to.be.true;
@@ -169,7 +172,7 @@ describe("siteActions", () => {
       addSite.withArgs(siteToAdd).returns(rejectedWithErrorPromise);
 
       const actual = fixture.addSite(siteToAdd);
-      
+
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
@@ -184,9 +187,9 @@ describe("siteActions", () => {
       };
       const sitePromise = Promise.resolve(site);
       updateSite.withArgs(siteToUpdate, data).returns(sitePromise);
-      
+
       const actual = fixture.updateSite(siteToUpdate, data);
-      
+
       return actual.then(() => {
         expect(dispatchSiteUpdatedAction.calledWith(site)).to.be.true;
       });
@@ -202,7 +205,7 @@ describe("siteActions", () => {
       updateSite.withArgs(siteToUpdate, data).returns(rejectedWithErrorPromise);
 
       const actual = fixture.updateSite(siteToUpdate, data);
-      
+
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
@@ -216,7 +219,7 @@ describe("siteActions", () => {
       deleteSite.withArgs(siteId).returns(sitePromise);
 
       const actual = fixture.deleteSite(siteId);
-      
+
       return actual.then(() => {
         expect(dispatchSiteDeletedAction.calledWith(siteId)).to.be.true;
         expect(updateRouterToSitesUri.calledOnce).to.be.true;
@@ -227,7 +230,7 @@ describe("siteActions", () => {
       deleteSite.withArgs(siteId).returns(rejectedWithErrorPromise);
 
       const actual = fixture.deleteSite(siteId);
-      
+
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
@@ -243,7 +246,7 @@ describe("siteActions", () => {
       fetchRepositoryContent.withArgs(site, path).returns(filePromise);
 
       const actual = fixture.fetchFiles(site, path);
-      
+
       return actual.then(() => {
         expect(dispatchSiteFilesReceivedAction.calledWith(siteId, files)).to.be.true;
       });
@@ -254,7 +257,7 @@ describe("siteActions", () => {
       fetchRepositoryContent.withArgs(site, path).returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchFiles(site, path);
-      
+
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
@@ -270,7 +273,7 @@ describe("siteActions", () => {
       fetchRepositoryContent.withArgs(site, path).returns(filePromise);
 
       const actual = fixture.fetchFileContent(site, path);
-      
+
       return actual.then(() => {
         expect(dispatchSiteFileContentReceivedAction.calledWith(siteId, file)).to.be.true;
       });
@@ -296,7 +299,7 @@ describe("siteActions", () => {
       fetchRepositoryConfigs.withArgs(site).returns(configsPromise);
 
       const actual = fixture.fetchSiteConfigs(site);
-      
+
       return actual.then((result) => {
         expect(dispatchSiteConfigsReceivedAction.calledWith(siteId, configs)).to.be.true;
         expect(result).to.equal(site);
@@ -307,7 +310,7 @@ describe("siteActions", () => {
       fetchRepositoryConfigs.withArgs(site).returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchSiteConfigs(site);
-      
+
       expectDispatchToNotBeCalled(actual, dispatchSiteConfigsReceivedAction);
     });
   });
@@ -336,7 +339,7 @@ describe("siteActions", () => {
       createCommit.withArgs(site, path, expectedCommit).returns(commitObjectPromise);
 
       const actual = fixture.createCommit(site, path, content);
-      
+
       return actual.then(() => {
         expect(alertSuccess.calledWith("File committed successfully")).to.be.true;
         expect(dispatchSiteFileContentReceivedAction.calledWith(siteId, content)).to.be.true;
@@ -368,13 +371,13 @@ describe("siteActions", () => {
       createCommit.withArgs(site, path, expectedCommit).returns(commitObjectPromise);
 
       const actual = fixture.createCommit(site, path, content, message, sha);
-      
+
       return actual.then(() => {
         expect(alertSuccess.calledWith("File committed successfully")).to.be.true;
         expect(dispatchSiteFileContentReceivedAction.calledWith(siteId, content)).to.be.true;
-      });    
+      });
     });
-        
+
     it("triggers an error when creating a commit fails", () => {
       const sha = "euvuhvauy2498u0294fjerhv98ewyg0942jviuehgiorefjhviofdsjv";
       const message = "this one goes out to the one i compile";
@@ -392,7 +395,7 @@ describe("siteActions", () => {
       fetchSites.withArgs().returns(rejectedWithErrorPromise);
 
       const actual = fixture.createCommit(site, path, content, message, sha);
-      
+
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
 
@@ -421,19 +424,19 @@ describe("siteActions", () => {
         },
         could: "be anything"
       };
-      
+
       const assetsPromise = Promise.resolve(assets);
       fetchRepositoryContent.withArgs(site, "assets").returns(assetsPromise);
       filterAssetsWithTypeOfFile.withArgs(assets).returns(filteredAssets);
-      
+
       const actual = fixture.fetchSiteAssets(site);
-      
+
       return actual.then((result) => {
         expect(dispatchSiteAssetsReceivedAction.calledWith(siteId, filteredAssets)).to.be.true;
         expect(result).to.equal(site);
       });
     });
-    
+
     it("fetches a site's assets with a configed asset path and dispatches a site assets received action to the store when successful, returning the same site given", () => {
       const assetPath = "/go/directly/here";
       const site = {
@@ -443,13 +446,13 @@ describe("siteActions", () => {
         },
         could: "be anything"
       };
-      
+
       const assetsPromise = Promise.resolve(assets);
       fetchRepositoryContent.withArgs(site, assetPath).returns(assetsPromise);
       filterAssetsWithTypeOfFile.withArgs(assets).returns(filteredAssets);
 
       const actual = fixture.fetchSiteAssets(site);
-      
+
       return actual.then((result) => {
         expect(dispatchSiteAssetsReceivedAction.calledWith(siteId, filteredAssets)).to.be.true;
         expect(result).to.equal(site);
@@ -468,34 +471,34 @@ describe("siteActions", () => {
       fetchRepositoryContent.withArgs(site, assetPath).returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchSiteAssets(site);
-      
+
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
-  
+
   describe("fetch(Site)Branches", () => {
     it("fetches a site's branches and dispatches a site branches received action to the store when successful, returning the same site given", () => {
       const branches = {
         blurry: "vision",
         get: "glasses"
       };
-      
+
       const branchesPromise = Promise.resolve(branches);
       fetchBranches.withArgs(site).returns(branchesPromise);
 
       const actual = fixture.fetchBranches(site);
-      
+
       return actual.then((result) => {
         expect(dispatchSiteBranchesReceivedAction.calledWith(siteId, branches)).to.be.true;
         expect(result).to.equal(site);
       });
     });
-    
+
     it("does nothing when fetching a site's branches fails", () => {
       fetchBranches.withArgs(site).returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchBranches(site);
-      
+
       expectDispatchToNotBeCalled(actual, dispatchSiteBranchesReceivedAction);
     });
   });
@@ -514,30 +517,30 @@ describe("siteActions", () => {
       fetchBranches.withArgs(site).returns(branchesPromise);
 
       const actual = fixture.deleteBranch(site, branch);
-      
+
       return actual.then((result) => {
         expect(dispatchSiteBranchesReceivedAction.calledWith(siteId, branches)).to.be.true;
         expect(result).to.equal(site);
       });
     });
-    
+
     it("alerts an error when deleting a site's branch fails", () => {
       deleteBranch.withArgs(site, branch).returns(rejectedWithErrorPromise);
 
       const actual = fixture.deleteBranch(site, branch);
-      
+
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
-    
+
     it("alerts an error when fetching branches fails after successfully deleting a site's branch", () => {
       const deleteBranchPromise = Promise.resolve("ig-nored");
       deleteBranch.withArgs(site, branch).returns(deleteBranchPromise);
       fetchBranches.withArgs(site).returns(rejectedWithErrorPromise);
 
       const actual = fixture.deleteBranch(site, branch);
-      
+
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
-    });    
+    });
   });
 
   describe("cloneRepo", () => {
@@ -556,15 +559,15 @@ describe("siteActions", () => {
         expect(dispatchSiteAddedAction.calledWith(site)).to.be.true;
       });
     });
-    
+
     it("alerts an error if createRepo fails", () => {
       createRepo.withArgs(destination, source).returns(rejectedWithErrorPromise);
 
       const actual = fixture.cloneRepo(destination, source);
-      
+
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
-    
+
     it("alerts an error if cloneRepo fails", () => {
       createRepo.withArgs(destination, source).returns(Promise.resolve("ignored"));
       cloneRepo.withArgs(destination, source).returns(rejectedWithErrorPromise);
@@ -592,26 +595,26 @@ describe("siteActions", () => {
       fetchBranches.withArgs(site).returns(branchesPromise);
 
       const actual = fixture.createDraftBranch(site, path);
-      
+
       return actual.then((result) => {
         expect(dispatchSiteBranchesReceivedAction.calledWith(siteId, branches)).to.be.true;
         expect(result).to.equal(draftBranchName);
       });
     });
-    
+
     it("does nothing when creating a branch fails", () => {
       formatDraftBranchName.withArgs(path).returns(draftBranchName);
       findShaForDefaultBranch.withArgs(site).returns(sha);
       createBranch.withArgs(site, draftBranchName, sha).returns(rejectedWithErrorPromise);
 
       const actual = fixture.createDraftBranch(site, path);
-      
+
       expectDispatchToNotBeCalled(actual, dispatchSiteBranchesReceivedAction);
     });
   });
 
   describe("uploadFile", () => {
-    const filename = "files need a name, you see"; 
+    const filename = "files need a name, you see";
     const file = {
       name: filename
     };
@@ -620,7 +623,7 @@ describe("siteActions", () => {
       convertFileToData.withArgs(file).returns(rejectedWithErrorPromise);
 
       const actual = fixture.uploadFile(site, file);
-      
+
       return validateResultDispatchesAlertError(actual, errorMessage);
     });
 
@@ -639,7 +642,7 @@ describe("siteActions", () => {
       createCommit.withArgs(site, expectedPath, expectedCommit).returns(rejectedWithErrorPromise);
 
       const actual = fixture.uploadFile(site, file);
-      
+
       return validateResultDispatchesAlertError(actual, errorMessage);
     });
 
@@ -663,7 +666,7 @@ describe("siteActions", () => {
       return actual.then(() => {
         expect(alertSuccess.calledWith("File uploaded successfully")).to.be.true;
         expect(fetchRepositoryContent.calledWith(site, "assets"));
-      });    
+      });
     });
 
     it("alerts a success and fetches assets when it successfully create a commit with github, with a sha", () => {
@@ -687,7 +690,7 @@ describe("siteActions", () => {
       return actual.then(() => {
         expect(alertSuccess.calledWith("File uploaded successfully")).to.be.true;
         expect(fetchRepositoryContent.calledWith(site, "assets"));
-      });    
+      });
     });
   });
 
@@ -698,87 +701,122 @@ describe("siteActions", () => {
       go: "team!"
     };
 
-    it("triggers an error when creating a pull request fails", () => {
-      createPullRequest.withArgs(site, head, base).returns(rejectedWithErrorPromise);
-
-      const actual = fixture.createPR(site, head, base);
-      
-      return validateResultDispatchesHttpAlertError(actual, errorMessage);
+    beforeEach(() => {
+      const existingPrs = [{
+        head: {
+          ref: 'not-head'
+        }
+      }];
+      const prsPromise = Promise.resolve(existingPrs);
+      fetchPullRequests.withArgs(site).returns(prsPromise);
     });
 
-    it("triggers an error when merging a pull request fails", () => {
-      const prPromise = Promise.resolve(pr);
-      createPullRequest.withArgs(site, head, base).returns(prPromise);
-      mergePullRequest.withArgs(site, pr).returns(rejectedWithErrorPromise);
+    describe('error states', () => {
+      it("triggers an error when creating a pull request fails", () => {
+        createPullRequest.withArgs(site, head, base).returns(rejectedWithErrorPromise);
 
-      const actual = fixture.createPR(site, head, base);
-      
-      return validateResultDispatchesHttpAlertError(actual, errorMessage);
+        const actual = fixture.createPR(site, head, base);
+
+        return validateResultDispatchesHttpAlertError(actual, errorMessage);
+      });
+
+      it("triggers an error when merging a pull request fails", () => {
+        const prPromise = Promise.resolve(pr);
+        createPullRequest.withArgs(site, head, base).returns(prPromise);
+        mergePullRequest.withArgs(site, pr).returns(rejectedWithErrorPromise);
+
+        const actual = fixture.createPR(site, head, base);
+
+        return validateResultDispatchesHttpAlertError(actual, errorMessage);
+      });
+
+      it("triggers an error when deleting a branch fails", () => {
+        const prPromise = Promise.resolve(pr);
+        createPullRequest.withArgs(site, head, base).returns(prPromise);
+        mergePullRequest.withArgs(site, pr).returns("whatever");
+        deleteBranch.withArgs(site, head).returns(rejectedWithErrorPromise);
+
+        const actual = fixture.createPR(site, head, base);
+
+        return validateResultDispatchesHttpAlertError(actual, errorMessage)
+          .then(() => {
+            expect(mergePullRequest.calledWith(site, pr)).to.be.true;
+          });
+      });
+
+      it("triggers an error when fetching a branch fails", () => {
+        const prPromise = Promise.resolve(pr);
+        createPullRequest.withArgs(site, head, base).returns(prPromise);
+        mergePullRequest.withArgs(site, pr).returns("whatever");
+        deleteBranch.withArgs(site, head).returns("ignored, too");
+        fetchBranches.withArgs(site).throws(error);
+
+        const actual = fixture.createPR(site, head, base);
+
+        return validateResultDispatchesHttpAlertError(actual, errorMessage)
+          .then(() => {
+            expect(mergePullRequest.calledWith(site, pr)).to.be.true;
+            expect(deleteBranch.calledWith(site, head)).to.be.true;
+          });
+      });
     });
 
-    it("triggers an error when deleting a branch fails", () => {
-      const prPromise = Promise.resolve(pr);
-      createPullRequest.withArgs(site, head, base).returns(prPromise);
-      mergePullRequest.withArgs(site, pr).returns("whatever");
-      deleteBranch.withArgs(site, head).returns(rejectedWithErrorPromise);
-      
-      const actual = fixture.createPR(site, head, base);
-
-      return validateResultDispatchesHttpAlertError(actual, errorMessage)
-        .then(() => {
-          expect(mergePullRequest.calledWith(site, pr)).to.be.true;
-        });
-    });    
-
-    it("triggers an error when fetching a branch fails", () => {
-      const prPromise = Promise.resolve(pr);
-      createPullRequest.withArgs(site, head, base).returns(prPromise);
-      mergePullRequest.withArgs(site, pr).returns("whatever");
-      deleteBranch.withArgs(site, head).returns("ignored, too");
-      fetchBranches.withArgs(site).throws(error);
-
-      const actual = fixture.createPR(site, head, base);
-
-      return validateResultDispatchesHttpAlertError(actual, errorMessage)
-        .then(() => {
-          expect(mergePullRequest.calledWith(site, pr)).to.be.true;
-          expect(deleteBranch.calledWith(site, head)).to.be.true;
-        });
-    });
-    
-    it("alerts a successful message and returns it when everything works fine", () => {
-      const prPromise = Promise.resolve(pr);
+    describe('success states', () => {
       const expected = "expected thing you might want";
-      createPullRequest.withArgs(site, head, base).returns(prPromise);
-      mergePullRequest.withArgs(site, pr).returns("whatever");
-      deleteBranch.withArgs(site, head).returns("ignored, too");
+      const branches = "branches";
       const siteBranchesReceivedAction = {
         branches: "r us"
       };
-      const branches = "branches";
-      fetchBranches.withArgs(site).returns(Promise.resolve(branches));
-      alertSuccess.withArgs(`${head} merged successfully`).returns(expected);
-      
-      const actual = fixture.createPR(site, head, base);
 
-      return actual
-        .then((result) => {
-          expect(mergePullRequest.calledWith(site, pr)).to.be.true;
-          expect(deleteBranch.calledWith(site, head)).to.be.true;
-          expect(fetchBranches.calledWith(site)).to.be.true;
-          expect(dispatchSiteBranchesReceivedAction.calledWith(siteId, branches)).to.be.true;
-          expect(alertSuccess.calledWith(`${head} merged successfully`)).to.be.true;
-          expect(result).to.equal(expected);
+      beforeEach(() => {
+        mergePullRequest.withArgs(site, pr).returns("whatever");
+        deleteBranch.withArgs(site, head).returns("ignored, too");
+        fetchBranches.withArgs(site).returns(Promise.resolve(branches));
+        alertSuccess.withArgs(`${head} merged successfully`).returns(expected);
+      });
+
+      it('does not create a new branch when one exists', () => {
+        const existingPrs = [{
+          head: {
+            ref: 'head'
+          }
+        }];
+        const prsPromise = Promise.resolve(existingPrs);
+        fetchPullRequests.withArgs(site).returns(prsPromise);
+
+        const actual = fixture.createPR(site, head, base);
+
+        return actual.then((result) => {
+          expect(createPullRequest.calledWith(site, head, base)).to.not.be.true
         });
+      });
+
+      it("alerts a successful message and returns it when everything works fine", () => {
+        const prPromise = Promise.resolve(pr);
+        createPullRequest.withArgs(site, head, base).returns(prPromise);
+
+        const actual = fixture.createPR(site, head, base);
+
+        return actual
+          .then((result) => {
+            expect(createPullRequest.calledWith(site, head, base)).to.be.true;
+            expect(mergePullRequest.calledWith(site, pr)).to.be.true;
+            expect(deleteBranch.calledWith(site, head)).to.be.true;
+            expect(fetchBranches.calledWith(site)).to.be.true;
+            expect(dispatchSiteBranchesReceivedAction.calledWith(siteId, branches)).to.be.true;
+            expect(alertSuccess.calledWith(`${head} merged successfully`)).to.be.true;
+            expect(result).to.equal(expected);
+          });
+      });
     });
   });
-  
+
   describe("fetchSiteConfigsAndAssets", () => {
     it("triggers an error when fetching site configs fails without a runtime error", () => {
       fetchRepositoryConfigs.withArgs(site).returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchSiteConfigsAndAssets(site);
-      
+
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
 
@@ -792,7 +830,7 @@ describe("siteActions", () => {
       fetchRepositoryConfigs.withArgs(site).returns(fakeRuntimeErrorPromise);
 
       const actual = fixture.fetchSiteConfigsAndAssets(site);
-      
+
       return actual.catch((error) => {
         expect(error).to.equal(fakeRuntimeError);
       });
@@ -809,7 +847,7 @@ describe("siteActions", () => {
       fetchRepositoryContent.withArgs(site).returns(filesPromise);
 
       const actual = fixture.fetchSiteConfigsAndAssets(site);
-      
+
       return actual.then((result) => {
         expect(dispatchSiteFilesReceivedAction.calledWith(siteId, files)).to.be.true;
         expect(result).to.equal(files);
@@ -828,17 +866,17 @@ describe("siteActions", () => {
       expectDispatchOfHttpErrorAlert(errorMessage);
     });
   };
-  
+
   const expectDispatchOfHttpErrorAlert = errorMessage => {
     expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
   };
-    
+
   const validateResultDispatchesAlertError = (promise, errorMessage) => {
     return promise.then(() => {
       expectDispatchOfErrorAlert(errorMessage);
     });
   };
-  
+
   const expectDispatchOfErrorAlert = errorMessage => {
     expect(alertError.calledWith(errorMessage)).to.be.true;
   };
