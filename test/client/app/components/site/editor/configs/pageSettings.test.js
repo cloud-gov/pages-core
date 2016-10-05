@@ -9,53 +9,41 @@ proxyquire.noCallThru();
 const PageSettingsForm = () => <div></div>;
 const Codemirror = () => <div></div>;
 
-const parseYaml = (string) => {
-  return string.split('\n').reduce(function(memo, pair) {
-    var keyValue = pair.split(':');
-    memo[keyValue[0]] = keyValue[1];
-    return memo;
-  },{});
-};
-
-const writeYaml = (object) => {
-  return Object.keys(object).reduce((memo, key) => {
-    memo += `${key}:${object[key]}\n`;
-    return memo;
-  },'').trimRight();
-};
-
 const onChange = stub();
 
 describe('<PageSettings />', () => {
   const props = {
-    frontmatter: 'title:squanch\npermalink:/about/\nimage:/assets/img/about.jpg\nlayout:page',
+    frontmatter: 'title: squanch\npermalink: /about/\nimage: /assets/img/about.jpg\nlayout: page',
     templateConfig: 'layouts:\n  - projects\n  - page',
     onChange: onChange
   };
-
-  const Fixture = proxyquire('../../../../../../../assets/app/components/site/editor/configs/pageSettings', {
-    './pageSettingsForm': PageSettingsForm,
-    './codemirror': Codemirror,
-    '../../../../util/parseYaml': { parseYaml, writeYaml }
-  }).default;;
+  const layouts = ['one', 'two'];
 
   const transformedProps = {
-    initialFrontmatterContent: 'permalink:/about/\nimage:/assets/img/about.jpg'
+    initialFrontmatterContent: 'permalink: /about/\nimage: /assets/img/about.jpg\n'
   };
 
+  const configuration = {
+    permalink: '/about/',
+    image: '/assets/img/about.jpg'
+  };
+
+  const fields = [{
+    field: 'select'
+  }, {
+    field: 'input'
+  }];
+
+  let Fixture = proxyquire('../../../../../../../assets/app/components/site/editor/configs/pageSettings', {
+       './pageSettingsForm': PageSettingsForm,
+       './codemirror': Codemirror
+     }).default;
   let wrapper;
 
   beforeEach(() => {
+
+
     wrapper = shallow(<Fixture {...props } />);
-  });
-
-  describe('state', () => {
-    it('maintains a JS object of the frontmatter as internal state', () => {
-      const state = wrapper.state();
-
-      expect(state).not.to.equal(undefined);
-      expect(state).to.deep.equal(parseYaml(props.frontmatter));
-    });
   });
 
   describe('child components', () => {
@@ -96,11 +84,6 @@ describe('<PageSettings />', () => {
       const { onChange } = wrapper.instance().props;
       wrapper.update();
       expect(onChange.calledOnce).to.be.true;
-    });
-
-    it('updates its internal state when handleChange is called', () => {
-      wrapper.update();
-      expect(wrapper.instance().state.layout).to.equal(updateText);
     });
   });
 });

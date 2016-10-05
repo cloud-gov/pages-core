@@ -135,7 +135,7 @@ class Editor extends React.Component {
   buildFile() {
     let { frontmatter, markdown, path, message } = this.state;
     let content = markdown;
-
+    
     if (!path) {
       return alertActions.alertError('File must have a name');
     }

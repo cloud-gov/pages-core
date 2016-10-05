@@ -53,7 +53,7 @@ class Prosemirror extends React.Component {
     const sameContent = (markdown === nextProps.initialMarkdownContent);
     const { selected } = nextProps;
 
-    if (sameContent) return;
+    if (this.toMarkdown()) return;
 
     const doc = this.fromMarkdown(nextProps.initialMarkdownContent);
     this.editor.setDoc(doc);

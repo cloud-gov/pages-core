@@ -28,7 +28,7 @@ class Codemirror extends React.Component {
     const editorValue = this.editor.getValue();
     const {initialFrontmatterContent: frontmatter } = nextProps;
 
-    if (editorValue === frontmatter) return;
+    if (editorValue) return;
 
     this.editor.setValue(frontmatter);
   }
@@ -42,10 +42,11 @@ class Codemirror extends React.Component {
       // We force an update here to ensure the component gets rendered
       // no more than once with the supplied initialMarkdownContent
       this.forceUpdate();
+      rendered = true;
+
       this.editor.on('change', (cm) => {
         this.props.onChange(cm.getValue().trimRight());
       });
-      rendered = true;
     }
 
     // This component should never rerender as prosemirror provides
