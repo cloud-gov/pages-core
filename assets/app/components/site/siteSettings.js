@@ -103,7 +103,7 @@ class SiteSettings extends React.Component {
             <div className="usa-alert usa-alert-info">
               <div className="usa-alert-body">
                 <h3 className="usa-alert-heading">Custom Domain</h3>
-                <p className="usa-alert-text">This origin is used for Federalist to set a custom domain on the 18F side.</p>
+                <p className="usa-alert-text">This read-only origin box is used for Federalist to set a custom domain on the 18F side. Federalist customers only need this information if handling custom URL work directly.</p>
                 <input readOnly type="text" value="" />
               </div>
             </div>
