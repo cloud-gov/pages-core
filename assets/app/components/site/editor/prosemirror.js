@@ -53,7 +53,7 @@ class Prosemirror extends React.Component {
     const sameContent = (markdown === nextProps.initialMarkdownContent);
     const { selected } = nextProps;
 
-    if (sameContent) return;
+    if (this.toMarkdown()) return;
 
     const doc = this.fromMarkdown(nextProps.initialMarkdownContent);
     this.editor.setDoc(doc);
@@ -102,8 +102,8 @@ class Prosemirror extends React.Component {
 
   render() {
     return (
-      <div>
-        <strong>ProseMirror instance</strong>
+      <div className="usa-grid">
+        <label><strong>Page Content</strong></label>
         <div id="js-prosemirror-target" className="editor"></div>
       </div>
     );

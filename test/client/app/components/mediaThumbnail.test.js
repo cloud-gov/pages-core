@@ -1,7 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import { expect } from 'chai';
-import { spy } from 'sinon';
 
 import MediaThumbnail from '../../../../assets/app/components/mediaThumbnail';
 
