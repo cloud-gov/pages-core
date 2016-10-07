@@ -62,6 +62,7 @@
     "watch:client:js": "watchify assets/app/main.js -o assets/js/bundle.js -t [ babelify --presets [ es2015 react stage-2 ] --plugins [ transform-object-assign ] ]",
     "test": "npm run build && npm run test:server && npm run test:client",
     "watch:client:js": "watchify --debug -t brfs assets/app/app.js -o assets/js/bundle.js",
+    "test": "npm run build && npm run test:server && npm run test:client",
     "test:server": "NODE_ENV=test mocha --timeout 60000 test/api/bootstrap.test.js test/api/unit/**/*.test.js",
     "test:client": "mocha --compilers js:babel-register --recursive ./test/client",
     "test:client:watch": "watch 'npm run test:client' ./assets/app ./test/client",
@@ -114,7 +115,8 @@
     "sinon": "1.17.2",
     "watch": "^0.19.2",
     "watchify": "^3.2.2",
-    "webdriverio": "^3.4.0"
+    "webdriverio": "^3.4.0",
+    "yamljs": "^0.2.8"
   },
   "engines": {
     "node": "4.2.3",
