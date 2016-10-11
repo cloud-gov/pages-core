@@ -96,6 +96,7 @@
     "cfenv": "^1.0.0",
     "chai": "^3.5.0",
     "classname": "0.0.0",
+    "core-js": "^2.4.1",
     "enzyme": "^2.4.1",
     "es6-promise": "^4.0.5",
     "eslint": "^2.7.0",
