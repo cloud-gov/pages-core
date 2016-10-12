@@ -7,7 +7,7 @@ proxyquire.noCallThru();
 describe("siteActions", () => {
   let fixture;
   let fetchRepositoryContent, fetchRepositoryConfigs, createCommit, fetchBranches,
-      deleteBranch, createRepo;
+      deleteBranch, createRepo, fetchFile;
   let fetchSites, addSite, updateSite, deleteSite, cloneRepo, createBranch,
       createPullRequest, mergePullRequest, fetchPullRequests;
   let addPathToSite, uploadFileToSite, formatDraftBranchName, findShaForDefaultBranch, convertFileToData,
@@ -45,6 +45,7 @@ describe("siteActions", () => {
     mergePullRequest = stub();
     fetchRepositoryContent = stub();
     fetchRepositoryConfigs = stub();
+    fetchFile = stub();
     createCommit = stub();
     fetchBranches = stub();
     deleteBranch = stub();
@@ -108,6 +109,9 @@ describe("siteActions", () => {
         createBranch: createBranch,
         createPullRequest: createPullRequest,
         mergePullRequest: mergePullRequest
+      },
+      '../util/s3Api': {
+        fetchFile: fetchFile
       },
       "../util/makeCommitData": {
         addPathToSite: addPathToSite,
@@ -297,6 +301,7 @@ describe("siteActions", () => {
       };
       const configsPromise = Promise.resolve(configs);
       fetchRepositoryConfigs.withArgs(site).returns(configsPromise);
+      fetchFile.withArgs(site, 'fileeeeeee.json').returns(configsPromise);
 
       const actual = fixture.fetchSiteConfigs(site);
 

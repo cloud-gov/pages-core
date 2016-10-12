@@ -26,7 +26,7 @@ const s3 =  {
     });
   },
 
-  getFile(site, file) {
+  fetchFile(site, file) {
     return this.fetch(getS3FileURL(site, file), {
       // necessary to not trigger an options request when hitting s3
       headers: {

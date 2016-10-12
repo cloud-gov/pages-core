@@ -76,7 +76,7 @@ export default {
   fetchSiteConfigs(site) {
     return Promise.all([
       github.fetchRepositoryConfigs(site),
-      s3.getFile(site, '_navigation.json')
+      s3.fetchFile(site, '_navigation.json')
     ]).then((values) => {
       const configFilesObj = values.reduce((memo, config) => {
         return Object.assign({}, memo, config);

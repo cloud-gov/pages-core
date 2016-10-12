@@ -52,7 +52,7 @@ export default function sites(state = initialState, action) {
     siteFiles = getFilesForSite(site);
 
     let newFiles = nextFiles.map((file) => {
-      const exists = siteFiles.find((f) => f.path === file.path);
+      const exists = getExistingFileFromSiteWithPath(siteFiles, file.path);
 
       if (!exists) return file;
 
@@ -88,8 +88,10 @@ export default function sites(state = initialState, action) {
 
     // Check to see if this file already exists in the files array.
     // If it doesn't, add it
-    if (!siteFiles.find((f) => f.path === action.file.path)) {
+    if (!getExistingFileFromSiteWithPath(siteFiles, action.file.path)) {
       files = siteFiles.concat(action.file);
+    } else {
+      files = [];
     }
 
     updatedSiteFiles = siteFiles.map((file) => {
@@ -130,4 +132,8 @@ const getSiteWithId = (state, id) => {
 
 const getFilesForSite = (site) => {
   return site.files || [];
+};
+
+const getExistingFileFromSiteWithPath = (files, pathToFind) => {
+  return files.find((file) => file.path === pathToFind);
 };
