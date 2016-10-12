@@ -27,6 +27,7 @@ const parserNodes = Object.assign({}, defaultMarkdownParser.nodes, {
   image: {
     node: "image",
     attrs: tok => ({
+      src: tok.attrGet('src') || null,
       title: tok.attrGet("title") || null,
       alt: tok.children[0] && tok.children[0].content || null
     })}

@@ -2,7 +2,7 @@ import React from 'react';
 import LinkButton from '../../linkButton';
 
 const propTypes = {
-  children: React.PropTypes.oneOf([
+  children: React.PropTypes.oneOfType([
     React.PropTypes.object,
     React.PropTypes.array
   ]),

@@ -77,12 +77,7 @@ const getFilesByPath = (files = [], startingPath = '') => {
 
 const hasNavigationJsonContent = (site) => {
   const navigationJSON = site['_navigation.json'];
-
-  try {
-    return !!JSON.parse(navigationJSON.content);
-  } catch(error) {
-    return false;
-  }
+  return navigationJSON instanceof Array;
 };
 
 Pages.propTypes = propTypes;

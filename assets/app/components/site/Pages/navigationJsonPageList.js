@@ -8,19 +8,17 @@ const propTypes = {
 };
 
 const NavigationJsonContent = ({ site }) => {
-  const pagesConfigurationString = site["_navigation.json"].content;
-  const pagesConfiguration = JSON.parse(pagesConfigurationString);
-  const siteId = site.id;
-  const defaultBranch = site.defaultBranch;
+  const pagesConfiguration = site['_navigation.json'];
+  const { id, defaultBranch, branches = [] } = site;
 
   return (
     <ul className="list-group">
-      { emitPages(pagesConfiguration, siteId, defaultBranch) }
+      { emitPages(pagesConfiguration, id, defaultBranch, branches) }
     </ul>
   );
 };
 
-const emitPages = (pages, siteId, defaultBranch) => {
+const emitPages = (pages, siteId, defaultBranch, branches) => {
   const emitPage = (page, index) => {
     const { title, permalink, href, children, path } = page;
     const pageListItemHref = getLinkFor(href, siteId, defaultBranch);
@@ -31,7 +29,7 @@ const emitPages = (pages, siteId, defaultBranch) => {
         pageName={ title }
         href={ pageListItemHref }
         isPageDirectory={ false }
-        hasDraft={ pathHasDraft(page.path, site.branches) }
+        hasDraft={ pathHasDraft(page.path, branches) }
       >
         { emitChildren(children, siteId, defaultBranch) }
       </PageListItem>

@@ -108,7 +108,7 @@ const github = {
   },
 
   fetchRepositoryConfigs(site) {
-    const configFiles = ['_config.yml', '_navigation.json'];
+    const configFiles = ['_config.yml'];
 
     const configFetches = configFiles.map((path) => {
       return this.fetchRepositoryContent(site, path);

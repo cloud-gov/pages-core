@@ -1,5 +1,6 @@
 import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
+import s3 from '../util/s3Api';
 import convertFileToData from '../util/convertFileToData';
 import alertActions from './alertActions';
 import { addPathToSite, uploadFileToSite } from "../util/makeCommitData";
@@ -73,9 +74,16 @@ export default {
   },
 
   fetchSiteConfigs(site) {
-    return github.fetchRepositoryConfigs(site)
-      .then(dispatchSiteConfigsReceivedAction.bind(null, site.id))
-      .then(() => site);
+    return Promise.all([
+      github.fetchRepositoryConfigs(site),
+      s3.getFile(site, '_navigation.json')
+    ]).then((values) => {
+      const configFilesObj = values.reduce((memo, config) => {
+        return Object.assign({}, memo, config);
+      }, {});
+
+      dispatchSiteConfigsReceivedAction(site.id, configFilesObj);
+    }).then(() => site);
   },
 
   createCommit(site, path, fileData, message = false, sha = false) {
