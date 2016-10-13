@@ -299,9 +299,29 @@ describe("siteActions", () => {
         fee: "fie",
         fo: "fum"
       };
+
       const configsPromise = Promise.resolve(configs);
       fetchRepositoryConfigs.withArgs(site).returns(configsPromise);
-      fetchFile.withArgs(site, 'fileeeeeee.json').returns(configsPromise);
+      fetchFile.withArgs(site, '_navigation.json').returns(configsPromise);
+
+      const actual = fixture.fetchSiteConfigs(site);
+
+      return actual.then((result) => {
+        expect(dispatchSiteConfigsReceivedAction.calledWith(siteId, configs)).to.be.true;
+        expect(result).to.equal(site);
+      });
+    });
+
+    it("returns only the config if fetching navigation.json fails", () => {
+      const configs = {
+        fee: "fie",
+        fo: "fum"
+      };
+      const resolvedPromise = Promise.resolve(configs);
+      const rejectedPromise = Promise.reject('Try again');
+
+      fetchRepositoryConfigs.withArgs(site).returns(resolvedPromise);
+      fetchFile.withArgs(site, '_navigation.json').returns(rejectedPromise);
 
       const actual = fixture.fetchSiteConfigs(site);
 
@@ -847,7 +867,9 @@ describe("siteActions", () => {
       }];
       const sitePromise = Promise.resolve(site);
       const filesPromise = Promise.resolve(files);
+
       fetchRepositoryConfigs.withArgs(site).returns(sitePromise);
+      fetchFile.withArgs(site, '_navigation.json').returns(sitePromise);
       fetchBranches.withArgs(site).returns(sitePromise);
       fetchRepositoryContent.withArgs(site).returns(filesPromise);
 

@@ -74,16 +74,27 @@ export default {
   },
 
   fetchSiteConfigs(site) {
-    return Promise.all([
-      github.fetchRepositoryConfigs(site),
-      s3.fetchFile(site, '_navigation.json')
-    ]).then((values) => {
-      const configFilesObj = values.reduce((memo, config) => {
+    function getFileFromS3(config) {
+      return s3.fetchFile(site, '_navigation.json').then((navigation) => {
+        return [config, navigation];
+      }).catch((error) => {
+        return [config];
+      });
+    }
+
+    function mergeConfigAndNavigation(configs) {
+      return configs.reduce((memo, config) => {
         return Object.assign({}, memo, config);
       }, {});
+    }
 
-      dispatchSiteConfigsReceivedAction(site.id, configFilesObj);
-    }).then(() => site);
+    return github.fetchRepositoryConfigs(site)
+      .then(getFileFromS3)
+      .then(mergeConfigAndNavigation)
+      .then((configsObj) => {
+        return dispatchSiteConfigsReceivedAction(site.id, configsObj);
+      })
+      .then(() => site);
   },
 
   createCommit(site, path, fileData, message = false, sha = false) {
@@ -181,7 +192,6 @@ export default {
       return github.fetchRepositoryContent(site);
     }).then((files) => {
       dispatchSiteFilesReceivedAction(site.id, files);
-
       return files;
     }).catch((error) => {
       // TODO: make a generic catch handler that will only
