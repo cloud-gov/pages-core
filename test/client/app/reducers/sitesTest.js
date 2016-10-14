@@ -628,27 +628,22 @@ describe("sitesReducer", () => {
 
   it("returns site's exisiting files if action.files is missing and site has files", () => {
     const siteOne = {
-      id: "siteToKeep",
+      id: 1,
       files: [{path: 'test'}]
     };
 
     const siteTwo = {
-      id: "anotherSiteToKeep"
+      id: 2
     };
 
     const existingSites = [ siteOne, siteTwo ];
 
     const actual = fixture(existingSites, {
       type: SITE_FILES_RECEIVED,
-      siteId: "siteToKeep"
+      siteId: 1
     });
 
-    const updatedSiteOne = {
-      id: "siteToKeep",
-      files: [{path: 'test'}]
-    };
-
-    expect(actual).to.deep.equal([ updatedSiteOne, siteTwo ]);
+    expect(actual).to.deep.equal(existingSites)
   });
 
   it("updates a site's file with a content attribute if it is found", function() {
@@ -658,6 +653,7 @@ describe("sitesReducer", () => {
       id: "siteToKeep",
       files: [
         {
+          path: 'radpath',
           sha: fileSha,
           oldData: "this should make it all the way through"
         }
@@ -670,6 +666,7 @@ describe("sitesReducer", () => {
       type: SITE_FILE_CONTENT_RECEIVED,
       siteId: "siteToKeep",
       file: {
+        path: 'radpath',
         sha: fileSha,
         content: fileContent
       }
@@ -758,6 +755,7 @@ describe("sitesReducer", () => {
 
   it("adds a file to a site if it is not found in the state when the request for content comes back from the github api", function() {
     const file = {
+      path: 'path/to/file',
       sha: "this is a cool sha",
       content: "yo dude, here's some content"
     }

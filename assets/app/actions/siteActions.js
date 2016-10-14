@@ -1,5 +1,6 @@
 import federalist from '../util/federalistApi';
 import github from '../util/githubApi';
+import s3 from '../util/s3Api';
 import convertFileToData from '../util/convertFileToData';
 import alertActions from './alertActions';
 import { addPathToSite, uploadFileToSite } from "../util/makeCommitData";
@@ -73,8 +74,26 @@ export default {
   },
 
   fetchSiteConfigs(site) {
+    function getFileFromS3(config) {
+      return s3.fetchFile(site, '_navigation.json').then((navigation) => {
+        return [config, navigation];
+      }).catch((error) => {
+        return [config];
+      });
+    }
+
+    function mergeConfigAndNavigation(configs) {
+      return configs.reduce((memo, config) => {
+        return Object.assign({}, memo, config);
+      }, {});
+    }
+
     return github.fetchRepositoryConfigs(site)
-      .then(dispatchSiteConfigsReceivedAction.bind(null, site.id))
+      .then(getFileFromS3)
+      .then(mergeConfigAndNavigation)
+      .then((configsObj) => {
+        return dispatchSiteConfigsReceivedAction(site.id, configsObj);
+      })
       .then(() => site);
   },
 
@@ -173,7 +192,6 @@ export default {
       return github.fetchRepositoryContent(site);
     }).then((files) => {
       dispatchSiteFilesReceivedAction(site.id, files);
-
       return files;
     }).catch((error) => {
       // TODO: make a generic catch handler that will only

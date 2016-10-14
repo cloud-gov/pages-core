@@ -52,7 +52,7 @@ export default function sites(state = initialState, action) {
     siteFiles = getFilesForSite(site);
 
     let newFiles = nextFiles.map((file) => {
-      const exists = siteFiles.find((f) => f.path === file.path);
+      const exists = getExistingFileFromSiteWithPath(siteFiles, file.path);
 
       if (!exists) return file;
 
@@ -65,6 +65,7 @@ export default function sites(state = initialState, action) {
       return Object.assign({}, exists, file);
     });
 
+    // get files that were in original site.files but not in the nextFiles array
     let leftBehind = siteFiles.filter((file) => {
       const added = newFiles.find((f) => f.path === file.path);
       return !added
@@ -82,17 +83,27 @@ export default function sites(state = initialState, action) {
     const currentSite = getSiteWithId(state, action.siteId);
     // get list of files associated with the current site
     const siteFiles = getFilesForSite(currentSite);
+    let updatedSiteFiles;
+    let files;
 
-    let files = siteFiles.map((file) => {
+    // Check to see if this file already exists in the files array.
+    // If it doesn't, add it
+    if (!getExistingFileFromSiteWithPath(siteFiles, action.file.path)) {
+      files = siteFiles.concat(action.file);
+    } else {
+      files = [];
+    }
+
+    updatedSiteFiles = siteFiles.map((file) => {
       if (file.path !== action.file.path) return file;
       // if the path of the fetched file is equivalent to a path of an existing file,
       // replace it.
       return Object.assign({}, file, action.file);
     });
 
-    if (!files.length) files = [action.file];
-
-    return mapPropertyToMatchingSite(state, action.siteId, {files});
+    return mapPropertyToMatchingSite(state, action.siteId, {
+      files: files.concat(updatedSiteFiles)
+    });
 
   default:
     return state;
@@ -121,4 +132,8 @@ const getSiteWithId = (state, id) => {
 
 const getFilesForSite = (site) => {
   return site.files || [];
+};
+
+const getExistingFileFromSiteWithPath = (files, pathToFind) => {
+  return files.find((file) => file.path === pathToFind);
 };

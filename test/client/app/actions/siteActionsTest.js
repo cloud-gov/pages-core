@@ -7,7 +7,7 @@ proxyquire.noCallThru();
 describe("siteActions", () => {
   let fixture;
   let fetchRepositoryContent, fetchRepositoryConfigs, createCommit, fetchBranches,
-      deleteBranch, createRepo;
+      deleteBranch, createRepo, fetchFile;
   let fetchSites, addSite, updateSite, deleteSite, cloneRepo, createBranch,
       createPullRequest, mergePullRequest, fetchPullRequests;
   let addPathToSite, uploadFileToSite, formatDraftBranchName, findShaForDefaultBranch, convertFileToData,
@@ -45,6 +45,7 @@ describe("siteActions", () => {
     mergePullRequest = stub();
     fetchRepositoryContent = stub();
     fetchRepositoryConfigs = stub();
+    fetchFile = stub();
     createCommit = stub();
     fetchBranches = stub();
     deleteBranch = stub();
@@ -108,6 +109,9 @@ describe("siteActions", () => {
         createBranch: createBranch,
         createPullRequest: createPullRequest,
         mergePullRequest: mergePullRequest
+      },
+      '../util/s3Api': {
+        fetchFile: fetchFile
       },
       "../util/makeCommitData": {
         addPathToSite: addPathToSite,
@@ -295,8 +299,29 @@ describe("siteActions", () => {
         fee: "fie",
         fo: "fum"
       };
+
       const configsPromise = Promise.resolve(configs);
       fetchRepositoryConfigs.withArgs(site).returns(configsPromise);
+      fetchFile.withArgs(site, '_navigation.json').returns(configsPromise);
+
+      const actual = fixture.fetchSiteConfigs(site);
+
+      return actual.then((result) => {
+        expect(dispatchSiteConfigsReceivedAction.calledWith(siteId, configs)).to.be.true;
+        expect(result).to.equal(site);
+      });
+    });
+
+    it("returns only the config if fetching navigation.json fails", () => {
+      const configs = {
+        fee: "fie",
+        fo: "fum"
+      };
+      const resolvedPromise = Promise.resolve(configs);
+      const rejectedPromise = Promise.reject('Try again');
+
+      fetchRepositoryConfigs.withArgs(site).returns(resolvedPromise);
+      fetchFile.withArgs(site, '_navigation.json').returns(rejectedPromise);
 
       const actual = fixture.fetchSiteConfigs(site);
 
@@ -842,7 +867,9 @@ describe("siteActions", () => {
       }];
       const sitePromise = Promise.resolve(site);
       const filesPromise = Promise.resolve(files);
+
       fetchRepositoryConfigs.withArgs(site).returns(sitePromise);
+      fetchFile.withArgs(site, '_navigation.json').returns(sitePromise);
       fetchBranches.withArgs(site).returns(sitePromise);
       fetchRepositoryContent.withArgs(site).returns(filesPromise);
 
