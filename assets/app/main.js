@@ -1,4 +1,3 @@
-
 import { render } from 'react-dom';
 import React from 'react';
 import { Router, browserHistory } from 'react-router';
@@ -10,7 +9,7 @@ import userActions from './actions/userActions';
 import routes from './routes';
 import store from './store';
 import Provider from './util/provider';
-
+require('es6-promise').polyfill();
 const mainEl = document.querySelector('#js-app');
 
 store.subscribe(() => {
