@@ -31,7 +31,7 @@ const emitPages = (pages, siteId, defaultBranch, branches) => {
         isPageDirectory={ false }
         hasDraft={ pathHasDraft(page.path, branches) }
       >
-        { emitChildren(children, siteId, defaultBranch) }
+        { emitChildren(children, siteId, defaultBranch, branches) }
       </PageListItem>
     );
   };
@@ -43,11 +43,11 @@ const getLinkFor = (href, siteId, defaultBranch) => {
   return `/sites/${siteId}/edit/${defaultBranch}/${href}`;
 };
 
-const emitChildren = (children, siteId, defaultBranch) => {
+const emitChildren = (children, siteId, defaultBranch, branches) => {
   if (children) {
     return (
       <ul className="list-group">
-        { emitPages(children, siteId, defaultBranch) }
+        { emitPages(children, siteId, defaultBranch, branches) }
       </ul>
     );
   }
