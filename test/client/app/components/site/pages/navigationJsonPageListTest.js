@@ -10,10 +10,10 @@ describe("navigationJsonPageList", () => {
   let Fixture;
   let pathHasDraft;
   const pageListItem = () => <div>pageListItem</div>;
-  
+
   beforeEach(() => {
     pathHasDraft = stub();
-    Fixture = proxyquire('../../../../../../assets/app/components/site/Pages/navigationJsonPageList', {
+    Fixture = proxyquire('../../../../../../assets/app/components/site/pages/navigationJsonPageList', {
       '../../../util/branchFormatter': {
         pathHasDraft: pathHasDraft
       },
@@ -44,7 +44,7 @@ describe("navigationJsonPageList", () => {
     // super-coupled.
     const linkForHref = `/sites/${siteId}/edit/${defaultBranch}/${href}`;
     pathHasDraft.withArgs(path, branches).returns(false);
-    
+
     const reactWrapper = shallow(<Fixture site={ site }/>);
 
     const pageListItemElement = reactWrapper.find(pageListItem);
@@ -88,7 +88,7 @@ describe("navigationJsonPageList", () => {
     const linkForHref2 = `/sites/${siteId}/edit/${defaultBranch}/${href2}`;
     pathHasDraft.withArgs(path, branches).returns(true);
     pathHasDraft.withArgs(path2, branches).returns(false);
-    
+
     const reactWrapper = shallow(<Fixture site={ site }/>);
 
     const pageListItemElements = reactWrapper.find(pageListItem);
@@ -141,7 +141,7 @@ describe("navigationJsonPageList", () => {
     const linkForHref2 = `/sites/${siteId}/edit/${defaultBranch}/${href2}`;
     pathHasDraft.withArgs(path, branches).returns(true);
     pathHasDraft.withArgs(path2, branches).returns(false);
-    
+
     const reactWrapper = shallow(<Fixture site={ site }/>);
 
     const pageListItemElements = reactWrapper.find(pageListItem);
@@ -149,7 +149,7 @@ describe("navigationJsonPageList", () => {
     const parent = pageListItemElements.at(0);
     const children = parent.children();
     const child = children.find(pageListItem);
-    
+
     expect(parent.prop("pageName")).to.equal(title);
     expect(parent.prop("href")).to.equal(linkForHref);
     expect(parent.prop("hasDraft")).to.equal(true);
