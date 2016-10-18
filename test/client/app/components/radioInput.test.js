@@ -42,8 +42,8 @@ describe('<RadioInput/>', () => {
       const checkedInputProps = Object.assign({}, props, {checked: true});
       const checkedInputWrapper = shallow(<RadioInput {...checkedInputProps}/>);
 
-      expect(/checked/.test(wrapper.find('input'))).to.be.false;
-      expect(checkedInputWrapper.find('input[checked=""]')).to.have.length(1);
+      expect(/checked/.test(wrapper.html())).to.be.false;
+      expect(/checked/.test(checkedInputWrapper.html())).to.be.true;
     });
   });
 
