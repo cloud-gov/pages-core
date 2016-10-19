@@ -1,7 +1,9 @@
 /*
  * Settings the build process
  */
-var env = require('../services/environment.js')();
+var envFn = require('../services/environment.js');
+var env = envFn();
+var s3Bucket = (envFn(`federalist-${process.env.NODE_ENV}-s3`) || {}).bucket;
 
 module.exports.build = {
   tempDir: env.FEDERALIST_TEMP_DIR || './.tmp',
@@ -12,7 +14,7 @@ module.exports.build = {
   token: env.FEDERALIST_BUILD_TOKEN,
   awsBuildKey: env.FEDERALIST_AWS_BUILD_KEY,
   awsBuildSecret: env.FEDERALIST_AWS_BUILD_SECRET,
-  s3Bucket: env.FEDERALIST_S3_BUCKET,
+  s3Bucket: s3Bucket || env.FEDERALIST_S3_BUCKET,
   sqsQueue: env.FEDERALIST_SQS_QUEUE,
   containerName: env.FEDERALIST_ECS_CONTAINER || 'builder'
 };
