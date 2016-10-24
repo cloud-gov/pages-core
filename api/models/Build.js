@@ -37,6 +37,7 @@ module.exports = {
   },
 
   afterCreate: function(model, done) {
+    sails.log.verbose('after create hook called for Build');
     if (Build.publishCreate) Build.publishCreate(model);
     // Use SQS for queue if available
     var queue = sails.config.build.sqsQueue ? SQS : this;
@@ -44,15 +45,20 @@ module.exports = {
       .populate('site')
       .populate('user')
       .exec(function(err, model) {
+        sails.log.verbose('Build exists?', err, model);
         if (err && done) return done(err, model);
         if (err) return sails.log.error(err);
         if (!model && done) return done();
         // Additional query since we need to populate a 2nd level association
         Passport.findOne({ user: model.user.id })
           .exec(function(err, passport) {
+            sails.log.verbose('User exists?', err, model);
             if (err && done) return done(err, model);
             if (err) return sails.log.error(err);
             model.user.passport = passport;
+
+            sails.log.verbose('Adding job to sqs queue with build: ', model);
+
             queue.addJob(model);
             if (done) return done();
           });
@@ -104,6 +110,7 @@ module.exports = {
    * @param {Boolean} skipped build?
    */
   completeJob: function(err, model, skip) {
+    sails.log.verbose('IS there a model?', model);
     if (!model) return;
     sails.log.verbose('Completed job: ', model.id);
 
@@ -113,10 +120,13 @@ module.exports = {
 
     // Load model if only attributes are present
     if (typeof model.save === 'function') {
+      sails.log.verbose('WE are in the model.save === function block');
       if (err) return next(err, model);
       next(null, model);
     } else {
+      sails.log.verbose('Model.save is not a function, so find it')
       Build.findOne(model.id).exec(function(error, model) {
+        sails.log.verbose('Did we find the model? error:', error, 'model:', model);
         if (err) return next(err, model);
         if (error) return next(error, model);
         next(null, model);
@@ -139,9 +149,10 @@ module.exports = {
 
       // Add error message if it exists
       model.error = error;
-
+      sails.log.verbose('Ok time to save');
       // Save updated model
       model.save(function(err) {
+        sails.log.verbose('was there an error saving?', err);
         // We expect an error on first build after clone so do nothing
       });
 

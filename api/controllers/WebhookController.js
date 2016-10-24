@@ -39,12 +39,14 @@ module.exports = {
 
       // Find a matching user
       user: function(next) {
+        sails.log.verbose('Getting user from payload');
         var record = { username: payload.sender.login };
         User.findOrCreate(record, record, next);
       },
 
       // Find a matching site
       site: function(next) {
+        sails.log.verbose('getting site for repo: ', payload.repository);
         Site.findOne({
           owner: payload.repository.full_name.split('/')[0],
           repository: payload.repository.full_name.split('/')[1]
@@ -52,15 +54,16 @@ module.exports = {
       }
 
     }, function(err, data) {
-
+      sails.log.verbose('callback called');
       // Abort if no matching user or site found
       if (err) return sails.log.warn('Unable to set up build: ', err);
 
       // Set branch
       data.branch = payload.ref.replace('refs/heads/', '');
-
+      sails.log.verbose('about to create a build using site: ', data.site);
       // Create a new build
       Build.create(data, function(err) {
+        sails.log.verbose('creating a build?', err);
         if (err) return sails.log.warn('Unable to create build: ', err);
       });
 

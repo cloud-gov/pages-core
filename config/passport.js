@@ -14,6 +14,8 @@
  * http://passportjs.org/guide/providers/
  */
 
+var env = require('../services/environment.js')();
+
 module.exports.passport = {
   local: {
     strategy: require('passport-local').Strategy
@@ -38,9 +40,9 @@ module.exports.passport = {
     protocol: 'oauth2',
     strategy: require('passport-github').Strategy,
     options: {
-      clientID: process.env.GITHUB_CLIENT_ID || 'not_set',
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || 'not_set',
-      callbackURL: process.env.GITHUB_CLIENT_CALLBACK_URL || 'not_set',
+      clientID: env.GITHUB_CLIENT_ID || 'not_set',
+      clientSecret: env.GITHUB_CLIENT_SECRET || 'not_set',
+      callbackURL: env.GITHUB_CLIENT_CALLBACK_URL || 'not_set',
       scope: ['user', 'repo']
     },
     // IDs for approved organizations
