@@ -5,7 +5,8 @@ var AWS = require('aws-sdk'),
     AWSCreds = appEnv.getServiceCreds('federalist-staging-s3') ||
       appEnv.getServiceCreds('federalist-staging-env'),
     redisCreds = appEnv.getServiceCreds('federalist-staging-redis');
-
+console.log('HEY ARE WE RUNNING STAGING\n\n\n\n\n\n');
+console.log('DOES THIS EXIST', dbURL, '\n\n\n\n\n\n\n\n\n');
 var _ = require('underscore');
 var session = {
   cookie: {
@@ -34,6 +35,7 @@ module.exports = {
 
 // If running in Cloud Foundry with a service database available, use it
 if (dbURL) {
+
   module.exports.connections = {
     postgres: {
       adapter: 'sails-postgresql',
