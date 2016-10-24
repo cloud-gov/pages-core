@@ -9,16 +9,17 @@ import {
   siteFilesReceived as createSiteFilesReceivedAction,
   siteConfigsReceived as createSiteConfigsReceivedAction,
   siteBranchesReceived as createSiteBranchesReceivedAction
-} from "./actionCreators/siteActions";
+} from './actionCreators/siteActions';
+import { pushHistory, replaceHistory } from './routeActions';
 
-import { updateRouter as createUpdateRouterAction } from "./actionCreators/navigationActions";
 
+console.log('HELLO', pushHistory, replaceHistory );
 const updateRouterToSitesUri = () => {
-  dispatch(createUpdateRouterAction(`/sites`));
+  dispatch(pushHistory(`/sites`));
 };
 
 const updateRouterToSpecificSiteUri = siteId => {
-  dispatch(createUpdateRouterAction(`/sites/${siteId}`));
+  dispatch(pushHistory(`/sites/${siteId}`));
 };
 
 const dispatchSitesReceivedAction = sites => {
@@ -51,11 +52,11 @@ const dispatchSiteFilesReceivedAction = (siteId, files) => {
 
 const dispatchSiteConfigsReceivedAction = (siteId, configs) => {
   dispatch(createSiteConfigsReceivedAction(siteId, configs));
-};    
+};
 
 const dispatchSiteBranchesReceivedAction = (siteId, branches) => {
   dispatch(createSiteBranchesReceivedAction(siteId, branches));
-};    
+};
 
 export {
   updateRouterToSitesUri,

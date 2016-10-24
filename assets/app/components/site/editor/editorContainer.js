@@ -15,7 +15,7 @@ import {
 
 import alertActions from '../../../actions/alertActions';
 import siteActions from '../../../actions/siteActions';
-import routeActions from '../../../actions/routeActions';
+import { pushHistory, replaceHistory } from '../../../actions/routeActions';
 
 const propTypes = {
   site: React.PropTypes.shape({
@@ -32,12 +32,12 @@ const propTypes = {
 };
 
 const redirectToFileOnBranch = (siteId, branch, filePath) => {
-  routeActions.replaceHistory(`/sites/${siteId}/edit/${branch}/${filePath}`);
+  replaceHistory(`/sites/${siteId}/edit/${branch}/${filePath}`);
 };
 
 const alertAndRedirect = (message, uri) => {
   alertActions.alertSuccess(message);
-  routeActions.pushHistory(uri);
+  pushHistory(uri);
 };
 
 let insertFn;
@@ -161,7 +161,7 @@ class Editor extends React.Component {
     return this.submitFile(branchName).then(() => {
       return siteActions.createPR(site, branchName, site.defaultBranch);
     }).then(() => {
-      routeActions.pushHistory(`/sites/${site.id}`);
+      pushHistory(`/sites/${site.id}`);
     });
   }
 

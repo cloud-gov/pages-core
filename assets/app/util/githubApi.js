@@ -185,21 +185,10 @@ const github = {
    */
   createRepo(destination, source) {
     const token = getToken();
-    /**
-     * Issue an OPTIONS request to determine if the source repository to be
-     * cloned exists on github.
-     * @param  {String} owner Github username associated with the repo
-     * @param  {String} repo  Name of the repository to be cloned
-     * @return {Promise}
-     */
-    function checkSourceRepo(owner, repo) {
-      const params = {
-        access_token: token
-      };
-      const sourceUrl = `repos/${owner}/${repo}`;
-
-      return this.fetch(sourceUrl, { params });
-    }
+    const params = {
+      access_token: token
+    };
+    const sourceUrl = `repos/${source.owner}/${source.repo}`;
 
     /**
      * Issue a POST request to github to create a new repository for the user
@@ -225,8 +214,8 @@ const github = {
       });
     }
 
-    return checkSourceRepo(source.owner, source.repo)
-      .then(() => createRepo(destination));
+    return this.fetch(sourceUrl, { params })
+      .then(createRepo.bind(this, destination));
   }
 }
 

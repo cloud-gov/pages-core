@@ -4,12 +4,12 @@ import {
   replaceRouterHistory as createReplaceHistoryRouterAction
 } from "./actionCreators/navigationActions";
 
-export default {
-  pushHistory(path, method) {
-    dispatch(createPushHistoryRouterAction(path));
-  },
-
-  replaceHistory(path) {
-    dispatch(createReplaceHistoryRouterAction(path));
-  }
+const pushHistory = (path) => {
+  dispatch(createPushHistoryRouterAction(path));
 };
+
+const replaceHistory = (path) => {
+  dispatch(createReplaceHistoryRouterAction(path));
+};
+
+export { pushHistory, replaceHistory };
