@@ -1,13 +1,12 @@
 var fs = require('fs'),
     url = require('url'),
     AWS = require('aws-sdk'),
-    sqs = sails.SQS,
+    sqs = sails.config.SQS,
     queueUrl = sails.config.build.sqsQueue,
     awsKey = sails.config.build.awsBuildKey,
     awsSecret = sails.config.build.awsBuildSecret;
 
 module.exports = {
-
   addJob: function(model) {
     var defaultBranch = model.branch === model.site.defaultBranch,
         tokensBase = {
@@ -31,8 +30,7 @@ module.exports = {
             tokensBase.owner + '/' +
             tokensBase.repository +
             tokensBase.branchURL,
-          callback: [sails.config.build.callback,
-            model.id + '/' + sails.config.build.token].join('/')
+          callback: `${sails.config.build.callback}${model.id}/${sails.config.build.token}`
         }),
         body = {
           environment: [
@@ -65,7 +63,7 @@ module.exports = {
 
     params.MessageBody = JSON.stringify(body);
 
-    sails.log.verbose('SQS payload build');
+    sails.log.verbose('SQS payload build', tokens.callback);
 
     sqs.sendMessage(params, function(err, data) {
       sails.log.verbose('message sent with error? and data', err, data);
