@@ -4,7 +4,8 @@ var fs = require('fs'),
     sqs = sails.config.SQS,
     queueUrl = sails.config.build.sqsQueue,
     awsKey = sails.config.build.awsBuildKey,
-    awsSecret = sails.config.build.awsBuildSecret;
+    awsSecret = sails.config.build.awsBuildSecret,
+    awsRegion = sails.config.build.awsRegion;
 
 module.exports = {
   addJob: function(model) {
@@ -34,6 +35,7 @@ module.exports = {
         }),
         body = {
           environment: [
+            { "name": "AWS_DEFAULT_REGION", "value": awsRegion },
             { "name": "AWS_ACCESS_KEY_ID", "value": awsKey },
             { "name": "AWS_SECRET_ACCESS_KEY", "value": awsSecret },
             { "name": "CALLBACK", "value": tokens.callback },
