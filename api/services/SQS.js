@@ -63,7 +63,7 @@ module.exports = {
 
     params.MessageBody = JSON.stringify(body);
 
-    sails.log.verbose('SQS payload build', tokens.callback);
+    sails.log.verbose('SQS payload build', tokens.callback, sails.config.build.s3Bucket, awsKey);
 
     sqs.sendMessage(params, function(err, data) {
       sails.log.verbose('message sent with error? and data', err, data);
