@@ -1,7 +1,7 @@
 var fs = require('fs'),
     url = require('url'),
     AWS = require('aws-sdk'),
-    sqs = new AWS.SQS(),
+    sqs = sails.SQS,
     queueUrl = sails.config.build.sqsQueue,
     awsKey = sails.config.build.awsBuildKey,
     awsSecret = sails.config.build.awsBuildSecret;

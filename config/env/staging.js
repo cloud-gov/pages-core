@@ -2,11 +2,10 @@ var AWS = require('aws-sdk'),
     cfenv = require('cfenv'),
     appEnv = cfenv.getAppEnv(),
     dbURL = appEnv.getServiceURL('federalist-staging-rds'),
-    AWSCreds = appEnv.getServiceCreds('federalist-staging-s3') ||
-      appEnv.getServiceCreds('federalist-staging-env'),
+    AWS_SQS_CREDS = appEnv.getServiceCreds('federalist-staging-env'),
+    AWS_S3_CREDS = appEnv.getServiceCreds('federalist-staging-s3'),
     redisCreds = appEnv.getServiceCreds('federalist-staging-redis');
-console.log('HEY ARE WE RUNNING STAGING\n\n\n\n\n\n');
-console.log('DOES THIS EXIST', dbURL, '\n\n\n\n\n\n\n\n\n');
+
 var _ = require('underscore');
 var session = {
   cookie: {
@@ -35,7 +34,6 @@ module.exports = {
 
 // If running in Cloud Foundry with a service database available, use it
 if (dbURL) {
-
   module.exports.connections = {
     postgres: {
       adapter: 'sails-postgresql',
@@ -48,11 +46,17 @@ if (dbURL) {
 }
 
 // If running in Cloud Foundry with an S3 credential service available
-if (AWSCreds) {
-  AWS.config.update({
-    accessKeyId: AWSCreds.FEDERALIST_AWS_BUILD_KEY,
-    secretAccessKey: AWSCreds.FEDERALIST_AWS_BUILD_SECRET,
-    region: AWSCreds.region || 'us-east-1'
+if (AWS_SQS_CREDS && AWS_S3_CREDS) {
+  module.exports.SQS = new AWS.SQS({
+    accessKeyId: AWS_SQS_CREDS.FEDERALIST_AWS_BUILD_KEY,
+    secretAccessKey: AWS_SQS_CREDS.FEDERALIST_AWS_BUILD_SECRET,
+    region: 'us-east-1'
+  });
+
+  module.exports.S3 = new AWS.S3({
+    accessKeyId: AWS_S3_CREDS.access_key_id,
+    secretAccessKey: AWS_S3_CREDS.secret_access_key,
+    region: AWS_S3_CREDS.region
   });
 }
 
