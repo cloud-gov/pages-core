@@ -13,7 +13,7 @@ services:
 - federalist-staging-s3
 - federalist-staging-env
 env:
-  NODE_ENV: staging
+  NODE_ENV: production
   SAILS_LOG_LEVEL: verbose
   NPM_CONFIG_PRODUCTION: false
   NODE_MODULES_CACHE: false
