@@ -2,9 +2,10 @@
 applications:
 - name: federalist-staging
 buildpack: https://github.com/cloudfoundry/nodejs-buildpack#v1.5.4
+stack: cflinuxfs2
 domain: fr.cloud.gov
 disk_quota: 2G
-memory: 512MB
+memory: 1G
 instances: 2
 services:
 - federalist-staging-rds
@@ -12,7 +13,7 @@ services:
 - federalist-staging-s3
 - federalist-staging-env
 env:
-  NODE_ENV: staging
+  NODE_ENV: production
   SAILS_LOG_LEVEL: verbose
   NPM_CONFIG_PRODUCTION: false
   NODE_MODULES_CACHE: false
