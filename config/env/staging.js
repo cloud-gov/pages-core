@@ -58,6 +58,8 @@ if (AWS_SQS_CREDS && AWS_S3_CREDS) {
     secretAccessKey: AWS_S3_CREDS.secret_access_key,
     region: AWS_S3_CREDS.region
   });
+} else {
+  console.log('You didn\'t define AWS user credentials for either SQS or S3!\n');
 }
 
 // If running in Cloud Foundry with a redis service
