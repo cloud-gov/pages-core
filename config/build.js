@@ -1,7 +1,9 @@
 /*
  * Settings the build process
  */
-var env = require('../services/environment.js')();
+var envFn = require('../services/environment.js');
+var env = envFn();
+var s3Creds = (envFn(`federalist-${process.env.NODE_ENV}-s3`) || {});
 
 module.exports.build = {
   tempDir: env.FEDERALIST_TEMP_DIR || './.tmp',
@@ -10,9 +12,12 @@ module.exports.build = {
   cacheControl: env.FEDERALIST_CACHE_CONTROL || 'max-age=60',
   callback: env.FEDERALIST_BUILD_CALLBACK || 'http://localhost:1337/build/status/',
   token: env.FEDERALIST_BUILD_TOKEN,
-  awsBuildKey: env.FEDERALIST_AWS_BUILD_KEY,
-  awsBuildSecret: env.FEDERALIST_AWS_BUILD_SECRET,
-  s3Bucket: env.FEDERALIST_S3_BUCKET,
+  // s3 creds
+  awsBuildKey: s3Creds.access_key_id || env.FEDERALIST_AWS_BUILD_KEY,
+  awsBuildSecret: s3Creds.secret_access_key || env.FEDERALIST_AWS_BUILD_SECRET,
+  s3Bucket: s3Creds.bucket || env.FEDERALIST_S3_BUCKET,
+  awsRegion: s3Creds.region || 'us-east-1',
+
   sqsQueue: env.FEDERALIST_SQS_QUEUE,
   containerName: env.FEDERALIST_ECS_CONTAINER || 'builder'
 };

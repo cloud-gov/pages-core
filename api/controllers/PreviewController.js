@@ -1,5 +1,5 @@
 var AWS = require('aws-sdk'),
-    s3 = new AWS.S3();
+    s3 = sails.config.S3;
 
 module.exports = {
 

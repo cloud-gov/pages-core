@@ -3,10 +3,10 @@ import github from '../util/githubApi';
 import s3 from '../util/s3Api';
 import convertFileToData from '../util/convertFileToData';
 import alertActions from './alertActions';
-import { addPathToSite, uploadFileToSite } from "../util/makeCommitData";
-import { formatDraftBranchName } from "../util/branchFormatter";
-import findShaForDefaultBranch from "../util/findShaForDefaultBranch";
-import filterAssetsWithTypeOfFile from "../util/filterAssetsWithTypeOfFile";
+import { addPathToSite, uploadFileToSite } from '../util/makeCommitData';
+import { formatDraftBranchName } from '../util/branchFormatter';
+import findShaForDefaultBranch from '../util/findShaForDefaultBranch';
+import filterAssetsWithTypeOfFile from '../util/filterAssetsWithTypeOfFile';
 
 import {
   updateRouterToSitesUri,
@@ -20,7 +20,7 @@ import {
   dispatchSiteFilesReceivedAction,
   dispatchSiteConfigsReceivedAction,
   dispatchSiteBranchesReceivedAction
-} from "./dispatchActions";
+} from './dispatchActions';
 
 
 const alertError = error => {

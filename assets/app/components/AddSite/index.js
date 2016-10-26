@@ -77,7 +77,7 @@ class AddSite extends React.Component {
           <div className="usa-grid">
             <div className="col-md-12">
               <div className="form-group">
-                <label for="owner">Repository Owner&#39;s Username or Org name</label>
+                <label htmlFor="owner">Repository Owner&#39;s Username or Org name</label>
                 <input
                   type="text"
                   id="owner"
@@ -87,7 +87,7 @@ class AddSite extends React.Component {
                   onChange={this.onChange} />
               </div>
               <div className="form-group">
-                <label for="repository">Repository&#39;s Name</label>
+                <label htmlFor="repository">Repository&#39;s Name</label>
                 <input
                   type="text"
                   className="form-control"
@@ -97,7 +97,7 @@ class AddSite extends React.Component {
                   onChange={this.onChange} />
               </div>
               <div className="form-group">
-                <label for="engine">Static site engine</label>
+                <label htmlFor="engine">Static site engine</label>
                 <select
                   name="engine"
                   id="engine"
@@ -111,7 +111,7 @@ class AddSite extends React.Component {
                 </select>
               </div>
               <div className="form-group">
-                <label for="defaultBranch">Default branch</label>
+                <label htmlFor="defaultBranch">Default branch</label>
                 <input
                   type="text"
                   id="defaultBranch"

@@ -10,12 +10,12 @@ describe("dispatchActions", () => {
   let sitesReceivedActionCreator, siteAddedActionCreator, siteDeletedActionCreator,
       siteUpdatedActionCreator, siteFileContentReceivedActionCreator, siteAssetsReceivedActionCreator,
       siteFilesReceivedActionCreator, siteConfigsReceivedActionCreator, siteBranchesReceivedActionCreator,
-      updateRouterActionCreator;
+      updateRouterActionCreator, pushHistory;
 
   const action = { whatever: "bub" };
   const site = { site: "site1" };
   const siteId = "42";
-  
+
   beforeEach(() => {
     dispatch = spy();
     sitesReceivedActionCreator = stub();
@@ -28,6 +28,7 @@ describe("dispatchActions", () => {
     siteFilesReceivedActionCreator = stub();
     siteConfigsReceivedActionCreator = stub();
     siteBranchesReceivedActionCreator = stub();
+    pushHistory = stub();
 
     fixture = proxyquire("../../../../assets/app/actions/dispatchActions", {
       "./actionCreators/siteActions": {
@@ -41,8 +42,8 @@ describe("dispatchActions", () => {
         siteConfigsReceived: siteConfigsReceivedActionCreator,
         siteBranchesReceived: siteBranchesReceivedActionCreator
       },
-      "./actionCreators/navigationActions": {
-        updateRouter: updateRouterActionCreator
+      "./routeActions": {
+        pushHistory: pushHistory
       },
       "../store": {
         dispatch: dispatch
@@ -51,7 +52,7 @@ describe("dispatchActions", () => {
   });
 
   it("updateRouterToSitesUri", () => {
-    updateRouterActionCreator.withArgs("/sites").returns(action);
+    pushHistory.withArgs("/sites").returns(action);
 
     fixture.updateRouterToSitesUri();
 
@@ -60,7 +61,7 @@ describe("dispatchActions", () => {
 
   it("updateRouterToSpecificSiteUri", () => {
     const siteId = "7";
-    updateRouterActionCreator.withArgs(`/sites/${siteId}`).returns(action);
+    pushHistory.withArgs(`/sites/${siteId}`).returns(action);
 
     fixture.updateRouterToSpecificSiteUri(siteId);
 

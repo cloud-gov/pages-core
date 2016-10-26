@@ -1,13 +1,13 @@
 var fs = require('fs'),
     url = require('url'),
     AWS = require('aws-sdk'),
-    sqs = new AWS.SQS(),
+    sqs = sails.config.SQS,
     queueUrl = sails.config.build.sqsQueue,
     awsKey = sails.config.build.awsBuildKey,
-    awsSecret = sails.config.build.awsBuildSecret;
+    awsSecret = sails.config.build.awsBuildSecret,
+    awsRegion = sails.config.build.awsRegion;
 
 module.exports = {
-
   addJob: function(model) {
     var defaultBranch = model.branch === model.site.defaultBranch,
         tokensBase = {
@@ -31,11 +31,11 @@ module.exports = {
             tokensBase.owner + '/' +
             tokensBase.repository +
             tokensBase.branchURL,
-          callback: [sails.config.build.callback,
-            model.id + '/' + sails.config.build.token].join('/')
+          callback: `${sails.config.build.callback}${model.id}/${sails.config.build.token}`
         }),
         body = {
           environment: [
+            { "name": "AWS_DEFAULT_REGION", "value": awsRegion },
             { "name": "AWS_ACCESS_KEY_ID", "value": awsKey },
             { "name": "AWS_SECRET_ACCESS_KEY", "value": awsSecret },
             { "name": "CALLBACK", "value": tokens.callback },
@@ -65,7 +65,7 @@ module.exports = {
 
     params.MessageBody = JSON.stringify(body);
 
-    sails.log.verbose('SQS payload build');
+    sails.log.verbose('SQS payload build', tokens.callback, sails.config.build.s3Bucket, awsKey);
 
     sqs.sendMessage(params, function(err, data) {
       sails.log.verbose('message sent with error? and data', err, data);

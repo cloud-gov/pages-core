@@ -22,7 +22,7 @@ describe("routeActions", () => {
       "../store": {
         dispatch: dispatch
       }
-    }).default;
+    });
   });
 
   describe("pushHistory, replaceHistory", () => {

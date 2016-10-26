@@ -94,7 +94,7 @@ class TemplateSite extends React.Component {
               aria-hidden={this.getFormVisible()}
               onSubmit={this.handleSubmit}
             >
-              <label for="site-name">Name your new site</label>
+              <label htmlFor="site-name">Name your new site</label>
               <input
                 name="site-name"
                 type="text"
