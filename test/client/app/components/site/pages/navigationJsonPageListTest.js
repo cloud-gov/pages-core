@@ -13,7 +13,7 @@ describe("navigationJsonPageList", () => {
 
   beforeEach(() => {
     pathHasDraft = stub();
-    Fixture = proxyquire('../../../../../../assets/app/components/site/pages/navigationJsonPageList', {
+    Fixture = proxyquire('../../../../../../assets/app/components/site/Pages/navigationJsonPageList', {
       '../../../util/branchFormatter': {
         pathHasDraft: pathHasDraft
       },
