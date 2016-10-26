@@ -10,10 +10,8 @@ import {
   siteConfigsReceived as createSiteConfigsReceivedAction,
   siteBranchesReceived as createSiteBranchesReceivedAction
 } from './actionCreators/siteActions';
-import { pushHistory, replaceHistory } from './routeActions';
+import { pushHistory } from './routeActions';
 
-
-console.log('HELLO', pushHistory, replaceHistory );
 const updateRouterToSitesUri = () => {
   dispatch(pushHistory(`/sites`));
 };
