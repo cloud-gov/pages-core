@@ -37,5 +37,5 @@ module.exports.passport = {
       14109682, // federalist-users
       14080592  // us-federal-sbst
     ]
-  }a
+  }
 };
