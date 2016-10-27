@@ -5,11 +5,13 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
-var env = process.env.NODE_ENV;
+var env = require('./services/environment.js')();
+var s3 = require('./services/environment.js')(`federalist-${process.env.NODE_ENV}-s3`) || {};
+var domain = env.APP_DOMAIN;
+var app = env.APP_NAME;
+var region = `s3-website-${s3.region}`;
 
-var DEFAULT_BUCKET = env === 'staging' ?
-  'federalist-staging.18f.gov.s3-website-us-east-1.amazonaws.com' :
-  'federalist.18f.gov.s3-website-us-east-1.amazonaws.com';
+var DEFAULT_BUCKET = `${app}.${domain}.${region}.amazonaws.com`;
 
 module.exports = {
   // Enforce model schema in the case of schemaless databases
