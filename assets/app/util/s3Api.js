@@ -1,7 +1,7 @@
 import fetch from './fetch';
 import store from '../store';
 
-const S3_BASE_URL = 'https://s3.amazonaws.com/';
+const S3_BASE_URL = 'https://s3-us-gov-west-1.amazonaws.com/';
 
 const getS3FileURL = (site, file) => {
   const { repository, owner, name, siteRoot = ''} = site;

@@ -17,3 +17,5 @@ env:
   SAILS_LOG_LEVEL: verbose
   NPM_CONFIG_PRODUCTION: false
   NODE_MODULES_CACHE: false
+  APP_NAME: federalist-staging
+  APP_DOMAIN: fr.cloud.gov
