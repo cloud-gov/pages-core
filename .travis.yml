@@ -4,6 +4,8 @@ branches:
 cache: false
 language: node_js
 sudo: true
+rvm:
+  - 2.3.1
 node_js:
 - 4
 env:
