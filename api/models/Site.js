@@ -5,8 +5,9 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
-var env = require('./services/environment.js')();
-var s3 = require('./services/environment.js')(`federalist-${process.env.NODE_ENV}-s3`) || {};
+var envFn = require('../services/environment.js');
+var env = envFn();
+var s3 = envFn(`federalist-${process.env.NODE_ENV}-s3`) || {};
 var domain = env.APP_DOMAIN;
 var app = env.APP_NAME;
 var region = `s3-website-${s3.region}`;
