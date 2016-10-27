@@ -4,10 +4,10 @@ branches:
 cache: false
 language: node_js
 sudo: true
-rvm:
-  - 2.3.1
 node_js:
 - 4
+before_install:
+  - rvm install ruby-1.9.3-p551
 env:
   global:
   - CF_API="https://api.fr.cloud.gov"
