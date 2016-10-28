@@ -1,33 +1,95 @@
 var expect = require("chai").expect
 var request = require("supertest-as-promised")
 var sinon = require("sinon")
-var factory = require("../factory")
-
-var postBuildStatus = (options) => {
-  buildToken = options["buildToken"] || sails.config.build.token
-
-  return request("http://localhost:1337")
-    .post(`/build/status/${options["buildID"]}/${buildToken}`)
-    .type("json")
-    .send({
-      status: options["status"],
-      message: encode64(options["message"])
-    })
-}
-
-var encode64 = (str) => {
-  return new Buffer(str, 'utf8').toString('base64');
-}
+var factory = require("../support/factory")
+var session = require("../support/session")
 
 describe("Build API", () => {
-  describe("POST /build/status/:id/:token", () => {
-    beforeEach(() => {
-      sinon.stub(Site, "registerSite", (_, done) => done())
+  beforeEach(() => {
+    sinon.stub(Site, "registerSite", (_, done) => done())
+  })
+
+  afterEach(() => {
+    Site.registerSite.restore()
+  })
+
+  describe("GET /v0/build/:id", () => {
+    it("should require authentication", done => {
+      factory(Build).then(build => {
+        return request("http://localhost:1337")
+          .get(`/v0/build/${build.id}`)
+          .expect(403)
+      }).then(response => {
+        expect(response.body).to.be.empty
+        done()
+      })
     })
 
-    afterEach(() => {
-      Site.registerSite.restore()
+    it("should return a JSON representation of the build", done => {
+      var build
+      var buildAttributes = {
+        error: "message",
+        state: "error",
+        branch: "18f-pages",
+        completedAt: new Date()
+      }
+
+      factory(Build, buildAttributes).then(model => {
+        build = model
+        return session(
+          User.findOne({ id: build.user })
+        )
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .get(`/v0/build/${build.id}`)
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(response => {
+        var body = response.body
+        expect(body.id).to.equal(build.id)
+        expect(body.user.id).to.equal(build.user)
+        expect(body.site.id).to.equal(build.site)
+        expect(body).to.contain.keys(
+          "completedAt", "error", "branch", "state"
+        )
+        done()
+      })
     })
+
+    it("should respond with a 403 if the current user is not associated with the build", done => {
+      var build
+
+      factory(Build).then(model => {
+        build = model
+        return session(factory(User))
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .get(`/v0/build/${build.id}`)
+          .set("Cookie", cookie)
+          .expect(403)
+      }).then(response => {
+        expect(response.body).to.be.empty
+        done()
+      })
+    })
+  })
+
+  describe("POST /build/status/:id/:token", () => {
+    var postBuildStatus = (options) => {
+      buildToken = options["buildToken"] || sails.config.build.token
+
+      return request("http://localhost:1337")
+        .post(`/build/status/${options["buildID"]}/${buildToken}`)
+        .type("json")
+        .send({
+          status: options["status"],
+          message: encode64(options["message"])
+        })
+    }
+
+    var encode64 = (str) => {
+      return new Buffer(str, 'utf8').toString('base64');
+    }
 
     it("should mark a build successful if status is 0 and message is blank", done => {
       var build
@@ -40,7 +102,7 @@ describe("Build API", () => {
           status: "0",
           message: ""
         }).expect(200)
-      }).then(request => {
+      }).then(response => {
         return Build.findOne({ id: build.id })
       }).then(build => {
         expect(build).to.not.be.undefined
@@ -61,7 +123,7 @@ describe("Build API", () => {
           status: "1",
           message: "The build failed for a reason"
         }).expect(200)
-      }).then(request => {
+      }).then(response => {
         return Build.findOne({ id: build.id })
       }).then(build => {
         expect(build).to.not.be.undefined
@@ -91,7 +153,7 @@ describe("Build API", () => {
           status: "0",
           message: ""
         }).expect(400)
-      }).then(request => {
+      }).then(response => {
         return Build.findOne({ id: build.id })
       }).then(build => {
         expect(build).to.not.be.undefined

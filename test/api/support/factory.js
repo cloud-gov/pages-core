@@ -1,7 +1,7 @@
 var Promise = require("bluebird")
 
 var factory = (model, overrides) => {
-  var attributes = defaultAttributes[model.globalId].call(overrides)
+  var attributes = defaultAttributes[model.globalId].call(undefined, overrides)
 
   return Promise.props(attributes).then(attributes => {
     return model.create(attributes)
