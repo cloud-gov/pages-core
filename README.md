@@ -10,14 +10,18 @@ Federalist is a unified interface for publishing static government websites. It 
 
 To run the server, you'll need [Node.js](https://nodejs.org/download/) and [Ruby](https://www.ruby-lang.org/en/documentation/installation/) installed. The setup process will automatically install Jekyll and its dependencies based on the `github-pages` gem.
 You'll also need [nvm](https://github.com/creationix/nvm).
-To build sites using Hugo, install [Hugo](http://gohugo.io/overview/installing/) and make sure it's available in your path.
-
 
 
 
 ### env variables
 
 We have a few environment variables that the application uses, here is a list of the environment variables that the application will use if present:
+
+#### The following variables are used to derive preview links
+* `FEDERALIST_S3_BUCKET` - The name of the S3 bucket. *There is no default, this value must be supplied.* To find this value, in the cloud foundry environment you use to interact with, type `cf env ${app_name}` and look for the s3 user provided service
+* `FEDERALIST_S3_REGION` - Defaults to `us-gov-west-1`.
+* `FEDERALIST_APP_DOMAIN` - Defaults to `fr.cloud.gov`
+* `FEDERALIST_APP_NAME` -Defaults to `federalist-staging`. Can be changed to `federalist` to interact with sites already on the production instance of federalist.
 
 * `FEDERALIST_AWS_BUILD_KEY` - the AWS key for container builds
 * `FEDERALIST_AWS_BUILD_SECRET` - the AWS secret for container builds
@@ -40,8 +44,8 @@ We have a few environment variables that the application uses, here is a list of
 * `GITHUB_WEBHOOK_SECRET` - random token used to protect webhook messages, defaults to 'testingSecret'
 * `GITHUB_WEBHOOK_URL` - should be full url, defaults to  'http://localhost:1337/webhook/github'
 
-* `NEW_RELIC_APP_NAME` - application name to report to New Relic
-* `NEW_RELIC_LICENSE_KEY` - license key for New Relic
+* `NEW_RELIC_APP_NAME` - application name to report to New Relic.
+* `NEW_RELIC_LICENSE_KEY` - license key for New Relic.
 
 * `NODE_ENV` - Node.js environment setting, defaults to 'development'
 * `PORT` - Server port, defaults to  1337
@@ -145,28 +149,6 @@ models: {
 }
 ```
 
-#### Integration tests
-
-To run the integration tests you'll need:
-
-- [Selenium](http://www.seleniumhq.org/) (and [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html)).
-- [chromedriver](https://sites.google.com/a/chromium.org/chromedriver/)
-
-##### Installing all of that and getting it running
-
-We're going to use `selenium-standalone` to make installing all of those tools
-just a bit easier to manage and install and we have some `npm` scripts to help
-out.
-
-    $ npm run test:selenium:install
-    $ npm run test:selenium:start
-
-Make sure to run both of these commands, and install Java if it asks you to do so.
-It is required for selenium. After the second command is run successfully you
-should see something like
-
-    09:47:12.342 INFO - Selenium Server is up and running
-    Selenium started
 
 ##### Setting up the test Github user
 
@@ -198,38 +180,6 @@ And now you can run the tests:
     $ npm run test:integration
 
 
-##### Running against Sauce Labs
-
-Sauce Labs can be a bit flakey sometimes and failures on Travis might not be
-reproducible locally. If you're just looking for details of the last Travis run,
-ping the [account holder for
-access](https://github.com/18F/federalist/blob/523aceb9885f248dd60189f9c13c834c3ba0947e/.travis.yml#L24).
-Otherwise, 18F personnel can request a Sauce Labs account in Slack.
-
-Once you have an account, you'll need your access key. It's available in the
-Sauce Labs account settings and looks like a GUID e.g.
-`abcdef78-1234-1234-1234-abcdef789012`.
-
-    $ export SAUCE_USERNAME=<username> SAUCE_ACCESS_KEY=<sauce access key>
-
-Use [Sauce
-Connect](https://wiki.saucelabs.com/display/DOCS/Setting+Up+Sauce+Connect) to
-open a tunnel between your localhost and Sauce Labs (because your dev server is
-running on localhost).
-
-    $ brew install sauce-connect
-    $ sc -u $SAUCE_USERNAME -k $SAUCE_ACCESS_KEY &
-
-Then run your tests.
-
-    $ SAUCE_USERNAME=$SAUCE_USERNAME SAUCE_ACCESS_KEY=$SAUCE_ACCESS_KEY npm run test:integration
-
-You shouldn't see Chrome launch locally because the tests are launched in on
-a Sauce Labs VM. Instead, you can watch the tests run live through the Sauce
-Labs UI.
-
-_Note: the environment variable names are important here because these are what
-webdriverio will be looking for._
 
 
 ## Architecture
@@ -238,7 +188,7 @@ This application is primarily a JSON API server based on the [Sails.js](http://s
 
 It automatically applies a webhook to the repository new sites and creates a new build on validated webhook requests.
 
-The front end of the application is a [Backbone](http://backbonejs.org) based application, that uses [browserify](http://www.browserify.org) in the build process. It is a very lightweight consumer of the Sails API.
+The front end of the application is a [React](https://facebook.github.io/react/) based application, that uses [browserify](http://www.browserify.org) in the build process. It is a very lightweight consumer of the Sails API.
 
 ### Proof of concept
 

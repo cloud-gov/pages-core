@@ -19,7 +19,7 @@ const PageList = ({ site, files }) => {
 const emitPages = (files, site) => {
   return files.map((page, index) => {
     const { id, branch, branches, defaultBranch } = site;
-    const href = getLinkFor(page, id, branch || defaultBranch);
+    const pageLink = getLinkFor(page, id, branch || defaultBranch);
     const isPageDirectory = isDir(page);
 
     return (
@@ -27,7 +27,7 @@ const emitPages = (files, site) => {
         key={ index }
         pageName={ page.name }
         hasDraft={ pathHasDraft(page.path, site.branches) }
-        href={ href }
+        href={ pageLink }
         isPageDirectory={ isPageDirectory }/>
     );
   });
@@ -38,10 +38,6 @@ const getLinkFor = (page, id, branch) => {
 
   return isDir(page) ?
     `/sites/${id}/tree/${path}` : `/sites/${id}/edit/${branch}/${path}`;
-};
-
-const getButtonCopy = (page) => {
-  return isDir(page) ? 'Open' : 'Edit';
 };
 
 const isDir = (page) => {

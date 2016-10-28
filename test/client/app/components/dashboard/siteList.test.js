@@ -19,7 +19,7 @@ describe('<SiteList />', () => {
   let wrapper;
 
   beforeEach(() => {
-    Fixture = proxyquire('../../../../../assets/app/components/Dashboard/siteList', {
+    Fixture = proxyquire('../../../../../assets/app/components/siteList/siteList', {
       './siteListItem': SiteListItem,
       '../linkButton': LinkButton
     }).default;

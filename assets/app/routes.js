@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, Link, IndexRedirect, IndexRoute, Redirect } from 'react-router';
 
 import App from './components/app';
-import SiteList from './components/Dashboard/siteList';
+import SiteList from './components/siteList/siteList';
 import SiteContainer from './components/siteContainer';
 import SitePagesContainer from './components/site/Pages/pagesContainer';
 import SiteEditorContainer from './components/site/editor/editorContainer';

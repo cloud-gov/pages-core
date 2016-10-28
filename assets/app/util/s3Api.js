@@ -4,7 +4,7 @@ import store from '../store';
 const S3_BASE_URL = 'https://s3-us-gov-west-1.amazonaws.com/';
 
 const getS3FileURL = (site, file) => {
-  const { repository, owner, name, siteRoot = ''} = site;
+  const { repository, owner, siteRoot = ''} = site;
   const bucketPath = /^http\:\/\/(.*)\.s3\-website\-(.*)\.amazonaws\.com/;
   const match = siteRoot.match(bucketPath);
   const bucket = match && match[1];

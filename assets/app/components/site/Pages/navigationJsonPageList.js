@@ -20,7 +20,7 @@ const NavigationJsonContent = ({ site }) => {
 
 const emitPages = (pages, siteId, defaultBranch, branches) => {
   const emitPage = (page, index) => {
-    const { title, permalink, href, children, path } = page;
+    const { title, permalink, href, children } = page;
     const pageListItemHref = getLinkFor(href, siteId, defaultBranch);
 
     return (
@@ -29,7 +29,7 @@ const emitPages = (pages, siteId, defaultBranch, branches) => {
         pageName={ title }
         href={ pageListItemHref }
         isPageDirectory={ false }
-        hasDraft={ pathHasDraft(page.path, branches) }
+        hasDraft={ pathHasDraft(href, branches) }
       >
         { emitChildren(children, siteId, defaultBranch, branches) }
       </PageListItem>

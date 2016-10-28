@@ -1,19 +1,3 @@
-/**
-* Site.js
-*
-* @description :: TODO: You might write a short summary of how this model works and what it represents here.
-* @docs        :: http://sailsjs.org/#!documentation/models
-*/
-
-var envFn = require('../../services/environment.js');
-var env = envFn();
-var s3 = envFn(`federalist-${process.env.NODE_ENV}-s3`) || {};
-var domain = env.APP_DOMAIN;
-var app = env.APP_NAME;
-var region = `s3-website-${s3.region}`;
-
-var DEFAULT_BUCKET = `${app}.${domain}.${region}.amazonaws.com`;
-
 module.exports = {
   // Enforce model schema in the case of schemaless databases
   schema: true,
@@ -60,10 +44,8 @@ module.exports = {
     toJSON: function() {
       var obj = this.toObject(),
           config = sails.config.build || {};
-      // Add siteRoot to the API response for previews
-      obj.siteRoot = 'http://' + (config.s3Bucket ? config.s3Bucket +
-        '.s3-website-us-east-1.amazonaws.com': DEFAULT_BUCKET);
-
+      // Add siteRoot to the API response for previews.
+      obj.siteRoot = `http://${config.s3Bucket}.s3-website-${config.awsRegion}.amazonaws.com`;
       obj.viewLink = obj.domain || [obj.siteRoot, 'site', obj.owner, obj.repository].join('/');
 
       return obj;

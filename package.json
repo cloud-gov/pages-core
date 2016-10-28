@@ -84,7 +84,7 @@
     "migrate:up": "grunt db:migrate:up || true",
     "migrate:down": "grunt db:migrate:down",
     "uswds": "npm run uswds:css && npm run uswds:images && npm run uswds:fonts",
-    "uswds:css": "cp node_modules/uswds/dist/css/uswds.css assets/styles/",
+    "uswds:css": "cp node_modules/uswds/dist/css/uswds.min.css assets/styles/",
     "uswds:images": "cp -r node_modules/uswds/dist/img/ ./assets/images/uswds",
     "uswds:fonts": "cp node_modules/uswds/dist/fonts/* ./assets/fonts",
     "codemirror": "cp node_modules/codemirror/lib/codemirror.css assets/styles/",

@@ -3,6 +3,7 @@ import LinkButton from '../linkButton';
 
 const propTypes = {
   repository: React.PropTypes.string.isRequired, // Name of the repo
+  owner: React.PropTypes.string.isRequired,
   title: React.PropTypes.string.isRequired, // Title of the section we are on
   siteId: React.PropTypes.number.isRequired,
   branch: React.PropTypes.string.isRequired,
@@ -17,12 +18,29 @@ const defaultPropTypes = {
 
 class PagesHeader extends React.Component {
   getLinkButtonConfigs() {
-    const { isPages, siteId, branch, fileName, viewLink } = this.props;
+    const {
+      isPages,
+      siteId,
+      branch,
+      fileName,
+      viewLink,
+      owner,
+      repository
+    } = this.props;
+
     const configs = {
       text: 'View Website',
       alt: 'View this website',
       className: 'usa-button-big pull-right icon icon-view icon-white'
     };
+
+    if (branch.match(/_draft/)) {
+      return Object.assign({}, configs, {
+        text: 'Preview Draft',
+        alt: 'Preview Draft',
+        href: `/preview/${owner}/${repository}/${branch}/`
+      });
+    }
 
     if (!isPages) {
       return Object.assign({}, configs, {
