@@ -113,8 +113,10 @@ export default {
     return github.fetchRepositoryContent(site, assetPath)
       .then(filterAssetsWithTypeOfFile)
       .then(dispatchSiteAssetsReceivedAction.bind(null, site.id))
-      .then(() => Promise.resolve(site))
-      .catch(alertError);
+      .then(() => site)
+      .catch((error) => {
+        throwRuntime(error)
+      });
   },
 
   fetchBranches(site) {
@@ -198,7 +200,6 @@ export default {
       // trigger an http error action for an actual http
       // error.
       throwRuntime(error);
-      alertActions.httpError(error.message);
     });
   }
 };

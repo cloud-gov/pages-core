@@ -8,7 +8,7 @@ import getPageLayoutsFromConfig from './getPageLayoutsFromConfig';
 const propTypes = {
   frontmatter: React.PropTypes.string.isRequired,
   onChange: React.PropTypes.func.isRequired,
-  templateConfig: React.PropTypes.string.isRequired
+  templateConfig: React.PropTypes.string
 };
 
 class PageSettings extends React.Component {

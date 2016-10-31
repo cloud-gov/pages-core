@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link, withRouter } from 'react-router';
+import { Link } from 'react-router';
 
+import { replaceRouterHistory } from '../actions/ActionCreators/navigationActions';
 import siteActions from '../actions/siteActions';
 
 import SideNav from './site/SideNav/sideNav';
@@ -23,10 +24,10 @@ class SiteContainer extends React.Component {
     const { storeState, params, routeParams } = this.props;
     const currentSite = this.getCurrentSite(storeState.sites, params.id);
 
-    if (!currentSite) {
-      this.props.router.push('/sites');
-    } else {
+    if (currentSite) {
       siteActions.fetchSiteConfigsAndAssets(currentSite);
+    } else {
+      replaceRouterHistory('/sites');
     }
   }
 
@@ -72,7 +73,7 @@ class SiteContainer extends React.Component {
         childConfigs = { site };
     }
 
-    if (!site || !site.branches) {
+    if (!site) {
       return null;
     }
 
@@ -106,4 +107,4 @@ class SiteContainer extends React.Component {
 
 SiteContainer.propTypes = propTypes;
 
-export default withRouter(SiteContainer);
+export default SiteContainer;

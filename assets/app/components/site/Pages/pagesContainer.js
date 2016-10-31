@@ -3,6 +3,7 @@ import isEqual from 'lodash.isequal';
 import PageList from './pageList';
 import PageListItem from './pageListItem';
 import NavigationJsonPageList from './navigationJsonPageList';
+import hasConfig from '../../higherOrder/hasConfig';
 
 import siteActions from '../../../actions/siteActions';
 
@@ -13,10 +14,6 @@ const propTypes = {
 class Pages extends React.Component {
   constructor(props) {
     super(props);
-  }
-
-  componentDidMount() {
-    fetchFiles(this.props.site, this.props.params);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -82,4 +79,4 @@ const hasNavigationJsonContent = (site) => {
 
 Pages.propTypes = propTypes;
 
-export default Pages;
+export default hasConfig(Pages);
