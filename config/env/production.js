@@ -1,10 +1,12 @@
 var AWS = require('aws-sdk'),
     env = require("../../services/environment")()
     cfenv = require('cfenv'),
+    sqsKey = env.FEDERALIST_AWS_BUILD_KEY,
+    sqsSecret = env.FEDERALIST_AWS_BUILD_SECRET,
     appEnv = cfenv.getAppEnv(),
-    dbURL = appEnv.getServiceURL('federalist-database'),
-    AWSCreds = appEnv.getServiceCreds('federalist-aws-user'),
-    redisCreds = appEnv.getServiceCreds('federalist-redis');
+    dbURL = appEnv.getServiceURL(`federalist-${process.env.APP_ENV}-rds`),
+    AWS_S3_CREDS = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-s3`),
+    redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}}-redis`);
 
 var _ = require('underscore');
 var session = {
@@ -33,7 +35,7 @@ module.exports = {
   }
 };
 
-// If running in Cloud Foundry with a service database avaible, use it
+// If running in Cloud Foundry with a service database available, use it
 if (dbURL) {
   module.exports.connections = {
     postgres: {
@@ -47,12 +49,20 @@ if (dbURL) {
 }
 
 // If running in Cloud Foundry with an S3 credential service available
-if (AWSCreds) {
-  AWS.config.update({
-    accessKeyId: AWSCreds.access_key,
-    secretAccessKey: AWSCreds.secret_key,
-    region: AWSCreds.region || 'us-east-1'
+if (sqsKey && sqsSecret && AWS_S3_CREDS) {
+  module.exports.SQS = new AWS.SQS({
+    accessKeyId: sqsKey
+    secretAccessKey: sqsSecret,
+    region: 'us-east-1'
   });
+
+  module.exports.S3 = new AWS.S3({
+    accessKeyId: AWS_S3_CREDS.access_key_id,
+    secretAccessKey: AWS_S3_CREDS.secret_access_key,
+    region: AWS_S3_CREDS.region
+  });
+} else {
+  console.log('You didn\'t define AWS user credentials for either SQS or S3!\n');
 }
 
 // If running in Cloud Foundry with a redis service
