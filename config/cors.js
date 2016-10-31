@@ -39,15 +39,9 @@ module.exports.cors = {
 
   // allRoutes: false,
 
-  /***************************************************************************
-  *                                                                          *
-  * Which domains which are allowed CORS access? This can be a               *
-  * comma-delimited list of hosts (beginning with http:// or https://) or    *
-  * "*" to allow all domains CORS access.                                    *
-  *                                                                          *
-  ***************************************************************************/
-
-  // origin: '*',
+  // setting this to _some_ value to mitigate vulnerability described here
+  // https://nodesecurity.io/advisories/148
+  origin: 'federalist.18f.gov, federalist-staging.18f.gov, federalist-staging.fr.cloud.gov, federalist.fr.cloud.gov'
 
   /***************************************************************************
   *                                                                          *
