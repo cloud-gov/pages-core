@@ -1,16 +1,18 @@
 var AWS = require('aws-sdk'),
+    env = require("../services/environment")
     cfenv = require('cfenv'),
     appEnv = cfenv.getAppEnv(),
     dbURL = appEnv.getServiceURL('federalist-database'),
     AWSCreds = appEnv.getServiceCreds('federalist-aws-user'),
     redisCreds = appEnv.getServiceCreds('federalist-redis');
-console.log('OK I GUESS I AM RUNNING\n\n\n');
+
 var _ = require('underscore');
 var session = {
   cookie: {
     secure: true
   },
-  proxy: true
+  proxy: true,
+  secret: env.FEDERALIST_SESSION_SECRET
 };
 
 /**

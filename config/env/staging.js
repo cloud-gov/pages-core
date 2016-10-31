@@ -1,4 +1,5 @@
 var AWS = require('aws-sdk'),
+    env = require("../services/environment")
     cfenv = require('cfenv'),
     appEnv = cfenv.getAppEnv(),
     dbURL = appEnv.getServiceURL('federalist-staging-rds'),
@@ -11,7 +12,8 @@ var session = {
   cookie: {
     secure: true
   },
-  proxy: true
+  proxy: true,
+  secret: env.FEDERALIST_SESSION_SECRET
 };
 
 /**
