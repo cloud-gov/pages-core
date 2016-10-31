@@ -34,7 +34,7 @@ class PagesHeader extends React.Component {
       className: 'usa-button-big pull-right icon icon-view icon-white'
     };
 
-    if (branch.match(/_draft/)) {
+    if (/_draft/.test(branch)) {
       return Object.assign({}, configs, {
         text: 'Preview Draft',
         alt: 'Preview Draft',
