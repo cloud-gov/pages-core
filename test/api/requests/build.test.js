@@ -7,11 +7,27 @@ var session = require("../support/session")
 describe("Build API", () => {
   beforeEach(() => {
     sinon.stub(Site, "registerSite", (_, done) => done())
+    sinon.stub(Site, "startInitialBuild", (_, done) => done())
   })
 
   afterEach(() => {
     Site.registerSite.restore()
+    Site.startInitialBuild.restore()
   })
+
+  var buildResponseExpectations = (response, build) => {
+    Object.keys(build).forEach(key => {
+      expect(response[key]).to.not.be.undefined
+
+      if (typeof build[key] === "number" && typeof response[key] === "object") {
+        expect(response[key].id).to.equal(build[key])
+      } else if (build[key].toISOString) {
+        expect(response[key]).to.equal(build[key].toISOString())
+      } else {
+        expect(response[key]).to.equal(build[key])
+      }
+    })
+  }
 
   describe("GET /v0/build/:id", () => {
     it("should require authentication", done => {
@@ -45,13 +61,7 @@ describe("Build API", () => {
           .set("Cookie", cookie)
           .expect(200)
       }).then(response => {
-        var body = response.body
-        expect(body.id).to.equal(build.id)
-        expect(body.user.id).to.equal(build.user)
-        expect(body.site.id).to.equal(build.site)
-        expect(body).to.contain.keys(
-          "completedAt", "error", "branch", "state"
-        )
+        buildResponseExpectations(response.body, build)
         done()
       })
     })
@@ -67,6 +77,69 @@ describe("Build API", () => {
           .get(`/v0/build/${build.id}`)
           .set("Cookie", cookie)
           .expect(403)
+      }).then(response => {
+        expect(response.body).to.be.empty
+        done()
+      })
+    })
+  })
+
+  describe("GET /v0/build", () => {
+    it("should require authentication", done => {
+      factory(Build).then(build => {
+        return request("http://localhost:1337")
+          .get("/v0/build")
+          .expect(403)
+      }).then(response => {
+        expect(response.body).to.be.empty
+        done()
+      })
+    })
+
+    it("should list builds for sites associated with the current user", done => {
+      var user, builds
+
+      factory(User).then(model => {
+        user = model
+        var buildPromises = Array(3).fill(0).map(() => {
+          return factory(Build, { user: user.id })
+        })
+        return Promise.all(buildPromises)
+      }).then(models => {
+        builds = models
+        return session(user)
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .get("/v0/build")
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(response => {
+        expect(response.body).to.be.a("Array")
+        expect(response.body).to.have.length(3)
+        builds.forEach((build, index) => {
+          buildResponseExpectations(response.body[index], build)
+        })
+        done()
+      })
+    })
+
+    it("should not show a user any builds not associated with their sites", done => {
+      var user
+
+      factory(User).then(model => {
+        user = model
+        var buildPromises = Array(3).fill(0).map(() => {
+          return factory(Build)
+        })
+        return Promise.all(buildPromises)
+      }).then(builds => {
+        expect(builds).to.have.length(3)
+        return session(user)
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .get("/v0/build")
+          .set("Cookie", cookie)
+          .expect(200)
       }).then(response => {
         expect(response.body).to.be.empty
         done()
