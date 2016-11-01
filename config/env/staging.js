@@ -1,5 +1,5 @@
 var AWS = require('aws-sdk'),
-    env = require("../services/environment")
+    env = require("../../services/environment")
     cfenv = require('cfenv'),
     appEnv = cfenv.getAppEnv(),
     dbURL = appEnv.getServiceURL('federalist-staging-rds'),
