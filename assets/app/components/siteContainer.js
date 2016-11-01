@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-import { replaceRouterHistory } from '../actions/ActionCreators/navigationActions';
+import { replaceRouterHistory } from '../actions/actionCreators/navigationActions';
 import siteActions from '../actions/siteActions';
 
 import SideNav from './site/SideNav/sideNav';
@@ -101,7 +101,7 @@ class SiteContainer extends React.Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
 

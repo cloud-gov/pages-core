@@ -18,9 +18,12 @@
 
 html,
 body,
-main {
-  height: 100%;
-}
+main,
+main > div,
+.usa-grid.site,
+#js-app,
+#js-app > div {
+  height: 100%; }
 
 .recent-drafts {
   width: 100%;
