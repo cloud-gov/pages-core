@@ -1,3 +1,19 @@
+/**
+* Site.js
+*
+* @description :: TODO: You might write a short summary of how this model works and what it represents here.
+* @docs        :: http://sailsjs.org/#!documentation/models
+*/
+
+var envFn = require('../../services/environment.js');
+var env = envFn();
+var s3 = envFn(`federalist-${process.env.APP_ENV}-s3`) || {};
+var domain = env.APP_DOMAIN;
+var app = env.APP_NAME;
+var region = `s3-website-${s3.region}`;
+
+var DEFAULT_BUCKET = `${app}.${domain}.${region}.amazonaws.com`;
+
 module.exports = {
   // Enforce model schema in the case of schemaless databases
   schema: true,

@@ -3,7 +3,7 @@
  */
 var envFn = require('../services/environment.js');
 var env = envFn();
-var s3Creds = envFn(`federalist-${process.env.NODE_ENV}-s3`) || {};
+var s3Creds = (envFn(`federalist-${process.env.APP_ENV}-s3`) || {});
 
 module.exports.build = {
   tempDir: env.FEDERALIST_TEMP_DIR || './.tmp',

@@ -13,9 +13,10 @@ services:
 - federalist-staging-s3
 - federalist-staging-env
 env:
-  NODE_ENV: staging
+  NODE_ENV: production
+  APP_ENV: staging
   SAILS_LOG_LEVEL: verbose
-  NPM_CONFIG_PRODUCTION: false
+  NPM_CONFIG_PRODUCTION: true
   NODE_MODULES_CACHE: false
   APP_NAME: federalist-staging
   APP_DOMAIN: fr.cloud.gov
