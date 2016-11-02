@@ -43,7 +43,7 @@ describe("navigationJsonPageList", () => {
     };
     // super-coupled.
     const linkForHref = `/sites/${siteId}/edit/${defaultBranch}/${href}`;
-    pathHasDraft.withArgs(path, branches).returns(false);
+    pathHasDraft.withArgs(href, branches).returns(false);
 
     const reactWrapper = shallow(<Fixture site={ site }/>);
 
@@ -86,8 +86,8 @@ describe("navigationJsonPageList", () => {
     // super-coupled.
     const linkForHref = `/sites/${siteId}/edit/${defaultBranch}/${href}`;
     const linkForHref2 = `/sites/${siteId}/edit/${defaultBranch}/${href2}`;
-    pathHasDraft.withArgs(path, branches).returns(true);
-    pathHasDraft.withArgs(path2, branches).returns(false);
+    pathHasDraft.withArgs(href, branches).returns(true);
+    pathHasDraft.withArgs(href2, branches).returns(false);
 
     const reactWrapper = shallow(<Fixture site={ site }/>);
 
@@ -139,8 +139,8 @@ describe("navigationJsonPageList", () => {
     // super-coupled.
     const linkForHref = `/sites/${siteId}/edit/${defaultBranch}/${href}`;
     const linkForHref2 = `/sites/${siteId}/edit/${defaultBranch}/${href2}`;
-    pathHasDraft.withArgs(path, branches).returns(true);
-    pathHasDraft.withArgs(path2, branches).returns(false);
+    pathHasDraft.withArgs(href, branches).returns(true);
+    pathHasDraft.withArgs(href2, branches).returns(false);
 
     const reactWrapper = shallow(<Fixture site={ site }/>);
 

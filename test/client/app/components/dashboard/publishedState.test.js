@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import PublishedState from '../../../../../assets/app/components/Dashboard/publishedState';
+import PublishedState from '../../../../../assets/app/components/siteList/publishedState';
 
 const NO_BUILDS_MESSAGE = 'This site has not been published yet. Please wait while the site is built.';
 const PUBLISHED_BASE = 'This site was last published at';

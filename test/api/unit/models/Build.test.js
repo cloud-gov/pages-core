@@ -21,12 +21,18 @@ describe('Build Model', function() {
   });
 
   describe('.addJob', function() {
-    it('should add job to queue', function(done) {
+    it('should add job to queue', function() {
       var original = Build.queue;
+
       sails.hooks[sails.config.build.engine].jekyll = function() {
-        return done();
+        return;
+        // TODO: would be nice if this hook didnt run, myabe if the queue was
+        // stubbed out
+        //return done();
       };
+
       Build.addJob({ id: 1, site: { engine: 'jekyll' }, user: {}});
+      assert.equal(Build.queue.tasks.length, 0);
     });
   });
 

@@ -7,8 +7,11 @@ import SideNav from './site/SideNav/sideNav';
 import PagesHeader from './site/pagesHeader';
 import AlertBanner from './alertBanner';
 
+import { getDraft } from '../util/branchFormatter';
+
 const propTypes = {
-  storeState: React.PropTypes.object
+  storeState: React.PropTypes.object,
+  params: React.PropTypes.object //{id, branch, splat, fileName}
 };
 
 class SiteContainer extends React.Component {
@@ -53,9 +56,7 @@ class SiteContainer extends React.Component {
 
     let childConfigs;
 
-    // TODO: I dont like the switch in the render method.
-    // Ideally we can derive these configs using constants from the name/path
-    // of the route we are on. I'm also not crazy about tying these to route paths
+    // I'm not crazy about tying these to route paths
     // as it makes it harder to change things.
     switch(pageTitle) {
       case 'media':
@@ -84,10 +85,11 @@ class SiteContainer extends React.Component {
             status={storeState.alert.status}/>
           <PagesHeader
             repository={site.repository}
+            owner={site.owner}
             title={pageTitle}
             isPages={this.isPages(location.pathname)}
             siteId={site.id}
-            branch={site.defaultBranch}
+            branch={params.branch || site.defaultBranch}
             fileName={params.fileName}
             viewLink={site.viewLink}
           />
