@@ -36,8 +36,7 @@ module.exports.connections = {
 
   // Store data in memory. Used for tests
   memory: {
-    adapter: 'sails-disk',
-    inMemory: true
+    adapter: 'sails-memory'
   }
 
 };

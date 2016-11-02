@@ -75,17 +75,7 @@ module.exports = {
   },
 
   afterCreate: function(model, done) {
-    Site.findOne({id: model.id }).populate('users')
-        .exec(function(err, site) {
-          if (err) return done(err);
-          if (!site.users[0]) return done();
-          var build = {
-              user: site.users[0].id,
-              site: model.id,
-              branch: model.defaultBranch
-          };
-          Build.create(build, done);
-        });
+    this.startInitialBuild(model, done)
   },
 
   afterUpdate: function() {
@@ -111,5 +101,19 @@ module.exports = {
       }
       done();
     });
+  },
+
+  startInitialBuild: function(model, done) {
+    Site.findOne({id: model.id }).populate('users')
+        .exec(function(err, site) {
+          if (err) return done(err);
+          if (!site.users[0]) return done();
+          var build = {
+              user: site.users[0].id,
+              site: model.id,
+              branch: model.defaultBranch
+          };
+          Build.create(build, done);
+        });
   }
 };
