@@ -1,5 +1,5 @@
 var AWS = require('aws-sdk'),
-    env = require("../../services/environment")()
+    env = require("../../services/environment")(),
     cfenv = require('cfenv'),
     sqsKey = env.FEDERALIST_AWS_BUILD_KEY,
     sqsSecret = env.FEDERALIST_AWS_BUILD_SECRET,
@@ -51,7 +51,7 @@ if (dbURL) {
 // If running in Cloud Foundry with an S3 credential service available
 if (sqsKey && sqsSecret && AWS_S3_CREDS) {
   module.exports.SQS = new AWS.SQS({
-    accessKeyId: sqsKey
+    accessKeyId: sqsKey,
     secretAccessKey: sqsSecret,
     region: 'us-east-1'
   });
