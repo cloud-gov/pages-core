@@ -75,17 +75,13 @@ describe("Site API", () => {
     })
 
     it("should not render any sites not associated with the user", done => {
-      var user
+      var sitePromises = Array(3).fill(0).map(() => {
+        return factory(Site)
+      })
 
-      factory(User).then(model => {
-        user = model
-        var sitePromises = Array(3).fill(0).map(() => {
-          return factory(Site)
-        })
-        return Promise.all(sitePromises)
-      }).then(site => {
+      Promise.all(sitePromises).then(site => {
         expect(site).to.have.length(3)
-        return session(user)
+        return session(factory(User))
       }).then(cookie => {
         return request("http://localhost:1337")
           .get("/v0/site")
@@ -135,9 +131,7 @@ describe("Site API", () => {
 
       factory(Site).then(model => {
         site = model
-        return factory(User)
-      }).then(user => {
-        return session(user)
+        return session(factory(User))
       }).then(cookie => {
         return request("http://localhost:1337")
           .get(`/v0/site/${site.id}`)
@@ -211,7 +205,8 @@ describe("Site API", () => {
     it("should require authentication", done => {
       factory(Site).then(site => {
         return request("http://localhost:1337")
-          .put(`/v0/site/${site.id}`, {
+          .put(`/v0/site/${site.id}`)
+          .send({
             defaultBranch: "master"
           })
           .expect(403)
@@ -221,9 +216,79 @@ describe("Site API", () => {
       })
     })
 
-    it("should allow a user to update a site associated with their account")
-    it("should not allow a user to update a site not associated with their account")
-    it("should trigger a rebuild of the site")
+    it("should allow a user to update a site associated with their account", done => {
+      var site, response
+
+      factory(Site, { repository: "old-repo-name" }).then(site => {
+        return Site.findOne({ id: site.id }).populate("users")
+      }).then(model => {
+        site = model
+        return session(site.users[0])
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .put(`/v0/site/${site.id}`)
+          .send({
+            repository: "new-repo-name"
+          })
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(resp => {
+        response = resp
+        return Site.findOne({ id: site.id }).populate("users")
+      }).then(site => {
+        expect(response.body).to.have.property("repository", "new-repo-name")
+        expect(site).to.have.property("repository", "new-repo-name")
+        siteResponseExpectations(response.body, site)
+        done()
+      })
+    })
+
+    it("should not allow a user to update a site not associated with their account", done => {
+      factory(Site, { repository: "old-repo-name" }).then(site => {
+        return Site.findOne({ id: site.id }).populate("users")
+      }).then(model => {
+        site = model
+        return session(factory(User))
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .put(`/v0/site/${site.id}`)
+          .send({
+            repository: "new-repo-name"
+          })
+          .set("Cookie", cookie)
+          .expect(403)
+      }).then(resp => {
+        response = resp
+        expect(response.body).to.be.empty
+        return Site.findOne({ id: site.id }).populate("users")
+      }).then(site => {
+        expect(site).to.have.property("repository", "old-repo-name")
+        done()
+      })
+    })
+
+    it("should trigger a rebuild of the site", done => {
+      factory(Site, { repository: "old-repo-name" }).then(site => {
+        return Site.findOne({ id: site.id }).populate("users").populate("builds")
+      }).then(model => {
+        site = model
+        expect(site.builds).to.have.length(1)
+        return session(site.users[0])
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .put(`/v0/site/${site.id}`)
+          .send({
+            repository: "new-repo-name"
+          })
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(resp => {
+        return Site.findOne({ id: site.id }).populate("users").populate("builds")
+      }).then(site => {
+        expect(site.builds).to.have.length(2)
+        done()
+      })
+    })
   })
 
   describe("POST /v0/site/clone", () => {
