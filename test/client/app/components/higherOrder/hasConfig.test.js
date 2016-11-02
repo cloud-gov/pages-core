@@ -5,11 +5,11 @@ import hasConfig from '../../../../../assets/app/components/higherOrder/hasConfi
 
 const mock = React.createClass({
   render() {
-    return <div></div>
+    return <div></div>;
   }
 });
 
-describe.only('hasConfig()', () => {
+describe('hasConfig()', () => {
   it('returns the supplied component when the config property is exactly not null', () => {
     const site = {
       config: ''

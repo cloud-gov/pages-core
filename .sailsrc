@@ -1,9 +1,5 @@
 {
   "generators": {
     "modules": {}
-  },
-  "hooks": {
-    "sockets": false,
-    "pubsub": false
   }
 }
