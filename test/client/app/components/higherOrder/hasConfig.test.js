@@ -3,11 +3,7 @@ import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import hasConfig from '../../../../../assets/app/components/higherOrder/hasConfig';
 
-const mock = React.createClass({
-  render() {
-    return <div></div>;
-  }
-});
+const mock = () => <div></div>;
 
 describe('hasConfig()', () => {
   it('returns the supplied component when the config property is exactly not null', () => {
