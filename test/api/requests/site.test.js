@@ -293,24 +293,89 @@ describe("Site API", () => {
 
   describe("POST /v0/site/clone", () => {
     it("should require authentication", done => {
-      factory(Site).then(site => {
-        return request("http://localhost:1337")
-          .post(`/v0/site/clone`, {
-            sourceOwner: "18f",
-            sourceRepo: "example-template",
-            destinationOrg: "partner-org",
-            destinationRepo: "partner-site",
-            destinationBranch: "master",
-            engine: "jekyll"
-          })
-          .expect(403)
-      }).then(response => {
+      var cloneRequest = request("http://localhost:1337")
+        .post(`/v0/site/clone`, {
+          sourceOwner: "18f",
+          sourceRepo: "example-template",
+          destinationOrg: "partner-org",
+          destinationRepo: "partner-site",
+          destinationBranch: "master",
+          engine: "jekyll"
+        })
+        .expect(403)
+
+      cloneRequest.then(response => {
         expect(response.body).to.be.empty
         done()
       })
     })
 
-    it("should create a new site record for the given repository")
-    it("should trigger a build that pushes the source repo to the destiantion repo")
+    it("should create a new site record for the given repository", done => {
+      var user, response
+
+      factory(User).then(model => {
+        user = model
+        return session(user)
+      }).then(cookie => {
+        return request("http://localhost:1337")
+        .post(`/v0/site/clone`)
+        .send({
+          sourceOwner: "18f",
+          sourceRepo: "example-template",
+          destinationOrg: "partner-org",
+          destinationRepo: "partner-site",
+          destinationBranch: "master",
+          engine: "jekyll"
+        })
+        .set("Cookie", cookie)
+        .expect(200)
+      }).then(resp => {
+        response = resp
+        return Site.findOne({ id: response.body.id }).populate("users")
+      }).then(site => {
+        expect(site).to.have.property("owner", "partner-org")
+        expect(site).to.have.property("repository", "partner-site")
+        expect(site).to.have.property("defaultBranch", "master")
+        expect(site).to.have.property("engine", "jekyll")
+        expect(site).not.to.be.undefined
+        expect(site.users).to.have.length(1)
+        expect(site.users[0]).to.have.property("id", user.id)
+
+        siteResponseExpectations(response.body, site)
+
+        done()
+      })
+    })
+
+    it("should trigger a build that pushes the source repo to the destiantion repo", done => {
+      var user
+
+      factory(User).then(model => {
+        user = model
+        return session(user)
+      }).then(cookie => {
+        return request("http://localhost:1337")
+        .post(`/v0/site/clone`)
+        .send({
+          sourceOwner: "18f",
+          sourceRepo: "example-template",
+          destinationOrg: "partner-org",
+          destinationRepo: "partner-site",
+          destinationBranch: "master",
+          engine: "jekyll"
+        })
+        .set("Cookie", cookie)
+        .expect(200)
+      }).then(response => {
+        return Site.findOne({ id: response.body.id }).populate("builds")
+      }).then(site => {
+        expect(site.builds).to.have.length(1)
+
+        var buildSource = site.builds[0].source
+        expect(buildSource).to.have.property("owner", "18f")
+        expect(buildSource).to.have.property("repository", "example-template")
+        done()
+      })
+    })
   })
 })
