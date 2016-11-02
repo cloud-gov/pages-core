@@ -19,7 +19,10 @@ describe("Site API", () => {
     expect(response.engine).to.equal(site.engine)
     expect(response.defaultBranch).to.equal(site.defaultBranch)
     expect(response.publicPreview).to.equal(site.publicPreview)
-    expect(response.users.map(user => user.id)).to.include.members(site.users)
+
+    expect(response.users.map(user => user.id))
+      .to.have.members(site.users.map(user => user.id))
+
     expect(response.builds).to.be.a("array")
     expect(response.siteRoot).to.be.a("string")
     expect(response.viewLink).to.be.a("string")
@@ -38,7 +41,7 @@ describe("Site API", () => {
     })
 
     it("should render a list of sites associated with the user", done => {
-      var user, sites
+      var user, sites, response
 
       factory(User).then(model => {
         user = model
@@ -54,9 +57,16 @@ describe("Site API", () => {
           .get("/v0/site")
           .set("Cookie", cookie)
           .expect(200)
-      }).then(response => {
+      }).then(resp => {
+        response = resp
+
         expect(response.body).to.be.a("array")
         expect(response.body).to.have.length(3)
+
+        return Promise.all(sites.map(site => {
+          return Site.findOne({ id: site.id }).populate("users")
+        }))
+      }).then(sites => {
         sites.forEach((site, index) => {
           siteResponseExpectations(response.body[index], site)
         })
@@ -101,8 +111,43 @@ describe("Site API", () => {
       })
     })
 
-    it("should redner a JSON representation of the site")
-    it("should respond with a 401 if the user is not associated with the site")
+    it("should render a JSON representation of the site", done => {
+      var site
+
+      factory(Site).then(site => {
+        return Site.findOne({ id: site.id }).populate("users")
+      }).then(model => {
+        site = model
+        return session(site.users[0])
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .get(`/v0/site/${site.id}`)
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(response => {
+        siteResponseExpectations(response.body, site)
+        done()
+      })
+    })
+
+    it("should respond with a 403 if the user is not associated with the site", done => {
+      var site
+
+      factory(Site).then(model => {
+        site = model
+        return factory(User)
+      }).then(user => {
+        return session(user)
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .get(`/v0/site/${site.id}`)
+          .set("Cookie", cookie)
+          .expect(403)
+      }).then(response => {
+        expect(response.body).to.be.empty
+        done()
+      })
+    })
   })
 
   describe("DELETE /v0/site/:id", () => {
