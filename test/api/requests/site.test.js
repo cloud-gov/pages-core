@@ -2,6 +2,7 @@ var expect = require("chai").expect
 var request = require("supertest-as-promised")
 var sinon = require("sinon")
 var factory = require("../support/factory")
+var session = require("../support/session")
 
 describe("Site API", () => {
   beforeEach(() => {
@@ -11,6 +12,18 @@ describe("Site API", () => {
   afterEach(() => {
     GitHub.setWebhook.restore()
   })
+
+  var siteResponseExpectations = (response, site) => {
+    expect(response.owner).to.equal(site.owner)
+    expect(response.repository).to.equal(site.repository)
+    expect(response.engine).to.equal(site.engine)
+    expect(response.defaultBranch).to.equal(site.defaultBranch)
+    expect(response.publicPreview).to.equal(site.publicPreview)
+    expect(response.users.map(user => user.id)).to.include.members(site.users)
+    expect(response.builds).to.be.a("array")
+    expect(response.siteRoot).to.be.a("string")
+    expect(response.viewLink).to.be.a("string")
+  }
 
   describe("GET /v0/site", () => {
     it("should require authentication", done => {
@@ -24,15 +37,63 @@ describe("Site API", () => {
       })
     })
 
-    it("should render a list of sites associated with the user")
-    it("should not render any sites not associated with the user")
+    it("should render a list of sites associated with the user", done => {
+      var user, sites
+
+      factory(User).then(model => {
+        user = model
+        var sitePromises = Array(3).fill(0).map(() => {
+          return factory(Site, { users: [user.id] })
+        })
+        return Promise.all(sitePromises)
+      }).then(models => {
+        sites = models
+        return session(user)
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .get("/v0/site")
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(response => {
+        expect(response.body).to.be.a("array")
+        expect(response.body).to.have.length(3)
+        sites.forEach((site, index) => {
+          siteResponseExpectations(response.body[index], site)
+        })
+        done()
+      })
+    })
+
+    it("should not render any sites not associated with the user", done => {
+      var user
+
+      factory(User).then(model => {
+        user = model
+        var sitePromises = Array(3).fill(0).map(() => {
+          return factory(Site)
+        })
+        return Promise.all(sitePromises)
+      }).then(site => {
+        expect(site).to.have.length(3)
+        return session(user)
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .get("/v0/site")
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(response => {
+        expect(response.body).to.be.a("array")
+        expect(response.body).to.be.empty
+        done()
+      })
+    })
   })
 
   describe("GET /v0/site/:id", () => {
     it("should require authentication", done => {
-      factory(Build).then(build => {
+      factory(Site).then(site => {
         return request("http://localhost:1337")
-          .get(`/v0/site/${build.id}`)
+          .get(`/v0/site/${site.id}`)
           .expect(403)
       }).then(response => {
         expect(response.body).to.be.empty
@@ -46,9 +107,9 @@ describe("Site API", () => {
 
   describe("DELETE /v0/site/:id", () => {
     it("should require authentication", done => {
-      factory(Build).then(build => {
+      factory(Site).then(site => {
         return request("http://localhost:1337")
-          .delete(`/v0/site/${build.id}`)
+          .delete(`/v0/site/${site.id}`)
           .expect(403)
       }).then(response => {
         expect(response.body).to.be.empty
@@ -62,9 +123,9 @@ describe("Site API", () => {
 
   describe("PUT /v0/site/:id", () => {
     it("should require authentication", done => {
-      factory(Build).then(build => {
+      factory(Site).then(site => {
         return request("http://localhost:1337")
-          .put(`/v0/site/${build.id}`, {
+          .put(`/v0/site/${site.id}`, {
             defaultBranch: "master"
           })
           .expect(403)
@@ -81,7 +142,7 @@ describe("Site API", () => {
 
   describe("POST /v0/site/clone", () => {
     it("should require authentication", done => {
-      factory(Build).then(build => {
+      factory(Site).then(site => {
         return request("http://localhost:1337")
           .post(`/v0/site/clone`, {
             sourceOwner: "18f",

@@ -141,6 +141,7 @@ describe("Build API", () => {
           .set("Cookie", cookie)
           .expect(200)
       }).then(response => {
+        expect(response.body).to.be.a("array")
         expect(response.body).to.be.empty
         done()
       })
