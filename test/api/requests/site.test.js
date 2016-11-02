@@ -162,8 +162,49 @@ describe("Site API", () => {
       })
     })
 
-    it("should allow a user to delete a site associated with their account")
-    it("should not allow a user to delete a site not associated with their account")
+    it("should allow a user to delete a site associated with their account", done => {
+      var site
+
+      factory(Site).then(site => {
+        return Site.findOne({ id: site.id }).populate("users")
+      }).then(model => {
+        site = model
+        return session(site.users[0])
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .delete(`/v0/site/${site.id}`)
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(response => {
+        siteResponseExpectations(response.body, site)
+        return Site.find({ id: site.id })
+      }).then(sites => {
+        expect(sites).to.be.empty
+        done()
+      })
+    })
+
+    it("should not allow a user to delete a site not associated with their account", done => {
+      var site
+
+      factory(Site).then(site => {
+        return Site.findOne({ id: site.id }).populate("users")
+      }).then(model => {
+        site = model
+        return session(factory(User))
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .delete(`/v0/site/${site.id}`)
+          .set("Cookie", cookie)
+          .expect(403)
+      }).then(response => {
+        expect(response.body).to.be.empty
+        return Site.find({ id: site.id })
+      }).then(sites => {
+        expect(sites).not.to.be.empty
+        done()
+      })
+    })
   })
 
   describe("PUT /v0/site/:id", () => {
