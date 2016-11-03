@@ -5,6 +5,14 @@ var factory = require("../support/factory")
 var session = require("../support/session")
 
 describe("User API", () => {
+  var userResponseExpectations = (response, user) => {
+    expect(response).to.have.property("id", user.id)
+    expect(response).to.have.property("username", user.username)
+    expect(response).to.have.property("email", user.email)
+    expect(response).to.have.property("sites")
+    expect(response).to.have.property("builds")
+  }
+
   describe("GET /v0/user", () => {
     it("should require authentication", done => {
       factory(User).then(user => {
@@ -32,8 +40,39 @@ describe("User API", () => {
       })
     })
 
-    it("should show a JSON representation of the current user if the id matches theirs")
-    it("should respond with a 403 if the requested user does not match the current user")
+    it("should show a JSON representation of the current user if the id matches theirs", done => {
+      var user
+
+      factory(User).then(model => {
+        user = model
+        return session(user)
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .get(`/v0/user/${user.id}`)
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(response => {
+        userResponseExpectations(response.body, user)
+        done()
+      })
+    })
+
+    it("should respond with a 403 if the requested user does not match the current user", done => {
+      var user
+
+      factory(User).then(model => {
+        user = model
+        return session()
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .get(`/v0/user/${user.id}`)
+          .set("Cookie", cookie)
+          .expect(403)
+      }).then(response => {
+        expect(response.body).to.be.empty
+        done()
+      })
+    })
   })
 
   describe("POST /v0/user/add-site", () => {
