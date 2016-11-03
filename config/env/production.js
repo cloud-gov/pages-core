@@ -6,7 +6,7 @@ var AWS = require('aws-sdk'),
     appEnv = cfenv.getAppEnv(),
     dbURL = appEnv.getServiceURL(`federalist-${process.env.APP_ENV}-rds`),
     AWS_S3_CREDS = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-s3`),
-    redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}}-redis`);
+    redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`);
 
 var _ = require('underscore');
 var session = {
