@@ -28,12 +28,21 @@ var buildAttributes = (overrides) => {
   }, overrides)
 }
 
-var siteAttributes = (overrides) => Object.assign({
-  owner: "user",
-  repository: "site",
-  engine: "jekyll",
-  users: []
-}, overrides)
+var siteAttributes = (overrides) => {
+  overrides = overrides || {}
+  var users = overrides["users"]
+
+  if (users === undefined) {
+    users = Promise.all([factory(User)])
+  }
+
+  return Object.assign({
+    owner: "user",
+    repository: "site",
+    engine: "jekyll",
+    users: users
+  }, overrides)
+}
 
 var userAttributes = (overrides) => {
   var username = generateUniqueUserName()

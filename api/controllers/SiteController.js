@@ -28,7 +28,7 @@ module.exports = {
 
       Site.findOne({
         id: site.id
-      }).populate('builds').exec(function(err, site) {
+      }).populate('builds').populate("users").exec(function(err, site) {
         if (err) return res.serverError(err);
 
         // Delete the build that runs automatically when the site is created
