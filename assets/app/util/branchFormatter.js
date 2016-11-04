@@ -5,7 +5,7 @@ export const formatDraftBranchName = (path) => {
 }
 
 export const pathHasDraft = (path, branches) => {
-  return !!getDraft(path, branches);
+  return Boolean(getDraft(path, branches));
 }
 
 export const getDraft = (path = '', branches = []) => {
