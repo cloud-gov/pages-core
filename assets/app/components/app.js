@@ -1,10 +1,6 @@
-
 import React from 'react';
-import { routeTypes } from '../constants';
 import store from '../store';
-
 import alertActions from '../actions/alertActions';
-
 import Header from './header';
 
 class App extends React.Component {

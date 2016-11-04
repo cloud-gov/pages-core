@@ -62,6 +62,11 @@ class Editor extends React.Component {
   }
 
   componentDidMount() {
+    // Bail if we are on a new page; there wont be any drafts
+    if (this.props.route.isNewPage) {
+      return;
+    }
+
     // trigger the fetch file content action for the case
     // when a user first loads this view. That could be
     // a changing of the route to a site for the first time
@@ -151,7 +156,7 @@ class Editor extends React.Component {
     }
 
     if (this.props.route.isNewPage) {
-      path = `${path}.md`;
+      path = `pages/${path}.md`;
     }
 
     return { content, path, message };
