@@ -46,6 +46,8 @@ if (dbURL) {
   module.exports.models = {
     connection: 'postgres'
   };
+} else {
+  throw new Error('No database credentials found.');
 }
 
 // If running in Cloud Foundry with an S3 credential service available
@@ -62,7 +64,7 @@ if (sqsKey && sqsSecret && AWS_S3_CREDS) {
     region: AWS_S3_CREDS.region
   });
 } else {
-  console.log('You didn\'t define AWS user credentials for either SQS or S3!\n');
+  throw new Error('No SQS or S3 credentials found.');
 }
 
 // If running in Cloud Foundry with a redis service
@@ -74,14 +76,8 @@ if (redisCreds) {
     db: 0,
     pass: redisCreds.password
   });
-
-  module.exports.sockets = {
-    adapter: 'socket.io-redis',
-    host: redisCreds.hostname,
-    port: redisCreds.port,
-    db: 1,
-    pass: redisCreds.password
-  };
+} else {
+  throw new Error('No redis credentials found.');
 }
 
 module.exports.session = session;
