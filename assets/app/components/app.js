@@ -18,7 +18,7 @@ class App extends React.Component {
   }
 
   shouldClearAlert(alert, nextProps) {
-    const { key: lastKey } = this.props.location;
+    const { location: { key: lastKey } } = this.props;
     const { key: nextKey } = nextProps.location;
 
     // clear an existing alert message if stale, or flag it to be removed on
@@ -26,7 +26,7 @@ class App extends React.Component {
     if (lastKey === nextKey) return;
 
     if (alert.message) {
-      alertActions[alert.stale ? 'clear' : 'setStale']();
+      alertActions.update(alert.stale);
     }
   }
 

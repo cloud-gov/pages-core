@@ -8,8 +8,8 @@ describe("alertActions", () => {
   let fixture;
   let dispatch;
   let authErrorActionCreator, httpErrorActionCreator, httpSuccessActionCreator,
-      setStaleActionCreator, clearActionCreator;
-  
+      setStaleActionCreator, clearActionCreator, update;
+
   beforeEach(() => {
     dispatch = spy();
     authErrorActionCreator = stub();
@@ -17,7 +17,8 @@ describe("alertActions", () => {
     httpSuccessActionCreator = stub();
     setStaleActionCreator = stub();
     clearActionCreator = stub();
-    
+    update = stub();
+
     fixture = proxyquire("../../../../assets/app/actions/alertActions", {
       "./actionCreators/alertActions": {
         authError: authErrorActionCreator,
@@ -59,7 +60,7 @@ describe("alertActions", () => {
       expect(dispatch.calledOnce).to.be.true;
       expect(dispatch.calledWith(httpErrorAction)).to.be.true;
     });
-    
+
     it("has alertError as a synonym", () => {
       const message = "homework should be done";
       const httpErrorAction = {
@@ -114,6 +115,38 @@ describe("alertActions", () => {
 
       expect(dispatch.calledOnce).to.be.true;
       expect(dispatch.calledWith(clearAction)).to.be.true;
+    });
+
+    describe('update()', () => {
+      it('sends a clear action if the message is stale', () => {
+        const clearAction = {
+          monster: 'mash'
+        };
+
+        spy(fixture, 'clear');
+
+        clearActionCreator.withArgs().returns(clearAction);
+
+        fixture.update(true);
+
+        expect(fixture.clear.calledOnce).to.be.true;
+        expect(dispatch.calledWith(clearAction)).to.be.true;
+      });
+
+      it('sends a setStale action if the message is not stale', () => {
+        const staleAction = {
+          is: 'old'
+        };
+
+        spy(fixture, 'setStale');
+
+        setStaleActionCreator.withArgs().returns(staleAction);
+
+        fixture.update(false);
+
+        expect(fixture.setStale.calledOnce).to.be.true;
+        expect(dispatch.calledWith(staleAction)).to.be.true;
+      });
     });
   });
 });

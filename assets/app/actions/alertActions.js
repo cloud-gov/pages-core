@@ -31,5 +31,9 @@ export default {
 
   clear() {
     dispatch(createClearAction());
+  },
+
+  update(isStale) {
+    dispatch(this[isStale ? 'clear': 'setStale']());
   }
 };
