@@ -484,7 +484,7 @@ describe("siteActions", () => {
       });
     });
 
-    it("triggers an error when fetching the site assets fails", () => {
+    it("throws an error when fetching the site assets fails", () => {
       const assetPath = "/go/directly/here";
       const site = {
         id: siteId,
@@ -497,7 +497,7 @@ describe("siteActions", () => {
 
       const actual = fixture.fetchSiteAssets(site);
 
-      return validateResultDispatchesHttpAlertError(actual, errorMessage);
+      return expectDispatchToNotBeCalled(actual, httpErrorAlertAction);
     });
   });
 
@@ -837,14 +837,6 @@ describe("siteActions", () => {
   });
 
   describe("fetchSiteConfigsAndAssets", () => {
-    it("triggers an error when fetching site configs fails without a runtime error", () => {
-      fetchRepositoryConfigs.withArgs(site).returns(rejectedWithErrorPromise);
-
-      const actual = fixture.fetchSiteConfigsAndAssets(site);
-
-      return validateResultDispatchesHttpAlertError(actual, errorMessage);
-    });
-
     it("triggers an error when fetching site configs fails with a runtime error", () => {
       // FIXME: not sure what the point of this is
       const fakeRuntimeError = {

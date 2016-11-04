@@ -307,7 +307,7 @@ class Editor extends React.Component {
         {this.getNewPage()}
 
         <PageSettings
-          templateConfig={ props.site['_config.yml'].content }
+          templateConfig={ props.site['_config.yml'] && props.site['_config.yml'].content }
           frontmatter={ frontmatter }
           onChange={ (frontmatter) => {
             this.handleChange('frontmatter', frontmatter);
