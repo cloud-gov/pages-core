@@ -1,4 +1,4 @@
-const templates = {
+module.exports = {
   'microsite': {
     owner: 'USG-Website-Templates',
     branch: 'gh-pages',
@@ -24,5 +24,3 @@ const templates = {
     description: 'This is a Jekyll site. It is a simple site to showcase the work of an organization with a few different page types'
   }
 };
-
-export default templates;
