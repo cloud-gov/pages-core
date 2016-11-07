@@ -8,20 +8,20 @@ const propTypes = {
 
 const SiteMediaContainer = ({assets = []}) => {
   if (!assets.length) {
-    return <h1>No media uploaded yet.</h1>
+    return <h1>No media uploaded yet.</h1>;
   }
 
   return (
     <div className="media-assets">
       {
         assets.map((asset, index) => {
-          return <MediaThumbnail key={ index } asset={ asset } />
+          return <MediaThumbnail key={ index } asset={ asset } />;
         })
       }
     </div>
   );
 };
 
-SiteMediaContainer.propTypes = propTypes
+SiteMediaContainer.propTypes = propTypes;
 
 export default SiteMediaContainer;
