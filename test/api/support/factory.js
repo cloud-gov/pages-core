@@ -36,12 +36,22 @@ var siteAttributes = (overrides) => {
     users = Promise.all([factory(User)])
   }
 
+  var repository = generateUniqueRepository()
+
   return Object.assign({
-    owner: "user",
-    repository: "site",
+    owner: repository.owner,
+    repository: repository.name,
     engine: "jekyll",
     users: users
   }, overrides)
+}
+
+var repositroyNameStep = 1
+generateUniqueRepository = () => {
+  return {
+    owner: `repo-owner-${repositroyNameStep}`,
+    name: `repo-name-${repositroyNameStep++}`
+  }
 }
 
 var userAttributes = (overrides) => {

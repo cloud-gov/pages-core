@@ -28,6 +28,8 @@ module.exports = {
       return res.badRequest('Please specify a repository owner and name.')
     }
 
+    req.body.users = [user]
+
     async.series([
       checkPermissions,
       checkSite
