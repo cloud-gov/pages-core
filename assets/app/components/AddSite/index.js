@@ -4,12 +4,18 @@ import TemplateSiteList from './TemplateSiteList';
 import LinkButton from '../linkButton';
 import AlertBanner from '../alertBanner';
 
-import siteActions from '../../actions/siteActions';
+import { addSite, cloneRepo } from '../../actions/siteActions';
 
-import { templates } from '../../../../config/templates';
+import templates from '../../../../config/templates';
 
 const propTypes = {
-  storeState: React.PropTypes.object
+  storeState: React.PropTypes.shape({
+    user: React.PropTypes.shape({
+      username: React.PropTypes.string,
+      id: React.PropTypes.string
+    }),
+    error: React.PropTypes.string
+  })
 }
 
 class AddSite extends React.Component {
@@ -32,11 +38,11 @@ class AddSite extends React.Component {
 
   onSubmit(event) {
     event.preventDefault();
-    siteActions.addSite(this.state);
+    addSite(this.state);
   }
 
   onSubmitTemplate(siteName, templateName) {
-    siteActions.cloneRepo({
+    cloneRepo({
       repo: siteName
     }, templates[templateName]);
   }
@@ -124,7 +130,6 @@ class AddSite extends React.Component {
           </div>
           <div className="usa-grid">
             <div className="usa-width-one-whole">
-              <input type="hidden" name="users" value={ this.props.currentUserId } />
               <LinkButton
                 className="usa-button-secondary"
                 text="Cancel"
