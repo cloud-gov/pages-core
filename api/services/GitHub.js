@@ -58,7 +58,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       // Get user's organizations
       github.user.getOrgs({}, function(err, organizations) {
-        if (err) return reject(new Error(JSON.parse(err.message)));
+        if (err) return reject(new Error(err.message));
 
         // Do the user's organizations in any on the approved list?
         var hasApproval = _(organizations)

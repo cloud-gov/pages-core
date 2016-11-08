@@ -1,5 +1,3 @@
-/* jshint laxcomma:true */
-
 var GitHubStrategy = require('passport-github').Strategy
 var passport = require('passport')
 
@@ -7,18 +5,15 @@ var githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
   var user
 
   return GitHub.validateUser(accessToken).then(() => {
-    sails.log.info("Access token found: " + accessToken)
     return User.findOrCreate({ username: profile.username }, {
       email: profile.emails[0].value,
       username: profile.username,
     })
   }).then(model => {
-    sails.log.info("User: ", user)
     user = model
     if (!user) throw new Error(`Unable to find or create user ${profile.username}`)
-    return Passport.find({ user: user.id, provider: "github" })
+    return Passport.findOne({ user: user.id, provider: "github" })
   }).then(passport => {
-    sails.log.info("Old passport: ", passport)
     if (passport && passport.tokens && passport.tokens.accessToken === accessToken) {
       return passport
     } else if (passport) {
@@ -35,10 +30,8 @@ var githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
       })
     }
   }).then(passport => {
-    sails.log.info("New passport: ", passport)
     callback(null, user)
   }).catch(err => {
-    sails.log.error("Authentication error", err)
     callback(err)
   })
 }
