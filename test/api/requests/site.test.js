@@ -295,7 +295,8 @@ describe("Site API", () => {
   describe("POST /v0/site/clone", () => {
     it("should require authentication", done => {
       var cloneRequest = request("http://localhost:1337")
-        .post(`/v0/site/clone`, {
+        .post(`/v0/site/clone`)
+        .send({
           sourceOwner: "18f",
           sourceRepo: "example-template",
           destinationOrg: "partner-org",
