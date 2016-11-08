@@ -88,7 +88,6 @@ describe('<AddSite/>', () => {
   it('delivers the correct props to its children', () => {
     const bannerProps = wrapper.find(AlertBanner).props();
     const templateListProps = wrapper.find(TemplateSiteList).props();
-    const linkButtonProps = wrapper.find(LinkButton).props();
     const formProps = wrapper.find('form').props();
 
     expect(bannerProps).to.deep.equal({message: propsWithoutError.storeState.error});
