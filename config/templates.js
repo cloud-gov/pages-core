@@ -1,4 +1,4 @@
-module.exports.templates = {
+module.exports = {
   'microsite': {
     owner: 'USG-Website-Templates',
     branch: 'gh-pages',
