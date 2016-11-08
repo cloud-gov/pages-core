@@ -19,7 +19,9 @@ import {
   dispatchSiteAssetsReceivedAction,
   dispatchSiteFilesReceivedAction,
   dispatchSiteConfigsReceivedAction,
-  dispatchSiteBranchesReceivedAction
+  dispatchSiteBranchesReceivedAction,
+  dispatchSiteInvalidAction,
+  dispatchSiteLoadingAction
 } from './dispatchActions';
 
 
@@ -74,27 +76,18 @@ export default {
   },
 
   fetchSiteConfigs(site) {
-    function getFileFromS3(config) {
-      return s3.fetchFile(site, '_navigation.json').then((navigation) => {
-        return [config, navigation];
-      }).catch((error) => {
-        return [config];
-      });
-    }
+    return github.fetchRepositoryConfigs(site).then((config) => {
+      return dispatchSiteConfigsReceivedAction(site.id, config);
+    }).then(() => site)
+    .catch(error => throwRuntime(error));
+  },
 
-    function mergeConfigAndNavigation(configs) {
-      return configs.reduce((memo, config) => {
-        return Object.assign({}, memo, config);
-      }, {});
-    }
-
-    return github.fetchRepositoryConfigs(site)
-      .then(getFileFromS3)
-      .then(mergeConfigAndNavigation)
-      .then((configsObj) => {
-        return dispatchSiteConfigsReceivedAction(site.id, configsObj);
-      })
-      .then(() => site);
+  fetchSiteNavigationFile(site) {
+    return s3.fetchFile(site, '_navigation.json').then((navigation) => {
+      return dispatchSiteConfigsReceivedAction(site.id, navigation);
+    }).catch((error) => {
+      throwRuntime(error);
+    });
   },
 
   createCommit(site, path, fileData, message = false, sha = false) {
@@ -113,7 +106,7 @@ export default {
     return github.fetchRepositoryContent(site, assetPath)
       .then(filterAssetsWithTypeOfFile)
       .then(dispatchSiteAssetsReceivedAction.bind(null, site.id))
-      .then(() => site)
+      .then(() => {console.log('after assets call', site); return site})
       .catch((error) => {
         throwRuntime(error)
       });
@@ -185,22 +178,37 @@ export default {
     }).catch(error => alertActions.httpError(error.message));
   },
 
+  siteExists(site) {
+    return github.getRepo(site)
+      .then(() => site)
+      .catch((error) => dispatchSiteInvalidAction(site, true));
+  },
+
   fetchSiteConfigsAndAssets(site) {
-    return this.fetchSiteConfigs(site).then((site) => {
-      return this.fetchBranches(site);
-    }).then((site) => {
-      return this.fetchSiteAssets(site);
-    }).then((site) => {
-      return github.fetchRepositoryContent(site);
-    }).then((files) => {
-      dispatchSiteFilesReceivedAction(site.id, files);
-      return files;
-    }).catch((error) => {
-      // TODO: make a generic catch handler that will only
-      // trigger an http error action for an actual http
-      // error.
-      throwRuntime(error);
-    });
+    let _site = site;
+
+    return this.siteExists(site).then((site) => {
+      dispatchSiteLoadingAction(site, true);
+      this.fetchSiteAssets(site);
+
+      this.fetchSiteNavigationFile(site).then(() => {
+        dispatchSiteLoadingAction(site, false);
+      });
+
+      github.fetchRepositoryContent(site).then((files) => {
+        dispatchSiteFilesReceivedAction(site.id, files);
+        return site;
+      }).then((site) => {
+        return this.fetchBranches(site);
+      }).then((site) => {
+        return this.fetchSiteConfigs(site);
+      }).catch((error) => {
+        // TODO: make a generic catch handler that will only
+        // trigger an http error action for an actual http
+        // error.
+        throwRuntime(error);
+      });
+    }).catch(error => throwRuntime(error));
   }
 };
 

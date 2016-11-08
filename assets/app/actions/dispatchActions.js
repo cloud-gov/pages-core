@@ -8,7 +8,9 @@ import {
   siteAssetsReceived as createSiteAssetsReceivedAction,
   siteFilesReceived as createSiteFilesReceivedAction,
   siteConfigsReceived as createSiteConfigsReceivedAction,
-  siteBranchesReceived as createSiteBranchesReceivedAction
+  siteBranchesReceived as createSiteBranchesReceivedAction,
+  siteInvalid as createSiteInvalidAction,
+  siteLoading as createSiteLoadingAction
 } from './actionCreators/siteActions';
 import { pushHistory } from './routeActions';
 
@@ -56,6 +58,14 @@ const dispatchSiteBranchesReceivedAction = (siteId, branches) => {
   dispatch(createSiteBranchesReceivedAction(siteId, branches));
 };
 
+const dispatchSiteInvalidAction = (site, isInvalid) => {
+  dispatch(createSiteInvalidAction(site, isInvalid));
+};
+
+const dispatchSiteLoadingAction = (site, isLoading) => {
+  dispatch(createSiteLoadingAction(site, isLoading));
+}
+
 export {
   updateRouterToSitesUri,
   updateRouterToSpecificSiteUri,
@@ -67,5 +77,7 @@ export {
   dispatchSiteAssetsReceivedAction,
   dispatchSiteFilesReceivedAction,
   dispatchSiteConfigsReceivedAction,
-  dispatchSiteBranchesReceivedAction
+  dispatchSiteBranchesReceivedAction,
+  dispatchSiteInvalidAction,
+  dispatchSiteLoadingAction
 };

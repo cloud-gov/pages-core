@@ -4,7 +4,7 @@ import { Route, Link, IndexRedirect, IndexRoute, Redirect } from 'react-router';
 import App from './components/app';
 import SiteList from './components/siteList/siteList';
 import SiteContainer from './components/siteContainer';
-import SitePagesContainer from './components/site/Pages/pagesContainer';
+import SitePagesContainer from './bundles/pagesContainerBundle';
 import SiteEditorContainer from './components/site/editor/editorContainer';
 import SiteLogs from './components/site/siteLogs';
 import SiteMediaContainer from './components/site/siteMediaContainer';
@@ -12,7 +12,7 @@ import SiteSettings from './components/site/siteSettings';
 import NewSite from './components/AddSite';
 import NotFound from './components/NotFound';
 
-import alertActions from './actions/alertActions';
+import store from './store';
 
 export default (
   <Route path="/" component={App}>

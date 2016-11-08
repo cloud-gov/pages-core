@@ -19,10 +19,8 @@
 html,
 body,
 main,
-main > div,
 .usa-grid.site,
-#js-app,
-#js-app > div {
+#js-app, div[data-reactroot=""] {
   height: 100%; }
 
 .recent-drafts {
