@@ -23,7 +23,7 @@ export default function sites(state = initialState, action) {
     return mapPropertyToMatchingSite(state, action.site.id, {loading: action.loading});
 
   case SITE_INVALID:
-    return mapPropertyToMatchingSite(state, action.site.id, {invalid: true});
+    return mapPropertyToMatchingSite(state, action.site.id, {invalid: action.invalid});
 
   case SITES_RECEIVED:
     return action.sites || initialState;

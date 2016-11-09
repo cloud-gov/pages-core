@@ -106,10 +106,7 @@ export default {
     return github.fetchRepositoryContent(site, assetPath)
       .then(filterAssetsWithTypeOfFile)
       .then(dispatchSiteAssetsReceivedAction.bind(null, site.id))
-      .then(() => {console.log('after assets call', site); return site})
-      .catch((error) => {
-        throwRuntime(error)
-      });
+      .then(() => site);
   },
 
   fetchBranches(site) {
@@ -181,16 +178,19 @@ export default {
   siteExists(site) {
     return github.getRepo(site)
       .then(() => site)
-      .catch((error) => dispatchSiteInvalidAction(site, true));
+      .catch((error) => {
+        dispatchSiteLoadingAction(site, false);
+        dispatchSiteInvalidAction(site, true);
+
+        throw new Error(error);
+      });
   },
 
   fetchSiteConfigsAndAssets(site) {
-    let _site = site;
-
     return this.siteExists(site).then((site) => {
       dispatchSiteLoadingAction(site, true);
-      this.fetchSiteAssets(site);
 
+      this.fetchSiteAssets(site);
       this.fetchSiteNavigationFile(site).then(() => {
         dispatchSiteLoadingAction(site, false);
       });
@@ -208,7 +208,9 @@ export default {
         // error.
         throwRuntime(error);
       });
-    }).catch(error => throwRuntime(error));
+    }).catch(error => {
+      throwRuntime(error)}
+    );
   }
 };
 

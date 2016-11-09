@@ -14,9 +14,9 @@ const hasConfig = (Component) => {
   **/
   const hasConfig = (props) => {
     const { site } = props;
-    const { invalid, files = [], assets = [] } = site;
+    const { invalid, files = [] } = site;
 
-    if (invalid || (!files.length && !assets.length)) {
+    if (invalid || !files.length) {
       return (
         <h4>
           The site you requested is either building for the first time, or cannot be found on GitHub. If you just created a new site via Federalist, check back in a few minutes.

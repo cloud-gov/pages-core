@@ -16,9 +16,10 @@ const siteLoading = (site, loading) => ({
   loading
 });
 
-const siteInvalid = site => ({
+const siteInvalid = (site, invalid) => ({
   type: siteInvalidType,
-  site
+  site,
+  invalid
 });
 
 const sitesReceived = sites => ({
