@@ -22,7 +22,7 @@ const SiteLogs = ({site}) =>
       </tr>
     </thead>
     <tbody>
-      {site.builds.map((build) => {
+      {site.builds.reverse().map((build) => {
         const rowClass = `usa-alert-${build.state}`;
         const username = getUsername(site, build.user);
 
