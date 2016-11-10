@@ -55,6 +55,7 @@ assets/js/bundle.js
 # USWDS assets
 assets/images/uswds
 assets/styles/uswds.css
+assets/styles/uswds.min.css
 assets/styles/google-fonts.css
 assets/fonts/merriweather*
 assets/fonts/sourcesanspro*
