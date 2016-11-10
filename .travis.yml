@@ -1,6 +1,7 @@
 branches:
   only:
     - staging
+    - jmhooper-update-ignore-files
 cache: false
 language: node_js
 sudo: true
@@ -34,4 +35,4 @@ deploy:
     script: scripts/deploy-travis.sh
     skip_cleanup: true
     on:
-      branch: staging
+      branch: jmhooper-update-ignore-files
