@@ -10,7 +10,8 @@ describe("dispatchActions", () => {
   let sitesReceivedActionCreator, siteAddedActionCreator, siteDeletedActionCreator,
       siteUpdatedActionCreator, siteFileContentReceivedActionCreator, siteAssetsReceivedActionCreator,
       siteFilesReceivedActionCreator, siteConfigsReceivedActionCreator, siteBranchesReceivedActionCreator,
-      updateRouterActionCreator, pushHistory;
+      updateRouterActionCreator, siteLoadingActionCreator,
+      siteInvalidActionCreator, pushHistory;
 
   const action = { whatever: "bub" };
   const site = { site: "site1" };
@@ -28,6 +29,8 @@ describe("dispatchActions", () => {
     siteFilesReceivedActionCreator = stub();
     siteConfigsReceivedActionCreator = stub();
     siteBranchesReceivedActionCreator = stub();
+    siteLoadingActionCreator = stub();
+    siteInvalidActionCreator = stub();
     pushHistory = stub();
 
     fixture = proxyquire("../../../../assets/app/actions/dispatchActions", {
@@ -40,7 +43,9 @@ describe("dispatchActions", () => {
         siteAssetsReceived: siteAssetsReceivedActionCreator,
         siteFilesReceived: siteFilesReceivedActionCreator,
         siteConfigsReceived: siteConfigsReceivedActionCreator,
-        siteBranchesReceived: siteBranchesReceivedActionCreator
+        siteBranchesReceived: siteBranchesReceivedActionCreator,
+        siteInvalid: siteInvalidActionCreator,
+        siteLoading: siteLoadingActionCreator
       },
       "./routeActions": {
         pushHistory: pushHistory
@@ -142,6 +147,20 @@ describe("dispatchActions", () => {
     siteBranchesReceivedActionCreator.withArgs(siteId, branches).returns(action);
 
     fixture.dispatchSiteBranchesReceivedAction(siteId, branches);
+
+    expect(dispatch.calledWith(action)).to.be.true;
+  });
+
+  it('dispatchSiteInvalidAction', () => {
+    siteInvalidActionCreator.withArgs(site, false).returns(action);
+    fixture.dispatchSiteInvalidAction(site, false);
+
+    expect(dispatch.calledWith(action)).to.be.true;
+  });
+
+  it('dispatchSiteLoadingAction', () => {
+    siteLoadingActionCreator.withArgs(site, false).returns(action);
+    fixture.dispatchSiteLoadingAction(site, false);
 
     expect(dispatch.calledWith(action)).to.be.true;
   });

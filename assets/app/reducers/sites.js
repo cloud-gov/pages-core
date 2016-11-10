@@ -8,7 +8,9 @@ import {
   siteAssetsReceivedType as SITE_ASSETS_RECEIVED,
   siteConfigsReceivedType as SITE_CONFIGS_RECEIVED,
   siteBranchesReceivedType as SITE_BRANCHES_RECEIVED,
-  siteFilesReceivedType as SITE_FILES_RECEIVED
+  siteFilesReceivedType as SITE_FILES_RECEIVED,
+  siteInvalidType as SITE_INVALID,
+  siteLoadingType as SITE_LOADING
 } from '../actions/actionCreators/siteActions';
 
 
@@ -16,6 +18,13 @@ const initialState = [];
 
 export default function sites(state = initialState, action) {
   switch (action.type) {
+
+  case SITE_LOADING:
+    return mapPropertyToMatchingSite(state, action.site.id, {loading: action.loading});
+
+  case SITE_INVALID:
+    return mapPropertyToMatchingSite(state, action.site.id, {invalid: action.invalid});
+
   case SITES_RECEIVED:
     return action.sites || initialState;
 

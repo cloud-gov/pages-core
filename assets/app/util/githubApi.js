@@ -36,6 +36,13 @@ const github = {
     });
   },
 
+  getRepo(site) {
+    const url = `${getRepoFor(site)}`;
+    const params = { access_token: getToken() };
+
+    return this.fetch(url, { params });
+  },
+
   createCommit(site, path, commit) {
     let url = `${getRepoFor(site)}/contents/${path}`;
 

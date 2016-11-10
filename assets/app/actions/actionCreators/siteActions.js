@@ -7,6 +7,20 @@ const siteFileContentReceivedType = "SITE_FILE_CONTENT_RECEIVED";
 const siteAssetsReceivedType = "SITE_ASSETS_RECEIVED";
 const siteConfigsReceivedType = "SITE_CONFIGS_RECEIVED";
 const siteBranchesReceivedType = "SITE_BRANCHES_RECEIVED";
+const siteInvalidType = 'SITE_INVALID';
+const siteLoadingType = 'SITE_LOADING';
+
+const siteLoading = (site, loading) => ({
+  type: siteLoadingType,
+  site,
+  loading
+});
+
+const siteInvalid = (site, invalid) => ({
+  type: siteInvalidType,
+  site,
+  invalid
+});
 
 const sitesReceived = sites => ({
   type: sitesReceivedType,
@@ -68,5 +82,7 @@ export {
   siteFileContentReceived, siteFileContentReceivedType,
   siteAssetsReceived, siteAssetsReceivedType,
   siteConfigsReceived, siteConfigsReceivedType,
-  siteBranchesReceived, siteBranchesReceivedType
+  siteBranchesReceived, siteBranchesReceivedType,
+  siteInvalid, siteInvalidType,
+  siteLoading, siteLoadingType
 };

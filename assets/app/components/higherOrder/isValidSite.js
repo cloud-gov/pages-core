@@ -13,9 +13,10 @@ const hasConfig = (Component) => {
    * returned by reducers, to make this less confusing.
   **/
   const hasConfig = (props) => {
-    const { site: { config } } = props;
+    const { site } = props;
+    const { invalid, files = [] } = site;
 
-    if (config === null) {
+    if (invalid || !files.length) {
       return (
         <h4>
           The site you requested is either building for the first time, or cannot be found on GitHub. If you just created a new site via Federalist, check back in a few minutes.

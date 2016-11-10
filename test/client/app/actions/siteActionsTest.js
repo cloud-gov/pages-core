@@ -6,19 +6,25 @@ proxyquire.noCallThru();
 
 describe("siteActions", () => {
   let fixture;
+
   let fetchRepositoryContent, fetchRepositoryConfigs, createCommit, fetchBranches,
-      deleteBranch, createRepo, fetchFile;
+      deleteBranch, createRepo, fetchFile, getRepo;
+
   let fetchSites, addSite, updateSite, deleteSite, cloneRepo, createBranch,
-      createPullRequest, mergePullRequest, fetchPullRequests;
+      createPullRequest, mergePullRequest, fetchPullRequests, siteExists,
+      fetchSiteNavigationFile, fetchSiteAssets;
+
   let addPathToSite, uploadFileToSite, formatDraftBranchName, findShaForDefaultBranch, convertFileToData,
       filterAssetsWithTypeOfFile;
+
   let httpErrorAlertAction, alertSuccess, alertError;
 
   let updateRouterToSitesUri, updateRouterToSpecificSiteUri, dispatchSitesReceivedAction,
       dispatchSiteAddedAction, dispatchSiteUpdatedAction, dispatchSiteDeletedAction,
       dispatchSiteFileContentReceivedAction, dispatchSiteAssetsReceivedAction,
       dispatchSiteFilesReceivedAction, dispatchSiteConfigsReceivedAction,
-      dispatchSiteBranchesReceivedAction;
+      dispatchSiteBranchesReceivedAction, dispatchSiteInvalidAction,
+      dispatchSiteLoadingAction;
 
   const siteId = "kuaw8fsru8hwugfw";
   const site = {
@@ -38,6 +44,7 @@ describe("siteActions", () => {
     addSite = stub();
     updateSite = stub();
     deleteSite = stub();
+    getRepo = stub();
     cloneRepo = stub();
     createBranch = stub();
     fetchPullRequests = stub();
@@ -54,6 +61,9 @@ describe("siteActions", () => {
     uploadFileToSite = stub();
     alertSuccess = stub();
     alertError = stub();
+    siteExists = stub();
+    fetchSiteNavigationFile = stub();
+    fetchSiteAssets = stub();
 
     updateRouterToSitesUri = stub();
     updateRouterToSpecificSiteUri = stub();
@@ -66,6 +76,8 @@ describe("siteActions", () => {
     dispatchSiteFilesReceivedAction = stub();
     dispatchSiteConfigsReceivedAction = stub();
     dispatchSiteBranchesReceivedAction = stub();
+    dispatchSiteInvalidAction = stub();
+    dispatchSiteLoadingAction = stub();
 
     formatDraftBranchName = stub();
     findShaForDefaultBranch = stub();
@@ -84,7 +96,9 @@ describe("siteActions", () => {
         dispatchSiteAssetsReceivedAction: dispatchSiteAssetsReceivedAction,
         dispatchSiteFilesReceivedAction: dispatchSiteFilesReceivedAction,
         dispatchSiteConfigsReceivedAction: dispatchSiteConfigsReceivedAction,
-        dispatchSiteBranchesReceivedAction: dispatchSiteBranchesReceivedAction
+        dispatchSiteBranchesReceivedAction: dispatchSiteBranchesReceivedAction,
+        dispatchSiteInvalidAction: dispatchSiteInvalidAction,
+        dispatchSiteLoadingAction: dispatchSiteLoadingAction
       },
       "./alertActions": {
         httpError: httpErrorAlertAction,
@@ -108,7 +122,8 @@ describe("siteActions", () => {
         createRepo: createRepo,
         createBranch: createBranch,
         createPullRequest: createPullRequest,
-        mergePullRequest: mergePullRequest
+        mergePullRequest: mergePullRequest,
+        getRepo: getRepo
       },
       '../util/s3Api': {
         fetchFile: fetchFile
@@ -837,39 +852,77 @@ describe("siteActions", () => {
   });
 
   describe("fetchSiteConfigsAndAssets", () => {
-    it("triggers an error when fetching site configs fails with a runtime error", () => {
-      // FIXME: not sure what the point of this is
-      const fakeRuntimeError = {
-        name: "TypeError",
-        test: "YES!"
-      };
-      const fakeRuntimeErrorPromise = Promise.reject(fakeRuntimeError);
-      fetchRepositoryConfigs.withArgs(site).returns(fakeRuntimeErrorPromise);
+    describe('site does not exist on github', () => {
+      it('dispatches an `invalidSite` and `siteLoading` action', () => {
+        const error = {
+          name: 'error'
+        };
+        const promiseRejection = Promise.reject(error);
 
-      const actual = fixture.fetchSiteConfigsAndAssets(site);
+        siteExists.withArgs(site).returns(promiseRejection);
+        getRepo.withArgs(site).returns(promiseRejection)
 
-      return actual.catch((error) => {
-        expect(error).to.equal(fakeRuntimeError);
+        const actual = fixture.fetchSiteConfigsAndAssets(site);
+
+        actual.catch(error => {
+          expect(dispatchSiteInvalidAction.calledWith(site, true)).to.be.true;
+          expect(dispatchSiteLoadingAction.calledWith(site, false)).to.be.true;
+          expect(error).to.be.defined;
+        });
       });
     });
 
-    it("fetches configs, branches, assets, content and does all the things", () => {
-      const files = [{
-        hi: "there"
-      }];
-      const sitePromise = Promise.resolve(site);
-      const filesPromise = Promise.resolve(files);
+    describe('site does exist on github', () => {
+      it('dispatches a `siteLoading` action', () => {
+        stubSuccessChain([
+          siteExists,
+          getRepo
+        ]);
 
-      fetchRepositoryConfigs.withArgs(site).returns(sitePromise);
-      fetchFile.withArgs(site, '_navigation.json').returns(sitePromise);
-      fetchBranches.withArgs(site).returns(sitePromise);
-      fetchRepositoryContent.withArgs(site).returns(filesPromise);
+        const actual = fixture.fetchSiteConfigsAndAssets(site);
 
-      const actual = fixture.fetchSiteConfigsAndAssets(site);
+        actual.then(() => {
+          expect(dispatchSiteLoadingAction.calledWith(site, true)).to.be.true;
+          expect(dispatchSiteInvalidAction.calledWith(site, true)).to.be.false
+        });
+      });
 
-      return actual.then((result) => {
-        expect(dispatchSiteFilesReceivedAction.calledWith(siteId, files)).to.be.true;
-        expect(result).to.equal(files);
+      it('dispatches a `siteLoading` action when navigation.json has been requested', () => {
+        stubSuccessChain([
+          siteExists,
+          getRepo,
+          fetchSiteNavigationFile
+        ]);
+
+        const actual = fixture.fetchSiteConfigsAndAssets(site);
+
+        actual.then(() => {
+          expect(dispatchSiteLoadingAction.calledWith(site, false)).to.be.true;
+        });
+      });
+
+      it("fetches configs, branches, assets, content and does all the things", () => {
+        const files = [{
+          hi: "there"
+        }];
+
+        const sitePromise = Promise.resolve(site);
+        const filesPromise = Promise.resolve(files);
+
+        getRepo.withArgs(site).returns(Promise.resolve());
+        siteExists.withArgs(site).returns(sitePromise);
+        fetchRepositoryConfigs.withArgs(site).returns(sitePromise);
+        fetchFile.withArgs(site, '_navigation.json').returns(sitePromise);
+        fetchBranches.withArgs(site).returns(sitePromise);
+        fetchRepositoryContent.withArgs(site).returns(filesPromise);
+
+        const actual = fixture.fetchSiteConfigsAndAssets(site);
+
+        return actual.then((result) => {
+          expect(dispatchSiteConfigsReceivedAction.called).to.be.true
+          expect(dispatchSiteLoadingAction.calledWith(site, true)).to.be.true;
+          expect(dispatchSiteFilesReceivedAction.calledWith(siteId, files)).to.be.true;
+        });
       });
     });
   });
@@ -900,4 +953,9 @@ describe("siteActions", () => {
     expect(alertError.calledWith(errorMessage)).to.be.true;
   };
 
+  const stubSuccessChain = methods => {
+    methods.forEach((method) => {
+      method.withArgs(site).returns(Promise.resolve());
+    });
+  };
 });

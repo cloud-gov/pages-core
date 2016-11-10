@@ -3,7 +3,6 @@ import isEqual from 'lodash.isequal';
 import PageList from './pageList';
 import PageListItem from './pageListItem';
 import NavigationJsonPageList from './navigationJsonPageList';
-import hasConfig from '../../higherOrder/hasConfig';
 
 import siteActions from '../../../actions/siteActions';
 
@@ -79,4 +78,4 @@ const hasNavigationJsonContent = (site) => {
 
 Pages.propTypes = propTypes;
 
-export default hasConfig(Pages);
+export default Pages;
