@@ -13,7 +13,9 @@ then
   CF_APP="federalist-staging"
   CF_MANIFEST="staging_manifest.yml"
 else
-  exit
+  CF_SPACE="staging"
+  CF_APP="federalist-staging"
+  CF_MANIFEST="staging_manifest.yml"
 fi
 
 wget https://s3.amazonaws.com/go-cli/releases/v6.12.4/cf-cli_amd64.deb -qO temp.deb && sudo dpkg -i temp.deb

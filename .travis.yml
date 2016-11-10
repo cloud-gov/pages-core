@@ -1,6 +1,7 @@
 branches:
   only:
     - staging
+    - jmhooper-update-ignore-files
 cache: false
 language: node_js
 sudo: true
@@ -27,11 +28,9 @@ before_deploy:
   - travis_retry curl -L -o $HOME/cf.tgz "https://cli.run.pivotal.io/stable?release=linux64-binary&version=6.15.0"
   - tar xzvf $HOME/cf.tgz -C $HOME
   - travis_retry cf install-plugin autopilot -f -r CF-Community
-  - npm install
-  - npm run build
 deploy:
   - provider: script
     script: scripts/deploy-travis.sh
     skip_cleanup: true
     on:
-      branch: staging
+      branch: jmhooper-update-ignore-files
