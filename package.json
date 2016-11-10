@@ -40,6 +40,7 @@
     "underscore": "^1.8.3",
     "validator": "^3.39.0",
     "whatwg-fetch": "^1.0.0",
+    "ws": "~1.1.1",
     "yamljs": "^0.2.8"
   },
   "scripts": {
