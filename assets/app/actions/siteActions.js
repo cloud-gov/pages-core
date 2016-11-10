@@ -195,22 +195,15 @@ export default {
         dispatchSiteLoadingAction(site, false);
       });
 
-      github.fetchRepositoryContent(site).then((files) => {
+      return github.fetchRepositoryContent(site).then((files) => {
         dispatchSiteFilesReceivedAction(site.id, files);
         return site;
       }).then((site) => {
         return this.fetchBranches(site);
       }).then((site) => {
         return this.fetchSiteConfigs(site);
-      }).catch((error) => {
-        // TODO: make a generic catch handler that will only
-        // trigger an http error action for an actual http
-        // error.
-        throwRuntime(error);
       });
-    }).catch(error => {
-      throwRuntime(error)}
-    );
+    });
   }
 };
 

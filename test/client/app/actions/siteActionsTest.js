@@ -924,27 +924,6 @@ describe("siteActions", () => {
           expect(dispatchSiteFilesReceivedAction.calledWith(siteId, files)).to.be.true;
         });
       });
-
-      xit("triggers an error when fetching site configs fails with a runtime error", () => {
-        // FIXME: not sure what the point of this is
-        const fakeRuntimeError = {
-          name: "TypeError",
-          test: "YES!"
-        };
-        const fakeRuntimeErrorPromise = Promise.reject(fakeRuntimeError);
-
-        getRepo.withArgs(site),returns(Promise.resolve());
-        fetchRepositoryContent.withArgs(site, 'whatever').returns(fakeRuntimeErrorPromise);
-        fetchSiteAssets.withArgs(site).returns(fakeRuntimeErrorPromise);
-
-        const actual = fixture.fetchSiteConfigsAndAssets(site);
-
-        return actual.catch((error) => {
-          console.log(error.stack);
-
-          expect(error).to.equal({});
-        });
-      });
     });
   });
 
