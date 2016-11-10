@@ -45,7 +45,7 @@
     "yamljs": "^0.2.8"
   },
   "scripts": {
-    "postinstall": "npm run uswds && npm run codemirror && npm run migrate:up",
+    "postinstall": "npm run uswds && npm run codemirror && npm run build && npm run migrate:up",
     "build": "npm run browserify && npm run sass && npm run autoprefixer",
     "start": "node app.js",
     "debug": "node debug app.js",
