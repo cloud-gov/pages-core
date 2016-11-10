@@ -82,6 +82,7 @@
   "license": "Public Domain",
   "devDependencies": {
     "autoprefixer": "^6.5.1",
+    "aws-sdk-mock": "^1.5.0",
     "babel-polyfill": "^6.16.0",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-react": "^6.5.0",
