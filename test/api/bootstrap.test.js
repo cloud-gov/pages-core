@@ -1,9 +1,13 @@
-process.env.TEST_AUTH = 1; // Use alternative auth to avoid interactive user auth
+var AWS = require('aws-sdk-mock')
+var Sails = require('sails')
 
-var Sails = require('sails'),
-  sails;
+var sails
 
 before(function(done) {
+  AWS.mock('SQS', 'sendMessage', function (params, callback) {
+    callback(null, {})
+  })
+
   Sails.lift({
     // configuration for testing purposes
     // Use memory for data store
@@ -20,4 +24,5 @@ before(function(done) {
 after(function(done) {
   // here you can clear fixtures, etc.
   sails.lower(done);
+  AWS.restore('SQS')
 });
