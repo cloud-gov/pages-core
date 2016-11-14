@@ -40,7 +40,6 @@ module.exports = {
     sails.log.verbose('after create hook called for Build');
     if (Build.publishCreate) Build.publishCreate(model);
     // Use SQS for queue if available
-    var queue = sails.config.build.sqsQueue ? SQS : this;
     Build.findOne(model.id)
       .populate('site')
       .populate('user')
@@ -59,7 +58,7 @@ module.exports = {
 
             sails.log.verbose('Adding job to sqs queue with build: ', model);
 
-            queue.addJob(model);
+            SQS.sendBuildMessage(model);
             if (done) return done();
           });
     });
