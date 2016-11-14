@@ -1,74 +1,73 @@
-var fs = require('fs'),
-    url = require('url'),
-    AWS = require('aws-sdk'),
-    queueUrl = sails.config.build.sqsQueue,
-    awsKey = sails.config.build.awsBuildKey,
-    awsSecret = sails.config.build.awsBuildSecret,
-    awsRegion = sails.config.build.awsRegion;
-
+var buildConfig = sails.config.build
 var SQS = sails.config.SQS
 
-SQS.buildMessageBody = (model) => {
-  var defaultBranch = model.branch === model.site.defaultBranch,
-      tokensBase = {
-        engine: model.site.engine,
-        branch: model.branch,
-        branchURL: defaultBranch ? '' : '/' + model.branch,
-        root: defaultBranch ? 'site' : 'preview',
-        config: model.site.config,
-        repository: model.site.repository,
-        owner: model.site.owner,
-        sourceRepo: model.source && model.source.repository,
-        sourceOwner: model.source && model.source.owner,
-        token: (model.user.passport) ?
-          model.user.passport.tokens.accessToken : ''
-      },
-      tokens = _.extend(tokensBase, {
-        baseurl: (model.site.domain && defaultBranch) ? '' :
-          '/' + tokensBase.root + '/' + tokensBase.owner +
-          '/' + tokensBase.repository + tokensBase.branchURL,
-        prefix: tokensBase.root + '/' +
-          tokensBase.owner + '/' +
-          tokensBase.repository +
-          tokensBase.branchURL,
-        callback: `${sails.config.build.callback}${model.id}/${sails.config.build.token}`
-      }),
-      body = {
-        environment: [
-          { "name": "AWS_DEFAULT_REGION", "value": awsRegion },
-          { "name": "AWS_ACCESS_KEY_ID", "value": awsKey },
-          { "name": "AWS_SECRET_ACCESS_KEY", "value": awsSecret },
-          { "name": "CALLBACK", "value": tokens.callback },
-          { "name": "BUCKET", "value":  sails.config.build.s3Bucket },
-          { "name": "BASEURL", "value": tokens.baseurl },
-          { "name": "CACHE_CONTROL", "value": sails.config.build.cacheControl },
-          { "name": "BRANCH", "value": tokens.branch },
-          { "name": "CONFIG", "value": tokens.config },
-          { "name": "REPOSITORY", "value": tokens.repository },
-          { "name": "OWNER", "value": tokens.owner },
-          { "name": "PREFIX", "value": tokens.prefix },
-          { "name": "GITHUB_TOKEN", "value": tokens.token },
-          { "name": "GENERATOR", "value": tokens.engine }
-        ],
-        name: sails.config.build.containerName
-      },
-      params = { QueueUrl: queueUrl };
+var buildContainerEnvironment = (build) => ({
+  AWS_DEFAULT_REGION: buildConfig.awsRegion,
+  AWS_ACCESS_KEY_ID: buildConfig.awsBuildKey,
+  AWS_SECRET_ACCESS_KEY: buildConfig.awsBuildSecret,
+  CALLBACK: `${buildConfig.callback}${build.id}/${buildConfig.token}`,
+  BUCKET: buildConfig.s3Bucket,
+  BASEURL: baseURLForBuild(build),
+  CACHE_CONTROL: buildConfig.cacheControl,
+  BRANCH: build.branch,
+  CONFIG: build.site.config,
+  REPOSITORY: build.site.repository,
+  OWNER: build.site.owner,
+  PREFIX: pathForBuild(build),
+  GITHUB_TOKEN: githubTokenForBuild(build),
+  GENERATOR: build.site.engine,
+  SOURCE_REPO: sourceForBuild(build).repository,
+  SOURCE_OWNER: sourceForBuild(build).owner
+})
 
-  if (tokens.sourceRepo) body.environment.push({
-    "name": "SOURCE_REPO",
-    "value": tokens.sourceRepo
-  });
-  if (tokens.sourceOwner) body.environment.push({
-    "name": "SOURCE_OWNER",
-    "value": tokens.sourceOwner
-  });
+var defaultBranch = (build) => {
+  return build.branch === build.site.defaultBranch
+}
 
-  return body;
+var pathForBuild = (build) => {
+  if (defaultBranch(build)) {
+    return `site/${build.site.owner}/${build.site.repository}`
+  } else {
+    return `preview/${build.site.owner}/${build.site.repository}/${build.branch}`
+  }
+}
+
+var baseURLForBuild = (build) => {
+  if (defaultBranch(build) && build.site.domain) {
+    return ""
+  } else {
+    return "/" + pathForBuild(build)
+  }
+}
+
+var githubTokenForBuild = (build) => {
+  if (build.user.passport) {
+    return build.user.passport.tokens.accessToken
+  } else {
+    return ""
+  }
+}
+
+var sourceForBuild = (build) => {
+  return build.source || {}
+}
+
+SQS.buildMessageBody = (build) => {
+  var environment = buildContainerEnvironment(build)
+  return {
+    environment: Object.keys(environment).map(key => {
+      return {
+        name: key,
+        value: environment[key]
+      }
+    }),
+    name: buildConfig.containerName
+  }
 }
 
 SQS.sendBuildMessage = build => {
   var params = {
-    QueueUrl: sails.config.build.sqsQueue,
+    QueueUrl: buildConfig.sqsQueue,
     MessageBody: JSON.stringify(SQS.buildMessageBody(build))
   }
   SQS.sendMessage(params, function(err, data) {
