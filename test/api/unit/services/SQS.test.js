@@ -39,7 +39,7 @@ describe("SQS", () => {
     })
   })
 
-  describe(".buildMessageBody(build)", () => {
+  describe(".messageBodyForBuild(build)", () => {
     var messageEnv = (message, name) => {
       var element = message.environment.find(element => {
         return element.name === name
@@ -53,7 +53,7 @@ describe("SQS", () => {
       factory(Build).then(build => {
         return Build.findOne({ id: build.id }).populate("site")
       }).then(build => {
-        var message = SQS.buildMessageBody(build)
+        var message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "AWS_ACCESS_KEY_ID")).to.equal(sails.config.build.awsBuildKey)
         expect(messageEnv(message, "AWS_SECRET_ACCESS_KEY")).to.equal(sails.config.build.awsBuildSecret)
         expect(messageEnv(message, "AWS_DEFAULT_REGION")).to.equal(sails.config.build.awsRegion)
@@ -66,7 +66,7 @@ describe("SQS", () => {
       factory(Build).then(build => {
         return Build.findOne({ id: build.id }).populate("site")
       }).then(build => {
-        var message = SQS.buildMessageBody(build)
+        var message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "CALLBACK")).to.equal("http://localhost:1337/build/status/" + build.id + "/" + sails.config.build.token)
         done()
       })
@@ -79,7 +79,7 @@ describe("SQS", () => {
         }).then(build => {
           return Build.findOne({ id: build.id }).populate("site")
         }).then(build => {
-          var message = SQS.buildMessageBody(build)
+          var message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "BASEURL")).to.equal("")
           done()
         })
@@ -91,7 +91,7 @@ describe("SQS", () => {
         }).then(build => {
           return Build.findOne({ id: build.id }).populate("site")
         }).then(build => {
-          var message = SQS.buildMessageBody(build)
+          var message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "BASEURL")).to.equal("/site/owner/repo")
           done()
         })
@@ -103,7 +103,7 @@ describe("SQS", () => {
         }).then(build => {
           return Build.findOne({ id: build.id }).populate("site")
         }).then(build => {
-          var message = SQS.buildMessageBody(build)
+          var message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "PREFIX")).to.equal("site/owner/repo")
           done()
         })
@@ -117,7 +117,7 @@ describe("SQS", () => {
         }).then(build => {
           return Build.findOne({ id: build.id }).populate("site")
         }).then(build => {
-          var message = SQS.buildMessageBody(build)
+          var message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "BASEURL")).to.equal("/preview/owner/repo/branch")
           done()
         })
@@ -129,7 +129,7 @@ describe("SQS", () => {
         }).then(build => {
           return Build.findOne({ id: build.id }).populate("site")
         }).then(build => {
-          var message = SQS.buildMessageBody(build)
+          var message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "BASEURL")).to.equal("/preview/owner/repo/branch")
           done()
         })
@@ -141,7 +141,7 @@ describe("SQS", () => {
         }).then(build => {
           return Build.findOne({ id: build.id }).populate("site")
         }).then(build => {
-          var message = SQS.buildMessageBody(build)
+          var message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "PREFIX")).to.equal("preview/owner/repo/branch")
           done()
         })
@@ -152,7 +152,7 @@ describe("SQS", () => {
       factory(Build).then(build => {
         return Build.findOne({ id: build.id }).populate("site")
       }).then(build => {
-        var message = SQS.buildMessageBody(build)
+        var message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "CACHE_CONTROL")).to.equal(sails.config.build.cacheControl)
         done()
       })
@@ -164,7 +164,7 @@ describe("SQS", () => {
       }).then(build => {
         return Build.findOne({ id: build.id }).populate("site")
       }).then(build => {
-        var message = SQS.buildMessageBody(build)
+        var message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "BRANCH")).to.equal("branch")
         done()
       })
@@ -176,7 +176,7 @@ describe("SQS", () => {
       }).then(build => {
         return Build.findOne({ id: build.id }).populate("site")
       }).then(build => {
-        var message = SQS.buildMessageBody(build)
+        var message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "CONFIG")).to.equal("plugins_dir: _plugins")
         done()
       })
@@ -188,7 +188,7 @@ describe("SQS", () => {
       }).then(build => {
         return Build.findOne({ id: build.id }).populate("site")
       }).then(build => {
-        var message = SQS.buildMessageBody(build)
+        var message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "REPOSITORY")).to.equal("site-repo")
         done()
       })
@@ -200,7 +200,7 @@ describe("SQS", () => {
       }).then(build => {
         return Build.findOne({ id: build.id }).populate("site")
       }).then(build => {
-        var message = SQS.buildMessageBody(build)
+        var message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "OWNER")).to.equal("site-owner")
         done()
       })
@@ -228,7 +228,7 @@ describe("SQS", () => {
         return Build.findOne({ id: build.id }).populate("site").populate("user")
       }).then(build => {
         build.user.passport = passport
-        var message = SQS.buildMessageBody(build)
+        var message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "GITHUB_TOKEN")).to.equal("fake-access-token")
         done()
       })
@@ -240,7 +240,7 @@ describe("SQS", () => {
       }).then(build => {
         return Build.findOne({ id: build.id }).populate("site")
       }).then(build => {
-        var message = SQS.buildMessageBody(build)
+        var message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "GENERATOR")).to.equal("hugo")
         done()
       })
@@ -252,7 +252,7 @@ describe("SQS", () => {
       }).then(build => {
         return Build.findOne({ id: build.id }).populate("site")
       }).then(build => {
-        var message = SQS.buildMessageBody(build)
+        var message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "SOURCE_REPO")).to.equal("template")
         expect(messageEnv(message, "SOURCE_OWNER")).to.equal("18f")
         done()

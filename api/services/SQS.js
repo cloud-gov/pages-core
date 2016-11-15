@@ -52,7 +52,7 @@ var sourceForBuild = (build) => {
   return build.source || {}
 }
 
-SQS.buildMessageBody = (build) => {
+SQS.messageBodyForBuild = (build) => {
   var environment = buildContainerEnvironment(build)
   return {
     environment: Object.keys(environment).map(key => {
@@ -68,7 +68,7 @@ SQS.buildMessageBody = (build) => {
 SQS.sendBuildMessage = build => {
   var params = {
     QueueUrl: buildConfig.sqsQueue,
-    MessageBody: JSON.stringify(SQS.buildMessageBody(build))
+    MessageBody: JSON.stringify(SQS.messageBodyForBuild(build))
   }
   SQS.sendMessage(params, function(err, data) {
     if (err) {
