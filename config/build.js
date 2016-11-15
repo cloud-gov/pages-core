@@ -8,7 +8,6 @@ var s3Creds = (envFn(`federalist-${process.env.APP_ENV}-s3`) || {});
 module.exports.build = {
   tempDir: env.FEDERALIST_TEMP_DIR || './.tmp',
   publishDir: env.FEDERALIST_PUBLISH_DIR || './assets',
-  engine: env.FEDERALIST_BUILD_ENGINE ||'buildengine',
   cacheControl: env.FEDERALIST_CACHE_CONTROL || 'max-age=60',
   callback: env.FEDERALIST_BUILD_CALLBACK || 'http://localhost:1337/build/status/',
   token: env.FEDERALIST_BUILD_TOKEN,

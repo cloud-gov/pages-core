@@ -1,12 +1,58 @@
-/**
-* Build.js
-*
-* @description :: TODO: You might write a short summary of how this model works and what it represents here.
-* @docs        :: http://sailsjs.org/#!documentation/models
-*/
+var afterCreate = (model, done) => {
+  var build
+
+  Build.findOne(model.id).populate('site').populate('user').then(model => {
+    build = model
+    return Passport.findOne({ user: build.user.id })
+  }).then(passport => {
+    build.user.passport = passport
+    SQS.sendBuildMessage(build)
+    done()
+  }).catch(err => {
+    sails.log.error(err)
+    done(err, model)
+  })
+}
+
+var completeJob = (err, model) => {
+  if (!model || !model.id) {
+    sails.log.error("Build.completeJob called without a build", err)
+    return
+  }
+
+  return Build.findOne(model.id).then(build => {
+    if (!build) throw new Error(`Unable to find bulid for id: `, model.id);
+
+    if (err) {
+      build.state = "error"
+      build.error = completeJobErrorMessage(err)
+    } else {
+      build.state = "success"
+      build.error = ""
+    }
+
+    build.completedAt = new Date()
+    return build.save()
+  }).catch(err => {
+    sails.log.error("Error updating buld: ", err)
+  })
+}
+
+var completeJobErrorMessage = (err) => {
+  var message
+  if (err) {
+    message = err.message || err
+  } else {
+    message = "An unknown error occured"
+  }
+  return sanitizeCompleteJobErrorMessage(message)
+}
+
+var sanitizeCompleteJobErrorMessage = (message) => {
+  return message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github')
+}
 
 module.exports = {
-  // Enforce model schema in the case of schemaless databases
   schema: true,
 
   attributes: {
@@ -36,127 +82,6 @@ module.exports = {
     }
   },
 
-  afterCreate: function(model, done) {
-    sails.log.verbose('after create hook called for Build');
-    if (Build.publishCreate) Build.publishCreate(model);
-    // Use SQS for queue if available
-    Build.findOne(model.id)
-      .populate('site')
-      .populate('user')
-      .exec(function(err, model) {
-        sails.log.verbose('Build exists?', err, model);
-        if (err && done) return done(err, model);
-        if (err) return sails.log.error(err);
-        if (!model && done) return done();
-        // Additional query since we need to populate a 2nd level association
-        Passport.findOne({ user: model.user.id })
-          .exec(function(err, passport) {
-            sails.log.verbose('User exists?', err, model);
-            if (err && done) return done(err, model);
-            if (err) return sails.log.error(err);
-            model.user.passport = passport;
-
-            sails.log.verbose('Adding job to sqs queue with build: ', model);
-
-            SQS.sendBuildMessage(model);
-            if (done) return done();
-          });
-    });
-  },
-
-  afterUpdate: function(model) {
-    if (Build.publishUpdate) Build.publishUpdate(model.id, model);
-  },
-
-  /**
-   * Job queue for processing builds.
-   * An instance of [async.queue](https://github.com/caolan/async#queue)
-   */
-  queue: async.queue(function(model, done) {
-    sails.log.verbose('Starting job: ', model.id);
-    // Run the build with the appropriate engine and the model
-    sails.hooks[sails.config.build.engine][model.site.engine](model, done);
-  }),
-
-  /**
-   * Add a job to the build queue.
-   * @param {Build} a Build model to add to the queue
-   */
-  addJob: function(model) {
-
-    // Get job queue and look for matching job in the queue
-    var queue = module.exports.queue,
-        jobs = _.pluck(queue.tasks, 'data'),
-        queuedJob = _.find(jobs, function(job) {
-          return job.branch === model.branch && job.site === model.site;
-        });
-
-    // If a matching job isn't in the queue, add it
-    if (!queuedJob) {
-      sails.log.verbose('Adding job: ', model.id);
-      queue.push(model, this.completeJob);
-    } else {
-      sails.log.verbose('Skipping job: ', model.id);
-      this.completeJob(null, model, true);
-    }
-
-  },
-
-  /**
-   * Update a job after build completion.
-   * @param {String} error message
-   * @param {Build} a Build model to update
-   * @param {Boolean} skipped build?
-   */
-  completeJob: function(err, model, skip) {
-    sails.log.verbose('IS there a model?', model);
-    if (!model) return;
-    sails.log.verbose('Completed job: ', model.id);
-
-    // Reset associated models to ids
-    if (model.user.id) model.user = model.user.id;
-    if (model.site.id) model.site = model.site.id;
-
-    // Load model if only attributes are present
-    if (typeof model.save === 'function') {
-      sails.log.verbose('WE are in the model.save === function block');
-      if (err) return next(err, model);
-      next(null, model);
-    } else {
-      sails.log.verbose('Model.save is not a function, so find it')
-      Build.findOne(model.id).exec(function(error, model) {
-        sails.log.verbose('Did we find the model? error:', error, 'model:', model);
-        if (err) return next(err, model);
-        if (error) return next(error, model);
-        next(null, model);
-      });
-    }
-
-    function next(err, model) {
-      if (err) sails.log.error('Build error: ', err);
-
-      var error = err ? (err.message || err) : '';
-
-      // Set job completion timestamp
-      model.completedAt = new Date();
-
-      // Set build state
-      model.state = (err) ? 'error' : (skip) ? 'skipped' : 'success';
-
-      // Sanitize error message
-      error = error.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
-
-      // Add error message if it exists
-      model.error = error;
-      sails.log.verbose('Ok time to save');
-      // Save updated model
-      model.save(function(err) {
-        sails.log.verbose('was there an error saving?', err);
-        // We expect an error on first build after clone so do nothing
-      });
-
-    }
-
-  }
-
+  afterCreate: afterCreate,
+  completeJob: completeJob
 };
