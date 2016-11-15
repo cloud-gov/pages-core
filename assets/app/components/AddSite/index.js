@@ -4,7 +4,7 @@ import TemplateSiteList from './TemplateSiteList';
 import LinkButton from '../linkButton';
 import AlertBanner from '../alertBanner';
 
-import { addSite, cloneRepo } from '../../actions/siteActions';
+import siteActions from '../../actions/siteActions';
 
 import templates from '../../../../config/templates';
 
@@ -38,11 +38,11 @@ class AddSite extends React.Component {
 
   onSubmit(event) {
     event.preventDefault();
-    addSite(this.state);
+    siteActions.addSite(this.state);
   }
 
   onSubmitTemplate(siteName, templateName) {
-    cloneRepo({
+    siteActions.cloneRepo({
       repo: siteName
     }, templates[templateName]);
   }
