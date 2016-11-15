@@ -1,3 +1,4 @@
+var crypto = require("crypto")
 var expect = require("chai").expect
 var request = require("supertest-as-promised")
 var sinon = require("sinon")
@@ -375,6 +376,38 @@ describe("Site API", () => {
         expect(buildSource).to.have.property("owner", "18f")
         expect(buildSource).to.have.property("repository", "example-template")
         done()
+      })
+    })
+
+    it("should create a webhook for the new site", done => {
+      var user
+      var siteOwner = crypto.randomBytes(3).toString("hex")
+      var siteRepository = crypto.randomBytes(3).toString("hex")
+
+      GitHub.setWebhook.restore()
+      sinon.stub(GitHub, "setWebhook", (stubbedSite, stubbedUserID) => {
+        expect(stubbedUserID).to.equal(user.id)
+        expect(stubbedSite.owner).to.equal(siteOwner)
+        expect(stubbedSite.repository).to.equal(siteRepository)
+        done()
+      })
+
+      factory(User).then(model => {
+        user = model
+        return session(user)
+      }).then(cookie => {
+        return request("http://localhost:1337")
+        .post(`/v0/site/clone`)
+        .send({
+          sourceOwner: "18f",
+          sourceRepo: "example-template",
+          destinationOrg: siteOwner,
+          destinationRepo: siteRepository,
+          destinationBranch: "master",
+          engine: "jekyll"
+        })
+        .set("Cookie", cookie)
+        .expect(200)
       })
     })
   })
