@@ -207,12 +207,12 @@ describe("Build API", () => {
       })
     })
 
-    it("should respond with a 200 for a build that does not exist", done => {
+    it("should respond with a 404 for a build that does not exist", done => {
       postBuildStatus({
         buildID: "invalid-build-id",
         status: "0",
         message: ""
-      }).expect(200, done)
+      }).expect(404, done)
     })
 
     it("should respond with a 400 and not modify the build for an invalid build token", done => {

@@ -1,52 +1,93 @@
-var assert = require('assert'),
-    sinon = require('sinon');
+var expect = require("chai").expect
+var sinon = require('sinon')
+var factory = require("../../support/factory")
 
-describe('Build Model', function() {
+describe('Build Model', () => {
+  beforeEach(() => {
+    sinon.stub(GitHub, "setWebhook", (_, __, done) => done())
+  })
 
-  describe('.afterCreate', function() {
-    it('should add job to queue', function(done) {
-      sinon.spy(Build, 'addJob');
-      Build.afterCreate({ id: 1 }, function() {
-        Build.addJob.restore();
-        done();
-      });
-    });
-  });
+  afterEach(() => {
+    GitHub.setWebhook.restore()
+  })
 
-  describe('.queue', function() {
-    it('should be an async queue', function(done) {
-      assert.equal(Build.queue.tasks.length, 0);
-      done();
-    });
-  });
+  describe(".afterCreate(model)", () => {
+    it("should send a new build message", done => {
+      var oldSendMessage = SQS.sendMessage
+      SQS.sendMessage = (params, callback) => {
+        SQS.sendMessage = oldSendMessage
+        done()
+      }
+      factory(Build)
+    })
+  })
 
-  describe('.addJob', function() {
-    it('should add job to queue', function() {
-      var original = Build.queue;
+  describe(".completeJob(err, model)", done => {
+    it("should mark a build successful if there's no error", done => {
+      var build
 
-      sails.hooks[sails.config.build.engine].jekyll = function() {
-        return;
-        // TODO: would be nice if this hook didnt run, myabe if the queue was
-        // stubbed out
-        //return done();
-      };
+      factory(Build).then(model => {
+        build = model
+        expect(build.state).to.equal("processing")
+        expect(build.error).to.be.undefined
+        return Build.completeJob(null, build)
+      }).then(() => {
+        return Build.findOne(build.id)
+      }).then(build => {
+        expect(build.state).to.equal("success")
+        expect(build.error).to.equal("")
+        done()
+      })
+    })
 
-      Build.addJob({ id: 1, site: { engine: 'jekyll' }, user: {}});
-      assert.equal(Build.queue.tasks.length, 0);
-    });
-  });
+    it("should mark a build errored with a message if the error is a string", done => {
+      var build
 
-  describe('.completeJob', function() {
-    it('should save updated model', function(done) {
-      var findOne = Build.findOne;
-      Build.findOne = sinon.spy(function() {
-        assert(Build.findOne.called);
-        Build.findOne = findOne;
-        done();
-        return { exec: function() { } };
-      });
-      Build.completeJob(null, { id: 1, user: {}, site: {} });
-    });
-  });
+      factory(Build).then(model => {
+        build = model
+        expect(build.state).to.equal("processing")
+        expect(build.error).to.be.undefined
+        return Build.completeJob("this is an error message", build)
+      }).then(() => {
+        return Build.findOne(build.id)
+      }).then(build => {
+        expect(build.state).to.equal("error")
+        expect(build.error).to.equal("this is an error message")
+        done()
+      })
+    })
 
-});
+    it("should mark a build errored with the error's message if the error is an error object", done => {
+      var build
+
+      factory(Build).then(model => {
+        build = model
+        expect(build.state).to.equal("processing")
+        expect(build.error).to.be.undefined
+        return Build.completeJob(new Error("this is an error"), build)
+      }).then(() => {
+        return Build.findOne(build.id)
+      }).then(build => {
+        expect(build.state).to.equal("error")
+        expect(build.error).to.equal("this is an error")
+        done()
+      })
+    })
+
+    it("should sanitize GitHub access tokens from error message", done => {
+      var build
+
+      factory(Build).then(model => {
+        build = model
+        expect(build.state).to.equal("processing")
+        expect(build.error).to.be.undefined
+        return Build.completeJob(new Error("http://123abc@github.com"), build)
+      }).then(() => {
+        return Build.findOne(build.id)
+      }).then(build => {
+        expect(build.error).not.to.match(/123abc/)
+        done()
+      })
+    })
+  })
+})
