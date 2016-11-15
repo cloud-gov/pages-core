@@ -38,20 +38,10 @@ module.exports.routes = {
   'get /preview/:owner/:repo/:branch': 'PreviewController.proxy',
   'get /preview/:owner/:repo/:branch/*': 'PreviewController.proxy',
 
-  /*
-  *
-  * Passport routes
-  * https://github.com/kasperisager/sails-generate-auth#requirements
-  *
-  */
+  'get /auth/github': 'AuthController.github',
+  'get /auth/github/callback': 'AuthController.callback',
   'get /logout': 'AuthController.logout',
 
-  'post /auth/local': 'AuthController.callback',
-  'post /auth/local/:action': 'AuthController.callback',
-
-  'get /auth/:provider': 'AuthController.provider',
-  'get /auth/:provider/callback': 'AuthController.callback',
-  'get /auth/:provider/:action': 'AuthController.callback',
   'get /sites(/*)?': {
     controller: 'main',
     action: 'index'

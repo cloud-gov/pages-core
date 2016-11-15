@@ -43,7 +43,7 @@ module.exports = {
    * @param {object} values to become a user model
    * @param {Function} callback function
    */
-  validateUser: function(accessToken, done) {
+  validateUser: function(accessToken) {
     var approved = sails.config.passport.github.organizations || [];
     if (process.env.NODE_ENV === 'test' && process.env.FEDERALIST_TEST_ORG) {
       approved.push(parseInt(process.env.FEDERALIST_TEST_ORG));
@@ -55,18 +55,20 @@ module.exports = {
       token: accessToken
     });
 
-    // Get user's organizations
-    github.user.getOrgs({}, function(err, organizations) {
-      if (err) return done(new Error(JSON.parse(err.message)));
+    return new Promise((resolve, reject) => {
+      // Get user's organizations
+      github.user.getOrgs({}, function(err, organizations) {
+        if (err) return reject(new Error(err.message));
 
-      // Do the user's organizations in any on the approved list?
-      var hasApproval = _(organizations)
-            .pluck('id')
-            .intersection(approved)
-            .value().length > 0;
-      if (hasApproval) return done();
-      done(new Error('Unauthorized'));
-    });
+        // Do the user's organizations in any on the approved list?
+        var hasApproval = _(organizations)
+              .pluck('id')
+              .intersection(approved)
+              .value().length > 0;
+        if (hasApproval) return resolve();
+        reject(new Error('Unauthorized'));
+      });
+    })
   },
 
   /*

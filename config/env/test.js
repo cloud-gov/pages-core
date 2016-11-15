@@ -18,5 +18,18 @@ module.exports = {
     accessKeyId: "123abc",
     secretAccessKey: "456def",
     region: "us-gov-west-1"
-  })
+  }),
+  passport: {
+   github: {
+     options: {
+       clientID: "123abc",
+       clientSecret: "456def",
+       callbackURL: "http://localhost:1337/auth/github/callback",
+       scope: ["user", "repo"]
+     },
+     organizations: [
+       123456
+     ]
+    }
+  }
 }
