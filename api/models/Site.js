@@ -94,7 +94,7 @@ module.exports = {
         if (ghErr === hookMessage) return done();
         try { ghErr = JSON.parse(err.message).message; } catch(e) {}
         if (ghErr === noAccessMessage) return done('You do not have admin access to this repository');
-        if (JSON.parse(err.message)) return done(JSON.parse(err.message));
+        if (err.message) return done(err.message);
         return done(err);
       }
       done();

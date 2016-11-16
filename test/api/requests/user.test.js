@@ -188,6 +188,37 @@ describe("User API", () => {
       })
     })
 
+    it("should create a webhook for the site", done => {
+      var user
+      var siteOwner = crypto.randomBytes(3).toString("hex")
+      var siteRepository = crypto.randomBytes(3).toString("hex")
+
+      GitHub.setWebhook.restore()
+      sinon.stub(GitHub, "setWebhook", (stubbedSite, stubbedUserID) => {
+        expect(stubbedUserID).to.equal(user.id)
+        expect(stubbedSite.owner).to.equal(siteOwner)
+        expect(stubbedSite.repository).to.equal(siteRepository)
+        done()
+      })
+
+      factory(User).then(model => {
+        user = model
+        return session(user)
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .post("/v0/user/add-site")
+          .send({
+            owner: siteOwner,
+            repository: siteRepository,
+            engine: "jekyll",
+            defaultBranch: "18f-pages",
+            users: [user.id]
+          })
+          .set("Cookie", cookie)
+          .expect(200)
+      })
+    })
+
     it("should respond with a 400 if no owner or repo is specified and not create a site", done => {
       var user
 
