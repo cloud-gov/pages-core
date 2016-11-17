@@ -1,7 +1,7 @@
 ---
 applications:
 - name: federalist-staging
-buildpack: https://github.com/cloudfoundry/nodejs-buildpack#v1.5.4
+buildpack: https://github.com/cloudfoundry/nodejs-buildpack#v1.5.23
 stack: cflinuxfs2
 domain: fr.cloud.gov
 disk_quota: 2G
