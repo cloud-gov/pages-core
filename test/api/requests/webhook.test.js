@@ -65,6 +65,30 @@ describe("Webhook API", () => {
       })
     })
 
+    it("should create a user for the sender if no user exists", done => {
+      var username = crypto.randomBytes(3).toString("hex")
+
+      factory(Site).then(site => {
+        var payload = buildWebhookPayload({ username: username }, site)
+        signature = signWebhookPayload(payload)
+
+        return request("http://localhost:1337")
+          .post("/webhook/github")
+          .send(payload)
+          .set({
+            "X-GitHub-Event": "push",
+            "X-Hub-Signature": signature,
+            "X-GitHub-Delivery": "123abc"
+          })
+          .expect(200)
+      }).then(response => {
+        return Build.findOne(response.body.id).populate("user")
+      }).then(build => {
+        expect(build.user.username).to.equal(username)
+        done()
+      })
+    })
+
     it("should not schedule a build if there are no new commits", done => {
       var site, user
 
@@ -95,6 +119,26 @@ describe("Webhook API", () => {
       }).then(builds => {
         expect(builds).to.have.length(1)
         done()
+      })
+    })
+
+    it("should respond with a 400 if the site does not exist on Federalist", done => {
+      factory(User).then(user => {
+        var payload = buildWebhookPayload(user, {
+          owner: user.username,
+          repository: "fake-repo-name"
+        })
+        var signature = signWebhookPayload(payload)
+
+        request("http://localhost:1337")
+          .post("/webhook/github")
+          .send(payload)
+          .set({
+            "X-GitHub-Event": "push",
+            "X-Hub-Signature": signature,
+            "X-GitHub-Delivery": "123abc"
+          })
+          .expect(400, done)
       })
     })
 
