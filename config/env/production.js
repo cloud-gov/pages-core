@@ -66,11 +66,11 @@ if (s3Creds) {
 const sqsKey = env.FEDERALIST_AWS_BUILD_KEY
 const sqsSecret = env.FEDERALIST_AWS_BUILD_SECRET
 if (sqsKey && sqsSecret) {
-  module.exports.SQS = new AWS.SQS({
+  module.exports.sqs = {
     accessKeyId: sqsKey,
     secretAccessKey: sqsSecret,
     region: 'us-east-1',
-  })
+  }
 } else {
   throw new Error("Now SQS credentials found")
 }

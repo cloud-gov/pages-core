@@ -1,5 +1,7 @@
+var AWS = require('aws-sdk')
 var buildConfig = sails.config.build
-var SQS = sails.config.SQS
+
+var SQS = new AWS.SQS(sails.config.sqs)
 
 var buildContainerEnvironment = (build) => ({
   AWS_DEFAULT_REGION: buildConfig.awsRegion,
