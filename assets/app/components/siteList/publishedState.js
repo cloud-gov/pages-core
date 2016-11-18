@@ -13,7 +13,7 @@ const getLastBuildTime = (builds) => {
   });
   let last = sorted.pop();
 
-  return moment(last.completedAt).format('MMMM Do YYYY, h:mm:ss a')) || 'forever ago';
+  return moment(last.completedAt).format('MMMM Do YYYY, h:mm:ss a') || 'forever ago';
 };
 
 const getPublishedState = (builds) => {
