@@ -1,8 +1,6 @@
 var AWS = require('aws-sdk')
 var buildConfig = sails.config.build
 
-var SQS = new AWS.SQS(sails.config.sqs)
-
 var buildContainerEnvironment = (build) => ({
   AWS_DEFAULT_REGION: buildConfig.awsRegion,
   AWS_ACCESS_KEY_ID: buildConfig.awsBuildKey,
@@ -54,6 +52,10 @@ var sourceForBuild = (build) => {
   return build.source || {}
 }
 
+var SQS = {
+  sqsClient: new AWS.SQS(sails.config.sqs),
+}
+
 SQS.messageBodyForBuild = (build) => {
   var environment = buildContainerEnvironment(build)
   return {
@@ -72,7 +74,7 @@ SQS.sendBuildMessage = build => {
     QueueUrl: buildConfig.sqsQueue,
     MessageBody: JSON.stringify(SQS.messageBodyForBuild(build))
   }
-  SQS.sendMessage(params, function(err, data) {
+  SQS.sqsClient.sendMessage(params, function(err, data) {
     if (err) {
       sails.log.error('There was an error, adding the job to SQS: ', err);
       Build.completeJob(err, build);

@@ -13,9 +13,9 @@ describe('Build Model', () => {
 
   describe(".afterCreate(model)", () => {
     it("should send a new build message", done => {
-      var oldSendMessage = SQS.sendMessage
-      SQS.sendMessage = (params, callback) => {
-        SQS.sendMessage = oldSendMessage
+      var oldSendMessage = SQS.sqsClient.sendMessage
+      SQS.sqsClient.sendMessage = (params, callback) => {
+        SQS.sqsClient.sendMessage = oldSendMessage
         done()
       }
       factory(Build)
