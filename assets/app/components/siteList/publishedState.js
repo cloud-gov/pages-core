@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from "moment";
 
 const propTypes = {
   builds: React.PropTypes.array
@@ -12,7 +13,7 @@ const getLastBuildTime = (builds) => {
   });
   let last = sorted.pop();
 
-  return last.completedAt || 'forever ago';
+  return moment().format(last.completedAt)) || 'forever ago';
 };
 
 const getPublishedState = (builds) => {
