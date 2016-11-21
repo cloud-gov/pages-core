@@ -14,9 +14,9 @@ describe("SQS", () => {
 
   describe(".sendBuildMessage(build)", () => {
     it("should send a formatted build message", done => {
-      var oldSendMessage = SQS.sendMessage
-      SQS.sendMessage = (params, callback) => {
-        SQS.sendMessage = oldSendMessage
+      var oldSendMessage = SQS.sqsClient.sendMessage
+      SQS.sqsClient.sendMessage = (params, callback) => {
+        SQS.sqsClient.sendMessage = oldSendMessage
         expect(params).to.have.property("MessageBody")
         expect(params).to.have.property("QueueUrl", sails.config.build.sqsQueue)
         done()

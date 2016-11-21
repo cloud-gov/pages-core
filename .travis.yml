@@ -5,7 +5,7 @@ cache: false
 language: node_js
 sudo: true
 node_js:
-- 4
+- 6
 before_install:
   - rvm install ruby-1.9.3-p551
 env:

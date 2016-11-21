@@ -9,11 +9,11 @@ module.exports = {
     awsRegion: "us-gov-west-1",
     sqsQueue: "https://sqs.us-east-1.amazonaws.com/123abc/456def"
   },
-  SQS: new AWS.SQS({
+  sqs: {
     accessKeyId: "123abc",
     secretAccessKey: "456def",
     region: 'us-east-1'
-  }),
+  },
   S3: new AWS.S3({
     accessKeyId: "123abc",
     secretAccessKey: "456def",
