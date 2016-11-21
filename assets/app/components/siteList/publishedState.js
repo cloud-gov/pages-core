@@ -21,7 +21,7 @@ const getPublishedState = (builds) => {
   let lastBuildTime = getLastBuildTime(builds)
   if (lastBuildTime) {
     let formattedBuildTime = moment(lastBuildTime).format('MMMM Do YYYY, h:mm:ss a')
-    return `This site was last published at ${formattedBuildTime}`;
+    return `This site was last published at ${formattedBuildTime}.`;
   } else {
     return 'Please wait for build to complete or check logs for error message.';
   }
