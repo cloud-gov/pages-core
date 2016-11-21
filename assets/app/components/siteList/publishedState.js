@@ -1,26 +1,30 @@
 import React from 'react';
+import moment from "moment";
 
 const propTypes = {
   builds: React.PropTypes.array
 };
 
 const getLastBuildTime = (builds) => {
-  let sorted = builds.sort((a, b) => {
-    let aCompletedAt = new Date(a.completedAt);
-    let bCompletedAt = new Date(b.completedAt);
-    return aCompletedAt > bCompletedAt;
-  });
-  let last = sorted.pop();
-
-  return last.completedAt || 'forever ago';
+  if (builds.length) {
+    let sorted = builds.sort((a, b) => {
+      let aCompletedAt = new Date(a.completedAt);
+      let bCompletedAt = new Date(b.completedAt);
+      return aCompletedAt > bCompletedAt;
+    });
+    let last = sorted.pop();
+    return last.completedAt
+  }
 };
 
 const getPublishedState = (builds) => {
-  if (builds.length) {
-    return `This site was last published at ${getLastBuildTime(builds)}`;
+  let lastBuildTime = getLastBuildTime(builds)
+  if (lastBuildTime) {
+    let formattedBuildTime = moment(lastBuildTime).format('MMMM Do YYYY, h:mm:ss a')
+    return `This site was last published at ${formattedBuildTime}.`;
+  } else {
+    return 'Please wait for build to complete or check logs for error message.';
   }
-
-  return 'This site has not been published yet. Please wait while the site is built.';
 };
 
 const PublishedState = ({ builds = [] }) =>
