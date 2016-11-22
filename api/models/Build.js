@@ -1,11 +1,5 @@
 var afterCreate = (model, done) => {
-  var build
-
-  Build.findOne(model.id).populate('site').populate('user').then(model => {
-    build = model
-    return Passport.findOne({ user: build.user.id })
-  }).then(passport => {
-    build.user.passport = passport
+  Build.findOne(model.id).populate('site').populate('user').then(build => {
     SQS.sendBuildMessage(build)
     done()
   }).catch(err => {

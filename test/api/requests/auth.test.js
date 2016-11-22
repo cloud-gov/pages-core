@@ -113,56 +113,22 @@ describe("Authentication request", () => {
         })
       })
 
-      it("should create a GitHub passport for the user if one does not exist", done => {
+      it("should update the user's GitHub access token", done => {
         var user
 
         factory(User).then(model => {
           user = model
+          expect(user.githubAccessToken).not.to.equal("access-token-123abc")
+
           githubAPINocks.githubAuth(user.username, [{ id: 123456 }])
-          return Passport.count({ user: user })
-        }).then(passportCount => {
-          expect(passportCount).to.equal(0)
+
           return request("http://localhost:1337")
             .get("/auth/github/callback?code=auth-code-123abc")
             .expect(302)
         }).then(response => {
-          return Passport.find({ user: user.id })
-        }).then(passports => {
-          expect(passports).to.have.length(1)
-          expect(passports[0].provider).to.equal("github")
-          expect(passports[0].tokens.accessToken).to.equal("access-token-123abc")
-          done()
-        })
-      })
-
-      it("should update the GitHub passport for the user if one exists", done => {
-        var user
-
-        factory(User).then(model => {
-          user = model
-          var githubUserID = Math.floor(Math.random() * 10000)
-
-          githubAPINocks.accessToken()
-          githubAPINocks.user({ username: user.username, githubUserID: githubUserID })
-          githubAPINocks.userOrganizations()
-
-          return Passport.create({
-            protocol: "oauth2",
-            provider: "github",
-            identifier: githubUserID,
-            tokens: { accessToken: "old-access-token-123" },
-            user: user.id
-          })
-        }).then(model => {
-          return request("http://localhost:1337")
-            .get("/auth/github/callback?code=auth-code-123abc")
-            .expect(302)
-        }).then(response => {
-          return Passport.find({ user: user.id })
-        }).then(passports => {
-          expect(passports).to.have.length(1)
-          expect(passports[0].provider).to.equal("github")
-          expect(passports[0].tokens.accessToken).to.equal("access-token-123abc")
+          return User.findOne(user.id)
+        }).then(user => {
+          expect(user.githubAccessToken).to.equal("access-token-123abc")
           done()
         })
       })
@@ -190,28 +156,8 @@ describe("Authentication request", () => {
         }).then(user => {
           expect(user).to.have.property("email", `user-${githubUserID}@example.com`)
           expect(user).to.have.property("username", `user-${githubUserID}`)
-          done()
-        })
-      })
-
-      it("should create a passport for the user", done => {
-        githubAPINocks.githubAuth()
-
-        var authRequest = request("http://localhost:1337")
-          .get("/auth/github/callback?code=auth-code-123abc")
-          .expect(302)
-
-        authRequest.then(response => {
-          var cookie = sessionCookieFromResponse(response)
-          return sessionForCookie(cookie)
-        }).then(session => {
-          var userID = session.passport.user
-          return User.findOne({ id: userID })
-        }).then(user => {
-          return Passport.findOne({ user: user.id })
-        }).then(passport => {
-          expect(passport.provider).to.equal("github")
-          expect(passport.tokens.accessToken).to.equal("access-token-123abc")
+          expect(user).to.have.property("githubUserId", `${githubUserID}`)
+          expect(user).to.have.property("githubAccessToken", "access-token-123abc")
           done()
         })
       })

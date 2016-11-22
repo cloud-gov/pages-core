@@ -208,28 +208,17 @@ describe("SQS", () => {
 
     it("should set GITHUB_TOKEN in the message to the user's GitHub access token", done => {
       var user
-      var passport
 
-      factory(User).then(model => {
+      factory(User, { githubAccessToken: "fake-github-token-123" }).then(model => {
         user = model
-        return Passport.create({
-          protocol: "oauth2",
-          provider: "github",
-          identifier: "12345",
-          tokens: { accessToken: "fake-access-token" },
-          user: user
-       })
-      }).then(model => {
-        passport = model
         return factory(Site, { users: [user] })
       }).then(site => {
         return factory(Build, { user: user, site: site })
       }).then(build => {
         return Build.findOne({ id: build.id }).populate("site").populate("user")
       }).then(build => {
-        build.user.passport = passport
         var message = SQS.messageBodyForBuild(build)
-        expect(messageEnv(message, "GITHUB_TOKEN")).to.equal("fake-access-token")
+        expect(messageEnv(message, "GITHUB_TOKEN")).to.equal("fake-github-token-123")
         done()
       })
     })
