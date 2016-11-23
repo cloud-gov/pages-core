@@ -68,15 +68,11 @@ module.exports.policies = {
     'find': ['passport', 'sessionAuth', 'filterCurrentUser'],
     'findOne': ['passport', 'sessionAuth', 'filterCurrentUser'],
     'clone': ['passport', 'sessionAuth'],
-    'fork': ['passport', 'sessionAuth'],
-    'lock': ['passport', 'sessionAuth'],
-    'unlock': ['passport', 'sessionAuth'],
     'update': ['passport', 'sessionAuth', 'filterCurrentUser']
   },
 
   UserController: {
     'findOne': ['passport', 'sessionAuth', 'filterSelfOnly'],
-    'populate': ['passport', 'sessionAuth', 'filterSelfOnly'],
     'usernames': ['passport', 'sessionAuth'],
     'add-site': ['passport', 'sessionAuth'],
     'me': ['passport', 'sessionAuth']
