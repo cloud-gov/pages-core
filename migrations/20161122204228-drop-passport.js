@@ -1,3 +1,5 @@
+const Promise = require("bluebird")
+
 const dbm = global.dbm || require('db-migrate');
 const type = dbm.dataType;
 
@@ -93,19 +95,34 @@ const dropPassportTable = (db) => {
   })
 }
 
+const migrateUpUserData = (user, db) => {
+  return loadPassportForUser(user, db).then(passport => {
+    if (passport) {
+      return updateUserWithPassport(user, passport, db)
+    } else {
+      console.warn(`Unable to find passport for user: ${user.username}`)
+      return Promise.resolve()
+    }
+  })
+}
+
+const migrateUpNextUser = (users, db) => {
+  if (users.length > 0) {
+    let user = users.pop()
+    return migrateUpUserData(user, db).then(() => {
+      console.log(`Migrated user: ${user.username}`)
+      return migrateUpNextUser(users, db)
+    })
+  } else {
+    return Promise.resolve()
+  }
+}
+
 exports.up = function(db, callback) {
   addColumnsToUserTable(db).then(() => {
     return loadUsers(db)
   }).then(users => {
-    return Promise.all(users.map(user => {
-      return loadPassportForUser(user, db).then(passport => {
-        if (passport) {
-          return updateUserWithPassport(user, passport, db)
-        } else {
-          console.warn(`Unable to find passport for user: ${user}`)
-        }
-      })
-    }))
+    return migrateUpNextUser(users, db)
   }).then(() => {
     return dropPassportTable(db)
   }).then(() => {
@@ -143,6 +160,11 @@ const createPassportTable = (db) => {
 }
 
 const insertPassportRowForUser = (user, db) => {
+  if (!user.githubUserId || !user.githubAccessToken) {
+    console.warn(`Unable to find passport data for user: ${user.username}`)
+    return Promise.resolve()
+  }
+
   const sql = `
     INSERT INTO passport ("protocol", "provider", "identifier", "tokens", "user")
     VALUES ('oauth2', 'github', '${user.githubUserId}', '{ "accessToken": "${user.githubAccessToken}" }', '${user.id}');
@@ -177,13 +199,23 @@ const removeColumsFromUserTable = (db) => {
   })
 }
 
+const migrateDownNextUser = (users, db) => {
+  if (users.length > 0) {
+    let user = users.pop()
+    return insertPassportRowForUser(user, db).then(() => {
+      console.log(`Migrated user: ${user.username}`)
+      return migrateDownNextUser(users, db)
+    })
+  } else {
+    return Promise.resolve()
+  }
+}
+
 exports.down = function(db, callback) {
   createPassportTable(db).then(() => {
     return loadUsers(db)
   }).then(users => {
-    return Promise.all(users.map(user => {
-      return insertPassportRowForUser(user, db)
-    }))
+    return migrateDownNextUser(users, db)
   }).then(() => {
     return removeColumsFromUserTable(db)
   }).then(() => {
