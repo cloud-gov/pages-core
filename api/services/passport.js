@@ -11,25 +11,12 @@ var githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
     })
   }).then(model => {
     user = model
-    if (!user) throw new Error(`Unable to find or create user ${profile.username}`)
-    return Passport.findOne({ user: user.id, provider: "github" })
-  }).then(passport => {
-    if (passport && passport.tokens && passport.tokens.accessToken === accessToken) {
-      return passport
-    } else if (passport) {
-      return Passport.update(passport.id, {
-        tokens: { accessToken: accessToken }
-      })
-    } else {
-      return Passport.create({
-        protocol: "oauth2",
-        provider: "github",
-        identifier: profile.id,
-        tokens: { accessToken: accessToken },
-        user: user
-      })
-    }
-  }).then(passport => {
+    if (!user) throw new Error(`Unable to find or create user ${profile.username}`);
+    return User.update(user.id, {
+      githubAccessToken: accessToken,
+      githubUserId: profile.id
+    })
+  }).then(() => {
     callback(null, user)
   }).catch(err => {
     callback(err)

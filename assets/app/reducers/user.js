@@ -9,7 +9,7 @@ export default function user(state = false, action) {
       id: action.user.id,
       username: action.user.username,
       email: action.user.email,
-      passports: action.user.passports,
+      githubAccessToken: action.user.githubAccessToken,
       createdAt: action.user.createdAt,
       updatedAt: action.user.updatedAt
     };

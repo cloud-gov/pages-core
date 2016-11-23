@@ -10,9 +10,11 @@ var User = {
     email: {
       type: 'email'
     },
-    passports: {
-      collection: 'Passport',
-      via: 'user'
+    githubAccessToken: {
+      type: 'string'
+    },
+    githubUserId: {
+      type: 'string'
     },
     sites: {
       collection: 'site',
@@ -26,7 +28,8 @@ var User = {
     // Method to return JSON to the API
     toJSON: function() {
       var obj = this.toObject();
-      // delete obj.passports;
+      obj.githubAccessToken = undefined
+      obj.githubUserId = undefined
       return obj;
     }
   }

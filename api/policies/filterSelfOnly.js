@@ -13,9 +13,6 @@ module.exports = function (req, res, next) {
   // Allow if parent ID for associated models matches logged in user
   if (req.param('parentid') == req.user.id) return next();
 
-  // Redirect to current user if requested user list
-  if (req.options.action === 'find') return res.redirect('./' + req.user.id);
-
   // Reject all other requests
   res.forbidden('Forbidden');
 

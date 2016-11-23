@@ -14,7 +14,7 @@ var buildContainerEnvironment = (build) => ({
   REPOSITORY: build.site.repository,
   OWNER: build.site.owner,
   PREFIX: pathForBuild(build),
-  GITHUB_TOKEN: githubTokenForBuild(build),
+  GITHUB_TOKEN: build.user.githubAccessToken,
   GENERATOR: build.site.engine,
   SOURCE_REPO: sourceForBuild(build).repository,
   SOURCE_OWNER: sourceForBuild(build).owner
@@ -37,14 +37,6 @@ var baseURLForBuild = (build) => {
     return ""
   } else {
     return "/" + pathForBuild(build)
-  }
-}
-
-var githubTokenForBuild = (build) => {
-  if (build.user.passport) {
-    return build.user.passport.tokens.accessToken
-  } else {
-    return ""
   }
 }
 

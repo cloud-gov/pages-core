@@ -42,6 +42,8 @@ module.exports.routes = {
   'get /auth/github/callback': 'AuthController.callback',
   'get /logout': 'AuthController.logout',
 
+  'get /v0/me': 'UserController.me',
+
   'get /sites(/*)?': {
     controller: 'main',
     action: 'index'

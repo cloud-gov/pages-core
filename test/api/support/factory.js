@@ -59,7 +59,9 @@ var userAttributes = (overrides) => {
 
   return Object.assign({
     email: `${username}@example.com`,
-    username: username
+    username: username,
+    githubAccessToken: "fake-access-token",
+    githubUserId: 12345
   }, overrides)
 }
 

@@ -75,11 +75,11 @@ module.exports.policies = {
   },
 
   UserController: {
-    'find': ['passport', 'sessionAuth', 'filterSelfOnly'],
     'findOne': ['passport', 'sessionAuth', 'filterSelfOnly'],
     'populate': ['passport', 'sessionAuth', 'filterSelfOnly'],
     'usernames': ['passport', 'sessionAuth'],
-    'add-site': ['passport', 'sessionAuth']
+    'add-site': ['passport', 'sessionAuth'],
+    'me': ['passport', 'sessionAuth']
   },
 
   PreviewController: {

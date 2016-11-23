@@ -8,12 +8,7 @@ const API = 'https://api.github.com';
 
 const getToken = () => {
   const state = store.getState();
-  const passports = state.user.passports;
-  let github = passports.filter((passport) => {
-    return passport.provider === 'github';
-  }).pop();
-
-  return github.tokens.accessToken;
+  return state.user.githubAccessToken;
 }
 
 const getRepoFor = (site) => {

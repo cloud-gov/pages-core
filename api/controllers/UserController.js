@@ -68,5 +68,11 @@ module.exports = {
         }
       });
     }
+  },
+
+  me: (req, res) => {
+    User.findOne(req.user.id).populate("builds").populate("sites").then(user => {
+      res.json(user.toObject())
+    })
   }
 };
