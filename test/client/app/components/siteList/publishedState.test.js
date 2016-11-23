@@ -1,18 +1,21 @@
 import React from 'react';
+import moment from 'moment'
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import PublishedState from '../../../../../assets/app/components/siteList/publishedState';
 
 const NO_BUILDS_MESSAGE = 'Please wait for build to complete or check logs for error message.';
 const PUBLISHED_BASE = 'Please wait for build to complete or check logs for error message.';
-const MOST_RECENT_BUILD = 'This site was last published at September 4th 2015, 3:11:23 pm.';
+const MOST_RECENT_BUILD_TIME = "2015-09-04T15:11:23.000Z"
+const FORMATTED_MOST_RECENT_BUILD_TIME =  moment(MOST_RECENT_BUILD_TIME).format('MMMM Do YYYY, h:mm:ss a')
+const MOST_RECENT_BUILD = `This site was last published at ${FORMATTED_MOST_RECENT_BUILD_TIME}.`;
 const builds = [
   {
     completedAt: "2015-09-02T21:43:35.000Z"
   },
 
   {
-    completedAt: "2015-09-04T15:11:23.000Z"
+    completedAt: MOST_RECENT_BUILD_TIME
   }
 ];
 
