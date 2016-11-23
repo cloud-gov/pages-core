@@ -11,7 +11,7 @@ describe("userReducer", () => {
     fixture = proxyquire("../../../../assets/app/reducers/user", {
       "../actions/actionCreators/userActions": {
         userReceivedType: USER_RECEIVED
-      } 
+      }
     }).default;
   });
 
@@ -29,7 +29,7 @@ describe("userReducer", () => {
       id: 12,
       username: "bob",
       email: "no-email@nothingtoseeheresopleasego.org",
-      passports: [ "what is this?", "good question."],
+      githubAccessToken: "access-token-123abc",
       createdAt: "Monday morning.",
       updatedAt: "Thursday, late in the afternoon."
     };

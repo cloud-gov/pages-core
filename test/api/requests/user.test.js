@@ -15,11 +15,11 @@ describe("User API", () => {
     expect(response).to.have.property("builds")
   }
 
-  describe("GET /v0/user", () => {
+  describe("GET /v0/me", () => {
     it("should require authentication", done => {
       factory(User).then(user => {
         return request("http://localhost:1337")
-          .get("/v0/user")
+          .get("/v0/me")
           .expect(403)
       }).then(response => {
         expect(response.body).to.be.empty
@@ -27,7 +27,7 @@ describe("User API", () => {
       })
     })
 
-    it("should redirect to GET /v0/user/:id for the current user", done => {
+    it("should render the current user with their GitHub user data", done => {
       var user
 
       factory(User).then(model => {
@@ -35,11 +35,13 @@ describe("User API", () => {
         return session(user)
       }).then(cookie => {
         return request("http://localhost:1337")
-          .get("/v0/user")
+          .get("/v0/me")
           .set("Cookie", cookie)
-          .expect(302)
+          .expect(200)
       }).then(response => {
-        expect(response.headers).to.have.property("location", `/v0/user/${user.id}`)
+        userResponseExpectations(response.body, user)
+        expect(response.body).to.have.property("githubAccessToken", user.githubAccessToken)
+        expect(response.body).to.have.property("githubUserId", user.githubUserId)
         done()
       })
     })
@@ -70,6 +72,22 @@ describe("User API", () => {
           .expect(200)
       }).then(response => {
         userResponseExpectations(response.body, user)
+        done()
+      })
+    })
+
+    it("should not include GitHub user data", done => {
+      factory(User).then(model => {
+        user = model
+        return session(user)
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .get(`/v0/user/${user.id}`)
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(response => {
+        expect(response.body).not.to.have.property("githubAccessToken")
+        expect(response.body).not.to.have.property("githubUserId")
         done()
       })
     })
