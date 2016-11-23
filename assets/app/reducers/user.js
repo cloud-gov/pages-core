@@ -9,7 +9,6 @@ export default function user(state = false, action) {
       id: action.user.id,
       username: action.user.username,
       email: action.user.email,
-      passports: action.user.passports,
       createdAt: action.user.createdAt,
       updatedAt: action.user.updatedAt
     };

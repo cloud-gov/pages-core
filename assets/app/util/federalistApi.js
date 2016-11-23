@@ -28,7 +28,7 @@ export default {
         id: user.id,
         username: user.username,
         email: user.email,
-        passports: user.passports,
+        githubAccessToken: user.githubAccessToken,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
       }
