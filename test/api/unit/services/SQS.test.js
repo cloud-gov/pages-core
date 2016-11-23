@@ -18,7 +18,7 @@ describe("SQS", () => {
       SQS.sqsClient.sendMessage = (params, callback) => {
         SQS.sqsClient.sendMessage = oldSendMessage
         expect(params).to.have.property("MessageBody")
-        expect(params).to.have.property("QueueUrl", sails.config.build.sqsQueue)
+        expect(params).to.have.property("QueueUrl", sails.config.sqs.queue)
         done()
       }
       SQS.sendBuildMessage({
@@ -54,10 +54,10 @@ describe("SQS", () => {
         return Build.findOne({ id: build.id }).populate("site")
       }).then(build => {
         var message = SQS.messageBodyForBuild(build)
-        expect(messageEnv(message, "AWS_ACCESS_KEY_ID")).to.equal(sails.config.build.awsBuildKey)
-        expect(messageEnv(message, "AWS_SECRET_ACCESS_KEY")).to.equal(sails.config.build.awsBuildSecret)
-        expect(messageEnv(message, "AWS_DEFAULT_REGION")).to.equal(sails.config.build.awsRegion)
-        expect(messageEnv(message, "BUCKET")).to.equal(sails.config.build.s3Bucket)
+        expect(messageEnv(message, "AWS_ACCESS_KEY_ID")).to.equal(sails.config.s3.accessKeyId)
+        expect(messageEnv(message, "AWS_SECRET_ACCESS_KEY")).to.equal(sails.config.s3.secretAccessKey)
+        expect(messageEnv(message, "AWS_DEFAULT_REGION")).to.equal(sails.config.s3.region)
+        expect(messageEnv(message, "BUCKET")).to.equal(sails.config.s3.bucket)
         done()
       })
     })

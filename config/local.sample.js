@@ -23,24 +23,17 @@ if (process.env.NODE_ENV != "test") {
     // models: {
     //  connection: 'postgres',
     // },
-    // build: {
-    //   awsBuildKey: "123abc",
-    //   awsBuildSecret: "123abc",
-    //   s3Bucket: "bucket-name",
-    //   awsRegion: "us-gov-west-1",
-    //   sqsQueue: "https://sqs.us-east-1.amazonaws.com/123abc/456def",
-    //   appName: "federalist-staging",
-    //   appDomain: "fr.cloud.gov",
-    // },
     // sqs: {
     //   accessKeyId: "123abc",
     //   secretAccessKey: "456def",
     //   region: "us-east-1",
+    //   queue: "https://sqs.us-east-1.amazonaws.com/123abc/456def",
     // },
-    // S3: new AWS.S3({
+    // s3: {
     //   accessKeyId: "123abc",
     //   secretAccessKey: "456def",
     //   region: "us-gov-west-1",
-    // }),
+    //   bucket: "s3-bucket-name",
+    // },
   }
 }
