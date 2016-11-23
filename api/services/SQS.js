@@ -1,12 +1,13 @@
 var AWS = require('aws-sdk')
 var buildConfig = sails.config.build
+var s3Config = sails.config.s3
 
 var buildContainerEnvironment = (build) => ({
-  AWS_DEFAULT_REGION: buildConfig.awsRegion,
-  AWS_ACCESS_KEY_ID: buildConfig.awsBuildKey,
-  AWS_SECRET_ACCESS_KEY: buildConfig.awsBuildSecret,
+  AWS_DEFAULT_REGION: s3Config.region,
+  AWS_ACCESS_KEY_ID: s3Config.accessKeyId,
+  AWS_SECRET_ACCESS_KEY: s3Config.secretAccessKey,
   CALLBACK: `${buildConfig.callback}${build.id}/${buildConfig.token}`,
-  BUCKET: buildConfig.s3Bucket,
+  BUCKET: s3Config.bucket,
   BASEURL: baseURLForBuild(build),
   CACHE_CONTROL: buildConfig.cacheControl,
   BRANCH: build.branch,
@@ -44,8 +45,13 @@ var sourceForBuild = (build) => {
   return build.source || {}
 }
 
+var sqsConfig = sails.config.sqs
 var SQS = {
-  sqsClient: new AWS.SQS(sails.config.sqs),
+  sqsClient: new AWS.SQS({
+    accessKeyId: sqsConfig.accessKeyId,
+    secretAccessKey: sqsConfig.secretAccessKey,
+    region: sqsConfig.region,
+  }),
 }
 
 SQS.messageBodyForBuild = (build) => {
@@ -63,7 +69,7 @@ SQS.messageBodyForBuild = (build) => {
 
 SQS.sendBuildMessage = build => {
   var params = {
-    QueueUrl: buildConfig.sqsQueue,
+    QueueUrl: sqsConfig.queue,
     MessageBody: JSON.stringify(SQS.messageBodyForBuild(build))
   }
   SQS.sqsClient.sendMessage(params, function(err, data) {
