@@ -13,24 +13,26 @@ module.exports = {
    * @param {Function} callback function
    */
   setWebhook: function(site, user, done) {
-    // Authenticate request with user's oauth token
-    github.authenticate({
-      type: 'oauth',
-      token: user.githubAccessToken
-    });
+    User.findOne(user).then(user => {
+      // Authenticate request with user's oauth token
+      github.authenticate({
+        type: 'oauth',
+        token: user.githubAccessToken
+      });
 
-    // Create the webhook for the site repository
-    github.repos.createHook({
-      user: site.owner,
-      repo: site.repository,
-      name: 'web',
-      active: true,
-      config: {
-        url: sails.config.webhook.endpoint,
-        secret: sails.config.webhook.secret,
-        content_type: 'json'
-      }
-    }, done);
+      // Create the webhook for the site repository
+      github.repos.createHook({
+        user: site.owner,
+        repo: site.repository,
+        name: 'web',
+        active: true,
+        config: {
+          url: sails.config.webhook.endpoint,
+          secret: sails.config.webhook.secret,
+          content_type: 'json'
+        }
+      }, done)
+    })
   },
 
   /*
@@ -73,22 +75,21 @@ module.exports = {
    * @param {string} repository name
    * @param {Function} callback function
    */
-   checkPermissions: function(user, owner, repository, done) {
-     // Authenticate request with user's oauth token
-     github.authenticate({
-       type: 'oauth',
-       token: user.githubAccessToken,
-     });
+  checkPermissions: function(user, owner, repository, done) {
+    // Authenticate request with user's oauth token
+    github.authenticate({
+     type: 'oauth',
+     token: user.githubAccessToken,
+    });
 
-     // Retrieve the permissions for the repository
-     github.repos.get({
-       user: owner,
-       repo: repository
-     }, function(err, repo) {
-       if (err) return done('Unable to access the repository');
-       if (!repo) return done('The repository does not exist');
-       return done(null, repo.permissions);
-     });
-   }
-
+    // Retrieve the permissions for the repository
+    github.repos.get({
+     user: owner,
+     repo: repository
+    }, function(err, repo) {
+     if (err) return done('Unable to access the repository');
+     if (!repo) return done('The repository does not exist');
+     return done(null, repo.permissions);
+    });
+  }
 };
