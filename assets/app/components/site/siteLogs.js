@@ -10,6 +10,12 @@ const getUsername = (site, id) => {
   return user.username;
 };
 
+const sortSiteBuilds = (site) => {
+  return site.builds.sort((a, b) => {
+    return new Date(b.createdAt) - new Date(a.createdAt)
+  })
+}
+
 const SiteLogs = ({site}) =>
   <table className="usa-table-borderless build-log-table">
     <thead>
@@ -22,7 +28,7 @@ const SiteLogs = ({site}) =>
       </tr>
     </thead>
     <tbody>
-      {site.builds.reverse().map((build) => {
+      {sortSiteBuilds(site).map((build) => {
         const rowClass = `usa-alert-${build.state}`;
         const username = getUsername(site, build.user);
 
