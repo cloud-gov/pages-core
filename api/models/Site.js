@@ -65,9 +65,10 @@ module.exports = {
   },
 
   registerSite: function(values, done) {
+    const webhookUserId = values.users[0].id || values.users[0]
     async.parallel({
       // Set up GitHub webhook
-      hook: GitHub.setWebhook.bind(this, values, values.users[0])
+      hook: GitHub.setWebhook.bind(this, values, webhookUserId)
     }, function(err, res) {
       // Ignore error if hook already exists; otherwise, return error
       if (err) {

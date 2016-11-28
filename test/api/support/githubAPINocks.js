@@ -1,14 +1,11 @@
-var nock = require("nock")
+const nock = require("nock")
 
-var accessToken = (options) => {
-  options = options || {}
+const accessToken = ({ authorizationCode, accessToken, scope } = {}) => {
+  authorizationCode = authorizationCode || "auth-code-123abc"
+  accessToken = accessToken || "access-token-123abc"
 
-  var authorizationCode = options.authorizationCode || "auth-code-123abc"
-  var accessToken = options.accessToken || "access-token-123abc"
-
-  var scope
-  if (options.scope) {
-    scope = options.scope.join(",")
+  if (scope && typeof scope !== "string") {
+    scope = scope.join(",")
   } else {
     scope = "user,repo"
   }
@@ -26,44 +23,72 @@ var accessToken = (options) => {
     })
 }
 
-var user = (options) => {
-  options = options || {}
+const githubAuth = (username, organizations) => {
+  accessToken()
+  user({ username })
+  userOrganizations({ organizations })
+}
 
-  var accessToken = options.accessToken || "access-token-123abc"
+const user = ({ accessToken, githubUserID, username, email } = {}) => {
+  accessToken = accessToken || "access-token-123abc"
 
-  var userID = options.githubUserID || Math.floor(Math.random() * 10000)
-  var username = options.username || `user-${userID}`
-  var email = options.email || `${username}@example.com`
+  userID = githubUserID || Math.floor(Math.random() * 10000)
+  username = username || `user-${userID}`
+  email = email || `${username}@example.com`
 
   return nock("https://api.github.com")
     .get(`/user?access_token=${accessToken}`)
     .reply(200, {
       email: email,
       login: username,
-      id: userID
+      id: githubUserID
     })
 }
 
-var userOrganizations = (options) => {
-  options = options || {}
-
-  var accessToken = options.accessToken || "access-token-123abc"
-  var organizations = options.organizations || [{ id: 123456 }]
+const userOrganizations = ({ accessToken, organizations } = {}) => {
+  accessToken = accessToken || "access-token-123abc"
+  organizations = organizations || [{ id: 123456 }]
 
   return nock("https://api.github.com")
     .get(`/user/orgs?access_token=${accessToken}`)
     .reply(200, organizations)
 }
 
-var githubAuth = (username, organizations) => {
-  accessToken()
-  user({ username: username })
-  userOrganizations({ organizations: organizations })
+const webhook = ({ accessToken, owner, repo, response } = {}) => {
+  let webhookNock = nock("https://api.github.com")
+
+  if (owner && repo) {
+    webhookNock = webhookNock.post(`/repos/${owner}/${repo}/hooks`, {
+      name: 'web',
+      active: true,
+      config: {
+        url: sails.config.webhook.endpoint,
+        secret: sails.config.webhook.secret,
+        content_type: 'json',
+      },
+    })
+  } else {
+    webhookNock = webhookNock.post(/\/repos\/.*\/.*\/hooks/)
+  }
+
+  if (accessToken) {
+    webhookNock = webhookNock.query({ access_token: accessToken })
+  } else {
+    webhookNock = webhookNock.query(true)
+  }
+
+  response = response || 201
+  if (typeof response === "number") {
+    response = [response]
+  }
+
+  return webhookNock.reply(...response)
 }
 
 module.exports = {
-  accessToken: accessToken,
-  user: user,
-  userOrganizations: userOrganizations,
-  githubAuth: githubAuth
+  accessToken,
+  githubAuth,
+  user,
+  userOrganizations,
+  webhook,
 }

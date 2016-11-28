@@ -6,12 +6,10 @@ var session = require("../support/session")
 
 describe("Build API", () => {
   beforeEach(() => {
-    sinon.stub(Site, "registerSite", (_, done) => done())
     sinon.stub(Site, "startInitialBuild", (_, done) => done())
   })
 
   afterEach(() => {
-    Site.registerSite.restore()
     Site.startInitialBuild.restore()
   })
 
