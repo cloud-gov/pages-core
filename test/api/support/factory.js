@@ -1,11 +1,22 @@
 var Promise = require("bluebird")
+var githubAPINocks = require("./githubAPINocks")
 
 var factory = (model, overrides) => {
   var attributes = defaultAttributes[model.globalId].call(undefined, overrides)
 
   return Promise.props(attributes).then(attributes => {
+    prepareForCreation(model, attributes)
     return model.create(attributes)
   })
+}
+
+var prepareForCreation = (model, attributes) => {
+  if (model.globalId === "Site") {
+    githubAPINocks.webhook({
+      owner: attributes.owner,
+      repo: attributes.repository,
+    })
+  }
 }
 
 var buildAttributes = (overrides) => {

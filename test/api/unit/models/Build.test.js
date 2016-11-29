@@ -1,16 +1,7 @@
 var expect = require("chai").expect
-var sinon = require('sinon')
 var factory = require("../../support/factory")
 
 describe('Build Model', () => {
-  beforeEach(() => {
-    sinon.stub(GitHub, "setWebhook", (_, __, done) => done())
-  })
-
-  afterEach(() => {
-    GitHub.setWebhook.restore()
-  })
-
   describe(".afterCreate(model)", () => {
     it("should send a new build message", done => {
       var oldSendMessage = SQS.sqsClient.sendMessage

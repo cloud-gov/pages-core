@@ -1,17 +1,7 @@
-//var AWS = require('aws-sdk-mock')
 var expect = require("chai").expect
-var sinon = require("sinon")
 var factory = require("../../support/factory")
 
 describe("SQS", () => {
-  beforeEach(() => {
-    sinon.stub(GitHub, "setWebhook", (_, __, done) => done())
-  })
-
-  afterEach(() => {
-    GitHub.setWebhook.restore()
-  })
-
   describe(".sendBuildMessage(build)", () => {
     it("should send a formatted build message", done => {
       var oldSendMessage = SQS.sqsClient.sendMessage

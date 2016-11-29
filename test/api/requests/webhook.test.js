@@ -1,18 +1,9 @@
 var crypto = require('crypto')
 var expect = require("chai").expect
 var request = require("supertest-as-promised")
-var sinon = require("sinon")
 var factory = require("../support/factory")
 
 describe("Webhook API", () => {
-  beforeEach(() => {
-    sinon.stub(GitHub, "setWebhook", (_, __, done) => done())
-  })
-
-  afterEach(() => {
-    GitHub.setWebhook.restore()
-  })
-
   var signWebhookPayload = (payload) => {
     var secret = sails.config.webhook.secret
     var blob = JSON.stringify(payload)

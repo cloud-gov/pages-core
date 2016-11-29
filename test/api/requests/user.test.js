@@ -1,9 +1,12 @@
 var crypto = require("crypto")
 var expect = require("chai").expect
+var nock = require("nock")
 var Promise = require("bluebird")
 var request = require("supertest-as-promised")
 var sinon = require("sinon")
+
 var factory = require("../support/factory")
+var githubAPINocks = require("../support/githubAPINocks")
 var session = require("../support/session")
 
 describe("User API", () => {
@@ -112,14 +115,14 @@ describe("User API", () => {
 
   describe("POST /v0/user/add-site", () => {
     beforeEach(() => {
-      sinon.stub(GitHub, "setWebhook", (_, __, done) => done())
+      githubAPINocks.webhook()
       sinon.stub(GitHub, "checkPermissions", (_, __, ___, done) => {
         done(null, { push: true })
       })
     })
 
     afterEach(() => {
-      GitHub.setWebhook.restore()
+      nock.cleanAll()
       GitHub.checkPermissions.restore()
     })
 
@@ -207,22 +210,21 @@ describe("User API", () => {
     })
 
     it("should create a webhook for the site", done => {
-      var user
+      var user, webhookNock
       var siteOwner = crypto.randomBytes(3).toString("hex")
       var siteRepository = crypto.randomBytes(3).toString("hex")
-
-      GitHub.setWebhook.restore()
-      sinon.stub(GitHub, "setWebhook", (stubbedSite, stubbedUserID) => {
-        expect(stubbedUserID).to.equal(user.id)
-        expect(stubbedSite.owner).to.equal(siteOwner)
-        expect(stubbedSite.repository).to.equal(siteRepository)
-        done()
-      })
 
       factory(User).then(model => {
         user = model
         return session(user)
       }).then(cookie => {
+        nock.cleanAll()
+        webhookNock = githubAPINocks.webhook({
+          accessToken: user.githubAccessToken,
+          owner: siteOwner,
+          repo: siteRepository,
+        })
+
         return request("http://localhost:1337")
           .post("/v0/user/add-site")
           .send({
@@ -234,6 +236,9 @@ describe("User API", () => {
           })
           .set("Cookie", cookie)
           .expect(200)
+      }).then(response => {
+        expect(webhookNock.isDone()).to.equal(true)
+        done()
       })
     })
 
