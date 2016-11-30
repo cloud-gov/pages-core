@@ -29,6 +29,37 @@ const githubAuth = (username, organizations) => {
   userOrganizations({ organizations })
 }
 
+const repo = ({ accessToken, owner, repo, response } = {}) => {
+  let webhookNock = nock("https://api.github.com")
+
+  if (owner && repo) {
+    webhookNock = webhookNock.get(`/repos/${owner}/${repo}`)
+  } else {
+    webhookNock = webhookNock.get(/\/repos\/.*\/.*/)
+  }
+
+  if (accessToken) {
+    webhookNock = webhookNock.query({ access_token: accessToken })
+  } else {
+    webhookNock = webhookNock.query(true)
+  }
+
+  response = response || 201
+  if (typeof response === "number") {
+    response = [response, {}]
+  } else if (!response[1]) {
+    response[1] = {}
+  }
+
+  return webhookNock.reply(response[0], Object.assign({
+    permissions: {
+      admin: false,
+      push: true,
+      pull: true,
+    },
+  }, response[1]))
+}
+
 const user = ({ accessToken, githubUserID, username, email } = {}) => {
   accessToken = accessToken || "access-token-123abc"
 
@@ -88,6 +119,7 @@ const webhook = ({ accessToken, owner, repo, response } = {}) => {
 module.exports = {
   accessToken,
   githubAuth,
+  repo,
   user,
   userOrganizations,
   webhook,
