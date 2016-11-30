@@ -116,14 +116,11 @@ describe("User API", () => {
   describe("POST /v0/user/add-site", () => {
     beforeEach(() => {
       githubAPINocks.webhook()
-      sinon.stub(GitHub, "checkPermissions", (_, __, ___, done) => {
-        done(null, { push: true })
-      })
+      githubAPINocks.repo()
     })
 
     afterEach(() => {
       nock.cleanAll()
-      GitHub.checkPermissions.restore()
     })
 
     it("should require authentication", done => {
@@ -219,6 +216,7 @@ describe("User API", () => {
         return session(user)
       }).then(cookie => {
         nock.cleanAll()
+        githubAPINocks.repo()
         webhookNock = githubAPINocks.webhook({
           accessToken: user.githubAccessToken,
           owner: siteOwner,
@@ -267,22 +265,23 @@ describe("User API", () => {
     })
 
     it("should render a 400 if the user does not have write access to the repository and not create a site", done => {
-      var user
+      var user, repoNock
       var siteOwner = crypto.randomBytes(3).toString("hex")
       var siteRepository = crypto.randomBytes(3).toString("hex")
-
-      GitHub.checkPermissions.restore()
-      sinon.stub(GitHub, "checkPermissions", (stubbedUser, owner, repository, done) => {
-        expect(stubbedUser.id).to.equal(user.id)
-        expect(owner).to.equal(siteOwner)
-        expect(repository).to.equal(siteRepository)
-        done(null, { push: false })
-      })
 
       factory(User).then(model => {
         user = model
         return session(user)
       }).then(cookie => {
+        nock.cleanAll()
+        githubAPINocks.webhook()
+        repoNock = githubAPINocks.repo({
+          response: [200, { permissions: { push: false } }],
+          owner: siteOwner,
+          repo: siteRepository,
+          accessToken: user.githubAccessToken,
+        })
+
         return request("http://localhost:1337")
           .post("/v0/user/add-site")
           .send({
@@ -298,6 +297,7 @@ describe("User API", () => {
         return Site.find({ user: user.id })
       }).then(sites => {
         expect(sites).to.have.length(0)
+        expect(repoNock.isDone()).to.equal(true)
         done()
       })
     })
