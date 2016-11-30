@@ -72,7 +72,22 @@ const handleWebhookError = (error) => {
 }
 
 module.exports = {
-  setWebhook: function(site, user) {
+  checkPermissions: (user, owner, repository) => {
+    return githubClient(user.githubAccessToken).then(github => {
+      return getRepository(github, {
+        user: owner,
+        repo: repository,
+      })
+    }).then(repository => {
+      if (!repository) {
+        throw new Error("This repository does not exit")
+      } else {
+        return repository.permissions
+      }
+    })
+  },
+
+  setWebhook: (site, user) => {
     return User.findOne(user).then(model => {
       user = model
       return githubClient(user.githubAccessToken)
@@ -93,7 +108,7 @@ module.exports = {
     })
   },
 
-  validateUser: function(accessToken) {
+  validateUser: (accessToken) => {
     var approvedOrgs = sails.config.passport.github.organizations || []
 
     return githubClient(accessToken).then(github => {
@@ -108,20 +123,5 @@ module.exports = {
         throw new Error("Unauthorized")
       }
     })
-  },
-
-  checkPermissions: function(user, owner, repository, done) {
-    return githubClient(user.githubAccessToken).then(github => {
-      return getRepository(github, {
-        user: owner,
-        repo: repository,
-      })
-    }).then(repository => {
-      if (!repository) {
-        done("This repository does not exit")
-      } else {
-        done(null, repository.permissions)
-      }
-    }).catch(done)
   },
 }
