@@ -66,24 +66,9 @@ module.exports = {
 
   registerSite: function(values, done) {
     const webhookUserId = values.users[0].id || values.users[0]
-    async.parallel({
-      // Set up GitHub webhook
-      hook: GitHub.setWebhook.bind(this, values, webhookUserId)
-    }, function(err, res) {
-      // Ignore error if hook already exists; otherwise, return error
-      if (err) {
-        var ghErr,
-            hookMessage = 'Hook already exists on this repository',
-            noAccessMessage = 'Not Found';
-        try { ghErr = JSON.parse(err.message).errors[0].message; } catch(e) {}
-        if (ghErr === hookMessage) return done();
-        try { ghErr = JSON.parse(err.message).message; } catch(e) {}
-        if (ghErr === noAccessMessage) return done('You do not have admin access to this repository');
-        if (err.message) return done(err.message);
-        return done(err);
-      }
-      done();
-    });
+    GitHub.setWebhook(values, webhookUserId).then(() => {
+      done()
+    }).catch(done)
   },
 
   startInitialBuild: function(model, done) {

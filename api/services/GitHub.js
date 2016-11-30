@@ -1,8 +1,20 @@
 const Github = require("github")
 
+const createWebhook = (github, options) => {
+  return new Promise((resolve, reject) => {
+    github.repos.createHook(options, (err, res) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(res)
+      }
+    })
+  })
+}
+
 const getOrganizations = (github) => {
   return new Promise((resolve, reject) => {
-    github.user.getOrgs({}, function(err, organizations) {
+    github.user.getOrgs({}, (err, organizations) => {
       if (err) {
         reject(err)
       } else {
@@ -14,7 +26,7 @@ const getOrganizations = (github) => {
 
 const getRepository = (github, options) => {
   return new Promise((resolve, reject) => {
-    github.repos.get(options, function(err, repo) {
+    github.repos.get(options, (err, repo) => {
       if (err) {
         reject(err)
       } else {
@@ -35,13 +47,37 @@ const githubClient = (accessToken) => {
   })
 }
 
+const handleWebhookError = (error) => {
+  const HOOK_EXISTS_MESSAGE = "Hook already exists on this repository"
+  const NO_ACCESS_MESSAGE = "Not Found"
+  const NO_ADMIN_ACCESS_ERROR_MESSAGE = "You do not have admin access to this repository"
+  let githubError
+
+  try {
+    githubError = JSON.parse(err.message).errors[0].message
+  } catch(e) {
+    try {
+      githubError = JSON.parse(err.message).message
+    } catch(e) {}
+  }
+
+  if (githubError === HOOK_EXISTS_MESSAGE) {
+    // noop
+    return
+  } else if (githubError === NO_ACCESS_MESSAGE) {
+    throw new Error(NO_ADMIN_ACCESS_ERROR_MESSAGE)
+  } else {
+    throw error
+  }
+}
+
 module.exports = {
-  setWebhook: function(site, user, done) {
+  setWebhook: function(site, user) {
     return User.findOne(user).then(model => {
       user = model
       return githubClient(user.githubAccessToken)
     }).then(github => {
-      github.repos.createHook({
+      return createWebhook(github, {
         user: site.owner,
         repo: site.repository,
         name: 'web',
@@ -51,8 +87,10 @@ module.exports = {
           secret: sails.config.webhook.secret,
           content_type: 'json'
         }
-      }, done)
-    }).catch(done)
+      })
+    }).catch(err => {
+      handleWebhookError(err)
+    })
   },
 
   validateUser: function(accessToken) {
@@ -84,8 +122,6 @@ module.exports = {
       } else {
         done(null, repository.permissions)
       }
-    }).catch(err => {
-      done(err)
-    })
+    }).catch(done)
   },
 }

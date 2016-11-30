@@ -22,8 +22,13 @@ describe('Site Model', function() {
         assert(GitHub.setWebhook.called);
         GitHub.setWebhook = setWebhook;
         done();
+        return Promise.resolve();
       });
-      Site.registerSite({ users: [1] });
+      Site.registerSite({
+        users: [1],
+        owner: "someone",
+        repository: "something",
+      }, () => {});
     });
   });
 
