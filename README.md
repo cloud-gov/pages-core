@@ -9,51 +9,56 @@ Federalist is a unified interface for publishing static government websites. It 
 
 ## Getting started
 
-To run the server, you'll need [Node.js](https://nodejs.org/download/) and [Ruby](https://www.ruby-lang.org/en/documentation/installation/) installed. The setup process will automatically install Jekyll and its dependencies based on the `github-pages` gem.
-You'll also need [nvm](https://github.com/creationix/nvm).
-
-
+To run the server, you'll need [Node.js](https://nodejs.org/download/). You'll also need [nvm](https://github.com/creationix/nvm).
 
 ### env variables
 
-We have a few environment variables that the application uses, here is a list of the environment variables that the application will use if present:
+#### In Production
 
-#### The following variables are used to derive preview links
-* `FEDERALIST_S3_BUCKET` - The name of the S3 bucket. *There is no default, this value must be supplied.* To find this value, in the cloud foundry environment you use to interact with, type `cf env ${app_name}` and look for the s3 user provided service
-* `FEDERALIST_S3_REGION` - Defaults to `us-gov-west-1`.
-* `FEDERALIST_APP_DOMAIN` - Defaults to `fr.cloud.gov`
-* `FEDERALIST_APP_NAME` -Defaults to `federalist-staging`. Can be changed to `federalist` to interact with sites already on the production instance of federalist.
+We have a few environment variables that the application uses.
+In production, those variables are provided to the application either through the Cloud Foundry environment or through Cloud Foundry services.
 
-* `FEDERALIST_AWS_BUILD_KEY` - the AWS key for container builds
-* `FEDERALIST_AWS_BUILD_SECRET` - the AWS secret for container builds
-* `FEDERALIST_BUILD_CALLBACK` - the endpoint for build status, defaults to 'http://localhost:1337/build/status'
-* `FEDERALIST_BUILD_TOKEN` - random token used to protect the build status endpoint
-* `FEDERALIST_CACHE_CONTROL` - 'max-age=60'
-* `FEDERALIST_PUBLISH_DIR` - where to publish files if not S3, defaults to './assets'
-* `FEDERALIST_S3_BUCKET` - bucket ID to push files to on S3
-* `FEDERALIST_SQS_QUEUE` - the name of an SQS queue. If defined, Federalist will send build messages to this queue and expect an external build service
-* `FEDERALIST_TEMP_DIR` - where files will be temporarily built, defaults to './.tmp'
-* `FEDERALIST_TEST_ORG` - A github org to authorize the test user against
-* `FEDERALIST_TEST_PASSWORD` **required for tests** - A github user password to run the tests with
-* `FEDERALIST_TEST_USER` **required for tests** - A github user to run the tests with
+To inspect the way the environment is provided to the application in production and staging, look at `manifest.yml` and `staging_manifest.yml` respectively.
+To see how the application recieves those configurations, looks at `config/env/production.js`.
 
-* `GITHUB_CLIENT_CALLBACK_URL` - for dev you'll probably want to use http://localhost:1337/auth/github/callback
-* `GITHUB_CLIENT_ID` **required** - get this when you register your app with Github
-* `GITHUB_CLIENT_SECRET` **required** - you'll also get this when you register your app
-* `GITHUB_TOKEN` - A GitHub oauth token that will be used in place of authentication
-* `GITHUB_WEBHOOK_SECRET` - random token used to protect webhook messages, defaults to 'testingSecret'
-* `GITHUB_WEBHOOK_URL` - should be full url, defaults to  'http://localhost:1337/webhook/github'
+The following environment variables are set on the Cloud Foundry environment in the application manifest:
 
-* `NEW_RELIC_APP_NAME` - application name to report to New Relic.
-* `NEW_RELIC_LICENSE_KEY` - license key for New Relic.
+- `NODE_ENV`: The node environment where the app should run. When running in Cloud Foundry this should always be set to production, even for the staging environment
+- `APP_ENV`: The application environment in which the app should run. Valid values are `production` and `staging`.
+- `SAILS_LOG_LEVEL`: Sets the log level for sails.
+- `NPM_CONFIG_PRODUCTION`: This should be set to true in Cloud Foundry to prevent NPM from installing dev dependencies
+- `NODE_MODULES_CACHE`: This should be set to true in Cloud Foundry to prevent caching node modules since those are vendored by Federalist
+- `APP_NAME`: The name of the Cloud Foundry application
+- `APP_COMAIN`: The hostname where the application runs in Cloud Foundry
 
-* `NODE_ENV` - Node.js environment setting, defaults to 'development'
-* `PORT` - Server port, defaults to  1337
+Secrets cannot be kept in the application manifest so they are provided by Cloud Foundy services.
+The app expects the following user provided services to be provided:
 
-* `SAILS_LOG_LEVEL` - Log level, defaults to 'info'
+- `federalist-<environment<-redis`: A cloud.gov brokered service that allows the application to use redis for its session store
+- `federalist-<environment>-rds`: A cloud.gov brokered service that allows the application to use RDS Postgres for its database
+- `federalist-<environment>-s3`: A cloud.gov brokered service that allows the application to work with the S3 bucket where Federalist's sites live
+- `federalist-<environment>-env`: A user-provided service that provides the application with secrets that cannot be added to `manifest.yml` b/c that file is under version control; this service provides the following:
+  - `FEDERALIST_AWS_BUILD_KEY`: The AWS access key federalist uses to communicate with SQS
+  - `FEDERALIST_AWS_BUILD_SECRET`: The AWS secret key federalist uses to communicate with SQS
+  - `FEDERALIST_BUILD_CALLBACK`: The URL to which build containers should callback to with updates on their status
+  - `FEDERALIST_BUILD_TOKEN`: The token that is used to authenticate build container callbacks
+  - `FEDERALIST_SESSION_SECRET`: The session secret used to sign entries in Federalist's session store
+  - `FEDERALIST_SQS_QUEUE`: The URL for the SQS queue that Federalist uses to communicate with federalist-builder
+  - `GITHUB_CALLBACK_URL`: The callback URL used for GitHub authentication
+  - `GITHUB_CLIENT_ID`: The client ID used for GitHub authentication
+  - `GITHUB_CLIENT_SECRET`: The client secret used for GitHub authentication
+  - `GITHUB_WEBHOOK_SECRET`: The secret used to sign and verify webhook requests from GitHub
+  - `GITHUB_WEBHOOK_URL`: The url where GitHub webhook requests should be sent
+  - `NEW_RELIC_APP_NAME`: The app name to report to New Relic
+  - `NEW_RELIC_LICENSE_KEY`: The license key to use with New Relic
 
-You'll notice that we talk about a `/config/local.js` file below, particularly for setting up the Github app information. For local development either approach is fine, but for production environments you'll want to set these env vars instead of committing `local.js` to your git history.
+Here `<environment>` refers the value set for the `APP_ENV` environment variable.
 
+#### In Development
+
+In development, the application environment is configured within the `config/local.js`.
+There a sample of that file at `config/local.sample.js` which can be copied over and configured.
+This file's usage is discussed in length in "Building the Server" below.
 
 ### Build the server
 
@@ -73,21 +78,23 @@ $ npm install
 
 * Copy `config/local.sample.js` to `config/local.js`.
 
-    $ cp config/local.sample.js config/local.js
+```
+$ cp config/local.sample.js config/local.js
+```
 
 * Set up [an application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a Client ID and Client Secret. Add these values to `config/local.js`.
 
- ```
-  passport: {
-    github: {
-      options: {
-        clientID: '<<use the value from Github here>>',
-        clientSecret: '<<use the value from Github here>>',
-        callbackURL: 'http://localhost:1337/auth/github/callback'
-      }
+```
+passport: {
+  github: {
+    options: {
+      clientID: '<<use the value from Github here>>',
+      clientSecret: '<<use the value from Github here>>',
+      callbackURL: 'http://localhost:1337/auth/github/callback'
     }
   }
- ```
+}
+```
 
 In the end, your `local.js` file should look something like this:
 
@@ -115,22 +122,56 @@ organizations: [
   99999999 // your org added here
 ]
 ```
+* Connect to the SQS build queue
+
+In development, Federalist uses the staging build queue.
+To connect to the build queue, get the credentials for the staging build queue and add them to the SQS config in your `config/local.js`.
+
+Note that the values shown in the examples below are meant to serve only as an example.
+You will need to look at the staging environment to fetch the actual values.
+
+```
+sqs: {
+  accessKeyId: "ABC123",
+  secretAccessKey: "456DEF",
+  region: "us-est-1",
+  queue: "https://sqs.us-east-1.amazonaws.com/789/ghi",
+}
+```
+
+* Connect to the S3 bucket
+
+In development, Federalist uses the staging S3 bucket.
+To connect to the bucket, get the credentials for the staging bucket and add them to the S3 config in your `config/local.js`.
+
+Note that the values shown in the examples below are meant to serve only as an example.
+You will need to look at the staging environment to fetch the actual values.
+
+```
+s3: {
+  accessKeyId: "ABC123",
+  secretAccessKey: "456def",
+  region: "us-gov-west-1",
+  bucket: "789ghi",
+}
+```
 
 * Run the server with `npm start` (You can use `npm run watch:server` for the server to restart when you save file changes and `npm run watch:client` to rebuild front-end files on each save) at the directory of the project on your local computer.
 
-
 #### Build the server and the front-end
+
 There are really two applications in one repo here. Right now we're OK with that because we're moving quick to get done with the prototypal phase of the project.
 
 If you are working on the front-end of the application, the things you need to know are:
 
-0. It is a Backbone based application
+0. It is a React based application
 0. It is built with `browserify` and uses `watchify` to build on changes
 0. It lives in `/assets/app`
 
 You can use `npm run watch` to get the project built and running. This will set up `watchify` to run when front end files change and will set up the server to reload on any file change (front end included)
 
 #### Using Postgres
+
 By default, the application should use local disk storage in place of a database. This is easier to get started and isn't a problem for local development. In production, the app uses Postgres as the data store. To use Postgres in your local dev environment:
 
 0. First, you'll need to [install Postgres](http://www.postgresql.org/download/).
@@ -139,48 +180,15 @@ By default, the application should use local disk storage in place of a database
 
 ```
 connections: {
-	postgres: {
-		adapter: 'sails-postgresql',
-		database: 'federalist'
-	}
+  postgres: {
+    adapter: 'sails-postgresql',
+    database: 'federalist'
+  }
 },
 models: {
-	connection: 'postgres'
+  connection: 'postgres'
 }
 ```
-
-
-##### Setting up the test Github user
-
-The integration tests rely on a test Github user to ensure that data is
-appropriately displayed in the application. You can use any Github user, but
-18F uses [@FederalistTestingUser](https://github.com/FederalistTestingUser).
-
-First you need to give your app permission to access the user's data, but that
-is not part of the integration test at this time. Thus, you should do this just
-the first time you are setting up a new Github application.
-
-Ensure that you have a Federalist application running (locally is fine). Open
-an Incognito browser window and login to Github.com with your test user. If you
-are on the 18F team, please ask in the Slack room for the test user credentials.
-
-Once you have logged into Github, open your application
-([http://127.0.0.1:1337](http://127.0.0.1:1337) if you're running locally) and
-login. You should grant the application permission to access the test user's
-data in the OAuth authorization view.
-
-Now that your application can access Github on behalf of the test user, set the
-environment variables for the integration tests.
-
-    $ export FEDERALIST_TEST_USER=<test user>
-    $ export FEDERALIST_TEST_PASSWORD=<test user password>
-
-And now you can run the tests:
-
-    $ npm run test:integration
-
-
-
 
 ## Architecture
 
