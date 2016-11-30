@@ -13,6 +13,9 @@ import {
   siteLoadingType as SITE_LOADING
 } from '../actions/actionCreators/siteActions';
 
+import {
+  buildRestartedType as BUILD_RESTARTED,
+} from '../actions/actionCreators/buildActions';
 
 const initialState = [];
 
@@ -113,6 +116,17 @@ export default function sites(state = initialState, action) {
     return mapPropertyToMatchingSite(state, action.siteId, {
       files: files.concat(updatedSiteFiles)
     });
+
+  case BUILD_RESTARTED:
+    return state.map(site => {
+      if (site.id === action.build.site) {
+        return Object.assign({}, site, {
+          builds: [action.build, ...site.builds],
+        })
+      } else {
+        return site
+      }
+    })
 
   default:
     return state;

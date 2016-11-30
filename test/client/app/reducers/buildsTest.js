@@ -7,11 +7,13 @@ proxyquire.noCallThru();
 describe("buildsReducer", () => {
   let fixture;
   const BUILDS_RECEIVED = "builds received!";
+  const BUILD_RESTARTED = "build restarted!";
 
   beforeEach(() => {
     fixture = proxyquire("../../../../assets/app/reducers/builds.js", {
       "../actions/actionCreators/buildActions": {
-        buildsReceivedType: BUILDS_RECEIVED
+        buildsReceivedType: BUILDS_RECEIVED,
+        buildRestartedType: BUILD_RESTARTED,
       }
     }).default;
   });
@@ -47,5 +49,17 @@ describe("buildsReducer", () => {
     });
 
     expect(actual).to.deep.equal(BUILDS);
+  });
+
+  it("adds the restarted build in the action", () => {
+    const BUILDS = [ "build b", "build c" ];
+    const BUILD = "build a";
+
+    const actual = fixture(BUILDS, {
+      type: BUILD_RESTARTED,
+      build: BUILD
+    });
+
+    expect(actual).to.deep.equal([BUILD, ...BUILDS])
   });
 });
