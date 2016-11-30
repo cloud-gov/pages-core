@@ -1,26 +1,46 @@
-/*
- * Service for interfacing with GitHub
- */
-var url = require('url'),
-    Client = require('github'),
-    github = new Client({ version: '3.0.0' });
+const Github = require("github")
+
+const getOrganizations = (github) => {
+  return new Promise((resolve, reject) => {
+    github.user.getOrgs({}, function(err, organizations) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(organizations)
+      }
+    })
+  })
+}
+
+const getRepository = (github, options) => {
+  return new Promise((resolve, reject) => {
+    github.repos.get(options, function(err, repo) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(repo)
+      }
+    })
+  })
+}
+
+const githubClient = (accessToken) => {
+  return new Promise((resolve, reject) => {
+    let client = new Github({ version: "3.0.0" })
+    client.authenticate({
+      type: 'oauth',
+      token: accessToken
+    })
+    resolve(client)
+  })
+}
 
 module.exports = {
-
-  /*
-   * Set a webhook on a repository
-   * @param {Site} site model to apply the webhook
-   * @param {Function} callback function
-   */
   setWebhook: function(site, user, done) {
-    User.findOne(user).then(user => {
-      // Authenticate request with user's oauth token
-      github.authenticate({
-        type: 'oauth',
-        token: user.githubAccessToken
-      });
-
-      // Create the webhook for the site repository
+    return User.findOne(user).then(model => {
+      user = model
+      return githubClient(user.githubAccessToken)
+    }).then(github => {
       github.repos.createHook({
         user: site.owner,
         repo: site.repository,
@@ -32,64 +52,40 @@ module.exports = {
           content_type: 'json'
         }
       }, done)
-    })
+    }).catch(done)
   },
 
-  /*
-   * Validate that a user is part of an approved Organization
-   * @param {object} values to become a user model
-   * @param {Function} callback function
-   */
   validateUser: function(accessToken) {
-    var approved = sails.config.passport.github.organizations || [];
-    if (process.env.NODE_ENV === 'test' && process.env.FEDERALIST_TEST_ORG) {
-      approved.push(parseInt(process.env.FEDERALIST_TEST_ORG));
-    }
+    var approvedOrgs = sails.config.passport.github.organizations || []
 
-    // Authenticate request with user's oauth token
-    github.authenticate({
-      type: 'oauth',
-      token: accessToken
-    });
+    return githubClient(accessToken).then(github => {
+      return getOrganizations(github)
+    }).then(organizations => {
+      var usersApprovedOrgs = _(organizations)
+        .pluck('id')
+        .intersection(approvedOrgs)
+        .value()
 
-    return new Promise((resolve, reject) => {
-      // Get user's organizations
-      github.user.getOrgs({}, function(err, organizations) {
-        if (err) return reject(new Error(err.message));
-
-        // Do the user's organizations in any on the approved list?
-        var hasApproval = _(organizations)
-              .pluck('id')
-              .intersection(approved)
-              .value().length > 0;
-        if (hasApproval) return resolve();
-        reject(new Error('Unauthorized'));
-      });
+      if (usersApprovedOrgs.length <= 0) {
+        throw new Error("Unauthorized")
+      }
     })
   },
 
-  /*
-   * Check user permissions
-   * @param {object} user model
-   * @param {string} repository owner
-   * @param {string} repository name
-   * @param {Function} callback function
-   */
   checkPermissions: function(user, owner, repository, done) {
-    // Authenticate request with user's oauth token
-    github.authenticate({
-     type: 'oauth',
-     token: user.githubAccessToken,
-    });
-
-    // Retrieve the permissions for the repository
-    github.repos.get({
-     user: owner,
-     repo: repository
-    }, function(err, repo) {
-     if (err) return done('Unable to access the repository');
-     if (!repo) return done('The repository does not exist');
-     return done(null, repo.permissions);
-    });
-  }
-};
+    return githubClient(user.githubAccessToken).then(github => {
+      return getRepository(github, {
+        user: owner,
+        repo: repository,
+      })
+    }).then(repository => {
+      if (!repository) {
+        done("This repository does not exit")
+      } else {
+        done(null, repository.permissions)
+      }
+    }).catch(err => {
+      done(err)
+    })
+  },
+}
