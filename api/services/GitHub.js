@@ -54,10 +54,10 @@ const handleWebhookError = (error) => {
   let githubError
 
   try {
-    githubError = JSON.parse(err.message).errors[0].message
+    githubError = JSON.parse(error.message).errors[0].message
   } catch(e) {
     try {
-      githubError = JSON.parse(err.message).message
+      githubError = JSON.parse(error.message).message
     } catch(e) {}
   }
 
@@ -79,11 +79,7 @@ module.exports = {
         repo: repository,
       })
     }).then(repository => {
-      if (!repository) {
-        throw new Error("This repository does not exit")
-      } else {
-        return repository.permissions
-      }
+      return repository.permissions
     })
   },
 
