@@ -40,11 +40,13 @@ module.exports = {
     });
 
     function checkPermissions(done) {
-      GitHub.checkPermissions(user, owner, repository, function(err, perms) {
-        if (err) return done(err);
-        if (perms && perms.push) return done();
-        done('You do not have write access to this repository');
-      });
+      GitHub.checkPermissions(user, owner, repository).then(permissions => {
+        if (permissions && permissions.push) {
+          done()
+        } else {
+          done("You do not have write access to this repository")
+        }
+      }).catch(done)
     }
 
     function checkSite(done) {
