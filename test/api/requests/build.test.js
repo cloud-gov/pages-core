@@ -16,10 +16,9 @@ describe("Build API", () => {
   var buildResponseExpectations = (response, build) => {
     Object.keys(build).forEach(key => {
       expect(response[key]).to.not.be.undefined
-
       if (typeof build[key] === "number" && typeof response[key] === "object") {
         expect(response[key].id).to.equal(build[key])
-      } else if (build[key].toISOString) {
+      } else if (build[key] && build[key].toISOString) {
         expect(response[key]).to.equal(build[key].toISOString())
       } else {
         expect(response[key]).to.equal(build[key])
@@ -143,6 +142,132 @@ describe("Build API", () => {
         expect(response.body).to.be.empty
         done()
       })
+    })
+  })
+
+  describe("POST /build/:id/restart", () => {
+    context("On the default branch", () => {
+      it("should create a build that mirrors the original", done => {
+        let build
+
+        factory(Build, { branch: undefined }).then(model => {
+          build = model
+          return User.findOne(build.user)
+        }).then(user => {
+          return session(user)
+        }).then(cookie => {
+          return request("http://localhost:1337")
+            .post(`/v0/build/${build.id}/restart`)
+            .set("Cookie", cookie)
+            .expect(200)
+        }).then(response => {
+          return Build.find({
+            user: build.user,
+            site: build.site,
+            branch: build.branch,
+          })
+        }).then(builds => {
+          expect(builds).to.have.length(2)
+          done()
+        })
+      })
+    })
+
+    context("On a preview branch", () => {
+      it("should create a build that mirrors the original", done => {
+        let build
+
+        factory(Build, { branch: "preview" }).then(model => {
+          build = model
+          return User.findOne(build.user)
+        }).then(user => {
+          return session(user)
+        }).then(cookie => {
+          return request("http://localhost:1337")
+            .post(`/v0/build/${build.id}/restart`)
+            .set("Cookie", cookie)
+            .expect(200)
+        }).then(response => {
+          return Build.find({
+            user: build.user,
+            site: build.site,
+            branch: build.branch,
+          })
+        }).then(builds => {
+          expect(builds).to.have.length(2)
+          done()
+        })
+      })
+    })
+
+    it("should render a JSON representation of the new build", done => {
+      let build, response
+
+      factory(Build).then(model => {
+        build = model
+        return User.findOne(build.user)
+      }).then(user => {
+        return session(user)
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .post(`/v0/build/${build.id}/restart`)
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(res => {
+        response = res
+
+        return Build.find({
+          user: build.user,
+          site: build.site,
+        }).sort("createdAt DESC")
+      }).then(builds => {
+        buildResponseExpectations(response.body, builds[0])
+        done()
+      })
+    })
+
+    it("should restart the build if the user did not create the build, but is associated with the build's site", done => {
+      var build, user
+
+      factory(User).then(model => {
+        user = model
+        return factory(Build)
+      }).then(model => {
+        build = model
+        return Site.findOne(build.site)
+      }).then(site => {
+        site.users.add(user.id)
+        return site.save()
+      }).then(result => {
+        return session(user)
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .post(`/v0/build/${build.id}/restart`)
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(response => {
+        return Build.find({
+          user: [build.user, user.id],
+          site: build.site,
+        })
+      }).then(builds => {
+        expect(builds).to.have.length(2)
+        done()
+      })
+    })
+
+    it("should respond with a 403 if the user is not associated with the build's site", done => {
+      let build
+
+      factory(Build).then(model => {
+        build = model
+        return session(factory(User))
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .post(`/v0/build/${build.id}/restart`)
+          .set("Cookie", cookie)
+          .expect(403)
+      }).then(() => done())
     })
   })
 

@@ -34,6 +34,7 @@ module.exports.routes = {
 
   'post /webhook/github': 'WebhookController.github',
   'post /build/status/:id/:token': 'BuildController.status',
+  'post /v0/build/:id/restart': 'BuildController.restart',
 
   'get /preview/:owner/:repo/:branch': 'PreviewController.proxy',
   'get /preview/:owner/:repo/:branch/*': 'PreviewController.proxy',
@@ -43,7 +44,7 @@ module.exports.routes = {
   'get /logout': 'AuthController.logout',
 
   'get /v0/me': 'UserController.me',
-
+  
   'get /sites(/*)?': {
     controller: 'main',
     action: 'index'

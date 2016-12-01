@@ -58,5 +58,11 @@ export default {
     return this.fetch(`site/${siteId}`, {
       method: 'DELETE'
     });
-  }
+  },
+
+  restartBuild(build) {
+    return this.fetch(`build/${build.id}/restart`, {
+      method: 'POST'
+    })
+  },
 }

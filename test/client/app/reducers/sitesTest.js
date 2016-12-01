@@ -14,6 +14,7 @@ describe("sitesReducer", () => {
   const SITE_FILE_CONTENT_RECEIVED = "cool files!";
   const SITE_UPLOAD_RECEIVED = 'uploaded!';
   const SITE_FILES_RECEIVED = "contents? we have contents!";
+  const BUILD_RESTARTED = "build restarted!"
 
   beforeEach(() => {
     fixture = proxyquire("../../../../assets/app/reducers/sites", {
@@ -31,7 +32,10 @@ describe("sitesReducer", () => {
         siteAssetsReceivedType: SITE_ASSETS_RECEIVED,
         siteConfigsReceivedType: SITE_CONFIGS_RECEIVED,
         siteFilesReceivedType: SITE_FILES_RECEIVED
-      }
+      },
+      "../actions/actionCreators/buildActions": {
+        buildRestartedType: BUILD_RESTARTED,
+      },
     }).default;
   });
 
@@ -773,6 +777,29 @@ describe("sitesReducer", () => {
     });
 
     expect(actual.pop().files.pop()).to.deep.equal(file);
+  });
+
+  it("adds the restarted build in the action to its site", () => {
+    const sitePendingRestart = {
+      id: "pick this one",
+      builds: ["finished build"],
+    };
+    const otherSite = {
+      id: "not this one",
+    };
+    const build = {
+      site: "pick this one",
+    };
+    const restartedSite = Object.assign({}, sitePendingRestart, {
+      builds: [build, ...sitePendingRestart.builds],
+    });
+
+    const actual = fixture([sitePendingRestart, otherSite], {
+      type: BUILD_RESTARTED,
+      build: build
+    });
+
+    expect(actual).to.deep.equal([restartedSite, otherSite])
   });
 
 });
