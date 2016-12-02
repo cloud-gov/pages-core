@@ -44,20 +44,22 @@ const repo = ({ accessToken, owner, repo, response } = {}) => {
     webhookNock = webhookNock.query(true)
   }
 
-  response = response || 201
-  if (typeof response === "number") {
-    response = [response, {}]
-  } else if (!response[1]) {
-    response[1] = {}
-  }
-
-  return webhookNock.reply(response[0], Object.assign({
+  const typicalResponse = {
     permissions: {
       admin: false,
       push: true,
       pull: true,
-    },
-  }, response[1]))
+    }
+  }
+
+  response = response || 201
+  if (typeof response === "number") {
+    response = [response, typicalResponse]
+  } else if (response[1] === undefined) {
+    response[1] = typicalResponse
+  }
+
+  return webhookNock.reply(...response)
 }
 
 const user = ({ accessToken, githubUserID, username, email } = {}) => {
@@ -76,13 +78,13 @@ const user = ({ accessToken, githubUserID, username, email } = {}) => {
     })
 }
 
-const userOrganizations = ({ accessToken, organizations } = {}) => {
+const userOrganizations = ({ accessToken, organizations, response } = {}) => {
   accessToken = accessToken || "access-token-123abc"
   organizations = organizations || [{ id: 123456 }]
 
   return nock("https://api.github.com")
     .get(`/user/orgs?access_token=${accessToken}`)
-    .reply(200, organizations)
+    .reply(response || 200, organizations)
 }
 
 const webhook = ({ accessToken, owner, repo, response } = {}) => {
