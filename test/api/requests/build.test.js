@@ -5,14 +5,6 @@ var factory = require("../support/factory")
 var session = require("../support/session")
 
 describe("Build API", () => {
-  beforeEach(() => {
-    sinon.stub(Site, "startInitialBuild", (_, done) => done())
-  })
-
-  afterEach(() => {
-    Site.startInitialBuild.restore()
-  })
-
   var buildResponseExpectations = (response, build) => {
     Object.keys(build).forEach(key => {
       expect(response[key]).to.not.be.undefined

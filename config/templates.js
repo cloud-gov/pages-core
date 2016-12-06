@@ -1,4 +1,4 @@
-module.exports = {
+module.exports.templates = {
   'microsite': {
     owner: 'USG-Website-Templates',
     branch: 'gh-pages',
@@ -23,7 +23,7 @@ module.exports = {
     title: 'A clean template for teams and agencies',
     description: 'This is a Jekyll site. It is a simple site to showcase the work of an organization with a few different page types'
   },
-   'landing': {
+  'landing': {
     owner: '18f',
     branch: 'master',
     repo: 'federalist-landing-page-template',
