@@ -6,7 +6,7 @@ import AlertBanner from '../alertBanner';
 
 import siteActions from '../../actions/siteActions';
 
-import templates from '../../../../config/templates';
+import { templates } from '../../../../config/templates';
 
 const propTypes = {
   storeState: React.PropTypes.shape({
@@ -42,8 +42,10 @@ class AddSite extends React.Component {
   }
 
   onSubmitTemplate(siteName, templateName) {
+    console.log(templates)
     siteActions.cloneRepo({
-      repo: siteName
+      repository: siteName,
+      template: templateName
     }, templates[templateName]);
   }
 

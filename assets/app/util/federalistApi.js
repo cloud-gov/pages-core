@@ -27,23 +27,9 @@ export default {
   },
 
   addSite(site) {
-    return this.fetch(`user/add-site`, {
+    return this.fetch(`site`, {
       method: 'POST',
       data: site
-    });
-  },
-
-  cloneRepo(destination, source) {
-    return this.fetch('site/clone', {
-      method: 'POST',
-      data: {
-        sourceOwner: source.owner,
-        sourceRepo: source.repo,
-        destinationOrg: destination.organization,
-        destinationRepo: destination.repo,
-        destinationBranch: destination.branch || 'master',
-        engine: destination.engine || 'jekyll'
-      }
     });
   },
 
