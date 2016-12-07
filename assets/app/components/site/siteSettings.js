@@ -1,5 +1,6 @@
 
 import React from 'react';
+import SitePreviewLinksTable from "./sitePreviewLinksTable";
 import RadioInput from '../radioInput';
 import LinkButton from '../linkButton';
 import siteActions from '../../actions/siteActions';
@@ -61,7 +62,7 @@ class SiteSettings extends React.Component {
       <form id="site-edit" onSubmit={this.onSubmit}>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
-            <label for="defaultBranch" className={ defaultBranchClass }>
+            <label htmlFor="defaultBranch" className={ defaultBranchClass }>
               Default branch</label>
             <input
               name="defaultBranch"
@@ -90,8 +91,13 @@ class SiteSettings extends React.Component {
         </div>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
+            <SitePreviewLinksTable site={this.props.site}/>
+          </div>
+        </div>
+        <div className="usa-grid">
+          <div className="usa-width-one-whole">
             <div className="form-group">
-              <label className="active" for="domain">Custom domain</label>
+              <label className="active" htmlFor="domain">Custom domain</label>
               <input
                 name="domain"
                 className="form-control"
@@ -112,7 +118,7 @@ class SiteSettings extends React.Component {
         <div className="usa-grid">
           <div className="usa-width-one-whole">
             <div className="form-group">
-               <label for="config" className="">Custom configuration</label>
+               <label htmlFor="config" className="">Custom configuration</label>
               <textarea
                 name="config"
                 className="form-control"
