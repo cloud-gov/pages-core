@@ -12,7 +12,7 @@ const getLastBuildTime = (builds) => {
       let bCompletedAt = new Date(b.completedAt);
       return aCompletedAt > bCompletedAt;
     });
-    let last = sorted.pop();
+    let last = sorted.slice().pop();
     return last.completedAt
   }
 };
