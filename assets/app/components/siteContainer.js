@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-import { replaceRouterHistory } from '../actions/actionCreators/navigationActions';
+import { replaceHistory } from '../actions/routeActions';
 import siteActions from '../actions/siteActions';
 
 import SideNav from './site/SideNav/sideNav';
@@ -27,7 +27,7 @@ class SiteContainer extends React.Component {
     if (currentSite) {
       siteActions.fetchSiteConfigsAndAssets(currentSite);
     } else {
-      replaceRouterHistory('/sites');
+      replaceHistory('/sites');
     }
   }
 

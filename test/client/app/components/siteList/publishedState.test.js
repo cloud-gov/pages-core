@@ -9,19 +9,22 @@ const PUBLISHED_BASE = 'Please wait for build to complete or check logs for erro
 const MOST_RECENT_BUILD_TIME = "2015-09-04T15:11:23.000Z"
 const FORMATTED_MOST_RECENT_BUILD_TIME =  moment(MOST_RECENT_BUILD_TIME).format('MMMM Do YYYY, h:mm:ss a')
 const MOST_RECENT_BUILD = `This site was last published at ${FORMATTED_MOST_RECENT_BUILD_TIME}.`;
-const builds = [
-  {
-    completedAt: "2015-09-02T21:43:35.000Z"
-  },
 
-  {
-    completedAt: MOST_RECENT_BUILD_TIME
-  }
-];
-
+let builds;
+let wrapper;
 
 describe('<PublishedState />', () => {
-  let wrapper;
+  beforeEach(() => {
+    builds = [
+      {
+        completedAt: "2015-09-02T21:43:35.000Z"
+      },
+
+      {
+        completedAt: MOST_RECENT_BUILD_TIME
+      }
+    ];
+  })
 
   it('displays a fallback message if the site has no builds', () => {
     wrapper = shallow(<PublishedState />);
@@ -40,4 +43,10 @@ describe('<PublishedState />', () => {
 
     expect(wrapper.find('p').text()).to.equal(MOST_RECENT_BUILD);
   });
+
+  it('does not mutate builds prop', () => {
+    const buildsCopy = builds.concat()
+    wrapper = shallow(<PublishedState builds={builds} />);
+    expect(buildsCopy).to.deep.equal(builds)
+  })
 });
