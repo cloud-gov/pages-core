@@ -44,6 +44,7 @@ The app expects the following user provided services to be provided:
   - `FEDERALIST_BUILD_TOKEN`: The token that is used to authenticate build container callbacks
   - `FEDERALIST_SESSION_SECRET`: The session secret used to sign entries in Federalist's session store
   - `FEDERALIST_SQS_QUEUE`: The URL for the SQS queue that Federalist uses to communicate with federalist-builder
+  - `FEDERALIST_SQS_REGION`: The AWS region for the SQS queue that Federalist uses to communicate with federalist-builder
   - `GITHUB_CALLBACK_URL`: The callback URL used for GitHub authentication
   - `GITHUB_CLIENT_ID`: The client ID used for GitHub authentication
   - `GITHUB_CLIENT_SECRET`: The client secret used for GitHub authentication

@@ -66,11 +66,12 @@ if (s3Creds) {
 const sqsKey = env.FEDERALIST_AWS_BUILD_KEY
 const sqsSecret = env.FEDERALIST_AWS_BUILD_SECRET
 const sqsQueue = env.FEDERALIST_SQS_QUEUE
+const sqsRegion = env.FEDERALIST_SQS_REGION
 if (sqsKey && sqsSecret && sqsQueue) {
   module.exports.sqs = {
     accessKeyId: sqsKey,
     secretAccessKey: sqsSecret,
-    region: 'us-east-1',
+    region: sqsRegion,
     queue: sqsQueue,
   }
 } else {
