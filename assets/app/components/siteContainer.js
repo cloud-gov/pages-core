@@ -21,7 +21,23 @@ class SiteContainer extends React.Component {
   }
 
   componentDidMount() {
-    const { storeState, params, routeParams } = this.props;
+    const { storeState } = this.props;
+    if (storeState.sites.length) {
+      this.downloadCurrentSiteData();
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { storeState } = this.props;
+    const prevStoreState = prevProps.storeState;
+
+    if (storeState.sites.length && !prevStoreState.sites.length) {
+      this.downloadCurrentSiteData();
+    }
+  }
+
+  downloadCurrentSiteData() {
+    const { storeState, params } = this.props;
     const currentSite = this.getCurrentSite(storeState.sites, params.id);
 
     if (currentSite) {
