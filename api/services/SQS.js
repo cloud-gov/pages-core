@@ -14,7 +14,7 @@ var buildContainerEnvironment = (build) => ({
   CONFIG: build.site.config,
   REPOSITORY: build.site.repository,
   OWNER: build.site.owner,
-  PREFIX: pathForBuild(build),
+  SITE_PREFIX: pathForBuild(build),
   GITHUB_TOKEN: build.user.githubAccessToken,
   GENERATOR: build.site.engine,
   SOURCE_REPO: sourceForBuild(build).repository,
