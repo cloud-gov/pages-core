@@ -15,6 +15,8 @@ describe("Build API", () => {
 
   var buildResponseExpectations = (response, build) => {
     Object.keys(build).forEach(key => {
+      if (key === "buildLogs") return;
+
       expect(response[key]).to.not.be.undefined
       if (typeof build[key] === "number" && typeof response[key] === "object") {
         expect(response[key].id).to.equal(build[key])

@@ -39,6 +39,12 @@ var buildAttributes = (overrides) => {
   }, overrides)
 }
 
+const buildLogAttributes = ({ build, source, output } = {}) => ({
+  build: build || factory(Build),
+  source: source || "clone.sh",
+  output: output || "This is output from the build container",
+})
+
 var siteAttributes = (overrides) => {
   overrides = overrides || {}
   var users = overrides["users"]
@@ -83,6 +89,7 @@ var generateUniqueUserName = () => {
 
 var defaultAttributes = {
   Build: buildAttributes,
+  BuildLog: buildLogAttributes,
   Site: siteAttributes,
   User: userAttributes
 }
