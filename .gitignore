@@ -137,3 +137,4 @@ nbproject
 cf-ssh.yml
 .env
 .sass-cache
+current-sites.csv
