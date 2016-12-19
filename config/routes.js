@@ -44,7 +44,10 @@ module.exports.routes = {
   'get /logout': 'AuthController.logout',
 
   'get /v0/me': 'UserController.me',
-  
+
+  'post /v0/build/:build_id/log/:token': 'BuildLogController.create',
+  'get  /v0/build/:build_id/log': 'BuildLogController.find',
+
   'get /sites(/*)?': {
     controller: 'main',
     action: 'index'
