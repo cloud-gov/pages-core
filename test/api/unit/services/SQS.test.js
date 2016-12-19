@@ -87,14 +87,14 @@ describe("SQS", () => {
         })
       })
 
-      it("should set PREFIX in the message to 'site/:owner/:repo/'", done => {
+      it("should set SITE_PREFIX in the message to 'site/:owner/:repo/'", done => {
         factory(Site, { domain: "", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
           return factory(Build, { site: site, branch: "master" })
         }).then(build => {
           return Build.findOne({ id: build.id }).populate("site")
         }).then(build => {
           var message = SQS.messageBodyForBuild(build)
-          expect(messageEnv(message, "PREFIX")).to.equal("site/owner/repo")
+          expect(messageEnv(message, "SITE_PREFIX")).to.equal("site/owner/repo")
           done()
         })
       })
@@ -125,14 +125,14 @@ describe("SQS", () => {
         })
       })
 
-      it("should set PREFIX in the message to 'preview/:owner/:repo/:branch'", done => {
+      it("should set SITE_PREFIX in the message to 'preview/:owner/:repo/:branch'", done => {
         factory(Site, { domain: "", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
           return factory(Build, { site: site, branch: "branch" })
         }).then(build => {
           return Build.findOne({ id: build.id }).populate("site")
         }).then(build => {
           var message = SQS.messageBodyForBuild(build)
-          expect(messageEnv(message, "PREFIX")).to.equal("preview/owner/repo/branch")
+          expect(messageEnv(message, "SITE_PREFIX")).to.equal("preview/owner/repo/branch")
           done()
         })
       })
