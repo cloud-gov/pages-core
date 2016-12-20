@@ -273,12 +273,12 @@ describe("Build API", () => {
     })
   })
 
-  describe("POST /build/status/:id/:token", () => {
+  describe("POST /v0/build/:id/status/:token", () => {
     var postBuildStatus = (options) => {
       buildToken = options["buildToken"] || sails.config.build.token
 
       return request("http://localhost:1337")
-        .post(`/build/status/${options["buildID"]}/${buildToken}`)
+        .post(`/v0/build/${options["buildID"]}/status/${buildToken}`)
         .type("json")
         .send({
           status: options["status"],

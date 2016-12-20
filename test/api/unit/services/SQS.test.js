@@ -52,12 +52,22 @@ describe("SQS", () => {
       })
     })
 
-    it("should set CALLBACK in the message", done => {
+    it("should set STATUS_CALLBACK in the message", done => {
       factory(Build).then(build => {
         return Build.findOne({ id: build.id }).populate("site")
       }).then(build => {
         var message = SQS.messageBodyForBuild(build)
-        expect(messageEnv(message, "CALLBACK")).to.equal("http://localhost:1337/build/status/" + build.id + "/" + sails.config.build.token)
+        expect(messageEnv(message, "STATUS_CALLBACK")).to.equal("http://localhost:1337/v0/build/" + build.id + "/status/" + sails.config.build.token)
+        done()
+      })
+    })
+
+    it("should set LOG_CALLBACK in the message", done => {
+      factory(Build).then(build => {
+        return Build.findOne({ id: build.id }).populate("site")
+      }).then(build => {
+        var message = SQS.messageBodyForBuild(build)
+        expect(messageEnv(message, "LOG_CALLBACK")).to.equal("http://localhost:1337/v0/build/" + build.id + "/log/" + sails.config.build.token)
         done()
       })
     })

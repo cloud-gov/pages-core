@@ -33,7 +33,8 @@ module.exports.routes = {
   ***************************************************************************/
 
   'post /webhook/github': 'WebhookController.github',
-  'post /build/status/:id/:token': 'BuildController.status',
+
+  'post /v0/build/:id/status/:token': 'BuildController.status',
   'post /v0/build/:id/restart': 'BuildController.restart',
 
   'get /preview/:owner/:repo/:branch': 'PreviewController.proxy',
