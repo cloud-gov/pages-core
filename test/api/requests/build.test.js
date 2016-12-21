@@ -7,6 +7,8 @@ var session = require("../support/session")
 describe("Build API", () => {
   var buildResponseExpectations = (response, build) => {
     Object.keys(build).forEach(key => {
+      if (key === "buildLogs") return;
+
       expect(response[key]).to.not.be.undefined
       if (typeof build[key] === "number" && typeof response[key] === "object") {
         expect(response[key].id).to.equal(build[key])
@@ -263,12 +265,12 @@ describe("Build API", () => {
     })
   })
 
-  describe("POST /build/status/:id/:token", () => {
+  describe("POST /v0/build/:id/status/:token", () => {
     var postBuildStatus = (options) => {
       buildToken = options["buildToken"] || sails.config.build.token
 
       return request("http://localhost:1337")
-        .post(`/build/status/${options["buildID"]}/${buildToken}`)
+        .post(`/v0/build/${options["buildID"]}/status/${buildToken}`)
         .type("json")
         .send({
           status: options["status"],

@@ -34,9 +34,9 @@ class SideNav extends React.Component {
             linkText={sideNavPaths.SETTINGS}
           />
           <SideNavItem
-            href={this.getUrl(siteId, sideNavPaths.LOGS)}
+            href={this.getUrl(siteId, sideNavPaths.BUILDS)}
             icon='logs'
-            linkText={sideNavPaths.LOGS}
+            linkText={sideNavPaths.BUILDS}
           />
         </ul>
       </div>

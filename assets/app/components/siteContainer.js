@@ -82,9 +82,14 @@ class SiteContainer extends React.Component {
           site
         };
         break;
+      case 'logs':
+        childConfigs = {
+          buildLogs: storeState.buildLogs,
+        };
+        break;
       case 'settings':
       case 'pages':
-      case 'logs':
+      case 'builds':
       default:
         childConfigs = { site };
     }

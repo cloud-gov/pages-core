@@ -6,7 +6,8 @@ var buildContainerEnvironment = (build) => ({
   AWS_DEFAULT_REGION: s3Config.region,
   AWS_ACCESS_KEY_ID: s3Config.accessKeyId,
   AWS_SECRET_ACCESS_KEY: s3Config.secretAccessKey,
-  CALLBACK: `${buildConfig.callback}${build.id}/${buildConfig.token}`,
+  STATUS_CALLBACK: buildConfig.statusCallback.replace(":build_id", build.id).replace(":token", buildConfig.token),
+  LOG_CALLBACK: buildConfig.logCallback.replace(":build_id", build.id).replace(":token", buildConfig.token),
   BUCKET: s3Config.bucket,
   BASEURL: baseURLForBuild(build),
   CACHE_CONTROL: buildConfig.cacheControl,
@@ -18,7 +19,7 @@ var buildContainerEnvironment = (build) => ({
   GITHUB_TOKEN: build.user.githubAccessToken,
   GENERATOR: build.site.engine,
   SOURCE_REPO: sourceForBuild(build).repository,
-  SOURCE_OWNER: sourceForBuild(build).owner
+  SOURCE_OWNER: sourceForBuild(build).owner,
 })
 
 var defaultBranch = (build) => {

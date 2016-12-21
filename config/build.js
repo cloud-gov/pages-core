@@ -6,6 +6,7 @@ var env = envFn();
 
 module.exports.build = {
   cacheControl: env.FEDERALIST_CACHE_CONTROL || 'max-age=60',
-  callback: env.FEDERALIST_BUILD_CALLBACK || 'http://localhost:1337/build/status/',
+  statusCallback: env.FEDERALIST_BUILD_STATUS_CALLBACK || 'http://localhost:1337/v0/build/:build_id/status/:token',
+  logCallback: env.FEDERALIST_BUILD_LOG_CALLBACK || 'http://localhost:1337/v0/build/:build_id/log/:token',
   token: env.FEDERALIST_BUILD_TOKEN,
 }

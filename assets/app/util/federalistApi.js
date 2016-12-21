@@ -18,6 +18,10 @@ export default {
     return this.fetch('build');
   },
 
+  fetchBuildLogs(build) {
+    return this.fetch(`build/${build.id}/log`);
+  },
+
   fetchSites() {
     return this.fetch('site');
   },
