@@ -71,11 +71,20 @@ module.exports = {
       model: 'user',
       required: true
     },
+    buildLogs: {
+      collection: 'buildLog',
+      via: 'build',
+    },
     source: {
       type: 'json'
     }
   },
 
   afterCreate: afterCreate,
-  completeJob: completeJob
+  completeJob: completeJob,
+  toJSON: () => {
+    let object = this.toObject()
+    object.buildLogs = undefined
+    return object
+  }
 };

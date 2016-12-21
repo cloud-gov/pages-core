@@ -6,7 +6,8 @@ import SiteList from './components/siteList/siteList';
 import SiteContainer from './components/siteContainer';
 import SitePagesContainer from './bundles/pagesContainerBundle';
 import SiteEditorContainer from './components/site/editor/editorContainer';
-import SiteLogs from './components/site/siteLogs';
+import SiteBuilds from './components/site/siteBuilds';
+import SiteBuildLogs from './components/site/siteBuildLogs';
 import SiteMediaContainer from './components/site/siteMediaContainer';
 import SiteSettings from './components/site/siteSettings';
 import NewSite from './components/AddSite';
@@ -27,7 +28,10 @@ export default (
         <Route path="edit/:branch/(**/):fileName" component={SiteEditorContainer}/>
         <Route path="media" component={SiteMediaContainer}/>
         <Route path="settings" component={SiteSettings}/>
-        <Route path="logs" component={SiteLogs}/>
+        <Route path="builds">
+          <IndexRoute component={SiteBuilds}/>
+          <Route path=":buildId/logs" component={SiteBuildLogs}/>
+        </Route>
       </Route>
       <Redirect from="*" to="/not-found"/>
     </Route>

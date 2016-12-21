@@ -64,6 +64,11 @@ module.exports.policies = {
     'status': ['buildCallback'],
   },
 
+  BuildLogController: {
+    'find': ['passport', 'sessionAuth'],
+    'create': ['buildCallback'],
+  },
+
   SiteController: {
     'destroy': ['passport', 'sessionAuth', 'filterCurrentUser'],
     'find': ['passport', 'sessionAuth', 'filterCurrentUser'],

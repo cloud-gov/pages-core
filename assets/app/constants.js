@@ -16,8 +16,8 @@ export const routeTypes = keymirror({
   SITE_CONTENT: null,
   // Represents a site media page
   SITE_MEDIA: null,
-  // Represents a site log page
-  SITE_LOGS: null,
+  // Represents a site builds page
+  SITE_BUILDS: null,
   // Represents a site setting page
   SITE_SETTINGS: null,
   // Represents an edit page
@@ -39,5 +39,5 @@ export const sideNavPaths = {
   MEDIA: 'media',
   PAGES: 'pages',
   SETTINGS: 'settings',
-  LOGS: 'logs'
+  BUILDS: 'builds'
 };

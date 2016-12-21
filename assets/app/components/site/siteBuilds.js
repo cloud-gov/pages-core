@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 import { duration, timeFrom } from '../../util/datetime';
 import buildActions from '../../actions/buildActions';
 
@@ -16,13 +17,18 @@ const restartClicked = (event, build) => {
   buildActions.restartBuild(build);
 }
 
-const restartLink = (build) =>
+const restartLink = (build) => (
   <a
     href="#" alt="Restart this build"
     onClick={ (e) => restartClicked(e, build) }
   >
     Restart
   </a>
+)
+
+const buildLogsLink = ({ site, build }) => (
+  <Link to={`/sites/${site.id}/builds/${build.id}/logs`}>Logs</Link>
+)
 
 const sortSiteBuilds = (site) => {
   return site.builds.sort((a, b) => {
@@ -30,7 +36,7 @@ const sortSiteBuilds = (site) => {
   })
 }
 
-const SiteLogs = ({site}) =>
+const SiteBuilds = ({site}) =>
   <table className="usa-table-borderless build-log-table">
     <thead>
       <tr>
@@ -68,17 +74,20 @@ const SiteLogs = ({site}) =>
             <td>{ timeFrom(build.completedAt) }</td>
             <td>{ duration(build.createdAt, build.completedAt) }</td>
             <td>{ message }</td>
-            <td>{ restartLink(build) }</td>
+            <td>
+              { restartLink(build) }<br/>
+              { buildLogsLink({ site, build }) }
+            </td>
           </tr>
         )
       })}
     </tbody>
   </table>
 
-SiteLogs.defaultProps = {
+SiteBuilds.defaultProps = {
   builds: []
 };
 
-SiteLogs.propTypes = propTypes;
+SiteBuilds.propTypes = propTypes;
 
-export default SiteLogs;
+export default SiteBuilds;
