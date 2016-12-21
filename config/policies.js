@@ -83,7 +83,7 @@ module.exports.policies = {
   },
 
   PreviewController: {
-    '*': ['passport', 'sessionAuth']
+    '*': ['passport']
   },
 
   WebhookController: true
