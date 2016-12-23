@@ -12,7 +12,7 @@ describe("Build Log API", () => {
         build = model
 
         return request("localhost:1337")
-          .post(`/v0/build/${build.id}/log/${sails.config.build.token}`)
+          .post(`/v0/build/${build.id}/log/${build.token}`)
           .type("json")
           .send({
             source: "build.sh",
@@ -32,7 +32,7 @@ describe("Build Log API", () => {
       })
     })
 
-    it("should respond with a 400 and not create a build log for an invalid build token", done => {
+    it("should respond with a 403 and not create a build log for an invalid build token", done => {
       let build
 
       factory(Build).then(model => {
@@ -45,7 +45,7 @@ describe("Build Log API", () => {
             source: "build.sh",
             body: "This is the output for build.sh",
           })
-          .expect(400)
+          .expect(403)
       }).then(response => {
         expect(response.body).to.be.empty
 
@@ -58,7 +58,7 @@ describe("Build Log API", () => {
 
     it("should respond with a 404 if no build is found for the given id", done => {
       request("localhost:1337")
-        .post(`/v0/build/fake-id/log/${sails.config.build.token}`)
+        .post(`/v0/build/fake-id/log/fake-build-token`)
         .type("json")
         .send({
           source: "build.sh",
