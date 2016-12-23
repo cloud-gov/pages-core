@@ -39,6 +39,7 @@
     "sails-postgresql": "^0.12.2",
     "socket.io-redis": "^1.0.0",
     "underscore": "^1.8.3",
+    "urlsafe-base64": "^1.0.0",
     "validator": "^3.39.0",
     "whatwg-fetch": "^1.0.0",
     "ws": "~1.1.1",

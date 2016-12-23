@@ -2,6 +2,24 @@ var expect = require("chai").expect
 var factory = require("../../support/factory")
 
 describe('Build Model', () => {
+  describe(".beforeCreate(model)", () => {
+    it("should set the build token", done => {
+      factory(Site).then(site => {
+        return Site.findOne(site.id).populate("users")
+      }).then(site => {
+        user = site.users[0]
+        return Build.create({
+          site: site,
+          user: user,
+        })
+      }).then(build => {
+        expect(build.token).to.not.be.undefined
+        expect(build.token).to.have.length.above(0)
+        done()
+      })
+    })
+  })
+
   describe(".afterCreate(model)", () => {
     it("should send a new build message", done => {
       var oldSendMessage = SQS.sqsClient.sendMessage

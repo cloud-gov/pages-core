@@ -275,10 +275,10 @@ describe("Build API", () => {
 
   describe("POST /v0/build/:id/status/:token", () => {
     var postBuildStatus = (options) => {
-      buildToken = options["buildToken"] || sails.config.build.token
+      const buildToken = options.buildToken || options.build.token
 
       return request("http://localhost:1337")
-        .post(`/v0/build/${options["buildID"]}/status/${buildToken}`)
+        .post(`/v0/build/${options.build.id}/status/${buildToken}`)
         .type("json")
         .send({
           status: options["status"],
@@ -297,7 +297,7 @@ describe("Build API", () => {
         build = model
       }).then(() => {
         return postBuildStatus({
-          buildID: build.id,
+          build: build,
           status: "0",
           message: ""
         }).expect(200)
@@ -318,7 +318,7 @@ describe("Build API", () => {
         build = model
       }).then(() => {
         return postBuildStatus({
-          buildID: build.id,
+          build: build,
           status: "1",
           message: "The build failed for a reason"
         }).expect(200)
@@ -334,24 +334,24 @@ describe("Build API", () => {
 
     it("should respond with a 404 for a build that does not exist", done => {
       postBuildStatus({
-        buildID: "invalid-build-id",
+        build: { id: "invalid-build-id", token: "invalid-token" },
         status: "0",
         message: ""
       }).expect(404, done)
     })
 
-    it("should respond with a 400 and not modify the build for an invalid build token", done => {
+    it("should respond with a 403 and not modify the build for an invalid build token", done => {
       var build
 
       factory(Build).then(model => {
         build = model
       }).then(() => {
         return postBuildStatus({
-          buildID: build.id,
+          build: build,
           buildToken: "invalid-token",
           status: "0",
           message: ""
-        }).expect(400)
+        }).expect(403)
       }).then(response => {
         return Build.findOne({ id: build.id })
       }).then(build => {

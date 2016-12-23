@@ -1,4 +1,16 @@
-var afterCreate = (model, done) => {
+const crypto = require("crypto")
+const URLSafeBase64 = require('urlsafe-base64')
+
+const beforeCreate = (model, done) => {
+  model.token = model.token || generateToken()
+  done()
+}
+
+const generateToken = () => {
+  return URLSafeBase64.encode(crypto.randomBytes(32))
+}
+
+const afterCreate = (model, done) => {
   Build.findOne(model.id).populate('site').populate('user').then(build => {
     SQS.sendBuildMessage(build)
     done()
@@ -8,7 +20,7 @@ var afterCreate = (model, done) => {
   })
 }
 
-var completeJob = (err, model) => {
+const completeJob = (err, model) => {
   if (!model || !model.id) {
     sails.log.error("Build.completeJob called without a build", err)
     return
@@ -32,7 +44,7 @@ var completeJob = (err, model) => {
   })
 }
 
-var completeJobErrorMessage = (err) => {
+const completeJobErrorMessage = (err) => {
   var message
   if (err) {
     message = err.message || err
@@ -42,7 +54,7 @@ var completeJobErrorMessage = (err) => {
   return sanitizeCompleteJobErrorMessage(message)
 }
 
-var sanitizeCompleteJobErrorMessage = (message) => {
+const sanitizeCompleteJobErrorMessage = (message) => {
   return message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github')
 }
 
@@ -53,6 +65,7 @@ module.exports = {
     completedAt: 'datetime',
     error: 'string',
     branch: 'string',
+    token: "string",
     state: {
       type: 'string',
       defaultsTo: 'processing',
@@ -80,6 +93,7 @@ module.exports = {
     }
   },
 
+  beforeCreate: beforeCreate,
   afterCreate: afterCreate,
   completeJob: completeJob,
   toJSON: () => {
