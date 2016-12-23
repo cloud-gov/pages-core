@@ -57,7 +57,7 @@ describe("SQS", () => {
         return Build.findOne({ id: build.id }).populate("site")
       }).then(build => {
         var message = SQS.messageBodyForBuild(build)
-        expect(messageEnv(message, "STATUS_CALLBACK")).to.equal("http://localhost:1337/v0/build/" + build.id + "/status/" + sails.config.build.token)
+        expect(messageEnv(message, "STATUS_CALLBACK")).to.equal("http://localhost:1337/v0/build/" + build.id + "/status/" + build.token)
         done()
       })
     })
@@ -67,7 +67,7 @@ describe("SQS", () => {
         return Build.findOne({ id: build.id }).populate("site")
       }).then(build => {
         var message = SQS.messageBodyForBuild(build)
-        expect(messageEnv(message, "LOG_CALLBACK")).to.equal("http://localhost:1337/v0/build/" + build.id + "/log/" + sails.config.build.token)
+        expect(messageEnv(message, "LOG_CALLBACK")).to.equal("http://localhost:1337/v0/build/" + build.id + "/log/" + build.token)
         done()
       })
     })
