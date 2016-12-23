@@ -41,7 +41,6 @@ The app expects the following user provided services to be provided:
   - `FEDERALIST_AWS_BUILD_KEY`: The AWS access key federalist uses to communicate with SQS
   - `FEDERALIST_AWS_BUILD_SECRET`: The AWS secret key federalist uses to communicate with SQS
   - `FEDERALIST_BUILD_CALLBACK`: The URL to which build containers should callback to with updates on their status
-  - `FEDERALIST_BUILD_TOKEN`: The token that is used to authenticate build container callbacks
   - `FEDERALIST_SESSION_SECRET`: The session secret used to sign entries in Federalist's session store
   - `FEDERALIST_SQS_QUEUE`: The URL for the SQS queue that Federalist uses to communicate with federalist-builder
   - `FEDERALIST_SQS_REGION`: The AWS region for the SQS queue that Federalist uses to communicate with federalist-builder
