@@ -1,56 +1,57 @@
-var querystring = require('querystring');
 /**
  * Filter Current User Policy
  * Filters requested items to those matching the current user
  */
 
-module.exports = function (req, res, next) {
-  var reqID = req.params.id || req.params.parentid,
-      association = _.find(req.options.associations, function(assoc) {
-        return assoc.alias === 'users' || assoc.alias === 'user';
-      }),
-      model = req.options.model,
-      path;
+const filterRecordList = ({ req, res, next }) => {
+  const modelName = req.options.model + "s"
 
-  // Reject if not logged in
-  if (!req.user) return res.forbidden('Forbidden');
+  User.findOne(req.user.id).populate(modelName).then(user => {
+    const recordIDs = user[modelName].map(record => record.id)
+    req.query.where = JSON.stringify({
+      id: recordIDs
+    })
+    next()
+  })
+}
 
-  // Evaluate whether user is associated with requested model
-  if (reqID) {
+const filterSingleRecord = ({ recordID, req, res, next }) => {
+  const model = sails.models[req.options.model]
+  const association = model.associations.find(association => {
+    return association.alias === "users" || association.alias === "user"
+  })
 
-    sails.models[req.options.model]
-      .findOne({ id: reqID })
-      .populate(association.alias)
-      .exec(function(err, model) {
-        // not all models have many users, wrap one an array
-        var users = model.users || [model.user];
+  if (association) {
+    model.findOne(recordID).populate(association.alias).then(record => {
+      if (!record) {
+        res.forbidden("Forbidden")
+        return
+      }
 
-        if (err || !model) return res.forbidden('Forbidden');
-        if (_.pluck(users, 'id').indexOf(req.user.id) < 0) {
-          return res.forbidden('Forbidden');
-        }
-        return next();
-      });
+      const users = record.users || [record.user]
+      const currentUserIndex = users.findIndex(user => {
+        return user.id === req.user.id
+      })
 
+      if (currentUserIndex >= 0) {
+        next()
+      } else {
+        res.forbidden("Forbidden")
+      }
+    }).catch(err => res.forbidden("Forbidden"))
   } else {
-
-    // If requested model is associated with a user, get the records
-    // associated with the request user
-    if (User.attributes[model + 's']) {
-      User.findOne({
-        id: req.user.id
-      }).populate(model + 's').exec(function(err, user) {
-        if (err) return res.forbidden('Forbidden');
-        req.query.where = JSON.stringify({
-          id: _.pluck(user[model + 's'], 'id')
-        });
-        return next();
-      });
-    } else {
-
-      // Reject all other requests
-      res.forbidden('Forbidden');
-    }
+    res.badRequest()
   }
+}
 
-};
+module.exports = function (req, res, next) {
+  const recordID = req.params.id
+
+  if (!req.user || !req.session.authenticated) {
+    res.forbidden("Forbidden")
+  } else if (recordID) {
+    filterSingleRecord({ recordID, req, res, next })
+  } else {
+    filterRecordList({ req, res, next })
+  }
+}

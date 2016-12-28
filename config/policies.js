@@ -49,9 +49,7 @@ module.exports.policies = {
 		// feed : ['isNiceToAnimals', 'hasRabbitFood']
 	// }
 
-  MainController: {
-    '*': ['hasAuth']
-  },
+  MainController: true,
 
   AuthController: {
     '*': ['passport']
@@ -84,7 +82,7 @@ module.exports.policies = {
   },
 
   PreviewController: {
-    '*': ['passport', 'sessionAuth']
+    '*': ['passport']
   },
 
   WebhookController: true
