@@ -9,7 +9,9 @@ const propTypes = {
 
 const getUsername = (site, id) => {
   const user = site.users.find(user => user.id === id);
-  return user.username;
+  if (user) {
+    return user.username;
+  }
 };
 
 const restartClicked = (event, build) => {
