@@ -58,6 +58,14 @@ const paramsForNewSite = (req) => ({
   users: [req.user.id]
 })
 
+const renderError = (err, res) => {
+  if (err.code === "400") {
+    res.badRequest(err)
+  } else {
+    res.serverError(err)
+  }
+}
+
 const throwAnyExistingSiteErrors = ({ req, existingSite }) => {
   if (existingSite){
     if (req.param("template")) {
@@ -105,13 +113,7 @@ module.exports = {
       return Site.findOne(site.id).populate("users").populate("builds")
     }).then(site => {
       res.send(site)
-    }).catch(err => {
-      if (err.code === "400") {
-        res.badRequest(err)
-      } else {
-        res.serverError(err)
-      }
-    })
+    }).catch(err => renderError(err, res))
   },
 
   update: (req, res) => {
@@ -128,12 +130,6 @@ module.exports = {
       return Site.findOne(siteId).populate("users").populate("builds")
     }).then(site => {
       res.send(site)
-    }).catch(err => {
-      if (err.code === "400") {
-        res.badRequest(err)
-      } else {
-        res.serverError(err)
-      }
-    })
+    }).catch(err => renderError(err, res))
   }
 }
