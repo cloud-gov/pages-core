@@ -34,7 +34,7 @@ describe("Webhook API", () => {
         user = site.users[0]
         return Build.find({ site: site.id, user: user.id })
       }).then(builds => {
-        expect(builds).to.have.length(1)
+        expect(builds).to.have.length(0)
 
         const payload = buildWebhookPayload(user, site)
         const signature = signWebhookPayload(payload)
@@ -51,7 +51,7 @@ describe("Webhook API", () => {
       }).then(response => {
         return Build.find({ site: site.id, user: user.id })
       }).then(builds => {
-        expect(builds).to.have.length(2)
+        expect(builds).to.have.length(1)
         done()
       })
     })
@@ -97,7 +97,7 @@ describe("Webhook API", () => {
         user = site.users[0]
         return Build.find({ site: site.id, user: user.id })
       }).then(builds => {
-        expect(builds).to.have.length(1)
+        expect(builds).to.have.length(0)
 
         const payload = buildWebhookPayload(user, site)
         payload.commits = []
@@ -115,7 +115,7 @@ describe("Webhook API", () => {
       }).then(response => {
         return Build.find({ site: site.id, user: user.id })
       }).then(builds => {
-        expect(builds).to.have.length(1)
+        expect(builds).to.have.length(0)
         done()
       })
     })

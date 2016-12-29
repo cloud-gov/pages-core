@@ -211,7 +211,7 @@ const github = {
           'Authorization': `token ${token}`
         },
         data: {
-          name: destination.repo
+          name: destination.repository
         }
       });
     }

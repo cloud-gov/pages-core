@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { expect } from 'chai';
 import { stub, spy } from 'sinon';
-import templates from '../../../../../config/templates';
+import { templates } from '../../../../../config/templates';
 import proxyquire from 'proxyquire';
 
 proxyquire.noCallThru();
@@ -35,8 +35,7 @@ const Fixture = proxyquire('../../../../../assets/app/components/AddSite', {
   './TemplateSiteList': TemplateSiteList,
   '../linkButton': LinkButton,
   '../alertBanner': AlertBanner,
-  '../../actions/siteActions': { cloneRepo, addSite  },
-  '../../../../config/templates': templates
+  '../../actions/siteActions': { cloneRepo, addSite  }
 }).default;
 
 describe('<AddSite/>', () => {
@@ -81,7 +80,7 @@ describe('<AddSite/>', () => {
 
     wrapper.instance().onSubmitTemplate(templateRepo, siteName);
 
-    expect(cloneRepo.calledWith({repo: templateRepo}, templates[siteName])).to.be.true;
+    expect(cloneRepo.calledWith({repository: templateRepo, template: siteName}, templates[siteName])).to.be.true;
     expect(cloneRepo.called).to.be.true;
   });
 

@@ -56,32 +56,10 @@ module.exports = {
     this.registerSite(values, done);
   },
 
-  afterCreate: function(model, done) {
-    this.startInitialBuild(model, done)
-  },
-
-  afterUpdate: function() {
-    Site.afterCreate.apply(this, _.toArray(arguments));
-  },
-
   registerSite: function(values, done) {
     const webhookUserId = values.users[0].id || values.users[0]
     GitHub.setWebhook(values, webhookUserId).then(() => {
       done()
     }).catch(done)
   },
-
-  startInitialBuild: function(model, done) {
-    Site.findOne({id: model.id }).populate('users')
-        .exec(function(err, site) {
-          if (err) return done(err);
-          if (!site.users[0]) return done();
-          var build = {
-              user: site.users[0].id,
-              site: model.id,
-              branch: model.defaultBranch
-          };
-          Build.create(build, done);
-        });
-  }
 };

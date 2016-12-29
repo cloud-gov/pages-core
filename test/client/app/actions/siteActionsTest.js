@@ -10,7 +10,7 @@ describe("siteActions", () => {
   let fetchRepositoryContent, fetchRepositoryConfigs, createCommit, fetchBranches,
       deleteBranch, createRepo, fetchFile, getRepo;
 
-  let fetchSites, addSite, updateSite, deleteSite, cloneRepo, createBranch,
+  let fetchSites, addSite, updateSite, deleteSite, createBranch,
       createPullRequest, mergePullRequest, fetchPullRequests, siteExists,
       fetchSiteNavigationFile, fetchSiteAssets;
 
@@ -45,7 +45,6 @@ describe("siteActions", () => {
     updateSite = stub();
     deleteSite = stub();
     getRepo = stub();
-    cloneRepo = stub();
     createBranch = stub();
     fetchPullRequests = stub();
     createPullRequest = stub();
@@ -109,8 +108,7 @@ describe("siteActions", () => {
         fetchSites: fetchSites,
         addSite: addSite,
         updateSite: updateSite,
-        deleteSite: deleteSite,
-        cloneRepo: cloneRepo
+        deleteSite: deleteSite
       },
       "../util/githubApi": {
         fetchRepositoryContent: fetchRepositoryContent,
@@ -590,7 +588,7 @@ describe("siteActions", () => {
     it("dispatches a site added action and redirects to a site uri if we successfully create and clone a repo", () => {
       const sitePromise = Promise.resolve(site);
       createRepo.withArgs(destination, source).returns(Promise.resolve("ignored"));
-      cloneRepo.withArgs(destination, source).returns(sitePromise);
+      addSite.withArgs(destination).returns(sitePromise);
 
       const actual = fixture.cloneRepo(destination, source);
 
@@ -608,9 +606,9 @@ describe("siteActions", () => {
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
 
-    it("alerts an error if cloneRepo fails", () => {
+    it("alerts an error if addSite fails", () => {
       createRepo.withArgs(destination, source).returns(Promise.resolve("ignored"));
-      cloneRepo.withArgs(destination, source).returns(rejectedWithErrorPromise);
+      addSite.withArgs(destination).returns(rejectedWithErrorPromise);
 
       const actual = fixture.cloneRepo(destination, source);
 

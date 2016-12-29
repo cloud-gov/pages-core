@@ -68,17 +68,16 @@ module.exports.policies = {
   },
 
   SiteController: {
+    'create': ['passport', 'sessionAuth'],
     'destroy': ['passport', 'sessionAuth', 'filterCurrentUser'],
     'find': ['passport', 'sessionAuth', 'filterCurrentUser'],
     'findOne': ['passport', 'sessionAuth', 'filterCurrentUser'],
-    'clone': ['passport', 'sessionAuth'],
     'update': ['passport', 'sessionAuth', 'filterCurrentUser']
   },
 
   UserController: {
     'findOne': ['passport', 'sessionAuth', 'filterSelfOnly'],
     'usernames': ['passport', 'sessionAuth'],
-    'add-site': ['passport', 'sessionAuth'],
     'me': ['passport', 'sessionAuth']
   },
 

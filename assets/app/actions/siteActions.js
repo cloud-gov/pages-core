@@ -8,6 +8,7 @@ import { formatDraftBranchName } from '../util/branchFormatter';
 import findShaForDefaultBranch from '../util/findShaForDefaultBranch';
 import filterAssetsWithTypeOfFile from '../util/filterAssetsWithTypeOfFile';
 
+
 import {
   updateRouterToSitesUri,
   updateRouterToSpecificSiteUri,
@@ -121,9 +122,9 @@ export default {
     }).catch(alertError);
   },
 
-  cloneRepo(destination, source) {
-    return github.createRepo(destination, source).then(() => {
-      return federalist.cloneRepo(destination, source);
+  cloneRepo(destination, template) {
+    return github.createRepo(destination, template).then(() => {
+      return federalist.addSite(destination)
     }).then((site) => {
       dispatchSiteAddedAction(site);
       updateRouterToSpecificSiteUri(site.id);
