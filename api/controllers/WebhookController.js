@@ -1,4 +1,4 @@
-var crypto = require('crypto')
+const crypto = require('crypto')
 
 module.exports = {
   github: function(req, res) {
@@ -23,13 +23,13 @@ module.exports = {
   }
 }
 
-var signWebhookRequest = (request) => {
+const signWebhookRequest = (request) => {
   return new Promise((resolve, reject) => {
-    var webhookSecret = sails.config.webhook.secret
-    var requestBody = JSON.stringify(request.body)
+    const webhookSecret = sails.config.webhook.secret
+    const requestBody = JSON.stringify(request.body)
 
-    var signature = request.headers["x-hub-signature"]
-    var signedRequestBody = signBlob(webhookSecret, requestBody)
+    const signature = request.headers["x-hub-signature"]
+    const signedRequestBody = signBlob(webhookSecret, requestBody)
 
     if (!signature) {
       reject(new Error("No X-Hub-Signature found on request"))
@@ -41,22 +41,27 @@ var signWebhookRequest = (request) => {
   })
 }
 
-var signBlob = (key, blob) => {
+const signBlob = (key, blob) => {
   return 'sha1=' + crypto.createHmac('sha1', key).update(blob).digest('hex')
 }
 
-var createBuildForWebhookRequest = (request) => {
-  var user = findUserForWebhookRequest(request)
-  var site = findSiteForWebhookRequest(request)
+const createBuildForWebhookRequest = (request) => {
+  let buildParams
 
-  return Promise.props({ user, site }).then(buildParams => {
+  const user = findUserForWebhookRequest(request)
+  const site = findSiteForWebhookRequest(request)
+
+  return Promise.props({ user, site }).then((models) => {
+    buildParams = models
+    return addUserToSite(buildParams)
+  }).then(() => {
     buildParams.branch = request.body.ref.replace('refs/heads/', '')
     return Build.create(buildParams)
   })
 }
 
-var findUserForWebhookRequest = (request) => {
-  var username = request.body.sender.login
+const findUserForWebhookRequest = (request) => {
+  const username = request.body.sender.login
 
   return User.findOrCreate({ username }).then(user => {
     if (!user) {
@@ -67,9 +72,9 @@ var findUserForWebhookRequest = (request) => {
   })
 }
 
-var findSiteForWebhookRequest = (request) => {
-  var owner = request.body.repository.full_name.split('/')[0]
-  var repository = request.body.repository.full_name.split('/')[1]
+const findSiteForWebhookRequest = (request) => {
+  const owner = request.body.repository.full_name.split('/')[0]
+  const repository = request.body.repository.full_name.split('/')[1]
 
   return Site.findOne({ owner, repository }).then(site => {
     if (!repository) {
@@ -78,4 +83,9 @@ var findSiteForWebhookRequest = (request) => {
       return site
     }
   })
+}
+
+const addUserToSite = ({ user, site }) => {
+  user.sites.add(site.id)
+  return user.save()
 }

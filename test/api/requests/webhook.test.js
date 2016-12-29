@@ -1,16 +1,16 @@
-var crypto = require('crypto')
-var expect = require("chai").expect
-var request = require("supertest-as-promised")
-var factory = require("../support/factory")
+const crypto = require('crypto')
+const expect = require("chai").expect
+const request = require("supertest-as-promised")
+const factory = require("../support/factory")
 
 describe("Webhook API", () => {
-  var signWebhookPayload = (payload) => {
-    var secret = sails.config.webhook.secret
-    var blob = JSON.stringify(payload)
+  const signWebhookPayload = (payload) => {
+    const secret = sails.config.webhook.secret
+    const blob = JSON.stringify(payload)
     return 'sha1=' + crypto.createHmac('sha1', secret).update(blob).digest('hex')
   }
 
-  var buildWebhookPayload = (user, site) => ({
+  const buildWebhookPayload = (user, site) => ({
       ref: "refs/heads/master",
       commits: [{
         id: "456def"
@@ -25,7 +25,7 @@ describe("Webhook API", () => {
 
   describe("POST /webhook/github", () => {
     it("should create a new site build for the sender", done => {
-      var site, user
+      let site, user
 
       factory(Site).then(site => {
         return Site.findOne({ id: site.id }).populate("users")
@@ -36,8 +36,8 @@ describe("Webhook API", () => {
       }).then(builds => {
         expect(builds).to.have.length(1)
 
-        var payload = buildWebhookPayload(user, site)
-        signature = signWebhookPayload(payload)
+        const payload = buildWebhookPayload(user, site)
+        const signature = signWebhookPayload(payload)
 
         return request("http://localhost:1337")
           .post("/webhook/github")
@@ -56,12 +56,15 @@ describe("Webhook API", () => {
       })
     })
 
-    it("should create a user for the sender if no user exists", done => {
-      var username = crypto.randomBytes(3).toString("hex")
+    it("should create a user associated with the site for the sender if no user exists", done => {
+      let site
+      const username = crypto.randomBytes(3).toString("hex")
 
-      factory(Site).then(site => {
-        var payload = buildWebhookPayload({ username: username }, site)
-        signature = signWebhookPayload(payload)
+      factory(Site).then(model => {
+        site = model
+
+        const payload = buildWebhookPayload({ username: username }, site)
+        const signature = signWebhookPayload(payload)
 
         return request("http://localhost:1337")
           .post("/webhook/github")
@@ -76,12 +79,16 @@ describe("Webhook API", () => {
         return Build.findOne(response.body.id).populate("user")
       }).then(build => {
         expect(build.user.username).to.equal(username)
+        return User.findOne(build.user.id).populate("sites")
+      }).then(user => {
+        expect(user.sites).to.have.length(1)
+        expect(user.sites[0].id).to.equal(site.id)
         done()
       })
     })
 
     it("should not schedule a build if there are no new commits", done => {
-      var site, user
+      let site, user
 
       factory(Site).then(site => {
         return Site.findOne({ id: site.id }).populate("users")
@@ -92,9 +99,9 @@ describe("Webhook API", () => {
       }).then(builds => {
         expect(builds).to.have.length(1)
 
-        var payload = buildWebhookPayload(user, site)
+        const payload = buildWebhookPayload(user, site)
         payload.commits = []
-        signature = signWebhookPayload(payload)
+        const signature = signWebhookPayload(payload)
 
         return request("http://localhost:1337")
           .post("/webhook/github")
@@ -115,11 +122,11 @@ describe("Webhook API", () => {
 
     it("should respond with a 400 if the site does not exist on Federalist", done => {
       factory(User).then(user => {
-        var payload = buildWebhookPayload(user, {
+        const payload = buildWebhookPayload(user, {
           owner: user.username,
           repository: "fake-repo-name"
         })
-        var signature = signWebhookPayload(payload)
+        const signature = signWebhookPayload(payload)
 
         request("http://localhost:1337")
           .post("/webhook/github")
@@ -134,7 +141,7 @@ describe("Webhook API", () => {
     })
 
     it("should respond with a 400 if the signature is invalid", done => {
-      var site, user
+      let site, user
 
       factory(Site).then(site => {
         return Site.findOne({ id: site.id }).populate("users")
@@ -142,8 +149,8 @@ describe("Webhook API", () => {
         site = model
         user = site.users[0]
 
-        var payload = buildWebhookPayload(user, site)
-        signature = "123abc"
+        const payload = buildWebhookPayload(user, site)
+        const signature = "123abc"
 
         request("http://localhost:1337")
           .post("/webhook/github")
