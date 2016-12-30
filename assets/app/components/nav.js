@@ -12,6 +12,8 @@ const propTypes = {
 const getSecondaryNav = (loggedIn, username) => {
   const authLinks = [
     <Link to="/sites">{username}</Link>,
+    <a href="https://federalist-docs.18f.gov" target="_blank">Documentation</a>,
+    <a href="https://github.com/18F/federalist/issues/new" target="_blank">Contact us</a>
     <a href="/logout">Log out</a>
   ];
   const unAuthLinks = [
