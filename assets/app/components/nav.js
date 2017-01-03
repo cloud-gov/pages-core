@@ -13,13 +13,13 @@ const getSecondaryNav = (loggedIn, username) => {
   const authLinks = [
     <Link to="/sites">{username}</Link>,
     <a href="https://federalist-docs.18f.gov" target="_blank">Documentation</a>,
-    <a href="https://github.com/18F/federalist/issues/new" target="_blank">Contact us</a>
-    <a href="/logout">Log out</a>
+    <a href="https://github.com/18F/federalist/issues/new" target="_blank">Contact us</a>,
+    <a href="/logout">Log out</a>,
   ];
   const unAuthLinks = [
     <a href="/auth/github">Log in</a>,
-    <a href="https://federalist-docs.18f.gov" target="_blank">Help</a>,
-    <a href="https://github.com/18F/federalist/issues/new" target="_blank">Contact us</a>
+    <a href="https://federalist-docs.18f.gov" target="_blank">Documentation</a>,
+    <a href="https://github.com/18F/federalist/issues/new" target="_blank">Contact us</a>,
   ];
 
   return (loggedIn ? authLinks : unAuthLinks).map((link, index) => {
