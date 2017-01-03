@@ -2,32 +2,26 @@ import React from 'react';
 import { Link } from 'react-router';
 
 const propTypes = {
-  isLoggedIn: React.PropTypes.bool,
   username: React.PropTypes.oneOfType([
     React.PropTypes.string,
     React.PropTypes.object
   ])
 };
 
-const getSecondaryNav = (loggedIn, username) => {
-  const authLinks = [
+const getSecondaryNav = (username) => {
+  const links = [
     <Link to="/sites">{username}</Link>,
     <a href="https://federalist-docs.18f.gov" target="_blank">Documentation</a>,
     <a href="https://github.com/18F/federalist/issues/new" target="_blank">Contact us</a>,
     <a href="/logout">Log out</a>,
   ];
-  const unAuthLinks = [
-    <a href="/auth/github">Log in</a>,
-    <a href="https://federalist-docs.18f.gov" target="_blank">Documentation</a>,
-    <a href="https://github.com/18F/federalist/issues/new" target="_blank">Contact us</a>,
-  ];
 
-  return (loggedIn ? authLinks : unAuthLinks).map((link, index) => {
+  return links.map((link, index) => {
     return <li key={index}>{link}</li>;
   });
 };
 
-const Nav = ({ isLoggedIn, username = null }) =>
+const Nav = ({ username = null }) =>
   <nav className="usa-site-navbar">
     <div className="usa-grid">
       <div className="nav-elements">
@@ -36,7 +30,7 @@ const Nav = ({ isLoggedIn, username = null }) =>
         </div>
         <div className="navbar-links" id="navbar-links">
           <ul className="" id="nav-mobile">
-            {getSecondaryNav(isLoggedIn, username)}
+            {getSecondaryNav(username)}
           </ul>
         </div>
       </div>
