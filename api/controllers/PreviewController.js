@@ -22,6 +22,7 @@ module.exports = {
           var redirect = headers['x-amz-website-redirect-location'] ||
             headers['X-Amz-Website-Redirect-Location'];
           if (redirect) return res.redirect(redirect);
+          headers['x-frame-options'] = 'SAMEORIGIN';
           res.set(headers);
         }),
         stream = object.createReadStream().on('error', function(error) {
