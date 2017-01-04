@@ -51,7 +51,6 @@ describe('<App/>', () => {
 
   it('delivers the correct props to the header', () => {
     const expectedProps = {
-      isLoggedIn: true,
       username: username
     };
     const actualProps = wrapper.find(Header).props();

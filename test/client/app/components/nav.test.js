@@ -6,7 +6,7 @@ import { Link } from 'react-router';
 import Nav from '../../../../assets/app/components/nav';
 
 const userName = 'el-mapache';
-const helpText = 'Help';
+const helpText = 'Documentation';
 const contactUsText = 'Contact us';
 
 describe('<Nav/>', () => {
@@ -20,42 +20,28 @@ describe('<Nav/>', () => {
     expect(firstAnchor.text()).to.have.equal('Federalist logo');
   });
 
-  it('defaults to a logged out state if isLoggedIn is not supplied', () => {
+  it('displays a `contact us` link', () => {
     wrapper = shallow(<Nav/>);
 
-    expect(wrapper.find('a[href="/auth/github"]')).to.have.length(1);
+    expect(wrapper.find('a').filter(el => el.text() === contactUsText));
   });
 
-  describe('when prop isLoggedIn is false', () => {
-    beforeEach(() => {
-      wrapper = shallow(<Nav isLoggedIn={false}/>);
-    });
+  it('displays a `help` link', () => {
+    wrapper = shallow(<Nav/>);
 
-    it('displays a `contact us` link', () => {
-      expect(wrapper.find('a').filter(el => el.text() === contactUsText));
-    });
-
-    it('displays a `help` link', () => {
-      expect(wrapper.find('a').filter(el => el.text() === helpText));
-    });
-
-    it('displays a `log in` link', () => {
-      expect(wrapper.find('a[href="/auth/github"]')).to.have.length(1);
-    });
+    expect(wrapper.find('a').filter(el => el.text() === helpText));
   });
 
-  describe('when prop isLoggedIn is true', () => {
-    it('displays a link to log out if isLoggedIn prop is true', () => {
-      wrapper = shallow(<Nav isLoggedIn={true}/>);
+  it('displays a link to log out', () => {
+    wrapper = shallow(<Nav/>);
 
-      expect(wrapper.find('a[href="/logout"]')).to.have.length(1);
-    });
+    expect(wrapper.find('a[href="/logout"]')).to.have.length(1);
+  });
 
-    it('displays link with usersname when logged in', () => {
-      wrapper = shallow(<Nav isLoggedIn={true} username={userName}/>);
+  it('displays a link with usersname', () => {
+    wrapper = shallow(<Nav username={userName}/>);
 
-      expect(wrapper.find(Link)).to.have.length(1);
-      expect(wrapper.find(Link).children().text()).to.equal(userName);
-    });
+    expect(wrapper.find(Link)).to.have.length(1);
+    expect(wrapper.find(Link).children().text()).to.equal(userName);
   });
 });
