@@ -36,6 +36,7 @@ const pipeS3ObjectToResponse = ({ key, res }) => {
     Bucket: s3Config.bucket,
     Key: key
   }).on('httpHeaders', (statusCode, headers) => {
+    headers['X-Frame-Options'] = 'SAMEORIGIN';
     res.set(headers)
   }).createReadStream().on("error", error => {
     sails.log.error(error)
