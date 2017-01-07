@@ -1,12 +1,13 @@
 const crypto = require("crypto")
-var expect = require("chai").expect
-var nock = require("nock")
-var request = require("supertest-as-promised")
-var sinon = require("sinon")
+const expect = require("chai").expect
+const nock = require("nock")
+const request = require("supertest-as-promised")
+const sinon = require("sinon")
 
-var factory = require("../support/factory")
-var githubAPINocks = require("../support/githubAPINocks")
-var session = require("../support/session")
+const factory = require("../support/factory")
+const githubAPINocks = require("../support/githubAPINocks")
+const session = require("../support/session")
+const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
 
 describe("Site API", () => {
   var siteResponseExpectations = (response, site) => {
@@ -56,6 +57,8 @@ describe("Site API", () => {
       }).then(resp => {
         response = resp
 
+        validateAgainstJSONSchema("GET", "/site", 200, response.body)
+
         expect(response.body).to.be.a("array")
         expect(response.body).to.have.length(3)
 
@@ -84,6 +87,7 @@ describe("Site API", () => {
           .set("Cookie", cookie)
           .expect(200)
       }).then(response => {
+        validateAgainstJSONSchema("GET", "/site", 200, response.body)
         expect(response.body).to.be.a("array")
         expect(response.body).to.be.empty
         done()
@@ -117,6 +121,7 @@ describe("Site API", () => {
           .set("Cookie", cookie)
           .expect(200)
       }).then(response => {
+        validateAgainstJSONSchema("GET", "/site/{id}", 200, response.body)
         siteResponseExpectations(response.body, site)
         done()
       })
@@ -192,6 +197,8 @@ describe("Site API", () => {
           response = resp
           return Site.findOne({ id: response.body.id }).populate("users")
         }).then(site => {
+          validateAgainstJSONSchema("POST", "/site", 200, response.body)
+
           expect(site).to.have.property("owner", siteOwner)
           expect(site).to.have.property("repository", siteRepository)
           expect(site).to.have.property("defaultBranch", "master")
@@ -384,6 +391,8 @@ describe("Site API", () => {
           response = resp
           return Site.findOne({ id: response.body.id }).populate("users")
         }).then(site => {
+          validateAgainstJSONSchema("POST", "/site", 200, response.body)
+
           expect(site).to.have.property("owner", siteOwner)
           expect(site).to.have.property("repository", siteRepository)
           expect(site).to.have.property("defaultBranch", "master")
@@ -572,6 +581,7 @@ describe("Site API", () => {
           .set("Cookie", cookie)
           .expect(200)
         }).then(response => {
+          validateAgainstJSONSchema("POST", "/site", 200, response.body)
           return Site.find({ owner: site.owner, repository: site.repository })
         }).then(sites => {
           expect(sites.length).to.equal(1)
@@ -769,6 +779,7 @@ describe("Site API", () => {
           .set("Cookie", cookie)
           .expect(200)
       }).then(response => {
+        validateAgainstJSONSchema("DELETE", "/site/{id}", 200, response.body)
         siteResponseExpectations(response.body, site)
         return Site.find({ id: site.id })
       }).then(sites => {
@@ -835,9 +846,12 @@ describe("Site API", () => {
         response = resp
         return Site.findOne({ id: site.id }).populate("users")
       }).then(site => {
+        validateAgainstJSONSchema("PUT", "/site/{id}", 200, response.body)
+
         expect(response.body).to.have.property("repository", "new-repo-name")
         expect(site).to.have.property("repository", "new-repo-name")
         siteResponseExpectations(response.body, site)
+
         done()
       })
     })

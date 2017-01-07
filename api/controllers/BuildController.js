@@ -28,6 +28,8 @@ module.exports = {
         user: req.user.id,
       })
     }).then(build => {
+      return Build.findOne(build.id).populate("user").populate("site")
+    }).then(build => {
       res.json(build)
     }).catch(err => {
       if (err.statusCode === 403) {

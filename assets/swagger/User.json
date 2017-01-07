@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "username"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "builds": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "email": {
+      "type": "string"
+    },
+    "sites": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "username": {
+      "type": "string"
+    }
+  }
+}
