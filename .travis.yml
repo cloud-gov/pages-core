@@ -9,6 +9,7 @@ env:
   - CF_USERNAME=deploy-federalist
   - CF_ORGANIZATION=federalist
   - CF_SPACE=prod
+  # CF_PASSWORD
   - secure:  "JOCdomBbmT85bMwGvuJSpTcI0Z3cFIqi051EHp+g4ti5++DAamb6ah/o7NtR0j/TA7GpLUYGTI61O2InpdrJx3qQI11FE+QmtQpT5I2Ja9zeN3QzG15liQVxyyQAroXMvkhzZuI3AbSSG+TEeXHVLd7mmUdvJdOvT2KKIym2FKFdql6bOa+0//9TMv/JqSV8S50FDqd+zxb3YdxjkRjMWlidGHYFOsau6aAzNwvLNvjQNAJczJZvllTzqITWmL3hLQd1OMdnJFhb+5vo2uQNVJPDtM0b2wQ5hahwhZi+RY3a26yVPwV5zAy8tCIB8PdZN5i0vfBoVqt8J6oNMVv5aih9jgAsjefamTCPBmVPEVmr2vueTOdgCjWeZ7GylK90073mAHPpjX0EA7cu4w3dhD76MLN1Vc5ckfwv+P4s4gT9d2CPftyiUsTj2IeRngVb8xgdyzwCvDzx85lFbP6gvIl8CptEHpfMiHYIWzfm9RD9WkXt3WXFKZoZVTq2665YyzByK6BgcwlXQDTEUdqqqlaLd4tob5UOGhaFDEmM8f7vENz58alFkXgW2KJtEfKmsFYF2fDzV5MyeWuBAXbuEL2pAnjiZcJcSu8jiPpjvlonPxPxjESBtK24lUhdckq5OeElNCywRhUamnWu7UvShXEgQ//9W6OZB/z0941rJtc="
   - CXX=g++-4.8
   - FEDERALIST_TEST_USER=federalist-test
@@ -43,7 +44,7 @@ deploy:
   script: scripts/deploy-travis.sh
   skip_cleanup: true
   on:
-    branch: make_deploys_work_again
+    branch: master
 notifications:
   slack:
     on_success: never
