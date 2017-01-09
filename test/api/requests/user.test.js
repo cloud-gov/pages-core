@@ -24,7 +24,7 @@ describe("User API", () => {
           .get("/v0/me")
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("GET", "/me", 403, response.body)
         done()
       })
     })
@@ -59,7 +59,7 @@ describe("User API", () => {
           .get(`/v0/user/${user.id}`)
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("GET", "/user/{id}", 403, response.body)
         done()
       })
     })
@@ -110,7 +110,7 @@ describe("User API", () => {
           .set("Cookie", cookie)
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("GET", "/user/{id}", 403, response.body)
         done()
       })
     })

@@ -1,4 +1,6 @@
 const saniztizeBuildSecrets = (values, callback) => {
+  values.output = values.output || ""
+
   Build.findOne(values.build.id || values.build).populate("user").then(build => {
     secrets = [
       sails.config.s3.accessKeyId,

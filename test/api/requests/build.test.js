@@ -28,7 +28,7 @@ describe("Build API", () => {
           .get(`/v0/build/${build.id}`)
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("GET", "/build/{id}", 403, response.body)
         done()
       })
     })
@@ -71,7 +71,7 @@ describe("Build API", () => {
           .set("Cookie", cookie)
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("GET", "/build/{id}", 403, response.body)
         done()
       })
     })
@@ -84,7 +84,7 @@ describe("Build API", () => {
           .get("/v0/build")
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("GET", "/build", 403, response.body)
         done()
       })
     })

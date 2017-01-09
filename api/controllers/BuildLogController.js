@@ -4,9 +4,7 @@ const authorizeUserForBuild = ({ user, build }) => {
       return site.id === build.site
     })
     if (siteIndex < 0) {
-      const error = new Error("Unauthorized")
-      error.code = 403
-      throw error
+      throw 403
     }
   })
 }
@@ -15,9 +13,7 @@ module.exports = {
   create: (req, res) => {
     Build.findOne(req.param("build_id")).then(build => {
       if (!build) {
-        const error = new Error("Not found")
-        error.code = 404
-        throw error
+        throw 404
       }
       return BuildLog.create({
         build: build,
@@ -29,11 +25,7 @@ module.exports = {
     }).then(buildLog => {
       res.json(buildLog)
     }).catch(err => {
-      if (err.code === 404) {
-        res.notFound()
-      } else {
-        res.serverError(err)
-      }
+      res.error(err)
     })
   },
 
@@ -44,9 +36,7 @@ module.exports = {
       build = model
 
       if (!build) {
-        const error = new Error("Not found")
-        error.code = 404
-        throw error
+        throw 404
       }
 
       return authorizeUserForBuild({
@@ -58,13 +48,7 @@ module.exports = {
     }).then(buildLogs => {
       res.json(buildLogs)
     }).catch(err => {
-      if (err.code === 404) {
-        res.notFound()
-      } else if (err.code === 403) {
-        res.forbidden()
-      } else {
-        res.serverError(err)
-      }
+      res.error(err)
     })
   },
 

@@ -4,10 +4,10 @@ const checkNewSiteRepoPermissions = (req) => {
 
   return GitHub.checkPermissions(req.user, owner, repository).then(permissions => {
     if (!permissions || !permissions.push) {
-      throw httpError({
+      throw {
         message: "You do not have write access to this repository",
-        code: 400,
-      })
+        status: 400,
+      }
     }
   })
 }
@@ -24,12 +24,6 @@ const createAndBuildSite = (req) => {
   }).then(() => {
     return Site.findOne(createdSite.id).populate("users").populate("builds")
   })
-}
-
-const httpError = ({ message, code }) => {
-  const error = new Error(message)
-  error.code = `${code}`
-  return error
 }
 
 const paramsForNewBuild = ({ site, req }) => ({
@@ -58,29 +52,21 @@ const paramsForNewSite = (req) => ({
   users: [req.user.id]
 })
 
-const renderError = (err, res) => {
-  if (err.code === "400") {
-    res.badRequest(err)
-  } else {
-    res.serverError(err)
-  }
-}
-
 const throwAnyExistingSiteErrors = ({ req, existingSite }) => {
   if (existingSite){
     if (req.param("template")) {
-      throw httpError({
+      throw {
         message: "A site already exists for that owner / repository",
-        code: 400
-      })
+        status: 400
+      }
     }
 
     const userIndex = existingSite.users.findIndex(user => user.id === req.user.id)
     if (userIndex >= 0) {
-      throw httpError({
+      throw {
         message: "You've already added this site to Federalist",
-        code: 400
-      })
+        status: 400
+      }
     }
   }
 }
@@ -113,7 +99,9 @@ module.exports = {
       return Site.findOne(site.id).populate("users").populate("builds")
     }).then(site => {
       res.send(site)
-    }).catch(err => renderError(err, res))
+    }).catch(err => {
+      res.error(err)
+    })
   },
 
   update: (req, res) => {
@@ -130,6 +118,8 @@ module.exports = {
       return Site.findOne(siteId).populate("users").populate("builds")
     }).then(site => {
       res.send(site)
-    }).catch(err => renderError(err, res))
+    }).catch(err => {
+      res.error(err)
+    })
   }
 }

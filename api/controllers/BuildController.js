@@ -7,9 +7,7 @@ const verifyUserIsAuthorizedToRestartBuild = (user, build) => {
     const index = user.sites.findIndex(site => site.id === build.site)
 
     if (index < 0) {
-      const error = new Error("Unauthorized")
-      error.statusCode = 403
-      throw error
+      throw 403
     }
   })
 }
@@ -32,11 +30,7 @@ module.exports = {
     }).then(build => {
       res.json(build)
     }).catch(err => {
-      if (err.statusCode === 403) {
-        res.forbidden()
-      } else {
-        res.badRequest(err)
-      }
+      res.error(err)
     })
   },
 
@@ -45,21 +39,14 @@ module.exports = {
 
     Build.findOne(req.param("id")).then(build => {
       if (!build) {
-        var error = new Error(`Unable to find build with id: ${req.param("id")}`)
-        error.statusCode = 404
-        throw error
+        throw 404
       } else {
         return Build.completeJob(message, build)
       }
     }).then(build => {
       res.ok()
     }).catch(err => {
-      if (err.statusCode == 404) {
-        res.notFound()
-      } else {
-        res.serverError()
-        sails.log.error(err)
-      }
+      res.error(err)
     })
   },
 }

@@ -32,7 +32,7 @@ describe("Site API", () => {
           .get("/v0/site")
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("GET", "/site", 403, response.body)
         done()
       })
     })
@@ -102,7 +102,7 @@ describe("Site API", () => {
           .get(`/v0/site/${site.id}`)
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("GET", "/site/{id}", 403, response.body)
         done()
       })
     })
@@ -139,7 +139,7 @@ describe("Site API", () => {
           .set("Cookie", cookie)
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("GET", "/site/{id}", 403, response.body)
         done()
       })
     })
@@ -167,7 +167,7 @@ describe("Site API", () => {
         .expect(403)
 
       cloneRequest.then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("POST", "/site", 403, response.body)
         done()
       })
     })
@@ -760,7 +760,7 @@ describe("Site API", () => {
           .delete(`/v0/site/${site.id}`)
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("DELETE", "/site/{id}", 403, response.body)
         done()
       })
     })
@@ -802,7 +802,7 @@ describe("Site API", () => {
           .set("Cookie", cookie)
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("DELETE", "/site/{id}", 403, response.body)
         return Site.find({ id: site.id })
       }).then(sites => {
         expect(sites).not.to.be.empty
@@ -821,7 +821,7 @@ describe("Site API", () => {
           })
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("PUT", "/site/{id}", 403, response.body)
         done()
       })
     })
@@ -872,7 +872,7 @@ describe("Site API", () => {
           .expect(403)
       }).then(resp => {
         response = resp
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("PUT", "/site/{id}", 403, response.body)
         return Site.findOne({ id: site.id }).populate("users")
       }).then(site => {
         expect(site).to.have.property("repository", "old-repo-name")

@@ -35,6 +35,22 @@ describe("Build Log API", () => {
       })
     })
 
+    it("should respond with a 400 if the params are not correct", done => {
+      factory(Build).then(build => {
+        return request("localhost:1337")
+          .post(`/v0/build/${build.id}/log/${build.token}`)
+          .type("json")
+          .send({
+            src: "build.sh",
+            otpt: "This is the output for build.sh",
+          })
+          .expect(400)
+      }).then(response => {
+        validateAgainstJSONSchema("POST", "/build/{build_id}/log/{token}", 400, response.body)
+        done()
+      })
+    })
+
     it("should respond with a 403 and not create a build log for an invalid build token", done => {
       let build
 
@@ -50,7 +66,7 @@ describe("Build Log API", () => {
           })
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("POST", "/build/{build_id}/log/{token}", 403, response.body)
 
         return BuildLog.find({ build: build.id })
       }).then(logs => {
@@ -60,14 +76,19 @@ describe("Build Log API", () => {
     })
 
     it("should respond with a 404 if no build is found for the given id", done => {
-      request("localhost:1337")
+      const buildLogRequest = request("localhost:1337")
         .post(`/v0/build/fake-id/log/fake-build-token`)
         .type("json")
         .send({
           source: "build.sh",
           body: "This is the output for build.sh",
         })
-        .expect(404, done)
+        .expect(404)
+
+      buildLogRequest.then(response => {
+        validateAgainstJSONSchema("POST", "/build/{build_id}/log/{token}", 404, response.body)
+        done()
+      })
     })
   })
 
@@ -78,7 +99,7 @@ describe("Build Log API", () => {
           .get(`/v0/build/${buildLog.build}/log`)
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("GET", "/build/{build_id}/log", 403, response.body)
         done()
       })
     })
@@ -129,7 +150,19 @@ describe("Build Log API", () => {
           .set("Cookie", cookie)
           .expect(403)
       }).then(response => {
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("GET", "/build/{build_id}/log", 403, response.body)
+        done()
+      })
+    })
+
+    it("should response with a 404 if the given build does not exist", done => {
+      session().then(cookie => {
+        return request("localhost:1337")
+          .get(`/v0/build/fake-id/log`)
+          .set("Cookie", cookie)
+          .expect(404)
+      }).then(response => {
+        validateAgainstJSONSchema("GET", "/build/{build_id}/log", 404, response.body)
         done()
       })
     })
