@@ -15,11 +15,11 @@ import {
 import { pushHistory } from './routeActions';
 
 const updateRouterToSitesUri = () => {
-  dispatch(pushHistory(`/sites`));
+  pushHistory(`/sites`);
 };
 
 const updateRouterToSpecificSiteUri = siteId => {
-  dispatch(pushHistory(`/sites/${siteId}`));
+  pushHistory(`/sites/${siteId}`);
 };
 
 const dispatchSitesReceivedAction = sites => {

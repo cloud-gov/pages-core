@@ -34,6 +34,10 @@ export default {
   },
 
   update(isStale) {
-    dispatch(this[isStale ? 'clear': 'setStale']());
+    if (isStale) {
+      this.clear()
+    } else {
+      this.setStale()
+    }
   }
 };
