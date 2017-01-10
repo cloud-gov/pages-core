@@ -1,4 +1,5 @@
 import React from 'react';
+import AlertBanner from '../alertBanner';
 import SiteListItem from './siteListItem';
 import LinkButton from '../linkButton';
 
@@ -46,6 +47,7 @@ const SiteList = ({ storeState }) =>
           text="Add Website" />
       </div>
     </div>
+    <AlertBanner {...storeState.alert} />
     { getSites(storeState.sites) }
     <div className="usa-grid">
       <div className="usa-width-one-whole">
