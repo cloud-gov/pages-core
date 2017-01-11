@@ -56,6 +56,16 @@ module.exports = {
     this.registerSite(values, done);
   },
 
+  beforeValidate: function(values, done) {
+    if (values.repository) {
+      values.repository = values.repository.toLowerCase()
+    }
+    if (values.owner) {
+      values.owner = values.owner.toLowerCase()
+    }
+    done()
+  },
+
   registerSite: function(values, done) {
     const webhookUserId = values.users[0].id || values.users[0]
     GitHub.setWebhook(values, webhookUserId).then(() => {
