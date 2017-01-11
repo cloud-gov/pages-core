@@ -6,9 +6,6 @@
  */
 
 module.exports = {
-  /*
-   * Return an object of usernames
-   */
   usernames: function(req, res) {
     User.find({}).exec(function(err, users) {
       if (err) return res.serverError(err);

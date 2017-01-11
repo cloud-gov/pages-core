@@ -13,6 +13,24 @@ const verifyUserIsAuthorizedToRestartBuild = (user, build) => {
 }
 
 module.exports = {
+  find: (req, res) => {
+    Build.find({ user: req.user.id }).populate("user").populate("site").then(builds => {
+      res.json(builds)
+    })
+  },
+
+  findOne: (req, res) => {
+    Build.findOne(req.param("id")).populate("user").populate("site").then(model => {
+      if (model) {
+        res.json(model)
+      } else {
+        res.notFound()
+      }
+    }).catch(err => {
+      res.error(err)
+    })
+  },
+
   restart: (req, res) => {
     let build
 

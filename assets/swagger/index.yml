@@ -326,28 +326,6 @@ paths:
           description: Not authorized
           schema:
             $ref: "Error.json"
-  /user/{id}:
-    parameters:
-    - name: id
-      in: path
-      description: The id of the site
-      type: integer
-      required: true
-    get:
-      summary: Fetch data for a Federalist user
-      responses:
-        200:
-          description: A user object for the given ID
-          schema:
-            $ref: "User.json"
-        403:
-          description: Not authorized
-          schema:
-            $ref: "Error.json"
-        404:
-          description: Not found
-          schema:
-            $ref: "Error.json"
   /user/usernames:
     get:
       summary: Fetch the usernames for every user in federalist
