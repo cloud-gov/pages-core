@@ -57,20 +57,14 @@ describe("dispatchActions", () => {
   });
 
   it("updateRouterToSitesUri", () => {
-    pushHistory.withArgs("/sites").returns(action);
-
     fixture.updateRouterToSitesUri();
-
-    expect(dispatch.calledWith(action)).to.be.true;
+    expect(pushHistory.calledWith("/sites")).to.be.true;
   });
 
   it("updateRouterToSpecificSiteUri", () => {
     const siteId = "7";
-    pushHistory.withArgs(`/sites/${siteId}`).returns(action);
-
     fixture.updateRouterToSpecificSiteUri(siteId);
-
-    expect(dispatch.calledWith(action)).to.be.true;
+    expect(pushHistory.calledWith(`/sites/${siteId}`)).to.be.true;
   });
 
   it("dispatchSitesReceivedAction", () => {
