@@ -1,0 +1,61 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "createdAt",
+    "site",
+    "state",
+    "updatedAt",
+    "user"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "branch": {
+      "type": ["string", "null"]
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "completedAt": {
+      "type": "string"
+    },
+    "error": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "owner",
+        "repository"
+      ],
+      "properties": {
+        "owner": {
+          "type": "string"
+        },
+        "repository": {
+          "type": "string"
+        }
+      }
+    },
+    "site": {
+      "type": "object"
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "error",
+        "processing",
+        "skipped",
+        "success"
+      ]
+    },
+    "updatedAt": {
+      "type": "string"
+    },
+    "user": {
+      "type": "object"
+    }
+  }
+}

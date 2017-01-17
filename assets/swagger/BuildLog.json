@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "build",
+    "createdAt",
+    "output",
+    "source",
+    "updatedAt"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "build": {
+      "type": "object"
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "output": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string"
+    }
+  }
+}

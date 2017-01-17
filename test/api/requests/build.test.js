@@ -1,8 +1,9 @@
-var expect = require("chai").expect
-var request = require("supertest-as-promised")
-var sinon = require("sinon")
-var factory = require("../support/factory")
-var session = require("../support/session")
+const expect = require("chai").expect
+const request = require("supertest-as-promised")
+const sinon = require("sinon")
+const factory = require("../support/factory")
+const session = require("../support/session")
+const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
 
 describe("Build API", () => {
   var buildResponseExpectations = (response, build) => {
@@ -53,6 +54,7 @@ describe("Build API", () => {
           .expect(200)
       }).then(response => {
         buildResponseExpectations(response.body, build)
+        validateAgainstJSONSchema("GET", "/build/{id}", 200, response.body)
         done()
       })
     })
@@ -110,6 +112,7 @@ describe("Build API", () => {
         builds.forEach((build, index) => {
           buildResponseExpectations(response.body[index], build)
         })
+        validateAgainstJSONSchema("GET", "/build", 200, response.body)
         done()
       })
     })
@@ -216,6 +219,7 @@ describe("Build API", () => {
         }).sort("createdAt DESC")
       }).then(builds => {
         buildResponseExpectations(response.body, builds[0])
+        validateAgainstJSONSchema("POST", "/build/{id}/restart", 200, response.body)
         done()
       })
     })

@@ -1,21 +1,20 @@
-var crypto = require("crypto")
-var expect = require("chai").expect
-var nock = require("nock")
-var Promise = require("bluebird")
-var request = require("supertest-as-promised")
-var sinon = require("sinon")
+const crypto = require("crypto")
+const expect = require("chai").expect
+const nock = require("nock")
+const Promise = require("bluebird")
+const request = require("supertest-as-promised")
+const sinon = require("sinon")
 
-var factory = require("../support/factory")
-var githubAPINocks = require("../support/githubAPINocks")
-var session = require("../support/session")
+const factory = require("../support/factory")
+const githubAPINocks = require("../support/githubAPINocks")
+const session = require("../support/session")
+const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
 
 describe("User API", () => {
   var userResponseExpectations = (response, user) => {
     expect(response).to.have.property("id", user.id)
     expect(response).to.have.property("username", user.username)
     expect(response).to.have.property("email", user.email)
-    expect(response).to.have.property("sites")
-    expect(response).to.have.property("builds")
   }
 
   describe("GET /v0/me", () => {
@@ -42,9 +41,12 @@ describe("User API", () => {
           .set("Cookie", cookie)
           .expect(200)
       }).then(response => {
+        validateAgainstJSONSchema("GET", "/me", 200, response.body)
+
         userResponseExpectations(response.body, user)
         expect(response.body).to.have.property("githubAccessToken", user.githubAccessToken)
         expect(response.body).to.have.property("githubUserId", user.githubUserId)
+
         done()
       })
     })
@@ -74,6 +76,7 @@ describe("User API", () => {
           .set("Cookie", cookie)
           .expect(200)
       }).then(response => {
+        validateAgainstJSONSchema("GET", "/user/{id}", 200, response.body)
         userResponseExpectations(response.body, user)
         done()
       })

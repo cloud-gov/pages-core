@@ -1,7 +1,8 @@
-var expect = require("chai").expect
-var request = require("supertest-as-promised")
-var factory = require("../support/factory")
-var session = require("../support/session")
+const expect = require("chai").expect
+const request = require("supertest-as-promised")
+const factory = require("../support/factory")
+const session = require("../support/session")
+const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
 
 describe("Build Log API", () => {
   describe("POST /v0/build/:build_id/log/:token", () => {
@@ -20,6 +21,8 @@ describe("Build Log API", () => {
           })
           .expect(200)
       }).then(response => {
+        validateAgainstJSONSchema("POST", "/build/{build_id}/log/{token}", 200, response.body)
+
         expect(response.body).to.have.property("source", "build.sh")
         expect(response.body).to.have.property("output", "This is the output for build.sh")
 
@@ -102,12 +105,9 @@ describe("Build Log API", () => {
           .set("Cookie", cookie)
           .expect(200)
       }).then(response => {
+        validateAgainstJSONSchema("GET", "/build/{build_id}/log", 200, response.body)
         expect(response.body).to.be.a("array")
         expect(response.body).to.have.length(3)
-        response.body.forEach(log => {
-          expect(log).to.have.property("source")
-          expect(log).to.have.property("output")
-        })
         done()
       })
     })

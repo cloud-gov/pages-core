@@ -24,8 +24,10 @@ module.exports = {
         output: req.param("output"),
         source: req.param("source"),
       })
-    }).then(build => {
-      res.json(build)
+    }).then(buildLog => {
+      return BuildLog.findOne(buildLog.id).populate("build")
+    }).then(buildLog => {
+      res.json(buildLog)
     }).catch(err => {
       if (err.code === 404) {
         res.notFound()
@@ -38,7 +40,7 @@ module.exports = {
   find: (req, res) => {
     let build
 
-    Build.findOne(req.param("build_id")).populate("buildLogs").then(model => {
+    Build.findOne(req.param("build_id")).then(model => {
       build = model
 
       if (!build) {
@@ -52,7 +54,9 @@ module.exports = {
         user: req.user,
       })
     }).then(() => {
-      res.json(build.buildLogs)
+      return BuildLog.find({ build: build.id }).populate("build")
+    }).then(buildLogs => {
+      res.json(buildLogs)
     }).catch(err => {
       if (err.code === 404) {
         res.notFound()
