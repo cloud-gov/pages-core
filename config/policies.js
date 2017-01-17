@@ -56,8 +56,8 @@ module.exports.policies = {
   },
 
   BuildController: {
-    'find': ['passport', 'sessionAuth', 'filterCurrentUser'],
-    'findOne': ['passport', 'sessionAuth', 'filterCurrentUser'],
+    'find': ['passport', 'sessionAuth'],
+    'findOne': ['passport', 'sessionAuth'],
     'restart': ['passport', 'sessionAuth'],
     'status': ['buildCallback'],
   },

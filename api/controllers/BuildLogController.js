@@ -1,13 +1,4 @@
-const authorizeUserForBuild = ({ user, build }) => {
-  return User.findOne(user.id).populate("sites").then(user => {
-    const siteIndex = user.sites.findIndex(site => {
-      return site.id === build.site
-    })
-    if (siteIndex < 0) {
-      throw 403
-    }
-  })
-}
+const buildAuthorizer = require("../authorizers/build")
 
 module.exports = {
   create: (req, res) => {
@@ -34,15 +25,10 @@ module.exports = {
 
     Build.findOne(req.param("build_id")).then(model => {
       build = model
-
       if (!build) {
         throw 404
       }
-
-      return authorizeUserForBuild({
-        build: build,
-        user: req.user,
-      })
+      return buildAuthorizer.findOne(req.user, build)
     }).then(() => {
       return BuildLog.find({ build: build.id }).populate("build")
     }).then(buildLogs => {
@@ -50,11 +36,5 @@ module.exports = {
     }).catch(err => {
       res.error(err)
     })
-  },
-
-  _config: {
-    actions: false,
-    shortcuts: false,
-    rest: false,
   },
 }
