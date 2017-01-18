@@ -1,15 +1,7 @@
+const authorizer = require("../authorizers/build")
+
 var decodeb64 = (str) => {
   return new Buffer(str, 'base64').toString('utf8');
-}
-
-const verifyUserIsAuthorizedToRestartBuild = (user, build) => {
-  return User.findOne(user.id).populate("sites").then(user => {
-    const index = user.sites.findIndex(site => site.id === build.site)
-
-    if (index < 0) {
-      throw 403
-    }
-  })
 }
 
 module.exports = {
@@ -20,12 +12,17 @@ module.exports = {
   },
 
   findOne: (req, res) => {
+    let build
+
     Build.findOne(req.param("id")).populate("user").populate("site").then(model => {
       if (model) {
-        res.json(model)
+        build = model
       } else {
         res.notFound()
       }
+      return authorizer.findOne(req.user, build)
+    }).then(() => {
+      res.json(build)
     }).catch(err => {
       res.error(err)
     })
@@ -36,7 +33,7 @@ module.exports = {
 
     Build.findOne(req.param("id")).then(model => {
       build = model
-      return verifyUserIsAuthorizedToRestartBuild(req.user, build)
+      return authorizer.restart(req.user, build)
     }).then(() => {
       return Build.create({
         branch: build.branch,

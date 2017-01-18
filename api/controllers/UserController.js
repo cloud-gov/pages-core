@@ -1,9 +1,4 @@
-/**
- * UserController
- *
- * @description :: Server-side logic for managing builds
- * @help        :: See http://links.sailsjs.org/docs/controllers
- */
+const authorizer = require("../authorizers/user")
 
 module.exports = {
   usernames: function(req, res) {
@@ -17,7 +12,12 @@ module.exports = {
   },
 
   me: (req, res) => {
-    User.findOne(req.user.id).populate("builds").populate("sites").then(user => {
+    let user
+
+    User.findOne(req.user.id).populate("builds").populate("sites").then(model => {
+      user = model
+      return authorizer.me(req.user, user)
+    }).then(() => {
       res.json(user.toObject())
     })
   }
