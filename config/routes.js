@@ -1,56 +1,49 @@
-/**
- * Route Mappings
- * (sails.config.routes)
- *
- * Your routes map URLs to views and controllers.
- *
- * If Sails receives a URL that doesn't match any of the routes below,
- * it will check for matching files (images, scripts, stylesheets, etc.)
- * in your assets directory.  e.g. `http://localhost:1337/images/foo.jpg`
- * might match an image file: `/assets/images/foo.jpg`
- *
- * Finally, if those don't match either, the default 404 handler is triggered.
- * See `api/responses/notFound.js` to adjust your app's 404 logic.
- *
- * Note: Sails doesn't ACTUALLY serve stuff from `assets`-- the default Gruntfile in Sails copies
- * flat files from `assets` to `.tmp/public`.  This allows you to do things like compile LESS or
- * CoffeeScript for the front-end.
- *
- * For more information on configuring custom routes, check out:
- * http://sailsjs.org/#/documentation/concepts/Routes/RouteTargetSyntax.html
- */
-
 module.exports.routes = {
+  /**
+    API
+  */
+  // Builds
+  "get /v0/build": "BuildController.find",
+  "get /v0/build/:id": "BuildController.findOne",
+  "post /v0/build/:id/restart": "BuildController.restart",
 
-  /***************************************************************************
-  *                                                                          *
-  * Custom routes here...                                                    *
-  *                                                                          *
-  *  If a request to a URL doesn't match any of the custom routes above, it  *
-  * is matched against Sails route blueprints. See `config/blueprints.js`    *
-  * for configuration options and examples.                                  *
-  *                                                                          *
-  ***************************************************************************/
+  // Build logs
+  "get /v0/build/:build_id/log": "BuildLogController.find",
 
-  'post /webhook/github': 'WebhookController.github',
+  // Sites
+  "get /v0/site": "SiteController.find",
+  "post /v0/site": "SiteController.create",
+  "get /v0/site/:id": "SiteController.findOne",
+  "put /v0/site/:id": "SiteController.update",
+  "delete /v0/site/:id": "SiteController.destroy",
 
-  'post /v0/build/:id/status/:token': 'BuildController.status',
-  'post /v0/build/:id/restart': 'BuildController.restart',
+  // Users
+  "get /v0/me": "UserController.me",
+  "get /v0/user/usernames": "UserController.usernames",
 
-  'get /preview/:owner/:repo/:branch': 'PreviewController.proxy',
-  'get /preview/:owner/:repo/:branch/*': 'PreviewController.proxy',
+  /**
+    User exposed routes
+  */
 
-  'get /auth/github': 'AuthController.github',
-  'get /auth/github/callback': 'AuthController.callback',
-  'get /logout': 'AuthController.logout',
+  // Auth
+  "get /auth/github": "AuthController.github",
+  "get /auth/github/callback": "AuthController.callback",
+  "get /logout": "AuthController.logout",
 
-  'get /v0/me': 'UserController.me',
+  // Frontend
+  "get /sites(/*)?": "MainController.index",
 
-  'post /v0/build/:build_id/log/:token': 'BuildLogController.create',
-  'get  /v0/build/:build_id/log': 'BuildLogController.find',
+  // Previews
+  "get /preview/:owner/:repo/:branch(/*)?": "PreviewController.proxy",
 
-  'get /sites(/*)?': {
-    controller: 'main',
-    action: 'index'
-  }
-};
+  /**
+    Webhooks
+  */
+  "post /webhook/github": "WebhookController.github",
+
+  /**
+    Build container callbacks
+  */
+  "post /v0/build/:id/status/:token": "BuildController.status",
+  "post /v0/build/:build_id/log/:token": "BuildLogController.create",
+}

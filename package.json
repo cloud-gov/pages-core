@@ -60,7 +60,7 @@
     "watch:client:autoprefix": "npm run sass && postcss --use autoprefixer -r -w assets/styles/styles.css assets/styles/styles.css",
     "watch:client:js": "watchify assets/app/main.js -o assets/js/bundle.js -t [ babelify --presets [ es2015 react stage-2 ] ]",
     "test": "npm run build && npm run test:server && npm run test:client",
-    "test:server": "NODE_ENV=test mocha --timeout 3000 test/api/bootstrap.test.js test/api/unit/**/*.test.js test/api/requests/**/*.test.js",
+    "test:server": "NODE_ENV=test mocha --timeout 5000 test/api/bootstrap.test.js test/api/unit/**/*.test.js test/api/requests/**/*.test.js",
     "test:client": "mocha --compilers js:babel-register --recursive ./test/client",
     "test:client:watch": "watch 'npm run test:client' ./assets/app ./test/client",
     "coverage:client": "istanbul cover _mocha -- --compilers js:babel-register --recursive ./test/client",

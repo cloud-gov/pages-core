@@ -55,7 +55,10 @@
       "type": "string"
     },
     "user": {
-      "type": "object"
+      "type": "object",
+      "not": {
+        "required": ["githubAccessToken", "githubUserId"]
+      }
     }
   }
 }

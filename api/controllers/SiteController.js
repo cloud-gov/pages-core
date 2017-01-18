@@ -72,6 +72,45 @@ const throwAnyExistingSiteErrors = ({ req, existingSite }) => {
 }
 
 module.exports = {
+  find: (req, res) => {
+    User.findOne(req.user.id).populate("sites").then(user => {
+      const siteIds = user.sites.map(site => site.id)
+      return Site.find({ id: siteIds }).populate("users").populate("builds")
+    }).then(sites => {
+      res.json(sites)
+    }).catch(err => {
+      res.error(err)
+    })
+  },
+
+  findOne: (req, res) => {
+    Site.findOne(req.param("id")).populate("users").populate("builds").then(site => {
+      if (site) {
+        res.json(site)
+      } else {
+        res.notFound()
+      }
+    }).catch(err => {
+      res.error(err)
+    })
+  },
+
+  destroy: (req, res) => {
+    let site
+
+    Site.findOne(req.param("id")).populate("users").populate("builds").then(model => {
+      site = model
+      if (!site) {
+        throw 404
+      }
+      return site.destroy()
+    }).then(() => {
+      res.json(site)
+    }).catch(err => {
+      res.error(err)
+    })
+  },
+
   create: (req, res) => {
     let site
 

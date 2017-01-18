@@ -49,7 +49,10 @@
     "users": {
       "type": "array",
       "items": {
-        "type": "object"
+        "type": "object",
+        "not": {
+          "required": ["githubAccessToken", "githubUserId"]
+        }
       }
     },
     "viewLink": {
