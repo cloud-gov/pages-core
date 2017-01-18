@@ -1,3 +1,5 @@
+const authorizer = require("../authorizers/site")
+
 const checkNewSiteRepoPermissions = (req) => {
   const owner = req.param("owner") || req.user.username
   const repository = req.param("repository")
@@ -84,12 +86,17 @@ module.exports = {
   },
 
   findOne: (req, res) => {
-    Site.findOne(req.param("id")).populate("users").populate("builds").then(site => {
-      if (site) {
-        res.json(site)
+    let site
+
+    Site.findOne(req.param("id")).populate("users").populate("builds").then(model => {
+      if (model) {
+        site = model
       } else {
-        res.notFound()
+        throw 404
       }
+      return authorizer.findOne(req.user, site)
+    }).then(() => {
+      res.json(site)
     }).catch(err => {
       res.error(err)
     })
@@ -99,10 +106,13 @@ module.exports = {
     let site
 
     Site.findOne(req.param("id")).populate("users").populate("builds").then(model => {
-      site = model
-      if (!site) {
+      if (model) {
+        site = model
+      } else {
         throw 404
       }
+      return authorizer.destroy(req.user, site)
+    }).then(() => {
       return site.destroy()
     }).then(() => {
       res.json(site)
@@ -114,7 +124,9 @@ module.exports = {
   create: (req, res) => {
     let site
 
-    checkNewSiteRepoPermissions(req).then(() => {
+    authorizer.create(req.user, req.body).then(() => {
+      return checkNewSiteRepoPermissions(req)
+    }).then(() => {
       return Site.findOne({
         owner: req.param("owner"),
         repository: req.param("repository")
@@ -146,7 +158,14 @@ module.exports = {
   update: (req, res) => {
     let siteId = req.param("id")
 
-    Site.update(siteId, req.body).then(sites => {
+    Site.findOne(siteId).then(site => {
+      if (!site) {
+        throw 404
+      }
+      return authorizer.update(req.user, site)
+    }).then(() => {
+      return Site.update(siteId, req.body)
+    }).then(sites => {
       let site = sites[0]
       return Build.create({
         user: req.user.id,

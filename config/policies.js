@@ -69,10 +69,10 @@ module.exports.policies = {
 
   SiteController: {
     'create': ['passport', 'sessionAuth'],
-    'destroy': ['passport', 'sessionAuth', 'filterCurrentUser'],
-    'find': ['passport', 'sessionAuth', 'filterCurrentUser'],
-    'findOne': ['passport', 'sessionAuth', 'filterCurrentUser'],
-    'update': ['passport', 'sessionAuth', 'filterCurrentUser']
+    'destroy': ['passport', 'sessionAuth'],
+    'find': ['passport', 'sessionAuth'],
+    'findOne': ['passport', 'sessionAuth'],
+    'update': ['passport', 'sessionAuth']
   },
 
   UserController: {
