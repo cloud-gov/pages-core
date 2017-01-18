@@ -76,7 +76,6 @@ module.exports.policies = {
   },
 
   UserController: {
-    'findOne': ['passport', 'sessionAuth', 'filterSelfOnly'],
     'usernames': ['passport', 'sessionAuth'],
     'me': ['passport', 'sessionAuth']
   },
