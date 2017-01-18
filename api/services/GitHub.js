@@ -4,6 +4,7 @@ const createWebhook = (github, options) => {
   return new Promise((resolve, reject) => {
     github.repos.createHook(options, (err, res) => {
       if (err) {
+        err.status = err.code
         reject(err)
       } else {
         resolve(res)
@@ -16,6 +17,7 @@ const getOrganizations = (github) => {
   return new Promise((resolve, reject) => {
     github.user.getOrgs({}, (err, organizations) => {
       if (err) {
+        err.status = err.code
         reject(err)
       } else {
         resolve(organizations)
@@ -28,6 +30,7 @@ const getRepository = (github, options) => {
   return new Promise((resolve, reject) => {
     github.repos.get(options, (err, repo) => {
       if (err) {
+        err.status = err.code
         reject(err)
       } else {
         resolve(repo)

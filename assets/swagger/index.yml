@@ -20,6 +20,10 @@ paths:
             type: array
             items:
               $ref: "Build.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
   /build/{id}:
     parameters:
     - name: id
@@ -34,6 +38,14 @@ paths:
           description: The build object specified by the ID
           schema:
             $ref: "Build.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
   /build/{id}/status/{token}:
     parameters:
     - name: id
@@ -47,7 +59,10 @@ paths:
       type: string
       required: true
     post:
-      summary: Update a build's status. This endpoint is designed to be used by the build container to update the build's status when the build is done with its work.
+      summary: |
+        Update a build's status. This endpoint is designed to be used by the
+        build container to update the build's status when the build is done with
+        its work.
       parameters:
       - name: status
         in: body
@@ -65,6 +80,18 @@ paths:
       responses:
         200:
           description: Acknowledgement that the build has been updated
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
   /build/{id}/restart:
     parameters:
       - name: id
@@ -79,6 +106,18 @@ paths:
           description: Acknowledgement that the build has been restarted
           schema:
             $ref: "Build.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
   /build/{build_id}/log/{token}:
     parameters:
     - name: build_id
@@ -98,6 +137,18 @@ paths:
           description: Acknowledgement that the build log was created
           schema:
             $ref: "BuildLog.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
   /build/{build_id}/log:
     parameters:
     - name: build_id
@@ -114,6 +165,14 @@ paths:
             type: array
             items:
               $ref: "BuildLog.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
   /site:
     get:
       summary: Fetch all of the current user's sites
@@ -124,6 +183,10 @@ paths:
             type: array
             items:
               $ref: "Site.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
     post:
       summary: Create a site
       parameters:
@@ -152,12 +215,25 @@ paths:
                 description: The name of the GitHub repository for the site
               template:
                 type: string
-                description: The name of a Federalist site template. If provided, the a new repo will be created from the repo for the given template. If a template is not provided, Federalist will not create a new repo and will instead expect to build a site from an existing repo.
+                description: |
+                  The name of a Federalist site template. If provided, the a new
+                  repo will be created from the repo for the given template. If
+                  a template is not provided, Federalist will not create a new
+                  repo and will instead expect to build a site from an existing
+                  repo.
       responses:
         200:
           description: The newly created site
           schema:
             $ref: "Site.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
   /site/{id}:
     parameters:
     - name: id
@@ -172,6 +248,14 @@ paths:
           description: The site object for the given ID
           schema:
             $ref: "Site.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
     put:
       summary: Update the data for a Federalist site. This action will trigger a rebuild of the site.
       parameters:
@@ -203,6 +287,18 @@ paths:
           description: The updated site object
           schema:
             $ref: "Site.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
     delete:
       summary: Delete a site from Federalist
       responses:
@@ -210,6 +306,14 @@ paths:
           description: Acknowledgement that the site was deleted
           schema:
             $ref: "Site.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
   /me:
     get:
       summary: Fetch data for the current user
@@ -218,6 +322,10 @@ paths:
           description: A user object representing the current Federalist user
           schema:
             $ref: "CurrentUser.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
   /user/{id}:
     parameters:
     - name: id
@@ -232,6 +340,14 @@ paths:
           description: A user object for the given ID
           schema:
             $ref: "User.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
   /user/usernames:
     get:
       summary: Fetch the usernames for every user in federalist
@@ -242,3 +358,7 @@ paths:
             type: array
             items:
               type: string
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
