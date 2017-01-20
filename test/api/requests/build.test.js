@@ -21,6 +21,78 @@ describe("Build API", () => {
     })
   }
 
+  describe("POST /v0/build", () => {
+    it("should require authentication", done => {
+      factory(Site).then(site => {
+        return request("http://localhost:1337")
+          .post(`/v0/build/`)
+          .send({
+            site: site.id,
+            branch: "my-branch"
+          })
+          .expect(403)
+      }).then(response => {
+        validateAgainstJSONSchema("POST", "/build", 403, response.body)
+        done()
+      })
+    })
+
+    it("should create a build with the given site and branch for the current user", done => {
+      let site, user
+
+      const userPromise = factory(User)
+      const sitePromise = factory(Site, { users: Promise.all([userPromise]) })
+      const cookiePromise = session(userPromise)
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      }).then(promisedValues => {
+        site = promisedValues.site
+        user = promisedValues.user
+
+        return request("http://localhost:1337")
+          .post(`/v0/build/`)
+          .send({
+            site: site.id,
+            branch: "my-branch"
+          })
+          .set("Cookie", promisedValues.cookie)
+          .expect(200)
+      }).then(response => {
+        validateAgainstJSONSchema("POST", "/build", 200, response.body)
+        return Build.findOne({
+          site: site.id,
+          user: user.id,
+          branch: "my-branch",
+        })
+      }).then(build => {
+        expect(build).not.to.be.undefined
+        done()
+      })
+    })
+
+    it("should render a 403 if the user is not associated with the given site", done => {
+      Promise.props({
+        site: factory(Site),
+        cookie: session(),
+      }).then(({ site, cookie }) => {
+        return request("http://localhost:1337")
+          .post(`/v0/build/`)
+          .send({
+            site: site.id,
+            branch: "my-branch"
+          })
+          .set("Cookie", cookie)
+          .expect(403)
+      }).then(response => {
+        validateAgainstJSONSchema("POST", "/build", 403, response.body)
+        done()
+      })
+    })
+  })
+
   describe("GET /v0/build/:id", () => {
     it("should require authentication", done => {
       factory(Build).then(build => {
@@ -139,133 +211,6 @@ describe("Build API", () => {
         expect(response.body).to.be.empty
         done()
       })
-    })
-  })
-
-  describe("POST /build/:id/restart", () => {
-    context("On the default branch", () => {
-      it("should create a build that mirrors the original", done => {
-        let build
-
-        factory(Build, { branch: undefined }).then(model => {
-          build = model
-          return User.findOne(build.user)
-        }).then(user => {
-          return session(user)
-        }).then(cookie => {
-          return request("http://localhost:1337")
-            .post(`/v0/build/${build.id}/restart`)
-            .set("Cookie", cookie)
-            .expect(200)
-        }).then(response => {
-          return Build.find({
-            user: build.user,
-            site: build.site,
-            branch: build.branch,
-          })
-        }).then(builds => {
-          expect(builds).to.have.length(2)
-          done()
-        })
-      })
-    })
-
-    context("On a preview branch", () => {
-      it("should create a build that mirrors the original", done => {
-        let build
-
-        factory(Build, { branch: "preview" }).then(model => {
-          build = model
-          return User.findOne(build.user)
-        }).then(user => {
-          return session(user)
-        }).then(cookie => {
-          return request("http://localhost:1337")
-            .post(`/v0/build/${build.id}/restart`)
-            .set("Cookie", cookie)
-            .expect(200)
-        }).then(response => {
-          return Build.find({
-            user: build.user,
-            site: build.site,
-            branch: build.branch,
-          })
-        }).then(builds => {
-          expect(builds).to.have.length(2)
-          done()
-        })
-      })
-    })
-
-    it("should render a JSON representation of the new build", done => {
-      let build, response
-
-      factory(Build).then(model => {
-        build = model
-        return User.findOne(build.user)
-      }).then(user => {
-        return session(user)
-      }).then(cookie => {
-        return request("http://localhost:1337")
-          .post(`/v0/build/${build.id}/restart`)
-          .set("Cookie", cookie)
-          .expect(200)
-      }).then(res => {
-        response = res
-
-        return Build.find({
-          user: build.user,
-          site: build.site,
-        }).sort("createdAt DESC")
-      }).then(builds => {
-        buildResponseExpectations(response.body, builds[0])
-        validateAgainstJSONSchema("POST", "/build/{id}/restart", 200, response.body)
-        done()
-      })
-    })
-
-    it("should restart the build if the user did not create the build, but is associated with the build's site", done => {
-      var build, user
-
-      factory(User).then(model => {
-        user = model
-        return factory(Build)
-      }).then(model => {
-        build = model
-        return Site.findOne(build.site)
-      }).then(site => {
-        site.users.add(user.id)
-        return site.save()
-      }).then(result => {
-        return session(user)
-      }).then(cookie => {
-        return request("http://localhost:1337")
-          .post(`/v0/build/${build.id}/restart`)
-          .set("Cookie", cookie)
-          .expect(200)
-      }).then(response => {
-        return Build.find({
-          user: [build.user, user.id],
-          site: build.site,
-        })
-      }).then(builds => {
-        expect(builds).to.have.length(2)
-        done()
-      })
-    })
-
-    it("should respond with a 403 if the user is not associated with the build's site", done => {
-      let build
-
-      factory(Build).then(model => {
-        build = model
-        return session(factory(User))
-      }).then(cookie => {
-        return request("http://localhost:1337")
-          .post(`/v0/build/${build.id}/restart`)
-          .set("Cookie", cookie)
-          .expect(403)
-      }).then(() => done())
     })
   })
 

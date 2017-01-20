@@ -24,6 +24,35 @@ paths:
           description: Not authorized
           schema:
             $ref: "Error.json"
+    post:
+      summary: Create a build
+      parameters:
+        - name: build
+          in: body
+          schema:
+            type: object
+            properties:
+              site:
+                type: integer
+                description: The ID of the site to build.
+              branch:
+                type: string
+                description: |
+                  The branch that should be built. If no branch is provided, the
+                  site's default branch will be built.
+      responses:
+        200:
+          description: The newly created build
+          schema:
+            $ref: "Build.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
   /build/{id}:
     parameters:
     - name: id
@@ -80,32 +109,6 @@ paths:
       responses:
         200:
           description: Acknowledgement that the build has been updated
-        400:
-          description: Bad request
-          schema:
-            $ref: "Error.json"
-        403:
-          description: Not authorized
-          schema:
-            $ref: "Error.json"
-        404:
-          description: Not found
-          schema:
-            $ref: "Error.json"
-  /build/{id}/restart:
-    parameters:
-      - name: id
-        in: path
-        description: The id of the build
-        type: integer
-        required: true
-    post:
-      summary: Create a new build mirrored after the given build.
-      responses:
-        200:
-          description: Acknowledgement that the build has been restarted
-          schema:
-            $ref: "Build.json"
         400:
           description: Bad request
           schema:
