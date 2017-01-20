@@ -8,8 +8,8 @@ describe("<SiteBuildLogs/>", () => {
     const props = {
       params: { buildId: 1 },
       buildLogs: [
-        { build: 1, output: "output 1", source: "source 1" },
-        { build: 1, output: "output 2", source: "source 2" },
+        { build: { id: 1 }, output: "output 1", source: "source 1" },
+        { build: { id: 1 }, output: "output 2", source: "source 2" },
       ],
     };
 
@@ -25,8 +25,8 @@ describe("<SiteBuildLogs/>", () => {
     const props = {
       params: { buildId: 1 },
       buildLogs: [
-        { build: 1, output: "output 1", source: "source 1" },
-        { build: 2, output: "output 2", source: "source 2" },
+        { build: { id: 1 } , output: "output 1", source: "source 1" },
+        { build: { id: 2 }, output: "output 2", source: "source 2" },
       ],
     };
 
