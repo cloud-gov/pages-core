@@ -788,7 +788,7 @@ describe("sitesReducer", () => {
       id: "not this one",
     };
     const build = {
-      site: "pick this one",
+      site: sitePendingRestart,
     };
     const restartedSite = Object.assign({}, sitePendingRestart, {
       builds: [build, ...sitePendingRestart.builds],

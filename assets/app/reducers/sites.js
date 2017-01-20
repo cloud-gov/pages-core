@@ -119,7 +119,7 @@ export default function sites(state = initialState, action) {
 
   case BUILD_RESTARTED:
     return state.map(site => {
-      if (site.id === action.build.site) {
+      if (site.id === action.build.site.id) {
         return Object.assign({}, site, {
           builds: [action.build, ...site.builds],
         })
