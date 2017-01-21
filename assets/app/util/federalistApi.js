@@ -51,8 +51,12 @@ export default {
   },
 
   restartBuild(build) {
-    return this.fetch(`build/${build.id}/restart`, {
-      method: 'POST'
-    })
+    return this.fetch(`build/`, {
+      method: 'POST',
+      data: {
+        site: build.site.id || build.site,
+        branch: build.branch,
+      },
+    });
   },
 }

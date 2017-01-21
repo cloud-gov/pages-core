@@ -3,9 +3,9 @@ module.exports.routes = {
     API
   */
   // Builds
+  "post /v0/build": "BuildController.create",
   "get /v0/build": "BuildController.find",
   "get /v0/build/:id": "BuildController.findOne",
-  "post /v0/build/:id/restart": "BuildController.restart",
 
   // Build logs
   "get /v0/build/:build_id/log": "BuildLogController.find",

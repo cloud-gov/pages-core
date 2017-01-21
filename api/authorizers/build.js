@@ -13,8 +13,11 @@ const findOne = (user, build) => {
   return authorize(user, build)
 }
 
-const restart = (user, build) => {
-  return authorize(user, build)
+const create = (user, params) => {
+  if (user.id != params.user) {
+    throw 403
+  }
+  return authorize(user, params)
 }
 
-module.exports = { findOne, restart }
+module.exports = { findOne, create }

@@ -11,6 +11,23 @@ module.exports = {
     })
   },
 
+  create: (req, res) => {
+    const params = {
+      branch: req.param("branch"),
+      site: req.param("site"),
+      user: req.user.id,
+    }
+    authorizer.create(req.user, params).then(() => {
+      return Build.create(params)
+    }).then(build => {
+      return Build.findOne(build.id).populate("user").populate("site")
+    }).then(build => {
+      res.json(build)
+    }).catch(err => {
+      res.error(err)
+    })
+  },
+
   findOne: (req, res) => {
     let build
 
@@ -22,27 +39,6 @@ module.exports = {
       }
       return authorizer.findOne(req.user, build)
     }).then(() => {
-      res.json(build)
-    }).catch(err => {
-      res.error(err)
-    })
-  },
-
-  restart: (req, res) => {
-    let build
-
-    Build.findOne(req.param("id")).then(model => {
-      build = model
-      return authorizer.restart(req.user, build)
-    }).then(() => {
-      return Build.create({
-        branch: build.branch,
-        site: build.site,
-        user: req.user.id,
-      })
-    }).then(build => {
-      return Build.findOne(build.id).populate("user").populate("site")
-    }).then(build => {
       res.json(build)
     }).catch(err => {
       res.error(err)
