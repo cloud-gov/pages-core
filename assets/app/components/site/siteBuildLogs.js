@@ -12,7 +12,7 @@ class SiteBuildLogs extends React.Component {
     }
 
     return this.props.buildLogs.filter(log => {
-      return log.build === parseInt(this.props.params.buildId);
+      return log.build.id === parseInt(this.props.params.buildId);
     }).sort((a, b) => {
       return new Date(a.createdAt) - new Date(b.createdAt);
     });
