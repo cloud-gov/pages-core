@@ -66,8 +66,12 @@ describe("Site API", () => {
           return Site.findOne({ id: site.id }).populate("users")
         }))
       }).then(sites => {
-        sites.forEach((site, index) => {
-          siteResponseExpectations(response.body[index], site)
+        sites.forEach(site => {
+          const responseSite = response.body.find(candidate => {
+            return candidate.id === site.id
+          })
+          expect(responseSite).not.to.be.undefined
+          siteResponseExpectations(responseSite, site)
         })
         done()
       })
@@ -329,9 +333,9 @@ describe("Site API", () => {
             .set("Cookie", cookie)
             .expect(400)
         }).then(response => {
-          return Site.find({ user: user.id })
-        }).then(sites => {
-          expect(sites).to.have.length(0)
+          return User.findOne(user.id).populate("sites")
+        }).then(user => {
+          expect(user.sites).to.have.length(0)
           done()
         })
       })
@@ -513,9 +517,9 @@ describe("Site API", () => {
             .set("Cookie", cookie)
             .expect(400)
         }).then(response => {
-          return Site.find({ user: user.id })
-        }).then(sites => {
-          expect(sites).to.have.length(0)
+          return User.findOne(user.id).populate("sites")
+        }).then(user => {
+          expect(user.sites).to.have.length(0)
           done()
         })
       })

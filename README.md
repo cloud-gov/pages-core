@@ -175,7 +175,7 @@ You can use `npm run watch` to get the project built and running. This will set 
 By default, the application should use local disk storage in place of a database. This is easier to get started and isn't a problem for local development. In production, the app uses Postgres as the data store. To use Postgres in your local dev environment:
 
 0. First, you'll need to [install Postgres](http://www.postgresql.org/download/).
-0. Next, you'll have to create the `federalist` database for the application. `$ createdb federalist` should do the trick
+0. Next, you'll have to create the `federalist` database for the application. `$ createdb federalist` should do the trick. If you wish to run the tests, do the same, but for a database named `federalist-test`.
 0. Add postgres to your `/config/local.js` file
 
 ```

@@ -2,7 +2,12 @@ const buildAuthorizer = require("../authorizers/build")
 
 module.exports = {
   create: (req, res) => {
-    Build.findOne(req.param("build_id")).then(build => {
+    Promise.resolve(Number(req.param("build_id"))).then(id => {
+      if (isNaN(id)) {
+        throw 404
+      }
+      return Build.findOne(id)
+    }).then(build => {
       if (!build) {
         throw 404
       }
@@ -23,7 +28,12 @@ module.exports = {
   find: (req, res) => {
     let build
 
-    Build.findOne(req.param("build_id")).then(model => {
+    Promise.resolve(Number(req.param("build_id"))).then(id => {
+      if (isNaN(id)) {
+        throw 404
+      }
+      return Build.findOne(id)
+    }).then(model => {
       build = model
       if (!build) {
         throw 404

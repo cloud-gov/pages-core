@@ -48,6 +48,12 @@ module.exports = {
       obj.siteRoot = `http://${s3Config.bucket}.s3-website-${s3Config.region}.amazonaws.com`
       obj.viewLink = obj.domain || [obj.siteRoot, 'site', obj.owner, obj.repository].join('/')
 
+      for (key in obj) {
+        if (obj[key] === null) {
+          obj[key] = undefined
+        }
+      }
+
       return obj
     }
   },

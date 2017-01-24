@@ -31,7 +31,12 @@ module.exports = {
   findOne: (req, res) => {
     let build
 
-    Build.findOne(req.param("id")).populate("user").populate("site").then(model => {
+    Promise.resolve(Number(req.param("id"))).then(id => {
+      if (isNaN(id)) {
+        throw 404
+      }
+      return Build.findOne(id).populate("user").populate("site")
+    }).then(model => {
       if (model) {
         build = model
       } else {
@@ -48,7 +53,12 @@ module.exports = {
   status: (req, res) => {
     var message = decodeb64(req.body.message)
 
-    Build.findOne(req.param("id")).then(build => {
+    Promise.resolve(Number(req.param("id"))).then(id => {
+      if (isNaN(id)) {
+        throw 404
+      }
+      return Build.findOne(id).populate("user").populate("site")
+    }).then(build => {
       if (!build) {
         throw 404
       } else {
