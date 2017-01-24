@@ -2,16 +2,24 @@
 applications:
 - name: federalist
 buildpack: nodejs_buildpack
-domain: 18f.gov
+stack: cflinuxfs2
+domain: fr.cloud.gov
 disk_quota: 2G
 memory: 512MB
 instances: 2
 services:
-- federalist-database
-- federalist-redis
-- federalist-aws-user
+- federalist-production-rds
+- federalist-production-redis
+- federalist-production-s3
 - federalist-production-env
 env:
   NEW_RELIC_APP_NAME: federalist-prod
   NODE_ENV: production
-  APP_ENV: prod
+  APP_ENV: production
+  SAILS_LOG_LEVEL: info
+  NPM_CONFIG_PRODUCTION: true
+  NODE_MODULES_CACHE: false
+  APP_NAME: federalist
+  APP_DOMAIN: fr.cloud.gov
+  FEDERALIST_BUILD_STATUS_CALLBACK: https://federalist.fr.cloud.gov/v0/build/:build_id/status/:token
+  FEDERALIST_BUILD_LOG_CALLBACK: https://federalist.fr.cloud.gov/v0/build/:build_id/log/:token
