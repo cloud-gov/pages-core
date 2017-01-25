@@ -4,10 +4,10 @@ set -e
 
 if [ "$TRAVIS_BRANCH" == "master" ]
 then
-  CF_SPACE="prod"
+  CF_SPACE="production"
   CF_APP="federalist"
   CF_MANIFEST="manifest.yml"
-elif [[ "$TRAVIS_BRANCH" =~ ^[staging]-?.*$ ]]
+elif [ "$TRAVIS_BRANCH" == "staging" ]
 then
   CF_SPACE="staging"
   CF_APP="federalist-staging"
