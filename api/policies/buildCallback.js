@@ -1,5 +1,12 @@
 module.exports = function (req, res, next) {
-  Build.findOne(req.param("id") || req.param("build_id")).then(build => {
+  const id = Number(req.param("id") || req.param("build_id"))
+
+  Promise.resolve(id).then(id => {
+    if (isNaN(id)) {
+      throw 404
+    }
+    return Build.findOne(id)
+  }).then(build => {
     if (!build) {
       res.notFound()
     } else if (build.token !== req.param("token")) {
@@ -7,5 +14,7 @@ module.exports = function (req, res, next) {
     } else {
       next()
     }
+  }).catch(err => {
+    res.error(err)
   })
 }

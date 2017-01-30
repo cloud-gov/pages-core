@@ -88,7 +88,12 @@ module.exports = {
   findOne: (req, res) => {
     let site
 
-    Site.findOne(req.param("id")).populate("users").populate("builds").then(model => {
+    Promise.resolve(Number(req.param("id"))).then(id => {
+      if (isNaN(id)) {
+        throw 404
+      }
+      return Site.findOne(id).populate("users").populate("builds")
+    }).then(model => {
       if (model) {
         site = model
       } else {
@@ -105,7 +110,12 @@ module.exports = {
   destroy: (req, res) => {
     let site
 
-    Site.findOne(req.param("id")).populate("users").populate("builds").then(model => {
+    Promise.resolve(Number(req.param("id"))).then(id => {
+      if (isNaN(id)) {
+        throw 404
+      }
+      return Site.findOne(id).populate("users").populate("builds")
+    }).then(model => {
       if (model) {
         site = model
       } else {
@@ -156,9 +166,14 @@ module.exports = {
   },
 
   update: (req, res) => {
-    let siteId = req.param("id")
+    let siteId = Number(req.param("id"))
 
-    Site.findOne(siteId).then(site => {
+    Promise.resolve(siteId).then(id => {
+      if (isNaN(id)) {
+        throw 404
+      }
+      return Site.findOne(id)
+    }).then(site => {
       if (!site) {
         throw 404
       }

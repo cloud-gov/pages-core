@@ -6,8 +6,12 @@ language: node_js
 sudo: true
 node_js:
 - 6
+services:
+  - postgresql
 before_install:
   - rvm install ruby-1.9.3-p551
+before_script:
+  - "psql -c 'create database travis_ci_test;' -U postgres"
 env:
   global:
   - CF_API="https://api.fr.cloud.gov"
@@ -22,6 +26,7 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
+  postgresql: "9.5"
 before_deploy:
   - export PATH=$HOME:$PATH
   - travis_retry curl -L -o $HOME/cf.tgz "https://cli.run.pivotal.io/stable?release=linux64-binary&version=6.22.2"

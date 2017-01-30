@@ -30,6 +30,13 @@ var User = {
       var obj = this.toObject();
       obj.githubAccessToken = undefined
       obj.githubUserId = undefined
+
+      for (key in obj) {
+        if (obj[key] === null) {
+          obj[key] = undefined
+        }
+      }
+
       return obj;
     }
   }

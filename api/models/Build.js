@@ -90,15 +90,20 @@ module.exports = {
     },
     source: {
       type: 'json'
-    }
+    },
+    toJSON: function() {
+      let object = this.toObject()
+      object.buildLogs = undefined
+      for (key in object) {
+        if (object[key] === null) {
+          object[key] = undefined
+        }
+      }
+      return object
+    },
   },
 
   beforeCreate: beforeCreate,
   afterCreate: afterCreate,
   completeJob: completeJob,
-  toJSON: () => {
-    let object = this.toObject()
-    object.buildLogs = undefined
-    return object
-  }
 };

@@ -30,6 +30,15 @@ module.exports = {
       model: 'build',
       required: true
     },
+    toJSON: function() {
+      let object = this.toObject()
+      for (key in object) {
+        if (object[key] === null) {
+          object[key] = undefined
+        }
+      }
+      return object
+    },
   },
 
   beforeValidate: (values, cb) => {

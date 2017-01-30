@@ -38,7 +38,7 @@ describe('Build Model', () => {
       factory(Build).then(model => {
         build = model
         expect(build.state).to.equal("processing")
-        expect(build.error).to.be.undefined
+        expect(build.error).to.be.null
         return Build.completeJob(null, build)
       }).then(() => {
         return Build.findOne(build.id)
@@ -55,7 +55,7 @@ describe('Build Model', () => {
       factory(Build).then(model => {
         build = model
         expect(build.state).to.equal("processing")
-        expect(build.error).to.be.undefined
+        expect(build.error).to.be.null
         return Build.completeJob("this is an error message", build)
       }).then(() => {
         return Build.findOne(build.id)
@@ -72,7 +72,7 @@ describe('Build Model', () => {
       factory(Build).then(model => {
         build = model
         expect(build.state).to.equal("processing")
-        expect(build.error).to.be.undefined
+        expect(build.error).to.be.null
         return Build.completeJob(new Error("this is an error"), build)
       }).then(() => {
         return Build.findOne(build.id)
@@ -89,7 +89,7 @@ describe('Build Model', () => {
       factory(Build).then(model => {
         build = model
         expect(build.state).to.equal("processing")
-        expect(build.error).to.be.undefined
+        expect(build.error).to.be.null
         return Build.completeJob(new Error("http://123abc@github.com"), build)
       }).then(() => {
         return Build.findOne(build.id)

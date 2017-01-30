@@ -7,18 +7,16 @@ const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema"
 
 describe("Build API", () => {
   var buildResponseExpectations = (response, build) => {
-    Object.keys(build).forEach(key => {
-      if (key === "buildLogs") return;
-
-      expect(response[key]).to.not.be.undefined
-      if (typeof build[key] === "number" && typeof response[key] === "object") {
-        expect(response[key].id).to.equal(build[key])
-      } else if (build[key] && build[key].toISOString) {
-        expect(response[key]).to.equal(build[key].toISOString())
-      } else {
-        expect(response[key]).to.equal(build[key])
-      }
-    })
+    if (build.completedAt) {
+      expect(build.completedAt.toISOString()).to.equal(response.completedAt)
+    } else {
+      expect(response.completedAt).to.be.undefined
+    }
+    expect(build.error == response.error).to.be.ok
+    expect(build.branch == response.branch).to.be.ok
+    expect(response.site.id).to.equal(build.site.id || build.site)
+    expect(response.user.id).to.equal(build.user.id || build.user)
+    expect(response.buildLogs).to.be.undefined
   }
 
   describe("POST /v0/build", () => {
@@ -181,8 +179,12 @@ describe("Build API", () => {
       }).then(response => {
         expect(response.body).to.be.a("Array")
         expect(response.body).to.have.length(3)
-        builds.forEach((build, index) => {
-          buildResponseExpectations(response.body[index], build)
+        builds.forEach(build => {
+          const responseBuild = response.body.find(candidate => {
+            return candidate.id === build.id
+          })
+          expect(responseBuild).not.to.be.undefined
+          buildResponseExpectations(responseBuild, build)
         })
         validateAgainstJSONSchema("GET", "/build", 200, response.body)
         done()
