@@ -3,9 +3,10 @@ const Sails = require('sails')
 
 let sails
 
-const _cleanDatabase = (sails) => {
-  const promises = Object.keys(sails.models).map(key => {
-    return sails.models[key].destroy({})
+const _cleanDatabase = () => {
+  const models = require("../../api/modelss")
+  const promises = Object.keys(models).map(name => {
+    return models[name].destroy({ where: {} })
   })
   return Promise.all(promises)
 }
@@ -19,7 +20,7 @@ before(function(done) {
     sails = server;
     if (err) return done(err);
 
-    _cleanDatabase(sails).then(() => {
+    _cleanDatabase().then(() => {
       done(null, sails);
     }).catch(err => {
       done(err)
