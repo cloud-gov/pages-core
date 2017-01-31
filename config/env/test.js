@@ -37,6 +37,6 @@ module.exports = {
     connection: "postgres",
   },
   log: {
-    level: "info",
+    level: "error",
   },
 }

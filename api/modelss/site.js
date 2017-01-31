@@ -9,6 +9,15 @@ const associate = ({ Site, Build, User }) => {
   })
 }
 
+const beforeValidate = (site) => {
+  if (site.repository) {
+    site.repository = site.repository.toLowerCase()
+  }
+  if (site.owner) {
+    site.owner = site.owner.toLowerCase()
+  }
+}
+
 module.exports = (sequelize, DataTypes) => {
   const Site = sequelize.define("Site", {
     config: {
@@ -43,6 +52,9 @@ module.exports = (sequelize, DataTypes) => {
     classMethods: {
       associate,
     },
+    hooks: {
+      beforeValidate,
+    }
   })
 
   return Site

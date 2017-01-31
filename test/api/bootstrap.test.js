@@ -1,10 +1,8 @@
 const AWS = require('aws-sdk-mock')
 const Sails = require('sails')
 
-let sails
-
 const _cleanDatabase = () => {
-  const models = require("../../api/modelss")
+  const models = sequelize.models
   const promises = Object.keys(models).map(name => {
     return models[name].destroy({ where: {} })
   })
