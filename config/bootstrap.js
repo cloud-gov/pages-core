@@ -11,5 +11,7 @@
 
 module.exports.bootstrap = function(cb) {
   global.Promise = require("bluebird")
+  Object.assign(global, require("../api/modelss"))
+  global.sequelize = Build.sequelize
   cb();
 };

@@ -12,30 +12,30 @@ var buildContainerEnvironment = (build) => ({
   BASEURL: baseURLForBuild(build),
   CACHE_CONTROL: buildConfig.cacheControl,
   BRANCH: build.branch,
-  CONFIG: build.site.config,
-  REPOSITORY: build.site.repository,
-  OWNER: build.site.owner,
+  CONFIG: build.Site.config,
+  REPOSITORY: build.Site.repository,
+  OWNER: build.Site.owner,
   SITE_PREFIX: pathForBuild(build),
-  GITHUB_TOKEN: build.user.githubAccessToken,
-  GENERATOR: build.site.engine,
+  GITHUB_TOKEN: build.User.githubAccessToken,
+  GENERATOR: build.Site.engine,
   SOURCE_REPO: sourceForBuild(build).repository,
   SOURCE_OWNER: sourceForBuild(build).owner,
 })
 
 var defaultBranch = (build) => {
-  return build.branch === build.site.defaultBranch
+  return build.branch === build.Site.defaultBranch
 }
 
 var pathForBuild = (build) => {
   if (defaultBranch(build)) {
-    return `site/${build.site.owner}/${build.site.repository}`
+    return `site/${build.Site.owner}/${build.Site.repository}`
   } else {
-    return `preview/${build.site.owner}/${build.site.repository}/${build.branch}`
+    return `preview/${build.Site.owner}/${build.Site.repository}/${build.branch}`
   }
 }
 
 var baseURLForBuild = (build) => {
-  if (defaultBranch(build) && build.site.domain) {
+  if (defaultBranch(build) && build.Site.domain) {
     return ""
   } else {
     return "/" + pathForBuild(build)
