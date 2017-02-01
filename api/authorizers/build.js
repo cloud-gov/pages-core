@@ -1,7 +1,7 @@
 const authorize = (user, build) => {
-  return User.findOne(user.id).populate("sites").then(user => {
-    for (site of user.sites) {
-      if (build.site.id || build.site === site.id) {
+  return User.findById(user.id, { include: [Site] }).then(user => {
+    for (site of user.Sites) {
+      if (build.site || build.Site.id === site.id) {
         return Promise.resolve()
       }
     }
