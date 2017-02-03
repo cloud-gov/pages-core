@@ -3,7 +3,6 @@ var passport = require('passport')
 
 var githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
   var user
-
   return GitHub.validateUser(accessToken).then(() => {
     return User.findOrCreate({
       where: { username: profile.username },
@@ -22,6 +21,7 @@ var githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
   }).then(() => {
     callback(null, user)
   }).catch(err => {
+    sails.log.info("Authentication error: ", err)
     callback(err)
   })
 }

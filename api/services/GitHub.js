@@ -87,7 +87,7 @@ module.exports = {
   },
 
   setWebhook: (site, user) => {
-    return User.findOne(user).then(model => {
+    return User.findById(user).then(model => {
       user = model
       return githubClient(user.githubAccessToken)
     }).then(github => {
