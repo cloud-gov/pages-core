@@ -5,14 +5,17 @@ var githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
   var user
 
   return GitHub.validateUser(accessToken).then(() => {
-    return User.findOrCreate({ username: profile.username }, {
-      email: profile.emails[0].value,
-      username: profile.username,
+    return User.findOrCreate({
+      where: { username: profile.username },
+      defaults: {
+        email: profile.emails[0].value,
+        username: profile.username,
+      },
     })
-  }).then(model => {
-    user = model
+  }).then(models => {
+    user = models[0]
     if (!user) throw new Error(`Unable to find or create user ${profile.username}`);
-    return User.update(user.id, {
+    return user.update({
       githubAccessToken: accessToken,
       githubUserId: profile.id
     })
@@ -50,7 +53,7 @@ passport.serializeUser((user, next) => {
 })
 
 passport.deserializeUser((id, next) => {
-  User.findOne(id, next);
+  User.findById(id).then(next)
 })
 
 module.exports = passport;

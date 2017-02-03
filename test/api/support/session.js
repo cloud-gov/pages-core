@@ -1,11 +1,10 @@
-var crypto = require("crypto")
-var factory = require("./factory")
+const crypto = require("crypto")
+const factory = require("./factory")
 
-
-var session = (user) => {
-  return Promise.resolve(user || factory(User)).then(user => {
-    var sessionKey = crypto.randomBytes(8).toString("hex")
-    var sessionBody = {
+const session = (user) => {
+  return Promise.resolve(user || factory.user()).then(user => {
+    const sessionKey = crypto.randomBytes(8).toString("hex")
+    const sessionBody = {
       cookie: {
         originalMaxAge: null,
         expires: null,

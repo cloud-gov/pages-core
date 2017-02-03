@@ -38,13 +38,17 @@ describe("Authentication request", () => {
 
   describe("GET /logout", () => {
     it("should unauthenticate and remove the user from the session", done => {
-      var cookie, user
+      let user, cookie
 
-      factory(User).then(model => {
-        user = model
-        return session(user)
-      }).then(generatedCookie => {
-        cookie = generatedCookie
+      const userPromise = factory.user()
+      const sessionPromise = session(userPromise)
+
+      Promise.props({
+        user: userPromise,
+        cookie: sessionPromise
+      }).then(results => {
+        user = results.user
+        cookie = results.cookie
         return sessionForCookie(cookie)
       }).then(session => {
         expect(session.authenticated).to.be.equal(true)
@@ -61,7 +65,7 @@ describe("Authentication request", () => {
         expect(session.authenticated).to.equal(false)
         expect(session.passport).to.be.empty
         done()
-      })
+      }).catch(done)
     })
 
     it("should redirect to the root URL for an unauthenticated user", done => {
@@ -77,7 +81,7 @@ describe("Authentication request", () => {
       it("should authenticate the user", done => {
         var user
 
-        factory(User).then(model => {
+        factory.user().then(model => {
           user = model
           return githubAPINocks.githubAuth(user.username, [{ id: 123456 }])
         }).then(() => {
@@ -91,13 +95,13 @@ describe("Authentication request", () => {
           expect(session.authenticated).to.equal(true)
           expect(session.passport.user).to.equal(user.id)
           done()
-        })
+        }).catch(done)
       })
 
       it("should not create a new user", done => {
         var userCount
 
-        factory(User).then(user => {
+        factory.user().then(user => {
           githubAPINocks.githubAuth(user.username, [{ id: 123456 }])
           return User.count()
         }).then(count => {
@@ -110,13 +114,13 @@ describe("Authentication request", () => {
         }).then(count => {
           expect(count).to.equal(userCount)
           done()
-        })
+        }).catch(done)
       })
 
       it("should update the user's GitHub access token", done => {
         var user
 
-        factory(User).then(model => {
+        factory.user().then(model => {
           user = model
           expect(user.githubAccessToken).not.to.equal("access-token-123abc")
 
@@ -126,11 +130,11 @@ describe("Authentication request", () => {
             .get("/auth/github/callback?code=auth-code-123abc")
             .expect(302)
         }).then(response => {
-          return User.findOne(user.id)
+          return User.findById(user.id)
         }).then(user => {
           expect(user.githubAccessToken).to.equal("access-token-123abc")
           done()
-        })
+        }).catch(done)
       })
     })
 
@@ -152,14 +156,14 @@ describe("Authentication request", () => {
         }).then(session => {
           expect(session.authenticated).to.equal(true)
           var userID = session.passport.user
-          return User.findOne({ id: userID })
+          return User.findById(userID )
         }).then(user => {
           expect(user).to.have.property("email", `user-${githubUserID}@example.com`)
           expect(user).to.have.property("username", `user-${githubUserID}`)
           expect(user).to.have.property("githubUserId", `${githubUserID}`)
           expect(user).to.have.property("githubAccessToken", "access-token-123abc")
           done()
-        })
+        }).catch(done)
       })
     })
 
