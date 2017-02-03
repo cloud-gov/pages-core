@@ -12,9 +12,12 @@ const findSite = (req) => {
   const repository = req.param("repo")
 
   return Site.findOne({
-    owner: owner,
-    repository: repository,
-  }).populate("users").then(site => {
+    where: {
+      owner: owner,
+      repository: repository,
+    },
+    include: [ User ],
+  }).then(site => {
     if (!site) {
       throw httpError({
         message: `No such site: ${owner}/${repository}.`,
@@ -78,7 +81,7 @@ const verifyUserAuthorization = ({ user, site }) => {
     })
   }
 
-  const userIndex = site.users.findIndex(candidate => {
+  const userIndex = site.Users.findIndex(candidate => {
     return candidate.id === user.id
   })
   if (userIndex < 0) {
