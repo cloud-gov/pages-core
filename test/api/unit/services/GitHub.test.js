@@ -5,7 +5,7 @@ const githubAPINocks = require("../../support/githubAPINocks")
 describe("GitHub", () => {
   describe(".checkPermissions(user, owner, repository)", () => {
     it("should resolve with the users permissions", done => {
-      factory(User).then(user => {
+      factory.user().then(user => {
         githubAPINocks.repo({
           accessToken: user.accessToken,
           owner: "repo-owner",
@@ -17,11 +17,11 @@ describe("GitHub", () => {
       }).then(permissions => {
         expect(permissions).to.equal("Repo permissions")
         done()
-      })
+      }).catch(done)
     })
 
     it("should reject if the repository does not exist", done => {
-      factory(User).then(user => {
+      factory.user().then(user => {
         githubAPINocks.repo({
           accessToken: user.accessToken,
           owner: "repo-owner",
@@ -33,7 +33,7 @@ describe("GitHub", () => {
       }).catch(error => {
         expect(error).to.not.be.undefined
         done()
-      })
+      }).catch(done)
     })
   })
 
@@ -41,9 +41,9 @@ describe("GitHub", () => {
     it("should set a webhook on the repository", done => {
       let site, user
 
-      factory(User).then(model => {
+      factory.user().then(model => {
         user = model
-        return factory(Site)
+        return factory.site()
       }).then(model => {
         site = model
         githubAPINocks.webhook({
@@ -55,15 +55,15 @@ describe("GitHub", () => {
         return GitHub.setWebhook(site, user.id)
       }).then(() => {
         done()
-      })
+      }).catch(done)
     })
 
     it("should resolve if the webhook already exists", done => {
       let site, user
 
-      factory(User).then(model => {
+      factory.user().then(model => {
         user = model
-        return factory(Site)
+        return factory.site()
       }).then(model => {
         site = model
         githubAPINocks.webhook({
@@ -77,15 +77,15 @@ describe("GitHub", () => {
         return GitHub.setWebhook(site, user.id)
       }).then(() => {
         done()
-      })
+      }).catch(done)
     })
 
     it("should reject if the user does not have admin access to the repository", done => {
       let site, user
 
-      factory(User).then(model => {
+      factory.user().then(model => {
         user = model
-        return factory(Site)
+        return factory.site()
       }).then(model => {
         site = model
         githubAPINocks.webhook({
@@ -97,10 +97,12 @@ describe("GitHub", () => {
           }]
         })
         return GitHub.setWebhook(site, user.id)
+      }).then(() => {
+        throw new Error("Expected admin access error")
       }).catch(err => {
         expect(err.message).to.equal("You do not have admin access to this repository")
         done()
-      })
+      }).catch(done)
     })
   })
 
@@ -113,7 +115,7 @@ describe("GitHub", () => {
 
       GitHub.validateUser("123abc").then(() => {
         done()
-      })
+      }).catch(done)
     })
 
     it("should reject if the user is not on a whitelisted team", done => {

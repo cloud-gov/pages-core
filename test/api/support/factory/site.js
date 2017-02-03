@@ -1,4 +1,3 @@
-const githubAPINocks = require("../githubAPINocks")
 const userFactory = require("./user")
 
 const site = (overrides) => {
@@ -7,11 +6,6 @@ const site = (overrides) => {
   return Promise.props(_attributes(overrides)).then(attributes => {
     users = attributes.users.slice()
     delete attributes.users
-
-    githubAPINocks.webhook({
-      owner: attributes.owner,
-      repo: attributes.repository,
-    })
 
     return Site.create(attributes)
   }).then(model => {
