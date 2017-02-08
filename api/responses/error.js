@@ -6,7 +6,7 @@ module.exports = function badRequest(error = {}, options) {
     error = {
       status: error,
     }
-  } else if (error.code && error.code === "E_VALIDATION") {
+  } else if (error.name && error.name === "SequelizeValidationError") {
     error = {
       status: 400,
       message: "The request parameters were invalid."

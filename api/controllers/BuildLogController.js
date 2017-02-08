@@ -1,4 +1,5 @@
 const buildAuthorizer = require("../authorizers/build")
+const buildLogSerializer = require("../serializers/build-log")
 
 module.exports = {
   create: (req, res) => {
@@ -6,20 +7,20 @@ module.exports = {
       if (isNaN(id)) {
         throw 404
       }
-      return Build.findOne(id)
+      return Build.findById(id)
     }).then(build => {
       if (!build) {
         throw 404
       }
       return BuildLog.create({
-        build: build,
+        build: build.id,
         output: req.param("output"),
         source: req.param("source"),
       })
     }).then(buildLog => {
-      return BuildLog.findOne(buildLog.id).populate("build")
-    }).then(buildLog => {
-      res.json(buildLog)
+      return buildLogSerializer.serialize(buildLog)
+    }).then(buildLogJSON => {
+      res.json(buildLogJSON)
     }).catch(err => {
       res.error(err)
     })
@@ -32,7 +33,7 @@ module.exports = {
       if (isNaN(id)) {
         throw 404
       }
-      return Build.findOne(id)
+      return Build.findById(id)
     }).then(model => {
       build = model
       if (!build) {
@@ -40,9 +41,11 @@ module.exports = {
       }
       return buildAuthorizer.findOne(req.user, build)
     }).then(() => {
-      return BuildLog.find({ build: build.id }).populate("build")
+      return BuildLog.findAll({ where: { build: build.id }})
     }).then(buildLogs => {
-      res.json(buildLogs)
+      return buildLogSerializer.serialize(buildLogs)
+    }).then(buildLogsJSON => {
+      res.json(buildLogsJSON)
     }).catch(err => {
       res.error(err)
     })
