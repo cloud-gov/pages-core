@@ -5,7 +5,7 @@ module.exports = function (req, res, next) {
     if (isNaN(id)) {
       throw 404
     }
-    return Build.findOne(id)
+    return Build.findById(id)
   }).then(build => {
     if (!build) {
       res.notFound()

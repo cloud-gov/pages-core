@@ -9,7 +9,7 @@ describe("Build Log API", () => {
     it("should create a build log with the given params", done => {
       let build
 
-      factory(Build).then(model => {
+      factory.build().then(model => {
         build = model
 
         return request("localhost:1337")
@@ -26,17 +26,17 @@ describe("Build Log API", () => {
         expect(response.body).to.have.property("source", "build.sh")
         expect(response.body).to.have.property("output", "This is the output for build.sh")
 
-        return BuildLog.find({ build: build.id })
+        return BuildLog.findAll({ where: { build: build.id } })
       }).then(logs => {
         expect(logs).to.have.length(1)
         expect(logs[0]).to.have.property("source", "build.sh")
         expect(logs[0]).to.have.property("output", "This is the output for build.sh")
         done()
-      })
+      }).catch(done)
     })
 
     it("should respond with a 400 if the params are not correct", done => {
-      factory(Build).then(build => {
+      factory.build().then(build => {
         return request("localhost:1337")
           .post(`/v0/build/${build.id}/log/${build.token}`)
           .type("json")
@@ -48,13 +48,13 @@ describe("Build Log API", () => {
       }).then(response => {
         validateAgainstJSONSchema("POST", "/build/{build_id}/log/{token}", 400, response.body)
         done()
-      })
+      }).catch(done)
     })
 
     it("should respond with a 403 and not create a build log for an invalid build token", done => {
       let build
 
-      factory(Build).then(model => {
+      factory.build().then(model => {
         build = model
 
         return request("localhost:1337")
@@ -68,11 +68,11 @@ describe("Build Log API", () => {
       }).then(response => {
         validateAgainstJSONSchema("POST", "/build/{build_id}/log/{token}", 403, response.body)
 
-        return BuildLog.find({ build: build.id })
+        return BuildLog.findAll({ where: { build: build.id } })
       }).then(logs => {
         expect(logs).to.be.empty
         done()
-      })
+      }).catch(done)
     })
 
     it("should respond with a 404 if no build is found for the given id", done => {
@@ -88,37 +88,37 @@ describe("Build Log API", () => {
       buildLogRequest.then(response => {
         validateAgainstJSONSchema("POST", "/build/{build_id}/log/{token}", 404, response.body)
         done()
-      })
+      }).catch(done)
     })
   })
 
   describe("GET /v0/build/:build_id/log", () => {
     it("should require authentication", done => {
-      factory(BuildLog).then(buildLog => {
+      factory.buildLog().then(buildLog => {
         return request("http://localhost:1337")
           .get(`/v0/build/${buildLog.build}/log`)
           .expect(403)
       }).then(response => {
         validateAgainstJSONSchema("GET", "/build/{build_id}/log", 403, response.body)
         done()
-      })
+      }).catch(done)
     })
 
     it("should render builds logs for the given build", done => {
       let build
 
-      factory(Build).then(model => {
+      factory.build().then(model => {
         build = model
 
         return Promise.all(Array(3).fill(0).map(() => {
-          factory(BuildLog, {
+          factory.buildLog({
             build: build,
           })
         }))
       }).then(models => {
-        return Site.findOne({ id: build.site }).populate("users")
+        return Site.findById(build.site, { include: [User] })
       }).then(site => {
-        let user = site.users[0]
+        let user = site.Users[0]
         return session(user)
       }).then(cookie => {
         return request("localhost:1337")
@@ -130,18 +130,18 @@ describe("Build Log API", () => {
         expect(response.body).to.be.a("array")
         expect(response.body).to.have.length(3)
         done()
-      })
+      }).catch(done)
     })
 
     it("should respond with a 403 if the given build is not associated with one of the user's sites", done => {
       let build
 
-      factory(Build).then(model => {
+      factory.build().then(model => {
         build = model
 
-        return Promise.all(Array(3).fill(0).map(() => factory(BuildLog)))
+        return Promise.all(Array(3).fill(0).map(() => factory.buildLog()))
       }).then(models => {
-        return factory(User)
+        return factory.user()
       }).then(user => {
         return session(user)
       }).then(cookie => {
@@ -152,7 +152,7 @@ describe("Build Log API", () => {
       }).then(response => {
         validateAgainstJSONSchema("GET", "/build/{build_id}/log", 403, response.body)
         done()
-      })
+      }).catch(done)
     })
 
     it("should response with a 404 if the given build does not exist", done => {
@@ -164,7 +164,7 @@ describe("Build Log API", () => {
       }).then(response => {
         validateAgainstJSONSchema("GET", "/build/{build_id}/log", 404, response.body)
         done()
-      })
+      }).catch(done)
     })
   })
 })

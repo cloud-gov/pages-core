@@ -2,6 +2,11 @@ const buildFactory = require("./build")
 
 const buildLog = (overrides) => {
   return Promise.props(_attributes(overrides)).then(attributes => {
+    Object.keys(attributes).forEach(key => {
+      if (attributes[key].sequelize) {
+        attributes[key] = attributes[key].id
+      }
+    })
     return BuildLog.create(attributes)
   })
 }
