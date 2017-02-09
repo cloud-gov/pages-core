@@ -34,7 +34,8 @@ module.exports.routes = {
   "get /sites(/*)?": "MainController.index",
 
   // Previews
-  "get /preview/:owner/:repo/:branch(/*)?": "PreviewController.proxy",
+  "get /preview/:owner/:repo/:branch": "PreviewController.proxy",
+  "get /preview/:owner/:repo/:branch/*": "PreviewController.proxy",
 
   /**
     Webhooks
