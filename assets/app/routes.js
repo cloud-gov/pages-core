@@ -20,13 +20,7 @@ export default (
       <IndexRoute component={SiteList}/>
       <Route path="new" component={NewSite} />
       <Route path=":id" component={SiteContainer}>
-        <IndexRedirect to="tree" />
-        <Route path="tree" component={SitePagesContainer}>
-          <Route path="(**/):fileName" component={SitePagesContainer} />
-        </Route>
-        <Route path="new/:branch(/:fileName)" component={SiteEditorContainer} isNewPage={true} />
-        <Route path="edit/:branch/(**/):fileName" component={SiteEditorContainer}/>
-        <Route path="media" component={SiteMediaContainer}/>
+        <IndexRedirect to="settings" />
         <Route path="settings" component={SiteSettings}/>
         <Route path="builds">
           <IndexRoute component={SiteBuilds}/>
