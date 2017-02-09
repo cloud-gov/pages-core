@@ -1,4 +1,5 @@
 const authorizer = require("../authorizers/build")
+const buildSerializer = require("../serializers/build")
 
 var decodeb64 = (str) => {
   return new Buffer(str, 'base64').toString('utf8');
@@ -6,8 +7,10 @@ var decodeb64 = (str) => {
 
 module.exports = {
   find: (req, res) => {
-    Build.find({ user: req.user.id }).populate("user").populate("site").then(builds => {
-      res.json(builds)
+    Build.findAll({ where: { user: req.user.id } }).then(builds => {
+      return buildSerializer.serialize(builds)
+    }).then(buildsJSON => {
+      res.json(buildsJSON)
     })
   },
 
@@ -20,9 +23,9 @@ module.exports = {
     authorizer.create(req.user, params).then(() => {
       return Build.create(params)
     }).then(build => {
-      return Build.findOne(build.id).populate("user").populate("site")
-    }).then(build => {
-      res.json(build)
+      return buildSerializer.serialize(build)
+    }).then(buildJSON => {
+      res.json(buildJSON)
     }).catch(err => {
       res.error(err)
     })
@@ -35,7 +38,7 @@ module.exports = {
       if (isNaN(id)) {
         throw 404
       }
-      return Build.findOne(id).populate("user").populate("site")
+      return Build.findById(id)
     }).then(model => {
       if (model) {
         build = model
@@ -44,7 +47,9 @@ module.exports = {
       }
       return authorizer.findOne(req.user, build)
     }).then(() => {
-      res.json(build)
+      return buildSerializer.serialize(build)
+    }).then(buildJSON => {
+      res.json(buildJSON)
     }).catch(err => {
       res.error(err)
     })
@@ -57,12 +62,12 @@ module.exports = {
       if (isNaN(id)) {
         throw 404
       }
-      return Build.findOne(id).populate("user").populate("site")
+      return Build.findById(id)
     }).then(build => {
       if (!build) {
         throw 404
       } else {
-        return Build.completeJob(message, build)
+        return build.completeJob(message)
       }
     }).then(build => {
       res.ok()

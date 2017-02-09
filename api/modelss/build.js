@@ -62,6 +62,23 @@ const sanitizeCompleteJobErrorMessage = (message) => {
   return message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github')
 }
 
+const toJSON = function() {
+  const object = this.get({
+    plain: true,
+  })
+  object.createdAt = object.createdAt.toISOString()
+  object.updatedAt = object.updatedAt.toISOString()
+  if (object.completedAt) {
+    object.completedAt = object.completedAt.toISOString()
+  }
+  Object.keys(object).forEach(key => {
+    if (object[key] === null) {
+      delete object[key]
+    }
+  })
+  return object
+}
+
 module.exports = (sequelize, DataTypes) => {
   const Build = sequelize.define("Build", {
     branch: {
@@ -101,6 +118,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     instanceMethods: {
       completeJob,
+      toJSON,
     },
     hooks: {
       afterCreate,

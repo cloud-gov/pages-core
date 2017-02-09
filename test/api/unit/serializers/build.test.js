@@ -1,32 +1,32 @@
 const expect = require("chai").expect
 const validateJSONSchema = require('jsonschema').validate
 
-const buildLogSchema = require("../../../../assets/swagger/BuildLog.json")
+const buildSchema = require("../../../../assets/swagger/Build.json")
 const factory = require("../../support/factory")
 
-const BuildLogSerializer = require("../../../../api/serializers/build-log")
+const BuildSerializer = require("../../../../api/serializers/build")
 
-describe("BuildLogSerializer", () => {
+describe("BuildSerializer", () => {
   describe(".serialize(serializable)", () => {
     it("should serialize an object correctly", done => {
-      factory.buildLog().then(buildLog => {
-        return BuildLogSerializer.serialize(buildLog)
+      factory.build().then(build => {
+        return BuildSerializer.serialize(build)
       }).then(object => {
-        const result = validateJSONSchema(object, buildLogSchema)
+        const result = validateJSONSchema(object, buildSchema)
         expect(result.errors).to.be.empty
         done()
       }).catch(done)
     })
 
     it("should serialize an array correctly", done => {
-      const buildLogs = Array(3).fill(0).map(() => factory.buildLog())
+      const builds = Array(3).fill(0).map(() => factory.build())
 
-      Promise.all(buildLogs).then(buildLogs => {
-        return BuildLogSerializer.serialize(buildLogs)
+      Promise.all(builds).then(builds => {
+        return BuildSerializer.serialize(builds)
       }).then(object => {
         const arraySchema = {
           type: "array",
-          items: buildLogSchema,
+          items: buildSchema,
         }
         const result = validateJSONSchema(object, arraySchema)
         expect(result.errors).to.be.empty

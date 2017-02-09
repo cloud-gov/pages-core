@@ -18,7 +18,7 @@ const serialize = (serializable) => {
 
 const serializeObject = (buildLog) => {
   const json = buildLog.toJSON()
-  json.build = json.Build
+  json.build = buildLog.Build.toJSON()
   delete json.Build
   return json
 }
