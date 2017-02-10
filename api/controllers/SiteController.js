@@ -1,4 +1,5 @@
 const authorizer = require("../authorizers/site")
+const siteSerializer = require("../serializers/site")
 
 const checkNewSiteRepoPermissions = (req) => {
   const owner = req.param("owner") || req.user.username
@@ -15,16 +16,23 @@ const checkNewSiteRepoPermissions = (req) => {
 }
 
 const createAndBuildSite = (req) => {
-  let createdSite
-
   const siteParams = paramsForNewSite(req)
-  return Site.create(siteParams).then(site => {
-    createdSite = site
+  let site = Site.build(siteParams)
+
+  return site.validate().then(error => {
+    if (error) {
+      throw error
+    }
+    return GitHub.setWebhook(site, req.user.id)
+  }).then(() => {
+    return site.save()
+  }).then(createdSite => {
+    site = createdSite
 
     const buildParams = paramsForNewBuild({ site, req })
     return Build.create(buildParams)
   }).then(() => {
-    return Site.findOne(createdSite.id).populate("users").populate("builds")
+    return site
   })
 }
 
@@ -63,7 +71,7 @@ const throwAnyExistingSiteErrors = ({ req, existingSite }) => {
       }
     }
 
-    const userIndex = existingSite.users.findIndex(user => user.id === req.user.id)
+    const userIndex = existingSite.Users.findIndex(user => user.id === req.user.id)
     if (userIndex >= 0) {
       throw {
         message: "You've already added this site to Federalist",
@@ -75,11 +83,10 @@ const throwAnyExistingSiteErrors = ({ req, existingSite }) => {
 
 module.exports = {
   find: (req, res) => {
-    User.findOne(req.user.id).populate("sites").then(user => {
-      const siteIds = user.sites.map(site => site.id)
-      return Site.find({ id: siteIds }).populate("users").populate("builds")
-    }).then(sites => {
-      res.json(sites)
+    User.findById(req.user.id, { include: [ Site ] }).then(user => {
+      return siteSerializer.serialize(user.Sites)
+    }).then(sitesJSON => {
+      res.json(sitesJSON)
     }).catch(err => {
       res.error(err)
     })
@@ -92,7 +99,7 @@ module.exports = {
       if (isNaN(id)) {
         throw 404
       }
-      return Site.findOne(id).populate("users").populate("builds")
+      return Site.findById(id)
     }).then(model => {
       if (model) {
         site = model
@@ -101,7 +108,9 @@ module.exports = {
       }
       return authorizer.findOne(req.user, site)
     }).then(() => {
-      res.json(site)
+      return siteSerializer.serialize(site)
+    }).then(siteJSON => {
+      res.json(siteJSON)
     }).catch(err => {
       res.error(err)
     })
@@ -109,23 +118,27 @@ module.exports = {
 
   destroy: (req, res) => {
     let site
+    let siteJSON
 
     Promise.resolve(Number(req.param("id"))).then(id => {
       if (isNaN(id)) {
         throw 404
       }
-      return Site.findOne(id).populate("users").populate("builds")
+      return Site.findById(id)
     }).then(model => {
       if (model) {
         site = model
       } else {
         throw 404
       }
+      return siteSerializer.serialize(site)
+    }).then(json => {
+      siteJSON = json
       return authorizer.destroy(req.user, site)
     }).then(() => {
       return site.destroy()
     }).then(() => {
-      res.json(site)
+      res.json(siteJSON)
     }).catch(err => {
       res.error(err)
     })
@@ -138,9 +151,12 @@ module.exports = {
       return checkNewSiteRepoPermissions(req)
     }).then(() => {
       return Site.findOne({
-        owner: req.param("owner"),
-        repository: req.param("repository")
-      }).populate("users").populate("builds")
+        where: {
+          owner: req.param("owner"),
+          repository: req.param("repository"),
+        },
+        include: [ User, Build ],
+      })
     }).then(existingSite => {
       throwAnyExistingSiteErrors({
         existingSite,
@@ -154,43 +170,50 @@ module.exports = {
       }
     }).then(model => {
       site = model
-      site.users.add(req.user.id)
-      return site.save()
-    }).then(result => {
-      return Site.findOne(site.id).populate("users").populate("builds")
-    }).then(site => {
-      res.send(site)
+      return site.addUser(req.user.id)
+    }).then(() => {
+      return siteSerializer.serialize(site)
+    }).then(siteJSON => {
+      res.send(siteJSON)
     }).catch(err => {
       res.error(err)
     })
   },
 
   update: (req, res) => {
+    let site
     let siteId = Number(req.param("id"))
 
     Promise.resolve(siteId).then(id => {
       if (isNaN(id)) {
         throw 404
       }
-      return Site.findOne(id)
-    }).then(site => {
+      return Site.findById(id)
+    }).then(model => {
+      site = model
       if (!site) {
         throw 404
       }
       return authorizer.update(req.user, site)
     }).then(() => {
-      return Site.update(siteId, req.body)
-    }).then(sites => {
-      let site = sites[0]
+      return site.update({
+        config: req.body.config || site.config,
+        defaultBranch: req.body.defaultBranch || site.defaultBranch,
+        domain: req.body.domain || site.domain,
+        engine: req.body.engine || site.engine,
+        publicPreview: req.body.publicPreview || site.publicPreview,
+      })
+    }).then(model => {
+      let site = model
       return Build.create({
         user: req.user.id,
         site: siteId,
         branch: site.defaultBranch,
       })
     }).then(build => {
-      return Site.findOne(siteId).populate("users").populate("builds")
-    }).then(site => {
-      res.send(site)
+      return siteSerializer.serialize(site)
+    }).then(siteJSON => {
+      res.send(siteJSON)
     }).catch(err => {
       res.error(err)
     })
