@@ -22,13 +22,20 @@ const toJSON = function() {
   const object = this.get({
     plain: true,
   })
+
   object.createdAt = object.createdAt.toISOString()
   object.updatedAt = object.updatedAt.toISOString()
+
+  const s3Config = sails.config.s3
+  object.siteRoot = `http://${s3Config.bucket}.s3-website-${s3Config.region}.amazonaws.com`
+  object.viewLink = object.domain || [object.siteRoot, 'site', object.owner, object.repository].join('/')
+
   Object.keys(object).forEach(key => {
     if (object[key] === null) {
       delete object[key]
     }
   })
+
   return object
 }
 
