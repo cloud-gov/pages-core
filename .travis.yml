@@ -1,6 +1,7 @@
 branches:
   only:
     - staging
+    - master
 cache: false
 language: node_js
 sudo: true
