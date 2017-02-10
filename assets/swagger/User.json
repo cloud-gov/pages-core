@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "builds",
+    "email",
+    "sites",
+    "username"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "builds": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "email": {
+      "type": "string"
+    },
+    "sites": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "username": {
+      "type": "string"
+    }
+  },
+  "not": {
+    "required": ["githubAccessToken", "githubUserId"]
+  }
+}
