@@ -31,7 +31,7 @@ The following environment variables are set on the Cloud Foundry environment in 
 - `APP_NAME`: The name of the Cloud Foundry application
 - `APP_COMAIN`: The hostname where the application runs in Cloud Foundry
 
-Secrets cannot be kept in the application manifest so they are provided by Cloud Foundy services.
+Secrets cannot be kept in the application manifest so they are provided by Cloud Foundry services.
 The app expects the following user provided services to be provided:
 
 - `federalist-<environment<-redis`: A cloud.gov brokered service that allows the application to use redis for its session store
