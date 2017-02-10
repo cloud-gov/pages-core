@@ -19,7 +19,7 @@ describe("User API", () => {
 
   describe("GET /v0/me", () => {
     it("should require authentication", done => {
-      factory(User).then(user => {
+      factory.user().then(user => {
         return request("http://localhost:1337")
           .get("/v0/me")
           .expect(403)
@@ -32,7 +32,7 @@ describe("User API", () => {
     it("should render the current user with their GitHub user data", done => {
       var user
 
-      factory(User).then(model => {
+      factory.user().then(model => {
         user = model
         return session(user)
       }).then(cookie => {
