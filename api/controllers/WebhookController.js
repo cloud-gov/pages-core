@@ -1,4 +1,5 @@
 const crypto = require('crypto')
+const buildSerializer = require("../serializers/build")
 
 module.exports = {
   github: function(req, res) {
@@ -7,10 +8,14 @@ module.exports = {
         return createBuildForWebhookRequest(req)
       }
     }).then(build => {
-      if (build) {
-        res.ok(build)
-      } else {
+      if (!build) {
         res.ok("No new commits found. No build scheduled.")
+      } else {
+        return buildSerializer.serialize(build)
+      }
+    }).then(buildJSON => {
+      if (buildJSON) {
+        res.json(buildJSON)
       }
     }).catch(err => {
       if (err.message) {
@@ -55,19 +60,25 @@ const createBuildForWebhookRequest = (request) => {
     buildParams = models
     return addUserToSite(buildParams)
   }).then(() => {
-    buildParams.branch = request.body.ref.replace('refs/heads/', '')
-    return Build.create(buildParams)
+    return Build.create({
+      branch: request.body.ref.replace('refs/heads/', ''),
+      site: buildParams.site.id,
+      user: buildParams.user.id,
+    })
   })
 }
 
 const findUserForWebhookRequest = (request) => {
   const username = request.body.sender.login
 
-  return User.findOrCreate({ username }).then(user => {
-    if (!user) {
+  return User.findOrCreate({
+    where: { username },
+    defaults: { username },
+  }).then(users => {
+    if (!users.length) {
       throw new Error(`Unable to find or create Federalist user with username ${username}`)
     } else {
-      return user
+      return users[0]
     }
   })
 }
@@ -76,8 +87,8 @@ const findSiteForWebhookRequest = (request) => {
   const owner = request.body.repository.full_name.split('/')[0]
   const repository = request.body.repository.full_name.split('/')[1]
 
-  return Site.findOne({ owner, repository }).then(site => {
-    if (!repository) {
+  return Site.findOne({ where: { owner, repository } }).then(site => {
+    if (!site) {
       throw new Error(`Unable to find Federalist site with ${owner}/${repository}`)
     } else {
       return site
@@ -86,6 +97,5 @@ const findSiteForWebhookRequest = (request) => {
 }
 
 const addUserToSite = ({ user, site }) => {
-  user.sites.add(site.id)
-  return user.save()
+  return user.addSite(site)
 }
