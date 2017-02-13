@@ -8,8 +8,6 @@ import SideNav from './site/SideNav/sideNav';
 import PagesHeader from './site/pagesHeader';
 import AlertBanner from './alertBanner';
 
-import { getDraft } from '../util/branchFormatter';
-
 const propTypes = {
   storeState: React.PropTypes.object,
   params: React.PropTypes.object //{id, branch, splat, fileName}
@@ -41,7 +39,9 @@ class SiteContainer extends React.Component {
     const currentSite = this.getCurrentSite(storeState.sites, params.id);
 
     if (currentSite) {
-      siteActions.fetchSiteConfigsAndAssets(currentSite);
+      siteActions.siteExists(currentSite).then(() => {
+        return siteActions.fetchBranches(currentSite)
+      });
     } else {
       replaceHistory('/sites');
     }
@@ -49,14 +49,6 @@ class SiteContainer extends React.Component {
 
   getPageTitle(pathname) {
     const currentPath = pathname.split('/').pop();
-
-    // If the currentPath has only 'tree' as it's last parameter,
-    // we can safely return 'pages' as the title.
-    return currentPath === 'tree' ? 'pages' : currentPath;
-  }
-
-  isPages(path) {
-    return path.indexOf('tree') !== -1;
   }
 
   getCurrentSite(sites, siteId) {
@@ -76,19 +68,12 @@ class SiteContainer extends React.Component {
     // I'm not crazy about tying these to route paths
     // as it makes it harder to change things.
     switch(pageTitle) {
-      case 'media':
-        childConfigs = {
-          assets: storeState.assets,
-          site
-        };
-        break;
       case 'logs':
         childConfigs = {
           buildLogs: storeState.buildLogs,
         };
         break;
       case 'settings':
-      case 'pages':
       case 'builds':
       default:
         childConfigs = { site };
@@ -109,7 +94,6 @@ class SiteContainer extends React.Component {
             repository={site.repository}
             owner={site.owner}
             title={pageTitle}
-            isPages={this.isPages(location.pathname)}
             siteId={site.id}
             branch={params.branch || site.defaultBranch}
             fileName={params.fileName}

@@ -4,10 +4,6 @@ import {
   siteAdded, siteAddedType,
   siteUpdated, siteUpdatedType,
   siteDeleted, siteDeletedType,
-  siteFileContentReceived, siteFileContentReceivedType,
-  siteAssetsReceived, siteAssetsReceivedType,
-  siteFilesReceived, siteFilesReceivedType,
-  siteConfigsReceived, siteConfigsReceivedType,
   siteBranchesReceived, siteBranchesReceivedType,
   siteInvalid, siteInvalidType,
   siteLoading, siteLoadingType
@@ -74,7 +70,7 @@ describe("siteActions actionCreators", () => {
     });
   });
 
-  describe("siteUpdated", () => {
+  describe("siteDeleted", () => {
     it("constructs properly", () => {
       const siteId = "tk421";
 
@@ -90,89 +86,6 @@ describe("siteActions actionCreators", () => {
       expect(siteDeletedType).to.equal("SITE_DELETED");
     });
   });
-
-  describe("siteFilesReceived", () => {
-    it("constructs properly", () => {
-      const siteId = "tk421";
-      const files = [{name: 'fileA'},{name: 'radfile1'}];
-
-      const actual = siteFilesReceived(siteId, files);
-
-      expect(actual).to.deep.equal({
-        type: siteFilesReceivedType,
-        siteId,
-        files
-      });
-    });
-
-    it("exports its type", () => {
-      expect(siteFilesReceivedType).to.equal("SITE_FILES_RECEIVED");
-    });
-  });
-
-  describe("siteFileContentReceived", () => {
-    it("constructs properly", () => {
-      const siteId = "tk421";
-      const fileContent = "this is something coming from a commit response, I hope.";
-
-      const actual = siteFileContentReceived(siteId, fileContent);
-
-      expect(actual).to.deep.equal({
-        type: siteFileContentReceivedType,
-        siteId,
-        file: fileContent
-      });
-    });
-
-    it("exports its type", () => {
-      expect(siteFileContentReceivedType).to.equal("SITE_FILE_CONTENT_RECEIVED");
-    });
-  });
-
-  describe("siteAssetsReceived", () => {
-    it("constructs properly", () => {
-      const siteId = "tk421";
-      const assets = {
-        something: "could be anything",
-        except: "when it isn't"
-      };
-
-      const actual = siteAssetsReceived(siteId, assets);
-
-      expect(actual).to.deep.equal({
-        type: siteAssetsReceivedType,
-        siteId,
-        assets
-      });
-    });
-
-    it("exports its type", () => {
-      expect(siteAssetsReceivedType).to.equal("SITE_ASSETS_RECEIVED");
-    });
-  });
-
-  describe("siteConfigsReceived", () => {
-    it("constructs properly", () => {
-      const siteId = "tk421";
-      const configs = {
-        something: "could be anything",
-        except: "when it isn't"
-      };
-
-      const actual = siteConfigsReceived(siteId, configs);
-
-      expect(actual).to.deep.equal({
-        type: siteConfigsReceivedType,
-        siteId,
-        configs
-      });
-    });
-
-    it("exports its type", () => {
-      expect(siteConfigsReceivedType).to.equal("SITE_CONFIGS_RECEIVED");
-    });
-  });
-
 
   describe("siteBranchesReceived", () => {
     it("constructs properly", () => {

@@ -7,7 +7,6 @@ const propTypes = {
   title: React.PropTypes.string.isRequired, // Title of the section we are on
   siteId: React.PropTypes.number.isRequired,
   branch: React.PropTypes.string.isRequired,
-  isPages: React.PropTypes.bool, // Are we on the 'Pages' or index section
   fileName: React.PropTypes.string,
   viewLink: React.PropTypes.string
 };
@@ -19,7 +18,6 @@ const defaultPropTypes = {
 class PagesHeader extends React.Component {
   getLinkButtonConfigs() {
     const {
-      isPages,
       siteId,
       branch,
       fileName,
@@ -28,32 +26,13 @@ class PagesHeader extends React.Component {
       repository
     } = this.props;
 
-    const configs = {
+    return {
       text: 'View Website',
       alt: 'View this website',
-      className: 'usa-button-big pull-right icon icon-view icon-white'
+      className: 'usa-button-big pull-right icon icon-view icon-white',
+      target: '_blank',
+      href: viewLink,
     };
-
-    if (/_draft/.test(branch)) {
-      return Object.assign({}, configs, {
-        text: 'Preview Draft',
-        alt: 'Preview Draft',
-        href: `/preview/${owner}/${repository}/${branch}/`
-      });
-    }
-
-    if (!isPages) {
-      return Object.assign({}, configs, {
-        target: '_blank',
-        href: viewLink
-      });
-    }
-
-    return Object.assign({}, configs, {
-      text: 'Add a new page',
-      alt: 'Add a new page',
-      href: `/sites/${siteId}/new/${branch}` + (fileName ? `/${fileName}` : '')
-    });
   }
 
   render() {
