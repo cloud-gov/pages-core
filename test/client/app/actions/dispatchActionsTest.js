@@ -8,8 +8,7 @@ describe("dispatchActions", () => {
   let fixture;
   let dispatch;
   let sitesReceivedActionCreator, siteAddedActionCreator, siteDeletedActionCreator,
-      siteUpdatedActionCreator, siteFileContentReceivedActionCreator, siteAssetsReceivedActionCreator,
-      siteFilesReceivedActionCreator, siteConfigsReceivedActionCreator, siteBranchesReceivedActionCreator,
+      siteUpdatedActionCreator, siteBranchesReceivedActionCreator,
       updateRouterActionCreator, siteLoadingActionCreator,
       siteInvalidActionCreator, pushHistory;
 
@@ -24,10 +23,6 @@ describe("dispatchActions", () => {
     siteAddedActionCreator = stub();
     siteUpdatedActionCreator = stub();
     siteDeletedActionCreator = stub();
-    siteFileContentReceivedActionCreator = stub();
-    siteAssetsReceivedActionCreator = stub();
-    siteFilesReceivedActionCreator = stub();
-    siteConfigsReceivedActionCreator = stub();
     siteBranchesReceivedActionCreator = stub();
     siteLoadingActionCreator = stub();
     siteInvalidActionCreator = stub();
@@ -39,10 +34,6 @@ describe("dispatchActions", () => {
         siteAdded: siteAddedActionCreator,
         siteUpdated: siteUpdatedActionCreator,
         siteDeleted: siteDeletedActionCreator,
-        siteFileContentReceived: siteFileContentReceivedActionCreator,
-        siteAssetsReceived: siteAssetsReceivedActionCreator,
-        siteFilesReceived: siteFilesReceivedActionCreator,
-        siteConfigsReceived: siteConfigsReceivedActionCreator,
         siteBranchesReceived: siteBranchesReceivedActionCreator,
         siteInvalid: siteInvalidActionCreator,
         siteLoading: siteLoadingActionCreator
@@ -96,42 +87,6 @@ describe("dispatchActions", () => {
     siteDeletedActionCreator.withArgs(site).returns(action);
 
     fixture.dispatchSiteDeletedAction(site);
-
-    expect(dispatch.calledWith(action)).to.be.true;
-  });
-
-  it("dispatchSiteFileContentReceivedAction", () => {
-    const fileContent = "stuff and things, you know";
-    siteFileContentReceivedActionCreator.withArgs(siteId, fileContent).returns(action);
-
-    fixture.dispatchSiteFileContentReceivedAction(siteId, fileContent);
-
-    expect(dispatch.calledWith(action)).to.be.true;
-  });
-
-  it("dispatchSiteAssetsReceivedAction", () => {
-    const assets = "stuff and things, you know";
-    siteAssetsReceivedActionCreator.withArgs(siteId, assets).returns(action);
-
-    fixture.dispatchSiteAssetsReceivedAction(siteId, assets);
-
-    expect(dispatch.calledWith(action)).to.be.true;
-  });
-
-  it("dispatchSiteFilesReceivedAction", () => {
-    const files = "stuff and things, you know";
-    siteFilesReceivedActionCreator.withArgs(siteId, files).returns(action);
-
-    fixture.dispatchSiteFilesReceivedAction(siteId, files);
-
-    expect(dispatch.calledWith(action)).to.be.true;
-  });
-
-  it("dispatchSiteConfigsReceivedAction", () => {
-    const configs = "stuff and things, you know";
-    siteConfigsReceivedActionCreator.withArgs(siteId, configs).returns(action);
-
-    fixture.dispatchSiteConfigsReceivedAction(siteId, configs);
 
     expect(dispatch.calledWith(action)).to.be.true;
   });
