@@ -114,7 +114,6 @@ class AddSite extends React.Component {
                   onChange={this.onChange}
                 >
                   <option value="jekyll">Jekyll</option>
-                  <option value="hugo">Hugo</option>
                   <option value="static">Static (just publish the files in the repository)</option>
                 </select>
               </div>
