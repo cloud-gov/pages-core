@@ -21,7 +21,6 @@
     "passport": "^0.2.1",
     "passport-github": "^0.1.5",
     "pg": "^4.4.0",
-    "prosemirror": "^0.8.3",
     "rc": "~0.5.0",
     "request": "^2.61.0",
     "sails": "~0.12.9",
@@ -34,7 +33,7 @@
     "yamljs": "^0.2.8"
   },
   "scripts": {
-    "postinstall": "npm run uswds && npm run codemirror && npm run migrate:up",
+    "postinstall": "npm run uswds && npm run migrate:up",
     "build": "npm run browserify && npm run sass && npm run autoprefixer",
     "start": "node app.js",
     "debug": "node debug app.js",
@@ -61,7 +60,6 @@
     "uswds:css": "cp node_modules/uswds/dist/css/uswds.min.css assets/styles/",
     "uswds:images": "cp -r node_modules/uswds/dist/img/ ./assets/images/uswds",
     "uswds:fonts": "cp node_modules/uswds/dist/fonts/* ./assets/fonts",
-    "codemirror": "cp node_modules/codemirror/lib/codemirror.css assets/styles/",
     "export:sites": "node ./scripts/exportSitesAsCsv.js"
   },
   "main": "app.js",
@@ -82,7 +80,6 @@
     "babelify": "^7.3.0",
     "browserify": "^10.2.4",
     "chai": "^3.5.0",
-    "codemirror": "^5.6.0",
     "cookie": "^0.3.1",
     "enzyme": "^2.4.1",
     "eslint": "^2.7.0",
