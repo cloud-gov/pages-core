@@ -100,6 +100,7 @@ describe("GitHub", () => {
       }).then(() => {
         throw new Error("Expected admin access error")
       }).catch(err => {
+        expect(err.status).to.equal(400)
         expect(err.message).to.equal("You do not have admin access to this repository")
         done()
       }).catch(done)
