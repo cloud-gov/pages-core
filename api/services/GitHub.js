@@ -68,7 +68,9 @@ const handleWebhookError = (error) => {
     // noop
     return
   } else if (githubError === NO_ACCESS_MESSAGE) {
-    throw new Error(NO_ADMIN_ACCESS_ERROR_MESSAGE)
+    const error = new Error(NO_ADMIN_ACCESS_ERROR_MESSAGE)
+    error.status = 400
+    throw error
   } else {
     throw error
   }

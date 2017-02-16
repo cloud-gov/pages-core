@@ -559,6 +559,41 @@ describe("Site API", () => {
           done()
         }).catch(done)
       })
+
+      it("should respond with a 400 if the user does not have admin access to the repo", done => {
+        const siteOwner = crypto.randomBytes(3).toString("hex")
+        const siteRepository = crypto.randomBytes(3).toString("hex")
+        const user = factory.user()
+        const cookie = session(user)
+
+        Promise.props({ user, cookie }).then(({ user, cookie }) => {
+          nock.cleanAll()
+          githubAPINocks.repo()
+          webhookNock = githubAPINocks.webhook({
+            accessToken: user.githubAccessToken,
+            owner: siteOwner,
+            repo: siteRepository,
+            response: [404, {
+              message: "Not Found"
+            }]
+          })
+
+          return request("http://localhost:1337")
+            .post("/v0/site")
+            .send({
+              owner: siteOwner,
+              repository: siteRepository,
+              engine: "jekyll",
+              defaultBranch: "18f-pages",
+            })
+            .set("Cookie", cookie)
+            .expect(400)
+        }).then(response => {
+          validateAgainstJSONSchema("POST", "/site", 400, response.body)
+          expect(response.body.message).to.equal("You do not have admin access to this repository")
+          done()
+        }).catch(done)
+      })
     })
 
     context("adding an existing Federalist site from an existing GitHub repo", () => {
