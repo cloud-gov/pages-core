@@ -39,7 +39,6 @@ describe("siteActions", () => {
     getRepo = stub();
     fetchBranches = stub();
     deleteBranch = stub();
-    createRepo = stub();
     alertSuccess = stub();
     alertError = stub();
     siteExists = stub();
@@ -79,7 +78,6 @@ describe("siteActions", () => {
       },
       "../util/githubApi": {
         fetchBranches: fetchBranches,
-        createRepo: createRepo,
         getRepo: getRepo
       },
     }).default;
@@ -222,41 +220,6 @@ describe("siteActions", () => {
       const actual = fixture.fetchBranches(site);
 
       expectDispatchToNotBeCalled(actual, dispatchSiteBranchesReceivedAction);
-    });
-  });
-
-  describe("cloneRepo", () => {
-    const destination = "destination";
-    const source = "source";
-
-    it("dispatches a site added action and redirects to a site uri if we successfully create and clone a repo", () => {
-      const sitePromise = Promise.resolve(site);
-      createRepo.withArgs(destination, source).returns(Promise.resolve("ignored"));
-      addSite.withArgs(destination).returns(sitePromise);
-
-      const actual = fixture.cloneRepo(destination, source);
-
-      return actual.then(() => {
-        expect(updateRouterToSpecificSiteUri.calledOnce).to.be.true;
-        expect(dispatchSiteAddedAction.calledWith(site)).to.be.true;
-      });
-    });
-
-    it("alerts an error if createRepo fails", () => {
-      createRepo.withArgs(destination, source).returns(rejectedWithErrorPromise);
-
-      const actual = fixture.cloneRepo(destination, source);
-
-      return validateResultDispatchesHttpAlertError(actual, errorMessage);
-    });
-
-    it("alerts an error if addSite fails", () => {
-      createRepo.withArgs(destination, source).returns(Promise.resolve("ignored"));
-      addSite.withArgs(destination).returns(rejectedWithErrorPromise);
-
-      const actual = fixture.cloneRepo(destination, source);
-
-      return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
 

@@ -7,7 +7,7 @@ const API = 'https://api.github.com';
 
 const getToken = () => {
   const state = store.getState();
-  return state.user.githubAccessToken;
+  return state.user;
 }
 
 const getRepoFor = (site) => {
@@ -25,47 +25,13 @@ const github = {
 
   getRepo(site) {
     const url = `${getRepoFor(site)}`;
-    const params = { access_token: getToken() };
-
-    return this.fetch(url, { params });
+    return this.fetch(url);
   },
 
   fetchBranches(site) {
     const url = `${getRepoFor(site)}/branches`;
-    const params = {
-      access_token: getToken()
-    };
-
-    return this.fetch(url, { params });
+    return this.fetch(url);
   },
-
-  createRepo(destination, source) {
-    const token = getToken();
-    const params = {
-      access_token: token
-    };
-    const sourceUrl = `repos/${source.owner}/${source.repo}`;
-
-    function createRepo(destination) {
-      const org = destination.organization ?
-        `orgs/${destination.organization}` : 'user';
-
-      const repoUrl = `${org}/repos`;
-
-      return this.fetch(repoUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `token ${token}`
-        },
-        data: {
-          name: destination.repository
-        }
-      });
-    }
-
-    return this.fetch(sourceUrl, { params })
-      .then(createRepo.bind(this, destination));
-  }
 }
 
 export default github;

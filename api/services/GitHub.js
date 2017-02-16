@@ -1,5 +1,31 @@
 const Github = require("github")
 
+const createRepoForOrg = (github, options) => {
+  return new Promise((resolve, reject) => {
+    github.repos.createFromOrg(options, (err, res) => {
+      if (err) {
+        err.status = err.code
+        reject(err)
+      } else {
+        resolve(res)
+      }
+    })
+  })
+}
+
+const createRepoForUser = (github, options) => {
+  return new Promise((resolve, reject) => {
+    github.repos.create(options, (err, res) => {
+      if (err) {
+        err.status = err.code
+        reject(err)
+      } else {
+        resolve(res)
+      }
+    })
+  })
+}
+
 const createWebhook = (github, options) => {
   return new Promise((resolve, reject) => {
     github.repos.createHook(options, (err, res) => {
@@ -50,19 +76,28 @@ const githubClient = (accessToken) => {
   })
 }
 
+const handleCreateRepoError = (error) => {
+  const REPO_EXISTS_MESSAGE = "name already exists on this account"
+
+  const githubError = parseGithubErrorMessage(error)
+
+  if (githubError === REPO_EXISTS_MESSAGE) {
+    error.status = 400
+    error.message = "A repo with that name already exists."
+  } else if (githubError && error.code === 403) {
+    error.status = 400
+    error.message = githubError
+  }
+
+  throw error
+}
+
 const handleWebhookError = (error) => {
   const HOOK_EXISTS_MESSAGE = "Hook already exists on this repository"
   const NO_ACCESS_MESSAGE = "Not Found"
   const NO_ADMIN_ACCESS_ERROR_MESSAGE = "You do not have admin access to this repository"
-  let githubError
 
-  try {
-    githubError = JSON.parse(error.message).errors[0].message
-  } catch(e) {
-    try {
-      githubError = JSON.parse(error.message).message
-    } catch(e) {}
-  }
+  const githubError = parseGithubErrorMessage(error)
 
   if (githubError === HOOK_EXISTS_MESSAGE) {
     // noop
@@ -74,6 +109,18 @@ const handleWebhookError = (error) => {
   } else {
     throw error
   }
+}
+
+const parseGithubErrorMessage = (error) => {
+  try {
+    githubError = JSON.parse(error.message).errors[0].message
+  } catch(e) {
+    try {
+      githubError = JSON.parse(error.message).message
+    } catch(e) {}
+  }
+
+  return githubError
 }
 
 module.exports = {
@@ -88,8 +135,42 @@ module.exports = {
     })
   },
 
+  createRepo: (user, owner, repository) => {
+    return githubClient(user.githubAccessToken).then(github => {
+      if (user.username === owner) {
+        return createRepoForUser(github, {
+          name: repository,
+        })
+      } else {
+        return createRepoForOrg(github, {
+          name: repository,
+          org: owner,
+        })
+      }
+    }).catch(err => {
+      handleCreateRepoError(err)
+    })
+  },
+
+  getRepository: (user, owner, repository) => {
+    return githubClient(user.githubAccessToken).then(github => {
+      return getRepository(github, {
+        user: owner,
+        repo: repository,
+      })
+    }).catch(err => {
+      if (err.status === 404) {
+        return null
+      } else {
+        throw err
+      }
+    })
+  },
+
   setWebhook: (site, user) => {
-    return User.findById(user).then(model => {
+    const userId = user.id || user
+
+    return User.findById(userId).then(model => {
       user = model
       return githubClient(user.githubAccessToken)
     }).then(github => {

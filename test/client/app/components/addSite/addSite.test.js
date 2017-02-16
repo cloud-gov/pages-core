@@ -17,7 +17,6 @@ const TemplateSiteList = mock();
 const LinkButton = mock();
 const AlertBanner = mock();
 
-const cloneRepo = spy();
 const addSite = stub();
 
 const user = {
@@ -35,7 +34,7 @@ const Fixture = proxyquire('../../../../../assets/app/components/AddSite', {
   './TemplateSiteList': TemplateSiteList,
   '../linkButton': LinkButton,
   '../alertBanner': AlertBanner,
-  '../../actions/siteActions': { cloneRepo, addSite  }
+  '../../actions/siteActions': { addSite  }
 }).default;
 
 describe('<AddSite/>', () => {
@@ -74,14 +73,14 @@ describe('<AddSite/>', () => {
     expect(wrapper.find('form')).to.have.length(1);
   });
 
-  it('calls the clone repo action when a template is selected', () => {
-    const templateRepo = 'app';
-    const siteName = 'microsite';
+  it('calls the add site action when a template is selected', () => {
+    const owner = '18F';
+    const repository = 'app';
+    const template = 'microsite';
 
-    wrapper.instance().onSubmitTemplate(templateRepo, siteName);
+    wrapper.instance().onSubmitTemplate({ owner, repository, template });
 
-    expect(cloneRepo.calledWith({repository: templateRepo, template: siteName}, templates[siteName])).to.be.true;
-    expect(cloneRepo.called).to.be.true;
+    expect(addSite.calledWith({ owner, repository, template })).to.be.true;
   });
 
   it('delivers the correct props to its children', () => {
@@ -92,7 +91,8 @@ describe('<AddSite/>', () => {
     expect(bannerProps).to.deep.equal({message: propsWithoutError.storeState.error});
     expect(templateListProps).to.deep.equal({
       templates: templates,
-      handleSubmitTemplate: wrapper.instance().onSubmitTemplate
+      handleSubmitTemplate: wrapper.instance().onSubmitTemplate,
+      defaultOwner: propsWithoutError.storeState.user.username,
     });
     expect(formProps.onSubmit).to.equal(wrapper.instance().onSubmit);
   });

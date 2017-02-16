@@ -324,7 +324,7 @@ paths:
         200:
           description: A user object representing the current Federalist user
           schema:
-            $ref: "CurrentUser.json"
+            $ref: "User.json"
         403:
           description: Not authorized
           schema:

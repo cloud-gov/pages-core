@@ -23,8 +23,6 @@ module.exports = {
     }).then(() => {
       return userSerializer.serialize(user)
     }).then(userJSON => {
-      userJSON.githubUserId = user.githubUserId
-      userJSON.githubAccessToken = user.githubAccessToken
       res.json(userJSON)
     }).catch(err => {
       res.error(err)

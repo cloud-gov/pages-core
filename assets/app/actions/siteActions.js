@@ -53,15 +53,6 @@ export default {
       .then(() => site);
   },
 
-  cloneRepo(destination, template) {
-    return github.createRepo(destination, template).then(() => {
-      return federalist.addSite(destination)
-    }).then((site) => {
-      dispatchSiteAddedAction(site);
-      updateRouterToSpecificSiteUri(site.id);
-    }).catch(alertError);
-  },
-
   siteExists(site) {
     return github.getRepo(site)
       .then(() => site)
