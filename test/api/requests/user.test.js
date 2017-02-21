@@ -44,7 +44,7 @@ describe("User API", () => {
         validateAgainstJSONSchema("GET", "/me", 200, response.body)
         userResponseExpectations(response.body, user)
         done()
-      })
+      }).catch(done)
     })
   })
 })

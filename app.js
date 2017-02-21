@@ -1,3 +1,5 @@
+global.config = require("./configg")
+
 // If settings present, start New Relic
 var env = require('./services/environment.js')();
 

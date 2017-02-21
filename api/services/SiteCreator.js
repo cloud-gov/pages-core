@@ -111,7 +111,7 @@ const paramsForNewBuild = ({ user, site, template }) => ({
 
 const paramsForNewBuildSource = (templateName) => {
   if (templateName) {
-    const template = sails.config.templates[templateName]
+    const template = config.templates[templateName]
     if (!template) {
       throw new Error(`No such template: ${templateName}`)
     }

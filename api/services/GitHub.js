@@ -180,8 +180,8 @@ module.exports = {
         name: 'web',
         active: true,
         config: {
-          url: sails.config.webhook.endpoint,
-          secret: sails.config.webhook.secret,
+          url: config.webhook.endpoint,
+          secret: config.webhook.secret,
           content_type: 'json'
         }
       })
@@ -191,7 +191,7 @@ module.exports = {
   },
 
   validateUser: (accessToken) => {
-    var approvedOrgs = sails.config.passport.github.organizations || []
+    var approvedOrgs = config.passport.github.organizations || []
 
     return githubClient(accessToken).then(github => {
       return getOrganizations(github)

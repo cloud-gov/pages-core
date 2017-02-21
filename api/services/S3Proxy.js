@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk')
 
-const s3Config = sails.config.s3
+const s3Config = config.s3
 const S3 = new AWS.S3({
   accessKeyId: s3Config.accessKeyId,
   secretAccessKey: s3Config.secretAccessKey,

@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 
-const postgresConfig = sails.config.connections.postgres
+const postgresConfig = config.postgres
 const database = postgresConfig.database
 const username = postgresConfig.user
 const password = postgresConfig.password
