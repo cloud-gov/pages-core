@@ -30,7 +30,7 @@ module.exports = {
 
 const signWebhookRequest = (request) => {
   return new Promise((resolve, reject) => {
-    const webhookSecret = sails.config.webhook.secret
+    const webhookSecret = config.webhook.secret
     const requestBody = JSON.stringify(request.body)
 
     const signature = request.headers["x-hub-signature"]

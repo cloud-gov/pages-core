@@ -170,8 +170,8 @@ describe("Authentication request", () => {
     it("should respond with a 401 if the authorization code is invalid", done => {
       nock("https://github.com")
         .post("/login/oauth/access_token", {
-          client_id: sails.config.passport.github.options.clientID,
-          client_secret: sails.config.passport.github.options.clientSecret,
+          client_id: config.passport.github.options.clientID,
+          client_secret: config.passport.github.options.clientSecret,
           code: "invalid-code"
         })
         .reply(401)

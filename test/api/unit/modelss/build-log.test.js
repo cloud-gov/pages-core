@@ -12,7 +12,7 @@ describe("BuildLog model", () => {
         return BuildLog.create({
           build: build.id,
           source: "publish.sh",
-          output: `${sails.config.s3.accessKeyId} ${sails.config.s3.secretAccessKey} ${sails.config.build.token} ${user.githubAccessToken}`
+          output: `${config.s3.accessKeyId} ${config.s3.secretAccessKey} ${config.build.token} ${user.githubAccessToken}`
         })
       }).then(buildLog => {
         expect(buildLog.output).to.equal(Array(4).fill("[FILTERED]").join(" "))

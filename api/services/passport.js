@@ -27,7 +27,7 @@ var githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
 }
 
 passport.use(new GitHubStrategy(
-  sails.config.passport.github.options,
+  config.passport.github.options,
   githubVerifyCallback
 ))
 

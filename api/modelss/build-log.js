@@ -16,9 +16,9 @@ const sanitizeBuildSecrets = (buildLog) => {
     include: [ models.User ],
   }).then(build => {
     secrets = [
-      sails.config.s3.accessKeyId,
-      sails.config.s3.secretAccessKey,
-      sails.config.build.token,
+      config.s3.accessKeyId,
+      config.s3.secretAccessKey,
+      config.build.token,
       build ? build.User.githubAccessToken : undefined,
     ]
     secrets.forEach(secret => {

@@ -1,0 +1,3 @@
+module.exports = {
+  database: "federalist",
+}

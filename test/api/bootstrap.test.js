@@ -1,3 +1,5 @@
+global.config = require("../../configg")
+
 const AWS = require('aws-sdk-mock')
 const Sails = require('sails')
 

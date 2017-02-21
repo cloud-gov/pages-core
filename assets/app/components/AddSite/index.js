@@ -6,7 +6,7 @@ import AlertBanner from '../alertBanner';
 
 import siteActions from '../../actions/siteActions';
 
-import { templates } from '../../../../config/templates';
+import templates from '../../../../configg/templates';
 
 const propTypes = {
   storeState: React.PropTypes.shape({

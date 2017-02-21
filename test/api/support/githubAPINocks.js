@@ -12,8 +12,8 @@ const accessToken = ({ authorizationCode, accessToken, scope } = {}) => {
 
   return nock("https://github.com")
     .post("/login/oauth/access_token", {
-      client_id: sails.config.passport.github.options.clientID,
-      client_secret: sails.config.passport.github.options.clientSecret,
+      client_id: config.passport.github.options.clientID,
+      client_secret: config.passport.github.options.clientSecret,
       code: authorizationCode
     })
     .reply(200, {
@@ -159,8 +159,8 @@ const webhook = ({ accessToken, owner, repo, response } = {}) => {
       name: 'web',
       active: true,
       config: {
-        url: sails.config.webhook.endpoint,
-        secret: sails.config.webhook.secret,
+        url: config.webhook.endpoint,
+        secret: config.webhook.secret,
         content_type: 'json',
       },
     })

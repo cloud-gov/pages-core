@@ -8,7 +8,7 @@ describe("SQS", () => {
       SQS.sqsClient.sendMessage = (params, callback) => {
         SQS.sqsClient.sendMessage = oldSendMessage
         expect(params).to.have.property("MessageBody")
-        expect(params).to.have.property("QueueUrl", sails.config.sqs.queue)
+        expect(params).to.have.property("QueueUrl", config.sqs.queue)
         done()
       }
       SQS.sendBuildMessage({
@@ -44,10 +44,10 @@ describe("SQS", () => {
         return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
         const message = SQS.messageBodyForBuild(build)
-        expect(messageEnv(message, "AWS_ACCESS_KEY_ID")).to.equal(sails.config.s3.accessKeyId)
-        expect(messageEnv(message, "AWS_SECRET_ACCESS_KEY")).to.equal(sails.config.s3.secretAccessKey)
-        expect(messageEnv(message, "AWS_DEFAULT_REGION")).to.equal(sails.config.s3.region)
-        expect(messageEnv(message, "BUCKET")).to.equal(sails.config.s3.bucket)
+        expect(messageEnv(message, "AWS_ACCESS_KEY_ID")).to.equal(config.s3.accessKeyId)
+        expect(messageEnv(message, "AWS_SECRET_ACCESS_KEY")).to.equal(config.s3.secretAccessKey)
+        expect(messageEnv(message, "AWS_DEFAULT_REGION")).to.equal(config.s3.region)
+        expect(messageEnv(message, "BUCKET")).to.equal(config.s3.bucket)
         done()
       }).catch(done)
     })
@@ -153,7 +153,7 @@ describe("SQS", () => {
         return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
         const message = SQS.messageBodyForBuild(build)
-        expect(messageEnv(message, "CACHE_CONTROL")).to.equal(sails.config.build.cacheControl)
+        expect(messageEnv(message, "CACHE_CONTROL")).to.equal(config.build.cacheControl)
         done()
       }).catch(done)
     })

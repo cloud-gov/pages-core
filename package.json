@@ -12,6 +12,7 @@
     "connect-redis": "3.0.2",
     "core-js": "^2.4.1",
     "db-migrate": "^0.9.17",
+    "deep-extend": "^0.4.1",
     "github": "^0.2.4",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",

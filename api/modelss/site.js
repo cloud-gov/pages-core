@@ -26,7 +26,7 @@ const toJSON = function() {
   object.createdAt = object.createdAt.toISOString()
   object.updatedAt = object.updatedAt.toISOString()
 
-  const s3Config = sails.config.s3
+  const s3Config = config.s3
   object.siteRoot = `http://${s3Config.bucket}.s3-website-${s3Config.region}.amazonaws.com`
   object.viewLink = object.domain || [object.siteRoot, 'site', object.owner, object.repository].join('/')
 
