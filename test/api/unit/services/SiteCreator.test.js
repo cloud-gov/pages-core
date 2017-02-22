@@ -3,6 +3,7 @@ const expect = require("chai").expect
 const nock = require("nock")
 const factory = require("../../support/factory")
 const githubAPINocks = require("../../support/githubAPINocks")
+const SiteCreator = require("../../../../api/services/SiteCreator")
 
 describe("SiteCreator", () => {
   describe(".createSite({ siteParams, user })", () => {

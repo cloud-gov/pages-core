@@ -1,6 +1,6 @@
-global.config = require("./configg")
+global.config = require("./config")
 
-Object.assign(global, require("./api/modelss"))
+Object.assign(global, require("./api/models"))
 global.sequelize = Build.sequelize
 
 global.Promise = require("bluebird")
@@ -22,13 +22,14 @@ const responses = require("./api/responses")
 
 const app = express()
 
-const sessionConfig = Object.assign({}, config.session)
 if (config.redis) {
-  sessionConfig.store = new RedisStore(config.redis)
+  config.session.store = new RedisStore(config.redis)
+} else {
+  config.session.store = new session.MemoryStore()
 }
 
-app.use(session(sessionConfig))
-app.use(morgan("combined"))
+app.use(session(config.session))
+app.use(morgan("dev"))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(methodOverride())

@@ -9,14 +9,14 @@ var session = require("../support/session")
 var sessionCookieFromResponse = (response) => {
   var header = response.headers["set-cookie"][0]
   var parsedHeader = cookie.parse(header)
-  var session = parsedHeader["sails.sid"].replace("s:", "")
+  var session = parsedHeader["federalist.sid"].replace("s:", "")
   return session.split(".")[0]
 }
 
 var sessionForCookie = (cookie) => {
-  var sessionID = cookie.replace("sails.sid=s%3A", "").split(".")[0]
+  var sessionID = cookie.replace("federalist.sid=s%3A", "").split(".")[0]
   return new Promise((resolve, reject) => {
-    sails.config.session.store.get(sessionID, (err, sessionBody) => {
+    config.session.store.get(sessionID, (err, sessionBody) => {
       if (err) {
         reject(err)
       } else {
@@ -89,6 +89,7 @@ describe("Authentication request", () => {
             .get("/auth/github/callback?code=auth-code-123abc")
             .expect(302)
         }).then(response => {
+          console.log(response.headers)
           var cookie = sessionCookieFromResponse(response)
           return sessionForCookie(cookie)
         }).then(session => {

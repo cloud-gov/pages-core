@@ -1,4 +1,4 @@
-const config = require("./configg")
+const config = require("./config")
 
 const postgres = config.postgres
 

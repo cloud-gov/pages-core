@@ -1,6 +1,6 @@
-var request = require('request');
+const passport = require("../services/passport")
 
-var AuthController = {
+const AuthController = {
   logout: function (req, res) {
     passport.logout(req, res)
   },
