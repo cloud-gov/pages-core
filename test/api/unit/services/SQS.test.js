@@ -1,5 +1,7 @@
 const expect = require("chai").expect
 const factory = require("../../support/factory")
+const GitHub = require("../../../../api/services/SQS")
+const SQS = require("../../../../api/services/SQS")
 
 describe("SQS", () => {
   describe(".sendBuildMessage(build)", () => {

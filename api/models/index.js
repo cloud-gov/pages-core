@@ -9,7 +9,7 @@ const sequelize = new Sequelize(database, username, password, {
   dialect: "postgres",
   host: postgresConfig.host,
   port: postgresConfig.port,
-  logging: sails.log.info,
+  logging: () => {} // TODO DO NOT LET ME MERGE THIS UNTIL I WIRE THIS UP TO A PROPER LOGGER sails.log.info,
 })
 
 const Build = sequelize.import(__dirname + "/build")

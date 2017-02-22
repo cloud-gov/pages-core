@@ -1,5 +1,6 @@
 const crypto = require("crypto")
 const URLSafeBase64 = require('urlsafe-base64')
+const SQS = require("../services/SQS")
 
 const afterCreate = (build) => {
   const { Site, User, Build } = build.sequelize.models

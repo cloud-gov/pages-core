@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { expect } from 'chai';
 import { stub, spy } from 'sinon';
-import templates from '../../../../../configg/templates';
+import templates from '../../../../../config/templates';
 import proxyquire from 'proxyquire';
 
 proxyquire.noCallThru();

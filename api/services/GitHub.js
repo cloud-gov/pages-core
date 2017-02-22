@@ -196,12 +196,11 @@ module.exports = {
     return githubClient(accessToken).then(github => {
       return getOrganizations(github)
     }).then(organizations => {
-      var usersApprovedOrgs = _(organizations)
-        .pluck('id')
-        .intersection(approvedOrgs)
-        .value()
+      const approvedOrg = organizations.find(organization => {
+        return approvedOrgs.indexOf(organization.id) >= 0
+      })
 
-      if (usersApprovedOrgs.length <= 0) {
+      if (!approvedOrg) {
         throw new Error("Unauthorized")
       }
     })

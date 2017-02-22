@@ -1,3 +1,5 @@
+const GitHub = require("./GitHub")
+
 const createSite = ({ user, siteParams }) => {
   const template = siteParams.template
   siteParams = paramsForNewSite(siteParams)

@@ -1,4 +1,5 @@
 const expect = require("chai").expect
+const SQS = require("../../../../api/services/SQS")
 
 const factory = require("../../support/factory")
 
