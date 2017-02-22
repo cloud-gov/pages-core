@@ -16,14 +16,14 @@ const session = (user) => {
       },
       authenticated: true
     }
-    sails.config.session.store.set(sessionKey, sessionBody)
+    config.session.store.set(sessionKey, sessionBody)
 
     var signedSessionKey = sessionKey + "." + crypto
-      .createHmac('sha256', sails.config.session.secret)
+      .createHmac('sha256', config.session.secret)
       .update(sessionKey)
       .digest('base64')
       .replace(/\=+$/, '')
-    return `${sails.config.session.key}=s%3A${signedSessionKey}`
+    return `${config.session.key}=s%3A${signedSessionKey}`
   })
 }
 

@@ -1,7 +1,5 @@
-global.config = require("../../configg")
-
 const AWS = require('aws-sdk-mock')
-const Sails = require('sails')
+const app = require("../../app")
 
 const _cleanDatabase = () => {
   const models = sequelize.models
@@ -16,19 +14,18 @@ before(function(done) {
     callback(null, {})
   })
 
-  Sails.lift((err, server) => {
-    sails = server;
-    if (err) return done(err);
+  app.listen(1337, (err) => {
+    if (err) return done(err)
 
     _cleanDatabase().then(() => {
-      done(null, sails);
+      done(null, app);
     }).catch(err => {
       done(err)
     })
-  });
+  })
 });
 
 after((done) => {
-  sails.lower(done);
   AWS.restore('SQS')
+  done()
 });

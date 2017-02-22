@@ -75,7 +75,7 @@ SQS.sendBuildMessage = build => {
   }
   SQS.sqsClient.sendMessage(params, function(err, data) {
     if (err) {
-      sails.log.error('There was an error, adding the job to SQS: ', err);
+      console.error('There was an error, adding the job to SQS: ', err);
       build.completeJob(err);
     }
   })
