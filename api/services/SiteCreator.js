@@ -10,14 +10,14 @@ const createSite = ({ user, siteParams }) => {
 }
 
 checkExistingGithubRepository = ({ user, owner, repository }) => {
-  return GitHub.getRepository(user, owner, repository).then(repository => {
-    if (!repository) {
+  return GitHub.getRepository(user, owner, repository).then(repo => {
+    if (!repo) {
       throw {
         message: `The repository ${owner}/${repository} does not exist.`,
         status: 400,
       }
     }
-    if (!repository.permissions.push) {
+    if (!repo.permissions.push) {
       throw {
         message: "You do not have write access to this repository",
         status: 400,
