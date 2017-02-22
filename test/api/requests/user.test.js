@@ -19,7 +19,7 @@ describe("User API", () => {
 
   describe("GET /v0/me", () => {
     it("should require authentication", done => {
-      factory(User).then(user => {
+      factory.user().then(user => {
         return request("http://localhost:1337")
           .get("/v0/me")
           .expect(403)
@@ -29,10 +29,10 @@ describe("User API", () => {
       })
     })
 
-    it("should render the current user with their GitHub user data", done => {
+    it("should render the current user", done => {
       var user
 
-      factory(User).then(model => {
+      factory.user().then(model => {
         user = model
         return session(user)
       }).then(cookie => {
@@ -42,11 +42,7 @@ describe("User API", () => {
           .expect(200)
       }).then(response => {
         validateAgainstJSONSchema("GET", "/me", 200, response.body)
-
         userResponseExpectations(response.body, user)
-        expect(response.body).to.have.property("githubAccessToken", user.githubAccessToken)
-        expect(response.body).to.have.property("githubUserId", user.githubUserId)
-
         done()
       })
     })

@@ -1,6 +1,6 @@
 const authorize = (user, site) => {
-  return User.findOne(user.id).populate("sites").then(user => {
-    for (candidateSite of user.sites) {
+  return User.findById(user.id, { include: [ Site ] }).then(user => {
+    for (candidateSite of user.Sites) {
       if (site.id === candidateSite.id) {
         return Promise.resolve()
       }

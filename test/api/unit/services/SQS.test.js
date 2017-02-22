@@ -1,10 +1,10 @@
-var expect = require("chai").expect
-var factory = require("../../support/factory")
+const expect = require("chai").expect
+const factory = require("../../support/factory")
 
 describe("SQS", () => {
   describe(".sendBuildMessage(build)", () => {
     it("should send a formatted build message", done => {
-      var oldSendMessage = SQS.sqsClient.sendMessage
+      const oldSendMessage = SQS.sqsClient.sendMessage
       SQS.sqsClient.sendMessage = (params, callback) => {
         SQS.sqsClient.sendMessage = oldSendMessage
         expect(params).to.have.property("MessageBody")
@@ -14,13 +14,13 @@ describe("SQS", () => {
       SQS.sendBuildMessage({
         branch: "master",
         state: "processing",
-        site: {
+        Site: {
           owner: "owner",
-          repository: "repo",
+          repository: "formatted-message-repo",
           engine: "jekyll",
           defaultBranch: "master"
         },
-        user: {
+        User: {
           passport: {
             tokens: { accessToken: "123abc" }
           }
@@ -30,8 +30,8 @@ describe("SQS", () => {
   })
 
   describe(".messageBodyForBuild(build)", () => {
-    var messageEnv = (message, name) => {
-      var element = message.environment.find(element => {
+    const messageEnv = (message, name) => {
+      const element = message.environment.find(element => {
         return element.name === name
       })
       if (element) {
@@ -40,212 +40,212 @@ describe("SQS", () => {
     }
 
     it("should set the correct AWS credentials in the message", done => {
-      factory(Build).then(build => {
-        return Build.findOne({ id: build.id }).populate("site")
+      factory.build().then(build => {
+        return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
-        var message = SQS.messageBodyForBuild(build)
+        const message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "AWS_ACCESS_KEY_ID")).to.equal(sails.config.s3.accessKeyId)
         expect(messageEnv(message, "AWS_SECRET_ACCESS_KEY")).to.equal(sails.config.s3.secretAccessKey)
         expect(messageEnv(message, "AWS_DEFAULT_REGION")).to.equal(sails.config.s3.region)
         expect(messageEnv(message, "BUCKET")).to.equal(sails.config.s3.bucket)
         done()
-      })
+      }).catch(done)
     })
 
     it("should set STATUS_CALLBACK in the message", done => {
-      factory(Build).then(build => {
-        return Build.findOne({ id: build.id }).populate("site")
+      factory.build().then(build => {
+        return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
-        var message = SQS.messageBodyForBuild(build)
+        const message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "STATUS_CALLBACK")).to.equal("http://localhost:1337/v0/build/" + build.id + "/status/" + build.token)
         done()
-      })
+      }).catch(done)
     })
 
     it("should set LOG_CALLBACK in the message", done => {
-      factory(Build).then(build => {
-        return Build.findOne({ id: build.id }).populate("site")
+      factory.build().then(build => {
+        return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
-        var message = SQS.messageBodyForBuild(build)
+        const message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "LOG_CALLBACK")).to.equal("http://localhost:1337/v0/build/" + build.id + "/log/" + build.token)
         done()
-      })
+      }).catch(done)
     })
 
     context("building a site's default branch", () => {
       it("should set an empty string for BASEURL in the message for a site with a custom domain", done => {
-        factory(Site, { domain: "www.example.com", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
-          return factory(Build, { site: site, branch: "master" })
+        factory.site({ domain: "www.example.com", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
+          return factory.build({ site: site, branch: "master" })
         }).then(build => {
-          return Build.findOne({ id: build.id }).populate("site")
+          return Build.findById(build.id, { include: [Site, User] })
         }).then(build => {
-          var message = SQS.messageBodyForBuild(build)
+          const message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "BASEURL")).to.equal("")
           done()
-        })
+        }).catch(done)
       })
 
       it("it should set BASEURL in the message for a site without a custom domain", done => {
-        factory(Site, { domain: "", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
-          return factory(Build, { site: site, branch: "master" })
+        factory.site({ domain: "", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
+          return factory.build({ site: site, branch: "master" })
         }).then(build => {
-          return Build.findOne({ id: build.id }).populate("site")
+          return Build.findById(build.id, { include: [Site, User] })
         }).then(build => {
-          var message = SQS.messageBodyForBuild(build)
+          const message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "BASEURL")).to.equal("/site/owner/repo")
           done()
-        })
+        }).catch(done)
       })
 
       it("should set SITE_PREFIX in the message to 'site/:owner/:repo/'", done => {
-        factory(Site, { domain: "", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
-          return factory(Build, { site: site, branch: "master" })
+        factory.site({ domain: "", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
+          return factory.build({ site: site, branch: "master" })
         }).then(build => {
-          return Build.findOne({ id: build.id }).populate("site")
+          return Build.findById(build.id, { include: [Site, User] })
         }).then(build => {
-          var message = SQS.messageBodyForBuild(build)
+          const message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "SITE_PREFIX")).to.equal("site/owner/repo")
           done()
-        })
+        }).catch(done)
       })
     })
 
     context("building a site's preview branch", () => {
       it("should set BASEURL in the message for a site with a custom domain", done => {
-        factory(Site, { domain: "www.example.com", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
-          return factory(Build, { site: site, branch: "branch" })
+        factory.site({ domain: "www.example.com", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
+          return factory.build({ site: site, branch: "branch" })
         }).then(build => {
-          return Build.findOne({ id: build.id }).populate("site")
+          return Build.findById(build.id, { include: [Site, User] })
         }).then(build => {
-          var message = SQS.messageBodyForBuild(build)
+          const message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "BASEURL")).to.equal("/preview/owner/repo/branch")
           done()
-        })
+        }).catch(done)
       })
 
       it("should set BASEURL in the message for a site without a custom domain", done => {
-        factory(Site, { domain: "", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
-          return factory(Build, { site: site, branch: "branch" })
+        factory.site({ domain: "", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
+          return factory.build({ site: site, branch: "branch" })
         }).then(build => {
-          return Build.findOne({ id: build.id }).populate("site")
+          return Build.findById(build.id, { include: [Site, User] })
         }).then(build => {
-          var message = SQS.messageBodyForBuild(build)
+          const message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "BASEURL")).to.equal("/preview/owner/repo/branch")
           done()
-        })
+        }).catch(done)
       })
 
       it("should set SITE_PREFIX in the message to 'preview/:owner/:repo/:branch'", done => {
-        factory(Site, { domain: "", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
-          return factory(Build, { site: site, branch: "branch" })
+        factory.site({ domain: "", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
+          return factory.build({ site: site, branch: "branch" })
         }).then(build => {
-          return Build.findOne({ id: build.id }).populate("site")
+          return Build.findById(build.id, { include: [Site, User] })
         }).then(build => {
-          var message = SQS.messageBodyForBuild(build)
+          const message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "SITE_PREFIX")).to.equal("preview/owner/repo/branch")
           done()
-        })
+        }).catch(done)
       })
     })
 
     it("should set CACHE_CONTROL in the message", done => {
-      factory(Build).then(build => {
-        return Build.findOne({ id: build.id }).populate("site")
+      factory.build().then(build => {
+        return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
-        var message = SQS.messageBodyForBuild(build)
+        const message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "CACHE_CONTROL")).to.equal(sails.config.build.cacheControl)
         done()
-      })
+      }).catch(done)
     })
 
     it("should set BRANCH in the message to the name build's branch", done => {
-      factory(Site, { domain: "", defaultBranch: "master" }).then(site => {
-        return factory(Build, { site: site, branch: "branch" })
+      factory.site({ domain: "", defaultBranch: "master" }).then(site => {
+        return factory.build({ site: site, branch: "branch" })
       }).then(build => {
-        return Build.findOne({ id: build.id }).populate("site")
+        return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
-        var message = SQS.messageBodyForBuild(build)
+        const message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "BRANCH")).to.equal("branch")
         done()
-      })
+      }).catch(done)
     })
 
     it("should set CONFIG in the message to the YAML config for the site", done => {
-      factory(Site, { config: "plugins_dir: _plugins" }).then(site => {
-        return factory(Build, { site: site })
+      factory.site({ config: "plugins_dir: _plugins" }).then(site => {
+        return factory.build({ site: site })
       }).then(build => {
-        return Build.findOne({ id: build.id }).populate("site")
+        return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
-        var message = SQS.messageBodyForBuild(build)
+        const message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "CONFIG")).to.equal("plugins_dir: _plugins")
         done()
-      })
+      }).catch(done)
     })
 
     it("should set REPOSITORY in the message to the site's repo name", done => {
-      factory(Site, { repository: "site-repo" }).then(site => {
-        return factory(Build, { site: site })
+      factory.site({ repository: "site-repo" }).then(site => {
+        return factory.build({ site: site })
       }).then(build => {
-        return Build.findOne({ id: build.id }).populate("site")
+        return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
-        var message = SQS.messageBodyForBuild(build)
+        const message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "REPOSITORY")).to.equal("site-repo")
         done()
-      })
+      }).catch(done)
     })
 
     it("should set OWNER in the message to the site's owner", done => {
-      factory(Site, { owner: "site-owner" }).then(site => {
-        return factory(Build, { site: site })
+      factory.site({ owner: "site-owner" }).then(site => {
+        return factory.build({ site: site })
       }).then(build => {
-        return Build.findOne({ id: build.id }).populate("site")
+        return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
-        var message = SQS.messageBodyForBuild(build)
+        const message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "OWNER")).to.equal("site-owner")
         done()
-      })
+      }).catch(done)
     })
 
     it("should set GITHUB_TOKEN in the message to the user's GitHub access token", done => {
-      var user
+      let user
 
-      factory(User, { githubAccessToken: "fake-github-token-123" }).then(model => {
+      factory.user({ githubAccessToken: "fake-github-token-123" }).then(model => {
         user = model
-        return factory(Site, { users: [user] })
+        return factory.site({ users: [user] })
       }).then(site => {
-        return factory(Build, { user: user, site: site })
+        return factory.build({ user: user, site: site })
       }).then(build => {
-        return Build.findOne({ id: build.id }).populate("site").populate("user")
+        return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
-        var message = SQS.messageBodyForBuild(build)
+        const message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "GITHUB_TOKEN")).to.equal("fake-github-token-123")
         done()
-      })
+      }).catch(done)
     })
 
     it("should set GENERATOR in the message to the site's build engine (e.g. 'jekyll')", done => {
-      factory(Site, { engine: "hugo" }).then(site => {
-        return factory(Build, { site: site })
+      factory.site({ engine: "hugo" }).then(site => {
+        return factory.build({ site: site })
       }).then(build => {
-        return Build.findOne({ id: build.id }).populate("site")
+        return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
-        var message = SQS.messageBodyForBuild(build)
+        const message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "GENERATOR")).to.equal("hugo")
         done()
-      })
+      }).catch(done)
     })
 
     it("should set SOURCE_REPO and SOURCE_OWNER in the repository if the build has a source owner / repo", done => {
-      factory(Site, { engine: "hugo" }).then(site => {
-        return factory(Build, { source: { repository: "template", owner: "18f" } })
+      factory.site({ engine: "hugo" }).then(site => {
+        return factory.build({ source: { repository: "template", owner: "18f" } })
       }).then(build => {
-        return Build.findOne({ id: build.id }).populate("site")
+        return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
-        var message = SQS.messageBodyForBuild(build)
+        const message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "SOURCE_REPO")).to.equal("template")
         expect(messageEnv(message, "SOURCE_OWNER")).to.equal("18f")
         done()
-      })
+      }).catch(done)
     })
   })
 })

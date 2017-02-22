@@ -47,6 +47,7 @@ class TemplateList extends React.Component {
                 active={this.state.activeChildId}
                 handleChooseActive={this.handleChooseActive}
                 handleSubmit={this.props.handleSubmitTemplate}
+                defaultOwner={this.props.defaultOwner}
                 {...template} />
             );
           })}

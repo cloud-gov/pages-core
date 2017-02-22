@@ -1,9 +1,13 @@
 import React from 'react';
-import { sideNavPaths } from '../../../constants';
 import SideNavItem from './sideNavItem';
 
 const propTypes = {
   siteId: React.PropTypes.string
+};
+
+export const sideNavPaths = {
+  SETTINGS: 'settings',
+  BUILDS: 'builds'
 };
 
 class SideNav extends React.Component {

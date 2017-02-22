@@ -23,6 +23,70 @@ const accessToken = ({ authorizationCode, accessToken, scope } = {}) => {
     })
 }
 
+const createRepoForOrg = ({ accessToken, org, repo, response } = {}) => {
+  let createRepoNock = nock("https://api.github.com")
+
+  if (org && repo) {
+    createRepoNock = createRepoNock.post(`/orgs/${org}/repos`, {
+      name: repo,
+    })
+  } else {
+    createRepoNock = createRepoNock.post(/\/orgs\/.*\/repos/)
+  }
+
+  if (accessToken) {
+    createRepoNock = createRepoNock.query({ access_token: accessToken })
+  } else {
+    createRepoNock = createRepoNock.query(true)
+  }
+
+  const typicalResponse = {
+    owner: { login: org },
+    name: repo,
+  }
+
+  response = response || 201
+  if (typeof response === "number") {
+    response = [response, typicalResponse]
+  } else if (response[1] === undefined) {
+    response[1] = typicalResponse
+  }
+
+  return createRepoNock.reply(...response)
+}
+
+const createRepoForUser = ({ accessToken, repo, response } = {}) => {
+  let createRepoNock = nock("https://api.github.com")
+
+  if (repo) {
+    createRepoNock = createRepoNock.post("/user/repos", {
+      name: repo,
+    })
+  } else {
+    createRepoNock = createRepoNock.post("/user/repos")
+  }
+
+  if (accessToken) {
+    createRepoNock = createRepoNock.query({ access_token: accessToken })
+  } else {
+    createRepoNock = createRepoNock.query(true)
+  }
+
+  const typicalResponse = {
+    owner: { login: "your-name-here" },
+    name: repo,
+  }
+
+  response = response || 201
+  if (typeof response === "number") {
+    response = [response, typicalResponse]
+  } else if (response[1] === undefined) {
+    response[1] = typicalResponse
+  }
+
+  return createRepoNock.reply(...response)
+}
+
 const githubAuth = (username, organizations) => {
   accessToken()
   user({ username })
@@ -120,6 +184,8 @@ const webhook = ({ accessToken, owner, repo, response } = {}) => {
 
 module.exports = {
   accessToken,
+  createRepoForOrg,
+  createRepoForUser,
   githubAuth,
   repo,
   user,

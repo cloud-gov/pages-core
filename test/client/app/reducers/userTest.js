@@ -29,7 +29,6 @@ describe("userReducer", () => {
       id: 12,
       username: "bob",
       email: "no-email@nothingtoseeheresopleasego.org",
-      githubAccessToken: "access-token-123abc",
       createdAt: "Monday morning.",
       updatedAt: "Thursday, late in the afternoon."
     };

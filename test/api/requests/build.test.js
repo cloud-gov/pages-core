@@ -14,14 +14,14 @@ describe("Build API", () => {
     }
     expect(build.error == response.error).to.be.ok
     expect(build.branch == response.branch).to.be.ok
-    expect(response.site.id).to.equal(build.site.id || build.site)
-    expect(response.user.id).to.equal(build.user.id || build.user)
+    expect(response.site.id).to.equal(build.site || build.Site.id)
+    expect(response.user.id).to.equal(build.user || build.User.id)
     expect(response.buildLogs).to.be.undefined
   }
 
   describe("POST /v0/build", () => {
     it("should require authentication", done => {
-      factory(Site).then(site => {
+      factory.site().then(site => {
         return request("http://localhost:1337")
           .post(`/v0/build/`)
           .send({
@@ -32,14 +32,14 @@ describe("Build API", () => {
       }).then(response => {
         validateAgainstJSONSchema("POST", "/build", 403, response.body)
         done()
-      })
+      }).catch(done)
     })
 
     it("should create a build with the given site and branch for the current user", done => {
       let site, user
 
-      const userPromise = factory(User)
-      const sitePromise = factory(Site, { users: Promise.all([userPromise]) })
+      const userPromise = factory.user()
+      const sitePromise = factory.site({ users: Promise.all([userPromise]) })
       const cookiePromise = session(userPromise)
 
       Promise.props({
@@ -61,19 +61,21 @@ describe("Build API", () => {
       }).then(response => {
         validateAgainstJSONSchema("POST", "/build", 200, response.body)
         return Build.findOne({
-          site: site.id,
-          user: user.id,
-          branch: "my-branch",
+          where: {
+            site: site.id,
+            user: user.id,
+            branch: "my-branch",
+          }
         })
       }).then(build => {
         expect(build).not.to.be.undefined
         done()
-      })
+      }).catch(done)
     })
 
     it("should render a 403 if the user is not associated with the given site", done => {
       Promise.props({
-        site: factory(Site),
+        site: factory.site(),
         cookie: session(),
       }).then(({ site, cookie }) => {
         return request("http://localhost:1337")
@@ -87,20 +89,20 @@ describe("Build API", () => {
       }).then(response => {
         validateAgainstJSONSchema("POST", "/build", 403, response.body)
         done()
-      })
+      }).catch(done)
     })
   })
 
   describe("GET /v0/build/:id", () => {
     it("should require authentication", done => {
-      factory(Build).then(build => {
+      factory.build().then(build => {
         return request("http://localhost:1337")
           .get(`/v0/build/${build.id}`)
           .expect(403)
       }).then(response => {
         validateAgainstJSONSchema("GET", "/build/{id}", 403, response.body)
         done()
-      })
+      }).catch(done)
     })
 
     it("should return a JSON representation of the build", done => {
@@ -112,10 +114,10 @@ describe("Build API", () => {
         completedAt: new Date()
       }
 
-      factory(Build, buildAttributes).then(model => {
+      factory.build(buildAttributes).then(model => {
         build = model
         return session(
-          User.findOne({ id: build.user })
+          User.findById(build.user)
         )
       }).then(cookie => {
         return request("http://localhost:1337")
@@ -126,15 +128,15 @@ describe("Build API", () => {
         buildResponseExpectations(response.body, build)
         validateAgainstJSONSchema("GET", "/build/{id}", 200, response.body)
         done()
-      })
+      }).catch(done)
     })
 
     it("should respond with a 403 if the current user is not associated with the build", done => {
       var build
 
-      factory(Build).then(model => {
+      factory.build().then(model => {
         build = model
-        return session(factory(User))
+        return session(factory.user())
       }).then(cookie => {
         return request("http://localhost:1337")
           .get(`/v0/build/${build.id}`)
@@ -143,29 +145,29 @@ describe("Build API", () => {
       }).then(response => {
         validateAgainstJSONSchema("GET", "/build/{id}", 403, response.body)
         done()
-      })
+      }).catch(done)
     })
   })
 
   describe("GET /v0/build", () => {
     it("should require authentication", done => {
-      factory(Build).then(build => {
+      factory.build().then(build => {
         return request("http://localhost:1337")
           .get("/v0/build")
           .expect(403)
       }).then(response => {
         validateAgainstJSONSchema("GET", "/build", 403, response.body)
         done()
-      })
+      }).catch(done)
     })
 
     it("should list builds for sites associated with the current user", done => {
       var user, builds
 
-      factory(User).then(model => {
+      factory.user().then(model => {
         user = model
         var buildPromises = Array(3).fill(0).map(() => {
-          return factory(Build, { user: user.id })
+          return factory.build({ user: user.id })
         })
         return Promise.all(buildPromises)
       }).then(models => {
@@ -188,16 +190,16 @@ describe("Build API", () => {
         })
         validateAgainstJSONSchema("GET", "/build", 200, response.body)
         done()
-      })
+      }).catch(done)
     })
 
     it("should not show a user any builds not associated with their sites", done => {
       var user
 
-      factory(User).then(model => {
+      factory.user().then(model => {
         user = model
         var buildPromises = Array(3).fill(0).map(() => {
-          return factory(Build)
+          return factory.build
         })
         return Promise.all(buildPromises)
       }).then(builds => {
@@ -212,7 +214,7 @@ describe("Build API", () => {
         expect(response.body).to.be.a("array")
         expect(response.body).to.be.empty
         done()
-      })
+      }).catch(done)
     })
   })
 
@@ -236,7 +238,7 @@ describe("Build API", () => {
     it("should mark a build successful if status is 0 and message is blank", done => {
       var build
 
-      factory(Build).then(model => {
+      factory.build().then(model => {
         build = model
       }).then(() => {
         return postBuildStatus({
@@ -245,19 +247,19 @@ describe("Build API", () => {
           message: ""
         }).expect(200)
       }).then(response => {
-        return Build.findOne({ id: build.id })
+        return Build.findById(build.id)
       }).then(build => {
         expect(build).to.not.be.undefined
         expect(build.state).to.equal("success")
         expect(build.error).to.equal("")
         done()
-      })
+      }).catch(done)
     })
 
     it("should mark a build errored if the status is non-zero and should set the message", done => {
       var build
 
-      factory(Build).then(model => {
+      factory.build().then(model => {
         build = model
       }).then(() => {
         return postBuildStatus({
@@ -266,13 +268,13 @@ describe("Build API", () => {
           message: "The build failed for a reason"
         }).expect(200)
       }).then(response => {
-        return Build.findOne({ id: build.id })
+        return Build.findById(build.id)
       }).then(build => {
         expect(build).to.not.be.undefined
         expect(build.state).to.equal("error")
         expect(build.error).to.equal("The build failed for a reason")
         done()
-      })
+      }).catch(done)
     })
 
     it("should respond with a 404 for a build that does not exist", done => {
@@ -286,7 +288,7 @@ describe("Build API", () => {
     it("should respond with a 403 and not modify the build for an invalid build token", done => {
       var build
 
-      factory(Build).then(model => {
+      factory.build().then(model => {
         build = model
       }).then(() => {
         return postBuildStatus({
@@ -296,12 +298,12 @@ describe("Build API", () => {
           message: ""
         }).expect(403)
       }).then(response => {
-        return Build.findOne({ id: build.id })
+        return Build.findById(build.id)
       }).then(build => {
         expect(build).to.not.be.undefined
         expect(build.state).to.equal("processing")
         done()
-      })
+      }).catch(done)
     })
   })
 })

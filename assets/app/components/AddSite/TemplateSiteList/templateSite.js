@@ -20,7 +20,9 @@ class TemplateSite extends React.Component {
     super(props);
 
     this.state = {
-      siteName: ''
+      owner: props.defaultOwner,
+      repository: '',
+      template: props.name,
     };
 
     this.handleChooseActive = this.handleChooseActive.bind(this);
@@ -41,20 +43,20 @@ class TemplateSite extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    const safeName = this.getSafeRepoName(this.state.siteName);
+    const repository = this.getSafeRepoName(this.state.repository);
+    const site = Object.assign({}, this.state, { repository })
 
-    this.props.handleSubmit(safeName, this.props.name);
+    this.props.handleSubmit(site);
   }
 
   handleChange(event) {
-    this.setState({
-      siteName: event.target.value
-    });
+    const { name, value } = event.target
+    this.setState({ [name]: value })
   }
 
   getFormVisible() {
     const { active, index } = this.props;
-    return active === index ? "false" : "true";
+    return active === index;
   }
 
   render() {
@@ -89,19 +91,26 @@ class TemplateSite extends React.Component {
                 Use this template
               </button>
             </div>
-            <form
-              className="new-site-form"
-              aria-hidden={this.getFormVisible()}
-              onSubmit={this.handleSubmit}
-            >
-              <label htmlFor="site-name">Name your new site</label>
-              <input
-                name="site-name"
-                type="text"
-                value={this.state.siteName}
-                onChange={this.handleChange} />
-              <input type="submit" value="Create site" />
-            </form>
+            {this.getFormVisible() ?
+              <form
+                className="new-site-form"
+                onSubmit={this.handleSubmit}
+              >
+                <label htmlFor="repository">What GitHub account will own your site?</label>
+                <input
+                  name="owner"
+                  type="text"
+                  value={this.state.owner}
+                  onChange={this.handleChange} />
+                <label htmlFor="repository">Name your new site</label>
+                <input
+                  name="repository"
+                  type="text"
+                  value={this.state.repository}
+                  onChange={this.handleChange} />
+                <input type="submit" value="Create site" />
+              </form>
+            : null}
           </div>
         </div>
       </div>

@@ -41,12 +41,8 @@ class AddSite extends React.Component {
     siteActions.addSite(this.state);
   }
 
-  onSubmitTemplate(siteName, templateName) {
-    console.log(templates)
-    siteActions.cloneRepo({
-      repository: siteName,
-      template: templateName
-    }, templates[templateName]);
+  onSubmitTemplate(site) {
+    siteActions.addSite(site);
   }
 
   onChange(event) {
@@ -75,7 +71,9 @@ class AddSite extends React.Component {
         </div>
         <TemplateSiteList
           templates={templates}
-          handleSubmitTemplate={this.onSubmitTemplate} />
+          handleSubmitTemplate={this.onSubmitTemplate}
+          defaultOwner={this.props.storeState.user.username}
+        />
         <div className="usa-grid">
           <div className="col-md-12">
             <h2>Or add your own Github repository</h2>
@@ -114,7 +112,6 @@ class AddSite extends React.Component {
                   onChange={this.onChange}
                 >
                   <option value="jekyll">Jekyll</option>
-                  <option value="hugo">Hugo</option>
                   <option value="static">Static (just publish the files in the repository)</option>
                 </select>
               </div>

@@ -3,37 +3,125 @@ const factory = require("../../support/factory")
 const githubAPINocks = require("../../support/githubAPINocks")
 
 describe("GitHub", () => {
-  describe(".checkPermissions(user, owner, repository)", () => {
-    it("should resolve with the users permissions", done => {
-      factory(User).then(user => {
+  describe(".getRepository(user, owner, repository)", () => {
+    it("should resolve with the repository data if the repo exists", done => {
+      factory.user().then(user => {
         githubAPINocks.repo({
           accessToken: user.accessToken,
           owner: "repo-owner",
           repo: "repo-name",
-          response: [200, { permissions: "Repo permissions" }],
+          response: [200, {
+            "name": "repo-name",
+            "owner": {
+              "login": "repo-owner",
+            },
+            "meta": {},
+          }],
         })
 
-        return GitHub.checkPermissions(user, "repo-owner", "repo-name")
-      }).then(permissions => {
-        expect(permissions).to.equal("Repo permissions")
+        return GitHub.getRepository(user, "repo-owner", "repo-name")
+      }).then(data => {
+        expect(data).to.deep.equal({
+          "name": "repo-name",
+          "owner": {
+            "login": "repo-owner",
+          },
+          "meta": {},
+        })
         done()
-      })
+      }).catch(done)
     })
 
-    it("should reject if the repository does not exist", done => {
-      factory(User).then(user => {
+    it("should resolve with null if the repo does not exist", done => {
+      factory.user().then(user => {
         githubAPINocks.repo({
           accessToken: user.accessToken,
           owner: "repo-owner",
           repo: "repo-name",
-          response: [404, { message: "Not Found" }],
+          response: [404, {
+            "message": "Not Found",
+            "documentation_url": "https://developer.github.com/v3",
+          }],
         })
 
-        return GitHub.checkPermissions(user, "repo-owner", "repo-name")
-      }).catch(error => {
-        expect(error).to.not.be.undefined
+        return GitHub.getRepository(user, "repo-owner", "repo-name")
+      }).then(result => {
+        expect(result).to.be.null
         done()
-      })
+      }).catch(done)
+    })
+  })
+
+  describe(".createRepository(user, owner, repository)", () => {
+    it("should create a repository for the user if the user is the owner", done => {
+      let createRepoNock
+
+      factory.user().then(user => {
+        createRepoNock = githubAPINocks.createRepoForUser({
+          accessToken: user.accessToken,
+          repo: "repo-name",
+        })
+
+        return GitHub.createRepo(user, user.username, "repo-name")
+      }).then(() => {
+        expect(createRepoNock.isDone()).to.equal(true)
+        done()
+      }).catch(done)
+    })
+
+    it("should create a repository for an org if the user is not the owner", done => {
+      let createRepoNock
+
+      factory.user().then(user => {
+        createRepoNock = githubAPINocks.createRepoForOrg({
+          accessToken: user.accessToken,
+          org: "org-name",
+          repo: "repo-name",
+        })
+
+        return GitHub.createRepo(user, "org-name", "repo-name")
+      }).then(() => {
+        expect(createRepoNock.isDone()).to.equal(true)
+        done()
+      }).catch(done)
+    })
+
+    it("should reject if the user is not authorized to create a repository", done => {
+      factory.user().then(user => {
+        githubAPINocks.createRepoForOrg({
+          accessToken: user.accessToken,
+          org: "org-name",
+          repo: "repo-name",
+          response: [403, {
+            message: "You need admin access to the organization before adding a repository to it."
+          }]
+        })
+
+        return GitHub.createRepo(user, "org-name", "repo-name")
+      }).catch(err => {
+        expect(err.status).to.equal(400)
+        expect(err.message).to.equal("You need admin access to the organization before adding a repository to it.")
+        done()
+      }).catch(done)
+    })
+
+    it("should reject if the repo already exists", done => {
+      factory.user().then(user => {
+        githubAPINocks.createRepoForOrg({
+          accessToken: user.accessToken,
+          org: "org-name",
+          repo: "repo-name",
+          response: [422, {
+            "errors": [{ "message":"name already exists on this account" }]
+          }]
+        })
+
+        return GitHub.createRepo(user, "org-name", "repo-name")
+      }).catch(err => {
+        expect(err.status).to.equal(400)
+        expect(err.message).to.equal("A repo with that name already exists.")
+        done()
+      }).catch(done)
     })
   })
 
@@ -41,9 +129,9 @@ describe("GitHub", () => {
     it("should set a webhook on the repository", done => {
       let site, user
 
-      factory(User).then(model => {
+      factory.user().then(model => {
         user = model
-        return factory(Site)
+        return factory.site()
       }).then(model => {
         site = model
         githubAPINocks.webhook({
@@ -55,15 +143,15 @@ describe("GitHub", () => {
         return GitHub.setWebhook(site, user.id)
       }).then(() => {
         done()
-      })
+      }).catch(done)
     })
 
     it("should resolve if the webhook already exists", done => {
       let site, user
 
-      factory(User).then(model => {
+      factory.user().then(model => {
         user = model
-        return factory(Site)
+        return factory.site()
       }).then(model => {
         site = model
         githubAPINocks.webhook({
@@ -77,15 +165,15 @@ describe("GitHub", () => {
         return GitHub.setWebhook(site, user.id)
       }).then(() => {
         done()
-      })
+      }).catch(done)
     })
 
     it("should reject if the user does not have admin access to the repository", done => {
       let site, user
 
-      factory(User).then(model => {
+      factory.user().then(model => {
         user = model
-        return factory(Site)
+        return factory.site()
       }).then(model => {
         site = model
         githubAPINocks.webhook({
@@ -97,10 +185,13 @@ describe("GitHub", () => {
           }]
         })
         return GitHub.setWebhook(site, user.id)
+      }).then(() => {
+        throw new Error("Expected admin access error")
       }).catch(err => {
+        expect(err.status).to.equal(400)
         expect(err.message).to.equal("You do not have admin access to this repository")
         done()
-      })
+      }).catch(done)
     })
   })
 
@@ -113,7 +204,7 @@ describe("GitHub", () => {
 
       GitHub.validateUser("123abc").then(() => {
         done()
-      })
+      }).catch(done)
     })
 
     it("should reject if the user is not on a whitelisted team", done => {
