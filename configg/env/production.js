@@ -6,13 +6,7 @@ const appEnv = cfenv.getAppEnv()
 // Session Config
 const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`)
 if (redisCreds) {
-  module.exports.session = {
-    cookie: {
-      secure: true,
-    },
-    proxy: true,
-    secret: env.FEDERALIST_SESSION_SECRET,
-    adapter: 'connect-redis',
+  module.exports.redis = {
     host: redisCreds.hostname,
     port: redisCreds.port,
     db: 0,
