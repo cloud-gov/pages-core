@@ -60,7 +60,12 @@ const resolveKey = (path) => {
       if (err) {
         reject(err)
         return
-      } else if (data.Contents.length === 1 && data.Contents[0].Key === path) {
+      }
+
+      const object = data.Contents.find(candidate => {
+        return candidate.Key === path
+      })
+      if (object && object.Size > 0) {
         resolve(path)
       } else {
         resolve(path + "/index.html")

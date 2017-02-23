@@ -281,6 +281,23 @@ describe("SiteCreator", () => {
         }).catch(done)
       })
 
+      it("should use jekyll as the build engine", done => {
+        const siteParams = {
+          owner: crypto.randomBytes(3).toString("hex"),
+          repository: crypto.randomBytes(3).toString("hex"),
+          template: "microsite",
+        }
+
+        factory.user().then(user => {
+          githubAPINocks.createRepoForOrg()
+          githubAPINocks.webhook()
+          return SiteCreator.createSite({ siteParams, user })
+        }).then(site => {
+          expect(site.engine).to.equal("jekyll")
+          done()
+        }).catch(done)
+      })
+
       it("should trigger a build that pushes the source repo to the destiantion repo", done => {
         let user
         const siteParams = {

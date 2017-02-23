@@ -81,6 +81,7 @@ const createSiteFromExistingRepo = ({ siteParams, user }) => {
 
 const createSiteFromTemplate = ({ siteParams, user, template }) => {
   let site = Site.build(siteParams)
+  site.engine = "jekyll"
   const { owner, repository } = siteParams
 
   return site.validate().then(error => {
