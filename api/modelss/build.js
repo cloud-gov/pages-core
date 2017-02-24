@@ -35,11 +35,13 @@ const completeJob = function(err) {
     return this.update({
       state: "error",
       error: completeJobErrorMessage(err),
+      completedAt: new Date(),
     })
   } else {
     return this.update({
       state: "success",
       error: "",
+      completedAt: new Date(),
     })
   }
 }

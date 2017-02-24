@@ -52,6 +52,7 @@ describe("Build model", () => {
       }).then(build => {
         expect(build.state).to.equal("success")
         expect(build.error).to.equal("")
+        expect(new Date() - build.completedAt).to.be.below(1000)
         done()
       }).catch(done)
     })
