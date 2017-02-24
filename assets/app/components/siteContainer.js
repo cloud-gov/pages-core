@@ -48,7 +48,7 @@ class SiteContainer extends React.Component {
   }
 
   getPageTitle(pathname) {
-    const currentPath = pathname.split('/').pop();
+    return pathname.split('/').pop();
   }
 
   getCurrentSite(sites, siteId) {
