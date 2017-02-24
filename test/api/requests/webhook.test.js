@@ -87,6 +87,33 @@ describe("Webhook API", () => {
       }).catch(done)
     })
 
+    it("should find the site by the lowercased owner and repository", done => {
+      let site
+      const userPromise = factory.user()
+      const sitePromise = factory.site({ users: Promise.all([userPromise]) })
+
+      Promise.props({ user: userPromise, site: sitePromise }).then(models => {
+        site = models.site
+
+        const payload = buildWebhookPayload(models.user, site)
+        payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`
+        const signature = signWebhookPayload(payload)
+
+        return request("http://localhost:1337")
+          .post("/webhook/github")
+          .send(payload)
+          .set({
+            "X-GitHub-Event": "push",
+            "X-Hub-Signature": signature,
+            "X-GitHub-Delivery": "123abc"
+          })
+          .expect(200)
+      }).then(response => {
+        expect(response.body.site.id).to.equal(site.id)
+        done()
+      }).catch(done)
+    })
+
     it("should not schedule a build if there are no new commits", done => {
       let site, user
 
