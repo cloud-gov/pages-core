@@ -252,6 +252,7 @@ describe("Build API", () => {
         expect(build).to.not.be.undefined
         expect(build.state).to.equal("success")
         expect(build.error).to.equal("")
+        expect(new Date() - build.completedAt).to.be.below(1000)
         done()
       }).catch(done)
     })
@@ -273,6 +274,7 @@ describe("Build API", () => {
         expect(build).to.not.be.undefined
         expect(build.state).to.equal("error")
         expect(build.error).to.equal("The build failed for a reason")
+        expect(new Date() - build.completedAt).to.be.below(1000)
         done()
       }).catch(done)
     })
