@@ -19,7 +19,7 @@ module.exports = {
       }
     }).catch(err => {
       if (err.message) {
-        res.badRequest(err.message)
+        res.badRequest(err)
       } else {
         sails.log.error(err)
         res.badRequest()
@@ -84,8 +84,8 @@ const findUserForWebhookRequest = (request) => {
 }
 
 const findSiteForWebhookRequest = (request) => {
-  const owner = request.body.repository.full_name.split('/')[0]
-  const repository = request.body.repository.full_name.split('/')[1]
+  const owner = request.body.repository.full_name.split('/')[0].toLowerCase()
+  const repository = request.body.repository.full_name.split('/')[1].toLowerCase()
 
   return Site.findOne({ where: { owner, repository } }).then(site => {
     if (!site) {
