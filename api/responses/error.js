@@ -1,4 +1,4 @@
-module.exports = (error, { req, res }) => {
+module.exports = (error = {}, { req, res }) => {
   if (typeof error === "number") {
     error = {
       status: error,
