@@ -1,4 +1,9 @@
 const AWS = require('aws-sdk-mock')
+
+AWS.mock('SQS', 'sendMessage', function (params, callback) {
+  callback(null, {})
+})
+
 const app = require("../../app")
 
 const _cleanDatabase = () => {
@@ -10,10 +15,6 @@ const _cleanDatabase = () => {
 }
 
 before(function(done) {
-  AWS.mock('SQS', 'sendMessage', function (params, callback) {
-    callback(null, {})
-  })
-
   app.listen(1337, (err) => {
     if (err) return done(err)
 
@@ -26,6 +27,5 @@ before(function(done) {
 });
 
 after((done) => {
-  AWS.restore('SQS')
   done()
 });
