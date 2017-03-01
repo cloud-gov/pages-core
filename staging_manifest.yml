@@ -5,7 +5,7 @@ buildpack: nodejs_buildpack
 stack: cflinuxfs2
 domain: fr.cloud.gov
 disk_quota: 2G
-memory: 512MB
+memory: 256MB
 instances: 2
 services:
 - federalist-staging-rds
