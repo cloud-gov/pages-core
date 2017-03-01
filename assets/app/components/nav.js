@@ -12,7 +12,8 @@ const getSecondaryNav = (username) => {
   const links = [
     <Link to="/sites">{username}</Link>,
     <a href="https://federalist-docs.18f.gov" target="_blank">Documentation</a>,
-    <a href="https://github.com/18F/federalist/issues/new" target="_blank">Contact us</a>,
+    <a href="https://github.com/18F/federalist/issues/new" target="_blank">File Issue</a>,
+    <a href="mailto:federalist-support@gsa.gov" target="_blank">Get Help</a>,
     <a href="/logout">Log out</a>,
   ];
 
