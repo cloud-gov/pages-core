@@ -2,9 +2,9 @@ const deref = require('json-schema-deref-sync')
 const validate = require('jsonschema').validate
 const YAML = require("yamljs")
 
-const swagger = YAML.load("assets/swagger/index.yml")
+const swagger = YAML.load("public/swagger/index.yml")
 const schema = deref(swagger, {
-  baseFolder: process.cwd() + "/assets/swagger",
+  baseFolder: process.cwd() + "/public/swagger",
   failOnMissing: true,
 })
 

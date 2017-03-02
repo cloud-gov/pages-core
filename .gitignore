@@ -41,24 +41,20 @@
 
 config/local.js
 
-# Site builds
-assets/preview
-assets/site
-
 # Generated CSS
-assets/styles/styles.css
-assets/styles/google-fonts.css
+public/styles/styles.css
+public/styles/google-fonts.css
 
 # Browserify bundle
-assets/js/bundle.js
+public/js/bundle.js
 
 # USWDS assets
-assets/images/uswds
-assets/styles/uswds.css
-assets/styles/uswds.min.css
-assets/styles/google-fonts.css
-assets/fonts/merriweather*
-assets/fonts/sourcesanspro*
+public/images/uswds
+public/styles/uswds.css
+public/styles/uswds.min.css
+public/styles/google-fonts.css
+public/fonts/merriweather*
+public/fonts/sourcesanspro*
 
 # test coverage reports
 coverage
