@@ -1,4 +1,5 @@
 const authorizer = require("../authorizers/site")
+const SiteCreator = require("../services/SiteCreator")
 const siteSerializer = require("../serializers/site")
 
 module.exports = {
@@ -75,6 +76,7 @@ module.exports = {
     }).then(siteJSON => {
       res.send(siteJSON)
     }).catch(err => {
+      console.error(err)
       res.error(err)
     })
   },
