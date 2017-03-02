@@ -349,8 +349,8 @@ describe("Site API", () => {
         return request("http://localhost:1337")
           .post(`/v0/site`)
           .send({
-            owner: site.owner,
-            repository: site.repository,
+            owner: siteOwner,
+            repository: siteRepository,
             defaultBranch: "master",
             engine: "jekyll",
           })
