@@ -1,3 +1,5 @@
+const { BuildLog, Build } = require("../models")
+
 const serialize = (serializable) => {
   if (serializable.length !== undefined) {
     const buildLogIds = serializable.map(buildLog => buildLog.id)

@@ -9,6 +9,8 @@ const githubAPINocks = require("../support/githubAPINocks")
 const session = require("../support/session")
 const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
 
+const { Build, Site, User } = require("../../../api/models")
+
 describe("Site API", () => {
   var siteResponseExpectations = (response, site) => {
     expect(response.owner).to.equal(site.owner)

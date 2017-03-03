@@ -1,4 +1,5 @@
 const buildFactory = require("./build")
+const { BuildLog } = require("../../../../api/models")
 
 const buildLog = (overrides) => {
   return Promise.props(_attributes(overrides)).then(attributes => {

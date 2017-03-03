@@ -1,5 +1,6 @@
 const authorizer = require("../authorizers/user")
 const userSerializer = require("../serializers/user")
+const { User } = require("../models")
 
 module.exports = {
   usernames: function(req, res) {

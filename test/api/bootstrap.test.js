@@ -7,7 +7,7 @@ AWS.mock('SQS', 'sendMessage', function (params, callback) {
 const app = require("../../app")
 
 const _cleanDatabase = () => {
-  const models = sequelize.models
+  const models = require("../../api/models")
   const promises = Object.keys(models).map(name => {
     return models[name].destroy({ where: {} })
   })

@@ -1,5 +1,6 @@
 const authorizer = require("../authorizers/build")
 const buildSerializer = require("../serializers/build")
+const { Build } = require("../models")
 
 var decodeb64 = (str) => {
   return new Buffer(str, 'base64').toString('utf8');

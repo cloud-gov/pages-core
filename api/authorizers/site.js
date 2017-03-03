@@ -1,3 +1,5 @@
+const { User, Site } = require("../models")
+
 const authorize = (user, site) => {
   return User.findById(user.id, { include: [ Site ] }).then(user => {
     for (candidateSite of user.Sites) {

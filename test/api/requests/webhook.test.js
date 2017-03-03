@@ -2,6 +2,8 @@ const crypto = require('crypto')
 const expect = require("chai").expect
 const request = require("supertest-as-promised")
 const factory = require("../support/factory")
+const { Build, Site, User } = require("../../../api/models")
+
 
 describe("Webhook API", () => {
   const signWebhookPayload = (payload) => {
