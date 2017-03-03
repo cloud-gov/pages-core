@@ -1,10 +1,11 @@
-var expect = require("chai").expect
-var cookie = require('cookie')
-var nock = require("nock")
-var request = require("supertest-as-promised")
-var factory = require("../support/factory")
-var githubAPINocks = require("../support/githubAPINocks")
-var session = require("../support/session")
+const expect = require("chai").expect
+const cookie = require('cookie')
+const nock = require("nock")
+const request = require("supertest-as-promised")
+const factory = require("../support/factory")
+const githubAPINocks = require("../support/githubAPINocks")
+const session = require("../support/session")
+const { User } = require("../../../api/models")
 
 var sessionCookieFromResponse = (response) => {
   var header = response.headers["set-cookie"][0]

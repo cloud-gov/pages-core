@@ -4,6 +4,7 @@ const sinon = require("sinon")
 const factory = require("../support/factory")
 const session = require("../support/session")
 const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
+const { Build, User } = require("../../../api/models")
 
 describe("Build API", () => {
   var buildResponseExpectations = (response, build) => {

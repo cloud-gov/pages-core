@@ -1,7 +1,7 @@
 global.config = require("./config")
 
-Object.assign(global, require("./api/models"))
-global.sequelize = Build.sequelize
+//Object.assign(global, require("./api/models"))
+//global.sequelize = Build.sequelize
 
 global.Promise = require("bluebird")
 

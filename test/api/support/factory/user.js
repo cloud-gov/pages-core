@@ -1,3 +1,5 @@
+const { User } = require("../../../../api/models")
+
 const user = (overrides) => {
   return Promise.props(_attributes(overrides)).then(attributes => {
     return User.create(attributes)

@@ -2,6 +2,7 @@ const expect = require("chai").expect
 const factory = require("../../support/factory")
 const GitHub = require("../../../../api/services/SQS")
 const SQS = require("../../../../api/services/SQS")
+const { Build, Site, User } = require("../../../../api/models")
 
 describe("SQS", () => {
   describe(".sendBuildMessage(build)", () => {
