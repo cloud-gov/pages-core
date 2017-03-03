@@ -17,7 +17,7 @@ module.exports = {
   findOne: (req, res) => {
     let site
 
-    Promise.resolve(Number(req.param("id"))).then(id => {
+    Promise.resolve(Number(req.params["id"])).then(id => {
       if (isNaN(id)) {
         throw 404
       }
@@ -42,7 +42,7 @@ module.exports = {
     let site
     let siteJSON
 
-    Promise.resolve(Number(req.param("id"))).then(id => {
+    Promise.resolve(Number(req.params["id"])).then(id => {
       if (isNaN(id)) {
         throw 404
       }
@@ -83,7 +83,7 @@ module.exports = {
 
   update: (req, res) => {
     let site
-    let siteId = Number(req.param("id"))
+    let siteId = Number(req.params["id"])
 
     Promise.resolve(siteId).then(id => {
       if (isNaN(id)) {
