@@ -1,3 +1,5 @@
+const config = require("../../config")
+
 const associate = ({ Site, Build, User }) => {
   Site.hasMany(Build, {
     foreignKey: "site",

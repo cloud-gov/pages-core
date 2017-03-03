@@ -1,4 +1,5 @@
 const nock = require("nock")
+const config = require("../../../config")
 
 const accessToken = ({ authorizationCode, accessToken, scope } = {}) => {
   authorizationCode = authorizationCode || "auth-code-123abc"

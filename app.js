@@ -1,8 +1,3 @@
-global.config = require("./config")
-
-//Object.assign(global, require("./api/models"))
-//global.sequelize = Build.sequelize
-
 global.Promise = require("bluebird")
 
 // If settings present, start New Relic
@@ -20,6 +15,7 @@ const session = require("express-session")
 const RedisStore = require("connect-redis")(session)
 const responses = require("./api/responses")
 
+const config = require("./config")
 const app = express()
 
 if (config.redis) {

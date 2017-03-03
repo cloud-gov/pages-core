@@ -2,6 +2,7 @@ const expect = require("chai").expect
 const cookie = require('cookie')
 const nock = require("nock")
 const request = require("supertest-as-promised")
+const config = require("../../../config")
 const factory = require("../support/factory")
 const githubAPINocks = require("../support/githubAPINocks")
 const session = require("../support/session")
