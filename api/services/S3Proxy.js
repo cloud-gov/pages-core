@@ -11,8 +11,8 @@ const S3 = new AWS.S3({
 })
 
 const findSite = (req) => {
-  const owner = req.param("owner")
-  const repository = req.param("repo")
+  const owner = req.params["owner"]
+  const repository = req.params["repo"]
 
   return Site.findOne({
     where: {
