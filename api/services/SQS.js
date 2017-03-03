@@ -1,4 +1,5 @@
 var AWS = require('aws-sdk')
+const config = require("../../config")
 var buildConfig = config.build
 var s3Config = config.s3
 

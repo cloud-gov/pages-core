@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk')
+const config = require("../../config")
 const { Site, User } = require("../models")
 
 const s3Config = config.s3

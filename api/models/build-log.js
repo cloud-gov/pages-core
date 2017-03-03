@@ -1,3 +1,5 @@
+const config = require("../../config")
+
 const associate = ({ BuildLog, Build }) => {
   BuildLog.belongsTo(Build, {
     foreignKey: "build",

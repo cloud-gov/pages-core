@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const config = require("../../config")
 
 const postgresConfig = config.postgres
 const database = postgresConfig.database

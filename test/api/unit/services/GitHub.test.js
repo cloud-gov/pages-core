@@ -1,4 +1,5 @@
 const expect = require("chai").expect
+const config = require("../../../../config")
 const factory = require("../../support/factory")
 const GitHub = require("../../../../api/services/GitHub")
 const githubAPINocks = require("../../support/githubAPINocks")

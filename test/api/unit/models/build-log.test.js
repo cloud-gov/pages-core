@@ -1,5 +1,6 @@
 const expect = require("chai").expect
 const factory = require("../../support/factory")
+const config = require("../../../../config")
 const { BuildLog } = require("../../../../api/models")
 
 describe("BuildLog model", () => {
