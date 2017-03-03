@@ -1,3 +1,4 @@
+const logger = require("winston")
 const GitHub = require("./GitHub")
 const GitHubStrategy = require('passport-github').Strategy
 const passport = require('passport')
@@ -24,8 +25,7 @@ var githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
   }).then(() => {
     callback(null, user)
   }).catch(err => {
-    console.error("Authentication error: ")
-    console.error(err)
+    logger.warn("Authentication error: ", err)
     callback(err)
   })
 }
