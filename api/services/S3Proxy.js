@@ -42,7 +42,7 @@ const pipeS3ObjectToResponse = ({ key, res }) => {
     headers['X-Frame-Options'] = 'SAMEORIGIN';
     res.set(headers)
   }).createReadStream().on("error", error => {
-    sails.log.error(error)
+    console.error(error)
     res.send(error.statusCode, error.message)
   }).pipe(res)
 }

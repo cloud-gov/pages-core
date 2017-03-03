@@ -1,9 +1,4 @@
 module.exports = {
-  session: {
-    cookie: {
-      secure: false,
-    },
-  },
   build: {
     token: "123abc",
   },
