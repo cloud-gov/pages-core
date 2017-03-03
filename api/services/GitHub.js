@@ -1,4 +1,5 @@
 const Github = require("github")
+const config = require("../../config")
 const { User } = require("../models")
 
 const createRepoForOrg = (github, options) => {

@@ -1,5 +1,6 @@
 const crypto = require("crypto")
 const factory = require("./factory")
+const config = require("../../../config")
 
 const session = (user) => {
   return Promise.resolve(user || factory.user()).then(user => {
