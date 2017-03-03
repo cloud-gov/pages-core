@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk')
+const logger = require("winston")
 const config = require("../../config")
 const { Site, User } = require("../models")
 
@@ -44,7 +45,7 @@ const pipeS3ObjectToResponse = ({ key, res }) => {
     headers['X-Frame-Options'] = 'SAMEORIGIN';
     res.set(headers)
   }).createReadStream().on("error", error => {
-    console.error(error)
+    logger.error("Error proxying S3 object: ", error)
     res.send(error.statusCode, error.message)
   }).pipe(res)
 }

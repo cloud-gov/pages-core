@@ -1,7 +1,8 @@
-var AWS = require('aws-sdk')
+const AWS = require('aws-sdk')
+const logger = require("winston")
 const config = require("../../config")
-var buildConfig = config.build
-var s3Config = config.s3
+const buildConfig = config.build
+const s3Config = config.s3
 
 var buildContainerEnvironment = (build) => ({
   AWS_DEFAULT_REGION: s3Config.region,
@@ -76,7 +77,7 @@ SQS.sendBuildMessage = build => {
   }
   SQS.sqsClient.sendMessage(params, function(err, data) {
     if (err) {
-      console.error('There was an error, adding the job to SQS: ', err);
+      logger.error("There was an error, adding the job to SQS: ", err);
       build.completeJob(err);
     }
   })

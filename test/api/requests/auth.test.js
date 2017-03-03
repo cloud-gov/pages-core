@@ -91,7 +91,6 @@ describe("Authentication request", () => {
             .get("/auth/github/callback?code=auth-code-123abc")
             .expect(302)
         }).then(response => {
-          console.log(response.headers)
           var cookie = sessionCookieFromResponse(response)
           return sessionForCookie(cookie)
         }).then(session => {

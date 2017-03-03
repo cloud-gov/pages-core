@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const logger = require("winston")
 const config = require("../../config")
 
 const postgresConfig = config.postgres
@@ -10,7 +11,7 @@ const sequelize = new Sequelize(database, username, password, {
   dialect: "postgres",
   host: postgresConfig.host,
   port: postgresConfig.port,
-  logging: () => {} // TODO DO NOT LET ME MERGE THIS UNTIL I WIRE THIS UP TO A PROPER LOGGER sails.log.info,
+  logging: logger.info,
 })
 
 const Build = sequelize.import(__dirname + "/build")

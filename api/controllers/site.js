@@ -77,7 +77,6 @@ module.exports = {
     }).then(siteJSON => {
       res.send(siteJSON)
     }).catch(err => {
-      console.error(err)
       res.error(err)
     })
   },
