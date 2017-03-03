@@ -1,7 +1,7 @@
 const expect = require("chai").expect
 const sinon = require("sinon")
-
 const factory = require("../../support/factory")
+const { Site } = require("../../../../api/models")
 
 describe("Site model", () => {
   describe("before validate hook", () => {

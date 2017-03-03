@@ -1,5 +1,6 @@
 const crypto = require('crypto')
 const buildSerializer = require("../serializers/build")
+const { Build, User, Site } = require("../models")
 
 module.exports = {
   github: function(req, res) {

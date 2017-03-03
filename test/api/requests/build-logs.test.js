@@ -3,6 +3,7 @@ const request = require("supertest-as-promised")
 const factory = require("../support/factory")
 const session = require("../support/session")
 const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
+const { BuildLog, Site, User } = require("../../../api/models")
 
 describe("Build Log API", () => {
   describe("POST /v0/build/:build_id/log/:token", () => {

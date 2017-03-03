@@ -4,6 +4,7 @@ const nock = require("nock")
 const factory = require("../../support/factory")
 const githubAPINocks = require("../../support/githubAPINocks")
 const SiteCreator = require("../../../../api/services/SiteCreator")
+const { Build, Site, User } = require("../../../../api/models")
 
 describe("SiteCreator", () => {
   describe(".createSite({ siteParams, user })", () => {

@@ -1,4 +1,5 @@
 const userFactory = require("./user")
+const { Site } = require("../../../../api/models")
 
 const site = (overrides) => {
   let site, users

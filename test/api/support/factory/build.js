@@ -1,5 +1,6 @@
 const siteFactory = require("./site")
 const userFactory = require("./user")
+const { Build } = require("../../../../api/models")
 
 const build = (overrides) => {
   return Promise.props(_attributes(overrides)).then(attributes => {

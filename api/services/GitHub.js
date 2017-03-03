@@ -1,4 +1,5 @@
 const Github = require("github")
+const { User } = require("../models")
 
 const createRepoForOrg = (github, options) => {
   return new Promise((resolve, reject) => {
