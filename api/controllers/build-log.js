@@ -4,7 +4,7 @@ const { Build, BuildLog } = require("../models")
 
 module.exports = {
   create: (req, res) => {
-    Promise.resolve(Number(req.param("build_id"))).then(id => {
+    Promise.resolve(Number(req.params["build_id"])).then(id => {
       if (isNaN(id)) {
         throw 404
       }
@@ -15,8 +15,8 @@ module.exports = {
       }
       return BuildLog.create({
         build: build.id,
-        output: req.param("output"),
-        source: req.param("source"),
+        output: req.body["output"],
+        source: req.body["source"],
       })
     }).then(buildLog => {
       return buildLogSerializer.serialize(buildLog)
@@ -30,7 +30,7 @@ module.exports = {
   find: (req, res) => {
     let build
 
-    Promise.resolve(Number(req.param("build_id"))).then(id => {
+    Promise.resolve(Number(req.params["build_id"])).then(id => {
       if (isNaN(id)) {
         throw 404
       }
