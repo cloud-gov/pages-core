@@ -1,6 +1,6 @@
 const router = require("express").Router()
 const WebhookController = require("../controllers/webhook")
 
-// TODO: Setup routes and middlewares
+router.post("/webhook/github", WebhookController.github)
 
 module.exports = router
