@@ -7,13 +7,17 @@ const propTypes = {
 
 const getLastBuildTime = (builds) => {
   if (builds.length) {
-    let sorted = builds.sort((a, b) => {
+    let sorted = builds.slice().filter(build => {
+      return build.completedAt
+    }).sort((a, b) => {
       let aCompletedAt = new Date(a.completedAt);
       let bCompletedAt = new Date(b.completedAt);
       return aCompletedAt > bCompletedAt;
     });
-    let last = sorted.slice().pop();
-    return last.completedAt
+    let last = sorted.pop();
+    if (last) {
+      return last.completedAt
+    }
   }
 };
 

@@ -19,10 +19,12 @@ describe('<PublishedState />', () => {
       {
         completedAt: "2015-09-02T21:43:35.000Z"
       },
-
       {
         completedAt: MOST_RECENT_BUILD_TIME
-      }
+      },
+      {
+        completedAt: undefined,
+      },
     ];
   })
 
