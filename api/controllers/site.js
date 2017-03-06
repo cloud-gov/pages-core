@@ -1,4 +1,5 @@
 const authorizer = require("../authorizers/site")
+const S3SiteRemover = require("../services/S3SiteRemover")
 const SiteCreator = require("../services/SiteCreator")
 const siteSerializer = require("../serializers/site")
 const { User, Site, Build } = require("../models")
@@ -57,6 +58,8 @@ module.exports = {
     }).then(json => {
       siteJSON = json
       return authorizer.destroy(req.user, site)
+    }).then(() => {
+      return S3SiteRemover.removeSite(site)
     }).then(() => {
       return site.destroy()
     }).then(() => {

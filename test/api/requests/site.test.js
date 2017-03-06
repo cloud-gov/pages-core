@@ -10,6 +10,7 @@ const session = require("../support/session")
 const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
 
 const { Build, Site, User } = require("../../../api/models")
+const S3SiteRemover = require("../../../api/services/S3SiteRemover")
 
 describe("Site API", () => {
   var siteResponseExpectations = (response, site) => {
@@ -399,6 +400,14 @@ describe("Site API", () => {
   })
 
   describe("DELETE /v0/site/:id", () => {
+    beforeEach(() => {
+      sinon.stub(S3SiteRemover, "removeSite", () => Promise.resolve())
+    })
+
+    afterEach(() => {
+      S3SiteRemover.removeSite.restore()
+    })
+
     it("should require authentication", done => {
       factory.site().then(site => {
         return request("http://localhost:1337")
@@ -451,6 +460,34 @@ describe("Site API", () => {
         return Site.findAll({ where: { id: site.id } })
       }).then(sites => {
         expect(sites).not.to.be.empty
+        done()
+      }).catch(done)
+    })
+
+    it("should remove all of the site's data from S3", done => {
+      let site
+      const userPromise = factory.user()
+      const sitePromise = factory.site({ users: Promise.all([userPromise]) })
+      const sessionPromise = session(userPromise)
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: sessionPromise,
+      }).then(results => {
+        site = results.site
+        S3SiteRemover.removeSite.restore()
+        sinon.stub(S3SiteRemover, "removeSite", (calledSite) => {
+          expect(calledSite.id).to.equal(site.id)
+          return Promise.resolve()
+        })
+
+        return request("http://localhost:1337")
+          .delete(`/v0/site/${site.id}`)
+          .set("Cookie", results.cookie)
+          .expect(200)
+      }).then(response => {
+        expect(S3SiteRemover.removeSite.calledOnce).to.equal(true)
         done()
       }).catch(done)
     })
