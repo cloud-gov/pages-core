@@ -1,3 +1,5 @@
+const { Build } = require("../models")
+
 module.exports = function (req, res, next) {
   const id = Number(req.param("id") || req.param("build_id"))
 

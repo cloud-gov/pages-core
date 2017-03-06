@@ -1,4 +1,5 @@
 const expect = require("chai").expect
+const { User } = require("../../../../api/models")
 
 describe("User model", () => {
   describe("validations", () => {

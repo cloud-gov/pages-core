@@ -1,5 +1,6 @@
 const buildAuthorizer = require("../authorizers/build")
 const buildLogSerializer = require("../serializers/build-log")
+const { Build, BuildLog } = require("../models")
 
 module.exports = {
   create: (req, res) => {

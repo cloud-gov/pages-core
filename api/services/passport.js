@@ -1,6 +1,8 @@
 const GitHub = require("./GitHub")
 const GitHubStrategy = require('passport-github').Strategy
 const passport = require('passport')
+const config = require("../../config")
+const { User } = require("../models")
 
 var githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
   var user
