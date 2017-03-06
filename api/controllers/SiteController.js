@@ -95,12 +95,13 @@ module.exports = {
       }
       return authorizer.update(req.user, site)
     }).then(() => {
+      const params = Object.assign(site, req.body)
       return site.update({
-        config: req.body.config || site.config,
-        defaultBranch: req.body.defaultBranch || site.defaultBranch,
-        domain: req.body.domain || site.domain,
-        engine: req.body.engine || site.engine,
-        publicPreview: req.body.publicPreview || site.publicPreview,
+        config: params.config,
+        defaultBranch: params.defaultBranch,
+        domain: params.domain,
+        engine: params.engine,
+        publicPreview: params.publicPreview,
       })
     }).then(model => {
       let site = model

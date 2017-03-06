@@ -207,7 +207,7 @@ describe("Site API", () => {
       }).catch(done)
     })
 
-    it("sould add a user to an existing site for an existing repository", done => {
+    it("should add a user to an existing site for an existing repository", done => {
       let user, site
       const userPromise = factory.user()
 
@@ -542,6 +542,75 @@ describe("Site API", () => {
         return Site.findById(site.id, { include: [ User, Build ] })
       }).then(site => {
         expect(site.Builds).to.have.length(1)
+        done()
+      }).catch(done)
+    })
+
+    it("should update attributes when the value in the request body is an empty string", done => {
+      let site
+      const userPromise = factory.user()
+      const sitePromise = factory.site({
+        users: Promise.all([userPromise]),
+        config: "old-config: true",
+        domain: "https://example.com",
+      })
+      const cookiePromise = session(userPromise)
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      }).then(results => {
+        site = results.site
+
+        return request("http://localhost:1337")
+          .put(`/v0/site/${site.id}`)
+          .send({
+            config: "",
+            domain: "",
+          })
+          .set("Cookie", results.cookie)
+          .expect(200)
+      }).then(response => {
+        validateAgainstJSONSchema("PUT", "/site/{id}", 200, response.body)
+        return Site.findById(site.id)
+      }).then(site => {
+        expect(site.config).to.equal("")
+        expect(site.domain).to.equal("")
+        done()
+      }).catch(done)
+    })
+
+    it("should not override existing attributes if they are not present in the request body", done => {
+      let site
+      const userPromise = factory.user()
+      const sitePromise = factory.site({
+        users: Promise.all([userPromise]),
+        config: "old-config: true",
+        domain: "https://example.com",
+      })
+      const cookiePromise = session(userPromise)
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      }).then(results => {
+        site = results.site
+
+        return request("http://localhost:1337")
+          .put(`/v0/site/${site.id}`)
+          .send({
+            config: "new-config: true",
+          })
+          .set("Cookie", results.cookie)
+          .expect(200)
+      }).then(response => {
+        validateAgainstJSONSchema("PUT", "/site/{id}", 200, response.body)
+        return Site.findById(site.id)
+      }).then(site => {
+        expect(site.config).to.equal("new-config: true")
+        expect(site.domain).to.equal("https://example.com")
         done()
       }).catch(done)
     })
