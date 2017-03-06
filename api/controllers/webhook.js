@@ -1,4 +1,5 @@
 const crypto = require('crypto')
+const logger = require("winston")
 const config = require("../../config")
 const buildSerializer = require("../serializers/build")
 const { Build, User, Site } = require("../models")
@@ -23,7 +24,7 @@ module.exports = {
       if (err.message) {
         res.badRequest(err)
       } else {
-        sails.log.error(err)
+        logger.error(err)
         res.badRequest()
       }
     })
