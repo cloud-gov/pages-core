@@ -17,8 +17,8 @@ module.exports = {
 
   create: (req, res) => {
     const params = {
-      branch: req.param("branch"),
-      site: req.param("site"),
+      branch: req.body["branch"],
+      site: req.body["site"],
       user: req.user.id,
     }
     authorizer.create(req.user, params).then(() => {
@@ -35,7 +35,7 @@ module.exports = {
   findOne: (req, res) => {
     let build
 
-    Promise.resolve(Number(req.param("id"))).then(id => {
+    Promise.resolve(Number(req.params["id"])).then(id => {
       if (isNaN(id)) {
         throw 404
       }
@@ -59,7 +59,7 @@ module.exports = {
   status: (req, res) => {
     var message = decodeb64(req.body.message)
 
-    Promise.resolve(Number(req.param("id"))).then(id => {
+    Promise.resolve(Number(req.params["id"])).then(id => {
       if (isNaN(id)) {
         throw 404
       }
