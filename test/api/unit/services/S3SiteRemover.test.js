@@ -1,20 +1,15 @@
-const AWS = require('aws-sdk-mock')
+const AWSMocks = require('../../support/aws-mocks')
 const expect = require("chai").expect
-const proxyquire = require("proxyquire")
 const factory = require("../../support/factory")
 const config = require("../../../../config")
-
-const S3 = {
-  listObjects: () => Promise.resolve(),
-  deleteObjects: () => Promise.resolve(),
-}
-
-AWS.mock("S3", "listObjects", (params, cb) => S3.listObjects(params, cb))
-AWS.mock("S3", "deleteObjects", (params, cb) => S3.deleteObjects(params, cb))
 
 const S3SiteRemover = require("../../../../api/services/S3SiteRemover")
 
 describe("S3SiteRemover", () => {
+  after(() => {
+    AWSMocks.resetMocks()
+  })
+
   describe(".removeSite(site)", () => {
     it("should delete all objects in the `site/<org>/<repo>` and `preview/<org>/<repo> directories", done => {
       const siteObjectsToDelete = []
@@ -24,7 +19,7 @@ describe("S3SiteRemover", () => {
       let siteObjectsWereListed = false
       let previewObjectsWereListed = false
 
-      S3.listObjects = (params, cb) => {
+      AWSMocks.mocks.S3.listObjects = (params, cb) => {
         expect(params.Bucket).to.equal(config.s3.bucket)
         if (params.Prefix === `site/${site.owner}/${site.repository}`) {
           siteObjectsWereListed = true
@@ -38,7 +33,7 @@ describe("S3SiteRemover", () => {
           })
         }
       }
-      S3.deleteObjects = (params, cb) => {
+      AWSMocks.mocks.S3.deleteObjects = (params, cb) => {
         expect(params.Bucket).to.equal(config.s3.bucket)
 
         const objectsToDelete = siteObjectsToDelete.concat(previewObjectsToDelete)

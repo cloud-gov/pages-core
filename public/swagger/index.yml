@@ -317,6 +317,20 @@ paths:
           description: Not found
           schema:
             $ref: "Error.json"
+  /site/{site_id}/published-branch:
+    get:
+      summary: Fetch all of the branches published to S3 for the given site
+      responses:
+        200:
+          description: An array of branches published to S3
+          schema:
+            type: array
+            items:
+              $ref: "PublishedBranch.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
   /me:
     get:
       summary: Fetch data for the current user

@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "required": [
+    "name",
+    "site",
+    "viewLink"
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "files": {
+      "type": "array",
+      "itmes": {
+        "type": "string"
+      }
+    },
+    "site": {
+      "type": "object"
+    },
+    "viewLink": {
+      "type": "string"
+    }
+  }
+}

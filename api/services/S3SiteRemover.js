@@ -2,7 +2,7 @@ const AWS = require("aws-sdk")
 const config = require("../../config")
 
 const s3Config = config.s3
-const s3Client = () => new AWS.S3({
+const s3Client = new AWS.S3({
   accessKeyId: s3Config.accessKeyId,
   secretAccessKey: s3Config.secretAccessKey,
   region: s3Config.region,
@@ -20,7 +20,7 @@ const removeSite = site => {
 
 const deleteObjects = objects => {
   return new Promise((resolve, reject) => {
-    s3Client().deleteObjects({
+    s3Client.deleteObjects({
       Bucket: s3Config.bucket,
       Delete: {
         Objects: objects.map(object => ({ Key: object }))
@@ -37,7 +37,7 @@ const deleteObjects = objects => {
 
 const getObjectsWithPrefix = prefix => {
   return new Promise((resolve, reject) => {
-    s3Client().listObjects({
+    s3Client.listObjects({
       Bucket: s3Config.bucket,
       Prefix: prefix,
     }, (err, data) => {

@@ -21,9 +21,9 @@ const beforeValidate = (site) => {
 }
 
 const toJSON = function() {
-  const object = this.get({
+  const object = Object.assign({}, this.get({
     plain: true,
-  })
+  }))
 
   object.createdAt = object.createdAt.toISOString()
   object.updatedAt = object.updatedAt.toISOString()
@@ -39,6 +39,18 @@ const toJSON = function() {
   })
 
   return object
+}
+
+const viewLinkForBranch = function(branch) {
+  const s3Root = `http://${config.s3.bucket}.s3-website-${config.s3.region}.amazonaws.com`
+
+  if (branch === this.defaultBranch && this.domain) {
+    return this.domain
+  } else if (branch === this.defaultBranch) {
+    return `${s3Root}/site/${this.owner}/${this.repository}`
+  } else {
+    return `${s3Root}/preview/${this.owner}/${this.repository}/${branch}`
+  }
 }
 
 module.exports = (sequelize, DataTypes) => {
@@ -77,6 +89,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     instanceMethods: {
       toJSON,
+      viewLinkForBranch,
     },
     hooks: {
       beforeValidate,

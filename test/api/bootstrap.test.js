@@ -1,8 +1,4 @@
-const AWS = require('aws-sdk-mock')
-
-AWS.mock('SQS', 'sendMessage', function (params, callback) {
-  callback(null, {})
-})
+const AWSMocks = require("./support/aws-mocks")
 
 const app = require("../../app")
 
