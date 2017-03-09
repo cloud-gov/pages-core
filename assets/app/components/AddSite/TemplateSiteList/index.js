@@ -68,10 +68,11 @@ class TemplateList extends React.Component {
           {row.map((templateName, cellIndex) => {
             const template = templates[templateName];
             return (
-              <div className={`usa-width-one-${cellSize}`}>
+              <div
+                  className={`usa-width-one-${cellSize}`}
+                  key={cellIndex}>
                 <TemplateSite
                   name={templateName}
-                  key={cellIndex}
                   index={index++}
                   thumb={templateName}
                   active={this.state.activeChildId}
