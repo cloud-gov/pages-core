@@ -12,7 +12,7 @@ const propTypes = {
   storeState: React.PropTypes.shape({
     user: React.PropTypes.shape({
       username: React.PropTypes.string,
-      id: React.PropTypes.string
+      id: React.PropTypes.number
     }),
     error: React.PropTypes.string
   })
