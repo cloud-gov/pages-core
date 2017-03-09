@@ -63,7 +63,7 @@ class TemplateSite extends React.Component {
     const { props } = this;
 
     return (
-      <div className="usa-width-one-fourth template-block">
+      <div className="template-block">
         <div className="usa-alert usa-alert-info">
           <div className="usa-alert-heading">
             <h3>{props.title}</h3>
