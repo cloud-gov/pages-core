@@ -23,4 +23,4 @@ Object.keys(sequelize.models).forEach(key => {
   sequelize.models[key].associate(sequelize.models)
 })
 
-module.exports = sequelize.models
+module.exports = Object.assign({ sequelize }, sequelize.models)

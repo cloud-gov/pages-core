@@ -3,29 +3,10 @@ const cfenv = require("cfenv")
 
 const appEnv = cfenv.getAppEnv()
 
-// Session Config
-const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`)
-if (redisCreds) {
-  module.exports.session = {
-    cookie: {
-      secure: true,
-    },
-  }
-  module.exports.redis = {
-    host: redisCreds.hostname,
-    port: redisCreds.port,
-    db: 0,
-    pass: redisCreds.password,
-  }
-} else {
-  throw new Error("No redis credentials found.")
-}
-
 // Database Config
 const rdsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-rds`)
 if (rdsCreds) {
   module.exports.postgres: {
-    adapter: 'sails-postgresql',
     database: rdsCreds.db_name,
     host: rdsCreds.host,
     user: rdsCreds.username,
