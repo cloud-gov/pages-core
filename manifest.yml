@@ -9,7 +9,6 @@ memory: 256MB
 instances: 5
 services:
 - federalist-production-rds
-- federalist-production-redis
 - federalist-production-s3
 - federalist-production-env
 env:

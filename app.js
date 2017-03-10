@@ -20,16 +20,12 @@ const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
 const expressWinston = require("express-winston")
 const session = require("express-session")
-const RedisStore = require("connect-redis")(session)
+const PostgresStore = require("connect-session-sequelize")(session.Store)
 const responses = require("./api/responses")
 
 const app = express()
-
-if (config.redis) {
-  config.session.store = new RedisStore(config.redis)
-} else {
-  config.session.store = new session.MemoryStore()
-}
+const sequelize = require("./api/models").sequelize
+config.session.store = new PostgresStore({ db: sequelize })
 
 app.use(session(config.session))
 app.use(express.static("public"))
