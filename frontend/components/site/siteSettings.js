@@ -46,7 +46,7 @@ class SiteSettings extends React.Component {
   }
 
   onDelete(event) {
-    if (confirm('Are you sure you want to delete this site?')) {
+    if (confirm('Are you sure you want to delete this site? This action will also delete your site builds, including all previews.')) {
       siteActions.deleteSite(this.props.params.id);
     }
 
