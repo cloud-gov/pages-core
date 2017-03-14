@@ -1,7 +1,6 @@
 var dbm = global.dbm || require('db-migrate');
 var type = dbm.dataType;
 var fs = require('fs');
-var async = require('sails/node_modules/async');
 
 const dropTable = (db, table) => {
   return new Promise((resolve, reject) => {
