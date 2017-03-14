@@ -7,7 +7,8 @@ const propTypes = {
 
 export const sideNavPaths = {
   SETTINGS: 'settings',
-  BUILDS: 'builds'
+  BUILDS: 'builds',
+  PUBLISHED: 'published',
 };
 
 class SideNav extends React.Component {
@@ -26,6 +27,11 @@ class SideNav extends React.Component {
             href={this.getUrl(siteId, sideNavPaths.SETTINGS)}
             icon='settings'
             linkText={sideNavPaths.SETTINGS}
+          />
+          <SideNavItem
+            href={this.getUrl(siteId, sideNavPaths.PUBLISHED)}
+            icon='media'
+            linkText={sideNavPaths.PUBLISHED}
           />
           <SideNavItem
             href={this.getUrl(siteId, sideNavPaths.BUILDS)}

@@ -15,7 +15,7 @@ describe("buildLogsReducer", () => {
     }).default;
   });
 
-  it("ignores other actions and returns and empty array", () => {
+  it("ignores other actions and returns an empty array", () => {
     const LOGS = ["Log 1", "Log 2"]
 
     const actual = fixture(undefined, {

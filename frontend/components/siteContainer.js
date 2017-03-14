@@ -73,6 +73,11 @@ class SiteContainer extends React.Component {
           buildLogs: storeState.buildLogs,
         };
         break;
+      case 'published':
+        childConfigs = {
+          publishedBranches: storeState.publishedBranches,
+        };
+        break;
       case 'settings':
       case 'builds':
       default:
