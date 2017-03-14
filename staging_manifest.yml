@@ -15,7 +15,7 @@ services:
 env:
   NODE_ENV: production
   APP_ENV: staging
-  SAILS_LOG_LEVEL: verbose
+  LOG_LEVEL: verbose
   NPM_CONFIG_PRODUCTION: true
   NODE_MODULES_CACHE: false
   APP_NAME: federalist-staging
