@@ -25,7 +25,7 @@ The following environment variables are set on the Cloud Foundry environment in 
 
 - `NODE_ENV`: The node environment where the app should run. When running in Cloud Foundry this should always be set to production, even for the staging environment
 - `APP_ENV`: The application environment in which the app should run. Valid values are `production` and `staging`.
-- `SAILS_LOG_LEVEL`: Sets the log level for sails.
+- `LOG_LEVEL`: Sets the log level for the app.
 - `NPM_CONFIG_PRODUCTION`: This should be set to true in Cloud Foundry to prevent NPM from installing dev dependencies
 - `NODE_MODULES_CACHE`: This should be set to true in Cloud Foundry to prevent caching node modules since those are vendored by Federalist
 - `APP_NAME`: The name of the Cloud Foundry application

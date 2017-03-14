@@ -15,7 +15,7 @@ env:
   NEW_RELIC_APP_NAME: federalist-prod
   NODE_ENV: production
   APP_ENV: production
-  SAILS_LOG_LEVEL: info
+  LOG_LEVEL: info
   NPM_CONFIG_PRODUCTION: true
   NODE_MODULES_CACHE: false
   APP_NAME: federalist
