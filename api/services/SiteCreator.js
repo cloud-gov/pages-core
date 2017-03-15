@@ -82,6 +82,7 @@ const createSiteFromExistingRepo = ({ siteParams, user }) => {
 const createSiteFromTemplate = ({ siteParams, user, template }) => {
   let site = Site.build(siteParams)
   site.engine = "jekyll"
+  site.defaultBranch = templateForTemplateName(template).branch
   const { owner, repository } = siteParams
 
   return site.validate().then(error => {
@@ -111,10 +112,7 @@ const paramsForNewBuild = ({ user, site, template }) => ({
 
 const paramsForNewBuildSource = (templateName) => {
   if (templateName) {
-    const template = sails.config.templates[templateName]
-    if (!template) {
-      throw new Error(`No such template: ${templateName}`)
-    }
+    const template = templateForTemplateName(templateName)
     return { repository: template.repo, owner: template.owner }
   }
 }
@@ -128,6 +126,14 @@ const paramsForNewSite = (params) => ({
 
 const siteExists = ({ owner, repository }) => {
   return Promise.resolve(false)
+}
+
+const templateForTemplateName = (templateName) => {
+  const template = sails.config.templates[templateName]
+  if (!template) {
+    throw new Error(`No such template: ${templateName}`)
+  }
+  return template
 }
 
 module.exports = {

@@ -316,6 +316,7 @@ describe("SiteCreator", () => {
         }).then(site => {
           expect(site.Builds).to.have.length(1)
           expect(site.Builds[0].user).to.equal(user.id)
+          expect(site.Builds[0].branch).to.equal("gh-pages")
           expect(site.Builds[0].source).to.deep.equal({
             repository: "microsite-template",
             owner: "USG-Website-Templates",
