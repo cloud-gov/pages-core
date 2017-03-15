@@ -6,7 +6,7 @@ const appEnv = cfenv.getAppEnv()
 // Database Config
 const rdsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-rds`)
 if (rdsCreds) {
-  module.exports.postgres: {
+  module.exports.postgres = {
     database: rdsCreds.db_name,
     host: rdsCreds.host,
     user: rdsCreds.username,
