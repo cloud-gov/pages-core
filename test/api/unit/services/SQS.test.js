@@ -78,13 +78,28 @@ describe("SQS", () => {
 
     context("building a site's default branch", () => {
       it("should set an empty string for BASEURL in the message for a site with a custom domain", done => {
-        factory.site({ domain: "www.example.com", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
-          return factory.build({ site: site, branch: "master" })
-        }).then(build => {
-          return Build.findById(build.id, { include: [Site, User] })
-        }).then(build => {
-          const message = SQS.messageBodyForBuild(build)
-          expect(messageEnv(message, "BASEURL")).to.equal("")
+        const domains = [
+          "www.example.com",
+          "www.example.com/",
+          "https://example.com",
+          "https://example.com/",
+          "http://example.com",
+          "http://example.com/",
+        ]
+
+        const baseurlPromises = domains.map(domain => {
+          return factory.site({ domain, defaultBranch: "master" }).then(site => {
+            return factory.build({ site, branch: "master" })
+          }).then(build => {
+            return Build.findById(build.id, { include: [Site, User] })
+          }).then(build => {
+            const message = SQS.messageBodyForBuild(build)
+            return messageEnv(message, "BASEURL")
+          })
+        })
+
+        Promise.all(baseurlPromises).then(baseurls => {
+          expect(baseurls).to.deep.equal(Array(domains.length).fill(""))
           done()
         }).catch(done)
       })
@@ -97,6 +112,33 @@ describe("SQS", () => {
         }).then(build => {
           const message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "BASEURL")).to.equal("/site/owner/repo")
+          done()
+        }).catch(done)
+      })
+
+      it("should respect the path component of a custom domain when setting BASEURL in the message", done => {
+        const domains = [
+          "www.example.com/abc/def",
+          "www.example.com/abc/def/",
+          "https://example.com/abc/def",
+          "https://example.com/abc/def/",
+          "http://example.com/abc/def",
+          "http://example.com/abc/def/",
+        ]
+
+        const baseurlPromises = domains.map(domain => {
+          return factory.site({ domain, defaultBranch: "master" }).then(site => {
+            return factory.build({ site, branch: "master" })
+          }).then(build => {
+            return Build.findById(build.id, { include: [Site, User] })
+          }).then(build => {
+            const message = SQS.messageBodyForBuild(build)
+            return messageEnv(message, "BASEURL")
+          })
+        })
+
+        Promise.all(baseurlPromises).then(baseurls => {
+          expect(baseurls).to.deep.equal(Array(domains.length).fill("/abc/def"))
           done()
         }).catch(done)
       })

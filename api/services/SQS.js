@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk')
 const logger = require("winston")
+const url = require("url")
 const config = require("../../config")
 const buildConfig = config.build
 const s3Config = config.s3
@@ -38,10 +39,17 @@ var pathForBuild = (build) => {
 
 var baseURLForBuild = (build) => {
   if (defaultBranch(build) && build.Site.domain) {
-    return ""
+    return baseURLForCustomDomain(build.Site.domain)
   } else {
     return "/" + pathForBuild(build)
   }
+}
+
+var baseURLForCustomDomain = (domain) => {
+  if (!domain.match(/https?\:\/\//)) {
+    domain = "https://" + domain
+  }
+  return url.parse(domain).path.replace(/\/$/, "")
 }
 
 var sourceForBuild = (build) => {
