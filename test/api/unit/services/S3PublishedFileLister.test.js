@@ -90,5 +90,16 @@ describe("S3PublishedFileLister", () => {
         done()
       }).catch(done)
     })
+
+    it("should reject with an error if S3.listObjects is unsuccessful", done => {
+      AWSMocks.mocks.S3.listObjects = (params, cb) => cb(new Error("Test error"))
+
+      factory.site().then(model => {
+        return S3PublishedFileLister.listPublishedFilesForBranch(site, "preview")
+      }).catch(err => {
+        expect(err.message).to.equal("Test error")
+        done()
+      }).catch(done)
+    })
   })
 })

@@ -318,6 +318,12 @@ paths:
           schema:
             $ref: "Error.json"
   /site/{site_id}/published-branch:
+    parameters:
+    - name: site_id
+      in: path
+      description: The id of the site
+      type: integer
+      required: true
     get:
       summary: Fetch all of the branches published to S3 for the given site
       responses:
@@ -327,6 +333,29 @@ paths:
             type: array
             items:
               $ref: "PublishedBranch.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+  /site/{site_id}/published-branch/{branch}:
+    parameters:
+    - name: site_id
+      in: path
+      description: The id of the site
+      type: integer
+      required: true
+    - name: branch
+      in: path
+      description: The name of the branch
+      type: string
+      required: true
+    get:
+      summary: Fetch information about what's pusblished for the site at the given branch
+      responses:
+        200:
+          description: A published branch object representing the branch published to S3
+          schema:
+            $ref: "PublishedBranch.json"
         403:
           description: Not authorized
           schema:

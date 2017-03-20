@@ -29,5 +29,30 @@ module.exports = {
     }).catch(err => {
       res.error(err)
     })
-  }
+  },
+
+  findOne: (req, res) => {
+    let site
+    const branch = req.params["branch"]
+
+    Promise.resolve(Number(req.params["site_id"])).then(id => {
+      if (isNaN(id)) {
+        throw 404
+      }
+      return Site.findById(id)
+    }).then(model => {
+      if (model) {
+        site = model
+      } else {
+        throw 404
+      }
+      return siteAuthorizer.findOne(req.user, site)
+    }).then(() => {
+      return S3PublishedFileLister.listPublishedFilesForBranch(site, branch)
+    }).then(files => {
+      return PublishedBranchSerializer.serialize(site, branch, files)
+    }).then(branchJSON => {
+      res.json(branchJSON)
+    }).catch(res.error)
+  },
 }

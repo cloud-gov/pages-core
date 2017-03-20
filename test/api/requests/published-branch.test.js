@@ -82,4 +82,76 @@ describe("Published Files API", () => {
       }).catch(done)
     })
   })
+
+  describe("GET /v0/site/:site_id/published-branch/:branch", () => {
+    it("should require authentication", done => {
+      factory.site().then(site => {
+        return request("http://localhost:1337")
+          .get(`/v0/site/${site.id}/published-branch/${site.defaultBranch}`)
+          .expect(403)
+      }).then(response => {
+        validateAgainstJSONSchema("GET", "/site/{site_id}/published-branch/{branch}", 403, response.body)
+        done()
+      }).catch(done)
+    })
+
+    it("should list the files on S3 for a given branch", done => {
+      let site
+      const userPromise = factory.user()
+      const sitePromise = factory.site({
+        defaultBranch: "master",
+        users: Promise.all([userPromise]),
+      })
+      const cookiePromise = session(userPromise)
+
+      AWSMocks.mocks.S3.listObjects = (params, callback) => {
+        const prefix = `site/${site.owner}/${site.repository}`
+        expect(params.Bucket).to.equal(config.s3.bucket)
+        expect(params.Prefix).to.equal(prefix)
+
+        callback(null, {
+          Contents: [
+            { Key: `${prefix}/abc` },
+            { Key: `${prefix}/abc/def` },
+            { Key: `${prefix}/ghi` },
+          ]
+        })
+      }
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      }).then(promisedValues => {
+        site = promisedValues.site
+
+        return request("http://localhost:1337")
+          .get(`/v0/site/${site.id}/published-branch/master`)
+          .set("Cookie", promisedValues.cookie)
+          .expect(200)
+      }).then(response => {
+        validateAgainstJSONSchema("GET", "/site/{site_id}/published-branch/{branch}", 200, response.body)
+        expect(response.body.files).to.include("abc")
+        expect(response.body.files).to.include("abc/def")
+        expect(response.body.files).to.include("ghi")
+        done()
+      }).catch(done)
+    })
+
+    it("should 403 if the user is not associated with the site", done => {
+      const user = factory.user()
+      const site = factory.site({ defaultBranch: "master" })
+      const cookie = session(user)
+
+      Promise.props({ user, site, cookie }).then(promisedValues => {
+        return request("http://localhost:1337")
+          .get(`/v0/site/${promisedValues.site.id}/published-branch/master`)
+          .set("Cookie", promisedValues.cookie)
+          .expect(403)
+      }).then(response => {
+        validateAgainstJSONSchema("GET", "/site/{site_id}/published-branch/{branch}", 403, response.body)
+        done()
+      }).catch(done)
+    })
+  })
 })
