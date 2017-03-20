@@ -37,4 +37,58 @@ describe("S3PublishedFileLister", () => {
       }).catch(done)
     })
   })
+
+  describe(".listPublishedFilesForBranch(site, branch)", () => {
+    it("should resolve with a list of files for the site's default branch", done => {
+      let site
+
+      AWSMocks.mocks.S3.listObjects = (params, callback) => {
+        const prefix = `site/${site.owner}/${site.repository}`
+        expect(params.Bucket).to.equal(config.s3.bucket)
+        expect(params.Prefix).to.equal(prefix)
+
+        callback(null, {
+          Contents: [
+            { Key: `${prefix}/abc` },
+            { Key: `${prefix}/abc/def` },
+            { Key: `${prefix}/ghi` },
+          ]
+        })
+      }
+
+      factory.site({ defaultBranch: "master" }).then(model => {
+        site = model
+        return S3PublishedFileLister.listPublishedFilesForBranch(site, "master")
+      }).then(publishedFiles => {
+        expect(publishedFiles).to.deep.equal(["abc", "abc/def", "ghi"])
+        done()
+      }).catch(done)
+    })
+
+    it("should resolve with a list of files for a preview branch", done => {
+      let site
+
+      AWSMocks.mocks.S3.listObjects = (params, callback) => {
+        const prefix = `preview/${site.owner}/${site.repository}/preview`
+        expect(params.Bucket).to.equal(config.s3.bucket)
+        expect(params.Prefix).to.equal(prefix)
+
+        callback(null, {
+          Contents: [
+            { Key: `${prefix}/abc` },
+            { Key: `${prefix}/abc/def` },
+            { Key: `${prefix}/ghi` },
+          ]
+        })
+      }
+
+      factory.site({ defaultBranch: "master" }).then(model => {
+        site = model
+        return S3PublishedFileLister.listPublishedFilesForBranch(site, "preview")
+      }).then(publishedFiles => {
+        expect(publishedFiles).to.deep.equal(["abc", "abc/def", "ghi"])
+        done()
+      }).catch(done)
+    })
+  })
 })

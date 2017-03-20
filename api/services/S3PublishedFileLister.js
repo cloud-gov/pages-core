@@ -13,6 +13,16 @@ const listPublishedPreviews = (site) => {
   return listFolders(previewPath)
 }
 
+const listPublishedFilesForBranch = (site, branch) => {
+  let filepath
+  if (site.defaultBranch === branch) {
+    filepath = `site/${site.owner}/${site.repository}`
+  } else {
+    filepath = `preview/${site.owner}/${site.repository}/${branch}`
+  }
+  return listFiles(filepath)
+}
+
 const listFolders = (path) => {
   return new Promise((resolve, reject) => {
     s3Client.listObjects({
@@ -33,4 +43,23 @@ const listFolders = (path) => {
   })
 }
 
-module.exports = { listPublishedPreviews }
+const listFiles = (path) => {
+  return new Promise((resolve, reject) => {
+    s3Client.listObjects({
+      Bucket: s3Config.bucket,
+      Prefix: path,
+    }, (err, data) => {
+      if (err) {
+        reject(err)
+      } else {
+        const prefixComponents = path.split("/").length
+        filenames = data.Contents.map(object => {
+          return object.Key.split("/").slice(prefixComponents).join("/")
+        })
+        resolve(filenames)
+      }
+    })
+  })
+}
+
+module.exports = { listPublishedPreviews, listPublishedFilesForBranch }
