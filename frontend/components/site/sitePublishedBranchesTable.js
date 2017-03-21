@@ -1,7 +1,7 @@
 import React from "react";
 import publishedBranchActions from "../../actions/publishedBranchActions";
 
-class SitePublishedBranches extends React.Component {
+class SitePublishedBranchesTable extends React.Component {
   componentDidMount() {
     publishedBranchActions.fetchPublishedBranches({ id: this.props.params.id })
   }
@@ -53,4 +53,4 @@ class SitePublishedBranches extends React.Component {
   }
 }
 
-export default SitePublishedBranches
+export default SitePublishedBranchesTable

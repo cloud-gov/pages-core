@@ -1,9 +1,9 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import SitePublishedBranches from '../../../../frontend/components/site/sitePublishedBranches';
+import SitePublishedBranchesTable from '../../../../frontend/components/site/sitePublishedBranchesTable';
 
-describe("<SitePublishedBranches/>", () => {
+describe("<SitePublishedBranchesTable/>", () => {
   it("should render a table with branches for the given site", () => {
     const props = {
       params: { id: 1 },
@@ -13,7 +13,7 @@ describe("<SitePublishedBranches/>", () => {
       ]
     }
 
-    const wrapper = shallow(<SitePublishedBranches {...props}/>)
+    const wrapper = shallow(<SitePublishedBranchesTable {...props}/>)
     expect(wrapper.find("table")).to.have.length(1)
     expect(wrapper.find("table").contains("branch-a")).to.be.true
     expect(wrapper.find("table").contains("branch-b")).to.be.true
@@ -28,7 +28,7 @@ describe("<SitePublishedBranches/>", () => {
       ]
     }
 
-    const wrapper = shallow(<SitePublishedBranches {...props}/>)
+    const wrapper = shallow(<SitePublishedBranchesTable {...props}/>)
     expect(wrapper.find("table")).to.have.length(1)
     expect(wrapper.find("table").contains("branch-a")).to.be.true
     expect(wrapper.find("table").contains("branch-b")).to.be.false
@@ -40,7 +40,7 @@ describe("<SitePublishedBranches/>", () => {
       publishedBranches: []
     }
 
-    const wrapper = shallow(<SitePublishedBranches {...props}/>)
+    const wrapper = shallow(<SitePublishedBranchesTable {...props}/>)
     expect(wrapper.find("table")).to.have.length(0)
     expect(wrapper.find("p")).to.have.length(1)
     expect(wrapper.find("p").contains("No published branch data available")).to.be.true
