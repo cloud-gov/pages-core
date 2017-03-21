@@ -22,6 +22,10 @@ export default {
     return this.fetch(`build/${build.id}/log`);
   },
 
+  fetchPublishedBranch(site, name) {
+    return this.fetch(`site/${site.id}/published-branch/${name}`)
+  },
+
   fetchPublishedBranches(site) {
     return this.fetch(`site/${site.id}/published-branch`);
   },

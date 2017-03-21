@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from 'react-router';
 import publishedBranchActions from "../../actions/publishedBranchActions";
 
 class SitePublishedBranchesTable extends React.Component {
@@ -33,7 +34,7 @@ class SitePublishedBranchesTable extends React.Component {
           </tr>
         </thead>
         <tbody>
-          { this.publishedBranches().map(this.renderPublishedBranchRow) }
+          { this.publishedBranches().map(this.renderPublishedBranchRow.bind(this)) }
         </tbody>
       </table>
     )
@@ -43,9 +44,21 @@ class SitePublishedBranchesTable extends React.Component {
     return (
       <tr key={branch.name}>
         <td>{ branch.name }</td>
-        <td><a href={branch.viewLink}>View</a></td>
+        <td>
+          { this.renderBranchViewLink(branch) }<br />
+          { this.renderBranchFilesLink(branch) }
+        </td>
       </tr>
     )
+  }
+
+  renderBranchViewLink(branch) {
+    return <a href={branch.viewLink}>View</a>
+  }
+
+  renderBranchFilesLink(branch) {
+    const href = `/sites/${branch.site.id}/published/${branch.name}`
+    return <Link to={href}>Files</Link>
   }
 
   renderLoadingState() {

@@ -61,6 +61,9 @@ class SiteContainer extends React.Component {
   render () {
     const { storeState, children, params, location } = this.props;
     const site = this.getCurrentSite(storeState.sites, params.id);
+    const publishedBranches = storeState.publishedBranches.filter(branch => {
+      return branch.site.id === site.id
+    })
     const pageTitle = this.getPageTitle(location.pathname);
 
     let childConfigs;
@@ -73,15 +76,11 @@ class SiteContainer extends React.Component {
           buildLogs: storeState.buildLogs,
         };
         break;
-      case 'published':
-        childConfigs = {
-          publishedBranches: storeState.publishedBranches,
-        };
-        break;
       case 'settings':
       case 'builds':
+      case 'published':
       default:
-        childConfigs = { site };
+        childConfigs = { site, publishedBranches };
     }
 
     if (!site) {

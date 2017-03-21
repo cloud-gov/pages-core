@@ -6,6 +6,7 @@ import SiteList from './components/siteList/siteList';
 import SiteContainer from './components/siteContainer';
 import SiteBuilds from './components/site/siteBuilds';
 import SiteBuildLogs from './components/site/siteBuildLogs';
+import SitePublishedBranch from "./components/site/sitePublishedBranch"
 import SitePublishedBranchesTable from './components/site/sitePublishedBranchesTable';
 import SiteSettings from './components/site/siteSettings';
 import NewSite from './components/AddSite';
@@ -20,7 +21,10 @@ export default (
       <Route path=":id" component={SiteContainer}>
         <IndexRedirect to="settings" />
         <Route path="settings" component={SiteSettings}/>
-        <Route path="published" component={SitePublishedBranchesTable}/>
+        <Route path="published">
+          <IndexRoute component={SitePublishedBranchesTable}/>
+          <Route path=":name" component={SitePublishedBranch}/>
+        </Route>
         <Route path="builds">
           <IndexRoute component={SiteBuilds}/>
           <Route path=":buildId/logs" component={SiteBuildLogs}/>
