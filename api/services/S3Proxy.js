@@ -51,8 +51,18 @@ const pipeS3ObjectToResponse = ({ key, res }) => {
 }
 
 const resolveKey = (path) => {
+  if (path.split("/").length <= 4) {
+    return Promise.resolve({
+      status: 302,
+      key: "/" + path + "/",
+    })
+  }
+
   if (path.slice(-1) === "/") {
-    return Promise.resolve(path + "index.html")
+    return Promise.resolve({
+      status: 200,
+      key: path + "index.html",
+    })
   }
 
   return new Promise((resolve, reject) => {
@@ -69,9 +79,11 @@ const resolveKey = (path) => {
         return candidate.Key === path
       })
       if (object && object.Size > 0) {
-        resolve(path)
+        resolve({ status: 200, key: path })
+      } else if (object && object.Size === 0) {
+        resolve({ status: 302, key: "/" + path + "/" })
       } else {
-        resolve(path + "/index.html")
+        resolve({ status: 404 })
       }
     })
   })
@@ -105,8 +117,16 @@ const proxy = (req, res) => {
     return verifyUserAuthorization({ user: req.user, site: site })
   }).then(() => {
     return resolveKey(req.path.slice(1))
-  }).then(key => {
-    pipeS3ObjectToResponse({ key, res })
+  }).then(({ status, key }) => {
+    if (status === 200) {
+      pipeS3ObjectToResponse({ key, res })
+    } else if (status === 404) {
+      res.notFound()
+    } else if (status === 302) {
+      res.redirect(302, key)
+    } else {
+      res.error("Unable to resolve S3 object")
+    }
   })
 }
 
