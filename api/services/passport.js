@@ -45,7 +45,11 @@ passport.callback = (req, res) => {
   passport.authenticate("github")(req, res, () => {
     if (req.user) {
       req.session.authenticated = true
-      res.redirect("/")
+      if (req.session.authRedirectPath) {
+        res.redirect(req.session.authRedirectPath)
+      } else {
+        res.redirect("/")
+      }
     } else {
       res.status(401).send("Unauthorized")
     }

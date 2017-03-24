@@ -1,5 +1,6 @@
 const expect = require("chai").expect
 const cookie = require('cookie')
+const crypto = require("crypto")
 const nock = require("nock")
 const request = require("supertest-as-promised")
 const config = require("../../../config")
@@ -189,6 +190,40 @@ describe("Authentication request", () => {
       request("http://localhost:1337")
         .get("/auth/github/callback?code=auth-code-123abc")
         .expect(401, done)
+    })
+
+    it("should redirect to a redirect path if one is set in the session", done => {
+      const redirectPath = "/path/to/something"
+
+      const sessionKey = crypto.randomBytes(8).toString("hex")
+      const sessionBody = {
+        cookie: {
+          originalMaxAge: null,
+          expires: null,
+          httpOnly: true,
+          path: "/"
+        },
+        authRedirectPath: redirectPath,
+      }
+      const signedSessionKey = sessionKey + "." + crypto
+        .createHmac('sha256', config.session.secret)
+        .update(sessionKey)
+        .digest('base64')
+        .replace(/\=+$/, '')
+      const cookie = `${config.session.key}=s%3A${signedSessionKey}`
+
+      config.session.store.set(sessionKey, sessionBody).then(() => {
+        return factory.user()
+      }).then(user => {
+        githubAPINocks.githubAuth(user.username, [{ id: 123456 }])
+        return request("http://localhost:1337")
+          .get("/auth/github/callback?code=auth-code-123abc")
+          .set("Cookie", cookie)
+          .expect(302)
+      }).then(response => {
+        expect(response.header.location).to.equal(redirectPath)
+        done()
+      }).catch(done)
     })
   })
 })
