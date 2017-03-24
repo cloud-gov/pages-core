@@ -24,17 +24,21 @@ const findSite = (req) => {
     if (!site) {
       throw httpError({
         message: `No such site: ${owner}/${repository}.`,
-        code: 404,
+        status: 404,
       })
     }
     return site
   })
 }
 
-const httpError = ({ message, code }) => {
+const httpError = ({ message, status }) => {
   const error = new Error(message)
-  error.code = `${code}`
+  error.status = status
   return error
+}
+
+const pathIsPreviewRoot = (path) => {
+  return path.split("/").length <= 4
 }
 
 const pipeS3ObjectToResponse = ({ key, res }) => {
@@ -45,13 +49,13 @@ const pipeS3ObjectToResponse = ({ key, res }) => {
     headers['X-Frame-Options'] = 'SAMEORIGIN';
     res.set(headers)
   }).createReadStream().on("error", error => {
-    logger.error("Error proxying S3 object: ", error)
+    logger.error("Error proxying S3 object:", error)
     res.send(error.statusCode, error.message)
   }).pipe(res)
 }
 
 const resolveKey = (path) => {
-  if (path.split("/").length <= 4) {
+  if (pathIsPreviewRoot(path)) {
     return Promise.resolve({
       status: 302,
       key: "/" + path + "/",
@@ -97,7 +101,7 @@ const verifyUserAuthorization = ({ user, site }) => {
   if (!user) {
     throw httpError({
       message: "Public preview is disabled for this site.",
-      code: 403,
+      status: 403,
     })
   }
 
@@ -107,7 +111,7 @@ const verifyUserAuthorization = ({ user, site }) => {
   if (userIndex < 0) {
     throw httpError({
       message: "User is not authorized to view this site.",
-      code: 403,
+      status: 403,
     })
   }
 }
