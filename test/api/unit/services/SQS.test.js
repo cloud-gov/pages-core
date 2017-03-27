@@ -216,14 +216,34 @@ describe("SQS", () => {
       }).catch(done)
     })
 
-    it("should set CONFIG in the message to the YAML config for the site", done => {
-      factory.site({ config: "plugins_dir: _plugins" }).then(site => {
-        return factory.build({ site: site })
+    it("should set CONFIG in the message to the YAML config for the site on the default branch", done => {
+      factory.site({
+        defaultBranch: "master",
+        config: "plugins_dir: _plugins",
+        previewConfig: "plugins_dir: _preview_plugins",
+      }).then(site => {
+        return factory.build({ site, branch: "master" })
       }).then(build => {
         return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
         const message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "CONFIG")).to.equal("plugins_dir: _plugins")
+        done()
+      }).catch(done)
+    })
+
+    it("should set CONFIG in the message to the YAML config for the site on a preview branch", done => {
+      factory.site({
+        defaultBranch: "master",
+        config: "plugins_dir: _plugins",
+        previewConfig: "plugins_dir: _preview_plugins",
+      }).then(site => {
+        return factory.build({ site, branch: "preview" })
+      }).then(build => {
+        return Build.findById(build.id, { include: [Site, User] })
+      }).then(build => {
+        const message = SQS.messageBodyForBuild(build)
+        expect(messageEnv(message, "CONFIG")).to.equal("plugins_dir: _preview_plugins")
         done()
       }).catch(done)
     })
