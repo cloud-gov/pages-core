@@ -273,7 +273,7 @@ describe("Site API", () => {
             repository: siteRepository,
             defaultBranch: "master",
             engine: "jekyll",
-            template: "microsite",
+            template: "team",
           })
           .set("Cookie", cookie)
           .expect(200)
@@ -299,7 +299,7 @@ describe("Site API", () => {
           .send({
             defaultBranch: "master",
             engine: "jekyll",
-            template: "microsite",
+            template: "team",
           })
           .set("Cookie", cookie)
           .expect(400)

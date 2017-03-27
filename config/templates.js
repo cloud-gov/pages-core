@@ -23,20 +23,4 @@ module.exports = {
     title: 'Single-page template',
     description: 'Single page to host information about a specific topic or report',
   },
-  'developer': {
-    owner: 'USG-Website-Templates',
-    repo: 'developer-hub',
-    branch: 'gh-pages',
-    example: 'http://usg-website-templates.github.io/developer-hub/',
-    title: 'A developer hub for API documentation',
-    description: 'A template for developer hubs and API docs',
-  },
-  'microsite': {
-    owner: 'USG-Website-Templates',
-    repo: 'microsite-template',
-    branch: 'gh-pages',
-    example: 'https://usg-website-templates.github.io/microsite-template/',
-    title: 'Basic microsite',
-    description: 'A site template for a small site',
-  },
 };

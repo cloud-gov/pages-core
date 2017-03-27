@@ -255,7 +255,7 @@ describe("SiteCreator", () => {
         const siteParams = {
           owner: crypto.randomBytes(3).toString("hex"),
           repository: crypto.randomBytes(3).toString("hex"),
-          template: "microsite",
+          template: "team",
         }
 
         factory.user().then(model => {
@@ -287,7 +287,7 @@ describe("SiteCreator", () => {
         const siteParams = {
           owner: crypto.randomBytes(3).toString("hex"),
           repository: crypto.randomBytes(3).toString("hex"),
-          template: "microsite",
+          template: "team",
         }
 
         factory.user().then(user => {
@@ -305,7 +305,7 @@ describe("SiteCreator", () => {
         const siteParams = {
           owner: crypto.randomBytes(3).toString("hex"),
           repository: crypto.randomBytes(3).toString("hex"),
-          template: "microsite",
+          template: "team",
         }
 
         factory.user().then(model => {
@@ -318,10 +318,10 @@ describe("SiteCreator", () => {
         }).then(site => {
           expect(site.Builds).to.have.length(1)
           expect(site.Builds[0].user).to.equal(user.id)
-          expect(site.Builds[0].branch).to.equal("gh-pages")
+          expect(site.Builds[0].branch).to.equal("master")
           expect(site.Builds[0].source).to.deep.equal({
-            repository: "microsite-template",
-            owner: "USG-Website-Templates",
+            repository: "federalist-modern-team-template",
+            owner: "18f",
           })
           done()
         }).catch(done)
@@ -332,7 +332,7 @@ describe("SiteCreator", () => {
         const siteParams = {
           owner: crypto.randomBytes(3).toString("hex"),
           repository: crypto.randomBytes(3).toString("hex"),
-          template: "microsite",
+          template: "team",
         }
 
         factory.user().then(user => {
@@ -353,7 +353,7 @@ describe("SiteCreator", () => {
         const siteParams = {
           owner: crypto.randomBytes(3).toString("hex"),
           repository: crypto.randomBytes(3).toString("hex"),
-          template: "microsite",
+          template: "team",
         }
 
         factory.user().then(user => {
