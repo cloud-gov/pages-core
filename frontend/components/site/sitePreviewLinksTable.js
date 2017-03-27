@@ -4,7 +4,7 @@ const branchRow = ({ branch, site }) => (
   <tr key={branch.name}>
     <td>{branch.name}</td>
     <td>
-      <a href={previewURL({ branch, site })}>View</a>
+      <a href={previewURL({ branch, site })} target="_blank">View</a>
     </td>
   </tr>
 )
