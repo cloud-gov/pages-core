@@ -1,4 +1,4 @@
-const AWS = require("aws-sdk-mock")
+const AWS = require("aws-sdk")
 
 const mocks = {
   S3: {},
@@ -6,19 +6,21 @@ const mocks = {
 }
 
 const mockableFunctions = {
-  S3: ["listObjects", "deleteObjects"],
+  S3: ["getObject", "listObjects", "deleteObjects"],
   SQS: ["sendMessage",]
 }
 
 Object.keys(mockableFunctions).forEach(service => {
+  AWS[service] = function() {}
+
   mockableFunctions[service].forEach(functionName => {
-    AWS.mock(service, functionName, (params, cb) => {
+    AWS[service].prototype[functionName] = (params, cb) => {
       if (mocks[service][functionName]) {
-        mocks[service][functionName](params, cb)
+        return mocks[service][functionName](params, cb)
       } else {
         cb(null, {})
       }
-    })
+    }
   })
 })
 

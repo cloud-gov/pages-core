@@ -24,17 +24,21 @@ const findSite = (req) => {
     if (!site) {
       throw httpError({
         message: `No such site: ${owner}/${repository}.`,
-        code: 404,
+        status: 404,
       })
     }
     return site
   })
 }
 
-const httpError = ({ message, code }) => {
+const httpError = ({ message, status }) => {
   const error = new Error(message)
-  error.code = `${code}`
+  error.status = status
   return error
+}
+
+const pathIsPreviewRoot = (path) => {
+  return path.split("/").length <= 4
 }
 
 const pipeS3ObjectToResponse = ({ key, res }) => {
@@ -45,14 +49,24 @@ const pipeS3ObjectToResponse = ({ key, res }) => {
     headers['X-Frame-Options'] = 'SAMEORIGIN';
     res.set(headers)
   }).createReadStream().on("error", error => {
-    logger.error("Error proxying S3 object: ", error)
+    logger.error("Error proxying S3 object:", error)
     res.send(error.statusCode, error.message)
   }).pipe(res)
 }
 
 const resolveKey = (path) => {
+  if (pathIsPreviewRoot(path)) {
+    return Promise.resolve({
+      status: 302,
+      key: "/" + path + "/",
+    })
+  }
+
   if (path.slice(-1) === "/") {
-    return Promise.resolve(path + "index.html")
+    return Promise.resolve({
+      status: 200,
+      key: path + "index.html",
+    })
   }
 
   return new Promise((resolve, reject) => {
@@ -69,9 +83,11 @@ const resolveKey = (path) => {
         return candidate.Key === path
       })
       if (object && object.Size > 0) {
-        resolve(path)
+        resolve({ status: 200, key: path })
+      } else if (object && object.Size === 0) {
+        resolve({ status: 302, key: "/" + path + "/" })
       } else {
-        resolve(path + "/index.html")
+        resolve({ status: 404 })
       }
     })
   })
@@ -85,7 +101,7 @@ const verifyUserAuthorization = ({ user, site }) => {
   if (!user) {
     throw httpError({
       message: "Public preview is disabled for this site.",
-      code: 403,
+      status: 403,
     })
   }
 
@@ -95,7 +111,7 @@ const verifyUserAuthorization = ({ user, site }) => {
   if (userIndex < 0) {
     throw httpError({
       message: "User is not authorized to view this site.",
-      code: 403,
+      status: 403,
     })
   }
 }
@@ -105,8 +121,16 @@ const proxy = (req, res) => {
     return verifyUserAuthorization({ user: req.user, site: site })
   }).then(() => {
     return resolveKey(req.path.slice(1))
-  }).then(key => {
-    pipeS3ObjectToResponse({ key, res })
+  }).then(({ status, key }) => {
+    if (status === 200) {
+      pipeS3ObjectToResponse({ key, res })
+    } else if (status === 404) {
+      res.notFound()
+    } else if (status === 302) {
+      res.redirect(302, key)
+    } else {
+      res.error("Unable to resolve S3 object")
+    }
   })
 }
 
