@@ -58,7 +58,7 @@ class SitePublishedBranch extends React.Component {
     const viewFileLink = `${branch.viewLink}/${filename}`
     return <tr key={filename}>
       <td>{filename}</td>
-      <td><a href={viewFileLink}>View</a></td>
+      <td><a href={viewFileLink} target="_blank">View</a></td>
     </tr>
   }
 
