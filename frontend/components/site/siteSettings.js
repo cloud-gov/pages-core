@@ -14,6 +14,7 @@ class SiteSettings extends React.Component {
     this.state = {
       enableSave: false,
       config: site.config || '',
+      previewConfig: site.previewConfig || '',
       defaultBranch: site.defaultBranch || '',
       domain: site.domain || '',
       publicPreview: site.publicPreview
@@ -118,7 +119,7 @@ class SiteSettings extends React.Component {
         <div className="usa-grid">
           <div className="usa-width-one-whole">
             <div className="form-group">
-               <label htmlFor="config" className="">Custom configuration</label>
+              <label htmlFor="config" className="">Site custom configuration</label>
               <textarea
                 name="config"
                 className="form-control"
@@ -127,9 +128,29 @@ class SiteSettings extends React.Component {
             </div>
             <div className="usa-alert usa-alert-info">
               <div className="usa-alert-body">
-                <h3 className="usa-alert-heading">Configuration</h3>
+                <h3 className="usa-alert-heading">Site configuration</h3>
                 <p className="usa-alert-text">
-                  Add additional configuration in yaml to be added to your <code>_config.yml</code> file when we render your site.
+                  Add additional configuration in yaml to be added to your <code>_config.yml</code> file when we build your site's default branch.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="usa-grid">
+          <div className="usa-width-one-whole">
+            <div className="form-group">
+              <label htmlFor="previewConfig" className="">Preview custom configuration</label>
+              <textarea
+                name="previewConfig"
+                className="form-control"
+                value={state.previewConfig}
+                onChange={this.onChange} />
+            </div>
+            <div className="usa-alert usa-alert-info">
+              <div className="usa-alert-body">
+                <h3 className="usa-alert-heading">Preview configuration</h3>
+                <p className="usa-alert-text">
+                  Add additional configuration in yaml to be added to your <code>_config.yml</code> file when we build a preview branch for your site.
                 </p>
               </div>
             </div>
