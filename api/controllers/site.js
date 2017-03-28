@@ -103,6 +103,7 @@ module.exports = {
       const params = Object.assign(site, req.body)
       return site.update({
         config: params.config,
+        previewConfig: params.previewConfig,
         defaultBranch: params.defaultBranch,
         domain: params.domain,
         engine: params.engine,

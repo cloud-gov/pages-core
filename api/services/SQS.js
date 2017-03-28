@@ -5,7 +5,7 @@ const config = require("../../config")
 const buildConfig = config.build
 const s3Config = config.s3
 
-var buildContainerEnvironment = (build) => ({
+const buildContainerEnvironment = (build) => ({
   AWS_DEFAULT_REGION: s3Config.region,
   AWS_ACCESS_KEY_ID: s3Config.accessKeyId,
   AWS_SECRET_ACCESS_KEY: s3Config.secretAccessKey,
@@ -15,7 +15,7 @@ var buildContainerEnvironment = (build) => ({
   BASEURL: baseURLForBuild(build),
   CACHE_CONTROL: buildConfig.cacheControl,
   BRANCH: build.branch,
-  CONFIG: build.Site.config,
+  CONFIG: siteConfig(build),
   REPOSITORY: build.Site.repository,
   OWNER: build.Site.owner,
   SITE_PREFIX: pathForBuild(build),
@@ -25,11 +25,19 @@ var buildContainerEnvironment = (build) => ({
   SOURCE_OWNER: sourceForBuild(build).owner,
 })
 
-var defaultBranch = (build) => {
+const siteConfig = (build) => {
+  if (defaultBranch(build)) {
+    return build.Site.config
+  } else {
+    return build.Site.previewConfig
+  }
+}
+
+const defaultBranch = (build) => {
   return build.branch === build.Site.defaultBranch
 }
 
-var pathForBuild = (build) => {
+const pathForBuild = (build) => {
   if (defaultBranch(build)) {
     return `site/${build.Site.owner}/${build.Site.repository}`
   } else {
@@ -37,7 +45,7 @@ var pathForBuild = (build) => {
   }
 }
 
-var baseURLForBuild = (build) => {
+const baseURLForBuild = (build) => {
   if (defaultBranch(build) && build.Site.domain) {
     return baseURLForCustomDomain(build.Site.domain)
   } else {
@@ -45,19 +53,19 @@ var baseURLForBuild = (build) => {
   }
 }
 
-var baseURLForCustomDomain = (domain) => {
+const baseURLForCustomDomain = (domain) => {
   if (!domain.match(/https?\:\/\//)) {
     domain = "https://" + domain
   }
   return url.parse(domain).path.replace(/\/$/, "")
 }
 
-var sourceForBuild = (build) => {
+const sourceForBuild = (build) => {
   return build.source || {}
 }
 
-var sqsConfig = config.sqs
-var SQS = {
+const sqsConfig = config.sqs
+const SQS = {
   sqsClient: new AWS.SQS({
     accessKeyId: sqsConfig.accessKeyId,
     secretAccessKey: sqsConfig.secretAccessKey,

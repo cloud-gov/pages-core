@@ -210,6 +210,9 @@ paths:
               owner:
                 type: string
                 description: The owner of the GitHub repo for the site
+              previewConfig:
+                type: string
+                description: Jekyll configs for the site in the preview environment
               publicPreview:
                 type: string
                 description: Whether public previews are enabled for the site
@@ -279,6 +282,9 @@ paths:
               owner:
                 type: string
                 description: The owner of the GitHub repo for the site
+              previewConfig:
+                type: string
+                description: Jekyll configs for the site in the preview environment
               publicPreview:
                 type: string
                 description: Whether public previews are enabled for the site

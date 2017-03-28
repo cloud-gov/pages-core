@@ -37,6 +37,9 @@
     "owner": {
       "type": "string"
     },
+    "previewConfig": {
+      "type": "string"
+    },
     "publicPreview": {
       "type": "boolean"
     },
