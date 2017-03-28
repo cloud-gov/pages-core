@@ -76,7 +76,7 @@ describe('<AddSite/>', () => {
   it('calls the add site action when a template is selected', () => {
     const owner = '18F';
     const repository = 'app';
-    const template = 'microsite';
+    const template = 'team';
 
     wrapper.instance().onSubmitTemplate({ owner, repository, template });
 
