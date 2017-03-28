@@ -511,7 +511,7 @@ describe("Site API", () => {
     it("should allow a user to update a site associated with their account", done => {
       var site, response
 
-      factory.site({ config: "old-config" }).then(site => {
+      factory.site({ config: "old-config", previewConfig: "old-preview-config" }).then(site => {
         return Site.findById(site.id, { include: [ User ] })
       }).then(model => {
         site = model
@@ -520,7 +520,8 @@ describe("Site API", () => {
         return request("http://localhost:1337")
           .put(`/v0/site/${site.id}`)
           .send({
-            config: "new-config"
+            config: "new-config",
+            previewConfig: "new-preview-config",
           })
           .set("Cookie", cookie)
           .expect(200)
@@ -530,8 +531,10 @@ describe("Site API", () => {
       }).then(site => {
         validateAgainstJSONSchema("PUT", "/site/{id}", 200, response.body)
 
-        expect(response.body).to.have.property("config", "new-config")
-        expect(site).to.have.property("config", "new-config")
+        expect(response.body.config).to.equal("new-config")
+        expect(site.config).to.equal("new-config")
+        expect(response.body.previewConfig).to.equal("new-preview-config")
+        expect(site.previewConfig).to.equal("new-preview-config")
         siteResponseExpectations(response.body, site)
 
         done()

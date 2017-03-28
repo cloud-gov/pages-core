@@ -53,7 +53,7 @@ class SitePublishedBranchesTable extends React.Component {
   }
 
   renderBranchViewLink(branch) {
-    return <a href={branch.viewLink}>View</a>
+    return <a href={branch.viewLink} target="_blank">View</a>
   }
 
   renderBranchFilesLink(branch) {
