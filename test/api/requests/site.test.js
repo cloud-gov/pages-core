@@ -334,7 +334,7 @@ describe("Site API", () => {
       }).catch(done)
     })
 
-    it("should respond with a 400 if the user does not have write access to the repository", done => {
+    it("should respond with a 400 if the user does not have admin access to the repository", done => {
       const siteOwner = crypto.randomBytes(3).toString("hex")
       const siteRepository = crypto.randomBytes(3).toString("hex")
 
@@ -343,7 +343,7 @@ describe("Site API", () => {
         owner: siteOwner,
         repository: siteRepository,
         response: [200, {
-          permissions: { push: false }
+          permissions: { admin: false, push: false }
         }],
       })
       githubAPINocks.webhook()
@@ -354,6 +354,40 @@ describe("Site API", () => {
           .send({
             owner: siteOwner,
             repository: siteRepository,
+            defaultBranch: "master",
+            engine: "jekyll",
+          })
+          .set("Cookie", cookie)
+          .expect(400)
+      }).then(response => {
+        validateAgainstJSONSchema("POST", "/site", 400, response.body)
+        expect(response.body.message).to.equal("You do not have admin access to this repository")
+        done()
+      }).catch(done)
+    })
+
+    it("should respond with a 400 if the site has been created by a user who does not have write access to the repository", done => {
+      let site
+      factory.site().then(model => {
+        site = model
+
+        nock.cleanAll()
+        githubAPINocks.repo({
+          owner: site.owner,
+          repository: site.repository,
+          response: [200, {
+            permissions: { admin: false, push: false }
+          }],
+        })
+        githubAPINocks.webhook()
+
+        return session()
+      }).then(cookie => {
+        return request("http://localhost:1337")
+          .post(`/v0/site`)
+          .send({
+            owner: site.owner,
+            repository: site.repository,
             defaultBranch: "master",
             engine: "jekyll",
           })

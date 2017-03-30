@@ -90,6 +90,31 @@ describe("SiteCreator", () => {
         }).catch(done)
       })
 
+      it("should reject if the user does not have admin access to the site", done => {
+        let repoNock
+        const siteParams = {
+          owner: crypto.randomBytes(3).toString("hex"),
+          repository: crypto.randomBytes(3).toString("hex"),
+        }
+
+        factory.user().then(user => {
+          repoNock = githubAPINocks.repo({
+            accessToken: user.accessToken,
+            owner: siteParams.owner,
+            repo: siteParams.repository,
+            response: [200, { permissions: {
+              admin: false,
+              push: true,
+            }}],
+          })
+          return SiteCreator.createSite({ user, siteParams })
+        }).catch(err => {
+          expect(err.status).to.equal(400)
+          expect(err.message).to.equal("You do not have admin access to this repository")
+          done()
+        })
+      })
+
       it("should reject if the user does not have write access to the site", done => {
         let repoNock
         const siteParams = {
@@ -103,13 +128,14 @@ describe("SiteCreator", () => {
             owner: siteParams.owner,
             repo: siteParams.repository,
             response: [200, { permissions: {
+              admin: false,
               push: false,
             }}],
           })
           return SiteCreator.createSite({ user, siteParams })
         }).catch(err => {
           expect(err.status).to.equal(400)
-          expect(err.message).to.equal("You do not have write access to this repository")
+          expect(err.message).to.equal("You do not have admin access to this repository")
           done()
         })
       })
@@ -207,6 +233,29 @@ describe("SiteCreator", () => {
         }).catch(done)
       })
 
+      it("should not reject if the user does not have admin access to the site", done => {
+        const user = factory.user()
+        const site = factory.site()
+
+        Promise.props({ user, site }).then(({ user, site }) => {
+          githubAPINocks.repo({
+            accessToken: user.accessToken,
+            owner: site.owner,
+            repo: site.repository,
+            response: [200, { permissions: {
+              admin: false,
+              push: true,
+            }}],
+          })
+          return SiteCreator.createSite({ user, siteParams: {
+            owner: site.owner,
+            repository: site.repository,
+          }})
+        }).then(() => {
+          done()
+        }).catch(done)
+      })
+
       it("should reject if the user does not have write access to the site", done => {
         const user = factory.user()
         const site = factory.site()
@@ -217,6 +266,7 @@ describe("SiteCreator", () => {
             owner: site.owner,
             repo: site.repository,
             response: [200, { permissions: {
+              admin: false,
               push: false,
             }}],
           })

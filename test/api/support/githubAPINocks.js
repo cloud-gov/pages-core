@@ -111,7 +111,7 @@ const repo = ({ accessToken, owner, repo, response } = {}) => {
 
   const typicalResponse = {
     permissions: {
-      admin: false,
+      admin: true,
       push: true,
       pull: true,
     }
