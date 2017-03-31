@@ -1,3 +1,4 @@
+const url = require("url")
 const config = require("../../config")
 
 const associate = ({ Site, Build, User }) => {
@@ -49,7 +50,7 @@ const viewLinkForBranch = function(branch) {
   } else if (branch === this.defaultBranch) {
     return `${s3Root}/site/${this.owner}/${this.repository}`
   } else {
-    return `${s3Root}/preview/${this.owner}/${this.repository}/${branch}`
+    return url.resolve(config.app.hostname, `/preview/${this.owner}/${this.repository}/${branch}`)
   }
 }
 
