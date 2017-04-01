@@ -17,7 +17,8 @@ class SiteSettings extends React.Component {
       previewConfig: site.previewConfig || '',
       defaultBranch: site.defaultBranch || '',
       domain: site.domain || '',
-      publicPreview: site.publicPreview
+      publicPreview: site.publicPreview,
+      engine: site.engine,
     };
 
     this.onSubmit = this.onSubmit.bind(this);
@@ -88,6 +89,20 @@ class SiteSettings extends React.Component {
               checked={!state.publicPreview}
               handleChange={this.onChange}
               labelText="Only users with Federalist accounts can see previews" />
+          </div>
+        </div>
+        <div className="usa-grid">
+          <div className="usa-width-one-whole">
+            <label htmlFor="engine">Static site engine</label>
+            <select
+              name="engine"
+              className="form-control"
+              value={state.engine}
+              onChange={this.onChange}
+            >
+              <option value="jekyll">Jekyll</option>
+              <option value="static">Static (just publish the files in the repository)</option>
+            </select>
           </div>
         </div>
         <div className="usa-grid">
