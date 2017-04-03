@@ -52,6 +52,7 @@ lib-cov
 *.out
 *.pid
 npm-debug.log
+node_modules/
 
 
 
