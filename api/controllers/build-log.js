@@ -2,6 +2,12 @@ const buildAuthorizer = require("../authorizers/build")
 const buildLogSerializer = require("../serializers/build-log")
 const { Build, BuildLog } = require("../models")
 
+const decodeb64 = (str) => {
+  if (str) {
+    return new Buffer(str, 'base64').toString('utf8')
+  }
+}
+
 module.exports = {
   create: (req, res) => {
     Promise.resolve(Number(req.params["build_id"])).then(id => {
@@ -15,7 +21,7 @@ module.exports = {
       }
       return BuildLog.create({
         build: build.id,
-        output: req.body["output"],
+        output: decodeb64(req.body["output"]),
         source: req.body["source"],
       })
     }).then(buildLog => {
