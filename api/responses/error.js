@@ -1,7 +1,4 @@
-module.exports = function badRequest(error = {}, options) {
-  const res = this.res;
-
-
+module.exports = (error = {}, { req, res }) => {
   if (typeof error === "number") {
     error = {
       status: error,

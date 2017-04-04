@@ -1,4 +1,6 @@
 const Github = require("github")
+const config = require("../../config")
+const { User } = require("../models")
 
 const createRepoForOrg = (github, options) => {
   return new Promise((resolve, reject) => {
@@ -180,8 +182,8 @@ module.exports = {
         name: 'web',
         active: true,
         config: {
-          url: sails.config.webhook.endpoint,
-          secret: sails.config.webhook.secret,
+          url: config.webhook.endpoint,
+          secret: config.webhook.secret,
           content_type: 'json'
         }
       })
@@ -191,17 +193,16 @@ module.exports = {
   },
 
   validateUser: (accessToken) => {
-    var approvedOrgs = sails.config.passport.github.organizations || []
+    var approvedOrgs = config.passport.github.organizations || []
 
     return githubClient(accessToken).then(github => {
       return getOrganizations(github)
     }).then(organizations => {
-      var usersApprovedOrgs = _(organizations)
-        .pluck('id')
-        .intersection(approvedOrgs)
-        .value()
+      const approvedOrg = organizations.find(organization => {
+        return approvedOrgs.indexOf(organization.id) >= 0
+      })
 
-      if (usersApprovedOrgs.length <= 0) {
+      if (!approvedOrg) {
         throw new Error("Unauthorized")
       }
     })

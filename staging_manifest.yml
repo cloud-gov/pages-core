@@ -15,7 +15,8 @@ services:
 env:
   NODE_ENV: production
   APP_ENV: staging
-  SAILS_LOG_LEVEL: verbose
+  APP_HOSTNAME: https://federalist-staging.fr.cloud.gov
+  LOG_LEVEL: verbose
   NPM_CONFIG_PRODUCTION: true
   NODE_MODULES_CACHE: false
   APP_NAME: federalist-staging

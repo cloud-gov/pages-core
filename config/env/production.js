@@ -3,47 +3,15 @@ const cfenv = require("cfenv")
 
 const appEnv = cfenv.getAppEnv()
 
-// Grunt config
-module.exports = {
-  grunt: {
-    _hookTimeout: 60 * 1000,
-  }
-}
-
-// Session Config
-const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`)
-if (redisCreds) {
-  module.exports.session = {
-    cookie: {
-      secure: true,
-    },
-    proxy: true,
-    secret: env.FEDERALIST_SESSION_SECRET,
-    adapter: 'connect-redis',
-    host: redisCreds.hostname,
-    port: redisCreds.port,
-    db: 0,
-    pass: redisCreds.password,
-  }
-} else {
-  throw new Error("No redis credentials found.")
-}
-
 // Database Config
 const rdsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-rds`)
 if (rdsCreds) {
-  module.exports.connections = {
-    postgres: {
-      adapter: 'sails-postgresql',
-      database: rdsCreds.db_name,
-      host: rdsCreds.host,
-      user: rdsCreds.username,
-      password: rdsCreds.password,
-      port: rdsCreds.port,
-    }
-  }
-  module.exports.models = {
-    connection: 'postgres',
+  module.exports.postgres = {
+    database: rdsCreds.db_name,
+    host: rdsCreds.host,
+    user: rdsCreds.username,
+    password: rdsCreds.password,
+    port: rdsCreds.port,
   }
 } else {
   throw new Error("No database credentials found.")

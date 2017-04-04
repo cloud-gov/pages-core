@@ -1,3 +1,7 @@
+const GitHub = require("./GitHub")
+const config = require("../../config")
+const { Build, Site, User } = require("../models")
+
 const createSite = ({ user, siteParams }) => {
   const template = siteParams.template
   siteParams = paramsForNewSite(siteParams)
@@ -9,11 +13,17 @@ const createSite = ({ user, siteParams }) => {
   }
 }
 
-checkExistingGithubRepository = ({ user, owner, repository }) => {
+checkExistingGithubRepository = ({ user, owner, repository, site }) => {
   return GitHub.getRepository(user, owner, repository).then(repo => {
     if (!repo) {
       throw {
         message: `The repository ${owner}/${repository} does not exist.`,
+        status: 400,
+      }
+    }
+    if (!repo.permissions.admin && !site) {
+      throw {
+        message: "You do not have admin access to this repository",
         status: 400,
       }
     }
@@ -62,12 +72,13 @@ const createSiteFromExistingRepo = ({ siteParams, user }) => {
   let site
   const { owner, repository } = siteParams
 
-  return checkExistingGithubRepository({ user, owner, repository }).then(() => {
-    return Site.findOne({
-      where: { owner, repository },
-      include: [ User ],
-    })
-  }).then(site => {
+  return Site.findOne({
+    where: { owner, repository },
+    include: [ User ],
+  }).then(model => {
+    site = model
+    return checkExistingGithubRepository({ user, owner, repository, site })
+  }).then(() => {
     if (site) {
       return checkForExistingSiteErrors({ site, user })
     } else {
@@ -82,6 +93,7 @@ const createSiteFromExistingRepo = ({ siteParams, user }) => {
 const createSiteFromTemplate = ({ siteParams, user, template }) => {
   let site = Site.build(siteParams)
   site.engine = "jekyll"
+  site.defaultBranch = templateForTemplateName(template).branch
   const { owner, repository } = siteParams
 
   return site.validate().then(error => {
@@ -111,10 +123,7 @@ const paramsForNewBuild = ({ user, site, template }) => ({
 
 const paramsForNewBuildSource = (templateName) => {
   if (templateName) {
-    const template = sails.config.templates[templateName]
-    if (!template) {
-      throw new Error(`No such template: ${templateName}`)
-    }
+    const template = templateForTemplateName(templateName)
     return { repository: template.repo, owner: template.owner }
   }
 }
@@ -128,6 +137,14 @@ const paramsForNewSite = (params) => ({
 
 const siteExists = ({ owner, repository }) => {
   return Promise.resolve(false)
+}
+
+const templateForTemplateName = (templateName) => {
+  const template = config.templates[templateName]
+  if (!template) {
+    throw new Error(`No such template: ${templateName}`)
+  }
+  return template
 }
 
 module.exports = {

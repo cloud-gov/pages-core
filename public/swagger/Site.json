@@ -1,0 +1,65 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "builds",
+    "defaultBranch",
+    "engine",
+    "owner",
+    "repository",
+    "siteRoot",
+    "users",
+    "viewLink"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "builds": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "config": {
+      "type": "string"
+    },
+    "defaultBranch": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string"
+    },
+    "engine": {
+      "type": "string",
+      "enum": ["jekyll", "hugo", "static"]
+    },
+    "owner": {
+      "type": "string"
+    },
+    "previewConfig": {
+      "type": "string"
+    },
+    "publicPreview": {
+      "type": "boolean"
+    },
+    "repository": {
+      "type": "string"
+    },
+    "siteRoot": {
+      "type": "string"
+    },
+    "users": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "not": {
+          "required": ["githubAccessToken", "githubUserId"]
+        }
+      }
+    },
+    "viewLink": {
+      "type": "string"
+    }
+  }
+}

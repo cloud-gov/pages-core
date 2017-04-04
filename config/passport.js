@@ -1,6 +1,6 @@
 var env = require('../services/environment.js')();
 
-module.exports.passport = {
+module.exports = {
   github: {
     options: {
       clientID: env.GITHUB_CLIENT_ID || 'not_set',
@@ -14,4 +14,4 @@ module.exports.passport = {
       14080592  // us-federal-sbst
     ]
   }
-};
+}

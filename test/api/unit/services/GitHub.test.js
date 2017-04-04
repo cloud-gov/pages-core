@@ -1,5 +1,7 @@
 const expect = require("chai").expect
+const config = require("../../../../config")
 const factory = require("../../support/factory")
+const GitHub = require("../../../../api/services/GitHub")
 const githubAPINocks = require("../../support/githubAPINocks")
 
 describe("GitHub", () => {
@@ -199,7 +201,7 @@ describe("GitHub", () => {
     it("should resolve if the user is on a whitelisted team", done => {
       githubAPINocks.userOrganizations({
         accessToken: "123abc",
-        organizations: [{ id: sails.config.passport.github.organizations[0] }],
+        organizations: [{ id: config.passport.github.organizations[0] }],
       })
 
       GitHub.validateUser("123abc").then(() => {

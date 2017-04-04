@@ -1,67 +1,54 @@
+const config = require("./config")
+global.Promise = require("bluebird")
+
+const logger = require("winston")
+logger.level = config.log.level
+logger.remove(logger.transports.Console)
+logger.add(logger.transports.Console, {colorize: true})
+
 // If settings present, start New Relic
 var env = require('./services/environment.js')();
-
 if (env.NEW_RELIC_APP_NAME && env.NEW_RELIC_LICENSE_KEY) {
-  console.log('Activating New Relic: ', env.NEW_RELIC_APP_NAME);
+  logger.info('Activating New Relic: ', env.NEW_RELIC_APP_NAME);
   require('newrelic');
+} else {
+  logger.warn("Skipping New Relic Activation")
 }
 
-/**
- * app.js
- *
- * Use `app.js` to run your app without `sails lift`.
- * To start the server, run: `node app.js`.
- *
- * This is handy in situations where the sails CLI is not relevant or useful.
- *
- * For example:
- *   => `node app.js`
- *   => `forever start app.js`
- *   => `node debug app.js`
- *   => `modulus deploy`
- *   => `heroku scale`
- *
- *
- * The same command-line arguments are supported, e.g.:
- * `node app.js --silent --port=80 --prod`
- */
+const express = require("express")
+const bodyParser = require('body-parser')
+const methodOverride = require('method-override')
+const expressWinston = require("express-winston")
+const session = require("express-session")
+const PostgresStore = require("connect-session-sequelize")(session.Store)
+const responses = require("./api/responses")
 
-// Ensure we're in the project directory, so relative paths work as expected
-// no matter where we actually lift from.
-process.chdir(__dirname);
+const app = express()
+const sequelize = require("./api/models").sequelize
+config.session.store = new PostgresStore({ db: sequelize })
 
-// Ensure a "sails" can be located:
-(function() {
-  var sails;
-  try {
-    sails = require('sails');
-  } catch (e) {
-    console.error('To run an app using `node app.js`, you usually need to have a version of `sails` installed in the same directory as your app.');
-    console.error('To do that, run `npm install sails`');
-    console.error('');
-    console.error('Alternatively, if you have sails installed globally (i.e. you did `npm install -g sails`), you can use `sails lift`.');
-    console.error('When you run `sails lift`, your app will still use a local `./node_modules/sails` dependency if it exists,');
-    console.error('but if it doesn\'t, the app will run with the global sails instead!');
-    return;
-  }
+app.use(session(config.session))
+app.use(express.static("public"))
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+app.use(methodOverride())
+app.use(responses)
 
-  // Try to get `rc` dependency
-  var rc;
-  try {
-    rc = require('rc');
-  } catch (e0) {
-    try {
-      rc = require('sails/node_modules/rc');
-    } catch (e1) {
-      console.error('Could not find dependency: `rc`.');
-      console.error('Your `.sailsrc` file(s) will be ignored.');
-      console.error('To resolve this, run:');
-      console.error('npm install rc --save');
-      rc = function () { return {}; };
-    }
-  }
+if (logger.levels[logger.level] >= 2) {
+  app.use(expressWinston.logger({
+    transports: [
+      new logger.transports.Console({ colorize: true })
+    ],
+    requestWhitelist: expressWinston.requestWhitelist.concat("body"),
+  }))
+}
+app.use(expressWinston.errorLogger({
+  transports: [
+    new logger.transports.Console({ json: true, colorize: true })
+  ],
+}))
 
+const routers = require("./api/routers")
+app.use(routers)
 
-  // Start server
-  sails.lift(rc('sails'));
-})();
+module.exports = app

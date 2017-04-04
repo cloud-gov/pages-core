@@ -1,22 +1,25 @@
-var expect = require("chai").expect
-var cookie = require('cookie')
-var nock = require("nock")
-var request = require("supertest-as-promised")
-var factory = require("../support/factory")
-var githubAPINocks = require("../support/githubAPINocks")
-var session = require("../support/session")
+const expect = require("chai").expect
+const cookie = require('cookie')
+const crypto = require("crypto")
+const nock = require("nock")
+const request = require("supertest-as-promised")
+const config = require("../../../config")
+const factory = require("../support/factory")
+const githubAPINocks = require("../support/githubAPINocks")
+const session = require("../support/session")
+const { User } = require("../../../api/models")
 
 var sessionCookieFromResponse = (response) => {
   var header = response.headers["set-cookie"][0]
   var parsedHeader = cookie.parse(header)
-  var session = parsedHeader["sails.sid"].replace("s:", "")
+  var session = parsedHeader["federalist.sid"].replace("s:", "")
   return session.split(".")[0]
 }
 
 var sessionForCookie = (cookie) => {
-  var sessionID = cookie.replace("sails.sid=s%3A", "").split(".")[0]
+  var sessionID = cookie.replace("federalist.sid=s%3A", "").split(".")[0]
   return new Promise((resolve, reject) => {
-    sails.config.session.store.get(sessionID, (err, sessionBody) => {
+    config.session.store.get(sessionID, (err, sessionBody) => {
       if (err) {
         reject(err)
       } else {
@@ -170,8 +173,8 @@ describe("Authentication request", () => {
     it("should respond with a 401 if the authorization code is invalid", done => {
       nock("https://github.com")
         .post("/login/oauth/access_token", {
-          client_id: sails.config.passport.github.options.clientID,
-          client_secret: sails.config.passport.github.options.clientSecret,
+          client_id: config.passport.github.options.clientID,
+          client_secret: config.passport.github.options.clientSecret,
           code: "invalid-code"
         })
         .reply(401)
@@ -187,6 +190,40 @@ describe("Authentication request", () => {
       request("http://localhost:1337")
         .get("/auth/github/callback?code=auth-code-123abc")
         .expect(401, done)
+    })
+
+    it("should redirect to a redirect path if one is set in the session", done => {
+      const redirectPath = "/path/to/something"
+
+      const sessionKey = crypto.randomBytes(8).toString("hex")
+      const sessionBody = {
+        cookie: {
+          originalMaxAge: null,
+          expires: null,
+          httpOnly: true,
+          path: "/"
+        },
+        authRedirectPath: redirectPath,
+      }
+      const signedSessionKey = sessionKey + "." + crypto
+        .createHmac('sha256', config.session.secret)
+        .update(sessionKey)
+        .digest('base64')
+        .replace(/\=+$/, '')
+      const cookie = `${config.session.key}=s%3A${signedSessionKey}`
+
+      config.session.store.set(sessionKey, sessionBody).then(() => {
+        return factory.user()
+      }).then(user => {
+        githubAPINocks.githubAuth(user.username, [{ id: 123456 }])
+        return request("http://localhost:1337")
+          .get("/auth/github/callback?code=auth-code-123abc")
+          .set("Cookie", cookie)
+          .expect(302)
+      }).then(response => {
+        expect(response.header.location).to.equal(redirectPath)
+        done()
+      }).catch(done)
     })
   })
 })

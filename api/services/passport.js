@@ -1,5 +1,9 @@
-var GitHubStrategy = require('passport-github').Strategy
-var passport = require('passport')
+const logger = require("winston")
+const GitHub = require("./GitHub")
+const GitHubStrategy = require('passport-github').Strategy
+const passport = require('passport')
+const config = require("../../config")
+const { User } = require("../models")
 
 var githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
   var user
@@ -21,13 +25,13 @@ var githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
   }).then(() => {
     callback(null, user)
   }).catch(err => {
-    sails.log.info("Authentication error: ", err)
+    logger.warn("Authentication error: ", err)
     callback(err)
   })
 }
 
 passport.use(new GitHubStrategy(
-  sails.config.passport.github.options,
+  config.passport.github.options,
   githubVerifyCallback
 ))
 
@@ -41,9 +45,13 @@ passport.callback = (req, res) => {
   passport.authenticate("github")(req, res, () => {
     if (req.user) {
       req.session.authenticated = true
-      res.redirect("/")
+      if (req.session.authRedirectPath) {
+        res.redirect(req.session.authRedirectPath)
+      } else {
+        res.redirect("/")
+      }
     } else {
-      res.send(401, "Unauthorized")
+      res.status(401).send("Unauthorized")
     }
   })
 }

@@ -1,8 +1,9 @@
-const AWS = require('aws-sdk-mock')
-const Sails = require('sails')
+const AWSMocks = require("./support/aws-mocks")
+
+const app = require("../../app")
 
 const _cleanDatabase = () => {
-  const models = sequelize.models
+  const models = require("../../api/models").sequelize.models
   const promises = Object.keys(models).map(name => {
     return models[name].destroy({ where: {} })
   })
@@ -10,23 +11,17 @@ const _cleanDatabase = () => {
 }
 
 before(function(done) {
-  AWS.mock('SQS', 'sendMessage', function (params, callback) {
-    callback(null, {})
-  })
-
-  Sails.lift((err, server) => {
-    sails = server;
-    if (err) return done(err);
+  app.listen(1337, (err) => {
+    if (err) return done(err)
 
     _cleanDatabase().then(() => {
-      done(null, sails);
+      done(null, app);
     }).catch(err => {
       done(err)
     })
-  });
+  })
 });
 
 after((done) => {
-  sails.lower(done);
-  AWS.restore('SQS')
+  done()
 });

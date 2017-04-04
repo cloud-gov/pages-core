@@ -9,6 +9,9 @@ const githubAPINocks = require("../support/githubAPINocks")
 const session = require("../support/session")
 const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
 
+const { Build, Site, User } = require("../../../api/models")
+const S3SiteRemover = require("../../../api/services/S3SiteRemover")
+
 describe("Site API", () => {
   var siteResponseExpectations = (response, site) => {
     expect(response.owner).to.equal(site.owner)
@@ -270,7 +273,7 @@ describe("Site API", () => {
             repository: siteRepository,
             defaultBranch: "master",
             engine: "jekyll",
-            template: "microsite",
+            template: "team",
           })
           .set("Cookie", cookie)
           .expect(200)
@@ -296,7 +299,7 @@ describe("Site API", () => {
           .send({
             defaultBranch: "master",
             engine: "jekyll",
-            template: "microsite",
+            template: "team",
           })
           .set("Cookie", cookie)
           .expect(400)
@@ -331,7 +334,7 @@ describe("Site API", () => {
       }).catch(done)
     })
 
-    it("should respond with a 400 if the user does not have write access to the repository", done => {
+    it("should respond with a 400 if the user does not have admin access to the repository", done => {
       const siteOwner = crypto.randomBytes(3).toString("hex")
       const siteRepository = crypto.randomBytes(3).toString("hex")
 
@@ -340,12 +343,46 @@ describe("Site API", () => {
         owner: siteOwner,
         repository: siteRepository,
         response: [200, {
-          permissions: { push: false }
+          permissions: { admin: false, push: false }
         }],
       })
       githubAPINocks.webhook()
 
       session().then(cookie => {
+        return request("http://localhost:1337")
+          .post(`/v0/site`)
+          .send({
+            owner: siteOwner,
+            repository: siteRepository,
+            defaultBranch: "master",
+            engine: "jekyll",
+          })
+          .set("Cookie", cookie)
+          .expect(400)
+      }).then(response => {
+        validateAgainstJSONSchema("POST", "/site", 400, response.body)
+        expect(response.body.message).to.equal("You do not have admin access to this repository")
+        done()
+      }).catch(done)
+    })
+
+    it("should respond with a 400 if the site has been created by a user who does not have write access to the repository", done => {
+      let site
+      factory.site().then(model => {
+        site = model
+
+        nock.cleanAll()
+        githubAPINocks.repo({
+          owner: site.owner,
+          repository: site.repository,
+          response: [200, {
+            permissions: { admin: false, push: false }
+          }],
+        })
+        githubAPINocks.webhook()
+
+        return session()
+      }).then(cookie => {
         return request("http://localhost:1337")
           .post(`/v0/site`)
           .send({
@@ -397,6 +434,14 @@ describe("Site API", () => {
   })
 
   describe("DELETE /v0/site/:id", () => {
+    beforeEach(() => {
+      sinon.stub(S3SiteRemover, "removeSite", () => Promise.resolve())
+    })
+
+    afterEach(() => {
+      S3SiteRemover.removeSite.restore()
+    })
+
     it("should require authentication", done => {
       factory.site().then(site => {
         return request("http://localhost:1337")
@@ -452,6 +497,34 @@ describe("Site API", () => {
         done()
       }).catch(done)
     })
+
+    it("should remove all of the site's data from S3", done => {
+      let site
+      const userPromise = factory.user()
+      const sitePromise = factory.site({ users: Promise.all([userPromise]) })
+      const sessionPromise = session(userPromise)
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: sessionPromise,
+      }).then(results => {
+        site = results.site
+        S3SiteRemover.removeSite.restore()
+        sinon.stub(S3SiteRemover, "removeSite", (calledSite) => {
+          expect(calledSite.id).to.equal(site.id)
+          return Promise.resolve()
+        })
+
+        return request("http://localhost:1337")
+          .delete(`/v0/site/${site.id}`)
+          .set("Cookie", results.cookie)
+          .expect(200)
+      }).then(response => {
+        expect(S3SiteRemover.removeSite.calledOnce).to.equal(true)
+        done()
+      }).catch(done)
+    })
   })
 
   describe("PUT /v0/site/:id", () => {
@@ -472,7 +545,7 @@ describe("Site API", () => {
     it("should allow a user to update a site associated with their account", done => {
       var site, response
 
-      factory.site({ config: "old-config" }).then(site => {
+      factory.site({ config: "old-config", previewConfig: "old-preview-config" }).then(site => {
         return Site.findById(site.id, { include: [ User ] })
       }).then(model => {
         site = model
@@ -481,7 +554,8 @@ describe("Site API", () => {
         return request("http://localhost:1337")
           .put(`/v0/site/${site.id}`)
           .send({
-            config: "new-config"
+            config: "new-config",
+            previewConfig: "new-preview-config",
           })
           .set("Cookie", cookie)
           .expect(200)
@@ -491,8 +565,10 @@ describe("Site API", () => {
       }).then(site => {
         validateAgainstJSONSchema("PUT", "/site/{id}", 200, response.body)
 
-        expect(response.body).to.have.property("config", "new-config")
-        expect(site).to.have.property("config", "new-config")
+        expect(response.body.config).to.equal("new-config")
+        expect(site.config).to.equal("new-config")
+        expect(response.body.previewConfig).to.equal("new-preview-config")
+        expect(site.previewConfig).to.equal("new-preview-config")
         siteResponseExpectations(response.body, site)
 
         done()

@@ -1,5 +1,9 @@
 const expect = require("chai").expect
+const config = require("../../../../config")
 const factory = require("../../support/factory")
+const GitHub = require("../../../../api/services/SQS")
+const SQS = require("../../../../api/services/SQS")
+const { Build, Site, User } = require("../../../../api/models")
 
 describe("SQS", () => {
   describe(".sendBuildMessage(build)", () => {
@@ -8,7 +12,7 @@ describe("SQS", () => {
       SQS.sqsClient.sendMessage = (params, callback) => {
         SQS.sqsClient.sendMessage = oldSendMessage
         expect(params).to.have.property("MessageBody")
-        expect(params).to.have.property("QueueUrl", sails.config.sqs.queue)
+        expect(params).to.have.property("QueueUrl", config.sqs.queue)
         done()
       }
       SQS.sendBuildMessage({
@@ -44,10 +48,10 @@ describe("SQS", () => {
         return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
         const message = SQS.messageBodyForBuild(build)
-        expect(messageEnv(message, "AWS_ACCESS_KEY_ID")).to.equal(sails.config.s3.accessKeyId)
-        expect(messageEnv(message, "AWS_SECRET_ACCESS_KEY")).to.equal(sails.config.s3.secretAccessKey)
-        expect(messageEnv(message, "AWS_DEFAULT_REGION")).to.equal(sails.config.s3.region)
-        expect(messageEnv(message, "BUCKET")).to.equal(sails.config.s3.bucket)
+        expect(messageEnv(message, "AWS_ACCESS_KEY_ID")).to.equal(config.s3.accessKeyId)
+        expect(messageEnv(message, "AWS_SECRET_ACCESS_KEY")).to.equal(config.s3.secretAccessKey)
+        expect(messageEnv(message, "AWS_DEFAULT_REGION")).to.equal(config.s3.region)
+        expect(messageEnv(message, "BUCKET")).to.equal(config.s3.bucket)
         done()
       }).catch(done)
     })
@@ -74,13 +78,28 @@ describe("SQS", () => {
 
     context("building a site's default branch", () => {
       it("should set an empty string for BASEURL in the message for a site with a custom domain", done => {
-        factory.site({ domain: "www.example.com", owner: "owner", repository: "repo", defaultBranch: "master" }).then(site => {
-          return factory.build({ site: site, branch: "master" })
-        }).then(build => {
-          return Build.findById(build.id, { include: [Site, User] })
-        }).then(build => {
-          const message = SQS.messageBodyForBuild(build)
-          expect(messageEnv(message, "BASEURL")).to.equal("")
+        const domains = [
+          "www.example.com",
+          "www.example.com/",
+          "https://example.com",
+          "https://example.com/",
+          "http://example.com",
+          "http://example.com/",
+        ]
+
+        const baseurlPromises = domains.map(domain => {
+          return factory.site({ domain, defaultBranch: "master" }).then(site => {
+            return factory.build({ site, branch: "master" })
+          }).then(build => {
+            return Build.findById(build.id, { include: [Site, User] })
+          }).then(build => {
+            const message = SQS.messageBodyForBuild(build)
+            return messageEnv(message, "BASEURL")
+          })
+        })
+
+        Promise.all(baseurlPromises).then(baseurls => {
+          expect(baseurls).to.deep.equal(Array(domains.length).fill(""))
           done()
         }).catch(done)
       })
@@ -93,6 +112,33 @@ describe("SQS", () => {
         }).then(build => {
           const message = SQS.messageBodyForBuild(build)
           expect(messageEnv(message, "BASEURL")).to.equal("/site/owner/repo")
+          done()
+        }).catch(done)
+      })
+
+      it("should respect the path component of a custom domain when setting BASEURL in the message", done => {
+        const domains = [
+          "www.example.com/abc/def",
+          "www.example.com/abc/def/",
+          "https://example.com/abc/def",
+          "https://example.com/abc/def/",
+          "http://example.com/abc/def",
+          "http://example.com/abc/def/",
+        ]
+
+        const baseurlPromises = domains.map(domain => {
+          return factory.site({ domain, defaultBranch: "master" }).then(site => {
+            return factory.build({ site, branch: "master" })
+          }).then(build => {
+            return Build.findById(build.id, { include: [Site, User] })
+          }).then(build => {
+            const message = SQS.messageBodyForBuild(build)
+            return messageEnv(message, "BASEURL")
+          })
+        })
+
+        Promise.all(baseurlPromises).then(baseurls => {
+          expect(baseurls).to.deep.equal(Array(domains.length).fill("/abc/def"))
           done()
         }).catch(done)
       })
@@ -153,7 +199,7 @@ describe("SQS", () => {
         return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
         const message = SQS.messageBodyForBuild(build)
-        expect(messageEnv(message, "CACHE_CONTROL")).to.equal(sails.config.build.cacheControl)
+        expect(messageEnv(message, "CACHE_CONTROL")).to.equal(config.build.cacheControl)
         done()
       }).catch(done)
     })
@@ -170,14 +216,34 @@ describe("SQS", () => {
       }).catch(done)
     })
 
-    it("should set CONFIG in the message to the YAML config for the site", done => {
-      factory.site({ config: "plugins_dir: _plugins" }).then(site => {
-        return factory.build({ site: site })
+    it("should set CONFIG in the message to the YAML config for the site on the default branch", done => {
+      factory.site({
+        defaultBranch: "master",
+        config: "plugins_dir: _plugins",
+        previewConfig: "plugins_dir: _preview_plugins",
+      }).then(site => {
+        return factory.build({ site, branch: "master" })
       }).then(build => {
         return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
         const message = SQS.messageBodyForBuild(build)
         expect(messageEnv(message, "CONFIG")).to.equal("plugins_dir: _plugins")
+        done()
+      }).catch(done)
+    })
+
+    it("should set CONFIG in the message to the YAML config for the site on a preview branch", done => {
+      factory.site({
+        defaultBranch: "master",
+        config: "plugins_dir: _plugins",
+        previewConfig: "plugins_dir: _preview_plugins",
+      }).then(site => {
+        return factory.build({ site, branch: "preview" })
+      }).then(build => {
+        return Build.findById(build.id, { include: [Site, User] })
+      }).then(build => {
+        const message = SQS.messageBodyForBuild(build)
+        expect(messageEnv(message, "CONFIG")).to.equal("plugins_dir: _preview_plugins")
         done()
       }).catch(done)
     })

@@ -1,4 +1,5 @@
 module.exports = function(req, res, next) {
+  req.session.authRedirectPath = undefined
   if (req.session.authenticated) {
     return next();
   } else {

@@ -1,7 +1,18 @@
 var dbm = global.dbm || require('db-migrate');
 var type = dbm.dataType;
 var fs = require('fs');
-var async = require('sails/node_modules/async');
+
+const dropTable = (db, table) => {
+  return new Promise((resolve, reject) => {
+    db.dropTable(table, (err) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve()
+      }
+    })
+  })
+}
 
 exports.up = function(db, callback) {
   fs.readFile(__dirname + '/initial.sql', { encoding: 'utf-8' }, function(err, data) {
@@ -14,16 +25,17 @@ exports.up = function(db, callback) {
 };
 
 exports.down = function(db, callback) {
-  var q = async.queue(db.dropTable.bind(db));
-  q.drain = callback;
-
-  db.runSql('DELETE FROM migrations', function(err) {
-    if (err) throw err;
-    q.push('build');
-    q.push('passport');
-    q.push('site');
-    q.push('site_users__user_sites');
-    q.push('user');
-  });
-
+  db.runSql("DELETE FROM migrations", (err) => {
+    dropTable(db, "build").then(() => {
+      return dropTable(db, "passport")
+    }).then(() => {
+      return dropTable(db, "site")
+    }).then(() => {
+      return dropTable(db, "site_users__user_sites")
+    }).then(() => {
+      return dropTable(db, "user")
+    }).then(() => {
+      callback()
+    }).catch(err => callback(err))
+  })
 };

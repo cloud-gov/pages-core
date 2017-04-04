@@ -1,9 +1,11 @@
 const crypto = require("crypto")
 const factory = require("./factory")
+const config = require("../../../config")
 
 const session = (user) => {
+  const sessionKey = crypto.randomBytes(8).toString("hex")
+
   return Promise.resolve(user || factory.user()).then(user => {
-    const sessionKey = crypto.randomBytes(8).toString("hex")
     const sessionBody = {
       cookie: {
         originalMaxAge: null,
@@ -16,14 +18,14 @@ const session = (user) => {
       },
       authenticated: true
     }
-    sails.config.session.store.set(sessionKey, sessionBody)
-
-    var signedSessionKey = sessionKey + "." + crypto
-      .createHmac('sha256', sails.config.session.secret)
+    return config.session.store.set(sessionKey, sessionBody)
+  }).then(() => {
+    const signedSessionKey = sessionKey + "." + crypto
+      .createHmac('sha256', config.session.secret)
       .update(sessionKey)
       .digest('base64')
       .replace(/\=+$/, '')
-    return `${sails.config.session.key}=s%3A${signedSessionKey}`
+    return `${config.session.key}=s%3A${signedSessionKey}`
   })
 }
 

@@ -1,7 +1,7 @@
 const expect = require("chai").expect
 const validateJSONSchema = require('jsonschema').validate
 
-const buildSchema = require("../../../../assets/swagger/Build.json")
+const buildSchema = require("../../../../public/swagger/Build.json")
 const factory = require("../../support/factory")
 
 const BuildSerializer = require("../../../../api/serializers/build")

@@ -27,14 +27,9 @@ module.exports = {
      ],
     },
   },
-  connections: {
-    postgres: {
-      adapter: 'sails-postgresql',
-      database: process.env.TRAVIS ? "travis_ci_test" : "federalist-test",
-    },
-  },
-  models: {
-    connection: "postgres",
+  postgres: {
+    adapter: 'sails-postgresql',
+    database: process.env.TRAVIS ? "travis_ci_test" : "federalist-test",
   },
   log: {
     level: "error",

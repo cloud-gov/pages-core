@@ -3,9 +3,14 @@ const request = require("supertest-as-promised")
 const factory = require("../support/factory")
 const session = require("../support/session")
 const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
+const { BuildLog, Site, User } = require("../../../api/models")
 
 describe("Build Log API", () => {
   describe("POST /v0/build/:build_id/log/:token", () => {
+    const encode64 = (str) => {
+      return new Buffer(str, 'utf8').toString('base64');
+    }
+
     it("should create a build log with the given params", done => {
       let build
 
@@ -17,7 +22,7 @@ describe("Build Log API", () => {
           .type("json")
           .send({
             source: "build.sh",
-            output: "This is the output for build.sh",
+            output: encode64("This is the output for build.sh"),
           })
           .expect(200)
       }).then(response => {
@@ -42,7 +47,7 @@ describe("Build Log API", () => {
           .type("json")
           .send({
             src: "build.sh",
-            otpt: "This is the output for build.sh",
+            otpt: encode64("This is the output for build.sh"),
           })
           .expect(400)
       }).then(response => {
@@ -62,7 +67,7 @@ describe("Build Log API", () => {
           .type("json")
           .send({
             source: "build.sh",
-            body: "This is the output for build.sh",
+            output: encode64("This is the output for build.sh"),
           })
           .expect(403)
       }).then(response => {
@@ -81,7 +86,7 @@ describe("Build Log API", () => {
         .type("json")
         .send({
           source: "build.sh",
-          body: "This is the output for build.sh",
+          output: encode64("This is the output for build.sh"),
         })
         .expect(404)
 

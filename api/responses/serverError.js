@@ -1,7 +1,7 @@
-module.exports = function badRequest(error = {}, options) {
-  const res = this.res;
+const logger = require("winston")
 
-  sails.log.error('Sending 500 ("Server Error") response: \n', error)
+module.exports = (error = {}, { req, res }) => {
+  logger.error("Sending 500: ", error)
 
   res.status(500)
   return res.json({
