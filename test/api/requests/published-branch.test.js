@@ -1,6 +1,7 @@
 const AWSMocks = require("../support/aws-mocks")
 const expect = require("chai").expect
 const request = require("supertest-as-promised")
+const app = require("../../../app")
 const config = require("../../../config")
 const factory = require("../support/factory")
 const session = require("../support/session")
@@ -15,7 +16,7 @@ describe("Published Files API", () => {
   describe("GET /v0/site/:site_id/published-branch", () => {
     it("should require authentication", done => {
       factory.site().then(site => {
-        return request("http://localhost:1337")
+        return request(app)
           .get(`/v0/site/${site.id}/published-branch`)
           .expect(403)
       }).then(response => {
@@ -51,7 +52,7 @@ describe("Published Files API", () => {
       }).then(promisedValues => {
         site = promisedValues.site
 
-        return request("http://localhost:1337")
+        return request(app)
           .get(`/v0/site/${site.id}/published-branch`)
           .set("Cookie", promisedValues.cookie)
           .expect(200)
@@ -72,7 +73,7 @@ describe("Published Files API", () => {
       const cookie = session(user)
 
       Promise.props({ user, site, cookie }).then(promisedValues => {
-        return request("http://localhost:1337")
+        return request(app)
           .get(`/v0/site/${promisedValues.site.id}/published-branch`)
           .set("Cookie", promisedValues.cookie)
           .expect(403)
@@ -86,7 +87,7 @@ describe("Published Files API", () => {
   describe("GET /v0/site/:site_id/published-branch/:branch", () => {
     it("should require authentication", done => {
       factory.site().then(site => {
-        return request("http://localhost:1337")
+        return request(app)
           .get(`/v0/site/${site.id}/published-branch/${site.defaultBranch}`)
           .expect(403)
       }).then(response => {
@@ -125,7 +126,7 @@ describe("Published Files API", () => {
       }).then(promisedValues => {
         site = promisedValues.site
 
-        return request("http://localhost:1337")
+        return request(app)
           .get(`/v0/site/${site.id}/published-branch/master`)
           .set("Cookie", promisedValues.cookie)
           .expect(200)
@@ -144,7 +145,7 @@ describe("Published Files API", () => {
       const cookie = session(user)
 
       Promise.props({ user, site, cookie }).then(promisedValues => {
-        return request("http://localhost:1337")
+        return request(app)
           .get(`/v0/site/${promisedValues.site.id}/published-branch/master`)
           .set("Cookie", promisedValues.cookie)
           .expect(403)

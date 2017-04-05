@@ -1,5 +1,6 @@
 const expect = require("chai").expect
 const request = require("supertest-as-promised")
+const app = require("../../../app")
 const factory = require("../support/factory")
 const session = require("../support/session")
 const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
@@ -17,7 +18,7 @@ describe("Build Log API", () => {
       factory.build().then(model => {
         build = model
 
-        return request("localhost:1337")
+        return request(app)
           .post(`/v0/build/${build.id}/log/${build.token}`)
           .type("json")
           .send({
@@ -42,7 +43,7 @@ describe("Build Log API", () => {
 
     it("should respond with a 400 if the params are not correct", done => {
       factory.build().then(build => {
-        return request("localhost:1337")
+        return request(app)
           .post(`/v0/build/${build.id}/log/${build.token}`)
           .type("json")
           .send({
@@ -62,7 +63,7 @@ describe("Build Log API", () => {
       factory.build().then(model => {
         build = model
 
-        return request("localhost:1337")
+        return request(app)
           .post(`/v0/build/${build.id}/log/invalid-token`)
           .type("json")
           .send({
@@ -81,7 +82,7 @@ describe("Build Log API", () => {
     })
 
     it("should respond with a 404 if no build is found for the given id", done => {
-      const buildLogRequest = request("localhost:1337")
+      const buildLogRequest = request(app)
         .post(`/v0/build/fake-id/log/fake-build-token`)
         .type("json")
         .send({
@@ -100,7 +101,7 @@ describe("Build Log API", () => {
   describe("GET /v0/build/:build_id/log", () => {
     it("should require authentication", done => {
       factory.buildLog().then(buildLog => {
-        return request("http://localhost:1337")
+        return request(app)
           .get(`/v0/build/${buildLog.build}/log`)
           .expect(403)
       }).then(response => {
@@ -126,7 +127,7 @@ describe("Build Log API", () => {
         let user = site.Users[0]
         return session(user)
       }).then(cookie => {
-        return request("localhost:1337")
+        return request(app)
           .get(`/v0/build/${build.id}/log`)
           .set("Cookie", cookie)
           .expect(200)
@@ -150,7 +151,7 @@ describe("Build Log API", () => {
       }).then(user => {
         return session(user)
       }).then(cookie => {
-        return request("localhost:1337")
+        return request(app)
           .get(`/v0/build/${build.id}/log`)
           .set("Cookie", cookie)
           .expect(403)
@@ -162,7 +163,7 @@ describe("Build Log API", () => {
 
     it("should response with a 404 if the given build does not exist", done => {
       session().then(cookie => {
-        return request("localhost:1337")
+        return request(app)
           .get(`/v0/build/fake-id/log`)
           .set("Cookie", cookie)
           .expect(404)
