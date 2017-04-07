@@ -73,7 +73,7 @@ const createSiteFromExistingRepo = ({ siteParams, user }) => {
   const { owner, repository } = siteParams
 
   return Site.findOne({
-    where: { owner, repository },
+    where: { owner: owner, repository: repository },
     include: [ User ],
   }).then(model => {
     site = model
@@ -129,8 +129,8 @@ const paramsForNewBuildSource = (templateName) => {
 }
 
 const paramsForNewSite = (params) => ({
-  owner: params.owner,
-  repository: params.repository,
+  owner: params.owner ? params.owner.toLowerCase() : undefined,
+  repository: params.repository ? params.repository.toLowerCase() : undefined,
   defaultBranch: params.defaultBranch,
   engine: params.engine,
 })

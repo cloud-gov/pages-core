@@ -47,7 +47,7 @@
     "watch:client:js": "watchify frontend/main.js -o public/js/bundle.js -t [ babelify --presets [ es2015 react stage-2 ] ]",
     "test": "npm run test:prepare && npm run test:server && npm run test:client",
     "test:prepare": "NODE_ENV=test npm run migrate:up && npm run build",
-    "test:server": "NODE_ENV=test mocha --timeout 6000 test/api/bootstrap.test.js test/api/unit/**/*.test.js test/api/requests/**/*.test.js",
+    "test:server": "NODE_ENV=test mocha --timeout 1000 test/api/bootstrap.test.js test/api/unit/**/*.test.js test/api/requests/**/*.test.js",
     "test:client": "mocha --compilers js:babel-register --recursive ./test/frontend",
     "test:client:watch": "watch 'npm run test:client' ./frontend ./test/frontend",
     "coverage:client": "istanbul cover _mocha -- --compilers js:babel-register --recursive ./test/frontend",
