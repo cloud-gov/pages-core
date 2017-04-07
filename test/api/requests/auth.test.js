@@ -2,6 +2,7 @@ const expect = require("chai").expect
 const cookie = require('cookie')
 const crypto = require("crypto")
 const nock = require("nock")
+const app = require("../../../app")
 const request = require("supertest-as-promised")
 const config = require("../../../config")
 const factory = require("../support/factory")
@@ -32,7 +33,7 @@ var sessionForCookie = (cookie) => {
 describe("Authentication request", () => {
   describe("GET /login", () => {
     it("should redirect to GitHub for OAuth2 authentication", done => {
-      request("http://localhost:1337")
+      request(app)
         .get("/auth/github")
         .expect("Location", /^https:\/\/github.com\/login\/oauth\/authorize.*/)
         .expect(302, done)
@@ -57,7 +58,7 @@ describe("Authentication request", () => {
         expect(session.authenticated).to.be.equal(true)
         expect(session.passport.user).to.equal(user.id)
 
-        return request("http://localhost:1337")
+        return request(app)
           .get("/logout")
           .set("Cookie", cookie)
           .expect("Location", "/")
@@ -72,7 +73,7 @@ describe("Authentication request", () => {
     })
 
     it("should redirect to the root URL for an unauthenticated user", done => {
-      request("http://localhost:1337")
+      request(app)
         .get("/logout")
         .expect("Location", "/")
         .expect(302, done)
@@ -88,7 +89,7 @@ describe("Authentication request", () => {
           user = model
           return githubAPINocks.githubAuth(user.username, [{ id: 123456 }])
         }).then(() => {
-          return request("http://localhost:1337")
+          return request(app)
             .get("/auth/github/callback?code=auth-code-123abc")
             .expect(302)
         }).then(response => {
@@ -109,7 +110,7 @@ describe("Authentication request", () => {
           return User.count()
         }).then(count => {
           userCount = count
-          return request("http://localhost:1337")
+          return request(app)
             .get("/auth/github/callback?code=auth-code-123abc")
             .expect(302)
         }).then(response => {
@@ -129,7 +130,7 @@ describe("Authentication request", () => {
 
           githubAPINocks.githubAuth(user.username, [{ id: 123456 }])
 
-          return request("http://localhost:1337")
+          return request(app)
             .get("/auth/github/callback?code=auth-code-123abc")
             .expect(302)
         }).then(response => {
@@ -149,7 +150,7 @@ describe("Authentication request", () => {
         githubAPINocks.user({ githubUserID: githubUserID })
         githubAPINocks.userOrganizations()
 
-        var authRequest = request("http://localhost:1337")
+        var authRequest = request(app)
           .get("/auth/github/callback?code=auth-code-123abc")
           .expect(302)
 
@@ -179,7 +180,7 @@ describe("Authentication request", () => {
         })
         .reply(401)
 
-      request("http://localhost:1337")
+      request(app)
         .get("/auth/github/callback?code=invalid-code")
         .expect(401, done)
     })
@@ -187,7 +188,7 @@ describe("Authentication request", () => {
     it("should respond with a 401 if the user is not in a whitelisted GitHub organization", done => {
       githubAPINocks.githubAuth("unatuhorized-user", [{ id: 654321 }])
 
-      request("http://localhost:1337")
+      request(app)
         .get("/auth/github/callback?code=auth-code-123abc")
         .expect(401, done)
     })
@@ -216,7 +217,7 @@ describe("Authentication request", () => {
         return factory.user()
       }).then(user => {
         githubAPINocks.githubAuth(user.username, [{ id: 123456 }])
-        return request("http://localhost:1337")
+        return request(app)
           .get("/auth/github/callback?code=auth-code-123abc")
           .set("Cookie", cookie)
           .expect(302)

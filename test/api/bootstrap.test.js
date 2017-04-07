@@ -1,7 +1,5 @@
 const AWSMocks = require("./support/aws-mocks")
 
-const app = require("../../app")
-
 const _cleanDatabase = () => {
   const models = require("../../api/models").sequelize.models
   const promises = Object.keys(models).map(name => {
@@ -11,17 +9,9 @@ const _cleanDatabase = () => {
 }
 
 before(function(done) {
-  app.listen(1337, (err) => {
-    if (err) return done(err)
-
-    _cleanDatabase().then(() => {
-      done(null, app);
-    }).catch(err => {
-      done(err)
-    })
+  _cleanDatabase().then(() => {
+    done()
+  }).catch(err => {
+    done(err)
   })
-});
-
-after((done) => {
-  done()
-});
+})

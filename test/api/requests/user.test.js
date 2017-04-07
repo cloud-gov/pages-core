@@ -5,6 +5,7 @@ const Promise = require("bluebird")
 const request = require("supertest-as-promised")
 const sinon = require("sinon")
 
+const app = require("../../../app")
 const factory = require("../support/factory")
 const githubAPINocks = require("../support/githubAPINocks")
 const session = require("../support/session")
@@ -20,7 +21,7 @@ describe("User API", () => {
   describe("GET /v0/me", () => {
     it("should require authentication", done => {
       factory.user().then(user => {
-        return request("http://localhost:1337")
+        return request(app)
           .get("/v0/me")
           .expect(403)
       }).then(response => {
@@ -36,7 +37,7 @@ describe("User API", () => {
         user = model
         return session(user)
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .get("/v0/me")
           .set("Cookie", cookie)
           .expect(200)

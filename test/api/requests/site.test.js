@@ -4,6 +4,7 @@ const nock = require("nock")
 const request = require("supertest-as-promised")
 const sinon = require("sinon")
 
+const app = require("../../../app")
 const factory = require("../support/factory")
 const githubAPINocks = require("../support/githubAPINocks")
 const session = require("../support/session")
@@ -31,7 +32,7 @@ describe("Site API", () => {
   describe("GET /v0/site", () => {
     it("should require authentication", done => {
       factory.build().then(build => {
-        return request("http://localhost:1337")
+        return request(app)
           .get("/v0/site")
           .expect(403)
       }).then(response => {
@@ -53,7 +54,7 @@ describe("Site API", () => {
         sites = models
         return session(user)
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .get("/v0/site")
           .set("Cookie", cookie)
           .expect(200)
@@ -89,7 +90,7 @@ describe("Site API", () => {
         expect(site).to.have.length(3)
         return session(factory.user())
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .get("/v0/site")
           .set("Cookie", cookie)
           .expect(200)
@@ -105,7 +106,7 @@ describe("Site API", () => {
   describe("GET /v0/site/:id", () => {
     it("should require authentication", done => {
       factory.site().then(site => {
-        return request("http://localhost:1337")
+        return request(app)
           .get(`/v0/site/${site.id}`)
           .expect(403)
       }).then(response => {
@@ -123,7 +124,7 @@ describe("Site API", () => {
         site = model
         return session(site.Users[0])
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .get(`/v0/site/${site.id}`)
           .set("Cookie", cookie)
           .expect(200)
@@ -141,7 +142,7 @@ describe("Site API", () => {
         site = model
         return session(factory.user())
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .get(`/v0/site/${site.id}`)
           .set("Cookie", cookie)
           .expect(403)
@@ -165,7 +166,7 @@ describe("Site API", () => {
     })
 
     it("should require authentication", done => {
-      const newSiteRequest = request("http://localhost:1337")
+      const newSiteRequest = request(app)
         .post(`/v0/site`)
         .send({
           organization: "partner-org",
@@ -186,7 +187,7 @@ describe("Site API", () => {
       const siteRepository = crypto.randomBytes(3).toString("hex")
 
       session().then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .post(`/v0/site`)
           .send({
             owner: siteOwner,
@@ -224,7 +225,7 @@ describe("Site API", () => {
 
         githubAPINocks.repo()
 
-        return request("http://localhost:1337")
+        return request(app)
           .post(`/v0/site`)
           .send({
             owner: site.owner,
@@ -266,7 +267,7 @@ describe("Site API", () => {
       })
 
       session().then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .post(`/v0/site`)
           .send({
             owner: siteOwner,
@@ -294,7 +295,7 @@ describe("Site API", () => {
 
     it("should respond with a 400 if no user or repository is specified", done => {
       session().then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .post(`/v0/site`)
           .send({
             defaultBranch: "master",
@@ -317,7 +318,7 @@ describe("Site API", () => {
         site: factory.site({ users: Promise.all([userPromise]) }),
         cookie: session(userPromise),
       }).then(({ site, cookie }) => {
-        return request("http://localhost:1337")
+        return request(app)
           .post(`/v0/site`)
           .send({
             owner: site.owner,
@@ -349,7 +350,7 @@ describe("Site API", () => {
       githubAPINocks.webhook()
 
       session().then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .post(`/v0/site`)
           .send({
             owner: siteOwner,
@@ -383,7 +384,7 @@ describe("Site API", () => {
 
         return session()
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .post(`/v0/site`)
           .send({
             owner: site.owner,
@@ -415,7 +416,7 @@ describe("Site API", () => {
       })
 
       session().then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .post(`/v0/site`)
           .send({
             owner: siteOwner,
@@ -444,7 +445,7 @@ describe("Site API", () => {
 
     it("should require authentication", done => {
       factory.site().then(site => {
-        return request("http://localhost:1337")
+        return request(app)
           .delete(`/v0/site/${site.id}`)
           .expect(403)
       }).then(response => {
@@ -462,7 +463,7 @@ describe("Site API", () => {
         site = model
         return session(site.Users[0])
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .delete(`/v0/site/${site.id}`)
           .set("Cookie", cookie)
           .expect(200)
@@ -485,7 +486,7 @@ describe("Site API", () => {
         site = model
         return session(factory.user())
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .delete(`/v0/site/${site.id}`)
           .set("Cookie", cookie)
           .expect(403)
@@ -516,7 +517,7 @@ describe("Site API", () => {
           return Promise.resolve()
         })
 
-        return request("http://localhost:1337")
+        return request(app)
           .delete(`/v0/site/${site.id}`)
           .set("Cookie", results.cookie)
           .expect(200)
@@ -530,7 +531,7 @@ describe("Site API", () => {
   describe("PUT /v0/site/:id", () => {
     it("should require authentication", done => {
       factory.site().then(site => {
-        return request("http://localhost:1337")
+        return request(app)
           .put(`/v0/site/${site.id}`)
           .send({
             defaultBranch: "master"
@@ -551,7 +552,7 @@ describe("Site API", () => {
         site = model
         return session(site.Users[0])
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .put(`/v0/site/${site.id}`)
           .send({
             config: "new-config",
@@ -582,7 +583,7 @@ describe("Site API", () => {
         site = model
         return session(factory.user())
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .put(`/v0/site/${site.id}`)
           .send({
             repository: "new-repo-name"
@@ -607,7 +608,7 @@ describe("Site API", () => {
         expect(site.Builds).to.have.length(0)
         return session(site.Users[0])
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .put(`/v0/site/${site.id}`)
           .send({
             repository: "new-repo-name"
@@ -639,7 +640,7 @@ describe("Site API", () => {
       }).then(results => {
         site = results.site
 
-        return request("http://localhost:1337")
+        return request(app)
           .put(`/v0/site/${site.id}`)
           .send({
             config: "",
@@ -674,7 +675,7 @@ describe("Site API", () => {
       }).then(results => {
         site = results.site
 
-        return request("http://localhost:1337")
+        return request(app)
           .put(`/v0/site/${site.id}`)
           .send({
             config: "new-config: true",
