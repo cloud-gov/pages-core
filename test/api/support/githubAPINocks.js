@@ -12,10 +12,15 @@ const accessToken = ({ authorizationCode, accessToken, scope } = {}) => {
   }
 
   return nock("https://github.com")
-    .post("/login/oauth/access_token", {
-      client_id: config.passport.github.options.clientID,
-      client_secret: config.passport.github.options.clientSecret,
-      code: authorizationCode
+    .post("/login/oauth/access_token", (body) => {
+      const expectedBody = {
+        client_id: config.passport.github.options.clientID,
+        client_secret: config.passport.github.options.clientSecret,
+        code: authorizationCode,
+      }
+      return body.client_id === expectedBody.client_id &&
+        body.client_secret === expectedBody.client_secret &&
+        body.code === expectedBody.code
     })
     .reply(200, {
       token_type: "bearer",
