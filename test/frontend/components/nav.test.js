@@ -5,8 +5,8 @@ import { Link } from 'react-router';
 
 import Nav from '../../../frontend/components/nav';
 
-const userName = 'el-mapache';
-const helpText = 'Documentation';
+const username = 'el-mapache';
+const documentationText = 'Documentation';
 const contactUsText = 'Contact us';
 
 describe('<Nav/>', () => {
@@ -26,22 +26,32 @@ describe('<Nav/>', () => {
     expect(wrapper.find('a').filter(el => el.text() === contactUsText));
   });
 
-  it('displays a `help` link', () => {
+  it('displays a `documentation` link', () => {
     wrapper = shallow(<Nav/>);
 
-    expect(wrapper.find('a').filter(el => el.text() === helpText));
+    expect(wrapper.find('a').filter(el => el.text() === documentationText));
   });
 
-  it('displays a link to log out', () => {
-    wrapper = shallow(<Nav/>);
+  context("logged in", () => {
+    it('displays a link with usersname', () => {
+      wrapper = shallow(<Nav username={username}/>);
 
-    expect(wrapper.find('a[href="/logout"]')).to.have.length(1);
-  });
+      expect(wrapper.find(Link)).to.have.length(1);
+      expect(wrapper.find(Link).children().text()).to.equal(username);
+    });
 
-  it('displays a link with usersname', () => {
-    wrapper = shallow(<Nav username={userName}/>);
+    it('displays a link to log out', () => {
+      wrapper = shallow(<Nav username={username}/>);
 
-    expect(wrapper.find(Link)).to.have.length(1);
-    expect(wrapper.find(Link).children().text()).to.equal(userName);
-  });
+      expect(wrapper.find('a[href="/logout"]')).to.have.length(1);
+    });
+  })
+
+  context("not logged in", () => {
+    it('displays a link to login', () => {
+      wrapper = shallow(<Nav/>);
+
+      expect(wrapper.find('a[href="/auth/github"]')).to.have.length(1);
+    })
+  })
 });
