@@ -5,8 +5,8 @@ const passport = require('passport')
 const config = require("../../config")
 const { User } = require("../models")
 
-var githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
-  var user
+const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
+  let user
   return GitHub.validateUser(accessToken).then(() => {
     return User.findOrCreate({
       where: { username: profile.username },
@@ -38,18 +38,22 @@ passport.use(new GitHubStrategy(
 passport.logout = (req, res) => {
   req.logout();
   req.session.authenticated = false;
-  res.redirect('/');
+  req.session.save(() => {
+    res.redirect('/');
+  })
 }
 
 passport.callback = (req, res) => {
   passport.authenticate("github")(req, res, () => {
     if (req.user) {
       req.session.authenticated = true
-      if (req.session.authRedirectPath) {
-        res.redirect(req.session.authRedirectPath)
-      } else {
-        res.redirect("/")
-      }
+      req.session.save(() => {
+        if (req.session.authRedirectPath) {
+          res.redirect(req.session.authRedirectPath)
+        } else {
+          res.redirect("/")
+        }
+      })
     } else {
       res.status(401).send("Unauthorized")
     }
