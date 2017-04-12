@@ -1,3 +1,5 @@
+Promise.props = require("promise-props")
+
 const AWSMocks = require("./support/aws-mocks")
 
 const _cleanDatabase = () => {
