@@ -74,7 +74,7 @@ class TemplateList extends React.Component {
                 <TemplateSite
                   name={templateName}
                   index={index++}
-                  thumb={templateName}
+                  thumb={template.thumb}
                   active={this.state.activeChildId}
                   handleChooseActive={this.handleChooseActive}
                   handleSubmit={this.props.handleSubmitTemplate}
