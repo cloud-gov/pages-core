@@ -1,9 +1,13 @@
 import federalist from '../util/federalistApi';
 import { dispatch } from '../store';
 import {
+  userFetchStarted as createUserFetchStartedAction,
   userReceived as createUserReceivedAction,
-  userLogout as createUserLogoutAction
 } from "./actionCreators/userActions";
+
+const dispatchUserFetchStartedAction = () => {
+  dispatch(createUserFetchStartedAction())
+}
 
 const dispatchUserReceivedAction = user => {
   dispatch(createUserReceivedAction(user));
@@ -11,11 +15,8 @@ const dispatchUserReceivedAction = user => {
 
 export default {
   fetchUser() {
+    dispatchUserFetchStartedAction
     return federalist.fetchUser()
-      .then(dispatchUserReceivedAction);
+      .then(dispatchUserReceivedAction)
   },
-
-  logout() {
-    dispatch(createUserLogoutAction());
-  }
 };
