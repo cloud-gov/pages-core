@@ -297,6 +297,23 @@ describe("SiteCreator", () => {
           done()
         }).catch(done)
       })
+
+      it("should reject if the user has already added the site and the site name is a different case", done => {
+        const user = factory.user()
+        const site = factory.site({ users: Promise.all([user]) })
+
+        Promise.props({ user, site }).then(({ user, site }) => {
+          githubAPINocks.repo()
+          return SiteCreator.createSite({ user, siteParams: {
+            owner: site.owner.toUpperCase(),
+            repository: site.repository.toUpperCase(),
+          }})
+        }).catch(err => {
+          expect(err.status).to.equal(400)
+          expect(err.message).to.equal("You've already added this site to Federalist")
+          done()
+        }).catch(done)
+      })
     })
 
     context("when the site is created from a template", () => {
