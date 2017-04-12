@@ -16,10 +16,7 @@ before_script:
 env:
   global:
   - CF_API="https://api.fr.cloud.gov"
-  - CF_USERNAME="gsa-18f-federalist_deployer"
   - CF_ORGANIZATION="gsa-18f-federalist"
-  # CF_PASSWORD for gsa-18f-federalist_deployer user
-  - secure: "E+PN3rztdIFrY02/0O3bAna0ClEeBe/IewLems9xnPtsZtBsobdGaA0RBoI5NRZlYElbF+x9CtfTyPCX5/iNEmBTHcz5I3n4DO6CSmPGVTU2RIZheSLhhLQ9dcOxZv+kArEWsN8WiIavZQQ14o2CgokAbZRewiDRjRtreACalA1cF6EgLiD9VEaZKwSihwCyey1QNoC8JNt/qAL/5YlV1ytgeiXCI2TNMyrnYvwJkeTkd9QzjNcJoD30FHZv63gPaEA3sKN7KXfx2Y2D56t4p+rnMnpcmpk/TMZcqNUc36v9A+JN6udsDW/LOD4vk+YztK026x93wMjW5sYuA/peAuJ5MbnCwaq3gIbvqQs7divLrQR/qWFw54OYaVaPdKJHeollRXHp/ZqnUNy0bvHEEaHBltXrkHSCyvr5KpumrTIokvouJDd+dqNjr2jaA4CO+Pl1QM+sqyIQvu6pIsOStRmGDtKFY2897jJ2VAk8HEsLo4wQZKUaAgPJ/yKXIjo+P0NiZnqwAaGF/TVxOJ5SqSMSHsAgulWRqguZVgdP5Zc2lxdyyTGUWQPDR7s0hJ5Byf0EAG45xVGUTzeTHZie1kRtlgfOmUrdur9KOP1RUFqop66mSQzeWPVtPP6Fp8TfwhNpiuDPCDbF+e6W6N5NxEbiuh7FOeNYVTZaavgRThA="
   - CXX=g++-4.8
 addons:
   apt:
