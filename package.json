@@ -97,6 +97,7 @@
     "react-addons-test-utils": "^15.3.1",
     "react-dom": "^15.1.0",
     "react-router": "^2.4.1",
+    "react-test-renderer": "^15.5.4",
     "redux": "^3.5.2",
     "sinon": "1.17.2",
     "supertest": "^2.0.1",
