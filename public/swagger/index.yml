@@ -356,12 +356,37 @@ paths:
       type: string
       required: true
     get:
-      summary: Fetch information about what's pusblished for the site at the given branch
+      summary: Fetch metadata about what's published for the site at the given branch
       responses:
         200:
           description: A published branch object representing the branch published to S3
           schema:
             $ref: "PublishedBranch.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+  /site/{site_id}/published-branch/{branch}/published-file:
+    parameters:
+    - name: site_id
+      in: path
+      description: The id of the site
+      type: integer
+      required: true
+    - name: branch
+      in: path
+      description: The name of the branch
+      type: string
+      required: true
+    get:
+      summary: Fetch the list of files that are published to the given branch for the given site
+      responses:
+        200:
+          description: A list of files published to the branch
+          schema:
+            type: array
+            items:
+              $ref: "PublishedFile.json"
         403:
           description: Not authorized
           schema:

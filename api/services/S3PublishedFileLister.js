@@ -53,10 +53,12 @@ const listFiles = (path) => {
         reject(err)
       } else {
         const prefixComponents = path.split("/").length
-        filenames = data.Contents.map(object => {
-          return object.Key.split("/").slice(prefixComponents).join("/")
+        files = data.Contents.map(object => {
+          const name = object.Key.split("/").slice(prefixComponents).join("/")
+          const size = Number(object.Size)
+          return { name, size }
         })
-        resolve(filenames)
+        resolve(files)
       }
     })
   })

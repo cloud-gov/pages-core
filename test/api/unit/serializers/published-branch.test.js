@@ -38,7 +38,7 @@ describe("PublishedBranchesSerializer", () => {
 
       factory.site({ defaultBranch: "default" }).then(model => {
         site = model
-        return PublishedBranchSerializer.serialize(site, "default", ["abc", "abc/def", "ghi"])
+        return PublishedBranchSerializer.serialize(site, "default")
       }).then(object => {
         const viewLink = site.viewLinkForBranch("default")
         const result = validateJSONSchema(object, PublishedBranchSchema)
@@ -47,7 +47,6 @@ describe("PublishedBranchesSerializer", () => {
         expect(object.name).to.equal("default")
         expect(object.viewLink).to.equal(viewLink)
         expect(object.site.id).to.equal(site.id)
-        expect(object.files).to.deep.equal(["abc", "abc/def", "ghi"])
         done()
       }).catch(done)
     })
