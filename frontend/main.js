@@ -29,4 +29,3 @@ store.subscribe(() => {
 
 userActions.fetchUser();
 siteActions.fetchSites();
-// buildActions.fetchBuilds();
