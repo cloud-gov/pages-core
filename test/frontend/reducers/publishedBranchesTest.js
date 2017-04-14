@@ -5,13 +5,11 @@ proxyquire.noCallThru();
 
 describe("publishedBranchesReducer", () => {
   let fixture
-  const PUBLISHED_BRANCH_RECEIVED = "published branch received"
   const PUBLISHED_BRANCHES_RECEIVED = "published branches received"
 
   beforeEach(() => {
     fixture = proxyquire("../../../frontend/reducers/publishedBranches", {
       "../actions/actionCreators/publishedBranchActions": {
-        publishedBranchReceivedType: PUBLISHED_BRANCH_RECEIVED,
         publishedBranchesReceivedType: PUBLISHED_BRANCHES_RECEIVED,
       }
     }).default
@@ -48,25 +46,5 @@ describe("publishedBranchesReducer", () => {
     })
 
     expect(actual).to.deep.equal(BRANCHES)
-  })
-
-  it("adds files received from a branch in the action", () => {
-    const BRANCH = { name: "branch", site: { id: 1 }, files: "I am the files!" }
-    const state = [
-      { name: "master", site: { id: 1 } },
-      { name: "branch", site: { id: 1 } },
-      { name: "branch", site: { id: 2 } },
-    ]
-
-    const actual = fixture(state, {
-      type: PUBLISHED_BRANCH_RECEIVED,
-      branch: BRANCH,
-    })
-
-    expect(actual).to.deep.equal([
-      { name: "master", site: { id: 1 } },
-      { name: "branch", site: { id: 1 }, files: "I am the files!" },
-      { name: "branch", site: { id: 2 } },
-    ])
   })
 })
