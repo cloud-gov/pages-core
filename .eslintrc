@@ -1,7 +1,10 @@
 {
   "extends": "airbnb/legacy",
   "rules": {
-    "func-names": 0,
-    "space-before-function-paren": 0
-  }
+    "comma-dangle": ["error", "always-multiline"],
+    "no-inner-declarations": ["error", "functions"],
+    "quotes": ["error", "double", { "allowTemplateLiterals": true }],
+    "semi": ["error", "never"],
+  },
+  "parser": "babel-eslint",
 }
