@@ -7,17 +7,20 @@ proxyquire.noCallThru()
 describe("publishedFileActions", () => {
   let fixture
   let dispatch
+  let publishedFilesFetchStartedActionCreator
   let publishedFilesReceivedActionCreator
   let fetchPublishedFiles
 
   beforeEach(() => {
     dispatch = spy()
+    publishedFilesFetchStartedActionCreator = stub()
     publishedFilesReceivedActionCreator = stub()
 
     fetchPublishedFiles = stub()
 
     fixture = proxyquire("../../../frontend/actions/publishedFileActions", {
       "./actionCreators/publishedFileActions": {
+        publishedFilesFetchStarted: publishedFilesFetchStartedActionCreator,
         publishedFilesReceived: publishedFilesReceivedActionCreator,
       },
       "../util/federalistApi": {
@@ -29,18 +32,21 @@ describe("publishedFileActions", () => {
     }).default
   })
 
-  it("fetchPublishedFilees", done => {
+  it("fetchPublishedFiles", done => {
     const files = ["File 1", "File 2"]
     const publishedFilesPromise = Promise.resolve(files)
-    const action = { action: "action" }
+    const startedAction = { action: "started" }
+    const receivedAction = { action: "received" }
     fetchPublishedFiles.withArgs().returns(publishedFilesPromise)
-    publishedFilesReceivedActionCreator.withArgs(files).returns(action)
+    publishedFilesFetchStartedActionCreator.withArgs().returns(startedAction)
+    publishedFilesReceivedActionCreator.withArgs(files).returns(receivedAction)
 
     const actual = fixture.fetchPublishedFiles()
 
     actual.then(() => {
-      expect(dispatch.calledOnce).to.be.true
-      expect(dispatch.calledWith(action)).to.be.true
+      expect(dispatch.calledTwice).to.be.true
+      expect(dispatch.calledWith(startedAction)).to.be.true
+      expect(dispatch.calledWith(receivedAction)).to.be.true
       done()
     })
   })
