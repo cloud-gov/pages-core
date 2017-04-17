@@ -64,9 +64,7 @@ class SiteContainer extends React.Component {
     const publishedBranches = storeState.publishedBranches.filter(branch => {
       return branch.site.id === site.id
     })
-    const publishedFiles = storeState.publishedFiles.filter(file => {
-      return file.publishedBranch.site.id === site.id
-    })
+    const publishedFiles = storeState.publishedFiles
     const pageTitle = this.getPageTitle(location.pathname);
 
     let childConfigs;
