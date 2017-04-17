@@ -1,7 +1,1 @@
-assets/*
-test/**/*.js
-assets/js/dependencies/**/*.js
-assets/js/bundle.js
-assets/site/**/*.js
-tasks/config/**/*.js
-tasks/register/**/*.js
+public/*
