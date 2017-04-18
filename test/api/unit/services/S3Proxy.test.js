@@ -157,7 +157,7 @@ describe("S3Proxy", () => {
 
         const path = `preview/${site.owner}/${site.repository}/branch/file`
         AWSMocks.mocks.S3.listObjects = (params, cb) => cb(null, {
-          Contents: [{ Key: path, Size: 0 }, { Key: `${path}/index.html`, Size: 1000 }]
+          Contents: [{ Key: `${path}/index.html`, Size: 1000 }]
         })
 
         const req = {
@@ -187,7 +187,7 @@ describe("S3Proxy", () => {
 
         const path = `preview/${site.owner}/${site.repository}/branch/file`
         AWSMocks.mocks.S3.listObjects = (params, cb) => cb(null, {
-          Contents: [{ Key: path, Size: 0 }, { Key: `${path}/index.html`, Size: 1000 }]
+          Contents: [{ Key: `${path}/index.html`, Size: 1000 }]
         })
 
         const req = {
