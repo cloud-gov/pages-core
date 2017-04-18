@@ -15,16 +15,16 @@ describe("userReducer", () => {
     }).default;
   });
 
-  it("defaults to false and ignores other actions", () => {
+  it("has a default and ignores other actions", () => {
     const actual = fixture(undefined, {
       type: "not what you're looking for",
       hello: "alijasfjir"
     });
 
-    expect(actual).to.be.false;
+    expect(actual).to.deep.equal({ isLoading: false });
   });
 
-  it("records lots of data from the user received action, overwriting what's there", () => {
+  it("records lots of data from the user received action and sets isLoading", () => {
     const user = {
       id: 12,
       username: "bob",
@@ -38,6 +38,9 @@ describe("userReducer", () => {
       user: user
     });
 
-    expect(actual).to.deep.equal(user);
+    expect(actual).to.deep.equal({
+      isLoading: false,
+      data: user,
+    });
   });
 });

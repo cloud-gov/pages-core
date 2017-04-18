@@ -1,17 +1,16 @@
+const userFetchStartedType = "USER_FETCH_STARTED"
 const userReceivedType = "USER_RECEIVED";
-const userLogoutType = "USER_LOGOUT";
+
+const userFetchStarted = () => ({
+  type: userFetchStartedType,
+})
 
 const userReceived = user => ({
   type: userReceivedType,
-  user
-});
-
-// FIXME: nobody appears to listen to this-- should we drop it?
-const userLogout = () => ({
-  type: userLogoutType
-});
+  user,
+})
 
 export {
+  userFetchStarted, userFetchStartedType,
   userReceived, userReceivedType,
-  userLogout, userLogoutType
 };
