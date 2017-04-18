@@ -5,7 +5,6 @@ proxyquire.noCallThru();
 
 describe("maps reducers", () => {
   let fixture;
-  const BUILDS = "builds are here";
   const BUILD_LOGS = "build logs are here"
   const ALERT = "alerts is here";
   const PUBLISHED_BRANCHES = "published branches are here"
@@ -14,17 +13,12 @@ describe("maps reducers", () => {
 
   beforeEach(() => {
     fixture = proxyquire("../../frontend/reducers.js", {
-      "./reducers/builds": BUILDS,
       "./reducers/buildLogs": BUILD_LOGS,
       "./reducers/alert": ALERT,
       "./reducers/publishedBranches": PUBLISHED_BRANCHES,
       "./reducers/sites": SITES,
       "./reducers/user": USER,
     }).default;
-  });
-
-  it("maps builds reducer", () => {
-    expect(fixture.builds).to.equal(BUILDS);
   });
 
   it("maps buildLogs reducer", () => {
