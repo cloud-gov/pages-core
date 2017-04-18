@@ -23,18 +23,4 @@ describe("userActions actionCreators", () => {
       expect(userReceivedType).to.equal("USER_RECEIVED");
     });
   });
-
-  describe("userLogout", () => {
-    it("constructs properly", () => {
-      const actual = userLogout();
-
-      expect(actual).to.deep.equal({
-        type: userLogoutType
-      });
-    });
-
-    it("exports its type", () => {
-      expect(userLogoutType).to.equal("USER_LOGOUT");
-    });
-  });
 });

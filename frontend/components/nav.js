@@ -9,18 +9,30 @@ const propTypes = {
 };
 
 const getSecondaryNav = (username) => {
-  const links = [
-    <Link to="/sites">{username}</Link>,
-    <a href="https://federalist-docs.18f.gov" target="_blank">Documentation</a>,
-    <a href="https://github.com/18F/federalist/issues/new" target="_blank">File Issue</a>,
-    <a href="mailto:federalist-support@gsa.gov">Get Help</a>,
-    <a href="/logout">Log out</a>,
-  ];
+  const links = getSecondaryNavLinks(username);
 
   return links.map((link, index) => {
     return <li key={index}>{link}</li>;
   });
 };
+
+const getSecondaryNavLinks = (username) => {
+  if (username) {
+    return [
+      <Link to="/sites">{username}</Link>,
+      <a href="https://federalist-docs.18f.gov" target="_blank">Documentation</a>,
+      <a href="https://github.com/18F/federalist/issues/new" target="_blank">File Issue</a>,
+      <a href="mailto:federalist-support@gsa.gov">Get Help</a>,
+      <a href="/logout">Log out</a>,
+    ]
+  } else {
+    return [
+      <a href="https://federalist-docs.18f.gov" target="_blank">Documentation</a>,
+      <a href="https://github.com/18F/federalist/issues/new" target="_blank">Contact Us</a>,
+      <a href="/auth/github">Log in</a>,
+    ]
+  }
+}
 
 const Nav = ({ username = null }) =>
   <nav className="usa-site-navbar">

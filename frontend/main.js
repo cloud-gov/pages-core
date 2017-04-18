@@ -14,10 +14,6 @@ import Provider from './util/provider';
 const mainEl = document.querySelector('#js-app');
 
 store.subscribe(() => {
-  const state = store.getState();
-
-  if (!state.user) return;
-
   render((
     <Provider state={{get: store.getState}}>
       <Router history={browserHistory}>

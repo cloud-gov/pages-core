@@ -25,15 +25,23 @@ class AddSite extends React.Component {
     const { user } = props.storeState;
 
     this.state = {
-      owner: user.username || '',
+      owner: this.defaultOwner(),
       repository: '',
       engine: 'jekyll',
       defaultBranch: 'master',
-      users: [+user.id]
     };
 
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+  }
+
+  defaultOwner() {
+    const userState = this.props.storeState.user
+    if (userState.data) {
+      return userState.data.username
+    } else {
+      return ""
+    }
   }
 
   onSubmit(event) {
@@ -72,7 +80,7 @@ class AddSite extends React.Component {
         <TemplateSiteList
           templates={templates}
           handleSubmitTemplate={this.onSubmitTemplate}
-          defaultOwner={this.props.storeState.user.username}
+          defaultOwner={this.defaultOwner()}
         />
         <div className="usa-grid">
           <div className="col-md-12">
