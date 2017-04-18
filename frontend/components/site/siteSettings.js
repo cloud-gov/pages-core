@@ -113,60 +113,54 @@ class SiteSettings extends React.Component {
         <div className="usa-grid">
           <div className="usa-width-one-whole">
             <div className="form-group">
-              <label className="active" htmlFor="domain">Custom domain</label>
-              <input
-                name="domain"
-                className="form-control"
-                type="text"
-                placeholder="https://example.com"
-                value={ state.domain }
-                onChange={this.onChange} />
-            </div>
-            <div className="usa-alert usa-alert-info">
-              <div className="usa-alert-body">
-                <h3 className="usa-alert-heading">Custom Domain</h3>
-                <p className="usa-alert-text">This read-only origin box is used for Federalist to set a custom domain on the 18F side. Federalist customers only need this information if handling custom URL work directly.</p>
-                <input readOnly type="text" value="" />
+              <div className="usa-alert usa-alert-info">
+                <div className="usa-alert-body">
+                  <h3 className="usa-alert-heading">Custom Domain</h3>
+                  <p className="usa-alert-text">
+                    If you build your site with Jekyll, Federalist can configure your production site to load at a custom domain specified here.
+                  </p>
+                  <input
+                   name="domain"
+                   className="form-control"
+                   type="text"
+                   placeholder="https://example.com"
+                   value={ state.domain }
+                   onChange={this.onChange} />
+                </div>
               </div>
             </div>
           </div>
         </div>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
-            <div className="form-group">
-              <label htmlFor="config" className="">Site custom configuration</label>
-              <textarea
-                name="config"
-                className="form-control"
-                value={state.config}
-                onChange={this.onChange} />
-            </div>
             <div className="usa-alert usa-alert-info">
               <div className="usa-alert-body">
                 <h3 className="usa-alert-heading">Site configuration</h3>
                 <p className="usa-alert-text">
                   Add additional configuration in yaml to be added to your <code>_config.yml</code> file when we build your site's default branch.
                 </p>
+                <textarea
+                name="config"
+                className="form-control"
+                value={state.config}
+                onChange={this.onChange} />
               </div>
             </div>
           </div>
         </div>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
-            <div className="form-group">
-              <label htmlFor="previewConfig" className="">Preview custom configuration</label>
-              <textarea
-                name="previewConfig"
-                className="form-control"
-                value={state.previewConfig}
-                onChange={this.onChange} />
-            </div>
             <div className="usa-alert usa-alert-info">
               <div className="usa-alert-body">
                 <h3 className="usa-alert-heading">Preview configuration</h3>
                 <p className="usa-alert-text">
                   Add additional configuration in yaml to be added to your <code>_config.yml</code> file when we build a preview branch for your site.
                 </p>
+                <textarea
+                name="previewConfig"
+                className="form-control"
+                value={state.previewConfig}
+                onChange={this.onChange} />
               </div>
             </div>
           </div>
