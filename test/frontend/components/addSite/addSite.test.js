@@ -20,8 +20,11 @@ const AlertBanner = mock();
 const addSite = stub();
 
 const user = {
-  username: 'jill',
-  id: '1'
+  isLoading: false,
+  data: {
+    username: 'jill',
+    id: '1',
+  },
 };
 
 const error = {error: 'whoooooops'};
@@ -47,8 +50,7 @@ describe('<AddSite/>', () => {
   it('has expected default state based on supplied props', () => {
     const actualState = wrapper.state();
     const expectedState = {
-      owner: user.username,
-      users: [+user.id],
+      owner: user.data.username,
       engine: 'jekyll',
       defaultBranch: 'master',
       repository: ''
@@ -92,7 +94,7 @@ describe('<AddSite/>', () => {
     expect(templateListProps).to.deep.equal({
       templates: templates,
       handleSubmitTemplate: wrapper.instance().onSubmitTemplate,
-      defaultOwner: propsWithoutError.storeState.user.username,
+      defaultOwner: propsWithoutError.storeState.user.data.username,
     });
     expect(formProps.onSubmit).to.equal(wrapper.instance().onSubmit);
   });

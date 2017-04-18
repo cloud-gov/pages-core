@@ -1,5 +1,6 @@
 import React from "react"
 import { pushHistory } from "../actions/routeActions"
+import LoadingIndicator from './loadingIndicator'
 
 const homeHTML = require("./home.html")
 
@@ -17,13 +18,18 @@ class Home extends React.Component {
   }
 
   redirectForLoggedInUser() {
-    if (this.props.storeState.user) {
+    const userState = this.props.storeState.user
+    if (!userState.isLoading && userState.data) {
       pushHistory("/sites")
     }
   }
 
   render() {
-    return <div dangerouslySetInnerHTML={{ __html: homeHTML }}/>
+    if (!this.props.storeState.user.isLoading) {
+      return <div dangerouslySetInnerHTML={{ __html: homeHTML }}/>
+    } else {
+      return <LoadingIndicator/>
+    }
   }
 }
 
