@@ -14,10 +14,6 @@ export default {
     });
   },
 
-  fetchBuilds() {
-    return this.fetch('build');
-  },
-
   fetchBuildLogs(build) {
     return this.fetch(`build/${build.id}/log`);
   },
