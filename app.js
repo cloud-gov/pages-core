@@ -1,5 +1,4 @@
 const config = require("./config")
-global.Promise = require("bluebird")
 
 const logger = require("winston")
 logger.level = config.log.level

@@ -59,7 +59,7 @@ const createBuildForWebhookRequest = (request) => {
   const user = findUserForWebhookRequest(request)
   const site = findSiteForWebhookRequest(request)
 
-  return Promise.props([ user, site ]).then((models) => {
+  return Promise.all([user, site]).then((models) => {
     buildParams = {
       user: models[0],
       site: models[1],
