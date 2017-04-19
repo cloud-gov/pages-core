@@ -49,9 +49,9 @@ describe("S3PublishedFileLister", () => {
 
         callback(null, {
           Contents: [
-            { Key: `${prefix}/abc` },
-            { Key: `${prefix}/abc/def` },
-            { Key: `${prefix}/ghi` },
+            { Key: `${prefix}/abc`, Size: 123 },
+            { Key: `${prefix}/abc/def`, Size: 456 },
+            { Key: `${prefix}/ghi`, Size: 789 },
           ]
         })
       }
@@ -60,7 +60,11 @@ describe("S3PublishedFileLister", () => {
         site = model
         return S3PublishedFileLister.listPublishedFilesForBranch(site, "master")
       }).then(publishedFiles => {
-        expect(publishedFiles).to.deep.equal(["abc", "abc/def", "ghi"])
+        expect(publishedFiles).to.deep.equal([
+          { name: "abc", size: 123 },
+          { name: "abc/def", size: 456 },
+          { name: "ghi", size: 789 },
+        ])
         done()
       }).catch(done)
     })
@@ -75,9 +79,9 @@ describe("S3PublishedFileLister", () => {
 
         callback(null, {
           Contents: [
-            { Key: `${prefix}/abc` },
-            { Key: `${prefix}/abc/def` },
-            { Key: `${prefix}/ghi` },
+            { Key: `${prefix}/abc`, Size: 123 },
+            { Key: `${prefix}/abc/def`, Size: 456 },
+            { Key: `${prefix}/ghi`, Size: 789 },
           ]
         })
       }
@@ -86,7 +90,11 @@ describe("S3PublishedFileLister", () => {
         site = model
         return S3PublishedFileLister.listPublishedFilesForBranch(site, "preview")
       }).then(publishedFiles => {
-        expect(publishedFiles).to.deep.equal(["abc", "abc/def", "ghi"])
+        expect(publishedFiles).to.deep.equal([
+          { name: "abc", size: 123 },
+          { name: "abc/def", size: 456 },
+          { name: "ghi", size: 789 },
+        ])
         done()
       }).catch(done)
     })

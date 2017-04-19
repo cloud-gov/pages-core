@@ -71,7 +71,7 @@ class TemplateSite extends React.Component {
           <div className="usa-alert-text">
             <a data-action="name-site" className="thumbnail">
               <img
-                src={`/images/${props.thumb}.thumb.png`}
+                src={props.thumb}
                 alt={`Thumbnail screenshot for the ${props.title} template`} />
             </a>
             <p>{props.description}</p>

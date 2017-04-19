@@ -64,18 +64,4 @@ describe("userActions", () => {
       });
     });
   });
-
-  describe("logoutUser", () => {
-    it("sends a user logout action to the store", () => {
-      const userLogoutAction = {
-        gee: "whiz"
-      };
-      userLogoutActionCreator.withArgs().returns(userLogoutAction);
-
-      fixture.logout();
-
-      expect(dispatch.calledOnce).to.be.true;
-      expect(dispatch.calledWith(userLogoutAction)).to.be.true;
-    });
-  });
 });

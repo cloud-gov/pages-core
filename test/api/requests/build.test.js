@@ -1,6 +1,7 @@
 const expect = require("chai").expect
 const request = require("supertest-as-promised")
 const sinon = require("sinon")
+const app = require("../../../app")
 const factory = require("../support/factory")
 const session = require("../support/session")
 const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
@@ -23,7 +24,7 @@ describe("Build API", () => {
   describe("POST /v0/build", () => {
     it("should require authentication", done => {
       factory.site().then(site => {
-        return request("http://localhost:1337")
+        return request(app)
           .post(`/v0/build/`)
           .send({
             site: site.id,
@@ -51,7 +52,7 @@ describe("Build API", () => {
         site = promisedValues.site
         user = promisedValues.user
 
-        return request("http://localhost:1337")
+        return request(app)
           .post(`/v0/build/`)
           .send({
             site: site.id,
@@ -79,7 +80,7 @@ describe("Build API", () => {
         site: factory.site(),
         cookie: session(),
       }).then(({ site, cookie }) => {
-        return request("http://localhost:1337")
+        return request(app)
           .post(`/v0/build/`)
           .send({
             site: site.id,
@@ -97,7 +98,7 @@ describe("Build API", () => {
   describe("GET /v0/build/:id", () => {
     it("should require authentication", done => {
       factory.build().then(build => {
-        return request("http://localhost:1337")
+        return request(app)
           .get(`/v0/build/${build.id}`)
           .expect(403)
       }).then(response => {
@@ -121,7 +122,7 @@ describe("Build API", () => {
           User.findById(build.user)
         )
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .get(`/v0/build/${build.id}`)
           .set("Cookie", cookie)
           .expect(200)
@@ -139,7 +140,7 @@ describe("Build API", () => {
         build = model
         return session(factory.user())
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .get(`/v0/build/${build.id}`)
           .set("Cookie", cookie)
           .expect(403)
@@ -153,7 +154,7 @@ describe("Build API", () => {
   describe("GET /v0/build", () => {
     it("should require authentication", done => {
       factory.build().then(build => {
-        return request("http://localhost:1337")
+        return request(app)
           .get("/v0/build")
           .expect(403)
       }).then(response => {
@@ -175,7 +176,7 @@ describe("Build API", () => {
         builds = models
         return session(user)
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .get("/v0/build")
           .set("Cookie", cookie)
           .expect(200)
@@ -207,7 +208,7 @@ describe("Build API", () => {
         expect(builds).to.have.length(3)
         return session(user)
       }).then(cookie => {
-        return request("http://localhost:1337")
+        return request(app)
           .get("/v0/build")
           .set("Cookie", cookie)
           .expect(200)
@@ -223,7 +224,7 @@ describe("Build API", () => {
     var postBuildStatus = (options) => {
       const buildToken = options.buildToken || options.build.token
 
-      return request("http://localhost:1337")
+      return request(app)
         .post(`/v0/build/${options.build.id}/status/${buildToken}`)
         .type("json")
         .send({

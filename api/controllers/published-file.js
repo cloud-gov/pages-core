@@ -6,33 +6,7 @@ const { Site } = require("../models")
 module.exports = {
   find: (req, res) => {
     let site
-
-    Promise.resolve(Number(req.params["site_id"])).then(id => {
-      if (isNaN(id)) {
-        throw 404
-      }
-      return Site.findById(id)
-    }).then(model => {
-      if (model) {
-        site = model
-      } else {
-        throw 404
-      }
-      return siteAuthorizer.findOne(req.user, site)
-    }).then(() => {
-      return S3PublishedFileLister.listPublishedPreviews(site)
-    }).then(branchNames => {
-      branchNames = [site.defaultBranch].concat(branchNames)
-      return PublishedBranchSerializer.serialize(site, branchNames)
-    }).then(branches => {
-      res.json(branches)
-    }).catch(err => {
-      res.error(err)
-    })
-  },
-
-  findOne: (req, res) => {
-    let site
+    let files
     const branch = req.params["branch"]
 
     Promise.resolve(Number(req.params["site_id"])).then(id => {
@@ -48,9 +22,14 @@ module.exports = {
       }
       return siteAuthorizer.findOne(req.user, site)
     }).then(() => {
+      return S3PublishedFileLister.listPublishedFilesForBranch(site, branch)
+    }).then(resolvedFiles => {
+      files = resolvedFiles
       return PublishedBranchSerializer.serialize(site, branch)
     }).then(branchJSON => {
-      res.json(branchJSON)
+      res.json(files.map(file => {
+        return Object.assign(file, { publishedBranch: branchJSON })
+      }))
     }).catch(res.error)
-  },
+  }
 }

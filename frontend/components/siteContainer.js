@@ -64,6 +64,9 @@ class SiteContainer extends React.Component {
     const publishedBranches = storeState.publishedBranches.filter(branch => {
       return branch.site.id === site.id
     })
+    const publishedFiles = storeState.publishedFiles.filter(file => {
+      return file.publishedBranch.site.id === site.id
+    })
     const pageTitle = this.getPageTitle(location.pathname);
 
     let childConfigs;
@@ -80,7 +83,7 @@ class SiteContainer extends React.Component {
       case 'builds':
       case 'published':
       default:
-        childConfigs = { site, publishedBranches };
+        childConfigs = { site, publishedBranches, publishedFiles };
     }
 
     if (!site) {

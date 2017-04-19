@@ -1,6 +1,7 @@
 const crypto = require('crypto')
 const expect = require("chai").expect
 const request = require("supertest-as-promised")
+const app = require("../../../app")
 const config = require("../../../config")
 const factory = require("../support/factory")
 const { Build, Site, User } = require("../../../api/models")
@@ -42,7 +43,7 @@ describe("Webhook API", () => {
         const payload = buildWebhookPayload(user, site)
         const signature = signWebhookPayload(payload)
 
-        return request("http://localhost:1337")
+        return request(app)
           .post("/webhook/github")
           .send(payload)
           .set({
@@ -69,7 +70,7 @@ describe("Webhook API", () => {
         const payload = buildWebhookPayload({ username: username }, site)
         const signature = signWebhookPayload(payload)
 
-        return request("http://localhost:1337")
+        return request(app)
           .post("/webhook/github")
           .send(payload)
           .set({
@@ -102,7 +103,7 @@ describe("Webhook API", () => {
         payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`
         const signature = signWebhookPayload(payload)
 
-        return request("http://localhost:1337")
+        return request(app)
           .post("/webhook/github")
           .send(payload)
           .set({
@@ -133,7 +134,7 @@ describe("Webhook API", () => {
         payload.commits = []
         const signature = signWebhookPayload(payload)
 
-        return request("http://localhost:1337")
+        return request(app)
           .post("/webhook/github")
           .send(payload)
           .set({
@@ -158,7 +159,7 @@ describe("Webhook API", () => {
         })
         const signature = signWebhookPayload(payload)
 
-        request("http://localhost:1337")
+        request(app)
           .post("/webhook/github")
           .send(payload)
           .set({
@@ -182,7 +183,7 @@ describe("Webhook API", () => {
         const payload = buildWebhookPayload(user, site)
         const signature = "123abc"
 
-        request("http://localhost:1337")
+        request(app)
           .post("/webhook/github")
           .send(payload)
           .set({

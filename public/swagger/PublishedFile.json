@@ -2,18 +2,18 @@
   "type": "object",
   "required": [
     "name",
-    "site",
-    "viewLink"
+    "size",
+    "publishedBranch"
   ],
   "properties": {
     "name": {
       "type": "string"
     },
-    "site": {
-      "type": "object"
+    "size": {
+      "type": "integer"
     },
-    "viewLink": {
-      "type": "string"
+    "publishedBranch": {
+      "type": "object"
     }
   }
 }

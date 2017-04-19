@@ -80,11 +80,11 @@ const resolveKey = (path) => {
       }
 
       const object = data.Contents.find(candidate => {
-        return candidate.Key === path
+        return candidate.Key === path || candidate.Key === path + "/index.html"
       })
-      if (object && object.Size > 0) {
+      if (object && object.Key === path) {
         resolve({ status: 200, key: path })
-      } else if (object && object.Size === 0) {
+      } else if (object && object.Key === path + "/index.html") {
         resolve({ status: 302, key: "/" + path + "/" })
       } else {
         resolve({ status: 404 })

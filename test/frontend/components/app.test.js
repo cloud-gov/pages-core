@@ -12,7 +12,10 @@ const Header = () => <div></div>;
 const username = 'jenny mcuser';
 const appState = {
   user: {
-    username: username
+    data: {
+      username: username,
+    },
+    isLoading: false,
   },
   alert: {}
 };

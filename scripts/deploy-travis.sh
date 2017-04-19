@@ -4,11 +4,15 @@ set -e
 
 if [ "$TRAVIS_BRANCH" == "master" ]
 then
+  CF_USERNAME=$CF_USERNAME_PRODUCTION
+  CF_PASSWORD=$CF_PASSWORD_PRODUCTION
   CF_SPACE="production"
   CF_APP="federalist"
   CF_MANIFEST="manifest.yml"
 elif [ "$TRAVIS_BRANCH" == "staging" ]
 then
+  CF_USERNAME=$CF_USERNAME_STAGING
+  CF_PASSWORD=$CF_PASSWORD_STAGING
   CF_SPACE="staging"
   CF_APP="federalist-staging"
   CF_MANIFEST="staging_manifest.yml"

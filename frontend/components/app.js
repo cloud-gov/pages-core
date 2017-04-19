@@ -13,6 +13,13 @@ class App extends React.Component {
     return this.context.state.get();
   }
 
+  getUsername(storeState) {
+    const userState = storeState.user
+    if (!userState.isLoading && userState.data) {
+      return userState.data.username
+    }
+  }
+
   shouldClearAlert(alert, nextProps) {
     const { location: { key: lastKey } } = this.props;
     const { key: nextKey } = nextProps.location;
@@ -41,7 +48,7 @@ class App extends React.Component {
     return (
       <div>
         <Header
-          username={storeState.user.username}
+          username={this.getUsername(storeState)}
         />
         {children && React.cloneElement(children, {
           storeState: storeState

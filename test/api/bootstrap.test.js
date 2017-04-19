@@ -1,6 +1,6 @@
-const AWSMocks = require("./support/aws-mocks")
+Promise.props = require("promise-props")
 
-const app = require("../../app")
+const AWSMocks = require("./support/aws-mocks")
 
 const _cleanDatabase = () => {
   const models = require("../../api/models").sequelize.models
@@ -11,17 +11,9 @@ const _cleanDatabase = () => {
 }
 
 before(function(done) {
-  app.listen(1337, (err) => {
-    if (err) return done(err)
-
-    _cleanDatabase().then(() => {
-      done(null, app);
-    }).catch(err => {
-      done(err)
-    })
+  _cleanDatabase().then(() => {
+    done()
+  }).catch(err => {
+    done(err)
   })
-});
-
-after((done) => {
-  done()
-});
+})
