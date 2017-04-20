@@ -1,6 +1,7 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import LoadingIndicator from '../../../../frontend/components/loadingIndicator'
 import SiteBuildLogs from '../../../../frontend/components/site/siteBuildLogs';
 
 describe("<SiteBuildLogs/>", () => {
@@ -32,8 +33,7 @@ describe("<SiteBuildLogs/>", () => {
 
     const wrapper = shallow(<SiteBuildLogs {...props} />);
     expect(wrapper.find("table")).to.have.length(0);
-    expect(wrapper.find("p")).to.have.length(1);
-    expect(wrapper.find("p").contains("Loading build logs"))
+    expect(wrapper.find(LoadingIndicator)).to.have.length(1);
   })
 
   it("should render an empty state if there are no builds", () => {

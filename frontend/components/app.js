@@ -1,6 +1,7 @@
 import React from 'react';
 import store from '../store';
 import alertActions from '../actions/alertActions';
+import LoadingIndicator from "./loadingIndicator"
 import Header from './header';
 
 class App extends React.Component {
@@ -45,16 +46,25 @@ class App extends React.Component {
     const { children } = this.props;
     const storeState = this.state;
 
-    return (
-      <div>
-        <Header
-          username={this.getUsername(storeState)}
-        />
-        {children && React.cloneElement(children, {
-          storeState: storeState
-        })}
-      </div>
-    );
+    if (storeState.user.isLoading) {
+      return (
+        <div>
+          <Header/>
+          <LoadingIndicator/>
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          <Header
+            username={this.getUsername(storeState)}
+          />
+          {children && React.cloneElement(children, {
+            storeState: storeState
+          })}
+        </div>
+      );
+    }
   }
 }
 

@@ -7,19 +7,20 @@ proxyquire.noCallThru();
 describe("userActions", () => {
   let fixture;
   let dispatch;
-  let userReceivedActionCreator, userLogoutActionCreator;
+  let userFetchStartedActionCreator, userReceivedActionCreator;
   let fetchUser;
 
   beforeEach(() => {
     dispatch = spy();
+
+    userFetchStartedActionCreator = stub()
     userReceivedActionCreator = stub();
-    userLogoutActionCreator = stub();
     fetchUser = stub();
 
     fixture = proxyquire("../../../frontend/actions/userActions", {
       "./actionCreators/userActions": {
+        userFetchStarted: userFetchStartedActionCreator,
         userReceived: userReceivedActionCreator,
-        userLogout: userLogoutActionCreator
       },
       "../util/federalistApi": {
         fetchUser: fetchUser
@@ -38,17 +39,18 @@ describe("userActions", () => {
         favoritePancake: "buttermilk"
       };
       const userPromise = Promise.resolve(user);
-      const action = {
-        action: "action"
-      };
+      const fetchStartedAction = { action: "started" }
+      const receivedAction = { action: "received" };
       fetchUser.withArgs().returns(userPromise);
-      userReceivedActionCreator.withArgs(user).returns(action);
+      userFetchStartedActionCreator.withArgs().returns(fetchStartedAction)
+      userReceivedActionCreator.withArgs(user).returns(receivedAction);
 
       const actual = fixture.fetchUser();
 
       actual.then(() => {
-        expect(dispatch.calledOnce).to.be.true;
-        expect(dispatch.calledWith(action)).to.be.true;
+        expect(dispatch.calledTwice).to.be.true;
+        expect(dispatch.calledWith(fetchStartedAction)).to.be.true;
+        expect(dispatch.calledWith(receivedAction)).to.be.true;
       });
     });
 
