@@ -4,7 +4,7 @@ const passport = require("../policies/passport")
 
 router.use(passport)
 
-router.get("/auth/github", AuthController.github)
+router.get("/auth/github", passport, AuthController.github)
 router.get("/auth/github/callback", AuthController.callback)
 router.get("/logout", AuthController.logout)
 
