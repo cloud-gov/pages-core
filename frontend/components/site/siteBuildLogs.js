@@ -7,26 +7,26 @@ class SiteBuildLogs extends React.Component {
   }
 
   buildLogs() {
-    if (!this.props.buildLogs) {
-      return [];
-    }
 
-    return this.props.buildLogs.filter(log => {
-      return log.build.id === parseInt(this.props.params.buildId);
-    }).sort((a, b) => {
-      return new Date(a.createdAt) - new Date(b.createdAt);
-    });
+    if (this.props.buildLogs.isLoading || !this.props.buildLogs.data) {
+      return [];
+    } else {
+      return this.props.buildLogs.data
+    }
   }
 
   render() {
-    if (this.buildLogs().length > 0) {
-      return this.renderBuildLogsTable()
-    } else {
+    const buildLogs = this.buildLogs()
+    if (this.props.buildLogs.isLoading) {
+      return this.renderLoadingState()
+    } else if (!buildLogs.length) {
       return this.renderEmptyState()
+    } else {
+      return this.renderBuildLogsTable(buildLogs)
     }
   }
 
-  renderBuildLogsTable() {
+  renderBuildLogsTable(buildLogs) {
     return (
       <table>
         <thead>
@@ -37,7 +37,7 @@ class SiteBuildLogs extends React.Component {
           </tr>
         </thead>
         <tbody>
-          { this.buildLogs().map(log => this.renderBuildLogRow(log)) }
+          { buildLogs.map(log => this.renderBuildLogRow(log)) }
         </tbody>
       </table>
     )
@@ -55,6 +55,11 @@ class SiteBuildLogs extends React.Component {
         <td>{ log.createdAt }</td>
       </tr>
     )
+  }
+
+  renderLoadingState() {
+    // TODO: Replace with a loading component
+    return <p>Loading build logs</p>
   }
 
   renderEmptyState() {
