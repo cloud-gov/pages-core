@@ -6,7 +6,11 @@ const AuthController = {
   },
 
   github: function (req, res) {
-    passport.authenticate("github")(req, res, req.next)
+    if (req.session.authenticated) {
+      res.redirect("/")
+    } else {
+      passport.authenticate("github")(req, res, req.next)
+    }
   },
 
   callback: function (req, res) {
