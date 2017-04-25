@@ -1,6 +1,5 @@
 import React from "react"
 import { pushHistory } from "../actions/routeActions"
-import LoadingIndicator from './loadingIndicator'
 
 const homeHTML = require("./home.html")
 
@@ -25,11 +24,7 @@ class Home extends React.Component {
   }
 
   render() {
-    if (!this.props.storeState.user.isLoading) {
-      return <div dangerouslySetInnerHTML={{ __html: homeHTML }}/>
-    } else {
-      return <LoadingIndicator/>
-    }
+    return <div dangerouslySetInnerHTML={{ __html: homeHTML }}/>
   }
 }
 

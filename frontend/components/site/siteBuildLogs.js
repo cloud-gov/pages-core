@@ -1,5 +1,6 @@
 import React from "react";
 import buildLogActions from "../../actions/buildLogActions";
+import LoadingIndicator from '../loadingIndicator'
 
 class SiteBuildLogs extends React.Component {
   componentDidMount() {
@@ -59,7 +60,7 @@ class SiteBuildLogs extends React.Component {
 
   renderLoadingState() {
     // TODO: Replace with a loading component
-    return <p>Loading build logs</p>
+    return <LoadingIndicator/>
   }
 
   renderEmptyState() {

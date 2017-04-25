@@ -15,7 +15,7 @@ const dispatchUserReceivedAction = user => {
 
 export default {
   fetchUser() {
-    dispatchUserFetchStartedAction
+    dispatchUserFetchStartedAction()
     return federalist.fetchUser()
       .then(dispatchUserReceivedAction)
   },
