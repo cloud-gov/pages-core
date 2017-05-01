@@ -151,38 +151,43 @@ describe("Build API", () => {
     })
   })
 
-  describe("GET /v0/build", () => {
+  describe("GET /v0/site/:site_id/build", () => {
     it("should require authentication", done => {
-      factory.build().then(build => {
+      factory.site().then(site => {
         return request(app)
-          .get("/v0/build")
+          .get(`/v0/site/${site.id}/build`)
           .expect(403)
       }).then(response => {
-        validateAgainstJSONSchema("GET", "/build", 403, response.body)
+        validateAgainstJSONSchema("GET", "/site/{site_id}/build", 403, response.body)
         done()
       }).catch(done)
     })
 
-    it("should list builds for sites associated with the current user", done => {
-      var user, builds
+    it("should list builds for a site associated with the current user", done => {
+      let user, site, builds
+      const userPromise = factory.user()
+      const sitePromise = factory.site({ users: Promise.all([userPromise]) })
+      const buildsPromise = Promise.all([
+        factory.build({ site: sitePromise }),
+        factory.build({ site: sitePromise, user: userPromise })
+      ])
 
-      factory.user().then(model => {
-        user = model
-        var buildPromises = Array(3).fill(0).map(() => {
-          return factory.build({ user: user.id })
-        })
-        return Promise.all(buildPromises)
-      }).then(models => {
-        builds = models
-        return session(user)
-      }).then(cookie => {
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        builds: buildsPromise,
+        cookie: session(userPromise),
+      }).then(promisedValues => {
+        ({ user, site, builds } = promisedValues)
+        const cookie = promisedValues.cookie
+
         return request(app)
-          .get("/v0/build")
+          .get(`/v0/site/${site.id}/build`)
           .set("Cookie", cookie)
           .expect(200)
       }).then(response => {
         expect(response.body).to.be.a("Array")
-        expect(response.body).to.have.length(3)
+        expect(response.body).to.have.length(2)
         builds.forEach(build => {
           const responseBuild = response.body.find(candidate => {
             return candidate.id === build.id
@@ -190,31 +195,35 @@ describe("Build API", () => {
           expect(responseBuild).not.to.be.undefined
           buildResponseExpectations(responseBuild, build)
         })
-        validateAgainstJSONSchema("GET", "/build", 200, response.body)
+        validateAgainstJSONSchema("GET", "/site/{site_id}/build", 200, response.body)
         done()
       }).catch(done)
     })
 
-    it("should not show a user any builds not associated with their sites", done => {
-      var user
+    it("should not list builds for a site not associated with the current user", done => {
+      let user, site, builds
+      const userPromise = factory.user()
+      const sitePromise = factory.site()
+      const buildsPromise = Promise.all([
+        factory.build({ site: sitePromise }),
+        factory.build({ site: sitePromise, user: userPromise })
+      ])
 
-      factory.user().then(model => {
-        user = model
-        var buildPromises = Array(3).fill(0).map(() => {
-          return factory.build
-        })
-        return Promise.all(buildPromises)
-      }).then(builds => {
-        expect(builds).to.have.length(3)
-        return session(user)
-      }).then(cookie => {
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        builds: buildsPromise,
+        cookie: session(userPromise),
+      }).then(promisedValues => {
+        ({ user, site, builds } = promisedValues)
+        const cookie = promisedValues.cookie
+
         return request(app)
-          .get("/v0/build")
+          .get(`/v0/site/${site.id}/build`)
           .set("Cookie", cookie)
-          .expect(200)
+          .expect(403)
       }).then(response => {
-        expect(response.body).to.be.a("array")
-        expect(response.body).to.be.empty
+        validateAgainstJSONSchema("GET", "/site/{site_id}/build", 403, response.body)
         done()
       }).catch(done)
     })

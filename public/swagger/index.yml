@@ -11,19 +11,6 @@ produces:
   - application/json
 paths:
   /build:
-    get:
-      summary: Fetch all of the user's builds
-      responses:
-        200:
-          description: An array of builds
-          schema:
-            type: array
-            items:
-              $ref: "Build.json"
-        403:
-          description: Not authorized
-          schema:
-            $ref: "Error.json"
     post:
       summary: Create a build
       parameters:
@@ -49,6 +36,20 @@ paths:
           description: Bad request
           schema:
             $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+  /site/{site_id}/build:
+    get:
+      summary: Fetch all of the user's builds
+      responses:
+        200:
+          description: An array of builds
+          schema:
+            type: array
+            items:
+              $ref: "Build.json"
         403:
           description: Not authorized
           schema:
