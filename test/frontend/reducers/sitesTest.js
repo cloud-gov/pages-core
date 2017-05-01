@@ -166,29 +166,4 @@ describe("sitesReducer", () => {
 
     expect(actual).to.deep.equal([ siteOne ]);
   });
-
-
-  it("adds the restarted build in the action to its site", () => {
-    const sitePendingRestart = {
-      id: "pick this one",
-      builds: ["finished build"],
-    };
-    const otherSite = {
-      id: "not this one",
-    };
-    const build = {
-      site: sitePendingRestart,
-    };
-    const restartedSite = Object.assign({}, sitePendingRestart, {
-      builds: [build, ...sitePendingRestart.builds],
-    });
-
-    const actual = fixture([sitePendingRestart, otherSite], {
-      type: BUILD_RESTARTED,
-      build: build
-    });
-
-    expect(actual).to.deep.equal([restartedSite, otherSite])
-  });
-
 });

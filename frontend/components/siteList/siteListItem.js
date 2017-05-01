@@ -7,14 +7,12 @@ const propTypes = {
     repository: React.PropTypes.string,
     owner: React.PropTypes.string,
     id: React.PropTypes.number,
-    builds: React.PropTypes.array,
+    publishedAt: React.PropTypes.string,
     viewLink: React.PropTypes.string
   })
 };
 
-const getViewLink = (hasLink, viewLink, repo) => {
-  if (!hasLink) return null;
-
+const getViewLink = (viewLink, repo) => {
   return <a
     className="icon icon-view"
     href={ viewLink }
@@ -28,10 +26,10 @@ const SiteListItem = ({ site }) =>
       <Link to={`/sites/${site.id}`}>
         { site.owner } / { site.repository }
       </Link>
-      <PublishedState builds={ site.builds } />
+      <PublishedState site={site} />
     </div>
     <div className="sites-list-item-actions">
-      { getViewLink(!!site.builds.length, site.viewLink, site.repository) }
+      { getViewLink(site.viewLink, site.repository) }
     </div>
   </li>
 

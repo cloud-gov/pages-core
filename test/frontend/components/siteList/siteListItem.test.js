@@ -12,7 +12,6 @@ const testSite = {
   repository: 'something',
   owner: 'someone',
   id: 1,
-  builds: [],
   viewLink: 'https://mysiteishere.biz'
 };
 
@@ -29,7 +28,7 @@ describe('<SiteListItem />', () => {
 
   it('outputs a published state component', () => {
     wrapper = shallow(<Fixture site={testSite}/>);
-    expect(wrapper.find(PublishedState).props()).to.deep.equals({builds: []})
+    expect(wrapper.find(PublishedState).props()).to.deep.equals({site: testSite})
     expect(wrapper.find(PublishedState)).to.have.length(1);
   });
 
@@ -42,12 +41,7 @@ describe('<SiteListItem />', () => {
     expect(wrapper.find(Link)).to.have.length(1);
   });
 
-  it('does not output a link tag when site `builds` array is empty', () => {
-    wrapper = shallow(<Fixture site={testSite}/>);
-    expect(wrapper.find('a')).to.have.length(0);
-  });
-
-  it('outputs a link tag when site `builds` array has a length', () => {
+  it('outputs a link tag to view the site', () => {
     const siteWithBuilds = Object.assign({}, testSite, {
       builds: [{}]
     });

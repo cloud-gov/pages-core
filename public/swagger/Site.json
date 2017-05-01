@@ -36,7 +36,8 @@
       "type": "boolean"
     },
     "publishedAt": {
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
     },
     "repository": {
       "type": "string"

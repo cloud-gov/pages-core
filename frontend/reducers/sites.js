@@ -10,10 +10,6 @@ import {
   siteLoadingType as SITE_LOADING
 } from '../actions/actionCreators/siteActions';
 
-import {
-  buildRestartedType as BUILD_RESTARTED,
-} from '../actions/actionCreators/buildActions';
-
 const initialState = [];
 
 export default function sites(state = initialState, action) {
@@ -40,17 +36,6 @@ export default function sites(state = initialState, action) {
 
   case SITE_DELETED:
     return state.filter((site) => site.id != action.siteId);
-
-  case BUILD_RESTARTED:
-    return state.map(site => {
-      if (site.id === action.build.site.id) {
-        return Object.assign({}, site, {
-          builds: [action.build, ...site.builds],
-        })
-      } else {
-        return site
-      }
-    })
 
   default:
     return state;

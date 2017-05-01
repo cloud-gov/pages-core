@@ -1,6 +1,7 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import LoadingIndicator from '../../../../frontend/components/loadingIndicator'
 import SitePublishedFilesTable from '../../../../frontend/components/site/sitePublishedFilesTable';
 
 
@@ -50,7 +51,7 @@ describe("<SitePublishedFilesTable/>", () => {
     }
 
     const wrapper = shallow(<SitePublishedFilesTable {...props} />)
-    expect(wrapper.find("p").contains("Loading published files")).to.be.true
+    expect(wrapper.find(LoadingIndicator)).to.have.length(1);
   })
 
   it("should render an empty state if there are no files", () => {

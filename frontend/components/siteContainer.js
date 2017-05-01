@@ -60,29 +60,17 @@ class SiteContainer extends React.Component {
 
   render () {
     const { storeState, children, params, location } = this.props;
-    const site = this.getCurrentSite(storeState.sites, params.id);
+
+    const site = this.getCurrentSite(storeState.sites, params.id)
+    const builds = storeState.builds
+    const buildLogs = storeState.buildLogs
     const publishedBranches = storeState.publishedBranches.filter(branch => {
       return branch.site.id === site.id
     })
     const publishedFiles = storeState.publishedFiles
+    const childConfigs = { site, builds, buildLogs, publishedBranches, publishedFiles }
+
     const pageTitle = this.getPageTitle(location.pathname);
-
-    let childConfigs;
-
-    // I'm not crazy about tying these to route paths
-    // as it makes it harder to change things.
-    switch(pageTitle) {
-      case 'logs':
-        childConfigs = {
-          buildLogs: storeState.buildLogs,
-        };
-        break;
-      case 'settings':
-      case 'builds':
-      case 'published':
-      default:
-        childConfigs = { site, publishedBranches, publishedFiles };
-    }
 
     if (!site) {
       return null;

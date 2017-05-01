@@ -10,6 +10,7 @@ describe("maps reducers", () => {
   const PUBLISHED_BRANCHES = "published branches are here"
   const PUBLISHED_FILES = "published files are here"
   const SITES = "sites are here";
+  const BUILDS = "builds are here 🛠"
   const USER = "user is here";
 
   beforeEach(() => {
@@ -19,6 +20,7 @@ describe("maps reducers", () => {
       "./reducers/publishedBranches": PUBLISHED_BRANCHES,
       "./reducers/publishedFiles": PUBLISHED_FILES,
       "./reducers/sites": SITES,
+      "./reducers/builds": BUILDS,
       "./reducers/user": USER,
     }).default;
   });
@@ -41,6 +43,10 @@ describe("maps reducers", () => {
 
   it("maps sites reducer", () => {
     expect(fixture.sites).to.equal(SITES);
+  });
+
+  it("maps builds reducer", () => {
+    expect(fixture.builds).to.equal(BUILDS)
   });
 
   it("maps user reducer", () => {

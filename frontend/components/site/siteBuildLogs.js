@@ -8,7 +8,6 @@ class SiteBuildLogs extends React.Component {
   }
 
   buildLogs() {
-
     if (this.props.buildLogs.isLoading || !this.props.buildLogs.data) {
       return [];
     } else {
@@ -59,7 +58,6 @@ class SiteBuildLogs extends React.Component {
   }
 
   renderLoadingState() {
-    // TODO: Replace with a loading component
     return <LoadingIndicator/>
   }
 

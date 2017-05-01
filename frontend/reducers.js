@@ -3,6 +3,7 @@ import alert from './reducers/alert';
 import publishedBranches from './reducers/publishedBranches';
 import publishedFiles from './reducers/publishedFiles';
 import sites from './reducers/sites';
+import builds from './reducers/builds';
 import user from './reducers/user';
 
 export default {
@@ -11,5 +12,6 @@ export default {
   publishedBranches,
   publishedFiles,
   sites,
+  builds,
   user
 };

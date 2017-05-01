@@ -1,5 +1,6 @@
 import React from 'react'
 import publishedFileActions from "../../actions/publishedFileActions";
+import LoadingIndicator from '../loadingIndicator'
 
 class SitePublishedBranch extends React.Component {
   componentDidMount() {
@@ -56,8 +57,7 @@ class SitePublishedBranch extends React.Component {
   }
 
   renderLoadingState() {
-    // TODO: Replace with a loading component
-    return <p>Loading published files</p>
+    return <LoadingIndicator/>
   }
 
   renderEmptyState() {

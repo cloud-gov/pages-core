@@ -42,7 +42,7 @@ paths:
             $ref: "Error.json"
   /site/{site_id}/build:
     get:
-      summary: Fetch all of the user's builds
+      summary: Fetch all of the user's builds for a given site
       responses:
         200:
           description: An array of builds
