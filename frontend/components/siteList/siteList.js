@@ -12,7 +12,7 @@ const getSites = (sites) => {
     return (
       <div className="usa-grid">
         <h1>No sites yet.</h1>
-        <p>Add one now.</p>
+        <p>Add one now. (This message may also appear briefly before your site list loads).</p>
       </div>
     );
   }

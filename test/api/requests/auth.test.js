@@ -31,12 +31,22 @@ var sessionForCookie = (cookie) => {
 }
 
 describe("Authentication request", () => {
-  describe("GET /login", () => {
+  describe("GET /auth/github", () => {
     it("should redirect to GitHub for OAuth2 authentication", done => {
       request(app)
         .get("/auth/github")
         .expect("Location", /^https:\/\/github.com\/login\/oauth\/authorize.*/)
         .expect(302, done)
+    })
+
+    it("should redirect to the root URL if the users is logged in", done => {
+      session().then(cookie => {
+        request(app)
+          .get("/auth/github")
+          .set("Cookie", cookie)
+          .expect("Location", "/")
+          .expect(302, done)
+      })
     })
   })
 
