@@ -1,7 +1,7 @@
 const expect = require("chai").expect
 const SQS = require("../../../../api/services/SQS")
 const factory = require("../../support/factory")
-const { Build } = require("../../../../api/models")
+const { Build, Site } = require("../../../../api/models")
 
 describe("Build model", () => {
   describe("before validate hook", () => {
@@ -75,6 +75,27 @@ describe("Build model", () => {
       }).then(build => {
         expect(build.state).to.equal("error")
         expect(build.error).to.equal("this is an error")
+        done()
+      }).catch(done)
+    })
+
+    it("should update the site's publishedAt timestamp if the build is successful", done => {
+      let site
+
+      const sitePromise = factory.site()
+      Promise.props({
+        site: sitePromise,
+        build: factory.build({ site: sitePromise })
+      }).then(promisedValues => {
+        site = promisedValues.site
+        expect(site.publishedAt).to.be.null
+
+        return promisedValues.build.completeJob()
+      }).then(() => {
+        return Site.findById(site.id)
+      }).then(site => {
+        expect(site.publishedAt).to.be.a("date")
+        expect(new Date().getTime() - site.publishedAt.getTime()).to.be.below(500)
         done()
       }).catch(done)
     })

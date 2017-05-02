@@ -5,7 +5,7 @@ const app = require("../../../app")
 const factory = require("../support/factory")
 const session = require("../support/session")
 const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
-const { Build, User } = require("../../../api/models")
+const { Build, User, Site } = require("../../../api/models")
 
 describe("Build API", () => {
   var buildResponseExpectations = (response, build) => {
@@ -286,6 +286,31 @@ describe("Build API", () => {
         expect(build.state).to.equal("error")
         expect(build.error).to.equal("The build failed for a reason")
         expect(new Date() - build.completedAt).to.be.below(1000)
+        done()
+      }).catch(done)
+    })
+
+    it("should update the publishedAt field for the site if the build is successful", done => {
+      let site
+      const sitePromise = factory.site()
+
+      Promise.props({
+        site: sitePromise,
+        build: factory.build({ site: sitePromise }),
+      }).then(promisedValues => {
+        expect(promisedValues.site.publishedAt).to.be.null
+
+        site = promisedValues.site
+        return postBuildStatus({
+          build: promisedValues.build,
+          status: "0",
+          message: "",
+        })
+      }).then(response => {
+        return Site.findById(site.id)
+      }).then(site => {
+        expect(site.publishedAt).to.be.a("date")
+        expect(new Date().getTime() - site.publishedAt.getTime()).to.be.below(500)
         done()
       }).catch(done)
     })

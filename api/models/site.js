@@ -82,6 +82,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    publishedAt: {
+      type: DataTypes.DATE,
+    },
     repository: {
       type: DataTypes.STRING,
       allowNull: false,

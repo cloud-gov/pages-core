@@ -32,17 +32,25 @@ const beforeValidate = (build) => {
 }
 
 const completeJob = function(err) {
+  const completedAt = new Date()
+  const { Site } = this.sequelize.models
+
   if (err) {
     return this.update({
       state: "error",
       error: completeJobErrorMessage(err),
-      completedAt: new Date(),
+      completedAt: completedAt,
     })
   } else {
     return this.update({
       state: "success",
       error: "",
-      completedAt: new Date(),
+      completedAt: completedAt,
+    }).then(build => {
+      return Site.update(
+        { publishedAt: completedAt },
+        { where: { id: this.site } }
+      ).then(() => build)
     })
   }
 }

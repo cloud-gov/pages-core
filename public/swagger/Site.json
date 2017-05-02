@@ -35,6 +35,9 @@
     "publicPreview": {
       "type": "boolean"
     },
+    "publishedAt": {
+      "type": "string"
+    },
     "repository": {
       "type": "string"
     },
