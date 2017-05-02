@@ -12,7 +12,7 @@ ENV BRANCH= \
   AWS_ACCESS_KEY_ID= \
   AWS_SECRET_ACCESS_KEY= \
   SAILS_LOG_LEVEL= \
-  PORT=3000
+  PORT=1337
 
 # Run additional npm install scripts
 RUN npm run install --unsafe-perm
@@ -24,7 +24,7 @@ RUN apt-get update && \
   bundle install
 
 # Make internal port available to host
-EXPOSE 3000
+EXPOSE 1337
 
 # Start script
 ENTRYPOINT ["./scripts/docker-start.sh"]
