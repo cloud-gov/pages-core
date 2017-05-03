@@ -13,6 +13,12 @@
     "id": {
       "type": "integer"
     },
+    "demoBranch": {
+      "type": "string"
+    },
+    "demoDomain": {
+      "type": "string"
+    },
     "config": {
       "type": "string"
     },

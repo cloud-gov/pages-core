@@ -102,6 +102,8 @@ module.exports = {
     }).then(() => {
       const params = Object.assign(site, req.body)
       return site.update({
+        demoBranch: params.demoBranch,
+        demoDomain: params.demoDomain,
         config: params.config,
         previewConfig: params.previewConfig,
         defaultBranch: params.defaultBranch,
@@ -116,7 +118,15 @@ module.exports = {
         site: siteId,
         branch: site.defaultBranch,
       })
-    }).then(build => {
+    }).then(() => {
+      if (site.demoDomain && site.demoBranch) {
+        return Build.create({
+          user: req.user.id,
+          site: siteId,
+          branch: site.demoBranch,
+        })
+      }
+    }).then(() => {
       return siteSerializer.serialize(site)
     }).then(siteJSON => {
       res.send(siteJSON)
