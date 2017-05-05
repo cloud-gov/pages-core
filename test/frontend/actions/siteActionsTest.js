@@ -7,16 +7,15 @@ proxyquire.noCallThru();
 describe("siteActions", () => {
   let fixture;
 
-  let fetchBranches, deleteBranch, createRepo, fetchFile, getRepo;
+  let fetchBranches;
 
-  let fetchSites, addSite, updateSite, deleteSite, siteExists;
+  let fetchSites, addSite, updateSite, deleteSite;
 
   let httpErrorAlertAction, alertSuccess, alertError;
 
-  let updateRouterToSitesUri, updateRouterToSpecificSiteUri, dispatchSitesReceivedAction,
+  let updateRouterToSitesUri, dispatchSitesReceivedAction,
       dispatchSiteAddedAction, dispatchSiteUpdatedAction, dispatchSiteDeletedAction,
-      dispatchSiteBranchesReceivedAction, dispatchSiteInvalidAction,
-      dispatchSiteLoadingAction;
+      dispatchSiteBranchesReceivedAction;
 
   const siteId = "kuaw8fsru8hwugfw";
   const site = {
@@ -36,34 +35,25 @@ describe("siteActions", () => {
     addSite = stub();
     updateSite = stub();
     deleteSite = stub();
-    getRepo = stub();
     fetchBranches = stub();
-    deleteBranch = stub();
     alertSuccess = stub();
     alertError = stub();
-    siteExists = stub();
 
     updateRouterToSitesUri = stub();
-    updateRouterToSpecificSiteUri = stub();
     dispatchSitesReceivedAction = stub();
     dispatchSiteAddedAction = stub();
     dispatchSiteUpdatedAction = stub();
     dispatchSiteDeletedAction = stub();
     dispatchSiteBranchesReceivedAction = stub();
-    dispatchSiteInvalidAction = stub();
-    dispatchSiteLoadingAction = stub();
 
     fixture = proxyquire("../../../frontend/actions/siteActions", {
       "./dispatchActions": {
         updateRouterToSitesUri: updateRouterToSitesUri,
-        updateRouterToSpecificSiteUri: updateRouterToSpecificSiteUri,
         dispatchSitesReceivedAction: dispatchSitesReceivedAction,
         dispatchSiteAddedAction: dispatchSiteAddedAction,
         dispatchSiteUpdatedAction: dispatchSiteUpdatedAction,
         dispatchSiteDeletedAction: dispatchSiteDeletedAction,
         dispatchSiteBranchesReceivedAction: dispatchSiteBranchesReceivedAction,
-        dispatchSiteInvalidAction: dispatchSiteInvalidAction,
-        dispatchSiteLoadingAction: dispatchSiteLoadingAction
       },
       "./alertActions": {
         httpError: httpErrorAlertAction,
@@ -78,7 +68,6 @@ describe("siteActions", () => {
       },
       "../util/githubApi": {
         fetchBranches: fetchBranches,
-        getRepo: getRepo
       },
     }).default;
   });

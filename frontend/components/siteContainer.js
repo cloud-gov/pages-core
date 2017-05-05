@@ -39,9 +39,7 @@ class SiteContainer extends React.Component {
     const currentSite = this.getCurrentSite(storeState.sites, params.id);
 
     if (currentSite) {
-      siteActions.siteExists(currentSite).then(() => {
-        return siteActions.fetchBranches(currentSite)
-      });
+      siteActions.fetchBranches(currentSite)
     } else {
       replaceHistory('/sites');
     }
