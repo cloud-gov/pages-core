@@ -66,9 +66,7 @@ class SiteContainer extends React.Component {
     const site = this.getCurrentSite(storeState.sites, params.id)
     const builds = storeState.builds
     const buildLogs = storeState.buildLogs
-    const publishedBranches = storeState.publishedBranches.filter(branch => {
-      return branch.site.id === site.id
-    })
+    const publishedBranches = storeState.publishedBranches
     const publishedFiles = storeState.publishedFiles
     const childConfigs = { site, builds, buildLogs, publishedBranches, publishedFiles }
 
