@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import {
+  sitesFetchStarted, sitesFetchStartedType,
   sitesReceived, sitesReceivedType,
   siteAdded, siteAddedType,
   siteUpdated, siteUpdatedType,
@@ -8,6 +9,19 @@ import {
 } from "../../../../frontend/actions/actionCreators/siteActions";
 
 describe("siteActions actionCreators", () => {
+  describe("sitesFetchStarted", () => {
+    it("constructs propery", () => {
+      const actual = sitesFetchStarted()
+      expect(actual).to.deep.equal({
+        type: sitesFetchStartedType,
+      })
+    })
+
+    it("exports its type", () => {
+      expect(sitesFetchStartedType).to.equal("SITES_FETCH_STARTED")
+    })
+  })
+
   describe("sitesReceived", () => {
     it("constructs properly", () => {
       const sites = [{

@@ -4,6 +4,7 @@ import alertActions from './alertActions';
 
 import {
   updateRouterToSitesUri,
+  dispatchSitesFetchStartedAction,
   dispatchSitesReceivedAction,
   dispatchSiteAddedAction,
   dispatchSiteUpdatedAction,
@@ -19,6 +20,7 @@ const alertError = error => {
 
 export default {
   fetchSites() {
+    dispatchSitesFetchStartedAction()
     return federalist.fetchSites()
       .then(dispatchSitesReceivedAction)
       .catch(alertError);

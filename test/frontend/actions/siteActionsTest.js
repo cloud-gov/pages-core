@@ -13,8 +13,9 @@ describe("siteActions", () => {
 
   let httpErrorAlertAction, alertSuccess, alertError;
 
-  let updateRouterToSitesUri, dispatchSitesReceivedAction,
-      dispatchSiteAddedAction, dispatchSiteUpdatedAction, dispatchSiteDeletedAction,
+  let updateRouterToSitesUri, dispatchSitesFetchStartedAction,
+      dispatchSitesReceivedAction, dispatchSiteAddedAction,
+      dispatchSiteUpdatedAction, dispatchSiteDeletedAction,
       dispatchSiteBranchesReceivedAction;
 
   const siteId = "kuaw8fsru8hwugfw";
@@ -40,6 +41,7 @@ describe("siteActions", () => {
     alertError = stub();
 
     updateRouterToSitesUri = stub();
+    dispatchSitesFetchStartedAction = stub();
     dispatchSitesReceivedAction = stub();
     dispatchSiteAddedAction = stub();
     dispatchSiteUpdatedAction = stub();
@@ -49,6 +51,7 @@ describe("siteActions", () => {
     fixture = proxyquire("../../../frontend/actions/siteActions", {
       "./dispatchActions": {
         updateRouterToSitesUri: updateRouterToSitesUri,
+        dispatchSitesFetchStartedAction: dispatchSitesFetchStartedAction,
         dispatchSitesReceivedAction: dispatchSitesReceivedAction,
         dispatchSiteAddedAction: dispatchSiteAddedAction,
         dispatchSiteUpdatedAction: dispatchSiteUpdatedAction,
@@ -74,9 +77,6 @@ describe("siteActions", () => {
 
   describe("fetchSites", () => {
     it("triggers the fetching of sites and dispatches a sites received action to the store when successful", () => {
-      const action = {
-        hi: "you"
-      };
       const sites = {
         hi: "mom"
       };
@@ -86,6 +86,7 @@ describe("siteActions", () => {
       const actual = fixture.fetchSites();
 
       return actual.then(() => {
+        expect(dispatchSitesFetchStartedAction.called).to.be.true
         expect(dispatchSitesReceivedAction.calledWith(sites)).to.be.true;
       });
     });

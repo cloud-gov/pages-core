@@ -7,7 +7,8 @@ proxyquire.noCallThru();
 describe("dispatchActions", () => {
   let fixture;
   let dispatch;
-  let sitesReceivedActionCreator, siteAddedActionCreator, siteDeletedActionCreator,
+  let sitesFetchStartedActionCreator, sitesReceivedActionCreator,
+      siteAddedActionCreator, siteDeletedActionCreator,
       siteUpdatedActionCreator, siteBranchesReceivedActionCreator,
       updateRouterActionCreator, pushHistory;
 
@@ -17,6 +18,7 @@ describe("dispatchActions", () => {
 
   beforeEach(() => {
     dispatch = spy();
+    sitesFetchStartedActionCreator = stub();
     sitesReceivedActionCreator = stub();
     updateRouterActionCreator = stub();
     siteAddedActionCreator = stub();
@@ -27,6 +29,7 @@ describe("dispatchActions", () => {
 
     fixture = proxyquire("../../../frontend/actions/dispatchActions", {
       "./actionCreators/siteActions": {
+        sitesFetchStarted: sitesFetchStartedActionCreator,
         sitesReceived: sitesReceivedActionCreator,
         siteAdded: siteAddedActionCreator,
         siteUpdated: siteUpdatedActionCreator,
@@ -46,6 +49,14 @@ describe("dispatchActions", () => {
     fixture.updateRouterToSitesUri();
     expect(pushHistory.calledWith("/sites")).to.be.true;
   });
+
+  it("dispatchSitesFetchStartedAction", () => {
+    sitesFetchStartedActionCreator.returns(action)
+
+    fixture.dispatchSitesFetchStartedAction()
+
+    expect(dispatch.calledWith(action)).to.be.true
+  })
 
   it("dispatchSitesReceivedAction", () => {
     const sites = [ site ];

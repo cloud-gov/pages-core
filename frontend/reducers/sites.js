@@ -1,4 +1,5 @@
 import {
+  sitesFetchStartedType as SITES_FETCH_STARTED,
   sitesReceivedType as SITES_RECEIVED,
   siteAddedType as SITE_ADDED,
   siteUpdatedType as SITE_UPDATED,
@@ -6,34 +7,53 @@ import {
   siteBranchesReceivedType as SITE_BRANCHES_RECEIVED,
 } from '../actions/actionCreators/siteActions';
 
-const initialState = [];
+const initialState = { isLoading: false };
 
 export default function sites(state = initialState, action) {
   switch (action.type) {
 
+  case SITES_FETCH_STARTED:
+    return { isLoading: true }
+
   case SITES_RECEIVED:
-    return action.sites || initialState;
+    return { isLoading: false, data: action.sites || [] }
 
   case SITE_ADDED:
-    return action.site ? [...state, action.site] : state;
+    if (action.site) {
+      return {
+        isLoading: false,
+        data: state.data.concat(action.site),
+      }
+    } else {
+      return state
+    }
 
   case SITE_UPDATED:
-    return mapPropertyToMatchingSite(state, action.siteId, action.site);
+    return {
+      isLoading: false,
+      data: mapPropertyToMatchingSite(state.data, action.siteId, action.site),
+    }
 
   case SITE_BRANCHES_RECEIVED:
     const branches = action.branches;
-    return mapPropertyToMatchingSite(state, action.siteId, { branches });
+    return {
+      isLoading: false,
+      data: mapPropertyToMatchingSite(state.data, action.siteId, { branches }),
+    }
 
   case SITE_DELETED:
-    return state.filter((site) => site.id != action.siteId);
+    return {
+      isLoading: false,
+      data: state.data.filter((site) => site.id != action.siteId),
+    }
 
   default:
     return state;
   }
 }
 
-const mapPropertyToMatchingSite = (state, siteId, properties) => {
-  return state.map((site) => {
+const mapPropertyToMatchingSite = (data, siteId, properties) => {
+  return data.map((site) => {
     if (site.id !== siteId) return site;
     return Object.assign({}, site, properties);
   });
