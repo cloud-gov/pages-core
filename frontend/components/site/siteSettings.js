@@ -13,6 +13,8 @@ class SiteSettings extends React.Component {
 
     this.state = {
       enableSave: false,
+      demoBranch: site.demoBranch || '',
+      demoDomain: site.demoDomain || '',
       config: site.config || '',
       previewConfig: site.previewConfig || '',
       defaultBranch: site.defaultBranch || '',
@@ -125,6 +127,36 @@ class SiteSettings extends React.Component {
                    type="text"
                    placeholder="https://example.com"
                    value={ state.domain }
+                   onChange={this.onChange} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="usa-grid">
+          <div className="usa-width-one-whole">
+            <div className="form-group">
+              <div className="usa-alert usa-alert-info">
+                <div className="usa-alert-body">
+                  <h3 className="usa-alert-heading">Demo Site</h3>
+                  <p className="usa-alert-text">
+                    Setup a branch to be deployed to a demo url.
+                  </p>
+                  <p>Branch name:</p>
+                  <input
+                   name="demoBranch"
+                   className="form-control"
+                   type="text"
+                   placeholder="Branch name"
+                   value={ state.demoBranch }
+                   onChange={this.onChange} />
+                  <p>Demo domain:</p>
+                  <input
+                   name="demoDomain"
+                   className="form-control"
+                   type="text"
+                   placeholder="https://preview.example.com"
+                   value={ state.demoDomain }
                    onChange={this.onChange} />
                 </div>
               </div>

@@ -42,6 +42,27 @@ describe("Site model", () => {
       })
     })
 
+    context("for the demo branch", () => {
+      it("should return a federalist preview link if there is no demo domain", done => {
+        factory.site({ demoBranch: "demo-branch" }).then(site => {
+          const viewLink = site.viewLinkForBranch("demo-branch")
+          expect(viewLink).to.equal(`http://localhost:1337/preview/${site.owner}/${site.repository}/demo-branch`)
+          done()
+        }).catch(done)
+      })
+
+      it("should return the demo domain if there is a demo domain", done => {
+        factory.site({
+          demoDomain: "https://demo.example.gov",
+          demoBranch: "demo-branch",
+        }).then(site => {
+          const viewLink = site.viewLinkForBranch("demo-branch")
+          expect(viewLink).to.equal("https://demo.example.gov")
+          done()
+        }).catch(done)
+      })
+    })
+
     context("for a preview branch", () => {
       it("should return a federalist preview link", done => {
         factory.site().then(site => {
@@ -51,5 +72,31 @@ describe("Site model", () => {
         }).catch(done)
       })
     })
+  })
+
+  it("should not let the domain and demoDomain be equal", done => {
+    Site.create({
+      owner: "owner",
+      repository: "repository",
+      domain: "https://www.example.gov",
+      demoDomain: "https://www.example.gov",
+    }).catch(err => {
+      expect(err.status).to.equal(403)
+      expect(err.message).to.equal("Domain and demo domain cannot be the same")
+      done()
+    }).catch(done)
+  })
+
+  it("should not let the defaultBranch and demoBranch be equal", done => {
+    Site.create({
+      owner: "owner",
+      repository: "repository",
+      defaultBranch: "preview",
+      demoBranch: "preview",
+    }).catch(err => {
+      expect(err.status).to.equal(403)
+      expect(err.message).to.equal("Default branch and demo branch cannot be the same")
+      done()
+    }).catch(done)
   })
 })
