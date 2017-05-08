@@ -7,10 +7,10 @@ proxyquire.noCallThru();
 describe("dispatchActions", () => {
   let fixture;
   let dispatch;
-  let sitesReceivedActionCreator, siteAddedActionCreator, siteDeletedActionCreator,
+  let sitesFetchStartedActionCreator, sitesReceivedActionCreator,
+      siteAddedActionCreator, siteDeletedActionCreator,
       siteUpdatedActionCreator, siteBranchesReceivedActionCreator,
-      updateRouterActionCreator, siteLoadingActionCreator,
-      siteInvalidActionCreator, pushHistory;
+      updateRouterActionCreator, pushHistory;
 
   const action = { whatever: "bub" };
   const site = { site: "site1" };
@@ -18,25 +18,23 @@ describe("dispatchActions", () => {
 
   beforeEach(() => {
     dispatch = spy();
+    sitesFetchStartedActionCreator = stub();
     sitesReceivedActionCreator = stub();
     updateRouterActionCreator = stub();
     siteAddedActionCreator = stub();
     siteUpdatedActionCreator = stub();
     siteDeletedActionCreator = stub();
     siteBranchesReceivedActionCreator = stub();
-    siteLoadingActionCreator = stub();
-    siteInvalidActionCreator = stub();
     pushHistory = stub();
 
     fixture = proxyquire("../../../frontend/actions/dispatchActions", {
       "./actionCreators/siteActions": {
+        sitesFetchStarted: sitesFetchStartedActionCreator,
         sitesReceived: sitesReceivedActionCreator,
         siteAdded: siteAddedActionCreator,
         siteUpdated: siteUpdatedActionCreator,
         siteDeleted: siteDeletedActionCreator,
         siteBranchesReceived: siteBranchesReceivedActionCreator,
-        siteInvalid: siteInvalidActionCreator,
-        siteLoading: siteLoadingActionCreator
       },
       "./routeActions": {
         pushHistory: pushHistory
@@ -52,11 +50,13 @@ describe("dispatchActions", () => {
     expect(pushHistory.calledWith("/sites")).to.be.true;
   });
 
-  it("updateRouterToSpecificSiteUri", () => {
-    const siteId = "7";
-    fixture.updateRouterToSpecificSiteUri(siteId);
-    expect(pushHistory.calledWith(`/sites/${siteId}`)).to.be.true;
-  });
+  it("dispatchSitesFetchStartedAction", () => {
+    sitesFetchStartedActionCreator.returns(action)
+
+    fixture.dispatchSitesFetchStartedAction()
+
+    expect(dispatch.calledWith(action)).to.be.true
+  })
 
   it("dispatchSitesReceivedAction", () => {
     const sites = [ site ];
@@ -96,20 +96,6 @@ describe("dispatchActions", () => {
     siteBranchesReceivedActionCreator.withArgs(siteId, branches).returns(action);
 
     fixture.dispatchSiteBranchesReceivedAction(siteId, branches);
-
-    expect(dispatch.calledWith(action)).to.be.true;
-  });
-
-  it('dispatchSiteInvalidAction', () => {
-    siteInvalidActionCreator.withArgs(site, false).returns(action);
-    fixture.dispatchSiteInvalidAction(site, false);
-
-    expect(dispatch.calledWith(action)).to.be.true;
-  });
-
-  it('dispatchSiteLoadingAction', () => {
-    siteLoadingActionCreator.withArgs(site, false).returns(action);
-    fixture.dispatchSiteLoadingAction(site, false);
 
     expect(dispatch.calledWith(action)).to.be.true;
   });

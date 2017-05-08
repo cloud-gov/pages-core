@@ -1,15 +1,27 @@
 import { expect } from "chai";
 import {
+  sitesFetchStarted, sitesFetchStartedType,
   sitesReceived, sitesReceivedType,
   siteAdded, siteAddedType,
   siteUpdated, siteUpdatedType,
   siteDeleted, siteDeletedType,
   siteBranchesReceived, siteBranchesReceivedType,
-  siteInvalid, siteInvalidType,
-  siteLoading, siteLoadingType
 } from "../../../../frontend/actions/actionCreators/siteActions";
 
 describe("siteActions actionCreators", () => {
+  describe("sitesFetchStarted", () => {
+    it("constructs propery", () => {
+      const actual = sitesFetchStarted()
+      expect(actual).to.deep.equal({
+        type: sitesFetchStartedType,
+      })
+    })
+
+    it("exports its type", () => {
+      expect(sitesFetchStartedType).to.equal("SITES_FETCH_STARTED")
+    })
+  })
+
   describe("sitesReceived", () => {
     it("constructs properly", () => {
       const sites = [{
@@ -106,50 +118,6 @@ describe("siteActions actionCreators", () => {
 
     it("exports its type", () => {
       expect(siteBranchesReceivedType).to.equal("SITE_BRANCHES_RECEIVED");
-    });
-  });
-
-  describe('siteInvalid', () => {
-    it('constructs properly', () => {
-      const site = {
-        id: 1,
-        name: 'hotseatcantsitdown'
-      };
-      const invalid = true;
-
-      const actual = siteInvalid(site, invalid);
-
-      expect(actual).to.deep.equal({
-        type: siteInvalidType,
-        site,
-        invalid
-      });
-    });
-
-    it ('exports its type', () => {
-      expect(siteInvalidType).to.equal('SITE_INVALID');
-    });
-  });
-
-  describe('siteLoading', () => {
-    it('constructs properly', () => {
-      const site = {
-        id: 1,
-        name: 'hotseatcantsitdown'
-      };
-      const loading = false;
-
-      const actual = siteLoading(site, false);
-
-      expect(actual).to.deep.equal({
-        type: siteLoadingType,
-        site,
-        loading
-      });
-    });
-
-    it ('exports its type', () => {
-      expect(siteLoadingType).to.equal('SITE_LOADING');
     });
   });
 

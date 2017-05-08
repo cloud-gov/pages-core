@@ -2,6 +2,7 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import proxyquire from 'proxyquire';
+import LoadingIndicator from '../../../../frontend/components/loadingIndicator'
 
 proxyquire.noCallThru();
 
@@ -11,8 +12,9 @@ const LinkButton = () => <div></div>;
 const NO_SITE_TEXT = 'No sites yet.';
 
 // sites can be empty as the test is rendering empty divs for children.
-const STORE_WITH_SITES = {sites: [{}, {}, {}]};
-const STORE_WITH_NO_SITES = {sites: []};
+const STORE_WITH_SITES = { sites: { isLoading: false, data: [{}, {}, {}]} };
+const STORE_WITH_NO_SITES = { sites: { isLoading: false, data: []} };
+const STORE_LOADING_SITES = { sites: { isLoading: true } }
 
 describe('<SiteList />', () => {
   let Fixture;
@@ -24,6 +26,16 @@ describe('<SiteList />', () => {
       '../linkButton': LinkButton
     }).default;
   });
+
+  describe('when sites are being loaded', () => {
+    beforeEach(() => {
+      wrapper = shallow(<Fixture storeState={STORE_LOADING_SITES}/>)
+    })
+
+    it("renders a loading indicator", () => {
+      expect(wrapper.find(LoadingIndicator)).to.have.length(1)
+    })
+  })
 
   describe('when no sites are received as props', () => {
     beforeEach(() => {
