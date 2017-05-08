@@ -39,9 +39,7 @@ class SiteContainer extends React.Component {
     const currentSite = this.getCurrentSite(storeState.sites, params.id);
 
     if (currentSite) {
-      siteActions.siteExists(currentSite).then(() => {
-        return siteActions.fetchBranches(currentSite)
-      });
+      siteActions.fetchBranches(currentSite)
     } else {
       replaceHistory('/sites');
     }
@@ -51,8 +49,12 @@ class SiteContainer extends React.Component {
     return pathname.split('/').pop();
   }
 
-  getCurrentSite(sites, siteId) {
-    return sites.find((site) => {
+  getCurrentSite(sitesState, siteId) {
+    if (sitesState.isLoading) {
+      return null
+    }
+
+    return sitesState.data.find((site) => {
       // force type coersion
       return site.id == siteId;
     });

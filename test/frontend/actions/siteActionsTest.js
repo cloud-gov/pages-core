@@ -7,16 +7,16 @@ proxyquire.noCallThru();
 describe("siteActions", () => {
   let fixture;
 
-  let fetchBranches, deleteBranch, createRepo, fetchFile, getRepo;
+  let fetchBranches;
 
-  let fetchSites, addSite, updateSite, deleteSite, siteExists;
+  let fetchSites, addSite, updateSite, deleteSite;
 
   let httpErrorAlertAction, alertSuccess, alertError;
 
-  let updateRouterToSitesUri, updateRouterToSpecificSiteUri, dispatchSitesReceivedAction,
-      dispatchSiteAddedAction, dispatchSiteUpdatedAction, dispatchSiteDeletedAction,
-      dispatchSiteBranchesReceivedAction, dispatchSiteInvalidAction,
-      dispatchSiteLoadingAction;
+  let updateRouterToSitesUri, dispatchSitesFetchStartedAction,
+      dispatchSitesReceivedAction, dispatchSiteAddedAction,
+      dispatchSiteUpdatedAction, dispatchSiteDeletedAction,
+      dispatchSiteBranchesReceivedAction;
 
   const siteId = "kuaw8fsru8hwugfw";
   const site = {
@@ -36,34 +36,27 @@ describe("siteActions", () => {
     addSite = stub();
     updateSite = stub();
     deleteSite = stub();
-    getRepo = stub();
     fetchBranches = stub();
-    deleteBranch = stub();
     alertSuccess = stub();
     alertError = stub();
-    siteExists = stub();
 
     updateRouterToSitesUri = stub();
-    updateRouterToSpecificSiteUri = stub();
+    dispatchSitesFetchStartedAction = stub();
     dispatchSitesReceivedAction = stub();
     dispatchSiteAddedAction = stub();
     dispatchSiteUpdatedAction = stub();
     dispatchSiteDeletedAction = stub();
     dispatchSiteBranchesReceivedAction = stub();
-    dispatchSiteInvalidAction = stub();
-    dispatchSiteLoadingAction = stub();
 
     fixture = proxyquire("../../../frontend/actions/siteActions", {
       "./dispatchActions": {
         updateRouterToSitesUri: updateRouterToSitesUri,
-        updateRouterToSpecificSiteUri: updateRouterToSpecificSiteUri,
+        dispatchSitesFetchStartedAction: dispatchSitesFetchStartedAction,
         dispatchSitesReceivedAction: dispatchSitesReceivedAction,
         dispatchSiteAddedAction: dispatchSiteAddedAction,
         dispatchSiteUpdatedAction: dispatchSiteUpdatedAction,
         dispatchSiteDeletedAction: dispatchSiteDeletedAction,
         dispatchSiteBranchesReceivedAction: dispatchSiteBranchesReceivedAction,
-        dispatchSiteInvalidAction: dispatchSiteInvalidAction,
-        dispatchSiteLoadingAction: dispatchSiteLoadingAction
       },
       "./alertActions": {
         httpError: httpErrorAlertAction,
@@ -78,16 +71,12 @@ describe("siteActions", () => {
       },
       "../util/githubApi": {
         fetchBranches: fetchBranches,
-        getRepo: getRepo
       },
     }).default;
   });
 
   describe("fetchSites", () => {
     it("triggers the fetching of sites and dispatches a sites received action to the store when successful", () => {
-      const action = {
-        hi: "you"
-      };
       const sites = {
         hi: "mom"
       };
@@ -97,6 +86,7 @@ describe("siteActions", () => {
       const actual = fixture.fetchSites();
 
       return actual.then(() => {
+        expect(dispatchSitesFetchStartedAction.called).to.be.true
         expect(dispatchSitesReceivedAction.calledWith(sites)).to.be.true;
       });
     });

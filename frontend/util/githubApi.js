@@ -20,6 +20,8 @@ const github = {
 
     return fetch(url, params).then((data) => {
       return data;
+    }).catch((error) => {
+      alertActions.httpError(error.message);
     });
   },
 

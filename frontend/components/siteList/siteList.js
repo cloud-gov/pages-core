@@ -2,17 +2,22 @@ import React from 'react';
 import AlertBanner from '../alertBanner';
 import SiteListItem from './siteListItem';
 import LinkButton from '../linkButton';
+import LoadingIndicator from '../loadingIndicator';
 
 const propTypes = {
   storeState: React.PropTypes.object
 };
 
-const getSites = (sites) => {
-  if (!sites.length) {
+const getSites = (sitesState) => {
+  if (sitesState.isLoading) {
+    return <LoadingIndicator/>
+  }
+
+  if (!sitesState.data.length) {
     return (
       <div className="usa-grid">
         <h1>No sites yet.</h1>
-        <p>Add one now. (This message may also appear briefly before your site list loads).</p>
+        <p>Add one now.</p>
       </div>
     );
   }
@@ -21,7 +26,7 @@ const getSites = (sites) => {
     <div className="usa-grid">
       <h2>Websites</h2>
       <ul className="sites-list">
-        {sites.map((site, index) => {
+        {sitesState.data.map((site, index) => {
             return <SiteListItem key={ index } site={ site } />
         })}
       </ul>
