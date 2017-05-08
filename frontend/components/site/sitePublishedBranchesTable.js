@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from 'react-router';
 import publishedBranchActions from "../../actions/publishedBranchActions";
+import LoadingIndicator from "../loadingIndicator"
 
 class SitePublishedBranchesTable extends React.Component {
   componentDidMount() {
@@ -8,25 +9,27 @@ class SitePublishedBranchesTable extends React.Component {
   }
 
   publishedBranches() {
-    if (!this.props.publishedBranches) {
+    if (this.props.publishedBranches.isLoading || !this.props.publishedBranches.data) {
       return []
+    } else {
+      return this.props.publishedBranches.data
     }
-    return this.props.publishedBranches.filter(branch => {
-      return branch.site.id === parseInt(this.props.params.id)
-    })
   }
 
   render() {
-    if (this.publishedBranches().length > 0) {
-      return this.renderBuildLogsTable()
-    } else {
+    const branches = this.publishedBranches()
+    if (this.props.publishedBranches.isLoading) {
       return this.renderLoadingState()
+    } else if (!branches.length) {
+      return this.renderEmptyState()
+    } else {
+      return this.renderPublishedBranchesTable()
     }
   }
 
-  renderBuildLogsTable() {
+  renderPublishedBranchesTable() {
     return (
-      <table className="usa-table-borderless build-log-table">
+      <table className="usa-table-borderless published-branch-table">
         <thead>
           <tr>
             <th>Branch</th>
@@ -62,7 +65,14 @@ class SitePublishedBranchesTable extends React.Component {
   }
 
   renderLoadingState() {
-    return <p>No published branch data available</p>
+    return <LoadingIndicator/>
+  }
+
+  renderEmptyState() {
+    return <p>
+      No branches have been published.
+      Please wait for build to complete or check logs for error message.
+    </p>
   }
 }
 

@@ -7,17 +7,20 @@ proxyquire.noCallThru()
 describe("publishedBranchActions", () => {
   let fixture
   let dispatch
+  let publishedBranchesFetchStartedActionCreator
   let publishedBranchesReceivedActionCreator
   let fetchPublishedBranches
 
   beforeEach(() => {
     dispatch = spy()
+    publishedBranchesFetchStartedActionCreator = stub()
     publishedBranchesReceivedActionCreator = stub()
 
     fetchPublishedBranches = stub()
 
     fixture = proxyquire("../../../frontend/actions/publishedBranchActions", {
       "./actionCreators/publishedBranchActions": {
+        publishedBranchesFetchStarted: publishedBranchesFetchStartedActionCreator,
         publishedBranchesReceived: publishedBranchesReceivedActionCreator,
       },
       "../util/federalistApi": {
@@ -32,15 +35,18 @@ describe("publishedBranchActions", () => {
   it("fetchPublishedBranches", done => {
     const branches = ["Branch 1", "Branch 2"]
     const publishedBranchesPromise = Promise.resolve(branches)
-    const action = { action: "action" }
+    const startedAction = { action: "🚦🏎" }
+    const receivedAction = { action: "🏁" }
     fetchPublishedBranches.withArgs().returns(publishedBranchesPromise)
-    publishedBranchesReceivedActionCreator.withArgs(branches).returns(action)
+    publishedBranchesFetchStartedActionCreator.withArgs().returns(startedAction)
+    publishedBranchesReceivedActionCreator.withArgs(branches).returns(receivedAction)
 
     const actual = fixture.fetchPublishedBranches()
 
     actual.then(() => {
-      expect(dispatch.calledOnce).to.be.true
-      expect(dispatch.calledWith(action)).to.be.true
+      expect(dispatch.calledTwice).to.be.true
+      expect(dispatch.calledWith(startedAction)).to.be.true
+      expect(dispatch.calledWith(receivedAction)).to.be.true
       done()
     })
   })

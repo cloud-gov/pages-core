@@ -1,11 +1,17 @@
 import {
+  publishedBranchesFetchStartedType as PUBLISHED_BRANCHES_FETCH_STARTED,
   publishedBranchesReceivedType as PUBLISHED_BRANCHES_RECEIVED,
 } from "../actions/actionCreators/publishedBranchActions";
 
-export default function publishedBranches(state = [], action) {
+const initialState = { isLoading: false }
+
+export default function publishedBranches(state = initialState, action) {
   switch (action.type) {
+
+  case PUBLISHED_BRANCHES_FETCH_STARTED:
+    return { isLoading: true }
   case PUBLISHED_BRANCHES_RECEIVED:
-    return action.branches;
+    return { isLoading: false, data: action.branches };
   default:
     return state;
   }
