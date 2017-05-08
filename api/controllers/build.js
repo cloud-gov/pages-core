@@ -24,10 +24,7 @@ module.exports = {
       site = model
       return siteAuthorizer.findOne(req.user, site)
     }).then(() => {
-      return Build.findAll({
-        where: { site: site.id },
-        order: [["createdAt", "DESC"]],
-      })
+      return Build.findAll({ where: { site: site.id } })
     }).then(builds => {
       return buildSerializer.serialize(builds)
     }).then(buildsJSON => {
