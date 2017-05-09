@@ -98,27 +98,4 @@ describe("siteActions actionCreators", () => {
       expect(siteDeletedType).to.equal("SITE_DELETED");
     });
   });
-
-  describe("siteBranchesReceived", () => {
-    it("constructs properly", () => {
-      const siteId = "tk421";
-      const branches = {
-        something: "could be anything",
-        except: "when it isn't"
-      };
-
-      const actual = siteBranchesReceived(siteId, branches);
-
-      expect(actual).to.deep.equal({
-        type: siteBranchesReceivedType,
-        siteId,
-        branches
-      });
-    });
-
-    it("exports its type", () => {
-      expect(siteBranchesReceivedType).to.equal("SITE_BRANCHES_RECEIVED");
-    });
-  });
-
 });

@@ -1,8 +1,9 @@
 
 import React from 'react';
-import SitePreviewLinksTable from "./sitePreviewLinksTable";
+import SiteGithubBranchesTable from "./siteGithubBranchesTable";
 import RadioInput from '../radioInput';
 import LinkButton from '../linkButton';
+import githubBranchActions from '../../actions/githubBranchActions';
 import siteActions from '../../actions/siteActions';
 
 class SiteSettings extends React.Component {
@@ -26,6 +27,10 @@ class SiteSettings extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.onDelete = this.onDelete.bind(this);
     this.onChange = this.onChange.bind(this);
+  }
+
+  componentDidMount() {
+    githubBranchActions.fetchBranches(this.props.site)
   }
 
   getSiteUrl() {
@@ -109,7 +114,8 @@ class SiteSettings extends React.Component {
         </div>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
-            <SitePreviewLinksTable site={this.props.site}/>
+            <label>GitHub Branches</label>
+            <SiteGithubBranchesTable site={this.props.site} branches={this.props.githubBranches}/>
           </div>
         </div>
         <div className="usa-grid">

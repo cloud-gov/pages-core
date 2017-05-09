@@ -12,6 +12,7 @@ describe("maps reducers", () => {
   const SITES = "sites are here";
   const BUILDS = "builds are here 🛠"
   const USER = "user is here";
+  const GITHUB_BRANCHES = "github branches 🌳 are here"
 
   beforeEach(() => {
     fixture = proxyquire("../../frontend/reducers.js", {
@@ -22,6 +23,7 @@ describe("maps reducers", () => {
       "./reducers/sites": SITES,
       "./reducers/builds": BUILDS,
       "./reducers/user": USER,
+      "./reducers/githubBranches": GITHUB_BRANCHES,
     }).default;
   });
 
@@ -53,4 +55,7 @@ describe("maps reducers", () => {
     expect(fixture.user).to.equal(USER);
   });
 
+  it("maps githubBranches reducer", () => {
+    expect(fixture.githubBranches).to.equal(GITHUB_BRANCHES)
+  })
 });
