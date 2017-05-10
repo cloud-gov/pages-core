@@ -18,33 +18,6 @@ class SiteContainer extends React.Component {
     super(props);
   }
 
-  componentDidMount() {
-    const { storeState } = this.props;
-    if (storeState.sites.length) {
-      this.downloadCurrentSiteData();
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    const { storeState } = this.props;
-    const prevStoreState = prevProps.storeState;
-
-    if (storeState.sites.length && !prevStoreState.sites.length) {
-      this.downloadCurrentSiteData();
-    }
-  }
-
-  downloadCurrentSiteData() {
-    const { storeState, params } = this.props;
-    const currentSite = this.getCurrentSite(storeState.sites, params.id);
-
-    if (currentSite) {
-      siteActions.fetchBranches(currentSite)
-    } else {
-      replaceHistory('/sites');
-    }
-  }
-
   getPageTitle(pathname) {
     return pathname.split('/').pop();
   }
@@ -68,7 +41,8 @@ class SiteContainer extends React.Component {
     const buildLogs = storeState.buildLogs
     const publishedBranches = storeState.publishedBranches
     const publishedFiles = storeState.publishedFiles
-    const childConfigs = { site, builds, buildLogs, publishedBranches, publishedFiles }
+    const githubBranches = storeState.githubBranches
+    const childConfigs = { site, builds, buildLogs, publishedBranches, publishedFiles, githubBranches }
 
     const pageTitle = this.getPageTitle(location.pathname);
 

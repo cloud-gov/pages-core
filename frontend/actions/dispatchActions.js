@@ -5,7 +5,6 @@ import {
   siteAdded as createSiteAddedAction,
   siteUpdated as createSiteUpdatedAction,
   siteDeleted as createSiteDeletedAction,
-  siteBranchesReceived as createSiteBranchesReceivedAction,
 } from './actionCreators/siteActions';
 import { pushHistory } from './routeActions';
 
@@ -33,10 +32,6 @@ const dispatchSiteDeletedAction = siteId => {
   dispatch(createSiteDeletedAction(siteId));
 };
 
-const dispatchSiteBranchesReceivedAction = (siteId, branches) => {
-  dispatch(createSiteBranchesReceivedAction(siteId, branches));
-};
-
 export {
   updateRouterToSitesUri,
   dispatchSitesFetchStartedAction,
@@ -44,5 +39,4 @@ export {
   dispatchSiteAddedAction,
   dispatchSiteUpdatedAction,
   dispatchSiteDeletedAction,
-  dispatchSiteBranchesReceivedAction,
 };

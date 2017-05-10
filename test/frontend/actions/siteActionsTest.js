@@ -186,33 +186,6 @@ describe("siteActions", () => {
     });
   });
 
-  describe("fetch(Site)Branches", () => {
-    it("fetches a site's branches and dispatches a site branches received action to the store when successful, returning the same site given", () => {
-      const branches = {
-        blurry: "vision",
-        get: "glasses"
-      };
-
-      const branchesPromise = Promise.resolve(branches);
-      fetchBranches.withArgs(site).returns(branchesPromise);
-
-      const actual = fixture.fetchBranches(site);
-
-      return actual.then((result) => {
-        expect(dispatchSiteBranchesReceivedAction.calledWith(siteId, branches)).to.be.true;
-        expect(result).to.equal(site);
-      });
-    });
-
-    it("does nothing when fetching a site's branches fails", () => {
-      fetchBranches.withArgs(site).returns(rejectedWithErrorPromise);
-
-      const actual = fixture.fetchBranches(site);
-
-      expectDispatchToNotBeCalled(actual, dispatchSiteBranchesReceivedAction);
-    });
-  });
-
   const expectDispatchToNotBeCalled = (promise, dispatchFunction) => {
     promise.catch(() => {
       expect(dispatchFunction.called).to.be.false;

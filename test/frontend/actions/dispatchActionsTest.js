@@ -24,7 +24,6 @@ describe("dispatchActions", () => {
     siteAddedActionCreator = stub();
     siteUpdatedActionCreator = stub();
     siteDeletedActionCreator = stub();
-    siteBranchesReceivedActionCreator = stub();
     pushHistory = stub();
 
     fixture = proxyquire("../../../frontend/actions/dispatchActions", {
@@ -34,7 +33,6 @@ describe("dispatchActions", () => {
         siteAdded: siteAddedActionCreator,
         siteUpdated: siteUpdatedActionCreator,
         siteDeleted: siteDeletedActionCreator,
-        siteBranchesReceived: siteBranchesReceivedActionCreator,
       },
       "./routeActions": {
         pushHistory: pushHistory
@@ -87,15 +85,6 @@ describe("dispatchActions", () => {
     siteDeletedActionCreator.withArgs(site).returns(action);
 
     fixture.dispatchSiteDeletedAction(site);
-
-    expect(dispatch.calledWith(action)).to.be.true;
-  });
-
-  it("dispatchSiteBranchesReceivedAction", () => {
-    const branches = "stuff and things, you know";
-    siteBranchesReceivedActionCreator.withArgs(siteId, branches).returns(action);
-
-    fixture.dispatchSiteBranchesReceivedAction(siteId, branches);
 
     expect(dispatch.calledWith(action)).to.be.true;
   });

@@ -1,5 +1,4 @@
 import federalist from '../util/federalistApi';
-import github from '../util/githubApi';
 import alertActions from './alertActions';
 
 import {
@@ -9,7 +8,6 @@ import {
   dispatchSiteAddedAction,
   dispatchSiteUpdatedAction,
   dispatchSiteDeletedAction,
-  dispatchSiteBranchesReceivedAction,
 } from './dispatchActions';
 
 
@@ -43,13 +41,6 @@ export default {
     return federalist.deleteSite(siteId)
       .then(dispatchSiteDeletedAction.bind(null, siteId))
       .then(updateRouterToSitesUri)
-      .catch(alertError);
-  },
-
-  fetchBranches(site) {
-    return github.fetchBranches(site)
-      .then(dispatchSiteBranchesReceivedAction.bind(null, site.id))
-      .then(() => site)
       .catch(alertError);
   },
 };
