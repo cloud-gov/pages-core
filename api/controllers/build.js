@@ -39,6 +39,7 @@ module.exports = {
       branch: req.body["branch"],
       site: req.body["site"],
       user: req.user.id,
+      commitSha: req.body["commitSha"],
     }
     authorizer.create(req.user, params).then(() => {
       return Build.create(params)

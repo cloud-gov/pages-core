@@ -95,6 +95,9 @@ module.exports = (sequelize, DataTypes) => {
     branch: {
       type: DataTypes.STRING,
     },
+    commitSha: {
+      type: DataTypes.STRING,
+    },
     completedAt: {
       type: DataTypes.DATE,
     },

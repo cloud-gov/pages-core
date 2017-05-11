@@ -19,6 +19,7 @@ describe("Webhook API", () => {
     commits: [{
       id: "456def"
     }],
+    after: "456def",
     sender: {
       login: user.username,
     },
@@ -29,7 +30,7 @@ describe("Webhook API", () => {
 
   describe("POST /webhook/github", () => {
     it("should create a new site build for the sender", done => {
-      let site, user
+      let site, user, payload
 
       factory.site().then(site => {
         return Site.findById(site.id, { include: [ User ] })
@@ -40,7 +41,7 @@ describe("Webhook API", () => {
       }).then(builds => {
         expect(builds).to.have.length(0)
 
-        const payload = buildWebhookPayload(user, site)
+        payload = buildWebhookPayload(user, site)
         const signature = signWebhookPayload(payload)
 
         return request(app)
@@ -53,7 +54,14 @@ describe("Webhook API", () => {
           })
           .expect(200)
       }).then(response => {
-        return Build.findAll({ where: { site: site.id, user: user.id } })
+        return Build.findAll({
+          where: {
+            site: site.id,
+            user: user.id,
+            branch: payload.ref.split("/")[2],
+            commitSha: payload.after,
+          }
+        })
       }).then(builds => {
         expect(builds).to.have.length(1)
         done()

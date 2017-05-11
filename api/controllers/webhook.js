@@ -68,6 +68,7 @@ const createBuildForWebhookRequest = (request) => {
   }).then(() => {
     return Build.create({
       branch: request.body.ref.replace('refs/heads/', ''),
+      commitSha: request.body.after,
       site: buildParams.site.id,
       user: buildParams.user.id,
     })

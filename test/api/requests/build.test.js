@@ -16,6 +16,7 @@ describe("Build API", () => {
     }
     expect(build.error == response.error).to.be.ok
     expect(build.branch == response.branch).to.be.ok
+    expect(build.commitSha == response.commitSha).to.be.ok
     expect(response.site.id).to.equal(build.site || build.Site.id)
     expect(response.user.id).to.equal(build.user || build.User.id)
     expect(response.buildLogs).to.be.undefined
@@ -56,7 +57,8 @@ describe("Build API", () => {
           .post(`/v0/build/`)
           .send({
             site: site.id,
-            branch: "my-branch"
+            branch: "my-branch",
+            commitSha: "test-commit-sha",
           })
           .set("Cookie", promisedValues.cookie)
           .expect(200)
@@ -67,6 +69,7 @@ describe("Build API", () => {
             site: site.id,
             user: user.id,
             branch: "my-branch",
+            commitSha: "test-commit-sha",
           }
         })
       }).then(build => {
@@ -84,7 +87,8 @@ describe("Build API", () => {
           .post(`/v0/build/`)
           .send({
             site: site.id,
-            branch: "my-branch"
+            branch: "my-branch",
+            commitSha: "test-commit-sha",
           })
           .set("Cookie", cookie)
           .expect(403)
@@ -113,7 +117,8 @@ describe("Build API", () => {
         error: "message",
         state: "error",
         branch: "18f-pages",
-        completedAt: new Date()
+        completedAt: new Date(),
+        commitSha: "json-test-commit-sha",
       }
 
       factory.build(buildAttributes).then(model => {
