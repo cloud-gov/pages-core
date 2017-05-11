@@ -2,6 +2,7 @@ const crypto = require('crypto')
 const logger = require("winston")
 const config = require("../../config")
 const buildSerializer = require("../serializers/build")
+const GithubBuildStatusReporter = require("../services/GithubBuildStatusReporter")
 const { Build, User, Site } = require("../models")
 
 module.exports = {
@@ -14,7 +15,9 @@ module.exports = {
       if (!build) {
         res.ok("No new commits found. No build scheduled.")
       } else {
-        return buildSerializer.serialize(build)
+        return GithubBuildStatusReporter.reportBuildStatus(build).then(() =>{
+          return buildSerializer.serialize(build)
+        })
       }
     }).then(buildJSON => {
       if (buildJSON) {

@@ -64,6 +64,7 @@ export default {
       data: {
         site: build.site.id || build.site,
         branch: build.branch,
+        commitSha: build.commitSha,
       },
     });
   },

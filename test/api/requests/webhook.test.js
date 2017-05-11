@@ -1,9 +1,11 @@
 const crypto = require('crypto')
 const expect = require("chai").expect
+const nock = require("nock")
 const request = require("supertest-as-promised")
 const app = require("../../../app")
 const config = require("../../../config")
 const factory = require("../support/factory")
+const githubAPINocks = require("../support/githubAPINocks")
 const { Build, Site, User } = require("../../../api/models")
 
 
@@ -29,6 +31,11 @@ describe("Webhook API", () => {
   })
 
   describe("POST /webhook/github", () => {
+    beforeEach(() => {
+      nock.cleanAll()
+      githubAPINocks.status()
+    })
+
     it("should create a new site build for the sender", done => {
       let site, user, payload
 
@@ -122,6 +129,32 @@ describe("Webhook API", () => {
           .expect(200)
       }).then(response => {
         expect(response.body.site.id).to.equal(site.id)
+        done()
+      }).catch(done)
+    })
+
+    it("should report the status of the new build to GitHub", done => {
+      nock.cleanAll()
+      const statusNock = githubAPINocks.status({ state: "pending" })
+
+      const user = factory.user()
+      const site = factory.site({ users: Promise.all([user]) })
+      Promise.props({ user, site }).then(({ user, site }) => {
+        const payload = buildWebhookPayload(user, site)
+        payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`
+        const signature = signWebhookPayload(payload)
+
+        return request(app)
+          .post("/webhook/github")
+          .send(payload)
+          .set({
+            "X-GitHub-Event": "push",
+            "X-Hub-Signature": signature,
+            "X-GitHub-Delivery": "123abc"
+          })
+          .expect(200)
+      }).then(() => {
+        expect(statusNock.isDone()).to.be.true
         done()
       }).catch(done)
     })

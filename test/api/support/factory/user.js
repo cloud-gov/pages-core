@@ -13,7 +13,8 @@ const _attributes = (overrides) => {
     email: `${username}@example.com`,
     username: username,
     githubAccessToken: "fake-access-token",
-    githubUserId: 12345
+    githubUserId: 12345,
+    signedInAt: new Date(),
   }, overrides)
 }
 
