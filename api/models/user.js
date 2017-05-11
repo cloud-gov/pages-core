@@ -16,6 +16,7 @@ const toJSON = function() {
 
   delete object.githubAccessToken
   delete object.githubUserId
+  delete object.signedInAt
 
   object.createdAt = object.createdAt.toISOString()
   object.updatedAt = object.updatedAt.toISOString()
@@ -42,6 +43,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     githubUserId: {
       type: DataTypes.STRING,
+    },
+    signedInAt: {
+      type: DataTypes.DATE,
     },
     username: {
       type: DataTypes.STRING,
