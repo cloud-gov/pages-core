@@ -3,7 +3,11 @@ const { Build, User, Site } = require("../models")
 const serialize = (serializable) => {
   if (serializable.length !== undefined) {
     const buildIds = serializable.map(build => build.id)
-    const query = Build.findAll({ where: { id: buildIds }, include: [ User, Site ] })
+    const query = Build.findAll({
+      where: { id: buildIds },
+      order: [["createdAt", "DESC"]],
+      include: [ User, Site ],
+    })
 
     return query.then(builds => {
       return builds.map(build => serializeObject(build))

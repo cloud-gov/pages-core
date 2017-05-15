@@ -7,16 +7,16 @@ proxyquire.noCallThru();
 describe("siteActions", () => {
   let fixture;
 
-  let fetchBranches, deleteBranch, createRepo, fetchFile, getRepo;
+  let fetchBranches;
 
-  let fetchSites, addSite, updateSite, deleteSite, siteExists;
+  let fetchSites, addSite, updateSite, deleteSite;
 
   let httpErrorAlertAction, alertSuccess, alertError;
 
-  let updateRouterToSitesUri, updateRouterToSpecificSiteUri, dispatchSitesReceivedAction,
-      dispatchSiteAddedAction, dispatchSiteUpdatedAction, dispatchSiteDeletedAction,
-      dispatchSiteBranchesReceivedAction, dispatchSiteInvalidAction,
-      dispatchSiteLoadingAction;
+  let updateRouterToSitesUri, dispatchSitesFetchStartedAction,
+      dispatchSitesReceivedAction, dispatchSiteAddedAction,
+      dispatchSiteUpdatedAction, dispatchSiteDeletedAction,
+      dispatchSiteBranchesReceivedAction;
 
   const siteId = "kuaw8fsru8hwugfw";
   const site = {
@@ -36,34 +36,27 @@ describe("siteActions", () => {
     addSite = stub();
     updateSite = stub();
     deleteSite = stub();
-    getRepo = stub();
     fetchBranches = stub();
-    deleteBranch = stub();
     alertSuccess = stub();
     alertError = stub();
-    siteExists = stub();
 
     updateRouterToSitesUri = stub();
-    updateRouterToSpecificSiteUri = stub();
+    dispatchSitesFetchStartedAction = stub();
     dispatchSitesReceivedAction = stub();
     dispatchSiteAddedAction = stub();
     dispatchSiteUpdatedAction = stub();
     dispatchSiteDeletedAction = stub();
     dispatchSiteBranchesReceivedAction = stub();
-    dispatchSiteInvalidAction = stub();
-    dispatchSiteLoadingAction = stub();
 
     fixture = proxyquire("../../../frontend/actions/siteActions", {
       "./dispatchActions": {
         updateRouterToSitesUri: updateRouterToSitesUri,
-        updateRouterToSpecificSiteUri: updateRouterToSpecificSiteUri,
+        dispatchSitesFetchStartedAction: dispatchSitesFetchStartedAction,
         dispatchSitesReceivedAction: dispatchSitesReceivedAction,
         dispatchSiteAddedAction: dispatchSiteAddedAction,
         dispatchSiteUpdatedAction: dispatchSiteUpdatedAction,
         dispatchSiteDeletedAction: dispatchSiteDeletedAction,
         dispatchSiteBranchesReceivedAction: dispatchSiteBranchesReceivedAction,
-        dispatchSiteInvalidAction: dispatchSiteInvalidAction,
-        dispatchSiteLoadingAction: dispatchSiteLoadingAction
       },
       "./alertActions": {
         httpError: httpErrorAlertAction,
@@ -78,16 +71,12 @@ describe("siteActions", () => {
       },
       "../util/githubApi": {
         fetchBranches: fetchBranches,
-        getRepo: getRepo
       },
     }).default;
   });
 
   describe("fetchSites", () => {
     it("triggers the fetching of sites and dispatches a sites received action to the store when successful", () => {
-      const action = {
-        hi: "you"
-      };
       const sites = {
         hi: "mom"
       };
@@ -97,6 +86,7 @@ describe("siteActions", () => {
       const actual = fixture.fetchSites();
 
       return actual.then(() => {
+        expect(dispatchSitesFetchStartedAction.called).to.be.true
         expect(dispatchSitesReceivedAction.calledWith(sites)).to.be.true;
       });
     });
@@ -193,33 +183,6 @@ describe("siteActions", () => {
       const actual = fixture.deleteSite(siteId);
 
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
-    });
-  });
-
-  describe("fetch(Site)Branches", () => {
-    it("fetches a site's branches and dispatches a site branches received action to the store when successful, returning the same site given", () => {
-      const branches = {
-        blurry: "vision",
-        get: "glasses"
-      };
-
-      const branchesPromise = Promise.resolve(branches);
-      fetchBranches.withArgs(site).returns(branchesPromise);
-
-      const actual = fixture.fetchBranches(site);
-
-      return actual.then((result) => {
-        expect(dispatchSiteBranchesReceivedAction.calledWith(siteId, branches)).to.be.true;
-        expect(result).to.equal(site);
-      });
-    });
-
-    it("does nothing when fetching a site's branches fails", () => {
-      fetchBranches.withArgs(site).returns(rejectedWithErrorPromise);
-
-      const actual = fixture.fetchBranches(site);
-
-      expectDispatchToNotBeCalled(actual, dispatchSiteBranchesReceivedAction);
     });
   });
 

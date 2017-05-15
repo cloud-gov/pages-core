@@ -5,6 +5,7 @@ proxyquire.noCallThru();
 
 describe("sitesReducer", () => {
   let fixture;
+  const SITES_FETCH_STARTED = "🐶⚾️"
   const SITE_ADDED = "hey, new site!";
   const SITE_DELETED = "bye, site.";
   const SITE_UPDATED = "change the site, please";
@@ -14,6 +15,7 @@ describe("sitesReducer", () => {
   beforeEach(() => {
     fixture = proxyquire("../../../frontend/reducers/sites", {
       "../actions/actionCreators/siteActions": {
+        sitesFetchStartedType: SITES_FETCH_STARTED,
         sitesReceivedType: SITES_RECEIVED,
         siteAddedType: SITE_ADDED,
         siteUpdatedType: SITE_UPDATED,
@@ -25,58 +27,70 @@ describe("sitesReducer", () => {
     }).default;
   });
 
-  it("defaults to empty array and ignores other actions", () => {
+  it("defaults to an initial state and ignores other actions", () => {
     const actual = fixture(undefined, {
       type: "not what you're looking for",
       hello: "alijasfjir"
     });
 
-    expect(actual).to.deep.equal([]);
+    expect(actual).to.deep.equal({ isLoading: false });
   });
+
+  it("marks the state as loading when it gets a 'sites fetch started' action", () => {
+    const actual = fixture({ isLoading: false }, {
+      type: SITES_FETCH_STARTED,
+    })
+
+    expect(actual).to.deep.equal({ isLoading: true })
+  })
 
   it("replaces anything it has when it gets a 'sites received' action", () => {
     const sites = [{ hello: "world"}, { how: "are you?" }];
 
-    const actual = fixture([{ oldData: "to be lost" }], {
+    const actual = fixture({ isLoading: false, data: [{ oldData: "to be lost" }] }, {
       type: SITES_RECEIVED,
       sites: sites
     });
 
-    expect(actual).to.deep.equal(sites);
+    expect(actual).to.deep.equal({
+      isLoading: false,
+      data: sites,
+    });
   });
 
 
   it("ignores a malformed 'sites received' action", () => {
-    const sites = [{ hello: "world"}, { how: "are you?" }];
-
     const actual = fixture([{ oldData: "to be lost" }], {
       type: SITES_RECEIVED
     });
 
-    expect(actual).to.deep.equal([]);
+    expect(actual).to.deep.equal({
+      isLoading: false,
+      data: [],
+    });
   });
 
   it("adds a site if action has a site", () => {
     const existingSites = [{ existing: "siteToKeep" }];
     const site = { hereIs: "something" };
 
-    const actual = fixture(existingSites, {
+    const actual = fixture({ isLoading: false, data: existingSites }, {
       type: SITE_ADDED,
       site: site
     });
 
-    expect(actual).to.deep.equal(existingSites.concat(site));
+    expect(actual.data).to.deep.equal(existingSites.concat(site));
   });
 
   it("does not add a site if action has no site", () => {
     const existingSites = [{ existing: "siteToKeep" }];
     const site = { hereIs: "something" };
 
-    const actual = fixture(existingSites, {
+    const actual = fixture({ isLoading: false, data: existingSites }, {
       type: SITE_ADDED
     });
 
-    expect(actual).to.deep.equal(existingSites);
+    expect(actual.data).to.deep.equal(existingSites);
   });
 
   it("ignores when given an update action and the new site's id is not found", () => {
@@ -90,13 +104,13 @@ describe("sitesReducer", () => {
 
     const site = { id: "something", oldData: false };
 
-    const actual = fixture(existingSites, {
+    const actual = fixture({ isLoading: false, data: existingSites }, {
       type: SITE_UPDATED,
       siteId: "something",
       site: site
     });
 
-    expect(actual).to.deep.equal(existingSites);
+    expect(actual.data).to.deep.equal(existingSites);
   });
 
   it("updates existing site data when given an update action and the new site's id is found", () => {
@@ -114,13 +128,13 @@ describe("sitesReducer", () => {
 
     const newSite = { id: "siteToKeep", oldData: false, hi: "there" };
 
-    const actual = fixture(existingSites, {
+    const actual = fixture({ isLoading: false, data: existingSites }, {
       type: SITE_UPDATED,
       siteId: "siteToKeep",
       site: newSite
     });
 
-    expect(actual).to.deep.equal([ newSite, siteTwo ]);
+    expect(actual.data).to.deep.equal([ newSite, siteTwo ]);
   });
 
   it("ignores delete request if site id is not found", () => {
@@ -136,12 +150,12 @@ describe("sitesReducer", () => {
 
     const existingSites = [ siteOne, siteTwo ];
 
-    const actual = fixture(existingSites, {
+    const actual = fixture({ isLoading: false, data: existingSites }, {
       type: SITE_DELETED,
       siteId: "i'm not here."
     });
 
-    expect(actual).to.deep.equal(existingSites);
+    expect(actual.data).to.deep.equal(existingSites);
   });
 
   it("deletes site if site id is found", () => {
@@ -159,36 +173,11 @@ describe("sitesReducer", () => {
 
     const existingSites = [ siteOne, siteTwo ];
 
-    const actual = fixture(existingSites, {
+    const actual = fixture({ isLoading: false, data: existingSites }, {
       type: SITE_DELETED,
       siteId: siteToLoseId
     });
 
-    expect(actual).to.deep.equal([ siteOne ]);
+    expect(actual.data).to.deep.equal([ siteOne ]);
   });
-
-
-  it("adds the restarted build in the action to its site", () => {
-    const sitePendingRestart = {
-      id: "pick this one",
-      builds: ["finished build"],
-    };
-    const otherSite = {
-      id: "not this one",
-    };
-    const build = {
-      site: sitePendingRestart,
-    };
-    const restartedSite = Object.assign({}, sitePendingRestart, {
-      builds: [build, ...sitePendingRestart.builds],
-    });
-
-    const actual = fixture([sitePendingRestart, otherSite], {
-      type: BUILD_RESTARTED,
-      build: build
-    });
-
-    expect(actual).to.deep.equal([restartedSite, otherSite])
-  });
-
 });

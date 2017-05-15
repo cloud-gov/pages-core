@@ -1,95 +1,121 @@
 import React from 'react';
 import { Link } from 'react-router';
+import LoadingIndicator from '../loadingIndicator'
 import { duration, timeFrom } from '../../util/datetime';
 import buildActions from '../../actions/buildActions';
 
-const propTypes = {
+class SiteBuilds extends React.Component {
+  componentDidMount() {
+    buildActions.fetchBuilds(this.props.site)
+  }
+
+  builds() {
+    if (this.props.builds.isLoading || !this.props.builds.data) {
+      return [];
+    } else {
+      return this.props.builds.data
+    }
+  }
+
+  render() {
+    const builds = this.builds()
+    if (this.props.builds.isLoading) {
+      return this.renderLoadingState()
+    } else if (!builds.length) {
+      return this.renderEmptyState()
+    } else {
+      return this.renderBuildsTable()
+    }
+  }
+
+  renderBuildsTable() {
+    return (
+      <table className="usa-table-borderless build-log-table">
+        <thead>
+          <tr>
+            <th scope="col">Branch</th>
+            <th scope="col">User</th>
+            <th scope="col">Completed</th>
+            <th scope="col">Duration</th>
+            <th scope="col">Message</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {this.builds().map(build => {
+            const rowClass = `usa-alert-${build.state}`;
+            let message;
+
+            switch (build.state) {
+              case 'error':
+                message = build.error;
+                break;
+              case 'processing':
+                message = 'This build is in progress';
+                break;
+              default:
+                message = 'The build completed successfully.';
+                break;
+            }
+
+            return (
+              <tr key={ build.id } className={ rowClass }>
+                <td scope="row">{ build.branch }</td>
+                <td>{ this.getUsername(build) }</td>
+                <td>{ timeFrom(build.completedAt) }</td>
+                <td>{ duration(build.createdAt, build.completedAt) }</td>
+                <td>{ message }</td>
+                <td>
+                  { this.restartLink(build) }<br/>
+                  { this.buildLogsLink(build) }
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    )
+  }
+
+  getUsername(build) {
+    if (build.user) {
+      return build.user.username
+    } else {
+      return ""
+    }
+  }
+
+  restartLink(build) {
+    return (
+      <a
+        href="#" alt="Restart this build"
+        onClick={ (e) => this.restartClicked(e, build) }
+      >
+        Restart
+      </a>
+    )
+  }
+
+  restartClicked(event, build) {
+    event.preventDefault()
+    buildActions.restartBuild(build);
+  }
+
+  buildLogsLink(build) {
+    return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>Logs</Link>
+  }
+
+  renderLoadingState() {
+    return <LoadingIndicator/>
+  }
+
+  renderEmptyState() {
+    return <p>This site does not have any builds</p>
+  }
+}
+
+SiteBuilds.propTypes = {
   site: React.PropTypes.object
 };
-
-const getUsername = (site, id) => {
-  const user = site.users.find(user => user.id === id);
-  if (user) {
-    return user.username;
-  }
-};
-
-const restartClicked = (event, build) => {
-  event.preventDefault()
-  buildActions.restartBuild(build);
-}
-
-const restartLink = (build) => (
-  <a
-    href="#" alt="Restart this build"
-    onClick={ (e) => restartClicked(e, build) }
-  >
-    Restart
-  </a>
-)
-
-const buildLogsLink = ({ site, build }) => (
-  <Link to={`/sites/${site.id}/builds/${build.id}/logs`}>Logs</Link>
-)
-
-const sortSiteBuilds = (site) => {
-  return site.builds.sort((a, b) => {
-    return new Date(b.createdAt) - new Date(a.createdAt)
-  })
-}
-
-const SiteBuilds = ({site}) =>
-  <table className="usa-table-borderless build-log-table">
-    <thead>
-      <tr>
-        <th scope="col">Branch</th>
-        <th scope="col">User</th>
-        <th scope="col">Completed</th>
-        <th scope="col">Duration</th>
-        <th scope="col">Message</th>
-        <th scope="col">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {sortSiteBuilds(site).map((build) => {
-        const rowClass = `usa-alert-${build.state}`;
-        const username = getUsername(site, build.user);
-
-        let message;
-
-        switch (build.state) {
-          case 'error':
-            message = build.error;
-            break;
-          case 'processing':
-            message = 'This build is in progress';
-            break;
-          default:
-            message = 'The build completed successfully.';
-            break;
-        }
-
-        return (
-          <tr key={ build.id } className={ rowClass }>
-            <td scope="row">{ build.branch }</td>
-            <td>{ username }</td>
-            <td>{ timeFrom(build.completedAt) }</td>
-            <td>{ duration(build.createdAt, build.completedAt) }</td>
-            <td>{ message }</td>
-            <td>
-              { restartLink(build) }<br/>
-              { buildLogsLink({ site, build }) }
-            </td>
-          </tr>
-        )
-      })}
-    </tbody>
-  </table>
-
-SiteBuilds.defaultProps = {
-  builds: []
-};
-
-SiteBuilds.propTypes = propTypes;
 
 export default SiteBuilds;

@@ -11,19 +11,6 @@ produces:
   - application/json
 paths:
   /build:
-    get:
-      summary: Fetch all of the user's builds
-      responses:
-        200:
-          description: An array of builds
-          schema:
-            type: array
-            items:
-              $ref: "Build.json"
-        403:
-          description: Not authorized
-          schema:
-            $ref: "Error.json"
     post:
       summary: Create a build
       parameters:
@@ -49,6 +36,20 @@ paths:
           description: Bad request
           schema:
             $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+  /site/{site_id}/build:
+    get:
+      summary: Fetch all of the user's builds for a given site
+      responses:
+        200:
+          description: An array of builds
+          schema:
+            type: array
+            items:
+              $ref: "Build.json"
         403:
           description: Not authorized
           schema:
@@ -198,6 +199,12 @@ paths:
           schema:
             type: object
             properties:
+              demoBranch:
+                type: string
+                description: The name of the branch served on the demo URL
+              demoDomain:
+                type: string
+                description: The domain where the demo branch's site is served
               config:
                 type: string
                 description: Jekyll configs for the site.
@@ -270,12 +277,21 @@ paths:
           schema:
             type: object
             properties:
+              demoBranch:
+                type: string
+                description: The name of the branch served on the demo URL
+              demoDomain:
+                type: string
+                description: The domain where the demo branch's site is served
               config:
                 type: string
                 description: Jekyll configs for the site.
               defaultBranch:
                 type: string
                 description: The default branch for the site.
+              domain:
+                type: string
+                description: The domain where the site is served
               engine:
                 type: string
                 description: The build engine to use when building the new site

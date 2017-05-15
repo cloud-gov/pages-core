@@ -2,24 +2,22 @@
   "type": "object",
   "required": [
     "id",
-    "builds",
     "defaultBranch",
     "engine",
     "owner",
     "repository",
     "siteRoot",
-    "users",
     "viewLink"
   ],
   "properties": {
     "id": {
       "type": "integer"
     },
-    "builds": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      }
+    "demoBranch": {
+      "type": "string"
+    },
+    "demoDomain": {
+      "type": "string"
     },
     "config": {
       "type": "string"
@@ -43,20 +41,15 @@
     "publicPreview": {
       "type": "boolean"
     },
+    "publishedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
     "repository": {
       "type": "string"
     },
     "siteRoot": {
       "type": "string"
-    },
-    "users": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "not": {
-          "required": ["githubAccessToken", "githubUserId"]
-        }
-      }
     },
     "viewLink": {
       "type": "string"

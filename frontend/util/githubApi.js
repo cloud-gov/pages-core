@@ -5,11 +5,6 @@ import alertActions from '../actions/alertActions';
 
 const API = 'https://api.github.com';
 
-const getToken = () => {
-  const state = store.getState();
-  return state.user;
-}
-
 const getRepoFor = (site) => {
   return `repos/${site.owner}/${site.repository}`;
 };
@@ -21,11 +16,6 @@ const github = {
     return fetch(url, params).then((data) => {
       return data;
     });
-  },
-
-  getRepo(site) {
-    const url = `${getRepoFor(site)}`;
-    return this.fetch(url);
   },
 
   fetchBranches(site) {

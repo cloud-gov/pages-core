@@ -20,11 +20,6 @@ describe("Site API", () => {
     expect(response.engine).to.equal(site.engine)
     expect(response.defaultBranch).to.equal(site.defaultBranch)
     expect(response.publicPreview).to.equal(site.publicPreview)
-
-    expect(response.users.map(user => user.id))
-      .to.have.members(site.Users.map(user => user.id))
-
-    expect(response.builds).to.be.a("array")
     expect(response.siteRoot).to.be.a("string")
     expect(response.viewLink).to.be.a("string")
   }
@@ -619,6 +614,38 @@ describe("Site API", () => {
         return Site.findById(site.id, { include: [ User, Build ] })
       }).then(site => {
         expect(site.Builds).to.have.length(1)
+        expect(site.Builds[0].branch).to.equal(site.defaultBranch)
+        done()
+      }).catch(done)
+    })
+
+    it("should trigger a rebuild of the demo branch if one is present", done => {
+      factory.site({
+        repository: "old-repo-name",
+        demoBranch: "demo",
+        demoDomain: "https://demo.example.gov"
+      }).then(site => {
+        return Site.findById(site.id, { include: [ User, Build ] })
+      }).then(model => {
+        site = model
+        expect(site.Builds).to.have.length(0)
+        return session(site.Users[0])
+      }).then(cookie => {
+        return request(app)
+          .put(`/v0/site/${site.id}`)
+          .send({
+            repository: "new-repo-name"
+          })
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(resp => {
+        return Site.findById(site.id, { include: [ User, Build ] })
+      }).then(site => {
+        expect(site.Builds).to.have.length(2)
+        const demoBuild = site.Builds.find(candidateBuild => {
+          return candidateBuild.branch === site.demoBranch
+        })
+        expect(demoBuild).to.not.be.undefined
         done()
       }).catch(done)
     })

@@ -37,6 +37,10 @@ const defaultBranch = (build) => {
   return build.branch === build.Site.defaultBranch
 }
 
+const demoBranch = (build) => {
+  return build.branch === build.Site.demoBranch
+}
+
 const pathForBuild = (build) => {
   if (defaultBranch(build)) {
     return `site/${build.Site.owner}/${build.Site.repository}`
@@ -48,6 +52,8 @@ const pathForBuild = (build) => {
 const baseURLForBuild = (build) => {
   if (defaultBranch(build) && build.Site.domain) {
     return baseURLForCustomDomain(build.Site.domain)
+  } else if (demoBranch(build) && build.Site.demoDomain) {
+    return baseURLForCustomDomain(build.Site.demoDomain)
   } else {
     return "/" + pathForBuild(build)
   }

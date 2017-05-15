@@ -1,6 +1,19 @@
 const url = require("url")
 const config = require("../../config")
 
+const afterValidate = (site) => {
+  if (site.defaultBranch == site.demoBranch) {
+    const error = new Error("Default branch and demo branch cannot be the same")
+    error.status = 403
+    throw error
+  }
+  if (site.domain && site.domain == site.demoDomain) {
+    const error = new Error("Domain and demo domain cannot be the same")
+    error.status = 403
+    throw error
+  }
+}
+
 const associate = ({ Site, Build, User }) => {
   Site.hasMany(Build, {
     foreignKey: "site",
@@ -49,6 +62,8 @@ const viewLinkForBranch = function(branch) {
     return this.domain
   } else if (branch === this.defaultBranch) {
     return `${s3Root}/site/${this.owner}/${this.repository}`
+  } else if (branch === this.demoBranch && this.demoDomain) {
+    return this.demoDomain
   } else {
     return url.resolve(config.app.hostname, `/preview/${this.owner}/${this.repository}/${branch}`)
   }
@@ -56,6 +71,12 @@ const viewLinkForBranch = function(branch) {
 
 module.exports = (sequelize, DataTypes) => {
   const Site = sequelize.define("Site", {
+    demoBranch: {
+      type: DataTypes.STRING,
+    },
+    demoDomain: {
+      type: DataTypes.STRING,
+    },
     config: {
       type: DataTypes.STRING,
     },
@@ -82,6 +103,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    publishedAt: {
+      type: DataTypes.DATE,
+    },
     repository: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -97,6 +121,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     hooks: {
       beforeValidate,
+      afterValidate,
     }
   })
 

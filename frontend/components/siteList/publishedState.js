@@ -2,38 +2,23 @@ import React from 'react';
 import moment from "moment";
 
 const propTypes = {
-  builds: React.PropTypes.array
+  site: React.PropTypes.shape({
+    publishedAt: React.PropTypes.string,
+  })
 };
 
-const getLastBuildTime = (builds) => {
-  if (builds.length) {
-    let sorted = builds.slice().filter(build => {
-      return build.completedAt
-    }).sort((a, b) => {
-      let aCompletedAt = new Date(a.completedAt);
-      let bCompletedAt = new Date(b.completedAt);
-      return aCompletedAt > bCompletedAt;
-    });
-    let last = sorted.pop();
-    if (last) {
-      return last.completedAt
-    }
-  }
-};
-
-const getPublishedState = (builds) => {
-  let lastBuildTime = getLastBuildTime(builds)
-  if (lastBuildTime) {
-    let formattedBuildTime = moment(lastBuildTime).format('MMMM Do YYYY, h:mm:ss a')
+const getPublishedState = (site) => {
+  if (site.publishedAt) {
+    let formattedBuildTime = moment(site.publishedAt).format('MMMM Do YYYY, h:mm:ss a')
     return `This site was last published at ${formattedBuildTime}.`;
   } else {
     return 'Please wait for build to complete or check logs for error message.';
   }
 };
 
-const PublishedState = ({ builds = [] }) =>
+const PublishedState = ({ site = {} }) =>
   <p>
-    {getPublishedState(builds)}
+    {getPublishedState(site)}
   </p>
 
 PublishedState.propTypes = propTypes;

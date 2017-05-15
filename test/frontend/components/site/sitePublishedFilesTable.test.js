@@ -1,6 +1,7 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import LoadingIndicator from '../../../../frontend/components/loadingIndicator'
 import SitePublishedFilesTable from '../../../../frontend/components/site/sitePublishedFilesTable';
 
 
@@ -9,9 +10,12 @@ describe("<SitePublishedFilesTable/>", () => {
     const publishedBranch = { name: "master", viewLink: "www.example.gov/master" }
     const props = {
       params: { id: 1, name: "master" },
-      publishedFiles: [
-        { name: "abc", publishedBranch }
-      ]
+      publishedFiles: {
+        isLoading: false,
+        data: [
+          { name: "abc", publishedBranch },
+        ],
+      }
     }
 
     const wrapper = shallow(<SitePublishedFilesTable {...props} />)
@@ -21,15 +25,16 @@ describe("<SitePublishedFilesTable/>", () => {
   it("should render a table with the files for the given branch", () => {
     const correctBranch = { name: "master", viewLink: "www.example.gov/master" }
     const incorrectBranch = { name: "preview", viewLink: "www.example.gov/preview" }
-    //const correctFiles = ["abc", "abc/def", "ghi"]
-    //const incorrectFiles = ["xyz"]
     const props = {
       params: { id: 1, name: "master" },
-      publishedFiles: [
-        { name: "abc", publishedBranch: correctBranch },
-        { name: "abc/def", publishedBranch: correctBranch },
-        { name: "xyz", publishedBranch: incorrectBranch },
-      ]
+      publishedFiles: {
+        isLoading: false,
+        data: [
+          { name: "abc", publishedBranch: correctBranch },
+          { name: "abc/def", publishedBranch: correctBranch },
+          { name: "xyz", publishedBranch: incorrectBranch },
+        ],
+      },
     }
 
     const wrapper = shallow(<SitePublishedFilesTable {...props} />)
@@ -39,10 +44,20 @@ describe("<SitePublishedFilesTable/>", () => {
     expect(wrapper.find("table").contains("xyz")).to.be.false
   })
 
+  it("should render a loading state if the files are loading", () => {
+    const props = {
+      params: { id: 1, name: "master" },
+      publishedFiles: { isLoading: true }
+    }
+
+    const wrapper = shallow(<SitePublishedFilesTable {...props} />)
+    expect(wrapper.find(LoadingIndicator)).to.have.length(1);
+  })
+
   it("should render an empty state if there are no files", () => {
     const props = {
       params: { id: 1, name: "master" },
-      publishedFiles: []
+      publishedFiles: { isLoading: false, data: [] }
     }
 
     const wrapper = shallow(<SitePublishedFilesTable {...props} />)

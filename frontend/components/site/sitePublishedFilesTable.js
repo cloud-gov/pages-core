@@ -1,5 +1,6 @@
 import React from 'react'
 import publishedFileActions from "../../actions/publishedFileActions";
+import LoadingIndicator from '../loadingIndicator'
 
 class SitePublishedBranch extends React.Component {
   componentDidMount() {
@@ -10,8 +11,8 @@ class SitePublishedBranch extends React.Component {
 
   publishedFiles() {
     const branch = this.props.params.name
-    if (this.props.publishedFiles) {
-      return this.props.publishedFiles.filter(file => {
+    if (this.props.publishedFiles.data && !this.props.publishedFiles.isLoading) {
+      return this.props.publishedFiles.data.filter(file => {
         return file.publishedBranch.name === branch
       })
     } else {
@@ -21,7 +22,9 @@ class SitePublishedBranch extends React.Component {
 
   render() {
     const files = this.publishedFiles()
-    if (!files.length) {
+    if (this.props.publishedFiles.isLoading) {
+      return this.renderLoadingState()
+    } else if (!files.length) {
       return this.renderEmptyState()
     } else {
       return this.renderPublishedFilesTable(files)
@@ -51,6 +54,10 @@ class SitePublishedBranch extends React.Component {
       <td>{file.name}</td>
       <td><a href={viewFileLink} target="_blank">View</a></td>
     </tr>
+  }
+
+  renderLoadingState() {
+    return <LoadingIndicator/>
   }
 
   renderEmptyState() {
