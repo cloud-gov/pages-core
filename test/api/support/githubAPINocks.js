@@ -132,6 +132,33 @@ const repo = ({ accessToken, owner, repo, response } = {}) => {
   return webhookNock.reply(...response)
 }
 
+const status = ({ accessToken, owner, repo, sha, state, targetURL } = {}) => {
+  let path
+  if (owner && repo && sha) {
+    path = `/repos/${owner}/${repo}/statuses/${sha}`
+  } else {
+    path = /\/repos\/.+\/.+\/statuses\/.+/
+  }
+
+  let statusNock = nock("https://api.github.com").post(path, body => {
+    if (state && body.state != state) {
+      return false
+    }
+    if (targetURL && body.target_url !== targetURL) {
+      return false
+    }
+    return true
+  })
+
+  if (accessToken) {
+    statusNock = statusNock.query({ access_token: accessToken })
+  } else {
+    statusNock = statusNock.query(true)
+  }
+
+  return statusNock.reply(201, { id: 1 })
+}
+
 const user = ({ accessToken, githubUserID, username, email } = {}) => {
   accessToken = accessToken || "access-token-123abc"
 
@@ -194,6 +221,7 @@ module.exports = {
   createRepoForUser,
   githubAuth,
   repo,
+  status,
   user,
   userOrganizations,
   webhook,

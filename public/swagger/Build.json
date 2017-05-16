@@ -15,6 +15,9 @@
     "branch": {
       "type": ["string", "null"]
     },
+    "commitSha": {
+      "type": "string"
+    },
     "createdAt": {
       "type": "string"
     },

@@ -1,8 +1,10 @@
 const expect = require("chai").expect
+const nock = require("nock")
 const request = require("supertest-as-promised")
 const sinon = require("sinon")
 const app = require("../../../app")
 const factory = require("../support/factory")
+const githubAPINocks = require("../support/githubAPINocks")
 const session = require("../support/session")
 const validateAgainstJSONSchema = require("../support/validateAgainstJSONSchema")
 const { Build, User, Site } = require("../../../api/models")
@@ -16,12 +18,18 @@ describe("Build API", () => {
     }
     expect(build.error == response.error).to.be.ok
     expect(build.branch == response.branch).to.be.ok
+    expect(build.commitSha == response.commitSha).to.be.ok
     expect(response.site.id).to.equal(build.site || build.Site.id)
     expect(response.user.id).to.equal(build.user || build.User.id)
     expect(response.buildLogs).to.be.undefined
   }
 
   describe("POST /v0/build", () => {
+    beforeEach(() => {
+      nock.cleanAll()
+      githubAPINocks.status()
+    })
+
     it("should require authentication", done => {
       factory.site().then(site => {
         return request(app)
@@ -56,7 +64,8 @@ describe("Build API", () => {
           .post(`/v0/build/`)
           .send({
             site: site.id,
-            branch: "my-branch"
+            branch: "my-branch",
+            commitSha: "test-commit-sha",
           })
           .set("Cookie", promisedValues.cookie)
           .expect(200)
@@ -67,10 +76,35 @@ describe("Build API", () => {
             site: site.id,
             user: user.id,
             branch: "my-branch",
+            commitSha: "test-commit-sha",
           }
         })
       }).then(build => {
         expect(build).not.to.be.undefined
+        done()
+      }).catch(done)
+    })
+
+    it("should report the new build's status to GitHub", done => {
+      nock.cleanAll()
+      const statusNock = githubAPINocks.status({ state: "pending" })
+
+      const user = factory.user()
+      const site = factory.site({ users: Promise.all([user]) })
+      const cookie = session(user)
+
+      Promise.props({ site, cookie }).then(({ site, cookie }) => {
+        return request(app)
+          .post(`/v0/build/`)
+          .send({
+            site: site.id,
+            branch: "my-branch",
+            commitSha: "Introducing the sha sha slide 🎤🎶",
+          })
+          .set("Cookie", cookie)
+          .expect(200)
+      }).then(() => {
+        expect(statusNock.isDone()).to.be.true
         done()
       }).catch(done)
     })
@@ -84,7 +118,8 @@ describe("Build API", () => {
           .post(`/v0/build/`)
           .send({
             site: site.id,
-            branch: "my-branch"
+            branch: "my-branch",
+            commitSha: "Everybody 👏👏👏👏 your hands",
           })
           .set("Cookie", cookie)
           .expect(403)
@@ -113,7 +148,8 @@ describe("Build API", () => {
         error: "message",
         state: "error",
         branch: "18f-pages",
-        completedAt: new Date()
+        completedAt: new Date(),
+        commitSha: "⬅️  slide to the left ⬅️ ",
       }
 
       factory.build(buildAttributes).then(model => {
@@ -246,16 +282,21 @@ describe("Build API", () => {
       return new Buffer(str, 'utf8').toString('base64');
     }
 
+    beforeEach(() => {
+      nock.cleanAll()
+      githubAPINocks.status()
+    })
+
     it("should mark a build successful if status is 0 and message is blank", done => {
       var build
 
-      factory.build().then(model => {
+      factory.build({ commitSha: "➡️ slide to the right ➡️" }).then(model => {
         build = model
       }).then(() => {
         return postBuildStatus({
           build: build,
           status: "0",
-          message: ""
+          message: "",
         }).expect(200)
       }).then(response => {
         return Build.findById(build.id)
@@ -271,7 +312,7 @@ describe("Build API", () => {
     it("should mark a build errored if the status is non-zero and should set the message", done => {
       var build
 
-      factory.build().then(model => {
+      factory.build({ commitSha: "🐰 one hop this time 🐰" }).then(model => {
         build = model
       }).then(() => {
         return postBuildStatus({
@@ -296,7 +337,10 @@ describe("Build API", () => {
 
       Promise.props({
         site: sitePromise,
-        build: factory.build({ site: sitePromise }),
+        build: factory.build({
+          site: sitePromise,
+          commitSha: "👟 right foot lets stomp; left foot lets stomp 👟"
+        }),
       }).then(promisedValues => {
         expect(promisedValues.site.publishedAt).to.be.null
 
@@ -311,6 +355,22 @@ describe("Build API", () => {
       }).then(site => {
         expect(site.publishedAt).to.be.a("date")
         expect(new Date().getTime() - site.publishedAt.getTime()).to.be.below(500)
+        done()
+      }).catch(done)
+    })
+
+    it("should report the build's status back to github", done => {
+      nock.cleanAll()
+      const statusNock = githubAPINocks.status({ state: "success" })
+
+      const build = factory.build({ commitSha: "sha sha real smooth 😎" }).then(build => {
+        return postBuildStatus({
+          build: build,
+          status: "0",
+          message: "",
+        })
+      }).then(response => {
+        expect(statusNock.isDone()).to.be.true
         done()
       }).catch(done)
     })

@@ -20,7 +20,8 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
     if (!user) throw new Error(`Unable to find or create user ${profile.username}`);
     return user.update({
       githubAccessToken: accessToken,
-      githubUserId: profile.id
+      githubUserId: profile.id,
+      signedInAt: new Date(),
     })
   }).then(() => {
     callback(null, user)
