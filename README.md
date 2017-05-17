@@ -3,9 +3,9 @@
 [![Code Climate](https://codeclimate.com/github/18F/federalist/badges/gpa.svg)](https://codeclimate.com/github/18F/federalist)
 [![Known Vulnerabilities](https://snyk.io/test/github/18F/federalist/badge.svg)](https://snyk.io/test/github/18F/federalist)
 
-***Under active development. Everything is subject to change. Interested in talking to us? [Join our public chat room](https://chat.18f.gov/?channel=federalist-public).***
+***Under active development. Everything is subject to change. Learn more at the [documentation site](https://federalist-docs.18f.gov/). Interested in talking to us? [Join our public chat room](https://chat.18f.gov/).***
 
-Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub, [Prose](https://github.com/prose/prose), and Amazon Web Services to provide a simple way for developers to launch new websites or more easily manage existing ones.
+Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub and Amazon Web Services to provide a simple way for developers to launch new static websites or more easily manage existing static websites.
 
 ## Getting started
 
@@ -189,26 +189,6 @@ models: {
   connection: 'postgres'
 }
 ```
-
-## Architecture
-
-This application is primarily a JSON API server based on the [Sails.js](http://sailsjs.org/) framework. It handles authentication, managing users, sites, and builds, and receives webhook requests from GitHub.
-
-It automatically applies a webhook to the repository new sites and creates a new build on validated webhook requests.
-
-The front end of the application is a [React](https://facebook.github.io/react/) based application, that uses [browserify](http://www.browserify.org) in the build process. It is a very lightweight consumer of the Sails API.
-
-### Proof of concept
-
-The proof of concept application will have a web-based front-end to interface with the API and allow users to add new sites, configure them, and open them in Prose for editing.
-
-It will also route requests to the published static websites, including preview sites for each branch.
-
-### Future goals
-
-After the initial proof of concept, development will focus on scalability by moving to the AWS platform, using S3 for publishing, SQS for managing the publishing queue, and running publishing tasks on separate servers.
-
-Additional development will focus on improved collaboration features, such as built-in support for forking and merging branches for drafts of changes, and automatic configuration of Prose settings.
 
 ## Initial proposal
 
