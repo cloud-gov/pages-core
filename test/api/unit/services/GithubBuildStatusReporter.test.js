@@ -1,6 +1,7 @@
 const crypto = require("crypto")
 const expect = require("chai").expect
 const nock = require("nock")
+const config = require("../../../../config")
 const factory = require("../../support/factory")
 const githubAPINocks = require("../../support/githubAPINocks")
 const { Build, User } = require("../../../../api/models")
@@ -49,7 +50,7 @@ describe("GithubBuildStatusReporter", () => {
             owner: "test-owner",
             repo: "test-repo",
             sha: "456def",
-            targetURL: `http://localhost:1337/sites/${build.site}/builds/${build.id}/logs`,
+            targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
           })
 
           return GithubBuildStatusReporter.reportBuildStatus(build)
@@ -96,7 +97,7 @@ describe("GithubBuildStatusReporter", () => {
             owner: "test-owner",
             repo: "test-repo",
             sha: "456def",
-            targetURL: `http://localhost:1337/preview/test-owner/test-repo/preview-branch`,
+            targetURL: `${config.app.preview_hostname}/preview/test-owner/test-repo/preview-branch`,
           })
 
           return GithubBuildStatusReporter.reportBuildStatus(build)
@@ -142,7 +143,7 @@ describe("GithubBuildStatusReporter", () => {
             owner: "test-owner",
             repo: "test-repo",
             sha: "456def",
-            targetURL: `http://localhost:1337/sites/${build.site}/builds/${build.id}/logs`,
+            targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
           })
 
           return GithubBuildStatusReporter.reportBuildStatus(build)

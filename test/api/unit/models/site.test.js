@@ -67,7 +67,7 @@ describe("Site model", () => {
       it("should return a federalist preview link", done => {
         factory.site().then(site => {
           const viewLink = site.viewLinkForBranch("preview-branch")
-          expect(viewLink).to.equal(`http://localhost:1337/preview/${site.owner}/${site.repository}/preview-branch`)
+          expect(viewLink).to.equal(`http://localhost:1338/preview/${site.owner}/${site.repository}/preview-branch`)
           done()
         }).catch(done)
       })

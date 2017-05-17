@@ -23,3 +23,4 @@ env:
   APP_DOMAIN: fr.cloud.gov
   FEDERALIST_BUILD_STATUS_CALLBACK: https://federalist-staging.fr.cloud.gov/v0/build/:build_id/status/:token
   FEDERALIST_BUILD_LOG_CALLBACK: https://federalist-staging.fr.cloud.gov/v0/build/:build_id/log/:token
+  FEDERALIST_PREVIEW_HOSTNAME: https://federalist-proxy-staging.app.cloud.gov

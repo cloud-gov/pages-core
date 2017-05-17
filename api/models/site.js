@@ -70,7 +70,7 @@ const viewLinkForBranch = function(branch) {
   } else if (branch === this.demoBranch) {
     return `${s3Root}/demo/${this.owner}/${this.repository}`
   } else {
-    return url.resolve(config.app.hostname, `/preview/${this.owner}/${this.repository}/${branch}`)
+    return url.resolve(config.app.preview_hostname, `/preview/${this.owner}/${this.repository}/${branch}`)
   }
 }
 
