@@ -119,7 +119,7 @@ module.exports = {
         branch: site.defaultBranch,
       })
     }).then(() => {
-      if (site.demoDomain && site.demoBranch) {
+      if (site.demoBranch) {
         return Build.create({
           user: req.user.id,
           site: siteId,

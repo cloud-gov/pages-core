@@ -26,7 +26,7 @@ const buildContainerEnvironment = (build) => ({
 })
 
 const siteConfig = (build) => {
-  if (defaultBranch(build)) {
+  if (defaultBranch(build) || demoBranch(build)) {
     return build.Site.config
   } else {
     return build.Site.previewConfig
@@ -44,6 +44,8 @@ const demoBranch = (build) => {
 const pathForBuild = (build) => {
   if (defaultBranch(build)) {
     return `site/${build.Site.owner}/${build.Site.repository}`
+  } else if (demoBranch(build)) {
+    return `demo/${build.Site.owner}/${build.Site.repository}`
   } else {
     return `preview/${build.Site.owner}/${build.Site.repository}/${build.branch}`
   }

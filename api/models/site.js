@@ -45,6 +45,9 @@ const toJSON = function() {
   const s3Config = config.s3
   object.siteRoot = `http://${s3Config.bucket}.s3-website-${s3Config.region}.amazonaws.com`
   object.viewLink = object.domain || [object.siteRoot, 'site', object.owner, object.repository].join('/')
+  if (object.demoBranch) {
+    object.demoViewLink = object.demoDomain || [object.siteRoot, 'demo', object.owner, object.repository].join('/')
+  }
 
   Object.keys(object).forEach(key => {
     if (object[key] === null) {
@@ -64,6 +67,8 @@ const viewLinkForBranch = function(branch) {
     return `${s3Root}/site/${this.owner}/${this.repository}`
   } else if (branch === this.demoBranch && this.demoDomain) {
     return this.demoDomain
+  } else if (branch === this.demoBranch) {
+    return `${s3Root}/demo/${this.owner}/${this.repository}`
   } else {
     return url.resolve(config.app.hostname, `/preview/${this.owner}/${this.repository}/${branch}`)
   }

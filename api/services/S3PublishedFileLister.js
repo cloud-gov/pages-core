@@ -17,6 +17,8 @@ const listPublishedFilesForBranch = (site, branch) => {
   let filepath
   if (site.defaultBranch === branch) {
     filepath = `site/${site.owner}/${site.repository}`
+  } else if (site.demoBranch === branch) {
+    filepath = `demo/${site.owner}/${site.repository}`
   } else {
     filepath = `preview/${site.owner}/${site.repository}/${branch}`
   }

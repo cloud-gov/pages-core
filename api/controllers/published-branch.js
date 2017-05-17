@@ -22,6 +22,10 @@ module.exports = {
     }).then(() => {
       return S3PublishedFileLister.listPublishedPreviews(site)
     }).then(branchNames => {
+      if (site.demoBranch) {
+        branchNames = branchNames.filter(branchName => branchName != site.demoBranch)
+        branchNames = [site.demoBranch].concat(branchNames)
+      }
       branchNames = [site.defaultBranch].concat(branchNames)
       return PublishedBranchSerializer.serialize(site, branchNames)
     }).then(branches => {

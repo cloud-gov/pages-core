@@ -47,8 +47,8 @@ const branchRow = ({ branch, site }) => (
 const previewURL = ({ branch, site }) => {
   if (branch.name === site.defaultBranch) {
     return site.viewLink
-  } else if (branch.name === site.demoBranch && site.demoDomain) {
-    return site.demoDomain
+  } else if (branch.name === site.demoBranch) {
+    return site.demoViewLink
   } else {
     return `/preview/${site.owner}/${site.repository}/${branch.name}/`
   }

@@ -19,6 +19,9 @@
     "demoDomain": {
       "type": "string"
     },
+    "demoViewLink": {
+      "type": "string"
+    },
     "config": {
       "type": "string"
     },
