@@ -220,9 +220,6 @@ paths:
               previewConfig:
                 type: string
                 description: Jekyll configs for the site in the preview environment
-              publicPreview:
-                type: string
-                description: Whether public previews are enabled for the site
               repository:
                 type: string
                 description: The name of the GitHub repository for the site
@@ -301,9 +298,6 @@ paths:
               previewConfig:
                 type: string
                 description: Jekyll configs for the site in the preview environment
-              publicPreview:
-                type: string
-                description: Whether public previews are enabled for the site
               repository:
                 type: string
                 description: The name of the GitHub repository for the site

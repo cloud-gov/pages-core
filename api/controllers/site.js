@@ -109,7 +109,6 @@ module.exports = {
         defaultBranch: params.defaultBranch,
         domain: params.domain,
         engine: params.engine,
-        publicPreview: params.publicPreview,
       })
     }).then(model => {
       let site = model

@@ -104,10 +104,6 @@ module.exports = (sequelize, DataTypes) => {
     previewConfig: {
       type: DataTypes.STRING,
     },
-    publicPreview: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
     publishedAt: {
       type: DataTypes.DATE,
     },

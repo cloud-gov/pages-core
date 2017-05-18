@@ -41,9 +41,6 @@
     "previewConfig": {
       "type": "string"
     },
-    "publicPreview": {
-      "type": "boolean"
-    },
     "publishedAt": {
       "type": "string",
       "format": "date-time"
