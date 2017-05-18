@@ -9,8 +9,8 @@ const buildContainerEnvironment = (build) => ({
   AWS_DEFAULT_REGION: s3Config.region,
   AWS_ACCESS_KEY_ID: s3Config.accessKeyId,
   AWS_SECRET_ACCESS_KEY: s3Config.secretAccessKey,
-  STATUS_CALLBACK: buildConfig.statusCallback.replace(":build_id", build.id).replace(":token", build.token),
-  LOG_CALLBACK: buildConfig.logCallback.replace(":build_id", build.id).replace(":token", build.token),
+  STATUS_CALLBACK: statusCallbackURL(build),
+  LOG_CALLBACK: buildLogCallbackURL(build),
   BUCKET: s3Config.bucket,
   BASEURL: baseURLForBuild(build),
   CACHE_CONTROL: buildConfig.cacheControl,
@@ -31,6 +31,24 @@ const siteConfig = (build) => {
   } else {
     return build.Site.previewConfig
   }
+}
+
+const statusCallbackURL = (build) => {
+  return [
+    url.resolve(config.app.hostname, "/v0/build"),
+    build.id,
+    "status",
+    build.token,
+  ].join("/")
+}
+
+const buildLogCallbackURL = (build) => {
+  return [
+    url.resolve(config.app.hostname, "/v0/build"),
+    build.id,
+    "log",
+    build.token,
+  ].join("/")
 }
 
 const defaultBranch = (build) => {
