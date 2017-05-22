@@ -19,7 +19,7 @@ We have a few environment variables that the application uses.
 In production, those variables are provided to the application either through the Cloud Foundry environment or through Cloud Foundry services.
 
 To inspect the way the environment is provided to the application in production and staging, look at `manifest.yml` and `staging_manifest.yml` respectively.
-To see how the application recieves those configurations, looks at `config/env/production.js`.
+To see how the application receives those configurations, looks at `config/env/production.js`.
 
 The following environment variables are set on the Cloud Foundry environment in the application manifest:
 
@@ -134,7 +134,7 @@ You will need to look at the staging environment to fetch the actual values.
 sqs: {
   accessKeyId: "ABC123",
   secretAccessKey: "456DEF",
-  region: "us-est-1",
+  region: "us-east-1",
   queue: "https://sqs.us-east-1.amazonaws.com/789/ghi",
 }
 ```
