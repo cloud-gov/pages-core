@@ -181,7 +181,7 @@ describe("Authentication request", () => {
       })
     })
 
-    it("should respond with a 401 if the authorization code is invalid", done => {
+    it("should redirect to the home page with the login_failed parameter if the authorization code is invalid", done => {
       nock("https://github.com")
         .post("/login/oauth/access_token", {
           client_id: config.passport.github.options.clientID,
@@ -192,15 +192,25 @@ describe("Authentication request", () => {
 
       request(app)
         .get("/auth/github/callback?code=invalid-code")
-        .expect(401, done)
+        .then(response => {
+          expect(response.statusCode).to.equal(302)
+          expect(response.header.location).to.equal('/?login_failed=1')
+          done()
+        })
+        .catch(done)
     })
 
-    it("should respond with a 401 if the user is not in a whitelisted GitHub organization", done => {
+    it("should redirect to the home page with the login_failed parameter if the user is not in a whitelisted GitHub organization", done => {
       githubAPINocks.githubAuth("unatuhorized-user", [{ id: 654321 }])
 
       request(app)
         .get("/auth/github/callback?code=auth-code-123abc")
-        .expect(401, done)
+        .then(response => {
+          expect(response.statusCode).to.equal(302)
+          expect(response.header.location).to.equal('/?login_failed=1')
+          done()
+        })
+        .catch(done)
     })
 
     it("should redirect to a redirect path if one is set in the session", done => {
