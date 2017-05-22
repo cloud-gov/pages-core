@@ -87,6 +87,9 @@ button.usa-button-outline.usa-button-hover,
 .upload-alert {
   margin-bottom: 1.5em; }
 
+.usa-alert-home {
+  margin-top: 0; }
+
 #secure-svg:hover #secure {
   -webkit-animation: shakeLock .3s 2.3s 1 ease both;
           animation: shakeLock .3s 2.3s 1 ease both; }

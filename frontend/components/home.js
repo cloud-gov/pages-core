@@ -24,7 +24,22 @@ class Home extends React.Component {
   }
 
   render() {
-    return <div dangerouslySetInnerHTML={{ __html: homeHTML }}/>
+    const hasLoginFailed = window.location.search.indexOf('login_failed') > -1;
+    return (
+      <main className="container">
+        {
+          hasLoginFailed ?
+          <div className="usa-alert usa-alert-error usa-alert-home" role="alert">
+            <div className="usa-alert-body">
+              <h3 className="usa-alert-heading">Unauthorized</h3>
+              <p className="usa-alert-text">Sorry, you are not authorized to log in to Federalist.</p>
+            </div>
+          </div>
+          : ""
+        }
+        <div dangerouslySetInnerHTML={{ __html: homeHTML }}/>
+      </main>
+    )
   }
 }
 

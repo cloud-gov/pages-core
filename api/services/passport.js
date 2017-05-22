@@ -56,7 +56,7 @@ passport.callback = (req, res) => {
         }
       })
     } else {
-      res.status(401).send("Unauthorized")
+      res.redirect("/?login_failed=1")
     }
   })
 }
