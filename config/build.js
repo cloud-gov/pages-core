@@ -1,9 +1,10 @@
 /*
  * Settings the build process
  */
-var envFn = require('../services/environment.js');
-var env = envFn();
+const envFn = require('../services/environment.js');
+
+const env = envFn();
 
 module.exports = {
   cacheControl: env.FEDERALIST_CACHE_CONTROL || 'max-age=60',
-}
+};
