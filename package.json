@@ -52,6 +52,7 @@
     "test:client:watch": "watch 'npm run test:client' ./frontend ./test/frontend",
     "coverage:client": "istanbul cover _mocha -- --compilers js:babel-register --recursive ./test/frontend",
     "lint": "eslint ./api/**/*.js ./config/**/*.js ./frontend/**/*.js ./migration/**/*.js ./script/**/*.js ./services/**/*.js",
+    "lint:diff": "./scripts/lint-diff.sh",
     "migrate:create": "node migrate.js create",
     "migrate:up": "node migrate.js up || true",
     "migrate:down": "node migrate.js down",
