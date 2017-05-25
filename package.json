@@ -58,7 +58,8 @@
     "uswds": "if [ -d ./node_modules/uswds ]; then npm run uswds:css && npm run uswds:images && npm run uswds:fonts; fi",
     "uswds:css": "cp node_modules/uswds/dist/css/uswds.min.css public/styles/",
     "uswds:images": "cp -r node_modules/uswds/dist/img/ ./public/images/uswds",
-    "uswds:fonts": "cp node_modules/uswds/dist/fonts/* ./public/fonts"
+    "uswds:fonts": "cp node_modules/uswds/dist/fonts/* ./public/fonts",
+    "export:sites": "node ./scripts/exportSitesAsCsv.js"
   },
   "main": "index.js",
   "repository": {
