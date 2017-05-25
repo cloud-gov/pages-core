@@ -28,7 +28,6 @@ module.exports = {
     },
   },
   postgres: {
-    adapter: 'sails-postgresql',
     database: process.env.TRAVIS ? "travis_ci_test" : "federalist-test",
   },
   log: {

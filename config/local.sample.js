@@ -13,7 +13,6 @@ if (process.env.NODE_ENV != "test") {
      },
     },
     postgres: {
-      adapter: 'sails-postgresql',
       database: 'federalist',
     },
     sqs: {
@@ -30,4 +29,3 @@ if (process.env.NODE_ENV != "test") {
     },
   }
 }
-
