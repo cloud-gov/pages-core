@@ -14,8 +14,8 @@ before_install:
 before_script:
   - "psql -c 'create database travis_ci_test;' -U postgres"
 script:
-  - npm test
   - scripts/lint-travis.sh
+  - npm test
 env:
   global:
   - CF_API="https://api.fr.cloud.gov"
