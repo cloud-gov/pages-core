@@ -33,26 +33,10 @@ const beforeValidate = (build) => {
 
 const completeJob = function(err) {
   const completedAt = new Date()
-  const { Site } = this.sequelize.models
 
-  if (err) {
-    return this.update({
-      state: "error",
-      error: completeJobErrorMessage(err),
-      completedAt: completedAt,
-    })
-  } else {
-    return this.update({
-      state: "success",
-      error: "",
-      completedAt: completedAt,
-    }).then(build => {
-      return Site.update(
-        { publishedAt: completedAt },
-        { where: { id: this.site } }
-      ).then(() => build)
-    })
-  }
+  return completeJobStateUpdate(err, this, completedAt).then(build => {
+    return completeJobSiteUpdate(build, completedAt).then(() => build)
+  })
 }
 
 const completeJobErrorMessage = (err) => {
@@ -63,6 +47,35 @@ const completeJobErrorMessage = (err) => {
     message = "An unknown error occured"
   }
   return sanitizeCompleteJobErrorMessage(message)
+}
+
+const completeJobSiteUpdate = (build, completedAt) => {
+  const { Site } = build.sequelize.models
+
+  if (build.state === "success") {
+    return Site.update(
+      { publishedAt: completedAt },
+      { where: { id: build.site } }
+    )
+  } else {
+    return Promise.resolve()
+  }
+}
+
+const completeJobStateUpdate = (err, build, completedAt) => {
+  if (err) {
+    return build.update({
+      state: "error",
+      error: completeJobErrorMessage(err),
+      completedAt: completedAt,
+    })
+  } else {
+    return build.update({
+      state: "success",
+      error: "",
+      completedAt: completedAt,
+    })
+  }
 }
 
 const generateToken = () => {
@@ -93,6 +106,9 @@ const toJSON = function() {
 module.exports = (sequelize, DataTypes) => {
   const Build = sequelize.define("Build", {
     branch: {
+      type: DataTypes.STRING,
+    },
+    commitSha: {
       type: DataTypes.STRING,
     },
     completedAt: {

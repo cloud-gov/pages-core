@@ -1,5 +1,6 @@
 const authorizer = require("../authorizers/build")
 const buildSerializer = require("../serializers/build")
+const GithubBuildStatusReporter = require("../services/GithubBuildStatusReporter")
 const siteAuthorizer = require("../authorizers/site")
 const { Build, Site } = require("../models")
 
@@ -39,9 +40,12 @@ module.exports = {
       branch: req.body["branch"],
       site: req.body["site"],
       user: req.user.id,
+      commitSha: req.body["commitSha"],
     }
     authorizer.create(req.user, params).then(() => {
       return Build.create(params)
+    }).then(build => {
+      return GithubBuildStatusReporter.reportBuildStatus(build).then(() => build)
     }).then(build => {
       return buildSerializer.serialize(build)
     }).then(buildJSON => {
@@ -90,6 +94,8 @@ module.exports = {
         return build.completeJob(message)
       }
     }).then(build => {
+      return GithubBuildStatusReporter.reportBuildStatus(build)
+    }).then(() => {
       res.ok()
     }).catch(err => {
       res.error(err)

@@ -20,7 +20,6 @@ class SiteSettings extends React.Component {
       previewConfig: site.previewConfig || '',
       defaultBranch: site.defaultBranch || '',
       domain: site.domain || '',
-      publicPreview: site.publicPreview,
       engine: site.engine,
     };
 
@@ -79,23 +78,6 @@ class SiteSettings extends React.Component {
               onChange={ this.onChange }
               type="text"
               value={ state.defaultBranch } />
-          </div>
-        </div>
-        <div className="usa-grid">
-          <div className="usa-width-one-whole">
-            <label>Draft previews</label>
-            <RadioInput
-              name="publicPreview"
-              value={true}
-              checked={state.publicPreview}
-              handleChange={this.onChange}
-              labelText="Allow anyone to see previews of draft sites" />
-            <RadioInput
-              name="publicPreview"
-              value={false}
-              checked={!state.publicPreview}
-              handleChange={this.onChange}
-              labelText="Only users with Federalist accounts can see previews" />
           </div>
         </div>
         <div className="usa-grid">

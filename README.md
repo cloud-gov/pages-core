@@ -3,9 +3,9 @@
 [![Code Climate](https://codeclimate.com/github/18F/federalist/badges/gpa.svg)](https://codeclimate.com/github/18F/federalist)
 [![Known Vulnerabilities](https://snyk.io/test/github/18F/federalist/badge.svg)](https://snyk.io/test/github/18F/federalist)
 
-***Under active development. Everything is subject to change. Interested in talking to us? [Join our public chat room](https://chat.18f.gov/?channel=federalist-public).***
+***Under active development. Everything is subject to change. Learn more at the [documentation site](https://federalist-docs.18f.gov/). Interested in talking to us? [Join our public chat room](https://chat.18f.gov/).***
 
-Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub, [Prose](https://github.com/prose/prose), and Amazon Web Services to provide a simple way for developers to launch new websites or more easily manage existing ones.
+Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub and Amazon Web Services to provide a simple way for developers to launch new static websites or more easily manage existing static websites.
 
 ## Getting started
 
@@ -19,7 +19,7 @@ We have a few environment variables that the application uses.
 In production, those variables are provided to the application either through the Cloud Foundry environment or through Cloud Foundry services.
 
 To inspect the way the environment is provided to the application in production and staging, look at `manifest.yml` and `staging_manifest.yml` respectively.
-To see how the application recieves those configurations, looks at `config/env/production.js`.
+To see how the application receives those configurations, looks at `config/env/production.js`.
 
 The following environment variables are set on the Cloud Foundry environment in the application manifest:
 
@@ -134,7 +134,7 @@ You will need to look at the staging environment to fetch the actual values.
 sqs: {
   accessKeyId: "ABC123",
   secretAccessKey: "456DEF",
-  region: "us-est-1",
+  region: "us-east-1",
   queue: "https://sqs.us-east-1.amazonaws.com/789/ghi",
 }
 ```
@@ -181,7 +181,6 @@ By default, the application should use local disk storage in place of a database
 ```
 connections: {
   postgres: {
-    adapter: 'sails-postgresql',
     database: 'federalist'
   }
 },
@@ -189,26 +188,6 @@ models: {
   connection: 'postgres'
 }
 ```
-
-## Architecture
-
-This application is primarily a JSON API server based on the [Sails.js](http://sailsjs.org/) framework. It handles authentication, managing users, sites, and builds, and receives webhook requests from GitHub.
-
-It automatically applies a webhook to the repository new sites and creates a new build on validated webhook requests.
-
-The front end of the application is a [React](https://facebook.github.io/react/) based application, that uses [browserify](http://www.browserify.org) in the build process. It is a very lightweight consumer of the Sails API.
-
-### Proof of concept
-
-The proof of concept application will have a web-based front-end to interface with the API and allow users to add new sites, configure them, and open them in Prose for editing.
-
-It will also route requests to the published static websites, including preview sites for each branch.
-
-### Future goals
-
-After the initial proof of concept, development will focus on scalability by moving to the AWS platform, using S3 for publishing, SQS for managing the publishing queue, and running publishing tasks on separate servers.
-
-Additional development will focus on improved collaboration features, such as built-in support for forking and merging branches for drafts of changes, and automatic configuration of Prose settings.
 
 ## Initial proposal
 

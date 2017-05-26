@@ -1,10 +1,4 @@
 {
-  "extends": "airbnb/legacy",
-  "rules": {
-    "comma-dangle": ["error", "always-multiline"],
-    "no-inner-declarations": ["error", "functions"],
-    "quotes": ["error", "double", { "allowTemplateLiterals": true }],
-    "semi": ["error", "never"],
-  },
+  "extends": "airbnb",
   "parser": "babel-eslint",
 }

@@ -59,7 +59,6 @@ partners:
 # Technologies used to build the project
 stack:
 - Node
-- Sails.js
 - Express
 - Backbone
 - browserify

@@ -58,10 +58,51 @@ describe("Published Branches API", () => {
       }).then(response => {
         validateAgainstJSONSchema("GET", "/site/{site_id}/published-branch", 200, response.body)
         const branchNames = response.body.map(branch => branch.name)
+        expect(branchNames).to.have.length(4)
         expect(branchNames).to.include(site.defaultBranch)
         expect(branchNames).to.include("abc")
         expect(branchNames).to.include("def")
         expect(branchNames).to.include("ghi")
+        done()
+      }).catch(done)
+    })
+
+    it("should list the demo branch if one is set on the site", done => {
+      let site
+      const userPromise = factory.user()
+      const sitePromise = factory.site({
+        users: Promise.all([userPromise]),
+        demoBranch: "demo"
+      })
+      const cookiePromise = session(userPromise)
+
+      AWSMocks.mocks.S3.listObjects = (params, callback) => {
+        expect(params.Bucket).to.equal(config.s3.bucket)
+        expect(params.Prefix).to.equal(`preview/${site.owner}/${site.repository}/`)
+        expect(params.Delimiter).to.equal("/")
+        callback(null, {
+          Contents: [],
+          CommonPrefixes: [
+            { Prefix: `preview/${site.owner}/${site.repository}/abc/` },
+          ],
+        })
+      }
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      }).then(promisedValues => {
+        site = promisedValues.site
+
+        return request(app)
+          .get(`/v0/site/${site.id}/published-branch`)
+          .set("Cookie", promisedValues.cookie)
+          .expect(200)
+      }).then(response => {
+        validateAgainstJSONSchema("GET", "/site/{site_id}/published-branch", 200, response.body)
+        const branchNames = response.body.map(branch => branch.name)
+        expect(branchNames).to.deep.equal([ site.defaultBranch, site.demoBranch, "abc" ])
         done()
       }).catch(done)
     })

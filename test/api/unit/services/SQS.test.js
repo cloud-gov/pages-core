@@ -191,7 +191,7 @@ describe("SQS", () => {
           return Build.findById(build.id, { include: [Site, User] })
         }).then(build => {
           const message = SQS.messageBodyForBuild(build)
-          expect(messageEnv(message, "BASEURL")).to.equal("/preview/owner/repo/demo")
+          expect(messageEnv(message, "BASEURL")).to.equal("/demo/owner/repo")
           done()
         }).catch(done)
       })
@@ -223,14 +223,14 @@ describe("SQS", () => {
         }).catch(done)
       })
 
-      it("should set SITE_PREFIX in the message to 'preview/:owner/:repo/:branch'", done => {
+      it("should set SITE_PREFIX in the message to 'demo/:owner/:repo'", done => {
         factory.site({ demoDomain: "", owner: "owner", repository: "repo", demoBranch: "demo" }).then(site => {
           return factory.build({ site: site, branch: "demo" })
         }).then(build => {
           return Build.findById(build.id, { include: [Site, User] })
         }).then(build => {
           const message = SQS.messageBodyForBuild(build)
-          expect(messageEnv(message, "SITE_PREFIX")).to.equal("preview/owner/repo/demo")
+          expect(messageEnv(message, "SITE_PREFIX")).to.equal("demo/owner/repo")
           done()
         }).catch(done)
       })
@@ -303,6 +303,22 @@ describe("SQS", () => {
         previewConfig: "plugins_dir: _preview_plugins",
       }).then(site => {
         return factory.build({ site, branch: "master" })
+      }).then(build => {
+        return Build.findById(build.id, { include: [Site, User] })
+      }).then(build => {
+        const message = SQS.messageBodyForBuild(build)
+        expect(messageEnv(message, "CONFIG")).to.equal("plugins_dir: _plugins")
+        done()
+      }).catch(done)
+    })
+
+    it("should set CONFIG in the message to the YAML config for the site on a demo branch", done => {
+      factory.site({
+        demoBranch: "demo",
+        config: "plugins_dir: _plugins",
+        previewConfig: "plugins_dir: _preview_plugins",
+      }).then(site => {
+        return factory.build({ site, branch: "demo" })
       }).then(build => {
         return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {

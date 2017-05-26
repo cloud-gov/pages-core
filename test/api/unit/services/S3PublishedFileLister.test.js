@@ -69,6 +69,36 @@ describe("S3PublishedFileLister", () => {
       }).catch(done)
     })
 
+    it("should resolve with a list of files for the site's demo branch", done => {
+      let site
+
+      AWSMocks.mocks.S3.listObjects = (params, callback) => {
+        const prefix = `demo/${site.owner}/${site.repository}`
+        expect(params.Bucket).to.equal(config.s3.bucket)
+        expect(params.Prefix).to.equal(prefix)
+
+        callback(null, {
+          Contents: [
+            { Key: `${prefix}/abc`, Size: 123 },
+            { Key: `${prefix}/abc/def`, Size: 456 },
+            { Key: `${prefix}/ghi`, Size: 789 },
+          ]
+        })
+      }
+
+      factory.site({ demoBranch: "demo-branch-name" }).then(model => {
+        site = model
+        return S3PublishedFileLister.listPublishedFilesForBranch(site, "demo-branch-name")
+      }).then(publishedFiles => {
+        expect(publishedFiles).to.deep.equal([
+          { name: "abc", size: 123 },
+          { name: "abc/def", size: 456 },
+          { name: "ghi", size: 789 },
+        ])
+        done()
+      }).catch(done)
+    })
+
     it("should resolve with a list of files for a preview branch", done => {
       let site
 

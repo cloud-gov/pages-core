@@ -11,12 +11,14 @@ describe("S3SiteRemover", () => {
   })
 
   describe(".removeSite(site)", () => {
-    it("should delete all objects in the `site/<org>/<repo>` and `preview/<org>/<repo> directories", done => {
+    it("should delete all objects in the `site/<org>/<repo>`, `demo/<org>/<repo>`, and `preview/<org>/<repo> directories", done => {
       const siteObjectsToDelete = []
+      const demoObjectsToDelete = []
       const previewObjectsToDelete = []
       let site
       let objectsWereDeleted = false
       let siteObjectsWereListed = false
+      let demoObjectWereListed = false
       let previewObjectsWereListed = false
 
       AWSMocks.mocks.S3.listObjects = (params, cb) => {
@@ -25,6 +27,11 @@ describe("S3SiteRemover", () => {
           siteObjectsWereListed = true
           cb(null, {
             Contents: siteObjectsToDelete.map(Key => ({ Key }))
+          })
+        } else if (params.Prefix === `demo/${site.owner}/${site.repository}`) {
+          demoObjectWereListed = true
+          cb(null, {
+            Contents: demoObjectsToDelete.map(Key => ({ Key }))
           })
         } else if (params.Prefix === `preview/${site.owner}/${site.repository}`) {
           previewObjectsWereListed = true
@@ -36,7 +43,7 @@ describe("S3SiteRemover", () => {
       AWSMocks.mocks.S3.deleteObjects = (params, cb) => {
         expect(params.Bucket).to.equal(config.s3.bucket)
 
-        const objectsToDelete = siteObjectsToDelete.concat(previewObjectsToDelete)
+        const objectsToDelete = siteObjectsToDelete.concat(demoObjectsToDelete).concat(previewObjectsToDelete)
         expect(params.Delete.Objects).to.have.length(objectsToDelete.length)
         params.Delete.Objects.forEach(object => {
           const index = objectsToDelete.indexOf(object.Key)
@@ -54,6 +61,10 @@ describe("S3SiteRemover", () => {
         siteObjectsToDelete.push(`${sitePrefix}/index.html`)
         siteObjectsToDelete.push(`${sitePrefix}/redirect`)
         siteObjectsToDelete.push(`${sitePrefix}/redirect/index.html`)
+        const demoPrefix = `demo/${site.owner}/${site.repository}`
+        demoObjectsToDelete.push(`${demoPrefix}/index.html`)
+        demoObjectsToDelete.push(`${demoPrefix}/redirect`)
+        demoObjectsToDelete.push(`${demoPrefix}/redirect/index.html`)
         const previewPrefix = `preview/${site.owner}/${site.repository}`
         previewObjectsToDelete.push(`${previewPrefix}/index.html`)
         previewObjectsToDelete.push(`${previewPrefix}/redirect`)

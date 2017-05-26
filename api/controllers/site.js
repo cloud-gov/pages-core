@@ -109,7 +109,6 @@ module.exports = {
         defaultBranch: params.defaultBranch,
         domain: params.domain,
         engine: params.engine,
-        publicPreview: params.publicPreview,
       })
     }).then(model => {
       let site = model
@@ -119,7 +118,7 @@ module.exports = {
         branch: site.defaultBranch,
       })
     }).then(() => {
-      if (site.demoDomain && site.demoBranch) {
+      if (site.demoBranch) {
         return Build.create({
           user: req.user.id,
           site: siteId,

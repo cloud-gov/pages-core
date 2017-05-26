@@ -11,9 +11,10 @@ const s3Client = new AWS.S3({
 const removeSite = site => {
   return Promise.all([
     getObjectsWithPrefix(`site/${site.owner}/${site.repository}`),
+    getObjectsWithPrefix(`demo/${site.owner}/${site.repository}`),
     getObjectsWithPrefix(`preview/${site.owner}/${site.repository}`),
   ]).then(objects => {
-    objects = objects[0].concat(objects[1])
+    objects = [].concat.apply([], objects)
     return deleteObjects(objects)
   })
 }

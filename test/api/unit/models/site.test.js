@@ -43,10 +43,10 @@ describe("Site model", () => {
     })
 
     context("for the demo branch", () => {
-      it("should return a federalist preview link if there is no demo domain", done => {
+      it("should return an s3 demo link if there is no demo domain", done => {
         factory.site({ demoBranch: "demo-branch" }).then(site => {
           const viewLink = site.viewLinkForBranch("demo-branch")
-          expect(viewLink).to.equal(`http://localhost:1337/preview/${site.owner}/${site.repository}/demo-branch`)
+          expect(viewLink).to.equal(`${s3BaseURL}/demo/${site.owner}/${site.repository}`)
           done()
         }).catch(done)
       })
@@ -67,7 +67,7 @@ describe("Site model", () => {
       it("should return a federalist preview link", done => {
         factory.site().then(site => {
           const viewLink = site.viewLinkForBranch("preview-branch")
-          expect(viewLink).to.equal(`http://localhost:1337/preview/${site.owner}/${site.repository}/preview-branch`)
+          expect(viewLink).to.equal(`http://localhost:1338/preview/${site.owner}/${site.repository}/preview-branch`)
           done()
         }).catch(done)
       })

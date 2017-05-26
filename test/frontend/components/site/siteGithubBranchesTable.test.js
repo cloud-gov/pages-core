@@ -59,14 +59,14 @@ describe("<SiteGithubBranchesTable/>", () => {
     ]
     props.site ={
       demoBranch: "demo",
-      demoDomain: "demo.example.com",
+      demoViewLink: "demo.example.com",
     };
 
     const wrapper = shallow(<SiteGithubBranchesTable {...props}/>);
     const link = wrapper.find("a");
 
     expect(link.contains("View")).to.be.true;
-    expect(link.prop("href")).to.equal(props.site.demoDomain);
+    expect(link.prop("href")).to.equal(props.site.demoViewLink);
   })
 
   it("renders the the preview URL for preview branches", () => {
