@@ -1,13 +1,15 @@
-var path = require('path');
+/* eslint no-console: 0 */
+const path = require('path');
 
-var _ = require('underscore');
-var jsonToCSV = require('json-to-csv');
-var sails = require('sails');
+const _ = require('underscore');
+const jsonToCSV = require('json-to-csv');
+
+const { User, Site } = require('../api/models');
 
 function resolveDestination(d) {
-  var relativePathRegex = /^\.\//;
-  var fullPathRegex = /^[~/]/;
-  var destination = d;
+  const relativePathRegex = /^\.\//;
+  const fullPathRegex = /^[~/]/;
+  let destination = d;
   if (d.match(relativePathRegex)) {
     destination = ['..', d].join('/');
     return path.resolve([__dirname, destination].join('/'));
@@ -18,67 +20,45 @@ function resolveDestination(d) {
 }
 
 function sitesFromUsers(users) {
-  return _.flatten(users.map(function(user) {
-    return user.sites.map(function(site) {
-      return {
-        id: site.id,
-        github: [site.owner, site.repository].join('/'),
-        domain: site.domain,
-        users: [user.username]
-      };
-    });
-  }));
+  return _.flatten(users.map(user => user.Sites.map(site => ({
+    id: site.id,
+    github: [site.owner, site.repository].join('/'),
+    domain: site.domain,
+    users: [user.username],
+  }))));
 }
 
 function consolidateOnSiteId(sites) {
-  var ids = sites.map(function(site) {
-    return site.id;
-  });
+  const ids = sites.map(site => site.id);
 
-  return ids.map(function(id, i) {
-    var sitesById = _.where(sites, { id: id });
-    var users = sitesById.map(function(site) {
-      return site.users[0];
-    });
+  return ids.map((id, i) => {
+    const sitesById = _.where(sites, { id });
+    const users = sitesById.map(site => site.users[0]);
 
-    return Object.assign({}, sites[i], { users: users });
+    return Object.assign({}, sites[i], { users });
   });
 }
 
-function main(err, app) {
-  var args = Array.prototype.slice.call(process.argv);
-  var destination = resolveDestination(args[2] || './current-sites.csv');
 
-  if (err) return console.log('Error occurred lifting Sails app', err);
+const args = Array.prototype.slice.call(process.argv);
+const destination = resolveDestination(args[2] || './current-sites.csv');
+console.log('Final output can be found at', destination);
+console.log('\tUse npm run export:sites -- /other/path/file.csv to change');
 
-  console.log('Final output can be found at', destination);
-  console.log('\tUse npm run export -- /other/path/file.csv to change');
-
-  return User.find({})
-    .populate('sites')
-    .then(sitesFromUsers)
-    .then(consolidateOnSiteId)
-    .then(function(sites) {
-      return sites.map(function(site) {
-        return Object.assign({}, site, { users: site.users.join(', ') })
-      });
-    })
-    .then(function(sites) {
-      console.log('Found ' + sites.length + ' unique sites');
-      return sites;
-    })
-    .then(function(sites) {
-      return jsonToCSV(sites, destination)
-    })
-    .then(function() {
-      console.log('Current sites written to file', destination);
-    })
-    .then(function() {
-      sails.lower();
-    })
-    .catch(function(err) {
-      console.log('An error occurred', err);
-    });
-}
-
-sails.lift({}, main);
+return User.findAll({ include: [Site] })
+  .then(sitesFromUsers)
+  .then(consolidateOnSiteId)
+  .then(sites => sites.map(site => Object.assign({}, site, { users: site.users.join(', ') })))
+  .then((sites) => {
+    console.log(`Found ${sites.length} unique sites`);
+    return sites;
+  })
+  .then(sites => jsonToCSV(sites, destination))
+  .then(() => {
+    console.log('Current sites written to file', destination);
+    process.exit(0);
+  })
+  .catch((err) => {
+    console.log('An error occurred:', err);
+    process.exit(1);
+  });

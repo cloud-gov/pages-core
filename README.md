@@ -181,7 +181,6 @@ By default, the application should use local disk storage in place of a database
 ```
 connections: {
   postgres: {
-    adapter: 'sails-postgresql',
     database: 'federalist'
   }
 },

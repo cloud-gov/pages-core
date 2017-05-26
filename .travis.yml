@@ -13,6 +13,9 @@ before_install:
   - rvm install ruby-1.9.3-p551
 before_script:
   - "psql -c 'create database travis_ci_test;' -U postgres"
+script:
+  - scripts/lint-travis.sh
+  - npm test
 env:
   global:
   - CF_API="https://api.fr.cloud.gov"

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+DIFF_TARGET_BRANCH="${DIFF_TARGET_BRANCH:-staging}"
+echo "Linting diff against \"$DIFF_TARGET_BRANCH\" branch"
+
+CHANGED_FILES_LIST=`git diff-index --name-only $DIFF_TARGET_BRANCH | grep -E '.js$|.jsx$' | tr '\n' ' '`
+
+FAILURES=0
+
+for FILE in $CHANGED_FILES_LIST; do
+  `npm bin`/eslint $FILE
+  if [ "$?" != 0 ]; then
+    FAILURES=$(($FAILURES+1))
+  fi
+done
+
+echo "ESLint found $FAILURES file(s) with errors"
+
+exit $FAILURES

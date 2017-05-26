@@ -15,12 +15,8 @@ env:
   NEW_RELIC_APP_NAME: federalist-prod
   NODE_ENV: production
   APP_ENV: production
-  APP_HOSTNAME: https://federalist.fr.cloud.gov
+  APP_HOSTNAME: https://federalist.18f.gov
   LOG_LEVEL: info
   NPM_CONFIG_PRODUCTION: true
   NODE_MODULES_CACHE: false
-  APP_NAME: federalist
-  APP_DOMAIN: fr.cloud.gov
-  FEDERALIST_BUILD_STATUS_CALLBACK: https://federalist.fr.cloud.gov/v0/build/:build_id/status/:token
-  FEDERALIST_BUILD_LOG_CALLBACK: https://federalist.fr.cloud.gov/v0/build/:build_id/log/:token
   FEDERALIST_PREVIEW_HOSTNAME: https://federalist-proxy.app.cloud.gov
