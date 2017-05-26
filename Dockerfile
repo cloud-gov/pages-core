@@ -11,7 +11,6 @@ ENV BRANCH= \
   FEDERALIST_S3_BUCKET= \
   AWS_ACCESS_KEY_ID= \
   AWS_SECRET_ACCESS_KEY= \
-  SAILS_LOG_LEVEL= \
   PORT=3000
 
 # Run additional npm install scripts
