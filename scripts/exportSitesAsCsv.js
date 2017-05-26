@@ -56,7 +56,9 @@ return User.findAll({ include: [Site] })
   .then(sites => jsonToCSV(sites, destination))
   .then(() => {
     console.log('Current sites written to file', destination);
+    process.exit(0);
   })
   .catch((err) => {
-    console.log('An error occurred', err);
+    console.log('An error occurred:', err);
+    process.exit(1);
   });
