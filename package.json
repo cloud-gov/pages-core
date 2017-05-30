@@ -6,6 +6,7 @@
   "keywords": [],
   "dependencies": {
     "aws-sdk": "^2.1.36",
+    "babel-loader": "^7.0.0",
     "body-parser": "^1.16.1",
     "cfenv": "^1.0.0",
     "connect-session-sequelize": "^4.1.0",
@@ -16,6 +17,7 @@
     "express-session": "^1.5.0",
     "express-winston": "^2.3.0",
     "github": "^0.2.4",
+    "html-loader": "^0.4.5",
     "json-to-csv": "^1.0.0",
     "method-override": "^2.3.7",
     "moment": "^2.10.3",
@@ -28,6 +30,7 @@
     "sequelize": "^3.30.0",
     "underscore": "^1.8.3",
     "urlsafe-base64": "^1.0.0",
+    "webpack": "^2.6.1",
     "whatwg-fetch": "^1.0.0",
     "winston": "^2.3.1",
     "yamljs": "^0.2.8"
@@ -35,6 +38,7 @@
   "scripts": {
     "postinstall": "npm run uswds && npm run migrate:up",
     "build": "npm run browserify && npm run sass && npm run autoprefixer",
+    "webpack": "webpack",
     "start": "node index.js",
     "debug": "node debug index.js",
     "browserify": "browserify frontend/main.js -o public/js/bundle.js -t [ stringify --extensions [ .html ] ] -t [ babelify --presets [ es2015 react stage-2 ] ]",
