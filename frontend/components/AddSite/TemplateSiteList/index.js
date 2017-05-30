@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import TemplateSite from './templateSite';
 
 const propTypes = {
-  templates: React.PropTypes.object.isRequired,
-  handleSubmitTemplate: React.PropTypes.func.isRequired
+  templates: PropTypes.object.isRequired,
+  handleSubmitTemplate: PropTypes.func.isRequired
 };
 
 const MAX_CELLS_PER_ROW = 3;

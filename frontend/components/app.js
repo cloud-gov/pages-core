@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import store from '../store';
 import alertActions from '../actions/alertActions';
@@ -69,7 +70,7 @@ class App extends React.Component {
 }
 
 App.contextTypes = {
-  state: React.PropTypes.object
+  state: PropTypes.object
 };
 
 export default App;

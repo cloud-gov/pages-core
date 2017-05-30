@@ -1,14 +1,15 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import LinkButton from '../linkButton';
 
 const propTypes = {
-  repository: React.PropTypes.string.isRequired, // Name of the repo
-  owner: React.PropTypes.string.isRequired,
-  title: React.PropTypes.string.isRequired, // Title of the section we are on
-  siteId: React.PropTypes.number.isRequired,
-  branch: React.PropTypes.string.isRequired,
-  fileName: React.PropTypes.string,
-  viewLink: React.PropTypes.string
+  repository: PropTypes.string.isRequired, // Name of the repo
+  owner: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired, // Title of the section we are on
+  siteId: PropTypes.number.isRequired,
+  branch: PropTypes.string.isRequired,
+  fileName: PropTypes.string,
+  viewLink: PropTypes.string
 };
 
 const defaultPropTypes = {

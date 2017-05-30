@@ -1,18 +1,19 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const propTypes = {
-  name: React.PropTypes.string.isRequired,
-  owner: React.PropTypes.string.isRequired,
-  branch: React.PropTypes.string.isRequired,
-  repo: React.PropTypes.string.isRequired,
-  example: React.PropTypes.string.isRequired,
-  title: React.PropTypes.string.isRequired,
-  description: React.PropTypes.string.isRequired,
-  thumb: React.PropTypes.string.isRequired,
-  active: React.PropTypes.number.isRequired,
-  handleChooseActive: React.PropTypes.func.isRequired,
-  handleSubmit: React.PropTypes.func.isRequired,
-  index: React.PropTypes.number.isRequired
+  name: PropTypes.string.isRequired,
+  owner: PropTypes.string.isRequired,
+  branch: PropTypes.string.isRequired,
+  repo: PropTypes.string.isRequired,
+  example: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  thumb: PropTypes.string.isRequired,
+  active: PropTypes.number.isRequired,
+  handleChooseActive: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  index: PropTypes.number.isRequired
 };
 
 class TemplateSite extends React.Component {

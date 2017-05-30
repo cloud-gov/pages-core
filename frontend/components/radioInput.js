@@ -1,11 +1,12 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const propTypes = {
-  name: React.PropTypes.string.isRequired,
-  value: React.PropTypes.bool,
-  checked: React.PropTypes.bool,
-  labelText: React.PropTypes.string,
-  handleChange: React.PropTypes.func.isRequired
+  name: PropTypes.string.isRequired,
+  value: PropTypes.bool,
+  checked: PropTypes.bool,
+  labelText: PropTypes.string,
+  handleChange: PropTypes.func.isRequired
 };
 
 class RadioInput extends React.Component {

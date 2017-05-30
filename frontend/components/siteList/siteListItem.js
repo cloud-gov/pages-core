@@ -1,14 +1,15 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router';
 import PublishedState from './publishedState';
 
 const propTypes = {
-  site: React.PropTypes.shape({
-    repository: React.PropTypes.string,
-    owner: React.PropTypes.string,
-    id: React.PropTypes.number,
-    publishedAt: React.PropTypes.string,
-    viewLink: React.PropTypes.string
+  site: PropTypes.shape({
+    repository: PropTypes.string,
+    owner: PropTypes.string,
+    id: PropTypes.number,
+    publishedAt: PropTypes.string,
+    viewLink: PropTypes.string
   })
 };
 

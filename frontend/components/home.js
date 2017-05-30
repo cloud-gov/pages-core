@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from "react"
 import { pushHistory } from "../actions/routeActions"
 
 const homeHTML = require("./home.html")
 
 const propTypes = {
-  storeState: React.PropTypes.object
+  storeState: PropTypes.object
 }
 
 class Home extends React.Component {

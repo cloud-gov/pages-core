@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router';
 
 const propTypes = {
-  href: React.PropTypes.string,
-  icon: React.PropTypes.string
+  href: PropTypes.string,
+  icon: PropTypes.string
 };
 
 const SideNavItem = ({ href, icon, linkText }) =>

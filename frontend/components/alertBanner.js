@@ -1,8 +1,9 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const propTypes = {
-  message: React.PropTypes.string,
-  status: React.PropTypes.string
+  message: PropTypes.string,
+  status: PropTypes.string
 };
 
 const AlertBanner = ({message, status = 'info'}) =>

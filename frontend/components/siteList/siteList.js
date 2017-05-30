@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import AlertBanner from '../alertBanner';
 import SiteListItem from './siteListItem';
@@ -5,7 +6,7 @@ import LinkButton from '../linkButton';
 import LoadingIndicator from '../loadingIndicator';
 
 const propTypes = {
-  storeState: React.PropTypes.object
+  storeState: PropTypes.object
 };
 
 const getSites = (sitesState) => {
