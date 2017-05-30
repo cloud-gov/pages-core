@@ -32,7 +32,7 @@ class Home extends React.Component {
           <div className="usa-alert usa-alert-error usa-alert-home" role="alert">
             <div className="usa-alert-body">
               <h3 className="usa-alert-heading">Unauthorized</h3>
-              <p className="usa-alert-text">Apologies; you don't have access to Federalist! Please contact the Federalist team if this is in error.</p>
+              <p className="usa-alert-text">Apologies; you don&apos;t have access to Federalist! Please contact the Federalist team if this is in error.</p>
             </div>
           </div>
           : ""
