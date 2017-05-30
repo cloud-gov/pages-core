@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import moment from "moment";
 
 const propTypes = {
-  site: React.PropTypes.shape({
-    publishedAt: React.PropTypes.string,
+  site: PropTypes.shape({
+    publishedAt: PropTypes.string,
   })
 };
 

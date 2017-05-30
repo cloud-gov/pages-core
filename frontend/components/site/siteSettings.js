@@ -1,4 +1,5 @@
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import SiteGithubBranchesTable from "./siteGithubBranchesTable";
 import RadioInput from '../radioInput';
@@ -217,8 +218,8 @@ class SiteSettings extends React.Component {
 }
 
 SiteSettings.propTypes = {
-  site: React.PropTypes.object,
-  viewLink: React.PropTypes.string
+  site: PropTypes.object,
+  viewLink: PropTypes.string
 };
 
 export default SiteSettings;

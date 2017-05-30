@@ -1,16 +1,17 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router';
 
 const propTypes = {
-  alt: React.PropTypes.string,
-  children: React.PropTypes.oneOfType([
-    React.PropTypes.object,
-    React.PropTypes.array
+  alt: PropTypes.string,
+  children: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.array
   ]),
-  className: React.PropTypes.string,
-  href: React.PropTypes.string,
-  target: React.PropTypes.string,
-  text: React.PropTypes.string
+  className: PropTypes.string,
+  href: PropTypes.string,
+  target: PropTypes.string,
+  text: PropTypes.string
 }
 
 const LinkButton = ({ className, children, text, href, alt, target }) =>

@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router';
 
 const propTypes = {
-  username: React.PropTypes.oneOfType([
-    React.PropTypes.string,
-    React.PropTypes.object
+  username: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object
   ])
 };
 

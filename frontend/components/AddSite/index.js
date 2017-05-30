@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import TemplateSiteList from './TemplateSiteList';
@@ -9,12 +10,12 @@ import siteActions from '../../actions/siteActions';
 import templates from '../../../config/templates';
 
 const propTypes = {
-  storeState: React.PropTypes.shape({
-    user: React.PropTypes.shape({
-      username: React.PropTypes.string,
-      id: React.PropTypes.number
+  storeState: PropTypes.shape({
+    user: PropTypes.shape({
+      username: PropTypes.string,
+      id: PropTypes.number
     }),
-    error: React.PropTypes.string
+    error: PropTypes.string
   })
 }
 

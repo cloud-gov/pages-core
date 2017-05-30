@@ -1,8 +1,9 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import SideNavItem from './sideNavItem';
 
 const propTypes = {
-  siteId: React.PropTypes.string
+  siteId: PropTypes.string
 };
 
 export const sideNavPaths = {

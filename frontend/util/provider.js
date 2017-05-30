@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 class Provider extends React.Component {
@@ -18,7 +19,7 @@ class Provider extends React.Component {
 }
 
 Provider.childContextTypes = {
-  state: React.PropTypes.object
+  state: PropTypes.object
 };
 
 export default Provider;

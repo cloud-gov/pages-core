@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import LoadingIndicator from '../loadingIndicator';
 
@@ -64,8 +65,8 @@ const renderErrorState = () => (
 )
 
 SiteGithubBranchesTable.propTypes = {
-  site: React.PropTypes.object.isRequired,
-  branches: React.PropTypes.object.isRequired,
+  site: PropTypes.object.isRequired,
+  branches: PropTypes.object.isRequired,
 };
 
 export default SiteGithubBranchesTable;

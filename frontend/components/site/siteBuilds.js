@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router';
 import LoadingIndicator from '../loadingIndicator'
@@ -115,7 +116,7 @@ class SiteBuilds extends React.Component {
 }
 
 SiteBuilds.propTypes = {
-  site: React.PropTypes.object
+  site: PropTypes.object
 };
 
 export default SiteBuilds;

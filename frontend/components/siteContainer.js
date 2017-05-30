@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router';
 
@@ -9,8 +10,8 @@ import PagesHeader from './site/pagesHeader';
 import AlertBanner from './alertBanner';
 
 const propTypes = {
-  storeState: React.PropTypes.object,
-  params: React.PropTypes.object //{id, branch, splat, fileName}
+  storeState: PropTypes.object,
+  params: PropTypes.object //{id, branch, splat, fileName}
 };
 
 class SiteContainer extends React.Component {
