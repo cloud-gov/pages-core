@@ -1,12 +1,18 @@
 import path from 'path';
 
-// TODO: enable production settings when NODE_ENV is "production"
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import AssetsPlugin from 'assets-webpack-plugin';
+
+const extractSass = new ExtractTextPlugin({
+  filename: 'styles/styles.[contenthash].css',
+});
 
 export default {
-  entry: './frontend/main.js',
+  entry: './frontend/main.jsx',
+  devtool: 'source-map',
   output: {
-    filename: 'bundle.js', // TODO: add hash to this
-    path: path.resolve(__dirname, 'public', 'js'),
+    filename: 'js/bundle.[hash].js',
+    path: path.resolve(__dirname, 'public'),
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -22,7 +28,11 @@ export default {
         test: /\.html$/,
         loader: 'html-loader',
       },
-      // TODO: SASS
+      {
+        test: /\.scss$/,
+        use: extractSass.extract(['css-loader?sourceMap', 'postcss-loader?sourceMap', 'sass-loader?sourceMap']),
+      },
     ],
   },
+  plugins: [extractSass, new AssetsPlugin()],
 };

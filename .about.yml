@@ -60,8 +60,7 @@ partners:
 stack:
 - Node
 - Express
-- Backbone
-- browserify
+- Webpack
 - AWS
 
 # Brief description of the project's outcomes
