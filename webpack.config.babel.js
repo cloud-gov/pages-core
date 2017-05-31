@@ -1,5 +1,6 @@
 import path from 'path';
 
+import autoprefixer from 'autoprefixer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import AssetsPlugin from 'assets-webpack-plugin';
 
@@ -30,7 +31,17 @@ export default {
       },
       {
         test: /\.scss$/,
-        use: extractSass.extract(['css-loader?sourceMap', 'postcss-loader?sourceMap', 'sass-loader?sourceMap']),
+        use: extractSass.extract([
+          'css-loader?sourceMap',
+          {
+            loader: 'postcss-loader',
+            options: {
+              sourceMap: true,
+              plugins: [autoprefixer],
+            },
+          },
+          'sass-loader?sourceMap',
+        ]),
       },
     ],
   },
