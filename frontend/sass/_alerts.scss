@@ -5,3 +5,15 @@
 .usa-alert-home {
   margin-top: 0;
 }
+
+.usa-alert-delete {
+  background-image: none;
+
+  .usa-alert-body {
+    padding-left: 0;
+  }
+
+  button {
+    margin-left: 0.5em;
+  }
+}
