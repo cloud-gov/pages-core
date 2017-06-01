@@ -50,12 +50,7 @@ export default {
       },
       {
         test: /\.(gif|png|jpe?g|svg|ttf|woff2?|eot)$/i,
-        use: [{
-          loader: 'file-loader',
-          options: {
-            outputPath: './webpackAssets/',
-          },
-        }],
+        loader: 'file-loader?name=/styles/webpackAssets/[hash].[ext]',
       },
     ],
   },
