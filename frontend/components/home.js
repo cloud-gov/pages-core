@@ -1,33 +1,60 @@
-import React from "react"
-import { pushHistory } from "../actions/routeActions"
+/* global window:true */
 
-const homeHTML = require("./home.html")
+import React from 'react';
+import { pushHistory } from '../actions/routeActions';
+
+const homeHTML = require('./home.html');
 
 const propTypes = {
-  storeState: React.PropTypes.object
-}
+  storeState: React.PropTypes.object,
+};
+
+const defaultProps = {
+  storeState: {},
+};
 
 class Home extends React.Component {
   componentDidMount() {
-    this.redirectForLoggedInUser()
+    this.redirectForLoggedInUser();
   }
 
   componentDidUpdate() {
-    this.redirectForLoggedInUser()
+    this.redirectForLoggedInUser();
   }
 
   redirectForLoggedInUser() {
-    const userState = this.props.storeState.user
+    const userState = this.props.storeState.user;
     if (!userState.isLoading && userState.data) {
-      pushHistory("/sites")
+      pushHistory('/sites');
     }
   }
 
   render() {
-    return <div dangerouslySetInnerHTML={{ __html: homeHTML }}/>
+    const hasLoginFailed = window.location.search.indexOf('login_failed') > -1;
+    return (
+      <main className="container">
+        {
+          hasLoginFailed ?
+            <div className="usa-alert usa-alert-error usa-alert-home" role="alert">
+              <div className="usa-alert-body">
+                <h3 className="usa-alert-heading">Unauthorized</h3>
+                <p className="usa-alert-text">
+                  Apologies; you don&apos;t have access to Federalist!
+                  Please contact the Federalist team if this is in error.
+                </p>
+              </div>
+            </div>
+          : ''
+        }
+        <div
+          dangerouslySetInnerHTML={{ __html: homeHTML }} // eslint-disable-line react/no-danger
+        />
+      </main>
+    );
   }
 }
 
-Home.propTypes = propTypes
+Home.propTypes = propTypes;
+Home.defaultProps = defaultProps;
 
-export default Home
+export default Home;
