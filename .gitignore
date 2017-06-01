@@ -24,7 +24,9 @@
 config/local.js
 
 # Webpack-generated assets
+public/js/bundle.js
 public/js/bundle.*.js*
+public/styles/styles.css
 public/styles/styles.*.css*
 webpack-assets.json
 
