@@ -202,13 +202,14 @@ class SiteSettings extends React.Component {
           </div>
         </div>
         <div className="usa-grid">
-          <div className="usa-alert usa-alert-error" role="alert">
-            Delete this site from Federalist?
-            <button
-              className="usa-button usa-button-secondary"
-              alt="delete the site { site.repository }"
-              onClick={this.onDelete}
-            >Delete</button>
+          <div className="usa-alert usa-alert-error usa-alert-delete" role="alert">
+            <div className="usa-alert-body">
+              Delete this site from Federalist?
+              <button
+                className="usa-button usa-button-secondary"
+                onClick={this.onDelete}
+              >Delete</button>
+            </div>
           </div>
         </div>
       </form>
