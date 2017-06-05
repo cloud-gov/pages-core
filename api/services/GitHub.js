@@ -114,6 +114,8 @@ const handleWebhookError = (error) => {
 }
 
 const parseGithubErrorMessage = (error) => {
+  let githubError = "Encounted an unexpected GitHub error"
+
   try {
     githubError = JSON.parse(error.message).errors[0].message
   } catch(e) {
@@ -139,7 +141,7 @@ module.exports = {
 
   createRepo: (user, owner, repository) => {
     return githubClient(user.githubAccessToken).then(github => {
-      if (user.username === owner) {
+      if (user.username.toLowerCase() === owner.toLowerCase()) {
         return createRepoForUser(github, {
           name: repository,
         })

@@ -88,6 +88,22 @@ describe("GitHub", () => {
       }).catch(done)
     })
 
+    it("should create a user repository even if the case for the owner and username don't match", done => {
+      let createRepoNock
+
+      factory.user().then(user => {
+        createRepoNock = githubAPINocks.createRepoForUser({
+          accessToken: user.accessToken,
+          repo: "repo-name",
+        })
+
+        return GitHub.createRepo(user, user.username.toUpperCase(), "repo-name")
+      }).then(() => {
+        expect(createRepoNock.isDone()).to.equal(true)
+        done()
+      }).catch(done)
+    })
+
     it("should reject if the user is not authorized to create a repository", done => {
       factory.user().then(user => {
         githubAPINocks.createRepoForOrg({
