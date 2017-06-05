@@ -74,6 +74,7 @@
     "babel-preset-stage-2": "^6.16.0",
     "babel-register": "^6.9.0",
     "chai": "^3.5.0",
+    "concurrently": "^3.4.0",
     "cookie": "^0.3.1",
     "css-loader": "^0.28.4",
     "enzyme": "^2.4.1",
