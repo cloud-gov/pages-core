@@ -23,18 +23,17 @@
 
 config/local.js
 
-# Generated CSS
-public/styles/styles.css
-public/styles/google-fonts.css
-
-# Browserify bundle
+# Webpack-generated assets
 public/js/bundle.js
+public/js/bundle.*.js*
+public/styles/styles.css
+public/styles/styles.*.css*
+webpack-assets.json
 
 # USWDS assets
 public/images/uswds
 public/styles/uswds.css
 public/styles/uswds.min.css
-public/styles/google-fonts.css
 public/fonts/merriweather*
 public/fonts/sourcesanspro*
 
