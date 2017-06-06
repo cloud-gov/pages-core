@@ -26,5 +26,15 @@ describe('Main Site', () => {
         })
         .catch(done);
     });
+
+    it('should include a cache-control header', (done) => {
+      request(app)
+      .get('/')
+      .then((response) => {
+        expect(response.headers).to.have.property('cache-control', 'max-age=0');
+        done();
+      })
+      .catch(done);
+    });
   });
 });
