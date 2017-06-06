@@ -263,7 +263,31 @@ describe("Build API", () => {
         done()
       }).catch(done)
     })
-  })
+
+    it("shouldn't list more than 100 builds", (done) => {
+      const userPromise = factory.user();
+      const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+      const buildsPromise = Promise.all(
+        Array(110).fill(0).map(() => factory.build({ site: sitePromise }))
+      );
+      const cookiePromise = session(userPromise);
+
+      Promise.props({
+        site: sitePromise,
+        cookie: cookiePromise,
+        builds: buildsPromise,
+      }).then(({ site, cookie }) =>
+        request(app)
+          .get(`/v0/site/${site.id}/build`)
+          .set('Cookie', cookie)
+          .expect(200)
+      ).then((response) => {
+        expect(response.body).to.be.an('array');
+        expect(response.body).to.have.length(100);
+        done();
+      }).catch(done);
+    });
+  });
 
   describe("POST /v0/build/:id/status/:token", () => {
     var postBuildStatus = (options) => {
