@@ -165,7 +165,7 @@ There are really two applications in one repo here. Right now we're OK with that
 If you are working on the front-end of the application, the things you need to know are:
 
 0. It is a React based application
-0. It is built with `browserify` and uses `watchify` to build on changes
+0. It is built with `Webpack`
 0. It lives in `/assets/app`
 
 You can use `npm run watch` to get the project built and running. This will set up `watchify` to run when front end files change and will set up the server to reload on any file change (front end included)
