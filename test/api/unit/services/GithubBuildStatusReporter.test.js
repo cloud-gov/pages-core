@@ -61,6 +61,37 @@ describe('GithubBuildStatusReporter', () => {
       });
     });
 
+    context('with every build', () => {
+      const origAppEnv = process.env.APP_ENV;
+      after(() => {
+        // reset process.env.APP_ENV to its original value
+        process.env.APP_ENV = origAppEnv;
+      });
+
+      it('should set status context to "federalist/build" when APP_ENV is "production"', (done) => {
+        let statusNock;
+
+        factory.build({
+          state: 'success',
+          site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
+          commitSha: '456def',
+        }).then((build) => {
+          process.env.APP_ENV = 'production';
+          statusNock = githubAPINocks.status({
+            owner: 'test-owner',
+            repo: 'test-repo',
+            sha: '456def',
+            state: 'success',
+          });
+
+          return GithubBuildStatusReporter.reportBuildStatus(build);
+        }).then(() => {
+          expect(statusNock.isDone()).to.be.true;
+          done();
+        }).catch(done);
+      });
+    });
+
     context('with a build in the success state', () => {
       it("should report that the status is 'success'", (done) => {
         let statusNock;

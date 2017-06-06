@@ -3,7 +3,6 @@ const logger = require('winston');
 const url = require('url');
 const config = require('../../config');
 
-const environment = require('../../services/environment');
 const { Build, Site, User } = require('../models');
 
 const loadSiteUserAccessToken = site => site.getUsers({
@@ -72,8 +71,8 @@ const reportBuildStatus = (build) => {
   }).then((accessToken) => {
     const githubClient = authenticateGithubClient(accessToken);
 
-    const context = environment.env === 'production'
-      ? 'federalist/build' : `federalist-${environment.env}/build`;
+    const context = process.env.APP_ENV === 'production'
+      ? 'federalist/build' : `federalist-${process.env.APP_ENV}/build`;
 
     const options = {
       user: site.owner,

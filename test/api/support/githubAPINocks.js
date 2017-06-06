@@ -147,6 +147,14 @@ const status = ({ accessToken, owner, repo, sha, state, targetURL } = {}) => {
     if (targetURL && body.target_url !== targetURL) {
       return false
     }
+
+    const appEnv = process.env.APP_ENV;
+    if (appEnv === 'production' && body.context !== 'federalist/build') {
+      return false;
+    } else if (appEnv !== 'production' && body.context !== `federalist-${process.env.APP_ENV}/build`) {
+      return false;
+    }
+
     return true
   })
 

@@ -1,5 +1,5 @@
 /*
- * Settings the build process
+ * Settings for the build process
  */
 const envFn = require('../services/environment.js');
 
