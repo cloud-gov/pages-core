@@ -5,7 +5,6 @@
   "description": "",
   "keywords": [],
   "dependencies": {
-    "assets-webpack-plugin": "^3.5.1",
     "aws-sdk": "^2.1.36",
     "babel-loader": "^7.0.0",
     "babel-polyfill": "^6.16.0",
@@ -36,18 +35,17 @@
     "sequelize": "^3.30.0",
     "underscore": "^1.8.3",
     "urlsafe-base64": "^1.0.0",
+    "uswds": "^0.9.0",
     "whatwg-fetch": "^1.0.0",
     "winston": "^2.3.1",
     "yamljs": "^0.2.8"
   },
   "scripts": {
-    "postinstall": "npm run uswds && npm run migrate:up",
+    "postinstall": "npm run migrate:up",
     "build": "webpack -p",
     "start": "node index.js",
     "debug": "node debug index.js",
-    "watch": "npm run uswds && node index.js & npm run watch:client",
-    "watch:server": "nodemon index.js --ignore frontend/ --ignore .tmp/ --ignore node_modules/",
-    "watch:client": "webpack --progress --colors --watch",
+    "watch": "concurrently --kill-others --raw \"nodemon index.js --config nodemon.json\" \"webpack --progress --colors --watch\"",
     "test": "npm run test:prepare && npm run test:server && npm run test:client",
     "test:prepare": "NODE_ENV=test npm run migrate:up && npm run build",
     "test:server": "NODE_ENV=test mocha --timeout 1000 test/api/bootstrap.test.js test/api/unit/**/*.test.js test/api/requests/**/*.test.js",
@@ -59,10 +57,6 @@
     "migrate:create": "node migrate.js create",
     "migrate:up": "node migrate.js up || true",
     "migrate:down": "node migrate.js down",
-    "uswds": "if [ -d ./node_modules/uswds ]; then npm run uswds:css && npm run uswds:images && npm run uswds:fonts; fi",
-    "uswds:css": "cp node_modules/uswds/dist/css/uswds.min.css public/styles/",
-    "uswds:images": "cp -r node_modules/uswds/dist/img/ ./public/images/uswds",
-    "uswds:fonts": "cp node_modules/uswds/dist/fonts/* ./public/fonts",
     "export:sites": "node ./scripts/exportSitesAsCsv.js"
   },
   "main": "index.js",
@@ -80,6 +74,7 @@
     "babel-preset-stage-2": "^6.16.0",
     "babel-register": "^6.9.0",
     "chai": "^3.5.0",
+    "concurrently": "^3.4.0",
     "cookie": "^0.3.1",
     "css-loader": "^0.28.4",
     "enzyme": "^2.4.1",
@@ -89,6 +84,7 @@
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.10.3",
     "extract-text-webpack-plugin": "^2.1.0",
+    "file-loader": "^0.11.1",
     "istanbul": "^1.1.0-alpha.1",
     "json-schema-deref-sync": "^0.3.3",
     "jsonschema": "^1.1.1",
@@ -106,9 +102,9 @@
     "sinon": "1.17.2",
     "supertest": "^2.0.1",
     "supertest-as-promised": "^4.0.1",
-    "uswds": "^0.9.0",
     "watch": "^0.19.2",
-    "webpack": "^2.6.1"
+    "webpack": "^2.6.1",
+    "webpack-manifest-plugin": "^1.1.0"
   },
   "engines": {
     "node": "6.x.x",

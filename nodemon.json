@@ -1,0 +1,4 @@
+{
+  "ignore": ["frontend/", ".tmp/", "node_modules/"],
+  "extensions": ["js", "json"]
+}
