@@ -1,31 +1,53 @@
 import React from 'react';
 import { Link } from 'react-router';
-import LoadingIndicator from '../loadingIndicator'
+import LoadingIndicator from '../loadingIndicator';
 import { duration, timeFrom } from '../../util/datetime';
 import buildActions from '../../actions/buildActions';
 
 class SiteBuilds extends React.Component {
+  static getUsername(build) {
+    if (build.user) {
+      return build.user.username;
+    }
+    return '';
+  }
+
+  static restartClicked(event, build) {
+    event.preventDefault();
+    buildActions.restartBuild(build);
+  }
+
+  static buildLogsLink(build) {
+    return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>Logs</Link>;
+  }
+
+  static renderLoadingState() {
+    return <LoadingIndicator />;
+  }
+
+  static renderEmptyState() {
+    return <p>This site does not have any builds</p>;
+  }
+
+  static restartLink(build) {
+    return (
+      <button
+        onClick={e => SiteBuilds.restartClicked(e, build)}
+      >
+        Restart
+      </button>
+    );
+  }
+
   componentDidMount() {
-    buildActions.fetchBuilds(this.props.site)
+    buildActions.fetchBuilds(this.props.site);
   }
 
   builds() {
     if (this.props.builds.isLoading || !this.props.builds.data) {
       return [];
-    } else {
-      return this.props.builds.data
     }
-  }
-
-  render() {
-    const builds = this.builds()
-    if (this.props.builds.isLoading) {
-      return this.renderLoadingState()
-    } else if (!builds.length) {
-      return this.renderEmptyState()
-    } else {
-      return this.renderBuildsTable()
-    }
+    return this.props.builds.data;
   }
 
   renderBuildsTable() {
@@ -43,7 +65,7 @@ class SiteBuilds extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {this.builds().map(build => {
+            {this.builds().map((build) => {
               const rowClass = `usa-alert-${build.state}`;
               let message;
 
@@ -60,65 +82,55 @@ class SiteBuilds extends React.Component {
               }
 
               return (
-                <tr key={ build.id } className={ rowClass }>
-                  <td scope="row">{ build.branch }</td>
-                  <td>{ this.getUsername(build) }</td>
+                <tr key={build.id} className={rowClass}>
+                  <td>{ build.branch }</td>
+                  <td>{ SiteBuilds.getUsername(build) }</td>
                   <td>{ timeFrom(build.completedAt) }</td>
                   <td>{ duration(build.createdAt, build.completedAt) }</td>
                   <td>{ message }</td>
                   <td>
-                    { this.restartLink(build) }<br/>
-                    { this.buildLogsLink(build) }
+                    { SiteBuilds.restartLink(build) }<br />
+                    { SiteBuilds.buildLogsLink(build) }
                   </td>
                 </tr>
-              )
+              );
             })}
           </tbody>
         </table>
         { this.builds().length >= 100 ? <p>Build list may have been shortened</p> : null }
       </div>
-    )
+    );
   }
 
-  getUsername(build) {
-    if (build.user) {
-      return build.user.username
-    } else {
-      return ""
+  render() {
+    const builds = this.builds();
+    if (this.props.builds.isLoading) {
+      return SiteBuilds.renderLoadingState();
+    } else if (!builds.length) {
+      return SiteBuilds.renderEmptyState();
     }
-  }
-
-  restartLink(build) {
-    return (
-      <a
-        href="#" alt="Restart this build"
-        onClick={ (e) => this.restartClicked(e, build) }
-      >
-        Restart
-      </a>
-    )
-  }
-
-  restartClicked(event, build) {
-    event.preventDefault()
-    buildActions.restartBuild(build);
-  }
-
-  buildLogsLink(build) {
-    return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>Logs</Link>
-  }
-
-  renderLoadingState() {
-    return <LoadingIndicator/>
-  }
-
-  renderEmptyState() {
-    return <p>This site does not have any builds</p>
+    return this.renderBuildsTable();
   }
 }
 
 SiteBuilds.propTypes = {
-  site: React.PropTypes.object
+  builds: React.PropTypes.arrayOf(React.PropTypes.shape({
+    isLoading: React.PropTypes.boolean,
+    data: React.PropTypes.arrayOf(React.PropTypes.shape({
+      id: React.PropTypes.number,
+      state: React.PropTypes.string,
+      error: React.PropTypes.string,
+      branch: React.PropTypes.string,
+      completedAt: React.PropTypes.string,
+      createdAt: React.PropTypes.string,
+      user: React.PropTypes.shape({
+        username: React.PropTypes.string,
+      }),
+    })),
+  })).isRequired,
+  site: React.PropTypes.shape({
+    id: React.PropTypes.number,
+  }).isRequired,
 };
 
 export default SiteBuilds;
