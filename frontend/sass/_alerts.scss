@@ -7,13 +7,22 @@
 }
 
 .usa-alert-delete {
-  background-image: none;
-
-  .usa-alert-body {
-    padding-left: 0;
-  }
+  background-color: $alert-delete-bg-color;
 
   button {
     margin-left: 0.5em;
   }
 }
+
+/*
+ * Borrowed from USWDS 1.2.1
+ * TODO: remove once USWDS dependency is upgraded
+ */
+.usa-alert-body p:last-child {
+  margin-bottom: 0.8rem;
+}
+
+.usa-alert-body p:first-child {
+  margin-top: 0.8rem;
+}
+/* end borrowing */

@@ -64,11 +64,11 @@ class TemplateSite extends React.Component {
 
     return (
       <div className="template-block">
-        <div className="usa-alert usa-alert-info">
-          <div className="usa-alert-heading">
+        <div className="well">
+          <div className="well-heading">
             <h3>{props.title}</h3>
           </div>
-          <div className="usa-alert-text">
+          <div className="well-text">
             <a data-action="name-site" className="thumbnail">
               <img
                 src={props.thumb}
