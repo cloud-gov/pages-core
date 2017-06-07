@@ -7,7 +7,7 @@ const propTypes = {
 
 const defaultProps = {
   message: null,
-  status: null,
+  status: 'info',
 };
 
 const AlertBanner = ({ message, status = 'info' }) => {
