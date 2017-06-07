@@ -2,10 +2,15 @@ import path from 'path';
 
 import autoprefixer from 'autoprefixer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
-import AssetsPlugin from 'assets-webpack-plugin';
+import ManifestPlugin from 'webpack-manifest-plugin';
 
-const extractSass = new ExtractTextPlugin({
+const extractStyles = new ExtractTextPlugin({
   filename: 'styles/styles.[contenthash].css',
+  allChunks: true,
+});
+
+const manifestPlugin = new ManifestPlugin({
+  fileName: '../webpack-manifest.json',
 });
 
 export default {
@@ -31,7 +36,7 @@ export default {
       },
       {
         test: /\.scss$/,
-        use: extractSass.extract([
+        use: extractStyles.extract([
           'css-loader?sourceMap',
           {
             loader: 'postcss-loader',
@@ -43,7 +48,11 @@ export default {
           'sass-loader?sourceMap',
         ]),
       },
+      {
+        test: /\.(gif|png|jpe?g|svg|ttf|woff2?|eot)$/i,
+        loader: 'file-loader?name=/styles/webpackAssets/[hash].[ext]',
+      },
     ],
   },
-  plugins: [extractSass, new AssetsPlugin()],
+  plugins: [extractStyles, manifestPlugin],
 };

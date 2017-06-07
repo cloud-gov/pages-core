@@ -28,14 +28,9 @@ public/js/bundle.js
 public/js/bundle.*.js*
 public/styles/styles.css
 public/styles/styles.*.css*
-webpack-assets.json
-
-# USWDS assets
-public/images/uswds
-public/styles/uswds.css
-public/styles/uswds.min.css
-public/fonts/merriweather*
-public/fonts/sourcesanspro*
+public/styles/uswds.*.css*
+webpack-manifest.json
+webpackAssets
 
 # test coverage reports
 coverage
