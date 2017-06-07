@@ -160,7 +160,7 @@ describe('Authentication request', () => {
       it('should create and authenticate the user', (done) => {
         const githubUserID = Math.floor(Math.random() * 10000);
 
-        githubAPINocks.accessToken();
+        githubAPINocks.getAccessToken();
         githubAPINocks.user({ githubUserID });
         githubAPINocks.userOrganizations();
 
