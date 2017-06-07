@@ -1,117 +1,149 @@
-const nock = require("nock")
-const config = require("../../../config")
+const nock = require('nock');
+const config = require('../../../config');
 
-const accessToken = ({ authorizationCode, accessToken, scope } = {}) => {
-  authorizationCode = authorizationCode || "auth-code-123abc"
-  accessToken = accessToken || "access-token-123abc"
+const getAccessToken = ({ authorizationCode, accessToken, scope } = {}) => {
+  /* eslint-disable no-param-reassign */
+  authorizationCode = authorizationCode || 'auth-code-123abc';
+  accessToken = accessToken || 'access-token-123abc';
 
-  if (scope && typeof scope !== "string") {
-    scope = scope.join(",")
+  if (scope && typeof scope !== 'string') {
+    scope = scope.join(',');
   } else {
-    scope = "user,repo"
+    scope = 'user,repo';
   }
+  /* eslint-enable no-param-reassign */
 
-  return nock("https://github.com")
-    .post("/login/oauth/access_token", (body) => {
+  return nock('https://github.com')
+    .post('/login/oauth/access_token', (body) => {
       const expectedBody = {
         client_id: config.passport.github.options.clientID,
         client_secret: config.passport.github.options.clientSecret,
         code: authorizationCode,
-      }
+      };
       return body.client_id === expectedBody.client_id &&
         body.client_secret === expectedBody.client_secret &&
-        body.code === expectedBody.code
+        body.code === expectedBody.code;
     })
     .reply(200, {
-      token_type: "bearer",
-      scope: scope,
-      access_token: accessToken
-    })
-}
+      token_type: 'bearer',
+      scope,
+      access_token: accessToken,
+    });
+};
 
 const createRepoForOrg = ({ accessToken, org, repo, response } = {}) => {
-  let createRepoNock = nock("https://api.github.com")
+  let createRepoNock = nock('https://api.github.com');
 
   if (org && repo) {
     createRepoNock = createRepoNock.post(`/orgs/${org}/repos`, {
       name: repo,
-    })
+    });
   } else {
-    createRepoNock = createRepoNock.post(/\/orgs\/.*\/repos/)
+    createRepoNock = createRepoNock.post(/\/orgs\/.*\/repos/);
   }
 
   if (accessToken) {
-    createRepoNock = createRepoNock.query({ access_token: accessToken })
+    createRepoNock = createRepoNock.query({ access_token: accessToken });
   } else {
-    createRepoNock = createRepoNock.query(true)
+    createRepoNock = createRepoNock.query(true);
   }
 
   const typicalResponse = {
     owner: { login: org },
     name: repo,
+  };
+
+  let resp = response || 201;
+  if (typeof resp === 'number') {
+    resp = [resp, typicalResponse];
+  } else if (resp[1] === undefined) {
+    resp[1] = typicalResponse;
   }
 
-  response = response || 201
-  if (typeof response === "number") {
-    response = [response, typicalResponse]
-  } else if (response[1] === undefined) {
-    response[1] = typicalResponse
-  }
-
-  return createRepoNock.reply(...response)
-}
+  return createRepoNock.reply(...resp);
+};
 
 const createRepoForUser = ({ accessToken, repo, response } = {}) => {
-  let createRepoNock = nock("https://api.github.com")
+  let createRepoNock = nock('https://api.github.com');
 
   if (repo) {
-    createRepoNock = createRepoNock.post("/user/repos", {
+    createRepoNock = createRepoNock.post('/user/repos', {
       name: repo,
-    })
+    });
   } else {
-    createRepoNock = createRepoNock.post("/user/repos")
+    createRepoNock = createRepoNock.post('/user/repos');
   }
 
   if (accessToken) {
-    createRepoNock = createRepoNock.query({ access_token: accessToken })
+    createRepoNock = createRepoNock.query({ access_token: accessToken });
   } else {
-    createRepoNock = createRepoNock.query(true)
+    createRepoNock = createRepoNock.query(true);
   }
 
   const typicalResponse = {
-    owner: { login: "your-name-here" },
+    owner: { login: 'your-name-here' },
     name: repo,
+  };
+
+  let resp = response || 201;
+  if (typeof resp === 'number') {
+    resp = [resp, typicalResponse];
+  } else if (resp[1] === undefined) {
+    resp[1] = typicalResponse;
   }
 
-  response = response || 201
-  if (typeof response === "number") {
-    response = [response, typicalResponse]
-  } else if (response[1] === undefined) {
-    response[1] = typicalResponse
-  }
+  return createRepoNock.reply(...resp);
+};
 
-  return createRepoNock.reply(...response)
-}
+const user = ({ accessToken, githubUserID, username, email } = {}) => {
+  /* eslint-disable no-param-reassign */
+  accessToken = accessToken || 'access-token-123abc';
+
+  const userID = githubUserID || Math.floor(Math.random() * 10000);
+  username = username || `user-${userID}`;
+  email = email || `${username}@example.com`;
+  /* eslint-enable no-param-reassign */
+
+  return nock('https://api.github.com')
+    .get(`/user?access_token=${accessToken}`)
+    .reply(200, {
+      email,
+      login: username,
+      id: githubUserID,
+    });
+};
+
+const userOrganizations = ({ accessToken, organizations, response } = {}) => {
+  /* eslint-disable no-param-reassign */
+  accessToken = accessToken || 'access-token-123abc';
+  organizations = organizations || [{ id: 123456 }];
+  /* eslint-enable no-param-reassign */
+
+  return nock('https://api.github.com')
+    .get(`/user/orgs?access_token=${accessToken}`)
+    .reply(response || 200, organizations);
+};
 
 const githubAuth = (username, organizations) => {
-  accessToken()
-  user({ username })
-  userOrganizations({ organizations })
-}
+  getAccessToken();
+  user({ username });
+  userOrganizations({ organizations });
+};
 
+// eslint-disable-next-line no-shadow
 const repo = ({ accessToken, owner, repo, response } = {}) => {
-  let webhookNock = nock("https://api.github.com")
+  let webhookNock = nock('https://api.github.com');
 
   if (owner && repo) {
-    webhookNock = webhookNock.get(`/repos/${owner}/${repo}`)
+    webhookNock = webhookNock.get(`/repos/${owner}/${repo}`);
   } else {
-    webhookNock = webhookNock.get(/\/repos\/.*\/.*/)
+    webhookNock = webhookNock.get(/\/repos\/.*\/.*/);
   }
 
   if (accessToken) {
-    webhookNock = webhookNock.query({ access_token: accessToken })
+    webhookNock = webhookNock.query({ access_token: accessToken });
   } else {
-    webhookNock = webhookNock.query(true)
+    webhookNock = webhookNock.query(true);
   }
 
   const typicalResponse = {
@@ -119,73 +151,58 @@ const repo = ({ accessToken, owner, repo, response } = {}) => {
       admin: true,
       push: true,
       pull: true,
-    }
+    },
+  };
+
+  let resp = response || 201;
+  if (typeof resp === 'number') {
+    resp = [resp, typicalResponse];
+  } else if (resp[1] === undefined) {
+    resp[1] = typicalResponse;
   }
 
-  response = response || 201
-  if (typeof response === "number") {
-    response = [response, typicalResponse]
-  } else if (response[1] === undefined) {
-    response[1] = typicalResponse
-  }
+  return webhookNock.reply(...resp);
+};
 
-  return webhookNock.reply(...response)
-}
-
+// eslint-disable-next-line no-shadow
 const status = ({ accessToken, owner, repo, sha, state, targetURL } = {}) => {
-  let path
+  let path;
   if (owner && repo && sha) {
-    path = `/repos/${owner}/${repo}/statuses/${sha}`
+    path = `/repos/${owner}/${repo}/statuses/${sha}`;
   } else {
-    path = /\/repos\/.+\/.+\/statuses\/.+/
+    path = /\/repos\/.+\/.+\/statuses\/.+/;
   }
 
-  let statusNock = nock("https://api.github.com").post(path, body => {
-    if (state && body.state != state) {
-      return false
+  let statusNock = nock('https://api.github.com').post(path, (body) => {
+    if (state && body.state != state) { // eslint-disable-line eqeqeq
+      return false;
     }
     if (targetURL && body.target_url !== targetURL) {
-      return false
+      return false;
     }
-    return true
-  })
+
+    const appEnv = config.app.app_env;
+    if (appEnv === 'production' && body.context !== 'federalist/build') {
+      return false;
+    } else if (appEnv !== 'production' && body.context !== `federalist-${appEnv}/build`) {
+      return false;
+    }
+
+    return true;
+  });
 
   if (accessToken) {
-    statusNock = statusNock.query({ access_token: accessToken })
+    statusNock = statusNock.query({ access_token: accessToken });
   } else {
-    statusNock = statusNock.query(true)
+    statusNock = statusNock.query(true);
   }
 
-  return statusNock.reply(201, { id: 1 })
-}
+  return statusNock.reply(201, { id: 1 });
+};
 
-const user = ({ accessToken, githubUserID, username, email } = {}) => {
-  accessToken = accessToken || "access-token-123abc"
-
-  userID = githubUserID || Math.floor(Math.random() * 10000)
-  username = username || `user-${userID}`
-  email = email || `${username}@example.com`
-
-  return nock("https://api.github.com")
-    .get(`/user?access_token=${accessToken}`)
-    .reply(200, {
-      email: email,
-      login: username,
-      id: githubUserID
-    })
-}
-
-const userOrganizations = ({ accessToken, organizations, response } = {}) => {
-  accessToken = accessToken || "access-token-123abc"
-  organizations = organizations || [{ id: 123456 }]
-
-  return nock("https://api.github.com")
-    .get(`/user/orgs?access_token=${accessToken}`)
-    .reply(response || 200, organizations)
-}
-
+// eslint-disable-next-line no-shadow
 const webhook = ({ accessToken, owner, repo, response } = {}) => {
-  let webhookNock = nock("https://api.github.com")
+  let webhookNock = nock('https://api.github.com');
 
   if (owner && repo) {
     webhookNock = webhookNock.post(`/repos/${owner}/${repo}/hooks`, {
@@ -196,27 +213,27 @@ const webhook = ({ accessToken, owner, repo, response } = {}) => {
         secret: config.webhook.secret,
         content_type: 'json',
       },
-    })
+    });
   } else {
-    webhookNock = webhookNock.post(/\/repos\/.*\/.*\/hooks/)
+    webhookNock = webhookNock.post(/\/repos\/.*\/.*\/hooks/);
   }
 
   if (accessToken) {
-    webhookNock = webhookNock.query({ access_token: accessToken })
+    webhookNock = webhookNock.query({ access_token: accessToken });
   } else {
-    webhookNock = webhookNock.query(true)
+    webhookNock = webhookNock.query(true);
   }
 
-  response = response || 201
-  if (typeof response === "number") {
-    response = [response]
+  let resp = response || 201;
+  if (typeof resp === 'number') {
+    resp = [resp];
   }
 
-  return webhookNock.reply(...response)
-}
+  return webhookNock.reply(...resp);
+};
 
 module.exports = {
-  accessToken,
+  getAccessToken,
   createRepoForOrg,
   createRepoForUser,
   githubAuth,
@@ -225,4 +242,4 @@ module.exports = {
   user,
   userOrganizations,
   webhook,
-}
+};
