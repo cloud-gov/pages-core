@@ -38,6 +38,11 @@ app.use(bodyParser.json());
 app.use(methodOverride());
 app.use(responses);
 
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'max-age=0');
+  next();
+});
+
 if (logger.levels[logger.level] >= 2) {
   app.use(expressWinston.logger({
     transports: [
