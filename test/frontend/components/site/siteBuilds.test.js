@@ -71,6 +71,16 @@ describe("<SiteBuilds/>", () => {
     expect(wrapper.find("p").contains("This site does not have any builds")).to.be.true;
   })
 
+  it('should render a paragraph about truncation if 100 or more builds are present', () => {
+    props.builds.data = Array(100).fill(1).map((val, index) =>
+      Object.assign(build, { id: index })
+    );
+
+    const wrapper = shallow(<SiteBuilds {...props} />);
+    expect(wrapper.find('p')).to.have.length(1);
+    expect(wrapper.find('p').contains('Build list may have been shortened')).to.be.true;
+  });
+
   it("should render a loading state if the builds are loading", () => {
     props = { builds: { isLoading: true } }
 

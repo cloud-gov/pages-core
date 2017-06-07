@@ -30,50 +30,53 @@ class SiteBuilds extends React.Component {
 
   renderBuildsTable() {
     return (
-      <table className="usa-table-borderless build-log-table">
-        <thead>
-          <tr>
-            <th scope="col">Branch</th>
-            <th scope="col">User</th>
-            <th scope="col">Completed</th>
-            <th scope="col">Duration</th>
-            <th scope="col">Message</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {this.builds().map(build => {
-            const rowClass = `usa-alert-${build.state}`;
-            let message;
+      <div>
+        <table className="usa-table-borderless build-log-table">
+          <thead>
+            <tr>
+              <th scope="col">Branch</th>
+              <th scope="col">User</th>
+              <th scope="col">Completed</th>
+              <th scope="col">Duration</th>
+              <th scope="col">Message</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.builds().map(build => {
+              const rowClass = `usa-alert-${build.state}`;
+              let message;
 
-            switch (build.state) {
-              case 'error':
-                message = build.error;
-                break;
-              case 'processing':
-                message = 'This build is in progress';
-                break;
-              default:
-                message = 'The build completed successfully.';
-                break;
-            }
+              switch (build.state) {
+                case 'error':
+                  message = build.error;
+                  break;
+                case 'processing':
+                  message = 'This build is in progress';
+                  break;
+                default:
+                  message = 'The build completed successfully.';
+                  break;
+              }
 
-            return (
-              <tr key={ build.id } className={ rowClass }>
-                <td scope="row">{ build.branch }</td>
-                <td>{ this.getUsername(build) }</td>
-                <td>{ timeFrom(build.completedAt) }</td>
-                <td>{ duration(build.createdAt, build.completedAt) }</td>
-                <td>{ message }</td>
-                <td>
-                  { this.restartLink(build) }<br/>
-                  { this.buildLogsLink(build) }
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+              return (
+                <tr key={ build.id } className={ rowClass }>
+                  <td scope="row">{ build.branch }</td>
+                  <td>{ this.getUsername(build) }</td>
+                  <td>{ timeFrom(build.completedAt) }</td>
+                  <td>{ duration(build.createdAt, build.completedAt) }</td>
+                  <td>{ message }</td>
+                  <td>
+                    { this.restartLink(build) }<br/>
+                    { this.buildLogsLink(build) }
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+        { this.builds().length >= 100 ? <p>Build list may have been shortened</p> : null }
+      </div>
     )
   }
 
