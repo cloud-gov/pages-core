@@ -23,9 +23,6 @@ const AlertBanner = ({ message, status = 'info' }) => {
           role="alert"
         >
           <div className="usa-alert-body">
-            <div className="usa-alert-heading">
-              <h3>Heading</h3>
-            </div>
             <p className="usa-alert-text">
               { message }
             </p>
