@@ -62,10 +62,10 @@ describe('GithubBuildStatusReporter', () => {
     });
 
     context('with every build', () => {
-      const origAppEnv = process.env.APP_ENV;
+      const origAppEnv = config.app.app_env;
       after(() => {
-        // reset process.env.APP_ENV to its original value
-        process.env.APP_ENV = origAppEnv;
+        // reset config.app.app_env to its original value
+        config.app.app_env = origAppEnv;
       });
 
       it('should set status context to "federalist/build" when APP_ENV is "production"', (done) => {
@@ -76,7 +76,7 @@ describe('GithubBuildStatusReporter', () => {
           site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
           commitSha: '456def',
         }).then((build) => {
-          process.env.APP_ENV = 'production';
+          config.app.app_env = 'production';
           statusNock = githubAPINocks.status({
             owner: 'test-owner',
             repo: 'test-repo',

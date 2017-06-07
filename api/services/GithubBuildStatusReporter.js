@@ -71,8 +71,8 @@ const reportBuildStatus = (build) => {
   }).then((accessToken) => {
     const githubClient = authenticateGithubClient(accessToken);
 
-    const context = process.env.APP_ENV === 'production'
-      ? 'federalist/build' : `federalist-${process.env.APP_ENV}/build`;
+    const context = config.app.app_env === 'production'
+      ? 'federalist/build' : `federalist-${config.app.app_env}/build`;
 
     const options = {
       user: site.owner,

@@ -181,10 +181,10 @@ const status = ({ accessToken, owner, repo, sha, state, targetURL } = {}) => {
       return false;
     }
 
-    const appEnv = process.env.APP_ENV;
+    const appEnv = config.app.app_env;
     if (appEnv === 'production' && body.context !== 'federalist/build') {
       return false;
-    } else if (appEnv !== 'production' && body.context !== `federalist-${process.env.APP_ENV}/build`) {
+    } else if (appEnv !== 'production' && body.context !== `federalist-${appEnv}/build`) {
       return false;
     }
 
