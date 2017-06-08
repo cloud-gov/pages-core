@@ -7,10 +7,16 @@ const webpackAssets = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
 
 module.exports = {
   index(req, res) {
-    res.render('index.html', {
-      siteWideError: SiteWideErrorLoader.loadSiteWideError(),
+    const context = {
+      siteWideError: null,
       jsBundleName: webpackAssets['main.js'],
       cssBundleName: webpackAssets['main.css'],
-    });
+    };
+
+    if (req.session.authenticated) {
+      context.siteWideError = SiteWideErrorLoader.loadSiteWideError();
+    }
+
+    res.render('index.html', context);
   },
 };
