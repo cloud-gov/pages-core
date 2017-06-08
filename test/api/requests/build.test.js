@@ -323,7 +323,7 @@ describe('Build API', () => {
         done();
       })
       .catch(done);
-    });
+    }).timeout(2000); // this test can take a long time because of all the builds it creates
   });
 
   describe('POST /v0/build/:id/status/:token', () => {
