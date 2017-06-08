@@ -53,8 +53,6 @@ class TemplateSite extends React.Component {
   }
 
   render() {
-    // const { props } = this;
-
     return (
       <div className="template-block">
         <div className="well">
