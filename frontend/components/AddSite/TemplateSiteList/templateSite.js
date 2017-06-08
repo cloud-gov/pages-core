@@ -1,10 +1,10 @@
 import React from 'react';
 
+import { getSafeRepoName } from '../../../util';
+
 const propTypes = {
   name: React.PropTypes.string.isRequired,
-  owner: React.PropTypes.string.isRequired,
-  branch: React.PropTypes.string.isRequired,
-  repo: React.PropTypes.string.isRequired,
+  defaultOwner: React.PropTypes.string.isRequired,
   example: React.PropTypes.string.isRequired,
   title: React.PropTypes.string.isRequired,
   description: React.PropTypes.string.isRequired,
@@ -12,7 +12,7 @@ const propTypes = {
   active: React.PropTypes.number.isRequired,
   handleChooseActive: React.PropTypes.func.isRequired,
   handleSubmit: React.PropTypes.func.isRequired,
-  index: React.PropTypes.number.isRequired
+  index: React.PropTypes.number.isRequired,
 };
 
 class TemplateSite extends React.Component {
@@ -30,56 +30,49 @@ class TemplateSite extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChooseActive() {
-    this.props.handleChooseActive(this.props.index);
-  }
-
-  getSafeRepoName(name) {
-    return name
-      .replace(/[^\w\.]+/g, '-')
-      .replace(/^-+/g, '')
-      .replace(/-+$/g, '');
-  }
-
-  handleSubmit(event) {
-    event.preventDefault();
-    const repository = this.getSafeRepoName(this.state.repository);
-    const site = Object.assign({}, this.state, { repository })
-
-    this.props.handleSubmit(site);
-  }
-
-  handleChange(event) {
-    const { name, value } = event.target
-    this.setState({ [name]: value })
-  }
-
   getFormVisible() {
     const { active, index } = this.props;
     return active === index;
   }
 
-  render() {
-    const { props } = this;
+  handleChange(event) {
+    const { name, value } = event.target;
+    this.setState({ [name]: value });
+  }
 
+  handleSubmit(event) {
+    event.preventDefault();
+    const repository = getSafeRepoName(this.state.repository);
+    const site = Object.assign({}, this.state, { repository });
+
+    this.props.handleSubmit(site);
+  }
+
+  handleChooseActive() {
+    this.props.handleChooseActive(this.props.index);
+  }
+
+  render() {
     return (
       <div className="template-block">
-        <div className="usa-alert usa-alert-info">
-          <div className="usa-alert-heading">
-            <h3>{props.title}</h3>
+        <div className="well">
+          <div className="well-heading">
+            <h3>{this.props.title}</h3>
           </div>
-          <div className="usa-alert-text">
+          <div className="well-text">
             <a data-action="name-site" className="thumbnail">
               <img
-                src={props.thumb}
-                alt={`Thumbnail screenshot for the ${props.title} template`} />
+                src={this.props.thumb}
+                alt={`Thumbnail screenshot for the ${this.props.title} template`}
+              />
             </a>
-            <p>{props.description}</p>
+            <p>{this.props.description}</p>
             <div className="button_wrapper">
               <a
                 className="usa-button usa-button-outline"
-                href={props.example}
+                href={this.props.example}
                 target="_blank"
+                rel="noopener noreferrer"
                 role="button"
               >
                 Example
@@ -101,13 +94,15 @@ class TemplateSite extends React.Component {
                   name="owner"
                   type="text"
                   value={this.state.owner}
-                  onChange={this.handleChange} />
+                  onChange={this.handleChange}
+                />
                 <label htmlFor="repository">Name your new site</label>
                 <input
                   name="repository"
                   type="text"
                   value={this.state.repository}
-                  onChange={this.handleChange} />
+                  onChange={this.handleChange}
+                />
                 <input type="submit" value="Create site" />
               </form>
             : null}
