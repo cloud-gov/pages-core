@@ -30,13 +30,17 @@ class SiteBuilds extends React.Component {
   }
 
   static restartLink(build) {
+    /* eslint-disable jsx-a11y/href-no-hash */
     return (
-      <button
+      <a
+        href="#"
+        role="button"
         onClick={e => SiteBuilds.restartClicked(e, build)}
       >
         Restart
-      </button>
+      </a>
     );
+    /* eslint-enable jsx-a11y/href-no-hash */
   }
 
   componentDidMount() {
@@ -97,7 +101,7 @@ class SiteBuilds extends React.Component {
             })}
           </tbody>
         </table>
-        { this.builds().length >= 100 ? <p>Build list may have been shortened</p> : null }
+        { this.builds().length >= 100 ? <p>List only displays 100 most recent builds.</p> : null }
       </div>
     );
   }
