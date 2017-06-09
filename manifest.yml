@@ -11,6 +11,7 @@ services:
 - federalist-production-rds
 - federalist-production-s3
 - federalist-production-env
+- federalist-site-wide-error
 env:
   NEW_RELIC_APP_NAME: federalist-prod
   NODE_ENV: production
