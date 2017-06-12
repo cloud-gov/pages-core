@@ -23,20 +23,14 @@
 
 config/local.js
 
-# Generated CSS
-public/styles/styles.css
-public/styles/google-fonts.css
-
-# Browserify bundle
+# Webpack-generated assets
 public/js/bundle.js
-
-# USWDS assets
-public/images/uswds
-public/styles/uswds.css
-public/styles/uswds.min.css
-public/styles/google-fonts.css
-public/fonts/merriweather*
-public/fonts/sourcesanspro*
+public/js/bundle.*.js*
+public/styles/styles.css
+public/styles/styles.*.css*
+public/styles/uswds.*.css*
+webpack-manifest.json
+webpackAssets
 
 # test coverage reports
 coverage

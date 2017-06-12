@@ -9,13 +9,13 @@ memory: 256MB
 instances: 2
 services:
 - federalist-staging-rds
-- federalist-staging-redis
 - federalist-staging-s3
 - federalist-staging-env
+- federalist-site-wide-error
 env:
   NODE_ENV: production
   APP_ENV: staging
-  APP_HOSTNAME: https://federalist-staging.fr.cloud.gov
+  APP_HOSTNAME: https://federalist-staging.18f.gov
   LOG_LEVEL: verbose
   NPM_CONFIG_PRODUCTION: true
   NODE_MODULES_CACHE: false

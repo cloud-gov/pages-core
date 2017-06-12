@@ -1,5 +1,7 @@
 import React from 'react';
 
+const flagUrl = require('uswds/dist/img/us_flag_small.png');
+
 const Disclaimer = () =>
   <div className="usa-disclaimer">
     <div className="usa-grid">
@@ -7,7 +9,7 @@ const Disclaimer = () =>
         <img
           className="usa-flag_icon"
           alt="US flag signifying that this is a United States Federal Government website"
-          src="/images/uswds/us_flag_small.png"
+          src={flagUrl}
         />
         An official website of the United States Government
       </span>
