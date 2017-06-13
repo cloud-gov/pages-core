@@ -1,50 +1,41 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import { expect } from 'chai';
-import { spy, stub } from 'sinon';
+import { stub } from 'sinon';
 import proxyquire from 'proxyquire';
 
 proxyquire.noCallThru();
 
 const alertActionUpdate = stub();
-const Header = () => <div></div>;
+const Header = () => <div />;
 
 const username = 'jenny mcuser';
-const appState = {
+
+const props = {
+  alert: {},
   user: {
     data: {
-      username: username,
+      username,
     },
     isLoading: false,
   },
-  alert: {}
-};
-
-const context = (state) => {
-  return {
-    state: {
-      get: stub().returns(state)
-    }
-  };
-};
-
-const props = {
   location: {
-    key: 'a-route'
-  }
+    key: 'a-route',
+  },
 };
 
 const AppFixture = proxyquire('../../../frontend/components/app', {
   '../store': {},
   '../actions/alertActions': { update: alertActionUpdate },
-  './header': Header
-}).default;
+  './header': Header,
+}).App;
 
 describe('<App/>', () => {
   let wrapper;
 
   beforeEach(() => {
-    wrapper = shallow(<AppFixture {...props} />, { context: context(appState) });
+    // TODO: need to figure out the store mocking here and refactor these
+    wrapper = shallow(<AppFixture {...props} />);
     alertActionUpdate.reset();
   });
 
@@ -54,43 +45,63 @@ describe('<App/>', () => {
 
   it('delivers the correct props to the header', () => {
     const expectedProps = {
-      username: username
+      username,
     };
     const actualProps = wrapper.find(Header).props();
 
-    expect(actualProps).to.deep.equal(expectedProps)
+    expect(actualProps).to.deep.equal(expectedProps);
+  });
+
+  it('renders children', () => {
+    const newProps = Object.assign({}, props, {
+      children: (<div id="app-child">child!</div>),
+    });
+    wrapper = shallow(<AppFixture {...newProps} />);
+
+    expect(wrapper.find('LoadingIndicator')).to.have.length(0);
+    expect(wrapper.find('#app-child')).to.have.length(1);
   });
 
   it('does not trigger an alert update if no alert message is present', () => {
-    wrapper.setProps({location: {key: 'path'}});
+    wrapper.setProps({ location: { key: 'path' } });
     expect(alertActionUpdate.called).to.be.false;
   });
 
   it('does not trigger an alert update if the route has not changed', () => {
-    const newAppState = Object.assign({}, appState, {
+    const newProps = Object.assign({}, props, {
       alert: {
         message: 'hello!',
-        stale: false
-      }
+        stale: false,
+      },
     });
 
-    wrapper = shallow(<AppFixture {...props}/>, {context: context(newAppState)});
-    wrapper.setProps({location: {key: 'a-route'}});
+    wrapper = shallow(<AppFixture {...newProps} />);
+    wrapper.setProps({ location: { key: 'a-route' } });
     expect(alertActionUpdate.called).to.be.false;
   });
 
   it('triggers an alert update if there is an alert message', () => {
-    const newAppState = Object.assign({}, appState, {
+    const newProps = Object.assign({}, props, {
       alert: {
         message: 'hello!',
-        stale: false
-      }
+        stale: false,
+      },
     });
 
-    wrapper = shallow(<AppFixture {...props}/>, {context: context(newAppState)});
+    wrapper = shallow(<AppFixture {...newProps} />);
 
-    wrapper.setProps({location: {key: 'next-route'}});
+    wrapper.setProps({ location: { key: 'next-route' } });
     expect(alertActionUpdate.called).to.be.true;
-    expect(alertActionUpdate.calledWith(newAppState.alert.stale)).to.be.true;
+    expect(alertActionUpdate.calledWith(newProps.alert.stale)).to.be.true;
+  });
+
+  it('renders a loading indicator when the user is loading', () => {
+    const newProps = Object.assign({}, props, {
+      user: { isLoading: true, data: null },
+    });
+
+    wrapper = shallow(<AppFixture {...newProps} />);
+    expect(wrapper.find('Header')).to.have.length(1);
+    expect(wrapper.find('LoadingIndicator')).to.have.length(1);
   });
 });
