@@ -1,8 +1,18 @@
 import React from 'react';
-import store from '../store';
+import PropTypes from 'prop-types';
+import Notifications from 'react-notification-system-redux';
+
 import alertActions from '../actions/alertActions';
-import LoadingIndicator from "./loadingIndicator"
+import LoadingIndicator from './loadingIndicator';
 import Header from './header';
+
+function getUsername(storeState) {
+  const userState = storeState.user;
+  if (!userState.isLoading && userState.data) {
+    return userState.data.username;
+  }
+  return null;
+}
 
 class App extends React.Component {
   constructor(props, context) {
@@ -10,15 +20,16 @@ class App extends React.Component {
     this.state = this.getStateFromStore();
   }
 
-  getStateFromStore() {
-    return this.context.state.get();
+  componentWillReceiveProps(nextProps) {
+    const state = this.getStateFromStore();
+    const { alert } = state;
+
+    this.shouldClearAlert(alert, nextProps);
+    this.setState(state);
   }
 
-  getUsername(storeState) {
-    const userState = storeState.user
-    if (!userState.isLoading && userState.data) {
-      return userState.data.username
-    }
+  getStateFromStore() {
+    return this.context.state.get();
   }
 
   shouldClearAlert(alert, nextProps) {
@@ -34,14 +45,6 @@ class App extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    const state = this.getStateFromStore();
-    const { alert } = state;
-
-    this.shouldClearAlert(alert, nextProps);
-    this.setState(state);
-  }
-
   render() {
     const { children } = this.props;
     const storeState = this.state;
@@ -49,27 +52,40 @@ class App extends React.Component {
     if (storeState.user.isLoading) {
       return (
         <div>
-          <Header/>
-          <LoadingIndicator/>
-        </div>
-      )
-    } else {
-      return (
-        <div>
-          <Header
-            username={this.getUsername(storeState)}
-          />
-          {children && React.cloneElement(children, {
-            storeState: storeState
-          })}
+          <Header />
+          <LoadingIndicator />
         </div>
       );
     }
+    return (
+      <div>
+        <Notifications notifications={storeState.notifications} />
+        <Header
+          username={getUsername(storeState)}
+        />
+        {children && React.cloneElement(children, {
+          storeState,
+        })}
+      </div>
+    );
   }
 }
 
 App.contextTypes = {
-  state: React.PropTypes.object
+  state: PropTypes.object,
+};
+
+App.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]),
+  location: PropTypes.objectOf(PropTypes.string),
+};
+
+App.defaultProps = {
+  children: null,
+  location: null,
 };
 
 export default App;
