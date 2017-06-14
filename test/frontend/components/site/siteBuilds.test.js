@@ -78,7 +78,7 @@ describe('<SiteBuilds/>', () => {
 
     const wrapper = shallow(<SiteBuilds {...props} />);
     expect(wrapper.find('p')).to.have.length(1);
-    expect(wrapper.find('p').contains('Build list may have been shortened')).to.be.true;
+    expect(wrapper.find('p').contains('List only displays 100 most recent builds.')).to.be.true;
   });
 
   it('should render a loading state if the builds are loading', () => {
