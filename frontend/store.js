@@ -2,14 +2,14 @@ import { combineReducers, createStore, applyMiddleware } from 'redux';
 import { createLogger } from 'redux-logger';
 
 import reducers from './reducers';
-import { reroute, notify } from './middleware';
-
+import { reroute, createNotifier } from './middleware';
+import { notificationSettings } from './util/notificationSettings';
 
 const app = combineReducers(reducers);
 
 const middlewares = [
   reroute,
-  notify,
+  createNotifier(notificationSettings),
   createLogger(), // must be last in the middlewares chain
 ];
 
