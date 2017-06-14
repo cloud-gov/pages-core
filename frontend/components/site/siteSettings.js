@@ -4,6 +4,8 @@
 /* eslint react/forbid-prop-types:0 react/require-default-props:0 */
 
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import SiteGithubBranchesTable from './siteGithubBranchesTable';
 import LinkButton from '../linkButton';
 import githubBranchActions from '../../actions/githubBranchActions';
@@ -222,9 +224,9 @@ class SiteSettings extends React.Component {
 }
 
 SiteSettings.propTypes = {
-  site: React.PropTypes.object,
-  params: React.PropTypes.object,
-  githubBranches: React.PropTypes.object,
+  site: PropTypes.object,
+  params: PropTypes.object,
+  githubBranches: PropTypes.object,
 };
 
 export default SiteSettings;

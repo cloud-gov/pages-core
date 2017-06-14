@@ -1,29 +1,24 @@
 import { combineReducers, createStore, applyMiddleware } from 'redux';
-import { browserHistory } from 'react-router';
-import { updateRouterType as UPDATE_ROUTER } from './actions/actionCreators/navigationActions';
+import { createLogger } from 'redux-logger';
+
 import reducers from './reducers';
+import { reroute, createNotifier } from './middleware';
+import { notificationSettings } from './util/notificationSettings';
 
 const app = combineReducers(reducers);
 
-const logger = store => next => action => {
-  console.log('::dispatching::', action);
-  let result = next(action);
-  console.log('::next state::', _store.getState());
-  return result;
-};
+const middlewares = [
+  reroute,
+  createNotifier(notificationSettings),
+  createLogger(), // must be last in the middlewares chain
+];
 
-const reroute = store => next => action => {
-  if (action.type !== UPDATE_ROUTER) {
-    return next(action);
-  }
+const store = createStore(
+  app,
+  applyMiddleware(...middlewares)
+);
 
-  browserHistory[action.method].apply(browserHistory, action.arguments);
-  return next(action);
-};
-
-const _store = createStore(app, applyMiddleware(logger, reroute));
-
-const dispatch = _store.dispatch;
+const dispatch = store.dispatch;
 
 export { dispatch };
-export default _store;
+export default store;
