@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 const nock = require('nock');
-const request = require('supertest-as-promised');
+const request = require('supertest');
 const app = require('../../../app');
 const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
