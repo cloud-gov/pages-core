@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 
 import SiteGithubBranchesTable from './siteGithubBranchesTable';
 import LinkButton from '../linkButton';
+import SelectSiteEngine from '../selectSiteEngine';
 import githubBranchActions from '../../actions/githubBranchActions';
 import siteActions from '../../actions/siteActions';
 
@@ -89,16 +90,7 @@ class SiteSettings extends React.Component {
         </div>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
-            <label htmlFor="engine">Static site engine</label>
-            <select
-              name="engine"
-              className="form-control"
-              value={state.engine}
-              onChange={this.onChange}
-            >
-              <option value="jekyll">Jekyll</option>
-              <option value="static">Static (just publish the files in the repository)</option>
-            </select>
+            <SelectSiteEngine value={state.engine} onChange={this.onChange} />
           </div>
         </div>
         <div className="usa-grid">

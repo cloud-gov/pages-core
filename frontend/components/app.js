@@ -80,7 +80,9 @@ App.propTypes = {
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node,
   ]),
-  location: PropTypes.objectOf(PropTypes.string),
+  location: PropTypes.shape({
+    key: PropTypes.string.isRequired,
+  }),
 };
 
 App.defaultProps = {

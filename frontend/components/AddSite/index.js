@@ -3,6 +3,7 @@ import React from 'react';
 import TemplateSiteList from './TemplateSiteList';
 import LinkButton from '../linkButton';
 import AlertBanner from '../alertBanner';
+import SelectSiteEngine from '../selectSiteEngine';
 
 import siteActions from '../../actions/siteActions';
 
@@ -12,17 +13,19 @@ const propTypes = {
   storeState: React.PropTypes.shape({
     user: React.PropTypes.shape({
       username: React.PropTypes.string,
-      id: React.PropTypes.number
+      id: React.PropTypes.number,
     }),
-    error: React.PropTypes.string
-  })
-}
+    error: React.PropTypes.string,
+  }),
+};
+
+const defaultProps = {
+  storeState: null,
+};
 
 class AddSite extends React.Component {
   constructor(props) {
     super(props);
-
-    const { user } = props.storeState;
 
     this.state = {
       owner: this.defaultOwner(),
@@ -33,15 +36,6 @@ class AddSite extends React.Component {
 
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
-  }
-
-  defaultOwner() {
-    const userState = this.props.storeState.user
-    if (userState.data) {
-      return userState.data.username
-    } else {
-      return ""
-    }
   }
 
   onSubmit(event) {
@@ -61,6 +55,14 @@ class AddSite extends React.Component {
     this.setState(nextState);
   }
 
+  defaultOwner() {
+    const userState = this.props.storeState.user;
+    if (userState.data) {
+      return userState.data.username;
+    }
+    return '';
+  }
+
   render() {
     return (
       <div>
@@ -73,7 +75,9 @@ class AddSite extends React.Component {
         <div className="usa-grid">
           <div className="usa-width-one-whole">
             <p>
-              There are a few different ways you can add sites to Federalist. You can start with a brand new site by selecting one of our template sites below. Or you can specify the Github repository where your site&#39;s code lives.
+              There are a few different ways you can add sites to Federalist.
+              You can start with a brand new site by selecting one of our template sites below.
+              Or you can specify the Github repository where your site&#39;s code lives.
             </p>
           </div>
         </div>
@@ -87,7 +91,7 @@ class AddSite extends React.Component {
             <h2>Or add your own Github repository</h2>
           </div>
         </div>
-        <form onSubmit={ this.onSubmit }>
+        <form onSubmit={this.onSubmit}>
           <div className="usa-grid">
             <div className="col-md-12">
               <div className="form-group">
@@ -98,7 +102,8 @@ class AddSite extends React.Component {
                   className="form-control"
                   name="owner"
                   value={this.state.owner}
-                  onChange={this.onChange} />
+                  onChange={this.onChange}
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="repository">Repository&#39;s Name</label>
@@ -108,20 +113,11 @@ class AddSite extends React.Component {
                   name="repository"
                   id="repository"
                   value={this.state.repository}
-                  onChange={this.onChange} />
+                  onChange={this.onChange}
+                />
               </div>
               <div className="form-group">
-                <label htmlFor="engine">Static site engine</label>
-                <select
-                  name="engine"
-                  id="engine"
-                  className="form-control"
-                  value={this.state.engine}
-                  onChange={this.onChange}
-                >
-                  <option value="jekyll">Jekyll</option>
-                  <option value="static">Static (just publish the files in the repository)</option>
-                </select>
+                <SelectSiteEngine value={this.state.engine} onChange={this.onChange} />
               </div>
               <div className="form-group">
                 <label htmlFor="defaultBranch">Default branch</label>
@@ -131,7 +127,8 @@ class AddSite extends React.Component {
                   className="form-control"
                   name="defaultBranch"
                   value={this.state.defaultBranch}
-                  onChange={this.onChange}/>
+                  onChange={this.onChange}
+                />
               </div>
             </div>
           </div>
@@ -140,8 +137,9 @@ class AddSite extends React.Component {
               <LinkButton
                 className="usa-button-secondary"
                 text="Cancel"
-                href="/sites" />
-              <button type="submit" className="usa-button usa-button-primary" style={{display: 'inline-block'}}>
+                href="/sites"
+              />
+              <button type="submit" className="usa-button usa-button-primary" style={{ display: 'inline-block' }}>
                 Submit repository-based site
               </button>
             </div>
@@ -153,5 +151,6 @@ class AddSite extends React.Component {
 }
 
 AddSite.propTypes = propTypes;
+AddSite.defaultProps = defaultProps;
 
 export default AddSite;
