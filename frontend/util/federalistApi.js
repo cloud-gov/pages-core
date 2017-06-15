@@ -1,21 +1,19 @@
 import fetch from './fetch';
 import alertActions from '../actions/alertActions';
 
-const API = '/v0';
+export const API = '/v0';
 
 export default {
   fetch(endpoint, params) {
     const url = `${API}/${endpoint}`;
 
-    return fetch(url, params).then((data) => {
-      return data;
-    }).catch((error) => {
+    return fetch(url, params).then(data => data).catch((error) => {
       alertActions.httpError(error.message);
     });
   },
 
   fetchBuilds(site) {
-    return this.fetch(`site/${site.id}/build`)
+    return this.fetch(`site/${site.id}/build`);
   },
 
   fetchBuildLogs(build) {
@@ -27,7 +25,7 @@ export default {
   },
 
   fetchPublishedFiles(site, branch) {
-    return this.fetch(`site/${site.id}/published-branch/${branch}/published-file`)
+    return this.fetch(`site/${site.id}/published-branch/${branch}/published-file`);
   },
 
   fetchSites() {
@@ -39,27 +37,27 @@ export default {
   },
 
   addSite(site) {
-    return this.fetch(`site`, {
+    return this.fetch('site', {
       method: 'POST',
-      data: site
+      data: site,
     });
   },
 
   updateSite(site, data) {
     return this.fetch(`site/${site.id}`, {
       method: 'PUT',
-      data: data
+      data,
     });
   },
 
   deleteSite(siteId) {
     return this.fetch(`site/${siteId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
     });
   },
 
   restartBuild(build) {
-    return this.fetch(`build/`, {
+    return this.fetch('build/', {
       method: 'POST',
       data: {
         site: build.site.id || build.site,
@@ -68,4 +66,4 @@ export default {
       },
     });
   },
-}
+};

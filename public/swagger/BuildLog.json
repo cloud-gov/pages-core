@@ -13,7 +13,10 @@
       "type": "integer"
     },
     "build": {
-      "type": "object"
+      "type": "object",
+      "not": {
+        "required": ["token"]
+      }
     },
     "createdAt": {
       "type": "string"

@@ -1,17 +1,14 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import { expect } from 'chai';
-import { stub, spy } from 'sinon';
-import templates from '../../../../config/templates';
+import { stub } from 'sinon';
 import proxyquire from 'proxyquire';
+
+import templates from '../../../../config/templates';
 
 proxyquire.noCallThru();
 
-const mock = () => {
-  return function() {
-    return <div></div>;
-  };
-};
+const mock = () => () => <div />;
 
 const TemplateSiteList = mock();
 const LinkButton = mock();
@@ -27,17 +24,15 @@ const user = {
   },
 };
 
-const error = {error: 'whoooooops'};
-
 const propsWithoutError = {
-  storeState: { user, error: ''}
+  storeState: { user, error: '' },
 };
 
 const Fixture = proxyquire('../../../../frontend/components/AddSite', {
   './TemplateSiteList': TemplateSiteList,
   '../linkButton': LinkButton,
   '../alertBanner': AlertBanner,
-  '../../actions/siteActions': { addSite  }
+  '../../actions/siteActions': { addSite },
 }).default;
 
 describe('<AddSite/>', () => {
@@ -53,7 +48,7 @@ describe('<AddSite/>', () => {
       owner: user.data.username,
       engine: 'jekyll',
       defaultBranch: 'master',
-      repository: ''
+      repository: '',
     };
 
     expect(actualState).to.deep.equal(expectedState);
@@ -64,7 +59,7 @@ describe('<AddSite/>', () => {
 
     expect(wrapper.find('input[name="owner"]').props().value).to.equal(owner);
     expect(wrapper.find('input[name="repository"]').props().value).to.equal(repository);
-    expect(wrapper.find('select[name="engine"]').props().value).to.equal(engine);
+    expect(wrapper.find('SelectSiteEngine').props().value).to.equal(engine);
     expect(wrapper.find('input[name="defaultBranch"]').props().value).to.equal(defaultBranch);
   });
 
@@ -90,9 +85,9 @@ describe('<AddSite/>', () => {
     const templateListProps = wrapper.find(TemplateSiteList).props();
     const formProps = wrapper.find('form').props();
 
-    expect(bannerProps).to.deep.equal({message: propsWithoutError.storeState.error});
+    expect(bannerProps).to.deep.equal({ message: propsWithoutError.storeState.error });
     expect(templateListProps).to.deep.equal({
-      templates: templates,
+      templates,
       handleSubmitTemplate: wrapper.instance().onSubmitTemplate,
       defaultOwner: propsWithoutError.storeState.user.data.username,
     });
@@ -100,7 +95,7 @@ describe('<AddSite/>', () => {
   });
 
   it('calls addSite action when add site form is submitted', () => {
-    wrapper.find('form').simulate('submit', {preventDefault: () => {}});
+    wrapper.find('form').simulate('submit', { preventDefault: () => {} });
     expect(addSite.called).to.be.true;
   });
 
@@ -108,7 +103,7 @@ describe('<AddSite/>', () => {
     const repoInput = wrapper.find('input[name="repository"]');
     const newValue = 'ohyeah';
 
-    repoInput.simulate('change', {target: { name: 'repository', value: newValue}});
+    repoInput.simulate('change', { target: { name: 'repository', value: newValue } });
     expect(wrapper.state().repository).to.equal(newValue);
   });
 });

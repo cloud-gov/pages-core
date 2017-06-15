@@ -8,6 +8,9 @@
     "updatedAt",
     "user"
   ],
+  "not": {
+    "required": ["token"]
+  },
   "properties": {
     "id": {
       "type": "integer"
