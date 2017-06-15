@@ -2,7 +2,7 @@ const crypto = require("crypto")
 const expect = require("chai").expect
 const nock = require("nock")
 const Promise = require("bluebird")
-const request = require("supertest-as-promised")
+const request = require("supertest")
 const sinon = require("sinon")
 
 const app = require("../../../app")
