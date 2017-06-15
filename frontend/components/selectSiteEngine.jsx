@@ -7,7 +7,7 @@ const availableEngines = [
     value: 'jekyll',
   },
   {
-    label: 'Hugo',
+    label: 'Hugo (experimental)',
     value: 'hugo',
   },
   {
