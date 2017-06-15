@@ -64,7 +64,7 @@ describe('<AddSite/>', () => {
 
     expect(wrapper.find('input[name="owner"]').props().value).to.equal(owner);
     expect(wrapper.find('input[name="repository"]').props().value).to.equal(repository);
-    expect(wrapper.find('select[name="engine"]').props().value).to.equal(engine);
+    expect(wrapper.find('SelectSiteEngine').props().value).to.equal(engine);
     expect(wrapper.find('input[name="defaultBranch"]').props().value).to.equal(defaultBranch);
   });
 

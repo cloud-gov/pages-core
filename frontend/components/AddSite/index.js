@@ -3,6 +3,7 @@ import React from 'react';
 import TemplateSiteList from './TemplateSiteList';
 import LinkButton from '../linkButton';
 import AlertBanner from '../alertBanner';
+import SelectSiteEngine from '../selectSiteEngine';
 
 import siteActions from '../../actions/siteActions';
 
@@ -111,17 +112,7 @@ class AddSite extends React.Component {
                   onChange={this.onChange} />
               </div>
               <div className="form-group">
-                <label htmlFor="engine">Static site engine</label>
-                <select
-                  name="engine"
-                  id="engine"
-                  className="form-control"
-                  value={this.state.engine}
-                  onChange={this.onChange}
-                >
-                  <option value="jekyll">Jekyll</option>
-                  <option value="static">Static (just publish the files in the repository)</option>
-                </select>
+                <SelectSiteEngine value={this.state.engine} onChange={this.onChange} />
               </div>
               <div className="form-group">
                 <label htmlFor="defaultBranch">Default branch</label>
