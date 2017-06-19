@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import { Link } from 'react-router';
 import LoadingIndicator from '../loadingIndicator';
 import { duration, timeFrom } from '../../util/datetime';
@@ -57,7 +59,7 @@ class SiteBuilds extends React.Component {
   renderBuildsTable() {
     return (
       <div>
-        <table className="usa-table-borderless build-log-table">
+        <table className="usa-table-borderless log-table log-table__site-builds">
           <thead>
             <tr>
               <th scope="col">Branch</th>
@@ -70,7 +72,6 @@ class SiteBuilds extends React.Component {
           </thead>
           <tbody>
             {this.builds().map((build) => {
-              const rowClass = `usa-alert-${build.state}`;
               let message;
 
               switch (build.state) {
@@ -86,12 +87,12 @@ class SiteBuilds extends React.Component {
               }
 
               return (
-                <tr key={build.id} className={rowClass}>
+                <tr key={build.id}>
                   <td>{ build.branch }</td>
                   <td>{ SiteBuilds.getUsername(build) }</td>
                   <td>{ timeFrom(build.completedAt) }</td>
                   <td>{ duration(build.createdAt, build.completedAt) }</td>
-                  <td>{ message }</td>
+                  <td><pre>{ message }</pre></td>
                   <td>
                     { SiteBuilds.restartLink(build) }<br />
                     { SiteBuilds.buildLogsLink(build) }
@@ -118,23 +119,28 @@ class SiteBuilds extends React.Component {
 }
 
 SiteBuilds.propTypes = {
-  builds: React.PropTypes.arrayOf(React.PropTypes.shape({
-    isLoading: React.PropTypes.boolean,
-    data: React.PropTypes.arrayOf(React.PropTypes.shape({
-      id: React.PropTypes.number,
-      state: React.PropTypes.string,
-      error: React.PropTypes.string,
-      branch: React.PropTypes.string,
-      completedAt: React.PropTypes.string,
-      createdAt: React.PropTypes.string,
-      user: React.PropTypes.shape({
-        username: React.PropTypes.string,
+  builds: PropTypes.shape({
+    isLoading: PropTypes.boolean,
+    data: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.number,
+      state: PropTypes.string,
+      error: PropTypes.string,
+      branch: PropTypes.string,
+      completedAt: PropTypes.string,
+      createdAt: PropTypes.string,
+      user: PropTypes.shape({
+        username: PropTypes.string,
       }),
     })),
-  })).isRequired,
-  site: React.PropTypes.shape({
-    id: React.PropTypes.number,
-  }).isRequired,
+  }),
+  site: PropTypes.shape({
+    id: PropTypes.number,
+  }),
+};
+
+SiteBuilds.defaultProps = {
+  builds: null,
+  site: null,
 };
 
 export default SiteBuilds;
