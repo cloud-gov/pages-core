@@ -29,7 +29,9 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Federalist</title>
+    <title>
+      Federalist<% if (siteDisplayEnv) { %> | <%= siteDisplayEnv %><% } %>
+    </title>
   </head>
   <body>
     <% if (siteWideError) { %>
