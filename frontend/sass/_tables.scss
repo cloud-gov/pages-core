@@ -1,0 +1,16 @@
+
+.log-table {
+  font-size: smaller;
+
+  pre {
+    overflow: auto;
+    white-space: pre-wrap;
+    margin: 0;
+    max-height: 200px;
+    max-width: 200px;
+  }
+}
+
+.log-table__site-build-log pre {
+  max-width: 400px;
+}
