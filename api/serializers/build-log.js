@@ -1,28 +1,33 @@
-const { BuildLog, Build } = require("../models")
+const { BuildLog, Build } = require('../models');
 
-const serialize = (serializable) => {
+function serializeObject(buildLog) {
+  const json = buildLog.toJSON();
+  json.build = buildLog.Build.toJSON();
+  delete json.Build;
+  return json;
+}
+
+function serializePlaintext(buildLog) {
+  // Serializes a buildLog as a text-based representation
+  return [
+    `Source: ${buildLog.source}`,
+    `Timestamp: ${buildLog.createdAt.toISOString()}`,
+    `Output:\n${buildLog.output}`,
+  ].join('\n');
+}
+
+function serialize(serializable, { isPlaintext } = {}) {
+  const serializationFn = isPlaintext ? serializePlaintext : serializeObject;
+
   if (serializable.length !== undefined) {
-    const buildLogIds = serializable.map(buildLog => buildLog.id)
-    const query = BuildLog.findAll({ where: { id: buildLogIds }, include: [ Build ] })
+    const buildLogIds = serializable.map(buildLog => buildLog.id);
+    const query = BuildLog.findAll({ where: { id: buildLogIds }, include: [Build] });
 
-    return query.then(buildLogs => {
-      return buildLogs.map(buildLog => serializeObject(buildLog))
-    })
-  } else {
-    const buildLog = serializable
-    const query = BuildLog.findById(buildLog.id, { include: [ Build ] })
-
-    return query.then(buildLog => {
-      return serializeObject(buildLog)
-    })
+    return query.then(buildLogs => buildLogs.map(serializationFn));
   }
+
+  const query = BuildLog.findById(serializable.id, { include: [Build] });
+  return query.then(serializationFn);
 }
 
-const serializeObject = (buildLog) => {
-  const json = buildLog.toJSON()
-  json.build = buildLog.Build.toJSON()
-  delete json.Build
-  return json
-}
-
-module.exports = { serialize }
+module.exports = { serialize };
