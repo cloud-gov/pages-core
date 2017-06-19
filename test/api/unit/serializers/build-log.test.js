@@ -45,7 +45,7 @@ describe('BuildLogSerializer', () => {
 
     it('should serialize an object to plaintext when specified', (done) => {
       factory.buildLog()
-        .then(buildLog => BuildLogSerializer.serialize(buildLog, true))
+        .then(buildLog => BuildLogSerializer.serialize(buildLog, { isPlaintext: true }))
         .then((text) => {
           plaintextLineIsOk(text);
           done();
@@ -57,7 +57,7 @@ describe('BuildLogSerializer', () => {
       const buildLogs = Array(3).fill(0).map(() => factory.buildLog());
 
       Promise.all(buildLogs)
-        .then(logs => BuildLogSerializer.serialize(logs, true))
+        .then(logs => BuildLogSerializer.serialize(logs, { isPlaintext: true }))
         .then((arr) => {
           expect(arr).to.be.an('array');
           expect(arr.length).to.equal(3);

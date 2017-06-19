@@ -16,7 +16,7 @@ function serializePlaintext(buildLog) {
   ].join('\n');
 }
 
-function serialize(serializable, isPlaintext = false) {
+function serialize(serializable, { isPlaintext } = {}) {
   const serializationFn = isPlaintext ? serializePlaintext : serializeObject;
 
   if (serializable.length !== undefined) {

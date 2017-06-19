@@ -40,7 +40,7 @@ module.exports = {
   find: (req, res) => {
     let build;
 
-    const returnPlaintext = req.query.format &&
+    const isPlaintext = req.query.format &&
       req.query.format.toLowerCase() === 'text';
 
     return Promise.resolve(Number(req.params.build_id))
@@ -57,9 +57,9 @@ module.exports = {
         return buildAuthorizer.findOne(req.user, build);
       })
       .then(() => BuildLog.findAll({ where: { build: build.id } }))
-      .then(buildLogs => buildLogSerializer.serialize(buildLogs, returnPlaintext))
+      .then(buildLogs => buildLogSerializer.serialize(buildLogs, { isPlaintext }))
       .then((serializedBuildLogs) => {
-        if (returnPlaintext) {
+        if (isPlaintext) {
           // .findAll always resolves to an array, so join is available
           res.type('text').send(serializedBuildLogs.join('\n\n'));
         } else {
