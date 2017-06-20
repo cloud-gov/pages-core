@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Exit if we are not targetting the correct space
-if ! cf target | grep "Org: \s*gsa-18f-federalist"; then
+if ! cf target | grep "org: \s*gsa-18f-federalist"; then
   echo "This command must be run while targeting the gsa-18f-federalist org"
   exit 1
 fi
 
 # Make sure we're using the correct app
-if cf target | grep "Space: \s*staging"; then
+if cf target | grep "space: \s*staging"; then
   APP_NAME="federalist-staging"
-elif cf target | grep "Space: \s*production"; then
+elif cf target | grep "space: \s*production"; then
   APP_NAME="federalist"
 fi
 
@@ -18,10 +18,12 @@ if [[ -f current-sites.csv ]]; then
   rm current-sites.csv
 fi
 
+# /home/vcap/app/.cloudfoundry/0/bin/node
+
 # Run the export script on the instance
 cf ssh $APP_NAME <<EOD
-cd app
-PORT=4000 timeout 5s .heroku/node/bin/node scripts/exportSitesAsCsv.js
+cd /home/vcap/app
+PORT=4000 timeout 5s /home/vcap/app/.cloudfoundry/0/bin/node scripts/exportSitesAsCsv.js
 EOD
 
 # Download current-sites.csv
