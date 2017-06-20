@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
+const config = require('../../config');
 
 function loadAssetManifest() {
   const manifestPath = path.join(__dirname, '..', '..', 'webpack-manifest.json');
@@ -17,10 +19,13 @@ module.exports = {
       webpackAssets = loadAssetManifest();
     }
 
+    const siteDisplayEnv = config.app.app_env !== 'production' ? config.app.app_env : null;
+
     const context = {
       siteWideError: null,
       jsBundleName: webpackAssets['main.js'],
       cssBundleName: webpackAssets['main.css'],
+      siteDisplayEnv,
     };
 
     if (req.session.authenticated) {
