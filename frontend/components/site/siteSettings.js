@@ -105,14 +105,16 @@ class SiteSettings extends React.Component {
               <div className="well">
                 <h3 className="well-heading">Custom Domain</h3>
                 <p className="well-text">
-                  If you build your site with Jekyll, Federalist can configure your
-                  production site to load at a custom domain specified here.
+                  After you delegate your .gov or .mil URL to Federalist,
+                  enter the URL here so your site builds correctly.
+                  See <a href="https://federalist-docs.18f.gov/pages/how-federalist-works/custom-urls/" target="_blank" rel="noopener noreferrer">
+                  Federalist&apos;s custom URL documentation</a> for more information.
                 </p>
                 <input
                   name="domain"
                   className="form-control"
                   type="text"
-                  placeholder="https://example.com"
+                  placeholder="https://example.gov"
                   value={state.domain}
                   onChange={this.onChange}
                 />
