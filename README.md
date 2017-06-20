@@ -26,7 +26,7 @@ The following environment variables are set on the Cloud Foundry environment in 
 - `NODE_ENV`: The node environment where the app should run. When running in Cloud Foundry this should always be set to production, even for the staging environment
 - `APP_ENV`: The application environment in which the app should run. Valid values are `production` and `staging`.
 - `LOG_LEVEL`: Sets the log level for the app.
-- `NPM_CONFIG_PRODUCTION`: This should be set to true in Cloud Foundry to prevent NPM from installing dev dependencies
+- `NPM_CONFIG_PRODUCTION`: This should be set to true in Cloud Foundry to prevent Yarn/NPM from installing dev dependencies
 - `NODE_MODULES_CACHE`: This should be set to true in Cloud Foundry to prevent caching node modules since those are vendored by Federalist
 - `APP_NAME`: The name of the Cloud Foundry application
 - `APP_COMAIN`: The hostname where the application runs in Cloud Foundry
@@ -62,10 +62,12 @@ This file's usage is discussed in length in "Building the Server" below.
 
 ### Build the server
 
+This project uses [`yarn`](https://yarnpkg.com/) for managing JavaScript dependencies and running tasks specified in `package.json`.
+If you don't already have yarn, follow the instructions at https://yarnpkg.com/en/docs/install to get it installed.
+
 * Download or Clone this repository from Github either by using the command line or repo's website on Github. On the right side of the repo's page, there is a button that states "Clone in Desktop".
-*
 * Run `nvm use` to ensure you are using the correct version of node
-* Run `npm install` from the root(the directory that houses the projects files on your computer) of the repository to load modules and install Jekyll dependencies
+* Run `yarn` from the root (the directory that houses the projects files on your computer) of the repository to load modules and install Jekyll dependencies
 
 Together these commands will looks something like the following:
 
@@ -73,7 +75,7 @@ Together these commands will looks something like the following:
 $ git clone git@github.com:18F/federalist.git
 $ cd federalist
 $ nvm use
-$ npm install
+$ yarn
 ```
 
 * Copy `config/local.sample.js` to `config/local.js`.
@@ -156,7 +158,7 @@ s3: {
 }
 ```
 
-* Run the server with `npm start` at the directory of the project on your local computer. You can use `npm run watch` to automatically restart the server and rebuild front end assets on file change, which is useful for development.
+* Run the server with `yarn start` at the directory of the project on your local computer. You can use `yarn watch` to automatically restart the server and rebuild front end assets on file change, which is useful for development.
 
 #### Build the server and the front-end
 

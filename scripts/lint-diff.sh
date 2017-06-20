@@ -8,7 +8,7 @@ CHANGED_FILES_LIST=`git diff-index --name-only $DIFF_TARGET_BRANCH | grep -E '.j
 FAILURES=0
 
 for FILE in $CHANGED_FILES_LIST; do
-  `npm bin`/eslint $FILE
+  `yarn bin`/eslint $FILE
   if [ "$?" != 0 ]; then
     FAILURES=$(($FAILURES+1))
   fi
