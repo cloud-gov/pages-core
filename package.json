@@ -20,7 +20,7 @@
     "json-to-csv": "^1.0.0",
     "method-override": "^2.3.7",
     "moment": "^2.10.3",
-    "newrelic": "^1.22.0",
+    "newrelic": "^1.40.0",
     "passport": "^0.2.1",
     "passport-github": "^0.1.5",
     "pg": "^4.4.0",
