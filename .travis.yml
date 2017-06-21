@@ -42,7 +42,6 @@ before_deploy:
   - travis_retry curl -L -o $HOME/cf.tgz "https://cli.run.pivotal.io/stable?release=linux64-binary&version=6.22.2"
   - tar xzvf $HOME/cf.tgz -C $HOME
   - travis_retry cf install-plugin autopilot -f -r CF-Community
-  - yarn --pure-lockfile
   - yarn build
 deploy:
   - provider: script
