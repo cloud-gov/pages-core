@@ -1,110 +1,105 @@
-const crypto = require("crypto")
-const URLSafeBase64 = require('urlsafe-base64')
-const SQS = require("../services/SQS")
+const crypto = require('crypto');
+const URLSafeBase64 = require('urlsafe-base64');
+const SQS = require('../services/SQS');
 
 const afterCreate = (build) => {
-  const { Site, User, Build } = build.sequelize.models
+  const { Site, User, Build } = build.sequelize.models;
 
   return Build.findOne({
     where: { id: build.id },
-    include: [ User, Site ]
-  }).then(build => {
-    SQS.sendBuildMessage(build)
-  })
-}
+    include: [User, Site],
+  }).then((foundBuild) => {
+    SQS.sendBuildMessage(foundBuild);
+  });
+};
 
 const associate = ({ Build, BuildLog, Site, User }) => {
   Build.hasMany(BuildLog, {
-    foreignKey: "build",
-  })
+    foreignKey: 'build',
+  });
   Build.belongsTo(Site, {
-    foreignKey: "site",
+    foreignKey: 'site',
     allowNull: false,
-  })
+  });
   Build.belongsTo(User, {
-    foreignKey: "user",
+    foreignKey: 'user',
     allowNull: false,
-  })
-}
+  });
+};
+
+const generateToken = () => URLSafeBase64.encode(crypto.randomBytes(32));
 
 const beforeValidate = (build) => {
-  build.token = build.token || generateToken()
-}
+  build.token = build.token || generateToken(); // eslint-disable-line no-param-reassign
+};
 
-const completeJob = function(err) {
-  const completedAt = new Date()
-
-  return completeJobStateUpdate(err, this, completedAt).then(build => {
-    return completeJobSiteUpdate(build, completedAt).then(() => build)
-  })
-}
+const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
 
 const completeJobErrorMessage = (err) => {
-  let message
+  let message;
   if (err) {
-    message = err.message || err
+    message = err.message || err;
   } else {
-    message = "An unknown error occured"
+    message = 'An unknown error occured';
   }
-  return sanitizeCompleteJobErrorMessage(message)
-}
-
-const completeJobSiteUpdate = (build, completedAt) => {
-  const { Site } = build.sequelize.models
-
-  if (build.state === "success") {
-    return Site.update(
-      { publishedAt: completedAt },
-      { where: { id: build.site } }
-    )
-  } else {
-    return Promise.resolve()
-  }
-}
+  return sanitizeCompleteJobErrorMessage(message);
+};
 
 const completeJobStateUpdate = (err, build, completedAt) => {
   if (err) {
     return build.update({
-      state: "error",
+      state: 'error',
       error: completeJobErrorMessage(err),
-      completedAt: completedAt,
-    })
-  } else {
-    return build.update({
-      state: "success",
-      error: "",
-      completedAt: completedAt,
-    })
+      completedAt,
+    });
   }
+  return build.update({
+    state: 'success',
+    error: '',
+    completedAt,
+  });
+};
+
+const completeJobSiteUpdate = (build, completedAt) => {
+  const { Site } = build.sequelize.models;
+
+  if (build.state === 'success') {
+    return Site.update(
+      { publishedAt: completedAt },
+      { where: { id: build.site } }
+    );
+  }
+  return Promise.resolve();
+};
+
+function completeJob(err) {
+  const completedAt = new Date();
+
+  return completeJobStateUpdate(err, this, completedAt)
+    .then(build => completeJobSiteUpdate(build, completedAt)
+    .then(() => build));
 }
 
-const generateToken = () => {
-  return URLSafeBase64.encode(crypto.randomBytes(32))
-}
-
-const sanitizeCompleteJobErrorMessage = (message) => {
-  return message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github')
-}
-
-const toJSON = function() {
+function toJSON() {
   const object = this.get({
     plain: true,
-  })
-  object.createdAt = object.createdAt.toISOString()
-  object.updatedAt = object.updatedAt.toISOString()
+  });
+  object.createdAt = object.createdAt.toISOString();
+  object.updatedAt = object.updatedAt.toISOString();
   if (object.completedAt) {
-    object.completedAt = object.completedAt.toISOString()
+    object.completedAt = object.completedAt.toISOString();
   }
-  Object.keys(object).forEach(key => {
+  Object.keys(object).forEach((key) => {
     if (object[key] === null) {
-      delete object[key]
+      delete object[key];
     }
-  })
-  return object
+  });
+  delete object.token;
+  return object;
 }
 
 module.exports = (sequelize, DataTypes) => {
-  const Build = sequelize.define("Build", {
+  const Build = sequelize.define('Build', {
     branch: {
       type: DataTypes.STRING,
     },
@@ -122,8 +117,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     state: {
       type: DataTypes.ENUM,
-      values: ["error", "processing", "skipped", "success"],
-      defaultValue: "processing",
+      values: ['error', 'processing', 'skipped', 'success'],
+      defaultValue: 'processing',
       allowNull: false,
     },
     token: {
@@ -139,7 +134,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   }, {
-    tableName: "build",
+    tableName: 'build',
     classMethods: {
       associate,
     },
@@ -151,7 +146,7 @@ module.exports = (sequelize, DataTypes) => {
       afterCreate,
       beforeValidate,
     },
-  })
+  });
 
-  return Build
-}
+  return Build;
+};
