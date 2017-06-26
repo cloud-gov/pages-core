@@ -4,8 +4,11 @@
 /* eslint react/forbid-prop-types:0 react/require-default-props:0 */
 
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import SiteGithubBranchesTable from './siteGithubBranchesTable';
 import LinkButton from '../linkButton';
+import SelectSiteEngine from '../selectSiteEngine';
 import githubBranchActions from '../../actions/githubBranchActions';
 import siteActions from '../../actions/siteActions';
 
@@ -87,16 +90,7 @@ class SiteSettings extends React.Component {
         </div>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
-            <label htmlFor="engine">Static site engine</label>
-            <select
-              name="engine"
-              className="form-control"
-              value={state.engine}
-              onChange={this.onChange}
-            >
-              <option value="jekyll">Jekyll</option>
-              <option value="static">Static (just publish the files in the repository)</option>
-            </select>
+            <SelectSiteEngine value={state.engine} onChange={this.onChange} />
           </div>
         </div>
         <div className="usa-grid">
@@ -111,14 +105,16 @@ class SiteSettings extends React.Component {
               <div className="well">
                 <h3 className="well-heading">Custom Domain</h3>
                 <p className="well-text">
-                  If you build your site with Jekyll, Federalist can configure your
-                  production site to load at a custom domain specified here.
+                  After you delegate your .gov or .mil URL to Federalist,
+                  enter the URL here so your site builds correctly.
+                  See <a href="https://federalist-docs.18f.gov/pages/how-federalist-works/custom-urls/" target="_blank" rel="noopener noreferrer">
+                  Federalist&apos;s custom URL documentation</a> for more information.
                 </p>
                 <input
                   name="domain"
                   className="form-control"
                   type="text"
-                  placeholder="https://example.com"
+                  placeholder="https://example.gov"
                   value={state.domain}
                   onChange={this.onChange}
                 />
@@ -222,9 +218,9 @@ class SiteSettings extends React.Component {
 }
 
 SiteSettings.propTypes = {
-  site: React.PropTypes.object,
-  params: React.PropTypes.object,
-  githubBranches: React.PropTypes.object,
+  site: PropTypes.object,
+  params: PropTypes.object,
+  githubBranches: PropTypes.object,
 };
 
 export default SiteSettings;

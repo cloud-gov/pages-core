@@ -10,7 +10,7 @@ logger.add(logger.transports.Console, { colorize: true });
 const env = require('./services/environment.js')();
 
 if (env.NEW_RELIC_APP_NAME && env.NEW_RELIC_LICENSE_KEY) {
-  logger.info('Activating New Relic: ', env.NEW_RELIC_APP_NAME);
+  logger.info(`Activating New Relic: ${env.NEW_RELIC_APP_NAME}`);
   require('newrelic'); // eslint-disable-line global-require
 } else {
   logger.warn('Skipping New Relic Activation');

@@ -1,6 +1,6 @@
 const AWSMocks = require("../support/aws-mocks")
 const expect = require("chai").expect
-const request = require("supertest-as-promised")
+const request = require("supertest")
 const app = require("../../../app")
 const config = require("../../../config")
 const factory = require("../support/factory")

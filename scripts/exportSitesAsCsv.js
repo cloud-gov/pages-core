@@ -43,9 +43,9 @@ function consolidateOnSiteId(sites) {
 const args = Array.prototype.slice.call(process.argv);
 const destination = resolveDestination(args[2] || './current-sites.csv');
 console.log('Final output can be found at', destination);
-console.log('\tUse npm run export:sites -- /other/path/file.csv to change');
+console.log('\tUse yarn export:sites -- /other/path/file.csv to change');
 
-return User.findAll({ include: [Site] })
+User.findAll({ include: [Site] })
   .then(sitesFromUsers)
   .then(consolidateOnSiteId)
   .then(sites => sites.map(site => Object.assign({}, site, { users: site.users.join(', ') })))
