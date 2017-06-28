@@ -78,9 +78,11 @@ class SiteSettings extends React.Component {
       <form id="site-edit" onSubmit={this.onSubmit}>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
-            <label htmlFor="defaultBranch" className={defaultBranchClass}>
-              Default branch</label>
+            <label htmlFor="defaultBranchInput" className={defaultBranchClass}>
+              Default branch
+            </label>
             <input
+              id="defaultBranchInput"
               name="defaultBranch"
               className="form-control"
               onChange={this.onChange}
@@ -131,19 +133,21 @@ class SiteSettings extends React.Component {
                 <p className="well-text">
                   Setup a branch to be deployed to a demo url.
                 </p>
-                <p>Branch name:</p>
+                <label htmlFor="demoBranchInput">Branch name:</label>
                 <input
                   name="demoBranch"
+                  id="demoBranchInput"
                   className="form-control"
                   type="text"
                   placeholder="Branch name"
                   value={state.demoBranch}
                   onChange={this.onChange}
                 />
-                <p>Demo domain:</p>
+                <label htmlFor="demoDomainInput">Demo domain:</label>
                 <input
                   name="demoDomain"
                   className="form-control"
+                  id="demoDomainInput"
                   type="text"
                   placeholder="https://preview.example.com"
                   value={state.demoDomain}
