@@ -106,6 +106,7 @@ module.exports = {
         demoDomain: params.demoDomain,
         config: params.config,
         previewConfig: params.previewConfig,
+        demoConfig: params.demoConfig,
         defaultBranch: params.defaultBranch,
         domain: params.domain,
         engine: params.engine,

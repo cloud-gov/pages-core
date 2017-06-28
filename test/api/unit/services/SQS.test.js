@@ -300,6 +300,7 @@ describe("SQS", () => {
       factory.site({
         defaultBranch: "master",
         config: "plugins_dir: _plugins",
+        demoConfig: "plugins_dir: _demo_plugins",
         previewConfig: "plugins_dir: _preview_plugins",
       }).then(site => {
         return factory.build({ site, branch: "master" })
@@ -316,6 +317,7 @@ describe("SQS", () => {
       factory.site({
         demoBranch: "demo",
         config: "plugins_dir: _plugins",
+        demoConfig: "plugins_dir: _demo_plugins",
         previewConfig: "plugins_dir: _preview_plugins",
       }).then(site => {
         return factory.build({ site, branch: "demo" })
@@ -323,7 +325,7 @@ describe("SQS", () => {
         return Build.findById(build.id, { include: [Site, User] })
       }).then(build => {
         const message = SQS.messageBodyForBuild(build)
-        expect(messageEnv(message, "CONFIG")).to.equal("plugins_dir: _plugins")
+        expect(messageEnv(message, "CONFIG")).to.equal("plugins_dir: _demo_plugins")
         done()
       }).catch(done)
     })
@@ -332,6 +334,7 @@ describe("SQS", () => {
       factory.site({
         defaultBranch: "master",
         config: "plugins_dir: _plugins",
+        demoConfig: "plugins_dir: _demo_plugins",
         previewConfig: "plugins_dir: _preview_plugins",
       }).then(site => {
         return factory.build({ site, branch: "preview" })

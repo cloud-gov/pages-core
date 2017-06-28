@@ -104,6 +104,9 @@ module.exports = (sequelize, DataTypes) => {
     previewConfig: {
       type: DataTypes.STRING,
     },
+    demoConfig: {
+      type: DataTypes.STRING,
+    },
     publishedAt: {
       type: DataTypes.DATE,
     },

@@ -10,8 +10,10 @@ const defaultBranch = build => build.branch === build.Site.defaultBranch;
 const demoBranch = build => build.branch === build.Site.demoBranch;
 
 const siteConfig = (build) => {
-  if (defaultBranch(build) || demoBranch(build)) {
+  if (defaultBranch(build)) {
     return build.Site.config;
+  } else if (demoBranch(build)) {
+    return build.Site.demoConfig;
   }
   return build.Site.previewConfig;
 };

@@ -24,6 +24,7 @@ class SiteSettings extends React.Component {
       demoDomain: site.demoDomain || '',
       config: site.config || '',
       previewConfig: site.previewConfig || '',
+      demoConfig: site.demoConfig || '',
       defaultBranch: site.defaultBranch || '',
       domain: site.domain || '',
       engine: site.engine,
@@ -164,6 +165,23 @@ class SiteSettings extends React.Component {
                 name="config"
                 className="form-control"
                 value={state.config}
+                onChange={this.onChange}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="usa-grid">
+          <div className="usa-width-one-whole">
+            <div className="well">
+              <h3 className="well-heading">Demo configuration</h3>
+              <p className="well-text">
+                Add additional configuration in yaml to be added to your
+                <code>_config.yml</code> file when we build your site&apos;s demo branch.
+              </p>
+              <textarea
+                name="demoConfig"
+                className="form-control"
+                value={state.demoConfig}
                 onChange={this.onChange}
               />
             </div>
