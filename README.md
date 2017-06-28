@@ -167,8 +167,10 @@ There are really two applications in one repo here. Right now we're OK with that
 If you are working on the front-end of the application, the things you need to know are:
 
 0. It is a React based application
-0. It is built with `Webpack`
-0. It lives in `/assets/app`
+0. It is built with `webpack`
+0. It lives in `/frontend`
+
+To analyze the contents of the front end JavaScript bundle, use `yarn analyze-webpack` after a build. This will launch a browser window showing a visualization of all the code that makes up the bundle.
 
 #### Using Postgres
 
@@ -178,7 +180,7 @@ By default, the application should use local disk storage in place of a database
 0. Next, you'll have to create the `federalist` database for the application. `$ createdb federalist` should do the trick. If you wish to run the tests, do the same, but for a database named `federalist-test`.
 0. Add postgres to your `/config/local.js` file
 
-```
+```json
 connections: {
   postgres: {
     database: 'federalist'

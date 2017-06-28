@@ -1,8 +1,10 @@
 import path from 'path';
 
+import webpack from 'webpack';
 import autoprefixer from 'autoprefixer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import ManifestPlugin from 'webpack-manifest-plugin';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 const extractStyles = new ExtractTextPlugin({
   filename: 'styles/styles.[contenthash].css',
@@ -54,5 +56,19 @@ export default {
       },
     ],
   },
-  plugins: [extractStyles, manifestPlugin],
+  plugins: [
+    extractStyles,
+    manifestPlugin,
+    // When webpack bundles moment, it includes all of its locale files,
+    // which we don't need, so we'll use this plugin to keep them out of the
+    // bundle
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    // Generate a webpack-bundle-analyzer stats file (in public/stats.json)
+    // It can be viewed by running `yarn analyze-webpack`
+    new BundleAnalyzerPlugin({
+      analyzerMode: 'disabled',
+      openAnalyzer: false,
+      generateStatsFile: true,
+    }),
+  ],
 };
