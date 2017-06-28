@@ -50,7 +50,8 @@
     "migrate:create": "node migrate.js create",
     "migrate:up": "node migrate.js up || true",
     "migrate:down": "node migrate.js down",
-    "export:sites": "node ./scripts/exportSitesAsCsv.js"
+    "export:sites": "node ./scripts/exportSitesAsCsv.js",
+    "analyze-webpack": "webpack-bundle-analyzer public/stats.json"
   },
   "main": "index.js",
   "repository": {
@@ -108,6 +109,7 @@
     "uswds": "^0.9.0",
     "watch": "^1.0.2",
     "webpack": "^2.6.1",
+    "webpack-bundle-analyzer": "^2.8.2",
     "webpack-manifest-plugin": "^1.1.0"
   },
   "engines": {
