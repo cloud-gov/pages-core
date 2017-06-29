@@ -1,10 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import autoBind from 'react-autobind';
 import { Link } from 'react-router';
-import LoadingIndicator from '../loadingIndicator';
-import { duration, timeFrom } from '../../util/datetime';
+
 import buildActions from '../../actions/buildActions';
+import LoadingIndicator from '../loadingIndicator';
+import RefreshBuildsButton from './refreshBuildsButton';
+import { duration, timeFrom } from '../../util/datetime';
+
 
 class SiteBuilds extends React.Component {
   static getUsername(build) {
@@ -27,10 +30,6 @@ class SiteBuilds extends React.Component {
     return <LoadingIndicator />;
   }
 
-  static renderEmptyState() {
-    return <p>This site does not have any builds</p>;
-  }
-
   static restartLink(build) {
     /* eslint-disable jsx-a11y/href-no-hash */
     return (
@@ -45,6 +44,11 @@ class SiteBuilds extends React.Component {
     /* eslint-enable jsx-a11y/href-no-hash */
   }
 
+  constructor(props) {
+    super(props);
+    autoBind(this);
+  }
+
   componentDidMount() {
     buildActions.fetchBuilds(this.props.site);
   }
@@ -56,9 +60,21 @@ class SiteBuilds extends React.Component {
     return this.props.builds.data;
   }
 
+  renderEmptyState() {
+    return (
+      <div>
+        <p>This site does not have any builds.</p>
+        <RefreshBuildsButton site={this.props.site} />
+      </div>
+    );
+  }
+
   renderBuildsTable() {
     return (
       <div>
+        <div className="log-tools">
+          <RefreshBuildsButton site={this.props.site} />
+        </div>
         <table className="usa-table-borderless log-table log-table__site-builds">
           <thead>
             <tr>
@@ -112,7 +128,7 @@ class SiteBuilds extends React.Component {
     if (this.props.builds.isLoading) {
       return SiteBuilds.renderLoadingState();
     } else if (!builds.length) {
-      return SiteBuilds.renderEmptyState();
+      return this.renderEmptyState();
     }
     return this.renderBuildsTable();
   }
