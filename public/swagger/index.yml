@@ -220,6 +220,9 @@ paths:
               previewConfig:
                 type: string
                 description: Jekyll configs for the site in the preview environment
+              demoConfig:
+                type: string
+                description: Jekyll configs for the site demo
               repository:
                 type: string
                 description: The name of the GitHub repository for the site
@@ -298,6 +301,9 @@ paths:
               previewConfig:
                 type: string
                 description: Jekyll configs for the site in the preview environment
+              demoConfig:
+                type: string
+                description: Jekyll configs for the site demo
               repository:
                 type: string
                 description: The name of the GitHub repository for the site

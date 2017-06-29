@@ -41,6 +41,9 @@
     "previewConfig": {
       "type": "string"
     },
+    "demoConfig": {
+      "type": "string"
+    },
     "publishedAt": {
       "type": "string",
       "format": "date-time"
