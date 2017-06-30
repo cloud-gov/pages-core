@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import buildLogActions from '../../actions/buildLogActions';
 import LoadingIndicator from '../loadingIndicator';
 import SiteBuildLogTable from './siteBuildLogTable';
+import RefreshBuildLogsButton from './refreshBuildLogsButton';
+
 import { API } from '../../util/federalistApi';
 
 
@@ -21,7 +23,12 @@ class SiteBuildLogs extends React.Component {
 
     // else
     if (!buildLogs.data || !buildLogs.data.length) {
-      return (<p>This build does not have any build logs.</p>);
+      return (
+        <div>
+          <p>This build does not have any build logs.</p>
+          <RefreshBuildLogsButton buildId={this.props.params.buildId} />
+        </div>
+      );
     }
 
     // else
@@ -31,7 +38,12 @@ class SiteBuildLogs extends React.Component {
 
     return (
       <div>
-        <a href={downloadUrl} download={downloadName}>Download logs</a>
+        <div className="log-tools">
+          <ul className="usa-unstyled-list">
+            <li><a href={downloadUrl} download={downloadName}>Download logs</a></li>
+            <li><RefreshBuildLogsButton buildId={buildId} /></li>
+          </ul>
+        </div>
         <SiteBuildLogTable buildLogs={buildLogs.data} />
       </div>
     );
