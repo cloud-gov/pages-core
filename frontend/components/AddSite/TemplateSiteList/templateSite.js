@@ -1,18 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { getSafeRepoName } from '../../../util';
 
 const propTypes = {
-  name: React.PropTypes.string.isRequired,
-  defaultOwner: React.PropTypes.string.isRequired,
-  example: React.PropTypes.string.isRequired,
-  title: React.PropTypes.string.isRequired,
-  description: React.PropTypes.string.isRequired,
-  thumb: React.PropTypes.string.isRequired,
-  active: React.PropTypes.number.isRequired,
-  handleChooseActive: React.PropTypes.func.isRequired,
-  handleSubmit: React.PropTypes.func.isRequired,
-  index: React.PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired,
+  defaultOwner: PropTypes.string.isRequired,
+  example: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  thumb: PropTypes.string.isRequired,
+  active: PropTypes.number.isRequired,
+  handleChooseActive: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  index: PropTypes.number.isRequired,
 };
 
 class TemplateSite extends React.Component {

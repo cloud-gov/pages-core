@@ -1,36 +1,23 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import LinkButton from '../linkButton';
 
 const propTypes = {
-  repository: React.PropTypes.string.isRequired, // Name of the repo
-  owner: React.PropTypes.string.isRequired,
-  title: React.PropTypes.string.isRequired, // Title of the section we are on
-  siteId: React.PropTypes.number.isRequired,
-  branch: React.PropTypes.string.isRequired,
-  fileName: React.PropTypes.string,
-  viewLink: React.PropTypes.string
-};
-
-const defaultPropTypes = {
-  fileName: ''
+  repository: PropTypes.string.isRequired, // Name of the repo
+  title: PropTypes.string.isRequired, // Title of the section we are on
+  viewLink: PropTypes.string.isRequired,
 };
 
 class PagesHeader extends React.Component {
   getLinkButtonConfigs() {
-    const {
-      siteId,
-      branch,
-      fileName,
-      viewLink,
-      owner,
-      repository
-    } = this.props;
+    const { viewLink } = this.props;
 
     return {
       text: 'View Website',
       alt: 'View this website',
       className: 'usa-button-big pull-right icon icon-view icon-white',
       target: '_blank',
+      rel: 'noopener noreferrer',
       href: viewLink,
     };
   }
@@ -45,7 +32,8 @@ class PagesHeader extends React.Component {
           <img
             className="header-icon"
             src="/images/website.svg"
-            alt="Websites icon"/>
+            alt="Websites icon"
+          />
           <div className="header-title">
             <h1>{repository}</h1>
             <p>{title}</p>
@@ -60,6 +48,5 @@ class PagesHeader extends React.Component {
 }
 
 PagesHeader.propTypes = propTypes;
-PagesHeader.defaultPropTypes = defaultPropTypes;
 
 export default PagesHeader;
