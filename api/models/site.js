@@ -1,4 +1,6 @@
 const url = require('url');
+const validator = require('validator');
+
 const config = require('../../config');
 
 const afterValidate = (site) => {
@@ -12,6 +14,14 @@ const afterValidate = (site) => {
     error.status = 403;
     throw error;
   }
+};
+
+const validationFailed = (site, options, validationError) => {
+  const messages = validationError.errors.map(err => `${err.path}: ${err.message}`);
+
+  const error = new Error(messages.join('\n'));
+  error.status = 403;
+  throw error;
 };
 
 const associate = ({ Site, Build, User }) => {
@@ -34,6 +44,22 @@ const beforeValidate = (site) => {
   }
 };
 
+
+function isEmptyOrUrl(value, throws = true) {
+  const validUrlOptions = {
+    require_protocol: true,
+    protocols: ['http', 'https'],
+  };
+
+  if (value && value.length && !validator.isURL(value, validUrlOptions)) {
+    if (throws) {
+      throw new Error('URL must start with http:// or https://');
+    }
+    return false;
+  }
+  return true;
+}
+
 function toJSON() {
   const object = Object.assign({}, this.get({
     plain: true,
@@ -41,6 +67,16 @@ function toJSON() {
 
   object.createdAt = object.createdAt.toISOString();
   object.updatedAt = object.updatedAt.toISOString();
+
+  // prevent any invalid domain or demoDomain URLs from being returned
+  // or used in the creation of viewLink or demoViewLink
+  if (!isEmptyOrUrl(object.domain, false)) {
+    object.domain = null;
+  }
+
+  if (!isEmptyOrUrl(object.demoDomain, false)) {
+    object.demoDomain = null;
+  }
 
   const s3Config = config.s3;
   object.siteRoot = `http://${s3Config.bucket}.s3-website-${s3Config.region}.amazonaws.com`;
@@ -80,6 +116,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     demoDomain: {
       type: DataTypes.STRING,
+      validate: {
+        isEmptyOrUrl,
+      },
     },
     config: {
       type: DataTypes.STRING,
@@ -90,6 +129,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     domain: {
       type: DataTypes.STRING,
+      validate: {
+        isEmptyOrUrl,
+      },
     },
     engine: {
       type: DataTypes.ENUM,
@@ -125,6 +167,7 @@ module.exports = (sequelize, DataTypes) => {
     hooks: {
       beforeValidate,
       afterValidate,
+      validationFailed,
     },
   });
 

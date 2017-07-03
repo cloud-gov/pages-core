@@ -80,8 +80,6 @@ describe('SQS', () => {
     context("building a site's default branch", () => {
       it('should set an empty string for BASEURL in the message for a site with a custom domain', (done) => {
         const domains = [
-          'www.example.com',
-          'www.example.com/',
           'https://example.com',
           'https://example.com/',
           'http://example.com',
@@ -114,8 +112,6 @@ describe('SQS', () => {
 
       it('should respect the path component of a custom domain when setting BASEURL in the message', (done) => {
         const domains = [
-          'www.example.com/abc/def',
-          'www.example.com/abc/def/',
           'https://example.com/abc/def',
           'https://example.com/abc/def/',
           'http://example.com/abc/def',
@@ -150,8 +146,6 @@ describe('SQS', () => {
     context("building a site's demo branch", () => {
       it('should set an empty string for BASEURL in the message for a site with a demo domain', (done) => {
         const domains = [
-          'www.example.com',
-          'www.example.com/',
           'https://example.com',
           'https://example.com/',
           'http://example.com',
@@ -181,8 +175,6 @@ describe('SQS', () => {
 
       it('should respect the path component of a custom domain when setting BASEURL in the message', (done) => {
         const domains = [
-          'www.example.com/abc/def',
-          'www.example.com/abc/def/',
           'https://example.com/abc/def',
           'https://example.com/abc/def/',
           'http://example.com/abc/def',
@@ -213,7 +205,7 @@ describe('SQS', () => {
 
     context("building a site's preview branch", () => {
       it('should set BASEURL in the message for a site with a custom domain', (done) => {
-        factory.site({ domain: 'www.example.com', owner: 'owner', repository: 'repo', defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'branch' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+        factory.site({ domain: 'http://www.example.com', owner: 'owner', repository: 'repo', defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'branch' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'BASEURL')).to.equal('/preview/owner/repo/branch');
           done();
