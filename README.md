@@ -120,7 +120,6 @@ module.exports = {
 organizations: [
   6233994,  // 18f
   14109682, // federalist-users
-  14080592,  // us-federal-sbst
   99999999 // your org added here
 ]
 ```
