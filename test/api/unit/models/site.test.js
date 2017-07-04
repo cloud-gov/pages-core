@@ -106,7 +106,7 @@ describe('Site model', () => {
       domain: 'boop://beep.com',
     }).catch((err) => {
       expect(err.status).to.equal(403);
-      expect(err.message).to.equal('domain: URL must start with http:// or https://');
+      expect(err.message).to.equal('domain: URL must start with https://');
       done();
     }).catch(done);
   });
@@ -118,7 +118,7 @@ describe('Site model', () => {
       demoDomain: 'beep.com',
     }).catch((err) => {
       expect(err.status).to.equal(403);
-      expect(err.message).to.equal('demoDomain: URL must start with http:// or https://');
+      expect(err.message).to.equal('demoDomain: URL must start with https://');
       done();
     }).catch(done);
   });

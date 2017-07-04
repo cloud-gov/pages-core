@@ -44,22 +44,6 @@ const beforeValidate = (site) => {
   }
 };
 
-
-function isEmptyOrUrl(value, throws = true) {
-  const validUrlOptions = {
-    require_protocol: true,
-    protocols: ['http', 'https'],
-  };
-
-  if (value && value.length && !validator.isURL(value, validUrlOptions)) {
-    if (throws) {
-      throw new Error('URL must start with http:// or https://');
-    }
-    return false;
-  }
-  return true;
-}
-
 function toJSON() {
   const object = Object.assign({}, this.get({
     plain: true,
@@ -67,16 +51,6 @@ function toJSON() {
 
   object.createdAt = object.createdAt.toISOString();
   object.updatedAt = object.updatedAt.toISOString();
-
-  // prevent any invalid domain or demoDomain URLs from being returned
-  // or used in the creation of viewLink or demoViewLink
-  if (!isEmptyOrUrl(object.domain, false)) {
-    object.domain = null;
-  }
-
-  if (!isEmptyOrUrl(object.demoDomain, false)) {
-    object.demoDomain = null;
-  }
 
   const s3Config = config.s3;
   object.siteRoot = `http://${s3Config.bucket}.s3-website-${s3Config.region}.amazonaws.com`;
@@ -107,6 +81,17 @@ function viewLinkForBranch(branch) {
     return `${s3Root}/demo/${this.owner}/${this.repository}`;
   }
   return url.resolve(config.app.preview_hostname, `/preview/${this.owner}/${this.repository}/${branch}`);
+}
+
+function isEmptyOrUrl(value) {
+  const validUrlOptions = {
+    require_protocol: true,
+    protocols: ['https'],
+  };
+
+  if (value && value.length && !validator.isURL(value, validUrlOptions)) {
+    throw new Error('URL must start with https://');
+  }
 }
 
 module.exports = (sequelize, DataTypes) => {
