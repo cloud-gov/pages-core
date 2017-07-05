@@ -11,7 +11,6 @@ proxyquire.noCallThru();
 const mock = () => () => <div />;
 
 const TemplateSiteList = mock();
-const LinkButton = mock();
 const AlertBanner = mock();
 
 const addSite = stub();
@@ -30,7 +29,6 @@ const propsWithoutError = {
 
 const Fixture = proxyquire('../../../../frontend/components/AddSite', {
   './TemplateSiteList': TemplateSiteList,
-  '../linkButton': LinkButton,
   '../alertBanner': AlertBanner,
   '../../actions/siteActions': { addSite },
 }).default;
@@ -66,7 +64,7 @@ describe('<AddSite/>', () => {
   it('renders its children', () => {
     expect(wrapper.find(TemplateSiteList)).to.have.length(1);
     expect(wrapper.find(AlertBanner)).to.have.length(1);
-    expect(wrapper.find(LinkButton)).to.have.length(1);
+    expect(wrapper.find('Link')).to.have.length(1);
     expect(wrapper.find('form')).to.have.length(1);
   });
 

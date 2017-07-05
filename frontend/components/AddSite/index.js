@@ -1,7 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { Link } from 'react-router';
 
 import TemplateSiteList from './TemplateSiteList';
-import LinkButton from '../linkButton';
 import AlertBanner from '../alertBanner';
 import SelectSiteEngine from '../selectSiteEngine';
 
@@ -10,12 +11,12 @@ import siteActions from '../../actions/siteActions';
 import templates from '../../../config/templates';
 
 const propTypes = {
-  storeState: React.PropTypes.shape({
-    user: React.PropTypes.shape({
-      username: React.PropTypes.string,
-      id: React.PropTypes.number,
+  storeState: PropTypes.shape({
+    user: PropTypes.shape({
+      username: PropTypes.string,
+      id: PropTypes.number,
     }),
-    error: React.PropTypes.string,
+    error: PropTypes.string,
   }),
 };
 
@@ -134,11 +135,13 @@ class AddSite extends React.Component {
           </div>
           <div className="usa-grid">
             <div className="usa-width-one-whole">
-              <LinkButton
-                className="usa-button-secondary"
-                text="Cancel"
-                href="/sites"
-              />
+              <Link
+                role="button"
+                to="/sites"
+                className="usa-button usa-button-secondary"
+              >
+                Cancel
+              </Link>
               <button type="submit" className="usa-button usa-button-primary" style={{ display: 'inline-block' }}>
                 Submit repository-based site
               </button>
