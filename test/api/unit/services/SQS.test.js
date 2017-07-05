@@ -80,12 +80,8 @@ describe('SQS', () => {
     context("building a site's default branch", () => {
       it('should set an empty string for BASEURL in the message for a site with a custom domain', (done) => {
         const domains = [
-          'www.example.com',
-          'www.example.com/',
           'https://example.com',
           'https://example.com/',
-          'http://example.com',
-          'http://example.com/',
         ];
 
         const baseurlPromises = domains.map(domain => factory.site({ domain, defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'master' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
@@ -114,12 +110,8 @@ describe('SQS', () => {
 
       it('should respect the path component of a custom domain when setting BASEURL in the message', (done) => {
         const domains = [
-          'www.example.com/abc/def',
-          'www.example.com/abc/def/',
           'https://example.com/abc/def',
           'https://example.com/abc/def/',
-          'http://example.com/abc/def',
-          'http://example.com/abc/def/',
         ];
 
         const baseurlPromises = domains.map(domain => factory.site({ domain, defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'master' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
@@ -150,12 +142,8 @@ describe('SQS', () => {
     context("building a site's demo branch", () => {
       it('should set an empty string for BASEURL in the message for a site with a demo domain', (done) => {
         const domains = [
-          'www.example.com',
-          'www.example.com/',
           'https://example.com',
           'https://example.com/',
-          'http://example.com',
-          'http://example.com/',
         ];
 
         const baseurlPromises = domains.map(domain => factory.site({ demoDomain: domain, demoBranch: 'demo' }).then(site => factory.build({ site, branch: 'demo' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
@@ -181,12 +169,8 @@ describe('SQS', () => {
 
       it('should respect the path component of a custom domain when setting BASEURL in the message', (done) => {
         const domains = [
-          'www.example.com/abc/def',
-          'www.example.com/abc/def/',
           'https://example.com/abc/def',
           'https://example.com/abc/def/',
-          'http://example.com/abc/def',
-          'http://example.com/abc/def/',
         ];
 
         const baseurlPromises = domains.map(domain => factory.site({ demoDomain: domain, demoBranch: 'demo' }).then(site => factory.build({ site, branch: 'demo' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
@@ -213,7 +197,7 @@ describe('SQS', () => {
 
     context("building a site's preview branch", () => {
       it('should set BASEURL in the message for a site with a custom domain', (done) => {
-        factory.site({ domain: 'www.example.com', owner: 'owner', repository: 'repo', defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'branch' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+        factory.site({ domain: 'https://www.example.com', owner: 'owner', repository: 'repo', defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'branch' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'BASEURL')).to.equal('/preview/owner/repo/branch');
           done();

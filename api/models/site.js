@@ -1,4 +1,6 @@
 const url = require('url');
+const validator = require('validator');
+
 const config = require('../../config');
 
 const afterValidate = (site) => {
@@ -12,6 +14,14 @@ const afterValidate = (site) => {
     error.status = 403;
     throw error;
   }
+};
+
+const validationFailed = (site, options, validationError) => {
+  const messages = validationError.errors.map(err => `${err.path}: ${err.message}`);
+
+  const error = new Error(messages.join('\n'));
+  error.status = 403;
+  throw error;
 };
 
 const associate = ({ Site, Build, User }) => {
@@ -73,6 +83,17 @@ function viewLinkForBranch(branch) {
   return url.resolve(config.app.preview_hostname, `/preview/${this.owner}/${this.repository}/${branch}`);
 }
 
+function isEmptyOrUrl(value) {
+  const validUrlOptions = {
+    require_protocol: true,
+    protocols: ['https'],
+  };
+
+  if (value && value.length && !validator.isURL(value, validUrlOptions)) {
+    throw new Error('URL must start with https://');
+  }
+}
+
 module.exports = (sequelize, DataTypes) => {
   const Site = sequelize.define('Site', {
     demoBranch: {
@@ -80,6 +101,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     demoDomain: {
       type: DataTypes.STRING,
+      validate: {
+        isEmptyOrUrl,
+      },
     },
     config: {
       type: DataTypes.STRING,
@@ -90,6 +114,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     domain: {
       type: DataTypes.STRING,
+      validate: {
+        isEmptyOrUrl,
+      },
     },
     engine: {
       type: DataTypes.ENUM,
@@ -125,6 +152,7 @@ module.exports = (sequelize, DataTypes) => {
     hooks: {
       beforeValidate,
       afterValidate,
+      validationFailed,
     },
   });
 

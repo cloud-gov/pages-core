@@ -116,7 +116,8 @@ class SiteSettings extends React.Component {
                 <input
                   name="domain"
                   className="form-control"
-                  type="text"
+                  type="url"
+                  pattern="https://.+"
                   placeholder="https://example.gov"
                   value={state.domain}
                   onChange={this.onChange}
@@ -148,7 +149,8 @@ class SiteSettings extends React.Component {
                   name="demoDomain"
                   className="form-control"
                   id="demoDomainInput"
-                  type="text"
+                  type="url"
+                  pattern="https://.+"
                   placeholder="https://preview.example.com"
                   value={state.demoDomain}
                   onChange={this.onChange}
