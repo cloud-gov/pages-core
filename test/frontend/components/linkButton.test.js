@@ -6,37 +6,39 @@ import { Link } from 'react-router';
 import LinkButton from '../../../frontend/components/linkButton';
 
 const linkButton =
-  <LinkButton
+  (<LinkButton
     href="https://site.org"
     text="click here"
     className="another-class"
     alt="alt text"
-  />;
+  />);
 
 class ButtonChild extends React.Component {
   render() {
     return 'I am a child';
   }
-};
+}
 
 describe('<LinkButton/>', () => {
   let wrapper;
 
   describe('props', () => {
-    const props = ['alt', 'className', 'text', 'href'];
+    const props = ['alt', 'className', 'text', 'href', 'target'];
 
     wrapper = shallow(linkButton);
 
-    let propKeys = Object.keys(wrapper.instance().props);
+    const propKeys = Object.keys(wrapper.instance().props);
 
-    props.forEach(prop => {
+    props.forEach((prop) => {
       it(`has prop ${prop}`, () => {
         expect(propKeys.indexOf(prop)).not.to.equal(-1);
       });
     });
   });
 
-  beforeEach(() => wrapper = shallow(linkButton));
+  beforeEach(() => {
+    wrapper = shallow(linkButton);
+  });
 
   it('renders a <Link/> tag', () => {
     expect(wrapper.find(Link)).to.have.length(1);
@@ -47,14 +49,22 @@ describe('<LinkButton/>', () => {
     expect(wrapper.hasClass('another-class')).to.be.true;
   });
 
+  it('adds ref="noopener noreferrer" when target="_blank"', () => {
+    const wrapperWithTarget = shallow(
+      <LinkButton href="https://example.com" target="_blank" text="link" />
+    );
+
+    expect(wrapperWithTarget.prop('rel')).to.equal('noopener noreferrer');
+  });
+
   it('accepts a text property as a child', () => {
     expect(wrapper.children().text()).to.equal('click here');
   });
 
   it('accepts arbitrary react components as children', () => {
     const wrapperWithKids =
-      shallow(<LinkButton href="https://google.com"><ButtonChild/></LinkButton>);
+      shallow(<LinkButton href="https://google.com"><ButtonChild /></LinkButton>);
 
-    expect(wrapperWithKids.contains(<ButtonChild/>)).to.be.true;
+    expect(wrapperWithKids.contains(<ButtonChild />)).to.be.true;
   });
 });

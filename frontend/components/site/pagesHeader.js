@@ -17,7 +17,6 @@ class PagesHeader extends React.Component {
       alt: 'View this website',
       className: 'usa-button-big pull-right icon icon-view icon-white',
       target: '_blank',
-      rel: 'noopener noreferrer',
       href: viewLink,
     };
   }
