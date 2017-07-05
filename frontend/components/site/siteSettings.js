@@ -5,9 +5,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router';
 
 import SiteGithubBranchesTable from './siteGithubBranchesTable';
-import LinkButton from '../linkButton';
 import SelectSiteEngine from '../selectSiteEngine';
 import githubBranchActions from '../../actions/githubBranchActions';
 import siteActions from '../../actions/siteActions';
@@ -212,11 +212,13 @@ class SiteSettings extends React.Component {
         </div>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
-            <LinkButton
-              href={this.getSiteUrl()}
-              className="usa-button-gray"
-              text="Cancel"
-            />
+            <Link
+              role="button"
+              to={this.getSiteUrl()}
+              className="usa-button usa-button-gray"
+            >
+              Cancel
+            </Link>
             <button
               type="submit"
               className="usa-button usa-button-primary"

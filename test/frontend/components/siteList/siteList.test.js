@@ -2,19 +2,18 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import proxyquire from 'proxyquire';
-import LoadingIndicator from '../../../../frontend/components/loadingIndicator'
+import LoadingIndicator from '../../../../frontend/components/loadingIndicator';
 
 proxyquire.noCallThru();
 
-const SiteListItem = () => <div></div>;
-const LinkButton = () => <div></div>;
+const SiteListItem = () => <div />;
 
 const NO_SITE_TEXT = 'No sites yet.';
 
 // sites can be empty as the test is rendering empty divs for children.
-const STORE_WITH_SITES = { sites: { isLoading: false, data: [{}, {}, {}]} };
-const STORE_WITH_NO_SITES = { sites: { isLoading: false, data: []} };
-const STORE_LOADING_SITES = { sites: { isLoading: true } }
+const STORE_WITH_SITES = { sites: { isLoading: false, data: [{}, {}, {}] } };
+const STORE_WITH_NO_SITES = { sites: { isLoading: false, data: [] } };
+const STORE_LOADING_SITES = { sites: { isLoading: true } };
 
 describe('<SiteList />', () => {
   let Fixture;
@@ -23,19 +22,18 @@ describe('<SiteList />', () => {
   beforeEach(() => {
     Fixture = proxyquire('../../../../frontend/components/siteList/siteList', {
       './siteListItem': SiteListItem,
-      '../linkButton': LinkButton
     }).default;
   });
 
   describe('when sites are being loaded', () => {
     beforeEach(() => {
-      wrapper = shallow(<Fixture storeState={STORE_LOADING_SITES}/>)
-    })
+      wrapper = shallow(<Fixture storeState={STORE_LOADING_SITES} />);
+    });
 
-    it("renders a loading indicator", () => {
-      expect(wrapper.find(LoadingIndicator)).to.have.length(1)
-    })
-  })
+    it('renders a loading indicator', () => {
+      expect(wrapper.find(LoadingIndicator)).to.have.length(1);
+    });
+  });
 
   describe('when no sites are received as props', () => {
     beforeEach(() => {
@@ -47,21 +45,19 @@ describe('<SiteList />', () => {
     });
 
     it('always renders 2 `add new site` button', () => {
-      expect(wrapper.find(LinkButton)).to.have.length(2);
+      expect(wrapper.find('Link[to="/sites/new"]')).to.have.length(2);
     });
 
     it('renders fallback content when user has no sites', () => {
-      const fallbackEl = wrapper.find('h1').filterWhere((el) => {
-        return el.text() === NO_SITE_TEXT;
-      });
+      const fallbackEl = wrapper.find('h1').filterWhere(el => el.text() === NO_SITE_TEXT);
 
-      expect(fallbackEl.text()).to.equal(NO_SITE_TEXT)
+      expect(fallbackEl.text()).to.equal(NO_SITE_TEXT);
     });
   });
 
   describe('when sites are received as props', () => {
     beforeEach(() => {
-      wrapper = shallow(<Fixture storeState={STORE_WITH_SITES}/>);
+      wrapper = shallow(<Fixture storeState={STORE_WITH_SITES} />);
     });
 
     it('renders a container for the list of sites', () => {
