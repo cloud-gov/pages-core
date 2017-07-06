@@ -1,45 +1,48 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
+import shortid from 'shortid';
 
 const propTypes = {
-  username: React.PropTypes.oneOfType([
-    React.PropTypes.string,
-    React.PropTypes.object
-  ])
+  username: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object,
+  ]),
 };
 
-const getSecondaryNav = (username) => {
-  const links = getSecondaryNavLinks(username);
-
-  return links.map((link, index) => {
-    return <li key={index}>{link}</li>;
-  });
+const defaultProps = {
+  username: null,
 };
 
-const getSecondaryNavLinks = (username) => {
+function getSecondaryNavLinks(username) {
   if (username) {
     return [
       <Link to="/sites">{username}</Link>,
-      <a href="https://federalist-docs.18f.gov" target="_blank">Documentation</a>,
-      <a href="https://github.com/18F/federalist/issues/new" target="_blank">File Issue</a>,
+      <a href="https://federalist-docs.18f.gov" target="_blank" rel="noopener noreferrer">Documentation</a>,
+      <a href="https://github.com/18F/federalist/issues/new" target="_blank" rel="noopener noreferrer">File Issue</a>,
       <a href="mailto:federalist-support@gsa.gov">Get Help</a>,
       <a href="/logout">Log out</a>,
-    ]
-  } else {
-    return [
-      <a href="https://federalist-docs.18f.gov" target="_blank">Documentation</a>,
-      <a href="https://github.com/18F/federalist/issues/new" target="_blank">Contact Us</a>,
-      <a href="/auth/github">Log in</a>,
-    ]
+    ];
   }
+  return [
+    <a href="https://federalist-docs.18f.gov" target="_blank" rel="noopener noreferrer">Documentation</a>,
+    <a href="https://github.com/18F/federalist/issues/new" target="_blank" rel="noopener noreferrer">Contact Us</a>,
+    <a href="/auth/github">Log in</a>,
+  ];
 }
+
+function getSecondaryNav(username) {
+  const links = getSecondaryNavLinks(username);
+  return links.map(link => <li key={shortid.generate()}>{link}</li>);
+}
+
 
 const Nav = ({ username = null }) =>
   <nav className="usa-site-navbar">
     <div className="usa-grid">
       <div className="nav-elements">
         <div className="logo" id="logo">
-          <a href="/" accessKey="1" title="Home" aria-label="Home">Federalist logo</a>
+          <a href="/" title="Home" aria-label="Home">Federalist logo</a>
         </div>
         <div className="navbar-links" id="navbar-links">
           <ul className="" id="nav-mobile">
@@ -48,8 +51,9 @@ const Nav = ({ username = null }) =>
         </div>
       </div>
     </div>
-  </nav>
+  </nav>;
 
 Nav.propTypes = propTypes;
+Nav.defaultProps = defaultProps;
 
 export default Nav;

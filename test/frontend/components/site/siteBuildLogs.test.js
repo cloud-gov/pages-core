@@ -1,8 +1,10 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import LoadingIndicator from '../../../../frontend/components/loadingIndicator';
+
 import SiteBuildLogs from '../../../../frontend/components/site/siteBuildLogs';
+import LoadingIndicator from '../../../../frontend/components/loadingIndicator';
+
 
 describe('<SiteBuildLogs/>', () => {
   it('should render a download link and <SiteBuildLogTable>', () => {
@@ -25,6 +27,21 @@ describe('<SiteBuildLogs/>', () => {
     expect(downloadLink).to.have.length(1);
     expect(downloadLink.prop('href')).to.equal('/v0/build/123/log?format=text');
     expect(downloadLink.prop('download')).to.equal('build-log-123.txt');
+  });
+
+  it('should render a button to refresh logs', () => {
+    const props = {
+      params: {
+        buildId: 123,
+      },
+      buildLogs: {
+        isLoading: false,
+        data: [],
+      },
+    };
+
+    const wrapper = shallow(<SiteBuildLogs {...props} />);
+    expect(wrapper.find('RefreshBuildLogsButton')).to.have.length(1);
   });
 
   it('should render a loading state if builds are loading', () => {
@@ -57,5 +74,6 @@ describe('<SiteBuildLogs/>', () => {
     expect(wrapper.find('SiteBuildLogTable')).to.have.length(0);
     expect(wrapper.find('p')).to.have.length(1);
     expect(wrapper.find('p').contains('This build does not have any build logs.')).to.be.true;
+    expect(wrapper.find('RefreshBuildLogsButton')).to.have.length(1);
   });
 });

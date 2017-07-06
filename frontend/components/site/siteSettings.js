@@ -5,9 +5,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router';
 
 import SiteGithubBranchesTable from './siteGithubBranchesTable';
-import LinkButton from '../linkButton';
 import SelectSiteEngine from '../selectSiteEngine';
 import githubBranchActions from '../../actions/githubBranchActions';
 import siteActions from '../../actions/siteActions';
@@ -24,6 +24,7 @@ class SiteSettings extends React.Component {
       demoDomain: site.demoDomain || '',
       config: site.config || '',
       previewConfig: site.previewConfig || '',
+      demoConfig: site.demoConfig || '',
       defaultBranch: site.defaultBranch || '',
       domain: site.domain || '',
       engine: site.engine,
@@ -77,9 +78,11 @@ class SiteSettings extends React.Component {
       <form id="site-edit" onSubmit={this.onSubmit}>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
-            <label htmlFor="defaultBranch" className={defaultBranchClass}>
-              Default branch</label>
+            <label htmlFor="defaultBranchInput" className={defaultBranchClass}>
+              Default branch
+            </label>
             <input
+              id="defaultBranchInput"
               name="defaultBranch"
               className="form-control"
               onChange={this.onChange}
@@ -113,7 +116,8 @@ class SiteSettings extends React.Component {
                 <input
                   name="domain"
                   className="form-control"
-                  type="text"
+                  type="url"
+                  pattern="https://.+"
                   placeholder="https://example.gov"
                   value={state.domain}
                   onChange={this.onChange}
@@ -130,20 +134,23 @@ class SiteSettings extends React.Component {
                 <p className="well-text">
                   Setup a branch to be deployed to a demo url.
                 </p>
-                <p>Branch name:</p>
+                <label htmlFor="demoBranchInput">Branch name:</label>
                 <input
                   name="demoBranch"
+                  id="demoBranchInput"
                   className="form-control"
                   type="text"
                   placeholder="Branch name"
                   value={state.demoBranch}
                   onChange={this.onChange}
                 />
-                <p>Demo domain:</p>
+                <label htmlFor="demoDomainInput">Demo domain:</label>
                 <input
                   name="demoDomain"
                   className="form-control"
-                  type="text"
+                  id="demoDomainInput"
+                  type="url"
+                  pattern="https://.+"
                   placeholder="https://preview.example.com"
                   value={state.demoDomain}
                   onChange={this.onChange}
@@ -172,6 +179,23 @@ class SiteSettings extends React.Component {
         <div className="usa-grid">
           <div className="usa-width-one-whole">
             <div className="well">
+              <h3 className="well-heading">Demo configuration</h3>
+              <p className="well-text">
+                Add additional configuration in yaml to be added to your
+                <code>_config.yml</code> file when we build your site&apos;s demo branch.
+              </p>
+              <textarea
+                name="demoConfig"
+                className="form-control"
+                value={state.demoConfig}
+                onChange={this.onChange}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="usa-grid">
+          <div className="usa-width-one-whole">
+            <div className="well">
               <h3 className="well-heading">Preview configuration</h3>
               <p className="well-text">
                 Add additional configuration in yaml to be added to your
@@ -188,11 +212,13 @@ class SiteSettings extends React.Component {
         </div>
         <div className="usa-grid">
           <div className="usa-width-one-whole">
-            <LinkButton
-              href={this.getSiteUrl()}
-              className="usa-button-gray"
-              text="Cancel"
-            />
+            <Link
+              role="button"
+              to={this.getSiteUrl()}
+              className="usa-button usa-button-gray"
+            >
+              Cancel
+            </Link>
             <button
               type="submit"
               className="usa-button usa-button-primary"

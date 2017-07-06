@@ -1,8 +1,9 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import LoadingIndicator from '../../../../frontend/components/loadingIndicator';
+
 import SiteBuilds from '../../../../frontend/components/site/siteBuilds';
+import LoadingIndicator from '../../../../frontend/components/loadingIndicator';
 
 let user;
 let site;
@@ -62,13 +63,19 @@ describe('<SiteBuilds/>', () => {
     expect(userCell.text()).to.equal('');
   });
 
+  it('should render a button to refresh builds', () => {
+    const wrapper = shallow(<SiteBuilds {...props} />);
+    expect(wrapper.find('RefreshBuildsButton')).to.have.length(1);
+  });
+
   it('should render an empty state if no builds are present', () => {
     props = { builds: { isLoading: false, builds: [] } };
     const wrapper = shallow(<SiteBuilds {...props} />);
 
     expect(wrapper.find('table')).to.have.length(0);
     expect(wrapper.find('p')).to.have.length(1);
-    expect(wrapper.find('p').contains('This site does not have any builds')).to.be.true;
+    expect(wrapper.find('p').contains('This site does not have any builds.')).to.be.true;
+    expect(wrapper.find('RefreshBuildsButton')).to.have.length(1);
   });
 
   it('should render a paragraph about truncation if 100 or more builds are present', () => {

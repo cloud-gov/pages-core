@@ -6,7 +6,6 @@ function serializeObject(build) {
   json.site = build.Site.toJSON();
   delete json.User;
   delete json.Site;
-  delete json.token;
   return json;
 }
 

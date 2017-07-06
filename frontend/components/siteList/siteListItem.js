@@ -1,27 +1,33 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import PublishedState from './publishedState';
 
 const propTypes = {
-  site: React.PropTypes.shape({
-    repository: React.PropTypes.string,
-    owner: React.PropTypes.string,
-    id: React.PropTypes.number,
-    publishedAt: React.PropTypes.string,
-    viewLink: React.PropTypes.string
-  })
+  site: PropTypes.shape({
+    repository: PropTypes.string,
+    owner: PropTypes.string,
+    id: PropTypes.number,
+    publishedAt: PropTypes.string,
+    viewLink: PropTypes.string,
+  }),
 };
 
-const getViewLink = (viewLink, repo) => {
-  return <a
-    className="icon icon-view"
-    href={ viewLink }
-    alt={`View the ${repo} site`}
-    target="_blank">Visit Site</a>;
+function getViewLink(viewLink, repo) {
+  return (
+    <a
+      className="icon icon-view"
+      href={viewLink}
+      alt={`View the ${repo} site`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Visit Site
+    </a>);
 }
 
 const SiteListItem = ({ site }) =>
-  <li className="sites-list-item">
+  (<li className="sites-list-item">
     <div className="sites-list-item-text">
       <Link to={`/sites/${site.id}`}>
         { site.owner } / { site.repository }
@@ -31,7 +37,7 @@ const SiteListItem = ({ site }) =>
     <div className="sites-list-item-actions">
       { getViewLink(site.viewLink, site.repository) }
     </div>
-  </li>
+  </li>);
 
 SiteListItem.propTypes = propTypes;
 
