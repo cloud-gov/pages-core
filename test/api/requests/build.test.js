@@ -122,15 +122,22 @@ describe('Build API', () => {
     });
 
     it('should render a 403 if the user is not associated with the given site', (done) => {
+      const userProm = factory.user();
+      const authorizedSiteProm = factory.site({ users: Promise.all([userProm]) });
+      const notAuthorizedSiteProm = factory.site();
+      const cookieProm = session(userProm);
+
       Promise.props({
-        site: factory.site(),
-        cookie: session(),
+        user: userProm,
+        authorizedSite: authorizedSiteProm,
+        notAuthorizedSite: notAuthorizedSiteProm,
+        cookie: cookieProm,
       })
-      .then(({ site, cookie }) =>
+      .then(({ notAuthorizedSite, cookie }) =>
         request(app)
           .post('/v0/build/')
           .send({
-            site: site.id,
+            site: notAuthorizedSite.id,
             branch: 'my-branch',
             commitSha: 'Everybody 👏👏👏👏 your hands',
           })
