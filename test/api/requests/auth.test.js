@@ -238,19 +238,19 @@ describe('Authentication request', () => {
       const cookie = `${config.session.key}=s%3A${signedSessionKey}`;
 
       config.session.store.set(sessionKey, sessionBody)
-      .then(() => factory.user())
-      .then((user) => {
-        githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
-        return request(app)
-          .get('/auth/github/callback?code=auth-code-123abc')
-          .set('Cookie', cookie)
-          .expect(302);
-      })
-      .then((response) => {
-        expect(response.header.location).to.equal(redirectPath);
-        done();
-      })
-      .catch(done);
+        .then(() => factory.user())
+        .then((user) => {
+          githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
+          return request(app)
+            .get('/auth/github/callback?code=auth-code-123abc')
+            .set('Cookie', cookie)
+            .expect(302);
+        })
+        .then((response) => {
+          expect(response.header.location).to.equal(redirectPath);
+          done();
+        })
+        .catch(done);
     });
   });
 });
