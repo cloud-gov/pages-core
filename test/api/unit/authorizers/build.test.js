@@ -1,89 +1,107 @@
-const expect = require("chai").expect
-const factory = require("../../support/factory")
+const expect = require('chai').expect;
+const factory = require('../../support/factory');
 
-const authorizer = require("../../../../api/authorizers/build.js")
+const authorizer = require('../../../../api/authorizers/build.js');
 
-describe("Build authorizer", () => {
-  describe("findOne(user, build)", () => {
-    it("should resolve if the build is associated with one of the user's site", done => {
-      const user = factory.user()
-      const site = factory.site({ users: Promise.all([user]) })
-      const build = factory.build({ site: site })
+describe('Build authorizer', () => {
+  describe('findOne(user, build)', () => {
+    it("should resolve if the build is associated with one of the user's site", (done) => {
+      const userProm = factory.user();
+      const siteProm = factory.site({ users: Promise.all([userProm]) });
+      const buildProm = factory.build({ siteProm });
 
-      Promise.props({ user, site, build }).then(({ user, site, build }) => {
-        authorizer.findOne(user, build)
-      }).then(() => {
-        done()
-      }).catch(done)
-    })
+      Promise.props({ user: userProm, site: siteProm, build: buildProm })
+        .then(({ user, build }) => {
+          authorizer.findOne(user, build);
+        }).then(() => {
+          done();
+        }).catch(done);
+    });
 
-    it("should reject if the build is not associated with one of the user's sites", done => {
+    it("should reject if the build is not associated with one of the user's sites", (done) => {
       Promise.props({
         user: factory.user(),
         build: factory.build(),
-      }).then(({ user, build }) => {
-        return authorizer.findOne(user, build)
-      }).then(() => {
-        done(new Error("Expected authorization error"))
-      }).catch(err => {
-        expect(err).to.equal(403)
-        done()
-      }).catch(done)
-    })
+      })
+      .then(({ user, build }) => authorizer.findOne(user, build))
+      .then(() => {
+        done(new Error('Expected authorization error'));
+      })
+      .catch((err) => {
+        expect(err).to.equal(403);
+        done();
+      })
+      .catch(done);
+    });
 
-    it("should reject if the build is not associated with one of the user's site even if the user started the build", done => {
-      const user = factory.user()
-      const build = factory.build({ user: user, site: factory.site() })
+    it("should reject if the build is not associated with one of the user's site even if the user started the build", (done) => {
+      const userProm = factory.user();
+      const buildProm = factory.build({ user: userProm, site: factory.site() });
 
-      Promise.props({ user, build }).then(({ user, build }) => {
-        return authorizer.findOne(user, build)
-      }).then(() => {
-        done(new Error("Expected authorization error"))
-      }).catch(err => {
-        expect(err).to.equal(403)
-        done()
-      }).catch(done)
-    })
-  })
+      Promise.props({ user: userProm, build: buildProm })
+      .then(({ user, build }) => authorizer.findOne(user, build))
+      .then(() => {
+        done(new Error('Expected authorization error'));
+      })
+      .catch((err) => {
+        expect(err).to.equal(403);
+        done();
+      })
+      .catch(done);
+    });
+  });
 
-  describe("create(user, params)", () => {
-    it("should resolve if the build is associated with one of the user's site", done => {
-      const user = factory.user()
-      const site = factory.site({ users: Promise.all([user]) })
+  describe('create(user, params)', () => {
+    it("should resolve if the build is associated with one of the user's site", (done) => {
+      const userProm = factory.user();
+      const siteProm = factory.site({ users: Promise.all([userProm]) });
 
-      Promise.props({ user, site }).then(({ user, site }) => {
-        return authorizer.create(user, { user: user.id, site: site.id })
-      }).then(() => {
-        done()
-      }).catch(done)
-    })
+      Promise.props({ user: userProm, site: siteProm })
+        .then(({ user, site }) => authorizer.create(user, { user: user.id, site: site.id }))
+        .then(() => {
+          done();
+        })
+        .catch(done);
+    });
 
-    it("should reject if the build is not associated with one of the user's sites", done => {
+    it("should reject if the build is not associated with one of the user's sites", (done) => {
+      const userProm = factory.user();
+      const authorizedSiteProm = factory.site({ users: Promise.all([userProm]) });
+      const notAuthorizedSiteProm = factory.site();
+
       Promise.props({
-        user: factory.user(),
-        site: factory.site(),
-      }).then(({ user, build }) => {
-        return authorizer.create(user, { user: user.id, site: site.id })
-      }).then(() => {
-        done(new Error("Expected authorization error"))
-      }).catch(err => {
-        expect(err).to.equal(403)
-        done()
-      }).catch(done)
-    })
+        user: userProm,
+        authorizedSite: authorizedSiteProm,
+        notAuthorizedSite: notAuthorizedSiteProm,
+      }).then(({ user, notAuthorizedSite }) =>
+        authorizer.create(user, { user: user.id, site: notAuthorizedSite.id })
+      )
+      .then(() => {
+        done(new Error('Expected authorization error'));
+      })
+      .catch((err) => {
+        expect(err).to.equal(403);
+        done();
+      })
+      .catch(done);
+    });
 
-    it("should reject if the build is not associated with the current user", done => {
-      const user = factory.user()
-      const otherUser = factory.user()
-      const site = factory.site({ users: Promise.all([user, otherUser]) })
-      Promise.props({ user, otherUser, site }).then(({ user, otherUser, site }) => {
-        return authorizer.create(user, { user: otherUser.id, site: site.id })
-      }).then(() => {
-        done(new Error("Expected authorization error"))
-      }).catch(err => {
-        expect(err).to.equal(403)
-        done()
-      }).catch(done)
-    })
-  })
-})
+    it('should reject if the build is not associated with the current user', (done) => {
+      const userProm = factory.user();
+      const otherUserProm = factory.user();
+      const siteProm = factory.site({ users: Promise.all([userProm, otherUserProm]) });
+      Promise.props({ user: userProm, otherUser: otherUserProm, site: siteProm })
+        .then(({ user, otherUser, site }) =>
+          authorizer.create(user, { user: otherUser.id, site: site.id })
+        )
+        .then(() => {
+          done(new Error('Expected authorization error'));
+        })
+        .catch((err) => {
+          expect(err).to.equal(403);
+          done();
+        })
+        .catch(done);
+    });
+  });
+});
