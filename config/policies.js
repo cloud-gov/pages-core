@@ -1,3 +1,3 @@
 module.exports = {
-  authRevalidationMinutes: 30,
+  authRevalidationMinutes: 60 * 24,
 };
