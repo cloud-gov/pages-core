@@ -1,8 +1,7 @@
-const router = require("express").Router()
-const PublishedFileController = require("../controllers/published-file")
-const passport = require("../policies/passport")
-const sessionAuth = require("../policies/sessionAuth")
+const router = require('express').Router();
+const PublishedFileController = require('../controllers/published-file');
+const sessionAuth = require('../policies/sessionAuth');
 
-router.get("/v0/site/:site_id/published-branch/:branch/published-file", passport, sessionAuth, PublishedFileController.find)
+router.get('/v0/site/:site_id/published-branch/:branch/published-file', sessionAuth, PublishedFileController.find);
 
-module.exports = router
+module.exports = router;

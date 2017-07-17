@@ -23,6 +23,7 @@ const expressWinston = require('express-winston');
 const session = require('express-session');
 const PostgresStore = require('connect-session-sequelize')(session.Store);
 const responses = require('./api/responses');
+const passport = require('./api/services/passport');
 
 const app = express();
 const sequelize = require('./api/models').sequelize;
@@ -32,6 +33,13 @@ config.session.store = new PostgresStore({ db: sequelize });
 app.engine('html', require('ejs').renderFile);
 
 app.use(session(config.session));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  next();
+});
+
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

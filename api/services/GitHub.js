@@ -62,7 +62,7 @@ const githubClient = accessToken => new Promise((resolve) => {
 });
 
 const parseGithubErrorMessage = (error) => {
-  let githubError = 'Encounted an unexpected GitHub error';
+  let githubError = 'Encountered an unexpected GitHub error';
 
   try {
     githubError = JSON.parse(error.message).errors[0].message;

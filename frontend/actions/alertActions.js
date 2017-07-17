@@ -5,8 +5,8 @@ import {
   httpError as createHttpErrorAction,
   httpSuccess as createHttpSuccessAction,
   setStale as createSetStaleAction,
-  clear as createClearAction
-} from "./actionCreators/alertActions";
+  clear as createClearAction,
+} from './actionCreators/alertActions';
 
 export default {
   authError() {
@@ -35,9 +35,9 @@ export default {
 
   update(isStale) {
     if (isStale) {
-      this.clear()
+      this.clear();
     } else {
-      this.setStale()
+      this.setStale();
     }
-  }
+  },
 };
