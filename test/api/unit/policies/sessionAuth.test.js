@@ -3,6 +3,8 @@ const sinon = require('sinon');
 const moment = require('moment');
 const proxyquire = require('proxyquire').noCallThru();
 
+const config = require('../../../../config');
+
 describe('sessionAuth', () => {
   let mockReq;
   let mockRes;
@@ -74,7 +76,7 @@ describe('sessionAuth', () => {
   });
 
   it('revalidates the user if authenticatedAt is too old', (done) => {
-    mockReq.session.authenticatedAt = moment().subtract(35, 'minutes').toDate();
+    mockReq.session.authenticatedAt = moment().subtract(config.policies.authRevalidationMinutes + 5, 'minutes').toDate();
     sessionAuth(mockReq, mockRes, mockNext)
       .then(() => {
         expect(moment(mockReq.session.authenticatedAt).isSame(moment(), 'second')).to.equal(true);
@@ -86,7 +88,7 @@ describe('sessionAuth', () => {
   });
 
   it('ends the session and calls res.forbidden if the user is no longer valid', (done) => {
-    mockReq.session.authenticatedAt = moment().subtract(35, 'minutes').toDate();
+    mockReq.session.authenticatedAt = moment().subtract(config.policies.authRevalidationMinutes + 5, 'minutes').toDate();
     mockReq.user.githubAccessToken = 'bad-user-token';
 
     sessionAuth(mockReq, mockRes, mockNext)
