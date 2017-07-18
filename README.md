@@ -1,7 +1,6 @@
 # Federalist
 [![Build Status](https://travis-ci.org/18F/federalist.svg?ref=master)](https://travis-ci.org/18F/federalist)
 [![Code Climate](https://codeclimate.com/github/18F/federalist/badges/gpa.svg)](https://codeclimate.com/github/18F/federalist)
-[![Known Vulnerabilities](https://snyk.io/test/github/18F/federalist/badge.svg)](https://snyk.io/test/github/18F/federalist)
 
 ***Under active development. Everything is subject to change. Learn more at the [documentation site](https://federalist-docs.18f.gov/). Interested in talking to us? [Join our public chat room](https://chat.18f.gov/).***
 
