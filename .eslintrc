@@ -1,6 +1,7 @@
 {
   "extends": "airbnb",
   "rules": {
+    /** airbnb config overrides **/
     "react/jsx-filename-extension": [0],
     "import/no-extraneous-dependencies": [0],
     "class-methods-use-this": [0],
