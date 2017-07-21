@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import SideNav from './site/SideNav/sideNav';
 import PagesHeader from './site/pagesHeader';
 import AlertBanner from './alertBanner';
+import LoadingIndicator from './loadingIndicator';
 
 const propTypes = {
   params: PropTypes.shape({
@@ -25,7 +26,7 @@ const propTypes = {
   }),
   location: PropTypes.shape({
     pathname: PropTypes.string,
-  }),
+  }).isRequired,
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node,
@@ -34,7 +35,6 @@ const propTypes = {
 
 const defaultProps = {
   children: null,
-  location: null,
   storeState: null,
 };
 
@@ -54,12 +54,36 @@ class SiteContainer extends React.Component {
   render() {
     const { storeState, children, params, location } = this.props;
 
+    if (storeState.sites.isLoading) {
+      return <LoadingIndicator />;
+    }
+
     const site = this.getCurrentSite(storeState.sites, params.id);
+
+    if (!site) {
+      return (
+        <div className="usa-grid">
+          <div className="usa-alert usa-alert-error" role="alert">
+            <div className="usa-alert-body">
+              <h3 className="usa-alert-heading">Unauthorized</h3>
+              <p className="usa-alert-text">
+                Apologies; you don&apos;t have access to this site in Federalist!
+                <br />
+                Please contact the site owner if you should have access.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const pageTitle = this.getPageTitle(location.pathname);
     const builds = storeState.builds;
     const buildLogs = storeState.buildLogs;
     const publishedBranches = storeState.publishedBranches;
     const publishedFiles = storeState.publishedFiles;
     const githubBranches = storeState.githubBranches;
+
     const childConfigs = {
       site,
       builds,
@@ -68,12 +92,6 @@ class SiteContainer extends React.Component {
       publishedFiles,
       githubBranches,
     };
-
-    const pageTitle = this.getPageTitle(location.pathname);
-
-    if (!site) {
-      return null;
-    }
 
     return (
       <div className="usa-grid site">
