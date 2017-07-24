@@ -1,0 +1,20 @@
+---
+engines:
+  eslint:
+    enabled: true
+    channel: "eslint-3"
+    checks:
+      import/no-unresolved:
+        enabled: false
+      import/extensions:
+        enabled: false
+    config:
+      extensions:
+      - .js
+      - .jsx
+ratings:
+  paths:
+  - "**.js"
+  - "**.jsx"
+exclude_paths:
+- node_modules/

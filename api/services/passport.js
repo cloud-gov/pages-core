@@ -18,7 +18,9 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
     }))
     .then((models) => {
       user = models[0];
-      if (!user) throw new Error(`Unable to find or create user ${profile.username}`);
+      if (!user) {
+        throw new Error(`Unable to find or create user ${profile.username}`);
+      }
       return user.update({
         githubAccessToken: accessToken,
         githubUserId: profile.id,
@@ -34,13 +36,12 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
     });
 };
 
-passport.use(new GitHubStrategy(
-  config.passport.github.options,
-  githubVerifyCallback));
+passport.use(new GitHubStrategy(config.passport.github.options, githubVerifyCallback));
 
 passport.logout = (req, res) => {
   req.logout();
   req.session.authenticated = false;
+  req.session.authenticatedAt = null;
   req.session.save(() => {
     res.redirect('/');
   });
@@ -50,6 +51,7 @@ passport.callback = (req, res) => {
   passport.authenticate('github')(req, res, () => {
     if (req.user) {
       req.session.authenticated = true;
+      req.session.authenticatedAt = new Date();
       req.session.save(() => {
         if (req.session.authRedirectPath) {
           res.redirect(req.session.authRedirectPath);

@@ -7,9 +7,11 @@ export default {
   fetch(endpoint, params) {
     const url = `${API}/${endpoint}`;
 
-    return fetch(url, params).then(data => data).catch((error) => {
-      alertActions.httpError(error.message);
-    });
+    return fetch(url, params)
+      .then(data => data)
+      .catch((error) => {
+        alertActions.httpError(error.message);
+      });
   },
 
   fetchBuilds(site) {

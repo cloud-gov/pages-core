@@ -51,7 +51,7 @@ describe('Authentication request', () => {
   });
 
   describe('GET /logout', () => {
-    it('should unauthenticate and remove the user from the session', (done) => {
+    it('should de-authenticate and remove the user from the session', (done) => {
       let user;
       let cookie;
 
@@ -205,7 +205,7 @@ describe('Authentication request', () => {
     });
 
     it('should redirect to the home page with the login_failed parameter if the user is not in a whitelisted GitHub organization', (done) => {
-      githubAPINocks.githubAuth('unatuhorized-user', [{ id: 654321 }]);
+      githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
 
       request(app)
         .get('/auth/github/callback?code=auth-code-123abc')
@@ -238,19 +238,19 @@ describe('Authentication request', () => {
       const cookie = `${config.session.key}=s%3A${signedSessionKey}`;
 
       config.session.store.set(sessionKey, sessionBody)
-      .then(() => factory.user())
-      .then((user) => {
-        githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
-        return request(app)
-          .get('/auth/github/callback?code=auth-code-123abc')
-          .set('Cookie', cookie)
-          .expect(302);
-      })
-      .then((response) => {
-        expect(response.header.location).to.equal(redirectPath);
-        done();
-      })
-      .catch(done);
+        .then(() => factory.user())
+        .then((user) => {
+          githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
+          return request(app)
+            .get('/auth/github/callback?code=auth-code-123abc')
+            .set('Cookie', cookie)
+            .expect(302);
+        })
+        .then((response) => {
+          expect(response.header.location).to.equal(redirectPath);
+          done();
+        })
+        .catch(done);
     });
   });
 });
