@@ -1,9 +1,9 @@
 const scanjsRules = {
-  /** no-unsanitized rules **/
+  /* no-unsanitized rules */
   'no-unsanitized/method': 2,
   'no-unsanitized/property': 2,
 
-  /** ScanJS rules **/
+  /* ScanJS rules */
   'scanjs-rules/assign_to_hostname': 1,
   'scanjs-rules/assign_to_href': 1,
   'scanjs-rules/assign_to_location': 1,
@@ -21,7 +21,7 @@ const scanjsRules = {
   'scanjs-rules/call_addEventListener_message': 1,
   'scanjs-rules/call_addEventListener_moznetworkdownload': 1,
   'scanjs-rules/call_addEventListener_moznetworkupload': 1,
-  'scanjs-rules/call_connect': 1,
+  // 'scanjs-rules/call_connect': 1,  // we use react-redux's connect in many places safely
   'scanjs-rules/call_eval': 1,
   'scanjs-rules/call_execScript': 1,
   'scanjs-rules/call_generateCRMFRequest': 1,
@@ -53,7 +53,7 @@ const scanjsRules = {
   'scanjs-rules/new_MozActivity': 1,
   'scanjs-rules/new_MozSpeakerManager': 1,
   'scanjs-rules/new_Notification': 1,
-  'scanjs-rules/object_mozSystem': 1,
+  // 'scanjs-rules/object_mozSystem': 1,  // bombs out on spread operator, ref: https://github.com/mozfreddyb/eslint-plugin-scanjs-rules/issues/8
   'scanjs-rules/property_addIdleObserver': 1,
   'scanjs-rules/property_createContextualFragment': 1,
   'scanjs-rules/property_geolocation': 1,
@@ -93,7 +93,9 @@ const scanjsRules = {
 };
 
 const finalRules = {
-  /** airbnb config overrides **/
+  /* airbnb config overrides */
+  // allow names to be the same as the default for Redux container testing
+  'import/no-named-as-default': [0],
   'react/jsx-filename-extension': [0],
   'import/no-extraneous-dependencies': [0],
   'class-methods-use-this': [0],

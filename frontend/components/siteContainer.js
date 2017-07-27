@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import SideNav from './site/SideNav/sideNav';
 import PagesHeader from './site/pagesHeader';
@@ -38,7 +39,7 @@ const defaultProps = {
   storeState: null,
 };
 
-class SiteContainer extends React.Component {
+export class SiteContainer extends React.Component {
   getPageTitle(pathname) {
     return pathname.split('/').pop();
   }
@@ -54,7 +55,7 @@ class SiteContainer extends React.Component {
   render() {
     const { storeState, children, params, location } = this.props;
 
-    if (storeState.sites.isLoading) {
+    if (storeState.sites.isLoading || !storeState.sites.data) {
       return <LoadingIndicator />;
     }
 
@@ -124,4 +125,4 @@ class SiteContainer extends React.Component {
 SiteContainer.propTypes = propTypes;
 SiteContainer.defaultProps = defaultProps;
 
-export default SiteContainer;
+export default connect(state => state)(SiteContainer);
