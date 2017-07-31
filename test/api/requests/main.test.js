@@ -167,7 +167,7 @@ describe('robots.txt', () => {
 
   it('denies robots when in production but non-production hostname', (done) => {
     config.app.app_env = 'production';
-    config.app.hostname = 'http://prod-url.com';
+    config.app.hostname = 'https://prod-url.com';
 
     request(app)
       .get('/robots.txt')
@@ -183,7 +183,7 @@ describe('robots.txt', () => {
 
   it('allows robots when in production and with production hostname', (done) => {
     config.app.app_env = 'production';
-    config.app.hostname = 'http://prod-url.com';
+    config.app.hostname = 'https://prod-url.com';
 
     request(app)
       .get('/robots.txt')

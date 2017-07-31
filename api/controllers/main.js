@@ -43,7 +43,7 @@ module.exports = {
 
     // If this is the production instance and the request came to the production hostname
     if (config.app.app_env === 'production' &&
-      config.app.hostname === `${req.protocol}://${req.hostname}`) {
+      config.app.hostname === `https://${req.hostname}`) {
       // then send the production robots.txt content
       return res.send(PROD_CONTENT);
     }
