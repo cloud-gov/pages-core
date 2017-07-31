@@ -5,7 +5,7 @@
 
 ***Under active development. Everything is subject to change. Learn more at the [documentation site](https://federalist-docs.18f.gov/). Interested in talking to us? [Join our public chat room](https://chat.18f.gov/).***
 
-Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub and Amazon Web Services to provide a simple way for developers to launch new static websites or more easily manage existing static websites.
+Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub and Amazon Web Services to provide a simple way for developers to launch new static websites or more easily manage existing static websites. This repo is home to "federalist-core" - a Node.js app that allows government users to add and configure their Federalist sites.
 
 ## Getting started
 
