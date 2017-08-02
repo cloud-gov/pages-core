@@ -72,16 +72,8 @@ app.use(expressWinston.errorLogger({
   ],
 }));
 
-const limiter = new RateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute window
-  max: 50, // limit each IP to 50 requests per window
-  delayAfter: 25, // delay requests by delayMs after 25 are made in a window
-  delayMs: 500, // delay requests by 500 ms
-});
-
-if (config.app.app_env !== 'development') {
-  app.use(limiter); // must be set before router is added to app
-}
+const limiter = new RateLimit(config.rateLimiting);
+app.use(limiter); // must be set before router is added to app
 
 app.use(router);
 
