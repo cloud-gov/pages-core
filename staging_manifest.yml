@@ -3,7 +3,9 @@ applications:
 - name: federalist-staging
 buildpack: nodejs_buildpack
 stack: cflinuxfs2
-domain: fr.cloud.gov
+routes:
+- route: federalist-staging.18f.gov
+- route: federalist-staging.fr.cloud.gov
 disk_quota: 2G
 memory: 256MB
 instances: 2
