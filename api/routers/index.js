@@ -1,14 +1,21 @@
-const router = new require("express").Router()
+const express = require('express');
 
-router.use(require("./auth"))
-router.use(require("./build-log"))
-router.use(require("./build"))
-router.use(require("./main"))
-router.use(require("./preview"))
-router.use(require("./published-branch"))
-router.use(require("./published-file"))
-router.use(require("./site"))
-router.use(require("./user"))
-router.use(require("./webhook"))
+const mainRouter = express.Router();
 
-module.exports = router
+mainRouter.use(require('./auth'));
+mainRouter.use(require('./main'));
+mainRouter.use(require('./preview'));
+mainRouter.use(require('./webhook'));
+
+const apiRouter = express.Router();
+apiRouter.use(require('./build-log'));
+apiRouter.use(require('./build'));
+apiRouter.use(require('./published-branch'));
+apiRouter.use(require('./site'));
+apiRouter.use(require('./user'));
+apiRouter.use(require('./published-file'));
+
+// prefix all api routes with "/v0"
+mainRouter.use('/v0', apiRouter);
+
+module.exports = mainRouter;

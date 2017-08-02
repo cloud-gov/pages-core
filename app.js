@@ -24,6 +24,8 @@ const session = require('express-session');
 const PostgresStore = require('connect-session-sequelize')(session.Store);
 const responses = require('./api/responses');
 const passport = require('./api/services/passport');
+const RateLimit = require('express-rate-limit');
+const router = require('./api/routers');
 
 const app = express();
 const sequelize = require('./api/models').sequelize;
@@ -31,6 +33,11 @@ const sequelize = require('./api/models').sequelize;
 config.session.store = new PostgresStore({ db: sequelize });
 
 app.engine('html', require('ejs').renderFile);
+
+// When deployed we are behind a proxy, but we want to be
+// able to access the requesting user's IP in req.ip, so
+// 'trust proxy' must be enabled.
+app.enable('trust proxy');
 
 app.use(session(config.session));
 app.use(passport.initialize());
@@ -65,8 +72,17 @@ app.use(expressWinston.errorLogger({
   ],
 }));
 
-const routers = require('./api/routers');
+const limiter = new RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute window
+  max: 50, // limit each IP to 50 requests per window
+  delayAfter: 25, // delay requests by delayMs after 25 are made in a window
+  delayMs: 500, // delay requests by 500 ms
+});
 
-app.use(routers);
+if (config.app.app_env !== 'development') {
+  app.use(limiter); // must be set before router is added to app
+}
+
+app.use(router);
 
 module.exports = app;
