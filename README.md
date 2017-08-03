@@ -16,7 +16,7 @@ To run the server, you'll need [Node.js](https://nodejs.org/download/). You'll a
 #### In Production
 
 We have a few environment variables that the application uses.
-In production, those variables are provided to the application either through the Cloud Foundry environment or through Cloud Foundry services.
+In production, those variables are provided to the application either through the Cloud Foundry environment or through Cloud Foundry services
 
 To inspect the way the environment is provided to the application in production and staging, look at `manifest.yml` and `staging_manifest.yml` respectively.
 To see how the application receives those configurations, looks at `config/env/production.js`.
