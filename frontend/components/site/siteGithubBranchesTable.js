@@ -1,6 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+
 import LoadingIndicator from '../loadingIndicator';
+import { SITE, GITHUB_BRANCHES } from '../../propTypes';
 
 const tableHeader = () => (
   <thead>
@@ -47,7 +48,7 @@ const renderLoadingState = () => <LoadingIndicator />;
 
 const renderErrorState = () => (
   <p>
-    An error occured while downloading branch data from Github.
+    An error occurred while downloading branch data from Github.
     Often this is because the repo is private or has been deleted.
   </p>
 );
@@ -63,18 +64,8 @@ const SiteGithubBranchesTable = ({ site, branches }) => {
 
 
 SiteGithubBranchesTable.propTypes = {
-  site: PropTypes.shape({
-    defaultBranch: PropTypes.string.isRequired,
-    viewLink: PropTypes.string.isRequired,
-    demoViewLink: PropTypes.string,
-    owner: PropTypes.string.isRequired,
-    repository: PropTypes.string.isRequired,
-  }).isRequired,
-  branches: PropTypes.shape({
-    error: PropTypes.object,
-    isLoading: PropTypes.bool.isRequired,
-    data: PropTypes.array,
-  }).isRequired,
+  site: SITE.isRequired,
+  branches: GITHUB_BRANCHES.isRequired,
 };
 
 export default SiteGithubBranchesTable;
