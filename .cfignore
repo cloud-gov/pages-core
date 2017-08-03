@@ -23,6 +23,9 @@
 
 config/local.js
 
+# test coverage reports
+coverage
+.nyc_output
 
 ################################################
 # Node.js / NPM

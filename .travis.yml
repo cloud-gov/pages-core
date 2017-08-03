@@ -24,6 +24,10 @@ before_script:
 script:
   - scripts/lint-travis.sh
   - yarn test
+after_success:
+  - npm install -g codeclimate-test-reporter
+  - yarn coverage # converts to lcov format
+  - codeclimate-test-reporter < ./coverage/lcov.info
 env:
   global:
   - CF_API="https://api.fr.cloud.gov"
