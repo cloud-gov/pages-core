@@ -39,6 +39,18 @@ describe('Main Site', () => {
       .catch(done);
     });
 
+    it('should contain front end config values', (done) => {
+      request(app)
+        .get('/')
+        .then((response) => {
+          expect(response.text.search('FRONTEND_CONFIG')).to.be.above(-1);
+          expect(response.text.search('PREVIEW_HOSTNAME')).to.be.above(-1);
+          expect(response.text.search('TEMPLATES')).to.be.above(-1);
+          done();
+        })
+        .catch(done);
+    });
+
     context('<title> element', () => {
       const origAppEnv = config.app.app_env;
 

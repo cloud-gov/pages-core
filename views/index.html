@@ -32,6 +32,10 @@
     <title>
       Federalist<% if (siteDisplayEnv) { %> | <%= siteDisplayEnv %><% } %>
     </title>
+
+    <script>
+      window.FRONTEND_CONFIG = <%- JSON.stringify(frontendConfig) %>;
+    </script>
   </head>
   <body>
     <% if (siteWideError) { %>

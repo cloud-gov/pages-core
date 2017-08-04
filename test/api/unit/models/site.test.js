@@ -18,13 +18,11 @@ describe('Site model', () => {
   });
 
   describe('.viewLinkForBranch(branch)', () => {
-    const s3BaseURL = `http://${config.s3.bucket}.s3-website-${config.s3.region}.amazonaws.com`;
-
     context('for the default branch', () => {
-      it('should return an S3 site link if there is no custom domain', (done) => {
+      it('should return a proxy link if there is no custom domain', (done) => {
         factory.site({ defaultBranch: 'default-branch' }).then((site) => {
           const viewLink = site.viewLinkForBranch('default-branch');
-          expect(viewLink).to.equal(`${s3BaseURL}/site/${site.owner}/${site.repository}`);
+          expect(viewLink).to.equal(`${config.app.preview_hostname}/site/${site.owner}/${site.repository}/`);
           done();
         }).catch(done);
       });
@@ -42,10 +40,10 @@ describe('Site model', () => {
     });
 
     context('for the demo branch', () => {
-      it('should return an s3 demo link if there is no demo domain', (done) => {
+      it('should return a proxy demo link if there is no demo domain', (done) => {
         factory.site({ demoBranch: 'demo-branch' }).then((site) => {
           const viewLink = site.viewLinkForBranch('demo-branch');
-          expect(viewLink).to.equal(`${s3BaseURL}/demo/${site.owner}/${site.repository}`);
+          expect(viewLink).to.equal(`${config.app.preview_hostname}/demo/${site.owner}/${site.repository}/`);
           done();
         }).catch(done);
       });
@@ -66,7 +64,7 @@ describe('Site model', () => {
       it('should return a federalist preview link', (done) => {
         factory.site().then((site) => {
           const viewLink = site.viewLinkForBranch('preview-branch');
-          expect(viewLink).to.equal(`http://localhost:1338/preview/${site.owner}/${site.repository}/preview-branch`);
+          expect(viewLink).to.equal(`${config.app.preview_hostname}/preview/${site.owner}/${site.repository}/preview-branch/`);
           done();
         }).catch(done);
       });

@@ -1,10 +1,13 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import TemplateSite from './templateSite';
 
 const propTypes = {
-  templates: React.PropTypes.object.isRequired,
-  handleSubmitTemplate: React.PropTypes.func.isRequired
+  templates: PropTypes.object.isRequired,
+  handleSubmitTemplate: PropTypes.func.isRequired,
+  defaultOwner: PropTypes.string.isRequired,
 };
 
 const MAX_CELLS_PER_ROW = 3;
@@ -30,13 +33,13 @@ const createRowsOf = (values, perRow) => {
   return rows;
 };
 
-class TemplateList extends React.Component {
+export class TemplateList extends React.Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
-      activeChildId: -1
+      activeChildId: -1,
     };
 
     this.handleChooseActive = this.handleChooseActive.bind(this);
@@ -44,7 +47,7 @@ class TemplateList extends React.Component {
 
   handleChooseActive(childId) {
     this.setState({
-      activeChildId: childId
+      activeChildId: childId,
     });
   }
 
@@ -62,30 +65,30 @@ class TemplateList extends React.Component {
 
     let index = 0;
 
-    const templateGrid = templateRows.map((row, rowIndex) => {
-      return (
-        <div className="usa-grid" key={rowIndex}>
-          {row.map((templateName, cellIndex) => {
-            const template = templates[templateName];
-            return (
-              <div
-                  className={`usa-width-one-${cellSize}`}
-                  key={cellIndex}>
-                <TemplateSite
-                  name={templateName}
-                  index={index++}
-                  thumb={template.thumb}
-                  active={this.state.activeChildId}
-                  handleChooseActive={this.handleChooseActive}
-                  handleSubmit={this.props.handleSubmitTemplate}
-                  defaultOwner={this.props.defaultOwner}
-                  {...template} />
-              </div>
-            );
-          })}
-        </div>
-      );
-    });
+    const templateGrid = templateRows.map(row => (
+      <div className="usa-grid" key={row}>
+        {row.map((templateName) => {
+          const template = templates[templateName];
+          return (
+            <div
+              className={`usa-width-one-${cellSize}`}
+              key={templateName}
+            >
+              <TemplateSite
+                name={templateName}
+                index={index++} // eslint-disable-line no-plusplus
+                thumb={template.thumb}
+                active={this.state.activeChildId}
+                handleChooseActive={this.handleChooseActive}
+                handleSubmit={this.props.handleSubmitTemplate}
+                defaultOwner={this.props.defaultOwner}
+                {...template}
+              />
+            </div>
+          );
+        })}
+      </div>
+    ));
 
     return (
       <div>
@@ -102,4 +105,8 @@ class TemplateList extends React.Component {
 
 TemplateList.propTypes = propTypes;
 
-export default TemplateList;
+const mapStateToProps = state => ({
+  templates: state.FRONTEND_CONFIG.TEMPLATES,
+});
+
+export default connect(mapStateToProps)(TemplateList);

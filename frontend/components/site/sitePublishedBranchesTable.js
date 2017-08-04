@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import publishedBranchActions from '../../actions/publishedBranchActions';
 import LoadingIndicator from '../loadingIndicator';
+import BranchViewLink from '../branchViewLink';
+import { SITE } from '../../propTypes';
 
 class SitePublishedBranchesTable extends React.Component {
   componentDidMount() {
@@ -36,22 +38,24 @@ class SitePublishedBranchesTable extends React.Component {
   renderPublishedBranchRow(branch) {
     return (
       <tr key={branch.name}>
-        <td>{ branch.name }</td>
+        <td>{branch.name}</td>
         <td>
-          { this.renderBranchViewLink(branch) }<br />
-          { this.renderBranchFilesLink(branch) }
+          <ul className="usa-unstyled-list">
+            <li>
+              <BranchViewLink branchName={branch.name} site={this.props.site} />
+            </li>
+            <li>
+              {this.renderBranchFilesLink(branch)}
+            </li>
+          </ul>
         </td>
       </tr>
     );
   }
 
-  renderBranchViewLink(branch) {
-    return <a href={branch.viewLink} target="_blank" rel="noopener noreferrer">View</a>;
-  }
-
   renderBranchFilesLink(branch) {
     const href = `/sites/${branch.site.id}/published/${branch.name}`;
-    return <Link to={href}>Files</Link>;
+    return <Link to={href}>View Files</Link>;
   }
 
   renderLoadingState() {
@@ -84,10 +88,12 @@ SitePublishedBranchesTable.propTypes = {
     isLoading: PropTypes.bool.isRequired,
     data: PropTypes.array,
   }),
+  site: SITE,
 };
 
 SitePublishedBranchesTable.defaultProps = {
   publishedBranches: null,
+  site: null,
 };
 
 export default SitePublishedBranchesTable;

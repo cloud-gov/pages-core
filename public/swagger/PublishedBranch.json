@@ -2,8 +2,7 @@
   "type": "object",
   "required": [
     "name",
-    "site",
-    "viewLink"
+    "site"
   ],
   "properties": {
     "name": {
@@ -11,9 +10,6 @@
     },
     "site": {
       "type": "object"
-    },
-    "viewLink": {
-      "type": "string"
     }
   }
 }

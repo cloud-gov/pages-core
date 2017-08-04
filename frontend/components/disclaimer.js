@@ -1,6 +1,6 @@
 import React from 'react';
 
-const flagUrl = require('uswds/dist/img/us_flag_small.png');
+import flagUrl from 'uswds/dist/img/us_flag_small.png';
 
 const Disclaimer = () =>
   <div className="usa-disclaimer">

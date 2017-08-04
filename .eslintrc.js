@@ -25,11 +25,20 @@ try {
   const scanjsConfig = require('eslint-plugin-scanjs-rules');
   scanjsRulesConfig = {};
 
-  // bring in all the scanjs rules, prefixed with 'scanjs-rules',
+  // ScanJS rules we don't want to use:
+  const ignoredScanjsRules = [
+    // scanjs is looking for a different `connect` than the one we use often from react-redux
+    'call_connect',
+  ];
+
+  // bring in all the scanjs rules (other than those we want ignored),
+  // prefixed with 'scanjs-rules',
   // but convert them to eslint errors instead of warnings
-  Object.keys(scanjsConfig.rulesConfig).forEach((rule) => {
-    scanjsRulesConfig[`scanjs-rules/${rule}`] = 1;
-  });
+  Object.keys(scanjsConfig.rulesConfig)
+    .filter(rule => ignoredScanjsRules.indexOf(rule) === -1)
+    .forEach((rule) => {
+      scanjsRulesConfig[`scanjs-rules/${rule}`] = 1;
+    });
 } catch (err) {
   // eslint-disable-next-line no-console
   console.log('eslint-plugin-scanjs-rules not found, will not include scanjs rules');

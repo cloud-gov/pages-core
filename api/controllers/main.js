@@ -21,11 +21,17 @@ module.exports = {
 
     const siteDisplayEnv = config.app.app_env !== 'production' ? config.app.app_env : null;
 
+    const frontendConfig = {
+      TEMPLATES: config.templates,
+      PREVIEW_HOSTNAME: config.app.preview_hostname,
+    };
+
     const context = {
       siteWideError: null,
       jsBundleName: webpackAssets['main.js'],
       cssBundleName: webpackAssets['main.css'],
       siteDisplayEnv,
+      frontendConfig,
     };
 
     if (req.session.authenticated) {
