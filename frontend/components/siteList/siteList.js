@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
+import { connect } from 'react-redux';
 
 import AlertBanner from '../alertBanner';
 import SiteListItem from './siteListItem';
@@ -22,7 +23,7 @@ const getSites = (sitesState) => {
     return <LoadingIndicator />;
   }
 
-  if (!sitesState.data.length) {
+  if (!sitesState.data || !sitesState.data.length) {
     return (
       <div className="usa-grid">
         <h1>No sites yet.</h1>
@@ -52,7 +53,7 @@ const addWebsiteButton = () => (
   </Link>
 );
 
-const SiteList = ({ storeState }) =>
+export const SiteList = ({ storeState }) =>
   (<div>
     <div className="usa-grid dashboard header">
       <div className="usa-width-two-thirds">
@@ -78,4 +79,4 @@ const SiteList = ({ storeState }) =>
 SiteList.propTypes = propTypes;
 SiteList.defaultProps = defaultProps;
 
-export default SiteList;
+export default connect(state => state)(SiteList);

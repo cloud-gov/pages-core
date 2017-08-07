@@ -16,18 +16,18 @@ const STORE_WITH_NO_SITES = { sites: { isLoading: false, data: [] } };
 const STORE_LOADING_SITES = { sites: { isLoading: true } };
 
 describe('<SiteList />', () => {
-  let Fixture;
+  let SiteList;
   let wrapper;
 
   beforeEach(() => {
-    Fixture = proxyquire('../../../../frontend/components/siteList/siteList', {
+    SiteList = proxyquire('../../../../frontend/components/siteList/siteList', {
       './siteListItem': SiteListItem,
-    }).default;
+    }).SiteList;
   });
 
   describe('when sites are being loaded', () => {
     beforeEach(() => {
-      wrapper = shallow(<Fixture storeState={STORE_LOADING_SITES} />);
+      wrapper = shallow(<SiteList storeState={STORE_LOADING_SITES} />);
     });
 
     it('renders a loading indicator', () => {
@@ -37,7 +37,7 @@ describe('<SiteList />', () => {
 
   describe('when no sites are received as props', () => {
     beforeEach(() => {
-      wrapper = shallow(<Fixture storeState={STORE_WITH_NO_SITES} />);
+      wrapper = shallow(<SiteList storeState={STORE_WITH_NO_SITES} />);
     });
 
     it('renders an h1 element with the title', () => {
@@ -57,7 +57,7 @@ describe('<SiteList />', () => {
 
   describe('when sites are received as props', () => {
     beforeEach(() => {
-      wrapper = shallow(<Fixture storeState={STORE_WITH_SITES} />);
+      wrapper = shallow(<SiteList storeState={STORE_WITH_SITES} />);
     });
 
     it('renders a container for the list of sites', () => {

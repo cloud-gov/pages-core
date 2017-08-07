@@ -1,11 +1,12 @@
 # Federalist
 [![Build Status](https://travis-ci.org/18F/federalist.svg?ref=master)](https://travis-ci.org/18F/federalist)
 [![Code Climate](https://codeclimate.com/github/18F/federalist/badges/gpa.svg)](https://codeclimate.com/github/18F/federalist)
+[![Test Coverage](https://codeclimate.com/github/18F/federalist/badges/coverage.svg)](https://codeclimate.com/github/18F/federalist/coverage)
 [![Dependency Status](https://gemnasium.com/badges/github.com/18F/federalist.svg)](https://gemnasium.com/github.com/18F/federalist)
 
 ***Under active development. Everything is subject to change. Learn more at the [documentation site](https://federalist-docs.18f.gov/). Interested in talking to us? [Join our public chat room](https://chat.18f.gov/).***
 
-Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub and Amazon Web Services to provide a simple way for developers to launch new static websites or more easily manage existing static websites.
+Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub and Amazon Web Services to provide a simple way for developers to launch new static websites or more easily manage existing static websites. This repo is home to "federalist-core" - a Node.js app that allows government users to add and configure their Federalist sites.
 
 ## Getting started
 
@@ -34,7 +35,7 @@ The following environment variables are set on the Cloud Foundry environment in 
 Secrets cannot be kept in the application manifest so they are provided by Cloud Foundry services.
 The app expects the following user provided services to be provided:
 
-- `federalist-<environment<-redis`: A cloud.gov brokered service that allows the application to use redis for its session store
+- `federalist-<environment>-redis`: A cloud.gov brokered service that allows the application to use redis for its session store
 - `federalist-<environment>-rds`: A cloud.gov brokered service that allows the application to use RDS Postgres for its database
 - `federalist-<environment>-s3`: A cloud.gov brokered service that allows the application to work with the S3 bucket where Federalist's sites live
 - `federalist-<environment>-env`: A user-provided service that provides the application with secrets that cannot be added to `manifest.yml` b/c that file is under version control; this service provides the following:

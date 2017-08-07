@@ -1,18 +1,31 @@
 /* global window:true */
-
-/* TODO: remove the below line and properly set PropType validation */
-/* eslint react/forbid-prop-types:0 react/require-default-props:0 */
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
+import autoBind from 'react-autobind';
 
+import { SITE, GITHUB_BRANCHES } from '../../propTypes';
 import SiteGithubBranchesTable from './siteGithubBranchesTable';
 import SelectSiteEngine from '../selectSiteEngine';
+import HttpsUrlInput from '../httpsUrlInput';
 import githubBranchActions from '../../actions/githubBranchActions';
 import siteActions from '../../actions/siteActions';
 
-class SiteSettings extends React.Component {
+const propTypes = {
+  params: PropTypes.shape({
+    id: PropTypes.string,
+  }).isRequired,
+  site: SITE,
+  githubBranches: GITHUB_BRANCHES,
+};
+
+const defaultProps = {
+  site: null,
+  githubBranches: null,
+};
+
+
+export class SiteSettings extends React.Component {
   constructor(props) {
     super(props);
 
@@ -30,9 +43,7 @@ class SiteSettings extends React.Component {
       engine: site.engine,
     };
 
-    this.onSubmit = this.onSubmit.bind(this);
-    this.onDelete = this.onDelete.bind(this);
-    this.onChange = this.onChange.bind(this);
+    autoBind(this);
   }
 
   componentDidMount() {
@@ -113,12 +124,9 @@ class SiteSettings extends React.Component {
                   See <a href="https://federalist-docs.18f.gov/pages/how-federalist-works/custom-urls/" target="_blank" rel="noopener noreferrer">
                   Federalist&apos;s custom URL documentation</a> for more information.
                 </p>
-                <input
+                <HttpsUrlInput
                   name="domain"
                   className="form-control"
-                  type="url"
-                  pattern="https://.+"
-                  placeholder="https://example.gov"
                   value={state.domain}
                   onChange={this.onChange}
                 />
@@ -145,15 +153,13 @@ class SiteSettings extends React.Component {
                   onChange={this.onChange}
                 />
                 <label htmlFor="demoDomainInput">Demo domain:</label>
-                <input
+                <HttpsUrlInput
                   name="demoDomain"
                   className="form-control"
                   id="demoDomainInput"
-                  type="url"
-                  pattern="https://.+"
-                  placeholder="https://preview.example.com"
                   value={state.demoDomain}
                   onChange={this.onChange}
+                  placeholder="https://preview.example.com"
                 />
               </div>
             </div>
@@ -243,10 +249,7 @@ class SiteSettings extends React.Component {
   }
 }
 
-SiteSettings.propTypes = {
-  site: PropTypes.object,
-  params: PropTypes.object,
-  githubBranches: PropTypes.object,
-};
+SiteSettings.propTypes = propTypes;
+SiteSettings.defaultProps = defaultProps;
 
 export default SiteSettings;

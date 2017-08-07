@@ -1,30 +1,40 @@
-const deepExtend = require("deep-extend")
-const fs = require("fs")
-const url = require("url")
+const deepExtend = require('deep-extend');
+const fs = require('fs');
+const path = require('path');
 
-const config = {}
+const config = {};
 
-fs.readdirSync(__dirname).forEach(filename => {
-  if (filename === "env" || filename === "index.js" || filename === "local.js" || filename.match(/.*\.sample\.js/)) {
-    return
-  } else {
-    const filepath = [__dirname, filename].join("/")
-    configName = filename.match(/^(.*).js/)[1]
-    config[configName] = require(filepath)
-  }
-})
-
-if (fs.existsSync([__dirname, "local.js"].join("/"))) {
-  deepExtend(config, require([__dirname, "local.js"].join("/")))
+function validConfigFile(filename) {
+  return (
+    path.extname(filename) === '.js' &&
+    filename !== 'index.js' &&
+    filename !== 'local.js' &&
+    !filename.match(/.*\.sample\.js/)
+  );
 }
 
-const environment = process.env.NODE_ENV
+fs.readdirSync(__dirname)
+  .filter(validConfigFile)
+  .forEach((filename) => {
+    const configName = path.basename(filename, '.js');
+    const filepath = path.join(__dirname, filename);
+    // eslint-disable-next-line global-require, import/no-dynamic-require
+    config[configName] = require(filepath);
+  });
+
+if (fs.existsSync([__dirname, 'local.js'].join('/'))) {
+  // eslint-disable-next-line global-require, import/no-dynamic-require
+  deepExtend(config, require([__dirname, 'local.js'].join('/')));
+}
+
+const environment = process.env.NODE_ENV;
 
 if (environment) {
-  const environmentFilepath = [__dirname, "env", environment + ".js"].join("/")
+  const environmentFilepath = path.join(__dirname, 'env', `${environment}.js`);
   if (fs.existsSync(environmentFilepath)) {
-    deepExtend(config, require(environmentFilepath))
+    // eslint-disable-next-line global-require, import/no-dynamic-require
+    deepExtend(config, require(environmentFilepath));
   }
 }
 
-module.exports = config
+module.exports = config;
