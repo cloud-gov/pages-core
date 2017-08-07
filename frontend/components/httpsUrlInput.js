@@ -13,7 +13,7 @@ const HttpsUrlInput = ({ placeholder, ...props }) => (
   <input
     {...props}
     type="url"
-    pattern="https://.+"
+    pattern="https://.+\.\w{2,}"
     placeholder={placeholder}
     onInvalid={onInvalidUrl}
     onInput={onUrlInput}

@@ -11,7 +11,7 @@ describe('<HttpsUrlInput/>', () => {
     const input = wrapper.find('input');
     expect(input.length).to.equal(1);
     expect(input.prop('type')).to.equal('url');
-    expect(input.prop('pattern')).to.equal('https://.+');
+    expect(input.prop('pattern')).to.equal('https://.+\\.\\w{2,}');
     expect(input.prop('placeholder')).to.equal('https://example.gov');
   });
 
