@@ -180,7 +180,7 @@ By default, the application should use local disk storage in place of a database
 0. Next, you'll have to create the `federalist` database for the application. `$ createdb federalist` should do the trick. If you wish to run the tests, do the same, but for a database named `federalist-test`.
 0. Add postgres to your `/config/local.js` file
 
-```json
+```js
 connections: {
   postgres: {
     database: 'federalist'
