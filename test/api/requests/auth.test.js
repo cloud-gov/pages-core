@@ -1,5 +1,4 @@
 const expect = require('chai').expect;
-const cookieLib = require('cookie');
 const crypto = require('crypto');
 const nock = require('nock');
 const app = require('../../../app');
@@ -8,27 +7,9 @@ const config = require('../../../config');
 const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
 const session = require('../support/session');
+const { sessionForCookie, sessionCookieFromResponse } = require('../support/cookieSession');
 const { User } = require('../../../api/models');
 
-const sessionCookieFromResponse = (response) => {
-  const header = response.headers['set-cookie'][0];
-  const parsedHeader = cookieLib.parse(header);
-  const sess = parsedHeader['federalist.sid'].replace('s:', '');
-  return sess.split('.')[0];
-};
-
-const sessionForCookie = (cookie) => {
-  const sessionID = cookie.replace('federalist.sid=s%3A', '').split('.')[0];
-  return new Promise((resolve, reject) => {
-    config.session.store.get(sessionID, (err, sessionBody) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(sessionBody);
-      }
-    });
-  });
-};
 
 describe('Authentication request', () => {
   describe('GET /auth/github', () => {
@@ -184,7 +165,7 @@ describe('Authentication request', () => {
       });
     });
 
-    it('should redirect to the home page with the login_failed parameter if the authorization code is invalid', (done) => {
+    it('should redirect to the home page with a flash error if the authorization code is invalid', (done) => {
       nock('https://github.com')
         .post('/login/oauth/access_token', {
           client_id: config.passport.github.options.clientID,
@@ -197,20 +178,39 @@ describe('Authentication request', () => {
         .get('/auth/github/callback?code=invalid-code')
         .then((response) => {
           expect(response.statusCode).to.equal(302);
-          expect(response.header.location).to.equal('/?login_failed=1');
+          expect(response.header.location).to.equal('/');
+
+          const cookie = sessionCookieFromResponse(response);
+          return sessionForCookie(cookie);
+        })
+        .then((sess) => {
+          expect(sess.flash.error.length).to.equal(1);
+          expect(sess.flash.error[0].title).to.equal('Unauthorized');
+          expect(sess.flash.error[0].message).to.equal(
+            'Apologies; you don\'t have access to Federalist! ' +
+            'Please contact the Federalist team if this is in error.');
           done();
         })
         .catch(done);
     });
 
-    it('should redirect to the home page with the login_failed parameter if the user is not in a whitelisted GitHub organization', (done) => {
+    it('should redirect to the home page with a flash error if the user is not in a whitelisted GitHub organization', (done) => {
       githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
 
       request(app)
         .get('/auth/github/callback?code=auth-code-123abc')
         .then((response) => {
           expect(response.statusCode).to.equal(302);
-          expect(response.header.location).to.equal('/?login_failed=1');
+          expect(response.header.location).to.equal('/');
+          const cookie = sessionCookieFromResponse(response);
+          return sessionForCookie(cookie);
+        })
+        .then((sess) => {
+          expect(sess.flash.error.length).to.equal(1);
+          expect(sess.flash.error[0].title).to.equal('Unauthorized');
+          expect(sess.flash.error[0].message).to.equal(
+            'Apologies; you don\'t have access to Federalist! ' +
+            'Please contact the Federalist team if this is in error.');
           done();
         })
         .catch(done);
