@@ -1831,13 +1831,13 @@ db-migrate-base@^1.5.2:
   dependencies:
     bluebird "^3.1.1"
 
-db-migrate-pg@^0.2.4:
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/db-migrate-pg/-/db-migrate-pg-0.2.4.tgz#e2fa44dc748e4ef8c1605d21b8f57a851e600280"
+db-migrate-pg@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/db-migrate-pg/-/db-migrate-pg-0.2.5.tgz#94d98243ee0daeb37aafce4d8b48341de41105c1"
   dependencies:
     bluebird "^3.1.1"
     db-migrate-base "^1.5.2"
-    pg "^4.5.5"
+    pg "^4.5.7"
     semver "^5.0.3"
 
 db-migrate-shared@^1.1.2:
@@ -3698,6 +3698,10 @@ js-base64@^2.1.8, js-base64@^2.1.9:
   version "2.1.9"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.1.9.tgz#f0e80ae039a4bd654b5f281fc93f04a914a7fcce"
 
+js-string-escape@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/js-string-escape/-/js-string-escape-1.0.1.tgz#e2625badbc0d67c7533e9edc1068c587ae4137ef"
+
 js-tokens@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.1.tgz#08e9f132484a2c45a30907e9dc4d5567b7f114d7"
@@ -5031,12 +5035,13 @@ pg-types@1.*:
     postgres-date "~1.0.0"
     postgres-interval "^1.1.0"
 
-pg@^4.4.0, pg@^4.5.5:
-  version "4.5.6"
-  resolved "https://registry.yarnpkg.com/pg/-/pg-4.5.6.tgz#a1de4878afa5cb208a25815f5ff89d2e0ebf52f8"
+pg@^4.5.7:
+  version "4.5.7"
+  resolved "https://registry.yarnpkg.com/pg/-/pg-4.5.7.tgz#45ae16b23706a6345a03279decc6af795c16d29b"
   dependencies:
     buffer-writer "1.0.1"
     generic-pool "2.4.2"
+    js-string-escape "1.0.1"
     packet-reader "0.2.0"
     pg-connection-string "0.1.3"
     pg-types "1.*"
