@@ -1,4 +1,3 @@
-const url = require('url');
 const validator = require('validator');
 
 const config = require('../../config');
@@ -44,6 +43,19 @@ const beforeValidate = (site) => {
   }
 };
 
+
+function siteUrl() {
+  return this.domain || `${config.app.preview_hostname}/site/${this.owner}/${this.repository}/`;
+}
+
+function demoUrl() {
+  return this.demoDomain || `${config.app.preview_hostname}/demo/${this.owner}/${this.repository}/`;
+}
+
+function branchPreviewUrl(branch) {
+  return `${config.app.preview_hostname}/preview/${this.owner}/${this.repository}/${branch}/`;
+}
+
 function toJSON() {
   const object = Object.assign({}, this.get({
     plain: true,
@@ -52,11 +64,10 @@ function toJSON() {
   object.createdAt = object.createdAt.toISOString();
   object.updatedAt = object.updatedAt.toISOString();
 
-  const s3Config = config.s3;
-  object.siteRoot = `http://${s3Config.bucket}.s3-website-${s3Config.region}.amazonaws.com`;
-  object.viewLink = object.domain || [object.siteRoot, 'site', object.owner, object.repository].join('/');
+  object.viewLink = this.siteUrl();
+
   if (object.demoBranch) {
-    object.demoViewLink = object.demoDomain || [object.siteRoot, 'demo', object.owner, object.repository].join('/');
+    object.demoViewLink = this.demoUrl();
   }
 
   Object.keys(object).forEach((key) => {
@@ -69,18 +80,13 @@ function toJSON() {
 }
 
 function viewLinkForBranch(branch) {
-  const s3Root = `http://${config.s3.bucket}.s3-website-${config.s3.region}.amazonaws.com`;
-
-  if (branch === this.defaultBranch && this.domain) {
-    return this.domain;
-  } else if (branch === this.defaultBranch) {
-    return `${s3Root}/site/${this.owner}/${this.repository}`;
-  } else if (branch === this.demoBranch && this.demoDomain) {
-    return this.demoDomain;
+  if (branch === this.defaultBranch) {
+    return this.siteUrl();
   } else if (branch === this.demoBranch) {
-    return `${s3Root}/demo/${this.owner}/${this.repository}`;
+    return this.demoUrl();
   }
-  return url.resolve(config.app.preview_hostname, `/preview/${this.owner}/${this.repository}/${branch}`);
+
+  return this.branchPreviewUrl(branch);
 }
 
 function isEmptyOrUrl(value) {
@@ -148,6 +154,9 @@ module.exports = (sequelize, DataTypes) => {
     instanceMethods: {
       toJSON,
       viewLinkForBranch,
+      siteUrl,
+      demoUrl,
+      branchPreviewUrl,
     },
     hooks: {
       beforeValidate,

@@ -6,7 +6,6 @@
     "engine",
     "owner",
     "repository",
-    "siteRoot",
     "viewLink"
   ],
   "properties": {
@@ -49,9 +48,6 @@
       "format": "date-time"
     },
     "repository": {
-      "type": "string"
-    },
-    "siteRoot": {
       "type": "string"
     },
     "viewLink": {

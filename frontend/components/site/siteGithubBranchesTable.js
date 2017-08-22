@@ -1,46 +1,31 @@
 import React from 'react';
 
 import LoadingIndicator from '../loadingIndicator';
+import BranchViewLink from '../branchViewLink';
 import { SITE, GITHUB_BRANCHES } from '../../propTypes';
-
-const tableHeader = () => (
-  <thead>
-    <tr>
-      <th>Branch</th>
-      <th />
-    </tr>
-  </thead>
-);
-
-const previewURL = (branch, site) => {
-  if (branch.name === site.defaultBranch) {
-    return site.viewLink;
-  } else if (branch.name === site.demoBranch) {
-    return site.demoViewLink;
-  }
-  return `/preview/${site.owner}/${site.repository}/${branch.name}/`;
-};
 
 const branchRow = (branch, site) => (
   <tr key={branch.name}>
-    <td>{branch.name}</td>
     <td>
-      <a href={previewURL(branch, site)} target="_blank" rel="noopener noreferrer">View</a>
+      <p>{branch.name}</p>
+    </td>
+    <td>
+      <BranchViewLink site={site} branchName={branch.name} />
     </td>
   </tr>
 );
 
-const tableBody = (site, branches) => (
-  <tbody>
-    {branches.data.map(branch => branchRow(branch, site))}
-  </tbody>
-);
-
-
 const renderTable = (site, branches) => (
   <table className="usa-table-borderless">
-    {tableHeader()}
-    {tableBody(site, branches)}
+    <thead>
+      <tr>
+        <th>Branch</th>
+        <th />
+      </tr>
+    </thead>
+    <tbody>
+      {branches.data.map(branch => branchRow(branch, site))}
+    </tbody>
   </table>
 );
 

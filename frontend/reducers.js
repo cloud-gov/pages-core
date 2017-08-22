@@ -19,4 +19,5 @@ export default {
   user,
   githubBranches,
   notifications,
+  FRONTEND_CONFIG: (state = {}) => state,
 };

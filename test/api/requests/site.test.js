@@ -19,7 +19,6 @@ describe('Site API', () => {
     expect(response.repository).to.equal(site.repository);
     expect(response.engine).to.equal(site.engine);
     expect(response.defaultBranch).to.equal(site.defaultBranch);
-    expect(response.siteRoot).to.be.a('string');
     expect(response.viewLink).to.be.a('string');
   };
 
