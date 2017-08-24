@@ -40,9 +40,7 @@ passport.use(new GitHubStrategy(config.passport.github.options, githubVerifyCall
 
 passport.logout = (req, res) => {
   req.logout();
-  req.session.authenticated = false;
-  req.session.authenticatedAt = null;
-  req.session.save(() => {
+  req.session.destroy(() => {
     res.redirect('/');
   });
 };
