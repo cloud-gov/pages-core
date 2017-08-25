@@ -1,20 +1,20 @@
-const passport = require("../services/passport")
+const passport = require('../services/passport');
 
 const AuthController = {
-  logout: function (req, res) {
-    passport.logout(req, res)
+  logout(req, res) {
+    passport.logout(req, res);
   },
 
-  github: function (req, res) {
+  github(req, res) {
     if (req.session.authenticated) {
-      res.redirect("/")
+      res.redirect('/');
     } else {
-      passport.authenticate("github")(req, res, req.next)
+      passport.authenticate('github')(req, res, req.next);
     }
   },
 
-  callback: function (req, res) {
-    passport.callback(req, res)
+  callback(req, res) {
+    passport.callback(req, res);
   },
 };
 

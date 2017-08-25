@@ -77,8 +77,7 @@ describe('Authentication request', () => {
       })
       .then(() => sessionForCookie(cookie))
       .then((nonAuthSession) => {
-        expect(nonAuthSession.authenticated).to.equal(false);
-        expect(nonAuthSession.passport).to.be.empty;
+        expect(nonAuthSession).to.equal(null);
         done();
       })
       .catch(done);
