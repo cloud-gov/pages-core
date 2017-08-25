@@ -11,34 +11,62 @@ function loadAssetManifest() {
 
 let webpackAssets = loadAssetManifest();
 
+function defaultContext(req) {
+  if (process.env.NODE_ENV === 'development') {
+    // reload the webpack assets during development so we don't have to
+    // restart the server for front end changes
+    webpackAssets = loadAssetManifest();
+  }
+
+  const siteDisplayEnv = config.app.app_env !== 'production' ? config.app.app_env : null;
+
+  const messages = {
+    errors: req.flash('error'),
+  };
+
+  const context = {
+    isAuthenticated: false,
+    webpackAssets,
+    siteDisplayEnv,
+    messages,
+  };
+
+  return context;
+}
+
 module.exports = {
-  index(req, res) {
-    if (process.env.NODE_ENV === 'development') {
-      // reload the webpack assets during development so we don't have to
-      // restart the server for front end changes
-      webpackAssets = loadAssetManifest();
+  home(req, res) {
+    // redirect to main app if is authenticated
+    if (req.session.authenticated) {
+      return res.redirect('/sites');
     }
 
-    const siteDisplayEnv = config.app.app_env !== 'production' ? config.app.app_env : null;
+    return res.render('home.njk', defaultContext(req));
+  },
+
+  app(req, res) {
+    if (!req.session.authenticated) {
+      req.flash('error', {
+        title: 'Unauthorized',
+        message: 'You are not permitted to perform this action. Are you sure you are logged in?',
+      });
+      return res.redirect('/');
+    }
+
+    const context = defaultContext(req);
+
+    context.isAuthenticated = true;
+    context.username = req.user.username;
+    context.siteWideError = SiteWideErrorLoader.loadSiteWideError();
 
     const frontendConfig = {
       TEMPLATES: config.templates,
       PREVIEW_HOSTNAME: config.app.preview_hostname,
     };
 
-    const context = {
-      siteWideError: null,
-      jsBundleName: webpackAssets['main.js'],
-      cssBundleName: webpackAssets['main.css'],
-      siteDisplayEnv,
-      frontendConfig,
-    };
+    context.frontendConfig = frontendConfig;
 
-    if (req.session.authenticated) {
-      context.siteWideError = SiteWideErrorLoader.loadSiteWideError();
-    }
-
-    res.render('index.html', context);
+    return res.render('app.njk', context);
   },
 
   robots(req, res) {

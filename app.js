@@ -22,6 +22,9 @@ const methodOverride = require('method-override');
 const expressWinston = require('express-winston');
 const session = require('express-session');
 const PostgresStore = require('connect-session-sequelize')(session.Store);
+const nunjucks = require('nunjucks');
+const flash = require('connect-flash');
+
 const responses = require('./api/responses');
 const passport = require('./api/services/passport');
 const RateLimit = require('express-rate-limit');
@@ -32,7 +35,10 @@ const sequelize = require('./api/models').sequelize;
 
 config.session.store = new PostgresStore({ db: sequelize });
 
-app.engine('html', require('ejs').renderFile);
+nunjucks.configure('views', {
+  autoescape: true,
+  express: app,
+});
 
 // When deployed we are behind a proxy, but we want to be
 // able to access the requesting user's IP in req.ip, so
@@ -51,12 +57,14 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(methodOverride());
+app.use(flash());
 app.use(responses);
 
 app.use((req, res, next) => {
   res.set('Cache-Control', 'max-age=0');
   next();
 });
+
 
 if (logger.levels[logger.level] >= 2) {
   app.use(expressWinston.logger({

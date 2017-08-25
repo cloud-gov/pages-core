@@ -11,11 +11,9 @@ import SitePublishedFilesTable from './components/site/sitePublishedFilesTable';
 import SiteSettings from './components/site/siteSettings';
 import NewSite from './components/AddSite';
 import NotFound from './components/NotFound';
-import Home from './components/home';
 
 export default (
   <Route path="/" component={App}>
-    <IndexRoute component={Home} />
     <Route path="sites">
       <IndexRoute component={SiteList} />
       <Route path="new" component={NewSite} />

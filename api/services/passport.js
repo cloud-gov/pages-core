@@ -58,7 +58,12 @@ passport.callback = (req, res) => {
         }
       });
     } else {
-      res.redirect('/?login_failed=1');
+      req.flash('error', {
+        title: 'Unauthorized',
+        message: 'Apologies; you don\'t have access to Federalist! ' +
+                 'Please contact the Federalist team if this is in error.',
+      });
+      res.redirect('/');
     }
   });
 };

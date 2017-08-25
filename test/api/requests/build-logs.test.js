@@ -123,7 +123,6 @@ describe('Build Log API', () => {
         .expect(200)
       )
       .then((response) => {
-        // TODO: Adjust this to make sure token is not present
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
         expect(response.body).to.be.an('array');
         expect(response.body).to.have.length(3);
