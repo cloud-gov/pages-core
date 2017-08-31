@@ -57,4 +57,15 @@ jobs:
           # Attempt to submit a report, but don't fail the build if this fails (`|| true`)
           command: ./cc-test-reporter after-build --exit-code $? ./coverage/lcov.info || true
 
-      # TODO: deploy steps using scripts/deploy-circle.sh
+      - deploy:
+          name: Deploy to staging
+          command: |
+              if [ "${CIRCLE_BRANCH}" == "staging" ]; then
+                  ./scripts/deploy-circle.sh
+              fi
+      - deploy:
+          name: Deploy to production
+          command: |
+              if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                  ./scripts/deploy-circle.sh
+              fi
