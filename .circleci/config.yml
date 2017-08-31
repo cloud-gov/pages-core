@@ -1,0 +1,71 @@
+version: 2
+
+default-docker-node: &default-docker-node
+  image: circleci/node:6.11
+  environment:
+    YARN_VERSION: 0.24.6-1
+    CC_TEST_REPORTER_ID: 101a439651b6abd27e5440028a53b5b8f08fe0889f3948d5f58f6cf9f7c786a0
+default-docker-postgres: &default-docker-postgres
+  image: circleci/postgres:9.6
+  environment:
+    POSTGRES_USER: ci-test-user
+    POSTGRES_DB: federalist-ci-test
+
+jobs:
+  build:
+     docker:
+       - *default-docker-node
+       - *default-docker-postgres
+     steps:
+      - checkout
+      - run:
+          name: Install yarn
+          command: sudo npm install -g yarn
+      - run:
+          name: Display versions
+          command: |
+            echo $(node --version)
+            echo $(yarn --version)
+            echo $(npm --version)
+
+      - restore_cache:
+          key: dependency-cache-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install dependencies
+          command: yarn --pure-lockfile
+      - save_cache:
+          key: dependency-cache-{{ checksum "yarn.lock" }}
+          paths:
+            - ./node_modules
+            - ~/.cache/yarn
+
+      - run:
+          name: Lint changed files
+          command: scripts/lint-ci-pr.sh
+
+      - run:
+          name: CodeClimate before-build
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+            ./cc-test-reporter before-build
+      - run:
+          name: Run tests
+          command: yarn test
+      - run:
+          name: CodeClimate after-build
+          # Attempt to submit a report, but don't fail the build if this fails (`|| true`)
+          command: ./cc-test-reporter after-build --exit-code $? ./coverage/lcov.info || true
+
+      - deploy:
+          name: Deploy to staging
+          command: |
+              if [ "${CIRCLE_BRANCH}" == "staging" ]; then
+                  ./scripts/deploy-circle.sh
+              fi
+      - deploy:
+          name: Deploy to production
+          command: |
+              if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                  ./scripts/deploy-circle.sh
+              fi

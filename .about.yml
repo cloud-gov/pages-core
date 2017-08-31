@@ -80,10 +80,10 @@ stack:
 #   url: URL for detailed information
 #   badge: URL for the status badge
 services:
-- name: Travis CI
+- name: Circle CI
   category: Continuous Deployment
-  url: https://travis-ci.org/18F/federalist
-  badge: https://travis-ci.org/18F/federalist.svg?branch=master
+  url: https://circleci.com/gh/18F/federalist
+  badge: https://circleci.com/gh/18F/federalist.svg?style=svg
 - name: Code Climate
   category: Code Review
   url: https://codeclimate.com/github/18F/federalist
