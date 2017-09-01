@@ -36,7 +36,12 @@ const getSites = (sitesState) => {
     <div className="usa-grid">
       <h2>Websites</h2>
       <ul className="sites-list">
-        {sitesState.data.map(site => (<SiteListItem key={site.id} site={site} />))}
+        {
+          sitesState.data
+            .slice() // create a copy so that sort doesn't modify the original
+            .sort((a, b) => a.id - b.id) // sort ascending by id
+            .map(site => (<SiteListItem key={site.id} site={site} />))
+        }
       </ul>
     </div>
   );

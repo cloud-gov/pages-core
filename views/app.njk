@@ -1,0 +1,29 @@
+{% extends "base.njk" %}
+
+{% block head_extra %}
+  <script>
+    window.FRONTEND_CONFIG = {{ frontendConfig | dump | safe }};
+  </script>
+{% endblock %}
+
+{% block before_header %}
+  {% if siteWideError %}
+    <div class="usa-alert usa-alert-warning usa-alert-home" role="alert">
+      <div class="usa-alert-body">
+        <h3 class="usa-alert-heading">
+          {{ siteWideError.heading }}
+        </h3>
+        <p class="usa-alert-text">
+          {{ siteWideError.body | safe }}
+        </p>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
+
+
+{% block main_content %}
+  <div id="js-app"></div>
+
+  <script src="/{{ webpackAssets['main.js'] }}"></script>
+{% endblock %}

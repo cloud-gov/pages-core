@@ -1,3 +1,7 @@
+a {
+  text-decoration-skip: ink;
+}
+
 a,
 a:visited {
   color: $link-color;

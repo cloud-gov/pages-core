@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="apple-touch-icon" sizes="57x57" href="/images/favicons/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/images/favicons/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/images/favicons/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/favicons/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/images/favicons/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/images/favicons/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/images/favicons/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/images/favicons/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicons/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="/images/favicons/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicons/favicon-194x194.png" sizes="194x194">
+    <link rel="icon" type="image/png" href="/images/favicons/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/images/favicons/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/images/favicons/favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="/images/favicons/manifest.json">
+    <link rel="mask-icon" href="/images/favicons/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="/images/favicons/favicon.ico">
+    <meta name="apple-mobile-web-app-title" content="Federalist">
+    <meta name="application-name" content="Federalist">
+    <meta name="msapplication-TileColor" content="#153d64">
+    <meta name="msapplication-TileImage" content="/images/favicons/mstile-144x144.png">
+    <meta name="msapplication-config" content="/images/favicons/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="/{{ webpackAssets['main.css'] }}">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>
+      Federalist{% if siteDisplayEnv %} | {{ siteDisplayEnv }}{% endif %}
+    </title>
+
+    {% block head_extra %}
+    {% endblock %}
+  </head>
+  <body>
+    {% block before_header %}
+    {% endblock %}
+
+    <header class="usa-site-header" role="banner">
+      <div class="usa-disclaimer">
+        <div class="usa-grid">
+          <span class="usa-disclaimer-official">
+            <img
+              class="usa-flag_icon"
+              alt="US flag"
+              src="images/us_flag_small.png"
+            />
+            An official website of the United States Government
+          </span>
+        </div>
+      </div>
+
+      <nav class="usa-site-navbar">
+        <div class="usa-grid">
+          <div class="nav-elements">
+            <div class="logo" id="logo">
+              <a href="/" title="Home" aria-label="Home">Federalist logo</a>
+            </div>
+            <div class="navbar-links" id="navbar-links">
+              <ul class="" id="nav-mobile">
+
+                {% if not isAuthenticated %}
+                  <li>
+                    <a href="https://federalist-docs.18f.gov" target="_blank" rel="noopener noreferrer">Documentation</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/18F/federalist/issues/new" target="_blank" rel="noopener noreferrer">Contact Us</a>
+                  </li>
+                  <li>
+                    <a href="/auth/github">Log in</a>
+                  </li>
+                {% else %}
+                  <li>
+                    <a href="/sites">{{ username }}</a>
+                  </li>
+                  <li>
+                    <a href="https://federalist-docs.18f.gov" target="_blank" rel="noopener noreferrer">Documentation</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/18F/federalist/issues/new" target="_blank" rel="noopener noreferrer">File Issue</a>
+                  </li>
+                  <li>
+                    <a href="mailto:federalist-support@gsa.gov">Get Help</a>
+                  </li>
+                  <li>
+                    <a href="/logout">Log out</a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    {% block flash_messages %}
+      {% if messages.errors %}
+        {% for error in messages.errors %}
+          <div class="usa-alert usa-alert-error usa-alert-home" role="alert">
+            <div class="usa-alert-body">
+              <h3 class="usa-alert-header">{{ error.title }}</h3>
+              <p class="usa-alert-text">{{ error.message }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endblock %}
+
+    {% block main_content %}
+    {% endblock %}
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-48605964-31', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('set', 'forceSSL', true);
+      ga('send', 'pageview');
+    </script>
+    <!-- Digital Analytics Program roll-up, see https://analytics.usa.gov for data -->
+    <script id="_fed_an_ua_tag" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=GSA&subagency=18F"></script>
+  </body>
+</html>

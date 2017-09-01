@@ -1,19 +1,15 @@
+const serializeObject = (site, name) => ({
+  name,
+  site: site.toJSON(),
+});
+
 const serialize = (site, branch) => {
   if (branch instanceof Array) {
-    const array = branch.map(name => serializeObject(site, name))
-    return Promise.resolve(array)
-  } else {
-    const object = serializeObject(site, branch)
-    return Promise.resolve(object)
+    const array = branch.map(name => serializeObject(site, name));
+    return Promise.resolve(array);
   }
-}
+  const object = serializeObject(site, branch);
+  return Promise.resolve(object);
+};
 
-const serializeObject = (site, name) => {
-  return {
-    name,
-    site: site.toJSON(),
-    viewLink: site.viewLinkForBranch(name),
-  }
-}
-
-module.exports = { serialize }
+module.exports = { serialize };

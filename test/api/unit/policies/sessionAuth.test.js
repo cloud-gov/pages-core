@@ -72,7 +72,8 @@ describe('sessionAuth', () => {
         expect(mockNext.calledOnce).to.equal(true);
         expect(mockReq.session.authRedirectPath).to.equal(undefined);
         done();
-      });
+      })
+      .catch(done);
   });
 
   it('revalidates the user if authenticatedAt is too old', (done) => {
@@ -84,7 +85,8 @@ describe('sessionAuth', () => {
         expect(mockNext.calledOnce).to.equal(true);
         expect(mockReq.session.authRedirectPath).to.equal(undefined);
         done();
-      });
+      })
+      .catch(done);
   });
 
   it('ends the session and calls res.forbidden if the user is no longer valid', (done) => {
@@ -99,6 +101,7 @@ describe('sessionAuth', () => {
         expect(mockNext.notCalled).to.equal(true);
         expect(mockRes.forbidden.calledOnce).to.equal(true);
         done();
-      });
+      })
+      .catch(done);
   });
 });

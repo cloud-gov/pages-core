@@ -39,19 +39,6 @@ describe('<App/>', () => {
     alertActionUpdate.reset();
   });
 
-  it('renders its header component', () => {
-    expect(wrapper.find(Header)).to.have.length(1);
-  });
-
-  it('delivers the correct props to the header', () => {
-    const expectedProps = {
-      username,
-    };
-    const actualProps = wrapper.find(Header).props();
-
-    expect(actualProps).to.deep.equal(expectedProps);
-  });
-
   it('renders children', () => {
     const newProps = Object.assign({}, props, {
       children: (<div id="app-child">child!</div>),
@@ -101,7 +88,6 @@ describe('<App/>', () => {
     });
 
     wrapper = shallow(<AppFixture {...newProps} />);
-    expect(wrapper.find('Header')).to.have.length(1);
     expect(wrapper.find('LoadingIndicator')).to.have.length(1);
   });
 });

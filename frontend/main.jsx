@@ -13,7 +13,7 @@ import userActions from './actions/userActions';
 import routes from './routes';
 import store from './store';
 
-require('./sass/styles.scss');
+import './sass/styles.scss';
 
 const history = syncHistoryWithStore(browserHistory, store);
 

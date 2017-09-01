@@ -8,8 +8,6 @@ import SelectSiteEngine from '../selectSiteEngine';
 
 import siteActions from '../../actions/siteActions';
 
-import templates from '../../../config/templates';
-
 const propTypes = {
   storeState: PropTypes.shape({
     user: PropTypes.shape({
@@ -83,7 +81,6 @@ class AddSite extends React.Component {
           </div>
         </div>
         <TemplateSiteList
-          templates={templates}
           handleSubmitTemplate={this.onSubmitTemplate}
           defaultOwner={this.defaultOwner()}
         />

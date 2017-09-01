@@ -11,7 +11,7 @@ const SiteListItem = () => <div />;
 const NO_SITE_TEXT = 'No sites yet.';
 
 // sites can be empty as the test is rendering empty divs for children.
-const STORE_WITH_SITES = { sites: { isLoading: false, data: [{}, {}, {}] } };
+const STORE_WITH_SITES = { sites: { isLoading: false, data: [{ id: 5 }, { id: 2 }, { id: 8 }] } };
 const STORE_WITH_NO_SITES = { sites: { isLoading: false, data: [] } };
 const STORE_LOADING_SITES = { sites: { isLoading: true } };
 
@@ -66,6 +66,13 @@ describe('<SiteList />', () => {
 
     it('renders a SiteListItem component for each site in the list', () => {
       expect(wrapper.find(SiteListItem)).to.have.length(3);
+    });
+
+    it('renders sites in ascending order by id', () => {
+      const items = wrapper.find(SiteListItem);
+      expect(items.nodes[0].key).to.equal('2');
+      expect(items.nodes[1].key).to.equal('5');
+      expect(items.nodes[2].key).to.equal('8');
     });
   });
 });

@@ -4,8 +4,6 @@ import { expect } from 'chai';
 import { stub } from 'sinon';
 import proxyquire from 'proxyquire';
 
-import templates from '../../../../config/templates';
-
 proxyquire.noCallThru();
 
 const mock = () => () => <div />;
@@ -85,7 +83,6 @@ describe('<AddSite/>', () => {
 
     expect(bannerProps).to.deep.equal({ message: propsWithoutError.storeState.error });
     expect(templateListProps).to.deep.equal({
-      templates,
       handleSubmitTemplate: wrapper.instance().onSubmitTemplate,
       defaultOwner: propsWithoutError.storeState.user.data.username,
     });

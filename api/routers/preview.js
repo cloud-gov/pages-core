@@ -1,7 +1,13 @@
-const router = require("express").Router()
-const PreviewController = require("../controllers/preview")
+const router = require('express').Router();
+const PreviewController = require('../controllers/preview');
 
-router.get("/preview/:owner/:repo/:branch", PreviewController.redirect)
-router.get("/preview/:owner/:repo/:branch/*", PreviewController.redirect)
+// These /preview/ routes provide redirects to the proxy app
+// (configured as config.app.preview_hostname).
+// They are used to not break existing links from when
+// Federalist site previews were handled in this application instead
+// of by federalist-proxy.
 
-module.exports = router
+router.get('/preview/:owner/:repo/:branch', PreviewController.redirect);
+router.get('/preview/:owner/:repo/:branch/*', PreviewController.redirect);
+
+module.exports = router;

@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 
 import alertActions from '../actions/alertActions';
 import LoadingIndicator from './loadingIndicator';
-import Header from './header';
 
 export class App extends React.Component {
   componentWillReceiveProps(nextProps) {
@@ -30,22 +29,12 @@ export class App extends React.Component {
     const { user, children, notifications } = this.props;
 
     if (user.isLoading) {
-      return (
-        <div>
-          <Header />
-          <LoadingIndicator />
-        </div>
-      );
+      return <LoadingIndicator />;
     }
-
-    const username = !user.isLoading && user.data ? user.data.username : null;
 
     return (
       <div>
         <Notifications notifications={notifications} />
-        <Header
-          username={username}
-        />
         { children && React.cloneElement(children, { storeState: this.props }) }
       </div>
     );

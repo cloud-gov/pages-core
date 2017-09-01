@@ -40,9 +40,7 @@ passport.use(new GitHubStrategy(config.passport.github.options, githubVerifyCall
 
 passport.logout = (req, res) => {
   req.logout();
-  req.session.authenticated = false;
-  req.session.authenticatedAt = null;
-  req.session.save(() => {
+  req.session.destroy(() => {
     res.redirect('/');
   });
 };
@@ -60,7 +58,12 @@ passport.callback = (req, res) => {
         }
       });
     } else {
-      res.redirect('/?login_failed=1');
+      req.flash('error', {
+        title: 'Unauthorized',
+        message: 'Apologies; you don\'t have access to Federalist! ' +
+                 'Please contact the Federalist team if this is in error.',
+      });
+      res.redirect('/');
     }
   });
 };

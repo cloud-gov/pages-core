@@ -128,7 +128,7 @@ describe('GithubBuildStatusReporter', () => {
             owner: 'test-owner',
             repo: 'test-repo',
             sha: '456def',
-            targetURL: `${config.app.preview_hostname}/preview/test-owner/test-repo/preview-branch`,
+            targetURL: `${config.app.preview_hostname}/preview/test-owner/test-repo/preview-branch/`,
           });
 
           return GithubBuildStatusReporter.reportBuildStatus(build);

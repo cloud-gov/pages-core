@@ -39,54 +39,27 @@ describe('<SiteGithubBranchesTable/>', () => {
     expect(rows.at(1).contains('branch-b')).to.be.true;
   });
 
-  it('renders the view URL for the default branch', () => {
+  it('renders a connected <BranchViewLink /> for each branch', () => {
     props.branches.data = [
-        { name: 'master' },
-    ];
-    props.site = {
-      defaultBranch: 'master',
-      viewLink: 'www.example.com',
-    };
-
-    const wrapper = shallow(<SiteGithubBranchesTable {...props} />);
-    const link = wrapper.find('a');
-
-    expect(link.contains('View')).to.be.true;
-    expect(link.prop('href')).to.equal(props.site.viewLink);
-  });
-
-  it('renders the view URL for demo branches', () => {
-    props.branches.data = [
+      { name: 'master' },
       { name: 'demo' },
-    ];
-    props.site = {
-      demoBranch: 'demo',
-      demoViewLink: 'demo.example.com',
-    };
-
-    const wrapper = shallow(<SiteGithubBranchesTable {...props} />);
-    const link = wrapper.find('a');
-
-    expect(link.contains('View')).to.be.true;
-    expect(link.prop('href')).to.equal(props.site.demoViewLink);
-  });
-
-  it('renders the the preview URL for preview branches', () => {
-    props.branches.data = [
+      { name: 'bad-?-branch' },
       { name: 'preview-branch' },
     ];
+
     props.site = {
-      owner: 'owner-name',
-      repository: 'repo-name',
       defaultBranch: 'master',
+      viewLink: 'https://www.example.com',
+      demoBranch: 'demo',
+      demoViewLink: 'https://demo.example.com',
     };
-    const previewURL = '/preview/owner-name/repo-name/preview-branch/';
 
     const wrapper = shallow(<SiteGithubBranchesTable {...props} />);
-    const link = wrapper.find('a');
-
-    expect(link.contains('View')).to.be.true;
-    expect(link.prop('href')).to.equal(previewURL);
+    const links = wrapper.find('Connect(BranchViewLink)');
+    expect(links.length).to.equal(4);
+    links.forEach((link, i) => {
+      expect(link.prop('branchName')).to.equal(props.branches.data[i].name);
+    });
   });
 
   it('renders an error if a site has no branch data', () => {
