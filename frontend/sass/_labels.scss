@@ -16,4 +16,8 @@
 
 h4.label {
   margin-bottom: 0;
+
+  + table {
+    margin-top: 0.2em;
+  }
 }

@@ -7,7 +7,7 @@ import { SITE, GITHUB_BRANCHES } from '../../propTypes';
 const branchRow = (branch, site) => (
   <tr key={branch.name}>
     <td>
-      <p>{branch.name}</p>
+      {branch.name}
     </td>
     <td>
       <BranchViewLink site={site} branchName={branch.name} />
