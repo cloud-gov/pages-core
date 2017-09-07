@@ -1,4 +1,5 @@
 const express = require('express');
+const csurf = require('csurf');
 
 const mainRouter = express.Router();
 
@@ -15,7 +16,9 @@ apiRouter.use(require('./site'));
 apiRouter.use(require('./user'));
 apiRouter.use(require('./published-file'));
 
-// prefix all api routes with "/v0"
-mainRouter.use('/v0', apiRouter);
+const csrfProtection = csurf();
+
+// prefix all api routes with "/v0" and add csrf protection
+mainRouter.use('/v0', csrfProtection, apiRouter);
 
 module.exports = mainRouter;
