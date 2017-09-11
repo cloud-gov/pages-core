@@ -1,18 +1,22 @@
+/* global window:true fetch:true */
+
 import 'whatwg-fetch';
 
 const defaultMethod = 'GET';
 const credentials = 'same-origin';
+const csrfToken = typeof window !== 'undefined' ?
+  window.CSRF_TOKEN : global.CSRF_TOKEN;
+
 const defaultHeaders = {
-  'Accept': 'application/json',
-  'Content-Type': 'application/json'
+  accept: 'application/json',
+  'content-type': 'application/json',
+  'x-csrf-token': csrfToken,
 };
 
 function mergeParams(url, params) {
-  return Object.keys(params).reduce((memo, param, index) => {
-    memo += ((!index ? '?' : '&') + `${param}=${params[param]}`);
-
-    return memo;
-  }, url);
+  return Object.keys(params).reduce((memo, param, index) => (
+    `${memo}${!index ? '?' : '&'}${param}=${params[param]}`), url
+  );
 }
 
 function checkStatus(response) {
@@ -26,7 +30,7 @@ function checkStatus(response) {
 
     try {
       formattedError = JSON.parse(errorText).message;
-    } catch(error) {
+    } catch (error) {
       formattedError = errorText;
     }
 
@@ -45,29 +49,28 @@ function parseJSON(response) {
   return response.json();
 }
 
-function _fetch(url, configs = {}) {
+function fetchWrapper(url, configs = {}) {
   const baseConfigs = {
     credentials: configs.credentials || credentials,
     headers: Object.assign({}, defaultHeaders, configs.headers || {}),
-    method: configs.method || defaultMethod
+    method: configs.method || defaultMethod,
   };
 
   let requestConfigs;
-  let requestUrl;
 
   if (configs.method && !(/get|delete/i).test(configs.method)) {
     requestConfigs = Object.assign(baseConfigs, {}, {
-      body: JSON.stringify(configs.data)
+      body: JSON.stringify(configs.data),
     });
   } else {
     requestConfigs = baseConfigs;
   }
 
-  requestUrl = configs.params ? mergeParams(url, configs.params) : url;
+  const requestUrl = configs.params ? mergeParams(url, configs.params) : url;
 
   return fetch(requestUrl, requestConfigs)
     .then(checkStatus)
     .then(parseJSON);
 }
 
-export default _fetch
+export default fetchWrapper;

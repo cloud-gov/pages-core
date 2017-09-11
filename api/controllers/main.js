@@ -58,6 +58,7 @@ module.exports = {
     context.isAuthenticated = true;
     context.username = req.user.username;
     context.siteWideError = SiteWideErrorLoader.loadSiteWideError();
+    context.csrfToken = req.csrfToken();
 
     const frontendConfig = {
       TEMPLATES: config.templates,
