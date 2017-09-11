@@ -33,10 +33,6 @@ export default {
         loader: 'babel-loader',
       },
       {
-        test: /\.html$/,
-        loader: 'html-loader',
-      },
-      {
         test: /\.scss$/,
         use: extractStyles.extract([
           'css-loader?sourceMap',
