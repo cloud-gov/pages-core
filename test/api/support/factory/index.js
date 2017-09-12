@@ -1,6 +1,11 @@
+const buildLog = require('./build-log');
+const build = require('./build');
+const site = require('./site');
+const user = require('./user');
+
 module.exports = {
-  buildLog: require("./build-log"),
-  build: require("./build"),
-  site: require("./site"),
-  user: require("./user"),
-}
+  buildLog,
+  build,
+  site,
+  user,
+};

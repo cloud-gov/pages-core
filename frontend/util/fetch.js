@@ -1,22 +1,19 @@
-/* global window:true fetch:true */
+/* global fetch:true */
 
 import 'whatwg-fetch';
 
 const defaultMethod = 'GET';
 const credentials = 'same-origin';
-const csrfToken = typeof window !== 'undefined' ?
-  window.CSRF_TOKEN : global.CSRF_TOKEN;
 
 const defaultHeaders = {
   accept: 'application/json',
   'content-type': 'application/json',
-  'x-csrf-token': csrfToken,
 };
 
 function mergeParams(url, params) {
   return Object.keys(params).reduce((memo, param, index) => (
-    `${memo}${!index ? '?' : '&'}${param}=${params[param]}`), url
-  );
+    `${memo}${!index ? '?' : '&'}${param}=${params[param]}`)
+  , url);
 }
 
 function checkStatus(response) {

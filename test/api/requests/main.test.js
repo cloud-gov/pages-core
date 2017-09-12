@@ -3,7 +3,7 @@ const request = require('supertest');
 
 const app = require('../../../app');
 const config = require('../../../config');
-const session = require('../support/session');
+const { authenticatedSession } = require('../support/session');
 const { sessionForCookie, sessionCookieFromResponse } = require('../support/cookieSession');
 
 describe('Main Site', () => {
@@ -35,7 +35,7 @@ describe('Main Site', () => {
     });
 
     it('should redirect to /sites when authenticated', (done) => {
-      session()
+      authenticatedSession()
       .then(cookie => request(app)
         .get('/')
         .set('Cookie', cookie)
@@ -103,7 +103,7 @@ describe('Main Site', () => {
     });
 
     it('should work when authenticated', (done) => {
-      session()
+      authenticatedSession()
         .then(cookie => request(app)
           .get('/sites')
           .set('Cookie', cookie)
@@ -113,7 +113,7 @@ describe('Main Site', () => {
     });
 
     it('should have app content', (done) => {
-      session()
+      authenticatedSession()
       .then(cookie => request(app)
         .get('/sites')
         .set('Cookie', cookie)
@@ -128,30 +128,45 @@ describe('Main Site', () => {
     });
 
     it('should contain references to built assets', (done) => {
-      session()
+      authenticatedSession()
         .then(cookie => request(app)
-        .get('/sites')
-        .set('Cookie', cookie)
-        .expect(200)
-      )
-      .then((response) => {
-        const stylesBundleRe = /<link rel="stylesheet" href="\/styles\/styles\.[a-z0-9]*\.css">/;
-        expect(response.text.search(stylesBundleRe)).to.be.above(-1);
+          .get('/sites')
+          .set('Cookie', cookie)
+          .expect(200)
+        )
+        .then((response) => {
+          const stylesBundleRe = /<link rel="stylesheet" href="\/styles\/styles\.[a-z0-9]*\.css">/;
+          expect(response.text.search(stylesBundleRe)).to.be.above(-1);
 
-        const jsBundleRe = /<script src="\/js\/bundle\.[a-z0-9]*\.js"><\/script>/;
-        expect(response.text.search(jsBundleRe)).to.be.above(-1);
-        done();
-      })
-      .catch(done);
+          const jsBundleRe = /<script src="\/js\/bundle\.[a-z0-9]*\.js"><\/script>/;
+          expect(response.text.search(jsBundleRe)).to.be.above(-1);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should contain a csrfToken', (done) => {
+      authenticatedSession()
+        .then(cookie => request(app)
+          .get('/sites')
+          .set('Cookie', cookie)
+          .expect(200)
+        )
+        .then((response) => {
+          const csrfTokenRe = /window.CSRF_TOKEN = "[a-z0-9_-]+";/i;
+          expect(response.text.search(csrfTokenRe)).to.be.above(-1);
+          done();
+        })
+        .catch(done);
     });
 
     it('should contain front end config values', (done) => {
-      session()
+      authenticatedSession()
         .then(cookie => request(app)
-        .get('/sites')
-        .set('Cookie', cookie)
-        .expect(200)
-      )
+          .get('/sites')
+          .set('Cookie', cookie)
+          .expect(200)
+        )
         .then((response) => {
           expect(response.text.search('FRONTEND_CONFIG')).to.be.above(-1);
           expect(response.text.search('PREVIEW_HOSTNAME')).to.be.above(-1);
@@ -178,7 +193,7 @@ describe('Main Site', () => {
       });
 
       it('should display a banner for authenticated users', (done) => {
-        session().then(cookie =>
+        authenticatedSession().then(cookie =>
           request(app)
             .get('/sites')
             .set('Cookie', cookie)
@@ -195,7 +210,7 @@ describe('Main Site', () => {
 
     context('when an error is not present', () => {
       it('should not display a banner for authenticated users', (done) => {
-        session().then(cookie =>
+        authenticatedSession().then(cookie =>
           request(app)
             .get('/sites')
             .set('Cookie', cookie)

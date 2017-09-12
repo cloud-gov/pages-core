@@ -6,7 +6,7 @@ const request = require('supertest');
 const config = require('../../../config');
 const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
-const session = require('../support/session');
+const { authenticatedSession } = require('../support/session');
 const { sessionForCookie, sessionCookieFromResponse } = require('../support/cookieSession');
 const { User } = require('../../../api/models');
 
@@ -21,7 +21,7 @@ describe('Authentication request', () => {
     });
 
     it('should redirect to the root URL if the users is logged in', (done) => {
-      session().then((cookie) => {
+      authenticatedSession().then((cookie) => {
         request(app)
           .get('/auth/github')
           .set('Cookie', cookie)
@@ -37,7 +37,7 @@ describe('Authentication request', () => {
       let cookie;
 
       const userPromise = factory.user();
-      const sessionPromise = session(userPromise);
+      const sessionPromise = authenticatedSession(userPromise);
 
       Promise.props({
         user: userPromise,

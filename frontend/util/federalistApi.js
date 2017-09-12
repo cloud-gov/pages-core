@@ -1,14 +1,25 @@
+/* global window:true */
+
 import fetch from './fetch';
 import alertActions from '../actions/alertActions';
 
 export const API = '/v0';
 
+const csrfToken = typeof window !== 'undefined' ?
+  window.CSRF_TOKEN : global.CSRF_TOKEN;
+
+const defaultHeaders = {
+  'x-csrf-token': csrfToken,
+};
+
 export default {
-  fetch(endpoint, params) {
+  fetch(endpoint, params = {}) {
     const url = `${API}/${endpoint}`;
 
-    return fetch(url, params)
-      .then(data => data)
+    const headers = Object.assign({}, defaultHeaders, params.headers || {});
+    const finalParams = Object.assign({}, params, { headers });
+
+    return fetch(url, finalParams)
       .catch((error) => {
         alertActions.httpError(error.message);
       });
