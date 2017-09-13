@@ -1,12 +1,14 @@
 const expect = require('chai').expect;
 const nock = require('nock');
 const request = require('supertest');
+
 const app = require('../../../app');
 const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
-const session = require('../support/session');
+const { authenticatedSession, unauthenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const { Build, User, Site } = require('../../../api/models');
+const csrfToken = require('../support/csrfToken');
 
 describe('Build API', () => {
   const buildResponseExpectations = (response, build) => {
@@ -32,22 +34,58 @@ describe('Build API', () => {
     });
 
     it('should require authentication', (done) => {
+      let site;
+
       factory.site()
-      .then(site =>
-        request(app)
-          .post('/v0/build/')
-          .send({
-            site: site.id,
-            branch: 'my-branch',
-          })
-          .expect(403)
-      )
-      .then((response) => {
-        validateAgainstJSONSchema('POST', '/build', 403, response.body);
-        done();
-      })
-      .catch(done);
+        .then((model) => {
+          site = model;
+          return unauthenticatedSession();
+        })
+        .then(cookie =>
+          request(app)
+            .post('/v0/build/')
+            .set('x-csrf-token', csrfToken.getToken())
+            .send({
+              site: site.id,
+              branch: 'my-branch',
+            })
+            .set('Cookie', cookie)
+            .expect(403)
+        )
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/build', 403, response.body);
+          done();
+        })
+        .catch(done);
     });
+
+    it('should require a valid csrf token', (done) => {
+      let site;
+
+      factory.site()
+        .then((model) => {
+          site = model;
+          return authenticatedSession();
+        })
+        .then(cookie =>
+          request(app)
+            .post('/v0/build/')
+            .set('x-csrf-token', 'bad-token')
+            .send({
+              site: site.id,
+              branch: 'my-branch',
+            })
+            .set('Cookie', cookie)
+            .expect(403)
+        )
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/build', 403, response.body);
+          expect(response.body.message).to.equal('Invalid CSRF token');
+          done();
+        })
+        .catch(done);
+    });
+
 
     it('should create a build with the given site and branch for the current user', (done) => {
       let site;
@@ -55,7 +93,7 @@ describe('Build API', () => {
 
       const userPromise = factory.user();
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-      const cookiePromise = session(userPromise);
+      const cookiePromise = authenticatedSession(userPromise);
 
       Promise.props({
         user: userPromise,
@@ -68,6 +106,7 @@ describe('Build API', () => {
 
         return request(app)
           .post('/v0/build/')
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             site: site.id,
             branch: 'my-branch',
@@ -100,12 +139,13 @@ describe('Build API', () => {
 
       const userPromise = factory.user();
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-      const cookiePromise = session(userPromise);
+      const cookiePromise = authenticatedSession(userPromise);
 
       Promise.props({ site: sitePromise, cookie: cookiePromise })
       .then(({ site, cookie }) =>
         request(app)
           .post('/v0/build/')
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             site: site.id,
             branch: 'my-branch',
@@ -125,7 +165,7 @@ describe('Build API', () => {
       const userProm = factory.user();
       const authorizedSiteProm = factory.site({ users: Promise.all([userProm]) });
       const notAuthorizedSiteProm = factory.site();
-      const cookieProm = session(userProm);
+      const cookieProm = authenticatedSession(userProm);
 
       Promise.props({
         user: userProm,
@@ -136,6 +176,7 @@ describe('Build API', () => {
       .then(({ notAuthorizedSite, cookie }) =>
         request(app)
           .post('/v0/build/')
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             site: notAuthorizedSite.id,
             branch: 'my-branch',
@@ -178,7 +219,7 @@ describe('Build API', () => {
 
       factory.build(buildAttributes).then((model) => {
         build = model;
-        return session(
+        return authenticatedSession(
           User.findById(build.user)
         );
       })
@@ -201,7 +242,7 @@ describe('Build API', () => {
 
       factory.build().then((model) => {
         build = model;
-        return session(factory.user());
+        return authenticatedSession(factory.user());
       })
       .then(cookie =>
         request(app)
@@ -246,7 +287,7 @@ describe('Build API', () => {
       Promise.props({
         site: sitePromise,
         builds: buildsPromise,
-        cookie: session(userPromise),
+        cookie: authenticatedSession(userPromise),
       })
       .then((promisedValues) => {
         ({ site, builds } = promisedValues);
@@ -287,7 +328,7 @@ describe('Build API', () => {
         user: userPromise,
         site: sitePromise,
         builds: buildsPromise,
-        cookie: session(userPromise),
+        cookie: authenticatedSession(userPromise),
       })
       .then((promisedValues) => {
         site = promisedValues.site;
@@ -311,7 +352,7 @@ describe('Build API', () => {
       const buildsPromise = Promise.all(
         Array(110).fill(0).map(() => factory.build({ site: sitePromise }))
       );
-      const cookiePromise = session(userPromise);
+      const cookiePromise = authenticatedSession(userPromise);
 
       Promise.props({
         site: sitePromise,

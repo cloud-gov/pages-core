@@ -65,7 +65,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
 if (logger.levels[logger.level] >= 2) {
   app.use(expressWinston.logger({
     transports: [
@@ -84,5 +83,17 @@ const limiter = new RateLimit(config.rateLimiting);
 app.use(limiter); // must be set before router is added to app
 
 app.use(router);
+
+// error handler middleware for custom CSRF error responses
+// note that error handling middlewares must come last in the stack
+app.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN') {
+    res.forbidden({ message: 'Invalid CSRF token' });
+    return;
+  }
+
+  next(err);
+});
+
 
 module.exports = app;

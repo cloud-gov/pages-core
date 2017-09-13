@@ -7,11 +7,15 @@ const sinon = require('sinon');
 const app = require('../../../app');
 const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
-const session = require('../support/session');
+const { authenticatedSession, unauthenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
+const csrfToken = require('../support/csrfToken');
 
 const { Build, Site, User } = require('../../../api/models');
 const S3SiteRemover = require('../../../api/services/S3SiteRemover');
+
+const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
+
 
 describe('Site API', () => {
   const siteResponseExpectations = (response, site) => {
@@ -29,6 +33,7 @@ describe('Site API', () => {
           .expect(403))
           .then((response) => {
             validateAgainstJSONSchema('GET', '/site', 403, response.body);
+            expect(response.body.message).to.equal(authErrorMessage);
             done();
           })
           .catch(done);
@@ -45,7 +50,7 @@ describe('Site API', () => {
         return Promise.all(sitePromises);
       }).then((models) => {
         sites = models;
-        return session(user);
+        return authenticatedSession(user);
       }).then(cookie => request(app)
           .get('/v0/site')
           .set('Cookie', cookie)
@@ -76,7 +81,7 @@ describe('Site API', () => {
 
       Promise.all(sitePromises).then((site) => {
         expect(site).to.have.length(3);
-        return session(factory.user());
+        return authenticatedSession(factory.user());
       }).then(cookie => request(app)
           .get('/v0/site')
           .set('Cookie', cookie)
@@ -98,6 +103,7 @@ describe('Site API', () => {
           .expect(403))
           .then((response) => {
             validateAgainstJSONSchema('GET', '/site/{id}', 403, response.body);
+            expect(response.body.message).to.equal(authErrorMessage);
             done();
           })
           .catch(done);
@@ -110,7 +116,7 @@ describe('Site API', () => {
         .then(s => Site.findById(s.id, { include: [User] }))
         .then((model) => {
           site = model;
-          return session(site.Users[0]);
+          return authenticatedSession(site.Users[0]);
         })
         .then(cookie => request(app)
           .get(`/v0/site/${site.id}`)
@@ -130,7 +136,7 @@ describe('Site API', () => {
 
       factory.site().then((model) => {
         site = model;
-        return session(factory.user());
+        return authenticatedSession(factory.user());
       }).then(cookie => request(app)
           .get(`/v0/site/${site.id}`)
           .set('Cookie', cookie)
@@ -155,29 +161,59 @@ describe('Site API', () => {
       nock.cleanAll();
     });
 
-    it('should require authentication', (done) => {
-      const newSiteRequest = request(app)
+    it('should require a valid csrf token', (done) => {
+      authenticatedSession().then(cookie => request(app)
         .post('/v0/site')
+        .set('x-csrf-token', 'bad-token')
         .send({
-          organization: 'partner-org',
+          owner: 'partner-org',
           repository: 'partner-site',
           defaultBranch: 'master',
           engine: 'jekyll',
         })
-        .expect(403);
-
-      newSiteRequest.then((response) => {
+        .set('Cookie', cookie)
+        .expect(403)
+      )
+      .then((response) => {
         validateAgainstJSONSchema('POST', '/site', 403, response.body);
+        expect(response.body.message).to.equal('Invalid CSRF token');
         done();
-      }).catch(done);
+      })
+      .catch(done);
+    });
+
+    it('should require authentication', (done) => {
+      unauthenticatedSession()
+        .then((cookie) => {
+          const newSiteRequest = request(app)
+            .post('/v0/site')
+            .set('x-csrf-token', csrfToken.getToken())
+            .send({
+              organization: 'partner-org',
+              repository: 'partner-site',
+              defaultBranch: 'master',
+              engine: 'jekyll',
+            })
+            .set('Cookie', cookie)
+            .expect(403);
+
+          return newSiteRequest;
+        })
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site', 403, response.body);
+          expect(response.body.message).to.equal(authErrorMessage);
+          done();
+        })
+        .catch(done);
     });
 
     it('should create a new site from an existing repository', (done) => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
 
-      session().then(cookie => request(app)
+      authenticatedSession().then(cookie => request(app)
           .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             owner: siteOwner,
             repository: siteRepository,
@@ -209,7 +245,7 @@ describe('Site API', () => {
       Promise.props({
         user: userPromise,
         site: factory.site(),
-        cookie: session(userPromise),
+        cookie: authenticatedSession(userPromise),
       }).then((models) => {
         user = models.user;
         site = models.site;
@@ -218,6 +254,7 @@ describe('Site API', () => {
 
         return request(app)
           .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             owner: site.owner,
             repository: site.repository,
@@ -260,8 +297,9 @@ describe('Site API', () => {
         repo: siteRepository,
       });
 
-      session().then(cookie => request(app)
+      authenticatedSession().then(cookie => request(app)
           .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             owner: siteOwner,
             repository: siteRepository,
@@ -289,8 +327,9 @@ describe('Site API', () => {
     });
 
     it('should respond with a 400 if no user or repository is specified', (done) => {
-      session().then(cookie => request(app)
+      authenticatedSession().then(cookie => request(app)
           .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             defaultBranch: 'master',
             engine: 'jekyll',
@@ -309,9 +348,10 @@ describe('Site API', () => {
       Promise.props({
         user: userPromise,
         site: factory.site({ users: Promise.all([userPromise]) }),
-        cookie: session(userPromise),
+        cookie: authenticatedSession(userPromise),
       }).then(({ site, cookie }) => request(app)
           .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             owner: site.owner,
             repository: site.repository,
@@ -340,8 +380,9 @@ describe('Site API', () => {
       });
       githubAPINocks.webhook();
 
-      session().then(cookie => request(app)
+      authenticatedSession().then(cookie => request(app)
           .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             owner: siteOwner,
             repository: siteRepository,
@@ -371,9 +412,10 @@ describe('Site API', () => {
         });
         githubAPINocks.webhook();
 
-        return session();
+        return authenticatedSession();
       }).then(cookie => request(app)
           .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             owner: site.owner,
             repository: site.repository,
@@ -404,8 +446,9 @@ describe('Site API', () => {
         }],
       });
 
-      session().then(cookie => request(app)
+      authenticatedSession().then(cookie => request(app)
           .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             owner: siteOwner,
             repository: siteRepository,
@@ -431,13 +474,49 @@ describe('Site API', () => {
     });
 
     it('should require authentication', (done) => {
-      factory.site().then(site => request(app)
+      let site;
+
+      factory.site()
+        .then((model) => {
+          site = model;
+          return unauthenticatedSession();
+        })
+        .then(cookie => request(app)
           .delete(`/v0/site/${site.id}`)
-          .expect(403)).then((response) => {
-            validateAgainstJSONSchema('DELETE', '/site/{id}', 403, response.body);
-            done();
-          });
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(403)
+        )
+        .then((response) => {
+          validateAgainstJSONSchema('DELETE', '/site/{id}', 403, response.body);
+          expect(response.body.message).to.equal(authErrorMessage);
+          done();
+        })
+        .catch(done);
     });
+
+    it('should require a valid csrf token', (done) => {
+      let site;
+
+      factory.site()
+        .then((model) => {
+          site = model;
+          return authenticatedSession();
+        })
+        .then(cookie => request(app)
+          .delete(`/v0/site/${site.id}`)
+          .set('x-csrf-token', 'bad-token')
+          .set('Cookie', cookie)
+          .expect(403)
+        )
+        .then((response) => {
+          validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
+          expect(response.body.message).to.equal('Invalid CSRF token');
+          done();
+        })
+        .catch(done);
+    });
+
 
     it('should allow a user to delete a site associated with their account', (done) => {
       let site;
@@ -446,10 +525,11 @@ describe('Site API', () => {
         .then(s => Site.findById(s.id, { include: [User] }))
         .then((model) => {
           site = model;
-          return session(site.Users[0]);
+          return authenticatedSession(site.Users[0]);
         })
         .then(cookie => request(app)
           .delete(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
           .expect(200)
         )
@@ -472,10 +552,11 @@ describe('Site API', () => {
         .then(s => Site.findById(s.id))
         .then((model) => {
           site = model;
-          return session(factory.user());
+          return authenticatedSession(factory.user());
         })
         .then(cookie => request(app)
           .delete(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
           .expect(403)
         )
@@ -494,7 +575,7 @@ describe('Site API', () => {
       let site;
       const userPromise = factory.user();
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-      const sessionPromise = session(userPromise);
+      const sessionPromise = authenticatedSession(userPromise);
 
       Promise.props({
         user: userPromise,
@@ -510,6 +591,7 @@ describe('Site API', () => {
 
         return request(app)
           .delete(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', results.cookie)
           .expect(200);
       })
@@ -523,15 +605,53 @@ describe('Site API', () => {
 
   describe('PUT /v0/site/:id', () => {
     it('should require authentication', (done) => {
-      factory.site().then(site => request(app)
+      let site;
+
+      factory.site()
+        .then((model) => {
+          site = model;
+          return unauthenticatedSession();
+        })
+        .then(cookie => request(app)
           .put(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             defaultBranch: 'master',
           })
-          .expect(403)).then((response) => {
-            validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
-            done();
-          }).catch(done);
+          .set('Cookie', cookie)
+          .expect(403)
+        )
+        .then((response) => {
+          validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
+          expect(response.body.message).to.equal(authErrorMessage);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should require a valid csrf token', (done) => {
+      let site;
+
+      factory.site()
+        .then((model) => {
+          site = model;
+          return authenticatedSession();
+        })
+        .then(cookie => request(app)
+          .put(`/v0/site/${site.id}`)
+          .set('x-csrf-token', 'bad-token')
+          .send({
+            defaultBranch: 'master',
+          })
+          .set('Cookie', cookie)
+          .expect(403)
+        )
+        .then((response) => {
+          validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
+          expect(response.body.message).to.equal('Invalid CSRF token');
+          done();
+        })
+        .catch(done);
     });
 
     it('should allow a user to update a site associated with their account', (done) => {
@@ -539,13 +659,14 @@ describe('Site API', () => {
       let response;
 
       factory.site({ config: 'old-config', demoConfig: 'old-demo-config', previewConfig: 'old-preview-config' })
-      .then(s => Site.findById(s.id, { include: [User] }))
-      .then((model) => {
-        site = model;
-        return session(site.Users[0]);
-      })
-      .then(cookie => request(app)
+        .then(s => Site.findById(s.id, { include: [User] }))
+        .then((model) => {
+          site = model;
+          return authenticatedSession(site.Users[0]);
+        })
+        .then(cookie => request(app)
           .put(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             config: 'new-config',
             demoConfig: 'new-demo-config',
@@ -579,10 +700,11 @@ describe('Site API', () => {
         .then(site => Site.findById(site.id))
         .then((model) => {
           siteModel = model;
-          return session(factory.user());
+          return authenticatedSession(factory.user());
         })
         .then(cookie => request(app)
             .put(`/v0/site/${siteModel.id}`)
+            .set('x-csrf-token', csrfToken.getToken())
             .send({
               repository: 'new-repo-name',
             })
@@ -607,10 +729,11 @@ describe('Site API', () => {
         .then((model) => {
           siteModel = model;
           expect(siteModel.Builds).to.have.length(0);
-          return session(siteModel.Users[0]);
+          return authenticatedSession(siteModel.Users[0]);
         })
         .then(cookie => request(app)
           .put(`/v0/site/${siteModel.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             repository: 'new-repo-name',
           })
@@ -637,25 +760,26 @@ describe('Site API', () => {
       .then((model) => {
         siteModel = model;
         expect(siteModel.Builds).to.have.length(0);
-        return session(siteModel.Users[0]);
+        return authenticatedSession(siteModel.Users[0]);
       })
       .then(cookie => request(app)
-          .put(`/v0/site/${siteModel.id}`)
-          .send({
-            repository: 'new-repo-name',
-          })
-          .set('Cookie', cookie)
-          .expect(200)
-        )
-        .then(() => Site.findById(siteModel.id, { include: [User, Build] }))
-        .then((site) => {
-          expect(site.Builds).to.have.length(2);
-          const demoBuild = site.Builds.find(
-            candidateBuild => candidateBuild.branch === site.demoBranch);
-          expect(demoBuild).to.not.be.undefined;
-          done();
+        .put(`/v0/site/${siteModel.id}`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          repository: 'new-repo-name',
         })
-        .catch(done);
+        .set('Cookie', cookie)
+        .expect(200)
+      )
+      .then(() => Site.findById(siteModel.id, { include: [User, Build] }))
+      .then((site) => {
+        expect(site.Builds).to.have.length(2);
+        const demoBuild = site.Builds.find(
+          candidateBuild => candidateBuild.branch === site.demoBranch);
+        expect(demoBuild).to.not.be.undefined;
+        done();
+      })
+      .catch(done);
     });
 
     it('should update attributes when the value in the request body is an empty string', (done) => {
@@ -666,7 +790,7 @@ describe('Site API', () => {
         config: 'old-config: true',
         domain: 'https://example.com',
       });
-      const cookiePromise = session(userPromise);
+      const cookiePromise = authenticatedSession(userPromise);
 
       Promise.props({
         user: userPromise,
@@ -678,6 +802,7 @@ describe('Site API', () => {
 
         return request(app)
           .put(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             config: '',
             domain: '',
@@ -705,7 +830,7 @@ describe('Site API', () => {
         config: 'old-config: true',
         domain: 'https://example.com',
       });
-      const cookiePromise = session(userPromise);
+      const cookiePromise = authenticatedSession(userPromise);
 
       Promise.props({
         user: userPromise,
@@ -717,6 +842,7 @@ describe('Site API', () => {
 
         return request(app)
           .put(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
           .send({
             config: 'new-config: true',
           })

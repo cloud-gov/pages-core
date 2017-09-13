@@ -25,5 +25,8 @@
 {% block main_content %}
   <div id="js-app"></div>
 
+  <script>
+    window.CSRF_TOKEN = "{{ csrfToken }}";
+  </script>
   <script src="/{{ webpackAssets['main.js'] }}"></script>
 {% endblock %}

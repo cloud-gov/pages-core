@@ -4,7 +4,7 @@ const request = require('supertest');
 const app = require('../../../app');
 const config = require('../../../config');
 const factory = require('../support/factory');
-const session = require('../support/session');
+const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 
 describe('Published Branches API', () => {
@@ -26,7 +26,7 @@ describe('Published Branches API', () => {
       let site;
       const userPromise = factory.user();
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-      const cookiePromise = session(userPromise);
+      const cookiePromise = authenticatedSession(userPromise);
 
       AWSMocks.mocks.S3.listObjects = (params, callback) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
@@ -72,7 +72,7 @@ describe('Published Branches API', () => {
         users: Promise.all([userPromise]),
         demoBranch: 'demo',
       });
-      const cookiePromise = session(userPromise);
+      const cookiePromise = authenticatedSession(userPromise);
 
       AWSMocks.mocks.S3.listObjects = (params, callback) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
@@ -108,7 +108,7 @@ describe('Published Branches API', () => {
     it('should 403 if the user is not associated with the site', (done) => {
       const user = factory.user();
       const site = factory.site();
-      const cookie = session(user);
+      const cookie = authenticatedSession(user);
 
       Promise.props({ user, site, cookie }).then(promisedValues => request(app)
           .get(`/v0/site/${promisedValues.site.id}/published-branch`)
@@ -137,7 +137,7 @@ describe('Published Branches API', () => {
         defaultBranch: 'master',
         users: Promise.all([userPromise]),
       });
-      const cookiePromise = session(userPromise);
+      const cookiePromise = authenticatedSession(userPromise);
 
       Promise.props({
         user: userPromise,
@@ -161,7 +161,7 @@ describe('Published Branches API', () => {
     it('should 403 if the user is not associated with the site', (done) => {
       const user = factory.user();
       const site = factory.site({ defaultBranch: 'master' });
-      const cookie = session(user);
+      const cookie = authenticatedSession(user);
 
       Promise.props({ user, site, cookie }).then(promisedValues => request(app)
           .get(`/v0/site/${promisedValues.site.id}/published-branch/master`)
