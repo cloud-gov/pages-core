@@ -32,10 +32,14 @@ const renderTable = (site, branches) => (
 const renderLoadingState = () => <LoadingIndicator />;
 
 const renderErrorState = () => (
-  <p>
-    An error occurred while downloading branch data from Github.
-    Often this is because the repo is private or has been deleted.
-  </p>
+  <div className="usa-alert usa-alert-error no-icon" role="alert">
+    <div className="usa-alert-body">
+      <p className="usa-alert-text">
+        An error occurred while downloading branch data from Github.
+        Often this is because the repo is private or has been deleted.
+      </p>
+    </div>
+  </div>
 );
 
 const SiteGithubBranchesTable = ({ site, branches }) => {
