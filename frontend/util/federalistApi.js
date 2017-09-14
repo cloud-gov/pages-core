@@ -5,15 +5,15 @@ import alertActions from '../actions/alertActions';
 
 export const API = '/v0';
 
-const csrfToken = typeof window !== 'undefined' ?
-  window.CSRF_TOKEN : global.CSRF_TOKEN;
-
-const defaultHeaders = {
-  'x-csrf-token': csrfToken,
-};
-
 export default {
   fetch(endpoint, params = {}) {
+    const csrfToken = typeof window !== 'undefined' ?
+      window.CSRF_TOKEN : global.CSRF_TOKEN;
+
+    const defaultHeaders = {
+      'x-csrf-token': csrfToken,
+    };
+
     const url = `${API}/${endpoint}`;
 
     const headers = Object.assign({}, defaultHeaders, params.headers || {});
