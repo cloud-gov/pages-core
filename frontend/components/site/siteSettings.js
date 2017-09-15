@@ -140,7 +140,7 @@ export class SiteSettings extends React.Component {
               <div className="well">
                 <h3 className="well-heading">Demo Site</h3>
                 <p className="well-text">
-                  Setup a branch to be deployed to a demo url.
+                  Setup a branch to be deployed to a demo URL.
                 </p>
                 <label htmlFor="demoBranchInput">Branch name:</label>
                 <input

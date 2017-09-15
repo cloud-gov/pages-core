@@ -58,4 +58,14 @@ describe('<BranchViewLink/>', () => {
       'https://preview-hostname.com/preview/test-owner/test-repo/some-other-branch/');
     expect(anchor.text()).equal('View preview');
   });
+
+  it('allows some special characters', () => {
+    props.branchName = 'release_1.2.3';
+    const wrapper = shallow(<BranchViewLink {...props} />);
+    const anchor = wrapper.find('a');
+    expect(anchor.length).to.equal(1);
+    expect(anchor.prop('href')).to.equal(
+      'https://preview-hostname.com/preview/test-owner/test-repo/release_1.2.3/');
+    expect(anchor.text()).equal('View preview');
+  });
 });

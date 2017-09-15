@@ -8,8 +8,8 @@ const isDefaultBranch = (branchName, site) => branchName === site.defaultBranch;
 
 const isDemoBranch = (branchName, site) => branchName === site.demoBranch;
 
-// we only want to link branch names that are alphanumeric plus _ and -
-const isLinkable = s => /^[a-zA-Z0-9_-]+$/.test(s);
+// we only want to link branch names that are alphanumeric plus _, -, and .
+const isLinkable = s => /^[a-zA-Z0-9._-]+$/.test(s);
 
 const getUrlAndViewText = (branchName, site, previewHostname) => {
   if (isDefaultBranch(branchName, site)) {

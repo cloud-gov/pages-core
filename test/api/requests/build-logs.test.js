@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const request = require('supertest');
 const app = require('../../../app');
 const factory = require('../support/factory');
-const session = require('../support/session');
+const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const { BuildLog, Site, User } = require('../../../api/models');
 
@@ -115,7 +115,7 @@ describe('Build Log API', () => {
         return Promise.all(Array(3).fill(0).map(() => factory.buildLog({ build })));
       }).then(() => Site.findById(build.site, { include: [User] })).then((site) => {
         const user = site.Users[0];
-        return session(user);
+        return authenticatedSession(user);
       })
       .then(cookie => request(app)
         .get(`/v0/build/${build.id}/log`)
@@ -141,7 +141,7 @@ describe('Build Log API', () => {
       .then(() => Site.findById(build.site, { include: [User] }))
       .then((site) => {
         const user = site.Users[0];
-        return session(user);
+        return authenticatedSession(user);
       })
       .then(cookie => request(app)
         .get(`/v0/build/${build.id}/log?format=text`)
@@ -166,7 +166,7 @@ describe('Build Log API', () => {
 
         return Promise.all(Array(3).fill(0).map(() => factory.buildLog()));
       })
-      .then(() => factory.user()).then(user => session(user))
+      .then(() => factory.user()).then(user => authenticatedSession(user))
       .then(cookie => request(app)
         .get(`/v0/build/${build.id}/log`)
         .set('Cookie', cookie)
@@ -180,7 +180,7 @@ describe('Build Log API', () => {
     });
 
     it('should response with a 404 if the given build does not exist', (done) => {
-      session().then(cookie => request(app)
+      authenticatedSession().then(cookie => request(app)
           .get('/v0/build/fake-id/log')
           .set('Cookie', cookie)
           .expect(404)).then((response) => {
