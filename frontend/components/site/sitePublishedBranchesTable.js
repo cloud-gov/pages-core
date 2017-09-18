@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { Link } from 'react-router';
 import publishedBranchActions from '../../actions/publishedBranchActions';
+import buildActions from '../../actions/buildActions';
 import LoadingIndicator from '../loadingIndicator';
 import BranchViewLink from '../branchViewLink';
 import { SITE } from '../../propTypes';
@@ -10,6 +11,14 @@ import { SITE } from '../../propTypes';
 class SitePublishedBranchesTable extends React.Component {
   componentDidMount() {
     publishedBranchActions.fetchPublishedBranches({ id: this.props.params.id });
+    buildActions.fetchBuilds(this.props.site);
+  }
+
+  builds() {
+    if (this.props.builds.isLoading || !this.props.builds.data) {
+      return [];
+    }
+    return this.props.builds.data;
   }
 
   publishedBranches() {
@@ -25,6 +34,7 @@ class SitePublishedBranchesTable extends React.Component {
         <thead>
           <tr>
             <th>Branch</th>
+            <th>Last Build</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -39,6 +49,7 @@ class SitePublishedBranchesTable extends React.Component {
     return (
       <tr key={branch.name}>
         <td>{branch.name}</td>
+        <td>TODO: Put last build date here</td>
         <td>
           <ul className="usa-unstyled-list">
             <li>
