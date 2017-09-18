@@ -43,7 +43,7 @@ export class SiteSettings extends React.Component {
       engine: site.engine,
     };
 
-    autoBind(this);
+    autoBind(this, 'onChange', 'onSubmit');
   }
 
   componentDidMount() {
