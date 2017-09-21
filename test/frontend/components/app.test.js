@@ -16,6 +16,10 @@ const props = {
   user: {
     data: {
       username,
+      createdAt: '2016-09-15',
+      updatedAt: '2017-10-12',
+      email: 'user@example.gov',
+      id: 123,
     },
     isLoading: false,
   },

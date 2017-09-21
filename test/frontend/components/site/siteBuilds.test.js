@@ -17,7 +17,7 @@ describe('<SiteBuilds/>', () => {
       username: 'user123',
     };
     site = {
-      id: '🎫',
+      id: 5,
     };
     build = {
       user,
@@ -33,6 +33,7 @@ describe('<SiteBuilds/>', () => {
         data: [build],
         isLoading: false,
       },
+      site,
     };
   });
 
@@ -69,7 +70,10 @@ describe('<SiteBuilds/>', () => {
   });
 
   it('should render an empty state if no builds are present', () => {
-    props = { builds: { isLoading: false, builds: [] } };
+    props = {
+      builds: { isLoading: false, builds: [] },
+      site: { id: 5 },
+    };
     const wrapper = shallow(<SiteBuilds {...props} />);
 
     expect(wrapper.find('table')).to.have.length(0);
@@ -89,7 +93,7 @@ describe('<SiteBuilds/>', () => {
   });
 
   it('should render a loading state if the builds are loading', () => {
-    props = { builds: { isLoading: true } };
+    props = { builds: { isLoading: true }, site: { id: 5 } };
 
     const wrapper = shallow(<SiteBuilds {...props} />);
 

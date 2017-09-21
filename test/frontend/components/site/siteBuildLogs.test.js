@@ -10,13 +10,13 @@ describe('<SiteBuildLogs/>', () => {
   it('should render a download link and <SiteBuildLogTable>', () => {
     const props = {
       params: {
-        buildId: 123,
+        buildId: '123',
       },
       buildLogs: {
         isLoading: false,
         data: [
-          { build: { id: 1 }, output: 'output 1', source: 'source 1' },
-          { build: { id: 1 }, output: 'output 2', source: 'source 2' },
+          { id: 1, output: 'output 1', source: 'source 1' },
+          { id: 1, output: 'output 2', source: 'source 2' },
         ],
       },
     };
@@ -32,7 +32,7 @@ describe('<SiteBuildLogs/>', () => {
   it('should render a button to refresh logs', () => {
     const props = {
       params: {
-        buildId: 123,
+        buildId: '123',
       },
       buildLogs: {
         isLoading: false,
@@ -47,7 +47,7 @@ describe('<SiteBuildLogs/>', () => {
   it('should render a loading state if builds are loading', () => {
     const props = {
       params: {
-        buildId: 123,
+        buildId: '123',
       },
       buildLogs: {
         isLoading: true,
@@ -62,7 +62,7 @@ describe('<SiteBuildLogs/>', () => {
   it('should render an empty state if there are no builds', () => {
     const props = {
       params: {
-        buildId: 123,
+        buildId: '123',
       },
       buildLogs: {
         data: [],

@@ -19,6 +19,8 @@ describe('<SiteContainer/>', () => {
             engine: 'jekyll',
             owner: '18f',
             publishedAt: '2017-06-08T20:53:14.363Z',
+            viewLink: 'https://view-link.gov',
+            repository: 'test-repo',
           }],
         },
       },
