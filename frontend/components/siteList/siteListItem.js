@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 
 import PublishedState from './publishedState';
-import GitHubMark from '../GitHubMark';
+import GitHubRepoLink from '../GitHubRepoLink';
 
 const propTypes = {
   site: PropTypes.shape({
@@ -36,9 +36,7 @@ const SiteListItem = ({ site }) =>
           { site.owner }/{ site.repository }
         </Link>
 
-        <a className="repo-link" href={`https://github.com/${site.owner}/${site.repository}`} title="Visit repository" target="_blank" rel="noopener noreferrer">
-          <GitHubMark />
-        </a>
+        <GitHubRepoLink owner={site.owner} repository={site.repository} />
       </h3>
 
       <PublishedState site={site} />

@@ -60,10 +60,10 @@ describe('<SiteListItem />', () => {
     });
   });
 
-  it('outputs a link to the site\'s GitHub repo', () => {
-    const repoLink = wrapper.find('a.repo-link');
+  it('outputs a GitHubRepoLink', () => {
+    const repoLink = wrapper.find('GitHubRepoLink');
     expect(repoLink).to.have.length(1);
-    expect(repoLink.prop('href')).to.equal('https://github.com/someone/something');
-    expect(repoLink.prop('title')).to.equal('Visit repository');
+    expect(repoLink.prop('owner')).to.equal('someone');
+    expect(repoLink.prop('repository')).to.equal('something');
   });
 });
