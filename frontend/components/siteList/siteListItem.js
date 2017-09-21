@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
+
 import PublishedState from './publishedState';
+import GitHubMark from '../GitHubMark';
 
 const propTypes = {
   site: PropTypes.shape({
@@ -29,9 +31,16 @@ function getViewLink(viewLink, repo) {
 const SiteListItem = ({ site }) =>
   (<li className="sites-list-item">
     <div className="sites-list-item-text">
-      <Link to={`/sites/${site.id}`}>
-        { site.owner } / { site.repository }
-      </Link>
+      <h3>
+        <Link to={`/sites/${site.id}`} title="View site settings">
+          { site.owner }/{ site.repository }
+        </Link>
+
+        <a className="repo-link" href={`https://github.com/${site.owner}/${site.repository}`} title="Visit repository" target="_blank" rel="noopener noreferrer">
+          <GitHubMark />
+        </a>
+      </h3>
+
       <PublishedState site={site} />
     </div>
     <div className="sites-list-item-actions">

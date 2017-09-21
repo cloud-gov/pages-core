@@ -30,9 +30,27 @@
   flex-grow: 1;
 }
 
-.sites-list-item-text p {
-  margin: 0;
+.sites-list-item-text {
+  h3 {
+    font-weight: normal;
+
+    .repo-link {
+      margin-left: 0.25em;
+
+      svg {
+        width: 18px;
+        height: 18px;
+        vertical-align: middle;
+      }
+    }
+  }
+
+  p {
+    margin: 0;
+  }
 }
+
+
 
 .sites-list-item-actions {
   padding-right: 2em;

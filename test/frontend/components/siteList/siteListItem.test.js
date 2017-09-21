@@ -36,7 +36,8 @@ describe('<SiteListItem />', () => {
     wrapper = shallow(<Fixture site={testSite} />);
     expect(wrapper.find(Link).props()).to.deep.equals({
       to: `/sites/${testSite.id}`,
-      children: [testSite.owner, ' / ', testSite.repository],
+      children: [testSite.owner, '/', testSite.repository],
+      title: 'View site settings',
     });
     expect(wrapper.find(Link)).to.have.length(1);
   });
@@ -47,7 +48,9 @@ describe('<SiteListItem />', () => {
     });
 
     wrapper = shallow(<Fixture site={siteWithBuilds} />);
-    expect(wrapper.find('a').props()).to.deep.equals({
+    const viewLink = wrapper.find('.sites-list-item-actions a');
+    expect(viewLink).to.have.length(1);
+    expect(viewLink.props()).to.deep.equals({
       className: 'icon icon-view',
       href: testSite.viewLink,
       alt: `View the ${testSite.repository} site`,
@@ -55,6 +58,12 @@ describe('<SiteListItem />', () => {
       rel: 'noopener noreferrer',
       children: 'Visit Site',
     });
-    expect(wrapper.find('a')).to.have.length(1);
+  });
+
+  it('outputs a link to the site\'s GitHub repo', () => {
+    const repoLink = wrapper.find('a.repo-link');
+    expect(repoLink).to.have.length(1);
+    expect(repoLink.prop('href')).to.equal('https://github.com/someone/something');
+    expect(repoLink.prop('title')).to.equal('Visit repository');
   });
 });
