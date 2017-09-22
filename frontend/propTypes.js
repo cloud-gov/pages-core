@@ -16,3 +16,10 @@ export const GITHUB_BRANCHES = PropTypes.shape({
   isLoading: PropTypes.bool.isRequired,
   data: PropTypes.array,
 });
+
+export const BUILD_LOG = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  source: PropTypes.string.isRequired,
+  output: PropTypes.string.isRequired,
+  createdAt: PropTypes.string.isRequired,
+});
