@@ -6,6 +6,7 @@ import SiteList from './components/siteList/siteList';
 import SiteContainer from './components/siteContainer';
 import SiteBuilds from './components/site/siteBuilds';
 import SiteBuildLogs from './components/site/siteBuildLogs';
+import SiteUsers from './components/site/SiteUsers';
 import SitePublishedBranchesTable from './components/site/sitePublishedBranchesTable';
 import SitePublishedFilesTable from './components/site/sitePublishedFilesTable';
 import SiteSettings from './components/site/siteSettings';
@@ -28,6 +29,7 @@ export default (
           <IndexRoute component={SiteBuilds} />
           <Route path=":buildId/logs" component={SiteBuildLogs} />
         </Route>
+        <Route path="users" component={SiteUsers} />
       </Route>
       <Redirect from="*" to="/not-found" />
     </Route>

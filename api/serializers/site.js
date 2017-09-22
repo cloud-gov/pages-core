@@ -1,26 +1,30 @@
-const { Site } = require("../models")
-
-const serialize = (serializable) => {
-  if (serializable.length !== undefined) {
-    const siteIds = serializable.map(site => site.id)
-    const query = Site.findAll({ where: { id: siteIds } })
-
-    return query.then(sites => {
-      return sites.map(site => serializeObject(site))
-    })
-  } else {
-    const site = serializable
-    const query = Site.findById(site.id)
-
-    return query.then(site => {
-      return serializeObject(site)
-    })
-  }
-}
+const { Site, User } = require('../models');
 
 const serializeObject = (site) => {
-  const json = site.toJSON()
-  return json
-}
+  const json = site.toJSON();
 
-module.exports = { serialize }
+  if (json.Users) {
+    json.users = site.Users.map(u => u.toJSON());
+    delete json.Users;
+  }
+
+  return json;
+};
+
+const serialize = (serializable) => {
+  // TODO: Why does this (and every other serializer) re-query for the model?
+  // In addition to seeming unnecessary, it also
+  // removes the loaded associations if any were specified
+  const include = [User];
+
+  if (serializable.length !== undefined) {
+    const siteIds = serializable.map(site => site.id);
+    const query = Site.findAll({ where: { id: siteIds }, include });
+    return query.then(sites => sites.map(site => serializeObject(site)));
+  }
+
+  const query = Site.findById(serializable.id, { include });
+  return query.then(serializeObject);
+};
+
+module.exports = { serialize };

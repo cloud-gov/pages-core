@@ -6,6 +6,8 @@ const factory = require('../../support/factory');
 
 const SiteSerializer = require('../../../../api/serializers/site');
 
+// TODO: amend scheme to include user array
+
 describe('SiteSerializer', () => {
   describe('.serialize(serializable)', () => {
     it('should serialize an object correctly', (done) => {
