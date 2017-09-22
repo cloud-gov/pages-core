@@ -16,6 +16,7 @@ class SiteBuildLogs extends React.Component {
 
   render() {
     const { buildLogs } = this.props;
+    const buildId = parseInt(this.props.params.buildId, 10);
 
     if (buildLogs.isLoading) {
       return <LoadingIndicator />;
@@ -26,13 +27,12 @@ class SiteBuildLogs extends React.Component {
       return (
         <div>
           <p>This build does not have any build logs.</p>
-          <RefreshBuildLogsButton buildId={this.props.params.buildId} />
+          <RefreshBuildLogsButton buildId={buildId} />
         </div>
       );
     }
 
     // else
-    const buildId = this.props.params.buildId;
     const downloadUrl = `${API}/build/${buildId}/log?format=text`;
     const downloadName = `build-log-${buildId}.txt`;
 

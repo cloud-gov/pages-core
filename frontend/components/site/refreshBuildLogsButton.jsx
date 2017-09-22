@@ -23,7 +23,7 @@ class RefreshBuildLogsButton extends React.Component {
 }
 
 RefreshBuildLogsButton.propTypes = {
-  buildId: PropTypes.string.isRequired,
+  buildId: PropTypes.number.isRequired,
 };
 
 export default RefreshBuildLogsButton;
