@@ -2,14 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 
+import GitHubRepoLink from '../GitHubRepoLink';
+
 
 const propTypes = {
+  owner: PropTypes.string.isRequired, // Owner (org or user) of the repo
   repository: PropTypes.string.isRequired, // Name of the repo
   title: PropTypes.string.isRequired, // Title of the section we are on
   viewLink: PropTypes.string.isRequired,
 };
 
-const PagesHeader = ({ repository, title, viewLink }) => (
+const PagesHeader = ({ owner, repository, title, viewLink }) => (
   <div className="usa-grid header">
     <div className="usa-width-two-thirds">
       <img
@@ -18,7 +21,10 @@ const PagesHeader = ({ repository, title, viewLink }) => (
         alt="Websites icon"
       />
       <div className="header-title">
-        <h1>{repository}</h1>
+        <h1>
+          {owner}/{repository}
+          <GitHubRepoLink owner={owner} repository={repository} />
+        </h1>
         <p>{title}</p>
       </div>
     </div>

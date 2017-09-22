@@ -47,7 +47,7 @@
     "test": "yarn test:prepare && yarn test:server && yarn test:client",
     "test:prepare": "NODE_ENV=test yarn migrate:up && yarn build",
     "test:server": "NODE_ENV=test nyc mocha --timeout 1500 test/api/bootstrap.test.js test/api/unit/**/*.test.js test/api/requests/**/*.test.js",
-    "test:client": "nyc mocha --compilers js:babel-register --recursive ./test/frontend",
+    "test:client": "nyc mocha --compilers js:babel-register,jsx:babel-register --recursive ./test/frontend",
     "test:client:watch": "watch 'yarn test:client' ./frontend ./test/frontend",
     "lint": "eslint ./api/**/*.js ./config/**/*.js ./frontend/**/*.js ./migration/**/*.js ./script/**/*.js ./services/**/*.js",
     "lint:diff": "./scripts/lint-diff.sh",

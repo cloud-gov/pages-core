@@ -20,7 +20,7 @@
   align-items: center;
   background-color: $secondary-background-color;
   display: flex;
-  margin-bottom: .2em;
+  margin-bottom: 0.2em;
   padding: 1em;
   width: 100%;
 }
@@ -30,9 +30,17 @@
   flex-grow: 1;
 }
 
-.sites-list-item-text p {
-  margin: 0;
+.sites-list-item-text {
+  h3 {
+    font-weight: normal;
+  }
+
+  p {
+    margin: 0;
+  }
 }
+
+
 
 .sites-list-item-actions {
   padding-right: 2em;
