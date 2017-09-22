@@ -33,7 +33,7 @@ const SiteUsers = ({ site }) => {
                 >
                   {user.username}
                 </a>
-                {user.username === site.owner ? '(you)' : ''}
+                {user.username.toLowerCase() === site.owner.toLowerCase() ? '(owner)' : ''}
               </td>
             </tr>)
           )}
