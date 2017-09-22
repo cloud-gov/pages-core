@@ -6,7 +6,8 @@
     "engine",
     "owner",
     "repository",
-    "viewLink"
+    "viewLink",
+    "users"
   ],
   "properties": {
     "id": {
@@ -52,6 +53,16 @@
     },
     "viewLink": {
       "type": "string"
+    },
+    "users": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "username", "email"],
+        "not": {
+          "required": ["githubAccessToken", "githubUserId"]
+        }
+      }
     }
   }
 }

@@ -14,7 +14,7 @@ const SiteUsers = ({ site }) => {
 
   return (
     <div>
-      <p>Users associated with {site.owner}/{site.repository}:</p>
+      <h4 className="label">Federalist users associated with this site</h4>
       <table className="usa-table-borderless">
         <thead>
           <tr>
@@ -33,6 +33,7 @@ const SiteUsers = ({ site }) => {
                 >
                   {user.username}
                 </a>
+                {' '}
                 {user.username.toLowerCase() === site.owner.toLowerCase() ? '(owner)' : ''}
               </td>
             </tr>)

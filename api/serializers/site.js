@@ -12,9 +12,6 @@ const serializeObject = (site) => {
 };
 
 const serialize = (serializable) => {
-  // TODO: Why does this (and every other serializer) re-query for the model?
-  // In addition to seeming unnecessary, it also
-  // removes the loaded associations if any were specified
   const include = [User];
 
   if (serializable.length !== undefined) {
