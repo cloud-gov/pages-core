@@ -1,8 +1,8 @@
 import React from 'react';
-import { SITE } from '../../propTypes';
+import { SITE, USER } from '../../propTypes';
 
 
-const SiteUsers = ({ site }) => {
+const SiteUsers = ({ site, user }) => {
   // sort users by lower-cased usernames
   const users = site.users.slice().sort((a, b) => {
     const aName = a.username.toLowerCase();
@@ -22,19 +22,19 @@ const SiteUsers = ({ site }) => {
           </tr>
         </thead>
         <tbody>
-          {users.map(user =>
-            (<tr key={user.username}>
+          {users.map(u =>
+            (<tr key={u.username}>
               <td>
                 <a
-                  href={`https://github.com/${user.username}`}
+                  href={`https://github.com/${u.username}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  title={`Visit GitHub profile for ${user.username}`}
+                  title={`Visit GitHub profile for ${u.username}`}
                 >
-                  {user.username}
+                  {u.username}
                 </a>
                 {' '}
-                {user.username.toLowerCase() === site.owner.toLowerCase() ? '(owner)' : ''}
+                {u.username.toLowerCase() === user.username.toLowerCase() ? '(you)' : ''}
               </td>
             </tr>)
           )}
@@ -46,10 +46,12 @@ const SiteUsers = ({ site }) => {
 
 SiteUsers.propTypes = {
   site: SITE,
+  user: USER,
 };
 
 SiteUsers.defaultProps = {
   site: null,
+  user: null,
 };
 
 export default SiteUsers;

@@ -18,6 +18,11 @@ describe('<SiteUsers/>', () => {
 
   it('renders rows of users in order of username', () => {
     const props = {
+      user: {
+        username: 'test-owner',
+        id: 4,
+        email: 'test-owner@beep.gov',
+      },
       site: {
         owner: 'test-owner',
         repository: 'test-repo',
@@ -43,8 +48,13 @@ describe('<SiteUsers/>', () => {
     });
   });
 
-  it('notes the site repository owner', () => {
+  it('notes the current user as "you"', () => {
     const props = {
+      user: {
+        username: 'test-owner',
+        id: 4,
+        email: 'owner@beep.gov',
+      },
       site: {
         owner: 'test-owner',
         repository: 'test-repo',
@@ -58,7 +68,7 @@ describe('<SiteUsers/>', () => {
     const wrapper = shallow(<SiteUsers {...props} />);
     const rows = wrapper.find('tbody tr');
     expect(rows).to.have.length(2);
-    expect(rows.at(0).find('td').contains('(owner)')).to.be.false;
-    expect(rows.at(1).find('td').contains('(owner)')).to.be.true;
+    expect(rows.at(0).find('td').contains('(you)')).to.be.false;
+    expect(rows.at(1).find('td').contains('(you)')).to.be.true;
   });
 });
