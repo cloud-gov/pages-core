@@ -1,14 +1,10 @@
 /* global window:true */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router';
 import autoBind from 'react-autobind';
 
-import { SITE, GITHUB_BRANCHES } from '../../propTypes';
-import SiteGithubBranchesTable from './siteGithubBranchesTable';
-import SelectSiteEngine from '../selectSiteEngine';
+import { SITE } from '../../propTypes';
 import HttpsUrlInput from '../httpsUrlInput';
-import githubBranchActions from '../../actions/githubBranchActions';
 import siteActions from '../../actions/siteActions';
 
 const propTypes = {
@@ -16,12 +12,11 @@ const propTypes = {
     id: PropTypes.string,
   }).isRequired,
   site: SITE,
-  githubBranches: GITHUB_BRANCHES,
+  // TODO: Delete from route - githubBranches: GITHUB_BRANCHES,
 };
 
 const defaultProps = {
-  site: null,
-  githubBranches: null,
+  site: null, // TODO: Should site be required actually? when would it be null?
 };
 
 
@@ -44,10 +39,6 @@ export class SiteSettings extends React.Component {
     };
 
     autoBind(this, 'onChange', 'onSubmit', 'onDelete', 'getSiteUrl');
-  }
-
-  componentDidMount() {
-    githubBranchActions.fetchBranches(this.props.site);
   }
 
   onChange(event) {
@@ -102,17 +93,7 @@ export class SiteSettings extends React.Component {
             />
           </div>
         </div>
-        <div className="usa-grid">
-          <div className="usa-width-one-whole">
-            <SelectSiteEngine value={state.engine} onChange={this.onChange} />
-          </div>
-        </div>
-        <div className="usa-grid">
-          <div className="usa-width-one-whole">
-            <h4 className="label">GitHub Branches</h4>
-            <SiteGithubBranchesTable site={this.props.site} branches={this.props.githubBranches} />
-          </div>
-        </div>
+
         <div className="usa-grid">
           <div className="usa-width-one-whole">
             <div className="form-group">
@@ -165,66 +146,13 @@ export class SiteSettings extends React.Component {
             </div>
           </div>
         </div>
+
+
         <div className="usa-grid">
           <div className="usa-width-one-whole">
-            <div className="well">
-              <h3 className="well-heading">Site configuration</h3>
-              <p className="well-text">
-                Add additional configuration in yaml to be added to your
-                <code>_config.yml</code> file when we build your site&apos;s default branch.
-              </p>
-              <textarea
-                name="config"
-                className="form-control"
-                value={state.config}
-                onChange={this.onChange}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="usa-grid">
-          <div className="usa-width-one-whole">
-            <div className="well">
-              <h3 className="well-heading">Demo configuration</h3>
-              <p className="well-text">
-                Add additional configuration in yaml to be added to your
-                <code>_config.yml</code> file when we build your site&apos;s demo branch.
-              </p>
-              <textarea
-                name="demoConfig"
-                className="form-control"
-                value={state.demoConfig}
-                onChange={this.onChange}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="usa-grid">
-          <div className="usa-width-one-whole">
-            <div className="well">
-              <h3 className="well-heading">Preview configuration</h3>
-              <p className="well-text">
-                Add additional configuration in yaml to be added to your
-                <code>_config.yml</code> file when we build a preview branch for your site.
-              </p>
-              <textarea
-                name="previewConfig"
-                className="form-control"
-                value={state.previewConfig}
-                onChange={this.onChange}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="usa-grid">
-          <div className="usa-width-one-whole">
-            <Link
-              role="button"
-              to={this.getSiteUrl()}
-              className="usa-button usa-button-gray"
-            >
+            <a href={this.getSiteUrl()} className="usa-button usa-button-gray">
               Cancel
-            </Link>
+            </a>
             <button
               type="submit"
               className="usa-button usa-button-primary"
@@ -235,15 +163,7 @@ export class SiteSettings extends React.Component {
             </button>
           </div>
         </div>
-        <div className="usa-grid">
-          <div className="usa-alert usa-alert-delete" role="alert">
-            Delete this site from Federalist?
-            <button
-              className="usa-button usa-button-secondary"
-              onClick={this.onDelete}
-            >Delete</button>
-          </div>
-        </div>
+
       </form>
     );
   }
