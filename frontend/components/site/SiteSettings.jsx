@@ -1,6 +1,12 @@
 /* global window:true */
 import React from 'react';
 import autoBind from 'react-autobind';
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemTitle,
+  AccordionItemBody,
+} from 'react-accessible-accordion';
 
 import { SITE } from '../../propTypes';
 import BasicSiteSettings from './BasicSiteSettings';
@@ -15,7 +21,6 @@ const defaultProps = {
   site: null,
 };
 
-// TODO: make an accordion widget to wrap AdvancedSettings
 
 class SiteSettings extends React.Component {
   constructor(props) {
@@ -65,14 +70,20 @@ class SiteSettings extends React.Component {
           onSubmit={this.onSubmit}
         />
 
-        <hr />
-
-        <h3>Advanced Settings</h3>
-        <AdvancedSiteSettings
-          initialValues={advancedInitialValues}
-          onDelete={this.onDelete}
-          onSubmit={this.onSubmit}
-        />
+        <Accordion>
+          <AccordionItem>
+            <AccordionItemTitle>
+              <h3>Advanced Settings</h3>
+            </AccordionItemTitle>
+            <AccordionItemBody>
+              <AdvancedSiteSettings
+                initialValues={advancedInitialValues}
+                onDelete={this.onDelete}
+                onSubmit={this.onSubmit}
+              />
+            </AccordionItemBody>
+          </AccordionItem>
+        </Accordion>
       </div>
     );
   }

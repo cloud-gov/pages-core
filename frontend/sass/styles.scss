@@ -1,4 +1,5 @@
 @import '../../node_modules/uswds/dist/css/uswds.css';
+@import '../../node_modules/react-accessible-accordion/dist/react-accessible-accordion.css';
 
 @import "_variables";
 
@@ -18,6 +19,7 @@
 @import "_tables";
 @import "_log-tools";
 @import "_repo-link";
+@import "_accordions";
 
 html,
 body,
