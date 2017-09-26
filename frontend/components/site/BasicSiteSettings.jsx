@@ -7,10 +7,10 @@ import HttpsUrlInput from '../httpsUrlInput';
 const propTypes = {
   // initialValues is what the initial form values are based on
   initialValues: PropTypes.shape({
-    defaultBranch: PropTypes.string.isRequired,
-    domain: PropTypes.string.isRequired,
-    demoBranch: PropTypes.string.isRequired,
-    demoDomain: PropTypes.string.isRequired,
+    defaultBranch: PropTypes.string,
+    domain: PropTypes.string,
+    demoBranch: PropTypes.string,
+    demoDomain: PropTypes.string,
   }).isRequired,
 
   // the following props are from reduxForm:
@@ -18,10 +18,6 @@ const propTypes = {
   reset: PropTypes.func.isRequired,
   pristine: PropTypes.bool.isRequired,
 };
-
-
-// TODO: domain and demoDomain are not working with the reduxForm
-// Probably because of the wrapped component
 
 export const BasicSiteSettings = ({
   // even though initialValues is not directly used, it is used
@@ -125,7 +121,7 @@ export const BasicSiteSettings = ({
           className="usa-button usa-button-primary"
           disabled={pristine}
         >
-          Save
+          Save Basic Settings
         </button>
       </div>
     </div>

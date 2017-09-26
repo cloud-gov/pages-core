@@ -1,3 +1,4 @@
+/* global window:true */
 import React from 'react';
 import autoBind from 'react-autobind';
 
@@ -8,7 +9,6 @@ import siteActions from '../../actions/siteActions';
 
 const propTypes = {
   site: SITE,
-  // TODO: Delete from route - githubBranches: GITHUB_BRANCHES,
 };
 
 const defaultProps = {
@@ -50,8 +50,16 @@ class SiteSettings extends React.Component {
       demoDomain: site.demoDomain || '',
     };
 
+    const advancedInitialValues = {
+      engine: site.engine,
+      config: site.config || '',
+      demoConfig: site.demoConfig || '',
+      previewConfig: site.previewConfig || '',
+    };
+
     return (
       <div>
+        <h3>Basic Settings</h3>
         <BasicSiteSettings
           initialValues={basicInitialValues}
           onSubmit={this.onSubmit}
@@ -59,17 +67,12 @@ class SiteSettings extends React.Component {
 
         <hr />
 
-        {/* TODO:
-        <h4>Advanced Settings</h4>
-        <div style={{ background: 'red' }}>
-          <AdvancedSiteSettings
-            site={this.props.site}
-            onDelete={this.onDelete}
-            onCancel={this.onCancel}
-            onSubmit={this.onSubmit}
-          />
-        </div>
-        */}
+        <h3>Advanced Settings</h3>
+        <AdvancedSiteSettings
+          initialValues={advancedInitialValues}
+          onDelete={this.onDelete}
+          onSubmit={this.onSubmit}
+        />
       </div>
     );
   }

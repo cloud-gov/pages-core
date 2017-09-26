@@ -1,14 +1,19 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Field, reduxForm } from 'redux-form';
 
 import SelectSiteEngine from '../selectSiteEngine';
 
 const propTypes = {
   onDelete: PropTypes.func.isRequired,
+
   // initialValues is what the initial form values are based on
   initialValues: PropTypes.shape({
-    // TODO: fill this out
+    engine: PropTypes.string.isRequired,
+    config: PropTypes.string,
+    demoConfig: PropTypes.string,
+    previewConfig: PropTypes.string,
   }).isRequired,
 
   // the following props are from reduxForm:
@@ -31,7 +36,16 @@ export const AdvancedSiteSettings = ({
   <form className="settings-form settings-form-advanced" onSubmit={handleSubmit}>
     <div className="usa-grid">
       <div className="usa-width-one-whole">
-        <SelectSiteEngine value={state.engine} />
+        <Field
+          name="engine"
+          component={p =>
+            <SelectSiteEngine
+              value={p.input.value}
+              onChange={p.input.onChange}
+              className="form-control"
+            />
+          }
+        />
       </div>
     </div>
 
@@ -44,7 +58,8 @@ export const AdvancedSiteSettings = ({
             Add additional configuration in yaml to be added to your
             <code>_config.yml</code> file when we build your site&apos;s default branch.
           </p>
-          <textarea
+          <Field
+            component="textarea"
             name="config"
             className="form-control"
           />
@@ -61,7 +76,8 @@ export const AdvancedSiteSettings = ({
             Add additional configuration in yaml to be added to your
             <code>_config.yml</code> file when we build your site&apos;s demo branch.
           </p>
-          <textarea
+          <Field
+            component="textarea"
             name="demoConfig"
             className="form-control"
           />
@@ -78,7 +94,8 @@ export const AdvancedSiteSettings = ({
             Add additional configuration in yaml to be added to your
             <code>_config.yml</code> file when we build a preview branch for your site.
           </p>
-          <textarea
+          <Field
+            component="textarea"
             name="previewConfig"
             className="form-control"
           />
@@ -102,7 +119,7 @@ export const AdvancedSiteSettings = ({
           className="usa-button usa-button-primary"
           disabled={pristine}
         >
-          Save
+          Save Advanced Settings
         </button>
       </div>
     </div>
@@ -124,4 +141,5 @@ export const AdvancedSiteSettings = ({
 
 AdvancedSiteSettings.propTypes = propTypes;
 
-export default AdvancedSiteSettings;
+// create a higher-order component with reduxForm and export that
+export default reduxForm({ form: 'advancedSiteSettings' })(AdvancedSiteSettings);
