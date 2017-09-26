@@ -1,31 +1,37 @@
+
 import React from 'react';
 import PropTypes from 'prop-types';
 
 import SelectSiteEngine from '../selectSiteEngine';
 
-// For now, will put on SiteSettings page
-// since I'm unclear if it should be on a totally separate
-// view or not
+const propTypes = {
+  onDelete: PropTypes.func.isRequired,
+  // initialValues is what the initial form values are based on
+  initialValues: PropTypes.shape({
+    // TODO: fill this out
+  }).isRequired,
 
-// Engine select
-// Custom config
-// Demo config
-// Preview config
-// Delete from my account
-//  -> new functionality: disassociate from me
-// Delete from Federalist
-//  -> existing delete functionality
+  // the following props are from reduxForm:
+  handleSubmit: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  pristine: PropTypes.bool.isRequired,
+};
 
-// TODO: Is SiteGitHubBranchesTable still going to be used
-// or should it be deleted?
 
-// TODO: collapse-expand component to wrap this?
-
-const AdvancedSiteSettings = () => (
-  <div>
+export const AdvancedSiteSettings = ({
+  // even though initialValues is not directly used, it is used
+  // by reduxForm, and we want PropType validation on it, so we'll
+  // keep it here but disable the eslint rule below
+  initialValues, // eslint-disable-line no-unused-vars
+  onDelete,
+  reset,
+  pristine,
+  handleSubmit,
+}) => (
+  <form className="settings-form settings-form-advanced" onSubmit={handleSubmit}>
     <div className="usa-grid">
       <div className="usa-width-one-whole">
-        <SelectSiteEngine value={state.engine} onChange={this.onChange} />
+        <SelectSiteEngine value={state.engine} />
       </div>
     </div>
 
@@ -41,8 +47,6 @@ const AdvancedSiteSettings = () => (
           <textarea
             name="config"
             className="form-control"
-            value={state.config}
-            onChange={this.onChange}
           />
         </div>
       </div>
@@ -60,8 +64,6 @@ const AdvancedSiteSettings = () => (
           <textarea
             name="demoConfig"
             className="form-control"
-            value={state.demoConfig}
-            onChange={this.onChange}
           />
         </div>
       </div>
@@ -79,10 +81,29 @@ const AdvancedSiteSettings = () => (
           <textarea
             name="previewConfig"
             className="form-control"
-            value={state.previewConfig}
-            onChange={this.onChange}
           />
         </div>
+      </div>
+    </div>
+
+    <div className="usa-grid">
+      <div className="usa-width-one-whole">
+        <button
+          type="button"
+          className="usa-button usa-button-gray"
+          disabled={pristine}
+          onClick={reset}
+        >
+          Reset
+        </button>
+
+        <button
+          type="submit"
+          className="usa-button usa-button-primary"
+          disabled={pristine}
+        >
+          Save
+        </button>
       </div>
     </div>
 
@@ -91,11 +112,16 @@ const AdvancedSiteSettings = () => (
         Delete this site from Federalist?
         <button
           className="usa-button usa-button-secondary"
-          onClick={this.onDelete}
-        >Delete</button>
+          onClick={onDelete}
+        >
+          Delete
+        </button>
       </div>
     </div>
-  </div>
+  </form>
 );
+
+
+AdvancedSiteSettings.propTypes = propTypes;
 
 export default AdvancedSiteSettings;
