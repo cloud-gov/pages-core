@@ -31,30 +31,25 @@ export const BasicSiteSettings = ({
   <form className="settings-form" onSubmit={handleSubmit}>
     <div className="usa-grid">
       <div className="usa-width-one-whole">
-        <label htmlFor="defaultBranchInput" className="active">
-          Default branch
-        </label>
-        <Field
-          component="input"
-          type="text"
-          id="defaultBranchInput"
-          name="defaultBranch"
-          className="form-control"
-        />
-      </div>
-    </div>
-
-    <div className="usa-grid">
-      <div className="usa-width-one-whole">
         <div className="form-group">
           <div className="well">
-            <h3 className="well-heading">Custom Domain</h3>
+            <h3 className="well-heading">Live Site</h3>
             <p className="well-text">
-              After you delegate your .gov or .mil URL to Federalist,
-              enter the URL here so your site builds correctly.
-              See <a href="https://federalist-docs.18f.gov/pages/how-federalist-works/custom-urls/" target="_blank" rel="noopener noreferrer">
-              Federalist&apos;s custom URL documentation</a> for more information.
+              These settings control the primary branch Federalist uses to build your site.
+              <br />
+              After your DNS is pointed to Federalist, set the <a href="https://federalist-docs.18f.gov/pages/how-federalist-works/custom-urls/" target="_blank" rel="noopener noreferrer">live domain</a> to ensure the site builds correctly.
             </p>
+            <label htmlFor="defaultBranchInput">
+              Branch name:
+            </label>
+            <Field
+              component="input"
+              type="text"
+              id="defaultBranchInput"
+              name="defaultBranch"
+              className="form-control"
+            />
+            <label htmlFor="domainInput">Live domain:</label>
             <Field
               name="domain"
               component={p =>
@@ -70,6 +65,7 @@ export const BasicSiteSettings = ({
         </div>
       </div>
     </div>
+
     <div className="usa-grid">
       <div className="usa-width-one-whole">
         <div className="form-group">
