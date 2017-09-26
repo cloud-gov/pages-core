@@ -84,6 +84,7 @@ export class SiteContainer extends React.Component {
     const publishedBranches = storeState.publishedBranches;
     const publishedFiles = storeState.publishedFiles;
     const githubBranches = storeState.githubBranches;
+    const user = storeState.user.data;
 
     const childConfigs = {
       site,
@@ -92,6 +93,7 @@ export class SiteContainer extends React.Component {
       publishedBranches,
       publishedFiles,
       githubBranches,
+      user,
     };
 
     return (
