@@ -1,14 +1,9 @@
 /* global window:true */
 import React from 'react';
 import autoBind from 'react-autobind';
-import {
-  Accordion,
-  AccordionItem,
-  AccordionItemTitle,
-  AccordionItemBody,
-} from 'react-accessible-accordion';
 
 import { SITE } from '../../propTypes';
+import ExpandableArea from '../ExpandableArea';
 import BasicSiteSettings from './BasicSiteSettings';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
 import siteActions from '../../actions/siteActions';
@@ -70,20 +65,13 @@ class SiteSettings extends React.Component {
           onSubmit={this.onSubmit}
         />
 
-        <Accordion>
-          <AccordionItem>
-            <AccordionItemTitle>
-              <h3>Advanced Settings</h3>
-            </AccordionItemTitle>
-            <AccordionItemBody>
-              <AdvancedSiteSettings
-                initialValues={advancedInitialValues}
-                onDelete={this.onDelete}
-                onSubmit={this.onSubmit}
-              />
-            </AccordionItemBody>
-          </AccordionItem>
-        </Accordion>
+        <ExpandableArea title="Advanced Settings">
+          <AdvancedSiteSettings
+            initialValues={advancedInitialValues}
+            onDelete={this.onDelete}
+            onSubmit={this.onSubmit}
+          />
+        </ExpandableArea>
       </div>
     );
   }
