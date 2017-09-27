@@ -19,7 +19,7 @@ describe('Main Site', () => {
         .get('/')
         .expect(200)
         .then((response) => {
-          expect(response.text.indexOf('Federalist compliantly hosts static government websites.')).to.be.above(-1);
+          expect(response.text.indexOf('Federalist compliantly hosts federal government websites.')).to.be.above(-1);
           expect(response.text.indexOf('Log in')).to.be.above(-1);
         });
     });
