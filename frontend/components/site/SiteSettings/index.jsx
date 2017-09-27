@@ -2,11 +2,11 @@
 import React from 'react';
 import autoBind from 'react-autobind';
 
-import { SITE } from '../../propTypes';
-import ExpandableArea from '../ExpandableArea';
+import { SITE } from '../../../propTypes';
+import ExpandableArea from '../../ExpandableArea';
 import BasicSiteSettings from './BasicSiteSettings';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
-import siteActions from '../../actions/siteActions';
+import siteActions from '../../../actions/siteActions';
 
 const propTypes = {
   site: SITE,

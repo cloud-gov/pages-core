@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
-import SelectSiteEngine from '../selectSiteEngine';
+import SelectSiteEngine from '../../selectSiteEngine';
 
 const propTypes = {
   onDelete: PropTypes.func.isRequired,
@@ -107,7 +107,7 @@ export const AdvancedSiteSettings = ({
       <div className="usa-width-one-whole">
         <button
           type="button"
-          className="usa-button usa-button-gray"
+          className="usa-button usa-button-gray button-reset"
           disabled={pristine}
           onClick={reset}
         >
@@ -128,7 +128,7 @@ export const AdvancedSiteSettings = ({
       <div className="usa-alert usa-alert-delete" role="alert">
         Delete this site from Federalist?
         <button
-          className="usa-button usa-button-secondary"
+          className="usa-button usa-button-secondary button-delete"
           onClick={onDelete}
         >
           Delete

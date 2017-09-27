@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
-import HttpsUrlInput from '../httpsUrlInput';
+import HttpsUrlInput from '../../httpsUrlInput';
 
 const propTypes = {
   // initialValues is what the initial form values are based on
@@ -105,7 +105,7 @@ export const BasicSiteSettings = ({
       <div className="usa-width-one-whole">
         <button
           type="button"
-          className="usa-button usa-button-gray"
+          className="usa-button usa-button-gray button-reset"
           disabled={pristine}
           onClick={reset}
         >
