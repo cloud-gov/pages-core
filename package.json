@@ -21,7 +21,7 @@
     "express-winston": "^2.3.0",
     "github": "^0.2.4",
     "json-to-csv": "^1.0.0",
-    "method-override": "^2.3.7",
+    "method-override": "^2.3.10",
     "moment": "^2.10.3",
     "newrelic": "^1.40.0",
     "nunjucks": "^3.0.1",
