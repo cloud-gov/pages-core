@@ -11,14 +11,14 @@ import {
 } from './dispatchActions';
 
 
-const alertError = error => {
+const alertError = (error) => {
   alertActions.httpError(error.message);
 };
 
 
 export default {
   fetchSites() {
-    dispatchSitesFetchStartedAction()
+    dispatchSitesFetchStartedAction();
     return federalist.fetchSites()
       .then(dispatchSitesReceivedAction)
       .catch(alertError);
