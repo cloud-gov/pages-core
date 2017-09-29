@@ -1,0 +1,39 @@
+// Copied from USWDS "usa-accordion button" styling
+// because the usa-accordion styling in the version of
+// the USWDS we are using does not play well with child content
+.expandable-area-button {
+  background-color: #f1f1f1;
+  background-image: url("../../node_modules/uswds/dist/img/minus.png");
+  background-image: url("../../node_modules/uswds/dist/img/minus.svg");
+  background-position: right 3rem center;
+  background-repeat: no-repeat;
+  background-size: 13px;
+  color: #212121;
+  display: inline-block;
+  margin: 0;
+  padding: 1.5rem 5.5rem 1.5rem 3rem;
+  width: 100%;
+
+  text-align: left;
+  font-weight: bold;
+
+  &[aria-expanded="false"] {
+    background-image: url("../../node_modules/uswds/dist/img/plus.png");
+    background-image: url("../../node_modules/uswds/dist/img/plus.svg");
+    background-repeat: no-repeat;
+    background-size: 1.3rem;
+  }
+
+  &:focus {
+    box-shadow: 0 0 3px #3e94cf, 0 0 7px #3e94cf;
+  }
+
+  &:hover {
+    background-color: #d6d7d9;
+    color: #212121;
+  }
+}
+
+.expandable-area-content[aria-hidden="true"] {
+  display: none;
+}

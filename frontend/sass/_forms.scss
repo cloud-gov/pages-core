@@ -32,3 +32,9 @@ select {
     max-width: 100%;
   }
 }
+
+.settings-form {
+  button[type="submit"] {
+    display: inline;
+  }
+}
