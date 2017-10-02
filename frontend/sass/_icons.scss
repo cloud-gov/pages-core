@@ -12,14 +12,14 @@
 }
 
 $first-row: -.1em;
-$second-row: -1.3em;
+$second-row: -1.25em;
 $third-row: -2.5em;
 $fourth-row: -3.6em;
 $fifth-row: -4.7em;
 $sixth-row: -5.9em;
 
 $first-column: -0.35em;
-$second-column: 0;
+$second-column: -1.45em;
 $third-column: 0;
 $fourth-column: -3.85em;
 $fifth-column: -5.0em;
@@ -96,4 +96,17 @@ $twelfth-column: 0;
 
 .icon.icon-logs:hover:before {
   background-position-x: $fourth-column;
+}
+
+.icon.icon-gear {
+  &:before {
+    @include icon();
+    height: 1em;
+    background-position: $second-column $second-row;
+    content: 'Gear icon';
+  }
+
+  &:hover:before {
+    background-position-x: $fifth-column;
+  }
 }
