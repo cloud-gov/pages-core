@@ -15,11 +15,11 @@ const SiteUsers = ({ site, user }) => {
   return (
     <div>
       <p>
-        This user table is an incomplete feature.
-        It does not allow you to add or remove users,
-        but instead allows you to easily audit who else has access
-        to Federalist settings for this site.
-        New users get access to Federalist by logging into Federalist
+        This user table is a partially complete feature.
+        It allows you to easily audit who else has access 
+        to Federalist settings and logs for this site. Eventually, 
+        this table will be used to allow you to add and remove other users. 
+        New users get access for a specific site by logging into Federalist
         and adding the site themselves.
       </p>
       <h4 className="label">Federalist users associated with this site</h4>
