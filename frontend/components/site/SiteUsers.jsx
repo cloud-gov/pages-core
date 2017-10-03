@@ -14,6 +14,14 @@ const SiteUsers = ({ site, user }) => {
 
   return (
     <div>
+      <p>
+        This user table is a partially complete feature.
+        It allows you to easily audit who else has access
+        to Federalist settings and logs for this site. Eventually,
+        this table will be used to allow you to add and remove other users.
+        Currently, new users get access for a specific site by logging into Federalist
+        and adding the site themselves.
+      </p>
       <h4 className="label">Federalist users associated with this site</h4>
       <table className="usa-table-borderless">
         <thead>
