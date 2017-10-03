@@ -9,7 +9,7 @@ describe('<SitePublishedFilesTable/>', () => {
   it('should render the branch name', () => {
     const publishedBranch = { name: 'master', viewLink: 'www.example.gov/master' };
     const props = {
-      params: { id: 1, name: 'master' },
+      params: { id: '1', name: 'master' },
       publishedFiles: {
         isLoading: false,
         data: [
@@ -26,7 +26,7 @@ describe('<SitePublishedFilesTable/>', () => {
     const correctBranch = { name: 'master', viewLink: 'www.example.gov/master' };
     const incorrectBranch = { name: 'preview', viewLink: 'www.example.gov/preview' };
     const props = {
-      params: { id: 1, name: 'master' },
+      params: { id: '1', name: 'master' },
       publishedFiles: {
         isLoading: false,
         data: [
@@ -48,7 +48,7 @@ describe('<SitePublishedFilesTable/>', () => {
 
   it('should render a loading state if the files are loading', () => {
     const props = {
-      params: { id: 1, name: 'master' },
+      params: { id: '1', name: 'master' },
       publishedFiles: { isLoading: true },
     };
 
@@ -58,7 +58,7 @@ describe('<SitePublishedFilesTable/>', () => {
 
   it('should render an empty state if there are no files', () => {
     const props = {
-      params: { id: 1, name: 'master' },
+      params: { id: '1', name: 'master' },
       publishedFiles: { isLoading: false, data: [] },
     };
 

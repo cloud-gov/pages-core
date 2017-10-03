@@ -61,6 +61,8 @@ function toJSON() {
     plain: true,
   }));
 
+  delete object.site_users__user_sites;
+
   object.createdAt = object.createdAt.toISOString();
   object.updatedAt = object.updatedAt.toISOString();
 

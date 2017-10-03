@@ -1,4 +1,5 @@
 import { reducer as notifications } from 'react-notification-system-redux';
+import { reducer as form } from 'redux-form';
 
 import buildLogs from './reducers/buildLogs';
 import alert from './reducers/alert';
@@ -8,6 +9,7 @@ import sites from './reducers/sites';
 import builds from './reducers/builds';
 import user from './reducers/user';
 import githubBranches from './reducers/githubBranches';
+
 
 export default {
   buildLogs,
@@ -19,5 +21,6 @@ export default {
   user,
   githubBranches,
   notifications,
+  form,
   FRONTEND_CONFIG: (state = {}) => state,
 };

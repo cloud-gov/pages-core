@@ -8,7 +8,7 @@ import buildLogActions from '../../actions/buildLogActions';
 class RefreshBuildLogsButton extends React.Component {
   constructor(props) {
     super(props);
-    autoBind(this);
+    autoBind(this, 'refreshBuildLogs');
   }
 
   refreshBuildLogs() {
@@ -23,7 +23,7 @@ class RefreshBuildLogsButton extends React.Component {
 }
 
 RefreshBuildLogsButton.propTypes = {
-  buildId: PropTypes.string.isRequired,
+  buildId: PropTypes.number.isRequired,
 };
 
 export default RefreshBuildLogsButton;

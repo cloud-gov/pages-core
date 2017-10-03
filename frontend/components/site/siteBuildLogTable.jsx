@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { BUILD_LOG } from '../../propTypes';
+
 function SiteBuildLogTable({ buildLogs }) {
   return (
     <table className="usa-table-borderless log-table log-table__site-build-log">
@@ -30,12 +32,7 @@ function SiteBuildLogTable({ buildLogs }) {
 
 
 SiteBuildLogTable.propTypes = {
-  buildLogs: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    source: PropTypes.string.isRequired,
-    output: PropTypes.string.isRequired,
-    createdAt: PropTypes.string.isRequired,
-  })).isRequired,
+  buildLogs: PropTypes.arrayOf(BUILD_LOG).isRequired,
 };
 
 export default SiteBuildLogTable;

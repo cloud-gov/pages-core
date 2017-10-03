@@ -92,16 +92,21 @@ $logo-height: 29px;
   margin-left: 1em;
   flex-direction: column;
   justify-content: space-between;
-}
 
-.header-title h1 {
-  font-size: 2.8rem;
-  margin: 0;
-}
+  h1 {
+    font-size: 2.8rem;
+    margin: 0;
+  }
 
-.header-title p {
-  line-height: 1em;
-  margin: 0;
+  p {
+    line-height: 1em;
+    margin: 0;
+  }
+
+  .repo-link svg {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .header .usa-button {

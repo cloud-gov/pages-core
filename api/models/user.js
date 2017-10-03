@@ -17,6 +17,7 @@ function toJSON() {
   delete object.githubAccessToken;
   delete object.githubUserId;
   delete object.signedInAt;
+  delete object.site_users__user_sites;
 
   object.createdAt = object.createdAt.toISOString();
   object.updatedAt = object.updatedAt.toISOString();

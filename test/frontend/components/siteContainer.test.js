@@ -11,6 +11,14 @@ describe('<SiteContainer/>', () => {
     props = {
       storeState: {
         alert: {},
+        user: {
+          isLoading: false,
+          data: {
+            id: 1,
+            username: 'aUser',
+            email: 'aUser@example.gov',
+          },
+        },
         sites: {
           isLoading: false,
           data: [{
@@ -19,6 +27,8 @@ describe('<SiteContainer/>', () => {
             engine: 'jekyll',
             owner: '18f',
             publishedAt: '2017-06-08T20:53:14.363Z',
+            viewLink: 'https://view-link.gov',
+            repository: 'test-repo',
           }],
         },
       },

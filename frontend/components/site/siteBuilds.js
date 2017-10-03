@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import autoBind from 'react-autobind';
 import { Link } from 'react-router';
 
 import buildActions from '../../actions/buildActions';
@@ -42,11 +41,6 @@ class SiteBuilds extends React.Component {
       </a>
     );
     /* eslint-enable jsx-a11y/href-no-hash */
-  }
-
-  constructor(props) {
-    super(props);
-    autoBind(this);
   }
 
   componentDidMount() {
