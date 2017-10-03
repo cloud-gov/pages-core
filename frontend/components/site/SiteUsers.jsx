@@ -14,15 +14,14 @@ const SiteUsers = ({ site, user }) => {
 
   return (
     <div>
-      <div className="usa-grid">
-          <div className="usa-width-one-whole">
-            <p>
-              This user table is an incomplete feature. It does not allow you to add or remove users, but instead allows you to easily audit who else has access to Federalist settings for this site.
-              New users get access to Federalist by logging into Federalist and adding the site themselves.
-            </p>
-          </div>
-        </div>
-      <br/ >
+      <p>
+        This user table is an incomplete feature.
+        It does not allow you to add or remove users,
+        but instead allows you to easily audit who else has access
+        to Federalist settings for this site.
+        New users get access to Federalist by logging into Federalist
+        and adding the site themselves.
+      </p>
       <h4 className="label">Federalist users associated with this site</h4>
       <table className="usa-table-borderless">
         <thead>
