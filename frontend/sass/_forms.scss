@@ -15,6 +15,11 @@ textarea {
   border: 3px solid #ccc;
 }
 
+input[type="url"]
+textarea {
+  border: 3px solid #ccc;
+}
+
 input[type="text"]:focus,
 textarea:focus {
   background-color: white;
