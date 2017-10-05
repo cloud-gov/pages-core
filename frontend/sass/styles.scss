@@ -92,25 +92,26 @@ li.list-group-item ul.list-group {
   padding-bottom: 3em;
 }
 
-.site-actions {
+.side-nav {
   list-style-type: none;
   margin-top: 0.7em;
+  width: 100%;
 }
 
-.site-actions li:before {
+.side-nav li:before {
   content: '';
 }
 
-.site-actions li {
+.side-nav li {
   display: block;
   margin-bottom: 1.2em;
 }
 
-.site-actions a {
+.side-nav a {
   color: $text-color;
 }
 
-.site-actions a:hover {
+.side-nav a:hover {
   color: $link-color;
 }
 

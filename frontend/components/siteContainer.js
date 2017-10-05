@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import SideNav from './site/SideNav/sideNav';
+import SideNav from './site/SideNav';
 import PagesHeader from './site/pagesHeader';
 import AlertBanner from './alertBanner';
 import LoadingIndicator from './loadingIndicator';

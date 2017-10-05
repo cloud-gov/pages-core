@@ -11,7 +11,7 @@
   width: 1em;
 }
 
-$first-row: -.1em;
+$first-row: -0.1em;
 $second-row: -1.25em;
 $third-row: -2.5em;
 $fourth-row: -3.6em;
@@ -20,10 +20,10 @@ $sixth-row: -5.9em;
 
 $first-column: -0.35em;
 $second-column: -1.45em;
-$third-column: 0;
+$third-column: -2.65em;;
 $fourth-column: -3.85em;
 $fifth-column: -5.0em;
-$sixth-column: 0;
+$sixth-column: -6.125em;
 $seventh-column: 0;
 $eighth-column: 0;
 $ninth-column: 0;
@@ -96,6 +96,19 @@ $twelfth-column: 0;
 
 .icon.icon-logs:hover:before {
   background-position-x: $fourth-column;
+}
+
+.icon.icon-upload {
+  &:before {
+    @include icon();
+
+    background-position: $third-column $first-row;
+    content: 'Upload icon';
+  }
+
+  &:hover:before {
+    background-position-x: $sixth-column;
+  }
 }
 
 .icon.icon-gear {
