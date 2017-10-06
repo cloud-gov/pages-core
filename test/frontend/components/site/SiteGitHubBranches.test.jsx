@@ -73,7 +73,7 @@ describe('<SiteGitHubBranches />', () => {
     ).to.be.true;
   });
 
-  it('should render an loading state site is null', () => {
+  it('should render a loading state if site is null', () => {
     const props = {
       site: null,
       githubBranches: {
