@@ -3,6 +3,7 @@ const sitesReceivedType = 'SITES_RECEIVED';
 const siteAddedType = 'SITE_ADDED';
 const siteUpdatedType = 'SITE_UPDATED';
 const siteDeletedType = 'SITE_DELETED';
+const siteUserAddedType = 'SITE_USER_ADDED';
 
 const sitesFetchStarted = () => ({
   type: sitesFetchStartedType,
@@ -29,10 +30,16 @@ const siteDeleted = siteId => ({
   siteId,
 });
 
+const siteUserAdded = site => ({
+  type: siteUserAddedType,
+  site,
+});
+
 export {
   sitesFetchStarted, sitesFetchStartedType,
   sitesReceived, sitesReceivedType,
   siteAdded, siteAddedType,
   siteUpdated, siteUpdatedType,
   siteDeleted, siteDeletedType,
+  siteUserAdded, siteUserAddedType,
 };

@@ -9,8 +9,10 @@ describe('sitesReducer', () => {
   const SITE_ADDED = 'hey, new site!';
   const SITE_DELETED = 'bye, site.';
   const SITE_UPDATED = 'change the site, please';
+  const SITE_BRANCHES_RECEIVED = 'branches received';
   const SITES_RECEIVED = 'hey, sites!';
   const BUILD_RESTARTED = 'build restarted!';
+  const SITE_USER_ADDED = 'site user added';
 
   beforeEach(() => {
     fixture = proxyquire('../../../frontend/reducers/sites', {
@@ -19,7 +21,9 @@ describe('sitesReducer', () => {
         sitesReceivedType: SITES_RECEIVED,
         siteAddedType: SITE_ADDED,
         siteUpdatedType: SITE_UPDATED,
+        siteBranchesReceivedType: SITE_BRANCHES_RECEIVED,
         siteDeletedType: SITE_DELETED,
+        siteUserAddedType: SITE_USER_ADDED,
       },
       '../actions/actionCreators/buildActions': {
         buildRestartedType: BUILD_RESTARTED,
@@ -136,6 +140,27 @@ describe('sitesReducer', () => {
     expect(actual.data).to.deep.equal([newSite, siteTwo]);
   });
 
+  it('sets existing site branches when SITE_BRANCHES_RECEIVED', () => {
+    const site = {
+      id: 23,
+      branches: ['flower'],
+    };
+
+    const newBranches = ['pencil', 'beer'];
+    const actual = fixture({ isLoading: false, data: [site] }, {
+      type: SITE_BRANCHES_RECEIVED,
+      siteId: site.id,
+      branches: newBranches,
+    });
+
+    expect(actual.data).to.deep.equal([
+      {
+        id: site.id,
+        branches: newBranches,
+      },
+    ]);
+  });
+
   it('ignores delete request if site id is not found', () => {
     const siteOne = {
       id: 'siteToKeep',
@@ -178,5 +203,25 @@ describe('sitesReducer', () => {
     });
 
     expect(actual.data).to.deep.equal([siteOne]);
+  });
+
+  it('adds site to state\'s data when SITE_USER_ADDED', () => {
+    const siteAdded = { id: 55 };
+    const actual = fixture({ isLoading: false, data: [] }, {
+      type: SITE_USER_ADDED,
+      site: siteAdded,
+    });
+
+    expect(actual.isLoading).to.be.false;
+    expect(actual.data).to.deep.equal([siteAdded]);
+  });
+
+  it('returns existing state when SITE_USER_ADDED if action has no site', () => {
+    const actual = fixture({ isLoading: false, data: [] }, {
+      type: SITE_USER_ADDED,
+    });
+
+    expect(actual.isLoading).to.be.false;
+    expect(actual.data).to.deep.equal([]);
   });
 });

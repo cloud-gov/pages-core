@@ -8,6 +8,8 @@ import {
   dispatchSiteAddedAction,
   dispatchSiteUpdatedAction,
   dispatchSiteDeletedAction,
+  dispatchUserAddedToSiteAction,
+  dispatchShowAddNewSiteFieldsAction,
 } from './dispatchActions';
 
 
@@ -29,6 +31,16 @@ export default {
       .then(dispatchSiteAddedAction)
       .then(updateRouterToSitesUri)
       .catch(alertError);
+  },
+
+  addUserToSite({ owner, repository }) {
+    return federalist.addUserToSite({ owner, repository })
+      .then(dispatchUserAddedToSiteAction)
+      .then(updateRouterToSitesUri)
+      // rather than display an alert error for this action
+      // we'll instead want to show the additional fields necessary
+      // for adding a completely new site to Federalist
+      .catch(dispatchShowAddNewSiteFieldsAction);
   },
 
   updateSite(site, data) {

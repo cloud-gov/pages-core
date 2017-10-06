@@ -1,32 +1,41 @@
-import { expect } from "chai";
-import { spy, stub } from "sinon";
-import proxyquire from "proxyquire";
+import { expect } from 'chai';
+import { spy, stub } from 'sinon';
+import proxyquire from 'proxyquire';
 
 proxyquire.noCallThru();
 
-describe("siteActions", () => {
+describe('siteActions', () => {
   let fixture;
 
   let fetchBranches;
 
-  let fetchSites, addSite, updateSite, deleteSite;
+  let fetchSites;
+  let addSite;
+  let addUserToSite;
+  let updateSite;
+  let deleteSite;
+  let httpErrorAlertAction;
+  let alertSuccess;
+  let alertError;
+  let updateRouterToSitesUri;
+  let dispatchSitesFetchStartedAction;
+  let dispatchSitesReceivedAction;
+  let dispatchSiteAddedAction;
+  let dispatchSiteUpdatedAction;
+  let dispatchSiteDeletedAction;
+  let dispatchSiteBranchesReceivedAction;
+  let dispatchShowAddNewSiteFieldsAction;
+  let dispatchUserAddedToSiteAction;
 
-  let httpErrorAlertAction, alertSuccess, alertError;
-
-  let updateRouterToSitesUri, dispatchSitesFetchStartedAction,
-      dispatchSitesReceivedAction, dispatchSiteAddedAction,
-      dispatchSiteUpdatedAction, dispatchSiteDeletedAction,
-      dispatchSiteBranchesReceivedAction;
-
-  const siteId = "kuaw8fsru8hwugfw";
+  const siteId = 'kuaw8fsru8hwugfw';
   const site = {
     id: siteId,
-    could: "be anything"
+    could: 'be anything',
   };
 
-  const errorMessage = "it failed.";
+  const errorMessage = 'it failed.';
   const error = {
-    message: errorMessage
+    message: errorMessage,
   };
   const rejectedWithErrorPromise = Promise.reject(error);
 
@@ -34,6 +43,7 @@ describe("siteActions", () => {
     httpErrorAlertAction = spy();
     fetchSites = stub();
     addSite = stub();
+    addUserToSite = stub();
     updateSite = stub();
     deleteSite = stub();
     fetchBranches = stub();
@@ -47,38 +57,52 @@ describe("siteActions", () => {
     dispatchSiteUpdatedAction = stub();
     dispatchSiteDeletedAction = stub();
     dispatchSiteBranchesReceivedAction = stub();
+    dispatchShowAddNewSiteFieldsAction = stub();
+    dispatchUserAddedToSiteAction = stub();
 
-    fixture = proxyquire("../../../frontend/actions/siteActions", {
-      "./dispatchActions": {
-        updateRouterToSitesUri: updateRouterToSitesUri,
-        dispatchSitesFetchStartedAction: dispatchSitesFetchStartedAction,
-        dispatchSitesReceivedAction: dispatchSitesReceivedAction,
-        dispatchSiteAddedAction: dispatchSiteAddedAction,
-        dispatchSiteUpdatedAction: dispatchSiteUpdatedAction,
-        dispatchSiteDeletedAction: dispatchSiteDeletedAction,
-        dispatchSiteBranchesReceivedAction: dispatchSiteBranchesReceivedAction,
+    fixture = proxyquire('../../../frontend/actions/siteActions', {
+      './dispatchActions': {
+        updateRouterToSitesUri,
+        dispatchSitesFetchStartedAction,
+        dispatchSitesReceivedAction,
+        dispatchSiteAddedAction,
+        dispatchSiteUpdatedAction,
+        dispatchSiteDeletedAction,
+        dispatchSiteBranchesReceivedAction,
+        dispatchShowAddNewSiteFieldsAction,
+        dispatchUserAddedToSiteAction,
       },
-      "./alertActions": {
+      './alertActions': {
         httpError: httpErrorAlertAction,
-        alertSuccess: alertSuccess,
-        alertError: alertError
+        alertSuccess,
+        alertError,
       },
-      "../util/federalistApi": {
-        fetchSites: fetchSites,
-        addSite: addSite,
-        updateSite: updateSite,
-        deleteSite: deleteSite
+      '../util/federalistApi': {
+        fetchSites,
+        addSite,
+        updateSite,
+        deleteSite,
+        addUserToSite,
       },
-      "../util/githubApi": {
-        fetchBranches: fetchBranches,
+      '../util/githubApi': {
+        fetchBranches,
       },
     }).default;
   });
 
-  describe("fetchSites", () => {
-    it("triggers the fetching of sites and dispatches a sites received action to the store when successful", () => {
+  const expectDispatchOfHttpErrorAlert = (errMsg) => {
+    expect(httpErrorAlertAction.calledWith(errMsg)).to.be.true;
+  };
+
+  const validateResultDispatchesHttpAlertError = (promise, errMsg) => promise.then(() => {
+    expectDispatchOfHttpErrorAlert(errMsg);
+  });
+
+
+  describe('fetchSites', () => {
+    it('triggers the fetching of sites and dispatches a sites received action to the store when successful', () => {
       const sites = {
-        hi: "mom"
+        hi: 'mom',
       };
       const sitesPromise = Promise.resolve(sites);
       fetchSites.withArgs().returns(sitesPromise);
@@ -86,12 +110,12 @@ describe("siteActions", () => {
       const actual = fixture.fetchSites();
 
       return actual.then(() => {
-        expect(dispatchSitesFetchStartedAction.called).to.be.true
+        expect(dispatchSitesFetchStartedAction.called).to.be.true;
         expect(dispatchSitesReceivedAction.calledWith(sites)).to.be.true;
       });
     });
 
-    it("triggers an error when fetching of sites fails", () => {
+    it('triggers an error when fetching of sites fails', () => {
       fetchSites.withArgs().returns(rejectedWithErrorPromise);
 
       const actual = fixture.fetchSites();
@@ -100,10 +124,10 @@ describe("siteActions", () => {
     });
   });
 
-  describe("addSite", () => {
-    it("triggers the adding of a site and dispatches site added and update router actions to the store when successful", () => {
+  describe('addSite', () => {
+    it('triggers the adding of a site and dispatches site added and update router actions to the store when successful', () => {
       const siteToAdd = {
-        hey: "you"
+        hey: 'you',
       };
       const sitePromise = Promise.resolve(site);
       addSite.withArgs(siteToAdd).returns(sitePromise);
@@ -116,9 +140,9 @@ describe("siteActions", () => {
       });
     });
 
-    it("triggers an error when adding a site fails", () => {
+    it('triggers an error when adding a site fails', () => {
       const siteToAdd = {
-        hey: "you"
+        hey: 'you',
       };
       addSite.withArgs(siteToAdd).returns(rejectedWithErrorPromise);
 
@@ -128,13 +152,13 @@ describe("siteActions", () => {
     });
   });
 
-  describe("updateSite", () => {
-    it("triggers the updating of a site and dispatches a site updated action to the store when successful", () => {
+  describe('updateSite', () => {
+    it('triggers the updating of a site and dispatches a site updated action to the store when successful', () => {
       const siteToUpdate = {
-        hi: "pal"
+        hi: 'pal',
       };
       const data = {
-        who: "knows"
+        who: 'knows',
       };
       const sitePromise = Promise.resolve(site);
       updateSite.withArgs(siteToUpdate, data).returns(sitePromise);
@@ -146,12 +170,12 @@ describe("siteActions", () => {
       });
     });
 
-    it("triggers an error when updating a site fails", () => {
+    it('triggers an error when updating a site fails', () => {
       const siteToUpdate = {
-        hi: "pal"
+        hi: 'pal',
       };
       const data = {
-        who: "knows"
+        who: 'knows',
       };
       updateSite.withArgs(siteToUpdate, data).returns(rejectedWithErrorPromise);
 
@@ -161,12 +185,12 @@ describe("siteActions", () => {
     });
   });
 
-  describe("deleteSite", () => {
-    it("triggers the deletion of a site and dispatches a site deleted update router actions to the store when successful", () => {
-      const site = {
-        completely: "ignored"
+  describe('deleteSite', () => {
+    it('triggers the deletion of a site and dispatches a site deleted update router actions to the store when successful', () => {
+      const siteToDelete = {
+        completely: 'ignored',
       };
-      const sitePromise = Promise.resolve(site);
+      const sitePromise = Promise.resolve(siteToDelete);
       deleteSite.withArgs(siteId).returns(sitePromise);
 
       const actual = fixture.deleteSite(siteId);
@@ -177,7 +201,7 @@ describe("siteActions", () => {
       });
     });
 
-    it("triggers an error when deleting a site fails", () => {
+    it('triggers an error when deleting a site fails', () => {
       deleteSite.withArgs(siteId).returns(rejectedWithErrorPromise);
 
       const actual = fixture.deleteSite(siteId);
@@ -186,35 +210,35 @@ describe("siteActions", () => {
     });
   });
 
-  const expectDispatchToNotBeCalled = (promise, dispatchFunction) => {
-    promise.catch(() => {
-      expect(dispatchFunction.called).to.be.false;
+  describe('addUserToSite', () => {
+    it('triggers adding adding the current user to the site represented by owner/repository', () => {
+      const repoToAdd = {
+        owner: 'owner',
+        repository: 'a-repo',
+      };
+      const sitePromise = Promise.resolve(site);
+      addUserToSite.withArgs(repoToAdd).returns(sitePromise);
+
+      const actual = fixture.addUserToSite(repoToAdd);
+
+      return actual.then(() => {
+        expect(updateRouterToSitesUri.calledOnce).to.be.true;
+        expect(dispatchUserAddedToSiteAction.calledWith(site)).to.be.true;
+      });
     });
-  };
 
-  const validateResultDispatchesHttpAlertError = (promise, errorMessage) => {
-    return promise.then(() => {
-      expectDispatchOfHttpErrorAlert(errorMessage);
+    it('triggers showing additional add site fields when adding the user fails', () => {
+      const repoToAdd = {
+        owner: 'owner',
+        repository: 'a-repo',
+      };
+      addUserToSite.withArgs(repoToAdd).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.addUserToSite(repoToAdd);
+
+      return actual.then(() => {
+        expect(dispatchShowAddNewSiteFieldsAction.calledOnce).to.be.true;
+      });
     });
-  };
-
-  const expectDispatchOfHttpErrorAlert = errorMessage => {
-    expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
-  };
-
-  const validateResultDispatchesAlertError = (promise, errorMessage) => {
-    return promise.then(() => {
-      expectDispatchOfErrorAlert(errorMessage);
-    });
-  };
-
-  const expectDispatchOfErrorAlert = errorMessage => {
-    expect(alertError.calledWith(errorMessage)).to.be.true;
-  };
-
-  const stubSuccessChain = methods => {
-    methods.forEach((method) => {
-      method.withArgs(site).returns(Promise.resolve());
-    });
-  };
+  });
 });

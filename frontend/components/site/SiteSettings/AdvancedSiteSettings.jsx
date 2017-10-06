@@ -56,7 +56,7 @@ export const AdvancedSiteSettings = ({
           <h3 className="well-heading">Site configuration</h3>
           <p className="well-text">
             Add additional configuration in yaml to be added to your
-            <code>_config.yml</code> file when we build your site&apos;s default branch.
+            <code>_config.yml</code> file when we build your site&apos;s primary branch.
           </p>
           <Field
             component="textarea"
@@ -125,6 +125,7 @@ export const AdvancedSiteSettings = ({
     </div>
 
     <div className="usa-grid">
+      <h3>Danger Zone</h3>
       <div className="usa-alert usa-alert-delete" role="alert">
         Delete this site from Federalist?
         <button

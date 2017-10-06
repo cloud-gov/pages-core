@@ -466,4 +466,100 @@ describe('SiteCreator', () => {
       });
     });
   });
+
+  describe('.addUserToSite(owner, repository, user)', () => {
+    context('when the site with the given owner/repository does not exist in Federalist', () => {
+      it('returns a 404 error when attempting to add a user', (done) => {
+        factory.user().then((user) => {
+          SiteCreator.addUserToSite('boop', 'beep', user)
+            .catch((err) => {
+              expect(err.status).to.equal(404);
+              expect(err.message).to.equal('Site for boop/beep does not yet exist in Federalist');
+              done();
+            });
+        });
+      });
+    });
+
+    context('when the site with the given owner/repository exists in Federalist', () => {
+      it('adds the user to the site\'s users', (done) => {
+        let site;
+        let user;
+        const sitePromise = factory.site({ users: [] });
+        const userPromise = factory.user();
+
+        Promise.props({ site: sitePromise, user: userPromise })
+          .then((models) => {
+            site = models.site;
+            user = models.user;
+
+            githubAPINocks.repo({
+              owner: site.owner,
+              repo: site.repository,
+            });
+            githubAPINocks.webhook();
+
+            SiteCreator.addUserToSite(site.owner, site.repository, user)
+              .then(() => Site.findById(site.id, { include: [User] }))
+              .then((s) => {
+                expect(s).to.not.be.empty;
+                expect(s.Users).to.have.length(1);
+                expect(s.Users[0].id).to.equal(user.id);
+                done();
+              })
+              .catch(done);
+          });
+      });
+
+      it('throws an error if the user already added the site', (done) => {
+        let site;
+        let user;
+        const userPromise = factory.user();
+        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+
+        Promise.props({ site: sitePromise, user: userPromise })
+          .then((models) => {
+            site = models.site;
+            user = models.user;
+
+            githubAPINocks.repo({
+              owner: site.owner,
+              repo: site.repository,
+            });
+            githubAPINocks.webhook();
+
+            SiteCreator.addUserToSite(site.owner, site.repository, user)
+              .catch((err) => {
+                expect(err.status).to.equal(400);
+                expect(err.message).to.equal("You've already added this site to Federalist");
+                done();
+              });
+          });
+      });
+
+      it('throws an error if the user does not have appropriate permissions on the site repo', (done) => {
+        const userPromise = factory.user();
+        const sitePromise = factory.site();
+
+        Promise.props({ user: userPromise, site: sitePromise })
+          .then(({ user, site }) => {
+            githubAPINocks.repo({
+              accessToken: user.accessToken,
+              owner: site.owner,
+              repo: site.repository,
+              response: [200, { permissions: {
+                admin: false,
+                push: false,
+              } }],
+            });
+            return SiteCreator.addUserToSite(site.owner, site.repository, user)
+            .catch((err) => {
+              expect(err.status).to.equal(400);
+              expect(err.message).to.equal('You do not have write access to this repository');
+              done();
+            });
+          });
+      });
+    });
+  });
 });

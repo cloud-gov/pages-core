@@ -5,7 +5,7 @@ const siteSerializer = require('../serializers/site');
 const { User, Site, Build } = require('../models');
 
 module.exports = {
-  find: (req, res) => {
+  findAllForUser: (req, res) => {
     User.findById(req.user.id, { include: [Site] })
       .then(user => siteSerializer.serialize(user.Sites))
       .then((sitesJSON) => {
@@ -15,7 +15,7 @@ module.exports = {
       });
   },
 
-  findOne: (req, res) => {
+  findById: (req, res) => {
     let site;
 
     Promise.resolve(Number(req.params.id)).then((id) => {
@@ -73,15 +73,37 @@ module.exports = {
       });
   },
 
+  addUser: (req, res) => {
+    const body = req.body;
+    if (!body.owner || !body.repository) {
+      throw 400;
+    }
+
+    authorizer.create(req.user, body)
+      .then(() => SiteCreator.addUserToSite(
+        body.owner.toLowerCase(),
+        body.repository.toLowerCase(),
+        req.user)
+      )
+      .then(site => siteSerializer.serialize(site))
+      .then((siteJSON) => {
+        res.json(siteJSON);
+      })
+      .catch((err) => {
+        res.error(err);
+      });
+  },
+
   create: (req, res) => {
-    authorizer.create(req.user, req.body)
+    const body = req.body;
+    authorizer.create(req.user, body)
       .then(() => SiteCreator.createSite({
         user: req.user,
-        siteParams: req.body,
+        siteParams: body,
       }))
       .then(site => siteSerializer.serialize(site))
       .then((siteJSON) => {
-        res.send(siteJSON);
+        res.json(siteJSON);
       })
       .catch((err) => {
         res.error(err);
@@ -134,7 +156,7 @@ module.exports = {
     })
     .then(() => siteSerializer.serialize(site))
     .then((siteJSON) => {
-      res.send(siteJSON);
+      res.json(siteJSON);
     })
     .catch((err) => {
       res.error(err);

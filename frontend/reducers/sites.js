@@ -5,6 +5,7 @@ import {
   siteUpdatedType as SITE_UPDATED,
   siteDeletedType as SITE_DELETED,
   siteBranchesReceivedType as SITE_BRANCHES_RECEIVED,
+  siteUserAddedType as SITE_USER_ADDED,
 } from '../actions/actionCreators/siteActions';
 
 const initialState = { isLoading: false };
@@ -49,6 +50,15 @@ export default function sites(state = initialState, action) {
         isLoading: false,
         data: state.data.filter(site => site.id !== action.siteId),
       };
+
+    case SITE_USER_ADDED:
+      if (action.site) {
+        return {
+          isLoading: false,
+          data: state.data.concat(action.site),
+        };
+      }
+      return state;
 
     default:
       return state;

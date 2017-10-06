@@ -91,6 +91,31 @@ function createAndBuildSite({ siteParams, user }) {
     .then(() => site);
 }
 
+
+function addUserToSite(owner, repository, user) {
+  let site;
+
+  return Site.findOne({
+    where: { owner, repository },
+    include: [User],
+  })
+    .then((model) => {
+      if (!model) {
+        throw {
+          message: `Site for ${owner}/${repository} does not yet exist in Federalist`,
+          status: 404,
+        };
+      }
+      site = model;
+      return site;
+    })
+    .then(() => checkExistingGithubRepository({ user, owner, repository, site }))
+    .then(() => checkForExistingSiteErrors({ site, user }))
+    .then(() => site.addUser(user.id))
+    .then(() => site);
+}
+
+
 function createSiteFromExistingRepo({ siteParams, user }) {
   let site;
   const { owner, repository } = siteParams;
@@ -107,6 +132,7 @@ function createSiteFromExistingRepo({ siteParams, user }) {
       if (site) {
         return checkForExistingSiteErrors({ site, user });
       }
+
       return createAndBuildSite({ siteParams, user });
     })
     .then((model) => {
@@ -154,4 +180,5 @@ function createSite({ user, siteParams }) {
 
 module.exports = {
   createSite,
+  addUserToSite,
 };
