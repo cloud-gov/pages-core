@@ -33,12 +33,46 @@ describe('<SiteGitHubBranches />', () => {
     expect(wrapper.find('table')).to.have.length(1);
     const rows = wrapper.find('tbody tr');
     expect(rows).to.have.length(2);
-    expect(rows.at(0).find('td').at(0).text()
-      .indexOf('branch-one')).to.be.above(-1);
-    expect(rows.at(1).find('td').at(0).text()
-      .indexOf('branch-two')).to.be.above(-1);
+    expect(rows.at(0).find('td').at(0).text())
+      .to.have.string('branch-one');
+    expect(rows.at(1).find('td').at(0).text())
+      .to.have.string('branch-two');
     expect(rows.find('GitHubRepoLink')).to.have.length(2);
     expect(rows.find('Connect(BranchViewLink)')).to.have.length(2);
+  });
+
+  it('should order default and demo branches first', () => {
+    const props = {
+      site: {
+        owner: 'test-owner',
+        repository: 'test-repo',
+        defaultBranch: 'default-branch',
+        demoBranch: 'demo-branch',
+      },
+      githubBranches: {
+        isLoading: false,
+        data: [
+          { name: 'branch-one' },
+          { name: 'default-branch' },
+          { name: 'branch-two' },
+          { name: 'demo-branch' },
+        ],
+      },
+    };
+
+    const wrapper = shallow(<SiteGitHubBranches {...props} />);
+    const rows = wrapper.find('tbody tr');
+
+    const firstTdText = row => row.find('td').at(0).text();
+
+    expect(firstTdText(rows.at(0))).to.have.string('default-branch');
+    expect(firstTdText(rows.at(0))).to.have.string('(live branch)');
+
+    expect(firstTdText(rows.at(1))).to.have.string('demo-branch');
+    expect(firstTdText(rows.at(1))).to.have.string('(demo branch)');
+
+    expect(firstTdText(rows.at(2))).to.have.string('branch-one');
+    expect(firstTdText(rows.at(3))).to.have.string('branch-two');
   });
 
   it('should render a loading state if branches are loading', () => {
@@ -68,9 +102,9 @@ describe('<SiteGitHubBranches />', () => {
     const wrapper = shallow(<SiteGitHubBranches {...props} />);
     expect(wrapper.find('table')).to.have.length(0);
     expect(wrapper.find('p')).to.have.length(1);
-    expect(wrapper.find('p').contains(
-      'No branches were found for this repository. There may have been an error communicating with the GitHub API.')
-    ).to.be.true;
+    expect(wrapper.find('p').text()).to.have.string(
+      'No branches were found for this repository. Often this is because the repository is private or has been deleted.'
+    );
   });
 
   it('should render a loading state if site is null', () => {

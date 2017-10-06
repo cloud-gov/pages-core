@@ -20,14 +20,45 @@ export class SiteGitHubBranches extends React.Component {
       return <LoadingIndicator />;
     }
 
-    if (!githubBranches.data || !githubBranches.data.length) {
+    if (githubBranches.error || !githubBranches.data || !githubBranches.data.length) {
       return (
         <p>
           No branches were found for this repository.
-          There may have been an error communicating with the GitHub API.
+          Often this is because the repository is private or has been deleted.
         </p>
       );
     }
+
+    // We want to put the site's defaultBranch and demoBranch
+    // first and second, respectively, in the table of branches
+    // if they exist
+    const regularBranches = [];
+    let defaultBranch;
+    let demoBranch;
+
+    githubBranches.data.forEach((branch) => {
+      if (site.defaultBranch && site.defaultBranch === branch.name) {
+        defaultBranch = branch;
+      } else if (site.demoBranch && site.demoBranch === branch.name) {
+        demoBranch = branch;
+      } else {
+        regularBranches.push(branch);
+      }
+    });
+
+
+    const branchRow = ({ name }, { isDefault = false, isDemo = false }) => (
+      <tr key={name}>
+        <td>
+          { name } { isDefault && '(live branch)' } { isDemo && '(demo branch)' }
+          {' '}
+          <GitHubRepoLink owner={site.owner} repository={site.repository} branch={name} />
+        </td>
+        <td>
+          <BranchViewLink branchName={name} site={site} />
+        </td>
+      </tr>
+    );
 
     return (
       <div>
@@ -40,20 +71,9 @@ export class SiteGitHubBranches extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {
-              githubBranches.data.map(({ name }) => (
-                <tr key={name}>
-                  <td>
-                    { name }
-                    {' '}
-                    <GitHubRepoLink owner={site.owner} repository={site.repository} branch={name} />
-                  </td>
-                  <td>
-                    <BranchViewLink branchName={name} site={site} />
-                  </td>
-                </tr>
-              ))
-            }
+            { defaultBranch && branchRow(defaultBranch, { isDefault: true }) }
+            { demoBranch && branchRow(demoBranch, { isDemo: true }) }
+            { regularBranches.map(branchRow) }
           </tbody>
         </table>
       </div>
