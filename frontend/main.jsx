@@ -7,9 +7,6 @@ import { Provider } from 'react-redux';
 import { Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
-import siteActions from './actions/siteActions';
-import userActions from './actions/userActions';
-
 import routes from './routes';
 import store from './store';
 
@@ -26,6 +23,3 @@ render((
     </Router>
   </Provider>
 ), mainEl);
-
-userActions.fetchUser();
-siteActions.fetchSites();
