@@ -1,48 +1,52 @@
-const userFactory = require("./user")
-const { Site } = require("../../../../api/models")
+const userFactory = require('./user');
+const { Site } = require('../../../../api/models');
 
-const site = (overrides) => {
-  let site, users
+let repositoryNameStep = 1;
 
-  return Promise.props(_attributes(overrides)).then(attributes => {
-    users = attributes.users.slice()
-    delete attributes.users
-
-    return Site.create(attributes)
-  }).then(model => {
-    site = model
-    const userPromises = users.map(user => {
-      return site.addUser(user)
-    })
-    return Promise.all(userPromises)
-  }).then(() => {
-    return Site.findById(site.id)
-  })
+function generateUniqueRepository() {
+  const res = {
+    owner: `repo-owner-${repositoryNameStep}`,
+    name: `repo-name-${repositoryNameStep}`,
+  };
+  repositoryNameStep += 1;
+  return res;
 }
 
-const _attributes = (overrides = {}) => {
-  let { users } = overrides
+function makeAttributes(overrides = {}) {
+  let { users } = overrides;
 
   if (users === undefined) {
-    users = Promise.all([userFactory()])
+    users = Promise.all([userFactory()]);
   }
 
-  const repository = _generateUniqueRepository()
+  const repository = generateUniqueRepository();
 
   return Object.assign({
     owner: repository.owner,
     repository: repository.name,
-    engine: "jekyll",
-    users: users
-  }, overrides)
+    engine: 'jekyll',
+    users,
+  }, overrides);
 }
 
-let _repositoryNameStep = 1
-_generateUniqueRepository = () => {
-  return {
-    owner: `repo-owner-${_repositoryNameStep}`,
-    name: `repo-name-${_repositoryNameStep++}`
-  }
+function site(overrides) {
+  let site; // eslint-disable-line no-shadow
+  let users;
+
+  return Promise.props(makeAttributes(overrides))
+    .then((attributes) => {
+      users = attributes.users.slice();
+      delete attributes.users; // eslint-disable-line no-param-reassign
+
+      return Site.create(attributes);
+    })
+    .then((siteModel) => {
+      site = siteModel;
+      const userPromises = users.map(user => site.addUser(user));
+      return Promise.all(userPromises);
+    })
+    .then(() => Site.findById(site.id));
 }
 
-module.exports = site
+
+module.exports = site;

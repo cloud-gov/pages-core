@@ -1,8 +1,8 @@
 import { dispatch } from '../store';
 import {
   pushRouterHistory as createPushHistoryRouterAction,
-  replaceRouterHistory as createReplaceHistoryRouterAction
-} from "./actionCreators/navigationActions";
+  replaceRouterHistory as createReplaceHistoryRouterAction,
+} from './actionCreators/navigationActions';
 
 const pushHistory = (path) => {
   dispatch(createPushHistoryRouterAction(path));
