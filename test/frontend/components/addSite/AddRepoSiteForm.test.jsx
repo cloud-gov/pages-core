@@ -27,11 +27,7 @@ describe('<AddRepoSiteForm />', () => {
 
     const wrapper = shallow(<AddRepoSiteForm {...props} />);
     expect(wrapper).to.be.defined;
-
-    expect(wrapper.find('Field[name="owner"]')).to.have.length(1);
-    expect(wrapper.find('Field[name="owner"]').props().required).to.be.true;
-    expect(wrapper.find('Field[name="repository"]')).to.have.length(1);
-    expect(wrapper.find('Field[name="repository"]').props().required).to.be.true;
+    expect(wrapper.find('GitHubRepoUrlField[name="repoUrl"]')).to.have.length(1);
   });
 
   it('renders additional fields when showAddNewSiteFields is true', () => {
@@ -51,7 +47,7 @@ describe('<AddRepoSiteForm />', () => {
     expect(wrapper.find('Field[name="defaultBranch"]').props().required).to.be.true;
   });
 
-  it('makes owner and repository readOnly showAddNewSiteFields is true', () => {
+  it('makes GitHubRepoUrlField readOnly when showAddNewSiteFields is true', () => {
     const props = {
       showAddNewSiteFields: false,
       handleSubmit: () => {},
@@ -59,13 +55,11 @@ describe('<AddRepoSiteForm />', () => {
     };
 
     let wrapper = shallow(<AddRepoSiteForm {...props} />);
-    expect(wrapper.find('Field[name="owner"]').props().readOnly).to.be.false;
-    expect(wrapper.find('Field[name="repository"]').props().readOnly).to.be.false;
+    expect(wrapper.find('GitHubRepoUrlField[name="repoUrl"]').props().readOnly).to.be.false;
 
     props.showAddNewSiteFields = true;
     wrapper = shallow(<AddRepoSiteForm {...props} />);
-    expect(wrapper.find('Field[name="owner"]').props().readOnly).to.be.true;
-    expect(wrapper.find('Field[name="repository"]').props().readOnly).to.be.true;
+    expect(wrapper.find('GitHubRepoUrlField[name="repoUrl"]').props().readOnly).to.be.true;
   });
 
   it('disables submit when pristine is true', () => {
