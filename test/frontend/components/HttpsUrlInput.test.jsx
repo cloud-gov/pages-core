@@ -3,7 +3,7 @@ import { shallow } from 'enzyme';
 import { expect } from 'chai';
 import { spy } from 'sinon';
 
-import HttpsUrlInput from '../../../frontend/components/httpsUrlInput';
+import HttpsUrlInput from '../../../frontend/components/HttpsUrlInput';
 
 describe('<HttpsUrlInput/>', () => {
   it('renders', () => {
