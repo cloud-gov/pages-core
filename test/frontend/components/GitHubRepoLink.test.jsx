@@ -14,5 +14,27 @@ describe('<GitHubRepoLink/>', () => {
     const anchor = wrapper.find('a.repo-link');
     expect(anchor.exists()).to.be.true;
     expect(anchor.prop('href')).to.equal('https://github.com/owner/a-repo');
+    expect(anchor.prop('title')).to.equal('View repository');
+  });
+
+  it('can link to a branch', () => {
+    const props = { owner: 'pumpkin-pie', repository: 'candle', branch: 'the-branch' };
+    const wrapper = shallow(<GitHubRepoLink {...props} />);
+    expect(wrapper.exists()).to.be.true;
+    expect(wrapper.find('GitHubMark')).to.have.length(1);
+
+    const anchor = wrapper.find('a.repo-link');
+    expect(anchor.exists()).to.be.true;
+    expect(anchor.prop('href')).to.equal('https://github.com/pumpkin-pie/candle/tree/the-branch');
+    expect(anchor.prop('title')).to.equal('View branch');
+  });
+
+  it('encodes the branch name', () => {
+    const props = { owner: 'spam', repository: 'potato', branch: '#-hash-#' };
+    const wrapper = shallow(<GitHubRepoLink {...props} />);
+
+    const anchor = wrapper.find('a.repo-link');
+    expect(anchor.exists()).to.be.true;
+    expect(anchor.prop('href')).to.equal('https://github.com/spam/potato/tree/%23-hash-%23');
   });
 });

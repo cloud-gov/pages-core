@@ -9,17 +9,26 @@ import SiteBuildLogs from './components/site/siteBuildLogs';
 import SiteUsers from './components/site/SiteUsers';
 import SitePublishedBranchesTable from './components/site/sitePublishedBranchesTable';
 import SitePublishedFilesTable from './components/site/sitePublishedFilesTable';
+import SiteGitHubBranches from './components/site/SiteGitHubBranches';
 import SiteSettings from './components/site/SiteSettings';
 import AddSite from './components/AddSite';
 import NotFound from './components/NotFound';
 
+import siteActions from './actions/siteActions';
+import userActions from './actions/userActions';
+
+const fetchInitialData = () => {
+  userActions.fetchUser();
+  siteActions.fetchSites();
+};
+
 export default (
-  <Route path="/" component={App}>
+  <Route path="/" component={App} onEnter={fetchInitialData}>
     <Route path="sites">
       <IndexRoute component={SiteList} />
       <Route path="new" component={AddSite} />
       <Route path=":id" component={SiteContainer}>
-        <IndexRedirect to="settings" />
+        <IndexRedirect to="builds" />
         <Route path="settings" component={SiteSettings} />
         <Route path="published">
           <IndexRoute component={SitePublishedBranchesTable} />
@@ -30,6 +39,7 @@ export default (
           <Route path=":buildId/logs" component={SiteBuildLogs} />
         </Route>
         <Route path="users" component={SiteUsers} />
+        <Route path="branches" component={SiteGitHubBranches} />
       </Route>
       <Redirect from="*" to="/not-found" />
     </Route>
