@@ -79,18 +79,16 @@ describe('<AddSite/>', () => {
   });
 
   it('calls addUserToSite action when add site form is submitted without engine and defaultBranch', () => {
-    const owner = 'boop';
-    const repository = 'beeper-beta-v2';
-    wrapper.find('ReduxForm').props().onSubmit({ owner, repository });
-    expect(addUserToSite.calledWith({ owner, repository })).to.be.true;
+    const repoUrl = 'https://github.com/owner/repo';
+    wrapper.find('ReduxForm').props().onSubmit({ repoUrl });
+    expect(addUserToSite.calledWith({ owner: 'owner', repository: 'repo' })).to.be.true;
   });
 
   it('calls addSite action when add site form is submitted with all fields', () => {
-    const owner = 'boop';
-    const repository = 'beeper-beta-v2';
+    const repoUrl = 'https://github.com/boop/beeper-v2';
     const engine = 'vrooooom';
     const defaultBranch = 'tree';
-    wrapper.find('ReduxForm').props().onSubmit({ owner, repository, engine, defaultBranch });
-    expect(addSite.calledWith({ owner, repository, engine, defaultBranch })).to.be.true;
+    wrapper.find('ReduxForm').props().onSubmit({ repoUrl, engine, defaultBranch });
+    expect(addSite.calledWith({ owner: 'boop', repository: 'beeper-v2', engine, defaultBranch })).to.be.true;
   });
 });

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 import { Link } from 'react-router';
 
+import GitHubRepoUrlField from '../GitHubRepoUrlField';
 import SelectSiteEngine from '../SelectSiteEngine';
 
 const propTypes = {
@@ -22,27 +23,11 @@ export const AddRepoSiteForm = ({ pristine, handleSubmit, showAddNewSiteFields }
     <div className="usa-grid">
       <div className="usa-width-one-half">
         <div className="form-group">
-          <label htmlFor="owner">Repository Owner&#39;s Username or Org name</label>
-          <Field
-            component="input"
-            type="text"
-            id="owner"
+          <GitHubRepoUrlField
+            name="repoUrl"
+            id="repoUrl"
             className="form-control"
-            name="owner"
             readOnly={showAddNewSiteFields}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="repository">Repository&#39;s Name</label>
-          <Field
-            component="input"
-            type="text"
-            className="form-control"
-            name="repository"
-            id="repository"
-            readOnly={showAddNewSiteFields}
-            required
           />
         </div>
         {
