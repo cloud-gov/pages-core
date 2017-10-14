@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
-import SelectSiteEngine from '../../selectSiteEngine';
+import SelectSiteEngine from '../../SelectSiteEngine';
 
 const propTypes = {
   onDelete: PropTypes.func.isRequired,
@@ -36,8 +36,10 @@ export const AdvancedSiteSettings = ({
   <form className="settings-form settings-form-advanced" onSubmit={handleSubmit}>
     <div className="usa-grid">
       <div className="usa-width-one-whole">
+        <label htmlFor="engine">Static site engine</label>
         <Field
           name="engine"
+          id="engine"
           component={p =>
             <SelectSiteEngine
               value={p.input.value}

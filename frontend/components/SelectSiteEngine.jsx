@@ -22,19 +22,15 @@ function makeOptions(opts) {
   ));
 }
 
-const SelectSiteEngine = ({ value, onChange }) => (
-  <div>
-    <label htmlFor="engine">Static site engine</label>
-    <select
-      name="engine"
-      id="engine"
-      className="form-control"
-      value={value}
-      onChange={onChange}
-    >
-      {makeOptions(availableEngines)}
-    </select>
-  </div>
+const SelectSiteEngine = ({ value, onChange, ...props }) => (
+  <select
+    {...props}
+    className="form-control"
+    value={value}
+    onChange={onChange}
+  >
+    {makeOptions(availableEngines)}
+  </select>
 );
 
 

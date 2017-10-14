@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 import { Link } from 'react-router';
 
-import SelectSiteEngine from '../selectSiteEngine';
+import SelectSiteEngine from '../SelectSiteEngine';
 
 const propTypes = {
   showAddNewSiteFields: PropTypes.bool,
@@ -59,8 +59,10 @@ export const AddRepoSiteForm = ({ pristine, handleSubmit, showAddNewSiteFields }
               </div>
             </div>
             <div className="form-group">
+              <label htmlFor="engine">Static site engine</label>
               <Field
                 name="engine"
+                id="engine"
                 component={p =>
                   <SelectSiteEngine
                     value={p.input.value}

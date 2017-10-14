@@ -227,18 +227,36 @@ describe('siteActions', () => {
       });
     });
 
-    it('triggers showing additional add site fields when adding the user fails', () => {
+    it('triggers showing additional add site fields when adding the user fails with 404', () => {
       const repoToAdd = {
         owner: 'owner',
         repository: 'a-repo',
       };
-      addUserToSite.withArgs(repoToAdd).returns(rejectedWithErrorPromise);
+
+      const rejectWith404Error = Promise.reject({
+        response: { status: 404 },
+        message: 'Not found',
+      });
+
+      addUserToSite.withArgs(repoToAdd).returns(rejectWith404Error);
 
       const actual = fixture.addUserToSite(repoToAdd);
 
       return actual.then(() => {
         expect(dispatchShowAddNewSiteFieldsAction.calledOnce).to.be.true;
       });
+    });
+
+    it('triggers an http alert error when adding the user fails with other than 404', () => {
+      const repoToAdd = {
+        owner: 'owner',
+        repository: 'a-repo',
+      };
+
+      addUserToSite.withArgs(repoToAdd).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.addUserToSite(repoToAdd);
+      return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });
 });
