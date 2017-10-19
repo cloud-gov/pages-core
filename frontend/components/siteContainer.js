@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import SideNav from './site/SideNav';
 import PagesHeader from './site/pagesHeader';
 import AlertBanner from './alertBanner';
-import LoadingIndicator from './loadingIndicator';
+import LoadingIndicator from './LoadingIndicator';
 
 const propTypes = {
   params: PropTypes.shape({

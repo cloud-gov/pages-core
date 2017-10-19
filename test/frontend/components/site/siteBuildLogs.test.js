@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { shallow } from 'enzyme';
 
 import SiteBuildLogs from '../../../../frontend/components/site/siteBuildLogs';
-import LoadingIndicator from '../../../../frontend/components/loadingIndicator';
+import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
 
 describe('<SiteBuildLogs/>', () => {
