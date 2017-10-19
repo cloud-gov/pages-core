@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import publishedFileActions from '../../actions/publishedFileActions';
-import LoadingIndicator from '../loadingIndicator';
+import LoadingIndicator from '../LoadingIndicator';
 
 class SitePublishedFilesTable extends React.Component {
   componentDidMount() {

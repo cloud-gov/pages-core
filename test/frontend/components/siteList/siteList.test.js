@@ -2,7 +2,7 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import proxyquire from 'proxyquire';
-import LoadingIndicator from '../../../../frontend/components/loadingIndicator';
+import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
 proxyquire.noCallThru();
 
