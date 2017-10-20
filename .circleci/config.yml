@@ -53,9 +53,14 @@ jobs:
           name: Run tests
           command: yarn test
       - run:
-          name: CodeClimate after-build
-          # Attempt to submit a report, but don't fail the build if this fails (`|| true`)
-          command: ./cc-test-reporter after-build --exit-code $? ./coverage/lcov.info || true
+          name: CodeClimate combine and upload coverage
+          command: |
+            # Combine the test coverage reports in coverage/server/ and coverage/client/
+            ./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.client.json coverage/client/lcov.info
+            ./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.server.json coverage/server/lcov.info
+            ./cc-test-reporter sum-coverage coverage/codeclimate.*.json
+            # Attempt to submit a report, but don't fail the build if this fails (`|| true`)
+            ./cc-test-reporter upload-coverage || true
 
       - deploy:
           name: Deploy to staging
