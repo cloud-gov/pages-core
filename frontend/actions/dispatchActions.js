@@ -5,31 +5,50 @@ import {
   siteAdded as createSiteAddedAction,
   siteUpdated as createSiteUpdatedAction,
   siteDeleted as createSiteDeletedAction,
+  siteUserAdded as createSiteUserAddedAction,
 } from './actionCreators/siteActions';
+
+import {
+  showAddNewSiteFields as createShowAddNewSiteFieldsAction,
+  hideAddNewSiteFields as createHideAddNewSiteFieldsAction,
+} from './actionCreators/addNewSiteFieldsActions';
+
 import { pushHistory } from './routeActions';
 
 const updateRouterToSitesUri = () => {
-  pushHistory(`/sites`);
+  pushHistory('/sites');
 };
 
 const dispatchSitesFetchStartedAction = () => {
-  dispatch(createSitesFetchStartedAction())
-}
+  dispatch(createSitesFetchStartedAction());
+};
 
-const dispatchSitesReceivedAction = sites => {
+const dispatchSitesReceivedAction = (sites) => {
   dispatch(createSitesReceivedAction(sites));
 };
 
-const dispatchSiteAddedAction = site => {
+const dispatchSiteAddedAction = (site) => {
   dispatch(createSiteAddedAction(site));
 };
 
-const dispatchSiteUpdatedAction = site => {
+const dispatchSiteUpdatedAction = (site) => {
   dispatch(createSiteUpdatedAction(site));
 };
 
-const dispatchSiteDeletedAction = siteId => {
+const dispatchSiteDeletedAction = (siteId) => {
   dispatch(createSiteDeletedAction(siteId));
+};
+
+const dispatchUserAddedToSiteAction = (site) => {
+  dispatch(createSiteUserAddedAction(site));
+};
+
+const dispatchShowAddNewSiteFieldsAction = () => {
+  dispatch(createShowAddNewSiteFieldsAction());
+};
+
+const dispatchHideAddNewSiteFieldsAction = () => {
+  dispatch(createHideAddNewSiteFieldsAction());
 };
 
 export {
@@ -39,4 +58,7 @@ export {
   dispatchSiteAddedAction,
   dispatchSiteUpdatedAction,
   dispatchSiteDeletedAction,
+  dispatchUserAddedToSiteAction,
+  dispatchShowAddNewSiteFieldsAction,
+  dispatchHideAddNewSiteFieldsAction,
 };

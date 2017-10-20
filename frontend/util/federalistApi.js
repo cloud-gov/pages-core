@@ -6,7 +6,7 @@ import alertActions from '../actions/alertActions';
 export const API = '/v0';
 
 export default {
-  fetch(endpoint, params = {}) {
+  fetch(endpoint, params = {}, { handleHttpError = true } = {}) {
     const csrfToken = typeof window !== 'undefined' ?
       window.CSRF_TOKEN : global.CSRF_TOKEN;
 
@@ -21,7 +21,11 @@ export default {
 
     return fetch(url, finalParams)
       .catch((error) => {
-        alertActions.httpError(error.message);
+        if (handleHttpError) {
+          alertActions.httpError(error.message);
+        } else {
+          throw error;
+        }
       });
   },
 
@@ -47,6 +51,20 @@ export default {
 
   fetchUser() {
     return this.fetch('me');
+  },
+
+  addUserToSite({ owner, repository }) {
+    return this.fetch('site/user', {
+      method: 'POST',
+      data: {
+        owner,
+        repository,
+      },
+    }, {
+      // we want to handle the error elsewhere in order
+      // to show the additional AddSite fields
+      handleHttpError: false,
+    });
   },
 
   addSite(site) {

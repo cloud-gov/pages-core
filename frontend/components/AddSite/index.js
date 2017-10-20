@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router';
+import autoBind from 'react-autobind';
+import { connect } from 'react-redux';
 
 import TemplateSiteList from './TemplateSiteList';
+import AddRepoSiteForm from './AddRepoSiteForm';
 import AlertBanner from '../alertBanner';
-import SelectSiteEngine from '../selectSiteEngine';
 
 import siteActions from '../../actions/siteActions';
+import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
 
 const propTypes = {
   storeState: PropTypes.shape({
@@ -16,42 +18,41 @@ const propTypes = {
     }),
     error: PropTypes.string,
   }),
+  showAddNewSiteFields: PropTypes.bool,
 };
 
 const defaultProps = {
   storeState: null,
+  showAddNewSiteFields: false,
 };
 
-class AddSite extends React.Component {
+export class AddSite extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      owner: this.defaultOwner(),
-      repository: '',
-      engine: 'jekyll',
-      defaultBranch: 'master',
-    };
-
-    this.onChange = this.onChange.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
+    autoBind(
+      this,
+      'onAddRepoSiteSubmit',
+      'onSubmitTemplate'
+    );
   }
 
-  onSubmit(event) {
-    event.preventDefault();
-    siteActions.addSite(this.state);
+  componentWillUnmount() {
+    // dispatch the action to hide the additional new site fields
+    // when this component is unmounted
+    addNewSiteFieldsActions.hideAddNewSiteFields();
+  }
+
+  onAddRepoSiteSubmit({ owner, repository, engine, defaultBranch }) {
+    if (!engine && !defaultBranch) {
+      siteActions.addUserToSite({ owner, repository });
+    } else {
+      siteActions.addSite({ owner, repository, engine, defaultBranch });
+    }
   }
 
   onSubmitTemplate(site) {
     siteActions.addSite(site);
-  }
-
-  onChange(event) {
-    const { name, value } = event.target;
-    const nextState = {};
-
-    nextState[name] = value;
-    this.setState(nextState);
   }
 
   defaultOwner() {
@@ -76,7 +77,7 @@ class AddSite extends React.Component {
             <p>
               There are a few different ways you can add sites to Federalist.
               You can start with a brand new site by selecting one of our template sites below.
-              Or you can specify the Github repository where your site&#39;s code lives.
+              Or you can specify the GitHub repository where your site&#39;s code lives.
             </p>
           </div>
         </div>
@@ -84,67 +85,15 @@ class AddSite extends React.Component {
           handleSubmitTemplate={this.onSubmitTemplate}
           defaultOwner={this.defaultOwner()}
         />
+
         <div className="usa-grid">
-          <div className="col-md-12">
-            <h2>Or add your own Github repository</h2>
-          </div>
+          <h2>Or add your own GitHub repository</h2>
         </div>
-        <form onSubmit={this.onSubmit}>
-          <div className="usa-grid">
-            <div className="col-md-12">
-              <div className="form-group">
-                <label htmlFor="owner">Repository Owner&#39;s Username or Org name</label>
-                <input
-                  type="text"
-                  id="owner"
-                  className="form-control"
-                  name="owner"
-                  value={this.state.owner}
-                  onChange={this.onChange}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="repository">Repository&#39;s Name</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="repository"
-                  id="repository"
-                  value={this.state.repository}
-                  onChange={this.onChange}
-                />
-              </div>
-              <div className="form-group">
-                <SelectSiteEngine value={this.state.engine} onChange={this.onChange} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="defaultBranch">Default branch</label>
-                <input
-                  type="text"
-                  id="defaultBranch"
-                  className="form-control"
-                  name="defaultBranch"
-                  value={this.state.defaultBranch}
-                  onChange={this.onChange}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="usa-grid">
-            <div className="usa-width-one-whole">
-              <Link
-                role="button"
-                to="/sites"
-                className="usa-button usa-button-secondary"
-              >
-                Cancel
-              </Link>
-              <button type="submit" className="usa-button usa-button-primary" style={{ display: 'inline-block' }}>
-                Submit repository-based site
-              </button>
-            </div>
-          </div>
-        </form>
+
+        <AddRepoSiteForm
+          showAddNewSiteFields={this.props.showAddNewSiteFields}
+          onSubmit={this.onAddRepoSiteSubmit}
+        />
       </div>
     );
   }
@@ -153,4 +102,6 @@ class AddSite extends React.Component {
 AddSite.propTypes = propTypes;
 AddSite.defaultProps = defaultProps;
 
-export default AddSite;
+const mapStateToProps = ({ showAddNewSiteFields }) => ({ showAddNewSiteFields });
+
+export default connect(mapStateToProps)(AddSite);
