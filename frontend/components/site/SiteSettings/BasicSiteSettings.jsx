@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
-import HttpsUrlInput from '../../httpsUrlInput';
+import HttpsUrlInput from '../../HttpsUrlInput';
 
 const propTypes = {
   // initialValues is what the initial form values are based on

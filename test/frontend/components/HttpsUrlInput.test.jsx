@@ -3,7 +3,7 @@ import { shallow } from 'enzyme';
 import { expect } from 'chai';
 import { spy } from 'sinon';
 
-import HttpsUrlInput from '../../../frontend/components/httpsUrlInput';
+import HttpsUrlInput from '../../../frontend/components/HttpsUrlInput';
 
 describe('<HttpsUrlInput/>', () => {
   it('renders', () => {
@@ -31,7 +31,8 @@ describe('<HttpsUrlInput/>', () => {
     const onInvalidFunc = input.prop('onInvalid');
     const setCustomValiditySpy = spy();
     onInvalidFunc({ target: { setCustomValidity: setCustomValiditySpy } });
-    expect(setCustomValiditySpy.calledWith('Please enter a URL that starts with "https://"')).to.equal(true);
+    expect(setCustomValiditySpy.calledWith('Please enter a URL that starts with "https://" and has no trailing path'))
+      .to.equal(true);
 
     const onInputFunc = input.prop('onInput');
     onInputFunc({ target: { setCustomValidity: setCustomValiditySpy } });

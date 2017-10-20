@@ -43,7 +43,10 @@ export class AddSite extends React.Component {
     addNewSiteFieldsActions.hideAddNewSiteFields();
   }
 
-  onAddRepoSiteSubmit({ owner, repository, engine, defaultBranch }) {
+  onAddRepoSiteSubmit({ repoUrl, engine, defaultBranch }) {
+    const owner = repoUrl.split('/')[3];
+    const repository = repoUrl.split('/')[4];
+
     if (!engine && !defaultBranch) {
       siteActions.addUserToSite({ owner, repository });
     } else {

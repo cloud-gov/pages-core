@@ -4,7 +4,7 @@ import Notifications from 'react-notification-system-redux';
 import { connect } from 'react-redux';
 
 import alertActions from '../actions/alertActions';
-import LoadingIndicator from './loadingIndicator';
+import LoadingIndicator from './LoadingIndicator';
 
 export class App extends React.Component {
   componentWillReceiveProps(nextProps) {
