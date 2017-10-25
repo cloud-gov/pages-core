@@ -55,7 +55,7 @@ class SitePublishedBranchesTable extends React.Component {
 
   renderBranchFilesLink(branch) {
     const href = `/sites/${branch.site.id}/published/${branch.name}`;
-    return <Link to={href}>View Files</Link>;
+    return <Link to={href}>View files</Link>;
   }
 
   renderLoadingState() {
