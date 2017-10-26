@@ -26,4 +26,13 @@ module.exports = {
     description: 'Single page to host information about a specific topic or report',
     thumb: '/images/landing.thumb.png',
   },
+  report: {
+    owner: '18f',
+    repo: 'federalist-report-template',
+    branch: 'master',
+    example: 'https://federalist-proxy.app.cloud.gov/site/18f/federalist-report-template',
+    title: 'Basic Report Template',
+    description: 'A basic template to host a set of pages about a recent report or order',
+    thumb: '/images/report.thumb.png',
+  },
 };
