@@ -21,17 +21,23 @@ class SitePublishedBranchesTable extends React.Component {
 
   renderPublishedBranchesTable() {
     return (
-      <table className="usa-table-borderless published-branch-table">
-        <thead>
-          <tr>
-            <th>Branch</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          { this.publishedBranches().map(this.renderPublishedBranchRow.bind(this)) }
-        </tbody>
-      </table>
+      <div>
+        <p>
+          Use this page to see every version of your site&apos;s code published on
+          Federalist and to audit the specific files that Federalist has published.
+        </p>
+        <table className="usa-table-borderless published-branch-table">
+          <thead>
+            <tr>
+              <th>Branch</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            { this.publishedBranches().map(this.renderPublishedBranchRow.bind(this)) }
+          </tbody>
+        </table>
+      </div>
     );
   }
 
