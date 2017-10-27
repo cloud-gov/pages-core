@@ -62,9 +62,8 @@ export class SiteGitHubBranches extends React.Component {
 
     return (
       <div>
-        <h4 className="label">Branches retrieved from GitHub</h4>
         <p>
-          This page links to every branch of your site&apos;s code currently live on GitHub.
+          This page links to every live branch of your site&apos;s code on GitHub and to site built using that code.
         </p>
         <table className="usa-table-borderless">
           <thead>
