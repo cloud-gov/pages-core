@@ -63,7 +63,8 @@ export class SiteGitHubBranches extends React.Component {
     return (
       <div>
         <p>
-          This page links to every live branch of your site&apos;s code on GitHub and to site built using that code.
+          This page links to every live branch of your site
+          code on GitHub and to each deployed build of that code.
         </p>
         <table className="usa-table-borderless">
           <thead>
