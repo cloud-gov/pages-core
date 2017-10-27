@@ -1,6 +1,5 @@
 const crypto = require('crypto');
 const expect = require('chai').expect;
-const nock = require('nock');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const SiteCreator = require('../../../../api/services/SiteCreator');
@@ -8,7 +7,7 @@ const { Build, Site, User } = require('../../../../api/models');
 
 describe('SiteCreator', () => {
   describe('.createSite({ siteParams, user })', () => {
-    context('when the site does not exist in Federalist', () => {
+    context('when the site is created from a GitHub repo', () => {
       it('should create a new site record for the given repository and add the user', (done) => {
         let user;
         const siteParams = {
@@ -114,7 +113,21 @@ describe('SiteCreator', () => {
         });
       });
 
-      it('should reject if the user does not have write access to the site', (done) => {
+      it('should reject if the site already exists in Federalist', (done) => {
+        Promise.props({ site: factory.site(), user: factory.user() }).then(({ site, user }) => {
+          const siteParams = {
+            owner: site.owner,
+            repository: site.repository,
+          };
+          return SiteCreator.createSite({ user, siteParams });
+        }).catch((err) => {
+          expect(err.status).to.equal(400);
+          expect(err.message).to.equal('This site has already been added to Federalist');
+          done();
+        }).catch(done);
+      });
+
+      it('should reject if the GitHub repository does not exist', (done) => {
         const siteParams = {
           owner: crypto.randomBytes(3).toString('hex'),
           repository: crypto.randomBytes(3).toString('hex'),
@@ -123,221 +136,16 @@ describe('SiteCreator', () => {
         factory.user().then((user) => {
           githubAPINocks.repo({
             accessToken: user.accessToken,
-            owner: siteParams.owner,
+            org: siteParams.owner,
             repo: siteParams.repository,
-            response: [200, { permissions: {
-              admin: false,
-              push: false,
-            } }],
+            response: [404, { message: 'Not Found' }],
           });
           return SiteCreator.createSite({ user, siteParams });
         }).catch((err) => {
-          expect(err.status).to.equal(400);
-          expect(err.message).to.equal('You do not have admin access to this repository');
+          expect(err.status).to.eq(400);
+          expect(err.message).to.eq(`The repository ${siteParams.owner}/${siteParams.repository} does not exist.`);
           done();
-        });
-      });
-    });
-
-    context('when the site exists in Federalist', () => {
-      it('should not create a new site record', (done) => {
-        let site;
-        const sitePromise = factory.site();
-        const userPromise = factory.user();
-
-        Promise.props({ site: sitePromise, user: userPromise }).then((models) => {
-          site = models.site;
-          githubAPINocks.repo();
-          return SiteCreator.createSite({ user: models.user,
-            siteParams: {
-              owner: site.owner,
-              repository: site.repository,
-            } });
-        }).then((createdSite) => {
-          expect(createdSite.id).to.equal(site.id);
-
-          return Site.findAll({
-            where: {
-              owner: site.owner,
-              repository: site.repository,
-            },
-          });
-        }).then((sites) => {
-          expect(sites).to.have.length(1);
-          done();
-        })
-        .catch(done);
-      });
-
-      it('should not trigger a build for the existing site', (done) => {
-        let site;
-        let user;
-        const sitePromise = factory.site();
-        const userPromise = factory.user();
-
-        Promise.props({ site: sitePromise, user: userPromise })
-        .then((models) => {
-          site = models.site;
-          user = models.user;
-          githubAPINocks.repo();
-          return SiteCreator.createSite({ user,
-            siteParams: {
-              owner: site.owner,
-              repository: site.repository,
-            } });
-        })
-        .then(() => Site.findById(site.id, { include: [Build] }))
-        .then((s) => {
-          expect(s.Builds).to.have.length(0);
-          done();
-        })
-        .catch(done);
-      });
-
-      it('should add the user to the existing site', (done) => {
-        let site;
-        let user;
-        const sitePromise = factory.site();
-        const userPromise = factory.user();
-
-        Promise.props({ site: sitePromise, user: userPromise }).then((models) => {
-          site = models.site;
-          user = models.user;
-          githubAPINocks.repo();
-          return SiteCreator.createSite({ user,
-            siteParams: {
-              owner: site.owner,
-              repository: site.repository,
-            } });
-        })
-        .then(() => Site.findById(site.id, { include: [User] }))
-        .then((s) => {
-          const addedUser = s.Users.find(candidate => candidate.id === user.id);
-          expect(addedUser).to.not.be.undefined;
-          done();
-        })
-        .catch(done);
-      });
-
-      it('should not attempt to add a webhook for the site', (done) => {
-        let webhookNock;
-        const siteProm = factory.site();
-        const userProm = factory.user();
-
-        Promise.props({ user: userProm, site: siteProm })
-          .then(({ user, site }) => {
-            githubAPINocks.repo();
-            webhookNock = githubAPINocks.webhook();
-            return SiteCreator.createSite({ user,
-              siteParams: {
-                owner: site.owner,
-                repository: site.repository,
-              } });
-          })
-          .then(() => {
-            expect(webhookNock.isDone()).to.equal(false);
-            nock.cleanAll();
-            done();
-          })
-          .catch(done);
-      });
-
-      it('should not reject if the user does not have admin access to the site', (done) => {
-        const userProm = factory.user();
-        const siteProm = factory.site();
-
-        Promise.props({ user: userProm, site: siteProm })
-          .then(({ user, site }) => {
-            githubAPINocks.repo({
-              accessToken: user.accessToken,
-              owner: site.owner,
-              repo: site.repository,
-              response: [200, { permissions: {
-                admin: false,
-                push: true,
-              } }],
-            });
-            return SiteCreator.createSite({ user,
-              siteParams: {
-                owner: site.owner,
-                repository: site.repository,
-              } });
-          })
-          .then(() => {
-            done();
-          })
-          .catch(done);
-      });
-
-      it('should reject if the user does not have write access to the site', (done) => {
-        const userProm = factory.user();
-        const siteProm = factory.site();
-
-        Promise.props({ user: userProm, site: siteProm })
-          .then(({ user, site }) => {
-            githubAPINocks.repo({
-              accessToken: user.accessToken,
-              owner: site.owner,
-              repo: site.repository,
-              response: [200, { permissions: {
-                admin: false,
-                push: false,
-              } }],
-            });
-            return SiteCreator.createSite({ user,
-              siteParams: {
-                owner: site.owner,
-                repository: site.repository,
-              } });
-          })
-          .catch((err) => {
-            expect(err.status).to.equal(400);
-            expect(err.message).to.equal('You do not have write access to this repository');
-            done();
-          })
-          .catch(done);
-      });
-
-      it('should reject if the user has already added the site', (done) => {
-        const userProm = factory.user();
-        const siteProm = factory.site({ users: Promise.all([userProm]) });
-
-        Promise.props({ user: userProm, site: siteProm })
-          .then(({ user, site }) => {
-            githubAPINocks.repo();
-            return SiteCreator.createSite({ user,
-              siteParams: {
-                owner: site.owner,
-                repository: site.repository,
-              } });
-          })
-          .catch((err) => {
-            expect(err.status).to.equal(400);
-            expect(err.message).to.equal("You've already added this site to Federalist");
-            done();
-          })
-          .catch(done);
-      });
-
-      it('should reject if the user has already added the site and the site name is a different case', (done) => {
-        const userProm = factory.user();
-        const siteProm = factory.site({ users: Promise.all([userProm]) });
-
-        Promise.props({ user: userProm, site: siteProm })
-          .then(({ user, site }) => {
-            githubAPINocks.repo();
-            return SiteCreator.createSite({ user,
-              siteParams: {
-                owner: site.owner.toUpperCase(),
-                repository: site.repository.toUpperCase(),
-              } });
-          })
-          .catch((err) => {
-            expect(err.status).to.equal(400);
-            expect(err.message).to.equal("You've already added this site to Federalist");
-            done();
-          })
-          .catch(done);
+        }).catch(done);
       });
     });
 
@@ -464,101 +272,21 @@ describe('SiteCreator', () => {
           done();
         }).catch(done);
       });
-    });
-  });
 
-  describe('.addUserToSite(owner, repository, user)', () => {
-    context('when the site with the given owner/repository does not exist in Federalist', () => {
-      it('returns a 404 error when attempting to add a user', (done) => {
-        factory.user().then((user) => {
-          SiteCreator.addUserToSite('boop', 'beep', user)
-            .catch((err) => {
-              expect(err.status).to.equal(404);
-              expect(err.message).to.equal('Site for boop/beep does not yet exist in Federalist');
-              done();
-            });
-        });
-      });
-    });
+      it('should reject if the template does not exist', (done) => {
+        const siteParams = {
+          owner: crypto.randomBytes(3).toString('hex'),
+          repository: crypto.randomBytes(3).toString('hex'),
+          template: 'not-a-template',
+        };
 
-    context('when the site with the given owner/repository exists in Federalist', () => {
-      it('adds the user to the site\'s users', (done) => {
-        let site;
-        let user;
-        const sitePromise = factory.site({ users: [] });
-        const userPromise = factory.user();
-
-        Promise.props({ site: sitePromise, user: userPromise })
-          .then((models) => {
-            site = models.site;
-            user = models.user;
-
-            githubAPINocks.repo({
-              owner: site.owner,
-              repo: site.repository,
-            });
-            githubAPINocks.webhook();
-
-            SiteCreator.addUserToSite(site.owner, site.repository, user)
-              .then(() => Site.findById(site.id, { include: [User] }))
-              .then((s) => {
-                expect(s).to.not.be.empty;
-                expect(s.Users).to.have.length(1);
-                expect(s.Users[0].id).to.equal(user.id);
-                done();
-              })
-              .catch(done);
-          });
-      });
-
-      it('throws an error if the user already added the site', (done) => {
-        let site;
-        let user;
-        const userPromise = factory.user();
-        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-
-        Promise.props({ site: sitePromise, user: userPromise })
-          .then((models) => {
-            site = models.site;
-            user = models.user;
-
-            githubAPINocks.repo({
-              owner: site.owner,
-              repo: site.repository,
-            });
-            githubAPINocks.webhook();
-
-            SiteCreator.addUserToSite(site.owner, site.repository, user)
-              .catch((err) => {
-                expect(err.status).to.equal(400);
-                expect(err.message).to.equal("You've already added this site to Federalist");
-                done();
-              });
-          });
-      });
-
-      it('throws an error if the user does not have appropriate permissions on the site repo', (done) => {
-        const userPromise = factory.user();
-        const sitePromise = factory.site();
-
-        Promise.props({ user: userPromise, site: sitePromise })
-          .then(({ user, site }) => {
-            githubAPINocks.repo({
-              accessToken: user.accessToken,
-              owner: site.owner,
-              repo: site.repository,
-              response: [200, { permissions: {
-                admin: false,
-                push: false,
-              } }],
-            });
-            return SiteCreator.addUserToSite(site.owner, site.repository, user)
-            .catch((err) => {
-              expect(err.status).to.equal(400);
-              expect(err.message).to.equal('You do not have write access to this repository');
-              done();
-            });
-          });
+        factory.user().then(user =>
+          SiteCreator.createSite({ user, siteParams })
+        ).catch((err) => {
+          expect(err.status).to.eq(400);
+          expect(err.message).to.eq('No such template: not-a-template');
+          done();
+        }).catch(done);
       });
     });
   });

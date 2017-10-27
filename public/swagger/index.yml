@@ -407,6 +407,38 @@ paths:
           description: Not authorized
           schema:
             $ref: "Error.json"
+  /site/user:
+    post:
+      summary: Add the current user to a site based on the owner and repository name
+      parameters:
+        - name: site
+          in: body
+          schema:
+            type: object
+            properties:
+              owner:
+                type: string
+                description: The owner of the GitHub repo for the site
+              repository:
+                type: string
+                description: The name of the GitHub repository for the site
+      responses:
+        200:
+          description: A site object representing the site the user was added to
+          schema:
+            $ref: "Site.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: The site the user is to be added to cannot be found
+          schema:
+            $ref: "Error.json"
   /me:
     get:
       summary: Fetch data for the current user

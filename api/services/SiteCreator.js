@@ -1,6 +1,6 @@
 const GitHub = require('./GitHub');
 const config = require('../../config');
-const { Build, Site, User } = require('../models');
+const { Build, Site } = require('../models');
 
 function paramsForNewSite(params) {
   return {
@@ -14,7 +14,9 @@ function paramsForNewSite(params) {
 function templateForTemplateName(templateName) {
   const template = config.templates[templateName];
   if (!template) {
-    throw new Error(`No such template: ${templateName}`);
+    const error = new Error(`No such template: ${templateName}`);
+    error.status = 400;
+    throw error;
   }
   return template;
 }
@@ -36,7 +38,7 @@ function paramsForNewBuild({ user, site, template }) {
   };
 }
 
-function checkExistingGithubRepository({ user, owner, repository, site }) {
+function checkGithubRepository({ user, owner, repository }) {
   return GitHub.getRepository(user, owner, repository)
     .then((repo) => {
       if (!repo) {
@@ -45,31 +47,14 @@ function checkExistingGithubRepository({ user, owner, repository, site }) {
           status: 400,
         };
       }
-      if (!repo.permissions.admin && !site) {
+      if (!repo.permissions.admin) {
         throw {
           message: 'You do not have admin access to this repository',
           status: 400,
         };
       }
-      if (!repo.permissions.push) {
-        throw {
-          message: 'You do not have write access to this repository',
-          status: 400,
-        };
-      }
       return true;
     });
-}
-
-function checkForExistingSiteErrors({ site, user }) {
-  const existingUser = site.Users.find(candidate => candidate.id === user.id);
-  if (existingUser) {
-    throw {
-      message: "You've already added this site to Federalist",
-      status: 400,
-    };
-  }
-  return site;
 }
 
 function createAndBuildSite({ siteParams, user }) {
@@ -91,55 +76,29 @@ function createAndBuildSite({ siteParams, user }) {
     .then(() => site);
 }
 
-
-function addUserToSite(owner, repository, user) {
-  let site;
-
-  return Site.findOne({
-    where: { owner, repository },
-    include: [User],
-  })
-    .then((model) => {
-      if (!model) {
-        throw {
-          message: `Site for ${owner}/${repository} does not yet exist in Federalist`,
-          status: 404,
-        };
-      }
-      site = model;
-      return site;
-    })
-    .then(() => checkExistingGithubRepository({ user, owner, repository, site }))
-    .then(() => checkForExistingSiteErrors({ site, user }))
-    .then(() => site.addUser(user.id))
-    .then(() => site);
-}
-
-
 function createSiteFromExistingRepo({ siteParams, user }) {
   let site;
   const { owner, repository } = siteParams;
 
   return Site.findOne({
     where: { owner, repository },
-    include: [User],
   })
-    .then((model) => {
-      site = model;
-      return checkExistingGithubRepository({ user, owner, repository, site });
-    })
-    .then(() => {
-      if (site) {
-        return checkForExistingSiteErrors({ site, user });
-      }
-
-      return createAndBuildSite({ siteParams, user });
-    })
-    .then((model) => {
-      site = model;
-      return site.addUser(user.id);
-    })
-    .then(() => site);
+  .then((existingSite) => {
+    if (existingSite) {
+      const error = new Error('This site has already been added to Federalist');
+      error.status = 400;
+      throw error;
+    }
+    return checkGithubRepository({ user, owner, repository });
+  })
+  .then(() =>
+    createAndBuildSite({ siteParams, user })
+  )
+  .then((model) => {
+    site = model;
+    return site.addUser(user.id);
+  })
+  .then(() => site);
 }
 
 function createSiteFromTemplate({ siteParams, user, template }) {
@@ -180,5 +139,4 @@ function createSite({ user, siteParams }) {
 
 module.exports = {
   createSite,
-  addUserToSite,
 };
