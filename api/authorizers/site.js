@@ -1,30 +1,24 @@
-const { User, Site } = require("../models")
+const { User, Site } = require('../models');
 
-const authorize = (user, site) => {
-  return User.findById(user.id, { include: [ Site ] }).then(user => {
-    for (candidateSite of user.Sites) {
-      if (site.id === candidateSite.id) {
-        return Promise.resolve()
+const authorize = ({ id }, site) => (
+  User.findById(id, { include: [Site] })
+    .then((user) => {
+      const hasSite = user.Sites.some(s => site.id === s.id);
+      if (hasSite) {
+        return Promise.resolve();
       }
-    }
-    return Promise.reject(403)
-  })
-}
 
-const create = (user, params) => {
-  return Promise.resolve()
-}
+      return Promise.reject(403);
+    })
+);
 
-const findOne = (user, site) => {
-  return authorize(user, site)
-}
+// create is allowed for all
+const create = () => Promise.resolve();
 
-const update = (user, site) => {
-  return authorize(user, site)
-}
+const findOne = (user, site) => authorize(user, site);
 
-const destroy = (user, site) => {
-  return authorize(user, site)
-}
+const update = (user, site) => authorize(user, site);
 
-module.exports = { create, findOne, update, destroy }
+const destroy = (user, site) => authorize(user, site);
+
+module.exports = { create, findOne, update, destroy };

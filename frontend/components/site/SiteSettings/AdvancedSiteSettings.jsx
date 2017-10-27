@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
-import SelectSiteEngine from '../../selectSiteEngine';
+import SelectSiteEngine from '../../SelectSiteEngine';
 
 const propTypes = {
   onDelete: PropTypes.func.isRequired,
@@ -36,8 +36,10 @@ export const AdvancedSiteSettings = ({
   <form className="settings-form settings-form-advanced" onSubmit={handleSubmit}>
     <div className="usa-grid">
       <div className="usa-width-one-whole">
+        <label htmlFor="engine">Static site engine</label>
         <Field
           name="engine"
+          id="engine"
           component={p =>
             <SelectSiteEngine
               value={p.input.value}
@@ -56,7 +58,7 @@ export const AdvancedSiteSettings = ({
           <h3 className="well-heading">Site configuration</h3>
           <p className="well-text">
             Add additional configuration in yaml to be added to your
-            <code>_config.yml</code> file when we build your site&apos;s default branch.
+            <code>_config.yml</code> file when we build your site&apos;s primary branch.
           </p>
           <Field
             component="textarea"
@@ -125,6 +127,7 @@ export const AdvancedSiteSettings = ({
     </div>
 
     <div className="usa-grid">
+      <h3>Danger Zone</h3>
       <div className="usa-alert usa-alert-delete" role="alert">
         Delete this site from Federalist?
         <button

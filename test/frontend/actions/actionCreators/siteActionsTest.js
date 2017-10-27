@@ -1,71 +1,71 @@
-import { expect } from "chai";
+import { expect } from 'chai';
 import {
   sitesFetchStarted, sitesFetchStartedType,
   sitesReceived, sitesReceivedType,
   siteAdded, siteAddedType,
   siteUpdated, siteUpdatedType,
   siteDeleted, siteDeletedType,
-  siteBranchesReceived, siteBranchesReceivedType,
-} from "../../../../frontend/actions/actionCreators/siteActions";
+  siteUserAdded, siteUserAddedType,
+} from '../../../../frontend/actions/actionCreators/siteActions';
 
-describe("siteActions actionCreators", () => {
-  describe("sitesFetchStarted", () => {
-    it("constructs propery", () => {
-      const actual = sitesFetchStarted()
+describe('siteActions actionCreators', () => {
+  describe('sitesFetchStarted', () => {
+    it('constructs properly', () => {
+      const actual = sitesFetchStarted();
       expect(actual).to.deep.equal({
         type: sitesFetchStartedType,
-      })
-    })
+      });
+    });
 
-    it("exports its type", () => {
-      expect(sitesFetchStartedType).to.equal("SITES_FETCH_STARTED")
-    })
-  })
+    it('exports its type', () => {
+      expect(sitesFetchStartedType).to.equal('SITES_FETCH_STARTED');
+    });
+  });
 
-  describe("sitesReceived", () => {
-    it("constructs properly", () => {
+  describe('sitesReceived', () => {
+    it('constructs properly', () => {
       const sites = [{
-        something: "here"
+        something: 'here',
       }];
 
       const actual = sitesReceived(sites);
 
       expect(actual).to.deep.equal({
         type: sitesReceivedType,
-        sites
+        sites,
       });
     });
 
-    it("exports its type", () => {
-      expect(sitesReceivedType).to.equal("SITES_RECEIVED");
+    it('exports its type', () => {
+      expect(sitesReceivedType).to.equal('SITES_RECEIVED');
     });
   });
 
-  describe("siteAdded", () => {
-    it("constructs properly", () => {
+  describe('siteAdded', () => {
+    it('constructs properly', () => {
       const site = {
-        something: "here"
+        something: 'here',
       };
 
       const actual = siteAdded(site);
 
       expect(actual).to.deep.equal({
         type: siteAddedType,
-        site
+        site,
       });
     });
 
-    it("exports its type", () => {
-      expect(siteAddedType).to.equal("SITE_ADDED");
+    it('exports its type', () => {
+      expect(siteAddedType).to.equal('SITE_ADDED');
     });
   });
 
-  describe("siteUpdated", () => {
-    it("constructs properly", () => {
-      const id = "tk421";
+  describe('siteUpdated', () => {
+    it('constructs properly', () => {
+      const id = 'tk421';
       const site = {
-        something: "here",
-        id: id
+        something: 'here',
+        id,
       };
 
       const actual = siteUpdated(site);
@@ -73,29 +73,47 @@ describe("siteActions actionCreators", () => {
       expect(actual).to.deep.equal({
         type: siteUpdatedType,
         siteId: id,
-        site
+        site,
       });
     });
 
-    it("exports its type", () => {
-      expect(siteUpdatedType).to.equal("SITE_UPDATED");
+    it('exports its type', () => {
+      expect(siteUpdatedType).to.equal('SITE_UPDATED');
     });
   });
 
-  describe("siteDeleted", () => {
-    it("constructs properly", () => {
-      const siteId = "tk421";
+  describe('siteDeleted', () => {
+    it('constructs properly', () => {
+      const siteId = 'tk421';
 
       const actual = siteDeleted(siteId);
 
       expect(actual).to.deep.equal({
         type: siteDeletedType,
-        siteId
+        siteId,
       });
     });
 
-    it("exports its type", () => {
-      expect(siteDeletedType).to.equal("SITE_DELETED");
+    it('exports its type', () => {
+      expect(siteDeletedType).to.equal('SITE_DELETED');
+    });
+  });
+
+  describe('siteUserAdded', () => {
+    it('constructs properly', () => {
+      const site = {
+        id: 123,
+        owner: 'owner',
+        repository: 'a-repo',
+      };
+
+      const action = siteUserAdded(site);
+      expect(action.type).to.equal(siteUserAddedType);
+      expect(action.site).to.equal(site);
+    });
+
+    it('exports its type', () => {
+      expect(siteUserAddedType).to.equal('SITE_USER_ADDED');
     });
   });
 });

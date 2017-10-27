@@ -9,6 +9,7 @@ import sites from './reducers/sites';
 import builds from './reducers/builds';
 import user from './reducers/user';
 import githubBranches from './reducers/githubBranches';
+import showAddNewSiteFields from './reducers/showAddNewSiteFields';
 
 
 export default {
@@ -22,5 +23,6 @@ export default {
   githubBranches,
   notifications,
   form,
+  showAddNewSiteFields,
   FRONTEND_CONFIG: (state = {}) => state,
 };

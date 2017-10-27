@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import AlertBanner from '../alertBanner';
 import SiteListItem from './siteListItem';
-import LoadingIndicator from '../loadingIndicator';
+import LoadingIndicator from '../LoadingIndicator';
 
 const propTypes = {
   storeState: PropTypes.shape({

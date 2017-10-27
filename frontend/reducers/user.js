@@ -5,30 +5,32 @@ import {
 
 const initialState = {
   isLoading: false,
-}
+};
 
 export default function user(state = initialState, action) {
   switch (action.type) {
-  case USER_FETCH_STARTED:
-    return {
-      isLoading: true,
-    }
-  case USER_RECEIVED:
-    if (!action.user) {
-      return false
-    }
+    case USER_FETCH_STARTED:
+      return {
+        isLoading: true,
+      };
+    case USER_RECEIVED:
+      // TODO: When does this happen? Should this happen, or should
+      // an error be thrown instead?
+      if (!action.user) {
+        return false;
+      }
 
-    return {
-      isLoading: false,
-      data: {
-        id: action.user.id,
-        username: action.user.username,
-        email: action.user.email,
-        createdAt: action.user.createdAt,
-        updatedAt: action.user.updatedAt
-      },
-    }
-  default:
-    return state;
+      return {
+        isLoading: false,
+        data: {
+          id: action.user.id,
+          username: action.user.username,
+          email: action.user.email,
+          createdAt: action.user.createdAt,
+          updatedAt: action.user.updatedAt,
+        },
+      };
+    default:
+      return state;
   }
 }

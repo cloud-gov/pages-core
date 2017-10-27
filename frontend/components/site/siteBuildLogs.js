@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import buildLogActions from '../../actions/buildLogActions';
-import LoadingIndicator from '../loadingIndicator';
+import LoadingIndicator from '../LoadingIndicator';
 import SiteBuildLogTable from './siteBuildLogTable';
 import RefreshBuildLogsButton from './refreshBuildLogsButton';
 

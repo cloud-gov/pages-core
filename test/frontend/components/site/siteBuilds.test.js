@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { shallow } from 'enzyme';
 
 import SiteBuilds from '../../../../frontend/components/site/siteBuilds';
-import LoadingIndicator from '../../../../frontend/components/loadingIndicator';
+import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
 let user;
 let site;

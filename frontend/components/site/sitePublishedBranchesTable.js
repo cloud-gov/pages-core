@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { Link } from 'react-router';
 import publishedBranchActions from '../../actions/publishedBranchActions';
-import LoadingIndicator from '../loadingIndicator';
+import LoadingIndicator from '../LoadingIndicator';
 import BranchViewLink from '../branchViewLink';
 import { SITE } from '../../propTypes';
 
@@ -21,17 +21,23 @@ class SitePublishedBranchesTable extends React.Component {
 
   renderPublishedBranchesTable() {
     return (
-      <table className="usa-table-borderless published-branch-table">
-        <thead>
-          <tr>
-            <th>Branch</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          { this.publishedBranches().map(this.renderPublishedBranchRow.bind(this)) }
-        </tbody>
-      </table>
+      <div>
+        <p>
+          Use this page to see every version of your site&apos;s code published on
+          Federalist and to audit the specific files that Federalist has published.
+        </p>
+        <table className="usa-table-borderless published-branch-table">
+          <thead>
+            <tr>
+              <th>Branch</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            { this.publishedBranches().map(this.renderPublishedBranchRow.bind(this)) }
+          </tbody>
+        </table>
+      </div>
     );
   }
 
@@ -55,7 +61,7 @@ class SitePublishedBranchesTable extends React.Component {
 
   renderBranchFilesLink(branch) {
     const href = `/sites/${branch.site.id}/published/${branch.name}`;
-    return <Link to={href}>View Files</Link>;
+    return <Link to={href}>View files</Link>;
   }
 
   renderLoadingState() {

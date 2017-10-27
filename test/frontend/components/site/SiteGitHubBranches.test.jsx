@@ -127,7 +127,9 @@ describe('<SiteGitHubBranches />', () => {
         owner: 'owner',
         repository: 'repo',
       },
-      githubBranches: {},
+      githubBranches: {
+        isLoading: false,
+      },
     };
 
     const wrapper = shallow(<SiteGitHubBranches {...props} />);

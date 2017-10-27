@@ -1,31 +1,31 @@
-const authErrorType = "AUTH_ERROR";
-const httpErrorType = "HTTP_ERROR";
-const httpSuccessType = "HTTP_SUCCESS";
-const setStaleType = "SET_STALE";
-const clearType = "CLEAR";
+const authErrorType = 'AUTH_ERROR';
+const httpErrorType = 'HTTP_ERROR';
+const httpSuccessType = 'HTTP_SUCCESS';
+const setStaleType = 'SET_STALE';
+const clearType = 'CLEAR';
 
 const authError = () => ({
-  type: authErrorType
+  type: authErrorType,
 });
 
 const httpError = message => ({
   type: httpErrorType,
   status: 'error',
-  message
+  message,
 });
 
 const httpSuccess = message => ({
   type: httpSuccessType,
   status: 'info',
-  message
+  message,
 });
 
 const setStale = () => ({
-  type: setStaleType
+  type: setStaleType,
 });
 
 const clear = () => ({
-  type: clearType
+  type: clearType,
 });
 
 export {
@@ -33,5 +33,5 @@ export {
   httpError, httpErrorType,
   httpSuccess, httpSuccessType,
   setStale, setStaleType,
-  clear, clearType
+  clear, clearType,
 };

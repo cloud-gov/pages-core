@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import publishedFileActions from '../../actions/publishedFileActions';
-import LoadingIndicator from '../loadingIndicator';
+import LoadingIndicator from '../LoadingIndicator';
 
 class SitePublishedFilesTable extends React.Component {
   componentDidMount() {
@@ -22,6 +22,7 @@ class SitePublishedFilesTable extends React.Component {
   renderPublishedFilesTable(files) {
     return (<div>
       <h3>{this.props.params.name}</h3>
+      <p>Use this page to audit the files that Federalist has publicly published.</p>
       <table className="usa-table-borderless">
         <thead>
           <tr>

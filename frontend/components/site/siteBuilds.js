@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 
 import buildActions from '../../actions/buildActions';
-import LoadingIndicator from '../loadingIndicator';
+import LoadingIndicator from '../LoadingIndicator';
 import RefreshBuildsButton from './refreshBuildsButton';
 import { duration, timeFrom } from '../../util/datetime';
 

@@ -10,7 +10,7 @@ const propTypes = {
   defaultOwner: PropTypes.string.isRequired,
 };
 
-const MAX_CELLS_PER_ROW = 3;
+const MAX_CELLS_PER_ROW = 4;
 const CELL_WIDTHS = ['', 'whole', 'half', 'third', 'fourth'];
 
 /**

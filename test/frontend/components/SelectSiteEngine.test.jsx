@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import { spy } from 'sinon';
 
-import SelectSiteEngine from '../../../frontend/components/selectSiteEngine';
+import SelectSiteEngine from '../../../frontend/components/SelectSiteEngine';
 
 const expectedEngineValues = ['jekyll', 'hugo', 'static'];
 
@@ -20,7 +20,7 @@ describe('<SelectSiteEngine />', () => {
   });
 
   it('renders a select element with expect options', () => {
-    const select = wrapper.find('select#engine');
+    const select = wrapper.find('select');
     expect(select).to.have.length(1);
     expect(select.props().value).to.equal(props.value);
 
@@ -30,7 +30,7 @@ describe('<SelectSiteEngine />', () => {
   });
 
   it('calls props.onChange when a new option is selected', () => {
-    const select = wrapper.find('select#engine');
+    const select = wrapper.find('select');
     expect(props.onChange.notCalled).to.be.true;
     select.simulate('change', { target: { value: expectedEngineValues[2] } });
     expect(props.onChange.calledOnce).to.be.true;

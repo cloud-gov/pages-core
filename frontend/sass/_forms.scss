@@ -10,6 +10,18 @@ fieldset {
   margin-top: 2rem;
 }
 
+.usa-input-error {
+  margin-top: 2rem;
+  padding-top: 0;
+  padding-bottom: 0;
+
+  input[type="text"],
+  input[type="url"],
+  textarea {
+    border: 3px solid $uswds-error-color;
+  }
+}
+
 input[type="text"],
 input[type="url"],
 textarea {
