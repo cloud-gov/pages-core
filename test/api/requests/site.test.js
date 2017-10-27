@@ -189,7 +189,7 @@ describe('Site API', () => {
             .post('/v0/site')
             .set('x-csrf-token', csrfToken.getToken())
             .send({
-              organization: 'partner-org',
+              owner: 'partner-org',
               repository: 'partner-site',
               defaultBranch: 'master',
               engine: 'jekyll',
@@ -235,53 +235,6 @@ describe('Site API', () => {
             done();
           })
           .catch(done);
-    });
-
-    it('should add a user to an existing site for an existing repository', (done) => {
-      let user;
-      let site;
-      const userPromise = factory.user();
-
-      Promise.props({
-        user: userPromise,
-        site: factory.site(),
-        cookie: authenticatedSession(userPromise),
-      }).then((models) => {
-        user = models.user;
-        site = models.site;
-
-        githubAPINocks.repo();
-
-        return request(app)
-          .post('/v0/site')
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            owner: site.owner,
-            repository: site.repository,
-            defaultBranch: 'master',
-            engine: 'jekyll',
-          })
-          .set('Cookie', models.cookie)
-          .expect(200);
-      })
-      .then((response) => {
-        validateAgainstJSONSchema('POST', '/site', 200, response.body);
-        return Site.findAll({
-          where: {
-            owner: site.owner,
-            repository: site.repository,
-          },
-          include: [User],
-        });
-      })
-      .then((sites) => {
-        expect(sites).to.have.length(1);
-        const s = sites[0];
-        const addedUser = s.Users.find(candidate => candidate.id === user.id);
-        expect(addedUser).to.not.be.undefined;
-        done();
-      })
-      .catch(done);
     });
 
     it('should create a new repo and site from a template', (done) => {
@@ -342,12 +295,12 @@ describe('Site API', () => {
           }).catch(done);
     });
 
-    it('should respond with a 400 if a user has already added a site', (done) => {
+    it('should respond with a 400 if the site already exists', (done) => {
       const userPromise = factory.user();
 
       Promise.props({
-        user: userPromise,
-        site: factory.site({ users: Promise.all([userPromise]) }),
+        user: factory.user(),
+        site: factory.site(),
         cookie: authenticatedSession(userPromise),
       }).then(({ site, cookie }) => request(app)
           .post('/v0/site')
@@ -361,7 +314,7 @@ describe('Site API', () => {
           .set('Cookie', cookie)
           .expect(400)).then((response) => {
             validateAgainstJSONSchema('POST', '/site', 400, response.body);
-            expect(response.body.message).to.equal("You've already added this site to Federalist");
+            expect(response.body.message).to.equal('This site has already been added to Federalist');
             done();
           }).catch(done);
     });
@@ -397,41 +350,6 @@ describe('Site API', () => {
           }).catch(done);
     });
 
-    it('should respond with a 400 if the site has been created by a user who does not have write access to the repository', (done) => {
-      let site;
-      factory.site().then((model) => {
-        site = model;
-
-        nock.cleanAll();
-        githubAPINocks.repo({
-          owner: site.owner,
-          repository: site.repository,
-          response: [200, {
-            permissions: { admin: false, push: false },
-          }],
-        });
-        githubAPINocks.webhook();
-
-        return authenticatedSession();
-      }).then(cookie => request(app)
-          .post('/v0/site')
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            owner: site.owner,
-            repository: site.repository,
-            defaultBranch: 'master',
-            engine: 'jekyll',
-          })
-          .set('Cookie', cookie)
-          .expect(400))
-          .then((response) => {
-            validateAgainstJSONSchema('POST', '/site', 400, response.body);
-            expect(response.body.message).to.equal('You do not have write access to this repository');
-            done();
-          })
-          .catch(done);
-    });
-
     it('should respond with a 400 if a webhook cannot be created', (done) => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
@@ -447,20 +365,200 @@ describe('Site API', () => {
       });
 
       authenticatedSession().then(cookie => request(app)
-          .post('/v0/site')
+        .post('/v0/site')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          owner: siteOwner,
+          repository: siteRepository,
+          defaultBranch: 'master',
+          engine: 'jekyll',
+        })
+        .set('Cookie', cookie)
+        .expect(400)).then((response) => {
+          validateAgainstJSONSchema('POST', '/site', 400, response.body);
+          expect(response.body.message).to.equal('You do not have admin access to this repository');
+          done();
+        }).catch(done);
+    });
+  });
+
+  describe('POST /v0/site/user', () => {
+    beforeEach(() => {
+      nock.cleanAll();
+      githubAPINocks.repo();
+    });
+
+    it('should require a valid csrf token', (done) => {
+      authenticatedSession().then(cookie => request(app)
+        .post('/v0/site/user')
+        .set('x-csrf-token', 'bad-token')
+        .send({
+          owner: 'partner-org',
+          repository: 'partner-site',
+        })
+        .set('Cookie', cookie)
+        .expect(403)
+      )
+      .then((response) => {
+        validateAgainstJSONSchema('POST', '/site/user', 403, response.body);
+        expect(response.body.message).to.equal('Invalid CSRF token');
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should require authentication', (done) => {
+      unauthenticatedSession()
+        .then((cookie) => {
+          const newSiteRequest = request(app)
+            .post('/v0/site/user')
+            .set('x-csrf-token', csrfToken.getToken())
+            .send({
+              owner: 'partner-org',
+              repository: 'partner-site',
+            })
+            .set('Cookie', cookie)
+            .expect(403);
+
+          return newSiteRequest;
+        })
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site/user', 403, response.body);
+          expect(response.body.message).to.equal(authErrorMessage);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should add the user to the site', (done) => {
+      const userPromise = factory.user();
+      let user;
+      let site;
+
+      Promise.props({
+        user: userPromise,
+        site: factory.site(),
+        cookie: authenticatedSession(userPromise),
+      })
+        .then((models) => {
+          user = models.user;
+          site = models.site;
+
+          return request(app)
+            .post('/v0/site/user')
+            .set('x-csrf-token', csrfToken.getToken())
+            .set('Cookie', models.cookie)
+            .send({
+              owner: site.owner,
+              repository: site.repository,
+            })
+            .expect(200);
+        })
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site/user', 200, response.body);
+          return Site.findById(site.id, { include: [User] });
+        })
+        .then((fetchedSite) => {
+          expect(fetchedSite.Users).to.be.an('array');
+          const userIDs = fetchedSite.Users.map(u => u.id);
+          expect(userIDs).to.include(user.id);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should respond with a 400 if no user or repository is specified', (done) => {
+      authenticatedSession()
+        .then(cookie =>
+          request(app)
+            .post('/v0/site/user')
+            .set('x-csrf-token', csrfToken.getToken())
+            .set('Cookie', cookie)
+            .send({})
+            .expect(400)
+        )
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
+          done();
+        }).catch(done);
+    });
+
+    it('should respond with a 400 if the user has already added the site', (done) => {
+      const userPromise = factory.user();
+
+      Promise.props({
+        site: factory.site({ users: Promise.all([userPromise]) }),
+        cookie: authenticatedSession(userPromise),
+      })
+        .then(({ site, cookie }) =>
+          request(app)
+            .post('/v0/site/user')
+            .set('x-csrf-token', csrfToken.getToken())
+            .set('Cookie', cookie)
+            .send({
+              owner: site.owner,
+              repository: site.repository,
+            })
+            .expect(400)
+        )
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
+          expect(response.body.message).to.eq("You've already added this site to Federalist");
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should respond with a 400 if the user does not have write access to repository', (done) => {
+      const siteOwner = crypto.randomBytes(3).toString('hex');
+      const siteRepository = crypto.randomBytes(3).toString('hex');
+
+      nock.cleanAll();
+      githubAPINocks.repo({
+        owner: siteOwner,
+        repository: siteRepository,
+        response: [200, {
+          permissions: { admin: false, push: false },
+        }],
+      });
+      githubAPINocks.webhook();
+
+      Promise.props({
+        cookie: authenticatedSession(),
+        site: factory.site({ owner: siteOwner, repository: siteRepository }),
+      }).then(({ cookie, site }) =>
+        request(app)
+          .post('/v0/site/user')
           .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            owner: siteOwner,
-            repository: siteRepository,
-            defaultBranch: 'master',
-            engine: 'jekyll',
-          })
           .set('Cookie', cookie)
-          .expect(400)).then((response) => {
-            validateAgainstJSONSchema('POST', '/site', 400, response.body);
-            expect(response.body.message).to.equal('You do not have admin access to this repository');
-            done();
-          }).catch(done);
+          .send({
+            owner: site.owner,
+            repository: site.repository,
+          })
+          .expect(400)
+      ).then((response) => {
+        validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
+        expect(response.body.message).to.eq('You do not have write access to this repository');
+        done();
+      }).catch(done);
+    });
+
+    it('should respond with a 404 if the site does not exist', (done) => {
+      authenticatedSession().then(cookie =>
+        request(app)
+          .post('/v0/site/user')
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .send({
+            owner: 'this-is',
+            repository: 'not-real',
+          })
+          .expect(404)
+      ).then((response) => {
+        validateAgainstJSONSchema('POST', '/site/user', 404, response.body);
+        expect(response.body.message).to.eq('The site you are trying to add does not exist');
+        done();
+      }).catch(done);
     });
   });
 
