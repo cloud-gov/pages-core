@@ -1,5 +1,5 @@
 module.exports = {
-    report: {
+  report: {
     owner: '18f',
     repo: 'federalist-report-template',
     branch: 'master',
@@ -26,7 +26,7 @@ module.exports = {
     description: 'Single page to host information about a specific topic or report',
     thumb: '/images/landing.thumb.png',
   },
-    uswds: {
+  uswds: {
     owner: '18f',
     repo: 'federalist-uswds-template',
     branch: 'master',
