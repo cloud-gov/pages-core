@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { expect } from 'chai';
 
-import GitHubRepoUrlField, { required, githubRepoUrl } from '../../../frontend/components/GitHubRepoUrlField';
+import GitHubRepoUrlField, { githubRepoUrl } from '../../../frontend/components/GitHubRepoUrlField';
 import RenderField from '../../../frontend/components/GitHubRepoUrlField/RenderField';
 
 describe('<GitHubRepoUrlField />', () => {
@@ -25,24 +25,16 @@ describe('<GitHubRepoUrlField />', () => {
 
     const wrapper = shallow(<GitHubRepoUrlField {...props} />);
     const validateProp = wrapper.props().validate;
-    expect(validateProp.length).to.equal(2);
-    expect(validateProp.find(required)).to.not.be.null;
+    expect(validateProp.length).to.equal(1);
     expect(validateProp.find(githubRepoUrl)).to.not.be.null;
-  });
-
-  describe('required validator', () => {
-    it('validates', () => {
-      expect(required('')).to.equal('Required');
-      expect(required()).to.equal('Required');
-      expect(required('anything')).to.be.undefined;
-    });
   });
 
   describe('githubRepoUrl validator', () => {
     it('validates', () => {
       const msg = 'URL is not formatted correctly';
-      expect(githubRepoUrl()).to.equal(msg);
-      expect(githubRepoUrl('')).to.equal(msg);
+      expect(githubRepoUrl()).to.be.undefined;
+      expect(githubRepoUrl('')).to.be.undefined;
+
       expect(githubRepoUrl('anything')).to.equal(msg);
       expect(githubRepoUrl('https://example.com')).to.equal(msg);
 
