@@ -74,20 +74,36 @@ describe('<AddSite/>', () => {
       handleSubmitTemplate: wrapper.instance().onSubmitTemplate,
       defaultOwner: propsWithoutError.storeState.user.data.username,
     });
-    expect(formProps.onSubmit).to.equal(wrapper.instance().onAddRepoSiteSubmit);
+    expect(formProps.onSubmit).to.equal(wrapper.instance().onAddUserSubmit);
     expect(formProps.showAddNewSiteFields).to.equal(propsWithoutError.showAddNewSiteFields);
+    expect(formProps.initialValues).to.deep.equal({ engine: 'jekyll' });
   });
 
-  it('calls addUserToSite action when add site form is submitted without engine and defaultBranch', () => {
+  it('delivers onCreateSiteSubmit when showAddNewSiteFields is true', () => {
+    const props = Object.assign({}, propsWithoutError);
+    props.showAddNewSiteFields = true;
+
+    wrapper = shallow(<Fixture {...props} />);
+
+    const formProps = wrapper.find('ReduxForm').props();
+    expect(formProps.onSubmit).to.equal(wrapper.instance().onCreateSiteSubmit);
+  });
+
+  it('calls addUserToSite action when add site form is submitted', () => {
     const repoUrl = 'https://github.com/owner/repo';
     wrapper.find('ReduxForm').props().onSubmit({ repoUrl });
     expect(addUserToSite.calledWith({ owner: 'owner', repository: 'repo' })).to.be.true;
   });
 
-  it('calls addSite action when add site form is submitted with all fields', () => {
+  it('calls addSite action when add site form is submitted and showAddNewSiteFields is true', () => {
     const repoUrl = 'https://github.com/boop/beeper-v2';
     const engine = 'vrooooom';
     const defaultBranch = 'tree';
+
+    const props = Object.assign({}, propsWithoutError);
+    props.showAddNewSiteFields = true;
+    wrapper = shallow(<Fixture {...props} />);
+
     wrapper.find('ReduxForm').props().onSubmit({ repoUrl, engine, defaultBranch });
     expect(addSite.calledWith({ owner: 'boop', repository: 'beeper-v2', engine, defaultBranch })).to.be.true;
   });
