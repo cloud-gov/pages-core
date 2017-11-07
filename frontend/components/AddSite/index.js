@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
 import AlertBanner from '../alertBanner';
+import { availableEngines } from '../SelectSiteEngine';
 
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
@@ -26,13 +27,21 @@ const defaultProps = {
   showAddNewSiteFields: false,
 };
 
+function getOwnerAndRepo(repoUrl) {
+  const owner = repoUrl.split('/')[3];
+  const repository = repoUrl.split('/')[4];
+
+  return { owner, repository };
+}
+
 export class AddSite extends React.Component {
   constructor(props) {
     super(props);
 
     autoBind(
       this,
-      'onAddRepoSiteSubmit',
+      'onAddUserSubmit',
+      'onCreateSiteSubmit',
       'onSubmitTemplate'
     );
   }
@@ -43,15 +52,14 @@ export class AddSite extends React.Component {
     addNewSiteFieldsActions.hideAddNewSiteFields();
   }
 
-  onAddRepoSiteSubmit({ repoUrl, engine, defaultBranch }) {
-    const owner = repoUrl.split('/')[3];
-    const repository = repoUrl.split('/')[4];
+  onAddUserSubmit({ repoUrl }) {
+    const { owner, repository } = getOwnerAndRepo(repoUrl);
+    siteActions.addUserToSite({ owner, repository });
+  }
 
-    if (!engine && !defaultBranch) {
-      siteActions.addUserToSite({ owner, repository });
-    } else {
-      siteActions.addSite({ owner, repository, engine, defaultBranch });
-    }
+  onCreateSiteSubmit({ repoUrl, engine, defaultBranch }) {
+    const { owner, repository } = getOwnerAndRepo(repoUrl);
+    siteActions.addSite({ owner, repository, engine, defaultBranch });
   }
 
   onSubmitTemplate(site) {
@@ -67,6 +75,11 @@ export class AddSite extends React.Component {
   }
 
   render() {
+    // select the function to use on form submit based on
+    // the showAddNewSiteFields flag
+    const formSubmitFunc = this.props.showAddNewSiteFields ?
+      this.onCreateSiteSubmit : this.onAddUserSubmit;
+
     return (
       <div>
         <AlertBanner message={this.props.storeState.error} />
@@ -94,8 +107,9 @@ export class AddSite extends React.Component {
         </div>
 
         <AddRepoSiteForm
+          initialValues={{ engine: availableEngines[0].value }}
           showAddNewSiteFields={this.props.showAddNewSiteFields}
-          onSubmit={this.onAddRepoSiteSubmit}
+          onSubmit={formSubmitFunc}
         />
       </div>
     );
