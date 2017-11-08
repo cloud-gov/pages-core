@@ -1,10 +1,13 @@
 const expect = require('chai').expect;
+const moment = require('moment');
 const request = require('supertest');
 
 const app = require('../../../app');
 const config = require('../../../config');
+const { Build } = require('../../../api/models');
 const { authenticatedSession } = require('../support/session');
 const { sessionForCookie, sessionCookieFromResponse } = require('../support/cookieSession');
+const factory = require('../support/factory');
 
 describe('Main Site', () => {
   describe('Home /', () => {
@@ -43,6 +46,26 @@ describe('Main Site', () => {
       )
       .then((response) => {
         expect(response.headers.location).to.equal('/sites');
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should display the number of builds from the past week', (done) => {
+      Build.destroy({ where: {} }).then(() => {
+        const promises = Array.from(Array(10).keys()).map((day) => {
+          const date = moment().subtract(day + 1, 'days');
+          return factory.build({ createdAt: date });
+        });
+        return Promise.all(promises);
+      })
+      .then(() =>
+        request(app)
+          .get('/')
+          .expect(200)
+      )
+      .then((response) => {
+        expect(response.text.indexOf('Federalist has deployed 7 site updates in the past week.')).to.be.above(-1);
         done();
       })
       .catch(done);
