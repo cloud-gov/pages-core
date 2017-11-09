@@ -45,6 +45,7 @@ describe('<GitHubRepoUrlField />', () => {
 
       expect(githubRepoUrl('https://github.com/org/repo')).to.be.undefined;
       expect(githubRepoUrl('https://github.com/org_with-special_chars11/repo22_with-special_chars')).to.be.undefined;
+      expect(githubRepoUrl('https://github.com/org.with.periods/repo.com')).to.be.undefined;
     });
   });
 });
