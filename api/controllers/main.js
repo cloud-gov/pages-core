@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
+const BuildCounter = require('../services/BuildCounter');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const config = require('../../config');
 
@@ -40,8 +41,11 @@ module.exports = {
     if (req.session.authenticated) {
       return res.redirect('/sites');
     }
-
-    return res.render('home.njk', defaultContext(req));
+    const context = defaultContext(req);
+    return BuildCounter.countBuildsFromPastWeek().then((count) => {
+      context.buildCount = count;
+      res.render('home.njk', context);
+    });
   },
 
   app(req, res) {

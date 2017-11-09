@@ -9,6 +9,9 @@ import SelectSiteEngine from '../SelectSiteEngine';
 const propTypes = {
   showAddNewSiteFields: PropTypes.bool,
 
+  initialValues: PropTypes.shape({
+    engine: PropTypes.string.isRequired,
+  }).isRequired,
   // the following props are from reduxForm:
   handleSubmit: PropTypes.func.isRequired,
   pristine: PropTypes.bool.isRequired,
@@ -18,7 +21,15 @@ const defaultProps = {
   showAddNewSiteFields: false,
 };
 
-export const AddRepoSiteForm = ({ pristine, handleSubmit, showAddNewSiteFields }) => (
+export const AddRepoSiteForm = ({
+  // even though initialValues is not directly used, it is used
+  // by reduxForm, and we want PropType validation on it, so we'll
+  // keep it here but disable the eslint rule below
+  initialValues, // eslint-disable-line no-unused-vars
+  pristine,
+  handleSubmit,
+  showAddNewSiteFields,
+}) => (
   <form onSubmit={handleSubmit}>
     <div className="usa-grid">
       <div className="usa-width-one-half">

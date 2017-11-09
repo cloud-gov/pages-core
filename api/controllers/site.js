@@ -1,6 +1,7 @@
 const authorizer = require('../authorizers/site');
 const S3SiteRemover = require('../services/S3SiteRemover');
 const SiteCreator = require('../services/SiteCreator');
+const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const siteSerializer = require('../serializers/site');
 const { User, Site, Build } = require('../models');
 
@@ -76,15 +77,15 @@ module.exports = {
   addUser: (req, res) => {
     const body = req.body;
     if (!body.owner || !body.repository) {
-      throw 400;
+      res.error(400);
+      return;
     }
 
     authorizer.create(req.user, body)
-      .then(() => SiteCreator.addUserToSite(
-        body.owner.toLowerCase(),
-        body.repository.toLowerCase(),
-        req.user)
-      )
+      .then(() => SiteMembershipCreator.createSiteMembership({
+        user: req.user,
+        siteParams: body,
+      }))
       .then(site => siteSerializer.serialize(site))
       .then((siteJSON) => {
         res.json(siteJSON);

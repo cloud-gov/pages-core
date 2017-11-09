@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const availableEngines = [
+export const availableEngines = [
   {
     label: 'Jekyll',
     value: 'jekyll',
