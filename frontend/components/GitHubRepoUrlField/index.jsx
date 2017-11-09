@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Field } from 'redux-form';
 import RenderField from './RenderField';
 
-const githubUrlRegex = /^https:\/\/github\.com\/[a-zA-Z0-9_-]{2,}\/[a-zA-Z0-9_-]{2,}$/;
+const githubUrlRegex = /^https:\/\/github\.com\/[a-zA-Z0-9._-]{2,}\/[a-zA-Z0-9._-]{2,}$/;
 
 export const githubRepoUrl = (value) => {
   if (value && value.length && !githubUrlRegex.test(value)) {
