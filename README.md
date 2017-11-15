@@ -192,6 +192,32 @@ models: {
 }
 ```
 
+### Testing and linting
+
+When making code changes, be sure to write new or modify existing tests to cover your changes.
+
+The full test suite of both front and back end tests can be run via:
+
+```sh
+yarn test
+```
+
+You can also just run back or front end tests via:
+
+```sh
+yarn test:server  # for back end tests
+yarn test:client  # for front end tests
+yarn test:client:watch  # to watch and re-run front end tests
+```
+
+To lint the files you have changed (with `eslint`), run:
+
+```sh
+yarn lint:diff
+```
+
+For the full list of available commands that you can run with `yarn` or `npm`, see the `"scripts"` section of `package.json`.
+
 ## Initial proposal
 
 Federalist is new open source publishing system based on proven open source components and techniques. Once the text has been written, images uploaded, and a page is published, the outward-facing site will act like a simple web site -- fast, reliable, and easily scalable. Administrative tools, which require authentication and additional interactive components, can be responsive with far fewer users.
