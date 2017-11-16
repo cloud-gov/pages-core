@@ -11,9 +11,81 @@ Federalist is a unified interface for publishing static government websites. It 
 
 ## Getting started
 
-To run the server, you'll need [Node.js](https://nodejs.org/download/). You'll also need [nvm](https://github.com/creationix/nvm).
+### Dependencies / Tooling
+Before you start, ensure you have the following installed:
 
-### env variables
+- [node](https://nodejs.org/en/download/package-manager/#osx)
+- [nvm](https://github.com/creationix/nvm#installation) or [n](https://github.com/tj/n#installation)
+- [yarn](https://yarnpkg.com/)
+- [Postgres](https://www.postgresql.org/)
+- [Docker](https://docs.docker.com/engine/installation/mac/)
+- [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
+- [AWS CLI](https://aws.amazon.com/cli/)
+
+
+### Running locally (development)
+
+1. Download or clone the `18F/federalist` repository from Github.
+1. Run `nvm use` to ensure you are using the correct version of node
+1. Run `yarn` from the root (the directory that houses the projects files on your computer) of the repository to load modules and install Jekyll dependencies
+1. Make a copy of `config/local.sample.js` and name it `local.js` and place it in the `config` folder. 
+This will be the file that holds your S3 and SQS configurations.
+1. [Register a new OAuth application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a `Client ID` and `Client Secret`. Add these values to `config/local.js`.
+```
+passport: {
+  github: {
+    options: {
+      clientID: 'VALUE FROM GITHUB',
+      clientSecret: 'VALUE FROM GITHUB',
+      callbackURL: 'http://localhost:1337/auth/github/callback'
+    }
+  }
+}
+```
+1. [Register or create a new GitHub organization](https://github.com/settings/organizations). Find your organization's ID by visiting `https://api.github.com/orgs/<your-org-name>` and copying the `id` into the whitelist of `organizations` in `config/local.js`.
+```
+organizations: [
+  99999999 // your org added here
+]
+```
+1. type `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` in terminal 
+1. Visit https://login.fr.cloud.gov/passcode to get a one time passcode
+1. Enter your passcode back into terminal
+1. Type `cf apps`
+1. Type `cf env federalist-staging` to get environment variables 
+1. Find the section in the listing of evnironment veriables that starts with `"s3": [` and look for the following values and paste those values into the S3 section in your `local.js` file.
+  - `access_key_id`
+  - `bucket`
+  - `secret_access_key` 
+1. Find the section in the listing of environment variables for SQS and look for the following values and paste those values into the SQS section in your `local.js` file.
+  - `FEDERALIST_AWS_BUILD_KEY` is `accessKeyId` 
+  - `FEDERALIST_SESSION_SECRET` is `secreyAccessKey`
+  - `FEDERALIST_SQS_QUEUE` is `queue`
+1. Create Postgres databases by running
+  - Run `createdb federalist`
+  - Run `createdb federalist-test`
+1. Great work! The Federalist app is now ready to run locally! :tada:
+  - Run `yarn`
+  - Run `yarn build`
+  - Run `yarn start`
+1. You should now be able to see Federalist running at http://localhost:1337/
+
+**Pro tips:** 
+- You can use `yarn watch` to automatically restart the server and rebuild front end assets on file change, which is useful for development.
+- You can use `yarn test` to run local testing on the app. 
+
+
+#### Build the server and the front-end
+
+If you are working on the front-end of the application, the things you need to know are:
+
+1. It is a React based application
+1. It is built with `webpack`
+1. It lives in `/frontend`
+
+To analyze the contents of the front end JavaScript bundle, use `yarn analyze-webpack` after a build. This will launch a browser window showing a visualization of all the code that makes up the bundle.
+
+### Environment variables
 
 #### In Production
 
@@ -55,123 +127,6 @@ The app expects the following user provided services to be provided:
   - `NEW_RELIC_LICENSE_KEY`: The license key to use with New Relic
 
 Here `<environment>` refers the value set for the `APP_ENV` environment variable.
-
-#### In Development
-
-In development, the application environment is configured within the `config/local.js`.
-There a sample of that file at `config/local.sample.js` which can be copied over and configured.
-This file's usage is discussed in length in "Building the Server" below.
-
-### Build the server
-
-This project uses [`yarn`](https://yarnpkg.com/) for managing JavaScript dependencies and running tasks specified in `package.json`.
-If you don't already have yarn, follow the instructions at https://yarnpkg.com/en/docs/install to get it installed.
-
-* Download or Clone this repository from Github either by using the command line or repo's website on Github. On the right side of the repo's page, there is a button that states "Clone in Desktop".
-* Run `nvm use` to ensure you are using the correct version of node
-* Run `yarn` from the root (the directory that houses the projects files on your computer) of the repository to load modules and install Jekyll dependencies
-
-Together these commands will looks something like the following:
-
-```
-$ git clone git@github.com:18F/federalist.git
-$ cd federalist
-$ nvm use
-$ yarn
-```
-
-* Copy `config/local.sample.js` to `config/local.js`.
-
-```
-$ cp config/local.sample.js config/local.js
-```
-
-* Set up [an application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a Client ID and Client Secret. Add these values to `config/local.js`.
-
-```
-passport: {
-  github: {
-    options: {
-      clientID: '<<use the value from Github here>>',
-      clientSecret: '<<use the value from Github here>>',
-      callbackURL: 'http://localhost:1337/auth/github/callback'
-    }
-  }
-}
-```
-
-In the end, your `local.js` file should look something like this:
-
-```
-module.exports = {
-  passport: {
-    github: {
-      options: {
-        clientID: 'abcdef123456',
-        clientSecret: 'aabbccddeeff112233445566',
-        callbackURL: 'http://localhost:1337/auth/github/callback'
-      }
-    }
-  }
-};
-```
-
-* Federalist grants access according to the organizations a user is a part of. Find your organization's ID by visiting `https://api.github.com/orgs/<your-org-name>` and copying the `id` into the whitelist of `organizations` in `config/local.js`, for example:
-
-```
-organizations: [
-  6233994,  // 18f
-  14109682, // federalist-users
-  99999999 // your org added here
-]
-```
-* Connect to the SQS build queue
-
-In development, Federalist uses the staging build queue.
-To connect to the build queue, get the credentials for the staging build queue and add them to the SQS config in your `config/local.js`.
-
-Note that the values shown in the examples below are meant to serve only as an example.
-You will need to look at the staging environment to fetch the actual values.
-
-```
-sqs: {
-  accessKeyId: "ABC123",
-  secretAccessKey: "456DEF",
-  region: "us-east-1",
-  queue: "https://sqs.us-east-1.amazonaws.com/789/ghi",
-}
-```
-
-* Connect to the S3 bucket
-
-In development, Federalist uses the staging S3 bucket.
-To connect to the bucket, get the credentials for the staging bucket and add them to the S3 config in your `config/local.js`.
-
-Note that the values shown in the examples below are meant to serve only as an example.
-You will need to look at the staging environment to fetch the actual values.
-
-```
-s3: {
-  accessKeyId: "ABC123",
-  secretAccessKey: "456def",
-  region: "us-gov-west-1",
-  bucket: "789ghi",
-}
-```
-
-* Run the server with `yarn start` at the directory of the project on your local computer. You can use `yarn watch` to automatically restart the server and rebuild front end assets on file change, which is useful for development.
-
-#### Build the server and the front-end
-
-There are really two applications in one repo here. Right now we're OK with that because we're moving quick to get done with the prototypal phase of the project.
-
-If you are working on the front-end of the application, the things you need to know are:
-
-0. It is a React based application
-0. It is built with `webpack`
-0. It lives in `/frontend`
-
-To analyze the contents of the front end JavaScript bundle, use `yarn analyze-webpack` after a build. This will launch a browser window showing a visualization of all the code that makes up the bundle.
 
 #### Using Postgres
 
