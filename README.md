@@ -30,7 +30,7 @@ Before you start, ensure you have the following installed:
 1. Make a copy of `config/local.sample.js` and name it `local.js` and place it in the `config` folder.
 This will be the file that holds your S3 and SQS configurations.
 1. [Register a new OAuth application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a `Client ID` and `Client Secret`. Add these values to `config/local.js`.
-    ```json
+    ```js
     passport: {
       github: {
         options: {
@@ -42,7 +42,7 @@ This will be the file that holds your S3 and SQS configurations.
     }
     ```
 1. [Register or create a new GitHub organization](https://github.com/settings/organizations). Find your organization's ID by visiting `https://api.github.com/orgs/<your-org-name>` and copying the `id` into the whitelist of `organizations` in `config/local.js`.
-    ```json
+    ```js
     organizations: [
       99999999 // your org added here
     ]
