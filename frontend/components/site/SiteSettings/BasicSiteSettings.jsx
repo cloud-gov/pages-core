@@ -37,7 +37,7 @@ export const BasicSiteSettings = ({
             <p className="well-text">
               These settings control the primary branch Federalist uses to build your site.
               <br />
-              After your DNS is pointed to Federalist, set the <a href="https://federalist-docs.18f.gov/pages/how-federalist-works/custom-urls/" target="_blank" rel="noopener noreferrer">live domain</a> to ensure the site builds correctly.
+              After your DNS is pointed to Federalist, set the <a href="https://federalist-docs.18f.gov/pages/how-federalist-works/custom-urls/" target="_blank" rel="noopener noreferrer">live URL</a> to ensure the site builds correctly.
             </p>
             <label htmlFor="defaultBranchInput">
               Branch name:
@@ -49,7 +49,7 @@ export const BasicSiteSettings = ({
               name="defaultBranch"
               className="form-control"
             />
-            <label htmlFor="domainInput">Live domain:</label>
+            <label htmlFor="domainInput">Live URL:</label>
             <Field
               name="domain"
               component={p =>
@@ -83,7 +83,7 @@ export const BasicSiteSettings = ({
               type="text"
               placeholder="Branch name"
             />
-            <label htmlFor="demoDomainInput">Demo domain:</label>
+            <label htmlFor="demoDomainInput">Demo URL:</label>
             <Field
               name="demoDomain"
               component={p =>
