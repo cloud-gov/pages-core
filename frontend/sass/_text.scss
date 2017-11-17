@@ -2,32 +2,7 @@ body {
   color: $text-color;
   font-family: $sans-serif;
 }
-// Scott start styles
-.usa-hero-callout {
-  max-width: 40rem;
-  background-color: $header-bg-color;
-  padding: 3rem;
-  a {
-    color: #fff;
-  }
-}
-.build-count {
-  background-color: $well-bg-color;
-  text-align: center;
-  color: inherit;
-  p {
-    margin-top: 0;
-    padding-top: 1rem;
-  }
-}
-.navbar-links {
-  .usa-button {
-    margin-top: -.4rem;
-    margin-bottom: 0;
-  }
-}
 
-// Scott END Styles
 h1,
 h2,
 h3,
@@ -45,6 +20,7 @@ h1 {
 p {
   font-family: $serif;
   font-size: 16px;
+  font-style: italic;
 
   &.small {
     font-size: 14px;
