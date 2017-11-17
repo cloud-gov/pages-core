@@ -65,7 +65,7 @@ describe('Main Site', () => {
           .expect(200)
       )
       .then((response) => {
-        expect(response.text.indexOf('Federalist has deployed 7 site updates in the past week.')).to.be.above(-1);
+        expect(response.text.indexOf('7 site updates in the past week.')).to.be.above(-1);
         done();
       })
       .catch(done);
