@@ -61,7 +61,7 @@ export class TemplateList extends React.Component {
     // generate a two-dimensional array of template keys
     const templateRows = createRowsOf(templateKeys, cellsPerRow);
     // i.e. 'whole', 'half', 'third', or 'fourth'
-    const cellSize = CELL_WIDTHS[cellsPerRow];
+    // const cellSize = CELL_WIDTHS[cellsPerRow];
 
     let index = 0;
 

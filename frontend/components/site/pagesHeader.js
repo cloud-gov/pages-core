@@ -23,15 +23,15 @@ const PagesHeader = ({ owner, repository, title, viewLink }) => (
       <div className="header-title">
         <h1>
           {owner}/{repository}
-          <GitHubRepoLink owner={owner} repository={repository} />
         </h1>
-        <p>{title}</p>
+        <GitHubRepoLink owner={owner} repository={repository} />
+        <h2>{title}</h2>
       </div>
     </div>
     <div className="usa-width-one-third">
       <Link
         role="button"
-        className="usa-button usa-button-big pull-right icon icon-view icon-white"
+        className="usa-button pull-right icon icon-view icon-white"
         alt="View this website"
         target="_blank"
         rel="noopener noreferrer"

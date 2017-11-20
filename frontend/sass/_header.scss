@@ -83,15 +83,13 @@ $logo-height: 29px;
 }
 
 .header-icon {
-  height: 55px;
-  width: 90px;
+  height: 35px;
+  display: inline-block;
+  margin-right: 10px;
+  vertical-align: middle;
 }
 
 .header-title {
-  display: flex;
-  margin-left: 1em;
-  flex-direction: column;
-  justify-content: space-between;
 
   h1 {
     font-size: 2.8rem;
@@ -101,11 +99,6 @@ $logo-height: 29px;
   p {
     line-height: 1em;
     margin: 0;
-  }
-
-  .repo-link svg {
-    width: 24px;
-    height: 24px;
   }
 }
 
