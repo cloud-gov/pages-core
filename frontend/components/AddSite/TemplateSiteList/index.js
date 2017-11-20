@@ -70,16 +70,16 @@ export class TemplateList extends React.Component {
         {row.map((templateName) => {
           const template = templates[templateName];
           return (
-              <TemplateSite
-                name={templateName}
-                index={index++} // eslint-disable-line no-plusplus
-                thumb={template.thumb}
-                active={this.state.activeChildId}
-                handleChooseActive={this.handleChooseActive}
-                handleSubmit={this.props.handleSubmitTemplate}
-                defaultOwner={this.props.defaultOwner}
-                {...template}
-              />
+            <TemplateSite
+              name={templateName}
+              index={index++} // eslint-disable-line no-plusplus
+              thumb={template.thumb}
+              active={this.state.activeChildId}
+              handleChooseActive={this.handleChooseActive}
+              handleSubmit={this.props.handleSubmitTemplate}
+              defaultOwner={this.props.defaultOwner}
+              {...template}
+            />
           );
         })}
       </div>
@@ -88,8 +88,8 @@ export class TemplateList extends React.Component {
     return (
       <div>
         <div className="usa-grid">
-            <h2>Choose from one of our templates</h2>
-            {templateGrid}
+          <h2>Choose from one of our templates</h2>
+          {templateGrid}
         </div>
 
       </div>

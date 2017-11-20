@@ -56,54 +56,56 @@ class TemplateSite extends React.Component {
   render() {
     return (
       <div className="flexbox-item well">
-          <div className="well-heading">
-            <img data-action="name-site" className="thumbnail"
-              src={this.props.thumb}
-              alt={`Thumbnail screenshot for the ${this.props.title} template`}
-            />
-            <h3 className="well-title">{this.props.title}</h3>
-          </div>
-          <div className="well-text">
-            <p>{this.props.description}</p>
-            {this.getFormVisible() ?
-              <form
-                className="new-site-form"
-                onSubmit={this.handleSubmit}
-              >
-                <label htmlFor="repository">What GitHub account will own your site?</label>
-                <input
-                  name="owner"
-                  type="text"
-                  value={this.state.owner}
-                  onChange={this.handleChange}
-                />
-                <label htmlFor="repository">Name your new site</label>
-                <input
-                  name="repository"
-                  type="text"
-                  value={this.state.repository}
-                  onChange={this.handleChange}
-                />
-                <input type="submit" value="Create site" />
-              </form>
-            : null}
-          </div>
-          <div className="well-footer">
-            <a
-              href={this.props.example}
-              target="_blank"
-              rel="noopener noreferrer"
-              role="button"
+        <div className="well-heading">
+          <img
+            data-action="name-site"
+            className="thumbnail"
+            src={this.props.thumb}
+            alt={`Thumbnail screenshot for the ${this.props.title} template`}
+          />
+          <h3 className="well-title">{this.props.title}</h3>
+        </div>
+        <div className="well-text">
+          <p>{this.props.description}</p>
+          {this.getFormVisible() ?
+            <form
+              className="new-site-form"
+              onSubmit={this.handleSubmit}
             >
-              View template
-            </a>
-            <button
-              className="usa-button"
-              onClick={this.handleChooseActive}
-            >
-              Use this template
-            </button>
-          </div>
+              <label htmlFor="repository">What GitHub account will own your site?</label>
+              <input
+                name="owner"
+                type="text"
+                value={this.state.owner}
+                onChange={this.handleChange}
+              />
+              <label htmlFor="repository">Name your new site</label>
+              <input
+                name="repository"
+                type="text"
+                value={this.state.repository}
+                onChange={this.handleChange}
+              />
+              <input type="submit" value="Create site" />
+            </form>
+          : null}
+        </div>
+        <div className="well-footer">
+          <a
+            href={this.props.example}
+            target="_blank"
+            rel="noopener noreferrer"
+            role="button"
+          >
+            View template
+          </a>
+          <button
+            className="usa-button"
+            onClick={this.handleChooseActive}
+          >
+            Use this template
+          </button>
+        </div>
       </div>
     );
   }
