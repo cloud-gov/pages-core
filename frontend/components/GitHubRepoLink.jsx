@@ -19,7 +19,7 @@ const GitHubRepoLink = ({ owner, repository, branch }) => {
       title={title}
       target="_blank"
       rel="noopener noreferrer"
-    >View repo&nbsp;
+    >
       <GitHubMark />
     </a>
   );

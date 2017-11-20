@@ -23,8 +23,8 @@ const PagesHeader = ({ owner, repository, title, viewLink }) => (
       <div className="header-title">
         <h1>
           {owner}/{repository}
+          &nbsp;<GitHubRepoLink owner={owner} repository={repository} />
         </h1>
-        <GitHubRepoLink owner={owner} repository={repository} />
         <h2>{title}</h2>
       </div>
     </div>
