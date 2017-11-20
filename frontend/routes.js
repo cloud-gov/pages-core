@@ -8,7 +8,7 @@ import SiteBuilds from './components/site/siteBuilds';
 import SiteBuildLogs from './components/site/siteBuildLogs';
 import SiteUsers from './components/site/SiteUsers';
 import SitePublishedBranchesTable from './components/site/sitePublishedBranchesTable';
-import SitePublishedFilesTable from './components/site/sitePublishedFilesTable';
+import SitePublishedFilesTable from './components/site/SitePublishedFilesTable';
 import SiteGitHubBranches from './components/site/SiteGitHubBranches';
 import SiteSettings from './components/site/SiteSettings';
 import AddSite from './components/AddSite';
