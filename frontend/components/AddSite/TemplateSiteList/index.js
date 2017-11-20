@@ -66,14 +66,10 @@ export class TemplateList extends React.Component {
     let index = 0;
 
     const templateGrid = templateRows.map(row => (
-      <div className="usa-grid" key={row}>
+      <div className="flexbox-grid flexbox-grid-4" key={row}>
         {row.map((templateName) => {
           const template = templates[templateName];
           return (
-            <div
-              className={`usa-width-one-${cellSize}`}
-              key={templateName}
-            >
               <TemplateSite
                 name={templateName}
                 index={index++} // eslint-disable-line no-plusplus
@@ -84,7 +80,6 @@ export class TemplateList extends React.Component {
                 defaultOwner={this.props.defaultOwner}
                 {...template}
               />
-            </div>
           );
         })}
       </div>
@@ -93,11 +88,10 @@ export class TemplateList extends React.Component {
     return (
       <div>
         <div className="usa-grid">
-          <div className="usa-width-one-whole">
             <h2>Choose from one of our templates</h2>
-          </div>
+            {templateGrid}
         </div>
-        {templateGrid}
+
       </div>
     );
   }

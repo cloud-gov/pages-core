@@ -2,16 +2,46 @@
 
 .well {
   background-color: $well-bg-color;
-  margin-top: 1.5em;
-  padding: 1em;
+  padding: 1.5rem;
+  position: relative;
 }
 
 .well-heading {
   margin-bottom: .3rem;
   margin-top: 0;
+  .well-title {
+    margin-bottom:0;
+  }
 }
 
 .well-text {
   margin-bottom: 0;
   margin-top: 0;
+  flex: 1 1 auto;
+}
+.well-footer {
+    padding: 2rem 0 0;
+    :last-child {
+      margin-bottom: 0;
+    }
+}
+.flexbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  &.flexbox-grid-4 {
+    .flexbox-item {
+      display:block;
+      flex-direction: column;
+      display: flex;
+      flex: 0 0 240px;
+      margin-bottom: 20px;
+      &:not(:last-child) {
+        margin-right: 5px;
+      }
+      &:not(:first-child) {
+        margin-right: 5px;
+      }
+    }
+  }
 }
