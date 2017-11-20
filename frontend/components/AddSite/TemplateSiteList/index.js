@@ -11,7 +11,6 @@ const propTypes = {
 };
 
 const MAX_CELLS_PER_ROW = 4;
-// const CELL_WIDTHS = ['', 'whole', 'half', 'third', 'fourth'];
 
 /**
  * Create a two-dimensional array of values that represent one or more rows
@@ -60,8 +59,6 @@ export class TemplateList extends React.Component {
     const cellsPerRow = Math.min(templateKeys.length, MAX_CELLS_PER_ROW);
     // generate a two-dimensional array of template keys
     const templateRows = createRowsOf(templateKeys, cellsPerRow);
-    // i.e. 'whole', 'half', 'third', or 'fourth'
-    // const cellSize = CELL_WIDTHS[cellsPerRow];
 
     let index = 0;
 

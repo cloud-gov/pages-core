@@ -1,0 +1,20 @@
+.flexbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  &.flexbox-grid-4 {
+    .flexbox-item {
+      display:block;
+      flex-direction: column;
+      display: flex;
+      flex: 0 0 240px;
+      margin-bottom: 20px;
+      &:not(:last-child) {
+        margin-right: 5px;
+      }
+      &:not(:first-child) {
+        margin-right: 5px;
+      }
+    }
+  }
+}
