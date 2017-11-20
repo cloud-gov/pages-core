@@ -30,10 +30,18 @@ function listFolders(path) {
 
 
 function listFiles(path) {
+  let prefixPath = path;
+  // add a trailing slash to the prefix if not there already
+  // to prevent getting files published at a repo whose name
+  // is a superset of the given path name (ex: `mysite-2` and `mysite`).
+  if (prefixPath[prefixPath.length - 1] !== '/') {
+    prefixPath = `${prefixPath}/`;
+  }
+
   return new Promise((resolve, reject) => {
     s3Client.listObjects({
       Bucket: s3Config.bucket,
-      Prefix: path,
+      Prefix: prefixPath,
     }, (err, data) => {
       if (err) {
         reject(err);

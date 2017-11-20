@@ -28,15 +28,15 @@ describe('Published Files API', () => {
       const cookiePromise = authenticatedSession(userPromise);
 
       AWSMocks.mocks.S3.listObjects = (params, callback) => {
-        const prefix = `site/${site.owner}/${site.repository}`;
+        const prefix = `site/${site.owner}/${site.repository}/`;
         expect(params.Bucket).to.equal(config.s3.bucket);
         expect(params.Prefix).to.equal(prefix);
 
         callback(null, {
           Contents: [
-            { Key: `${prefix}/abc`, Size: 123 },
-            { Key: `${prefix}/abc/def`, Size: 456 },
-            { Key: `${prefix}/ghi`, Size: 789 },
+            { Key: `${prefix}abc`, Size: 123 },
+            { Key: `${prefix}abc/def`, Size: 456 },
+            { Key: `${prefix}ghi`, Size: 789 },
           ],
         });
       };
