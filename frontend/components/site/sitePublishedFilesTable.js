@@ -38,11 +38,13 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   renderBranchFileRow(file) {
-    const viewFileLink = `${file.publishedBranch.viewLink}/${file.name}`;
-    return (<tr key={file.name}>
-      <td>{file.name}</td>
-      <td><a href={viewFileLink} target="_blank" rel="noopener noreferrer">View</a></td>
-    </tr>);
+    const viewFileLink = `${file.publishedBranch.site.viewLink}${file.name}`;
+    return (
+      <tr key={viewFileLink}>
+        <td>{file.name}</td>
+        <td><a href={viewFileLink} target="_blank" rel="noopener noreferrer">View</a></td>
+      </tr>
+    );
   }
 
   renderLoadingState() {
