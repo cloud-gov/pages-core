@@ -11,7 +11,7 @@ const propTypes = {
 };
 
 const MAX_CELLS_PER_ROW = 4;
-const CELL_WIDTHS = ['', 'whole', 'half', 'third', 'fourth'];
+//const CELL_WIDTHS = ['', 'whole', 'half', 'third', 'fourth'];
 
 /**
  * Create a two-dimensional array of values that represent one or more rows
