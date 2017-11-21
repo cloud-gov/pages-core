@@ -18,7 +18,6 @@ Before you start, ensure you have the following installed:
 - [nvm](https://github.com/creationix/nvm#installation) or [n](https://github.com/tj/n#installation)
 - [yarn](https://yarnpkg.com/)
 - [Postgres](https://www.postgresql.org/)
-- [Docker](https://docs.docker.com/engine/installation/mac/)
 - [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
 
 
