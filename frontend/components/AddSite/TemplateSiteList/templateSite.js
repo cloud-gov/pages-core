@@ -91,20 +91,24 @@ class TemplateSite extends React.Component {
           : null}
         </div>
         <div className="well-footer">
-          <a
-            href={this.props.example}
-            target="_blank"
-            rel="noopener noreferrer"
-            role="button"
-          >
-            View template
-          </a>
-          <button
-            className="usa-button"
-            onClick={this.handleChooseActive}
-          >
-            Use this template
-          </button>
+          {!this.getFormVisible() &&
+            <div>
+              <a
+                href={this.props.example}
+                target="_blank"
+                rel="noopener noreferrer"
+                role="button"
+              >
+                View template
+              </a>
+              <button
+                className="usa-button"
+                onClick={this.handleChooseActive}
+              >
+                Use this template
+              </button>
+            </div>
+          }
         </div>
       </div>
     );
