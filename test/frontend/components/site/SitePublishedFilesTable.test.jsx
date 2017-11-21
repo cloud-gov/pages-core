@@ -2,12 +2,12 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
-import SitePublishedFilesTable from '../../../../frontend/components/site/sitePublishedFilesTable';
+import SitePublishedFilesTable from '../../../../frontend/components/site/SitePublishedFilesTable';
 
 
 describe('<SitePublishedFilesTable/>', () => {
   it('should render the branch name', () => {
-    const publishedBranch = { name: 'master', viewLink: 'www.example.gov/master' };
+    const publishedBranch = { name: 'master', site: { viewLink: 'www.example.gov/master' } };
     const props = {
       params: { id: '1', name: 'master' },
       publishedFiles: {
@@ -23,8 +23,8 @@ describe('<SitePublishedFilesTable/>', () => {
   });
 
   it('should render a table with the files for the given branch', () => {
-    const correctBranch = { name: 'master', viewLink: 'www.example.gov/master' };
-    const incorrectBranch = { name: 'preview', viewLink: 'www.example.gov/preview' };
+    const correctBranch = { name: 'master', site: { viewLink: 'www.example.gov/master' } };
+    const incorrectBranch = { name: 'preview', site: { viewLink: 'www.example.gov/preview' } };
     const props = {
       params: { id: '1', name: 'master' },
       publishedFiles: {

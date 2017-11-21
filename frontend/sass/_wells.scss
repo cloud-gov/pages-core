@@ -2,16 +2,27 @@
 
 .well {
   background-color: $well-bg-color;
-  margin-top: 1.5em;
-  padding: 1em;
+  padding: 1.5rem;
+  position: relative;
+  margin-bottom: 1.5rem;
 }
 
 .well-heading {
   margin-bottom: .3rem;
   margin-top: 0;
+  .well-title {
+    margin-bottom:0;
+  }
 }
 
 .well-text {
   margin-bottom: 0;
   margin-top: 0;
+  flex: 1 1 auto;
+}
+.well-footer {
+    padding: 2rem 0 0;
+    :last-child {
+      margin-bottom: 0;
+    }
 }

@@ -55,28 +55,51 @@ class TemplateSite extends React.Component {
 
   render() {
     return (
-      <div className="template-block">
-        <div className="well">
-          <div className="well-heading">
-            <h3>{this.props.title}</h3>
-          </div>
-          <div className="well-text">
-            <a data-action="name-site" className="thumbnail">
-              <img
-                src={this.props.thumb}
-                alt={`Thumbnail screenshot for the ${this.props.title} template`}
+      <div className="flexbox-item well">
+        <div className="well-heading">
+          <img
+            data-action="name-site"
+            className="thumbnail"
+            src={this.props.thumb}
+            alt={`Thumbnail screenshot for the ${this.props.title} template`}
+          />
+          <h3 className="well-title">{this.props.title}</h3>
+        </div>
+        <div className="well-text">
+          <p>{this.props.description}</p>
+          {this.getFormVisible() ?
+            <form
+              className="new-site-form"
+              onSubmit={this.handleSubmit}
+            >
+              <label htmlFor="repository">What GitHub account will own your site?</label>
+              <input
+                name="owner"
+                type="text"
+                value={this.state.owner}
+                onChange={this.handleChange}
               />
-            </a>
-            <p>{this.props.description}</p>
-            <div className="button_wrapper">
+              <label htmlFor="repository">Name your new site</label>
+              <input
+                name="repository"
+                type="text"
+                value={this.state.repository}
+                onChange={this.handleChange}
+              />
+              <input type="submit" value="Create site" />
+            </form>
+          : null}
+        </div>
+        <div className="well-footer">
+          {!this.getFormVisible() &&
+            <div>
               <a
-                className="usa-button usa-button-outline"
                 href={this.props.example}
                 target="_blank"
                 rel="noopener noreferrer"
                 role="button"
               >
-                Example
+                View template
               </a>
               <button
                 className="usa-button"
@@ -85,29 +108,7 @@ class TemplateSite extends React.Component {
                 Use this template
               </button>
             </div>
-            {this.getFormVisible() ?
-              <form
-                className="new-site-form"
-                onSubmit={this.handleSubmit}
-              >
-                <label htmlFor="repository">What GitHub account will own your site?</label>
-                <input
-                  name="owner"
-                  type="text"
-                  value={this.state.owner}
-                  onChange={this.handleChange}
-                />
-                <label htmlFor="repository">Name your new site</label>
-                <input
-                  name="repository"
-                  type="text"
-                  value={this.state.repository}
-                  onChange={this.handleChange}
-                />
-                <input type="submit" value="Create site" />
-              </form>
-            : null}
-          </div>
+          }
         </div>
       </div>
     );

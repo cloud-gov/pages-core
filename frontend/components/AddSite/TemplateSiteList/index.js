@@ -11,7 +11,6 @@ const propTypes = {
 };
 
 const MAX_CELLS_PER_ROW = 4;
-const CELL_WIDTHS = ['', 'whole', 'half', 'third', 'fourth'];
 
 /**
  * Create a two-dimensional array of values that represent one or more rows
@@ -60,31 +59,24 @@ export class TemplateList extends React.Component {
     const cellsPerRow = Math.min(templateKeys.length, MAX_CELLS_PER_ROW);
     // generate a two-dimensional array of template keys
     const templateRows = createRowsOf(templateKeys, cellsPerRow);
-    // i.e. 'whole', 'half', 'third', or 'fourth'
-    const cellSize = CELL_WIDTHS[cellsPerRow];
 
     let index = 0;
 
     const templateGrid = templateRows.map(row => (
-      <div className="usa-grid" key={row}>
+      <div className="flexbox-grid flexbox-grid-4" key={row}>
         {row.map((templateName) => {
           const template = templates[templateName];
           return (
-            <div
-              className={`usa-width-one-${cellSize}`}
-              key={templateName}
-            >
-              <TemplateSite
-                name={templateName}
-                index={index++} // eslint-disable-line no-plusplus
-                thumb={template.thumb}
-                active={this.state.activeChildId}
-                handleChooseActive={this.handleChooseActive}
-                handleSubmit={this.props.handleSubmitTemplate}
-                defaultOwner={this.props.defaultOwner}
-                {...template}
-              />
-            </div>
+            <TemplateSite
+              name={templateName}
+              index={index++} // eslint-disable-line no-plusplus
+              thumb={template.thumb}
+              active={this.state.activeChildId}
+              handleChooseActive={this.handleChooseActive}
+              handleSubmit={this.props.handleSubmitTemplate}
+              defaultOwner={this.props.defaultOwner}
+              {...template}
+            />
           );
         })}
       </div>
@@ -93,11 +85,9 @@ export class TemplateList extends React.Component {
     return (
       <div>
         <div className="usa-grid">
-          <div className="usa-width-one-whole">
-            <h2>Choose from one of our templates</h2>
-          </div>
+          <h2>Choose from one of our templates</h2>
+          {templateGrid}
         </div>
-        {templateGrid}
       </div>
     );
   }
