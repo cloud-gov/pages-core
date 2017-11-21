@@ -34,7 +34,9 @@ const SiteListItem = ({ site }) =>
       <h3>
         <Link to={`/sites/${site.id}`} title="View site settings">
           { site.owner }/{ site.repository }
-        </Link>{' '}<GitHubRepoLink owner={site.owner} repository={site.repository} />
+        </Link>
+        {' '}
+        <GitHubRepoLink owner={site.owner} repository={site.repository} />
       </h3>
       <PublishedState site={site} />
     </div>

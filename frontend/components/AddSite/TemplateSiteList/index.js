@@ -88,7 +88,6 @@ export class TemplateList extends React.Component {
           <h2>Choose from one of our templates</h2>
           {templateGrid}
         </div>
-
       </div>
     );
   }
