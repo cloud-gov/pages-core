@@ -5,7 +5,7 @@ module.exports = {
     branch: 'master',
     example: 'https://federalist-report-template.18f.gov',
     title: 'Basic Report Template',
-    description: 'A basic template to host a set of pages about a recent report or order',
+    description: 'A basic template to host a set of pages about a recent report or order.',
     thumb: '/images/federalist-report-template.jpg',
   },
   team: {
@@ -14,7 +14,7 @@ module.exports = {
     branch: 'master',
     example: 'https://federalist-modern-team-template.18f.gov',
     title: 'Modern Team Template',
-    description: 'Simple Jekyll site to showcase the work of an organization',
+    description: 'A simple template to showcase the work of an organization.',
     thumb: '/images/federalist-modern-team-template.jpg',
   },
   landing: {
@@ -23,7 +23,7 @@ module.exports = {
     branch: 'master',
     example: 'https://federalist-landing-template.18f.gov',
     title: 'Landing Page Template',
-    description: 'Single page to host information about a specific topic or report',
+    description: 'A one page template to show information about a specific topic or report.',
     thumb: '/images/federalist-landing-template.jpg',
   },
   uswds: {
@@ -32,7 +32,7 @@ module.exports = {
     branch: 'master',
     example: 'https://federalist-uswds-template.18f.gov',
     title: 'USWDS Template',
-    description: 'A flexible Jekyll implementation of the U.S. Web Design Standards',
+    description: 'A flexible template using the U.S. Web Design Standards.',
     thumb: '/images/federalist-uswds-template.jpg',
   },
 };
