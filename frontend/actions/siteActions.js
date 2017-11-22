@@ -54,7 +54,11 @@ export default {
 
   updateSite(site, data) {
     return federalist.updateSite(site, data)
-      .then(dispatchSiteUpdatedAction)
+      .then((updatedSite) => {
+        if (updatedSite) {
+          dispatchSiteUpdatedAction(updatedSite);
+        }
+      })
       .catch(alertError);
   },
 
