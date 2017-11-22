@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const logger = require('winston');
 
 const BuildCounter = require('../services/BuildCounter');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
@@ -7,6 +8,10 @@ const config = require('../../config');
 
 function loadAssetManifest() {
   const manifestPath = path.join(__dirname, '..', '..', 'webpack-manifest.json');
+  if (!fs.existsSync(manifestPath)) {
+    logger.error('webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?');
+    throw new Error();
+  }
   return JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
 }
 
