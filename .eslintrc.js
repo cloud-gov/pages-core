@@ -1,6 +1,9 @@
 module.exports = {
-  extends: 'airbnb',
-  plugins: ['scanjs-rules', 'no-unsanitized'],
+  extends: [
+    'airbnb',
+    'plugin:security/recommended',
+  ],
+  plugins: ['security'],
   rules: {
     /* airbnb config overrides */
     'react/jsx-filename-extension': [0],
@@ -17,14 +20,5 @@ module.exports = {
         functions: 'never',
       },
     ],
-
-    /* scanjs config overrides */
-    // scanjs is looking for a different `connect`
-    // than the one we use often from react-redux
-    call_connect: [0],
-
-    /* no-unsanitized rules */
-    'no-unsanitized/method': 2,
-    'no-unsanitized/property': 2,
   },
 };
