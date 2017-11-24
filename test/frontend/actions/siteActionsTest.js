@@ -181,7 +181,10 @@ describe('siteActions', () => {
 
       const actual = fixture.updateSite(siteToUpdate, data);
 
-      return validateResultDispatchesHttpAlertError(actual, errorMessage);
+      return actual.then(() => {
+        expect(dispatchSiteUpdatedAction.called).to.be.false;
+        validateResultDispatchesHttpAlertError(actual, errorMessage);
+      });
     });
   });
 
