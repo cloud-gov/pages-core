@@ -43,15 +43,15 @@ describe('S3PublishedFileLister', () => {
       let site;
 
       AWSMocks.mocks.S3.listObjects = (params, callback) => {
-        const prefix = `site/${site.owner}/${site.repository}`;
+        const prefix = `site/${site.owner}/${site.repository}/`;
         expect(params.Bucket).to.equal(config.s3.bucket);
         expect(params.Prefix).to.equal(prefix);
 
         callback(null, {
           Contents: [
-            { Key: `${prefix}/abc`, Size: 123 },
-            { Key: `${prefix}/abc/def`, Size: 456 },
-            { Key: `${prefix}/ghi`, Size: 789 },
+            { Key: `${prefix}abc`, Size: 123 },
+            { Key: `${prefix}abc/def`, Size: 456 },
+            { Key: `${prefix}ghi`, Size: 789 },
           ],
         });
       };
@@ -73,15 +73,15 @@ describe('S3PublishedFileLister', () => {
       let site;
 
       AWSMocks.mocks.S3.listObjects = (params, callback) => {
-        const prefix = `demo/${site.owner}/${site.repository}`;
+        const prefix = `demo/${site.owner}/${site.repository}/`;
         expect(params.Bucket).to.equal(config.s3.bucket);
         expect(params.Prefix).to.equal(prefix);
 
         callback(null, {
           Contents: [
-            { Key: `${prefix}/abc`, Size: 123 },
-            { Key: `${prefix}/abc/def`, Size: 456 },
-            { Key: `${prefix}/ghi`, Size: 789 },
+            { Key: `${prefix}abc`, Size: 123 },
+            { Key: `${prefix}abc/def`, Size: 456 },
+            { Key: `${prefix}ghi`, Size: 789 },
           ],
         });
       };
@@ -103,15 +103,15 @@ describe('S3PublishedFileLister', () => {
       let site;
 
       AWSMocks.mocks.S3.listObjects = (params, callback) => {
-        const prefix = `preview/${site.owner}/${site.repository}/preview`;
+        const prefix = `preview/${site.owner}/${site.repository}/preview/`;
         expect(params.Bucket).to.equal(config.s3.bucket);
         expect(params.Prefix).to.equal(prefix);
 
         callback(null, {
           Contents: [
-            { Key: `${prefix}/abc`, Size: 123 },
-            { Key: `${prefix}/abc/def`, Size: 456 },
-            { Key: `${prefix}/ghi`, Size: 789 },
+            { Key: `${prefix}abc`, Size: 123 },
+            { Key: `${prefix}abc/def`, Size: 456 },
+            { Key: `${prefix}ghi`, Size: 789 },
           ],
         });
       };
