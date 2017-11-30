@@ -4,6 +4,7 @@ import { shallow } from 'enzyme';
 
 import SiteBuilds from '../../../../frontend/components/site/siteBuilds';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
+import GitHubRepoLink from '../../../../frontend/components/GitHubRepoLink';
 
 let user;
 let site;
@@ -27,6 +28,7 @@ describe('<SiteBuilds/>', () => {
       createdAt: '2016-12-28T12:00:00',
       completedAt: '2016-12-28T12:05:00',
       state: 'success',
+      commitSha: '123A',
     };
     props = {
       builds: {
@@ -62,6 +64,22 @@ describe('<SiteBuilds/>', () => {
 
     const userCell = wrapper.find('tr').at(1).find('td').at(userIndex);
     expect(userCell.text()).to.equal('');
+  });
+
+  it('should render a `-` if the commit SHA is absent', () => {
+    build.commitSha = null;
+
+    const wrapper = shallow(<SiteBuilds {...props} />);
+    const shaIndex = columnIndex(wrapper, 'Commit SHA');
+    const shaCell = wrapper.find('tr').at(1).find('td').at(shaIndex);
+
+    expect(shaCell.text()).to.equal('-');
+  });
+
+  it('should render a `GitHubRepoLink` component if commit SHA present', () => {
+    const wrapper = shallow(<SiteBuilds {...props} />);
+
+    expect(wrapper.find(GitHubRepoLink)).to.have.length(1);
   });
 
   it('should render a button to refresh builds', () => {

@@ -37,4 +37,13 @@ describe('<GitHubRepoLink/>', () => {
     expect(anchor.exists()).to.be.true;
     expect(anchor.prop('href')).to.equal('https://github.com/spam/potato/tree/%23-hash-%23');
   });
+
+  it('links to a specific commit', () => {
+    const props = { owner: 'zookeeni', repository: 'veggies', sha: '123A' };
+    const wrapper = shallow(<GitHubRepoLink {...props} />);
+    const commitUrl = `https://github.com/${props.owner}/${props.repository}/commits/${props.sha}`;
+    const anchor = wrapper.find('a');
+
+    expect(anchor.prop('href')).to.equal(commitUrl);
+  });
 });
