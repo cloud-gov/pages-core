@@ -18,6 +18,7 @@ describe('siteActions', () => {
   let alertSuccess;
   let alertError;
   let updateRouterToSitesUri;
+  let updateRouterToSiteBuildsUri;
   let dispatchSitesFetchStartedAction;
   let dispatchSitesReceivedAction;
   let dispatchSiteAddedAction;
@@ -51,6 +52,7 @@ describe('siteActions', () => {
     alertError = stub();
 
     updateRouterToSitesUri = stub();
+    updateRouterToSiteBuildsUri = stub();
     dispatchSitesFetchStartedAction = stub();
     dispatchSitesReceivedAction = stub();
     dispatchSiteAddedAction = stub();
@@ -63,6 +65,7 @@ describe('siteActions', () => {
     fixture = proxyquire('../../../frontend/actions/siteActions', {
       './dispatchActions': {
         updateRouterToSitesUri,
+        updateRouterToSiteBuildsUri,
         dispatchSitesFetchStartedAction,
         dispatchSitesReceivedAction,
         dispatchSiteAddedAction,
@@ -135,7 +138,7 @@ describe('siteActions', () => {
       const actual = fixture.addSite(siteToAdd);
 
       return actual.then(() => {
-        expect(updateRouterToSitesUri.calledOnce).to.be.true;
+        expect(updateRouterToSiteBuildsUri.calledOnce).to.be.true;
         expect(dispatchSiteAddedAction.calledWith(site)).to.be.true;
       });
     });
