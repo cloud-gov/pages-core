@@ -20,7 +20,7 @@ Before you start, ensure you have the following installed:
 - [Postgres](https://www.postgresql.org/)
 - [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
 
-You'll also need to ask for `space-developer` permissions for the federalist cloud.gov org in the Federalist slack channel.
+You'll also need to ask for `SpaceDeveloper` permissions for the federalist cloud.gov org in the Federalist slack channel.
 
 
 ### Running locally (development)
