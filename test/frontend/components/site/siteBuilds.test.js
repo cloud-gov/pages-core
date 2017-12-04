@@ -71,7 +71,7 @@ describe('<SiteBuilds/>', () => {
     build.commitSha = null;
 
     const wrapper = shallow(<SiteBuilds {...props} />);
-    const shaIndex = columnIndex(wrapper, 'Commit SHA');
+    const shaIndex = columnIndex(wrapper, 'Commit');
     const shaCell = wrapper.find('tr').at(1).find('td').at(shaIndex);
 
     expect(shaCell.text()).to.equal('-');

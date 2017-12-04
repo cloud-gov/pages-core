@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const GitHubRepoLink = ({ branch, sha, baseHref, children, ...props }) => {
-  let title = 'View repository';
+  let title;
   let href = baseHref;
 
   if (branch) {
@@ -17,7 +17,7 @@ const GitHubRepoLink = ({ branch, sha, baseHref, children, ...props }) => {
     <a
       className="repo-link"
       href={href}
-      title={props.title || title}
+      title={title || props.title}
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -31,12 +31,14 @@ GitHubRepoLink.propTypes = {
   branch: PropTypes.string,
   sha: PropTypes.string,
   children: PropTypes.node,
+  title: PropTypes.string,
 };
 
 GitHubRepoLink.defaultProps = {
   branch: null,
   sha: null,
   children: null,
+  title: 'View repository',
 };
 
 export default GitHubRepoLink;

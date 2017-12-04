@@ -96,7 +96,7 @@ class SiteBuilds extends React.Component {
         <table className="usa-table-borderless log-table log-table__site-builds">
           <thead>
             <tr>
-              <th scope="col">Commit SHA</th>
+              <th scope="col">Commit</th>
               <th scope="col">Branch</th>
               <th scope="col">User</th>
               <th scope="col">Completed</th>
