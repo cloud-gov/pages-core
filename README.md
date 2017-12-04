@@ -1,7 +1,7 @@
 # Federalist
 
 [![CircleCI](https://circleci.com/gh/18F/federalist.svg?style=svg)](https://circleci.com/gh/18F/federalist)
-[![Code Climate](https://codeclimate.com/github/18F/federalist/badges/gpa.svg)](https://codeclimate.com/github/18F/federalist)
+[![Maintainability](https://api.codeclimate.com/v1/badges/184146beaefded6a509f/maintainability)](https://codeclimate.com/github/18F/federalist/maintainability)
 [![Test Coverage](https://codeclimate.com/github/18F/federalist/badges/coverage.svg)](https://codeclimate.com/github/18F/federalist/coverage)
 [![Dependency Status](https://gemnasium.com/badges/github.com/18F/federalist.svg)](https://gemnasium.com/github.com/18F/federalist)
 
@@ -20,11 +20,16 @@ Before you start, ensure you have the following installed:
 - [Postgres](https://www.postgresql.org/)
 - [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
 
+You'll also need to ask for `SpaceDeveloper` permissions for the federalist cloud.gov org in the Federalist slack channel.
+
 
 ### Running locally (development)
 
 1. Download or clone the `18F/federalist` repository from Github and `cd` to that directory.
 1. Run `nvm use` to ensure you are using the correct version of node.
+1. Create Postgres databases by running
+    - Run `createdb federalist`
+    - Run `createdb federalist-test`
 1. Run `yarn` to load modules and install Jekyll dependencies.
 1. Make a copy of `config/local.sample.js` and name it `local.js` and place it in the `config` folder.
 This will be the file that holds your S3 and SQS configurations.
@@ -46,6 +51,9 @@ This will be the file that holds your S3 and SQS configurations.
       99999999 // your org added here
     ]
     ```
+The organization will need to grant access to federalist, which can be done during:
+  * a first-time login with your GitHub credentials
+  * in the Settings -> Applications -> federalist view in your GitHub Account
 1. Type `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` in terminal.
 1. Visit https://login.fr.cloud.gov/passcode to get a one time passcode.
 1. Enter your passcode back into terminal.
@@ -57,11 +65,9 @@ This will be the file that holds your S3 and SQS configurations.
     - `secret_access_key`
 1. Find the section in the listing of environment variables for SQS and look for the following values and paste those values into the SQS section in your `local.js` file.
     - `FEDERALIST_AWS_BUILD_KEY` is `accessKeyId`
-    - `FEDERALIST_SESSION_SECRET` is `secreyAccessKey`
+    - `FEDERALIST_SESSION_SECRET` is `secretAccessKey`
     - `FEDERALIST_SQS_QUEUE` is `queue`
-1. Create Postgres databases by running
-    - Run `createdb federalist`
-    - Run `createdb federalist-test`
+    - `FEDERALIST_SQS_REGION` is `region`
 1. Great work! The Federalist app is now ready to run locally! :tada:
     - Run `yarn`
     - Run `yarn build`
