@@ -5,7 +5,7 @@ import { shallow } from 'enzyme';
 import GitHubIconLink from '../../../../frontend/components/GitHubLink/GitHubIconLink';
 
 describe('<GitHubIconLink />', () => {
-  const props  = { owner: 'owner', repository: 'a-repo' };
+  const props = { owner: 'owner', repository: 'a-repo' };
   let wrapper;
 
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe('<GitHubIconLink />', () => {
     expect(wrapper.first().shallow().find('GitHubMark')).to.have.length(1);
   });
 
-  it("renders a <GitHubRepoLink/> component", () => {
+  it('renders a <GitHubRepoLink/> component', () => {
     expect(wrapper.first().shallow().find('GitHubRepoLink')).to.have.length(1);
   });
 });

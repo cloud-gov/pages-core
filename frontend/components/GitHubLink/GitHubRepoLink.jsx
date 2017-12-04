@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const GitHubRepoLink =  ({ branch, sha, baseHref, children }) => {
+const GitHubRepoLink = ({ branch, sha, baseHref, children }) => {
   let title = 'View repository';
   let href = baseHref;
 

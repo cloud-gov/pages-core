@@ -19,7 +19,7 @@ describe('<SiteBuilds/>', () => {
     site = {
       id: 5,
       owner: 'user',
-      repository: 'repo'
+      repository: 'repo',
     };
     build = {
       user,
@@ -79,11 +79,11 @@ describe('<SiteBuilds/>', () => {
 
   it('should render a `GitHubLink` component if commit SHA present', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
-    const build = props.builds.data[0];
-    const { commitSha } = build;
-    const { owner, repository } = build.site;
+    const siteBuild = props.builds.data[0];
+    const { commitSha } = siteBuild;
+    const { owner, repository } = siteBuild.site;
 
-    expect(wrapper.find({owner, repository, sha: commitSha })).to.have.length(1);
+    expect(wrapper.find({ owner, repository, sha: commitSha })).to.have.length(1);
   });
 
   it('should render a button to refresh builds', () => {

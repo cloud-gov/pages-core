@@ -4,7 +4,7 @@ import GitHubURLProvider from './GitHubURLProvider';
 import GitHubRepoLink from './GitHubRepoLink';
 
 const propTypes = {
-  children: PropTypes.node
+  children: PropTypes.node,
 };
 
 const GitHubLink = GitHubURLProvider(({ ...props, children }) =>
@@ -12,5 +12,7 @@ const GitHubLink = GitHubURLProvider(({ ...props, children }) =>
     { children }
   </GitHubRepoLink>
 );
+
+GitHubLink.propTypes = propTypes;
 
 export default GitHubLink;

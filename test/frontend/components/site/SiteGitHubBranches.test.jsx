@@ -43,9 +43,9 @@ describe('<SiteGitHubBranches />', () => {
     // TODO: Nested component selectors, like the `Connect(BranchViewLink)` below, don't
     // work in this case because the rendered component has  name of `Component`, which enzyme
     // cant seem to find. Figure out why this is happening
-   expect(rows.find({
+    expect(rows.find({
       owner: props.site.owner,
-      repository: props.site.repository
+      repository: props.site.repository,
     })).to.have.length(2);
     expect(rows.find('Connect(BranchViewLink)')).to.have.length(2);
   });
