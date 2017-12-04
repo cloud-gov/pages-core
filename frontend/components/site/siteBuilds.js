@@ -56,8 +56,9 @@ class SiteBuilds extends React.Component {
         owner={owner}
         repository={repository}
         sha={build.commitSha}
+        title={build.commitSha}
       >
-        {build.commitSha}
+        View Commit
       </GitHubLink>
     );
   }

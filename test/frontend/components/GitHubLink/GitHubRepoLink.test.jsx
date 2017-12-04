@@ -47,4 +47,11 @@ describe('<GitHubRepoLink/>', () => {
 
     expect(anchor.prop('href')).to.equal(commitUrl);
   });
+
+  it('uses overrided title attribute if provided', () => {
+    const props = { owner: 'owner', repository: 'a-repo', title: 'handy explanation' };
+    const wrapper = shallow(<RepoLink {...props} />);
+
+    expect(wrapper.prop('title')).to.equal(props.title);
+  });
 });
