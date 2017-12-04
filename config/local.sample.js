@@ -3,29 +3,31 @@ if (process.env.NODE_ENV !== 'test') {
     passport: {
       github: {
         options: {
-          clientID: '123abc',
-          clientSecret: '456def',
+          clientID: 'GITHUB_OAUTH_CLIENT_ID',
+          clientSecret: 'GITHUB_OAUTH_CLIENT_SECRET',
           callbackURL: 'http://localhost:1337/auth/github/callback',
         },
         organizations: [
-          1234567,
+          1234567, // YOUR GITHUB ORGANIZATION ID
         ],
       },
     },
     postgres: {
       database: 'federalist',
+      host: 'db',
+      user: 'postgres',
     },
     sqs: {
-      accessKeyId: '123abc',
-      secretAccessKey: '456def',
+      accessKeyId: 'SQS_ACCESS_KEY',
+      secretAccessKey: 'SQS_SECRET_KEY',
       region: 'us-gov-west-1',
-      queue: 'https://sqs.us-east-1.amazonaws.com/123abc/456def',
+      queue: 'SQS_URL',
     },
     s3: {
-      accessKeyId: '123abc',
-      secretAccessKey: '456def',
+      accessKeyId: 'S3_ACCESS_KEY',
+      secretAccessKey: 'S3_SECRET_KEY',
       region: 'us-gov-west-1',
-      bucket: 'cg-123-abc-456-def',
+      bucket: 'S3_BUCKET_NAME',
     },
   };
 }

@@ -1,0 +1,29 @@
+version: '3'
+services:
+  app:
+    build:
+      dockerfile: Dockerfile-app
+      context: .
+    command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "watch"]
+    volumes:
+      - .:/app
+      - node-modules:/app/node_modules/
+      - yarn-cache:/app/.yarn-cache/
+    ports:
+      - "1337:1337"
+      - "8888:8888"
+    depends_on:
+      - db
+  db:
+    build:
+      dockerfile: Dockerfile-db
+      context: .
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: federalist
+      POSTGRES_TEST_DB: federalist-test
+volumes:
+  db-data:
+  yarn-cache:
+  node-modules:
