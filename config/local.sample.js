@@ -12,11 +12,6 @@ if (process.env.NODE_ENV !== 'test') {
         ],
       },
     },
-    postgres: {
-      database: 'federalist',
-      host: 'db',
-      user: 'postgres',
-    },
     sqs: {
       accessKeyId: 'SQS_ACCESS_KEY',
       secretAccessKey: 'SQS_SECRET_KEY',

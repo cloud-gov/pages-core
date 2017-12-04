@@ -69,7 +69,7 @@ In our Docker Compose environment, `app` is the name of the container where the 
 
 For example:
 
-- Use `docker-compose run --service-ports app yarn test` to run local testing on the app.
+- Use `docker-compose run app yarn test` to run local testing on the app.
 - Use `docker-compose run app yarn lint:diff` to check that your local changes meet our linting standards.
 
 Similarly you can run any command in the context of the database container `db` by running `docker-compose run db <THE COMMAND>`.
