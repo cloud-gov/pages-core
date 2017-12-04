@@ -40,9 +40,8 @@ describe('<SiteGitHubBranches />', () => {
     expect(rows.at(1).find('td').at(0).text())
       .to.have.string('branch-two');
 
-    // TODO: Nested component selectors, like the `Connect(BranchViewLink)` below, don't
-    // work in this case because the rendered component has  name of `Component`, which enzyme
-    // cant seem to find. Figure out why this is happening
+    // Workaround to select the GitHubIconLink component.
+    // See https://github.com/18F/federalist/issues/1325
     expect(rows.find({
       owner: props.site.owner,
       repository: props.site.repository,
