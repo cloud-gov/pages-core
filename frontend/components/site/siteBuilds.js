@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
-import GitHubRepoLink from '../GitHubRepoLink';
+import GitHubLink from '../GitHubLink/GitHubLink';
 
 import buildActions from '../../actions/buildActions';
 import LoadingIndicator from '../LoadingIndicator';
@@ -52,13 +52,13 @@ class SiteBuilds extends React.Component {
     const { owner, repository } = build.site;
 
     return (
-      <GitHubRepoLink
+      <GitHubLink
         owner={owner}
         repository={repository}
         sha={build.commitSha}
       >
         {build.commitSha}
-      </GitHubRepoLink>
+      </GitHubLink>
     );
   }
 

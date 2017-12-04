@@ -1,17 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import GitHubMark from './GitHubMark';
-
-const GitHubRepoLink = ({ owner, repository, branch, sha, children }) => {
-  let href = `https://github.com/${owner}/${repository}`;
+const GitHubRepoLink =  ({ branch, sha, baseHref, children }) => {
   let title = 'View repository';
+  let href = baseHref;
 
   if (branch) {
-    href = `${href}/tree/${encodeURIComponent(branch)}`;
+    href = `${baseHref}/tree/${encodeURIComponent(branch)}`;
     title = 'View branch';
   } else if (sha) {
-    href = `${href}/commits/${sha}`;
+    href = `${baseHref}/commits/${sha}`;
     title = 'View commit';
   }
 
@@ -23,14 +21,13 @@ const GitHubRepoLink = ({ owner, repository, branch, sha, children }) => {
       target="_blank"
       rel="noopener noreferrer"
     >
-      { children || <GitHubMark /> }
+      { children }
     </a>
   );
 };
 
 GitHubRepoLink.propTypes = {
-  owner: PropTypes.string.isRequired,
-  repository: PropTypes.string.isRequired,
+  baseHref: PropTypes.string.isRequired,
   branch: PropTypes.string,
   sha: PropTypes.string,
   children: PropTypes.node,

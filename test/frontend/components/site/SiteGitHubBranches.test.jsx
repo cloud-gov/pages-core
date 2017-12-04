@@ -29,15 +29,24 @@ describe('<SiteGitHubBranches />', () => {
     };
 
     const wrapper = shallow(<SiteGitHubBranches {...props} />);
+
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('table')).to.have.length(1);
     const rows = wrapper.find('tbody tr');
+
     expect(rows).to.have.length(2);
     expect(rows.at(0).find('td').at(0).text())
       .to.have.string('branch-one');
     expect(rows.at(1).find('td').at(0).text())
       .to.have.string('branch-two');
-    expect(rows.find('GitHubRepoLink')).to.have.length(2);
+
+    // TODO: Nested component selectors, like the `Connect(BranchViewLink)` below, don't
+    // work in this case because the rendered component has  name of `Component`, which enzyme
+    // cant seem to find. Figure out why this is happening
+   expect(rows.find({
+      owner: props.site.owner,
+      repository: props.site.repository
+    })).to.have.length(2);
     expect(rows.find('Connect(BranchViewLink)')).to.have.length(2);
   });
 

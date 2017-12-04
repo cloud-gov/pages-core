@@ -4,7 +4,6 @@ import { shallow } from 'enzyme';
 
 import SiteBuilds from '../../../../frontend/components/site/siteBuilds';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
-import GitHubRepoLink from '../../../../frontend/components/GitHubRepoLink';
 
 let user;
 let site;
@@ -19,6 +18,8 @@ describe('<SiteBuilds/>', () => {
     };
     site = {
       id: 5,
+      owner: 'user',
+      repository: 'repo'
     };
     build = {
       user,
@@ -76,10 +77,13 @@ describe('<SiteBuilds/>', () => {
     expect(shaCell.text()).to.equal('-');
   });
 
-  it('should render a `GitHubRepoLink` component if commit SHA present', () => {
+  it('should render a `GitHubLink` component if commit SHA present', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
+    const build = props.builds.data[0];
+    const { commitSha } = build;
+    const { owner, repository } = build.site;
 
-    expect(wrapper.find(GitHubRepoLink)).to.have.length(1);
+    expect(wrapper.find({owner, repository, sha: commitSha })).to.have.length(1);
   });
 
   it('should render a button to refresh builds', () => {
