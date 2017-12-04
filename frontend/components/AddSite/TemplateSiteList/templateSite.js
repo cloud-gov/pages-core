@@ -98,6 +98,7 @@ class TemplateSite extends React.Component {
                 target="_blank"
                 rel="noopener noreferrer"
                 role="button"
+                className="view-template-link"
               >
                 View template
               </a>
