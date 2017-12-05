@@ -1,14 +1,32 @@
 .flexbox-grid {
+  align-content: flex-start;
   display: flex;
   flex-wrap: wrap;
-  align-content: flex-start;
+
   &.flexbox-grid-4 {
+
+    @media (min-width: 100px) {
+      .flexbox-item {
+          flex: 0 0 100%;
+        }
+      }
+    @media (min-width: 500px) {
+      .flexbox-item {
+          flex: 0 0 48%;
+        }
+      }
+    @media (min-width: 800px) {
+      .flexbox-item {
+          flex: 0 0 24%;
+        }
+      }
+
     .flexbox-item {
-      display:block;
-      flex-direction: column;
+      display: block;
       display: flex;
-      flex: 0 0 240px;
+      flex-direction: column;
       margin-bottom: 20px;
+
       &:not(:last-child) {
         margin-right: 5px;
       }
