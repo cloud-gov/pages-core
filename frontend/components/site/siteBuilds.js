@@ -54,7 +54,7 @@ class SiteBuilds extends React.Component {
 
     return (
       <span>
-        <br/>
+        <br />
         <GitHubLink
           owner={owner}
           repository={repository}

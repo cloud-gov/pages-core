@@ -71,10 +71,10 @@ describe('<SiteBuilds/>', () => {
     build.commitSha = null;
 
     const wrapper = shallow(<SiteBuilds {...props} />);
-    const shaIndex = columnIndex(wrapper, 'Commit');
-    const shaCell = wrapper.find('tr').at(1).find('td').at(shaIndex);
+    const branchIndex = columnIndex(wrapper, 'Branch');
+    const branchCell = wrapper.find('tr').at(1).find('td').at(branchIndex);
 
-    expect(shaCell.text()).to.equal('-');
+    expect(branchCell.text()).to.equal('master');
   });
 
   it('should render a `GitHubLink` component if commit SHA present', () => {

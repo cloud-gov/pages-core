@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const GitHubRepoLink = ({ branch, sha, baseHref, children, ...props }) => {
-  let title;
+  let title = props.title;
   let href = baseHref;
 
   if (branch) {
@@ -17,7 +17,7 @@ const GitHubRepoLink = ({ branch, sha, baseHref, children, ...props }) => {
     <a
       className="repo-link"
       href={href}
-      title={props.title || title}
+      title={title}
       target="_blank"
       rel="noopener noreferrer"
     >
