@@ -1,0 +1,10 @@
+FROM node:6.12-slim
+
+RUN mkdir -p /app
+
+WORKDIR /app
+ADD . /app
+
+RUN yarn config set cache-folder /app/.yarn-cache
+
+EXPOSE 1337 8888

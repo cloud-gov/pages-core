@@ -56,7 +56,7 @@
     "migrate:down": "node migrate.js down",
     "migrate:test": "node migrate.js up --dry-run",
     "export:sites": "node ./scripts/exportSitesAsCsv.js",
-    "analyze-webpack": "webpack-bundle-analyzer public/stats.json"
+    "analyze-webpack": "webpack-bundle-analyzer -h 0.0.0.0 public/stats.json"
   },
   "main": "index.js",
   "repository": {
