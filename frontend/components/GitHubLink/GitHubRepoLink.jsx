@@ -17,7 +17,7 @@ const GitHubRepoLink = ({ branch, sha, baseHref, children, ...props }) => {
     <a
       className="repo-link"
       href={href}
-      title={title || props.title}
+      title={props.title || title}
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -36,8 +36,8 @@ GitHubRepoLink.propTypes = {
 
 GitHubRepoLink.defaultProps = {
   branch: null,
-  sha: null,
   children: null,
+  sha: null,
   title: 'View repository',
 };
 

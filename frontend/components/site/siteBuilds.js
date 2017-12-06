@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import GitHubLink from '../GitHubLink/GitHubLink';
+import GitHubMark from '../GitHubMark';
 
 import buildActions from '../../actions/buildActions';
 import LoadingIndicator from '../LoadingIndicator';
@@ -46,20 +47,23 @@ class SiteBuilds extends React.Component {
 
   static commitLink(build) {
     if (!build.commitSha) {
-      return '-';
+      return null;
     }
 
     const { owner, repository } = build.site;
 
     return (
-      <GitHubLink
-        owner={owner}
-        repository={repository}
-        sha={build.commitSha}
-        title={build.commitSha}
-      >
-        View Commit
-      </GitHubLink>
+      <span>
+        <br/>
+        <GitHubLink
+          owner={owner}
+          repository={repository}
+          sha={build.commitSha}
+          title={build.commitSha}
+        >
+          View Commit <GitHubMark />
+        </GitHubLink>
+      </span>
     );
   }
 
@@ -96,7 +100,6 @@ class SiteBuilds extends React.Component {
         <table className="usa-table-borderless log-table log-table__site-builds">
           <thead>
             <tr>
-              <th scope="col">Commit</th>
               <th scope="col">Branch</th>
               <th scope="col">User</th>
               <th scope="col">Completed</th>
@@ -123,8 +126,10 @@ class SiteBuilds extends React.Component {
 
               return (
                 <tr key={build.id}>
-                  <td>{ SiteBuilds.commitLink(build) }</td>
-                  <td>{ build.branch }</td>
+                  <td>
+                    { build.branch }
+                    { SiteBuilds.commitLink(build) }
+                  </td>
                   <td>{ SiteBuilds.getUsername(build) }</td>
                   <td>{ timeFrom(build.completedAt) }</td>
                   <td>{ duration(build.createdAt, build.completedAt) }</td>
