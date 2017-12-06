@@ -107,7 +107,10 @@ export class AddSite extends React.Component {
         </div>
 
         <AddRepoSiteForm
-          initialValues={{ engine: availableEngines[0].value }}
+          initialValues={{
+            engine: availableEngines[0].value,
+            repoUrl: 'https://github.com/'
+          }}
           showAddNewSiteFields={this.props.showAddNewSiteFields}
           onSubmit={formSubmitFunc}
         />
