@@ -76,7 +76,9 @@ Similarly you can run any command in the context of the database container `db` 
 
 Note that when using `docker-compose run`, the docker network will not be exposed to your local machine. If you do need the network available, run `docker-compose run --service-ports app <THE COMMAND>`.
 
-#### Build the server and the front-end
+The `db` container is exposed on port `5433` of your host computer to make it easier to run commands on. For instance, you can open a `psql` session to it by running `psql -h localhost -p 5433 -d federalist -U postgres`.
+
+#### Front end application
 
 If you are working on the front end of the application, the things you need to know are:
 
