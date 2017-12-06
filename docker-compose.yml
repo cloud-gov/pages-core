@@ -20,6 +20,8 @@ services:
       context: .
     volumes:
       - db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
     environment:
       POSTGRES_DB: federalist
       POSTGRES_TEST_DB: federalist-test
