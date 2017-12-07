@@ -1,10 +1,29 @@
 .featured-site {
-padding: 5rem 0;
+padding: 5rem 0 0;
   &:nth-last-of-type(2) {
   background-color: $well-bg-color;
   }
   img {
     position: relative;
-    bottom: -5rem;
+    bottom: -5px;
+  }
+}
+.usa-section {
+  padding: 5rem 0;
+  background-color: $hero-bg-color;
+  background-color: $header-bg-color;
+}
+.example-cards {
+  margin-bottom: 2.5rem;
+  .usa-width-one-third {
+    background: #fff;
+    padding: 1rem;
+    box-shadow: 0 1px 9px rgba(0, 0, 0, 0.4);
+    .well-heading {
+      margin-top: -1rem;
+      margin-left: -1rem;
+      margin-right: -1rem;
+    }
+    .well-title {margin-bottom: 0;}
   }
 }
