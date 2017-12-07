@@ -52,4 +52,22 @@ const createSiteMembership = ({ user, siteParams }) => {
   ).then(() => site);
 };
 
-module.exports = { createSiteMembership };
+const revokeSiteMembership = ({ user, site, userId }) => {
+  return GitHub.checkPermissions( user, site.owner, site.repository)
+    .then((permissions) => {
+      console.log('THE PERSMS', permissions)
+      if (!permissions.push) {
+        throw {
+          message: 'You do not have write access to this repository',
+          status: 400,
+        };
+      }
+    })
+    .then(() => {
+      const user = site.Users.find(u => u.id === +userId);
+
+      return site.removeUser(user);
+    });
+};
+
+module.exports = { createSiteMembership, revokeSiteMembership };

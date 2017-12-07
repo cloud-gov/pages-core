@@ -562,13 +562,8 @@ describe('Site API', () => {
     });
   });
 
-  describe('DELETE /v0/site/:siteId/user/:userId', () => {
-    const path = '/site/{siteId}/user/{userId}';
-
-    beforeEach(() => {
-      nock.cleanAll();
-      githubAPINocks.repo();
-    });
+  describe('DELETE /v0/site/:site_id/user/:user_id', () => {
+    const path = '/site/{site_id}/user/{user_id}';
 
     it('should require a valid csrf token', (done) => {
       authenticatedSession().then(cookie => request(app)
@@ -596,7 +591,6 @@ describe('Site API', () => {
           return newSiteRequest;
         })
         .then((response) => {
-          console.log('THE PATH', path);
           validateAgainstJSONSchema('DELETE', path, 403, response.body);
           expect(response.body.message).to.equal(authErrorMessage);
           done();
@@ -606,57 +600,121 @@ describe('Site API', () => {
 
     it('should return an error if siteId and userId are not numbers', (done) => {
       const userPromise = factory.user();
-      let user;
-      let site;
 
       Promise.props({
         user: userPromise,
-        site: factory.site({ users: Promise.all([ userPromise ]) }),
+        site: factory.site(),
         cookie: authenticatedSession(userPromise),
       }).then(({ user, site, cookie }) => {
-        user = user;
-        site = site;
-
-        return request(app).delete('/v0/site/app/user/a-user')
+        return request(app).delete('/v0/site/a-site/user/a-user')
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
           .expect(400);
         }).then((response) => {
           validateAgainstJSONSchema('DELETE', path, 400, response.body);
-          expect(response.body.message).to.equal(authErrorMessage);
+          expect(response.body.message).to.equal('Bad Request');
           done();
         }).catch(done);
     });
-  });
 
-  it('should remove the user from the site', (done) => {
-    const userPromise = factory.user();
-    let user;
-    let site;
+    it('should return a 404 if the site cannot be found', (done) => {
+      const userPromise = factory.user();
 
-    Promise.props({
-      user: userPromise,
-      site: factory.site(),
-      cookie: authenticatedSession(userPromise),
-    }).then(({ user, site, cookie }) => {
-      user = user;
-      site = site;
+      Promise.props({
+        user: userPromise,
+        site: factory.site(),
+        cookie: authenticatedSession(userPromise),
+      }).then(({ user, site, cookie }) => {
+        return request(app).delete(`/v0/site/10000/user/${user.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(404);
+        }).then((response) => {
+          validateAgainstJSONSchema('DELETE', path, 404, response.body);
+          expect(response.body.message).to.equal('Not found');
+          done();
+        }).catch(done);
+    });
 
-      return site.addUser(user).then(() => {
+    it('should remove the user from the site', (done) => {
+      const mike = factory.user({ username: 'mike' });
+      const jane = factory.user({ username: 'jane' });
+      let currentSite;
+
+      Promise.props({
+        user: jane,
+        site: factory.site({ users: Promise.all([ mike, jane ]) }),
+        cookie: authenticatedSession(jane),
+      }).then(({ user, site, cookie }) => {
+        currentSite = site;
+
         return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
-          .expect(204);
+          .expect(200);
       }).then((response) => {
-        validateAgainstJSONSchema('DELETE', path, 204, response.body);
-        return Site.findById(site.id, { include: [User] });
-      })
-      .then((fetchedSite) => {
+        validateAgainstJSONSchema('DELETE', path, 200, response.body);
+        return Site.withUsers(currentSite.id);
+      }).then((fetchedSite) => {
         expect(fetchedSite.Users).to.be.an('array');
-        expect(fetchedSite.Users.length).to.equal(0);
+        expect(fetchedSite.Users.length).to.equal(1);
         done();
-      });
-    }).catch(done);
+      }).catch(done);
+    });
+
+    it('should respond with a 400 when deleting the final user', (done) => {
+      const user = factory.user();
+      let currentSite;
+
+      Promise.props({
+        user: user,
+        site: factory.site({ users: Promise.all([ user ]) }),
+        cookie: authenticatedSession(user),
+      }).then(({ user, site, cookie }) => {
+        currentSite = site;
+
+        return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(400);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 400, response.body);
+        expect(response.body.message).to.equal('A site must have at least one user');
+        done();
+      }).catch(done);
+    });
+
+    it('should respond with a 400 if the user does not have admin access', (done) => {
+      const username = 'jane';
+      const userA = factory.user();
+      const userB = factory.user();
+      const repo = 'whatever';
+
+      nock.cleanAll();
+
+      Promise.props({
+        user: userA,
+        site: factory.site({ owner: username, repository: repo, users: Promise.all([ userA, userB ]) }),
+        cookie: authenticatedSession(userA),
+      }).then(({ user, site, cookie }) => {
+        githubAPINocks.repo({
+          owner: site.username,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: false, push: false },
+          }],
+        });
+
+        return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(400);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 400, response.body);
+        expect(response.body.message).to.equal('You do not have write access to this repository');
+        done();
+      }).catch(done);
+    });
   });
 
   describe('DELETE /v0/site/:id', () => {

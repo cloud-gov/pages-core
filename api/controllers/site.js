@@ -3,7 +3,13 @@ const S3SiteRemover = require('../services/S3SiteRemover');
 const SiteCreator = require('../services/SiteCreator');
 const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const siteSerializer = require('../serializers/site');
+const GitHub = require('../services/GitHub');
 const { User, Site, Build } = require('../models');
+
+const sendJSON = (site, res) => {
+  return siteSerializer.serialize(site)
+    .then((siteJSON) => res.json(siteJSON));
+};
 
 module.exports = {
   findAllForUser: (req, res) => {
@@ -96,20 +102,39 @@ module.exports = {
   },
 
   removeUser: (req, res) => {
-    const { siteId, userId } = req.params;
+    const { site_id: siteId, user_id: userId } = req.params;
+    const { user } = req;
 
-    if (!Number(siteId)|| !Number(userId)) {
-      res.error(400);
-      return;
+    if (!Number(siteId) || !Number(userId)) {
+      return res.error(400);
     }
 
-    Site.findById(siteId, { include: [ User ] }).then((site) => {
-      return authorizer.destroy(req.user, site).then(() => {
-        const user = site.users.find(u => u.id === userId);
+    Site.withUsers(siteId)
+      .then((site)=> {
+        if (!site) {
+          throw 404;
+        }
 
-        return site.remove(user).then(() => res.send(204));
-      });
-    }).catch(error => res.error(error));
+        if (site.Users.length === 1) {
+          throw {
+            status: 400,
+            message: 'A site must have at least one user',
+          };
+        }
+
+        return authorizer.destroy(user, site)
+          .then(() => site);
+      })
+      .then((site) => {
+        return SiteMembershipCreator.revokeSiteMembership({
+          user,
+          site,
+          userId
+        });
+      })
+      .then(() => Site.withUsers(siteId))
+      .then(site => sendJSON(site, res))
+      .catch(res.error);
   },
 
   create: (req, res) => {

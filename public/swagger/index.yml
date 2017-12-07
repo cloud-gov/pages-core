@@ -439,7 +439,7 @@ paths:
           description: The site the user is to be added to cannot be found
           schema:
             $ref: "Error.json"
-  /site/{siteId}/user/{userId}:
+  /site/{site_id}/user/{user_id}:
     delete:
       summary: Remove a user from a site
       parameters:
@@ -452,8 +452,7 @@ paths:
           description: the id of the user to remove from the site
           type: integer
       responses:
-        204:
-          description: No content
+        200:
           schema:
             $ref: "Site.json"
         400:
@@ -465,7 +464,7 @@ paths:
           schema:
             $ref: "Error.json"
         404:
-          description: Site or user not found
+          description: Not found
           schema:
             $ref: "Error.json"
 
