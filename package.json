@@ -56,7 +56,8 @@
     "migrate:down": "node migrate.js down",
     "migrate:test": "node migrate.js up --dry-run",
     "export:sites": "node ./scripts/exportSitesAsCsv.js",
-    "analyze-webpack": "webpack-bundle-analyzer -h 0.0.0.0 public/stats.json"
+    "analyze-webpack": "webpack-bundle-analyzer -h 0.0.0.0 public/stats.json",
+    "serve-coverage": "http-server ./coverage"
   },
   "main": "index.js",
   "repository": {
@@ -92,6 +93,7 @@
     "fetch-mock": "^5.12.2",
     "file-loader": "^0.11.1",
     "history": "^4.6.3",
+    "http-server": "^0.10.0",
     "json-schema-deref-sync": "^0.3.3",
     "jsonschema": "^1.1.1",
     "mocha": "2.3.4",

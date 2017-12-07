@@ -149,6 +149,15 @@ docker-compose run app yarn test:client  # for front end tests
 docker-compose run app yarn test:client:watch  # to watch and re-run front end tests
 ```
 
+To view coverage reports as HTML after running the full test suite:
+
+```sh
+docker-compose run --service-ports app yarn serve-coverage
+```
+
+and then visit http://localhost:8080.
+
+
 To lint the files you have changed (with `eslint`), run:
 
 ```sh
