@@ -37,13 +37,19 @@ function cleanRequestPath(reqPath) {
 }
 
 let webpackAssets = loadAssetManifest();
+let availableContentFiles;
 
 module.exports = {
   serve(req, res) {
     const reqPath = cleanRequestPath(req.path);
 
-    const availableContentFiles = getDirectoryFiles(CONTENT_PATH)
-      .map(fp => path.relative(CONTENT_PATH, fp));
+    if (!availableContentFiles) {
+      // Walk the content directory save the results the first time we get here.
+      // We do this within this handler in order to easily mock the fs
+      // during testing.
+      availableContentFiles = getDirectoryFiles(CONTENT_PATH)
+        .map(fp => path.relative(CONTENT_PATH, fp));
+    }
 
     // try to find a content template file matching the requested path
     const contentFilePath = findContentFilePath(reqPath, availableContentFiles);
