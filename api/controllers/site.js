@@ -95,6 +95,23 @@ module.exports = {
       });
   },
 
+  removeUser: (req, res) => {
+    const { siteId, userId } = req.params;
+
+    if (!Number(siteId)|| !Number(userId)) {
+      res.error(400);
+      return;
+    }
+
+    authorizer.update(req.user).then(() => {
+      Site.findById(siteId).then((site) => {
+        const user = User.find(userId);
+
+        site.remove(user);
+      });
+    });
+  },
+
   create: (req, res) => {
     const body = req.body;
     authorizer.create(req.user, body)

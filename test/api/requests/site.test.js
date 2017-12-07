@@ -26,6 +26,50 @@ describe('Site API', () => {
     expect(response.viewLink).to.be.a('string');
   };
 
+  describe('PUT /v0/site/:site_id/user/:user_id', () => {
+    it('should require a valid csrf token', (done) => {
+      authenticatedSession().then(cookie => request(app)
+        .put('/v0/site/1/user/1')
+        .set('x-csrf-token', 'bad-token')
+        .send({
+          user: 'el-mapache',
+          repository: 'partner-site',
+        })
+        .set('Cookie', cookie)
+        .expect(403)
+      )
+      .then((response) => {
+        validateAgainstJSONSchema('PUT', '/site/{site_id}/user/{user_id}', 403, response.body);
+        expect(response.body.message).to.equal('Invalid CSRF token');
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should require authentication', (done) => {
+      unauthenticatedSession()
+        .then((cookie) => {
+          const newSiteRequest = request(app)
+            .put('/v0/site/1/user/1')
+            .set('x-csrf-token', csrfToken.getToken())
+            .send({
+              owner: 'el-mapache',
+              repository: 'partner-site',
+            })
+            .set('Cookie', cookie)
+            .expect(403);
+
+          return newSiteRequest;
+        })
+        .then((response) => {
+          validateAgainstJSONSchema('PUT', '/site/{site_id}/user/{user_id}', 403, response.body);
+          expect(response.body.message).to.equal(authErrorMessage);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
   describe('GET /v0/site', () => {
     it('should require authentication', (done) => {
       factory.build().then(() => request(app)
