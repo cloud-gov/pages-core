@@ -103,13 +103,13 @@ module.exports = {
       return;
     }
 
-    authorizer.update(req.user).then(() => {
-      Site.findById(siteId).then((site) => {
-        const user = User.find(userId);
+    Site.findById(siteId, { include: [ User ] }).then((site) => {
+      return authorizer.destroy(req.user, site).then(() => {
+        const user = site.users.find(u => u.id === userId);
 
-        site.remove(user);
+        return site.remove(user).then(() => res.send(204));
       });
-    });
+    }).catch(error => res.error(error));
   },
 
   create: (req, res) => {

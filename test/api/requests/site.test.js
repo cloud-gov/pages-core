@@ -26,50 +26,6 @@ describe('Site API', () => {
     expect(response.viewLink).to.be.a('string');
   };
 
-  describe('PUT /v0/site/:site_id/user/:user_id', () => {
-    it('should require a valid csrf token', (done) => {
-      authenticatedSession().then(cookie => request(app)
-        .put('/v0/site/1/user/1')
-        .set('x-csrf-token', 'bad-token')
-        .send({
-          user: 'el-mapache',
-          repository: 'partner-site',
-        })
-        .set('Cookie', cookie)
-        .expect(403)
-      )
-      .then((response) => {
-        validateAgainstJSONSchema('PUT', '/site/{site_id}/user/{user_id}', 403, response.body);
-        expect(response.body.message).to.equal('Invalid CSRF token');
-        done();
-      })
-      .catch(done);
-    });
-
-    it('should require authentication', (done) => {
-      unauthenticatedSession()
-        .then((cookie) => {
-          const newSiteRequest = request(app)
-            .put('/v0/site/1/user/1')
-            .set('x-csrf-token', csrfToken.getToken())
-            .send({
-              owner: 'el-mapache',
-              repository: 'partner-site',
-            })
-            .set('Cookie', cookie)
-            .expect(403);
-
-          return newSiteRequest;
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('PUT', '/site/{site_id}/user/{user_id}', 403, response.body);
-          expect(response.body.message).to.equal(authErrorMessage);
-          done();
-        })
-        .catch(done);
-    });
-  });
-
   describe('GET /v0/site', () => {
     it('should require authentication', (done) => {
       factory.build().then(() => request(app)
@@ -604,6 +560,103 @@ describe('Site API', () => {
         done();
       }).catch(done);
     });
+  });
+
+  describe('DELETE /v0/site/:siteId/user/:userId', () => {
+    const path = '/site/{siteId}/user/{userId}';
+
+    beforeEach(() => {
+      nock.cleanAll();
+      githubAPINocks.repo();
+    });
+
+    it('should require a valid csrf token', (done) => {
+      authenticatedSession().then(cookie => request(app)
+        .delete('/v0/site/1/user/1')
+        .set('x-csrf-token', 'bad-token')
+        .set('Cookie', cookie)
+        .expect(403)
+      )
+      .then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 403, response.body);
+        expect(response.body.message).to.equal('Invalid CSRF token');
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should require authentication', (done) => {
+      unauthenticatedSession()
+        .then((cookie) => {
+          const newSiteRequest = request(app)
+            .delete('/v0/site/1/user/1')
+            .set('x-csrf-token', csrfToken.getToken())
+            .set('Cookie', cookie)
+            .expect(403);
+          return newSiteRequest;
+        })
+        .then((response) => {
+          console.log('THE PATH', path);
+          validateAgainstJSONSchema('DELETE', path, 403, response.body);
+          expect(response.body.message).to.equal(authErrorMessage);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should return an error if siteId and userId are not numbers', (done) => {
+      const userPromise = factory.user();
+      let user;
+      let site;
+
+      Promise.props({
+        user: userPromise,
+        site: factory.site({ users: Promise.all([ userPromise ]) }),
+        cookie: authenticatedSession(userPromise),
+      }).then(({ user, site, cookie }) => {
+        user = user;
+        site = site;
+
+        return request(app).delete('/v0/site/app/user/a-user')
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(400);
+        }).then((response) => {
+          validateAgainstJSONSchema('DELETE', path, 400, response.body);
+          expect(response.body.message).to.equal(authErrorMessage);
+          done();
+        }).catch(done);
+    });
+  });
+
+  it('should remove the user from the site', (done) => {
+    const userPromise = factory.user();
+    let user;
+    let site;
+
+    Promise.props({
+      user: userPromise,
+      site: factory.site(),
+      cookie: authenticatedSession(userPromise),
+    }).then(({ user, site, cookie }) => {
+      user = user;
+      site = site;
+
+      return site.addUser(user).then(() => {
+        return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(204);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 204, response.body);
+        return Site.findById(site.id, { include: [User] });
+      })
+      .then((fetchedSite) => {
+        expect(fetchedSite.Users).to.be.an('array');
+        expect(fetchedSite.Users.length).to.equal(0);
+        done();
+      });
+    }).catch(done);
   });
 
   describe('DELETE /v0/site/:id', () => {

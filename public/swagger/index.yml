@@ -439,8 +439,8 @@ paths:
           description: The site the user is to be added to cannot be found
           schema:
             $ref: "Error.json"
-  /site/{site_id}/user/{user_id}:
-    put:
+  /site/{siteId}/user/{userId}:
+    delete:
       summary: Remove a user from a site
       parameters:
         - name: site_id
