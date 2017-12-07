@@ -10,8 +10,9 @@ services:
       - node-modules:/app/node_modules/
       - yarn-cache:/app/.yarn-cache/
     ports:
-      - "1337:1337"
-      - "8888:8888"
+      - "1337:1337" # for the app itself
+      - "8888:8888" # for viewing analyze-webpack
+      - "8080:8080" # for serving test coverage html
     depends_on:
       - db
   db:
@@ -21,7 +22,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
-      - "5433:5432"
+      - "5433:5432" # expose db on host at port 5433
     environment:
       POSTGRES_DB: federalist
       POSTGRES_TEST_DB: federalist-test
