@@ -18,8 +18,7 @@ apiRouter.use(require('./site'));
 // prefix all api routes with "/v0"
 mainRouter.use('/v0', apiRouter);
 
-// this must come last since it contains a wildcard
-// catch-all route to serve content pages
-mainRouter.use(require('./content'));
+// prefix all static content routes with "/content"
+mainRouter.use('/content', require('./content'));
 
 module.exports = mainRouter;

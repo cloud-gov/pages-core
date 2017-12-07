@@ -36,15 +36,14 @@ function cleanRequestPath(reqPath) {
   return cleaned;
 }
 
-// get a list of all available content files upon this module being loaded
-const availableContentFiles = getDirectoryFiles(CONTENT_PATH)
-  .map(fp => path.relative(CONTENT_PATH, fp));
-
 let webpackAssets = loadAssetManifest();
 
 module.exports = {
   serve(req, res) {
     const reqPath = cleanRequestPath(req.path);
+
+    const availableContentFiles = getDirectoryFiles(CONTENT_PATH)
+      .map(fp => path.relative(CONTENT_PATH, fp));
 
     // try to find a content template file matching the requested path
     const contentFilePath = findContentFilePath(reqPath, availableContentFiles);
