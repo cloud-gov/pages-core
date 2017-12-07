@@ -5,15 +5,11 @@
 [![Test Coverage](https://codeclimate.com/github/18F/federalist/badges/coverage.svg)](https://codeclimate.com/github/18F/federalist/coverage)
 [![Dependency Status](https://gemnasium.com/badges/github.com/18F/federalist.svg)](https://gemnasium.com/github.com/18F/federalist)
 
-***Federalist is updated regularly.  Contact us via [email]() or [Join our public chat room](https://chat.18f.gov/) to talk to us and stay informed. Or, check our our [documentation](https://federalist-docs.18f.gov/).***
-
-Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub and Amazon Web Services to provide a simple way for developers to launch new static websites or more easily manage existing static websites. This repo is home to "federalist-core" - a Node.js app that allows government users to add and configure their Federalist sites.
+***Federalist is updated regularly.  Contact us via [email](federalist-support@gsa.gov) or [Join our public chat room](https://chat.18f.gov/) to talk to us and stay informed. Or, check our our [documentation](https://federalist-docs.18f.gov/).***
 
 ## About Federalist
 
 Federalist helps government agencies publish basic websites quickly and seamlessly.  It provides a simple interface for managing simple website content that is compliant with federal guidelines.  More complex tasks are automated behind the scenes, providing a way for users to more easily create and launch government websites.  Federalist is built on top of Github and Amazon Web Services.   
-
-Federalist-core is a node.js application that allows government users to add and configure basic websites. 
 
 ## Examples
 
@@ -27,7 +23,7 @@ More examples can be found [here] (https://federalist-docs.18f.gov/pages/about-f
 
 ## Getting started
 
-This section will walk you through how to install Federalist locally onto your own machine or within your own environment.  Depending on your familiarity with the dependencies and process, this may take anywhere between an hour or two to the better part of a day.  If you need help, [contact us](). 
+This section will walk you through how to install Federalist locally onto your own machine or within your own environment.  Depending on your familiarity with the dependencies and process, this may take anywhere between an hour or two to the better part of a day.  If you need help, [contact us](federalist-support@gsa.gov). 
 
 ### Dependencies / Tooling
 
@@ -76,7 +72,7 @@ This will be the file that holds your S3 and SQS configurations.
       * in the Settings -> Applications -> federalist view in your GitHub Account
 1. Type `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` in terminal.
 1. Visit https://login.fr.cloud.gov/passcode to get a one time passcode.  You'll need to login using your cloud.gov credentials.
-1. Enter your passcode back into terminal.  (Note: if you have a problem at this point it's likely because you don't have permissions.  [Contact us] for help.)
+1. Enter your passcode back into terminal.  (Note: if you have a problem at this point it's likely because you don't have permissions.  [Contact us] (federalist-support@gsa.gov) for help.)
 1. Type `cf apps`.  This will list the current, running applications. 
 1. Type `cf env federalist-staging` to get environment variables.
 1. Find the section in the listing of environment variables that starts with `"s3": [` and look for the following values and paste those values into the S3 section in your `local.js` file.  (Hint: you may have to scroll up to the top of the file to find the S3 environment variables.)
