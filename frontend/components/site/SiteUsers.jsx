@@ -1,5 +1,7 @@
 import React from 'react';
 import { SITE, USER } from '../../propTypes';
+import ButtonLink from '../ButtonLink';
+import siteActions from '../../actions/siteActions';
 
 
 const SiteUsers = ({ site, user }) => {
@@ -12,13 +14,19 @@ const SiteUsers = ({ site, user }) => {
     return -1;
   });
 
+  const handleClick = (event, userToRemove) => {
+    event.preventDefault();
+
+    siteActions.removeUserFromSite(site.id, userToRemove.id);
+  };
+
   return (
     <div>
       <p>
         This user table is a partially complete feature.
         It allows you to easily audit who else has access
         to Federalist settings and logs for this site. Eventually,
-        this table will be used to allow you to add and remove other users.
+        this table will be used to allow you to add other users.
         Currently, new users get access for a specific site by logging into Federalist
         and adding the site themselves.
       </p>
@@ -27,6 +35,7 @@ const SiteUsers = ({ site, user }) => {
         <thead>
           <tr>
             <th>User</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -43,6 +52,9 @@ const SiteUsers = ({ site, user }) => {
                 </a>
                 {' '}
                 {u.username.toLowerCase() === user.username.toLowerCase() ? '(you)' : ''}
+              </td>
+              <td>
+                <ButtonLink clickHandler={e => handleClick(e, user)}>Remove user</ButtonLink>
               </td>
             </tr>)
           )}

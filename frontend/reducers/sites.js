@@ -6,6 +6,7 @@ import {
   siteDeletedType as SITE_DELETED,
   siteBranchesReceivedType as SITE_BRANCHES_RECEIVED,
   siteUserAddedType as SITE_USER_ADDED,
+  siteUserRemovedType as SITE_USER_REMOVED,
 } from '../actions/actionCreators/siteActions';
 
 const initialState = { isLoading: false };
@@ -59,6 +60,16 @@ export default function sites(state = initialState, action) {
         };
       }
       return state;
+
+    case SITE_USER_REMOVED: {
+      return {
+        isLoading: false,
+        data: [
+          action.site,
+          ...state.data.filter(site => site.id !== action.site.id),
+        ],
+      };
+    }
 
     default:
       return state;
