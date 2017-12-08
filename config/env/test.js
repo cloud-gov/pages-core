@@ -28,8 +28,9 @@ module.exports = {
     },
   },
   postgres: {
-    user: process.env.CI ? 'ci-test-user' : null,
     database: process.env.CI ? 'federalist-ci-test' : 'federalist-test',
+    user: process.env.CI ? 'ci-test-user' : 'postgres',
+    host: process.env.CI ? 'localhost' : 'db',
   },
   log: {
     level: 'error',

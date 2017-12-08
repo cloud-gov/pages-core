@@ -12,26 +12,18 @@ Federalist is a unified interface for publishing static government websites. It 
 ## Getting started
 
 ### Dependencies / Tooling
+
 Before you start, ensure you have the following installed:
 
-- [node](https://nodejs.org/en/download/package-manager/#osx)
-- [nvm](https://github.com/creationix/nvm#installation) or [n](https://github.com/tj/n#installation)
-- [yarn](https://yarnpkg.com/)
-- [Postgres](https://www.postgresql.org/)
 - [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
-
-You'll also need to ask for `SpaceDeveloper` permissions for the federalist cloud.gov org in the Federalist slack channel.
-
+- [Docker Compose](https://docs.docker.com/compose/install/#install-compose)
 
 ### Running locally (development)
 
-1. Download or clone the `18F/federalist` repository from Github and `cd` to that directory.
-1. Run `nvm use` to ensure you are using the correct version of node.
-1. Create Postgres databases by running
-    - Run `createdb federalist`
-    - Run `createdb federalist-test`
-1. Run `yarn` to load modules and install Jekyll dependencies.
-1. Make a copy of `config/local.sample.js` and name it `local.js` and place it in the `config` folder.
+Federalist uses Docker Compose for local development.
+
+1. Clone the `18F/federalist` repository from Github and `cd` to that directory.
+1. Make a copy of `config/local.sample.js` and name it `local.js` and place it in the `config` folder. You can do this by running `cp config/local{.sample,}.js`
 This will be the file that holds your S3 and SQS configurations.
 1. [Register a new OAuth application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a `Client ID` and `Client Secret`. Add these values to `config/local.js`.
     ```js
@@ -51,9 +43,9 @@ This will be the file that holds your S3 and SQS configurations.
       99999999 // your org added here
     ]
     ```
-The organization will need to grant access to federalist, which can be done during:
-  * a first-time login with your GitHub credentials
-  * in the Settings -> Applications -> federalist view in your GitHub Account
+    The organization will need to grant access to federalist, which can be done during:
+      * a first-time login with your GitHub credentials
+      * in the Settings -> Applications -> federalist view in your GitHub Account
 1. Type `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` in terminal.
 1. Visit https://login.fr.cloud.gov/passcode to get a one time passcode.
 1. Enter your passcode back into terminal.
@@ -67,27 +59,34 @@ The organization will need to grant access to federalist, which can be done duri
     - `FEDERALIST_AWS_BUILD_KEY` is `accessKeyId`
     - `FEDERALIST_SESSION_SECRET` is `secretAccessKey`
     - `FEDERALIST_SQS_QUEUE` is `queue`
-    - `FEDERALIST_SQS_REGION` is `region`
-1. Great work! The Federalist app is now ready to run locally! :tada:
-    - Run `yarn`
-    - Run `yarn build`
-    - Run `yarn start`
-1. You should now be able to see Federalist running at http://localhost:1337/
+1. Run `docker-compose build`.
+1. Run `docker-compose run app yarn && docker-compose run app yarn build` to install dependencies and build the app initially.
+1. Run `docker-compose up` to start the development environment.  You should now be able to see Federalist running at http://localhost:1337/. Local file changes will cause the server to restart and/or the front end bundles to be rebuilt.
 
 **Pro tips:**
-- You can use `yarn watch` to automatically restart the server and rebuild front end assets on file change, which is useful for development.
-- You can use `yarn test` to run local testing on the app.
 
+In our Docker Compose environment, `app` is the name of the container where the Federalist web application runs. You can run any command in the context of the web application by running  `docker-compose run app <THE COMMAND>`.
 
-#### Build the server and the front-end
+For example:
 
-If you are working on the front-end of the application, the things you need to know are:
+- Use `docker-compose run app yarn test` to run local testing on the app.
+- Use `docker-compose run app yarn lint:diff` to check that your local changes meet our linting standards.
 
-1. It is a React based application
+Similarly you can run any command in the context of the database container `db` by running `docker-compose run db <THE COMMAND>`.
+
+Note that when using `docker-compose run`, the docker network will not be exposed to your local machine. If you do need the network available, run `docker-compose run --service-ports app <THE COMMAND>`.
+
+The `db` container is exposed on port `5433` of your host computer to make it easier to run commands on. For instance, you can open a `psql` session to it by running `psql -h localhost -p 5433 -d federalist -U postgres`.
+
+#### Front end application
+
+If you are working on the front end of the application, the things you need to know are:
+
+1. It is a React and Redux application
 1. It is built with `webpack`
 1. It lives in `/frontend`
 
-To analyze the contents of the front end JavaScript bundle, use `yarn analyze-webpack` after a build. This will launch a browser window showing a visualization of all the code that makes up the bundle.
+To analyze the contents of the front end JavaScript bundle, use `docker-compose run --service-ports app yarn analyze-webpack` after a build. Then visit http://127.0.0.1:8888 to see a visualization of the the bundle contents.
 
 ### Environment variables
 
@@ -132,25 +131,6 @@ The app expects the following user provided services to be provided:
 
 Here `<environment>` refers the value set for the `APP_ENV` environment variable.
 
-#### Using Postgres
-
-By default, the application should use local disk storage in place of a database. This is easier to get started and isn't a problem for local development. In production, the app uses Postgres as the data store. To use Postgres in your local dev environment:
-
-0. First, you'll need to [install Postgres](http://www.postgresql.org/download/).
-0. Next, you'll have to create the `federalist` database for the application. `$ createdb federalist` should do the trick. If you wish to run the tests, do the same, but for a database named `federalist-test`.
-0. Add postgres to your `/config/local.js` file
-
-```js
-connections: {
-  postgres: {
-    database: 'federalist'
-  }
-},
-models: {
-  connection: 'postgres'
-}
-```
-
 ### Testing and linting
 
 When making code changes, be sure to write new or modify existing tests to cover your changes.
@@ -158,21 +138,30 @@ When making code changes, be sure to write new or modify existing tests to cover
 The full test suite of both front and back end tests can be run via:
 
 ```sh
-yarn test
+docker-compose run app yarn test
 ```
 
 You can also just run back or front end tests via:
 
 ```sh
-yarn test:server  # for back end tests
-yarn test:client  # for front end tests
-yarn test:client:watch  # to watch and re-run front end tests
+docker-compose run app yarn test:server  # for back end tests
+docker-compose run app yarn test:client  # for front end tests
+docker-compose run app yarn test:client:watch  # to watch and re-run front end tests
 ```
+
+To view coverage reports as HTML after running the full test suite:
+
+```sh
+docker-compose run --service-ports app yarn serve-coverage
+```
+
+and then visit http://localhost:8080.
+
 
 To lint the files you have changed (with `eslint`), run:
 
 ```sh
-yarn lint:diff
+docker-compose run app yarn lint:diff
 ```
 
 For the full list of available commands that you can run with `yarn` or `npm`, see the `"scripts"` section of `package.json`.

@@ -1,3 +1,5 @@
 module.exports = {
-  database: "federalist",
-}
+  database: 'federalist',
+  host: 'db',
+  user: 'postgres',
+};
