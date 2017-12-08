@@ -439,6 +439,35 @@ paths:
           description: The site the user is to be added to cannot be found
           schema:
             $ref: "Error.json"
+  /site/{site_id}/user/{user_id}:
+    delete:
+      summary: Remove a user from a site
+      parameters:
+        - name: site_id
+          in: path
+          description: the id of the site
+          type: integer
+        - name: user_id
+          in: path
+          description: the id of the user to remove from the site
+          type: integer
+      responses:
+        200:
+          schema:
+            $ref: "Site.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+
   /me:
     get:
       summary: Fetch data for the current user

@@ -29,15 +29,23 @@ describe('<SiteGitHubBranches />', () => {
     };
 
     const wrapper = shallow(<SiteGitHubBranches {...props} />);
+
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('table')).to.have.length(1);
     const rows = wrapper.find('tbody tr');
+
     expect(rows).to.have.length(2);
     expect(rows.at(0).find('td').at(0).text())
       .to.have.string('branch-one');
     expect(rows.at(1).find('td').at(0).text())
       .to.have.string('branch-two');
-    expect(rows.find('GitHubRepoLink')).to.have.length(2);
+
+    // Workaround to select the GitHubIconLink component.
+    // See https://github.com/18F/federalist/issues/1325
+    expect(rows.find({
+      owner: props.site.owner,
+      repository: props.site.repository,
+    })).to.have.length(2);
     expect(rows.find('Connect(BranchViewLink)')).to.have.length(2);
   });
 

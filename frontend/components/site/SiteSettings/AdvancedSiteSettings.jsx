@@ -58,6 +58,7 @@ export const AdvancedSiteSettings = ({
           <h3 className="well-heading">Site configuration</h3>
           <p className="well-text">
             Add additional configuration in yaml to be added to your
+            {' '}
             <code>_config.yml</code> file when we build your site&apos;s primary branch.
           </p>
           <Field
@@ -76,6 +77,7 @@ export const AdvancedSiteSettings = ({
           <h3 className="well-heading">Demo configuration</h3>
           <p className="well-text">
             Add additional configuration in yaml to be added to your
+            {' '}
             <code>_config.yml</code> file when we build your site&apos;s demo branch.
           </p>
           <Field
@@ -94,6 +96,7 @@ export const AdvancedSiteSettings = ({
           <h3 className="well-heading">Preview configuration</h3>
           <p className="well-text">
             Add additional configuration in yaml to be added to your
+            {' '}
             <code>_config.yml</code> file when we build a preview branch for your site.
           </p>
           <Field

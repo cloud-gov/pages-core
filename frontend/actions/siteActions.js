@@ -3,6 +3,7 @@ import alertActions from './alertActions';
 
 import {
   updateRouterToSitesUri,
+  updateRouterToSiteBuildsUri,
   dispatchSitesFetchStartedAction,
   dispatchSitesReceivedAction,
   dispatchSiteAddedAction,
@@ -28,8 +29,11 @@ export default {
 
   addSite(siteToAdd) {
     return federalist.addSite(siteToAdd)
-      .then(dispatchSiteAddedAction)
-      .then(updateRouterToSitesUri)
+      .then((site) => {
+        dispatchSiteAddedAction(site);
+        return site;
+      })
+      .then(updateRouterToSiteBuildsUri)
       .catch(alertError);
   },
 
@@ -54,7 +58,11 @@ export default {
 
   updateSite(site, data) {
     return federalist.updateSite(site, data)
-      .then(dispatchSiteUpdatedAction)
+      .then((updatedSite) => {
+        if (updatedSite) {
+          dispatchSiteUpdatedAction(updatedSite);
+        }
+      })
       .catch(alertError);
   },
 

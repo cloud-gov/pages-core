@@ -18,6 +18,8 @@ describe('<SiteBuilds/>', () => {
     };
     site = {
       id: 5,
+      owner: 'user',
+      repository: 'repo',
     };
     build = {
       user,
@@ -27,6 +29,7 @@ describe('<SiteBuilds/>', () => {
       createdAt: '2016-12-28T12:00:00',
       completedAt: '2016-12-28T12:05:00',
       state: 'success',
+      commitSha: '123A',
     };
     props = {
       builds: {
@@ -64,6 +67,25 @@ describe('<SiteBuilds/>', () => {
     expect(userCell.text()).to.equal('');
   });
 
+  it('should render a `-` if the commit SHA is absent', () => {
+    build.commitSha = null;
+
+    const wrapper = shallow(<SiteBuilds {...props} />);
+    const branchIndex = columnIndex(wrapper, 'Branch');
+    const branchCell = wrapper.find('tr').at(1).find('td').at(branchIndex);
+
+    expect(branchCell.text()).to.equal('master');
+  });
+
+  it('should render a `GitHubLink` component if commit SHA present', () => {
+    const wrapper = shallow(<SiteBuilds {...props} />);
+    const siteBuild = props.builds.data[0];
+    const { commitSha } = siteBuild;
+    const { owner, repository } = siteBuild.site;
+
+    expect(wrapper.find({ owner, repository, sha: commitSha })).to.have.length(1);
+  });
+
   it('should render a button to refresh builds', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
     expect(wrapper.find('RefreshBuildsButton')).to.have.length(1);
@@ -77,8 +99,9 @@ describe('<SiteBuilds/>', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
 
     expect(wrapper.find('table')).to.have.length(0);
-    expect(wrapper.find('p')).to.have.length(1);
-    expect(wrapper.find('p').contains('This site does not have any builds.')).to.be.true;
+    expect(wrapper.find('p')).to.have.length(2);
+    expect(wrapper.find('p').first().contains('This site does not yet have any builds.')).to.be.true;
+    expect(wrapper.find('p').at(1).text().indexOf('just added')).to.be.greaterThan(-1);
     expect(wrapper.find('RefreshBuildsButton')).to.have.length(1);
   });
 

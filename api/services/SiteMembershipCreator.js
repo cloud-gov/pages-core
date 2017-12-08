@@ -52,4 +52,19 @@ const createSiteMembership = ({ user, siteParams }) => {
   ).then(() => site);
 };
 
-module.exports = { createSiteMembership };
+const revokeSiteMembership = ({ user, site, userId }) =>
+  GitHub.checkPermissions(user, site.owner, site.repository)
+    .then((permissions) => {
+      if (!permissions.push) {
+        throw {
+          message: 'You do not have write access to this repository',
+          status: 400,
+        };
+      }
+    })
+    .then(() => {
+      const userToRemove = site.Users.find(u => u.id === Number(userId));
+      site.removeUser(userToRemove);
+    });
+
+module.exports = { createSiteMembership, revokeSiteMembership };

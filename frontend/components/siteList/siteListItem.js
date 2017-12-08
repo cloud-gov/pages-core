@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 
 import PublishedState from './publishedState';
-import GitHubRepoLink from '../GitHubRepoLink';
+import GitHubRepoLink from '../GitHubLink/GitHubRepoLink';
 
 const propTypes = {
   site: PropTypes.shape({
