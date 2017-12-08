@@ -1,6 +1,8 @@
 import { expect } from 'chai';
 import proxyquire from 'proxyquire';
 
+import siteReducer from '../../../frontend/reducers/sites';
+
 proxyquire.noCallThru();
 
 describe('sitesReducer', () => {
@@ -13,6 +15,7 @@ describe('sitesReducer', () => {
   const SITES_RECEIVED = 'hey, sites!';
   const BUILD_RESTARTED = 'build restarted!';
   const SITE_USER_ADDED = 'site user added';
+  const SITE_USER_REMOVED = 'SITE_USER_REMOVED'
 
   beforeEach(() => {
     fixture = proxyquire('../../../frontend/reducers/sites', {
@@ -223,5 +226,29 @@ describe('sitesReducer', () => {
 
     expect(actual.isLoading).to.be.false;
     expect(actual.data).to.deep.equal([]);
+  });
+
+  it('returns existing state with removed user information on SITE_USER_REMOVED', () => {
+    const oldSite = {
+      id: 1,
+      owner: 'person1',
+      repository: 'a',
+      users: [{ username: 'james' }, { username: 'jane' }]
+    };
+
+    const state = {
+      isLoading: false,
+      data: [
+        oldSite, {
+          id: 2, owner: 'person2', repository: 'b', users: []
+        },
+      ]
+    };
+    const updatedSite = { ...oldSite, users: [{ username: 'jane' }] };
+    const actual = siteReducer(state, { type: 'SITE_USER_REMOVED', site: updatedSite });
+
+    expect(actual.data.length).to.equal(2);
+    expect(actual.data[0].users[0].username).to.equal('jane');
+    expect(actual.data[1]).to.deep.equal(state.data[1]);
   });
 });
