@@ -36,7 +36,7 @@ const siteUserAdded = site => ({
 });
 
 const siteUserRemoved = (site, users) => ({
-  type: siteUserRemovedType
+  type: siteUserRemovedType,
 });
 
 export {
@@ -46,4 +46,5 @@ export {
   siteUpdated, siteUpdatedType,
   siteDeleted, siteDeletedType,
   siteUserAdded, siteUserAddedType,
+  siteUserRemoved, siteUserRemovedType,
 };

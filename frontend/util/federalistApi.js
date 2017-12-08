@@ -67,8 +67,8 @@ export default {
     });
   },
 
-  removeUserFromSite({ siteId, userId }) {
-    return this.fetch(`site/${siteId}/user/${userId}`);
+  removeUserFromSite(siteId, userId) {
+    return this.fetch(`site/${siteId}/user/${userId}`, { method: 'DELETE' });
   },
 
   addSite(site) {

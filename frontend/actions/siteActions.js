@@ -56,9 +56,9 @@ export default {
       });
   },
 
-  removeUserFromSite({ siteId, userId }) {
-    return federalist.removeUserFromSite(siteId, userId).then((returned) => {
-      console.log(returned);
+  removeUserFromSite(siteId, userId) {
+    return federalist.removeUserFromSite(siteId, userId).then(() => {
+      dispatchUserRemovedFromSiteAction();
     });
   },
 
