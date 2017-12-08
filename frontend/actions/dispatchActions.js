@@ -48,8 +48,8 @@ const dispatchUserAddedToSiteAction = (site) => {
   dispatch(createSiteUserAddedAction(site));
 };
 
-const dispatchUserRemovedFromSiteAction = (site, username) => {
-  dispatch(siteUserRemovedAction(site, username));
+const dispatchUserRemovedFromSiteAction = (site) => {
+  dispatch(siteUserRemovedAction(site));
 };
 
 const dispatchShowAddNewSiteFieldsAction = () => {

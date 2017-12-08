@@ -1,13 +1,13 @@
 import React from 'react';
-import ButtonLink from '../../../frontend/components/ButtonLink';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import { spy } from 'sinon';
+import ButtonLink from '../../../frontend/components/ButtonLink';
 
 describe('<ButtonLink />', () => {
   const props = {
     clickHandler: spy(),
-    children: 'a child'
+    children: 'a child',
   };
   let wrapper;
 
@@ -28,7 +28,7 @@ describe('<ButtonLink />', () => {
 
     const otherProps = {
       ...props,
-      children: ['test', 'test2']
+      children: ['test', 'test2'],
     };
     const anotherWrapper = shallow(<ButtonLink {...otherProps} />);
 
@@ -39,5 +39,5 @@ describe('<ButtonLink />', () => {
     wrapper.find('a').simulate('click');
 
     expect(props.clickHandler.calledOnce).to.be.true;
-  })
+  });
 });

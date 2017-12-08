@@ -6,6 +6,7 @@ import {
   siteUpdated, siteUpdatedType,
   siteDeleted, siteDeletedType,
   siteUserAdded, siteUserAddedType,
+  siteUserRemoved, siteUserRemovedType,
 } from '../../../../frontend/actions/actionCreators/siteActions';
 
 describe('siteActions actionCreators', () => {
@@ -114,6 +115,19 @@ describe('siteActions actionCreators', () => {
 
     it('exports its type', () => {
       expect(siteUserAddedType).to.equal('SITE_USER_ADDED');
+    });
+  });
+
+  describe('siteUserRemoved', () => {
+    it('constructs properly', () => {
+      const site = {
+        id: 1,
+        owner: 'someone',
+        repository: 'something',
+      };
+      const action = siteUserRemoved(site);
+      expect(action.type).to.equal(siteUserRemovedType);
+      expect(action.site).to.equal(site);
     });
   });
 });
