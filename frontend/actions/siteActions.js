@@ -19,7 +19,6 @@ const alertError = (error) => {
   alertActions.httpError(error.message);
 };
 
-
 export default {
   fetchSites() {
     dispatchSitesFetchStartedAction();
@@ -57,8 +56,10 @@ export default {
       });
   },
 
-  removeUserFromSite({ user, repository }) {
-    return;
+  removeUserFromSite({ siteId, userId }) {
+    return federalist.removeUserFromSite(siteId, userId).then((returned) => {
+      console.log(returned);
+    });
   },
 
   updateSite(site, data) {
