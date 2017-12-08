@@ -67,10 +67,8 @@ export default {
     });
   },
 
-  removeUserFromSite({ user, repository }) {
-    return this.fetch('', {
-
-    });
+  removeUserFromSite({ siteId, userId }) {
+    return this.fetch(`site/${siteId}/user/${userId}`);
   },
 
   addSite(site) {
