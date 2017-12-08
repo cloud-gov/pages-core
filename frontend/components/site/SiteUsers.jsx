@@ -15,6 +15,8 @@ const SiteUsers = ({ site, user }) => {
   });
 
   const handleClick = (event, userToRemove) => {
+    event.preventDefault();
+
     siteActions.removeUserFromSite(site.id, userToRemove.id);
   };
 
