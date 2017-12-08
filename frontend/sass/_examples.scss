@@ -1,11 +1,10 @@
 .featured-site {
-padding: 5rem 0 0;
+padding: 5rem 0;
   &:nth-last-of-type(2) {
   background-color: $well-bg-color;
   }
   img {
-    position: relative;
-    bottom: -5px;
+    margin-top: -3rem;
   }
 }
 .usa-section {
