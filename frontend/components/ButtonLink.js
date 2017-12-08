@@ -19,7 +19,7 @@ const ButtonLink = ({ clickHandler, children }) =>
 
 ButtonLink.propTypes = propTypes;
 ButtonLink.defaultProps = {
-  children: null
+  children: null,
 };
 
 export default ButtonLink;
