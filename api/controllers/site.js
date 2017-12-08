@@ -3,13 +3,11 @@ const S3SiteRemover = require('../services/S3SiteRemover');
 const SiteCreator = require('../services/SiteCreator');
 const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const siteSerializer = require('../serializers/site');
-const GitHub = require('../services/GitHub');
 const { User, Site, Build } = require('../models');
 
-const sendJSON = (site, res) => {
-  return siteSerializer.serialize(site)
-    .then((siteJSON) => res.json(siteJSON));
-};
+const sendJSON = (site, res) =>
+  siteSerializer.serialize(site)
+    .then(siteJSON => res.json(siteJSON));
 
 module.exports = {
   findAllForUser: (req, res) => {
@@ -103,38 +101,33 @@ module.exports = {
 
   removeUser: (req, res) => {
     const { site_id: siteId, user_id: userId } = req.params;
-    const { user } = req;
 
     if (!Number(siteId) || !Number(userId)) {
       return res.error(400);
     }
 
-    Site.withUsers(siteId)
-      .then((site)=> {
-        if (!site) {
-          throw 404;
-        }
+    return Site.withUsers(siteId).then((site) => {
+      if (!site) {
+        throw 404;
+      }
 
-        if (site.Users.length === 1) {
-          throw {
-            status: 400,
-            message: 'A site must have at least one user',
-          };
-        }
+      if (site.Users.length === 1) {
+        throw {
+          status: 400,
+          message: 'A site must have at least one user',
+        };
+      }
 
-        return authorizer.destroy(user, site)
-          .then(() => site);
+      return authorizer.destroy(req.user, site).then(() => site);
+    }).then(site =>
+      SiteMembershipCreator.revokeSiteMembership({
+        user: req.user,
+        site,
+        userId,
       })
-      .then((site) => {
-        return SiteMembershipCreator.revokeSiteMembership({
-          user,
-          site,
-          userId
-        });
-      })
-      .then(() => Site.withUsers(siteId))
-      .then(site => sendJSON(site, res))
-      .catch(res.error);
+    ).then(() => Site.withUsers(siteId))
+    .then(site => sendJSON(site, res))
+    .catch(res.error);
   },
 
   create: (req, res) => {

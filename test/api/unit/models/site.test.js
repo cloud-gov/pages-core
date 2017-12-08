@@ -20,9 +20,9 @@ describe('Site model', () => {
   describe('.withUsers', () => {
     it('returns the site object with user association', () => {
       factory.site({
-        users: Promise.all([ factory.user() ])
+        users: Promise.all([factory.user()]),
       })
-      .then((site) => Site.withUsers(site.id))
+      .then(site => Site.withUsers(site.id))
       .then((site) => {
         expect(site.Users).to.be.an('array');
         expect(site.Users.length).to.equal(1);

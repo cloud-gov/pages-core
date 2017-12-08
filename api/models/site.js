@@ -32,8 +32,6 @@ const associate = ({ Site, Build, User }) => {
     foreignKey: 'site_users',
     timestamps: false,
   });
-
-  Site.withUsers = (id) => Site.findById(id, { include: [ User ] });
 };
 
 const beforeValidate = (site) => {
@@ -166,8 +164,10 @@ module.exports = (sequelize, DataTypes) => {
       beforeValidate,
       afterValidate,
       validationFailed,
-    }
+    },
   });
+
+  Site.withUsers = id => Site.findById(id, { include: [sequelize.models.User] });
 
   return Site;
 };

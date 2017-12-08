@@ -540,7 +540,8 @@ describe('Site API', () => {
         validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
         expect(response.body.message).to.eq('You do not have write access to this repository');
         done();
-      }).catch(done);
+      })
+      .catch(done);
     });
 
     it('should respond with a 404 if the site does not exist', (done) => {
@@ -558,7 +559,8 @@ describe('Site API', () => {
         validateAgainstJSONSchema('POST', '/site/user', 404, response.body);
         expect(response.body.message).to.eq('The site you are trying to add does not exist');
         done();
-      }).catch(done);
+      })
+      .catch(done);
     });
   });
 
@@ -605,16 +607,18 @@ describe('Site API', () => {
         user: userPromise,
         site: factory.site(),
         cookie: authenticatedSession(userPromise),
-      }).then(({ user, site, cookie }) => {
-        return request(app).delete('/v0/site/a-site/user/a-user')
+      })
+      .then(models =>
+        request(app).delete('/v0/site/a-site/user/a-user')
           .set('x-csrf-token', csrfToken.getToken())
-          .set('Cookie', cookie)
-          .expect(400);
-        }).then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 400, response.body);
-          expect(response.body.message).to.equal('Bad Request');
-          done();
-        }).catch(done);
+          .set('Cookie', models.cookie)
+          .expect(400)
+      ).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 400, response.body);
+        expect(response.body.message).to.equal('Bad Request');
+        done();
+      })
+      .catch(done);
     });
 
     it('should return a 404 if the site cannot be found', (done) => {
@@ -624,16 +628,18 @@ describe('Site API', () => {
         user: userPromise,
         site: factory.site(),
         cookie: authenticatedSession(userPromise),
-      }).then(({ user, site, cookie }) => {
-        return request(app).delete(`/v0/site/10000/user/${user.id}`)
+      })
+      .then(models =>
+        request(app).delete(`/v0/site/10000/user/${models.user.id}`)
           .set('x-csrf-token', csrfToken.getToken())
-          .set('Cookie', cookie)
-          .expect(404);
-        }).then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 404, response.body);
-          expect(response.body.message).to.equal('Not found');
-          done();
-        }).catch(done);
+          .set('Cookie', models.cookie)
+          .expect(404)
+      ).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 404, response.body);
+        expect(response.body.message).to.equal('Not found');
+        done();
+      })
+      .catch(done);
     });
 
     it('should remove the user from the site', (done) => {
@@ -643,7 +649,7 @@ describe('Site API', () => {
 
       Promise.props({
         user: jane,
-        site: factory.site({ users: Promise.all([ mike, jane ]) }),
+        site: factory.site({ users: Promise.all([mike, jane]) }),
         cookie: authenticatedSession(jane),
       }).then(({ user, site, cookie }) => {
         currentSite = site;
@@ -659,29 +665,29 @@ describe('Site API', () => {
         expect(fetchedSite.Users).to.be.an('array');
         expect(fetchedSite.Users.length).to.equal(1);
         done();
-      }).catch(done);
+      })
+      .catch(done);
     });
 
     it('should respond with a 400 when deleting the final user', (done) => {
-      const user = factory.user();
-      let currentSite;
+      const userPromise = factory.user();
 
       Promise.props({
-        user: user,
-        site: factory.site({ users: Promise.all([ user ]) }),
-        cookie: authenticatedSession(user),
-      }).then(({ user, site, cookie }) => {
-        currentSite = site;
-
-        return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
+        user: userPromise,
+        site: factory.site({ users: Promise.all([userPromise]) }),
+        cookie: authenticatedSession(userPromise),
+      })
+      .then(({ user, site, cookie }) =>
+        request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
-          .expect(400);
-      }).then((response) => {
+          .expect(400)
+      ).then((response) => {
         validateAgainstJSONSchema('DELETE', path, 400, response.body);
         expect(response.body.message).to.equal('A site must have at least one user');
         done();
-      }).catch(done);
+      })
+      .catch(done);
     });
 
     it('should respond with a 400 if the user does not have admin access', (done) => {
@@ -689,12 +695,17 @@ describe('Site API', () => {
       const userA = factory.user();
       const userB = factory.user();
       const repo = 'whatever';
+      const siteProps = {
+        owner: username,
+        repository: repo,
+        users: Promise.all([userA, userB]),
+      };
 
       nock.cleanAll();
 
       Promise.props({
         user: userA,
-        site: factory.site({ owner: username, repository: repo, users: Promise.all([ userA, userB ]) }),
+        site: factory.site(siteProps),
         cookie: authenticatedSession(userA),
       }).then(({ user, site, cookie }) => {
         githubAPINocks.repo({
@@ -713,7 +724,8 @@ describe('Site API', () => {
         validateAgainstJSONSchema('DELETE', path, 400, response.body);
         expect(response.body.message).to.equal('You do not have write access to this repository');
         done();
-      }).catch(done);
+      })
+      .catch(done);
     });
   });
 

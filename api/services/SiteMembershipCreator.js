@@ -52,10 +52,9 @@ const createSiteMembership = ({ user, siteParams }) => {
   ).then(() => site);
 };
 
-const revokeSiteMembership = ({ user, site, userId }) => {
-  return GitHub.checkPermissions( user, site.owner, site.repository)
+const revokeSiteMembership = ({ user, site, userId }) =>
+  GitHub.checkPermissions(user, site.owner, site.repository)
     .then((permissions) => {
-      console.log('THE PERSMS', permissions)
       if (!permissions.push) {
         throw {
           message: 'You do not have write access to this repository',
@@ -64,10 +63,8 @@ const revokeSiteMembership = ({ user, site, userId }) => {
       }
     })
     .then(() => {
-      const user = site.Users.find(u => u.id === +userId);
-
-      return site.removeUser(user);
+      const userToRemove = site.Users.find(u => u.id === Number(userId));
+      site.removeUser(userToRemove);
     });
-};
 
 module.exports = { createSiteMembership, revokeSiteMembership };
