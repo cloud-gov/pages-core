@@ -9,7 +9,7 @@ const GitHubRepoLink = ({ branch, sha, baseHref, children, ...props }) => {
     href = `${baseHref}/tree/${encodeURIComponent(branch)}`;
     title = 'View branch';
   } else if (sha) {
-    href = `${baseHref}/commits/${sha}`;
+    href = `${baseHref}/commit/${sha}`;
     title = 'View commit';
   }
 
