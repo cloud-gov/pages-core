@@ -85,7 +85,7 @@ module.exports = {
       return;
     }
 
-    authorizer.create(req.user, body)
+    authorizer.addUser(req.user, body)
       .then(() => SiteMembershipCreator.createSiteMembership({
         user: req.user,
         siteParams: body,
@@ -118,7 +118,7 @@ module.exports = {
         };
       }
 
-      return authorizer.destroy(req.user, site).then(() => site);
+      return authorizer.removeUser(req.user, site).then(() => site);
     }).then(site =>
       SiteMembershipCreator.revokeSiteMembership({
         user: req.user,
