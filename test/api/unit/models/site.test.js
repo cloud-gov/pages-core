@@ -17,6 +17,19 @@ describe('Site model', () => {
     });
   });
 
+  describe('.withUsers', () => {
+    it('returns the site object with user association', () => {
+      factory.site({
+        users: Promise.all([factory.user()]),
+      })
+      .then(site => Site.withUsers(site.id))
+      .then((site) => {
+        expect(site.Users).to.be.an('array');
+        expect(site.Users.length).to.equal(1);
+      });
+    });
+  });
+
   describe('.viewLinkForBranch(branch)', () => {
     context('for the default branch', () => {
       it('should return a proxy link if there is no custom domain', (done) => {

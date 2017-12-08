@@ -167,5 +167,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
+  Site.withUsers = id => Site.findById(id, { include: [sequelize.models.User] });
+
   return Site;
 };

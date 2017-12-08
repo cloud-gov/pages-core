@@ -540,7 +540,8 @@ describe('Site API', () => {
         validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
         expect(response.body.message).to.eq('You do not have write access to this repository');
         done();
-      }).catch(done);
+      })
+      .catch(done);
     });
 
     it('should respond with a 404 if the site does not exist', (done) => {
@@ -558,7 +559,173 @@ describe('Site API', () => {
         validateAgainstJSONSchema('POST', '/site/user', 404, response.body);
         expect(response.body.message).to.eq('The site you are trying to add does not exist');
         done();
-      }).catch(done);
+      })
+      .catch(done);
+    });
+  });
+
+  describe('DELETE /v0/site/:site_id/user/:user_id', () => {
+    const path = '/site/{site_id}/user/{user_id}';
+
+    it('should require a valid csrf token', (done) => {
+      authenticatedSession().then(cookie => request(app)
+        .delete('/v0/site/1/user/1')
+        .set('x-csrf-token', 'bad-token')
+        .set('Cookie', cookie)
+        .expect(403)
+      )
+      .then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 403, response.body);
+        expect(response.body.message).to.equal('Invalid CSRF token');
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should require authentication', (done) => {
+      unauthenticatedSession()
+        .then((cookie) => {
+          const newSiteRequest = request(app)
+            .delete('/v0/site/1/user/1')
+            .set('x-csrf-token', csrfToken.getToken())
+            .set('Cookie', cookie)
+            .expect(403);
+          return newSiteRequest;
+        })
+        .then((response) => {
+          validateAgainstJSONSchema('DELETE', path, 403, response.body);
+          expect(response.body.message).to.equal(authErrorMessage);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should return an error if siteId and userId are not numbers', (done) => {
+      const userPromise = factory.user();
+
+      Promise.props({
+        user: userPromise,
+        site: factory.site(),
+        cookie: authenticatedSession(userPromise),
+      })
+      .then(models =>
+        request(app).delete('/v0/site/a-site/user/a-user')
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', models.cookie)
+          .expect(400)
+      ).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 400, response.body);
+        expect(response.body.message).to.equal('Bad Request');
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should return a 404 if the site cannot be found', (done) => {
+      const userPromise = factory.user();
+
+      Promise.props({
+        user: userPromise,
+        site: factory.site(),
+        cookie: authenticatedSession(userPromise),
+      })
+      .then(models =>
+        request(app).delete(`/v0/site/10000/user/${models.user.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', models.cookie)
+          .expect(404)
+      ).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 404, response.body);
+        expect(response.body.message).to.equal('Not found');
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should remove the user from the site', (done) => {
+      const mike = factory.user({ username: 'mike' });
+      const jane = factory.user({ username: 'jane' });
+      let currentSite;
+
+      Promise.props({
+        user: jane,
+        site: factory.site({ users: Promise.all([mike, jane]) }),
+        cookie: authenticatedSession(jane),
+      }).then(({ user, site, cookie }) => {
+        currentSite = site;
+
+        return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(200);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 200, response.body);
+        return Site.withUsers(currentSite.id);
+      }).then((fetchedSite) => {
+        expect(fetchedSite.Users).to.be.an('array');
+        expect(fetchedSite.Users.length).to.equal(1);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should respond with a 400 when deleting the final user', (done) => {
+      const userPromise = factory.user();
+
+      Promise.props({
+        user: userPromise,
+        site: factory.site({ users: Promise.all([userPromise]) }),
+        cookie: authenticatedSession(userPromise),
+      })
+      .then(({ user, site, cookie }) =>
+        request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(400)
+      ).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 400, response.body);
+        expect(response.body.message).to.equal('A site must have at least one user');
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should respond with a 400 if the user does not have admin access', (done) => {
+      const username = 'jane';
+      const userA = factory.user();
+      const userB = factory.user();
+      const repo = 'whatever';
+      const siteProps = {
+        owner: username,
+        repository: repo,
+        users: Promise.all([userA, userB]),
+      };
+
+      nock.cleanAll();
+
+      Promise.props({
+        user: userA,
+        site: factory.site(siteProps),
+        cookie: authenticatedSession(userA),
+      }).then(({ user, site, cookie }) => {
+        githubAPINocks.repo({
+          owner: site.username,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: false, push: false },
+          }],
+        });
+
+        return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(400);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 400, response.body);
+        expect(response.body.message).to.equal('You do not have write access to this repository');
+        done();
+      })
+      .catch(done);
     });
   });
 
