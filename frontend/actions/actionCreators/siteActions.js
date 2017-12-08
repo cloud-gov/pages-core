@@ -35,6 +35,10 @@ const siteUserAdded = site => ({
   site,
 });
 
+const siteUserRemoved = (site, users) => ({
+  type: siteUserRemovedType
+});
+
 export {
   sitesFetchStarted, sitesFetchStartedType,
   sitesReceived, sitesReceivedType,

@@ -10,6 +10,7 @@ import {
   dispatchSiteUpdatedAction,
   dispatchSiteDeletedAction,
   dispatchUserAddedToSiteAction,
+  dispatchUserRemovedFromSiteAction,
   dispatchShowAddNewSiteFieldsAction,
 } from './dispatchActions';
 
@@ -54,6 +55,10 @@ export default {
           alertError(err);
         }
       });
+  },
+
+  removeUserFromSite({ user, repository }) {
+    return;
   },
 
   updateSite(site, data) {

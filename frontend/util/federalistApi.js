@@ -67,6 +67,12 @@ export default {
     });
   },
 
+  removeUserFromSite({ user, repository }) {
+    return this.fetch('', {
+
+    });
+  },
+
   addSite(site) {
     return this.fetch('site', {
       method: 'POST',
