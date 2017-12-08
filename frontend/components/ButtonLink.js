@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const propTypes = {
-  clickHandler: PropTypes.func,
+  clickHandler: PropTypes.func.isRequired,
   children: PropTypes.node,
 };
 
@@ -18,5 +18,8 @@ const ButtonLink = ({ clickHandler, children }) =>
 /* eslint-enable jsx-a11y/href-no-hash */
 
 ButtonLink.propTypes = propTypes;
+ButtonLink.defaultProps = {
+  children: null
+};
 
 export default ButtonLink;
