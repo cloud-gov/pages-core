@@ -5,6 +5,10 @@ const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const siteSerializer = require('../serializers/site');
 const { User, Site, Build } = require('../models');
 
+const sendJSON = (site, res) =>
+  siteSerializer.serialize(site)
+    .then(siteJSON => res.json(siteJSON));
+
 module.exports = {
   findAllForUser: (req, res) => {
     User.findById(req.user.id, { include: [Site] })
@@ -81,7 +85,7 @@ module.exports = {
       return;
     }
 
-    authorizer.create(req.user, body)
+    authorizer.addUser(req.user, body)
       .then(() => SiteMembershipCreator.createSiteMembership({
         user: req.user,
         siteParams: body,
@@ -93,6 +97,37 @@ module.exports = {
       .catch((err) => {
         res.error(err);
       });
+  },
+
+  removeUser: (req, res) => {
+    const { site_id: siteId, user_id: userId } = req.params;
+
+    if (!Number(siteId) || !Number(userId)) {
+      return res.error(400);
+    }
+
+    return Site.withUsers(siteId).then((site) => {
+      if (!site) {
+        throw 404;
+      }
+
+      if (site.Users.length === 1) {
+        throw {
+          status: 400,
+          message: 'A site must have at least one user',
+        };
+      }
+
+      return authorizer.removeUser(req.user, site).then(() => site);
+    }).then(site =>
+      SiteMembershipCreator.revokeSiteMembership({
+        user: req.user,
+        site,
+        userId,
+      })
+    ).then(() => Site.withUsers(siteId))
+    .then(site => sendJSON(site, res))
+    .catch(res.error);
   },
 
   create: (req, res) => {
