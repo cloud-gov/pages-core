@@ -42,7 +42,7 @@ describe('<GitHubRepoLink/>', () => {
   it('links to a specific commit', () => {
     const props = { owner: 'zookeeni', repository: 'veggies', sha: '123A' };
     const wrapper = shallow(<RepoLink {...props} />).first().shallow();
-    const commitUrl = `https://github.com/${props.owner}/${props.repository}/commits/${props.sha}`;
+    const commitUrl = `https://github.com/${props.owner}/${props.repository}/commit/${props.sha}`;
     const anchor = wrapper.find('a');
 
     expect(anchor.prop('href')).to.equal(commitUrl);
