@@ -1,5 +1,6 @@
 const path = require('path');
 
+const BuildCounter = require('../services/BuildCounter');
 const { getDirectoryFiles, loadAssetManifest, getSiteDisplayEnv } = require('../utils');
 
 const CONTENT_DIR = 'content';
@@ -55,7 +56,8 @@ module.exports = {
     const contentFilePath = findContentFilePath(reqPath, availableContentFiles);
 
     if (!contentFilePath) {
-      return res.status(404).send('Not Found');
+      res.status(404).send('Not Found');
+      return;
     }
 
     if (process.env.NODE_ENV === 'development') {
@@ -71,6 +73,10 @@ module.exports = {
       siteDisplayEnv,
     };
 
-    return res.render(path.join(CONTENT_DIR, contentFilePath), context);
+    BuildCounter.countBuildsFromPastWeek()
+      .then((count) => {
+        context.buildCount = count;
+        return res.render(path.join(CONTENT_DIR, contentFilePath), context);
+      });
   },
 };
