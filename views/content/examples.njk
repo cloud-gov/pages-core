@@ -1,0 +1,136 @@
+{% extends "base.njk" %}
+
+{% block main_content %}
+  <div id="home">
+    <div class="hero">
+      <div class="usa-grid">
+        <div class="usa-width-one-half">
+          <div class="usa-hero-callout usa-section-dark">
+            <h1>
+              Easy to maintain.
+            </h1>
+            <p>Our partners made and previewed
+              {{ buildCount }}
+              site updates last week.</p>
+          </div>
+        </div>
+        <div class="usa-width-one-half">
+          <div class="usa-hero-callout usa-section-dark">
+            <h1>
+              Trusted and scalable.
+            </h1>
+            <p>Used by 8 agencies to host 96 compliant websites with over 140,000 pageviews per day.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="featured-site">
+      <div class="usa-grid">
+        <div class="usa-width-one-half">
+          <img src="/images/example-sites/vote-gov.png"/>
+        </div>
+        <div class="usa-width-one-half">
+          <h2>Vote.gov</h2>
+          <p>Vote.gov makes it easier for eligible voters participate in our democratic process by providing streamlined information on how to vote. Site visitors can register electronically in states that allow it, and download a printable application in a
+            number of languages for those states where electronic registration isn't an option.</p>
+          <p>
+            <a class="usa-button" href="https://docs.google.com/forms/d/1iB8aW7c9r1QH3s8XElQCrnXRGjAiPUYpWG1CMeEqGIo/viewform">Learn more</a>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="featured-site">
+      <div class="usa-grid">
+        <div class="usa-width-one-half">
+          <h2>College Scorecard</h2>
+          <p>The U.S. Department of Education uses Federalist to host College Scorecard. Combined with an API server, College Scorecard provides important information on everything from financial aid to expected earnings. Federalist's cloud infrastructure
+            helps manage site traffic during spikes in visitors, making sure College Scorecard is always available.
+          </p>
+          <p>
+            <a class="usa-button" href="https://docs.google.com/forms/d/1iB8aW7c9r1QH3s8XElQCrnXRGjAiPUYpWG1CMeEqGIo/viewform">Learn more</a>
+          </p>
+        </div>
+        <div class="usa-width-one-half">
+          <img src="/images/example-sites/college-scorecard.png"/>
+        </div>
+      </div>
+    </div>
+    <div class="featured-site">
+      <div class="usa-grid">
+        <div class="usa-width-one-half">
+          <img src="/images/example-sites/cyber-dhs.png"/>
+        </div>
+        <div class="usa-width-one-half">
+          <h2>Department of Homeland Security</h2>
+          <p>DHS used a Federalist template to publish information about a new
+            <a href="https://cyber.dhs.gov/">binding operational directive</a>. Federalist makes it easy to update and maintain the documentation, reducing e-mail queries to DHS.</p>
+          <p>
+            <a class="usa-button" href="https://docs.google.com/forms/d/1iB8aW7c9r1QH3s8XElQCrnXRGjAiPUYpWG1CMeEqGIo/viewform">Learn more</a>
+          </p>
+        </div>
+      </div>
+    </div>
+    <section class="usa-section">
+      <div class="usa-grid">
+        <div class="flexbox-grid example-cards">
+          <div class="usa-width-one-third">
+            <a href="https://18f.gsa.gov">
+              <div class="well-heading"><img data-action="name-site" class="thumbnail" src="/images/example-sites/cards/18f-gsa-gov.png" alt="18F home page">
+              </div>
+              <div class="well-text">
+                <h3 class="well-title">18F.gsa.gov
+                </h3>
+              </div>
+            </a>
+          </div>
+          <div class="usa-width-one-third">
+            <a href="https://login.gov">
+              <div class="well-heading"><img data-action="name-site" class="thumbnail" src="/images/example-sites/cards/login-gov.png" alt="Login.gov home page">
+              </div>
+              <div class="well-text">
+                <h3 class="well-title">Login.gov</h3>
+              </div>
+            </a>
+          </div>
+          <div class="usa-width-one-third">
+            <a href="https://useiti.doi.gov">
+              <div class="well-heading"><img data-action="name-site" class="thumbnail" src="/images/example-sites/cards/useiti-doi-gov.png" alt="U.S. DOI Natural Resources Revenue Data home page">
+              </div>
+              <div class="well-text">
+                <h3 class="well-title">DOI Revenue Data</h3>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="flexbox-grid example-cards">
+          <div class="usa-width-one-third">
+            <a href="https://oes.gsa.gov">
+              <div class="well-heading"><img data-action="name-site" class="thumbnail" src="/images/example-sites/cards/oes-gsa-gov.png" alt="GSA Office of Evaluation Sciences home page">
+              </div>
+              <div class="well-text">
+                <h3 class="well-title">OES</h3>
+              </div>
+            </a>
+          </div>
+          <div class="usa-width-one-third">
+            <a href="https://standards.usa.gov/">
+              <div class="well-heading"><img data-action="name-site" class="thumbnail" src="/images/example-sites/cards/standards-usa-gov.png" alt="U.S. Web Design Standards home page">
+              </div>
+              <div class="well-text">
+                <h3 class="well-title">USWDS</h3>
+              </div>
+            </a>
+          </div>
+          <div class="usa-width-one-third">
+            <a href="https://tech.gsa.gov">
+              <div class="well-heading"><img data-action="name-site" class="thumbnail" src="/images/example-sites/cards/tech-gsa-gov.png" alt="GSA Modernizing Technology home page">
+              </div>
+              <div class="well-text">
+                <h3 class="well-title">tech.gsa.gov</h3>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  {% endblock %}
