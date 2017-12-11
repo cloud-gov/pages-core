@@ -3,7 +3,6 @@ import { SITE, USER } from '../../propTypes';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
 
-
 const SiteUsers = ({ site, user }) => {
   // sort users by lower-cased usernames
   const users = site.users.slice().sort((a, b) => {

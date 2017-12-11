@@ -684,7 +684,7 @@ describe('Site API', () => {
           .expect(400)
       ).then((response) => {
         validateAgainstJSONSchema('DELETE', path, 400, response.body);
-        expect(response.body.message).to.equal('A site must have at least one user');
+        expect(response.body.message).to.equal('A site must have at least one user. If you want to remove the last user, delete the site from Settings -> Advanced');
         done();
       })
       .catch(done);

@@ -15,7 +15,7 @@ describe('sitesReducer', () => {
   const SITES_RECEIVED = 'hey, sites!';
   const BUILD_RESTARTED = 'build restarted!';
   const SITE_USER_ADDED = 'site user added';
-  const SITE_USER_REMOVED = 'SITE_USER_REMOVED'
+  const SITE_USER_REMOVED = 'SITE_USER_REMOVED';
 
   beforeEach(() => {
     fixture = proxyquire('../../../frontend/reducers/sites', {
@@ -233,19 +233,19 @@ describe('sitesReducer', () => {
       id: 1,
       owner: 'person1',
       repository: 'a',
-      users: [{ username: 'james' }, { username: 'jane' }]
+      users: [{ username: 'james' }, { username: 'jane' }],
     };
 
     const state = {
       isLoading: false,
       data: [
         oldSite, {
-          id: 2, owner: 'person2', repository: 'b', users: []
+          id: 2, owner: 'person2', repository: 'b', users: [],
         },
-      ]
+      ],
     };
     const updatedSite = { ...oldSite, users: [{ username: 'jane' }] };
-    const actual = siteReducer(state, { type: 'SITE_USER_REMOVED', site: updatedSite });
+    const actual = siteReducer(state, { type: SITE_USER_REMOVED, site: updatedSite });
 
     expect(actual.data.length).to.equal(2);
     expect(actual.data[0].users[0].username).to.equal('jane');

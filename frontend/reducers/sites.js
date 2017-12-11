@@ -53,13 +53,10 @@ export default function sites(state = initialState, action) {
       };
 
     case SITE_USER_ADDED:
-      if (action.site) {
-        return {
-          isLoading: false,
-          data: state.data.concat(action.site),
-        };
-      }
-      return state;
+      return action.site ? {
+        isLoading: false,
+        data: state.data.concat(action.site),
+      } : state;
 
     case SITE_USER_REMOVED: {
       return {

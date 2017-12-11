@@ -12,10 +12,8 @@ const sendJSON = (site, res) =>
 module.exports = {
   findAllForUser: (req, res) => {
     User.findById(req.user.id, { include: [Site] })
-      .then(user => siteSerializer.serialize(user.Sites))
-      .then((sitesJSON) => {
-        res.json(sitesJSON);
-      }).catch((err) => {
+      .then(user => sendJSON(user.Sites, res))
+      .catch((err) => {
         res.error(err);
       });
   },
