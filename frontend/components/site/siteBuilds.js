@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
+import GitHubLink from '../GitHubLink/GitHubLink';
+import GitHubMark from '../GitHubMark';
 
 import buildActions from '../../actions/buildActions';
 import LoadingIndicator from '../LoadingIndicator';
@@ -43,6 +45,28 @@ class SiteBuilds extends React.Component {
     /* eslint-enable jsx-a11y/href-no-hash */
   }
 
+  static commitLink(build) {
+    if (!build.commitSha) {
+      return null;
+    }
+
+    const { owner, repository } = build.site;
+
+    return (
+      <span>
+        <br />
+        <GitHubLink
+          owner={owner}
+          repository={repository}
+          sha={build.commitSha}
+          title={build.commitSha}
+        >
+          View Commit <GitHubMark />
+        </GitHubLink>
+      </span>
+    );
+  }
+
   componentDidMount() {
     buildActions.fetchBuilds(this.props.site);
   }
@@ -57,7 +81,11 @@ class SiteBuilds extends React.Component {
   renderEmptyState() {
     return (
       <div>
-        <p>This site does not have any builds.</p>
+        <p>This site does not yet have any builds.</p>
+        <p>
+          If this site was just added, the first build should be available
+          within a few minutes.
+        </p>
         <RefreshBuildsButton site={this.props.site} />
       </div>
     );
@@ -98,7 +126,10 @@ class SiteBuilds extends React.Component {
 
               return (
                 <tr key={build.id}>
-                  <td>{ build.branch }</td>
+                  <td>
+                    { build.branch }
+                    { SiteBuilds.commitLink(build) }
+                  </td>
                   <td>{ SiteBuilds.getUsername(build) }</td>
                   <td>{ timeFrom(build.completedAt) }</td>
                   <td>{ duration(build.createdAt, build.completedAt) }</td>
@@ -136,6 +167,7 @@ SiteBuilds.propTypes = {
       state: PropTypes.string,
       error: PropTypes.string,
       branch: PropTypes.string,
+      commitSha: PropTypes.string,
       completedAt: PropTypes.string,
       createdAt: PropTypes.string,
       user: PropTypes.shape({

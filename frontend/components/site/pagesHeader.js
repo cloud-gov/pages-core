@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 
-import GitHubRepoLink from '../GitHubRepoLink';
+import GitHubIconLink from '../GitHubLink/GitHubIconLink';
 
 
 const propTypes = {
@@ -24,7 +24,7 @@ const PagesHeader = ({ owner, repository, title, viewLink }) => (
         <h1>
           {owner}/{repository}
           {' '}
-          <GitHubRepoLink owner={owner} repository={repository} />
+          <GitHubIconLink owner={owner} repository={repository} />
         </h1>
         <h2>{title}</h2>
       </div>

@@ -63,7 +63,7 @@ export class TemplateList extends React.Component {
     let index = 0;
 
     const templateGrid = templateRows.map(row => (
-      <div className="flexbox-grid flexbox-grid-4" key={row}>
+      <div className={`flexbox-grid flexbox-grid-${MAX_CELLS_PER_ROW}`} key={row}>
         {row.map((templateName) => {
           const template = templates[templateName];
           return (

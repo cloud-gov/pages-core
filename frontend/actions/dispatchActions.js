@@ -19,6 +19,10 @@ const updateRouterToSitesUri = () => {
   pushHistory('/sites');
 };
 
+const updateRouterToSiteBuildsUri = (site) => {
+  pushHistory(`/sites/${site.id}/builds`);
+};
+
 const dispatchSitesFetchStartedAction = () => {
   dispatch(createSitesFetchStartedAction());
 };
@@ -53,6 +57,7 @@ const dispatchHideAddNewSiteFieldsAction = () => {
 
 export {
   updateRouterToSitesUri,
+  updateRouterToSiteBuildsUri,
   dispatchSitesFetchStartedAction,
   dispatchSitesReceivedAction,
   dispatchSiteAddedAction,
