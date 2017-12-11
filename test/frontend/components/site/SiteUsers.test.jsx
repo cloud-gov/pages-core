@@ -1,7 +1,9 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import { stub } from 'sinon';
 import SiteUsers from '../../../../frontend/components/site/SiteUsers';
+import siteActions from '../../../../frontend/actions/siteActions';
 
 
 describe('<SiteUsers/>', () => {
@@ -70,12 +72,16 @@ describe('<SiteUsers/>', () => {
     });
 
     it('should render a `Remove user` link in each action column', () => {
+      const clickSpy = stub(siteActions, 'removeUserFromSite');
       wrapper = shallow(<SiteUsers {...props} />);
       const rows = wrapper.find('tbody tr');
-      rows.forEach((row) => {
-        const removeUserLink = row.find('td').last().find('ButtonLink');
 
-        removeUserLink.simulate('click');
+      rows.forEach((row) => {
+        const removeUserLink = row.find('td').last().find('ButtonLink').shallow();
+
+        removeUserLink.simulate('click', { preventDefault: () => ({}) });
+
+        expect(clickSpy.called).to.be.true;
         expect(removeUserLink.exists()).to.be.true;
         expect(removeUserLink.contains('Remove user')).to.be.true;
       });

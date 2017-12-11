@@ -13,7 +13,7 @@ const SiteUsers = ({ site, user }) => {
     return -1;
   });
 
-  const handleClick = (event, userToRemove) => {
+  const handleClick = userToRemove => (event) => {
     event.preventDefault();
 
     siteActions.removeUserFromSite(site.id, userToRemove.id);
@@ -53,7 +53,7 @@ const SiteUsers = ({ site, user }) => {
                 {u.username.toLowerCase() === user.username.toLowerCase() ? '(you)' : ''}
               </td>
               <td>
-                <ButtonLink clickHandler={e => handleClick(e, user)}>Remove user</ButtonLink>
+                <ButtonLink clickHandler={handleClick(user)}>Remove user</ButtonLink>
               </td>
             </tr>)
           )}
