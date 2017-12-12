@@ -3,6 +3,10 @@ import { SITE, USER } from '../../propTypes';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
 
+const isSiteOwner = (currentUser, maybeOwner) =>
+  maybeOwner.username.toLowerCase() === currentUser.username.toLowerCase();
+
+
 const SiteUsers = ({ site, user }) => {
   // sort users by lower-cased usernames
   const users = site.users.slice().sort((a, b) => {
@@ -38,22 +42,27 @@ const SiteUsers = ({ site, user }) => {
           </tr>
         </thead>
         <tbody>
-          {users.map(u =>
-            (<tr key={u.username}>
+          {users.map(rowUser =>
+            (<tr key={rowUser.username}>
               <td>
                 <a
-                  href={`https://github.com/${u.username}`}
+                  href={`https://github.com/${rowUser.username}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  title={`Visit GitHub profile for ${u.username}`}
+                  title={`Visit GitHub profile for ${rowUser.username}`}
                 >
-                  {u.username}
+                  {rowUser.username}
                 </a>
                 {' '}
-                {u.username.toLowerCase() === user.username.toLowerCase() ? '(you)' : ''}
+                {isSiteOwner(user, rowUser) ? '(you)' : ''}
               </td>
               <td>
-                <ButtonLink clickHandler={handleClick(user)}>Remove user</ButtonLink>
+                {
+                  isSiteOwner(user, rowUser) ? '-' :
+                  <ButtonLink clickHandler={handleClick(rowUser)}>
+                    Remove user
+                  </ButtonLink>
+                }
               </td>
             </tr>)
           )}

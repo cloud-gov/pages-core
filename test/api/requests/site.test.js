@@ -684,7 +684,44 @@ describe('Site API', () => {
           .expect(400)
       ).then((response) => {
         validateAgainstJSONSchema('DELETE', path, 400, response.body);
-        expect(response.body.message).to.equal('A site must have at least one user. If you want to remove the last user, delete the site from Settings -> Advanced');
+        expect(response.body.message).to.equal('A site must have at least one user. If you want to remove the last user, delete the site from Settings -> Advanced.');
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should respond with a 400 when the site owner attempts to delete the site', (done) => {
+      const username = 'a-user';
+      const userPromise = factory.user({ username });
+      const anotherUser = factory.user();
+      const siteProps = {
+        owner: username,
+        users: Promise.all([userPromise, anotherUser]),
+      };
+
+      nock.cleanAll();
+
+      Promise.props({
+        user: userPromise,
+        site: factory.site(siteProps),
+        cookie: authenticatedSession(userPromise),
+      })
+      .then(({ user, site, cookie }) => {
+        githubAPINocks.repo({
+          owner: user.username,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: false, push: false },
+          }],
+        });
+
+        return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(400);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 400, response.body);
+        expect(response.body.message).to.equal('You cannot remove yourself from a site that you are the owner of.');
         done();
       })
       .catch(done);

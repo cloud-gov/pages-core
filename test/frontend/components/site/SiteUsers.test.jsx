@@ -66,25 +66,28 @@ describe('<SiteUsers/>', () => {
     });
 
     it('should render an `actions` column for each user', () => {
-      wrapper = shallow(<SiteUsers {...props} />);
       const rows = wrapper.find('tbody tr');
       rows.forEach(row => expect(row.find('td')).to.have.length(2));
     });
 
-    it('should render a `Remove user` link in each action column', () => {
-      const clickSpy = stub(siteActions, 'removeUserFromSite');
-      wrapper = shallow(<SiteUsers {...props} />);
+    it('should render a `Remove User` link if the user is not the site owner', () => {
       const rows = wrapper.find('tbody tr');
+      expect(rows.at(0).find('td').last().find('ButtonLink')).to.have.length(1);
+      expect(rows.at(1).find('td').last().find('ButtonLink')).to.have.length(0);
+    });
 
-      rows.forEach((row) => {
-        const removeUserLink = row.find('td').last().find('ButtonLink').shallow();
+    it('should call `removeUserFromSite` when `Remove user` is clicked', () => {
+      const clickSpy = stub(siteActions, 'removeUserFromSite');
+      const rows = wrapper.find('tbody tr');
+      const removeUserLink = rows.at(0).find('td').last().find('ButtonLink')
+        .shallow();
 
-        removeUserLink.simulate('click', { preventDefault: () => ({}) });
+      expect(removeUserLink.exists()).to.be.true;
+      expect(removeUserLink.contains('Remove user')).to.be.true;
 
-        expect(clickSpy.called).to.be.true;
-        expect(removeUserLink.exists()).to.be.true;
-        expect(removeUserLink.contains('Remove user')).to.be.true;
-      });
+      removeUserLink.simulate('click', { preventDefault: () => ({}) });
+
+      expect(clickSpy.called).to.be.true;
     });
   });
 });

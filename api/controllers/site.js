@@ -112,7 +112,7 @@ module.exports = {
       if (site.Users.length === 1) {
         throw {
           status: 400,
-          message: 'A site must have at least one user. If you want to remove the last user, delete the site from Settings -> Advanced',
+          message: 'A site must have at least one user. If you want to remove the last user, delete the site from Settings -> Advanced.',
         };
       }
 

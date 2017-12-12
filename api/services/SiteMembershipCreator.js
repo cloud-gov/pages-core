@@ -52,8 +52,15 @@ const createSiteMembership = ({ user, siteParams }) => {
   ).then(() => site);
 };
 
-const revokeSiteMembership = ({ user, site, userId }) =>
-  GitHub.checkPermissions(user, site.owner, site.repository)
+const revokeSiteMembership = ({ user, site, userId }) => {
+  if (user.username.toLowerCase() === site.owner.toLowerCase()) {
+    throw {
+      message: 'You cannot remove yourself from a site that you are the owner of.',
+      status: 400,
+    };
+  }
+
+  return GitHub.checkPermissions(user, site.owner, site.repository)
     .then((permissions) => {
       if (!permissions.push) {
         throw {
@@ -66,5 +73,6 @@ const revokeSiteMembership = ({ user, site, userId }) =>
       const userToRemove = site.Users.find(u => u.id === Number(userId));
       site.removeUser(userToRemove);
     });
+};
 
 module.exports = { createSiteMembership, revokeSiteMembership };
