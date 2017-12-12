@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
-import HttpsUrlInput from '../../HttpsUrlInput';
+import HttpsUrlField from '../../Fields/HttpsUrlField';
 
 const propTypes = {
   // initialValues is what the initial form values are based on
@@ -49,17 +49,12 @@ export const BasicSiteSettings = ({
               name="defaultBranch"
               className="form-control"
             />
-            <label htmlFor="domainInput">Live URL:</label>
-            <Field
+            <HttpsUrlField
+              label="Live URL:"
               name="domain"
-              component={p =>
-                <HttpsUrlInput
-                  value={p.input.value}
-                  onChange={p.input.onChange}
-                  className="form-control"
-                  id="domainInput"
-                />
-              }
+              id="domainInput"
+              placeholder="https://example.gov"
+              className="form-control"
             />
           </div>
         </div>
@@ -83,18 +78,12 @@ export const BasicSiteSettings = ({
               type="text"
               placeholder="Branch name"
             />
-            <label htmlFor="demoDomainInput">Demo URL:</label>
-            <Field
+            <HttpsUrlField
+              label="Demo URL:"
               name="demoDomain"
-              component={p =>
-                <HttpsUrlInput
-                  value={p.input.value}
-                  onChange={p.input.onChange}
-                  className="form-control"
-                  placeholder="https://preview.example.com"
-                  id="demoDomainInput"
-                />
-              }
+              id="demoDomainInput"
+              placeholder="https://preview.example.gov"
+              className="form-control"
             />
           </div>
         </div>

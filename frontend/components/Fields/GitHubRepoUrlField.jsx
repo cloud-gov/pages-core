@@ -1,7 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Field } from 'redux-form';
-import RenderField from './RenderField';
+import RenderUrlField from './RenderUrlField';
 
 const githubUrlRegex = /^https:\/\/github\.com\/[a-zA-Z0-9._-]{2,}\/[a-zA-Z0-9._-]{2,}$/;
 
@@ -12,19 +11,12 @@ export const githubRepoUrl = (value) => {
   return undefined;
 };
 
-const GitHubRepoUrlField = ({ id, ...props }) => (
+const GitHubRepoUrlField = ({ ...props }) => (
   <Field
-    id={id}
-    component={RenderField}
+    component={RenderUrlField}
     validate={[githubRepoUrl]}
     {...props}
   />
 );
-
-const propTypes = {
-  id: PropTypes.string.isRequired,
-};
-
-GitHubRepoUrlField.propTypes = propTypes;
 
 export default GitHubRepoUrlField;
