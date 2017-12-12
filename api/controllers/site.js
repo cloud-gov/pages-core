@@ -98,9 +98,10 @@ module.exports = {
   },
 
   removeUser: (req, res) => {
-    const { site_id: siteId, user_id: userId } = req.params;
+    const siteId = Number(req.params.site_id);
+    const userId = Number(req.params.user_id);
 
-    if (!Number(siteId) || !Number(userId)) {
+    if (isNaN(siteId) || isNaN(userId)) {
       return res.error(400);
     }
 

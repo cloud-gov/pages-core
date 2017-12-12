@@ -669,6 +669,51 @@ describe('Site API', () => {
       .catch(done);
     });
 
+    it('should allow the owner to remove a user from the site', (done) => {
+      const username = 'b-user';
+      const userPromise = factory.user({ username });
+      const anotherUser = factory.user();
+      const siteProps = {
+        owner: username,
+        users: Promise.all([userPromise, anotherUser]),
+      };
+
+      let currentSite;
+
+      nock.cleanAll();
+
+      Promise.props({
+        user: userPromise,
+        site: factory.site(siteProps),
+        cookie: authenticatedSession(userPromise),
+        anotherUser,
+      })
+      .then((models) => {
+        currentSite = models.site;
+
+        githubAPINocks.repo({
+          owner: username,
+          repository: models.site.repo,
+          response: [200, {
+            permissions: { admin: true, push: true },
+          }],
+        });
+
+        return request(app).delete(`/v0/site/${models.site.id}/user/${models.anotherUser.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', models.cookie)
+          .expect(200);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 200, response.body);
+        return Site.withUsers(currentSite.id);
+      }).then((fetchedSite) => {
+        expect(fetchedSite.Users).to.be.an('array');
+        expect(fetchedSite.Users.length).to.equal(1);
+        done();
+      })
+      .catch(done);
+    });
+
     it('should respond with a 400 when deleting the final user', (done) => {
       const userPromise = factory.user();
 
@@ -690,7 +735,7 @@ describe('Site API', () => {
       .catch(done);
     });
 
-    it('should respond with a 400 when the site owner attempts to delete the site', (done) => {
+    it('should respond with a 400 when the site owner attempts to remove themselves', (done) => {
       const username = 'a-user';
       const userPromise = factory.user({ username });
       const anotherUser = factory.user();
@@ -708,10 +753,10 @@ describe('Site API', () => {
       })
       .then(({ user, site, cookie }) => {
         githubAPINocks.repo({
-          owner: user.username,
+          owner: username,
           repository: site.repo,
           response: [200, {
-            permissions: { admin: false, push: false },
+            permissions: { admin: true, push: true },
           }],
         });
 
@@ -721,7 +766,7 @@ describe('Site API', () => {
           .expect(400);
       }).then((response) => {
         validateAgainstJSONSchema('DELETE', path, 400, response.body);
-        expect(response.body.message).to.equal('You cannot remove yourself from a site that you are the owner of.');
+        expect(response.body.message).to.equal('You cannot remove yourself from a site that you own.');
         done();
       })
       .catch(done);

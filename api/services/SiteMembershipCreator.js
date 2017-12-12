@@ -53,9 +53,9 @@ const createSiteMembership = ({ user, siteParams }) => {
 };
 
 const revokeSiteMembership = ({ user, site, userId }) => {
-  if (user.username.toLowerCase() === site.owner.toLowerCase()) {
+  if (userId === user.id && user.username.toLowerCase() === site.owner.toLowerCase()) {
     throw {
-      message: 'You cannot remove yourself from a site that you are the owner of.',
+      message: 'You cannot remove yourself from a site that you own.',
       status: 400,
     };
   }
