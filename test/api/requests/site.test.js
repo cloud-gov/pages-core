@@ -806,7 +806,7 @@ describe('Site API', () => {
           .expect(400);
       }).then((response) => {
         validateAgainstJSONSchema('DELETE', path, 400, response.body);
-        expect(response.body.message).to.equal(siteErrors.OWNER_REMOVED_SELF);
+        expect(response.body.message).to.equal(siteErrors.OWNER_REMOVE);
         done();
       })
       .catch(done);

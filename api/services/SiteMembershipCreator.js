@@ -53,15 +53,8 @@ const createSiteMembership = ({ user, siteParams }) => {
   ).then(() => site);
 };
 
-const revokeSiteMembership = ({ user, site, userId }) => {
-  if (userId === user.id && user.username.toLowerCase() === site.owner.toLowerCase()) {
-    throw {
-      message: siteErrors.OWNER_REMOVED_SELF,
-      status: 400,
-    };
-  }
-
-  return GitHub.checkPermissions(user, site.owner, site.repository)
+const revokeSiteMembership = ({ user, site, userId }) =>
+  GitHub.checkPermissions(user, site.owner, site.repository)
     .then((permissions) => {
       if (!permissions.push) {
         throw {
@@ -82,6 +75,5 @@ const revokeSiteMembership = ({ user, site, userId }) => {
 
       site.removeUser(userToRemove);
     });
-};
 
 module.exports = { createSiteMembership, revokeSiteMembership };
