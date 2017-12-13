@@ -66,6 +66,13 @@ const revokeSiteMembership = ({ user, site, userId }) =>
     .then(() => {
       const userToRemove = site.Users.find(u => u.id === Number(userId));
 
+      if (!userToRemove) {
+        throw {
+          message: siteErrors.NO_ASSOCIATED_USER,
+          status: 404,
+        };
+      }
+
       if (userToRemove.username.toLowerCase() === site.owner.toLowerCase()) {
         throw {
           message: siteErrors.OWNER_REMOVE,

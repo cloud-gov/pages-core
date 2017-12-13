@@ -737,6 +737,37 @@ describe('Site API', () => {
       .catch(done);
     });
 
+    it('should respond with a 404 when the user to delete is not found', (done) => {
+      const userPromise = factory.user();
+      const otherUser = factory.user();
+
+      nock.cleanAll();
+
+      Promise.props({
+        site: factory.site({ users: Promise.all([userPromise, otherUser]) }),
+        cookie: authenticatedSession(userPromise),
+      })
+      .then((models) => {
+        githubAPINocks.repo({
+          owner: 'james',
+          repository: models.site.repo,
+          response: [200, {
+            permissions: { admin: true, push: true },
+          }],
+        });
+
+        return request(app).delete(requestPath(models.site.id, 100000))
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', models.cookie)
+          .expect(404);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 404, response.body);
+        expect(response.body.message).to.equal(siteErrors.NO_ASSOCIATED_USER);
+        done();
+      })
+      .catch(done);
+    });
+
     it('should respond with a 400 when any user attempts to remove the owner', (done) => {
       const ownerName = 'owner';
       const ownerUser = factory.user({ username: ownerName });
