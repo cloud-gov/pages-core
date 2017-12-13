@@ -59,6 +59,11 @@ class SiteSettings extends React.Component {
 
     return (
       <div>
+        <p>
+          See our doucmentation site for more about
+          <a href="https://federalist-docs.18f.gov/pages/using-federalist/#managing-site-settings">these settings</a> or 
+          <a href="https://federalist-docs.18f.gov/pages/using-federalist/previews/">viewing site previews</a>.
+        </p>
         <h3>Basic Settings</h3>
         <BasicSiteSettings
           initialValues={basicInitialValues}
