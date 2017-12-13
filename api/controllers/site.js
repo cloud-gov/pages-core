@@ -125,8 +125,8 @@ module.exports = {
         site,
         userId,
       })
-    ).then(() => Site.withUsers(siteId))
-    .then(site => sendJSON(site, res))
+    )
+    .then(() => sendJSON({ id: siteId }, res))
     .catch(res.error);
   },
 

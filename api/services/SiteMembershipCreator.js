@@ -80,7 +80,7 @@ const revokeSiteMembership = ({ user, site, userId }) =>
         };
       }
 
-      site.removeUser(userToRemove);
+      return site.removeUser(userToRemove);
     });
 
 module.exports = { createSiteMembership, revokeSiteMembership };
