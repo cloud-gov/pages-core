@@ -28,10 +28,10 @@ const SiteUsers = ({ site, user }) => {
       <p>
         This user table is a partially complete feature.
         It allows you to easily audit who else has access
-        to Federalist settings and logs for this site, and 
+        to Federalist settings and logs for this site, and
         to remove user access for others. Eventually,
         this table will be used to allow you to add other users.
-        Currently, new users get access for a specific site by 
+        Currently, new users get access for a specific site by
         logging into Federalist and adding the site themselves.
       </p>
       <h4 className="label">Federalist users associated with this site</h4>
