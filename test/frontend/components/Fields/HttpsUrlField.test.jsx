@@ -35,6 +35,8 @@ describe('<HttpsUrlField />', () => {
       expect(isHttpsUrlWithoutPath('')).to.be.undefined;
 
       expect(isHttpsUrlWithoutPath('anything')).to.equal(msg);
+      expect(isHttpsUrlWithoutPath('boop.com')).to.equal(msg);
+      expect(isHttpsUrlWithoutPath('https:boop.com')).to.equal(msg);
       expect(isHttpsUrlWithoutPath('http://boop.com')).to.equal(msg);
       expect(isHttpsUrlWithoutPath('https://boop.com/')).to.equal(msg);
       expect(isHttpsUrlWithoutPath('https://boop.com/subdir')).to.equal(msg);
