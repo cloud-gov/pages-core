@@ -6,6 +6,7 @@ import {
   siteDeletedType as SITE_DELETED,
   siteBranchesReceivedType as SITE_BRANCHES_RECEIVED,
   siteUserAddedType as SITE_USER_ADDED,
+  siteUserRemovedType as SITE_USER_REMOVED,
 } from '../actions/actionCreators/siteActions';
 
 const initialState = { isLoading: false };
@@ -52,13 +53,20 @@ export default function sites(state = initialState, action) {
       };
 
     case SITE_USER_ADDED:
-      if (action.site) {
-        return {
-          isLoading: false,
-          data: state.data.concat(action.site),
-        };
-      }
-      return state;
+      return action.site ? {
+        isLoading: false,
+        data: state.data.concat(action.site),
+      } : state;
+
+    case SITE_USER_REMOVED: {
+      return {
+        isLoading: false,
+        data: [
+          action.site,
+          ...state.data.filter(site => site.id !== action.site.id),
+        ],
+      };
+    }
 
     default:
       return state;

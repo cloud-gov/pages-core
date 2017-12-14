@@ -10,6 +10,7 @@ import {
   dispatchSiteUpdatedAction,
   dispatchSiteDeletedAction,
   dispatchUserAddedToSiteAction,
+  dispatchUserRemovedFromSiteAction,
   dispatchShowAddNewSiteFieldsAction,
 } from './dispatchActions';
 
@@ -17,7 +18,6 @@ import {
 const alertError = (error) => {
   alertActions.httpError(error.message);
 };
-
 
 export default {
   fetchSites() {
@@ -54,6 +54,12 @@ export default {
           alertError(err);
         }
       });
+  },
+
+  removeUserFromSite(siteId, userId) {
+    return federalist.removeUserFromSite(siteId, userId).then((site) => {
+      if (site) dispatchUserRemovedFromSiteAction(site);
+    });
   },
 
   updateSite(site, data) {

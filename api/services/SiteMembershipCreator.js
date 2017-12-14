@@ -1,5 +1,6 @@
 const GitHub = require('./GitHub');
 const { Site, User } = require('../models');
+const siteErrors = require('../responses/siteErrors');
 
 const checkGithubRepository = ({ user, owner, repository }) =>
   GitHub.getRepository(user, owner, repository).then((repo) => {
@@ -11,7 +12,7 @@ const checkGithubRepository = ({ user, owner, repository }) =>
     }
     if (!repo.permissions.push) {
       throw {
-        message: 'You do not have write access to this repository',
+        message: siteErrors.WRITE_ACCESS_REQUIRED,
         status: 400,
       };
     }
@@ -57,14 +58,29 @@ const revokeSiteMembership = ({ user, site, userId }) =>
     .then((permissions) => {
       if (!permissions.push) {
         throw {
-          message: 'You do not have write access to this repository',
+          message: siteErrors.WRITE_ACCESS_REQUIRED,
           status: 400,
         };
       }
     })
     .then(() => {
       const userToRemove = site.Users.find(u => u.id === Number(userId));
-      site.removeUser(userToRemove);
+
+      if (!userToRemove) {
+        throw {
+          message: siteErrors.NO_ASSOCIATED_USER,
+          status: 404,
+        };
+      }
+
+      if (userToRemove.username.toLowerCase() === site.owner.toLowerCase()) {
+        throw {
+          message: siteErrors.OWNER_REMOVE,
+          status: 400,
+        };
+      }
+
+      return site.removeUser(userToRemove);
     });
 
 module.exports = { createSiteMembership, revokeSiteMembership };

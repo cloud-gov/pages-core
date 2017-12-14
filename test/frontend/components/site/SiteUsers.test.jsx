@@ -1,7 +1,10 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import { stub } from 'sinon';
 import SiteUsers from '../../../../frontend/components/site/SiteUsers';
+import siteActions from '../../../../frontend/actions/siteActions';
+
 
 describe('<SiteUsers/>', () => {
   it('should render', () => {
@@ -16,39 +19,7 @@ describe('<SiteUsers/>', () => {
     expect(wrapper.find('table')).to.have.length(1);
   });
 
-  it('renders rows of users in order of username', () => {
-    const props = {
-      user: {
-        username: 'test-owner',
-        id: 4,
-        email: 'test-owner@beep.gov',
-      },
-      site: {
-        owner: 'test-owner',
-        repository: 'test-repo',
-        users: [
-          { id: 3, email: 'zboop@beep.gov', username: 'Zuser' },
-          { id: 4, email: 'test-owner@beep.gov', username: 'test-owner' },
-          { id: 1, email: 'aboop@beep.gov', username: 'Auser' },
-        ],
-      },
-    };
-
-    const wrapper = shallow(<SiteUsers {...props} />);
-    expect(wrapper.find('table')).to.have.length(1);
-
-    const rows = wrapper.find('tbody tr');
-    expect(rows).to.have.length(3);
-
-    const expectedOrder = ['Auser', 'test-owner', 'Zuser'];
-    rows.forEach((row, i) => {
-      expect(row.find('a').prop('href')).to.equal(
-        `https://github.com/${expectedOrder[i]}`
-      );
-    });
-  });
-
-  it('notes the current user as "you"', () => {
+  describe('rendered table', () => {
     const props = {
       user: {
         username: 'test-owner',
@@ -65,10 +36,58 @@ describe('<SiteUsers/>', () => {
       },
     };
 
-    const wrapper = shallow(<SiteUsers {...props} />);
-    const rows = wrapper.find('tbody tr');
-    expect(rows).to.have.length(2);
-    expect(rows.at(0).find('td').contains('(you)')).to.be.false;
-    expect(rows.at(1).find('td').contains('(you)')).to.be.true;
+    let wrapper;
+
+    beforeEach(() => {
+      wrapper = shallow(<SiteUsers {...props} />);
+    });
+
+    it('renders rows of users in order of username', () => {
+      const { users } = props.site;
+
+      expect(wrapper.find('table')).to.have.length(1);
+
+      const rows = wrapper.find('tbody tr');
+      expect(rows).to.have.length(users.length);
+
+      const expectedOrder = users.map(u => u.username);
+      rows.forEach((row, i) => {
+        expect(row.find('a').prop('href')).to.equal(
+          `https://github.com/${expectedOrder[i]}`
+        );
+      });
+    });
+
+    it('notes the current user as "you"', () => {
+      const rows = wrapper.find('tbody tr');
+      expect(rows).to.have.length(2);
+      expect(rows.at(0).find('td').contains('(you)')).to.be.false;
+      expect(rows.at(1).find('td').contains('(you)')).to.be.true;
+    });
+
+    it('should render an `actions` column for each user', () => {
+      const rows = wrapper.find('tbody tr');
+      rows.forEach(row => expect(row.find('td')).to.have.length(2));
+    });
+
+    it('should render a `Remove User` link if the user is not the site owner', () => {
+      const rows = wrapper.find('tbody tr');
+      expect(rows.at(0).find('td').last().find('ButtonLink')).to.have.length(1);
+      expect(rows.at(1).find('td').last().find('ButtonLink')).to.have.length(0);
+    });
+
+    it('should call `removeUserFromSite` when `Remove user` is clicked', () => {
+      const clickSpy = stub(siteActions, 'removeUserFromSite');
+      const rows = wrapper.find('tbody tr');
+      const removeUserLink = rows.at(0).find('td').last().find('ButtonLink')
+        .shallow();
+
+      expect(removeUserLink.exists()).to.be.true;
+      expect(removeUserLink.contains('Remove user')).to.be.true;
+
+      removeUserLink.simulate('click', { preventDefault: () => ({}) });
+
+      expect(clickSpy.called).to.be.true;
+    });
   });
 });

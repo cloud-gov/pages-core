@@ -1,0 +1,31 @@
+.featured-site {
+  padding: 5rem 0;
+  &:nth-last-of-type(2) {
+    background-color: $well-bg-color;
+  }
+  img {
+    border-bottom: 4px solid #afafaf;
+    margin-top: -3rem;
+  }
+}
+.usa-section {
+  background-color: $hero-bg-color;
+  background-color: $header-bg-color;
+  padding: 5rem 0;
+}
+.example-cards {
+  margin-bottom: 2.5rem;
+  .usa-width-one-third {
+    background: #fff;
+    box-shadow: 0 1px 9px rgba(0, 0, 0, .4);
+    padding: 1rem;
+    .well-heading {
+      margin-left: -1rem;
+      margin-right: -1rem;
+      margin-top: -1rem;
+    }
+    .well-title {
+      margin-bottom: 0;
+    }
+  }
+}
