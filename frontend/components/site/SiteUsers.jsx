@@ -3,8 +3,8 @@ import { SITE, USER } from '../../propTypes';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
 
-const isSiteOwner = (currentUser, maybeOwner) =>
-  maybeOwner.username.toLowerCase() === currentUser.username.toLowerCase();
+const isSiteOwner = (user, siteOwner) =>
+  user.username.toLowerCase() === siteOwner.toLowerCase();
 
 
 const SiteUsers = ({ site, user }) => {
@@ -55,11 +55,11 @@ const SiteUsers = ({ site, user }) => {
                   {rowUser.username}
                 </a>
                 {' '}
-                {isSiteOwner(user, rowUser) ? '(you)' : ''}
+                {rowUser.username.toLowerCase() === user.username.toLowerCase() ? '(you)' : ''}
               </td>
               <td>
                 {
-                  isSiteOwner(user, rowUser) ? '-' :
+                  isSiteOwner(rowUser, site.owner) ? '-' :
                   <ButtonLink clickHandler={handleClick(rowUser)}>
                     Remove user
                   </ButtonLink>
