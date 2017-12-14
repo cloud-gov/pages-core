@@ -6,6 +6,7 @@ import {
   siteUpdated as createSiteUpdatedAction,
   siteDeleted as createSiteDeletedAction,
   siteUserAdded as createSiteUserAddedAction,
+  siteUserRemoved as siteUserRemovedAction,
 } from './actionCreators/siteActions';
 
 import {
@@ -47,6 +48,10 @@ const dispatchUserAddedToSiteAction = (site) => {
   dispatch(createSiteUserAddedAction(site));
 };
 
+const dispatchUserRemovedFromSiteAction = (site) => {
+  dispatch(siteUserRemovedAction(site));
+};
+
 const dispatchShowAddNewSiteFieldsAction = () => {
   dispatch(createShowAddNewSiteFieldsAction());
 };
@@ -64,6 +69,7 @@ export {
   dispatchSiteUpdatedAction,
   dispatchSiteDeletedAction,
   dispatchUserAddedToSiteAction,
+  dispatchUserRemovedFromSiteAction,
   dispatchShowAddNewSiteFieldsAction,
   dispatchHideAddNewSiteFieldsAction,
 };
