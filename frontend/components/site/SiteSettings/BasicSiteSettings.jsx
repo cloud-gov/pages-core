@@ -67,7 +67,8 @@ export const BasicSiteSettings = ({
           <div className="well">
             <h3 className="well-heading">Demo Site</h3>
             <p className="well-text">
-              Setup a branch to be deployed to a demo URL.
+              Set a branch to be deployed to a custom demo URL like demo.yoursite.gov
+              instead of to a standard Federalist preview URL.
             </p>
             <label htmlFor="demoBranchInput">Branch name:</label>
             <Field
