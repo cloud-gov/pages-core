@@ -35,9 +35,17 @@ export const BasicSiteSettings = ({
           <div className="well">
             <h3 className="well-heading">Live Site</h3>
             <p className="well-text">
-              These settings control the primary branch Federalist uses to build your site.
-              <br />
-              After your DNS is pointed to Federalist, set the <a href="https://federalist-docs.18f.gov/pages/how-federalist-works/custom-urls/" target="_blank" rel="noopener noreferrer">live URL</a> to ensure the site builds correctly.
+              Set the primary branch Federalist uses to build your site.
+              After your DNS is pointed to Federalist, you'll set the 
+              <a 
+                href="https://federalist-docs.18f.gov/pages/how-federalist-works/custom-urls/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                title="Custom URL documentation"
+              >
+                live URL
+              </a> 
+              to ensure the site builds correctly.
             </p>
             <label htmlFor="defaultBranchInput">
               Branch name:
@@ -67,8 +75,8 @@ export const BasicSiteSettings = ({
           <div className="well">
             <h3 className="well-heading">Demo Site</h3>
             <p className="well-text">
-              Set a branch to be deployed to a custom demo URL like demo.yoursite.gov
-              instead of to a standard Federalist preview URL.
+              After setting up DNS with the Federalist team, set a demo branch to be deployed to a custom URL like demo.yoursite.gov
+              instead of a standard Federalist preview URL. (optional)
             </p>
             <label htmlFor="demoBranchInput">Branch name:</label>
             <Field
