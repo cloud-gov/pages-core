@@ -58,7 +58,10 @@ export default {
 
   removeUserFromSite(siteId, userId) {
     return federalist.removeUserFromSite(siteId, userId).then((site) => {
-      if (site) dispatchUserRemovedFromSiteAction(site);
+      if (site) {
+        dispatchUserRemovedFromSiteAction(site);
+        alertActions.alertSuccess('User successfully removed.');
+      }
     });
   },
 
