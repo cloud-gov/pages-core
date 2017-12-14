@@ -101,15 +101,18 @@ module.exports = {
   removeUser: (req, res) => {
     const siteId = Number(req.params.site_id);
     const userId = Number(req.params.user_id);
+    let site;
 
     if (isNaN(siteId) || isNaN(userId)) {
       return res.error(400);
     }
 
-    return Site.withUsers(siteId).then((site) => {
-      if (!site) {
+    return Site.withUsers(siteId).then((model) => {
+      if (!model) {
         throw 404;
       }
+
+      site = model;
 
       if (site.Users.length === 1) {
         throw {
@@ -118,15 +121,16 @@ module.exports = {
         };
       }
 
-      return authorizer.removeUser(req.user, site).then(() => site);
-    }).then(site =>
+      return authorizer.removeUser(req.user, site);
+    })
+    .then(() =>
       SiteMembershipCreator.revokeSiteMembership({
         user: req.user,
         site,
         userId,
       })
     )
-    .then(() => sendJSON({ id: siteId }, res))
+    .then(() => sendJSON(site, res))
     .catch(res.error);
   },
 
