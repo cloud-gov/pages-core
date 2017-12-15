@@ -12,6 +12,7 @@ describe('siteActions', () => {
   let fetchSites;
   let addSite;
   let addUserToSite;
+  let removeUserFromSite;
   let updateSite;
   let deleteSite;
   let httpErrorAlertAction;
@@ -27,6 +28,7 @@ describe('siteActions', () => {
   let dispatchSiteBranchesReceivedAction;
   let dispatchShowAddNewSiteFieldsAction;
   let dispatchUserAddedToSiteAction;
+  let dispatchUserRemovedFromSiteAction;
 
   const siteId = 'kuaw8fsru8hwugfw';
   const site = {
@@ -45,6 +47,7 @@ describe('siteActions', () => {
     fetchSites = stub();
     addSite = stub();
     addUserToSite = stub();
+    removeUserFromSite = stub();
     updateSite = stub();
     deleteSite = stub();
     fetchBranches = stub();
@@ -61,6 +64,7 @@ describe('siteActions', () => {
     dispatchSiteBranchesReceivedAction = stub();
     dispatchShowAddNewSiteFieldsAction = stub();
     dispatchUserAddedToSiteAction = stub();
+    dispatchUserRemovedFromSiteAction = stub();
 
     fixture = proxyquire('../../../frontend/actions/siteActions', {
       './dispatchActions': {
@@ -74,6 +78,7 @@ describe('siteActions', () => {
         dispatchSiteBranchesReceivedAction,
         dispatchShowAddNewSiteFieldsAction,
         dispatchUserAddedToSiteAction,
+        dispatchUserRemovedFromSiteAction,
       },
       './alertActions': {
         httpError: httpErrorAlertAction,
@@ -86,6 +91,7 @@ describe('siteActions', () => {
         updateSite,
         deleteSite,
         addUserToSite,
+        removeUserFromSite,
       },
       '../util/githubApi': {
         fetchBranches,
@@ -263,6 +269,16 @@ describe('siteActions', () => {
 
       const actual = fixture.addUserToSite(repoToAdd);
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
+    });
+  });
+
+  describe('.removeUserFromSite', () => {
+    it('triggers an http success alert when user is removed', () => {
+      removeUserFromSite.withArgs(1, 1).returns(Promise.resolve({}));
+      const actual = fixture.removeUserFromSite(1, 1);
+      actual.then(() => {
+        expect(alertSuccess.called).to.be.true;
+      });
     });
   });
 });

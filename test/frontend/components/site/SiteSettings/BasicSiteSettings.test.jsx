@@ -27,11 +27,31 @@ describe('<BasicSiteSettings/>', () => {
     const wrapper = shallow(<BasicSiteSettings {...props} />);
     expect(wrapper.exists()).to.be.true;
 
-    expect(wrapper.find('Field')).to.have.length(4);
+    expect(wrapper.find('Field')).to.have.length(2);
     expect(wrapper.find('Field[name="defaultBranch"]').exists()).to.be.true;
-    expect(wrapper.find('Field[name="domain"]').exists()).to.be.true;
     expect(wrapper.find('Field[name="demoBranch"]').exists()).to.be.true;
-    expect(wrapper.find('Field[name="demoDomain"]').exists()).to.be.true;
+
+    expect(wrapper.find('HttpsUrlField')).to.have.length(2);
+
+    const domainField = wrapper.find('HttpsUrlField[name="domain"]');
+    expect(domainField.exists()).to.be.true;
+    expect(domainField.props()).to.deep.equal({
+      label: 'Live URL:',
+      name: 'domain',
+      id: 'domainInput',
+      placeholder: 'https://example.gov',
+      className: 'form-control',
+    });
+
+    const demoDomainField = wrapper.find('HttpsUrlField[name="demoDomain"]');
+    expect(demoDomainField.exists()).to.be.true;
+    expect(demoDomainField.props()).to.deep.equal({
+      label: 'Demo URL:',
+      name: 'demoDomain',
+      id: 'demoDomainInput',
+      placeholder: 'https://preview.example.gov',
+      className: 'form-control',
+    });
   });
 
   it('should have its buttons disabled when pristine', () => {

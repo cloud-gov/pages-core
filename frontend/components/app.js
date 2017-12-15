@@ -16,6 +16,11 @@ export class App extends React.Component {
     const { location: { key: lastKey } } = this.props;
     const { key: nextKey } = nextProps.location;
 
+    if (alert.stale) {
+      alertActions.clear();
+      return;
+    }
+
     // clear an existing alert message if stale, or flag it to be removed on
     // the next route transition
     if (lastKey === nextKey) return;

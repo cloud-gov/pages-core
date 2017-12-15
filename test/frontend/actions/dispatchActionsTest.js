@@ -14,6 +14,7 @@ describe('dispatchActions', () => {
   let siteUpdatedActionCreator;
   let pushHistory;
   let userAddedToSiteActionCreator;
+  let userRemovedFromSiteActionCreator;
   let showAddNewSiteFieldsActionCreator;
   let hideAddNewSiteFieldsActionCreator;
 
@@ -29,6 +30,7 @@ describe('dispatchActions', () => {
     siteUpdatedActionCreator = stub();
     siteDeletedActionCreator = stub();
     userAddedToSiteActionCreator = stub();
+    userRemovedFromSiteActionCreator = stub();
     showAddNewSiteFieldsActionCreator = stub();
     hideAddNewSiteFieldsActionCreator = stub();
     pushHistory = stub();
@@ -41,6 +43,7 @@ describe('dispatchActions', () => {
         siteUpdated: siteUpdatedActionCreator,
         siteDeleted: siteDeletedActionCreator,
         siteUserAdded: userAddedToSiteActionCreator,
+        siteUserRemoved: userRemovedFromSiteActionCreator,
       },
       './actionCreators/addNewSiteFieldsActions': {
         showAddNewSiteFields: showAddNewSiteFieldsActionCreator,
@@ -105,6 +108,14 @@ describe('dispatchActions', () => {
     userAddedToSiteActionCreator.withArgs(site).returns(action);
 
     fixture.dispatchUserAddedToSiteAction(site);
+
+    expect(dispatch.calledWith(action)).to.be.true;
+  });
+
+  it('dispatchUserRemovedFromSiteAction', () => {
+    userRemovedFromSiteActionCreator.withArgs(site).returns(action);
+
+    fixture.dispatchUserRemovedFromSiteAction(site);
 
     expect(dispatch.calledWith(action)).to.be.true;
   });

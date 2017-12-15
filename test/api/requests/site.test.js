@@ -13,6 +13,7 @@ const csrfToken = require('../support/csrfToken');
 
 const { Build, Site, User } = require('../../../api/models');
 const S3SiteRemover = require('../../../api/services/S3SiteRemover');
+const siteErrors = require('../../../api/responses/siteErrors');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 
@@ -566,10 +567,11 @@ describe('Site API', () => {
 
   describe('DELETE /v0/site/:site_id/user/:user_id', () => {
     const path = '/site/{site_id}/user/{user_id}';
+    const requestPath = (siteId, userId) => `/v0/site/${siteId}/user/${userId}`;
 
     it('should require a valid csrf token', (done) => {
       authenticatedSession().then(cookie => request(app)
-        .delete('/v0/site/1/user/1')
+        .delete(requestPath(1, 1))
         .set('x-csrf-token', 'bad-token')
         .set('Cookie', cookie)
         .expect(403)
@@ -586,7 +588,7 @@ describe('Site API', () => {
       unauthenticatedSession()
         .then((cookie) => {
           const newSiteRequest = request(app)
-            .delete('/v0/site/1/user/1')
+            .delete(requestPath(1, 1))
             .set('x-csrf-token', csrfToken.getToken())
             .set('Cookie', cookie)
             .expect(403);
@@ -600,7 +602,7 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should return an error if siteId and userId are not numbers', (done) => {
+    it('should respond with a 400 if siteId or userId are not numbers', (done) => {
       const userPromise = factory.user();
 
       Promise.props({
@@ -609,7 +611,7 @@ describe('Site API', () => {
         cookie: authenticatedSession(userPromise),
       })
       .then(models =>
-        request(app).delete('/v0/site/a-site/user/a-user')
+        request(app).delete(requestPath('a-site', 'a-user'))
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', models.cookie)
           .expect(400)
@@ -630,7 +632,7 @@ describe('Site API', () => {
         cookie: authenticatedSession(userPromise),
       })
       .then(models =>
-        request(app).delete(`/v0/site/10000/user/${models.user.id}`)
+        request(app).delete(requestPath(1000, models.user.id))
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', models.cookie)
           .expect(404)
@@ -654,9 +656,54 @@ describe('Site API', () => {
       }).then(({ user, site, cookie }) => {
         currentSite = site;
 
-        return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
+        return request(app).delete(requestPath(site.id, user.id))
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
+          .expect(200);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 200, response.body);
+        return Site.withUsers(currentSite.id);
+      }).then((fetchedSite) => {
+        expect(fetchedSite.Users).to.be.an('array');
+        expect(fetchedSite.Users.length).to.equal(1);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should allow the owner to remove a user from the site', (done) => {
+      const username = 'b-user';
+      const userPromise = factory.user({ username });
+      const anotherUser = factory.user();
+      const siteProps = {
+        owner: username,
+        users: Promise.all([userPromise, anotherUser]),
+      };
+
+      let currentSite;
+
+      nock.cleanAll();
+
+      Promise.props({
+        user: userPromise,
+        site: factory.site(siteProps),
+        cookie: authenticatedSession(userPromise),
+        anotherUser,
+      })
+      .then((models) => {
+        currentSite = models.site;
+
+        githubAPINocks.repo({
+          owner: username,
+          repository: models.site.repo,
+          response: [200, {
+            permissions: { admin: true, push: true },
+          }],
+        });
+
+        return request(app).delete(requestPath(models.site.id, models.anotherUser.id))
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', models.cookie)
           .expect(200);
       }).then((response) => {
         validateAgainstJSONSchema('DELETE', path, 200, response.body);
@@ -678,13 +725,119 @@ describe('Site API', () => {
         cookie: authenticatedSession(userPromise),
       })
       .then(({ user, site, cookie }) =>
-        request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
+        request(app).delete(requestPath(site.id, user.id))
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
           .expect(400)
       ).then((response) => {
         validateAgainstJSONSchema('DELETE', path, 400, response.body);
-        expect(response.body.message).to.equal('A site must have at least one user');
+        expect(response.body.message).to.equal(siteErrors.USER_REQUIRED);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should respond with a 404 when the user to delete is not found', (done) => {
+      const userPromise = factory.user();
+      const otherUser = factory.user();
+
+      nock.cleanAll();
+
+      Promise.props({
+        site: factory.site({ users: Promise.all([userPromise, otherUser]) }),
+        cookie: authenticatedSession(userPromise),
+      })
+      .then((models) => {
+        githubAPINocks.repo({
+          owner: 'james',
+          repository: models.site.repo,
+          response: [200, {
+            permissions: { admin: true, push: true },
+          }],
+        });
+
+        return request(app).delete(requestPath(models.site.id, 100000))
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', models.cookie)
+          .expect(404);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 404, response.body);
+        expect(response.body.message).to.equal(siteErrors.NO_ASSOCIATED_USER);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should respond with a 400 when any user attempts to remove the owner', (done) => {
+      const ownerName = 'owner';
+      const ownerUser = factory.user({ username: ownerName });
+      const normalUser = factory.user({ username: 'not-owner' });
+
+      const siteProps = {
+        owner: ownerName,
+        users: Promise.all([ownerUser, normalUser]),
+      };
+
+      nock.cleanAll();
+
+      Promise.props({
+        user: ownerUser,
+        site: factory.site(siteProps),
+        cookie: authenticatedSession(normalUser),
+      })
+      .then(({ user, site, cookie }) => {
+        githubAPINocks.repo({
+          owner: ownerName,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: true, push: true },
+          }],
+        });
+
+        return request(app).delete(requestPath(site.id, user.id))
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(400);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 400, response.body);
+        expect(response.body.message).to.equal(siteErrors.OWNER_REMOVE);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should respond with a 400 when the site owner attempts to remove themselves', (done) => {
+      const username = 'a-user';
+      const userPromise = factory.user({ username });
+      const anotherUser = factory.user();
+      const siteProps = {
+        owner: username,
+        users: Promise.all([userPromise, anotherUser]),
+      };
+
+      nock.cleanAll();
+
+      Promise.props({
+        user: userPromise,
+        site: factory.site(siteProps),
+        cookie: authenticatedSession(userPromise),
+      })
+      .then(({ user, site, cookie }) => {
+        githubAPINocks.repo({
+          owner: username,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: true, push: true },
+          }],
+        });
+
+        return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(400);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 400, response.body);
+        expect(response.body.message).to.equal(siteErrors.OWNER_REMOVE);
         done();
       })
       .catch(done);
@@ -722,7 +875,7 @@ describe('Site API', () => {
           .expect(400);
       }).then((response) => {
         validateAgainstJSONSchema('DELETE', path, 400, response.body);
-        expect(response.body.message).to.equal('You do not have write access to this repository');
+        expect(response.body.message).to.equal(siteErrors.WRITE_ACCESS_REQUIRED);
         done();
       })
       .catch(done);
