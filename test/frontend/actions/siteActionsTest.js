@@ -288,6 +288,7 @@ describe('siteActions', () => {
 
       actual.then(() => {
         expect(updateRouterToSitesUri.called).to.be.true;
+        expect(fetchSites.called).to.be.true;
       });
     });
   });

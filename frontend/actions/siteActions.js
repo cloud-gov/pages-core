@@ -19,6 +19,14 @@ const alertError = (error) => {
   alertActions.httpError(error.message);
 };
 
+const onUserRemoveFromSite = (site) => {
+  if (site) {
+    dispatchUserRemovedFromSiteAction(site);
+  }
+
+  alertActions.alertSuccess('User successfully removed.');
+};
+
 export default {
   fetchSites() {
     dispatchSitesFetchStartedAction();
@@ -57,16 +65,18 @@ export default {
   },
 
   removeUserFromSite(siteId, userId, me = false) {
-    return federalist.removeUserFromSite(siteId, userId).then((site) => {
-      if (site) {
-        if (me) {
-          updateRouterToSitesUri();
-        }
+    const onRemoveUser = federalist.removeUserFromSite(siteId, userId);
 
-        dispatchUserRemovedFromSiteAction(site);
-        alertActions.alertSuccess('User successfully removed.');
-      }
-    });
+    if (me) {
+      return onRemoveUser
+        .then(this.fetchSites)
+        .then(() => {
+          updateRouterToSitesUri();
+          onUserRemoveFromSite();
+        });
+    }
+
+    return onRemoveUser.then(onUserRemoveFromSite);
   },
 
   updateSite(site, data) {
