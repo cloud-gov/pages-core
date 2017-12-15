@@ -56,9 +56,13 @@ export default {
       });
   },
 
-  removeUserFromSite(siteId, userId) {
+  removeUserFromSite(siteId, userId, me = false) {
     return federalist.removeUserFromSite(siteId, userId).then((site) => {
       if (site) {
+        if (me) {
+          updateRouterToSitesUri();
+        }
+
         dispatchUserRemovedFromSiteAction(site);
         alertActions.alertSuccess('User successfully removed.');
       }
