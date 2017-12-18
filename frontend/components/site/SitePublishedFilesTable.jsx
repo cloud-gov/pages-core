@@ -52,7 +52,13 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   renderEmptyState() {
-    return (<p>No published branch files available.</p>);
+    return (
+      <div className="usa-alert usa-alert-info" role="alert">
+        <div className="usa-alert-body">
+          <p className="usa-alert-text">No published branch files available.</p>
+        </div>
+      </div>
+    );
   }
 
   render() {

@@ -8,7 +8,7 @@
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-PRPJKWN');</script>
     <!-- End Google Tag Manager -->
-    
+
     <link rel="apple-touch-icon" sizes="57x57" href="/images/favicons/apple-touch-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/images/favicons/apple-touch-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="/images/favicons/apple-touch-icon-72x72.png">
@@ -116,12 +116,14 @@
     {% block flash_messages %}
       {% if messages.errors %}
         {% for error in messages.errors %}
+        <div class="usa-grid">
           <div class="usa-alert usa-alert-error usa-alert-home" role="alert">
             <div class="usa-alert-body">
               <h3 class="usa-alert-header">{{ error.title }}</h3>
               <p class="usa-alert-text">{{ error.message }}</p>
             </div>
           </div>
+        </div>
         {% endfor %}
       {% endif %}
     {% endblock %}

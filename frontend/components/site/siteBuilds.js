@@ -80,14 +80,16 @@ class SiteBuilds extends React.Component {
 
   renderEmptyState() {
     return (
-      <div>
-        <p>This site does not yet have any builds.</p>
-        <p>
-          If this site was just added, the first build should be available
-          within a few minutes.
-        </p>
+      <div class="usa-alert usa-alert-info" role="alert">
+        <div class="usa-alert-body">
+          <h3 class="usa-alert-header">This site does not yet have any builds.</h3>
+          <p class="usa-alert-text">
+            If this site was just added, the first build should be available
+            within a few minutes.
+          </p>
         <RefreshBuildsButton site={this.props.site} />
       </div>
+    </div>
     );
   }
 
