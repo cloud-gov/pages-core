@@ -88,8 +88,8 @@ class SiteBuilds extends React.Component {
             within a few minutes.
           </p>
           <RefreshBuildsButton site={this.props.site} />
+        </div>
       </div>
-    </div>
     );
   }
 

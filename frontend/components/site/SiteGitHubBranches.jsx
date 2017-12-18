@@ -27,9 +27,9 @@ export class SiteGitHubBranches extends React.Component {
             <h3 className="usa-alert-header">No branches were found for this repository.</h3>
             <p className="usa-alert-text">
               Often this is because the repository is private or has been deleted.
-          </p>
+            </p>
+          </div>
         </div>
-      </div>
       );
     }
 
