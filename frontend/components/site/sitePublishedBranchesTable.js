@@ -73,10 +73,11 @@ class SitePublishedBranchesTable extends React.Component {
       <div className="usa-alert usa-alert-info" role="alert">
         <div className="usa-alert-body">
           <h3 className="usa-alert-header">No branches have been published.</h3>
-          <p className="usa-alert-text">Please wait for build to complete or check logs for error message.</p>
+          <p className="usa-alert-text">Please wait for build to complete or check logs
+            for error message.</p>
         </div>
       </div>
-  );
+    );
   }
 
   render() {

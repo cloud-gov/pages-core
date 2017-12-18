@@ -28,8 +28,8 @@ export class SiteGitHubBranches extends React.Component {
             <p className="usa-alert-text">
               Often this is because the repository is private or has been deleted.
           </p>
+        </div>
       </div>
-    </div>
       );
     }
 
