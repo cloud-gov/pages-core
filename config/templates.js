@@ -1,7 +1,7 @@
 module.exports = {
   report: {
     owner: '18f',
-    repo: 'federalist-uswds-template',
+    repo: 'federalist-report-template',
     branch: 'master',
     example: 'https://federalist-report-template.18f.gov',
     title: 'Basic Report Template',
