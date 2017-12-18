@@ -277,7 +277,18 @@ describe('siteActions', () => {
       removeUserFromSite.withArgs(1, 1).returns(Promise.resolve({}));
       const actual = fixture.removeUserFromSite(1, 1);
       actual.then(() => {
+        expect(updateRouterToSitesUri.called).to.be.false;
         expect(alertSuccess.called).to.be.true;
+      });
+    });
+
+    it('triggers a redirect to the sites page when a user removes themselves', () => {
+      removeUserFromSite.withArgs(1, 1).returns(Promise.resolve({}));
+      const actual = fixture.removeUserFromSite(1, 1, true);
+
+      actual.then(() => {
+        expect(updateRouterToSitesUri.called).to.be.true;
+        expect(fetchSites.called).to.be.true;
       });
     });
   });
