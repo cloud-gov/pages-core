@@ -38,10 +38,17 @@ export default {
   addSite(siteToAdd) {
     return federalist.addSite(siteToAdd)
       .then((site) => {
-        dispatchSiteAddedAction(site);
-        return site;
+        // site is undefined here if addSite fails
+        if (site) {
+          dispatchSiteAddedAction(site);
+          // route to the builds page for the added site
+          updateRouterToSiteBuildsUri(site);
+        } else {
+          // route to the sites list page, which will display
+          // any errors that occurred during addSite
+          updateRouterToSitesUri();
+        }
       })
-      .then(updateRouterToSiteBuildsUri)
       .catch(alertError);
   },
 
