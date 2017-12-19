@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const RenderField = ({
+const RenderUrlField = ({
   id,
   placeholder,
   label,
@@ -26,7 +26,7 @@ const RenderField = ({
   </div>
 );
 
-RenderField.propTypes = {
+RenderUrlField.propTypes = {
   id: PropTypes.string.isRequired,
   placeholder: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
@@ -37,8 +37,8 @@ RenderField.propTypes = {
   }).isRequired,
 };
 
-RenderField.defaultProps = {
+RenderUrlField.defaultProps = {
   help: null,
 };
 
-export default RenderField;
+export default RenderUrlField;
