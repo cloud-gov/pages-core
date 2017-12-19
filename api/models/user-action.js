@@ -1,6 +1,6 @@
 const associate = ({ User, UserAction }) => {
-  UserAction.belongsTo(UserAction, {
-    foreignKey: 'userId'
+  UserAction.belongsTo(User, {
+    foreignKey: 'userId',
   });
 };
 
@@ -29,14 +29,9 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     actionTypeID: {
-      type: DataTypes.INTEGER
-      //values: ['zadd', 'remove', 'update'],
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
-    createdAt: {
-      type: DataTypes.TIMESTAMP,
-      allowNull: false
-    }
   }, {
     tableName: 'user_action',
     classMethods: {
@@ -44,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     instanceMethods: {
       toJSON,
-    }
+    },
   });
 
   return UserAction;

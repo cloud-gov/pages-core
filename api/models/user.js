@@ -8,7 +8,7 @@ const associate = ({ User, Build, Site, UserAction }) => {
     timestamps: false,
   });
   User.hasMany(UserAction, {
-    foreignKey: 'userId'
+    foreignKey: 'userId',
   });
 };
 
