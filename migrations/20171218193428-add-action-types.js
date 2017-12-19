@@ -2,8 +2,6 @@ module.exports.up = (db, callback) => {
   db.createTable('action_type', {
     id: { type: 'int', primaryKey: true, autoIncrement: true },
     action: { type: 'string', length: 20, notNull: true },
-    createdAt: { type: 'timestamp', notNull: true },
-    updatedAt: { type: 'timestamp', notNull: true },
   }, callback);
 };
 

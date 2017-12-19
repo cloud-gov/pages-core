@@ -55,6 +55,7 @@
     "migrate:up": "node migrate.js up || true",
     "migrate:down": "node migrate.js down",
     "migrate:test": "node migrate.js up --dry-run",
+    "migrate:reset": "node migrate.js reset",
     "export:sites": "node ./scripts/exportSitesAsCsv.js",
     "analyze-webpack": "webpack-bundle-analyzer -h 0.0.0.0 public/stats.json",
     "serve-coverage": "http-server ./coverage"
