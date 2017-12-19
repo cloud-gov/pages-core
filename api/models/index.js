@@ -14,13 +14,6 @@ const sequelize = new Sequelize(database, username, password, {
   logging: logger.info,
 });
 
-const Build = sequelize.import(__dirname + "/build");
-const BuildLog = sequelize.import(__dirname + "/build-log");
-const Site = sequelize.import(__dirname + "/site");
-const User = sequelize.import(__dirname + "/user");
-const UserAction = sequelize.import(__dirname + "/user-action");
-const ActionType = sequelize.import(__dirname + "/action-type");
-
 Object.keys(sequelize.models).forEach(key =>
   sequelize.models[key].associate(sequelize.models)
 );
