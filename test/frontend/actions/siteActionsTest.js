@@ -154,8 +154,9 @@ describe('siteActions', () => {
         hey: 'you',
       };
 
-      // addSite returns nothing when the POST request fails, so resolve to undefined
-      addSite.withArgs(siteToAdd).returns(Promise.resolve(undefined));
+      // addSite returns nothing when the POST request fails,
+      // so resolve to nothing
+      addSite.withArgs(siteToAdd).returns(Promise.resolve());
 
       const actual = fixture.addSite(siteToAdd);
 
