@@ -11,10 +11,10 @@ describe('UserAction model', () => {
         targetType: 'site',
       });
 
-       model.validate().then(() => {
-         expect(model).to.exist;
-         done();
-       }).catch(done);
+      model.validate().then(() => {
+        expect(model).to.exist;
+        done();
+      }).catch(done);
     });
   });
 
@@ -26,10 +26,10 @@ describe('UserAction model', () => {
         done();
       }).catch((error) => {
         const { errors } = error;
-        const errorList = errors.reduce((memo, error) => [ ...memo, error.path], []);
+        const errorList = errors.reduce((memo, e) => [...memo, e.path], []);
 
-        errorList.forEach((error) => {
-          expect(requiredFields.indexOf(error)).to.not.equal(-1);
+        errorList.forEach((field) => {
+          expect(requiredFields.indexOf(field)).to.not.equal(-1);
         });
 
         done();
@@ -37,7 +37,6 @@ describe('UserAction model', () => {
     });
 
     it('fails validation if targetType is not `site` or `build`', (done) => {
-      const badTypes = ['penguin', 'llama'];
       const goodProps = {
         userId: 1,
         actionId: 1,
