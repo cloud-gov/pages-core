@@ -5,7 +5,7 @@ const associate = ({ User, UserAction }) => {
   });
 };
 
-const toJSON = () => {
+const toJSON = function json() {
   const record = this.get({
     plain: true,
   });
@@ -46,14 +46,6 @@ module.exports = (sequelize, DataTypes) => {
     actionId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: sequelize.literal('NOW()'),
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: sequelize.literal('NOW()'),
     },
   }, tableOptions);
 

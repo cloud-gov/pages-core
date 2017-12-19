@@ -5,8 +5,8 @@ module.exports.up = (db, callback) => {
     targetId: { type: 'int', notNull: true },
     targetType: { type: 'text', notNull: true },
     actionId: { type: 'int', notNull: true },
-    created_at: { type: 'datetime', notNull: true },
-    updated_at: { type: 'datetime', notNull: true },
+    createdAt: { type: 'date', notNull: true },
+    updatedAt: { type: 'date', notNull: true },
   }, callback);
 };
 

@@ -1,15 +1,19 @@
 const expect = require('chai').expect;
 const { UserAction } = require('../../../../api/models');
 
+const props = {
+  userId: 1,
+  actionId: 1,
+  targetId: 1,
+  targetType: 'site',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
 describe('UserAction model', () => {
   describe('instantiation', () => {
     it('creates a new UserAction record', (done) => {
-      const model = UserAction.build({
-        userId: 1,
-        actionId: 1,
-        targetId: 1,
-        targetType: 'site',
-      });
+      const model = UserAction.build(props);
 
       model.validate().then(() => {
         expect(model).to.exist;
@@ -54,6 +58,13 @@ describe('UserAction model', () => {
           errors.forEach(e => expect(e.errors[0].path).to.equal('targetType'));
           done();
         }).catch(done);
+    });
+  });
+
+  describe('.toJSON', () => {
+    it('returns an object with a formatted createdAt date', () => {
+      const model = UserAction.build(props);
+      expect(model.toJSON().createdAt).to.equal(props.createdAt.toISOString());
     });
   });
 });
