@@ -1,3 +1,4 @@
+const validTargetTypes = ['site', 'user'];
 const associate = ({ User, UserAction }) => {
   UserAction.belongsTo(User, {
     foreignKey: 'userId',
@@ -36,12 +37,23 @@ module.exports = (sequelize, DataTypes) => {
     },
     targetType: {
       type: DataTypes.ENUM,
-      values: ['site', 'user'],
+      values: validTargetTypes,
+      validate: {
+        isIn: validTargetTypes,
+      },
       allowNull: false,
     },
-    actionTypeID: {
+    actionId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: sequelize.literal('NOW()'),
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: sequelize.literal('NOW()'),
     },
   }, tableOptions);
 
