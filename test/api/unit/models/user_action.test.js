@@ -23,7 +23,7 @@ describe('UserAction model', () => {
   });
 
   describe('validations', () => {
-    it('requires userId, targetId, targetType, actionId, and createdAt', (done) => {
+    it('requires userId, targetId, targetType, actionId', (done) => {
       const requiredFields = ['userId', 'targetId', 'targetType', 'actionId'];
 
       UserAction.create().then(() => {
