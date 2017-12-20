@@ -14,12 +14,13 @@ const sequelize = new Sequelize(database, username, password, {
   port: postgresConfig.port,
   logging: logger.info,
 });
-
-const Build = sequelize.import(path.join(__dirname, '/build')); // eslint-disable-line no-unused-vars
-const BuildLog = sequelize.import(path.join(__dirname, '/build-log')); // eslint-disable-line no-unused-vars
-const Site = sequelize.import(path.join(__dirname, '/site')); // eslint-disable-line no-unused-vars
-const User = sequelize.import(path.join(__dirname, '/user')); // eslint-disable-line no-unused-vars
-const UserAction = sequelize.import(path.join(__dirname, '/user-action')); // eslint-disable-line no-unused-vars
+/* eslint-disable no-unused-vars */
+const Build = sequelize.import(path.join(__dirname, '/build'));
+const BuildLog = sequelize.import(path.join(__dirname, '/build-log'));
+const Site = sequelize.import(path.join(__dirname, '/site'));
+const User = sequelize.import(path.join(__dirname, '/user'));
+const UserAction = sequelize.import(path.join(__dirname, '/user-action'));
+/* eslint-enable no-unused-vars */
 
 Object.keys(sequelize.models).forEach(key =>
   sequelize.models[key].associate(sequelize.models)
