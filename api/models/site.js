@@ -165,7 +165,6 @@ module.exports = (sequelize, DataTypes) => {
       afterValidate,
       validationFailed,
     },
-    timestamps: true,
     paranoid: true,
   });
 

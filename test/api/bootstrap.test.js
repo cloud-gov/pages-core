@@ -1,6 +1,6 @@
 Promise.props = require('promise-props');
 
-const AWSMocks = require('./support/aws-mocks'); // eslint-disable-line no-unused-vars
+require('./support/aws-mocks');
 const sequelize = require('../../api/models').sequelize;
 
 const models = sequelize.models;
