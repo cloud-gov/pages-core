@@ -64,6 +64,8 @@ module.exports = (sequelize, DataTypes) => {
     instanceMethods: {
       toJSON,
     },
+    timestamps: true,
+    paranoid: true,
   });
 
   return User;
