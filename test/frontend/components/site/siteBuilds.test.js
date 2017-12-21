@@ -99,9 +99,10 @@ describe('<SiteBuilds/>', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
 
     expect(wrapper.find('table')).to.have.length(0);
-    expect(wrapper.find('p')).to.have.length(2);
-    expect(wrapper.find('p').first().contains('This site does not yet have any builds.')).to.be.true;
-    expect(wrapper.find('p').at(1).text().indexOf('just added')).to.be.greaterThan(-1);
+    expect(wrapper.find('AlertBanner').prop('header')).to.equal('This site does not yet have any builds.');
+    expect(wrapper.find('AlertBanner').prop('message')).to.equal(
+      'If this site was just added, the first build should be available within a few minutes.'
+    );
     expect(wrapper.find('RefreshBuildsButton')).to.have.length(1);
   });
 
