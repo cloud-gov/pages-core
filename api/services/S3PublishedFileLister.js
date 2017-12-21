@@ -38,18 +38,42 @@ function listFiles(path) {
     prefixPath = `${prefixPath}/`;
   }
 
-  return new Promise((resolve, reject) => {
-    s3Client.listObjects({
+  const listFilesHelper = (currFiles, continuationToken, callback) => {
+    const listObjectArgs = {
       Bucket: s3Config.bucket,
       Prefix: prefixPath,
-    }, (err, data) => {
+    };
+
+    if (continuationToken) {
+      listObjectArgs.ContinuationToken = continuationToken;
+    }
+
+    s3Client.listObjectsV2(listObjectArgs, (err, data) => {
+      if (err) {
+        callback(err);
+        return;
+      }
+
+      const files = currFiles ? currFiles.concat(data.Contents) : data.Contents;
+
+      if (data.IsTruncated) {
+        listFilesHelper(files, data.NextContinuationToken, callback);
+      } else {
+        // done !
+        callback(null, files);
+      }
+    });
+  };
+
+  return new Promise((resolve, reject) => {
+    listFilesHelper(null, null, (err, fileObjects) => {
       if (err) {
         reject(err);
       } else {
         const prefixComponents = path.split('/').length;
-        const files = data.Contents.map((object) => {
-          const name = object.Key.split('/').slice(prefixComponents).join('/');
-          const size = Number(object.Size);
+        const files = fileObjects.map((file) => {
+          const name = file.Key.split('/').slice(prefixComponents).join('/');
+          const size = Number(file.Size);
           return { name, size };
         });
         resolve(files);
