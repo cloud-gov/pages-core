@@ -130,6 +130,13 @@ module.exports = {
         userId,
       })
     )
+    .then(() =>
+      UserActionCreator.addRemoveAction({
+        userId: req.user.id,
+        targetId: userId,
+        targetType: 'user',
+      })
+    )
     .then(() => sendJSON(site, res))
     .catch(res.error);
   },
