@@ -52,7 +52,8 @@ export class SiteGitHubBranches extends React.Component {
       <tr key={name}>
         <td>
             <GitHubLink owner={site.owner} repository={site.repository} branch={name}>
-              { name } { isDefault && '(live branch)' } { isDemo && '(demo branch)' } <GitHubMark />
+              { name } { isDefault && '(live branch)' } { isDemo && '(demo branch)' }
+              <GitHubMark />
             </GitHubLink>
         </td>
         <td>

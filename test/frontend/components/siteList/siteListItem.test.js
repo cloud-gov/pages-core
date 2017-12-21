@@ -61,9 +61,10 @@ describe('<SiteListItem />', () => {
     });
   });
 
-  it('outputs a GitHubIconLink', () => {
-    const iconLink = wrapper.find(GitHubIconLink).shallow().first();
-    const repoLink = iconLink.shallow().find('GitHubRepoLink');
+  it('outputs a GitHubLink', () => {
+
+    const iconLink = wrapper.find('GitHubLink').shallow().first();
+    const repoLink = iconLink.shallow().find('GitHubMark');
 
     expect(iconLink).to.have.length(1);
     expect(iconLink.prop('baseHref')).to.be.defined;

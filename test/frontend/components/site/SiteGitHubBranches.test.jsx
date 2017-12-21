@@ -35,10 +35,10 @@ describe('<SiteGitHubBranches />', () => {
     const rows = wrapper.find('tbody tr');
 
     expect(rows).to.have.length(2);
-    expect(rows.at(0).find('td').at(0).text())
-      .to.have.string('branch-one');
-    expect(rows.at(1).find('td').at(0).text())
-      .to.have.string('branch-two');
+    expect(rows.at(0).find('wrapper').at(0).props().branch)
+      .to.equal('branch-one');
+    expect(rows.at(1).find('wrapper').at(0).props().branch)
+      .to.equal('branch-two');
 
     // Workaround to select the GitHubIconLink component.
     // See https://github.com/18F/federalist/issues/1325
@@ -71,16 +71,16 @@ describe('<SiteGitHubBranches />', () => {
     const wrapper = shallow(<SiteGitHubBranches {...props} />);
     const rows = wrapper.find('tbody tr');
 
-    const firstTdText = row => row.find('td').at(0).text();
+    const firstTdWrapperText = row => row.find('wrapper').dive().text();
+    console.log(rows.debug());
+    expect(firstTdWrapperText(rows.at(0))).to.have.string('default-branch');
+    expect(firstTdWrapperText(rows.at(0))).to.have.string('(live branch)');
 
-    expect(firstTdText(rows.at(0))).to.have.string('default-branch');
-    expect(firstTdText(rows.at(0))).to.have.string('(live branch)');
+    expect(firstTdWrapperText(rows.at(1))).to.have.string('demo-branch');
+    expect(firstTdWrapperText(rows.at(1))).to.have.string('(demo branch)');
 
-    expect(firstTdText(rows.at(1))).to.have.string('demo-branch');
-    expect(firstTdText(rows.at(1))).to.have.string('(demo branch)');
-
-    expect(firstTdText(rows.at(2))).to.have.string('branch-one');
-    expect(firstTdText(rows.at(3))).to.have.string('branch-two');
+    expect(firstTdWrapperText(rows.at(2))).to.have.string('branch-one');
+    expect(firstTdWrapperText(rows.at(3))).to.have.string('branch-two');
   });
 
   it('should render a loading state if branches are loading', () => {
