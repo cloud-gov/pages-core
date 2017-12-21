@@ -74,6 +74,11 @@ export const SiteList = ({ storeState }) =>
     </div>
     <AlertBanner {...storeState.alert} />
     {getSites(storeState.sites)}
+    <div className="usa-grid">
+      <div className="usa-width-one-whole">
+        {addWebsiteButton()}
+      </div>
+    </div>
   </div>);
 
 SiteList.propTypes = propTypes;
