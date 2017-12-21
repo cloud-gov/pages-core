@@ -8,7 +8,7 @@ import buildActions from '../../actions/buildActions';
 import LoadingIndicator from '../LoadingIndicator';
 import RefreshBuildsButton from './refreshBuildsButton';
 import { duration, timeFrom } from '../../util/datetime';
-
+import AlertBanner from '../alertBanner';
 
 class SiteBuilds extends React.Component {
   static getUsername(build) {
@@ -80,16 +80,15 @@ class SiteBuilds extends React.Component {
 
   renderEmptyState() {
     return (
-      <div className="usa-alert usa-alert-info" role="alert">
-        <div className="usa-alert-body">
-          <h3 className="usa-alert-header">This site does not yet have any builds.</h3>
-          <p className="usa-alert-text">
-            If this site was just added, the first build should be available
-            within a few minutes.
-          </p>
-          <RefreshBuildsButton site={this.props.site} />
-        </div>
-      </div>
+      <AlertBanner
+        status="info"
+        header="This site does not yet have any builds."
+        message="If this site was just added, the first build should be available
+          within a few minutes."
+      >
+        <RefreshBuildsButton site={this.props.site} />
+      </AlertBanner>
+
     );
   }
 

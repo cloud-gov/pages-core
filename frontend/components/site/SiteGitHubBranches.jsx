@@ -6,6 +6,7 @@ import LoadingIndicator from '../LoadingIndicator';
 import GitHubIconLink from '../GitHubLink/GitHubIconLink';
 import BranchViewLink from '../branchViewLink';
 import githubBranchActions from '../../actions/githubBranchActions';
+import AlertBanner from '../alertBanner';
 
 export class SiteGitHubBranches extends React.Component {
   componentDidMount() {
@@ -22,14 +23,11 @@ export class SiteGitHubBranches extends React.Component {
 
     if (githubBranches.error || !githubBranches.data || !githubBranches.data.length) {
       return (
-        <div className="usa-alert usa-alert-info" role="alert">
-          <div className="usa-alert-body">
-            <h3 className="usa-alert-header">No branches were found for this repository.</h3>
-            <p className="usa-alert-text">
-              Often this is because the repository is private or has been deleted.
-            </p>
-          </div>
-        </div>
+        <AlertBanner
+          status="info"
+          header="No branches were found for this repository."
+          message="Often this is because the repository is private or has been deleted."
+        />
       );
     }
 

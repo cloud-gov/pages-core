@@ -6,6 +6,7 @@ import publishedBranchActions from '../../actions/publishedBranchActions';
 import LoadingIndicator from '../LoadingIndicator';
 import BranchViewLink from '../branchViewLink';
 import { SITE } from '../../propTypes';
+import AlertBanner from '../alertBanner';
 
 class SitePublishedBranchesTable extends React.Component {
   componentDidMount() {
@@ -70,13 +71,11 @@ class SitePublishedBranchesTable extends React.Component {
 
   renderEmptyState() {
     return (
-      <div className="usa-alert usa-alert-info" role="alert">
-        <div className="usa-alert-body">
-          <h3 className="usa-alert-header">No branches have been published.</h3>
-          <p className="usa-alert-text">Please wait for build to complete or check logs
-            for error message.</p>
-        </div>
-      </div>
+      <AlertBanner
+        status="info"
+        header="No branches have been published."
+        message="Please wait for build to complete or check logs for error message."
+      />
     );
   }
 
