@@ -149,15 +149,23 @@ describe('siteActions', () => {
       });
     });
 
-    it('triggers an error when adding a site fails', () => {
+    it('triggers an error and triggers a router update to the site list page when adding a site fails', () => {
       const siteToAdd = {
         hey: 'you',
       };
-      addSite.withArgs(siteToAdd).returns(rejectedWithErrorPromise);
+
+      // addSite returns nothing when the POST request fails,
+      // so resolve to nothing
+      addSite.withArgs(siteToAdd).returns(Promise.resolve());
 
       const actual = fixture.addSite(siteToAdd);
 
-      return validateResultDispatchesHttpAlertError(actual, errorMessage);
+      return actual.then(() => {
+        expect(dispatchSiteAddedAction.called).to.be.false;
+        expect(updateRouterToSiteBuildsUri.called).to.be.false;
+        expect(updateRouterToSitesUri.calledOnce).to.be.true;
+        validateResultDispatchesHttpAlertError(actual, errorMessage);
+      });
     });
   });
 
