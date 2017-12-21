@@ -109,9 +109,11 @@ describe('<SiteGitHubBranches />', () => {
 
     const wrapper = shallow(<SiteGitHubBranches {...props} />);
     expect(wrapper.find('table')).to.have.length(0);
-    expect(wrapper.find('p')).to.have.length(1);
-    expect(wrapper.find('p').text()).to.have.string(
-      'No branches were found for this repository. Often this is because the repository is private or has been deleted.'
+    expect(wrapper.find('AlertBanner').prop('header')).to.equal(
+      'No branches were found for this repository.'
+    );
+    expect(wrapper.find('AlertBanner').prop('message')).to.equal(
+      'Often this is because the repository is private or has been deleted.'
     );
   });
 
