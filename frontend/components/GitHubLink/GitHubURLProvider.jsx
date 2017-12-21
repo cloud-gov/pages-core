@@ -3,18 +3,18 @@ import PropTypes from 'prop-types';
 
 const base = 'https://github.com';
 const GitHubURLProvider = (Component) => {
-  const wrapper = ({ owner, repository, ...props }) => {
+  const GitHubURLWrapper = ({ owner, repository, ...props }) => {
     const baseHref = `${base}/${owner}/${repository}`;
 
     return <Component baseHref={baseHref} {...props} />;
   };
 
-  wrapper.propTypes = {
+  GitHubURLWrapper.propTypes = {
     owner: PropTypes.string.isRequired,
     repository: PropTypes.string.isRequired,
   };
 
-  return wrapper;
+  return GitHubURLWrapper;
 };
 
 export default GitHubURLProvider;

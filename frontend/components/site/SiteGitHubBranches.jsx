@@ -47,14 +47,13 @@ export class SiteGitHubBranches extends React.Component {
       }
     });
 
-
     const branchRow = ({ name }, { isDefault = false, isDemo = false }) => (
       <tr key={name}>
         <td>
-            <GitHubLink owner={site.owner} repository={site.repository} branch={name}>
-              { name } { isDefault && '(live branch)' } { isDemo && '(demo branch)' }
-              <GitHubMark />
-            </GitHubLink>
+          <GitHubLink owner={site.owner} repository={site.repository} branch={name}>
+            { name } { isDefault && '(live branch)' } { isDemo && '(demo branch)' }
+            <GitHubMark />
+          </GitHubLink>
         </td>
         <td>
           <BranchViewLink branchName={name} site={site} />
