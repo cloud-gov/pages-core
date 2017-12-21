@@ -61,6 +61,7 @@ class SiteSettings extends React.Component {
       <div>
         <p>
           See our doucmentation site for more about
+          { ' ' }
           <a
             target="_blank"
             rel="noopener noreferrer"
@@ -69,7 +70,9 @@ class SiteSettings extends React.Component {
           >
             these settings
           </a>
+          { ' ' }
           or
+          { ' ' }
           <a
             target="_blank"
             rel="noopener noreferrer"

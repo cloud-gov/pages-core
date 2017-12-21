@@ -63,6 +63,6 @@ describe('<SitePublishedFilesTable/>', () => {
     };
 
     const wrapper = shallow(<SitePublishedFilesTable {...props} />);
-    expect(wrapper.find('p').contains('No published branch files available.')).to.be.true;
+    expect(wrapper.find('AlertBanner').prop('message')).to.equal('No published branch files available.');
   });
 });

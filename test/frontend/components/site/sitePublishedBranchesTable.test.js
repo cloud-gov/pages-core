@@ -42,9 +42,11 @@ describe('<SitePublishedBranchesTable/>', () => {
 
     const wrapper = shallow(<SitePublishedBranchesTable {...props} />);
     expect(wrapper.find('table')).to.have.length(0);
-    expect(wrapper.find('p')).to.have.length(1);
-    expect(wrapper.find('p').contains(
-      'No branches have been published. Please wait for build to complete or check logs for error message.'
-    )).to.be.true;
+    expect(wrapper.find('AlertBanner').prop('header')).to.equal(
+      'No branches have been published.'
+    );
+    expect(wrapper.find('AlertBanner').prop('message')).to.equal(
+      'Please wait for build to complete or check logs for error message.'
+    );
   });
 });

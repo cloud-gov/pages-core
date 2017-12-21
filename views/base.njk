@@ -119,12 +119,14 @@
     {% block flash_messages %}
       {% if messages.errors %}
         {% for error in messages.errors %}
+        <div class="usa-grid">
           <div class="usa-alert usa-alert-error usa-alert-home" role="alert">
             <div class="usa-alert-body">
               <h3 class="usa-alert-header">{{ error.title }}</h3>
               <p class="usa-alert-text">{{ error.message }}</p>
             </div>
           </div>
+        </div>
         {% endfor %}
       {% endif %}
     {% endblock %}
