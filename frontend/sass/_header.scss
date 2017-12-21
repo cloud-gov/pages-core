@@ -81,7 +81,7 @@ $logo-height: 29px;
 }
 
 .header .usa-width-two-thirds {
-  display: flex;
+  // display: flex;
 }
 
 .header-icon {
@@ -108,6 +108,12 @@ $logo-height: 29px;
   margin-top: 0;
 }
 
+.header-actions {
+  text-align: right;
+  a {
+    margin-left: 2rem;
+  }
+}
 .usa-disclaimer-official {
   margin-top: 3px;
 }

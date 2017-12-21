@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 
 import PublishedState from './publishedState';
-import GitHubIconLink from '../GitHubLink/GitHubIconLink';
+import GitHubLink from '../GitHubLink/GitHubLink';
+import GitHubMark from '../GitHubMark';
 
 const propTypes = {
   site: PropTypes.shape({
@@ -31,16 +32,19 @@ function getViewLink(viewLink, repo) {
 const SiteListItem = ({ site }) =>
   (<li className="sites-list-item">
     <div className="sites-list-item-text">
-      <h3>
+      <h3 className="site-list-item-title">
         <Link to={`/sites/${site.id}`} title="View site settings">
           { site.owner }/{ site.repository }
         </Link>
         {' '}
-        <GitHubIconLink owner={site.owner} repository={site.repository} />
       </h3>
       <PublishedState site={site} />
     </div>
     <div className="sites-list-item-actions">
+      <GitHubLink owner={site.owner} repository={site.repository}>
+        View repo
+        <GitHubMark />
+      </GitHubLink>
       { getViewLink(site.viewLink, site.repository) }
     </div>
   </li>);
