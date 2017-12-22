@@ -1,19 +1,29 @@
-Promise.props = require("promise-props")
+Promise.props = require('promise-props');
 
-const AWSMocks = require("./support/aws-mocks")
+require('./support/aws-mocks');
+const sequelize = require('../../api/models').sequelize;
 
-const _cleanDatabase = () => {
-  const models = require("../../api/models").sequelize.models
-  const promises = Object.keys(models).map(name => {
-    return models[name].destroy({ where: {} })
-  })
-  return Promise.all(promises)
-}
+const models = sequelize.models;
 
-before(function(done) {
-  _cleanDatabase().then(() => {
-    done()
-  }).catch(err => {
-    done(err)
-  })
-})
+const cleanDatabase = () => {
+  const promises = Object.keys(models).map((name) => {
+    const model = models[name];
+    const promise = model.sync()
+      .then(() => model.destroy({ where: {} }));
+
+    return promise;
+  });
+
+  return Promise.all(promises);
+};
+
+before((done) => {
+  sequelize.sync({ force: true })
+    .then(() =>
+      cleanDatabase().then(() => {
+        done();
+      }).catch((err) => {
+        done(err);
+      })
+    );
+});
