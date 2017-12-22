@@ -61,8 +61,8 @@ describe('<SiteUsers/>', () => {
     it('notes the current user as "you"', () => {
       const rows = wrapper.find('tbody tr');
       expect(rows).to.have.length(2);
-      expect(rows.at(0).find('td').contains('(you)')).to.be.true;
-      expect(rows.at(1).find('td').contains('(you)')).to.be.false;
+      expect(rows.at(0).find('td').contains(' (you)')).to.be.true;
+      expect(rows.at(1).find('td').contains(' (you)')).to.be.false;
     });
 
     it('should render an `actions` column for each user', () => {

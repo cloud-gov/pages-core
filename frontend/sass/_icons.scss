@@ -42,12 +42,12 @@ $twelfth-column: 0;
   background-position: $eleventh-column $first-row;
 }
 
-.icon.icon-view:before {
+.icon.icon-view:after {
   @include icon();
 
   background-position: $fifth-column $sixth-row;
   content: 'Visit site icon';
-  height: 1em;
+  margin-right: 0;
 }
 
 .icon.icon-view.icon-white:before {

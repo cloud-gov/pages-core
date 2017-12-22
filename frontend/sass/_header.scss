@@ -80,10 +80,6 @@ $logo-height: 29px;
   margin-bottom: 1.5em;
 }
 
-.header .usa-width-two-thirds {
-  display: flex;
-}
-
 .header-icon {
   height: 35px;
   display: inline-block;
@@ -108,6 +104,12 @@ $logo-height: 29px;
   margin-top: 0;
 }
 
+.header-actions {
+  text-align: right;
+  a {
+    margin-left: 2rem;
+  }
+}
 .usa-disclaimer-official {
   margin-top: 3px;
 }

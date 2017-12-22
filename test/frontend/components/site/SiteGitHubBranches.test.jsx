@@ -35,17 +35,17 @@ describe('<SiteGitHubBranches />', () => {
     const rows = wrapper.find('tbody tr');
 
     expect(rows).to.have.length(2);
-    expect(rows.at(0).find('td').at(0).text())
+
+    expect(rows.at(0).find('td').at(0).html())
       .to.have.string('branch-one');
-    expect(rows.at(1).find('td').at(0).text())
+    expect(rows.at(1).find('td').at(0).html())
       .to.have.string('branch-two');
 
     // Workaround to select the GitHubIconLink component.
     // See https://github.com/18F/federalist/issues/1325
-    expect(rows.find({
-      owner: props.site.owner,
-      repository: props.site.repository,
-    })).to.have.length(2);
+    const githubUrlWrappers = rows.find('GitHubURLWrapper');
+    expect(githubUrlWrappers).to.have.length(2);
+
     expect(rows.find('Connect(BranchViewLink)')).to.have.length(2);
   });
 
@@ -71,16 +71,16 @@ describe('<SiteGitHubBranches />', () => {
     const wrapper = shallow(<SiteGitHubBranches {...props} />);
     const rows = wrapper.find('tbody tr');
 
-    const firstTdText = row => row.find('td').at(0).text();
+    const firstTdHtml = row => row.find('td').at(0).html();
 
-    expect(firstTdText(rows.at(0))).to.have.string('default-branch');
-    expect(firstTdText(rows.at(0))).to.have.string('(live branch)');
+    expect(firstTdHtml(rows.at(0))).to.have.string('default-branch');
+    expect(firstTdHtml(rows.at(0))).to.have.string('(live branch)');
 
-    expect(firstTdText(rows.at(1))).to.have.string('demo-branch');
-    expect(firstTdText(rows.at(1))).to.have.string('(demo branch)');
+    expect(firstTdHtml(rows.at(1))).to.have.string('demo-branch');
+    expect(firstTdHtml(rows.at(1))).to.have.string('(demo branch)');
 
-    expect(firstTdText(rows.at(2))).to.have.string('branch-one');
-    expect(firstTdText(rows.at(3))).to.have.string('branch-two');
+    expect(firstTdHtml(rows.at(2))).to.have.string('branch-one');
+    expect(firstTdHtml(rows.at(3))).to.have.string('branch-two');
   });
 
   it('should render a loading state if branches are loading', () => {

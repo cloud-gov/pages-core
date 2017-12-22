@@ -3,6 +3,8 @@ import { SITE, USER } from '../../propTypes';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
 
+import GitHubMark from '../GitHubMark';
+
 const isSiteOwner = (user, siteOwner) =>
   user.username.toLowerCase() === siteOwner.toLowerCase();
 
@@ -50,13 +52,13 @@ const SiteUsers = ({ site, user }) => {
                 <a
                   href={`https://github.com/${rowUser.username}`}
                   target="_blank"
+                  className="repo-link"
                   rel="noopener noreferrer"
                   title={`Visit GitHub profile for ${rowUser.username}`}
-                >
-                  {rowUser.username}
+                >{rowUser.username}
+                  <GitHubMark />
                 </a>
-                {' '}
-                {rowUser.username.toLowerCase() === user.username.toLowerCase() ? '(you)' : ''}
+                {rowUser.username.toLowerCase() === user.username.toLowerCase() ? ' (you)' : ''}
               </td>
               <td>
                 {
