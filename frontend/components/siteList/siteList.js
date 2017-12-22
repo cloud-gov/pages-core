@@ -72,7 +72,9 @@ export const SiteList = ({ storeState }) =>
         {addWebsiteButton()}
       </div>
     </div>
-    <AlertBanner {...storeState.alert} />
+    <div className="usa-grid">
+      <AlertBanner {...storeState.alert} />
+    </div>
     {getSites(storeState.sites)}
     <div className="usa-grid">
       <div className="usa-width-one-whole">
