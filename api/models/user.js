@@ -14,7 +14,7 @@ const associate = ({ User, Build, Site, UserAction }) => {
     timestamps: false,
   });
   User.hasMany(UserAction, {
-    as: 'userAction',
+    as: 'userActions',
     foreignKey: 'userId',
   });
   User.belongsToMany(User, {

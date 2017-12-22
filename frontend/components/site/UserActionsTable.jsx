@@ -3,12 +3,14 @@ import PropTypes from 'prop-types';
 import { USER_ACTION } from '../../propTypes';
 
 const propTypes = {
-  userActions: PropTypes.arrayOf(USER_ACTION),
+  userActions: PropTypes.arrayOf(USER_ACTION).isRequired,
 };
 
 const userAction = (action) =>
   <tr>
-    <th>action</th>
+    <th>{action.actionType.action}</th>
+    <th>{action.actionTarget[0].username}</th>
+    <th>{action.createdAt}</th>
   </tr>
 
 const UserActionsTable = ({ userActions }) => {
@@ -20,7 +22,7 @@ const UserActionsTable = ({ userActions }) => {
             Action
           </th>
           <th>
-            targetId
+            Target
           </th>
           <th>
             Performed on
@@ -28,12 +30,15 @@ const UserActionsTable = ({ userActions }) => {
         </tr>
       </thead>
       <tbody>
-
+        {userActions.map(action => userAction(action))}
       </tbody>
     </table>
   );
 };
 
 UserActionsTable.propTypes = propTypes;
+UserActionsTable.defaultProps = {
+  userActions: []
+};
 
 export default UserActionsTable;

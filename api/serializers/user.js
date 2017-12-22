@@ -14,7 +14,7 @@ const serialize = (serializable) => {
   const query = User.findById(user.id, {
     include: [{
       model: UserAction,
-      as: 'userAction',
+      as: 'userActions',
       attributes: ['targetType', 'createdAt'],
       include: [{
         model: User,

@@ -1,5 +1,4 @@
 const validator = require('validator');
-
 const config = require('../../config');
 
 const afterValidate = (site) => {
