@@ -60,7 +60,7 @@ class SiteSettings extends React.Component {
     return (
       <div>
         <p>
-          See our doucmentation site for more about
+          See our documentation site for more about
           { ' ' }
           <a
             target="_blank"
