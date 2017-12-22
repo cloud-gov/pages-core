@@ -1,4 +1,4 @@
-const { User, UserAction, ActionType} = require('../models');
+const { User, UserAction, ActionType } = require('../models');
 
 const serializeObject = user => user.toJSON();
 
@@ -25,7 +25,7 @@ const serialize = (serializable) => {
         as: 'actionType',
         attributes: ['action'],
       }],
-    }]
+    }],
   });
 
   return query.then(serializeObject);

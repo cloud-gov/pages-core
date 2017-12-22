@@ -31,6 +31,7 @@ function toJSON() {
     plain: true,
   });
 
+  /* eslint-disable no-param-reassign */
   return Object.assign({}, Object.keys(object).reduce((out, attr) => {
     if (protectedAttributes.indexOf(attr) !== -1) {
       return out;
@@ -43,6 +44,7 @@ function toJSON() {
     createdAt: object.createdAt.toISOString(),
     updatedAt: object.updatedAt.toISOString(),
   });
+  /* eslint-enable */
 }
 
 module.exports = (sequelize, DataTypes) => {

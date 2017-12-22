@@ -23,7 +23,7 @@ export default function user(state = initialState, action) {
       return {
         isLoading: false,
         data: {
-          ...action.user
+          ...action.user,
         },
       };
     default:
