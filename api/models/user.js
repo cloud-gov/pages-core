@@ -1,4 +1,4 @@
-const associate = ({ User, Build, Site }) => {
+const associate = ({ User, Build, Site, UserAction }) => {
   User.hasMany(Build, {
     foreignKey: 'user',
   });
@@ -6,6 +6,9 @@ const associate = ({ User, Build, Site }) => {
     through: 'site_users__user_sites',
     foreignKey: 'user_sites',
     timestamps: false,
+  });
+  User.hasMany(UserAction, {
+    foreignKey: 'userId',
   });
 };
 

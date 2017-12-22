@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import publishedFileActions from '../../actions/publishedFileActions';
 import LoadingIndicator from '../LoadingIndicator';
+import AlertBanner from '../alertBanner';
 
 class SitePublishedFilesTable extends React.Component {
   componentDidMount() {
@@ -52,7 +53,12 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   renderEmptyState() {
-    return (<p>No published branch files available.</p>);
+    return (
+      <AlertBanner
+        status="info"
+        message="No published branch files available."
+      />
+    );
   }
 
   render() {

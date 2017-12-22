@@ -1,35 +1,50 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const propTypes = {
-  message: React.PropTypes.string,
-  status: React.PropTypes.string,
+  message: PropTypes.string,
+  status: PropTypes.string,
+  header: PropTypes.string,
+  children: PropTypes.node,
 };
 
 const defaultProps = {
   message: null,
   status: 'info',
+  children: null,
 };
 
-const AlertBanner = ({ message, status = 'info' }) => {
+const renderHeader = (text) => {
+  if (!text) {
+    return null;
+  }
+
+  return (
+    <h3 className="usa-alert-header">
+      { text }
+    </h3>
+  );
+};
+
+const AlertBanner = ({ children, header, message, status }) => {
   if (!message) {
     return null;
   }
 
   return (
-    <div className="usa-grid">
-      <div className="alert-container container">
-        <div
-          className={`usa-alert usa-alert-${status}`}
-          role="alert"
-        >
-          <div className="usa-alert-body">
-            <p className="usa-alert-text">
-              { message }
-            </p>
-          </div>
-        </div>
+    <div
+      className={`usa-alert usa-alert-${status}`}
+      role="alert"
+    >
+      <div className="usa-alert-body">
+        { renderHeader(header) }
+        <p className="usa-alert-text">
+          { message }
+        </p>
+        { children }
       </div>
-    </div>);
+    </div>
+  );
 };
 
 AlertBanner.propTypes = propTypes;

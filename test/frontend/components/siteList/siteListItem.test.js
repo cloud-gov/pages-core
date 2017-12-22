@@ -2,7 +2,6 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import proxyquire from 'proxyquire';
-import GitHubIconLink from '../../../../frontend/components/GitHubLink/GitHubIconLink';
 
 proxyquire.noCallThru();
 
@@ -61,14 +60,13 @@ describe('<SiteListItem />', () => {
     });
   });
 
-  it('outputs a GitHubLink', () => {
+  it('outputs a link to the GitHub repo', () => {
+    const wrappedGitHubLink = wrapper.find('GitHubURLWrapper');
 
-    const iconLink = wrapper.find('GitHubLink').shallow().first();
-    const repoLink = iconLink.shallow().find('GitHubMark');
+    expect(wrappedGitHubLink.props().owner).to.equal('someone');
+    expect(wrappedGitHubLink.props().repository).to.equal('something');
 
-    expect(iconLink).to.have.length(1);
-    expect(iconLink.prop('baseHref')).to.be.defined;
-    expect(repoLink).to.have.length(1);
-    expect(repoLink.children().find('GitHubMark')).to.have.length(1);
+    // it has a GitHubMark
+    expect(wrappedGitHubLink.find('GitHubMark')).to.have.length(1);
   });
 });

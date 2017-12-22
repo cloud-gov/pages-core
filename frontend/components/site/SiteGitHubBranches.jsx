@@ -7,6 +7,7 @@ import GitHubLink from '../GitHubLink/GitHubLink';
 import GitHubMark from '../GitHubMark';
 import BranchViewLink from '../branchViewLink';
 import githubBranchActions from '../../actions/githubBranchActions';
+import AlertBanner from '../alertBanner';
 
 export class SiteGitHubBranches extends React.Component {
   componentDidMount() {
@@ -23,10 +24,11 @@ export class SiteGitHubBranches extends React.Component {
 
     if (githubBranches.error || !githubBranches.data || !githubBranches.data.length) {
       return (
-        <p>
-          No branches were found for this repository.
-          Often this is because the repository is private or has been deleted.
-        </p>
+        <AlertBanner
+          status="info"
+          header="No branches were found for this repository."
+          message="Often this is because the repository is private or has been deleted."
+        />
       );
     }
 
@@ -46,7 +48,6 @@ export class SiteGitHubBranches extends React.Component {
         regularBranches.push(branch);
       }
     });
-
 
     const branchRow = ({ name }, { isDefault = false, isDemo = false }) => (
       <tr key={name}>

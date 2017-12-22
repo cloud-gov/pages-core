@@ -10,6 +10,7 @@ describe('<RenderUrlField />', () => {
       id: 'anId',
       input: {},
       name: 'aName',
+      label: 'the label',
       placeholder: 'placeholder',
       help: <span id="helpspan">help text</span>,
       meta: { touched: false, error: null },
@@ -26,6 +27,8 @@ describe('<RenderUrlField />', () => {
       id: 'anId',
       input: {},
       name: 'aName',
+      label: 'the label',
+      placeholder: 'put text here',
       meta: { touched: false, error: null },
     };
 
