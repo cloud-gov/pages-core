@@ -3,14 +3,21 @@
 }
 
 .usa-alert-home {
-  margin-top: 0;
+  background-color: $alert-delete-bg-color;
+  margin: 0 auto;
+  .usa-alert {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0;
+    max-width: 1040px;
+  }
 }
 
 .usa-alert-delete {
   background-color: $alert-delete-bg-color;
 
   button {
-    margin-left: 0.5em;
+    margin-left: .5em;
   }
 }
 
@@ -27,10 +34,10 @@
  * TODO: remove once USWDS dependency is upgraded
  */
 .usa-alert-body p:last-child {
-  margin-bottom: 0.8rem;
+  margin-bottom: .8rem;
 }
 
 .usa-alert-body p:first-child {
-  margin-top: 0.8rem;
+  margin-top: .8rem;
 }
 /* end borrowing */
