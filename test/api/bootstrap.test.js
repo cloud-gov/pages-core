@@ -1,5 +1,4 @@
 Promise.props = require('promise-props');
-
 require('./support/aws-mocks');
 const sequelize = require('../../api/models').sequelize;
 

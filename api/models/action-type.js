@@ -1,6 +1,6 @@
 const associate = ({ ActionType, UserAction }) => {
   ActionType.belongsTo(UserAction, {
-    foreignKey: 'actionTypeId',
+    foreignKey: 'actionId',
   });
 };
 
