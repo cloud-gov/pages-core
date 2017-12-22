@@ -102,8 +102,8 @@ export class SiteContainer extends React.Component {
         <div className="usa-width-five-sixths site-main" id="pages-container">
           <div className="usa-grid">
             <AlertBanner
-            message={storeState.alert.message}
-            status={storeState.alert.status}
+              message={storeState.alert.message}
+              status={storeState.alert.status}
             />
           </div>
           <PagesHeader
