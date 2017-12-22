@@ -8,15 +8,6 @@ module.exports = {
     description: 'A basic template to host a set of pages about a recent report or order.',
     thumb: '/images/federalist-report-template.jpg',
   },
-  reportconfig: {
-    owner: '18f',
-    repo: 'federalist-uswds-template',
-    branch: 'report-config',
-    example: 'https://federalist-proxy.app.cloud.gov/preview/18f/federalist-uswds-template/report-config/',
-    title: 'Report config',
-    description: 'A basic template to host a set of pages about a recent report or order.',
-    thumb: '/images/federalist-report-template.jpg',
-  },
   team: {
     owner: '18f',
     repo: 'federalist-modern-team-template',
