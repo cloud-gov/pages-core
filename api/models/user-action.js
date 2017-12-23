@@ -1,7 +1,18 @@
 const validTargetTypes = ['site', 'user'];
-const associate = ({ User, UserAction }) => {
+const associate = ({ User, UserAction, ActionType }) => {
   UserAction.belongsTo(User, {
     foreignKey: 'userId',
+  });
+
+  UserAction.belongsTo(ActionType, {
+    foreignKey: 'actionId',
+    as: 'actionType',
+  });
+
+  UserAction.hasMany(User, {
+    as: 'actionTarget',
+    constraints: false,
+    foreignKey: 'id',
   });
 };
 
@@ -11,6 +22,7 @@ const toJSON = function json() {
   });
 
   record.createdAt = record.createdAt.toISOString();
+  record.updatedAt = record.updatedAt.toISOString();
 
   return record;
 };

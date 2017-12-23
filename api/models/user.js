@@ -1,3 +1,9 @@
+const protectedAttributes = [
+  'githubAccessToken',
+  'githubUserId',
+  'signedInAt',
+  'site_users__user_sites',
+];
 const associate = ({ User, Build, Site, UserAction }) => {
   User.hasMany(Build, {
     foreignKey: 'user',
@@ -8,7 +14,15 @@ const associate = ({ User, Build, Site, UserAction }) => {
     timestamps: false,
   });
   User.hasMany(UserAction, {
+    as: 'userActions',
     foreignKey: 'userId',
+  });
+  User.belongsToMany(User, {
+    through: 'user_action',
+    as: 'actionTarget',
+    constraints: false,
+    unique: false,
+    foreignKey: 'targetId',
   });
 };
 
@@ -17,21 +31,20 @@ function toJSON() {
     plain: true,
   });
 
-  delete object.githubAccessToken;
-  delete object.githubUserId;
-  delete object.signedInAt;
-  delete object.site_users__user_sites;
-
-  object.createdAt = object.createdAt.toISOString();
-  object.updatedAt = object.updatedAt.toISOString();
-
-  Object.keys(object).forEach((key) => {
-    if (object[key] === null) {
-      delete object[key];
+  /* eslint-disable no-param-reassign */
+  return Object.assign({}, Object.keys(object).reduce((out, attr) => {
+    if (protectedAttributes.indexOf(attr) !== -1) {
+      return out;
     }
-  });
 
-  return object;
+    out[attr] = object[attr];
+
+    return out;
+  }, {}), {
+    createdAt: object.createdAt.toISOString(),
+    updatedAt: object.updatedAt.toISOString(),
+  });
+  /* eslint-enable */
 }
 
 module.exports = (sequelize, DataTypes) => {
