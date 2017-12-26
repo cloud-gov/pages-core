@@ -20,8 +20,8 @@ const cleanDatabase = () => {
 const addActionTypes = () => Promise.all(types.map(type => ActionType.create({ action: type })));
 
 before((done) => {
-    cleanDatabase()
-    .then(() => addActionTypes())
-    .then(() => done())
-    .catch(err => done(err));
+  cleanDatabase()
+  .then(() => addActionTypes())
+  .then(() => done())
+  .catch(err => done(err));
 });

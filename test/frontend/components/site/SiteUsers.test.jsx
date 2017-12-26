@@ -14,6 +14,7 @@ describe('<SiteUsers/>', () => {
         repository: 'test-repo',
         users: [],
       },
+      user: {},
     };
     const wrapper = shallow(<SiteUsers {...props} />);
     expect(wrapper.find('table')).to.have.length(1);
@@ -25,6 +26,7 @@ describe('<SiteUsers/>', () => {
         username: 'not-owner',
         id: 4,
         email: 'not-owner@beep.gov',
+        userActions: [],
       },
       site: {
         owner: 'test-owner',

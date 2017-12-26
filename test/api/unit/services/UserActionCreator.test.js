@@ -16,7 +16,7 @@ describe('UserActionCreator', () => {
   const props = {
     userId: 1,
     targetId: 1,
-    targetType: 'user'
+    targetType: 'user',
   };
 
   describe('.addRemoveAction', () => {

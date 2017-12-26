@@ -3,14 +3,14 @@ const { UserAction, ActionType } = require('../models');
 const buildUserAction = actionType => ({ userId, targetId, targetType }) =>
   ActionType.findOne({
     where: { action: actionType },
-  }).then((action) => {
-    return UserAction.create({
+  }).then(action =>
+    UserAction.create({
       userId,
       targetId,
       targetType,
       actionId: action.id,
-    });
-  });
+    })
+  );
 
 const addRemoveAction = buildUserAction('remove');
 const addUpdateAction = buildUserAction('update');

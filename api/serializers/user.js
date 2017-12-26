@@ -2,20 +2,20 @@ const { User, UserAction, ActionType } = require('../models');
 
 const serializeObject = user => user.toJSON();
 const includedModels = [{
-    model: UserAction,
-    as: 'userActions',
-    attributes: ['id', 'targetType', 'createdAt'],
-    include: [{
-      model: User,
-      as: 'actionTarget',
-      attributes: ['id', 'username', 'email', 'createdAt'],
-    },
-    {
-      model: ActionType,
-      as: 'actionType',
-      attributes: ['action'],
-    }],
-  }];
+  model: UserAction,
+  as: 'userActions',
+  attributes: ['id', 'targetType', 'createdAt'],
+  include: [{
+    model: User,
+    as: 'actionTarget',
+    attributes: ['id', 'username', 'email', 'createdAt'],
+  },
+  {
+    model: ActionType,
+    as: 'actionType',
+    attributes: ['action'],
+  }],
+}];
 
 const serialize = (serializable) => {
   if (serializable.length !== undefined) {
