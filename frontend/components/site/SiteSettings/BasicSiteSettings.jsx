@@ -36,16 +36,15 @@ export const BasicSiteSettings = ({
             <h3 className="well-heading">Live Site</h3>
             <p className="well-text">
               Set the primary branch Federalist uses to build your site.
-              After your DNS is pointed to Federalist, you'll set the 
-              <a 
-                href="https://federalist-docs.18f.gov/pages/how-federalist-works/custom-urls/" 
-                target="_blank" 
+              After your DNS is pointed to Federalist, you&apos;ll set
+              the <a
+                href="https://federalist-docs.18f.gov/pages/how-federalist-works/custom-urls/"
+                target="_blank"
                 rel="noopener noreferrer"
                 title="Custom URL documentation"
               >
                 live URL
-              </a> 
-              to ensure the site builds correctly.
+              </a> to ensure the site builds correctly.
             </p>
             <label htmlFor="defaultBranchInput">
               Branch name:
@@ -75,8 +74,9 @@ export const BasicSiteSettings = ({
           <div className="well">
             <h3 className="well-heading">Demo Site</h3>
             <p className="well-text">
-              After setting up DNS with the Federalist team, set a demo branch to be deployed to a custom URL like demo.yoursite.gov
-              instead of a standard Federalist preview URL. (optional)
+              Optional: After setting up DNS with the Federalist team, set a demo branch
+              to be deployed to a custom URL like <code>demo.example.gov</code> instead
+              of a standard Federalist preview URL.
             </p>
             <label htmlFor="demoBranchInput">Branch name:</label>
             <Field
@@ -91,7 +91,7 @@ export const BasicSiteSettings = ({
               label="Demo URL:"
               name="demoDomain"
               id="demoDomainInput"
-              placeholder="https://preview.example.gov"
+              placeholder="https://demo.example.gov"
               className="form-control"
             />
           </div>
