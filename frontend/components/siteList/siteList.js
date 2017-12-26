@@ -35,7 +35,7 @@ const getSites = (sitesState) => {
   return (
     <div className="usa-grid">
       <h2>Websites</h2>
-      <ul className="sites-list">
+      <ul className="sites-list usa-unstyled-list">
         {
           sitesState.data
             .slice() // create a copy so that sort doesn't modify the original
@@ -51,10 +51,10 @@ const addWebsiteButton = () => (
   <Link
     to="/sites/new"
     role="button"
-    className="usa-button usa-button-big pull-right icon icon-new icon-white"
+    className="usa-button pull-right icon icon-new icon-white"
     alt="Add a new website"
   >
-    Add Website
+    Add website
   </Link>
 );
 
@@ -72,7 +72,9 @@ export const SiteList = ({ storeState }) =>
         {addWebsiteButton()}
       </div>
     </div>
-    <AlertBanner {...storeState.alert} />
+    <div className="usa-grid">
+      <AlertBanner {...storeState.alert} />
+    </div>
     {getSites(storeState.sites)}
     <div className="usa-grid">
       <div className="usa-width-one-whole">

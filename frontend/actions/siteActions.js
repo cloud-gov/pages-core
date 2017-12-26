@@ -10,6 +10,7 @@ import {
   dispatchSiteUpdatedAction,
   dispatchSiteDeletedAction,
   dispatchUserAddedToSiteAction,
+  dispatchUserRemovedFromSiteAction,
   dispatchShowAddNewSiteFieldsAction,
 } from './dispatchActions';
 
@@ -18,6 +19,13 @@ const alertError = (error) => {
   alertActions.httpError(error.message);
 };
 
+const onUserRemoveFromSite = (site) => {
+  if (site) {
+    dispatchUserRemovedFromSiteAction(site);
+  }
+
+  alertActions.alertSuccess('User successfully removed.');
+};
 
 export default {
   fetchSites() {
@@ -30,10 +38,17 @@ export default {
   addSite(siteToAdd) {
     return federalist.addSite(siteToAdd)
       .then((site) => {
-        dispatchSiteAddedAction(site);
-        return site;
+        // site is undefined here if addSite fails
+        if (site) {
+          dispatchSiteAddedAction(site);
+          // route to the builds page for the added site
+          updateRouterToSiteBuildsUri(site);
+        } else {
+          // route to the sites list page, which will display
+          // any errors that occurred during addSite
+          updateRouterToSitesUri();
+        }
       })
-      .then(updateRouterToSiteBuildsUri)
       .catch(alertError);
   },
 
@@ -54,6 +69,21 @@ export default {
           alertError(err);
         }
       });
+  },
+
+  removeUserFromSite(siteId, userId, me = false) {
+    const onRemoveUser = federalist.removeUserFromSite(siteId, userId);
+
+    if (me) {
+      return onRemoveUser
+        .then(this.fetchSites)
+        .then(() => {
+          updateRouterToSitesUri();
+          onUserRemoveFromSite();
+        });
+    }
+
+    return onRemoveUser.then(onUserRemoveFromSite);
   },
 
   updateSite(site, data) {

@@ -165,6 +165,7 @@ module.exports = (sequelize, DataTypes) => {
       afterValidate,
       validationFailed,
     },
+    paranoid: true,
   });
 
   Site.withUsers = id => Site.findById(id, { include: [sequelize.models.User] });

@@ -3,7 +3,7 @@
 DIFF_TARGET_BRANCH="${DIFF_TARGET_BRANCH:-staging}"
 echo "Linting diff against \"$DIFF_TARGET_BRANCH\" branch"
 
-CHANGED_FILES_LIST=`git diff-index --name-only $DIFF_TARGET_BRANCH | grep -E '.js$|.jsx$' | tr '\n' ' '`
+CHANGED_FILES_LIST=`git diff --name-only $DIFF_TARGET_BRANCH -- '*.js' '*.jsx' | tr '\n' ' '`
 
 FAILURES=0
 

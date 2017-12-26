@@ -16,14 +16,26 @@
   content: "";
 }
 
+
+
+  .sites-list .sites-list-item {
+    display: block;
+    align-items: center;
+    background-color: $secondary-background-color;
+    margin-bottom: 0.5rem;
+    padding: 1em;
+    width: 100%;
+  }
+
+@media screen and (min-width: 700px) {
 .sites-list .sites-list-item {
-  align-items: center;
-  background-color: $secondary-background-color;
   display: flex;
-  margin-bottom: 0.2em;
-  padding: 1em;
-  width: 100%;
 }
+}
+
+
+
+
 
 .sites-list-item-text,
 .sites-list-item-actions {
@@ -31,8 +43,9 @@
 }
 
 .sites-list-item-text {
-  h3 {
+  .site-list-item-title {
     font-weight: normal;
+    margin: 0;
   }
 
   p {
@@ -41,8 +54,19 @@
 }
 
 
-
 .sites-list-item-actions {
-  padding-right: 2em;
-  text-align: right;
+  text-align:left;
+  margin-top: 1rem;
+  a {
+    margin-right: 2rem;
+  }
+}
+
+@media screen and (min-width: 700px) {
+  .sites-list-item-actions {
+    text-align: right;
+    a {
+      margin-left: 2rem;
+    }
+  }
 }

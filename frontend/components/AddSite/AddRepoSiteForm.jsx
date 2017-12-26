@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 import { Link } from 'react-router';
 
-import GitHubRepoUrlField from '../GitHubRepoUrlField';
+import GitHubRepoUrlField from '../Fields/GitHubRepoUrlField';
 import SelectSiteEngine from '../SelectSiteEngine';
 
 const propTypes = {
@@ -35,8 +35,17 @@ export const AddRepoSiteForm = ({
       <div className="usa-width-one-half">
         <div className="form-group">
           <GitHubRepoUrlField
+            label="GitHub Repository URL"
+            help={
+              <span>
+                Paste your repository&apos;s GitHub URL here.
+                <br />
+                For example: https://github.com/18f/federalist-docs
+              </span>
+            }
             name="repoUrl"
             id="repoUrl"
+            placeholder="https://github.com/owner/repository"
             className="form-control"
             readOnly={showAddNewSiteFields}
           />
