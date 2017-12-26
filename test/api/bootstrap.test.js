@@ -18,11 +18,7 @@ const cleanDatabase = () => {
 
 before((done) => {
   sequelize.sync({ force: true })
-    .then(() =>
-      cleanDatabase()
-    ).then(() =>
-        done()
-    ).catch((err) => {
-        done(err);
-    });
+    .then(() => cleanDatabase())
+    .then(() => done())
+    .catch(err => done(err));
 });

@@ -6,40 +6,37 @@ import { timeFrom } from '../../util/datetime';
 const propTypes = {
   userActions: PropTypes.arrayOf(USER_ACTION),
 };
-const defaultPropTypes = {
+const defaultProps = {
   userActions: [],
 };
 
-const UserActionsTable = ({ userActions }) => {
-  return (
-    <table>
-      <thead>
-        <tr>
-          <th>
-            Action
-          </th>
-          <th>
-            targetId
-          </th>
-          <th>
-            Performed on
-          </th>
+const UserActionsTable = ({ userActions }) =>
+  <table>
+    <thead>
+      <tr>
+        <th>
+          Action
+        </th>
+        <th>
+          targetId
+        </th>
+        <th>
+          Performed on
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {userActions.map(action =>
+        <tr key={`${action.id}-${action.targetType}`}>
+          <th>{action.actionType.action}</th>
+          <th>{action.actionTarget.username}</th>
+          <th>{timeFrom(action.createdAt)}</th>
         </tr>
-      </thead>
-      <tbody>
-        {userActions.map((action) =>
-          <tr key={`${action.id}-${action.targetType}`}>
-            <th>{action.actionType.action}</th>
-            <th>{action.actionTarget.username}</th>
-            <th>{timeFrom(action.createdAt)}</th>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  );
-};
+      )}
+    </tbody>
+  </table>;
 
 UserActionsTable.propTypes = propTypes;
-UserActionsTable.defaultPropTypes = defaultPropTypes;
+UserActionsTable.defaultProps = defaultProps;
 
 export default UserActionsTable;

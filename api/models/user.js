@@ -16,7 +16,7 @@ const associate = ({ User, Build, Site, UserAction }) => {
     as: 'actionTarget',
     foreignKey: 'targetId',
     unique: false,
-  })
+  });
 };
 
 function toJSON() {

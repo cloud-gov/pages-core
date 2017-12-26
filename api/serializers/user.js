@@ -15,8 +15,7 @@ const serialize = (serializable) => {
       model: UserAction,
       as: 'userActions',
       attributes: ['targetType', 'createdAt'],
-      include: [
-        {
+      include: [{
         model: User,
         as: 'actionTarget',
         attributes: ['id', 'username', 'email', 'createdAt'],
@@ -26,7 +25,7 @@ const serialize = (serializable) => {
         as: 'actionType',
         attributes: ['action'],
       }],
-    }]
+    }],
   });
 
   return query.then(serializeObject);
