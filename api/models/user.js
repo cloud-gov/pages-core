@@ -1,3 +1,9 @@
+const protectedAttributes = [
+  'githubAccessToken',
+  'githubUserId',
+  'signedInAt',
+  'site_users__user_sites',
+];
 const associate = ({ User, Build, Site, UserAction }) => {
   User.hasMany(Build, {
     foreignKey: 'user',
@@ -20,25 +26,23 @@ const associate = ({ User, Build, Site, UserAction }) => {
 };
 
 function toJSON() {
-  const object = this.get({
+  const record = this.get({
     plain: true,
   });
-
-  delete object.githubAccessToken;
-  delete object.githubUserId;
-  delete object.signedInAt;
-  delete object.site_users__user_sites;
-
-  object.createdAt = object.createdAt.toISOString();
-  object.updatedAt = object.updatedAt.toISOString();
-
-  Object.keys(object).forEach((key) => {
-    if (object[key] === null) {
-      delete object[key];
+  /* eslint-disable no-param-reassign */
+  return Object.assign({}, Object.keys(record).reduce((out, attr) => {
+    if (protectedAttributes.indexOf(attr) !== -1) {
+      return out;
     }
-  });
 
-  return object;
+    out[attr] = record[attr];
+
+    return out;
+  }, {}), {
+    createdAt: record.createdAt.toISOString(),
+    updatedAt: record.updatedAt.toISOString(),
+  });
+  /* eslint-enable */
 }
 
 module.exports = (sequelize, DataTypes) => {
