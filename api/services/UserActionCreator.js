@@ -4,7 +4,7 @@ const buildUserAction = actionType => ({ userId, targetId, targetType }) =>
   ActionType.findOne({
     where: { action: actionType },
   }).then((action) => {
-    UserAction.create({
+    return UserAction.create({
       userId,
       targetId,
       targetType,
