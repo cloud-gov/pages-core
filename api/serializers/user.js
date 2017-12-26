@@ -14,7 +14,7 @@ const serialize = (serializable) => {
     include: [{
       model: UserAction,
       as: 'userActions',
-      attributes: ['targetType', 'createdAt'],
+      attributes: ['id', 'targetType', 'createdAt'],
       include: [{
         model: User,
         as: 'actionTarget',

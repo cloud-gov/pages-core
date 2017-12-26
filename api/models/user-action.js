@@ -1,4 +1,4 @@
-const validTargetTypes = ['site', 'user'];
+const validTargetTypes = [['site', 'user']];
 const associate = ({ User, UserAction, ActionType }) => {
   UserAction.belongsTo(User, {
     foreignKey: 'userId',
