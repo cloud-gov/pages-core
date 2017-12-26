@@ -100,10 +100,12 @@ export class SiteContainer extends React.Component {
       <div className="usa-grid site">
         <SideNav siteId={site.id} />
         <div className="usa-width-five-sixths site-main" id="pages-container">
-          <AlertBanner
-            message={storeState.alert.message}
-            status={storeState.alert.status}
-          />
+          <div className="usa-grid">
+            <AlertBanner
+              message={storeState.alert.message}
+              status={storeState.alert.status}
+            />
+          </div>
           <PagesHeader
             repository={site.repository}
             owner={site.owner}
