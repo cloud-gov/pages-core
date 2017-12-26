@@ -9,7 +9,14 @@ const associate = ({ User, Build, Site, UserAction }) => {
   });
   User.hasMany(UserAction, {
     foreignKey: 'userId',
+    as: 'userActions',
   });
+  User.belongsToMany(User, {
+    through: 'user_action',
+    as: 'actionTarget',
+    foreignKey: 'targetId',
+    unique: false,
+  })
 };
 
 function toJSON() {

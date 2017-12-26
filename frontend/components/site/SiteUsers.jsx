@@ -2,6 +2,7 @@ import React from 'react';
 import { SITE, USER } from '../../propTypes';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
+import UserActionsTable from './UserActionsTable';
 
 import GitHubMark from '../GitHubMark';
 
@@ -28,6 +29,7 @@ const SiteUsers = ({ site, user }) => {
 
   return (
     <div>
+      <UserActionsTable userActions={user.userActions} />
       <p>
         This user table is a partially complete feature.
         It allows you to easily audit who else has access
