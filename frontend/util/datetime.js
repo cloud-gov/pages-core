@@ -24,7 +24,7 @@ export const duration = (startTime, endTime) => {
  * @param  {String | Date} date format "YYYY-DD-DDT00:00:00.000Z"
  * @return {String}
  */
-export const timeFrom = date => {
+export const timeFrom = (date) => {
   if (!date) {
     return NO_TIME;
   }
@@ -37,7 +37,7 @@ export const timeFrom = date => {
  * @param  {String | Date} date format "YYYY-DD-DDT00:00:00.000Z"
  * @return {String}
  */
-export const dayAndDate = date => {
+export const dayAndDate = (date) => {
   if (!date) {
     return NO_TIME;
   }

@@ -6,9 +6,7 @@ proxyquire.noCallThru();
 
 describe('siteActions', () => {
   let fixture;
-
   let fetchBranches;
-
   let fetchSites;
   let addSite;
   let addUserToSite;
@@ -29,6 +27,7 @@ describe('siteActions', () => {
   let dispatchShowAddNewSiteFieldsAction;
   let dispatchUserAddedToSiteAction;
   let dispatchUserRemovedFromSiteAction;
+  let fetchUser;
 
   const siteId = 'kuaw8fsru8hwugfw';
   const site = {
@@ -53,7 +52,6 @@ describe('siteActions', () => {
     fetchBranches = stub();
     alertSuccess = stub();
     alertError = stub();
-
     updateRouterToSitesUri = stub();
     updateRouterToSiteBuildsUri = stub();
     dispatchSitesFetchStartedAction = stub();
@@ -65,6 +63,7 @@ describe('siteActions', () => {
     dispatchShowAddNewSiteFieldsAction = stub();
     dispatchUserAddedToSiteAction = stub();
     dispatchUserRemovedFromSiteAction = stub();
+    fetchUser = stub();
 
     fixture = proxyquire('../../../frontend/actions/siteActions', {
       './dispatchActions': {
@@ -95,6 +94,9 @@ describe('siteActions', () => {
       },
       '../util/githubApi': {
         fetchBranches,
+      },
+      './userActions': {
+        fetchUser,
       },
     }).default;
   });
@@ -281,10 +283,11 @@ describe('siteActions', () => {
   });
 
   describe('.removeUserFromSite', () => {
-    it('triggers an http success alert when user is removed', () => {
+    it('triggers an http success alert when user is removed, and refetches user data', () => {
       removeUserFromSite.withArgs(1, 1).returns(Promise.resolve({}));
       const actual = fixture.removeUserFromSite(1, 1);
       actual.then(() => {
+        expect(fetchUser.called).to.be.true;
         expect(updateRouterToSitesUri.called).to.be.false;
         expect(alertSuccess.called).to.be.true;
       });
