@@ -28,159 +28,190 @@ describe('Build API', () => {
   };
 
   describe('POST /v0/build', () => {
+    const validCreateRequest = (token, cookie, buildId) =>
+      request(app)
+        .post('/v0/build/')
+        .set('x-csrf-token', token)
+        .send({
+          buildId,
+        })
+        .set('Cookie', cookie)
+        .expect(200);
+
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.status();
     });
 
     it('should require authentication', (done) => {
-      let site;
-
-      factory.site()
-        .then((model) => {
-          site = model;
-          return unauthenticatedSession();
-        })
-        .then(cookie =>
-          request(app)
-            .post('/v0/build/')
-            .set('x-csrf-token', csrfToken.getToken())
-            .send({
-              site: site.id,
-              branch: 'my-branch',
-            })
-            .set('Cookie', cookie)
-            .expect(403)
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/build', 403, response.body);
-          done();
-        })
-        .catch(done);
+      Promise.props({
+        cookie: unauthenticatedSession(),
+      })
+      .then(cookie =>
+        request(app)
+          .post('/v0/build/')
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            buildId: 1,
+          })
+          .set('Cookie', cookie)
+          .expect(403)
+      )
+      .then((response) => {
+        validateAgainstJSONSchema('POST', '/build', 403, response.body);
+        done();
+      })
+      .catch(done);
     });
 
     it('should require a valid csrf token', (done) => {
-      let site;
-
-      factory.site()
-        .then((model) => {
-          site = model;
-          return authenticatedSession();
-        })
-        .then(cookie =>
-          request(app)
-            .post('/v0/build/')
-            .set('x-csrf-token', 'bad-token')
-            .send({
-              site: site.id,
-              branch: 'my-branch',
-            })
-            .set('Cookie', cookie)
-            .expect(403)
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/build', 403, response.body);
-          expect(response.body.message).to.equal('Invalid CSRF token');
-          done();
-        })
-        .catch(done);
-    });
-
-
-    it('should create a build with the given site and branch for the current user', (done) => {
-      let site;
-      let user;
-
       const userPromise = factory.user();
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-      const cookiePromise = authenticatedSession(userPromise);
 
       Promise.props({
         user: userPromise,
         site: sitePromise,
-        cookie: cookiePromise,
+        cookie: authenticatedSession(userPromise),
       })
-      .then((promisedValues) => {
-        site = promisedValues.site;
-        user = promisedValues.user;
-
-        return request(app)
+      .then(promises =>
+        request(app)
           .post('/v0/build/')
-          .set('x-csrf-token', csrfToken.getToken())
+          .set('x-csrf-token', 'bad-token')
           .send({
-            site: site.id,
-            branch: 'my-branch',
-            commitSha: 'test-commit-sha',
+            buildId: 1,
           })
-          .set('Cookie', promisedValues.cookie)
-          .expect(200);
-      })
+          .set('Cookie', promises.cookie)
+          .expect(403)
+      )
       .then((response) => {
-        validateAgainstJSONSchema('POST', '/build', 200, response.body);
-        return Build.findOne({
-          where: {
-            site: site.id,
-            user: user.id,
-            branch: 'my-branch',
-            commitSha: 'test-commit-sha',
-          },
-        });
-      })
-      .then((build) => {
-        expect(build).not.to.be.undefined;
+        validateAgainstJSONSchema('POST', '/build', 403, response.body);
+        expect(response.body.message).to.equal('Invalid CSRF token');
         done();
       })
       .catch(done);
     });
 
-    it('should report the new build\'s status to GitHub', (done) => {
-      nock.cleanAll();
-      const statusNock = githubAPINocks.status({ state: 'pending' });
-
+    it('returns a 404 if a build to restart is not found', (done) => {
       const userPromise = factory.user();
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-      const cookiePromise = authenticatedSession(userPromise);
 
-      Promise.props({ site: sitePromise, cookie: cookiePromise })
-      .then(({ site, cookie }) =>
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: authenticatedSession(userPromise),
+      }).then(promises =>
         request(app)
           .post('/v0/build/')
           .set('x-csrf-token', csrfToken.getToken())
           .send({
-            site: site.id,
-            branch: 'my-branch',
-            commitSha: 'Introducing the sha sha slide 🎤🎶',
+            buildId: 1,
           })
-          .set('Cookie', cookie)
-          .expect(200)
-      )
-      .then(() => {
-        expect(statusNock.isDone()).to.be.true;
+          .set('Cookie', promises.cookie)
+          .expect(404)
+      .then((response) => {
+        validateAgainstJSONSchema('POST', '/build', 404, response.body);
+        expect(response.body.message).to.equal('Not found');
         done();
       })
-      .catch(done);
+      ).catch(done);
+    });
+
+    describe('successful requests', () => {
+      let userPromise;
+      let sitePromise;
+      let buildPromise;
+
+      beforeEach(() => {
+        userPromise = factory.user();
+        sitePromise = factory.site({ users: Promise.all([userPromise]) });
+        buildPromise = factory.build({
+          site: sitePromise,
+          branch: 'master',
+          commitSha: 'abc123',
+        });
+      });
+
+      it('should create a new build for the site given an existing build id', (done) => {
+        let site;
+        let user;
+
+        Promise.props({
+          user: userPromise,
+          site: sitePromise,
+          build: buildPromise,
+          cookie: authenticatedSession(userPromise),
+        })
+        .then((promisedValues) => {
+          site = promisedValues.site;
+          user = promisedValues.user;
+
+          return validCreateRequest(
+            csrfToken.getToken(),
+            promisedValues.cookie,
+            promisedValues.build.id
+          );
+        })
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/build', 200, response.body);
+          return Build.findOne({
+            where: {
+              site: site.id,
+              user: user.id,
+              branch: 'my-branch',
+              commitSha: 'test-commit-sha',
+            },
+          });
+        })
+        .then((build) => {
+          expect(build).not.to.be.undefined;
+          done();
+        })
+        .catch(done);
+      });
+
+      it('should report the new build\'s status to GitHub', (done) => {
+        nock.cleanAll();
+        const statusNock = githubAPINocks.status({ state: 'pending' });
+
+        Promise.props({
+          user: userPromise,
+          site: sitePromise,
+          build: buildPromise,
+          cookie: authenticatedSession(userPromise),
+        })
+        .then(promisedValues =>
+          validCreateRequest(
+            csrfToken.getToken(),
+            promisedValues.cookie,
+            promisedValues.build.id
+          )
+        )
+        .then(() => {
+          expect(statusNock.isDone()).to.be.true;
+          done();
+        })
+        .catch(done);
+      });
     });
 
     it('should render a 403 if the user is not associated with the given site', (done) => {
       const userProm = factory.user();
-      const authorizedSiteProm = factory.site({ users: Promise.all([userProm]) });
       const notAuthorizedSiteProm = factory.site();
+      const buildPromise = factory.build({ site: notAuthorizedSiteProm });
       const cookieProm = authenticatedSession(userProm);
 
       Promise.props({
         user: userProm,
-        authorizedSite: authorizedSiteProm,
         notAuthorizedSite: notAuthorizedSiteProm,
+        build: buildPromise,
         cookie: cookieProm,
       })
-      .then(({ notAuthorizedSite, cookie }) =>
+      .then(({ build, cookie }) =>
         request(app)
           .post('/v0/build/')
           .set('x-csrf-token', csrfToken.getToken())
           .send({
-            site: notAuthorizedSite.id,
-            branch: 'my-branch',
-            commitSha: 'Everybody 👏👏👏👏 your hands',
+            buildId: build.id,
           })
           .set('Cookie', cookie)
           .expect(403)

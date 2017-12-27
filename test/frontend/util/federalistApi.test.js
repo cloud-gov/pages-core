@@ -141,27 +141,11 @@ describe('federalistApi', () => {
 
   describe('restartBuild', () => {
     it('is defined', () => {
-      federalistApi.restartBuild(testBuild);
+      federalistApi.restartBuild(testBuild.id);
       testRouteCalled('postBuild', {
         method: 'POST',
         body: {
-          site: testSite.id,
-          branch: testBranch,
-          commitSha: testBuild.commitSha,
-        },
-      });
-    });
-
-    it('works when build site is not an object', () => {
-      const boopBuild = Object.assign({}, testBuild);
-      boopBuild.site = 123;
-      federalistApi.restartBuild(boopBuild);
-      testRouteCalled('postBuild', {
-        method: 'POST',
-        body: {
-          site: 123,
-          branch: testBranch,
-          commitSha: testBuild.commitSha,
+          buildId: testBuild.id,
         },
       });
     });

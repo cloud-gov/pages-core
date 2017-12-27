@@ -41,15 +41,32 @@ module.exports = {
     .catch(res.error);
   },
 
-  create: (req, res) => {
-    const params = {
-      branch: req.body.branch,
-      site: req.body.site,
-      user: req.user.id,
-      commitSha: req.body.commitSha,
-    };
+  /**
+   * Create a new build using data from an existing build
+   * Currently, the only way for a user to directly create a new build is
+   * the `restart build` interface in the site builds view.
+   *
+   * This method is named `restart` as it's
+   * not otherwise possible to create a build via the API.
+   */
+  restart: (req, res) => {
+    let params;
 
-    authorizer.create(req.user, params)
+    Build.findById(req.body.buildId, { include: [Site] })
+    .then((build) => {
+      if (!build) {
+        throw 404;
+      }
+
+      params = {
+        branch: build.get('branch'),
+        site: build.get('Site').get('id'),
+        user: req.user.id,
+        commitSha: build.get('commitSha'),
+      };
+
+      return authorizer.create(req.user, params);
+    })
     .then(() => Build.create(params))
     .then(build =>
       GithubBuildStatusReporter.reportBuildStatus(build)
