@@ -42,14 +42,23 @@ module.exports = {
   },
 
   create: (req, res) => {
-    const params = {
-      branch: req.body.branch,
-      site: req.body.site,
-      user: req.user.id,
-      commitSha: req.body.commitSha,
-    };
+    let params;
 
-    authorizer.create(req.user, params)
+    Build.findById(req.body.buildId, { include: [Site] })
+    .then((build) => {
+      if (!build) {
+        throw 400;
+      }
+
+      params = {
+        branch: build.get('branch'),
+        site: build.get('Site').get('id'),
+        user: req.user.id,
+        commitSha: build.get('commitSha'),
+      };
+
+      return authorizer.create(req.user, params);
+    })
     .then(() => Build.create(params))
     .then(build =>
       GithubBuildStatusReporter.reportBuildStatus(build)

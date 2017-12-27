@@ -20,7 +20,7 @@ class SiteBuilds extends React.Component {
 
   static restartClicked(event, build) {
     event.preventDefault();
-    buildActions.restartBuild(build);
+    buildActions.restartBuild(build.id);
   }
 
   static buildLogsLink(build) {
