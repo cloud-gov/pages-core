@@ -41,13 +41,21 @@ module.exports = {
     .catch(res.error);
   },
 
-  create: (req, res) => {
+  /**
+   * Create a new build using data from an existing build
+   * Currently, the only way for a user to directly create a new build is
+   * the `restart build` interface in the site builds view.
+   *
+   * This method is named `restart` as it's
+   * not otherwise possible to create a build via the API.
+   */
+  restart: (req, res) => {
     let params;
 
     Build.findById(req.body.buildId, { include: [Site] })
     .then((build) => {
       if (!build) {
-        throw 400;
+        throw 404;
       }
 
       params = {

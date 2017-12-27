@@ -28,78 +28,98 @@ describe('Build API', () => {
   };
 
   describe('POST /v0/build', () => {
+    const validCreateRequest = (token, cookie, buildId) =>
+      request(app)
+        .post('/v0/build/')
+        .set('x-csrf-token', token)
+        .send({
+          buildId,
+        })
+        .set('Cookie', cookie)
+        .expect(200);
+
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.status();
     });
 
     it('should require authentication', (done) => {
-      let site;
-
-      factory.site()
-        .then((model) => {
-          site = model;
-          return unauthenticatedSession();
-        })
-        .then(cookie =>
-          request(app)
-            .post('/v0/build/')
-            .set('x-csrf-token', csrfToken.getToken())
-            .send({
-              site: site.id,
-              branch: 'my-branch',
-            })
-            .set('Cookie', cookie)
-            .expect(403)
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/build', 403, response.body);
-          done();
-        })
-        .catch(done);
+      Promise.props({
+        cookie: unauthenticatedSession(),
+      })
+      .then(cookie =>
+        request(app)
+          .post('/v0/build/')
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            buildId: 1,
+          })
+          .set('Cookie', cookie)
+          .expect(403)
+      )
+      .then((response) => {
+        validateAgainstJSONSchema('POST', '/build', 403, response.body);
+        done();
+      })
+      .catch(done);
     });
 
     it('should require a valid csrf token', (done) => {
-      let site;
+      const userPromise = factory.user();
+      const sitePromise = factory.site({ users: Promise.all([userPromise]) });
 
-      factory.site()
-        .then((model) => {
-          site = model;
-          return authenticatedSession();
-        })
-        .then(cookie =>
-          request(app)
-            .post('/v0/build/')
-            .set('x-csrf-token', 'bad-token')
-            .send({
-              site: site.id,
-              branch: 'my-branch',
-            })
-            .set('Cookie', cookie)
-            .expect(403)
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/build', 403, response.body);
-          expect(response.body.message).to.equal('Invalid CSRF token');
-          done();
-        })
-        .catch(done);
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: authenticatedSession(userPromise),
+      })
+      .then(promises =>
+        request(app)
+          .post('/v0/build/')
+          .set('x-csrf-token', 'bad-token')
+          .send({
+            buildId: 1,
+          })
+          .set('Cookie', promises.cookie)
+          .expect(403)
+      )
+      .then((response) => {
+        validateAgainstJSONSchema('POST', '/build', 403, response.body);
+        expect(response.body.message).to.equal('Invalid CSRF token');
+        done();
+      })
+      .catch(done);
+    });
+
+    it('returns a 404 if a build to restart is not found', (done) => {
+      const userPromise = factory.user();
+      const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: authenticatedSession(userPromise),
+      }).then(promises =>
+        request(app)
+          .post('/v0/build/')
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            buildId: 1,
+          })
+          .set('Cookie', promises.cookie)
+          .expect(404)
+      .then((response) => {
+        validateAgainstJSONSchema('POST', '/build', 404, response.body);
+        expect(response.body.message).to.equal('Not found');
+        done();
+      })
+      ).catch(done);
     });
 
     describe('successful requests', () => {
       let userPromise;
       let sitePromise;
       let buildPromise;
-
-      const validCreateRequest = (token, cookie, buildId) =>
-        request(app)
-          .post('/v0/build/')
-          .set('x-csrf-token', token)
-          .send({
-            buildId,
-          })
-          .set('Cookie', cookie)
-          .expect(200);
 
       beforeEach(() => {
         userPromise = factory.user();
