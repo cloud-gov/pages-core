@@ -136,10 +136,11 @@ describe('siteActions', () => {
   });
 
   describe('addSite', () => {
+    const siteToAdd = {
+      hey: 'you',
+    };
+
     it('triggers the adding of a site and dispatches site added and update router actions to the store when successful', () => {
-      const siteToAdd = {
-        hey: 'you',
-      };
       const sitePromise = Promise.resolve(site);
       addSite.withArgs(siteToAdd).returns(sitePromise);
 
@@ -152,10 +153,6 @@ describe('siteActions', () => {
     });
 
     it('triggers an error and triggers a router update to the site list page when adding a site fails', () => {
-      const siteToAdd = {
-        hey: 'you',
-      };
-
       // addSite returns nothing when the POST request fails,
       // so resolve to nothing
       addSite.withArgs(siteToAdd).returns(Promise.resolve());
@@ -172,13 +169,14 @@ describe('siteActions', () => {
   });
 
   describe('updateSite', () => {
+    const siteToUpdate = {
+      hi: 'pal',
+    };
+    const data = {
+      who: 'knows',
+    };
+
     it('triggers the updating of a site and dispatches a site updated action to the store when successful', () => {
-      const siteToUpdate = {
-        hi: 'pal',
-      };
-      const data = {
-        who: 'knows',
-      };
       const sitePromise = Promise.resolve(site);
       updateSite.withArgs(siteToUpdate, data).returns(sitePromise);
 
@@ -190,12 +188,6 @@ describe('siteActions', () => {
     });
 
     it('triggers an error when updating a site fails', () => {
-      const siteToUpdate = {
-        hi: 'pal',
-      };
-      const data = {
-        who: 'knows',
-      };
       updateSite.withArgs(siteToUpdate, data).returns(rejectedWithErrorPromise);
 
       const actual = fixture.updateSite(siteToUpdate, data);
@@ -233,11 +225,12 @@ describe('siteActions', () => {
   });
 
   describe('addUserToSite', () => {
+    const repoToAdd = {
+      owner: 'owner',
+      repository: 'a-repo',
+    };
+
     it('triggers adding adding the current user to the site represented by owner/repository', () => {
-      const repoToAdd = {
-        owner: 'owner',
-        repository: 'a-repo',
-      };
       const sitePromise = Promise.resolve(site);
       addUserToSite.withArgs(repoToAdd).returns(sitePromise);
 
@@ -250,11 +243,6 @@ describe('siteActions', () => {
     });
 
     it('triggers showing additional add site fields when adding the user fails with 404', () => {
-      const repoToAdd = {
-        owner: 'owner',
-        repository: 'a-repo',
-      };
-
       const rejectWith404Error = Promise.reject({
         response: { status: 404 },
         message: 'Not found',
@@ -270,11 +258,6 @@ describe('siteActions', () => {
     });
 
     it('triggers an http alert error when adding the user fails with other than 404', () => {
-      const repoToAdd = {
-        owner: 'owner',
-        repository: 'a-repo',
-      };
-
       addUserToSite.withArgs(repoToAdd).returns(rejectedWithErrorPromise);
 
       const actual = fixture.addUserToSite(repoToAdd);
