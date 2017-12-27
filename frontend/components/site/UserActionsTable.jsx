@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { USER_ACTION } from '../../propTypes';
-import { timeFrom } from '../../util/datetime';
+import { dayAndDate } from '../../util/datetime';
 
 const propTypes = {
   userActions: PropTypes.arrayOf(USER_ACTION),
@@ -12,13 +12,14 @@ const defaultProps = {
 
 const UserActionsTable = ({ userActions }) =>
   <table>
+    <caption><b>Action Log</b></caption>
     <thead>
       <tr>
         <th>
           Action
         </th>
         <th>
-          targetId
+          Target
         </th>
         <th>
           Performed on
@@ -30,7 +31,7 @@ const UserActionsTable = ({ userActions }) =>
         <tr key={`${action.id}-${action.targetType}`}>
           <th>{action.actionType.action}</th>
           <th>{action.actionTarget.username}</th>
-          <th>{timeFrom(action.createdAt)}</th>
+          <th>{dayAndDate(action.createdAt)}</th>
         </tr>
       )}
     </tbody>

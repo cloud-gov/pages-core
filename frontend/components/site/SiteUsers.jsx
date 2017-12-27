@@ -29,7 +29,6 @@ const SiteUsers = ({ site, user }) => {
 
   return (
     <div>
-      <UserActionsTable userActions={user.userActions} />
       <p>
         This user table is a partially complete feature.
         It allows you to easily audit who else has access
@@ -74,6 +73,9 @@ const SiteUsers = ({ site, user }) => {
           )}
         </tbody>
       </table>
+      <div className="offset-top">
+        <UserActionsTable userActions={user.userActions} />
+      </div>
     </div>
   );
 };
