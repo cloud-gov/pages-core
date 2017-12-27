@@ -40,7 +40,7 @@ const completeJobErrorMessage = (err) => {
   if (err) {
     message = err.message || err;
   } else {
-    message = 'An unknown error occured';
+    message = 'An unknown error occurred';
   }
   return sanitizeCompleteJobErrorMessage(message);
 };
