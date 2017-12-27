@@ -13,7 +13,7 @@ import {
   dispatchUserRemovedFromSiteAction,
   dispatchShowAddNewSiteFieldsAction,
 } from './dispatchActions';
-
+import userActions from './userActions';
 
 const alertError = error => alertActions.httpError(error.message);
 
@@ -81,7 +81,9 @@ export default {
         });
     }
 
-    return onRemoveUser.then(onUserRemoveFromSite);
+    return onRemoveUser
+      .then(userActions.fetchUser)
+      .then(onUserRemoveFromSite);
   },
 
   updateSite(site, data) {
