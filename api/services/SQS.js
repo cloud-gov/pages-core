@@ -78,6 +78,7 @@ const buildContainerEnvironment = build => ({
   GENERATOR: build.Site.engine,
   SOURCE_REPO: sourceForBuild(build).repository,
   SOURCE_OWNER: sourceForBuild(build).owner,
+  SKIP_LOGGING: config.app.app_env === 'development',
 });
 
 const sqsConfig = config.sqs;
