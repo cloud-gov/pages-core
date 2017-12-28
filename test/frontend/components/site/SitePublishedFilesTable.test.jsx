@@ -8,42 +8,95 @@ import SitePublishedFilesTable from '../../../../frontend/components/site/SitePu
 describe('<SitePublishedFilesTable/>', () => {
   it('should render the branch name', () => {
     const publishedBranch = { name: 'master', site: { viewLink: 'www.example.gov/master' } };
-    const props = {
+    const origProps = {
       params: { id: '1', name: 'master' },
       publishedFiles: {
-        isLoading: false,
-        data: [
-          { name: 'abc', publishedBranch },
+        isLoading: true,
+      },
+    };
+
+    const publishedFiles = {
+      isLoading: false,
+      data: {
+        isTruncated: false,
+        files: [
+          { name: 'abc', size: 123, key: 'prefix/abc', publishedBranch },
         ],
       },
     };
 
-    const wrapper = shallow(<SitePublishedFilesTable {...props} />);
+    const wrapper = shallow(<SitePublishedFilesTable {...origProps} />);
+    wrapper.setProps({ publishedFiles });
+
     expect(wrapper.find('h3').contains('master')).to.be.true;
   });
 
   it('should render a table with the files for the given branch', () => {
     const correctBranch = { name: 'master', site: { viewLink: 'www.example.gov/master' } };
-    const incorrectBranch = { name: 'preview', site: { viewLink: 'www.example.gov/preview' } };
-    const props = {
+    const origProps = {
       params: { id: '1', name: 'master' },
       publishedFiles: {
-        isLoading: false,
-        data: [
+        isLoading: true,
+      },
+    };
+
+    const publishedFiles = {
+      isLoading: false,
+      data: {
+        isTruncated: false,
+        files: [
           { name: 'abc', publishedBranch: correctBranch },
           { name: 'abc/def', publishedBranch: correctBranch },
           { name: null, publishedBranch: correctBranch }, // shouldn't be rendered b/c no name
-          { name: 'xyz', publishedBranch: incorrectBranch },
         ],
       },
     };
 
-    const wrapper = shallow(<SitePublishedFilesTable {...props} />);
+    const wrapper = shallow(<SitePublishedFilesTable {...origProps} />);
+    wrapper.setProps({ publishedFiles });
     expect(wrapper.find('table')).to.have.length(1);
     expect(wrapper.find('tbody > tr')).to.have.length(2);
     expect(wrapper.find('table').contains('abc')).to.be.true;
     expect(wrapper.find('table').contains('abc/def')).to.be.true;
     expect(wrapper.find('table').contains('xyz')).to.be.false;
+
+    // paging buttons should be present if the first page is not truncated
+    const buttons = wrapper.find('button');
+    expect(buttons).to.have.length(0);
+  });
+
+  it('should render previous and next buttons if files are truncated', () => {
+    const publishedBranch = { name: 'master', site: { viewLink: 'www.example.gov/master' } };
+    const origProps = {
+      params: { id: '1', name: 'master' },
+      publishedFiles: {
+        isLoading: true,
+      },
+    };
+
+    const publishedFiles = {
+      isLoading: false,
+      data: {
+        isTruncated: true,
+        files: [
+          { name: 'abc', size: 123, key: 'prefix/abc', publishedBranch },
+        ],
+      },
+    };
+
+    const wrapper = shallow(<SitePublishedFilesTable {...origProps} />);
+    wrapper.setProps({ publishedFiles });
+
+    const buttons = wrapper.find('button');
+    expect(buttons).to.have.length(2);
+
+    const prevButton = buttons.at(0);
+    const nextButton = buttons.at(1);
+
+    expect(prevButton.prop('disabled')).to.be.true;
+    expect(prevButton.text()).to.contain('Previous');
+    expect(nextButton.prop('disabled')).to.be.false;
+    expect(nextButton.text()).to.contain('Next');
   });
 
   it('should render a loading state if the files are loading', () => {
@@ -59,7 +112,7 @@ describe('<SitePublishedFilesTable/>', () => {
   it('should render an empty state if there are no files', () => {
     const props = {
       params: { id: '1', name: 'master' },
-      publishedFiles: { isLoading: false, data: [] },
+      publishedFiles: { isLoading: false, data: { isTruncated: false, files: [] } },
     };
 
     const wrapper = shallow(<SitePublishedFilesTable {...props} />);

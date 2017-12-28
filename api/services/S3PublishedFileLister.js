@@ -1,35 +1,25 @@
-const AWS = require('aws-sdk');
-const config = require('../../config');
+const S3Helper = require('./S3Helper');
 
-const s3Config = config.s3;
-const s3Client = new AWS.S3({
-  accessKeyId: s3Config.accessKeyId,
-  secretAccessKey: s3Config.secretAccessKey,
-  region: s3Config.region,
-});
 
-function listFolders(path) {
-  return new Promise((resolve, reject) => {
-    s3Client.listObjects({
-      Bucket: s3Config.bucket,
-      Prefix: path,
-      Delimiter: '/',
-    }, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        const prefixes = data.CommonPrefixes.map(
-          prefix => prefix.Prefix.split('/').slice(-2)[0]
-        );
-        resolve(prefixes);
-      }
-    }
-    );
-  });
+function listTopLevelFolders(path) {
+  // Lists all top-level "folders" in the S3 bucket that start with
+  // the given prefix path.
+
+  // Pass the Delimiter option so that results are grouped
+  // according to their "folder" paths
+  return S3Helper.listCommonPrefixes(path)
+    .then((commonPrefixes) => {
+      const prefixes = commonPrefixes.map(
+        prefix => prefix.Prefix.split('/').slice(-2)[0]
+      );
+      return prefixes;
+    });
 }
 
+function listFilesPaged(path, startAtKey = null) {
+  // Lists all the files in the S3 bucket that start
+  // with the given prefix path.
 
-function listFiles(path) {
   let prefixPath = path;
   // add a trailing slash to the prefix if not there already
   // to prevent getting files published at a repo whose name
@@ -38,58 +28,33 @@ function listFiles(path) {
     prefixPath = `${prefixPath}/`;
   }
 
-  const listFilesHelper = (currFiles, continuationToken, callback) => {
-    const listObjectArgs = {
-      Bucket: s3Config.bucket,
-      Prefix: prefixPath,
-    };
-
-    if (continuationToken) {
-      listObjectArgs.ContinuationToken = continuationToken;
-    }
-
-    s3Client.listObjectsV2(listObjectArgs, (err, data) => {
-      if (err) {
-        callback(err);
-        return;
-      }
-
-      const files = currFiles ? currFiles.concat(data.Contents) : data.Contents;
-
-      if (data.IsTruncated) {
-        listFilesHelper(files, data.NextContinuationToken, callback);
-      } else {
-        // done !
-        callback(null, files);
-      }
+  return S3Helper.listObjectsPaged(prefixPath, startAtKey)
+    .then((pagedResults) => {
+      const prefixComponents = path.split('/').length;
+      const files = pagedResults.objects.map((file) => {
+        // convenient name for display
+        const name = file.Key.split('/').slice(prefixComponents).join('/');
+        const size = Number(file.Size);
+        return {
+          name,
+          size,
+          key: file.Key,
+        };
+      });
+      return {
+        isTruncated: pagedResults.isTruncated,
+        files,
+      };
     });
-  };
-
-  return new Promise((resolve, reject) => {
-    listFilesHelper(null, null, (err, fileObjects) => {
-      if (err) {
-        reject(err);
-      } else {
-        const prefixComponents = path.split('/').length;
-        const files = fileObjects.map((file) => {
-          const name = file.Key.split('/').slice(prefixComponents).join('/');
-          const size = Number(file.Size);
-          return { name, size };
-        });
-        resolve(files);
-      }
-    });
-  });
 }
-
 
 function listPublishedPreviews(site) {
   const previewPath = `preview/${site.owner}/${site.repository}/`;
-  return listFolders(previewPath);
+  return listTopLevelFolders(previewPath);
 }
 
 
-function listPublishedFilesForBranch(site, branch) {
+function listPagedPublishedFilesForBranch(site, branch, startAtKey) {
   let filepath;
   if (site.defaultBranch === branch) {
     filepath = `site/${site.owner}/${site.repository}`;
@@ -98,8 +63,8 @@ function listPublishedFilesForBranch(site, branch) {
   } else {
     filepath = `preview/${site.owner}/${site.repository}/${branch}`;
   }
-  return listFiles(filepath);
+  return listFilesPaged(filepath, startAtKey);
 }
 
 
-module.exports = { listPublishedPreviews, listPublishedFilesForBranch };
+module.exports = { listPublishedPreviews, listPagedPublishedFilesForBranch };

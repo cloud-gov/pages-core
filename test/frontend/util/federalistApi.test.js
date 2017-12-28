@@ -47,6 +47,9 @@ describe('federalistApi', () => {
     fetchMock.get(
       `${API}/site/${testSite.id}/published-branch/${testBranch}/published-file`,
       { files: [] }, { name: 'getPublishedFiles' });
+    fetchMock.get(
+      `${API}/site/${testSite.id}/published-branch/${testBranch}/published-file?startAtKey=boop`,
+      { files: [] }, { name: 'getPublishedFilesWithQueryParam' });
     fetchMock.get(`${API}/site`, { sites: [testSite] }, { name: 'getSites' });
     fetchMock.get(`${API}/me`, { user: 'me' }, { name: 'getMe' });
     fetchMock.post(`${API}/site`, {}, { name: 'postSite' });
@@ -100,9 +103,16 @@ describe('federalistApi', () => {
     testRouteCalled('getPublishedBranches');
   });
 
-  it('defines fetchPublishedFiles', () => {
-    federalistApi.fetchPublishedFiles(testSite, testBranch);
-    testRouteCalled('getPublishedFiles');
+  describe('fetchPublishedFiles', () => {
+    it('is defined', () => {
+      federalistApi.fetchPublishedFiles(testSite, testBranch);
+      testRouteCalled('getPublishedFiles');
+    });
+
+    it('works with the startAtKey param', () => {
+      federalistApi.fetchPublishedFiles(testSite, testBranch, 'boop');
+      testRouteCalled('getPublishedFilesWithQueryParam');
+    });
   });
 
   it('defines fetchSites', () => {

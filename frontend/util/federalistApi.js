@@ -41,8 +41,12 @@ export default {
     return this.fetch(`site/${site.id}/published-branch`);
   },
 
-  fetchPublishedFiles(site, branch) {
-    return this.fetch(`site/${site.id}/published-branch/${branch}/published-file`);
+  fetchPublishedFiles(site, branch, startAtKey = null) {
+    let path = `site/${site.id}/published-branch/${branch}/published-file`;
+    if (startAtKey) {
+      path += `?startAtKey=${startAtKey}`;
+    }
+    return this.fetch(path);
   },
 
   fetchSites() {
