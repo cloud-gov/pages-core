@@ -91,13 +91,11 @@ export default {
     });
   },
 
-  restartBuild(build) {
+  restartBuild(buildId) {
     return this.fetch('build/', {
       method: 'POST',
       data: {
-        site: build.site.id || build.site,
-        branch: build.branch,
-        commitSha: build.commitSha,
+        buildId,
       },
     });
   },
