@@ -66,7 +66,6 @@ export const SiteList = ({ storeState }) =>
             <img className="header-icon" src="/images/websites.svg" alt="Websites icon" />
             Your websites
           </h1>
-          <h2>Dashboard</h2>
         </div>
       </div>
       <div className="usa-width-one-third">
