@@ -50,12 +50,13 @@ export const AdvancedSiteSettings = ({
 
       {/* CUSTOM CONFIG */}
       <fieldset>
-        <legend>Site configuration</legend>
+        <legend>Live site</legend>
         <p className="well-text">
           Add additional configuration in yaml to be added to your
           {' '}
           <code>_config.yml</code> file when we build your site&apos;s primary branch.
         </p>
+        <label htmlFor="config">Site configuration</label>
         <Field
           component="textarea"
           name="config"
@@ -65,12 +66,13 @@ export const AdvancedSiteSettings = ({
 
       {/* DEMO CONFIG */}
       <fieldset>
-        <legend>Demo configuration</legend>
+        <legend>Demo site</legend>
         <p className="well-text">
           Add additional configuration in yaml to be added to your
           {' '}
           <code>_config.yml</code> file when we build your site&apos;s demo branch.
         </p>
+        <label htmlFor="demoConfig">Demo configuration</label>
         <Field
           component="textarea"
           name="demoConfig"
@@ -80,12 +82,13 @@ export const AdvancedSiteSettings = ({
 
       {/* PREVIEW CONFIG */}
       <fieldset>
-        <legend>Preview configuration</legend>
+        <legend>Preview site</legend>
         <p className="well-text">
           Add additional configuration in yaml to be added to your
           {' '}
           <code>_config.yml</code> file when we build a preview branch for your site.
         </p>
+        <label htmlFor="previewConfig">Preview configuration</label>
         <Field
           component="textarea"
           name="previewConfig"
