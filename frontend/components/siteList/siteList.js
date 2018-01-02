@@ -62,7 +62,10 @@ export const SiteList = ({ storeState }) =>
     <div className="usa-grid dashboard header">
       <div className="usa-width-two-thirds">
         <div className="header-title">
-          <h1><img className="header-icon" src="/images/websites.svg" alt="Websites icon" /> Your websites</h1>
+          <h1>
+            <img className="header-icon" src="/images/websites.svg" alt="Websites icon" />
+            Your websites
+          </h1>
           <h2>Dashboard</h2>
         </div>
       </div>
