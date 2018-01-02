@@ -1,12 +1,18 @@
 label,
 legend {
   font-size: inherit;
-  font-weight: 800;
-  text-transform: capitalize;
 }
 
-label,
 fieldset {
+  margin-bottom: 2rem;
+}
+
+legend {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+label {
   margin-top: 2rem;
 }
 
@@ -49,5 +55,14 @@ select {
 .settings-form {
   button[type="submit"] {
     display: inline;
+  }
+}
+
+.form-control-mono {
+  font-family: monospace,monospace;
+}
+.settings-form-advanced {
+  select {
+    margin-bottom: 2rem;
   }
 }

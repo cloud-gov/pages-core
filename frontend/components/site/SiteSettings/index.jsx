@@ -82,7 +82,7 @@ class SiteSettings extends React.Component {
             viewing site previews
           </a>.
         </p>
-        <h3>Basic Settings</h3>
+        <h3>Basic settings</h3>
         <BasicSiteSettings
           initialValues={basicInitialValues}
           onSubmit={this.onSubmit}
