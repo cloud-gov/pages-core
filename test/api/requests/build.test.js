@@ -28,12 +28,13 @@ describe('Build API', () => {
   };
 
   describe('POST /v0/build', () => {
-    const validCreateRequest = (token, cookie, buildId) =>
+    const validCreateRequest = (token, cookie, buildId, siteId) =>
       request(app)
         .post('/v0/build/')
         .set('x-csrf-token', token)
         .send({
           buildId,
+          siteId,
         })
         .set('Cookie', cookie)
         .expect(200);
@@ -91,7 +92,7 @@ describe('Build API', () => {
       .catch(done);
     });
 
-    it('returns a 404 if a build to restart is not found', (done) => {
+    it('returns a 403 if a build to restart is not associated with the user', (done) => {
       const userPromise = factory.user();
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
 
@@ -105,12 +106,12 @@ describe('Build API', () => {
           .set('x-csrf-token', csrfToken.getToken())
           .send({
             buildId: 1,
+            siteId: promises.site.id,
           })
           .set('Cookie', promises.cookie)
-          .expect(404)
+          .expect(403)
       .then((response) => {
-        validateAgainstJSONSchema('POST', '/build', 404, response.body);
-        expect(response.body.message).to.equal('Not found');
+        validateAgainstJSONSchema('POST', '/build', 403, response.body);
         done();
       })
       ).catch(done);
@@ -128,6 +129,7 @@ describe('Build API', () => {
           site: sitePromise,
           branch: 'master',
           commitSha: 'abc123',
+          user: userPromise,
         });
       });
 
@@ -148,7 +150,8 @@ describe('Build API', () => {
           return validCreateRequest(
             csrfToken.getToken(),
             promisedValues.cookie,
-            promisedValues.build.id
+            promisedValues.build.id,
+            site.id
           );
         })
         .then((response) => {
@@ -169,6 +172,45 @@ describe('Build API', () => {
         .catch(done);
       });
 
+      // it('creates a new build form a branch name given an existing build of that branch', () => {
+      //   let site;
+      //   let user;
+      //
+      //   Promise.props({
+      //     user: userPromise,
+      //     site: sitePromise,
+      //     build: buildPromise,
+      //     cookie: authenticatedSession(userPromise),
+      //   })
+      //   .then((promisedValues) => {
+      //     site = promisedValues.site;
+      //     user = promisedValues.user;
+      //
+      //     return validCreateRequest(
+      //       csrfToken.getToken(),
+      //       promisedValues.cookie,
+      //       promisedValues.build.id,
+      //       site.id
+      //     );
+      //   })
+      //   .then((response) => {
+      //     validateAgainstJSONSchema('POST', '/build', 200, response.body);
+      //     return Build.findOne({
+      //       where: {
+      //         site: site.id,
+      //         user: user.id,
+      //         branch: 'my-branch',
+      //         commitSha: 'test-commit-sha',
+      //       },
+      //     });
+      //   })
+      //   .then((build) => {
+      //     expect(build).not.to.be.undefined;
+      //     done();
+      //   })
+      //   .catch(done);
+      // });
+
       it('should report the new build\'s status to GitHub', (done) => {
         nock.cleanAll();
         const statusNock = githubAPINocks.status({ state: 'pending' });
@@ -183,7 +225,8 @@ describe('Build API', () => {
           validCreateRequest(
             csrfToken.getToken(),
             promisedValues.cookie,
-            promisedValues.build.id
+            promisedValues.build.id,
+            promisedValues.site.id
           )
         )
         .then(() => {
@@ -212,6 +255,7 @@ describe('Build API', () => {
           .set('x-csrf-token', csrfToken.getToken())
           .send({
             buildId: build.id,
+            siteId: 1,
           })
           .set('Cookie', cookie)
           .expect(403)

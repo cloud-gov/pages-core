@@ -3,8 +3,15 @@ const { User, Build } = require('../models');
 const shaRegex = /^[a-f0-9]{40}/;
 const validateSha = maybeSha => shaRegex.test(maybeSha);
 
+const normalizeParams = (params) => {
+  const buildId = params.buildId || params.build.id;
+  const siteId = params.siteId || params.site.id;
+
+  return Object.assign({}, params, { buildId, siteId });
+};
+
 const verifyBuild = (model) => {
-  const build = model.Builds[0];
+  const build = model && model.Builds && model.Builds[0];
 
   if (!build) {
     return Promise.reject(403);
@@ -48,12 +55,13 @@ const getBuildByBranch = (user, params) => {
 };
 
 const authorize = (user, params) => {
+  const normalized = normalizeParams(params);
   const finderFn = params.buildId ? getBuildById : getBuildByBranch;
 
   return finderFn(user, params);
 };
 
-const findOne = (user, build) => authorize(user, build);
-const create = (user, build) => authorize(user, build);
+const findOne = (user, params) => authorize(user, params);
+const create = (user, params) => authorize(user, params);
 
 module.exports = { findOne, create };

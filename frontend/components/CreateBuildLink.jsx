@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 const propTypes = {
   handlerParams: PropTypes.object,
-  children: PropTypes.node,
-  handleClick: PropTypes.func,
+  children: PropTypes.node.isRequired,
+  handleClick: PropTypes.func.isRequired,
 };
 
 class CreateBuildLink extends React.Component {
@@ -15,7 +15,7 @@ class CreateBuildLink extends React.Component {
   }
 
   handleClick(event) {
-    event.preventDefault;
+    event.preventDefault();
     const { handlerParams } = this.props;
     const args = Object.keys(handlerParams).map(key => handlerParams[key]);
 
@@ -23,7 +23,7 @@ class CreateBuildLink extends React.Component {
   }
 
   render() {
-    const { handleClick, children } = this.props;
+    const { children } = this.props;
 
     return (
       /* eslint-disable jsx-a11y/href-no-hash */
@@ -32,12 +32,12 @@ class CreateBuildLink extends React.Component {
         role="button"
         onClick={this.handleClick}
       >
-        {this.props.children}
+        {children}
       </a>
       /* eslint-enable jsx-a11y/href-no-hash */
     );
   }
-};
+}
 
 CreateBuildLink.propTypes = propTypes;
 CreateBuildLink.defaultProps = {

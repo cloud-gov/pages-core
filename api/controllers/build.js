@@ -79,7 +79,7 @@ module.exports = {
       } else {
         res.notFound();
       }
-      return authorizer.findOne(req.user, build);
+      return authorizer.findOne(req.user, { buildId: build.id, siteId: build.site });
     })
     .then(() => buildSerializer.serialize(build))
     .then(buildJSON => res.json(buildJSON))
