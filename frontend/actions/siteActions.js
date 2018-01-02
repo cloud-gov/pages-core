@@ -15,9 +15,7 @@ import {
 } from './dispatchActions';
 
 
-const alertError = (error) => {
-  alertActions.httpError(error.message);
-};
+const alertError = error => alertActions.httpError(error.message);
 
 const onUserRemoveFromSite = (site) => {
   if (site) {
