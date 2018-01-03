@@ -266,7 +266,7 @@ describe('siteActions', () => {
   });
 
   describe('.removeUserFromSite', () => {
-    it('triggers an http success alert when user is removed, and refetches user data', () => {
+    it('triggers an http success alert when user is removed, and refetches user + site data', () => {
       removeUserFromSite.withArgs(1, 1).returns(Promise.resolve({}));
       const actual = fixture.removeUserFromSite(1, 1);
       actual.then(() => {
@@ -274,6 +274,7 @@ describe('siteActions', () => {
         expect(fetchUser.called).to.be.true;
         expect(updateRouterToSitesUri.called).to.be.false;
         expect(alertSuccess.called).to.be.true;
+        expect(alertSuccess.calledWith('User successfully removed.')).to.be.true;
         expect(dispatchUserRemovedFromSiteAction.called).to.be.true;
       });
     });
@@ -282,9 +283,11 @@ describe('siteActions', () => {
       removeUserFromSite.withArgs(1, 1).returns(Promise.resolve({}));
       const actual = fixture.removeUserFromSite(1, 1, true);
       actual.then(() => {
-        expect(updateRouterToSitesUri.called).to.be.true;
+        expect(fetchUser.called).to.be.false;
         expect(fetchSites.called).to.be.true;
+        expect(updateRouterToSitesUri.called).to.be.true;
         expect(alertSuccess.called).to.be.true;
+        expect(alertSuccess.calledWith('User successfully removed.')).to.be.true;
         expect(dispatchUserRemovedFromSiteAction.called).to.be.true;
       });
     });
