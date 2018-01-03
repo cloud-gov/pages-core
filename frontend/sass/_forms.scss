@@ -1,6 +1,7 @@
 label,
 legend {
   font-size: inherit;
+  font-weight: 800;
 }
 
 fieldset {
@@ -55,6 +56,9 @@ select {
 .settings-form {
   button[type="submit"] {
     display: inline;
+  }
+  .well {
+    margin-left: 2rem;
   }
 }
 

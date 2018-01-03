@@ -47,7 +47,8 @@ export const AdvancedSiteSettings = ({
           />
         }
       />
-
+    </div>
+    <div className="well">
       {/* CUSTOM CONFIG */}
       <fieldset>
         <legend>Live site</legend>
@@ -63,7 +64,8 @@ export const AdvancedSiteSettings = ({
           className="form-control-mono"
         />
       </fieldset>
-
+    </div>
+    <div className="well">
       {/* DEMO CONFIG */}
       <fieldset>
         <legend>Demo site</legend>
@@ -79,7 +81,8 @@ export const AdvancedSiteSettings = ({
           className="form-control-mono"
         />
       </fieldset>
-
+    </div>
+    <div className="well">
       {/* PREVIEW CONFIG */}
       <fieldset>
         <legend>Preview site</legend>
@@ -95,27 +98,27 @@ export const AdvancedSiteSettings = ({
           className="form-control-mono"
         />
       </fieldset>
-      <button
-        type="button"
-        className="usa-button usa-button-gray button-reset"
-        disabled={pristine}
-        onClick={reset}
-      >
-        Reset
-      </button>
-
-      <button
-        type="submit"
-        className="usa-button usa-button-primary"
-        disabled={pristine}
-      >
-        Save advanced settings
-      </button>
     </div>
+    <button
+      type="button"
+      className="usa-button usa-button-gray button-reset"
+      disabled={pristine}
+      onClick={reset}
+    >
+      Reset
+    </button>
+
+    <button
+      type="submit"
+      className="usa-button usa-button-primary"
+      disabled={pristine}
+    >
+      Save advanced settings
+    </button>
 
 
-    <div className="usa-alert usa-alert-error usa-alert-delete" role="alert">
-       <div className="usa-alert-body">
+    <div className="usa-alert usa-alert-warning usa-alert-danger">
+      <div className="usa-alert-body">
         <h3 className="usa-alert-heading">Danger zone</h3>
         <p className="usa-alert-text">Delete this site from Federalist?</p>
         <button

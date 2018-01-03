@@ -29,6 +29,7 @@ export const BasicSiteSettings = ({
   handleSubmit,
 }) => (
   <form className="settings-form" onSubmit={handleSubmit}>
+    <h3>Basic settings</h3>
     <div className="well">
       <fieldset>
         <legend>Live site</legend>
@@ -62,7 +63,8 @@ export const BasicSiteSettings = ({
           className="form-control"
         />
       </fieldset>
-
+    </div>
+    <div className="well">
       <fieldset>
         <legend>Demo site</legend>
         <p className="well-text">
@@ -87,24 +89,23 @@ export const BasicSiteSettings = ({
           className="form-control"
         />
       </fieldset>
-
-      <button
-        type="button"
-        className="usa-button usa-button-gray button-reset"
-        disabled={pristine}
-        onClick={reset}
-      >
-        Reset
-      </button>
-
-      <button
-        type="submit"
-        className="usa-button usa-button-primary"
-        disabled={pristine}
-      >
-        Save basic settings
-      </button>
     </div>
+    <button
+      type="button"
+      className="usa-button usa-button-gray button-reset"
+      disabled={pristine}
+      onClick={reset}
+    >
+      Reset
+    </button>
+
+    <button
+      type="submit"
+      className="usa-button usa-button-primary"
+      disabled={pristine}
+    >
+      Save basic settings
+    </button>
   </form>
 );
 
