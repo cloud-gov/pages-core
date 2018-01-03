@@ -12,7 +12,7 @@ const defaultProps = {
 
 const UserActionsTable = ({ userActions }) =>
   <table>
-    <caption><b>Action Log</b></caption>
+    <caption>Action Log</caption>
     <thead>
       <tr>
         <th>

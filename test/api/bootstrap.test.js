@@ -9,7 +9,7 @@ const types = ['add', 'remove', 'update'];
 const cleanDatabase = () => {
   const promises = Object.keys(models).map((name) => {
     const model = models[name];
-    // { force: true } removes soft deleted models and prevents uniqueness validation errors
+    // Using `force: true` removes soft deleted models and prevents uniqueness validation errors
     const promise = model.destroy({ where: {}, force: true });
 
     return promise;

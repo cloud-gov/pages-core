@@ -29,20 +29,19 @@ function toJSON() {
   const record = this.get({
     plain: true,
   });
-  /* eslint-disable no-param-reassign */
+
   return Object.assign({}, Object.keys(record).reduce((out, attr) => {
     if (protectedAttributes.indexOf(attr) !== -1) {
       return out;
     }
 
-    out[attr] = record[attr];
+    out[attr] = record[attr]; // eslint-disable-line no-param-reassign
 
     return out;
   }, {}), {
     createdAt: record.createdAt.toISOString(),
     updatedAt: record.updatedAt.toISOString(),
   });
-  /* eslint-enable */
 }
 
 module.exports = (sequelize, DataTypes) => {
