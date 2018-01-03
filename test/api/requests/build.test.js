@@ -10,6 +10,8 @@ const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema'
 const { Build, User, Site } = require('../../../api/models');
 const csrfToken = require('../support/csrfToken');
 
+const commitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
+
 describe('Build API', () => {
   const buildResponseExpectations = (response, build) => {
     if (build.completedAt) {
@@ -28,14 +30,11 @@ describe('Build API', () => {
   };
 
   describe('POST /v0/build', () => {
-    const validCreateRequest = (token, cookie, buildId, siteId) =>
+    const validCreateRequest = (token, cookie, params) =>
       request(app)
         .post('/v0/build/')
         .set('x-csrf-token', token)
-        .send({
-          buildId,
-          siteId,
-        })
+        .send(params)
         .set('Cookie', cookie)
         .expect(200);
 
@@ -128,7 +127,7 @@ describe('Build API', () => {
         buildPromise = factory.build({
           site: sitePromise,
           branch: 'master',
-          commitSha: 'abc123',
+          commitSha,
           user: userPromise,
         });
       });
@@ -150,8 +149,10 @@ describe('Build API', () => {
           return validCreateRequest(
             csrfToken.getToken(),
             promisedValues.cookie,
-            promisedValues.build.id,
-            site.id
+            {
+              buildId: promisedValues.build.id,
+              siteId: site.id,
+            }
           );
         })
         .then((response) => {
@@ -161,7 +162,7 @@ describe('Build API', () => {
               site: site.id,
               user: user.id,
               branch: 'my-branch',
-              commitSha: 'test-commit-sha',
+              commitSha,
             },
           });
         })
@@ -172,44 +173,47 @@ describe('Build API', () => {
         .catch(done);
       });
 
-      // it('creates a new build form a branch name given an existing build of that branch', () => {
-      //   let site;
-      //   let user;
-      //
-      //   Promise.props({
-      //     user: userPromise,
-      //     site: sitePromise,
-      //     build: buildPromise,
-      //     cookie: authenticatedSession(userPromise),
-      //   })
-      //   .then((promisedValues) => {
-      //     site = promisedValues.site;
-      //     user = promisedValues.user;
-      //
-      //     return validCreateRequest(
-      //       csrfToken.getToken(),
-      //       promisedValues.cookie,
-      //       promisedValues.build.id,
-      //       site.id
-      //     );
-      //   })
-      //   .then((response) => {
-      //     validateAgainstJSONSchema('POST', '/build', 200, response.body);
-      //     return Build.findOne({
-      //       where: {
-      //         site: site.id,
-      //         user: user.id,
-      //         branch: 'my-branch',
-      //         commitSha: 'test-commit-sha',
-      //       },
-      //     });
-      //   })
-      //   .then((build) => {
-      //     expect(build).not.to.be.undefined;
-      //     done();
-      //   })
-      //   .catch(done);
-      // });
+      it('creates a new build from a branch name given an existing build of that branch', (done) => {
+        let site;
+        let user;
+
+        Promise.props({
+          user: userPromise,
+          site: sitePromise,
+          build: buildPromise,
+          cookie: authenticatedSession(userPromise),
+        })
+        .then((promisedValues) => {
+          site = promisedValues.site;
+          user = promisedValues.user;
+
+          return validCreateRequest(
+            csrfToken.getToken(),
+            promisedValues.cookie,
+            {
+              branch: promisedValues.build.branch,
+              siteId: promisedValues.build.site,
+              sha: promisedValues.build.commitSha,
+            }
+          );
+        })
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/build', 200, response.body);
+          return Build.findOne({
+            where: {
+              site: site.id,
+              user: user.id,
+              branch: 'my-branch',
+              commitSha,
+            },
+          });
+        })
+        .then((build) => {
+          expect(build).not.to.be.undefined;
+          done();
+        })
+        .catch(done);
+      });
 
       it('should report the new build\'s status to GitHub', (done) => {
         nock.cleanAll();
@@ -225,8 +229,10 @@ describe('Build API', () => {
           validCreateRequest(
             csrfToken.getToken(),
             promisedValues.cookie,
-            promisedValues.build.id,
-            promisedValues.site.id
+            {
+              buildId: promisedValues.build.id,
+              siteId: promisedValues.build.site,
+            }
           )
         )
         .then(() => {
@@ -289,7 +295,7 @@ describe('Build API', () => {
         state: 'error',
         branch: '18f-pages',
         completedAt: new Date(),
-        commitSha: '⬅️  slide to the left ⬅️ ',
+        commitSha,
       };
 
       factory.build(buildAttributes).then((model) => {
@@ -472,7 +478,7 @@ describe('Build API', () => {
     it('should mark a build successful if status is 0 and message is blank', (done) => {
       let build;
 
-      factory.build({ commitSha: '➡️ slide to the right ➡️' })
+      factory.build({ commitSha })
       .then((model) => {
         build = model;
       })
@@ -497,7 +503,7 @@ describe('Build API', () => {
     it('should mark a build errored if the status is non-zero and should set the message', (done) => {
       let build;
 
-      factory.build({ commitSha: '🐰 one hop this time 🐰' })
+      factory.build({ commitSha })
       .then((model) => {
         build = model;
       })
@@ -527,7 +533,7 @@ describe('Build API', () => {
         site: sitePromise,
         build: factory.build({
           site: sitePromise,
-          commitSha: '👟 right foot lets stomp; left foot lets stomp 👟',
+          commitSha,
         }),
       })
       .then((promisedValues) => {
@@ -553,7 +559,7 @@ describe('Build API', () => {
       nock.cleanAll();
       const statusNock = githubAPINocks.status({ state: 'success' });
 
-      factory.build({ commitSha: 'sha sha real smooth 😎' })
+      factory.build({ commitSha })
       .then(build =>
         postBuildStatus({
           build,

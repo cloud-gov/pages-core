@@ -41,6 +41,19 @@ module.exports = {
     .catch(res.error);
   },
 
+  /**
+   * req.body will contain some combination of a `siteId` property, and either
+   * a `buildId` or a `branch` and `sha`.
+   * For example: { buildId: 1, siteId: 1 } OR { siteId: 1, branch: 'master', sha: '123abc' }
+   *
+   * We may want to consider just using shas in the future, although there are edge cases
+   * in which a build record can be saved without a sha.
+   *
+   * It might also be worth nesting builds within a site, since they are only ever used in that
+   * context. Then we don't have to explicity pass the site id as a param to this controller
+   *
+   * e.g. `sites/1/builds/1`
+   */
   create: (req, res) => {
     authorizer.create(req.user, req.body)
     .then(build =>

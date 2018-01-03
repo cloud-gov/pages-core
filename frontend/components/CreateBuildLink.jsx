@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 const propTypes = {
   handlerParams: PropTypes.object,
-  children: PropTypes.node.isRequired,
   handleClick: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
 };
 
 class CreateBuildLink extends React.Component {

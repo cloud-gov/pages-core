@@ -1,15 +1,5 @@
 const { User, Build } = require('../models');
 
-const shaRegex = /^[a-f0-9]{40}/;
-const validateSha = maybeSha => shaRegex.test(maybeSha);
-
-const normalizeParams = (params) => {
-  const buildId = params.buildId || params.build.id;
-  const siteId = params.siteId || params.site.id;
-
-  return Object.assign({}, params, { buildId, siteId });
-};
-
 const verifyBuild = (model) => {
   const build = model && model.Builds && model.Builds[0];
 
@@ -35,10 +25,6 @@ const getBuildById = (user, params) => {
 const getBuildByBranch = (user, params) => {
   const { siteId, sha, branch } = params;
 
-  if (!validateSha(sha)) {
-    throw 400;
-  }
-
   return User.findById(user.id, {
     include: {
       model: Build,
@@ -46,7 +32,7 @@ const getBuildByBranch = (user, params) => {
         branch,
         site: siteId,
       },
-      order: User.sequelize.literal('"createdAt" desc'),
+      order: [['createdAt', 'desc']],
       limit: 1,
     },
   })
@@ -55,7 +41,6 @@ const getBuildByBranch = (user, params) => {
 };
 
 const authorize = (user, params) => {
-  const normalized = normalizeParams(params);
   const finderFn = params.buildId ? getBuildById : getBuildByBranch;
 
   return finderFn(user, params);

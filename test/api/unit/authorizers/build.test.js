@@ -61,7 +61,7 @@ describe('Build authorizer', () => {
       Promise.props({
         user: userProm,
         site: siteProm,
-        build: buildPromise
+        build: buildPromise,
       })
       .then(({ user, site, build }) =>
         authorizer.create(user, { buildId: build.id, siteId: site.id }))
