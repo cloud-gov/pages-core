@@ -70,11 +70,11 @@ export default {
   },
 
   removeUserFromSite(siteId, userId, me = false) {
-    const onRemoveUser = federalist.removeUserFromSite(siteId, userId);
+    const onRemoveUser = federalist.removeUserFromSite(siteId, userId)
+      .then(this.fetchSites);
 
     if (me) {
       return onRemoveUser
-        .then(this.fetchSites)
         .then(() => {
           updateRouterToSitesUri();
           onUserRemoveFromSite();

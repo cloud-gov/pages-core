@@ -270,9 +270,11 @@ describe('siteActions', () => {
       removeUserFromSite.withArgs(1, 1).returns(Promise.resolve({}));
       const actual = fixture.removeUserFromSite(1, 1);
       actual.then(() => {
+        expect(fetchSites.called).to.be.true;
         expect(fetchUser.called).to.be.true;
         expect(updateRouterToSitesUri.called).to.be.false;
         expect(alertSuccess.called).to.be.true;
+        expect(dispatchUserRemovedFromSiteAction.called).to.be.true;
       });
     });
 
@@ -283,6 +285,8 @@ describe('siteActions', () => {
       actual.then(() => {
         expect(updateRouterToSitesUri.called).to.be.true;
         expect(fetchSites.called).to.be.true;
+        expect(alertSuccess.called).to.be.true;
+        expect(dispatchUserRemovedFromSiteAction.called).to.be.true;
       });
     });
   });
