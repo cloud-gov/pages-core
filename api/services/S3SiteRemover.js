@@ -17,12 +17,12 @@ const s3Client = new AWS.S3({
   prevents the delete requests from breaking AWS's rate limit.
 */
 const deleteObjects = (keys) => {
-  if (keys.length === 0) {
+  if (!keys.length) {
     return Promise.resolve();
   }
 
-  const keysToDeleteNow = keys.slice(0, 1000);
-  const keysToDeleteLater = keys.slice(1000, keys.length);
+  const keysToDeleteNow = keys.slice(0, S3Helper.S3_DEFAULT_MAX_KEYS);
+  const keysToDeleteLater = keys.slice(S3Helper.S3_DEFAULT_MAX_KEYS, keys.length);
 
   return new Promise((resolve, reject) => {
     s3Client.deleteObjects({

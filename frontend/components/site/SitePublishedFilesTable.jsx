@@ -15,6 +15,8 @@ class SitePublishedFilesTable extends React.Component {
       filesByPage: {},
       lastPage: null,
     };
+
+    autoBind(this, 'previousPage', 'nextPage');
   }
 
   componentDidMount() {
@@ -23,9 +25,6 @@ class SitePublishedFilesTable extends React.Component {
 
     const startAtKey = null; // start without a startAtKey
     publishedFileActions.fetchPublishedFiles(site, branch, startAtKey);
-
-    autoBind(this, 'previousPage', 'nextPage', 'shouldDisablePreviousPage',
-             'shouldDisableNextPage', 'shouldShowButtons');
   }
 
   componentWillReceiveProps(nextProps) {
@@ -34,10 +33,9 @@ class SitePublishedFilesTable extends React.Component {
     if (publishedFiles.data && !publishedFiles.isLoading) {
       const files = publishedFiles.data.files || [];
 
-      // save the current page of files state
-      const filesByPage = this.state.filesByPage;
-      const currentPage = this.state.currentPage;
+      const { filesByPage, currentPage } = this.state;
 
+      // save the current page of files into state
       filesByPage[currentPage] = files;
       this.setState({ filesByPage });
 
@@ -48,7 +46,7 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   shouldDisablePreviousPage() {
-    return this.state.currentPage === 0;
+    return !this.state.currentPage;
   }
 
   previousPage() {
@@ -58,17 +56,14 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   shouldDisableNextPage() {
-    if (this.state.lastPage !== null) {
-      return this.state.currentPage === this.state.lastPage;
-    }
-    return false;
+    return this.state.currentPage === this.state.lastPage;
   }
 
   nextPage() {
     const currentPage = this.state.currentPage;
     const nextPage = currentPage + 1;
 
-    if (this.state.lastPage !== null && currentPage === this.state.lastPage) {
+    if (this.shouldDisableNextPage()) {
       // do nothing if already on the known last page
       return;
     }
@@ -96,9 +91,34 @@ class SitePublishedFilesTable extends React.Component {
     return true;
   }
 
-  renderPublishedFilesTable(files) {
+  renderPagingButtons() {
     const prevButtonClass = `${this.shouldDisablePreviousPage() ? 'usa-button-disabled' : 'usa-button'}`;
     const nextButtonClass = `pull-right ${this.shouldDisableNextPage() ? 'usa-button-disabled' : 'usa-button'}`;
+
+    if (!this.shouldShowButtons()) {
+      return null;
+    }
+
+    return (
+      <nav className="pagination" aria-label="Pagination">
+        <button
+          className={prevButtonClass}
+          disabled={this.shouldDisablePreviousPage()}
+          onClick={this.previousPage}
+          title="View the previous page of published files"
+        >&laquo; Previous</button>
+
+        <button
+          className={nextButtonClass}
+          disabled={this.shouldDisableNextPage()}
+          onClick={this.nextPage}
+          title="View the next page of published files"
+        >Next &raquo;</button>
+      </nav>
+    );
+  }
+
+  renderPublishedFilesTable(files) {
     return (
       <div>
         <h3>{this.props.params.name}</h3>
@@ -117,23 +137,7 @@ class SitePublishedFilesTable extends React.Component {
             { files.filter(f => !!f.name).map(this.renderBranchFileRow) }
           </tbody>
         </table>
-        {this.shouldShowButtons() &&
-          <nav className={'pagination'} aria-label="Pagination">
-            <button
-              className={prevButtonClass}
-              disabled={this.shouldDisablePreviousPage()}
-              onClick={this.previousPage}
-              title="View the previous page of published files"
-            >&laquo; Previous</button>
-
-            <button
-              className={nextButtonClass}
-              disabled={this.shouldDisableNextPage()}
-              onClick={this.nextPage}
-              title="View the next page of published files"
-            >Next &raquo;</button>
-          </nav>
-        }
+        { this.renderPagingButtons() }
       </div>
     );
   }

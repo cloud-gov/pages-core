@@ -11,6 +11,26 @@ const s3Client = new AWS.S3({
   region: s3Config.region,
 });
 
+function shouldPageResults(totalMaxObjects, isTruncated, objects) {
+  // We're ready to exit if the totalMaxObjects is defined, and
+  // if either the response data are not truncated
+  // or the current objects length is >= to the desired totalMaxObjects
+  return totalMaxObjects && (!isTruncated || objects.length >= totalMaxObjects);
+}
+
+function createPagedResults(totalMaxObjects, isTruncated, objects) {
+  // First, truncate the objects to the maximum total objects
+  // or its length (slice will only go as far as the array's length)
+  const truncatedObjects = objects.slice(0, totalMaxObjects);
+
+  const pagedResults = {
+    isTruncated,
+    objects: truncatedObjects,
+  };
+
+  return pagedResults;
+}
+
 function listObjectsHelper(currObjects, extraS3Params = {}, opts = {}, callback) {
   const listObjectArgs = Object.assign({}, {
     Bucket: s3Config.bucket,
@@ -29,27 +49,13 @@ function listObjectsHelper(currObjects, extraS3Params = {}, opts = {}, callback)
       currObjects.concat(data[aggregationKey])
       : data[aggregationKey];
 
-    // if results should be limited
-    if (totalMaxObjects) {
-      // We're ready to exit if either the response data are not truncated
-      // or the current objects length is >= to the desired totalMaxObjects
-      if (!data.IsTruncated || objects.length >= totalMaxObjects) {
-        // then we should return early
-
-        // first, truncate the objects to the maximum total objects
-        // or its length (slice will only go as far as the array's length)
-        const truncatedObjects = objects.slice(0, totalMaxObjects);
-
-        const pagedResults = {
-          isTruncated: data.IsTruncated,
-          objects: truncatedObjects,
-        };
-
-        callback(null, pagedResults);
-        return;
-      }
-      // otherwise continue as normal (ie, not paged)
+    // if the number of results should be limited
+    if (shouldPageResults(totalMaxObjects, data.IsTruncated, objects)) {
+      // then callback with the paged results
+      callback(null, createPagedResults(totalMaxObjects, data.IsTruncated, objects));
+      return;
     }
+    // otherwise continue as normal (ie, not paged)
 
     if (data.IsTruncated) {
       const newExtraParams = Object.assign({},
@@ -125,4 +131,4 @@ function listObjectsPaged(prefix, startAfterKey = null, totalMaxObjects = 200) {
   });
 }
 
-module.exports = { listObjects, listCommonPrefixes, listObjectsPaged };
+module.exports = { S3_DEFAULT_MAX_KEYS, listObjects, listCommonPrefixes, listObjectsPaged };
