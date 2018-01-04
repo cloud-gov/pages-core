@@ -91,11 +91,23 @@ export default {
     });
   },
 
-  restartBuild(buildId) {
+  restartBuild(buildId, siteId) {
     return this.fetch('build/', {
       method: 'POST',
       data: {
         buildId,
+        siteId,
+      },
+    });
+  },
+
+  createBuild(sha, branch, siteId) {
+    return this.fetch('build/', {
+      method: 'POST',
+      data: {
+        sha,
+        siteId,
+        branch,
       },
     });
   },

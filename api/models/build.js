@@ -105,6 +105,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     commitSha: {
       type: DataTypes.STRING,
+      validate: {
+        is: /^[a-f0-9]{40}$/,
+      },
     },
     completedAt: {
       type: DataTypes.DATE,

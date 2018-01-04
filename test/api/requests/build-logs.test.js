@@ -113,7 +113,9 @@ describe('Build Log API', () => {
         build = model;
 
         return Promise.all(Array(3).fill(0).map(() => factory.buildLog({ build })));
-      }).then(() => Site.findById(build.site, { include: [User] })).then((site) => {
+      })
+      .then(() => Site.findById(build.site, { include: [User] }))
+      .then((site) => {
         const user = site.Users[0];
         return authenticatedSession(user);
       })

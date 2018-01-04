@@ -7,6 +7,9 @@ import {
   buildRestarted as createBuildRestartedAction,
 } from './actionCreators/buildActions';
 
+import alertActions from './alertActions';
+import { updateRouterToSiteBuildsUri } from './dispatchActions';
+
 const dispatchBuildsFetchStartedAction = () => {
   dispatch(createBuildsFetchStartedAction());
 };
@@ -26,8 +29,17 @@ export default {
       .then(dispatchBuildsReceivedAction);
   },
 
-  restartBuild(buildId) {
-    return api.restartBuild(buildId)
+  restartBuild(buildId, siteId) {
+    return api.restartBuild(buildId, siteId)
       .then(dispatchBuildRestartedAction);
+  },
+
+  createBuild(sha, branch, siteId) {
+    return api.createBuild(sha, branch, siteId)
+      .then((build) => {
+        updateRouterToSiteBuildsUri(build.site);
+        alertActions.alertSuccess(`Build from branch "${branch}" created!`);
+        dispatchBuildRestartedAction(build);
+      });
   },
 };

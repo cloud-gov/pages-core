@@ -42,34 +42,31 @@ module.exports = {
   },
 
   /**
-   * Create a new build using data from an existing build
-   * Currently, the only way for a user to directly create a new build is
-   * the `restart build` interface in the site builds view.
+   * req.body will contain some combination of a `siteId` property, and either
+   * a `buildId` or a `branch` and `sha`.
+   * For example: { buildId: 1, siteId: 1 } OR { siteId: 1, branch: 'master', sha: '123abc' }
    *
-   * This method is named `restart` as it's
-   * not otherwise possible to create a build via the API.
+   * We may want to consider just using shas in the future, although there are edge cases
+   * in which a build record can be saved without a sha.
+   *
+   * It might also be worth nesting builds within a site, since they are only ever used in that
+   * context. Then we don't have to explicity pass the site id as a param to this controller
+   *
+   * e.g. `sites/1/builds/1`
    */
-  restart: (req, res) => {
-    let params;
-
-    Build.findById(req.body.buildId, { include: [Site] })
-    .then((build) => {
-      if (!build) {
-        throw 404;
-      }
-
-      params = {
-        branch: build.get('branch'),
-        site: build.get('Site').get('id'),
-        user: req.user.id,
-        commitSha: build.get('commitSha'),
-      };
-
-      return authorizer.create(req.user, params);
-    })
-    .then(() => Build.create(params))
+  create: (req, res) => {
+    authorizer.create(req.user, req.body)
     .then(build =>
-      GithubBuildStatusReporter.reportBuildStatus(build)
+      Build.create({
+        branch: build.branch,
+        site: build.site,
+        user: req.user.id,
+        commitSha: build.commitSha,
+      })
+    )
+    .then(build =>
+      GithubBuildStatusReporter
+      .reportBuildStatus(build)
       .then(() => build)
     )
     .then(build => buildSerializer.serialize(build))
@@ -95,7 +92,7 @@ module.exports = {
       } else {
         res.notFound();
       }
-      return authorizer.findOne(req.user, build);
+      return authorizer.findOne(req.user, { buildId: build.id, siteId: build.site });
     })
     .then(() => buildSerializer.serialize(build))
     .then(buildJSON => res.json(buildJSON))
