@@ -29,96 +29,83 @@ export const BasicSiteSettings = ({
   handleSubmit,
 }) => (
   <form className="settings-form" onSubmit={handleSubmit}>
-    <div className="usa-grid">
-      <div className="usa-width-one-whole">
-        <div className="form-group">
-          <div className="well">
-            <h3 className="well-heading">Live Site</h3>
-            <p className="well-text">
-              Set the primary branch Federalist uses to build your site.
-              After your DNS is pointed to Federalist, you&apos;ll set
-              the <a
-                href="https://federalist-docs.18f.gov/pages/how-federalist-works/custom-urls/"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Custom URL documentation"
-              >
-                live URL
-              </a> to ensure the site builds correctly.
-            </p>
-            <label htmlFor="defaultBranchInput">
-              Branch name:
-            </label>
-            <Field
-              component="input"
-              type="text"
-              id="defaultBranchInput"
-              name="defaultBranch"
-              className="form-control"
-            />
-            <HttpsUrlField
-              label="Live URL:"
-              name="domain"
-              id="domainInput"
-              placeholder="https://example.gov"
-              className="form-control"
-            />
-          </div>
-        </div>
-      </div>
+    <h3>Basic settings</h3>
+    <div className="well">
+      <fieldset>
+        <legend>Live site</legend>
+        <p className="well-text">
+          Set the primary branch Federalist uses to build your site.
+          After your DNS is pointed to Federalist, you&apos;ll set
+          the <a
+            href="https://federalist-docs.18f.gov/pages/how-federalist-works/custom-urls/"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Custom URL documentation"
+          >
+            live URL
+          </a> to ensure the site builds correctly.
+        </p>
+        <label htmlFor="defaultBranchInput">
+          Branch name:
+        </label>
+        <Field
+          component="input"
+          type="text"
+          id="defaultBranchInput"
+          name="defaultBranch"
+          className="form-control"
+        />
+        <HttpsUrlField
+          label="Live URL:"
+          name="domain"
+          id="domainInput"
+          placeholder="https://example.gov"
+          className="form-control"
+        />
+      </fieldset>
     </div>
-
-    <div className="usa-grid">
-      <div className="usa-width-one-whole">
-        <div className="form-group">
-          <div className="well">
-            <h3 className="well-heading">Demo Site</h3>
-            <p className="well-text">
-              Optional: After setting up DNS with the Federalist team, set a demo branch
-              to be deployed to a custom URL like <code>demo.example.gov</code> instead
-              of a standard Federalist preview URL.
-            </p>
-            <label htmlFor="demoBranchInput">Branch name:</label>
-            <Field
-              component="input"
-              name="demoBranch"
-              id="demoBranchInput"
-              className="form-control"
-              type="text"
-              placeholder="Branch name"
-            />
-            <HttpsUrlField
-              label="Demo URL:"
-              name="demoDomain"
-              id="demoDomainInput"
-              placeholder="https://demo.example.gov"
-              className="form-control"
-            />
-          </div>
-        </div>
-      </div>
+    <div className="well">
+      <fieldset>
+        <legend>Demo site</legend>
+        <p className="well-text">
+          Optional: After setting up DNS with the Federalist team, set a demo branch
+          to be deployed to a custom URL like <code>demo.example.gov</code> instead
+          of a standard Federalist preview URL.
+        </p>
+        <label htmlFor="demoBranchInput">Branch name:</label>
+        <Field
+          component="input"
+          name="demoBranch"
+          id="demoBranchInput"
+          className="form-control"
+          type="text"
+          placeholder="Branch name"
+        />
+        <HttpsUrlField
+          label="Demo URL:"
+          name="demoDomain"
+          id="demoDomainInput"
+          placeholder="https://demo.example.gov"
+          className="form-control"
+        />
+      </fieldset>
     </div>
+    <button
+      type="button"
+      className="usa-button usa-button-gray button-reset"
+      disabled={pristine}
+      onClick={reset}
+    >
+      Reset
+    </button>
 
-    <div className="usa-grid">
-      <div className="usa-width-one-whole">
-        <button
-          type="button"
-          className="usa-button usa-button-gray button-reset"
-          disabled={pristine}
-          onClick={reset}
-        >
-          Reset
-        </button>
-
-        <button
-          type="submit"
-          className="usa-button usa-button-primary"
-          disabled={pristine}
-        >
-          Save Basic Settings
-        </button>
-      </div>
-    </div>
+    <button
+      type="submit"
+      className="usa-button usa-button-primary"
+      disabled={pristine}
+    >
+      Save basic settings
+    </button>
   </form>
 );
 
