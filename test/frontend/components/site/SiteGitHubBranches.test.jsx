@@ -22,8 +22,8 @@ describe('<SiteGitHubBranches />', () => {
       githubBranches: {
         isLoading: false,
         data: [
-          { name: 'branch-one' },
-          { name: 'branch-two' },
+          { name: 'branch-one', commit: { sha: '123df' } },
+          { name: 'branch-two', commit: { sha: 'fd321' } },
         ],
       },
     };
@@ -60,10 +60,10 @@ describe('<SiteGitHubBranches />', () => {
       githubBranches: {
         isLoading: false,
         data: [
-          { name: 'branch-one' },
-          { name: 'default-branch' },
-          { name: 'branch-two' },
-          { name: 'demo-branch' },
+          { name: 'branch-one', commit: { sha: 'c1' } },
+          { name: 'default-branch', commit: { sha: 'b' } },
+          { name: 'branch-two', commit: { sha: 'c' } },
+          { name: 'demo-branch', commit: { sha: 'a' } },
         ],
       },
     };
@@ -145,5 +145,33 @@ describe('<SiteGitHubBranches />', () => {
     const wrapper = shallow(<SiteGitHubBranches {...props} />);
     wrapper.instance().componentDidMount();
     expect(fetchBranchesSpy.calledOnce).to.be.true;
+  });
+
+  it('passes the correct props to the `CreateBuildLink` component', () => {
+    const props = {
+      site: {
+        id: 1,
+        owner: 'test-owner',
+        repository: 'test-repo',
+      },
+      githubBranches: {
+        isLoading: false,
+        data: [
+          { name: 'branch-one', commit: { sha: '123df' } },
+        ],
+      },
+    };
+
+    const wrapper = shallow(<SiteGitHubBranches {...props} />);
+    const buildLink = wrapper.find('CreateBuildLink');
+    const actualProps = buildLink.props();
+
+    expect(actualProps.handlerParams).to.deep.equal({
+      commit: '123df',
+      branch: 'branch-one',
+      siteId: 1,
+    });
+    expect(actualProps.children).to.not.be.null;
+    expect(typeof actualProps.handleClick).to.equal('function');
   });
 });

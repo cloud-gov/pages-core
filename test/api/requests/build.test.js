@@ -10,6 +10,8 @@ const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema'
 const { Build, User, Site } = require('../../../api/models');
 const csrfToken = require('../support/csrfToken');
 
+const commitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
+
 describe('Build API', () => {
   const buildResponseExpectations = (response, build) => {
     if (build.completedAt) {
@@ -28,13 +30,11 @@ describe('Build API', () => {
   };
 
   describe('POST /v0/build', () => {
-    const validCreateRequest = (token, cookie, buildId) =>
+    const validCreateRequest = (token, cookie, params) =>
       request(app)
         .post('/v0/build/')
         .set('x-csrf-token', token)
-        .send({
-          buildId,
-        })
+        .send(params)
         .set('Cookie', cookie)
         .expect(200);
 
@@ -91,7 +91,7 @@ describe('Build API', () => {
       .catch(done);
     });
 
-    it('returns a 404 if a build to restart is not found', (done) => {
+    it('returns a 403 if a build to restart is not associated with the user', (done) => {
       const userPromise = factory.user();
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
 
@@ -105,12 +105,12 @@ describe('Build API', () => {
           .set('x-csrf-token', csrfToken.getToken())
           .send({
             buildId: 1,
+            siteId: promises.site.id,
           })
           .set('Cookie', promises.cookie)
-          .expect(404)
+          .expect(403)
       .then((response) => {
-        validateAgainstJSONSchema('POST', '/build', 404, response.body);
-        expect(response.body.message).to.equal('Not found');
+        validateAgainstJSONSchema('POST', '/build', 403, response.body);
         done();
       })
       ).catch(done);
@@ -127,7 +127,8 @@ describe('Build API', () => {
         buildPromise = factory.build({
           site: sitePromise,
           branch: 'master',
-          commitSha: 'abc123',
+          commitSha,
+          user: userPromise,
         });
       });
 
@@ -148,7 +149,10 @@ describe('Build API', () => {
           return validCreateRequest(
             csrfToken.getToken(),
             promisedValues.cookie,
-            promisedValues.build.id
+            {
+              buildId: promisedValues.build.id,
+              siteId: site.id,
+            }
           );
         })
         .then((response) => {
@@ -158,7 +162,49 @@ describe('Build API', () => {
               site: site.id,
               user: user.id,
               branch: 'my-branch',
-              commitSha: 'test-commit-sha',
+              commitSha,
+            },
+          });
+        })
+        .then((build) => {
+          expect(build).not.to.be.undefined;
+          done();
+        })
+        .catch(done);
+      });
+
+      it('creates a new build from a branch name given an existing build of that branch', (done) => {
+        let site;
+        let user;
+
+        Promise.props({
+          user: userPromise,
+          site: sitePromise,
+          build: buildPromise,
+          cookie: authenticatedSession(userPromise),
+        })
+        .then((promisedValues) => {
+          site = promisedValues.site;
+          user = promisedValues.user;
+
+          return validCreateRequest(
+            csrfToken.getToken(),
+            promisedValues.cookie,
+            {
+              branch: promisedValues.build.branch,
+              siteId: promisedValues.build.site,
+              sha: promisedValues.build.commitSha,
+            }
+          );
+        })
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/build', 200, response.body);
+          return Build.findOne({
+            where: {
+              site: site.id,
+              user: user.id,
+              branch: 'my-branch',
+              commitSha,
             },
           });
         })
@@ -183,7 +229,10 @@ describe('Build API', () => {
           validCreateRequest(
             csrfToken.getToken(),
             promisedValues.cookie,
-            promisedValues.build.id
+            {
+              buildId: promisedValues.build.id,
+              siteId: promisedValues.build.site,
+            }
           )
         )
         .then(() => {
@@ -212,6 +261,7 @@ describe('Build API', () => {
           .set('x-csrf-token', csrfToken.getToken())
           .send({
             buildId: build.id,
+            siteId: 1,
           })
           .set('Cookie', cookie)
           .expect(403)
@@ -245,7 +295,7 @@ describe('Build API', () => {
         state: 'error',
         branch: '18f-pages',
         completedAt: new Date(),
-        commitSha: '⬅️  slide to the left ⬅️ ',
+        commitSha,
       };
 
       factory.build(buildAttributes).then((model) => {
@@ -428,7 +478,7 @@ describe('Build API', () => {
     it('should mark a build successful if status is 0 and message is blank', (done) => {
       let build;
 
-      factory.build({ commitSha: '➡️ slide to the right ➡️' })
+      factory.build({ commitSha })
       .then((model) => {
         build = model;
       })
@@ -453,7 +503,7 @@ describe('Build API', () => {
     it('should mark a build errored if the status is non-zero and should set the message', (done) => {
       let build;
 
-      factory.build({ commitSha: '🐰 one hop this time 🐰' })
+      factory.build({ commitSha })
       .then((model) => {
         build = model;
       })
@@ -483,7 +533,7 @@ describe('Build API', () => {
         site: sitePromise,
         build: factory.build({
           site: sitePromise,
-          commitSha: '👟 right foot lets stomp; left foot lets stomp 👟',
+          commitSha,
         }),
       })
       .then((promisedValues) => {
@@ -509,7 +559,7 @@ describe('Build API', () => {
       nock.cleanAll();
       const statusNock = githubAPINocks.status({ state: 'success' });
 
-      factory.build({ commitSha: 'sha sha real smooth 😎' })
+      factory.build({ commitSha })
       .then(build =>
         postBuildStatus({
           build,

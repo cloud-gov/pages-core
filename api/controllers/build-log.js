@@ -54,7 +54,7 @@ module.exports = {
         if (!build) {
           throw 404;
         }
-        return buildAuthorizer.findOne(req.user, build);
+        return buildAuthorizer.findOne(req.user, { buildId: build.id, siteId: build.site });
       })
       .then(() => BuildLog.findAll({ where: { build: build.id } }))
       .then(buildLogs => buildLogSerializer.serialize(buildLogs, { isPlaintext }))
