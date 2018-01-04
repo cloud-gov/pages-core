@@ -7,23 +7,16 @@ module.exports = {
   find: (req, res) => {
     let site;
     let pagedFilesResponse;
-    const branch = req.params.branch;
-
+    const { site_id, branch } = req.params;
     const startAtKey = req.query.startAtKey || null;
 
-    Promise.resolve(Number(req.params.site_id))
-      .then((id) => {
-        if (isNaN(id)) {
-          throw 404;
-        }
-        return Site.findById(id);
-      })
+    if (isNaN(site_id)) { throw 404; }
+
+    Site.findById(site_id)
       .then((model) => {
-        if (model) {
-          site = model;
-        } else {
-          throw 404;
-        }
+        if (!model) { throw 404; }
+
+        site = model;
         return siteAuthorizer.findOne(req.user, site);
       })
       .then(() => S3PublishedFileLister.listPagedPublishedFilesForBranch(site, branch, startAtKey))

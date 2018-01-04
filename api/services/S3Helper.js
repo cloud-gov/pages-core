@@ -38,22 +38,19 @@ function listObjectsHelper(currObjects, extraS3Params = {}, opts = {}, callback)
 
   s3Client.listObjectsV2(listObjectArgs, (err, data) => {
     if (err) {
-      callback(err);
-      return;
+      return callback(err);
     }
 
     const aggregationKey = opts.aggregationKey || 'Contents';
     const totalMaxObjects = opts.totalMaxObjects;
 
-    const objects = currObjects ?
-      currObjects.concat(data[aggregationKey])
+    const objects = currObjects ? currObjects.concat(data[aggregationKey])
       : data[aggregationKey];
 
     // if the number of results should be limited
     if (shouldPageResults(totalMaxObjects, data.IsTruncated, objects)) {
       // then callback with the paged results
-      callback(null, createPagedResults(totalMaxObjects, data.IsTruncated, objects));
-      return;
+      return callback(null, createPagedResults(totalMaxObjects, data.IsTruncated, objects));
     }
     // otherwise continue as normal (ie, not paged)
 
@@ -63,11 +60,10 @@ function listObjectsHelper(currObjects, extraS3Params = {}, opts = {}, callback)
         { ContinuationToken: data.NextContinuationToken }
       );
       // call recursively
-      listObjectsHelper(objects, newExtraParams, opts, callback);
-    } else {
-      // done !
-      callback(null, objects);
+      return listObjectsHelper(objects, newExtraParams, opts, callback);
     }
+    // else done !
+    return callback(null, objects);
   });
 }
 
