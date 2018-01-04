@@ -5,6 +5,7 @@ const props = {
   userId: 1,
   actionId: 1,
   targetId: 1,
+  siteId: 1,
   targetType: 'site',
   createdAt: new Date(),
   updatedAt: new Date(),
@@ -23,8 +24,8 @@ describe('UserAction model', () => {
   });
 
   describe('validations', () => {
-    it('requires userId, targetId, targetType, actionId', (done) => {
-      const requiredFields = ['userId', 'targetId', 'targetType', 'actionId'];
+    it('requires userId, targetId, targetType, actionId, siteId', (done) => {
+      const requiredFields = ['userId', 'targetId', 'targetType', 'actionId', 'siteId'];
 
       UserAction.create().then(() => {
         done();
@@ -45,6 +46,7 @@ describe('UserAction model', () => {
         userId: 1,
         actionId: 1,
         targetId: 1,
+        siteId: 1,
       };
 
       const promises = [

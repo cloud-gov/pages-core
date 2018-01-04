@@ -68,7 +68,11 @@ export default {
   },
 
   removeUserFromSite(siteId, userId) {
-    return this.fetch(`site/${siteId}/user/${userId}`, { method: 'DELETE' });
+    return this.fetch(
+      `site/${siteId}/user/${userId}`,
+      { method: 'DELETE' },
+      { handleHttpError: false }
+    );
   },
 
   addSite(site) {
