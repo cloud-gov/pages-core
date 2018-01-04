@@ -17,7 +17,6 @@ const siteErrors = require('../../../api/responses/siteErrors');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 
-
 describe('Site API', () => {
   const siteResponseExpectations = (response, site) => {
     expect(response.owner).to.equal(site.owner);

@@ -132,6 +132,7 @@ module.exports = {
         userId: req.user.id,
         targetId: userId,
         targetType: 'user',
+        siteId: site.id,
       })
     )
     .then(() => sendJSON(site, res))

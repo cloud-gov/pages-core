@@ -1,6 +1,6 @@
 const { UserAction, ActionType } = require('../models');
 
-const buildUserAction = actionType => ({ userId, targetId, targetType }) =>
+const buildUserAction = actionType => ({ userId, targetId, targetType, siteId }) =>
   ActionType.findOne({
     where: { action: actionType },
   }).then(action =>
@@ -9,6 +9,7 @@ const buildUserAction = actionType => ({ userId, targetId, targetType }) =>
       targetId,
       targetType,
       actionId: action.id,
+      siteId,
     })
   );
 

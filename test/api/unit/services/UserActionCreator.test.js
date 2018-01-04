@@ -17,6 +17,7 @@ describe('UserActionCreator', () => {
     userId: 1,
     targetId: 1,
     targetType: 'user',
+    siteId: 1,
   };
 
   describe('.addRemoveAction', () => {

@@ -4,7 +4,7 @@ const serializeObject = user => user.toJSON();
 const includedModels = [{
   model: UserAction,
   as: 'userActions',
-  attributes: ['id', 'targetType', 'createdAt'],
+  attributes: ['id', 'targetType', 'siteId', 'createdAt'],
   include: [{
     model: User,
     as: 'actionTarget',
