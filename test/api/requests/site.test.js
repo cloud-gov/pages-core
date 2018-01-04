@@ -11,12 +11,11 @@ const { authenticatedSession, unauthenticatedSession } = require('../support/ses
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const csrfToken = require('../support/csrfToken');
 
-const { Build, Site, User } = require('../../../api/models');
+const { Build, Site, User, UserAction } = require('../../../api/models');
 const S3SiteRemover = require('../../../api/services/S3SiteRemover');
 const siteErrors = require('../../../api/responses/siteErrors');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
-
 
 describe('Site API', () => {
   const siteResponseExpectations = (response, site) => {
@@ -648,6 +647,7 @@ describe('Site API', () => {
       const mike = factory.user({ username: 'mike' });
       const jane = factory.user({ username: 'jane' });
       let currentSite;
+      let activeUser;
 
       Promise.props({
         user: jane,
@@ -655,6 +655,7 @@ describe('Site API', () => {
         cookie: authenticatedSession(jane),
       }).then(({ user, site, cookie }) => {
         currentSite = site;
+        activeUser = user;
 
         return request(app).delete(requestPath(site.id, user.id))
           .set('x-csrf-token', csrfToken.getToken())
@@ -666,6 +667,14 @@ describe('Site API', () => {
       }).then((fetchedSite) => {
         expect(fetchedSite.Users).to.be.an('array');
         expect(fetchedSite.Users.length).to.equal(1);
+        return UserAction.find({ where: {
+          userId: activeUser.id,
+          targetId: activeUser.id,
+        } });
+      })
+      .then((action) => {
+        expect(action).to.exist;
+        expect(action.get('targetType')).to.equal('user');
         done();
       })
       .catch(done);

@@ -1,7 +1,19 @@
-const validTargetTypes = ['site', 'user'];
-const associate = ({ User, UserAction }) => {
+const validTargetTypes = [['site', 'user']];
+const associate = ({ User, UserAction, ActionType, Site }) => {
   UserAction.belongsTo(User, {
     foreignKey: 'userId',
+  });
+  UserAction.belongsTo(User, {
+    as: 'actionTarget',
+    foreignKey: 'targetId',
+    unique: false,
+  });
+  UserAction.belongsTo(ActionType, {
+    foreignKey: 'actionId',
+    as: 'actionType',
+  });
+  UserAction.belongsTo(Site, {
+    foreignKey: 'siteId',
   });
 };
 
@@ -11,6 +23,7 @@ const toJSON = function json() {
   });
 
   record.createdAt = record.createdAt.toISOString();
+  record.updatedAt = record.updatedAt.toISOString();
 
   return record;
 };
@@ -28,13 +41,9 @@ const tableOptions = {
 module.exports = (sequelize, DataTypes) => {
   const UserAction = sequelize.define('UserAction', {
     userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
+      type: DataTypes.INTEGER, allowNull: false },
     targetId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
+      type: DataTypes.INTEGER, allowNull: false },
     targetType: {
       type: DataTypes.ENUM,
       values: validTargetTypes,
@@ -44,9 +53,9 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     actionId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
+      type: DataTypes.INTEGER, allowNull: false },
+    siteId: {
+      type: DataTypes.INTEGER, allowNull: false },
   }, tableOptions);
 
   return UserAction;
