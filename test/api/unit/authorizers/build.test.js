@@ -1,7 +1,16 @@
 const expect = require('chai').expect;
 const factory = require('../../support/factory');
+const authorizer = require('../../../../api/authorizers/build');
+const buildErrors = require('../../../../api/responses/buildErrors');
 
-const authorizer = require('../../../../api/authorizers/build.js');
+const expectedUnauthorizedError = {
+  status: 403,
+  message: buildErrors.UNABLE_TO_BUILD,
+};
+const validateUnauthorizedError = (actual, done) => {
+  expect(actual).to.deep.equal(expectedUnauthorizedError);
+  done();
+};
 
 describe('Build authorizer', () => {
   describe('findOne(user, build)', () => {
@@ -29,10 +38,8 @@ describe('Build authorizer', () => {
         done(new Error('Expected authorization error'));
       })
       .catch((err) => {
-        expect(err).to.equal(403);
-        done();
-      })
-      .catch(done);
+        validateUnauthorizedError(err, done);
+      });
     });
 
     it('should reject if the build is not associated with one of the user\'s site even if the user started the build', (done) => {
@@ -45,10 +52,8 @@ describe('Build authorizer', () => {
         done(new Error('Expected authorization error'));
       })
       .catch((err) => {
-        expect(err).to.equal(403);
-        done();
-      })
-      .catch(done);
+        validateUnauthorizedError(err, done);
+      });
     });
   });
 
@@ -88,10 +93,8 @@ describe('Build authorizer', () => {
         done(new Error('Expected authorization error'));
       })
       .catch((err) => {
-        expect(err).to.equal(403);
-        done();
-      })
-      .catch(done);
+        validateUnauthorizedError(err, done);
+      });
     });
 
     it('should reject if the build is not associated with the current user', (done) => {
@@ -106,10 +109,8 @@ describe('Build authorizer', () => {
           done(new Error('Expected authorization error'));
         })
         .catch((err) => {
-          expect(err).to.equal(403);
-          done();
-        })
-        .catch(done);
+          validateUnauthorizedError(err, done);
+        });
     });
   });
 });

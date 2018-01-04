@@ -1,10 +1,14 @@
 const { User, Build } = require('../models');
+const buildErrors = require('../responses/buildErrors');
 
 const verifyBuild = (model) => {
   const build = model && model.Builds && model.Builds[0];
 
   if (!build) {
-    return Promise.reject(403);
+    return Promise.reject({
+      status: 403,
+      message: buildErrors.UNABLE_TO_BUILD,
+    });
   }
 
   return build.get({ plain: true });
