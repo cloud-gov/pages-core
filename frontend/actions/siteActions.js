@@ -64,9 +64,7 @@ export default {
     return federalist.removeUserFromSite(siteId, userId)
     .then(this.fetchSites)
     .then(() => {
-      if (me) {
-        return updateRouterToSitesUri();
-      }
+      if (me) { return updateRouterToSitesUri(); }
 
       return userActions.fetchUser;
     })
