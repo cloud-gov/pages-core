@@ -39,9 +39,37 @@ const defaultProps = {
   storeState: null,
 };
 
+export const SITE_NAVIGATION_CONFIG = [
+  {
+    display: 'Build history',
+    route: 'builds',
+  },
+  {
+    display: 'GitHub branches',
+    route: 'branches',
+  },
+  {
+    display: 'Published files',
+    route: 'published',
+  },
+  {
+    display: 'Users',
+    route: 'users',
+  },
+  {
+    display: 'Settings',
+    route: 'settings',
+  },
+];
+
 export class SiteContainer extends React.Component {
   getPageTitle(pathname) {
-    return pathname.split('/').pop();
+    const route = pathname.split('/').pop();
+    const routeConf = SITE_NAVIGATION_CONFIG.find(conf => conf.route === route);
+    if (routeConf) {
+      return routeConf.display;
+    }
+    return '';
   }
 
   getCurrentSite(sitesState, siteId) {
