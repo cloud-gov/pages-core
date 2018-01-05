@@ -7,27 +7,27 @@ const SideNav = ({ siteId }) => (
     <ul className="side-nav">
       <li>
         <Link to={`/sites/${siteId}/builds`} className="icon icon-logs">
-          Build History
+          Build history
         </Link>
       </li>
       <li>
         <Link to={`/sites/${siteId}/branches`} className="icon icon-pages">
-          GitHub Branches
+          GitHub branches
         </Link>
       </li>
       <li>
         <Link to={`/sites/${siteId}/published`} className="icon icon-upload">
-          Published Files
+          Published files
         </Link>
       </li>
       <li>
         <Link to={`/sites/${siteId}/users`} className="icon icon-gear">
-          Users
+          Collaborators
         </Link>
       </li>
       <li>
         <Link to={`/sites/${siteId}/settings`} className="icon icon-settings">
-          Settings
+          Site settings
         </Link>
       </li>
     </ul>
