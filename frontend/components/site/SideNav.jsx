@@ -10,7 +10,7 @@ const SideNav = ({ siteId }) => (
       {
         SITE_NAVIGATION_CONFIG.map(conf => (
           <li key={conf.route}>
-            <Link to={`/sites/${siteId}/${conf.route}`} className="icon icon-logs">
+            <Link to={`/sites/${siteId}/${conf.route}`}>
               {conf.display}
             </Link>
           </li>
