@@ -43,7 +43,7 @@ class SiteBuilds extends React.Component {
           sha={build.commitSha}
           title={build.commitSha}
         >
-          View Commit <GitHubMark />
+          View commit <GitHubMark />
         </GitHubLink>
       </span>
     );

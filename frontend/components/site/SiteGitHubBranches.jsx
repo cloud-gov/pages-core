@@ -66,7 +66,7 @@ export class SiteGitHubBranches extends React.Component {
             handlerParams={{ commit: commit.sha, branch: name, siteId: site.id }}
             handleClick={buildActions.createBuild}
           >
-            Build from branch
+            Trigger build
           </CreateBuildLink>
         </td>
       </tr>
