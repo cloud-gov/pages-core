@@ -69,6 +69,6 @@ describe('<SiteContainer/>', () => {
   it('displays a page title if one is configured for the location', () => {
     props.location.pathname = 'settings';
     const wrapper = shallow(<SiteContainer {...props} />);
-    expect(wrapper.find('PagesHeader').prop('title')).to.equal('Settings');
+    expect(wrapper.find('PagesHeader').prop('title')).to.equal('Site settings');
   });
 });

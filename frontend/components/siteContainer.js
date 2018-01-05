@@ -53,11 +53,11 @@ export const SITE_NAVIGATION_CONFIG = [
     route: 'published',
   },
   {
-    display: 'Users',
+    display: 'Collaborators',
     route: 'users',
   },
   {
-    display: 'Settings',
+    display: 'Site settings',
     route: 'settings',
   },
 ];
