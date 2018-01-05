@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const { UserAction } = require('../../../../api/models');
 
 const props = {

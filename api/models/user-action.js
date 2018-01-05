@@ -1,4 +1,23 @@
 const validTargetTypes = [['site', 'user']];
+
+const findAllBySite = ({ UserAction, User, ActionType }, siteId) =>
+  UserAction.findAll({
+    where: {
+      siteId,
+    },
+    attributes: ['id', 'targetType', 'siteId', 'createdAt'],
+    include: [{
+      model: User,
+      as: 'actionTarget',
+      attributes: ['id', 'username', 'email', 'createdAt'],
+    },
+    {
+      model: ActionType,
+      as: 'actionType',
+      attributes: ['action'],
+    }],
+  });
+
 const associate = ({ User, UserAction, ActionType, Site }) => {
   UserAction.belongsTo(User, {
     foreignKey: 'userId',
@@ -23,7 +42,6 @@ const toJSON = function json() {
   });
 
   record.createdAt = record.createdAt.toISOString();
-  record.updatedAt = record.updatedAt.toISOString();
 
   return record;
 };
@@ -32,6 +50,7 @@ const tableOptions = {
   tableName: 'user_action',
   classMethods: {
     associate,
+    findAllBySite,
   },
   instanceMethods: {
     toJSON,
