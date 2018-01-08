@@ -5,41 +5,34 @@ import { stub } from 'sinon';
 import SiteUsers from '../../../../frontend/components/site/SiteUsers';
 import siteActions from '../../../../frontend/actions/siteActions';
 
+const user = {
+  username: 'not-owner',
+  id: 4,
+  email: 'not-owner@beep.gov',
+  userActions: [],
+};
+const props = {
+  user,
+  site: {
+    owner: 'test-owner',
+    repository: 'test-repo',
+    users: [
+      { id: 1, email: 'not-owner@beep.gov', username: 'not-owner' },
+      { id: 2, email: 'owner@beep.gov', username: 'test-owner' },
+    ],
+  },
+};
 
 describe('<SiteUsers/>', () => {
-  it('should render', () => {
-    const props = {
-      site: {
-        owner: 'test-owner',
-        repository: 'test-repo',
-        users: [],
-      },
-    };
-    const wrapper = shallow(<SiteUsers {...props} />);
-    expect(wrapper.find('table')).to.have.length(1);
-  });
-
   describe('rendered table', () => {
-    const props = {
-      user: {
-        username: 'not-owner',
-        id: 4,
-        email: 'not-owner@beep.gov',
-      },
-      site: {
-        owner: 'test-owner',
-        repository: 'test-repo',
-        users: [
-          { id: 1, email: 'not-owner@beep.gov', username: 'not-owner' },
-          { id: 2, email: 'owner@beep.gov', username: 'test-owner' },
-        ],
-      },
-    };
-
     let wrapper;
 
     beforeEach(() => {
       wrapper = shallow(<SiteUsers {...props} />);
+    });
+
+    it('should render', () => {
+      expect(wrapper.find('table')).to.have.length(1);
     });
 
     it('renders rows of users in order of username', () => {
@@ -88,6 +81,32 @@ describe('<SiteUsers/>', () => {
       removeUserLink.simulate('click', { preventDefault: () => ({}) });
 
       expect(clickSpy.called).to.be.true;
+    });
+
+    it('should render nothing if the current user has no actions', () => {
+      expect(wrapper.find('UserActionsTable')).to.have.length(0);
+    });
+
+    it('renders a <UserActionsTable /> component when current user has actions', () => {
+      const userAction = {
+        actionTarget: {
+          id: 2,
+          username: 'fake-person',
+          email: null,
+          createdAt: '2017-12-26T14:06:51.669Z',
+        },
+        actionType: { action: 'remove' },
+        createdAt: '2017-12-26T00:00:00.000Z',
+        id: 2,
+        targetType: 'user',
+      };
+      const userWithActions = Object.assign({}, user, { userActions: [userAction] });
+      const nextProps = Object.assign({}, props, { user: userWithActions });
+      const wrapperWithActions = shallow(<SiteUsers {...nextProps} />);
+      const actionsTable = wrapperWithActions.find('UserActionsTable');
+
+      expect(actionsTable).to.have.length(1);
+      expect(actionsTable.prop('userActions')).to.deep.equal(nextProps.user.userActions);
     });
   });
 });

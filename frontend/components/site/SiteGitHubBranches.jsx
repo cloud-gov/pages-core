@@ -7,7 +7,9 @@ import GitHubLink from '../GitHubLink/GitHubLink';
 import GitHubMark from '../GitHubMark';
 import BranchViewLink from '../branchViewLink';
 import githubBranchActions from '../../actions/githubBranchActions';
+import buildActions from '../../actions/buildActions';
 import AlertBanner from '../alertBanner';
+import CreateBuildLink from '../CreateBuildLink';
 
 export class SiteGitHubBranches extends React.Component {
   componentDidMount() {
@@ -15,8 +17,7 @@ export class SiteGitHubBranches extends React.Component {
   }
 
   render() {
-    const githubBranches = this.props.githubBranches;
-    const site = this.props.site;
+    const { githubBranches, site } = this.props;
 
     if (!site || githubBranches.isLoading) {
       return <LoadingIndicator />;
@@ -49,7 +50,7 @@ export class SiteGitHubBranches extends React.Component {
       }
     });
 
-    const branchRow = ({ name }, { isDefault = false, isDemo = false }) => (
+    const branchRow = ({ name, commit }, { isDefault = false, isDemo = false }) => (
       <tr key={name}>
         <td>
           <GitHubLink owner={site.owner} repository={site.repository} branch={name}>
@@ -60,6 +61,13 @@ export class SiteGitHubBranches extends React.Component {
         </td>
         <td>
           <BranchViewLink branchName={name} site={site} />
+          <br />
+          <CreateBuildLink
+            handlerParams={{ commit: commit.sha, branch: name, siteId: site.id }}
+            handleClick={buildActions.createBuild}
+          >
+            Trigger build
+          </CreateBuildLink>
         </td>
       </tr>
     );

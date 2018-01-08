@@ -9,6 +9,7 @@ import LoadingIndicator from '../LoadingIndicator';
 import RefreshBuildsButton from './refreshBuildsButton';
 import { duration, timeFrom } from '../../util/datetime';
 import AlertBanner from '../alertBanner';
+import CreateBuildLink from '../CreateBuildLink';
 
 class SiteBuilds extends React.Component {
   static getUsername(build) {
@@ -18,31 +19,12 @@ class SiteBuilds extends React.Component {
     return '';
   }
 
-  static restartClicked(event, build) {
-    event.preventDefault();
-    buildActions.restartBuild(build);
-  }
-
   static buildLogsLink(build) {
     return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>Logs</Link>;
   }
 
   static renderLoadingState() {
     return <LoadingIndicator />;
-  }
-
-  static restartLink(build) {
-    /* eslint-disable jsx-a11y/href-no-hash */
-    return (
-      <a
-        href="#"
-        role="button"
-        onClick={e => SiteBuilds.restartClicked(e, build)}
-      >
-        Restart
-      </a>
-    );
-    /* eslint-enable jsx-a11y/href-no-hash */
   }
 
   static commitLink(build) {
@@ -61,7 +43,7 @@ class SiteBuilds extends React.Component {
           sha={build.commitSha}
           title={build.commitSha}
         >
-          View Commit <GitHubMark />
+          View commit <GitHubMark />
         </GitHubLink>
       </span>
     );
@@ -93,10 +75,11 @@ class SiteBuilds extends React.Component {
   }
 
   renderBuildsTable() {
+    const { site } = this.props;
     return (
       <div>
         <div className="log-tools">
-          <RefreshBuildsButton site={this.props.site} />
+          <RefreshBuildsButton site={site} />
         </div>
         <table className="usa-table-borderless log-table log-table__site-builds">
           <thead>
@@ -136,7 +119,13 @@ class SiteBuilds extends React.Component {
                   <td>{ duration(build.createdAt, build.completedAt) }</td>
                   <td><pre>{ message }</pre></td>
                   <td>
-                    { SiteBuilds.restartLink(build) }<br />
+                    <CreateBuildLink
+                      handlerParams={{ buildId: build.id, siteId: site.id }}
+                      handleClick={buildActions.restartBuild}
+                    >
+                      Restart
+                    </CreateBuildLink>
+                    <br />
                     { SiteBuilds.buildLogsLink(build) }
                   </td>
                 </tr>

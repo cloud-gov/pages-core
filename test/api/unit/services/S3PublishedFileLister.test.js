@@ -14,11 +14,12 @@ describe('S3PublishedFileLister', () => {
     it('should resolve with a list of published previews for the given site', (done) => {
       let site;
 
-      AWSMocks.mocks.S3.listObjects = (params, callback) => {
+      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
         expect(params.Prefix).to.equal(`preview/${site.owner}/${site.repository}/`);
         expect(params.Delimiter).to.equal('/');
         callback(null, {
+          IsTruncated: false,
           Contents: [],
           CommonPrefixes: [
             { Prefix: `preview/${site.owner}/${site.repository}/abc/` },
@@ -38,16 +39,17 @@ describe('S3PublishedFileLister', () => {
     });
   });
 
-  describe('.listPublishedFilesForBranch(site, branch)', () => {
+  describe('.listPagedPublishedFilesForBranch(site, branch)', () => {
     it("should resolve with a list of files for the site's default branch", (done) => {
       let site;
+      let prefix;
 
-      AWSMocks.mocks.S3.listObjects = (params, callback) => {
-        const prefix = `site/${site.owner}/${site.repository}/`;
+      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
         expect(params.Prefix).to.equal(prefix);
 
         callback(null, {
+          IsTruncated: false,
           Contents: [
             { Key: `${prefix}abc`, Size: 123 },
             { Key: `${prefix}abc/def`, Size: 456 },
@@ -58,26 +60,31 @@ describe('S3PublishedFileLister', () => {
 
       factory.site({ defaultBranch: 'master' }).then((model) => {
         site = model;
-        return S3PublishedFileLister.listPublishedFilesForBranch(site, 'master');
+        prefix = `site/${site.owner}/${site.repository}/`;
+        return S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'master');
       }).then((publishedFiles) => {
-        expect(publishedFiles).to.deep.equal([
-          { name: 'abc', size: 123 },
-          { name: 'abc/def', size: 456 },
-          { name: 'ghi', size: 789 },
-        ]);
+        expect(publishedFiles).to.deep.equal({
+          isTruncated: false,
+          files: [
+            { name: 'abc', size: 123, key: `${prefix}abc` },
+            { name: 'abc/def', size: 456, key: `${prefix}abc/def` },
+            { name: 'ghi', size: 789, key: `${prefix}ghi` },
+          ],
+        });
         done();
       }).catch(done);
     });
 
     it("should resolve with a list of files for the site's demo branch", (done) => {
       let site;
+      let prefix;
 
-      AWSMocks.mocks.S3.listObjects = (params, callback) => {
-        const prefix = `demo/${site.owner}/${site.repository}/`;
+      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
         expect(params.Prefix).to.equal(prefix);
 
         callback(null, {
+          IsTruncated: false,
           Contents: [
             { Key: `${prefix}abc`, Size: 123 },
             { Key: `${prefix}abc/def`, Size: 456 },
@@ -88,26 +95,31 @@ describe('S3PublishedFileLister', () => {
 
       factory.site({ demoBranch: 'demo-branch-name' }).then((model) => {
         site = model;
-        return S3PublishedFileLister.listPublishedFilesForBranch(site, 'demo-branch-name');
+        prefix = `demo/${site.owner}/${site.repository}/`;
+        return S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'demo-branch-name');
       }).then((publishedFiles) => {
-        expect(publishedFiles).to.deep.equal([
-          { name: 'abc', size: 123 },
-          { name: 'abc/def', size: 456 },
-          { name: 'ghi', size: 789 },
-        ]);
+        expect(publishedFiles).to.deep.equal({
+          isTruncated: false,
+          files: [
+            { name: 'abc', size: 123, key: `${prefix}abc` },
+            { name: 'abc/def', size: 456, key: `${prefix}abc/def` },
+            { name: 'ghi', size: 789, key: `${prefix}ghi` },
+          ],
+        });
         done();
       }).catch(done);
     });
 
     it('should resolve with a list of files for a preview branch', (done) => {
       let site;
+      let prefix;
 
-      AWSMocks.mocks.S3.listObjects = (params, callback) => {
-        const prefix = `preview/${site.owner}/${site.repository}/preview/`;
+      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
         expect(params.Prefix).to.equal(prefix);
 
         callback(null, {
+          IsTruncated: false,
           Contents: [
             { Key: `${prefix}abc`, Size: 123 },
             { Key: `${prefix}abc/def`, Size: 456 },
@@ -118,23 +130,27 @@ describe('S3PublishedFileLister', () => {
 
       factory.site({ defaultBranch: 'master' }).then((model) => {
         site = model;
-        return S3PublishedFileLister.listPublishedFilesForBranch(site, 'preview');
+        prefix = `preview/${site.owner}/${site.repository}/preview/`;
+        return S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'preview');
       }).then((publishedFiles) => {
-        expect(publishedFiles).to.deep.equal([
-          { name: 'abc', size: 123 },
-          { name: 'abc/def', size: 456 },
-          { name: 'ghi', size: 789 },
-        ]);
+        expect(publishedFiles).to.deep.equal({
+          isTruncated: false,
+          files: [
+            { name: 'abc', size: 123, key: `${prefix}abc` },
+            { name: 'abc/def', size: 456, key: `${prefix}abc/def` },
+            { name: 'ghi', size: 789, key: `${prefix}ghi` },
+          ],
+        });
         done();
       }).catch(done);
     });
 
-    it('should reject with an error if S3.listObjects is unsuccessful', (done) => {
-      AWSMocks.mocks.S3.listObjects = (params, cb) => cb(new Error('Test error'));
+    it('should reject with an error if S3.listObjectsV2 is unsuccessful', (done) => {
+      AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => cb(new Error('Test error'));
 
       factory.site()
         .then(site =>
-          S3PublishedFileLister.listPublishedFilesForBranch(site, 'preview')
+          S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'preview')
         )
         .catch((err) => {
           expect(err.message).to.equal('Test error');

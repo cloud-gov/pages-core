@@ -2,34 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 
+import { SITE_NAVIGATION_CONFIG } from '../siteContainer';
+
 const SideNav = ({ siteId }) => (
   <div className="usa-width-one-sixth">
     <ul className="side-nav">
-      <li>
-        <Link to={`/sites/${siteId}/builds`} className="icon icon-logs">
-          Build History
-        </Link>
-      </li>
-      <li>
-        <Link to={`/sites/${siteId}/branches`} className="icon icon-pages">
-          GitHub Branches
-        </Link>
-      </li>
-      <li>
-        <Link to={`/sites/${siteId}/published`} className="icon icon-upload">
-          Published Files
-        </Link>
-      </li>
-      <li>
-        <Link to={`/sites/${siteId}/users`} className="icon icon-gear">
-          Users
-        </Link>
-      </li>
-      <li>
-        <Link to={`/sites/${siteId}/settings`} className="icon icon-settings">
-          Settings
-        </Link>
-      </li>
+      {
+        SITE_NAVIGATION_CONFIG.map(conf => (
+          <li key={conf.route}>
+            <Link to={`/sites/${siteId}/${conf.route}`} className={`icon ${conf.iconClass}`}>
+              {conf.display}
+            </Link>
+          </li>
+        ))
+      }
     </ul>
   </div>
 );

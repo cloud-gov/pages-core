@@ -34,7 +34,6 @@ const getSites = (sitesState) => {
 
   return (
     <div className="usa-grid">
-      <h2>Websites</h2>
       <ul className="sites-list usa-unstyled-list">
         {
           sitesState.data
@@ -62,10 +61,11 @@ export const SiteList = ({ storeState }) =>
   (<div>
     <div className="usa-grid dashboard header">
       <div className="usa-width-two-thirds">
-        <img className="header-icon" src="/images/websites.svg" alt="Websites icon" />
         <div className="header-title">
-          <h1>Your Websites</h1>
-          <p>Dashboard</p>
+          <h1>
+            <img className="header-icon" src="/images/websites.svg" alt="Websites icon" />
+            Your websites
+          </h1>
         </div>
       </div>
       <div className="usa-width-one-third">

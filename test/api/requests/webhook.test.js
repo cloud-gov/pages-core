@@ -19,9 +19,9 @@ describe('Webhook API', () => {
   const buildWebhookPayload = (user, site) => ({
     ref: 'refs/heads/master',
     commits: [{
-      id: '456def',
+      id: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
     }],
-    after: '456def',
+    after: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
     sender: {
       login: user.username,
     },

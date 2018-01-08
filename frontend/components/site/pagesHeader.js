@@ -41,7 +41,7 @@ const PagesHeader = ({ owner, repository, title, viewLink }) => (
         rel="noopener noreferrer"
         to={viewLink}
       >
-        View Website
+        View website
       </Link>
     </div>
   </div>

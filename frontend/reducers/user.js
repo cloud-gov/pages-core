@@ -23,11 +23,7 @@ export default function user(state = initialState, action) {
       return {
         isLoading: false,
         data: {
-          id: action.user.id,
-          username: action.user.username,
-          email: action.user.email,
-          createdAt: action.user.createdAt,
-          updatedAt: action.user.updatedAt,
+          ...action.user,
         },
       };
     default:
