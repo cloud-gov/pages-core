@@ -1,4 +1,4 @@
-const buildAuthorizer = require('../authorizers/build');
+const siteAuthorizer = require('../authorizers/site');
 const buildLogSerializer = require('../serializers/build-log');
 const { Build, BuildLog } = require('../models');
 
@@ -54,7 +54,7 @@ module.exports = {
         if (!build) {
           throw 404;
         }
-        return buildAuthorizer.findOne(req.user, build);
+        return siteAuthorizer.findOne(req.user, { id: build.site });
       })
       .then(() => BuildLog.findAll({ where: { build: build.id } }))
       .then(buildLogs => buildLogSerializer.serialize(buildLogs, { isPlaintext }))
