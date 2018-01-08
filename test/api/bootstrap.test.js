@@ -4,24 +4,26 @@ require('./support/aws-mocks');
 const sequelize = require('../../api/models').sequelize;
 
 const models = sequelize.models;
-const ActionType = models.ActionType;
-const types = ['add', 'remove', 'update'];
+
 const cleanDatabase = () => {
   const promises = Object.keys(models).map((name) => {
     const model = models[name];
-    // Using `force: true` removes soft deleted models and prevents uniqueness validation errors
-    const promise = model.destroy({ where: {}, force: true });
+    const promise = model.sync()
+      .then(() => model.destroy({ where: {} }));
 
     return promise;
   });
 
   return Promise.all(promises);
 };
-const addActionTypes = () => Promise.all(types.map(type => ActionType.create({ action: type })));
 
 before((done) => {
-  cleanDatabase()
-  .then(() => addActionTypes())
-  .then(() => done())
-  .catch(err => done(err));
+  sequelize.sync({ force: true })
+    .then(() =>
+      cleanDatabase().then(() => {
+        done();
+      }).catch((err) => {
+        done(err);
+      })
+    );
 });

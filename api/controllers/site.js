@@ -2,7 +2,6 @@ const authorizer = require('../authorizers/site');
 const S3SiteRemover = require('../services/S3SiteRemover');
 const SiteCreator = require('../services/SiteCreator');
 const SiteMembershipCreator = require('../services/SiteMembershipCreator');
-const UserActionCreator = require('../services/UserActionCreator');
 const siteSerializer = require('../serializers/site');
 const { User, Site, Build } = require('../models');
 const siteErrors = require('../responses/siteErrors');
@@ -125,14 +124,10 @@ module.exports = {
       return authorizer.removeUser(req.user, site);
     })
     .then(() =>
-      SiteMembershipCreator.revokeSiteMembership({ user: req.user, site, userId })
-    )
-    .then(() =>
-      UserActionCreator.addRemoveAction({
-        userId: req.user.id,
-        targetId: userId,
-        targetType: 'user',
-        siteId: site.id,
+      SiteMembershipCreator.revokeSiteMembership({
+        user: req.user,
+        site,
+        userId,
       })
     )
     .then(() => sendJSON(site, res))

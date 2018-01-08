@@ -3,7 +3,6 @@
   "required": [
     "name",
     "size",
-    "key",
     "publishedBranch"
   ],
   "properties": {
@@ -12,9 +11,6 @@
     },
     "size": {
       "type": "integer"
-    },
-    "key": {
-      "type": "string"
     },
     "publishedBranch": {
       "type": "object"

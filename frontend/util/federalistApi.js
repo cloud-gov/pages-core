@@ -41,12 +41,8 @@ export default {
     return this.fetch(`site/${site.id}/published-branch`);
   },
 
-  fetchPublishedFiles(site, branch, startAtKey = null) {
-    let path = `site/${site.id}/published-branch/${branch}/published-file`;
-    if (startAtKey) {
-      path += `?startAtKey=${startAtKey}`;
-    }
-    return this.fetch(path);
+  fetchPublishedFiles(site, branch) {
+    return this.fetch(`site/${site.id}/published-branch/${branch}/published-file`);
   },
 
   fetchSites() {
@@ -72,11 +68,7 @@ export default {
   },
 
   removeUserFromSite(siteId, userId) {
-    return this.fetch(
-      `site/${siteId}/user/${userId}`,
-      { method: 'DELETE' },
-      { handleHttpError: false }
-    );
+    return this.fetch(`site/${siteId}/user/${userId}`, { method: 'DELETE' });
   },
 
   addSite(site) {
@@ -99,23 +91,13 @@ export default {
     });
   },
 
-  restartBuild(buildId, siteId) {
+  restartBuild(build) {
     return this.fetch('build/', {
       method: 'POST',
       data: {
-        buildId,
-        siteId,
-      },
-    });
-  },
-
-  createBuild(sha, branch, siteId) {
-    return this.fetch('build/', {
-      method: 'POST',
-      data: {
-        sha,
-        siteId,
-        branch,
+        site: build.site.id || build.site,
+        branch: build.branch,
+        commitSha: build.commitSha,
       },
     });
   },

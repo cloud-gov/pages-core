@@ -9,16 +9,12 @@ import LoadingIndicator from './LoadingIndicator';
 export class App extends React.Component {
   componentWillReceiveProps(nextProps) {
     const { alert } = this.props;
-
-    if (alert.message) {
-      this.shouldClearAlert(nextProps);
-    }
+    this.shouldClearAlert(alert, nextProps);
   }
 
-  shouldClearAlert(nextProps) {
+  shouldClearAlert(alert, nextProps) {
     const { location: { key: lastKey } } = this.props;
     const { key: nextKey } = nextProps.location;
-    const { alert } = nextProps;
 
     if (alert.stale) {
       alertActions.clear();
