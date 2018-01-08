@@ -10,6 +10,23 @@ const defaultProps = {
   userActions: [],
 };
 
+const sortActions = array =>
+  array.sort((a, b) => {
+    const dateA = new Date(a.createdAt);
+    const dateB = new Date(b.createdAt);
+    let result;
+
+    if (dateA > dateB) {
+      result = -1;
+    } else if (dateA < dateB) {
+      result = 1;
+    } else {
+      result = 0;
+    }
+
+    return result;
+  });
+
 const UserActionsTable = ({ userActions }) =>
   <table>
     <caption>Action Log (All actions performed across all sites)</caption>
@@ -27,7 +44,7 @@ const UserActionsTable = ({ userActions }) =>
       </tr>
     </thead>
     <tbody>
-      {userActions.map(action =>
+      {sortActions(userActions).map(action =>
         <tr key={`${action.id}-${action.targetType}`}>
           <th>{action.actionType.action}</th>
           <th>{action.actionTarget.username}</th>
