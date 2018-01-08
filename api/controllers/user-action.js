@@ -17,27 +17,14 @@ const validId = (maybeId) => {
 
 module.exports = {
   find(req, res) {
-    /**
-     * WHAT ACTUALLY NEEDS TO HAPPEN
-     *
-     * validId ->
-     * userAuthorized ->
-     * complicated site + actions query ->
-     * serialize results ->
-     * res.json
-     */
-
     validId(req.params.site_id)
-    .then(id =>
-      id
-      //showActions(req.user, { id })
+    .then(id => showActions(req.user, { id }))
+    .then(siteId =>
+      UserAction.findAllBySite({ UserAction, User, ActionType }, siteId)
     )
-    .then(id =>
-      UserAction.findAllBySite({ UserAction, User, ActionType }, id)
-    )
-    .then(userActions => {
+    .then((userActions) => {
       if (!userActions) {
-        throw 404;
+        return [];
       }
 
       return userActions;
