@@ -1,0 +1,3 @@
+- Level of Effort:
+- Implementation Sketch (if higher than a "low" effort):
+- Definition of Done:
