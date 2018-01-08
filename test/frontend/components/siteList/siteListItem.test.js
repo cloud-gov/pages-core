@@ -56,7 +56,7 @@ describe('<SiteListItem />', () => {
       alt: `View the ${testSite.repository} site`,
       target: '_blank',
       rel: 'noopener noreferrer',
-      children: 'Visit site',
+      children: 'Visit Site',
     });
   });
 

@@ -4,20 +4,20 @@ import { dispatch } from '../store';
 import {
   publishedFilesFetchStarted as createPublishedFilesFetchStartedAction,
   publishedFilesReceived as createPublishedFilesReceivedAction,
-} from './actionCreators/publishedFileActions';
+} from "./actionCreators/publishedFileActions";
 
 const dispatchPublishedfilesFetchStartedAction = () => {
-  dispatch(createPublishedFilesFetchStartedAction());
-};
+  dispatch(createPublishedFilesFetchStartedAction())
+}
 
-const dispatchPublishedFilesReceivedAction = (files) => {
-  dispatch(createPublishedFilesReceivedAction(files));
-};
+const dispatchPublishedFilesReceivedAction = files => {
+  dispatch(createPublishedFilesReceivedAction(files))
+}
 
 export default {
-  fetchPublishedFiles(site, branch, startAtKey) {
-    dispatchPublishedfilesFetchStartedAction();
-    return api.fetchPublishedFiles(site, branch, startAtKey)
-      .then(dispatchPublishedFilesReceivedAction);
+  fetchPublishedFiles(site, branch) {
+    dispatchPublishedfilesFetchStartedAction()
+    return api.fetchPublishedFiles(site, branch)
+      .then(dispatchPublishedFilesReceivedAction)
   },
 };

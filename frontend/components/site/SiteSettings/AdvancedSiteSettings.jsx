@@ -34,93 +34,105 @@ export const AdvancedSiteSettings = ({
   handleSubmit,
 }) => (
   <form className="settings-form settings-form-advanced" onSubmit={handleSubmit}>
-    <div className="well">
-      <label htmlFor="engine">Static site engine</label>
-      <Field
-        name="engine"
-        id="engine"
-        component={p =>
-          <SelectSiteEngine
-            value={p.input.value}
-            onChange={p.input.onChange}
+    <div className="usa-grid">
+      <div className="usa-width-one-whole">
+        <label htmlFor="engine">Static site engine</label>
+        <Field
+          name="engine"
+          id="engine"
+          component={p =>
+            <SelectSiteEngine
+              value={p.input.value}
+              onChange={p.input.onChange}
+              className="form-control"
+            />
+          }
+        />
+      </div>
+    </div>
+
+    {/* CUSTOM CONFIG */}
+    <div className="usa-grid">
+      <div className="usa-width-one-whole">
+        <div className="well">
+          <h3 className="well-heading">Site configuration</h3>
+          <p className="well-text">
+            Add additional configuration in yaml to be added to your
+            {' '}
+            <code>_config.yml</code> file when we build your site&apos;s primary branch.
+          </p>
+          <Field
+            component="textarea"
+            name="config"
             className="form-control"
           />
-        }
-      />
+        </div>
+      </div>
     </div>
-    <div className="well">
-      {/* CUSTOM CONFIG */}
-      <fieldset>
-        <legend>Live site</legend>
-        <p className="well-text">
-          Add additional configuration in yaml to be added to your
-          {' '}
-          <code>_config.yml</code> file when we build your site&apos;s primary branch.
-        </p>
-        <label htmlFor="config">Site configuration</label>
-        <Field
-          component="textarea"
-          name="config"
-          className="form-control-mono"
-        />
-      </fieldset>
-    </div>
-    <div className="well">
-      {/* DEMO CONFIG */}
-      <fieldset>
-        <legend>Demo site</legend>
-        <p className="well-text">
-          Add additional configuration in yaml to be added to your
-          {' '}
-          <code>_config.yml</code> file when we build your site&apos;s demo branch.
-        </p>
-        <label htmlFor="demoConfig">Demo configuration</label>
-        <Field
-          component="textarea"
-          name="demoConfig"
-          className="form-control-mono"
-        />
-      </fieldset>
-    </div>
-    <div className="well">
-      {/* PREVIEW CONFIG */}
-      <fieldset>
-        <legend>Preview site</legend>
-        <p className="well-text">
-          Add additional configuration in yaml to be added to your
-          {' '}
-          <code>_config.yml</code> file when we build a preview branch for your site.
-        </p>
-        <label htmlFor="previewConfig">Preview configuration</label>
-        <Field
-          component="textarea"
-          name="previewConfig"
-          className="form-control-mono"
-        />
-      </fieldset>
-    </div>
-    <button
-      type="button"
-      className="usa-button usa-button-gray button-reset"
-      disabled={pristine}
-      onClick={reset}
-    >
-      Reset
-    </button>
 
-    <button
-      type="submit"
-      className="usa-button usa-button-primary"
-      disabled={pristine}
-    >
-      Save advanced settings
-    </button>
+    {/* DEMO CONFIG */}
+    <div className="usa-grid">
+      <div className="usa-width-one-whole">
+        <div className="well">
+          <h3 className="well-heading">Demo configuration</h3>
+          <p className="well-text">
+            Add additional configuration in yaml to be added to your
+            {' '}
+            <code>_config.yml</code> file when we build your site&apos;s demo branch.
+          </p>
+          <Field
+            component="textarea"
+            name="demoConfig"
+            className="form-control"
+          />
+        </div>
+      </div>
+    </div>
 
+    {/* PREVIEW CONFIG */}
+    <div className="usa-grid">
+      <div className="usa-width-one-whole">
+        <div className="well">
+          <h3 className="well-heading">Preview configuration</h3>
+          <p className="well-text">
+            Add additional configuration in yaml to be added to your
+            {' '}
+            <code>_config.yml</code> file when we build a preview branch for your site.
+          </p>
+          <Field
+            component="textarea"
+            name="previewConfig"
+            className="form-control"
+          />
+        </div>
+      </div>
+    </div>
 
-    <div className="usa-alert usa-alert-warning usa-alert-danger">
-      <div className="usa-alert-body">
-        <h3 className="usa-alert-heading">Danger zone</h3>
-        <p className="usa-alert-text">Delete this site from Federalist?</p>
+    <div className="usa-grid">
+      <div className="usa-width-one-whole">
+        <button
+          type="button"
+          className="usa-button usa-button-gray button-reset"
+          disabled={pristine}
+          onClick={reset}
+        >
+          Reset
+        </button>
+
+        <button
+          type="submit"
+          className="usa-button usa-button-primary"
+          disabled={pristine}
+        >
+          Save Advanced Settings
+        </button>
+      </div>
+    </div>
+
+    <div className="usa-grid">
+      <h3>Danger Zone</h3>
+      <div className="usa-alert usa-alert-delete" role="alert">
+        Delete this site from Federalist?
         <button
           className="usa-button usa-button-secondary button-delete"
           onClick={onDelete}

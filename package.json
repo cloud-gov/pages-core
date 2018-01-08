@@ -5,7 +5,7 @@
   "description": "",
   "keywords": [],
   "dependencies": {
-    "aws-sdk": "^2.173.0",
+    "aws-sdk": "^2.1.36",
     "body-parser": "^1.16.1",
     "cfenv": "^1.0.0",
     "connect-flash": "^0.1.1",

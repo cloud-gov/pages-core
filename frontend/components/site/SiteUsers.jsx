@@ -2,20 +2,12 @@ import React from 'react';
 import { SITE, USER } from '../../propTypes';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
-import UserActionsTable from './UserActionsTable';
 
 import GitHubMark from '../GitHubMark';
 
 const isSiteOwner = (user, siteOwner) =>
   user.username.toLowerCase() === siteOwner.toLowerCase();
 
-const renderUserActions = (userActions) => {
-  if (!userActions.length) {
-    return null;
-  }
-
-  return <UserActionsTable userActions={userActions} />;
-};
 
 const SiteUsers = ({ site, user }) => {
   // sort users by lower-cased usernames
@@ -80,9 +72,6 @@ const SiteUsers = ({ site, user }) => {
           )}
         </tbody>
       </table>
-      <div className="offset-top">
-        {renderUserActions(user.userActions)}
-      </div>
     </div>
   );
 };

@@ -6,7 +6,7 @@ const { Build } = require('../../../../api/models');
 
 describe('BuildCounter', () => {
   describe('countBuildsFromPastWeek', () => {
-    it('counts how many builds occurred in the past week', (done) => {
+    it('counts how many builds occured in the past week', (done) => {
       Build.destroy({ where: {} }).then(() => {
         const promises = Array.from(Array(10).keys()).map((day) => {
           const date = moment().subtract(day + 1, 'days');
