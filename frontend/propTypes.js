@@ -32,3 +32,10 @@ export const BUILD_LOG = PropTypes.shape({
   output: PropTypes.string.isRequired,
   createdAt: PropTypes.string.isRequired,
 });
+
+export const USER_ACTION = PropTypes.shape({
+  targetType: PropTypes.string,
+  createdAt: PropTypes.string,
+  actionTarget: PropTypes.shape(USER),
+  actionType: PropTypes.shape({ action: PropTypes.string }),
+});

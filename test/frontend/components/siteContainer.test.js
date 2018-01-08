@@ -65,4 +65,10 @@ describe('<SiteContainer/>', () => {
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
     expect(wrapper.find('.usa-alert-error')).to.have.length(1);
   });
+
+  it('displays a page title if one is configured for the location', () => {
+    props.location.pathname = 'settings';
+    const wrapper = shallow(<SiteContainer {...props} />);
+    expect(wrapper.find('PagesHeader').prop('title')).to.equal('Site settings');
+  });
 });

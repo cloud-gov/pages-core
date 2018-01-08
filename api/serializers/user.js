@@ -1,23 +1,31 @@
-const { Build, User, Site } = require('../models');
+const { User, UserAction, ActionType } = require('../models');
 
-const serializeObject = (user) => {
-  const json = user.toJSON();
-  json.sites = user.Sites.map(site => site.toJSON());
-  json.builds = user.Builds.map(build => build.toJSON());
-  delete json.Sites;
-  delete json.Builds;
-  return json;
-};
+const serializeObject = user => user.toJSON();
+const includedModels = [{
+  model: UserAction,
+  as: 'userActions',
+  attributes: ['id', 'targetType', 'siteId', 'createdAt'],
+  include: [{
+    model: User,
+    as: 'actionTarget',
+    attributes: ['id', 'username', 'email', 'createdAt'],
+  },
+  {
+    model: ActionType,
+    as: 'actionType',
+    attributes: ['action'],
+  }],
+}];
 
 const serialize = (serializable) => {
   if (serializable.length !== undefined) {
     const userIds = serializable.map(user => user.id);
-    const query = User.findAll({ where: { id: userIds }, include: [Site, Build] });
+    const query = User.findAll({ where: { id: userIds }, include: includedModels });
 
     return query.then(users => users.map(serializeObject));
   }
-  const user = serializable;
-  const query = User.findById(user.id, { include: [Site, Build] });
+
+  const query = User.findById(serializable.id, { include: includedModels });
 
   return query.then(serializeObject);
 };

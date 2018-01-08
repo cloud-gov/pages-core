@@ -10,22 +10,11 @@ import {
   dispatchSiteUpdatedAction,
   dispatchSiteDeletedAction,
   dispatchUserAddedToSiteAction,
-  dispatchUserRemovedFromSiteAction,
   dispatchShowAddNewSiteFieldsAction,
 } from './dispatchActions';
+import userActions from './userActions';
 
-
-const alertError = (error) => {
-  alertActions.httpError(error.message);
-};
-
-const onUserRemoveFromSite = (site) => {
-  if (site) {
-    dispatchUserRemovedFromSiteAction(site);
-  }
-
-  alertActions.alertSuccess('User successfully removed.');
-};
+const alertError = error => alertActions.httpError(error.message);
 
 export default {
   fetchSites() {
@@ -72,18 +61,15 @@ export default {
   },
 
   removeUserFromSite(siteId, userId, me = false) {
-    const onRemoveUser = federalist.removeUserFromSite(siteId, userId);
+    return federalist.removeUserFromSite(siteId, userId)
+    .then(this.fetchSites)
+    .then(() => {
+      if (me) { return updateRouterToSitesUri(); }
 
-    if (me) {
-      return onRemoveUser
-        .then(this.fetchSites)
-        .then(() => {
-          updateRouterToSitesUri();
-          onUserRemoveFromSite();
-        });
-    }
-
-    return onRemoveUser.then(onUserRemoveFromSite);
+      return userActions.fetchUser;
+    })
+    .then(() => alertActions.alertSuccess('User successfully removed.'))
+    .catch(alertError);
   },
 
   updateSite(site, data) {

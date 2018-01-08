@@ -28,7 +28,7 @@ describe('Published Branches API', () => {
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
       const cookiePromise = authenticatedSession(userPromise);
 
-      AWSMocks.mocks.S3.listObjects = (params, callback) => {
+      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
         expect(params.Prefix).to.equal(`preview/${site.owner}/${site.repository}/`);
         expect(params.Delimiter).to.equal('/');
@@ -74,7 +74,7 @@ describe('Published Branches API', () => {
       });
       const cookiePromise = authenticatedSession(userPromise);
 
-      AWSMocks.mocks.S3.listObjects = (params, callback) => {
+      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
         expect(params.Prefix).to.equal(`preview/${site.owner}/${site.repository}/`);
         expect(params.Delimiter).to.equal('/');
