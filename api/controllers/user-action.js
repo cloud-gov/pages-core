@@ -22,13 +22,7 @@ module.exports = {
     .then(siteId =>
       UserAction.findAllBySite({ UserAction, User, ActionType }, siteId)
     )
-    .then((userActions) => {
-      if (!userActions) {
-        return [];
-      }
-
-      return userActions;
-    })
+    .then(userActions => userActions || [])
     .then(userActionSerializer.serialize)
     .then(serialized => res.json(serialized))
     .catch(res.error);

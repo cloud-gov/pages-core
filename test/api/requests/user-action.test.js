@@ -67,7 +67,7 @@ describe('UserAction API', () => {
       factory.user()
       .then((user) => {
         currentUser = user;
-        return userActionFactory.buildMany({ user }, userActionCount);
+        return userActionFactory.buildMany(userActionCount, { user });
       })
       .then((userActions) => {
         actions = userActions;

@@ -45,13 +45,13 @@ const build = overrides => (
   .then(attrs => UserAction.create(prepareAttributes(attrs)))
 );
 
-const buildMany = (overrides, count) =>
+const buildMany = (count, overrides = {}) =>
   Promise.props(attributes(overrides))
   .then((attrs) => {
     const finalAttributes = prepareAttributes(attrs);
 
     return Promise.all(
-      Array.apply(null, { length: count }).map(() => UserAction.create(finalAttributes))
+      Array(count).fill(0).map(() => UserAction.create(finalAttributes))
     );
   });
 
