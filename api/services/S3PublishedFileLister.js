@@ -1,25 +1,35 @@
-const S3Helper = require('./S3Helper');
+const AWS = require('aws-sdk');
+const config = require('../../config');
 
+const s3Config = config.s3;
+const s3Client = new AWS.S3({
+  accessKeyId: s3Config.accessKeyId,
+  secretAccessKey: s3Config.secretAccessKey,
+  region: s3Config.region,
+});
 
-function listTopLevelFolders(path) {
-  // Lists all top-level "folders" in the S3 bucket that start with
-  // the given prefix path.
-
-  // Pass the Delimiter option so that results are grouped
-  // according to their "folder" paths
-  return S3Helper.listCommonPrefixes(path)
-    .then((commonPrefixes) => {
-      const prefixes = commonPrefixes.map(
-        prefix => prefix.Prefix.split('/').slice(-2)[0]
-      );
-      return prefixes;
-    });
+function listFolders(path) {
+  return new Promise((resolve, reject) => {
+    s3Client.listObjects({
+      Bucket: s3Config.bucket,
+      Prefix: path,
+      Delimiter: '/',
+    }, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        const prefixes = data.CommonPrefixes.map(
+          prefix => prefix.Prefix.split('/').slice(-2)[0]
+        );
+        resolve(prefixes);
+      }
+    }
+    );
+  });
 }
 
-function listFilesPaged(path, startAtKey = null) {
-  // Lists all the files in the S3 bucket that start
-  // with the given prefix path.
 
+function listFiles(path) {
   let prefixPath = path;
   // add a trailing slash to the prefix if not there already
   // to prevent getting files published at a repo whose name
@@ -28,33 +38,34 @@ function listFilesPaged(path, startAtKey = null) {
     prefixPath = `${prefixPath}/`;
   }
 
-  return S3Helper.listObjectsPaged(prefixPath, startAtKey)
-    .then((pagedResults) => {
-      const prefixComponents = path.split('/').length;
-      const files = pagedResults.objects.map((file) => {
-        // convenient name for display
-        const name = file.Key.split('/').slice(prefixComponents).join('/');
-        const size = Number(file.Size);
-        return {
-          name,
-          size,
-          key: file.Key,
-        };
-      });
-      return {
-        isTruncated: pagedResults.isTruncated,
-        files,
-      };
+  return new Promise((resolve, reject) => {
+    s3Client.listObjects({
+      Bucket: s3Config.bucket,
+      Prefix: prefixPath,
+    }, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        const prefixComponents = path.split('/').length;
+        const files = data.Contents.map((object) => {
+          const name = object.Key.split('/').slice(prefixComponents).join('/');
+          const size = Number(object.Size);
+          return { name, size };
+        });
+        resolve(files);
+      }
     });
+  });
 }
+
 
 function listPublishedPreviews(site) {
   const previewPath = `preview/${site.owner}/${site.repository}/`;
-  return listTopLevelFolders(previewPath);
+  return listFolders(previewPath);
 }
 
 
-function listPagedPublishedFilesForBranch(site, branch, startAtKey) {
+function listPublishedFilesForBranch(site, branch) {
   let filepath;
   if (site.defaultBranch === branch) {
     filepath = `site/${site.owner}/${site.repository}`;
@@ -63,8 +74,8 @@ function listPagedPublishedFilesForBranch(site, branch, startAtKey) {
   } else {
     filepath = `preview/${site.owner}/${site.repository}/${branch}`;
   }
-  return listFilesPaged(filepath, startAtKey);
+  return listFiles(filepath);
 }
 
 
-module.exports = { listPublishedPreviews, listPagedPublishedFilesForBranch };
+module.exports = { listPublishedPreviews, listPublishedFilesForBranch };

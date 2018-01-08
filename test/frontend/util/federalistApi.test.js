@@ -47,9 +47,6 @@ describe('federalistApi', () => {
     fetchMock.get(
       `${API}/site/${testSite.id}/published-branch/${testBranch}/published-file`,
       { files: [] }, { name: 'getPublishedFiles' });
-    fetchMock.get(
-      `${API}/site/${testSite.id}/published-branch/${testBranch}/published-file?startAtKey=boop`,
-      { files: [] }, { name: 'getPublishedFilesWithQueryParam' });
     fetchMock.get(`${API}/site`, { sites: [testSite] }, { name: 'getSites' });
     fetchMock.get(`${API}/me`, { user: 'me' }, { name: 'getMe' });
     fetchMock.post(`${API}/site`, {}, { name: 'postSite' });
@@ -103,16 +100,9 @@ describe('federalistApi', () => {
     testRouteCalled('getPublishedBranches');
   });
 
-  describe('fetchPublishedFiles', () => {
-    it('is defined', () => {
-      federalistApi.fetchPublishedFiles(testSite, testBranch);
-      testRouteCalled('getPublishedFiles');
-    });
-
-    it('works with the startAtKey param', () => {
-      federalistApi.fetchPublishedFiles(testSite, testBranch, 'boop');
-      testRouteCalled('getPublishedFilesWithQueryParam');
-    });
+  it('defines fetchPublishedFiles', () => {
+    federalistApi.fetchPublishedFiles(testSite, testBranch);
+    testRouteCalled('getPublishedFiles');
   });
 
   it('defines fetchSites', () => {
@@ -151,11 +141,27 @@ describe('federalistApi', () => {
 
   describe('restartBuild', () => {
     it('is defined', () => {
-      federalistApi.restartBuild(testBuild.id);
+      federalistApi.restartBuild(testBuild);
       testRouteCalled('postBuild', {
         method: 'POST',
         body: {
-          buildId: testBuild.id,
+          site: testSite.id,
+          branch: testBranch,
+          commitSha: testBuild.commitSha,
+        },
+      });
+    });
+
+    it('works when build site is not an object', () => {
+      const boopBuild = Object.assign({}, testBuild);
+      boopBuild.site = 123;
+      federalistApi.restartBuild(boopBuild);
+      testRouteCalled('postBuild', {
+        method: 'POST',
+        body: {
+          site: 123,
+          branch: testBranch,
+          commitSha: testBuild.commitSha,
         },
       });
     });

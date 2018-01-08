@@ -40,7 +40,7 @@ const completeJobErrorMessage = (err) => {
   if (err) {
     message = err.message || err;
   } else {
-    message = 'An unknown error occurred';
+    message = 'An unknown error occured';
   }
   return sanitizeCompleteJobErrorMessage(message);
 };
@@ -105,9 +105,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     commitSha: {
       type: DataTypes.STRING,
-      validate: {
-        is: /^[a-f0-9]{40}$/,
-      },
     },
     completedAt: {
       type: DataTypes.DATE,

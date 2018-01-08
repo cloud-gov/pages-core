@@ -1,32 +1,32 @@
-const AWS = require('aws-sdk');
+const AWS = require("aws-sdk")
 
 const mocks = {
   S3: {},
   SQS: {},
-};
+}
 
 const mockableFunctions = {
-  S3: ['getObject', 'listObjectsV2', 'deleteObjects'],
-  SQS: ['sendMessage'],
-};
+  S3: ["getObject", "listObjects", "deleteObjects"],
+  SQS: ["sendMessage",]
+}
 
-Object.keys(mockableFunctions).forEach((service) => {
-  AWS[service] = function mock() {};
+Object.keys(mockableFunctions).forEach(service => {
+  AWS[service] = function() {}
 
-  mockableFunctions[service].forEach((functionName) => {
+  mockableFunctions[service].forEach(functionName => {
     AWS[service].prototype[functionName] = (params, cb) => {
       if (mocks[service][functionName]) {
-        mocks[service][functionName](params, cb);
-        return;
+        return mocks[service][functionName](params, cb)
+      } else {
+        cb(null, {})
       }
-      cb(null, {});
-    };
-  });
-});
+    }
+  })
+})
 
 const resetMocks = () => {
-  mocks.S3 = {};
-  mocks.SQS = {};
-};
+  mocks.S3 = {}
+  mocks.SQS = {}
+}
 
-module.exports = { mocks, resetMocks };
+module.exports = { mocks, resetMocks }
