@@ -5,41 +5,29 @@ import {
   buildsFetchStarted as createBuildsFetchStartedAction,
   buildsReceived as createBuildsReceivedAction,
   buildRestarted as createBuildRestartedAction,
-} from './actionCreators/buildActions';
-
-import alertActions from './alertActions';
-import { updateRouterToSiteBuildsUri } from './dispatchActions';
+} from "./actionCreators/buildActions";
 
 const dispatchBuildsFetchStartedAction = () => {
-  dispatch(createBuildsFetchStartedAction());
-};
+  dispatch(createBuildsFetchStartedAction())
+}
 
-const dispatchBuildsReceivedAction = (builds) => {
-  dispatch(createBuildsReceivedAction(builds));
-};
+const dispatchBuildsReceivedAction = builds => {
+  dispatch(createBuildsReceivedAction(builds))
+}
 
-const dispatchBuildRestartedAction = (build) => {
-  dispatch(createBuildRestartedAction(build));
+const dispatchBuildRestartedAction = build => {
+  dispatch(createBuildRestartedAction(build))
 };
 
 export default {
   fetchBuilds(site) {
-    dispatchBuildsFetchStartedAction();
+    dispatchBuildsFetchStartedAction()
     return api.fetchBuilds(site)
-      .then(dispatchBuildsReceivedAction);
+      .then(dispatchBuildsReceivedAction)
   },
 
-  restartBuild(buildId, siteId) {
-    return api.restartBuild(buildId, siteId)
+  restartBuild(build) {
+    return api.restartBuild(build)
       .then(dispatchBuildRestartedAction);
-  },
-
-  createBuild(sha, branch, siteId) {
-    return api.createBuild(sha, branch, siteId)
-      .then((build) => {
-        updateRouterToSiteBuildsUri(build.site);
-        alertActions.alertSuccess(`Build from branch "${branch}" created!`);
-        dispatchBuildRestartedAction(build);
-      });
   },
 };

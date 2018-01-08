@@ -82,12 +82,13 @@ class SiteSettings extends React.Component {
             viewing site previews
           </a>.
         </p>
+        <h3>Basic Settings</h3>
         <BasicSiteSettings
           initialValues={basicInitialValues}
           onSubmit={this.onSubmit}
         />
 
-        <ExpandableArea title="Advanced settings">
+        <ExpandableArea title="Advanced Settings">
           <AdvancedSiteSettings
             initialValues={advancedInitialValues}
             onDelete={this.onDelete}

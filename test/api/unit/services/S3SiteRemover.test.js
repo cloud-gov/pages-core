@@ -21,7 +21,7 @@ describe('S3SiteRemover', () => {
       let demoObjectWereListed = false;
       let previewObjectsWereListed = false;
 
-      AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => {
+      AWSMocks.mocks.S3.listObjects = (params, cb) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
         if (params.Prefix === `site/${site.owner}/${site.repository}`) {
           siteObjectsWereListed = true;
@@ -87,7 +87,7 @@ describe('S3SiteRemover', () => {
     it('should delete objects in batches of 1000 at a time', (done) => {
       let deleteObjectsCallCount = 0;
 
-      AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => cb(null, {
+      AWSMocks.mocks.S3.listObjects = (params, cb) => cb(null, {
         Contents: Array(750).fill(0).map(() => ({ Key: 'abc123' })),
       });
 
@@ -109,7 +109,7 @@ describe('S3SiteRemover', () => {
     });
 
     it('should not delete anything if there is nothing to delete', (done) => {
-      AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => cb(null, {
+      AWSMocks.mocks.S3.listObjects = (params, cb) => cb(null, {
         Contents: [],
       });
 

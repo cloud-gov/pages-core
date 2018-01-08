@@ -20,7 +20,6 @@ describe('Published Files API', () => {
 
     it('should list the files published to the branch for the site', (done) => {
       let site;
-      let prefix;
       const userPromise = factory.user();
       const sitePromise = factory.site({
         defaultBranch: 'master',
@@ -28,12 +27,12 @@ describe('Published Files API', () => {
       });
       const cookiePromise = authenticatedSession(userPromise);
 
-      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
+      AWSMocks.mocks.S3.listObjects = (params, callback) => {
+        const prefix = `site/${site.owner}/${site.repository}/`;
         expect(params.Bucket).to.equal(config.s3.bucket);
         expect(params.Prefix).to.equal(prefix);
 
         callback(null, {
-          IsTruncated: false,
           Contents: [
             { Key: `${prefix}abc`, Size: 123 },
             { Key: `${prefix}abc/def`, Size: 456 },
@@ -48,7 +47,6 @@ describe('Published Files API', () => {
         cookie: cookiePromise,
       }).then((promisedValues) => {
         site = promisedValues.site;
-        prefix = `site/${site.owner}/${site.repository}/`;
 
         return request(app)
           .get(`/v0/site/${site.id}/published-branch/master/published-file`)
@@ -56,16 +54,12 @@ describe('Published Files API', () => {
           .expect(200);
       }).then((response) => {
         validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 200, response.body);
-
-        const files = response.body.files;
-        files.forEach((file) => {
-          delete file.publishedBranch; // eslint-disable-line no-param-reassign
+        response.body.forEach((fileResponse) => {
+          delete fileResponse.publishedBranch; // eslint-disable-line no-param-reassign
         });
-        expect(files).to.deep.equal([
-          { name: 'abc', size: 123, key: `${prefix}abc` },
-          { name: 'abc/def', size: 456, key: `${prefix}abc/def` },
-          { name: 'ghi', size: 789, key: `${prefix}ghi` },
-        ]);
+        expect(response.body).to.include({ name: 'abc', size: 123 });
+        expect(response.body).to.include({ name: 'abc/def', size: 456 });
+        expect(response.body).to.include({ name: 'ghi', size: 789 });
         done();
       }).catch(done);
     });
