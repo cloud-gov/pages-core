@@ -3,15 +3,15 @@ const siteFactory = require('./site');
 const { UserAction, ActionType } = require('../../../../api/models');
 
 const attributes = (overrides = {}) => {
-  let { user, site, target, actionType } = overrides
+  let { user, site, target, actionType } = overrides;
 
   if (!user) {
     user = userFactory();
   }
 
   if (!site) {
-    site = Promise.resolve(user).then(user =>
-      siteFactory({ users: [user] })
+    site = Promise.resolve(user).then(siteUser =>
+      siteFactory({ users: [siteUser] })
     );
   }
 
@@ -19,7 +19,7 @@ const attributes = (overrides = {}) => {
     actionType = ActionType.findOne({ where: { action: 'remove' } });
   }
 
-  if(!target) {
+  if (!target) {
     target = userFactory();
   }
 
@@ -35,7 +35,7 @@ const attributes = (overrides = {}) => {
 const prepareAttributes = attrs => ({
   userId: attrs.user.id,
   targetId: attrs.target.id,
-  targetType: attrs.targetType  ,
+  targetType: attrs.targetType,
   actionId: attrs.actionType.id,
   siteId: attrs.site.id,
 });
@@ -47,7 +47,7 @@ const build = overrides => (
 
 const buildMany = (overrides, count) =>
   Promise.props(attributes(overrides))
-  .then(attrs => {
+  .then((attrs) => {
     const finalAttributes = prepareAttributes(attrs);
 
     return Promise.all(
