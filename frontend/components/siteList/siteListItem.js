@@ -25,7 +25,7 @@ function getViewLink(viewLink, repo) {
       target="_blank"
       rel="noopener noreferrer"
     >
-      Visit site
+      Visit Site
     </a>);
 }
 

@@ -118,7 +118,7 @@ describe("Build model", () => {
         site: null,
       })
     }).then(() => {
-      done(new Error("Expected a validation error"))
+      done(new Error("Excepted a validation error"))
     }).catch(err => {
       expect(err.name).to.equal("SequelizeValidationError")
       expect(err.errors[0].path).to.equal("site")
@@ -133,28 +133,11 @@ describe("Build model", () => {
         site: user.id,
       })
     }).then(() => {
-      done(new Error("Expected a validation error"))
+      done(new Error("Excepted a validation error"))
     }).catch(err => {
       expect(err.name).to.equal("SequelizeValidationError")
       expect(err.errors[0].path).to.equal("user")
       done()
     }).catch(done)
   })
-
-  it('should require a valid sha before saving', (done) => {
-    factory.user()
-    .then(user =>
-      Build.create({
-        user,
-        site: 1,
-        commitSha: 'not-a-real-sha.biz',
-      })
-    )
-    .then(done)
-    .catch((error) => {
-      expect(error.name).to.equal("SequelizeValidationError")
-      expect(error.errors[0].path).to.equal('commitSha');
-      done();
-    });
-  });
 })
