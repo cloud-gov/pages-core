@@ -23,7 +23,7 @@ const validationFailed = (site, options, validationError) => {
   throw error;
 };
 
-const associate = ({ Site, Build, User }) => {
+const associate = ({ Site, Build, User, UserAction }) => {
   Site.hasMany(Build, {
     foreignKey: 'site',
   });
@@ -31,6 +31,10 @@ const associate = ({ Site, Build, User }) => {
     through: 'site_users__user_sites',
     foreignKey: 'site_users',
     timestamps: false,
+  });
+  Site.hasMany(UserAction, {
+    as: 'userActions',
+    foreignKey: 'siteId',
   });
 };
 

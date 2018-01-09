@@ -28,8 +28,8 @@ nav {
 
 nav ul {
   display: flex;
-  margin-top: 0;
   margin-bottom: 0;
+  margin-top: 0;
 }
 
 @media screen and (max-width: 600px) {
@@ -39,7 +39,7 @@ nav ul {
 }
 
 nav li:before {
-  content: "";
+  content: '';
   display: none;
 }
 
@@ -76,22 +76,24 @@ $logo-height: 29px;
 }
 
 .header {
-  margin-top: 1.5em;
   margin-bottom: 1.5em;
+  margin-top: 1.5em;
 }
 
 .header-icon {
-  height: 35px;
   display: inline-block;
+  margin-left: -60px;
   margin-right: 10px;
-  vertical-align: middle;
+  vertical-align: text-top;
+  height: 36px;
 }
 
 .header-title {
-
   h1 {
     font-size: 2.8rem;
+    line-height: 1.8rem;
     margin: 0;
+    padding-left: 60px;
   }
 
   p {
@@ -107,6 +109,7 @@ $logo-height: 29px;
 .header-actions {
   text-align: right;
   a {
+    display: inline-block;
     margin-left: 2rem;
   }
 }

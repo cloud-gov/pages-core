@@ -2,16 +2,15 @@
   "type": "object",
   "required": [
     "id",
-    "builds",
+    "userActions",
     "email",
-    "sites",
     "username"
   ],
   "properties": {
     "id": {
       "type": "integer"
     },
-    "builds": {
+    "userActions": {
       "type": "array",
       "items": {
         "type": "object"
@@ -19,12 +18,6 @@
     },
     "email": {
       "type": "string"
-    },
-    "sites": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      }
     },
     "username": {
       "type": "string"

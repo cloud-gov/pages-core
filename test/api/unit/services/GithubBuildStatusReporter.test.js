@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const nock = require('nock');
 const config = require('../../../../config');
 const factory = require('../../support/factory');
@@ -7,6 +7,8 @@ const githubAPINocks = require('../../support/githubAPINocks');
 const { User } = require('../../../../api/models');
 
 const GithubBuildStatusReporter = require('../../../../api/services/GithubBuildStatusReporter');
+
+const commitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
 
 describe('GithubBuildStatusReporter', () => {
   afterEach(() => {
@@ -21,13 +23,13 @@ describe('GithubBuildStatusReporter', () => {
         factory.build({
           state: 'processing',
           site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
-          commitSha: '456def',
+          commitSha,
         }).then((build) => {
           statusNock = githubAPINocks.status({
             owner: 'test-owner',
             repo: 'test-repo',
             repository: 'test-repo',
-            sha: '456def',
+            sha: commitSha,
             state: 'pending',
           });
 
@@ -44,12 +46,12 @@ describe('GithubBuildStatusReporter', () => {
         factory.build({
           state: 'processing',
           site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
-          commitSha: '456def',
+          commitSha,
         }).then((build) => {
           statusNock = githubAPINocks.status({
             owner: 'test-owner',
             repo: 'test-repo',
-            sha: '456def',
+            sha: commitSha,
             targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
           });
 
@@ -74,13 +76,13 @@ describe('GithubBuildStatusReporter', () => {
         factory.build({
           state: 'success',
           site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
-          commitSha: '456def',
+          commitSha,
         }).then((build) => {
           config.app.app_env = 'production';
           statusNock = githubAPINocks.status({
             owner: 'test-owner',
             repo: 'test-repo',
-            sha: '456def',
+            sha: commitSha,
             state: 'success',
           });
 
@@ -99,12 +101,12 @@ describe('GithubBuildStatusReporter', () => {
         factory.build({
           state: 'success',
           site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
-          commitSha: '456def',
+          commitSha,
         }).then((build) => {
           statusNock = githubAPINocks.status({
             owner: 'test-owner',
             repo: 'test-repo',
-            sha: '456def',
+            sha: commitSha,
             state: 'success',
           });
 
@@ -121,13 +123,13 @@ describe('GithubBuildStatusReporter', () => {
         factory.build({
           state: 'success',
           site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
-          commitSha: '456def',
+          commitSha,
           branch: 'preview-branch',
         }).then((build) => {
           statusNock = githubAPINocks.status({
             owner: 'test-owner',
             repo: 'test-repo',
-            sha: '456def',
+            sha: commitSha,
             targetURL: `${config.app.preview_hostname}/preview/test-owner/test-repo/preview-branch/`,
           });
 
@@ -146,12 +148,12 @@ describe('GithubBuildStatusReporter', () => {
         factory.build({
           state: 'error',
           site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
-          commitSha: '456def',
+          commitSha,
         }).then((build) => {
           statusNock = githubAPINocks.status({
             owner: 'test-owner',
             repo: 'test-repo',
-            sha: '456def',
+            sha: commitSha,
             state: 'error',
           });
 
@@ -168,12 +170,12 @@ describe('GithubBuildStatusReporter', () => {
         factory.build({
           state: 'error',
           site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
-          commitSha: '456def',
+          commitSha,
         }).then((build) => {
           statusNock = githubAPINocks.status({
             owner: 'test-owner',
             repo: 'test-repo',
-            sha: '456def',
+            sha: commitSha,
             targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
           });
 
@@ -193,12 +195,12 @@ describe('GithubBuildStatusReporter', () => {
           state: 'error',
           user: factory.user({ githubAccessToken: 'federalist-user-access-token' }),
           site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
-          commitSha: '456def',
+          commitSha,
         }).then((build) => {
           statusNock = githubAPINocks.status({
             owner: 'test-owner',
             repo: 'test-repo',
-            sha: '456def',
+            sha: commitSha,
             accessToken: 'federalist-user-access-token',
           });
 
@@ -230,12 +232,12 @@ describe('GithubBuildStatusReporter', () => {
           state: 'processing',
           user: githubUser,
           site,
-          commitSha: '456def',
+          commitSha,
         }).then((build) => {
           statusNock = githubAPINocks.status({
             owner: 'test-owner',
             repo: 'test-repo',
-            sha: '456def',
+            sha: commitSha,
             accessToken: 'fallback-access-token',
           });
 

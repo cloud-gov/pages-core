@@ -348,5 +348,40 @@ describe('SQS', () => {
         })
         .catch(done);
     });
+
+    describe('SKIP_LOGGING', () => {
+      const origAppEnv = config.app.app_env;
+
+      after(() => {
+        // reset to original value after these test cases
+        config.app.app_env = origAppEnv;
+      });
+
+      it('should set SKIP_LOGGING to true if the app_env is "development"', (done) => {
+        config.app.app_env = 'development';
+        factory.site()
+          .then(() => factory.build())
+          .then(build => Build.findById(build.id, { include: [Site, User] }))
+          .then((build) => {
+            const message = SQS.messageBodyForBuild(build);
+            expect(messageEnv(message, 'SKIP_LOGGING')).to.equal(true);
+            done();
+          })
+          .catch(done);
+      });
+
+      it('should set SKIP_LOGGING to false if the app_env is not "development"', (done) => {
+        config.app.app_env = 'not-development';
+        factory.site()
+          .then(() => factory.build())
+          .then(build => Build.findById(build.id, { include: [Site, User] }))
+          .then((build) => {
+            const message = SQS.messageBodyForBuild(build);
+            expect(messageEnv(message, 'SKIP_LOGGING')).to.equal(false);
+            done();
+          })
+          .catch(done);
+      });
+    });
   });
 });

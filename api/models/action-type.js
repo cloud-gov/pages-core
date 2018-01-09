@@ -1,6 +1,6 @@
 const associate = ({ ActionType, UserAction }) => {
-  ActionType.belongsTo(UserAction, {
-    foreignKey: 'actionTypeId',
+  ActionType.hasMany(UserAction, {
+    foreignKey: 'actionId',
   });
 };
 
@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     classMethods: {
       associate,
     },
+    timestamps: false,
   });
 
   return ActionType;

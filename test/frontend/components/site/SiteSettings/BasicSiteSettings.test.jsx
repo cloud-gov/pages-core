@@ -49,7 +49,7 @@ describe('<BasicSiteSettings/>', () => {
       label: 'Demo URL:',
       name: 'demoDomain',
       id: 'demoDomainInput',
-      placeholder: 'https://preview.example.gov',
+      placeholder: 'https://demo.example.gov',
       className: 'form-control',
     });
   });

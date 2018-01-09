@@ -20,6 +20,7 @@ const BuildLog = sequelize.import(path.join(__dirname, '/build-log'));
 const Site = sequelize.import(path.join(__dirname, '/site'));
 const User = sequelize.import(path.join(__dirname, '/user'));
 const UserAction = sequelize.import(path.join(__dirname, '/user-action'));
+const ActionType = sequelize.import(path.join(__dirname, '/action-type'));
 /* eslint-enable no-unused-vars */
 
 Object.keys(sequelize.models).forEach(key =>

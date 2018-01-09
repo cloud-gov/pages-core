@@ -16,14 +16,9 @@ module.exports = {
   },
 
   me: (req, res) => {
-    let user;
-
     User.findById(req.user.id)
-      .then((model) => {
-        user = model;
-        return authorizer.me(req.user, user);
-      })
-      .then(() => userSerializer.serialize(user))
+      .then(model => authorizer.me(req.user, model))
+      .then(currentUser => userSerializer.serialize(currentUser))
       .then(userJSON => res.json(userJSON))
       .catch(err => res.error(err));
   },
