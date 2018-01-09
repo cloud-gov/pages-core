@@ -4,6 +4,12 @@ import { shallow } from 'enzyme';
 import UserActionsTable from '../../../../frontend/components/site/UserActionsTable';
 
 describe('<UserActionsTable/>', () => {
+  it('should render nothing if the current user has no actions', () => {
+    const wrapper = shallow(<UserActionsTable />);
+
+    expect(wrapper.find('UserActionsTable')).to.have.length(0);
+  });
+
   it('should render a table of user actions', () => {
     const props = {
       userActions: [

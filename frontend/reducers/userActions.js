@@ -19,10 +19,10 @@ export default function userActions(state = initialState, action) {
     case USER_ACTIONS_RECEIVED:
       return {
         isLoading: false,
-        data: action.userActions
+        data: action.userActions,
       };
 
     default:
       return state;
   }
-};
+}

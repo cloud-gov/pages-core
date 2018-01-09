@@ -8,26 +8,26 @@ import {
 } from './actionCreators/userActions';
 
 const dispatchUserFetchStartedAction = () => {
-  dispatch(createUserFetchStartedAction())
-}
-
-const dispatchUserReceivedAction = user => {
-  dispatch(createUserReceivedAction(user));
+  dispatch(createUserFetchStartedAction());
 };
+
+const dispatchUserReceivedAction = user =>
+  dispatch(createUserReceivedAction(user));
 
 const dispatchUserActionFetchStarted = () =>
   dispatch(createUserActionFetchStarted());
 
-const dispatchUserActionReceived = (userActions) =>
+const dispatchUserActionReceived = userActions =>
   dispatch(createUserActionReceived(userActions));
 
 export default {
   fetchUser() {
-    dispatchUserFetchStartedAction()
+    dispatchUserFetchStartedAction();
     return federalist.fetchUser()
-      .then(dispatchUserReceivedAction)
+      .then(dispatchUserReceivedAction);
   },
 
+  // TODO: need to move this siteActions
   fetchUserActions(siteId) {
     dispatchUserActionFetchStarted();
 

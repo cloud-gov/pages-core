@@ -8,7 +8,7 @@ import {
 describe('userActions reducer', () => {
   it('returns a default and ignores undefined actions', () => {
     const actual = userActions(undefined, {
-      type: 'NOT_ACCEPTED_ACTION'
+      type: 'NOT_ACCEPTED_ACTION',
     });
 
     expect(actual).to.deep.equal({ isLoading: false, data: [] });
@@ -21,7 +21,7 @@ describe('userActions reducer', () => {
     };
 
     const actual = userActions(existingData, {
-      type: userActionFetchStartedType
+      type: userActionFetchStartedType,
     });
 
     expect(actual).to.deep.equal({
@@ -41,7 +41,7 @@ describe('userActions reducer', () => {
 
     expect(actual).to.deep.equal({
       isLoading: false,
-      data: nextState
+      data: nextState,
     });
   });
 });

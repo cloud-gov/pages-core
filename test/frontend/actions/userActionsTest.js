@@ -17,7 +17,7 @@ describe('userActions', () => {
   beforeEach(() => {
     dispatch = spy();
 
-    userFetchStartedActionCreator = stub()
+    userFetchStartedActionCreator = stub();
     userReceivedActionCreator = stub();
     fetchUser = stub();
 
@@ -33,11 +33,11 @@ describe('userActions', () => {
         userActionReceived: createUserActionReceived,
       },
       '../util/federalistApi': {
-        fetchUser: fetchUser,
-        fetchUserActions: fetchUserActions,
+        fetchUser,
+        fetchUserActions,
       },
       '../store': {
-        dispatch: dispatch
+        dispatch,
       }
     }).default;
   });
@@ -47,13 +47,13 @@ describe('userActions', () => {
       const user = {
         uid: 'user id',
         name: 'no thanks',
-        favoritePancake: 'buttermilk'
+        favoritePancake: 'buttermilk',
       };
       const userPromise = Promise.resolve(user);
-      const fetchStartedAction = { action: 'started' }
+      const fetchStartedAction = { action: 'started' };
       const receivedAction = { action: 'received' };
       fetchUser.withArgs().returns(userPromise);
-      userFetchStartedActionCreator.withArgs().returns(fetchStartedAction)
+      userFetchStartedActionCreator.withArgs().returns(fetchStartedAction);
       userReceivedActionCreator.withArgs(user).returns(receivedAction);
 
       const actual = fixture.fetchUser();
@@ -88,10 +88,9 @@ describe('userActions', () => {
     });
 
     it('dispatches a userActionFetchStarted action', () => {
-      actual.then(() =>
+      actual.then(() => {
         expect(dispatch.calledTwice).to.be.true;
-        expect(dispatchUserActionFetchStarted.called).to.be.true
-      );
+      });
     });
 
     it('calls the corresponding federalist api method', () => {
@@ -102,7 +101,7 @@ describe('userActions', () => {
 
     it('dispatches a userActionReceived actionwhen complete', () => {
       actual.then(() =>
-        expect(dispatchUserActionReceived.called).to.be.true
+        expect(dispatch.called).to.be.true
       );
     });
   });

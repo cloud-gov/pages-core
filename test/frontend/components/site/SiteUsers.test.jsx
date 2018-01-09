@@ -82,31 +82,5 @@ describe('<SiteUsers/>', () => {
 
       expect(clickSpy.called).to.be.true;
     });
-
-    it('should render nothing if the current user has no actions', () => {
-      expect(wrapper.find('UserActionsTable')).to.have.length(0);
-    });
-
-    it('renders a <UserActionsTable /> component when current user has actions', () => {
-      const userAction = {
-        actionTarget: {
-          id: 2,
-          username: 'fake-person',
-          email: null,
-          createdAt: '2017-12-26T14:06:51.669Z',
-        },
-        actionType: { action: 'remove' },
-        createdAt: '2017-12-26T00:00:00.000Z',
-        id: 2,
-        targetType: 'user',
-      };
-      const userWithActions = Object.assign({}, user, { userActions: [userAction] });
-      const nextProps = Object.assign({}, props, { user: userWithActions });
-      const wrapperWithActions = shallow(<SiteUsers {...nextProps} />);
-      const actionsTable = wrapperWithActions.find('UserActionsTable');
-
-      expect(actionsTable).to.have.length(1);
-      expect(actionsTable.prop('userActions')).to.deep.equal(nextProps.user.userActions);
-    });
   });
 });
