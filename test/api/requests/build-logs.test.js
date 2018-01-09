@@ -106,31 +106,67 @@ describe('Build Log API', () => {
           }).catch(done);
     });
 
-    it('should render builds logs for the given build', (done) => {
-      let build;
+    describe('successfully fetching build logs', () => {
+      const prepareAndFetchLogData = ({ userPromise, sitePromise, buildPromise }) =>
+        Promise.props({
+          user: userPromise,
+          site: sitePromise,
+          build: buildPromise,
+        })
+        .then(({ build, user }) =>
+          Promise.all([
+            Promise.all(
+              Array(3).fill(0).map(() => factory.buildLog({ build }))
+            ),
+            authenticatedSession(user),
+          ])
+        )
+        .then(([logs, cookie]) => {
+          const buildId = logs[0].get({ plain: true }).build;
 
-      factory.build().then((model) => {
-        build = model;
+          return request(app)
+            .get(`/v0/build/${buildId}/log`)
+            .set('Cookie', cookie)
+            .expect(200);
+        });
 
-        return Promise.all(Array(3).fill(0).map(() => factory.buildLog({ build })));
-      })
-      .then(() => Site.findById(build.site, { include: [User] }))
-      .then((site) => {
-        const user = site.Users[0];
-        return authenticatedSession(user);
-      })
-      .then(cookie => request(app)
-        .get(`/v0/build/${build.id}/log`)
-        .set('Cookie', cookie)
-        .expect(200)
-      )
-      .then((response) => {
+      const expectedResponse = (response, done) => {
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
         expect(response.body).to.be.an('array');
         expect(response.body).to.have.length(3);
         done();
-      })
-      .catch(done);
+      };
+
+      it('should render builds logs for the given build', (done) => {
+        const userPromise = factory.user();
+        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+        const buildPromise = factory.build({
+          user: userPromise,
+          site: sitePromise,
+        });
+
+        prepareAndFetchLogData({
+          userPromise,
+          sitePromise,
+          buildPromise,
+        })
+        .then(response => expectedResponse(response, done))
+        .catch(done);
+      });
+
+      it('should render logs if user is not associated to the build', (done) => {
+        const userPromise = factory.user();
+        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+        const buildPromise = factory.build({ site: sitePromise });
+
+        prepareAndFetchLogData({
+          userPromise,
+          sitePromise,
+          buildPromise,
+        })
+        .then(response => expectedResponse(response, done))
+        .catch(done);
+      });
     });
 
     it('should return plaintext logs when ?format=text', (done) => {
