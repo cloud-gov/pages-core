@@ -52,19 +52,6 @@ export const timeFrom = (date) => {
 };
 
 /**
- * Return a human-readable day, months and year (i.e. Monday, Dec. 25th 2020)
- * @param  {String | Date} date format "YYYY-DD-DDT00:00:00.000Z"
- * @return {String}
- */
-export const dayAndDate = (date) => {
-  if (!date) {
-    return NO_TIME;
-  }
-
-  return format(date, 'dddd, MMM Do YYYY');
-};
-
-/**
  * Return a human-readable day, months and year (i.e. December 25th 2020 5:22 PM)
  * @param  {String | Date} date format "YYYY-DD-DDT00:00:00.000Z"
  * @return {String}

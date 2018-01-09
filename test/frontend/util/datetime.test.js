@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { duration, timeFrom, dayAndDate, dateAndTime, timestampUTC } from '../../../frontend/util/datetime';
+import { duration, timeFrom, dateAndTime, timestampUTC } from '../../../frontend/util/datetime';
 
 const NO_DATE = '-';
 
@@ -31,16 +31,6 @@ describe('datetime', () => {
 
     it('provides a fallback if no initial time is supplied', () => {
       expect(timeFrom()).to.equal(NO_DATE);
-    });
-  });
-
-  describe('.dayAndDate', () => {
-    it('provides a day and date when a valid date is provided', () => {
-      expect(dayAndDate(startTime)).to.equal('Saturday, Feb 13th 2016');
-    });
-
-    it('provides a fallback if no date is provided', () => {
-      expect(dayAndDate()).to.equal(NO_DATE);
     });
   });
 
