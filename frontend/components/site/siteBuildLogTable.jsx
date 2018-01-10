@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { BUILD_LOG } from '../../propTypes';
+import { timestampUTC } from '../../util/datetime';
 
 function SiteBuildLogTable({ buildLogs }) {
   return (
@@ -10,7 +11,7 @@ function SiteBuildLogTable({ buildLogs }) {
         <tr>
           <th>Source</th>
           <th>Output</th>
-          <th>Timestamp</th>
+          <th>Timestamp (UTC)</th>
         </tr>
       </thead>
       <tbody>
@@ -22,7 +23,7 @@ function SiteBuildLogTable({ buildLogs }) {
                 {log.output}
               </pre>
             </td>
-            <td>{log.createdAt}</td>
+            <td>{timestampUTC(log.createdAt)}</td>
           </tr>
         )))}
       </tbody>
