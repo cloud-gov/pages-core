@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { USER_ACTION } from '../../propTypes';
-import { dayAndDate } from '../../util/datetime';
+import { timestampUTC } from '../../util/datetime';
 import userActions from '../../actions/userActions';
 
 const propTypes = {
@@ -18,9 +18,10 @@ class UserActionsTable extends React.Component {
   renderRow(action) {
     return (
       <tr key={`${action.id}-${action.targetType}`}>
+        <td>{action.initiator.username}</td>
         <td>{action.actionType.action}</td>
         <td>{action.actionTarget.username}</td>
-        <td>{dayAndDate(action.createdAt)}</td>
+        <td>{timestampUTC(action.createdAt)}</td>
       </tr>
     );
   }
@@ -30,13 +31,16 @@ class UserActionsTable extends React.Component {
       <thead>
         <tr>
           <th>
+            Initiator
+          </th>
+          <th>
             Action
           </th>
           <th>
             Target
           </th>
           <th>
-            Performed on
+            Timestamp (UTC)
           </th>
         </tr>
       </thead>

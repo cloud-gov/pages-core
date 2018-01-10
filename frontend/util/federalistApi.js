@@ -57,8 +57,8 @@ export default {
     return this.fetch('me');
   },
 
-  fetchUserActions(/* siteId */) {
-    return Promise.resolve([]);
+  fetchUserActions(siteId) {
+    return this.fetch(`site/${siteId}/user-action`);
   },
 
   addUserToSite({ owner, repository }) {

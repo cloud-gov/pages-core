@@ -27,7 +27,6 @@ export default {
       .then(dispatchUserReceivedAction);
   },
 
-  // TODO: need to move this siteActions
   fetchUserActions(siteId) {
     dispatchUserActionFetchStarted();
 
