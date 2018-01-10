@@ -2,6 +2,8 @@ import { expect } from 'chai';
 import {
   userReceived, userReceivedType,
   userFetchStarted, userFetchStartedType,
+  userActionFetchStarted, userActionFetchStartedType,
+  userActionReceived, userActionReceivedType,
 } from '../../../../frontend/actions/actionCreators/userActions';
 
 describe('userActions actionCreators', () => {
@@ -35,6 +37,36 @@ describe('userActions actionCreators', () => {
 
     it('exports its type', () => {
       expect(userFetchStartedType).to.equal('USER_FETCH_STARTED');
+    });
+  });
+
+  describe('userActionFetchStarted', () => {
+    it('exports its type', () => {
+      expect(userActionFetchStartedType).to.equal('USER_ACTIONS_FETCH_STARTED');
+    });
+
+    it('constructs properly', () => {
+      const actual = userActionFetchStarted();
+
+      expect(actual).to.deep.equal({
+        type: userActionFetchStartedType,
+      });
+    });
+  });
+
+  describe('userActionReceived', () => {
+    it('exports its type', () => {
+      expect(userActionReceivedType).to.equal('USER_ACTIONS_RECEIVED');
+    });
+
+    it('constructs properly', () => {
+      const userActions = ['a', 'b'];
+      const actual = userActionReceived(userActions);
+
+      expect(actual).to.deep.equal({
+        type: userActionReceivedType,
+        userActions,
+      });
     });
   });
 });

@@ -10,6 +10,7 @@ import builds from './reducers/builds';
 import user from './reducers/user';
 import githubBranches from './reducers/githubBranches';
 import showAddNewSiteFields from './reducers/showAddNewSiteFields';
+import userActions from './reducers/userActions';
 
 
 export default {
@@ -24,5 +25,6 @@ export default {
   notifications,
   form,
   showAddNewSiteFields,
+  userActions,
   FRONTEND_CONFIG: (state = {}) => state,
 };

@@ -2,6 +2,7 @@ const validTargetTypes = [['site', 'user']];
 
 const associate = ({ User, UserAction, ActionType, Site }) => {
   UserAction.belongsTo(User, {
+    as: 'initiator',
     foreignKey: 'userId',
   });
   UserAction.belongsTo(User, {
@@ -56,8 +57,11 @@ module.exports = (sequelize, DataTypes) => {
         model: sequelize.models.User,
         as: 'actionTarget',
         attributes: ['id', 'username', 'email', 'createdAt'],
-      },
-      {
+      }, {
+        model: sequelize.models.User,
+        as: 'initiator',
+        attributes: ['id', 'username', 'email', 'createdAt'],
+      }, {
         model: sequelize.models.ActionType,
         as: 'actionType',
         attributes: ['action'],
