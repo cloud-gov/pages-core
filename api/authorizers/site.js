@@ -5,7 +5,7 @@ const authorize = ({ id }, site) => (
     .then((user) => {
       const hasSite = user.Sites.some(s => site.id === s.id);
       if (hasSite) {
-        return Promise.resolve();
+        return Promise.resolve(site.id);
       }
 
       return Promise.reject(403);
@@ -16,6 +16,8 @@ const authorize = ({ id }, site) => (
 const create = () => Promise.resolve();
 const addUser = () => Promise.resolve();
 
+const showActions = (user, site) => authorize(user, site);
+
 const findOne = (user, site) => authorize(user, site);
 
 const update = (user, site) => authorize(user, site);
@@ -24,4 +26,4 @@ const destroy = (user, site) => authorize(user, site);
 
 const removeUser = (user, site) => authorize(user, site);
 
-module.exports = { create, findOne, update, destroy, addUser, removeUser };
+module.exports = { create, findOne, update, destroy, addUser, removeUser, showActions };
