@@ -38,9 +38,14 @@ function getSiteDisplayEnv() {
   return null;
 }
 
+function shouldIncludeTracking() {
+  return config.app.app_env === 'production';
+}
+
 module.exports = {
   getDirectoryFiles,
   getSiteDisplayEnv,
   isPastAuthThreshold,
   loadAssetManifest,
+  shouldIncludeTracking,
 };
