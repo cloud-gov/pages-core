@@ -5,13 +5,14 @@ import UserActionsTable from '../../../../frontend/components/site/UserActionsTa
 
 describe('<UserActionsTable/>', () => {
   it('should render nothing if the current user has no actions', () => {
-    const wrapper = shallow(<UserActionsTable />);
+    const wrapper = shallow(<UserActionsTable site={1} />);
 
     expect(wrapper.find('UserActionsTable')).to.have.length(0);
   });
 
   it('should render a table of user actions', () => {
     const props = {
+      site: 1,
       userActions: [
         {
           targetType: 'user',

@@ -9,7 +9,6 @@ const user = {
   username: 'not-owner',
   id: 4,
   email: 'not-owner@beep.gov',
-  userActions: [],
 };
 const props = {
   user,

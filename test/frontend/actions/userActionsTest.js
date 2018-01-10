@@ -38,7 +38,7 @@ describe('userActions', () => {
       },
       '../store': {
         dispatch,
-      }
+      },
     }).default;
   });
 

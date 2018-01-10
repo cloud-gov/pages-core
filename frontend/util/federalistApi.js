@@ -57,7 +57,7 @@ export default {
     return this.fetch('me');
   },
 
-  fetchUserActions(siteId) {
+  fetchUserActions(/* siteId */) {
     return Promise.resolve([]);
   },
 
