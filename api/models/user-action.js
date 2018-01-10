@@ -1,23 +1,5 @@
 const validTargetTypes = [['site', 'user']];
 
-const findAllBySite = ({ UserAction, User, ActionType }, siteId) =>
-  UserAction.findAll({
-    where: {
-      siteId,
-    },
-    attributes: ['id', 'targetType', 'siteId', 'createdAt'],
-    include: [{
-      model: User,
-      as: 'actionTarget',
-      attributes: ['id', 'username', 'email', 'createdAt'],
-    },
-    {
-      model: ActionType,
-      as: 'actionType',
-      attributes: ['action'],
-    }],
-  });
-
 const associate = ({ User, UserAction, ActionType, Site }) => {
   UserAction.belongsTo(User, {
     foreignKey: 'userId',
@@ -46,36 +28,50 @@ const toJSON = function json() {
   return record;
 };
 
-const tableOptions = {
-  tableName: 'user_action',
-  classMethods: {
-    associate,
-    findAllBySite,
+const schema = DataTypes => ({
+  userId: {
+    type: DataTypes.INTEGER, allowNull: false },
+  targetId: {
+    type: DataTypes.INTEGER, allowNull: false },
+  targetType: {
+    type: DataTypes.ENUM,
+    values: validTargetTypes,
+    validate: {
+      isIn: validTargetTypes,
+    },
+    allowNull: false,
   },
-  instanceMethods: {
-    toJSON,
-  },
-};
+  actionId: {
+    type: DataTypes.INTEGER, allowNull: false },
+  siteId: {
+    type: DataTypes.INTEGER, allowNull: false },
+});
 
 module.exports = (sequelize, DataTypes) => {
-  const UserAction = sequelize.define('UserAction', {
-    userId: {
-      type: DataTypes.INTEGER, allowNull: false },
-    targetId: {
-      type: DataTypes.INTEGER, allowNull: false },
-    targetType: {
-      type: DataTypes.ENUM,
-      values: validTargetTypes,
-      validate: {
-        isIn: validTargetTypes,
+  const findAllBySite = siteId =>
+    sequelize.models.UserAction.findAll({
+      where: { siteId },
+      attributes: ['id', 'targetType', 'siteId', 'createdAt'],
+      include: [{
+        model: sequelize.models.User,
+        as: 'actionTarget',
+        attributes: ['id', 'username', 'email', 'createdAt'],
       },
-      allowNull: false,
+      {
+        model: sequelize.models.ActionType,
+        as: 'actionType',
+        attributes: ['action'],
+      }],
+    });
+
+  const UserAction = sequelize.define('UserAction', schema(DataTypes), {
+    tableName: 'user_action',
+    classMethods: {
+      associate,
+      findAllBySite,
     },
-    actionId: {
-      type: DataTypes.INTEGER, allowNull: false },
-    siteId: {
-      type: DataTypes.INTEGER, allowNull: false },
-  }, tableOptions);
+    instanceMethods: { toJSON },
+  });
 
   return UserAction;
 };

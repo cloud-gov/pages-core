@@ -1,5 +1,5 @@
 const { showActions } = require('../authorizers/site');
-const { UserAction, User, ActionType } = require('../models');
+const { UserAction } = require('../models');
 const userActionSerializer = require('../serializers/user-action');
 
 const validId = (maybeId) => {
@@ -20,7 +20,7 @@ module.exports = {
     validId(req.params.site_id)
     .then(id => showActions(req.user, { id }))
     .then(siteId =>
-      UserAction.findAllBySite({ UserAction, User, ActionType }, siteId)
+      UserAction.findAllBySite(siteId)
     )
     .then(userActions => userActions || [])
     .then(userActionSerializer.serialize)
