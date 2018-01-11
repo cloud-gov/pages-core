@@ -1,6 +1,6 @@
 const { User, Build, Site } = require('../models');
 const buildErrors = require('../responses/buildErrors');
-const Github = require('../services/Github');
+const GitHub = require('../services/GitHub');
 
 const rejectBuild = () =>
   Promise.reject({
@@ -8,19 +8,16 @@ const rejectBuild = () =>
     message: buildErrors.UNABLE_TO_BUILD,
   });
 
-const verifyBuild = (model, branch) => {
-  const site = model && model.Sites && model.Sites[0];
-
-  return Github.getBranch({ model, build, site, branch })
-  .then(build => {
-    return {
-      branch: build.name,
-      site: site.id,
-      commitSha: build.commit.sha,
-    };
-  })
+const getBranch = ({ user, site, branchName }) =>
+  GitHub.getBranch(user, site.owner, site.repository, branchName)
+  .then(branch => ({
+    branch: branch.name,
+    site: site.id,
+    commitSha: branch.commit.sha,
+  }))
   .catch(rejectBuild);
-};
+
+const buildExists = user => user && user.Builds && user.Builds[0];
 
 const getBuildById = (user, params) => {
   const { buildId, siteId } = params;
@@ -35,13 +32,13 @@ const getBuildById = (user, params) => {
     }],
   })
   .then((model) => {
-    const build = model && model.Builds && model.Builds[0];
+    const build = buildExists(model);
 
-    if (!build) {
-      return rejectBuild();
+    if (build) {
+      return build;
     }
 
-    return build.get({ plain: true });
+    return rejectBuild();
   });
 };
 
@@ -60,10 +57,20 @@ const getBuildByBranch = (user, params) => {
     }, {
       model: Site,
       where: { id: siteId },
-      attributes: [ 'id', 'owner', 'repository' ]
+      attributes: ['id', 'owner', 'repository'],
     }],
   })
-  .then(model => verifyBuild(model, branch));
+  .then((model) => {
+    const build = buildExists(model);
+
+    if (build) {
+      return Object.assign({}, build, { commitSha: sha });
+    }
+
+    const site = user.Sites[0];
+
+    return getBranch({ model, site, branch });
+  });
 };
 
 const authorize = (user, params) => {

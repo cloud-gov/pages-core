@@ -52,10 +52,9 @@ const getRepository = (github, options) => new Promise((resolve, reject) => {
   });
 });
 
-const getBranch = (github, { user, repo, branch }) => new Promise((resolve, reject) => {
-  github.repos.getBranch({ user, repo, branch }, (err, branch) => {
+const getBranch = (github, { user, repo, branchName }) => new Promise((resolve, reject) => {
+  github.repos.getBranch({ user, repo, branch: branchName }, (err, branch) => {
     if (err) {
-      console.log('fell inot error', err)
       reject(Object.assign(err, { status: err.code }));
     } else {
       resolve(branch);
