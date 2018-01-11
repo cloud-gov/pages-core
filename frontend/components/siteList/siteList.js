@@ -33,7 +33,6 @@ const getSites = (sitesState) => {
   }
 
   return (
-    <div className="usa-grid">
       <ul className="sites-list usa-unstyled-list">
         {
           sitesState.data
@@ -42,7 +41,6 @@ const getSites = (sitesState) => {
             .map(site => (<SiteListItem key={site.id} site={site} />))
         }
       </ul>
-    </div>
   );
 };
 
@@ -50,7 +48,7 @@ const addWebsiteButton = () => (
   <Link
     to="/sites/new"
     role="button"
-    className="usa-button pull-right icon icon-new icon-white"
+    className="usa-button"
     alt="Add a new website"
   >
     Add website
@@ -58,8 +56,8 @@ const addWebsiteButton = () => (
 );
 
 export const SiteList = ({ storeState }) =>
-  (<div>
-    <div className="usa-grid dashboard header">
+  (<div className="usa-grid">
+    <div className="page-header usa-grid-full">
       <div className="usa-width-two-thirds">
         <div className="header-title">
           <h1>
@@ -68,19 +66,15 @@ export const SiteList = ({ storeState }) =>
           </h1>
         </div>
       </div>
-      <div className="usa-width-one-third">
+      <div className="usa-width-one-third header-actions">
         {addWebsiteButton()}
       </div>
     </div>
-    <div className="usa-grid">
+
       <AlertBanner {...storeState.alert} />
-    </div>
+
     {getSites(storeState.sites)}
-    <div className="usa-grid">
-      <div className="usa-width-one-whole">
-        {addWebsiteButton()}
-      </div>
-    </div>
+      {addWebsiteButton()}
   </div>);
 
 SiteList.propTypes = propTypes;

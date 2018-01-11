@@ -101,7 +101,7 @@ export const AdvancedSiteSettings = ({
     </div>
     <button
       type="button"
-      className="usa-button usa-button-gray button-reset"
+      className="usa-button usa-button-secondary"
       disabled={pristine}
       onClick={reset}
     >
@@ -117,12 +117,12 @@ export const AdvancedSiteSettings = ({
     </button>
 
 
-    <div className="usa-alert usa-alert-warning usa-alert-danger">
+    <div className="usa-alert usa-alert-warning">
       <div className="usa-alert-body">
         <h3 className="usa-alert-heading">Danger zone</h3>
         <p className="usa-alert-text">Delete this site from Federalist?</p>
         <button
-          className="usa-button usa-button-secondary button-delete"
+          className="usa-button usa-button-red"
           onClick={onDelete}
         >
           Delete

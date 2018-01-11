@@ -1,4 +1,9 @@
-@import '../../node_modules/uswds/dist/css/uswds.css';
+
+// Setup for the US Web Design Standards
+$font-path: '../../node_modules/uswds/src/fonts';
+$image-path: '../../node_modules/uswds/src/img';
+
+@import '../../node_modules/uswds/src/stylesheets/all.scss';
 
 @import "_variables";
 
@@ -21,6 +26,7 @@
 @import "_expandableArea";
 @import "_flexbox";
 @import "_examples";
+@import "side-nav";
 
 html,
 body,
@@ -33,15 +39,15 @@ main,
   width: 100%;
 }
 
-.pull-right {
-  float: right;
-}
-
-.pull-right::after {
-  content: '';
-  clear: both;
-  display: table-cell;
-}
+// .pull-right {
+//   float: right;
+// }
+//
+// .pull-right::after {
+//   content: '';
+//   clear: both;
+//   display: table-cell;
+// }
 
 .list-group {
   width: 100%;
@@ -84,50 +90,29 @@ li.list-group-item ul.list-group {
   color: #5b616b;
 }
 
-.site {
-  padding-right: 0;
-}
-
 .site-main {
   background-color: white;
   min-height: 100%;
-  padding-bottom: 3em;
-}
-
-.side-nav {
-  list-style-type: none;
-  margin-top: 0.7em;
-  width: 100%;
-}
-
-.side-nav li:before {
-  content: '';
-}
-
-.side-nav li {
-  display: block;
-  margin-bottom: 1.2em;
-}
-
-.side-nav a {
-  color: $text-color;
-}
-
-.side-nav a:hover {
-  color: $link-color;
-}
-
-.usa-grid.site:before {
-  background-color: $secondary-background-color;
-  bottom: 0;
-  content: '';
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 50%;
-  z-index: -1;
 }
 
 .offset-top {
   margin-top: 6em;
+}
+.usa-grid.site:before {
+bottom: 0;
+content: "";
+left: 0;
+position: fixed;
+top: 0;
+width: 50%;
+z-index: -1;
+}
+
+@media screen and (min-width: 600px) {
+  .usa-grid.site:before {
+    background-color: $color-gray-lightest;
+  }
+  .site-main {
+    padding-left: 3rem;
+  }
 }

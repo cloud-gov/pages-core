@@ -1,20 +1,20 @@
-.breadcrumb {
-  list-style-type: none;
-}
-.breadcrumb a {
-  text-decoration: underline;
-}
-.breadcrumb li:before {
-  content: "";
-  display: inherit;
-  padding-right: 0.4em;
-  text-align: right;
-}
-.breadcrumb li:not(:last-child):after {
-  content: '/';
-  display: inherit;
-  padding-left: 1em;
-}
-.breadcrumb.files li {
-  display: inline-block;
-}
+// .breadcrumb {
+//   list-style-type: none;
+// }
+// .breadcrumb a {
+//   text-decoration: underline;
+// }
+// .breadcrumb li:before {
+//   content: "";
+//   display: inherit;
+//   padding-right: 0.4em;
+//   text-align: right;
+// }
+// .breadcrumb li:not(:last-child):after {
+//   content: '/';
+//   display: inherit;
+//   padding-left: 1em;
+// }
+// .breadcrumb.files li {
+//   display: inline-block;
+// }

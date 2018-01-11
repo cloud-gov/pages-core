@@ -1,7 +1,15 @@
+.usa-table-borderless {
+  thead {
+    background-color: $color-gray-lightest;
+  }
+  th:first-child {
+    padding-left: 1rem;
+  }
+}
+
 
 .log-table {
-  font-size: smaller;
-  margin-top: 0;
+  font-size: 1.45rem;
 
   pre {
     overflow: auto;
@@ -14,4 +22,12 @@
 
 .log-table__site-build-log pre {
   max-width: 400px;
+}
+
+.table-full-width {
+  width: 100%;
+  td,
+  th {
+    padding: 1rem;
+  }
 }

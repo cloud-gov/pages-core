@@ -1,5 +1,50 @@
-header {
+.usa-banner {
+  p {
+    font-family: inherit;
+    font-size: inherit;
+  }
+}
+.usa-navbar {
+  height: auto;
+}
+.usa-header {
   background-color: $header-bg-color;
+  border-bottom: none;
+  min-height: 4rem;
+
+  .usa-logo {
+    top: -.45rem;
+  }
+
+ }
+.usa-nav {
+  background-color: transparent;
+  padding-top: 0;
+}
+.usa-nav-primary {
+  li {
+    a {
+      font-size: 1.7rem;
+      font-weight: 600;
+      color: #fff;
+      &:visited {
+        color: #fff;
+      }
+      &:hover {
+      color: #fff;
+        span {
+          border-color: #fff;
+        }
+      }
+    }
+  }
+  .usa-button {
+    padding: 1rem 2rem;
+    background: $button-color;
+    &:hover {
+      background-color: $button-color-active;
+    }
+  }
 }
 
 $nav-padding: .45em;
@@ -65,21 +110,23 @@ $logo-height: 29px;
   display: flex;
 }
 
-.logo a {
+.usa-logo a {
   background-image: url('/images/logo.svg');
   background-repeat: no-repeat;
   background-size: contain;
   color: transparent;
   display: inline-block;
-  height: $logo-height;
-  width: $logo-width;
-}
+  height: auto;
+  width: 100px;
+  background-position: center;
 
-.header {
-  margin-bottom: 1.5em;
-  margin-top: 1.5em;
 }
-
+@media screen and (min-width: 951px) {
+  .usa-logo a {
+    height: $logo-height;
+    width: $logo-width;
+  }
+}
 .header-icon {
   display: inline-block;
   margin-left: -60px;
@@ -112,7 +159,13 @@ $logo-height: 29px;
     display: inline-block;
     margin-left: 2rem;
   }
+  :last-child {
+    margin-right:0;
+  }
 }
-.usa-disclaimer-official {
-  margin-top: 3px;
+/// New styles Scott
+.page-header,
+.usa-grid .page-header {
+  margin-bottom: 1.5em;
+  margin-top: 1.5em;
 }

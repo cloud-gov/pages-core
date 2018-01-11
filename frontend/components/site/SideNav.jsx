@@ -5,8 +5,8 @@ import { Link } from 'react-router';
 import { SITE_NAVIGATION_CONFIG } from '../siteContainer';
 
 const SideNav = ({ siteId }) => (
-  <div className="usa-width-one-sixth">
-    <ul className="side-nav">
+  <div className="usa-width-one-sixth side-nav">
+    <ul className="usa-sidenav-list">
       {
         SITE_NAVIGATION_CONFIG.map(conf => (
           <li key={conf.route}>

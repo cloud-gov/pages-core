@@ -1,39 +1,28 @@
-.upload-alert {
-  margin-bottom: 1.5em;
+// .upload-alert {
+//   margin-bottom: 1.5em;
+// }
+//
+// .usa-alert-home {
+//   background-color: $alert-delete-bg-color;
+//   margin: 0 auto;
+//   .usa-alert {
+//     margin-left: auto;
+//     margin-right: auto;
+//     margin-top: 0;
+//     max-width: 1040px;
+//   }
+// }
+//
+// .usa-alert-danger {
+//   background-color: $alert-delete-bg-color;
+// }
+//
+// .usa-alert.no-icon {
+//   background-image: none;
+// }
+
+.usa-width-five-sixths :first-child.usa-alert {
+  margin-top: 1.5rem;
 }
 
-.usa-alert-home {
-  background-color: $alert-delete-bg-color;
-  margin: 0 auto;
-  .usa-alert {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 0;
-    max-width: 1040px;
-  }
-}
-
-.usa-alert-danger {
-  background-color: $alert-delete-bg-color;
-}
-
-.usa-alert.no-icon {
-  background-image: none;
-
-  .usa-alert-body {
-    padding-left: 0;
-  }
-}
-
-/*
- * Borrowed from USWDS 1.2.1
- * TODO: remove once USWDS dependency is upgraded
- */
-.usa-alert-body p:last-child {
-  margin-bottom: .8rem;
-}
-
-.usa-alert-body p:first-child {
-  margin-top: .8rem;
-}
-/* end borrowing */
+.usa-alert {margin-bottom: 1.5rem;}

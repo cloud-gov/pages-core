@@ -81,7 +81,7 @@ class SiteBuilds extends React.Component {
         <div className="log-tools">
           <RefreshBuildsButton site={site} />
         </div>
-        <table className="usa-table-borderless log-table log-table__site-builds">
+        <table className="usa-table-borderless log-table log-table__site-builds table-full-width">
           <thead>
             <tr>
               <th scope="col">Branch</th>
@@ -110,10 +110,10 @@ class SiteBuilds extends React.Component {
 
               return (
                 <tr key={build.id}>
-                  <td>
+                  <th scope="row">
                     { build.branch }
                     { SiteBuilds.commitLink(build) }
-                  </td>
+                  </th>
                   <td>{ SiteBuilds.getUsername(build) }</td>
                   <td>{ timeFrom(build.completedAt) }</td>
                   <td>{ duration(build.createdAt, build.completedAt) }</td>
