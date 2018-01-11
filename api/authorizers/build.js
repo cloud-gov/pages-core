@@ -17,7 +17,7 @@ const getBranch = ({ user, site, branch }) =>
   }))
   .catch(rejectBuild);
 
-const buildExists = user => user && user.Builds && user.Builds[0];
+const getBuild = user => user && user.Builds && user.Builds[0];
 
 const getBuildById = (user, params) => {
   const { buildId, siteId } = params;
@@ -32,7 +32,7 @@ const getBuildById = (user, params) => {
     }],
   })
   .then((model) => {
-    const build = buildExists(model);
+    const build = getBuild(model);
 
     if (build) {
       return build;
@@ -62,14 +62,17 @@ const getBuildByBranch = (user, params) => {
     }],
   })
   .then((model) => {
-    const build = buildExists(model);
+    const build = getBuild(model);
 
+    // The branch we want to create a new build from has been built via federalist before
     if (build) {
       return Object.assign({}, build.toJSON(), { commitSha: sha });
     }
 
     const site = model.Sites[0];
 
+    // We don't have a build record, using this branch, go to github and check if the
+    // requested branch is a valid one for the current site.
     return getBranch({ user: model, site, branch });
   });
 };

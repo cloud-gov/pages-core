@@ -316,7 +316,7 @@ describe('GitHub', () => {
 
         return GitHub.getBranch(values.user, owner, repository)
           .catch((err) => {
-            expect(err.status).to.equal('400')
+            expect(err.status).to.equal('400');
             done();
           });
       })
