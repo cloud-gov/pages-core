@@ -232,6 +232,29 @@ const webhook = ({ accessToken, owner, repo, response } = {}) => {
   return webhookNock.reply(...resp);
 };
 
+// eslint-disable-next-line no-shadow
+const getBranch = ({ accessToken, owner, repo, branch, expected }) => {
+  let branchNock = nock('https://api.github.com');
+  const path = `/repos/${owner}/${repo}/branches/${branch}`;
+
+  branchNock = branchNock.get(path);
+
+  if (accessToken) {
+    branchNock = branchNock.query({ access_token: accessToken });
+  } else {
+    branchNock = branchNock.query(true);
+  }
+
+  const output = expected || {
+    name: 'master',
+    commit: {
+      sha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+    },
+  };
+
+  return branchNock.reply(200, output);
+};
+
 module.exports = {
   getAccessToken,
   createRepoForOrg,
@@ -242,4 +265,5 @@ module.exports = {
   user,
   userOrganizations,
   webhook,
+  getBranch,
 };
