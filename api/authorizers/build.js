@@ -64,7 +64,7 @@ const getBuildByBranch = (user, params) => {
     const build = buildExists(model);
 
     if (build) {
-      return Object.assign({}, build, { commitSha: sha });
+      return Object.assign({}, build.toJSON(), { commitSha: sha });
     }
 
     const site = user.Sites[0];

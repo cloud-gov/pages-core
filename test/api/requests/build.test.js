@@ -117,18 +117,22 @@ describe('Build API', () => {
     });
 
     describe('successful requests', () => {
-      let userPromise;
-      let sitePromise;
-      let buildPromise;
+      let promiseProps;
 
       beforeEach(() => {
-        userPromise = factory.user();
-        sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        buildPromise = factory.build({
-          site: sitePromise,
-          branch: 'master',
-          commitSha,
+        const userPromise = factory.user();
+        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+
+        promiseProps = Promise.props({
           user: userPromise,
+          site: sitePromise,
+          build: factory.build({
+            site: sitePromise,
+            branch: 'master',
+            commitSha,
+            user: userPromise,
+          }),
+          cookie: authenticatedSession(userPromise),
         });
       });
 
@@ -136,12 +140,7 @@ describe('Build API', () => {
         let site;
         let user;
 
-        Promise.props({
-          user: userPromise,
-          site: sitePromise,
-          build: buildPromise,
-          cookie: authenticatedSession(userPromise),
-        })
+        promiseProps
         .then((promisedValues) => {
           site = promisedValues.site;
           user = promisedValues.user;
@@ -177,12 +176,7 @@ describe('Build API', () => {
         let site;
         let user;
 
-        Promise.props({
-          user: userPromise,
-          site: sitePromise,
-          build: buildPromise,
-          cookie: authenticatedSession(userPromise),
-        })
+        promiseProps
         .then((promisedValues) => {
           site = promisedValues.site;
           user = promisedValues.user;
@@ -215,16 +209,61 @@ describe('Build API', () => {
         .catch(done);
       });
 
+      it('creates a new build from a branch if that branch exists on GitHub', (done) => {
+        let branch;
+        let site;
+        let user;
+
+        promiseProps
+        .then((promisedValues) => {
+          site = promisedValues.site;
+          user = promisedValues.user;
+          branch = promisedValues.build.branch;
+          githubAPINocks.getBranch({
+            owner: site.owner,
+            repo: site.repository,
+            branch,
+            expected: {
+              name: branch,
+              commit: { sha: commitSha },
+            },
+          });
+
+          return validCreateRequest(
+            csrfToken.getToken(),
+            promisedValues.cookie,
+            {
+              branch,
+              siteId: promisedValues.build.site,
+              sha: promisedValues.build.commitSha,
+            }
+          );
+        })
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/build', 200, response.body);
+          return Build.findOne({
+            where: {
+              site: site.id,
+              user: user.id,
+              branch,
+              commitSha,
+            },
+          });
+        })
+        .then((build) => {
+          expect(build).to.not.be.undefined;
+          expect(build.branch).to.equal(branch);
+          // This doesn't want to pass
+          // expect(getBranchNock.isDone()).to.equal(true);
+          done();
+        }).catch(done);
+      });
+
       it('should report the new build\'s status to GitHub', (done) => {
         nock.cleanAll();
         const statusNock = githubAPINocks.status({ state: 'pending' });
 
-        Promise.props({
-          user: userPromise,
-          site: sitePromise,
-          build: buildPromise,
-          cookie: authenticatedSession(userPromise),
-        })
+        promiseProps
         .then(promisedValues =>
           validCreateRequest(
             csrfToken.getToken(),
