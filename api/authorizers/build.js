@@ -8,12 +8,12 @@ const rejectBuild = () =>
     message: buildErrors.UNABLE_TO_BUILD,
   });
 
-const getBranch = ({ user, site, branchName }) =>
-  GitHub.getBranch(user, site.owner, site.repository, branchName)
-  .then(branch => ({
-    branch: branch.name,
+const getBranch = ({ user, site, branch }) =>
+  GitHub.getBranch(user, site.owner, site.repository, branch)
+  .then(branchInfo => ({
+    branch: branchInfo.name,
     site: site.id,
-    commitSha: branch.commit.sha,
+    commitSha: branchInfo.commit.sha,
   }))
   .catch(rejectBuild);
 
@@ -45,7 +45,8 @@ const getBuildById = (user, params) => {
 const getBuildByBranch = (user, params) => {
   const { siteId, sha, branch } = params;
 
-  return User.findById(user.id, {
+  return User.findOne({
+    where: { id: user.id },
     include: [{
       model: Build,
       where: {
@@ -67,9 +68,9 @@ const getBuildByBranch = (user, params) => {
       return Object.assign({}, build.toJSON(), { commitSha: sha });
     }
 
-    const site = user.Sites[0];
+    const site = model.Sites[0];
 
-    return getBranch({ model, site, branch });
+    return getBranch({ user: model, site, branch });
   });
 };
 

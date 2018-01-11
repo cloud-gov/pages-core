@@ -264,4 +264,37 @@ describe('GitHub', () => {
       GitHub.validateUser('123abc').catch(() => done());
     });
   });
+
+  describe('.getBranch', () => {
+    it('returns a branch based on the supplied parameters', (done) => {
+      const userPromise = factory.user();
+      const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+      let mockGHRequest;
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+      })
+      .then((values) => {
+        const { owner, repository } = values.site;
+        const branch = 'master';
+
+        mockGHRequest = githubAPINocks.getBranch({
+          owner,
+          repo: repository,
+          branch,
+        });
+
+        return GitHub.getBranch(values.user, owner, repository, branch);
+      })
+      .then((branchInfo) => {
+        expect(branchInfo).to.be.defined;
+        expect(branchInfo.name).to.be.defined;
+        expect(branchInfo.commit).to.be.defined;
+        expect(mockGHRequest.isDone()).to.be.true;
+        done();
+      })
+      .catch(done);
+    });
+  });
 });

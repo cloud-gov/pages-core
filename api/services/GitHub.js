@@ -162,7 +162,7 @@ module.exports = {
 
   getBranch: (user, owner, repo, branch) =>
     githubClient(user.githubAccessToken)
-    .then(github => getBranch(github, { user: owner, repo, branch }))
+    .then(github => getBranch(github, { user: owner, repo, branchName: branch }))
     .catch((err) => {
       if (err.status === 404) {
         return null;
