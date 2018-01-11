@@ -1,36 +1,53 @@
-const { User, Build } = require('../models');
+const { User, Build, Site } = require('../models');
 const buildErrors = require('../responses/buildErrors');
+const GitHub = require('../services/GitHub');
 
-const verifyBuild = (model) => {
-  const build = model && model.Builds && model.Builds[0];
+const rejectBuild = () =>
+  Promise.reject({
+    status: 403,
+    message: buildErrors.UNABLE_TO_BUILD,
+  });
 
-  if (!build) {
-    return Promise.reject({
-      status: 403,
-      message: buildErrors.UNABLE_TO_BUILD,
-    });
-  }
+const getBranch = ({ user, site, branch }) =>
+  GitHub.getBranch(user, site.owner, site.repository, branch)
+  .then(branchInfo => ({
+    branch: branchInfo.name,
+    site: site.id,
+    commitSha: branchInfo.commit.sha,
+  }))
+  .catch(rejectBuild);
 
-  return build.get({ plain: true });
-};
+const getBuild = user => user && user.Builds && user.Builds[0];
 
 const getBuildById = (user, params) => {
   const { buildId, siteId } = params;
 
   return User.findById(user.id, {
-    include: {
+    include: [{
       model: Build,
       where: { site: siteId, id: buildId },
-    },
+    }, {
+      model: Site,
+      where: { id: siteId },
+    }],
   })
-  .then(verifyBuild);
+  .then((model) => {
+    const build = getBuild(model);
+
+    if (build) {
+      return build;
+    }
+
+    return rejectBuild();
+  });
 };
 
 const getBuildByBranch = (user, params) => {
   const { siteId, sha, branch } = params;
 
-  return User.findById(user.id, {
-    include: {
+  return User.findOne({
+    where: { id: user.id },
+    include: [{
       model: Build,
       where: {
         branch,
@@ -38,10 +55,26 @@ const getBuildByBranch = (user, params) => {
       },
       order: [['createdAt', 'desc']],
       limit: 1,
-    },
+    }, {
+      model: Site,
+      where: { id: siteId },
+      attributes: ['id', 'owner', 'repository'],
+    }],
   })
-  .then(verifyBuild)
-  .then(build => Object.assign({}, build, { commitSha: sha }));
+  .then((model) => {
+    const build = getBuild(model);
+
+    // The branch we want to create a new build from has been built via federalist before
+    if (build) {
+      return Object.assign({}, build.toJSON(), { commitSha: sha });
+    }
+
+    const site = model.Sites[0];
+
+    // We don't have a build record, using this branch, go to github and check if the
+    // requested branch is a valid one for the current site.
+    return getBranch({ user: model, site, branch });
+  });
 };
 
 const authorize = (user, params) => {

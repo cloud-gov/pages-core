@@ -117,41 +117,156 @@ describe('Build API', () => {
     });
 
     describe('successful requests', () => {
-      let userPromise;
-      let sitePromise;
-      let buildPromise;
+      describe('with an existing build', () => {
+        let promiseProps;
 
-      beforeEach(() => {
-        userPromise = factory.user();
-        sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        buildPromise = factory.build({
-          site: sitePromise,
-          branch: 'master',
-          commitSha,
-          user: userPromise,
+        beforeEach(() => {
+          const userPromise = factory.user();
+          const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+
+          promiseProps = Promise.props({
+            user: userPromise,
+            site: sitePromise,
+            build: factory.build({
+              site: sitePromise,
+              branch: 'master',
+              commitSha,
+              user: userPromise,
+            }),
+            cookie: authenticatedSession(userPromise),
+          });
+        });
+
+        it('should create a new build for the site given an existing build id', (done) => {
+          let site;
+          let user;
+
+          promiseProps
+          .then((promisedValues) => {
+            site = promisedValues.site;
+            user = promisedValues.user;
+
+            return validCreateRequest(
+              csrfToken.getToken(),
+              promisedValues.cookie,
+              {
+                buildId: promisedValues.build.id,
+                siteId: site.id,
+              }
+            );
+          })
+          .then((response) => {
+            validateAgainstJSONSchema('POST', '/build', 200, response.body);
+            return Build.findOne({
+              where: {
+                site: site.id,
+                user: user.id,
+                branch: 'my-branch',
+                commitSha,
+              },
+            });
+          })
+          .then((build) => {
+            expect(build).not.to.be.undefined;
+            done();
+          })
+          .catch(done);
+        });
+
+        it('creates a new build from a branch name given an existing build of that branch', (done) => {
+          let site;
+          let user;
+
+          promiseProps
+          .then((promisedValues) => {
+            site = promisedValues.site;
+            user = promisedValues.user;
+
+            return validCreateRequest(
+              csrfToken.getToken(),
+              promisedValues.cookie,
+              {
+                branch: promisedValues.build.branch,
+                siteId: promisedValues.build.site,
+                sha: promisedValues.build.commitSha,
+              }
+            );
+          })
+          .then((response) => {
+            validateAgainstJSONSchema('POST', '/build', 200, response.body);
+            return Build.findOne({
+              where: {
+                site: site.id,
+                user: user.id,
+                branch: 'my-branch',
+                commitSha,
+              },
+            });
+          })
+          .then((build) => {
+            expect(build).not.to.be.undefined;
+            done();
+          })
+          .catch(done);
+        });
+
+        it('should report the new build\'s status to GitHub', (done) => {
+          nock.cleanAll();
+          const statusNock = githubAPINocks.status({ state: 'pending' });
+
+          promiseProps
+          .then(promisedValues =>
+            validCreateRequest(
+              csrfToken.getToken(),
+              promisedValues.cookie,
+              {
+                buildId: promisedValues.build.id,
+                siteId: promisedValues.build.site,
+              }
+            )
+          )
+          .then(() => {
+            expect(statusNock.isDone()).to.be.true;
+            done();
+          })
+          .catch(done);
         });
       });
 
-      it('should create a new build for the site given an existing build id', (done) => {
+      it('creates a new build from a branch if that branch exists on GitHub', (done) => {
+        const branch = 'master';
         let site;
         let user;
+        let mockGHRequest;
+
+        const userPromise = factory.user();
 
         Promise.props({
           user: userPromise,
-          site: sitePromise,
-          build: buildPromise,
+          site: factory.site({ users: Promise.all([userPromise]) }),
           cookie: authenticatedSession(userPromise),
         })
         .then((promisedValues) => {
           site = promisedValues.site;
           user = promisedValues.user;
 
+          mockGHRequest = githubAPINocks.getBranch({
+            owner: site.owner,
+            repo: site.repository,
+            branch,
+            expected: {
+              name: branch,
+              commit: { sha: commitSha },
+            },
+          });
+
           return validCreateRequest(
             csrfToken.getToken(),
             promisedValues.cookie,
             {
-              buildId: promisedValues.build.id,
+              branch,
               siteId: site.id,
+              sha: commitSha,
             }
           );
         })
@@ -161,82 +276,15 @@ describe('Build API', () => {
             where: {
               site: site.id,
               user: user.id,
-              branch: 'my-branch',
+              branch,
               commitSha,
             },
           });
         })
         .then((build) => {
-          expect(build).not.to.be.undefined;
-          done();
-        })
-        .catch(done);
-      });
-
-      it('creates a new build from a branch name given an existing build of that branch', (done) => {
-        let site;
-        let user;
-
-        Promise.props({
-          user: userPromise,
-          site: sitePromise,
-          build: buildPromise,
-          cookie: authenticatedSession(userPromise),
-        })
-        .then((promisedValues) => {
-          site = promisedValues.site;
-          user = promisedValues.user;
-
-          return validCreateRequest(
-            csrfToken.getToken(),
-            promisedValues.cookie,
-            {
-              branch: promisedValues.build.branch,
-              siteId: promisedValues.build.site,
-              sha: promisedValues.build.commitSha,
-            }
-          );
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/build', 200, response.body);
-          return Build.findOne({
-            where: {
-              site: site.id,
-              user: user.id,
-              branch: 'my-branch',
-              commitSha,
-            },
-          });
-        })
-        .then((build) => {
-          expect(build).not.to.be.undefined;
-          done();
-        })
-        .catch(done);
-      });
-
-      it('should report the new build\'s status to GitHub', (done) => {
-        nock.cleanAll();
-        const statusNock = githubAPINocks.status({ state: 'pending' });
-
-        Promise.props({
-          user: userPromise,
-          site: sitePromise,
-          build: buildPromise,
-          cookie: authenticatedSession(userPromise),
-        })
-        .then(promisedValues =>
-          validCreateRequest(
-            csrfToken.getToken(),
-            promisedValues.cookie,
-            {
-              buildId: promisedValues.build.id,
-              siteId: promisedValues.build.site,
-            }
-          )
-        )
-        .then(() => {
-          expect(statusNock.isDone()).to.be.true;
+          expect(build).to.not.be.undefined;
+          expect(build.branch).to.equal(branch);
+          expect(mockGHRequest.isDone()).to.equal(true);
           done();
         })
         .catch(done);
