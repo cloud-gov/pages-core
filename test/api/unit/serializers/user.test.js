@@ -1,37 +1,38 @@
-const expect = require("chai").expect
-const validateJSONSchema = require('jsonschema').validate
+const { expect } = require('chai');
+const validateJSONSchema = require('jsonschema').validate;
 
-const userSchema = require("../../../../public/swagger/User.json")
-const factory = require("../../support/factory")
+const userSchema = require('../../../../public/swagger/User.json');
+const factory = require('../../support/factory');
 
-const UserSerializer = require("../../../../api/serializers/user")
+const UserSerializer = require('../../../../api/serializers/user');
 
-describe("UserSerializer", () => {
-  describe(".serialize(serializable)", () => {
-    it("should serialize an object correctly", done => {
-      factory.user().then(user => {
-        return UserSerializer.serialize(user)
-      }).then(object => {
-        const result = validateJSONSchema(object, userSchema)
-        expect(result.errors).to.be.empty
-        done()
-      }).catch(done)
-    })
+describe('UserSerializer', () => {
+  describe('.serialize(serializable)', () => {
+    it('should serialize an object correctly', (done) => {
+      factory.user()
+      .then(user => UserSerializer.serialize(user))
+      .then((object) => {
+        const result = validateJSONSchema(object, userSchema);
 
-    it("should serialize an array correctly", done => {
-      const users = Array(3).fill(0).map(() => factory.user())
+        expect(result.errors).to.be.empty;
+        done();
+      }).catch(done);
+    });
 
-      Promise.all(users).then(users => {
-        return UserSerializer.serialize(users)
-      }).then(object => {
+    it('should serialize an array correctly', (done) => {
+      const userPromises = Array(3).fill(0).map(() => factory.user());
+
+      Promise.all(userPromises)
+      .then(users => UserSerializer.serialize(users))
+      .then((object) => {
         const arraySchema = {
-          type: "array",
+          type: 'array',
           items: userSchema,
-        }
-        const result = validateJSONSchema(object, arraySchema)
-        expect(result.errors).to.be.empty
-        done()
-      }).catch(done)
-    })
-  })
-})
+        };
+        const result = validateJSONSchema(object, arraySchema);
+        expect(result.errors).to.be.empty;
+        done();
+      }).catch(done);
+    });
+  });
+});

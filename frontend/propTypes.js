@@ -38,4 +38,5 @@ export const USER_ACTION = PropTypes.shape({
   createdAt: PropTypes.string,
   actionTarget: PropTypes.shape(USER),
   actionType: PropTypes.shape({ action: PropTypes.string }),
+  initiator: PropTypes.shape(USER),
 });

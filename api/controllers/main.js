@@ -1,7 +1,7 @@
 const BuildCounter = require('../services/BuildCounter');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const config = require('../../config');
-const { loadAssetManifest, getSiteDisplayEnv } = require('../utils');
+const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
 
 let webpackAssets = loadAssetManifest();
 
@@ -12,17 +12,16 @@ function defaultContext(req) {
     webpackAssets = loadAssetManifest();
   }
 
-  const siteDisplayEnv = getSiteDisplayEnv();
-
   const messages = {
     errors: req.flash('error'),
   };
 
   const context = {
     isAuthenticated: false,
-    webpackAssets,
-    siteDisplayEnv,
     messages,
+    shouldIncludeTracking: shouldIncludeTracking(),
+    siteDisplayEnv: getSiteDisplayEnv(),
+    webpackAssets,
   };
 
   return context;

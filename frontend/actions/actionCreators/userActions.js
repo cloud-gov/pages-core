@@ -1,5 +1,7 @@
 const userFetchStartedType = 'USER_FETCH_STARTED';
 const userReceivedType = 'USER_RECEIVED';
+const userActionFetchStartedType = 'USER_ACTIONS_FETCH_STARTED';
+const userActionReceivedType = 'USER_ACTIONS_RECEIVED';
 
 const userFetchStarted = () => ({
   type: userFetchStartedType,
@@ -10,7 +12,19 @@ const userReceived = user => ({
   user,
 });
 
+const userActionFetchStarted = () => ({
+  type: userActionFetchStartedType,
+});
+
+const userActionReceived = userActions => ({
+  type: userActionReceivedType,
+  userActions,
+});
+
+
 export {
   userFetchStarted, userFetchStartedType,
   userReceived, userReceivedType,
+  userActionFetchStarted, userActionFetchStartedType,
+  userActionReceived, userActionReceivedType,
 };
