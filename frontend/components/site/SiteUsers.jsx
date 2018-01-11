@@ -9,14 +9,6 @@ import GitHubMark from '../GitHubMark';
 const isSiteOwner = (user, siteOwner) =>
   user.username.toLowerCase() === siteOwner.toLowerCase();
 
-const renderUserActions = (userActions) => {
-  if (!userActions.length) {
-    return null;
-  }
-
-  return <UserActionsTable userActions={userActions} />;
-};
-
 const SiteUsers = ({ site, user }) => {
   // sort users by lower-cased usernames
   const users = site.users.slice().sort((a, b) => {
@@ -81,7 +73,7 @@ const SiteUsers = ({ site, user }) => {
         </tbody>
       </table>
       <div className="offset-top">
-        {renderUserActions(user.userActions)}
+        <UserActionsTable site={site.id} />
       </div>
     </div>
   );

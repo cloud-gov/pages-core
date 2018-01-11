@@ -82,6 +82,7 @@
     "concurrently": "^3.4.0",
     "cookie": "^0.3.1",
     "css-loader": "^0.28.4",
+    "date-fns": "^1.29.0",
     "enzyme": "^2.4.1",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",

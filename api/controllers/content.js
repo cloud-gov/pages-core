@@ -1,7 +1,7 @@
 const path = require('path');
 
 const BuildCounter = require('../services/BuildCounter');
-const { getDirectoryFiles, loadAssetManifest, getSiteDisplayEnv } = require('../utils');
+const { getDirectoryFiles, loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
 
 const CONTENT_DIR = 'content';
 const CONTENT_PATH = path.join('views', CONTENT_DIR);
@@ -38,19 +38,14 @@ function cleanRequestPath(reqPath) {
 }
 
 let webpackAssets = loadAssetManifest();
-let availableContentFiles;
 
 module.exports = {
   serve(req, res) {
     const reqPath = cleanRequestPath(req.path);
 
-    if (!availableContentFiles) {
-      // Walk the content directory save the results the first time we get here.
-      // We do this within this handler in order to easily mock the fs
-      // during testing.
-      availableContentFiles = getDirectoryFiles(CONTENT_PATH)
-        .map(fp => path.relative(CONTENT_PATH, fp));
-    }
+    // walk the static content directory and create an array of content files
+    const availableContentFiles = getDirectoryFiles(CONTENT_PATH)
+      .map(fp => path.relative(CONTENT_PATH, fp));
 
     // try to find a content template file matching the requested path
     const contentFilePath = findContentFilePath(reqPath, availableContentFiles);
@@ -66,11 +61,10 @@ module.exports = {
       webpackAssets = loadAssetManifest();
     }
 
-    const siteDisplayEnv = getSiteDisplayEnv();
-
     const context = {
       webpackAssets,
-      siteDisplayEnv,
+      siteDisplayEnv: getSiteDisplayEnv(),
+      shouldIncludeTracking: shouldIncludeTracking(),
     };
 
     BuildCounter.countBuildsFromPastWeek()

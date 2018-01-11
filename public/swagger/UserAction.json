@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "siteId",
+    "userId",
+    "targetId",
+    "targetType",
+    "actionId"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "siteId": {
+      "type": "integer"
+    },
+    "userId": {
+      "type": "integer"
+    },
+    "targetId": {
+      "type": "integer"
+    },
+    "actionId": {
+      "type": "integer"
+    },
+    "targetType": {
+      "type": "string"
+    }
+  }
+}

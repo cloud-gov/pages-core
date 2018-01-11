@@ -1,26 +1,31 @@
 import React from 'react';
-import moment from "moment";
+
+import { dateAndTime } from '../../util/datetime';
 
 const propTypes = {
   site: React.PropTypes.shape({
     publishedAt: React.PropTypes.string,
-  })
+  }),
+};
+
+const defaultProps = {
+  site: {},
 };
 
 const getPublishedState = (site) => {
   if (site.publishedAt) {
-    let formattedBuildTime = moment(site.publishedAt).format('MMMM Do YYYY, h:mm:ss a')
-    return `This site was last published at ${formattedBuildTime}.`;
-  } else {
-    return 'Please wait for build to complete or check logs for error message.';
+    const formattedBuildTime = dateAndTime(site.publishedAt);
+    return `Last published on ${formattedBuildTime}.`;
   }
+  return 'Please wait for build to complete or check logs for error message.';
 };
 
 const PublishedState = ({ site = {} }) =>
   <p>
     {getPublishedState(site)}
-  </p>
+  </p>;
 
 PublishedState.propTypes = propTypes;
+PublishedState.defaultProps = defaultProps;
 
 export default PublishedState;

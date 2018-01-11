@@ -1,6 +1,6 @@
 const request = require('supertest');
 const fsMock = require('mock-fs');
-const expect = require('chai').expect;
+const { expect } = require('chai');
 
 const app = require('../../../app');
 

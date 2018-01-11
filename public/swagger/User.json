@@ -2,19 +2,12 @@
   "type": "object",
   "required": [
     "id",
-    "userActions",
     "email",
     "username"
   ],
   "properties": {
     "id": {
       "type": "integer"
-    },
-    "userActions": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      }
     },
     "email": {
       "type": "string"
