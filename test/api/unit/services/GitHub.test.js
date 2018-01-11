@@ -266,16 +266,22 @@ describe('GitHub', () => {
   });
 
   describe('.getBranch', () => {
-    it('returns a branch based on the supplied parameters', (done) => {
+    let promised;
+    let mockGHRequest;
+
+    beforeEach(() => {
+      mockGHRequest = null;
       const userPromise = factory.user();
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-      let mockGHRequest;
 
-      Promise.props({
+      promised = Promise.props({
         user: userPromise,
         site: sitePromise,
-      })
-      .then((values) => {
+      });
+    });
+
+    it('returns a branch based on the supplied parameters', (done) => {
+      promised.then((values) => {
         const { owner, repository } = values.site;
         const branch = 'master';
 
@@ -293,6 +299,26 @@ describe('GitHub', () => {
         expect(branchInfo.commit).to.be.defined;
         expect(mockGHRequest.isDone()).to.be.true;
         done();
+      })
+      .catch(done);
+    });
+
+    it('returns an error if branch is not defined', (done) => {
+      promised.then((values) => {
+        const { owner, repository } = values.site;
+        const branch = 'master';
+
+        mockGHRequest = githubAPINocks.getBranch({
+          owner,
+          repo: repository,
+          branch,
+        });
+
+        return GitHub.getBranch(values.user, owner, repository)
+          .catch((err) => {
+            expect(err.status).to.equal('400')
+            done();
+          });
       })
       .catch(done);
     });
