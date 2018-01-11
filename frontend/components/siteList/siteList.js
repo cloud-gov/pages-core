@@ -33,14 +33,14 @@ const getSites = (sitesState) => {
   }
 
   return (
-      <ul className="sites-list usa-unstyled-list">
-        {
-          sitesState.data
-            .slice() // create a copy so that sort doesn't modify the original
-            .sort((a, b) => a.id - b.id) // sort ascending by id
-            .map(site => (<SiteListItem key={site.id} site={site} />))
-        }
-      </ul>
+    <ul className="sites-list usa-unstyled-list">
+      {
+        sitesState.data
+          .slice() // create a copy so that sort doesn't modify the original
+          .sort((a, b) => a.id - b.id) // sort ascending by id
+          .map(site => (<SiteListItem key={site.id} site={site} />))
+      }
+    </ul>
   );
 };
 
@@ -71,10 +71,10 @@ export const SiteList = ({ storeState }) =>
       </div>
     </div>
 
-      <AlertBanner {...storeState.alert} />
+    <AlertBanner {...storeState.alert} />
 
     {getSites(storeState.sites)}
-      {addWebsiteButton()}
+    {addWebsiteButton()}
   </div>);
 
 SiteList.propTypes = propTypes;
