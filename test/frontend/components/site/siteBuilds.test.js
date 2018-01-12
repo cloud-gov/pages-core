@@ -63,7 +63,7 @@ describe('<SiteBuilds/>', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
     const userIndex = columnIndex(wrapper, 'User');
 
-    const userCell = wrapper.find('tr').at(1).find('th').at(userIndex);
+    const userCell = wrapper.find('tr').at(0).find('td').at(userIndex);
     expect(userCell.text()).to.equal('');
   });
 
