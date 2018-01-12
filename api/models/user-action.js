@@ -53,6 +53,7 @@ module.exports = (sequelize, DataTypes) => {
     sequelize.models.UserAction.findAll({
       where: { siteId },
       attributes: ['id', 'targetType', 'siteId', 'createdAt'],
+      order: [['createdAt', 'DESC']],
       include: [{
         model: sequelize.models.User,
         as: 'actionTarget',
