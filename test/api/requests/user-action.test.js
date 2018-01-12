@@ -60,9 +60,9 @@ describe('UserAction API', () => {
     });
 
     it('returns a list of user actions associated with a site', (done) => {
-      const userActionCount = 2;
+      const userActionCount = 3;
       let currentUser;
-      let actions;
+      let siteId;
 
       factory.user()
       .then((user) => {
@@ -70,11 +70,11 @@ describe('UserAction API', () => {
         return userActionFactory.buildMany(userActionCount, { user });
       })
       .then((userActions) => {
-        actions = userActions;
+        siteId = userActions[0].siteId;
         return buildAuthenticatedSession(currentUser);
       })
       .then(cookie =>
-        makeGetRequest(200, { id: actions[0].siteId, cookie })
+        makeGetRequest(200, { id: siteId, cookie })
       )
       .then((response) => {
         const { body } = response;
@@ -82,9 +82,15 @@ describe('UserAction API', () => {
         expect(body).to.be.defined;
         expect(body.length).to.equal(userActionCount);
 
+        let lastCreatedAt = (new Date()).toISOString();
+
         body.forEach((action) => {
           expect(action.actionTarget).to.have.all.keys('id', 'username', 'email', 'createdAt');
           expect(action.actionType).to.have.all.keys('action');
+
+          // make sure they are in descending order by createdAt
+          expect(action.createdAt).to.be.lte(lastCreatedAt);
+          lastCreatedAt = action.createdAt;
         });
 
         done();

@@ -44,6 +44,24 @@ function toJSON() {
   });
 }
 
+const tableOptions = {
+  tableName: 'user',
+  classMethods: {
+    associate,
+  },
+  instanceMethods: {
+    toJSON,
+  },
+  paranoid: true,
+  scopes: {
+    withGithub: {
+      where: {
+        githubAccessToken: { $ne: null },
+      },
+    },
+  },
+};
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     email: {
@@ -66,16 +84,7 @@ module.exports = (sequelize, DataTypes) => {
       unique: true,
       allowNull: false,
     },
-  }, {
-    tableName: 'user',
-    classMethods: {
-      associate,
-    },
-    instanceMethods: {
-      toJSON,
-    },
-    paranoid: true,
-  });
+  }, tableOptions);
 
   return User;
 };

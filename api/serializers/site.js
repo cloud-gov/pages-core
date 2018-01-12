@@ -12,7 +12,7 @@ const serializeObject = (site) => {
 };
 
 const serialize = (serializable) => {
-  const include = [User];
+  const include = [User.scope('withGithub')];
 
   if (serializable.length !== undefined) {
     const siteIds = serializable.map(site => site.id);
