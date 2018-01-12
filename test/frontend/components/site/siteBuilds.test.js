@@ -72,7 +72,7 @@ describe('<SiteBuilds/>', () => {
 
     const wrapper = shallow(<SiteBuilds {...props} />);
     const branchIndex = columnIndex(wrapper, 'Branch');
-    const branchCell = wrapper.find('tr').at(1).find('td').at(branchIndex);
+    const branchCell = wrapper.find('tr').at(1).find('th').at(branchIndex);
 
     expect(branchCell.text()).to.equal('master');
   });
