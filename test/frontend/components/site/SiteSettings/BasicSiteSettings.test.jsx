@@ -58,12 +58,12 @@ describe('<BasicSiteSettings/>', () => {
     const props = makeProps();
     let wrapper = shallow(<BasicSiteSettings {...props} />);
     expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('button.button-reset').prop('disabled')).to.be.true;
+    expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.true;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.true;
 
     props.pristine = false;
     wrapper = shallow(<BasicSiteSettings {...props} />);
-    expect(wrapper.find('button.button-reset').prop('disabled')).to.be.false;
+    expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.false;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.false;
   });
 
@@ -71,7 +71,7 @@ describe('<BasicSiteSettings/>', () => {
     const props = makeProps();
     props.pristine = false;
     const wrapper = shallow(<BasicSiteSettings {...props} />);
-    const resetButton = wrapper.find('button.button-reset');
+    const resetButton = wrapper.find('button.usa-button-secondary');
 
     expect(props.reset.called).to.be.false;
     resetButton.simulate('click');
