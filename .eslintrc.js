@@ -59,4 +59,7 @@ module.exports = {
   extends: 'airbnb',
   plugins: finalPlugins,
   rules: finalRules,
+  parserOptions: {
+    ecmaVersion: 6
+  },
 };
