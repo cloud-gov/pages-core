@@ -60,6 +60,6 @@ module.exports = {
   plugins: finalPlugins,
   rules: finalRules,
   parserOptions: {
-    ecmaVersion: 6
+    ecmaVersion: 6,
   },
 };

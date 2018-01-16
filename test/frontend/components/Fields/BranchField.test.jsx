@@ -1,8 +1,6 @@
-import React from 'react';
-import { shallow } from 'enzyme';
 import { expect } from 'chai';
 
-import BranchField, { validateBranchName } from '../../../../frontend/components/Fields/BranchField';
+import { validateBranchName } from '../../../../frontend/components/Fields/BranchField';
 
 describe('<BranchField />', () => {
   it('validates', () => {
