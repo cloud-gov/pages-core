@@ -18,9 +18,14 @@
 
  }
 .usa-nav {
-  background-color: transparent;
-  padding-top: 0;
+  background-color: $header-bg-color;
 }
+@media screen and (min-width: 951px) {
+  .usa-nav {
+    padding-top: 0;
+  }
+}
+
 .usa-nav-primary {
   li {
     a {
@@ -31,9 +36,14 @@
         color: #fff;
       }
       &:hover {
-      color: #fff;
+      color: #000;
         span {
           border-color: #fff;
+        }
+      }
+      @media screen and (min-width: 951px) {
+        &:hover {
+        color: #fff;
         }
       }
     }
@@ -71,11 +81,11 @@ nav {
   margin-bottom: 0;
 }
 
-nav ul {
-  display: flex;
-  margin-bottom: 0;
-  margin-top: 0;
-}
+// nav ul {
+//   display: flex;
+//   margin-bottom: 0;
+//   margin-top: 0;
+// }
 
 @media screen and (max-width: 600px) {
   nav li:first-of-type {
@@ -88,12 +98,12 @@ nav li:before {
   display: none;
 }
 
-nav li {
-  display: inline-block;
-  flex-grow: 1;
-  list-style-type: none;
-  text-align: right;
-}
+// nav li {
+//   display: inline-block;
+//   flex-grow: 1;
+//   list-style-type: none;
+//   text-align: right;
+// }
 
 nav li a,
 nav li a:visited,

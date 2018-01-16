@@ -12,6 +12,8 @@ import store from './store';
 
 import './sass/styles.scss';
 
+import '../node_modules/uswds/dist/js/uswds.min';
+
 const history = syncHistoryWithStore(browserHistory, store);
 
 const mainEl = document.querySelector('#js-app');
