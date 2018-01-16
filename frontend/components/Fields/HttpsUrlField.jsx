@@ -2,8 +2,7 @@ import React from 'react';
 import { Field } from 'redux-form';
 import { isURL } from 'validator';
 
-import RenderUrlField from './RenderUrlField';
-
+import InputWithErrorField from './InputWithErrorField';
 
 export const isHttpsUrlWithoutPath = (value) => {
   if (value && value.length) {
@@ -17,7 +16,7 @@ export const isHttpsUrlWithoutPath = (value) => {
 
 const HttpsUrlField = ({ ...props }) => (
   <Field
-    component={RenderUrlField}
+    component={InputWithErrorField}
     validate={[isHttpsUrlWithoutPath]}
     {...props}
   />
