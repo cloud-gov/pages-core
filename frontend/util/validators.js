@@ -1,3 +1,3 @@
-const validBranchName = /^[a-zA-Z0-9._-]+$/;
+const validBranchName = s => /^[a-zA-Z0-9._-]+$/.test(s);
 
-export { validBranchName };
+export default validBranchName;
