@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const RenderUrlField = ({
+const InputWithErrorField = ({
   id,
   placeholder,
   label,
@@ -27,7 +27,7 @@ const RenderUrlField = ({
   </div>
 );
 
-RenderUrlField.propTypes = {
+InputWithErrorField.propTypes = {
   id: PropTypes.string.isRequired,
   placeholder: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
@@ -39,9 +39,9 @@ RenderUrlField.propTypes = {
   type: PropTypes.string,
 };
 
-RenderUrlField.defaultProps = {
+InputWithErrorField.defaultProps = {
   help: null,
   type: 'url',
 };
 
-export default RenderUrlField;
+export default InputWithErrorField;

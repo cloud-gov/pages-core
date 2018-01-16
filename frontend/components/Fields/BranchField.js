@@ -1,6 +1,6 @@
 import React from 'react';
 import { Field } from 'redux-form';
-import RenderUrlField from './RenderUrlField';
+import InputWithErrorField from './InputWithErrorField';
 
 const invalidPrefix = /^[/|.]/;
 const invalidChars = /(.*\.{2}|.*\/{2}|^@$|.*@\{|[\s<>~^:?[\\])/;
@@ -21,7 +21,7 @@ export const validateBranchName = (value) => {
 
 const BranchField = ({ ...props }) =>
   <Field
-    component={RenderUrlField}
+    component={InputWithErrorField}
     validate={[validateBranchName]}
     {...props}
   />;
