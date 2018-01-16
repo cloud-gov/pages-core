@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-
+import { validBranchName } from '../util/validators';
 import { SITE } from '../propTypes';
 
 const isDefaultBranch = (branchName, site) => branchName === site.defaultBranch;
@@ -9,7 +9,7 @@ const isDefaultBranch = (branchName, site) => branchName === site.defaultBranch;
 const isDemoBranch = (branchName, site) => branchName === site.demoBranch;
 
 // we only want to link branch names that are alphanumeric plus _, -, and .
-const isLinkable = s => /^[a-zA-Z0-9._-]+$/.test(s);
+const isLinkable = s => validBranchName.test(s);
 
 const getUrlAndViewText = (branchName, site, previewHostname) => {
   if (isDefaultBranch(branchName, site)) {
