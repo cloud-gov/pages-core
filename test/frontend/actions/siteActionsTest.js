@@ -101,9 +101,8 @@ describe('siteActions', () => {
     }).default;
   });
 
-  const expectDispatchOfHttpErrorAlert = (errMsg) => {
+  const expectDispatchOfHttpErrorAlert = errMsg =>
     expect(httpErrorAlertAction.calledWith(errMsg)).to.be.true;
-  };
 
   const validateResultDispatchesHttpAlertError = (promise, errMsg) => promise.then(() => {
     expectDispatchOfHttpErrorAlert(errMsg);
@@ -162,6 +161,17 @@ describe('siteActions', () => {
       return actual.then(() => {
         expect(dispatchSiteAddedAction.called).to.be.false;
         expect(updateRouterToSiteBuildsUri.called).to.be.false;
+        expect(updateRouterToSitesUri.calledOnce).to.be.true;
+        validateResultDispatchesHttpAlertError(actual, errorMessage);
+      });
+    });
+
+    it('triggers an error and redirects when a thrown error is caught', () => {
+      addSite.withArgs(siteToAdd).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.addSite(siteToAdd);
+
+      return actual.catch(() => {
         expect(updateRouterToSitesUri.calledOnce).to.be.true;
         validateResultDispatchesHttpAlertError(actual, errorMessage);
       });
