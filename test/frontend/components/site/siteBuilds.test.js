@@ -42,7 +42,7 @@ describe('<SiteBuilds/>', () => {
 
   const columnIndex = (wrapper, name) => {
     let index;
-    wrapper.find('th').children().forEach((child, childIndex) => {
+    wrapper.find('tr').children().forEach((child, childIndex) => {
       if (child.contains(name)) {
         index = childIndex;
       }
