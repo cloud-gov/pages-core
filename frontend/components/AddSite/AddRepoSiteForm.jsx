@@ -79,12 +79,12 @@ export const AddRepoSiteForm = ({
               />
             </div>
             <div className="form-group">
-              <label htmlFor="defaultBranch">Primary branch</label>
               <BranchField
-                component="input"
+                label="Primary branch"
                 type="text"
                 id="defaultBranch"
                 className="form-control"
+                placeholder="master"
                 name="defaultBranch"
                 required
               />

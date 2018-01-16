@@ -9,6 +9,7 @@ const RenderUrlField = ({
   meta: { touched, error }, // from the Field component
   // eslint-disable-next-line react/prop-types
   input, // from the Field component
+  type,
   ...props
 }) => (
   <div className={touched && error ? 'usa-input-error' : ''}>
@@ -19,7 +20,7 @@ const RenderUrlField = ({
       {...input}
       {...props}
       placeholder={placeholder}
-      type="url"
+      type={type}
       id={id}
       autoComplete="off"
     />
@@ -35,10 +36,12 @@ RenderUrlField.propTypes = {
     touched: PropTypes.bool,
     error: PropTypes.string,
   }).isRequired,
+  type: PropTypes.string,
 };
 
 RenderUrlField.defaultProps = {
   help: null,
+  type: 'url',
 };
 
 export default RenderUrlField;
