@@ -106,7 +106,7 @@ The following environment variables are set on the Cloud Foundry environment in 
 - `NPM_CONFIG_PRODUCTION`: This should be set to true in Cloud Foundry to prevent Yarn/NPM from installing dev dependencies
 - `NODE_MODULES_CACHE`: This should be set to true in Cloud Foundry to prevent caching node modules since those are vendored by Federalist
 - `APP_NAME`: The name of the Cloud Foundry application
-- `APP_COMAIN`: The hostname where the application runs in Cloud Foundry
+- `APP_DOMAIN`: The hostname where the application runs in Cloud Foundry
 
 Secrets cannot be kept in the application manifest so they are provided by Cloud Foundry services.
 The app expects the following user provided services to be provided:
@@ -144,9 +144,11 @@ docker-compose run app yarn test
 You can also just run back or front end tests via:
 
 ```sh
-docker-compose run app yarn test:server  # for back end tests
-docker-compose run app yarn test:client  # for front end tests
+docker-compose run app yarn test:server  # for all back end tests
+docker-compose run app yarn test:server:file ./test/api/<path/to/test.js> # to run a single back end test file
+docker-compose run app yarn test:client  # for all front end tests
 docker-compose run app yarn test:client:watch  # to watch and re-run front end tests
+docker-compose run app yarn test:client:file ./test/frontend/<path/to/test.js> # to run a single front end test file
 ```
 
 To view coverage reports as HTML after running the full test suite:

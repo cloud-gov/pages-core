@@ -38,7 +38,10 @@ export default {
           updateRouterToSitesUri();
         }
       })
-      .catch(alertError);
+      .catch((err) => {
+        updateRouterToSitesUri();
+        alertError(err);
+      });
   },
 
   addUserToSite({ owner, repository }) {

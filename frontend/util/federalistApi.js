@@ -87,6 +87,8 @@ export default {
     return this.fetch('site', {
       method: 'POST',
       data: site,
+    }, {
+      handleHttpError: false,
     });
   },
 
