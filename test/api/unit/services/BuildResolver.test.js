@@ -28,8 +28,8 @@ describe('BuildResolver', () => {
       values = response;
       return BuildResolver.getBuild(values.user, {
         buildId: 1,
-        siteId: values.site.id
-      })
+        siteId: values.site.id,
+      });
     })
     .then(() => {
       done();
@@ -37,7 +37,7 @@ describe('BuildResolver', () => {
     .catch((err) => {
       expect(err.status).to.equal(404);
       expect(err.message).to.equal(buildErrors.BUILD_NOT_FOUND);
-      done()
+      done();
     });
   });
 
@@ -56,11 +56,11 @@ describe('BuildResolver', () => {
       values = response;
       return BuildResolver.getBuild(values.user, {
         buildId: values.build.id,
-        siteId: values.site.id
-      })
+        siteId: values.site.id,
+      });
     })
-    .then((build) => {
-      expect(build.id).to.equal(values.build.id);
+    .then((response) => {
+      expect(response.id).to.equal(values.build.id);
       done();
     })
     .catch(done);
@@ -78,16 +78,16 @@ describe('BuildResolver', () => {
       site,
       build,
     })
-    .then((values) =>
+    .then(values =>
       BuildResolver.getBuild(values.user, {
         branch,
         siteId: values.site.id,
         sha,
       })
     )
-    .then((build) => {
-      expect(build.branch).to.equal(branch);
-      expect(build.commitSha).to.equal(sha);
+    .then((response) => {
+      expect(response.branch).to.equal(branch);
+      expect(response.commitSha).to.equal(sha);
       done();
     })
     .catch(done);

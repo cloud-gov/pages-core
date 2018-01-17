@@ -1,4 +1,4 @@
-const { User, Build, Site } = require('../models');
+const { Build, Site } = require('../models');
 const buildErrors = require('../responses/buildErrors');
 const GitHub = require('../services/GitHub');
 
@@ -24,7 +24,7 @@ const getBuildById = (user, params) => {
     where: {
       id: buildId,
       site: siteId,
-    }
+    },
   })
   .then((model) => {
     if (model) {
@@ -67,7 +67,7 @@ const BuildResolver = {
     const finderFn = params.buildId ? getBuildById : getBuildByBranch;
 
     return finderFn(user, params);
-  }
+  },
 };
 
 module.exports = BuildResolver;
