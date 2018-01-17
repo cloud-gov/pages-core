@@ -50,7 +50,7 @@ This will be the file that holds your S3 and SQS configurations.
     ```
     The organization will need to grant access to federalist, which can be done during:
       * a first-time login with your GitHub credentials
-      * in the [Authorized OAuth Apps](https://github.com/settings/applications) tab in Settings -> Applications -> federalist view in your GitHub Account
+      * in the [Authorized OAuth Apps](https://github.com/settings/applications) tab in your GitHub Account settings
 1. Paste `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` into your terminal window.
 1. Visit https://login.fr.cloud.gov/passcode to get a Temporary Authentication Code.
 1. Paste this code into the terminal, and hit the return key. (For security purposes, the code won't be rendered in the terminal.)
