@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const { stub } = require('sinon');
 const SQS = require('../../../../api/services/SQS');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
@@ -39,16 +40,26 @@ describe('Build model', () => {
   });
 
   describe('after create hook', () => {
-    // TODO: This doesnt test anything
+    let sendMessageStub;
+
+    beforeEach(() => {
+      sendMessageStub = stub(SQS, 'sendBuildMessage');
+    });
+
+    afterEach(() => {
+      sendMessageStub.restore();
+    });
+
     it('should send a build new build message', (done) => {
-      const oldSendMessage = SQS.sqsClient.sendMessage;
-
-      SQS.sqsClient.sendMessage = () => {
-        SQS.sqsClient.sendMessage = oldSendMessage;
-        done();
-      };
-
       factory.build()
+      .then((build) => {
+        const queuedBuild = sendMessageStub.getCall(0).args[0];
+
+        expect(sendMessageStub.called).to.be.true;
+        expect(queuedBuild.id).to.equal(build.id);
+
+        done();
+      })
       .catch(done);
     });
   });
