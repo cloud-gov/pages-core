@@ -8,7 +8,7 @@ const rejectBuild = msg =>
     message: msg,
   });
 
-const getBranch = ({ user, site, branch }) =>
+const getBranchFromGithub = ({ user, site, branch }) =>
   GitHub.getBranch(user, site.owner, site.repository, branch)
   .then(branchInfo => ({
     branch: branchInfo.name,
@@ -44,6 +44,8 @@ const getBuildByBranch = (user, params) => {
     include: {
       model: Build,
       where: { branch },
+      orderBy: [['createdAt', 'desc']],
+      limit: 1,
       required: false,
     },
   })
@@ -58,7 +60,7 @@ const getBuildByBranch = (user, params) => {
 
     // We don't have a build record, using this branch, go to github and check if the
     // requested branch is a valid one for the current site.
-    return getBranch({ user, site, branch });
+    return getBranchFromGithub({ user, site, branch });
   });
 };
 
