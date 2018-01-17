@@ -55,7 +55,9 @@ const getBuildByBranch = (user, params) => {
 
     // The branch we want to create a new build from has been built via federalist before
     if (build) {
-      return Object.assign({}, build.toJSON(), { commitSha: sha });
+      return Object.assign({}, build.toJSON(), {
+        commitSha: build.commitSha || sha,
+      });
     }
 
     // We don't have a build record, using this branch, go to github and check if the
