@@ -52,7 +52,7 @@ export const BasicSiteSettings = ({
           id="defaultBranchInput"
           name="defaultBranch"
           className="form-control"
-          placeholder=""
+          placeholder="Branch name"
         />
         <HttpsUrlField
           label="Live URL:"
