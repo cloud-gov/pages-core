@@ -13,10 +13,10 @@ Federalist is a unified interface for publishing static government websites. It 
 
 ### Dependencies / Tooling
 
-Before you start, ensure you have the following installed:
+**Before attempting to run a local development server, ensure you have the following installed:**
 
-- [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
-- [Docker Compose](https://docs.docker.com/compose/install/#install-compose)
+- [Install Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
+- [Install Docker Compose](https://docs.docker.com/compose/install/#install-compose)
 
 ### Running locally (development)
 
