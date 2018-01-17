@@ -28,7 +28,7 @@ Federalist uses Docker Compose for local development.
 1. Clone the `18F/federalist` repository from Github and `cd` to that directory.
 1. Make a copy of `config/local.sample.js` and name it `local.js` and place it in the `config` folder. You can do this by running `cp config/local{.sample,}.js`
 This will be the file that holds your S3 and SQS configurations.
-1. [Register a new OAuth application on GitHub](https://github.com/settings/applications/new). Give your app a name and URL (`http://localhost:1337`, e.g.), and use `http://localhost:1337/auth` as the "Authorization callback url".
+1. [Register a new OAuth application on GitHub](https://github.com/settings/applications/new). Give your app a name and "Homepage URL" (`http://localhost:1337`, e.g.), and use `http://localhost:1337/auth` as the "Authorization callback url".
 
 1. Once you have created the application, you'll see a `Client ID` and `Client Secret`. Open the `config/local.js` file in your html editor and update it with these values:
     ```js
