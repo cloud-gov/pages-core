@@ -46,7 +46,7 @@ describe('<AddRepoSiteForm />', () => {
     props.showAddNewSiteFields = true;
     wrapper = shallow(<AddRepoSiteForm {...props} />);
     expect(wrapper.find('Field[name="engine"]')).to.have.length(1);
-    expect(wrapper.find('Field[name="defaultBranch"]').props().required).to.be.true;
+    expect(wrapper.find('BranchField').props().required).to.be.true;
   });
 
   it('makes GitHubRepoUrlField readOnly when showAddNewSiteFields is true', () => {
