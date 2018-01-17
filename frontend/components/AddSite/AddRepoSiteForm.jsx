@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 import { Link } from 'react-router';
 
+import BranchField from '../Fields/BranchField';
 import GitHubRepoUrlField from '../Fields/GitHubRepoUrlField';
 import SelectSiteEngine from '../SelectSiteEngine';
 
@@ -78,12 +79,12 @@ export const AddRepoSiteForm = ({
               />
             </div>
             <div className="form-group">
-              <label htmlFor="defaultBranch">Primary branch</label>
-              <Field
-                component="input"
+              <BranchField
+                label="Primary branch"
                 type="text"
                 id="defaultBranch"
                 className="form-control"
+                placeholder="master"
                 name="defaultBranch"
                 required
               />
