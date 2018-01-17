@@ -21,7 +21,7 @@ Before you start, ensure you have the following installed:
 ### Then follow these steps to set up and run your server
 In order to provide a simple development user experience, Federalist has some complexity on the backend. So as part of your local setup, you will need to emulate some of that complexity through the creation steps below. This shouldn't take longer than 15 minutes.
 
-_Note: some terminal commands may take a while to process, without offering feedback to you._
+_Note: some terminal commands may take a while to process, without offering feedback to you. Your patience will be rewarded!_
 
 Federalist uses Docker Compose for local development.
 
