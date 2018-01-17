@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Field, reduxForm } from 'redux-form';
+import { reduxForm } from 'redux-form';
 
 import HttpsUrlField from '../../Fields/HttpsUrlField';
+import BranchField from '../../Fields/BranchField';
 
 const propTypes = {
   // initialValues is what the initial form values are based on
@@ -45,15 +46,13 @@ export const BasicSiteSettings = ({
             live URL
           </a> to ensure the site builds correctly.
         </p>
-        <label htmlFor="defaultBranchInput">
-          Branch name:
-        </label>
-        <Field
-          component="input"
+        <BranchField
+          label="Branch name:"
           type="text"
           id="defaultBranchInput"
           name="defaultBranch"
           className="form-control"
+          placeholder=""
         />
         <HttpsUrlField
           label="Live URL:"
@@ -72,9 +71,8 @@ export const BasicSiteSettings = ({
           to be deployed to a custom URL like <code>demo.example.gov</code> instead
           of a standard Federalist preview URL.
         </p>
-        <label htmlFor="demoBranchInput">Branch name:</label>
-        <Field
-          component="input"
+        <BranchField
+          label="Branch name:"
           name="demoBranch"
           id="demoBranchInput"
           className="form-control"
