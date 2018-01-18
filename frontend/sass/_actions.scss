@@ -12,8 +12,8 @@ button,
 .usa-button,
 a.usa-button,
 .usa-button[role=button] {
-  border-radius: 0;
   background-color: $button-color;
+  border-radius: 0;
   font-weight: 400;
   &:hover {
     background-color: $button-color-active;

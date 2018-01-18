@@ -4,22 +4,21 @@
   flex-wrap: wrap;
 
   &.flexbox-grid-4 {
-
     @media (min-width: 100px) {
       .flexbox-item {
-          flex: 0 0 100%;
-        }
+        flex: 0 0 100%;
       }
+    }
     @media (min-width: 500px) {
       .flexbox-item {
-          flex: 0 0 48%;
-        }
+        flex: 0 0 48%;
       }
+    }
     @media (min-width: 800px) {
       .flexbox-item {
-          flex: 0 0 24%;
-        }
+        flex: 0 0 24%;
       }
+    }
 
     .flexbox-item {
       display: block;

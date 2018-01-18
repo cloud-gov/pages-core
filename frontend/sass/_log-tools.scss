@@ -1,9 +1,11 @@
 .log-tools {
   float: right;
   text-align: right;
+
   :last-child {
     margin-right: 0;
   }
+
   li {
     display: inline;
     margin-left: 20px;

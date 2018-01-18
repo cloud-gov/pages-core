@@ -15,8 +15,8 @@
   .usa-logo {
     top: -.45rem;
   }
+}
 
- }
 .usa-nav {
   background-color: $header-bg-color;
 }
@@ -29,63 +29,33 @@
 .usa-nav-primary {
   li {
     a {
+      color: #fff;
       font-size: 1.7rem;
       font-weight: 600;
-      color: #fff;
       &:visited {
         color: #fff;
       }
       &:hover {
-      color: #000;
+        color: #000;
         span {
           border-color: #fff;
         }
       }
       @media screen and (min-width: 951px) {
         &:hover {
-        color: #fff;
+          color: #fff;
         }
       }
     }
   }
   .usa-button {
-    padding: 1rem 2rem;
     background: $button-color;
+    padding: 1rem 2rem;
     &:hover {
       background-color: $button-color-active;
     }
   }
 }
-
-$nav-padding: .45em;
-
-nav {
-  padding-bottom: $nav-padding;
-  padding-top: $nav-padding;
-}
-
-.nav-elements {
-  display: flex;
-  min-height: 50px;
-}
-
-.logo {
-  flex-grow: 3;
-}
-
-.navbar-links {
-  flex-grow: 1;
-}
-
-.navbar-links li:after {
-  margin-bottom: 0;
-}
-
-// nav ul {
-//   display: flex;
-//   margin-bottom: 0;
-//   margin-top: 0;
-// }
 
 @media screen and (max-width: 600px) {
   nav li:first-of-type {
@@ -98,13 +68,6 @@ nav li:before {
   display: none;
 }
 
-// nav li {
-//   display: inline-block;
-//   flex-grow: 1;
-//   list-style-type: none;
-//   text-align: right;
-// }
-
 nav li a,
 nav li a:visited,
 nav li a:hover,
@@ -112,24 +75,15 @@ nav li a:visited {
   color: white;
 }
 
-$logo-width: 140px;
-$logo-height: 29px;
-
-.logo {
-  align-items: center;
-  display: flex;
-}
-
 .usa-logo a {
   background-image: url('/images/logo.svg');
+  background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
   color: transparent;
   display: inline-block;
   height: auto;
   width: 100px;
-  background-position: center;
-
 }
 @media screen and (min-width: 951px) {
   .usa-logo a {
@@ -139,10 +93,10 @@ $logo-height: 29px;
 }
 .header-icon {
   display: inline-block;
+  height: 36px;
   margin-left: -60px;
   margin-right: 10px;
   vertical-align: text-top;
-  height: 36px;
 }
 
 .header-title {
@@ -170,10 +124,9 @@ $logo-height: 29px;
     margin-left: 2rem;
   }
   :last-child {
-    margin-right:0;
+    margin-right: 0;
   }
 }
-/// New styles Scott
 .page-header,
 .usa-grid .page-header {
   margin-bottom: 1.5em;

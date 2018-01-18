@@ -2,21 +2,21 @@
   thead {
     background-color: $color-gray-lightest;
   }
+
   th:first-child {
     padding-left: 1rem;
   }
 }
 
-
 .log-table {
   font-size: 1.45rem;
 
   pre {
-    overflow: auto;
-    white-space: pre-wrap;
     margin: 0;
     max-height: 200px;
     max-width: 200px;
+    overflow: auto;
+    white-space: pre-wrap;
   }
 }
 
