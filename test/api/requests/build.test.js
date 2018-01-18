@@ -7,7 +7,7 @@ const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
 const { authenticatedSession, unauthenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
-const { Build, User, Site } = require('../../../api/models');
+const { Build, Site } = require('../../../api/models');
 const csrfToken = require('../support/csrfToken');
 
 const commitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
@@ -91,7 +91,7 @@ describe('Build API', () => {
       .catch(done);
     });
 
-    it('returns a 403 if a build to restart is not associated with the user', (done) => {
+    it('returns a 404 if a build to restart is not associated with the site', (done) => {
       const userPromise = factory.user();
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
 
@@ -108,12 +108,13 @@ describe('Build API', () => {
             siteId: promises.site.id,
           })
           .set('Cookie', promises.cookie)
-          .expect(403)
+          .expect(404)
+      )
       .then((response) => {
-        validateAgainstJSONSchema('POST', '/build', 403, response.body);
+        validateAgainstJSONSchema('POST', '/build', 404, response.body);
         done();
       })
-      ).catch(done);
+      .catch(done);
     });
 
     describe('successful requests', () => {
@@ -337,27 +338,23 @@ describe('Build API', () => {
     });
 
     it('should return a JSON representation of the build', (done) => {
+      const user = factory.user();
+      const site = factory.site({ users: Promise.all([user]) });
+      const buildPromise = factory.build({ site });
       let build;
-      const buildAttributes = {
-        error: 'message',
-        state: 'error',
-        branch: '18f-pages',
-        completedAt: new Date(),
-        commitSha,
-      };
 
-      factory.build(buildAttributes).then((model) => {
-        build = model;
-        return authenticatedSession(
-          User.findById(build.user)
-        );
+      Promise.props({
+        cookie: authenticatedSession(user),
+        site,
+        build: buildPromise,
       })
-      .then(cookie =>
-        request(app)
+      .then((values) => {
+        build = values.build;
+        return request(app)
           .get(`/v0/build/${build.id}`)
-          .set('Cookie', cookie)
-          .expect(200)
-      )
+          .set('Cookie', values.cookie)
+          .expect(200);
+      })
       .then((response) => {
         buildResponseExpectations(response.body, build);
         validateAgainstJSONSchema('GET', '/build/{id}', 200, response.body);
