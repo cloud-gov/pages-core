@@ -56,11 +56,11 @@ This will be the file that holds your S3 and SQS configurations.
 1. Paste this code into the terminal, and hit the return key. (For security purposes, the code won't be rendered in the terminal.)
 1. Type `cf apps`.
 1. Type `cf env federalist-staging` to get environment variables.
-1. Find the section in the listing of environment variables for SQS and look for the following values and paste those values into the SQS section in your `local.js` file.
+1. Open your `local.js` file and find the `sqs` environment variables section. Then paste the following values from the terminal:
     - `FEDERALIST_AWS_BUILD_KEY` is `accessKeyId`
     - `FEDERALIST_SESSION_SECRET` is `secretAccessKey`
     - `FEDERALIST_SQS_QUEUE` is `queue`
-1. Find the section in the listing of environment variables that starts with `"s3": [` and look for the following values and paste those values into the S3 section in your `local.js` file. Leave the `region` value as `'us-gov-west-1'`.
+1. Next find the `s3` section of the file and paste these values from the terminal (leave the `region` value as `'us-gov-west-1'`):
     - `access_key_id`
     - `secret_access_key`
     - `bucket`
