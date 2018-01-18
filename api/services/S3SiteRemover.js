@@ -46,14 +46,25 @@ const getKeys = prefix =>
   S3Helper.listObjects(prefix)
     .then(objects => objects.map(o => o.Key));
 
-const removeSite = site =>
-  Promise.all([
-    getKeys(`site/${site.owner}/${site.repository}`),
-    getKeys(`demo/${site.owner}/${site.repository}`),
-    getKeys(`preview/${site.owner}/${site.repository}`),
-  ]).then((keys) => {
-    const mergedKeys = [].concat(...keys);
+const removeSite = (site) => {
+  const prefixes = [
+    `site/${site.owner}/${site.repository}`,
+    `demo/${site.owner}/${site.repository}`,
+    `preview/${site.owner}/${site.repository}`,
+  ];
+
+  return Promise.all(
+    prefixes.map(prefix => getKeys(`${prefix}/`))
+  ).then((keys) => {
+    // S3 puts redirect objects in the root of each user's folder which correspond to the
+    // names of each site prefix. We have to manually add them to the array of keys to delete
+    // because `listObjects` will no longer find them now that each prefix is suffixed
+    // with a trailing slash
+    const redirectObjects = prefixes.slice(0);
+    const mergedKeys = redirectObjects.concat(...keys);
+
     return deleteObjects(mergedKeys);
   });
+};
 
 module.exports = { removeSite };
