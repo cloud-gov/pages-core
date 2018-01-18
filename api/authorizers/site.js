@@ -16,6 +16,8 @@ const authorize = ({ id }, site) => (
 const create = () => Promise.resolve();
 const addUser = () => Promise.resolve();
 
+const createBuild = (user, site) => authorize(user, site);
+
 const showActions = (user, site) => authorize(user, site);
 
 const findOne = (user, site) => authorize(user, site);
@@ -26,4 +28,13 @@ const destroy = (user, site) => authorize(user, site);
 
 const removeUser = (user, site) => authorize(user, site);
 
-module.exports = { create, findOne, update, destroy, addUser, removeUser, showActions };
+module.exports = {
+  create,
+  findOne,
+  update,
+  destroy,
+  addUser,
+  removeUser,
+  showActions,
+  createBuild,
+};
