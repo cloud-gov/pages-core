@@ -54,7 +54,6 @@ This will be the file that holds your S3 and SQS configurations.
 1. Paste `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` into your terminal window.
 1. Visit https://login.fr.cloud.gov/passcode to get a Temporary Authentication Code.
 1. Paste this code into the terminal, and hit the return key. (For security purposes, the code won't be rendered in the terminal.)
-1. Type `cf apps`.
 1. Type `cf env federalist-staging` to get environment variables.
 1. Open your `local.js` file and find the `sqs` environment variables section. Then paste the following values from the terminal:
     - `FEDERALIST_AWS_BUILD_KEY` is `accessKeyId`
