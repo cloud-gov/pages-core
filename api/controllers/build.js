@@ -1,7 +1,7 @@
-const authorizer = require('../authorizers/build');
 const buildSerializer = require('../serializers/build');
 const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
 const siteAuthorizer = require('../authorizers/site');
+const BuildResolver = require('../services/BuildResolver');
 const { Build, Site } = require('../models');
 
 const decodeb64 = str => new Buffer(str, 'base64').toString('utf8');
@@ -55,7 +55,8 @@ module.exports = {
    * e.g. `sites/1/builds/1`
    */
   create: (req, res) => {
-    authorizer.create(req.user, req.body)
+    siteAuthorizer.createBuild(req.user, { id: req.body.siteId })
+    .then(() => BuildResolver.getBuild(req.user, req.body))
     .then(build =>
       Build.create({
         branch: build.branch,
@@ -92,7 +93,7 @@ module.exports = {
       } else {
         res.notFound();
       }
-      return authorizer.findOne(req.user, { buildId: build.id, siteId: build.site });
+      return siteAuthorizer.findOne(req.user, { id: build.site });
     })
     .then(() => buildSerializer.serialize(build))
     .then(buildJSON => res.json(buildJSON))

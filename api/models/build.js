@@ -102,6 +102,9 @@ module.exports = (sequelize, DataTypes) => {
   const Build = sequelize.define('Build', {
     branch: {
       type: DataTypes.STRING,
+      validate: {
+        is: /^[a-zA-Z0-9._-]+$/,
+      },
     },
     commitSha: {
       type: DataTypes.STRING,
