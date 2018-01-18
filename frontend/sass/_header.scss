@@ -123,6 +123,9 @@ nav li a:visited {
     display: inline-block;
     margin-left: 2rem;
   }
+  :first-child {
+    margin-left: 0;
+  }
   :last-child {
     margin-right: 0;
   }
