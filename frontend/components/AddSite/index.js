@@ -84,33 +84,34 @@ export class AddSite extends React.Component {
       <div>
         <AlertBanner message={this.props.storeState.error} />
         <div className="usa-grid">
-          <div className="usa-width-one-whole">
-            <h1>Make a new site</h1>
-          </div>
-        </div>
-        <div className="usa-grid">
-          <div className="usa-width-one-whole">
+          <div className="page-header usa-grid-full">
+              <div className="header-title">
+                <h1>
+                  <img className="header-icon" src="/images/website.svg" alt="Websites icon" />
+                  Make a new site
+                </h1>
+              </div>
+            </div>
             <p>
               There are a few different ways you can add sites to Federalist.
               You can start with a brand new site by selecting one of our template sites below.
               Or you can specify the GitHub repository where your site&#39;s code lives.
             </p>
-          </div>
-        </div>
+
         <TemplateSiteList
           handleSubmitTemplate={this.onSubmitTemplate}
           defaultOwner={this.defaultOwner()}
         />
 
-        <div className="usa-grid">
-          <h2>Or add your own GitHub repository</h2>
-        </div>
 
-        <AddRepoSiteForm
-          initialValues={{ engine: availableEngines[0].value }}
-          showAddNewSiteFields={this.props.showAddNewSiteFields}
-          onSubmit={formSubmitFunc}
-        />
+          <h2>Or add your own GitHub repository</h2>
+
+          <AddRepoSiteForm
+            initialValues={{ engine: availableEngines[0].value }}
+            showAddNewSiteFields={this.props.showAddNewSiteFields}
+            onSubmit={formSubmitFunc}
+          />
+        </div>
       </div>
     );
   }
