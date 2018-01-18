@@ -25,12 +25,12 @@ describe('<BasicSiteSettings/>', () => {
   it('should render', () => {
     const props = makeProps();
     const wrapper = shallow(<BasicSiteSettings {...props} />);
+    const branchFields = wrapper.find('BranchField');
+
     expect(wrapper.exists()).to.be.true;
-
-    expect(wrapper.find('Field')).to.have.length(2);
-    expect(wrapper.find('Field[name="defaultBranch"]').exists()).to.be.true;
-    expect(wrapper.find('Field[name="demoBranch"]').exists()).to.be.true;
-
+    expect(branchFields).to.have.length(2);
+    expect(branchFields.at(0).prop('name')).to.equal('defaultBranch');
+    expect(branchFields.at(1).prop('name')).to.equal('demoBranch');
     expect(wrapper.find('HttpsUrlField')).to.have.length(2);
 
     const domainField = wrapper.find('HttpsUrlField[name="domain"]');
