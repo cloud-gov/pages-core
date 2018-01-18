@@ -56,12 +56,15 @@ const removeSite = (site) => {
   return Promise.all(
     prefixes.map(prefix => getKeys(`${prefix}/`))
   ).then((keys) => {
-    // S3 puts redirect objects in the root of each user's folder which correspond to the
-    // names of each site prefix. We have to manually add them to the array of keys to delete
-    // because `listObjects` will no longer find them now that each prefix is suffixed
-    // with a trailing slash
-    const redirectObjects = prefixes.slice(0);
-    const mergedKeys = redirectObjects.concat(...keys);
+    let mergedKeys = [].concat(...keys);
+
+    if (mergedKeys.length) {
+      // S3 puts redirect objects in the root of each user's folder which correspond to the
+      // names of each site prefix. We have to manually add them to the array of keys to delete
+      // because `listObjects` will no longer find them now that each prefix is suffixed
+      // with a trailing slash
+      mergedKeys = mergedKeys.concat(prefixes.slice(0));
+    }
 
     return deleteObjects(mergedKeys);
   });
