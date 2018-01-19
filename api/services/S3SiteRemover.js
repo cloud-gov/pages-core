@@ -59,10 +59,12 @@ const removeSite = (site) => {
     let mergedKeys = [].concat(...keys);
 
     if (mergedKeys.length) {
-      // S3 puts redirect objects in the root of each user's folder which correspond to the
-      // names of each site prefix. We have to manually add them to the array of keys to delete
-      // because `listObjects` will no longer find them now that each prefix is suffixed
-      // with a trailing slash
+      /**
+       * The federalist build container puts redirect objects in the root of each user's folder
+       * which correspond to the name of each site prefix. Because each site prefix is suffixed
+       * with a trailing `/`, `listObjects will no longer see them.
+       * Therefore, they are manually added to the array of keys marked for deletion.
+       */
       mergedKeys = mergedKeys.concat(prefixes.slice(0));
     }
 
