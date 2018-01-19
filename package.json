@@ -60,7 +60,8 @@
     "migrate:reset": "node migrate.js reset",
     "export:sites": "node ./scripts/exportSitesAsCsv.js",
     "analyze-webpack": "webpack-bundle-analyzer -h 0.0.0.0 public/stats.json",
-    "serve-coverage": "http-server ./coverage"
+    "serve-coverage": "http-server ./coverage",
+    "update-local-config": "node ./scripts/update-local-config.js"
   },
   "main": "index.js",
   "repository": {

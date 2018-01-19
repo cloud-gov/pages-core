@@ -1,5 +1,6 @@
 # Local config
 config/local.js
+config/local-from-staging.js
 
 # Webpack-generated assets
 public/js/bundle.js
