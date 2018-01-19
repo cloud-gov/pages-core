@@ -1,6 +1,6 @@
 const validator = require('validator');
-
 const config = require('../../config');
+const branchRegex = /^[a-zA-Z0-9._-]+$/;
 
 const afterValidate = (site) => {
   if (site.defaultBranch === site.demoBranch) {
@@ -110,6 +110,9 @@ module.exports = (sequelize, DataTypes) => {
   const Site = sequelize.define('Site', {
     demoBranch: {
       type: DataTypes.STRING,
+      validate: {
+        is: branchRegex,
+      },
     },
     demoDomain: {
       type: DataTypes.STRING,
@@ -123,6 +126,9 @@ module.exports = (sequelize, DataTypes) => {
     defaultBranch: {
       type: DataTypes.STRING,
       defaultValue: 'master',
+      validate: {
+        is: branchRegex,
+      },
     },
     domain: {
       type: DataTypes.STRING,

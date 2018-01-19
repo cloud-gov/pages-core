@@ -3,10 +3,13 @@ const config = require('../../../../config');
 const factory = require('../../support/factory');
 const { Site } = require('../../../../api/models');
 
+const owner = 'owner';
+const repository = 'repository';
+
 describe('Site model', () => {
   describe('before validate hook', () => {
     it('should lowercase the owner and repository values', (done) => {
-      Site.create({
+      factory.site({
         owner: 'RepoOwner',
         repository: 'RepoName',
       }).then((site) => {
@@ -85,9 +88,7 @@ describe('Site model', () => {
   });
 
   it('should not let the domain and demoDomain be equal', (done) => {
-    Site.create({
-      owner: 'owner',
-      repository: 'repository',
+    factory.site({
       domain: 'https://www.example.gov',
       demoDomain: 'https://www.example.gov',
     }).catch((err) => {
@@ -98,9 +99,7 @@ describe('Site model', () => {
   });
 
   it('should not let the defaultBranch and demoBranch be equal', (done) => {
-    Site.create({
-      owner: 'owner',
-      repository: 'repository',
+    factory.site({
       defaultBranch: 'preview',
       demoBranch: 'preview',
     }).catch((err) => {
@@ -111,9 +110,7 @@ describe('Site model', () => {
   });
 
   it('should validate that the domain is a valid URL', (done) => {
-    Site.create({
-      owner: 'owner',
-      repository: 'repository',
+    factory.site({
       domain: 'boop://beep.com',
     }).catch((err) => {
       expect(err.status).to.equal(403);
@@ -123,14 +120,33 @@ describe('Site model', () => {
   });
 
   it('should validate that the demoDomain is a valid URL', (done) => {
-    Site.create({
-      owner: 'owner',
-      repository: 'repository',
+    factory.site({
       demoDomain: 'beep.com',
     }).catch((err) => {
       expect(err.status).to.equal(403);
       expect(err.message).to.equal('demoDomain: URL must start with https://');
       done();
     }).catch(done);
+  });
+
+  it('should validate the primary branch name is valid', (done) => {
+    factory.site({
+      defaultBranch: 'very/bad',
+    }).catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('defaultBranch: Validation is failed');
+      done();
+    });
+  });
+
+  it('should validate the demo branch name is valid', (done) => {
+    factory.site({
+      demoBranch: 'in@valid',
+    })
+    .catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('demoBranch: Validation is failed');
+      done();
+    })
   });
 });
