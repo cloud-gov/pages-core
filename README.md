@@ -9,23 +9,28 @@
 
 Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub and Amazon Web Services to provide a simple way for developers to launch new static websites or more easily manage existing static websites. This repo is home to "federalist-core" - a Node.js app that allows government users to add and configure their Federalist sites.
 
-## Getting started
+## How to set up a local Federalist development server
 
-### Dependencies / Tooling
+### First install these dependencies
 
 Before you start, ensure you have the following installed:
 
 - [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
 - [Docker Compose](https://docs.docker.com/compose/install/#install-compose)
 
-### Running locally (development)
+### Then follow these steps to set up and run your server
+In order to provide a simple development user experience, Federalist has some complexity on the backend. So as part of your local setup, you will need to emulate some of that complexity through the creation steps below. This shouldn't take longer than 15 minutes.
+
+_Note: some terminal commands may take a while to process, without offering feedback to you. Your patience will be rewarded!_
 
 Federalist uses Docker Compose for local development.
 
 1. Clone the `18F/federalist` repository from Github and `cd` to that directory.
 1. Make a copy of `config/local.sample.js` and name it `local.js` and place it in the `config` folder. You can do this by running `cp config/local{.sample,}.js`
 This will be the file that holds your S3 and SQS configurations.
-1. [Register a new OAuth application on GitHub](https://github.com/settings/applications/new). You'll want to use `http://localhost:1337/auth` as the "Authorization callback url". Once you have created the application, you'll see a `Client ID` and `Client Secret`. Add these values to `config/local.js`.
+1. [Register a new OAuth application on GitHub](https://github.com/settings/applications/new). Give your app a name and "Homepage URL" (`http://localhost:1337`, e.g.), and use `http://localhost:1337/auth` as the "Authorization callback url".
+
+1. Once you have created the application, you'll see a `Client ID` and `Client Secret`. Open the `config/local.js` file in your text or code editor and update it with these values:
     ```js
     passport: {
       github: {
@@ -37,28 +42,19 @@ This will be the file that holds your S3 and SQS configurations.
       }
     }
     ```
-1. [Register or create a new GitHub organization](https://github.com/settings/organizations). Find your organization's ID by visiting `https://api.github.com/orgs/<your-org-name>` and copying the `id` into the whitelist of `organizations` in `config/local.js`.
+1. [Register or create a new GitHub organization](https://github.com/settings/organizations) with a name of your choosing. Then find your organization's ID by visiting `https://api.github.com/orgs/<your-org-name>` and copying the `id` into the whitelist of `organizations` in `config/local.js`.
     ```js
     organizations: [
       99999999 // your org added here
     ]
     ```
-    The organization will need to grant access to federalist, which can be done during:
-      * a first-time login with your GitHub credentials
-      * in the Settings -> Applications -> federalist view in your GitHub Account
-1. Type `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` in terminal.
-1. Visit https://login.fr.cloud.gov/passcode to get a one time passcode.
-1. Enter your passcode back into terminal.
-1. Type `cf apps`.
-1. Type `cf env federalist-staging` to get environment variables.
-1. Find the section in the listing of environment variables that starts with `"s3": [` and look for the following values and paste those values into the S3 section in your `local.js` file.
-    - `access_key_id`
-    - `bucket`
-    - `secret_access_key`
-1. Find the section in the listing of environment variables for SQS and look for the following values and paste those values into the SQS section in your `local.js` file.
-    - `FEDERALIST_AWS_BUILD_KEY` is `accessKeyId`
-    - `FEDERALIST_SESSION_SECRET` is `secretAccessKey`
-    - `FEDERALIST_SQS_QUEUE` is `queue`
+    The organization will need to grant access to federalist, which can be done:
+      * during a first-time login with your GitHub credentials, or
+      * in the [Authorized OAuth Apps](https://github.com/settings/applications) tab in your GitHub Account settings
+1. Paste `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` into your terminal window.
+1. Visit https://login.fr.cloud.gov/passcode to get a Temporary Authentication Code.
+1. Paste this code into the terminal, and hit the return key. (For security purposes, the code won't be rendered in the terminal.)
+1. Type `npm run update-local-config` to read necessary service keys from the staging environment and load them into a local file called `config/local-from-staging.js`. Note that this command will need to be re-run with some frequency, as service keys are changed every time Federalist's staging instance is deployed.
 1. Run `docker-compose build`.
 1. Run `docker-compose run app yarn && docker-compose run app yarn build` to install dependencies and build the app initially.
 1. Run `docker-compose up` to start the development environment.  You should now be able to see Federalist running at http://localhost:1337/. Local file changes will cause the server to restart and/or the front end bundles to be rebuilt.
@@ -106,7 +102,7 @@ The following environment variables are set on the Cloud Foundry environment in 
 - `NPM_CONFIG_PRODUCTION`: This should be set to true in Cloud Foundry to prevent Yarn/NPM from installing dev dependencies
 - `NODE_MODULES_CACHE`: This should be set to true in Cloud Foundry to prevent caching node modules since those are vendored by Federalist
 - `APP_NAME`: The name of the Cloud Foundry application
-- `APP_COMAIN`: The hostname where the application runs in Cloud Foundry
+- `APP_DOMAIN`: The hostname where the application runs in Cloud Foundry
 
 Secrets cannot be kept in the application manifest so they are provided by Cloud Foundry services.
 The app expects the following user provided services to be provided:
@@ -144,9 +140,11 @@ docker-compose run app yarn test
 You can also just run back or front end tests via:
 
 ```sh
-docker-compose run app yarn test:server  # for back end tests
-docker-compose run app yarn test:client  # for front end tests
+docker-compose run app yarn test:server  # for all back end tests
+docker-compose run app yarn test:server:file ./test/api/<path/to/test.js> # to run a single back end test file
+docker-compose run app yarn test:client  # for all front end tests
 docker-compose run app yarn test:client:watch  # to watch and re-run front end tests
+docker-compose run app yarn test:client:file ./test/frontend/<path/to/test.js> # to run a single front end test file
 ```
 
 To view coverage reports as HTML after running the full test suite:

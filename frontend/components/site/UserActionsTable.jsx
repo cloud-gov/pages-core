@@ -1,43 +1,79 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { USER_ACTION } from '../../propTypes';
-import { dayAndDate } from '../../util/datetime';
+import { timestampUTC } from '../../util/datetime';
+import userActions from '../../actions/userActions';
 
 const propTypes = {
+  site: PropTypes.number.isRequired,
   userActions: PropTypes.arrayOf(USER_ACTION),
 };
-const defaultProps = {
+
+class UserActionsTable extends React.Component {
+  componentDidMount() {
+    userActions.fetchUserActions(this.props.site);
+  }
+
+  renderRow(action) {
+    return (
+      <tr key={`${action.id}-${action.targetType}`}>
+        <td>{action.initiator.username}</td>
+        <td>{action.actionType.action}</td>
+        <td>{action.actionTarget.username}</td>
+        <td>{timestampUTC(action.createdAt)}</td>
+      </tr>
+    );
+  }
+
+  renderTableHead() {
+    return (
+      <thead>
+        <tr>
+          <th>
+            Initiator
+          </th>
+          <th>
+            Action
+          </th>
+          <th>
+            Target
+          </th>
+          <th>
+            Timestamp (UTC)
+          </th>
+        </tr>
+      </thead>
+    );
+  }
+
+  render() {
+    const actions = this.props.userActions;
+
+    if (!actions || !actions.length) {
+      return null;
+    }
+
+    return (
+      <table>
+        <caption>Action Log</caption>
+        {this.renderTableHead()}
+        <tbody>
+          {actions.map(this.renderRow)}
+        </tbody>
+      </table>
+    );
+  }
+}
+
+UserActionsTable.propTypes = propTypes;
+UserActionsTable.defaultProps = {
   userActions: [],
 };
 
-const UserActionsTable = ({ userActions }) =>
-  <table>
-    <caption>Action Log (All actions performed across all sites)</caption>
-    <thead>
-      <tr>
-        <th>
-          Action
-        </th>
-        <th>
-          Target
-        </th>
-        <th>
-          Performed on
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      {userActions.map(action =>
-        <tr key={`${action.id}-${action.targetType}`}>
-          <th>{action.actionType.action}</th>
-          <th>{action.actionTarget.username}</th>
-          <th>{dayAndDate(action.createdAt)}</th>
-        </tr>
-      )}
-    </tbody>
-  </table>;
+const mapStateToProps = state => ({
+  userActions: state.userActions.data,
+});
 
-UserActionsTable.propTypes = propTypes;
-UserActionsTable.defaultProps = defaultProps;
-
-export default UserActionsTable;
+export { UserActionsTable };
+export default connect(mapStateToProps)(UserActionsTable);

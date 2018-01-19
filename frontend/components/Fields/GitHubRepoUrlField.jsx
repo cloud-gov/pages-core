@@ -1,6 +1,6 @@
 import React from 'react';
 import { Field } from 'redux-form';
-import RenderUrlField from './RenderUrlField';
+import InputWithErrorField from './InputWithErrorField';
 
 const githubUrlRegex = /^https:\/\/github\.com\/[a-zA-Z0-9._-]{2,}\/[a-zA-Z0-9._-]{2,}$/;
 
@@ -13,7 +13,7 @@ export const githubRepoUrl = (value) => {
 
 const GitHubRepoUrlField = ({ ...props }) => (
   <Field
-    component={RenderUrlField}
+    component={InputWithErrorField}
     validate={[githubRepoUrl]}
     {...props}
   />

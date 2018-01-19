@@ -482,7 +482,32 @@ paths:
           description: Not found
           schema:
             $ref: "Error.json"
-
+  /site/{site_id}/user-action:
+    parameters:
+      - name: site_id
+        in: path
+        description: the id of the site
+        type: integer
+        required: true
+    get:
+      summary: Fetch all user actions for a given site
+      responses:
+        200:
+          description: An array of UserAction records
+          schema:
+            $ref: "UserAction.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
   /me:
     get:
       summary: Fetch data for the current user

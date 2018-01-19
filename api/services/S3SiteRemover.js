@@ -46,14 +46,30 @@ const getKeys = prefix =>
   S3Helper.listObjects(prefix)
     .then(objects => objects.map(o => o.Key));
 
-const removeSite = site =>
-  Promise.all([
-    getKeys(`site/${site.owner}/${site.repository}`),
-    getKeys(`demo/${site.owner}/${site.repository}`),
-    getKeys(`preview/${site.owner}/${site.repository}`),
-  ]).then((keys) => {
-    const mergedKeys = [].concat(...keys);
+const removeSite = (site) => {
+  const prefixes = [
+    `site/${site.owner}/${site.repository}`,
+    `demo/${site.owner}/${site.repository}`,
+    `preview/${site.owner}/${site.repository}`,
+  ];
+
+  return Promise.all(
+    prefixes.map(prefix => getKeys(`${prefix}/`))
+  ).then((keys) => {
+    let mergedKeys = [].concat(...keys);
+
+    if (mergedKeys.length) {
+      /**
+       * The federalist build container puts redirect objects in the root of each user's folder
+       * which correspond to the name of each site prefix. Because each site prefix is suffixed
+       * with a trailing `/`, `listObjects will no longer see them.
+       * Therefore, they are manually added to the array of keys marked for deletion.
+       */
+      mergedKeys = mergedKeys.concat(prefixes.slice(0));
+    }
+
     return deleteObjects(mergedKeys);
   });
+};
 
 module.exports = { removeSite };

@@ -1,0 +1,3 @@
+- Level of effort:
+- Implementation outline (if higher than a "low" effort):
+- Definition of done:

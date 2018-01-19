@@ -22,9 +22,14 @@ fs.readdirSync(__dirname)
     config[configName] = require(filepath);
   });
 
-if (fs.existsSync([__dirname, 'local.js'].join('/'))) {
+if (fs.existsSync(path.join(__dirname, 'local.js'))) {
   // eslint-disable-next-line global-require, import/no-dynamic-require
-  deepExtend(config, require([__dirname, 'local.js'].join('/')));
+  deepExtend(config, require(path.join(__dirname, 'local.js')));
+}
+
+if (fs.existsSync(path.join(__dirname, 'local-from-staging.js'))) {
+  // eslint-disable-next-line global-require, import/no-dynamic-require
+  deepExtend(config, require(path.join(__dirname, 'local-from-staging.js')));
 }
 
 const environment = process.env.NODE_ENV;

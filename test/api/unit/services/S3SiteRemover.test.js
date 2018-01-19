@@ -5,6 +5,20 @@ const config = require('../../../../config');
 
 const S3SiteRemover = require('../../../../api/services/S3SiteRemover');
 
+const mapSiteContents = objects => ({
+  Contents: objects.map(Key => ({ Key })),
+});
+
+const buildSiteObjects = (qualifier = 'site', site, bucket) => {
+  const prefix = `${qualifier}/${site.owner}/${site.repository}`;
+
+  bucket.push(`${prefix}/index.html`);
+  bucket.push(`${prefix}/redirect`);
+  bucket.push(`${prefix}/redirect/index.html`);
+
+  return bucket;
+};
+
 describe('S3SiteRemover', () => {
   after(() => {
     AWSMocks.resetMocks();
@@ -15,45 +29,50 @@ describe('S3SiteRemover', () => {
       const siteObjectsToDelete = [];
       const demoObjectsToDelete = [];
       const previewObjectsToDelete = [];
+
       let site;
       let objectsWereDeleted = false;
       let siteObjectsWereListed = false;
       let demoObjectWereListed = false;
       let previewObjectsWereListed = false;
+      let objectsToDelete;
 
       AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
-        if (params.Prefix === `site/${site.owner}/${site.repository}`) {
+        if (params.Prefix === `site/${site.owner}/${site.repository}/`) {
           siteObjectsWereListed = true;
-          cb(null, {
-            Contents: siteObjectsToDelete.map(Key => ({ Key })),
-          });
-        } else if (params.Prefix === `demo/${site.owner}/${site.repository}`) {
+          cb(null, mapSiteContents(siteObjectsToDelete));
+        } else if (params.Prefix === `demo/${site.owner}/${site.repository}/`) {
           demoObjectWereListed = true;
-          cb(null, {
-            Contents: demoObjectsToDelete.map(Key => ({ Key })),
-          });
-        } else if (params.Prefix === `preview/${site.owner}/${site.repository}`) {
+          cb(null, mapSiteContents(demoObjectsToDelete));
+        } else if (params.Prefix === `preview/${site.owner}/${site.repository}/`) {
           previewObjectsWereListed = true;
-          cb(null, {
-            Contents: previewObjectsToDelete.map(Key => ({ Key })),
-          });
+          cb(null, mapSiteContents(previewObjectsToDelete));
         }
       };
+
+
       AWSMocks.mocks.S3.deleteObjects = (params, cb) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
 
-        const objectsToDelete = [
+        objectsToDelete = [
           ...siteObjectsToDelete,
           ...demoObjectsToDelete,
           ...previewObjectsToDelete,
+          ...[
+            `site/${site.owner}/${site.repository}`,
+            `demo/${site.owner}/${site.repository}`,
+            `preview/${site.owner}/${site.repository}`,
+          ],
         ];
+
         expect(params.Delete.Objects).to.have.length(objectsToDelete.length);
         params.Delete.Objects.forEach((object) => {
           const index = objectsToDelete.indexOf(object.Key);
           expect(index).to.be.at.least(0);
           objectsToDelete.splice(index, 1);
         });
+
         objectsWereDeleted = true;
         cb(null, {});
       };
@@ -61,18 +80,9 @@ describe('S3SiteRemover', () => {
       factory.site().then((model) => {
         site = model;
 
-        const sitePrefix = `site/${site.owner}/${site.repository}`;
-        siteObjectsToDelete.push(`${sitePrefix}/index.html`);
-        siteObjectsToDelete.push(`${sitePrefix}/redirect`);
-        siteObjectsToDelete.push(`${sitePrefix}/redirect/index.html`);
-        const demoPrefix = `demo/${site.owner}/${site.repository}`;
-        demoObjectsToDelete.push(`${demoPrefix}/index.html`);
-        demoObjectsToDelete.push(`${demoPrefix}/redirect`);
-        demoObjectsToDelete.push(`${demoPrefix}/redirect/index.html`);
-        const previewPrefix = `preview/${site.owner}/${site.repository}`;
-        previewObjectsToDelete.push(`${previewPrefix}/index.html`);
-        previewObjectsToDelete.push(`${previewPrefix}/redirect`);
-        previewObjectsToDelete.push(`${previewPrefix}/redirect/index.html`);
+        buildSiteObjects('site', site, siteObjectsToDelete);
+        buildSiteObjects('demo', site, demoObjectsToDelete);
+        buildSiteObjects('preview', site, previewObjectsToDelete);
 
         return S3SiteRemover.removeSite(site);
       }).then(() => {
@@ -80,6 +90,8 @@ describe('S3SiteRemover', () => {
         expect(demoObjectWereListed).to.equal(true);
         expect(previewObjectsWereListed).to.equal(true);
         expect(objectsWereDeleted).to.equal(true);
+        expect(objectsToDelete.length).to.equal(0);
+
         done();
       }).catch(done);
     });

@@ -57,6 +57,10 @@ export default {
     return this.fetch('me');
   },
 
+  fetchUserActions(siteId) {
+    return this.fetch(`site/${siteId}/user-action`);
+  },
+
   addUserToSite({ owner, repository }) {
     return this.fetch('site/user', {
       method: 'POST',
@@ -83,6 +87,8 @@ export default {
     return this.fetch('site', {
       method: 'POST',
       data: site,
+    }, {
+      handleHttpError: false,
     });
   },
 

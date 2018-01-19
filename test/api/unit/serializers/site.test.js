@@ -35,5 +35,20 @@ describe('SiteSerializer', () => {
         })
         .catch(done);
     });
+
+    it('excludes users without a federalist account', (done) => {
+      const authUserCount = 3;
+      const nonGithubUser = factory.user({ githubAccessToken: null });
+      const otherUsers = Array(authUserCount).fill(0).map(() => factory.user());
+
+      Promise.all(otherUsers.concat(nonGithubUser))
+      .then(users => factory.site({ users }))
+      .then(SiteSerializer.serialize)
+      .then((object) => {
+        expect(object.users.length).to.equal(authUserCount);
+        done();
+      })
+      .catch(done);
+    });
   });
 });

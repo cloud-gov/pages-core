@@ -7,7 +7,7 @@ const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
 const { authenticatedSession, unauthenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
-const { Build, User, Site } = require('../../../api/models');
+const { Build, Site } = require('../../../api/models');
 const csrfToken = require('../support/csrfToken');
 
 const commitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
@@ -91,7 +91,7 @@ describe('Build API', () => {
       .catch(done);
     });
 
-    it('returns a 403 if a build to restart is not associated with the user', (done) => {
+    it('returns a 404 if a build to restart is not associated with the site', (done) => {
       const userPromise = factory.user();
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
 
@@ -108,50 +108,166 @@ describe('Build API', () => {
             siteId: promises.site.id,
           })
           .set('Cookie', promises.cookie)
-          .expect(403)
+          .expect(404)
+      )
       .then((response) => {
-        validateAgainstJSONSchema('POST', '/build', 403, response.body);
+        validateAgainstJSONSchema('POST', '/build', 404, response.body);
         done();
       })
-      ).catch(done);
+      .catch(done);
     });
 
     describe('successful requests', () => {
-      let userPromise;
-      let sitePromise;
-      let buildPromise;
+      describe('with an existing build', () => {
+        let promiseProps;
 
-      beforeEach(() => {
-        userPromise = factory.user();
-        sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        buildPromise = factory.build({
-          site: sitePromise,
-          branch: 'master',
-          commitSha,
-          user: userPromise,
+        beforeEach(() => {
+          const userPromise = factory.user();
+          const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+
+          promiseProps = Promise.props({
+            user: userPromise,
+            site: sitePromise,
+            build: factory.build({
+              site: sitePromise,
+              branch: 'master',
+              commitSha,
+              user: userPromise,
+            }),
+            cookie: authenticatedSession(userPromise),
+          });
+        });
+
+        it('should create a new build for the site given an existing build id', (done) => {
+          let site;
+          let user;
+
+          promiseProps
+          .then((promisedValues) => {
+            site = promisedValues.site;
+            user = promisedValues.user;
+
+            return validCreateRequest(
+              csrfToken.getToken(),
+              promisedValues.cookie,
+              {
+                buildId: promisedValues.build.id,
+                siteId: site.id,
+              }
+            );
+          })
+          .then((response) => {
+            validateAgainstJSONSchema('POST', '/build', 200, response.body);
+            return Build.findOne({
+              where: {
+                site: site.id,
+                user: user.id,
+                branch: 'my-branch',
+                commitSha,
+              },
+            });
+          })
+          .then((build) => {
+            expect(build).not.to.be.undefined;
+            done();
+          })
+          .catch(done);
+        });
+
+        it('creates a new build from a branch name given an existing build of that branch', (done) => {
+          let site;
+          let user;
+
+          promiseProps
+          .then((promisedValues) => {
+            site = promisedValues.site;
+            user = promisedValues.user;
+
+            return validCreateRequest(
+              csrfToken.getToken(),
+              promisedValues.cookie,
+              {
+                branch: promisedValues.build.branch,
+                siteId: promisedValues.build.site,
+                sha: promisedValues.build.commitSha,
+              }
+            );
+          })
+          .then((response) => {
+            validateAgainstJSONSchema('POST', '/build', 200, response.body);
+            return Build.findOne({
+              where: {
+                site: site.id,
+                user: user.id,
+                branch: 'my-branch',
+                commitSha,
+              },
+            });
+          })
+          .then((build) => {
+            expect(build).not.to.be.undefined;
+            done();
+          })
+          .catch(done);
+        });
+
+        it('should report the new build\'s status to GitHub', (done) => {
+          nock.cleanAll();
+          const statusNock = githubAPINocks.status({ state: 'pending' });
+
+          promiseProps
+          .then(promisedValues =>
+            validCreateRequest(
+              csrfToken.getToken(),
+              promisedValues.cookie,
+              {
+                buildId: promisedValues.build.id,
+                siteId: promisedValues.build.site,
+              }
+            )
+          )
+          .then(() => {
+            expect(statusNock.isDone()).to.be.true;
+            done();
+          })
+          .catch(done);
         });
       });
 
-      it('should create a new build for the site given an existing build id', (done) => {
+      it('creates a new build from a branch if that branch exists on GitHub', (done) => {
+        const branch = 'master';
         let site;
         let user;
+        let mockGHRequest;
+
+        const userPromise = factory.user();
 
         Promise.props({
           user: userPromise,
-          site: sitePromise,
-          build: buildPromise,
+          site: factory.site({ users: Promise.all([userPromise]) }),
           cookie: authenticatedSession(userPromise),
         })
         .then((promisedValues) => {
           site = promisedValues.site;
           user = promisedValues.user;
 
+          mockGHRequest = githubAPINocks.getBranch({
+            owner: site.owner,
+            repo: site.repository,
+            branch,
+            expected: {
+              name: branch,
+              commit: { sha: commitSha },
+            },
+          });
+
           return validCreateRequest(
             csrfToken.getToken(),
             promisedValues.cookie,
             {
-              buildId: promisedValues.build.id,
+              branch,
               siteId: site.id,
+              sha: commitSha,
             }
           );
         })
@@ -161,82 +277,15 @@ describe('Build API', () => {
             where: {
               site: site.id,
               user: user.id,
-              branch: 'my-branch',
+              branch,
               commitSha,
             },
           });
         })
         .then((build) => {
-          expect(build).not.to.be.undefined;
-          done();
-        })
-        .catch(done);
-      });
-
-      it('creates a new build from a branch name given an existing build of that branch', (done) => {
-        let site;
-        let user;
-
-        Promise.props({
-          user: userPromise,
-          site: sitePromise,
-          build: buildPromise,
-          cookie: authenticatedSession(userPromise),
-        })
-        .then((promisedValues) => {
-          site = promisedValues.site;
-          user = promisedValues.user;
-
-          return validCreateRequest(
-            csrfToken.getToken(),
-            promisedValues.cookie,
-            {
-              branch: promisedValues.build.branch,
-              siteId: promisedValues.build.site,
-              sha: promisedValues.build.commitSha,
-            }
-          );
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/build', 200, response.body);
-          return Build.findOne({
-            where: {
-              site: site.id,
-              user: user.id,
-              branch: 'my-branch',
-              commitSha,
-            },
-          });
-        })
-        .then((build) => {
-          expect(build).not.to.be.undefined;
-          done();
-        })
-        .catch(done);
-      });
-
-      it('should report the new build\'s status to GitHub', (done) => {
-        nock.cleanAll();
-        const statusNock = githubAPINocks.status({ state: 'pending' });
-
-        Promise.props({
-          user: userPromise,
-          site: sitePromise,
-          build: buildPromise,
-          cookie: authenticatedSession(userPromise),
-        })
-        .then(promisedValues =>
-          validCreateRequest(
-            csrfToken.getToken(),
-            promisedValues.cookie,
-            {
-              buildId: promisedValues.build.id,
-              siteId: promisedValues.build.site,
-            }
-          )
-        )
-        .then(() => {
-          expect(statusNock.isDone()).to.be.true;
+          expect(build).to.not.be.undefined;
+          expect(build.branch).to.equal(branch);
+          expect(mockGHRequest.isDone()).to.equal(true);
           done();
         })
         .catch(done);
@@ -289,27 +338,23 @@ describe('Build API', () => {
     });
 
     it('should return a JSON representation of the build', (done) => {
+      const user = factory.user();
+      const site = factory.site({ users: Promise.all([user]) });
+      const buildPromise = factory.build({ site });
       let build;
-      const buildAttributes = {
-        error: 'message',
-        state: 'error',
-        branch: '18f-pages',
-        completedAt: new Date(),
-        commitSha,
-      };
 
-      factory.build(buildAttributes).then((model) => {
-        build = model;
-        return authenticatedSession(
-          User.findById(build.user)
-        );
+      Promise.props({
+        cookie: authenticatedSession(user),
+        site,
+        build: buildPromise,
       })
-      .then(cookie =>
-        request(app)
+      .then((values) => {
+        build = values.build;
+        return request(app)
           .get(`/v0/build/${build.id}`)
-          .set('Cookie', cookie)
-          .expect(200)
-      )
+          .set('Cookie', values.cookie)
+          .expect(200);
+      })
       .then((response) => {
         buildResponseExpectations(response.body, build);
         validateAgainstJSONSchema('GET', '/build/{id}', 200, response.body);
