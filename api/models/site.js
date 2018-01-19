@@ -1,7 +1,7 @@
 const validator = require('validator');
 const config = require('../../config');
 
-const branchRegex = /^[a-zA-Z0-9._-]+$/;
+const { branchRegex } = require('../utils/validators');
 
 const afterValidate = (site) => {
   if (site.defaultBranch === site.demoBranch) {
