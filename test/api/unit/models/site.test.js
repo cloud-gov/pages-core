@@ -3,9 +3,6 @@ const config = require('../../../../config');
 const factory = require('../../support/factory');
 const { Site } = require('../../../../api/models');
 
-const owner = 'owner';
-const repository = 'repository';
-
 describe('Site model', () => {
   describe('before validate hook', () => {
     it('should lowercase the owner and repository values', (done) => {
@@ -147,6 +144,6 @@ describe('Site model', () => {
       expect(err.status).to.equal(403);
       expect(err.message).to.equal('demoBranch: Validation is failed');
       done();
-    })
+    });
   });
 });

@@ -1,5 +1,6 @@
 const validator = require('validator');
 const config = require('../../config');
+
 const branchRegex = /^[a-zA-Z0-9._-]+$/;
 
 const afterValidate = (site) => {

@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
 const SQS = require('../services/SQS');
+
 const branchRegex = /^[a-zA-Z0-9._-]+$/;
 
 const afterCreate = (build) => {
