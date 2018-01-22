@@ -57,6 +57,7 @@ This will be the file that holds your S3 and SQS configurations.
 1. Type `npm run update-local-config` to read necessary service keys from the staging environment and load them into a local file called `config/local-from-staging.js`. Note that this command will need to be re-run with some frequency, as service keys are changed every time Federalist's staging instance is deployed.
 1. Run `docker-compose build`.
 1. Run `docker-compose run app yarn && docker-compose run app yarn build` to install dependencies and build the app initially.
+1. Run `docker-compose run app yarn create-dev-data` and answer its prompts to create some fake development data for your local database.
 1. Run `docker-compose up` to start the development environment.  You should now be able to see Federalist running at http://localhost:1337/. Local file changes will cause the server to restart and/or the front end bundles to be rebuilt.
 
 **Pro tips:**
