@@ -12,17 +12,5 @@ if (process.env.NODE_ENV !== 'test') {
         ],
       },
     },
-    sqs: {
-      accessKeyId: 'SQS_ACCESS_KEY',
-      secretAccessKey: 'SQS_SECRET_KEY',
-      region: 'us-gov-west-1',
-      queue: 'SQS_URL',
-    },
-    s3: {
-      accessKeyId: 'S3_ACCESS_KEY',
-      secretAccessKey: 'S3_SECRET_KEY',
-      region: 'us-gov-west-1',
-      bucket: 'S3_BUCKET_NAME',
-    },
   };
 }
