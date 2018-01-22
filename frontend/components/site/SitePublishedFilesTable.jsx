@@ -126,7 +126,7 @@ class SitePublishedFilesTable extends React.Component {
           Use this page to audit the files that Federalist has publicly published.
           Up to 200 files are shown per page.
         </p>
-        <table className="usa-table-borderless">
+        <table className="usa-table-borderless table-full-width log-table">
           <thead>
             <tr>
               <th>File</th>

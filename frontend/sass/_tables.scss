@@ -18,6 +18,20 @@
     overflow: auto;
     white-space: pre-wrap;
   }
+  .usa-button {
+    font-size: 1.5rem;
+  }
+  .table-actions {
+    a {
+      margin: 0 .5rem;
+      &:first-child {
+        margin-left: 0;
+      }
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
 }
 
 .log-table__site-build-log pre {

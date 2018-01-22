@@ -37,7 +37,7 @@ const SiteUsers = ({ site, user }) => {
         Currently, new users get access for a specific site by
         logging into Federalist and adding the site themselves.
       </p>
-      <table className="usa-table-borderless table-full-width">
+      <table className="usa-table-borderless table-full-width log-table">
         <caption>Federalist users associated with this site</caption>
         <thead>
           <tr>

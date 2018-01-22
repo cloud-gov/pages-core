@@ -20,7 +20,7 @@ class SiteBuilds extends React.Component {
   }
 
   static buildLogsLink(build) {
-    return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>Logs</Link>;
+    return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>View logs</Link>;
   }
 
   static renderLoadingState() {
@@ -118,15 +118,15 @@ class SiteBuilds extends React.Component {
                   <td>{ timeFrom(build.completedAt) }</td>
                   <td>{ duration(build.createdAt, build.completedAt) }</td>
                   <td><pre>{ message }</pre></td>
-                  <td>
+                  <td className="table-actions">
+                    { SiteBuilds.buildLogsLink(build) }
                     <CreateBuildLink
                       handlerParams={{ buildId: build.id, siteId: site.id }}
                       handleClick={buildActions.restartBuild}
+                      class="usa-button usa-button-secondary"
                     >
                       Restart
                     </CreateBuildLink>
-                    <br />
-                    { SiteBuilds.buildLogsLink(build) }
                   </td>
                 </tr>
               );

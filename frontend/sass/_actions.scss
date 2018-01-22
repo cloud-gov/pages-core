@@ -18,4 +18,7 @@ a.usa-button,
   &:hover {
     background-color: $button-color-active;
   }
+  &.usa-button-secondary {
+    background-color: $color-white;
+  }
 }

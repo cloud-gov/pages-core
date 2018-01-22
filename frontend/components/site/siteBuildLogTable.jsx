@@ -6,7 +6,7 @@ import { timestampUTC } from '../../util/datetime';
 
 function SiteBuildLogTable({ buildLogs }) {
   return (
-    <table className="usa-table-borderless log-table log-table__site-build-log">
+    <table className="usa-table-borderless log-table log-table__site-build-log table-full-width">
       <thead>
         <tr>
           <th>Source</th>
