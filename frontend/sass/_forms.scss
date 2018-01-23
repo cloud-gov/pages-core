@@ -1,6 +1,5 @@
 label,
 legend {
-  font-size: inherit;
   font-weight: 800;
 }
 
@@ -17,36 +16,6 @@ label {
   margin-top: 2rem;
 }
 
-.usa-input-error {
-  margin-top: 2rem;
-  padding-top: 0;
-  padding-bottom: 0;
-
-  input[type="text"],
-  input[type="url"],
-  textarea {
-    border: 3px solid $uswds-error-color;
-  }
-}
-
-input[type="text"],
-input[type="url"],
-textarea {
-  border: 3px solid #ccc;
-}
-
-input[type="text"]:focus,
-textarea:focus {
-  background-color: white;
-  border: 1px solid $button-color;
-  box-shadow: 0;
-}
-
-select {
-  background-color: $secondary-background-color;
-  border: 0;
-}
-
 @media screen and (min-width: 600px) {
   form {
     max-width: 100%;
@@ -54,7 +23,7 @@ select {
 }
 
 .settings-form {
-  button[type="submit"] {
+  button[type='submit'] {
     display: inline;
   }
   .well {
@@ -69,4 +38,9 @@ select {
   select {
     margin-bottom: 2rem;
   }
+}
+
+// used to fix the padding on the advanced settings form section 
+.usa-accordion-content {
+  padding: 1.5rem 0;
 }

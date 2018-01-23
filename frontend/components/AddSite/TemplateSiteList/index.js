@@ -85,10 +85,8 @@ export class TemplateList extends React.Component {
 
     return (
       <div>
-        <div className="usa-grid">
-          <h2>Choose from one of our templates</h2>
-          {templateGrid}
-        </div>
+        <h2>Choose from one of our templates</h2>
+        {templateGrid}
       </div>
     );
   }

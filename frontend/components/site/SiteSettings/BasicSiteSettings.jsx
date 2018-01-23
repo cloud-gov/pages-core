@@ -90,7 +90,7 @@ export const BasicSiteSettings = ({
     </div>
     <button
       type="button"
-      className="usa-button usa-button-gray button-reset"
+      className="usa-button usa-button-secondary"
       disabled={pristine}
       onClick={reset}
     >

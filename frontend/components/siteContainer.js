@@ -96,16 +96,14 @@ export class SiteContainer extends React.Component {
 
     if (!site) {
       return (
-        <div className="usa-grid">
-          <div className="usa-alert usa-alert-error" role="alert">
-            <div className="usa-alert-body">
-              <h3 className="usa-alert-heading">Unauthorized</h3>
-              <p className="usa-alert-text">
-                Apologies; you don&apos;t have access to this site in Federalist!
-                <br />
-                Please contact the site owner if you should have access.
-              </p>
-            </div>
+        <div className="usa-alert usa-alert-error" role="alert">
+          <div className="usa-alert-body">
+            <h3 className="usa-alert-heading">Unauthorized</h3>
+            <p className="usa-alert-text">
+              Apologies; you don&apos;t have access to this site in Federalist!
+              <br />
+              Please contact the site owner if you should have access.
+            </p>
           </div>
         </div>
       );
@@ -133,12 +131,12 @@ export class SiteContainer extends React.Component {
       <div className="usa-grid site">
         <SideNav siteId={site.id} />
         <div className="usa-width-five-sixths site-main" id="pages-container">
-          <div className="usa-grid">
-            <AlertBanner
-              message={storeState.alert.message}
-              status={storeState.alert.status}
-            />
-          </div>
+
+          <AlertBanner
+            message={storeState.alert.message}
+            status={storeState.alert.status}
+          />
+
           <PagesHeader
             repository={site.repository}
             owner={site.owner}
@@ -148,7 +146,7 @@ export class SiteContainer extends React.Component {
             fileName={params.fileName}
             viewLink={site.viewLink}
           />
-          <div className="usa-grid">
+          <div className="">
             {children &&
               React.cloneElement(children, childConfigs)
             }

@@ -59,12 +59,13 @@ export class SiteGitHubBranches extends React.Component {
           </GitHubLink>
           { isDefault && ' (live branch)' }{ isDemo && ' (demo branch)' }
         </td>
-        <td>
+        <td className="table-actions">
           <BranchViewLink branchName={name} site={site} />
-          <br />
+
           <CreateBuildLink
             handlerParams={{ commit: commit.sha, branch: name, siteId: site.id }}
             handleClick={buildActions.createBuild}
+            className="usa-button usa-button-secondary"
           >
             Trigger build
           </CreateBuildLink>
@@ -78,7 +79,7 @@ export class SiteGitHubBranches extends React.Component {
           This page links to every live branch of your site
           code on GitHub and to each deployed build of that code.
         </p>
-        <table className="usa-table-borderless">
+        <table className="usa-table-borderless table-full-width log-table">
           <thead>
             <tr>
               <th>Branch</th>

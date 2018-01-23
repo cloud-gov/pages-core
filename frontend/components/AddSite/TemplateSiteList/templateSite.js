@@ -86,7 +86,7 @@ class TemplateSite extends React.Component {
                 value={this.state.repository}
                 onChange={this.handleChange}
               />
-              <input type="submit" value="Create site" />
+              <input type="submit" className="usa-button usa-button-primary" value="Create site" />
             </form>
           : null}
         </div>

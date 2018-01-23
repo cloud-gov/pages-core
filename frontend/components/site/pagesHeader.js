@@ -13,7 +13,7 @@ const propTypes = {
 };
 
 const PagesHeader = ({ owner, repository, title, viewLink }) => (
-  <div className="usa-grid header">
+  <div className="page-header usa-grid-full">
     <div className="usa-width-two-thirds">
       <div className="header-title">
         <h1>

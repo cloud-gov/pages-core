@@ -42,7 +42,7 @@ describe('<SiteBuilds/>', () => {
 
   const columnIndex = (wrapper, name) => {
     let index;
-    wrapper.find('th').children().forEach((child, childIndex) => {
+    wrapper.find('tr').children().forEach((child, childIndex) => {
       if (child.contains(name)) {
         index = childIndex;
       }
@@ -54,7 +54,7 @@ describe('<SiteBuilds/>', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
     const userIndex = columnIndex(wrapper, 'User');
 
-    const userCell = wrapper.find('tr').at(1).find('td').at(userIndex);
+    const userCell = wrapper.find('tr').at(1).find('td').at(userIndex - 1);
     expect(userCell.text()).to.equal(user.username);
   });
 
@@ -63,7 +63,7 @@ describe('<SiteBuilds/>', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
     const userIndex = columnIndex(wrapper, 'User');
 
-    const userCell = wrapper.find('tr').at(1).find('td').at(userIndex);
+    const userCell = wrapper.find('tr').at(0).find('td').at(userIndex);
     expect(userCell.text()).to.equal('');
   });
 
@@ -72,7 +72,7 @@ describe('<SiteBuilds/>', () => {
 
     const wrapper = shallow(<SiteBuilds {...props} />);
     const branchIndex = columnIndex(wrapper, 'Branch');
-    const branchCell = wrapper.find('tr').at(1).find('td').at(branchIndex);
+    const branchCell = wrapper.find('tr').at(1).find('th').at(branchIndex);
 
     expect(branchCell.text()).to.equal('master');
   });

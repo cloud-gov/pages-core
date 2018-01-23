@@ -1,5 +1,4 @@
 body {
-  color: $text-color;
   font-family: $sans-serif;
 }
 .usa-hero-callout {
@@ -15,14 +14,7 @@ body {
   color: inherit;
   text-align: center;
   p {
-    margin-top: 0;
-    padding-top: 1rem;
-  }
-}
-.navbar-links {
-  .usa-button {
-    margin-bottom: 0;
-    margin-top: -.4rem;
+    padding: 1rem 0;
   }
 }
 

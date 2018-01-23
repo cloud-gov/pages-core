@@ -20,7 +20,7 @@ const renderHeader = (text) => {
   }
 
   return (
-    <h3 className="usa-alert-header">
+    <h3 className="usa-alert-heading">
       { text }
     </h3>
   );

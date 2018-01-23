@@ -27,7 +27,7 @@ class SitePublishedBranchesTable extends React.Component {
           Use this page to see every version of your site&apos;s code published on
           Federalist and to audit the specific files that Federalist has published.
         </p>
-        <table className="usa-table-borderless published-branch-table">
+        <table className="usa-table-borderless published-branch-table log-table table-full-width">
           <thead>
             <tr>
               <th>Branch</th>
