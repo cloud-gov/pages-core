@@ -180,7 +180,7 @@ describe('SiteCreator', () => {
           return SiteCreator.createSite({ user, siteParams });
         })
         .catch((err) => {
-          const expectedError = `Organization '${siteParams.owner}'' hasn't approved access for federalist. Ask an owner to authorize it`;
+          const expectedError = `Organization '${siteParams.owner}' hasn't approved access for Federalist. Ask an owner to authorize it.`;
 
           expect(err.message).to.equal(expectedError);
           expect(err.status).to.equal(403);

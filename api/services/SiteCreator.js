@@ -56,10 +56,11 @@ function checkGithubOrg({ user, owner }) {
 
     return GitHub.checkOrganizations(user, owner);
   })
-  .then((existingOrg) => {
-    if (!existingOrg) {
+  .then((federalistAuthorizedOrg) => {
+    // Has this org authorized federalist as an oauth app?
+    if (!federalistAuthorizedOrg) {
       throw {
-        message: `Organization '${owner}'' hasn't approved access for federalist. Ask an owner to authorize it`,
+        message: `Organization '${owner}' hasn't approved access for Federalist. Ask an owner to authorize it.`,
         status: 403,
       };
     }
