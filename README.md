@@ -54,15 +54,7 @@ This will be the file that holds your S3 and SQS configurations.
 1. Paste `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` into your terminal window.
 1. Visit https://login.fr.cloud.gov/passcode to get a Temporary Authentication Code.
 1. Paste this code into the terminal, and hit the return key. (For security purposes, the code won't be rendered in the terminal.)
-1. Type `cf env federalist-staging` to get environment variables.
-1. Locate the 'sqs' environment variables section in the terminal window (under `"user-provided": [`), then paste the following values from there into your `local.js` file:
-    - `FEDERALIST_AWS_BUILD_KEY` is `accessKeyId`
-    - `FEDERALIST_AWS_BUILD_SECRET` is `secretAccessKey`
-    - `FEDERALIST_SQS_QUEUE` is `queue`    
-1. Next find the `"s3": [` section in the terminal and paste these values into `local.js` as well (leave the `region` value as `'us-gov-west-1'`):
-    - `access_key_id`
-    - `secret_access_key`
-    - `bucket`
+1. Type `npm run update-local-config` to read necessary service keys from the staging environment and load them into a local file called `config/local-from-staging.js`. Note that this command will need to be re-run with some frequency, as service keys are changed every time Federalist's staging instance is deployed.
 1. Run `docker-compose build`.
 1. Run `docker-compose run app yarn && docker-compose run app yarn build` to install dependencies and build the app initially.
 1. Run `docker-compose up` to start the development environment.  You should now be able to see Federalist running at http://localhost:1337/. Local file changes will cause the server to restart and/or the front end bundles to be rebuilt.

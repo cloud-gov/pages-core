@@ -2,6 +2,8 @@ const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
 const SQS = require('../services/SQS');
 
+const { branchRegex, shaRegex } = require('../utils/validators');
+
 const afterCreate = (build) => {
   const { Site, User, Build } = build.sequelize.models;
 
@@ -103,13 +105,13 @@ module.exports = (sequelize, DataTypes) => {
     branch: {
       type: DataTypes.STRING,
       validate: {
-        is: /^[a-zA-Z0-9._-]+$/,
+        is: branchRegex,
       },
     },
     commitSha: {
       type: DataTypes.STRING,
       validate: {
-        is: /^[a-f0-9]{40}$/,
+        is: shaRegex,
       },
     },
     completedAt: {
