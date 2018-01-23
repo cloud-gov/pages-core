@@ -48,7 +48,11 @@ function ownerIsFederalistUser(owner) {
 function checkGithubOrg({ user, owner }) {
   return ownerIsFederalistUser(owner)
   .then((model) => {
-    if (model) return Promise.resolve();
+    if (model) {
+      // Owner of the repo is a user, not an org.
+      // They exist in our DB, drop down to the next promise and bypass
+      return Promise.resolve(true);
+    }
 
     return GitHub.checkOrganizations(user, owner);
   })
