@@ -1,6 +1,6 @@
 const GitHub = require('./GitHub');
 const config = require('../../config');
-const { Build, Site } = require('../models');
+const { Build, Site, User } = require('../models');
 
 function paramsForNewSite(params) {
   return {
@@ -36,6 +36,35 @@ function paramsForNewBuild({ user, site, template }) {
     branch: site.defaultBranch,
     source: paramsForNewBuildSource(template),
   };
+}
+
+function ownerIsFederalistUser(owner) {
+  return User.findOne({
+    where: { username: owner },
+    attributes: ['username'],
+  });
+}
+
+function checkGithubOrg({ user, owner }) {
+  return ownerIsFederalistUser(owner)
+  .then((model) => {
+    if (model) {
+      // Owner of the repo is a user, not an org.
+      // They exist in our DB, drop down to the next promise and bypass
+      return Promise.resolve(true);
+    }
+
+    return GitHub.checkOrganizations(user, owner);
+  })
+  .then((federalistAuthorizedOrg) => {
+    // Has this org authorized federalist as an oauth app?
+    if (!federalistAuthorizedOrg) {
+      throw {
+        message: `Organization '${owner}' hasn't approved access for Federalist. Ask an owner to authorize it.`,
+        status: 403,
+      };
+    }
+  });
 }
 
 function checkGithubRepository({ user, owner, repository }) {
@@ -91,9 +120,8 @@ function createSiteFromExistingRepo({ siteParams, user }) {
     }
     return checkGithubRepository({ user, owner, repository });
   })
-  .then(() =>
-    createAndBuildSite({ siteParams, user })
-  )
+  .then(() => checkGithubOrg({ user, owner }))
+  .then(() => createAndBuildSite({ siteParams, user }))
   .then((model) => {
     site = model;
     return site.addUser(user.id);
