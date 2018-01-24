@@ -1,15 +1,15 @@
 #### Description of feature or bug
 
-TODO
+<TODO>
 
 #### Definition of done
 
-TODO
+<TODO>
 
 _After evaluating, edit this part:_
 
-##### Level of effort - (low/medium/high)
+#### Level of effort - <low/medium/high>
 
-### Implementation outline (if higher than "low" effort):
+#### Implementation outline (if higher than "low" effort):
 
-TODO
+<TODO>
