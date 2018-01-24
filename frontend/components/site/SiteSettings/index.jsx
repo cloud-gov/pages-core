@@ -7,6 +7,7 @@ import ExpandableArea from '../../ExpandableArea';
 import BasicSiteSettings from './BasicSiteSettings';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
 import siteActions from '../../../actions/siteActions';
+import CopyRepoForm from './CopyRepoForm';
 
 const propTypes = {
   site: SITE,
@@ -20,7 +21,7 @@ const defaultProps = {
 class SiteSettings extends React.Component {
   constructor(props) {
     super(props);
-    autoBind(this, 'onSubmit', 'onDelete');
+    autoBind(this, 'onSubmit', 'onDelete', 'submitRepoForm');
   }
 
   onDelete(event) {
@@ -34,6 +35,22 @@ class SiteSettings extends React.Component {
 
   onSubmit(values) {
     siteActions.updateSite(this.props.site, values);
+  }
+
+  submitRepoForm({ newBaseBranch, newRepoName, targetOwner }) {
+    const { site } = this.props;
+    const siteParams = {
+      owner: targetOwner,
+      repository: newRepoName,
+      defaultBranch: newBaseBranch,
+      engine: site.engine,
+      source: {
+        owner: site.owner,
+        repository: site.repository,
+      },
+    };
+
+    siteActions.addSite(siteParams);
   }
 
   render() {
@@ -86,7 +103,9 @@ class SiteSettings extends React.Component {
           initialValues={basicInitialValues}
           onSubmit={this.onSubmit}
         />
-
+        <ExpandableArea title="Copy site">
+          <CopyRepoForm onSubmit={this.submitRepoForm} />
+        </ExpandableArea>
         <ExpandableArea title="Advanced settings">
           <AdvancedSiteSettings
             initialValues={advancedInitialValues}

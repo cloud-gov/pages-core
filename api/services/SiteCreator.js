@@ -22,6 +22,10 @@ function templateForTemplateName(templateName) {
 }
 
 function paramsForNewBuildSource(templateName) {
+  if (typeof templateName === 'object') {
+    return templateName;
+  }
+
   if (templateName) {
     const template = templateForTemplateName(templateName);
     return { repository: template.repo, owner: template.owner };
@@ -42,6 +46,20 @@ function ownerIsFederalistUser(owner) {
   return User.findOne({
     where: { username: owner },
     attributes: ['username'],
+  });
+}
+
+// rename this
+function checkSiteExists({ owner, repository }) {
+  return Site.findOne({
+    where: { owner, repository },
+  })
+  .then((existingSite) => {
+    if (existingSite) {
+      const error = new Error('This site has already been added to Federalist.');
+      error.status = 400;
+      throw error;
+    }
   });
 }
 
@@ -96,7 +114,8 @@ function createAndBuildSite({ siteParams, user }) {
       }
       return GitHub.setWebhook(site, user.id);
     })
-    .then(() => site.save()).then((createdSite) => {
+    .then(() => site.save())
+    .then((createdSite) => {
       site = createdSite;
 
       const buildParams = paramsForNewBuild({ site, user });
@@ -109,17 +128,10 @@ function createSiteFromExistingRepo({ siteParams, user }) {
   let site;
   const { owner, repository } = siteParams;
 
-  return Site.findOne({
-    where: { owner, repository },
-  })
-  .then((existingSite) => {
-    if (existingSite) {
-      const error = new Error('This site has already been added to Federalist');
-      error.status = 400;
-      throw error;
-    }
-    return checkGithubRepository({ user, owner, repository });
-  })
+  return checkSiteExists({ owner, repository })
+  .then(() =>
+    checkGithubRepository({ user, owner, repository })
+  )
   .then(() => checkGithubOrg({ user, owner }))
   .then(() => createAndBuildSite({ siteParams, user }))
   .then((model) => {
@@ -155,12 +167,50 @@ function createSiteFromTemplate({ siteParams, user, template }) {
     .then(() => site);
 }
 
+function createSiteFromSource({ siteParams, user }) {
+  const params = paramsForNewSite(siteParams);
+  const { owner, repository } = params;
+  const { source } = siteParams;
+  let site;
+
+  return checkSiteExists({
+    owner,
+    repository,
+  })
+  .then(() => checkGithubRepository({ user, owner: source.owner, repository: source.repository }))
+  .then(() => checkGithubOrg({ user, owner: source.owner }))
+  .then(() => Site.build(params))
+  .then((model) => {
+    site = model;
+    return site.validate();
+  })
+  .then((error) => {
+    if (error) {
+      throw error;
+    }
+    return GitHub.createRepo(user, owner, repository);
+  })
+  .then(() => GitHub.setWebhook(site, user))
+  .then(() => site.save())
+  .then((createdSite) => {
+    site = createdSite;
+    return site.addUser(user.id);
+  })
+  .then(() => {
+    const buildParams = paramsForNewBuild({ user, site, template: source });
+    return Build.create(buildParams);
+  })
+  .then(() => site);
+}
+
 function createSite({ user, siteParams }) {
   const template = siteParams.template;
   const newSiteParams = paramsForNewSite(siteParams);
 
   if (template) {
     return createSiteFromTemplate({ siteParams: newSiteParams, template, user });
+  } else if (siteParams.source) {
+    return createSiteFromSource({ siteParams, user });
   }
   return createSiteFromExistingRepo({ siteParams: newSiteParams, user });
 }
