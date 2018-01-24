@@ -10,6 +10,7 @@ proxyquire.noCallThru();
 const siteActionsMock = {
   deleteSite: spy(),
   updateSite: spy(),
+  addSite: spy(),
 };
 
 const SiteSettings = proxyquire(
@@ -18,28 +19,32 @@ const SiteSettings = proxyquire(
 ).default;
 
 describe('<SiteSettings/>', () => {
-  const makeProps = () => (
-    {
-      site: {
-        domain: 'https://example.gov',
-        defaultBranch: 'master',
-        demoBranch: 'demo',
-        demoDomain: 'https://demo.example.gov',
-        engine: 'jekyll',
-      },
-    }
-  );
+  const props = {
+    site: {
+      owner: 'el-mapache',
+      repository: 'federalist-modern-team-template',
+      domain: 'https://example.gov',
+      defaultBranch: 'master',
+      demoBranch: 'demo',
+      demoDomain: 'https://demo.example.gov',
+      engine: 'jekyll',
+    },
+  };
+
+  let origWindow;
+  let wrapper;
 
   beforeEach(() => {
     siteActionsMock.deleteSite = spy();
     siteActionsMock.updateSite = spy();
+    siteActionsMock.addSite = spy();
 
     global.window = { confirm: spy() };
   });
 
-  let origWindow;
   before(() => {
     origWindow = global.window;
+    wrapper = shallow(<SiteSettings {...props} />);
   });
 
   after(() => {
@@ -47,39 +52,54 @@ describe('<SiteSettings/>', () => {
   });
 
   it('should render', () => {
-    const props = makeProps();
-    const wrapper = shallow(<SiteSettings {...props} />);
     expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('ReduxForm')).to.have.length(2);
+    expect(wrapper.find('ReduxForm')).to.have.length(3);
   });
 
   it('should not render if site prop is not defined', () => {
-    const props = {};
-    const wrapper = shallow(<SiteSettings {...props} />);
-    expect(wrapper.get(0)).to.be.null;
+    const formlessWrapper = shallow(<SiteSettings {...{}} />);
+    expect(formlessWrapper.get(0)).to.be.null;
   });
 
   it('can call updateSite action', () => {
-    const props = makeProps();
-    const wrapper = shallow(<SiteSettings {...props} />);
-
     expect(siteActionsMock.updateSite.called).to.be.false;
     const newValues = { boop: 'beep' };
-    wrapper.instance().onSubmit(newValues);
+    wrapper.instance().handleUpdate(newValues);
     expect(siteActionsMock.updateSite.calledOnce).to.be.true;
     expect(siteActionsMock.updateSite.calledWith(props.site, newValues)).to.be.true;
   });
 
   it('can call deleteSite action', () => {
     global.window = { confirm: () => true };
-    const props = makeProps();
-    const wrapper = shallow(<SiteSettings {...props} />);
 
     expect(siteActionsMock.deleteSite.called).to.be.false;
     const mockEvent = { preventDefault: spy() };
-    wrapper.instance().onDelete(mockEvent);
+    wrapper.instance().handleDelete(mockEvent);
     expect(siteActionsMock.deleteSite.calledOnce).to.be.true;
     expect(siteActionsMock.deleteSite.calledWith(props.site.id)).to.be.true;
     expect(mockEvent.preventDefault.calledOnce).to.be.true;
+  });
+
+  it('calls the addSite action', () => {
+    expect(siteActionsMock.updateSite.called).to.be.false;
+    const newValues = {
+      newBaseBranch: 'new-branch',
+      newRepoName: 'repo-two',
+      targetOwner: 'github-user',
+    };
+    const expectedValues = {
+      owner: newValues.targetOwner,
+      repository: newValues.newRepoName,
+      defaultBranch: newValues.newBaseBranch,
+      engine: props.site.engine,
+      source: {
+        owner: props.site.owner,
+        repository: props.site.repository,
+      },
+    };
+
+    wrapper.instance().handleCopySite(newValues);
+    expect(siteActionsMock.addSite.calledOnce).to.be.true;
+    expect(siteActionsMock.addSite.calledWith(expectedValues)).to.be.true;
   });
 });
