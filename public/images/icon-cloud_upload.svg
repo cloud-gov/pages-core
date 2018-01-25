@@ -4,11 +4,11 @@
     <title>icon-cloud_arrow</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Artboard-4" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-222.000000, -127.000000)" stroke-linecap="round" stroke-linejoin="round">
-        <g id="icon-cloud_arrow" transform="translate(222.000000, 127.000000)" stroke="#000000" stroke-width="2">
+    <g id="Artboard-4" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-21.000000, -93.000000)" stroke-linecap="round" stroke-linejoin="round">
+        <g id="icon-cloud-upload" transform="translate(21.000000, 93.000000)" stroke="#000000" stroke-width="2">
             <polyline id="Shape" transform="translate(12.000000, 12.000000) scale(1, -1) translate(-12.000000, -12.000000) " points="8 10 12 14 16 10"></polyline>
             <path d="M12,10 L12,19" id="Shape" transform="translate(12.500000, 14.500000) scale(1, -1) translate(-12.500000, -14.500000) "></path>
-            <path d="M20.88,16.09 C22.6641359,14.8353957 23.4291619,12.5690557 22.7703958,10.4898251 C22.1116296,8.41059447 20.1810938,6.99829391 18,7 L16.74,7 C15.9163145,3.78994369 13.198686,1.42008673 9.90640275,1.04088975 C6.61411951,0.661692769 3.42888903,2.35167313 1.89699969,5.2904202 C0.365110346,8.22916726 0.803758542,11.8081775 3,14.29" id="Shape"></path>
+            <path d="M20.8770171,16 C22.6600708,14.7538593 23.4246327,12.5028082 22.7662662,10.4376041 C22.1078996,8.37240007 20.1785348,6.96962696 17.9987641,6.97132154 L16.7395284,6.97132154 C15.9163425,3.78292041 13.2003625,1.42905061 9.91007627,1.05241171 C6.61979009,0.675772805 3.43649173,2.35435249 1.90553161,5.27327463 C0.37457149,8.19219678 0.812953607,11.7470629 3.00786286,14.2121429" id="Shape"></path>
         </g>
     </g>
 </svg>
