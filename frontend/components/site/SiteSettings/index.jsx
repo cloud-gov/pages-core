@@ -46,7 +46,7 @@ class SiteSettings extends React.Component {
       engine: site.engine,
       source: {
         owner: site.owner,
-        repository: site.repository,
+        repo: site.repository,
       },
     };
 

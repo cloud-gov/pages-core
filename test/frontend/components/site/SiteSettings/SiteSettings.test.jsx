@@ -81,7 +81,6 @@ describe('<SiteSettings/>', () => {
   });
 
   it('calls the addSite action', () => {
-    expect(siteActionsMock.updateSite.called).to.be.false;
     const newValues = {
       newBaseBranch: 'new-branch',
       newRepoName: 'repo-two',
@@ -94,7 +93,7 @@ describe('<SiteSettings/>', () => {
       engine: props.site.engine,
       source: {
         owner: props.site.owner,
-        repository: props.site.repository,
+        repo: props.site.repository,
       },
     };
 
