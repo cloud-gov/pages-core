@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-branch</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Artboard-4" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-171.000000, -127.000000)">
+        <g id="icon-branch" transform="translate(172.000000, 128.000000)" fill="#000000" fill-rule="nonzero">
+            <path d="M15,7 C12.790861,7 11,5.209139 11,3 C11,0.790861001 12.790861,-1 15,-1 C17.209139,-1 19,0.790861001 19,3 C19,5.209139 17.209139,7 15,7 Z M15,5 C16.1045695,5 17,4.1045695 17,3 C17,1.8954305 16.1045695,1 15,1 C13.8954305,1 13,1.8954305 13,3 C13,4.1045695 13.8954305,5 15,5 Z" id="Oval" transform="translate(15.000000, 3.000000) scale(1, -1) translate(-15.000000, -3.000000) "></path>
+            <path d="M3,19 C0.790861001,19 -1,17.209139 -1,15 C-1,12.790861 0.790861001,11 3,11 C5.209139,11 7,12.790861 7,15 C7,17.209139 5.209139,19 3,19 Z M3,17 C4.1045695,17 5,16.1045695 5,15 C5,13.8954305 4.1045695,13 3,13 C1.8954305,13 1,13.8954305 1,15 C1,16.1045695 1.8954305,17 3,17 Z" id="Oval" transform="translate(3.000000, 15.000000) scale(1, -1) translate(-3.000000, -15.000000) "></path>
+            <path d="M4,12 C4,12.5522847 3.55228475,13 3,13 C2.44771525,13 2,12.5522847 2,12 L2,-2.22044605e-16 C2,-1.33333333 4,-1.33333333 4,-2.22044605e-16 C4,4.418278 7.581722,8 12,8 C12.5522847,8 13,8.44771525 13,9 C13,9.55228475 12.5522847,10 12,10 C8.72880208,10 5.82445758,8.4293138 4,6.00097491 L4,12 Z" id="Shape" transform="translate(7.500000, 6.000000) scale(1, -1) translate(-7.500000, -6.000000) "></path>
+        </g>
+    </g>
+</svg>

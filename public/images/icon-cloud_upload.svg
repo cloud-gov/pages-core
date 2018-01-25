@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="20px" viewBox="0 0 24 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-cloud_arrow</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Artboard-4" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-222.000000, -127.000000)" stroke-linecap="round" stroke-linejoin="round">
+        <g id="icon-cloud_arrow" transform="translate(222.000000, 127.000000)" stroke="#000000" stroke-width="2">
+            <polyline id="Shape" transform="translate(12.000000, 12.000000) scale(1, -1) translate(-12.000000, -12.000000) " points="8 10 12 14 16 10"></polyline>
+            <path d="M12,10 L12,19" id="Shape" transform="translate(12.500000, 14.500000) scale(1, -1) translate(-12.500000, -14.500000) "></path>
+            <path d="M20.88,16.09 C22.6641359,14.8353957 23.4291619,12.5690557 22.7703958,10.4898251 C22.1116296,8.41059447 20.1810938,6.99829391 18,7 L16.74,7 C15.9163145,3.78994369 13.198686,1.42008673 9.90640275,1.04088975 C6.61411951,0.661692769 3.42888903,2.35167313 1.89699969,5.2904202 C0.365110346,8.22916726 0.803758542,11.8081775 3,14.29" id="Shape"></path>
+        </g>
+    </g>
+</svg>
