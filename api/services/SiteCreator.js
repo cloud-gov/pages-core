@@ -20,6 +20,7 @@ function templateForTemplateName(templateName) {
   }
 
   const template = config.templates[templateName];
+
   if (!template) {
     throw {
       message: `No such template: ${templateName}`,
@@ -193,7 +194,10 @@ function createSite({ user, siteParams }) {
   if (template) {
     return createSiteFromTemplate({ siteParams: newSiteParams, template, user });
   } else if (siteParams.source) {
-    return createSiteFromSource({ siteParams: paramsForNewSite, user });
+    return createSiteFromSource({
+      siteParams: Object.assign({}, newSiteParams, { source: siteParams.source }),
+      user,
+    });
   }
   return createSiteFromExistingRepo({ siteParams: newSiteParams, user });
 }

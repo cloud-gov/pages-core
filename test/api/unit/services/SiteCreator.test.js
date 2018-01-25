@@ -7,31 +7,28 @@ const { Build, Site, User } = require('../../../../api/models');
 
 describe('SiteCreator', () => {
   describe('.createSite', () => {
+    const validateSiteExpectations = (site, owner, repository, user) => {
+      expect(site).to.not.be.undefined;
+      expect(site.owner).to.equal(owner);
+      expect(site.repository).to.equal(repository);
+      expect(site.Users).to.have.length(1);
+      expect(site.Users[0].id).to.equal(user.id);
+      expect(site.Builds).to.have.length(1);
+      expect(site.Builds[0].user).to.equal(user.id);
+    };
+
+    const afterCreateSite = (owner, repository) =>
+      Site.findOne({
+        where: {
+          owner,
+          repository,
+        },
+        include: [User, Build],
+      });
+
     context('from a GitHub repo', () => {
       let user;
       let webhookNock;
-
-      const validateSiteExpectations = (params, site) => {
-        expect(site).to.not.be.undefined;
-        expect(site.owner).to.equal(params.owner);
-        expect(site.repository).to.equal(params.repository);
-        expect(site.Users).to.have.length(1);
-        expect(site.Users[0].id).to.equal(user.id);
-
-        expect(site.Builds).to.have.length(1);
-        expect(site.Builds[0].user).to.equal(user.id);
-
-        expect(webhookNock.isDone()).to.equal(true);
-      };
-
-      const afterCreateSite = (owner, repository) =>
-        Site.findOne({
-          where: {
-            owner,
-            repository,
-          },
-          include: [User, Build],
-        });
 
       const setupWebhook = (accessToken, owner, repo) =>
         githubAPINocks.webhook({
@@ -66,7 +63,13 @@ describe('SiteCreator', () => {
           })
           .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
           .then((site) => {
-            validateSiteExpectations(siteParams, site);
+            validateSiteExpectations(
+              site,
+              siteParams.owner,
+              siteParams.repository,
+              user
+            );
+            expect(webhookNock.isDone()).to.equal(true);
             done();
           })
           .catch(done);
@@ -94,7 +97,14 @@ describe('SiteCreator', () => {
           })
           .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
           .then((site) => {
-            validateSiteExpectations(siteParams, site);
+            validateSiteExpectations(
+              site,
+              siteParams.owner,
+              siteParams.repository,
+              user
+            );
+
+            expect(webhookNock.isDone()).to.equal(true);
             done();
           })
           .catch(done);
@@ -190,14 +200,14 @@ describe('SiteCreator', () => {
     });
 
     context('when the site is created from a template', () => {
-      it('should create a new site record for the given repository and add the user', (done) => {
-        let user;
-        const siteParams = {
-          owner: crypto.randomBytes(3).toString('hex'),
-          repository: crypto.randomBytes(3).toString('hex'),
-          template: 'team',
-        };
+      const siteParams = {
+        owner: crypto.randomBytes(3).toString('hex'),
+        repository: crypto.randomBytes(3).toString('hex'),
+        template: 'team',
+      };
+      let user;
 
+      it('should create a new site record for the given repository and add the user', (done) => {
         factory.user().then((model) => {
           user = model;
           githubAPINocks.createRepoForOrg();
@@ -225,13 +235,9 @@ describe('SiteCreator', () => {
       });
 
       it('should use jekyll as the build engine', (done) => {
-        const siteParams = {
-          owner: crypto.randomBytes(3).toString('hex'),
-          repository: crypto.randomBytes(3).toString('hex'),
-          template: 'team',
-        };
-
-        factory.user().then((user) => {
+        factory.user()
+        .then((model) => {
+          user = model;
           githubAPINocks.createRepoForOrg();
           githubAPINocks.webhook();
           return SiteCreator.createSite({ siteParams, user });
@@ -241,15 +247,9 @@ describe('SiteCreator', () => {
         }).catch(done);
       });
 
-      it('should trigger a build that pushes the source repo to the destiantion repo', (done) => {
-        let user;
-        const siteParams = {
-          owner: crypto.randomBytes(3).toString('hex'),
-          repository: crypto.randomBytes(3).toString('hex'),
-          template: 'team',
-        };
-
-        factory.user().then((model) => {
+      it('should trigger a build that pushes the source repo to the destination repo', (done) => {
+        factory.user()
+        .then((model) => {
           user = model;
           githubAPINocks.createRepoForOrg();
           githubAPINocks.webhook();
@@ -269,13 +269,10 @@ describe('SiteCreator', () => {
 
       it('should create a webhook for the new site', (done) => {
         let webhookNock;
-        const siteParams = {
-          owner: crypto.randomBytes(3).toString('hex'),
-          repository: crypto.randomBytes(3).toString('hex'),
-          template: 'team',
-        };
 
-        factory.user().then((user) => {
+        factory.user()
+        .then((model) => {
+          user = model;
           githubAPINocks.createRepoForOrg();
           webhookNock = githubAPINocks.webhook({
             accessToken: user.githubAccessToken,
@@ -283,20 +280,19 @@ describe('SiteCreator', () => {
             repo: siteParams.repository,
           });
           return SiteCreator.createSite({ user, siteParams });
-        }).then(() => {
+        })
+        .then(() => {
           expect(webhookNock.isDone()).to.equal(true);
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
 
       it('should reject if the repo already exists on GitHub', (done) => {
-        const siteParams = {
-          owner: crypto.randomBytes(3).toString('hex'),
-          repository: crypto.randomBytes(3).toString('hex'),
-          template: 'team',
-        };
+        factory.user()
+        .then((model) => {
+          user = model;
 
-        factory.user().then((user) => {
           githubAPINocks.createRepoForOrg({
             accessToken: user.accessToken,
             org: siteParams.owner,
@@ -306,27 +302,85 @@ describe('SiteCreator', () => {
             }],
           });
           return SiteCreator.createSite({ user, siteParams });
-        }).catch((err) => {
+        })
+        .catch((err) => {
           expect(err.status).to.equal(400);
           expect(err.message).to.equal('A repo with that name already exists.');
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
 
       it('should reject if the template does not exist', (done) => {
-        const siteParams = {
+        const badSiteParams = {
           owner: crypto.randomBytes(3).toString('hex'),
           repository: crypto.randomBytes(3).toString('hex'),
           template: 'not-a-template',
         };
 
-        factory.user().then(user =>
-          SiteCreator.createSite({ user, siteParams })
-        ).catch((err) => {
+        factory.user()
+        .then((model) => {
+          user = model;
+          return SiteCreator.createSite({ user, siteParams: badSiteParams });
+        }).catch((err) => {
           expect(err.status).to.eq(400);
           expect(err.message).to.eq('No such template: not-a-template');
           done();
-        }).catch(done);
+        })
+        .catch(done);
+      });
+    });
+
+    context('creating a site from an existing site', () => {
+      it('creates a repo and webhook, new site on federalist for specified user', (done) => {
+        let user;
+        let site;
+        let siteParams;
+        let webhookNock;
+
+        factory.user()
+        .then((userModel) => {
+          user = userModel;
+
+          return factory.site({ owner: user.username });
+        })
+        .then((siteModel) => {
+          site = siteModel;
+
+          return { site, user };
+        })
+        .then((values) => {
+          siteParams = {
+            owner: crypto.randomBytes(3).toString('hex'),
+            repository: crypto.randomBytes(3).toString('hex'),
+            defaultBranch: 'master',
+            source: {
+              owner: values.site.owner,
+              repo: values.site.repository,
+            },
+          };
+
+          githubAPINocks.repo();
+          githubAPINocks.createRepoForOrg();
+          webhookNock = githubAPINocks.webhook();
+
+          return SiteCreator.createSite({ user: values.user, siteParams })
+          .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
+          .then((model) => {
+            site = model;
+
+            validateSiteExpectations(
+              site,
+              siteParams.owner,
+              siteParams.repository,
+              user
+            );
+
+            expect(webhookNock.isDone()).to.equal(true);
+            done();
+          })
+          .catch(done);
+        });
       });
     });
   });

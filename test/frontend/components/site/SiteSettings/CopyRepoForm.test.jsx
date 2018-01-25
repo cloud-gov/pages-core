@@ -26,6 +26,23 @@ describe('<CopyRepoForm />', () => {
     expect(wrapper.find('input[type="submit"]').length).to.equal(1);
   });
 
+  it('passes its validation function to its fields', () => {
+    const validator = wrapper.instance().validateInput;
+
+    wrapper.find('Field').forEach((field) => {
+      expect(field.prop('validate')[0]).to.equal(validator);
+    });
+  });
+
+  it('validates Field input', () => {
+    const invalidInputMsg = 'Field contains invalid characters. Please use only letters or hyphens.';
+    const validator = wrapper.instance().validateInput;
+
+    expect(validator('valid-name')).to.equal(undefined);
+    expect(validator('-bad-input')).to.equal(invalidInputMsg);
+    expect(validator('off@the@rails')).to.equal(invalidInputMsg);
+  });
+
   it('disables the form if no fields have been touched', () => {
     expect(wrapper.find('input[type="submit"]').prop('disabled')).to.equal(true);
   });
