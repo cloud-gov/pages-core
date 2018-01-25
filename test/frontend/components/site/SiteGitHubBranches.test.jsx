@@ -83,6 +83,26 @@ describe('<SiteGitHubBranches />', () => {
     expect(firstTdHtml(rows.at(3))).to.have.string('branch-two');
   });
 
+  it('renders a fallback for unlinkable branch names', () => {
+    const props = {
+      site: {
+        owner: 'test-owner',
+        repository: 'test-repo',
+      },
+      githubBranches: {
+        isLoading: false,
+        data: [
+          { name: 'abc-#-def', commit: { sha: 'fd321' } },
+        ],
+      },
+    };
+
+    const wrapper = shallow(<SiteGitHubBranches {...props} />);
+    const data = wrapper.find('tbody tr td');
+
+    expect(data.at(1).find('span').text()).to.equal('Unlinkable branch name');
+  });
+
   it('should render a loading state if branches are loading', () => {
     const props = {
       githubBranches: {
