@@ -4,6 +4,7 @@ import { reduxForm, Field } from 'redux-form';
 import AlertBanner from '../../alertBanner';
 import BranchField from '../../Fields/BranchField';
 import InputWithErrorField from '../../Fields/InputWithErrorField';
+import { githubUsernameRegex } from '../../../../api/utils/validators';
 
 const propTypes = {
   handleSubmit: PropTypes.func.isRequired,
@@ -12,7 +13,7 @@ const propTypes = {
 
 class CopyRepoForm extends React.Component {
   validateInput(value) {
-    if (value && value.length && !(/^[^-][a-zA-Z-]+$/.test(value))) {
+    if (value && value.length && !(githubUsernameRegex.test(value))) {
       return 'Field contains invalid characters. Please use only letters or hyphens.';
     }
 
@@ -66,6 +67,31 @@ class CopyRepoForm extends React.Component {
     );
   }
 
+  renderBranchField() {
+    return (
+      <BranchField
+        className="form-control"
+        label="From which branch should the new repo be based?"
+        id="base-branch"
+        name="newBaseBranch"
+        type="text"
+        placeholder="master"
+        required
+      />
+    );
+  }
+
+  renderSubmit() {
+    return (
+      <input
+        type="submit"
+        className="usa-button usa-button-primary"
+        value="Copy site"
+        disabled={this.props.pristine}
+      />
+    );
+  }
+
   render() {
     return (
       <form onSubmit={this.props.handleSubmit}>
@@ -86,24 +112,11 @@ class CopyRepoForm extends React.Component {
               {this.renderRepoField()}
             </div>
             <div className="form-group">
-              <BranchField
-                className="form-control"
-                label="From which branch should the new repo be based?"
-                id="base-branch"
-                name="newBaseBranch"
-                type="text"
-                placeholder="master"
-                required
-              />
+              {this.renderBranchField()}
             </div>
           </fieldset>
         </div>
-        <input
-          type="submit"
-          className="usa-button usa-button-primary"
-          value="Copy site"
-          disabled={this.props.pristine}
-        />
+        {this.renderSubmit()}
       </form>
     );
   }

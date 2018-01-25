@@ -33,7 +33,7 @@ describe('<CopyRepoForm />', () => {
   it('allows submission if the pristine prop is false', () => {
     const newProps = Object.assign({}, props, { pristine: false });
     const form = shallow(<CopyRepoForm {...newProps} />);
-    
+
     expect(form.find('input[type="submit"]').prop('disabled')).to.equal(false);
   });
 });

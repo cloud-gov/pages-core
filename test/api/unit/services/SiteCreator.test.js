@@ -136,7 +136,7 @@ describe('SiteCreator', () => {
           return SiteCreator.createSite({ user: values.user, siteParams });
         }).catch((err) => {
           expect(err.status).to.equal(400);
-          expect(err.message).to.equal('This site has already been added to Federalist');
+          expect(err.message).to.equal('This site has already been added to Federalist.');
           done();
         }).catch(done);
       });
