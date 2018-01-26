@@ -34,6 +34,11 @@ div[data-reactroot=''] {
   height: 100%;
 }
 
+#js-app {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
 .main-loader {
   color: #5b616b;
   margin: 40px 0;
