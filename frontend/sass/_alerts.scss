@@ -6,3 +6,13 @@
 .usa-alert {
   margin-bottom: 1.5rem;
 }
+
+.usa-alert-home {
+  background: $header-bg-color;
+  padding-bottom: 1.5rem;
+
+  .usa-alert {
+    margin: 0 auto;
+    max-width: 980px;
+  }
+}

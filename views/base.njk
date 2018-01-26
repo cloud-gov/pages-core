@@ -127,10 +127,9 @@
       {% if messages.errors %}
         {% for error in messages.errors %}
         <div class="usa-alert-home">
-          <div class="usa-alert usa-alert-error" role="alert">
+          <div class="usa-alert usa-alert-error usa-alert-slim" role="alert">
             <div class="usa-alert-body">
-              <h3 class="usa-alert-header">{{ error.title }}</h3>
-              <p class="usa-alert-text">{{ error.message }}</p>
+              <p class="usa-alert-text"><b>{{ error.title }}</b> {{ error.message }}</p>
             </div>
           </div>
         </div>

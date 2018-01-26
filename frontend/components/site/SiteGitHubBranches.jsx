@@ -10,10 +10,52 @@ import githubBranchActions from '../../actions/githubBranchActions';
 import buildActions from '../../actions/buildActions';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
+import validBranchName from '../../util/validators';
+
+// we only want to link branch names that are alphanumeric plus _, -, and .
+const isLinkable = s => validBranchName(s);
 
 export class SiteGitHubBranches extends React.Component {
   componentDidMount() {
     githubBranchActions.fetchBranches(this.props.site);
+  }
+
+  renderRowActions(name, commit) {
+    if (!isLinkable(name)) {
+      return <span>Unlinkable branch name</span>;
+    }
+
+    return (
+      <span>
+        <BranchViewLink branchName={name} site={this.props.site} />
+        <CreateBuildLink
+          handlerParams={{ commit: commit.sha, branch: name, siteId: this.props.site.id }}
+          handleClick={buildActions.createBuild}
+          className="usa-button usa-button-secondary"
+        >
+          Trigger build
+        </CreateBuildLink>
+      </span>
+    );
+  }
+
+  renderRow({ name, commit }, { isDefault = false, isDemo = false }) {
+    const { owner, repository } = this.props.site;
+
+    return (
+      <tr key={name}>
+        <td>
+          <GitHubLink owner={owner} repository={repository} branch={name}>
+            { name }
+            <GitHubMark />
+          </GitHubLink>
+          { isDefault && ' (live branch)' }{ isDemo && ' (demo branch)' }
+        </td>
+        <td className="table-actions">
+          {this.renderRowActions(name, commit)}
+        </td>
+      </tr>
+    );
   }
 
   render() {
@@ -41,37 +83,14 @@ export class SiteGitHubBranches extends React.Component {
     let demoBranch;
 
     githubBranches.data.forEach((branch) => {
-      if (site.defaultBranch && site.defaultBranch === branch.name) {
+      if (site.defaultBranch === branch.name) {
         defaultBranch = branch;
-      } else if (site.demoBranch && site.demoBranch === branch.name) {
+      } else if (site.demoBranch === branch.name) {
         demoBranch = branch;
       } else {
         regularBranches.push(branch);
       }
     });
-
-    const branchRow = ({ name, commit }, { isDefault = false, isDemo = false }) => (
-      <tr key={name}>
-        <td>
-          <GitHubLink owner={site.owner} repository={site.repository} branch={name}>
-            { name }
-            <GitHubMark />
-          </GitHubLink>
-          { isDefault && ' (live branch)' }{ isDemo && ' (demo branch)' }
-        </td>
-        <td className="table-actions">
-          <BranchViewLink branchName={name} site={site} />
-
-          <CreateBuildLink
-            handlerParams={{ commit: commit.sha, branch: name, siteId: site.id }}
-            handleClick={buildActions.createBuild}
-            className="usa-button usa-button-secondary"
-          >
-            Trigger build
-          </CreateBuildLink>
-        </td>
-      </tr>
-    );
 
     return (
       <div>
@@ -87,16 +106,15 @@ export class SiteGitHubBranches extends React.Component {
             </tr>
           </thead>
           <tbody>
-            { defaultBranch && branchRow(defaultBranch, { isDefault: true }) }
-            { demoBranch && branchRow(demoBranch, { isDemo: true }) }
-            { regularBranches.map(branchRow) }
+            { defaultBranch && this.renderRow(defaultBranch, { isDefault: true }) }
+            { demoBranch && this.renderRow(demoBranch, { isDemo: true }) }
+            { regularBranches.map(branch => this.renderRow(branch, {})) }
           </tbody>
         </table>
       </div>
     );
   }
 }
-
 
 SiteGitHubBranches.propTypes = {
   site: SITE,
@@ -107,7 +125,6 @@ SiteGitHubBranches.defaultProps = {
   site: null,
   githubBranches: null,
 };
-
 
 const mapStateToProps = ({ githubBranches }) => ({ githubBranches });
 
