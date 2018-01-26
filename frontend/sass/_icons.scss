@@ -114,3 +114,13 @@ $twelfth-column: 0;
     background-position-x: $fifth-column;
   }
 }
+
+.icon.icon-book {
+  background-image: url('/images/icon-book.svg');
+  background-repeat: no-repeat;
+  background-position: left center;
+
+  &:hover {
+    background-image: url('/images/icon-gear.svg');
+  }
+}
