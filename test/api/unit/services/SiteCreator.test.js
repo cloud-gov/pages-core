@@ -1,8 +1,10 @@
 const crypto = require('crypto');
-const expect = require('chai').expect;
+const { expect } = require('chai');
+const { stub } = require('sinon');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const SiteCreator = require('../../../../api/services/SiteCreator');
+const TemplateResolver = require('../../../../api/services/TemplateResolver');
 const { Build, Site, User } = require('../../../../api/models');
 
 describe('SiteCreator', () => {
@@ -207,7 +209,7 @@ describe('SiteCreator', () => {
       };
       let user;
 
-      it('should create a new site record for the given repository and add the user', (done) => {
+      it.only('should create a new site record for the given repository and add the user', (done) => {
         factory.user().then((model) => {
           user = model;
           githubAPINocks.createRepoForOrg();
@@ -217,6 +219,7 @@ describe('SiteCreator', () => {
           expect(site).to.not.be.undefined;
           expect(site.owner).to.equal(siteParams.owner);
           expect(site.repository).to.equal(siteParams.repository);
+          expect(site.defaultBranch).to.equal('master');
 
           return Site.findOne({
             where: {
@@ -247,9 +250,21 @@ describe('SiteCreator', () => {
         }).catch(done);
       });
 
-      it('should trigger a build that pushes the source repo to the destination repo', (done) => {
-        factory.user()
-        .then((model) => {
+      it('should trigger a build that pushes the source repo to the destiantion repo', (done) => {
+        let user;
+        const templateResolverStub = stub(TemplateResolver, 'getTemplate');
+        templateResolverStub.returns({
+          repository: 'federalist-template',
+          owner: '18f',
+          branch: 'not-master',
+        });
+        const siteParams = {
+          owner: crypto.randomBytes(3).toString('hex'),
+          repository: crypto.randomBytes(3).toString('hex'),
+          template: 'redirect',
+        };
+
+        factory.user().then((model) => {
           user = model;
           githubAPINocks.createRepoForOrg();
           githubAPINocks.webhook();
@@ -259,9 +274,12 @@ describe('SiteCreator', () => {
           expect(site.Builds[0].user).to.equal(user.id);
           expect(site.Builds[0].branch).to.equal('master');
           expect(site.Builds[0].source).to.deep.equal({
-            repository: 'federalist-modern-team-template',
+            repository: 'federalist-uswds-template',
             owner: '18f',
           });
+          
+          stub.restore();
+          
           done();
         })
         .catch(done);
