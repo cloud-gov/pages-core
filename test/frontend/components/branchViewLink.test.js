@@ -24,13 +24,6 @@ describe('<BranchViewLink/>', () => {
     };
   });
 
-  it('does not link an unlinkable branch name', () => {
-    props.branchName = 'abc-#-def';
-    const wrapper = shallow(<BranchViewLink {...props} />);
-    expect(wrapper.find('span').length).to.equal(1);
-    expect(wrapper.find('span').text()).to.equal('Unlinkable branch name');
-  });
-
   it('renders a link to the default branch\'s site', () => {
     props.branchName = 'default-branch';
     const wrapper = shallow(<BranchViewLink {...props} />);
