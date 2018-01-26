@@ -119,8 +119,53 @@ $twelfth-column: 0;
   background-image: url('/images/icon-book.svg');
   background-repeat: no-repeat;
   background-position: left center;
+  background-size: 1em;
 
   &:hover {
-    background-image: url('/images/icon-gear.svg');
+    background-image: url('/images/icon-book-hover.svg');
+  }
+}
+
+.icon.icon-branch {
+  background-image: url('/images/icon-branch.svg');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 1em;
+
+  &:hover {
+    background-image: url('/images/icon-branch-hover.svg');
+  }
+}
+
+.icon.icon-cloud_upload {
+  background-image: url('/images/icon-cloud_upload.svg');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 1em;
+
+  &:hover {
+    background-image: url('/images/icon-cloud_upload-hover.svg');
+  }
+}
+
+.icon.icon-people {
+  background-image: url('/images/icon-people.svg');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 1em;
+
+  &:hover {
+    background-image: url('/images/icon-people-hover.svg');
+  }
+}
+
+.icon.icon-gear {
+  background-image: url('/images/icon-gear-hover.svg');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 1em;
+
+  &:hover {
+    background-image: url('/images/icon-gear-hover.svg');
   }
 }
