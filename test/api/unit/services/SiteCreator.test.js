@@ -209,7 +209,7 @@ describe('SiteCreator', () => {
       };
       let user;
 
-      it.only('should create a new site record for the given repository and add the user', (done) => {
+      it('should create a new site record for the given repository and add the user', (done) => {
         factory.user().then((model) => {
           user = model;
           githubAPINocks.createRepoForOrg();
@@ -253,16 +253,18 @@ describe('SiteCreator', () => {
       it('should trigger a build that pushes the source repo to the destiantion repo', (done) => {
         let user;
         const templateResolverStub = stub(TemplateResolver, 'getTemplate');
-        templateResolverStub.returns({
-          repository: 'federalist-template',
+        const fakeTemplate = {
+          repo: 'federalist-template',
           owner: '18f',
           branch: 'not-master',
-        });
+        };
         const siteParams = {
           owner: crypto.randomBytes(3).toString('hex'),
           repository: crypto.randomBytes(3).toString('hex'),
           template: 'redirect',
         };
+
+        templateResolverStub.returns(fakeTemplate);
 
         factory.user().then((model) => {
           user = model;
@@ -273,13 +275,11 @@ describe('SiteCreator', () => {
           expect(site.Builds).to.have.length(1);
           expect(site.Builds[0].user).to.equal(user.id);
           expect(site.Builds[0].branch).to.equal('master');
-          expect(site.Builds[0].source).to.deep.equal({
-            repository: 'federalist-uswds-template',
-            owner: '18f',
-          });
-          
-          stub.restore();
-          
+          expect(site.Builds[0].source.repository).to.equal(fakeTemplate.repo);
+          expect(site.Builds[0].source.owner).to.equal(fakeTemplate.owner);
+
+          templateResolverStub.restore();
+
           done();
         })
         .catch(done);
