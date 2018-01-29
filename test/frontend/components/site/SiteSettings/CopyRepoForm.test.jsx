@@ -21,7 +21,7 @@ describe('<CopyRepoForm />', () => {
 
   it('displays form fields for repo, owner, and branch, and submit button', () => {
     expect(wrapper.find('Field[name="targetOwner"]').length).to.equal(1);
-    expect(wrapper.find('Field[name="newRepoName"]').length).to.equal(1);
+    expect(wrapper.find('BranchField[name="newRepoName"]').length).to.equal(1);
     expect(wrapper.find('BranchField[name="newBaseBranch"]').length).to.equal(1);
     expect(wrapper.find('input[type="submit"]').length).to.equal(1);
   });

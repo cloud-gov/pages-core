@@ -103,15 +103,15 @@ class SiteSettings extends React.Component {
           initialValues={basicInitialValues}
           onSubmit={this.handleUpdate}
         />
-        <ExpandableArea title="Copy site">
-          <CopyRepoForm onSubmit={this.handleCopySite} />
-        </ExpandableArea>
         <ExpandableArea title="Advanced settings">
           <AdvancedSiteSettings
             initialValues={advancedInitialValues}
             onDelete={this.handleDelete}
             onSubmit={this.handleUpdate}
           />
+        </ExpandableArea>
+        <ExpandableArea title="Copy site">
+          <CopyRepoForm onSubmit={this.handleCopySite} />
         </ExpandableArea>
       </div>
     );

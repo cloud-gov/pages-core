@@ -55,7 +55,6 @@ function ownerIsFederalistUser(owner) {
   });
 }
 
-// rename this
 function checkSiteExists({ owner, repository }) {
   return Site.findOne({
     where: { owner, repository },

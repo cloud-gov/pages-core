@@ -23,15 +23,18 @@ class CopyRepoForm extends React.Component {
   renderDisclaimer() {
     return (
       <p>
-        This functionality will allow you to copy a repository you are an admin user of to
-        the account of another Federalist user.
+        This feature will allow you to copy this site to a new GitHub repository.
+        You must be an admin user of this site.
         <br /><br />
-        It will only copy <b>basic</b> site information — builds, associated users, and
-        site settings will not be transferred.
-
-        If your site is hosted at a custom domain, please contact Federalist support after
-        copying the repository, and before updating or deleting the existing site from
-        Federalist!
+        A new site will be created in Federalist, but only <b>basic</b> site information is
+        copied — builds, associated users, and site settings will not be transferred.
+        <br />
+        If your site is hosted at a custom domain, and you want that domain to point
+        to your new site,
+        please <a href="mailto:federalist-support@gsa.gov">contact Federalist support</a>
+        after the copy
+        has completed. Do not delete the original site before receiving confirmation that the
+        route information has been updated.
       </p>
     );
   }
@@ -44,7 +47,7 @@ class CopyRepoForm extends React.Component {
         id="target-owner"
         name="targetOwner"
         type="text"
-        placeholder="a-username"
+        placeholder="account-name"
         validate={[this.validateInput]}
         required
       />
@@ -53,7 +56,7 @@ class CopyRepoForm extends React.Component {
 
   renderRepoField() {
     return (
-      <Field
+      <BranchField
         component={InputWithErrorField}
         className="form-control"
         label="Name the new site"
@@ -61,7 +64,6 @@ class CopyRepoForm extends React.Component {
         name="newRepoName"
         type="text"
         placeholder="my-new-site"
-        validate={[this.validateInput]}
         required
       />
     );
