@@ -5,41 +5,33 @@ import { stub } from 'sinon';
 import SiteUsers from '../../../../frontend/components/site/SiteUsers';
 import siteActions from '../../../../frontend/actions/siteActions';
 
+const user = {
+  username: 'not-owner',
+  id: 4,
+  email: 'not-owner@beep.gov',
+};
+const props = {
+  user,
+  site: {
+    owner: 'test-owner',
+    repository: 'test-repo',
+    users: [
+      { id: 1, email: 'not-owner@beep.gov', username: 'not-owner' },
+      { id: 2, email: 'owner@beep.gov', username: 'test-owner' },
+    ],
+  },
+};
 
 describe('<SiteUsers/>', () => {
-  it('should render', () => {
-    const props = {
-      site: {
-        owner: 'test-owner',
-        repository: 'test-repo',
-        users: [],
-      },
-    };
-    const wrapper = shallow(<SiteUsers {...props} />);
-    expect(wrapper.find('table')).to.have.length(1);
-  });
-
   describe('rendered table', () => {
-    const props = {
-      user: {
-        username: 'test-owner',
-        id: 4,
-        email: 'owner@beep.gov',
-      },
-      site: {
-        owner: 'test-owner',
-        repository: 'test-repo',
-        users: [
-          { id: 1, email: 'not-owner@beep.gov', username: 'not-owner' },
-          { id: 2, email: 'owner@beep.gov', username: 'test-owner' },
-        ],
-      },
-    };
-
     let wrapper;
 
     beforeEach(() => {
       wrapper = shallow(<SiteUsers {...props} />);
+    });
+
+    it('should render', () => {
+      expect(wrapper.find('table')).to.have.length(1);
     });
 
     it('renders rows of users in order of username', () => {
@@ -61,8 +53,8 @@ describe('<SiteUsers/>', () => {
     it('notes the current user as "you"', () => {
       const rows = wrapper.find('tbody tr');
       expect(rows).to.have.length(2);
-      expect(rows.at(0).find('td').contains('(you)')).to.be.false;
-      expect(rows.at(1).find('td').contains('(you)')).to.be.true;
+      expect(rows.at(0).find('td').contains(' (you)')).to.be.true;
+      expect(rows.at(1).find('td').contains(' (you)')).to.be.false;
     });
 
     it('should render an `actions` column for each user', () => {

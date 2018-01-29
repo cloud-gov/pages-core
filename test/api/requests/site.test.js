@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const nock = require('nock');
 const request = require('supertest');
 const sinon = require('sinon');
@@ -16,7 +16,6 @@ const S3SiteRemover = require('../../../api/services/S3SiteRemover');
 const siteErrors = require('../../../api/responses/siteErrors');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
-
 
 describe('Site API', () => {
   const siteResponseExpectations = (response, site) => {
@@ -212,30 +211,41 @@ describe('Site API', () => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
 
-      authenticatedSession().then(cookie => request(app)
-          .post('/v0/site')
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
+      factory.user()
+      .then((user) => {
+        githubAPINocks.userOrganizations({
+          accessToken: user.githubAccessToken,
+          organizations: [{ login: siteOwner }],
+        });
+
+        return authenticatedSession(user);
+      })
+      .then(cookie =>
+        request(app)
+        .post('/v0/site')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          owner: siteOwner,
+          repository: siteRepository,
+          defaultBranch: 'master',
+          engine: 'jekyll',
+        })
+        .set('Cookie', cookie)
+        .expect(200))
+      .then((response) => {
+        validateAgainstJSONSchema('POST', '/site', 200, response.body);
+        return Site.findOne({
+          where: {
             owner: siteOwner,
             repository: siteRepository,
-            defaultBranch: 'master',
-            engine: 'jekyll',
-          })
-          .set('Cookie', cookie)
-          .expect(200)).then((response) => {
-            validateAgainstJSONSchema('POST', '/site', 200, response.body);
-            return Site.findOne({
-              where: {
-                owner: siteOwner,
-                repository: siteRepository,
-              },
-            });
-          })
-          .then((site) => {
-            expect(site).to.not.be.undefined;
-            done();
-          })
-          .catch(done);
+          },
+        });
+      })
+      .then((site) => {
+        expect(site).to.not.be.undefined;
+        done();
+      })
+      .catch(done);
     });
 
     it('should create a new repo and site from a template', (done) => {
@@ -315,7 +325,7 @@ describe('Site API', () => {
           .set('Cookie', cookie)
           .expect(400)).then((response) => {
             validateAgainstJSONSchema('POST', '/site', 400, response.body);
-            expect(response.body.message).to.equal('This site has already been added to Federalist');
+            expect(response.body.message).to.equal('This site has already been added to Federalist.');
             done();
           }).catch(done);
     });
@@ -348,7 +358,8 @@ describe('Site API', () => {
             validateAgainstJSONSchema('POST', '/site', 400, response.body);
             expect(response.body.message).to.equal('You do not have admin access to this repository');
             done();
-          }).catch(done);
+          })
+          .catch(done);
     });
 
     it('should respond with a 400 if a webhook cannot be created', (done) => {
@@ -365,7 +376,16 @@ describe('Site API', () => {
         }],
       });
 
-      authenticatedSession().then(cookie => request(app)
+      factory.user()
+      .then((user) => {
+        githubAPINocks.userOrganizations({
+          accessToken: user.githubAccessToken,
+          organizations: [{ login: siteOwner }],
+        });
+
+        return authenticatedSession(user);
+      })
+      .then(cookie => request(app)
         .post('/v0/site')
         .set('x-csrf-token', csrfToken.getToken())
         .send({
@@ -379,7 +399,8 @@ describe('Site API', () => {
           validateAgainstJSONSchema('POST', '/site', 400, response.body);
           expect(response.body.message).to.equal('You do not have admin access to this repository');
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
   });
 

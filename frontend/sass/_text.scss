@@ -1,10 +1,9 @@
 body {
-  color: $text-color;
   font-family: $sans-serif;
 }
 .usa-hero-callout {
-  max-width: 40rem;
   background-color: $header-bg-color;
+  max-width: 40rem;
   padding: 3rem;
   a {
     color: #fff;
@@ -12,17 +11,10 @@ body {
 }
 .build-count {
   background-color: $well-bg-color;
-  text-align: center;
   color: inherit;
+  text-align: center;
   p {
-    margin-top: 0;
-    padding-top: 1rem;
-  }
-}
-.navbar-links {
-  .usa-button {
-    margin-top: -.4rem;
-    margin-bottom: 0;
+    padding: 1rem 0;
   }
 }
 

@@ -39,12 +39,12 @@ describe('<AdvancedSiteSettings/>', () => {
     const props = makeProps();
     let wrapper = shallow(<AdvancedSiteSettings {...props} />);
     expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('button.button-reset').prop('disabled')).to.be.true;
+    expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.true;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.true;
 
     props.pristine = false;
     wrapper = shallow(<AdvancedSiteSettings {...props} />);
-    expect(wrapper.find('button.button-reset').prop('disabled')).to.be.false;
+    expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.false;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.false;
   });
 
@@ -52,7 +52,7 @@ describe('<AdvancedSiteSettings/>', () => {
     const props = makeProps();
     const wrapper = shallow(<AdvancedSiteSettings {...props} />);
 
-    const deleteButton = wrapper.find('button.button-delete');
+    const deleteButton = wrapper.find('button.usa-button-red');
     expect(props.onDelete.called).to.be.false;
     deleteButton.simulate('click');
     expect(props.onDelete.calledOnce).to.be.true;
@@ -62,7 +62,7 @@ describe('<AdvancedSiteSettings/>', () => {
     const props = makeProps();
     props.pristine = false;
     const wrapper = shallow(<AdvancedSiteSettings {...props} />);
-    const resetButton = wrapper.find('button.button-reset');
+    const resetButton = wrapper.find('button.usa-button-secondary');
 
     expect(props.reset.called).to.be.false;
     resetButton.simulate('click');

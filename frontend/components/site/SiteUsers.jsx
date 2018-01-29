@@ -2,10 +2,12 @@ import React from 'react';
 import { SITE, USER } from '../../propTypes';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
+import UserActionsTable from './UserActionsTable';
 
-const isSiteOwner = (currentUser, maybeOwner) =>
-  maybeOwner.username.toLowerCase() === currentUser.username.toLowerCase();
+import GitHubMark from '../GitHubMark';
 
+const isSiteOwner = (user, siteOwner) =>
+  user.username.toLowerCase() === siteOwner.toLowerCase();
 
 const SiteUsers = ({ site, user }) => {
   // sort users by lower-cased usernames
@@ -19,8 +21,9 @@ const SiteUsers = ({ site, user }) => {
 
   const handleClick = userToRemove => (event) => {
     event.preventDefault();
+    const userToRemoveId = userToRemove.id;
 
-    siteActions.removeUserFromSite(site.id, userToRemove.id);
+    siteActions.removeUserFromSite(site.id, userToRemoveId, userToRemoveId === user.id);
   };
 
   return (
@@ -34,8 +37,8 @@ const SiteUsers = ({ site, user }) => {
         Currently, new users get access for a specific site by
         logging into Federalist and adding the site themselves.
       </p>
-      <h4 className="label">Federalist users associated with this site</h4>
-      <table className="usa-table-borderless">
+      <table className="usa-table-borderless table-full-width log-table">
+        <caption>Federalist users associated with this site</caption>
         <thead>
           <tr>
             <th>User</th>
@@ -49,17 +52,17 @@ const SiteUsers = ({ site, user }) => {
                 <a
                   href={`https://github.com/${rowUser.username}`}
                   target="_blank"
+                  className="repo-link"
                   rel="noopener noreferrer"
                   title={`Visit GitHub profile for ${rowUser.username}`}
-                >
-                  {rowUser.username}
+                >{rowUser.username}
+                  <GitHubMark />
                 </a>
-                {' '}
-                {isSiteOwner(user, rowUser) ? '(you)' : ''}
+                {rowUser.username.toLowerCase() === user.username.toLowerCase() ? ' (you)' : ''}
               </td>
               <td>
                 {
-                  isSiteOwner(user, rowUser) ? '-' :
+                  isSiteOwner(rowUser, site.owner) ? '-' :
                   <ButtonLink clickHandler={handleClick(rowUser)}>
                     Remove user
                   </ButtonLink>
@@ -69,6 +72,9 @@ const SiteUsers = ({ site, user }) => {
           )}
         </tbody>
       </table>
+      <div className="offset-top">
+        <UserActionsTable site={site.id} />
+      </div>
     </div>
   );
 };

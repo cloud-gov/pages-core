@@ -10,14 +10,11 @@ import {
   dispatchSiteUpdatedAction,
   dispatchSiteDeletedAction,
   dispatchUserAddedToSiteAction,
-  dispatchUserRemovedFromSiteAction,
   dispatchShowAddNewSiteFieldsAction,
 } from './dispatchActions';
+import userActions from './userActions';
 
-
-const alertError = (error) => {
-  alertActions.httpError(error.message);
-};
+const alertError = error => alertActions.httpError(error.message);
 
 export default {
   fetchSites() {
@@ -30,11 +27,21 @@ export default {
   addSite(siteToAdd) {
     return federalist.addSite(siteToAdd)
       .then((site) => {
-        dispatchSiteAddedAction(site);
-        return site;
+        // site is undefined here if addSite fails
+        if (site) {
+          dispatchSiteAddedAction(site);
+          // route to the builds page for the added site
+          updateRouterToSiteBuildsUri(site);
+        } else {
+          // route to the sites list page, which will display
+          // any errors that occurred during addSite
+          updateRouterToSitesUri();
+        }
       })
-      .then(updateRouterToSiteBuildsUri)
-      .catch(alertError);
+      .catch((err) => {
+        updateRouterToSitesUri();
+        alertError(err);
+      });
   },
 
   addUserToSite({ owner, repository }) {
@@ -56,10 +63,16 @@ export default {
       });
   },
 
-  removeUserFromSite(siteId, userId) {
-    return federalist.removeUserFromSite(siteId, userId).then((site) => {
-      if (site) dispatchUserRemovedFromSiteAction(site);
-    });
+  removeUserFromSite(siteId, userId, me = false) {
+    return federalist.removeUserFromSite(siteId, userId)
+    .then(this.fetchSites)
+    .then(() => {
+      if (me) { return updateRouterToSitesUri(); }
+
+      return userActions.fetchUser;
+    })
+    .then(() => alertActions.alertSuccess('User successfully removed.'))
+    .catch(alertError);
   },
 
   updateSite(site, data) {

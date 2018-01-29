@@ -52,6 +52,16 @@ const getRepository = (github, options) => new Promise((resolve, reject) => {
   });
 });
 
+const getBranch = (github, { user, repo, branchName }) => new Promise((resolve, reject) => {
+  github.repos.getBranch({ user, repo, branch: branchName }, (err, branch) => {
+    if (err) {
+      reject(Object.assign(err, { status: err.code }));
+    } else {
+      resolve(branch);
+    }
+  });
+});
+
 const githubClient = accessToken => new Promise((resolve) => {
   const client = new Github({ version: '3.0.0' });
   client.authenticate({
@@ -95,7 +105,6 @@ const handleCreateRepoError = (err) => {
 
 const handleWebhookError = (err) => {
   const error = err;
-
   const HOOK_EXISTS_MESSAGE = 'Hook already exists on this repository';
   const NO_ACCESS_MESSAGE = 'Not Found';
   const NO_ADMIN_ACCESS_ERROR_MESSAGE = 'You do not have admin access to this repository';
@@ -119,6 +128,11 @@ module.exports = {
       .then(github => getRepository(github, { user: owner, repo: repository }))
       .then(fetchedRepository => fetchedRepository.permissions),
 
+  checkOrganizations: (user, orgName) =>
+    githubClient(user.githubAccessToken)
+    .then(github => getOrganizations(github))
+    .then(orgs => orgs.some(org => org.login === orgName)),
+
   createRepo: (user, owner, repository) =>
     githubClient(user.githubAccessToken)
       .then((github) => {
@@ -137,16 +151,28 @@ module.exports = {
 
   getRepository: (user, owner, repository) =>
     githubClient(user.githubAccessToken)
-      .then(github => getRepository(github, {
-        user: owner,
-        repo: repository,
-      }))
+      .then(github =>
+        getRepository(github, {
+          user: owner,
+          repo: repository,
+        })
+      )
       .catch((err) => {
         if (err.status === 404) {
           return null;
         }
         throw err;
       }),
+
+  getBranch: (user, owner, repo, branch) =>
+    githubClient(user.githubAccessToken)
+    .then(github => getBranch(github, { user: owner, repo, branchName: branch }))
+    .catch((err) => {
+      if (err.status === 404) {
+        return null;
+      }
+      throw err;
+    }),
 
   setWebhook: (site, user) => {
     const userId = user.id || user;

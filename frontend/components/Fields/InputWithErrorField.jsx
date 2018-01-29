@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const RenderField = ({
+const InputWithErrorField = ({
   id,
   placeholder,
   label,
@@ -9,6 +9,7 @@ const RenderField = ({
   meta: { touched, error }, // from the Field component
   // eslint-disable-next-line react/prop-types
   input, // from the Field component
+  type,
   ...props
 }) => (
   <div className={touched && error ? 'usa-input-error' : ''}>
@@ -19,14 +20,14 @@ const RenderField = ({
       {...input}
       {...props}
       placeholder={placeholder}
-      type="url"
+      type={type}
       id={id}
       autoComplete="off"
     />
   </div>
 );
 
-RenderField.propTypes = {
+InputWithErrorField.propTypes = {
   id: PropTypes.string.isRequired,
   placeholder: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
@@ -35,10 +36,12 @@ RenderField.propTypes = {
     touched: PropTypes.bool,
     error: PropTypes.string,
   }).isRequired,
+  type: PropTypes.string,
 };
 
-RenderField.defaultProps = {
+InputWithErrorField.defaultProps = {
   help: null,
+  type: 'url',
 };
 
-export default RenderField;
+export default InputWithErrorField;

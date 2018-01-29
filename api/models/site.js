@@ -1,6 +1,7 @@
 const validator = require('validator');
-
 const config = require('../../config');
+
+const { branchRegex } = require('../utils/validators');
 
 const afterValidate = (site) => {
   if (site.defaultBranch === site.demoBranch) {
@@ -23,7 +24,7 @@ const validationFailed = (site, options, validationError) => {
   throw error;
 };
 
-const associate = ({ Site, Build, User }) => {
+const associate = ({ Site, Build, User, UserAction }) => {
   Site.hasMany(Build, {
     foreignKey: 'site',
   });
@@ -31,6 +32,10 @@ const associate = ({ Site, Build, User }) => {
     through: 'site_users__user_sites',
     foreignKey: 'site_users',
     timestamps: false,
+  });
+  Site.hasMany(UserAction, {
+    as: 'userActions',
+    foreignKey: 'siteId',
   });
 };
 
@@ -106,6 +111,9 @@ module.exports = (sequelize, DataTypes) => {
   const Site = sequelize.define('Site', {
     demoBranch: {
       type: DataTypes.STRING,
+      validate: {
+        is: branchRegex,
+      },
     },
     demoDomain: {
       type: DataTypes.STRING,
@@ -119,6 +127,9 @@ module.exports = (sequelize, DataTypes) => {
     defaultBranch: {
       type: DataTypes.STRING,
       defaultValue: 'master',
+      validate: {
+        is: branchRegex,
+      },
     },
     domain: {
       type: DataTypes.STRING,
@@ -165,6 +176,7 @@ module.exports = (sequelize, DataTypes) => {
       afterValidate,
       validationFailed,
     },
+    paranoid: true,
   });
 
   Site.withUsers = id => Site.findById(id, { include: [sequelize.models.User] });

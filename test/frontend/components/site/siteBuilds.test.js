@@ -42,7 +42,7 @@ describe('<SiteBuilds/>', () => {
 
   const columnIndex = (wrapper, name) => {
     let index;
-    wrapper.find('th').children().forEach((child, childIndex) => {
+    wrapper.find('tr').children().forEach((child, childIndex) => {
       if (child.contains(name)) {
         index = childIndex;
       }
@@ -54,7 +54,7 @@ describe('<SiteBuilds/>', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
     const userIndex = columnIndex(wrapper, 'User');
 
-    const userCell = wrapper.find('tr').at(1).find('td').at(userIndex);
+    const userCell = wrapper.find('tr').at(1).find('td').at(userIndex - 1);
     expect(userCell.text()).to.equal(user.username);
   });
 
@@ -63,7 +63,7 @@ describe('<SiteBuilds/>', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
     const userIndex = columnIndex(wrapper, 'User');
 
-    const userCell = wrapper.find('tr').at(1).find('td').at(userIndex);
+    const userCell = wrapper.find('tr').at(0).find('td').at(userIndex);
     expect(userCell.text()).to.equal('');
   });
 
@@ -72,7 +72,7 @@ describe('<SiteBuilds/>', () => {
 
     const wrapper = shallow(<SiteBuilds {...props} />);
     const branchIndex = columnIndex(wrapper, 'Branch');
-    const branchCell = wrapper.find('tr').at(1).find('td').at(branchIndex);
+    const branchCell = wrapper.find('tr').at(1).find('th').at(branchIndex);
 
     expect(branchCell.text()).to.equal('master');
   });
@@ -99,9 +99,10 @@ describe('<SiteBuilds/>', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
 
     expect(wrapper.find('table')).to.have.length(0);
-    expect(wrapper.find('p')).to.have.length(2);
-    expect(wrapper.find('p').first().contains('This site does not yet have any builds.')).to.be.true;
-    expect(wrapper.find('p').at(1).text().indexOf('just added')).to.be.greaterThan(-1);
+    expect(wrapper.find('AlertBanner').prop('header')).to.equal('This site does not yet have any builds.');
+    expect(wrapper.find('AlertBanner').prop('message')).to.equal(
+      'If this site was just added, the first build should be available within a few minutes.'
+    );
     expect(wrapper.find('RefreshBuildsButton')).to.have.length(1);
   });
 

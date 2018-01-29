@@ -39,9 +39,42 @@ const defaultProps = {
   storeState: null,
 };
 
+export const SITE_NAVIGATION_CONFIG = [
+  {
+    display: 'Build history',
+    route: 'builds',
+    iconClass: 'icon-logs',
+  },
+  {
+    display: 'GitHub branches',
+    route: 'branches',
+    iconClass: 'icon-pages',
+  },
+  {
+    display: 'Published files',
+    route: 'published',
+    iconClass: 'icon-upload',
+  },
+  {
+    display: 'Collaborators',
+    route: 'users',
+    iconClass: 'icon-gear',
+  },
+  {
+    display: 'Site settings',
+    route: 'settings',
+    iconClass: 'icon-settings',
+  },
+];
+
 export class SiteContainer extends React.Component {
   getPageTitle(pathname) {
-    return pathname.split('/').pop();
+    const route = pathname.split('/').pop();
+    const routeConf = SITE_NAVIGATION_CONFIG.find(conf => conf.route === route);
+    if (routeConf) {
+      return routeConf.display;
+    }
+    return '';
   }
 
   getCurrentSite(sitesState, siteId) {
@@ -63,16 +96,14 @@ export class SiteContainer extends React.Component {
 
     if (!site) {
       return (
-        <div className="usa-grid">
-          <div className="usa-alert usa-alert-error" role="alert">
-            <div className="usa-alert-body">
-              <h3 className="usa-alert-heading">Unauthorized</h3>
-              <p className="usa-alert-text">
-                Apologies; you don&apos;t have access to this site in Federalist!
-                <br />
-                Please contact the site owner if you should have access.
-              </p>
-            </div>
+        <div className="usa-alert usa-alert-error" role="alert">
+          <div className="usa-alert-body">
+            <h3 className="usa-alert-heading">Unauthorized</h3>
+            <p className="usa-alert-text">
+              Apologies; you don&apos;t have access to this site in Federalist!
+              <br />
+              Please contact the site owner if you should have access.
+            </p>
           </div>
         </div>
       );
@@ -100,10 +131,12 @@ export class SiteContainer extends React.Component {
       <div className="usa-grid site">
         <SideNav siteId={site.id} />
         <div className="usa-width-five-sixths site-main" id="pages-container">
+
           <AlertBanner
             message={storeState.alert.message}
             status={storeState.alert.status}
           />
+
           <PagesHeader
             repository={site.repository}
             owner={site.owner}
@@ -113,7 +146,7 @@ export class SiteContainer extends React.Component {
             fileName={params.fileName}
             viewLink={site.viewLink}
           />
-          <div className="usa-grid">
+          <div className="">
             {children &&
               React.cloneElement(children, childConfigs)
             }

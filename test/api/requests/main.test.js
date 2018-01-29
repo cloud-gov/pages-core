@@ -27,16 +27,6 @@ describe('Main Site', () => {
         });
     });
 
-    it('should include a cache-control header', (done) => {
-      request(app)
-        .get('/')
-      .then((response) => {
-        expect(response.headers).to.have.property('cache-control', 'max-age=0');
-        done();
-      })
-      .catch(done);
-    });
-
     it('should redirect to /sites when authenticated', (done) => {
       authenticatedSession()
       .then(cookie => request(app)
@@ -69,39 +59,6 @@ describe('Main Site', () => {
         done();
       })
       .catch(done);
-    });
-
-    context('<title> element', () => {
-      const origAppEnv = config.app.app_env;
-
-      after(() => {
-        // reset config.app.app_env to its original value
-        config.app.app_env = origAppEnv;
-      });
-
-      it('should display the app_env in the title element', (done) => {
-        config.app.app_env = 'testing123';
-        request(app)
-          .get('/')
-          .then((response) => {
-            const titleRegex = /<title>\s*Federalist \| testing123\s*<\/title>/g;
-            expect(response.text.search(titleRegex)).to.be.above(-1);
-            done();
-          })
-          .catch(done);
-      });
-
-      it('should not display the app_env in the title when it is "production"', (done) => {
-        config.app.app_env = 'production';
-        request(app)
-          .get('/')
-          .then((response) => {
-            const titleRegex = /<title>\s*Federalist\s*<\/title>/g;
-            expect(response.text.search(titleRegex)).to.be.above(-1);
-            done();
-          })
-          .catch(done);
-      });
     });
   });
 

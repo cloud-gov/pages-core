@@ -9,12 +9,21 @@ import LoadingIndicator from './LoadingIndicator';
 export class App extends React.Component {
   componentWillReceiveProps(nextProps) {
     const { alert } = this.props;
-    this.shouldClearAlert(alert, nextProps);
+
+    if (alert.message) {
+      this.shouldClearAlert(nextProps);
+    }
   }
 
-  shouldClearAlert(alert, nextProps) {
+  shouldClearAlert(nextProps) {
     const { location: { key: lastKey } } = this.props;
     const { key: nextKey } = nextProps.location;
+    const { alert } = nextProps;
+
+    if (alert.stale) {
+      alertActions.clear();
+      return;
+    }
 
     // clear an existing alert message if stale, or flag it to be removed on
     // the next route transition

@@ -21,6 +21,7 @@ describe('<AddRepoSiteForm />', () => {
   it('renders', () => {
     const props = {
       showAddNewSiteFields: false,
+      initialValues: { engine: 'jekyll' },
       handleSubmit: () => {},
       pristine: true,
     };
@@ -33,6 +34,7 @@ describe('<AddRepoSiteForm />', () => {
   it('renders additional fields when showAddNewSiteFields is true', () => {
     const props = {
       showAddNewSiteFields: false,
+      initialValues: { engine: 'jekyll' },
       handleSubmit: () => {},
       pristine: true,
     };
@@ -44,12 +46,13 @@ describe('<AddRepoSiteForm />', () => {
     props.showAddNewSiteFields = true;
     wrapper = shallow(<AddRepoSiteForm {...props} />);
     expect(wrapper.find('Field[name="engine"]')).to.have.length(1);
-    expect(wrapper.find('Field[name="defaultBranch"]').props().required).to.be.true;
+    expect(wrapper.find('BranchField').props().required).to.be.true;
   });
 
   it('makes GitHubRepoUrlField readOnly when showAddNewSiteFields is true', () => {
     const props = {
       showAddNewSiteFields: false,
+      initialValues: { engine: 'jekyll' },
       handleSubmit: () => {},
       pristine: true,
     };
@@ -65,6 +68,7 @@ describe('<AddRepoSiteForm />', () => {
   it('disables submit when pristine is true', () => {
     const props = {
       showAddNewSiteFields: false,
+      initialValues: { engine: 'jekyll' },
       handleSubmit: () => {},
       pristine: true,
     };
@@ -80,6 +84,7 @@ describe('<AddRepoSiteForm />', () => {
   it('calls handleSubmit when submitted', () => {
     const props = {
       showAddNewSiteFields: false,
+      initialValues: { engine: 'jekyll' },
       handleSubmit: spy(),
       pristine: false,
     };
@@ -92,6 +97,7 @@ describe('<AddRepoSiteForm />', () => {
   it('links back to /sites from the Cancel button', () => {
     const props = {
       showAddNewSiteFields: false,
+      initialValues: { engine: 'jekyll' },
       handleSubmit: () => {},
       pristine: true,
     };

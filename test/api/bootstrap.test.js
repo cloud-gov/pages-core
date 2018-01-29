@@ -1,19 +1,12 @@
-Promise.props = require("promise-props")
+Promise.props = require('promise-props');
 
-const AWSMocks = require("./support/aws-mocks")
+require('./support/aws-mocks');
+const cleanDatabase = require('../../api/utils/cleanDatabase');
+const { ActionType } = require('../../api/models');
 
-const _cleanDatabase = () => {
-  const models = require("../../api/models").sequelize.models
-  const promises = Object.keys(models).map(name => {
-    return models[name].destroy({ where: {} })
-  })
-  return Promise.all(promises)
-}
-
-before(function(done) {
-  _cleanDatabase().then(() => {
-    done()
-  }).catch(err => {
-    done(err)
-  })
-})
+before((done) => {
+  cleanDatabase()
+    .then(() => ActionType.createDefaultActionTypes())
+    .then(() => done())
+    .catch(err => done(err));
+});

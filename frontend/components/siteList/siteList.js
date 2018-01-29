@@ -33,17 +33,14 @@ const getSites = (sitesState) => {
   }
 
   return (
-    <div className="usa-grid">
-      <h2>Websites</h2>
-      <ul className="sites-list">
-        {
-          sitesState.data
-            .slice() // create a copy so that sort doesn't modify the original
-            .sort((a, b) => a.id - b.id) // sort ascending by id
-            .map(site => (<SiteListItem key={site.id} site={site} />))
-        }
-      </ul>
-    </div>
+    <ul className="sites-list usa-unstyled-list">
+      {
+        sitesState.data
+          .slice() // create a copy so that sort doesn't modify the original
+          .sort((a, b) => a.id - b.id) // sort ascending by id
+          .map(site => (<SiteListItem key={site.id} site={site} />))
+      }
+    </ul>
   );
 };
 
@@ -51,34 +48,33 @@ const addWebsiteButton = () => (
   <Link
     to="/sites/new"
     role="button"
-    className="usa-button usa-button-big pull-right icon icon-new icon-white"
+    className="usa-button"
     alt="Add a new website"
   >
-    Add Website
+    Add website
   </Link>
 );
 
 export const SiteList = ({ storeState }) =>
-  (<div>
-    <div className="usa-grid dashboard header">
+  (<div className="usa-grid">
+    <div className="page-header usa-grid-full">
       <div className="usa-width-two-thirds">
-        <img className="header-icon" src="/images/websites.svg" alt="Websites icon" />
         <div className="header-title">
-          <h1>Your Websites</h1>
-          <p>Dashboard</p>
+          <h1>
+            <img className="header-icon" src="/images/websites.svg" alt="Websites icon" />
+            Your websites
+          </h1>
         </div>
       </div>
-      <div className="usa-width-one-third">
+      <div className="usa-width-one-third header-actions">
         {addWebsiteButton()}
       </div>
     </div>
+
     <AlertBanner {...storeState.alert} />
+
     {getSites(storeState.sites)}
-    <div className="usa-grid">
-      <div className="usa-width-one-whole">
-        {addWebsiteButton()}
-      </div>
-    </div>
+    {addWebsiteButton()}
   </div>);
 
 SiteList.propTypes = propTypes;

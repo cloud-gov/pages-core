@@ -8,7 +8,8 @@ import buildActions from '../../actions/buildActions';
 import LoadingIndicator from '../LoadingIndicator';
 import RefreshBuildsButton from './refreshBuildsButton';
 import { duration, timeFrom } from '../../util/datetime';
-
+import AlertBanner from '../alertBanner';
+import CreateBuildLink from '../CreateBuildLink';
 
 class SiteBuilds extends React.Component {
   static getUsername(build) {
@@ -18,31 +19,12 @@ class SiteBuilds extends React.Component {
     return '';
   }
 
-  static restartClicked(event, build) {
-    event.preventDefault();
-    buildActions.restartBuild(build);
-  }
-
   static buildLogsLink(build) {
-    return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>Logs</Link>;
+    return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>View logs</Link>;
   }
 
   static renderLoadingState() {
     return <LoadingIndicator />;
-  }
-
-  static restartLink(build) {
-    /* eslint-disable jsx-a11y/href-no-hash */
-    return (
-      <a
-        href="#"
-        role="button"
-        onClick={e => SiteBuilds.restartClicked(e, build)}
-      >
-        Restart
-      </a>
-    );
-    /* eslint-enable jsx-a11y/href-no-hash */
   }
 
   static commitLink(build) {
@@ -61,7 +43,7 @@ class SiteBuilds extends React.Component {
           sha={build.commitSha}
           title={build.commitSha}
         >
-          View Commit <GitHubMark />
+          View commit <GitHubMark />
         </GitHubLink>
       </span>
     );
@@ -80,24 +62,26 @@ class SiteBuilds extends React.Component {
 
   renderEmptyState() {
     return (
-      <div>
-        <p>This site does not yet have any builds.</p>
-        <p>
-          If this site was just added, the first build should be available
-          within a few minutes.
-        </p>
+      <AlertBanner
+        status="info"
+        header="This site does not yet have any builds."
+        message="If this site was just added, the first build should be available
+          within a few minutes."
+      >
         <RefreshBuildsButton site={this.props.site} />
-      </div>
+      </AlertBanner>
+
     );
   }
 
   renderBuildsTable() {
+    const { site } = this.props;
     return (
       <div>
         <div className="log-tools">
-          <RefreshBuildsButton site={this.props.site} />
+          <RefreshBuildsButton site={site} />
         </div>
-        <table className="usa-table-borderless log-table log-table__site-builds">
+        <table className="usa-table-borderless log-table log-table__site-builds table-full-width">
           <thead>
             <tr>
               <th scope="col">Branch</th>
@@ -126,17 +110,23 @@ class SiteBuilds extends React.Component {
 
               return (
                 <tr key={build.id}>
-                  <td>
+                  <th scope="row">
                     { build.branch }
                     { SiteBuilds.commitLink(build) }
-                  </td>
+                  </th>
                   <td>{ SiteBuilds.getUsername(build) }</td>
                   <td>{ timeFrom(build.completedAt) }</td>
                   <td>{ duration(build.createdAt, build.completedAt) }</td>
                   <td><pre>{ message }</pre></td>
-                  <td>
-                    { SiteBuilds.restartLink(build) }<br />
+                  <td className="table-actions">
                     { SiteBuilds.buildLogsLink(build) }
+                    <CreateBuildLink
+                      handlerParams={{ buildId: build.id, siteId: site.id }}
+                      handleClick={buildActions.restartBuild}
+                      class="usa-button usa-button-secondary"
+                    >
+                      Restart
+                    </CreateBuildLink>
                   </td>
                 </tr>
               );

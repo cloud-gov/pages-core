@@ -40,6 +40,10 @@ paths:
           description: Not authorized
           schema:
             $ref: "Error.json"
+        404:
+          descriptions: Not found
+          schema:
+            $ref: "Error.json"
   /site/{site_id}/build:
     get:
       summary: Fetch all of the user's builds for a given site
@@ -394,15 +398,26 @@ paths:
       description: The name of the branch
       type: string
       required: true
+    - name: startAtKey
+      in: query
+      description: The S3 key to start after when retrieving the page of files
+      type: string
+      required: false
     get:
       summary: Fetch the list of files that are published to the given branch for the given site
       responses:
         200:
-          description: A list of files published to the branch
+          description: A paged list of files published to the branch
           schema:
-            type: array
-            items:
-              $ref: "PublishedFile.json"
+            type: object
+            properties:
+              isTruncated:
+                type: bool
+                description: Indicates whether the current page of files is truncated
+              files:
+                type: array
+                items:
+                  $ref: "PublishedFile.json"
         403:
           description: Not authorized
           schema:
@@ -467,7 +482,32 @@ paths:
           description: Not found
           schema:
             $ref: "Error.json"
-
+  /site/{site_id}/user-action:
+    parameters:
+      - name: site_id
+        in: path
+        description: the id of the site
+        type: integer
+        required: true
+    get:
+      summary: Fetch all user actions for a given site
+      responses:
+        200:
+          description: An array of UserAction records
+          schema:
+            $ref: "UserAction.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
   /me:
     get:
       summary: Fetch data for the current user

@@ -25,12 +25,12 @@ describe('<BasicSiteSettings/>', () => {
   it('should render', () => {
     const props = makeProps();
     const wrapper = shallow(<BasicSiteSettings {...props} />);
+    const branchFields = wrapper.find('BranchField');
+
     expect(wrapper.exists()).to.be.true;
-
-    expect(wrapper.find('Field')).to.have.length(2);
-    expect(wrapper.find('Field[name="defaultBranch"]').exists()).to.be.true;
-    expect(wrapper.find('Field[name="demoBranch"]').exists()).to.be.true;
-
+    expect(branchFields).to.have.length(2);
+    expect(branchFields.at(0).prop('name')).to.equal('defaultBranch');
+    expect(branchFields.at(1).prop('name')).to.equal('demoBranch');
     expect(wrapper.find('HttpsUrlField')).to.have.length(2);
 
     const domainField = wrapper.find('HttpsUrlField[name="domain"]');
@@ -49,7 +49,7 @@ describe('<BasicSiteSettings/>', () => {
       label: 'Demo URL:',
       name: 'demoDomain',
       id: 'demoDomainInput',
-      placeholder: 'https://preview.example.gov',
+      placeholder: 'https://demo.example.gov',
       className: 'form-control',
     });
   });
@@ -58,12 +58,12 @@ describe('<BasicSiteSettings/>', () => {
     const props = makeProps();
     let wrapper = shallow(<BasicSiteSettings {...props} />);
     expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('button.button-reset').prop('disabled')).to.be.true;
+    expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.true;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.true;
 
     props.pristine = false;
     wrapper = shallow(<BasicSiteSettings {...props} />);
-    expect(wrapper.find('button.button-reset').prop('disabled')).to.be.false;
+    expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.false;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.false;
   });
 
@@ -71,7 +71,7 @@ describe('<BasicSiteSettings/>', () => {
     const props = makeProps();
     props.pristine = false;
     const wrapper = shallow(<BasicSiteSettings {...props} />);
-    const resetButton = wrapper.find('button.button-reset');
+    const resetButton = wrapper.find('button.usa-button-secondary');
 
     expect(props.reset.called).to.be.false;
     resetButton.simulate('click');

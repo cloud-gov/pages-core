@@ -1,10 +1,14 @@
-@import '_variables';
-
 .well {
   background-color: $well-bg-color;
   padding: 1.5rem;
   position: relative;
   margin-bottom: 1.5rem;
+  > :first-child {
+    margin-top: 0;
+  }
+  > :last-child {
+    margin-bottom: 0;
+  }
 }
 
 .well-heading {

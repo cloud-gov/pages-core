@@ -2,6 +2,8 @@ const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
 const SQS = require('../services/SQS');
 
+const { branchRegex, shaRegex } = require('../utils/validators');
+
 const afterCreate = (build) => {
   const { Site, User, Build } = build.sequelize.models;
 
@@ -40,7 +42,7 @@ const completeJobErrorMessage = (err) => {
   if (err) {
     message = err.message || err;
   } else {
-    message = 'An unknown error occured';
+    message = 'An unknown error occurred';
   }
   return sanitizeCompleteJobErrorMessage(message);
 };
@@ -102,9 +104,15 @@ module.exports = (sequelize, DataTypes) => {
   const Build = sequelize.define('Build', {
     branch: {
       type: DataTypes.STRING,
+      validate: {
+        is: branchRegex,
+      },
     },
     commitSha: {
       type: DataTypes.STRING,
+      validate: {
+        is: shaRegex,
+      },
     },
     completedAt: {
       type: DataTypes.DATE,
