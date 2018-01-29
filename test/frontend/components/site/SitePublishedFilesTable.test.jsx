@@ -12,7 +12,7 @@ const fetchPublishedFiles = spy();
 
 const SitePublishedFilesTable = proxyquire('../../../../frontend/components/site/SitePublishedFilesTable', {
   '../../actions/publishedFileActions': { fetchPublishedFiles },
-}).default;
+}).SitePublishedFilesTable;
 
 
 const deepCopy = obj => JSON.parse(JSON.stringify(obj));

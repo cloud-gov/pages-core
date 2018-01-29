@@ -110,13 +110,9 @@ export class SiteContainer extends React.Component {
     }
 
     const pageTitle = this.getPageTitle(location.pathname);
-    // const buildLogs = storeState.buildLogs;
-    // const publishedBranches = storeState.publishedBranches;
     // const publishedFiles = storeState.publishedFiles;
 
     // const childConfigs = {
-    //   buildLogs,
-    //   publishedBranches,
     //   publishedFiles,
     // };
 

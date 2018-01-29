@@ -90,8 +90,8 @@ SiteUsers.defaultProps = {
   user: null,
 };
 
-const mapStateToProps = state => ({
-  user: state.user,
+const mapStateToProps = ({ user }) => ({
+  user: user.data,
 });
 
 export { SiteUsers };
