@@ -9,28 +9,26 @@ let props;
 describe('<SiteContainer/>', () => {
   beforeEach(() => {
     props = {
-      storeState: {
-        alert: {},
-        user: {
-          isLoading: false,
-          data: {
-            id: 1,
-            username: 'aUser',
-            email: 'aUser@example.gov',
-          },
+      alert: {},
+      user: {
+        isLoading: false,
+        data: {
+          id: 1,
+          username: 'aUser',
+          email: 'aUser@example.gov',
         },
-        sites: {
-          isLoading: false,
-          data: [{
-            id: 1,
-            defaultBranch: 'master',
-            engine: 'jekyll',
-            owner: '18f',
-            publishedAt: '2017-06-08T20:53:14.363Z',
-            viewLink: 'https://view-link.gov',
-            repository: 'test-repo',
-          }],
-        },
+      },
+      sites: {
+        isLoading: false,
+        data: [{
+          id: 1,
+          defaultBranch: 'master',
+          engine: 'jekyll',
+          owner: '18f',
+          publishedAt: '2017-06-08T20:53:14.363Z',
+          viewLink: 'https://view-link.gov',
+          repository: 'test-repo',
+        }],
       },
       location: {
         pathname: '',
@@ -44,7 +42,7 @@ describe('<SiteContainer/>', () => {
   });
 
   it('renders a LoadingIndicator while sites are loading', () => {
-    props.storeState.sites = {
+    props.sites = {
       isLoading: true,
     };
     const wrapper = shallow(<SiteContainer {...props} />);

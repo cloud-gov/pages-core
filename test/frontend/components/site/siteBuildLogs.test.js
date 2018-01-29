@@ -2,7 +2,7 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 
-import SiteBuildLogs from '../../../../frontend/components/site/siteBuildLogs';
+import { SiteBuildLogs } from '../../../../frontend/components/site/siteBuildLogs';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
 
@@ -51,6 +51,7 @@ describe('<SiteBuildLogs/>', () => {
       },
       buildLogs: {
         isLoading: true,
+        data: [],
       },
     };
 

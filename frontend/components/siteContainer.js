@@ -13,18 +13,6 @@ const propTypes = {
     branch: PropTypes.string,
     fileName: PropTypes.string,
   }).isRequired,
-  storeState: PropTypes.shape({
-    sites: PropTypes.object,
-    builds: PropTypes.object,
-    buildLogs: PropTypes.object,
-    publishedBranches: PropTypes.object,
-    publishedFiles: PropTypes.object,
-    githubBranches: PropTypes.object,
-    alert: PropTypes.shape({
-      message: PropTypes.string,
-      status: PropTypes.string,
-    }),
-  }),
   location: PropTypes.shape({
     pathname: PropTypes.string,
   }).isRequired,
@@ -32,11 +20,14 @@ const propTypes = {
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node,
   ]),
+  sites: PropTypes.object,
+  alert: PropTypes.object,
 };
 
 const defaultProps = {
   children: null,
-  storeState: null,
+  sites: null,
+  alert: {},
 };
 
 export const SITE_NAVIGATION_CONFIG = [
@@ -86,13 +77,13 @@ export class SiteContainer extends React.Component {
   }
 
   render() {
-    const { storeState, children, params, location } = this.props;
+    const { sites, children, params, location, alert } = this.props;
 
-    if (storeState.sites.isLoading || !storeState.sites.data) {
+    if (sites.isLoading || !sites.data) {
       return <LoadingIndicator />;
     }
 
-    const site = this.getCurrentSite(storeState.sites, params.id);
+    const site = this.getCurrentSite(sites, params.id);
 
     if (!site) {
       return (
@@ -110,11 +101,6 @@ export class SiteContainer extends React.Component {
     }
 
     const pageTitle = this.getPageTitle(location.pathname);
-    // const publishedFiles = storeState.publishedFiles;
-
-    // const childConfigs = {
-    //   publishedFiles,
-    // };
 
     return (
       <div className="usa-grid site">
@@ -122,8 +108,8 @@ export class SiteContainer extends React.Component {
         <div className="usa-width-five-sixths site-main" id="pages-container">
 
           <AlertBanner
-            message={storeState.alert.message}
-            status={storeState.alert.status}
+            message={alert.message}
+            status={alert.status}
           />
 
           <PagesHeader

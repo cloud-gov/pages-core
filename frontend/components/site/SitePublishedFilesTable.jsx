@@ -32,7 +32,7 @@ const propTypes = {
 const defaultProps = {
   publishedFiles: null,
 };
-const mapStateToProps = ({ publishedFiles}) => ({
+const mapStateToProps = ({ publishedFiles }) => ({
   publishedFiles,
 });
 
