@@ -56,6 +56,10 @@ class CopyRepoForm extends React.Component {
 
   renderRepoField() {
     return (
+      /**
+       * Here we reuse the BranchField since the same regex can be used to
+       * validate branch and repository names which are acceptable to GitHub.
+       */
       <BranchField
         component={InputWithErrorField}
         className="form-control"
