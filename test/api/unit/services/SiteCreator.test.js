@@ -251,17 +251,11 @@ describe('SiteCreator', () => {
       });
 
       it('should trigger a build that pushes the source repo to the destiantion repo', (done) => {
-        let user;
         const templateResolverStub = stub(TemplateResolver, 'getTemplate');
         const fakeTemplate = {
           repo: 'federalist-template',
           owner: '18f',
           branch: 'not-master',
-        };
-        const siteParams = {
-          owner: crypto.randomBytes(3).toString('hex'),
-          repository: crypto.randomBytes(3).toString('hex'),
-          template: 'redirect',
         };
 
         templateResolverStub.returns(fakeTemplate);
@@ -274,7 +268,7 @@ describe('SiteCreator', () => {
         }).then(site => Site.findById(site.id, { include: [Build] })).then((site) => {
           expect(site.Builds).to.have.length(1);
           expect(site.Builds[0].user).to.equal(user.id);
-          expect(site.Builds[0].branch).to.equal('master');
+          expect(site.Builds[0].branch).to.equal(fakeTemplate.branch);
           expect(site.Builds[0].source.repository).to.equal(fakeTemplate.repo);
           expect(site.Builds[0].source.owner).to.equal(fakeTemplate.owner);
 

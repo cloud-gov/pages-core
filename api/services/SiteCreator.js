@@ -21,11 +21,11 @@ function paramsForNewBuildSource(template) {
   return null;
 }
 
-function paramsForNewBuild({ user, site, template }) {
+function paramsForNewBuild({ user, site, template = {} }) {
   return {
     user: user.id,
     site: site.id,
-    branch: template.branch,
+    branch: template.branch || site.defaultBranch,
     source: paramsForNewBuildSource(template),
   };
 }
