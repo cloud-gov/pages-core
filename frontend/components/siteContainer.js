@@ -110,22 +110,20 @@ export class SiteContainer extends React.Component {
     }
 
     const pageTitle = this.getPageTitle(location.pathname);
-    const builds = storeState.builds;
-    const buildLogs = storeState.buildLogs;
-    const publishedBranches = storeState.publishedBranches;
-    const publishedFiles = storeState.publishedFiles;
-    const githubBranches = storeState.githubBranches;
-    const user = storeState.user.data;
+    // const buildLogs = storeState.buildLogs;
+    // const publishedBranches = storeState.publishedBranches;
+    // const publishedFiles = storeState.publishedFiles;
+    // const githubBranches = storeState.githubBranches;
+    // const user = storeState.user.data;
 
-    const childConfigs = {
-      site,
-      builds,
-      buildLogs,
-      publishedBranches,
-      publishedFiles,
-      githubBranches,
-      user,
-    };
+    // const childConfigs = {
+    //   site,
+    //   buildLogs,
+    //   publishedBranches,
+    //   publishedFiles,
+    //   githubBranches,
+    //   user,
+    // };
 
     return (
       <div className="usa-grid site">
@@ -147,9 +145,7 @@ export class SiteContainer extends React.Component {
             viewLink={site.viewLink}
           />
           <div className="">
-            {children &&
-              React.cloneElement(children, childConfigs)
-            }
+            {children && React.cloneElement(children, { site })}
           </div>
         </div>
       </div>

@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import GitHubLink from '../GitHubLink/GitHubLink';
 import GitHubMark from '../GitHubMark';
 
+import { BUILD } from '../../propTypes';
 import buildActions from '../../actions/buildActions';
 import LoadingIndicator from '../LoadingIndicator';
 import RefreshBuildsButton from './refreshBuildsButton';
@@ -53,13 +55,6 @@ class SiteBuilds extends React.Component {
     buildActions.fetchBuilds(this.props.site);
   }
 
-  builds() {
-    if (this.props.builds.isLoading || !this.props.builds.data) {
-      return [];
-    }
-    return this.props.builds.data;
-  }
-
   renderEmptyState() {
     return (
       <AlertBanner
@@ -75,7 +70,7 @@ class SiteBuilds extends React.Component {
   }
 
   renderBuildsTable() {
-    const { site } = this.props;
+    const { site, builds } = this.props;
     return (
       <div>
         <div className="log-tools">
@@ -93,7 +88,7 @@ class SiteBuilds extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {this.builds().map((build) => {
+            {builds.data.map((build) => {
               let message;
 
               switch (build.state) {
@@ -133,16 +128,17 @@ class SiteBuilds extends React.Component {
             })}
           </tbody>
         </table>
-        { this.builds().length >= 100 ? <p>List only displays 100 most recent builds.</p> : null }
+        { builds.data.length >= 100 ? <p>List only displays 100 most recent builds.</p> : null }
       </div>
     );
   }
 
   render() {
-    const builds = this.builds();
-    if (this.props.builds.isLoading) {
+    const { builds } = this.props;
+
+    if (builds.isLoading) {
       return SiteBuilds.renderLoadingState();
-    } else if (!builds.length) {
+    } else if (!builds.data.length) {
       return this.renderEmptyState();
     }
     return this.renderBuildsTable();
@@ -152,18 +148,7 @@ class SiteBuilds extends React.Component {
 SiteBuilds.propTypes = {
   builds: PropTypes.shape({
     isLoading: PropTypes.boolean,
-    data: PropTypes.arrayOf(PropTypes.shape({
-      id: PropTypes.number,
-      state: PropTypes.string,
-      error: PropTypes.string,
-      branch: PropTypes.string,
-      commitSha: PropTypes.string,
-      completedAt: PropTypes.string,
-      createdAt: PropTypes.string,
-      user: PropTypes.shape({
-        username: PropTypes.string,
-      }),
-    })),
+    data: PropTypes.arrayOf(BUILD),
   }),
   site: PropTypes.shape({
     id: PropTypes.number,
@@ -175,4 +160,9 @@ SiteBuilds.defaultProps = {
   site: null,
 };
 
-export default SiteBuilds;
+const mapStateToProps = state => ({
+  builds: state.builds,
+});
+
+export { SiteBuilds };
+export default connect(mapStateToProps)(SiteBuilds);
