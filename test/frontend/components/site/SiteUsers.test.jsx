@@ -2,7 +2,7 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import { stub } from 'sinon';
-import SiteUsers from '../../../../frontend/components/site/SiteUsers';
+import { SiteUsers } from '../../../../frontend/components/site/SiteUsers';
 import siteActions from '../../../../frontend/actions/siteActions';
 
 const user = {

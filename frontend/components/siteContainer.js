@@ -113,16 +113,11 @@ export class SiteContainer extends React.Component {
     // const buildLogs = storeState.buildLogs;
     // const publishedBranches = storeState.publishedBranches;
     // const publishedFiles = storeState.publishedFiles;
-    // const githubBranches = storeState.githubBranches;
-    // const user = storeState.user.data;
 
     // const childConfigs = {
-    //   site,
     //   buildLogs,
     //   publishedBranches,
     //   publishedFiles,
-    //   githubBranches,
-    //   user,
     // };
 
     return (
