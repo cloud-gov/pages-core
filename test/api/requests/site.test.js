@@ -325,7 +325,7 @@ describe('Site API', () => {
           .set('Cookie', cookie)
           .expect(400)).then((response) => {
             validateAgainstJSONSchema('POST', '/site', 400, response.body);
-            expect(response.body.message).to.equal('This site has already been added to Federalist');
+            expect(response.body.message).to.equal('This site has already been added to Federalist.');
             done();
           }).catch(done);
     });
