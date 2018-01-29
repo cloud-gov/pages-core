@@ -52,3 +52,25 @@
     background-image: url('/images/icon-gear-hover.svg');
   }
 }
+
+.icon-view {
+  background-image: url('/images/icon-view.svg');
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 0.9em;
+
+  &:hover {
+    background-image: url('/images/icon-view-hover.svg');
+  }
+}
+
+.icon-github {
+  background-image: url('/images/icon-github.svg');
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 0.9em;
+
+  &:hover {
+    background-image: url('/images/icon-github-hover.svg');
+  }
+}
