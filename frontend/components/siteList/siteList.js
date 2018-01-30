@@ -52,19 +52,19 @@ const addWebsiteButton = () => (
     alt="Add a new website"
   >
     <svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1">
-      <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="icon-plus-12" fill="#FFFFFF" fill-rule="nonzero">
+      <g id="Symbols" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+        <g id="icon-plus-12" fill="#FFFFFF" fillRule="nonzero">
           <g id="Group">
             <path d="M5,1.27272727 C5,0.569819409 5.44771525,0 6,0 C6.55228475,0 7,0.569819409
               7,1.27272727 L7,10.7272727 C7,11.4301806 6.55228475,12 6,12 C5.44771525,12
               5,11.4301806 5,10.7272727 L5,1.27272727 Z" id="Shape"
               transform="translate(6.000000, 6.000000) scale(1, -1)
-              translate(-6.000000, -6.000000) "></path>
+              translate(-6.000000, -6.000000) " />
             <path d="M5,1.27272727 C5,0.569819409 5.44771525,0 6,0 C6.55228475,0 7,0.569819409
               7,1.27272727 L7,10.7272727 C7,11.4301806 6.55228475,12 6,12 C5.44771525,12
               5,11.4301806 5,10.7272727 L5,1.27272727 Z" id="Shape-Copy"
               transform="translate(6.000000, 6.000000) scale(1, -1) rotate(90.000000)
-              translate(-6.000000, -6.000000) "></path>
+              translate(-6.000000, -6.000000) " />
           </g>
         </g>
       </g>
