@@ -34,4 +34,12 @@ describe('<AlertBanner/>', () => {
     expect(childInstance).to.have.length(1);
     expect(childInstance.text()).to.equal(componentText);
   });
+
+  it('can opt out of displaying `role="alert"`', () => {
+    const wrapperWithRole = shallow(<AlertBanner message="wow" />);
+    const wrapperWithoutRole = shallow(<AlertBanner message="hi" alertRole={false} />);
+
+    expect(wrapperWithRole.find('div').at(0).prop('role')).to.equal('alert');
+    expect(wrapperWithoutRole.find('div').at(0).prop('role')).to.equal(undefined);
+  });
 });

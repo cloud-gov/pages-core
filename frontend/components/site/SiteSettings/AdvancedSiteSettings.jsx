@@ -121,6 +121,7 @@ export const AdvancedSiteSettings = ({
       status="warning"
       header="Danger zone"
       message="Delete this site from Federalist?"
+      alertRole={false}
     >
       <button className="usa-button usa-button-red" onClick={onDelete}>
         Delete

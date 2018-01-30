@@ -37,6 +37,7 @@ describe('<AdvancedSiteSettings/>', () => {
     expect(alertBanner).to.have.length(1);
     expect(alertBanner.prop('header')).to.be.defined;
     expect(alertBanner.prop('message')).to.be.defined;
+    expect(alertBanner.prop('alertRole')).to.be.false;
   });
 
   it('should have its buttons disabled when pristine', () => {
