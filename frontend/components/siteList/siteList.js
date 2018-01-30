@@ -52,14 +52,23 @@ const addWebsiteButton = () => (
     alt="Add a new website"
   >
     <svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" >
-        <g id="Artboard-7" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-55.000000, -46.000000)">
-            <g id="icon-plus" transform="translate(55.000000, 46.000000)" fill="#FFFFFF">
-                <g id="Group">
-                    <path d="M6,1.27272727 C6,0.569819409 6.44771525,0 7,0 C7.55228475,0 8,0.569819409 8,1.27272727 L8,12.7272727 C8,13.4301806 7.55228475,14 7,14 C6.44771525,14 6,13.4301806 6,12.7272727 L6,1.27272727 Z" id="Shape" fill-rule="nonzero" transform="translate(7.000000, 7.000000) scale(1, -1) translate(-7.000000, -7.000000) "></path>
-                    <path d="M6,1.27272727 C6,0.569819409 6.44771525,0 7,0 C7.55228475,0 8,0.569819409 8,1.27272727 L8,12.7272727 C8,13.4301806 7.55228475,14 7,14 C6.44771525,14 6,13.4301806 6,12.7272727 L6,1.27272727 Z" id="Shape-Copy" fill-rule="nonzero" transform="translate(7.000000, 7.000000) scale(1, -1) rotate(90.000000) translate(-7.000000, -7.000000) "></path>
-                </g>
-            </g>
+      <g id="Artboard-7" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"
+        transform="translate(-55.000000, -46.000000)">
+        <g id="icon-plus" transform="translate(55.000000, 46.000000)" fill="#FFFFFF">
+          <g id="Group">
+            <path d="M6,1.27272727 C6,0.569819409 6.44771525,0 7,0 C7.55228475,0 8,0.569819409
+              8,1.27272727 L8,12.7272727 C8,13.4301806 7.55228475,14 7,14 C6.44771525,14
+              6,13.4301806 6,12.7272727 L6,1.27272727 Z" id="Shape" fill-rule="nonzero"
+              transform="translate(7.000000, 7.000000) scale(1, -1) translate(-7.000000,
+                -7.000000) "></path>
+            <path d="M6,1.27272727 C6,0.569819409 6.44771525,0 7,0 C7.55228475,0 8,0.569819409
+              8,1.27272727 L8,12.7272727 C8,13.4301806 7.55228475,14 7,14 C6.44771525,14
+              6,13.4301806 6,12.7272727 L6,1.27272727 Z" id="Shape-Copy" fill-rule="nonzero"
+              transform="translate(7.000000, 7.000000) scale(1, -1) rotate(90.000000)
+              translate(-7.000000, -7.000000) "></path>
+          </g>
         </g>
+      </g>
     </svg>
     Add website
   </Link>
