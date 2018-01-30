@@ -19,7 +19,7 @@ const propTypes = {
 function getViewLink(viewLink, repo) {
   return (
     <a
-      className="icon icon-view"
+      className="icon-view"
       href={viewLink}
       alt={`View the ${repo} site`}
       target="_blank"

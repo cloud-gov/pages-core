@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-grid</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Artboard-4" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-402.000000, -23.000000)">
+        <g id="icon-layout" transform="translate(402.000000, 23.000000)" fill="#000000" fill-rule="nonzero">
+            <path d="M3,2 C2.44771525,2 2,2.44771525 2,3 L2,17 C2,17.5522847 2.44771525,18 3,18 L17,18 C17.5522847,18 18,17.5522847 18,17 L18,3 C18,2.44771525 17.5522847,2 17,2 L3,2 Z M3,0 L17,0 C18.6568542,-2.22044605e-16 20,1.34314575 20,3 L20,17 C20,18.6568542 18.6568542,20 17,20 L3,20 C1.34314575,20 2.22044605e-16,18.6568542 0,17 L0,3 C-2.22044605e-16,1.34314575 1.34314575,3.33066907e-16 3,0 Z" id="Rectangle-path"></path>
+            <path d="M1,8 C0.44771525,8 0,7.55228475 0,7 C0,6.44771525 0.44771525,6 1,6 L19,6 C19.5522847,6 20,6.44771525 20,7 C20,7.55228475 19.5522847,8 19,8 L1,8 Z" id="Shape"></path>
+            <path d="M8,19 C8,19.5522847 7.55228475,20 7,20 C6.44771525,20 6,19.5522847 6,19 L6,7 C6,6.44771525 6.44771525,6 7,6 C7.55228475,6 8,6.44771525 8,7 L8,19 Z" id="Shape"></path>
+        </g>
+    </g>
+</svg>
