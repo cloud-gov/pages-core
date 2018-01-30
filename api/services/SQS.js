@@ -69,7 +69,7 @@ const buildContainerEnvironment = build => ({
   BUCKET: s3Config.bucket,
   BASEURL: baseURLForBuild(build),
   CACHE_CONTROL: buildConfig.cacheControl,
-  BRANCH: build.branch,
+  BRANCH: sourceForBuild(build).branch || build.branch,
   CONFIG: siteConfig(build),
   REPOSITORY: build.Site.repository,
   OWNER: build.Site.owner,

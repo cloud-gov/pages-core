@@ -268,7 +268,7 @@ describe('SiteCreator', () => {
         }).then(site => Site.findById(site.id, { include: [Build] })).then((site) => {
           expect(site.Builds).to.have.length(1);
           expect(site.Builds[0].user).to.equal(user.id);
-          expect(site.Builds[0].branch).to.equal(fakeTemplate.branch);
+          expect(site.Builds[0].branch).to.equal(site.defaultBranch);
           expect(site.Builds[0].source.repository).to.equal(fakeTemplate.repo);
           expect(site.Builds[0].source.owner).to.equal(fakeTemplate.owner);
 

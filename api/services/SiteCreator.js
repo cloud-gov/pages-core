@@ -15,7 +15,11 @@ function paramsForNewSite(params) {
 
 function paramsForNewBuildSource(template) {
   if (template) {
-    return { repository: template.repo, owner: template.owner };
+    return {
+      repository: template.repo,
+      owner: template.owner,
+      branch: template.branch,
+    };
   }
 
   return null;
@@ -25,7 +29,7 @@ function paramsForNewBuild({ user, site, template = {} }) {
   return {
     user: user.id,
     site: site.id,
-    branch: template.branch || site.defaultBranch,
+    branch: site.defaultBranch,
     source: paramsForNewBuildSource(template),
   };
 }
