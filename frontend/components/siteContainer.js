@@ -43,27 +43,27 @@ export const SITE_NAVIGATION_CONFIG = [
   {
     display: 'Build history',
     route: 'builds',
-    iconClass: 'icon-logs',
+    icon: 'icon-book',
   },
   {
     display: 'GitHub branches',
     route: 'branches',
-    iconClass: 'icon-pages',
+    icon: 'icon-branch',
   },
   {
     display: 'Published files',
     route: 'published',
-    iconClass: 'icon-upload',
+    icon: 'icon-cloud_upload',
   },
   {
     display: 'Collaborators',
     route: 'users',
-    iconClass: 'icon-gear',
+    icon: 'icon-people',
   },
   {
     display: 'Site settings',
     route: 'settings',
-    iconClass: 'icon-settings',
+    icon: 'icon-gear',
   },
 ];
 
