@@ -48,10 +48,6 @@ describe('<SiteList />', () => {
       expect(wrapper.find('Link[to="/sites/new"]')).to.have.length(1);
     });
 
-    it('renders 1 `return to top` link', () => {
-      expect(wrapper.find('Link[to="/sites#]')).to.have.length(1);
-    });
-
     it('renders fallback content when user has no sites', () => {
       const fallbackEl = wrapper.find('h1').filterWhere(el => el.text() === NO_SITE_TEXT);
 
