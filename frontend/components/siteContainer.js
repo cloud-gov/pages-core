@@ -51,7 +51,7 @@ export const SITE_NAVIGATION_CONFIG = [
     iconClass: 'icon-pages',
   },
   {
-    display: 'Published files',
+    display: 'Uploaded files',
     route: 'published',
     iconClass: 'icon-upload',
   },
