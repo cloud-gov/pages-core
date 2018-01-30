@@ -60,8 +60,11 @@ describe('<SiteContainer/>', () => {
   it('renders an error after sites have loaded but no matching site', () => {
     props.params.id = '999';
     const wrapper = shallow(<SiteContainer {...props} />);
+    const alert = wrapper.find('AlertBanner');
+
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
-    expect(wrapper.find('.usa-alert-error')).to.have.length(1);
+    expect(alert).to.have.length(1);
+    expect(alert.prop('status')).to.equal('error');
   });
 
   it('displays a page title if one is configured for the location', () => {

@@ -86,17 +86,19 @@ export class SiteContainer extends React.Component {
     const site = this.getCurrentSite(sites, params.id);
 
     if (!site) {
+      const errorMessage = (
+        <span>
+          Apologies; you don&apos;t have access to this site in Federalist!
+          <br />
+          Please contact the site owner if you should have access.
+        </span>
+      );
       return (
-        <div className="usa-alert usa-alert-error" role="alert">
-          <div className="usa-alert-body">
-            <h3 className="usa-alert-heading">Unauthorized</h3>
-            <p className="usa-alert-text">
-              Apologies; you don&apos;t have access to this site in Federalist!
-              <br />
-              Please contact the site owner if you should have access.
-            </p>
-          </div>
-        </div>
+        <AlertBanner
+          status="error"
+          header="Unavailable"
+          message={errorMessage}
+        />
       );
     }
 
