@@ -119,7 +119,7 @@ export const AdvancedSiteSettings = ({
 
     <AlertBanner
       status="warning"
-      heading="Danger zone"
+      header="Danger zone"
       message="Delete this site from Federalist?"
     >
       <button className="usa-button usa-button-red" onClick={onDelete}>

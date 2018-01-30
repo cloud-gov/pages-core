@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const propTypes = {
-  message: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  message: PropTypes.node,
   status: PropTypes.string,
   header: PropTypes.string,
   children: PropTypes.node,

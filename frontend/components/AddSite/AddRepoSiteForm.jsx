@@ -32,7 +32,7 @@ const showNewSiteAlert = () => {
     </span>
   );
 
-  return <AlertBanner status="info" heading="New Site" message={message} />;
+  return <AlertBanner status="info" header="New Site" message={message} />;
 };
 
 export const AddRepoSiteForm = ({

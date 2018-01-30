@@ -26,13 +26,17 @@ describe('<AdvancedSiteSettings/>', () => {
   it('should render', () => {
     const props = makeProps();
     const wrapper = shallow(<AdvancedSiteSettings {...props} />);
-    expect(wrapper.exists()).to.be.true;
+    const alertBanner = wrapper.find('AlertBanner');
 
+    expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('Field')).to.have.length(4);
     expect(wrapper.find('Field[name="engine"]').exists()).to.be.true;
     expect(wrapper.find('Field[name="config"]').exists()).to.be.true;
     expect(wrapper.find('Field[name="demoConfig"]').exists()).to.be.true;
     expect(wrapper.find('Field[name="previewConfig"]').exists()).to.be.true;
+    expect(alertBanner).to.have.length(1);
+    expect(alertBanner.prop('header')).to.be.defined;
+    expect(alertBanner.prop('message')).to.be.defined;
   });
 
   it('should have its buttons disabled when pristine', () => {
