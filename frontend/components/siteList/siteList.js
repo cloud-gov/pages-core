@@ -72,13 +72,8 @@ export const SiteList = ({ storeState }) =>
     </div>
 
     <AlertBanner {...storeState.alert} />
-
     {getSites(storeState.sites)}
-    <Link
-      to="/sites#"
-    >
-      Return to top
-    </Link>
+    <a href="#top">Return to top</a>
   </div>);
 
 SiteList.propTypes = propTypes;
