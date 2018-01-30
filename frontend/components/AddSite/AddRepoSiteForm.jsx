@@ -6,6 +6,7 @@ import { Link } from 'react-router';
 import BranchField from '../Fields/BranchField';
 import GitHubRepoUrlField from '../Fields/GitHubRepoUrlField';
 import SelectSiteEngine from '../SelectSiteEngine';
+import AlertBanner from '../alertBanner';
 
 const propTypes = {
   showAddNewSiteFields: PropTypes.bool,
@@ -20,6 +21,18 @@ const propTypes = {
 
 const defaultProps = {
   showAddNewSiteFields: false,
+};
+
+const showNewSiteAlert = () => {
+  const message = (
+    <span>
+      Looks like this site is completely new to Federalist!
+      <br />
+      Please fill out these additional fields to complete the process.
+    </span>
+  );
+
+  return <AlertBanner status="info" heading="New Site" message={message} />;
 };
 
 export const AddRepoSiteForm = ({
@@ -52,16 +65,7 @@ export const AddRepoSiteForm = ({
     {
       showAddNewSiteFields && (
       <div className="add-repo-site-additional-fields">
-        <div className="usa-alert usa-alert-info" role="alert">
-          <div className="usa-alert-body">
-            <h3 className="usa-alert-heading">New Site</h3>
-            <p className="usa-alert-text">
-              Looks like this site is completely new to Federalist!
-              <br />
-              Please fill out these additional fields to complete the process.
-            </p>
-          </div>
-        </div>
+        {showNewSiteAlert()}
         <div className="form-group">
           <label htmlFor="engine">Static site engine</label>
           <Field
