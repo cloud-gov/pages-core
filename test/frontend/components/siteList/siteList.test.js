@@ -44,8 +44,12 @@ describe('<SiteList />', () => {
       expect(wrapper.find('div.header-title > h1')).to.have.length(1);
     });
 
-    it('always renders 2 `add new site` button', () => {
-      expect(wrapper.find('Link[to="/sites/new"]')).to.have.length(2);
+    it('renders 1 `add new site` button', () => {
+      expect(wrapper.find('Link[to="/sites/new"]')).to.have.length(1);
+    });
+
+    it('renders 1 `return to top` link', () => {
+      expect(wrapper.find('Link[to="/sites#]')).to.have.length(1);
     });
 
     it('renders fallback content when user has no sites', () => {
