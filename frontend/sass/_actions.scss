@@ -23,7 +23,8 @@ a.usa-button,
   }
 }
 .button-add-website {
-  svg {
-    margin-right: .6rem;
-  }
+  background-image: url('/images/icon-plus.svg');
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  padding-left: 30px;
 }
