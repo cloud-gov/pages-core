@@ -75,3 +75,12 @@
     background-image: url('/images/icon-github-hover.svg');
   }
 }
+
+.repo-link {
+  svg {
+    height: 18px;
+    margin-left: .4rem;
+    vertical-align: middle;
+    width: 18px;
+  }
+}
