@@ -336,14 +336,20 @@ describe('SQS', () => {
         .catch(done);
     });
 
-    it('should set SOURCE_REPO and SOURCE_OWNER in the repository if the build has a source owner / repo', (done) => {
+    it('sets SOURCE_REPO, SOURCE_OWNER, and BRANCH in the repository if the build has a source owner / repo', (done) => {
+      const buildParams = {
+        repository: 'template',
+        owner: '18f',
+        branch: 'my-branch',
+      };
       factory.site({ engine: 'hugo' })
-        .then(() => factory.build({ source: { repository: 'template', owner: '18f' } }))
+        .then(() => factory.build({ source: buildParams }))
         .then(build => Build.findById(build.id, { include: [Site, User] }))
         .then((build) => {
           const message = SQS.messageBodyForBuild(build);
-          expect(messageEnv(message, 'SOURCE_REPO')).to.equal('template');
-          expect(messageEnv(message, 'SOURCE_OWNER')).to.equal('18f');
+          expect(messageEnv(message, 'SOURCE_REPO')).to.equal(buildParams.repository);
+          expect(messageEnv(message, 'SOURCE_OWNER')).to.equal(buildParams.owner);
+          expect(messageEnv(message, 'BRANCH')).to.equal(buildParams.branch);
           done();
         })
         .catch(done);

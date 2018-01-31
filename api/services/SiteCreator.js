@@ -1,5 +1,5 @@
 const GitHub = require('./GitHub');
-const config = require('../../config');
+const TemplateResolver = require('./TemplateResolver');
 const { Build, Site, User } = require('../models');
 
 const defaultEngine = 'jekyll';
@@ -13,33 +13,19 @@ function paramsForNewSite(params) {
   };
 }
 
-function templateForTemplateName(templateName) {
-  if (!templateName) {
-    /** no-op */
-    return null;
-  }
-
-  const template = config.templates[templateName];
-
-  if (!template) {
-    throw {
-      message: `No such template: ${templateName}`,
-      status: 400,
-    };
-  }
-
-  return template;
-}
-
 function paramsForNewBuildSource(template) {
   if (template) {
-    return { repository: template.repo, owner: template.owner };
+    return {
+      repository: template.repo,
+      owner: template.owner,
+      branch: template.branch,
+    };
   }
 
   return null;
 }
 
-function paramsForNewBuild({ user, site, template }) {
+function paramsForNewBuild({ user, site, template = {} }) {
   return {
     user: user.id,
     site: site.id,
@@ -187,7 +173,8 @@ function createSiteFromSource({ siteParams, user }) {
 }
 
 function createSite({ user, siteParams }) {
-  const template = templateForTemplateName(siteParams.template);
+  const templateName = siteParams.template;
+  const template = templateName && TemplateResolver.getTemplate(templateName);
   const newSiteParams = paramsForNewSite(siteParams);
 
   if (template) {
