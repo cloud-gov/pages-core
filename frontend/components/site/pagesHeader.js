@@ -36,12 +36,12 @@ const PagesHeader = ({ owner, repository, title, viewLink }) => (
       <Link
         role="button"
         className="icon-view"
-        alt="View this website"
+        alt="View this site"
         target="_blank"
         rel="noopener noreferrer"
         to={viewLink}
       >
-        View website
+        View site
       </Link>
     </div>
   </div>
