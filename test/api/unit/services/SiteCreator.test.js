@@ -1,8 +1,10 @@
 const crypto = require('crypto');
-const expect = require('chai').expect;
+const { expect } = require('chai');
+const { stub } = require('sinon');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const SiteCreator = require('../../../../api/services/SiteCreator');
+const TemplateResolver = require('../../../../api/services/TemplateResolver');
 const { Build, Site, User } = require('../../../../api/models');
 
 describe('SiteCreator', () => {
@@ -217,6 +219,7 @@ describe('SiteCreator', () => {
           expect(site).to.not.be.undefined;
           expect(site.owner).to.equal(siteParams.owner);
           expect(site.repository).to.equal(siteParams.repository);
+          expect(site.defaultBranch).to.equal('master');
 
           return Site.findOne({
             where: {
@@ -247,9 +250,17 @@ describe('SiteCreator', () => {
         }).catch(done);
       });
 
-      it('should trigger a build that pushes the source repo to the destination repo', (done) => {
-        factory.user()
-        .then((model) => {
+      it('should trigger a build that pushes the source repo to the destiantion repo', (done) => {
+        const templateResolverStub = stub(TemplateResolver, 'getTemplate');
+        const fakeTemplate = {
+          repo: 'federalist-template',
+          owner: '18f',
+          branch: 'not-master',
+        };
+
+        templateResolverStub.returns(fakeTemplate);
+
+        factory.user().then((model) => {
           user = model;
           githubAPINocks.createRepoForOrg();
           githubAPINocks.webhook();
@@ -257,11 +268,12 @@ describe('SiteCreator', () => {
         }).then(site => Site.findById(site.id, { include: [Build] })).then((site) => {
           expect(site.Builds).to.have.length(1);
           expect(site.Builds[0].user).to.equal(user.id);
-          expect(site.Builds[0].branch).to.equal('master');
-          expect(site.Builds[0].source).to.deep.equal({
-            repository: 'federalist-modern-team-template',
-            owner: '18f',
-          });
+          expect(site.Builds[0].branch).to.equal(site.defaultBranch);
+          expect(site.Builds[0].source.repository).to.equal(fakeTemplate.repo);
+          expect(site.Builds[0].source.owner).to.equal(fakeTemplate.owner);
+
+          templateResolverStub.restore();
+
           done();
         })
         .catch(done);
