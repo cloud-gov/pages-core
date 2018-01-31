@@ -48,7 +48,7 @@ const addWebsiteButton = () => (
   <Link
     to="/sites/new"
     role="button"
-    className="usa-button"
+    className="usa-button button-add-website"
     alt="Add a new website"
   >
     Add website
