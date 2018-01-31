@@ -6,6 +6,7 @@ import { SITE } from '../../../propTypes';
 import ExpandableArea from '../../ExpandableArea';
 import BasicSiteSettings from './BasicSiteSettings';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
+import CopyRepoForm from './CopyRepoForm';
 import siteActions from '../../../actions/siteActions';
 
 const propTypes = {
@@ -20,10 +21,10 @@ const defaultProps = {
 class SiteSettings extends React.Component {
   constructor(props) {
     super(props);
-    autoBind(this, 'onSubmit', 'onDelete');
+    autoBind(this, 'handleUpdate', 'handleDelete', 'handleCopySite');
   }
 
-  onDelete(event) {
+  handleDelete(event) {
     // eslint-disable-next-line no-alert
     if (window.confirm('Are you sure you want to delete this site? This action will also delete your site builds, including all previews.')) {
       siteActions.deleteSite(this.props.site.id);
@@ -32,16 +33,32 @@ class SiteSettings extends React.Component {
     event.preventDefault();
   }
 
-  onSubmit(values) {
+  handleUpdate(values) {
     siteActions.updateSite(this.props.site, values);
   }
 
+  handleCopySite({ newBaseBranch, newRepoName, targetOwner }) {
+    const { site } = this.props;
+    const siteParams = {
+      owner: targetOwner,
+      repository: newRepoName,
+      defaultBranch: newBaseBranch,
+      engine: site.engine,
+      source: {
+        owner: site.owner,
+        repo: site.repository,
+      },
+    };
+
+    siteActions.addSite(siteParams);
+  }
+
   render() {
-    if (!this.props.site) {
+    const { site } = this.props;
+
+    if (!site) {
       return null;
     }
-
-    const site = this.props.site;
 
     const basicInitialValues = {
       defaultBranch: site.defaultBranch || '',
@@ -84,15 +101,17 @@ class SiteSettings extends React.Component {
         </p>
         <BasicSiteSettings
           initialValues={basicInitialValues}
-          onSubmit={this.onSubmit}
+          onSubmit={this.handleUpdate}
         />
-
         <ExpandableArea title="Advanced settings">
           <AdvancedSiteSettings
             initialValues={advancedInitialValues}
-            onDelete={this.onDelete}
-            onSubmit={this.onSubmit}
+            onDelete={this.handleDelete}
+            onSubmit={this.handleUpdate}
           />
+        </ExpandableArea>
+        <ExpandableArea title="Copy site">
+          <CopyRepoForm onSubmit={this.handleCopySite} />
         </ExpandableArea>
       </div>
     );

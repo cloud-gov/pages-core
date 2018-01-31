@@ -35,7 +35,7 @@ const PagesHeader = ({ owner, repository, title, viewLink }) => (
       </GitHubLink>
       <Link
         role="button"
-        className="icon icon-view icon-white"
+        className="icon-view"
         alt="View this website"
         target="_blank"
         rel="noopener noreferrer"

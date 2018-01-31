@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
 import SelectSiteEngine from '../../SelectSiteEngine';
+import AlertBanner from '../../alertBanner';
 
 const propTypes = {
   onDelete: PropTypes.func.isRequired,
@@ -116,19 +117,16 @@ export const AdvancedSiteSettings = ({
       Save advanced settings
     </button>
 
-
-    <div className="usa-alert usa-alert-warning">
-      <div className="usa-alert-body">
-        <h3 className="usa-alert-heading">Danger zone</h3>
-        <p className="usa-alert-text">Delete this site from Federalist?</p>
-        <button
-          className="usa-button usa-button-red"
-          onClick={onDelete}
-        >
-          Delete
-        </button>
-      </div>
-    </div>
+    <AlertBanner
+      status="warning"
+      header="Danger zone"
+      message="Delete this site from Federalist?"
+      alertRole={false}
+    >
+      <button className="usa-button usa-button-red" onClick={onDelete}>
+        Delete
+      </button>
+    </AlertBanner>
   </form>
 );
 

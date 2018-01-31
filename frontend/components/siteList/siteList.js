@@ -48,7 +48,7 @@ const addWebsiteButton = () => (
   <Link
     to="/sites/new"
     role="button"
-    className="usa-button"
+    className="usa-button button-add-website"
     alt="Add a new website"
   >
     Add website
@@ -72,9 +72,8 @@ export const SiteList = ({ storeState }) =>
     </div>
 
     <AlertBanner {...storeState.alert} />
-
     {getSites(storeState.sites)}
-    {addWebsiteButton()}
+    <a href="#top">Return to top</a>
   </div>);
 
 SiteList.propTypes = propTypes;
