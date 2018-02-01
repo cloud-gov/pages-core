@@ -5,11 +5,25 @@
 [![Test Coverage](https://codeclimate.com/github/18F/federalist/badges/coverage.svg)](https://codeclimate.com/github/18F/federalist/coverage)
 [![Dependency Status](https://gemnasium.com/badges/github.com/18F/federalist.svg)](https://gemnasium.com/github.com/18F/federalist)
 
-***Under active development. Everything is subject to change. Learn more at the [documentation site](https://federalist-docs.18f.gov/). Interested in talking to us? [Join our public chat room](https://chat.18f.gov/).***
+***Federalist is updated regularly. [Join our public chat room](https://chat.18f.gov/) to talk to us and stay informed. You can also check out our [documentation](https://federalist-docs.18f.gov/) to learn more.***
 
-Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub and Amazon Web Services to provide a simple way for developers to launch new static websites or more easily manage existing static websites. This repo is home to "federalist-core" - a Node.js app that allows government users to add and configure their Federalist sites.
+## About Federalist
 
-## How to set up a local Federalist development server
+[Federalist](https://federalist.18f.gov) helps federal government entities publish compliant static websites quickly and seamlessly. Federalist is built on top of [cloud.gov](cloud.gov), GitHub, and Amazon Web Services.
+
+This repository is home to "federalist-core" - a Node.js app that allows government users to create and configure Federalist sites.
+
+## Examples
+
+Partner agencies across the federal government use Federalist to host websites. A few examples include:
+
+- [College Scorecard](https://collegescorecard.ed.gov/)
+- [Natural Resources Revenue Data](https://revenuedata.doi.gov/)
+- [NSF Small Business Innovation Research program](https://seedfund.nsf.gov)
+
+More examples can be found at [https://federalist.18f.gov/content/examples](https://federalist.18f.gov/content/examples).
+
+## Setting up a local Federalist development environment
 
 ### First install these dependencies
 
@@ -19,6 +33,7 @@ Before you start, ensure you have the following installed:
 - [Docker Compose](https://docs.docker.com/compose/install/#install-compose)
 
 ### Then follow these steps to set up and run your server
+
 In order to provide a simple development user experience, Federalist has some complexity on the backend. So as part of your local setup, you will need to emulate some of that complexity through the creation steps below. This shouldn't take longer than 15 minutes.
 
 _Note: some terminal commands may take a while to process, without offering feedback to you. Your patience will be rewarded!_
@@ -62,7 +77,7 @@ This will be the file that holds your S3 and SQS configurations.
 
 **Pro tips:**
 
-In our Docker Compose environment, `app` is the name of the container where the Federalist web application runs. You can run any command in the context of the web application by running  `docker-compose run app <THE COMMAND>`.
+In our Docker Compose environment, `app` is the name of the container where the Federalist web application runs. You can run any command in the context of the web application by running `docker-compose run app <THE COMMAND>`.
 
 For example:
 
