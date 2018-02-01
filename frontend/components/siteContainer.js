@@ -51,7 +51,7 @@ export const SITE_NAVIGATION_CONFIG = [
     icon: 'icon-branch',
   },
   {
-    display: 'Published files',
+    display: 'Uploaded files',
     route: 'published',
     icon: 'icon-cloud_upload',
   },
