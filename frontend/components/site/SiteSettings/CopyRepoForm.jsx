@@ -23,7 +23,7 @@ class CopyRepoForm extends React.Component {
   renderDisclaimer() {
     return (
       <p>
-        This feature will allow you to copy this site's code to a new GitHub repository.
+        This feature will allow you to copy this site&apos;s code to a new GitHub repository.
         You must have admin permissions for the code in GitHub to use this feature and you
         must have permissions to create new repos in GitHub if copying into an org.
         <br /><br />
