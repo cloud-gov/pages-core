@@ -23,18 +23,19 @@ class CopyRepoForm extends React.Component {
   renderDisclaimer() {
     return (
       <p>
-        This feature will allow you to copy this site to a new GitHub repository.
-        You must be an admin user of this site.
+        This feature will allow you to copy this site&apos;s code to a new GitHub repository.
+        You must have admin permissions for the code in GitHub to use this feature and you
+        must have permissions to create new repos in GitHub if copying into an org.
         <br /><br />
         A new site will be created in Federalist, but only <b>basic</b> site information is
         copied — builds, associated users, and site settings will not be transferred.
         <br />
         If your site is hosted at a custom domain, and you want that domain to point
         to your new site,
-        please <a href="mailto:federalist-support@gsa.gov">contact Federalist support</a>
-        after the copy
-        has completed. Do not delete the original site before receiving confirmation that the
-        route information has been updated.
+        please <a href="mailto:federalist-support@gsa.gov">contact Federalist support</a> after
+        the copy has completed to enact the transfer.
+        <b>Do not delete</b> the original site in Federalist before the copied code
+        is live at your custom domain.
       </p>
     );
   }
@@ -43,7 +44,7 @@ class CopyRepoForm extends React.Component {
     return (
       <Field
         component={InputWithErrorField}
-        label="What GitHub account will own this site?"
+        label="What GitHub user or org will own the copied site?"
         id="target-owner"
         name="targetOwner"
         type="text"
@@ -63,7 +64,7 @@ class CopyRepoForm extends React.Component {
       <BranchField
         component={InputWithErrorField}
         className="form-control"
-        label="Name the new site"
+        label="What name do you want for the copied repo?"
         id="new-repo-name"
         name="newRepoName"
         type="text"
