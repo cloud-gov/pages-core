@@ -88,27 +88,26 @@ export class AddSite extends React.Component {
             <div className="header-title">
               <h1>
                 <img className="header-icon" src="/images/website.svg" alt="Websites icon" />
-                Make a new site
+                Add a new site
               </h1>
             </div>
           </div>
-          <p>
-            There are a few different ways you can add sites to Federalist.
-            You can start with a brand new site by selecting one of our template sites below.
-            Or you can specify the GitHub repository where your site&#39;s code lives.
-          </p>
-
-          <TemplateSiteList
-            handleSubmitTemplate={this.onSubmitTemplate}
-            defaultOwner={this.defaultOwner()}
-          />
-
-          <h2>Or add your own GitHub repository</h2>
-
+          <div className="usa-content">
+            <p>
+              There are a few different ways you can add sites to Federalist.
+              You can start with a brand new site by selecting one of our template sites below.
+              Or you can specify the GitHub repository where your site&#39;s code lives.
+            </p>
+          </div>
+          <h2>Add your own GitHub repository</h2>
           <AddRepoSiteForm
             initialValues={{ engine: availableEngines[0].value }}
             showAddNewSiteFields={this.props.showAddNewSiteFields}
             onSubmit={formSubmitFunc}
+          />
+          <TemplateSiteList
+            handleSubmitTemplate={this.onSubmitTemplate}
+            defaultOwner={this.defaultOwner()}
           />
         </div>
       </div>

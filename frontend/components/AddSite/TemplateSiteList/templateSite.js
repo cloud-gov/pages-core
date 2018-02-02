@@ -55,17 +55,18 @@ class TemplateSite extends React.Component {
 
   render() {
     return (
-      <div className="flexbox-item well">
-        <div className="well-heading">
+      <div className="federalist-template-list-item">
+        <div className="federalist-template-list-item-img">
           <img
             data-action="name-site"
             className="thumbnail"
             src={this.props.thumb}
             alt={`Thumbnail screenshot for the ${this.props.title} template`}
           />
-          <h3 className="well-title">{this.props.title}</h3>
+
         </div>
-        <div className="well-text">
+        <div className="federalist-template-list-item-content">
+          <h3 className="well-title">{this.props.title}</h3>
           <p>{this.props.description}</p>
           {this.getFormVisible() ?
             <form
@@ -89,8 +90,6 @@ class TemplateSite extends React.Component {
               <input type="submit" className="usa-button usa-button-primary" value="Create site" />
             </form>
           : null}
-        </div>
-        <div className="well-footer">
           {!this.getFormVisible() &&
             <div>
               <a
@@ -100,8 +99,8 @@ class TemplateSite extends React.Component {
                 role="button"
                 className="view-template-link"
               >
-                View template
-              </a>
+                View sample
+              </a><br/>
               <button
                 className="usa-button"
                 onClick={this.handleChooseActive}

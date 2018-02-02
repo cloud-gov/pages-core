@@ -11,6 +11,20 @@
   }
 }
 
+.federalist-template-list {
+  .federalist-template-list-item {
+    background-color: $secondary-background-color;
+    display: flex;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .thumbnail {
+    max-width: 300px;
+    border: 1px solid #efefef;
+    margin-right: 1.5rem;
+  }
+}
+
 .well-heading {
   margin-bottom: .3rem;
   margin-top: 0;
