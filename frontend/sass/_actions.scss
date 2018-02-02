@@ -22,3 +22,9 @@ a.usa-button,
     background-color: $color-white;
   }
 }
+.button-add-website {
+  background-image: url('/images/icon-plus.svg');
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  padding-left: 34px;
+}

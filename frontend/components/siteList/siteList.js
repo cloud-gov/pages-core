@@ -58,10 +58,10 @@ const addWebsiteButton = () => (
   <Link
     to="/sites/new"
     role="button"
-    className="usa-button"
-    alt="Add a new website"
+    className="usa-button button-add-website"
+    alt="Add a new site"
   >
-    Add website
+    Add site
   </Link>
 );
 
