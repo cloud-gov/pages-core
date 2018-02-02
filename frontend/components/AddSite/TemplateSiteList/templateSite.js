@@ -66,7 +66,7 @@ class TemplateSite extends React.Component {
 
         </div>
         <div className="federalist-template-list-item-content">
-          <h3 className="well-title">{this.props.title}</h3>
+          <h3 className="federalist-template-title">{this.props.title}</h3>
           <p>{this.props.description}</p>
           {this.getFormVisible() ?
             <form
