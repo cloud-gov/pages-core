@@ -99,7 +99,7 @@ export class AddSite extends React.Component {
               Or you can specify the GitHub repository where your site&#39;s code lives.
             </p>
           </div>
-          <h2>Add your own GitHub repository</h2>
+          <h2>Use your own GitHub repository</h2>
           <AddRepoSiteForm
             initialValues={{ engine: availableEngines[0].value }}
             showAddNewSiteFields={this.props.showAddNewSiteFields}

@@ -99,16 +99,4 @@ describe('<AddRepoSiteForm />', () => {
     wrapper.find('form').simulate('submit');
     expect(props.handleSubmit.calledOnce).to.be.true;
   });
-
-  it('links back to /sites from the Cancel button', () => {
-    const props = {
-      showAddNewSiteFields: false,
-      initialValues: { engine: 'jekyll' },
-      handleSubmit: () => {},
-      pristine: true,
-    };
-
-    const wrapper = shallow(<AddRepoSiteForm {...props} />);
-    expect(wrapper.find('Link.usa-button-secondary[to="/sites"]')).to.have.length(1);
-  });
 });

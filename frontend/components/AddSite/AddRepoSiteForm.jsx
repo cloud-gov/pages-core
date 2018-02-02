@@ -47,7 +47,7 @@ export const AddRepoSiteForm = ({
   <form onSubmit={handleSubmit}>
     <div className="form-group">
       <GitHubRepoUrlField
-        label="GitHub Repository URL"
+        label="Already have a GitHub repo for your site? Paste the URL here."
         name="repoUrl"
         id="repoUrl"
         placeholder="https://github.com/owner/repository"
