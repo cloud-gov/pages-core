@@ -6,7 +6,7 @@ import {
 
 const initialState = {
   isLoading: false,
-  data: {},
+  data: [],
 };
 
 export default function builds(state = initialState, action) {
