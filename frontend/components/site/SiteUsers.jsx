@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { SITE, USER } from '../../propTypes';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
@@ -89,4 +90,9 @@ SiteUsers.defaultProps = {
   user: null,
 };
 
-export default SiteUsers;
+const mapStateToProps = ({ user }) => ({
+  user: user.data,
+});
+
+export { SiteUsers };
+export default connect(mapStateToProps)(SiteUsers);

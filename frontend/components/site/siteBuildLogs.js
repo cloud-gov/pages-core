@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import buildLogActions from '../../actions/buildLogActions';
 import LoadingIndicator from '../LoadingIndicator';
@@ -8,6 +9,21 @@ import RefreshBuildLogsButton from './refreshBuildLogsButton';
 
 import { API } from '../../util/federalistApi';
 
+const propTypes = {
+  params: PropTypes.shape({
+    buildId: PropTypes.string.isRequired,
+  }).isRequired,
+  buildLogs: PropTypes.shape({
+    isLoading: PropTypes.bool,
+    data: PropTypes.array,
+  }),
+};
+const defaultProps = {
+  buildLogs: null,
+};
+const mapStateToProps = ({ buildLogs }) => ({
+  buildLogs,
+});
 
 class SiteBuildLogs extends React.Component {
   componentDidMount() {
@@ -22,8 +38,7 @@ class SiteBuildLogs extends React.Component {
       return <LoadingIndicator />;
     }
 
-    // else
-    if (!buildLogs.data || !buildLogs.data.length) {
+    if (!buildLogs || !buildLogs.data || !buildLogs.data.length) {
       return (
         <div>
           <p>This build does not have any build logs.</p>
@@ -32,7 +47,6 @@ class SiteBuildLogs extends React.Component {
       );
     }
 
-    // else
     const downloadUrl = `${API}/build/${buildId}/log?format=text`;
     const downloadName = `build-log-${buildId}.txt`;
 
@@ -50,18 +64,8 @@ class SiteBuildLogs extends React.Component {
   }
 }
 
-SiteBuildLogs.propTypes = {
-  params: PropTypes.shape({
-    buildId: PropTypes.string.isRequired,
-  }).isRequired,
-  buildLogs: PropTypes.shape({
-    isLoading: PropTypes.bool,
-    data: PropTypes.array,
-  }),
-};
+SiteBuildLogs.propTypes = propTypes;
+SiteBuildLogs.defaultProps = defaultProps;
 
-SiteBuildLogs.defaultProps = {
-  buildLogs: null,
-};
-
-export default SiteBuildLogs;
+export { SiteBuildLogs };
+export default connect(mapStateToProps)(SiteBuildLogs);
