@@ -2,12 +2,11 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
-import SitePublishedBranchesTable from '../../../../frontend/components/site/sitePublishedBranchesTable';
+import { SitePublishedBranchesTable } from '../../../../frontend/components/site/sitePublishedBranchesTable';
 
 describe('<SitePublishedBranchesTable/>', () => {
   it('should render a table with branches from the state', () => {
     const props = {
-      params: { id: '1' },
       publishedBranches: {
         isLoading: false,
         data: [
@@ -25,7 +24,6 @@ describe('<SitePublishedBranchesTable/>', () => {
 
   it('should render a loading state if branch data is loading', () => {
     const props = {
-      params: { id: '1' },
       publishedBranches: { isLoading: true },
     };
 
@@ -36,7 +34,6 @@ describe('<SitePublishedBranchesTable/>', () => {
 
   it('should render an empty state if there are no published branches', () => {
     const props = {
-      params: { id: '1' },
       publishedBranches: { isLoading: false, data: [] },
     };
 

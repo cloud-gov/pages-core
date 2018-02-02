@@ -3,29 +3,31 @@ import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 
+import { USER } from '../../propTypes';
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
 import AlertBanner from '../alertBanner';
 import { availableEngines } from '../SelectSiteEngine';
-
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
 
 const propTypes = {
-  storeState: PropTypes.shape({
-    user: PropTypes.shape({
-      username: PropTypes.string,
-      id: PropTypes.number,
-    }),
-    error: PropTypes.string,
-  }),
+  error: PropTypes.string, // TODO: confirm that this is actually necessary
   showAddNewSiteFields: PropTypes.bool,
+  user: PropTypes.shape(USER),
 };
 
 const defaultProps = {
-  storeState: null,
+  error: null,
   showAddNewSiteFields: false,
+  user: null,
 };
+
+const mapStateToProps = ({ showAddNewSiteFields, user, error }) => ({
+  error,
+  showAddNewSiteFields,
+  user,
+});
 
 function getOwnerAndRepo(repoUrl) {
   const owner = repoUrl.split('/')[3];
@@ -67,11 +69,9 @@ export class AddSite extends React.Component {
   }
 
   defaultOwner() {
-    const userState = this.props.storeState.user;
-    if (userState.data) {
-      return userState.data.username;
-    }
-    return '';
+    const { user } = this.props;
+
+    return (user.data && user.data.username) || '';
   }
 
   render() {
@@ -82,7 +82,7 @@ export class AddSite extends React.Component {
 
     return (
       <div>
-        <AlertBanner message={this.props.storeState.error} />
+        <AlertBanner message={this.props.error} />
         <div className="usa-grid">
           <div className="page-header usa-grid-full">
             <div className="header-title">
@@ -117,7 +117,5 @@ export class AddSite extends React.Component {
 
 AddSite.propTypes = propTypes;
 AddSite.defaultProps = defaultProps;
-
-const mapStateToProps = ({ showAddNewSiteFields }) => ({ showAddNewSiteFields });
 
 export default connect(mapStateToProps)(AddSite);

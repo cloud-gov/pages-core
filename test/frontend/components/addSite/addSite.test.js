@@ -24,7 +24,8 @@ const user = {
 };
 
 const propsWithoutError = {
-  storeState: { user, error: '' },
+  user,
+  error: '',
   showAddNewSiteFields: false,
 };
 
@@ -69,10 +70,10 @@ describe('<AddSite/>', () => {
     const templateListProps = wrapper.find(TemplateSiteList).props();
     const formProps = wrapper.find('ReduxForm').props();
 
-    expect(bannerProps).to.deep.equal({ message: propsWithoutError.storeState.error });
+    expect(bannerProps).to.deep.equal({ message: propsWithoutError.error });
     expect(templateListProps).to.deep.equal({
       handleSubmitTemplate: wrapper.instance().onSubmitTemplate,
-      defaultOwner: propsWithoutError.storeState.user.data.username,
+      defaultOwner: propsWithoutError.user.data.username,
     });
     expect(formProps.onSubmit).to.equal(wrapper.instance().onAddUserSubmit);
     expect(formProps.showAddNewSiteFields).to.equal(propsWithoutError.showAddNewSiteFields);

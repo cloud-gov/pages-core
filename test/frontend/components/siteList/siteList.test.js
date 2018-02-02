@@ -27,7 +27,7 @@ describe('<SiteList />', () => {
 
   describe('when sites are being loaded', () => {
     beforeEach(() => {
-      wrapper = shallow(<SiteList storeState={STORE_LOADING_SITES} />);
+      wrapper = shallow(<SiteList {...STORE_LOADING_SITES} />);
     });
 
     it('renders a loading indicator', () => {
@@ -37,7 +37,7 @@ describe('<SiteList />', () => {
 
   describe('when no sites are received as props', () => {
     beforeEach(() => {
-      wrapper = shallow(<SiteList storeState={STORE_WITH_NO_SITES} />);
+      wrapper = shallow(<SiteList {...STORE_WITH_NO_SITES} />);
     });
 
     it('renders an h1 element with the title', () => {
@@ -57,7 +57,7 @@ describe('<SiteList />', () => {
 
   describe('when sites are received as props', () => {
     beforeEach(() => {
-      wrapper = shallow(<SiteList storeState={STORE_WITH_SITES} />);
+      wrapper = shallow(<SiteList {...STORE_WITH_SITES} />);
     });
 
     it('renders a container for the list of sites', () => {
