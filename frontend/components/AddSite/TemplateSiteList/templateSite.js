@@ -100,7 +100,9 @@ class TemplateSite extends React.Component {
                 className="view-template-link"
               >
                 View sample
-              </a><br/>
+              </a>
+              <br>
+              </br>
               <button
                 className="usa-button"
                 onClick={this.handleChooseActive}

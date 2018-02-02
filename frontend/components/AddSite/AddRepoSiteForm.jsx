@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
-import { Link } from 'react-router';
 
 import BranchField from '../Fields/BranchField';
 import GitHubRepoUrlField from '../Fields/GitHubRepoUrlField';
