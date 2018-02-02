@@ -1,18 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import { Link } from 'react-router';
-import publishedBranchActions from '../../actions/publishedBranchActions';
 import LoadingIndicator from '../LoadingIndicator';
 import BranchViewLink from '../branchViewLink';
 import { SITE } from '../../propTypes';
 import AlertBanner from '../alertBanner';
 
-class SitePublishedBranchesTable extends React.Component {
-  componentDidMount() {
-    publishedBranchActions.fetchPublishedBranches({ id: this.props.params.id });
-  }
+const propTypes = {
+  publishedBranches: PropTypes.shape({
+    isLoading: PropTypes.bool.isRequired,
+    data: PropTypes.array,
+  }),
+  site: SITE,
+};
+const defaultProps = {
+  publishedBranches: null,
+  site: null,
+};
 
+const mapStateToProps = ({ publishedBranches }) => ({
+  publishedBranches,
+});
+
+class SitePublishedBranchesTable extends React.Component {
   publishedBranches() {
     if (this.props.publishedBranches.isLoading || !this.props.publishedBranches.data) {
       return [];
@@ -90,20 +102,8 @@ class SitePublishedBranchesTable extends React.Component {
   }
 }
 
-SitePublishedBranchesTable.propTypes = {
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-  }).isRequired,
-  publishedBranches: PropTypes.shape({
-    isLoading: PropTypes.bool.isRequired,
-    data: PropTypes.array,
-  }),
-  site: SITE,
-};
+SitePublishedBranchesTable.propTypes = propTypes;
+SitePublishedBranchesTable.defaultProps = defaultProps;
 
-SitePublishedBranchesTable.defaultProps = {
-  publishedBranches: null,
-  site: null,
-};
-
-export default SitePublishedBranchesTable;
+export { SitePublishedBranchesTable };
+export default connect(mapStateToProps)(SitePublishedBranchesTable);

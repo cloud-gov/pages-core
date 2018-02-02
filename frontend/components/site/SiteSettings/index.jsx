@@ -17,7 +17,6 @@ const defaultProps = {
   site: null,
 };
 
-
 class SiteSettings extends React.Component {
   constructor(props) {
     super(props);

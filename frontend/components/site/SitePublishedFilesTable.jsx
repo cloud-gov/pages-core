@@ -1,10 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
+import { connect } from 'react-redux';
 
 import publishedFileActions from '../../actions/publishedFileActions';
 import LoadingIndicator from '../LoadingIndicator';
 import AlertBanner from '../alertBanner';
+
+const propTypes = {
+  params: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
+  publishedFiles: PropTypes.shape({
+    isLoading: PropTypes.bool.isRequired,
+    data: PropTypes.shape({
+      files: PropTypes.arrayOf(
+        PropTypes.shape({
+          name: PropTypes.string,
+          size: PropTypes.number,
+          key: PropTypes.string,
+          publishedBranch: PropTypes.shape({
+            name: PropTypes.string,
+          }),
+        })
+      ),
+      isTruncated: PropTypes.bool,
+    }),
+  }),
+};
+const defaultProps = {
+  publishedFiles: null,
+};
+const mapStateToProps = ({ publishedFiles }) => ({
+  publishedFiles,
+});
 
 class SitePublishedFilesTable extends React.Component {
   constructor(props) {
@@ -177,31 +207,8 @@ class SitePublishedFilesTable extends React.Component {
   }
 }
 
-SitePublishedFilesTable.propTypes = {
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-  }).isRequired,
-  publishedFiles: PropTypes.shape({
-    isLoading: PropTypes.bool.isRequired,
-    data: PropTypes.shape({
-      files: PropTypes.arrayOf(
-        PropTypes.shape({
-          name: PropTypes.string,
-          size: PropTypes.number,
-          key: PropTypes.string,
-          publishedBranch: PropTypes.shape({
-            name: PropTypes.string,
-          }),
-        })
-      ),
-      isTruncated: PropTypes.bool,
-    }),
-  }),
-};
+SitePublishedFilesTable.propTypes = propTypes;
+SitePublishedFilesTable.defaultProps = defaultProps;
 
-SitePublishedFilesTable.defaultProps = {
-  publishedFiles: null,
-};
-
-export default SitePublishedFilesTable;
+export { SitePublishedFilesTable };
+export default connect(mapStateToProps)(SitePublishedFilesTable);
