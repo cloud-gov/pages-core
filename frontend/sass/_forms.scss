@@ -52,3 +52,10 @@ textarea,
 select {
   border: 3px solid #ccc;
 }
+.usa-input-error {
+  margin-top: 0;
+  padding-top: 0;
+  label {
+    margin-top: 2rem;
+  }
+}
