@@ -86,18 +86,12 @@ nav li a:visited {
   height: auto;
   width: 100px;
 }
+
 @media screen and (min-width: 951px) {
   .usa-logo a {
     height: $logo-height;
     width: $logo-width;
   }
-}
-.header-icon {
-  display: inline-block;
-  height: 36px;
-  margin-left: -60px;
-  margin-right: 10px;
-  vertical-align: text-top;
 }
 
 .header-title {
@@ -105,7 +99,6 @@ nav li a:visited {
     font-size: 2.8rem;
     line-height: 1.8rem;
     margin: 0;
-    padding-left: 60px;
   }
 
   p {

@@ -71,7 +71,6 @@ export const SiteList = ({ sites, alert }) =>
       <div className="usa-width-two-thirds">
         <div className="header-title">
           <h1>
-            <img className="header-icon" src="/images/websites.svg" alt="Websites icon" />
             Your websites
           </h1>
         </div>

@@ -87,8 +87,7 @@ export class AddSite extends React.Component {
           <div className="page-header usa-grid-full">
             <div className="header-title">
               <h1>
-                <img className="header-icon" src="/images/website.svg" alt="Websites icon" />
-                Add a new site
+                Make a new site
               </h1>
             </div>
           </div>
