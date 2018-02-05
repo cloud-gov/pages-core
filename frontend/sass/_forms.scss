@@ -26,6 +26,7 @@ label {
   button[type='submit'] {
     display: inline;
   }
+
   .well {
     margin-left: 2rem;
   }
@@ -34,13 +35,20 @@ label {
 .form-control-mono {
   font-family: monospace;
 }
+
 .settings-form-advanced {
   select {
     margin-bottom: 2rem;
   }
 }
 
-// used to fix the padding on the advanced settings form section 
+// used to fix the padding on the advanced settings form section
 .usa-accordion-content {
   padding: 1.5rem 0;
+}
+
+input,
+textarea,
+select {
+  border: 3px solid #ccc;
 }
