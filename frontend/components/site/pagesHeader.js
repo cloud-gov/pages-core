@@ -17,13 +17,7 @@ const PagesHeader = ({ owner, repository, title, viewLink }) => (
     <div className="usa-width-two-thirds">
       <div className="header-title">
         <h1>
-          <img
-            className="header-icon"
-            src="/images/website.svg"
-            alt="Websites icon"
-          />
           {owner}/{repository}
-          {' '}
         </h1>
       </div>
       <h2>{title}</h2>
