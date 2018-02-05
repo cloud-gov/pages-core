@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
-import { Link } from 'react-router';
 
 import BranchField from '../Fields/BranchField';
 import GitHubRepoUrlField from '../Fields/GitHubRepoUrlField';
@@ -47,14 +46,7 @@ export const AddRepoSiteForm = ({
   <form onSubmit={handleSubmit}>
     <div className="form-group">
       <GitHubRepoUrlField
-        label="GitHub Repository URL"
-        help={
-          <span>
-            Paste your repository&apos;s GitHub URL here.
-            <br />
-            For example: https://github.com/18f/federalist-docs
-          </span>
-        }
+        label="Already have a GitHub repo for your site? Paste the URL here."
         name="repoUrl"
         id="repoUrl"
         placeholder="https://github.com/owner/repository"
@@ -93,20 +85,13 @@ export const AddRepoSiteForm = ({
         </div>
       </div>
     )}
-    <Link
-      role="button"
-      to="/sites"
-      className="usa-button usa-button-secondary"
-    >
-      Cancel
-    </Link>
     <button
       type="submit"
       className="usa-button usa-button-primary"
       style={{ display: 'inline-block' }}
       disabled={pristine}
     >
-      Submit repository-based site
+      Add repository-based site
     </button>
   </form>
 );

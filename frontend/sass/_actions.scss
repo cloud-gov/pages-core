@@ -1,11 +1,13 @@
 a {
   text-decoration-skip: ink;
-}
-a:visited {
-  color: $link-color;
-}
-a:hover {
-  text-decoration: none;
+
+  &:visited {
+    color: $link-color;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
 }
 
 button,
@@ -21,10 +23,13 @@ a.usa-button,
   &.usa-button-secondary {
     background-color: $color-white;
   }
+  &.usa-button-primary:disabled {
+    color: #323a45;
+  }
 }
 .button-add-website {
   background-image: url('/images/icon-plus.svg');
-  background-repeat: no-repeat;
   background-position: 15px center;
+  background-repeat: no-repeat;
   padding-left: 34px;
 }
