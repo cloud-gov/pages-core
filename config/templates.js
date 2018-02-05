@@ -5,7 +5,7 @@ module.exports = {
     branch: 'master',
     example: 'https://federalist-uswds-template.18f.gov',
     title: 'U.S. web design system',
-    description: 'The U.S. Web Design System landing page template. A multi page template designed to introduce an agency or program.',
+    description: 'A flexible multi page setup is intended to introduce an agency or program. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
     thumb: '/images/federalist-uswds-template.jpg',
   },
   team: {
@@ -14,7 +14,7 @@ module.exports = {
     branch: 'master',
     example: 'https://federalist-modern-team-template.18f.gov',
     title: 'Modern team',
-    description: 'A multi page template designed to introduce to an agency or program. This template offers an alternate look and feel to the USWDS template.',
+    description: 'A multi page setup designed to introduce an agency or program that offers a different look and feel to the U.S. web design system. This setup includes a landing page with a Hero section and multiple sections on the landing page to showcase current work and projects. The navigation setup offers easy to customize internal pages meant to provide additional information.',
     thumb: '/images/federalist-modern-team-template.jpg',
   },
   report: {
@@ -23,7 +23,7 @@ module.exports = {
     branch: 'master',
     example: 'https://federalist-report-template.18f.gov',
     title: 'Basic report',
-    description: 'An easy to use template with a simple layout. This template is designed to host a multiple pages about a recent report or order.',
+    description: 'A simple, easy to use setup designed to host multiple pages about a recent report or order. This setup provides a clean space for complex details or instructions. Navigation can be customized to host many pages while maintaining a clear hierarchy.',
     thumb: '/images/federalist-report-template.jpg',
   },
   landing: {
@@ -32,7 +32,7 @@ module.exports = {
     branch: 'master',
     example: 'https://federalist-landing-template.18f.gov',
     title: 'Landing page',
-    description: 'A one page template to show information about a specific topic or report.',
+    description: 'An exciting and engaging single page template designed to showcase specific work or a project. This setup offers a Hero section with a background image meant to provide a high-level summary and set the tone for site content. Navigation options in this setup are anchors to sections on the single main page.',
     thumb: '/images/federalist-landing-template.jpg',
   },
   redirect: {
@@ -41,7 +41,7 @@ module.exports = {
     branch: 'redirect-config',
     example: 'https://federalist-proxy.app.cloud.gov/preview/18f/federalist-uswds-template/redirect-config/',
     title: 'Redirect page',
-    description: 'A simple redirect template.',
+    description: 'A simple and professional redirect template that follows U.S. web design system principles. This redirect page fits well with a variety of different branding and styling.',
     thumb: '/images/federalist-redirect-template.jpg',
   },
 };
