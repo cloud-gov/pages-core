@@ -5,7 +5,7 @@ module.exports = {
     branch: 'master',
     example: 'https://federalist-uswds-template.18f.gov',
     title: 'U.S. web design system',
-    description: 'A flexible multi page setup intended to introduce an agency or program. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
+    description: 'A flexible multi-page setup intended to introduce an agency or program. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
     thumb: '/images/federalist-uswds-template.jpg',
   },
   team: {
@@ -14,7 +14,7 @@ module.exports = {
     branch: 'master',
     example: 'https://federalist-modern-team-template.18f.gov',
     title: 'Modern team',
-    description: 'A multi page setup designed to introduce an agency or program that offers a different look and feel to the U.S. web design system. This setup includes a landing page with a Hero section and multiple sections on the landing page to showcase current work and projects. The navigation setup offers easy to customize internal pages meant to provide additional information.',
+    description: 'A multi-page setup designed to introduce an agency or program that offers a different look and feel to the U.S. web design system. This setup includes a landing page with a Hero section and multiple sections on the landing page to showcase current work and projects. The navigation setup offers easy to customize internal pages meant to provide additional information.',
     thumb: '/images/federalist-modern-team-template.jpg',
   },
   report: {
