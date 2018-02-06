@@ -11,6 +11,7 @@ import {
   dispatchSiteDeletedAction,
   dispatchUserAddedToSiteAction,
   dispatchShowAddNewSiteFieldsAction,
+  dispatchSetCurrentSiteAction,
 } from './dispatchActions';
 import userActions from './userActions';
 
@@ -22,6 +23,10 @@ export default {
     return federalist.fetchSites()
       .then(dispatchSitesReceivedAction)
       .catch(alertError);
+  },
+
+  setCurrentSite(siteId) {
+    dispatchSetCurrentSiteAction(siteId);
   },
 
   addSite(siteToAdd) {

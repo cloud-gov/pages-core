@@ -32,8 +32,10 @@ const propTypes = {
 const defaultProps = {
   publishedFiles: null,
 };
-const mapStateToProps = ({ publishedFiles }) => ({
+
+const mapStateToProps = ({ publishedFiles, sites }) => ({
   publishedFiles,
+  site: sites.currentSite,
 });
 
 class SitePublishedFilesTable extends React.Component {

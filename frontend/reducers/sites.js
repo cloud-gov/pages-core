@@ -7,9 +7,14 @@ import {
   siteBranchesReceivedType as SITE_BRANCHES_RECEIVED,
   siteUserAddedType as SITE_USER_ADDED,
   siteUserRemovedType as SITE_USER_REMOVED,
+  setCurrentSiteType as SET_CURRENT_SITE,
 } from '../actions/actionCreators/siteActions';
 
-const initialState = { isLoading: false };
+const initialState = {
+  isLoading: false,
+  currentSite: null,
+  data: [],
+};
 
 const mapPropertyToMatchingSite = (data, siteId, properties) => data.map((site) => {
   if (site.id !== siteId) return site;
@@ -18,21 +23,26 @@ const mapPropertyToMatchingSite = (data, siteId, properties) => data.map((site) 
 
 export default function sites(state = initialState, action) {
   switch (action.type) {
-
     case SITES_FETCH_STARTED:
-      return { isLoading: true };
+      return { ...state, isLoading: true };
 
-    case SITES_RECEIVED:
-      return { isLoading: false, data: action.sites || [] };
+    case SITES_RECEIVED: {
+      const nextSites = action.sites || state.data;
+
+      return {
+        ...state,
+        isLoading: false,
+        data: nextSites,
+      };
+    }
+
+    case SET_CURRENT_SITE: {
+      const id = Number(action.siteId);
+      return { ...state, currentSite: state.data.find(site => site.id === id) };
+    }
 
     case SITE_ADDED:
-      if (action.site) {
-        return {
-          isLoading: false,
-          data: state.data.concat(action.site),
-        };
-      }
-      return state;
+      return { ...state, isLoading: false, data: state.data.concat(action.site || []) };
 
     case SITE_UPDATED:
       return {

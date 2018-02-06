@@ -126,6 +126,9 @@ SiteGitHubBranches.defaultProps = {
   githubBranches: null,
 };
 
-const mapStateToProps = ({ githubBranches }) => ({ githubBranches });
+const mapStateToProps = ({ githubBranches, sites }) => ({
+  githubBranches,
+  site: sites.currentSite,
+});
 
 export default connect(mapStateToProps)(SiteGitHubBranches);

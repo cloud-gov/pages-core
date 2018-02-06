@@ -1,6 +1,7 @@
 /* global window:true */
 import React from 'react';
 import autoBind from 'react-autobind';
+import { connect } from 'react-redux';
 
 import { SITE } from '../../../propTypes';
 import ExpandableArea from '../../ExpandableArea';
@@ -16,6 +17,8 @@ const propTypes = {
 const defaultProps = {
   site: null,
 };
+
+const mapStateToProps = ({ sites }) => ({ site: sites.currentSite });
 
 class SiteSettings extends React.Component {
   constructor(props) {
@@ -120,4 +123,5 @@ class SiteSettings extends React.Component {
 SiteSettings.propTypes = propTypes;
 SiteSettings.defaultProps = defaultProps;
 
-export default SiteSettings;
+export { SiteSettings };
+export default connect(mapStateToProps)(SiteSettings);

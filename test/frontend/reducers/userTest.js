@@ -23,7 +23,7 @@ describe('userReducer', () => {
       hello: 'alijasfjir',
     });
 
-    expect(actual).to.deep.equal({ isLoading: false });
+    expect(actual).to.deep.equal({ isLoading: false, data: {} });
   });
 
   it('sets isLoading to true when USER_FETCH_STARTED', () => {
@@ -31,7 +31,7 @@ describe('userReducer', () => {
       type: USER_FETCH_STARTED,
     });
 
-    expect(actual).to.deep.equal({ isLoading: true });
+    expect(actual).to.deep.equal({ isLoading: true, data: {} });
   });
 
   it('returns false when USER_RECEIVED with no user', () => {
