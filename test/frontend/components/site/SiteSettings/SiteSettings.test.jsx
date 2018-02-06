@@ -16,7 +16,7 @@ const siteActionsMock = {
 const SiteSettings = proxyquire(
   '../../../../../frontend/components/site/SiteSettings',
   { '../../../actions/siteActions': siteActionsMock }
-).default;
+).SiteSettings;
 
 describe('<SiteSettings/>', () => {
   const props = {

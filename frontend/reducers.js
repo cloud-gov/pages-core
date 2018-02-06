@@ -12,7 +12,6 @@ import githubBranches from './reducers/githubBranches';
 import showAddNewSiteFields from './reducers/showAddNewSiteFields';
 import userActions from './reducers/userActions';
 
-
 export default {
   buildLogs,
   alert,

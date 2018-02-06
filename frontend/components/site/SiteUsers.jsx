@@ -73,9 +73,7 @@ const SiteUsers = ({ site, user }) => {
           )}
         </tbody>
       </table>
-      <div className="offset-top">
-        <UserActionsTable site={site.id} />
-      </div>
+      <UserActionsTable site={site.id} />
     </div>
   );
 };
@@ -90,8 +88,9 @@ SiteUsers.defaultProps = {
   user: null,
 };
 
-const mapStateToProps = ({ user }) => ({
+const mapStateToProps = ({ user, sites }) => ({
   user: user.data,
+  site: sites.currentSite,
 });
 
 export { SiteUsers };
