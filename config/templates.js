@@ -5,7 +5,7 @@ module.exports = {
     branch: 'master',
     example: 'https://federalist-uswds-template.18f.gov',
     title: 'U.S. web design system',
-    description: 'A flexible multi page setup is intended to introduce an agency or program. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
+    description: 'A flexible multi page setup intended to introduce an agency or program. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
     thumb: '/images/federalist-uswds-template.jpg',
   },
   team: {
