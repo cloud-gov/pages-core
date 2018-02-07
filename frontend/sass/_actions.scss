@@ -1,93 +1,35 @@
 a {
   text-decoration-skip: ink;
+
+  &:visited {
+    color: $link-color;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
 }
 
-a,
-a:visited {
-  color: $link-color;
-}
-
-a:hover,
-a:focus {
-  color: $link-color-active;
-  text-decoration: none;
-}
-
-.usa-button-disabled,
-.usa-button {
-  border-radius: 0;
-}
-
-.usa-button,
-.usa-button-primary,
-.usa-button:visited,
-.usa-button-primary:visited,
 button,
-[type="button"],
-[type="submit"],
-[type="reset"],
-[type="image"] {
+.usa-button,
+a.usa-button,
+.usa-button[role=button] {
   background-color: $button-color;
-  color: $button-text-color;
-  font-weight: 500;
+  border-radius: 0;
+  font-weight: 400;
+  &:hover {
+    background-color: $button-color-active;
+  }
+  &.usa-button-secondary {
+    background-color: $color-white;
+  }
+  &.usa-button-primary:disabled {
+    color: #323a45;
+  }
 }
-
-.usa-button:hover,
-.usa-button.usa-button-hover,
-.usa-button-primary:hover,
-.usa-button-primary.usa-button-hover,
-.usa-button:visited:hover,
-.usa-button:visited.usa-button-hover,
-.usa-button-primary:visited:hover,
-.usa-button-primary:visited.usa-button-hover,
-button:hover,
-button.usa-button-hover,
-[type="button"]:hover,
-[type="button"].usa-button-hover,
-[type="submit"]:hover,
-[type="submit"].usa-button-hover,
-[type="reset"]:hover,
-[type="reset"].usa-button-hover,
-[type="image"]:hover,
-[type="image"].usa-button-hover {
-  background-color: $button-color-active;
-  color: $button-text-color;
-}
-
-.usa-button.usa-button-secondary,
-.usa-button-primary.usa-button-secondary,
-.usa-button:visited.usa-button-secondary,
-.usa-button-primary:visited.usa-button-secondary,
-button.usa-button-secondary,
-[type="button"].usa-button-secondary,
-[type="submit"].usa-button-secondary,
-[type="reset"].usa-button-secondary,
-[type="image"].usa-button-secondary {
-  background-color: $secondary-button-color;
-}
-
-.usa-button.usa-button-outline:hover,
-.usa-button.usa-button-outline.usa-button-hover,
-.usa-button-primary.usa-button-outline:hover,
-.usa-button-primary.usa-button-outline.usa-button-hover,
-.usa-button:visited.usa-button-outline:hover,
-.usa-button:visited.usa-button-outline.usa-button-hover,
-.usa-button-primary:visited.usa-button-outline:hover,
-.usa-button-primary:visited.usa-button-outline.usa-button-hover,
-button.usa-button-outline:hover,
-button.usa-button-outline.usa-button-hover,
-[type="button"].usa-button-outline:hover,
-[type="button"].usa-button-outline.usa-button-hover,
-[type="submit"].usa-button-outline:hover,
-[type="submit"].usa-button-outline.usa-button-hover,
-[type="reset"].usa-button-outline:hover,
-[type="reset"].usa-button-outline.usa-button-hover,
-[type="image"].usa-button-outline:hover,
-[type="image"].usa-button-outline.usa-button-hover {
-  background-color: $button-color;
-  color: $button-text-color;
-}
-
-.usa-button.file-list-item-button {
-  width: 90px;
+.button-add-website {
+  background-image: url('/images/icon-plus.svg');
+  background-position: 15px center;
+  background-repeat: no-repeat;
+  padding-left: 34px;
 }

@@ -5,11 +5,25 @@
 [![Test Coverage](https://codeclimate.com/github/18F/federalist/badges/coverage.svg)](https://codeclimate.com/github/18F/federalist/coverage)
 [![Dependency Status](https://gemnasium.com/badges/github.com/18F/federalist.svg)](https://gemnasium.com/github.com/18F/federalist)
 
-***Under active development. Everything is subject to change. Learn more at the [documentation site](https://federalist-docs.18f.gov/). Interested in talking to us? [Join our public chat room](https://chat.18f.gov/).***
+***Federalist is updated regularly. [Join our public chat room](https://chat.18f.gov/) to talk to us and stay informed. You can also check out our [documentation](https://federalist-docs.18f.gov/) to learn more.***
 
-Federalist is a unified interface for publishing static government websites. It automates common tasks for integrating GitHub and Amazon Web Services to provide a simple way for developers to launch new static websites or more easily manage existing static websites. This repo is home to "federalist-core" - a Node.js app that allows government users to add and configure their Federalist sites.
+## About Federalist
 
-## How to set up a local Federalist development server
+[Federalist](https://federalist.18f.gov) helps federal government entities publish compliant static websites quickly and seamlessly. Federalist integrates with GitHub and is built on top of [cloud.gov](cloud.gov), which uses Amazon Web Services.
+
+This repository is home to "federalist-core" - a Node.js app that allows government users to create and configure Federalist sites.
+
+## Examples
+
+Partner agencies across the federal government use Federalist to host websites. A few examples include:
+
+- [College Scorecard](https://collegescorecard.ed.gov/)
+- [Natural Resources Revenue Data](https://revenuedata.doi.gov/)
+- [NSF Small Business Innovation Research program](https://seedfund.nsf.gov)
+
+More examples can be found at [https://federalist.18f.gov/content/examples](https://federalist.18f.gov/content/examples).
+
+## Setting up a local Federalist development environment
 
 ### First install these dependencies
 
@@ -19,13 +33,15 @@ Before you start, ensure you have the following installed:
 - [Docker Compose](https://docs.docker.com/compose/install/#install-compose)
 
 ### Then follow these steps to set up and run your server
+
 In order to provide a simple development user experience, Federalist has some complexity on the backend. So as part of your local setup, you will need to emulate some of that complexity through the creation steps below. This shouldn't take longer than 15 minutes.
 
 _Note: some terminal commands may take a while to process, without offering feedback to you. Your patience will be rewarded!_
 
-Federalist uses Docker Compose for local development.
-
 1. Clone the `18F/federalist` repository from Github and `cd` to that directory.
+
+#### Editing the local configuration file
+
 1. Make a copy of `config/local.sample.js` and name it `local.js` and place it in the `config` folder. You can do this by running `cp config/local{.sample,}.js`
 This will be the file that holds your S3 and SQS configurations.
 1. [Register a new OAuth application on GitHub](https://github.com/settings/applications/new). Give your app a name and "Homepage URL" (`http://localhost:1337`, e.g.), and use `http://localhost:1337/auth` as the "Authorization callback url".
@@ -48,20 +64,36 @@ This will be the file that holds your S3 and SQS configurations.
       99999999 // your org added here
     ]
     ```
-    The organization will need to grant access to federalist, which can be done:
+    The organization will need to grant access to Federalist, which can be done:
       * during a first-time login with your GitHub credentials, or
       * in the [Authorized OAuth Apps](https://github.com/settings/applications) tab in your GitHub Account settings
+
+**For 18F/TTS developers:** This section is primarily for 18F/TTS developers working on the Federalist project. Before you get started, make sure you have been fully on-boarded, including getting access to the Federalist cloud.gov `staging` space.
+
 1. Paste `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` into your terminal window.
 1. Visit https://login.fr.cloud.gov/passcode to get a Temporary Authentication Code.
 1. Paste this code into the terminal, and hit the return key. (For security purposes, the code won't be rendered in the terminal.)
-1. Type `npm run update-local-config` to read necessary service keys from the staging environment and load them into a local file called `config/local-from-staging.js`. Note that this command will need to be re-run with some frequency, as service keys are changed every time Federalist's staging instance is deployed.
+1. Type `npm run update-local-config` to read necessary service keys from the staging environment and load them into a local file called `config/local-from-staging.js`.
+
+Note that `npm run update-local-config` will need to be re-run with some frequency, as service keys are changed every time Federalist's staging instance is deployed.
+
+#### Setting up Docker
+
 1. Run `docker-compose build`.
 1. Run `docker-compose run app yarn && docker-compose run app yarn build` to install dependencies and build the app initially.
-1. Run `docker-compose up` to start the development environment.  You should now be able to see Federalist running at http://localhost:1337/. Local file changes will cause the server to restart and/or the front end bundles to be rebuilt.
+1. Run `docker-compose run app yarn create-dev-data` and answer its prompts to create some fake development data for your local database.
+1. Run `docker-compose up` to start the development environment.
+
+Any time the node dependencies are changed (like from a recently completed new feature), `docker-compose run app yarn` will need to be re-run to install updated dependencies after pulling the new code from GitHub.
+
+#### Check to see if everything is working correctly
+
+1. If you've successfully completed all of the steps the Federalist app is now ready to run locally! :tada:
+1. You should now be able to see Federalist running at [http://localhost:1337](http://localhost:1337). Local file changes will cause the server to restart and/or the front end bundles to be rebuilt.
 
 **Pro tips:**
 
-In our Docker Compose environment, `app` is the name of the container where the Federalist web application runs. You can run any command in the context of the web application by running  `docker-compose run app <THE COMMAND>`.
+In our Docker Compose environment, `app` is the name of the container where the Federalist web application runs. You can run any command in the context of the web application by running `docker-compose run app <THE COMMAND>`.
 
 For example:
 

@@ -8,6 +8,10 @@ describe('buildsReducer', () => {
   const BUILDS_FETCH_STARTED = 'builds fetch started';
   const BUILDS_RECEIVED = 'builds received';
   const BUILD_RESTARTED = 'build restarted';
+  const defaultState = {
+    isLoading: false,
+    data: [],
+  };
 
   beforeEach(() => {
     fixture = proxyquire('../../../frontend/reducers/builds.js', {
@@ -27,21 +31,21 @@ describe('buildsReducer', () => {
       builds: BUILDS,
     });
 
-    expect(actual).to.deep.equal({ isLoading: false, data: {} });
+    expect(actual).to.deep.equal(defaultState);
   });
 
   it('marks the state loading when a fetch is started', () => {
-    const actual = fixture({ isLoading: false }, {
+    const actual = fixture(defaultState, {
       type: BUILDS_FETCH_STARTED,
     });
 
-    expect(actual).to.deep.equal({ isLoading: true });
+    expect(actual).to.deep.equal({ isLoading: true, data: [] });
   });
 
   it('sets the builds to the ones in the action when the fetch completes', () => {
     const BUILDS = ['🛠', '⚒'];
 
-    const actual = fixture({ isLoading: true }, {
+    const actual = fixture({ isLoading: true, data: [] }, {
       type: BUILDS_RECEIVED,
       builds: BUILDS,
     });

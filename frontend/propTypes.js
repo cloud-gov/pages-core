@@ -26,6 +26,19 @@ export const GITHUB_BRANCHES = PropTypes.shape({
   data: PropTypes.array,
 });
 
+export const BUILD = PropTypes.shape({
+  id: PropTypes.number,
+  state: PropTypes.string,
+  error: PropTypes.string,
+  branch: PropTypes.string,
+  commitSha: PropTypes.string,
+  completedAt: PropTypes.string,
+  createdAt: PropTypes.string,
+  user: PropTypes.shape({
+    username: PropTypes.string,
+  }),
+});
+
 export const BUILD_LOG = PropTypes.shape({
   id: PropTypes.number.isRequired,
   source: PropTypes.string.isRequired,

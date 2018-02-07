@@ -105,7 +105,6 @@ const handleCreateRepoError = (err) => {
 
 const handleWebhookError = (err) => {
   const error = err;
-
   const HOOK_EXISTS_MESSAGE = 'Hook already exists on this repository';
   const NO_ACCESS_MESSAGE = 'Not Found';
   const NO_ADMIN_ACCESS_ERROR_MESSAGE = 'You do not have admin access to this repository';
@@ -128,6 +127,11 @@ module.exports = {
     githubClient(user.githubAccessToken)
       .then(github => getRepository(github, { user: owner, repo: repository }))
       .then(fetchedRepository => fetchedRepository.permissions),
+
+  checkOrganizations: (user, orgName) =>
+    githubClient(user.githubAccessToken)
+    .then(github => getOrganizations(github))
+    .then(orgs => orgs.some(org => org.login === orgName)),
 
   createRepo: (user, owner, repository) =>
     githubClient(user.githubAccessToken)

@@ -1,14 +1,14 @@
-@import '_variables';
-
 .well {
   background-color: $well-bg-color;
+  margin-bottom: 1.5rem;
   padding: 1.5rem;
   position: relative;
-  margin-bottom: 1.5rem;
-  :first-child {
+
+  > :first-child {
     margin-top: 0;
   }
-  :last-child {
+
+  > :last-child {
     margin-bottom: 0;
   }
 }
@@ -16,21 +16,25 @@
 .well-heading {
   margin-bottom: .3rem;
   margin-top: 0;
+
   .well-title {
-    margin-bottom:0;
+    margin-bottom: 0;
   }
 }
 
 .well-text {
+  flex: 1 1 auto;
   margin-bottom: 0;
   margin-top: 0;
-  flex: 1 1 auto;
 }
+
 .well-footer {
-    padding: 2rem 0 0;
-    :last-child {
-      margin-bottom: 0;
-    }
+  padding: 2rem 0 0;
+
+  :last-child {
+    margin-bottom: 0;
+  }
+
   .view-template-link {
     display: table;
   }

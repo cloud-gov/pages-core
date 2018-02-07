@@ -63,7 +63,7 @@ export class TemplateList extends React.Component {
     let index = 0;
 
     const templateGrid = templateRows.map(row => (
-      <div className={`flexbox-grid flexbox-grid-${MAX_CELLS_PER_ROW}`} key={row.join('-')}>
+      <div className="federalist-template-list">
         {row.map((templateName) => {
           const template = templates[templateName];
           return (
@@ -85,10 +85,8 @@ export class TemplateList extends React.Component {
 
     return (
       <div>
-        <div className="usa-grid">
-          <h2>Choose from one of our templates</h2>
-          {templateGrid}
-        </div>
+        <h2>Or choose from one of our templates</h2>
+        {templateGrid}
       </div>
     );
   }

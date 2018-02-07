@@ -1,35 +1,61 @@
-header {
+.usa-banner {
+  p {
+    font-family: inherit;
+    font-size: inherit;
+  }
+}
+.usa-navbar {
+  height: auto;
+  border: none;
+}
+.usa-header {
+  background-color: $header-bg-color;
+  border-bottom: none;
+  min-height: 4rem;
+
+  .usa-logo {
+    top: -.45rem;
+  }
+}
+
+.usa-nav {
   background-color: $header-bg-color;
 }
-
-$nav-padding: .45em;
-
-nav {
-  padding-bottom: $nav-padding;
-  padding-top: $nav-padding;
+@media screen and (min-width: 951px) {
+  .usa-nav {
+    padding-top: 0;
+  }
 }
 
-.nav-elements {
-  display: flex;
-  min-height: 50px;
-}
-
-.logo {
-  flex-grow: 3;
-}
-
-.navbar-links {
-  flex-grow: 1;
-}
-
-.navbar-links li:after {
-  margin-bottom: 0;
-}
-
-nav ul {
-  display: flex;
-  margin-bottom: 0;
-  margin-top: 0;
+.usa-nav-primary {
+  li {
+    a {
+      color: #fff;
+      font-size: 1.7rem;
+      font-weight: 600;
+      &:visited {
+        color: #fff;
+      }
+      &:hover {
+        color: #000;
+        span {
+          border-color: #fff;
+        }
+      }
+      @media screen and (min-width: 951px) {
+        &:hover {
+          color: #fff;
+        }
+      }
+    }
+  }
+  .usa-button {
+    background: $button-color;
+    padding: 1rem 2rem;
+    &:hover {
+      background-color: $button-color-active;
+    }
+  }
 }
 
 @media screen and (max-width: 600px) {
@@ -43,13 +69,6 @@ nav li:before {
   display: none;
 }
 
-nav li {
-  display: inline-block;
-  flex-grow: 1;
-  list-style-type: none;
-  text-align: right;
-}
-
 nav li a,
 nav li a:visited,
 nav li a:hover,
@@ -57,35 +76,22 @@ nav li a:visited {
   color: white;
 }
 
-$logo-width: 140px;
-$logo-height: 29px;
-
-.logo {
-  align-items: center;
-  display: flex;
-}
-
-.logo a {
+.usa-logo a {
   background-image: url('/images/logo.svg');
+  background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
   color: transparent;
   display: inline-block;
-  height: $logo-height;
-  width: $logo-width;
+  height: auto;
+  width: 100px;
 }
 
-.header {
-  margin-bottom: 1.5em;
-  margin-top: 1.5em;
-}
-
-.header-icon {
-  display: inline-block;
-  margin-left: -60px;
-  margin-right: 10px;
-  vertical-align: text-top;
-  height: 36px;
+@media screen and (min-width: 951px) {
+  .usa-logo a {
+    height: $logo-height;
+    width: $logo-width;
+  }
 }
 
 .header-title {
@@ -93,7 +99,6 @@ $logo-height: 29px;
     font-size: 2.8rem;
     line-height: 1.8rem;
     margin: 0;
-    padding-left: 60px;
   }
 
   p {
@@ -112,7 +117,15 @@ $logo-height: 29px;
     display: inline-block;
     margin-left: 2rem;
   }
+  > :first-child {
+    margin-left: 0;
+  }
+  > :last-child {
+    margin-right: 0;
+  }
 }
-.usa-disclaimer-official {
-  margin-top: 3px;
+.page-header,
+.usa-grid .page-header {
+  margin-bottom: 1.5em;
+  margin-top: 1.5em;
 }

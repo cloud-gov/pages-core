@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="22px" viewBox="0 0 18 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-book</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Artboard-4" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-23.000000, -24.000000)">
+        <g id="icon-book" transform="translate(23.000000, 24.000000)" fill="#000000" fill-rule="nonzero">
+            <path d="M2,18.5 C2,19.0522847 1.55228475,19.5 1,19.5 C0.44771525,19.5 0,19.0522847 0,18.5 C0,16.5670034 1.56700338,15 3.5,15 L17,15 C17.5522847,15 18,15.4477153 18,16 C18,16.5522847 17.5522847,17 17,17 L3.5,17 C2.67157288,17 2,17.6715729 2,18.5 Z" id="Shape"></path>
+            <path d="M16,2 L3.5,2 C2.67157288,2 2,2.67157288 2,3.5 L2,18.5 C2,19.3284271 2.67157288,20 3.5,20 L16,20 L16,2 Z M3.5,0 L17,0 C17.5522847,0 18,0.44771525 18,1 L18,21 C18,21.5522847 17.5522847,22 17,22 L3.5,22 C1.56700338,22 0,20.4329966 0,18.5 L0,3.5 C0,1.56700338 1.56700338,6.66133815e-16 3.5,0 Z" id="Shape"></path>
+        </g>
+    </g>
+</svg>

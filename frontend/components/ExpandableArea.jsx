@@ -24,10 +24,10 @@ class ExpandableArea extends React.Component {
 
   render() {
     return (
-      <div className="expandable-area">
+      <div className="usa-accordion">
         <button
           onClick={this.toggle}
-          className="expandable-area-button"
+          className="usa-accordion-button"
           aria-expanded={this.state.isExpanded}
           aria-controls={this.id}
         >
@@ -35,7 +35,7 @@ class ExpandableArea extends React.Component {
         </button>
         <div
           id={this.id}
-          className="expandable-area-content"
+          className="usa-accordion-content"
           aria-hidden={!this.state.isExpanded}
         >
           {this.props.children}

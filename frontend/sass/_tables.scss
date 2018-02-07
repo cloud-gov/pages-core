@@ -1,17 +1,47 @@
+.usa-table-borderless {
+  thead {
+    background-color: $color-gray-lightest;
+  }
+
+  th:first-child {
+    padding-left: 1rem;
+  }
+}
 
 .log-table {
-  font-size: smaller;
-  margin-top: 0;
+  font-size: 1.45rem;
 
   pre {
-    overflow: auto;
-    white-space: pre-wrap;
     margin: 0;
     max-height: 200px;
     max-width: 200px;
+    overflow: auto;
+    white-space: pre-wrap;
+  }
+  .usa-button {
+    font-size: 1.5rem;
+  }
+  .table-actions {
+    a {
+      margin: 0 .5rem;
+      &:first-child {
+        margin-left: 0;
+      }
+      &:last-child {
+        margin-right: 0;
+      }
+    }
   }
 }
 
 .log-table__site-build-log pre {
   max-width: 400px;
+}
+
+.table-full-width {
+  width: 100%;
+  td,
+  th {
+    padding: 1rem;
+  }
 }

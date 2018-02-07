@@ -51,12 +51,12 @@ describe('<SiteListItem />', () => {
     const viewLink = wrapper.find('.sites-list-item-actions a');
     expect(viewLink).to.have.length(1);
     expect(viewLink.props()).to.deep.equals({
-      className: 'icon icon-view',
+      className: 'icon-view',
       href: testSite.viewLink,
       alt: `View the ${testSite.repository} site`,
       target: '_blank',
       rel: 'noopener noreferrer',
-      children: 'Visit site',
+      children: 'View site',
     });
   });
 

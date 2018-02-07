@@ -6,7 +6,7 @@ services:
       context: .
     command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "watch"]
     volumes:
-      - .:/app
+      - .:/app:delegated
       - node-modules:/app/node_modules/
       - yarn-cache:/app/.yarn-cache/
     ports:

@@ -3,29 +3,31 @@ import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 
+import { USER } from '../../propTypes';
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
 import AlertBanner from '../alertBanner';
 import { availableEngines } from '../SelectSiteEngine';
-
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
 
 const propTypes = {
-  storeState: PropTypes.shape({
-    user: PropTypes.shape({
-      username: PropTypes.string,
-      id: PropTypes.number,
-    }),
-    error: PropTypes.string,
-  }),
+  error: PropTypes.string, // TODO: confirm that this is actually necessary
   showAddNewSiteFields: PropTypes.bool,
+  user: PropTypes.shape(USER),
 };
 
 const defaultProps = {
-  storeState: null,
+  error: null,
   showAddNewSiteFields: false,
+  user: null,
 };
+
+const mapStateToProps = ({ showAddNewSiteFields, user, error }) => ({
+  error,
+  showAddNewSiteFields,
+  user,
+});
 
 function getOwnerAndRepo(repoUrl) {
   const owner = repoUrl.split('/')[3];
@@ -67,11 +69,9 @@ export class AddSite extends React.Component {
   }
 
   defaultOwner() {
-    const userState = this.props.storeState.user;
-    if (userState.data) {
-      return userState.data.username;
-    }
-    return '';
+    const { user } = this.props;
+
+    return (user.data && user.data.username) || '';
   }
 
   render() {
@@ -82,35 +82,33 @@ export class AddSite extends React.Component {
 
     return (
       <div>
-        <AlertBanner message={this.props.storeState.error} />
+        <AlertBanner message={this.props.error} />
         <div className="usa-grid">
-          <div className="usa-width-one-whole">
-            <h1>Make a new site</h1>
+          <div className="page-header usa-grid-full">
+            <div className="header-title">
+              <h1>
+                Make a new site
+              </h1>
+            </div>
           </div>
-        </div>
-        <div className="usa-grid">
-          <div className="usa-width-one-whole">
+          <div className="usa-content">
             <p>
               There are a few different ways you can add sites to Federalist.
               You can start with a brand new site by selecting one of our template sites below.
               Or you can specify the GitHub repository where your site&#39;s code lives.
             </p>
           </div>
+          <h2>Use your own GitHub repository</h2>
+          <AddRepoSiteForm
+            initialValues={{ engine: availableEngines[0].value }}
+            showAddNewSiteFields={this.props.showAddNewSiteFields}
+            onSubmit={formSubmitFunc}
+          />
+          <TemplateSiteList
+            handleSubmitTemplate={this.onSubmitTemplate}
+            defaultOwner={this.defaultOwner()}
+          />
         </div>
-        <TemplateSiteList
-          handleSubmitTemplate={this.onSubmitTemplate}
-          defaultOwner={this.defaultOwner()}
-        />
-
-        <div className="usa-grid">
-          <h2>Or add your own GitHub repository</h2>
-        </div>
-
-        <AddRepoSiteForm
-          initialValues={{ engine: availableEngines[0].value }}
-          showAddNewSiteFields={this.props.showAddNewSiteFields}
-          onSubmit={formSubmitFunc}
-        />
       </div>
     );
   }
@@ -118,7 +116,5 @@ export class AddSite extends React.Component {
 
 AddSite.propTypes = propTypes;
 AddSite.defaultProps = defaultProps;
-
-const mapStateToProps = ({ showAddNewSiteFields }) => ({ showAddNewSiteFields });
 
 export default connect(mapStateToProps)(AddSite);

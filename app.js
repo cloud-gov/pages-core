@@ -1,3 +1,4 @@
+const path = require('path');
 const config = require('./config');
 
 const logger = require('winston');
@@ -54,6 +55,10 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static('public'));
+
+// Add path to access USWDS dist files from node_modules
+app.use('/uswds', express.static(path.join(__dirname, '/node_modules/uswds/dist/')));
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: '2mb' }));
 app.use(methodOverride());

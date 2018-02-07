@@ -26,25 +26,30 @@ describe('<AdvancedSiteSettings/>', () => {
   it('should render', () => {
     const props = makeProps();
     const wrapper = shallow(<AdvancedSiteSettings {...props} />);
-    expect(wrapper.exists()).to.be.true;
+    const alertBanner = wrapper.find('AlertBanner');
 
+    expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('Field')).to.have.length(4);
     expect(wrapper.find('Field[name="engine"]').exists()).to.be.true;
     expect(wrapper.find('Field[name="config"]').exists()).to.be.true;
     expect(wrapper.find('Field[name="demoConfig"]').exists()).to.be.true;
     expect(wrapper.find('Field[name="previewConfig"]').exists()).to.be.true;
+    expect(alertBanner).to.have.length(1);
+    expect(alertBanner.prop('header')).to.be.defined;
+    expect(alertBanner.prop('message')).to.be.defined;
+    expect(alertBanner.prop('alertRole')).to.be.false;
   });
 
   it('should have its buttons disabled when pristine', () => {
     const props = makeProps();
     let wrapper = shallow(<AdvancedSiteSettings {...props} />);
     expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('button.button-reset').prop('disabled')).to.be.true;
+    expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.true;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.true;
 
     props.pristine = false;
     wrapper = shallow(<AdvancedSiteSettings {...props} />);
-    expect(wrapper.find('button.button-reset').prop('disabled')).to.be.false;
+    expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.false;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.false;
   });
 
@@ -52,7 +57,7 @@ describe('<AdvancedSiteSettings/>', () => {
     const props = makeProps();
     const wrapper = shallow(<AdvancedSiteSettings {...props} />);
 
-    const deleteButton = wrapper.find('button.button-delete');
+    const deleteButton = wrapper.find('button.usa-button-red');
     expect(props.onDelete.called).to.be.false;
     deleteButton.simulate('click');
     expect(props.onDelete.calledOnce).to.be.true;
@@ -62,7 +67,7 @@ describe('<AdvancedSiteSettings/>', () => {
     const props = makeProps();
     props.pristine = false;
     const wrapper = shallow(<AdvancedSiteSettings {...props} />);
-    const resetButton = wrapper.find('button.button-reset');
+    const resetButton = wrapper.find('button.usa-button-secondary');
 
     expect(props.reset.called).to.be.false;
     resetButton.simulate('click');

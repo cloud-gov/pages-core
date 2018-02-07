@@ -13,17 +13,11 @@ const propTypes = {
 };
 
 const PagesHeader = ({ owner, repository, title, viewLink }) => (
-  <div className="usa-grid header">
+  <div className="page-header usa-grid-full">
     <div className="usa-width-two-thirds">
       <div className="header-title">
         <h1>
-          <img
-            className="header-icon"
-            src="/images/website.svg"
-            alt="Websites icon"
-          />
           {owner}/{repository}
-          {' '}
         </h1>
       </div>
       <h2>{title}</h2>
@@ -35,13 +29,13 @@ const PagesHeader = ({ owner, repository, title, viewLink }) => (
       </GitHubLink>
       <Link
         role="button"
-        className="icon icon-view icon-white"
-        alt="View this website"
+        className="icon-view"
+        alt="View this site"
         target="_blank"
         rel="noopener noreferrer"
         to={viewLink}
       >
-        View website
+        View site
       </Link>
     </div>
   </div>

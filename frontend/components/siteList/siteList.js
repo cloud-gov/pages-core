@@ -3,27 +3,37 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 
+import { SITE } from '../../propTypes';
 import AlertBanner from '../alertBanner';
 import SiteListItem from './siteListItem';
 import LoadingIndicator from '../LoadingIndicator';
 
 const propTypes = {
-  storeState: PropTypes.shape({
+  alert: PropTypes.object,
+  sites: PropTypes.shape({
+    data: PropTypes.arrayOf(SITE),
     isLoading: PropTypes.bool,
-    data: PropTypes.array,
   }),
 };
 
 const defaultProps = {
-  storeState: null,
+  alert: null,
+  sites: null,
 };
 
-const getSites = (sitesState) => {
-  if (sitesState.isLoading) {
+const mapStateToProps = ({ alert, sites }) => ({
+  alert,
+  sites,
+});
+
+const getSites = (sites) => {
+  const { isLoading, data } = sites;
+
+  if (isLoading) {
     return <LoadingIndicator />;
   }
 
-  if (!sitesState.data || !sitesState.data.length) {
+  if (!data || !data.length) {
     return (
       <div className="usa-grid">
         <h1>No sites yet.</h1>
@@ -33,16 +43,14 @@ const getSites = (sitesState) => {
   }
 
   return (
-    <div className="usa-grid">
-      <ul className="sites-list usa-unstyled-list">
-        {
-          sitesState.data
-            .slice() // create a copy so that sort doesn't modify the original
-            .sort((a, b) => a.id - b.id) // sort ascending by id
-            .map(site => (<SiteListItem key={site.id} site={site} />))
-        }
-      </ul>
-    </div>
+    <ul className="sites-list usa-unstyled-list">
+      {
+        data
+          .slice() // create a copy so that sort doesn't modify the original
+          .sort((a, b) => a.id - b.id) // sort ascending by id
+          .map(site => <SiteListItem key={site.id} site={site} />)
+      }
+    </ul>
   );
 };
 
@@ -50,40 +58,34 @@ const addWebsiteButton = () => (
   <Link
     to="/sites/new"
     role="button"
-    className="usa-button pull-right icon icon-new icon-white"
-    alt="Add a new website"
+    className="usa-button button-add-website"
+    alt="Add a new site"
   >
-    Add website
+    Add site
   </Link>
 );
 
-export const SiteList = ({ storeState }) =>
-  (<div>
-    <div className="usa-grid dashboard header">
+export const SiteList = ({ sites, alert }) =>
+  <div className="usa-grid">
+    <div className="page-header usa-grid-full">
       <div className="usa-width-two-thirds">
         <div className="header-title">
           <h1>
-            <img className="header-icon" src="/images/websites.svg" alt="Websites icon" />
             Your websites
           </h1>
         </div>
       </div>
-      <div className="usa-width-one-third">
+      <div className="usa-width-one-third header-actions">
         {addWebsiteButton()}
       </div>
     </div>
-    <div className="usa-grid">
-      <AlertBanner {...storeState.alert} />
-    </div>
-    {getSites(storeState.sites)}
-    <div className="usa-grid">
-      <div className="usa-width-one-whole">
-        {addWebsiteButton()}
-      </div>
-    </div>
-  </div>);
+
+    <AlertBanner {...alert} />
+    {getSites(sites)}
+    <a href="#top">Return to top</a>
+  </div>;
 
 SiteList.propTypes = propTypes;
 SiteList.defaultProps = defaultProps;
 
-export default connect(state => state)(SiteList);
+export default connect(mapStateToProps)(SiteList);

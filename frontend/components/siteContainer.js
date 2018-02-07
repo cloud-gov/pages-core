@@ -13,18 +13,6 @@ const propTypes = {
     branch: PropTypes.string,
     fileName: PropTypes.string,
   }).isRequired,
-  storeState: PropTypes.shape({
-    sites: PropTypes.object,
-    builds: PropTypes.object,
-    buildLogs: PropTypes.object,
-    publishedBranches: PropTypes.object,
-    publishedFiles: PropTypes.object,
-    githubBranches: PropTypes.object,
-    alert: PropTypes.shape({
-      message: PropTypes.string,
-      status: PropTypes.string,
-    }),
-  }),
   location: PropTypes.shape({
     pathname: PropTypes.string,
   }).isRequired,
@@ -32,38 +20,41 @@ const propTypes = {
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node,
   ]),
+  sites: PropTypes.object,
+  alert: PropTypes.object,
 };
 
 const defaultProps = {
   children: null,
-  storeState: null,
+  sites: null,
+  alert: {},
 };
 
 export const SITE_NAVIGATION_CONFIG = [
   {
     display: 'Build history',
     route: 'builds',
-    iconClass: 'icon-logs',
+    icon: 'icon-book',
   },
   {
     display: 'GitHub branches',
     route: 'branches',
-    iconClass: 'icon-pages',
+    icon: 'icon-branch',
   },
   {
-    display: 'Published files',
+    display: 'Uploaded files',
     route: 'published',
-    iconClass: 'icon-upload',
+    icon: 'icon-cloud_upload',
   },
   {
     display: 'Collaborators',
     route: 'users',
-    iconClass: 'icon-gear',
+    icon: 'icon-people',
   },
   {
     display: 'Site settings',
     route: 'settings',
-    iconClass: 'icon-settings',
+    icon: 'icon-gear',
   },
 ];
 
@@ -86,59 +77,43 @@ export class SiteContainer extends React.Component {
   }
 
   render() {
-    const { storeState, children, params, location } = this.props;
+    const { sites, children, params, location, alert } = this.props;
 
-    if (storeState.sites.isLoading || !storeState.sites.data) {
+    if (sites.isLoading || !sites.data) {
       return <LoadingIndicator />;
     }
 
-    const site = this.getCurrentSite(storeState.sites, params.id);
+    const site = this.getCurrentSite(sites, params.id);
 
     if (!site) {
+      const errorMessage = (
+        <span>
+          Apologies; you don&apos;t have access to this site in Federalist!
+          <br />
+          Please contact the site owner if you should have access.
+        </span>
+      );
       return (
-        <div className="usa-grid">
-          <div className="usa-alert usa-alert-error" role="alert">
-            <div className="usa-alert-body">
-              <h3 className="usa-alert-heading">Unauthorized</h3>
-              <p className="usa-alert-text">
-                Apologies; you don&apos;t have access to this site in Federalist!
-                <br />
-                Please contact the site owner if you should have access.
-              </p>
-            </div>
-          </div>
-        </div>
+        <AlertBanner
+          status="error"
+          header="Unavailable"
+          message={errorMessage}
+        />
       );
     }
 
     const pageTitle = this.getPageTitle(location.pathname);
-    const builds = storeState.builds;
-    const buildLogs = storeState.buildLogs;
-    const publishedBranches = storeState.publishedBranches;
-    const publishedFiles = storeState.publishedFiles;
-    const githubBranches = storeState.githubBranches;
-    const user = storeState.user.data;
-
-    const childConfigs = {
-      site,
-      builds,
-      buildLogs,
-      publishedBranches,
-      publishedFiles,
-      githubBranches,
-      user,
-    };
 
     return (
       <div className="usa-grid site">
         <SideNav siteId={site.id} />
         <div className="usa-width-five-sixths site-main" id="pages-container">
-          <div className="usa-grid">
-            <AlertBanner
-              message={storeState.alert.message}
-              status={storeState.alert.status}
-            />
-          </div>
+
+          <AlertBanner
+            message={alert.message}
+            status={alert.status}
+          />
+
           <PagesHeader
             repository={site.repository}
             owner={site.owner}
@@ -148,10 +123,8 @@ export class SiteContainer extends React.Component {
             fileName={params.fileName}
             viewLink={site.viewLink}
           />
-          <div className="usa-grid">
-            {children &&
-              React.cloneElement(children, childConfigs)
-            }
+          <div className="">
+            {children && React.cloneElement(children, { site })}
           </div>
         </div>
       </div>

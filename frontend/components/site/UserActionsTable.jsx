@@ -55,7 +55,7 @@ class UserActionsTable extends React.Component {
     }
 
     return (
-      <table>
+      <table className="table-full-width log-table">
         <caption>Action Log</caption>
         {this.renderTableHead()}
         <tbody>

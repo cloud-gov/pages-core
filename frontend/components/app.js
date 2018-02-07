@@ -6,6 +6,12 @@ import { connect } from 'react-redux';
 import alertActions from '../actions/alertActions';
 import LoadingIndicator from './LoadingIndicator';
 
+const mapStateToProps = ({ alert, notifications, user }) => ({
+  alert,
+  notifications,
+  user,
+});
+
 export class App extends React.Component {
   componentWillReceiveProps(nextProps) {
     const { alert } = this.props;
@@ -15,10 +21,11 @@ export class App extends React.Component {
     }
   }
 
-  shouldClearAlert(nextProps) {
+  shouldClearAlert({ alert, location }) {
+    // the route we are leaving
     const { location: { key: lastKey } } = this.props;
-    const { key: nextKey } = nextProps.location;
-    const { alert } = nextProps;
+    // the route we are moving to
+    const { key: nextKey } = location;
 
     if (alert.stale) {
       alertActions.clear();
@@ -44,7 +51,7 @@ export class App extends React.Component {
     return (
       <div>
         <Notifications notifications={notifications} />
-        { children && React.cloneElement(children, { storeState: this.props }) }
+        { children }
       </div>
     );
   }
@@ -96,4 +103,4 @@ App.defaultProps = {
   notifications: [],
 };
 
-export default connect(state => state)(App);
+export default connect(mapStateToProps)(App);

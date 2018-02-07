@@ -45,8 +45,14 @@ describe('<AddRepoSiteForm />', () => {
 
     props.showAddNewSiteFields = true;
     wrapper = shallow(<AddRepoSiteForm {...props} />);
+
+    const alertBanner = wrapper.find('AlertBanner');
+
     expect(wrapper.find('Field[name="engine"]')).to.have.length(1);
     expect(wrapper.find('BranchField').props().required).to.be.true;
+    expect(alertBanner).to.have.length(1);
+    expect(alertBanner.prop('header')).to.be.defined;
+    expect(alertBanner.prop('message')).to.be.defined;
   });
 
   it('makes GitHubRepoUrlField readOnly when showAddNewSiteFields is true', () => {
@@ -92,17 +98,5 @@ describe('<AddRepoSiteForm />', () => {
     const wrapper = shallow(<AddRepoSiteForm {...props} />);
     wrapper.find('form').simulate('submit');
     expect(props.handleSubmit.calledOnce).to.be.true;
-  });
-
-  it('links back to /sites from the Cancel button', () => {
-    const props = {
-      showAddNewSiteFields: false,
-      initialValues: { engine: 'jekyll' },
-      handleSubmit: () => {},
-      pristine: true,
-    };
-
-    const wrapper = shallow(<AddRepoSiteForm {...props} />);
-    expect(wrapper.find('Link.usa-button-secondary[to="/sites"]')).to.have.length(1);
   });
 });
