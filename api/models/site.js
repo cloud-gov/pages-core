@@ -96,6 +96,12 @@ function viewLinkForBranch(branch) {
   return this.branchPreviewUrl(branch);
 }
 
+function isEmptyOrBranch(value) {
+  if (value && value.length && !branchRegex.test(value)) {
+    throw new Error('Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
+  }
+}
+
 function isEmptyOrUrl(value) {
   const validUrlOptions = {
     require_protocol: true,
@@ -112,7 +118,7 @@ module.exports = (sequelize, DataTypes) => {
     demoBranch: {
       type: DataTypes.STRING,
       validate: {
-        is: branchRegex,
+        isEmptyOrBranch,
       },
     },
     demoDomain: {
@@ -128,7 +134,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       defaultValue: 'master',
       validate: {
-        is: branchRegex,
+        isEmptyOrBranch,
       },
     },
     domain: {
