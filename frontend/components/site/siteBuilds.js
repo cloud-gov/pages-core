@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
-import GitHubLink from '../GitHubLink/GitHubLink';
-import GitHubMark from '../GitHubMark';
 
+import GitHubLink from '../GitHubLink/GitHubLink';
+import { IconGitHub } from '../icons';
 import { BUILD } from '../../propTypes';
 import buildActions from '../../actions/buildActions';
 import LoadingIndicator from '../LoadingIndicator';
@@ -45,7 +45,7 @@ class SiteBuilds extends React.Component {
           sha={build.commitSha}
           title={build.commitSha}
         >
-          View commit <GitHubMark />
+          View commit <IconGitHub />
         </GitHubLink>
       </span>
     );
@@ -56,16 +56,16 @@ class SiteBuilds extends React.Component {
   }
 
   renderEmptyState() {
+    const message = 'If this site was just added, the ' +
+      'first build should be available within a few minutes.';
     return (
       <AlertBanner
         status="info"
         header="This site does not yet have any builds."
-        message="If this site was just added, the first build should be available
-          within a few minutes."
+        message={message}
       >
         <RefreshBuildsButton site={this.props.site} />
       </AlertBanner>
-
     );
   }
 

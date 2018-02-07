@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 
 import PublishedState from './publishedState';
 import GitHubLink from '../GitHubLink/GitHubLink';
-import GitHubMark from '../GitHubMark';
+import { IconGitHub } from '../icons';
 
 const propTypes = {
   site: PropTypes.shape({
@@ -19,7 +19,6 @@ const propTypes = {
 function getViewLink(viewLink, repo) {
   return (
     <a
-      className="icon-view"
       href={viewLink}
       alt={`View the ${repo} site`}
       target="_blank"
@@ -43,7 +42,7 @@ const SiteListItem = ({ site }) =>
     <div className="sites-list-item-actions">
       <GitHubLink owner={site.owner} repository={site.repository}>
         View repo
-        <GitHubMark />
+        <IconGitHub />
       </GitHubLink>
       { getViewLink(site.viewLink, site.repository) }
     </div>

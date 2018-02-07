@@ -22,6 +22,7 @@ describe('<SiteList />', () => {
   beforeEach(() => {
     SiteList = proxyquire('../../../../frontend/components/siteList/siteList', {
       './siteListItem': SiteListItem,
+      '../icons': { IconPlus: 'IconPlus' },
     }).SiteList;
   });
 

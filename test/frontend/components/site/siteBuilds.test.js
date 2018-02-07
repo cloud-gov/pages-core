@@ -1,9 +1,17 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import proxyquire from 'proxyquire';
 
-import { SiteBuilds } from '../../../../frontend/components/site/siteBuilds';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
+
+proxyquire.noCallThru();
+
+const { SiteBuilds } = proxyquire('../../../../frontend/components/site/siteBuilds', {
+  '../icons': {
+    IconGitHub: 'IconGitHub',
+  },
+});
 
 let user;
 let site;

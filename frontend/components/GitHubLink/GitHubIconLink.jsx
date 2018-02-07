@@ -1,11 +1,11 @@
 import React from 'react';
 import GitHubURLProvider from './GitHubURLProvider';
 import GitHubRepoLink from './GitHubRepoLink';
-import GitHubMark from '../GitHubMark';
+import { IconGitHub } from '../icons';
 
 const GitHubIconLink = ({ ...props }) =>
   <GitHubRepoLink {...props}>
-    <GitHubMark />
+    <IconGitHub />
   </GitHubRepoLink>;
 
 export default GitHubURLProvider(GitHubIconLink);

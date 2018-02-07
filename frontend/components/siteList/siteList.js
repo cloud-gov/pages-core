@@ -7,6 +7,7 @@ import { SITE } from '../../propTypes';
 import AlertBanner from '../alertBanner';
 import SiteListItem from './siteListItem';
 import LoadingIndicator from '../LoadingIndicator';
+import { IconPlus } from '../icons';
 
 const propTypes = {
   alert: PropTypes.object,
@@ -61,7 +62,7 @@ const addWebsiteButton = () => (
     className="usa-button button-add-website"
     alt="Add a new site"
   >
-    Add site
+    <IconPlus /> Add site
   </Link>
 );
 

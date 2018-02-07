@@ -10,6 +10,7 @@ const fetchBranchesSpy = spy();
 
 const SiteGitHubBranches = proxyquire('../../../../frontend/components/site/SiteGitHubBranches', {
   '../../actions/githubBranchActions': { fetchBranches: fetchBranchesSpy },
+  '../icons': { IconGitHub: 'IconGitHub' },
 }).SiteGitHubBranches;
 
 describe('<SiteGitHubBranches />', () => {

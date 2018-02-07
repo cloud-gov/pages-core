@@ -1,8 +1,15 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import proxyquire from 'proxyquire';
 
-import GitHubIconLink from '../../../../frontend/components/GitHubLink/GitHubIconLink';
+proxyquire.noCallThru();
+
+const GitHubIconLink = proxyquire('../../../../frontend/components/GitHubLink/GitHubIconLink', {
+  '../icons': {
+    IconGitHub: 'IconGitHub',
+  },
+}).default;
 
 describe('<GitHubIconLink />', () => {
   const props = { owner: 'owner', repository: 'a-repo' };
@@ -16,8 +23,8 @@ describe('<GitHubIconLink />', () => {
     expect(wrapper.exists()).to.be.true;
   });
 
-  it('renders a <GitHubMark/> component', () => {
-    expect(wrapper.first().shallow().find('GitHubMark')).to.have.length(1);
+  it('renders an <IconGitHub/> component', () => {
+    expect(wrapper.first().shallow().find('IconGitHub')).to.have.length(1);
   });
 
   it('renders a <GitHubRepoLink/> component', () => {

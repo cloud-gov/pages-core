@@ -35,27 +35,27 @@ export const SITE_NAVIGATION_CONFIG = [
   {
     display: 'Build history',
     route: 'builds',
-    icon: 'icon-book',
+    icon: 'IconBook',
   },
   {
     display: 'GitHub branches',
     route: 'branches',
-    icon: 'icon-branch',
+    icon: 'IconBranch',
   },
   {
     display: 'Uploaded files',
     route: 'published',
-    icon: 'icon-cloud_upload',
+    icon: 'IconCloudUpload',
   },
   {
     display: 'Collaborators',
     route: 'users',
-    icon: 'icon-people',
+    icon: 'IconPeople',
   },
   {
     display: 'Site settings',
     route: 'settings',
-    icon: 'icon-gear',
+    icon: 'IconGear',
   },
 ];
 
