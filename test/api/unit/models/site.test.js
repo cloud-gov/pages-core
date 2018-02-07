@@ -131,7 +131,7 @@ describe('Site model', () => {
       defaultBranch: 'very/bad',
     }).catch((err) => {
       expect(err.status).to.equal(403);
-      expect(err.message).to.equal('defaultBranch: Validation is failed');
+      expect(err.message).to.equal('defaultBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
       done();
     });
   });
@@ -142,7 +142,7 @@ describe('Site model', () => {
     })
     .catch((err) => {
       expect(err.status).to.equal(403);
-      expect(err.message).to.equal('demoBranch: Validation is failed');
+      expect(err.message).to.equal('demoBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
       done();
     });
   });
