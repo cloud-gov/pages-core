@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Notifications from 'react-notification-system-redux';
 import { connect } from 'react-redux';
 
+import { USER } from '../propTypes';
 import alertActions from '../actions/alertActions';
 import LoadingIndicator from './LoadingIndicator';
 
@@ -73,14 +74,8 @@ App.propTypes = {
     // When the user is not auth'd, this prop is false, which is a little weird
     PropTypes.bool,
     PropTypes.shape({
-      isLoading: PropTypes.bool.isRequired,
-      data: PropTypes.shape({
-        createdAt: PropTypes.string.isRequired,
-        updatedAt: PropTypes.string.isRequired,
-        username: PropTypes.string.isRequired,
-        email: PropTypes.string.isRequired,
-        id: PropTypes.number.isRequired,
-      }),
+      isLoading: PropTypes.bool,
+      data: USER,
     }),
   ]),
   notifications: PropTypes.arrayOf(
@@ -99,7 +94,7 @@ App.defaultProps = {
   alert: null,
   children: null,
   location: null,
-  user: null,
+  user: false,
   notifications: [],
 };
 
