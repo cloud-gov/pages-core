@@ -7,6 +7,7 @@ import {
   siteDeleted as createSiteDeletedAction,
   siteUserAdded as createSiteUserAddedAction,
   siteUserRemoved as siteUserRemovedAction,
+  setCurrentSite as setCurrentSiteAction,
 } from './actionCreators/siteActions';
 
 import {
@@ -60,6 +61,8 @@ const dispatchHideAddNewSiteFieldsAction = () => {
   dispatch(createHideAddNewSiteFieldsAction());
 };
 
+const dispatchSetCurrentSiteAction = siteId => dispatch(setCurrentSiteAction(siteId));
+
 export {
   updateRouterToSitesUri,
   updateRouterToSiteBuildsUri,
@@ -72,4 +75,5 @@ export {
   dispatchUserRemovedFromSiteAction,
   dispatchShowAddNewSiteFieldsAction,
   dispatchHideAddNewSiteFieldsAction,
+  dispatchSetCurrentSiteAction,
 };

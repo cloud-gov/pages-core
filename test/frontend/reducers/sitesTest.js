@@ -16,6 +16,12 @@ describe('sitesReducer', () => {
   const BUILD_RESTARTED = 'build restarted!';
   const SITE_USER_ADDED = 'site user added';
   const SITE_USER_REMOVED = 'SITE_USER_REMOVED';
+  const SET_CURRENT_SITE = 'SET_CURRENT_SITE';
+  const initialState = {
+    isLoading: false,
+    data: [],
+    currentSite: null,
+  };
 
   beforeEach(() => {
     fixture = proxyquire('../../../frontend/reducers/sites', {
@@ -27,6 +33,7 @@ describe('sitesReducer', () => {
         siteBranchesReceivedType: SITE_BRANCHES_RECEIVED,
         siteDeletedType: SITE_DELETED,
         siteUserAddedType: SITE_USER_ADDED,
+        setCurrentSiteType: SET_CURRENT_SITE,
       },
       '../actions/actionCreators/buildActions': {
         buildRestartedType: BUILD_RESTARTED,
@@ -40,41 +47,36 @@ describe('sitesReducer', () => {
       hello: 'alijasfjir',
     });
 
-    expect(actual).to.deep.equal({ isLoading: false });
+    expect(actual).to.deep.equal(initialState);
   });
 
   it("marks the state as loading when it gets a 'sites fetch started' action", () => {
-    const actual = fixture({ isLoading: false }, {
+    const actual = fixture(initialState, {
       type: SITES_FETCH_STARTED,
     });
 
-    expect(actual).to.deep.equal({ isLoading: true });
+    expect(actual).to.deep.equal({ ...initialState, isLoading: true });
   });
 
   it("replaces anything it has when it gets a 'sites received' action", () => {
     const sites = [{ hello: 'world' }, { how: 'are you?' }];
 
-    const actual = fixture({ isLoading: false, data: [{ oldData: 'to be lost' }] }, {
+    const actual = fixture({ ...initialState, data: [{ oldData: 'to be lost' }] }, {
       type: SITES_RECEIVED,
       sites,
     });
 
-    expect(actual).to.deep.equal({
-      isLoading: false,
-      data: sites,
-    });
+    expect(actual).to.deep.equal({ ...initialState, isLoading: false, data: sites });
   });
 
 
   it("ignores a malformed 'sites received' action", () => {
-    const actual = fixture([{ oldData: 'to be lost' }], {
+    const state = { ...initialState, data: [{ oldData: 'to be there' }] };
+    const actual = fixture(state, {
       type: SITES_RECEIVED,
     });
 
-    expect(actual).to.deep.equal({
-      isLoading: false,
-      data: [],
-    });
+    expect(actual).to.deep.equal(state);
   });
 
   it('adds a site if action has a site', () => {
@@ -250,5 +252,22 @@ describe('sitesReducer', () => {
     expect(actual.data.length).to.equal(2);
     expect(actual.data[0].users[0].username).to.equal('jane');
     expect(actual.data[1]).to.deep.equal(state.data[1]);
+  });
+
+  it('sets the current site', () => {
+    const state = {
+      isLoading: false,
+      data: [{
+        id: 2, owner: 'person2', repository: 'b', users: [],
+      }],
+      currentSite: null,
+    };
+
+    const actual = siteReducer(state, {
+      type: SET_CURRENT_SITE,
+      siteId: 2,
+    });
+
+    expect(actual.currentSite).to.deep.equal(state.data[0]);
   });
 });

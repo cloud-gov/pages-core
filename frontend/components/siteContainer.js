@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+import siteActions from '../actions/siteActions';
 import SideNav from './site/SideNav';
 import PagesHeader from './site/pagesHeader';
 import AlertBanner from './alertBanner';
@@ -59,6 +60,19 @@ export const SITE_NAVIGATION_CONFIG = [
 ];
 
 export class SiteContainer extends React.Component {
+  componentDidMount() {
+    siteActions.setCurrentSite(this.props.params.id);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { sites } = nextProps;
+    const { currentSite, data } = sites;
+
+    if (data.length && !currentSite) {
+      siteActions.setCurrentSite(this.props.params.id);
+    }
+  }
+
   getPageTitle(pathname) {
     const route = pathname.split('/').pop();
     const routeConf = SITE_NAVIGATION_CONFIG.find(conf => conf.route === route);
@@ -68,14 +82,6 @@ export class SiteContainer extends React.Component {
     return '';
   }
 
-  getCurrentSite(sitesState, siteId) {
-    if (sitesState.isLoading) {
-      return null;
-    }
-
-    return sitesState.data.find(site => site.id === parseInt(siteId, 10));
-  }
-
   render() {
     const { sites, children, params, location, alert } = this.props;
 
@@ -83,7 +89,7 @@ export class SiteContainer extends React.Component {
       return <LoadingIndicator />;
     }
 
-    const site = this.getCurrentSite(sites, params.id);
+    const site = sites.currentSite;
 
     if (!site) {
       const errorMessage = (
@@ -124,7 +130,7 @@ export class SiteContainer extends React.Component {
             viewLink={site.viewLink}
           />
           <div className="">
-            {children && React.cloneElement(children, { site })}
+            {children}
           </div>
         </div>
       </div>
