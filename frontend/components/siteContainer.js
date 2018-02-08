@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import siteActions from '../actions/siteActions';
 import SideNav from './site/SideNav';
-import PagesHeader from './site/pagesHeader';
+import PagesHeader from './site/PagesHeader';
 import AlertBanner from './alertBanner';
 import LoadingIndicator from './LoadingIndicator';
 
