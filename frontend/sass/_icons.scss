@@ -1,86 +1,31 @@
-.icon-book {
-  background-image: url('/images/icon-book.svg');
-  background-repeat: no-repeat;
-  background-position: left center;
-  background-size: 0.8em;
-
-  &:hover {
-    background-image: url('/images/icon-book-hover.svg');
-  }
-}
-
-.icon-branch {
-  background-image: url('/images/icon-branch.svg');
-  background-repeat: no-repeat;
-  background-position: left center;
-  background-size: 0.9em;
-
-  &:hover {
-    background-image: url('/images/icon-branch-hover.svg');
-  }
-}
-
-.icon-cloud_upload {
-  background-image: url('/images/icon-cloud_upload.svg');
-  background-repeat: no-repeat;
-  background-position: left center;
-  background-size: 1em;
-
-  &:hover {
-    background-image: url('/images/icon-cloud_upload-hover.svg');
-  }
-}
-
-.icon-people {
-  background-image: url('/images/icon-people.svg');
-  background-repeat: no-repeat;
-  background-position: left center;
-  background-size: 1em;
-
-  &:hover {
-    background-image: url('/images/icon-people-hover.svg');
-  }
-}
-
-.icon-gear {
-  background-image: url('/images/icon-gear.svg');
-  background-repeat: no-repeat;
-  background-position: left center;
-  background-size: 1em;
-
-  &:hover {
-    background-image: url('/images/icon-gear-hover.svg');
-  }
-}
-
-.icon-view {
-  background-image: url('/images/icon-view.svg');
-  background-repeat: no-repeat;
-  background-position: right center;
-  background-size: 0.9em;
-  padding-right: 2rem;
-
-  &:hover {
-    background-image: url('/images/icon-view-hover.svg');
-  }
-}
-
-.icon-github {
-  background-image: url('/images/icon-github.svg');
-  background-repeat: no-repeat;
-  background-position: right center;
-  background-size: 0.9em;
-
-  &:hover {
-    background-image: url('/images/icon-github-hover.svg');
-  }
-}
 
 .repo-link {
   svg {
     height: 18px;
-    margin-left: .6rem;
-    vertical-align: middle;
     width: 18px;
+    margin-left: 0.3rem;
+    vertical-align: middle;
+    
+    stroke-width: 0;
+    fill: $link-color;
+  }
+
+  &:hover svg {
+    fill: $link-color-active;
+  }
+}
+
+.view-site-link {
+  svg {
+    height: 1em;
+    width: 1em;
+    margin-left: 0.3rem;
+    vertical-align: middle;
+    padding-bottom: 3px;
+    fill: $link-color;
+  }
+
+  &:hover svg {
+    fill: $link-color-active;
   }
 }

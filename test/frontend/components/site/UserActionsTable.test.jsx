@@ -1,13 +1,34 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import { UserActionsTable } from '../../../../frontend/components/site/UserActionsTable';
+import { spy } from 'sinon';
+import proxyquire from 'proxyquire';
+
+proxyquire.noCallThru();
+
+const fetchUserActions = spy();
+
+const { UserActionsTable } = proxyquire('../../../../frontend/components/site/UserActionsTable', {
+  '../../actions/userActions': { fetchUserActions },
+});
 
 describe('<UserActionsTable/>', () => {
+  beforeEach(() => {
+    // reset the spy
+    fetchUserActions.reset();
+  });
+
   it('should render nothing if the current user has no actions', () => {
     const wrapper = shallow(<UserActionsTable site={1} />);
 
     expect(wrapper.find('table')).to.have.length(0);
+  });
+
+  it('calls fetchUserActions on mount', () => {
+    const wrapper = shallow(<UserActionsTable site={22} />);
+    wrapper.instance().componentDidMount();
+    expect(fetchUserActions.calledOnce).to.be.true;
+    expect(fetchUserActions.calledWith(22)).to.be.true;
   });
 
   it('should render a table of user actions', () => {

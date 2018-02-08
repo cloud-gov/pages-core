@@ -4,8 +4,8 @@
     <title>icon-sliders</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Artboard-4" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-17.000000, -159.000000)">
-        <g id="icon-sliders" transform="translate(17.000000, 159.000000)" fill="#000000" fill-rule="nonzero">
+    <g id="Artboard-4" fill-rule="evenodd" transform="translate(-17.000000, -159.000000)">
+        <g id="icon-sliders" transform="translate(17.000000, 159.000000)" fill-rule="nonzero">
             <path d="M5,19 C5,19.5522847 4.55228475,20 4,20 C3.44771525,20 3,19.5522847 3,19 L3,12 C3,11.4477153 3.44771525,11 4,11 C4.55228475,11 5,11.4477153 5,12 L5,19 Z" id="Shape"></path>
             <path d="M5,8 C5,8.55228475 4.55228475,9 4,9 C3.44771525,9 3,8.55228475 3,8 L3,1 C3,0.44771525 3.44771525,0 4,0 C4.55228475,0 5,0.44771525 5,1 L5,8 Z" id="Shape"></path>
             <path d="M13,19 C13,19.5522847 12.5522847,20 12,20 C11.4477153,20 11,19.5522847 11,19 L11,10 C11,9.44771525 11.4477153,9 12,9 C12.5522847,9 13,9.44771525 13,10 L13,19 Z" id="Shape"></path>
