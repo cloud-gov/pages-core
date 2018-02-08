@@ -55,8 +55,8 @@ const SiteUsers = ({ site, user }) => {
                   className="repo-link"
                   rel="noopener noreferrer"
                   title={`Visit GitHub profile for ${rowUser.username}`}
-                >{rowUser.username}
-                  <IconGitHub />
+                >
+                  {rowUser.username}<IconGitHub />
                 </a>
                 {rowUser.username.toLowerCase() === user.username.toLowerCase() ? ' (you)' : ''}
               </td>

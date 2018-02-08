@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 
+import { IconView } from '../icons';
 import PublishedState from './publishedState';
-import GitHubLink from '../GitHubLink/GitHubLink';
-import { IconGitHub } from '../icons';
+import GitHubLink from '../GitHubLink';
 
 const propTypes = {
   site: PropTypes.shape({
@@ -23,8 +23,9 @@ function getViewLink(viewLink, repo) {
       alt={`View the ${repo} site`}
       target="_blank"
       rel="noopener noreferrer"
+      className="view-site-link"
     >
-      View site
+      View site <IconView />
     </a>);
 }
 
@@ -40,10 +41,7 @@ const SiteListItem = ({ site }) =>
       <PublishedState site={site} />
     </div>
     <div className="sites-list-item-actions">
-      <GitHubLink owner={site.owner} repository={site.repository}>
-        View repo
-        <IconGitHub />
-      </GitHubLink>
+      <GitHubLink text="View repo" owner={site.owner} repository={site.repository} />
       { getViewLink(site.viewLink, site.repository) }
     </div>
   </li>);

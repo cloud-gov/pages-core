@@ -1,7 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const GitHubRepoLink = ({ branch, sha, baseHref, children, ...props }) => {
+import { IconGitHub } from './icons';
+
+const BASE = 'https://github.com';
+
+const GitHubLink = ({ owner, repository, text, branch, sha, ...props }) => {
+  const baseHref = `${BASE}/${owner}/${repository}`;
+
   let title = props.title;
   let href = baseHref;
 
@@ -21,24 +27,24 @@ const GitHubRepoLink = ({ branch, sha, baseHref, children, ...props }) => {
       target="_blank"
       rel="noopener noreferrer"
     >
-      { children }
+      {text}<IconGitHub />
     </a>
   );
 };
 
-GitHubRepoLink.propTypes = {
-  baseHref: PropTypes.string.isRequired,
+GitHubLink.propTypes = {
+  owner: PropTypes.string.isRequired,
+  repository: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
   branch: PropTypes.string,
   sha: PropTypes.string,
-  children: PropTypes.node,
   title: PropTypes.string,
 };
 
-GitHubRepoLink.defaultProps = {
+GitHubLink.defaultProps = {
   branch: null,
-  children: null,
   sha: null,
   title: 'View repository',
 };
 
-export default GitHubRepoLink;
+export default GitHubLink;

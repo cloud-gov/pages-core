@@ -13,8 +13,6 @@ const SideNav = proxyquire('../../../../frontend/components/site/SideNav', {
     IconCloudUpload: 'IconCloudUpload',
     IconPeople: 'IconPeople',
     IconGear: 'IconGear',
-    IconGitHub: 'IconGitHub',
-    IconPlus: 'IconPlus',
   },
 }).default;
 

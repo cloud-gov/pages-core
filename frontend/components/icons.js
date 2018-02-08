@@ -5,6 +5,7 @@ import IconGear from '../../public/images/icons/icon-gear.svg';
 import IconGitHub from '../../public/images/icons/icon-github.svg';
 import IconPeople from '../../public/images/icons/icon-people.svg';
 import IconPlus from '../../public/images/icons/icon-plus.svg';
+import IconView from '../../public/images/icons/icon-view.svg';
 
 export {
   IconBook,
@@ -14,4 +15,5 @@ export {
   IconGitHub,
   IconPeople,
   IconPlus,
+  IconView,
 };

@@ -1,27 +1,31 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import proxyquire from 'proxyquire';
 
-import GitHubRepoLink from '../../../../frontend/components/GitHubLink/GitHubRepoLink';
-import GitHubURLProvider from '../../../../frontend/components/GitHubLink/GitHubURLProvider';
+proxyquire.noCallThru();
 
-const RepoLink = GitHubURLProvider(GitHubRepoLink);
+const GitHubLink = proxyquire('../../../frontend/components/GitHubLink', {
+  './icons': { IconGitHub: 'IconGitHub' },
+}).default;
 
-describe('<GitHubRepoLink/>', () => {
+describe('<GitHubLink/>', () => {
   it('renders', () => {
-    const props = { owner: 'owner', repository: 'a-repo' };
-    const wrapper = shallow(<RepoLink {...props} />).first().shallow();
+    const props = { owner: 'owner', repository: 'a-repo', text: 'link text' };
+    const wrapper = shallow(<GitHubLink {...props} />).first().shallow();
     expect(wrapper.exists()).to.be.true;
 
     const anchor = wrapper.find('a.repo-link');
     expect(anchor.exists()).to.be.true;
     expect(anchor.prop('href')).to.equal('https://github.com/owner/a-repo');
     expect(anchor.prop('title')).to.equal('View repository');
+    expect(anchor.text()).to.equal('link text');
+    expect(wrapper.find('IconGitHub').exists()).to.be.true;
   });
 
   it('can link to a branch', () => {
-    const props = { owner: 'pumpkin-pie', repository: 'candle', branch: 'the-branch' };
-    const wrapper = shallow(<RepoLink {...props} />).first().shallow();
+    const props = { text: 'link text', owner: 'pumpkin-pie', repository: 'candle', branch: 'the-branch' };
+    const wrapper = shallow(<GitHubLink {...props} />).first().shallow();
     expect(wrapper.exists()).to.be.true;
 
     const anchor = wrapper.find('a.repo-link');
@@ -31,8 +35,8 @@ describe('<GitHubRepoLink/>', () => {
   });
 
   it('encodes the branch name', () => {
-    const props = { owner: 'spam', repository: 'potato', branch: '#-hash-#' };
-    const wrapper = shallow(<RepoLink {...props} />).first().shallow();
+    const props = { text: 'boop', owner: 'spam', repository: 'potato', branch: '#-hash-#' };
+    const wrapper = shallow(<GitHubLink {...props} />).first().shallow();
 
     const anchor = wrapper.find('a.repo-link');
     expect(anchor.exists()).to.be.true;
@@ -40,8 +44,8 @@ describe('<GitHubRepoLink/>', () => {
   });
 
   it('links to a specific commit', () => {
-    const props = { owner: 'zookeeni', repository: 'veggies', sha: '123A' };
-    const wrapper = shallow(<RepoLink {...props} />).first().shallow();
+    const props = { text: 'boop', owner: 'zookeeni', repository: 'veggies', sha: '123A' };
+    const wrapper = shallow(<GitHubLink {...props} />).first().shallow();
     const commitUrl = `https://github.com/${props.owner}/${props.repository}/commit/${props.sha}`;
     const anchor = wrapper.find('a');
 
@@ -49,8 +53,8 @@ describe('<GitHubRepoLink/>', () => {
   });
 
   it('uses overrided title attribute if provided', () => {
-    const props = { owner: 'owner', repository: 'a-repo', title: 'handy explanation' };
-    const wrapper = shallow(<RepoLink {...props} />);
+    const props = { text: 'boop', owner: 'owner', repository: 'a-repo', title: 'handy explanation' };
+    const wrapper = shallow(<GitHubLink {...props} />);
 
     expect(wrapper.prop('title')).to.equal(props.title);
   });

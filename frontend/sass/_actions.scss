@@ -26,4 +26,9 @@ a.usa-button,
   &.usa-button-primary:disabled {
     color: #323a45;
   }
+
+  svg {
+    stroke-width: 0;
+    fill: $button-text-color;
+  }
 }

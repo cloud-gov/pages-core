@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 
-import GitHubLink from '../GitHubLink/GitHubLink';
-import { IconGitHub } from '../icons';
+import GitHubLink from '../GitHubLink';
 import { BUILD } from '../../propTypes';
 import buildActions from '../../actions/buildActions';
 import LoadingIndicator from '../LoadingIndicator';
@@ -44,9 +43,8 @@ class SiteBuilds extends React.Component {
           repository={repository}
           sha={build.commitSha}
           title={build.commitSha}
-        >
-          View commit <IconGitHub />
-        </GitHubLink>
+          text="View commit"
+        />
       </span>
     );
   }

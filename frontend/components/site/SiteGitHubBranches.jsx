@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 
 import { SITE, GITHUB_BRANCHES } from '../../propTypes';
 import LoadingIndicator from '../LoadingIndicator';
-import GitHubLink from '../GitHubLink/GitHubLink';
-import { IconGitHub } from '../icons';
+import GitHubLink from '../GitHubLink';
 import BranchViewLink from '../branchViewLink';
 import githubBranchActions from '../../actions/githubBranchActions';
 import buildActions from '../../actions/buildActions';
@@ -45,10 +44,7 @@ export class SiteGitHubBranches extends React.Component {
     return (
       <tr key={name}>
         <td>
-          <GitHubLink owner={owner} repository={repository} branch={name}>
-            { name }
-            <IconGitHub />
-          </GitHubLink>
+          <GitHubLink text={name} owner={owner} repository={repository} branch={name} />
           { isDefault && ' (live branch)' }{ isDemo && ' (demo branch)' }
         </td>
         <td className="table-actions">
