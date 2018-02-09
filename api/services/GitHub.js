@@ -131,7 +131,7 @@ module.exports = {
   checkOrganizations: (user, orgName) =>
     githubClient(user.githubAccessToken)
     .then(github => getOrganizations(github))
-    .then(orgs => orgs.some(org => org.login === orgName)),
+    .then(orgs => orgs.some(org => org.login.toLowerCase() === orgName)),
 
   createRepo: (user, owner, repository) =>
     githubClient(user.githubAccessToken)
