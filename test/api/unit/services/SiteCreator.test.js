@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const { expect } = require('chai');
+const nock = require('nock');
 const { stub } = require('sinon');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
@@ -8,6 +9,10 @@ const TemplateResolver = require('../../../../api/services/TemplateResolver');
 const { Build, Site, User } = require('../../../../api/models');
 
 describe('SiteCreator', () => {
+  beforeEach(() => {
+    nock.cleanAll();
+  });
+
   describe('.createSite', () => {
     const validateSiteExpectations = (site, owner, repository, user) => {
       expect(site).to.not.be.undefined;
@@ -72,6 +77,37 @@ describe('SiteCreator', () => {
               user
             );
             expect(webhookNock.isDone()).to.equal(true);
+            done();
+          })
+          .catch(done);
+        });
+
+        it('ignores case when comparing org name', (done) => {
+          const siteParams = {
+            owner: crypto.randomBytes(3).toString('hex'),
+            repository: crypto.randomBytes(3).toString('hex'),
+          };
+
+          factory.user().then((model) => {
+            user = model;
+            githubAPINocks.repo();
+            githubAPINocks.webhook();
+
+            githubAPINocks.userOrganizations({
+              accessToken: user.githubAccessToken,
+              organizations: [{ login: siteParams.owner.toUpperCase() }],
+            });
+
+            return SiteCreator.createSite({ user, siteParams });
+          })
+          .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
+          .then((site) => {
+            validateSiteExpectations(
+              site,
+              siteParams.owner,
+              siteParams.repository,
+              user
+            );
             done();
           })
           .catch(done);
@@ -187,6 +223,7 @@ describe('SiteCreator', () => {
           githubAPINocks.repo();
           githubAPINocks.userOrganizations({
             accessToken: user.githubAccessToken,
+            organizations: [{ login: 'some-other-org' }],
           });
 
           return SiteCreator.createSite({ user, siteParams });
