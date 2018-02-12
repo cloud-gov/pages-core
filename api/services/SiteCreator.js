@@ -69,9 +69,9 @@ function checkGithubOrg({ user, owner }) {
     // Has this org authorized federalist as an oauth app?
     if (!federalistAuthorizedOrg) {
       throw {
-        message: `Federalist can't confirm org permissions for '${owner}'.
-          Either '${owner}' hasn't approved access for Federalist or you aren't an org member.
-          Ensure you are an org member and ask an org owner to authorize Federalist for the organization.`,
+        message: `Federalist can't confirm org permissions for '${owner}'. ` +
+          `Either '${owner}' hasn't approved access for Federalist or you aren't an org member. ` +
+          'Ensure you are an org member and ask an org owner to authorize Federalist for the organization.',
         status: 403,
       };
     }
