@@ -230,8 +230,8 @@ describe('SiteCreator', () => {
         })
         .catch((err) => {
           const expectedError = `Federalist can't confirm org permissions for '${siteParams.owner}'. ` +
-          `Either '${siteParams.owner}' hasn't approved access for Federalist or you aren't an org member. ` +
-          'Ensure you are an org member and ask an org owner to authorize Federalist for the organization.';
+            `Either '${siteParams.owner}' hasn't approved access for Federalist or you aren't an org member. ` +
+            'Ensure you are an org member and ask an org owner to authorize Federalist for the organization.';
 
           expect(err.message).to.equal(expectedError);
           expect(err.status).to.equal(403);
