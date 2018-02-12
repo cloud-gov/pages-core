@@ -1,22 +1,35 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import { spy } from 'sinon';
+import proxyquire from 'proxyquire';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
-import { SitePublishedBranchesTable } from '../../../../frontend/components/site/sitePublishedBranchesTable';
+
+proxyquire.noCallThru();
+
+const publishedBranchesSpy = {
+  fetchPublishedBranches: spy(),
+};
+const SitePublishedBranchesTable = proxyquire('../../../../frontend/components/site/sitePublishedBranchesTable', {
+  '../../actions/publishedBranchActions': publishedBranchesSpy,
+}).SitePublishedBranchesTable;
+
+const completeProps = {
+  publishedBranches: {
+    isLoading: false,
+    data: [
+      { name: 'branch-a', viewLink: 'www.example.gov/branch-a', site: { id: 1 } },
+      { name: 'branch-b', viewLink: 'www.example.gov/branch-b', site: { id: 1 } },
+    ],
+  },
+  site: {
+    id: 1,
+  },
+};
 
 describe('<SitePublishedBranchesTable/>', () => {
   it('should render a table with branches from the state', () => {
-    const props = {
-      publishedBranches: {
-        isLoading: false,
-        data: [
-          { name: 'branch-a', viewLink: 'www.example.gov/branch-a', site: { id: 1 } },
-          { name: 'branch-b', viewLink: 'www.example.gov/branch-b', site: { id: 1 } },
-        ],
-      },
-    };
-
-    const wrapper = shallow(<SitePublishedBranchesTable {...props} />);
+    const wrapper = shallow(<SitePublishedBranchesTable {...completeProps} />);
     expect(wrapper.find('table')).to.have.length(1);
     expect(wrapper.find('table').contains('branch-a')).to.be.true;
     expect(wrapper.find('table').contains('branch-b')).to.be.true;
@@ -45,5 +58,15 @@ describe('<SitePublishedBranchesTable/>', () => {
     expect(wrapper.find('AlertBanner').prop('message')).to.equal(
       'Please wait for build to complete or check logs for error message.'
     );
+  });
+
+  it('fetches published branches on mount', () => {
+    const wrapper = shallow(<SitePublishedBranchesTable {...completeProps} />);
+    const { fetchPublishedBranches } = publishedBranchesSpy;
+    const expectedProps = { id: completeProps.site.id };
+
+    wrapper.instance().componentDidMount();
+
+    expect(fetchPublishedBranches.calledWith(expectedProps)).to.be.true;
   });
 });
