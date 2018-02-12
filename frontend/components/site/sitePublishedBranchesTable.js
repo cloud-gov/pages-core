@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-
 import { Link } from 'react-router';
+import publishedBranchActions from '../../actions/publishedBranchActions';
 import LoadingIndicator from '../LoadingIndicator';
 import BranchViewLink from '../branchViewLink';
 import { SITE } from '../../propTypes';
@@ -20,11 +20,17 @@ const defaultProps = {
   site: null,
 };
 
-const mapStateToProps = ({ publishedBranches }) => ({
+const mapStateToProps = ({ publishedBranches, sites }) => ({
   publishedBranches,
+  site: sites.currentSite,
 });
 
 class SitePublishedBranchesTable extends React.Component {
+  componentDidMount() {
+    const { id } = this.props.site;
+    publishedBranchActions.fetchPublishedBranches({ id });
+  }
+
   publishedBranches() {
     if (this.props.publishedBranches.isLoading || !this.props.publishedBranches.data) {
       return [];
