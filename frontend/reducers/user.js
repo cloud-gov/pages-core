@@ -5,12 +5,14 @@ import {
 
 const initialState = {
   isLoading: false,
+  data: {},
 };
 
 export default function user(state = initialState, action) {
   switch (action.type) {
     case USER_FETCH_STARTED:
       return {
+        ...state,
         isLoading: true,
       };
     case USER_RECEIVED:

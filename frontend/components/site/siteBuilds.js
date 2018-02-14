@@ -162,6 +162,7 @@ SiteBuilds.defaultProps = {
 
 const mapStateToProps = state => ({
   builds: state.builds,
+  site: state.sites.currentSite,
 });
 
 export { SiteBuilds };

@@ -5,6 +5,7 @@ const siteUpdatedType = 'SITE_UPDATED';
 const siteDeletedType = 'SITE_DELETED';
 const siteUserAddedType = 'SITE_USER_ADDED';
 const siteUserRemovedType = 'SITE_USER_REMOVED';
+const setCurrentSiteType = 'SET_CURRENT_SITE';
 
 const sitesFetchStarted = () => ({
   type: sitesFetchStartedType,
@@ -41,6 +42,11 @@ const siteUserRemoved = site => ({
   site,
 });
 
+const setCurrentSite = siteId => ({
+  type: setCurrentSiteType,
+  siteId,
+});
+
 export {
   sitesFetchStarted, sitesFetchStartedType,
   sitesReceived, sitesReceivedType,
@@ -49,4 +55,5 @@ export {
   siteDeleted, siteDeletedType,
   siteUserAdded, siteUserAddedType,
   siteUserRemoved, siteUserRemovedType,
+  setCurrentSiteType, setCurrentSite,
 };
