@@ -345,21 +345,21 @@ describe('Site API', () => {
       githubAPINocks.webhook();
 
       authenticatedSession().then(cookie => request(app)
-          .post('/v0/site')
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            owner: siteOwner,
-            repository: siteRepository,
-            defaultBranch: 'master',
-            engine: 'jekyll',
-          })
-          .set('Cookie', cookie)
-          .expect(400)).then((response) => {
-            validateAgainstJSONSchema('POST', '/site', 400, response.body);
-            expect(response.body.message).to.equal('You do not have admin access to this repository');
-            done();
-          })
-          .catch(done);
+        .post('/v0/site')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          owner: siteOwner,
+          repository: siteRepository,
+          defaultBranch: 'master',
+          engine: 'jekyll',
+        })
+        .set('Cookie', cookie)
+        .expect(400)).then((response) => {
+          validateAgainstJSONSchema('POST', '/site', 400, response.body);
+          expect(response.body.message).to.equal('You do not have admin access to this repository');
+          done();
+        })
+        .catch(done);
     });
 
     it('should respond with a 400 if a webhook cannot be created', (done) => {
@@ -1298,6 +1298,45 @@ describe('Site API', () => {
         done();
       })
       .catch(done);
+    });
+
+    it('should respond with an error if config values are not valid YAML', (done) => {
+      let site;
+      const userPromise = factory.user();
+      const sitePromise = factory.site({
+        users: Promise.all([userPromise]),
+      });
+      const cookiePromise = authenticatedSession(userPromise);
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      })
+        .then((results) => {
+          site = results.site;
+
+          return request(app)
+            .put(`/v0/site/${site.id}`)
+            .set('x-csrf-token', csrfToken.getToken())
+            .send({
+              config: ': badyaml1',
+              demoConfig: ': badyaml2',
+              previewConfig: ': badyaml3',
+            })
+            .set('Cookie', results.cookie)
+            .expect(403);
+        })
+        .then((response) => {
+          expect(response.body.message).to.equal([
+            'config: input is not valid YAML',
+            'previewConfig: input is not valid YAML',
+            'demoConfig: input is not valid YAML',
+          ].join('\n'));
+          validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
+          done();
+        })
+        .catch(done);
     });
   });
 });

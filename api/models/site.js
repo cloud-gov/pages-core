@@ -1,7 +1,7 @@
 const validator = require('validator');
 const config = require('../../config');
 
-const { branchRegex } = require('../utils/validators');
+const { branchRegex, isValidYaml } = require('../utils/validators');
 
 const afterValidate = (site) => {
   if (site.defaultBranch === site.demoBranch) {
@@ -129,6 +129,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     config: {
       type: DataTypes.STRING,
+      validate: {
+        isValidYaml,
+      },
     },
     defaultBranch: {
       type: DataTypes.STRING,
@@ -154,9 +157,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     previewConfig: {
       type: DataTypes.STRING,
+      validate: {
+        isValidYaml,
+      },
     },
     demoConfig: {
       type: DataTypes.STRING,
+      validate: {
+        isValidYaml,
+      },
     },
     publishedAt: {
       type: DataTypes.DATE,
