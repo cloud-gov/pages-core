@@ -25,7 +25,6 @@ const user = {
 
 const propsWithoutError = {
   user,
-  error: '',
   showAddNewSiteFields: false,
 };
 
@@ -51,7 +50,6 @@ describe('<AddSite/>', () => {
 
   it('renders its children', () => {
     expect(wrapper.find(TemplateSiteList)).to.have.length(1);
-    expect(wrapper.find(AlertBanner)).to.have.length(1);
     expect(wrapper.find('ReduxForm')).to.have.length(1);
   });
 
@@ -66,11 +64,9 @@ describe('<AddSite/>', () => {
   });
 
   it('delivers the correct props to its children', () => {
-    const bannerProps = wrapper.find(AlertBanner).props();
     const templateListProps = wrapper.find(TemplateSiteList).props();
     const formProps = wrapper.find('ReduxForm').props();
 
-    expect(bannerProps).to.deep.equal({ message: propsWithoutError.error });
     expect(templateListProps).to.deep.equal({
       handleSubmitTemplate: wrapper.instance().onSubmitTemplate,
       defaultOwner: propsWithoutError.user.data.username,

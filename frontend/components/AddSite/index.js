@@ -6,25 +6,21 @@ import { connect } from 'react-redux';
 import { USER } from '../../propTypes';
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
-import AlertBanner from '../alertBanner';
 import { availableEngines } from '../SelectSiteEngine';
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
 
 const propTypes = {
-  error: PropTypes.string, // TODO: confirm that this is actually necessary
   showAddNewSiteFields: PropTypes.bool,
   user: PropTypes.shape(USER),
 };
 
 const defaultProps = {
-  error: null,
   showAddNewSiteFields: false,
   user: null,
 };
 
-const mapStateToProps = ({ showAddNewSiteFields, user, error }) => ({
-  error,
+const mapStateToProps = ({ showAddNewSiteFields, user }) => ({
   showAddNewSiteFields,
   user,
 });
@@ -82,7 +78,6 @@ export class AddSite extends React.Component {
 
     return (
       <div>
-        <AlertBanner message={this.props.error} />
         <div className="usa-grid">
           <div className="page-header usa-grid-full">
             <div className="header-title">
