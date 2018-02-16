@@ -323,67 +323,6 @@ describe('Build API', () => {
     });
   });
 
-  describe('GET /v0/build/:id', () => {
-    it('should require authentication', (done) => {
-      factory.build().then(build =>
-        request(app)
-          .get(`/v0/build/${build.id}`)
-          .expect(403)
-      )
-      .then((response) => {
-        validateAgainstJSONSchema('GET', '/build/{id}', 403, response.body);
-        done();
-      })
-      .catch(done);
-    });
-
-    it('should return a JSON representation of the build', (done) => {
-      const user = factory.user();
-      const site = factory.site({ users: Promise.all([user]) });
-      const buildPromise = factory.build({ site });
-      let build;
-
-      Promise.props({
-        cookie: authenticatedSession(user),
-        site,
-        build: buildPromise,
-      })
-      .then((values) => {
-        build = values.build;
-        return request(app)
-          .get(`/v0/build/${build.id}`)
-          .set('Cookie', values.cookie)
-          .expect(200);
-      })
-      .then((response) => {
-        buildResponseExpectations(response.body, build);
-        validateAgainstJSONSchema('GET', '/build/{id}', 200, response.body);
-        done();
-      })
-      .catch(done);
-    });
-
-    it('should respond with a 403 if the current user is not associated with the build', (done) => {
-      let build;
-
-      factory.build().then((model) => {
-        build = model;
-        return authenticatedSession(factory.user());
-      })
-      .then(cookie =>
-        request(app)
-          .get(`/v0/build/${build.id}`)
-          .set('Cookie', cookie)
-          .expect(403)
-      )
-      .then((response) => {
-        validateAgainstJSONSchema('GET', '/build/{id}', 403, response.body);
-        done();
-      })
-      .catch(done);
-    });
-  });
-
   describe('GET /v0/site/:site_id/build', () => {
     it('should require authentication', (done) => {
       factory.site()

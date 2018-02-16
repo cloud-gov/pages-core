@@ -75,31 +75,6 @@ module.exports = {
     .catch(res.error);
   },
 
-  findOne: (req, res) => {
-    let build;
-
-    Promise.resolve(Number(req.params.id))
-    .then((id) => {
-      if (isNaN(id)) {
-        const error = new Error();
-        error.status = 404;
-        throw error;
-      }
-      return Build.findById(id);
-    })
-    .then((model) => {
-      if (model) {
-        build = model;
-      } else {
-        res.notFound();
-      }
-      return siteAuthorizer.findOne(req.user, { id: build.site });
-    })
-    .then(() => buildSerializer.serialize(build))
-    .then(buildJSON => res.json(buildJSON))
-    .catch(res.error);
-  },
-
   status: (req, res) => {
     const message = decodeb64(req.body.message);
 
