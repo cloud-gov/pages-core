@@ -5,10 +5,6 @@ import { USER_ACTION } from '../../propTypes';
 import { timestampUTC } from '../../util/datetime';
 import userActions from '../../actions/userActions';
 
-const propTypes = {
-  site: PropTypes.number.isRequired,
-  userActions: PropTypes.arrayOf(USER_ACTION),
-};
 
 class UserActionsTable extends React.Component {
   componentDidMount() {
@@ -66,7 +62,11 @@ class UserActionsTable extends React.Component {
   }
 }
 
-UserActionsTable.propTypes = propTypes;
+UserActionsTable.propTypes = {
+  site: PropTypes.number.isRequired,
+  userActions: PropTypes.arrayOf(USER_ACTION),
+};
+
 UserActionsTable.defaultProps = {
   userActions: [],
 };
