@@ -49,7 +49,7 @@ export const BUILD_LOG = PropTypes.shape({
 export const USER_ACTION = PropTypes.shape({
   targetType: PropTypes.string,
   createdAt: PropTypes.string,
-  actionTarget: PropTypes.shape(USER),
+  actionTarget: USER,
   actionType: PropTypes.shape({ action: PropTypes.string }),
-  initiator: PropTypes.shape(USER),
+  initiator: USER,
 });
