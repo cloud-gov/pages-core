@@ -3,15 +3,14 @@
     svg {
       width: 0.8em;
       height: 0.8em;
+      margin-right: .4rem;
 
       g {
-        stroke: $text-color;
         fill: $text-color;
       }
     }
-  
+
     &:hover svg g {
-      stroke: $link-color-active;
       fill: $link-color-active;
     }
   }
