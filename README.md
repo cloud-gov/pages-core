@@ -158,7 +158,7 @@ The app expects the following user provided services to be provided:
 
 Here `<environment>` refers the value set for the `APP_ENV` environment variable.
 
-### Testing and linting
+### Testing
 
 When making code changes, be sure to write new or modify existing tests to cover your changes.
 
@@ -186,14 +186,19 @@ docker-compose run --service-ports app yarn serve-coverage
 
 and then visit http://localhost:8080.
 
+For the full list of available commands that you can run with `yarn` or `npm`, see the `"scripts"` section of `package.json`.
 
-To lint the files you have changed (with `eslint`), run:
+### Linting
+
+We use [`eslint`](https://eslint.org/) and adhere to [Airbnb's eslint config](https://www.npmjs.com/package/eslint-config-airbnb) (with some [minor exceptions](https://github.com/18F/federalist/blob/staging/.eslintrc.js#L2)) as recommended by the [18F Front End Guild](https://frontend.18f.gov/javascript/style/).
+
+Because this project was not initially written in a way that complies with our current linting standard, we are taking the strategy of bringing existing files into compliance as they are touched during normal feature development or bug fixing.
+
+To lint the files you have created or changed in a branch, run:
 
 ```sh
 docker-compose run app yarn lint:diff
 ```
-
-For the full list of available commands that you can run with `yarn` or `npm`, see the `"scripts"` section of `package.json`.
 
 ## Initial proposal
 
