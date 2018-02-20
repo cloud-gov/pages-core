@@ -200,6 +200,12 @@ To lint the files you have created or changed in a branch, run:
 docker-compose run app yarn lint:diff
 ```
 
+`eslint` also has a helpful auto-fix command that can be run by:
+
+```sh
+docker-compose run app node_modules/.bin/eslint --fix path/to/file.js
+```
+
 ## Initial proposal
 
 Federalist is new open source publishing system based on proven open source components and techniques. Once the text has been written, images uploaded, and a page is published, the outward-facing site will act like a simple web site -- fast, reliable, and easily scalable. Administrative tools, which require authentication and additional interactive components, can be responsive with far fewer users.
