@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 
-import GitHubLink from '../GitHubLink/GitHubLink';
-import GitHubMark from '../GitHubMark';
+import { IconView } from '../icons';
+import GitHubLink from '../GitHubLink';
 
 const propTypes = {
   owner: PropTypes.string.isRequired, // Owner (org or user) of the repo
@@ -23,19 +23,16 @@ const PagesHeader = ({ owner, repository, title, viewLink }) => (
       <h2>{title}</h2>
     </div>
     <div className="usa-width-one-third header-actions">
-      <GitHubLink owner={owner} repository={repository}>
-        View repo
-        <GitHubMark />
-      </GitHubLink>
+      <GitHubLink text="View repo" owner={owner} repository={repository} />
       <Link
         role="button"
-        className="icon-view"
         alt="View this site"
         target="_blank"
         rel="noopener noreferrer"
+        className="view-site-link"
         to={viewLink}
       >
-        View site
+        View site<IconView />
       </Link>
     </div>
   </div>

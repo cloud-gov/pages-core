@@ -15,6 +15,8 @@ const manifestPlugin = new ManifestPlugin({
   fileName: '../webpack-manifest.json',
 });
 
+const fileLoaderConfig = 'file-loader?name=/styles/webpackAssets/[hash].[ext]';
+
 export default {
   entry: './frontend/main.jsx',
   devtool: 'source-map',
@@ -47,8 +49,26 @@ export default {
         ]),
       },
       {
-        test: /\.(gif|png|jpe?g|svg|ttf|woff2?|eot)$/i,
-        loader: 'file-loader?name=/styles/webpackAssets/[hash].[ext]',
+        test: /\.(gif|png|jpe?g|ttf|woff2?|eot)$/i,
+        loader: fileLoaderConfig,
+      },
+      {
+        test: /\.svg$/i,
+        oneOf: [
+          {
+            // For .svg files in public/images/icons/, use the react-svg loader
+            // so that they can be loaded as React components
+            include: path.resolve(__dirname, 'public/images/icons'),
+            use: [
+              'babel-loader',
+              'react-svg-loader',
+            ],
+          },
+          {
+            // For all other .svg files, fallback to the file-loader
+            loader: fileLoaderConfig,
+          },
+        ],
       },
     ],
   },

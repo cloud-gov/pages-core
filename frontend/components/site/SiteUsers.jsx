@@ -4,8 +4,7 @@ import { SITE, USER } from '../../propTypes';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
 import UserActionsTable from './UserActionsTable';
-
-import GitHubMark from '../GitHubMark';
+import { IconGitHub } from '../icons';
 
 const isSiteOwner = (user, siteOwner) =>
   user.username.toLowerCase() === siteOwner.toLowerCase();
@@ -56,8 +55,8 @@ const SiteUsers = ({ site, user }) => {
                   className="repo-link"
                   rel="noopener noreferrer"
                   title={`Visit GitHub profile for ${rowUser.username}`}
-                >{rowUser.username}
-                  <GitHubMark />
+                >
+                  {rowUser.username}<IconGitHub />
                 </a>
                 {rowUser.username.toLowerCase() === user.username.toLowerCase() ? ' (you)' : ''}
               </td>

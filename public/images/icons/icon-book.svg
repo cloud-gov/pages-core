@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-book</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-book" fill="#000000" fill-rule="nonzero">
+            <path d="M5,20.5 C5,21.0522847 4.55228475,21.5 4,21.5 C3.44771525,21.5 3,21.0522847 3,20.5 C3,18.5670034 4.56700338,17 6.5,17 L20,17 C20.5522847,17 21,17.4477153 21,18 C21,18.5522847 20.5522847,19 20,19 L6.5,19 C5.67157288,19 5,19.6715729 5,20.5 Z" id="Shape"></path>
+            <path d="M19,4 L6.5,4 C5.67157288,4 5,4.67157288 5,5.5 L5,20.5 C5,21.3284271 5.67157288,22 6.5,22 L19,22 L19,4 Z M6.5,2 L20,2 C20.5522847,2 21,2.44771525 21,3 L21,23 C21,23.5522847 20.5522847,24 20,24 L6.5,24 C4.56700338,24 3,22.4329966 3,20.5 L3,5.5 C3,3.56700338 4.56700338,2 6.5,2 Z" id="Shape"></path>
+        </g>
+    </g>
+</svg>

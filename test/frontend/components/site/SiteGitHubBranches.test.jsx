@@ -8,9 +8,9 @@ proxyquire.noCallThru();
 
 const fetchBranchesSpy = spy();
 
-const SiteGitHubBranches = proxyquire('../../../../frontend/components/site/SiteGitHubBranches', {
+const { SiteGitHubBranches } = proxyquire('../../../../frontend/components/site/SiteGitHubBranches', {
   '../../actions/githubBranchActions': { fetchBranches: fetchBranchesSpy },
-}).SiteGitHubBranches;
+});
 
 describe('<SiteGitHubBranches />', () => {
   it('should render a table of branches', () => {
@@ -41,10 +41,10 @@ describe('<SiteGitHubBranches />', () => {
     expect(rows.at(1).find('td').at(0).html())
       .to.have.string('branch-two');
 
-    // Workaround to select the GitHubIconLink component.
+    // Workaround to select the GitHubLink component.
     // See https://github.com/18F/federalist/issues/1325
-    const githubUrlWrappers = rows.find('GitHubURLWrapper');
-    expect(githubUrlWrappers).to.have.length(2);
+    const ghLinks = rows.find('GitHubLink');
+    expect(ghLinks).to.have.length(2);
 
     expect(rows.find('Connect(BranchViewLink)')).to.have.length(2);
   });

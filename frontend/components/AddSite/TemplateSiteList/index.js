@@ -10,30 +10,7 @@ const propTypes = {
   defaultOwner: PropTypes.string.isRequired,
 };
 
-const MAX_CELLS_PER_ROW = 4;
-
-/**
- * Create a two-dimensional array of values that represent one or more rows
- * of values, with `perRow` values per row.
- *
- * @param {array<*>} values
- * @param {integer} perRow
- * @return {array<array<*>>}
- */
-const createRowsOf = (values, perRow) => {
-  let row = [];
-  const rows = [row];
-  values.forEach((val, index) => {
-    if (index === perRow) {
-      rows.push(row = []);
-    }
-    row.push(val);
-  });
-  return rows;
-};
-
 export class TemplateList extends React.Component {
-
   constructor(props) {
     super(props);
 
@@ -53,35 +30,24 @@ export class TemplateList extends React.Component {
   render() {
     const { templates } = this.props;
 
-    const templateKeys = Object.keys(templates);
-    // if there are fewer templates than cells per row,
-    // fill the space with them
-    const cellsPerRow = Math.min(templateKeys.length, MAX_CELLS_PER_ROW);
-    // generate a two-dimensional array of template keys
-    const templateRows = createRowsOf(templateKeys, cellsPerRow);
+    const templateGrid = Object.keys(templates).map((templateName, index) => {
+      const template = templates[templateName];
 
-    let index = 0;
-
-    const templateGrid = templateRows.map(row => (
-      <div className="federalist-template-list">
-        {row.map((templateName) => {
-          const template = templates[templateName];
-          return (
-            <TemplateSite
-              key={templateName}
-              name={templateName}
-              index={index++} // eslint-disable-line no-plusplus
-              thumb={template.thumb}
-              active={this.state.activeChildId}
-              handleChooseActive={this.handleChooseActive}
-              handleSubmit={this.props.handleSubmitTemplate}
-              defaultOwner={this.props.defaultOwner}
-              {...template}
-            />
-          );
-        })}
-      </div>
-    ));
+      return (
+        <div className="federalist-template-list" key={templateName}>
+          <TemplateSite
+            name={template.title}
+            index={index}
+            thumb={template.thumb}
+            active={this.state.activeChildId}
+            handleChooseActive={this.handleChooseActive}
+            handleSubmit={this.props.handleSubmitTemplate}
+            defaultOwner={this.props.defaultOwner}
+            {...template}
+          />
+        </div>
+      );
+    });
 
     return (
       <div>

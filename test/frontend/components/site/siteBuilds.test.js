@@ -5,6 +5,7 @@ import { shallow } from 'enzyme';
 import { SiteBuilds } from '../../../../frontend/components/site/siteBuilds';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
+
 let user;
 let site;
 let build;
@@ -18,6 +19,8 @@ describe('<SiteBuilds/>', () => {
     };
     site = {
       id: 5,
+      owner: 'an-owner',
+      repository: 'the-repo',
     };
     build = {
       user,

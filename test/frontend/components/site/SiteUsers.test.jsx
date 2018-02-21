@@ -2,8 +2,15 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import { stub } from 'sinon';
-import { SiteUsers } from '../../../../frontend/components/site/SiteUsers';
+import proxyquire from 'proxyquire';
+
 import siteActions from '../../../../frontend/actions/siteActions';
+
+proxyquire.noCallThru();
+
+const { SiteUsers } = proxyquire('../../../../frontend/components/site/SiteUsers', {
+  '../icons': { IconGitHub: 'IconGitHub' },
+});
 
 const user = {
   username: 'not-owner',

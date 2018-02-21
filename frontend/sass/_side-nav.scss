@@ -1,3 +1,21 @@
+.usa-sidenav-list {
+  a {
+    svg {
+      width: 1em;
+      height: 1em;
+      margin-right: .4rem;
+
+      g {
+        fill: black;
+      }
+    }
+
+    &:hover svg g {
+      fill: $link-color-active;
+    }
+  }
+}
+
 .usa-width-one-sixth {
   &.side-nav {
     background-color: $color-gray-lightest;
@@ -6,9 +24,9 @@
     .usa-sidenav-list li {
       border: none;
       a {
-        color: initial;
-        padding-left: 24px;
+        color: black;
         padding-right: 0;
+        padding-left: 0;
         &:hover {
           color: $link-color;
         }

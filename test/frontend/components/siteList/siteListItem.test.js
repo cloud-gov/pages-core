@@ -23,6 +23,7 @@ describe('<SiteListItem />', () => {
     Fixture = proxyquire('../../../../frontend/components/siteList/siteListItem', {
       'react-router': { Link },
       './publishedState': PublishedState,
+      '../icons': { IconView: 'IconView' },
     }).default;
   });
 
@@ -50,23 +51,20 @@ describe('<SiteListItem />', () => {
     wrapper = shallow(<Fixture site={siteWithBuilds} />);
     const viewLink = wrapper.find('.sites-list-item-actions a');
     expect(viewLink).to.have.length(1);
-    expect(viewLink.props()).to.deep.equals({
-      className: 'icon-view',
+    expect(viewLink.props()).to.contain({
       href: testSite.viewLink,
       alt: `View the ${testSite.repository} site`,
       target: '_blank',
       rel: 'noopener noreferrer',
-      children: 'View site',
+      className: 'view-site-link',
     });
+    expect(viewLink.text()).to.equal('View site ');
   });
 
   it('outputs a link to the GitHub repo', () => {
-    const wrappedGitHubLink = wrapper.find('GitHubURLWrapper');
+    const ghLink = wrapper.find('GitHubLink');
 
-    expect(wrappedGitHubLink.props().owner).to.equal('someone');
-    expect(wrappedGitHubLink.props().repository).to.equal('something');
-
-    // it has a GitHubMark
-    expect(wrappedGitHubLink.find('GitHubMark')).to.have.length(1);
+    expect(ghLink.props().owner).to.equal('someone');
+    expect(ghLink.props().repository).to.equal('something');
   });
 });
