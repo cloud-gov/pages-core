@@ -1,17 +1,16 @@
 .usa-sidenav-list {
   a {
     svg {
-      width: 0.8em;
-      height: 0.8em;
+      width: 1em;
+      height: 1em;
+      margin-right: .4rem;
 
       g {
-        stroke: $text-color;
-        fill: $text-color;
+        fill: black;
       }
     }
-  
+
     &:hover svg g {
-      stroke: $link-color-active;
       fill: $link-color-active;
     }
   }
@@ -25,7 +24,7 @@
     .usa-sidenav-list li {
       border: none;
       a {
-        color: $text-color;
+        color: black;
         padding-right: 0;
         padding-left: 0;
         &:hover {
