@@ -61,7 +61,7 @@ $image-path: '../../node_modules/uswds/src/img';
   margin-top: 6em;
 }
 
-body:before {
+.usa-grid.site:before {
   bottom: 0;
   content: '';
   left: 0;
@@ -72,7 +72,7 @@ body:before {
 }
 
 @media screen and (min-width: 600px) {
-  body:before {
+.usa-grid.site:before {
     background-color: $color-gray-lightest;
   }
 
