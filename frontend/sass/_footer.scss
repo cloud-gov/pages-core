@@ -1,0 +1,64 @@
+.usa-footer-primary-section {
+  background-color: #122e51;
+
+  .usa-unstyled-list {
+    text-align: right;
+
+    li {
+      display: inline-block;
+      float: none;
+      width: auto;
+    }
+  }
+}
+
+.usa-footer .usa-footer-primary-link {
+  color: #fff;
+  width: auto;
+}
+
+.usa-footer-secondary_section {
+  background-color: #3b5a83;
+}
+
+.usa-footer-logo {
+  text-align: right;
+}
+
+.usa-footer-logo-img {
+  float: none;
+  height: 70px;
+  vertical-align: middle;
+  width: 70px;
+
+  &.federalist-logo {
+    height: 50px;
+    margin-right: 25px;
+    width: 50px;
+  }
+}
+
+.usa-footer-contact-links {
+  text-align: left;
+
+  a {
+    color: #fff;
+  }
+}
+
+.usa-footer-contact_info {
+  display: block;
+  margin-bottom: 1rem;
+
+  p {
+    font-family: inherit;
+  }
+
+  svg {
+    fill: #fff;
+    height: 20px;
+    margin-right: 10px;
+    vertical-align: middle;
+    width: 20px;
+  }
+}
