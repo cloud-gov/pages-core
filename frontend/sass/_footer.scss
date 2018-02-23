@@ -14,6 +14,7 @@
 
 .usa-footer .usa-footer-primary-link {
   color: #fff;
+  -webkit-font-smoothing: antialiased;
   width: auto;
 }
 
@@ -52,13 +53,15 @@
 
   p {
     font-family: inherit;
+    font-size: 1.7rem;
+    -webkit-font-smoothing: antialiased;
   }
 
   svg {
     fill: #fff;
-    height: 20px;
+    height: 17px;
     margin-right: 10px;
     vertical-align: middle;
-    width: 20px;
+    width: 17px;
   }
 }
