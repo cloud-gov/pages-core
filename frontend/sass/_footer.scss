@@ -83,10 +83,28 @@ li.usa-footer-primary-content:last-child {
   .usa-footer-primary-section {
     .usa-unstyled-list {
       text-align: left;
-      li {
+
+      .usa-footer-primary-content {
         clear: both;
         display: block;
         float: left;
+
+        &:first-of-type {
+          margin-top: 4rem;
+        }
+
+        &:last-of-type {
+          margin-bottom: 4rem;
+
+          .usa-footer-primary-link {
+             padding-bottom: 0;
+           }
+        }
+
+        .usa-footer-primary-link {
+          padding-top: 0;
+
+        }
       }
     }
   }
