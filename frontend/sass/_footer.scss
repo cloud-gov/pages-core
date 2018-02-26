@@ -68,3 +68,26 @@
     width: 17px;
   }
 }
+@media screen and (min-width: 600px) {
+  .usa-width-one-sixth:nth-child(3n) {
+    margin-right: 4.82916%;
+  }
+}
+
+li.usa-footer-primary-content,
+li.usa-footer-primary-content:last-child {
+  border: none;
+}
+
+@media screen and (max-width: 600px) {
+  .usa-footer-primary-section {
+    .usa-unstyled-list {
+      text-align: left;
+      li {
+        clear: both;
+        display: block;
+        float: left;
+      }
+    }
+  }
+}
