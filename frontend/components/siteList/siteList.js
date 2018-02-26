@@ -67,7 +67,7 @@ const addWebsiteButton = () => (
 );
 
 export const SiteList = ({ sites, alert }) =>
-  <div className="usa-grid">
+  <div>
     <div className="page-header usa-grid-full">
       <div className="usa-width-two-thirds">
         <div className="header-title">
@@ -84,7 +84,7 @@ export const SiteList = ({ sites, alert }) =>
     <AlertBanner {...alert} />
     {getSites(sites)}
     <a href="#top">Return to top</a>
-  </div>;
+    </div>;
 
 SiteList.propTypes = propTypes;
 SiteList.defaultProps = defaultProps;
