@@ -12,7 +12,7 @@ import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
 
 const propTypes = {
   showAddNewSiteFields: PropTypes.bool,
-  user: PropTypes.shape(USER),
+  user: USER,
 };
 
 const defaultProps = {
