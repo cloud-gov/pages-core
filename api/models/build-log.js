@@ -1,45 +1,43 @@
-const config = require("../../config")
+const config = require('../../config');
 
 const associate = ({ BuildLog, Build }) => {
   BuildLog.belongsTo(Build, {
-    foreignKey: "build",
+    foreignKey: 'build',
     allowNull: false,
-  })
-}
-
-const afterValidate = (buildLog) => {
-  return sanitizeBuildSecrets(buildLog)
-}
+  });
+};
 
 const sanitizeBuildSecrets = (buildLog) => {
-  const models = buildLog.sequelize.models
+  const models = buildLog.sequelize.models;
   return models.Build.findOne({
     where: { id: buildLog.build },
-    include: [ models.User ],
-  }).then(build => {
-    secrets = [
+    include: [models.User],
+  }).then((build) => {
+    const secrets = [
       config.s3.accessKeyId,
       config.s3.secretAccessKey,
       config.build.token,
       build ? build.User.githubAccessToken : undefined,
-    ]
-    secrets.forEach(secret => {
-      buildLog.output = buildLog.output.replace(secret, "[FILTERED]")
-    })
-  })
-}
+    ];
+    secrets.forEach((secret) => {
+      buildLog.output = buildLog.output.replace(secret, '[FILTERED]'); // eslint-disable-line no-param-reassign
+    });
+  });
+};
 
-const toJSON = function() {
+const afterValidate = buildLog => sanitizeBuildSecrets(buildLog);
+
+const toJSON = () => {
   const object = this.get({
     plain: true,
-  })
-  object.createdAt = object.createdAt.toISOString()
-  object.updatedAt = object.updatedAt.toISOString()
-  return object
-}
+  });
+  object.createdAt = object.createdAt.toISOString();
+  object.updatedAt = object.updatedAt.toISOString();
+  return object;
+};
 
 module.exports = (sequelize, DataTypes) => {
-  const BuildLog = sequelize.define("BuildLog", {
+  const BuildLog = sequelize.define('BuildLog', {
     output: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -51,9 +49,9 @@ module.exports = (sequelize, DataTypes) => {
     build: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    }
+    },
   }, {
-    tableName: "buildlog",
+    tableName: 'buildlog',
     classMethods: {
       associate,
     },
@@ -63,7 +61,7 @@ module.exports = (sequelize, DataTypes) => {
     hooks: {
       afterValidate,
     },
-  })
+  });
 
-  return BuildLog
-}
+  return BuildLog;
+};
