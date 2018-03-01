@@ -41,6 +41,14 @@ describe('siteActions', () => {
   };
   const rejectedWithErrorPromise = Promise.reject(error);
 
+  before(() => {
+    global.window = { scrollTo: stub() };
+  });
+
+  after(() => {
+    global.window = undefined;
+  });
+
   beforeEach(() => {
     httpErrorAlertAction = spy();
     fetchSites = stub();
