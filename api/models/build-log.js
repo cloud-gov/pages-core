@@ -27,14 +27,14 @@ const sanitizeBuildSecrets = (buildLog) => {
 
 const afterValidate = buildLog => sanitizeBuildSecrets(buildLog);
 
-const toJSON = () => {
+function toJSON() {
   const object = this.get({
     plain: true,
   });
   object.createdAt = object.createdAt.toISOString();
   object.updatedAt = object.updatedAt.toISOString();
   return object;
-};
+}
 
 module.exports = (sequelize, DataTypes) => {
   const BuildLog = sequelize.define('BuildLog', {

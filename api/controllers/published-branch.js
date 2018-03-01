@@ -22,13 +22,15 @@ module.exports = {
     })
     .then(() => S3PublishedFileLister.listPublishedPreviews(site))
     .then((branchNames) => {
-      let combinedBranchNames;
+      let combinedBranchNames = branchNames.slice(0);
 
       if (site.demoBranch) {
         combinedBranchNames = branchNames.filter(branchName => branchName !== site.demoBranch);
         combinedBranchNames = [site.demoBranch].concat(combinedBranchNames);
       }
-      combinedBranchNames = [site.defaultBranch].concat(branchNames);
+
+      combinedBranchNames = [site.defaultBranch].concat(combinedBranchNames);
+
       return PublishedBranchSerializer.serialize(site, combinedBranchNames);
     })
     .then((branches) => {

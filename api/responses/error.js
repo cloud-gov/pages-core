@@ -12,7 +12,7 @@ module.exports = (error = {}, { res }) => {
     };
   }
 
-  const status = parseInt(error.status, 10) || 500;
+  const status = parseInt(finalError.status, 10) || 500;
 
   switch (status) {
     case 400:
