@@ -4,20 +4,20 @@ import { dispatch } from '../store';
 import {
   publishedBranchesFetchStarted as createPublishedBranchesFetchStartedAction,
   publishedBranchesReceived as createPublishedBranchesReceivedAction,
-} from "./actionCreators/publishedBranchActions";
+} from './actionCreators/publishedBranchActions';
 
 const dispatchPublishedBranchesFetchStartedAction = () => {
-  dispatch(createPublishedBranchesFetchStartedAction())
-}
+  dispatch(createPublishedBranchesFetchStartedAction());
+};
 
-const dispatchPublishedBranchesReceivedAction = branches => {
-  dispatch(createPublishedBranchesReceivedAction(branches))
-}
+const dispatchPublishedBranchesReceivedAction = (branches) => {
+  dispatch(createPublishedBranchesReceivedAction(branches));
+};
 
 export default {
   fetchPublishedBranches(site) {
-    dispatchPublishedBranchesFetchStartedAction()
+    dispatchPublishedBranchesFetchStartedAction();
     return api.fetchPublishedBranches(site)
-      .then(dispatchPublishedBranchesReceivedAction)
+      .then(dispatchPublishedBranchesReceivedAction);
   },
 };
