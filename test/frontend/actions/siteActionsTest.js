@@ -170,7 +170,7 @@ describe('siteActions', () => {
       return actual.then(() => {
         expect(dispatchSiteAddedAction.called).to.be.false;
         expect(updateRouterToSiteBuildsUri.called).to.be.false;
-        expect(updateRouterToSitesUri.calledOnce).to.be.true;
+        expect(updateRouterToSitesUri.calledOnce).to.be.false;
         validateResultDispatchesHttpAlertError(actual, errorMessage);
       });
     });
@@ -181,7 +181,7 @@ describe('siteActions', () => {
       const actual = fixture.addSite(siteToAdd);
 
       return actual.catch(() => {
-        expect(updateRouterToSitesUri.calledOnce).to.be.true;
+        expect(updateRouterToSitesUri.called).to.be.false;
         validateResultDispatchesHttpAlertError(actual, errorMessage);
       });
     });
@@ -282,6 +282,8 @@ describe('siteActions', () => {
       addUserToSite.withArgs(repoToAdd).returns(rejectedWithErrorPromise);
 
       const actual = fixture.addUserToSite(repoToAdd);
+
+      expect(updateRouterToSitesUri.called).to.be.false;
       return validateResultDispatchesHttpAlertError(actual, errorMessage);
     });
   });

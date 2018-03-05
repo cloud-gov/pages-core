@@ -104,4 +104,15 @@ describe('<AddSite/>', () => {
     wrapper.find('ReduxForm').props().onSubmit({ repoUrl, engine, defaultBranch });
     expect(addSite.calledWith({ owner: 'boop', repository: 'beeper-v2', engine, defaultBranch })).to.be.true;
   });
+
+  it('displays an alert banner when add to site action fails', () => {
+    const props = Object.assign({}, propsWithoutError, {
+      alert: {
+        message: 'A site with that name already exists',
+      },
+    });
+    wrapper = shallow(<Fixture {...props} />);
+
+    expect(wrapper.find(AlertBanner)).to.have.length(1);
+  });
 });
