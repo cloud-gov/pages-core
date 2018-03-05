@@ -1,29 +1,31 @@
 
 .repo-link {
   svg {
-    fill: $link-color;
-    margin-left: 0.4rem;
-    stroke-width: 0;
+    height: 18px;
+    width: 18px;
+    margin-left: 0.3rem;
     vertical-align: middle;
-    width: 14px;
+    
+    stroke-width: 0;
+    fill: $link-color;
   }
 
   &:hover svg {
     fill: $link-color-active;
   }
-
 }
 
 .view-site-link {
   svg {
-    fill: $link-color;
-    margin-left: 0.4rem;
+    height: 1em;
+    width: 1em;
+    margin-left: 0.3rem;
     vertical-align: middle;
-    width: 13px;
+    padding-bottom: 3px;
+    fill: $link-color;
   }
 
   &:hover svg {
     fill: $link-color-active;
   }
-
 }
