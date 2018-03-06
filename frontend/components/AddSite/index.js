@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 
-import { USER } from '../../propTypes';
+import { USER, ALERT } from '../../propTypes';
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
 import AlertBanner from '../alertBanner';
@@ -12,7 +12,7 @@ import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
 
 const propTypes = {
-  alert: PropTypes.object,
+  alert: ALERT,
   showAddNewSiteFields: PropTypes.bool,
   user: USER,
 };

@@ -25,7 +25,7 @@ describe('siteActions', () => {
   let dispatchSiteDeletedAction;
   let dispatchSiteBranchesReceivedAction;
   let dispatchShowAddNewSiteFieldsAction;
-  let dispatchHideAddNewSiteFieldsAction
+  let dispatchHideAddNewSiteFieldsAction;
   let dispatchUserAddedToSiteAction;
   let dispatchUserRemovedFromSiteAction;
   let dispatchResetFormAction;
@@ -117,7 +117,7 @@ describe('siteActions', () => {
       },
       'redux-form': {
         reset,
-      }
+      },
     }).default;
   });
 
