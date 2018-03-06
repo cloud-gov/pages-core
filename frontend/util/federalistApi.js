@@ -96,6 +96,8 @@ export default {
     return this.fetch(`site/${site.id}`, {
       method: 'PUT',
       data,
+    }, {
+      handleHttpError: false,
     });
   },
 

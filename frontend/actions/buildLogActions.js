@@ -4,19 +4,19 @@ import { dispatch } from '../store';
 import {
   buildLogsFetchStarted as createBuildLogsFetchStartedAction,
   buildLogsReceived as createBuildLogsReceivedAction,
-} from "./actionCreators/buildLogActions";
+} from './actionCreators/buildLogActions';
 
 const dispatchBuildLogsFetchStartedAction = () => {
-  dispatch(createBuildLogsFetchStartedAction())
-}
+  dispatch(createBuildLogsFetchStartedAction());
+};
 
-const dispatchBuildLogsReceivedAction = logs => {
+const dispatchBuildLogsReceivedAction = (logs) => {
   dispatch(createBuildLogsReceivedAction(logs));
-}
+};
 
 export default {
   fetchBuildLogs(build) {
-    dispatchBuildLogsFetchStartedAction()
+    dispatchBuildLogsFetchStartedAction();
     return api.fetchBuildLogs(build)
       .then(dispatchBuildLogsReceivedAction);
   },

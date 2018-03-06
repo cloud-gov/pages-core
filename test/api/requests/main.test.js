@@ -101,7 +101,7 @@ describe('Main Site', () => {
       )
       .then((response) => {
         expect(response.text.indexOf('Log out')).to.be.above(-1);
-        expect(response.text.indexOf('<div id="js-app"></div>')).to.be.above(-1);
+        expect(response.text.indexOf('<div id="js-app" class="usa-grid"></div>')).to.be.above(-1);
         done();
       })
       .catch(done);

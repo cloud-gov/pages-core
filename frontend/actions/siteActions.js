@@ -1,3 +1,5 @@
+/* global window:true */
+
 import federalist from '../util/federalistApi';
 import alertActions from './alertActions';
 
@@ -15,7 +17,10 @@ import {
 } from './dispatchActions';
 import userActions from './userActions';
 
-const alertError = error => alertActions.httpError(error.message);
+const alertError = (error) => {
+  window.scrollTo(0, 0);
+  alertActions.httpError(error.message);
+};
 
 export default {
   fetchSites() {

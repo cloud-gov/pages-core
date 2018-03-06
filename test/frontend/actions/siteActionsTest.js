@@ -28,6 +28,7 @@ describe('siteActions', () => {
   let dispatchUserAddedToSiteAction;
   let dispatchUserRemovedFromSiteAction;
   let fetchUser;
+  const scrollTo = stub();
 
   const siteId = 'kuaw8fsru8hwugfw';
   const site = {
@@ -40,6 +41,14 @@ describe('siteActions', () => {
     message: errorMessage,
   };
   const rejectedWithErrorPromise = Promise.reject(error);
+
+  before(() => {
+    global.window = { scrollTo };
+  });
+
+  after(() => {
+    global.window = undefined;
+  });
 
   beforeEach(() => {
     httpErrorAlertAction = spy();
@@ -203,6 +212,8 @@ describe('siteActions', () => {
       const actual = fixture.updateSite(siteToUpdate, data);
 
       return actual.then(() => {
+        expect(scrollTo.called).to.be.true;
+        expect(scrollTo.getCall(0).args).to.deep.equal([0, 0]);
         expect(dispatchSiteUpdatedAction.called).to.be.false;
         validateResultDispatchesHttpAlertError(actual, errorMessage);
       });
