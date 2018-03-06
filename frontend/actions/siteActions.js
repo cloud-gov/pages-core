@@ -13,13 +13,21 @@ import {
   dispatchSiteDeletedAction,
   dispatchUserAddedToSiteAction,
   dispatchShowAddNewSiteFieldsAction,
+  dispatchHideAddNewSiteFieldsAction,
   dispatchSetCurrentSiteAction,
+  dispatchResetFormAction,
 } from './dispatchActions';
 import userActions from './userActions';
 
 const alertError = (error) => {
   window.scrollTo(0, 0);
   alertActions.httpError(error.message);
+};
+
+const resetFormOnError = (err) => {
+  dispatchResetFormAction('addRepoSite');
+  dispatchHideAddNewSiteFieldsAction();
+  alertError(err);
 };
 
 export default {
@@ -45,7 +53,7 @@ export default {
         }
       })
       .catch((err) => {
-        alertError(err);
+        resetFormOnError(err);
       });
   },
 
@@ -58,9 +66,9 @@ export default {
         // yet exist in Federalist, so we want to show the
         // additional Add New Site fields
         if (err.response && err.response.status === 404) {
-          dispatchShowAddNewSiteFieldsAction(err);
+          dispatchShowAddNewSiteFieldsAction();
         } else {
-          alertError(err);
+          resetFormOnError(err);
         }
       });
   },

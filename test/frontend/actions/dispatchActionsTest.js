@@ -18,6 +18,7 @@ describe('dispatchActions', () => {
   let showAddNewSiteFieldsActionCreator;
   let hideAddNewSiteFieldsActionCreator;
   let setCurrentSiteActionCreator;
+  let reset;
 
   const action = { whatever: 'bub' };
   const site = { site: 'site1' };
@@ -35,6 +36,7 @@ describe('dispatchActions', () => {
     hideAddNewSiteFieldsActionCreator = stub();
     setCurrentSiteActionCreator = stub();
     pushHistory = stub();
+    reset = stub();
 
     fixture = proxyquire('../../../frontend/actions/dispatchActions', {
       './actionCreators/siteActions': {
@@ -56,6 +58,9 @@ describe('dispatchActions', () => {
       },
       '../store': {
         dispatch,
+      },
+      'redux-form': {
+        reset,
       },
     });
   });
@@ -141,6 +146,14 @@ describe('dispatchActions', () => {
   it('dispatchSetCurrentSiteAction', () => {
     setCurrentSiteActionCreator.withArgs(1).returns(action);
     fixture.dispatchSetCurrentSiteAction();
+
+    expect(dispatch.calledOnce).to.be.true;
+  });
+
+  it('dispatchResetFormAction', () => {
+    reset.withArgs('aForm');
+
+    fixture.dispatchResetFormAction();
 
     expect(dispatch.calledOnce).to.be.true;
   });
