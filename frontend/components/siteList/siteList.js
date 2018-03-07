@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 
-import { SITE } from '../../propTypes';
+import { SITE, ALERT } from '../../propTypes';
 import AlertBanner from '../alertBanner';
 import SiteListItem from './siteListItem';
 import LoadingIndicator from '../LoadingIndicator';
 import { IconPlus } from '../icons';
 
 const propTypes = {
-  alert: PropTypes.object,
+  alert: ALERT,
   sites: PropTypes.shape({
     data: PropTypes.arrayOf(SITE),
     isLoading: PropTypes.bool,
