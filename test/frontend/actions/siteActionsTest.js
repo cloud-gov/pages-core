@@ -159,7 +159,7 @@ describe('siteActions', () => {
       hey: 'you',
     };
 
-    it('triggers the adding of a site and dispatches site added and update router actions to the store when successful', () => {
+    it('dispatches site added and update router actions to the store when successful', () => {
       const sitePromise = Promise.resolve(site);
       addSite.withArgs(siteToAdd).returns(sitePromise);
 
@@ -171,7 +171,7 @@ describe('siteActions', () => {
       });
     });
 
-    it('behaves as a no-op qhen a site isnt added, but there is no error', () => {
+    it('behaves as a no-op when a site isnt added, but there is no error', () => {
       // addSite returns nothing when the POST request fails,
       // so resolve to nothing
       addSite.withArgs(siteToAdd).returns(Promise.resolve());
