@@ -2,25 +2,29 @@ $sans-serif: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 $serif: 'Merriweather', serif;
 
 $background-color: white;
-$secondary-background-color: #f7f8f9; /*#e6e6e6;*/
+$secondary-background-color: #f7f8f9;
 
 $form-input-border-color: #ccc;
 $template-thumb-border-color: #efefef;
-$text-color: #414141;
 
-$header-bg-color: #2d476a;
+$heading-color: #192532;
+$heading-contrast-color: #7b3028;
+$heading-quiet-color: #415161;
+$text-color: #2c3e50;
+
+$header-bg-color: $heading-color;
 $header-text-color: white;
 
-$hero-bg-color: rgb(97, 142, 200);
-$hero-text-color: $header-text-color;
+$hero-bg-color: #EEF4FB;
+//$hero-text-color: $header-text-color;
 
-$contrast: #f05b4e;
+$contrast: #d14636;
 
-$link-color: #0071bc;
-$link-color-active: #017aa7;
+$link-color: #2373a7;
+$link-color-active: #287DB5;
 
-$button-color: #017aa7;
-$button-color-active: #03c0e9;
+$button-color: $link-color;
+$button-color-active: $link-color-active;
 $button-text-color: white;
 
 $secondary-button-color: $contrast;
@@ -29,10 +33,10 @@ $label-success-bg-color: #2e8540;
 $label-danger-bg-color: $contrast;
 $label-warning-bg-color: #fdb81e;
 
-$well-bg-color: #e1f3f8;
-$alert-delete-bg-color: #f9dede;
+//$well-bg-color: #e1f3f8;
+//$alert-delete-bg-color: #f9dede;
 
-$uswds-error-color: #cd2026;
+//$uswds-error-color: #cd2026;
 
 $logo-width: 140px;
 $logo-height: 29px;
@@ -41,3 +45,18 @@ $home-feature-margin: 3em;
 
 $footer-primary-bg-color: #122e51;
 $footer-bg-color: #3b5a83;
+
+$h1-hero-font-size: 3.75em;
+$h2-font-size: 3.125em;
+$h3-font-size: 2.75em;
+$h4-font-size: 1.5em;
+$h5-font-size: 1.1875em;
+$h6-font-size: .9375em;
+
+$font-weight-heavy: 700;
+$font-weight-normal: 400;
+
+$base-font-size: 17px;
+
+$body-line-height: 1.375em;
+$body-lg-line-height: 2.0625em;
