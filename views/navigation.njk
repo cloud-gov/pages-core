@@ -1,0 +1,54 @@
+{% block navigation %}
+  <header class="usa-header usa-header-basic" role="banner">
+    <div class="usa-nav-container">
+      <div class="usa-navbar">
+        <div class="usa-logo" id="basic-logo">
+          <em class="usa-logo-text">
+            <a href="/" title="Home" aria-label="Home">Federalist</a>
+          </em>
+        </div>
+        <button class="usa-menu-btn">Menu</button>
+      </div>
+
+      <nav role="navigation" class="usa-nav">
+        <button class="usa-nav-close">
+          <img src="/images/close.svg" alt="close">
+        </button>
+        <ul class="usa-nav-primary">
+          {% if not isAuthenticated %}
+            <li>
+              <a class="usa-nav-link" href="/content/examples/" rel="noopener noreferrer">Example sites</a>
+            </li>
+            <li>
+              <a class="usa-nav-link" href="https://federalist-docs.18f.gov" target="_blank" rel="noopener noreferrer">Documentation</a>
+            </li>
+            <li>
+              <a class="usa-nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSesNI1qlov7Ec_1u2FralYWg9hV4WsB-3FyAHPXc1pRT6In7w/viewform" target="_blank" rel="noopener noreferrer">Get started</a>
+            </li>
+            <li>
+              <a href="/auth/github" class="usa-button">Log in</a>
+            </li>
+          {% else %}
+            <li>
+              <a class="usa-nav-link" href="/sites">
+                {{ username }}'s sites
+              </a>
+            </li>
+            <li>
+              <a class="usa-nav-link" href="https://federalist-docs.18f.gov" target="_blank" rel="noopener noreferrer">Documentation</a>
+            </li>
+            <li>
+              <a class="usa-nav-link" href="https://github.com/18F/federalist/issues/new" target="_blank" rel="noopener noreferrer">File issue</a>
+            </li>
+            <li>
+              <a class="usa-nav-link" href="mailto:federalist-support@gsa.gov">Get help</a>
+            </li>
+            <li>
+              <a class="usa-button" href="/logout">Log out</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+{% endblock %}
