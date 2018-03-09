@@ -33,3 +33,28 @@
   background-color: $well-bg-color;
   padding: 5rem 0;
 }
+
+.features {
+  margin-left: 60px;
+  margin-right: 60px;
+}
+
+.feature-group {
+  margin-bottom: 60px;
+
+  &:after {
+    content: ' ';
+    clear: both;
+    display: table;
+  }
+
+  .feature-image {
+    background-color: $hero-bg-color;
+    border-radius: 50% 50%;
+    padding: $spacing-lg; 
+  }
+
+  .feature-text {
+    margin-top: 2%;
+  }
+}

@@ -23,7 +23,7 @@ $text-color: $color-gray-darker;
 $header-bg-color: $color-gray-darker;
 $header-text-color: $white;
 
-$hero-bg-color: #EEF4FB;
+$hero-bg-color: $color-gray-lightest;
 $hero-text-color: $header-text-color;
 
 $contrast: #d14636;
@@ -81,3 +81,5 @@ $body-lg-line-height: 2.0625em;
 
 $spacing-sm: 10px;
 $spacing-med: 20px;
+$spacing-lg: 30px;
+$spacing-xl: 40px;

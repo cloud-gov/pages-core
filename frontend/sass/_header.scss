@@ -30,7 +30,7 @@
 
 .usa-nav-primary {
   li {
-    a {
+    .usa-nav-link {
       color: #fff;
       font-size: 1.7rem;
       font-weight: 600;
@@ -38,7 +38,6 @@
         color: #fff;
       }
       &:hover {
-        color: #000;
         span {
           border-color: #fff;
         }
@@ -50,11 +49,22 @@
       }
     }
   }
+
   .usa-button {
     background: $button-color;
     padding: 1rem 2rem;
+    
     &:hover {
-      background-color: $button-color-active;
+      background-color: $white;
+    }
+  }
+
+  .usa-button-white {
+    background-color: $white;
+    color: $body-copy-color;
+
+    &:hover {
+      color: $body-copy-color;
     }
   }
 }
