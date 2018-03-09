@@ -17,34 +17,46 @@
         <ul class="usa-nav-primary">
           {% if not isAuthenticated %}
             <li>
-              <a class="usa-nav-link" href="/content/examples/" rel="noopener noreferrer">Example sites</a>
+              <a class="usa-nav-link" href="/content/examples/" rel="noopener noreferrer">
+                <span>Example sites</span>
+              </a>
             </li>
             <li>
-              <a class="usa-nav-link" href="https://federalist-docs.18f.gov" target="_blank" rel="noopener noreferrer">Documentation</a>
+              <a class="usa-nav-link" href="https://federalist-docs.18f.gov" target="_blank" rel="noopener noreferrer">
+                <span>Documentation</span>
+              </a>
             </li>
             <li>
-              <a class="usa-nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSesNI1qlov7Ec_1u2FralYWg9hV4WsB-3FyAHPXc1pRT6In7w/viewform" target="_blank" rel="noopener noreferrer">Get started</a>
+              <a class="usa-nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSesNI1qlov7Ec_1u2FralYWg9hV4WsB-3FyAHPXc1pRT6In7w/viewform" target="_blank" rel="noopener noreferrer">
+                <span>Get started<span>
+              </a>
             </li>
             <li>
-              <a href="/auth/github" class="usa-button">Log in</a>
+              <a href="/auth/github" class="usa-button usa-button-white">Log in</a>
             </li>
           {% else %}
             <li>
               <a class="usa-nav-link" href="/sites">
-                {{ username }}'s sites
+                <span>{{ username }}'s sites</span>
               </a>
             </li>
             <li>
-              <a class="usa-nav-link" href="https://federalist-docs.18f.gov" target="_blank" rel="noopener noreferrer">Documentation</a>
+              <a class="usa-nav-link" href="https://federalist-docs.18f.gov" target="_blank" rel="noopener noreferrer">
+                <span>Documentation</span>
+              </a>
             </li>
             <li>
-              <a class="usa-nav-link" href="https://github.com/18F/federalist/issues/new" target="_blank" rel="noopener noreferrer">File issue</a>
+              <a class="usa-nav-link" href="https://github.com/18F/federalist/issues/new" target="_blank" rel="noopener noreferrer">
+                <span>File issue</span>
+              </a>
             </li>
             <li>
-              <a class="usa-nav-link" href="mailto:federalist-support@gsa.gov">Get help</a>
+              <a class="usa-nav-link" href="mailto:federalist-support@gsa.gov">
+                <span>Get help</span>
+              </a>
             </li>
             <li>
-              <a class="usa-button" href="/logout">Log out</a>
+              <a class="usa-button usa-button-white" href="/logout">Log out</a>
             </li>
           {% endif %}
         </ul>
