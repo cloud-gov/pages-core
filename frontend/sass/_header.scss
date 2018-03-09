@@ -1,9 +1,13 @@
 .usa-banner {
+  background-color: $color-gray-dark;
+  color: $white;
+ 
   p {
     font-family: inherit;
     font-size: inherit;
   }
 }
+
 .usa-navbar {
   height: auto;
   border: none;
