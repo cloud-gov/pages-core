@@ -4,6 +4,12 @@ body {
   font-size: $base-font-size;
 }
 
+.hr-dark {
+  background-color: $color-gray-dark;
+  height: 5px;
+  width: 100%;
+}
+
 .federalist-hero {
   padding-top: 60px;
 }
@@ -11,7 +17,7 @@ body {
 .hero-heading {
   font-size: $h1-font-size;
   font-weight: $font-weight-heavy;
-  padding-right: 70px;
+  padding-right: 40px;
 }
 
 .contrast-heading {
@@ -50,10 +56,9 @@ h2 {
 }
 
 p {
-  font-family: $serif;
-
   &.small {
     font-size: $body-font-size-sm;
+    line-height: $body-line-height-sm;
   }
 }
 

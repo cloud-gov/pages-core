@@ -1,11 +1,7 @@
 .usa-banner {
   background-color: $color-gray-dark;
   color: $white;
- 
-  p {
-    font-family: inherit;
-    font-size: inherit;
-  }
+  padding: $spacing-sm 0 $spacing-sm 0;
 }
 
 .usa-navbar {
@@ -16,6 +12,7 @@
   background-color: $header-bg-color;
   border-bottom: none;
   min-height: 4rem;
+  padding: $spacing-med 0 $spacing-med 0;
 
   .usa-logo {
     top: -.45rem;
