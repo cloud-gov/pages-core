@@ -52,7 +52,11 @@
   .feature-image {
     background-color: $hero-bg-color;
     border-radius: 50% 50%;
-    padding: $spacing-lg; 
+    padding: $spacing-lg;
+
+    &.light {
+      background-color: $white;
+    }
   }
 
   .feature-text {
@@ -87,5 +91,11 @@
 
   .figure {
     margin: 0;
+
+    figcaption {
+      p {
+        margin: 0;
+      }
+    }
   }
 }
