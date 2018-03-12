@@ -35,8 +35,9 @@
 }
 
 .features {
-  margin-left: 60px;
-  margin-right: 60px;
+  margin-left: $spacing-xl;
+  margin-right: $spacing-xl;
+  padding-top: $spacing-xl;
 }
 
 .feature-group {
@@ -56,5 +57,35 @@
 
   .feature-text {
     margin-top: 2%;
+  }
+}
+
+.info-block {
+  padding-bottom: $spacing-xxl;
+  padding-top: $spacing-xxl;
+
+  .usa-grid {
+    padding: 0;
+  }
+
+  .info-image {
+    float: right;
+  }
+}
+
+.figure-group {
+  .figure-list {
+    list-style: none;
+    margin-top: $spacing-sm;
+    padding: 0;
+
+    li {
+      display: inline-block;
+      padding-right: 20px;
+    }
+  }
+
+  .figure {
+    margin: 0;
   }
 }

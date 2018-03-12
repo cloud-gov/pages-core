@@ -4,18 +4,31 @@ body {
   font-size: $base-font-size;
 }
 
-.hr-dark {
-  background-color: $color-gray-dark;
+@mixin hr {
+  border: none;
   height: 5px;
   width: 100%;
 }
 
+.hr-dark {
+  background-color: $color-gray-dark;
+
+  @include hr;
+}
+
+.hr-light {
+  background-color: $color-gray-light;
+
+  @include hr;
+}
+
 .federalist-hero {
+  padding-bottom: 60px;
   padding-top: 60px;
 }
 
 .hero-heading {
-  font-size: $h1-font-size;
+  font-size: $h1-hero-font-size;
   font-weight: $font-weight-heavy;
   padding-right: 40px;
 }
@@ -28,6 +41,10 @@ body {
   background-color: $white;
   max-width: 40rem;
   padding: 30px;
+
+  .usa-hero-callout-stats {
+    padding-bottom: $spacing-sm;
+  }
 }
 
 .build-count {
@@ -52,13 +69,12 @@ h6 {
 h2 {
   color: $heading-contrast-color;
   font-size: $h2-font-size;
-  line-height: $h2-line-height;
 }
 
 p {
   &.small {
     font-size: $body-font-size-sm;
-    line-height: $body-line-height-sm;
+    line-height: 1em;
   }
 }
 
