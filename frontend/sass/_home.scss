@@ -125,6 +125,13 @@
       display: inline-block;
       padding-right: 20px;
     }
+
+    @media screen and (max-width: $mobile-size) {
+      li {
+        display: block;
+        margin-bottom: $spacing-lg;
+      }
+    }
   }
 
   .figure {
