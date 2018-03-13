@@ -31,6 +31,12 @@ body {
   font-size: $h1-hero-font-size;
   font-weight: $font-weight-heavy;
   padding-right: 40px;
+
+  @media screen and (max-width: $mobile-size) {
+    font-size: 2.25em;
+    padding-bottom: $spacing-xl;
+    padding-right: 0;
+  }
 }
 
 .contrast-heading {
@@ -40,19 +46,20 @@ body {
 .usa-hero-callout {
   background-color: $white;
   max-width: 40rem;
-  padding: 30px;
+  padding: $spacing-lg;
 
   .usa-hero-callout-stats {
     padding-bottom: $spacing-sm;
   }
-}
 
-.build-count {
-  background-color: $well-bg-color;
-  color: inherit;
-  text-align: center;
-  p {
-    padding: 1rem 0;
+  @media screen and (max-width: $mobile-size) {
+    font-size: 20px;
+    text-align: center;
+    width: 100%;
+
+    .usa-hero-callout-stats {
+      padding-bottom: 0;
+    }
   }
 }
 
@@ -71,13 +78,20 @@ h2 {
   font-size: $h2-font-size;
 }
 
+h3 {
+  font-size: 2.125em;
+}
+
 p {
+  font-size: $body-font-size-lg;
+  margin-top: 0;
+
   &.small {
     font-size: $body-font-size-sm;
     line-height: 1em;
   }
-}
 
-.center-text {
-  text-align: center;
+  @media screen and (max-width: $mobile-size) {
+    font-size: 20px;
+  }
 }
