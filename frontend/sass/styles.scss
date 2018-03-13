@@ -78,6 +78,14 @@ div[data-reactroot=''] {
   z-index: -1;
 }
 
+@mixin clearfix {
+  &:after {
+    clear: both;
+    content: '';
+    display: block;
+  }
+}
+
 @media screen and (min-width: 600px) {
 .usa-grid.site:before {
     background-color: $color-gray-lightest;

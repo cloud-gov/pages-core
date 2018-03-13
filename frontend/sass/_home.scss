@@ -38,6 +38,11 @@
   margin-left: $spacing-xl;
   margin-right: $spacing-xl;
   padding-top: $spacing-xl;
+
+  @media screen and (max-width: $mobile-size) {
+    margin-left: $spacing-med;
+    margin-right: $spacing-med;
+  }
 }
 
 .feature-group {
@@ -49,13 +54,28 @@
     display: table;
   }
 
-  .feature-image {
+  .feature-image {    
+    align-items: center;
     background-color: $hero-bg-color;
     border-radius: 50% 50%;
+    display: flex;
+    height: 150px;
+    justify-content: center;
     padding: $spacing-lg;
+    width: 150px;
 
     &.light {
       background-color: $white;
+    }
+
+    @media screen and (max-width: $mobile-size) {
+      background-color: transparent;
+      border-radius: none;
+      padding: 0;
+
+      &.light {
+        margin: 0;
+      }
     }
   }
 
@@ -65,15 +85,30 @@
 }
 
 .info-block {
+  @include clearfix;
+
   padding-bottom: $spacing-xxl;
   padding-top: $spacing-xxl;
 
-  .usa-grid {
-    padding: 0;
+  .info-image {
+    text-align: right;
   }
 
-  .info-image {
-    float: right;
+  @media screen and (max-width: $mobile-size) {
+    display: flex;
+    flex-direction: column;
+
+    .info-image {
+      align-self: center;
+      float: none;
+      margin-bottom: $spacing-lg;
+      order: 1;
+    }
+
+    .description {
+      order: 2;
+      width: 100%;
+    }
   }
 }
 

@@ -8,6 +8,15 @@
   height: auto;
   border: none;
 }
+
+.usa-nav-container {
+  &:after {
+    clear: both;
+    content: ' ';
+    display: table;
+  }
+}
+
 .usa-header {
   background-color: $header-bg-color;
   border-bottom: none;
@@ -139,4 +148,8 @@ nav li a:visited {
 .usa-grid .page-header {
   margin-bottom: 1.5em;
   margin-top: 1.5em;
+}
+
+.usa-menu-btn {
+  margin-right: $spacing-med;
 }
