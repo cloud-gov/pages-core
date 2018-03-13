@@ -29,10 +29,6 @@
 .homepage .usa-section {
   background-color: transparent;
 }
-.lets-talk-section {
-  background-color: $well-bg-color;
-  padding: 5rem 0;
-}
 
 .features {
   margin-left: $spacing-xl;
@@ -46,6 +42,8 @@
 }
 
 .feature-group {
+  display: flex;
+  flex-direction: row;
   margin-bottom: 60px;
 
   &:after {
@@ -80,7 +78,12 @@
   }
 
   .feature-text {
+    margin-left: $spacing-med;
     margin-top: 2%;
+  }
+
+  @media screen and (max-width: $mobile-size) {
+    display: block;
   }
 }
 

@@ -78,6 +78,14 @@ div[data-reactroot=''] {
   z-index: -1;
 }
 
+@media screen and (max-width: $mobile-size) {
+  .flex-center {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
 @mixin clearfix {
   &:after {
     clear: both;
@@ -94,4 +102,9 @@ div[data-reactroot=''] {
   .site-main {
     padding-left: 3rem;
   }
+
+  .usa-width-one-sixth {
+    margin-right: initial;
+    width: initial;
+  }    
 }
