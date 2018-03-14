@@ -74,7 +74,7 @@ app.use((req, res, next) => {
   const host = req.hostname;
 
   if (redirectUrls.indexOf(host) !== -1) {
-    return res.redirect(301, host.slice().replace('fr.cloud', '18f'));
+    return res.redirect(301, `https://${host.slice().replace('fr.cloud', '18f')}`);
   }
 
   return next();
