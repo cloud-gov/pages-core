@@ -34,6 +34,11 @@ const router = require('./api/routers');
 const app = express();
 const sequelize = require('./api/models').sequelize;
 
+const redirectUrls = [
+  'federalist.fr.cloud.gov',
+  'federalist-staging.fr.cloud.gov',
+];
+
 config.session.store = new PostgresStore({ db: sequelize });
 
 nunjucks.configure('views', {
@@ -64,6 +69,16 @@ app.use(bodyParser.json({ limit: '2mb' }));
 app.use(methodOverride());
 app.use(flash());
 app.use(responses);
+
+app.use((req, res, next) => {
+  const host = req.get('host');
+
+  if (redirectUrls.indexOf(host) !== -1) {
+    return res.redirect(301, host.slice().replace('fr.cloud', '18f'));
+  }
+
+  return next();
+});
 
 app.use((req, res, next) => {
   res.set('Cache-Control', 'max-age=0');
@@ -99,6 +114,5 @@ app.use((err, req, res, next) => {
 
   next(err);
 });
-
 
 module.exports = app;
