@@ -13,7 +13,10 @@ const SideNav = ({ siteId }) => (
           const IconComponent = icons[conf.icon];
           return (
             <li key={conf.route}>
-              <Link to={`/sites/${siteId}/${conf.route}`}>
+              <Link
+                to={`/sites/${siteId}/${conf.route}`}
+                activeClassName="side-nav-active-item"
+              >
                 <IconComponent /> {conf.display}
               </Link>
             </li>
