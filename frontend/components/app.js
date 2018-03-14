@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Notifications from 'react-notification-system-redux';
 import { connect } from 'react-redux';
 
-import { USER } from '../propTypes';
+import { USER, ALERT } from '../propTypes';
 import alertActions from '../actions/alertActions';
 import LoadingIndicator from './LoadingIndicator';
 
@@ -59,10 +59,7 @@ export class App extends React.Component {
 }
 
 App.propTypes = {
-  alert: PropTypes.shape({
-    message: PropTypes.string,
-    stale: PropTypes.bool,
-  }),
+  alert: ALERT,
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node,

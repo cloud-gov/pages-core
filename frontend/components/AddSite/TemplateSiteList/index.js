@@ -30,13 +30,13 @@ export class TemplateList extends React.Component {
   render() {
     const { templates } = this.props;
 
-    const templateGrid = Object.keys(templates).map((templateName, index) => {
-      const template = templates[templateName];
+    const templateGrid = Object.keys(templates).map((templateKey, index) => {
+      const template = templates[templateKey];
 
       return (
-        <div className="federalist-template-list" key={templateName}>
+        <div className="federalist-template-list" key={templateKey}>
           <TemplateSite
-            name={template.title}
+            templateKey={templateKey}
             index={index}
             thumb={template.thumb}
             active={this.state.activeChildId}

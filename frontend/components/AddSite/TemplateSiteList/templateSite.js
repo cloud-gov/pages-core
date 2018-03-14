@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { getSafeRepoName } from '../../../util';
 
 const propTypes = {
-  name: PropTypes.string.isRequired,
+  templateKey: PropTypes.string.isRequired,
   defaultOwner: PropTypes.string.isRequired,
   example: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
@@ -23,7 +23,7 @@ class TemplateSite extends React.Component {
     this.state = {
       owner: props.defaultOwner,
       repository: '',
-      template: props.name,
+      template: props.templateKey,
     };
 
     this.handleChooseActive = this.handleChooseActive.bind(this);

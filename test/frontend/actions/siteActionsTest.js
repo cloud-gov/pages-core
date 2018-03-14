@@ -25,9 +25,13 @@ describe('siteActions', () => {
   let dispatchSiteDeletedAction;
   let dispatchSiteBranchesReceivedAction;
   let dispatchShowAddNewSiteFieldsAction;
+  let dispatchHideAddNewSiteFieldsAction;
   let dispatchUserAddedToSiteAction;
   let dispatchUserRemovedFromSiteAction;
+  let dispatchResetFormAction;
+  let reset;
   let fetchUser;
+  const scrollTo = stub();
 
   const siteId = 'kuaw8fsru8hwugfw';
   const site = {
@@ -40,6 +44,14 @@ describe('siteActions', () => {
     message: errorMessage,
   };
   const rejectedWithErrorPromise = Promise.reject(error);
+
+  before(() => {
+    global.window = { scrollTo };
+  });
+
+  after(() => {
+    global.window = undefined;
+  });
 
   beforeEach(() => {
     httpErrorAlertAction = spy();
@@ -61,9 +73,12 @@ describe('siteActions', () => {
     dispatchSiteDeletedAction = stub();
     dispatchSiteBranchesReceivedAction = stub();
     dispatchShowAddNewSiteFieldsAction = stub();
+    dispatchHideAddNewSiteFieldsAction = stub();
     dispatchUserAddedToSiteAction = stub();
     dispatchUserRemovedFromSiteAction = stub();
+    dispatchResetFormAction = stub();
     fetchUser = stub();
+    reset = stub();
 
     fixture = proxyquire('../../../frontend/actions/siteActions', {
       './dispatchActions': {
@@ -76,8 +91,10 @@ describe('siteActions', () => {
         dispatchSiteDeletedAction,
         dispatchSiteBranchesReceivedAction,
         dispatchShowAddNewSiteFieldsAction,
+        dispatchHideAddNewSiteFieldsAction,
         dispatchUserAddedToSiteAction,
         dispatchUserRemovedFromSiteAction,
+        dispatchResetFormAction,
       },
       './alertActions': {
         httpError: httpErrorAlertAction,
@@ -97,6 +114,9 @@ describe('siteActions', () => {
       },
       './userActions': {
         fetchUser,
+      },
+      'redux-form': {
+        reset,
       },
     }).default;
   });
@@ -139,7 +159,7 @@ describe('siteActions', () => {
       hey: 'you',
     };
 
-    it('triggers the adding of a site and dispatches site added and update router actions to the store when successful', () => {
+    it('dispatches site added and update router actions to the store when successful', () => {
       const sitePromise = Promise.resolve(site);
       addSite.withArgs(siteToAdd).returns(sitePromise);
 
@@ -151,7 +171,7 @@ describe('siteActions', () => {
       });
     });
 
-    it('triggers an error and triggers a router update to the site list page when adding a site fails', () => {
+    it('behaves as a no-op when a site isnt added, but there is no error', () => {
       // addSite returns nothing when the POST request fails,
       // so resolve to nothing
       addSite.withArgs(siteToAdd).returns(Promise.resolve());
@@ -161,18 +181,20 @@ describe('siteActions', () => {
       return actual.then(() => {
         expect(dispatchSiteAddedAction.called).to.be.false;
         expect(updateRouterToSiteBuildsUri.called).to.be.false;
-        expect(updateRouterToSitesUri.calledOnce).to.be.true;
+        expect(updateRouterToSitesUri.calledOnce).to.be.false;
         validateResultDispatchesHttpAlertError(actual, errorMessage);
       });
     });
 
-    it('triggers an error and redirects when a thrown error is caught', () => {
+    it('triggers an error and resets the add site form when a thrown error is caught', () => {
       addSite.withArgs(siteToAdd).returns(rejectedWithErrorPromise);
 
       const actual = fixture.addSite(siteToAdd);
 
       return actual.catch(() => {
-        expect(updateRouterToSitesUri.calledOnce).to.be.true;
+        expect(updateRouterToSitesUri.called).to.be.false;
+        expect(dispatchHideAddNewSiteFieldsAction.called).to.be.true;
+        expect(dispatchResetFormAction.called).to.be.true;
         validateResultDispatchesHttpAlertError(actual, errorMessage);
       });
     });
@@ -203,6 +225,8 @@ describe('siteActions', () => {
       const actual = fixture.updateSite(siteToUpdate, data);
 
       return actual.then(() => {
+        expect(scrollTo.called).to.be.true;
+        expect(scrollTo.getCall(0).args).to.deep.equal([0, 0]);
         expect(dispatchSiteUpdatedAction.called).to.be.false;
         validateResultDispatchesHttpAlertError(actual, errorMessage);
       });
@@ -267,11 +291,18 @@ describe('siteActions', () => {
       });
     });
 
-    it('triggers an http alert error when adding the user fails with other than 404', () => {
+    it('triggers an http alert error, and resets the form when adding the user fails with other than 404', () => {
       addUserToSite.withArgs(repoToAdd).returns(rejectedWithErrorPromise);
 
       const actual = fixture.addUserToSite(repoToAdd);
-      return validateResultDispatchesHttpAlertError(actual, errorMessage);
+
+      return actual.then(() => {
+        expect(updateRouterToSitesUri.called).to.be.false;
+        expect(dispatchHideAddNewSiteFieldsAction.called).to.be.true;
+        expect(dispatchResetFormAction.called).to.be.true;
+
+        validateResultDispatchesHttpAlertError(actual, errorMessage);
+      });
     });
   });
 

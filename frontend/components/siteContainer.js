@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+import { ALERT } from '../propTypes';
 import siteActions from '../actions/siteActions';
 import SideNav from './site/SideNav';
 import PagesHeader from './site/PagesHeader';
@@ -22,7 +23,7 @@ const propTypes = {
     PropTypes.node,
   ]),
   sites: PropTypes.object,
-  alert: PropTypes.object,
+  alert: ALERT,
 };
 
 const defaultProps = {

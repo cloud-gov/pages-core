@@ -176,6 +176,7 @@ function createSiteFromSource({ siteParams, user }) {
 
 function createSite({ user, siteParams }) {
   const templateName = siteParams.template;
+
   const template = templateName && TemplateResolver.getTemplate(templateName);
   const newSiteParams = paramsForNewSite(siteParams);
 

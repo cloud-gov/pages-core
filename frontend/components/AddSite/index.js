@@ -3,24 +3,28 @@ import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 
-import { USER } from '../../propTypes';
+import { USER, ALERT } from '../../propTypes';
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
+import AlertBanner from '../alertBanner';
 import { availableEngines } from '../SelectSiteEngine';
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
 
 const propTypes = {
+  alert: ALERT,
   showAddNewSiteFields: PropTypes.bool,
-  user: PropTypes.shape(USER),
+  user: USER,
 };
 
 const defaultProps = {
+  alert: null,
   showAddNewSiteFields: false,
   user: null,
 };
 
-const mapStateToProps = ({ showAddNewSiteFields, user }) => ({
+const mapStateToProps = ({ alert, showAddNewSiteFields, user }) => ({
+  alert,
   showAddNewSiteFields,
   user,
 });
@@ -75,11 +79,13 @@ export class AddSite extends React.Component {
     // the showAddNewSiteFields flag
     const formSubmitFunc = this.props.showAddNewSiteFields ?
       this.onCreateSiteSubmit : this.onAddUserSubmit;
+    const { alert } = this.props;
 
     return (
       <div>
         <div className="usa-grid">
           <div className="page-header usa-grid-full">
+            <AlertBanner {...alert} />
             <div className="header-title">
               <h1>
                 Make a new site
@@ -88,9 +94,9 @@ export class AddSite extends React.Component {
           </div>
           <div className="usa-content">
             <p>
-              There are a few different ways you can add sites to Federalist.
-              You can start with a brand new site by selecting one of our template sites below.
-              Or you can specify the GitHub repository where your site&#39;s code lives.
+              There are a two different ways you can add sites to Federalist.
+              You can specify the GitHub repository where your site&#39;s code lives.
+              Or, you can start with a brand new site by selecting one of our template sites below.
             </p>
           </div>
           <h2>Use your own GitHub repository</h2>

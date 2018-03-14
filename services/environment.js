@@ -5,7 +5,7 @@ const env = process.env.APP_ENV || 'development';
 const serviceCredsKey = `federalist-${env.toLowerCase()}-env`;
 const federalistCreds = appEnv.getServiceCreds(serviceCredsKey) || {};
 
-module.exports = function (key) {
+module.exports = (key) => {
   const creds = key ? appEnv.getServiceCreds(key) : federalistCreds;
   return Object.assign({}, process.env, creds);
 };
