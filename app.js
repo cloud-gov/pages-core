@@ -71,7 +71,7 @@ app.use(flash());
 app.use(responses);
 
 app.use((req, res, next) => {
-  const host = req.get('host');
+  const host = req.hostname;
 
   if (redirectUrls.indexOf(host) !== -1) {
     return res.redirect(301, host.slice().replace('fr.cloud', '18f'));
