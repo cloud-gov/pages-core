@@ -127,6 +127,8 @@
     }
 
     @media screen and (max-width: $mobile-size) {
+      width: 100%;
+
       li {
         display: block;
         margin-bottom: $spacing-lg;
