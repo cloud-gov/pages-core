@@ -3,10 +3,15 @@ $serif: 'Merriweather', serif;
 
 $white: #fff;
 
+$color-blue: #2373a7;
+$color-blue-dark: #175c8a;
+
+$color-gray: #526577;
 $color-gray-dark: #415161;
 $color-gray-darker: #2c3e50;
 $color-gray-lightest: #eef4fb;
-$color-gray-light: #c7d5e3;
+$color-gray-lighter: #c7d5e3;
+$color-gray-light: #65798c;
 
 $body-copy-color: $color-gray-darker;
 
@@ -29,8 +34,8 @@ $hero-text-color: $header-text-color;
 
 $contrast: #d14636;
 
-$link-color: #2373a7;
-$link-color-active: #287DB5;
+$link-color: $color-blue;
+$link-color-active: $color-blue-dark;
 
 $button-color: $link-color;
 $button-color-active: $link-color-active;
@@ -47,15 +52,14 @@ $alert-delete-bg-color: #f9dede;
 
 $uswds-error-color: #cd2026;
 
-$logo-width: 140px;
-$logo-height: 29px;
+$logo-width: 170px;
 
 $home-feature-margin: 3em;
 
-$footer-primary-bg-color: #122e51;
-$footer-bg-color: #3b5a83;
+$footer-primary-bg-color: $color-gray-light;
+$footer-bg-color: $color-gray;
 
-$h1-hero-font-size: 3.5em;
+$h1-hero-font-size: 3.125em;
 $h1-font-size: 3.125em;
 $h2-font-size: 2.375em;
 $h3-font-size: 2.125em;
@@ -63,7 +67,7 @@ $h4-font-size: 1.5em;
 $h5-font-size: 1.1875em;
 $h6-font-size: .9375em;
 
-$h1-hero-line-height: 4.47em;
+$h1-hero-line-height: 4.0625em;
 $h1-line-height: 3.82em;
 $h2-line-height: 3.0625em;
 $h3-line-height: 2.58em;

@@ -40,20 +40,20 @@
 .usa-nav-primary {
   li {
     .usa-nav-link {
-      color: #fff;
-      font-size: 1.7rem;
-      font-weight: 600;
+      color: #white;
+      font-size: 1.125rem;
+      font-weight: $font-weight-normal;
       &:visited {
-        color: #fff;
+        color: #white;
       }
       &:hover {
         span {
-          border-color: #fff;
+          border-color: $white;
         }
       }
       @media screen and (min-width: 951px) {
         &:hover {
-          color: #fff;
+          color: #white;
         }
       }
     }
@@ -62,7 +62,7 @@
   .usa-button {
     background: $button-color;
     padding: 1rem 2rem;
-    
+
     &:hover {
       background-color: $white;
     }
@@ -109,7 +109,6 @@ nav li a:visited {
 
 @media screen and (min-width: 951px) {
   .usa-logo a {
-    height: $logo-height;
     width: $logo-width;
   }
 }

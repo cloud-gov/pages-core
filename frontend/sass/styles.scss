@@ -26,6 +26,9 @@ $image-path: '../../node_modules/uswds/src/img';
 @import "template-items";
 @import "_footer";
 
+html {
+  font-size: $base-font-size;
+}
 
 html,
 body,
@@ -106,5 +109,11 @@ div[data-reactroot=''] {
   .usa-width-one-sixth {
     margin-right: initial;
     width: initial;
-  }    
+  }
+}
+
+@media screen and (max-width: $mobile-size) {
+  .desktop-only {
+    display: none;
+  }
 }
