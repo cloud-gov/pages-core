@@ -13,7 +13,20 @@
     &:hover svg g {
       fill: $link-color-active;
     }
+
+    &.side-nav-active-item {
+      background-color: #2d476a;
+      color: white !important;
+      padding: 5px !important;
+
+      svg {
+        g {
+          fill: white;
+        }
+      }
+    }
   }
+
 }
 
 .usa-width-one-sixth {
