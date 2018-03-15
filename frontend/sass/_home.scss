@@ -61,6 +61,10 @@
 
     .feature-text {
       margin-left: $spacing-lg;
+
+      @media screen and (max-width: $mobile-size) {
+        margin-left: 0;
+      }
     }
   }
 
