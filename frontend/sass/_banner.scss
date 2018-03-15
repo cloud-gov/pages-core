@@ -1,0 +1,33 @@
+.usa-banner {
+  background-color: $color-gray-dark;
+  color: $white;
+  font-size: $base-font-size;
+  padding: $spacing-sm 0 0 0;
+}
+
+.usa-banner-header {
+  font-size: $base-font-size;
+
+  p {
+    display: inline-block;
+    margin-top: -5px;
+    vertical-align: initial;
+    -webkit-font-smoothing: antialiased;
+
+    @media screen and (max-width: $mobile-size) {
+      margin-top: -20px;
+    }
+  }
+
+  img {
+    float: left;
+    margin-right: 1rem;
+    margin-top: 1px;
+    width: initial;
+    
+    @media screen and (min-width: 481px) {
+      margin-right: 0.7rem;
+      width: initial;
+    }
+  }
+}

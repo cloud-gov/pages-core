@@ -1,15 +1,13 @@
-.usa-banner {
-  background-color: $color-gray-dark;
-  color: $white;
-  padding: $spacing-sm 0 $spacing-sm 0;
-}
-
 .usa-navbar {
   height: auto;
   border: none;
 }
 
 .usa-nav-container {
+  .usa-menu-btn {
+    margin-top: 10px;
+  }
+
   &:after {
     clear: both;
     content: ' ';
@@ -30,37 +28,55 @@
 
 .usa-nav {
   background-color: $header-bg-color;
-}
-@media screen and (min-width: 951px) {
-  .usa-nav {
+  
+  @media screen and (min-width: 951px) {
     padding-top: 0;
+  }
+}
+
+.usa-logo-text {
+  @media screen and (min-width: 951px) {
+    line-height: 1;
   }
 }
 
 .usa-nav-primary {
   li {
     .usa-nav-link {
-      color: #white;
+      color: $white;
       font-size: 1.125rem;
       font-weight: $font-weight-normal;
       &:visited {
-        color: #white;
+        color: $white;
       }
       &:hover {
         span {
           border-color: $white;
+          border-width: 4px;
         }
       }
       @media screen and (min-width: 951px) {
         &:hover {
-          color: #white;
+          color: $white;
         }
+      }
+    }
+
+    a {
+      @media screen and (min-width: 951px) {
+        padding: 0 15px 0 15px;
       }
     }
   }
 
+  .nav-action {
+    margin-left: $spacing-lg;
+  }
+
   .usa-button {
     background: $button-color;
+    border-radius: 2px 2px;
+    font-size: $base-font-size;
     padding: 1rem 2rem;
 
     &:hover {
@@ -69,7 +85,7 @@
   }
 
   .usa-button-white {
-    background-color: $white;
+    background-color: $white !important;
     color: $body-copy-color;
 
     &:hover {
@@ -93,7 +109,7 @@ nav li a,
 nav li a:visited,
 nav li a:hover,
 nav li a:visited {
-  color: white;
+  color: $white;
 }
 
 .usa-logo a {
@@ -150,5 +166,8 @@ nav li a:visited {
 }
 
 .usa-menu-btn {
+  font-size: $base-font-size;
+  height: 3rem;
+  line-height: 2rem;
   margin-right: $spacing-med;
 }
