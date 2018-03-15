@@ -12,6 +12,7 @@ body {
 
 .hr-dark {
   background-color: $color-gray-dark;
+  margin-bottom: 0;
 
   @include hr;
 }
@@ -49,9 +50,18 @@ body {
   max-width: 40rem;
   padding: $spacing-lg;
 
+  > *:first-child {
+    margin-bottom: 1.5em;
+  }
+
   .usa-hero-callout-stats {
     p {
       font-size: $h5-font-size;
+      margin-bottom: .5em;
+    }
+
+    p, h5 {
+      line-height: 24px;
     }
 
     padding-bottom: $spacing-sm;
