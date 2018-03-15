@@ -3,12 +3,13 @@ $serif: 'Merriweather', serif;
 
 $white: #fff;
 
-$color-blue: #2373a7;
+$color-blue: #287db5;
 $color-blue-dark: #175c8a;
 
 $color-gray: #526577;
 $color-gray-dark: #415161;
 $color-gray-darker: #2c3e50;
+$color-gray-darkest: #192532;
 $color-gray-lightest: #eef4fb;
 $color-gray-lighter: #c7d5e3;
 $color-gray-light: #65798c;
@@ -21,7 +22,6 @@ $secondary-background-color: #f7f8f9;
 $form-input-border-color: #ccc;
 $template-thumb-border-color: #efefef;
 
-$heading-color: #192532;
 $heading-contrast-color: #7b3028;
 $heading-quiet-color: $color-gray-dark;
 $text-color: $color-gray-darker;
@@ -59,7 +59,7 @@ $home-feature-margin: 3em;
 $footer-primary-bg-color: $color-gray-light;
 $footer-bg-color: $color-gray;
 
-$h1-font-size: 3.125em;
+$h1-font-size: 3.125rem;
 $h2-font-size: 2.375em;
 $h3-font-size: 2.125em;
 $h4-font-size: 1.5em;
@@ -72,7 +72,7 @@ $h2-line-height: 3.0625em;
 $h3-line-height: 2.58em;
 $h4-line-height: 1.5675em; 
 $h5-line-height: .94em;
-$h6-line-height: .88em;
+$h6-line-height: 1.25em;
 
 $font-weight-heavy: 700;
 $font-weight-normal: 400;

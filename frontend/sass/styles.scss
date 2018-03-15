@@ -87,6 +87,12 @@ div[data-reactroot=''] {
     align-items: center;
     display: flex;
     flex-direction: column;
+    float: none;
+  }
+
+  .full-width {
+    margin: 0;
+    width: 100%;
   }
 }
 
