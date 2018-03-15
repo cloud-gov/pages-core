@@ -32,7 +32,7 @@
 }
 
 .features {
-  margin-left: $spacing-xl;
+  margin-left: $spacing-lg;
   margin-right: $spacing-xl;
   padding-top: $spacing-xl;
 
@@ -71,6 +71,7 @@
     display: flex;
     height: 160px;
     justify-content: center;
+    margin: 0 $spacing-sm 0 0;
     padding: $spacing-lg;
     width: 160px;
 
@@ -83,13 +84,7 @@
     }
 
     @media screen and (max-width: $mobile-size) {
-      background-color: transparent;
-      border-radius: none;
-      padding: 0;
-
-      img {
-        width: 50%;
-      }
+      margin: auto;
 
       &.light {
         margin: 0;
