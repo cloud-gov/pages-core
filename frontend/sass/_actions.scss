@@ -6,7 +6,12 @@ a {
   }
 
   &:hover {
+    color: $link-color;
     text-decoration: none;
+  }
+
+  &:active {
+    color: $button-color-active;
   }
 }
 
@@ -17,13 +22,15 @@ a.usa-button,
   background-color: $button-color !important;
   border-radius: 2px 2px;
   font-size: $base-font-size;
-  font-weight: 400;
+
   &:hover {
     background-color: $button-color-active;
   }
+
   &.usa-button-secondary {
     background-color: $color-white;
   }
+  
   &.usa-button-primary:disabled {
     color: #323a45;
   }
