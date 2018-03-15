@@ -26,7 +26,13 @@ body {
 .federalist-hero {
   padding-bottom: 60px;
   padding-top: 60px;
-}
+
+  @media screen and (max-width: $mobile-size) {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+ }
 
 .hero-heading {
   font-size: $h1-font-size;
@@ -61,6 +67,11 @@ body {
     p {
       font-size: $h5-font-size;
       margin-bottom: .5em;
+
+      @media screen and (max-width: $mobile-size) {
+        font-size: 20px;
+        margin-bottom: 1em;
+      }
     }
 
     p, h5 {
@@ -73,7 +84,7 @@ body {
   @media screen and (max-width: $mobile-size) {
     font-size: 20px;
     text-align: center;
-    width: 100%;
+    width: auto;
 
     .usa-hero-callout-stats {
       padding-bottom: 0;
