@@ -19,6 +19,8 @@
 .usa-footer {
   .usa-footer-primary-link {
     color: $color-white;
+    font-weight: $font-weight-normal;
+    -webkit-font-smoothing: antialiased;
     width: auto;
   }
 }
