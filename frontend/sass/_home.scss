@@ -117,6 +117,10 @@
   padding-bottom: $spacing-xxl;
   padding-top: $spacing-xxl;
 
+  .copy {
+    margin-bottom: $spacing-xxl;
+  }
+
   .info-image {
     text-align: right;
   }
@@ -151,7 +155,7 @@
     }
 
     @media screen and (max-width: $mobile-size) {
-      width: 100%;
+      text-align: center;
 
       li {
         display: block;
