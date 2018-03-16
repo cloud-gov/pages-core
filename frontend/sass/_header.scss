@@ -89,6 +89,7 @@
     color: $body-copy-color;
 
     &:hover {
+      background-color: $color-gray-lightest !important;
       color: $body-copy-color;
     }
   }

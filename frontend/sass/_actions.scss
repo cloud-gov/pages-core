@@ -1,10 +1,6 @@
 a {
   text-decoration-skip: ink;
 
-  &:visited {
-    color: $link-color;
-  }
-
   &:hover {
     color: $link-color;
     text-decoration: none;
@@ -19,7 +15,7 @@ button,
 .usa-button,
 a.usa-button,
 .usa-button[role=button] {
-  background-color: $button-color !important;
+  background-color: $button-color;
   border-radius: 2px 2px;
   font-size: $base-font-size;
 
