@@ -85,11 +85,11 @@
   }
 
   .usa-button-white {
-    background-color: $white !important;
+    background-color: $white;
     color: $body-copy-color;
 
     &:hover {
-      background-color: $color-gray-lightest !important;
+      background-color: $color-gray-lightest;
       color: $body-copy-color;
     }
   }
