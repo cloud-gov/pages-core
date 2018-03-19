@@ -10,7 +10,7 @@ const { Build, Site, User } = require('../models');
 // finds a user with a valid access token
 const checkAccessTokenPermissions = (users, site) => {
   let count = 0;
-  
+
   const getNextToken = (user) => {
     if (!user) {
       return Promise.resolve(null);
@@ -21,15 +21,15 @@ const checkAccessTokenPermissions = (users, site) => {
       if (permissions.admin) {
         return Promise.resolve(user.githubAccessToken);
       }
-      
+
       count += 1;
 
       return getNextToken(users[count]);
     });
-  }
+  };
 
   return getNextToken(users[count]);
-}
+};
 
 const loadSiteUserAccessToken = site =>
   site.getUsers({
