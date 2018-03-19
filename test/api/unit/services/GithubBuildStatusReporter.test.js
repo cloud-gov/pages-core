@@ -6,7 +6,6 @@ const nock = require('nock');
 const config = require('../../../../config');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
-const { User } = require('../../../../api/models');
 
 const GithubBuildStatusReporter = require('../../../../api/services/GithubBuildStatusReporter');
 
@@ -226,10 +225,10 @@ describe('GithubBuildStatusReporter', () => {
         githubAccessToken: null,
       });
 
-      let site;
       let invalidPermissionsNock;
 
-      it('uses the access token of a signed in user with valid permissions' , (done) => {
+      it('uses the access token of a signed in user with valid permissions', (done) => {
+        let site;
         let statusNock;
         let validPermissionsNock;
 
@@ -274,12 +273,14 @@ describe('GithubBuildStatusReporter', () => {
           });
 
           return GithubBuildStatusReporter.reportBuildStatus(build);
-        }).then(() => {
+        })
+        .then(() => {
           expect(statusNock.isDone()).to.be.true;
           expect(invalidPermissionsNock.isDone()).to.be.true;
           expect(validPermissionsNock.isDone()).to.be.true;
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
 
       it('reports an error if no users with valid permissions are found', (done) => {
@@ -299,19 +300,19 @@ describe('GithubBuildStatusReporter', () => {
             commitSha,
           })
         )
-        .then(build => {
-          invalidPermissionsNock = githubAPINocks.repo({
+        .then((build) => {
+          githubAPINocks.repo({
             response: [201, {
               permissions: { admin: false },
             }],
           });
-          statusNock = githubAPINocks.status({
-            owner: site.owner,
-            repo: site.repository,
+          githubAPINocks.status({
+            owner: build.site.owner,
+            repo: build.site.repository,
             sha: commitSha,
             accessToken: githubUser.githubAccessToken,
           });
-          
+
           return GithubBuildStatusReporter.reportBuildStatus(build);
         })
         .then(() => {
