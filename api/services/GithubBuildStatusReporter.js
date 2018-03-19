@@ -1,33 +1,69 @@
 const Github = require('github');
+const GitHubAPI = require('./GitHub');
 const logger = require('winston');
 const url = require('url');
 const config = require('../../config');
 
 const { Build, Site, User } = require('../models');
 
-const loadSiteUserAccessToken = site => site.getUsers({
-  where: {
-    githubAccessToken: { $ne: null },
-    signedInAt: { $ne: null },
-  },
-  order: [['signedInAt', 'DESC']],
-  limit: 1,
-}).then((users) => {
-  const user = users[0];
-  if (user && user.githubAccessToken) {
-    return user.githubAccessToken;
+// Loops through supplied list of users, until it
+// finds a user with a valid access token
+const checkAccessTokenPermissions = (users, site) => {
+  let count = 0;
+  
+  const getNextToken = (user) => {
+    if (!user) {
+      return Promise.resolve(null);
+    }
+
+    return GitHubAPI.checkPermissions(user, site.owner, site.repository)
+    .then((permissions) => {
+      if (permissions.admin) {
+        return Promise.resolve(user.githubAccessToken);
+      }
+      
+      count += 1;
+
+      return getNextToken(users[count]);
+    });
   }
-  throw new Error('Unable to find valid access token to report build status');
-});
+
+  return getNextToken(users[count]);
+}
+
+const loadSiteUserAccessToken = site =>
+  site.getUsers({
+    where: {
+      githubAccessToken: { $ne: null },
+      signedInAt: { $ne: null },
+    },
+    order: [['signedInAt', 'DESC']],
+  }).then(users =>
+    checkAccessTokenPermissions(users, site)
+    .then((githubAccessToken) => {
+      if (githubAccessToken) {
+        return githubAccessToken;
+      }
+
+      throw new Error('Unable to find valid access token to report build status');
+    })
+  );
 
 
-const loadBuildUserAccessToken = build => Build.findById(build.id, { include: [Site, User] })
+const loadBuildUserAccessToken = build =>
+  Build.findById(build.id, { include: [Site, User] })
   .then((foundBuild) => {
     const user = foundBuild.User;
 
     if (user.githubAccessToken) {
       return user.githubAccessToken;
     }
+
+    /**
+     * an anonymous user (i.e. not through federalist) has pushed
+     * an update, we need to find a valid GitHub access token among the
+     * site's current users with which to report the build's status
+    */
     return loadSiteUserAccessToken(foundBuild.Site);
   });
 
@@ -62,11 +98,14 @@ const reportBuildStatus = (build) => {
     } else {
       resolve();
     }
-  }).then(() => Site.findById(build.site)).then((model) => {
+  })
+  .then(() => Site.findById(build.site))
+  .then((model) => {
     if (!model) {
       throw new Error('Unable to find a site for the given build');
     }
     site = model;
+
     return loadBuildUserAccessToken(build);
   }).then((accessToken) => {
     const githubClient = authenticateGithubClient(accessToken);

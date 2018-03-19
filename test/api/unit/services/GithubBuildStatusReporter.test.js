@@ -1,5 +1,7 @@
 const crypto = require('crypto');
 const { expect } = require('chai');
+const { spy } = require('sinon');
+const logger = require('winston');
 const nock = require('nock');
 const config = require('../../../../config');
 const factory = require('../../support/factory');
@@ -213,39 +215,111 @@ describe('GithubBuildStatusReporter', () => {
     });
 
     context('with a build by a user outside Federalist', () => {
-      it("should use the access token of the site's most recently signed in user", (done) => {
-        let statusNock;
+      const githubUserName = () => `github-user-${crypto.randomBytes(8).toString('hex')}`;
+      const validUserParams = () => ({
+        username: githubUserName(),
+        githubAccessToken: 'fallback-access-token',
+        signedInAt: new Date(),
+      });
+      const invalidUserParams = () => ({
+        username: githubUserName(),
+        githubAccessToken: null,
+      });
 
-        const federalistUser = factory.user({
-          githubAccessToken: 'fallback-access-token',
+      let site;
+      let invalidPermissionsNock;
+
+      it('uses the access token of a signed in user with valid permissions' , (done) => {
+        let statusNock;
+        let validPermissionsNock;
+
+        const federalistUser = factory.user(validUserParams());
+        const expiredFederalistUser = factory.user({
           signedInAt: new Date(),
         });
-        const githubUserName = `github-user-${crypto.randomBytes(8).toString('hex')}`;
-        const githubUser = User.create({ username: githubUserName });
-        const site = factory.site({
+        const githubUser = factory.user(invalidUserParams());
+
+        factory.site({
           owner: 'test-owner',
           repository: 'test-repo',
-          users: Promise.all([federalistUser, githubUser]),
-        });
-
-        factory.build({
-          state: 'processing',
-          user: githubUser,
-          site,
-          commitSha,
-        }).then((build) => {
+          users: Promise.all([expiredFederalistUser, federalistUser, githubUser]),
+        })
+        .then((model) => {
+          site = model;
+        })
+        .then(() =>
+          factory.build({
+            state: 'processing',
+            user: githubUser,
+            site,
+            commitSha,
+          })
+        )
+        .then((build) => {
           statusNock = githubAPINocks.status({
-            owner: 'test-owner',
-            repo: 'test-repo',
+            owner: site.owner,
+            repo: site.repository,
             sha: commitSha,
-            accessToken: 'fallback-access-token',
+            accessToken: federalistUser.githubAccessToken,
+          });
+          invalidPermissionsNock = githubAPINocks.repo({
+            response: [201, {
+              permissions: { admin: false },
+            }],
+          });
+          validPermissionsNock = githubAPINocks.repo({
+            response: [201, {
+              permissions: { admin: true },
+            }],
           });
 
           return GithubBuildStatusReporter.reportBuildStatus(build);
         }).then(() => {
           expect(statusNock.isDone()).to.be.true;
+          expect(invalidPermissionsNock.isDone()).to.be.true;
+          expect(validPermissionsNock.isDone()).to.be.true;
           done();
         }).catch(done);
+      });
+
+      it('reports an error if no users with valid permissions are found', (done) => {
+        const githubUser = factory.user(invalidUserParams());
+        const loggerSpy = spy(logger, 'error');
+
+        factory.site({
+          owner: 'test-owner',
+          repository: 'test-repo',
+          users: Promise.all([githubUser]),
+        })
+        .then(site =>
+          factory.build({
+            state: 'processing',
+            user: githubUser,
+            site,
+            commitSha,
+          })
+        )
+        .then(build => {
+          invalidPermissionsNock = githubAPINocks.repo({
+            response: [201, {
+              permissions: { admin: false },
+            }],
+          });
+          statusNock = githubAPINocks.status({
+            owner: site.owner,
+            repo: site.repository,
+            sha: commitSha,
+            accessToken: githubUser.githubAccessToken,
+          });
+          
+          return GithubBuildStatusReporter.reportBuildStatus(build);
+        })
+        .then(() => {
+          expect(loggerSpy.called).to.be.true;
+          loggerSpy.restore();
+          done();
+        })
+        .catch(done);
       });
     });
   });

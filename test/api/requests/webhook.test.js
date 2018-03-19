@@ -30,13 +30,13 @@ describe('Webhook API', () => {
     },
   });
 
-  describe('POST /webhook/github', () => {
+  describe.only('POST /webhook/github', () => {
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.status();
     });
 
-    it('should create a new site build for the sender', (done) => {
+    it.only('should create a new site build for the sender', (done) => {
       let site;
       let user;
       let payload;
