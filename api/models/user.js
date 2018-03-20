@@ -25,6 +25,11 @@ const associate = ({ User, Build, Site, UserAction }) => {
   });
 };
 
+function beforeValidate(user) {
+  const { username } = user;
+  user.username = username && username.toLowerCase() || null; // eslint-disable-line no-param-reassign
+}
+
 function toJSON() {
   const record = this.get({
     plain: true,
@@ -51,6 +56,9 @@ const tableOptions = {
   },
   instanceMethods: {
     toJSON,
+  },
+  hooks: {
+    beforeValidate,
   },
   paranoid: true,
   scopes: {
