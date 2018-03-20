@@ -27,7 +27,8 @@ const associate = ({ User, Build, Site, UserAction }) => {
 
 function beforeValidate(user) {
   const { username } = user;
-  user.username = username && username.toLowerCase() || null; // eslint-disable-line no-param-reassign
+  const safeUsername = username && username.toLowerCase();
+  user.username = safeUsername || null; // eslint-disable-line no-param-reassign
 }
 
 function toJSON() {

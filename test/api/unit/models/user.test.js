@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { User } = require('../../../../api/models');
 
-describe.only('User model', () => {
+describe('User model', () => {
   it('lowercases usernames on save', () => {
     const mixedCaseName = 'SoManyCases';
     User.create({
