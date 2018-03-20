@@ -38,11 +38,9 @@ const beforeValidate = (build) => {
 const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
 
 const completeJobErrorMessage = (err) => {
-  let message;
+  let message = 'An unknown error occurred';
   if (err) {
     message = err.message || err;
-  } else {
-    message = 'An unknown error occurred';
   }
   return sanitizeCompleteJobErrorMessage(message);
 };
