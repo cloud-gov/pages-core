@@ -86,7 +86,7 @@ function toJSON() {
   const object = Object.assign({}, this.get({
     plain: true,
   }));
-  
+
   object.createdAt = object.createdAt.toISOString();
   object.updatedAt = object.updatedAt.toISOString();
   if (object.completedAt) {
