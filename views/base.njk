@@ -56,6 +56,8 @@
     <title>
       Federalist{% if siteDisplayEnv %} | {{ siteDisplayEnv }}{% endif %}
     </title>
+    {% block head_extra %}
+    {% endblock %}
   </head>
   <body>
     {% if shouldIncludeTracking %}
@@ -65,8 +67,10 @@
       <!-- End Google Tag Manager (noscript) -->
     {% endif %}
 
-    {% include "usa-banner.njk" %}
+    {% block before_header %}
+    {% endblock %}
 
+    {% include "usa-banner.njk" %}
     {% include "navigation.njk" %}
 
     <div class="usa-overlay"></div>
