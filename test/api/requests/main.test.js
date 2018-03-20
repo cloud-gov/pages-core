@@ -40,6 +40,26 @@ describe('Main Site', () => {
       })
       .catch(done);
     });
+
+    it('should display the number of builds from the past week', (done) => {
+      Build.destroy({ where: {} }).then(() => {
+        const promises = Array.from(Array(10).keys()).map((day) => {
+          const date = moment().subtract(day + 1, 'days');
+          return factory.build({ createdAt: date });
+        });
+        return Promise.all(promises);
+      })
+      .then(() =>
+        request(app)
+          .get('/')
+          .expect(200)
+      )
+      .then((response) => {
+        expect(response.text.indexOf('Site updates deployed by Federalist this week: 7')).to.be.above(-1);
+        done();
+      })
+      .catch(done);
+    });
   });
 
   describe('App /sites', () => {
