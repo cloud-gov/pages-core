@@ -83,9 +83,10 @@ function completeJob(err) {
 }
 
 function toJSON() {
-  const object = this.get({
+  const object = Object.assign({}, this.get({
     plain: true,
-  });
+  }));
+
   object.createdAt = object.createdAt.toISOString();
   object.updatedAt = object.updatedAt.toISOString();
   if (object.completedAt) {
