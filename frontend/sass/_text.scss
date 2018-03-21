@@ -35,17 +35,17 @@ body {
  }
 
 .hero-heading {
-  font-size: $h1-font-size;
   font-weight: $font-weight-heavy;
   padding-bottom: 16px;
 
   @media screen and (max-width: $mobile-size) {
     h1 {
-      font-size: 2.25em;
       padding-bottom: $spacing-xl;
       padding-right: 0;
     }
 
+    margin-right: 0;
+    text-align: center;
     width: 100%;
   }
 }
@@ -136,7 +136,7 @@ a {
 }
 
 p {
-  font-size: $body-font-size-lg;
+  font-size: $base-font-size;
   margin-top: 0;
 
   &.small {
