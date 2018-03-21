@@ -34,6 +34,11 @@ describe('Webhook API', () => {
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.status();
+      githubAPINocks.repo({
+        response: [201, {
+          permissions: { admin: false },
+        }],
+      });
     });
 
     it('should create a new site build for the sender', (done) => {

@@ -38,11 +38,9 @@ const beforeValidate = (build) => {
 const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
 
 const completeJobErrorMessage = (err) => {
-  let message;
+  let message = 'An unknown error occurred';
   if (err) {
     message = err.message || err;
-  } else {
-    message = 'An unknown error occurred';
   }
   return sanitizeCompleteJobErrorMessage(message);
 };
@@ -83,9 +81,10 @@ function completeJob(err) {
 }
 
 function toJSON() {
-  const object = this.get({
+  const object = Object.assign({}, this.get({
     plain: true,
-  });
+  }));
+
   object.createdAt = object.createdAt.toISOString();
   object.updatedAt = object.updatedAt.toISOString();
   if (object.completedAt) {

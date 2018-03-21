@@ -1,5 +1,11 @@
 import PropTypes from 'prop-types';
 
+export const ALERT = PropTypes.shape({
+  message: PropTypes.string,
+  status: PropTypes.string,
+  stale: PropTypes.bool,
+});
+
 export const USER = PropTypes.shape({
   id: PropTypes.number,
   email: PropTypes.string,

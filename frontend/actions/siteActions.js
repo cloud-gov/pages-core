@@ -13,13 +13,21 @@ import {
   dispatchSiteDeletedAction,
   dispatchUserAddedToSiteAction,
   dispatchShowAddNewSiteFieldsAction,
+  dispatchHideAddNewSiteFieldsAction,
   dispatchSetCurrentSiteAction,
+  dispatchResetFormAction,
 } from './dispatchActions';
 import userActions from './userActions';
 
 const alertError = (error) => {
   window.scrollTo(0, 0);
   alertActions.httpError(error.message);
+};
+
+const resetFormOnError = (err) => {
+  dispatchResetFormAction('addRepoSite');
+  dispatchHideAddNewSiteFieldsAction();
+  alertError(err);
 };
 
 export default {
@@ -42,15 +50,10 @@ export default {
           dispatchSiteAddedAction(site);
           // route to the builds page for the added site
           updateRouterToSiteBuildsUri(site);
-        } else {
-          // route to the sites list page, which will display
-          // any errors that occurred during addSite
-          updateRouterToSitesUri();
         }
       })
       .catch((err) => {
-        updateRouterToSitesUri();
-        alertError(err);
+        resetFormOnError(err);
       });
   },
 
@@ -63,12 +66,9 @@ export default {
         // yet exist in Federalist, so we want to show the
         // additional Add New Site fields
         if (err.response && err.response.status === 404) {
-          dispatchShowAddNewSiteFieldsAction(err);
+          dispatchShowAddNewSiteFieldsAction();
         } else {
-          // otherwise something else went wrong so redirect and
-          // show the error like in the other actions
-          updateRouterToSitesUri();
-          alertError(err);
+          resetFormOnError(err);
         }
       });
   },

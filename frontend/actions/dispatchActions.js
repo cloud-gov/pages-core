@@ -1,3 +1,4 @@
+import { reset } from 'redux-form';
 import { dispatch } from '../store';
 import {
   sitesFetchStarted as createSitesFetchStartedAction,
@@ -9,7 +10,6 @@ import {
   siteUserRemoved as siteUserRemovedAction,
   setCurrentSite as setCurrentSiteAction,
 } from './actionCreators/siteActions';
-
 import {
   showAddNewSiteFields as createShowAddNewSiteFieldsAction,
   hideAddNewSiteFields as createHideAddNewSiteFieldsAction,
@@ -63,6 +63,8 @@ const dispatchHideAddNewSiteFieldsAction = () => {
 
 const dispatchSetCurrentSiteAction = siteId => dispatch(setCurrentSiteAction(siteId));
 
+const dispatchResetFormAction = formName => dispatch(reset(formName));
+
 export {
   updateRouterToSitesUri,
   updateRouterToSiteBuildsUri,
@@ -76,4 +78,5 @@ export {
   dispatchShowAddNewSiteFieldsAction,
   dispatchHideAddNewSiteFieldsAction,
   dispatchSetCurrentSiteAction,
+  dispatchResetFormAction,
 };
