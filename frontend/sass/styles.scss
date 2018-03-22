@@ -9,11 +9,15 @@ $image-path: '../../node_modules/uswds/src/img';
 
 @import "_actions";
 @import "_alerts";
+@import "_banner";
 @import "_dashboard";
+@import "_feature_group";
+@import "_figure_group";
 @import "_forms";
 @import "_header";
 @import "_home";
 @import "_icons";
+@import "_info_block";
 @import "_labels";
 @import "_loader";
 @import "_text";
@@ -25,7 +29,6 @@ $image-path: '../../node_modules/uswds/src/img';
 @import "side-nav";
 @import "template-items";
 @import "_footer";
-
 
 html,
 body,
@@ -64,6 +67,10 @@ div[data-reactroot=''] {
   margin-top: 6em;
 }
 
+.offset-left {
+  margin-left: 2em;
+}
+
 .usa-grid.site:before {
   bottom: 0;
   content: '';
@@ -74,6 +81,28 @@ div[data-reactroot=''] {
   z-index: -1;
 }
 
+@media screen and (max-width: $mobile-size) {
+  .flex-center {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    float: none;
+  }
+
+  .full-width {
+    margin: 0;
+    width: 100%;
+  }
+}
+
+@mixin clearfix {
+  &:after {
+    clear: both;
+    content: '';
+    display: block;
+  }
+}
+
 @media screen and (min-width: 600px) {
 .usa-grid.site:before {
     background-color: $color-gray-lightest;
@@ -81,5 +110,16 @@ div[data-reactroot=''] {
 
   .site-main {
     padding-left: 3rem;
+  }
+
+  .usa-width-one-sixth {
+    margin-right: initial;
+    width: initial;
+  }
+}
+
+@media screen and (max-width: $mobile-size) {
+  .desktop-only {
+    display: none;
   }
 }

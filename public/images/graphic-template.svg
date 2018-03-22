@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="216px" height="153px" viewBox="0 0 216 153" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49 (51002) - http://www.bohemiancoding.com/sketch -->
+    <title>thumb - stroked - usds home wire blue copy</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="208" height="145" rx="10"></rect>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icons-and-illustration" transform="translate(-930.000000, -1378.000000)">
+            <g id="thumb-/-stroked---usds-home-wire-blue" transform="translate(930.000000, 1378.000000)">
+                <g id="Group-3">
+                    <g id="Group-2" transform="translate(4.000000, 4.000000)">
+                        <mask id="mask-2" fill="white">
+                            <use xlink:href="#path-1"></use>
+                        </mask>
+                        <g id="Rectangle"></g>
+                        <rect id="Rectangle-3-Copy" fill="#3398DC" mask="url(#mask-2)" x="0" y="28" width="208" height="77"></rect>
+                        <rect id="Rectangle-3-Copy-3" fill="#90C9F0" mask="url(#mask-2)" x="0" y="0" width="208" height="28"></rect>
+                        <rect id="Rectangle-3-Copy-14" fill="#FFFFFF" mask="url(#mask-2)" x="27" y="10" width="34" height="6"></rect>
+                        <rect id="Rectangle-3-Copy-15" fill="#FFFFFF" mask="url(#mask-2)" x="172" y="12" width="20" height="3"></rect>
+                        <rect id="Rectangle-3-Copy-16" fill="#FFFFFF" mask="url(#mask-2)" x="148" y="12" width="20" height="3"></rect>
+                        <rect id="Rectangle-3-Copy-17" fill="#FFFFFF" mask="url(#mask-2)" x="124" y="12" width="20" height="3"></rect>
+                        <rect id="Rectangle-3-Copy-23" fill="#90C9F0" mask="url(#mask-2)" x="0" y="105" width="208" height="40"></rect>
+                        <rect id="Rectangle-3-Copy-18" fill="#FFFFFF" mask="url(#mask-2)" x="34" y="115" width="36" height="3"></rect>
+                        <rect id="Rectangle-3-Copy-18" fill="#FFFFFF" mask="url(#mask-2)" x="91" y="115" width="101" height="2"></rect>
+                        <rect id="Rectangle-3-Copy-19" fill="#FFFFFF" mask="url(#mask-2)" x="91" y="120" width="101" height="2"></rect>
+                        <rect id="Rectangle-3-Copy-20" fill="#FFFFFF" mask="url(#mask-2)" x="91" y="125" width="101" height="2"></rect>
+                        <rect id="Rectangle-3-Copy-22" fill="#FFFFFF" mask="url(#mask-2)" x="91" y="130" width="76" height="2"></rect>
+                        <rect id="Rectangle-3-Copy-18" fill="#FFFFFF" mask="url(#mask-2)" x="34" y="121" width="30" height="3"></rect>
+                        <rect id="Rectangle-3-Copy-2" fill="#287DB5" mask="url(#mask-2)" x="28" y="28" width="47" height="77"></rect>
+                        <rect id="Rectangle-3-Copy-24" fill="#FFFFFF" mask="url(#mask-2)" x="34" y="39" width="34" height="4"></rect>
+                        <rect id="Rectangle-3-Copy-25" fill="#FFFFFF" mask="url(#mask-2)" x="34" y="48" width="29" height="4"></rect>
+                        <rect id="Rectangle-3-Copy-30" fill="#C7D5E3" mask="url(#mask-2)" x="34" y="59" width="26" height="2"></rect>
+                        <rect id="Rectangle-3-Copy-29" fill="#C7D5E3" mask="url(#mask-2)" x="34" y="63" width="26" height="2"></rect>
+                        <rect id="Rectangle-3-Copy-28" fill="#C7D5E3" mask="url(#mask-2)" x="34" y="67" width="26" height="2"></rect>
+                        <rect id="Rectangle-3-Copy-27" fill="#C7D5E3" mask="url(#mask-2)" x="34" y="71" width="26" height="2"></rect>
+                        <rect id="Rectangle-3-Copy-26" fill="#C7D5E3" mask="url(#mask-2)" x="34" y="75" width="19" height="2"></rect>
+                        <circle id="Oval" fill="#90C9F0" mask="url(#mask-2)" cx="152" cy="50" r="8"></circle>
+                        <polyline id="Path-2" stroke="#90C9F0" stroke-width="4" mask="url(#mask-2)" points="90 88 123.529629 54 144 74.7575404"></polyline>
+                        <polyline id="Path-3" stroke="#90C9F0" stroke-width="4" mask="url(#mask-2)" points="141 88.378227 164.697791 64 189 89"></polyline>
+                    </g>
+                    <path d="M14,8 C10.6862915,8 8,10.6862915 8,14 L8,139 C8,142.313708 10.6862915,145 14,145 L202,145 C205.313708,145 208,142.313708 208,139 L208,14 C208,10.6862915 205.313708,8 202,8 L14,8 Z M14,1.77635684e-15 L202,0 C209.731986,1.9095836e-14 216,6.2680135 216,14 L216,139 C216,146.731986 209.731986,153 202,153 L14,153 C6.2680135,153 8.8817842e-16,146.731986 0,139 L0,14 C-8.8817842e-16,6.2680135 6.2680135,1.02140518e-14 14,1.77635684e-15 Z" id="Rectangle" fill="#2C3E50" fill-rule="nonzero"></path>
+                    <polygon id="Path-9" fill="#2C3E50" fill-rule="nonzero" points="5.64257812 33.1152344 5.64257812 27.1152344 212.953129 27.1152344 212.953129 33.1152344"></polygon>
+                    <polygon id="Path-9-Copy" fill="#2C3E50" fill-rule="nonzero" points="5.64257812 112.115234 5.64257812 106.115234 212.953129 106.115234 212.953129 112.115234"></polygon>
+                    <polygon id="Path-10" fill="#2C3E50" fill-rule="nonzero" points="27 31.2435457 33 31.2435457 33 108.243546 27 108.243546"></polygon>
+                    <polygon id="Path-10-Copy" fill="#2C3E50" fill-rule="nonzero" points="77 31.2435457 83 31.2435457 83 108.243546 77 108.243546"></polygon>
+                    <circle id="Oval-6" fill="#FFFFFF" cx="22" cy="17" r="6"></circle>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,20 +1,94 @@
 body {
+  color: $body-copy-color;
   font-family: $sans-serif;
+  font-size: $base-font-size;
 }
-.usa-hero-callout {
-  background-color: $header-bg-color;
-  max-width: 40rem;
-  padding: 3rem;
-  a {
-    color: #fff;
+
+@mixin hr {
+  border: none;
+  height: 5px;
+  width: 100%;
+}
+
+.hr-dark {
+  background-color: $color-gray-dark;
+  margin-bottom: 0;
+
+  @include hr;
+}
+
+.hr-light {
+  background-color: $color-gray-lighter;
+
+  @include hr;
+}
+
+.federalist-hero {
+  padding-bottom: 60px;
+  padding-top: 60px;
+
+  @media screen and (max-width: $mobile-size) {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+ }
+
+.hero-heading {
+  font-weight: $font-weight-heavy;
+  padding-bottom: 16px;
+
+  @media screen and (max-width: $mobile-size) {
+    h1 {
+      padding-bottom: $spacing-xl;
+      padding-right: 0;
+    }
+
+    margin-right: 0;
+    text-align: center;
+    width: 100%;
   }
 }
-.build-count {
-  background-color: $well-bg-color;
-  color: inherit;
-  text-align: center;
-  p {
-    padding: 1rem 0;
+
+.contrast-heading {
+  color: $heading-contrast-color
+}
+
+.usa-hero-callout {
+  background-color: $white;
+  max-width: 40rem;
+  padding: $spacing-lg;
+
+  > *:first-child {
+    margin-bottom: $spacing-med;
+  }
+
+  .usa-hero-callout-stats {
+    p {
+      font-size: $h5-font-size;
+      margin-bottom: .5em;
+
+      @media screen and (max-width: $mobile-size) {
+        font-size: 20px;
+        margin-bottom: 1em;
+      }
+    }
+
+    p, h5 {
+      line-height: 24px;
+    }
+
+    padding-bottom: $spacing-sm;
+  }
+
+  @media screen and (max-width: $mobile-size) {
+    font-size: 20px;
+    text-align: center;
+    width: auto;
+
+    .usa-hero-callout-stats {
+      padding-bottom: 0;
+    }
   }
 }
 
@@ -29,18 +103,52 @@ h6 {
 }
 
 h1 {
-  font-weight: 500;
+  font-size: $h1-font-size;
+}
+
+h2 {
+  color: $heading-contrast-color;
+  font-size: $h2-font-size;
+}
+
+h3 {
+  font-size: $h3-font-size;
+}
+
+h4 {
+  color: $color-gray-dark;
+  font-size: $h4-font-size;
+  line-height: $h4-line-height;
+}
+
+h5 {
+  font-size: $h5-font-size;
+}
+
+h6 {
+  color: $color-gray-darkest;
+  font-size: $h6-font-size;
+  line-height: $h6-line-height;
+}
+
+a {
+  color: $link-color;
 }
 
 p {
-  font-family: $serif;
-  font-size: 16px;
+  font-size: $base-font-size;
+  margin-top: 0;
 
   &.small {
-    font-size: 14px;
+    font-size: $body-font-size-sm;
+    line-height: 1em;
   }
-}
 
-.center-text {
-  text-align: center;
+  &.x-small {
+    font-size: $body-font-size-xsm;
+  }
+
+  @media screen and (max-width: $mobile-size) {
+    font-size: 20px;
+  }
 }
