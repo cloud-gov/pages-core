@@ -25,7 +25,6 @@ module.exports = {
         error.status = 404;
         throw error;
       }
-
       site = model;
       return siteAuthorizer.findOne(req.user, site);
     })
@@ -77,7 +76,6 @@ module.exports = {
 
   status: (req, res) => {
     const message = decodeb64(req.body.message);
-
     Promise.resolve(Number(req.params.id))
     .then((id) => {
       if (isNaN(id)) {
@@ -91,6 +89,10 @@ module.exports = {
       if (!build) {
         const error = new Error();
         error.status = 404;
+        throw error;
+      } else if (build.token !== req.params.token) {
+        const error = new Error();
+        error.status = 403;
         throw error;
       } else {
         return build.completeJob(message);

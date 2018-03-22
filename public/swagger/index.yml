@@ -58,6 +58,10 @@ paths:
           description: Not authorized
           schema:
             $ref: "Error.json"
+        404:
+          descriptions: Not found
+          schema:
+            $ref: "Error.json"
   /build/{id}:
     parameters:
     - name: id

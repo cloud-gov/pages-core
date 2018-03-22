@@ -437,6 +437,66 @@ describe('Build API', () => {
       })
       .catch(done);
     }).timeout(3000); // this test can take a long time because of all the builds it creates
+
+    it('should not display unfound build', (done) => {
+      let site;
+      let cookie = factory.user();
+
+      const userPromise = factory.user();
+      const sitePromise = factory.site();
+      const buildsPromise = Promise.all([
+        factory.build({ site: sitePromise, user: userPromise }),
+      ]);
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        builds: buildsPromise,
+        cookie: authenticatedSession(userPromise),
+      })
+      .then((promisedValues) => {
+        const cookie = promisedValues.cookie;
+        return request(app)
+          .get('/v0/site/-1000/build')
+          .set('Cookie', cookie)
+          .expect(404)
+      })
+      .then((response) => {
+        validateAgainstJSONSchema('GET', '/site/{site_id}/build', 404, response.body);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should not display build when site id is NaN', (done) => {
+      let site;
+
+      const userPromise = factory.user();
+      const sitePromise = factory.site();
+      const buildsPromise = Promise.all([
+        factory.build({ site: sitePromise, user: userPromise }),
+      ]);
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        builds: buildsPromise,
+        cookie: authenticatedSession(userPromise),
+      })
+      .then((promisedValues) => {
+        site = promisedValues.site;
+        const cookie = promisedValues.cookie;
+        return request(app)
+          .get('/v0/site/NaN/build')
+          .set('Cookie', cookie)
+          .expect(404)
+      })
+      .then((response) => {
+        validateAgainstJSONSchema('GET', '/site/{site_id}/build', 404, response.body);
+        done();
+      })
+      .catch(done);
+    });
   });
 
   describe('POST /v0/build/:id/status/:token', () => {
@@ -558,9 +618,19 @@ describe('Build API', () => {
       .catch(done);
     });
 
-    it('should respond with a 404 for a build that does not exist', (done) => {
+    it('should respond with a 404 for an id that is NaN', (done) => {
       postBuildStatus({
         build: { id: 'invalid-build-id', token: 'invalid-token' },
+        status: '0',
+        message: '',
+      }).expect(404, done);
+    });
+
+    it('should respond with a 404 for a build that does not exist', (done) => {
+      let build = factory.build({ commitSha });
+      build.id = -1;
+      postBuildStatus({
+        build: build,
         status: '0',
         message: '',
       }).expect(404, done);

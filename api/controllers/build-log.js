@@ -22,6 +22,9 @@ module.exports = {
         if (!build) {
           throw 404;
         }
+        if (build.token !== req.params.token) {
+          throw 403;
+        }
         return BuildLog.create({
           build: build.id,
           output: decodeb64(req.body.output),
