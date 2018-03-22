@@ -118,6 +118,38 @@ describe('Published Branches API', () => {
             done();
           }).catch(done);
     });
+
+    it('returns a 400 if the access keys are invalid', (done) => {
+      let site;
+      const userPromise = factory.user();
+      const sitePromise = factory.site({
+        users: Promise.all([userPromise]),
+        demoBranch: 'demo',
+      });
+      const cookiePromise = authenticatedSession(userPromise);
+
+      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
+        callback(null, {});
+      };
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      }).then((promisedValues) => {
+        site = promisedValues.site;
+
+        return request(app)
+          .get(`/v0/site/${site.id}/published-branch`)
+          .set('Cookie', promisedValues.cookie)
+          .expect(400);
+      }).then((response) => {
+        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch', 400, response.body);
+        const branchNames = response.body.map(branch => branch.name);
+        expect(branchNames).to.deep.equal([site.defaultBranch, site.demoBranch, 'abc']);
+        done();
+      }).catch(done);
+    });
   });
 
   describe('GET /v0/site/:site_id/published-branch/:branch', () => {

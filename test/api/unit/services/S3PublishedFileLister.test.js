@@ -37,6 +37,25 @@ describe('S3PublishedFileLister', () => {
         done();
       }).catch(done);
     });
+
+    it('responds with the appropriate error when s3 keys are invalid', (done) => {
+      const expected = 'S3 keys out of date. Update them with `npm run update-local-config`';
+      let site;
+
+      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
+        callback({ status: 403, code: 'InvalidAccessKeyId' }, null);
+      };
+
+      factory.site()
+      .then((model) => {
+        site = model;
+        return S3PublishedFileLister.listPublishedPreviews(site);
+      })
+      .catch((error) => {
+        expect(error.message).to.equal(expected);
+        done();
+      });
+    });
   });
 
   describe('.listPagedPublishedFilesForBranch(site, branch)', () => {
