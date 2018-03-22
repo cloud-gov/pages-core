@@ -129,7 +129,7 @@ describe('Published Branches API', () => {
       const cookiePromise = authenticatedSession(userPromise);
 
       AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
-        callback(null, {});
+        callback({ status: 403, code: 'InvalidAccessKeyId' }, {});
       };
 
       Promise.props({
@@ -145,8 +145,6 @@ describe('Published Branches API', () => {
           .expect(400);
       }).then((response) => {
         validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch', 400, response.body);
-        const branchNames = response.body.map(branch => branch.name);
-        expect(branchNames).to.deep.equal([site.defaultBranch, site.demoBranch, 'abc']);
         done();
       }).catch(done);
     });
