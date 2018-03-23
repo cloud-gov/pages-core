@@ -118,6 +118,40 @@ describe('Published Branches API', () => {
             done();
           }).catch(done);
     });
+
+    it('returns a 400 if the access keys are invalid', (done) => {
+      let site;
+      const expected = 'S3 keys out of date. Update them with `npm run update-local-config`';
+      const userPromise = factory.user();
+      const sitePromise = factory.site({
+        users: Promise.all([userPromise]),
+        demoBranch: 'demo',
+      });
+      const cookiePromise = authenticatedSession(userPromise);
+
+      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
+        callback({ status: 403, code: 'InvalidAccessKeyId' }, {});
+      };
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      }).then((promisedValues) => {
+        site = promisedValues.site;
+
+        return request(app)
+          .get(`/v0/site/${site.id}/published-branch`)
+          .set('Cookie', promisedValues.cookie)
+          .expect(400);
+      }).then((response) => {
+        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch', 400, response.body);
+        throw response.body;
+      }).catch((error) => {
+        expect(error.message).to.equal(expected);
+        done();
+      });
+    });
   });
 
   describe('GET /v0/site/:site_id/published-branch/:branch', () => {

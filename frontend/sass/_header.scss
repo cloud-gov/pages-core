@@ -22,7 +22,8 @@
   padding: $spacing-med 0 $spacing-med 0;
 
   .usa-logo {
-    top: -.45rem;
+    margin-top: 5px;
+    position: relative;
   }
 }
 
@@ -35,6 +36,7 @@
 }
 
 .usa-logo-text {
+  font-size: $h2-font-size;
   @media screen and (min-width: 951px) {
     line-height: 1;
   }
