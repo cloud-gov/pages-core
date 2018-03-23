@@ -70,11 +70,9 @@ export const SiteList = ({ sites, alert }) =>
   <div>
     <div className="page-header usa-grid-full">
       <div className="usa-width-two-thirds">
-        <div className="header-title">
-          <h1>
-            Your websites
-          </h1>
-        </div>
+        <h1>
+          Your websites
+        </h1>
       </div>
       <div className="usa-width-one-third header-actions">
         {addWebsiteButton()}

@@ -18,8 +18,9 @@
 
 .usa-footer {
   .usa-footer-primary-link {
-    -webkit-font-smoothing: antialiased;
     color: $color-white;
+    font-weight: $font-weight-normal;
+    -webkit-font-smoothing: antialiased;
     width: auto;
   }
 }
@@ -59,7 +60,6 @@
 
   p {
     font-family: inherit;
-    font-size: 1.7rem;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -104,7 +104,6 @@ li.usa-footer-primary-content:last-child {
 
         .usa-footer-primary-link {
           padding-top: 0;
-
         }
       }
     }

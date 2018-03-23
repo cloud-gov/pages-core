@@ -1,5 +1,19 @@
 const S3Helper = require('./S3Helper');
 
+const handleInvalidAccessKeyError = (error) => {
+  const validS3KeyUpdateEnv = process.env.NODE_ENV === 'development' ||
+  process.env.NODE_ENV === 'test';
+
+  if (error.code === 'InvalidAccessKeyId' && validS3KeyUpdateEnv) {
+    const message = 'S3 keys out of date. Update them with `npm run update-local-config`';
+    throw {
+      message,
+      status: 400,
+    };
+  }
+
+  throw error;
+};
 
 function listTopLevelFolders(path) {
   // Lists all top-level "folders" in the S3 bucket that start with
@@ -13,7 +27,8 @@ function listTopLevelFolders(path) {
         prefix => prefix.Prefix.split('/').slice(-2)[0]
       );
       return prefixes;
-    });
+    })
+    .catch(handleInvalidAccessKeyError);
 }
 
 function listFilesPaged(path, startAtKey = null) {
@@ -45,7 +60,8 @@ function listFilesPaged(path, startAtKey = null) {
         isTruncated: pagedResults.isTruncated,
         files,
       };
-    });
+    })
+    .catch(handleInvalidAccessKeyError);
 }
 
 function listPublishedPreviews(site) {
