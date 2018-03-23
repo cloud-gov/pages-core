@@ -11,6 +11,7 @@ describe('Content Pages', () => {
       'views/content/subdir/hi.njk': 'hi content',
       'views/content/subdir/index.njk': 'index content',
       'views/content/file.txt': 'a file',
+      'webpack-manifest.json' : '{}',
     });
   });
 
