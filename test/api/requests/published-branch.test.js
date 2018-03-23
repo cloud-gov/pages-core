@@ -22,6 +22,56 @@ describe('Published Branches API', () => {
           }).catch(done);
     });
 
+    it('should throw 404 when site_id is NaN', (done) => {
+      let site;
+      const userPromise = factory.user();
+      const sitePromise = factory.site({
+        users: Promise.all([userPromise]),
+        demoBranch: 'demo',
+      });
+      const cookiePromise = authenticatedSession(userPromise);
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      }).then((promisedValues) => {
+
+        return request(app)
+          .get('/v0/site/NaN/published-branch')
+          .set('Cookie', promisedValues.cookie)
+          .expect(404);
+      }).then((response) => {
+        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch', 404, response.body);
+        done();
+      }).catch(done);
+    });
+
+    it('should throw 404 when site_id does not exist', (done) => {
+      let site;
+      const userPromise = factory.user();
+      const sitePromise = factory.site({
+        users: Promise.all([userPromise]),
+        demoBranch: 'demo',
+      });
+      const cookiePromise = authenticatedSession(userPromise);
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      }).then((promisedValues) => {
+
+        return request(app)
+          .get('/v0/site/-1/published-branch')
+          .set('Cookie', promisedValues.cookie)
+          .expect(404);
+      }).then((response) => {
+        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch', 404, response.body);
+        done();
+      }).catch(done);
+    });
+
     it("should list the previews available on S3 for a user's site", (done) => {
       let site;
       const userPromise = factory.user();
@@ -170,6 +220,56 @@ describe('Published Branches API', () => {
             validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}', 403, response.body);
             done();
           }).catch(done);
+    });
+
+    it('should require site id is a Number', (done) => {
+      let site;
+      const userPromise = factory.user();
+      const sitePromise = factory.site({
+        defaultBranch: 'master',
+        users: Promise.all([userPromise]),
+      });
+      const cookiePromise = authenticatedSession(userPromise);
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      }).then((promisedValues) => {
+
+        return request(app)
+          .get('/v0/site/NaN/published-branch/master')
+          .set('Cookie', promisedValues.cookie)
+          .expect(404);
+      }).then((response) => {
+        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}', 404, response.body);
+        done();
+      }).catch(done);
+    });
+
+    it('should require site id is in the sites table', (done) => {
+      let site;
+      const userPromise = factory.user();
+      const sitePromise = factory.site({
+        defaultBranch: 'master',
+        users: Promise.all([userPromise]),
+      });
+      const cookiePromise = authenticatedSession(userPromise);
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      }).then((promisedValues) => {
+
+        return request(app)
+          .get('/v0/site/-1/published-branch/master')
+          .set('Cookie', promisedValues.cookie)
+          .expect(404);
+      }).then((response) => {
+        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}', 404, response.body);
+        done();
+      }).catch(done);
     });
   });
 });
