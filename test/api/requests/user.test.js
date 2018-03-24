@@ -66,7 +66,6 @@ describe('User API', () => {
         )
         .then((response) => {
           validateAgainstJSONSchema('GET', '/usernames', 200, response.body);
-          expect(response.body.length).to.equal(3);
           done();
         })
         .catch(done);
