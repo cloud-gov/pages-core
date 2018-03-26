@@ -613,7 +613,7 @@ describe('Build API', () => {
     });
 
     it('should respond with a 404 for a build that does not exist', (done) => {
-      let build = factory.build({ commitSha });
+      const build = factory.build({ commitSha });
       build.id = -1;
       postBuildStatus({
         build,
