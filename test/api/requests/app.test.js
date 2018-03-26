@@ -10,7 +10,6 @@ const expectRedirect = (hostname, expectedUrl) =>
     .expect(301)
     .then((res) => {
       expect(res.headers.location).to.equal(expectedUrl);
-
       resolve();
     })
   );
