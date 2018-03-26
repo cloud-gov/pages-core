@@ -24,7 +24,7 @@ describe('Published Branches API', () => {
 
     it('should throw 404 when site_id is NaN', (done) => {
       const userPromise = factory.user();
-      const sitePromise = factory.site({users: Promise.all([userPromise]), demoBranch: 'demo'});
+      const sitePromise = factory.site({users: Promise.all([userPromise]), demoBranch: 'demo' });
       const cookiePromise = authenticatedSession(userPromise);
 
       Promise.props({user: userPromise, site: sitePromise, cookie: cookiePromise})
