@@ -363,6 +363,10 @@ paths:
             type: array
             items:
               $ref: "PublishedBranch.json"
+        400:
+          description: Bad Request
+          schema:
+            $ref: "Error.json"
         403:
           description: Not authorized
           schema:

@@ -42,7 +42,7 @@ describe('<SiteList />', () => {
     });
 
     it('renders an h1 element with the title', () => {
-      expect(wrapper.find('div.header-title > h1')).to.have.length(1);
+      expect(wrapper.find('.page-header h1')).to.have.length(1);
     });
 
     it('renders 1 `add new site` button', () => {

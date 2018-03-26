@@ -1,4 +1,5 @@
 const BuildCounter = require('../services/BuildCounter');
+const { Site } = require('../models');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const config = require('../../config');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
@@ -34,8 +35,14 @@ module.exports = {
       return res.redirect('/sites');
     }
     const context = defaultContext(req);
-    return BuildCounter.countBuildsFromPastWeek().then((count) => {
-      context.buildCount = count;
+
+    return Promise.all([
+      BuildCounter.countBuildsFromPastWeek(),
+      Site.count(),
+    ])
+    .then(([builds, sites]) => {
+      context.buildCount = builds;
+      context.siteCount = sites;
       res.render('home.njk', context);
     });
   },
