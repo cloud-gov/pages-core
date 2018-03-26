@@ -5,16 +5,14 @@ const { Site } = require('../models');
 
 module.exports = {
   find: (req, res) => {
-    let site;
-    let pagedFilesResponse;
+    let site, pagedFilesResponse;
     const { site_id, branch } = req.params;
     const startAtKey = req.query.startAtKey || null;
 
     Promise.resolve(Number(req.params.site_id))
     .then((id) => {
-      if (isNaN(site_id)) {
-        throw 404;
-      }
+      if (isNaN(site_id)) { throw 404; }
+
       return Site.findById(site_id)
     })
     .then((model) => {
@@ -29,9 +27,7 @@ module.exports = {
       return PublishedBranchSerializer.serialize(site, branch);
     })
     .then((branchJSON) => {
-      pagedFilesResponse.files = pagedFilesResponse.files.map(file =>
-        Object.assign(file, { publishedBranch: branchJSON })
-      );
+      pagedFilesResponse.files = pagedFilesResponse.files.map(file => Object.assign(file, { publishedBranch: branchJSON }));
       res.json(pagedFilesResponse);
     })
     .catch(res.error);
