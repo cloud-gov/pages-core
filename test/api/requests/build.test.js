@@ -439,9 +439,6 @@ describe('Build API', () => {
     }).timeout(3000); // this test can take a long time because of all the builds it creates
 
     it('should not display unfound build', (done) => {
-      let site;
-      let cookie = factory.user();
-
       const userPromise = factory.user();
       const sitePromise = factory.site();
       const buildsPromise = Promise.all([
@@ -459,7 +456,7 @@ describe('Build API', () => {
         return request(app)
           .get('/v0/site/-1000/build')
           .set('Cookie', cookie)
-          .expect(404)
+          .expect(404);
       })
       .then((response) => {
         validateAgainstJSONSchema('GET', '/site/{site_id}/build', 404, response.body);
@@ -469,27 +466,16 @@ describe('Build API', () => {
     });
 
     it('should not display build when site id is NaN', (done) => {
-      let site;
-
       const userPromise = factory.user();
-      const sitePromise = factory.site();
-      const buildsPromise = Promise.all([
-        factory.build({ site: sitePromise, user: userPromise }),
-      ]);
-
       Promise.props({
         user: userPromise,
-        site: sitePromise,
-        builds: buildsPromise,
         cookie: authenticatedSession(userPromise),
       })
       .then((promisedValues) => {
-        site = promisedValues.site;
-        const cookie = promisedValues.cookie;
         return request(app)
           .get('/v0/site/NaN/build')
-          .set('Cookie', cookie)
-          .expect(404)
+          .set('Cookie', promisedValues.cookie)
+          .expect(404);
       })
       .then((response) => {
         validateAgainstJSONSchema('GET', '/site/{site_id}/build', 404, response.body);
@@ -630,7 +616,7 @@ describe('Build API', () => {
       let build = factory.build({ commitSha });
       build.id = -1;
       postBuildStatus({
-        build: build,
+        build,
         status: '0',
         message: '',
       }).expect(404, done);
