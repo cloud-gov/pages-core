@@ -13,17 +13,13 @@ module.exports = {
     Promise.resolve(Number(req.params.site_id))
     .then((id) => {
       if (isNaN(id)) {
-        const error = new Error();
-        error.status = 404;
-        throw error;
+        throw 404;
       }
       return Site.findById(id);
     })
     .then((model) => {
       if (!model) {
-        const error = new Error();
-        error.status = 404;
-        throw error;
+        throw 404;
       }
       site = model;
       return siteAuthorizer.findOne(req.user, site);
@@ -79,21 +75,15 @@ module.exports = {
     Promise.resolve(Number(req.params.id))
     .then((id) => {
       if (isNaN(id)) {
-        const error = new Error();
-        error.status = 404;
-        throw error;
+        throw 404;
       }
       return Build.findById(id);
     })
     .then((build) => {
       if (!build) {
-        const error = new Error();
-        error.status = 404;
-        throw error;
+        throw 404;
       } else if (build.token !== req.params.token) {
-        const error = new Error();
-        error.status = 403;
-        throw error;
+        throw 403;
       } else {
         return build.completeJob(message);
       }
