@@ -17,15 +17,17 @@ module.exports = {
       return Build.findById(id);
     })
     .then((build) => {
-      if (!build) { throw 404; }
-
-      if (build.token !== req.params.token) { throw 403; }
-
-      return BuildLog.create({
-        build: build.id,
-        output: decodeb64(req.body.output),
-        source: req.body.source,
-      });
+      if (!build) {
+        throw 404;
+      } else if (build.token !== req.params.token) {
+        throw 403;
+      } else {
+        return BuildLog.create({
+          build: build.id,
+          output: decodeb64(req.body.output),
+          source: req.body.source,
+        });
+      }
     })
     .then(buildLog => buildLogSerializer.serialize(buildLog))
     .then((buildLogJSON) => { res.json(buildLogJSON); })
