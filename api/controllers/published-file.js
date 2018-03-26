@@ -13,7 +13,7 @@ module.exports = {
     .then((site_id) => {
       if (isNaN(site_id)) { throw 404; }
 
-      return Site.findById(site_id)
+      return Site.findById(site_id);
     })
     .then((model) => {
       if (!model) { throw 404; }
@@ -27,7 +27,9 @@ module.exports = {
       return PublishedBranchSerializer.serialize(site, branch);
     })
     .then((branchJSON) => {
-      pagedFilesResponse.files = pagedFilesResponse.files.map(file => Object.assign(file, { publishedBranch: branchJSON }));
+      pagedFilesResponse.files = pagedFilesResponse.files.map(file =>
+        Object.assign(file, { publishedBranch: branchJSON })
+      );
       res.json(pagedFilesResponse);
     })
     .catch(res.error);
