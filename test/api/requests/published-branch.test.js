@@ -15,28 +15,20 @@ describe('Published Branches API', () => {
   describe('GET /v0/site/:site_id/published-branch', () => {
     it('should require authentication', (done) => {
       factory.site().then(site => request(app)
-          .get(`/v0/site/${site.id}/published-branch`)
-          .expect(403)).then((response) => {
-            validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch', 403, response.body);
-            done();
-          }).catch(done);
+        .get(`/v0/site/${site.id}/published-branch`)
+        .expect(403)).then((response) => {
+          validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch', 403, response.body);
+          done();
+        }).catch(done);
     });
 
     it('should throw 404 when site_id is NaN', (done) => {
-      let site;
       const userPromise = factory.user();
-      const sitePromise = factory.site({
-        users: Promise.all([userPromise]),
-        demoBranch: 'demo',
-      });
+      const sitePromise = factory.site({users: Promise.all([userPromise]), demoBranch: 'demo'});
       const cookiePromise = authenticatedSession(userPromise);
 
-      Promise.props({
-        user: userPromise,
-        site: sitePromise,
-        cookie: cookiePromise,
-      }).then((promisedValues) => {
-
+      Promise.props({user: userPromise, site: sitePromise, cookie: cookiePromise})
+      .then((promisedValues) => {
         return request(app)
           .get('/v0/site/NaN/published-branch')
           .set('Cookie', promisedValues.cookie)
@@ -48,7 +40,6 @@ describe('Published Branches API', () => {
     });
 
     it('should throw 404 when site_id does not exist', (done) => {
-      let site;
       const userPromise = factory.user();
       const sitePromise = factory.site({
         users: Promise.all([userPromise]),
@@ -56,12 +47,8 @@ describe('Published Branches API', () => {
       });
       const cookiePromise = authenticatedSession(userPromise);
 
-      Promise.props({
-        user: userPromise,
-        site: sitePromise,
-        cookie: cookiePromise,
-      }).then((promisedValues) => {
-
+      Promise.props({user: userPromise, site: sitePromise, cookie: cookiePromise})
+      .then((promisedValues) => {
         return request(app)
           .get('/v0/site/-1/published-branch')
           .set('Cookie', promisedValues.cookie)
@@ -161,12 +148,12 @@ describe('Published Branches API', () => {
       const cookie = authenticatedSession(user);
 
       Promise.props({ user, site, cookie }).then(promisedValues => request(app)
-          .get(`/v0/site/${promisedValues.site.id}/published-branch`)
-          .set('Cookie', promisedValues.cookie)
-          .expect(403)).then((response) => {
-            validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch', 403, response.body);
-            done();
-          }).catch(done);
+        .get(`/v0/site/${promisedValues.site.id}/published-branch`)
+        .set('Cookie', promisedValues.cookie)
+        .expect(403)).then((response) => {
+          validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch', 403, response.body);
+          done();
+        }).catch(done);
     });
 
     it('returns a 400 if the access keys are invalid', (done) => {
@@ -207,11 +194,12 @@ describe('Published Branches API', () => {
   describe('GET /v0/site/:site_id/published-branch/:branch', () => {
     it('should require authentication', (done) => {
       factory.site().then(site => request(app)
-          .get(`/v0/site/${site.id}/published-branch/${site.defaultBranch}`)
-          .expect(403)).then((response) => {
-            validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}', 403, response.body);
-            done();
-          }).catch(done);
+        .get(`/v0/site/${site.id}/published-branch/${site.defaultBranch}`)
+        .expect(403))
+      .then((response) => {
+        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}', 403, response.body);
+        done();
+      }).catch(done);
     });
 
     it('should render a JSON response for a pubslished branch', (done) => {
@@ -247,17 +235,17 @@ describe('Published Branches API', () => {
       const site = factory.site({ defaultBranch: 'master' });
       const cookie = authenticatedSession(user);
 
-      Promise.props({ user, site, cookie }).then(promisedValues => request(app)
-          .get(`/v0/site/${promisedValues.site.id}/published-branch/master`)
-          .set('Cookie', promisedValues.cookie)
-          .expect(403)).then((response) => {
-            validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}', 403, response.body);
-            done();
-          }).catch(done);
+      Promise.props({ user, site, cookie })
+      .then(promisedValues => request(app)
+        .get(`/v0/site/${promisedValues.site.id}/published-branch/master`)
+        .set('Cookie', promisedValues.cookie)
+        .expect(403)).then((response) => {
+          validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}', 403, response.body);
+          done();
+        }).catch(done);
     });
 
     it('should require site id is a Number', (done) => {
-      let site;
       const userPromise = factory.user();
       const sitePromise = factory.site({
         defaultBranch: 'master',
@@ -282,7 +270,6 @@ describe('Published Branches API', () => {
     });
 
     it('should require site id is in the sites table', (done) => {
-      let site;
       const userPromise = factory.user();
       const sitePromise = factory.site({
         defaultBranch: 'master',
