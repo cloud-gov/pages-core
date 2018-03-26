@@ -24,10 +24,10 @@ describe('Published Branches API', () => {
 
     it('should throw 404 when site_id is NaN', (done) => {
       const userPromise = factory.user();
-      const sitePromise = factory.site({users: Promise.all([userPromise]), demoBranch: 'demo' });
+      const sitePromise = factory.site({ users: Promise.all([userPromise]), demoBranch: 'demo' });
       const cookiePromise = authenticatedSession(userPromise);
 
-      Promise.props({user: userPromise, site: sitePromise, cookie: cookiePromise})
+      Promise.props({ user: userPromise, site: sitePromise, cookie: cookiePromise })
       .then((promisedValues) => {
         return request(app)
           .get('/v0/site/NaN/published-branch')
@@ -47,7 +47,7 @@ describe('Published Branches API', () => {
       });
       const cookiePromise = authenticatedSession(userPromise);
 
-      Promise.props({user: userPromise, site: sitePromise, cookie: cookiePromise})
+      Promise.props({ user: userPromise, site: sitePromise, cookie: cookiePromise })
       .then((promisedValues) => {
         return request(app)
           .get('/v0/site/-1/published-branch')
@@ -282,7 +282,6 @@ describe('Published Branches API', () => {
         site: sitePromise,
         cookie: cookiePromise,
       }).then((promisedValues) => {
-
         return request(app)
           .get('/v0/site/-1/published-branch/master')
           .set('Cookie', promisedValues.cookie)
