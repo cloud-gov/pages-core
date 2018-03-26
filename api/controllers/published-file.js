@@ -6,11 +6,11 @@ const { Site } = require('../models');
 module.exports = {
   find: (req, res) => {
     let site, pagedFilesResponse;
-    const { site_id, branch } = req.params;
+    const branch = req.params.branch;
     const startAtKey = req.query.startAtKey || null;
 
     Promise.resolve(Number(req.params.site_id))
-    .then((id) => {
+    .then((site_id) => {
       if (isNaN(site_id)) { throw 404; }
 
       return Site.findById(site_id)
