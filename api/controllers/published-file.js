@@ -7,14 +7,15 @@ module.exports = {
   find: (req, res) => {
     let site;
     let pagedFilesResponse;
-    const { site_id, branch } = req.params;
+    let branch = req.params.branch;
+
     const startAtKey = req.query.startAtKey || null;
 
-    Promise.resolve(Number(site_id)).then((site_id) => {
-      if (isNaN(site_id)) {
+    Promise.resolve(Number(req.params.site_id)).then((siteId) => {
+      if (isNaN(siteId)) {
         throw 404;
       }
-      return Site.findById(site_id);
+      return Site.findById(siteId);
     }).then((model) => {
       if (!model) { throw 404; }
 
@@ -28,6 +29,7 @@ module.exports = {
       pagedFilesResponse.files = pagedFilesResponse.files.map(file =>
         Object.assign(file, { publishedBranch: branchJSON })
       );
+
       res.json(pagedFilesResponse);
     }).catch(res.error);
   },
