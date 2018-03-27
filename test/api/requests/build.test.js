@@ -471,13 +471,11 @@ describe('Build API', () => {
         user: userPromise,
         cookie: authenticatedSession(userPromise),
       })
-      .then((promisedValues) => {
-        return request(app)
-          .get('/v0/site/NaN/build')
-          .set('Cookie', promisedValues.cookie)
-          .expect(404);
-      })
-      .then((response) => {
+      .then(promisedValues => request(app)
+        .get('/v0/site/NaN/build')
+        .set('Cookie', promisedValues.cookie)
+        .expect(404)
+      ).then((response) => {
         validateAgainstJSONSchema('GET', '/site/{site_id}/build', 404, response.body);
         done();
       })
