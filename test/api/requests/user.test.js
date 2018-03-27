@@ -13,11 +13,6 @@ describe('User API', () => {
     expect(response).to.have.property('email', user.email);
   };
 
-  const usernameResponseExpectations = (response, user) => {
-    expect(response).to.have.property('id', user.id);
-    expect(response).to.have.property('username', user.username);
-  };
-
   describe('GET /v0/me', () => {
     it('should require authentication', (done) => {
       factory.user().then(() => request(app)
