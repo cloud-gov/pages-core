@@ -6,28 +6,30 @@ const { Site } = require('../models');
 module.exports = {
   find: (req, res) => {
     let site;
-    const branch = req.params.branch;
+    let pagedFilesResponse;
+    const { site_id, branch } = req.params;
     const startAtKey = req.query.startAtKey || null;
 
-    Promise.resolve(Number(req.params.site_id))
-    .then((siteId) => {
-      if (isNaN(siteId)) { throw 404; }
+    if (isNaN(site_id)) { throw 404; }
 
-      return Site.findById(siteId);
-    })
-    .then((model) => {
-      if (!model) { throw 404; }
+    Site.findById(site_id)
+      .then((model) => {
+        if (!model) { throw 404; }
 
-      site = model;
-      return siteAuthorizer.findOne(req.user, site);
-    })
-    .then(() => S3PublishedFileLister.listPagedPublishedFilesForBranch(site, branch, startAtKey))
-    .then((pagedFilesResponse) => {
-      pagedFilesResponse.files = pagedFilesResponse.files.map(file =>
-        Object.assign(file, { publishedBranch: PublishedBranchSerializer.serialize(site, branch) })
-      );
-      res.json(pagedFilesResponse);
-    })
-    .catch(res.error);
+        site = model;
+        return siteAuthorizer.findOne(req.user, site);
+      })
+      .then(() => S3PublishedFileLister.listPagedPublishedFilesForBranch(site, branch, startAtKey))
+      .then((response) => {
+        pagedFilesResponse = response;
+        return PublishedBranchSerializer.serialize(site, branch);
+      })
+      .then((branchJSON) => {
+        pagedFilesResponse.files = pagedFilesResponse.files.map(file =>
+          Object.assign(file, { publishedBranch: branchJSON })
+        );
+        res.json(pagedFilesResponse);
+      })
+      .catch(res.error);
   },
 };
