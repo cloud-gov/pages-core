@@ -7,7 +7,7 @@ module.exports = {
   find: (req, res) => {
     let site;
     let pagedFilesResponse;
-    let branch = req.params.branch;
+    const branch = req.params.branch;
 
     const startAtKey = req.query.startAtKey || null;
 
@@ -25,12 +25,14 @@ module.exports = {
     .then((response) => {
       pagedFilesResponse = response;
       return PublishedBranchSerializer.serialize(site, branch);
-    }).then((branchJSON) => {
+    })
+    .then((branchJSON) => {
       pagedFilesResponse.files = pagedFilesResponse.files.map(file =>
         Object.assign(file, { publishedBranch: branchJSON })
       );
 
       res.json(pagedFilesResponse);
-    }).catch(res.error);
+    })
+    .catch(res.error);
   },
 };
