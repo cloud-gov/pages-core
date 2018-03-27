@@ -6,7 +6,6 @@ const { Site } = require('../models');
 module.exports = {
   find: (req, res) => {
     let site;
-    let pagedFilesResponse;
     const branch = req.params.branch;
     const startAtKey = req.query.startAtKey || null;
 
