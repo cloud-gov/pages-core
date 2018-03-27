@@ -12,15 +12,11 @@ module.exports = {
 
     Promise.resolve(Number(req.params.site_id))
     .then((id) => {
-      if (isNaN(id)) {
-        throw 404;
-      }
+      if (isNaN(id)) { throw 404; }
       return Site.findById(id);
     })
     .then((model) => {
-      if (!model) {
-        throw 404;
-      }
+      if (!model) { throw 404; }
       site = model;
       return siteAuthorizer.findOne(req.user, site);
     })
