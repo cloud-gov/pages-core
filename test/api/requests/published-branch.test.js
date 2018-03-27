@@ -43,7 +43,7 @@ describe('Published Branches API', () => {
       const sitePromise = factory.site({ users: Promise.all([userPromise]), demoBranch: 'demo' });
 
       Promise.props({ user: userPromise, site: sitePromise, cookie: authenticatedSession(userPromise) })
-      .then((promisedValues) => request(app)
+      .then(promisedValues => request(app)
         .get('/v0/site/-1/published-branch')
         .set('Cookie', promisedValues.cookie)
         .expect(404))
@@ -73,7 +73,7 @@ describe('Published Branches API', () => {
       };
 
       Promise.props({ user: userPromise, site: sitePromise, cookie: authenticatedSession(userPromise) })
-      .then(promisedValues => {
+      .then((promisedValues) => {
         site = promisedValues.site;
 
         return request(app)
@@ -191,7 +191,7 @@ describe('Published Branches API', () => {
           .get(`/v0/site/${site.id}/published-branch/master`)
           .set('Cookie', promisedValues.cookie)
           .expect(200);
-      }).then(response => {
+      }).then((response) => {
         validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}', 200, response.body);
         expect(response.body.site.id).to.equal(site.id);
         expect(response.body.name).to.equal('master');
@@ -209,10 +209,10 @@ describe('Published Branches API', () => {
         .get(`/v0/site/${promisedValues.site.id}/published-branch/master`)
         .set('Cookie', promisedValues.cookie)
         .expect(403))
-      .then(response => {
-          validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}', 403, response.body);
-          done();
-        }).catch(done);
+      .then((response) => {
+        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}', 403, response.body);
+        done();
+      }).catch(done);
     });
 
     it('should require site id is a Number', (done) => {
@@ -224,7 +224,7 @@ describe('Published Branches API', () => {
         .get('/v0/site/NaN/published-branch/master')
         .set('Cookie', promisedValues.cookie)
         .expect(404)
-      ).then(response => {
+      ).then((response) => {
         validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}', 404, response.body);
         done();
       }).catch(done);
