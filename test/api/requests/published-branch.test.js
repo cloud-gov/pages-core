@@ -28,7 +28,7 @@ describe('Published Branches API', () => {
       const cookiePromise = authenticatedSession(userPromise);
 
       Promise.props({ user: userPromise, site: sitePromise, cookie: cookiePromise })
-      .then((promisedValues) => {
+      .then(promisedValues => {
         return request(app)
           .get('/v0/site/NaN/published-branch')
           .set('Cookie', promisedValues.cookie)
