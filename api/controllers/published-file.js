@@ -23,13 +23,9 @@ module.exports = {
       return siteAuthorizer.findOne(req.user, site);
     })
     .then(() => S3PublishedFileLister.listPagedPublishedFilesForBranch(site, branch, startAtKey))
-    .then((response) => {
-      pagedFilesResponse = response;
-      return PublishedBranchSerializer.serialize(site, branch);
-    })
-    .then((branchJSON) => {
+    .then((pagedFilesResponse) => {
       pagedFilesResponse.files = pagedFilesResponse.files.map(file =>
-        Object.assign(file, { publishedBranch: branchJSON })
+        Object.assign(file, { publishedBranch: PublishedBranchSerializer.serialize(site, branch) })
       );
       res.json(pagedFilesResponse);
     })
