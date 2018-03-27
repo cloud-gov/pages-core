@@ -23,11 +23,10 @@ describe('Published Branches API', () => {
     });
 
     it('should throw 404 when site_id is NaN', (done) => {
-      const userPromise = factory.user();
-      const sitePromise = factory.site({ users: Promise.all([userPromise]), demoBranch: 'demo' });
+      const user = factory.user();
+      const site = factory.site({ users: Promise.all([user]), demoBranch: 'demo' });
 
-
-      Promise.props({ user: userPromise, site: sitePromise, cookie: authenticatedSession(userPromise) })
+      Promise.props({ user, site, cookie: authenticatedSession(user) })
       .then(promisedValues => request(app)
         .get('/v0/site/NaN/published-branch')
         .set('Cookie', promisedValues.cookie)
@@ -39,10 +38,10 @@ describe('Published Branches API', () => {
     });
 
     it('should throw 404 when site_id does not exist', (done) => {
-      const userPromise = factory.user();
-      const sitePromise = factory.site({ users: Promise.all([userPromise]), demoBranch: 'demo' });
+      const user = factory.user();
+      const site = factory.site({ users: Promise.all([user]), demoBranch: 'demo' });
 
-      Promise.props({ user: userPromise, site: sitePromise, cookie: authenticatedSession(userPromise) })
+      Promise.props({ user, site, cookie: authenticatedSession(user) })
       .then(promisedValues => request(app)
         .get('/v0/site/-1/published-branch')
         .set('Cookie', promisedValues.cookie)
@@ -55,8 +54,8 @@ describe('Published Branches API', () => {
 
     it("should list the previews available on S3 for a user's site", (done) => {
       let site;
-      const userPromise = factory.user();
-      const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+      const user = factory.user();
+      const sitePromise = factory.site({ users: Promise.all([user]) });
 
       AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
@@ -72,7 +71,7 @@ describe('Published Branches API', () => {
         });
       };
 
-      Promise.props({ user: userPromise, site: sitePromise, cookie: authenticatedSession(userPromise) })
+      Promise.props({ user, site: sitePromise, cookie: authenticatedSession(user) })
       .then((promisedValues) => {
         site = promisedValues.site;
 
@@ -94,8 +93,8 @@ describe('Published Branches API', () => {
 
     it('should list the demo branch if one is set on the site', (done) => {
       let site;
-      const userPromise = factory.user();
-      const sitePromise = factory.site({ users: Promise.all([userPromise]), demoBranch: 'demo' });
+      const user = factory.user();
+      const sitePromise = factory.site({ users: Promise.all([user]), demoBranch: 'demo' });
 
       AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
@@ -109,7 +108,7 @@ describe('Published Branches API', () => {
         });
       };
 
-      Promise.props({ user: userPromise, site: sitePromise, cookie: authenticatedSession(userPromise) })
+      Promise.props({ user, site: sitePromise, cookie: authenticatedSession(user) })
       .then((promisedValues) => {
         site = promisedValues.site;
 
@@ -142,14 +141,14 @@ describe('Published Branches API', () => {
     it('returns a 400 if the access keys are invalid', (done) => {
       let site;
       const expected = 'S3 keys out of date. Update them with `npm run update-local-config`';
-      const userPromise = factory.user();
-      const sitePromise = factory.site({ users: Promise.all([userPromise]), demoBranch: 'demo' });
+      const user = factory.user();
+      const sitePromise = factory.site({ users: Promise.all([user]), demoBranch: 'demo' });
 
       AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
         callback({ status: 403, code: 'InvalidAccessKeyId' }, {});
       };
 
-      Promise.props({ user: userPromise, site: sitePromise, cookie: authenticatedSession(userPromise) })
+      Promise.props({ user, site: sitePromise, cookie: authenticatedSession(user) })
       .then((promisedValues) => {
         site = promisedValues.site;
 
@@ -180,10 +179,10 @@ describe('Published Branches API', () => {
 
     it('should render a JSON response for a pubslished branch', (done) => {
       let site;
-      const userPromise = factory.user();
-      const sitePromise = factory.site({ defaultBranch: 'master', users: Promise.all([userPromise]) });
+      const user = factory.user();
+      const sitePromise = factory.site({ defaultBranch: 'master', users: Promise.all([user]) });
 
-      Promise.props({ user: userPromise, site: sitePromise, cookie: authenticatedSession(userPromise) })
+      Promise.props({ user, site: sitePromise, cookie: authenticatedSession(user) })
       .then((promisedValues) => {
         site = promisedValues.site;
 
@@ -216,10 +215,10 @@ describe('Published Branches API', () => {
     });
 
     it('should require site id is a Number', (done) => {
-      const userPromise = factory.user();
-      const sitePromise = factory.site({ defaultBranch: 'master', users: Promise.all([userPromise]) });
+      const user = factory.user();
+      const site = factory.site({ defaultBranch: 'master', users: Promise.all([user]) });
 
-      Promise.props({ user: userPromise, site: sitePromise, cookie: authenticatedSession(userPromise) })
+      Promise.props({ user, site, cookie: authenticatedSession(user) })
       .then(promisedValues => request(app)
         .get('/v0/site/NaN/published-branch/master')
         .set('Cookie', promisedValues.cookie)
@@ -231,10 +230,10 @@ describe('Published Branches API', () => {
     });
 
     it('should require site id is in the sites table', (done) => {
-      const userPromise = factory.user();
-      const sitePromise = factory.site({ defaultBranch: 'master', users: Promise.all([userPromise]) });
+      const user = factory.user();
+      const site = factory.site({ defaultBranch: 'master', users: Promise.all([user]) });
 
-      Promise.props({ user: userPromise, site: sitePromise, cookie: authenticatedSession(userPromise) })
+      Promise.props({ user, site, cookie: authenticatedSession(user) })
       .then(promisedValues => request(app)
         .get('/v0/site/-1/published-branch/master')
         .set('Cookie', promisedValues.cookie)
