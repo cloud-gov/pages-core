@@ -150,7 +150,7 @@ describe('Published Branches API', () => {
       };
 
       Promise.props({ user: userPromise, site: sitePromise, cookie: authenticatedSession(userPromise) })
-      .then(promisedValues => {
+      .then((promisedValues) => {
         site = promisedValues.site;
 
         return request(app)
@@ -172,7 +172,7 @@ describe('Published Branches API', () => {
       factory.site().then(site => request(app)
         .get(`/v0/site/${site.id}/published-branch/${site.defaultBranch}`)
         .expect(403))
-      .then(response => {
+      .then((response) => {
         validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}', 403, response.body);
         done();
       }).catch(done);
@@ -235,7 +235,7 @@ describe('Published Branches API', () => {
       const sitePromise = factory.site({ defaultBranch: 'master', users: Promise.all([userPromise]) });
 
       Promise.props({ user: userPromise, site: sitePromise, cookie: authenticatedSession(userPromise) })
-      .then(promisedValues =>  request(app)
+      .then(promisedValues => request(app)
         .get('/v0/site/-1/published-branch/master')
         .set('Cookie', promisedValues.cookie)
         .expect(404)
