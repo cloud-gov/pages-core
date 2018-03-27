@@ -28,12 +28,11 @@ describe('Published Branches API', () => {
       const cookiePromise = authenticatedSession(userPromise);
 
       Promise.props({ user: userPromise, site: sitePromise, cookie: cookiePromise })
-      .then(promisedValues => {
-        return request(app)
-          .get('/v0/site/NaN/published-branch')
-          .set('Cookie', promisedValues.cookie)
-          .expect(404);
-      }).then((response) => {
+      .then((promisedValues) =>  request(app)
+        .get('/v0/site/NaN/published-branch')
+        .set('Cookie', promisedValues.cookie)
+        .expect(404))
+      .then((response) => {
         validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch', 404, response.body);
         done();
       }).catch(done);
@@ -48,12 +47,11 @@ describe('Published Branches API', () => {
       const cookiePromise = authenticatedSession(userPromise);
 
       Promise.props({ user: userPromise, site: sitePromise, cookie: cookiePromise })
-      .then((promisedValues) => {
-        return request(app)
-          .get('/v0/site/-1/published-branch')
-          .set('Cookie', promisedValues.cookie)
-          .expect(404);
-      }).then((response) => {
+      .then((promisedValues) => request(app)
+        .get('/v0/site/-1/published-branch')
+        .set('Cookie', promisedValues.cookie)
+        .expect(404)
+      ).then((response) => {
         validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch', 404, response.body);
         done();
       }).catch(done);
