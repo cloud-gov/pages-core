@@ -10,29 +10,25 @@ module.exports = {
     const { site_id, branch } = req.params;
     const startAtKey = req.query.startAtKey || null;
 
-    Promise.resolve(Number(site_id)).then((id) => {
+    Promise.resolve(Number(site_id)).then((site_id) => {
       if (isNaN(site_id)) {
         throw 404;
       }
       return Site.findById(site_id);
-    })
-    .then((model) => {
+    }).then((model) => {
       if (!model) { throw 404; }
 
       site = model;
       return siteAuthorizer.findOne(req.user, site);
-    })
-    .then(() => S3PublishedFileLister.listPagedPublishedFilesForBranch(site, branch, startAtKey))
+    }).then(() => S3PublishedFileLister.listPagedPublishedFilesForBranch(site, branch, startAtKey))
     .then((response) => {
       pagedFilesResponse = response;
       return PublishedBranchSerializer.serialize(site, branch);
-    })
-    .then((branchJSON) => {
+    }).then((branchJSON) => {
       pagedFilesResponse.files = pagedFilesResponse.files.map(file =>
         Object.assign(file, { publishedBranch: branchJSON })
       );
       res.json(pagedFilesResponse);
-    })
-    .catch(res.error);
+    }).catch(res.error);
   },
 };
