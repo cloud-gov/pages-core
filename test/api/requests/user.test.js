@@ -44,4 +44,26 @@ describe('User API', () => {
         .catch(done);
     });
   });
+
+  describe('GET /v0/usernames', () => {
+    it('should render the current user', (done) => {
+      let user;
+
+      factory.user()
+        .then((model) => {
+          user = model;
+          return authenticatedSession(user);
+        })
+        .then(cookie => request(app)
+          .get('/v0/usernames')
+          .set('Cookie', cookie)
+          .expect(200)
+        )
+        .then((response) => {
+          validateAgainstJSONSchema('GET', '/usernames', 200, response.body);
+          done();
+        })
+        .catch(done);
+    });
+  });
 });
