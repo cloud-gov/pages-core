@@ -31,10 +31,11 @@ if (s3Creds) {
 }
 
 // SQS Configs
-const sqsKey = env.FEDERALIST_AWS_BUILD_KEY;
-const sqsSecret = env.FEDERALIST_AWS_BUILD_SECRET;
-const sqsQueue = env.FEDERALIST_SQS_QUEUE;
-const sqsRegion = env.FEDERALIST_SQS_REGION;
+const sqsCredentials = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-sqs-creds`);
+const sqsKey = sqsCredentials.access_key;
+const sqsSecret = sqsCredentials.secret_key;
+const sqsQueue = sqsCredentials.sqs_url;
+const sqsRegion = sqsCredentials.region;
 if (sqsKey && sqsSecret && sqsQueue) {
   module.exports.sqs = {
     accessKeyId: sqsKey,
