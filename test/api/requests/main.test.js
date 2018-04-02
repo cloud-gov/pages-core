@@ -157,6 +157,33 @@ describe('Main Site', () => {
     });
   });
 
+  describe('.examples', () => {
+    it('renders the page properly', (done) => {
+      request(app)
+      .get('/case-studies')
+      .expect(200)
+      .then((response) => {
+        expect(response.text.indexOf('example-sites')).to.be.above(-1);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should redirect to /sites when authenticated', (done) => {
+      authenticatedSession()
+      .then(cookie => request(app)
+        .get('/case-studies')
+        .set('Cookie', cookie)
+        .expect(302)
+      )
+      .then((response) => {
+        expect(response.headers.location).to.equal('/sites');
+        done();
+      })
+      .catch(done);
+    });
+  });
+
   describe('site wide error banner', () => {
     context('when an error is present', () => {
       beforeEach(() => {

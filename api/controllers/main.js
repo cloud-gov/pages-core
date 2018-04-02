@@ -56,7 +56,7 @@ module.exports = {
 
     const context = Object.assign({}, defaultContext(req), caseStudyData);
 
-    res.render('content/case-studies.njk', context);
+    return res.render('content/case-studies.njk', context);
   },
 
   app(req, res) {
