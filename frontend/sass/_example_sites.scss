@@ -1,0 +1,31 @@
+.example-sites {
+  @media screen and (max-width: $mobile-size) {
+    display: block;
+    display: flex;
+
+    text-align: left;
+
+    .example-sites-list {
+      order: 2;
+    }
+
+    .example-sites-copy {
+      order: 3;
+    }
+
+    .hero-heading {
+      order: 1;
+      text-align: left;
+    }
+
+    &.federalist-hero {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    &.usa-width-one-half {
+      margin: 0;
+      width: 100%;
+    }
+  }
+}

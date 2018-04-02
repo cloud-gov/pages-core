@@ -3,6 +3,7 @@
 {% block main_content %}
 
   {% import "case-study.njk" as caseStudy %}
+  {% import "example-thumb.njk" as exampleSite %}
 
   <div id="home">
     <div class="well">
@@ -27,61 +28,24 @@
     </div>
 
     {% for study in caseStudies %}
-    {{ caseStudy.template(study) }}
+      {{ caseStudy.template(study, loop.index) }}
     {% endfor %}
 
-    <section class="well">
-      <div class="usa-grid">
+    <section class="well example-sites">
+      <div class="usa-grid federalist-hero">
         <div class="usa-width-one-half">
           <h1 class="hero-heading">
             See more sites powered by Federalist.
           </h1>
-          <p>
+          <p class="example-sites-copy">
             Eight agencies use Federalist to host over 100 sites with over 140,000 page views per day. This page shows a sample of our partners.
           </p>
         </div>
         <div class="usa-width-one-half">
-          <div class="flexbox-grid">
-            <div class="usa-width-one-third">
-              <a href="https://18f.gsa.gov">
-                <img data-action="name-site" class="thumbnail" src="/images/example-sites/cards/18f-gsa-gov.png" alt="18F home page">
-                <h5>18F.gsa.gov</h5>
-              </a>
-            </div>
-            <div class="usa-width-one-third">
-              <a href="https://login.gov">
-                <img data-action="name-site" class="thumbnail" src="/images/example-sites/cards/login-gov.png" alt="Login.gov home page">
-                <h5>Login.gov</h5>
-              </a>
-            </div>
-            <div class="usa-width-one-third">
-              <a href="https://useiti.doi.gov">
-                <img data-action="name-site" class="thumbnail" src="/images/example-sites/cards/useiti-doi-gov.png" alt="U.S. DOI Natural Resources Revenue Data home page">
-                <h5>DOI Revenue Data</h5>
-              </a>
-            </div>
-            <div class="usa-width-one-third">
-              <a href="https://oes.gsa.gov">
-                <img data-action="name-site" class="thumbnail" src="/images/example-sites/cards/oes-gsa-gov.png" alt="GSA Office of Evaluation Sciences home page"> 
-                <h5>OES</h5>
-              </a>
-            </div>
-            <div class="usa-width-one-third">
-              <a href="https://standards.usa.gov/">
-                <img data-action="name-site" class="thumbnail" src="/images/example-sites/cards/standards-usa-gov.png" alt="U.S. Web Design Standards home page">              
-                <h5>USWDS</h5>
-              </a>
-            </div>
-            <div class="usa-width-one-third">
-              <a href="https://tech.gsa.gov">
-                <div class="figure">
-                  <img data-action="name-site" class="thumbnail" src="/images/example-sites/cards/tech-gsa-gov.png" alt="GSA Modernizing Technology home page">
-                  <figcaption class="caption">
-                    <p>tech.gsa.gov</p>
-                  </div>
-                </div>
-              </a>
-            </div>
+          <div class="flexbox-grid example-sites-list">
+            {% for example in exampleSites %}
+            {{ exampleSite.template(example) }}
+            {% endfor %}
           </div>
         </div>
       </div>

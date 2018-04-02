@@ -1,5 +1,8 @@
-{% macro template(study) %}
+{% macro template(study, index) %}
 <div class="usa-grid">
+  {% if index > 1 %}
+    <hr class="hr-light">
+  {% endif %}
   <div class="info-block">
     <div class="usa-width-one-half description">
       <h2 class="heading">{{ study.heading }}</h2>

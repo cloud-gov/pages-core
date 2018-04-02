@@ -3,7 +3,7 @@ const { Site } = require('../models');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const config = require('../../config');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
-const caseStudies = require('../../public/data/case-studies');
+const caseStudyData = require('../../public/data/case-studies');
 
 let webpackAssets = loadAssetManifest();
 
@@ -54,7 +54,7 @@ module.exports = {
       return res.redirect('/sites');
     }
 
-    const context = Object.assign({}, defaultContext(req), { caseStudies });
+    const context = Object.assign({}, defaultContext(req), caseStudyData);
 
     res.render('content/case-studies.njk', context);
   },
