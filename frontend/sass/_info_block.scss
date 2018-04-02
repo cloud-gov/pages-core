@@ -4,12 +4,27 @@
   padding-bottom: $spacing-xxl;
   padding-top: $spacing-xxl;
 
+  .heading {
+    margin-bottom: 0;
+  }
+
+  .sub-heading {
+    margin-bottom: 0;
+    margin-top: 0;
+  }
+
   .copy {
     margin-bottom: $spacing-xxl;
+    margin-top: $spacing-lg;
   }
 
   .info-image {
     text-align: right;
+
+    .caption {
+      padding-top: $spacing-sm;
+      text-align: left;
+    }
   }
 
   @media screen and (max-width: $mobile-size) {
