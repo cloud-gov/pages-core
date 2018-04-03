@@ -39,11 +39,11 @@ if (sqsCreds) {
     region: sqsCreds.region,
     queue: sqsCreds.sqs_url,
   };
-} else { // this env variable block to be removed once SQS user-provided service is created in production environment but will keep exception block
-  let sqsKey = env.FEDERALIST_AWS_BUILD_KEY;
-  let sqsSecret = env.FEDERALIST_AWS_BUILD_SECRET;
-  let sqsQueue = env.FEDERALIST_SQS_QUEUE;
-  let sqsRegion = env.FEDERALIST_SQS_REGION;
+} else {
+  const sqsKey = env.FEDERALIST_AWS_BUILD_KEY;
+  const sqsSecret = env.FEDERALIST_AWS_BUILD_SECRET;
+  const sqsQueue = env.FEDERALIST_SQS_QUEUE;
+  constt sqsRegion = env.FEDERALIST_SQS_REGION;
   if (sqsKey && sqsSecret && sqsQueue) {
     module.exports.sqs = {
       accessKeyId: sqsKey,
