@@ -30,6 +30,7 @@
   @media screen and (max-width: $mobile-size) {
     display: flex;
     flex-direction: column;
+    padding-bottom: 0px;
 
     .info-image {
       align-self: center;
