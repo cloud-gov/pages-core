@@ -35,6 +35,16 @@ module.exports = {
   ],
   exampleSites: [
     {
+      image: '/images/example-sites/cards/performance-gov.png',
+      caption: 'Performance.gov',
+      link: 'https://www.performance.gov',
+    },
+    {
+      image: '/images/example-sites/cards/cio-gov.png',
+      caption: 'CIO.gov',
+      link: 'https://www.cio.gov',
+    },
+    {
       image: '/images/example-sites/cards/18f-gsa-gov.png',
       caption: '18F.gsa.gov',
       link: 'https://18f.gsa.gov',
