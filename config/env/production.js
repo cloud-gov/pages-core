@@ -27,12 +27,23 @@ if (s3Creds) {
     bucket: s3Creds.bucket,
   };
 } else {
-  // this env variable block to be removed once SQS user-provided service is created in production environment but will keep exception block
+  throw new Error('No S3 credentials found');
+}
+
+// SQS Configs
+const sqsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-sqs-creds`);
+if (sqsCreds) {
+  module.exports.sqs = {
+    accessKeyId: sqsCreds.access_key,
+    secretAccessKey: sqsCreds.secret_key,
+    region: sqsCreds.region,
+    queue: sqsCreds.sqs_url,
+  };
+} else { // this env variable block to be removed once SQS user-provided service is created in production environment but will keep exception block
   let sqsKey = env.FEDERALIST_AWS_BUILD_KEY;
   let sqsSecret = env.FEDERALIST_AWS_BUILD_SECRET;
   let sqsQueue = env.FEDERALIST_SQS_QUEUE;
   let sqsRegion = env.FEDERALIST_SQS_REGION;
-
   if (sqsKey && sqsSecret && sqsQueue) {
     module.exports.sqs = {
       accessKeyId: sqsKey,
@@ -41,25 +52,8 @@ if (s3Creds) {
       queue: sqsQueue,
     };
   } else {
-    throw new Error('No S3 credentials found');
+    throw new Error('No SQS credentials found');
   }
-}
-
-// SQS Configs
-const sqsCredentials = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-sqs-creds`);
-const sqsKey = sqsCredentials.access_key;
-const sqsSecret = sqsCredentials.secret_key;
-const sqsQueue = sqsCredentials.sqs_url;
-const sqsRegion = sqsCredentials.region;
-if (sqsKey && sqsSecret && sqsQueue) {
-  module.exports.sqs = {
-    accessKeyId: sqsKey,
-    secretAccessKey: sqsSecret,
-    region: sqsRegion,
-    queue: sqsQueue,
-  };
-} else {
-  throw new Error('No SQS credentials found');
 }
 
 // See https://github.com/nfriedly/express-rate-limit/blob/master/README.md#configuration
