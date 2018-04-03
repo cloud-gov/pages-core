@@ -27,7 +27,22 @@ if (s3Creds) {
     bucket: s3Creds.bucket,
   };
 } else {
-  throw new Error('No S3 credentials found');
+  // this env variable block to be removed once SQS user-provided service is created in production environment but will keep exception block
+  let sqsKey = env.FEDERALIST_AWS_BUILD_KEY;
+  let sqsSecret = env.FEDERALIST_AWS_BUILD_SECRET;
+  let sqsQueue = env.FEDERALIST_SQS_QUEUE;
+  let sqsRegion = env.FEDERALIST_SQS_REGION;
+
+  if (sqsKey && sqsSecret && sqsQueue) {
+    module.exports.sqs = {
+      accessKeyId: sqsKey,
+      secretAccessKey: sqsSecret,
+      region: sqsRegion,
+      queue: sqsQueue,
+    };
+  } else {
+    throw new Error('No S3 credentials found');
+  }
 }
 
 // SQS Configs
