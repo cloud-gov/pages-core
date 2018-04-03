@@ -43,7 +43,7 @@ if (sqsCreds) {
   const sqsKey = env.FEDERALIST_AWS_BUILD_KEY;
   const sqsSecret = env.FEDERALIST_AWS_BUILD_SECRET;
   const sqsQueue = env.FEDERALIST_SQS_QUEUE;
-  constt sqsRegion = env.FEDERALIST_SQS_REGION;
+  const sqsRegion = env.FEDERALIST_SQS_REGION;
   if (sqsKey && sqsSecret && sqsQueue) {
     module.exports.sqs = {
       accessKeyId: sqsKey,
