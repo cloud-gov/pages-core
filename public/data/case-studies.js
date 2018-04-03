@@ -64,5 +64,15 @@ module.exports = {
       caption: 'tech.gsa.gov',
       link: 'https://tech.gsa.gov',
     },
+    {
+      image: '/images/example-sites/cards/performance-gov.png',
+      caption: 'Performance.gov',
+      link: 'https://www.performance.gov',
+    },
+    {
+      image: '/images/example-sites/cards/cio-gov.png',
+      caption: 'CIO.gov',
+      link: 'https://www.cio.gov',
+    },
   ],
 };
