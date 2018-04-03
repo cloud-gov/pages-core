@@ -55,7 +55,7 @@ describe('Main Site', () => {
           .expect(200)
       )
       .then((response) => {
-        expect(response.text.indexOf('7 sites updated this week')).to.be.above(-1);
+        expect(response.text.indexOf('7 site updates')).to.be.above(-1);
         done();
       })
       .catch(done);
