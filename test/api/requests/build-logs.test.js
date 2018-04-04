@@ -94,6 +94,20 @@ describe('Build Log API', () => {
         done();
       }).catch(done);
     });
+
+    it('should respond with a 404 if build id is a number and not found', (done) => {
+      factory.build().then(build => request(app)
+          .post(`/v0/build/-100/log/${build.token}`)
+          .type('json')
+          .send({
+            src: 'build.sh',
+            otpt: encode64('This is the output for build.sh'),
+          })
+          .expect(404)).then((response) => {
+            validateAgainstJSONSchema('POST', '/build/{build_id}/log/{token}', 400, response.body);
+            done();
+          }).catch(done);
+    });
   });
 
   describe('GET /v0/build/:build_id/log', () => {
@@ -220,6 +234,16 @@ describe('Build Log API', () => {
     it('should response with a 404 if the given build does not exist', (done) => {
       authenticatedSession().then(cookie => request(app)
           .get('/v0/build/fake-id/log')
+          .set('Cookie', cookie)
+          .expect(404)).then((response) => {
+            validateAgainstJSONSchema('GET', '/build/{build_id}/log', 404, response.body);
+            done();
+          }).catch(done);
+    });
+
+    it('should response with a 404 if the given build does not exist', (done) => {
+      authenticatedSession().then(cookie => request(app)
+          .get('/v0/build/-100/log')
           .set('Cookie', cookie)
           .expect(404)).then((response) => {
             validateAgainstJSONSchema('GET', '/build/{build_id}/log', 404, response.body);

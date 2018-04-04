@@ -70,6 +70,90 @@ describe('Published Files API', () => {
       }).catch(done);
     });
 
+    it('should 404 is site owner is NaN', (done) => {
+      let site;
+      let prefix;
+      const userPromise = factory.user();
+      const sitePromise = factory.site({
+        defaultBranch: 'master',
+        users: Promise.all([userPromise]),
+      });
+      const cookiePromise = authenticatedSession(userPromise);
+
+      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
+        expect(params.Bucket).to.equal(config.s3.bucket);
+        expect(params.Prefix).to.equal(prefix);
+
+        callback(null, {
+          IsTruncated: false,
+          Contents: [
+            { Key: `${prefix}abc`, Size: 123 },
+            { Key: `${prefix}abc/def`, Size: 456 },
+            { Key: `${prefix}ghi`, Size: 789 },
+          ],
+        });
+      };
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      }).then((promisedValues) => {
+        site = promisedValues.site;
+        prefix = `site/${site.owner}/${site.repository}/`;
+
+        return request(app)
+          .get('/v0/site/NaN/published-branch/master/published-file')
+          .set('Cookie', promisedValues.cookie)
+          .expect(404);
+      }).then((response) => {
+        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 404, response.body);
+        done();
+      }).catch(done);
+    });
+
+    it('should 404 is site owner is not found', (done) => {
+      let site;
+      let prefix;
+      const userPromise = factory.user();
+      const sitePromise = factory.site({
+        defaultBranch: 'master',
+        users: Promise.all([userPromise]),
+      });
+      const cookiePromise = authenticatedSession(userPromise);
+
+      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
+        expect(params.Bucket).to.equal(config.s3.bucket);
+        expect(params.Prefix).to.equal(prefix);
+
+        callback(null, {
+          IsTruncated: false,
+          Contents: [
+            { Key: `${prefix}abc`, Size: 123 },
+            { Key: `${prefix}abc/def`, Size: 456 },
+            { Key: `${prefix}ghi`, Size: 789 },
+          ],
+        });
+      };
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      }).then((promisedValues) => {
+        site = promisedValues.site;
+        prefix = `site/${site.owner}/${site.repository}/`;
+
+        return request(app)
+          .get('/v0/site/-1/published-branch/master/published-file')
+          .set('Cookie', promisedValues.cookie)
+          .expect(404);
+      }).then((response) => {
+        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 404, response.body);
+        done();
+      }).catch(done);
+    });
+
     it('should 403 if the user is not associated with the site', (done) => {
       const user = factory.user();
       const site = factory.site({ defaultBranch: 'master' });

@@ -31,19 +31,29 @@ if (s3Creds) {
 }
 
 // SQS Configs
-const sqsKey = env.FEDERALIST_AWS_BUILD_KEY;
-const sqsSecret = env.FEDERALIST_AWS_BUILD_SECRET;
-const sqsQueue = env.FEDERALIST_SQS_QUEUE;
-const sqsRegion = env.FEDERALIST_SQS_REGION;
-if (sqsKey && sqsSecret && sqsQueue) {
+const sqsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-sqs-creds`);
+if (sqsCreds) {
   module.exports.sqs = {
-    accessKeyId: sqsKey,
-    secretAccessKey: sqsSecret,
-    region: sqsRegion,
-    queue: sqsQueue,
+    accessKeyId: sqsCreds.access_key,
+    secretAccessKey: sqsCreds.secret_key,
+    region: sqsCreds.region,
+    queue: sqsCreds.sqs_url,
   };
 } else {
-  throw new Error('No SQS credentials found');
+  const sqsKey = env.FEDERALIST_AWS_BUILD_KEY;
+  const sqsSecret = env.FEDERALIST_AWS_BUILD_SECRET;
+  const sqsQueue = env.FEDERALIST_SQS_QUEUE;
+  const sqsRegion = env.FEDERALIST_SQS_REGION;
+  if (sqsKey && sqsSecret && sqsQueue) {
+    module.exports.sqs = {
+      accessKeyId: sqsKey,
+      secretAccessKey: sqsSecret,
+      region: sqsRegion,
+      queue: sqsQueue,
+    };
+  } else {
+    throw new Error('No SQS credentials found');
+  }
 }
 
 // See https://github.com/nfriedly/express-rate-limit/blob/master/README.md#configuration
