@@ -1,26 +1,44 @@
 $sans-serif: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 $serif: 'Merriweather', serif;
 
-$background-color: white;
-$secondary-background-color: #f7f8f9; /*#e6e6e6;*/
+$white: #fff;
+
+$color-blue: #287db5;
+$color-blue-dark: #175c8a;
+
+$color-gray: #526577;
+$color-gray-dark: #415161;
+$color-gray-darker: #2c3e50;
+$color-gray-darkest: #192532;
+$color-gray-light: #65798c;
+$color-gray-lighter: #c7d5e3;
+$color-gray-lightest: #eef4fb;
+
+$body-copy-color: $color-gray-darker;
+
+$background-color: $white;
+$secondary-background-color: #f7f8f9;
 
 $form-input-border-color: #ccc;
 $template-thumb-border-color: #efefef;
-$text-color: #414141;
 
-$header-bg-color: #2d476a;
-$header-text-color: white;
+$heading-contrast-color: #7b3028;
+$heading-quiet-color: $color-gray-dark;
+$text-color: $color-gray-darker;
 
-$hero-bg-color: rgb(97, 142, 200);
+$header-bg-color: $color-gray-darker;
+$header-text-color: $white;
+
+$hero-bg-color: $color-gray-lightest;
 $hero-text-color: $header-text-color;
 
-$contrast: #f05b4e;
+$contrast: #d14636;
 
-$link-color: #0071bc;
-$link-color-active: #017aa7;
+$link-color: $color-blue;
+$link-color-active: $color-blue-dark;
 
-$button-color: #017aa7;
-$button-color-active: #03c0e9;
+$button-color: $link-color;
+$button-color-active: $link-color-active;
 $button-text-color: white;
 
 $secondary-button-color: $contrast;
@@ -29,15 +47,49 @@ $label-success-bg-color: #2e8540;
 $label-danger-bg-color: $contrast;
 $label-warning-bg-color: #fdb81e;
 
-$well-bg-color: #e1f3f8;
+$well-bg-color: $color-gray-lightest;
 $alert-delete-bg-color: #f9dede;
 
 $uswds-error-color: #cd2026;
 
-$logo-width: 140px;
-$logo-height: 29px;
+$logo-width: 170px;
 
 $home-feature-margin: 3em;
 
-$footer-primary-bg-color: #122e51;
-$footer-bg-color: #3b5a83;
+$footer-primary-bg-color: $color-gray-light;
+$footer-bg-color: $color-gray;
+
+$h1-font-size: 2.75em;
+$h2-font-size: 2.375em;
+$h3-font-size: 1.875em;
+$h4-font-size: 1.5em;
+$h5-font-size: 1.1875em;
+$h6-font-size: .9375em;
+
+$h1-line-height: 3.82em;
+$h2-line-height: 3.0625em;
+$h3-line-height: 2.58em;
+$h4-line-height: 1.5675em;
+$h5-line-height: .94em;
+$h6-line-height: 1.25em;
+
+$font-weight-heavy: 700;
+$font-weight-normal: 400;
+
+$base-font-size: 16px;
+$body-font-size-sm: .9375em;
+$body-font-size-xsm: .875em;
+$body-font-size-lg: 1.375em;
+$body-line-height-sm: 1.4375em;
+
+$body-line-height: 1.375em;
+$body-lg-line-height: 2.0625em;
+
+$spacing-thin: 4px;
+$spacing-sm: 10px;
+$spacing-med: 20px;
+$spacing-lg: 30px;
+$spacing-xl: 40px;
+$spacing-xxl: 60px;
+
+$mobile-size: 768px;

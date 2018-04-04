@@ -1,10 +1,3 @@
-.hero {
-  background-color: $hero-bg-color;
-  background-image: url('/images/essay-blue.png');
-  background-repeat: no-repeat;
-  background-size: cover;
-  color: $hero-text-color;
-}
 .usa-section-dark h1 {
   color: #fff;
 }
@@ -15,11 +8,6 @@
 .hero .usa-grid {
   padding-bottom: 3em;
   padding-top: 3em;
-}
-
-.hero h1 {
-  font-size: 3rem;
-  margin-top: 0;
 }
 
 .hero .usa-button.usa-button-outline {
@@ -38,10 +26,24 @@
   margin-bottom: $home-feature-margin;
   margin-top: $home-feature-margin;
 }
-.homepage .usa-section {
-  background-color: transparent;
+
+.homepage {
+  p {
+    font-size: $body-font-size-lg;
+  }
+
+  .usa-section {
+    background-color: transparent;
+  }
 }
-.lets-talk-section {
-  background-color: $well-bg-color;
-  padding: 5rem 0;
+
+.features {
+  margin-left: $spacing-lg;
+  margin-right: $spacing-xl;
+  padding-top: $spacing-xl;
+
+  @media screen and (max-width: $mobile-size) {
+    margin-left: $spacing-med;
+    margin-right: $spacing-med;
+  }
 }

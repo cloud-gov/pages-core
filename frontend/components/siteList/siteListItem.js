@@ -32,12 +32,12 @@ function getViewLink(viewLink, repo) {
 const SiteListItem = ({ site }) =>
   (<li className="sites-list-item">
     <div className="sites-list-item-text">
-      <h3 className="site-list-item-title">
+      <h4 className="site-list-item-title">
         <Link to={`/sites/${site.id}`} title="View site settings">
           { site.owner }/{ site.repository }
         </Link>
         {' '}
-      </h3>
+      </h4>
       <PublishedState site={site} />
     </div>
     <div className="sites-list-item-actions">

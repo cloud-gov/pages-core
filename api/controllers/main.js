@@ -1,4 +1,5 @@
 const BuildCounter = require('../services/BuildCounter');
+const { Site } = require('../models');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const config = require('../../config');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
@@ -6,7 +7,7 @@ const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require(
 let webpackAssets = loadAssetManifest();
 
 function defaultContext(req) {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
     // reload the webpack assets during development so we don't have to
     // restart the server for front end changes
     webpackAssets = loadAssetManifest();
@@ -34,8 +35,14 @@ module.exports = {
       return res.redirect('/sites');
     }
     const context = defaultContext(req);
-    return BuildCounter.countBuildsFromPastWeek().then((count) => {
-      context.buildCount = count;
+
+    return Promise.all([
+      BuildCounter.countBuildsFromPastWeek(),
+      Site.count(),
+    ])
+    .then(([builds, sites]) => {
+      context.buildCount = builds;
+      context.siteCount = sites;
       res.render('home.njk', context);
     });
   },

@@ -21,6 +21,13 @@
     background-color: $color-gray-lightest;
     margin: 0 -1.5rem;
     padding: 1.5rem;
+
+    a {
+      &:hover {
+        background-color: initial;
+      }
+    }
+
     .usa-sidenav-list li {
       border: none;
       a {

@@ -58,6 +58,10 @@ paths:
           description: Not authorized
           schema:
             $ref: "Error.json"
+        404:
+          descriptions: Not found
+          schema:
+            $ref: "Error.json"
   /build/{id}:
     parameters:
     - name: id
@@ -359,8 +363,16 @@ paths:
             type: array
             items:
               $ref: "PublishedBranch.json"
+        400:
+          description: Bad Request
+          schema:
+            $ref: "Error.json"
         403:
           description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
           schema:
             $ref: "Error.json"
   /site/{site_id}/published-branch/{branch}:
@@ -384,6 +396,10 @@ paths:
             $ref: "PublishedBranch.json"
         403:
           description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
           schema:
             $ref: "Error.json"
   /site/{site_id}/published-branch/{branch}/published-file:
@@ -420,6 +436,10 @@ paths:
                   $ref: "PublishedFile.json"
         403:
           description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
           schema:
             $ref: "Error.json"
   /site/user:
@@ -520,7 +540,7 @@ paths:
           description: Not authorized
           schema:
             $ref: "Error.json"
-  /user/usernames:
+  /usernames:
     get:
       summary: Fetch the usernames for every user in federalist
       responses:
@@ -529,7 +549,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: object
         403:
           description: Not authorized
           schema:

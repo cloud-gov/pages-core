@@ -3,54 +3,243 @@
 
 {% block main_content %}
   <div id="home" class="homepage">
-    <div class="hero">
-      <div class="usa-grid">
-        <div class="usa-hero-callout usa-section-dark">
+    <div class="well">
+      <div class="usa-grid federalist-hero">
+        <div class="usa-width-two-thirds hero-heading">
           <h1>
-            Federalist compliantly hosts federal government websites.
+            Rapidly launch a compliant website for your federal agency, program, or office
           </h1>
-          <p><a class="usa-hero-link" href="https://docs.google.com/forms/d/1iB8aW7c9r1QH3s8XElQCrnXRGjAiPUYpWG1CMeEqGIo/viewform">Get in touch for more information</a></p>
+        </div>
+        <div class="usa-width-one-third usa-hero-callout">
+          <hr class="hr-dark"></hr>
+          <h5 class="contrast-heading">Federalist Stats:</h5>
+          <div class="usa-hero-callout-stats">
+            <p>119 live .gov sites supported</p>
+            <p>8 federal agency customers</p>
+            <p>{{ siteCount }} prototypes tested</p>
+            <p>{{ buildCount }} site updates this week</p>
+          </div>
+          <hr class="hr-dark"></hr>
         </div>
       </div>
     </div>
-    <div class="build-count">
-      <div class="usa-grid text-center">
-        <p>Site updates deployed by Federalist this week: {{ buildCount }}.</p>
-      </div>
+
+    <div class="usa-grid info-block">
+     <h2><a id="page-body"></a>Federalist takes care of the heavy lifting</h2>
+      <section class="features">
+        <div class="feature-group">
+          <div class="usa-width-one-sixth">
+            <div class="feature-image">
+              <img src="/images/icons/icon-rocket-color.svg" />
+            </div>
+          </div>
+          <div class="usa-width-three-fourths feature-text">
+            <h3>Easy, powerful and fast</h3>
+            <p>You don&#8217;t have to be a programmer to get started or spend months getting an ATO. We’ve taken care of the compliance using popular and easy-to-use open source tools so you can get right to work.</p>
+          </div>
+        </div>
+
+        <div class="feature-group">
+          <div class="usa-width-one-sixth">
+            <div class="feature-image">
+              <img src="/images/icons/icon-layout-color.svg"/>
+            </div>
+          </div>
+          <div class="usa-width-three-fourths feature-text">
+            <h3>Fully customizable</h3>
+            <p>Bringing your own design team? Advanced users can use Jekyll, Hugo, or your own tools deploy custom sites that take advantage of Federalist’s scalable hosting architecture.</p>
+          </div>
+        </div>
+
+        <div class="feature-group">
+          <div class="usa-width-one-sixth">
+            <div class="feature-image">
+              <img src="/images/icons/icon-lock-color.svg" />
+            </div>
+          </div>
+          <div class="usa-width-three-fourths feature-text">
+            <h3>Secure and scalable</h3>
+            <p>Built on the FedRAMP-certified Amazon Web Services (AWS) GovCloud infrastructure and services from cloud.gov, our websites offer the highest level of security and scalability.</p>
+          </div>
+        </div>
+      </section>
     </div>
+
     <div class="usa-grid">
-      <div class="usa-width-one-third home-feature">
-        <div class="feature-text">
-          <h2><img src="/images/icons/icon-lock.svg"/> Secure and scalable</h2>
-          <p>Leveraging FedRAMP certified cloud infrastructure, Federalist websites provide compliance combined with performance, easily serving thousands of views a second.</p>
+      <hr class="hr-light">
+      <section class="info-block">
+        <div class="usa-width-two-thirds description">
+          <h2>Kickstart your web project with one of our templates</h2>
+          <p class="copy">
+            You don’t need to start from scratch if you don’t want to. Customize one of our 508-compliant Jekyll templates and spend more time on your content.
+          </p>
+
+          <div class="figure-group">
+            <h4>A few websites built with our templates</h4>
+            <ul class="figure-list">
+              <li>
+                <figure class="figure">
+                  <img src="/images/home-page/thumbnails/www.citizenscience.gov.jpg" alt="A screenshot of the Citizen Science website" height="90" width="120" />
+                  <figcaption><a href="https://www.citizenscience.gov">citizenscience.gov</a></figcaption>
+                </figure>
+              </li>
+              <li>
+                <figure class="figure">
+                  <img src="/images/home-page/thumbnails/cyber.dhs.gov.jpg" height="90" alt="A screenshot of the DHS Bindingn Operational Directives website" width="120" />
+                  <figcaption><a href="https://cyber.dhs.gov">DHS Binding Operational Directives</a></figcaption>
+                </figure>
+              </li>
+              <li>
+                <figure class="figure">
+                  <img src="/images/home-page/thumbnails/www.fedramp.gov.jpg" height="90" alt="A screenshot of the FedRAMP website" width="120" />
+                  <figcaption><a href="https://fedramp.gov">FedRAMP Homepage</a></figcaption>
+                </figure>
+              </li>
+              <li>
+                <figure class="figure">
+                  <img src="/images/home-page/thumbnails/www.pclob.gov.jpg" height="90" alt="A screenshot of the Privacy an Civil Liberties Oversight Board website" width="120" />
+                  <figcaption><a href="https://pclob.gov">Privacy and Civil Liberties Oversight Board</a></figcaption>
+                </figure>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="usa-width-one-third info-image">
+          <img src="/images/graphic-template.svg"/>
         </div>
       </div>
-      <div class="usa-width-one-third home-feature">
-        <div class="feature-text">
-          <h2><img src="/images/icons/icon-edit.svg"/> Easy to maintain</h2>
-          <p>You don't have to be a programmer to update your site. Select a template and add your content with a web-based editor.</p>
+    </section>
+
+    <div class="usa-grid">
+      <hr class="hr-light">
+      <section class="info-block">
+        <div class="usa-width-two-thirds description">
+          <h2>Launch your site in minutes.</h2>
+          <p class="copy">
+            Is your code already on GitHub? Federalist can securely deploy a static website from your repository in minutes. Federalist also deploys site previews from GitHub branches, allowing your team to easily prototype site updates.
+          </p>
+          <div class="figure-group">
+            <h4>Agencies using Federalist</h4>
+            <ul class="figure-list">
+              <li>
+                <figure class="figure">
+                  <img src="/images/logos/partners/500px-Education.png" alt="Seal of the Department of Education" height="64" width="64" />
+                  <figcaption>Department of Education</figcaption>
+                </figure>
+              </li>
+              <li>
+                <figure class="figure">
+                  <img src="/images/logos/partners/500px-DHS.png" alt="Seal of the Department of Homeland Security" height="64" width="64" />
+                  <figcaption>Department of Homeland Security</figcaption>
+                </figure>
+              </li>
+              <li>
+                <figure class="figure">
+                  <img src="/images/logos/partners/500px-DOI.png" alt="Seal of the Department of the Interior" height="64" width="64" />
+                  <figcaption>Department of the Interior</figcaption>
+                </figure>
+              </li>
+              <li>
+                <figure class="figure">
+                  <img src="/images/logos/partners/500px-treasury.png" alt="Seal of the Department of the Treasury" height="64" width="64" />
+                  <figcaption>Department of the Treasury</figcaption>
+                </figure>
+              </li>
+              <li>
+                <figure class="figure">
+                  <img src="/images/logos/partners/500px-GSA.png" alt="Seal of the General Services Adminstration" height="64" width="64" />
+                  <figcaption>General Services Administration</figcaption>
+                </figure>
+              </li>
+              <li>
+                <figure class="figure">
+                  <img src="/images/logos/partners/500px-NSF.png" alt="Seal of the National Science Foundation" height="64" width="64" />
+                  <figcaption>National Science Foundation</figcaption>
+                </figure>
+              </li>
+              <li>
+                <figure class="figure">
+                  <img src="/images/logos/partners/500px-OPM.png" alt="Seal of the Office of Personnel Management" height="64" width="64" />
+                  <figcaption>Office of Personnel Management</figcaption>
+                </figure>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-      <div class="usa-width-one-third home-feature">
-        <div class="feature-text">
-          <h2><img src="/images/icons/icon-layout.svg"/> Fully customizable</h2>
-          <p>Advanced users can build and deploy complex sites that take advantage of Federalist's static hosting architecture. Federalist hosts over 100 diverse sites; <a href="mailto:federalist-inquiries@gsa.gov">contact us</a> to learn more about what you can do with Federalist.</p>
+
+        <div class="usa-width-one-third info-image">
+          <img src="/images/graphic-git-to-website.svg"/>
+        </div>
+      </section>
+    </div>
+
+    <div class="usa-grid">
+      <hr class="hr-light">
+      <section class="info-block">
+        <h3>Federalist fact sheets</h3>
+        <div class="usa-width-one-third full-width">
+          <p class="copy">
+            Need more details about Federalist? Need something to convince to your executive team? Here are some useful grab-and-go pdf documents. See more on the <a href="https://federalist-docs.18f.gov/">Federalist documentation site</a>.
+          </p>
+        </div>
+        <div class="usa-width-two-thirds figure-group">
+          <ul class="figure-list offset-left">
+            <li>
+              <figure class="figure">
+                <img src="/images/home-page/Federalist-Proposal-Thumbnail.jpg" />
+                <figcaption>
+                  <h6>Federalist Proposal</h6>
+                  <p class="small">A two page overview about Federalist, for briefing stakeholders.</p>
+                  <a href="https://federalist-docs.18f.gov/assets/documents/Federalist-Proposal.pdf">Download PDF</a>
+                </figcaption>
+              </figure>
+            </li>
+            <li>
+              <figure class="figure">
+                <img src="/images/home-page/how-federalist-works-diagram-Thumbnail.jpg" />
+                <figcaption>
+                  <h6>Federalist Basic Diagram</h6>
+                  <p class="small">How all of Federalist’s parts work together.</p>
+                  <a href="https://federalist-docs.18f.gov/assets/documents/how-federalist-works-diagram.pdf">Download PDF</a>
+                </figcaption>
+              </figure>
+            </li>
+            <li>
+              <figure class="figure">
+                <img src="/images/home-page/Federalist-Compliance-Memo-Thumbnail.jpg" />
+                <figcaption>
+                  <h6>Compliance memo</h6>
+                  <p class="small">Details about Federalist’s compliance and Authority to Operate.</p>
+                  <a href="https://federalist-docs.18f.gov/assets/documents/Federalist-Compliance-Memo.pdf">Download PDF</a>
+                </figcaption>
+              </figure>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <div class="well">
+      <div class="usa-grid federalist-hero">
+        <div class="feature-group large">
+          <div class="usa-width-one-sixth flex-center">
+            <div class="feature-image light">
+              <img src="/images/graphic-speech-bubbles.svg" width="110" height="93" />
+            </div>
+          </div>
+          <div class="usa-width-two-thirds feature-text">
+              <p>
+                Want to talk to someone about what Federalist can do for your agency? Questions about our ATO? Want to try it out for yourself?
+              </p>
+              <p>
+                <a class="usa-button" href="https://docs.google.com/forms/d/1iB8aW7c9r1QH3s8XElQCrnXRGjAiPUYpWG1CMeEqGIo/viewform">Get in touch</a>
+              </p>
+              <p>If you can’t access the form, please reach out to <a href="mailto:federalist-inquiries@gsa.gov">federalist-inquiries@gsa.gov</a>.</p>
+              <p>Federalist is a product of the <a href="https://www.gsa.gov/about-us/organization/federal-acquisition-service/technology-transformation-services">General Services Administration</a>.</p>
+          </div>
         </div>
       </div>
     </div>
-    <div class="lets-talk-section">
-      <div class="usa-grid">
-        <div class="usa-width-one-third">
-          <h2>Federalist is open for business!</h2>
-        </div>
-        <div class="usa-width-two-thirds">
-          <p>
-            Federalist is a product of the <a href="https://www.gsa.gov/about-us/organization/federal-acquisition-service/technology-transformation-services">General Services Administration</a>.
-            We developed Federalist to help deliver high-quality websites for departments and agencies across the US federal government. Want to learn more about what Federalist can do for your agency? Click below.
-          </p>
-          <p>If you can’t access the form, please reach out to <a href="mailto:federalist-inquiries@gsa.gov">federalist-inquiries@gsa.gov</a>.</p>
-          <p><a class="usa-button" href="https://docs.google.com/forms/d/1iB8aW7c9r1QH3s8XElQCrnXRGjAiPUYpWG1CMeEqGIo/viewform">Contact us</a></p>
-        </div>
-      </div>
   </div>
 {% endblock %}

@@ -12,29 +12,28 @@ function decodeb64(str) {
 module.exports = {
   create: (req, res) => {
     Promise.resolve(Number(req.params.build_id))
-      .then((id) => {
-        if (isNaN(id)) {
-          throw 404;
-        }
-        return Build.findById(id);
-      })
-      .then((build) => {
-        if (!build) {
-          throw 404;
-        }
-        return BuildLog.create({
-          build: build.id,
-          output: decodeb64(req.body.output),
-          source: req.body.source,
-        });
-      })
-      .then(buildLog => buildLogSerializer.serialize(buildLog))
-      .then((buildLogJSON) => {
-        res.json(buildLogJSON);
-      })
-      .catch((err) => {
-        res.error(err);
+    .then((id) => {
+      if (isNaN(id)) { throw 404; }
+      return Build.findById(id);
+    })
+    .then((build) => {
+      if (!build) {
+        throw 404;
+      } else if (build.token !== req.params.token) {
+        throw 403;
+      }
+
+      return BuildLog.create({
+        build: build.id,
+        output: decodeb64(req.body.output),
+        source: req.body.source,
       });
+    })
+    .then(buildLog => buildLogSerializer.serialize(buildLog))
+    .then((buildLogJSON) => { res.json(buildLogJSON); })
+    .catch((err) => {
+      res.error(err);
+    });
   },
 
   find: (req, res) => {

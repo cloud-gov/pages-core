@@ -13,6 +13,7 @@ const validateAgainstJSONSchema = (action, path, statusCode, response) => {
   const pathLower = path.toLowerCase();
   const statusCodeInt = parseInt(statusCode, 10);
   const responseSchema = schema.paths[pathLower][actionLower].responses[statusCodeInt].schema;
+
   const result = validate(response, responseSchema);
 
   if (result.errors.length) {

@@ -39,26 +39,23 @@
     <meta name="theme-color" content="#ffffff">
     <meta charset="utf-8">
     <link rel="stylesheet" href="/{{ webpackAssets['main.css'] }}">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- For Facebook -->
     <meta property="og:title" content="Federalist compliantly hosts federal government websites." />
     <meta property="og:type" content="article" />
-    <meta property="og:image" content="/images/social-share/facebook-1200x627.png" />
+    <meta property="og:image" content="/images/social-cards/facebook-1200x627.png" />
     <meta property="og:url" content="https://federalist.18f.gov" />
     <meta property="og:description" content="Federalist expertly manages the backend work of deploying secure, compliant, and scalable government websites, allowing federal offices to focus on their content." />
 
     <!-- For Twitter -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:image" content="/images/social-share/twitter-1024x512.png" />
+    <meta name="twitter:image" content="/images/social-cards/twitter-1024x512.png" />
 
     <script src="/uswds/js/uswds.min.js" type="text/javascript"></script>
-
     <title>
       Federalist{% if siteDisplayEnv %} | {{ siteDisplayEnv }}{% endif %}
     </title>
-
     {% block head_extra %}
     {% endblock %}
   </head>
@@ -72,64 +69,10 @@
 
     {% block before_header %}
     {% endblock %}
-    <div class="usa-banner">
-      <header class="usa-banner-header">
-        <div class="usa-grid usa-banner-inner">
-          <img src="/images/favicon-57.png" alt="U.S. flag">
-          <p>An official website of the United States government</p>
-        </div>
-      </header>
-    </div>
-    <header class="usa-header usa-header-basic" role="banner">
-      <div class="usa-nav-container">
-        <div class="usa-navbar">
-          <div class="usa-logo" id="basic-logo">
-            <em class="usa-logo-text">
-              <a href="/" title="Home" aria-label="Home">Federalist</a>
-            </em>
-          </div>
-          <button class="usa-menu-btn">Menu</button>
-        </div>
 
-        <nav role="navigation" class="usa-nav">
-          <button class="usa-nav-close">
-            <img src="/images/close.svg" alt="close">
-          </button>
-          <ul class="usa-nav-primary usa-accordion">
-            {% if not isAuthenticated %}
-              <li>
-                <a class="usa-nav-link" href="/content/examples/" rel="noopener noreferrer"><span>Example sites</span></a>
-              </li>
-              <li>
-                <a class="usa-nav-link" href="https://federalist-docs.18f.gov" target="_blank" rel="noopener noreferrer"><span>Documentation</span></a>
-              </li>
-              <li>
-                <a class="usa-nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSesNI1qlov7Ec_1u2FralYWg9hV4WsB-3FyAHPXc1pRT6In7w/viewform" target="_blank" rel="noopener noreferrer"><span>Get started</span></a>
-              </li>
-              <li>
-                <a href="/auth/github" class="usa-button"><span>Log in</span></a>
-              </li>
-            {% else %}
-              <li>
-                <a class="usa-nav-link" href="/sites"><span>{{ username }}'s sites</span></a>
-              </li>
-              <li>
-                <a class="usa-nav-link" href="https://federalist-docs.18f.gov" target="_blank" rel="noopener noreferrer"><span>Documentation</span></a>
-              </li>
-              <li>
-                <a class="usa-nav-link" href="https://github.com/18F/federalist/issues/new" target="_blank" rel="noopener noreferrer"><span>File issue</span></a>
-              </li>
-              <li>
-                <a class="usa-nav-link" href="mailto:federalist-support@gsa.gov"><span>Get help</span></a>
-              </li>
-              <li>
-                <a class="usa-button" href="/logout"><span>Log out</span></a>
-              </li>
-            {% endif %}
-          </ul>
-        </nav>
-      </div>
-    </header>
+    {% include "usa-banner.njk" %}
+    {% include "navigation.njk" %}
+
     <div class="usa-overlay"></div>
     {% block flash_messages %}
       {% if messages.errors %}
@@ -190,7 +133,7 @@
             <div class="usa-footer-primary-content usa-footer-contact_info">
               <p>
                 <a href="https://github.com/18F/federalist/">
-                  <img src="/images/icons/icon-github-white.svg"/>GitHub repo</a>
+                  <img src="/images/icons/icon-github-white.svg"/>Browse source code</a>
               </p>
             </div>
             <div class="usa-footer-primary-content usa-footer-contact_info">

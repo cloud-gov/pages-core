@@ -55,7 +55,7 @@ module.exports = {
       return;
     }
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
       // reload the webpack assets during development so we don't have to
       // restart the server for front end changes
       webpackAssets = loadAssetManifest();
