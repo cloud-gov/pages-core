@@ -6,7 +6,6 @@ const config = require('../../../config');
 
 const commonPaths = [
   '/', // the home page
-  '/content/examples', // a static content page
 ];
 
 commonPaths.forEach((path) => {

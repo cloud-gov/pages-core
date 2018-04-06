@@ -3,6 +3,7 @@ const { Site } = require('../models');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const config = require('../../config');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
+const caseStudyData = require('../../public/data/case-studies');
 
 let webpackAssets = loadAssetManifest();
 
@@ -45,6 +46,17 @@ module.exports = {
       context.siteCount = sites;
       res.render('home.njk', context);
     });
+  },
+
+  examples(req, res) {
+    // redirect to main app if is authenticated
+    if (req.session.authenticated) {
+      return res.redirect('/sites');
+    }
+
+    const context = Object.assign({}, defaultContext(req), caseStudyData);
+
+    return res.render('content/case-studies.njk', context);
   },
 
   app(req, res) {
