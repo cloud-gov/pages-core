@@ -3,7 +3,7 @@ module.exports = {
     {
       heading: 'Vote.gov',
       subheading: null,
-      copy: 'Vote.gov makes it easier for eligible voters participate in our democratic process by providing streamlined information on how to vote. Site visitors can register electronically in states that allow it, and download a printable application in a number of languages for those states where electronic registration isn\'t an option.',
+      copy: 'Vote.gov makes it easier for eligible voters to participate in our democratic process by providing streamlined information on how to vote. Site visitors can register electronically in states that allow it, and download a printable application in a number of languages for those states where electronic registration isn\'t an option. Vote.gov was ranked as the #1 federal website in 2017 by the Information Technology & Innovation Foundation for meeting basic standards in security, speed, mobile friendliness, and accessibility.',
       image: '/images/thumbs/cs-preview-vote.png',
       imageCaption: null,
       agency: null,
