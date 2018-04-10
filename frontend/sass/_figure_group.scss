@@ -12,45 +12,29 @@
   @media screen and (max-width: $mobile-size) {
     margin: 0 auto;    
   }
+}
 
-  .figure-list {
-    display: flex;
-    list-style: none;
-    margin-top: $spacing-thin;
-    padding: 0;
+.figure {
+  margin: 0;
+
+  figcaption {
+    margin-bottom: 6px;
+    margin-top: 20px;
+    text-align: left;
     
-
-    li {
-      padding-right: 20px;
-      width: 33%;
-    }
-
     @media screen and (max-width: $mobile-size) {
-      display: block;
       text-align: center;
-
-      li {
-        display: block;
-        margin-bottom: $spacing-lg;
-        width: 100%;
-      }
     }
-  }
 
-  .figure {
-    margin: 0;
+    h6 {
+      font-weight: 700;
+      margin-bottom: 6px;
+      margin-top: 0px;
+      text-transform: none;
+    }
 
-    figcaption {
-      h6 {
-        font-weight: 700;
-        margin-bottom: 6px;
-        margin-top: 20px;
-        text-transform: none;
-      }
-
-      p {
-        margin: 0;
-      }
+    p {
+      margin: 0;
     }
   }
 }
