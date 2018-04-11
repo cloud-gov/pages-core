@@ -1,4 +1,3 @@
-const env = require('../../services/environment')();
 const cfenv = require('cfenv');
 
 const appEnv = cfenv.getAppEnv();
