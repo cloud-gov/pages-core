@@ -19,9 +19,9 @@ module.exports = {
   },
   report: {
     owner: '18f',
-    repo: 'federalist-report-template',
-    branch: 'master',
-    example: 'https://federalist-report-template.18f.gov',
+    repo: 'federalist-uswds-template',
+    branch: 'report-config',
+    example: 'https://federalist-proxy.app.cloud.gov/preview/18f/federalist-uswds-template/report-config/',
     title: 'Basic report',
     description: 'A simple, easy to use setup designed to host multiple pages about a recent report or order. This setup provides a clean space for complex details or instructions. Navigation can be customized to host many pages while maintaining a clear hierarchy.',
     thumb: '/images/federalist-report-template.jpg',
