@@ -1,0 +1,22 @@
+.example-sites {
+  @media screen and (max-width: $mobile-size) {
+    display: block;
+    display: flex;
+
+    text-align: left;
+
+    .hero-heading {
+      text-align: left;
+    }
+
+    .federalist-hero {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .usa-width-one-half {
+      margin: 0;
+      width: 100%;
+    }
+  }
+}

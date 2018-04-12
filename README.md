@@ -142,19 +142,19 @@ The app expects the following user provided services to be provided:
 - `federalist-<environment>-rds`: A cloud.gov brokered service that allows the application to use RDS Postgres for its database
 - `federalist-<environment>-s3`: A cloud.gov brokered service that allows the application to work with the S3 bucket where Federalist's sites live
 - `federalist-<environment>-env`: A user-provided service that provides the application with secrets that cannot be added to `manifest.yml` b/c that file is under version control; this service provides the following:
-  - `FEDERALIST_AWS_BUILD_KEY`: The AWS access key federalist uses to communicate with SQS
-  - `FEDERALIST_AWS_BUILD_SECRET`: The AWS secret key federalist uses to communicate with SQS
-  - `FEDERALIST_BUILD_CALLBACK`: The URL to which build containers should callback to with updates on their status
   - `FEDERALIST_SESSION_SECRET`: The session secret used to sign entries in Federalist's session store
-  - `FEDERALIST_SQS_QUEUE`: The URL for the SQS queue that Federalist uses to communicate with federalist-builder
-  - `FEDERALIST_SQS_REGION`: The AWS region for the SQS queue that Federalist uses to communicate with federalist-builder
-  - `GITHUB_CALLBACK_URL`: The callback URL used for GitHub authentication
+  - `GITHUB_CLIENT_CALLBACK_URL`: The callback URL used for GitHub authentication
   - `GITHUB_CLIENT_ID`: The client ID used for GitHub authentication
   - `GITHUB_CLIENT_SECRET`: The client secret used for GitHub authentication
   - `GITHUB_WEBHOOK_SECRET`: The secret used to sign and verify webhook requests from GitHub
   - `GITHUB_WEBHOOK_URL`: The url where GitHub webhook requests should be sent
   - `NEW_RELIC_APP_NAME`: The app name to report to New Relic
   - `NEW_RELIC_LICENSE_KEY`: The license key to use with New Relic
+- `federalist-<environment>-sqs-creds`: A user-provided service that provides the application with SQS credentials that cannot be added to `manifest.yml` b/c that file is under version control; this service provides the following:
+  - `access_key`: The AWS access key for SQS queue
+  - `secret_key`: The AWS secret key for SQS queue
+  - `region`: The AWS region
+  - `sqs_url`: The AWS SQS queue URL
 
 Here `<environment>` refers the value set for the `APP_ENV` environment variable.
 
