@@ -24,7 +24,9 @@ const terms = [
   },
 ];
 
-new Glossary(terms);
+new Glossary(terms, {}, {
+  termClass: 'glossary__term accordion__button',
+});
 
 import routes from './routes';
 import store from './store';

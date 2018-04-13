@@ -1,5 +1,26 @@
 // Glossary
 //
+.accordion__button {
+  background-image: url(/images/icons/plus-circle.svg);
+  background-size: 2rem;
+  background-position: 95% 50%;
+  background-repeat: no-repeat;
+  border-bottom: 1px solid $white;
+  margin: 0 0 -1px 0;
+  color: $white;
+  fill: $white;
+  font-size: 1.6rem;
+  font-weight: bold;
+  letter-spacing: -.3px;
+  padding: 1rem 4rem 1rem 1rem;
+  text-align: left;
+  width: 100%;
+
+  &[aria-expanded='true'] {
+    background-image: url(/images/icons/minus-circle.svg);
+    border-bottom: none;
+  }
+}
 
 .glossary {
   transition: right .3s;
@@ -67,28 +88,11 @@
   width: 100%;
 }
 
-button {
-  &.glossary__term {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    -ms-appearance: none;
-    -o-appearance: none;
-    appearance: none;
-    background: 0 0;
-    border-radius: 0;
-    cursor: pointer;
-    display: inline-block;
-    line-height: 1;
-    text-decoration: none;
-    user-select: none;
-  }
-}
-
 .glossary__term {
   border-bottom: 1px solid $white;
 
   &:hover {
-    background: transparent;
+    background-color: transparent;
     border-bottom: 1px solid white;
   }
 
@@ -96,7 +100,7 @@ button {
     border-bottom: none;
   }
 
-  background: transparent;
+  background-color: transparent;
   margin: 0 0 -1px 0;
   color: $white;
   font-size: 1.6rem;
