@@ -24,10 +24,6 @@
 
 {% block main_content %}
   <div id="js-app" class="usa-grid"></div>
-  <div class="usa-grid">
-    <button class="js-glossary-toggle">Glossary</button>
-  </div>
-  {% include "glossary.njk" %}
   <script>
     window.CSRF_TOKEN = "{{ csrfToken }}";
   </script>
