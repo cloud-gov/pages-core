@@ -193,6 +193,10 @@ argparse@^1.0.7:
   dependencies:
     sprintf-js "~1.0.2"
 
+aria-accordion@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/aria-accordion/-/aria-accordion-1.0.0.tgz#2dcb25ba86c97ac20d258c3fcdc710863f9ea2a2"
+
 aria-query@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/aria-query/-/aria-query-0.3.0.tgz#cb8a9984e2862711c83c80ade5b8f5ca0de2b467"
@@ -3412,6 +3416,14 @@ globule@^1.0.0:
     lodash "~4.17.4"
     minimatch "~3.0.2"
 
+glossary-panel@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/glossary-panel/-/glossary-panel-1.0.0.tgz#b474a5309c7241c2d2daec13b44e05dc70edb1fb"
+  dependencies:
+    aria-accordion "1.0.0"
+    list.js "1.3.0"
+    underscore "^1.8.3"
+
 got@^3.2.0:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/got/-/got-3.3.1.tgz#e5d0ed4af55fc3eef4d56007769d98192bcb2eca"
@@ -4368,6 +4380,10 @@ lexical-scope@^1.2.0:
   resolved "https://registry.yarnpkg.com/lexical-scope/-/lexical-scope-1.2.0.tgz#fcea5edc704a4b3a8796cdca419c3a0afaf22df4"
   dependencies:
     astw "^2.0.0"
+
+list.js@1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/list.js/-/list.js-1.3.0.tgz#6c9f9c106a6a9e2681bf41823ee4fc1067a1645c"
 
 load-json-file@^1.0.0:
   version "1.1.0"
