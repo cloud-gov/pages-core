@@ -33,7 +33,7 @@
   position: fixed;
   top: 0;
   width: 75%;
-  z-index: 100;
+  z-index: 10000;
 
   .glossary__list {
     list-style: none;
@@ -141,11 +141,13 @@
 }
 
 .glossary__toggle {
-  //@include u-icon-bg($book, $base);
+  background-image: url(/images/icons/icon-glossary.svg);
+  background-repeat: no-repeat;
   background-position: 0% 50%;
   background-size: 1em;
-  padding-left: 2.5em;
+  padding-left: 1.5em !important;
 }
+
 
 // Term classes
 //

@@ -126,10 +126,6 @@
             </ul>
           </nav>
         </div>
-        <div class="usa-grid">
-          <button class="js-glossary-toggle">Glossary</button>
-        </div>
-        {% include "glossary.njk" %}
       </div>
       <div class="usa-footer-secondary_section">
         <div class="usa-grid">
@@ -155,6 +151,7 @@
       </div>
     </footer>
     {% if not isAuthenticated %}
+      {% include "glossary.njk" %}
       <script src="/{{ webpackAssets['glossary.js'] }}"></script>
     {% endif %}
   </body>
