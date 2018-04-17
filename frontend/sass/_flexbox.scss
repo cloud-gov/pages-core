@@ -3,10 +3,16 @@
   display: block;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
 
   .usa-width-one-third {
-    margin-right: 0px !important;
+    &:nth-child(3n) {
+      margin-right: 0px;
+    }
+
+    @media screen and (max-width: 976px) {
+      // needed because performance.gov overflows its container
+      margin-right: 10% !important;
+    }
   }
   // TODO move this out of here
   // these are specific to the image grid
