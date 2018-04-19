@@ -41,12 +41,10 @@
             Eight agencies use Federalist to host over 100 sites with over 140,000 page views per day. This page shows a sample of our partners.
           </p>
         </div>
-        <div class="usa-width-one-half">
-          <div class="flexbox-grid example-sites-list">
-            {% for example in exampleSites %}
-            {{ exampleSite.template(example) }}
-            {% endfor %}
-          </div>
+        <div class="usa-width-one-half flexbox-grid example-sites-list">
+          {% for example in exampleSites %}
+          {{ exampleSite.template(example) }}
+          {% endfor %}
         </div>
       </div>
     </section>
