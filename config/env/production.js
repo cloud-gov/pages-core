@@ -1,4 +1,3 @@
-const env = require('../../services/environment')();
 const cfenv = require('cfenv');
 
 const appEnv = cfenv.getAppEnv();
@@ -40,20 +39,7 @@ if (sqsCreds) {
     queue: sqsCreds.sqs_url,
   };
 } else {
-  const sqsKey = env.FEDERALIST_AWS_BUILD_KEY;
-  const sqsSecret = env.FEDERALIST_AWS_BUILD_SECRET;
-  const sqsQueue = env.FEDERALIST_SQS_QUEUE;
-  const sqsRegion = env.FEDERALIST_SQS_REGION;
-  if (sqsKey && sqsSecret && sqsQueue) {
-    module.exports.sqs = {
-      accessKeyId: sqsKey,
-      secretAccessKey: sqsSecret,
-      region: sqsRegion,
-      queue: sqsQueue,
-    };
-  } else {
-    throw new Error('No SQS credentials found');
-  }
+  throw new Error('No SQS credentials found');
 }
 
 // See https://github.com/nfriedly/express-rate-limit/blob/master/README.md#configuration
