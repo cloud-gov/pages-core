@@ -48,7 +48,7 @@ const getSites = (sites) => {
       {
         data
           .slice() // create a copy so that sort doesn't modify the original
-          .sort((a, b) => a.id - b.id) // sort ascending by id
+          .sort((a, b) => a.id - b.id) // sort by id ascending
           .map(site => <SiteListItem key={site.id} site={site} />)
       }
     </ul>
