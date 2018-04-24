@@ -71,7 +71,7 @@ export const SiteList = ({ sites, alert }) =>
     <div className="page-header usa-grid-full">
       <div className="usa-width-two-thirds">
         <h1>
-          Your websites
+          Your sites
         </h1>
       </div>
       <div className="usa-width-one-third header-actions">
