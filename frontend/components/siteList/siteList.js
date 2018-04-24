@@ -88,3 +88,4 @@ SiteList.propTypes = propTypes;
 SiteList.defaultProps = defaultProps;
 
 export default connect(mapStateToProps)(SiteList);
+
