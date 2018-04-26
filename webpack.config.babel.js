@@ -18,10 +18,13 @@ const manifestPlugin = new ManifestPlugin({
 const fileLoaderConfig = 'file-loader?name=/styles/webpackAssets/[hash].[ext]';
 
 export default {
-  entry: './frontend/main.jsx',
+  entry: {
+    main: './frontend/main.jsx',
+    glossary: './frontend/glossary.js',
+  },
   devtool: 'source-map',
   output: {
-    filename: 'js/bundle.[hash].js',
+    filename: 'js/bundle.[name].[hash].js',
     path: path.resolve(__dirname, 'public'),
   },
   resolve: {

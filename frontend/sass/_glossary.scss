@@ -1,0 +1,182 @@
+// Glossary
+//
+.accordion__button {
+  background-image: url(/images/icons/plus-circle.svg);
+  background-size: 2rem;
+  background-position: 95% 50%;
+  background-repeat: no-repeat;
+  border-bottom: 1px solid $white;
+  margin: 0 0 -1px 0;
+  color: $white;
+  fill: $white;
+  font-size: 1.6rem;
+  font-weight: bold;
+  letter-spacing: -.3px;
+  padding: 1rem 4rem 1rem 1rem;
+  text-align: left;
+  width: 100%;
+
+  &[aria-expanded='true'] {
+    background-image: url(/images/icons/minus-circle.svg);
+    border-bottom: none;
+  }
+}
+
+.glossary {
+  transition: right .3s;
+  background-color: $color-gray-darker;
+  bottom: 0;
+  color: $white;
+  max-width: 30em;
+  overflow-y: scroll;
+  padding: 3em 2em;
+  position: fixed;
+  top: 0;
+  width: 75%;
+  z-index: 10000;
+
+  .glossary__list {
+    list-style: none;
+  }
+  // styles copied from usa-nav-close. That class also controls
+  // javascript behavior that we don't want to trigger in this context
+  .close {
+    background-color: transparent;
+    border: 0;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    -webkit-font-smoothing: auto;
+    margin: -1.2rem -1.5rem 1.5rem auto;
+    float: right;
+    height: 4.4rem;
+    text-align: center;
+    width: 4.4rem;
+  }
+
+  &[aria-hidden='true'] {
+    display: block !important;
+    right: -100%;
+  }
+
+  &[aria-hidden='false'] {
+    transition: right .3s;
+    right: 0;
+  }
+
+  .button--close--inverse {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  h3 {
+    color: $white;
+  }
+
+  .label {
+    color: $white;
+  }
+}
+
+.glossary__content {
+  padding: 4em 0;
+}
+
+.glossary__search {
+  width: 100%;
+}
+
+.glossary__term {
+  border-bottom: 1px solid $white;
+
+  &:hover {
+    background-color: transparent;
+    border-bottom: 1px solid white;
+  }
+
+  &[aria-expanded='true'] {
+    border-bottom: none;
+  }
+
+  background-color: transparent;
+  margin: 0 0 -1px 0;
+  color: $white;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -.3px;
+  padding: 1rem 4rem 1rem 1rem;
+  text-align: left;
+  width: 100%;
+}
+
+.glossary__definition {
+  border-bottom: 1px solid white;
+  font-family: $sans-serif;
+  letter-spacing: -.3px;
+  padding: 1rem;
+
+  ol {
+    margin-left: 0;
+
+    li {
+      font-size: 1.4em;
+    }
+  }
+
+  ul {
+    list-style: none;
+    margin-left: 0;
+
+    li {
+      font-size: 1.4em;
+    }
+  }
+
+  p {
+    font-size: 1.4em;
+  }
+
+}
+
+.glossary__toggle {
+  background-image: url(/images/icons/icon-glossary.svg);
+  background-repeat: no-repeat;
+  background-position: 0% 50%;
+  background-size: 1em;
+  padding-left: 1.5em !important;
+}
+
+
+// Term classes
+//
+// Wrap glossary terms with these classes
+
+// standard class, adds the book icon
+.term {
+  //@include u-icon-bg($book, $primary);
+  transition: background-color, .2s, box-shadow, .2s, color, .2s;
+  background-size: .6em;
+  background-position: 100% 50%;
+  background-color: transparent;
+  box-shadow: 0 0 0 4px transparent;
+  border-bottom: none;
+  cursor: pointer;
+  margin-right: 2px;
+  padding-right: .9em;
+
+
+  &:focus,
+  &:hover {
+    box-shadow: 0 0 0 4px rgba($color-gray, .7);
+    background-color: rgba($color-gray, .7);
+    //color: $primary;
+  }
+}
+
+// Used when the term is in a body paragaraph of text, reduces padding and adds margin
+.term--p {
+  margin-right: .5em;
+  box-shadow: none;
+}

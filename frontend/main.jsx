@@ -13,7 +13,6 @@ import store from './store';
 import './sass/styles.scss';
 
 const history = syncHistoryWithStore(browserHistory, store);
-
 const mainEl = document.querySelector('#js-app');
 
 render((
