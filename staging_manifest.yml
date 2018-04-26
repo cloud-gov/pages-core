@@ -7,7 +7,7 @@ routes:
 - route: federalist-staging.18f.gov
 - route: federalist-staging.fr.cloud.gov
 disk_quota: 2G
-memory: 256MB
+memory: 512MB
 instances: 2
 services:
 - federalist-staging-rds
