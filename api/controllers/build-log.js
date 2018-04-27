@@ -55,7 +55,7 @@ module.exports = {
         }
         return siteAuthorizer.findOne(req.user, { id: build.site });
       })
-      .then(() => BuildLog.findAll({ where: { build: build.id } }))
+      .then(() => BuildLog.findAll({ attributes: ['id'], where: { build: build.id } })) //only return id incase log output is LARGE
       .then(buildLogs => buildLogSerializer.serialize(buildLogs, { isPlaintext }))
       .then((serializedBuildLogs) => {
         if (isPlaintext) {
