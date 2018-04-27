@@ -2,7 +2,6 @@
   "type": "object",
   "required": [
     "id",
-    "build",
     "createdAt",
     "output",
     "source",
@@ -11,12 +10,6 @@
   "properties": {
     "id": {
       "type": "integer"
-    },
-    "build": {
-      "type": "object",
-      "not": {
-        "required": ["token"]
-      }
     },
     "createdAt": {
       "type": "string"

@@ -17,7 +17,7 @@ describe('BuildLogSerializer', () => {
   describe('.serialize(serializable)', () => {
     it('should serialize an object correctly', (done) => {
       factory.buildLog()
-        .then(buildLog => BuildLogSerializer.serialize(buildLog))
+        .then(buildLog => BuildLogSerializer.serializeBuildLog(buildLog))
         .then((object) => {
           const result = validateJSONSchema(object, buildLogSchema);
           expect(result.errors).to.be.empty;
@@ -30,7 +30,7 @@ describe('BuildLogSerializer', () => {
       const buildLogs = Array(3).fill(0).map(() => factory.buildLog());
 
       Promise.all(buildLogs)
-        .then(logs => BuildLogSerializer.serialize(logs))
+        .then(logs => BuildLogSerializer.serializeBuildLogs(logs))
         .then((object) => {
           const arraySchema = {
             type: 'array',
@@ -45,7 +45,7 @@ describe('BuildLogSerializer', () => {
 
     it('should serialize an object to plaintext when specified', (done) => {
       factory.buildLog()
-        .then(buildLog => BuildLogSerializer.serialize(buildLog, { isPlaintext: true }))
+        .then(buildLog => BuildLogSerializer.serializeBuildLog(buildLog, { isPlaintext: true }))
         .then((text) => {
           plaintextLineIsOk(text);
           done();
@@ -57,7 +57,7 @@ describe('BuildLogSerializer', () => {
       const buildLogs = Array(3).fill(0).map(() => factory.buildLog());
 
       Promise.all(buildLogs)
-        .then(logs => BuildLogSerializer.serialize(logs, { isPlaintext: true }))
+        .then(logs => BuildLogSerializer.serializeBuildLogs(logs, { isPlaintext: true }))
         .then((arr) => {
           expect(arr).to.be.an('array');
           expect(arr.length).to.equal(3);

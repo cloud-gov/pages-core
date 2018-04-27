@@ -31,8 +31,8 @@ function toJSON() {
   const object = this.get({
     plain: true,
   });
-  object.createdAt = object.createdAt.toISOString();
-  object.updatedAt = object.updatedAt.toISOString();
+  object.createdAt = new Date(object.createdAt).toISOString();
+  object.updatedAt = new Date(object.updatedAt).toISOString();
   return object;
 }
 
