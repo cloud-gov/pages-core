@@ -38,6 +38,7 @@ module.exports = {
 
   find: (req, res) => {
     let build;
+    const limit = 5;
 
     const isPlaintext = req.query.format &&
       req.query.format.toLowerCase() === 'text';
@@ -55,7 +56,14 @@ module.exports = {
         }
         return siteAuthorizer.findOne(req.user, { id: build.site });
       })
-      .then(() => BuildLog.findAll({ attributes: ['id'], where: { build: build.id } })) //only return id incase log output is LARGE
+      .then(() => {
+        return Promise.resolve(Number(req.params.page) || 1)
+          .then((page) => BuildLog.findAll({
+            attributes: ['id'],
+            where: { build: build.id },
+            offset: (limit * (page - 1)), limit
+          }));  //only return id incase log output is LARGE
+      })
       .then(buildLogs => buildLogSerializer.serialize(buildLogs, { isPlaintext }))
       .then((serializedBuildLogs) => {
         if (isPlaintext) {
