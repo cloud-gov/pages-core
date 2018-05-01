@@ -17,6 +17,7 @@ const testBuild = {
   branch: testBranch,
   commitSha: '123abc',
 };
+const buildLogPage = 1;
 
 function testRouteCalled(routeName, { method = 'GET', body } = {}) {
   const expectedOptions = {
@@ -40,7 +41,7 @@ function testRouteCalled(routeName, { method = 'GET', body } = {}) {
 describe('federalistApi', () => {
   before(() => {
     fetchMock.get(`${API}/site/${testSite.id}/build`, { build: true }, { name: 'getBuilds' });
-    fetchMock.get(`${API}/build/${testBuild.id}/log`, { log: true }, { name: 'getBuildLogs' });
+    fetchMock.get(`${API}/build/${testBuild.id}/log/page/${buildLogPage}`, { log: true }, { name: 'getBuildLogs' });
     fetchMock.get(
       `${API}/site/${testSite.id}/published-branch`,
       { branches: [testBranch] }, { name: 'getPublishedBranches' });
