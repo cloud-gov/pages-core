@@ -33,8 +33,8 @@ export default {
     return this.fetch(`site/${site.id}/build`);
   },
 
-  fetchBuildLogs(build) {
-    return this.fetch(`build/${build.id}/log`);
+  fetchBuildLogs(build, page = 1) {
+    return this.fetch(`build/${build.id}/log/page/${page}`);
   },
 
   fetchPublishedBranches(site) {
