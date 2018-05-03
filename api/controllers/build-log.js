@@ -29,8 +29,7 @@ module.exports = {
         source: req.body.source,
       });
     })
-    .then(buildLog => buildLogSerializer.serialize(buildLog))
-    .then((buildLogJSON) => { res.json(buildLogJSON); })
+    .then(buildLog => res.json(buildLogSerializer.serializeBuildLog(buildLog)))
     .catch((err) => {
       res.error(err);
     });
@@ -56,7 +55,7 @@ module.exports = {
         return siteAuthorizer.findOne(req.user, { id: build.site });
       })
       .then(() => BuildLog.findAll({ where: { build: build.id } }))
-      .then(buildLogs => buildLogSerializer.serialize(buildLogs, { isPlaintext }))
+      .then(buildLogs => buildLogSerializer.serializeBuildLogs(buildLogs, { isPlaintext }))
       .then((serializedBuildLogs) => {
         if (isPlaintext) {
           // .findAll always resolves to an array, so join is available
