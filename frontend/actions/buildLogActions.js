@@ -14,19 +14,19 @@ const dispatchBuildLogsReceivedAction = (logs) => {
   dispatch(createBuildLogsReceivedAction(logs));
 };
 
-const fetchBuildLogs = (build) => {
-	dispatchBuildLogsFetchStartedAction();
-	return fetchNextBuildLogsPage(build, 1);
-}
-
-const fetchNextBuildLogsPage = (build, page) => {
-	return api.fetchBuildLogs(build, page).then(buildLogs => {
+const fetchNextBuildLogsPage = (build, page) =>
+	api.fetchBuildLogs(build, page).then(buildLogs => {
 		dispatchBuildLogsReceivedAction(buildLogs);
-		if (buildLogs.length > 0 ) {
+		if ( buildLogs.length > 0 ) {
 			return fetchNextBuildLogsPage(build, page+1);
 		}
 	});
-}
+
+const fetchBuildLogs = (build) => {
+	dispatchBuildLogsFetchStartedAction();
+	return fetchNextBuildLogsPage(build, 1);
+};
+
 export default {
-  fetchBuildLogs
+	fetchBuildLogs,
 };
