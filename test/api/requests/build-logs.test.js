@@ -183,6 +183,167 @@ describe('Build Log API', () => {
       });
     });
 
+    describe('successfully fetching build logs with pagination', () => {
+      const prepareLogData = ({ userPromise, sitePromise, buildPromise }) =>
+        Promise.props({
+          user: userPromise,
+          site: sitePromise,
+          build: buildPromise,
+        })
+        .then(({ build, user }) =>
+          Promise.all([
+            Promise.all(
+              Array(7).fill(0).map(() => factory.buildLog({ build }))
+            ),
+            authenticatedSession(user),
+          ])
+        );
+      const fetchLogData = ({logs, cookie, page }) =>
+        Promise.props({ logs, cookie, page })
+        .then(({logs, cookie, page}) => {
+          const buildId = logs[0].get({ plain: true }).build;
+
+          return request(app)
+            .get(`/v0/build/${buildId}/log/page/${page}`)
+            .set('Cookie', cookie)
+            .expect(200);
+        });
+
+      it('should render builds logs for the given build on page 0', (done) => {
+        const userPromise = factory.user();
+        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+        const buildPromise = factory.build({
+          user: userPromise,
+          site: sitePromise,
+        });
+
+        prepareLogData({
+          userPromise,
+          sitePromise,
+          buildPromise,
+        })
+        .then(([logs, cookie]) => fetchLogData({ logs, cookie, page: 0 }))
+        .then(response => {
+          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
+          expect(response.body).to.be.an('array');
+          expect(response.body).to.have.length(5);
+          done();
+        }).catch(done);
+      });
+
+      it('should render builds logs for the given build on page NaN', (done) => {
+        const userPromise = factory.user();
+        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+        const buildPromise = factory.build({
+          user: userPromise,
+          site: sitePromise,
+        });
+
+        prepareLogData({
+          userPromise,
+          sitePromise,
+          buildPromise,
+        })
+        .then(([logs, cookie]) => fetchLogData({ logs, cookie, page: 'NaN' }))
+        .then(response => {
+          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
+          expect(response.body).to.be.an('array');
+          expect(response.body).to.have.length(5);
+          done();
+        }).catch(done);
+      });
+
+      it('should render builds logs for the given build on page 0', (done) => {
+        const userPromise = factory.user();
+        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+        const buildPromise = factory.build({
+          user: userPromise,
+          site: sitePromise,
+        });
+
+        prepareLogData({
+          userPromise,
+          sitePromise,
+          buildPromise,
+        })
+        .then(([logs, cookie]) => fetchLogData({ logs, cookie, page: 0 }))
+        .then(response => {
+          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
+          expect(response.body).to.be.an('array');
+          expect(response.body).to.have.length(5);
+          done();
+        }).catch(done);
+      });
+
+      it('should render builds logs for the given build on page 1', (done) => {
+        const userPromise = factory.user();
+        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+        const buildPromise = factory.build({
+          user: userPromise,
+          site: sitePromise,
+        });
+
+        prepareLogData({
+          userPromise,
+          sitePromise,
+          buildPromise,
+        })
+        .then(([logs, cookie]) => fetchLogData({ logs, cookie, page: 1 }))
+        .then(response => {
+          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
+          expect(response.body).to.be.an('array');
+          expect(response.body).to.have.length(5);
+          done();
+        }).catch(done);
+      });
+
+      it('should render builds logs for the given build on page 2', (done) => {
+        const userPromise = factory.user();
+        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+        const buildPromise = factory.build({
+          user: userPromise,
+          site: sitePromise,
+        });
+
+        prepareLogData({
+          userPromise,
+          sitePromise,
+          buildPromise,
+        })
+        .then(([logs, cookie]) => fetchLogData({ logs, cookie, page: 2 }))
+        .then(response => {
+          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
+          expect(response.body).to.be.an('array');
+          expect(response.body).to.have.length(2);
+          done();
+        })
+        .catch(done);
+      });
+
+      it('should render builds logs for the given build on empty page 3', (done) => {
+        const userPromise = factory.user();
+        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+        const buildPromise = factory.build({
+          user: userPromise,
+          site: sitePromise,
+        });
+
+        prepareLogData({
+          userPromise,
+          sitePromise,
+          buildPromise,
+        })
+        .then(([logs, cookie]) => fetchLogData({ logs, cookie, page: 3 }))
+        .then(response => {
+          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
+          expect(response.body).to.be.an('array');
+          expect(response.body).to.have.length(0);
+          done();
+        })
+        .catch(done);
+      });
+    });
+
     it('should return plaintext logs when ?format=text', (done) => {
       let build;
 
