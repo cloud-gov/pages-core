@@ -56,14 +56,15 @@ module.exports = {
         }
         return siteAuthorizer.findOne(req.user, { id: build.site });
       })
-      .then(() => {
-        return Promise.resolve(Number(req.params.page) || 1)
-          .then((page) => BuildLog.findAll({
-            attributes: ['id'],
-            where: { build: build.id },
-            offset: (limit * (page - 1)), limit
-          }));  //only return id incase log output is LARGE
-      })
+      .then(() =>
+        Promise.resolve(Number(req.params.page) || 1)
+        .then(page => BuildLog.findAll({
+          attributes: ['id'],
+          where: { build: build.id },
+          offset: (limit * (page - 1)),
+          limit,
+        }))
+      )
       .then(buildLogs => buildLogSerializer.serialize(buildLogs, { isPlaintext }))
       .then((serializedBuildLogs) => {
         if (isPlaintext) {

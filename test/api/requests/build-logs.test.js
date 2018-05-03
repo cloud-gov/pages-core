@@ -198,8 +198,8 @@ describe('Build Log API', () => {
             authenticatedSession(user),
           ])
         );
-      const fetchLogData = ({logs, cookie, page }) =>
-        Promise.props({ logs, cookie, page })
+      const fetchLogData = ({ logs, cookie, page }) =>
+        Promise.props({ logs, cookie, page, })
         .then(({logs, cookie, page}) => {
           const buildId = logs[0].get({ plain: true }).build;
 
