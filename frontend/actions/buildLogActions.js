@@ -25,7 +25,7 @@ const fetchNextBuildLogsPage = (build, page) => {
 		if (buildLogs.length > 0 ) {
 			return fetchNextBuildLogsPage(build, page+1);
 		}
-    })
+	});
 }
 export default {
   fetchBuildLogs

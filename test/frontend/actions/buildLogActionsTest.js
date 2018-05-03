@@ -38,7 +38,7 @@ describe("buildActions", () => {
     const fetchStartedAction = { action: "fetchStarted" }
     const receivedAction = { action: "received" };
     fetchBuildLogs.withArgs().onCall(0).returns(buildLogsPromise);
-    fetchBuildLogs.withArgs().onCall(1).returns(Promis.resolve([]));
+    fetchBuildLogs.withArgs().onCall(1).returns(Promise.resolve([]));
     buildLogsFetchStartedActionCreator.withArgs().returns(fetchStartedAction)
     buildLogsReceivedActionCreator.withArgs(logs).returns(receivedAction);
 
