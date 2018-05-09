@@ -19,7 +19,7 @@ describe('Build Log API', () => {
         return request(app)
           .post(`/v0/build/${build.id}/log/${build.token}`)
           .type('json')
-          .send({ source: 'build.sh', output: encode64('This is the output for build.sh'), })
+          .send({ source: 'build.sh', output: encode64('This is the output for build.sh') })
           .expect(200);
       }).then((response) => {
         validateAgainstJSONSchema('POST', '/build/{build_id}/log/{token}', 200, response.body);
@@ -41,7 +41,7 @@ describe('Build Log API', () => {
       factory.build().then(build => request(app)
           .post(`/v0/build/${build.id}/log/${build.token}`)
           .type('json')
-          .send({ src: 'build.sh', otpt: encode64('This is the output for build.sh'), })
+          .send({ src: 'build.sh', otpt: encode64('This is the output for build.sh') })
           .expect(400)).then((response) => {
             validateAgainstJSONSchema('POST', '/build/{build_id}/log/{token}', 400, response.body);
             done();
@@ -57,7 +57,7 @@ describe('Build Log API', () => {
         return request(app)
           .post(`/v0/build/${build.id}/log/invalid-token`)
           .type('json')
-          .send({ source: 'build.sh', output: encode64('This is the output for build.sh'), })
+          .send({ source: 'build.sh', output: encode64('This is the output for build.sh') })
           .expect(403);
       }).then((response) => {
         validateAgainstJSONSchema('POST', '/build/{build_id}/log/{token}', 403, response.body);
@@ -74,7 +74,7 @@ describe('Build Log API', () => {
       const buildLogRequest = request(app)
         .post('/v0/build/fake-id/log/fake-build-token')
         .type('json')
-        .send({ source: 'build.sh', output: encode64('This is the output for build.sh'), })
+        .send({ source: 'build.sh', output: encode64('This is the output for build.sh') })
         .expect(404);
 
       buildLogRequest.then((response) => {
@@ -87,7 +87,7 @@ describe('Build Log API', () => {
       factory.build().then(build => request(app)
         .post(`/v0/build/-100/log/${build.token}`)
         .type('json')
-        .send({ src: 'build.sh', otpt: encode64('This is the output for build.sh'), })
+        .send({ src: 'build.sh', otpt: encode64('This is the output for build.sh') })
         .expect(404)).then((response) => {
           validateAgainstJSONSchema('POST', '/build/{build_id}/log/{token}', 400, response.body);
           done();
@@ -106,12 +106,12 @@ describe('Build Log API', () => {
     });
 
     describe('successfully fetching build logs', () => {
-      const prepareAndFetchLogData = () => {//{ userPromise, sitePromise, buildPromise }) =>
+      const prepareAndFetchLogData = () => {
         const userPromise = factory.user();
         const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        const buildPromise = factory.build({ user: userPromise, site: sitePromise, });
+        const buildPromise = factory.build({ user: userPromise, site: sitePromise });
 
-        return Promise.props({ user: userPromise, site: sitePromise, build: buildPromise, })
+        return Promise.props({ user: userPromise, site: sitePromise, build: buildPromise })
         .then(({ build, user }) =>
           Promise.all([
             Promise.all(Array(3).fill(0).map(() => factory.buildLog({ build }))),
@@ -125,7 +125,7 @@ describe('Build Log API', () => {
             .set('Cookie', cookie)
             .expect(200);
         });
-      }
+      };
 
       const expectedResponse = (response, done) => {
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
@@ -135,20 +135,12 @@ describe('Build Log API', () => {
       };
 
       it('should render builds logs for the given build', (done) => {
-        const userPromise = factory.user();
-        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        const buildPromise = factory.build({ user: userPromise, site: sitePromise, });
-
         prepareAndFetchLogData()
         .then(response => expectedResponse(response, done))
         .catch(done);
       });
 
       it('should render logs if user is not associated to the build', (done) => {
-        const userPromise = factory.user();
-        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        const buildPromise = factory.build({ site: sitePromise });
-
         prepareAndFetchLogData()
         .then(response => expectedResponse(response, done))
         .catch(done);
