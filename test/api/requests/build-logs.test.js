@@ -149,24 +149,25 @@ describe('Build Log API', () => {
 
     describe('successfully fetching build logs with pagination', () => {
       const fetchLogData = ({ logLen, page }) => {
-        const user = factory.user();
-        const site = factory.site({ users: Promise.all([user]) });
-        const build = factory.build({ user, site });
+        const userPromise = factory.user();
+        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+        const buildPromise = factory.build({ user: userPromise, site: sitePromise });
 
-        return Promise.props({ user, build, logLen, page })
-          .then(({ user, build, logLen, page }) => 
+        return Promise.props({ user: userPromise, build: buildPromise })
+          .then(({ user, build }) =>
             Promise.props({
-              logs: Promise.all(Array(logLen).fill(0).map(() => factory.buildLog({build}))),
-              cookie: authenticatedSession(user), page
+              logs: Promise.all(Array(logLen).fill(0).map(() => factory.buildLog({ build }))),
+              cookie: authenticatedSession(user),
+              page
             })
-          ).then(({logs, cookie, page}) => {
+          ).then(({ logs, cookie }) => {
             const buildId = logs[0].get({ plain: true }).build;
-            return response = request(app)
+            return request(app)
               .get(`/v0/build/${buildId}/log/page/${page}`)
               .set('Cookie', cookie)
               .expect(200);
           });
-      }
+      };
 
       const expectedResponse = (logsOnPage, response, done) => {
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
