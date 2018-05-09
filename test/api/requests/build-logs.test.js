@@ -19,10 +19,7 @@ describe('Build Log API', () => {
         return request(app)
           .post(`/v0/build/${build.id}/log/${build.token}`)
           .type('json')
-          .send({
-            source: 'build.sh',
-            output: encode64('This is the output for build.sh'),
-          })
+          .send({ source: 'build.sh', output: encode64('This is the output for build.sh'), })
           .expect(200);
       }).then((response) => {
         validateAgainstJSONSchema('POST', '/build/{build_id}/log/{token}', 200, response.body);
@@ -44,10 +41,7 @@ describe('Build Log API', () => {
       factory.build().then(build => request(app)
           .post(`/v0/build/${build.id}/log/${build.token}`)
           .type('json')
-          .send({
-            src: 'build.sh',
-            otpt: encode64('This is the output for build.sh'),
-          })
+          .send({ src: 'build.sh', otpt: encode64('This is the output for build.sh'), })
           .expect(400)).then((response) => {
             validateAgainstJSONSchema('POST', '/build/{build_id}/log/{token}', 400, response.body);
             done();
@@ -63,10 +57,7 @@ describe('Build Log API', () => {
         return request(app)
           .post(`/v0/build/${build.id}/log/invalid-token`)
           .type('json')
-          .send({
-            source: 'build.sh',
-            output: encode64('This is the output for build.sh'),
-          })
+          .send({ source: 'build.sh', output: encode64('This is the output for build.sh'), })
           .expect(403);
       }).then((response) => {
         validateAgainstJSONSchema('POST', '/build/{build_id}/log/{token}', 403, response.body);
@@ -83,10 +74,7 @@ describe('Build Log API', () => {
       const buildLogRequest = request(app)
         .post('/v0/build/fake-id/log/fake-build-token')
         .type('json')
-        .send({
-          source: 'build.sh',
-          output: encode64('This is the output for build.sh'),
-        })
+        .send({ source: 'build.sh', output: encode64('This is the output for build.sh'), })
         .expect(404);
 
       buildLogRequest.then((response) => {
@@ -97,16 +85,13 @@ describe('Build Log API', () => {
 
     it('should respond with a 404 if build id is a number and not found', (done) => {
       factory.build().then(build => request(app)
-          .post(`/v0/build/-100/log/${build.token}`)
-          .type('json')
-          .send({
-            src: 'build.sh',
-            otpt: encode64('This is the output for build.sh'),
-          })
-          .expect(404)).then((response) => {
-            validateAgainstJSONSchema('POST', '/build/{build_id}/log/{token}', 400, response.body);
-            done();
-          }).catch(done);
+        .post(`/v0/build/-100/log/${build.token}`)
+        .type('json')
+        .send({ src: 'build.sh', otpt: encode64('This is the output for build.sh'), })
+        .expect(404)).then((response) => {
+          validateAgainstJSONSchema('POST', '/build/{build_id}/log/{token}', 400, response.body);
+          done();
+        }).catch(done);
     });
   });
 
@@ -121,21 +106,18 @@ describe('Build Log API', () => {
     });
 
     describe('successfully fetching build logs', () => {
-      const prepareAndFetchLogData = ({ userPromise, sitePromise, buildPromise }) =>
-        Promise.props({
-          user: userPromise,
-          site: sitePromise,
-          build: buildPromise,
-        })
+      const prepareAndFetchLogData = () => {//{ userPromise, sitePromise, buildPromise }) =>
+        const userPromise = factory.user();
+        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+        const buildPromise = factory.build({ user: userPromise, site: sitePromise, });
+
+        return Promise.props({ user: userPromise, site: sitePromise, build: buildPromise, })
         .then(({ build, user }) =>
           Promise.all([
-            Promise.all(
-              Array(3).fill(0).map(() => factory.buildLog({ build }))
-            ),
+            Promise.all(Array(3).fill(0).map(() => factory.buildLog({ build }))),
             authenticatedSession(user),
           ])
-        )
-        .then(([logs, cookie]) => {
+        ).then(([logs, cookie]) => {
           const buildId = logs[0].get({ plain: true }).build;
 
           return request(app)
@@ -143,6 +125,7 @@ describe('Build Log API', () => {
             .set('Cookie', cookie)
             .expect(200);
         });
+      }
 
       const expectedResponse = (response, done) => {
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
@@ -154,16 +137,9 @@ describe('Build Log API', () => {
       it('should render builds logs for the given build', (done) => {
         const userPromise = factory.user();
         const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        const buildPromise = factory.build({
-          user: userPromise,
-          site: sitePromise,
-        });
+        const buildPromise = factory.build({ user: userPromise, site: sitePromise, });
 
-        prepareAndFetchLogData({
-          userPromise,
-          sitePromise,
-          buildPromise,
-        })
+        prepareAndFetchLogData()
         .then(response => expectedResponse(response, done))
         .catch(done);
       });
@@ -173,173 +149,67 @@ describe('Build Log API', () => {
         const sitePromise = factory.site({ users: Promise.all([userPromise]) });
         const buildPromise = factory.build({ site: sitePromise });
 
-        prepareAndFetchLogData({
-          userPromise,
-          sitePromise,
-          buildPromise,
-        })
+        prepareAndFetchLogData()
         .then(response => expectedResponse(response, done))
         .catch(done);
       });
     });
 
     describe('successfully fetching build logs with pagination', () => {
-      const prepareLogData = ({ userPromise, sitePromise, buildPromise }) =>
-        Promise.props({
-          user: userPromise,
-          site: sitePromise,
-          build: buildPromise,
-        })
-        .then(({ build, user }) =>
-          Promise.all([
-            Promise.all(
-              Array(7).fill(0).map(() => factory.buildLog({ build }))
-            ),
-            authenticatedSession(user),
-          ])
-        );
-      const fetchLogData = ({ logs, cookie, page }) =>
-        Promise.props({ logs, cookie, page, })
-        .then(({logs, cookie, page}) => {
-          const buildId = logs[0].get({ plain: true }).build;
+      const fetchLogData = ({ logLen, page }) => {
+        const user = factory.user();
+        const site = factory.site({ users: Promise.all([user]) });
+        const build = factory.build({ user, site });
 
-          return request(app)
-            .get(`/v0/build/${buildId}/log/page/${page}`)
-            .set('Cookie', cookie)
-            .expect(200);
-        });
+        return Promise.props({ user, build, logLen, page })
+          .then(({ user, build, logLen, page }) => 
+            Promise.props({
+              logs: Promise.all(Array(logLen).fill(0).map(() => factory.buildLog({build}))),
+              cookie: authenticatedSession(user), page
+            })
+          ).then(({logs, cookie, page}) => {
+            const buildId = logs[0].get({ plain: true }).build;
+            return response = request(app)
+              .get(`/v0/build/${buildId}/log/page/${page}`)
+              .set('Cookie', cookie)
+              .expect(200);
+          });
+      }
+
+      const expectedResponse = (logsOnPage, response, done) => {
+        validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
+        expect(response.body).to.be.an('array');
+        expect(response.body).to.have.length(logsOnPage);
+        done();
+      };
 
       it('should render builds logs for the given build on page 0', (done) => {
-        const userPromise = factory.user();
-        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        const buildPromise = factory.build({
-          user: userPromise,
-          site: sitePromise,
-        });
-
-        prepareLogData({
-          userPromise,
-          sitePromise,
-          buildPromise,
-        })
-        .then(([logs, cookie]) => fetchLogData({ logs, cookie, page: 0 }))
-        .then(response => {
-          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
-          expect(response.body).to.be.an('array');
-          expect(response.body).to.have.length(5);
-          done();
-        }).catch(done);
+        fetchLogData({ logLen: 4, page: 0 })
+        .then(response => expectedResponse(4, response, done))
+        .catch(done);
       });
 
       it('should render builds logs for the given build on page NaN', (done) => {
-        const userPromise = factory.user();
-        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        const buildPromise = factory.build({
-          user: userPromise,
-          site: sitePromise,
-        });
-
-        prepareLogData({
-          userPromise,
-          sitePromise,
-          buildPromise,
-        })
-        .then(([logs, cookie]) => fetchLogData({ logs, cookie, page: 'NaN' }))
-        .then(response => {
-          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
-          expect(response.body).to.be.an('array');
-          expect(response.body).to.have.length(5);
-          done();
-        }).catch(done);
-      });
-
-      it('should render builds logs for the given build on page 0', (done) => {
-        const userPromise = factory.user();
-        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        const buildPromise = factory.build({
-          user: userPromise,
-          site: sitePromise,
-        });
-
-        prepareLogData({
-          userPromise,
-          sitePromise,
-          buildPromise,
-        })
-        .then(([logs, cookie]) => fetchLogData({ logs, cookie, page: 0 }))
-        .then(response => {
-          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
-          expect(response.body).to.be.an('array');
-          expect(response.body).to.have.length(5);
-          done();
-        }).catch(done);
-      });
+        fetchLogData({ logLen: 4, page: NaN })
+        .then(response => expectedResponse(4, response, done))
+        .catch(done);
+      });      
 
       it('should render builds logs for the given build on page 1', (done) => {
-        const userPromise = factory.user();
-        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        const buildPromise = factory.build({
-          user: userPromise,
-          site: sitePromise,
-        });
-
-        prepareLogData({
-          userPromise,
-          sitePromise,
-          buildPromise,
-        })
-        .then(([logs, cookie]) => fetchLogData({ logs, cookie, page: 1 }))
-        .then(response => {
-          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
-          expect(response.body).to.be.an('array');
-          expect(response.body).to.have.length(5);
-          done();
-        }).catch(done);
+        fetchLogData({ logLen: 6, page: 1 })
+        .then(response => expectedResponse(5, response, done))
+        .catch(done);
       });
 
       it('should render builds logs for the given build on page 2', (done) => {
-        const userPromise = factory.user();
-        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        const buildPromise = factory.build({
-          user: userPromise,
-          site: sitePromise,
-        });
-
-        prepareLogData({
-          userPromise,
-          sitePromise,
-          buildPromise,
-        })
-        .then(([logs, cookie]) => fetchLogData({ logs, cookie, page: 2 }))
-        .then(response => {
-          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
-          expect(response.body).to.be.an('array');
-          expect(response.body).to.have.length(2);
-          done();
-        })
+        fetchLogData({ logLen: 8, page: 2 })
+        .then(response => expectedResponse(3, response, done))
         .catch(done);
       });
 
       it('should render builds logs for the given build on empty page 3', (done) => {
-        const userPromise = factory.user();
-        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        const buildPromise = factory.build({
-          user: userPromise,
-          site: sitePromise,
-        });
-
-        prepareLogData({
-          userPromise,
-          sitePromise,
-          buildPromise,
-        })
-        .then(([logs, cookie]) => fetchLogData({ logs, cookie, page: 3 }))
-        .then(response => {
-          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
-          expect(response.body).to.be.an('array');
-          expect(response.body).to.have.length(0);
-          done();
-        })
+        fetchLogData({ logLen: 10, page: 3 })
+        .then(response => expectedResponse(0, response, done))
         .catch(done);
       });
     });
@@ -394,22 +264,22 @@ describe('Build Log API', () => {
 
     it('should response with a 404 if the given build does not exist', (done) => {
       authenticatedSession().then(cookie => request(app)
-          .get('/v0/build/fake-id/log')
-          .set('Cookie', cookie)
-          .expect(404)).then((response) => {
-            validateAgainstJSONSchema('GET', '/build/{build_id}/log', 404, response.body);
-            done();
-          }).catch(done);
+        .get('/v0/build/fake-id/log')
+        .set('Cookie', cookie)
+        .expect(404)).then((response) => {
+          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 404, response.body);
+          done();
+        }).catch(done);
     });
 
     it('should response with a 404 if the given build does not exist', (done) => {
       authenticatedSession().then(cookie => request(app)
-          .get('/v0/build/-100/log')
-          .set('Cookie', cookie)
-          .expect(404)).then((response) => {
-            validateAgainstJSONSchema('GET', '/build/{build_id}/log', 404, response.body);
-            done();
-          }).catch(done);
+        .get('/v0/build/-100/log')
+        .set('Cookie', cookie)
+        .expect(404)).then((response) => {
+          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 404, response.body);
+          done();
+        }).catch(done);
     });
   });
 });
