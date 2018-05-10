@@ -186,7 +186,7 @@ describe('Build Log API', () => {
         fetchLogData({ logLen: 4, page: NaN })
         .then(response => expectedResponse(4, response, done))
         .catch(done);
-      });      
+      });
 
       it('should render builds logs for the given build on page 1', (done) => {
         fetchLogData({ logLen: 6, page: 1 })
