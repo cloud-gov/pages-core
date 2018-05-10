@@ -16,18 +16,18 @@ const dispatchBuildLogsReceivedAction = (logs) => {
 
 const fetchNextBuildLogsPage = (build, page) =>
 	api.fetchBuildLogs(build, page)
-		.then((buildLogs) => {
-			dispatchBuildLogsReceivedAction(buildLogs);
-			if(buildLogs.length > 0) {
-				fetchNextBuildLogsPage(build, page + 1);
-			}
-			return Promise.resolve;
-		});
+	.then((buildLogs) => {
+		dispatchBuildLogsReceivedAction(buildLogs);
+		if (buildLogs.length > 0) {
+			fetchNextBuildLogsPage(build, page + 1);
+		}
+		return Promise.resolve;
+	});
 
 const fetchBuildLogs = (build) => {
 	dispatchBuildLogsFetchStartedAction();
 	return fetchNextBuildLogsPage(build, 1);
-};
+}
 
 export default {
 	fetchBuildLogs,
