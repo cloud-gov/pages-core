@@ -2,8 +2,8 @@ import api from '../util/federalistApi';
 import { dispatch } from '../store';
 
 import {
-	buildLogsFetchStarted as createBuildLogsFetchStartedAction,
- 	buildLogsReceived as createBuildLogsReceivedAction,
+  buildLogsFetchStarted as createBuildLogsFetchStartedAction,
+  buildLogsReceived as createBuildLogsReceivedAction,
 } from './actionCreators/buildLogActions';
 
 const dispatchBuildLogsFetchStartedAction = () => {
@@ -27,7 +27,7 @@ const fetchNextBuildLogsPage = (build, page) =>
 const fetchBuildLogs = (build) => {
   dispatchBuildLogsFetchStartedAction();
   return fetchNextBuildLogsPage(build, 1);
-}
+};
 
 export default {
   fetchBuildLogs,
