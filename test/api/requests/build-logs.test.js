@@ -158,7 +158,7 @@ describe('Build Log API', () => {
             Promise.props({
               logs: Promise.all(Array(logLen).fill(0).map(() => factory.buildLog({ build }))),
               cookie: authenticatedSession(user),
-              page
+              page,
             })
           ).then(({ logs, cookie }) => {
             const buildId = logs[0].get({ plain: true }).build;
