@@ -48,7 +48,7 @@ const getSites = (sites) => {
       {
         data
           .slice() // create a copy so that sort doesn't modify the original
-          .sort((a, b) => a.id - b.id) // sort ascending by id
+          .sort((a, b) => a.id - b.id) // sort by id ascending
           .map(site => <SiteListItem key={site.id} site={site} />)
       }
     </ul>
@@ -71,7 +71,7 @@ export const SiteList = ({ sites, alert }) =>
     <div className="page-header usa-grid-full">
       <div className="usa-width-two-thirds">
         <h1>
-          Your websites
+          Your sites
         </h1>
       </div>
       <div className="usa-width-one-third header-actions">
@@ -88,3 +88,4 @@ SiteList.propTypes = propTypes;
 SiteList.defaultProps = defaultProps;
 
 export default connect(mapStateToProps)(SiteList);
+
