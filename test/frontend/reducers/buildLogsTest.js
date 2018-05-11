@@ -25,7 +25,7 @@ describe("buildLogsReducer", () => {
       logs: LOGS
     });
 
-    expect(actual).to.deep.equal({ isLoading: false });
+    expect(actual).to.deep.equal({ isLoading: false, data: [] });
   });
 
   it("marks the state loading when a fetch is started", () => {
@@ -33,13 +33,13 @@ describe("buildLogsReducer", () => {
       type: BUILD_LOGS_FETCH_STARTED
     })
 
-    expect(actual).to.deep.equal({ isLoading: true })
+    expect(actual).to.deep.equal({ isLoading: true, data: [] })
   })
 
   it("records the build logs received in the action", () => {
     const LOGS = ["Log 1", "Log 2"]
 
-    const actual = fixture({ isLoading: true }, {
+    const actual = fixture({ isLoading: true, data: [] }, {
       type: BUILD_LOGS_RECEIVED,
       logs: LOGS
     });
@@ -50,7 +50,7 @@ describe("buildLogsReducer", () => {
   it("sets the builds logs to the ones in the action when the fetch completes", () => {
     const LOGS = ["Log 1", "Log 2"]
 
-    const actual = fixture({ isLoading: true }, {
+    const actual = fixture({ isLoading: true, data: [] }, {
       type: BUILD_LOGS_RECEIVED,
       logs: LOGS
     });

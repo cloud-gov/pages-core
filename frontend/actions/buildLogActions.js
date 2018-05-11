@@ -14,10 +14,21 @@ const dispatchBuildLogsReceivedAction = (logs) => {
   dispatch(createBuildLogsReceivedAction(logs));
 };
 
+const fetchNextBuildLogsPage = (build, page) =>
+  api.fetchBuildLogs(build, page)
+  .then((buildLogs) => {
+    dispatchBuildLogsReceivedAction(buildLogs);
+    if (buildLogs.length > 0) {
+      return fetchNextBuildLogsPage(build, page + 1);
+    }
+    return Promise.resolve();
+  });
+
+const fetchBuildLogs = (build) => {
+  dispatchBuildLogsFetchStartedAction();
+  return fetchNextBuildLogsPage(build, 1);
+};
+
 export default {
-  fetchBuildLogs(build) {
-    dispatchBuildLogsFetchStartedAction();
-    return api.fetchBuildLogs(build)
-      .then(dispatchBuildLogsReceivedAction);
-  },
+  fetchBuildLogs,
 };
