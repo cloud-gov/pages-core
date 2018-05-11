@@ -19,9 +19,9 @@ const fetchNextBuildLogsPage = (build, page) =>
   .then((buildLogs) => {
     dispatchBuildLogsReceivedAction(buildLogs);
     if (buildLogs.length > 0) {
-      fetchNextBuildLogsPage(build, page + 1);
+      return fetchNextBuildLogsPage(build, page + 1);
     }
-    return Promise.resolve;
+    return Promise.resolve();
   });
 
 const fetchBuildLogs = (build) => {
