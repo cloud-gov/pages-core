@@ -8,8 +8,6 @@ import SiteBuildLogTable from './siteBuildLogTable';
 import RefreshBuildLogsButton from './refreshBuildLogsButton';
 import DownloadBuildLogsButton from './downloadBuildLogsButton';
 
-import { API } from '../../util/federalistApi';
-
 const propTypes = {
   params: PropTypes.shape({
     buildId: PropTypes.string.isRequired,

@@ -5,9 +5,7 @@ import { shallow } from 'enzyme';
 import { SiteBuildLogs } from '../../../../frontend/components/site/siteBuildLogs';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
-
 describe('<SiteBuildLogs/>', () => {
-
   it('should render a button to refresh logs', () => {
     const props = {
       params: {
