@@ -5,6 +5,7 @@ import {
 
 const initialState = {
   isLoading: false,
+  data: [],
 };
 
 export default function buildLogs(state = initialState, action) {
@@ -12,11 +13,12 @@ export default function buildLogs(state = initialState, action) {
     case BUILD_LOGS_FETCH_STARTED:
       return {
         isLoading: true,
+        data: [],
       };
     case BUILD_LOGS_RECEIVED:
       return {
         isLoading: false,
-        data: action.logs,
+        data: state.data.concat(action.logs),
       };
     default:
       return state;
