@@ -43,6 +43,7 @@ class SiteBuildLogs extends React.Component {
       return (
         <div>
           <p>This build does not have any build logs.</p>
+          <DownloadBuildLogsButton buildId={buildId} buildLogsData={[]} />
           <RefreshBuildLogsButton buildId={buildId} />
         </div>
       );
