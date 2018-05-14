@@ -1,7 +1,6 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import { spy } from 'sinon';
 import DownloadBuildLogsButton from '../../../../frontend/components/site/downloadBuildLogsButton';
 
 describe('<DownloadBuildLogsButton />', () => {
