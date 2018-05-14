@@ -48,14 +48,11 @@ class SiteBuildLogs extends React.Component {
       );
     }
 
-    const downloadUrl = `${API}/build/${buildId}/log?format=text`;
-    const downloadName = `build-log-${buildId}.txt`;
-
     return (
       <div>
         <div className="log-tools">
           <ul className="usa-unstyled-list">
-            <li><DownloadBuildLogsButton buildId={buildId} buildLogsData={buildLogs.data || []} /></li>
+            <li><DownloadBuildLogsButton buildId={buildId} buildLogsData={buildLogs.data} /></li>
             <li><RefreshBuildLogsButton buildId={buildId} /></li>
           </ul>
         </div>

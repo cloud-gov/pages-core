@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
-import fileDownload  from 'js-file-download';
+import fileDownload from 'js-file-download';
 
 class DownloadBuildLogsButton extends React.Component {
   constructor(props) {
@@ -10,14 +10,14 @@ class DownloadBuildLogsButton extends React.Component {
   }
 
   downloadBuildLogs() {
-    let buildLogsData = this.props.buildLogsData;
-    buildLogsData = buildLogsData.map( data => [`Source: ${data.source}`,`Timestamp: ${(new Date(data.createdAt)).toISOString()}`,`Output:\n${data.output}`].join('\n') );
+    let buildLogsData = this.props.buildLogsData || [];
+    buildLogsData = buildLogsData.map(data => [`Source: ${data.source}`, `Timestamp: ${(new Date(data.createdAt)).toISOString()}`, `Output:\n${data.output}`].join('\n'));
     fileDownload(buildLogsData.join('\n\n'), `build-log-${this.props.buildId}.txt`);
   }
 
   render() {
     return (
-      <a href="#" onClick={this.downloadBuildLogs}>Download logs</a>
+      <button className="usa-button" onClick={this.downloadBuildLogs}>Download logs</button>
     );
   }
 }
