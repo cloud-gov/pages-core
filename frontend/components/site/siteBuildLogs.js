@@ -34,7 +34,7 @@ class SiteBuildLogs extends React.Component {
       return <LoadingIndicator />;
     }
 
-    if (!buildLogs || !buildLogs.data || !buildLogs.data.length || buildLogs.data.length == 0) {
+    if (!buildLogs || !buildLogs.data || !buildLogs.data.length || buildLogs.data.length === 0) {
       return (
         <div>
           <p>This build does not have any build logs.</p>
