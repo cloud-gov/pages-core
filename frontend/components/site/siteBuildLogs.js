@@ -18,8 +18,8 @@ const propTypes = {
   }),
 };
 
-const defaultProps = { buildLogs: null, };
-const mapStateToProps = ({ buildLogs }) => ({ buildLogs, });
+const defaultProps = { buildLogs: null };
+const mapStateToProps = ({ buildLogs }) => ({ buildLogs });
 
 class SiteBuildLogs extends React.Component {
   componentDidMount() {
