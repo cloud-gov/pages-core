@@ -6,6 +6,7 @@ import buildLogActions from '../../actions/buildLogActions';
 import LoadingIndicator from '../LoadingIndicator';
 import SiteBuildLogTable from './siteBuildLogTable';
 import RefreshBuildLogsButton from './refreshBuildLogsButton';
+import DownloadBuildLogsButton from './downloadBuildLogsButton';
 
 import { API } from '../../util/federalistApi';
 
@@ -54,7 +55,7 @@ class SiteBuildLogs extends React.Component {
       <div>
         <div className="log-tools">
           <ul className="usa-unstyled-list">
-            <li><a href={downloadUrl} download={downloadName}>Download logs</a></li>
+            <li><DownloadBuildLogsButton buildId={buildId} buildLogsData={buildLogs.data || []} /></li>
             <li><RefreshBuildLogsButton buildId={buildId} /></li>
           </ul>
         </div>
