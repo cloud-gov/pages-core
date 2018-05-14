@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import fileDownload from 'js-file-download';
+import { BUILD_LOG } from '../../propTypes';
 
 class DownloadBuildLogsButton extends React.Component {
   constructor(props) {
@@ -23,7 +24,7 @@ class DownloadBuildLogsButton extends React.Component {
 }
 
 DownloadBuildLogsButton.propTypes = {
-  buildLogsData: PropTypes.array.isRequired,
+  buildLogsData: PropTypes.arrayOf(BUILD_LOG).isRequired,
   buildId: PropTypes.number.isRequired,
 };
 
