@@ -13,7 +13,7 @@ describe('<SiteBuildLogs/>', () => {
       },
       buildLogs: {
         isLoading: false,
-        data: [{ source: 'theSource', createdAt: '2018-01-01', output: 'blahblah' }],
+        data: [{ source: 'theSource', createdAt: '2018-02-01', output: 'blahblah' }],
       },
     };
 
