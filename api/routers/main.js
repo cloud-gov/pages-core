@@ -5,7 +5,7 @@ const csrfProtection = require('../policies/csrfProtection');
 
 router.get('/', MainController.home);
 router.get('/case-studies/', MainController.examples);
-router.get('/content/examples', MainController.examples);
+router.get('/content/examples', (req, res) => res.redirect('/case-studies'));
 
 // add csrf middleware to app route so that we can use request.csrfToken()
 router.get('/sites(/*)?', csrfProtection, MainController.app);
