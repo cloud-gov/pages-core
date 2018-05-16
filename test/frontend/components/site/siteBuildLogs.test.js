@@ -5,43 +5,24 @@ import { shallow } from 'enzyme';
 import { SiteBuildLogs } from '../../../../frontend/components/site/siteBuildLogs';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
-
 describe('<SiteBuildLogs/>', () => {
-  it('should render a download link and <SiteBuildLogTable>', () => {
+  it('should render a button to download logs if builds exist', () => {
     const props = {
       params: {
         buildId: '123',
       },
       buildLogs: {
         isLoading: false,
-        data: [
-          { id: 1, output: 'output 1', source: 'source 1', createdAt: '2017-02-11' },
-          { id: 1, output: 'output 2', source: 'source 2', createdAt: '2017-11-16' },
-        ],
+        data: [{ source: 'theSource', createdAt: '2018-02-01', output: 'blahblah' }],
       },
     };
 
     const wrapper = shallow(<SiteBuildLogs {...props} />);
     expect(wrapper.find('SiteBuildLogTable')).to.have.length(1);
-    const downloadLink = wrapper.find('a[download]');
-    expect(downloadLink).to.have.length(1);
-    expect(downloadLink.prop('href')).to.equal('/v0/build/123/log?format=text');
-    expect(downloadLink.prop('download')).to.equal('build-log-123.txt');
-  });
-
-  it('should render a button to refresh logs', () => {
-    const props = {
-      params: {
-        buildId: '123',
-      },
-      buildLogs: {
-        isLoading: false,
-        data: [],
-      },
-    };
-
-    const wrapper = shallow(<SiteBuildLogs {...props} />);
+    expect(wrapper.find('p')).to.have.length(0);
+    expect(wrapper.find('p').contains('This build does not have any build logs.')).to.be.false;
     expect(wrapper.find('RefreshBuildLogsButton')).to.have.length(1);
+    expect(wrapper.find('DownloadBuildLogsButton')).to.have.length(1);
   });
 
   it('should render a loading state if builds are loading', () => {
@@ -76,5 +57,6 @@ describe('<SiteBuildLogs/>', () => {
     expect(wrapper.find('p')).to.have.length(1);
     expect(wrapper.find('p').contains('This build does not have any build logs.')).to.be.true;
     expect(wrapper.find('RefreshBuildLogsButton')).to.have.length(1);
+    expect(wrapper.find('DownloadBuildLogsButton')).to.have.length(0);
   });
 });

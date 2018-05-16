@@ -1,10 +1,14 @@
-#### Description of feature or bug
+ #### User Story
 
 <TODO>
 
-#### Definition of done
+#### Background (Optional)
 
 <TODO>
+
+#### Acceptance Criteria
+
+- [ ] <TODO>
 
 _After evaluating, edit this part:_
 
@@ -12,4 +16,5 @@ _After evaluating, edit this part:_
 
 #### Implementation outline (if higher than "low" effort):
 
-<TODO>
+- [ ] <TODO>
+
