@@ -1,4 +1,4 @@
-const octokit = require('@octokit/rest');//();
+const octokit = require('@octokit/rest');
 const config = require('../../config');
 const { User } = require('../models');
 
@@ -18,10 +18,10 @@ const getRepository = (github, options) =>
   github.repos.get(options).then(repos => repos.data);
 
 const getBranch = (github, { owner, repo, branch }) =>
-  github.repos.getBranch({ owner, repo, branch }).then(branch => branch.data);
+  github.repos.getBranch({ owner, repo, branch }).then(branchInfo => branchInfo.data);
 
-const githubClient = accessToken =>  new Promise((resolve) => {
-  let client = octokit();
+const githubClient = accessToken => new Promise((resolve) => {
+  const client = octokit();
   client.authenticate({
     type: 'oauth',
     token: accessToken,
@@ -114,14 +114,9 @@ module.exports = {
       })
       .catch(handleCreateRepoError),
 
-  getRepository: (user, owner, repository) =>
+  getRepository: (user, owner, repo) =>
     githubClient(user.githubAccessToken)
-      .then(github =>
-        getRepository(github, {
-          owner: owner,
-          repo: repository,
-        })
-      )
+      .then(github => getRepository(github, { owner, repo }))
       .catch((err) => {
         if (err.status === 404) {
           return null;

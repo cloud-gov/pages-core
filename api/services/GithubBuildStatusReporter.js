@@ -14,7 +14,6 @@ const checkAccessTokenPermissions = (users, site) => {
     if (!user) {
       return Promise.resolve(null);
     }
-    console.log("\n\nUSER:\t" + JSON.stringify(user) + "\n\n");
 
     return GitHub.checkPermissions(user, site.owner, site.repository)
     .then((permissions) => {

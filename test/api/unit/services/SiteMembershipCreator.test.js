@@ -149,7 +149,7 @@ describe('SiteMembershipCreator', () => {
         });
       }).catch((err) => {
         expect(err.code).to.eq(404);
-        expect(err.status).to.eq("Not Found");
+        expect(err.status).to.eq('Not Found');
         done();
       }).catch(done);
     });

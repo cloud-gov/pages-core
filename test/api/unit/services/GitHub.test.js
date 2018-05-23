@@ -48,7 +48,7 @@ describe('GitHub', () => {
 
         return GitHub.getRepository(user, 'repo-owner', 'repo-name');
       }).then((result) => {
-        expect(result.message).to.equal("Not Found");
+        expect(result.message).to.equal('Not Found');
         done();
       }).catch(done);
     });
