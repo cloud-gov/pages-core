@@ -158,7 +158,7 @@ module.exports = {
 
     return githubClient(accessToken)
       .then(github => getOrganizations(github))
-      .then(organizations => {
+      .then((organizations) => {
         const approvedOrg = organizations.find(organization =>
           approvedOrgs.indexOf(organization.id) >= 0
         );
