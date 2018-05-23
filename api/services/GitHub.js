@@ -1,69 +1,27 @@
-const Github = require('github');
+const octokit = require('@octokit/rest');//();
 const config = require('../../config');
 const { User } = require('../models');
 
-const createRepoForOrg = (github, options) => new Promise((resolve, reject) => {
-  github.repos.createFromOrg(options, (err, res) => {
-    if (err) {
-      reject(Object.assign(err, { status: err.code }));
-    } else {
-      resolve(res);
-    }
-  });
-});
+const createRepoForOrg = (github, options) =>
+  github.repos.createForOrg(options);
 
-const createRepoForUser = (github, options) => new Promise((resolve, reject) => {
-  github.repos.create(options, (err, res) => {
-    if (err) {
-      reject(Object.assign(err, { status: err.code }));
-    } else {
-      resolve(res);
-    }
-  });
-});
+const createRepoForUser = (github, options) =>
+  github.repos.create(options);
 
-const createWebhook = (github, options) => new Promise((resolve, reject) => {
-  github.repos.createHook(options, (err, res) => {
-    if (err) {
-      reject(Object.assign(err, { status: err.code }));
-    } else {
-      resolve(res);
-    }
-  });
-});
+const createWebhook = (github, options) =>
+  github.repos.createHook(options);
 
-const getOrganizations = github => new Promise((resolve, reject) => {
-  github.user.getOrgs({}, (err, organizations) => {
-    if (err) {
-      reject(Object.assign(err, { status: err.code }));
-    } else {
-      resolve(organizations);
-    }
-  });
-});
+const getOrganizations = github =>
+  github.users.getOrgs({}).then(orgs => orgs.data);
 
-const getRepository = (github, options) => new Promise((resolve, reject) => {
-  github.repos.get(options, (err, repo) => {
-    if (err) {
-      reject(Object.assign(err, { status: err.code }));
-    } else {
-      resolve(repo);
-    }
-  });
-});
+const getRepository = (github, options) =>
+  github.repos.get(options).then(repos => repos.data);
 
-const getBranch = (github, { user, repo, branchName }) => new Promise((resolve, reject) => {
-  github.repos.getBranch({ user, repo, branch: branchName }, (err, branch) => {
-    if (err) {
-      reject(Object.assign(err, { status: err.code }));
-    } else {
-      resolve(branch);
-    }
-  });
-});
+const getBranch = (github, { owner, repo, branch }) =>
+  github.repos.getBranch({ owner, repo, branch }).then(branch => branch.data);
 
-const githubClient = accessToken => new Promise((resolve) => {
-  const client = new Github({ version: '3.0.0' });
+const githubClient = accessToken =>  new Promise((resolve) => {
+  let client = octokit();
   client.authenticate({
     type: 'oauth',
     token: accessToken,
@@ -122,11 +80,18 @@ const handleWebhookError = (err) => {
   }
 };
 
+const sendCreateGithubStatusRequest = (github, options) =>
+  github.repos.createStatus(options);
+
+const reviewUserPermissionLevel = (github, options) =>
+  github.repos.reviewUserPermissionLevel(options)
+    .then(permissions => permissions.data);
+
 module.exports = {
-  checkPermissions: (user, owner, repository) =>
+  checkPermissions: (user, owner, repo) =>
     githubClient(user.githubAccessToken)
-      .then(github => getRepository(github, { user: owner, repo: repository }))
-      .then(fetchedRepository => fetchedRepository.permissions),
+      .then(github => reviewUserPermissionLevel(github, { owner, repo, username: user.username }))
+      .then(permissions => permissions.permissions),
 
   checkOrganizations: (user, orgName) =>
     githubClient(user.githubAccessToken)
@@ -153,7 +118,7 @@ module.exports = {
     githubClient(user.githubAccessToken)
       .then(github =>
         getRepository(github, {
-          user: owner,
+          owner: owner,
           repo: repository,
         })
       )
@@ -166,7 +131,7 @@ module.exports = {
 
   getBranch: (user, owner, repo, branch) =>
     githubClient(user.githubAccessToken)
-    .then(github => getBranch(github, { user: owner, repo, branchName: branch }))
+    .then(github => getBranch(github, { owner, repo, branch }))
     .catch((err) => {
       if (err.status === 404) {
         return null;
@@ -178,12 +143,9 @@ module.exports = {
     const userId = user.id || user;
 
     return User.findById(userId)
-      .then((model) => {
-        const fetchedFederalistUser = model;
-        return githubClient(fetchedFederalistUser.githubAccessToken);
-      })
+      .then(fetchedFederalistUser => githubClient(fetchedFederalistUser.githubAccessToken))
       .then(github => createWebhook(github, {
-        user: site.owner,
+        owner: site.owner,
         repo: site.repository,
         name: 'web',
         active: true,
@@ -201,7 +163,7 @@ module.exports = {
 
     return githubClient(accessToken)
       .then(github => getOrganizations(github))
-      .then((organizations) => {
+      .then(organizations => {
         const approvedOrg = organizations.find(organization =>
           approvedOrgs.indexOf(organization.id) >= 0
         );
@@ -211,4 +173,8 @@ module.exports = {
         }
       });
   },
+
+  sendCreateGithubStatusRequest: (accessToken, options) =>
+    githubClient(accessToken)
+      .then(github => sendCreateGithubStatusRequest(github, options)),
 };

@@ -1,5 +1,4 @@
-const Github = require('github');
-const GitHubAPI = require('./GitHub');
+const GitHub = require('./GitHub');
 const logger = require('winston');
 const url = require('url');
 const config = require('../../config');
@@ -15,8 +14,9 @@ const checkAccessTokenPermissions = (users, site) => {
     if (!user) {
       return Promise.resolve(null);
     }
+    console.log("\n\nUSER:\t" + JSON.stringify(user) + "\n\n");
 
-    return GitHubAPI.checkPermissions(user, site.owner, site.repository)
+    return GitHub.checkPermissions(user, site.owner, site.repository)
     .then((permissions) => {
       if (permissions.admin) {
         return Promise.resolve(user.githubAccessToken);
@@ -67,28 +67,6 @@ const loadBuildUserAccessToken = build =>
     return loadSiteUserAccessToken(foundBuild.Site);
   });
 
-
-const authenticateGithubClient = (accessToken) => {
-  const client = new Github({ version: '3.0.0' });
-  client.authenticate({
-    type: 'oauth',
-    token: accessToken,
-  });
-  return client;
-};
-
-
-const sendCreateGithubStatusRequest = (githubClient, options) => new Promise((resolve, reject) => {
-  githubClient.statuses.create(options, (err, res) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve(res);
-    }
-  });
-});
-
-
 const reportBuildStatus = (build) => {
   let site;
 
@@ -108,13 +86,11 @@ const reportBuildStatus = (build) => {
 
     return loadBuildUserAccessToken(build);
   }).then((accessToken) => {
-    const githubClient = authenticateGithubClient(accessToken);
-
     const context = config.app.app_env === 'production'
       ? 'federalist/build' : `federalist-${config.app.app_env}/build`;
 
     const options = {
-      user: site.owner,
+      owner: site.owner,
       repo: site.repository,
       sha: build.commitSha,
       context,
@@ -133,7 +109,7 @@ const reportBuildStatus = (build) => {
       options.target_url = url.resolve(config.app.hostname, `/sites/${site.id}/builds/${build.id}/logs`);
       options.description = 'The build has encountered an error.';
     }
-    return sendCreateGithubStatusRequest(githubClient, options);
+    return GitHub.sendCreateGithubStatusRequest(accessToken, options);
   })
   .catch((error) => {
     logger.error('Error reporting build status to GitHub: ', error);
