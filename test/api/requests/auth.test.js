@@ -121,7 +121,7 @@ describe('Authentication request', () => {
           user = model;
           expect(user.githubAccessToken).not.to.equal('access-token-123abc');
 
-          githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
+          githubAPINocks.githubAuth(user.username.toUpperCase(), [{ id: 123456 }]);
 
           return request(app)
             .get('/auth/github/callback?code=auth-code-123abc')
