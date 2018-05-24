@@ -6,8 +6,7 @@ import buildLogActions from '../../actions/buildLogActions';
 import LoadingIndicator from '../LoadingIndicator';
 import SiteBuildLogTable from './siteBuildLogTable';
 import RefreshBuildLogsButton from './refreshBuildLogsButton';
-
-import { API } from '../../util/federalistApi';
+import DownloadBuildLogsButton from './downloadBuildLogsButton';
 
 const propTypes = {
   params: PropTypes.shape({
@@ -18,12 +17,9 @@ const propTypes = {
     data: PropTypes.array,
   }),
 };
-const defaultProps = {
-  buildLogs: null,
-};
-const mapStateToProps = ({ buildLogs }) => ({
-  buildLogs,
-});
+
+const defaultProps = { buildLogs: null };
+const mapStateToProps = ({ buildLogs }) => ({ buildLogs });
 
 class SiteBuildLogs extends React.Component {
   componentDidMount() {
@@ -47,14 +43,11 @@ class SiteBuildLogs extends React.Component {
       );
     }
 
-    const downloadUrl = `${API}/build/${buildId}/log?format=text`;
-    const downloadName = `build-log-${buildId}.txt`;
-
     return (
       <div>
         <div className="log-tools">
           <ul className="usa-unstyled-list">
-            <li><a href={downloadUrl} download={downloadName}>Download logs</a></li>
+            <li><DownloadBuildLogsButton buildId={buildId} buildLogsData={buildLogs.data} /></li>
             <li><RefreshBuildLogsButton buildId={buildId} /></li>
           </ul>
         </div>
