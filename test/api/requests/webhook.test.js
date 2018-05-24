@@ -118,7 +118,7 @@ describe('Webhook API', () => {
         .catch(done);
     });
 
-    it('should find the site by the lowercased owner and repository', (done) => {
+    it('should find the site by the lowercased owner and repository and upper cased github user', (done) => {
       let site;
       const userPromise = factory.user();
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
@@ -126,6 +126,7 @@ describe('Webhook API', () => {
       Promise.props({ user: userPromise, site: sitePromise })
         .then((models) => {
           site = models.site;
+          models.user.username = models.user.username.toUpperCase();
 
           const payload = buildWebhookPayload(models.user, site);
           payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
