@@ -114,7 +114,7 @@ describe('Authentication request', () => {
         .catch(done);
       });
 
-      it("should update the user's GitHub access token", (done) => {
+      it("should update the user's GitHub access token and test auth for uppercased named github user", (done) => {
         let user;
 
         factory.user().then((model) => {
