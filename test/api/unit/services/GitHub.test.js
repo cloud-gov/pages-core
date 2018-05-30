@@ -40,7 +40,7 @@ describe('GitHub', () => {
           accessToken: user.accessToken,
           owner: 'repo-owner',
           repo: 'repo-name',
-          response: [200, {
+          response: [404, {
             message: 'Not Found',
             documentation_url: 'https://developer.github.com/v3',
           }],
@@ -48,7 +48,7 @@ describe('GitHub', () => {
 
         return GitHub.getRepository(user, 'repo-owner', 'repo-name');
       }).then((result) => {
-        expect(result.message).to.equal('Not Found');
+        expect(result).to.be.null;
         done();
       }).catch(done);
     });
@@ -312,14 +312,11 @@ describe('GitHub', () => {
           owner,
           repo: repository,
           branch,
-          response: [400, {
-            errors: [{ message: 'Not Found' }],
-          }],
         });
 
         return GitHub.getBranch(values.user, owner, repository)
           .catch((err) => {
-            expect(err.code).to.equal(400);
+            expect(err.status).to.equal('400');
             done();
           });
       })
