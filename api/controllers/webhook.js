@@ -12,7 +12,7 @@ const findUserForWebhookRequest = (request) => {
   const username = request.body.sender.login;
 
   return User.findOrCreate({
-    where: { username },
+    where: { username: username.toLowerCase() },
     defaults: { username },
   })
   .then((users) => {

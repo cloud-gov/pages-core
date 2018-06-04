@@ -114,14 +114,14 @@ describe('Authentication request', () => {
         .catch(done);
       });
 
-      it("should update the user's GitHub access token", (done) => {
+      it("should update the user's GitHub access token and test auth for uppercased named github user", (done) => {
         let user;
 
         factory.user().then((model) => {
           user = model;
           expect(user.githubAccessToken).not.to.equal('access-token-123abc');
 
-          githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
+          githubAPINocks.githubAuth(user.username.toUpperCase(), [{ id: 123456 }]);
 
           return request(app)
             .get('/auth/github/callback?code=auth-code-123abc')
