@@ -5,7 +5,7 @@
   "description": "",
   "keywords": [],
   "dependencies": {
-    "@octokit/rest": "^15.6.0",
+    "@octokit/rest": "^15.8.0",
     "aws-sdk": "^2.173.0",
     "body-parser": "^1.16.1",
     "cfenv": "^1.0.0",
@@ -27,7 +27,7 @@
     "json-to-csv": "^1.0.0",
     "method-override": "^2.3.10",
     "moment": "^2.19.3",
-    "newrelic": "^1.40.0",
+    "newrelic": "^4.0",
     "nunjucks": "^3.0.1",
     "passport": "0.3.2",
     "passport-github": "0.1.5",
