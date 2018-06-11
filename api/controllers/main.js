@@ -60,10 +60,6 @@ module.exports = {
   },
 
   contact(req, res) {
-    // redirect to main app if is authenticated
-    if (req.session.authenticated) {
-      return res.redirect('/sites');
-    }
 
     const context = Object.assign({}, defaultContext(req));
 
