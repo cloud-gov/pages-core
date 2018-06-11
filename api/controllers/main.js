@@ -60,7 +60,6 @@ module.exports = {
   },
 
   contact(req, res) {
-
     const context = Object.assign({}, defaultContext(req));
 
     return res.render('content/contact.njk', context);
