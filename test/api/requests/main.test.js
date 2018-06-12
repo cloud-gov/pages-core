@@ -184,6 +184,20 @@ describe('Main Site', () => {
     });
   });
 
+
+  describe('.contact', () => {
+    it('renders the page properly', (done) => {
+      request(app)
+      .get('/contact')
+      .expect(200)
+      .then((response) => {
+        expect(response.text.indexOf('contact')).to.be.above(-1);
+        done();
+      })
+      .catch(done);
+    });
+  });
+
   describe('site wide error banner', () => {
     context('when an error is present', () => {
       beforeEach(() => {
