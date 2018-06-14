@@ -100,8 +100,8 @@ const user = ({ accessToken, githubUserID, username, email } = {}) => {
   accessToken = accessToken || 'access-token-123abc';
 
   const userID = githubUserID || Math.floor(Math.random() * 10000);
-  username = username || `user-${userID}`;
-  email = email || `${username}@example.com`;
+  username = (username || `user-${userID}`).toUpperCase();
+  email = email || `${username}@example.com`.toLowerCase();
   /* eslint-enable no-param-reassign */
 
   return nock('https://api.github.com')

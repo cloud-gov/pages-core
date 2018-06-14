@@ -59,6 +59,12 @@ module.exports = {
     return res.render('content/case-studies.njk', context);
   },
 
+  contact(req, res) {
+    const context = Object.assign({}, defaultContext(req));
+
+    return res.render('content/contact.njk', context);
+  },
+
   app(req, res) {
     if (!req.session.authenticated) {
       req.flash('error', {
