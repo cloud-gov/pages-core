@@ -90,8 +90,8 @@ const reviewUserPermissionLevel = (github, options) =>
 module.exports = {
   checkPermissions: (user, owner, repo) =>
     githubClient(user.githubAccessToken)
-      .then(github => reviewUserPermissionLevel(github, { owner, repo, username: user.username }))
-      .then(permissions => permissions.permissions),
+      .then(github => getRepository(github, { owner, repo, username: user.username }))
+      .then(repository => repository.permissions),
 
   checkOrganizations: (user, orgName) =>
     githubClient(user.githubAccessToken)
