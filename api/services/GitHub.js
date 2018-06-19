@@ -83,10 +83,6 @@ const handleWebhookError = (err) => {
 const sendCreateGithubStatusRequest = (github, options) =>
   github.repos.createStatus(options);
 
-const reviewUserPermissionLevel = (github, options) =>
-  github.repos.reviewUserPermissionLevel(options)
-    .then(permissions => permissions.data);
-
 module.exports = {
   checkPermissions: (user, owner, repo) =>
     githubClient(user.githubAccessToken)
