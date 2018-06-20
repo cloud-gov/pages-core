@@ -63,8 +63,8 @@ module.exports = {
     const context = defaultContext(req);
 
     if (req.session.authenticated) {
-			context.isAuthenticated = true;
-			context.username = req.user.username;
+      context.isAuthenticated = true;
+      context.username = req.user.username;
     }
 
     return res.render('content/contact.njk', context);
