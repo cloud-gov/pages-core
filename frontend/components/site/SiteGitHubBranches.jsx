@@ -32,7 +32,7 @@ export class SiteGitHubBranches extends React.Component {
           handleClick={buildActions.createBuild}
           className="usa-button usa-button-secondary"
         >
-          <br/>
+           <br/>
           Rebuild branch
         </CreateBuildLink>
       </span>
