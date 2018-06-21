@@ -133,9 +133,11 @@ export const AdvancedSiteSettings = ({
         <AlertBanner
           status="warning"
           header="Danger zone"
-          message="Are you sure you want to delete this site from Federalist for all users, remove all published sites, and delete all previews?"
+          message="Are you sure you want to delete this site from Federalist for all users,
+                   {' '}
+                   remove all published sites, and delete all previews?"
           alertRole={false}
-             >
+        >
           <button className="usa-button usa-button-red" onClick={onDelete}>
             Delete
           </button>
