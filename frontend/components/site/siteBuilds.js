@@ -114,11 +114,11 @@ class SiteBuilds extends React.Component {
                   <td className="table-actions">
                     { SiteBuilds.buildLogsLink(build) }
                     <CreateBuildLink
-                       handlerParams={{ buildId: build.id, siteId: site.id }}
-                       handleClick={buildActions.restartBuild}
-                       class="usa-button usa-button-secondary"
-                     >
-                       <br />
+                      handlerParams={{ buildId: build.id, siteId: site.id }}
+                      handleClick={buildActions.restartBuild}
+                      class="usa-button usa-button-secondary"
+                    >
+                      <br />
                       Rebuild Branch
                     </CreateBuildLink>
                   </td>
