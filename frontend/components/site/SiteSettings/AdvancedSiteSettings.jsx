@@ -117,16 +117,31 @@ export const AdvancedSiteSettings = ({
       Save advanced settings
     </button>
 
-    <AlertBanner
-      status="warning"
-      header="Danger zone"
-      message="Delete this site and its previews from Federalist, for all users?"
-      alertRole={false}
-    >
-      <button className="usa-button usa-button-red" onClick={onDelete}>
-        Delete
-      </button>
-    </AlertBanner>
+    <div className="well">
+      {/* DELETE SITE */}
+      <fieldset>
+        <legend>Delete Site</legend>
+        <p className="well-text">
+          Deleting a Federalist site removes the published site from our servers and
+          {' '}
+          disconnects the Federalist admin interface for all users. This will bring the
+          {' '}
+          entire site offline and make it inaccessible for users. <i>Trying to remove a site
+          {' '}
+          from your list of Federalist sites? Go to the Collaborators page and remove yourself.</i>
+        </p>
+        <AlertBanner
+          status="warning"
+          header="Danger zone"
+          message="Are you sure you want to delete this site from Federalist for all users, remove all published sites, and delete all previews?"
+          alertRole={false}
+             >
+          <button className="usa-button usa-button-red" onClick={onDelete}>
+            Delete
+          </button>
+        </AlertBanner>
+      </fieldset>
+    </div>
   </form>
 );
 
