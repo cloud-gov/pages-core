@@ -117,8 +117,8 @@ class SiteBuilds extends React.Component {
                       handlerParams={{ buildId: build.id, siteId: site.id }}
                       handleClick={buildActions.restartBuild}
                       class="usa-button usa-button-secondary"
-                    >
-                      Restart
+                    ><br/>
+                      Rebuild Branch
                     </CreateBuildLink>
                   </td>
                 </tr>
