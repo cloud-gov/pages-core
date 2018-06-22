@@ -127,6 +127,7 @@ export const AdvancedSiteSettings = ({
           disconnects the Federalist admin interface for all users. This will bring the
           entire site offline and make it inaccessible for users. <i>Trying to remove a site
           from your list of Federalist sites? Go to the
+          {' '}
           <a href={`/sites/${siteId}/users`}>Collaborators page</a> and remove yourself.</i>
         </p>
         <AlertBanner
