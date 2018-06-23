@@ -70,6 +70,12 @@ module.exports = {
     return res.render('content/contact.njk', context);
   },
 
+  features(req, res) {
+    const context = Object.assign({}, defaultContext(req));
+
+    return res.render('features.njk', context);
+  },
+
   app(req, res) {
     if (!req.session.authenticated) {
       req.flash('error', {
