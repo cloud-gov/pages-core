@@ -128,7 +128,7 @@ export const AdvancedSiteSettings = ({
           entire site offline and make it inaccessible for users. <i>Trying to remove a site
           from your list of Federalist sites? Go to the
           {' '}
-          <a href={`/sites/${siteId}/users`}>Collaborators page</a> and remove yourself.</i>
+            <a href={`/sites/${siteId}/users`}>Collaborators page</a> and remove yourself.</i>
         </p>
         <AlertBanner
           status="warning"
