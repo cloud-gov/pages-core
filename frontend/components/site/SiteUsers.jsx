@@ -23,7 +23,8 @@ const SiteUsers = ({ site, user }) => {
     event.preventDefault();
     const userToRemoveId = userToRemove.id;
 
-    siteActions.removeUserFromSite(site.id, userToRemoveId, userToRemoveId === user.id);
+    siteActions.removeUserFromSite(site.id, userToRemoveId, userToRemoveId === user.id)
+    .then(() => siteActions.fetchSites());
   };
 
   return (
