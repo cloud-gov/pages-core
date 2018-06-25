@@ -30,8 +30,8 @@ export default function sites(state = initialState, action) {
       const nextSites = action.sites || state.data;
       let currentSite = null;
 
-      if (nextSites.currentSite){
-        currentSite = nextSites.find(site => site.id === nextSites.currentSite.id);
+      if (state.currentSite){
+        currentSite = nextSites.find(site => site.id === state.currentSite.id);
       }
 
       return {
