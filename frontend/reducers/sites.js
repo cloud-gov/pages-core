@@ -22,25 +22,23 @@ const mapPropertyToMatchingSite = (data, siteId, properties) => data.map((site) 
 });
 
 export default function sites(state = initialState, action) {
+  let currentSite = null;
+  const nextSites = action.sites || state.data;
+  if (state.currentSite) {
+    currentSite = nextSites.find(site => site.id === state.currentSite.id);
+  }
+
   switch (action.type) {
     case SITES_FETCH_STARTED:
       return { ...state, isLoading: true };
 
-    case SITES_RECEIVED: {
-      const nextSites = action.sites || state.data;
-      let currentSite = null;
-
-      if (state.currentSite){
-        currentSite = nextSites.find(site => site.id === state.currentSite.id);
-      }
-
+    case SITES_RECEIVED:
       return {
         ...state,
         isLoading: false,
         data: nextSites,
         currentSite,
       };
-    }
 
     case SET_CURRENT_SITE: {
       const id = Number(action.siteId);
