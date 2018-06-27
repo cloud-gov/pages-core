@@ -27,7 +27,7 @@ export default function sites(state = initialState, action) {
     case SITES_FETCH_STARTED:
       return { ...state, isLoading: true };
 
-    case SITES_RECEIVED:
+    case SITES_RECEIVED: {
       let currentSite = null;
       const nextSites = action.sites || state.data;
       if (state.currentSite) {
@@ -39,6 +39,7 @@ export default function sites(state = initialState, action) {
         data: nextSites,
         currentSite,
       };
+    }
 
     case SET_CURRENT_SITE: {
       const id = Number(action.siteId);
