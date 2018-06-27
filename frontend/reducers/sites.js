@@ -22,7 +22,6 @@ const mapPropertyToMatchingSite = (data, siteId, properties) => data.map((site) 
 });
 
 export default function sites(state = initialState, action) {
-
   switch (action.type) {
     case SITES_FETCH_STARTED:
       return { ...state, isLoading: true };
