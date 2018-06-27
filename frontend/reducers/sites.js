@@ -46,7 +46,7 @@ export default function sites(state = initialState, action) {
     }
 
     case SITE_ADDED:
-      return { ...state, isLoading: false, data: state.data.concat(action.site) };
+      return { ...state, isLoading: false, data: state.data.concat(action.site || []) };
 
     case SITE_UPDATED:
       return {
