@@ -18,7 +18,7 @@ const sitesReceived = sites => ({
 
 const siteAdded = site => ({
   type: siteAddedType,
-  site,
+  site: site || [],
 });
 
 const siteUpdated = site => ({
