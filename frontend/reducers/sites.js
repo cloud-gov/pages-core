@@ -86,4 +86,4 @@ export default function sites(state = initialState, action) {
       return state;
   }
 }
-/* eslint-disable complexity */
+/* eslint-enable complexity */
