@@ -76,7 +76,7 @@ describe('<SiteUsers/>', () => {
     });
 
     it('should call `removeUserFromSite` when `Remove user` is clicked', () => {
-      const clickSpy = stub(siteActions, 'removeUserFromSite');
+      const clickSpy = stub(siteActions, 'removeUserFromSite').returns(Promise.resolve());
       const rows = wrapper.find('tbody tr');
       const removeUserLink = rows.at(0).find('td').last().find('ButtonLink')
         .shallow();
