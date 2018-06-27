@@ -8,9 +8,9 @@
   dependencies:
     methods "^1.1.2"
 
-"@newrelic/native-metrics@^2.1.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@newrelic/native-metrics/-/native-metrics-2.4.0.tgz#65503820f1fc6afc215cd9893077848a6c013cae"
+"@newrelic/native-metrics@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@newrelic/native-metrics/-/native-metrics-3.0.0.tgz#973096ea8d9e8088c3e1b15f406614d8ca59a713"
   dependencies:
     nan "^2.8.0"
 
@@ -3412,12 +3412,6 @@ getpass@^0.1.1:
   dependencies:
     assert-plus "^1.0.0"
 
-github@^0.2.4:
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/github/-/github-0.2.4.tgz#24fa7f0e13fa11b946af91134c51982a91ce538b"
-  dependencies:
-    mime "^1.2.11"
-
 glob-base@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/glob-base/-/glob-base-0.3.0.tgz#dbb164f6221b1c0b1ccf82aea328b497df0ea3c4"
@@ -5039,9 +5033,9 @@ nested-error-stacks@^1.0.0:
   dependencies:
     inherits "~2.0.1"
 
-newrelic@^4.0.0:
-  version "4.1.3"
-  resolved "https://registry.yarnpkg.com/newrelic/-/newrelic-4.1.3.tgz#bd9f3b767e2b84f2ff6042dc160578f52b4de118"
+newrelic@^4.0:
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/newrelic/-/newrelic-4.1.5.tgz#e7ac0852ba81977c9090c728fd3251e507f5ce45"
   dependencies:
     "@newrelic/koa" "^1.0.0"
     "@tyriar/fibonacci-heap" "^2.0.7"
@@ -5052,7 +5046,7 @@ newrelic@^4.0.0:
     readable-stream "^2.1.4"
     semver "^5.3.0"
   optionalDependencies:
-    "@newrelic/native-metrics" "^2.1.0"
+    "@newrelic/native-metrics" "^3.0.0"
 
 nock@^9.0.2:
   version "9.0.13"
@@ -5523,7 +5517,7 @@ parseurl@~1.3.1, parseurl@~1.3.2:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/parseurl/-/parseurl-1.3.2.tgz#fc289d4ed8993119460c156253262cdc8de65bf3"
 
-passport-github@0.1.5:
+passport-github@^0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/passport-github/-/passport-github-0.1.5.tgz#258ebb75af40cdc4e3af11be3a138b75c1f865c1"
   dependencies:
@@ -5542,9 +5536,9 @@ passport-strategy@1.x.x:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/passport-strategy/-/passport-strategy-1.0.0.tgz#b5539aa8fc225a3d1ad179476ddf236b440f52e4"
 
-passport@0.3.2:
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/passport/-/passport-0.3.2.tgz#9dd009f915e8fe095b0124a01b8f82da07510102"
+passport@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/passport/-/passport-0.4.0.tgz#c5095691347bd5ad3b5e180238c3914d16f05811"
   dependencies:
     passport-strategy "1.x.x"
     pause "0.0.1"

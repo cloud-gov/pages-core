@@ -107,6 +107,7 @@ class SiteSettings extends React.Component {
         />
         <ExpandableArea title="Advanced settings">
           <AdvancedSiteSettings
+            siteId={site.id}
             initialValues={advancedInitialValues}
             onDelete={this.handleDelete}
             onSubmit={this.handleUpdate}

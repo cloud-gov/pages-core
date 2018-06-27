@@ -60,7 +60,12 @@ module.exports = {
   },
 
   contact(req, res) {
-    const context = Object.assign({}, defaultContext(req));
+    const context = defaultContext(req);
+
+    if (req.session.authenticated) {
+      context.isAuthenticated = true;
+      context.username = req.user.username;
+    }
 
     return res.render('content/contact.njk', context);
   },
