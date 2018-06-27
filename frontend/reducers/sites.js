@@ -20,7 +20,7 @@ const mapPropertyToMatchingSite = (data, siteId, properties) => data.map((site) 
   if (site.id !== siteId) return site;
   return Object.assign({}, site, properties);
 });
-/* eslint-disable complexity */
+
 export default function sites(state = initialState, action) {
   switch (action.type) {
     case SITES_FETCH_STARTED:
