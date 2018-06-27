@@ -119,7 +119,7 @@ class SiteBuilds extends React.Component {
                       class="usa-button usa-button-secondary"
                     >
                       <br />
-                      Rebuild Branch
+                      Rebuild branch
                     </CreateBuildLink>
                   </td>
                 </tr>
