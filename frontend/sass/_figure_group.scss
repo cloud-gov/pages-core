@@ -10,18 +10,22 @@
 
 .figure-group {
   @media screen and (max-width: $mobile-size) {
-    margin: 0 auto;    
+    margin: 0 auto;
   }
 }
 
 .figure {
   margin: 0;
 
+  img {
+    filter: brightness(95%);
+  }
+
   figcaption {
     margin-bottom: 6px;
     margin-top: 20px;
     text-align: left;
-    
+
     @media screen and (max-width: $mobile-size) {
       text-align: center;
     }
