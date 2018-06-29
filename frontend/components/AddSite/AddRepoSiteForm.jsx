@@ -74,11 +74,11 @@ export const AddRepoSiteForm = ({
         </div>
         <div className="form-group">
           <BranchField
-            label="Primary branch"
+            label="Set the primary branch Federalist uses to build your site"
             type="text"
             id="defaultBranch"
             className="form-control"
-            placeholder="master"
+            value="master"
             name="defaultBranch"
             required
           />
