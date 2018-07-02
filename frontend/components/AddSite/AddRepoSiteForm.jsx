@@ -12,6 +12,7 @@ const propTypes = {
 
   initialValues: PropTypes.shape({
     engine: PropTypes.string.isRequired,
+    defaultBranch: PropTypes.string.isRequired,
   }).isRequired,
   // the following props are from reduxForm:
   handleSubmit: PropTypes.func.isRequired,
