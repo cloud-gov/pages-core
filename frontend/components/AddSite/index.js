@@ -101,7 +101,7 @@ export class AddSite extends React.Component {
           </div>
           <h2>Use your own GitHub repository</h2>
           <AddRepoSiteForm
-            initialValues={{ engine: availableEngines[0].value, defaultBranch: "master" }}
+            initialValues={{ engine: availableEngines[0].value, defaultBranch: 'master' }}
             showAddNewSiteFields={this.props.showAddNewSiteFields}
             onSubmit={formSubmitFunc}
           />

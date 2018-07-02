@@ -73,7 +73,7 @@ describe('<AddSite/>', () => {
     });
     expect(formProps.onSubmit).to.equal(wrapper.instance().onAddUserSubmit);
     expect(formProps.showAddNewSiteFields).to.equal(propsWithoutError.showAddNewSiteFields);
-    expect(formProps.initialValues).to.deep.equal({ engine: 'jekyll' });
+    expect(formProps.initialValues).to.deep.equal({ defaultBranch: 'master', engine: 'jekyll' });
   });
 
   it('delivers onCreateSiteSubmit when showAddNewSiteFields is true', () => {
