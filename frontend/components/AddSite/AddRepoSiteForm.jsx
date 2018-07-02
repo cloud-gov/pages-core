@@ -78,7 +78,7 @@ export const AddRepoSiteForm = ({
             type="text"
             id="defaultBranch"
             className="form-control"
-            value="master"
+            placeholder="master"
             name="defaultBranch"
             required
           />
