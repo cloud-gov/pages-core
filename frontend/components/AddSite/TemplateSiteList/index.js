@@ -4,12 +4,6 @@ import PropTypes from 'prop-types';
 
 import TemplateSite from './templateSite';
 
-const propTypes = {
-  templates: PropTypes.object.isRequired,
-  handleSubmitTemplate: PropTypes.func.isRequired,
-  defaultOwner: PropTypes.string.isRequired,
-};
-
 export class TemplateList extends React.Component {
   constructor(props) {
     super(props);
@@ -58,7 +52,11 @@ export class TemplateList extends React.Component {
   }
 }
 
-TemplateList.propTypes = propTypes;
+TemplateList.propTypes = {
+  templates: PropTypes.object.isRequired,
+  handleSubmitTemplate: PropTypes.func.isRequired,
+  defaultOwner: PropTypes.string.isRequired,
+};
 
 const mapStateToProps = state => ({
   templates: state.FRONTEND_CONFIG.TEMPLATES,

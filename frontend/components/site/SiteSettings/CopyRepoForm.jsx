@@ -6,11 +6,6 @@ import BranchField from '../../Fields/BranchField';
 import InputWithErrorField from '../../Fields/InputWithErrorField';
 import { githubUsernameRegex } from '../../../../api/utils/validators';
 
-const propTypes = {
-  handleSubmit: PropTypes.func.isRequired,
-  pristine: PropTypes.bool.isRequired,
-};
-
 class CopyRepoForm extends React.Component {
   validateInput(value) {
     if (value && value.length && !(githubUsernameRegex.test(value))) {
@@ -129,7 +124,10 @@ class CopyRepoForm extends React.Component {
   }
 }
 
-CopyRepoForm.propTypes = propTypes;
+CopyRepoForm.propTypes = {
+  handleSubmit: PropTypes.func.isRequired,
+  pristine: PropTypes.bool.isRequired,
+};
 
 export { CopyRepoForm };
 

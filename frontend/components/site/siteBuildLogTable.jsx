@@ -31,7 +31,6 @@ function SiteBuildLogTable({ buildLogs }) {
   );
 }
 
-
 SiteBuildLogTable.propTypes = {
   buildLogs: PropTypes.arrayOf(BUILD_LOG).isRequired,
 };
