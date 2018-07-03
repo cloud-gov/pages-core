@@ -129,7 +129,11 @@ SiteContainer.propTypes = {
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node,
   ]),
-  sites: PropTypes.object,
+  sites: PropTypes.shape({
+    isLoading: PropTypes.bool.isRequired,
+    currentSite: PropTypes.object.isRequired,
+    sites: PropTypes.arrayOf(PropTypes.object).isRequired,
+  }),
   alert: ALERT,
 };
 

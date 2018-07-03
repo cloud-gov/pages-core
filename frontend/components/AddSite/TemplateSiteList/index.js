@@ -53,6 +53,9 @@ export class TemplateList extends React.Component {
 }
 
 TemplateList.propTypes = {
+  // Templates data structure is described in config/templates.js and is
+  // chellenging to describe with proptypes. Ignoring the rule here.
+  // eslint-disable-next-line react/forbid-prop-types
   templates: PropTypes.object.isRequired,
   handleSubmitTemplate: PropTypes.func.isRequired,
   defaultOwner: PropTypes.string.isRequired,
