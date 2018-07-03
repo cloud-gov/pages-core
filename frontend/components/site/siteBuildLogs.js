@@ -8,19 +8,6 @@ import SiteBuildLogTable from './siteBuildLogTable';
 import RefreshBuildLogsButton from './refreshBuildLogsButton';
 import DownloadBuildLogsButton from './downloadBuildLogsButton';
 
-const propTypes = {
-  params: PropTypes.shape({
-    buildId: PropTypes.string.isRequired,
-  }).isRequired,
-  buildLogs: PropTypes.shape({
-    isLoading: PropTypes.bool,
-    data: PropTypes.array,
-  }),
-};
-
-const defaultProps = { buildLogs: null };
-const mapStateToProps = ({ buildLogs }) => ({ buildLogs });
-
 class SiteBuildLogs extends React.Component {
   componentDidMount() {
     buildLogActions.fetchBuildLogs({ id: this.props.params.buildId });
@@ -57,8 +44,23 @@ class SiteBuildLogs extends React.Component {
   }
 }
 
-SiteBuildLogs.propTypes = propTypes;
-SiteBuildLogs.defaultProps = defaultProps;
+SiteBuildLogs.propTypes = {
+  params: PropTypes.shape({
+    buildId: PropTypes.string.isRequired,
+  }).isRequired,
+  buildLogs: PropTypes.shape({
+    isLoading: PropTypes.bool,
+    data: PropTypes.array,
+  }),
+};
+
+SiteBuildLogs.defaultProps = {
+  buildLogs: null,
+};
+
+const mapStateToProps = ({ buildLogs }) => ({
+  buildLogs,
+});
 
 export { SiteBuildLogs };
 export default connect(mapStateToProps)(SiteBuildLogs);

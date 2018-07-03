@@ -5,7 +5,6 @@ import { USER_ACTION } from '../../propTypes';
 import { timestampUTC } from '../../util/datetime';
 import userActions from '../../actions/userActions';
 
-
 class UserActionsTable extends React.Component {
   componentDidMount() {
     userActions.fetchUserActions(this.props.site);

@@ -11,24 +11,6 @@ import { availableEngines } from '../SelectSiteEngine';
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
 
-const propTypes = {
-  alert: ALERT,
-  showAddNewSiteFields: PropTypes.bool,
-  user: USER,
-};
-
-const defaultProps = {
-  alert: null,
-  showAddNewSiteFields: false,
-  user: null,
-};
-
-const mapStateToProps = ({ alert, showAddNewSiteFields, user }) => ({
-  alert,
-  showAddNewSiteFields,
-  user,
-});
-
 function getOwnerAndRepo(repoUrl) {
   const owner = repoUrl.split('/')[3];
   const repository = repoUrl.split('/')[4];
@@ -115,7 +97,22 @@ export class AddSite extends React.Component {
   }
 }
 
-AddSite.propTypes = propTypes;
-AddSite.defaultProps = defaultProps;
+AddSite.propTypes = {
+  alert: ALERT,
+  showAddNewSiteFields: PropTypes.bool,
+  user: USER,
+};
+
+AddSite.defaultProps = {
+  alert: null,
+  showAddNewSiteFields: false,
+  user: null,
+};
+
+const mapStateToProps = ({ alert, showAddNewSiteFields, user }) => ({
+  alert,
+  showAddNewSiteFields,
+  user,
+});
 
 export default connect(mapStateToProps)(AddSite);

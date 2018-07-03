@@ -3,19 +3,6 @@ import PropTypes from 'prop-types';
 
 import { getSafeRepoName } from '../../../util';
 
-const propTypes = {
-  templateKey: PropTypes.string.isRequired,
-  defaultOwner: PropTypes.string.isRequired,
-  example: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  thumb: PropTypes.string.isRequired,
-  active: PropTypes.number.isRequired,
-  handleChooseActive: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
-  index: PropTypes.number.isRequired,
-};
-
 class TemplateSite extends React.Component {
   constructor(props) {
     super(props);
@@ -116,6 +103,17 @@ class TemplateSite extends React.Component {
   }
 }
 
-TemplateSite.propTypes = propTypes;
+TemplateSite.propTypes = {
+  templateKey: PropTypes.string.isRequired,
+  defaultOwner: PropTypes.string.isRequired,
+  example: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  thumb: PropTypes.string.isRequired,
+  active: PropTypes.number.isRequired,
+  handleChooseActive: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  index: PropTypes.number.isRequired,
+};
 
 export default TemplateSite;
