@@ -8,23 +8,6 @@ import BranchViewLink from '../branchViewLink';
 import { SITE } from '../../propTypes';
 import AlertBanner from '../alertBanner';
 
-const propTypes = {
-  publishedBranches: PropTypes.shape({
-    isLoading: PropTypes.bool.isRequired,
-    data: PropTypes.array,
-  }),
-  site: SITE,
-};
-const defaultProps = {
-  publishedBranches: null,
-  site: null,
-};
-
-const mapStateToProps = ({ publishedBranches, sites }) => ({
-  publishedBranches,
-  site: sites.currentSite,
-});
-
 class SitePublishedBranchesTable extends React.Component {
   componentDidMount() {
     const { id } = this.props.site;
@@ -108,8 +91,23 @@ class SitePublishedBranchesTable extends React.Component {
   }
 }
 
-SitePublishedBranchesTable.propTypes = propTypes;
-SitePublishedBranchesTable.defaultProps = defaultProps;
+SitePublishedBranchesTable.propTypes = {
+  publishedBranches: PropTypes.shape({
+    isLoading: PropTypes.bool.isRequired,
+    data: PropTypes.array,
+  }),
+  site: SITE,
+};
+
+SitePublishedBranchesTable.defaultProps = {
+  publishedBranches: null,
+  site: null,
+};
+
+const mapStateToProps = ({ publishedBranches, sites }) => ({
+  publishedBranches,
+  site: sites.currentSite,
+});
 
 export { SitePublishedBranchesTable };
 export default connect(mapStateToProps)(SitePublishedBranchesTable);

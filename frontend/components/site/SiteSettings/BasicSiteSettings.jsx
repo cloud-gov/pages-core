@@ -5,21 +5,6 @@ import { reduxForm } from 'redux-form';
 import HttpsUrlField from '../../Fields/HttpsUrlField';
 import BranchField from '../../Fields/BranchField';
 
-const propTypes = {
-  // initialValues is what the initial form values are based on
-  initialValues: PropTypes.shape({
-    defaultBranch: PropTypes.string,
-    domain: PropTypes.string,
-    demoBranch: PropTypes.string,
-    demoDomain: PropTypes.string,
-  }).isRequired,
-
-  // the following props are from reduxForm:
-  handleSubmit: PropTypes.func.isRequired,
-  reset: PropTypes.func.isRequired,
-  pristine: PropTypes.bool.isRequired,
-};
-
 export const BasicSiteSettings = ({
   // even though initialValues is not directly used, it is used
   // by reduxForm, and we want PropType validation on it, so we'll
@@ -107,7 +92,20 @@ export const BasicSiteSettings = ({
   </form>
 );
 
-BasicSiteSettings.propTypes = propTypes;
+BasicSiteSettings.propTypes = {
+  // initialValues is what the initial form values are based on
+  initialValues: PropTypes.shape({
+    defaultBranch: PropTypes.string,
+    domain: PropTypes.string,
+    demoBranch: PropTypes.string,
+    demoDomain: PropTypes.string,
+  }).isRequired,
+
+  // the following props are from reduxForm:
+  handleSubmit: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  pristine: PropTypes.bool.isRequired,
+};
 
 // create a higher-order component with reduxForm and export that
 export default reduxForm({ form: 'basicSiteSettings' })(BasicSiteSettings);

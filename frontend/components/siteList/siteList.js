@@ -9,24 +9,6 @@ import SiteListItem from './siteListItem';
 import LoadingIndicator from '../LoadingIndicator';
 import { IconPlus } from '../icons';
 
-const propTypes = {
-  alert: ALERT,
-  sites: PropTypes.shape({
-    data: PropTypes.arrayOf(SITE),
-    isLoading: PropTypes.bool,
-  }),
-};
-
-const defaultProps = {
-  alert: null,
-  sites: null,
-};
-
-const mapStateToProps = ({ alert, sites }) => ({
-  alert,
-  sites,
-});
-
 const getSites = (sites) => {
   const { isLoading, data } = sites;
 
@@ -84,8 +66,23 @@ export const SiteList = ({ sites, alert }) =>
     <a href="#top">Return to top</a>
   </div>;
 
-SiteList.propTypes = propTypes;
-SiteList.defaultProps = defaultProps;
+SiteList.propTypes = {
+  alert: ALERT,
+  sites: PropTypes.shape({
+    data: PropTypes.arrayOf(SITE),
+    isLoading: PropTypes.bool,
+  }),
+};
+
+SiteList.defaultProps = {
+  alert: null,
+  sites: null,
+};
+
+const mapStateToProps = ({ alert, sites }) => ({
+  alert,
+  sites,
+});
 
 export default connect(mapStateToProps)(SiteList);
 

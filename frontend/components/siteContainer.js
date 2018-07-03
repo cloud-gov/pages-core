@@ -9,29 +9,6 @@ import PagesHeader from './site/PagesHeader';
 import AlertBanner from './alertBanner';
 import LoadingIndicator from './LoadingIndicator';
 
-const propTypes = {
-  params: PropTypes.shape({
-    id: PropTypes.string,
-    branch: PropTypes.string,
-    fileName: PropTypes.string,
-  }).isRequired,
-  location: PropTypes.shape({
-    pathname: PropTypes.string,
-  }).isRequired,
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
-  sites: PropTypes.object,
-  alert: ALERT,
-};
-
-const defaultProps = {
-  children: null,
-  sites: null,
-  alert: {},
-};
-
 export const SITE_NAVIGATION_CONFIG = [
   {
     display: 'Build history',
@@ -139,7 +116,31 @@ export class SiteContainer extends React.Component {
   }
 }
 
-SiteContainer.propTypes = propTypes;
-SiteContainer.defaultProps = defaultProps;
+SiteContainer.propTypes = {
+  params: PropTypes.shape({
+    id: PropTypes.string,
+    branch: PropTypes.string,
+    fileName: PropTypes.string,
+  }).isRequired,
+  location: PropTypes.shape({
+    pathname: PropTypes.string,
+  }).isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]),
+  sites: PropTypes.shape({
+    isLoading: PropTypes.bool.isRequired,
+    currentSite: PropTypes.object.isRequired,
+    sites: PropTypes.arrayOf(PropTypes.object).isRequired,
+  }),
+  alert: ALERT,
+};
+
+SiteContainer.defaultProps = {
+  children: null,
+  sites: null,
+  alert: {},
+};
 
 export default connect(state => state)(SiteContainer);
