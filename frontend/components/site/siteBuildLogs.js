@@ -59,7 +59,7 @@ SiteBuildLogs.defaultProps = {
 };
 
 const mapStateToProps = ({ buildLogs }) => ({
-  buildLogs
+  buildLogs,
 });
 
 export { SiteBuildLogs };

@@ -67,6 +67,6 @@ AlertBanner.defaultProps = {
   status: 'info',
   children: null,
   alertRole: true,
-};;
+};
 
 export default AlertBanner;

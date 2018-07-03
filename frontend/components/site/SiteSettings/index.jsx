@@ -120,7 +120,7 @@ SiteSettings.defaultProps = {
 };
 
 const mapStateToProps = ({ sites }) => ({
-  site: sites.currentSite
+  site: sites.currentSite,
 });
 
 export { SiteSettings };
