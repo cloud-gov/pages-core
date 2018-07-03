@@ -50,5 +50,4 @@ ExpandableArea.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-
 export default ExpandableArea;

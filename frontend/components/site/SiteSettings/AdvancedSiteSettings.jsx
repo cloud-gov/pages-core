@@ -6,24 +6,6 @@ import { Field, reduxForm } from 'redux-form';
 import SelectSiteEngine from '../../SelectSiteEngine';
 import AlertBanner from '../../alertBanner';
 
-const propTypes = {
-  onDelete: PropTypes.func.isRequired,
-  siteId: PropTypes.number.isRequired,
-  // initialValues is what the initial form values are based on
-  initialValues: PropTypes.shape({
-    engine: PropTypes.string.isRequired,
-    config: PropTypes.string,
-    demoConfig: PropTypes.string,
-    previewConfig: PropTypes.string,
-  }).isRequired,
-
-  // the following props are from reduxForm:
-  handleSubmit: PropTypes.func.isRequired,
-  reset: PropTypes.func.isRequired,
-  pristine: PropTypes.bool.isRequired,
-};
-
-
 export const AdvancedSiteSettings = ({
   // even though initialValues is not directly used, it is used
   // by reduxForm, and we want PropType validation on it, so we'll
@@ -146,8 +128,22 @@ export const AdvancedSiteSettings = ({
   </form>
 );
 
+AdvancedSiteSettings.propTypes = {
+  onDelete: PropTypes.func.isRequired,
+  siteId: PropTypes.number.isRequired,
+  // initialValues is what the initial form values are based on
+  initialValues: PropTypes.shape({
+    engine: PropTypes.string.isRequired,
+    config: PropTypes.string,
+    demoConfig: PropTypes.string,
+    previewConfig: PropTypes.string,
+  }).isRequired,
 
-AdvancedSiteSettings.propTypes = propTypes;
+  // the following props are from reduxForm:
+  handleSubmit: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  pristine: PropTypes.bool.isRequired,
+};
 
 // create a higher-order component with reduxForm and export that
 export default reduxForm({ form: 'advancedSiteSettings' })(AdvancedSiteSettings);

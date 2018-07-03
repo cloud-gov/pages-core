@@ -2,16 +2,6 @@ import React from 'react';
 
 import { dateAndTime } from '../../util/datetime';
 
-const propTypes = {
-  site: React.PropTypes.shape({
-    publishedAt: React.PropTypes.string,
-  }),
-};
-
-const defaultProps = {
-  site: {},
-};
-
 const getPublishedState = (site) => {
   if (site.publishedAt) {
     const formattedBuildTime = dateAndTime(site.publishedAt);
@@ -25,7 +15,14 @@ const PublishedState = ({ site = {} }) =>
     {getPublishedState(site)}
   </p>;
 
-PublishedState.propTypes = propTypes;
-PublishedState.defaultProps = defaultProps;
+PublishedState.propTypes = {
+  site: React.PropTypes.shape({
+    publishedAt: React.PropTypes.string,
+  }),
+};
+
+PublishedState.defaultProps = {
+  site: {},
+};
 
 export default PublishedState;

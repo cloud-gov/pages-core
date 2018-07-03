@@ -6,16 +6,6 @@ import { IconView } from '../icons';
 import PublishedState from './publishedState';
 import GitHubLink from '../GitHubLink';
 
-const propTypes = {
-  site: PropTypes.shape({
-    repository: PropTypes.string,
-    owner: PropTypes.string,
-    id: PropTypes.number,
-    publishedAt: PropTypes.string,
-    viewLink: PropTypes.string,
-  }),
-};
-
 function getViewLink(viewLink, repo) {
   return (
     <a
@@ -46,6 +36,14 @@ const SiteListItem = ({ site }) =>
     </div>
   </li>);
 
-SiteListItem.propTypes = propTypes;
+SiteListItem.propTypes = {
+  site: PropTypes.shape({
+    repository: PropTypes.string,
+    owner: PropTypes.string,
+    id: PropTypes.number,
+    publishedAt: PropTypes.string,
+    viewLink: PropTypes.string,
+  }),
+};
 
 export default SiteListItem;
