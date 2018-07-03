@@ -59,7 +59,7 @@ export const AddRepoSiteForm = ({
         </div>
         <div className="form-group">
           <BranchField
-            label="Primary branch"
+            label="Set the primary branch Federalist will use to build your site"
             type="text"
             id="defaultBranch"
             className="form-control"
@@ -86,6 +86,7 @@ AddRepoSiteForm.propTypes = {
 
   initialValues: PropTypes.shape({
     engine: PropTypes.string.isRequired,
+    defaultBranch: PropTypes.string.isRequired,
   }).isRequired,
   // the following props are from reduxForm:
   handleSubmit: PropTypes.func.isRequired,
