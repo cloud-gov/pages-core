@@ -10,8 +10,6 @@ import AdvancedSiteSettings from './AdvancedSiteSettings';
 import CopyRepoForm from './CopyRepoForm';
 import siteActions from '../../../actions/siteActions';
 
-const mapStateToProps = ({ sites }) => ({ site: sites.currentSite });
-
 class SiteSettings extends React.Component {
   constructor(props) {
     super(props);
@@ -120,6 +118,10 @@ SiteSettings.propTypes = {
 SiteSettings.defaultProps = {
   site: null,
 };
+
+const mapStateToProps = ({ sites }) => ({
+  site: sites.currentSite
+});
 
 export { SiteSettings };
 export default connect(mapStateToProps)(SiteSettings);

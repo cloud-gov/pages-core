@@ -7,11 +7,6 @@ import publishedFileActions from '../../actions/publishedFileActions';
 import LoadingIndicator from '../LoadingIndicator';
 import AlertBanner from '../alertBanner';
 
-const mapStateToProps = ({ publishedFiles, sites }) => ({
-  publishedFiles,
-  site: sites.currentSite,
-});
-
 class SitePublishedFilesTable extends React.Component {
   constructor(props) {
     super(props);
@@ -209,6 +204,11 @@ SitePublishedFilesTable.propTypes = {
 SitePublishedFilesTable.defaultProps = {
   publishedFiles: null,
 };
+
+const mapStateToProps = ({ publishedFiles, sites }) => ({
+  publishedFiles,
+  site: sites.currentSite,
+});
 
 export { SitePublishedFilesTable };
 export default connect(mapStateToProps)(SitePublishedFilesTable);

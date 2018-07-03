@@ -8,8 +8,6 @@ import SiteBuildLogTable from './siteBuildLogTable';
 import RefreshBuildLogsButton from './refreshBuildLogsButton';
 import DownloadBuildLogsButton from './downloadBuildLogsButton';
 
-const mapStateToProps = ({ buildLogs }) => ({ buildLogs });
-
 class SiteBuildLogs extends React.Component {
   componentDidMount() {
     buildLogActions.fetchBuildLogs({ id: this.props.params.buildId });
@@ -59,6 +57,10 @@ SiteBuildLogs.propTypes = {
 SiteBuildLogs.defaultProps = {
   buildLogs: null,
 };
+
+const mapStateToProps = ({ buildLogs }) => ({
+  buildLogs
+});
 
 export { SiteBuildLogs };
 export default connect(mapStateToProps)(SiteBuildLogs);

@@ -9,11 +9,6 @@ import SiteListItem from './siteListItem';
 import LoadingIndicator from '../LoadingIndicator';
 import { IconPlus } from '../icons';
 
-const mapStateToProps = ({ alert, sites }) => ({
-  alert,
-  sites,
-});
-
 const getSites = (sites) => {
   const { isLoading, data } = sites;
 
@@ -83,6 +78,11 @@ SiteList.defaultProps = {
   alert: null,
   sites: null,
 };
+
+const mapStateToProps = ({ alert, sites }) => ({
+  alert,
+  sites,
+});
 
 export default connect(mapStateToProps)(SiteList);
 

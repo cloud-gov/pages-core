@@ -11,12 +11,6 @@ import { availableEngines } from '../SelectSiteEngine';
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
 
-const mapStateToProps = ({ alert, showAddNewSiteFields, user }) => ({
-  alert,
-  showAddNewSiteFields,
-  user,
-});
-
 function getOwnerAndRepo(repoUrl) {
   const owner = repoUrl.split('/')[3];
   const repository = repoUrl.split('/')[4];
@@ -114,5 +108,11 @@ AddSite.defaultProps = {
   showAddNewSiteFields: false,
   user: null,
 };
+
+const mapStateToProps = ({ alert, showAddNewSiteFields, user }) => ({
+  alert,
+  showAddNewSiteFields,
+  user,
+});
 
 export default connect(mapStateToProps)(AddSite);

@@ -8,11 +8,6 @@ import BranchViewLink from '../branchViewLink';
 import { SITE } from '../../propTypes';
 import AlertBanner from '../alertBanner';
 
-const mapStateToProps = ({ publishedBranches, sites }) => ({
-  publishedBranches,
-  site: sites.currentSite,
-});
-
 class SitePublishedBranchesTable extends React.Component {
   componentDidMount() {
     const { id } = this.props.site;
@@ -108,6 +103,11 @@ SitePublishedBranchesTable.defaultProps = {
   publishedBranches: null,
   site: null,
 };
+
+const mapStateToProps = ({ publishedBranches, sites }) => ({
+  publishedBranches,
+  site: sites.currentSite,
+});
 
 export { SitePublishedBranchesTable };
 export default connect(mapStateToProps)(SitePublishedBranchesTable);
