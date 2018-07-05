@@ -5,13 +5,6 @@ import { Link } from 'react-router';
 import { IconView } from '../icons';
 import GitHubLink from '../GitHubLink';
 
-const propTypes = {
-  owner: PropTypes.string.isRequired, // Owner (org or user) of the repo
-  repository: PropTypes.string.isRequired, // Name of the repo
-  title: PropTypes.string.isRequired, // Title of the section we are on
-  viewLink: PropTypes.string.isRequired,
-};
-
 const PagesHeader = ({ owner, repository, title, viewLink }) => (
   <div className="page-header usa-grid-full">
     <div className="usa-width-two-thirds">
@@ -38,6 +31,11 @@ const PagesHeader = ({ owner, repository, title, viewLink }) => (
   </div>
 );
 
-PagesHeader.propTypes = propTypes;
+PagesHeader.propTypes = {
+  owner: PropTypes.string.isRequired, // Owner (org or user) of the repo
+  repository: PropTypes.string.isRequired, // Name of the repo
+  title: PropTypes.string.isRequired, // Title of the section we are on
+  viewLink: PropTypes.string.isRequired,
+};
 
 export default PagesHeader;

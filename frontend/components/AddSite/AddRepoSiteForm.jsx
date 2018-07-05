@@ -7,21 +7,6 @@ import GitHubRepoUrlField from '../Fields/GitHubRepoUrlField';
 import SelectSiteEngine from '../SelectSiteEngine';
 import AlertBanner from '../alertBanner';
 
-const propTypes = {
-  showAddNewSiteFields: PropTypes.bool,
-
-  initialValues: PropTypes.shape({
-    engine: PropTypes.string.isRequired,
-  }).isRequired,
-  // the following props are from reduxForm:
-  handleSubmit: PropTypes.func.isRequired,
-  pristine: PropTypes.bool.isRequired,
-};
-
-const defaultProps = {
-  showAddNewSiteFields: false,
-};
-
 const showNewSiteAlert = () => {
   const message = (
     <span>
@@ -74,7 +59,7 @@ export const AddRepoSiteForm = ({
         </div>
         <div className="form-group">
           <BranchField
-            label="Primary branch"
+            label="Set the primary branch Federalist will use to build your site"
             type="text"
             id="defaultBranch"
             className="form-control"
@@ -96,8 +81,21 @@ export const AddRepoSiteForm = ({
   </form>
 );
 
-AddRepoSiteForm.propTypes = propTypes;
-AddRepoSiteForm.defaultProps = defaultProps;
+AddRepoSiteForm.propTypes = {
+  showAddNewSiteFields: PropTypes.bool,
+
+  initialValues: PropTypes.shape({
+    engine: PropTypes.string.isRequired,
+    defaultBranch: PropTypes.string.isRequired,
+  }).isRequired,
+  // the following props are from reduxForm:
+  handleSubmit: PropTypes.func.isRequired,
+  pristine: PropTypes.bool.isRequired,
+};
+
+AddRepoSiteForm.defaultProps = {
+  showAddNewSiteFields: false,
+};
 
 // create a higher-order component with reduxForm and export that
 export default reduxForm({ form: 'addRepoSite' })(AddRepoSiteForm);
