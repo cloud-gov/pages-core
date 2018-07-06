@@ -1,5 +1,7 @@
 .features-page {
   .callout-inline {
-    margin-left: $spacing-xl;
+    @media screen and (min-width: $lesser-mobile-size) {
+      margin-left: $spacing-xl;
+    }
   }
 }
