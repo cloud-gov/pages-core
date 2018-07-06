@@ -231,10 +231,23 @@ Our solution is to provide scalable, fast, and affordable static hosting for all
 - [HealthCare.gov uses lightweight open source tools](https://www.digitalgov.gov/2013/05/07/the-new-healthcare-gov-uses-a-lightweight-open-source-tool/)
 - [A Few Notes on NotAlone.gov](https://18f.gsa.gov/2014/05/09/a-few-notes-on-notalone-gov/)
 
-## Public domain
+
+## License
+
+
+### Public domain
 
 This project is in the worldwide [public domain](LICENSE.md). As stated in [CONTRIBUTING](CONTRIBUTING.md):
 
 > This project is in the public domain within the United States, and copyright and related rights in the work worldwide are waived through the [CC0 1.0 Universal public domain dedication](https://creativecommons.org/publicdomain/zero/1.0/).
 >
 > All contributions to this project will be released under the CC0 dedication. By submitting a pull request, you are agreeing to comply with this waiver of copyright interest.
+
+
+### Exceptions
+
+`public/images/illo-pushing-stone.png` and
+`public/images/illo-pushing-stone@2x.png` concepts from ["Man Push The Stone" by
+Berkah Icon, from the Noun
+Project](https://thenounproject.com/berkahicon/collection/startup/?i=1441102)
+made available under [CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/us/legalcode).
