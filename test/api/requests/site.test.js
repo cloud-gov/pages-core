@@ -878,10 +878,10 @@ describe('Site API', () => {
       nock.cleanAll();
 
       Promise.props({
-        userB,
+        user: userB,
         site: factory.site(siteProps),
         cookie: authenticatedSession(userA),
-      }).then(({ userB, site, cookie }) => {
+      }).then(({ user, site, cookie }) => {
         githubAPINocks.repo({
           owner: site.username,
           repository: site.repo,
@@ -890,7 +890,7 @@ describe('Site API', () => {
           }],
         });
 
-        return request(app).delete(`/v0/site/${site.id}/user/${userB.id}`)
+        return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
           .expect(400);
