@@ -878,10 +878,11 @@ describe('Site API', () => {
       nock.cleanAll();
 
       Promise.props({
-        user: userA,
+        userA,
+        userB,
         site: factory.site(siteProps),
         cookie: authenticatedSession(userA),
-      }).then(({ user, site, cookie }) => {
+      }).then(({ userA, userB, site, cookie }) => {
         githubAPINocks.repo({
           owner: site.username,
           repository: site.repo,
@@ -890,13 +891,56 @@ describe('Site API', () => {
           }],
         });
 
-        return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
+        return request(app).delete(`/v0/site/${site.id}/user/${userB.id}`)
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
           .expect(400);
       }).then((response) => {
         validateAgainstJSONSchema('DELETE', path, 400, response.body);
         expect(response.body.message).to.equal(siteErrors.WRITE_ACCESS_REQUIRED);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should allow a user to remove themselves even if htey are not a repo write user', (done) => {
+      const username = 'jane';
+      const userA = factory.user();
+      const userB = factory.user();
+      const repo = 'whatever';
+      const siteProps = {
+        owner: username,
+        repository: repo,
+        users: Promise.all([userA, userB]),
+      };
+      let currentSite;
+
+      nock.cleanAll();
+
+      Promise.props({
+        user: userA,
+        site: factory.site(siteProps),
+        cookie: authenticatedSession(userA),
+      }).then(({ user, site, cookie }) => {
+        currentSite = site;
+        githubAPINocks.repo({
+          owner: site.username,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: false, push: false },
+          }],
+        });
+
+        return request(app).delete(requestPath(site.id, user.id))
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(200);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 200, response.body);
+        return Site.withUsers(currentSite.id);
+      }).then((fetchedSite) => {
+        expect(fetchedSite.Users).to.be.an('array');
+        expect(fetchedSite.Users.length).to.equal(1);
         done();
       })
       .catch(done);
