@@ -878,11 +878,10 @@ describe('Site API', () => {
       nock.cleanAll();
 
       Promise.props({
-        userA,
         userB,
         site: factory.site(siteProps),
         cookie: authenticatedSession(userA),
-      }).then(({ userA, userB, site, cookie }) => {
+      }).then(({ userB, site, cookie }) => {
         githubAPINocks.repo({
           owner: site.username,
           repository: site.repo,
