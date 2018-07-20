@@ -4,57 +4,12 @@
   display: flex;
   flex-wrap: wrap;
 
-  .usa-width-one-third {
-    &:nth-child(3n) {
-      margin-right: 0px;
-    }
-
-    @media screen and (max-width: 976px) {
-      // needed because performance.gov overflows its container
-      margin-right: 10% !important;
-    }
-  }
-  // TODO move this out of here
-  // these are specific to the image grid
-  @media screen and (max-width: $mobile-size) {
-    img {
-      display: none;
-    }
-
-    .usa-width-one-third {
-      width: 100%;
-    }
-  }
-
-  &.flexbox-grid-4 {
-    @media (min-width: 100px) {
-      .flexbox-item {
-        flex: 0 0 100%;
-      }
-    }
-    @media (min-width: 500px) {
-      .flexbox-item {
-        flex: 0 0 48%;
-      }
-    }
-    @media (min-width: 800px) {
-      .flexbox-item {
-        flex: 0 0 24%;
-      }
-    }
-
-    .flexbox-item {
-      display: block;
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 20px;
-
-      &:not(:last-child) {
-        margin-right: 5px;
-      }
-      &:not(:first-child) {
-        margin-right: 5px;
-      }
-    }
+  .flexbox-item {
+    align-items: start;
+    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 20px;
   }
 }
