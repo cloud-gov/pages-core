@@ -131,7 +131,7 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should respond with a 403 if the user is not associated with the site', (done) => {
+    it('should respond with a  403 if the user is not associated with the site', (done) => {
       let site;
 
       factory.site().then((model) => {
