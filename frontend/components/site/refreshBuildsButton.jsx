@@ -4,7 +4,6 @@ import autoBind from 'react-autobind';
 
 import buildActions from '../../actions/buildActions';
 
-
 class RefreshBuildsButton extends React.Component {
   constructor(props) {
     super(props);

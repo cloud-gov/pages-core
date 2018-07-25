@@ -33,7 +33,6 @@ const SelectSiteEngine = ({ value, onChange, ...props }) => (
   </select>
 );
 
-
 SelectSiteEngine.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func,

@@ -30,7 +30,6 @@ BranchViewLink.propTypes = {
   previewHostname: PropTypes.string.isRequired,
 };
 
-
 const mapStateToProps = state => ({
   previewHostname: state.FRONTEND_CONFIG.PREVIEW_HOSTNAME,
 });

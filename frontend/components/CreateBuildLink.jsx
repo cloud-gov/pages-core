@@ -1,12 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const propTypes = {
-  handlerParams: PropTypes.object,
-  handleClick: PropTypes.func.isRequired,
-  children: PropTypes.node.isRequired,
-};
-
 class CreateBuildLink extends React.Component {
   constructor(props) {
     super(props);
@@ -39,7 +33,15 @@ class CreateBuildLink extends React.Component {
   }
 }
 
-CreateBuildLink.propTypes = propTypes;
+CreateBuildLink.propTypes = {
+  // Handler params object is intentionally ambiguous to allow the parent
+  // component to specify params for the handleClick function
+  // eslint-disable-next-line react/forbid-prop-types
+  handlerParams: PropTypes.object,
+  handleClick: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
+};
+
 CreateBuildLink.defaultProps = {
   handlerParams: {},
 };

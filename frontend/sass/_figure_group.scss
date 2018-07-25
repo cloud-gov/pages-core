@@ -10,7 +10,7 @@
 
 .figure-group {
   @media screen and (max-width: $mobile-size) {
-    margin: 0 auto;    
+    margin: 0 auto;
   }
 }
 
@@ -21,7 +21,7 @@
     margin-bottom: 6px;
     margin-top: 20px;
     text-align: left;
-    
+
     @media screen and (max-width: $mobile-size) {
       text-align: center;
     }
@@ -36,5 +36,14 @@
     p {
       margin: 0;
     }
+  }
+}
+
+.tint {
+  background-color: #1c4e80;
+  display: inline-block;
+  img {
+    display: block;
+    opacity: 0.97;
   }
 }

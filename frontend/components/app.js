@@ -7,12 +7,6 @@ import { USER, ALERT } from '../propTypes';
 import alertActions from '../actions/alertActions';
 import LoadingIndicator from './LoadingIndicator';
 
-const mapStateToProps = ({ alert, notifications, user }) => ({
-  alert,
-  notifications,
-  user,
-});
-
 export class App extends React.Component {
   componentWillReceiveProps(nextProps) {
     const { alert } = this.props;
@@ -94,5 +88,11 @@ App.defaultProps = {
   user: false,
   notifications: [],
 };
+
+const mapStateToProps = ({ alert, notifications, user }) => ({
+  alert,
+  notifications,
+  user,
+});
 
 export default connect(mapStateToProps)(App);
