@@ -131,7 +131,7 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should respond with a  403 if the user is not associated with the site', (done) => {
+    it('should respond with a 403 if the user is not associated with the site', (done) => {
       let site;
 
       factory.site().then((model) => {
@@ -902,7 +902,7 @@ describe('Site API', () => {
       .catch(done);
     });
 
-    it('should allow a user to remove themselves even if htey are not a repo write user', (done) => {
+    it('should allow a user to remove themselves even if they are not a repo write user', (done) => {
       const username = 'jane';
       const userA = factory.user();
       const userB = factory.user();
