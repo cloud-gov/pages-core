@@ -16,6 +16,11 @@
 
     .feature-text {
       margin-left: 0;
+
+      // Make the headings a little smaller
+      h4 {
+        font-size: $h5-font-size;
+      }
     }
 
     @media screen and (max-width: $mobile-size) {
