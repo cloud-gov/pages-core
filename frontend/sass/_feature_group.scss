@@ -6,6 +6,10 @@
   &.vertical {
     flex-direction: column;
 
+    &:first-child {
+      margin-top: 2rem; // More margin between heading and feature-group. :first-child is used to override USWDS styles
+    }
+
     .feature-image {
       padding: $spacing-sm;
     }
