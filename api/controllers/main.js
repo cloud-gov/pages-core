@@ -71,8 +71,12 @@ module.exports = {
   },
 
   features(req, res) {
-    const context = Object.assign({}, defaultContext(req));
+    // redirect to main app if is authenticated
+    if (req.session.authenticated) {
+      return res.redirect('/sites');
+    }
 
+    const context = Object.assign({}, defaultContext(req));
     return res.render('features.njk', context);
   },
 
