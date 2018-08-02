@@ -1,0 +1,18 @@
+.case-study {
+  &:nth-child(3n) {
+    margin-right: 0px;
+  }
+
+  @media screen and (max-width: 976px) {
+    // needed because performance.gov overflows its container
+    margin-right: 10% !important;
+  }
+
+  @media screen and (max-width: $mobile-size) {
+    width: 100%;
+
+    .thumbnail {
+      display: none;
+    }
+  }
+}

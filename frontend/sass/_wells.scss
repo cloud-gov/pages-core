@@ -10,6 +10,12 @@
   > :last-child {
     margin-bottom: 0;
   }
+
+  &.callout {
+    font-size: $h5-font-size;
+    font-weight: bold;
+    text-align: center;
+  }
 }
 
 .well-heading {

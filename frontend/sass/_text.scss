@@ -23,6 +23,12 @@ body {
   @include hr;
 }
 
+.hr-light--inverted {
+  background-color: $color-white;
+
+  @include hr;
+}
+
 .federalist-hero {
   padding-bottom: 60px;
   padding-top: 60px;

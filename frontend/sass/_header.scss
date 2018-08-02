@@ -97,12 +97,6 @@
   }
 }
 
-@media screen and (max-width: 600px) {
-  nav li:first-of-type {
-    display: none;
-  }
-}
-
 nav li:before {
   content: '';
   display: none;

@@ -1,0 +1,27 @@
+$icon-size: 22px;
+
+.criteria-list {
+  margin-bottom: $spacing-lg;
+  padding-left: 2 * $icon-size;
+  position: relative;
+}
+
+.criteria-list-heading {
+  &::before {
+    background-image: url('/images/icons/icon-star.svg');
+    content: '';
+    display: block;
+    left: 0;
+    position: absolute;
+    width: $icon-size;
+    height: $icon-size;
+
+    .criteria-list--star & {
+      background-image: url('/images/icons/icon-star.svg');
+    }
+
+    .criteria-list--clock & {
+      background-image: url('/images/icons/icon-clock.svg');
+    }
+  }
+}
