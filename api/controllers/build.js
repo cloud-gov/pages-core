@@ -22,6 +22,7 @@ module.exports = {
     })
     .then(() =>
       Build.findAll({
+        attributes: ['id'],
         where: { site: site.id },
         order: [['createdAt', 'desc']],
         limit: 100,
