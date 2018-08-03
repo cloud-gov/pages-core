@@ -1,6 +1,8 @@
 const AWS = require('aws-sdk');
 const config = require('../../config');
 const S3Helper = require('./S3Helper');
+const GitHub = require('./GitHub');
+const siteErrors = require('../responses/siteErrors');
 
 const s3Config = config.s3;
 const s3Client = new AWS.S3({
@@ -46,16 +48,24 @@ const getKeys = prefix =>
   S3Helper.listObjects(prefix)
     .then(objects => objects.map(o => o.Key));
 
-const removeSite = (site) => {
+const removeSite = (site, user) => {
   const prefixes = [
     `site/${site.owner}/${site.repository}`,
     `demo/${site.owner}/${site.repository}`,
     `preview/${site.owner}/${site.repository}`,
   ];
 
-  return Promise.all(
-    prefixes.map(prefix => getKeys(`${prefix}/`))
-  ).then((keys) => {
+  return GitHub.checkPermissions(user, site.owner, site.repository)
+  .then((permissions) => {
+    if (!permissions.admin) {
+      throw {
+        message: siteErrors.ADMIN_PERMISSION_REQUIRED,
+        status: 403,
+      };
+    }
+    return Promise.all(prefixes.map(prefix => getKeys(`${prefix}/`)));
+  })
+  .then((keys) => {
     let mergedKeys = [].concat(...keys);
 
     if (mergedKeys.length) {

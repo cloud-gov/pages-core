@@ -2,7 +2,7 @@ const AWSMocks = require('../../support/aws-mocks');
 const expect = require('chai').expect;
 const factory = require('../../support/factory');
 const config = require('../../../../config');
-
+const githubAPINocks = require('../../support/githubAPINocks');
 const S3SiteRemover = require('../../../../api/services/S3SiteRemover');
 
 const mapSiteContents = objects => ({
@@ -77,14 +77,19 @@ describe('S3SiteRemover', () => {
         cb(null, {});
       };
 
-      factory.site().then((model) => {
-        site = model;
-
+      Promise.props({ _site: factory.site(), user: factory.user() })
+      .then(({ _site, user }) => {
+        site = _site;
         buildSiteObjects('site', site, siteObjectsToDelete);
         buildSiteObjects('demo', site, demoObjectsToDelete);
         buildSiteObjects('preview', site, previewObjectsToDelete);
 
-        return S3SiteRemover.removeSite(site);
+        githubAPINocks.repo({
+          response: [201, {
+            permissions: { admin: true },
+          }],
+        });
+        return S3SiteRemover.removeSite(site, user);
       }).then(() => {
         expect(siteObjectsWereListed).to.equal(true);
         expect(demoObjectWereListed).to.equal(true);
@@ -109,8 +114,15 @@ describe('S3SiteRemover', () => {
         cb();
       };
 
-      factory.site()
-      .then(site => S3SiteRemover.removeSite(site))
+      Promise.props({ site: factory.site(), user: factory.user() })
+      .then(({ site, user }) => {
+        githubAPINocks.repo({
+          response: [201, {
+            permissions: { admin: true },
+          }],
+        });
+        return S3SiteRemover.removeSite(site, user);
+      })
       .then(() => {
         // 750 site, 750 demo, 750 preview objects = 2250 total
         // 2250 objects means 3 groups of 1000
@@ -131,10 +143,34 @@ describe('S3SiteRemover', () => {
         throw new Error('Attempted to delete objects when there should be none to delete');
       };
 
-      factory.site()
-      .then(site => S3SiteRemover.removeSite(site))
+      Promise.props({ site: factory.site(), user: factory.user() })
+      .then(({ site, user }) => {
+        githubAPINocks.repo({
+          response: [201, {
+            permissions: { admin: true },
+          }],
+        });
+        return S3SiteRemover.removeSite(site, user);
+      })
       .then(done)
       .catch(done);
+    });
+
+    it('should not delete anything with out admin privileges', (done) => {
+      Promise.props({ site: factory.site(), user: factory.user() })
+      .then(({ site, user }) => {
+        githubAPINocks.repo({
+          response: [201, {
+            permissions: { admin: false },
+          }],
+        });
+        return S3SiteRemover.removeSite(site, user);
+      })
+      .catch((e) => {
+        expect(e.status).to.equal(403);
+        expect(e.message).to.equal('You do not have administrative privileges on this repository');
+        done();
+      });
     });
   });
 });
