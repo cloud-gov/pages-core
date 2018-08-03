@@ -168,7 +168,7 @@ describe('S3SiteRemover', () => {
       })
       .catch((e) => {
         expect(e.status).to.equal(403);
-        expect(e.message).to.equal('You do not have administrative privileges on this repository');
+        expect(e.message).to.equal('You do not have administrative access to this repository');
         done();
       });
     });

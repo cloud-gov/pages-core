@@ -531,7 +531,7 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should respond with a 400 if the user does not have write access to repository', (done) => {
+    it('should respond with a 400 if the user does not have admin access to repository', (done) => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
 
@@ -560,7 +560,7 @@ describe('Site API', () => {
           .expect(400)
       ).then((response) => {
         validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
-        expect(response.body.message).to.eq('You do not have write access to this repository');
+        expect(response.body.message).to.eq('You do not have administrative access to this repository');
         done();
       })
       .catch(done);
@@ -896,7 +896,7 @@ describe('Site API', () => {
           .expect(400);
       }).then((response) => {
         validateAgainstJSONSchema('DELETE', path, 400, response.body);
-        expect(response.body.message).to.equal(siteErrors.WRITE_ACCESS_REQUIRED);
+        expect(response.body.message).to.equal(siteErrors.ADMIN_ACCESS_REQUIRED);
         done();
       })
       .catch(done);

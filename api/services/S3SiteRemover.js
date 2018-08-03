@@ -59,7 +59,7 @@ const removeSite = (site, user) => {
   .then((permissions) => {
     if (!permissions.admin) {
       throw {
-        message: siteErrors.ADMIN_PERMISSION_REQUIRED,
+        message: siteErrors.ADMIN_ACCESS_REQUIRED,
         status: 403,
       };
     }

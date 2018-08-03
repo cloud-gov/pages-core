@@ -3,5 +3,5 @@ module.exports = {
   OWNER_REMOVE: 'You cannot remove the owner of a site.',
   WRITE_ACCESS_REQUIRED: 'You do not have write access to this repository',
   NO_ASSOCIATED_USER: 'That user is not associated with this site.',
-  ADMIN_PERMISSION_REQUIRED: 'You do not have administrative privileges on this repository',
+  ADMIN_ACCESS_REQUIRED: 'You do not have administrative access to this repository',
 };
