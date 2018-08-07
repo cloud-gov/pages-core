@@ -12,7 +12,7 @@ const checkGithubRepository = ({ user, owner, repository }) =>
     }
     if (!repo.permissions.push) {
       throw {
-        message: siteErrors.ADMIN_ACCESS_REQUIRED,
+        message: siteErrors.WRITE_ACCESS_REQUIRED,
         status: 400,
       };
     }

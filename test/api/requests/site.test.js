@@ -531,7 +531,7 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should respond with a 400 if the user does not have admin access to repository', (done) => {
+    it('should respond with a 400 if the user does not have write access to repository', (done) => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
 
@@ -560,7 +560,7 @@ describe('Site API', () => {
           .expect(400)
       ).then((response) => {
         validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
-        expect(response.body.message).to.eq('You do not have administrative access to this repository');
+        expect(response.body.message).to.eq('You do not have write access to this repository');
         done();
       })
       .catch(done);
@@ -676,6 +676,15 @@ describe('Site API', () => {
         cookie: authenticatedSession(jane),
       }).then(({ user, site, cookie }) => {
         currentSite = site;
+
+        nock.cleanAll();
+        githubAPINocks.repo({
+          owner: site.owner,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: true, push: true },
+          }],
+        });
 
         return request(app).delete(requestPath(site.id, user.id))
           .set('x-csrf-token', csrfToken.getToken())
@@ -961,6 +970,14 @@ describe('Site API', () => {
       factory.site()
         .then((model) => {
           site = model;
+          nock.cleanAll();
+          githubAPINocks.repo({
+            owner: site.owner,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: true, push: true },
+            }],
+          });
           return unauthenticatedSession();
         })
         .then(cookie => request(app)
@@ -1007,6 +1024,14 @@ describe('Site API', () => {
         .then(s => Site.findById(s.id, { include: [User] }))
         .then((model) => {
           site = model;
+          nock.cleanAll();
+          githubAPINocks.repo({
+            owner: site.owner,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: true, push: true },
+            }],
+          });
           return authenticatedSession(site.Users[0]);
         })
         .then(cookie => request(app)
@@ -1065,6 +1090,14 @@ describe('Site API', () => {
         cookie: sessionPromise,
       }).then((results) => {
         site = results.site;
+        nock.cleanAll();
+        githubAPINocks.repo({
+          owner: site.owner,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: true, push: true },
+          }],
+        });
         S3SiteRemover.removeSite.restore();
         sinon.stub(S3SiteRemover, 'removeSite', (calledSite) => {
           expect(calledSite.id).to.equal(site.id);

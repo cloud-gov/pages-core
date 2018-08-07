@@ -68,7 +68,7 @@ module.exports = {
         siteJSON = json;
         return authorizer.destroy(req.user, site);
       })
-      .then(() => S3SiteRemover.removeSite(site, req.user))
+      .then(() => S3SiteRemover.removeSite(site))
       .then(() => site.destroy())
       .then(() => {
         res.json(siteJSON);

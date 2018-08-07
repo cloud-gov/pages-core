@@ -53,7 +53,7 @@ describe('SiteMembershipCreator', () => {
       }).catch(done);
     });
 
-    it('should reject if the user does not have admin access to the site', (done) => {
+    it('should reject if the user does not have write access to the site', (done) => {
       let site;
       let user;
 
@@ -83,7 +83,7 @@ describe('SiteMembershipCreator', () => {
       })
       .catch((err) => {
         expect(err.status).to.eq(400);
-        expect(err.message).to.equal('You do not have administrative access to this repository');
+        expect(err.message).to.equal('You do not have write access to this repository');
         done();
       })
       .catch(done);
