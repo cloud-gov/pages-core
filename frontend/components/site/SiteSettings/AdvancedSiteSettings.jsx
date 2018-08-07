@@ -116,7 +116,7 @@ export const AdvancedSiteSettings = ({
           status="warning"
           header="Danger zone"
           message="Are you sure you want to delete this site from Federalist for all users,
-                   remove all published sites, and delete all previews? Only Github repo 
+                   remove all published sites, and delete all previews? Only Github repo
                    administrators can use this feature."
           alertRole={false}
         >
