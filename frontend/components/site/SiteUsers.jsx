@@ -32,7 +32,7 @@ const SiteUsers = ({ site, user }) => {
       <p>
         This user table is a partially complete feature.
         It allows you to easily audit who else has access
-        to Federalist settings and logs for this site. GitHub repo 
+        to Federalist settings and logs for this site. GitHub repo
         administrators can also remove user access for others. Eventually,
         this table will be used to allow you to add other users.
         Currently, new users get access for a specific site by
