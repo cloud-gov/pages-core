@@ -107,7 +107,7 @@ export const AdvancedSiteSettings = ({
         <p className="well-text">
           Deleting a Federalist site removes the published site from our servers and
           disconnects the Federalist admin interface for all users. This will bring the
-          entire site offline and make it inaccessible for users. <i>Trying to remove a site
+          entire site offline and make it inaccessible for users.<br/><br/> <i>Trying to remove a site
           from your list of Federalist sites? Go to the
           {' '}
             <a href={`/sites/${siteId}/users`}>collaborators page</a> and remove yourself.</i>
@@ -116,7 +116,8 @@ export const AdvancedSiteSettings = ({
           status="warning"
           header="Danger zone"
           message="Are you sure you want to delete this site from Federalist for all users,
-                   remove all published sites, and delete all previews?"
+                   remove all published sites, and delete all previews? Only Github repo 
+                   administrators can use this feature."
           alertRole={false}
         >
           <button className="usa-button usa-button-red" onClick={onDelete}>
