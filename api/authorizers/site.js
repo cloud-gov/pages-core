@@ -1,3 +1,5 @@
+const GitHub = require('../services/GitHub');
+
 const { User, Site } = require('../models');
 
 const authorize = ({ id }, site) => (
@@ -12,6 +14,16 @@ const authorize = ({ id }, site) => (
     })
 );
 
+const authorizeAdmin = (user, site) => (
+  GitHub.checkPermissions(user, site.owner, site.repository)
+  .then((permissions) => {
+    if (!permissions.admin) {
+      return Promise.reject(403);
+    }
+    return Promise.resolve(site.id);
+  })
+);
+
 // create is allowed for all
 const create = () => Promise.resolve();
 const addUser = () => Promise.resolve();
@@ -24,7 +36,10 @@ const findOne = (user, site) => authorize(user, site);
 
 const update = (user, site) => authorize(user, site);
 
-const destroy = (user, site) => authorize(user, site);
+const destroy = (user, site) => (
+  authorize(user, site)
+  .then(() => authorizeAdmin(user, site))
+);
 
 const removeUser = (user, site) => authorize(user, site);
 
