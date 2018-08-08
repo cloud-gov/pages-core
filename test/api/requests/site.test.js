@@ -677,6 +677,15 @@ describe('Site API', () => {
       }).then(({ user, site, cookie }) => {
         currentSite = site;
 
+        nock.cleanAll();
+        githubAPINocks.repo({
+          owner: site.owner,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: true, push: true },
+          }],
+        });
+
         return request(app).delete(requestPath(site.id, user.id))
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
@@ -896,7 +905,7 @@ describe('Site API', () => {
           .expect(400);
       }).then((response) => {
         validateAgainstJSONSchema('DELETE', path, 400, response.body);
-        expect(response.body.message).to.equal(siteErrors.WRITE_ACCESS_REQUIRED);
+        expect(response.body.message).to.equal(siteErrors.ADMIN_ACCESS_REQUIRED);
         done();
       })
       .catch(done);
@@ -961,6 +970,14 @@ describe('Site API', () => {
       factory.site()
         .then((model) => {
           site = model;
+          nock.cleanAll();
+          githubAPINocks.repo({
+            owner: site.owner,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: true, push: true },
+            }],
+          });
           return unauthenticatedSession();
         })
         .then(cookie => request(app)
@@ -1007,6 +1024,14 @@ describe('Site API', () => {
         .then(s => Site.findById(s.id, { include: [User] }))
         .then((model) => {
           site = model;
+          nock.cleanAll();
+          githubAPINocks.repo({
+            owner: site.owner,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: true, push: true },
+            }],
+          });
           return authenticatedSession(site.Users[0]);
         })
         .then(cookie => request(app)
@@ -1065,6 +1090,14 @@ describe('Site API', () => {
         cookie: sessionPromise,
       }).then((results) => {
         site = results.site;
+        nock.cleanAll();
+        githubAPINocks.repo({
+          owner: site.owner,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: true, push: true },
+          }],
+        });
         S3SiteRemover.removeSite.restore();
         sinon.stub(S3SiteRemover, 'removeSite', (calledSite) => {
           expect(calledSite.id).to.equal(site.id);
