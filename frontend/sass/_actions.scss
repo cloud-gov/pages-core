@@ -31,6 +31,12 @@ a.usa-button,
     color: #323a45;
   }
 
+  // Buttons containing icons, scale based on the font-size
+  img {
+    height: 1em;
+    vertical-align: bottom;
+  }
+
   svg {
     stroke-width: 0;
     fill: $button-text-color;

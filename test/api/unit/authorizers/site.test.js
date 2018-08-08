@@ -1,7 +1,8 @@
 const crypto = require("crypto")
 const expect = require("chai").expect
 const factory = require("../../support/factory")
-
+const nock = require('nock');
+const githubAPINocks = require('../../support/githubAPINocks');
 const authorizer = require("../../../../api/authorizers/site.js")
 
 describe("Site authorizer", () => {
@@ -78,8 +79,16 @@ describe("Site authorizer", () => {
 
   describe(".destroy(user, site)", () => {
     it("should resolve if the user is associated with the site", done => {
-      const user = factory.user()
-      const site = factory.site({ users: Promise.all([user]) })
+      const user = factory.user();
+      const site = factory.site({ users: Promise.all([user]) });
+      nock.cleanAll();
+      githubAPINocks.repo({
+        owner: site.owner,
+        repository: site.repo,
+        response: [200, {
+          permissions: { admin: true, push: true },
+        }],
+      });
 
       Promise.props({ user, site }).then(({ user, site }) => {
         return authorizer.destroy(user, site)
@@ -89,8 +98,38 @@ describe("Site authorizer", () => {
     })
 
     it("should reject if the user is not associated with the site", done => {
+      const user = factory.user();
+      const site = factory.site();
+      nock.cleanAll();
+      githubAPINocks.repo({
+        owner: site.owner,
+        repository: site.repo,
+        response: [200, {
+          permissions: { admin: true, push: true },
+        }],
+      });
+
+      Promise.props({ user, site }).then(({ user, site }) => {
+        return authorizer.destroy(user, site)
+      }).then(() => {
+        done(new Error('Expected authorization error'));
+      }).catch((err) => {
+        expect(err).to.equal(403);
+        done();
+      }).catch(done)
+    })
+
+    it("should reject if the user is associated with the site but not an admin", done => {
       const user = factory.user()
-      const site = factory.site()
+      const site = factory.site({ users: Promise.all([user]) })
+      nock.cleanAll();
+      githubAPINocks.repo({
+        owner: site.owner,
+        repository: site.repo,
+        response: [200, {
+          permissions: { admin: false, push: true },
+        }],
+      });
 
       Promise.props({ user, site }).then(({ user, site }) => {
         return authorizer.destroy(user, site)

@@ -677,6 +677,15 @@ describe('Site API', () => {
       }).then(({ user, site, cookie }) => {
         currentSite = site;
 
+        nock.cleanAll();
+        githubAPINocks.repo({
+          owner: site.owner,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: true, push: true },
+          }],
+        });
+
         return request(app).delete(requestPath(site.id, user.id))
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
@@ -878,7 +887,7 @@ describe('Site API', () => {
       nock.cleanAll();
 
       Promise.props({
-        user: userA,
+        user: userB,
         site: factory.site(siteProps),
         cookie: authenticatedSession(userA),
       }).then(({ user, site, cookie }) => {
@@ -896,7 +905,50 @@ describe('Site API', () => {
           .expect(400);
       }).then((response) => {
         validateAgainstJSONSchema('DELETE', path, 400, response.body);
-        expect(response.body.message).to.equal(siteErrors.WRITE_ACCESS_REQUIRED);
+        expect(response.body.message).to.equal(siteErrors.ADMIN_ACCESS_REQUIRED);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should allow a user to remove themselves even if they are not a repo write user', (done) => {
+      const username = 'jane';
+      const userA = factory.user();
+      const userB = factory.user();
+      const repo = 'whatever';
+      const siteProps = {
+        owner: username,
+        repository: repo,
+        users: Promise.all([userA, userB]),
+      };
+      let currentSite;
+
+      nock.cleanAll();
+
+      Promise.props({
+        user: userA,
+        site: factory.site(siteProps),
+        cookie: authenticatedSession(userA),
+      }).then(({ user, site, cookie }) => {
+        currentSite = site;
+        githubAPINocks.repo({
+          owner: site.username,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: false, push: false },
+          }],
+        });
+
+        return request(app).delete(requestPath(site.id, user.id))
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(200);
+      }).then((response) => {
+        validateAgainstJSONSchema('DELETE', path, 200, response.body);
+        return Site.withUsers(currentSite.id);
+      }).then((fetchedSite) => {
+        expect(fetchedSite.Users).to.be.an('array');
+        expect(fetchedSite.Users.length).to.equal(1);
         done();
       })
       .catch(done);
@@ -918,6 +970,14 @@ describe('Site API', () => {
       factory.site()
         .then((model) => {
           site = model;
+          nock.cleanAll();
+          githubAPINocks.repo({
+            owner: site.owner,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: true, push: true },
+            }],
+          });
           return unauthenticatedSession();
         })
         .then(cookie => request(app)
@@ -964,6 +1024,14 @@ describe('Site API', () => {
         .then(s => Site.findById(s.id, { include: [User] }))
         .then((model) => {
           site = model;
+          nock.cleanAll();
+          githubAPINocks.repo({
+            owner: site.owner,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: true, push: true },
+            }],
+          });
           return authenticatedSession(site.Users[0]);
         })
         .then(cookie => request(app)
@@ -1022,6 +1090,14 @@ describe('Site API', () => {
         cookie: sessionPromise,
       }).then((results) => {
         site = results.site;
+        nock.cleanAll();
+        githubAPINocks.repo({
+          owner: site.owner,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: true, push: true },
+          }],
+        });
         S3SiteRemover.removeSite.restore();
         sinon.stub(S3SiteRemover, 'removeSite', (calledSite) => {
           expect(calledSite.id).to.equal(site.id);

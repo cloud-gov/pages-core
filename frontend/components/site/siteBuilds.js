@@ -91,7 +91,7 @@ class SiteBuilds extends React.Component {
 
               switch (build.state) {
                 case 'error':
-                  message = build.error;
+                  message = 'This build has failed. Please view the logs for more information.';
                   break;
                 case 'processing':
                   message = 'This build is in progress';

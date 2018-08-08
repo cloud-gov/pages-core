@@ -56,9 +56,9 @@ const createSiteMembership = ({ user, siteParams }) => {
 const revokeSiteMembership = ({ user, site, userId }) =>
   GitHub.checkPermissions(user, site.owner, site.repository)
     .then((permissions) => {
-      if (!permissions.push) {
+      if (user.id !== Number(userId) && !permissions.admin) {
         throw {
-          message: siteErrors.WRITE_ACCESS_REQUIRED,
+          message: siteErrors.ADMIN_ACCESS_REQUIRED,
           status: 400,
         };
       }

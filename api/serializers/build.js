@@ -13,6 +13,7 @@ const serialize = (serializable) => {
   if (serializable.length !== undefined) {
     const buildIds = serializable.map(build => build.id);
     const query = Build.findAll({
+      attributes: { exclude: ['error'] },
       where: { id: buildIds },
       order: [['createdAt', 'DESC']],
       include: [User, Site],
