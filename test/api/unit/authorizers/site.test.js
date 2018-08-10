@@ -4,6 +4,7 @@ const factory = require("../../support/factory")
 const nock = require('nock');
 const githubAPINocks = require('../../support/githubAPINocks');
 const authorizer = require("../../../../api/authorizers/site.js")
+const siteErrors = require('../../../../api/responses/siteErrors');
 
 describe("Site authorizer", () => {
   describe(".create(user, params)", () => {
@@ -136,7 +137,8 @@ describe("Site authorizer", () => {
       }).then(() => {
         done(new Error("Expected authorization error"))
       }).catch(err => {
-        expect(err).to.equal(403)
+        expect(err.status).to.equal(403)
+        expect(err.message).to.equal(siteErrors.ADMIN_ACCESS_REQUIRED)
         done()
       }).catch(done)
     })

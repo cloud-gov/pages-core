@@ -1,5 +1,5 @@
 const GitHub = require('../services/GitHub');
-
+const siteErrors = require('../responses/siteErrors');
 const { User, Site } = require('../models');
 
 const authorize = ({ id }, site) => (
@@ -18,7 +18,10 @@ const authorizeAdmin = (user, site) => (
   GitHub.checkPermissions(user, site.owner, site.repository)
   .then((permissions) => {
     if (!permissions.admin) {
-      return Promise.reject(403);
+      return Promise.reject({
+        message: siteErrors.ADMIN_ACCESS_REQUIRED,
+        status: 403,
+      });
     }
     return Promise.resolve(site.id);
   })
