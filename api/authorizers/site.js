@@ -19,9 +19,9 @@ const authorizeAdmin = (user, site) => (
   .then((permissions) => {
     if (!permissions.admin) {
       return Promise.reject({
-          message: siteErrors.ADMIN_ACCESS_REQUIRED,
-          status: 403,
-        });
+        message: siteErrors.ADMIN_ACCESS_REQUIRED,
+        status: 403,
+      });
     }
     return Promise.resolve(site.id);
   })
