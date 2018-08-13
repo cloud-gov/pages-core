@@ -3,9 +3,9 @@ import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import { spy } from 'sinon';
 
-import ReduxFormAdvancedSiteSettings, { AdvancedSiteSettings } from '../../../../../frontend/components/site/SiteSettings/AdvancedSiteSettings';
+import ReduxFormAdvancedSiteSettings, { AdvancedSiteSettingsForm } from '../../../../../frontend/components/site/SiteSettings/AdvancedSiteSettingsForm';
 
-describe('<AdvancedSiteSettings/>', () => {
+describe('<AdvancedSiteSettingsForm/>', () => {
   const makeProps = () => (
     {
       initialValues: {
@@ -25,7 +25,7 @@ describe('<AdvancedSiteSettings/>', () => {
 
   it('should render', () => {
     const props = makeProps();
-    const wrapper = shallow(<AdvancedSiteSettings {...props} />);
+    const wrapper = shallow(<AdvancedSiteSettingsForm {...props} />);
     const alertBanner = wrapper.find('AlertBanner');
 
     expect(wrapper.exists()).to.be.true;
@@ -42,20 +42,20 @@ describe('<AdvancedSiteSettings/>', () => {
 
   it('should have its buttons disabled when pristine', () => {
     const props = makeProps();
-    let wrapper = shallow(<AdvancedSiteSettings {...props} />);
+    let wrapper = shallow(<AdvancedSiteSettingsForm {...props} />);
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.true;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.true;
 
     props.pristine = false;
-    wrapper = shallow(<AdvancedSiteSettings {...props} />);
+    wrapper = shallow(<AdvancedSiteSettingsForm {...props} />);
     expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.false;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.false;
   });
 
   it('should call onDelete when Delete button is clicked', () => {
     const props = makeProps();
-    const wrapper = shallow(<AdvancedSiteSettings {...props} />);
+    const wrapper = shallow(<AdvancedSiteSettingsForm {...props} />);
 
     const deleteButton = wrapper.find('button.usa-button-red');
     expect(props.onDelete.called).to.be.false;
@@ -66,7 +66,7 @@ describe('<AdvancedSiteSettings/>', () => {
   it('should call reset when Reset button is clicked', () => {
     const props = makeProps();
     props.pristine = false;
-    const wrapper = shallow(<AdvancedSiteSettings {...props} />);
+    const wrapper = shallow(<AdvancedSiteSettingsForm {...props} />);
     const resetButton = wrapper.find('button.usa-button-secondary');
 
     expect(props.reset.called).to.be.false;
@@ -77,7 +77,7 @@ describe('<AdvancedSiteSettings/>', () => {
   it('should call handleSubmit when form is submitted', () => {
     const props = makeProps();
     props.pristine = false;
-    const wrapper = shallow(<AdvancedSiteSettings {...props} />);
+    const wrapper = shallow(<AdvancedSiteSettingsForm {...props} />);
     const form = wrapper.find('form');
 
     expect(props.handleSubmit.called).to.be.false;

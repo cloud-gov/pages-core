@@ -53,7 +53,8 @@ describe('<SiteSettings/>', () => {
 
   it('should render', () => {
     expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('ReduxForm')).to.have.length(3);
+    expect(wrapper.find('AdvancedSiteSettings')).to.have.length(1);
+    expect(wrapper.find('ReduxForm')).to.have.length(2);
   });
 
   it('should not render if site prop is not defined', () => {

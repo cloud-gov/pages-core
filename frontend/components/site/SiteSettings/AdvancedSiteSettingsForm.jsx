@@ -6,7 +6,7 @@ import { Field, reduxForm } from 'redux-form';
 import SelectSiteEngine from '../../SelectSiteEngine';
 import AlertBanner from '../../alertBanner';
 
-export const AdvancedSiteSettings = ({
+export const AdvancedSiteSettingsForm = ({
   // even though initialValues is not directly used, it is used
   // by reduxForm, and we want PropType validation on it, so we'll
   // keep it here but disable the eslint rule below
@@ -129,7 +129,7 @@ export const AdvancedSiteSettings = ({
   </form>
 );
 
-AdvancedSiteSettings.propTypes = {
+AdvancedSiteSettingsForm.propTypes = {
   onDelete: PropTypes.func.isRequired,
   siteId: PropTypes.number.isRequired,
   // initialValues is what the initial form values are based on
@@ -147,4 +147,4 @@ AdvancedSiteSettings.propTypes = {
 };
 
 // create a higher-order component with reduxForm and export that
-export default reduxForm({ form: 'advancedSiteSettings' })(AdvancedSiteSettings);
+export default reduxForm({ form: 'advancedSiteSettings' })(AdvancedSiteSettingsForm);
