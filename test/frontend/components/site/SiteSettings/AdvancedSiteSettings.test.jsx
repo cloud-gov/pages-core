@@ -21,10 +21,10 @@ describe('<AdvancedSiteSettings/>', () => {
   it('should render', () => {
     const props = makeProps();
     const wrapper = shallow(<AdvancedSiteSettings {...props} />);
-    const form = wrapper.find('ReduxForm'); // AdvancedSiteSettingsForm
+    const form = wrapper.find('ReduxForm');
 
     expect(wrapper.exists()).to.be.true;
-    expect(form).to.have.length(1);
+    expect(form).to.have.length(2);
   });
 
   describe('AdvancedSiteSettingsForm', () => {
@@ -34,14 +34,28 @@ describe('<AdvancedSiteSettings/>', () => {
     beforeEach(() => {
       props = makeProps();
       wrapper = shallow(<AdvancedSiteSettings {...props} />);
-      form = wrapper.find('ReduxForm'); // AdvancedSiteSettingsForm
+      form = wrapper.find('ReduxForm').at(0); // AdvancedSiteSettingsForm
     });
 
     it('has props passed down', () => {
-      expect(form.prop('initialValues')).to.deep.equal(props.initialValues);
-      expect(form.prop('siteId')).to.deep.equal(props.siteId);
-      expect(form.prop('onDelete')).to.deep.equal(props.onDelete);
-      expect(form.prop('onSubmit')).to.deep.equal(props.onSubmit);
+      expect(form.prop('initialValues')).to.equal(props.initialValues);
+      expect(form.prop('onSubmit')).to.equal(props.onSubmit);
+    });
+  });
+
+  describe('DeleteSiteForm', () => {
+    let props;
+    let wrapper;
+    let form;
+    beforeEach(() => {
+      props = makeProps();
+      wrapper = shallow(<AdvancedSiteSettings {...props} />);
+      form = wrapper.find('ReduxForm').at(1); // DeleteSiteForm
+    });
+
+    it('has the onDelete handler as onSubmit', () => {
+      expect(form.prop('siteId')).to.equal(props.siteId);
+      expect(form.prop('onSubmit')).to.equal(props.onDelete);
     });
   });
 });

@@ -1,18 +1,15 @@
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
 import SelectSiteEngine from '../../SelectSiteEngine';
-import AlertBanner from '../../alertBanner';
+
 
 export const AdvancedSiteSettingsForm = ({
   // even though initialValues is not directly used, it is used
   // by reduxForm, and we want PropType validation on it, so we'll
   // keep it here but disable the eslint rule below
-  siteId,
   initialValues, // eslint-disable-line no-unused-vars
-  onDelete,
   reset,
   pristine,
   handleSubmit,
@@ -99,39 +96,10 @@ export const AdvancedSiteSettingsForm = ({
     >
       Save advanced settings
     </button>
-
-    <div className="well">
-      {/* DELETE SITE */}
-      <fieldset>
-        <legend>Delete Site</legend>
-        <p className="well-text">
-          Deleting a Federalist site removes the published site from our servers and
-          disconnects the Federalist admin interface for all users. This will bring the
-          entire site offline and make it inaccessible for users.<br /><br /> <i>Trying
-          to remove a site from your list of Federalist sites? Go to the
-          {' '}
-            <a href={`/sites/${siteId}/users`}>collaborators page</a> and remove yourself.</i>
-        </p>
-        <AlertBanner
-          status="warning"
-          header="Danger zone"
-          message="Are you sure you want to delete this site from Federalist for all users,
-                   remove all published sites, and delete all previews? Only Github repo
-                   administrators can use this feature."
-          alertRole={false}
-        >
-          <button className="usa-button usa-button-red" onClick={onDelete}>
-            Delete
-          </button>
-        </AlertBanner>
-      </fieldset>
-    </div>
   </form>
 );
 
 AdvancedSiteSettingsForm.propTypes = {
-  onDelete: PropTypes.func.isRequired,
-  siteId: PropTypes.number.isRequired,
   // initialValues is what the initial form values are based on
   initialValues: PropTypes.shape({
     engine: PropTypes.string.isRequired,

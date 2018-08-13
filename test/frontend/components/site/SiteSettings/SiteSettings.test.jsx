@@ -74,11 +74,9 @@ describe('<SiteSettings/>', () => {
     global.window = { confirm: () => true };
 
     expect(siteActionsMock.deleteSite.called).to.be.false;
-    const mockEvent = { preventDefault: spy() };
-    wrapper.instance().handleDelete(mockEvent);
+    wrapper.instance().handleDelete();
     expect(siteActionsMock.deleteSite.calledOnce).to.be.true;
     expect(siteActionsMock.deleteSite.calledWith(props.site.id)).to.be.true;
-    expect(mockEvent.preventDefault.calledOnce).to.be.true;
   });
 
   it('calls the addSite action', () => {

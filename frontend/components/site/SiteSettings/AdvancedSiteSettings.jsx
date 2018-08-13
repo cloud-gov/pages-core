@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import AdvancedSiteSettingsForm from './AdvancedSiteSettingsForm';
+import DeleteSiteForm from './DeleteSiteForm';
 
 
 export const AdvancedSiteSettings = ({
@@ -12,11 +13,10 @@ export const AdvancedSiteSettings = ({
 }) => (
   <div>
     <AdvancedSiteSettingsForm
-      siteId={siteId}
       initialValues={initialValues}
-      onDelete={onDelete}
       onSubmit={onSubmit}
     />
+    <DeleteSiteForm siteId={siteId} onSubmit={onDelete} />
   </div>
 );
 
