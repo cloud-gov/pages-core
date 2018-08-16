@@ -16,13 +16,13 @@ class SiteSettings extends React.Component {
     autoBind(this, 'handleUpdate', 'handleDelete', 'handleCopySite');
   }
 
-  handleDelete(event) {
+  handleDelete() {
     // eslint-disable-next-line no-alert
     if (window.confirm('Are you sure you want to delete this site for all users? This action will also delete all site builds and take down the live site, if published.')) {
-      siteActions.deleteSite(this.props.site.id);
+      return siteActions.deleteSite(this.props.site.id);
     }
 
-    event.preventDefault();
+    return Promise.resolve();
   }
 
   handleUpdate(values) {
