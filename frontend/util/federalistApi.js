@@ -104,7 +104,7 @@ export default {
   deleteSite(siteId) {
     return this.fetch(`site/${siteId}`,
       { method: 'DELETE' },
-      { handleHttpError: false },
+      { handleHttpError: false }
     );
   },
 
