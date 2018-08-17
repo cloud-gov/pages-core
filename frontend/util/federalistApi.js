@@ -102,9 +102,10 @@ export default {
   },
 
   deleteSite(siteId) {
-    return this.fetch(`site/${siteId}`, {
-      method: 'DELETE',
-    });
+    return this.fetch(`site/${siteId}`,
+      { method: 'DELETE' },
+      { handleHttpError: false }
+    );
   },
 
   restartBuild(buildId, siteId) {
