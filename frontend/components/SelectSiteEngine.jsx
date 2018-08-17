@@ -7,12 +7,12 @@ export const availableEngines = [
     value: 'hugo',
   },
   {
-    label: 'JavaScript (experimental)',
-    value: 'javascript',
-  },
-  {
     label: 'Jekyll',
     value: 'jekyll',
+  },
+  {
+    label: 'Script only (experimental)',
+    value: 'script only',
   },
   {
     label: 'Static (just publish the files in the repository)',
