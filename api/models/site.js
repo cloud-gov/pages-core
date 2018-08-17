@@ -148,7 +148,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     engine: {
       type: DataTypes.ENUM,
-      values: ['hugo', 'javascript','jekyll', 'static'],
+      values: ['hugo', 'javascript', 'jekyll', 'static'],
       defaultValue: 'static',
     },
     owner: {

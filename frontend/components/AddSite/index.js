@@ -7,7 +7,6 @@ import { USER, ALERT } from '../../propTypes';
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
 import AlertBanner from '../alertBanner';
-import { availableEngines } from '../SelectSiteEngine';
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
 
