@@ -3,12 +3,16 @@ import PropTypes from 'prop-types';
 
 export const availableEngines = [
   {
-    label: 'Jekyll',
-    value: 'jekyll',
-  },
-  {
     label: 'Hugo (experimental)',
     value: 'hugo',
+  },
+  {
+    label: 'JavaScript (experimental)',
+    value: 'javascript',
+  },
+  {
+    label: 'Jekyll',
+    value: 'jekyll',
   },
   {
     label: 'Static (just publish the files in the repository)',
