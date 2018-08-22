@@ -7,7 +7,6 @@ import { USER, ALERT } from '../../propTypes';
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
 import AlertBanner from '../alertBanner';
-import { availableEngines } from '../SelectSiteEngine';
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
 
@@ -83,7 +82,7 @@ export class AddSite extends React.Component {
           </div>
           <h2>Use your own GitHub repository</h2>
           <AddRepoSiteForm
-            initialValues={{ engine: availableEngines[0].value, defaultBranch: 'master' }}
+            initialValues={{ engine: 'jekyll', defaultBranch: 'master' }}
             showAddNewSiteFields={this.props.showAddNewSiteFields}
             onSubmit={formSubmitFunc}
           />
