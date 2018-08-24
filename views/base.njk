@@ -98,35 +98,26 @@
             <ul class="usa-unstyled-list">
               {% if not isAuthenticated %}
                 <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" href="/">Home</a>
+                  <a class="usa-footer-primary-link" href="/features/">Features & pricing</a>
+                </li>
+                <li class="usa-width-one-sixth usa-footer-primary-content">
+                  <a class="usa-footer-primary-link" href="/content/examples/">Example sites</a>
+                </li>
+                <li class="usa-width-one-sixth usa-footer-primary-content">
+                  <a class="usa-footer-primary-link" target="_blank" href="https://federalist-docs.18f.gov">Support</a>
                 </li>
                 <li class="usa-width-one-sixth usa-footer-primary-content">
                   <a class="usa-footer-primary-link" href="/contact/">Contact</a>
-                </li>
-                <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" href="/case-studies/">Case Studies</a>
-                </li>
-                <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" target="_blank" href="https://federalist-docs.18f.gov">Documentation</a>
-                </li>
-                <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLSesNI1qlov7Ec_1u2FralYWg9hV4WsB-3FyAHPXc1pRT6In7w/viewform">Get started</a>
                 </li>
               {% else %}
                 <li class="usa-width-one-sixth usa-footer-primary-content">
                   <a class="usa-footer-primary-link" href="/">{{ username }}'s sites</a>
                 </li>
                 <li class="usa-width-one-sixth usa-footer-primary-content">
+                  <a class="usa-footer-primary-link" target="_blank" href="https://federalist-docs.18f.gov">Support</a>
+                </li>
+                <li class="usa-width-one-sixth usa-footer-primary-content">
                   <a class="usa-footer-primary-link" href="/contact/">Contact</a>
-                </li>
-                <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" target="_blank" href="https://federalist-docs.18f.gov">Documentation</a>
-                </li>
-                <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" href="https://github.com/18F/federalist/issues/new" target="_blank" rel="noopener noreferrer">File an issue</a>
-                </li>
-                <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" href="mailto:federalist-support@gsa.gov">Get help</a>
                 </li>
               {% endif %}
             </ul>
