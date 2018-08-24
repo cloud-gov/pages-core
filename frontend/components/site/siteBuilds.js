@@ -152,6 +152,9 @@ SiteBuilds.propTypes = {
   site: PropTypes.shape({
     id: PropTypes.number,
   }),
+  params: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 SiteBuilds.defaultProps = {
