@@ -50,7 +50,7 @@ class SiteBuilds extends React.Component {
   }
 
   componentDidMount() {
-    buildActions.fetchBuilds(this.props.site);
+    buildActions.fetchBuilds({ id: this.props.params.id });
   }
 
   renderEmptyState() {
