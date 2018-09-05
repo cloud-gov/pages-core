@@ -160,7 +160,7 @@ describe('Main Site', () => {
   describe('.examples', () => {
     it('renders the page properly', (done) => {
       request(app)
-      .get('/case-studies')
+      .get('/content/examples/')
       .expect(200)
       .then((response) => {
         expect(response.text.indexOf('example-sites')).to.be.above(-1);
@@ -172,7 +172,7 @@ describe('Main Site', () => {
     it('should redirect to /sites when authenticated', (done) => {
       authenticatedSession()
       .then(cookie => request(app)
-        .get('/case-studies')
+        .get('/content/examples/')
         .set('Cookie', cookie)
         .expect(302)
       )

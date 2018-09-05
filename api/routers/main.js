@@ -4,8 +4,8 @@ const MainController = require('../controllers/main');
 const csrfProtection = require('../policies/csrfProtection');
 
 router.get('/', MainController.home);
-router.get('/case-studies/', MainController.examples);
-router.get('/content/examples', (req, res) => res.redirect('/case-studies'));
+router.get('/content/examples/', MainController.examples);
+router.get('/case-studies/', (req, res) => res.redirect('/content/examples/'));
 router.get('/contact/', MainController.contact);
 router.get('/features/', MainController.features);
 

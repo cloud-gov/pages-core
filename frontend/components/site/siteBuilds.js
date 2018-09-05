@@ -50,7 +50,7 @@ class SiteBuilds extends React.Component {
   }
 
   componentDidMount() {
-    buildActions.fetchBuilds(this.props.site);
+    buildActions.fetchBuilds({ id: this.props.params.id });
   }
 
   renderEmptyState() {
@@ -152,6 +152,9 @@ SiteBuilds.propTypes = {
   site: PropTypes.shape({
     id: PropTypes.number,
   }),
+  params: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 SiteBuilds.defaultProps = {
