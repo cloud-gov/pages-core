@@ -25,6 +25,15 @@ const authorizeAdmin = (user, site) => (
     }
     return Promise.resolve(site.id);
   })
+  .catch((error) => {
+    if (error.code === 404) {
+      return Promise.resolve(site.id);
+    }
+    return Promise.reject({
+      message: siteErrors.ADMIN_ACCESS_REQUIRED,
+      status: 403,
+    });
+  })
 );
 
 // create is allowed for all
