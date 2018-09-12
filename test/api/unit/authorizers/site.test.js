@@ -142,5 +142,45 @@ describe("Site authorizer", () => {
         done()
       }).catch(done)
     })
+
+    it('should accept if the user is associated with the site but site does not exist', done => {
+      const user = factory.user()
+      const site = factory.site({ users: Promise.all([user]) })
+      nock.cleanAll();
+      githubAPINocks.repo({
+        owner: site.owner,
+        repository: site.repo,
+        response: [404, {}],
+      });
+
+      Promise.props({ user, site })
+      .then(({ user, site }) => {
+        return authorizer.destroy(user, site)
+      }).then(() => {
+        done()
+      }).catch(done)
+    })
+
+    it('should reject if the user is associated with the site but returns error', done => {
+      const user = factory.user()
+      const site = factory.site({ users: Promise.all([user]) })
+      nock.cleanAll();
+      githubAPINocks.repo({
+        owner: site.owner,
+        repository: site.repo,
+        response: [400, {}],
+      });
+
+      Promise.props({ user, site })
+      .then(({ user, site }) => {
+        return authorizer.destroy(user, site)
+      }).then(() => {
+        done(new Error("Expected authorization error"))
+      }).catch(err => {
+        expect(err.status).to.equal(403)
+        expect(err.message).to.equal(siteErrors.ADMIN_ACCESS_REQUIRED)
+        done()
+      }).catch(done)
+    })
   })
 })
