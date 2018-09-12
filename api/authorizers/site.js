@@ -27,6 +27,7 @@ const authorizeAdmin = (user, site) => (
   })
   .catch((error) => {
     if (error.code === 404) {
+      //authorize user if the site's repo does not exist
       return Promise.resolve(site.id);
     }
     return Promise.reject({
