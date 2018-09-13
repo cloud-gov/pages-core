@@ -50,21 +50,21 @@ class SiteBuilds extends React.Component {
     );
   }
 
+  componentDidMount() {
+    buildActions.fetchBuilds({ id: this.props.params.id });
+  }
+
   latestBuildByBranch(builds) {
     const maxBuilds = {};
     const branchNames = [...new Set(builds.map(item => item.branch))];
-    branchNames.forEach(branchName => {
-      let successBuilds = builds.filter(b => b.branch === branchName && b.state === 'success');
-      successBuilds = successBuilds.sort((a, b) => (new Date(b.completedAt) - new Date(a.completedAt)));
-      if (successBuilds.length > 0) {
-        maxBuilds[branchName] = successBuilds[0].id;
+    branchNames.forEach((branchName) => {
+      let successes = builds.filter(b => b.branch === branchName && b.state === 'success');
+      successes = successes.sort((a, b) => (new Date(b.completedAt) - new Date(a.completedAt)));
+      if (successes.length > 0) {
+        maxBuilds[branchName] = successes[0].id;
       }
-    })
+    });
     return maxBuilds;
-  };
-
-  componentDidMount() {
-    buildActions.fetchBuilds({ id: this.props.params.id });
   }
 
   renderEmptyState() {
