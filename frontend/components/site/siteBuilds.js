@@ -54,7 +54,7 @@ class SiteBuilds extends React.Component {
     const maxBuilds = {};
     const branchNames = [...new Set(builds.map(item => item.branch))];
     branchNames.forEach(branchName => {
-      let successBuilds = builds.filter(b => b.branch === branchName && b.state === 'processing');
+      let successBuilds = builds.filter(b => b.branch === branchName && b.state === 'success');
       successBuilds = successBuilds.sort((a, b) => (new Date(b.completedAt) - new Date(a.completedAt)));
       if (successBuilds.length > 0) {
         maxBuilds[branchName] = successBuilds[0].id;
