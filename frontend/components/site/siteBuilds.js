@@ -11,6 +11,7 @@ import RefreshBuildsButton from './refreshBuildsButton';
 import { duration, timeFrom } from '../../util/datetime';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
+import BranchViewLink from '../branchViewLink';
 
 class SiteBuilds extends React.Component {
   static getUsername(build) {
@@ -53,6 +54,19 @@ class SiteBuilds extends React.Component {
     buildActions.fetchBuilds({ id: this.props.params.id });
   }
 
+  latestBuildByBranch(builds) {
+    const maxBuilds = {};
+    const branchNames = [...new Set(builds.map(item => item.branch))];
+    branchNames.forEach((branchName) => {
+      let successes = builds.filter(b => b.branch === branchName && b.state === 'success');
+      successes = successes.sort((a, b) => (new Date(b.completedAt) - new Date(a.completedAt)));
+      if (successes.length > 0) {
+        maxBuilds[branchName] = successes[0].id;
+      }
+    });
+    return maxBuilds;
+  }
+
   renderEmptyState() {
     const message = 'If this site was just added, the ' +
       'first build should be available within a few minutes.';
@@ -69,6 +83,7 @@ class SiteBuilds extends React.Component {
 
   renderBuildsTable() {
     const { site, builds } = this.props;
+    const previewBuilds = this.latestBuildByBranch(builds.data);
     return (
       <div>
         <div className="log-tools">
@@ -112,13 +127,16 @@ class SiteBuilds extends React.Component {
                   <td>{ duration(build.createdAt, build.completedAt) }</td>
                   <td><pre>{ message }</pre></td>
                   <td className="table-actions">
+                    { previewBuilds[build.branch] === build.id &&
+                    <BranchViewLink branchName={build.branch} site={site} /> }
+                    { previewBuilds[build.branch] === build.id && <br /> }
                     { SiteBuilds.buildLogsLink(build) }
+                    <br />
                     <CreateBuildLink
                       handlerParams={{ buildId: build.id, siteId: site.id }}
                       handleClick={buildActions.restartBuild}
                       class="usa-button usa-button-secondary"
                     >
-                      <br />
                       Rebuild branch
                     </CreateBuildLink>
                   </td>
