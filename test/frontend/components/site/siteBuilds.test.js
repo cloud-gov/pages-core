@@ -70,6 +70,7 @@ describe('<SiteBuilds/>', () => {
 
   it('should render a `-` if the commit SHA is absent', () => {
     build.commitSha = null;
+    build.state = 'processing';
 
     const wrapper = shallow(<SiteBuilds {...props} />);
     const branchIndex = columnIndex(wrapper, 'Branch');
@@ -85,6 +86,21 @@ describe('<SiteBuilds/>', () => {
     const { owner, repository } = siteBuild.site;
 
     expect(wrapper.find({ owner, repository, sha: commitSha })).to.have.length(1);
+  });
+
+  it('should render a `BranchViewLink` component if state is successful', () => {
+    const wrapper = shallow(<SiteBuilds {...props} />);
+    const siteBuild = props.builds.data[0];
+
+    expect(wrapper.find({ branchName: siteBuild.branch, site: props.site, showIcon: 'true' })).to.have.length(1);
+  });
+
+  it('should not render a `BranchViewLink` component if state is not successful', () => {
+    props.builds.data[0].state = 'not successful';
+    const wrapper = shallow(<SiteBuilds {...props} />);
+    const siteBuild = props.builds.data[0];
+
+    expect(wrapper.find({ branchName: siteBuild.branch, site: props.site, showIcon: 'true' })).to.have.length(0);
   });
 
   it('should render a button to refresh builds', () => {
