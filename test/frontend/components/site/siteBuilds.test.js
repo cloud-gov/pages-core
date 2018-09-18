@@ -92,7 +92,7 @@ describe('<SiteBuilds/>', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
     const siteBuild = props.builds.data[0];
 
-    expect(wrapper.find({ branchName: siteBuild.branch, site: props.site, showIcon: 'true' })).to.have.length(1);
+    expect(wrapper.find({ branchName: siteBuild.branch, site: props.site, showIcon: true })).to.have.length(1);
   });
 
   it('should not render a `BranchViewLink` component if state is not successful', () => {
@@ -100,7 +100,7 @@ describe('<SiteBuilds/>', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
     const siteBuild = props.builds.data[0];
 
-    expect(wrapper.find({ branchName: siteBuild.branch, site: props.site, showIcon: 'true' })).to.have.length(0);
+    expect(wrapper.find({ branchName: siteBuild.branch, site: props.site, showIcon: true })).to.have.length(0);
   });
 
   it('should render a button to refresh builds', () => {
