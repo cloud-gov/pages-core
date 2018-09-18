@@ -123,7 +123,7 @@ class SiteBuilds extends React.Component {
                     { SiteBuilds.commitLink(build) }
                     { previewBuilds[build.branch] === build.id && <br /> }
                     { previewBuilds[build.branch] === build.id &&
-                    <BranchViewLink branchName={build.branch} site={site} showIcon="true" /> }
+                    <BranchViewLink branchName={build.branch} site={site} showIcon /> }
                   </th>
                   <td>{ SiteBuilds.getUsername(build) }</td>
                   <td>{ timeFrom(build.completedAt) }</td>
