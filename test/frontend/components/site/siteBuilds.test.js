@@ -91,16 +91,16 @@ describe('<SiteBuilds/>', () => {
   it('should render a `BranchViewLink` component if state is successful', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
     const siteBuild = props.builds.data[0];
-
-    expect(wrapper.find({ branchName: siteBuild.branch, site: props.site, showIcon: true })).to.have.length(1);
+    const params = { branchName: siteBuild.branch, site: props.site, showIcon: true };
+    expect(wrapper.find(params)).to.have.length(1);
   });
 
   it('should not render a `BranchViewLink` component if state is not successful', () => {
     props.builds.data[0].state = 'not successful';
     const wrapper = shallow(<SiteBuilds {...props} />);
     const siteBuild = props.builds.data[0];
-
-    expect(wrapper.find({ branchName: siteBuild.branch, site: props.site, showIcon: true })).to.have.length(0);
+    const params = { branchName: siteBuild.branch, site: props.site, showIcon: true };
+    expect(wrapper.find(params)).to.have.length(0);
   });
 
   it('should render a button to refresh builds', () => {
