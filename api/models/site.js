@@ -48,13 +48,27 @@ const beforeValidate = (site) => {
   }
 };
 
+function domainWithSlash(url) {
+  if (url) {
+    if (!url.endsWith('/')) {
+      return `${url}/`;
+    }
+  }
+  return url;
+}
 
 function siteUrl() {
-  return this.domain || `${config.app.preview_hostname}/site/${this.owner}/${this.repository}/`;
+  if (this.domain) {
+    return domainWithSlash(this.domain);
+  }
+  return `${config.app.preview_hostname}/site/${this.owner}/${this.repository}/`;
 }
 
 function demoUrl() {
-  return this.demoDomain || `${config.app.preview_hostname}/demo/${this.owner}/${this.repository}/`;
+  if (this.demoDomain) {
+    return domainWithSlash(this.demoDomain);
+  }
+  return `${config.app.preview_hostname}/demo/${this.owner}/${this.repository}/`;
 }
 
 function branchPreviewUrl(branch) {

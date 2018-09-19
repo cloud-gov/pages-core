@@ -46,7 +46,7 @@ describe('Site model', () => {
           defaultBranch: 'default-branch',
         }).then((site) => {
           const viewLink = site.viewLinkForBranch('default-branch');
-          expect(viewLink).to.equal('https://www.example.gov');
+          expect(viewLink).to.equal('https://www.example.gov/');
           done();
         }).catch(done);
       });
@@ -67,7 +67,7 @@ describe('Site model', () => {
           demoBranch: 'demo-branch',
         }).then((site) => {
           const viewLink = site.viewLinkForBranch('demo-branch');
-          expect(viewLink).to.equal('https://demo.example.gov');
+          expect(viewLink).to.equal('https://demo.example.gov/');
           done();
         }).catch(done);
       });
