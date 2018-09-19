@@ -121,15 +121,15 @@ class SiteBuilds extends React.Component {
                   <th scope="row">
                     { build.branch }
                     { SiteBuilds.commitLink(build) }
+                    { previewBuilds[build.branch] === build.id && <br /> }
+                    { previewBuilds[build.branch] === build.id &&
+                    <BranchViewLink branchName={build.branch} site={site} showIcon /> }
                   </th>
                   <td>{ SiteBuilds.getUsername(build) }</td>
                   <td>{ timeFrom(build.completedAt) }</td>
                   <td>{ duration(build.createdAt, build.completedAt) }</td>
                   <td><pre>{ message }</pre></td>
                   <td className="table-actions">
-                    { previewBuilds[build.branch] === build.id &&
-                    <BranchViewLink branchName={build.branch} site={site} /> }
-                    { previewBuilds[build.branch] === build.id && <br /> }
                     { SiteBuilds.buildLogsLink(build) }
                     <br />
                     <CreateBuildLink
