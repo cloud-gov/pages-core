@@ -69,18 +69,15 @@
     width: 17px;
   }
 }
-@media screen and (min-width: 600px) {
-  .usa-width-one-sixth:nth-child(3n) {
-    margin-right: 4.82916%;
-  }
-}
 
-li.usa-footer-primary-content,
-li.usa-footer-primary-content:last-child {
-  border: none;
+li.usa-footer-primary-content {
+  border: none !important; // override uswds border on :last-child
+  margin-left: 5%;
 }
 
 @media screen and (max-width: 600px) {
+  // With all these custom rules, we may just want to ditch USWDS for the
+  // footer and make these custom classes
   .usa-footer-primary-section {
     .usa-unstyled-list {
       text-align: left;

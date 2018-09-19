@@ -61,6 +61,7 @@ module.exports = {
         .then(page => BuildLog.findAll({
           attributes: ['id'],
           where: { build: build.id },
+          order: [['id', 'ASC']],
           offset: (limit * (page - 1)),
           limit,
         }))
