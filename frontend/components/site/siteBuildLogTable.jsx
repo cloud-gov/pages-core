@@ -9,14 +9,14 @@ function SiteBuildLogTable({ buildLogs }) {
     <table className="usa-table-borderless log-table log-table__site-build-log table-full-width">
       <thead>
         <tr>
-          <th>Source<br/>Timestamp (UTC)</th>
+          <th>Source<br />Timestamp (UTC)</th>
           <th>Output</th>
         </tr>
       </thead>
       <tbody>
         {buildLogs.map((log => (
           <tr key={log.id}>
-            <td>{log.source}<br/>{timestampUTC(log.createdAt)}</td>
+            <td>{log.source}<br />{timestampUTC(log.createdAt)}</td>
             <td>
               <pre>
                 {log.output}
