@@ -30,6 +30,13 @@ module.exports = {
     )
     .then(builds => buildSerializer.serialize(builds))
     .then(buildJSON => res.json(buildJSON))
+    .then(() => {
+      console.log("\n\n1:\tServer: helloworld\n\n");
+      console.log(`\n\nIO:\t${typeof res.io}`);
+      res.io.emit('helloworld', 'helloBigOlWorld');
+      console.log("\n\n2:\tServer: helloworld\n\n");
+      return Promise.resolve();
+    })
     .catch(res.error);
   },
 
@@ -87,6 +94,10 @@ module.exports = {
     })
     .then(build => GithubBuildStatusReporter.reportBuildStatus(build))
     .then(() => res.ok())
+    .then(() => {
+      io.emit('build completed', { buildId: build.id, state: build.state });
+      return Promise.resolve();
+    })
     .catch(res.error);
   },
 };

@@ -55,7 +55,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use((req, res, next) => {
   res.locals.user = req.user;
-  next();
+  return next();
 });
 
 app.use(express.static('public'));
@@ -98,7 +98,7 @@ app.use(expressWinston.errorLogger({
 const limiter = new RateLimit(config.rateLimiting);
 app.use(limiter); // must be set before router is added to app
 
-app.use(router);
+// app.use(router);
 
 // error handler middleware for custom CSRF error responses
 // note that error handling middlewares must come last in the stack
@@ -111,4 +111,24 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
+const server = require('http').Server(app);
+server.listen(process.env.PORT || 1337, () => {
+  logger.info("Server running!")
+});
+
+const io = require('socket.io')(server);
+
+// io.on('connection', function(socket){
+  // console.log('\n\na user connected\n\n');
+//   socket.on('disconnect', function(){
+//     console.log('\n\nuser disconnected\n\n');
+//   });
+// });
+
+app.use((req, res, next) => {
+    res.io = io;
+    next();
+});
+
+app.use(router);
 module.exports = app;
