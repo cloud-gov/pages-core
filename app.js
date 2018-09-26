@@ -117,7 +117,14 @@ server.listen(process.env.PORT || 1337, () => {
 });
 
 const io = require('socket.io')(server);
-
+const redis = require('redis');
+const redisAdapter = require('socket.io-redis');
+const pub = redis.createClient(config.redis.port, config.redis.hostname, { auth_pass: config.redis.password });
+const sub = redis.createClient(config.redis.port, config.redis.hostname, { auth_pass: config.redis.password });
+io.adapter(redisAdapter({ pubClient: pub, subClient: sub }));
+// const redisAdapter = require('socket.io-redis');
+// io.adapter(redisAdapter({ host: config.redis.hostname, port: config.redis.port }));
+// io.adapter(redisAdapter({ host: 'redis', port: 6379 }));
 // io.on('connection', function(socket){
   // console.log('\n\na user connected\n\n');
 //   socket.on('disconnect', function(){

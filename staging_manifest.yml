@@ -15,6 +15,7 @@ services:
 - federalist-staging-env
 - federalist-site-wide-error
 - federalist-staging-sqs-creds
+- federalist-staging-redis
 env:
   NODE_ENV: production
   APP_ENV: staging
