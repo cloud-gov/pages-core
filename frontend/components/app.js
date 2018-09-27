@@ -12,8 +12,14 @@ export class App extends React.Component {
 
   componentDidMount() {
     const socket = io('/');
-    socket.on('helloworld', function(msg){
-      console.log('\n\n\nmessage: ' + msg);
+    Notification.requestPermission(function (permission) {
+      // If the user accepts, let's create a notification
+      if (permission === "granted") {
+        socket.on('helloworld', function(msg){
+          console.log('\n\n\nmessage: ' + msg);
+          new Notification(msg);
+        });
+      }
     });
   }
 
