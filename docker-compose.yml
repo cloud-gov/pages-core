@@ -15,7 +15,7 @@ services:
       - "8080:8080" # for serving test coverage html
     depends_on:
       - db
-      - redis
+      #- redis
   db:
     build:
       dockerfile: Dockerfile-db
@@ -27,16 +27,9 @@ services:
     environment:
       POSTGRES_DB: federalist
       POSTGRES_TEST_DB: federalist-test
-  redis:
-    image: redis
-    ports:
-      - "6380:6379" # expose db on host at port 5433
-    volumes:
-      - redis_data:/data
 
 volumes:
   db-data:
   yarn-cache:
   node-modules:
-  redis_data:
 
