@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { BUILD_LOG } from '../../propTypes';
-import { timestampUTC } from '../../util/datetime';
 
 function SiteBuildLogTable({ buildLogs }) {
   return (
