@@ -3,25 +3,12 @@ import PropTypes from 'prop-types';
 import Notifications from 'react-notification-system-redux';
 import { connect } from 'react-redux';
 
-import { USER, ALERT } from '../propTypes';
+import { USER, ALERT, SITE } from '../propTypes';
 import alertActions from '../actions/alertActions';
 import LoadingIndicator from './LoadingIndicator';
 import io from 'socket.io-client';
 
 export class App extends React.Component {
-
-  componentDidMount() {
-    const socket = io('/');
-    Notification.requestPermission(function (permission) {
-      // If the user accepts, let's create a notification
-      if (permission === "granted") {
-        socket.on('helloworld', function(msg){
-          console.log('\n\n\nmessage: ' + msg);
-          new Notification(msg);
-        });
-      }
-    });
-  }
 
   componentWillReceiveProps(nextProps) {
     const { alert } = this.props;
@@ -52,7 +39,31 @@ export class App extends React.Component {
   }
 
   render() {
-    const { user, children, notifications } = this.props;
+    const { user, children, notifications, sites } = this.props;
+
+    Notification.requestPermission(function (permission) {
+      // If the user accepts, let's create a notification
+      if (permission === "granted") {
+        socket.on('build status', function (build) {
+          site = sites.data.find(s => s.id === build.site);
+          if (site) {
+            let body;
+            switch (build.state) {
+              case 'error':
+                body = 'A build has failed. Please view the logs for more information.';
+                break;
+              case 'processing':
+                body = 'A build is in progress';
+                break;
+              default:
+                body = 'A build completed successfully.';
+                break;
+            }
+            new Notification(`${site.owner}/${site.repository}(${build.branch})`, {body, icon})
+          }
+        });
+      }
+    });
 
     if (user.isLoading) {
       return <LoadingIndicator />;
@@ -94,6 +105,10 @@ App.propTypes = {
       uid: PropTypes.number.isRequired,
     })
   ),
+  sites: PropTypes.shape({
+    data: PropTypes.arrayOf(SITE),
+    isLoading: PropTypes.bool,
+  }),
 };
 
 App.defaultProps = {
@@ -102,12 +117,17 @@ App.defaultProps = {
   location: null,
   user: false,
   notifications: [],
+  sites: null,
 };
 
-const mapStateToProps = ({ alert, notifications, user }) => ({
+const socket = io('/');
+const icon = '/images/favicons/favicon.ico';
+
+const mapStateToProps = ({ alert, notifications, user, sites }) => ({
   alert,
   notifications,
   user,
+  sites,
 });
 
 export default connect(mapStateToProps)(App);
