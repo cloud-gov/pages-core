@@ -15,7 +15,6 @@ services:
       - "8080:8080" # for serving test coverage html
     depends_on:
       - db
-      #- redis
   db:
     build:
       dockerfile: Dockerfile-db
@@ -27,7 +26,6 @@ services:
     environment:
       POSTGRES_DB: federalist
       POSTGRES_TEST_DB: federalist-test
-
 volumes:
   db-data:
   yarn-cache:
