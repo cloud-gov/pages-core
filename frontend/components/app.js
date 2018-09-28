@@ -45,7 +45,7 @@ export class App extends React.Component {
       // If the user accepts, let's create a notification
       if (permission === "granted") {
         socket.on('build status', function (build) {
-          site = sites.data.find(s => s.id === build.site);
+          const site = sites.data.find(s => s.id === build.site);
           if (site) {
             let body;
             switch (build.state) {
