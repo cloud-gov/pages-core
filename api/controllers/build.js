@@ -3,6 +3,7 @@ const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter
 const siteAuthorizer = require('../authorizers/site');
 const BuildResolver = require('../services/BuildResolver');
 const { Build, Site } = require('../models');
+const logger = require('winston');
 
 const decodeb64 = str => new Buffer(str, 'base64').toString('utf8');
 
@@ -85,13 +86,17 @@ module.exports = {
         return build.completeJob(message);
       }
     })
-    .then(build => GithubBuildStatusReporter.reportBuildStatus(build))
-    .then(() => res.ok())
-    .then(() => {
-      msg = { id: build.id, state: build.state, site: build.site, branch: build.branch };
-      io.emit('build status', msg);
-      return Promise.resolve();
+    .then(build => {
+      try {
+        const msg = { id: build.id, state: build.state, site: build.site, branch: build.branch };
+        res.io.emit('build status', msg);
+      }
+      catch(err) {
+        logger.error(err);
+      }
+      return GithubBuildStatusReporter.reportBuildStatus(build);
     })
+    .then(() => res.ok())
     .catch(res.error);
   },
 };
