@@ -42,8 +42,8 @@ export class App extends React.Component {
   }
 
   notifyBuildStatus(sites) {
-    /*eslint no-undef: "error"*/
-    /*eslint-env browser*/
+    /* eslint no-undef: "error" */
+    /* eslint-env browser */
     Notification.requestPermission((permission) => {
       // If the user accepts, let's create a notification
       if (permission === 'granted') {

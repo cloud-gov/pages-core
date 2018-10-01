@@ -24,6 +24,9 @@ const session = require('express-session');
 const PostgresStore = require('connect-session-sequelize')(session.Store);
 const nunjucks = require('nunjucks');
 const flash = require('connect-flash');
+const http = require('http');
+const io = require('socket.io')
+const redisAdapter = require('socket.io-redis');
 
 const responses = require('./api/responses');
 const passport = require('./api/services/passport');
@@ -109,23 +112,22 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-const server = require('http').Server(app);
+const server = http.Server(app);
 server.listen(process.env.PORT || 1337, () => {
   logger.info('Server running!');
 });
 
-const io = require('socket.io')(server);
+const socket = io(server);
 const redis = require('redis');
-const redisAdapter = require('socket.io-redis');
-if (config.redis) {  
-  const auth_pass = config.redis.password;
-  const pub = redis.createClient(config.redis.port, config.redis.hostname, { auth_pass });
-  const sub = redis.createClient(config.redis.port, config.redis.hostname, { auth_pass });
-  io.adapter(redisAdapter({ pubClient: pub, subClient: sub }));
+if (config.redis) {
+  const redisCreds = { auth_pass: config.redis.password };
+  const pub = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
+  const sub = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
+  socket.adapter(redisAdapter({ pubClient: pub, subClient: sub }));
 }
 
 app.use((req, res, next) => {
-  res.io = io;
+  res.socket = socket;
   next();
 });
 

@@ -7,10 +7,10 @@ const logger = require('winston');
 
 const decodeb64 = str => new Buffer(str, 'base64').toString('utf8');
 
-function emitBuildStatus(io, build) {
+function emitBuildStatus(socket, build) {
   try {
     const msg = { id: build.id, state: build.state, site: build.site, branch: build.branch };
-    io.emit('build status', msg);
+    socket.emit('build status', msg);
   } catch (err) {
     logger.error(err);
   }
@@ -96,7 +96,7 @@ module.exports = {
       }
     })
     .then((build) => {
-      emitBuildStatus(res.io, build);
+      emitBuildStatus(res.socket, build);
       return GithubBuildStatusReporter.reportBuildStatus(build);
     })
     .then(() => res.ok())
