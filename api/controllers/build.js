@@ -7,6 +7,15 @@ const logger = require('winston');
 
 const decodeb64 = str => new Buffer(str, 'base64').toString('utf8');
 
+function emitBuildStatus(io, build) {
+  try {
+    const msg = { id: build.id, state: build.state, site: build.site, branch: build.branch };
+    io.emit('build status', msg);
+  } catch (err) {
+    logger.error(err);
+  }
+}
+
 module.exports = {
   find: (req, res) => {
     let site;
@@ -86,14 +95,8 @@ module.exports = {
         return build.completeJob(message);
       }
     })
-    .then(build => {
-      try {
-        const msg = { id: build.id, state: build.state, site: build.site, branch: build.branch };
-        res.io.emit('build status', msg);
-      }
-      catch(err) {
-        logger.error(err);
-      }
+    .then((build) => {
+      emitBuildStatus(res.io, build);
       return GithubBuildStatusReporter.reportBuildStatus(build);
     })
     .then(() => res.ok())

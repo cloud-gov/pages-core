@@ -111,21 +111,22 @@ app.use((err, req, res, next) => {
 
 const server = require('http').Server(app);
 server.listen(process.env.PORT || 1337, () => {
-  logger.info("Server running!")
+  logger.info('Server running!');
 });
 
 const io = require('socket.io')(server);
-if (config.redis) {
-  const redis = require('redis');
-  const redisAdapter = require('socket.io-redis');
-  const pub = redis.createClient(config.redis.port, config.redis.hostname, { auth_pass: config.redis.password });
-  const sub = redis.createClient(config.redis.port, config.redis.hostname, { auth_pass: config.redis.password });
+const redis = require('redis');
+const redisAdapter = require('socket.io-redis');
+if (config.redis) {  
+  const auth_pass = config.redis.password;
+  const pub = redis.createClient(config.redis.port, config.redis.hostname, { auth_pass });
+  const sub = redis.createClient(config.redis.port, config.redis.hostname, { auth_pass });
   io.adapter(redisAdapter({ pubClient: pub, subClient: sub }));
 }
 
 app.use((req, res, next) => {
-    res.io = io;
-    next();
+  res.io = io;
+  next();
 });
 
 app.use(router);

@@ -2,11 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Notifications from 'react-notification-system-redux';
 import { connect } from 'react-redux';
+import io from 'socket.io-client';
 
 import { USER, ALERT, SITE } from '../propTypes';
 import alertActions from '../actions/alertActions';
 import LoadingIndicator from './LoadingIndicator';
-import io from 'socket.io-client';
+
+const socket = io('/');
+const icon = '/images/favicons/favicon.ico';
 
 export class App extends React.Component {
 
@@ -38,13 +41,13 @@ export class App extends React.Component {
     }
   }
 
-  render() {
-    const { user, children, notifications, sites } = this.props;
-
-    Notification.requestPermission(function (permission) {
+  notifyBuildStatus(sites) {
+    /*eslint no-undef: "error"*/
+    /*eslint-env browser*/
+    Notification.requestPermission((permission) => {
       // If the user accepts, let's create a notification
-      if (permission === "granted") {
-        socket.on('build status', function (build) {
+      if (permission === 'granted') {
+        socket.on('build status', (build) => {
           const site = sites.data.find(s => s.id === build.site);
           if (site) {
             let body;
@@ -59,11 +62,17 @@ export class App extends React.Component {
                 body = 'A build completed successfully.';
                 break;
             }
-            new Notification(`${site.owner}/${site.repository}(${build.branch})`, {body, icon})
+            new Notification(`${site.owner}/${site.repository}(${build.branch})`, { body, icon });
           }
         });
       }
     });
+  }
+
+  render() {
+    const { user, children, notifications, sites } = this.props;
+
+    this.notifyBuildStatus(sites);
 
     if (user.isLoading) {
       return <LoadingIndicator />;
@@ -119,9 +128,6 @@ App.defaultProps = {
   notifications: [],
   sites: null,
 };
-
-const socket = io('/');
-const icon = '/images/favicons/favicon.ico';
 
 const mapStateToProps = ({ alert, notifications, user, sites }) => ({
   alert,
