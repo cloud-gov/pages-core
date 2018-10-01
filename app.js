@@ -102,23 +102,9 @@ app.use(expressWinston.errorLogger({
 const limiter = new RateLimit(config.rateLimiting);
 app.use(limiter); // must be set before router is added to app
 
-// error handler middleware for custom CSRF error responses
-// note that error handling middlewares must come last in the stack
-app.use((err, req, res, next) => {
-  if (err.code === 'EBADCSRFTOKEN') {
-    res.forbidden({ message: 'Invalid CSRF token' });
-    return;
-  }
+app.server = http.Server(app);
 
-  next(err);
-});
-
-const server = http.Server(app);
-server.listen(process.env.PORT || 1337, () => {
-  logger.info('Server running!');
-});
-
-const socket = io(server);
+const socket = io(app.server);
 if (config.redis) {
   const redisCreds = { auth_pass: config.redis.password };
   const pub = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
@@ -132,4 +118,13 @@ app.use((req, res, next) => {
 });
 
 app.use(router);
+// error handler middleware for custom CSRF error responses
+// note that error handling middlewares must come last in the stack
+app.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN') {
+    res.forbidden({ message: 'Invalid CSRF token' });
+    return;
+  }
+  next(err);
+});
 module.exports = app;
