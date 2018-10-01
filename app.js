@@ -25,7 +25,8 @@ const PostgresStore = require('connect-session-sequelize')(session.Store);
 const nunjucks = require('nunjucks');
 const flash = require('connect-flash');
 const http = require('http');
-const io = require('socket.io')
+const io = require('socket.io');
+const redis = require('redis');
 const redisAdapter = require('socket.io-redis');
 
 const responses = require('./api/responses');
@@ -118,7 +119,6 @@ server.listen(process.env.PORT || 1337, () => {
 });
 
 const socket = io(server);
-const redis = require('redis');
 if (config.redis) {
   const redisCreds = { auth_pass: config.redis.password };
   const pub = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
