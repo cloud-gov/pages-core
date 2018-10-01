@@ -84,8 +84,8 @@ describe('Build API', () => {
           .expect(403)
       )
       .then((response) => {
-        // validateAgainstJSONSchema('POST', '/build', 403, response.text);
-        // expect(response.body.message).to.equal('Invalid CSRF token');
+        validateAgainstJSONSchema('POST', '/build', 403, response.body);
+        expect(response.body.message).to.equal('Invalid CSRF token');
         done();
       })
       .catch(done);
