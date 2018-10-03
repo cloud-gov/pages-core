@@ -12,7 +12,7 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
     .then(() => User.findOrCreate({
       where: { username: profile.username.toLowerCase() },
       defaults: {
-        email: profile._json.email,
+        email: profile['_json'].email,
         username: profile.username,
       },
     }))
