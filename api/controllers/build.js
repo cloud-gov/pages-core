@@ -10,7 +10,7 @@ const decodeb64 = str => new Buffer(str, 'base64').toString('utf8');
 function emitBuildStatus(socket, build) {
   try {
     const msg = { id: build.id, state: build.state, site: build.site, branch: build.branch };
-    socket.emit('build status', msg);
+    socket.of(`/${build.site}`).emit('build status', msg);
   } catch (err) {
     logger.error(err);
   }

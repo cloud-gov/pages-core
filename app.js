@@ -53,8 +53,8 @@ nunjucks.configure('views', {
 // able to access the requesting user's IP in req.ip, so
 // 'trust proxy' must be enabled.
 app.enable('trust proxy');
-
-app.use(session(config.session));
+const sessionMiddleware = session(config.session);
+app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use((req, res, next) => {
@@ -127,4 +127,28 @@ app.use((err, req, res, next) => {
   }
   next(err);
 });
+
+// socket.of('/1').use(function(_socket, next) {
+socket.use(function(_socket, next) {
+  sessionMiddleware(_socket.request, _socket.request.res, next);
+  next();
+});
+// socket.of('/1').on('connection', function (_socket) {
+socket.on('connection', function (_socket) {
+  if (_socket.request.session) {
+    console.log(`\n\npassport.user:\t${JSON.stringify(_socket.request.session.passport)}\n\n`);
+  }
+});
+//testing onlyy
+function testBuildNote()
+{
+  const msg = { id: 1, state: 'success', site: 1, branch: 'master' };
+  socket.of('/1').emit('build status', msg);
+
+    // Do your thing here
+    setTimeout(testBuildNote, 10*1000);
+    console.log('\n\nsent notification\n\n');
+}
+testBuildNote();
+
 module.exports = app;

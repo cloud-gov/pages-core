@@ -8,11 +8,13 @@ import { USER, ALERT, SITE } from '../propTypes';
 import alertActions from '../actions/alertActions';
 import LoadingIndicator from './LoadingIndicator';
 
-const socket = io('/');
-const icon = '/images/favicons/favicon.ico';
 
 export class App extends React.Component {
 
+  // constructor() {
+  //   super();
+  //   this.socket = io('/');
+  // }
   componentWillReceiveProps(nextProps) {
     const { alert } = this.props;
 
@@ -47,23 +49,28 @@ export class App extends React.Component {
     Notification.requestPermission((permission) => {
       // If the user accepts, let's create a notification
       if (permission === 'granted') {
-        socket.on('build status', (build) => {
-          const site = sites.data.find(s => s.id === build.site);
-          if (site) {
-            let body;
-            switch (build.state) {
-              case 'error':
-                body = 'A build has failed. Please view the logs for more information.';
-                break;
-              case 'processing':
-                body = 'A build is in progress';
-                break;
-              default:
-                body = 'A build completed successfully.';
-                break;
+        let socket;
+        sites.data.forEach(s => {
+          socket = io(`/${s.id}`);
+          socket.on('build status', (build) => {
+            const site = sites.data.find(s => s.id === build.site);
+            if (site) {
+              let body;
+              switch (build.state) {
+                case 'error':
+                  body = 'A build has failed. Please view the logs for more information.';
+                  break;
+                case 'processing':
+                  body = 'A build is in progress';
+                  break;
+                default:
+                  body = 'A build completed successfully.';
+                  break;
+              }
+              const icon = '/images/favicons/favicon.ico';
+              new Notification(`${site.owner}/${site.repository}(${build.branch})`, { body, icon });
             }
-            new Notification(`${site.owner}/${site.repository}(${build.branch})`, { body, icon });
-          }
+          });
         });
       }
     });
