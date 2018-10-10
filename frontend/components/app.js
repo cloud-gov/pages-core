@@ -8,7 +8,6 @@ import { USER, ALERT, SITE } from '../propTypes';
 import alertActions from '../actions/alertActions';
 import LoadingIndicator from './LoadingIndicator';
 
-
 export class App extends React.Component {
 
   // constructor() {
