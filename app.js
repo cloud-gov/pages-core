@@ -129,15 +129,19 @@ app.use((err, req, res, next) => {
 });
 
 // socket.of('/1').use(function(_socket, next) {
-socket.use(function(_socket, next) {
+// socket.use(function(_socket, next) {
+socket.of(/^d+$/).use(function(_socket, next) {
   sessionMiddleware(_socket.request, _socket.request.res, next);
   next();
 });
 // socket.of('/1').on('connection', function (_socket) {
-socket.on('connection', function (_socket) {
-  if (_socket.request.session) {
-    console.log(`\n\npassport.user:\t${JSON.stringify(_socket.request.session.passport)}\n\n`);
-  }
+// socket.on('connection', function (_socket) {
+socket.of(/^d+$/).on('connection', function (_socket) {
+  // if (_socket.request.session) {
+    console.log(`\n\n_socket.nsp:\t${Object.keys(_socket.nsp)}\n\n`);
+    console.log(`\n\n_socket.nsp:\t${JSON.stringify(_socket.nsp.name)}\n\n`);
+    // console.log(`\n\npassport.user:\t${JSON.stringify(_socket.request.session.passport)}\n\n`);
+  // }
 });
 //testing onlyy
 function testBuildNote()
