@@ -1,5 +1,4 @@
 const expect = require('chai').expect;
-const crypto = require('crypto');
 const nock = require('nock');
 const app = require('../../../app');
 const request = require('supertest');
@@ -7,7 +6,7 @@ const config = require('../../../config');
 const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
 const { authenticatedSession, unauthenticatedSession } = require('../support/session');
-const { sessionForCookie, sessionCookieFromResponse } = require('../support/cookieSession');
+const { sessionForCookie } = require('../support/cookieSession');
 const { User } = require('../../../api/models');
 
 
@@ -91,7 +90,7 @@ describe('Authentication request', () => {
             .set('Cookie', cookie)
             .expect(302);
         })
-        .then((response) => sessionForCookie(cookie))
+        .then(() => sessionForCookie(cookie))
         .then((authSession) => {
           expect(authSession.authenticated).to.equal(true);
           expect(authSession.passport.user).to.equal(user.id);
@@ -162,7 +161,7 @@ describe('Authentication request', () => {
         githubAPINocks.userOrganizations();
 
         unauthenticatedSession({ oauthState })
-        .then(session => {
+        .then((session) => {
           cookie = session;
           return request(app)
             .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
@@ -173,13 +172,15 @@ describe('Authentication request', () => {
           expect(authSession.authenticated).to.equal(true);
           const userID = authSession.passport.user;
           return User.findById(userID);
-        }).then((user) => {
+        })
+        .then((user) => {
           expect(user).to.have.property('email', `user-${githubUserID}@example.com`);
           expect(user).to.have.property('username', `user-${githubUserID}`);
           expect(user).to.have.property('githubUserId', `${githubUserID}`);
           expect(user).to.have.property('githubAccessToken', 'access-token-123abc');
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
     });
 
@@ -198,7 +199,7 @@ describe('Authentication request', () => {
         cookie = session;
         return request(app)
           .get(`/auth/github/callback?code=invalid-code&state=${oauthState}`)
-          .set('Cookie', cookie)
+          .set('Cookie', cookie);
       })
       .then((response) => {
         expect(response.statusCode).to.equal(302);
@@ -222,7 +223,7 @@ describe('Authentication request', () => {
       const oauthState = 'state-123abc';
       githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
       unauthenticatedSession({ oauthState })
-      .then((session) =>{
+      .then((session) => {
         cookie = session;
         return request(app)
           .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
@@ -240,8 +241,8 @@ describe('Authentication request', () => {
           'Apologies; you don\'t have access to Federalist! ' +
           'Please contact the Federalist team if this is in error.');
         done();
-        })
-        .catch(done);
+      })
+      .catch(done);
     });
 
     it('should redirect to a redirect path if one is set in the session', (done) => {
@@ -250,9 +251,9 @@ describe('Authentication request', () => {
       const oauthState = 'state-123abc';
 
       factory.user()
-      .then((user) => githubAPINocks.githubAuth(user.username, [{ id: 123456 }]))
+      .then(user => githubAPINocks.githubAuth(user.username, [{ id: 123456 }]))
       .then(() => unauthenticatedSession({ oauthState, authRedirectPath }))
-      .then((session) => request(app)
+      .then(session => request(app)
           .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
           .set('Cookie', session)
           .expect(302)
