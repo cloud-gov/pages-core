@@ -48,28 +48,22 @@ export class App extends React.Component {
     Notification.requestPermission((permission) => {
       // If the user accepts, let's create a notification
       if (permission === 'granted') {
-        let socket;
-        sites.data.forEach(s => {
-          socket = io(`/${s.id}`);
-          socket.on('build status', (build) => {
-            const site = sites.data.find(s => s.id === build.site);
-            if (site) {
-              let body;
-              switch (build.state) {
-                case 'error':
-                  body = 'A build has failed. Please view the logs for more information.';
-                  break;
-                case 'processing':
-                  body = 'A build is in progress';
-                  break;
-                default:
-                  body = 'A build completed successfully.';
-                  break;
-              }
-              const icon = '/images/favicons/favicon.ico';
-              new Notification(`${site.owner}/${site.repository}(${build.branch})`, { body, icon });
+        const socket = io();
+        socket.on('build status', (build) => {
+            let body;
+            switch (build.state) {
+              case 'error':
+                body = 'A build has failed. Please view the logs for more information.';
+                break;
+              case 'processing':
+                body = 'A build is in progress';
+                break;
+              default:
+                body = 'A build completed successfully.';
+                break;
             }
-          });
+            const icon = '/images/favicons/favicon.ico';
+            new Notification(`${build.owner}/${build.repository}(${build.branch})`, { body, icon });
         });
       }
     });

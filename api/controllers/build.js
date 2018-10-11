@@ -9,8 +9,19 @@ const decodeb64 = str => new Buffer(str, 'base64').toString('utf8');
 
 function emitBuildStatus(socket, build) {
   try {
-    const msg = { id: build.id, state: build.state, site: build.site, branch: build.branch };
-    socket.of(`/${build.site}`).emit('build status', msg);
+    Site.findById(build.site)
+    .then((site) =>{
+      const msg = {
+        id: build.id,
+        state: build.state,
+        site: build.site,
+        branch: build.branch,
+        owner: site.owner,
+        repository: site.repository,
+      };
+      socket.to(build.site).emit('build status', msg);
+      Promise.resolve();
+    })
   } catch (err) {
     logger.error(err);
   }
