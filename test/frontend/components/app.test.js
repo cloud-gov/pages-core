@@ -7,6 +7,7 @@ import proxyquire from 'proxyquire';
 proxyquire.noCallThru();
 
 const alertActionUpdate = stub();
+const buildStatusNotifierNotify = stub();
 const Header = () => <div />;
 
 const username = 'jenny mcuser';
@@ -32,6 +33,7 @@ const AppFixture = proxyquire('../../../frontend/components/app', {
   '../store': {},
   '../actions/alertActions': { update: alertActionUpdate },
   './header': Header,
+  '../util/buildStatusNotifier': { notify: buildStatusNotifierNotify },
 }).App;
 
 describe('<App/>', () => {
@@ -41,6 +43,7 @@ describe('<App/>', () => {
     // TODO: need to figure out the store mocking here and refactor these
     wrapper = shallow(<AppFixture {...props} />);
     alertActionUpdate.reset();
+    buildStatusNotifierNotify.reset();
   });
 
   it('renders children', () => {
@@ -51,11 +54,13 @@ describe('<App/>', () => {
 
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
     expect(wrapper.find('#app-child')).to.have.length(1);
+    expect(buildStatusNotifierNotify.called).to.be.true;
   });
 
   it('does not trigger an alert update if no alert message is present', () => {
     wrapper.setProps({ location: { key: 'path' } });
     expect(alertActionUpdate.called).to.be.false;
+    expect(buildStatusNotifierNotify.called).to.be.false;
   });
 
   it('does not trigger an alert update if the route has not changed', () => {
@@ -69,6 +74,7 @@ describe('<App/>', () => {
     wrapper = shallow(<AppFixture {...newProps} />);
     wrapper.setProps({ location: { key: 'a-route' } });
     expect(alertActionUpdate.called).to.be.false;
+    expect(buildStatusNotifierNotify.called).to.be.true;
   });
 
   it('triggers an alert update if there is an alert message', () => {
@@ -84,6 +90,7 @@ describe('<App/>', () => {
     wrapper.setProps({ location: { key: 'next-route' } });
     expect(alertActionUpdate.called).to.be.true;
     expect(alertActionUpdate.calledWith(newProps.alert.stale)).to.be.true;
+    expect(buildStatusNotifierNotify.called).to.be.true;
   });
 
   it('renders a loading indicator when the user is loading', () => {
@@ -93,5 +100,6 @@ describe('<App/>', () => {
 
     wrapper = shallow(<AppFixture {...newProps} />);
     expect(wrapper.find('LoadingIndicator')).to.have.length(1);
+    expect(buildStatusNotifierNotify.called).to.be.true;
   });
 });

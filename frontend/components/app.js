@@ -2,13 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Notifications from 'react-notification-system-redux';
 import { connect } from 'react-redux';
-import io from 'socket.io-client';
 
 import { USER, ALERT } from '../propTypes';
 import alertActions from '../actions/alertActions';
 import LoadingIndicator from './LoadingIndicator';
+import BuildStatusNotifier from '../util/buildStatusNotifier';
 
 export class App extends React.Component {
+
+  componentWillMount() {
+    BuildStatusNotifier.notify();
+  }
 
   componentWillReceiveProps(nextProps) {
     const { alert } = this.props;
@@ -38,37 +42,8 @@ export class App extends React.Component {
     }
   }
 
-  notifyBuildStatus() {
-    /* eslint no-undef: "error" */
-    /* eslint-env browser */
-    Notification.requestPermission((permission) => {
-      // If the user accepts, let's create a notification
-      if (permission === 'granted') {
-        const socket = io();
-        socket.on('build status', (build) => {
-          let body;
-          switch (build.state) {
-            case 'error':
-              body = 'A build has failed. Please view the logs for more information.';
-              break;
-            case 'processing':
-              body = 'A build is in progress';
-              break;
-            default:
-              body = 'A build completed successfully.';
-              break;
-          }
-          const icon = '/images/favicons/favicon.ico';
-          new Notification(`${build.state}: ${build.owner}/${build.repository} (${build.branch})`, { body, icon });
-        });
-      }
-    });
-  }
-
   render() {
     const { user, children, notifications } = this.props;
-
-    this.notifyBuildStatus();
 
     if (user.isLoading) {
       return <LoadingIndicator />;
