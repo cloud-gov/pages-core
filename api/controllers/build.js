@@ -21,7 +21,7 @@ function emitBuildStatus(socket, build) {
       };
       socket.to(build.site).emit('build status', msg);
       Promise.resolve();
-    })
+    });
   } catch (err) {
     logger.error(err);
   }

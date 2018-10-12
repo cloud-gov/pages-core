@@ -4,7 +4,7 @@ import Notifications from 'react-notification-system-redux';
 import { connect } from 'react-redux';
 import io from 'socket.io-client';
 
-import { USER, ALERT, SITE } from '../propTypes';
+import { USER, ALERT } from '../propTypes';
 import alertActions from '../actions/alertActions';
 import LoadingIndicator from './LoadingIndicator';
 
@@ -59,7 +59,7 @@ export class App extends React.Component {
               break;
           }
           const icon = '/images/favicons/favicon.ico';
-          new Notification(`${buildstate}: ${build.owner}/${build.repository} (${build.branch})`, { body, icon });
+          new Notification(`${build.state}: ${build.owner}/${build.repository} (${build.branch})`, { body, icon });
         });
       }
     });
@@ -110,10 +110,6 @@ App.propTypes = {
       uid: PropTypes.number.isRequired,
     })
   ),
-  sites: PropTypes.shape({
-    data: PropTypes.arrayOf(SITE),
-    isLoading: PropTypes.bool,
-  }),
 };
 
 App.defaultProps = {
@@ -122,14 +118,12 @@ App.defaultProps = {
   location: null,
   user: false,
   notifications: [],
-  sites: null,
 };
 
-const mapStateToProps = ({ alert, notifications, user, sites }) => ({
+const mapStateToProps = ({ alert, notifications, user }) => ({
   alert,
   notifications,
   user,
-  sites,
 });
 
 export default connect(mapStateToProps)(App);
