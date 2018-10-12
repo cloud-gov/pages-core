@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 module.exports = class BuildStatusNotifier {
-  static notify() {
+  static listen() {
     /* eslint no-undef: "error" */
     /* eslint-env browser */
 
@@ -14,7 +14,14 @@ module.exports = class BuildStatusNotifier {
       if (permission === 'granted') {
         const socket = io();
         socket.on('build status', (build) => {
-          let body;
+          this.notify(build);
+        });
+      }
+    });
+  }
+
+  static notify(build) {
+    let body;
           let titleStatus;
           switch (build.state) {
             case 'error':
@@ -32,8 +39,5 @@ module.exports = class BuildStatusNotifier {
           }
           const icon = '/images/favicons/favicon.ico';
           new Notification(`${titleStatus}`, {body: `Site: ${build.owner}/${build.repository}   Branch: ${build.branch}`, icon });
-        });
-      }
-    });
   }
 };

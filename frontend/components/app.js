@@ -11,7 +11,7 @@ import BuildStatusNotifier from '../util/buildStatusNotifier';
 export class App extends React.Component {
 
   componentWillMount() {
-    BuildStatusNotifier.notify();
+    BuildStatusNotifier.listen();
   }
 
   componentWillReceiveProps(nextProps) {
