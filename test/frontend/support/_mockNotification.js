@@ -1,4 +1,4 @@
- module.exports = class Notification {
+module.exports = class Notification {
   constructor(title, options = {}) {
     this.title = title;
     this.options = options;
