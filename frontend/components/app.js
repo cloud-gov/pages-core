@@ -10,10 +10,6 @@ import LoadingIndicator from './LoadingIndicator';
 
 export class App extends React.Component {
 
-  // constructor() {
-  //   super();
-  //   this.socket = io('/');
-  // }
   componentWillReceiveProps(nextProps) {
     const { alert } = this.props;
 
@@ -63,7 +59,7 @@ export class App extends React.Component {
                 break;
             }
             const icon = '/images/favicons/favicon.ico';
-            new Notification(`${build.owner}/${build.repository}(${build.branch})`, { body, icon });
+            new Notification(`${buildstate}: ${build.owner}/${build.repository} (${build.branch})`, { body, icon });
         });
       }
     });
