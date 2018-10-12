@@ -10,7 +10,7 @@ const decodeb64 = str => new Buffer(str, 'base64').toString('utf8');
 function emitBuildStatus(socket, build) {
   try {
     Site.findById(build.site)
-    .then((site) =>{
+    .then((site) => {
       const msg = {
         id: build.id,
         state: build.state,

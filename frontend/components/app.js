@@ -38,7 +38,7 @@ export class App extends React.Component {
     }
   }
 
-  notifyBuildStatus(sites) {
+  notifyBuildStatus() {
     /* eslint no-undef: "error" */
     /* eslint-env browser */
     Notification.requestPermission((permission) => {
@@ -46,29 +46,29 @@ export class App extends React.Component {
       if (permission === 'granted') {
         const socket = io();
         socket.on('build status', (build) => {
-            let body;
-            switch (build.state) {
-              case 'error':
-                body = 'A build has failed. Please view the logs for more information.';
-                break;
-              case 'processing':
-                body = 'A build is in progress';
-                break;
-              default:
-                body = 'A build completed successfully.';
-                break;
-            }
-            const icon = '/images/favicons/favicon.ico';
-            new Notification(`${buildstate}: ${build.owner}/${build.repository} (${build.branch})`, { body, icon });
+          let body;
+          switch (build.state) {
+            case 'error':
+              body = 'A build has failed. Please view the logs for more information.';
+              break;
+            case 'processing':
+              body = 'A build is in progress';
+              break;
+            default:
+              body = 'A build completed successfully.';
+              break;
+          }
+          const icon = '/images/favicons/favicon.ico';
+          new Notification(`${buildstate}: ${build.owner}/${build.repository} (${build.branch})`, { body, icon });
         });
       }
     });
   }
 
   render() {
-    const { user, children, notifications, sites } = this.props;
+    const { user, children, notifications } = this.props;
 
-    this.notifyBuildStatus(sites);
+    this.notifyBuildStatus();
 
     if (user.isLoading) {
       return <LoadingIndicator />;

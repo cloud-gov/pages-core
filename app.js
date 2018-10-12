@@ -128,35 +128,21 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-socket.use(function(_socket, next) {
+socket.use((_socket, next) => {
   sessionMiddleware(_socket.request, _socket.request.res, next);
 });
 
-socket.on('connection', function (_socket) {
-    userId = _socket.request.session.passport.user;
-    sequelize.models.User.findOne({
-      where: { id: userId },
-      include: [{ model: sequelize.models.Site }]
-    })
-    .then((user) => {
-      user.Sites.forEach(s => {
-        _socket.join(s.id);
-      });
-      return Promise.resolve();
-    })
-    .catch(err  => logger.error(err))
+socket.on('connection', (_socket) => {
+  const userId = _socket.request.session.passport.user;
+  sequelize.models.User.findOne({
+    where: { id: userId },
+    include: [{ model: sequelize.models.Site }],
+  })
+  .then((user) => {
+    user.Sites.forEach(s => _socket.join(s.id));
+    return Promise.resolve();
+  })
+  .catch(err => logger.error(err));
 });
-
-//testing onlyy
-function testBuildNote()
-{
-  const msg = { id: 1, state: 'success', site: 1, branch: 'master', owner: 'owner', repository: 'repo' };
-  socket.to('1').emit('build status', msg);
-
-    // Do your thing here
-    setTimeout(testBuildNote, 60*1000);
-    console.log('\n\nsent notification\n\n');
-}
-testBuildNote();
 
 module.exports = app;

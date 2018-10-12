@@ -1,10 +1,10 @@
-module.exports = class Notification {
+ module.exports = class Notification {
   constructor(title, options = {}) {
-	  this.title = title;
-	  this.options = options;
-	}
+    this.title = title;
+    this.options = options;
+  }
 
   static requestPermission() {
     return 'granted';
   }
-}
+};
