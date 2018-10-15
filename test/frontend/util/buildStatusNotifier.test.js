@@ -16,11 +16,13 @@ describe('listen', () => {
 
     expect(notifySpy.called).to.be.false;
     BuildStatusNotifier.notify(msg);
-    expect(notifySpy.called).to.be.true;
+    expect(notifySpy.calledOnce).to.be.true;
     msg.state = 'error';
-    expect(notifySpy.called).to.be.true;
+    BuildStatusNotifier.notify(msg);
+    expect(notifySpy.calledTwice).to.be.true;
     msg.state = 'processing';
-    expect(notifySpy.called).to.be.true;
+    BuildStatusNotifier.notify(msg);
+    expect(notifySpy.calledThrice).to.be.true;
     done();
   });
 });
