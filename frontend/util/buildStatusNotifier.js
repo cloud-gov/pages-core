@@ -1,10 +1,11 @@
 import io from 'socket.io-client';
+
 module.exports = class BuildStatusNotifier {
   static listen() {
     /* eslint no-undef: "error" */
     /* eslint-env browser */
 
-    if(BuildStatusNotifier.listening) {
+    if (BuildStatusNotifier.listening) {
       return;
     }
     BuildStatusNotifier.listening = true;
@@ -24,16 +25,16 @@ module.exports = class BuildStatusNotifier {
     let titleStatus;
     switch (build.state) {
       case 'error':
-        titleStatus = "Failed Build: Please review logs.";
+        titleStatus = 'Failed Build: Please review logs.';
         break;
       case 'processing':
-        titleStatus = "Build In-Progress";
+        titleStatus = 'Build In-Progress';
         break;
       default:
-        titleStatus = "Successful Build";
+        titleStatus = 'Successful Build';
         break;
     }
     const icon = '/images/favicons/favicon.ico';
-    new Notification(`${titleStatus}`, {body: `Site: ${build.owner}/${build.repository}   Branch: ${build.branch}`, icon });
+    new Notification(`${titleStatus}`, { body: `Site: ${build.owner}/${build.repository}   Branch: ${build.branch}`, icon });
   }
 };
