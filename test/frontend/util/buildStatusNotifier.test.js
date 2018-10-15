@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { spy, stub } from 'sinon';
+import { spy } from 'sinon';
 import BuildStatusNotifier from '../../../frontend/util/buildStatusNotifier';
 
 describe('listen', () => {
