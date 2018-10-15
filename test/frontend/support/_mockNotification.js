@@ -5,7 +5,7 @@ module.exports = class Notification {
   }
 
   static requestPermission() {
-    return new Promise((resolve, reject) => Promise.resolve('granted'));
+    return Promise.resolve('granted');
   }
 };
 
