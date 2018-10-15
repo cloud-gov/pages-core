@@ -18,7 +18,7 @@ module.exports = class BuildStatusNotifier {
           this.notify(build);
         });
       }
-      Promise.resolve();
+      return Promise.resolve();
     });
   }
 
