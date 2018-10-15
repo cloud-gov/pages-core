@@ -6,10 +6,10 @@ module.exports = class BuildStatusNotifier {
     /* eslint-env browser */
 
     if (BuildStatusNotifier.listening) {
-      return;
+      return Promise.resolve();
     }
     BuildStatusNotifier.listening = true;
-    Notification.requestPermission()
+    return Notification.requestPermission()
     .then((permission) => {
       // If the user accepts, let's create a notification
       if (permission === 'granted') {
