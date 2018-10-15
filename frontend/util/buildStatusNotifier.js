@@ -9,8 +9,8 @@ module.exports = class BuildStatusNotifier {
       return;
     }
     BuildStatusNotifier.listening = true;
-
-    Notification.requestPermission((permission) => {
+    Notification.requestPermission()
+    .then((permission) => {
       // If the user accepts, let's create a notification
       if (permission === 'granted') {
         const socket = io();
@@ -18,6 +18,7 @@ module.exports = class BuildStatusNotifier {
           this.notify(build);
         });
       }
+      Promise.resolve();
     });
   }
 
