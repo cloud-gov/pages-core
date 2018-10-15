@@ -12,7 +12,9 @@ describe('listen', () => {
     expect(BuildStatusNotifier.listening).to.be.undefined;
     BuildStatusNotifier.listen();
     expect(BuildStatusNotifier.listening).to.be.true;
-    expect(listenSpy.called).to.be.true;
+    expect(listenSpy.calledOnce).to.be.true;
+    BuildStatusNotifier.listen();
+    expect(listenSpy.calledTwice).to.be.true;
 
     expect(notifySpy.called).to.be.false;
     BuildStatusNotifier.notify(msg);
