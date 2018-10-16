@@ -1,3 +1,4 @@
+const logger = require('winston');
 const { User, Site } = require('../models');
 
 module.exports = {
@@ -12,5 +13,5 @@ module.exports = {
       return Promise.resolve();
     })
     .catch(err => logger.error(err));
-  }
+  },
 };

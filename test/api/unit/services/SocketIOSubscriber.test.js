@@ -1,15 +1,13 @@
 const expect = require('chai').expect;
 const factory = require('../../support/factory');
+const SocketIOSubscriber = require('../../../../api/services/SocketIOSubscriber')
 const MockSocket = require('../../support/mockSocket');
-
-  
-// const ioMock = sinon.stub(SocketIOSubscriber);//, "joinRooms");
 
 describe('SocketIOSubscriber', () => {
   context('listen', () => {
     it('a user with sites joinsRooms(socket)', (done) => {
       let user;
-      let socket
+      let socket;
 
       factory.user()
         .then((model) => {
@@ -29,14 +27,14 @@ describe('SocketIOSubscriber', () => {
         .then(() => {
           expect(socket.rooms.length).to.eql(6);
         });
-      done();  
+      done();
     });
 
     it('a user without sites joinsRooms(socket)', (done) => {
-      let socket
+      let socket;
 
       factory.site()
-        .then(site => factory.user())
+        .then(() => factory.user())
         .then((user) => {
           socket = MockSocket.new(user.id);
           SocketIOSubscriber.joinRooms(socket);
@@ -45,13 +43,14 @@ describe('SocketIOSubscriber', () => {
         .then(() => {
           expect(socket.rooms.length).to.eql(1);
         });
-      done();  
+      done();
     });
 
     it('user 1 and user 2 have different sites', (done) => {
       let user1;
       let user2;
-      let socket1
+      let socket1;
+      let socket2;
 
       factory.user()
         .then((model) => {
@@ -80,13 +79,14 @@ describe('SocketIOSubscriber', () => {
           expect(socket1.rooms.length).to.eql(4);
           expect(socket2.rooms.length).to.eql(2);
         });
-      done();  
+      done();
     });
 
     it('user 1 and user 2 have 2 same sites', (done) => {
       let user1;
       let user2;
-      let socket1
+      let socket1;
+      let socket2;
 
       factory.user()
         .then((model) => {
@@ -118,7 +118,7 @@ describe('SocketIOSubscriber', () => {
           const allRooms = Object.assign(socket1.rooms, socket2.rooms);
           expect(allRooms.length).to.eql(7);
         });
-      done();  
+      done();
     });
   });
 });

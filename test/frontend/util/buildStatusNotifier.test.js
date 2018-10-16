@@ -9,7 +9,8 @@ const BuildStatusNotifier = proxyquire('../../../frontend/util/buildStatusNotifi
 });
 
 describe('buildStatusNotifier', () => {
-  before(() => spy(BuildStatusNotifier, 'notify'))
+  before(() => spy(BuildStatusNotifier, 'notify'));
+
   context('listen', () => {
     let socketIOEventSubscriptions;
     let onMock;
@@ -92,7 +93,7 @@ describe('buildStatusNotifier', () => {
     const icon = '/images/favicons/favicon.ico';
     beforeEach(() => {
       msg = { state: 'state', owner: 'owner', repository: 'repository', branch: 'branch' };
-      options = { body: `Site: ${msg.owner}/${msg.repository}   Branch: ${msg.branch}`, icon }
+      options = { body: `Site: ${msg.owner}/${msg.repository}   Branch: ${msg.branch}`, icon };
       BuildStatusNotifier.notify.reset();
     });
 
