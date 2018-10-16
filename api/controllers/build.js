@@ -18,7 +18,7 @@ const emitBuildStatus = (socket, build) => Site.findById(build.site)
         repository: site.repository,
       };
       socket.to(build.site).emit('build status', msg);
-      Promise.resolve();
+      return Promise.resolve();
     })
     .catch(err => logger.error(err));
 
