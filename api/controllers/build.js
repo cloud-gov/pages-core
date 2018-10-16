@@ -101,7 +101,7 @@ module.exports = {
         return build.completeJob(message);
       }
     })
-    .then((build) => Promise.all([
+    .then(build => Promise.all([
       emitBuildStatus(res.socket, build),
       GithubBuildStatusReporter.reportBuildStatus(build),
     ]))
