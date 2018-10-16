@@ -5,6 +5,10 @@ module.exports = class BuildStatusNotifier {
     /* eslint no-undef: "error" */
     /* eslint-env browser */
 
+    if (typeof(Notification) === 'undefined') {
+      return Promise.resolve();
+    }
+
     if (BuildStatusNotifier.listening) {
       return Promise.resolve();
     }
