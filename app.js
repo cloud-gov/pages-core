@@ -33,6 +33,7 @@ const responses = require('./api/responses');
 const passport = require('./api/services/passport');
 const RateLimit = require('express-rate-limit');
 const router = require('./api/routers');
+const SocketIOSubscriber = require('./api/services/SocketIOSubscriber');
 
 const app = express();
 const sequelize = require('./api/models').sequelize;
@@ -133,16 +134,7 @@ socket.use((_socket, next) => {
 });
 
 socket.on('connection', (_socket) => {
-  const userId = _socket.request.session.passport.user;
-  sequelize.models.User.findOne({
-    where: { id: userId },
-    include: [{ model: sequelize.models.Site }],
-  })
-  .then((user) => {
-    user.Sites.forEach(s => _socket.join(s.id));
-    return Promise.resolve();
-  })
-  .catch(err => logger.error(err));
+  SocketIOSubscriber.joinRooms(_socket);
 });
 
 module.exports = app;
