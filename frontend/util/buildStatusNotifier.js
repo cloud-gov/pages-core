@@ -36,6 +36,6 @@ module.exports = class BuildStatusNotifier {
         break;
     }
     const icon = '/images/favicons/favicon.ico';
-    new Notification(`${titleStatus}`, { body: `Site: ${build.owner}/${build.repository}   Branch: ${build.branch}`, icon });
+    return new Notification(`${titleStatus}`, { body: `Site: ${build.owner}/${build.repository}   Branch: ${build.branch}`, icon });
   }
 };
