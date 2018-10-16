@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 const factory = require('../../support/factory');
-const SocketIOSubscriber = require('../../../../api/services/SocketIOSubscriber')
+const SocketIOSubscriber = require('../../../../api/services/SocketIOSubscriber');
 const MockSocket = require('../../support/mockSocket');
 
 describe('SocketIOSubscriber', () => {

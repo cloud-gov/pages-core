@@ -9,7 +9,7 @@ class MockSocket {
   }
 
   join(roomName) {
-    return this.rooms[roomName] = roomName;
+    this.rooms[roomName] = roomName;
   }
 }
 
