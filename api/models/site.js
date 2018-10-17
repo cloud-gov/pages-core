@@ -72,9 +72,9 @@ function demoUrl() {
 }
 
 function branchPreviewUrl(branch = null) {
-  let url =  `${config.app.preview_hostname}/preview/${this.owner}/${this.repository}/`
+  let url = `${config.app.preview_hostname}/preview/${this.owner}/${this.repository}/`;
   if (branch) {
-    url = url + `${branch}/`;
+    url = `${url}${branch}/`;
   }
   return url;
 }
