@@ -1,0 +1,1 @@
+global.Notification = require('./_mockNotification');

@@ -1,6 +1,6 @@
-const logger = require("winston")
+const logger = require('winston');
+const app = require('./app');
 
-const app = require("./app")
-app.listen(process.env.PORT || 1337, () => {
-  logger.info("Server running!")
-})
+app.server.listen(process.env.PORT || 1337, () => {
+  logger.info('Server running!');
+});
