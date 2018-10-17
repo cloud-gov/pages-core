@@ -24,11 +24,16 @@ const session = require('express-session');
 const PostgresStore = require('connect-session-sequelize')(session.Store);
 const nunjucks = require('nunjucks');
 const flash = require('connect-flash');
+const http = require('http');
+const io = require('socket.io');
+const redis = require('redis');
+const redisAdapter = require('socket.io-redis');
 
 const responses = require('./api/responses');
 const passport = require('./api/services/passport');
 const RateLimit = require('express-rate-limit');
 const router = require('./api/routers');
+const SocketIOSubscriber = require('./api/services/SocketIOSubscriber');
 
 const app = express();
 const sequelize = require('./api/models').sequelize;
@@ -49,13 +54,13 @@ nunjucks.configure('views', {
 // able to access the requesting user's IP in req.ip, so
 // 'trust proxy' must be enabled.
 app.enable('trust proxy');
-
-app.use(session(config.session));
+const sessionMiddleware = session(config.session);
+app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use((req, res, next) => {
   res.locals.user = req.user;
-  next();
+  return next();
 });
 
 app.use(express.static('public'));
@@ -98,8 +103,22 @@ app.use(expressWinston.errorLogger({
 const limiter = new RateLimit(config.rateLimiting);
 app.use(limiter); // must be set before router is added to app
 
-app.use(router);
+app.server = http.Server(app);
 
+const socket = io(app.server);
+if (config.redis) {
+  const redisCreds = { auth_pass: config.redis.password };
+  const pub = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
+  const sub = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
+  socket.adapter(redisAdapter({ pubClient: pub, subClient: sub }));
+}
+
+app.use((req, res, next) => {
+  res.socket = socket;
+  next();
+});
+
+app.use(router);
 // error handler middleware for custom CSRF error responses
 // note that error handling middlewares must come last in the stack
 app.use((err, req, res, next) => {
@@ -107,8 +126,15 @@ app.use((err, req, res, next) => {
     res.forbidden({ message: 'Invalid CSRF token' });
     return;
   }
-
   next(err);
+});
+
+socket.use((_socket, next) => {
+  sessionMiddleware(_socket.request, _socket.request.res, next);
+});
+
+socket.on('connection', (_socket) => {
+  SocketIOSubscriber.joinRooms(_socket);
 });
 
 module.exports = app;
