@@ -66,7 +66,7 @@ describe('<SitePublishedFilesTable/>', () => {
       site: {
         viewLink: 'https://www.example.gov/site/owner/repo/',
         demoBranch: 'demo',
-        demoViewLink: 'https://example.gov/demo/owner/repo/'
+        demoViewLink: 'https://example.gov/demo/owner/repo/',
       },
     };
     const origProps = {
@@ -106,8 +106,8 @@ describe('<SitePublishedFilesTable/>', () => {
       name: 'preview',
       site: {
         viewLink: 'https://www.example.gov/site/owner/repo/',
-        previewLink: 'https://www.example.gov/preview/owner/repo/'
-      }
+        previewLink: 'https://www.example.gov/preview/owner/repo/',
+      },
     };
     const origProps = {
       params: { id: '1', name: 'master' },
@@ -146,8 +146,8 @@ describe('<SitePublishedFilesTable/>', () => {
       name: 'master',
       site: {
         viewLink: 'www.example.gov/',
-        defaultBranch: 'master'
-      }
+        defaultBranch: 'master',
+      },
     };
     const origProps = {
       params: { id: '1', name: 'master' },
