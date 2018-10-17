@@ -145,6 +145,6 @@
   },
   "engines": {
     "node": "10.x.x",
-    "npm": "3.x.x"
+    "npm": "6.x.x"
   }
 }
