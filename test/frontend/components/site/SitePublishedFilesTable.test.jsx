@@ -61,7 +61,94 @@ describe('<SitePublishedFilesTable/>', () => {
   });
 
   it('should render a table with the files for the given branch', () => {
-    const correctBranch = { name: 'master', site: { viewLink: 'www.example.gov/master' } };
+    const correctBranch = {
+      name: 'demo',
+      site: {
+        viewLink: 'https://www.example.gov/site/owner/repo/',
+        demoBranch: 'demo',
+        demoViewLink: 'https://example.gov/demo/owner/repo/'
+      },
+    };
+    const origProps = {
+      params: { id: '1', name: 'master' },
+      publishedFiles: {
+        isLoading: true,
+      },
+    };
+
+    const publishedFiles = {
+      isLoading: false,
+      data: {
+        isTruncated: false,
+        files: [
+          { name: 'abc', publishedBranch: correctBranch },
+          { name: 'abc/def', publishedBranch: correctBranch },
+          { name: null, publishedBranch: correctBranch }, // shouldn't be rendered b/c no name
+        ],
+      },
+    };
+
+    const wrapper = shallow(<SitePublishedFilesTable {...origProps} />);
+    wrapper.setProps({ publishedFiles });
+    expect(wrapper.find('table')).to.have.length(1);
+    expect(wrapper.find('tbody > tr')).to.have.length(2);
+    expect(wrapper.find('table').contains('abc')).to.be.true;
+    expect(wrapper.find('table').contains('abc/def')).to.be.true;
+    expect(wrapper.find('table').contains('xyz')).to.be.false;
+
+    // paging buttons should be present if the first page is not truncated
+    const buttons = wrapper.find('button');
+    expect(buttons).to.have.length(0);
+  });
+
+  it('should render a table with the files for the given branch', () => {
+    const correctBranch = {
+      name: 'preview',
+      site: {
+        viewLink: 'https://www.example.gov/site/owner/repo/',
+        previewLink: 'https://www.example.gov/preview/owner/repo/'
+      }
+    };
+    const origProps = {
+      params: { id: '1', name: 'master' },
+      publishedFiles: {
+        isLoading: true,
+      },
+    };
+
+    const publishedFiles = {
+      isLoading: false,
+      data: {
+        isTruncated: false,
+        files: [
+          { name: 'abc', publishedBranch: correctBranch },
+          { name: 'abc/def', publishedBranch: correctBranch },
+          { name: null, publishedBranch: correctBranch }, // shouldn't be rendered b/c no name
+        ],
+      },
+    };
+
+    const wrapper = shallow(<SitePublishedFilesTable {...origProps} />);
+    wrapper.setProps({ publishedFiles });
+    expect(wrapper.find('table')).to.have.length(1);
+    expect(wrapper.find('tbody > tr')).to.have.length(2);
+    expect(wrapper.find('table').contains('abc')).to.be.true;
+    expect(wrapper.find('table').contains('abc/def')).to.be.true;
+    expect(wrapper.find('table').contains('xyz')).to.be.false;
+
+    // paging buttons should be present if the first page is not truncated
+    const buttons = wrapper.find('button');
+    expect(buttons).to.have.length(0);
+  });
+
+  it('should render a table with the files for the given branch', () => {
+    const correctBranch = {
+      name: 'master',
+      site: {
+        viewLink: 'www.example.gov/',
+        defaultBranch: 'master'
+      }
+    };
     const origProps = {
       params: { id: '1', name: 'master' },
       publishedFiles: {
