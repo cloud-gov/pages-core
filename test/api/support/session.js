@@ -3,7 +3,7 @@ const factory = require('./factory');
 const csrfToken = require('./csrfToken');
 const config = require('../../../config');
 
-function unauthenticatedSession({ oauthState, authRedirectPath } = {}) {
+function unauthenticatedSession() {
   const sessionKey = crypto.randomBytes(8).toString('hex');
 
   const sessionBody = {
@@ -16,8 +16,6 @@ function unauthenticatedSession({ oauthState, authRedirectPath } = {}) {
     flash: {},
     authenticated: false,
     csrfSecret: csrfToken.TEST_CSRF_SECRET,
-    'oauth2:github.com': { state: oauthState },
-    authRedirectPath,
   };
 
   return config.session.store.set(sessionKey, sessionBody)

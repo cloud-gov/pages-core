@@ -104,12 +104,8 @@ const user = ({ accessToken, githubUserID, username, email } = {}) => {
   email = email || `${username}@example.com`.toLowerCase();
   /* eslint-enable no-param-reassign */
 
-  const expectedHeaders = {
-    reqheaders: { authorization: `Bearer ${accessToken}` },
-  };
-
-  return nock('https://api.github.com', expectedHeaders)
-    .get('/user')
+  return nock('https://api.github.com')
+    .get(`/user?access_token=${accessToken}`)
     .reply(200, {
       email,
       login: username,

@@ -42,20 +42,6 @@ if (sqsCreds) {
   throw new Error('No SQS credentials found');
 }
 
-// S3 Configs
-const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`);
-if (redisCreds) {
-  module.exports.redis = {
-    hostname: redisCreds.hostname,
-    password: redisCreds.password,
-    port: redisCreds.port,
-    ports: redisCreds.ports,
-    uri: redisCreds.uri,
-  };
-} else {
-  throw new Error('No Redis credentials found');
-}
-
 // See https://github.com/nfriedly/express-rate-limit/blob/master/README.md#configuration
 // for all express-rate-limit options available
 module.exports.rateLimiting = {

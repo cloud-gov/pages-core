@@ -144,18 +144,7 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   renderBranchFileRow(file) {
-    let viewFileLink;
-    const branch = file.publishedBranch.name;
-    switch (branch) {
-      case file.publishedBranch.site.defaultBranch:
-        viewFileLink = `${file.publishedBranch.site.viewLink}${file.name}`;
-        break;
-      case file.publishedBranch.site.demoBranch:
-        viewFileLink = `${file.publishedBranch.site.demoViewLink}${file.name}`;
-        break;
-      default:
-        viewFileLink = `${file.publishedBranch.site.previewLink}${branch}/${file.name}`;
-    }
+    const viewFileLink = `${file.publishedBranch.site.viewLink}${file.name}`;
     return (
       <tr key={viewFileLink}>
         <td>{file.name}</td>
