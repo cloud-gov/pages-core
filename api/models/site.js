@@ -71,12 +71,8 @@ function demoUrl() {
   return `${config.app.preview_hostname}/demo/${this.owner}/${this.repository}/`;
 }
 
-function branchPreviewUrl(branch = null) {
-  let url = `${config.app.preview_hostname}/preview/${this.owner}/${this.repository}/`;
-  if (branch) {
-    url = `${url}${branch}/`;
-  }
-  return url;
+function branchPreviewUrl(branch) {
+  return `${config.app.preview_hostname}/preview/${this.owner}/${this.repository}/${branch}/`;
 }
 
 function toJSON() {
@@ -94,8 +90,6 @@ function toJSON() {
   if (object.demoBranch) {
     object.demoViewLink = this.demoUrl();
   }
-
-  object.previewLink = this.branchPreviewUrl();
 
   Object.keys(object).forEach((key) => {
     if (object[key] === null) {
