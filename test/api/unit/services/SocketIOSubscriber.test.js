@@ -20,14 +20,15 @@ describe('SocketIOSubscriber', () => {
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => {
-          const session =  { passport: { user: user.id } };
+          const session = { passport: { user: user.id } };
           socket = new MockSocket(session);
           return SocketIOSubscriber.joinRooms(socket);
         })
         .then(() => {
           expect(Object.keys(socket.rooms).length).to.eql(6);
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
 
     it('a user without sites joinsRooms(socket)', (done) => {
@@ -36,14 +37,15 @@ describe('SocketIOSubscriber', () => {
       factory.site()
         .then(() => factory.user())
         .then((user) => {
-          const session =  { passport: { user: user.id } };
+          const session = { passport: { user: user.id } };
           socket = new MockSocket(session);
           return SocketIOSubscriber.joinRooms(socket);
         })
         .then(() => {
           expect(Object.keys(socket.rooms).length).to.eql(1);
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
 
     it('user 1 and user 2 have different sites', (done) => {
@@ -67,22 +69,23 @@ describe('SocketIOSubscriber', () => {
         })
         .then(() => factory.site({ users: Promise.all([user2]) }))
         .then(() => {
-          const session1 =  { passport: { user: user1.id } };
+          const session1 = { passport: { user: user1.id } };
           socket1 = new MockSocket(session1);
 
-          const session2 =  { passport: { user: user2.id } };
+          const session2 = { passport: { user: user2.id } };
           socket2 = new MockSocket(session2);
 
           return Promise.all([
             SocketIOSubscriber.joinRooms(socket1),
-            SocketIOSubscriber.joinRooms(socket2)
+            SocketIOSubscriber.joinRooms(socket2),
           ]);
         })
         .then(() => {
           expect(Object.keys(socket1.rooms).length).to.eql(4);
           expect(Object.keys(socket2.rooms).length).to.eql(2);
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
 
     it('user 1 and user 2 have 2 same sites', (done) => {
@@ -107,15 +110,15 @@ describe('SocketIOSubscriber', () => {
         .then(() => factory.site({ users: Promise.all([user1, user2]) }))
         .then(() => factory.site({ users: Promise.all([user1, user2]) }))
         .then(() => {
-          const session1 =  { passport: { user: user1.id } };
+          const session1 = { passport: { user: user1.id } };
           socket1 = new MockSocket(session1);
 
-          const session2 =  { passport: { user: user2.id } };
+          const session2 = { passport: { user: user2.id } };
           socket2 = new MockSocket(session2);
 
           return Promise.all([
             SocketIOSubscriber.joinRooms(socket1),
-            SocketIOSubscriber.joinRooms(socket2)
+            SocketIOSubscriber.joinRooms(socket2),
           ]);
         })
         .then(() => {
@@ -124,7 +127,8 @@ describe('SocketIOSubscriber', () => {
           const allRooms = Object.assign(socket1.rooms, socket2.rooms);
           expect(Object.keys(allRooms).length).to.eql(7);
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
 
     it('non passport authenticated user with sites joinsRooms(socket)', (done) => {
@@ -148,7 +152,8 @@ describe('SocketIOSubscriber', () => {
         .then(() => {
           expect(Object.keys(socket.rooms).length).to.eql(1);
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
 
     it('no id user with sites joinsRooms(socket)', (done) => {
@@ -166,14 +171,15 @@ describe('SocketIOSubscriber', () => {
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => {
-          const session =  { passport: {} };
+          const session = { passport: {} };
           socket = new MockSocket(session);
           return SocketIOSubscriber.joinRooms(socket);
         })
         .then(() => {
           expect(Object.keys(socket.rooms).length).to.eql(1);
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
   });
 });
