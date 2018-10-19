@@ -1,8 +1,8 @@
 class MockSocket {
-  constructor(id) {
-    this.request = { session: { passport: { user: id } } };
+  constructor(session = {}) {
+    this.request = { session };
 
-    const defaultUserRoom = `defaultUserRoom${id}`;
+    const defaultUserRoom = `defaultUserRoom${Math.random() * 1000}`;
     const rooms = {};
     rooms[defaultUserRoom] = defaultUserRoom;
     this.rooms = rooms;
