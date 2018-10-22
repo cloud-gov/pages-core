@@ -14,7 +14,6 @@
   pre {
     margin: 0;
     max-height: 200px;
-    max-width: 200px;
     overflow: auto;
     white-space: pre-wrap;
   }
@@ -26,10 +25,13 @@
       margin: 0;
     }
   }
+
+  th, td {
+    min-width: 131px;
+  }
 }
 
 .log-table__site-build-log pre {
-  max-width: 400px;
   border: 1px solid lightgrey;
 }
 
