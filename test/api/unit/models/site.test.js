@@ -81,6 +81,14 @@ describe('Site model', () => {
           done();
         }).catch(done);
       });
+
+      it('should return a federalist preview link withouth branch', (done) => {
+        factory.site().then((site) => {
+          const viewLink = site.viewLinkForBranch();
+          expect(viewLink).to.equal(`${config.app.preview_hostname}/preview/${site.owner}/${site.repository}/`);
+          done();
+        }).catch(done);
+      });
     });
   });
 
