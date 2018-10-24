@@ -17,7 +17,7 @@ module.exports = class BuildStatusNotifier {
     .then((permission) => {
       // If the user accepts, let's create a notification
       if (permission === 'granted') {
-        const socket = io({ transports: [ 'websocket', ] });
+        const socket = io({ transports: ['websocket'] });
         socket.on('build status', (build) => {
           this.notify(build);
         });
