@@ -1,6 +1,6 @@
 class MockSocket {
   constructor(session = {}) {
-    this.request = { session };
+    this.handshake = { session };
 
     const defaultUserRoom = `defaultUserRoom${Math.random() * 1000}`;
     const rooms = {};

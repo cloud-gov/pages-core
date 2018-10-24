@@ -130,7 +130,7 @@ app.use((err, req, res, next) => {
 });
 
 socket.use((_socket, next) => {
-  sessionMiddleware(_socket.request, _socket.request.res, next);
+  sessionMiddleware(_socket.handshake, {}, next);
 });
 
 socket.on('connection', (_socket) => {
