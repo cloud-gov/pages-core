@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const secret = process.env.JWT_SECRET;
 module.exports = {
-  // warning: the payload must be an object for expiresIn to work ... bug???
   sign: (payload, options = {}) => {
     options.expiresIn = options.expiresIn || '1d';
     return jwt.sign(payload, secret, options);
