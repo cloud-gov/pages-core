@@ -8,7 +8,7 @@ class Document {
   }
 
   static createElement(str) {
-    /* eslint-disable eslint no-unused-vars */
+    /* eslint-disable no-unused-vars */
     return {};
   }
 }

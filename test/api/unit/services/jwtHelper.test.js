@@ -10,7 +10,7 @@ describe('jwtHelper', () => {
       jwtHelper.verify(token)
       .then((decoded) => {
         expect(decoded.hi).to.eq(payload.hi);
-        expect(decoded.exp > (Date.now()/1000)).to.eq(true);
+        expect(decoded.exp > (Date.now() / 1000)).to.eq(true);
         expect(decoded.exp <= ((Date.now() / 1000) + (60 * 60 * 24))); // expires in <= 24h
       })
       .catch(done);

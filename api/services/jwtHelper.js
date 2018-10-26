@@ -15,7 +15,7 @@ module.exports = {
       if (err || !decoded) {
         return reject(err);
       }
-      resolve(decoded);
+      return resolve(decoded);
     });
   }),
 
