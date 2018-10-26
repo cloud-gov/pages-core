@@ -20,8 +20,7 @@ describe('SocketIOSubscriber', () => {
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => {
-          const session = { passport: { user: user.id } };
-          socket = new MockSocket(session);
+          socket = new MockSocket(user.id );
           return SocketIOSubscriber.joinRooms(socket);
         })
         .then(() => {
@@ -37,8 +36,7 @@ describe('SocketIOSubscriber', () => {
       factory.site()
         .then(() => factory.user())
         .then((user) => {
-          const session = { passport: { user: user.id } };
-          socket = new MockSocket(session);
+          socket = new MockSocket(user.id);
           return SocketIOSubscriber.joinRooms(socket);
         })
         .then(() => {
@@ -69,11 +67,9 @@ describe('SocketIOSubscriber', () => {
         })
         .then(() => factory.site({ users: Promise.all([user2]) }))
         .then(() => {
-          const session1 = { passport: { user: user1.id } };
-          socket1 = new MockSocket(session1);
+          socket1 = new MockSocket(user1.id);
 
-          const session2 = { passport: { user: user2.id } };
-          socket2 = new MockSocket(session2);
+          socket2 = new MockSocket(user2.id);
 
           return Promise.all([
             SocketIOSubscriber.joinRooms(socket1),
@@ -110,11 +106,8 @@ describe('SocketIOSubscriber', () => {
         .then(() => factory.site({ users: Promise.all([user1, user2]) }))
         .then(() => factory.site({ users: Promise.all([user1, user2]) }))
         .then(() => {
-          const session1 = { passport: { user: user1.id } };
-          socket1 = new MockSocket(session1);
-
-          const session2 = { passport: { user: user2.id } };
-          socket2 = new MockSocket(session2);
+          socket1 = new MockSocket(user1.id);
+          socket2 = new MockSocket(user2.id);
 
           return Promise.all([
             SocketIOSubscriber.joinRooms(socket1),
@@ -126,31 +119,6 @@ describe('SocketIOSubscriber', () => {
           expect(Object.keys(socket2.rooms).length).to.eql(4);
           const allRooms = Object.assign(socket1.rooms, socket2.rooms);
           expect(Object.keys(allRooms).length).to.eql(7);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('non passport authenticated user with sites joinsRooms(socket)', (done) => {
-      let user;
-      let socket;
-
-      factory.user()
-        .then((model) => {
-          user = model;
-          return Promise.resolve();
-        })
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => {
-          socket = new MockSocket();
-          return SocketIOSubscriber.joinRooms(socket);
-        })
-        .then(() => {
-          expect(Object.keys(socket.rooms).length).to.eql(1);
           done();
         })
         .catch(done);
@@ -171,8 +139,7 @@ describe('SocketIOSubscriber', () => {
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => {
-          const session = { passport: {} };
-          socket = new MockSocket(session);
+          socket = new MockSocket();
           return SocketIOSubscriber.joinRooms(socket);
         })
         .then(() => {

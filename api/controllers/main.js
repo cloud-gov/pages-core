@@ -4,6 +4,7 @@ const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const config = require('../../config');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
 const caseStudyData = require('../../public/data/case-studies');
+const jwtHelper = require('../services/jwtHelper');
 
 let webpackAssets = loadAssetManifest();
 
@@ -95,6 +96,8 @@ module.exports = {
     context.username = req.user.username;
     context.siteWideError = SiteWideErrorLoader.loadSiteWideError();
     context.csrfToken = req.csrfToken();
+    context.accessToken = jwtHelper.sign({ user: req.user.id });
+    context.socketHost = process.env.SOCKET_HOST;
 
     const frontendConfig = {
       TEMPLATES: config.templates,

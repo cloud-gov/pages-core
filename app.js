@@ -34,6 +34,7 @@ const passport = require('./api/services/passport');
 const RateLimit = require('express-rate-limit');
 const router = require('./api/routers');
 const SocketIOSubscriber = require('./api/services/SocketIOSubscriber');
+const jwtHelper = require('./api/services/jwtHelper');
 
 const app = express();
 const sequelize = require('./api/models').sequelize;
@@ -130,10 +131,21 @@ app.use((err, req, res, next) => {
 });
 
 socket.use((_socket, next) => {
-  sessionMiddleware(_socket.handshake, {}, next);
-});
-
-socket.on('connection', (_socket) => {
+  if (_socket.handshake.query && _socket.handshake.query.accessToken){
+    jwtHelper.verify(_socket.handshake.query.accessToken, { expiresIn: 60 * 60 * 24 }) //expire 24h
+    .then((decoded) => {
+      _socket.user = decoded.user;
+    })
+    .then(() => next())
+    .catch(e => {
+      logger.warn(e);
+      next();
+    });
+  } else {
+      next();
+  }
+})
+.on('connection', (_socket) => {
   SocketIOSubscriber.joinRooms(_socket);
 });
 
