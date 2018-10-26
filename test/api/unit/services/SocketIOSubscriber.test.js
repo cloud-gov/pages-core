@@ -20,7 +20,7 @@ describe('SocketIOSubscriber', () => {
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => {
-          socket = new MockSocket(user.id );
+          socket = new MockSocket(user.id);
           return SocketIOSubscriber.joinRooms(socket);
         })
         .then(() => {

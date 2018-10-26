@@ -11,7 +11,7 @@ describe('jwtHelper', () => {
       .then((decoded) => {
         expect(decoded.hi).to.eq(payload.hi);
         expect(decoded.exp > (Date.now()/1000)).to.eq(true);
-        expect(decoded.exp <= ((Date.now()/1000) + (60 * 60 * 24))); //expires in <= 24h
+        expect(decoded.exp <= ((Date.now() / 1000) + (60 * 60 * 24))); // expires in <= 24h
       })
       .catch(done);
       done();
@@ -21,7 +21,7 @@ describe('jwtHelper', () => {
       const payload = { hi: 'bye' };
       const token = jwt.sign(payload, 'secret');
       jwtHelper.verify(token)
-      .catch(e => {
+      .catch((e) => {
         expect(e.name).to.eq('JsonWebTokenError');
         expect(e.message).to.eq('invalid signature');
       });
@@ -32,9 +32,8 @@ describe('jwtHelper', () => {
       const payload = { hi: 'bye' };
       const token = jwtHelper.sign(payload);
       try {
-        decoded = jwt.verify(token, 'secret');
-      }
-      catch(e) {
+        jwt.verify(token, 'secret');
+      } catch (e) {
         expect(e.name).to.eq('JsonWebTokenError');
         expect(e.message).to.eq('invalid signature');
       }
@@ -42,12 +41,11 @@ describe('jwtHelper', () => {
     });
 
     it('token expired', (done) => {
-      let error;
       const payload = { hi: 'bye' };
       const token = jwtHelper.sign(payload, { expiresIn: 0 });
-      
+
       jwtHelper.verify(token)
-      .catch(e => {
+      .catch((e) => {
         expect(e.name).to.eq('TokenExpiredError');
         expect(e.message).to.eq('jwt expired');
       });

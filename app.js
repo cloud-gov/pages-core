@@ -131,18 +131,19 @@ app.use((err, req, res, next) => {
 });
 
 socket.use((_socket, next) => {
-  if (_socket.handshake.query && _socket.handshake.query.accessToken){
-    jwtHelper.verify(_socket.handshake.query.accessToken, { expiresIn: 60 * 60 * 24 }) //expire 24h
+   /* eslint-disable no-param-reassign */
+  if (_socket.handshake.query && _socket.handshake.query.accessToken) {
+    jwtHelper.verify(_socket.handshake.query.accessToken, { expiresIn: 60 * 60 * 24 }) // expire 24h
     .then((decoded) => {
       _socket.user = decoded.user;
     })
     .then(() => next())
-    .catch(e => {
+    .catch((e) => {
       logger.warn(e);
       next();
     });
   } else {
-      next();
+    next();
   }
 })
 .on('connection', (_socket) => {
