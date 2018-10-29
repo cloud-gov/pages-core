@@ -17,10 +17,14 @@ module.exports = class BuildStatusNotifier {
     .then((permission) => {
       // If the user accepts, let's create a notification
       if (permission === 'granted') {
-        const socket = io();
-        socket.on('build status', (build) => {
-          this.notify(build);
-        });
+        const accessToken = (document.querySelectorAll('meta[name="accessToken"]')[0] || {}).content;
+        const socketHost = (document.querySelectorAll('meta[name="socketHost"]')[0] || {}).content;
+        if (accessToken) {
+          const socket = io(socketHost, { transports: ['websocket'], query: { accessToken } });
+          socket.on('build status', (build) => {
+            this.notify(build);
+          });
+        }
       }
       return Promise.resolve();
     });
