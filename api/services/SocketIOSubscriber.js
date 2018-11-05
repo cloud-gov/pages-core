@@ -10,7 +10,14 @@ module.exports = {
         include: [{ model: Site }],
       })
       .then((user) => {
-        user.Sites.forEach(s => _socket.join(s.id));
+        user.Sites.forEach(s => {
+          if (s.SiteUser.buildNotify === 'builds') {
+            _socket.join(`user-${user.id}`);
+          } else if (s.SiteUser.buildNotify === 'none') {
+          } else {
+            _socket.join(`site-${s.id}`);
+          }
+        });
         return Promise.resolve();
       })
       .catch(err => logger.error(err));

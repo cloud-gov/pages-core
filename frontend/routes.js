@@ -13,6 +13,7 @@ import SiteGitHubBranches from './components/site/SiteGitHubBranches';
 import SiteSettings from './components/site/SiteSettings';
 import AddSite from './components/AddSite';
 import NotFound from './components/NotFound';
+import NotificationSettings from './components/site/NotificationSettings';
 
 import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
@@ -40,6 +41,7 @@ export default (
         </Route>
         <Route path="users" component={SiteUsers} />
         <Route path="branches" component={SiteGitHubBranches} />
+        <Route path="notifications" component={NotificationSettings} />
       </Route>
       <Redirect from="*" to="/not-found" />
     </Route>

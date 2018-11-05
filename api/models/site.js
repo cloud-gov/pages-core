@@ -24,12 +24,12 @@ const validationFailed = (site, options, validationError) => {
   throw error;
 };
 
-const associate = ({ Site, Build, User, UserAction }) => {
+const associate = ({ Site, Build, User, UserAction, SiteUser }) => {
   Site.hasMany(Build, {
     foreignKey: 'site',
   });
   Site.belongsToMany(User, {
-    through: 'site_users__user_sites',
+    through: SiteUser,
     foreignKey: 'site_users',
     timestamps: false,
   });

@@ -128,4 +128,13 @@ export default {
       },
     });
   },
+
+  updateSiteUser(siteId, data) {
+    return this.fetch(`siteUser/${siteId}`, {
+      method: 'PUT',
+      data,
+    }, {
+      handleHttpError: false,
+    });
+  },
 };
