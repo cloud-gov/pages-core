@@ -14,6 +14,12 @@ function toJSON() {
     plain: true,
   }));
   
+  object.user_id = object.user_sites;
+  object.site_id = object.site_users;
+
+  object.user_sites = null;
+  object.site_users = null;
+
   Object.keys(object).forEach((key) => {
     if (object[key] === null) {
       delete object[key];

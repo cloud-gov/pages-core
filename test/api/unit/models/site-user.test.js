@@ -25,8 +25,10 @@ describe('SiteUser model', () => {
       expect(siteUser.buildNotify).to.equal('site');
 
       json = siteUser.toJSON();
-      expect(json.site_users).to.equal(site1.id);
-      expect(json.user_sites).to.equal(user1.id);
+      expect(json.site_users).to.equal(undefined);
+      expect(json.user_sites).to.equal(undefined);
+      expect(json.site_id).to.equal(site1.id);
+      expect(json.user_id).to.equal(user1.id);
       expect(json.buildNotify).to.equal('site');
 
       return factory.user();
