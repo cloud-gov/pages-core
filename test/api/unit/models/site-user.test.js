@@ -13,13 +13,16 @@ describe('SiteUser model', () => {
     })
     .then((model) => {
       site1 = model;
-      return SiteUser.findOne({ where: { site_users: site1.id, user_sites: user1.id } });
+      return SiteUser.findOne({ where: { site_users: site1.id, user_sites: user1.id }, include: [User, Site] });
     })
     .then(siteUser => {
       expect(siteUser.site_users).to.equal(site1.id);
       expect(siteUser.user_sites).to.equal(user1.id);
       expect(siteUser.buildNotify).to.equal('site');
 
+      expect(siteUser.Site.id).to.equal(site1.id);
+      expect(siteUser.User.id).to.equal(user1.id);
+      expect(siteUser.buildNotify).to.equal('site');
       return factory.user();
     })
     .then((user) => {

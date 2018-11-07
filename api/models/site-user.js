@@ -1,4 +1,4 @@
-const associate = () => ({ User, Site, SiteUser }) => {
+const associate = ({ User, Site, SiteUser }) => {
   SiteUser.belongsTo(Site, {
     foreignKey: 'site_users',
     targetKey: 'id',
