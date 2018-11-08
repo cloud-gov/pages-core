@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Field, reduxForm } from 'redux-form';
 import PropTypes from 'prop-types';
 
 import { SITE, USER } from '../../propTypes';
@@ -13,7 +12,7 @@ class NotificationSettings extends React.Component {
 
     const buildNotify = (props.site.users.find(u => u.id === props.user.id) || {}).buildNotify;
 
-    this.state = { value: (buildNotify || 'site')};//should change value to buildNotify
+    this.state = { value: (buildNotify || 'site') };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -24,8 +23,8 @@ class NotificationSettings extends React.Component {
     siteActions.updateSiteUser(this.props.site.id, { buildNotify: this.state.value });
   }
 
-  handleChange(event){  
-    this.setState({value: event.target.value});
+  handleChange(event) {
+    this.setState({ value: event.target.value });
   }
 
   render() {
@@ -35,28 +34,24 @@ class NotificationSettings extends React.Component {
           blah blah blah
         </p>
         <form onSubmit={this.handleSubmit}>
-        <label>
-          Recieve build notifications:
-          <select value={this.state.value} onChange={this.handleChange}>
-            <option value="none">None</option>
-            <option value="builds">My site builds only</option>
-            <option value="site">All site builds</option>
-          </select>
-        </label>
-        <input type="submit" value="Submit" />
+          <label>
+            Recieve build notifications:
+            <select value={this.state.value} onChange={this.handleChange}>
+              <option value="none">None</option>
+              <option value="builds">My site builds only</option>
+              <option value="site">All site builds</option>
+            </select>
+          </label>
+          <input type="submit" value="Submit" />
       </form>
       </div>
     );
   }
-};
+}
 
 NotificationSettings.propTypes = {
   site: SITE,
   user: USER,
-  buildNotify: PropTypes.shape({
-    isLoading: PropTypes.bool,
-    data: PropTypes.array,
-  }),
 };
 
 NotificationSettings.defaultProps = {

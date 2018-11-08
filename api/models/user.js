@@ -42,7 +42,7 @@ function toJSON() {
     }
 
     if (attr === 'SiteUser' && record[attr] && record[attr].buildNotify) {
-      out.buildNotify = record[attr].buildNotify;
+      out.buildNotify = record[attr].buildNotify; // eslint-disable-line no-param-reassign
     }
     return out;
   }, {}), {

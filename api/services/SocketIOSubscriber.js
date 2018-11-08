@@ -10,10 +10,11 @@ module.exports = {
         include: [{ model: Site }],
       })
       .then((user) => {
-        user.Sites.forEach(s => {
+        user.Sites.forEach((s) => {
           if (s.SiteUser.buildNotify === 'builds') {
             _socket.join(`site-${s.id}-user-${user.id}`);
           } else if (s.SiteUser.buildNotify === 'none') {
+            return;
           } else {
             _socket.join(`site-${s.id}`);
           }
