@@ -12,7 +12,7 @@ module.exports = {
       .then((user) => {
         user.Sites.forEach(s => {
           if (s.SiteUser.buildNotify === 'builds') {
-            _socket.join(`user-${user.id}`);
+            _socket.join(`site-${s.id}-user-${user.id}`);
           } else if (s.SiteUser.buildNotify === 'none') {
           } else {
             _socket.join(`site-${s.id}`);
