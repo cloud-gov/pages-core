@@ -94,7 +94,6 @@ describe('SiteUser API', () => {
 
     it('should not allow user to update buildNotify for site not assoc. with account', (done) => {
       let siteModel;
-      let user1;
 
       factory.site({
         users: Promise.all([factory.user()]),
@@ -190,7 +189,7 @@ describe('SiteUser API', () => {
         return Site.withUsers(site.id);
       })
       .then((foundSite) => {
-        siteUser = foundSite.Users[0].SiteUser;
+        const siteUser = foundSite.Users[0].SiteUser;
         expect(siteUser.buildNotify).to.equal('site');
         expect(siteUser.site_users).to.equal(site.id);
         expect(siteUser.user_sites).to.equal(foundSite.Users[0].id);
@@ -246,7 +245,7 @@ describe('SiteUser API', () => {
     })
     .then(user => authenticatedSession(user))
     .then(cookie => request(app)
-      .put(`/v0/siteUser/NaN`)
+      .put('/v0/siteUser/NaN')
       .set('x-csrf-token', csrfToken.getToken())
       .send({ buildNotify: 'builds' })
       .set('Cookie', cookie)

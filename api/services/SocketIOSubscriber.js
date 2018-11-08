@@ -11,7 +11,7 @@ module.exports = {
       })
       .then((user) => {
         user.Sites.forEach((s) => {
-          switch(s.SiteUser.buildNotify) {
+          switch (s.SiteUser.buildNotify) {
             case 'builds':
               _socket.join(`site-${s.id}-user-${user.id}`);
               break;
