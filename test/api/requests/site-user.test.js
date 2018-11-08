@@ -204,4 +204,67 @@ describe('SiteUser API', () => {
       .catch(done);
     });
   });
+
+  it('should return 404 for a site id NaN', (done) => {
+    factory.user()
+      .then(user => authenticatedSession(user))
+      .then(cookie => request(app)
+        .put(`/v0/siteUser/NaN`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ buildNotify: 'builds' })
+        .set('Cookie', cookie)
+        .expect(404)
+      )
+      .then((response) => {
+        validateAgainstJSONSchema('PUT', '/site/{id}', 404, response.body);
+        expect(response.status).to.equal(404);
+        expect(response.body.message).to.eq('Not found');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('should return 404 for a site not found', (done) => {
+    factory.user()
+      .then(user => authenticatedSession(user))
+      .then(cookie => request(app)
+        .put(`/v0/siteUser/0`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ buildNotify: 'builds' })
+        .set('Cookie', cookie)
+        .expect(404)
+      )
+      .then((response) => {
+        validateAgainstJSONSchema('PUT', '/site/{id}', 404, response.body);
+        expect(response.status).to.equal(404);
+        expect(response.body.message).to.eq('Not found');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('should return 404 when the user is not a collaborator', (done) => {
+    let site;
+    factory.site()
+      .then((model) => {
+        site = model;
+        return factory.user();
+      })
+      .then(user => authenticatedSession(user))
+      .then(cookie => request(app)
+        .put(`/v0/siteUser/NaN`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ buildNotify: 'builds' })
+        .set('Cookie', cookie)
+        .expect(404)
+      )
+      .then((response) => {
+        validateAgainstJSONSchema('PUT', '/site/{id}', 404, response.body);
+        expect(response.status).to.equal(404);
+        expect(response.body.message).to.eq('Not found');
+        done();
+      })
+      .catch(done);
+  });
+
 });
