@@ -15,18 +15,18 @@ module.exports = {
       site = model;
       if (!site) {
         throw 404;
-      }      
+      }
       return authorizer.update(req.user, site);
     })
-    .then(() => SiteUser.findOne({ where: { user_sites: req.user.id, site_users: site.id }}))
+    .then(() => SiteUser.findOne({ where: { user_sites: req.user.id, site_users: site.id } }))
     .then((siteUser) => {
       if (!siteUser) {
         throw 404;
       }
-      
+
       const params = Object.assign(site, req.body);
-      attrs = {};
-      if(params.buildNotify) {
+      const attrs = {};
+      if (params.buildNotify) {
         attrs.buildNotify = params.buildNotify;
       }
       return siteUser.update(attrs);
