@@ -67,7 +67,6 @@ describe('SiteUser API', () => {
 
     it('should allow user to update buildNotify for site assoc. with their account', (done) => {
       let site;
-      let response;
       factory.site({
         users: Promise.all([factory.user()]),
       })
@@ -84,11 +83,7 @@ describe('SiteUser API', () => {
         .set('Cookie', cookie)
         .expect(200)
       )
-      .then((resp) => {
-        response = resp;
-        return Site.findById(site.id, { include: [User] });
-      })
-      .then((foundSite) => {
+      .then((response) => {
         validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
         expect(response.body.users[0].buildNotify).to.equal('builds');
         done();
