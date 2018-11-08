@@ -1,17 +1,12 @@
-const crypto = require('crypto');
 const { expect } = require('chai');
-const nock = require('nock');
 const request = require('supertest');
-const sinon = require('sinon');
 
 const app = require('../../../app');
 const factory = require('../support/factory');
 const { authenticatedSession, unauthenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const csrfToken = require('../support/csrfToken');
-
 const { Site, User } = require('../../../api/models');
-const siteErrors = require('../../../api/responses/siteErrors');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 const permitErrorMessage = 'You are not authorized to perform that action';
@@ -22,107 +17,107 @@ describe('SiteUser API', () => {
       let site;
 
       factory.site({
-          users: Promise.all([factory.user()]),
-        })
-        .then(s => Site.findById(s.id, { include: [User] }))
-        .then((model) => {
-          site = model;
-          expect(site.Users[0].SiteUser.buildNotify).to.equal('site');
-          return unauthenticatedSession();
-        })
-        .then(cookie => request(app)
-          .put(`/v0/siteUser/${site.id}`)
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({ buildNotify: 'builds' })
-          .set('Cookie', cookie)
-          .expect(403)
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
-          expect(response.body.message).to.equal(authErrorMessage);
-          done();
-        })
-        .catch(done);
+        users: Promise.all([factory.user()]),
+      })
+      .then(s => Site.findById(s.id, { include: [User] }))
+      .then((model) => {
+        site = model;
+        expect(site.Users[0].SiteUser.buildNotify).to.equal('site');
+        return unauthenticatedSession();
+      })
+      .then(cookie => request(app)
+        .put(`/v0/siteUser/${site.id}`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ buildNotify: 'builds' })
+        .set('Cookie', cookie)
+        .expect(403)
+      )
+      .then((response) => {
+        validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
+        expect(response.body.message).to.equal(authErrorMessage);
+        done();
+      })
+      .catch(done);
     });
 
     it('should require a valid csrf token', (done) => {
       let site;
 
       factory.site({
-          users: Promise.all([factory.user()]),
-        })
-        .then((model) => {
-          site = model;
-          return authenticatedSession();
-        })
-        .then(cookie => request(app)
-          .put(`/v0/siteUser/${site.id}`)
-          .set('x-csrf-token', 'bad-token')
-          .send({ buildNotify: 'builds' })
-          .set('Cookie', cookie)
-          .expect(403)
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
-          expect(response.body.message).to.equal('Invalid CSRF token');
-          done();
-        })
-        .catch(done);
+        users: Promise.all([factory.user()]),
+      })
+      .then((model) => {
+        site = model;
+        return authenticatedSession();
+      })
+      .then(cookie => request(app)
+        .put(`/v0/siteUser/${site.id}`)
+        .set('x-csrf-token', 'bad-token')
+        .send({ buildNotify: 'builds' })
+        .set('Cookie', cookie)
+        .expect(403)
+      )
+      .then((response) => {
+        validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
+        expect(response.body.message).to.equal('Invalid CSRF token');
+        done();
+      })
+      .catch(done);
     });
 
     it('should allow user to update buildNotify for site assoc. with their account', (done) => {
       let site;
       let response;
-        factory.site({
-          users: Promise.all([factory.user()]),
-        })
-        .then(s => Site.findById(s.id, { include: [User] }))
-        .then((model) => {
-          site = model;
-          expect(site.Users[0].SiteUser.buildNotify).to.equal('site');
-          return authenticatedSession(site.Users[0]);
-        })
-        .then(cookie => request(app)
-          .put(`/v0/siteUser/${site.id}`)
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({ buildNotify: 'builds' })
-          .set('Cookie', cookie)
-          .expect(200)
-        )
-        .then((resp) => {
-          response = resp;
-          return Site.findById(site.id, { include: [User] });
-        })
-        .then((foundSite) => {
-          validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
-          expect(response.body.users[0].buildNotify).to.equal('builds');
-          done();
-        })
-        .catch(done);
+      factory.site({
+        users: Promise.all([factory.user()]),
+      })
+      .then(s => Site.findById(s.id, { include: [User] }))
+      .then((model) => {
+        site = model;
+        expect(site.Users[0].SiteUser.buildNotify).to.equal('site');
+        return authenticatedSession(site.Users[0]);
+      })
+      .then(cookie => request(app)
+        .put(`/v0/siteUser/${site.id}`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ buildNotify: 'builds' })
+        .set('Cookie', cookie)
+        .expect(200)
+      )
+      .then((resp) => {
+        response = resp;
+        return Site.findById(site.id, { include: [User] });
+      })
+      .then((foundSite) => {
+        validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
+        expect(response.body.users[0].buildNotify).to.equal('builds');
+        done();
+      })
+      .catch(done);
     });
 
     it('should not allow user to update buildNotify for site not assoc. with account', (done) => {
       let siteModel, user1;
       factory.site({
-          users: Promise.all([factory.user()]),
-        })
-        .then((model) => {
-          siteModel = model;
-          return authenticatedSession(factory.user());
-        })
-        .then(cookie => request(app)
-            .put(`/v0/siteUser/${siteModel.id}`)
-            .set('x-csrf-token', csrfToken.getToken())
-            .send({ buildNotify: 'builds' })
-            .set('Cookie', cookie)
-            .expect(403)
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
-          expect(response.body.message).to.equal(permitErrorMessage);
-          done();
-        })
-        .catch(done);
+        users: Promise.all([factory.user()]),
+      })
+      .then((model) => {
+        siteModel = model;
+        return authenticatedSession(factory.user());
+      })
+      .then(cookie => request(app)
+          .put(`/v0/siteUser/${siteModel.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({ buildNotify: 'builds' })
+          .set('Cookie', cookie)
+          .expect(403)
+      )
+      .then((response) => {
+        validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
+        expect(response.body.message).to.equal(permitErrorMessage);
+        done();
+      })
+      .catch(done);
     });
 
 
@@ -207,64 +202,63 @@ describe('SiteUser API', () => {
 
   it('should return 404 for a site id NaN', (done) => {
     factory.user()
-      .then(user => authenticatedSession(user))
-      .then(cookie => request(app)
-        .put(`/v0/siteUser/NaN`)
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({ buildNotify: 'builds' })
-        .set('Cookie', cookie)
-        .expect(404)
-      )
-      .then((response) => {
-        validateAgainstJSONSchema('PUT', '/site/{id}', 404, response.body);
-        expect(response.status).to.equal(404);
-        expect(response.body.message).to.eq('Not found');
-        done();
-      })
-      .catch(done);
+    .then(user => authenticatedSession(user))
+    .then(cookie => request(app)
+      .put(`/v0/siteUser/NaN`)
+      .set('x-csrf-token', csrfToken.getToken())
+      .send({ buildNotify: 'builds' })
+      .set('Cookie', cookie)
+      .expect(404)
+    )
+    .then((response) => {
+      validateAgainstJSONSchema('PUT', '/site/{id}', 404, response.body);
+      expect(response.status).to.equal(404);
+      expect(response.body.message).to.eq('Not found');
+      done();
+    })
+    .catch(done);
   });
 
   it('should return 404 for a site not found', (done) => {
     factory.user()
-      .then(user => authenticatedSession(user))
-      .then(cookie => request(app)
-        .put(`/v0/siteUser/0`)
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({ buildNotify: 'builds' })
-        .set('Cookie', cookie)
-        .expect(404)
-      )
-      .then((response) => {
-        validateAgainstJSONSchema('PUT', '/site/{id}', 404, response.body);
-        expect(response.status).to.equal(404);
-        expect(response.body.message).to.eq('Not found');
-        done();
-      })
-      .catch(done);
+    .then(user => authenticatedSession(user))
+    .then(cookie => request(app)
+      .put(`/v0/siteUser/0`)
+      .set('x-csrf-token', csrfToken.getToken())
+      .send({ buildNotify: 'builds' })
+      .set('Cookie', cookie)
+      .expect(404)
+    )
+    .then((response) => {
+      validateAgainstJSONSchema('PUT', '/site/{id}', 404, response.body);
+      expect(response.status).to.equal(404);
+      expect(response.body.message).to.eq('Not found');
+      done();
+    })
+    .catch(done);
   });
 
   it('should return 404 when the user is not a collaborator', (done) => {
     let site;
     factory.site()
-      .then((model) => {
-        site = model;
-        return factory.user();
-      })
-      .then(user => authenticatedSession(user))
-      .then(cookie => request(app)
-        .put(`/v0/siteUser/NaN`)
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({ buildNotify: 'builds' })
-        .set('Cookie', cookie)
-        .expect(404)
-      )
-      .then((response) => {
-        validateAgainstJSONSchema('PUT', '/site/{id}', 404, response.body);
-        expect(response.status).to.equal(404);
-        expect(response.body.message).to.eq('Not found');
-        done();
-      })
-      .catch(done);
+    .then((model) => {
+      site = model;
+      return factory.user();
+    })
+    .then(user => authenticatedSession(user))
+    .then(cookie => request(app)
+      .put(`/v0/siteUser/NaN`)
+      .set('x-csrf-token', csrfToken.getToken())
+      .send({ buildNotify: 'builds' })
+      .set('Cookie', cookie)
+      .expect(404)
+    )
+    .then((response) => {
+      validateAgainstJSONSchema('PUT', '/site/{id}', 404, response.body);
+      expect(response.status).to.equal(404);
+      expect(response.body.message).to.eq('Not found');
+      done();
+    })
+    .catch(done);
   });
-
 });
