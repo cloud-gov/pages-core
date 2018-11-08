@@ -5,7 +5,11 @@ const { User, Site, SiteUser } = require('../../../../api/models');
 
 describe('SiteUser model', () => {
   it('returns the site object with user association', (done) => {
-    let user1, user2, site1, site2;
+    let user1;
+    let user2;
+    let site1;
+    let site2;
+
     factory.user()
     .then((user) => {
       user1 = user;
@@ -13,9 +17,10 @@ describe('SiteUser model', () => {
     })
     .then((model) => {
       site1 = model;
-      return SiteUser.findOne({ where: { site_users: site1.id, user_sites: user1.id }, include: [User, Site] });
+      return SiteUser.findOne({ where: { site_users: site1.id, user_sites: user1.id },
+        include: [User, Site] });
     })
-    .then(siteUser => {
+    .then((siteUser) => {
       expect(siteUser.site_users).to.equal(site1.id);
       expect(siteUser.user_sites).to.equal(user1.id);
       expect(siteUser.buildNotify).to.equal('site');
@@ -24,7 +29,7 @@ describe('SiteUser model', () => {
       expect(siteUser.User.id).to.equal(user1.id);
       expect(siteUser.buildNotify).to.equal('site');
 
-      json = siteUser.toJSON();
+      const json = siteUser.toJSON();
       expect(json.site_users).to.equal(undefined);
       expect(json.user_sites).to.equal(undefined);
       expect(json.site_id).to.equal(site1.id);
@@ -40,7 +45,7 @@ describe('SiteUser model', () => {
     .then((siteWithUsers) => {
       expect(siteWithUsers.Users).to.be.an('array');
       expect(siteWithUsers.Users.length).to.equal(1);
-      return factory.site({ users: [user1, user2] });      
+      return factory.site({ users: [user1, user2] });
     })
     .then((site) => {
       site2 = site;

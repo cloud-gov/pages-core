@@ -162,11 +162,11 @@ describe('SocketIOSubscriber', () => {
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => factory.site({ users: Promise.all([user]) }))
-        .then((site) => SiteUser.update({ 'buildNotify': 'builds' },
-            { where: { user_sites: user.id, site_users: site.id }}))
+        .then(site => SiteUser.update({ buildNotify: 'builds' },
+            { where: { user_sites: user.id, site_users: site.id } }))
         .then(() => factory.site({ users: Promise.all([user]) }))
-        .then((site) => SiteUser.update({ 'buildNotify': 'none' },
-            { where: { user_sites: user.id, site_users: site.id }}))
+        .then(site => SiteUser.update({ buildNotify: 'none' },
+            { where: { user_sites: user.id, site_users: site.id } }))
         .then(() => {
           socket = new MockSocket(user.id);
           return SocketIOSubscriber.joinRooms(socket);
