@@ -2,6 +2,7 @@ const expect = require('chai').expect;
 const factory = require('../../support/factory');
 const SocketIOSubscriber = require('../../../../api/services/SocketIOSubscriber');
 const MockSocket = require('../../support/mockSocket');
+const { SiteUser } = require('../../../../api/models');
 
 describe('SocketIOSubscriber', () => {
   context('listen', () => {
@@ -144,6 +145,36 @@ describe('SocketIOSubscriber', () => {
         })
         .then(() => {
           expect(Object.keys(socket.rooms).length).to.eql(1);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('a user with sites with 1 buildsOnly  and 1 none subscription', (done) => {
+      let user;
+      let socket;
+
+      factory.user()
+        .then((model) => {
+          user = model;
+          return Promise.resolve();
+        })
+        .then(() => factory.site({ users: Promise.all([user]) }))
+        .then(() => factory.site({ users: Promise.all([user]) }))
+        .then(() => factory.site({ users: Promise.all([user]) }))
+        .then((site) => SiteUser.update({ 'buildNotify': 'builds' },
+            { where: { user_sites: user.id, site_users: site.id }}))
+        .then(() => factory.site({ users: Promise.all([user]) }))
+        .then((site) => SiteUser.update({ 'buildNotify': 'none' },
+            { where: { user_sites: user.id, site_users: site.id }}))
+        .then(() => {
+          socket = new MockSocket(user.id);
+          return SocketIOSubscriber.joinRooms(socket);
+        })
+        .then(() => {
+          const rooms = Object.keys(socket.rooms);
+          expect(rooms.length).to.eql(4);
+          expect(rooms.filter(room => room.endsWith(`user-${user.id}`)).length).to.eql(1);
           done();
         })
         .catch(done);
