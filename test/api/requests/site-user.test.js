@@ -240,7 +240,6 @@ describe('SiteUser API', () => {
   it('should return 404 when the user is not a collaborator', (done) => {
     factory.site()
     .then((model) => {
-      site = model;
       return factory.user();
     })
     .then(user => authenticatedSession(user))
