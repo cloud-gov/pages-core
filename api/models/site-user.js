@@ -13,7 +13,7 @@ function toJSON() {
   const object = Object.assign({}, this.get({
     plain: true,
   }));
-  
+
   object.user_id = object.user_sites;
   object.site_id = object.site_users;
 
@@ -36,12 +36,11 @@ module.exports = (sequelize, DataTypes) => {
       values: ['none', 'builds', 'site'],
       defaultValue: 'site',
     },
-  },
-  {
+  }, {
     tableName: 'site_users__user_sites',
     classMethods: { associate },
     instanceMethods: { toJSON },
     timestamps: false,
   });
   return SiteUser;
-}
+};
