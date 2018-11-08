@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
 import { SITE, USER } from '../../propTypes';
 import siteActions from '../../actions/siteActions';
@@ -43,7 +42,7 @@ class NotificationSettings extends React.Component {
             </select>
           </label>
           <input type="submit" value="Submit" />
-      </form>
+        </form>
       </div>
     );
   }

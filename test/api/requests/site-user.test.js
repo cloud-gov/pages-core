@@ -67,6 +67,7 @@ describe('SiteUser API', () => {
 
     it('should allow user to update buildNotify for site assoc. with their account', (done) => {
       let site;
+
       factory.site({
         users: Promise.all([factory.user()]),
       })
@@ -92,7 +93,9 @@ describe('SiteUser API', () => {
     });
 
     it('should not allow user to update buildNotify for site not assoc. with account', (done) => {
-      let siteModel, user1;
+      let siteModel;
+      let user1;
+
       factory.site({
         users: Promise.all([factory.user()]),
       })
@@ -118,6 +121,7 @@ describe('SiteUser API', () => {
 
     it('should not update attributes when value in the request body is empty string', (done) => {
       let site;
+
       const userPromise = factory.user();
       const sitePromise = factory.site({
         users: Promise.all([userPromise]),
@@ -144,7 +148,7 @@ describe('SiteUser API', () => {
         return Site.withUsers(site.id);
       })
       .then((foundSite) => {
-        siteUser = foundSite.Users[0].SiteUser;
+        const siteUser = foundSite.Users[0].SiteUser;
         expect(siteUser.buildNotify).to.equal('site');
         expect(siteUser.site_users).to.equal(site.id);
         expect(siteUser.user_sites).to.equal(foundSite.Users[0].id);
@@ -155,6 +159,7 @@ describe('SiteUser API', () => {
 
     it('should not override existing atts if they are not present in the request body', (done) => {
       let site;
+
       const userPromise = factory.user();
       const sitePromise = factory.site({
         users: Promise.all([userPromise]),
@@ -199,7 +204,7 @@ describe('SiteUser API', () => {
     factory.user()
     .then(user => authenticatedSession(user))
     .then(cookie => request(app)
-      .put(`/v0/siteUser/NaN`)
+      .put('/v0/siteUser/NaN')
       .set('x-csrf-token', csrfToken.getToken())
       .send({ buildNotify: 'builds' })
       .set('Cookie', cookie)
@@ -218,7 +223,7 @@ describe('SiteUser API', () => {
     factory.user()
     .then(user => authenticatedSession(user))
     .then(cookie => request(app)
-      .put(`/v0/siteUser/0`)
+      .put('/v0/siteUser/0')
       .set('x-csrf-token', csrfToken.getToken())
       .send({ buildNotify: 'builds' })
       .set('Cookie', cookie)
@@ -234,7 +239,6 @@ describe('SiteUser API', () => {
   });
 
   it('should return 404 when the user is not a collaborator', (done) => {
-    let site;
     factory.site()
     .then((model) => {
       site = model;
