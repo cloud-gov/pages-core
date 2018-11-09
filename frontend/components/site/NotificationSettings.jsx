@@ -30,9 +30,9 @@ class NotificationSettings extends React.Component {
     return (
       <div>
         <form onSubmit={this.handleSubmit}>
-          <label htmlFor='buildNotify'>
+          <label htmlFor="buildNotify">
             Recieve build notifications:
-            <select id='buildNotify' value={this.state.value} onChange={this.handleChange}>
+            <select id="buildNotify" value={this.state.value} onChange={this.handleChange}>
               <option value="none">None</option>
               <option value="builds">My site builds only</option>
               <option value="site">All site builds</option>
