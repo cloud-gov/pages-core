@@ -38,7 +38,7 @@ export const SITE_NAVIGATION_CONFIG = [
   {
     display: 'Notifications',
     route: 'notifications',
-    icon: 'IconGear',
+    icon: 'IconEnvelope',
   },
 ];
 
