@@ -1,7 +1,7 @@
 const logger = require('winston');
 const { User, Site } = require('../models');
 
-const getSiteRoom = (siteId) => `site-${siteId}`;
+const getSiteRoom = siteId => `site-${siteId}`;
 const getBuilderRoom = (siteId, userId) => `site-${siteId}-user-${userId}`;
 
 const joinRooms = (_socket) => {
