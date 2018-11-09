@@ -9,7 +9,6 @@ const csrfToken = require('../support/csrfToken');
 const { Site, User } = require('../../../api/models');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
-const permitErrorMessage = 'You are not authorized to perform that action';
 
 describe('SiteUser API', () => {
   describe('PUT /v0/siteUser/:id', () => {
@@ -107,11 +106,12 @@ describe('SiteUser API', () => {
           .set('x-csrf-token', csrfToken.getToken())
           .send({ buildNotify: 'builds' })
           .set('Cookie', cookie)
-          .expect(403)
+          .expect(404)
       )
       .then((response) => {
-        validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
-        expect(response.body.message).to.equal(permitErrorMessage);
+        validateAgainstJSONSchema('PUT', '/site/{id}', 404, response.body);
+        expect(response.status).to.equal(404);
+        expect(response.body.message).to.eq('Not found');
         done();
       })
       .catch(done);
