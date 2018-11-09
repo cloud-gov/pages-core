@@ -239,9 +239,7 @@ describe('SiteUser API', () => {
 
   it('should return 404 when the user is not a collaborator', (done) => {
     factory.site()
-    .then((model) => {
-      return factory.user();
-    })
+    .then(() => factory.user())
     .then(user => authenticatedSession(user))
     .then(cookie => request(app)
       .put('/v0/siteUser/NaN')

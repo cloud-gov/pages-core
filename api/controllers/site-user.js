@@ -1,16 +1,15 @@
-const authorizer = require('../authorizers/site');
 const siteSerializer = require('../serializers/site');
-const { Site, SiteUser } = require('../models');
+const { SiteUser } = require('../models');
 
 module.exports = {
   update: (req, res) => {
     Promise.resolve(Number(req.params.site_id))
-    .then((site_id) => {
-      if (isNaN(site_id)) {
+    .then((siteId) => {
+      if (isNaN(siteId)) {
         throw 404;
       }
       // same function as site authorizer
-      return SiteUser.findOne({ where: { user_sites: req.user.id, site_users: site_id } });
+      return SiteUser.findOne({ where: { user_sites: req.user.id, site_users: siteId } });
     })
     .then((siteUser) => {
       if (!siteUser) {
