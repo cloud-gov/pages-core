@@ -42,7 +42,8 @@ function toJSON() {
     }
 
     if (attr === 'SiteUser' && record[attr] && record[attr].buildNotificationSetting) {
-      out.buildNotificationSetting = record[attr].buildNotificationSetting; // eslint-disable-line no-param-reassign
+      // eslint-disable-next-line no-param-reassign
+      out.buildNotificationSetting = record[attr].buildNotificationSetting;
     }
     return out;
   }, {}), {
