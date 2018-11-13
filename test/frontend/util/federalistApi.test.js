@@ -59,8 +59,8 @@ describe('federalistApi', () => {
     fetchMock.post(`${API}/site/user`, {}, { name: 'postSiteUser' });
     fetchMock.put(`${API}/site/3`, {}, { name: 'putSite' });
     fetchMock.put(`${API}/site/5`, 400, { name: 'putSiteError' });
-    fetchMock.put(`${API}/notifications/3`, {}, { name: 'putSiteUser' });
-    fetchMock.put(`${API}/notifications/5`, 400, { name: 'putSiteUserError' });
+    fetchMock.put(`${API}/site/3/notifications`, {}, { name: 'putSiteUser' });
+    fetchMock.put(`${API}/site/5/notifications`, 400, { name: 'putSiteUserError' });
   });
 
   after(() => {

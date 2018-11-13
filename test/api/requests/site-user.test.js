@@ -11,7 +11,7 @@ const { Site, User } = require('../../../api/models');
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 
 describe('SiteUser API', () => {
-  describe('PUT /v0/notifications/:id', () => {
+  describe('PUT /v0/site/:site_id/notifications', () => {
     it('should require authentication', (done) => {
       let site;
 
@@ -25,7 +25,7 @@ describe('SiteUser API', () => {
         return unauthenticatedSession();
       })
       .then(cookie => request(app)
-        .put(`/v0/notifications/${site.id}`)
+        .put(`/v0/site/${site.id}/notifications`)
         .set('x-csrf-token', csrfToken.getToken())
         .send({ buildNotificationSetting: 'builds' })
         .set('Cookie', cookie)
@@ -50,7 +50,7 @@ describe('SiteUser API', () => {
         return authenticatedSession();
       })
       .then(cookie => request(app)
-        .put(`/v0/notifications/${site.id}`)
+        .put(`/v0/site/${site.id}/notifications`)
         .set('x-csrf-token', 'bad-token')
         .send({ buildNotificationSetting: 'builds' })
         .set('Cookie', cookie)
@@ -77,7 +77,7 @@ describe('SiteUser API', () => {
         return authenticatedSession(site.Users[0]);
       })
       .then(cookie => request(app)
-        .put(`/v0/notifications/${site.id}`)
+        .put(`/v0/site/${site.id}/notifications`)
         .set('x-csrf-token', csrfToken.getToken())
         .send({ buildNotificationSetting: 'builds' })
         .set('Cookie', cookie)
@@ -102,7 +102,7 @@ describe('SiteUser API', () => {
         return authenticatedSession(factory.user());
       })
       .then(cookie => request(app)
-          .put(`/v0/notifications/${siteModel.id}`)
+          .put(`/v0/site/${siteModel.id}/notifications`)
           .set('x-csrf-token', csrfToken.getToken())
           .send({ buildNotificationSetting: 'builds' })
           .set('Cookie', cookie)
@@ -136,7 +136,7 @@ describe('SiteUser API', () => {
         site = results.site;
 
         return request(app)
-          .put(`/v0/notifications/${site.id}`)
+          .put(`/v0/site/${site.id}/notifications`)
           .set('x-csrf-token', csrfToken.getToken())
           .send({ buildNotificationSetting: '', site_users: '', user_sites: '' })
           .set('Cookie', results.cookie)
@@ -176,7 +176,7 @@ describe('SiteUser API', () => {
         site = results.site;
 
         return request(app)
-          .put(`/v0/notifications/${site.id}`)
+          .put(`/v0/site/${site.id}/notifications`)
           .set('x-csrf-token', csrfToken.getToken())
           .send({
             config: 'new-config: true',
@@ -203,7 +203,7 @@ describe('SiteUser API', () => {
     factory.user()
     .then(user => authenticatedSession(user))
     .then(cookie => request(app)
-      .put('/v0/notifications/NaN')
+      .put('/v0/site/NaN/notifications')
       .set('x-csrf-token', csrfToken.getToken())
       .send({ buildNotificationSetting: 'builds' })
       .set('Cookie', cookie)
@@ -222,7 +222,7 @@ describe('SiteUser API', () => {
     factory.user()
     .then(user => authenticatedSession(user))
     .then(cookie => request(app)
-      .put('/v0/notifications/0')
+      .put('/v0/site/0/notifications')
       .set('x-csrf-token', csrfToken.getToken())
       .send({ buildNotificationSetting: 'builds' })
       .set('Cookie', cookie)
@@ -242,7 +242,7 @@ describe('SiteUser API', () => {
     .then(() => factory.user())
     .then(user => authenticatedSession(user))
     .then(cookie => request(app)
-      .put('/v0/notifications/NaN')
+      .put('/v0/site/NaN/notifications')
       .set('x-csrf-token', csrfToken.getToken())
       .send({ buildNotificationSetting: 'builds' })
       .set('Cookie', cookie)

@@ -130,7 +130,7 @@ export default {
   },
 
   updateSiteUser(siteId, data) {
-    return this.fetch(`notifications/${siteId}`, {
+    return this.fetch(`site/${siteId}/notifications`, {
       method: 'PUT',
       data,
     }, {

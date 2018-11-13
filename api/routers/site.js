@@ -15,5 +15,5 @@ router.post('/site', sessionAuth, SiteController.create);
 router.get('/site/:id', sessionAuth, SiteController.findById);
 router.put('/site/:id', sessionAuth, SiteController.update);
 router.delete('/site/:id', sessionAuth, SiteController.destroy);
-router.put('/notifications/:site_id', sessionAuth, SiteUserController.updateNotificationSettings);
+router.put('/site/:site_id/notifications', sessionAuth, SiteUserController.updateNotificationSettings);
 module.exports = router;
