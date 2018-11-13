@@ -484,7 +484,7 @@ describe('Build API', () => {
   });
 
   describe('POST /v0/build/:id/status/:token', () => {
-    const encode64 = str => new Buffer(str, 'utf8').toString('base64');
+    const encode64 = str => Buffer.from(str, 'utf8').toString('base64');
 
     const postBuildStatus = (options) => {
       const buildToken = options.buildToken || options.build.token;

@@ -4,7 +4,7 @@ const { Build, BuildLog } = require('../models');
 
 function decodeb64(str) {
   if (str) {
-    return new Buffer(str, 'base64').toString('utf8');
+    return Buffer.from(str, 'base64').toString('utf8');
   }
   return null;
 }

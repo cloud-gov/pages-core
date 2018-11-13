@@ -8,7 +8,7 @@ const { BuildLog, Site, User } = require('../../../api/models');
 
 describe('Build Log API', () => {
   describe('POST /v0/build/:build_id/log/:token', () => {
-    const encode64 = str => new Buffer(str, 'utf8').toString('base64');
+    const encode64 = str => Buffer.from(str, 'utf8').toString('base64');
 
     it('should create a build log with the given params', (done) => {
       let build;
