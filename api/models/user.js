@@ -41,8 +41,8 @@ function toJSON() {
       out[attr] = record[attr]; // eslint-disable-line no-param-reassign
     }
 
-    if (attr === 'SiteUser' && record[attr] && record[attr].buildNotificationSettings) {
-      out.buildNotificationSettings = record[attr].buildNotificationSettings; // eslint-disable-line no-param-reassign
+    if (attr === 'SiteUser' && record[attr] && record[attr].buildNotificationSetting) {
+      out.buildNotificationSetting = record[attr].buildNotificationSetting; // eslint-disable-line no-param-reassign
     }
     return out;
   }, {}), {

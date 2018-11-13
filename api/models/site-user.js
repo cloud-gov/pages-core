@@ -31,7 +31,7 @@ function toJSON() {
 
 module.exports = (sequelize, DataTypes) => {
   const SiteUser = sequelize.define('SiteUser', {
-    buildNotificationSettings: {
+    buildNotificationSetting: {
       type: DataTypes.ENUM,
       values: ['none', 'builds', 'site'],
       defaultValue: 'site',

@@ -154,7 +154,7 @@ describe('federalistApi', () => {
 
   it('defines updateSiteUser', () => {
     const site = { id: 3 };
-    const body = { buildNotificationSettings: 'none' };
+    const body = { buildNotificationSetting: 'none' };
     federalistApi.updateSiteUser(site.id, body);
     testRouteCalled('putSiteUser', { method: 'PUT', body });
   });

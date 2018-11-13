@@ -17,8 +17,8 @@ module.exports = {
       }
 
       const attrs = {};
-      if (req.body.buildNotificationSettings) {
-        attrs.buildNotificationSettings = req.body.buildNotificationSettings;
+      if (req.body.buildNotificationSetting) {
+        attrs.buildNotificationSetting = req.body.buildNotificationSetting;
       }
       return siteUser.update(attrs);
     })
