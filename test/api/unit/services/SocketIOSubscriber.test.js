@@ -162,10 +162,10 @@ describe('SocketIOSubscriber', () => {
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => factory.site({ users: Promise.all([user]) }))
         .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(site => SiteUser.update({ buildNotify: 'builds' },
+        .then(site => SiteUser.update({ buildNotificationSettings: 'builds' },
             { where: { user_sites: user.id, site_users: site.id } }))
         .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(site => SiteUser.update({ buildNotify: 'none' },
+        .then(site => SiteUser.update({ buildNotificationSettings: 'none' },
             { where: { user_sites: user.id, site_users: site.id } }))
         .then(() => {
           socket = new MockSocket(user.id);

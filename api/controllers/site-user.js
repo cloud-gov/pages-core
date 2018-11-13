@@ -2,7 +2,7 @@ const siteSerializer = require('../serializers/site');
 const { SiteUser } = require('../models');
 
 module.exports = {
-  update: (req, res) => {
+  updateNotificationSettings: (req, res) => {
     Promise.resolve(Number(req.params.site_id))
     .then((siteId) => {
       if (isNaN(siteId)) {
@@ -17,8 +17,8 @@ module.exports = {
       }
 
       const attrs = {};
-      if (req.body.buildNotify) {
-        attrs.buildNotify = req.body.buildNotify;
+      if (req.body.buildNotificationSettings) {
+        attrs.buildNotificationSettings = req.body.buildNotificationSettings;
       }
       return siteUser.update(attrs);
     })

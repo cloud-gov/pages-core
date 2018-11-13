@@ -13,7 +13,7 @@ const joinRooms = (_socket) => {
     })
     .then((user) => {
       user.Sites.forEach((s) => {
-        switch (s.SiteUser.buildNotify) {
+        switch (s.SiteUser.buildNotificationSettings) {
           case 'builds':
             _socket.join(getBuilderRoom(s.id, user.id));
             break;

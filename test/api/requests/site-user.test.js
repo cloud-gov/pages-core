@@ -11,7 +11,7 @@ const { Site, User } = require('../../../api/models');
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 
 describe('SiteUser API', () => {
-  describe('PUT /v0/siteUser/:id', () => {
+  describe('PUT /v0/notifications/:id', () => {
     it('should require authentication', (done) => {
       let site;
 
@@ -21,13 +21,13 @@ describe('SiteUser API', () => {
       .then(s => Site.findById(s.id, { include: [User] }))
       .then((model) => {
         site = model;
-        expect(site.Users[0].SiteUser.buildNotify).to.equal('site');
+        expect(site.Users[0].SiteUser.buildNotificationSettings).to.equal('site');
         return unauthenticatedSession();
       })
       .then(cookie => request(app)
-        .put(`/v0/siteUser/${site.id}`)
+        .put(`/v0/notifications/${site.id}`)
         .set('x-csrf-token', csrfToken.getToken())
-        .send({ buildNotify: 'builds' })
+        .send({ buildNotificationSettings: 'builds' })
         .set('Cookie', cookie)
         .expect(403)
       )
@@ -50,9 +50,9 @@ describe('SiteUser API', () => {
         return authenticatedSession();
       })
       .then(cookie => request(app)
-        .put(`/v0/siteUser/${site.id}`)
+        .put(`/v0/notifications/${site.id}`)
         .set('x-csrf-token', 'bad-token')
-        .send({ buildNotify: 'builds' })
+        .send({ buildNotificationSettings: 'builds' })
         .set('Cookie', cookie)
         .expect(403)
       )
@@ -64,7 +64,7 @@ describe('SiteUser API', () => {
       .catch(done);
     });
 
-    it('should allow user to update buildNotify for site assoc. with their account', (done) => {
+    it('should allow user to update buildNotificationSettings for a site', (done) => {
       let site;
 
       factory.site({
@@ -73,25 +73,25 @@ describe('SiteUser API', () => {
       .then(s => Site.findById(s.id, { include: [User] }))
       .then((model) => {
         site = model;
-        expect(site.Users[0].SiteUser.buildNotify).to.equal('site');
+        expect(site.Users[0].SiteUser.buildNotificationSettings).to.equal('site');
         return authenticatedSession(site.Users[0]);
       })
       .then(cookie => request(app)
-        .put(`/v0/siteUser/${site.id}`)
+        .put(`/v0/notifications/${site.id}`)
         .set('x-csrf-token', csrfToken.getToken())
-        .send({ buildNotify: 'builds' })
+        .send({ buildNotificationSettings: 'builds' })
         .set('Cookie', cookie)
         .expect(200)
       )
       .then((response) => {
         validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
-        expect(response.body.users[0].buildNotify).to.equal('builds');
+        expect(response.body.users[0].buildNotificationSettings).to.equal('builds');
         done();
       })
       .catch(done);
     });
 
-    it('should not allow user to update buildNotify for site not assoc. with account', (done) => {
+    it('should not allow user to update buildNotificationSettings', (done) => {
       let siteModel;
 
       factory.site({
@@ -102,9 +102,9 @@ describe('SiteUser API', () => {
         return authenticatedSession(factory.user());
       })
       .then(cookie => request(app)
-          .put(`/v0/siteUser/${siteModel.id}`)
+          .put(`/v0/notifications/${siteModel.id}`)
           .set('x-csrf-token', csrfToken.getToken())
-          .send({ buildNotify: 'builds' })
+          .send({ buildNotificationSettings: 'builds' })
           .set('Cookie', cookie)
           .expect(404)
       )
@@ -136,9 +136,9 @@ describe('SiteUser API', () => {
         site = results.site;
 
         return request(app)
-          .put(`/v0/siteUser/${site.id}`)
+          .put(`/v0/notifications/${site.id}`)
           .set('x-csrf-token', csrfToken.getToken())
-          .send({ buildNotify: '', site_users: '', user_sites: '' })
+          .send({ buildNotificationSettings: '', site_users: '', user_sites: '' })
           .set('Cookie', results.cookie)
           .expect(200);
       })
@@ -148,7 +148,7 @@ describe('SiteUser API', () => {
       })
       .then((foundSite) => {
         const siteUser = foundSite.Users[0].SiteUser;
-        expect(siteUser.buildNotify).to.equal('site');
+        expect(siteUser.buildNotificationSettings).to.equal('site');
         expect(siteUser.site_users).to.equal(site.id);
         expect(siteUser.user_sites).to.equal(foundSite.Users[0].id);
         done();
@@ -176,7 +176,7 @@ describe('SiteUser API', () => {
         site = results.site;
 
         return request(app)
-          .put(`/v0/siteUser/${site.id}`)
+          .put(`/v0/notifications/${site.id}`)
           .set('x-csrf-token', csrfToken.getToken())
           .send({
             config: 'new-config: true',
@@ -190,7 +190,7 @@ describe('SiteUser API', () => {
       })
       .then((foundSite) => {
         const siteUser = foundSite.Users[0].SiteUser;
-        expect(siteUser.buildNotify).to.equal('site');
+        expect(siteUser.buildNotificationSettings).to.equal('site');
         expect(siteUser.site_users).to.equal(site.id);
         expect(siteUser.user_sites).to.equal(foundSite.Users[0].id);
         done();
@@ -203,9 +203,9 @@ describe('SiteUser API', () => {
     factory.user()
     .then(user => authenticatedSession(user))
     .then(cookie => request(app)
-      .put('/v0/siteUser/NaN')
+      .put('/v0/notifications/NaN')
       .set('x-csrf-token', csrfToken.getToken())
-      .send({ buildNotify: 'builds' })
+      .send({ buildNotificationSettings: 'builds' })
       .set('Cookie', cookie)
       .expect(404)
     )
@@ -222,9 +222,9 @@ describe('SiteUser API', () => {
     factory.user()
     .then(user => authenticatedSession(user))
     .then(cookie => request(app)
-      .put('/v0/siteUser/0')
+      .put('/v0/notifications/0')
       .set('x-csrf-token', csrfToken.getToken())
-      .send({ buildNotify: 'builds' })
+      .send({ buildNotificationSettings: 'builds' })
       .set('Cookie', cookie)
       .expect(404)
     )
@@ -242,9 +242,9 @@ describe('SiteUser API', () => {
     .then(() => factory.user())
     .then(user => authenticatedSession(user))
     .then(cookie => request(app)
-      .put('/v0/siteUser/NaN')
+      .put('/v0/notifications/NaN')
       .set('x-csrf-token', csrfToken.getToken())
-      .send({ buildNotify: 'builds' })
+      .send({ buildNotificationSettings: 'builds' })
       .set('Cookie', cookie)
       .expect(404)
     )

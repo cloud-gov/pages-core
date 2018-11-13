@@ -9,9 +9,9 @@ class NotificationSettings extends React.Component {
   constructor(props) {
     super(props);
 
-    const buildNotify = (props.site.users.find(u => u.id === props.user.id) || {}).buildNotify;
+    const collaborator = (props.site.users.find(u => u.id === props.user.id) || {});
 
-    this.state = { value: (buildNotify || 'site') };
+    this.state = { value: (collaborator.buildNotificationSettings || 'site') };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -19,7 +19,7 @@ class NotificationSettings extends React.Component {
 
   handleSubmit() {
   // eslint-disable-next-line no-alert
-    siteActions.updateSiteUser(this.props.site.id, { buildNotify: this.state.value });
+    siteActions.updateSiteUser(this.props.site.id, { buildNotificationSettings: this.state.value });
   }
 
   handleChange(event) {
@@ -30,9 +30,9 @@ class NotificationSettings extends React.Component {
     return (
       <div>
         <form onSubmit={this.handleSubmit}>
-          <label htmlFor="buildNotify">
+          <label htmlFor="buildNotificationSettings">
             Recieve build notifications:
-            <select id="buildNotify" value={this.state.value} onChange={this.handleChange}>
+            <select id="buildNotificationSettings" value={this.state.value} onChange={this.handleChange}>
               <option value="none">None</option>
               <option value="builds">My site builds only</option>
               <option value="site">All site builds</option>
