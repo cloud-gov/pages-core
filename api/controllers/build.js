@@ -6,7 +6,7 @@ const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const { Build, Site } = require('../models');
 const logger = require('winston');
 
-const decodeb64 = str => new Buffer(str, 'base64').toString('utf8');
+const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
 
 const emitBuildStatus = (socket, build) => Site.findById(build.site)
     .then((site) => {
