@@ -12,6 +12,7 @@ describe('siteActions', () => {
   let addUserToSite;
   let removeUserFromSite;
   let updateSite;
+  let updateSiteUser;
   let deleteSite;
   let httpErrorAlertAction;
   let alertSuccess;
@@ -22,6 +23,7 @@ describe('siteActions', () => {
   let dispatchSitesReceivedAction;
   let dispatchSiteAddedAction;
   let dispatchSiteUpdatedAction;
+  let dispatchSiteUserUpdatedAction;
   let dispatchSiteDeletedAction;
   let dispatchSiteBranchesReceivedAction;
   let dispatchShowAddNewSiteFieldsAction;
@@ -60,6 +62,7 @@ describe('siteActions', () => {
     addUserToSite = stub();
     removeUserFromSite = stub();
     updateSite = stub();
+    updateSiteUser = stub();
     deleteSite = stub();
     fetchBranches = stub();
     alertSuccess = stub();
@@ -70,6 +73,7 @@ describe('siteActions', () => {
     dispatchSitesReceivedAction = stub();
     dispatchSiteAddedAction = stub();
     dispatchSiteUpdatedAction = stub();
+    dispatchSiteUserUpdatedAction = stub();
     dispatchSiteDeletedAction = stub();
     dispatchSiteBranchesReceivedAction = stub();
     dispatchShowAddNewSiteFieldsAction = stub();
@@ -88,6 +92,7 @@ describe('siteActions', () => {
         dispatchSitesReceivedAction,
         dispatchSiteAddedAction,
         dispatchSiteUpdatedAction,
+        dispatchSiteUserUpdatedAction,
         dispatchSiteDeletedAction,
         dispatchSiteBranchesReceivedAction,
         dispatchShowAddNewSiteFieldsAction,
@@ -105,6 +110,7 @@ describe('siteActions', () => {
         fetchSites,
         addSite,
         updateSite,
+        updateSiteUser,
         deleteSite,
         addUserToSite,
         removeUserFromSite,
@@ -228,6 +234,39 @@ describe('siteActions', () => {
         expect(scrollTo.called).to.be.true;
         expect(scrollTo.getCall(0).args).to.deep.equal([0, 0]);
         expect(dispatchSiteUpdatedAction.called).to.be.false;
+        validateResultDispatchesHttpAlertError(actual, errorMessage);
+      });
+    });
+  });
+
+  describe('updateSiteUser', () => {
+    const siteToUpdate = {
+      hi: 'pal',
+    };
+    const data = {
+      who: 'knows',
+    };
+
+    it('triggers the updating of a site and dispatches a site updated action to the store when successful', () => {
+      const sitePromise = Promise.resolve(site);
+      updateSiteUser.withArgs(siteToUpdate, data).returns(sitePromise);
+
+      const actual = fixture.updateSiteUser(siteToUpdate, data);
+
+      return actual.then(() => {
+        expect(dispatchSiteUserUpdatedAction.calledWith(site)).to.be.true;
+      });
+    });
+
+    it('triggers an error when updating a site fails', () => {
+      updateSiteUser.withArgs(siteToUpdate, data).returns(rejectedWithErrorPromise);
+
+      const actual = fixture.updateSiteUser(siteToUpdate, data);
+
+      return actual.then(() => {
+        expect(scrollTo.called).to.be.true;
+        expect(scrollTo.getCall(0).args).to.deep.equal([0, 0]);
+        expect(dispatchSiteUserUpdatedAction.called).to.be.false;
         validateResultDispatchesHttpAlertError(actual, errorMessage);
       });
     });

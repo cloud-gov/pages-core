@@ -2,14 +2,14 @@ const protectedAttributes = [
   'githubAccessToken',
   'githubUserId',
   'signedInAt',
-  'site_users__user_sites',
+  'SiteUser',
 ];
-const associate = ({ User, Build, Site, UserAction }) => {
+const associate = ({ User, Build, Site, UserAction, SiteUser }) => {
   User.hasMany(Build, {
     foreignKey: 'user',
   });
   User.belongsToMany(Site, {
-    through: 'site_users__user_sites',
+    through: SiteUser,
     foreignKey: 'user_sites',
     timestamps: false,
   });
@@ -37,12 +37,14 @@ function toJSON() {
   });
 
   return Object.assign({}, Object.keys(record).reduce((out, attr) => {
-    if (protectedAttributes.indexOf(attr) !== -1) {
-      return out;
+    if (protectedAttributes.indexOf(attr) === -1) {
+      out[attr] = record[attr]; // eslint-disable-line no-param-reassign
     }
 
-    out[attr] = record[attr]; // eslint-disable-line no-param-reassign
-
+    if (attr === 'SiteUser' && record[attr] && record[attr].buildNotificationSetting) {
+      // eslint-disable-next-line no-param-reassign
+      out.buildNotificationSetting = record[attr].buildNotificationSetting;
+    }
     return out;
   }, {}), {
     createdAt: record.createdAt.toISOString(),

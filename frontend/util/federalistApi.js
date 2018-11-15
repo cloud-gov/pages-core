@@ -128,4 +128,13 @@ export default {
       },
     });
   },
+
+  updateSiteUser(siteId, data) {
+    return this.fetch(`site/${siteId}/notifications`, {
+      method: 'PUT',
+      data,
+    }, {
+      handleHttpError: false,
+    });
+  },
 };

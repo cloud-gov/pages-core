@@ -59,6 +59,8 @@ describe('federalistApi', () => {
     fetchMock.post(`${API}/site/user`, {}, { name: 'postSiteUser' });
     fetchMock.put(`${API}/site/3`, {}, { name: 'putSite' });
     fetchMock.put(`${API}/site/5`, 400, { name: 'putSiteError' });
+    fetchMock.put(`${API}/site/3/notifications`, {}, { name: 'putSiteUser' });
+    fetchMock.put(`${API}/site/5/notifications`, 400, { name: 'putSiteUserError' });
   });
 
   after(() => {
@@ -148,6 +150,13 @@ describe('federalistApi', () => {
     const body = { defaultBranch: 'paperclip' };
     federalistApi.updateSite(site, body);
     testRouteCalled('putSite', { method: 'PUT', body });
+  });
+
+  it('defines updateSiteUser', () => {
+    const site = { id: 3 };
+    const body = { buildNotificationSetting: 'none' };
+    federalistApi.updateSiteUser(site.id, body);
+    testRouteCalled('putSiteUser', { method: 'PUT', body });
   });
 
   describe('restartBuild', () => {

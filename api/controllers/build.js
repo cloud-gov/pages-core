@@ -2,10 +2,11 @@ const buildSerializer = require('../serializers/build');
 const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
 const siteAuthorizer = require('../authorizers/site');
 const BuildResolver = require('../services/BuildResolver');
+const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const { Build, Site } = require('../models');
 const logger = require('winston');
 
-const decodeb64 = str => new Buffer(str, 'base64').toString('utf8');
+const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
 
 const emitBuildStatus = (socket, build) => Site.findById(build.site)
     .then((site) => {
@@ -17,7 +18,10 @@ const emitBuildStatus = (socket, build) => Site.findById(build.site)
         owner: site.owner,
         repository: site.repository,
       };
-      socket.to(build.site).emit('build status', msg);
+      const siteRoom = SocketIOSubscriber.getSiteRoom(build.site);
+      socket.to(siteRoom).emit('build status', msg);
+      const builderRoom = SocketIOSubscriber.getBuilderRoom(build.site, build.user);
+      socket.to(builderRoom).emit('build status', msg);
       return Promise.resolve();
     })
     .catch(err => logger.error(err));
