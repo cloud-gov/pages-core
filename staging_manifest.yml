@@ -5,7 +5,6 @@ buildpack: nodejs_buildpack
 stack: cflinuxfs2
 routes:
 - route: federalist-staging.fr.cloud.gov
-- route: federalist-staging.18f.gov
 - route: federalistapp-staging.18f.gov
 disk_quota: 2G
 memory: 256MB
