@@ -90,7 +90,7 @@ app.use((req, res, next) => {
   ];
 
   if (redirectUrls.indexOf(host) !== -1) {
-    return res.redirect(301, `https://${host.slice().replace('federalist', 'federalistapp')}`);
+    return res.redirect(302, `https://${host.slice().replace('federalist', 'federalistapp')}`);
   }
 
   return next();
