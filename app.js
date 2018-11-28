@@ -43,7 +43,7 @@ const redirectUrls = [
   'federalist.fr.cloud.gov',
   'federalist-staging.fr.cloud.gov',
   'federalist.18f.gov',
-  'federalist-staging.18f.gov'
+  'federalist-staging.18f.gov',
 ];
 
 config.session.store = new PostgresStore({ db: sequelize });
