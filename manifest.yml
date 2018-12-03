@@ -1,12 +1,11 @@
 ---
 applications:
-- name: federalist
+- name: federalistapp
 buildpack: nodejs_buildpack
 stack: cflinuxfs2
 routes:
 - route: federalistapp.18f.gov
-- route: federalist.fr.cloud.gov
-- route: federalist.18f.gov
+- route: federalistapp.fr.cloud.gov
 disk_quota: 2G
 memory: 256MB
 instances: 5
@@ -25,4 +24,4 @@ env:
   NPM_CONFIG_PRODUCTION: true
   NODE_MODULES_CACHE: false
   FEDERALIST_PREVIEW_HOSTNAME: https://federalist-proxy.app.cloud.gov
-  SOCKET_HOST: https://federalist.fr.cloud.gov
+  SOCKET_HOST: https://federalistapp.fr.cloud.gov
