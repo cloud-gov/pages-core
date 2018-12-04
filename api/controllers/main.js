@@ -98,6 +98,8 @@ module.exports = {
     context.csrfToken = req.csrfToken();
     context.accessToken = jwtHelper.sign({ user: req.user.id });
     context.socketHost = process.env.SOCKET_HOST;
+    context.homepageUrl = process.env.HOMEPAGE_URL;
+
 
     const frontendConfig = {
       TEMPLATES: config.templates,
