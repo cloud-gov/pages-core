@@ -30,7 +30,6 @@ describe('Main Site', () => {
       })
       .catch(done);
     });
-
   });
 
   describe('App /sites', () => {
