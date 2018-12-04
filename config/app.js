@@ -1,6 +1,6 @@
-var homepageUrl;
+let homepageUrl;
 
-switch( process.env.APP_ENV ){
+switch (process.env.APP_ENV) {
   case 'production':
     homepageUrl = 'https://federalist.18f.gov';
     break;
