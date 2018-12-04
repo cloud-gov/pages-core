@@ -8,7 +8,7 @@ $color-blue-dark: #175c8a;
 
 $color-gray: #526577;
 $color-gray-dark: #415161;
-$color-gray-darker: #2c3e50;
+$color-gray-darker: #2d476a;
 $color-gray-darkest: #192532;
 $color-gray-light: #65798c;
 $color-gray-lighter: #c7d5e3;
@@ -29,8 +29,8 @@ $text-color: $color-gray-darker;
 $header-bg-color: $color-gray-darker;
 $header-text-color: $white;
 
-$hero-bg-color: $color-gray-lightest;
-$hero-text-color: $header-text-color;
+$hero-bg-color: #f1f1f1;
+$hero-text-color: #212121;
 
 $contrast: #d14636;
 
@@ -47,12 +47,12 @@ $label-success-bg-color: #2e8540;
 $label-danger-bg-color: $contrast;
 $label-warning-bg-color: #fdb81e;
 
-$well-bg-color: $color-gray-lightest;
+$well-bg-color: white;
 $alert-delete-bg-color: #f9dede;
 
 $uswds-error-color: #cd2026;
 
-$logo-width: 170px;
+$logo-width: 155px;
 
 $home-feature-margin: 3em;
 
