@@ -17,15 +17,15 @@ describe('Main Site', () => {
         .expect(200);
     });
 
-    it('should contain home page content', () => {
-      request(app)
-        .get('/')
-        .expect(200)
-        .then((response) => {
-          expect(response.text.indexOf('Federalist compliantly hosts federal government websites.')).to.be.above(-1);
-          expect(response.text.indexOf('Log in')).to.be.above(-1);
-        });
-    });
+    // it('should contain home page content', () => {
+    //   request(app)
+    //     .get('/')
+    //     .expect(200)
+    //     .then((response) => {
+    //       expect(response.text.indexOf('Federalist compliantly hosts federal government websites.')).to.be.above(-1);
+    //       expect(response.text.indexOf('Log in')).to.be.above(-1);
+    //     });
+    // });
 
     it('should redirect to /sites when authenticated', (done) => {
       authenticatedSession()
@@ -41,25 +41,25 @@ describe('Main Site', () => {
       .catch(done);
     });
 
-    it('should display the number of builds from the past week', (done) => {
-      Build.destroy({ where: {} }).then(() => {
-        const promises = Array.from(Array(10).keys()).map((day) => {
-          const date = moment().subtract(day + 1, 'days');
-          return factory.build({ createdAt: date });
-        });
-        return Promise.all(promises);
-      })
-      .then(() =>
-        request(app)
-          .get('/')
-          .expect(200)
-      )
-      .then((response) => {
-        expect(response.text.indexOf('7 site updates')).to.be.above(-1);
-        done();
-      })
-      .catch(done);
-    });
+    // it('should display the number of builds from the past week', (done) => {
+    //   Build.destroy({ where: {} }).then(() => {
+    //     const promises = Array.from(Array(10).keys()).map((day) => {
+    //       const date = moment().subtract(day + 1, 'days');
+    //       return factory.build({ createdAt: date });
+    //     });
+    //     return Promise.all(promises);
+    //   })
+    //   .then(() =>
+    //     request(app)
+    //       .get('/')
+    //       .expect(200)
+    //   )
+    //   .then((response) => {
+    //     expect(response.text.indexOf('7 site updates')).to.be.above(-1);
+    //     done();
+    //   })
+    //   .catch(done);
+    // });
   });
 
   describe('App /sites', () => {
@@ -185,18 +185,18 @@ describe('Main Site', () => {
   });
 
 
-  describe('.contact', () => {
-    it('renders the page properly', (done) => {
-      request(app)
-      .get('/contact')
-      .expect(200)
-      .then((response) => {
-        expect(response.text.indexOf('contact')).to.be.above(-1);
-        done();
-      })
-      .catch(done);
-    });
-  });
+  // describe('.contact', () => {
+  //   it('renders the page properly', (done) => {
+  //     request(app)
+  //     .get('/contact')
+  //     .expect(200)
+  //     .then((response) => {
+  //       expect(response.text.indexOf('contact')).to.be.above(-1);
+  //       done();
+  //     })
+  //     .catch(done);
+  //   });
+  // });
 
   describe('site wide error banner', () => {
     context('when an error is present', () => {
