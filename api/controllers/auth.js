@@ -7,7 +7,7 @@ const AuthController = {
 
   github(req, res) {
     if (req.session.authenticated) {
-      res.redirect('/');
+      res.redirect(process.env.homepageUrl);
     } else {
       passport.authenticate('github')(req, res, req.next);
     }

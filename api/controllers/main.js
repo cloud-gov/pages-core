@@ -87,7 +87,7 @@ module.exports = {
         title: 'Unauthorized',
         message: 'You are not permitted to perform this action. Are you sure you are logged in?',
       });
-      return res.redirect('/');
+      return res.redirect(process.env.homepageUrl);
     }
 
     const context = defaultContext(req);
