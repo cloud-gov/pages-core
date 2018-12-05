@@ -38,7 +38,7 @@ describe('Main Site', () => {
         .get('/sites')
         .expect(302)
         .then((response) => {
-          expect(response.headers.location).to.equal('http://0.0.0.0:4000');
+          expect(response.headers.location).to.equal('http://localhost:4000');
           const cookie = sessionCookieFromResponse(response);
           return sessionForCookie(cookie);
         })

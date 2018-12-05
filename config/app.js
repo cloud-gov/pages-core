@@ -1,4 +1,4 @@
-let homepageUrl;
+const homepageUrl;
 
 switch (process.env.APP_ENV) {
   case 'production':
@@ -7,9 +7,9 @@ switch (process.env.APP_ENV) {
   case 'staging':
     homepageUrl = 'https://federalist-staging.18f.gov';
     break;
-  default: 
-    //development
-    homepageUrl = 'http://0.0.0.0:4000';
+  default:
+    // development
+    homepageUrl = 'http://localhost:4000';
 }
 
 module.exports = {
