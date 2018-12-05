@@ -100,7 +100,6 @@ module.exports = {
     context.socketHost = process.env.SOCKET_HOST;
     context.homepageUrl = config.app.homepageUrl;
 
-
     const frontendConfig = {
       TEMPLATES: config.templates,
       PREVIEW_HOSTNAME: config.app.preview_hostname,

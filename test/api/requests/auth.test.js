@@ -24,7 +24,7 @@ describe('Authentication request', () => {
         request(app)
           .get('/auth/github')
           .set('Cookie', cookie)
-          .expect('Location', '/')
+          .expect('Location', 'http://0.0.0.0:4000')
           .expect(302, done);
       });
     });
@@ -52,7 +52,7 @@ describe('Authentication request', () => {
         return request(app)
           .get('/logout')
           .set('Cookie', cookie)
-          .expect('Location', '/')
+          .expect('Location', 'http://0.0.0.0:4000')
           .expect(302);
       })
       .then(() => sessionForCookie(cookie))
@@ -66,7 +66,7 @@ describe('Authentication request', () => {
     it('should redirect to the root URL for an unauthenticated user', (done) => {
       request(app)
         .get('/logout')
-        .expect('Location', '/')
+        .expect('Location', 'http://0.0.0.0:4000')
         .expect(302, done);
     });
   });
