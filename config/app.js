@@ -1,4 +1,4 @@
-const homepageUrl;
+let homepageUrl;
 
 switch (process.env.APP_ENV) {
   case 'production':
