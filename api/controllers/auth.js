@@ -1,4 +1,5 @@
 const passport = require('../services/passport');
+const config = require('../../config');
 
 const AuthController = {
   logout(req, res) {
@@ -7,7 +8,7 @@ const AuthController = {
 
   github(req, res) {
     if (req.session.authenticated) {
-      res.redirect(process.env.homepageUrl);
+      res.redirect(config.app.homepageUrl); 
     } else {
       passport.authenticate('github')(req, res, req.next);
     }

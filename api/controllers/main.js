@@ -87,7 +87,7 @@ module.exports = {
         title: 'Unauthorized',
         message: 'You are not permitted to perform this action. Are you sure you are logged in?',
       });
-      return res.redirect(process.env.homepageUrl);
+      return res.redirect(config.app.homepageUrl);
     }
 
     const context = defaultContext(req);
@@ -98,7 +98,7 @@ module.exports = {
     context.csrfToken = req.csrfToken();
     context.accessToken = jwtHelper.sign({ user: req.user.id });
     context.socketHost = process.env.SOCKET_HOST;
-    context.homepageUrl = process.env.homepageUrl;
+    context.homepageUrl = config.app.homepageUrl;
 
 
     const frontendConfig = {

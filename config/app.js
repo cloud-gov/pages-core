@@ -9,7 +9,7 @@ switch (process.env.APP_ENV) {
     break;
   default: 
     //development
-    homepageUrl = '://0.0.0.0:4000';
+    homepageUrl = 'http://0.0.0.0:4000';
 }
 
 module.exports = {
