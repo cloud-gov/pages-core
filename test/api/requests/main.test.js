@@ -128,26 +128,26 @@ describe('Main Site', () => {
   });
 
   describe('.examples', () => {
-    it('renders the page properly', (done) => {
-      request(app)
-      .get('/content/examples/')
-      .expect(200)
-      .then((response) => {
-        expect(response.text.indexOf('example-sites')).to.be.above(-1);
-        done();
-      })
-      .catch(done);
-    });
+    // it('renders the page properly', (done) => {
+    //   request(app)
+    //   .get('/content/examples/')
+    //   .expect(200)
+    //   .then((response) => {
+    //     expect(response.text.indexOf('example-sites')).to.be.above(-1);
+    //     done();
+    //   })
+    //   .catch(done);
+    // });
 
-    it('should redirect to /sites when authenticated', (done) => {
+    it('should redirect to http://localhost:4000/examples when authenticated', (done) => {
       authenticatedSession()
       .then(cookie => request(app)
-        .get('/content/examples/')
+        .get('/examples')
         .set('Cookie', cookie)
         .expect(302)
       )
       .then((response) => {
-        expect(response.headers.location).to.equal('/sites');
+        expect(response.headers.location).to.equal('http://localhost:4000/examples');
         done();
       })
       .catch(done);
