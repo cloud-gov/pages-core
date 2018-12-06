@@ -21,6 +21,7 @@ env:
   NODE_ENV: production
   APP_ENV: production
   APP_HOSTNAME: https://federalistapp.18f.gov
+  HOMEPAGE_URL: https://federalist.18f.gov
   LOG_LEVEL: info
   NPM_CONFIG_PRODUCTION: true
   NODE_MODULES_CACHE: false
