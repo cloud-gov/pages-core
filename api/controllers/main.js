@@ -3,7 +3,6 @@ const { Site } = require('../models');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const config = require('../../config');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
-const caseStudyData = require('../../public/data/case-studies');
 const jwtHelper = require('../services/jwtHelper');
 
 let webpackAssets = loadAssetManifest();
@@ -51,19 +50,21 @@ module.exports = {
   },
 
   examples(req, res) {
-    return res.redirect(config.app.homepageUrl + '/examples');
+    
+    
+    return res.redirect(`${config.app.homepageUrl}/examples`);
   },
 
   contact(req, res) {
-    return res.redirect(config.app.homepageUrl + '/contact');
+    return res.redirect(`${config.app.homepageUrl}/contact`);
   },
 
   features(req, res) {
-    return res.redirect(config.app.homepageUrl + '/features');
+    return res.redirect(`${config.app.homepageUrl}/features`);
   },
 
   support(req, res) {
-    return res.redirect(config.app.homepageUrl + '/support');
+    return res.redirect(`${config.app.homepageUrl}/support`);
   },
 
   app(req, res) {
