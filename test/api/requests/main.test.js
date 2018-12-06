@@ -145,11 +145,8 @@ describe('Main Site', () => {
         .get('/examples')
         .set('Cookie', cookie)
         .expect(302)
+        .expect('Location', 'http://localhost:4000/examples')
       )
-      .then((response) => {
-        expect(response.headers.location).to.equal('http://localhost:4000/examples');
-        done();
-      })
       .catch(done);
     });
   });
