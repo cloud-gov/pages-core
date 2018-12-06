@@ -3,14 +3,24 @@
 
 {% block main_content %}
 
-  <div id="home" class="homepage">
+  <div id="home">
     <div class="well">
       <div class="usa-grid federalist-hero">
-        <div class="usa-width-full hero-heading">
-
-        <a href="/auth/github"><button class="usa-button"><img src="/images/github-logo.png"> Connect with your GitHub account</button></a>
-          
+        <div class="usa-width-one-third">
+          &nbsp;
+        </div>
+        <div class="usa-width-one-third">
+          <div class="hero-heading">
+            <a href="/auth/github"><button class="usa-button"><img src="/images/github-logo.png"> Login with your GitHub account</button></a>
+          </div>
+          <p>Federalist users are authenticated with GitHub OAuth.<br></p>
+          <p>If your office uses Federalist, ask your team’s primary contact for access.</p>
+          <p>To request access, send an email to federalist-support@gsa.gov with the GitHub usernames.</p>
+        </div>
+        <div class="usa-width-one-third">
+          &nbsp;
         </div>
       </div>
     </div>
+  </div>
 {% endblock %}

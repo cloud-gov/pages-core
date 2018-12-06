@@ -16,7 +16,7 @@
         </button>
         <ul class="usa-nav-primary">
           <li>
-            <a class="usa-nav-link" href="{{ homepageUrl }}">
+            <a class="usa-nav-link" href="{{ homepageUrl }}/">
               <span>Home</span>
             </a>
           </li>
@@ -44,13 +44,14 @@
           {% if isAuthenticated %}
             <li>
               <a class="usa-nav-link" href="/sites">
-                <span>{{ username }}'s sites</span>
+                <span>Manage Sites</span>
               </a>
             </li>
           </li>
           <li class="nav-action">
             <a class="usa-button usa-button-white" href="/logout">Log out</a>
           </li>
+          <!-- Removing this for now. Login will now have it's own login screen on home page-->
           {% else %}
             <li  class="nav-action">
               <a href="/auth/github" class="usa-button usa-button-white">Log in</a>
