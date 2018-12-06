@@ -24,6 +24,7 @@ function defaultContext(req) {
     messages,
     shouldIncludeTracking: shouldIncludeTracking(),
     siteDisplayEnv: getSiteDisplayEnv(),
+    homepageUrl: config.app.homepageUrl,
     webpackAssets,
   };
 
@@ -82,7 +83,6 @@ module.exports = {
     context.csrfToken = req.csrfToken();
     context.accessToken = jwtHelper.sign({ user: req.user.id });
     context.socketHost = process.env.SOCKET_HOST;
-    context.homepageUrl = config.app.homepageUrl;
 
     const frontendConfig = {
       TEMPLATES: config.templates,
