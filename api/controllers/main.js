@@ -50,7 +50,7 @@ module.exports = {
   },
 
   examples(req, res) {
-    return res.redirect(`${config.app.homepageUrl}/examples`);
+    return res.redirect(`${config.app.homepageUrl}/case-studies`);
   },
 
   contact(req, res) {
