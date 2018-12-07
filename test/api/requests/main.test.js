@@ -38,7 +38,7 @@ describe('Main Site', () => {
         .get('/sites')
         .expect(302)
         .then((response) => {
-          expect(response.headers.location).to.equal('http://localhost:4000');
+          expect(response.headers.location).to.equal('/');
           const cookie = sessionCookieFromResponse(response);
           return sessionForCookie(cookie);
         })
@@ -139,15 +139,15 @@ describe('Main Site', () => {
     //   .catch(done);
     // });
 
-    it('should redirect to http://localhost:4000/examples when authenticated', (done) => {
+    it('should redirect to http://localhost:4000/case-studies when authenticated', (done) => {
       authenticatedSession()
       .then(cookie => request(app)
-        .get('/examples')
+        .get('/case-studies')
         .set('Cookie', cookie)
         .expect(302)
       )
       .then((response) => {
-        expect(response.headers.location).to.equal('http://localhost:4000/examples');
+        expect(response.headers.location).to.equal('http://localhost:4000/case-studies');
         done();
       })
       .catch(done);
