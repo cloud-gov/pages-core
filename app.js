@@ -35,6 +35,7 @@ const RateLimit = require('express-rate-limit');
 const router = require('./api/routers');
 const SocketIOSubscriber = require('./api/services/SocketIOSubscriber');
 const jwtHelper = require('./api/services/jwtHelper');
+const FederalistUsersHelper = require('./api/services/FederalistUsersHelper')
 
 const app = express();
 const sequelize = require('./api/models').sequelize;
@@ -163,5 +164,7 @@ socket.use((_socket, next) => {
 .on('connection', (_socket) => {
   SocketIOSubscriber.joinRooms(_socket);
 });
+
+FederalistUsersHelper.audit18F();
 
 module.exports = app;
