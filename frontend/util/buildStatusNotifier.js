@@ -44,6 +44,11 @@ module.exports = class BuildStatusNotifier {
         break;
     }
     const icon = '/images/favicons/favicon.ico';
-    return new Notification(`${titleStatus}`, { body: `Site: ${build.owner}/${build.repository}   Branch: ${build.branch}`, icon });
+    const note = new Notification(`${titleStatus}`, { body: `Site: ${build.owner}/${build.repository}   Branch: ${build.branch}`, icon });
+    note.onclick = (event) => {
+      event.preventDefault(); // prevent the browser from focusing the Notification's tab
+      window.open(`/sites/${build.site}`, '_blank');
+    };
+    return note;
   }
 };

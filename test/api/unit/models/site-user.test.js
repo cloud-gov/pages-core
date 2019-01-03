@@ -1,5 +1,4 @@
 const expect = require('chai').expect;
-// const config = require('../../../../config');
 const factory = require('../../support/factory');
 const { User, Site, SiteUser } = require('../../../../api/models');
 

@@ -39,11 +39,6 @@ const jwtHelper = require('./api/services/jwtHelper');
 const app = express();
 const sequelize = require('./api/models').sequelize;
 
-const redirectUrls = [
-  'federalist.fr.cloud.gov',
-  'federalist-staging.fr.cloud.gov',
-];
-
 config.session.store = new PostgresStore({ db: sequelize });
 
 nunjucks.configure('views', {
@@ -74,9 +69,28 @@ app.use(responses);
 
 app.use((req, res, next) => {
   const host = req.hostname;
+  const redirectUrls = [
+    'federalist.fr.cloud.gov',
+    'federalist-staging.fr.cloud.gov',
+  ];
 
   if (redirectUrls.indexOf(host) !== -1) {
     return res.redirect(301, `https://${host.slice().replace('fr.cloud', '18f')}`);
+  }
+
+  return next();
+});
+
+// temporary until federalist.18f.gov is launched
+app.use((req, res, next) => {
+  const host = req.hostname;
+  const redirectUrls = [
+    'federalist.18f.gov',
+    'federalist-staging.18f.gov',
+  ];
+
+  if (redirectUrls.indexOf(host) !== -1) {
+    return res.redirect(302, `https://${host.slice().replace('federalist', 'federalistapp')}`);
   }
 
   return next();

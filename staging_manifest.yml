@@ -4,8 +4,9 @@ applications:
 buildpack: nodejs_buildpack
 stack: cflinuxfs2
 routes:
-- route: federalist-staging.18f.gov
 - route: federalist-staging.fr.cloud.gov
+- route: federalist-staging.18f.gov
+- route: federalistapp-staging.18f.gov
 disk_quota: 2G
 memory: 256MB
 instances: 2
@@ -19,7 +20,7 @@ services:
 env:
   NODE_ENV: production
   APP_ENV: staging
-  APP_HOSTNAME: https://federalist-staging.18f.gov
+  APP_HOSTNAME: https://federalistapp-staging.18f.gov
   LOG_LEVEL: verbose
   NPM_CONFIG_PRODUCTION: true
   NODE_MODULES_CACHE: false
