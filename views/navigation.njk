@@ -15,48 +15,46 @@
           <img src="/images/close.svg" alt="close">
         </button>
         <ul class="usa-nav-primary">
-          {% if not isAuthenticated %}
-            <li>
-              <a class="usa-nav-link" href="/features/" rel="noopener noreferrer">
-                <span>Features</span>
-              </a>
-            </li>
-            <li>
-              <a class="usa-nav-link" href="/content/examples/" rel="noopener noreferrer">
-                <span>Example sites</span>
-              </a>
-            </li>
-            <li>
-              <a class="usa-nav-link" href="https://federalist-docs.18f.gov" target="_blank" rel="noopener noreferrer">
-                <span>Support</span>
-              </a>
-            </li>
-            <li>
-              <a class="usa-nav-link" href="/contact/" rel="noopener noreferrer">
-                <span>Contact<span>
-              </a>
-            </li>
-            <li  class="nav-action">
-              <a href="/auth/github" class="usa-button usa-button-white">Log in</a>
-            </li>
-          {% else %}
+          <li>
+            <a class="usa-nav-link" href="{{ homepageUrl }}/">
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a class="usa-nav-link" href="{{ homepageUrl }}/features/">
+              <span>Features</span>
+            </a>
+          </li>
+          <li>
+            <a class="usa-nav-link" href="{{ homepageUrl }}/case-studies/">
+              <span>Case Studies</span>
+            </a>
+          </li>
+          <li>
+            <a class="usa-nav-link" href="{{ homepageUrl }}/support/">
+              <span>Support<span>
+            </a>
+          </li>
+          <li>
+            <a class="usa-nav-link" href="{{ homepageUrl }}/contact/">
+              <span>Contact<span>
+            </a>
+          </li>
+
+          {% if isAuthenticated %}
             <li>
               <a class="usa-nav-link" href="/sites">
-                <span>{{ username }}'s sites</span>
+                <span>Manage Sites</span>
               </a>
             </li>
-            <li>
-              <a class="usa-nav-link" href="https://federalist-docs.18f.gov/pages/using-federalist/support/" target="_blank" rel="noopener noreferrer">
-                <span>Support</span>
-              </a>
-            </li>
-            <li>
-              <a class="usa-nav-link" href="/contact/" rel="noopener noreferrer">
-                <span>Contact<span>
-              </a>
-            </li>
-            <li class="nav-action">
-              <a class="usa-button usa-button-white" href="/logout">Log out</a>
+          </li>
+          <li class="nav-action">
+            <a class="usa-button usa-button-white" href="/logout">Log out</a>
+          </li>
+          <!-- Removing this for now. Login will now have it's own login screen on home page-->
+          {% else %}
+            <li  class="nav-action">
+              <a href="/auth/github" class="usa-button usa-button-white">Log in</a>
             </li>
           {% endif %}
         </ul>

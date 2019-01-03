@@ -41,7 +41,7 @@ passport.use(new GitHubStrategy(config.passport.github.options, githubVerifyCall
 passport.logout = (req, res) => {
   req.logout();
   req.session.destroy(() => {
-    res.redirect('/');
+    res.redirect(config.app.homepageUrl);
   });
 };
 
