@@ -10,7 +10,6 @@ module.exports = {
       state: true,
     },
     organizations: [
-      6233994,  // 18f
       14109682, // federalist-users
     ],
   },

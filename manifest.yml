@@ -6,7 +6,6 @@ stack: cflinuxfs2
 routes:
 - route: federalistapp.18f.gov
 - route: federalist.fr.cloud.gov
-- route: federalist.18f.gov
 disk_quota: 2G
 memory: 256MB
 instances: 5
