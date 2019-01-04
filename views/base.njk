@@ -98,38 +98,6 @@
     {% endblock %}
 
     <footer class="usa-footer usa-footer-medium" role="contentinfo">
-      <div class="usa-footer-primary-section">
-        <div class="usa-grid">
-          <nav class="usa-footer-nav">
-            <ul class="usa-unstyled-list">
-              {% if not isAuthenticated %}
-                <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" href="/features/">Features</a>
-                </li>
-                <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" href="/content/examples/">Example sites</a>
-                </li>
-                <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" target="_blank" href="https://federalist-docs.18f.gov">Support</a>
-                </li>
-                <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" href="/contact/">Contact</a>
-                </li>
-              {% else %}
-                <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" href="/">{{ username }}'s sites</a>
-                </li>
-                <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" target="_blank" href="https://federalist-docs.18f.gov">Support</a>
-                </li>
-                <li class="usa-width-one-sixth usa-footer-primary-content">
-                  <a class="usa-footer-primary-link" href="/contact/">Contact</a>
-                </li>
-              {% endif %}
-            </ul>
-          </nav>
-        </div>
-      </div>
       <div class="usa-footer-secondary_section">
         <div class="usa-grid">
           <div class="usa-footer-contact-links usa-width-one-half">
