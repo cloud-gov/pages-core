@@ -101,6 +101,17 @@ const getNextOrganizationMembers = (github, org, page = 1, allMembers = []) => {
 const getTeamMembers = (github, team_id, page = 1) =>
   github.teams.listMembers({ team_id, per_page: 100, page }).then(teams => teams.data);
 
+const getNextTeamMembers = (github, team_id, page = 1, allMembers = []) => {
+  return getTeamMembers(github, team_id, page)
+    .then(members => {
+      if(members.length > 0){
+        allMembers = allMembers.concat(members);
+        return getNextTeamMembers(github, team_id, page + 1, allMembers);
+      }
+      return Promise.resolve(allMembers);
+    });
+  }
+
 const removeOrganizationMember = (github, org, member) => github.orgs.removeMember({ org, username: member });
 
 module.exports = {
@@ -189,13 +200,13 @@ module.exports = {
     githubClient(accessToken)
       .then(github => sendCreateGithubStatusRequest(github, options)),
 
-  getAllOrganizationMembers: (accessToken, organization) =>
+  getOrganizationMembers: (accessToken, organization) =>
     githubClient(accessToken)
       .then(github => getNextOrganizationMembers(github, organization)),
 
   getTeamMembers: (accessToken, teamId) =>
     githubClient(accessToken)
-      .then(github => getTeamMembers(github, teamId)),
+      .then(github => getNextTeamMembers(github, teamId)),
 
   removeOrganizationMember: (accessToken, organization, member) =>
     githubClient(accessToken)

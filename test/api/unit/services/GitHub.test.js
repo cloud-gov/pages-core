@@ -326,4 +326,37 @@ describe('GitHub', () => {
       .catch(done);
     });
   });
+
+  describe('.getOrganizationMembers', () => {
+    it('returns a branch based on the supplied parameters', (done) => {
+      const accessToken = 'token';
+      const organization = 'testOrg';
+
+      githubAPINocks.getOrganizationMembers({ accessToken, organization });
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, page: 2 });
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, page: 3 });
+      GitHub.getOrganizationMembers(accessToken, organization)
+      .then((members) => {
+        expect(members.length).to.equal(101);
+        done();
+      })
+      .catch(done);
+    });
+  });
+
+  describe('.getTeamMembers', () => {
+    it('returns a branch based on the supplied parameters', (done) => {
+      const accessToken = 'token';
+      const teamId = 12345;
+      githubAPINocks.getTeamMembers({ accessToken, teamId });
+      githubAPINocks.getTeamMembers({ accessToken, teamId, page: 2 });
+      githubAPINocks.getTeamMembers({ accessToken, teamId, page: 3 });
+      GitHub.getTeamMembers(accessToken, teamId)
+      .then((members) => {
+        expect(members.length).to.equal(102);
+        done();
+      })
+      .catch(done);
+    });
+  });
 });

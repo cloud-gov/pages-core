@@ -260,6 +260,56 @@ const getBranch = ({ accessToken, owner, repo, branch, expected }) => {
   return branchNock.reply(200, output);
 };
 
+const getOrganizationMembers = ({ accessToken, organization, per_page, page, response } = {}) => {
+  /* eslint-disable no-param-reassign */
+  accessToken = accessToken || 'access-token-123abc';
+  organization =  organization || 'test-org';
+  per_page = per_page || 100;
+  page = page || 1;
+  orgMembers = []
+  for (i = 0; i < (per_page + 1); i++) {
+    orgMembers.push({ login: `user-${organization}-${i}` });
+  }
+
+  return nock('https://api.github.com')
+    .get(`/orgs/${organization}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
+    .reply(response || 200, orgMembers.slice(((page - 1) * per_page), (page *per_page)));
+};
+
+const getTeamMembers = ({ accessToken, teamId, per_page, page, response } = {}) => {
+  /* eslint-disable no-param-reassign */
+  accessToken = accessToken || 'access-token-123abc';
+  teamId =  teamId || 'test-team';
+  per_page = per_page || 100;
+  page = page || 1;
+  teamMembers = []
+  for (i = 0; i < (per_page + 2); i++) {
+    teamMembers.push({ login: `user-${teamId}-${i}` });
+  }
+
+  const expectedHeaders = {
+    reqheaders: {
+      accept: [
+        "application/vnd.github.hellcat-preview+json"
+      ],
+      "user-agent": [
+        "octokit.js/15.18.1 Node.js/10.12.0 (Linux 4.9; x64)"
+      ],
+      "accept-encoding": [
+        "gzip,deflate"
+      ],
+      connection: [
+        "close"
+      ]
+    }
+  };
+
+  /* eslint-enable no-param-reassign */
+  return nock('https://api.github.com', expectedHeaders)
+    .get(`/teams/${teamId}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
+    .reply(response || 200, teamMembers.slice(((page - 1) * per_page), page * per_page));
+};
+
 module.exports = {
   getAccessToken,
   createRepoForOrg,
@@ -271,4 +321,6 @@ module.exports = {
   userOrganizations,
   webhook,
   getBranch,
+  getTeamMembers,
+  getOrganizationMembers,
 };
