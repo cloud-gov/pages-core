@@ -33,7 +33,6 @@ const audit18F = ({ auditor_username, fedUserTeams }) => {
       return Promise.all(removed);
     }
   })
-  .catch(logger.error)
 }
 
 module.exports = { audit18F };

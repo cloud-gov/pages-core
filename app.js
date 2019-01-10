@@ -165,6 +165,7 @@ socket.use((_socket, next) => {
   SocketIOSubscriber.joinRooms(_socket);
 });
 
-FederalistUsersHelper.audit18F();
+FederalistUsersHelper.audit18F({})
+  .catch(logger.error);
 
 module.exports = app;

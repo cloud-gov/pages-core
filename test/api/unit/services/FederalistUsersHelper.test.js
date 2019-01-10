@@ -130,6 +130,7 @@ describe('FederalistUsersHelper', () => {
 
             return fedUserHelper.audit18F({ auditor_username, fedUserTeams })
           })
+          .catch(err => expect(err).to.be.an('error'))
           .then(() => {
             federalistUsers = MockGitHub.getOrganizationMembers('token', 'federalist-users');
             expect(federalistUsers.length).to.equal(10);
