@@ -5,20 +5,20 @@ const config = require('../../config');
 
 const { User } = require('../models');
 
-const audit18F = () => {
-  const auditor_username = config.passport.github.federalistUsersAdmin;
-  const fedUserTeams = config.passport.github.federalistUsersTeams;
+const audit18F = ({ auditor_username, fedUserTeams }) => {
+  auditor_username = auditor_username || config.passport.github.federalistUsersAdmin;
+  fedUserTeams = fedUserTeams || config.passport.github.federalistUsersTeams;
   let members18F;
   let auditor;
 
-  User.findOne({ where: { username: auditor_username } })
+  return User.findOne({ where: { username: auditor_username } })
   .then(_auditor => {
     auditor = _auditor;
-    return GitHub.getAllOrganizationMembers(auditor.githubAccessToken, '18F');
+    return GitHub.getOrganizationMembers(auditor.githubAccessToken, '18F');
   })
   .then(members => {
     members18F = members.map(member => member.login);
-    return Promise.all(fedUserTeams.map(fedUserTeam => GitHub.getTeamMembers(auditor.githubAccessToken,fedUserTeam)));
+    return Promise.all(fedUserTeams.map(fedUserTeam => GitHub.getTeamMembers(auditor.githubAccessToken, fedUserTeam)));
   })
   .then(teams => {
     removed = []
