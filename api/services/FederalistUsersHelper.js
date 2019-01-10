@@ -21,15 +21,17 @@ const audit18F = ({ auditor_username, fedUserTeams }) => {
     return Promise.all(fedUserTeams.map(fedUserTeam => GitHub.getTeamMembers(auditor.githubAccessToken, fedUserTeam)));
   })
   .then(teams => {
-    removed = []
-    teams.forEach(team => {
-      team.forEach(member => {
-        if (!members18F.includes(member.login)){
-          removed.push(GitHub.removeOrganizationMember(auditor.githubAccessToken, 'federalist-users', member.login));
-        }
+    if(members18F.length > 0) {
+      removed = []
+      teams.forEach(team => {
+        team.forEach(member => {
+          if (!members18F.includes(member.login)){
+            removed.push(GitHub.removeOrganizationMember(auditor.githubAccessToken, 'federalist-users', member.login));
+          }
+        })
       })
-    })
-    return Promise.all(removed);
+      return Promise.all(removed);
+    }
   })
   .catch(logger.error)
 }
