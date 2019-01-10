@@ -1,7 +1,9 @@
 
 function getOrganizationMembers(githubAccessToken, orgName = '18F') {
   this.organizations = this.organizations || {};
-  this.organizations[orgName] = this.organizations[orgName] || [];
+  if (this.organizations[orgName] === undefined) {
+    return Promise.reject(new Error('org does not exist'));
+  }
   return this.organizations[orgName];
 }
 
@@ -47,7 +49,7 @@ function getOrganizations() {
 function generateMembers(name,size = 10) {
   const members = []
   let i;
-  for(i=0; i < size; i++) {
+  for(i = 0; i < size; i++) {
     members.push({ login: `${name}-${i}`})
   }
   return members;

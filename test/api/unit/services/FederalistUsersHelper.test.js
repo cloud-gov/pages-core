@@ -103,4 +103,37 @@ describe('FederalistUsersHelper', () => {
         .catch(done);
     });
   });
+  describe('no 18F', () => {
+
+    let members;
+    let federalistUsers;
+    let f81;
+    const fedUserTeams = ['12345', '54321'];
+
+    beforeEach(() => {
+      members = MockGitHub.generateMembers('user');
+      MockGitHub.addTeam('12345', members);
+      MockGitHub.addOrganization('federalist-users', members);
+    });
+
+    // test if 18F fetch generates an error .. then delete shouldnt' happen
+    it('no users removed if 18F org is empty', (done) => {
+      let auditor_username;
+
+      factory.user()
+        .then((user) => {
+          auditor_username = user.username;
+
+          federalistUsers = MockGitHub.getOrganizationMembers('token', 'federalist-users');
+          expect(federalistUsers.length).to.equal(10);
+
+          return fedUserHelper.audit18F({ auditor_username, fedUserTeams })
+        })
+        .then(() => {
+          federalistUsers = MockGitHub.getOrganizationMembers('token', 'federalist-users');
+          expect(federalistUsers.length).to.equal(10);
+          done();
+        })
+    });
+  });
 });
