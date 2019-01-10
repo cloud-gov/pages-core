@@ -268,10 +268,6 @@ const getOrganizationMembers = ({ accessToken, organization, per_page, page, res
   page = page || 1;
   orgMembers = []
 
-  if (organization === 'failOrg') {
-    return new Error('test error');
-  }
-
   for (i = 0; i < (per_page + 1); i++) {
     orgMembers.push({ login: `user-${organization}-${i}` });
   }
@@ -290,10 +286,6 @@ const getTeamMembers = ({ accessToken, teamId, per_page, page, response } = {}) 
   teamMembers = []
   for (i = 0; i < (per_page + 2); i++) {
     teamMembers.push({ login: `user-${teamId}-${i}` });
-  }
-
-  if (teamId === 'failTeam') {
-    return new Error('test error');
   }
 
   const expectedHeaders = {
