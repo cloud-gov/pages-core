@@ -328,7 +328,7 @@ describe('GitHub', () => {
   });
 
   describe('.getOrganizationMembers', () => {
-    it('returns a branch based on the supplied parameters', (done) => {
+    it('returns a list of all organization members', (done) => {
       const accessToken = 'token';
       const organization = 'testOrg';
 
@@ -341,6 +341,18 @@ describe('GitHub', () => {
         done();
       })
       .catch(done);
+    });
+
+    it('returns an exception', (done) => {
+      const accessToken = 'token';
+      const organization = 'failOrg';
+      let error;
+      githubAPINocks.getOrganizationMembers({ accessToken, organization });
+      GitHub.getOrganizationMembers(accessToken, organization)
+      .catch((err) => {
+        expect(err.code).to.exist;
+        done();
+      })
     });
   });
 
@@ -357,6 +369,17 @@ describe('GitHub', () => {
         done();
       })
       .catch(done);
+    });
+
+    it('returns a branch based on the supplied parameters', (done) => {
+      const accessToken = 'token';
+      const teamId = 'failTeam';
+      githubAPINocks.getTeamMembers({ accessToken, teamId });
+      GitHub.getTeamMembers(accessToken, teamId)
+      .catch((err) => {
+        expect(err.code).to.exist;
+        done();
+      })
     });
   });
 });
