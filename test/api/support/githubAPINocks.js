@@ -288,25 +288,8 @@ const getTeamMembers = ({ accessToken, teamId, per_page, page, response } = {}) 
     teamMembers.push({ login: `user-${teamId}-${i}` });
   }
 
-  const expectedHeaders = {
-    reqheaders: {
-      accept: [
-        "application/vnd.github.hellcat-preview+json"
-      ],
-      "user-agent": [
-        "octokit.js/15.18.1 Node.js/10.12.0 (Linux 4.9; x64)"
-      ],
-      "accept-encoding": [
-        "gzip,deflate"
-      ],
-      connection: [
-        "close"
-      ]
-    }
-  };
-
   /* eslint-enable no-param-reassign */
-  return nock('https://api.github.com', expectedHeaders)
+  return nock('https://api.github.com')
     .get(`/teams/${teamId}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
     .reply(response || 200, teamMembers.slice(((page - 1) * per_page), page * per_page));
 };
