@@ -20,7 +20,8 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
     })
     .then((members) => {
       members18F = members.map(member => member.login);
-      return Promise.all(fedUserTeams.map(t => GitHub.getTeamMembers(auditor.githubAccessToken, t)));
+      return Promise.all(fedUserTeams.map(team =>
+        GitHub.getTeamMembers(auditor.githubAccessToken, team)));
     })
     .then((teams) => {
       const removed = [];
@@ -36,6 +37,6 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
       }
       return Promise.all(removed);
     });
-}
+};
 
 module.exports = { audit18F };

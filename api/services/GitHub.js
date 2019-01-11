@@ -90,7 +90,7 @@ const getNextOrganizationMembers = (github, org, page = 1, allMembers = []) =>
   getOrganizationMembers(github, org, page)
     .then((members) => {
       if (members.length > 0) {
-        allMembers = allMembers.concat(members);  // eslint-disable no-param-reassign
+        allMembers = allMembers.concat(members);  // eslint-disable-line no-param-reassign
         return getNextOrganizationMembers(github, org, page + 1, allMembers);
       }
       return Promise.resolve(allMembers);
@@ -104,7 +104,7 @@ const getNextTeamMembers = (github, team_id, page = 1, allMembers = []) =>
   getTeamMembers(github, team_id, page)
     .then((members) => {
       if (members.length > 0) {
-        allMembers = allMembers.concat(members);  // eslint-disable no-param-reassign
+        allMembers = allMembers.concat(members);  // eslint-disable-line no-param-reassign
         return getNextTeamMembers(github, team_id, page + 1, allMembers);
       }
       return Promise.resolve(allMembers);

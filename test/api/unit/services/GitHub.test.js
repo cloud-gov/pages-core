@@ -357,6 +357,7 @@ describe('GitHub', () => {
   });
 
   describe('.getTeamMembers', () => {
+    /* eslint-disable camelcase */
     it('returns a branch based on the supplied parameters', (done) => {
       const accessToken = 'token';
       const team_id = 12345;
@@ -383,5 +384,6 @@ describe('GitHub', () => {
           done();
         });
     });
+    /* eslint-enable camelcase */
   });
 });

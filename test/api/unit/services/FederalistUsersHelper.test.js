@@ -3,6 +3,7 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const factory = require('../../support/factory');
 const MockGitHub = require('../../support/mockGitHub');
+
 const fedUserHelper = proxyquire('../../../../api/services/FederalistUsersHelper', { './GitHub': MockGitHub });
 
 describe('FederalistUsersHelper', () => {
