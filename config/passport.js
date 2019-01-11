@@ -12,10 +12,5 @@ module.exports = {
     organizations: [
       14109682, // federalist-users
     ],
-    federalistUsersTeams: [
-      3036896, //18F-Staff
-      3040935, //18F-org
-    ],
-    federalistUsersAdmin: (env.FEDERALIST_USERS_ADMIN || process.env.FEDERALIST_USERS_ADMIN),
   },
 };

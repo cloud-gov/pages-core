@@ -6,8 +6,9 @@ const config = require('../../config');
 const { User } = require('../models');
 
 const audit18F = ({ auditor_username, fedUserTeams }) => {
-  auditor_username = auditor_username || config.passport.github.federalistUsersAdmin;
-  fedUserTeams = fedUserTeams || config.passport.github.federalistUsersTeams;
+  auditor_username = auditor_username || config.federalistUsers.admin;
+  fedUserTeams = fedUserTeams || config.federalistUsers.teams18F;
+
   let members18F;
   let auditor;
 
