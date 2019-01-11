@@ -28,6 +28,7 @@ const http = require('http');
 const io = require('socket.io');
 const redis = require('redis');
 const redisAdapter = require('socket.io-redis');
+const schedule = require('node-schedule');
 
 const responses = require('./api/responses');
 const passport = require('./api/services/passport');
@@ -165,7 +166,10 @@ socket.use((_socket, next) => {
   SocketIOSubscriber.joinRooms(_socket);
 });
 
-FederalistUsersHelper.audit18F({})
-  .catch(logger.error);
+// audit federalist-users 18F teams daily at midnight
+schedule.scheduleJob('0 0 * * *', () => {
+  FederalistUsersHelper.audit18F({})
+    .catch(logger.error);
+});
 
 module.exports = app;
