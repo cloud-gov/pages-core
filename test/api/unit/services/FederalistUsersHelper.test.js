@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const proxyquire =  require('proxyquire').noCallThru();
+const proxyquire = require('proxyquire').noCallThru();
 
 const factory = require('../../support/factory');
 const MockGitHub = require('../../support/mockGitHub');
@@ -8,7 +8,6 @@ const fedUserHelper = proxyquire('../../../../api/services/FederalistUsersHelper
 describe('FederalistUsersHelper', () => {
   context('audit18F', () => {
     describe('18F exists', () => {
-
       let members;
       let federalistUsers;
       let f81;
@@ -24,11 +23,11 @@ describe('FederalistUsersHelper', () => {
 
 
       it('remove federalist-user not in 18F org', (done) => {
-        let auditor_username;
+        let auditorUsername;
 
         factory.user()
           .then((user) => {
-            auditor_username = user.username;
+            auditorUsername = user.username;
 
             federalistUsers = MockGitHub.getOrganizationMembers('token', 'federalist-users');
 
@@ -40,7 +39,7 @@ describe('FederalistUsersHelper', () => {
           .then(() => {
             federalistUsers = MockGitHub.getOrganizationMembers('token', 'federalist-users');
             expect(federalistUsers.length).to.equal(11);
-            return fedUserHelper.audit18F({ auditor_username, fedUserTeams })
+            return fedUserHelper.audit18F({ auditorUsername, fedUserTeams });
           })
           .then(() => {
             expect(f81.length).to.equal(10);
@@ -52,11 +51,11 @@ describe('FederalistUsersHelper', () => {
       });
 
       it('no federalist users to remove when 18F users are added', (done) => {
-        let auditor_username;
+        let auditorUsername;
 
         factory.user()
           .then((user) => {
-            auditor_username = user.username;
+            auditorUsername = user.username;
 
             federalistUsers = MockGitHub.getOrganizationMembers('token', 'federalist-users');
 
@@ -66,7 +65,7 @@ describe('FederalistUsersHelper', () => {
             MockGitHub.addOrganizationMember('18F', 'new18fUser');
             f81 = MockGitHub.getOrganizationMembers('token', '18F');
             expect(f81.length).to.equal(11);
-            return fedUserHelper.audit18F({ auditor_username, fedUserTeams })
+            return fedUserHelper.audit18F({ auditorUsername, fedUserTeams });
           })
           .then(() => {
             f81 = MockGitHub.getOrganizationMembers('token', '18F');
@@ -79,12 +78,11 @@ describe('FederalistUsersHelper', () => {
       });
 
       it('no users removed if 18F org is empty', (done) => {
-        let auditor_username;
-        // let members1;
+        let auditorUsername;
 
         factory.user()
           .then((user) => {
-            auditor_username = user.username;
+            auditorUsername = user.username;
 
             federalistUsers = MockGitHub.getOrganizationMembers('token', 'federalist-users');
             expect(federalistUsers.length).to.equal(10);
@@ -93,7 +91,7 @@ describe('FederalistUsersHelper', () => {
             f81 = MockGitHub.getOrganizationMembers('token', '18F');
             expect(f81.length).to.equal(0);
 
-            return fedUserHelper.audit18F({ auditor_username, fedUserTeams })
+            return fedUserHelper.audit18F({ auditorUsername, fedUserTeams });
           })
           .then(() => {
             expect(f81.length).to.equal(0);
@@ -105,10 +103,8 @@ describe('FederalistUsersHelper', () => {
       });
     });
     describe('no 18F', () => {
-
       let members;
       let federalistUsers;
-      let f81;
       const fedUserTeams = ['12345', '54321'];
 
       beforeEach(() => {
@@ -119,23 +115,23 @@ describe('FederalistUsersHelper', () => {
 
       // test if 18F fetch generates an error .. then delete shouldnt' happen
       it('no users removed if 18F org is empty', (done) => {
-        let auditor_username;
+        let auditorUsername;
 
         factory.user()
           .then((user) => {
-            auditor_username = user.username;
+            auditorUsername = user.username;
 
             federalistUsers = MockGitHub.getOrganizationMembers('token', 'federalist-users');
             expect(federalistUsers.length).to.equal(10);
 
-            return fedUserHelper.audit18F({ auditor_username, fedUserTeams })
+            return fedUserHelper.audit18F({ auditorUsername, fedUserTeams });
           })
           .catch(err => expect(err).to.be.an('error'))
           .then(() => {
             federalistUsers = MockGitHub.getOrganizationMembers('token', 'federalist-users');
             expect(federalistUsers.length).to.equal(10);
             done();
-          })
+          });
       });
     });
   });

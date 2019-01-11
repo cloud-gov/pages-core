@@ -86,33 +86,33 @@ const sendCreateGithubStatusRequest = (github, options) =>
 const getOrganizationMembers = (github, org, page = 1) =>
   github.orgs.listMembers({ org, per_page: 100, page }).then(orgs => Promise.resolve(orgs.data));
 
-const getNextOrganizationMembers = (github, org, page = 1, allMembers = []) => {
-  return getOrganizationMembers(github, org, page)
-    .then(members => {
-      if(members.length > 0){
-        allMembers = allMembers.concat(members);
+const getNextOrganizationMembers = (github, org, page = 1, allMembers = []) =>
+  getOrganizationMembers(github, org, page)
+    .then((members) => {
+      if (members.length > 0) {
+        allMembers = allMembers.concat(members);  // eslint-disable no-param-reassign
         return getNextOrganizationMembers(github, org, page + 1, allMembers);
       }
       return Promise.resolve(allMembers);
     });
-  }
 
-
+/* eslint-disable camelcase */
 const getTeamMembers = (github, team_id, page = 1) =>
   github.teams.listMembers({ team_id, per_page: 100, page }).then(teams => teams.data);
 
-const getNextTeamMembers = (github, team_id, page = 1, allMembers = []) => {
-  return getTeamMembers(github, team_id, page)
-    .then(members => {
-      if(members.length > 0){
-        allMembers = allMembers.concat(members);
+const getNextTeamMembers = (github, team_id, page = 1, allMembers = []) =>
+  getTeamMembers(github, team_id, page)
+    .then((members) => {
+      if (members.length > 0) {
+        allMembers = allMembers.concat(members);  // eslint-disable no-param-reassign
         return getNextTeamMembers(github, team_id, page + 1, allMembers);
       }
       return Promise.resolve(allMembers);
     });
-  }
+/* eslint-enable camelcase */
 
-const removeOrganizationMember = (github, org, member) => github.orgs.removeMember({ org, username: member });
+const removeOrganizationMember = (github, org, username) =>
+  github.orgs.removeMember({ org, username });
 
 module.exports = {
   checkPermissions: (user, owner, repo) =>

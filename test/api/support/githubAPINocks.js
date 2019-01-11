@@ -260,39 +260,43 @@ const getBranch = ({ accessToken, owner, repo, branch, expected }) => {
   return branchNock.reply(200, output);
 };
 
+/* eslint-disable camelcase */
 const getOrganizationMembers = ({ accessToken, organization, per_page, page, response } = {}) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
-  organization =  organization || 'test-org';
+  organization = organization || 'test-org';
   per_page = per_page || 100;
   page = page || 1;
-  orgMembers = []
+  /* eslint-enable no-param-reassign */
 
-  for (i = 0; i < (per_page + 1); i++) {
+  const orgMembers = [];
+  for (let i = 0; i < (per_page + 1); i += 1) {
     orgMembers.push({ login: `user-${organization}-${i}` });
   }
 
   return nock('https://api.github.com')
     .get(`/orgs/${organization}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
-    .reply(response || 200, orgMembers.slice(((page - 1) * per_page), (page *per_page)));
+    .reply(response || 200, orgMembers.slice(((page - 1) * per_page), (page * per_page)));
 };
 
-const getTeamMembers = ({ accessToken, teamId, per_page, page, response } = {}) => {
+const getTeamMembers = ({ accessToken, team_id, per_page, page, response } = {}) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
-  teamId =  teamId || 'test-team';
+  team_id = team_id || 'test-team';
   per_page = per_page || 100;
   page = page || 1;
-  teamMembers = []
-  for (i = 0; i < (per_page + 2); i++) {
-    teamMembers.push({ login: `user-${teamId}-${i}` });
+  /* eslint-enable no-param-reassign */
+
+  const teamMembers = [];
+  for (let i = 0; i < (per_page + 2); i += 1) {
+    teamMembers.push({ login: `user-${team_id}-${i}` });
   }
 
-  /* eslint-enable no-param-reassign */
   return nock('https://api.github.com')
-    .get(`/teams/${teamId}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
+    .get(`/teams/${team_id}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
     .reply(response || 200, teamMembers.slice(((page - 1) * per_page), page * per_page));
 };
+/* eslint-enable camelcase */
 
 module.exports = {
   getAccessToken,

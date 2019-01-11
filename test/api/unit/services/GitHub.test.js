@@ -336,50 +336,52 @@ describe('GitHub', () => {
       githubAPINocks.getOrganizationMembers({ accessToken, organization, page: 2 });
       githubAPINocks.getOrganizationMembers({ accessToken, organization, page: 3 });
       GitHub.getOrganizationMembers(accessToken, organization)
-      .then((members) => {
-        expect(members.length).to.equal(101);
-        done();
-      })
-      .catch(done);
+        .then((members) => {
+          expect(members.length).to.equal(101);
+          done();
+        })
+        .catch(done);
     });
 
     it('returns an exception', (done) => {
       const accessToken = 'token';
       const organization = 'failOrg';
-      let error;
+
       githubAPINocks.getOrganizationMembers({ accessToken, organization });
       GitHub.getOrganizationMembers(accessToken, organization)
-      .catch((err) => {
-        expect(err.code).to.exist;
-        done();
-      })
+        .catch((err) => {
+          expect(err.code).to.exist;
+          done();
+        });
     });
   });
 
   describe('.getTeamMembers', () => {
     it('returns a branch based on the supplied parameters', (done) => {
       const accessToken = 'token';
-      const teamId = 12345;
-      githubAPINocks.getTeamMembers({ accessToken, teamId });
-      githubAPINocks.getTeamMembers({ accessToken, teamId, page: 2 });
-      githubAPINocks.getTeamMembers({ accessToken, teamId, page: 3 });
-      GitHub.getTeamMembers(accessToken, teamId)
-      .then((members) => {
-        expect(members.length).to.equal(102);
-        done();
-      })
-      .catch(done);
+      const team_id = 12345;
+
+      githubAPINocks.getTeamMembers({ accessToken, team_id });
+      githubAPINocks.getTeamMembers({ accessToken, team_id, page: 2 });
+      githubAPINocks.getTeamMembers({ accessToken, team_id, page: 3 });
+      GitHub.getTeamMembers(accessToken, team_id)
+        .then((members) => {
+          expect(members.length).to.equal(102);
+          done();
+        })
+        .catch(done);
     });
 
     it('returns a branch based on the supplied parameters', (done) => {
       const accessToken = 'token';
-      const teamId = 'failTeam';
-      githubAPINocks.getTeamMembers({ accessToken, teamId });
-      GitHub.getTeamMembers(accessToken, teamId)
-      .catch((err) => {
-        expect(err.code).to.exist;
-        done();
-      })
+      const team_id = 'failTeam';
+
+      githubAPINocks.getTeamMembers({ accessToken, team_id });
+      GitHub.getTeamMembers(accessToken, team_id)
+        .catch((err) => {
+          expect(err.code).to.exist;
+          done();
+        });
     });
   });
 });

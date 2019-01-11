@@ -8,13 +8,13 @@ function getOrganizationMembers(githubAccessToken, orgName = '18F') {
 }
 
 function getTeamMembers(githubAccessToken, teamId) {
-  this.teams = this.teams || {}
+  this.teams = this.teams || {};
   this.teams[teamId] = this.teams[teamId] || [];
   return this.teams[teamId];
 }
 
 function addTeamMember(teamId, username) {
-  this.teams = this.teams || {}
+  this.teams = this.teams || {};
   this.teams[teamId] = this.teams[teamId] || [];
   this.teams[teamId].push({ login: username });
 }
@@ -32,7 +32,7 @@ function addOrganization(orgName, members = []) {
 }
 
 function addTeam(teamId, members = []) {
-  this.teams = this.teams || {}
+  this.teams = this.teams || {};
   this.teams[teamId] = members;
 }
 
@@ -46,11 +46,11 @@ function getOrganizations() {
   return this.organizations;
 }
 
-function generateMembers(name,size = 10) {
-  const members = []
+function generateMembers(name, size = 10) {
+  const members = [];
   let i;
-  for(i = 0; i < size; i++) {
-    members.push({ login: `${name}-${i}`})
+  for (i = 0; i < size; i += 1) {
+    members.push({ login: `${name}-${i}` });
   }
   return members;
 }
@@ -58,7 +58,7 @@ function generateMembers(name,size = 10) {
 function removeOrganizationMember(githubAccessToken, orgName, removeUser) {
   this.organizations = this.organizations || {};
   this.organizations[orgName] = this.organizations[orgName] || [];
-  this.organizations[orgName] = this.organizations[orgName].filter(member => member.login !== removeUser);
+  this.organizations[orgName] = this.organizations[orgName].filter(m => m.login !== removeUser);
 }
 
 module.exports = {
