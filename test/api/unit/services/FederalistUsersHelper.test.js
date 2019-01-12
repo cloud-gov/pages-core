@@ -40,12 +40,16 @@ describe('FederalistUsersHelper', () => {
           .then(() => {
             federalistUsers = MockGitHub.getOrganizationMembers('token', 'federalist-users');
             expect(federalistUsers.length).to.equal(11);
+            const logins = federalistUsers.map(l => l.login);
+            expect(logins.includes('non-18F-user' )).to.equal(true);
             return fedUserHelper.audit18F({ auditorUsername, fedUserTeams });
           })
           .then(() => {
             expect(f81.length).to.equal(10);
             federalistUsers = MockGitHub.getOrganizationMembers('token', 'federalist-users');
             expect(federalistUsers.length).to.equal(10);
+            const logins = federalistUsers.map(l => l.login);
+            expect(logins.includes('non-18F-user' )).to.equal(false);
             done();
           })
           .catch(done);
