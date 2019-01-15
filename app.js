@@ -28,6 +28,7 @@ const http = require('http');
 const io = require('socket.io');
 const redis = require('redis');
 const redisAdapter = require('socket.io-redis');
+const schedule = require('node-schedule');
 
 const responses = require('./api/responses');
 const passport = require('./api/services/passport');
@@ -35,6 +36,7 @@ const RateLimit = require('express-rate-limit');
 const router = require('./api/routers');
 const SocketIOSubscriber = require('./api/services/SocketIOSubscriber');
 const jwtHelper = require('./api/services/jwtHelper');
+const RepositoryVerifier = require('./api/services/RepositoryVerifier');
 
 const app = express();
 const sequelize = require('./api/models').sequelize;
@@ -162,6 +164,11 @@ socket.use((_socket, next) => {
 })
 .on('connection', (_socket) => {
   SocketIOSubscriber.joinRooms(_socket);
+});
+
+schedule.scheduleJob('0 0 * * *', () => {
+  RepositoryVerifier.verifyRepos()
+    .catch(logger.error);
 });
 
 module.exports = app;
