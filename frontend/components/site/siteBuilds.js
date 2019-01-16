@@ -35,10 +35,6 @@ class SiteBuilds extends React.Component {
     return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>View logs</Link>;
   }
 
-  // static renderLoadingState() {
-  //   return <LoadingIndicator />;
-  // }
-
   static commitLink(build) {
     if (!build.commitSha) {
       return null;
