@@ -5,7 +5,6 @@ import { shallow } from 'enzyme';
 import { SiteBuilds } from '../../../../frontend/components/site/siteBuilds';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
-
 let user;
 let site;
 let build;
@@ -140,5 +139,27 @@ describe('<SiteBuilds/>', () => {
 
     expect(wrapper.find('table')).to.have.length(0);
     expect(wrapper.find(LoadingIndicator)).to.have.length(1);
+  });
+
+  describe('Auto Refresh', () => {
+    const SELECTOR = '[data-test="toggle-auto-refresh"]';
+
+    it('should default to auto refresh: ON', () => {
+      const wrapper = shallow(<SiteBuilds {...props} />);
+      expect(wrapper.state('autoRefresh')).to.equal(true);
+      expect(wrapper.find(SELECTOR).text()).to.equal('Auto Refresh: ON');
+    });
+
+    it('should toggle auto refresh when the `auto refresh` button is clicked', () => {
+      const wrapper = shallow(<SiteBuilds {...props} />);
+
+      wrapper.find(SELECTOR).simulate('click');
+      expect(wrapper.state('autoRefresh')).to.equal(false);
+      expect(wrapper.find(SELECTOR).text()).to.equal('Auto Refresh: OFF');
+
+      wrapper.find(SELECTOR).simulate('click');
+      expect(wrapper.state('autoRefresh')).to.equal(true);
+      expect(wrapper.find(SELECTOR).text()).to.equal('Auto Refresh: ON');
+    })
   });
 });
