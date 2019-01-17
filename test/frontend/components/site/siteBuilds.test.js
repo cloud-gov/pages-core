@@ -1,8 +1,9 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import sinon from 'sinon';
 
-import { SiteBuilds } from '../../../../frontend/components/site/siteBuilds';
+import { SiteBuilds, REFRESH_INTERVAL } from '../../../../frontend/components/site/siteBuilds';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
 let user;
@@ -37,6 +38,9 @@ describe('<SiteBuilds/>', () => {
         isLoading: false,
       },
       site,
+      params: {
+        id: 5
+      }
     };
   });
 
@@ -141,8 +145,28 @@ describe('<SiteBuilds/>', () => {
     expect(wrapper.find(LoadingIndicator)).to.have.length(1);
   });
 
+  it('should fetch the builds on mount', () => {
+    const spy = sinon.spy();
+
+    props.actions = { fetchBuilds: spy };
+
+    const wrapper = shallow(<SiteBuilds {...props} />);
+    wrapper.instance().componentDidMount();
+    expect(spy.calledOnce).to.equal(true);
+  });
+
   describe('Auto Refresh', () => {
     const SELECTOR = '[data-test="toggle-auto-refresh"]';
+
+    let clock;
+
+    beforeEach(() => {
+      clock = sinon.useFakeTimers();
+    });
+
+    afterEach(() => {
+      clock.restore();
+    });
 
     it('should default to auto refresh: ON', () => {
       const wrapper = shallow(<SiteBuilds {...props} />);
@@ -160,6 +184,29 @@ describe('<SiteBuilds/>', () => {
       wrapper.find(SELECTOR).simulate('click');
       expect(wrapper.state('autoRefresh')).to.equal(true);
       expect(wrapper.find(SELECTOR).text()).to.equal('Auto Refresh: ON');
-    })
+    });
+
+    it('should refresh builds according to the refresh interval when `auto refresh` is on', () => {
+      const spy = sinon.spy();
+
+      props.actions = { fetchBuilds: spy };
+
+      const wrapper = shallow(<SiteBuilds {...props} />);
+      wrapper.instance().componentDidMount();
+      clock.tick(REFRESH_INTERVAL + 1000);
+      expect(spy.callCount).to.equal(2);
+    });
+
+    it('should NOT refresh builds when `auto refresh` is turned off', () => {
+      const spy = sinon.spy();
+
+      props.actions = { fetchBuilds: spy };
+
+      const wrapper = shallow(<SiteBuilds {...props} />);
+      wrapper.instance().componentDidMount();
+      wrapper.setState({ autoRefresh: false });
+      clock.tick(REFRESH_INTERVAL + 1000);
+      expect(spy.callCount).to.equal(1);
+    });
   });
 });

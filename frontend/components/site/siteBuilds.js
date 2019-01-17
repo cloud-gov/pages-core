@@ -57,14 +57,15 @@ class SiteBuilds extends React.Component {
   }
 
   componentDidMount() {
-    buildActions.fetchBuilds({ id: this.props.params.id });
-    this.intervalHandle = window.setInterval(() => {
-      this.state.autoRefresh && buildActions.fetchBuilds({ id: this.props.params.id });
+    const { fetchBuilds } = this.props.actions;
+    fetchBuilds({ id: this.props.params.id });
+    this.intervalHandle = setInterval(() => {
+      this.state.autoRefresh && fetchBuilds({ id: this.props.params.id });
     }, REFRESH_INTERVAL);
   }
 
   componentWillUnmount() {
-    window.clearInterval(this.intervalHandle);
+    clearInterval(this.intervalHandle);
   }
 
   toggleAutoRefresh() {
@@ -99,7 +100,7 @@ class SiteBuilds extends React.Component {
   }
 
   renderBuildsTable() {
-    const { site, builds } = this.props;
+    const { site, builds, actions } = this.props;
     const { autoRefresh } = this.state;
     const previewBuilds = builds.data && this.latestBuildByBranch(builds.data);
     return (
@@ -160,7 +161,7 @@ class SiteBuilds extends React.Component {
                         <br />
                         <CreateBuildLink
                           handlerParams={{ buildId: build.id, siteId: site.id }}
-                          handleClick={buildActions.restartBuild}
+                          handleClick={actions.restartBuild}
                           class="usa-button usa-button-secondary"
                         >
                           Rebuild branch
@@ -198,11 +199,19 @@ SiteBuilds.propTypes = {
   params: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
+  actions: PropTypes.shape({
+    fetchBuilds: PropTypes.func.isRequired,
+    restartBuild: PropTypes.func.isRequired
+  })
 };
 
 SiteBuilds.defaultProps = {
   builds: null,
   site: null,
+  actions: {
+    fetchBuilds: buildActions.fetchBuilds,
+    restartBuild: buildActions.restartBuild
+  }
 };
 
 const mapStateToProps = state => ({
