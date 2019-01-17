@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 
@@ -13,7 +14,10 @@ import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
 import BranchViewLink from '../branchViewLink';
 
+export const REFRESH_INTERVAL = 15 * 1000;
+
 class SiteBuilds extends React.Component {
+
   static getUsername(build) {
     if (build.user) {
       return build.user.username;
@@ -23,10 +27,6 @@ class SiteBuilds extends React.Component {
 
   static buildLogsLink(build) {
     return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>View logs</Link>;
-  }
-
-  static renderLoadingState() {
-    return <LoadingIndicator />;
   }
 
   static commitLink(build) {
@@ -50,8 +50,30 @@ class SiteBuilds extends React.Component {
     );
   }
 
+  constructor(props) {
+    super(props);
+    this.state = { autoRefresh: true };
+    autoBind(this, 'toggleAutoRefresh');
+  }
+
+  /* eslint-disable scanjs-rules/call_setInterval */
   componentDidMount() {
-    buildActions.fetchBuilds({ id: this.props.params.id });
+    const { fetchBuilds } = this.props.actions;
+    fetchBuilds({ id: this.props.params.id });
+    this.intervalHandle = setInterval(() => {
+      if (this.state.autoRefresh) {
+        fetchBuilds({ id: this.props.params.id });
+      }
+    }, REFRESH_INTERVAL);
+  }
+  /* eslint-enable scanjs-rules/call_setInterval */
+
+  componentWillUnmount() {
+    clearInterval(this.intervalHandle);
+  }
+
+  toggleAutoRefresh() {
+    this.setState(state => ({ autoRefresh: !state.autoRefresh }));
   }
 
   latestBuildByBranch(builds) {
@@ -81,81 +103,98 @@ class SiteBuilds extends React.Component {
     );
   }
 
+  /* eslint-disable jsx-a11y/href-no-hash */
   renderBuildsTable() {
-    const { site, builds } = this.props;
-    const previewBuilds = this.latestBuildByBranch(builds.data);
+    const { site, builds, actions } = this.props;
+    const { autoRefresh } = this.state;
+    const previewBuilds = builds.data && this.latestBuildByBranch(builds.data);
     return (
       <div>
         <div className="log-tools">
+          <div>
+            <a
+              href="#"
+              role="button"
+              onClick={this.toggleAutoRefresh}
+              data-test="toggle-auto-refresh"
+            >
+              Auto Refresh: <b>{autoRefresh ? 'ON' : 'OFF'}</b>
+            </a>
+          </div>
           <RefreshBuildsButton site={site} />
         </div>
-        <table className="usa-table-borderless log-table log-table__site-builds table-full-width">
-          <thead>
-            <tr>
-              <th scope="col">Branch</th>
-              <th scope="col">User</th>
-              <th scope="col">Completed</th>
-              <th scope="col">Duration</th>
-              <th scope="col">Message</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {builds.data.map((build) => {
-              let message;
-
-              switch (build.state) {
-                case 'error':
-                  message = 'This build has failed. Please view the logs for more information.';
-                  break;
-                case 'processing':
-                  message = 'This build is in progress';
-                  break;
-                default:
-                  message = 'The build completed successfully.';
-                  break;
-              }
-
-              return (
-                <tr key={build.id}>
-                  <th scope="row">
-                    { build.branch }
-                    { SiteBuilds.commitLink(build) }
-                    { previewBuilds[build.branch] === build.id && <br /> }
-                    { previewBuilds[build.branch] === build.id &&
-                    <BranchViewLink branchName={build.branch} site={site} showIcon /> }
-                  </th>
-                  <td>{ SiteBuilds.getUsername(build) }</td>
-                  <td>{ timeFrom(build.completedAt) }</td>
-                  <td>{ duration(build.createdAt, build.completedAt) }</td>
-                  <td><pre>{ message }</pre></td>
-                  <td className="table-actions">
-                    { SiteBuilds.buildLogsLink(build) }
-                    <br />
-                    <CreateBuildLink
-                      handlerParams={{ buildId: build.id, siteId: site.id }}
-                      handleClick={buildActions.restartBuild}
-                      class="usa-button usa-button-secondary"
-                    >
-                      Rebuild branch
-                    </CreateBuildLink>
-                  </td>
+        { builds.isLoading ?
+          <LoadingIndicator /> :
+          <div>
+            <table
+              className="usa-table-borderless log-table log-table__site-builds table-full-width"
+            >
+              <thead>
+                <tr>
+                  <th scope="col">Branch</th>
+                  <th scope="col">User</th>
+                  <th scope="col">Completed</th>
+                  <th scope="col">Duration</th>
+                  <th scope="col">Message</th>
+                  <th scope="col">Actions</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        { builds.data.length >= 100 ? <p>List only displays 100 most recent builds.</p> : null }
+              </thead>
+              <tbody>
+                {builds.data.map((build) => {
+                  let message;
+
+                  switch (build.state) {
+                    case 'error':
+                      message = 'This build has failed. Please view the logs for more information.';
+                      break;
+                    case 'processing':
+                      message = 'This build is in progress';
+                      break;
+                    default:
+                      message = 'The build completed successfully.';
+                      break;
+                  }
+
+                  return (
+                    <tr key={build.id}>
+                      <th scope="row">
+                        { build.branch }
+                        { SiteBuilds.commitLink(build) }
+                        { previewBuilds[build.branch] === build.id && <br /> }
+                        { previewBuilds[build.branch] === build.id &&
+                        <BranchViewLink branchName={build.branch} site={site} showIcon /> }
+                      </th>
+                      <td>{ SiteBuilds.getUsername(build) }</td>
+                      <td>{ timeFrom(build.completedAt) }</td>
+                      <td>{ duration(build.createdAt, build.completedAt) }</td>
+                      <td><pre>{ message }</pre></td>
+                      <td className="table-actions">
+                        { SiteBuilds.buildLogsLink(build) }
+                        <br />
+                        <CreateBuildLink
+                          handlerParams={{ buildId: build.id, siteId: site.id }}
+                          handleClick={actions.restartBuild}
+                          class="usa-button usa-button-secondary"
+                        >
+                          Rebuild branch
+                        </CreateBuildLink>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            { builds.data.length >= 100 ? <p>List only displays 100 most recent builds.</p> : null }
+          </div>}
       </div>
     );
   }
+  /* eslint-enable jsx-a11y/href-no-hash */
 
   render() {
     const { builds } = this.props;
 
-    if (builds.isLoading) {
-      return SiteBuilds.renderLoadingState();
-    } else if (!builds.data.length) {
+    if (!builds.isLoading && !builds.data.length) {
       return this.renderEmptyState();
     }
     return this.renderBuildsTable();
@@ -173,11 +212,19 @@ SiteBuilds.propTypes = {
   params: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
+  actions: PropTypes.shape({
+    fetchBuilds: PropTypes.func.isRequired,
+    restartBuild: PropTypes.func.isRequired,
+  }),
 };
 
 SiteBuilds.defaultProps = {
   builds: null,
   site: null,
+  actions: {
+    fetchBuilds: buildActions.fetchBuilds,
+    restartBuild: buildActions.restartBuild,
+  },
 };
 
 const mapStateToProps = state => ({
