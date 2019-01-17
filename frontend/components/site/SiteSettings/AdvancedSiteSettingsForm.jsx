@@ -16,7 +16,7 @@ export const AdvancedSiteSettingsForm = ({
 }) => (
   <form className="settings-form settings-form-advanced" onSubmit={handleSubmit}>
     <div className="well">
-      <label htmlFor="engine">Static site engine</label>
+      <label htmlFor="engine">Site engine</label>
       <Field
         name="engine"
         id="engine"
