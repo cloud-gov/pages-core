@@ -39,8 +39,8 @@ describe('<SiteBuilds/>', () => {
       },
       site,
       params: {
-        id: 5
-      }
+        id: 5,
+      },
     };
   });
 
@@ -156,7 +156,7 @@ describe('<SiteBuilds/>', () => {
   });
 
   describe('Auto Refresh', () => {
-    const SELECTOR = '[data-test="toggle-auto-refresh"]';
+    const AUTO_REFRESH_SELECTOR = '[data-test="toggle-auto-refresh"]';
 
     let clock;
 
@@ -171,19 +171,19 @@ describe('<SiteBuilds/>', () => {
     it('should default to auto refresh: ON', () => {
       const wrapper = shallow(<SiteBuilds {...props} />);
       expect(wrapper.state('autoRefresh')).to.equal(true);
-      expect(wrapper.find(SELECTOR).text()).to.equal('Auto Refresh: ON');
+      expect(wrapper.find(AUTO_REFRESH_SELECTOR).text()).to.equal('Auto Refresh: ON');
     });
 
     it('should toggle auto refresh when the `auto refresh` button is clicked', () => {
       const wrapper = shallow(<SiteBuilds {...props} />);
 
-      wrapper.find(SELECTOR).simulate('click');
+      wrapper.find(AUTO_REFRESH_SELECTOR).simulate('click');
       expect(wrapper.state('autoRefresh')).to.equal(false);
-      expect(wrapper.find(SELECTOR).text()).to.equal('Auto Refresh: OFF');
+      expect(wrapper.find(AUTO_REFRESH_SELECTOR).text()).to.equal('Auto Refresh: OFF');
 
-      wrapper.find(SELECTOR).simulate('click');
+      wrapper.find(AUTO_REFRESH_SELECTOR).simulate('click');
       expect(wrapper.state('autoRefresh')).to.equal(true);
-      expect(wrapper.find(SELECTOR).text()).to.equal('Auto Refresh: ON');
+      expect(wrapper.find(AUTO_REFRESH_SELECTOR).text()).to.equal('Auto Refresh: ON');
     });
 
     it('should refresh builds according to the refresh interval when `auto refresh` is on', () => {

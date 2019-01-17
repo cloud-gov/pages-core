@@ -1,4 +1,3 @@
-/* global window:true */
 import React from 'react';
 import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
@@ -18,11 +17,6 @@ import BranchViewLink from '../branchViewLink';
 export const REFRESH_INTERVAL = 15 * 1000;
 
 class SiteBuilds extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { autoRefresh: true };
-    autoBind(this, 'toggleAutoRefresh');
-  }
 
   static getUsername(build) {
     if (build.user) {
@@ -56,13 +50,23 @@ class SiteBuilds extends React.Component {
     );
   }
 
+  constructor(props) {
+    super(props);
+    this.state = { autoRefresh: true };
+    autoBind(this, 'toggleAutoRefresh');
+  }
+
+  /* eslint-disable scanjs-rules/call_setInterval */
   componentDidMount() {
     const { fetchBuilds } = this.props.actions;
     fetchBuilds({ id: this.props.params.id });
     this.intervalHandle = setInterval(() => {
-      this.state.autoRefresh && fetchBuilds({ id: this.props.params.id });
+      if (this.state.autoRefresh) {
+        fetchBuilds({ id: this.props.params.id });
+      }
     }, REFRESH_INTERVAL);
   }
+  /* eslint-enable scanjs-rules/call_setInterval */
 
   componentWillUnmount() {
     clearInterval(this.intervalHandle);
@@ -99,6 +103,7 @@ class SiteBuilds extends React.Component {
     );
   }
 
+  /* eslint-disable jsx-a11y/href-no-hash */
   renderBuildsTable() {
     const { site, builds, actions } = this.props;
     const { autoRefresh } = this.state;
@@ -107,7 +112,12 @@ class SiteBuilds extends React.Component {
       <div>
         <div className="log-tools">
           <div>
-            <a href="#" role="button" data-test="toggle-auto-refresh" onClick={this.toggleAutoRefresh}>
+            <a
+              href="#"
+              role="button"
+              onClick={this.toggleAutoRefresh}
+              data-test="toggle-auto-refresh"
+            >
               Auto Refresh: <b>{autoRefresh ? 'ON' : 'OFF'}</b>
             </a>
           </div>
@@ -116,7 +126,9 @@ class SiteBuilds extends React.Component {
         { builds.isLoading ?
           <LoadingIndicator /> :
           <div>
-            <table className="usa-table-borderless log-table log-table__site-builds table-full-width">
+            <table
+              className="usa-table-borderless log-table log-table__site-builds table-full-width"
+            >
               <thead>
                 <tr>
                   <th scope="col">Branch</th>
@@ -172,11 +184,12 @@ class SiteBuilds extends React.Component {
                 })}
               </tbody>
             </table>
-          { builds.data.length >= 100 ? <p>List only displays 100 most recent builds.</p> : null }
-        </div>}
+            { builds.data.length >= 100 ? <p>List only displays 100 most recent builds.</p> : null }
+          </div>}
       </div>
     );
   }
+  /* eslint-enable jsx-a11y/href-no-hash */
 
   render() {
     const { builds } = this.props;
@@ -201,8 +214,8 @@ SiteBuilds.propTypes = {
   }).isRequired,
   actions: PropTypes.shape({
     fetchBuilds: PropTypes.func.isRequired,
-    restartBuild: PropTypes.func.isRequired
-  })
+    restartBuild: PropTypes.func.isRequired,
+  }),
 };
 
 SiteBuilds.defaultProps = {
@@ -210,8 +223,8 @@ SiteBuilds.defaultProps = {
   site: null,
   actions: {
     fetchBuilds: buildActions.fetchBuilds,
-    restartBuild: buildActions.restartBuild
-  }
+    restartBuild: buildActions.restartBuild,
+  },
 };
 
 const mapStateToProps = state => ({
