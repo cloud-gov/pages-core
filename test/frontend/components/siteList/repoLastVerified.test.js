@@ -11,21 +11,37 @@ const MOST_RECENT_VERIFIED = `. Last seen on ${FORMATTED_MOST_RECENT_VERIFIED_TI
 let wrapper;
 
 describe('<RepoLastVerified />', () => {
-  it('displays a fallback message if the site is not verified', () => {
-    wrapper = shallow(<RepoLastVerified />);
+  it('displays warning if not found and site older than threshold', () => {
+    const daysNotFound = 6; // greater than default threshold 5
+    const createdAt = new Date(new Date() - (daysNotFound * 24 * 60 * 60 * 1000)).toString();
+    wrapper = shallow(<RepoLastVerified site={{ repoLastVerified: undefined, createdAt }} />);
 
     expect(wrapper.find('p').text()).to.equal(VERIFIED_BASE);
   });
 
-  it('displays a fallback if verified times cant be determined properly', () => {
-    wrapper = shallow(<RepoLastVerified site={{ repoLastVerified: undefined }} />);
+  it('does not display warning if not found and site created less than threshold', () => {
+    const daysNotFound = 3; // greater than default threshold 5
+    const createdAt = new Date(new Date() - (daysNotFound * 24 * 60 * 60 * 1000)).toString();
+    wrapper = shallow(<RepoLastVerified site={{ repoLastVerified: undefined, createdAt }} />);
 
-    expect(wrapper.find('p').text()).to.equal(VERIFIED_BASE);
+    expect(wrapper.find('p').length).to.equal(0);
   });
 
   it('displays the datetime of the most recent repo verification', () => {
     wrapper = shallow(<RepoLastVerified site={{ repoLastVerified: MOST_RECENT_VERIFIED_TIME }} />);
 
     expect(wrapper.find('p').text()).to.equal(VERIFIED_BASE + MOST_RECENT_VERIFIED);
+  });
+
+  it('repoLastVerified today - under the threshold', () => {
+    const repoLastVerified = new Date(new Date() - (3 * 24 * 60 * 60 * 1000)).toString();
+    wrapper = shallow(<RepoLastVerified site={{ repoLastVerified }} />);
+    expect(wrapper.find('p').length).to.equal(0);
+  });
+
+  it('repoLastVerified under passed threshold', () => {
+    const repoLastVerified = new Date(new Date() - (3 * 24 * 60 * 60 * 1000)).toString();
+    wrapper = shallow(<RepoLastVerified site={{ repoLastVerified }} daysNotFound={2} />);
+    expect(wrapper.find('p').length).to.equal(1);
   });
 });

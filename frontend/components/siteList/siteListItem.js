@@ -29,9 +29,7 @@ const SiteListItem = ({ site }) =>
         </Link>
         {' '}
       </h4>
-      {(((new Date() - new Date(site.repoLastVerified)) / (24 * 60 * 60 * 1000)) > 0) &&
-        <RepoLastVerified site={site} />
-      }
+      <RepoLastVerified site={site} />
       <PublishedState site={site} />
     </div>
     <div className="sites-list-item-actions">

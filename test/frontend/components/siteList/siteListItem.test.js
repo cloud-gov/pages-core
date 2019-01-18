@@ -23,6 +23,7 @@ describe('<SiteListItem />', () => {
     Fixture = proxyquire('../../../../frontend/components/siteList/siteListItem', {
       'react-router': { Link },
       './publishedState': PublishedState,
+      './repoLastVerified': RepoLastVerified,
       '../icons': { IconView: 'IconView' },
     }).default;
   });
@@ -31,6 +32,12 @@ describe('<SiteListItem />', () => {
     wrapper = shallow(<Fixture site={testSite} />);
     expect(wrapper.find(PublishedState).props()).to.deep.equals({ site: testSite });
     expect(wrapper.find(PublishedState)).to.have.length(1);
+  });
+
+  it('outputs a published state component', () => {
+    wrapper = shallow(<Fixture site={testSite} />);
+    expect(wrapper.find(RepoLastVerified).props()).to.deep.equals({ site: testSite });
+    expect(wrapper.find(RepoLastVerified)).to.have.length(1);
   });
 
   it('outputs a link component to direct user to the site page', () => {
