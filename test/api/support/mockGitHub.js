@@ -8,11 +8,11 @@ function getOrganizationMembers(githubAccessToken, orgName = '18F', role = 'all'
   if (role === 'member') {
     return this.organizations[orgName].filter(m => m.role === 'member');
   }
-  
+
   if (role === 'admin') {
     return this.organizations[orgName].filter(m => m.role === 'admin');
   }
-  
+
   return this.organizations[orgName];
 }
 
@@ -61,8 +61,7 @@ function generateMembers(name, size = 10) {
   for (i = 0; i < size; i += 1) {
     if ((i % 10) === 0) {
       members.push({ login: `${name}-${i}`, role: 'admin' });
-    }
-    else {
+    } else {
       members.push({ login: `${name}-${i}`, role: 'member' });
     }
   }

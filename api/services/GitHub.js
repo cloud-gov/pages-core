@@ -84,7 +84,8 @@ const sendCreateGithubStatusRequest = (github, options) =>
   github.repos.createStatus(options);
 
 const getOrganizationMembers = (github, org, role = 'all', page = 1) =>
-  github.orgs.listMembers({ org, per_page: 100, page, role }).then(orgs => Promise.resolve(orgs.data));
+  github.orgs.listMembers({ org, per_page: 100, page, role })
+    .then(orgs => Promise.resolve(orgs.data));
 
 const getNextOrganizationMembers = (github, org, role = 'all', page = 1, allMembers = []) =>
   getOrganizationMembers(github, org, role, page)

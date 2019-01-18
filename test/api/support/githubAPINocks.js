@@ -165,7 +165,6 @@ const repo = ({ accessToken, owner, repo, response } = {}) => {
     resp[1] = typicalResponse;
   }
 
-
   return webhookNock.reply(...resp);
 };
 
@@ -261,7 +260,7 @@ const getBranch = ({ accessToken, owner, repo, branch, expected }) => {
 };
 
 /* eslint-disable camelcase */
-const getOrganizationMembers = ({ accessToken, organization, role, per_page, page, response } = {}) => {
+const getOrganizationMembers = ({ accessToken, organization, role, per_page, page, response }) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   organization = organization || 'test-org';
@@ -272,18 +271,14 @@ const getOrganizationMembers = ({ accessToken, organization, role, per_page, pag
 
   let orgMembers = [];
   for (let i = 0; i < (per_page + 1); i += 1) {
-
     if ((i % 50) === 0) {
-      orgMembers.push({ login: `admin-${organization}-${i}`, role: 'admin'});
+      orgMembers.push({ login: `admin-${organization}-${i}`, role: 'admin' });
+    } else {
+      orgMembers.push({ login: `user-${organization}-${i}`, role: 'member' });
     }
-    else {
-      orgMembers.push({ login: `user-${organization}-${i}`, role: 'member'});
-    }
+  }
+  if (role !== 'all') { orgMembers = orgMembers.filter(o => o.role === role) }
 
-  }
-  if (role !== 'all') {
-    orgMembers = orgMembers.filter(o => o.role === role);
-  }
   return nock('https://api.github.com')
     .get(`/orgs/${organization}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}&role=${role}`)
     .reply(response || 200, orgMembers.slice(((page - 1) * per_page), (page * per_page)));
