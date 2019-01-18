@@ -1,9 +1,18 @@
 
-function getOrganizationMembers(githubAccessToken, orgName = '18F') {
+function getOrganizationMembers(githubAccessToken, orgName = '18F', role = 'all') {
   this.organizations = this.organizations || {};
   if (this.organizations[orgName] === undefined) {
     return Promise.reject(new Error('org does not exist'));
   }
+
+  if (role === 'member') {
+    return this.organizations[orgName].filter(m => m.role === 'member');
+  }
+  
+  if (role === 'admin') {
+    return this.organizations[orgName].filter(m => m.role === 'admin');
+  }
+  
   return this.organizations[orgName];
 }
 
@@ -13,16 +22,16 @@ function getTeamMembers(githubAccessToken, teamId) {
   return this.teams[teamId];
 }
 
-function addTeamMember(teamId, username) {
+function addTeamMember(teamId, username, role = 'member') {
   this.teams = this.teams || {};
   this.teams[teamId] = this.teams[teamId] || [];
-  this.teams[teamId].push({ login: username });
+  this.teams[teamId].push({ login: username, role });
 }
 
-function addOrganizationMember(orgName, username) {
+function addOrganizationMember(orgName, username, role = 'member') {
   this.organizations = this.organizations || {};
   this.organizations[orgName] = this.organizations[orgName] || [];
-  this.organizations[orgName].push({ login: username });
+  this.organizations[orgName].push({ login: username, role });
 }
 
 function addOrganization(orgName, members = []) {
@@ -50,7 +59,12 @@ function generateMembers(name, size = 10) {
   const members = [];
   let i;
   for (i = 0; i < size; i += 1) {
-    members.push({ login: `${name}-${i}` });
+    if ((i % 10) === 0) {
+      members.push({ login: `${name}-${i}`, role: 'admin' });
+    }
+    else {
+      members.push({ login: `${name}-${i}`, role: 'member' });
+    }
   }
   return members;
 }

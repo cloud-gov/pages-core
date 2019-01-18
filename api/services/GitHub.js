@@ -83,15 +83,15 @@ const handleWebhookError = (err) => {
 const sendCreateGithubStatusRequest = (github, options) =>
   github.repos.createStatus(options);
 
-const getOrganizationMembers = (github, org, page = 1) =>
-  github.orgs.listMembers({ org, per_page: 100, page }).then(orgs => Promise.resolve(orgs.data));
+const getOrganizationMembers = (github, org, role = 'all', page = 1) =>
+  github.orgs.listMembers({ org, per_page: 100, page, role }).then(orgs => Promise.resolve(orgs.data));
 
-const getNextOrganizationMembers = (github, org, page = 1, allMembers = []) =>
-  getOrganizationMembers(github, org, page)
+const getNextOrganizationMembers = (github, org, role = 'all', page = 1, allMembers = []) =>
+  getOrganizationMembers(github, org, role, page)
     .then((members) => {
       if (members.length > 0) {
         allMembers = allMembers.concat(members);  // eslint-disable-line no-param-reassign
-        return getNextOrganizationMembers(github, org, page + 1, allMembers);
+        return getNextOrganizationMembers(github, org, role, page + 1, allMembers);
       }
       return Promise.resolve(allMembers);
     });
@@ -200,9 +200,9 @@ module.exports = {
     githubClient(accessToken)
       .then(github => sendCreateGithubStatusRequest(github, options)),
 
-  getOrganizationMembers: (accessToken, organization) =>
+  getOrganizationMembers: (accessToken, organization, role = 'all') =>
     githubClient(accessToken)
-      .then(github => getNextOrganizationMembers(github, organization)),
+      .then(github => getNextOrganizationMembers(github, organization, role)),
 
   getTeamMembers: (accessToken, teamId) =>
     githubClient(accessToken)

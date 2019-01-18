@@ -354,6 +354,36 @@ describe('GitHub', () => {
           done();
         });
     });
+
+    it('returns a list of organization admin members', (done) => {
+      const accessToken = 'token';
+      const organization = 'testOrg';
+
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'admin' });
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'admin', page: 2 });
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'admin', page: 3 });
+      GitHub.getOrganizationMembers(accessToken, organization, 'admin')
+        .then((members) => {
+          expect(members.length).to.equal(3);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('returns a list of organization non-admin members', (done) => {
+      const accessToken = 'token';
+      const organization = 'testOrg';
+
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'member' });
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'member', page: 2 });
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'member', page: 3 });
+      GitHub.getOrganizationMembers(accessToken, organization, 'member')
+        .then((members) => {
+          expect(members.length).to.equal(98);
+          done();
+        })
+        .catch(done);
+    });
   });
 
   describe('.getTeamMembers', () => {
