@@ -13,8 +13,7 @@ const getRepoLastVerified = (site) => {
 
 const RepoLastVerified = ({ site, daysNotVerified = 5 }) => {
   const  daysAgo = (fromDate) => ((new Date() - new Date(fromDate)) / (24 * 60 * 60 * 1000));
-  if ((!site.repoLastVerified && (daysAgo(site.createdAt) > daysNotVerified)) ||
-    (site.repoLastVerified && (daysAgo(site.repoLastVerified) > daysNotVerified))) {
+  if ((daysAgo(site.repoLastVerified || site.createdAt) > daysNotVerified)) {
     return <p className="repo-verification">
       {getRepoLastVerified(site)}
     </p>;
