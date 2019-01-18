@@ -2,7 +2,7 @@ import React from 'react';
 
 import { dateAndTime } from '../../util/datetime';
 
-const getRepoLastVerified = site => {
+const getRepoLastVerified = (site) => {
   let msg = 'Repository not found';
   if (site.repoLastVerified) {
     const formattedBuildTime = dateAndTime(site.repoLastVerified);
