@@ -166,10 +166,12 @@ socket.use((_socket, next) => {
   SocketIOSubscriber.joinRooms(_socket);
 });
 
-// audit federalist-users 18F teams daily at midnight
-schedule.scheduleJob('0 0 * * *', () => {
-  FederalistUsersHelper.audit18F({})
-    .catch(logger.error);
-});
+if (process.env.CF_INSTANCE_INDEX === 0) {
+  // audit federalist-users 18F teams daily at midnight
+  schedule.scheduleJob('0 0 * * *', () => {
+    FederalistUsersHelper.audit18F({})
+      .catch(logger.error);
+  });
+}
 
 module.exports = app;
