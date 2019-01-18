@@ -44,6 +44,8 @@ SiteListItem.propTypes = {
     owner: PropTypes.string,
     id: PropTypes.number,
     publishedAt: PropTypes.string,
+    repoLastVerified: PropTypes.string,
+    createdAt: PropTypes.string,
     viewLink: PropTypes.string,
   }),
 };

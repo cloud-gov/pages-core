@@ -7,13 +7,13 @@ proxyquire.noCallThru();
 
 const Link = () => <div />;
 const PublishedState = () => <div />;
+const RepoLastVerified = () => <div />;
 
 const testSite = {
   repository: 'something',
   owner: 'someone',
   id: 1,
   viewLink: 'https://mysiteishere.biz',
-  repoLastVerified: new Date(new Date() - (10 * 24 * 60 * 60 * 1000)), //10 days ago
 };
 
 describe('<SiteListItem />', () => {
@@ -35,7 +35,7 @@ describe('<SiteListItem />', () => {
     expect(wrapper.find(PublishedState)).to.have.length(1);
   });
 
-  it('outputs a published state component', () => {
+  it('outputs a repo last verified component', () => {
     wrapper = shallow(<Fixture site={testSite} />);
     expect(wrapper.find(RepoLastVerified).props()).to.deep.equals({ site: testSite });
     expect(wrapper.find(RepoLastVerified)).to.have.length(1);
