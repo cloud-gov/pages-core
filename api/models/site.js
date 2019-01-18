@@ -196,7 +196,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     repoLastVerified: {
       type: DataTypes.DATE,
-    }
+    },
   }, {
     tableName: 'site',
     classMethods: {

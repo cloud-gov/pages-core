@@ -13,7 +13,7 @@ describe('RepositoryVerifier', () => {
       Promise.all([factory.user(), factory.user()])
         .then((_users) => {
           users = _users;
-          return  factory.site({ users });
+          return factory.site({ users });
         })
         .then((_site) => {
           site = _site;
@@ -21,7 +21,7 @@ describe('RepositoryVerifier', () => {
           githubAPINocks.repo({
             accessToken: users[0].githubAccessToken,
             owner: site.owner,
-            repo: site.repository
+            repo: site.repository,
           });
           return RepositoryVerifier.verifyRepos();
         })
@@ -40,7 +40,7 @@ describe('RepositoryVerifier', () => {
       Promise.all([factory.user(), factory.user(), factory.user()])
         .then((_users) => {
           users = _users;
-          return  factory.site({ users });
+          return factory.site({ users });
         })
         .then((_site) => {
           site = _site;
@@ -54,7 +54,7 @@ describe('RepositoryVerifier', () => {
           githubAPINocks.repo({
             accessToken: users[1].githubAccessToken,
             owner: site.owner,
-            repo: site.repository
+            repo: site.repository,
           });
           return RepositoryVerifier.verifyRepos();
         })
@@ -73,7 +73,7 @@ describe('RepositoryVerifier', () => {
       Promise.all([factory.user(), factory.user()])
         .then((_users) => {
           users = _users;
-          return  factory.site({ users });
+          return factory.site({ users });
         })
         .then((_site) => {
           site = _site;
@@ -105,7 +105,7 @@ describe('RepositoryVerifier', () => {
       Site.destroy({ where: {}, truncate: true })
         .then(() => factory.site({ users: [] }))
         .then(() => factory.user({ githubAccessToken: null }))
-        .then((user) => factory.site({ users: [user] }))
+        .then(user => factory.site({ users: [user] }))
         .then(() => Promise.all([factory.user(), factory.user()]))
         .then((_users) => {
           users = _users;
@@ -116,7 +116,7 @@ describe('RepositoryVerifier', () => {
           ]);
         })
         .then((sites) => {
-          sites.forEach(site => {
+          sites.forEach((site) => {
             expect(site.repoLastVerified).to.be.null;
             githubAPINocks.repo({
               accessToken: users[0].githubAccessToken,
