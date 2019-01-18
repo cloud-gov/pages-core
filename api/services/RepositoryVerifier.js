@@ -17,6 +17,7 @@ const verifyNextRepo = (site, userIndex = 0) => {
       if (!found && site.Users[userIndex + 1]) {
         return verifyNextRepo(site, userIndex + 1);
       }
+      return Promise.resolve();
     });
 };
 
