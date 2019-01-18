@@ -12,16 +12,16 @@ let wrapper;
 
 describe('<RepoLastVerified />', () => {
   it('displays warning if not found and site older than threshold', () => {
-    const daysNotFound = 6; // greater than default threshold 5
-    const createdAt = new Date(new Date() - (daysNotFound * 24 * 60 * 60 * 1000)).toString();
+    const daysNotVerified = 6; // greater than default threshold 5
+    const createdAt = new Date(new Date() - (daysNotVerified * 24 * 60 * 60 * 1000)).toString();
     wrapper = shallow(<RepoLastVerified site={{ repoLastVerified: undefined, createdAt }} />);
 
     expect(wrapper.find('p').text()).to.equal(VERIFIED_BASE);
   });
 
   it('does not display warning if not found and site created less than threshold', () => {
-    const daysNotFound = 3; // greater than default threshold 5
-    const createdAt = new Date(new Date() - (daysNotFound * 24 * 60 * 60 * 1000)).toString();
+    const daysNotVerified = 3; // greater than default threshold 5
+    const createdAt = new Date(new Date() - (daysNotVerified * 24 * 60 * 60 * 1000)).toString();
     wrapper = shallow(<RepoLastVerified site={{ repoLastVerified: undefined, createdAt }} />);
 
     expect(wrapper.find('p').length).to.equal(0);
@@ -41,7 +41,7 @@ describe('<RepoLastVerified />', () => {
 
   it('repoLastVerified under passed threshold', () => {
     const repoLastVerified = new Date(new Date() - (3 * 24 * 60 * 60 * 1000)).toString();
-    wrapper = shallow(<RepoLastVerified site={{ repoLastVerified }} daysNotFound={2} />);
+    wrapper = shallow(<RepoLastVerified site={{ repoLastVerified }} daysNotVerified={2} />);
     expect(wrapper.find('p').length).to.equal(1);
   });
 });

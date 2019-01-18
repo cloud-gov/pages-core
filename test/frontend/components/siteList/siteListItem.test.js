@@ -13,6 +13,7 @@ const testSite = {
   owner: 'someone',
   id: 1,
   viewLink: 'https://mysiteishere.biz',
+  repoLastVerified: new Date(new Date() - (10 * 24 * 60 * 60 * 1000)), //10 days ago
 };
 
 describe('<SiteListItem />', () => {

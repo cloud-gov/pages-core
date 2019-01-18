@@ -11,11 +11,11 @@ const getRepoLastVerified = (site) => {
   return msg;
 };
 
-const RepoLastVerified = ({ site = {}, daysNotFound = 5 }) => {
+const RepoLastVerified = ({ site = {}, daysNotVerified = 5 }) => {
   if ((!site.repoLastVerified &&
-      (((new Date() - new Date(site.createdAt)) / (24 * 60 * 60 * 1000)) > daysNotFound)) ||
+      (((new Date() - new Date(site.createdAt)) / (24 * 60 * 60 * 1000)) > daysNotVerified)) ||
     (site.repoLastVerified &&
-      (((new Date() - new Date(site.repoLastVerified)) / (24 * 60 * 60 * 1000)) > daysNotFound))) {
+      (((new Date() - new Date(site.repoLastVerified)) / (24 * 60 * 60 * 1000)) > daysNotVerified))) {
     return <p className="repo-verification">
       {getRepoLastVerified(site)}
     </p>;
@@ -27,12 +27,12 @@ RepoLastVerified.propTypes = {
   site: React.PropTypes.shape({
     repoLastVerified: React.PropTypes.string,
   }),
-  daysNotFound: React.PropTypes.number,
+  daysNotVerified: React.PropTypes.number,
 };
 
 RepoLastVerified.defaultProps = {
   site: {},
-  daysNotFound: 5,
+  daysNotVerified: 5,
 };
 
 export default RepoLastVerified;
