@@ -166,9 +166,11 @@ socket.use((_socket, next) => {
   SocketIOSubscriber.joinRooms(_socket);
 });
 
-schedule.scheduleJob('0 0 * * *', () => {
-  RepositoryVerifier.verifyRepos()
-    .catch(logger.error);
-});
+if (process.env.CF_INSTANCE_INDEX === 0) {
+  schedule.scheduleJob('0 0 * * *', () => {
+    RepositoryVerifier.verifyRepos()
+      .catch(logger.error);
+  });
+}
 
 module.exports = app;
