@@ -178,12 +178,9 @@ const status = ({ accessToken, owner, repo, sha, state, targetURL } = {}) => {
   }
 
   let statusNock = nock('https://api.github.com').post(path, (body) => {
-    if (state && body.state != state) { // eslint-disable-line eqeqeq
-      return false;
-    }
-    if (targetURL && body.target_url !== targetURL) {
-      return false;
-    }
+    if (state && body.state != state) { return false };// eslint-disable-line eqeqeq
+
+    if (targetURL && body.target_url !== targetURL) { return false };
 
     const appEnv = config.app.app_env;
     if (appEnv === 'production' && body.context !== 'federalist/build') {
@@ -277,7 +274,7 @@ const getOrganizationMembers = ({ accessToken, organization, role, per_page, pag
       orgMembers.push({ login: `user-${organization}-${i}`, role: 'member' });
     }
   }
-  if (role !== 'all') { orgMembers = orgMembers.filter(o => o.role === role) }
+  if (role !== 'all') { orgMembers = orgMembers.filter(o => o.role === role) };
 
   return nock('https://api.github.com')
     .get(`/orgs/${organization}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}&role=${role}`)
