@@ -236,6 +236,32 @@ describe('Webhook API', () => {
       }).catch(done);
     });
 
+    it('should respond with a 400 if the site is inactive on Federalist', (done) => {
+      let user;
+      factory.user()
+      .then(model => {
+        user = model;
+        return factory.site({ users: [user], buildStatus: 'inactive' })
+      })
+      .then((site) => {
+        const payload = buildWebhookPayload(user, {
+          owner: site.owner,
+          repository: site.repository,
+        });
+        const signature = signWebhookPayload(payload);
+
+        request(app)
+          .post('/webhook/github')
+          .send(payload)
+          .set({
+            'X-GitHub-Event': 'push',
+            'X-Hub-Signature': signature,
+            'X-GitHub-Delivery': '123abc',
+          })
+          .expect(400, done);
+      }).catch(done);
+    });
+
     it('should respond with a 400 if the signature is invalid', (done) => {
       let site;
       let user;
