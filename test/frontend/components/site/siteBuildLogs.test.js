@@ -45,7 +45,6 @@ describe('<SiteBuildLogs/>', () => {
 
     const wrapper = shallow(<SiteBuildLogs {...props} />);
     expect(wrapper.find('SiteBuildLogTable')).to.have.length(0);
-    // expect(wrapper.find('p')).to.have.length(1);
     expect(wrapper.find('p').contains('This build does not have any build logs.')).to.be.true;
     expect(wrapper.find('RefreshBuildLogsButton')).to.have.length(1);
     expect(wrapper.find('DownloadBuildLogsButton')).to.have.length(0);
@@ -76,7 +75,6 @@ describe('<SiteBuildLogs/>', () => {
 
     it('should default to auto refresh: ON', () => {
       const wrapper = shallow(<SiteBuildLogs {...props} />);
-      console.log(wrapper.html());
       expect(wrapper.state('autoRefresh')).to.equal(true);
       expect(wrapper.find(AUTO_REFRESH_SELECTOR).text()).to.equal('Auto Refresh: ON');
     });
