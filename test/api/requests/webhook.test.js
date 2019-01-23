@@ -21,7 +21,7 @@ describe('Webhook API', () => {
     commits: [{ id: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7' }],
     after: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
     sender: { login: user.username },
-    repository: { full_name: `${site.owner}/${site.repository}`},
+    repository: { full_name: `${site.owner}/${site.repository}` },
   });
 
   describe('POST /webhook/github', () => {
@@ -248,8 +248,7 @@ describe('Webhook API', () => {
             'X-GitHub-Event': 'push',
             'X-Hub-Signature': signature,
             'X-GitHub-Delivery': '123abc',
-          })
-          .expect(400, done);
+          }).expect(400, done);
       }).catch(done);
     });
 
