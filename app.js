@@ -166,7 +166,7 @@ socket.use((_socket, next) => {
   SocketIOSubscriber.joinRooms(_socket);
 });
 
-if (process.env.CF_INSTANCE_INDEX === 0) {
+if (process.env.CF_INSTANCE_INDEX === 0 && config.app.app_env === 'production') {
   // audit federalist-users 18F teams daily at midnight
   schedule.scheduleJob('0 0 * * *', () => {
     FederalistUsersHelper.audit18F({})
