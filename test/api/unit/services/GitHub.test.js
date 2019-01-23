@@ -326,4 +326,59 @@ describe('GitHub', () => {
       .catch(done);
     });
   });
+
+  describe('.getRepositories', () => {
+    it('returns a list of a user repositories', (done) => {
+      const accessToken = 'token';
+
+      githubAPINocks.getRepositories({ accessToken });
+      githubAPINocks.getRepositories({ accessToken, page: 2 });
+      githubAPINocks.getRepositories({ accessToken, page: 3 });
+      GitHub.getRepositories(accessToken)
+        .then((repos) => {
+          expect(repos.length).to.equal(101);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('returns an exception', (done) => {
+      const accessToken = 'invalid';
+
+      GitHub.getRepositories(accessToken)
+        .catch((err) => {
+          expect(err.code).to.exist;
+          done();
+        });
+    });
+  });
+
+  describe('.getCollaborators', () => {
+    it('returns a list of a repo collaborators', (done) => {
+      const accessToken = 'token';
+      const owner = 'owner';
+      const repo = 'repo';
+
+      githubAPINocks.getCollaborators({ accessToken, owner, repo });
+      githubAPINocks.getCollaborators({ accessToken, owner, repo, page: 2 });
+      githubAPINocks.getCollaborators({ accessToken, owner, repo, page: 3 });
+
+      GitHub.getCollaborators(accessToken, owner, repo)
+        .then((collabs) => {
+          expect(collabs.length).to.equal(101);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('returns an exception', (done) => {
+      const accessToken = 'invalid';
+
+      GitHub.getRepositories(accessToken)
+        .catch((err) => {
+          expect(err.code).to.exist;
+          done();
+        });
+    });
+  });
 });

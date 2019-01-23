@@ -84,21 +84,21 @@ const sendCreateGithubStatusRequest = (github, options) =>
   github.repos.createStatus(options);
 
 const getRepositories = (github, page = 1) =>
-  github.repos.list({ org, per_page: 100, page })
+  github.repos.getAll({ per_page: 100, page })
     .then(repos => Promise.resolve(repos.data));
 
 const getNextRepositories = (github, page = 1, allRepos = []) =>
   getRepositories(github, page)
     .then((repos) => {
       if (repos.length > 0) {
-        allRepos = allMembers.concat(repos);  // eslint-disable-line no-param-reassign
+        allRepos = allRepos.concat(repos);  // eslint-disable-line no-param-reassign
         return getNextRepositories(github, page + 1, allRepos);
       }
       return Promise.resolve(allRepos);
     });
 
 const getCollaborators = (github, owner, repo, page = 1) =>
-  github.repos.listCollaborators({owner, repo, per_page: 100, page })
+  github.repos.getCollaborators({owner, repo, per_page: 100, page })
     .then(collabs => Promise.resolve(collabs.data));
 
 const getNextCollaborators = (github, owner, repo, page = 1, allCollabs = []) =>
