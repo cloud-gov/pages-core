@@ -166,7 +166,7 @@ socket.use((_socket, next) => {
   SocketIOSubscriber.joinRooms(_socket);
 });
 
-if (process.env.CF_INSTANCE_INDEX === 0) {
+if (process.env.CF_INSTANCE_INDEX === 0 && config.app.app_env === 'production') {
   schedule.scheduleJob('0 0 * * *', () => {
     RepositoryVerifier.verifyRepos()
       .catch(logger.error);
