@@ -194,6 +194,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    buildStatus: {
+      type: DataTypes.ENUM,
+      values: ['active', 'inactive'],
+      defaultValue: 'active',
+    },
   }, {
     tableName: 'site',
     classMethods: {
