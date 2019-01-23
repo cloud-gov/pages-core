@@ -248,7 +248,8 @@ describe('Webhook API', () => {
             'X-GitHub-Event': 'push',
             'X-Hub-Signature': signature,
             'X-GitHub-Delivery': '123abc',
-          }).expect(400, done);
+          })
+          .expect(400, done);
       }).catch(done);
     });
 
