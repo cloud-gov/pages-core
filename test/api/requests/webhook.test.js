@@ -255,15 +255,13 @@ describe('Webhook API', () => {
 
     it('should respond with a 400 if the signature is invalid', (done) => {
       let site;
-      let user;
 
       factory.site()
         .then(s => Site.findById(s.id, { include: [User] }))
         .then((model) => {
           site = model;
-          user = site.Users[0];
 
-          const payload = buildWebhookPayload(user, site);
+          const payload = buildWebhookPayload(site.Users[0], site);
           const signature = '123abc';
 
           request(app)
