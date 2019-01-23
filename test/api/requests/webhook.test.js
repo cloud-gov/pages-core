@@ -18,26 +18,17 @@ describe('Webhook API', () => {
 
   const buildWebhookPayload = (user, site) => ({
     ref: 'refs/heads/master',
-    commits: [{
-      id: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
-    }],
+    commits: [{ id: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7' }],
     after: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
-    sender: {
-      login: user.username,
-    },
-    repository: {
-      full_name: `${site.owner}/${site.repository}`,
-    },
+    sender: { login: user.username },
+    repository: { full_name: `${site.owner}/${site.repository}`},
   });
 
   describe('POST /webhook/github', () => {
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.status();
-      githubAPINocks.repo({
-        response: [201, {
-          permissions: { admin: false },
-        }],
+      githubAPINocks.repo({ response: [201, { permissions: { admin: false } }],
       });
     });
 
@@ -239,9 +230,9 @@ describe('Webhook API', () => {
     it('should respond with a 400 if the site is inactive on Federalist', (done) => {
       let user;
       factory.user()
-      .then(model => {
+      .then((model) => {
         user = model;
-        return factory.site({ users: [user], buildStatus: 'inactive' })
+        return factory.site({ users: [user], buildStatus: 'inactive' });
       })
       .then((site) => {
         const payload = buildWebhookPayload(user, {
