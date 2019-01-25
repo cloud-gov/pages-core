@@ -82,16 +82,6 @@ $image-path: '../../node_modules/uswds/src/img';
   margin-left: 2em;
 }
 
-.usa-grid.site:before {
-  bottom: 0;
-  content: '';
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 50%;
-  z-index: -1;
-}
-
 @media screen and (max-width: $mobile-size) {
   .flex-center {
     align-items: center;
