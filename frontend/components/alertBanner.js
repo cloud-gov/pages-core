@@ -26,6 +26,8 @@ const AlertBanner = ({ children, header, message, status, alertRole }) => {
     return null;
   }
 
+  const msg = status === 'error' ? 'We are experiencing a problem, please refresh the page in a few moments. If this error persists, please contact us.' : message;
+
   return (
     <div
       className={`usa-alert usa-alert-${status}`}
@@ -34,7 +36,7 @@ const AlertBanner = ({ children, header, message, status, alertRole }) => {
       <div className="usa-alert-body">
         { renderHeader(header) }
         <p className="usa-alert-text">
-          { message }
+          { msg }
         </p>
         { children }
       </div>

@@ -18,7 +18,7 @@ export default function buildLogs(state = initialState, action) {
     case BUILD_LOGS_RECEIVED:
       return {
         isLoading: false,
-        data: state.data.concat(action.logs),
+        data: action.logs ? state.data.concat(action.logs) : [],
       };
     default:
       return state;
