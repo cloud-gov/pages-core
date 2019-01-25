@@ -36,16 +36,17 @@ $image-path: '../../node_modules/uswds/src/img';
 @import "template-items";
 @import "_footer";
 
-html,
-body,
-main,
-.usa-grid.site,
-div[data-reactroot=''] {
-  height: 100%;
+.body {
+  display: flex;
+  flex-flow: column nowrap;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
 }
 
 .usa-grid.site {
-  height: 100vh;
   padding-left: 0;
   padding-right: 0;
 }
@@ -53,8 +54,6 @@ div[data-reactroot=''] {
 #js-app {
   max-width: 1040px;
   margin: 0 auto;
-  margin-bottom: $spacing-xxl;
-  min-height: 100%;
 }
 
 .main-loader {
@@ -66,7 +65,6 @@ div[data-reactroot=''] {
 
 .site-main {
   background-color: white;
-  min-height: 100%;
   padding-bottom: 5rem;
 }
 
@@ -84,7 +82,7 @@ div[data-reactroot=''] {
   left: 0;
   position: fixed;
   top: 0;
-  width: 50%;
+  width: 18%;
   z-index: -1;
 }
 
