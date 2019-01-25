@@ -47,13 +47,18 @@ $image-path: '../../node_modules/uswds/src/img';
 }
 
 .usa-grid.site {
+  height: inherit;
   padding-left: 0;
   padding-right: 0;
 }
 
 #js-app {
+  height: 100%;
   max-width: 1040px;
   margin: 0 auto;
+  > [data-reactroot] {
+    height: inherit;
+  }
 }
 
 .main-loader {
@@ -65,6 +70,7 @@ $image-path: '../../node_modules/uswds/src/img';
 
 .site-main {
   background-color: white;
+  height: inherit;
   padding-bottom: 5rem;
 }
 
@@ -82,7 +88,7 @@ $image-path: '../../node_modules/uswds/src/img';
   left: 0;
   position: fixed;
   top: 0;
-  width: 18%;
+  width: 50%;
   z-index: -1;
 }
 
