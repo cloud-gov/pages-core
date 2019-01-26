@@ -1,6 +1,11 @@
 .log-tools {
-  float: right;
+  display: flex;
+  justify-content: flex-end;
   text-align: right;
+
+  a {
+    display: block;
+  }
 
   :last-child {
     margin-right: 0;

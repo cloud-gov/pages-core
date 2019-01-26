@@ -134,3 +134,14 @@ $image-path: '../../node_modules/uswds/src/img';
     display: none;
   }
 }
+
+.table-container {
+  overflow-x: scroll;
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}

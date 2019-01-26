@@ -120,12 +120,12 @@ class SiteBuilds extends React.Component {
             >
               Auto Refresh: <b>{autoRefresh ? 'ON' : 'OFF'}</b>
             </a>
+            <RefreshBuildsButton site={site} />
           </div>
-          <RefreshBuildsButton site={site} />
         </div>
         { builds.isLoading ?
           <LoadingIndicator /> :
-          <div>
+          <div className="table-container">
             <table
               className="usa-table-borderless log-table log-table__site-builds table-full-width"
             >
@@ -157,13 +157,14 @@ class SiteBuilds extends React.Component {
 
                   return (
                     <tr key={build.id}>
-                      <th scope="row">
-                        { build.branch }
+                      <td scope="row">
+                        <div className="truncate">
+                          { build.branch }
+                        </div>
                         { SiteBuilds.commitLink(build) }
-                        { previewBuilds[build.branch] === build.id && <br /> }
                         { previewBuilds[build.branch] === build.id &&
                         <BranchViewLink branchName={build.branch} site={site} showIcon /> }
-                      </th>
+                      </td>
                       <td>{ SiteBuilds.getUsername(build) }</td>
                       <td>{ timeFrom(build.completedAt) }</td>
                       <td>{ duration(build.createdAt, build.completedAt) }</td>
