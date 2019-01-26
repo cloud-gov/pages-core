@@ -157,14 +157,14 @@ class SiteBuilds extends React.Component {
 
                   return (
                     <tr key={build.id}>
-                      <td scope="row">
+                      <th scope="row">
                         <div className="truncate">
                           { build.branch }
                         </div>
                         { SiteBuilds.commitLink(build) }
                         { previewBuilds[build.branch] === build.id &&
                         <BranchViewLink branchName={build.branch} site={site} showIcon /> }
-                      </td>
+                      </th>
                       <td>{ SiteBuilds.getUsername(build) }</td>
                       <td>{ timeFrom(build.completedAt) }</td>
                       <td>{ duration(build.createdAt, build.completedAt) }</td>
