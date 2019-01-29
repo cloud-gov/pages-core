@@ -26,7 +26,7 @@ const AlertBanner = ({ children, header, message, status, alertRole }) => {
     return null;
   }
 
-  const errorMsg =
+  const errorMsg = (
     <span>
       We are experiencing an unexpected problem, please wait a few moments and try the following:
       <ol>
@@ -34,7 +34,7 @@ const AlertBanner = ({ children, header, message, status, alertRole }) => {
         <li>log out and back in to your account</li>
       </ol>
       If this error persists, please contact us, we apologize for the inconvenience.
-    </span>
+  </span>);
 
   const msg = status === 'error' ? errorMsg : message;
 
