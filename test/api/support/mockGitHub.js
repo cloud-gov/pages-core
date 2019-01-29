@@ -25,7 +25,6 @@ function getCollaborators(githubAccessToken, owner, repo, size = 10) {
   return Promise.resolve(members);
 }
 
-
 module.exports = {
   getCollaborators,
   getRepositories,

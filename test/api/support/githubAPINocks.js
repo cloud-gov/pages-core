@@ -268,7 +268,7 @@ const getRepositories = ({ accessToken, per_page, page, response }) => {
   page = page || 1;
   /* eslint-enable no-param-reassign */
 
-  let repos = [];
+  const repos = [];
   for (let i = 0; i < (per_page + 1); i += 1) {
     repos.push({ full_name: `owner/repo-${i}`, permissions: { push: true } });
   }
@@ -278,22 +278,22 @@ const getRepositories = ({ accessToken, per_page, page, response }) => {
     .reply(response || 200, repos.slice(((page - 1) * per_page), (page * per_page)));
 };
 
-const getCollaborators = ({ accessToken, owner, repo, per_page, page, response }) => {
+const getCollaborators = ({ accessToken, owner, repository, per_page, page, response }) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   per_page = per_page || 100;
   page = page || 1;
   owner = owner || 'owner';
-  repo = repo || 'repo';
+  repository = repository || 'repo';
   /* eslint-enable no-param-reassign */
 
-  let collabs = [];
+  const collabs = [];
   for (let i = 0; i < (per_page + 1); i += 1) {
     collabs.push({ login: `collaborator-${i}`, permissions: { push: true } });
   }
 
   return nock('https://api.github.com')
-    .get(`/repos/${owner}/${repo}/collaborators?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
+    .get(`/repos/${owner}/${repository}/collaborators?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
     .reply(response || 200, collabs.slice(((page - 1) * per_page), (page * per_page)));
 };
 module.exports = {

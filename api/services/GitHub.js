@@ -98,7 +98,7 @@ const getNextRepositories = (github, page = 1, allRepos = []) =>
     });
 
 const getCollaborators = (github, owner, repo, page = 1) =>
-  github.repos.getCollaborators({owner, repo, per_page: 100, page })
+  github.repos.getCollaborators({ owner, repo, per_page: 100, page })
     .then(collabs => Promise.resolve(collabs.data));
 
 const getNextCollaborators = (github, owner, repo, page = 1, allCollabs = []) =>
@@ -197,7 +197,7 @@ module.exports = {
     githubClient(accessToken)
       .then(github => sendCreateGithubStatusRequest(github, options)),
 
-  getRepositories: (accessToken) =>
+  getRepositories: accessToken =>
     githubClient(accessToken)
       .then(github => getNextRepositories(github)),
 

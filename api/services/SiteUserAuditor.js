@@ -2,20 +2,20 @@ const logger = require('winston');
 const { User, Site, SiteUser } = require('../models');
 const GitHub = require('./GitHub');
 
-const auditUser = (user) =>
+const auditUser = user =>
   GitHub.getRepositories(user.githubAccessToken)
     .then((repos) => {
       const removed = [];
-      user.Sites.forEach(site => {
+      user.Sites.forEach((site) => {
         const fullName = [site.owner, site.repository].join('/').toUpperCase();
-        if (!(repos.find(repo => repo.full_name.toUpperCase() === fullName)) || //site not in repos
+        if (!(repos.find(repo => repo.full_name.toUpperCase() === fullName)) || // site not in repos
           (repos.find(repo => repo.full_name.toUpperCase() === fullName &&
-          !repo.permissions.push))) { //site does not have push permissions
-            removed.push(SiteUser.destroy({ where: { user_sites: user.id, site_users: site.id }}));
+          !repo.permissions.push))) { // site does not have push permissions
+          removed.push(SiteUser.destroy({ where: { user_sites: user.id, site_users: site.id } }));
         }
       });
       return Promise.all(removed);
-    })
+    });
 
 const auditAllUsers = () =>
   User.findAll({
@@ -31,7 +31,7 @@ const auditAllUsers = () =>
     const auditedUsers = [];
     users.forEach(user => auditedUsers.push(auditUser(user)));
     return Promise.all(auditedUsers);
-  })
+  });
 
 const auditSite = (site, userIndex = 0) => {
   let collaborators;
@@ -45,11 +45,10 @@ const auditSite = (site, userIndex = 0) => {
     .catch(logger.warn)
     .then(() => {
       if (collaborators && collaborators.length > 0) {
-        const removed = [];
-        const push_collabs = collaborators.filter(c => c.permissions.push).map(c => c.login);
-        const usersToRemove = site.Users.filter(u => !push_collabs.includes(u.username));
-        return SiteUser.destroy({ 
-          where: { user_sites: usersToRemove.map(u => u.id), site_users: site.id }
+        const pushCollabs = collaborators.filter(c => c.permissions.push).map(c => c.login);
+        const usersToRemove = site.Users.filter(u => !pushCollabs.includes(u.username));
+        return SiteUser.destroy({
+          where: { user_sites: usersToRemove.map(u => u.id), site_users: site.id },
         });
       }
       return auditSite(site, userIndex + 1);
@@ -58,7 +57,7 @@ const auditSite = (site, userIndex = 0) => {
 
 const auditAllSites = () =>
   Site.findAll({
-    attributes: ['id', 'owner','repository'],
+    attributes: ['id', 'owner', 'repository'],
     include: [{
       model: User.scope('withGithub'),
       attributes: ['id', 'username', 'githubAccessToken', 'signedInAt'],
@@ -69,6 +68,6 @@ const auditAllSites = () =>
     const auditedSites = [];
     sites.forEach(site => auditedSites.push(auditSite(site)));
     return Promise.all(auditedSites);
-  })
+  });
 
 module.exports = { auditAllUsers, auditAllSites };

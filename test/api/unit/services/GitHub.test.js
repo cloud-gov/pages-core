@@ -357,13 +357,13 @@ describe('GitHub', () => {
     it('returns a list of a repo collaborators', (done) => {
       const accessToken = 'token';
       const owner = 'owner';
-      const repo = 'repo';
+      const repository = 'repo';
 
-      githubAPINocks.getCollaborators({ accessToken, owner, repo });
-      githubAPINocks.getCollaborators({ accessToken, owner, repo, page: 2 });
-      githubAPINocks.getCollaborators({ accessToken, owner, repo, page: 3 });
+      githubAPINocks.getCollaborators({ accessToken, owner, repository });
+      githubAPINocks.getCollaborators({ accessToken, owner, repository, page: 2 });
+      githubAPINocks.getCollaborators({ accessToken, owner, repository, page: 3 });
 
-      GitHub.getCollaborators(accessToken, owner, repo)
+      GitHub.getCollaborators(accessToken, owner, repository)
         .then((collabs) => {
           expect(collabs.length).to.equal(101);
           done();
