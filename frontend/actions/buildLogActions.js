@@ -18,7 +18,7 @@ const fetchNextBuildLogsPage = (build, page) =>
   api.fetchBuildLogs(build, page)
   .then((buildLogs) => {
     dispatchBuildLogsReceivedAction(buildLogs);
-    if (buildLogs.length > 0) {
+    if (buildLogs && buildLogs.length > 0) {
       return fetchNextBuildLogsPage(build, page + 1);
     }
     return Promise.resolve();
