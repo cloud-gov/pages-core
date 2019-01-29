@@ -7,29 +7,31 @@ const auditUser = (user) =>
     .then((repos) => {
       const removed = [];
       user.Sites.forEach(site => {
-        const fullName = [site.owner, site.repository].join('/');
-        if (repos.find(repo => repo.full_name === fullName && !repo.permissions.push)) {
-          removed.push(SiteUser.destroy({ where: { user_sites: user.id, site_users: site.id }}));
+        const fullName = [site.owner, site.repository].join('/').toUpperCase();
+        if (!(repos.find(repo => repo.full_name.toUpperCase() === fullName)) || //site not in repos
+          (repos.find(repo => repo.full_name.toUpperCase() === fullName &&
+          !repo.permissions.push))) { //site does not have push permissions
+            removed.push(SiteUser.destroy({ where: { user_sites: user.id, site_users: site.id }}));
         }
       });
       return Promise.all(removed);
-    });
+    })
 
 const auditAllUsers = () =>
   User.findAll({
-    attributes: ['username', 'githubAccessToken', 'signedInAt'],
+    attributes: ['id', 'username', 'githubAccessToken', 'signedInAt'],
     where: {
       githubAccessToken: { $ne: null },
       signedInAt: { $ne: null },
     },
     order: [['signedInAt', 'DESC']],
-    include: [{ model: Site, attributes: ['owner', 'repository'] }],
+    include: [{ model: Site, attributes: ['id', 'owner', 'repository'] }],
   })
   .then((users) => {
     const auditedUsers = [];
-    users.forEach(user => auditedUsers.push(auditSiteUsers(user)));
-    return Promise.all(auditUser);
-  });
+    users.forEach(user => auditedUsers.push(auditUser(user)));
+    return Promise.all(auditedUsers);
+  })
 
 const auditSite = (site, userIndex = 0) => {
   let collaborators;
@@ -40,35 +42,33 @@ const auditSite = (site, userIndex = 0) => {
     .then((collabs) => {
       collaborators = collabs;
     })
-    .catch(logger.warn(e))
+    .catch(logger.warn)
     .then(() => {
       if (collaborators && collaborators.length > 0) {
         const removed = [];
         const push_collabs = collaborators.filter(c => c.permissions.push).map(c => c.login);
         const usersToRemove = site.Users.filter(u => !push_collabs.includes(u.username));
-        // usersToRemove.forEach(u => 
-        //   removed.push(SiteUser.destroy({ where: { user_sites: u.id, site_users: site.id }})));
-        // return Promise.all(removed);
         return SiteUser.destroy({ 
           where: { user_sites: usersToRemove.map(u => u.id), site_users: site.id }
         });
       }
       return auditSite(site, userIndex + 1);
     });
-}
+};
 
 const auditAllSites = () =>
   Site.findAll({
-    attributes: ['owner','repository']
-    include: [{ model: User.scope('withGithub'), attributes: ['username', 'githubAccessToken', 'signedInAt']],
-    order: [
-      [User, 'signedInAt', 'DESC'],
-    ],
+    attributes: ['id', 'owner','repository'],
+    include: [{
+      model: User.scope('withGithub'),
+      attributes: ['id', 'username', 'githubAccessToken', 'signedInAt'],
+    }],
+    order: [[User, 'signedInAt', 'DESC']],
   })
-    .then((sites) => {
-      const auditedSites = [];
-      sites.forEach(site => auditedSites.push(auditSite(site)));
-      return Promise.all(auditedSites);
-    })
+  .then((sites) => {
+    const auditedSites = [];
+    sites.forEach(site => auditedSites.push(auditSite(site)));
+    return Promise.all(auditedSites);
+  })
 
-module.exports = { auditAllUsers };
+module.exports = { auditAllUsers, auditAllSites };
