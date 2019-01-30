@@ -197,6 +197,11 @@ module.exports = (sequelize, DataTypes) => {
     repoLastVerified: {
       type: DataTypes.DATE,
     },
+    buildStatus: {
+      type: DataTypes.ENUM,
+      values: ['active', 'inactive'],
+      defaultValue: 'active',
+    },
   }, {
     tableName: 'site',
     classMethods: {
