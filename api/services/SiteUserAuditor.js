@@ -54,9 +54,12 @@ const auditSite = (site, userIndex = 0) => {
       if (collaborators && collaborators.length > 0) {
         const pushCollabs = collaborators.filter(c => c.permissions.push).map(c => c.login);
         const usersToRemove = site.Users.filter(u => !pushCollabs.includes(u.username));
-        return SiteUser.destroy({
-          where: { user_sites: usersToRemove.map(u => u.id), site_users: site.id },
-        });
+        if (usersToRemove.length > 0) {
+          return SiteUser.destroy({
+            where: { user_sites: usersToRemove.map(u => u.id), site_users: site.id },
+          });
+        }
+        return Promise.resolve();
       }
       return auditSite(site, userIndex + 1);
     })
