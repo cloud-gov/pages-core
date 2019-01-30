@@ -2,7 +2,7 @@ const logger = require('winston');
 const { User, Site, SiteUser } = require('../models');
 const GitHub = require('./GitHub');
 
-const auditUser = user => {
+const auditUser = (user) => {
   let repos;
   return GitHub.getRepositories(user.githubAccessToken)
     .then((_repos) => {
@@ -22,7 +22,7 @@ const auditUser = user => {
       return Promise.all(removed);
     })
     .catch(logger.error);
-}
+};
 
 const auditAllUsers = () =>
   User.findAll({
