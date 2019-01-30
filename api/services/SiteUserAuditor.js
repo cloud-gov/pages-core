@@ -2,11 +2,16 @@ const logger = require('winston');
 const { User, Site, SiteUser } = require('../models');
 const GitHub = require('./GitHub');
 
-const auditUser = user =>
-  GitHub.getRepositories(user.githubAccessToken)
-    .then((repos) => {
+const auditUser = user => {
+  let repos;
+  return GitHub.getRepositories(user.githubAccessToken)
+    .then((_repos) => {
+      repos = _repos;
+      return user.getSites();
+    })
+    .then((sites) => {
       const removed = [];
-      user.Sites.forEach((site) => {
+      sites.forEach((site) => {
         const fullName = [site.owner, site.repository].join('/').toUpperCase();
         if (!(repos.find(repo => repo.full_name.toUpperCase() === fullName)) || // site not in repos
           (repos.find(repo => repo.full_name.toUpperCase() === fullName &&
@@ -15,7 +20,9 @@ const auditUser = user =>
         }
       });
       return Promise.all(removed);
-    });
+    })
+    .catch(logger.error);
+}
 
 const auditAllUsers = () =>
   User.findAll({
@@ -25,7 +32,7 @@ const auditAllUsers = () =>
       signedInAt: { $ne: null },
     },
     order: [['signedInAt', 'DESC']],
-    include: [{ model: Site, attributes: ['id', 'owner', 'repository'] }],
+    // include: [{ model: Site, attributes: ['id', 'owner', 'repository'] }],
   })
   .then((users) => {
     const auditedUsers = [];
@@ -52,7 +59,8 @@ const auditSite = (site, userIndex = 0) => {
         });
       }
       return auditSite(site, userIndex + 1);
-    });
+    })
+    .catch(logger.error);
 };
 
 const auditAllSites = () =>
@@ -70,4 +78,4 @@ const auditAllSites = () =>
     return Promise.all(auditedSites);
   });
 
-module.exports = { auditAllUsers, auditAllSites };
+module.exports = { auditAllUsers, auditAllSites, auditUser };
