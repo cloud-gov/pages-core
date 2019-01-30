@@ -66,6 +66,9 @@ describe('SiteUserAuditor', () => {
         .then(siteUsers => Promise.resolve(expect(siteUsers.length).to.eql(12)))
         .then(() => SiteUserAuditor.auditAllSites())
         .then(() => SiteUser.findAll({ where: { site_users: site.id } }))
+        .then(siteUsers => expect(siteUsers.length).to.eql(9))
+        .then(() => SiteUserAuditor.auditAllSites())
+        .then(() => SiteUser.findAll({ where: { site_users: site.id } }))
         .then((siteUsers) => {
           expect(siteUsers.length).to.eql(9);
           done();
