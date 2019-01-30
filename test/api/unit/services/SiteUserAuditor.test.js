@@ -52,7 +52,7 @@ describe('SiteUserAuditor', () => {
       MockGitHub.getCollaborators('githubAccessToken', owner, repository)
         .then((collabos) => {
           const users = [];
-          const signedInAt =  new Date('2011-01-30');
+          const signedInAt = new Date('2011-01-30');
           collabos.forEach(c => users.push(factory.user({ username: c.login, signedInAt })));
           users.push(factory.user({ username: 'non-collab1', githubAccessToken: 'reject' }));
           users.push(factory.user({ username: 'non-collab2', signedInAt }));
