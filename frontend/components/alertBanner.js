@@ -26,6 +26,18 @@ const AlertBanner = ({ children, header, message, status, alertRole }) => {
     return null;
   }
 
+  const errorMsg = (
+    <span>
+      We are experiencing an unexpected problem, please wait a few moments and try the following:
+      <ol>
+        <li>refresh the page</li>
+        <li>log out and back in to your account</li>
+      </ol>
+      If this error persists, please contact us, we apologize for the inconvenience.
+  </span>);
+
+  const msg = status === 'error' ? errorMsg : message;
+
   return (
     <div
       className={`usa-alert usa-alert-${status}`}
@@ -34,7 +46,7 @@ const AlertBanner = ({ children, header, message, status, alertRole }) => {
       <div className="usa-alert-body">
         { renderHeader(header) }
         <p className="usa-alert-text">
-          { message }
+          { msg }
         </p>
         { children }
       </div>
