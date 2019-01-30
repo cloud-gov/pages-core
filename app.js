@@ -169,7 +169,7 @@ socket.use((_socket, next) => {
 if (process.env.CF_INSTANCE_INDEX === 0 && config.app.app_env === 'production') {
   // audit users and remove sites w/o repo push permissions
   schedule.scheduleJob('0 0 * * *', () => {
-    SiteUserAuditor.auditAllUsers()
+    SiteUserAuditor.auditAllSites()
       .catch(logger.error);
   });
 }
