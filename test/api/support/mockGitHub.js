@@ -13,6 +13,7 @@ function getRepositories(githubAccessToken, size = 10) {
 }
 
 function getCollaborators(githubAccessToken, owner, repo, size = 10) {
+  if (githubAccessToken === 'reject') { return Promise.reject(); }
   const members = [];
   let i;
   for (i = 0; i < size; i += 1) {

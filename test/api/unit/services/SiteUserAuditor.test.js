@@ -50,10 +50,12 @@ describe('SiteUserAuditor', () => {
       const repository = 'repo';
 
       MockGitHub.getCollaborators('githubAccessToken', owner, repository)
-        .then((collaborators) => {
+        .then((collabos) => {
           const users = [];
-          collaborators.forEach(collab => users.push(factory.user({ username: collab.login })));
-          users.push(factory.user({ username: 'non-collab' }));
+          const signedInAt =  new Date('2011-01-30');
+          collabos.forEach(c => users.push(factory.user({ username: c.login, signedInAt })));
+          users.push(factory.user({ username: 'non-collab1', githubAccessToken: 'reject' }));
+          users.push(factory.user({ username: 'non-collab2', signedInAt }));
           return Promise.all(users);
         })
         .then(users => factory.site({ owner, repository, users }))
@@ -61,7 +63,7 @@ describe('SiteUserAuditor', () => {
           site = model;
           return SiteUser.findAll({ where: { site_users: site.id } });
         })
-        .then(siteUsers => Promise.resolve(expect(siteUsers.length).to.eql(11)))
+        .then(siteUsers => Promise.resolve(expect(siteUsers.length).to.eql(12)))
         .then(() => SiteUserAuditor.auditAllSites())
         .then(() => SiteUser.findAll({ where: { site_users: site.id } }))
         .then((siteUsers) => {
