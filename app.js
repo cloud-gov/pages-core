@@ -38,6 +38,11 @@ const SocketIOSubscriber = require('./api/services/SocketIOSubscriber');
 const jwtHelper = require('./api/services/jwtHelper');
 const SiteUserAuditor = require('./api/services/SiteUserAuditor');
 
+const webpack = require('webpack');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+const webpackConfig = require('./webpack.development.config.js');
+const compiler = webpack(webpackConfig);
+
 const app = express();
 const sequelize = require('./api/models').sequelize;
 
@@ -62,6 +67,12 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static('public'));
+
+const wdm = webpackDevMiddleware(compiler, {
+  publicPath: webpackConfig.output.publicPath,
+});
+
+app.use(wdm);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: '2mb' }));

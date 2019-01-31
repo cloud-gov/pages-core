@@ -1,31 +1,15 @@
-// import path from 'path';
-
-// import webpack from 'webpack';
-// import autoprefixer from 'autoprefixer';
-// import ExtractTextPlugin from 'extract-text-webpack-plugin';
-// import ManifestPlugin from 'webpack-manifest-plugin';
-// import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-
 const path = require('path');
-
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const ManifestPlugin = require('webpack-manifest-plugin');
-// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 // export default {
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: './frontend/main.jsx',
-  devtool: 'inline-source-map',
-  devServer: {
-    contentBase: './dist',
-  },
   output: {
     filename: 'bundle.[hash].js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/dist/',
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -45,7 +29,6 @@ module.exports = {
           {
             loader: 'postcss-loader',
             options: {
-              sourceMap: true,
               plugins: [autoprefixer],
             },
           },
@@ -86,17 +69,9 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'styles.[contenthash].css',
     }),
-    new ManifestPlugin({ fileName: '../webpack-manifest.json' }),
     // When webpack bundles moment, it includes all of its locale files,
     // which we don't need, so we'll use this plugin to keep them out of the
     // bundle
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    // Generate a webpack-bundle-analyzer stats file (in public/stats.json)
-    // It can be viewed by running `yarn analyze-webpack`
-    // new BundleAnalyzerPlugin({
-    //   analyzerMode: 'disabled',
-    //   openAnalyzer: false,
-    //   generateStatsFile: true,
-    // }),
   ],
 };
