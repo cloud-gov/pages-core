@@ -327,7 +327,7 @@ describe('GitHub', () => {
     });
   });
 
-    describe('.getRepositories', () => {
+  describe('.getRepositories', () => {
     it('returns a list of a user repositories', (done) => {
       const accessToken = 'token';
 

@@ -298,7 +298,6 @@ const getTeamMembers = ({ accessToken, team_id, per_page, page, response } = {})
     .get(`/teams/${team_id}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
     .reply(response || 200, teamMembers.slice(((page - 1) * per_page), page * per_page));
 };
-/* eslint-enable camelcase */
 
 const getRepositories = ({ accessToken, per_page, page, response }) => {
   /* eslint-disable no-param-reassign */
@@ -335,6 +334,7 @@ const getCollaborators = ({ accessToken, owner, repository, per_page, page, resp
     .get(`/repos/${owner}/${repository}/collaborators?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
     .reply(response || 200, collabs.slice(((page - 1) * per_page), (page * per_page)));
 };
+/* eslint-enable camelcase */
 
 module.exports = {
   getAccessToken,
