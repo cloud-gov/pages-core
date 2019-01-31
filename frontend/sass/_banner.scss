@@ -1,8 +1,8 @@
 .usa-banner {
-  background-color: $color-gray-dark;
-  color: $white;
-  font-size: $base-font-size;
-  padding: $spacing-sm 0 0 0;
+  background-color: #f1f1f1;
+  color: black;
+  font-size: 12px;
+  padding: 0;
 }
 
 .usa-banner-header {
@@ -10,7 +10,7 @@
 
   p {
     display: inline-block;
-    margin-top: -5px;
+//    margin-top: -5px;
     vertical-align: initial;
     -webkit-font-smoothing: antialiased;
 
@@ -20,9 +20,9 @@
   }
 
   img {
-    float: left;
+//    float: left;
     margin-right: 1rem;
-    margin-top: 1px;
+    margin-top: 3px;
     width: initial;
 
     @media screen and (min-width: $lesser-mobile-size) {
@@ -30,4 +30,17 @@
       width: initial;
     }
   }
+  
+  
+  .usa-banner-inner{
+    line-height: 0.5;
+    padding: 3px 30px 3px;
+    
+    .x-small{
+      padding: 0;
+      margin: 0;
+      font-size: 1.2rem !important;
+    }
+  }
+  
 }

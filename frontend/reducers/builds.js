@@ -19,7 +19,7 @@ export default function builds(state = initialState, action) {
     case BUILDS_RECEIVED:
       return {
         isLoading: false,
-        data: action.builds,
+        data: action.builds || [],
       };
     case BUILD_RESTARTED:
       return {

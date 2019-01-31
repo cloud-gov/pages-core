@@ -9,7 +9,6 @@ const { authenticatedSession, unauthenticatedSession } = require('../support/ses
 const { sessionForCookie } = require('../support/cookieSession');
 const { User } = require('../../../api/models');
 
-
 describe('Authentication request', () => {
   describe('GET /auth/github', () => {
     it('should redirect to GitHub for OAuth2 authentication', (done) => {
@@ -24,7 +23,7 @@ describe('Authentication request', () => {
         request(app)
           .get('/auth/github')
           .set('Cookie', cookie)
-          .expect('Location', '/')
+          .expect('Location', 'http://localhost:4000')
           .expect(302, done);
       });
     });
@@ -52,7 +51,7 @@ describe('Authentication request', () => {
         return request(app)
           .get('/logout')
           .set('Cookie', cookie)
-          .expect('Location', '/')
+          .expect('Location', 'http://localhost:4000')
           .expect(302);
       })
       .then(() => sessionForCookie(cookie))
@@ -66,7 +65,7 @@ describe('Authentication request', () => {
     it('should redirect to the root URL for an unauthenticated user', (done) => {
       request(app)
         .get('/logout')
-        .expect('Location', '/')
+        .expect('Location', 'http://localhost:4000')
         .expect(302, done);
     });
   });

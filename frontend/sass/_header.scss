@@ -19,7 +19,7 @@
   background-color: $header-bg-color;
   border-bottom: none;
   min-height: 4rem;
-  padding: $spacing-med 0 $spacing-med 0;
+  padding: $spacing-thin 0 $spacing-thin 0;
 
   .usa-logo {
     margin-top: 5px;
@@ -46,7 +46,7 @@
   li {
     .usa-nav-link {
       color: $white;
-      font-size: 1.125em;
+      font-size: 1.5rem;
       font-weight: $font-weight-normal;
       &:visited {
         color: $white;
@@ -66,7 +66,8 @@
 
     a {
       @media screen and (min-width: 951px) {
-        padding: 0 15px 0 15px;
+        padding: 0;
+        padding-left: 1.8rem;
       }
     }
   }

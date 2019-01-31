@@ -115,6 +115,34 @@ const getNextTeamMembers = (github, team_id, page = 1, allMembers = []) =>
 const removeOrganizationMember = (github, org, username) =>
   github.orgs.removeMember({ org, username });
 
+const getRepositories = (github, page = 1) =>
+  github.repos.getAll({ per_page: 100, page })
+    .then(repos => Promise.resolve(repos.data));
+
+const getNextRepositories = (github, page = 1, allRepos = []) =>
+  getRepositories(github, page)
+    .then((repos) => {
+      if (repos.length > 0) {
+        allRepos = allRepos.concat(repos);  // eslint-disable-line no-param-reassign
+        return getNextRepositories(github, page + 1, allRepos);
+      }
+      return Promise.resolve(allRepos);
+    });
+
+const getCollaborators = (github, owner, repo, page = 1) =>
+  github.repos.getCollaborators({ owner, repo, per_page: 100, page })
+    .then(collabs => Promise.resolve(collabs.data));
+
+const getNextCollaborators = (github, owner, repo, page = 1, allCollabs = []) =>
+  getCollaborators(github, owner, repo, page)
+    .then((collabs) => {
+      if (collabs.length > 0) {
+        allCollabs = allCollabs.concat(collabs);  // eslint-disable-line no-param-reassign
+        return getNextCollaborators(github, owner, repo, page + 1, allCollabs);
+      }
+      return Promise.resolve(allCollabs);
+    });
+
 module.exports = {
   checkPermissions: (user, owner, repo) =>
     githubClient(user.githubAccessToken)
@@ -218,4 +246,12 @@ module.exports = {
         }
         throw err;
       }),
+
+  getRepositories: accessToken =>
+    githubClient(accessToken)
+      .then(github => getNextRepositories(github)),
+
+  getCollaborators: (accessToken, owner, repo) =>
+    githubClient(accessToken)
+      .then(github => getNextCollaborators(github, owner, repo)),
 };

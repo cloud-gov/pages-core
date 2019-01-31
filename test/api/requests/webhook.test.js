@@ -18,26 +18,17 @@ describe('Webhook API', () => {
 
   const buildWebhookPayload = (user, site) => ({
     ref: 'refs/heads/master',
-    commits: [{
-      id: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
-    }],
+    commits: [{ id: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7' }],
     after: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
-    sender: {
-      login: user.username,
-    },
-    repository: {
-      full_name: `${site.owner}/${site.repository}`,
-    },
+    sender: { login: user.username },
+    repository: { full_name: `${site.owner}/${site.repository}` },
   });
 
   describe('POST /webhook/github', () => {
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.status();
-      githubAPINocks.repo({
-        response: [201, {
-          permissions: { admin: false },
-        }],
+      githubAPINocks.repo({ response: [201, { permissions: { admin: false } }],
       });
     });
 
@@ -236,17 +227,41 @@ describe('Webhook API', () => {
       }).catch(done);
     });
 
+    it('should respond with a 400 if the site is inactive on Federalist', (done) => {
+      let user;
+      factory.user()
+      .then((model) => {
+        user = model;
+        return factory.site({ users: [user], buildStatus: 'inactive' });
+      })
+      .then((site) => {
+        const payload = buildWebhookPayload(user, {
+          owner: site.owner,
+          repository: site.repository,
+        });
+        const signature = signWebhookPayload(payload);
+
+        request(app)
+          .post('/webhook/github')
+          .send(payload)
+          .set({
+            'X-GitHub-Event': 'push',
+            'X-Hub-Signature': signature,
+            'X-GitHub-Delivery': '123abc',
+          })
+          .expect(400, done);
+      }).catch(done);
+    });
+
     it('should respond with a 400 if the signature is invalid', (done) => {
       let site;
-      let user;
 
       factory.site()
         .then(s => Site.findById(s.id, { include: [User] }))
         .then((model) => {
           site = model;
-          user = site.Users[0];
 
-          const payload = buildWebhookPayload(user, site);
+          const payload = buildWebhookPayload(site.Users[0], site);
           const signature = '123abc';
 
           request(app)

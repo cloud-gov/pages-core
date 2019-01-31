@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 
 import { IconView } from '../icons';
 import PublishedState from './publishedState';
+import RepoLastVerified from './repoLastVerified';
 import GitHubLink from '../GitHubLink';
 
 function getViewLink(viewLink, repo) {
@@ -28,6 +29,7 @@ const SiteListItem = ({ site }) =>
         </Link>
         {' '}
       </h4>
+      <RepoLastVerified site={site} />
       <PublishedState site={site} />
     </div>
     <div className="sites-list-item-actions">
@@ -42,6 +44,8 @@ SiteListItem.propTypes = {
     owner: PropTypes.string,
     id: PropTypes.number,
     publishedAt: PropTypes.string,
+    repoLastVerified: PropTypes.string,
+    createdAt: PropTypes.string,
     viewLink: PropTypes.string,
   }),
 };
