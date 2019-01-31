@@ -168,23 +168,26 @@ socket.use((_socket, next) => {
   SocketIOSubscriber.joinRooms(_socket);
 });
 
-schedule.scheduleJob('0 0 * * *', () => {
-  RepositoryVerifier.verifyRepos()
-    .catch(logger.error);
-});
-
-// audit users and remove sites w/o repo push permissions
-schedule.scheduleJob('0 0 * * *', () => {
-  SiteUserAuditor.auditAllSites()
-    .catch(logger.error);
-});
-
-if (process.env.CF_INSTANCE_INDEX === 0 && config.app.app_env === 'production') {
-  // audit federalist-users 18F teams daily at midnight
+if (process.env.CF_INSTANCE_INDEX === 0) {
+  // verify site's repositories exist
   schedule.scheduleJob('0 0 * * *', () => {
-    FederalistUsersHelper.audit18F({})
+    RepositoryVerifier.verifyRepos()
       .catch(logger.error);
   });
+
+  // audit users and remove sites w/o repo push permissions
+  schedule.scheduleJob('0 0 * * *', () => {
+    SiteUserAuditor.auditAllSites()
+      .catch(logger.error);
+  });
+
+  if (config.app.app_env === 'production') {
+    // audit federalist-users 18F teams daily at midnight
+    schedule.scheduleJob('0 0 * * *', () => {
+      FederalistUsersHelper.audit18F({})
+        .catch(logger.error);
+    });
+  }
 }
 
 module.exports = app;
