@@ -36,6 +36,7 @@ const RateLimit = require('express-rate-limit');
 const router = require('./api/routers');
 const SocketIOSubscriber = require('./api/services/SocketIOSubscriber');
 const jwtHelper = require('./api/services/jwtHelper');
+const RepositoryVerifier = require('./api/services/RepositoryVerifier');
 const SiteUserAuditor = require('./api/services/SiteUserAuditor');
 
 const app = express();
@@ -167,6 +168,11 @@ socket.use((_socket, next) => {
 });
 
 if (process.env.CF_INSTANCE_INDEX === 0 && config.app.app_env === 'production') {
+  schedule.scheduleJob('0 0 * * *', () => {
+    RepositoryVerifier.verifyRepos()
+      .catch(logger.error);
+  });
+
   // audit users and remove sites w/o repo push permissions
   schedule.scheduleJob('0 0 * * *', () => {
     SiteUserAuditor.auditAllSites()

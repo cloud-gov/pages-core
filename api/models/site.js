@@ -194,6 +194,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    repoLastVerified: {
+      type: DataTypes.DATE,
+    },
     buildStatus: {
       type: DataTypes.ENUM,
       values: ['active', 'inactive'],
