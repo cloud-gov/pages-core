@@ -1,10 +1,17 @@
 const expect = require('chai').expect;
 const moment = require('moment');
 const fsMock = require('mock-fs');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
 
 const config = require('../../../../config');
-const utils = require('../../../../api/utils');
 
+const MockWebpackConfig = {
+  output: { filename: 'filename.js', publicPath: '/publicPath/' },
+  plugins: [{ options: { filename: 'filename.css' } }],
+};
+
+const utils = proxyquire('../../../../api/utils', { '../../webpack.development.config.js': MockWebpackConfig });
 
 describe('utils', () => {
   describe('.isPastAuthThreshold', () => {
@@ -49,18 +56,58 @@ describe('utils', () => {
     });
   });
 
-  describe('.loadAssetManifest', () => {
+  describe('.loadDevelopmentManifest', () => {
+    it('loads and uses the development webpack config', () => {
+      const result = utils.loadDevelopmentManifest();
+      expect(result).to.deep.eq({
+        'main.js': 'publicPath/filename.js',
+        'main.css': 'publicPath/filename.css',
+      });
+    });
+  });
+
+  describe('.loadProductionManifest', () => {
+    beforeEach(() => {
+      fsMock({
+        'webpack-manifest.json': JSON.stringify({ manifest: 'yay' }),
+      });
+    });
+
     afterEach(() => {
       fsMock.restore();
     });
 
     it('loads webpack-manifest.json', () => {
+      const result = utils.loadProductionManifest();
+      expect(result).to.deep.eq({ manifest: 'yay' });
+    });
+  });
+
+  describe('.loadAssetManifest', () => {
+    beforeEach(() => {
       fsMock({
         'webpack-manifest.json': JSON.stringify({ manifest: 'yay' }),
       });
+    });
 
+    afterEach(() => {
+      fsMock.restore();
+    });
+
+    it('returns the result of `loadDevelopmentManifest` when in development', () => {
+      const orig = process.env.NODE_ENV
+      process.env.NODE_ENV = 'development'
       const result = utils.loadAssetManifest();
-      expect(result).to.deep.eq({ manifest: 'yay' });
+      expect(result).to.deep.eq(utils.loadDevelopmentManifest());
+      process.env.NODE_ENV = orig;
+    });
+
+    it('returns the result of `loadProductionManifest` when NOT in development', () => {
+      const orig = process.env.NODE_ENV
+      process.env.NODE_ENV = 'foobar'
+      const result = utils.loadAssetManifest();
+      expect(result).to.deep.eq(utils.loadProductionManifest());
+      process.env.NODE_ENV = orig;
     });
   });
 

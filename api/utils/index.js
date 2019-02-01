@@ -66,5 +66,7 @@ module.exports = {
   getSiteDisplayEnv,
   isPastAuthThreshold,
   loadAssetManifest,
+  loadDevelopmentManifest,
+  loadProductionManifest,
   shouldIncludeTracking,
 };
