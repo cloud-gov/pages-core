@@ -63,7 +63,8 @@ app.use((req, res, next) => {
 
 app.use(express.static('public'));
 
-if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+/* eslint-disable global-require */
+if (process.env.NODE_ENV === 'development') {
   const webpack = require('webpack');
   const webpackDevMiddleware = require('webpack-dev-middleware');
   const webpackConfig = require('./webpack.development.config.js');
@@ -73,6 +74,7 @@ if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
     publicPath: webpackConfig.output.publicPath,
   }));
 }
+/* eslint-enable global-require */
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: '2mb' }));

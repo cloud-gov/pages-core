@@ -1,11 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const  ManifestPlugin = require('webpack-manifest-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
 
 const fileLoaderOptions = {
-  name: '/styles/webpackAssets/[hash].[ext]'
+  name: '/styles/webpackAssets/[hash].[ext]',
 };
 
 module.exports = {

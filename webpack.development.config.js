@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   mode: 'development',
@@ -13,7 +13,7 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/dist/'
+    publicPath: '/dist/',
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -44,7 +44,7 @@ module.exports = {
         test: /\.(gif|png|jpe?g|ttf|woff2?|eot)$/i,
         loader: 'file-loader',
         options: {
-          name: 'images/[hash].[ext]'
+          name: 'images/[hash].[ext]',
         },
       },
       {
@@ -63,7 +63,7 @@ module.exports = {
             // For all other .svg files, fallback to the file-loader
             loader: 'file-loader',
             options: {
-              name: 'images/[hash].[ext]'
+              name: 'images/[hash].[ext]',
             },
           },
         ],

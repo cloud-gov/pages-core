@@ -5,7 +5,7 @@ const config = require('../../config');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
 const jwtHelper = require('../services/jwtHelper');
 
-let webpackAssets = loadAssetManifest();
+const webpackAssets = loadAssetManifest();
 
 function defaultContext(req) {
   const messages = {

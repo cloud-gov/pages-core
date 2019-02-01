@@ -37,7 +37,7 @@ function cleanRequestPath(reqPath) {
   return cleaned;
 }
 
-let webpackAssets = loadAssetManifest();
+const webpackAssets = loadAssetManifest();
 
 module.exports = {
   serve(req, res) {
