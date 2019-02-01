@@ -1,7 +1,6 @@
 const expect = require('chai').expect;
 const moment = require('moment');
 const fsMock = require('mock-fs');
-const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
 const config = require('../../../../config');
@@ -95,16 +94,16 @@ describe('utils', () => {
     });
 
     it('returns the result of `loadDevelopmentManifest` when in development', () => {
-      const orig = process.env.NODE_ENV
-      process.env.NODE_ENV = 'development'
+      const orig = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'development';
       const result = utils.loadAssetManifest();
       expect(result).to.deep.eq(utils.loadDevelopmentManifest());
       process.env.NODE_ENV = orig;
     });
 
     it('returns the result of `loadProductionManifest` when NOT in development', () => {
-      const orig = process.env.NODE_ENV
-      process.env.NODE_ENV = 'foobar'
+      const orig = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'foobar';
       const result = utils.loadAssetManifest();
       expect(result).to.deep.eq(utils.loadProductionManifest());
       process.env.NODE_ENV = orig;
