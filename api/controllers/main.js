@@ -110,7 +110,7 @@ module.exports = {
     return res.send(DENY_ALL_CONTENT);
   },
 
-  fileNotFound(req, res) {
+  notFound(req, res) {
     const context = defaultContext(req);
     if (req.session.authenticated) {
       context.isAuthenticated = true;
