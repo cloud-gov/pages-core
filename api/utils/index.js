@@ -23,12 +23,25 @@ function getDirectoryFiles(dir, existingFileList) {
 }
 
 function loadAssetManifest() {
-  const manifestFile = 'webpack-manifest.json';
-  if (!fs.existsSync(manifestFile)) {
-    logger.error('webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?');
-    throw new Error();
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+    const webpackConfig = require('./webpack.development.config.js');
+    const { filename: jsFilename, publicPath } = webpackConfig.output;
+    // This requires that MiniCssExtractPlugin be the first plugin in the development configuration!!!!!
+    const cssFilename = webpackConfig.plugins[0].options.filename;
+
+    return {
+      'main.js': publicPath + jsFilename,
+      'main.css': publicPath + cssFilename,
+    };
+
+  } else {
+    const manifestFile = 'webpack-manifest.json';
+    if (!fs.existsSync(manifestFile)) {
+      logger.error('webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?');
+      throw new Error();
+    }
+    return JSON.parse(fs.readFileSync(manifestFile, 'utf-8'));
   }
-  return JSON.parse(fs.readFileSync(manifestFile, 'utf-8'));
 }
 
 function getSiteDisplayEnv() {

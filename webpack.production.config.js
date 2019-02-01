@@ -2,14 +2,18 @@ const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const  ManifestPlugin = require('webpack-manifest-plugin');
 
-// export default {
+const fileLoaderOptions = {
+  name: '/styles/webpackAssets/[hash].[ext]'
+};
+
 module.exports = {
   mode: 'production',
   entry: './frontend/main.jsx',
   output: {
-    filename: 'bundle.[hash].js',
-    path: path.resolve(__dirname, 'dist'),
+    filename: 'js/bundle.[hash].js',
+    path: path.resolve(__dirname, 'public'),
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -38,9 +42,7 @@ module.exports = {
       {
         test: /\.(gif|png|jpe?g|ttf|woff2?|eot)$/i,
         loader: 'file-loader',
-        options: {
-          name: 'images/[hash].[ext]'
-        },
+        options: fileLoaderOptions,
       },
       {
         test: /\.svg$/i,
@@ -57,21 +59,18 @@ module.exports = {
           {
             // For all other .svg files, fallback to the file-loader
             loader: 'file-loader',
-            options: {
-              name: 'images/[hash].[ext]'
-            },
+            options: fileLoaderOptions,
           },
         ],
       },
     ],
   },
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: 'styles.[contenthash].css',
-    }),
+    new MiniCssExtractPlugin({ filename: 'styles/styles.[contenthash].css' }),
     // When webpack bundles moment, it includes all of its locale files,
     // which we don't need, so we'll use this plugin to keep them out of the
     // bundle
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new ManifestPlugin({ fileName: '../webpack-manifest.json' }),
   ],
 };

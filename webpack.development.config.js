@@ -3,7 +3,6 @@ const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-// export default {
 module.exports = {
   mode: 'development',
   entry: './frontend/main.jsx',
@@ -72,9 +71,8 @@ module.exports = {
     ],
   },
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: 'styles.css',
-    }),
+    // Make sure this is the first plugin!!!
+    new MiniCssExtractPlugin({ filename: 'styles.css' }),
     // When webpack bundles moment, it includes all of its locale files,
     // which we don't need, so we'll use this plugin to keep them out of the
     // bundle

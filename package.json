@@ -47,10 +47,9 @@
   },
   "scripts": {
     "postinstall": "yarn migrate:up",
-    "build": "webpack -p",
+    "build": "webpack -p --config webpack.production.config.js",
     "start": "node index.js",
     "debug": "node --inspect index.js",
-    "foo": "NODE_ENV=development concurrently --kill-others --raw \"nodemon index.js --config nodemon.json\" \"webpack --progress --colors --watch\"",
     "watch": "NODE_ENV=development concurrently --kill-others --raw \"nodemon index.js --config nodemon.json\"",
     "test": "yarn test:prepare && yarn test:server && yarn test:client",
     "test:prepare": "NODE_ENV=test yarn migrate:up && yarn build",
