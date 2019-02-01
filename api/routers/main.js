@@ -15,4 +15,6 @@ router.get('/features/', MainController.features);
 router.get('/sites(/*)?', csrfProtection, MainController.app);
 router.get('/robots.txt', MainController.robots);
 
+router.get('/404/', MainController.fileNotFound);
+
 module.exports = router;

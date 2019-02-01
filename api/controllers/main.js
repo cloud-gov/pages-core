@@ -109,4 +109,16 @@ module.exports = {
     // otherwise send the "deny all" robots.txt content
     return res.send(DENY_ALL_CONTENT);
   },
+
+  fileNotFound(req, res) {
+    const context = defaultContext(req);
+    if (req.session.authenticated) {
+      context.isAuthenticated = true;
+      context.username = req.user.username;
+      context.accessToken = jwtHelper.sign({ user: req.user.id });
+      context.socketHost = process.env.SOCKET_HOST;
+    }
+
+    res.render('404.njk', context);
+  },
 };
