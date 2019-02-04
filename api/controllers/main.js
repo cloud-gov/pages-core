@@ -5,15 +5,9 @@ const config = require('../../config');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
 const jwtHelper = require('../services/jwtHelper');
 
-let webpackAssets = loadAssetManifest();
+const webpackAssets = loadAssetManifest();
 
 function defaultContext(req) {
-  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-    // reload the webpack assets during development so we don't have to
-    // restart the server for front end changes
-    webpackAssets = loadAssetManifest();
-  }
-
   const messages = {
     errors: req.flash('error'),
   };

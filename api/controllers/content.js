@@ -37,7 +37,7 @@ function cleanRequestPath(reqPath) {
   return cleaned;
 }
 
-let webpackAssets = loadAssetManifest();
+const webpackAssets = loadAssetManifest();
 
 module.exports = {
   serve(req, res) {
@@ -53,12 +53,6 @@ module.exports = {
     if (!contentFilePath) {
       res.status(404).send('Not Found');
       return;
-    }
-
-    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-      // reload the webpack assets during development so we don't have to
-      // restart the server for front end changes
-      webpackAssets = loadAssetManifest();
     }
 
     const context = {

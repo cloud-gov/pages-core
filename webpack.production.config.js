@@ -1,25 +1,16 @@
-import path from 'path';
+const path = require('path');
+const webpack = require('webpack');
+const autoprefixer = require('autoprefixer');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
 
-import webpack from 'webpack';
-import autoprefixer from 'autoprefixer';
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
-import ManifestPlugin from 'webpack-manifest-plugin';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+const fileLoaderOptions = {
+  name: '/styles/webpackAssets/[hash].[ext]',
+};
 
-const extractStyles = new ExtractTextPlugin({
-  filename: 'styles/styles.[contenthash].css',
-  allChunks: true,
-});
-
-const manifestPlugin = new ManifestPlugin({
-  fileName: '../webpack-manifest.json',
-});
-
-const fileLoaderConfig = 'file-loader?name=/styles/webpackAssets/[hash].[ext]';
-
-export default {
+module.exports = {
+  mode: 'production',
   entry: './frontend/main.jsx',
-  devtool: 'source-map',
   output: {
     filename: 'js/bundle.[hash].js',
     path: path.resolve(__dirname, 'public'),
@@ -28,7 +19,7 @@ export default {
     extensions: ['.js', '.jsx'],
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.jsx?$/,
         exclude: /(node_modules|bower_components|public\/)/,
@@ -36,21 +27,22 @@ export default {
       },
       {
         test: /\.scss$/,
-        use: extractStyles.extract([
-          'css-loader?sourceMap',
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
           {
             loader: 'postcss-loader',
             options: {
-              sourceMap: true,
               plugins: [autoprefixer],
             },
           },
-          'sass-loader?sourceMap',
-        ]),
+          'sass-loader',
+        ],
       },
       {
         test: /\.(gif|png|jpe?g|ttf|woff2?|eot)$/i,
-        loader: fileLoaderConfig,
+        loader: 'file-loader',
+        options: fileLoaderOptions,
       },
       {
         test: /\.svg$/i,
@@ -66,25 +58,19 @@ export default {
           },
           {
             // For all other .svg files, fallback to the file-loader
-            loader: fileLoaderConfig,
+            loader: 'file-loader',
+            options: fileLoaderOptions,
           },
         ],
       },
     ],
   },
   plugins: [
-    extractStyles,
-    manifestPlugin,
+    new MiniCssExtractPlugin({ filename: 'styles/styles.[contenthash].css' }),
     // When webpack bundles moment, it includes all of its locale files,
     // which we don't need, so we'll use this plugin to keep them out of the
     // bundle
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    // Generate a webpack-bundle-analyzer stats file (in public/stats.json)
-    // It can be viewed by running `yarn analyze-webpack`
-    new BundleAnalyzerPlugin({
-      analyzerMode: 'disabled',
-      openAnalyzer: false,
-      generateStatsFile: true,
-    }),
+    new ManifestPlugin({ fileName: '../webpack-manifest.json' }),
   ],
 };
