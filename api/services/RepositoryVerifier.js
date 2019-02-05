@@ -42,7 +42,7 @@ const verifyUserRepos = (user) => {
       const repoLastVerified = new Date();
       sites.forEach((site) => {
         const fullName = [site.owner, site.repository].join('/').toUpperCase();
-        if (repos.find(repo => repo.full_name.toUpperCase() === fullName)) { // site does not have push permissions
+        if (repos.find(repo => repo.full_name.toUpperCase() === fullName)) {
           verified.push(site.update({ repoLastVerified }));
         }
       });

@@ -159,7 +159,7 @@ describe('RepositoryVerifier', () => {
             factory.site({ owner, repository: 'repo-0', users: [user] }),
             factory.site({ owner, repository: 'repo-1', users: [user] }),
             factory.site({ owner, repository: 'repo-2' }),
-          ])
+          ]);
         })
         .then((models) => {
           sites = models;
