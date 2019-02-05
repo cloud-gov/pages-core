@@ -1,8 +1,10 @@
 const expect = require('chai').expect;
+const proxyquire = require('proxyquire').noCallThru();
 const factory = require('../../support/factory');
 const RepositoryVerifier = require('../../../../api/services/RepositoryVerifier');
 const { Site, User } = require('../../../../api/models');
 const githubAPINocks = require('../../support/githubAPINocks');
+const MockGitHub = require('../../support/mockGitHub');
 
 describe('RepositoryVerifier', () => {
   context('verifyRepos', () => {
@@ -137,6 +139,38 @@ describe('RepositoryVerifier', () => {
           expect(sites.length).to.equal(5);
           expect(sites.filter(site => site.Users.length > 0).length).to.equal(4);
           expect(sites.filter(site => site.repoLastVerified).length).to.equal(3);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  context('verifyUserRepos', () => {
+    it('verify sites only with users that have githubAccessToken', (done) => {
+      const MockRepositoryVerifier = proxyquire('../../../../api/services/RepositoryVerifier',
+        { './GitHub': MockGitHub });
+      let user;
+      let sites;
+      factory.user()
+        .then((model) => {
+          user = model;
+          const owner = 'owner';
+          return Promise.all([
+            factory.site({ owner, repository: 'repo-0', users: [user] }),
+            factory.site({ owner, repository: 'repo-1', users: [user] }),
+            factory.site({ owner, repository: 'repo-2' }),
+          ])
+        })
+        .then((models) => {
+          sites = models;
+          expect(sites.filter(s => s.repoLastVerified).length).to.equal(0);
+          return MockRepositoryVerifier.verifyUserRepos(user);
+        })
+        .then(() => Site.findAll({ where: { id: sites.map(s => s.id) } }))
+        .then((models) => {
+          sites = models;
+          expect(sites.filter(s => s.repoLastVerified).length).to.equal(2);
+          expect(sites.filter(s => !s.repoLastVerified).length).to.equal(1);
           done();
         })
         .catch(done);
