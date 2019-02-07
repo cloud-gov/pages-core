@@ -30,4 +30,25 @@ const verifyRepos = () =>
   })
   .then(sites => Promise.all(sites.map(site => verifyNextRepo(site))));
 
-module.exports = { verifyRepos };
+const verifyUserRepos = (user) => {
+  let repos;
+  return GitHub.getRepositories(user.githubAccessToken)
+    .then((_repos) => {
+      repos = _repos;
+      return user.getSites();
+    })
+    .then((sites) => {
+      const verified = [];
+      const repoLastVerified = new Date();
+      sites.forEach((site) => {
+        const fullName = [site.owner, site.repository].join('/').toUpperCase();
+        if (repos.find(repo => repo.full_name.toUpperCase() === fullName)) {
+          verified.push(site.update({ repoLastVerified }));
+        }
+      });
+      return Promise.all(verified);
+    })
+    .catch(logger.error);
+};
+
+module.exports = { verifyRepos, verifyUserRepos };
