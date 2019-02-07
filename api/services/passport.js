@@ -30,7 +30,7 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
       });
     })
     .then(() => {
-      SiteUserAuditor.auditUser(user); // audit user's sites once authed
+      // SiteUserAuditor.auditUser(user); // audit user's sites once authed
       RepositoryVerifier.verifyUserRepos(user); // verify user's site's repos
       callback(null, user);
     })
