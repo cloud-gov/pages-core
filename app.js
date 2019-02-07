@@ -161,6 +161,8 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
+app.use((req, res) => res.status(404).redirect(302, '/404-not-found/'));
+
 socket.use((_socket, next) => {
    /* eslint-disable no-param-reassign */
   if (_socket.handshake.query && _socket.handshake.query.accessToken) {
