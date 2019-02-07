@@ -28,6 +28,7 @@ const http = require('http');
 const io = require('socket.io');
 const redis = require('redis');
 const redisAdapter = require('socket.io-redis');
+const schedule = require('node-schedule');
 
 const responses = require('./api/responses');
 const passport = require('./api/services/passport');
@@ -35,6 +36,9 @@ const RateLimit = require('express-rate-limit');
 const router = require('./api/routers');
 const SocketIOSubscriber = require('./api/services/SocketIOSubscriber');
 const jwtHelper = require('./api/services/jwtHelper');
+const FederalistUsersHelper = require('./api/services/FederalistUsersHelper');
+const RepositoryVerifier = require('./api/services/RepositoryVerifier');
+const SiteUserAuditor = require('./api/services/SiteUserAuditor');
 
 const app = express();
 const sequelize = require('./api/models').sequelize;
@@ -60,6 +64,19 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static('public'));
+
+/* eslint-disable global-require */
+if (process.env.NODE_ENV === 'development') {
+  const webpack = require('webpack');
+  const webpackDevMiddleware = require('webpack-dev-middleware');
+  const webpackConfig = require('./webpack.development.config.js');
+  const compiler = webpack(webpackConfig);
+
+  app.use(webpackDevMiddleware(compiler, {
+    publicPath: webpackConfig.output.publicPath,
+  }));
+}
+/* eslint-enable global-require */
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: '2mb' }));
@@ -144,6 +161,8 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
+app.use((req, res) => res.status(404).redirect(302, '/404-not-found/'));
+
 socket.use((_socket, next) => {
    /* eslint-disable no-param-reassign */
   if (_socket.handshake.query && _socket.handshake.query.accessToken) {
@@ -163,5 +182,30 @@ socket.use((_socket, next) => {
 .on('connection', (_socket) => {
   SocketIOSubscriber.joinRooms(_socket);
 });
+
+if (process.env.CF_INSTANCE_INDEX === '0') {
+  // verify site's repositories exist
+  schedule.scheduleJob('0 0 * * *', () => {
+    logger.info('Verifying Repos');
+    RepositoryVerifier.verifyRepos()
+      .catch(logger.error);
+  });
+
+  // audit users and remove sites w/o repo push permissions
+  schedule.scheduleJob('0 0 * * *', () => {
+    logger.info('Auditing All Sites');
+    SiteUserAuditor.auditAllSites()
+      .catch(logger.error);
+  });
+
+  if (config.app.app_env === 'production') {
+    // audit federalist-users 18F teams daily at midnight
+    schedule.scheduleJob('0 0 * * *', () => {
+      logger.info('Auditing federalist-users 18F Staff & Org Teams');
+      FederalistUsersHelper.audit18F({})
+        .catch(logger.error);
+    });
+  }
+}
 
 module.exports = app;

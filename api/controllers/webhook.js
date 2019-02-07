@@ -28,9 +28,16 @@ const findSiteForWebhookRequest = (request) => {
   const owner = request.body.repository.full_name.split('/')[0].toLowerCase();
   const repository = request.body.repository.full_name.split('/')[1].toLowerCase();
 
-  return Site.findOne({ where: { owner, repository } }).then((site) => {
+  return Site.findOne({
+    where: {
+      owner,
+      repository,
+      buildStatus: { $ne: 'inactive' },
+    },
+  })
+  .then((site) => {
     if (!site) {
-      throw new Error(`Unable to find Federalist site with ${owner}/${repository}`);
+      throw new Error(`Unable to find an active Federalist site with ${owner}/${repository}`);
     } else {
       return site;
     }

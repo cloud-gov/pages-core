@@ -112,9 +112,9 @@ export class SiteContainer extends React.Component {
             fileName={params.fileName}
             viewLink={site.viewLink}
           />
-          <div className="">
-            {children}
-          </div>
+
+          {children}
+
         </div>
       </div>
     );

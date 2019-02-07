@@ -326,4 +326,149 @@ describe('GitHub', () => {
       .catch(done);
     });
   });
+
+  describe('.getRepositories', () => {
+    it('returns a list of a user repositories', (done) => {
+      const accessToken = 'token';
+
+      githubAPINocks.getRepositories({ accessToken });
+      githubAPINocks.getRepositories({ accessToken, page: 2 });
+      githubAPINocks.getRepositories({ accessToken, page: 3 });
+      GitHub.getRepositories(accessToken)
+        .then((repos) => {
+          expect(repos.length).to.equal(101);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('returns an exception', (done) => {
+      const accessToken = 'invalid';
+
+      GitHub.getRepositories(accessToken)
+        .catch((err) => {
+          expect(err.code).to.exist;
+          done();
+        });
+    });
+  });
+
+  describe('.getCollaborators', () => {
+    it('returns a list of a repo collaborators', (done) => {
+      const accessToken = 'token';
+      const owner = 'owner';
+      const repository = 'repo';
+
+      githubAPINocks.getCollaborators({ accessToken, owner, repository });
+      githubAPINocks.getCollaborators({ accessToken, owner, repository, page: 2 });
+      githubAPINocks.getCollaborators({ accessToken, owner, repository, page: 3 });
+
+      GitHub.getCollaborators(accessToken, owner, repository)
+        .then((collabs) => {
+          expect(collabs.length).to.equal(101);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('returns an exception', (done) => {
+      const accessToken = 'invalid';
+
+      GitHub.getRepositories(accessToken)
+        .catch((err) => {
+          expect(err.code).to.exist;
+          done();
+        });
+    });
+  });
+
+  describe('.getOrganizationMembers', () => {
+    it('returns a list of all organization members', (done) => {
+      const accessToken = 'token';
+      const organization = 'testOrg';
+
+      githubAPINocks.getOrganizationMembers({ accessToken, organization });
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, page: 2 });
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, page: 3 });
+      GitHub.getOrganizationMembers(accessToken, organization)
+        .then((members) => {
+          expect(members.length).to.equal(101);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('returns an exception', (done) => {
+      const accessToken = 'token';
+      const organization = 'failOrg';
+
+      githubAPINocks.getOrganizationMembers({ accessToken, organization });
+      GitHub.getOrganizationMembers(accessToken, organization)
+        .catch((err) => {
+          expect(err.code).to.exist;
+          done();
+        });
+    });
+
+    it('returns a list of organization admin members', (done) => {
+      const accessToken = 'token';
+      const organization = 'testOrg';
+
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'admin' });
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'admin', page: 2 });
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'admin', page: 3 });
+      GitHub.getOrganizationMembers(accessToken, organization, 'admin')
+        .then((members) => {
+          expect(members.length).to.equal(3);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('returns a list of organization non-admin members', (done) => {
+      const accessToken = 'token';
+      const organization = 'testOrg';
+
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'member' });
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'member', page: 2 });
+      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'member', page: 3 });
+      GitHub.getOrganizationMembers(accessToken, organization, 'member')
+        .then((members) => {
+          expect(members.length).to.equal(98);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('.getTeamMembers', () => {
+    /* eslint-disable camelcase */
+    it('returns a branch based on the supplied parameters', (done) => {
+      const accessToken = 'token';
+      const team_id = 12345;
+
+      githubAPINocks.getTeamMembers({ accessToken, team_id });
+      githubAPINocks.getTeamMembers({ accessToken, team_id, page: 2 });
+      githubAPINocks.getTeamMembers({ accessToken, team_id, page: 3 });
+      GitHub.getTeamMembers(accessToken, team_id)
+        .then((members) => {
+          expect(members.length).to.equal(102);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('returns a branch based on the supplied parameters', (done) => {
+      const accessToken = 'token';
+      const team_id = 'failTeam';
+
+      githubAPINocks.getTeamMembers({ accessToken, team_id });
+      GitHub.getTeamMembers(accessToken, team_id)
+        .catch((err) => {
+          expect(err.code).to.exist;
+          done();
+        });
+    });
+    /* eslint-enable camelcase */
+  });
 });

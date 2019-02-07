@@ -83,6 +83,66 @@ const handleWebhookError = (err) => {
 const sendCreateGithubStatusRequest = (github, options) =>
   github.repos.createStatus(options);
 
+const getOrganizationMembers = (github, org, role = 'all', page = 1) =>
+  github.orgs.listMembers({ org, per_page: 100, page, role })
+    .then(orgs => Promise.resolve(orgs.data));
+
+const getNextOrganizationMembers = (github, org, role = 'all', page = 1, allMembers = []) =>
+  getOrganizationMembers(github, org, role, page)
+    .then((members) => {
+      if (members.length > 0) {
+        allMembers = allMembers.concat(members);  // eslint-disable-line no-param-reassign
+        return getNextOrganizationMembers(github, org, role, page + 1, allMembers);
+      }
+      return Promise.resolve(allMembers);
+    });
+
+/* eslint-disable camelcase */
+const getTeamMembers = (github, team_id, page = 1) =>
+  github.teams.listMembers({ team_id, per_page: 100, page }).then(teams => teams.data);
+
+const getNextTeamMembers = (github, team_id, page = 1, allMembers = []) =>
+  getTeamMembers(github, team_id, page)
+    .then((members) => {
+      if (members.length > 0) {
+        allMembers = allMembers.concat(members);  // eslint-disable-line no-param-reassign
+        return getNextTeamMembers(github, team_id, page + 1, allMembers);
+      }
+      return Promise.resolve(allMembers);
+    });
+/* eslint-enable camelcase */
+
+const removeOrganizationMember = (github, org, username) =>
+  github.orgs.removeMember({ org, username });
+
+const getRepositories = (github, page = 1) =>
+  github.repos.getAll({ per_page: 100, page })
+    .then(repos => Promise.resolve(repos.data));
+
+const getNextRepositories = (github, page = 1, allRepos = []) =>
+  getRepositories(github, page)
+    .then((repos) => {
+      if (repos.length > 0) {
+        allRepos = allRepos.concat(repos);  // eslint-disable-line no-param-reassign
+        return getNextRepositories(github, page + 1, allRepos);
+      }
+      return Promise.resolve(allRepos);
+    });
+
+const getCollaborators = (github, owner, repo, page = 1) =>
+  github.repos.getCollaborators({ owner, repo, per_page: 100, page })
+    .then(collabs => Promise.resolve(collabs.data));
+
+const getNextCollaborators = (github, owner, repo, page = 1, allCollabs = []) =>
+  getCollaborators(github, owner, repo, page)
+    .then((collabs) => {
+      if (collabs.length > 0) {
+        allCollabs = allCollabs.concat(collabs);  // eslint-disable-line no-param-reassign
+        return getNextCollaborators(github, owner, repo, page + 1, allCollabs);
+      }
+      return Promise.resolve(allCollabs);
+    });
+
 module.exports = {
   checkPermissions: (user, owner, repo) =>
     githubClient(user.githubAccessToken)
@@ -168,4 +228,30 @@ module.exports = {
   sendCreateGithubStatusRequest: (accessToken, options) =>
     githubClient(accessToken)
       .then(github => sendCreateGithubStatusRequest(github, options)),
+
+  getOrganizationMembers: (accessToken, organization, role = 'all') =>
+    githubClient(accessToken)
+      .then(github => getNextOrganizationMembers(github, organization, role)),
+
+  getTeamMembers: (accessToken, teamId) =>
+    githubClient(accessToken)
+      .then(github => getNextTeamMembers(github, teamId)),
+
+  removeOrganizationMember: (accessToken, organization, member) =>
+    githubClient(accessToken)
+      .then(github => removeOrganizationMember(github, organization, member))
+      .catch((err) => {
+        if (err.code === 404) {
+          return null;
+        }
+        throw err;
+      }),
+
+  getRepositories: accessToken =>
+    githubClient(accessToken)
+      .then(github => getNextRepositories(github)),
+
+  getCollaborators: (accessToken, owner, repo) =>
+    githubClient(accessToken)
+      .then(github => getNextCollaborators(github, owner, repo)),
 };

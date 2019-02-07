@@ -5,15 +5,9 @@ const config = require('../../config');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
 const jwtHelper = require('../services/jwtHelper');
 
-let webpackAssets = loadAssetManifest();
+const webpackAssets = loadAssetManifest();
 
 function defaultContext(req) {
-  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-    // reload the webpack assets during development so we don't have to
-    // restart the server for front end changes
-    webpackAssets = loadAssetManifest();
-  }
-
   const messages = {
     errors: req.flash('error'),
   };
@@ -108,5 +102,17 @@ module.exports = {
 
     // otherwise send the "deny all" robots.txt content
     return res.send(DENY_ALL_CONTENT);
+  },
+
+  notFound(req, res) {
+    const context = defaultContext(req);
+    if (req.session.authenticated) {
+      context.isAuthenticated = true;
+      context.username = req.user.username;
+      context.accessToken = jwtHelper.sign({ user: req.user.id });
+      context.socketHost = process.env.SOCKET_HOST;
+    }
+
+    res.render('404.njk', context);
   },
 };

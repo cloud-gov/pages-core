@@ -32,6 +32,62 @@ describe('Main Site', () => {
     });
   });
 
+  describe('App /404', () => {
+    it('should redirect to / with a flash error when not authenticated', (done) => {
+      request(app)
+        .get('/blahblahpage')
+        .expect(302)
+        .then((response) => {
+          expect(response.headers.location).to.equal('/404-not-found/');
+          expect(response.text.indexOf('Found. Redirecting to /404-not-found/')).to.be.above(-1);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should work when authenticated', (done) => {
+      authenticatedSession()
+        .then(cookie => request(app)
+          .get('/blahblahpage')
+          .set('Cookie', cookie)
+          .expect(302)
+        )
+        .then((response) => {
+          expect(response.headers.location).to.equal('/404-not-found/');
+          expect(response.text.indexOf('Found. Redirecting to /404-not-found/')).to.be.above(-1);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should have app content', (done) => {
+      authenticatedSession()
+      .then(cookie => request(app)
+        .get('/404-not-found/')
+        .set('Cookie', cookie)
+        .expect(200)
+      )
+      .then((response) => {
+        expect(response.text.indexOf('Log out')).to.be.above(-1);
+        expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should have app content', (done) => {
+      request(app)
+        .get('/404-not-found/')
+        .expect(200)
+      .then((response) => {
+        expect(response.text.indexOf('Log in')).to.be.above(-1);
+        expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
+        done();
+      })
+      .catch(done);
+    });
+  });
+
   describe('App /sites', () => {
     it('should redirect to / with a flash error when not authenticated', (done) => {
       request(app)
