@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const proxyquire = require('proxyquire').noCallThru();
 const factory = require('../../support/factory');
 const MockGitHub = require('../../support/mockGitHub');
-const { SiteUser } = require('../../../../api/models');
+const { SiteUser, UserAction } = require('../../../../api/models');
 
 const SiteUserAuditor = proxyquire('../../../../api/services/SiteUserAuditor', { './GitHub': MockGitHub });
 
@@ -29,7 +29,11 @@ describe('SiteUserAuditor', () => {
           sites.push(factory.site({ owner: 'owner', repository: 'remove-repo', users: [user] }));
           return Promise.all(sites);
         })
-        .then(() => SiteUser.findAll({ where: { user_sites: user.id } }))
+        .then(() => UserAction.findAll({ where: { targetId: user.id } }))
+        .then((userActions) => {
+          expect(userActions.length).to.eql(0);
+          return SiteUser.findAll({ where: { user_sites: user.id } });
+        })
         .then((siteUsers) => {
           expect(siteUsers.length).to.eql(11);
           return SiteUserAuditor.auditAllUsers();
@@ -37,6 +41,10 @@ describe('SiteUserAuditor', () => {
         .then(() => SiteUser.findAll({ where: { user_sites: user.id } }))
         .then((siteUsers) => {
           expect(siteUsers.length).to.eql(9);
+          return UserAction.findAll({ where: { targetId: user.id } });
+        })
+        .then((userActions) => {
+          expect(userActions.length).to.eql(2);
           done();
         })
         .catch(done);
@@ -63,14 +71,24 @@ describe('SiteUserAuditor', () => {
           site = model;
           return SiteUser.findAll({ where: { site_users: site.id } });
         })
-        .then(siteUsers => Promise.resolve(expect(siteUsers.length).to.eql(12)))
-        .then(() => SiteUserAuditor.auditAllSites())
+        .then(siteUsers => {
+          expect(siteUsers.length).to.eql(12);
+          return UserAction.findAll({ where: { siteId: site.id } });
+        })
+        .then((userActions) => {
+          expect(userActions.length).to.eql(0);
+          return SiteUserAuditor.auditAllSites();
+        })
         .then(() => SiteUser.findAll({ where: { site_users: site.id } }))
         .then(siteUsers => expect(siteUsers.length).to.eql(9))
         .then(() => SiteUserAuditor.auditAllSites())
         .then(() => SiteUser.findAll({ where: { site_users: site.id } }))
         .then((siteUsers) => {
           expect(siteUsers.length).to.eql(9);
+          return UserAction.findAll({ where: { siteId: site.id } });
+        })
+        .then((userActions) => {
+          expect(userActions.length).to.eql(3);
           done();
         })
         .catch(done);

@@ -13,7 +13,7 @@ class UserActionsTable extends React.Component {
   renderRow(action) {
     return (
       <tr key={`${action.id}-${action.targetType}`}>
-        <td>{action.initiator.username}</td>
+        <td>{action.initiator ? action.initiator.username : 'Federalist'}</td>
         <td>{action.actionType.action}</td>
         <td>{action.actionTarget.username}</td>
         <td>{timestampUTC(action.createdAt)}</td>

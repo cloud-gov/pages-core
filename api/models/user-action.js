@@ -31,7 +31,7 @@ const toJSON = function json() {
 
 const schema = DataTypes => ({
   userId: {
-    type: DataTypes.INTEGER, allowNull: false },
+    type: DataTypes.INTEGER, allowNull: true },
   targetId: {
     type: DataTypes.INTEGER, allowNull: false },
   targetType: {

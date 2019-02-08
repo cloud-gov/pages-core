@@ -1,6 +1,7 @@
 const logger = require('winston');
 const { User, Site, SiteUser } = require('../models');
 const GitHub = require('./GitHub');
+const UserActionCreator = require('./UserActionCreator');
 
 const auditUser = (user) => {
   let repos;
@@ -16,7 +17,13 @@ const auditUser = (user) => {
         if (!(repos.find(repo => repo.full_name.toUpperCase() === fullName)) || // site not in repos
           (repos.find(repo => repo.full_name.toUpperCase() === fullName &&
           !repo.permissions.push))) { // site does not have push permissions
-          removed.push(SiteUser.destroy({ where: { user_sites: user.id, site_users: site.id } }));
+          const r = site.removeUser(user)
+            .then(() => UserActionCreator.addRemoveAction({
+              targetId: user.id,
+              targetType: 'user',
+              siteId: site.id,
+            }));
+          removed.push(r);
         }
       });
       return Promise.all(removed);
@@ -54,12 +61,18 @@ const auditSite = (site, userIndex = 0) => {
       if (collaborators && collaborators.length > 0) {
         const pushCollabs = collaborators.filter(c => c.permissions.push).map(c => c.login);
         const usersToRemove = site.Users.filter(u => !pushCollabs.includes(u.username));
-        if (usersToRemove.length > 0) {
-          return SiteUser.destroy({
-            where: { user_sites: usersToRemove.map(u => u.id), site_users: site.id },
-          });
-        }
-        return Promise.resolve();
+        const removed = [];
+        usersToRemove.forEach(u => {
+          const r = site.removeUser(u)
+            .then(() => UserActionCreator.addRemoveAction({
+              // userId: req.user.id,
+              targetId: user.id,
+              targetType: 'user',
+              siteId: site.id,
+            }));
+          removed.push(r);
+        });
+        return Promise.all(removed);
       }
       return auditSite(site, userIndex + 1);
     })
