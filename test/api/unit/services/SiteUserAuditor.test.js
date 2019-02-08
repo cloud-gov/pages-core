@@ -71,7 +71,7 @@ describe('SiteUserAuditor', () => {
           site = model;
           return SiteUser.findAll({ where: { site_users: site.id } });
         })
-        .then(siteUsers => {
+        .then((siteUsers) => {
           expect(siteUsers.length).to.eql(12);
           return UserAction.findAll({ where: { siteId: site.id } });
         })

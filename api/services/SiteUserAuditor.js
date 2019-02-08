@@ -1,5 +1,5 @@
 const logger = require('winston');
-const { User, Site, SiteUser } = require('../models');
+const { User, Site } = require('../models');
 const GitHub = require('./GitHub');
 const UserActionCreator = require('./UserActionCreator');
 
@@ -39,13 +39,8 @@ const auditAllUsers = () =>
       signedInAt: { $ne: null },
     },
     order: [['signedInAt', 'DESC']],
-    // include: [{ model: Site, attributes: ['id', 'owner', 'repository'] }],
   })
-  .then((users) => {
-    const auditedUsers = [];
-    users.forEach(user => auditedUsers.push(auditUser(user)));
-    return Promise.all(auditedUsers);
-  });
+  .then((users) => Promise.all(users.map(user => auditUser(user))));
 
 const auditSite = (site, userIndex = 0) => {
   let collaborators;
@@ -62,10 +57,9 @@ const auditSite = (site, userIndex = 0) => {
         const pushCollabs = collaborators.filter(c => c.permissions.push).map(c => c.login);
         const usersToRemove = site.Users.filter(u => !pushCollabs.includes(u.username));
         const removed = [];
-        usersToRemove.forEach(u => {
+        usersToRemove.forEach((u) => {
           const r = site.removeUser(u)
             .then(() => UserActionCreator.addRemoveAction({
-              // userId: req.user.id,
               targetId: user.id,
               targetType: 'user',
               siteId: site.id,
