@@ -52,7 +52,7 @@ class SiteBuilds extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { autoRefresh: true };
+    this.state = { autoRefresh: false };
     autoBind(this, 'toggleAutoRefresh');
   }
 

@@ -14,7 +14,7 @@ export const REFRESH_INTERVAL = 15 * 1000;
 class SiteBuildLogs extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { autoRefresh: true };
+    this.state = { autoRefresh: false };
     autoBind(this, 'toggleAutoRefresh');
   }
 
