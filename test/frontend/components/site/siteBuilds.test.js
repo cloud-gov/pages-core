@@ -168,22 +168,22 @@ describe('<SiteBuilds/>', () => {
       clock.restore();
     });
 
-    it('should default to auto refresh: ON', () => {
+    it('should default to auto refresh: OFF', () => {
       const wrapper = shallow(<SiteBuilds {...props} />);
-      expect(wrapper.state('autoRefresh')).to.equal(true);
-      expect(wrapper.find(AUTO_REFRESH_SELECTOR).text()).to.equal('Auto Refresh: ON');
+      expect(wrapper.state('autoRefresh')).to.equal(false);
+      expect(wrapper.find(AUTO_REFRESH_SELECTOR).text()).to.equal('Auto Refresh: OFF');
     });
 
     it('should toggle auto refresh when the `auto refresh` button is clicked', () => {
       const wrapper = shallow(<SiteBuilds {...props} />);
 
       wrapper.find(AUTO_REFRESH_SELECTOR).simulate('click');
-      expect(wrapper.state('autoRefresh')).to.equal(false);
-      expect(wrapper.find(AUTO_REFRESH_SELECTOR).text()).to.equal('Auto Refresh: OFF');
-
-      wrapper.find(AUTO_REFRESH_SELECTOR).simulate('click');
       expect(wrapper.state('autoRefresh')).to.equal(true);
       expect(wrapper.find(AUTO_REFRESH_SELECTOR).text()).to.equal('Auto Refresh: ON');
+
+      wrapper.find(AUTO_REFRESH_SELECTOR).simulate('click');
+      expect(wrapper.state('autoRefresh')).to.equal(false);
+      expect(wrapper.find(AUTO_REFRESH_SELECTOR).text()).to.equal('Auto Refresh: OFF');
     });
 
     it('should refresh builds according to the refresh interval when `auto refresh` is on', () => {
@@ -193,6 +193,7 @@ describe('<SiteBuilds/>', () => {
 
       const wrapper = shallow(<SiteBuilds {...props} />);
       wrapper.instance().componentDidMount();
+      wrapper.setState({ autoRefresh: true });
       clock.tick(REFRESH_INTERVAL + 1000);
       expect(spy.callCount).to.equal(2);
     });
@@ -204,7 +205,6 @@ describe('<SiteBuilds/>', () => {
 
       const wrapper = shallow(<SiteBuilds {...props} />);
       wrapper.instance().componentDidMount();
-      wrapper.setState({ autoRefresh: false });
       clock.tick(REFRESH_INTERVAL + 1000);
       expect(spy.callCount).to.equal(1);
     });
