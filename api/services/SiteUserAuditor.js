@@ -3,7 +3,7 @@ const { User, Site } = require('../models');
 const GitHub = require('./GitHub');
 const UserActionCreator = require('./UserActionCreator');
 
-const auditUser = (user) => {
+const auditUser = (user, auditor) => {
   let repos;
   return GitHub.getRepositories(user.githubAccessToken)
     .then((_repos) => {
@@ -19,10 +19,12 @@ const auditUser = (user) => {
           !repo.permissions.push))) { // site does not have push permissions
           const r = site.removeUser(user)
             .then(() => UserActionCreator.addRemoveAction({
+              userId: auditor.id,
               targetId: user.id,
               targetType: 'user',
               siteId: site.id,
-            }));
+            }))
+            .catch(logger.error);
           removed.push(r);
         }
       });
@@ -31,18 +33,24 @@ const auditUser = (user) => {
     .catch(logger.error);
 };
 
-const auditAllUsers = () =>
-  User.findAll({
-    attributes: ['id', 'username', 'githubAccessToken', 'signedInAt'],
-    where: {
-      githubAccessToken: { $ne: null },
-      signedInAt: { $ne: null },
-    },
-    order: [['signedInAt', 'DESC']],
-  })
-  .then((users) => Promise.all(users.map(user => auditUser(user))));
+const auditAllUsers = () => {
+  let auditor;
+  return User.findOne({ where: { username: process.env.USER_AUDITOR } })
+    .then((model) => {
+      auditor = model
+      return User.findAll({
+        attributes: ['id', 'username', 'githubAccessToken', 'signedInAt'],
+        where: {
+          githubAccessToken: { $ne: null },
+          signedInAt: { $ne: null },
+        },
+        order: [['signedInAt', 'DESC']]
+      });
+    })
+    .then((users) => Promise.all(users.map(user => auditUser(user, auditor))));
+  }
 
-const auditSite = (site, userIndex = 0) => {
+const auditSite = (auditor, site, userIndex = 0) => {
   let collaborators;
   const user = site.Users[userIndex];
   if (!user) { return Promise.resolve(); }
@@ -60,32 +68,39 @@ const auditSite = (site, userIndex = 0) => {
         usersToRemove.forEach((u) => {
           const r = site.removeUser(u)
             .then(() => UserActionCreator.addRemoveAction({
+              userId: auditor.id,
               targetId: user.id,
               targetType: 'user',
               siteId: site.id,
-            }));
+            }))
+            .catch(logger.error);
           removed.push(r);
         });
         return Promise.all(removed);
       }
-      return auditSite(site, userIndex + 1);
+      return auditSite(auditor, site, userIndex + 1);
     })
     .catch(logger.error);
 };
 
-const auditAllSites = () =>
-  Site.findAll({
-    attributes: ['id', 'owner', 'repository'],
-    include: [{
-      model: User.scope('withGithub'),
-      attributes: ['id', 'username', 'githubAccessToken', 'signedInAt'],
-    }],
-    order: [[User, 'signedInAt', 'DESC']],
-  })
-  .then((sites) => {
-    const auditedSites = [];
-    sites.forEach(site => auditedSites.push(auditSite(site)));
-    return Promise.all(auditedSites);
-  });
-
+const auditAllSites = () => {
+  let auditor;
+  return User.findOne({ where: { username: process.env.USER_AUDITOR } })
+    .then((model) => {
+      auditor = model;
+      return Site.findAll({
+        attributes: ['id', 'owner', 'repository'],
+        include: [{
+          model: User.scope('withGithub'),
+          attributes: ['id', 'username', 'githubAccessToken', 'signedInAt'],
+        }],
+        order: [[User, 'signedInAt', 'DESC']],
+      });
+    })
+    .then((sites) => {
+      const auditedSites = [];
+      sites.forEach(site => auditedSites.push(auditSite(auditor, site)));
+      return Promise.all(auditedSites);
+    });
+}
 module.exports = { auditAllUsers, auditAllSites, auditUser };
