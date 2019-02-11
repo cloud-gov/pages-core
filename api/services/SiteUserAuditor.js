@@ -3,10 +3,14 @@ const { User, Site } = require('../models');
 const GitHub = require('./GitHub');
 const UserActionCreator = require('./UserActionCreator');
 
-const auditUser = (user, auditor) =>
-  GitHub.getRepositories(user.githubAccessToken)
-    .then(repos => Promise.props({ repos, sites: user.getSites() }))
-    .then(({ repos, sites }) => {
+const auditUser = (user, auditor) => {
+  let repos;
+  return GitHub.getRepositories(user.githubAccessToken)
+    .then((_repos) => {
+      repos = _repos;
+      return user.getSites();
+    })
+    .then((sites) => {
       const removed = [];
       sites.forEach((site) => {
         const fullName = [site.owner, site.repository].join('/').toUpperCase();
@@ -27,6 +31,7 @@ const auditUser = (user, auditor) =>
       return Promise.all(removed);
     })
     .catch(logger.error);
+};
 
 const auditAllUsers = () => {
   let auditor;
