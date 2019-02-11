@@ -37,18 +37,18 @@ const auditAllUsers = () => {
   let auditor;
   return User.findOne({ where: { username: process.env.USER_AUDITOR } })
     .then((model) => {
-      auditor = model
+      auditor = model;
       return User.findAll({
         attributes: ['id', 'username', 'githubAccessToken', 'signedInAt'],
         where: {
           githubAccessToken: { $ne: null },
           signedInAt: { $ne: null },
         },
-        order: [['signedInAt', 'DESC']]
+        order: [['signedInAt', 'DESC']],
       });
     })
-    .then((users) => Promise.all(users.map(user => auditUser(user, auditor))));
-  }
+    .then(users => Promise.all(users.map(user => auditUser(user, auditor))));
+};
 
 const auditSite = (auditor, site, userIndex = 0) => {
   let collaborators;
@@ -102,5 +102,5 @@ const auditAllSites = () => {
       sites.forEach(site => auditedSites.push(auditSite(auditor, site)));
       return Promise.all(auditedSites);
     });
-}
+};
 module.exports = { auditAllUsers, auditAllSites, auditUser };
