@@ -17,6 +17,7 @@ services:
       - db
     environment:
       JWT_SECRET: 'shhHhh...'
+      USER_AUDITOR: federalist
   db:
     build:
       dockerfile: Dockerfile-db
