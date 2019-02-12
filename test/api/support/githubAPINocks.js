@@ -165,7 +165,6 @@ const repo = ({ accessToken, owner, repo, response } = {}) => {
     resp[1] = typicalResponse;
   }
 
-
   return webhookNock.reply(...resp);
 };
 
@@ -179,12 +178,9 @@ const status = ({ accessToken, owner, repo, sha, state, targetURL } = {}) => {
   }
 
   let statusNock = nock('https://api.github.com').post(path, (body) => {
-    if (state && body.state != state) { // eslint-disable-line eqeqeq
-      return false;
-    }
-    if (targetURL && body.target_url !== targetURL) {
-      return false;
-    }
+    if (state && body.state != state) { return false; }// eslint-disable-line eqeqeq
+
+    if (targetURL && body.target_url !== targetURL) { return false; }
 
     const appEnv = config.app.app_env;
     if (appEnv === 'production' && body.context !== 'federalist/build') {
@@ -260,6 +256,86 @@ const getBranch = ({ accessToken, owner, repo, branch, expected }) => {
   return branchNock.reply(200, output);
 };
 
+/* eslint-disable camelcase */
+const getOrganizationMembers = ({ accessToken, organization, role, per_page, page, response }) => {
+  /* eslint-disable no-param-reassign */
+  accessToken = accessToken || 'access-token-123abc';
+  organization = organization || 'test-org';
+  per_page = per_page || 100;
+  page = page || 1;
+  role = role || 'all';
+  /* eslint-enable no-param-reassign */
+
+  let orgMembers = [];
+  for (let i = 0; i < (per_page + 1); i += 1) {
+    if ((i % 50) === 0) {
+      orgMembers.push({ login: `admin-${organization}-${i}`, role: 'admin' });
+    } else {
+      orgMembers.push({ login: `user-${organization}-${i}`, role: 'member' });
+    }
+  }
+  if (role !== 'all') { orgMembers = orgMembers.filter(o => o.role === role); }
+
+  return nock('https://api.github.com')
+    .get(`/orgs/${organization}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}&role=${role}`)
+    .reply(response || 200, orgMembers.slice(((page - 1) * per_page), (page * per_page)));
+};
+
+const getTeamMembers = ({ accessToken, team_id, per_page, page, response } = {}) => {
+  /* eslint-disable no-param-reassign */
+  accessToken = accessToken || 'access-token-123abc';
+  team_id = team_id || 'test-team';
+  per_page = per_page || 100;
+  page = page || 1;
+  /* eslint-enable no-param-reassign */
+
+  const teamMembers = [];
+  for (let i = 0; i < (per_page + 2); i += 1) {
+    teamMembers.push({ login: `user-${team_id}-${i}` });
+  }
+
+  return nock('https://api.github.com')
+    .get(`/teams/${team_id}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
+    .reply(response || 200, teamMembers.slice(((page - 1) * per_page), page * per_page));
+};
+
+const getRepositories = ({ accessToken, per_page, page, response }) => {
+  /* eslint-disable no-param-reassign */
+  accessToken = accessToken || 'access-token-123abc';
+  per_page = per_page || 100;
+  page = page || 1;
+  /* eslint-enable no-param-reassign */
+
+  const repos = [];
+  for (let i = 0; i < (per_page + 1); i += 1) {
+    repos.push({ full_name: `owner/repo-${i}`, permissions: { push: true } });
+  }
+
+  return nock('https://api.github.com')
+    .get(`/user/repos?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
+    .reply(response || 200, repos.slice(((page - 1) * per_page), (page * per_page)));
+};
+
+const getCollaborators = ({ accessToken, owner, repository, per_page, page, response }) => {
+  /* eslint-disable no-param-reassign */
+  accessToken = accessToken || 'access-token-123abc';
+  per_page = per_page || 100;
+  page = page || 1;
+  owner = owner || 'owner';
+  repository = repository || 'repo';
+  /* eslint-enable no-param-reassign */
+
+  const collabs = [];
+  for (let i = 0; i < (per_page + 1); i += 1) {
+    collabs.push({ login: `collaborator-${i}`, permissions: { push: true } });
+  }
+
+  return nock('https://api.github.com')
+    .get(`/repos/${owner}/${repository}/collaborators?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
+    .reply(response || 200, collabs.slice(((page - 1) * per_page), (page * per_page)));
+};
+/* eslint-enable camelcase */
+
 module.exports = {
   getAccessToken,
   createRepoForOrg,
@@ -271,4 +347,8 @@ module.exports = {
   userOrganizations,
   webhook,
   getBranch,
+  getTeamMembers,
+  getOrganizationMembers,
+  getRepositories,
+  getCollaborators,
 };

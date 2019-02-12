@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-
 const moment = require('moment');
 const logger = require('winston');
 
@@ -22,13 +21,33 @@ function getDirectoryFiles(dir, existingFileList) {
   return fileList;
 }
 
-function loadAssetManifest() {
+function loadDevelopmentManifest() {
+  const webpackConfig = require('../../webpack.development.config.js'); // eslint-disable-line global-require
+  const { filename: jsFilename, publicPath } = webpackConfig.output;
+
+  // This requires that MiniCssExtractPlugin be the first plugin in the
+  // development configuration!!!!!
+  const cssFilename = webpackConfig.plugins[0].options.filename;
+
+  return {
+    'main.js': publicPath.slice(1) + jsFilename,
+    'main.css': publicPath.slice(1) + cssFilename,
+  };
+}
+
+function loadProductionManifest() {
   const manifestFile = 'webpack-manifest.json';
   if (!fs.existsSync(manifestFile)) {
     logger.error('webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?');
     throw new Error();
   }
   return JSON.parse(fs.readFileSync(manifestFile, 'utf-8'));
+}
+
+function loadAssetManifest() {
+  return process.env.NODE_ENV === 'development' ?
+    loadDevelopmentManifest() :
+    loadProductionManifest();
 }
 
 function getSiteDisplayEnv() {
@@ -47,5 +66,7 @@ module.exports = {
   getSiteDisplayEnv,
   isPastAuthThreshold,
   loadAssetManifest,
+  loadDevelopmentManifest,
+  loadProductionManifest,
   shouldIncludeTracking,
 };

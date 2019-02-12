@@ -11,6 +11,7 @@ public/styles/uswds.*.css*
 webpack-manifest.json
 webpackAssets
 public/stats.json
+dist
 
 
 # Node.js / NPM

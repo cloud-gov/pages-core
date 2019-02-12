@@ -4,6 +4,8 @@ const GitHubStrategy = require('passport-github').Strategy;
 const passport = require('passport');
 const config = require('../../config');
 const { User } = require('../models');
+const SiteUserAuditor = require('./SiteUserAuditor');
+const RepositoryVerifier = require('./RepositoryVerifier');
 
 const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
   let user;
@@ -28,6 +30,10 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
       });
     })
     .then(() => {
+      User.findOne({ where: { username: process.env.USER_AUDITOR } })
+        .then(auditor => SiteUserAuditor.auditUser(user, auditor)); // audit user's sites post auth
+
+      RepositoryVerifier.verifyUserRepos(user); // verify user's site's repos
       callback(null, user);
     })
     .catch((err) => {
@@ -41,7 +47,7 @@ passport.use(new GitHubStrategy(config.passport.github.options, githubVerifyCall
 passport.logout = (req, res) => {
   req.logout();
   req.session.destroy(() => {
-    res.redirect('/');
+    res.redirect(config.app.homepageUrl);
   });
 };
 

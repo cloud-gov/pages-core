@@ -20,8 +20,10 @@ env:
   NODE_ENV: production
   APP_ENV: staging
   APP_HOSTNAME: https://federalistapp-staging.18f.gov
+  HOMEPAGE_URL: https://federalist-staging.18f.gov
   LOG_LEVEL: verbose
   NPM_CONFIG_PRODUCTION: true
   NODE_MODULES_CACHE: false
   FEDERALIST_PREVIEW_HOSTNAME: https://federalist-proxy-staging.app.cloud.gov
   SOCKET_HOST: https://federalistapp-staging.fr.cloud.gov
+  USER_AUDITOR: federalist

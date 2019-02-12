@@ -44,7 +44,7 @@ export const AddRepoSiteForm = ({
       <div className="add-repo-site-additional-fields">
         {showNewSiteAlert()}
         <div className="form-group">
-          <label htmlFor="engine">Static site engine</label>
+          <label htmlFor="engine">Site engine</label>
           <Field
             name="engine"
             id="engine"

@@ -3,18 +3,11 @@ const { Site } = require('../models');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const config = require('../../config');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
-const caseStudyData = require('../../public/data/case-studies');
 const jwtHelper = require('../services/jwtHelper');
 
-let webpackAssets = loadAssetManifest();
+const webpackAssets = loadAssetManifest();
 
 function defaultContext(req) {
-  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-    // reload the webpack assets during development so we don't have to
-    // restart the server for front end changes
-    webpackAssets = loadAssetManifest();
-  }
-
   const messages = {
     errors: req.flash('error'),
   };
@@ -24,6 +17,7 @@ function defaultContext(req) {
     messages,
     shouldIncludeTracking: shouldIncludeTracking(),
     siteDisplayEnv: getSiteDisplayEnv(),
+    homepageUrl: config.app.homepageUrl,
     webpackAssets,
   };
 
@@ -50,35 +44,19 @@ module.exports = {
   },
 
   examples(req, res) {
-    // redirect to main app if is authenticated
-    if (req.session.authenticated) {
-      return res.redirect('/sites');
-    }
-
-    const context = Object.assign({}, defaultContext(req), caseStudyData);
-
-    return res.render('content/case-studies.njk', context);
+    return res.redirect(`${config.app.homepageUrl}/case-studies`);
   },
 
   contact(req, res) {
-    const context = defaultContext(req);
-
-    if (req.session.authenticated) {
-      context.isAuthenticated = true;
-      context.username = req.user.username;
-    }
-
-    return res.render('content/contact.njk', context);
+    return res.redirect(`${config.app.homepageUrl}/contact`);
   },
 
   features(req, res) {
-    // redirect to main app if is authenticated
-    if (req.session.authenticated) {
-      return res.redirect('/sites');
-    }
+    return res.redirect(`${config.app.homepageUrl}/features`);
+  },
 
-    const context = Object.assign({}, defaultContext(req));
-    return res.render('features.njk', context);
+  support(req, res) {
+    return res.redirect(`${config.app.homepageUrl}/support`);
   },
 
   app(req, res) {
@@ -124,5 +102,17 @@ module.exports = {
 
     // otherwise send the "deny all" robots.txt content
     return res.send(DENY_ALL_CONTENT);
+  },
+
+  notFound(req, res) {
+    const context = defaultContext(req);
+    if (req.session.authenticated) {
+      context.isAuthenticated = true;
+      context.username = req.user.username;
+      context.accessToken = jwtHelper.sign({ user: req.user.id });
+      context.socketHost = process.env.SOCKET_HOST;
+    }
+
+    res.render('404.njk', context);
   },
 };

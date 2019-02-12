@@ -1,13 +1,13 @@
 const expect = require('chai').expect;
-const moment = require('moment');
+// const moment = require('moment');
 const request = require('supertest');
 
 const app = require('../../../app');
 const config = require('../../../config');
-const { Build } = require('../../../api/models');
+// const { Build } = require('../../../api/models');
 const { authenticatedSession } = require('../support/session');
 const { sessionForCookie, sessionCookieFromResponse } = require('../support/cookieSession');
-const factory = require('../support/factory');
+// const factory = require('../support/factory');
 
 describe('Main Site', () => {
   describe('Home /', () => {
@@ -15,16 +15,6 @@ describe('Main Site', () => {
       request(app)
         .get('/')
         .expect(200);
-    });
-
-    it('should contain home page content', () => {
-      request(app)
-        .get('/')
-        .expect(200)
-        .then((response) => {
-          expect(response.text.indexOf('Federalist compliantly hosts federal government websites.')).to.be.above(-1);
-          expect(response.text.indexOf('Log in')).to.be.above(-1);
-        });
     });
 
     it('should redirect to /sites when authenticated', (done) => {
@@ -40,22 +30,58 @@ describe('Main Site', () => {
       })
       .catch(done);
     });
+  });
 
-    it('should display the number of builds from the past week', (done) => {
-      Build.destroy({ where: {} }).then(() => {
-        const promises = Array.from(Array(10).keys()).map((day) => {
-          const date = moment().subtract(day + 1, 'days');
-          return factory.build({ createdAt: date });
-        });
-        return Promise.all(promises);
-      })
-      .then(() =>
-        request(app)
-          .get('/')
-          .expect(200)
+  describe('App /404', () => {
+    it('should redirect to / with a flash error when not authenticated', (done) => {
+      request(app)
+        .get('/blahblahpage')
+        .expect(302)
+        .then((response) => {
+          expect(response.headers.location).to.equal('/404-not-found/');
+          expect(response.text.indexOf('Found. Redirecting to /404-not-found/')).to.be.above(-1);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should work when authenticated', (done) => {
+      authenticatedSession()
+        .then(cookie => request(app)
+          .get('/blahblahpage')
+          .set('Cookie', cookie)
+          .expect(302)
+        )
+        .then((response) => {
+          expect(response.headers.location).to.equal('/404-not-found/');
+          expect(response.text.indexOf('Found. Redirecting to /404-not-found/')).to.be.above(-1);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should have app content', (done) => {
+      authenticatedSession()
+      .then(cookie => request(app)
+        .get('/404-not-found/')
+        .set('Cookie', cookie)
+        .expect(200)
       )
       .then((response) => {
-        expect(response.text.indexOf('7 site updates')).to.be.above(-1);
+        expect(response.text.indexOf('Log out')).to.be.above(-1);
+        expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should have app content', (done) => {
+      request(app)
+        .get('/404-not-found/')
+        .expect(200)
+      .then((response) => {
+        expect(response.text.indexOf('Log in')).to.be.above(-1);
+        expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
         done();
       })
       .catch(done);
@@ -158,40 +184,26 @@ describe('Main Site', () => {
   });
 
   describe('.examples', () => {
-    it('renders the page properly', (done) => {
-      request(app)
-      .get('/content/examples/')
-      .expect(200)
-      .then((response) => {
-        expect(response.text.indexOf('example-sites')).to.be.above(-1);
-        done();
-      })
-      .catch(done);
-    });
+    // it('renders the page properly', (done) => {
+    //   request(app)
+    //   .get('/content/examples/')
+    //   .expect(200)
+    //   .then((response) => {
+    //     expect(response.text.indexOf('example-sites')).to.be.above(-1);
+    //     done();
+    //   })
+    //   .catch(done);
+    // });
 
-    it('should redirect to /sites when authenticated', (done) => {
+    it('should redirect to http://localhost:4000/case-studies when authenticated', (done) => {
       authenticatedSession()
       .then(cookie => request(app)
-        .get('/content/examples/')
+        .get('/case-studies')
         .set('Cookie', cookie)
         .expect(302)
       )
       .then((response) => {
-        expect(response.headers.location).to.equal('/sites');
-        done();
-      })
-      .catch(done);
-    });
-  });
-
-
-  describe('.contact', () => {
-    it('renders the page properly', (done) => {
-      request(app)
-      .get('/contact')
-      .expect(200)
-      .then((response) => {
-        expect(response.text.indexOf('contact')).to.be.above(-1);
+        expect(response.headers.location).to.equal('http://localhost:4000/case-studies');
         done();
       })
       .catch(done);
