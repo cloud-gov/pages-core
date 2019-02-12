@@ -27,3 +27,4 @@ env:
   NODE_MODULES_CACHE: false
   FEDERALIST_PREVIEW_HOSTNAME: https://federalist-proxy-staging.app.cloud.gov
   SOCKET_HOST: https://federalist-staging.fr.cloud.gov
+  USER_AUDITOR: federalist
