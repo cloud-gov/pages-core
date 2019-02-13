@@ -203,7 +203,7 @@ describe('Site model', () => {
       done();
     });
   });
-  
+
   it('should validate the demo branch name is valid no trailing hyphen', (done) => {
     factory.site({
       demoBranch: 'invalid-',
