@@ -136,7 +136,7 @@ describe('Site model', () => {
 
   it('should validate the primary branch name is valid', (done) => {
     factory.site({
-      defaultBranch: 'very/bad',
+      defaultBranch: 'very*bad',
     }).catch((err) => {
       expect(err.status).to.equal(403);
       expect(err.message).to.equal('defaultBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
