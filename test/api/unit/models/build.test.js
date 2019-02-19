@@ -182,7 +182,35 @@ describe('Build model', () => {
         user: 1,
         site: 1,
         commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
-        branch: 'not/real',
+        branch: 'not*real',
+      })
+      .then(done)
+      .catch((error) => {
+        expect(error.name).to.equal('SequelizeValidationError');
+        expect(error.errors[0].path).to.equal('branch');
+        done();
+      });
+    });
+    it('requires a valid branch name before saving no end slash', (done) => {
+      Build.create({
+        user: 1,
+        site: 1,
+        commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+        branch: 'not-real/',
+      })
+      .then(done)
+      .catch((error) => {
+        expect(error.name).to.equal('SequelizeValidationError');
+        expect(error.errors[0].path).to.equal('branch');
+        done();
+      });
+    });
+    it('requires a valid branch name before saving no begin /', (done) => {
+      Build.create({
+        user: 1,
+        site: 1,
+        commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+        branch: '/not-real',
       })
       .then(done)
       .catch((error) => {
