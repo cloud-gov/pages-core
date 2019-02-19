@@ -50,6 +50,15 @@ describe('Site model', () => {
           done();
         }).catch(done);
       });
+
+      it('should return a proxy link if there is no domain and banchname w slash', (done) => {
+        const defaultBranch = 'defau/lt-branch';
+        factory.site({ defaultBranch }).then((site) => {
+          const viewLink = site.viewLinkForBranch(defaultBranch);
+          expect(viewLink).to.equal(`${config.app.preview_hostname}/site/${site.owner}/${site.repository}/`);
+          done();
+        }).catch(done);
+      });
     });
 
     context('for the demo branch', () => {
@@ -68,6 +77,15 @@ describe('Site model', () => {
         }).then((site) => {
           const viewLink = site.viewLinkForBranch('demo-branch');
           expect(viewLink).to.equal('https://demo.example.gov/');
+          done();
+        }).catch(done);
+      });
+
+      it('should return a proxy demo link if no demo branch contains slash', (done) => {
+        const demoBranch = 'dem/o-branch';
+        factory.site({ demoBranch }).then((site) => {
+          const viewLink = site.viewLinkForBranch(demoBranch);
+          expect(viewLink).to.equal(`${config.app.preview_hostname}/demo/${site.owner}/${site.repository}/`);
           done();
         }).catch(done);
       });
@@ -136,7 +154,7 @@ describe('Site model', () => {
 
   it('should validate the primary branch name is valid', (done) => {
     factory.site({
-      defaultBranch: 'very/bad',
+      defaultBranch: 'very*bad',
     }).catch((err) => {
       expect(err.status).to.equal(403);
       expect(err.message).to.equal('defaultBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
@@ -147,6 +165,48 @@ describe('Site model', () => {
   it('should validate the demo branch name is valid', (done) => {
     factory.site({
       demoBranch: 'in@valid',
+    })
+    .catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('demoBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
+      done();
+    });
+  });
+
+  it('should validate the primary branch name is valid no leading slash', (done) => {
+    factory.site({
+      defaultBranch: '/very-bad',
+    }).catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('defaultBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
+      done();
+    });
+  });
+
+  it('should validate the demo branch name is valid no trailing slashes', (done) => {
+    factory.site({
+      demoBranch: 'invalid/',
+    })
+    .catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('demoBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
+      done();
+    });
+  });
+
+  it('should validate the primary branch name is valid -no leading hyphen', (done) => {
+    factory.site({
+      defaultBranch: '-very-bad',
+    }).catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('defaultBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
+      done();
+    });
+  });
+
+  it('should validate the demo branch name is valid no trailing hyphen', (done) => {
+    factory.site({
+      demoBranch: 'invalid-',
     })
     .catch((err) => {
       expect(err.status).to.equal(403);
