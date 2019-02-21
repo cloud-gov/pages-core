@@ -130,7 +130,7 @@ const getNextRepositories = (github, page = 1, allRepos = []) =>
     });
 
 const getCollaborators = (github, owner, repo, page = 1) =>
-  github.repos.getCollaborators({ owner, repo, per_page: 100, page })
+  github.repos.listCollaborators({ owner, repo, per_page: 100, page })
     .then(collabs => Promise.resolve(collabs.data));
 
 const getNextCollaborators = (github, owner, repo, page = 1, allCollabs = []) =>
