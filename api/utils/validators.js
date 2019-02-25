@@ -1,6 +1,6 @@
 const yaml = require('js-yaml');
 
-const branchRegex = /^[^/-][a-zA-Z0-9._/-]+[^/-]$/;
+const branchRegex = /^[\w.]+(?:[/-]*[\w.])*$/;
 const githubUsernameRegex = /^[^-][a-zA-Z-]+$/;
 const shaRegex = /^[a-f0-9]{40}$/;
 
