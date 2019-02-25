@@ -6,6 +6,7 @@ stack: cflinuxfs2
 routes:
 - route: federalistapp-staging.fr.cloud.gov
 - route: federalistapp-staging.18f.gov
+- route: federalist-staging.fr.cloud.gov
 disk_quota: 2G
 memory: 256MB
 instances: 2
