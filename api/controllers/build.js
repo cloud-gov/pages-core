@@ -8,7 +8,7 @@ const logger = require('winston');
 
 const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
 
-const emitBuildStatus = (socket, build) => Site.findById(build.site)
+const emitBuildStatus = (socket, build) => Site.findByPk(build.site)
     .then((site) => {
       const msg = {
         id: build.id,
@@ -33,7 +33,7 @@ module.exports = {
     Promise.resolve(Number(req.params.site_id))
     .then((id) => {
       if (isNaN(id)) { throw 404; }
-      return Site.findById(id);
+      return Site.findByPk(id);
     })
     .then((model) => {
       if (!model) { throw 404; }
@@ -94,7 +94,7 @@ module.exports = {
       if (isNaN(id)) {
         throw 404;
       }
-      return Build.findById(id);
+      return Build.findByPk(id);
     })
     .then((build) => {
       if (!build) {

@@ -21,12 +21,11 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'action_type',
-    classMethods: {
-      associate,
-      createDefaultActionTypes,
-    },
     timestamps: false,
   });
+
+  ActionType.associate = associate;
+  ActionType.createDefaultActionTypes = createDefaultActionTypes
 
   return ActionType;
 };

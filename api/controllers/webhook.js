@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const logger = require('winston');
+const Sequelize = require('sequelize');
 const config = require('../../config');
 const buildSerializer = require('../serializers/build');
 const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
@@ -32,7 +33,7 @@ const findSiteForWebhookRequest = (request) => {
     where: {
       owner,
       repository,
-      buildStatus: { $ne: 'inactive' },
+      buildStatus: { [Sequelize.Op.ne]: 'inactive' },
     },
   })
   .then((site) => {

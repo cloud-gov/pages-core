@@ -19,16 +19,6 @@ const associate = ({ User, UserAction, ActionType, Site }) => {
   });
 };
 
-const toJSON = function json() {
-  const record = this.get({
-    plain: true,
-  });
-
-  record.createdAt = record.createdAt.toISOString();
-
-  return record;
-};
-
 const schema = DataTypes => ({
   userId: {
     type: DataTypes.INTEGER, allowNull: false },
@@ -71,12 +61,10 @@ module.exports = (sequelize, DataTypes) => {
 
   const UserAction = sequelize.define('UserAction', schema(DataTypes), {
     tableName: 'user_action',
-    classMethods: {
-      associate,
-      findAllBySite,
-    },
-    instanceMethods: { toJSON },
   });
+
+  UserAction.associate = associate;
+  UserAction.findAllBySite = findAllBySite;
 
   return UserAction;
 };

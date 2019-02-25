@@ -80,25 +80,6 @@ function completeJob(err) {
     .then(() => build));
 }
 
-function toJSON() {
-  const object = Object.assign({}, this.get({
-    plain: true,
-  }));
-
-  object.createdAt = object.createdAt.toISOString();
-  object.updatedAt = object.updatedAt.toISOString();
-  if (object.completedAt) {
-    object.completedAt = object.completedAt.toISOString();
-  }
-  Object.keys(object).forEach((key) => {
-    if (object[key] === null) {
-      delete object[key];
-    }
-  });
-  delete object.token;
-  return object;
-}
-
 module.exports = (sequelize, DataTypes) => {
   const Build = sequelize.define('Build', {
     branch: {
@@ -142,18 +123,14 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'build',
-    classMethods: {
-      associate,
-    },
-    instanceMethods: {
-      completeJob,
-      toJSON,
-    },
     hooks: {
       afterCreate,
       beforeValidate,
     },
   });
+
+  Build.associate = associate;
+  Build.prototype.completeJob = completeJob;
 
   return Build;
 };

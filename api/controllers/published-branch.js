@@ -11,7 +11,7 @@ module.exports = {
       if (isNaN(id)) {
         throw 404;
       }
-      return Site.findById(id);
+      return Site.findByPk(id);
     }).then((model) => {
       if (model) {
         site = model;
@@ -49,7 +49,7 @@ module.exports = {
       if (isNaN(id)) {
         throw 404;
       }
-      return Site.findById(id);
+      return Site.findByPk(id);
     })
     .then((model) => {
       if (model) {

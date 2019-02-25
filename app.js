@@ -2,7 +2,7 @@ const config = require('./config');
 
 const logger = require('winston');
 
-logger.level = config.log.level;
+// logger.level = config.log.level;
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, { colorize: true });
 

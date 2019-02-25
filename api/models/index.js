@@ -12,7 +12,7 @@ const sequelize = new Sequelize(database, username, password, {
   dialect: 'postgres',
   host: postgresConfig.host,
   port: postgresConfig.port,
-  logging: logger.info,
+  logging: logger.debug,
 });
 /* eslint-disable no-unused-vars */
 const Build = sequelize.import(path.join(__dirname, '/build'));

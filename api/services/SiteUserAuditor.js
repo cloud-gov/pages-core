@@ -1,4 +1,5 @@
 const logger = require('winston');
+const Sequelize = require('sequelize');
 const { User, Site } = require('../models');
 const GitHub = require('./GitHub');
 const UserActionCreator = require('./UserActionCreator');
@@ -41,8 +42,8 @@ const auditAllUsers = () => {
       return User.findAll({
         attributes: ['id', 'username', 'githubAccessToken', 'signedInAt'],
         where: {
-          githubAccessToken: { $ne: null },
-          signedInAt: { $ne: null },
+          githubAccessToken: { [Sequelize.Op.ne]: null },
+          signedInAt: { [Sequelize.Op.ne]: null },
         },
         order: [['signedInAt', 'DESC']],
       });

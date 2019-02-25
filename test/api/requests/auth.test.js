@@ -140,7 +140,7 @@ describe('Authentication request', () => {
             .set('Cookie', cookie)
             .expect(302)
         )
-        .then(() => User.findById(user.id))
+        .then(() => User.findByPk(user.id))
         .then((foundUser) => {
           expect(foundUser.githubAccessToken).to.equal('access-token-123abc');
           done();
@@ -170,7 +170,7 @@ describe('Authentication request', () => {
         .then((authSession) => {
           expect(authSession.authenticated).to.equal(true);
           const userID = authSession.passport.user;
-          return User.findById(userID);
+          return User.findByPk(userID);
         })
         .then((user) => {
           expect(user).to.have.property('email', `user-${githubUserID}@example.com`);

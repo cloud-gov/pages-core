@@ -1,9 +1,3 @@
-const protectedAttributes = [
-  'githubAccessToken',
-  'githubUserId',
-  'signedInAt',
-  'SiteUser',
-];
 const associate = ({ User, Build, Site, UserAction, SiteUser }) => {
   User.hasMany(Build, {
     foreignKey: 'user',
@@ -31,48 +25,6 @@ function beforeValidate(user) {
   user.username = safeUsername || null; // eslint-disable-line no-param-reassign
 }
 
-function toJSON() {
-  const record = this.get({
-    plain: true,
-  });
-
-  return Object.assign({}, Object.keys(record).reduce((out, attr) => {
-    if (protectedAttributes.indexOf(attr) === -1) {
-      out[attr] = record[attr]; // eslint-disable-line no-param-reassign
-    }
-
-    if (attr === 'SiteUser' && record[attr] && record[attr].buildNotificationSetting) {
-      // eslint-disable-next-line no-param-reassign
-      out.buildNotificationSetting = record[attr].buildNotificationSetting;
-    }
-    return out;
-  }, {}), {
-    createdAt: record.createdAt.toISOString(),
-    updatedAt: record.updatedAt.toISOString(),
-  });
-}
-
-const tableOptions = {
-  tableName: 'user',
-  classMethods: {
-    associate,
-  },
-  instanceMethods: {
-    toJSON,
-  },
-  hooks: {
-    beforeValidate,
-  },
-  paranoid: true,
-  scopes: {
-    withGithub: {
-      where: {
-        githubAccessToken: { $ne: null },
-      },
-    },
-  },
-};
-
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     email: {
@@ -95,7 +47,23 @@ module.exports = (sequelize, DataTypes) => {
       unique: true,
       allowNull: false,
     },
-  }, tableOptions);
+  }, 
+  {
+    tableName: 'user',
+    hooks: {
+      beforeValidate,
+    },
+    paranoid: true,
+    scopes: {
+      withGithub: {
+        where: {
+          githubAccessToken: { [sequelize.Op.ne]: null },
+        },
+      },
+    },
+  });
+
+  User.associate = associate;
 
   return User;
 };

@@ -79,33 +79,6 @@ function branchPreviewUrl(branch = null) {
   return url;
 }
 
-function toJSON() {
-  const object = Object.assign({}, this.get({
-    plain: true,
-  }));
-
-  delete object.site_users__user_sites;
-
-  object.createdAt = object.createdAt.toISOString();
-  object.updatedAt = object.updatedAt.toISOString();
-
-  object.viewLink = this.siteUrl();
-
-  if (object.demoBranch) {
-    object.demoViewLink = this.demoUrl();
-  }
-
-  object.previewLink = this.branchPreviewUrl();
-
-  Object.keys(object).forEach((key) => {
-    if (object[key] === null) {
-      delete object[key];
-    }
-  });
-
-  return object;
-}
-
 function viewLinkForBranch(branch) {
   if (branch === this.defaultBranch) {
     return this.siteUrl();
@@ -204,16 +177,6 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'site',
-    classMethods: {
-      associate,
-    },
-    instanceMethods: {
-      toJSON,
-      viewLinkForBranch,
-      siteUrl,
-      demoUrl,
-      branchPreviewUrl,
-    },
     hooks: {
       beforeValidate,
       afterValidate,
@@ -222,7 +185,13 @@ module.exports = (sequelize, DataTypes) => {
     paranoid: true,
   });
 
-  Site.withUsers = id => Site.findById(id, { include: [sequelize.models.User] });
+  Site.associate = associate;
+  Site.prototype.viewLinkForBranch = viewLinkForBranch;
+  Site.prototype.siteUrl = siteUrl;
+  Site.prototype.demoUrl = demoUrl;
+  Site.prototype.branchPreviewUrl = branchPreviewUrl;
+
+  Site.withUsers = id => Site.findByPk(id, { include: [sequelize.models.User] });
 
   return Site;
 };

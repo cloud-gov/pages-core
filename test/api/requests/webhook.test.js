@@ -38,7 +38,7 @@ describe('Webhook API', () => {
       let payload;
 
       factory.site()
-        .then(s => Site.findById(s.id, { include: [User] }))
+        .then(s => Site.findByPk(s.id, { include: [User] }))
         .then((model) => {
           site = model;
           user = site.Users[0];
@@ -96,10 +96,10 @@ describe('Webhook API', () => {
             })
             .expect(200);
         })
-        .then(response => Build.findById(response.body.id, { include: [User] }))
+        .then(response => Build.findByPk(response.body.id, { include: [User] }))
         .then((build) => {
           expect(build.User.username).to.equal(username);
-          return User.findById(build.User.id, { include: [Site] });
+          return User.findByPk(build.User.id, { include: [Site] });
         })
         .then((user) => {
           expect(user.Sites).to.have.length(1);
@@ -176,7 +176,7 @@ describe('Webhook API', () => {
       let user;
 
       factory.site()
-        .then(s => Site.findById(s.id, { include: [User] }))
+        .then(s => Site.findByPk(s.id, { include: [User] }))
         .then((model) => {
           site = model;
           user = site.Users[0];
@@ -257,7 +257,7 @@ describe('Webhook API', () => {
       let site;
 
       factory.site()
-        .then(s => Site.findById(s.id, { include: [User] }))
+        .then(s => Site.findByPk(s.id, { include: [User] }))
         .then((model) => {
           site = model;
 

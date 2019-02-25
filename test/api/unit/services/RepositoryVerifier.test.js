@@ -27,7 +27,7 @@ describe('RepositoryVerifier', () => {
           });
           return RepositoryVerifier.verifyRepos();
         })
-        .then(() => Site.findById(site.id))
+        .then(() => Site.findByPk(site.id))
         .then((_site) => {
           expect(_site.repoLastVerified).to.be.an.instanceOf(Date);
           done();
@@ -60,7 +60,7 @@ describe('RepositoryVerifier', () => {
           });
           return RepositoryVerifier.verifyRepos();
         })
-        .then(() => Site.findById(site.id))
+        .then(() => Site.findByPk(site.id))
         .then((_site) => {
           expect(_site.repoLastVerified).to.be.an.instanceOf(Date);
           done();
@@ -94,7 +94,7 @@ describe('RepositoryVerifier', () => {
           });
           return RepositoryVerifier.verifyRepos();
         })
-        .then(() => Site.findById(site.id))
+        .then(() => Site.findByPk(site.id))
         .then((_site) => {
           expect(_site.repoLastVerified).to.be.null;
           done();
