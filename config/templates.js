@@ -44,4 +44,13 @@ module.exports = {
     description: 'A simple and professional redirect template that follows U.S. web design system principles. This redirect page fits well with a variety of different branding and styling.',
     thumb: '/images/federalist-redirect-template.jpg',
   },
+  gatsby: {
+    owner: '18f',
+    repo: 'federalist-uswds-gatsby',
+    branch: 'master',
+    example: 'https://federalist-proxy.app.cloud.gov/site/18f/federalist-uswds-gatsby/',
+    title: 'Gatsby USWDS Template',
+    description: 'A flexible multi-page setup intended to introduce an agency or program using Gatsby.js. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
+    thumb: '/images/federalist-gatsby-uswds-template.png',
+  },
 };
