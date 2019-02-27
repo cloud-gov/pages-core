@@ -70,7 +70,6 @@ $image-path: '../../node_modules/uswds/src/img';
 
 .site-main {
   background-color: white;
-  height: inherit;
   padding-bottom: 5rem;
 }
 
@@ -90,6 +89,12 @@ $image-path: '../../node_modules/uswds/src/img';
   top: 0;
   width: 50%;
   z-index: -1;
+}
+
+.back-to-top {
+  display: block;
+  padding-bottom: 5rem;
+  padding-top: 2rem;
 }
 
 @media screen and (max-width: $mobile-size) {
@@ -120,6 +125,7 @@ $image-path: '../../node_modules/uswds/src/img';
   }
 
   .site-main {
+    height: inherit;
     padding-left: 3rem;
   }
 
