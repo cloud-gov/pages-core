@@ -269,7 +269,7 @@ describe('Site API', () => {
             repository: siteRepository,
             defaultBranch: 'master',
             engine: 'jekyll',
-            template: 'team',
+            template: 'uswds',
           })
           .set('Cookie', cookie)
           .expect(200))
