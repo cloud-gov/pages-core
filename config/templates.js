@@ -1,4 +1,13 @@
 module.exports = {
+  uswds2: {
+    owner: '18f',
+    repo: 'federalist-uswds-jekyll',
+    branch: 'master',
+    example: 'https://federalist-proxy.app.cloud.gov/site/18f/federalist-uswds-jekyll/',
+    title: 'U.S. web design system v2.0',
+    description: 'A flexible multi-page setup intended to introduce an agency or program. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
+    thumb: '/images/federalist-uswds-jekyll.png',
+  },
   uswds: {
     owner: '18f',
     repo: 'federalist-uswds-template',
