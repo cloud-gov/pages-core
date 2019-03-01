@@ -30,9 +30,6 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
       });
     })
     .then(() => {
-      User.findOne({ where: { username: process.env.USER_AUDITOR } })
-        .then(auditor => SiteUserAuditor.auditUser(user, auditor)); // audit user's sites post auth
-
       RepositoryVerifier.verifyUserRepos(user); // verify user's site's repos
       callback(null, user);
     })
