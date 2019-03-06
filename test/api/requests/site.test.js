@@ -290,7 +290,7 @@ describe('Site API', () => {
           .catch(done);
     });
 
-    it('should respond with a 400 if no user or repository is specified', (done) => {
+    it('should respond with a 403 if no user or repository is specified', (done) => {
       authenticatedSession().then(cookie => request(app)
           .post('/v0/site')
           .set('x-csrf-token', csrfToken.getToken())
@@ -298,6 +298,24 @@ describe('Site API', () => {
             defaultBranch: 'master',
             engine: 'jekyll',
             template: 'team',
+          })
+          .set('Cookie', cookie)
+          .expect(403)).then((response) => {
+            validateAgainstJSONSchema('POST', '/site', 403, response.body);
+            done();
+          }).catch(done);
+    });
+
+    it('should respond with a 400 if template specified does not exist', (done) => {
+      authenticatedSession().then(cookie => request(app)
+          .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            owner: 'siteOwner',
+            repository: 'siteRepository',
+            defaultBranch: 'master',
+            engine: 'jekyll',
+            template: 'fake-template',
           })
           .set('Cookie', cookie)
           .expect(400)).then((response) => {
