@@ -8,4 +8,4 @@ module.exports = () => {
   return webpackDevMiddleware(compiler, {
     publicPath: webpackConfig.output.publicPath,
   });
-}
+};
