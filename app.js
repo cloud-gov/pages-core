@@ -1,7 +1,5 @@
 const config = require('./config');
-const winston = require('./winston');
-
-const logger = winston.logger;
+const { logger, expressLogger, expressErrorLogger } = require('./winston');
 
 // If settings present, start New Relic
 const env = require('./services/environment.js')();
@@ -115,10 +113,10 @@ app.use((req, res, next) => {
 });
 
 if (logger.levels[logger.level] >= 2) {
-  app.use(winston.expressLogger);
+  app.use(expressLogger);
 }
 
-app.use(winston.expressErrorLogger);
+app.use(expressErrorLogger);
 
 const limiter = new RateLimit(config.rateLimiting);
 app.use(limiter); // must be set before router is added to app
