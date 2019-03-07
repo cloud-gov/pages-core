@@ -1,4 +1,4 @@
-const logger = require('winston');
+const { logger } = require('../../winston');
 
 module.exports = (error = {}, { res }) => {
   logger.error('Sending 500: ', error);

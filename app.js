@@ -1,10 +1,7 @@
 const config = require('./config');
+const winston = require('./winston');
 
-const logger = require('winston');
-
-// logger.level = config.log.level;
-logger.remove(logger.transports.Console);
-logger.add(logger.transports.Console, { colorize: true });
+const logger = winston.logger;
 
 // If settings present, start New Relic
 const env = require('./services/environment.js')();
@@ -19,7 +16,6 @@ if (env.NEW_RELIC_APP_NAME && env.NEW_RELIC_LICENSE_KEY) {
 const express = require('express');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
-const expressWinston = require('express-winston');
 const session = require('express-session');
 const PostgresStore = require('connect-session-sequelize')(session.Store);
 const nunjucks = require('nunjucks');
@@ -119,18 +115,10 @@ app.use((req, res, next) => {
 });
 
 if (logger.levels[logger.level] >= 2) {
-  app.use(expressWinston.logger({
-    transports: [
-      new logger.transports.Console({ colorize: true }),
-    ],
-    requestWhitelist: expressWinston.requestWhitelist.concat('body'),
-  }));
+  app.use(winston.expressLogger);
 }
-app.use(expressWinston.errorLogger({
-  transports: [
-    new logger.transports.Console({ json: true, colorize: true }),
-  ],
-}));
+
+app.use(winston.expressErrorLogger);
 
 const limiter = new RateLimit(config.rateLimiting);
 app.use(limiter); // must be set before router is added to app

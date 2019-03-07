@@ -1,7 +1,7 @@
-const logger = require('winston');
 const Sequelize = require('sequelize');
 const { User, Site } = require('../models');
 const GitHub = require('./GitHub');
+const { logger } = require('../../winston');
 const UserActionCreator = require('./UserActionCreator');
 
 const auditUser = (user, auditor) => {

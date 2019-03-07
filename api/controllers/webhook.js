@@ -1,10 +1,10 @@
 const crypto = require('crypto');
-const logger = require('winston');
 const Sequelize = require('sequelize');
 const config = require('../../config');
 const buildSerializer = require('../serializers/build');
 const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
 const { Build, User, Site } = require('../models');
+const { logger } = require('../../winston');
 
 const signBlob = (key, blob) =>
   `sha1=${crypto.createHmac('sha1', key).update(blob).digest('hex')}`;

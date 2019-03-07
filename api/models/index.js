@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
-const logger = require('winston');
-const config = require('../../config');
 const path = require('path');
+const config = require('../../config');
+const { logger } = require('../../winston');
 
 const postgresConfig = config.postgres;
 const database = postgresConfig.database;

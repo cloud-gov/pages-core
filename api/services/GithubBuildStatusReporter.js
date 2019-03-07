@@ -1,4 +1,4 @@
-const logger = require('winston');
+const { logger } = require('../../winston');
 const url = require('url');
 const Sequelize = require('sequelize');
 const GitHub = require('./GitHub');

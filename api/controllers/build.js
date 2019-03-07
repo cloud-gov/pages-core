@@ -4,7 +4,7 @@ const siteAuthorizer = require('../authorizers/site');
 const BuildResolver = require('../services/BuildResolver');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const { Build, Site } = require('../models');
-const logger = require('winston');
+const { logger } = require('../../winston');
 
 const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
 

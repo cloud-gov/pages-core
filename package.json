@@ -19,7 +19,7 @@
     "express": "4.16.4",
     "express-rate-limit": "^2.9.0",
     "express-session": "^1.15.6",
-    "express-winston": "^2.3.0",
+    "express-winston": "^3.0.1",
     "file-saver": "^1.3.8",
     "js-file-download": "^0.4.1",
     "js-yaml": "^3.10.0",
@@ -42,7 +42,7 @@
     "uswds": "^1.4.4",
     "validator": "^5.2.0",
     "whatwg-fetch": "^1.0.0",
-    "winston": "^2.3.1",
+    "winston": "^3.2.1",
     "yamljs": "^0.2.8"
   },
   "scripts": {
