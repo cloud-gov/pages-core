@@ -25,7 +25,7 @@ function beforeValidate(user) {
   user.username = safeUsername || null; // eslint-disable-line no-param-reassign
 }
 
-const attributes = (DataTypes) => ({
+const attributes = DataTypes => ({
   email: {
     type: DataTypes.STRING,
     validate: {
@@ -48,7 +48,7 @@ const attributes = (DataTypes) => ({
   },
 });
 
-const options = (sequelize) => ({
+const options = sequelize => ({
   tableName: 'user',
   hooks: {
     beforeValidate,
