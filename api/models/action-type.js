@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   ActionType.associate = associate;
-  ActionType.createDefaultActionTypes = createDefaultActionTypes
+  ActionType.createDefaultActionTypes = createDefaultActionTypes;
 
   return ActionType;
 };

@@ -25,45 +25,46 @@ function beforeValidate(user) {
   user.username = safeUsername || null; // eslint-disable-line no-param-reassign
 }
 
+const attributes = (DataTypes) => ({
+  email: {
+    type: DataTypes.STRING,
+    validate: {
+      isEmail: true,
+    },
+  },
+  githubAccessToken: {
+    type: DataTypes.STRING,
+  },
+  githubUserId: {
+    type: DataTypes.STRING,
+  },
+  signedInAt: {
+    type: DataTypes.DATE,
+  },
+  username: {
+    type: DataTypes.STRING,
+    unique: true,
+    allowNull: false,
+  },
+});
+
+const options = (sequelize) => ({
+  tableName: 'user',
+  hooks: {
+    beforeValidate,
+  },
+  paranoid: true,
+  scopes: {
+    withGithub: {
+      where: {
+        githubAccessToken: { [sequelize.Op.ne]: null },
+      },
+    },
+  },
+});
+
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
-    email: {
-      type: DataTypes.STRING,
-      validate: {
-        isEmail: true,
-      },
-    },
-    githubAccessToken: {
-      type: DataTypes.STRING,
-    },
-    githubUserId: {
-      type: DataTypes.STRING,
-    },
-    signedInAt: {
-      type: DataTypes.DATE,
-    },
-    username: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-    },
-  }, 
-  {
-    tableName: 'user',
-    hooks: {
-      beforeValidate,
-    },
-    paranoid: true,
-    scopes: {
-      withGithub: {
-        where: {
-          githubAccessToken: { [sequelize.Op.ne]: null },
-        },
-      },
-    },
-  });
-
+  const User = sequelize.define('User', attributes(DataTypes), options(sequelize));
   User.associate = associate;
-
   return User;
 };

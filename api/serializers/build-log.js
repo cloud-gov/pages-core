@@ -8,7 +8,7 @@ function toJSON(buildLog) {
   object.createdAt = object.createdAt.toISOString();
   object.updatedAt = object.updatedAt.toISOString();
   return object;
-};
+}
 
 function serializeObject(buildLog) {
   const json = toJSON(buildLog);
