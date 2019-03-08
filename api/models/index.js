@@ -12,6 +12,7 @@ const sequelize = new Sequelize(database, username, password, {
   dialect: 'postgres',
   host: postgresConfig.host,
   port: postgresConfig.port,
+  operatorsAliases: false,
   logging: logger.info,
 });
 /* eslint-disable no-unused-vars */
