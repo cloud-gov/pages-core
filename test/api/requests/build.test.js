@@ -436,7 +436,7 @@ describe('Build API', () => {
         done();
       })
       .catch(done);
-    }).timeout(3000); // this test can take a long time because of all the builds it creates
+    }).timeout(7500); // this test can take a long time because of all the builds it creates
 
     it('should not display unfound build', (done) => {
       const userPromise = factory.user();
