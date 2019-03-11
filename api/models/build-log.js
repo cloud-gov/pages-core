@@ -27,15 +27,6 @@ const sanitizeBuildSecrets = (buildLog) => {
 
 const afterValidate = buildLog => sanitizeBuildSecrets(buildLog);
 
-function toJSON() {
-  const object = this.get({
-    plain: true,
-  });
-  object.createdAt = object.createdAt.toISOString();
-  object.updatedAt = object.updatedAt.toISOString();
-  return object;
-}
-
 module.exports = (sequelize, DataTypes) => {
   const BuildLog = sequelize.define('BuildLog', {
     output: {
@@ -52,16 +43,12 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'buildlog',
-    classMethods: {
-      associate,
-    },
-    instanceMethods: {
-      toJSON,
-    },
     hooks: {
       afterValidate,
     },
   });
+
+  BuildLog.associate = associate;
 
   return BuildLog;
 };

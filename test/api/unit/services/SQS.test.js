@@ -43,7 +43,7 @@ describe('SQS', () => {
 
     it('should set the correct AWS credentials in the message', (done) => {
       factory.build()
-        .then(build => Build.findById(build.id, { include: [Site, User] }))
+        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'AWS_ACCESS_KEY_ID')).to.equal(config.s3.accessKeyId);
@@ -57,7 +57,7 @@ describe('SQS', () => {
 
     it('should set STATUS_CALLBACK in the message', (done) => {
       factory.build()
-        .then(build => Build.findById(build.id, { include: [Site, User] }))
+        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'STATUS_CALLBACK')).to.equal(`http://localhost:1337/v0/build/${build.id}/status/${build.token}`);
@@ -68,7 +68,7 @@ describe('SQS', () => {
 
     it('should set LOG_CALLBACK in the message', (done) => {
       factory.build()
-        .then(build => Build.findById(build.id, { include: [Site, User] }))
+        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'LOG_CALLBACK')).to.equal(`http://localhost:1337/v0/build/${build.id}/log/${build.token}`);
@@ -84,7 +84,7 @@ describe('SQS', () => {
           'https://example.com/',
         ];
 
-        const baseurlPromises = domains.map(domain => factory.site({ domain, defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'master' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+        const baseurlPromises = domains.map(domain => factory.site({ domain, defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'master' })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
           const message = SQS.messageBodyForBuild(build);
           return messageEnv(message, 'BASEURL');
         }));
@@ -99,7 +99,7 @@ describe('SQS', () => {
       it('it should set BASEURL in the message for a site without a custom domain', (done) => {
         factory.site({ domain: '', owner: 'owner', repository: 'repo', defaultBranch: 'master' })
           .then(site => factory.build({ site, branch: 'master' }))
-          .then(build => Build.findById(build.id, { include: [Site, User] }))
+          .then(build => Build.findByPk(build.id, { include: [Site, User] }))
           .then((build) => {
             const message = SQS.messageBodyForBuild(build);
             expect(messageEnv(message, 'BASEURL')).to.equal('/site/owner/repo');
@@ -114,7 +114,7 @@ describe('SQS', () => {
           'https://example.com/abc/def/',
         ];
 
-        const baseurlPromises = domains.map(domain => factory.site({ domain, defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'master' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+        const baseurlPromises = domains.map(domain => factory.site({ domain, defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'master' })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
           const message = SQS.messageBodyForBuild(build);
           return messageEnv(message, 'BASEURL');
         }));
@@ -129,7 +129,7 @@ describe('SQS', () => {
       it("should set SITE_PREFIX in the message to 'site/:owner/:repo/'", (done) => {
         factory.site({ domain: '', owner: 'owner', repository: 'repo', defaultBranch: 'master' })
           .then(site => factory.build({ site, branch: 'master' }))
-          .then(build => Build.findById(build.id, { include: [Site, User] }))
+          .then(build => Build.findByPk(build.id, { include: [Site, User] }))
           .then((build) => {
             const message = SQS.messageBodyForBuild(build);
             expect(messageEnv(message, 'SITE_PREFIX')).to.equal('site/owner/repo');
@@ -146,7 +146,7 @@ describe('SQS', () => {
           'https://example.com/',
         ];
 
-        const baseurlPromises = domains.map(domain => factory.site({ demoDomain: domain, demoBranch: 'demo' }).then(site => factory.build({ site, branch: 'demo' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+        const baseurlPromises = domains.map(domain => factory.site({ demoDomain: domain, demoBranch: 'demo' }).then(site => factory.build({ site, branch: 'demo' })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
           const message = SQS.messageBodyForBuild(build);
           return messageEnv(message, 'BASEURL');
         }));
@@ -159,7 +159,7 @@ describe('SQS', () => {
       });
 
       it('it should set BASEURL in the message for a site without a demo domain', (done) => {
-        factory.site({ demoDomain: '', owner: 'owner', repository: 'repo', demoBranch: 'demo' }).then(site => factory.build({ site, branch: 'demo' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+        factory.site({ demoDomain: '', owner: 'owner', repository: 'repo', demoBranch: 'demo' }).then(site => factory.build({ site, branch: 'demo' })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'BASEURL')).to.equal('/demo/owner/repo');
           done();
@@ -173,7 +173,7 @@ describe('SQS', () => {
           'https://example.com/abc/def/',
         ];
 
-        const baseurlPromises = domains.map(domain => factory.site({ demoDomain: domain, demoBranch: 'demo' }).then(site => factory.build({ site, branch: 'demo' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+        const baseurlPromises = domains.map(domain => factory.site({ demoDomain: domain, demoBranch: 'demo' }).then(site => factory.build({ site, branch: 'demo' })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
           const message = SQS.messageBodyForBuild(build);
           return messageEnv(message, 'BASEURL');
         }));
@@ -186,7 +186,7 @@ describe('SQS', () => {
       });
 
       it("should set SITE_PREFIX in the message to 'demo/:owner/:repo'", (done) => {
-        factory.site({ demoDomain: '', owner: 'owner', repository: 'repo', demoBranch: 'demo' }).then(site => factory.build({ site, branch: 'demo' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+        factory.site({ demoDomain: '', owner: 'owner', repository: 'repo', demoBranch: 'demo' }).then(site => factory.build({ site, branch: 'demo' })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'SITE_PREFIX')).to.equal('demo/owner/repo');
           done();
@@ -197,7 +197,7 @@ describe('SQS', () => {
 
     context("building a site's preview branch", () => {
       it('should set BASEURL in the message for a site with a custom domain', (done) => {
-        factory.site({ domain: 'https://www.example.com', owner: 'owner', repository: 'repo', defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'branch' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+        factory.site({ domain: 'https://www.example.com', owner: 'owner', repository: 'repo', defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'branch' })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'BASEURL')).to.equal('/preview/owner/repo/branch');
           done();
@@ -206,7 +206,7 @@ describe('SQS', () => {
       });
 
       it('should set BASEURL in the message for a site without a custom domain', (done) => {
-        factory.site({ domain: '', owner: 'owner', repository: 'repo', defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'branch' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+        factory.site({ domain: '', owner: 'owner', repository: 'repo', defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'branch' })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'BASEURL')).to.equal('/preview/owner/repo/branch');
           done();
@@ -215,7 +215,7 @@ describe('SQS', () => {
       });
 
       it("should set SITE_PREFIX in the message to 'preview/:owner/:repo/:branch'", (done) => {
-        factory.site({ domain: '', owner: 'owner', repository: 'repo', defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'branch' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+        factory.site({ domain: '', owner: 'owner', repository: 'repo', defaultBranch: 'master' }).then(site => factory.build({ site, branch: 'branch' })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'SITE_PREFIX')).to.equal('preview/owner/repo/branch');
           done();
@@ -225,7 +225,7 @@ describe('SQS', () => {
     });
 
     it('should set CACHE_CONTROL in the message', (done) => {
-      factory.build().then(build => Build.findById(build.id, { include: [Site, User] }))
+      factory.build().then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'CACHE_CONTROL')).to.equal(config.build.cacheControl);
@@ -237,7 +237,7 @@ describe('SQS', () => {
     it("should set BRANCH in the message to the name build's branch", (done) => {
       factory.site({ domain: '', defaultBranch: 'master' })
         .then(site => factory.build({ site, branch: 'branch' }))
-        .then(build => Build.findById(build.id, { include: [Site, User] }))
+        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'BRANCH')).to.equal('branch');
@@ -252,7 +252,7 @@ describe('SQS', () => {
         config: 'plugins_dir: _plugins',
         demoConfig: 'plugins_dir: _demo_plugins',
         previewConfig: 'plugins_dir: _preview_plugins',
-      }).then(site => factory.build({ site, branch: 'master' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+      }).then(site => factory.build({ site, branch: 'master' })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
         const message = SQS.messageBodyForBuild(build);
         expect(messageEnv(message, 'CONFIG')).to.equal('plugins_dir: _plugins');
         done();
@@ -266,7 +266,7 @@ describe('SQS', () => {
         config: 'plugins_dir: _plugins',
         demoConfig: 'plugins_dir: _demo_plugins',
         previewConfig: 'plugins_dir: _preview_plugins',
-      }).then(site => factory.build({ site, branch: 'demo' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+      }).then(site => factory.build({ site, branch: 'demo' })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
         const message = SQS.messageBodyForBuild(build);
         expect(messageEnv(message, 'CONFIG')).to.equal('plugins_dir: _demo_plugins');
         done();
@@ -280,7 +280,7 @@ describe('SQS', () => {
         config: 'plugins_dir: _plugins',
         demoConfig: 'plugins_dir: _demo_plugins',
         previewConfig: 'plugins_dir: _preview_plugins',
-      }).then(site => factory.build({ site, branch: 'preview' })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+      }).then(site => factory.build({ site, branch: 'preview' })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
         const message = SQS.messageBodyForBuild(build);
         expect(messageEnv(message, 'CONFIG')).to.equal('plugins_dir: _preview_plugins');
         done();
@@ -289,7 +289,7 @@ describe('SQS', () => {
     });
 
     it("should set REPOSITORY in the message to the site's repo name", (done) => {
-      factory.site({ repository: 'site-repo' }).then(site => factory.build({ site })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+      factory.site({ repository: 'site-repo' }).then(site => factory.build({ site })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
         const message = SQS.messageBodyForBuild(build);
         expect(messageEnv(message, 'REPOSITORY')).to.equal('site-repo');
         done();
@@ -298,7 +298,7 @@ describe('SQS', () => {
     });
 
     it("should set OWNER in the message to the site's owner", (done) => {
-      factory.site({ owner: 'site-owner' }).then(site => factory.build({ site })).then(build => Build.findById(build.id, { include: [Site, User] })).then((build) => {
+      factory.site({ owner: 'site-owner' }).then(site => factory.build({ site })).then(build => Build.findByPk(build.id, { include: [Site, User] })).then((build) => {
         const message = SQS.messageBodyForBuild(build);
         expect(messageEnv(message, 'OWNER')).to.equal('site-owner');
         done();
@@ -315,7 +315,7 @@ describe('SQS', () => {
           return factory.site({ users: [user] });
         })
         .then(site => factory.build({ user, site }))
-        .then(build => Build.findById(build.id, { include: [Site, User] }))
+        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'GITHUB_TOKEN')).to.equal('fake-github-token-123');
@@ -327,7 +327,7 @@ describe('SQS', () => {
     it("should set GENERATOR in the message to the site's build engine (e.g. 'jekyll')", (done) => {
       factory.site({ engine: 'hugo' })
         .then(site => factory.build({ site }))
-        .then(build => Build.findById(build.id, { include: [Site, User] }))
+        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'GENERATOR')).to.equal('hugo');
@@ -344,7 +344,7 @@ describe('SQS', () => {
       };
       factory.site({ engine: 'hugo' })
         .then(() => factory.build({ source: buildParams }))
-        .then(build => Build.findById(build.id, { include: [Site, User] }))
+        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then((build) => {
           const message = SQS.messageBodyForBuild(build);
           expect(messageEnv(message, 'SOURCE_REPO')).to.equal(buildParams.repository);
@@ -367,7 +367,7 @@ describe('SQS', () => {
         config.app.app_env = 'development';
         factory.site()
           .then(() => factory.build())
-          .then(build => Build.findById(build.id, { include: [Site, User] }))
+          .then(build => Build.findByPk(build.id, { include: [Site, User] }))
           .then((build) => {
             const message = SQS.messageBodyForBuild(build);
             expect(messageEnv(message, 'SKIP_LOGGING')).to.equal(true);
@@ -380,7 +380,7 @@ describe('SQS', () => {
         config.app.app_env = 'not-development';
         factory.site()
           .then(() => factory.build())
-          .then(build => Build.findById(build.id, { include: [Site, User] }))
+          .then(build => Build.findByPk(build.id, { include: [Site, User] }))
           .then((build) => {
             const message = SQS.messageBodyForBuild(build);
             expect(messageEnv(message, 'SKIP_LOGGING')).to.equal(false);

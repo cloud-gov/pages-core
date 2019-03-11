@@ -16,7 +16,7 @@ module.exports = {
   },
 
   me: (req, res) => {
-    User.findById(req.user.id)
+    User.findByPk(req.user.id)
       .then(model => authorizer.me(req.user, model))
       .then(currentUser => userSerializer.serialize(currentUser))
       .then(userJSON => res.json(userJSON))

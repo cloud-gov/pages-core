@@ -18,7 +18,7 @@ describe('SiteUser API', () => {
       factory.site({
         users: Promise.all([factory.user()]),
       })
-      .then(s => Site.findById(s.id, { include: [User] }))
+      .then(s => Site.findByPk(s.id, { include: [User] }))
       .then((model) => {
         site = model;
         expect(site.Users[0].SiteUser.buildNotificationSetting).to.equal('site');
@@ -70,7 +70,7 @@ describe('SiteUser API', () => {
       factory.site({
         users: Promise.all([factory.user()]),
       })
-      .then(s => Site.findById(s.id, { include: [User] }))
+      .then(s => Site.findByPk(s.id, { include: [User] }))
       .then((model) => {
         site = model;
         expect(site.Users[0].SiteUser.buildNotificationSetting).to.equal('site');

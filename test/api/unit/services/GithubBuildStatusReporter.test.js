@@ -1,9 +1,9 @@
 const crypto = require('crypto');
 const { expect } = require('chai');
 const { spy } = require('sinon');
-const logger = require('winston');
 const nock = require('nock');
 const config = require('../../../../config');
+const { logger } = require('../../../../winston');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 

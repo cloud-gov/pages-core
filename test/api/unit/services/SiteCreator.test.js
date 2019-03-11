@@ -304,7 +304,7 @@ describe('SiteCreator', () => {
           githubAPINocks.createRepoForOrg();
           githubAPINocks.webhook();
           return SiteCreator.createSite({ siteParams, user });
-        }).then(site => Site.findById(site.id, { include: [Build] })).then((site) => {
+        }).then(site => Site.findByPk(site.id, { include: [Build] })).then((site) => {
           expect(site.Builds).to.have.length(1);
           expect(site.Builds[0].user).to.equal(user.id);
           expect(site.Builds[0].branch).to.equal(site.defaultBranch);

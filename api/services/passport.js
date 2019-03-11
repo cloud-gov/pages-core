@@ -1,9 +1,9 @@
-const logger = require('winston');
 const GitHub = require('./GitHub');
 const GitHubStrategy = require('passport-github').Strategy;
 const passport = require('passport');
 const config = require('../../config');
 const { User } = require('../models');
+const { logger } = require('../../winston');
 const SiteUserAuditor = require('./SiteUserAuditor');
 const RepositoryVerifier = require('./RepositoryVerifier');
 
@@ -79,7 +79,7 @@ passport.serializeUser((user, next) => {
 });
 
 passport.deserializeUser((id, next) => {
-  User.findById(id).then((user) => {
+  User.findByPk(id).then((user) => {
     next(null, user);
   });
 });
