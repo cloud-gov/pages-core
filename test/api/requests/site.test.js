@@ -297,7 +297,7 @@ describe('Site API', () => {
           .send({
             defaultBranch: 'master',
             engine: 'jekyll',
-            template: 'team',
+            template: 'gatsby',
           })
           .set('Cookie', cookie)
           .expect(403)).then((response) => {
