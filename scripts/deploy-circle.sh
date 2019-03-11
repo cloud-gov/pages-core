@@ -9,13 +9,13 @@ if [ "$CIRCLE_BRANCH" == "master" ]; then
   CF_USERNAME=$CF_USERNAME_PRODUCTION
   CF_PASSWORD=$CF_PASSWORD_PRODUCTION
   CF_SPACE="production"
-  CF_APP="federalist"
+  CF_APP="federalistapp"
   CF_MANIFEST="manifest.yml"
 elif [ "$CIRCLE_BRANCH" == "staging" ]; then
   CF_USERNAME=$CF_USERNAME_STAGING
   CF_PASSWORD=$CF_PASSWORD_STAGING
   CF_SPACE="staging"
-  CF_APP="federalist-staging"
+  CF_APP="federalistapp-staging"
   CF_MANIFEST="staging_manifest.yml"
 else
   echo "Current branch has no associated deployment. Exiting."
