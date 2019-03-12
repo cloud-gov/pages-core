@@ -33,7 +33,7 @@ describe('RepositoryVerifier', () => {
           done();
         })
         .catch(done);
-    }).timeout(7500);
+    }).timeout(10000);
 
     it('verify site with second users', (done) => {
       let users;
@@ -66,7 +66,7 @@ describe('RepositoryVerifier', () => {
           done();
         })
         .catch(done);
-    }).timeout(10000);
+    }).timeout(12000);
 
     it('not able to verify sites with users that cannot access repository', (done) => {
       let users;
