@@ -50,7 +50,7 @@ const attributes = DataTypes => ({
   },
 });
 
-const options = sequelize => ({
+const options = {
   tableName: 'user',
   hooks: {
     beforeValidate,
@@ -63,10 +63,10 @@ const options = sequelize => ({
       },
     },
   },
-});
+};
 
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', attributes(DataTypes), options(sequelize));
+  const User = sequelize.define('User', attributes(DataTypes), options);
   User.associate = associate;
   return User;
 };
