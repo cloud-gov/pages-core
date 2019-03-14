@@ -19,7 +19,7 @@ const databaseLogger = winston.createLogger({
     winston.format.simple(),
     winston.format.colorize()
   ),
-  defaultMeta: { service: `federalistapp-${config.app.app_env}` },
+  defaultMeta: { service: `federalistapp-${config.app.app_env}-database` },
   transports: [new winston.transports.Console()],
 });
 
