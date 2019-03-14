@@ -13,7 +13,7 @@ function findContentFilePath(requestedPath, availableContentFiles) {
     if (f === `${requestedPath}.${TEMPLATE_EXT}`) {
       return true;
     }
-    // see if there is an index template file that matches
+    // see if there is an index template file tht matches
     if (f === `${requestedPath}/index.${TEMPLATE_EXT}`) {
       return true;
     }
