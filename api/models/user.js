@@ -1,3 +1,5 @@
+const { Op } = require('sequelize');
+
 const associate = ({ User, Build, Site, UserAction, SiteUser }) => {
   User.hasMany(Build, {
     foreignKey: 'user',
@@ -57,7 +59,7 @@ const options = sequelize => ({
   scopes: {
     withGithub: {
       where: {
-        githubAccessToken: { [sequelize.Op.ne]: null },
+        githubAccessToken: { [Op.ne]: null },
       },
     },
   },

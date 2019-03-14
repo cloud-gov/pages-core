@@ -13,6 +13,16 @@ const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
 });
 
+const databaseLogger = winston.createLogger({
+  level: 'warning',
+  format: winston.format.combine(
+    winston.format.simple(),
+    winston.format.colorize()
+  ),
+  defaultMeta: { service: `federalistapp-${config.app.app_env}` },
+  transports: [new winston.transports.Console()],
+});
+
 const expressLogger = expressWinston.logger({
   format: winston.format.combine(
     winston.format.simple(),
@@ -30,4 +40,4 @@ const expressErrorLogger = expressWinston.errorLogger({
   transports: [new winston.transports.Console()],
 });
 
-module.exports = { logger, expressLogger, expressErrorLogger };
+module.exports = { logger, expressLogger, expressErrorLogger, databaseLogger };
