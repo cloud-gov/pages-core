@@ -1,10 +1,38 @@
 const { Site, User } = require('../models');
+const userSerializer = require('../serializers/user');
+
+const toJSON = (site) => {
+  const object = Object.assign({}, site.get({
+    plain: true,
+  }));
+
+  delete object.site_users__user_sites;
+
+  object.createdAt = object.createdAt.toISOString();
+  object.updatedAt = object.updatedAt.toISOString();
+
+  object.viewLink = site.siteUrl();
+
+  if (object.demoBranch) {
+    object.demoViewLink = site.demoUrl();
+  }
+
+  object.previewLink = site.branchPreviewUrl();
+
+  Object.keys(object).forEach((key) => {
+    if (object[key] === null) {
+      delete object[key];
+    }
+  });
+
+  return object;
+};
 
 const serializeObject = (site) => {
-  const json = site.toJSON();
+  const json = toJSON(site);
 
   if (json.Users) {
-    json.users = site.Users.map(u => u.toJSON());
+    json.users = site.Users.map(u => userSerializer.toJSON(u));
     delete json.Users;
   }
 
@@ -20,8 +48,8 @@ const serialize = (serializable) => {
     return query.then(sites => sites.map(site => serializeObject(site)));
   }
 
-  const query = Site.findById(serializable.id, { include });
+  const query = Site.findByPk(serializable.id, { include });
   return query.then(serializeObject);
 };
 
-module.exports = { serialize };
+module.exports = { serialize, toJSON };

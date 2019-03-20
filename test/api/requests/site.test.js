@@ -63,7 +63,7 @@ describe('Site API', () => {
             expect(response.body).to.be.a('array');
             expect(response.body).to.have.length(3);
 
-            return Promise.all(sites.map(site => Site.findById(site.id, { include: [User] })));
+            return Promise.all(sites.map(site => Site.findByPk(site.id, { include: [User] })));
           })
           .then((foundSites) => {
             foundSites.forEach((site) => {
@@ -113,7 +113,7 @@ describe('Site API', () => {
       let site;
 
       factory.site()
-        .then(s => Site.findById(s.id, { include: [User] }))
+        .then(s => Site.findByPk(s.id, { include: [User] }))
         .then((model) => {
           site = model;
           return authenticatedSession(site.Users[0]);
@@ -269,7 +269,7 @@ describe('Site API', () => {
             repository: siteRepository,
             defaultBranch: 'master',
             engine: 'jekyll',
-            template: 'team',
+            template: 'uswds',
           })
           .set('Cookie', cookie)
           .expect(200))
@@ -290,14 +290,32 @@ describe('Site API', () => {
           .catch(done);
     });
 
-    it('should respond with a 400 if no user or repository is specified', (done) => {
+    it('should respond with a 403 if no user or repository is specified', (done) => {
       authenticatedSession().then(cookie => request(app)
           .post('/v0/site')
           .set('x-csrf-token', csrfToken.getToken())
           .send({
             defaultBranch: 'master',
             engine: 'jekyll',
-            template: 'team',
+            template: 'gatsby',
+          })
+          .set('Cookie', cookie)
+          .expect(403)).then((response) => {
+            validateAgainstJSONSchema('POST', '/site', 403, response.body);
+            done();
+          }).catch(done);
+    });
+
+    it('should respond with a 400 if template specified does not exist', (done) => {
+      authenticatedSession().then(cookie => request(app)
+          .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            owner: 'siteOwner',
+            repository: 'siteRepository',
+            defaultBranch: 'master',
+            engine: 'jekyll',
+            template: 'fake-template',
           })
           .set('Cookie', cookie)
           .expect(400)).then((response) => {
@@ -478,7 +496,7 @@ describe('Site API', () => {
         })
         .then((response) => {
           validateAgainstJSONSchema('POST', '/site/user', 200, response.body);
-          return Site.findById(site.id, { include: [User] });
+          return Site.findByPk(site.id, { include: [User] });
         })
         .then((fetchedSite) => {
           expect(fetchedSite.Users).to.be.an('array');
@@ -1021,7 +1039,7 @@ describe('Site API', () => {
       let site;
 
       factory.site()
-        .then(s => Site.findById(s.id, { include: [User] }))
+        .then(s => Site.findByPk(s.id, { include: [User] }))
         .then((model) => {
           site = model;
           nock.cleanAll();
@@ -1056,7 +1074,7 @@ describe('Site API', () => {
       let site;
 
       factory.site()
-        .then(s => Site.findById(s.id))
+        .then(s => Site.findByPk(s.id))
         .then((model) => {
           site = model;
           return authenticatedSession(factory.user());
@@ -1174,7 +1192,7 @@ describe('Site API', () => {
       let response;
 
       factory.site({ config: 'old-config', demoConfig: 'old-demo-config', previewConfig: 'old-preview-config' })
-        .then(s => Site.findById(s.id, { include: [User] }))
+        .then(s => Site.findByPk(s.id, { include: [User] }))
         .then((model) => {
           site = model;
           return authenticatedSession(site.Users[0]);
@@ -1192,7 +1210,7 @@ describe('Site API', () => {
         )
         .then((resp) => {
           response = resp;
-          return Site.findById(site.id, { include: [User] });
+          return Site.findByPk(site.id, { include: [User] });
         })
         .then((foundSite) => {
           validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
@@ -1212,7 +1230,7 @@ describe('Site API', () => {
     it('should not allow a user to update a site not associated with their account', (done) => {
       let siteModel;
       factory.site({ repository: 'old-repo-name' })
-        .then(site => Site.findById(site.id))
+        .then(site => Site.findByPk(site.id))
         .then((model) => {
           siteModel = model;
           return authenticatedSession(factory.user());
@@ -1228,7 +1246,7 @@ describe('Site API', () => {
         )
         .then((response) => {
           validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
-          return Site.findById(siteModel.id);
+          return Site.findByPk(siteModel.id);
         })
         .then((site) => {
           expect(site).to.have.property('repository', 'old-repo-name');
@@ -1240,7 +1258,7 @@ describe('Site API', () => {
     it('should trigger a rebuild of the site', (done) => {
       let siteModel;
       factory.site({ repository: 'old-repo-name' })
-        .then(site => Site.findById(site.id, { include: [User, Build] }))
+        .then(site => Site.findByPk(site.id, { include: [User, Build] }))
         .then((model) => {
           siteModel = model;
           expect(siteModel.Builds).to.have.length(0);
@@ -1255,7 +1273,7 @@ describe('Site API', () => {
           .set('Cookie', cookie)
           .expect(200)
         )
-        .then(() => Site.findById(siteModel.id, { include: [User, Build] }))
+        .then(() => Site.findByPk(siteModel.id, { include: [User, Build] }))
         .then((site) => {
           expect(site.Builds).to.have.length(1);
           expect(site.Builds[0].branch).to.equal(site.defaultBranch);
@@ -1271,7 +1289,7 @@ describe('Site API', () => {
         demoBranch: 'demo',
         demoDomain: 'https://demo.example.gov',
       })
-      .then(site => Site.findById(site.id, { include: [User, Build] }))
+      .then(site => Site.findByPk(site.id, { include: [User, Build] }))
       .then((model) => {
         siteModel = model;
         expect(siteModel.Builds).to.have.length(0);
@@ -1286,7 +1304,7 @@ describe('Site API', () => {
         .set('Cookie', cookie)
         .expect(200)
       )
-      .then(() => Site.findById(siteModel.id, { include: [User, Build] }))
+      .then(() => Site.findByPk(siteModel.id, { include: [User, Build] }))
       .then((site) => {
         expect(site.Builds).to.have.length(2);
         const demoBuild = site.Builds.find(
@@ -1327,7 +1345,7 @@ describe('Site API', () => {
       })
       .then((response) => {
         validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
-        return Site.findById(site.id);
+        return Site.findByPk(site.id);
       })
       .then((foundSite) => {
         expect(foundSite.config).to.equal('');
@@ -1366,7 +1384,7 @@ describe('Site API', () => {
       })
       .then((response) => {
         validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
-        return Site.findById(site.id);
+        return Site.findByPk(site.id);
       })
       .then((foundSite) => {
         expect(foundSite.config).to.equal('new-config: true');

@@ -1,6 +1,6 @@
 const GitHub = require('./GitHub');
 const { User, Site } = require('../models');
-const logger = require('winston');
+const { logger } = require('../../winston');
 
 const verifyNextRepo = (site, userIndex = 0) => {
   let found;

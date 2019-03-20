@@ -1,4 +1,4 @@
-const logger = require('winston');
+const { logger } = require('../../winston');
 const { User, Site } = require('../models');
 
 const getSiteRoom = siteId => `site-${siteId}`;

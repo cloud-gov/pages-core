@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
-const logger = require('winston');
 
 const config = require('../../config');
+const { logger } = require('../../winston');
 
 function isPastAuthThreshold(authDate) {
   return moment().isAfter(

@@ -436,7 +436,7 @@ describe('Build API', () => {
         done();
       })
       .catch(done);
-    }).timeout(3000); // this test can take a long time because of all the builds it creates
+    }).timeout(7500); // this test can take a long time because of all the builds it creates
 
     it('should not display unfound build', (done) => {
       const userPromise = factory.user();
@@ -517,7 +517,7 @@ describe('Build API', () => {
           message: '',
         }).expect(200)
       )
-      .then(() => Build.findById(build.id))
+      .then(() => Build.findByPk(build.id))
       .then((updatedBuild) => {
         expect(updatedBuild).to.not.be.undefined;
         expect(updatedBuild.state).to.equal('success');
@@ -542,7 +542,7 @@ describe('Build API', () => {
           message: 'The build failed for a reason',
         }).expect(200)
       )
-      .then(() => Build.findById(build.id))
+      .then(() => Build.findByPk(build.id))
       .then((updatedBuild) => {
         expect(updatedBuild).to.not.be.undefined;
         expect(updatedBuild.state).to.equal('error');
@@ -574,7 +574,7 @@ describe('Build API', () => {
           message: '',
         });
       })
-      .then(() => Site.findById(siteId))
+      .then(() => Site.findByPk(siteId))
       .then((site) => {
         expect(site.publishedAt).to.be.a('date');
         expect(new Date().getTime() - site.publishedAt.getTime()).to.be.below(500);
@@ -635,7 +635,7 @@ describe('Build API', () => {
           message: '',
         }).expect(403)
       )
-      .then(() => Build.findById(build.id))
+      .then(() => Build.findByPk(build.id))
       .then((unmodifiedBuild) => {
         expect(unmodifiedBuild).to.not.be.undefined;
         expect(unmodifiedBuild.state).to.equal('processing');

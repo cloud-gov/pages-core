@@ -17,7 +17,8 @@ class NotificationSettings extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleSubmit() {
+  handleSubmit(e) {
+    e.preventDefault();
   // eslint-disable-next-line no-alert
     siteActions.updateSiteUser(this.props.site.id, { buildNotificationSetting: this.state.value });
   }

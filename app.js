@@ -1,10 +1,5 @@
 const config = require('./config');
-
-const logger = require('winston');
-
-logger.level = config.log.level;
-logger.remove(logger.transports.Console);
-logger.add(logger.transports.Console, { colorize: true });
+const { logger, expressLogger, expressErrorLogger } = require('./winston');
 
 // If settings present, start New Relic
 const env = require('./services/environment.js')();
@@ -19,7 +14,6 @@ if (env.NEW_RELIC_APP_NAME && env.NEW_RELIC_LICENSE_KEY) {
 const express = require('express');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
-const expressWinston = require('express-winston');
 const session = require('express-session');
 const PostgresStore = require('connect-session-sequelize')(session.Store);
 const nunjucks = require('nunjucks');
@@ -34,6 +28,7 @@ const responses = require('./api/responses');
 const passport = require('./api/services/passport');
 const RateLimit = require('express-rate-limit');
 const router = require('./api/routers');
+const devMiddleware = require('./api/services/devMiddleware');
 const SocketIOSubscriber = require('./api/services/SocketIOSubscriber');
 const jwtHelper = require('./api/services/jwtHelper');
 const FederalistUsersHelper = require('./api/services/FederalistUsersHelper');
@@ -54,30 +49,17 @@ nunjucks.configure('views', {
 // able to access the requesting user's IP in req.ip, so
 // 'trust proxy' must be enabled.
 app.enable('trust proxy');
-const sessionMiddleware = session(config.session);
-app.use(sessionMiddleware);
+app.use(express.static('public'));
+if (process.env.NODE_ENV === 'development') {
+  app.use(devMiddleware());
+}
+app.use(session(config.session));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use((req, res, next) => {
   res.locals.user = req.user;
   return next();
 });
-
-app.use(express.static('public'));
-
-/* eslint-disable global-require */
-if (process.env.NODE_ENV === 'development') {
-  const webpack = require('webpack');
-  const webpackDevMiddleware = require('webpack-dev-middleware');
-  const webpackConfig = require('./webpack.development.config.js');
-  const compiler = webpack(webpackConfig);
-
-  app.use(webpackDevMiddleware(compiler, {
-    publicPath: webpackConfig.output.publicPath,
-  }));
-}
-/* eslint-enable global-require */
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: '2mb' }));
 app.use(methodOverride());
@@ -119,18 +101,10 @@ app.use((req, res, next) => {
 });
 
 if (logger.levels[logger.level] >= 2) {
-  app.use(expressWinston.logger({
-    transports: [
-      new logger.transports.Console({ colorize: true }),
-    ],
-    requestWhitelist: expressWinston.requestWhitelist.concat('body'),
-  }));
+  app.use(expressLogger);
 }
-app.use(expressWinston.errorLogger({
-  transports: [
-    new logger.transports.Console({ json: true, colorize: true }),
-  ],
-}));
+
+app.use(expressErrorLogger);
 
 const limiter = new RateLimit(config.rateLimiting);
 app.use(limiter); // must be set before router is added to app

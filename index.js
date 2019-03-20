@@ -1,4 +1,4 @@
-const logger = require('winston');
+const { logger } = require('./winston');
 const app = require('./app');
 
 app.server.listen(process.env.PORT || 1337, () => {

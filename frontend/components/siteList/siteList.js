@@ -63,7 +63,7 @@ export const SiteList = ({ sites, alert }) =>
 
     <AlertBanner {...alert} />
     {getSites(sites)}
-    <a href="#top">Return to top</a>
+    <a href="#top" className="back-to-top">Return to top</a>
   </div>;
 
 SiteList.propTypes = {

@@ -9,26 +9,6 @@ const associate = ({ User, Site, SiteUser }) => {
   });
 };
 
-function toJSON() {
-  const object = Object.assign({}, this.get({
-    plain: true,
-  }));
-
-  object.user_id = object.user_sites;
-  object.site_id = object.site_users;
-
-  object.user_sites = null;
-  object.site_users = null;
-
-  Object.keys(object).forEach((key) => {
-    if (object[key] === null) {
-      delete object[key];
-    }
-  });
-
-  return object;
-}
-
 module.exports = (sequelize, DataTypes) => {
   const SiteUser = sequelize.define('SiteUser', {
     buildNotificationSetting: {
@@ -38,9 +18,10 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'site_users__user_sites',
-    classMethods: { associate },
-    instanceMethods: { toJSON },
     timestamps: false,
   });
+
+  SiteUser.associate = associate;
+
   return SiteUser;
 };

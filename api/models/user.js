@@ -1,9 +1,3 @@
-const protectedAttributes = [
-  'githubAccessToken',
-  'githubUserId',
-  'signedInAt',
-  'SiteUser',
-];
 const associate = ({ User, Build, Site, UserAction, SiteUser }) => {
   User.hasMany(Build, {
     foreignKey: 'user',
@@ -31,35 +25,31 @@ function beforeValidate(user) {
   user.username = safeUsername || null; // eslint-disable-line no-param-reassign
 }
 
-function toJSON() {
-  const record = this.get({
-    plain: true,
-  });
+const attributes = DataTypes => ({
+  email: {
+    type: DataTypes.STRING,
+    validate: {
+      isEmail: true,
+    },
+  },
+  githubAccessToken: {
+    type: DataTypes.STRING,
+  },
+  githubUserId: {
+    type: DataTypes.STRING,
+  },
+  signedInAt: {
+    type: DataTypes.DATE,
+  },
+  username: {
+    type: DataTypes.STRING,
+    unique: true,
+    allowNull: false,
+  },
+});
 
-  return Object.assign({}, Object.keys(record).reduce((out, attr) => {
-    if (protectedAttributes.indexOf(attr) === -1) {
-      out[attr] = record[attr]; // eslint-disable-line no-param-reassign
-    }
-
-    if (attr === 'SiteUser' && record[attr] && record[attr].buildNotificationSetting) {
-      // eslint-disable-next-line no-param-reassign
-      out.buildNotificationSetting = record[attr].buildNotificationSetting;
-    }
-    return out;
-  }, {}), {
-    createdAt: record.createdAt.toISOString(),
-    updatedAt: record.updatedAt.toISOString(),
-  });
-}
-
-const tableOptions = {
+const options = sequelize => ({
   tableName: 'user',
-  classMethods: {
-    associate,
-  },
-  instanceMethods: {
-    toJSON,
-  },
   hooks: {
     beforeValidate,
   },
@@ -67,35 +57,14 @@ const tableOptions = {
   scopes: {
     withGithub: {
       where: {
-        githubAccessToken: { $ne: null },
+        githubAccessToken: { [sequelize.Op.ne]: null },
       },
     },
   },
-};
+});
 
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
-    email: {
-      type: DataTypes.STRING,
-      validate: {
-        isEmail: true,
-      },
-    },
-    githubAccessToken: {
-      type: DataTypes.STRING,
-    },
-    githubUserId: {
-      type: DataTypes.STRING,
-    },
-    signedInAt: {
-      type: DataTypes.DATE,
-    },
-    username: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-    },
-  }, tableOptions);
-
+  const User = sequelize.define('User', attributes(DataTypes), options(sequelize));
+  User.associate = associate;
   return User;
 };

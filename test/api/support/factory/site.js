@@ -45,7 +45,7 @@ function site(overrides) {
       const userPromises = users.map(user => site.addUser(user));
       return Promise.all(userPromises);
     })
-    .then(() => Site.findById(site.id));
+    .then(() => Site.findByPk(site.id));
 }
 
 

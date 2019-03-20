@@ -12,6 +12,7 @@ describe('Build model', () => {
       factory.site().then((site) => {
         build = Build.build({
           site: site.id,
+          user: 1,
         });
 
         return build.validate();
@@ -29,6 +30,7 @@ describe('Build model', () => {
         build = Build.build({
           site: site.id,
           token: '123abc',
+          user: 1,
         });
         return build.validate();
       }).then(() => {
@@ -72,7 +74,7 @@ describe('Build model', () => {
         expect(build.state).to.equal('success');
         expect(build.error).to.equal('');
         expect(new Date() - build.completedAt).to.be.below(1000);
-        expect(build.completedAt.toISOString()).to.equal(build.toJSON().completedAt);
+        expect(build.completedAt.toISOString()).to.equal(build.toJSON().completedAt.toISOString());
         done();
       })
       .catch(done);
@@ -113,7 +115,7 @@ describe('Build model', () => {
         expect(site.publishedAt).to.be.null;
 
         return promisedValues.build.completeJob();
-      }).then(() => Site.findById(site.id))
+      }).then(() => Site.findByPk(site.id))
       .then((model) => {
         expect(model.publishedAt).to.be.a('date');
         expect(new Date().getTime() - model.publishedAt.getTime()).to.be.below(500);
