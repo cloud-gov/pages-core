@@ -3,9 +3,7 @@
     [
       "env", {
         "targets": {
-        	"chrome": "73",
-        	"ie": "11",
-        	"safari": "12",
+          "browsers": "last 2 versions"
         }
       }
     ],
