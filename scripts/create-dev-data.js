@@ -52,6 +52,9 @@ inquirer.prompt(confirm).then(({ userAgrees }) => {
         engine: 'jekyll',
         owner: thisUser.username,
         repository: 'example-site',
+        cfInstanceName: 'federalist-dev-s3',
+        awsBucketName: 'cg-123456789',
+        awsBucketRegion: 'us-gov-west-1',
       }))
       // create a build for the site
       .then(site => Build.create({

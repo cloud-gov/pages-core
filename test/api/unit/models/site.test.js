@@ -214,4 +214,34 @@ describe('Site model', () => {
       done();
     });
   });
+
+  it('should not let cfInstanceName field be null', (done) => {
+    factory.site({
+      cfInstanceName: undefined,
+    }).catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('cfInstanceName: Site.cfInstanceName cannot be null');
+      done();
+    });
+  });
+
+  it('should not let awsBucketName field be null', (done) => {
+    factory.site({
+      awsBucketName: undefined,
+    }).catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('awsBucketName: Site.awsBucketName cannot be null');
+      done();
+    });
+  });
+
+  it('should not let awsBucketRegion field be null', (done) => {
+    factory.site({
+      awsBucketRegion: undefined,
+    }).catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('awsBucketRegion: Site.awsBucketRegion cannot be null');
+      done();
+    });
+  });
 });

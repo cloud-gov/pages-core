@@ -175,6 +175,18 @@ module.exports = (sequelize, DataTypes) => {
       values: ['active', 'inactive'],
       defaultValue: 'active',
     },
+    cfInstanceName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    awsBucketName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    awsBucketRegion: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   }, {
     tableName: 'site',
     hooks: {

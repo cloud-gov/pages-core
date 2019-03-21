@@ -24,6 +24,7 @@ if (s3Creds) {
     secretAccessKey: s3Creds.secret_access_key,
     region: s3Creds.region,
     bucket: s3Creds.bucket,
+    instanceName: s3Creds.instance_name,
   };
 } else {
   throw new Error('No S3 credentials found');
