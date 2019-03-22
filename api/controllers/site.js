@@ -136,10 +136,7 @@ module.exports = {
       })
     )
     .then(() => sendJSON(site, res))
-    .catch(e => {
-      console.log(`\n\nsiteControler.removeUser:\t${JSON.stringify(e)}\n\n`);
-      res.error(e);
-    });
+    .catch(res.error);
   },
 
   create: (req, res) => {

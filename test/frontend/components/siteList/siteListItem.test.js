@@ -2,9 +2,6 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import proxyquire from 'proxyquire';
-import { stub } from 'sinon';
-
-import siteActions from '../../../../frontend/actions/siteActions';
 
 proxyquire.noCallThru();
 
