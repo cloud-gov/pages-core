@@ -6,6 +6,9 @@ import { IconView } from '../icons';
 import PublishedState from './publishedState';
 import RepoLastVerified from './repoLastVerified';
 import GitHubLink from '../GitHubLink';
+import ButtonLink from '../ButtonLink';
+import siteActions from '../../actions/siteActions';
+import { USER } from '../../propTypes';
 
 function getViewLink(viewLink, repo) {
   return (
@@ -20,7 +23,13 @@ function getViewLink(viewLink, repo) {
     </a>);
 }
 
-const SiteListItem = ({ site }) =>
+const handleRemoveSite = (site, user) => (event) => {
+  event.preventDefault();
+  siteActions.removeUserFromSite(site.id, user.id)
+  .then(() => siteActions.fetchSites());
+};
+
+const SiteListItem = ({ site, user }) =>
   (<li className="sites-list-item">
     <div className="sites-list-item-text">
       <h4 className="site-list-item-title">
@@ -35,6 +44,7 @@ const SiteListItem = ({ site }) =>
     <div className="sites-list-item-actions">
       <GitHubLink text="View repo" owner={site.owner} repository={site.repository} />
       { getViewLink(site.viewLink, site.repository) }
+      <ButtonLink clickHandler={handleRemoveSite(site, user)}>Remove</ButtonLink>
     </div>
   </li>);
 
@@ -48,6 +58,7 @@ SiteListItem.propTypes = {
     createdAt: PropTypes.string,
     viewLink: PropTypes.string,
   }),
+  user: USER,
 };
 
 export default SiteListItem;
