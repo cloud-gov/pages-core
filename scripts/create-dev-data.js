@@ -1,7 +1,14 @@
 const inquirer = require('inquirer');
 
 const cleanDatabase = require('../api/utils/cleanDatabase');
-const { ActionType, Build, BuildLog, Site, User, UserAction } = require('../api/models');
+const {
+  ActionType,
+  Build,
+  BuildLog,
+  Site,
+  User,
+  UserAction,
+} = require('../api/models');
 
 const confirm = {
   type: 'confirm',
@@ -86,29 +93,24 @@ inquirer.prompt(confirm).then(({ userAgrees }) => {
         githubUserId: 123456,
       }))
       // add the other user to example site
-      .then(fakeUser =>
-        fakeUser.addSite(thisSiteId).then(() => fakeUser)
-      )
+      .then(fakeUser => fakeUser
+        .addSite(thisSiteId)
+        .then(() => fakeUser))
       // create a useraction of removing the other user
-      .then(fakeUser =>
-        ActionType
-          .findOne({ where: { action: 'remove' } })
-          .then(removeAction =>
-            UserAction.create({
-              userId: thisUserId,
-              targetId: fakeUser.id,
-              targetType: 'user',
-              actionId: removeAction.id,
-              siteId: thisSiteId,
-            })
-        )
-    )
-    .then(() => {
-      /* eslint-disable no-console */
-      console.log('Done!');
-      console.log('You may have to log out and then back in to your local development instance of Federalist.');
-      /* eslint-enable no-console */
-      process.exit();
-    });
+      .then(fakeUser => ActionType.findOne({ where: { action: 'remove' } })
+        .then(removeAction => UserAction.create({
+          userId: thisUserId,
+          targetId: fakeUser.id,
+          targetType: 'user',
+          actionId: removeAction.id,
+          siteId: thisSiteId,
+        })))
+      .then(() => {
+        /* eslint-disable no-console */
+        console.log('Done!');
+        console.log('You may have to log out and then back in to your local development instance of Federalist.');
+        /* eslint-enable no-console */
+        process.exit();
+      });
   });
 });

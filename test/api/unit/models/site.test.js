@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const config = require('../../../../config');
 const factory = require('../../support/factory');
 const { Site } = require('../../../../api/models');
@@ -21,12 +21,11 @@ describe('Site model', () => {
     it('returns the site object with user association', () => {
       factory.site({
         users: Promise.all([factory.user()]),
-      })
-      .then(site => Site.withUsers(site.id))
-      .then((site) => {
-        expect(site.Users).to.be.an('array');
-        expect(site.Users.length).to.equal(1);
-      });
+      }).then(site => Site.withUsers(site.id))
+        .then((site) => {
+          expect(site.Users).to.be.an('array');
+          expect(site.Users.length).to.equal(1);
+        });
     });
   });
 
@@ -165,8 +164,7 @@ describe('Site model', () => {
   it('should validate the demo branch name is valid', (done) => {
     factory.site({
       demoBranch: 'in@valid',
-    })
-    .catch((err) => {
+    }).catch((err) => {
       expect(err.status).to.equal(403);
       expect(err.message).to.equal('demoBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
       done();
@@ -186,8 +184,7 @@ describe('Site model', () => {
   it('should validate the demo branch name is valid no trailing slashes', (done) => {
     factory.site({
       demoBranch: 'invalid/',
-    })
-    .catch((err) => {
+    }).catch((err) => {
       expect(err.status).to.equal(403);
       expect(err.message).to.equal('demoBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
       done();
@@ -207,8 +204,7 @@ describe('Site model', () => {
   it('should validate the demo branch name is valid no trailing hyphen', (done) => {
     factory.site({
       demoBranch: 'invalid-',
-    })
-    .catch((err) => {
+    }).catch((err) => {
       expect(err.status).to.equal(403);
       expect(err.message).to.equal('demoBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
       done();
