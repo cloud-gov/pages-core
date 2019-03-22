@@ -2,19 +2,26 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import proxyquire from 'proxyquire';
+import { stub } from 'sinon';
+import siteActions from '../../../../frontend/actions/siteActions';
 
 proxyquire.noCallThru();
 
 const Link = () => <div />;
 const PublishedState = () => <div />;
 const RepoLastVerified = () => <div />;
-const ButtonLink = () => <div />;
 
 const testSite = {
   repository: 'something',
   owner: 'someone',
   id: 1,
   viewLink: 'https://mysiteishere.biz',
+};
+
+const testUser = {
+  username: 'not-owner',
+  id: 4,
+  email: 'not-owner@beep.gov',
 };
 
 describe('<SiteListItem />', () => {
@@ -26,7 +33,6 @@ describe('<SiteListItem />', () => {
       'react-router': { Link },
       './publishedState': PublishedState,
       './repoLastVerified': RepoLastVerified,
-      '../buttonLink': ButtonLink,
       '../icons': { IconView: 'IconView' },
     }).default;
   });
@@ -77,10 +83,16 @@ describe('<SiteListItem />', () => {
     expect(ghLink.props().owner).to.equal('someone');
     expect(ghLink.props().repository).to.equal('something');
   });
+
   it('should call `removeUserFromSite` when `Remove` is clicked', () => {
-    const removeSiteLink = wrapper.find('ButtonLink');
+    proxyquire.callThru();
+    wrapper = shallow(<Fixture site={testSite} user={testUser} />);
+    const clickSpy = stub(siteActions, 'removeUserFromSite').returns(Promise.resolve());
+    const removeSiteLink = wrapper.find('ButtonLink').shallow();
 
     expect(removeSiteLink.exists()).to.be.true;
     expect(removeSiteLink.contains('Remove')).to.be.true;
+    removeSiteLink.simulate('click', { preventDefault: () => ({}) });
+    expect(clickSpy.called).to.be.true;
   });
 });
