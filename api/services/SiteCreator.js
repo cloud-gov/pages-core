@@ -101,13 +101,7 @@ function validateSite(params) {
   const site = Site.build(params);
 
   return site.validate()
-  .then((error) => {
-    if (error) {
-      throw error;
-    }
-
-    return site;
-  });
+    .then(() => site);
 }
 
 /**

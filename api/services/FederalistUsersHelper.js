@@ -1,5 +1,5 @@
 const GitHub = require('./GitHub');
-const logger = require('winston');
+const { logger } = require('../../winston');
 const config = require('../../config');
 
 const { User } = require('../models');

@@ -1,6 +1,7 @@
-const GitHub = require('./GitHub');
-const logger = require('winston');
+const { logger } = require('../../winston');
 const url = require('url');
+const Sequelize = require('sequelize');
+const GitHub = require('./GitHub');
 const config = require('../../config');
 
 const { Build, Site, User } = require('../models');
@@ -33,8 +34,8 @@ const checkAccessTokenPermissions = (users, site) => {
 const loadSiteUserAccessToken = site =>
   site.getUsers({
     where: {
-      githubAccessToken: { $ne: null },
-      signedInAt: { $ne: null },
+      githubAccessToken: { [Sequelize.Op.ne]: null },
+      signedInAt: { [Sequelize.Op.ne]: null },
     },
     order: [['signedInAt', 'DESC']],
   }).then(users =>
@@ -50,7 +51,7 @@ const loadSiteUserAccessToken = site =>
 
 
 const loadBuildUserAccessToken = build =>
-  Build.findById(build.id, { include: [Site, User] })
+  Build.findByPk(build.id, { include: [Site, User] })
   .then((foundBuild) => {
     const user = foundBuild.User;
 
@@ -76,7 +77,7 @@ const reportBuildStatus = (build) => {
       resolve();
     }
   })
-  .then(() => Site.findById(build.site))
+  .then(() => Site.findByPk(build.site))
   .then((model) => {
     if (!model) {
       throw new Error('Unable to find a site for the given build');

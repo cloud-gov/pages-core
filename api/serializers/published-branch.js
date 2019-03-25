@@ -1,6 +1,8 @@
+const siteSerializer = require('../serializers/site');
+
 const serializeObject = (site, name) => ({
   name,
-  site: site.toJSON(),
+  site: siteSerializer.toJSON(site),
 });
 
 const serialize = (site, branch) => {

@@ -3,7 +3,7 @@ const siteErrors = require('../responses/siteErrors');
 const { User, Site } = require('../models');
 
 const authorize = ({ id }, site) => (
-  User.findById(id, { include: [Site] })
+  User.findByPk(id, { include: [Site] })
     .then((user) => {
       const hasSite = user.Sites.some(s => site.id === s.id);
       if (hasSite) {

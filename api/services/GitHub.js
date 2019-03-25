@@ -193,7 +193,7 @@ module.exports = {
   setWebhook: (site, user) => {
     const userId = user.id || user;
 
-    return User.findById(userId)
+    return User.findByPk(userId)
       .then(fetchedFederalistUser => githubClient(fetchedFederalistUser.githubAccessToken))
       .then(github => createWebhook(github, {
         owner: site.owner,

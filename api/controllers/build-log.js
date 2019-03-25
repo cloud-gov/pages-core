@@ -14,7 +14,7 @@ module.exports = {
     Promise.resolve(Number(req.params.build_id))
     .then((id) => {
       if (isNaN(id)) { throw 404; }
-      return Build.findById(id);
+      return Build.findByPk(id);
     })
     .then((build) => {
       if (!build) {
@@ -48,7 +48,7 @@ module.exports = {
         if (isNaN(id)) {
           throw 404;
         }
-        return Build.findById(id);
+        return Build.findByPk(id);
       }).then((model) => {
         build = model;
         if (!build) {

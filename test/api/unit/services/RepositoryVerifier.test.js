@@ -27,13 +27,13 @@ describe('RepositoryVerifier', () => {
           });
           return RepositoryVerifier.verifyRepos();
         })
-        .then(() => Site.findById(site.id))
+        .then(() => Site.findByPk(site.id))
         .then((_site) => {
           expect(_site.repoLastVerified).to.be.an.instanceOf(Date);
           done();
         })
         .catch(done);
-    });
+    }).timeout(10000);
 
     it('verify site with second users', (done) => {
       let users;
@@ -60,13 +60,13 @@ describe('RepositoryVerifier', () => {
           });
           return RepositoryVerifier.verifyRepos();
         })
-        .then(() => Site.findById(site.id))
+        .then(() => Site.findByPk(site.id))
         .then((_site) => {
           expect(_site.repoLastVerified).to.be.an.instanceOf(Date);
           done();
         })
         .catch(done);
-    });
+    }).timeout(12000);
 
     it('not able to verify sites with users that cannot access repository', (done) => {
       let users;
@@ -94,7 +94,7 @@ describe('RepositoryVerifier', () => {
           });
           return RepositoryVerifier.verifyRepos();
         })
-        .then(() => Site.findById(site.id))
+        .then(() => Site.findByPk(site.id))
         .then((_site) => {
           expect(_site.repoLastVerified).to.be.null;
           done();

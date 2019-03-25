@@ -15,7 +15,7 @@ module.exports = {
       if (isNaN(siteId)) {
         throw 404;
       }
-      return Site.findById(siteId);
+      return Site.findByPk(siteId);
     }).then((model) => {
       if (!model) { throw 404; }
 

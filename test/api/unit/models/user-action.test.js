@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const { UserAction } = require('../../../../api/models');
+const userActionSerializer = require('../../../../api/serializers/user');
 
 const props = {
   userId: 1,
@@ -47,17 +48,29 @@ describe('UserAction model', () => {
         actionId: 1,
         targetId: 1,
         siteId: 1,
+        actionType: 'penguin',
+        targetType: 'notSiteNorBuild',
       };
 
-      const promises = [
-        UserAction.build(Object.assign({}, goodProps, { actionType: 'penguin' })).validate(),
-        UserAction.build(Object.assign({}, goodProps, { actionType: 'alpaca' })).validate(),
-      ];
+      UserAction.build(goodProps).validate()
+        .catch((e) => {
+          expect(e.errors[0].path).to.equal('targetType');
+          done();
+        }).catch(done);
+    });
 
-      Promise.all(promises)
-        .then((errors) => {
-          expect(errors.length).to.equal(2);
-          errors.forEach(e => expect(e.errors[0].path).to.equal('targetType'));
+    it('fails validation if targetType is not null', (done) => {
+      const goodProps = {
+        userId: 1,
+        actionId: 1,
+        targetId: 1,
+        siteId: 1,
+        actionType: 'penguin',
+      };
+
+      UserAction.build(goodProps).validate()
+        .catch((e) => {
+          expect(e.errors[0].path).to.equal('targetType');
           done();
         }).catch(done);
     });
@@ -66,7 +79,7 @@ describe('UserAction model', () => {
   describe('.toJSON', () => {
     it('returns an object with a formatted createdAt date', () => {
       const model = UserAction.build(props);
-      expect(model.toJSON().createdAt).to.equal(props.createdAt.toISOString());
+      expect(userActionSerializer.toJSON(model).createdAt).to.equal(props.createdAt.toISOString());
     });
   });
 });

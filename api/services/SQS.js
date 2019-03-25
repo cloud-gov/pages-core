@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
-const logger = require('winston');
 const url = require('url');
 const config = require('../../config');
+const { logger } = require('../../winston');
 
 const buildConfig = config.build;
 const s3Config = config.s3;

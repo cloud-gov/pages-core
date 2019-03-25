@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
-const logger = require('winston');
-const config = require('../../config');
 const path = require('path');
+const config = require('../../config');
+const { databaseLogger } = require('../../winston');
 
 const postgresConfig = config.postgres;
 const database = postgresConfig.database;
@@ -12,7 +12,7 @@ const sequelize = new Sequelize(database, username, password, {
   dialect: 'postgres',
   host: postgresConfig.host,
   port: postgresConfig.port,
-  logging: logger.info,
+  logging: databaseLogger.info,
 });
 /* eslint-disable no-unused-vars */
 const Build = sequelize.import(path.join(__dirname, '/build'));
