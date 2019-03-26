@@ -20,12 +20,14 @@ describe('Published Files API', () => {
 
   describe('GET /v0/site/:site_id/published-branch/:branch/file', () => {
     it('should require authentication', (done) => {
-      factory.site().then(site => request(app)
-        .get(`/v0/site/${site.id}/published-branch/${site.defaultBranch}`)
-        .expect(403)).then((response) => {
-        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 403, response.body);
-        done();
-      }).catch(done);
+      factory.site()
+        .then(site => request(app)
+          .get(`/v0/site/${site.id}/published-branch/${site.defaultBranch}`)
+          .expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 403, response.body);
+          done();
+        }).catch(done);
     });
 
     it('should list the files published to the branch for the site', (done) => {
@@ -172,13 +174,15 @@ describe('Published Files API', () => {
       const site = factory.site({ defaultBranch: 'master' });
       const cookie = authenticatedSession(user);
 
-      Promise.props({ user, site, cookie }).then(promisedValues => request(app)
-        .get(`/v0/site/${promisedValues.site.id}/published-branch/master/published-file`)
-        .set('Cookie', promisedValues.cookie)
-        .expect(403)).then((response) => {
-        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 403, response.body);
-        done();
-      }).catch(done);
+      Promise.props({ user, site, cookie })
+        .then(promisedValues => request(app)
+          .get(`/v0/site/${promisedValues.site.id}/published-branch/master/published-file`)
+          .set('Cookie', promisedValues.cookie)
+          .expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 403, response.body);
+          done();
+        }).catch(done);
     });
   });
 });
