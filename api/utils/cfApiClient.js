@@ -76,6 +76,17 @@ class CloudFoundryAPIClient {
       .then(res => this.filterEntity(res, name));
   }
 
+  fetchServiceInstanceCredentials(name) {
+    return this.fetchServiceInstance(name)
+      .then(instance => this.accessToken().then(token => this.request(
+        'GET',
+        `/v2/service_instances/${instance.metadata.guid}/service_keys`,
+        token
+      )))
+      .then(keys => this.firstEntity(keys, `${name} Service Keys`))
+      .then(key => key.entity.credentials);
+  }
+
   fetchServiceInstances() {
     return this.accessToken().then(token => this.request(
       'GET',
@@ -125,6 +136,17 @@ class CloudFoundryAPIClient {
       name,
       field,
     }));
+  }
+
+  firstEntity(res, name) {
+    if (res.resources.length === 0) {
+      return Promise.reject(new Error({
+        message: 'Not found',
+        name,
+      }));
+    }
+
+    return res.resources[0];
   }
 
   parser(res) {

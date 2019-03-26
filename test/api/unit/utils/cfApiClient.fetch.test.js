@@ -82,6 +82,53 @@ describe('CloudFoundryAPIClient', () => {
     });
   });
 
+  describe('.fetchServiceInstanceCredentials', () => {
+    it('should return the service key credentials instance by name', (done) => {
+      const guid = 'testing-guid';
+      const name = 'testing-service-name';
+      const keyName = `${name}-key`;
+      const credentials = responses.credentials({
+        bucket: 'test-bucket',
+        region: 'test-region',
+        access_key_id: 'access-key-id',
+        secret_access_key: 'secret-access-key',
+      });
+
+      const instanceResponses = {
+        resources: [
+          responses.service({ guid }, { name }),
+          responses.service(),
+          responses.service(),
+        ],
+      };
+
+      const keyResponses = {
+        resources: [
+          responses.service(
+            {},
+            {
+              name: keyName,
+              credentials,
+            }
+          ),
+          responses.service(),
+          responses.service(),
+        ],
+      };
+
+      mockTokenRequest();
+      apiNocks.mockFetchServiceInstancesRequest(instanceResponses);
+      apiNocks.mockFetchServiceInstanceCredentialsRequest(guid, keyResponses);
+
+      const apiClient = new CloudFoundryAPIClient();
+      apiClient.fetchServiceInstanceCredentials(name)
+        .then((res) => {
+          expect(res).to.deep.equal(credentials);
+          done();
+        });
+    });
+  });
+
   describe('.fetchServiceKeys', () => {
     it('should return the service keys for a space', (done) => {
       const keyResponses = {
