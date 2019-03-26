@@ -39,7 +39,7 @@ class CloudFoundryAPIClient {
     ));
   }
 
-  createSiteBucket(name, serviceName, keyIdentifier = 'key') {
+  createSiteBucket(name, keyIdentifier = 'key', serviceName = 'basic-public') {
     return this.createS3ServiceInstance(name, serviceName)
       .then(res => this.createServiceKey(name, res.metadata.guid, keyIdentifier));
   }

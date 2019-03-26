@@ -13,6 +13,7 @@ module.exports = {
     secretAccessKey: '456def',
     region: 'us-gov-west-1',
     bucket: 's3-bucket',
+    instanceName: 'cf-s3-service',
   },
   passport: {
     github: {

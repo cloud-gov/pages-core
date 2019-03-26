@@ -8,207 +8,6 @@ const responses = require('../../support/factory/responses');
 describe('CloudFoundryAPIClient', () => {
   afterEach(() => nock.cleanAll());
 
-  describe('.fetchServiceInstances', () => {
-    it('should return the service instances for a space', (done) => {
-      const instanceResponses = {
-        resources: [
-          responses.service(),
-          responses.service(),
-          responses.service(),
-        ],
-      };
-
-      mockTokenRequest();
-      apiNocks.mockFetchServiceInstancesRequest(instanceResponses);
-
-      const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchServiceInstances()
-        .then((res) => {
-          expect(res).to.deep.equal(instanceResponses);
-          done();
-        });
-    });
-  });
-
-  describe('.fetchServiceInstance', () => {
-    it('should return the service instance by name', (done) => {
-      const guid = 'testing-guid';
-      const name = 'testing-service-name';
-
-      const instanceResponses = {
-        resources: [
-          responses.service({ guid }, { name }),
-          responses.service(),
-          responses.service(),
-        ],
-      };
-
-      mockTokenRequest();
-      apiNocks.mockFetchServiceInstancesRequest(instanceResponses);
-
-      const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchServiceInstance(name)
-        .then((res) => {
-          expect(res).to.deep.equal(instanceResponses.resources[0]);
-          done();
-        });
-    });
-
-    it('should reject when service instance does not exist', (done) => {
-      const name = 'not-an-instance';
-
-      const message = new Error({
-        message: 'Not found',
-        name,
-        field: 'name',
-      });
-
-      const instancesResponse = {
-        resources: [
-          responses.service(),
-          responses.service(),
-        ],
-      };
-
-      mockTokenRequest();
-      apiNocks.mockFetchServiceInstancesRequest(instancesResponse);
-
-      const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchServiceInstance(name)
-        .catch((err) => {
-          expect(err).to.deep.equal(message);
-          done();
-        });
-    });
-  });
-
-  describe('.fetchServiceKeys', () => {
-    it('should return the service keys for a space', (done) => {
-      const keyResponses = {
-        resources: [
-          responses.service(),
-          responses.service(),
-          responses.service(),
-        ],
-      };
-
-      mockTokenRequest();
-      apiNocks.mockFetchServiceKeysRequest(keyResponses);
-
-      const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchServiceKeys()
-        .then((res) => {
-          expect(res).to.deep.equal(keyResponses);
-          done();
-        });
-    });
-  });
-
-  describe('.fetchServiceKey', () => {
-    it('should return the service key by name', (done) => {
-      const guid = 'testing-guid';
-      const name = 'testing-service-name';
-
-      const keyResponses = {
-        resources: [
-          responses.service({ guid }, { name }),
-          responses.service(),
-          responses.service(),
-        ],
-      };
-
-      mockTokenRequest();
-      apiNocks.mockFetchServiceKeysRequest(keyResponses);
-      apiNocks.mockFetchServiceKeyRequest(guid, keyResponses.resources[0]);
-
-      const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchServiceKey(name)
-        .then((res) => {
-          expect(res).to.deep.equal(keyResponses.resources[0]);
-          done();
-        });
-    });
-
-    it('should reject when service key does not exist', (done) => {
-      const name = 'not-a-key';
-
-      const message = new Error({
-        message: 'Not found',
-        name,
-        field: 'name',
-      });
-
-      const keysResponse = {
-        resources: [
-          responses.service(),
-          responses.service(),
-        ],
-      };
-
-      mockTokenRequest();
-      apiNocks.mockFetchServiceKeysRequest(keysResponse);
-
-      const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchServiceKey(name)
-        .catch((err) => {
-          expect(err).to.deep.equal(message);
-          done();
-        });
-    });
-  });
-
-  describe('.fetchS3ServicePlanGUID', () => {
-    it('should return the service plan guid by name', (done) => {
-      const guid = 'testing-guid';
-      const name = 'testing-service-name';
-
-      const response = {
-        resources: [
-          responses.service({ guid }, { name }),
-          responses.service(),
-          responses.service(),
-        ],
-      };
-
-      mockTokenRequest();
-      apiNocks.mockFetchS3ServicePlanGUID(response);
-
-      const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchS3ServicePlanGUID(name)
-        .then((res) => {
-          expect(res).to.deep.equal(guid);
-          done();
-        });
-    });
-
-    it('should reject when service plan is not found', (done) => {
-      const name = 'not-a-service-plan';
-
-      const message = new Error({
-        message: 'Not found',
-        name,
-        field: 'name',
-      });
-
-      const response = {
-        resources: [
-          responses.service(),
-          responses.service(),
-        ],
-      };
-
-      mockTokenRequest();
-      apiNocks.mockFetchS3ServicePlanGUID(response);
-
-      const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchS3ServicePlanGUID(name)
-        .catch((err) => {
-          expect(err).to.deep.equal(message);
-          done();
-        });
-    });
-  });
-
   describe('.createS3ServiceInstance', () => {
     it('should return a new service plan', (done) => {
       const name = 'my-bucket';
@@ -338,6 +137,7 @@ describe('CloudFoundryAPIClient', () => {
   describe('.creatSiteBucket', () => {
     it('should create a new S3 service and service key', (done) => {
       const name = 'my-bucket';
+      const keyIdentifier = 'key';
       const keyName = `${name}-key`;
       const planName = 'aws-bucket';
       const planGuid = 'plan-guid';
@@ -363,7 +163,7 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.createSiteBucket(name, planName)
+      apiClient.createSiteBucket(name, keyIdentifier, planName)
         .then((res) => {
           expect(res).to.be.an('object');
           expect(res.entity.name).to.equal(keyName);

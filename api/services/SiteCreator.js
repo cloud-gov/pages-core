@@ -1,6 +1,10 @@
 const GitHub = require('./GitHub');
 const TemplateResolver = require('./TemplateResolver');
 const { Build, Site, User } = require('../models');
+const CloudFoundryAPIClient = require('../utils/cfApiClient');
+const config = require('../../config');
+
+const apiClient = new CloudFoundryAPIClient();
 
 const defaultEngine = 'jekyll';
 
@@ -10,6 +14,7 @@ function paramsForNewSite(params) {
     repository: params.repository ? params.repository.toLowerCase() : null,
     defaultBranch: params.defaultBranch,
     engine: params.engine || defaultEngine,
+    sharedBucket: params.sharedBucket === false ? params.sharedBucket : true,
   };
 }
 
@@ -44,8 +49,7 @@ function ownerIsFederalistUser(owner) {
 function checkSiteExists({ owner, repository }) {
   return Site.findOne({
     where: { owner, repository },
-  })
-  .then((existingSite) => {
+  }).then((existingSite) => {
     if (existingSite) {
       const error = new Error('This site has already been added to Federalist.');
       error.status = 400;
@@ -55,8 +59,7 @@ function checkSiteExists({ owner, repository }) {
 }
 
 function checkGithubOrg({ user, owner }) {
-  return ownerIsFederalistUser(owner)
-  .then((model) => {
+  return ownerIsFederalistUser(owner).then((model) => {
     if (model) {
       // Owner of the repo is a user with a DB record, and not an org.
       // Drop down to the next promise and bypass the org check
@@ -64,14 +67,13 @@ function checkGithubOrg({ user, owner }) {
     }
 
     return GitHub.checkOrganizations(user, owner);
-  })
-  .then((federalistAuthorizedOrg) => {
+  }).then((federalistAuthorizedOrg) => {
     // Has this org authorized federalist as an oauth app?
     if (!federalistAuthorizedOrg) {
       throw {
-        message: `Federalist can't confirm org permissions for '${owner}'. ` +
-          `Either '${owner}' hasn't approved access for Federalist or you aren't an org member. ` +
-          'Ensure you are an org member and ask an org owner to authorize Federalist for the organization.',
+        message: `Federalist can't confirm org permissions for '${owner}'.`
+          + `Either '${owner}' hasn't approved access for Federalist or you aren't an org member.`
+          + 'Ensure you are an org member and ask an org owner to authorize Federalist for the organization.',
         status: 403,
       };
     }
@@ -97,11 +99,34 @@ function checkGithubRepository({ user, owner, repository }) {
     });
 }
 
-function validateSite(params) {
-  const site = Site.build(params);
+function buildSite(params, s3) {
+  const siteParams = Object.assign({}, params, {
+    cfInstanceName: s3.instanceName,
+    awsBucketName: s3.bucket,
+    awsBucketRegion: s3.region,
+  });
+
+  const site = Site.build(siteParams);
 
   return site.validate()
     .then(() => site);
+}
+
+function validateSite(params) {
+  if (params.sharedBucket) {
+    return buildSite(params, config.s3);
+  }
+
+  return apiClient.createSiteBucket(params.repository)
+    .then((response) => {
+      const s3 = {
+        instanceName: params.repository,
+        bucket: response.entity.credentials.bucket,
+        region: response.entity.credentials.region,
+      };
+
+      return buildSite(params, s3);
+    });
 }
 
 /**
@@ -114,32 +139,32 @@ function saveAndBuildSite({ site, user, template }) {
   let model;
 
   return GitHub.setWebhook(site, user.id)
-  .then(() => site.save())
-  .then((createdSite) => {
-    model = createdSite;
+    .then(() => site.save())
+    .then((createdSite) => {
+      model = createdSite;
 
-    const buildParams = paramsForNewBuild({
-      site: model,
-      user,
-      template,
-    });
+      const buildParams = paramsForNewBuild({
+        site: model,
+        user,
+        template,
+      });
 
-    return Promise.all([
-      site.addUser(user.id),
-      Build.create(buildParams),
-    ]);
-  })
-  .then(() => model);
+      return Promise.all([
+        site.addUser(user.id),
+        Build.create(buildParams),
+      ]);
+    })
+    .then(() => model);
 }
 
 function createSiteFromExistingRepo({ siteParams, user }) {
   const { owner, repository } = siteParams;
 
   return checkSiteExists({ owner, repository })
-  .then(() => checkGithubRepository({ user, owner, repository }))
-  .then(() => checkGithubOrg({ user, owner }))
-  .then(() => validateSite(siteParams))
-  .then(site => saveAndBuildSite({ site, user }));
+    .then(() => checkGithubRepository({ user, owner, repository }))
+    .then(() => checkGithubOrg({ user, owner }))
+    .then(() => validateSite(siteParams))
+    .then(site => saveAndBuildSite({ site, user }));
 }
 
 function createSiteFromTemplate({ siteParams, user, template }) {
@@ -150,22 +175,22 @@ function createSiteFromTemplate({ siteParams, user, template }) {
   let site;
 
   return validateSite(siteParams)
-  .then((model) => {
-    site = model;
-    return GitHub.createRepo(user, owner, repository);
-  })
-  .then(() => saveAndBuildSite({ site, user, template }));
+    .then((model) => {
+      site = model;
+      return GitHub.createRepo(user, owner, repository);
+    })
+    .then(() => saveAndBuildSite({ site, user, template }));
 }
 
 function createSiteFromSource({ siteParams, user }) {
   const { owner, repository, source } = siteParams;
 
   return checkSiteExists({ owner, repository })
-  .then(() => checkGithubRepository({ user, owner: source.owner, repository: source.repo }))
-  .then(() => checkGithubOrg({ user, owner: source.owner }))
-  .then(() => GitHub.createRepo(user, owner, repository))
-  .then(() => validateSite(siteParams))
-  .then(site => saveAndBuildSite({ site, user, template: siteParams.source }));
+    .then(() => checkGithubRepository({ user, owner: source.owner, repository: source.repo }))
+    .then(() => checkGithubOrg({ user, owner: source.owner }))
+    .then(() => GitHub.createRepo(user, owner, repository))
+    .then(() => validateSite(siteParams))
+    .then(site => saveAndBuildSite({ site, user, template: siteParams.source }));
 }
 
 function createSite({ user, siteParams }) {
@@ -176,12 +201,15 @@ function createSite({ user, siteParams }) {
 
   if (template) {
     return createSiteFromTemplate({ siteParams: newSiteParams, template, user });
-  } else if (siteParams.source) {
+  }
+
+  if (siteParams.source) {
     return createSiteFromSource({
       siteParams: Object.assign({}, newSiteParams, { source: siteParams.source }),
       user,
     });
   }
+
   return createSiteFromExistingRepo({ siteParams: newSiteParams, user });
 }
 
