@@ -1,6 +1,7 @@
 const request = require('request');
 const url = require('url');
 const CloudFoundryAuthClient = require('./cfAuthClient');
+const config = require('../../config');
 
 class CloudFoundryAPIClient {
   constructor() {
@@ -156,7 +157,7 @@ class CloudFoundryAPIClient {
 
   resolveAPIURL(path) {
     return url.resolve(
-      process.env.CLOUD_FOUNDRY_API_HOST,
+      config.env.cfApiHost,
       path
     );
   }
@@ -184,7 +185,7 @@ class CloudFoundryAPIClient {
   }
 
   spaceGUID() {
-    return process.env.BUILD_SPACE_GUID;
+    return config.env.buildSpaceGuid;
   }
 }
 

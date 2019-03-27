@@ -8,12 +8,14 @@ const mockTokenRequest = (token) => {
     reqheaders: {
       authorization: `Basic ${Buffer.from('cf:').toString('Base64')}`,
     },
-  }).post('/oauth/token', {
-    grant_type: 'password',
-    username: 'deploy_user',
-    password: 'deploy_pass',
-    response_type: 'token',
-  });
+  })
+    .persist()
+    .post('/oauth/token', {
+      grant_type: 'password',
+      username: 'deploy_user',
+      password: 'deploy_pass',
+      response_type: 'token',
+    });
 
   if (token === 'badtoken') {
     return n.reply(401);

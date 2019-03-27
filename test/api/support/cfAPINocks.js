@@ -1,6 +1,5 @@
 const nock = require('nock');
 const factory = require('./factory');
-const config = require('../../../config');
 
 const url = 'https://api.example.com';
 const reqheaders = {
@@ -35,12 +34,20 @@ const mockDefaultCredentials = () => {
   const instanceResponses = {
     resources: [factory.responses.service({ guid: serviceGuid }, { name: serviceName })],
   };
+
   const keyResponses = {
-    resources: [factory.responses.service({}, { credentials: config.s3 })],
+    resources: [factory.responses.service({}, { credentials: factory.responses.credentials() })],
   };
 
-  mockFetchServiceInstancesRequest(instanceResponses);
-  mockFetchServiceInstanceCredentialsRequest(serviceGuid, keyResponses);
+  nock(url, reqheaders)
+    .persist()
+    .get('/v2/service_instances')
+    .reply(200, instanceResponses);
+
+  nock(url, reqheaders)
+    .persist()
+    .get(`/v2/service_instances/${serviceGuid}/service_keys`)
+    .reply(200, keyResponses);
 };
 
 const mockCreateS3ServiceInstance = (body, resources) => {

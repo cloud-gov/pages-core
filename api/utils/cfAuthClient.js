@@ -1,11 +1,11 @@
-const cfenv = require('cfenv');
 const jwt = require('jsonwebtoken');
 const request = require('request');
+const config = require('../../config');
 
 class CloudFoundryAuthClient {
   constructor() {
-    this.username = this.cloudFoundryCredentials().DEPLOY_USER_USERNAME;
-    this.password = this.cloudFoundryCredentials().DEPLOY_USER_PASSWORD;
+    this.username = config.deployUser.username;
+    this.password = config.deployUser.password;
     this.token = '';
   }
 
@@ -17,20 +17,6 @@ class CloudFoundryAuthClient {
         resolve(this.token);
       }
     });
-  }
-
-  // Private methods
-  cloudFoundryCredentials() {
-    const appEnv = cfenv.getAppEnv();
-    const cloudFoundryCredentials = appEnv.getServiceCreds('federalist-deploy-user');
-
-    if (cloudFoundryCredentials) {
-      return cloudFoundryCredentials;
-    }
-    return {
-      DEPLOY_USER_USERNAME: process.env.DEPLOY_USER_USERNAME,
-      DEPLOY_USER_PASSWORD: process.env.DEPLOY_USER_PASSWORD,
-    };
   }
 
   fetchNewToken() {
@@ -68,7 +54,7 @@ class CloudFoundryAuthClient {
   }
 
   tokenEndpoint() {
-    return process.env.CLOUD_FOUNDRY_OAUTH_TOKEN_URL;
+    return config.env.cfOauthTokenUrl;
   }
 
   tokenExpired() {

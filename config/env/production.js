@@ -43,7 +43,7 @@ if (sqsCreds) {
   throw new Error('No SQS credentials found');
 }
 
-// S3 Configs
+// Redis Configs
 const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`);
 if (redisCreds) {
   module.exports.redis = {
@@ -55,6 +55,32 @@ if (redisCreds) {
   };
 } else {
   throw new Error('No Redis credentials found');
+}
+
+// Deploy User
+const deployUserCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-deploy-user`);
+if (deployUserCreds) {
+  module.exports.deployUser = {
+    username: deployUserCreds.DEPLOY_USER_USERNAME,
+    password: deployUserCreds.DEPLOY_USER_PASSWORD,
+  };
+} else {
+  throw new Error('No deploy user credentials found');
+}
+
+// Environment Variables
+const buildSpaceGuid = process.env.BUILD_SPACE_GUID;
+const cfOauthTokenUrl = process.env.CLOUD_FOUNDRY_OAUTH_TOKEN_URL;
+const cfApiHost = process.env.CLOUD_FOUNDRY_API_HOST;
+
+if (buildSpaceGuid && cfOauthTokenUrl && cfApiHost) {
+  module.exports.env = {
+    buildSpaceGuid,
+    cfOauthTokenUrl,
+    cfApiHost,
+  };
+} else {
+  throw new Error('Missing environment variables for build space, cloud founders host url and token url.');
 }
 
 // See https://github.com/nfriedly/express-rate-limit/blob/master/README.md#configuration

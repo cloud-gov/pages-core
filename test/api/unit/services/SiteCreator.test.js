@@ -21,7 +21,7 @@ describe('SiteCreator', () => {
       owner,
       repository,
       user,
-      cfInstanceName = 'cf-s3-service',
+      cfInstanceName = 'federalist-dev-s3',
       awsBucketName = 's3-bucket',
       awsBucketRegion = 'us-gov-west-1'
     ) => {
@@ -494,10 +494,31 @@ describe('SiteCreator', () => {
           }),
         });
 
+        const buildResponses = {
+          resources: [
+            factory.responses.service({}, {
+              name,
+              service_instance_guid: bucketGuid,
+              credentials: factory.responses.credentials({
+                access_key_id: accessKeyId,
+                secret_access_key: secretAccessKey,
+                region,
+                bucket,
+              }),
+            }),
+          ],
+        };
+
+        const serviceCredentialsResponses = {
+          resources: [keyResponse],
+        };
+
         mockTokenRequest();
         apiNocks.mockFetchS3ServicePlanGUID(planResponses);
         apiNocks.mockCreateS3ServiceInstance(instanceRequestBody, bucketResponse);
         apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
+        apiNocks.mockFetchServiceInstancesRequest(buildResponses);
+        apiNocks.mockFetchServiceInstanceCredentialsRequest('test-guid', serviceCredentialsResponses);
 
         factory.user().then((model) => {
           user = model;
