@@ -15,39 +15,24 @@
           <img src="/images/close.svg" alt="close">
         </button>
         <ul class="usa-nav-primary">
+          {% if isAuthenticated %}
+            <li>
+              <a class="usa-nav-link" href="{{ homepageUrl }}/">
+                <span>Sites</span>
+              </a>
+            </li>
+          {% endif %}
           <li>
-            <a class="usa-nav-link" href="{{ homepageUrl }}/">
-              <span>Home</span>
+            <a class="usa-nav-link" href="{{ homepageUrl }}/documentation/">
+              <span>Documentation<span>
             </a>
           </li>
           <li>
-            <a class="usa-nav-link" href="{{ homepageUrl }}/features/">
-              <span>Features</span>
-            </a>
-          </li>
-          <li>
-            <a class="usa-nav-link" href="{{ homepageUrl }}/case-studies/">
-              <span>Case Studies</span>
-            </a>
-          </li>
-          <li>
-            <a class="usa-nav-link" href="{{ homepageUrl }}/pages/using-federalist/">
+            <a class="usa-nav-link" href="{{ homepageUrl }}/support/">
               <span>Support<span>
             </a>
           </li>
-          <li>
-            <a class="usa-nav-link" href="{{ homepageUrl }}/contact/">
-              <span>Contact<span>
-            </a>
-          </li>
-
           {% if isAuthenticated %}
-            <li>
-              <a class="usa-nav-link" href="/sites">
-                <span>Manage Sites</span>
-              </a>
-            </li>
-          </li>
           <li class="nav-action">
             <a class="usa-button usa-button-white" href="/logout">Log out</a>
           </li>
