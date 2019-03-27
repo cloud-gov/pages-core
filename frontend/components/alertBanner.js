@@ -21,22 +21,24 @@ const addRole = (shouldAddRole) => {
   return {};
 };
 
+const genericErrorMsg = (
+  <span>
+    We are experiencing an unexpected problem, please wait a few moments and try the following:
+    <ol>
+      <li>refresh the page</li>
+      <li>log out and back in to your account</li>
+    </ol>
+    If this error persists, please contact us, we apologize for the inconvenience.
+</span>);
+
+const cloudDotGovErrorRegex = /^404 Not Found: Requested route \('.*'\) does not exist./;
+
 const AlertBanner = ({ children, header, message, status, alertRole }) => {
   if (!message) {
     return null;
   }
 
-  const errorMsg = (
-    <span>
-      We are experiencing an unexpected problem, please wait a few moments and try the following:
-      <ol>
-        <li>refresh the page</li>
-        <li>log out and back in to your account</li>
-      </ol>
-      If this error persists, please contact us, we apologize for the inconvenience.
-  </span>);
-
-  const msg = status === 'error' ? errorMsg : message;
+  const msg = cloudDotGovErrorRegex.test(message) ? genericErrorMsg : message;
 
   return (
     <div
