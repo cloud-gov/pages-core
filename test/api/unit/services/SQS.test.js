@@ -33,7 +33,7 @@ describe('SQS', () => {
           repository: 'formatted-message-repo',
           engine: 'jekyll',
           defaultBranch: 'master',
-          cfInstanceName: config.s3.instanceName,
+          s3ServiceName: config.s3.serviceName,
         },
         User: {
           passport: {

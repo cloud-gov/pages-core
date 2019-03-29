@@ -21,14 +21,14 @@ describe('SiteCreator', () => {
       owner,
       repository,
       user,
-      cfInstanceName = 'federalist-dev-s3',
+      s3ServiceName = 'federalist-dev-s3',
       awsBucketName = 's3-bucket',
       awsBucketRegion = 'us-gov-west-1'
     ) => {
       expect(site).to.not.be.undefined;
       expect(site.owner).to.equal(owner);
       expect(site.repository).to.equal(repository);
-      expect(site.cfInstanceName).to.equal(cfInstanceName);
+      expect(site.s3ServiceName).to.equal(s3ServiceName);
       expect(site.awsBucketName).to.equal(awsBucketName);
       expect(site.awsBucketRegion).to.equal(awsBucketRegion);
       expect(site.Users).to.have.length(1);

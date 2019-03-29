@@ -183,7 +183,7 @@ module.exports = (sequelize, DataTypes) => {
       values: ['active', 'inactive'],
       defaultValue: 'active',
     },
-    cfInstanceName: {
+    s3ServiceName: {
       type: DataTypes.STRING,
       allowNull: false,
     },

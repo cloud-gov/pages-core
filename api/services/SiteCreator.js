@@ -101,7 +101,7 @@ function checkGithubRepository({ user, owner, repository }) {
 
 function buildSite(params, s3) {
   const siteParams = Object.assign({}, params, {
-    cfInstanceName: s3.instanceName,
+    s3ServiceName: s3.serviceName,
     awsBucketName: s3.bucket,
     awsBucketRegion: s3.region,
   });
@@ -120,7 +120,7 @@ function validateSite(params) {
   return apiClient.createSiteBucket(params.repository)
     .then((response) => {
       const s3 = {
-        instanceName: params.repository,
+        serviceName: params.repository,
         bucket: response.entity.credentials.bucket,
         region: response.entity.credentials.region,
       };

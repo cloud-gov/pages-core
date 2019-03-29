@@ -211,12 +211,12 @@ describe('Site model', () => {
     });
   });
 
-  it('should not let cfInstanceName field be null', (done) => {
+  it('should not let s3ServiceName field be null', (done) => {
     factory.site({
-      cfInstanceName: undefined,
+      s3ServiceName: undefined,
     }).catch((err) => {
       expect(err.status).to.equal(403);
-      expect(err.message).to.equal('cfInstanceName: Site.cfInstanceName cannot be null');
+      expect(err.message).to.equal('s3ServiceName: Site.s3ServiceName cannot be null');
       done();
     });
   });

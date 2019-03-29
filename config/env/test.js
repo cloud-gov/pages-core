@@ -13,7 +13,7 @@ module.exports = {
     secretAccessKey: '456def',
     region: 'us-gov-west-1',
     bucket: 's3-bucket',
-    instanceName: 'federalist-dev-s3',
+    serviceName: 'federalist-dev-s3',
   },
   passport: {
     github: {

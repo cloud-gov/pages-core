@@ -25,7 +25,7 @@ function makeAttributes(overrides = {}) {
     owner: repository.owner,
     repository: repository.name,
     engine: 'jekyll',
-    cfInstanceName: 'federalist-dev-s3',
+    s3ServiceName: 'federalist-dev-s3',
     awsBucketName: 'cg-123456789',
     awsBucketRegion: 'us-gov-west-1',
     users,

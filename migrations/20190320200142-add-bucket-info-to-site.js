@@ -5,7 +5,7 @@ const dataType = {
 };
 
 const data = {
-  instance: config.s3.instanceName || 'federalist-dev-s3',
+  serviceName: config.s3.serviceName || 'federalist-dev-s3',
   bucket: config.s3.bucket || 'cg-123456789',
   region: config.s3.region || 'us-gov-west-1',
 };
@@ -15,11 +15,11 @@ const cmdUpdateSiteRecords = `
   UPDATE
     site
   SET
-    "cfInstanceName" = '${data.instance}',
+    "s3ServiceName" = '${data.serviceName}',
     "awsBucketName" = '${data.bucket}',
     "awsBucketRegion" = '${data.region}'
   WHERE
-    "cfInstanceName" IS NULL;
+    "s3ServiceName" IS NULL;
 `;
 
 const insertIfMissing = (db) => {
@@ -30,14 +30,14 @@ const insertIfMissing = (db) => {
     });
 };
 
-exports.up = (db, callback) => db.addColumn('site', 'cfInstanceName', dataType)
+exports.up = (db, callback) => db.addColumn('site', 's3ServiceName', dataType)
   .then(() => db.addColumn('site', 'awsBucketName', dataType))
   .then(() => db.addColumn('site', 'awsBucketRegion', dataType))
   .then(() => insertIfMissing(db))
   .then(() => callback())
   .catch(callback);
 
-exports.down = (db, callback) => db.removeColumn('site', 'cfInstanceName')
+exports.down = (db, callback) => db.removeColumn('site', 's3ServiceName')
   .then(() => db.removeColumn('site', 'awsBucketName'))
   .then(() => db.removeColumn('site', 'awsBucketRegion'))
   .then(() => callback())

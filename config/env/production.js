@@ -18,13 +18,14 @@ if (rdsCreds) {
 
 // S3 Configs
 const s3Creds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-s3`);
+const serviceName = appEnv.getService(`federalist-${process.env.APP_ENV}-s3`).instance_name;
 if (s3Creds) {
   module.exports.s3 = {
     accessKeyId: s3Creds.access_key_id,
     secretAccessKey: s3Creds.secret_access_key,
     region: s3Creds.region,
     bucket: s3Creds.bucket,
-    instanceName: s3Creds.instance_name,
+    serviceName,
   };
 } else {
   throw new Error('No S3 credentials found');

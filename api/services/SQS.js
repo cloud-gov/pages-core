@@ -66,7 +66,7 @@ const buildLogCallbackURL = build => [
 const sourceForBuild = build => build.source || {};
 
 const buildContainerEnvironment = build => apiClient
-  .fetchServiceInstanceCredentials(build.Site.cfInstanceName)
+  .fetchServiceInstanceCredentials(build.Site.s3ServiceName)
   .then(credentials => ({
     AWS_DEFAULT_REGION: credentials.region,
     AWS_ACCESS_KEY_ID: credentials.access_key_id,
