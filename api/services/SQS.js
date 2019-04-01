@@ -65,28 +65,43 @@ const buildLogCallbackURL = build => [
 
 const sourceForBuild = build => build.source || {};
 
-const buildContainerEnvironment = build => apiClient
-  .fetchServiceInstanceCredentials(build.Site.s3ServiceName)
-  .then(credentials => ({
-    AWS_DEFAULT_REGION: credentials.region,
-    AWS_ACCESS_KEY_ID: credentials.access_key_id,
-    AWS_SECRET_ACCESS_KEY: credentials.secret_access_key,
-    STATUS_CALLBACK: statusCallbackURL(build),
-    LOG_CALLBACK: buildLogCallbackURL(build),
-    BUCKET: credentials.bucket,
-    BASEURL: baseURLForBuild(build),
-    CACHE_CONTROL: buildConfig.cacheControl,
-    BRANCH: sourceForBuild(build).branch || build.branch,
-    CONFIG: siteConfig(build),
-    REPOSITORY: build.Site.repository,
-    OWNER: build.Site.owner,
-    SITE_PREFIX: pathForBuild(build),
-    GITHUB_TOKEN: build.User.githubAccessToken,
-    GENERATOR: build.Site.engine,
-    SOURCE_REPO: sourceForBuild(build).repository,
-    SOURCE_OWNER: sourceForBuild(build).owner,
-    SKIP_LOGGING: config.app.app_env === 'development',
-  }));
+const generateDefaultCredentials = build => ({
+  AWS_DEFAULT_REGION: config.s3.region,
+  AWS_ACCESS_KEY_ID: config.s3.accessKeyId,
+  AWS_SECRET_ACCESS_KEY: config.s3.secretAccessKey,
+  STATUS_CALLBACK: statusCallbackURL(build),
+  LOG_CALLBACK: buildLogCallbackURL(build),
+  BUCKET: config.s3.bucket,
+  BASEURL: baseURLForBuild(build),
+  CACHE_CONTROL: buildConfig.cacheControl,
+  BRANCH: sourceForBuild(build).branch || build.branch,
+  CONFIG: siteConfig(build),
+  REPOSITORY: build.Site.repository,
+  OWNER: build.Site.owner,
+  SITE_PREFIX: pathForBuild(build),
+  GITHUB_TOKEN: build.User.githubAccessToken,
+  GENERATOR: build.Site.engine,
+  SOURCE_REPO: sourceForBuild(build).repository,
+  SOURCE_OWNER: sourceForBuild(build).owner,
+  SKIP_LOGGING: config.app.app_env === 'development',
+});
+
+const buildContainerEnvironment = (build) => {
+  const defaultCredentials = generateDefaultCredentials(build);
+
+  if (build.Site.s3ServiceName === config.s3.serviceName) {
+    return Promise.resolve(defaultCredentials);
+  }
+
+  return apiClient
+    .fetchServiceInstanceCredentials(build.Site.s3ServiceName)
+    .then(credentials => Object.assign({}, defaultCredentials, {
+      AWS_DEFAULT_REGION: credentials.region,
+      AWS_ACCESS_KEY_ID: credentials.access_key_id,
+      AWS_SECRET_ACCESS_KEY: credentials.secret_access_key,
+      BUCKET: credentials.bucket,
+    }));
+};
 
 const sqsConfig = config.sqs;
 const SQS = {
