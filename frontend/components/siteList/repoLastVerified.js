@@ -36,6 +36,7 @@ RepoLastVerified.propTypes = {
 RepoLastVerified.defaultProps = {
   site: {},
   daysNotVerified: 5,
+  userUpdated: new Date().toISOString(),
 };
 
 export default RepoLastVerified;

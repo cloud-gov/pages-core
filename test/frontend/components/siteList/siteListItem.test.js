@@ -46,7 +46,10 @@ describe('<SiteListItem />', () => {
 
   it('outputs a repo last verified component', () => {
     wrapper = shallow(<Fixture site={testSite} user={testUser} />);
-    expect(wrapper.find(RepoLastVerified).props()).to.deep.equals({ site: testSite, userUpdated: testUser.updatedAt });
+    expect(wrapper.find(RepoLastVerified).props()).to.deep.equals({
+      site: testSite,
+      userUpdated: testUser.updatedAt
+    });
     expect(wrapper.find(RepoLastVerified)).to.have.length(1);
   });
 
