@@ -38,7 +38,7 @@ const SiteListItem = ({ site, user }) =>
         </Link>
         {' '}
       </h4>
-      <RepoLastVerified site={site} />
+      <RepoLastVerified site={site} userUpdated={user.updatedAt} />
       <PublishedState site={site} />
     </div>
     <div className="sites-list-item-actions">

@@ -22,6 +22,7 @@ const testUser = {
   username: 'not-owner',
   id: 4,
   email: 'not-owner@beep.gov',
+  updatedAt: new Date(new Date() - (10 * 24 * 60 * 60 * 1000)).toString(),
 };
 
 describe('<SiteListItem />', () => {
@@ -38,19 +39,19 @@ describe('<SiteListItem />', () => {
   });
 
   it('outputs a published state component', () => {
-    wrapper = shallow(<Fixture site={testSite} />);
+    wrapper = shallow(<Fixture site={testSite} user={testUser} />);
     expect(wrapper.find(PublishedState).props()).to.deep.equals({ site: testSite });
     expect(wrapper.find(PublishedState)).to.have.length(1);
   });
 
   it('outputs a repo last verified component', () => {
-    wrapper = shallow(<Fixture site={testSite} />);
-    expect(wrapper.find(RepoLastVerified).props()).to.deep.equals({ site: testSite });
+    wrapper = shallow(<Fixture site={testSite} user={testUser} />);
+    expect(wrapper.find(RepoLastVerified).props()).to.deep.equals({ site: testSite, userUpdated: testUser.updatedAt });
     expect(wrapper.find(RepoLastVerified)).to.have.length(1);
   });
 
   it('outputs a link component to direct user to the site page', () => {
-    wrapper = shallow(<Fixture site={testSite} />);
+    wrapper = shallow(<Fixture site={testSite} user={testUser} />);
     expect(wrapper.find(Link).props()).to.deep.equals({
       to: `/sites/${testSite.id}`,
       children: [testSite.owner, '/', testSite.repository],
@@ -64,7 +65,7 @@ describe('<SiteListItem />', () => {
       builds: [{}],
     });
 
-    wrapper = shallow(<Fixture site={siteWithBuilds} />);
+    wrapper = shallow(<Fixture site={siteWithBuilds} user={testUser} />);
     const viewLink = wrapper.find('.sites-list-item-actions a');
     expect(viewLink).to.have.length(1);
     expect(viewLink.props()).to.contain({
