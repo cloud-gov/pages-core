@@ -14,7 +14,7 @@ const getRepoLastVerified = (site) => {
 const RepoLastVerified = ({ site, daysNotVerified = 5, userUpdated }) => {
   const daysAgo = fromDate => (new Date() - new Date(fromDate)) / (24 * 60 * 60 * 1000);
   const minutesAgo = fromDate => (new Date() - new Date(fromDate)) / (60 * 1000);
-  if ((daysAgo(site.repoLastVerified || site.createdAt) > daysNotVerified) 
+  if ((daysAgo(site.repoLastVerified || site.createdAt) > daysNotVerified)
     && (userUpdated && (minutesAgo(userUpdated) > 4))) { // user logged in 4 mins
     return (<p className="repo-verification">
       {getRepoLastVerified(site)}
@@ -30,6 +30,7 @@ RepoLastVerified.propTypes = {
     userUpdated: React.PropTypes.string,
   }),
   daysNotVerified: React.PropTypes.number,
+  userUpdated: React.PropTypes.string,
 };
 
 RepoLastVerified.defaultProps = {
