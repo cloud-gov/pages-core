@@ -1,6 +1,7 @@
 const GitHub = require('./GitHub');
 const TemplateResolver = require('./TemplateResolver');
 const { Build, Site, User } = require('../models');
+const { generateS3ServiceName } = require('../utils');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const config = require('../../config');
 
@@ -117,10 +118,12 @@ function validateSite(params) {
     return buildSite(params, config.s3);
   }
 
-  return apiClient.createSiteBucket(params.repository)
+  const s3ServiceName = generateS3ServiceName(params.owner, params.repository);
+
+  return apiClient.createSiteBucket(s3ServiceName)
     .then((response) => {
       const s3 = {
-        serviceName: params.repository,
+        serviceName: s3ServiceName,
         bucket: response.entity.credentials.bucket,
         region: response.entity.credentials.region,
       };

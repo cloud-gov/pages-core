@@ -11,9 +11,9 @@ const TemplateResolver = require('../../../../api/services/TemplateResolver');
 const { Build, Site, User } = require('../../../../api/models');
 
 describe('SiteCreator', () => {
-  beforeEach(() => {
-    nock.cleanAll();
-  });
+  beforeEach(() => mockTokenRequest());
+
+  afterEach(() => nock.cleanAll());
 
   describe('.createSite', () => {
     const validateSiteExpectations = (
@@ -62,6 +62,8 @@ describe('SiteCreator', () => {
             repository: crypto.randomBytes(3).toString('hex'),
           };
 
+          apiNocks.mockDefaultCredentials();
+
           factory.user().then((model) => {
             user = model;
             githubAPINocks.repo();
@@ -99,6 +101,8 @@ describe('SiteCreator', () => {
             repository: crypto.randomBytes(3).toString('hex'),
           };
 
+          apiNocks.mockDefaultCredentials();
+
           factory.user().then((model) => {
             user = model;
             githubAPINocks.repo();
@@ -130,6 +134,8 @@ describe('SiteCreator', () => {
           const siteParams = {
             repository: crypto.randomBytes(3).toString('hex'),
           };
+
+          apiNocks.mockDefaultCredentials();
 
           factory.user().then((model) => {
             user = model;
@@ -262,6 +268,8 @@ describe('SiteCreator', () => {
       let user;
 
       it('should create a new site record for the given repository and add the user', (done) => {
+        apiNocks.mockDefaultCredentials();
+
         factory.user().then((model) => {
           user = model;
           githubAPINocks.createRepoForOrg();
@@ -309,6 +317,8 @@ describe('SiteCreator', () => {
           owner: '18f',
           branch: 'not-master',
         };
+
+        apiNocks.mockDefaultCredentials();
 
         templateResolverStub.returns(fakeTemplate);
 
@@ -464,62 +474,12 @@ describe('SiteCreator', () => {
           repository: crypto.randomBytes(3).toString('hex'),
           sharedBucket: false,
         };
+
         const name = siteParams.repository;
-        const keyName = `${name}-key`;
-        const planName = 'basic-public';
-        const planGuid = 'plan-guid';
-        const bucketGuid = 'bucket-guid';
-        const accessKeyId = crypto.randomBytes(3).toString('hex');
-        const secretAccessKey = crypto.randomBytes(3).toString('hex');
+        const s3ServiceName = `${siteParams.owner}-${siteParams.repository}`;
         const region = 'us-gov-other-1';
         const bucket = 'testing-bucket';
-
-        const instanceRequestBody = { name, service_plan_guid: planGuid };
-        const keyRequestBody = { name, service_instance_guid: bucketGuid };
-
-        const planResponses = {
-          resources: [
-            factory.responses.service({ guid: planGuid }, { name: planName }),
-          ],
-        };
-        const bucketResponse = factory.responses.service({ guid: bucketGuid }, { name });
-        const keyResponse = factory.responses.service({}, {
-          name: keyName,
-          service_instance_guid: bucketGuid,
-          credentials: factory.responses.credentials({
-            access_key_id: accessKeyId,
-            secret_access_key: secretAccessKey,
-            region,
-            bucket,
-          }),
-        });
-
-        const buildResponses = {
-          resources: [
-            factory.responses.service({}, {
-              name,
-              service_instance_guid: bucketGuid,
-              credentials: factory.responses.credentials({
-                access_key_id: accessKeyId,
-                secret_access_key: secretAccessKey,
-                region,
-                bucket,
-              }),
-            }),
-          ],
-        };
-
-        const serviceCredentialsResponses = {
-          resources: [keyResponse],
-        };
-
-        mockTokenRequest();
-        apiNocks.mockFetchS3ServicePlanGUID(planResponses);
-        apiNocks.mockCreateS3ServiceInstance(instanceRequestBody, bucketResponse);
-        apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
-        apiNocks.mockFetchServiceInstancesRequest(buildResponses);
-        apiNocks.mockFetchServiceInstanceCredentialsRequest('test-guid', serviceCredentialsResponses);
-
+        apiNocks.mockSiteCreator(name, region, bucket);
         factory.user().then((model) => {
           user = model;
           githubAPINocks.repo();
@@ -544,7 +504,7 @@ describe('SiteCreator', () => {
               siteParams.owner,
               siteParams.repository,
               user,
-              name,
+              s3ServiceName,
               bucket,
               region
             );
