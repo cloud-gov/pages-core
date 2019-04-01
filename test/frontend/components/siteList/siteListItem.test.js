@@ -48,7 +48,7 @@ describe('<SiteListItem />', () => {
     wrapper = shallow(<Fixture site={testSite} user={testUser} />);
     expect(wrapper.find(RepoLastVerified).props()).to.deep.equals({
       site: testSite,
-      userUpdated: testUser.updatedAt
+      userUpdated: testUser.updatedAt,
     });
     expect(wrapper.find(RepoLastVerified)).to.have.length(1);
   });
