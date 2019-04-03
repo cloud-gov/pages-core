@@ -17,7 +17,7 @@ class CreateBuildLink extends React.Component {
   }
 
   render() {
-    const { children } = this.props;
+    const { children, className } = this.props;
 
     return (
       /* eslint-disable jsx-a11y/href-no-hash */
@@ -25,6 +25,7 @@ class CreateBuildLink extends React.Component {
         href="#"
         role="button"
         onClick={this.handleClick}
+        className={className}
       >
         {children}
       </a>
@@ -40,6 +41,7 @@ CreateBuildLink.propTypes = {
   handlerParams: PropTypes.object,
   handleClick: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
+  class: PropTypes.string,
 };
 
 CreateBuildLink.defaultProps = {

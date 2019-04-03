@@ -24,10 +24,36 @@
     a {
       margin: 0;
     }
+    .usa-button {
+      border-radius: 10px;
+      font-weight: bold;
+    }
   }
 
   th, td {
     min-width: 131px;
+  }
+}
+
+.table-full-width.log-table__site-builds {
+  th {
+    white-space: nowrap;
+  }
+  td, tbody th {
+    vertical-align: top;
+    padding: 1.5rem 1rem;
+  }
+  .commit-link {
+    font-weight: bold;
+    * {
+      vertical-align: top;
+    }
+    a {
+      margin-left: 1rem;
+    }
+    + * {
+      margin-left: 3.5rem;
+    }
   }
 }
 

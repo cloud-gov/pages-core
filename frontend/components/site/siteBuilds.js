@@ -13,8 +13,26 @@ import { duration, timeFrom } from '../../util/datetime';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
 import BranchViewLink from '../branchViewLink';
+import { IconCheckCircle, IconExclamationCircle, IconSpinner } from '../icons';
 
 export const REFRESH_INTERVAL = 15 * 1000;
+
+const buildStateData = buildState => {
+  return {
+    error: {
+      message: 'Failed', icon: IconExclamationCircle
+    },
+    processing: {
+      message: 'In progress', icon: IconSpinner
+    },
+    skipped: {
+      message: 'Skipped', icon: null
+    },
+    success: {
+      message: 'Completed', icon: IconCheckCircle
+    }
+  }[buildState]
+}
 
 class SiteBuilds extends React.Component {
 
@@ -30,23 +48,16 @@ class SiteBuilds extends React.Component {
   }
 
   static commitLink(build) {
-    if (!build.commitSha) {
-      return null;
-    }
-
     const { owner, repository } = build.site;
 
     return (
-      <span>
-        <br />
-        <GitHubLink
-          owner={owner}
-          repository={repository}
-          sha={build.commitSha}
-          title={build.commitSha}
-          text="View commit"
-        />
-      </span>
+      <GitHubLink
+        owner={owner}
+        repository={repository}
+        sha={build.commitSha}
+        branch={build.commitSha ? null : build.branch}
+        text={build.branch}
+      />
     );
   }
 
@@ -132,50 +143,41 @@ class SiteBuilds extends React.Component {
               <thead>
                 <tr>
                   <th scope="col">Branch</th>
+                  <th scope="col">Message</th>
                   <th scope="col">User</th>
                   <th scope="col">Completed</th>
                   <th scope="col">Duration</th>
-                  <th scope="col">Message</th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {builds.data.map((build) => {
-                  let message;
-
-                  switch (build.state) {
-                    case 'error':
-                      message = 'This build has failed. Please view the logs for more information.';
-                      break;
-                    case 'processing':
-                      message = 'This build is in progress';
-                      break;
-                    default:
-                      message = 'The build completed successfully.';
-                      break;
-                  }
+                  const { message, icon } = buildStateData(build.state);
 
                   return (
                     <tr key={build.id}>
                       <th scope="row">
-                        <div className="truncate">
-                          { build.branch }
+                        <p className="commit-link truncate">
+                          { React.createElement(icon) }
+                          { SiteBuilds.commitLink(build) }
+                        </p>
+                        <div>
+                          { previewBuilds[build.branch] === build.id &&
+                          <BranchViewLink branchName={build.branch} site={site} showIcon /> }
                         </div>
-                        { SiteBuilds.commitLink(build) }
-                        { previewBuilds[build.branch] === build.id &&
-                        <BranchViewLink branchName={build.branch} site={site} showIcon /> }
                       </th>
+                      <td>
+                        <p>{ message }</p>
+                        { SiteBuilds.buildLogsLink(build) }
+                      </td>
                       <td>{ SiteBuilds.getUsername(build) }</td>
                       <td>{ timeFrom(build.completedAt) }</td>
                       <td>{ duration(build.createdAt, build.completedAt) }</td>
-                      <td><pre>{ message }</pre></td>
                       <td className="table-actions">
-                        { SiteBuilds.buildLogsLink(build) }
-                        <br />
                         <CreateBuildLink
                           handlerParams={{ buildId: build.id, siteId: site.id }}
                           handleClick={actions.restartBuild}
-                          class="usa-button usa-button-secondary"
+                          className="usa-button usa-button-secondary br-5"
                         >
                           Rebuild branch
                         </CreateBuildLink>
