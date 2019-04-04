@@ -21,6 +21,8 @@
     background-color: $color-gray-lightest;
     margin: 0 -1.5rem;
     padding: 1.5rem;
+    position: sticky;
+    top: 10px;
 
     a {
       &:hover {
