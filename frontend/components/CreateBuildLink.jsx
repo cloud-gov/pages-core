@@ -41,11 +41,12 @@ CreateBuildLink.propTypes = {
   handlerParams: PropTypes.object,
   handleClick: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
-  class: PropTypes.string,
+  className: PropTypes.string,
 };
 
 CreateBuildLink.defaultProps = {
   handlerParams: {},
+  className: '',
 };
 
 export default CreateBuildLink;

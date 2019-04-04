@@ -17,21 +17,21 @@ import { IconCheckCircle, IconExclamationCircle, IconSpinner } from '../icons';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
-const buildStateData = buildState => {
+const buildStateData = (buildState) => {
   return {
     error: {
-      message: 'Failed', icon: IconExclamationCircle
+      message: 'Failed', icon: IconExclamationCircle,
     },
     processing: {
-      message: 'In progress', icon: IconSpinner
+      message: 'In progress', icon: IconSpinner,
     },
     skipped: {
-      message: 'Skipped', icon: null
+      message: 'Skipped', icon: null,
     },
     success: {
-      message: 'Completed', icon: IconCheckCircle
-    }
-  }[buildState]
+      message: 'Completed', icon: IconCheckCircle,
+    },
+  }[buildState];
 }
 
 class SiteBuilds extends React.Component {
@@ -176,7 +176,11 @@ class SiteBuilds extends React.Component {
                       </td>
                       <td data-title="User"><span>{ SiteBuilds.getUsername(build) }</span></td>
                       <td data-title="Completed"><span>{ timeFrom(build.completedAt) }</span></td>
-                      <td data-title="Duration"><span>{ duration(build.createdAt, build.completedAt) }</span></td>
+                      <td data-title="Duration">
+                        <span>
+                          { duration(build.createdAt, build.completedAt) }
+                        </span>
+                      </td>
                       <td data-title="Actions" className="table-actions">
                         <span>
                           {
