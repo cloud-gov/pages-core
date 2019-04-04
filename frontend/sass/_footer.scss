@@ -114,11 +114,13 @@ li.usa-footer-primary-content {
   display: block;
   margin-bottom: 1rem;
 
-  li:first-child .usa-nav-link {
+  @media screen and (min-width: 600px) {
     padding-left: 1rem;
   }
 
-  .usa-nav-link {
+  li .usa-nav-link {
+    padding-left: 0;
+    padding-right: 1rem;
     font-size: 1.75rem;
 
     &:hover {

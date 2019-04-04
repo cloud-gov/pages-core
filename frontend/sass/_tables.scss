@@ -65,7 +65,7 @@
     width: initial;
   }
 
-  @media(max-width: 640px) {
+  @media screen and (max-width: $mobile-size) {
     display: block;
     width: 100%;
 
@@ -99,8 +99,9 @@
         }
 
         &::before {
-          background-color: lightblue;
+          background-color: #eef4fb;
           padding: 1.5rem;
+          color: $color-blue-dark;
           content: attr(data-title);
           flex: none;
           font-weight: bold;
