@@ -13,9 +13,10 @@
 
   pre {
     margin: 0;
-    //max-height: 200px;
-    //overflow: auto;
+    max-height: 200px;
+    overflow: auto;
     white-space: pre-wrap;
+    border: 1px solid lightgrey;
   }
   .usa-button {
     font-size: 1.5rem;
@@ -32,7 +33,7 @@
 }
 
 .log-table__site-build-log {
-  border-top: 1px solid lightgrey;
+  //border-top: 1px solid lightgrey;
   .log-source-menu {
     a {
       color: $color-black;

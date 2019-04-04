@@ -11,7 +11,7 @@ function SiteBuildLogTable({ buildLogs }) {
           <tr key={log.id}>
             <td>
               <pre className="log-source-header">
-                <a name={log.source}>{log.source}</a>
+                <a name={log.source + '-' + log.id}>{log.source}</a>
               </pre>
               <pre>
                 {log.output}
