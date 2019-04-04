@@ -13,10 +13,9 @@
 
   pre {
     margin: 0;
-    max-height: 200px;
-    overflow: auto;
+    // max-height: 200px;
+    // overflow: auto;
     white-space: pre-wrap;
-    border: 1px solid lightgrey;
   }
   .usa-button {
     font-size: 1.5rem;
@@ -28,7 +27,7 @@
   }
 
   th, td {
-    min-width: 131px;
+    min-width: 124px;
   }
 }
 
@@ -61,6 +60,9 @@
 .log-data {
   table {
     margin: 0px;
+  }
+  pre {
+    border: 1px solid lightgrey;
   }
 }
 .table-full-width {
