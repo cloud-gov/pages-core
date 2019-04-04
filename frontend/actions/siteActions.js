@@ -82,7 +82,7 @@ export default {
 
       return userActions.fetchUser;
     })
-    .then(() => alertActions.alertSuccess('User successfully removed.'))
+    .then(() => alertActions.alertSuccess('Successfully removed.'))
     .catch(alertError);
   },
 
