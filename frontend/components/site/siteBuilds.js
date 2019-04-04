@@ -18,7 +18,7 @@ import { IconCheckCircle, IconExclamationCircle, IconSpinner } from '../icons';
 export const REFRESH_INTERVAL = 15 * 1000;
 
 const buildStateData = (buildState) => {
-  return {
+  const mapping = {
     error: {
       message: 'Failed', icon: IconExclamationCircle,
     },
@@ -31,8 +31,9 @@ const buildStateData = (buildState) => {
     success: {
       message: 'Completed', icon: IconCheckCircle,
     },
-  }[buildState];
-}
+  };
+  return mapping[buildState];
+};
 
 class SiteBuilds extends React.Component {
 
