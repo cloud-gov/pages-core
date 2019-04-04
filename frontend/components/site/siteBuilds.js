@@ -161,7 +161,9 @@ class SiteBuilds extends React.Component {
                         <div className="truncate">
                           { build.branch }
                         </div>
-                        { SiteBuilds.commitLink(build) }
+                        <div>
+                          { SiteBuilds.commitLink(build) }
+                        </div>
                         { previewBuilds[build.branch] === build.id &&
                         <BranchViewLink branchName={build.branch} site={site} showIcon /> }
                       </th>
