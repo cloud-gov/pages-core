@@ -163,7 +163,7 @@ class SiteBuilds extends React.Component {
                             { SiteBuilds.commitLink(build) }
                           </p>
                           <div>
-                            { previewBuilds[build.branch] === build.id &&
+                            { previewBuilds[build.branch] === build.id && build.state === 'success' &&
                             <BranchViewLink branchName={build.branch} site={site} showIcon /> }
                           </div>
                         </div>
