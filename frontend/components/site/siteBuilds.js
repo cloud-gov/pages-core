@@ -156,31 +156,37 @@ class SiteBuilds extends React.Component {
 
                   return (
                     <tr key={build.id}>
-                      <th scope="row">
-                        <p className="commit-link truncate">
-                          { React.createElement(icon) }
-                          { SiteBuilds.commitLink(build) }
-                        </p>
+                      <th scope="row" data-title="Branch">
                         <div>
-                          { previewBuilds[build.branch] === build.id &&
-                          <BranchViewLink branchName={build.branch} site={site} showIcon /> }
+                          <p className="commit-link truncate">
+                            { React.createElement(icon) }
+                            { SiteBuilds.commitLink(build) }
+                          </p>
+                          <div>
+                            { previewBuilds[build.branch] === build.id &&
+                            <BranchViewLink branchName={build.branch} site={site} showIcon /> }
+                          </div>
                         </div>
                       </th>
-                      <td>
-                        <p>{ message }</p>
-                        { SiteBuilds.buildLogsLink(build) }
+                      <td data-title="Message">
+                        <div>
+                          <p>{ message }</p>
+                          { SiteBuilds.buildLogsLink(build) }
+                        </div>
                       </td>
-                      <td>{ SiteBuilds.getUsername(build) }</td>
-                      <td>{ timeFrom(build.completedAt) }</td>
-                      <td>{ duration(build.createdAt, build.completedAt) }</td>
-                      <td className="table-actions">
-                        <CreateBuildLink
-                          handlerParams={{ buildId: build.id, siteId: site.id }}
-                          handleClick={actions.restartBuild}
-                          className="usa-button usa-button-secondary br-5"
-                        >
-                          Rebuild branch
-                        </CreateBuildLink>
+                      <td data-title="User"><span>{ SiteBuilds.getUsername(build) }</span></td>
+                      <td data-title="Completed"><span>{ timeFrom(build.completedAt) }</span></td>
+                      <td data-title="Duration"><span>{ duration(build.createdAt, build.completedAt) }</span></td>
+                      <td data-title="Actions" className="table-actions">
+                        <span>
+                          <CreateBuildLink
+                            handlerParams={{ buildId: build.id, siteId: site.id }}
+                            handleClick={actions.restartBuild}
+                            className="usa-button usa-button-secondary"
+                          >
+                            Rebuild branch
+                          </CreateBuildLink>
+                        </span>
                       </td>
                     </tr>
                   );
