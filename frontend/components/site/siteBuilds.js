@@ -179,13 +179,16 @@ class SiteBuilds extends React.Component {
                       <td data-title="Duration"><span>{ duration(build.createdAt, build.completedAt) }</span></td>
                       <td data-title="Actions" className="table-actions">
                         <span>
-                          <CreateBuildLink
-                            handlerParams={{ buildId: build.id, siteId: site.id }}
-                            handleClick={actions.restartBuild}
-                            className="usa-button usa-button-secondary"
-                          >
-                            Rebuild branch
-                          </CreateBuildLink>
+                          {
+                            build.state !== 'processing' &&
+                            <CreateBuildLink
+                              handlerParams={{ buildId: build.id, siteId: site.id }}
+                              handleClick={actions.restartBuild}
+                              className="usa-button usa-button-secondary"
+                            >
+                              Rebuild
+                            </CreateBuildLink>
+                          }
                         </span>
                       </td>
                     </tr>
