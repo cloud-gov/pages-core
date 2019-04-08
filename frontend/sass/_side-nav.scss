@@ -63,6 +63,13 @@
     &.side-nav {
       margin: 1.5rem 1.5rem 0 0;
       padding: 0;
+      position: sticky;
+    }
+  }
+
+  @media screen and (max-width: 990px) {
+    &.side-nav {
+      position: inherit;
     }
   }
 }
