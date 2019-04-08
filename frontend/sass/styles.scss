@@ -151,3 +151,10 @@ $image-path: '../../node_modules/uswds/src/img';
   text-overflow: ellipsis;
   max-width: 150px;
 }
+
+// unclear why this isn't already the case...
+@media screen and (min-width: $mobile-size) {
+  .usa-width-five-sixths {
+    width: 83%;
+  }
+}

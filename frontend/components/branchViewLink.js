@@ -15,7 +15,7 @@ const getUrlAndViewText = (branchName, site, previewHostname) => {
   }
   return {
     url: `${previewHostname}/preview/${site.owner}/${site.repository}/${branchName}/`,
-    viewText: 'View preview',
+    viewText: 'Preview site',
   };
 };
 

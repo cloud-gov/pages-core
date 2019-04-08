@@ -54,17 +54,36 @@ inquirer.prompt(confirm).then(({ userAgrees }) => {
         repository: 'example-site',
       }))
       // create a build for the site
-      .then(site => Build.create({
-        branch: site.defaultBranch,
-        completedAt: new Date(),
-        source: 'fake-build',
-        state: 'success',
-        site: site.id,
-        user: thisUserId,
-        token: 'fake-token',
-      }))
+      .then(site => Promise.all([
+        Build.create({
+          branch: site.defaultBranch,
+          completedAt: new Date(),
+          source: 'fake-build',
+          state: 'success',
+          site: site.id,
+          user: thisUserId,
+          token: 'fake-token',
+        }),
+        Build.create({
+          branch: site.defaultBranch,
+          source: 'fake-build',
+          site: site.id,
+          user: thisUserId,
+          token: 'fake-token',
+        }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1' })),
+        Build.create({
+          branch: site.demoBranch,
+          source: 'fake-build',
+          site: site.id,
+          user: thisUserId,
+          token: 'fake-token',
+          state: 'error',
+          error: 'Something bad happened here',
+          completedAt: new Date(),
+        }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2' })),
+      ]))
       // create a build log for the build
-      .then(build => BuildLog.create({
+      .then(builds => builds.map(build => BuildLog.create({
         output: `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                  Nullam fringilla, arcu ut ultricies auctor, elit quam
                  consequat neque, eu blandit metus lorem non turpis.
@@ -73,7 +92,7 @@ inquirer.prompt(confirm).then(({ userAgrees }) => {
                  Aenean laoreet nulla ut porta semper.`.replace(/\s\s+/g, ' '),
         source: 'fake-build-step',
         build: build.id,
-      }))
+      })))
       // create another user
       .then(() => User.create({
         id: 2,

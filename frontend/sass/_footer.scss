@@ -19,7 +19,7 @@
 .usa-footer {
   position: inherit;
   width: 100%;
-  bottom: 0;  
+  bottom: 0;
   .usa-footer-primary-link {
     color: $color-white;
     font-weight: $font-weight-normal;
@@ -105,6 +105,28 @@ li.usa-footer-primary-content {
         .usa-footer-primary-link {
           padding-top: 0;
         }
+      }
+    }
+  }
+}
+
+.usa-footer .usa-nav-primary {
+  display: block;
+  margin-bottom: 1rem;
+
+  @media screen and (min-width: 600px) {
+    padding-left: 1rem;
+  }
+
+  li .usa-nav-link {
+    padding-left: 0;
+    padding-right: 1rem;
+    font-size: 1.75rem;
+
+    &:hover {
+      border: none;
+      span {
+        border: none;
       }
     }
   }

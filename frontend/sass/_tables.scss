@@ -13,8 +13,8 @@
 
   pre {
     margin: 0;
-    max-height: 200px;
-    overflow: auto;
+    // max-height: 200px;
+    // overflow: auto;
     white-space: pre-wrap;
   }
   .usa-button {
@@ -24,15 +24,138 @@
     a {
       margin: 0;
     }
+    .usa-button {
+      border-radius: 10px;
+      font-weight: bold;
+    }
   }
 
   th, td {
-    min-width: 131px;
+    min-width: 124px;
+  }
+}
+
+.table-full-width.log-table__site-builds {
+  th {
+    white-space: nowrap;
+  }
+
+  td, tbody th {
+    vertical-align: top;
+    padding: 1.5rem 1rem;
+  }
+
+  .commit-link {
+    font-weight: bold;
+
+    * {
+      vertical-align: top;
+    }
+
+    a {
+      margin-left: 1rem;
+    }
+
+    + * {
+      margin-left: 3.5rem;
+    }
+  }
+
+  .usa-button {
+    width: initial;
+  }
+
+  @media screen and (max-width: 990px) {
+    display: block;
+    width: 100%;
+
+    thead {
+      position: absolute;
+      left: -999em;
+    }
+
+    tbody {
+      display: block;
+
+      tr {
+        display: block;
+        border: 1px solid rgb(104, 104, 104);
+        margin-bottom: 3rem;
+        position: relative;
+      }
+
+      td > *:first-child {
+        margin-left: 3.5rem;
+      }
+
+      th, td {
+        display: flex;
+        align-items: stretch;
+        padding: 0;
+        position: relative;
+
+        > *:first-child {
+          padding: 1.5rem;
+        }
+
+        &::before {
+          background-color: #eef4fb;
+          padding: 1.5rem;
+          color: $color-blue-dark;
+          content: attr(data-title);
+          flex: none;
+          font-weight: bold;
+          margin-right: .25rem;
+          max-width: 10.5rem;
+          text-align: left;
+          width: 50%;
+        }
+
+        p {
+          font-size: 1.5rem;
+        }
+      }
+    }
   }
 }
 
 .log-table__site-build-log pre {
   border: 1px solid lightgrey;
+}
+
+.log-table__site-build-log {
+  //border-top: 1px solid lightgrey;
+  .log-source-menu {
+    a {
+      color: $color-black;
+    }
+  }
+
+  th, td {
+    vertical-align: top;
+    border: none;
+
+    a {
+      text-decoration: none;
+    }
+
+    .log-source-header {
+      background-color: #112e51;//#eef4fb;//#112e51;//$color-black;
+      padding: 0.5rem;
+      a {
+        color: $color-white;//#eef4fb;//#112e51;//$color-white;
+      }
+    }
+  }
+}
+
+.log-data {
+  table {
+    margin: 0px;
+  }
+  pre {
+    border: 1px solid lightgrey;
+  }
 }
 
 .table-full-width {

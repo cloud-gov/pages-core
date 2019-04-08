@@ -20,6 +20,7 @@
   border-bottom: none;
   min-height: 4rem;
   padding: $spacing-thin 0 $spacing-thin 0;
+  z-index: auto;
 
   .usa-logo {
     margin-top: 5px;
@@ -57,6 +58,14 @@
           border-width: 3px;
         }
       }
+
+      @media screen and (max-width: 950px) {
+        &:hover {
+          background-color: initial;
+          text-decoration: underline;
+        }
+      }
+
       @media screen and (min-width: 951px) {
         &:hover {
           color: $white;
@@ -73,7 +82,9 @@
   }
 
   .nav-action {
-    margin-left: $spacing-lg;
+    @media screen and (min-width: 951px) {
+      margin-left: $spacing-lg;
+    }
   }
 
   .usa-button {
