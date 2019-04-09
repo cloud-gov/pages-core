@@ -26,14 +26,12 @@ export class SiteGitHubBranches extends React.Component {
 
     return (
       <span>
-        <BranchViewLink branchName={name} site={this.props.site} />
         <CreateBuildLink
           handlerParams={{ commit: commit.sha, branch: name, siteId: this.props.site.id }}
           handleClick={buildActions.createBuild}
           className="usa-button usa-button-secondary"
         >
-          <br />
-          Rebuild branch
+          Rebuild
         </CreateBuildLink>
       </span>
     );
@@ -45,8 +43,13 @@ export class SiteGitHubBranches extends React.Component {
     return (
       <tr key={name}>
         <td>
-          <GitHubLink text={name} owner={owner} repository={repository} branch={name} />
+          <span className="commit-link">
+            <GitHubLink text={name} owner={owner} repository={repository} branch={name} />
+          </span>
           { isDefault && ' (live branch)' }{ isDemo && ' (demo branch)' }
+          <div className="branch-link">
+            { isLinkable(name) && <BranchViewLink branchName={name} site={this.props.site} showIcon />}
+          </div>
         </td>
         <td className="table-actions">
           {this.renderRowActions(name, commit)}
