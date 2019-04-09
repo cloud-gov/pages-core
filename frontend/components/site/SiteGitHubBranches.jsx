@@ -48,7 +48,10 @@ export class SiteGitHubBranches extends React.Component {
           </span>
           { isDefault && ' (live branch)' }{ isDemo && ' (demo branch)' }
           <div className="branch-link">
-            { isLinkable(name) && <BranchViewLink branchName={name} site={this.props.site} showIcon />}
+            {
+              isLinkable(name)
+                && <BranchViewLink branchName={name} site={this.props.site} showIcon />
+            }
           </div>
         </td>
         <td className="table-actions">
