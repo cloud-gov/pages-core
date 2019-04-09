@@ -8,7 +8,7 @@
   }
 }
 
-.log-table {
+.table-full-width.log-table {
   font-size: 1.45rem;
 
   pre {
@@ -32,6 +32,11 @@
 
   th, td {
     min-width: 124px;
+    padding: 1.5rem 1rem;
+  }
+
+  .branch-link {
+    margin-top: 1.5rem;
   }
 }
 
@@ -46,8 +51,6 @@
   }
 
   .commit-link {
-    font-weight: bold;
-
     * {
       vertical-align: top;
     }
