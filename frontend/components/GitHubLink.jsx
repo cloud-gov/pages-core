@@ -27,7 +27,7 @@ const GitHubLink = ({ owner, repository, text, branch, sha, ...props }) => {
       target="_blank"
       rel="noopener noreferrer"
     >
-      {text}<IconGitHub />
+      {text}&nbsp;<IconGitHub />
     </a>
   );
 };
