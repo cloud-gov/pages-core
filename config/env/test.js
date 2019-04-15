@@ -41,7 +41,7 @@ module.exports = {
     password: 'deploy_pass',
   },
   env: {
-    buildSpaceGuid: '123abc-456def-789ghi',
+    cfSpaceGuid: '123abc-456def-789ghi',
     cfOauthTokenUrl: 'https://login.example.com/oauth/token',
     cfApiHost: 'https://api.example.com',
   },

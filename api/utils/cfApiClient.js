@@ -185,7 +185,7 @@ class CloudFoundryAPIClient {
   }
 
   spaceGUID() {
-    return config.env.buildSpaceGuid;
+    return config.env.cfSpaceGuid;
   }
 }
 

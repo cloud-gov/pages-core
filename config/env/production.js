@@ -70,13 +70,13 @@ if (deployUserCreds) {
 }
 
 // Environment Variables
-const buildSpaceGuid = process.env.BUILD_SPACE_GUID;
+const cfSpaceGuid = process.env.CF_SPACE_GUID;
 const cfOauthTokenUrl = process.env.CLOUD_FOUNDRY_OAUTH_TOKEN_URL;
 const cfApiHost = process.env.CLOUD_FOUNDRY_API_HOST;
 
-if (buildSpaceGuid && cfOauthTokenUrl && cfApiHost) {
+if (cfSpaceGuid && cfOauthTokenUrl && cfApiHost) {
   module.exports.env = {
-    buildSpaceGuid,
+    cfSpaceGuid,
     cfOauthTokenUrl,
     cfApiHost,
   };
