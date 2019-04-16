@@ -59,7 +59,7 @@ if (redisCreds) {
 }
 
 // Deploy User
-const deployUserCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-deploy-user`);
+const deployUserCreds = appEnv.getServiceCreds('federalist-deploy-user');
 if (deployUserCreds) {
   module.exports.deployUser = {
     username: deployUserCreds.DEPLOY_USER_USERNAME,
@@ -70,13 +70,13 @@ if (deployUserCreds) {
 }
 
 // Environment Variables
-const cfSpaceGuid = process.env.CF_SPACE_GUID;
+const cfSpace = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-space`);
 const cfOauthTokenUrl = process.env.CLOUD_FOUNDRY_OAUTH_TOKEN_URL;
 const cfApiHost = process.env.CLOUD_FOUNDRY_API_HOST;
 
-if (cfSpaceGuid && cfOauthTokenUrl && cfApiHost) {
+if (cfSpace && cfOauthTokenUrl && cfApiHost) {
   module.exports.env = {
-    cfSpaceGuid,
+    cfSpaceGuid: cfSpace.guid,
     cfOauthTokenUrl,
     cfApiHost,
   };
