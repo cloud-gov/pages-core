@@ -30,10 +30,11 @@ class TemplateSite extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
+    const { engine, handleSubmit } = this.props;
     const repository = getSafeRepoName(this.state.repository);
-    const site = Object.assign({}, this.state, { repository });
+    const site = Object.assign({}, this.state, { repository, engine });
 
-    this.props.handleSubmit(site);
+    handleSubmit(site);
   }
 
   handleChooseActive() {
@@ -106,6 +107,7 @@ class TemplateSite extends React.Component {
 TemplateSite.propTypes = {
   templateKey: PropTypes.string.isRequired,
   defaultOwner: PropTypes.string.isRequired,
+  engine: PropTypes.string.isRequired,
   example: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
