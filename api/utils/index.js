@@ -12,7 +12,7 @@ function generateS3ServiceName(owner, repository) {
     .split(' ')
     .join('-');
 
-  return `${format(owner)}-${format(repository)}`;
+  return `owner-${format(owner)}-repo-${format(repository)}`;
 }
 
 function isPastAuthThreshold(authDate) {

@@ -463,7 +463,7 @@ describe('SiteCreator', () => {
           sharedBucket: false,
         };
 
-        const name = `${siteParams.owner}-${siteParams.repository}`;
+        const name = `owner-${siteParams.owner}-repo-${siteParams.repository}`;
         const keyName = `${name}-key`;
         const planName = 'basic-public';
         const planGuid = 'plan-guid';

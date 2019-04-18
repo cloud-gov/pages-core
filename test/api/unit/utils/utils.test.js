@@ -17,7 +17,7 @@ describe('utils', () => {
     it('should concat and lowercase owner and repository name', (done) => {
       const owner = 'Hello';
       const repository = 'Hello World';
-      const expected = 'hello-hello-world';
+      const expected = 'owner-hello-repo-hello-world';
 
       expect(utils.generateS3ServiceName(owner, repository)).to.equal(expected);
       done();
@@ -26,7 +26,7 @@ describe('utils', () => {
     it('should convert to string when the owner and repository is a number', (done) => {
       const owner = 12345;
       const repository = 'Hello World';
-      const expected = '12345-hello-world';
+      const expected = 'owner-12345-repo-hello-world';
 
       expect(utils.generateS3ServiceName(owner, repository)).to.equal(expected);
       done();
