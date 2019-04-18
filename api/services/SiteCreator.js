@@ -145,11 +145,12 @@ function createSiteFromExistingRepo({ siteParams, user }) {
 function createSiteFromTemplate({ siteParams, user, template }) {
   const params = Object.assign({}, siteParams, {
     defaultBranch: template.branch,
+    engine: template.engine,
   });
   const { owner, repository } = params;
   let site;
 
-  return validateSite(siteParams)
+  return validateSite(params)
   .then((model) => {
     site = model;
     return GitHub.createRepo(user, owner, repository);
