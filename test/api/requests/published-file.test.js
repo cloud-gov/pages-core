@@ -1,6 +1,10 @@
-const AWSMocks = require('../support/aws-mocks');
-const expect = require('chai').expect;
+const nock = require('nock');
 const request = require('supertest');
+const { expect } = require('chai');
+
+const AWSMocks = require('../support/aws-mocks');
+const mockTokenRequest = require('../support/cfAuthNock');
+const apiNocks = require('../support/cfAPINocks');
 const app = require('../../../app');
 const config = require('../../../config');
 const factory = require('../support/factory');
@@ -8,14 +12,22 @@ const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 
 describe('Published Files API', () => {
+  after(() => {
+    AWSMocks.resetMocks();
+  });
+
+  afterEach(() => nock.cleanAll());
+
   describe('GET /v0/site/:site_id/published-branch/:branch/file', () => {
     it('should require authentication', (done) => {
-      factory.site().then(site => request(app)
+      factory.site()
+        .then(site => request(app)
           .get(`/v0/site/${site.id}/published-branch/${site.defaultBranch}`)
-          .expect(403)).then((response) => {
-            validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 403, response.body);
-            done();
-          }).catch(done);
+          .expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 403, response.body);
+          done();
+        }).catch(done);
     });
 
     it('should list the files published to the branch for the site', (done) => {
@@ -27,6 +39,9 @@ describe('Published Files API', () => {
         users: Promise.all([userPromise]),
       });
       const cookiePromise = authenticatedSession(userPromise);
+
+      mockTokenRequest();
+      apiNocks.mockDefaultCredentials();
 
       AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
@@ -47,7 +62,7 @@ describe('Published Files API', () => {
         site: sitePromise,
         cookie: cookiePromise,
       }).then((promisedValues) => {
-        site = promisedValues.site;
+        ({ site } = promisedValues);
         prefix = `site/${site.owner}/${site.repository}/`;
 
         return request(app)
@@ -57,7 +72,7 @@ describe('Published Files API', () => {
       }).then((response) => {
         validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 200, response.body);
 
-        const files = response.body.files;
+        const { files } = response.body;
         files.forEach((file) => {
           delete file.publishedBranch; // eslint-disable-line no-param-reassign
         });
@@ -99,7 +114,7 @@ describe('Published Files API', () => {
         site: sitePromise,
         cookie: cookiePromise,
       }).then((promisedValues) => {
-        site = promisedValues.site;
+        ({ site } = promisedValues);
         prefix = `site/${site.owner}/${site.repository}/`;
 
         return request(app)
@@ -141,7 +156,7 @@ describe('Published Files API', () => {
         site: sitePromise,
         cookie: cookiePromise,
       }).then((promisedValues) => {
-        site = promisedValues.site;
+        ({ site } = promisedValues);
         prefix = `site/${site.owner}/${site.repository}/`;
 
         return request(app)
@@ -159,13 +174,15 @@ describe('Published Files API', () => {
       const site = factory.site({ defaultBranch: 'master' });
       const cookie = authenticatedSession(user);
 
-      Promise.props({ user, site, cookie }).then(promisedValues => request(app)
+      Promise.props({ user, site, cookie })
+        .then(promisedValues => request(app)
           .get(`/v0/site/${promisedValues.site.id}/published-branch/master/published-file`)
           .set('Cookie', promisedValues.cookie)
-          .expect(403)).then((response) => {
-            validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 403, response.body);
-            done();
-          }).catch(done);
+          .expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 403, response.body);
+          done();
+        }).catch(done);
     });
   });
 });
