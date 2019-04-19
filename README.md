@@ -9,7 +9,7 @@
 
 ## About Federalist
 
-[Federalist](https://federalist.18f.gov) helps federal government entities publish compliant static websites quickly and seamlessly. Federalist integrates with GitHub and is built on top of [cloud.gov](cloud.gov), which uses Amazon Web Services.
+[Federalist](https://federalist.18f.gov) helps federal government entities publish compliant static websites quickly and seamlessly. Federalist integrates with GitHub and is built on top of [cloud.gov](https://cloud.gov), which uses Amazon Web Services.
 
 This repository is home to "federalist-core" - a Node.js app that allows government users to create and configure Federalist sites.
 
