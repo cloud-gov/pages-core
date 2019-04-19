@@ -14,7 +14,7 @@ const logger = winston.createLogger({
 });
 
 const databaseLogger = winston.createLogger({
-  level: 'warning',
+  level: 'warn',
   format: winston.format.combine(
     winston.format.simple(),
     winston.format.colorize()
