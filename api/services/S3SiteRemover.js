@@ -1,14 +1,7 @@
-const AWS = require('aws-sdk');
-const config = require('../../config');
 const S3Helper = require('./S3Helper');
+const CloudFoundryAPIClient = require('../utils/cfApiClient');
 
-const s3Config = config.s3;
-const s3Client = new AWS.S3({
-  accessKeyId: s3Config.accessKeyId,
-  secretAccessKey: s3Config.secretAccessKey,
-  region: s3Config.region,
-});
-
+const apiClient = new CloudFoundryAPIClient();
 /**
   Deletes the array of S3 objects passed to it.
   Since AWS limits the number of objects that can be deleted at a time, this
@@ -16,7 +9,7 @@ const s3Client = new AWS.S3({
   group of 1000 is deleted one after the other instead of simultaneously. This
   prevents the delete requests from breaking AWS's rate limit.
 */
-const deleteObjects = (keys) => {
+const deleteObjects = (s3Client, keys) => {
   if (!keys.length) {
     return Promise.resolve();
   }
@@ -25,8 +18,8 @@ const deleteObjects = (keys) => {
   const keysToDeleteLater = keys.slice(S3Helper.S3_DEFAULT_MAX_KEYS, keys.length);
 
   return new Promise((resolve, reject) => {
-    s3Client.deleteObjects({
-      Bucket: s3Config.bucket,
+    s3Client.client.deleteObjects({
+      Bucket: s3Client.bucket,
       Delete: {
         Objects: keysToDeleteNow.map(object => ({ Key: object })),
       },
@@ -37,14 +30,11 @@ const deleteObjects = (keys) => {
         resolve(data);
       }
     });
-  }).then(() =>
-    deleteObjects(keysToDeleteLater)
-  );
+  }).then(() => deleteObjects(s3Client, keysToDeleteLater));
 };
 
-const getKeys = prefix =>
-  S3Helper.listObjects(prefix)
-    .then(objects => objects.map(o => o.Key));
+const getKeys = (s3Client, prefix) => s3Client.listObjects(prefix)
+  .then(objects => objects.map(o => o.Key));
 
 const removeSite = (site) => {
   const prefixes = [
@@ -53,23 +43,33 @@ const removeSite = (site) => {
     `preview/${site.owner}/${site.repository}`,
   ];
 
-  return Promise.all(
-    prefixes.map(prefix => getKeys(`${prefix}/`))
-  ).then((keys) => {
-    let mergedKeys = [].concat(...keys);
+  return apiClient.fetchServiceInstanceCredentials(site.s3ServiceName)
+    .then((credentials) => {
+      const s3Client = new S3Helper.S3Client({
+        accessKeyId: credentials.access_key_id,
+        secretAccessKey: credentials.secret_access_key,
+        region: credentials.region,
+        bucket: credentials.bucket,
+      });
 
-    if (mergedKeys.length) {
-      /**
-       * The federalist build container puts redirect objects in the root of each user's folder
-       * which correspond to the name of each site prefix. Because each site prefix is suffixed
-       * with a trailing `/`, `listObjects will no longer see them.
-       * Therefore, they are manually added to the array of keys marked for deletion.
-       */
-      mergedKeys = mergedKeys.concat(prefixes.slice(0));
-    }
+      return Promise.all(
+        prefixes.map(prefix => getKeys(s3Client, `${prefix}/`))
+      ).then((keys) => {
+        let mergedKeys = [].concat(...keys);
 
-    return deleteObjects(mergedKeys);
-  });
+        if (mergedKeys.length) {
+          /**
+           * The federalist build container puts redirect objects in the root of each user's folder
+           * which correspond to the name of each site prefix. Because each site prefix is suffixed
+           * with a trailing `/`, `listObjects will no longer see them.
+           * Therefore, they are manually added to the array of keys marked for deletion.
+           */
+          mergedKeys = mergedKeys.concat(prefixes.slice(0));
+        }
+
+        return deleteObjects(s3Client, mergedKeys);
+      });
+    });
 };
 
 module.exports = { removeSite };

@@ -13,6 +13,7 @@ module.exports = {
     secretAccessKey: '456def',
     region: 'us-gov-west-1',
     bucket: 's3-bucket',
+    serviceName: 'federalist-dev-s3',
   },
   passport: {
     github: {
@@ -34,5 +35,14 @@ module.exports = {
   },
   log: {
     level: 'error',
+  },
+  deployUser: {
+    username: 'deploy_user',
+    password: 'deploy_pass',
+  },
+  env: {
+    cfSpaceGuid: '123abc-456def-789ghi',
+    cfOauthTokenUrl: 'https://login.example.com/oauth/token',
+    cfApiHost: 'https://api.example.com',
   },
 };
