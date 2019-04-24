@@ -8,6 +8,10 @@ const reqheaders = {
   },
 };
 
+const mockCreateRoute = resource => nock(url, reqheaders)
+  .post('/v2/routes')
+  .reply(200, resource);
+
 const mockFetchServiceKeysRequest = resources => nock(url, reqheaders)
   .get('/v2/service_keys')
   .reply(200, resources);
@@ -82,7 +86,12 @@ const mockCreateServiceKey = (body, resources) => {
   return n.reply(200, resources);
 };
 
+const mockMapRoute = resource => nock(url, reqheaders)
+  .post('/v2/route_mappings')
+  .reply(200, resource);
+
 module.exports = {
+  mockCreateRoute,
   mockCreateS3ServiceInstance,
   mockCreateServiceKey,
   mockDefaultCredentials,
@@ -91,4 +100,5 @@ module.exports = {
   mockFetchServiceKeyRequest,
   mockFetchServiceKeysRequest,
   mockFetchS3ServicePlanGUID,
+  mockMapRoute,
 };

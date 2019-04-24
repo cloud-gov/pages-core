@@ -8,6 +8,21 @@ class CloudFoundryAPIClient {
     this.authClient = new CloudFoundryAuthClient();
   }
 
+  createRoute(name) {
+    const body = {
+      domain_guid: this.domainGUID(),
+      space_guid: this.spaceGUID(),
+      host: name,
+    };
+
+    return this.accessToken().then(token => this.request(
+      'POST',
+      '/v2/routes',
+      token,
+      body
+    ));
+  }
+
   createS3ServiceInstance(name, serviceName) {
     return this.fetchS3ServicePlanGUID(serviceName)
       .then((servicePlanGuid) => {
@@ -45,6 +60,10 @@ class CloudFoundryAPIClient {
       .then(res => this.createServiceKey(name, res.metadata.guid, keyIdentifier));
   }
 
+  createSiteProxyRoute(bucketName) {
+    return this.createRoute(bucketName)
+      .then(route => this.mapRoute(route.metadata.guid));
+  }
 
   // TODO Check Permissions to Delete Services
 
@@ -123,6 +142,20 @@ class CloudFoundryAPIClient {
       .then(service => service.metadata.guid);
   }
 
+  mapRoute(routeGuid) {
+    const body = {
+      app_guid: this.proxyGUID(),
+      route_guid: routeGuid,
+    };
+
+    return this.accessToken().then(token => this.request(
+      'POST',
+      '/v2/route_mappings',
+      token,
+      body
+    ));
+  }
+
   // Private methods
   accessToken() {
     return this.authClient.accessToken();
@@ -182,6 +215,14 @@ class CloudFoundryAPIClient {
         }
       });
     });
+  }
+
+  domainGUID() {
+    return config.env.cfDomainGuid;
+  }
+
+  proxyGUID() {
+    return config.env.cfProxyGuid;
   }
 
   spaceGUID() {

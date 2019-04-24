@@ -71,11 +71,15 @@ if (deployUserCreds) {
 
 // Environment Variables
 const cfSpace = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-space`);
+const cfDomain = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-domain`);
+const cfProxy = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-proxy`);
 const cfOauthTokenUrl = process.env.CLOUD_FOUNDRY_OAUTH_TOKEN_URL;
 const cfApiHost = process.env.CLOUD_FOUNDRY_API_HOST;
 
-if (cfSpace && cfOauthTokenUrl && cfApiHost) {
+if (cfSpace && cfOauthTokenUrl && cfApiHost && cfDomain && cfProxy) {
   module.exports.env = {
+    cfDomainGuid: cfDomain.guid,
+    cfProxyGuid: cfProxy.guid,
     cfSpaceGuid: cfSpace.guid,
     cfOauthTokenUrl,
     cfApiHost,
