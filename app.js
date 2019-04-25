@@ -25,7 +25,7 @@ const redisAdapter = require('socket.io-redis');
 const schedule = require('node-schedule');
 
 const responses = require('./api/responses');
-const passport = require('./api/services/passport');
+const { github, foobar } = require('./api/services/passport');
 const RateLimit = require('express-rate-limit');
 const router = require('./api/routers');
 const devMiddleware = require('./api/services/devMiddleware');
@@ -54,8 +54,8 @@ if (process.env.NODE_ENV === 'development') {
   app.use(devMiddleware());
 }
 app.use(session(config.session));
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(github.initialize());
+app.use(github.session());
 app.use((req, res, next) => {
   res.locals.user = req.user;
   return next();

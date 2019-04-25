@@ -1,11 +1,14 @@
 const GitHub = require('./GitHub');
 const GitHubStrategy = require('passport-github').Strategy;
-const passport = require('passport');
+const Passport = require('passport').Passport;
 const config = require('../../config');
 const { User } = require('../models');
 const { logger } = require('../../winston');
 const SiteUserAuditor = require('./SiteUserAuditor');
 const RepositoryVerifier = require('./RepositoryVerifier');
+
+github = new Passport();
+foobar = new Passport();
 
 const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
   let user;
@@ -42,17 +45,17 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
     });
 };
 
-passport.use(new GitHubStrategy(config.passport.github.options, githubVerifyCallback));
+github.use(new GitHubStrategy(config.passport.github.options, githubVerifyCallback));
 
-passport.logout = (req, res) => {
+github.logout = (req, res) => {
   req.logout();
   req.session.destroy(() => {
     res.redirect(config.app.homepageUrl);
   });
 };
 
-passport.callback = (req, res) => {
-  passport.authenticate('github')(req, res, () => {
+github.callback = (req, res) => {
+  github.authenticate('github')(req, res, () => {
     if (req.user) {
       req.session.authenticated = true;
       req.session.authenticatedAt = new Date();
@@ -74,14 +77,30 @@ passport.callback = (req, res) => {
   });
 };
 
-passport.serializeUser((user, next) => {
-  next(null, user.id);
+github.serializeUser((user, next) => {
+  next(null, user.id || {});
 });
 
-passport.deserializeUser((id, next) => {
+github.deserializeUser((id, next) => {
+  if (typeof id === 'object') return next(null, {});
   User.findByPk(id).then((user) => {
     next(null, user);
   });
 });
 
-module.exports = passport;
+const foobarOptions = {
+  ...config.passport.github.options,
+  callbackURL: 'http://localhost:1337/auth/github/callback/external',
+  scope: ['user', 'repo'],
+}
+
+const foobarCallback = (accessToken, _refreshToken, _profile, callback) => {
+  callback(null, { accessToken })
+}
+
+foobar.use('foobar', new GitHubStrategy(foobarOptions, foobarCallback));
+
+module.exports = {
+  github,
+  foobar
+};
