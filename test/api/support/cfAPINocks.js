@@ -8,8 +8,8 @@ const reqheaders = {
   },
 };
 
-const mockCreateRoute = resource => nock(url, reqheaders)
-  .post('/v2/routes')
+const mockCreateRoute = (resource, body) => nock(url, reqheaders)
+  .post('/v2/routes', body)
   .reply(200, resource);
 
 const mockFetchServiceKeysRequest = resources => nock(url, reqheaders)
