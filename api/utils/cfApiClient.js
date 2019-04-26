@@ -165,6 +165,15 @@ class CloudFoundryAPIClient {
     return this.authClient.accessToken();
   }
 
+  parser(body, resolver) {
+    try {
+      const parsed = JSON.parse(body);
+      resolver(parsed);
+    } catch (e) {
+      resolver(body);
+    }
+  }
+
   request(method, path, accessToken, json) {
     return new Promise((resolve, reject) => {
       request({
@@ -183,15 +192,8 @@ class CloudFoundryAPIClient {
         } else if (response.statusCode > 399) {
           const errorMessage = `Received status code: ${response.statusCode}`;
           reject(new Error(body || errorMessage));
-        } else if (typeof body === 'string') {
-          try {
-            const parsed = JSON.parse(body);
-            resolve(parsed);
-          } catch (e) {
-            resolve(body);
-          }
         } else {
-          resolve(body);
+          this.parser(body, resolve);
         }
       });
     });
