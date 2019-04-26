@@ -82,31 +82,18 @@ class CloudFoundryAPIClient {
         )));
   }
 
-  // TODO Check Permissions to Delete Services
-
-  // deleteS3ServiceInstance(name) {
-  //   return this.fetchServiceInstances()
-  //     .then(res => filterEntity(res, name))
-  //     .then(instance => {
-  //       return this.accessToken().then(token => this.request(
-  //         `DELETE`,
-  //         `/v2/service_instances/${instance.metadata.guid}?accepts_incomplete=true`,
-  //         token
-  //       ));
-  //     })
-  // }
-
-  // deleteServiceKey(name) {
-  //   return this.fetchServiceKeys()
-  //     .then(res => filterEntity(res, name))
-  //     .then(key => key.entity.service_instance_guid)
-  //     .then(guid => {
-  //       return this.authClient.accessToken().then(token => this.request(
-  //         `DELETE`,
-  //         `/v2/service_keys/${guid}`
-  //       ));
-  //     })
-  // }
+  deleteServiceInstance(name) {
+    return this.fetchServiceInstance(name)
+      .then(instance => this.accessToken().then(token => this.request(
+        'DELETE',
+        `/v2/service_instances/${instance.metadata.guid}?accepts_incomplete=true&recursive=true&async=true`,
+        token
+      ).then(() => ({
+        metadata: {
+          guid: instance.metadata.guid,
+        },
+      }))));
+  }
 
   fetchServiceInstance(name) {
     return this.fetchServiceInstances()
@@ -197,7 +184,12 @@ class CloudFoundryAPIClient {
           const errorMessage = `Received status code: ${response.statusCode}`;
           reject(new Error(body || errorMessage));
         } else if (typeof body === 'string') {
-          resolve(JSON.parse(body));
+          try {
+            const parsed = JSON.parse(body);
+            resolve(parsed);
+          } catch (e) {
+            resolve(body);
+          }
         } else {
           resolve(body);
         }

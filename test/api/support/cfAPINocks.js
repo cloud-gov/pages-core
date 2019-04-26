@@ -27,6 +27,21 @@ const mockDeleteRoute = (host, guid) => {
     .reply(200, { metadata: { guid } });
 };
 
+const mockDeleteService = (name, guid) => {
+  nock(url, reqheaders)
+    .get('/v2/service_instances')
+    .reply(200, {
+      resources: [{
+        metadata: { guid },
+        entity: { name },
+      }],
+    });
+
+  nock(url, reqheaders)
+    .delete(`/v2/service_instances/${guid}?accepts_incomplete=true&recursive=true&async=true`)
+    .reply(200, { metadata: { guid } });
+};
+
 const mockFetchServiceKeysRequest = resources => nock(url, reqheaders)
   .get('/v2/service_keys')
   .reply(200, resources);
@@ -108,6 +123,7 @@ const mockMapRoute = resource => nock(url, reqheaders)
 module.exports = {
   mockCreateRoute,
   mockDeleteRoute,
+  mockDeleteService,
   mockCreateS3ServiceInstance,
   mockCreateServiceKey,
   mockDefaultCredentials,
