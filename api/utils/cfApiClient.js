@@ -66,6 +66,22 @@ class CloudFoundryAPIClient {
       .then(route => this.mapRoute(route.metadata.guid));
   }
 
+  deleteRoute(name) {
+    return this.accessToken()
+      .then(token => this.request(
+        'GET',
+        '/v2/routes',
+        token
+      ))
+      .then(res => filterEntity(res, name, 'host'))
+      .then(entity => this.accessToken()
+        .then(token => this.request(
+          'DELETE',
+          `/v2/routes/${entity.metadata.guid}?recursive=true&async=true`,
+          token
+        )));
+  }
+
   // TODO Check Permissions to Delete Services
 
   // deleteS3ServiceInstance(name) {

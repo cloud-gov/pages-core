@@ -12,6 +12,21 @@ const mockCreateRoute = (resource, body) => nock(url, reqheaders)
   .post('/v2/routes', body)
   .reply(200, resource);
 
+const mockDeleteRoute = (host, guid) => {
+  nock(url, reqheaders)
+    .get('/v2/routes')
+    .reply(200, {
+      resources: [{
+        metadata: { guid },
+        entity: { host },
+      }],
+    });
+
+  nock(url, reqheaders)
+    .delete(`/v2/routes/${guid}?recursive=true&async=true`)
+    .reply(200, { metadata: { guid } });
+};
+
 const mockFetchServiceKeysRequest = resources => nock(url, reqheaders)
   .get('/v2/service_keys')
   .reply(200, resources);
@@ -92,6 +107,7 @@ const mockMapRoute = resource => nock(url, reqheaders)
 
 module.exports = {
   mockCreateRoute,
+  mockDeleteRoute,
   mockCreateS3ServiceInstance,
   mockCreateServiceKey,
   mockDefaultCredentials,
