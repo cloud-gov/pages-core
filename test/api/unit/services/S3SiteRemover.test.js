@@ -151,4 +151,67 @@ describe('S3SiteRemover', () => {
         .catch(done);
     });
   });
+
+  describe('.removeInfrastructure', () => {
+    it('should resolve without deleting services when site is on shared bucket', (done) => {
+      let site;
+
+      factory.site().then((model) => {
+        site = model;
+
+        return S3SiteRemover.removeInfrastructure(site);
+      }).then(done)
+        .catch(done);
+    });
+
+    it('should delete the bucket and proxy route service when site is in a private bucket', (done) => {
+      let site;
+      const s3Service = 'this-is-a-s3-service';
+      const s3Guid = '8675-three-o-9';
+      const routeName = 'route-hostname-is-bucket-name';
+      const routeGuid = 'bev-hills-90210';
+
+      mockTokenRequest();
+      apiNocks.mockDeleteService(s3Service, s3Guid);
+      apiNocks.mockDeleteRoute(routeName, routeGuid);
+
+      factory.site({
+        s3ServiceName: s3Service,
+        awsBucketName: routeName,
+      }).then((model) => {
+        site = model;
+
+        return S3SiteRemover.removeInfrastructure(site);
+      }).then((res) => {
+        expect(res.metadata.guid).to.equal(routeGuid);
+        done();
+      }).catch(done);
+    });
+
+    it('should resolve without deleting services when site bucket name matches shared', (done) => {
+      let site;
+
+      factory.site({
+        s3ServiceName: 'not-shared-s3-bucket-service',
+      }).then((model) => {
+        site = model;
+
+        return S3SiteRemover.removeInfrastructure(site);
+      }).then(done)
+        .catch(done);
+    });
+
+    it('should resolve without deleting services when site s3 service name matches shared', (done) => {
+      let site;
+
+      factory.site({
+        awsBucketName: 'not-shared-s3-bucket-name',
+      }).then((model) => {
+        site = model;
+
+        return S3SiteRemover.removeInfrastructure(site);
+      }).then(done)
+        .catch(done);
+    });
+  });
 });

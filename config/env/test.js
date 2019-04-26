@@ -12,7 +12,7 @@ module.exports = {
     accessKeyId: '123abc',
     secretAccessKey: '456def',
     region: 'us-gov-west-1',
-    bucket: 's3-bucket',
+    bucket: 'cg-123456789',
     serviceName: 'federalist-dev-s3',
   },
   passport: {

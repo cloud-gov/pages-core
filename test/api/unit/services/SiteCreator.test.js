@@ -21,7 +21,7 @@ describe('SiteCreator', () => {
       repository,
       user,
       s3ServiceName = 'federalist-dev-s3',
-      awsBucketName = 's3-bucket',
+      awsBucketName = 'cg-123456789',
       awsBucketRegion = 'us-gov-west-1'
     ) => {
       expect(site).to.not.be.undefined;
