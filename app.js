@@ -28,7 +28,6 @@ const responses = require('./api/responses');
 const passport = require('./api/services/passport');
 const RateLimit = require('express-rate-limit');
 const router = require('./api/routers');
-const externalAuthRouter = require('./api/routers/external-auth');
 const devMiddleware = require('./api/services/devMiddleware');
 const SocketIOSubscriber = require('./api/services/SocketIOSubscriber');
 const jwtHelper = require('./api/services/jwtHelper');
@@ -37,7 +36,6 @@ const RepositoryVerifier = require('./api/services/RepositoryVerifier');
 const SiteUserAuditor = require('./api/services/SiteUserAuditor');
 
 const app = express();
-
 const sequelize = require('./api/models').sequelize;
 
 config.session.store = new PostgresStore({ db: sequelize });
@@ -127,7 +125,6 @@ app.use((req, res, next) => {
 });
 
 app.use(router);
-
 // error handler middleware for custom CSRF error responses
 // note that error handling middlewares must come last in the stack
 app.use((err, req, res, next) => {
