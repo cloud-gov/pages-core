@@ -23,6 +23,9 @@ export const SITE = PropTypes.shape({
   defaultBranch: PropTypes.string,
   domain: PropTypes.string,
   engine: PropTypes.string,
+  s3ServiceName: PropTypes.string,
+  awsBucketName: PropTypes.string,
+  awsBucketRegion: PropTypes.string,
   users: PropTypes.arrayOf(USER),
 });
 
