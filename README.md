@@ -144,6 +144,7 @@ The app expects the following user provided services to be provided:
 - `federalist-<environment>-env`: A user-provided service that provides the application with secrets that cannot be added to `manifest.yml` b/c that file is under version control; this service provides the following:
   - `FEDERALIST_SESSION_SECRET`: The session secret used to sign entries in Federalist's session store
   - `GITHUB_CLIENT_CALLBACK_URL`: The callback URL used for GitHub authentication
+  - `GITHUB_CLIENT_EXTERNAL_CALLBACK_URL`: The callback URL used for external GitHub authentication
   - `GITHUB_CLIENT_ID`: The client ID used for GitHub authentication
   - `GITHUB_CLIENT_SECRET`: The client secret used for GitHub authentication
   - `GITHUB_WEBHOOK_SECRET`: The secret used to sign and verify webhook requests from GitHub

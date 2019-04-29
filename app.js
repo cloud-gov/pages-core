@@ -25,9 +25,10 @@ const redisAdapter = require('socket.io-redis');
 const schedule = require('node-schedule');
 
 const responses = require('./api/responses');
-const { github, foobar } = require('./api/services/passport');
+const passport = require('./api/services/passport');
 const RateLimit = require('express-rate-limit');
 const router = require('./api/routers');
+const externalAuthRouter = require('./api/routers/external-auth');
 const devMiddleware = require('./api/services/devMiddleware');
 const SocketIOSubscriber = require('./api/services/SocketIOSubscriber');
 const jwtHelper = require('./api/services/jwtHelper');
@@ -36,6 +37,7 @@ const RepositoryVerifier = require('./api/services/RepositoryVerifier');
 const SiteUserAuditor = require('./api/services/SiteUserAuditor');
 
 const app = express();
+
 const sequelize = require('./api/models').sequelize;
 
 config.session.store = new PostgresStore({ db: sequelize });
@@ -54,8 +56,8 @@ if (process.env.NODE_ENV === 'development') {
   app.use(devMiddleware());
 }
 app.use(session(config.session));
-app.use(github.initialize());
-app.use(github.session());
+app.use(passport.initialize());
+app.use(passport.session());
 app.use((req, res, next) => {
   res.locals.user = req.user;
   return next();
@@ -125,6 +127,7 @@ app.use((req, res, next) => {
 });
 
 app.use(router);
+
 // error handler middleware for custom CSRF error responses
 // note that error handling middlewares must come last in the stack
 app.use((err, req, res, next) => {

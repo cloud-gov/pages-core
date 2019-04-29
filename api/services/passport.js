@@ -1,14 +1,11 @@
 const GitHub = require('./GitHub');
 const GitHubStrategy = require('passport-github').Strategy;
-const Passport = require('passport').Passport;
+const passport = require('passport');
 const config = require('../../config');
 const { User } = require('../models');
 const { logger } = require('../../winston');
 const SiteUserAuditor = require('./SiteUserAuditor');
 const RepositoryVerifier = require('./RepositoryVerifier');
-
-github = new Passport();
-foobar = new Passport();
 
 const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
   let user;
@@ -45,17 +42,17 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
     });
 };
 
-github.use(new GitHubStrategy(config.passport.github.options, githubVerifyCallback));
+passport.use(new GitHubStrategy(config.passport.github.options, githubVerifyCallback));
 
-github.logout = (req, res) => {
+passport.logout = (req, res) => {
   req.logout();
   req.session.destroy(() => {
     res.redirect(config.app.homepageUrl);
   });
 };
 
-github.callback = (req, res) => {
-  github.authenticate('github')(req, res, () => {
+passport.callback = (req, res) => {
+  passport.authenticate('github')(req, res, () => {
     if (req.user) {
       req.session.authenticated = true;
       req.session.authenticatedAt = new Date();
@@ -77,30 +74,22 @@ github.callback = (req, res) => {
   });
 };
 
-github.serializeUser((user, next) => {
-  next(null, user.id || {});
+passport.serializeUser((user, next) => {
+  next(null, user.id);
 });
 
-github.deserializeUser((id, next) => {
-  if (typeof id === 'object') return next(null, {});
+passport.deserializeUser((id, next) => {
   User.findByPk(id).then((user) => {
     next(null, user);
   });
 });
 
-const foobarOptions = {
-  ...config.passport.github.options,
-  callbackURL: 'http://localhost:1337/auth/github/callback/external',
-  scope: ['user', 'repo'],
+const externalCallback = (accessToken, _refreshToken, _profile, callback) => {
+  GitHub.validateUser(accessToken)
+    .then(() => callback(null, { accessToken }))
+    .catch(err => {callback(err)});
 }
 
-const foobarCallback = (accessToken, _refreshToken, _profile, callback) => {
-  callback(null, { accessToken })
-}
+passport.use('external', new GitHubStrategy(config.passport.github.externalOptions, externalCallback));
 
-foobar.use('foobar', new GitHubStrategy(foobarOptions, foobarCallback));
-
-module.exports = {
-  github,
-  foobar
-};
+module.exports = passport;
