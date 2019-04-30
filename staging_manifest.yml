@@ -19,6 +19,8 @@ services:
 - federalist-staging-redis
 - federalist-staging-space
 - federalist-deploy-user
+- federalist-staging-proxy
+- federalist-staging-domain
 env:
   NODE_ENV: production
   APP_ENV: staging
