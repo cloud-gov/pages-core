@@ -1,4 +1,5 @@
 const express = require('express');
+const config = require('../../config');
 
 const mainRouter = express.Router();
 
@@ -6,7 +7,11 @@ mainRouter.use(require('./auth'));
 mainRouter.use(require('./preview'));
 mainRouter.use(require('./webhook'));
 mainRouter.use(require('./main'));
-mainRouter.use(require('./external-auth'));
+
+// Temporary until we are ready to release
+if (config.app.app_env !== 'production') {
+  mainRouter.use(require('./external-auth'));
+}
 
 const apiRouter = express.Router();
 apiRouter.use(require('./build-log'));
