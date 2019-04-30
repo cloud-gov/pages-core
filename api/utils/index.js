@@ -5,6 +5,16 @@ const moment = require('moment');
 const config = require('../../config');
 const { logger } = require('../../winston');
 
+function generateS3ServiceName(owner, repository) {
+  const format = str => str
+    .toString()
+    .toLowerCase()
+    .split(' ')
+    .join('-');
+
+  return `owner-${format(owner)}-repo-${format(repository)}`;
+}
+
 function isPastAuthThreshold(authDate) {
   return moment().isAfter(
     moment(authDate).add(config.policies.authRevalidationMinutes, 'minutes')
@@ -45,9 +55,8 @@ function loadProductionManifest() {
 }
 
 function loadAssetManifest() {
-  return process.env.NODE_ENV === 'development' ?
-    loadDevelopmentManifest() :
-    loadProductionManifest();
+  return process.env.NODE_ENV === 'development'
+    ? loadDevelopmentManifest() : loadProductionManifest();
 }
 
 function getSiteDisplayEnv() {
@@ -62,6 +71,7 @@ function shouldIncludeTracking() {
 }
 
 module.exports = {
+  generateS3ServiceName,
   getDirectoryFiles,
   getSiteDisplayEnv,
   isPastAuthThreshold,

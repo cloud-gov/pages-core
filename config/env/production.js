@@ -18,12 +18,14 @@ if (rdsCreds) {
 
 // S3 Configs
 const s3Creds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-s3`);
+const serviceName = appEnv.getService(`federalist-${process.env.APP_ENV}-s3`).instance_name;
 if (s3Creds) {
   module.exports.s3 = {
     accessKeyId: s3Creds.access_key_id,
     secretAccessKey: s3Creds.secret_access_key,
     region: s3Creds.region,
     bucket: s3Creds.bucket,
+    serviceName,
   };
 } else {
   throw new Error('No S3 credentials found');
@@ -42,7 +44,7 @@ if (sqsCreds) {
   throw new Error('No SQS credentials found');
 }
 
-// S3 Configs
+// Redis Configs
 const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`);
 if (redisCreds) {
   module.exports.redis = {
@@ -54,6 +56,32 @@ if (redisCreds) {
   };
 } else {
   throw new Error('No Redis credentials found');
+}
+
+// Deploy User
+const deployUserCreds = appEnv.getServiceCreds('federalist-deploy-user');
+if (deployUserCreds) {
+  module.exports.deployUser = {
+    username: deployUserCreds.DEPLOY_USER_USERNAME,
+    password: deployUserCreds.DEPLOY_USER_PASSWORD,
+  };
+} else {
+  throw new Error('No deploy user credentials found');
+}
+
+// Environment Variables
+const cfSpace = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-space`);
+const cfOauthTokenUrl = process.env.CLOUD_FOUNDRY_OAUTH_TOKEN_URL;
+const cfApiHost = process.env.CLOUD_FOUNDRY_API_HOST;
+
+if (cfSpace && cfOauthTokenUrl && cfApiHost) {
+  module.exports.env = {
+    cfSpaceGuid: cfSpace.guid,
+    cfOauthTokenUrl,
+    cfApiHost,
+  };
+} else {
+  throw new Error('Missing environment variables for build space, cloud founders host url and token url.');
 }
 
 // See https://github.com/nfriedly/express-rate-limit/blob/master/README.md#configuration

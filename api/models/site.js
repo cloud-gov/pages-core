@@ -24,7 +24,13 @@ const validationFailed = (site, options, validationError) => {
   throw error;
 };
 
-const associate = ({ Site, Build, User, UserAction, SiteUser }) => {
+const associate = ({
+  Site,
+  Build,
+  User,
+  UserAction,
+  SiteUser,
+}) => {
   Site.hasMany(Build, {
     foreignKey: 'site',
   });
@@ -82,7 +88,9 @@ function branchPreviewUrl(branch = null) {
 function viewLinkForBranch(branch) {
   if (branch === this.defaultBranch) {
     return this.siteUrl();
-  } else if (branch === this.demoBranch) {
+  }
+
+  if (branch === this.demoBranch) {
     return this.demoUrl();
   }
 
@@ -174,6 +182,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM,
       values: ['active', 'inactive'],
       defaultValue: 'active',
+    },
+    s3ServiceName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    awsBucketName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    awsBucketRegion: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
   }, {
     tableName: 'site',

@@ -1,5 +1,6 @@
+const { expect } = require('chai');
+
 const AWSMocks = require('../../support/aws-mocks');
-const expect = require('chai').expect;
 const config = require('../../../../config');
 
 const S3Helper = require('../../../../api/services/S3Helper');
@@ -24,7 +25,8 @@ describe('S3Helper', () => {
         });
       };
 
-      S3Helper.listObjects(prefix)
+      const client = new S3Helper.S3Client(config.s3);
+      client.listObjects(prefix)
         .then((objects) => {
           expect(objects).to.deep.equal(['a', 'b', 'c']);
           done();
@@ -60,7 +62,8 @@ describe('S3Helper', () => {
         }
       };
 
-      S3Helper.listObjects(prefix)
+      const client = new S3Helper.S3Client(config.s3);
+      client.listObjects(prefix)
         .then((objects) => {
           expect(objects).to.deep.equal([1, 2, 3, 4, 5, 6, 7, 8, 9]);
           done();

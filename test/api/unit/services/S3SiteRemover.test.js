@@ -1,8 +1,11 @@
+const nock = require('nock');
+const { expect } = require('chai');
+
 const AWSMocks = require('../../support/aws-mocks');
-const expect = require('chai').expect;
+const mockTokenRequest = require('../../support/cfAuthNock');
+const apiNocks = require('../../support/cfAPINocks');
 const factory = require('../../support/factory');
 const config = require('../../../../config');
-
 const S3SiteRemover = require('../../../../api/services/S3SiteRemover');
 
 const mapSiteContents = objects => ({
@@ -24,6 +27,8 @@ describe('S3SiteRemover', () => {
     AWSMocks.resetMocks();
   });
 
+  afterEach(() => nock.cleanAll());
+
   describe('.removeSite(site)', () => {
     it('should delete all objects in the `site/<org>/<repo>`, `demo/<org>/<repo>`, and `preview/<org>/<repo> directories', (done) => {
       const siteObjectsToDelete = [];
@@ -36,6 +41,9 @@ describe('S3SiteRemover', () => {
       let demoObjectWereListed = false;
       let previewObjectsWereListed = false;
       let objectsToDelete;
+
+      mockTokenRequest();
+      apiNocks.mockDefaultCredentials();
 
       AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
@@ -99,6 +107,9 @@ describe('S3SiteRemover', () => {
     it('should delete objects in batches of 1000 at a time', (done) => {
       let deleteObjectsCallCount = 0;
 
+      mockTokenRequest();
+      apiNocks.mockDefaultCredentials();
+
       AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => cb(null, {
         Contents: Array(750).fill(0).map(() => ({ Key: 'abc123' })),
       });
@@ -110,17 +121,20 @@ describe('S3SiteRemover', () => {
       };
 
       factory.site()
-      .then(site => S3SiteRemover.removeSite(site))
-      .then(() => {
+        .then(site => S3SiteRemover.removeSite(site))
+        .then(() => {
         // 750 site, 750 demo, 750 preview objects = 2250 total
         // 2250 objects means 3 groups of 1000
-        expect(deleteObjectsCallCount).to.equal(3);
-        done();
-      })
-      .catch(done);
+          expect(deleteObjectsCallCount).to.equal(3);
+          done();
+        })
+        .catch(done);
     });
 
     it('should not delete anything if there is nothing to delete', (done) => {
+      mockTokenRequest();
+      apiNocks.mockDefaultCredentials();
+
       AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => cb(null, {
         Contents: [],
       });
@@ -132,9 +146,9 @@ describe('S3SiteRemover', () => {
       };
 
       factory.site()
-      .then(site => S3SiteRemover.removeSite(site))
-      .then(done)
-      .catch(done);
+        .then(site => S3SiteRemover.removeSite(site))
+        .then(done)
+        .catch(done);
     });
   });
 });
