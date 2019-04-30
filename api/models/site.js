@@ -1,5 +1,4 @@
 const validator = require('validator');
-const config = require('../../config');
 
 const { branchRegex, isValidYaml } = require('../utils/validators');
 
@@ -67,18 +66,18 @@ function siteUrl() {
   if (this.domain) {
     return domainWithSlash(this.domain);
   }
-  return `${config.app.preview_hostname}/site/${this.owner}/${this.repository}/`;
+  return `https://${this.awsBucketName}.app.cloud.gov/site/${this.owner}/${this.repository}/`;
 }
 
 function demoUrl() {
   if (this.demoDomain) {
     return domainWithSlash(this.demoDomain);
   }
-  return `${config.app.preview_hostname}/demo/${this.owner}/${this.repository}/`;
+  return `https://${this.awsBucketName}.app.cloud.gov/demo/${this.owner}/${this.repository}/`;
 }
 
 function branchPreviewUrl(branch = null) {
-  let url = `${config.app.preview_hostname}/preview/${this.owner}/${this.repository}/`;
+  let url = `https://${this.awsBucketName}.app.cloud.gov/preview/${this.owner}/${this.repository}/`;
   if (branch) {
     url = `${url}${branch}/`;
   }
