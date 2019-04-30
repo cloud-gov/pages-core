@@ -1,11 +1,10 @@
 const ExternalAuthController = {
-
   callback(req, res) {
 
     // https://github.com/vencax/netlify-cms-github-oauth-provider/blob/master/index.js
     const content = {
       token: req.user.accessToken,
-      provider: 'github'
+      provider: 'github',
     };
 
     const script = `
@@ -25,9 +24,7 @@ const ExternalAuthController = {
     `;
 
     res.send(script);
-  }
+  },
 };
 
 module.exports = ExternalAuthController;
-
-
