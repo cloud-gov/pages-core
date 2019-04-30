@@ -5,8 +5,11 @@ const request = require('supertest');
 const sinon = require('sinon');
 
 const app = require('../../../app');
+const config = require('../../../config');
 const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
+const mockTokenRequest = require('../support/cfAuthNock');
+const apiNocks = require('../support/cfAPINocks');
 const { authenticatedSession, unauthenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const csrfToken = require('../support/csrfToken');
@@ -150,6 +153,85 @@ describe('Site API', () => {
   });
 
   describe('POST /v0/site', () => {
+    function cfMockServices(owner, repository, sharedBucket = false) {
+      const siteParams = {
+        owner,
+        repository,
+        sharedBucket,
+      };
+
+      const name = `owner-${siteParams.owner}-repo-${siteParams.repository}`;
+      const guid = 'mapped-12345';
+      const appGuid = 'app-12345';
+      const routeGuid = 'route-12345';
+      const keyName = `${name}-key`;
+      const planName = 'basic-public';
+      const planGuid = 'plan-guid';
+      const bucketGuid = 'bucket-guid';
+      const accessKeyId = crypto.randomBytes(3).toString('hex');
+      const secretAccessKey = crypto.randomBytes(3).toString('hex');
+      const region = 'us-gov-other-1';
+      const bucket = 'testing-bucket';
+
+      const instanceRequestBody = { name, service_plan_guid: planGuid };
+      const keyRequestBody = { name, service_instance_guid: bucketGuid };
+
+      const planResponses = {
+        resources: [
+          factory.responses.service({ guid: planGuid }, { name: planName }),
+        ],
+      };
+      const bucketResponse = factory.responses.service({ guid: bucketGuid }, { name });
+      const keyResponse = factory.responses.service({}, {
+        name: keyName,
+        service_instance_guid: bucketGuid,
+        credentials: factory.responses.credentials({
+          access_key_id: accessKeyId,
+          secret_access_key: secretAccessKey,
+          region,
+          bucket,
+        }),
+      });
+
+      const buildResponses = {
+        resources: [
+          factory.responses.service({}, {
+            name,
+            service_instance_guid: bucketGuid,
+            credentials: factory.responses.credentials({
+              access_key_id: accessKeyId,
+              secret_access_key: secretAccessKey,
+              region,
+              bucket,
+            }),
+          }),
+        ],
+      };
+
+      const serviceCredentialsResponses = {
+        resources: [keyResponse],
+      };
+
+      const routeResponse = factory.responses.service({ guid: routeGuid });
+      const mapResponse = factory.responses.service({ guid }, {
+        app_guid: appGuid,
+        route_guid: routeGuid,
+      });
+
+      mockTokenRequest();
+      apiNocks.mockFetchS3ServicePlanGUID(planResponses);
+      apiNocks.mockCreateS3ServiceInstance(instanceRequestBody, bucketResponse);
+      apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
+      apiNocks.mockFetchServiceInstancesRequest(buildResponses);
+      apiNocks.mockFetchServiceInstanceCredentialsRequest('test-guid', serviceCredentialsResponses);
+      apiNocks.mockCreateRoute(routeResponse, {
+        domain_guid: config.env.cfDomainGuid,
+        space_guid: config.env.cfSpaceGuid,
+        host: bucket,
+      });
+      apiNocks.mockMapRoute(mapResponse);
+    }
+
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.repo();
@@ -211,6 +293,8 @@ describe('Site API', () => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
 
+      cfMockServices(siteOwner, siteRepository);
+
       factory.user()
       .then((user) => {
         githubAPINocks.userOrganizations({
@@ -255,6 +339,8 @@ describe('Site API', () => {
       nock.cleanAll();
       githubAPINocks.repo();
       githubAPINocks.webhook();
+
+      cfMockServices(siteOwner, siteRepository);
 
       const createRepoNock = githubAPINocks.createRepoForOrg({
         org: siteOwner,
@@ -393,6 +479,8 @@ describe('Site API', () => {
           message: 'Not Found',
         }],
       });
+
+      cfMockServices(siteOwner, siteRepository);
 
       factory.user()
       .then((user) => {
