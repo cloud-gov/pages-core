@@ -19,6 +19,8 @@ services:
 - federalist-production-redis
 - federalist-production-space
 - federalist-deploy-user
+- federalist-production-proxy
+- federalist-production-domain
 env:
   NODE_ENV: production
   APP_ENV: production

@@ -1,3 +1,4 @@
+const _ = require('underscore');
 const authorizer = require('../authorizers/site');
 const S3SiteRemover = require('../services/S3SiteRemover');
 const SiteCreator = require('../services/SiteCreator');
@@ -7,9 +8,9 @@ const siteSerializer = require('../serializers/site');
 const { User, Site, Build } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 
-const sendJSON = (site, res) =>
-  siteSerializer.serialize(site)
-    .then(siteJSON => res.json(siteJSON));
+const sendJSON = (site, res) => siteSerializer
+  .serialize(site)
+  .then(siteJSON => res.json(siteJSON));
 
 module.exports = {
   findAllForUser: (req, res) => {
@@ -24,25 +25,26 @@ module.exports = {
     let site;
 
     Promise.resolve(Number(req.params.id)).then((id) => {
-      if (isNaN(id)) {
+      if (_.isNaN(id)) {
         throw 404;
       }
       return Site.findByPk(id);
-    }).then((model) => {
-      if (model) {
-        site = model;
-      } else {
-        throw 404;
-      }
-      return authorizer.findOne(req.user, site);
     })
-    .then(() => siteSerializer.serialize(site))
-    .then((siteJSON) => {
-      res.json(siteJSON);
-    })
-    .catch((err) => {
-      res.error(err);
-    });
+      .then((model) => {
+        if (model) {
+          site = model;
+        } else {
+          throw 404;
+        }
+        return authorizer.findOne(req.user, site);
+      })
+      .then(() => siteSerializer.serialize(site))
+      .then((siteJSON) => {
+        res.json(siteJSON);
+      })
+      .catch((err) => {
+        res.error(err);
+      });
   },
 
   destroy: (req, res) => {
@@ -51,7 +53,7 @@ module.exports = {
 
     Promise.resolve(Number(req.params.id))
       .then((id) => {
-        if (isNaN(id)) {
+        if (_.isNaN(id)) {
           throw 404;
         }
         return Site.findByPk(id);
@@ -69,6 +71,7 @@ module.exports = {
         return authorizer.destroy(req.user, site);
       })
       .then(() => S3SiteRemover.removeSite(site))
+      .then(() => S3SiteRemover.removeInfrastructure(site))
       .then(() => site.destroy())
       .then(() => {
         res.json(siteJSON);
@@ -79,15 +82,15 @@ module.exports = {
   },
 
   addUser: (req, res) => {
-    const body = req.body;
+    const { body, user } = req;
     if (!body.owner || !body.repository) {
       res.error(400);
       return;
     }
 
-    authorizer.addUser(req.user, body)
+    authorizer.addUser(user, body)
       .then(() => SiteMembershipCreator.createSiteMembership({
-        user: req.user,
+        user,
         siteParams: body,
       }))
       .then(site => siteSerializer.serialize(site))
@@ -104,7 +107,7 @@ module.exports = {
     const userId = Number(req.params.user_id);
     let site;
 
-    if (isNaN(siteId) || isNaN(userId)) {
+    if (_.isNaN(siteId) || _.isNaN(userId)) {
       return res.error(400);
     }
 
@@ -124,26 +127,23 @@ module.exports = {
 
       return authorizer.removeUser(req.user, site);
     })
-    .then(() =>
-      SiteMembershipCreator.revokeSiteMembership({ user: req.user, site, userId })
-    )
-    .then(() =>
-      UserActionCreator.addRemoveAction({
+      .then(() => SiteMembershipCreator
+        .revokeSiteMembership({ user: req.user, site, userId }))
+      .then(() => UserActionCreator.addRemoveAction({
         userId: req.user.id,
         targetId: userId,
         targetType: 'user',
         siteId: site.id,
-      })
-    )
-    .then(() => sendJSON(site, res))
-    .catch(res.error);
+      }))
+      .then(() => sendJSON(site, res))
+      .catch(res.error);
   },
 
   create: (req, res) => {
-    const body = req.body;
-    authorizer.create(req.user, body)
+    const { body, user } = req;
+    authorizer.create(user, body)
       .then(() => SiteCreator.createSite({
-        user: req.user,
+        user,
         siteParams: body,
       }))
       .then(site => siteSerializer.serialize(site))
@@ -160,51 +160,52 @@ module.exports = {
     const siteId = Number(req.params.id);
 
     Promise.resolve(siteId).then((id) => {
-      if (isNaN(id)) {
+      if (_.isNaN(id)) {
         throw 404;
       }
       return Site.findByPk(id);
-    }).then((model) => {
-      site = model;
-      if (!site) {
-        throw 404;
-      }
-      return authorizer.update(req.user, site);
     })
-    .then(() => {
-      const params = Object.assign(site, req.body);
-      return site.update({
-        demoBranch: params.demoBranch,
-        demoDomain: params.demoDomain,
-        config: params.config,
-        previewConfig: params.previewConfig,
-        demoConfig: params.demoConfig,
-        defaultBranch: params.defaultBranch,
-        domain: params.domain,
-        engine: params.engine,
-      });
-    })
-    .then(model => Build.create({
-      user: req.user.id,
-      site: siteId,
-      branch: model.defaultBranch,
-    }))
-    .then(() => {
-      if (site.demoBranch) {
-        return Build.create({
-          user: req.user.id,
-          site: siteId,
-          branch: site.demoBranch,
+      .then((model) => {
+        site = model;
+        if (!site) {
+          throw 404;
+        }
+        return authorizer.update(req.user, site);
+      })
+      .then(() => {
+        const params = Object.assign(site, req.body);
+        return site.update({
+          demoBranch: params.demoBranch,
+          demoDomain: params.demoDomain,
+          config: params.config,
+          previewConfig: params.previewConfig,
+          demoConfig: params.demoConfig,
+          defaultBranch: params.defaultBranch,
+          domain: params.domain,
+          engine: params.engine,
         });
-      }
-      return null;
-    })
-    .then(() => siteSerializer.serialize(site))
-    .then((siteJSON) => {
-      res.json(siteJSON);
-    })
-    .catch((err) => {
-      res.error(err);
-    });
+      })
+      .then(model => Build.create({
+        user: req.user.id,
+        site: siteId,
+        branch: model.defaultBranch,
+      }))
+      .then(() => {
+        if (site.demoBranch) {
+          return Build.create({
+            user: req.user.id,
+            site: siteId,
+            branch: site.demoBranch,
+          });
+        }
+        return null;
+      })
+      .then(() => siteSerializer.serialize(site))
+      .then((siteJSON) => {
+        res.json(siteJSON);
+      })
+      .catch((err) => {
+        res.error(err);
+      });
   },
 };

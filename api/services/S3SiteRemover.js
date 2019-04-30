@@ -1,5 +1,6 @@
 const S3Helper = require('./S3Helper');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
+const config = require('../../config');
 
 const apiClient = new CloudFoundryAPIClient();
 /**
@@ -35,6 +36,15 @@ const deleteObjects = (s3Client, keys) => {
 
 const getKeys = (s3Client, prefix) => s3Client.listObjects(prefix)
   .then(objects => objects.map(o => o.Key));
+
+const removeInfrastructure = (site) => {
+  if (site.s3ServiceName !== config.s3.serviceName && site.awsBucketName !== config.s3.bucket) {
+    return apiClient.deleteRoute(site.awsBucketName)
+      .then(apiClient.deleteServiceInstance(site.s3ServiceName));
+  }
+
+  return Promise.resolve();
+};
 
 const removeSite = (site) => {
   const prefixes = [
@@ -72,4 +82,7 @@ const removeSite = (site) => {
     });
 };
 
-module.exports = { removeSite };
+module.exports = {
+  removeInfrastructure,
+  removeSite,
+};
