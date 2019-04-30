@@ -143,7 +143,7 @@ module.exports = {
     const { body, user } = req;
 
     const siteParams = Object.assign({}, body, {
-      sharedBucket: false
+      sharedBucket: false,
     });
 
     authorizer.create(user, siteParams)

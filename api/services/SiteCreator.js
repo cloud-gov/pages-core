@@ -123,10 +123,7 @@ function validateSite(params) {
   if (!s3ServiceName) {
     // Will always not create a valid site object
     // Used to throw the invalid model error and messaging
-    const site = Site.build({
-      ...params,
-      s3ServiceName
-    });
+    const site = Site.build(params);
 
     return site.validate()
       .then(() => site);
