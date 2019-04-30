@@ -172,4 +172,77 @@ describe('CloudFoundryAPIClient', () => {
         });
     });
   });
+
+  describe('.createRoute', () => {
+    it('should create a new route', (done) => {
+      const host = 'my-route';
+      const guid = '12345';
+      const response = responses.service({ guid }, { host });
+
+      mockTokenRequest();
+      apiNocks.mockCreateRoute(response);
+
+      const apiClient = new CloudFoundryAPIClient();
+      apiClient.createRoute(host)
+        .then((res) => {
+          expect(res.metadata.guid).to.equal(guid);
+          expect(res.entity.host).to.equal(host);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('.mapRoute', () => {
+    it('should map a route to an app', (done) => {
+      const guid = 'mapped-12345';
+      const appGuid = 'app-12345';
+      const routeGuid = 'route-12345';
+      const response = responses.service({ guid }, {
+        app_guid: appGuid,
+        route_guid: routeGuid,
+      });
+
+      mockTokenRequest();
+      apiNocks.mockMapRoute(response);
+
+      const apiClient = new CloudFoundryAPIClient();
+      apiClient.mapRoute(routeGuid)
+        .then((res) => {
+          expect(res.metadata.guid).to.equal(guid);
+          expect(res.entity.app_guid).to.equal(appGuid);
+          expect(res.entity.route_guid).to.equal(routeGuid);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('.createSiteProxyRoute', () => {
+    it('should create and map a route', (done) => {
+      const host = 'my-host';
+      const guid = 'mapped-12345';
+      const appGuid = 'app-12345';
+      const routeGuid = 'route-12345';
+      const routeResponse = responses.service({ guid: routeGuid });
+      const mapResponse = responses.service({ guid }, {
+        app_guid: appGuid,
+        route_guid: routeGuid,
+      });
+
+      mockTokenRequest();
+      apiNocks.mockCreateRoute(routeResponse);
+      apiNocks.mockMapRoute(mapResponse);
+
+      const apiClient = new CloudFoundryAPIClient();
+      apiClient.createSiteProxyRoute(host)
+        .then((res) => {
+          expect(res.metadata.guid).to.equal(guid);
+          expect(res.entity.app_guid).to.equal(appGuid);
+          expect(res.entity.route_guid).to.equal(routeGuid);
+          done();
+        })
+        .catch(done);
+    });
+  });
 });

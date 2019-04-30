@@ -8,6 +8,40 @@ const reqheaders = {
   },
 };
 
+const mockCreateRoute = (resource, body) => nock(url, reqheaders)
+  .post('/v2/routes', body)
+  .reply(200, resource);
+
+const mockDeleteRoute = (host, guid) => {
+  nock(url, reqheaders)
+    .get('/v2/routes')
+    .reply(200, {
+      resources: [{
+        metadata: { guid },
+        entity: { host },
+      }],
+    });
+
+  nock(url, reqheaders)
+    .delete(`/v2/routes/${guid}?recursive=true&async=true`)
+    .reply(200, { metadata: { guid } });
+};
+
+const mockDeleteService = (name, guid) => {
+  nock(url, reqheaders)
+    .get('/v2/service_instances')
+    .reply(200, {
+      resources: [{
+        metadata: { guid },
+        entity: { name },
+      }],
+    });
+
+  nock(url, reqheaders)
+    .delete(`/v2/service_instances/${guid}?accepts_incomplete=true&recursive=true&async=true`)
+    .reply(200, { metadata: { guid } });
+};
+
 const mockFetchServiceKeysRequest = resources => nock(url, reqheaders)
   .get('/v2/service_keys')
   .reply(200, resources);
@@ -82,7 +116,14 @@ const mockCreateServiceKey = (body, resources) => {
   return n.reply(200, resources);
 };
 
+const mockMapRoute = resource => nock(url, reqheaders)
+  .post('/v2/route_mappings')
+  .reply(200, resource);
+
 module.exports = {
+  mockCreateRoute,
+  mockDeleteRoute,
+  mockDeleteService,
   mockCreateS3ServiceInstance,
   mockCreateServiceKey,
   mockDefaultCredentials,
@@ -91,4 +132,5 @@ module.exports = {
   mockFetchServiceKeyRequest,
   mockFetchServiceKeysRequest,
   mockFetchS3ServicePlanGUID,
+  mockMapRoute,
 };
