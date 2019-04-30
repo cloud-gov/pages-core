@@ -122,13 +122,15 @@ function validateSite(params) {
 
   return apiClient.createSiteBucket(s3ServiceName)
     .then((response) => {
+      const { bucket, region } = response.entity.credentials;
       const s3 = {
         serviceName: s3ServiceName,
-        bucket: response.entity.credentials.bucket,
-        region: response.entity.credentials.region,
+        bucket,
+        region,
       };
 
-      return buildSite(params, s3);
+      return apiClient.createSiteProxyRoute(bucket)
+        .then(() => buildSite(params, s3));
     });
 }
 

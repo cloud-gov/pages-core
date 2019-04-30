@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const { expect } = require('chai');
 const nock = require('nock');
 const { stub } = require('sinon');
+const config = require('../../../../config/env/test');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const mockTokenRequest = require('../../support/cfAuthNock');
@@ -20,7 +21,7 @@ describe('SiteCreator', () => {
       repository,
       user,
       s3ServiceName = 'federalist-dev-s3',
-      awsBucketName = 's3-bucket',
+      awsBucketName = 'cg-123456789',
       awsBucketRegion = 'us-gov-west-1'
     ) => {
       expect(site).to.not.be.undefined;
@@ -464,6 +465,9 @@ describe('SiteCreator', () => {
         };
 
         const name = `owner-${siteParams.owner}-repo-${siteParams.repository}`;
+        const guid = 'mapped-12345';
+        const appGuid = 'app-12345';
+        const routeGuid = 'route-12345';
         const keyName = `${name}-key`;
         const planName = 'basic-public';
         const planGuid = 'plan-guid';
@@ -512,12 +516,24 @@ describe('SiteCreator', () => {
           resources: [keyResponse],
         };
 
+        const routeResponse = factory.responses.service({ guid: routeGuid });
+        const mapResponse = factory.responses.service({ guid }, {
+          app_guid: appGuid,
+          route_guid: routeGuid,
+        });
+
         mockTokenRequest();
         apiNocks.mockFetchS3ServicePlanGUID(planResponses);
         apiNocks.mockCreateS3ServiceInstance(instanceRequestBody, bucketResponse);
         apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
         apiNocks.mockFetchServiceInstancesRequest(buildResponses);
         apiNocks.mockFetchServiceInstanceCredentialsRequest('test-guid', serviceCredentialsResponses);
+        apiNocks.mockCreateRoute(routeResponse, {
+          domain_guid: config.env.cfDomainGuid,
+          space_guid: config.env.cfSpaceGuid,
+          host: bucket,
+        });
+        apiNocks.mockMapRoute(mapResponse);
 
         factory.user().then((model) => {
           user = model;

@@ -1,5 +1,6 @@
 const request = require('request');
 const url = require('url');
+const { filterEntity, firstEntity } = require('./');
 const CloudFoundryAuthClient = require('./cfAuthClient');
 const config = require('../../config');
 
@@ -8,13 +9,28 @@ class CloudFoundryAPIClient {
     this.authClient = new CloudFoundryAuthClient();
   }
 
+  createRoute(name) {
+    const body = {
+      domain_guid: config.env.cfDomainGuid,
+      space_guid: config.env.cfSpaceGuid,
+      host: name,
+    };
+
+    return this.accessToken().then(token => this.request(
+      'POST',
+      '/v2/routes',
+      token,
+      body
+    ));
+  }
+
   createS3ServiceInstance(name, serviceName) {
     return this.fetchS3ServicePlanGUID(serviceName)
       .then((servicePlanGuid) => {
         const body = {
           name,
           service_plan_guid: servicePlanGuid,
-          space_guid: this.spaceGUID(),
+          space_guid: config.env.cfSpaceGuid,
         };
 
         return this.accessToken().then(token => this.request(
@@ -45,36 +61,43 @@ class CloudFoundryAPIClient {
       .then(res => this.createServiceKey(name, res.metadata.guid, keyIdentifier));
   }
 
+  createSiteProxyRoute(bucketName) {
+    return this.createRoute(bucketName)
+      .then(route => this.mapRoute(route.metadata.guid));
+  }
 
-  // TODO Check Permissions to Delete Services
+  deleteRoute(name) {
+    return this.accessToken()
+      .then(token => this.request(
+        'GET',
+        '/v2/routes',
+        token
+      ))
+      .then(res => filterEntity(res, name, 'host'))
+      .then(entity => this.accessToken()
+        .then(token => this.request(
+          'DELETE',
+          `/v2/routes/${entity.metadata.guid}?recursive=true&async=true`,
+          token
+        )));
+  }
 
-  // deleteS3ServiceInstance(name) {
-  //   return this.fetchServiceInstances()
-  //     .then(res => this.filterEntity(res, name))
-  //     .then(instance => {
-  //       return this.accessToken().then(token => this.request(
-  //         `DELETE`,
-  //         `/v2/service_instances/${instance.metadata.guid}?accepts_incomplete=true`,
-  //         token
-  //       ));
-  //     })
-  // }
-
-  // deleteServiceKey(name) {
-  //   return this.fetchServiceKeys()
-  //     .then(res => this.filterEntity(res, name))
-  //     .then(key => key.entity.service_instance_guid)
-  //     .then(guid => {
-  //       return this.authClient.accessToken().then(token => this.request(
-  //         `DELETE`,
-  //         `/v2/service_keys/${guid}`
-  //       ));
-  //     })
-  // }
+  deleteServiceInstance(name) {
+    return this.fetchServiceInstance(name)
+      .then(instance => this.accessToken().then(token => this.request(
+        'DELETE',
+        `/v2/service_instances/${instance.metadata.guid}?accepts_incomplete=true&recursive=true&async=true`,
+        token
+      ).then(() => ({
+        metadata: {
+          guid: instance.metadata.guid,
+        },
+      }))));
+  }
 
   fetchServiceInstance(name) {
     return this.fetchServiceInstances()
-      .then(res => this.filterEntity(res, name));
+      .then(res => filterEntity(res, name));
   }
 
   fetchServiceInstanceCredentials(name) {
@@ -84,7 +107,7 @@ class CloudFoundryAPIClient {
         `/v2/service_instances/${instance.metadata.guid}/service_keys`,
         token
       )))
-      .then(keys => this.firstEntity(keys, `${name} Service Keys`))
+      .then(keys => firstEntity(keys, `${name} Service Keys`))
       .then(key => key.entity.credentials);
   }
 
@@ -98,7 +121,7 @@ class CloudFoundryAPIClient {
 
   fetchServiceKey(name) {
     return this.fetchServiceKeys()
-      .then(res => this.filterEntity(res, name))
+      .then(res => filterEntity(res, name))
       .then(key => this.accessToken().then(token => this.request(
         'GET',
         `/v2/service_keys/${key.metadata.guid}`,
@@ -119,8 +142,22 @@ class CloudFoundryAPIClient {
       'GET',
       '/v2/service_plans',
       token
-    )).then(res => this.filterEntity(res, serviceName))
+    )).then(res => filterEntity(res, serviceName))
       .then(service => service.metadata.guid);
+  }
+
+  mapRoute(routeGuid) {
+    const body = {
+      app_guid: config.env.cfProxyGuid,
+      route_guid: routeGuid,
+    };
+
+    return this.accessToken().then(token => this.request(
+      'POST',
+      '/v2/route_mappings',
+      token,
+      body
+    ));
   }
 
   // Private methods
@@ -128,45 +165,23 @@ class CloudFoundryAPIClient {
     return this.authClient.accessToken();
   }
 
-  filterEntity(res, name, field = 'name') {
-    const filtered = res.resources.filter(item => item.entity[field] === name);
-
-    if (filtered.length === 1) return filtered[0];
-    return Promise.reject(new Error({
-      message: 'Not found',
-      name,
-      field,
-    }));
-  }
-
-  firstEntity(res, name) {
-    if (res.resources.length === 0) {
-      return Promise.reject(new Error({
-        message: 'Not found',
-        name,
-      }));
+  parser(body, resolver) {
+    try {
+      const parsed = JSON.parse(body);
+      resolver(parsed);
+    } catch (e) {
+      resolver(body);
     }
-
-    return res.resources[0];
-  }
-
-  parser(res) {
-    if (typeof res === 'string') return JSON.parse(res);
-    return res;
-  }
-
-  resolveAPIURL(path) {
-    return url.resolve(
-      config.env.cfApiHost,
-      path
-    );
   }
 
   request(method, path, accessToken, json) {
     return new Promise((resolve, reject) => {
       request({
         method: method.toUpperCase(),
-        url: this.resolveAPIURL(path),
+        url: url.resolve(
+          config.env.cfApiHost,
+          path
+        ),
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -178,14 +193,10 @@ class CloudFoundryAPIClient {
           const errorMessage = `Received status code: ${response.statusCode}`;
           reject(new Error(body || errorMessage));
         } else {
-          resolve(this.parser(body));
+          this.parser(body, resolve);
         }
       });
     });
-  }
-
-  spaceGUID() {
-    return config.env.cfSpaceGuid;
   }
 }
 

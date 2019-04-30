@@ -5,6 +5,28 @@ const moment = require('moment');
 const config = require('../../config');
 const { logger } = require('../../winston');
 
+function filterEntity(res, name, field = 'name') {
+  const filtered = res.resources.filter(item => item.entity[field] === name);
+
+  if (filtered.length === 1) return filtered[0];
+  return Promise.reject(new Error({
+    message: 'Not found',
+    name,
+    field,
+  }));
+}
+
+function firstEntity(res, name) {
+  if (res.resources.length === 0) {
+    return Promise.reject(new Error({
+      message: 'Not found',
+      name,
+    }));
+  }
+
+  return res.resources[0];
+}
+
 function generateS3ServiceName(owner, repository) {
   const format = str => str
     .toString()
@@ -71,6 +93,8 @@ function shouldIncludeTracking() {
 }
 
 module.exports = {
+  filterEntity,
+  firstEntity,
   generateS3ServiceName,
   getDirectoryFiles,
   getSiteDisplayEnv,
