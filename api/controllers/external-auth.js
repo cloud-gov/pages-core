@@ -1,6 +1,5 @@
 const ExternalAuthController = {
   callback(req, res) {
-
     // https://github.com/vencax/netlify-cms-github-oauth-provider/blob/master/index.js
     const content = {
       token: req.user.accessToken,
