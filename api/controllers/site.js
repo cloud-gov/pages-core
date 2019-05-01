@@ -141,10 +141,15 @@ module.exports = {
 
   create: (req, res) => {
     const { body, user } = req;
-    authorizer.create(user, body)
+
+    const siteParams = Object.assign({}, body, {
+      sharedBucket: false,
+    });
+
+    authorizer.create(user, siteParams)
       .then(() => SiteCreator.createSite({
         user,
-        siteParams: body,
+        siteParams,
       }))
       .then(site => siteSerializer.serialize(site))
       .then((siteJSON) => {

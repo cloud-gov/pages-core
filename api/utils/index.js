@@ -28,6 +28,8 @@ function firstEntity(res, name) {
 }
 
 function generateS3ServiceName(owner, repository) {
+  if (!owner || !repository) return undefined;
+
   const format = str => str
     .toString()
     .toLowerCase()
