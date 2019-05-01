@@ -15,7 +15,7 @@ export const availableEngines = [
     value: 'script only',
   },
   {
-    label: 'Html pages',
+    label: 'Static HTML',
     value: 'static',
   },
 ];
