@@ -10,6 +10,7 @@ mainRouter.use(require('./main'));
 
 // Temporary until we are ready to release
 if (config.app.app_env !== 'production') {
+  // eslint-disable-line global-require
   mainRouter.use(require('./external-auth'));
 }
 
