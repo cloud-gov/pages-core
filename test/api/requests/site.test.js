@@ -153,114 +153,95 @@ describe('Site API', () => {
   });
 
   describe('POST /v0/site', () => {
-    function createMockVariables(siteParams) {
-      const name = `owner-${siteParams.owner}-repo-${siteParams.repository}`;
+    function createMockVariables(owner, repository) {
+      return {
+        name: `owner-${owner}-repo-${repository}`,
+        bucketGuid: 'bucket-guid',
+        s3: {
+          accessKeyId: crypto.randomBytes(3).toString('hex'),
+          secretAccessKey: crypto.randomBytes(3).toString('hex'),
+          region: 'us-gov-other-1',
+          bucket: 'testing-bucket',
+        },
+      };
+    }
+
+    function createKeyResponse(name, bucketGuid, s3) {
+      const {
+        accessKeyId,
+        bucket,
+        region,
+        secretAccessKey,
+      } = s3;
+
+      return factory.responses.service({}, {
+        name: `${name}-key`,
+        service_instance_guid: bucketGuid,
+        credentials: factory.responses.credentials({
+          access_key_id: accessKeyId,
+          secret_access_key: secretAccessKey,
+          region,
+          bucket,
+        }),
+      });
+    }
+
+    function mockBuildResponse(name, bucketGuid, s3) {
+      const keyResponse = createKeyResponse(name, bucketGuid, s3);
+      const response = { resources: [keyResponse] };
+
+      apiNocks.mockFetchServiceInstancesRequest(response);
+      apiNocks.mockFetchServiceInstanceCredentialsRequest('test-guid', response);
+    }
+
+    function mockKeyResponse(name, bucketGuid, s3) {
+      const keyRequestBody = { name, service_instance_guid: bucketGuid };
+      const keyResponse = createKeyResponse(name, bucketGuid, s3);
+
+      apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
+    }
+
+    function mockPlanResponse(name, bucketGuid) {
+      const planName = 'basic-public';
+      const planGuid = 'plan-guid';
+      const planResponses = {
+        resources: [
+          factory.responses.service({ guid: planGuid }, { name: planName }),
+        ],
+      };
+      const bucketResponse = factory.responses.service({ guid: bucketGuid }, { name });
+      const instanceRequestBody = { name, service_plan_guid: planGuid };
+
+      apiNocks.mockFetchS3ServicePlanGUID(planResponses);
+      apiNocks.mockCreateS3ServiceInstance(instanceRequestBody, bucketResponse);
+    }
+
+    function mockRouteResponse(bucket) {
       const guid = 'mapped-12345';
       const appGuid = 'app-12345';
       const routeGuid = 'route-12345';
-      const keyName = `${name}-key`;
-      const planName = 'basic-public';
-      const planGuid = 'plan-guid';
-      const bucketGuid = 'bucket-guid';
-      const accessKeyId = crypto.randomBytes(3).toString('hex');
-      const secretAccessKey = crypto.randomBytes(3).toString('hex');
-      const region = 'us-gov-other-1';
-      const bucket = 'testing-bucket';
-      const instanceRequestBody = { name, service_plan_guid: planGuid };
-      const keyRequestBody = { name, service_instance_guid: bucketGuid };
+      const routeResponse = factory.responses.service({ guid: routeGuid });
+      const mapResponse = factory.responses.service({ guid }, {
+        app_guid: appGuid,
+        route_guid: routeGuid,
+      });
 
-      return {
-        name, guid, appGuid, routeGuid, keyName, planName,
-        planGuid, bucketGuid, accessKeyId, secretAccessKey,
-        region, bucket, instanceRequestBody, keyRequestBody,
-      };
-    }
-
-    function createMockResponses(vars) {
-      const {
-        name, guid, appGuid, routeGuid, keyName, planName,
-        planGuid, bucketGuid, accessKeyId, secretAccessKey,
-        region, bucket, instanceRequestBody, keyRequestBody,
-      } = vars;
-
-      return {
-        planResponses: {
-          resources: [
-            factory.responses.service({ guid: planGuid }, { name: planName }),
-          ],
-        },
-        bucketResponse: factory.responses.service({ guid: bucketGuid }, { name }),
-        buildResponses: {
-          resources: [
-            factory.responses.service({}, {
-              name,
-              service_instance_guid: bucketGuid,
-              credentials: factory.responses.credentials({
-                access_key_id: accessKeyId,
-                secret_access_key: secretAccessKey,
-                region,
-                bucket,
-              }),
-            }),
-          ],
-        },
-        keyResponse: factory.responses.service({}, {
-          name: keyName,
-          service_instance_guid: bucketGuid,
-          credentials: factory.responses.credentials({
-            access_key_id: accessKeyId,
-            secret_access_key: secretAccessKey,
-            region,
-            bucket,
-          }),
-        }),
-        buildResponses: {
-          resources: [
-            factory.responses.service({}, {
-              name,
-              service_instance_guid: bucketGuid,
-              credentials: factory.responses.credentials({
-                access_key_id: accessKeyId,
-                secret_access_key: secretAccessKey,
-                region,
-                bucket,
-              }),
-            }),
-          ],
-        },
-        serviceCredentialsResponses: {
-          resources: [this.keyResponse],
-        },
-        routeResponse: factory.responses.service({ guid: routeGuid }),
-        mapResponse: factory.responses.service({ guid }, {
-          app_guid: appGuid,
-          route_guid: routeGuid,
-        }),
-      };
-    }
-
-    function cfMockServices(owner, repository, sharedBucket = false) {
-      const siteParams = {
-        owner,
-        repository,
-        sharedBucket,
-      };
-
-      const vars = createMockVariables(siteParams);
-      const res = createMockResponses(vars);
-
-      mockTokenRequest();
-      apiNocks.mockFetchS3ServicePlanGUID(res.planResponses);
-      apiNocks.mockCreateS3ServiceInstance(vars.instanceRequestBody, res.bucketResponse);
-      apiNocks.mockCreateServiceKey(vars.keyRequestBody, res.keyResponse);
-      apiNocks.mockFetchServiceInstancesRequest(res.buildResponses);
-      apiNocks.mockFetchServiceInstanceCredentialsRequest('test-guid', res.serviceCredentialsResponses);
-      apiNocks.mockCreateRoute(res.routeResponse, {
+      apiNocks.mockCreateRoute(routeResponse, {
         domain_guid: config.env.cfDomainGuid,
         space_guid: config.env.cfSpaceGuid,
-        host: vars.bucket,
+        host: bucket,
       });
-      apiNocks.mockMapRoute(res.mapResponse);
+      apiNocks.mockMapRoute(mapResponse);
+    }
+
+    function cfMockServices(owner, repository) {
+      const { bucketGuid, name, s3 } = createMockVariables(owner, repository);
+
+      mockTokenRequest();
+      mockPlanResponse(name, bucketGuid);
+      mockKeyResponse(name, bucketGuid, s3);
+      mockBuildResponse(name, bucketGuid, s3);
+      mockRouteResponse(s3.bucket);
     }
 
     beforeEach(() => {
