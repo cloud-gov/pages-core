@@ -120,6 +120,15 @@ function validateSite(params) {
 
   const s3ServiceName = generateS3ServiceName(params.owner, params.repository);
 
+  if (!s3ServiceName) {
+    // Will always not create a valid site object
+    // Used to throw the invalid model error and messaging
+    const site = Site.build(params);
+
+    return site.validate()
+      .then(() => site);
+  }
+
   return apiClient.createSiteBucket(s3ServiceName)
     .then((response) => {
       const { bucket, region } = response.entity.credentials;
