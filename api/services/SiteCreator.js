@@ -1,4 +1,5 @@
 const GitHub = require('./GitHub');
+const S3Helper = require('./S3Helper');
 const TemplateResolver = require('./TemplateResolver');
 const { Build, Site, User } = require('../models');
 const { generateS3ServiceName } = require('../utils');
@@ -113,6 +114,41 @@ function buildSite(params, s3) {
     .then(() => site);
 }
 
+function putBucketWebsite(credentials) {
+  const {
+    access_key_id, // eslint-disable-line
+    bucket,
+    region,
+    secret_access_key, // eslint-disable-line
+  } = credentials;
+
+  const s3Client = new S3Helper.S3Client({
+    accessKeyId: access_key_id,
+    secretAccessKey: secret_access_key,
+    bucket,
+    region,
+  });
+
+  return s3Client.putBucketWebsite();
+}
+
+function buildInfrastructure(params, s3ServiceName) {
+  return apiClient.createSiteBucket(s3ServiceName)
+    .then((response) => {
+      const { credentials } = response.entity;
+
+      const s3 = {
+        serviceName: s3ServiceName,
+        bucket: credentials.bucket,
+        region: credentials.region,
+      };
+
+      return putBucketWebsite(credentials)
+        .then(() => apiClient.createSiteProxyRoute(credentials.bucket))
+        .then(() => buildSite(params, s3));
+    });
+}
+
 function validateSite(params) {
   if (params.sharedBucket) {
     return buildSite(params, config.s3);
@@ -129,18 +165,7 @@ function validateSite(params) {
       .then(() => site);
   }
 
-  return apiClient.createSiteBucket(s3ServiceName)
-    .then((response) => {
-      const { bucket, region } = response.entity.credentials;
-      const s3 = {
-        serviceName: s3ServiceName,
-        bucket,
-        region,
-      };
-
-      return apiClient.createSiteProxyRoute(bucket)
-        .then(() => buildSite(params, s3));
-    });
+  return buildInfrastructure(params, s3ServiceName);
 }
 
 /**

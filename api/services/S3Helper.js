@@ -89,6 +89,24 @@ class S3Client {
     });
   }
 
+  putBucketWebsite() {
+    return new Promise((resolve, reject) => {
+      const params = {
+        Bucket: this.bucket,
+        WebsiteConfiguration: {
+          ErrorDocument: {
+            Key: '404.html',
+          },
+          IndexDocument: {
+            Suffix: 'index.html',
+          },
+        },
+      };
+
+      this.client.putBucketWebsite(params, resolveCallback(resolve, reject));
+    });
+  }
+
   // Private Methods
   listObjectsHelper(currObjects, extraS3Params = {}, opts = {}, callback) {
     const listObjectArgs = Object.assign({}, {

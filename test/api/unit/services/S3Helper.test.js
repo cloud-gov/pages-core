@@ -72,6 +72,49 @@ describe('S3Helper', () => {
     });
   });
 
+  describe('.putBucketWebsite', () => {
+    after(() => {
+      AWSMocks.resetMocks();
+    });
+
+    it('should successfully send params to bucket', (done) => {
+      const expected = {
+        Bucket: config.s3.bucket,
+        WebsiteConfiguration: {
+          ErrorDocument: {
+            Key: '404.html',
+          },
+          IndexDocument: {
+            Suffix: 'index.html',
+          },
+        },
+      };
+
+      AWSMocks.mocks.S3.putBucketWebsite = (params, callback) => {
+        expect(params).to.deep.equal(expected);
+        callback(null, null);
+      };
+
+      const client = new S3Helper.S3Client(config.s3);
+      client.putBucketWebsite()
+        .then(done)
+        .catch(done);
+    });
+
+    it('should reject with promise', (done) => {
+      AWSMocks.mocks.S3.putBucketWebsite = (params, callback) => {
+        callback(new Error());
+      };
+
+      const client = new S3Helper.S3Client(config.s3);
+      client.putBucketWebsite()
+        .catch((err) => {
+          expect(err).to.be.an('error');
+          done();
+        });
+    });
+  });
+
   describe('.listCommonPrefixes(prefix)', () => {
     after(() => {
       AWSMocks.resetMocks();
