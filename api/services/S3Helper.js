@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk');
+const _ = require('underscore');
 
 const S3_DEFAULT_MAX_KEYS = 1000;
 
@@ -103,26 +104,28 @@ class S3Client {
     });
   }
 
+  // Add delay due to initial credentials provisioning time for S3
+  // ToDo refactor and move `putBucketWebsite` config in site creation flow
   putBucketWebsite(max = 10) {
     let attempt = 0;
     const { client } = this;
     const params = createWebsiteParams(this.bucket);
 
     return new Promise((resolve, reject) => {
-      const request = (res, rej) => {
+      const request = () => {
         client.putBucketWebsite(params, (err, data) => {
           if (err && attempt < max) {
             attempt += 1;
-            return request(res, rej);
+            return _.delay(request, 500);
           }
 
-          if (err && attempt >= max) return rej(err);
+          if (err && attempt >= max) return reject(err);
 
-          return res(data);
+          return resolve(data);
         });
       };
 
-      request(resolve, reject);
+      _.delay(request, 750);
     });
   }
 
