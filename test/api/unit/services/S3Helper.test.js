@@ -73,7 +73,6 @@ describe('S3Helper', () => {
   });
 
   describe('.putBucketWebsite', () => {
-
     after(() => {
       AWSMocks.resetMocks();
     });
