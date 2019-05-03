@@ -72,7 +72,9 @@ describe('S3Helper', () => {
     });
   });
 
-  describe('.putBucketWebsite', () => {
+  describe('.putBucketWebsite', function() {
+    this.timeout(10000);
+
     after(() => {
       AWSMocks.resetMocks();
     });
