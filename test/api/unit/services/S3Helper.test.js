@@ -72,7 +72,7 @@ describe('S3Helper', () => {
     });
   });
 
-  describe('.putBucketWebsite', function() {
+  describe('.putBucketWebsite', function specialTest() {
     this.timeout(10000);
 
     after(() => {
