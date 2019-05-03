@@ -22,6 +22,20 @@ function createPagedResults(totalMaxObjects, isTruncated, objects) {
   return pagedResults;
 }
 
+function createWebsiteParams(bucket) {
+  return {
+    Bucket: bucket,
+    WebsiteConfiguration: {
+      ErrorDocument: {
+        Key: '404.html',
+      },
+      IndexDocument: {
+        Suffix: 'index.html',
+      },
+    },
+  };
+}
+
 function resolveCallback(resolve, reject) {
   return (err, objects) => {
     if (err) {
@@ -89,21 +103,26 @@ class S3Client {
     });
   }
 
-  putBucketWebsite() {
+  putBucketWebsite(max = 10) {
+    let attempt = 0;
+    const { client } = this;
+    const params = createWebsiteParams(this.bucket);
+
     return new Promise((resolve, reject) => {
-      const params = {
-        Bucket: this.bucket,
-        WebsiteConfiguration: {
-          ErrorDocument: {
-            Key: '404.html',
-          },
-          IndexDocument: {
-            Suffix: 'index.html',
-          },
-        },
+      const request = (res, rej) => {
+        client.putBucketWebsite(params, (err, data) => {
+          if (err && attempt < max) {
+            attempt += 1;
+            return request(res, rej);
+          }
+
+          if (err && attempt >= max) return rej(err);
+
+          return res(data);
+        });
       };
 
-      this.client.putBucketWebsite(params, resolveCallback(resolve, reject));
+      request(resolve, reject);
     });
   }
 

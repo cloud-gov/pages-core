@@ -143,8 +143,8 @@ function buildInfrastructure(params, s3ServiceName) {
         region: credentials.region,
       };
 
-      return putBucketWebsite(credentials)
-        .then(() => apiClient.createSiteProxyRoute(credentials.bucket))
+      return apiClient.createSiteProxyRoute(credentials.bucket)
+        .then(() => putBucketWebsite(credentials))
         .then(() => buildSite(params, s3));
     });
 }
