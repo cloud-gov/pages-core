@@ -144,6 +144,8 @@ function buildInfrastructure(params, s3ServiceName) {
       };
 
       return apiClient.createSiteProxyRoute(credentials.bucket)
+        // Add delay due to initial credentials provisioning time for S3
+        // ToDo refactor and move `putBucketWebsite` config in site creation flow
         .then(() => putBucketWebsite(credentials))
         .then(() => buildSite(params, s3));
     });
