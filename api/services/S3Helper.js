@@ -38,7 +38,7 @@ function createWebsiteParams(bucket) {
   };
 }
 
-function putBucketLogger(type, bucket, message, start, attempt) {
+function putBucketLogger(type, bucket, message, { start, attempt }) {
   const current = new Date().getTime();
 
   logger[type](`\
@@ -123,23 +123,23 @@ class S3Client {
     let attempt = 0;
     const { bucket, client } = this;
     const params = createWebsiteParams(bucket);
-    const startTime = new Date().getTime();
+    const start = new Date().getTime();
 
     return new Promise((resolve, reject) => {
       const request = () => {
         client.putBucketWebsite(params, (err, data) => {
           if (err && attempt < max) {
-            putBucketLogger('info', bucket, 'Retry', startTime, attempt);
+            putBucketLogger('info', bucket, 'Retry', { start, attempt });
             attempt += 1;
             return _.delay(request, 500);
           }
 
           if (err && attempt >= max) {
-            putBucketLogger('error', bucket, err, startTime, attempt);
+            putBucketLogger('error', bucket, err, { start, attempt });
             return reject(err);
           }
 
-          putBucketLogger('info', bucket, 'Success', startTime, attempt);
+          putBucketLogger('info', bucket, 'Success', { start, attempt });
           return resolve(data);
         });
       };
