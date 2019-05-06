@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const _ = require('underscore');
+const { logger } = require('../../winston');
 
 const S3_DEFAULT_MAX_KEYS = 1000;
 
@@ -35,6 +36,18 @@ function createWebsiteParams(bucket) {
       },
     },
   };
+}
+
+function putBucketLogger(type, bucket, message, start, attempt) {
+  const current = new Date().getTime();
+
+  logger[type](`\
+    bucket-website-config:\
+    Bucket=${bucket};\
+    ${message};\
+    Attempt=${attempt};\
+    TotalTime(ms)=${current - start}\
+  `);
 }
 
 function resolveCallback(resolve, reject) {
@@ -108,19 +121,25 @@ class S3Client {
   // ToDo refactor and move `putBucketWebsite` config in site creation flow
   putBucketWebsite(max = 10) {
     let attempt = 0;
-    const { client } = this;
-    const params = createWebsiteParams(this.bucket);
+    const { bucket, client } = this;
+    const params = createWebsiteParams(bucket);
+    const startTime = new Date().getTime();
 
     return new Promise((resolve, reject) => {
       const request = () => {
         client.putBucketWebsite(params, (err, data) => {
           if (err && attempt < max) {
+            putBucketLogger('info', bucket, 'Retry', startTime, attempt);
             attempt += 1;
             return _.delay(request, 500);
           }
 
-          if (err && attempt >= max) return reject(err);
+          if (err && attempt >= max) {
+            putBucketLogger('error', bucket, err, startTime, attempt);
+            return reject(err);
+          }
 
+          putBucketLogger('info', bucket, 'Success', startTime, attempt);
           return resolve(data);
         });
       };
