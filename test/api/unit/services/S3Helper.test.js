@@ -101,7 +101,9 @@ describe('S3Helper', () => {
         .catch(done);
     });
 
-    it('should reject with promise', (done) => {
+    it('should reject with promise', function specialTest(done) {
+      this.timeout(10000);
+
       AWSMocks.mocks.S3.putBucketWebsite = (params, callback) => {
         callback(new Error());
       };
