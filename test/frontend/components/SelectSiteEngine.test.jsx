@@ -2,7 +2,6 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import { spy } from 'sinon';
-import { Site } from '../../../api/models';
 
 import SelectSiteEngine from '../../../frontend/components/SelectSiteEngine';
 
