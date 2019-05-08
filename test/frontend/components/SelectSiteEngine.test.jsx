@@ -30,8 +30,7 @@ describe('<SelectSiteEngine />', () => {
     });
 
     const selectSiteEngines = wrapper.nodes[0].props.children.map(engine => engine.key);
-    const siteEngineEnum = Site.rawAttributes.engine.values;
-    selectSiteEngines.forEach(engine => expect(siteEngineEnum).to.include(engine));
+    selectSiteEngines.forEach(engine => expect(expectedEngineValues).to.include(engine));
   });
 
   it('calls props.onChange when a new option is selected', () => {
