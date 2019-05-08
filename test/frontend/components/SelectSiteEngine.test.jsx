@@ -2,10 +2,11 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import { spy } from 'sinon';
+import { Site } from '../../../api/models';
 
 import SelectSiteEngine from '../../../frontend/components/SelectSiteEngine';
 
-const expectedEngineValues = ['jekyll', 'hugo', 'static'];
+const expectedEngineValues = ['jekyll', 'hugo', 'static', 'node.js'];
 
 describe('<SelectSiteEngine />', () => {
   const props = {
@@ -27,6 +28,10 @@ describe('<SelectSiteEngine />', () => {
     expectedEngineValues.forEach((engine) => {
       expect(wrapper.find(`option[value="${engine}"]`)).to.have.length(1);
     });
+
+    const selectSiteEngines = wrapper.nodes[0].props.children.map(engine => engine.key);
+    const siteEngineEnum = Site.rawAttributes.engine.values;
+    selectSiteEngines.forEach(engine => expect(siteEngineEnum).to.include(engine));
   });
 
   it('calls props.onChange when a new option is selected', () => {
