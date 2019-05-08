@@ -1,6 +1,7 @@
 const nock = require('nock');
 const { expect } = require('chai');
-
+const { stub } = require('sinon');
+const AWSMocks = require('../../support/aws-mocks');
 const mockTokenRequest = require('../../support/cfAuthNock');
 const apiNocks = require('../../support/cfAPINocks');
 const config = require('../../../../config');
@@ -25,6 +26,7 @@ describe('SQS', () => {
         expect(params).to.have.property('QueueUrl', config.sqs.queue);
         done();
       };
+
       SQS.sendBuildMessage({
         branch: 'master',
         state: 'processing',
@@ -40,11 +42,72 @@ describe('SQS', () => {
             tokens: { accessToken: '123abc' },
           },
         },
-      });
+      }, 2);
+    });
+
+    it('should send a formatted build message and setup S3 bucket config on first built', (done) => {
+      const oldSendMessage = SQS.sqsClient.sendMessage;
+      SQS.sqsClient.sendMessage = (params) => {
+        SQS.sqsClient.sendMessage = oldSendMessage;
+        expect(params).to.have.property('MessageBody');
+        expect(params).to.have.property('QueueUrl', config.sqs.queue);
+        done();
+      };
+
+      AWSMocks.mocks.S3.putBucketWebsite = (params, callback) => {
+        expect(params).to.deep.equal({
+          Bucket: config.s3.bucket,
+          WebsiteConfiguration: {
+            ErrorDocument: {
+              Key: '404.html',
+            },
+            IndexDocument: {
+              Suffix: 'index.html',
+            },
+          },
+        });
+        callback(null, null);
+      };
+
+      AWSMocks.mocks.S3.putObject = (params, callback) => {
+        expect(params).to.deep.equal({
+          Bucket: config.s3.bucket,
+          Body: config.notFound,
+          Key: '404.html',
+        });
+        callback(null, null);
+      };
+
+      SQS.sendBuildMessage({
+        branch: 'master',
+        state: 'processing',
+        Site: {
+          owner: 'owner',
+          repository: 'formatted-message-repo',
+          engine: 'jekyll',
+          defaultBranch: 'master',
+          s3ServiceName: config.s3.serviceName,
+        },
+        User: {
+          passport: {
+            tokens: { accessToken: '123abc' },
+          },
+        },
+      }, 1);
     });
   });
 
   describe('.messageBodyForBuild(build)', () => {
+    let sendMessageStub;
+
+    beforeEach(() => {
+      sendMessageStub = stub(SQS, 'sendBuildMessage').returns({});
+    });
+
+    afterEach(() => {
+      sendMessageStub.restore();
+    });
+
     const messageEnv = (message, name) => {
       const element = message.environment.find(el => el.name === name);
       if (element) {
