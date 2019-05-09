@@ -69,15 +69,6 @@ describe('SQS', () => {
         callback(null, null);
       };
 
-      AWSMocks.mocks.S3.putObject = (params, callback) => {
-        expect(params).to.deep.equal({
-          Bucket: config.s3.bucket,
-          Body: config.notFound,
-          Key: '404.html',
-        });
-        callback(null, null);
-      };
-
       SQS.sendBuildMessage({
         branch: 'master',
         state: 'processing',
