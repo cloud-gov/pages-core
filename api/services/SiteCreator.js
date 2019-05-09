@@ -1,5 +1,4 @@
 const GitHub = require('./GitHub');
-const S3Helper = require('./S3Helper');
 const TemplateResolver = require('./TemplateResolver');
 const { Build, Site, User } = require('../models');
 const { generateS3ServiceName } = require('../utils');
@@ -114,24 +113,6 @@ function buildSite(params, s3) {
     .then(() => site);
 }
 
-function putBucketWebsite(credentials) {
-  const {
-    access_key_id, // eslint-disable-line
-    bucket,
-    region,
-    secret_access_key, // eslint-disable-line
-  } = credentials;
-
-  const s3Client = new S3Helper.S3Client({
-    accessKeyId: access_key_id,
-    secretAccessKey: secret_access_key,
-    bucket,
-    region,
-  });
-
-  return s3Client.putBucketWebsite();
-}
-
 function buildInfrastructure(params, s3ServiceName) {
   return apiClient.createSiteBucket(s3ServiceName)
     .then((response) => {
@@ -144,9 +125,6 @@ function buildInfrastructure(params, s3ServiceName) {
       };
 
       return apiClient.createSiteProxyRoute(credentials.bucket)
-        // Add delay due to initial credentials provisioning time for S3
-        // ToDo refactor and move `putBucketWebsite` config in site creation flow
-        .then(() => putBucketWebsite(credentials))
         .then(() => buildSite(params, s3));
     });
 }

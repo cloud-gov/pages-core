@@ -144,7 +144,27 @@ class S3Client {
         });
       };
 
-      _.delay(request, 750);
+      request();
+    });
+  }
+
+  putObject(body, key) {
+    const { bucket, client } = this;
+    const params = {
+      Body: body,
+      Bucket: bucket,
+      Key: key,
+    };
+
+    return new Promise((resolve, reject) => {
+      client.putObject(params, (err, data) => {
+        if (err) {
+          logger.error(`aws-putObject:Bucket=${bucket};${err}`);
+          return reject(err);
+        }
+
+        return resolve(data);
+      });
     });
   }
 

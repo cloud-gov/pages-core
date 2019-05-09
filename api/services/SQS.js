@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const url = require('url');
+const S3Helper = require('./S3Helper');
 const config = require('../../config');
 const { logger } = require('../../winston');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
@@ -103,6 +104,29 @@ const buildContainerEnvironment = (build) => {
     }));
 };
 
+const setupBucket = (build, buildCount) => {
+  if (buildCount > 1) return Promise.resolve();
+
+  return apiClient.fetchServiceInstanceCredentials(build.Site.s3ServiceName)
+    .then((credentials) => {
+      const {
+        access_key_id, // eslint-disable-line
+        bucket,
+        region,
+        secret_access_key, // eslint-disable-line
+      } = credentials;
+
+      const s3Client = new S3Helper.S3Client({
+        accessKeyId: access_key_id,
+        secretAccessKey: secret_access_key,
+        bucket,
+        region,
+      });
+
+      return s3Client.putBucketWebsite();
+    });
+};
+
 const sqsConfig = config.sqs;
 const SQS = {
   sqsClient: new AWS.SQS({
@@ -121,19 +145,22 @@ SQS.messageBodyForBuild = build => buildContainerEnvironment(build)
     name: buildConfig.containerName,
   }));
 
-SQS.sendBuildMessage = build => SQS.messageBodyForBuild(build)
+SQS.sendBuildMessage = (build, buildCount) => SQS.messageBodyForBuild(build)
   .then((message) => {
     const params = {
       QueueUrl: sqsConfig.queue,
       MessageBody: JSON.stringify(message),
     };
 
-    SQS.sqsClient.sendMessage(params, (err) => {
-      if (err) {
-        logger.error('There was an error, adding the job to SQS: ', err);
-        build.completeJob(err);
-      }
-    });
+    return setupBucket(build, buildCount)
+      .then(() => {
+        SQS.sqsClient.sendMessage(params, (err) => {
+          if (err) {
+            logger.error('There was an error, adding the job to SQS: ', err);
+            build.completeJob(err);
+          }
+        });
+      });
   });
 
 module.exports = SQS;

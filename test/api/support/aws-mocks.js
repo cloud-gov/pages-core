@@ -6,7 +6,13 @@ const mocks = {
 };
 
 const mockableFunctions = {
-  S3: ['getObject', 'listObjectsV2', 'deleteObjects', 'putBucketWebsite'],
+  S3: [
+    'getObject',
+    'listObjectsV2',
+    'deleteObjects',
+    'putBucketWebsite',
+    'putObject',
+  ],
   SQS: ['sendMessage'],
 };
 
