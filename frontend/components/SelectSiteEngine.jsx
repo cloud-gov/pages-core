@@ -12,7 +12,7 @@ export const availableEngines = [
   },
   {
     label: 'Node.js',
-    value: 'script only',
+    value: 'node.js',
   },
   {
     label: 'Static HTML',
