@@ -124,8 +124,6 @@ const setupBucket = (build, buildCount) => {
       });
 
       return s3Client.putBucketWebsite();
-      // Determine if we need to put a default 404.html on create.
-      // .then(() => s3Client.putObject(config.notFound, '404.html'));
     });
 };
 
