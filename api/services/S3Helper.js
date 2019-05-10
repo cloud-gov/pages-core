@@ -29,7 +29,7 @@ function createWebsiteParams(owner, repository, bucket) {
     Bucket: bucket,
     WebsiteConfiguration: {
       ErrorDocument: {
-        Key: `site/${owner}/${repository}/404/index.html`,
+        Key: `site/${owner}/${repository}/404.html`,
       },
       IndexDocument: {
         Suffix: 'index.html',
