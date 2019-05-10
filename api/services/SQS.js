@@ -123,7 +123,7 @@ const setupBucket = (build, buildCount) => {
         region,
       });
 
-      return s3Client.putBucketWebsite();
+      return s3Client.putBucketWebsite(build.Site.owner, build.Site.repository);
     });
 };
 

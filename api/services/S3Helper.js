@@ -24,12 +24,12 @@ function createPagedResults(totalMaxObjects, isTruncated, objects) {
   return pagedResults;
 }
 
-function createWebsiteParams(bucket) {
+function createWebsiteParams(owner, repository, bucket) {
   return {
     Bucket: bucket,
     WebsiteConfiguration: {
       ErrorDocument: {
-        Key: '404.html',
+        Key: `site/${owner}/${repository}/404/index.html`,
       },
       IndexDocument: {
         Suffix: 'index.html',
@@ -119,10 +119,10 @@ class S3Client {
 
   // Add delay due to initial credentials provisioning time for S3
   // ToDo refactor and move `putBucketWebsite` config in site creation flow
-  putBucketWebsite(max = 10) {
+  putBucketWebsite(owner, repository, max = 10) {
     let attempt = 0;
     const { bucket, client } = this;
-    const params = createWebsiteParams(bucket);
+    const params = createWebsiteParams(owner, repository, bucket);
     const start = new Date().getTime();
 
     return new Promise((resolve, reject) => {
