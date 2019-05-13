@@ -47,6 +47,8 @@ describe('SQS', () => {
 
     it('should send a formatted build message and setup S3 bucket config on first built', (done) => {
       const oldSendMessage = SQS.sqsClient.sendMessage;
+      const owner = 'owner';
+      const repository = 'formatted-message-repo';
       SQS.sqsClient.sendMessage = (params) => {
         SQS.sqsClient.sendMessage = oldSendMessage;
         expect(params).to.have.property('MessageBody');
@@ -59,7 +61,7 @@ describe('SQS', () => {
           Bucket: config.s3.bucket,
           WebsiteConfiguration: {
             ErrorDocument: {
-              Key: '404.html',
+              Key: `site/${owner}/${repository}/404.html`,
             },
             IndexDocument: {
               Suffix: 'index.html',
@@ -73,8 +75,8 @@ describe('SQS', () => {
         branch: 'master',
         state: 'processing',
         Site: {
-          owner: 'owner',
-          repository: 'formatted-message-repo',
+          owner,
+          repository,
           engine: 'jekyll',
           defaultBranch: 'master',
           s3ServiceName: config.s3.serviceName,

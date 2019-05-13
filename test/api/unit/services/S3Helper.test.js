@@ -78,11 +78,13 @@ describe('S3Helper', () => {
     });
 
     it('should successfully send params to bucket', (done) => {
+      const owner = 'an-owner';
+      const repository = 'a-reposistory';
       const expected = {
         Bucket: config.s3.bucket,
         WebsiteConfiguration: {
           ErrorDocument: {
-            Key: '404.html',
+            Key: `site/${owner}/${repository}/404.html`,
           },
           IndexDocument: {
             Suffix: 'index.html',
@@ -96,7 +98,7 @@ describe('S3Helper', () => {
       };
 
       const client = new S3Helper.S3Client(config.s3);
-      client.putBucketWebsite()
+      client.putBucketWebsite(owner, repository)
         .then(done)
         .catch(done);
     });
