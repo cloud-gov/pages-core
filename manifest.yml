@@ -2,7 +2,7 @@
 applications:
 - name: federalistapp
 buildpack: nodejs_buildpack
-stack: cflinuxfs2
+stack: cflinuxfs3
 routes:
 - route: federalistapp.18f.gov
 - route: federalistapp.fr.cloud.gov
