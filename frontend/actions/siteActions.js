@@ -44,6 +44,7 @@ export default {
   },
 
   addSite(siteToAdd) {
+    dispatchSitesFetchStartedAction();
     return federalist.addSite(siteToAdd)
       .then((site) => {
         // site is undefined here if addSite fails
@@ -97,6 +98,7 @@ export default {
   },
 
   deleteSite(siteId) {
+    dispatchSitesFetchStartedAction();
     return federalist.deleteSite(siteId)
       .then(updateRouterToSitesUri)
       .then(dispatchSiteDeletedAction.bind(null, siteId))
