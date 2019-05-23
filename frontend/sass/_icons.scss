@@ -27,3 +27,16 @@
   }
 
 }
+
+.sites-list-item {
+  svg {
+    g {
+      fill: $link-color;
+      vertical-align: middle;
+    }
+
+    &:hover {
+      fill: $link-color-active;
+    }
+  }
+}
