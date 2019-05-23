@@ -3,10 +3,12 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 
 import { IconView } from '../icons';
+import { IconBook } from '../icons';
 import PublishedState from './publishedState';
 import RepoLastVerified from './repoLastVerified';
 import GitHubLink from '../GitHubLink';
 import ButtonLink from '../ButtonLink';
+
 import siteActions from '../../actions/siteActions';
 import { USER } from '../../propTypes';
 
@@ -34,7 +36,7 @@ const SiteListItem = ({ site, user }) =>
     <div className="sites-list-item-text">
       <h4 className="site-list-item-title">
         <Link to={`/sites/${site.id}`} title="View site settings">
-          { site.owner }/{ site.repository }
+          <IconBook /> { site.owner }/{ site.repository }
         </Link>
         {' '}
       </h4>
