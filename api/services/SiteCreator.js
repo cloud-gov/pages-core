@@ -113,6 +113,22 @@ function buildSite(params, s3) {
     .then(() => site);
 }
 
+function buildInfrastructure(params, s3ServiceName) {
+  return apiClient.createSiteBucket(s3ServiceName)
+    .then((response) => {
+      const { credentials } = response.entity;
+
+      const s3 = {
+        serviceName: s3ServiceName,
+        bucket: credentials.bucket,
+        region: credentials.region,
+      };
+
+      return apiClient.createSiteProxyRoute(credentials.bucket)
+        .then(() => buildSite(params, s3));
+    });
+}
+
 function validateSite(params) {
   if (params.sharedBucket) {
     return buildSite(params, config.s3);
@@ -120,18 +136,16 @@ function validateSite(params) {
 
   const s3ServiceName = generateS3ServiceName(params.owner, params.repository);
 
-  return apiClient.createSiteBucket(s3ServiceName)
-    .then((response) => {
-      const { bucket, region } = response.entity.credentials;
-      const s3 = {
-        serviceName: s3ServiceName,
-        bucket,
-        region,
-      };
+  if (!s3ServiceName) {
+    // Will always not create a valid site object
+    // Used to throw the invalid model error and messaging
+    const site = Site.build(params);
 
-      return apiClient.createSiteProxyRoute(bucket)
-        .then(() => buildSite(params, s3));
-    });
+    return site.validate()
+      .then(() => site);
+  }
+
+  return buildInfrastructure(params, s3ServiceName);
 }
 
 /**

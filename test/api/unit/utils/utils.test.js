@@ -106,6 +106,17 @@ describe('utils', () => {
       expect(utils.generateS3ServiceName(owner, repository)).to.equal(expected);
       done();
     });
+
+    it('should return undefined when owner or repository or both are undefined or empty strings', (done) => {
+      const aString = 'hello';
+      const emptyString = '';
+
+      expect(utils.generateS3ServiceName(aString)).to.be.undefined;
+      expect(utils.generateS3ServiceName(undefined, aString)).to.be.undefined;
+      expect(utils.generateS3ServiceName()).to.be.undefined;
+      expect(utils.generateS3ServiceName(emptyString, emptyString)).to.be.undefined;
+      done();
+    });
   });
 
   describe('.isPastAuthThreshold', () => {

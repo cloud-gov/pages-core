@@ -72,6 +72,95 @@ describe('S3Helper', () => {
     });
   });
 
+  describe('.putBucketWebsite', () => {
+    after(() => {
+      AWSMocks.resetMocks();
+    });
+
+    it('should successfully send params to bucket', (done) => {
+      const owner = 'an-owner';
+      const repository = 'a-reposistory';
+      const expected = {
+        Bucket: config.s3.bucket,
+        WebsiteConfiguration: {
+          ErrorDocument: {
+            Key: `site/${owner}/${repository}/404.html`,
+          },
+          IndexDocument: {
+            Suffix: 'index.html',
+          },
+        },
+      };
+
+      AWSMocks.mocks.S3.putBucketWebsite = (params, callback) => {
+        expect(params).to.deep.equal(expected);
+        callback(null, null);
+      };
+
+      const client = new S3Helper.S3Client(config.s3);
+      client.putBucketWebsite(owner, repository)
+        .then(done)
+        .catch(done);
+    });
+
+    it('should reject with promise', function specialTest(done) {
+      this.timeout(10000);
+
+      AWSMocks.mocks.S3.putBucketWebsite = (params, callback) => {
+        callback(new Error());
+      };
+
+      const client = new S3Helper.S3Client(config.s3);
+      client.putBucketWebsite()
+        .catch((err) => {
+          expect(err).to.be.an('error');
+          done();
+        });
+    });
+  });
+
+  describe('.putObject', () => {
+    after(() => {
+      AWSMocks.resetMocks();
+    });
+
+    it('should successfully put object in bucket', (done) => {
+      const body = 'Hello World';
+      const key = 'hello.html';
+      const expected = {
+        Bucket: config.s3.bucket,
+        Body: body,
+        Key: key,
+      };
+
+      AWSMocks.mocks.S3.putObject = (params, callback) => {
+        expect(params).to.deep.equal(expected);
+        callback(null, null);
+      };
+
+      const client = new S3Helper.S3Client(config.s3);
+      client.putObject(body, key)
+        .then(done)
+        .catch(done);
+    });
+
+    it('should reject with promise', (done) => {
+      const body = 'Hello World';
+      const key = 'hello.html';
+
+      AWSMocks.mocks.S3.putObject = (params, callback) => {
+        callback(new Error());
+      };
+
+      const client = new S3Helper.S3Client(config.s3);
+      client.putObject(body, key)
+        .catch((err) => {
+          expect(err).to.be.an('error');
+          done();
+        });
+    });
+  });
+
   describe('.listCommonPrefixes(prefix)', () => {
     after(() => {
       AWSMocks.resetMocks();

@@ -1,4 +1,6 @@
 const AWS = require('aws-sdk');
+const _ = require('underscore');
+const { logger } = require('../../winston');
 
 const S3_DEFAULT_MAX_KEYS = 1000;
 
@@ -20,6 +22,32 @@ function createPagedResults(totalMaxObjects, isTruncated, objects) {
   };
 
   return pagedResults;
+}
+
+function createWebsiteParams(owner, repository, bucket) {
+  return {
+    Bucket: bucket,
+    WebsiteConfiguration: {
+      ErrorDocument: {
+        Key: `site/${owner}/${repository}/404.html`,
+      },
+      IndexDocument: {
+        Suffix: 'index.html',
+      },
+    },
+  };
+}
+
+function putBucketLogger(type, bucket, message, { start, attempt }) {
+  const current = new Date().getTime();
+
+  logger[type](`\
+    bucket-website-config:\
+    Bucket=${bucket};\
+    ${message};\
+    Attempt=${attempt};\
+    TotalTime(ms)=${current - start}\
+  `);
 }
 
 function resolveCallback(resolve, reject) {
@@ -86,6 +114,57 @@ class S3Client {
         { Prefix: prefix, MaxKeys: maxKeys, StartAfter: startAfterKey },
         { totalMaxObjects },
         resolveCallback(resolve, reject));
+    });
+  }
+
+  // Add delay due to initial credentials provisioning time for S3
+  // ToDo refactor and move `putBucketWebsite` config in site creation flow
+  putBucketWebsite(owner, repository, max = 10) {
+    let attempt = 0;
+    const { bucket, client } = this;
+    const params = createWebsiteParams(owner, repository, bucket);
+    const start = new Date().getTime();
+
+    return new Promise((resolve, reject) => {
+      const request = () => {
+        client.putBucketWebsite(params, (err, data) => {
+          if (err && attempt < max) {
+            putBucketLogger('info', bucket, 'Retry', { start, attempt });
+            attempt += 1;
+            return _.delay(request, 500);
+          }
+
+          if (err && attempt >= max) {
+            putBucketLogger('error', bucket, err, { start, attempt });
+            return reject(err);
+          }
+
+          putBucketLogger('info', bucket, 'Success', { start, attempt });
+          return resolve(data);
+        });
+      };
+
+      request();
+    });
+  }
+
+  putObject(body, key) {
+    const { bucket, client } = this;
+    const params = {
+      Body: body,
+      Bucket: bucket,
+      Key: key,
+    };
+
+    return new Promise((resolve, reject) => {
+      client.putObject(params, (err, data) => {
+        if (err) {
+          logger.error(`aws-putObject:Bucket=${bucket};${err}`);
+          return reject(err);
+        }
+
+        return resolve(data);
+      });
     });
   }
 

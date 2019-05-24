@@ -11,6 +11,10 @@ import {
   siteUserUpdatedType as SITE_USER_UPDATED,
 } from '../actions/actionCreators/siteActions';
 
+import {
+  httpErrorType as HTTP_ERROR,
+} from '../actions/actionCreators/alertActions';
+
 const initialState = {
   isLoading: false,
   currentSite: null,
@@ -24,6 +28,9 @@ const mapPropertyToMatchingSite = (data, siteId, properties) => data.map((site) 
 
 export default function sites(state = initialState, action) {
   switch (action.type) {
+    case HTTP_ERROR:
+      return { ...state, isLoading: false };
+
     case SITES_FETCH_STARTED:
       return { ...state, isLoading: true };
 

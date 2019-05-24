@@ -11,11 +11,18 @@ const afterCreate = (build) => {
     where: { id: build.id },
     include: [User, Site],
   }).then((foundBuild) => {
-    SQS.sendBuildMessage(foundBuild);
+    Build.findAndCountAll({
+      where: { site: foundBuild.site },
+    }).then(result => SQS.sendBuildMessage(foundBuild, result.count));
   });
 };
 
-const associate = ({ Build, BuildLog, Site, User }) => {
+const associate = ({
+  Build,
+  BuildLog,
+  Site,
+  User,
+}) => {
   Build.hasMany(BuildLog, {
     foreignKey: 'build',
   });
@@ -77,7 +84,7 @@ function completeJob(err) {
 
   return completeJobStateUpdate(err, this, completedAt)
     .then(build => completeJobSiteUpdate(build, completedAt)
-    .then(() => build));
+      .then(() => build));
 }
 
 module.exports = (sequelize, DataTypes) => {
