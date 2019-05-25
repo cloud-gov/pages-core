@@ -87,7 +87,13 @@ passport.deserializeUser((id, next) => {
 const externalCallback = (accessToken, _refreshToken, _profile, callback) => {
   GitHub.validateUser(accessToken)
     .then(() => callback(null, { accessToken }))
-    .catch(err => callback(err));
+    .catch((err) => {
+      if (err.message === 'Unauthorized') {
+        callback(null, false);
+      } else {
+        callback(err);
+      }
+    });
 };
 
 passport.use('external', new GitHubStrategy(config.passport.github.externalOptions, externalCallback));
