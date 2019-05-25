@@ -19,7 +19,7 @@ describe('External authentication request', () => {
     it('return unauthorized if the user is not in a whitelisted GitHub organization', (done) => {
       githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
       request(app)
-        .get(`/external/auth/github/callback?code=auth-code-123abc&state=state-123abc`)
+        .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
         .expect(401, done);
     });
 
@@ -30,8 +30,8 @@ describe('External authentication request', () => {
 
       it('returns a script tag', (done) => {
         request(app)
-          .get(`/external/auth/github/callback?code=auth-code-123abc&state=state-123abc`)
-          .expect(res => {
+          .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
+          .expect((res) => {
             expect(res.text.trim()).to.match(/^<script>(.|\n)*<\/script>$/g);
           })
           .expect(200, done);
@@ -43,15 +43,15 @@ describe('External authentication request', () => {
           .then((session) => {
             cookie = session;
             return request(app)
-              .get(`/external/auth/github/callback?code=auth-code-123abc&state=state-123abc`)
+              .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
               .set('Cookie', cookie)
               .expect(200)
-              .expect(res => {
+              .expect((res) => {
                 expect(res.text.trim()).to.match(/^<script>(.|\n)*<\/script>$/g);
               });
           })
           .then(() => sessionForCookie(cookie))
-          .then(session => {
+          .then((session) => {
             expect(session.passport).to.be.empty;
             done();
           })
