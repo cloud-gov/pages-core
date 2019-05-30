@@ -477,7 +477,7 @@ describe('GitHub', () => {
       const accessToken = 'token';
       const context = `federalist-${config.app.app_env}/build`;
       const targetURL = `${config.app.hostname}/sites/1/builds/1/logs`;
-      options = {
+      const options = {
         owner: 'test-owner',
         repo: 'test-repo',
         sha: '12344',
@@ -487,17 +487,17 @@ describe('GitHub', () => {
         context,
       };
 
-      failOptions = Object.assign({}, options);
+      const failOptions = Object.assign({}, options);
       failOptions.response = [404, 'File not found'];
 
       githubAPINocks.status(failOptions);
       githubAPINocks.status(failOptions);
       githubAPINocks.status(failOptions);
       githubAPINocks.status(failOptions);
-      statusNock = githubAPINocks.status(options);
+      const statusNock = githubAPINocks.status(options);
 
       GitHub.sendCreateGithubStatusRequest(accessToken, options)
-        .then((response) => {
+        .then(() => {
           expect(statusNock.isDone()).to.be.true;
           done();
         }).catch(done);
@@ -507,7 +507,7 @@ describe('GitHub', () => {
       const accessToken = 'token';
       const context = `federalist-${config.app.app_env}/build`;
       const targetURL = `${config.app.hostname}/sites/1/builds/1/logs`;
-      options = {
+      const options = {
         owner: 'test-owner',
         repo: 'test-repo',
         sha: '12344',
@@ -517,7 +517,7 @@ describe('GitHub', () => {
         context,
       };
 
-      failOptions = Object.assign({}, options);
+      const failOptions = Object.assign({}, options);
       failOptions.response = [404, 'File not found'];
 
       githubAPINocks.status(failOptions);

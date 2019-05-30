@@ -87,14 +87,13 @@ const sendCreateGithubStatusRequest = (github, options, attempt = 0) => {
   const maxTries = 5;
   return sendNextCreateGithubStatusRequest(github, options)
     .catch((err) => {
-      attempt += 1;
+      attempt += 1; // eslint-disable-line no-param-reassign
       if (attempt < maxTries) {
         return sendCreateGithubStatusRequest(github, options, attempt);
       }
       throw err;
-    })
-
-}
+    });
+};
 
 const getOrganizationMembers = (github, org, role = 'all', page = 1) =>
   github.orgs.listMembers({ org, per_page: 100, page, role })
