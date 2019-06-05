@@ -12,7 +12,8 @@ module.exports = {
     accessKeyId: '123abc',
     secretAccessKey: '456def',
     region: 'us-gov-west-1',
-    bucket: 's3-bucket',
+    bucket: 'cg-123456789',
+    serviceName: 'federalist-dev-s3',
   },
   passport: {
     github: {
@@ -20,6 +21,12 @@ module.exports = {
         clientID: '123abc',
         clientSecret: '456def',
         callbackURL: 'http://localhost:1337/auth/github/callback',
+        scope: ['user', 'repo'],
+      },
+      externalOptions: {
+        clientID: '123abc',
+        clientSecret: '456def',
+        callbackURL: 'http://localhost:1337/external/auth/github/callback',
         scope: ['user', 'repo'],
       },
       organizations: [
@@ -34,5 +41,16 @@ module.exports = {
   },
   log: {
     level: 'error',
+  },
+  deployUser: {
+    username: 'deploy_user',
+    password: 'deploy_pass',
+  },
+  env: {
+    cfDomainGuid: '987ihg-654fed-321cba',
+    cfProxyGuid: '867fiv-309ine',
+    cfSpaceGuid: '123abc-456def-789ghi',
+    cfOauthTokenUrl: 'https://login.example.com/oauth/token',
+    cfApiHost: 'https://api.example.com',
   },
 };

@@ -12,10 +12,10 @@ export const availableEngines = [
   },
   {
     label: 'Node.js',
-    value: 'script only',
+    value: 'node.js',
   },
   {
-    label: 'Html pages',
+    label: 'Static HTML',
     value: 'static',
   },
 ];

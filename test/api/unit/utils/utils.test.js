@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const moment = require('moment');
 const fsMock = require('mock-fs');
 const proxyquire = require('proxyquire').noCallThru();
@@ -13,6 +13,112 @@ const MockWebpackConfig = {
 const utils = proxyquire('../../../../api/utils', { '../../webpack.development.config.js': MockWebpackConfig });
 
 describe('utils', () => {
+  describe('.filterEntity', () => {
+    it('should filter out the named entity from an objects resources array', (done) => {
+      const name = 'one';
+      const field = 'name';
+      const entity = { [field]: name };
+      const resources = {
+        resources: [
+          {
+            entity,
+          },
+          {
+            entity: { [field]: 'two' },
+          },
+        ],
+      };
+      const result = utils.filterEntity(resources, name, field);
+
+      expect(result).to.deep.equal({ entity });
+      done();
+    });
+
+    it('should reject a promise if entity not found', (done) => {
+      const name = 'one';
+      const field = 'name';
+      const resources = {
+        resources: [
+          {
+            entity: { [field]: 'two' },
+          },
+        ],
+      };
+
+      utils.filterEntity(resources, name, field)
+        .catch((err) => {
+          expect(err).to.be.an('error');
+          done();
+        });
+    });
+  });
+
+  describe('.firstEntity', () => {
+    it('should return first entity from an objects resources array', (done) => {
+      const name = 'one';
+      const field = 'name';
+      const entity = { [field]: name };
+      const resources = {
+        resources: [
+          {
+            entity,
+          },
+          {
+            entity: { [field]: 'two' },
+          },
+        ],
+      };
+      const result = utils.firstEntity(resources, name);
+
+      expect(result).to.deep.equal({ entity });
+      done();
+    });
+
+    it('should reject a promise if no resources returned', (done) => {
+      const name = 'one';
+      const resources = {
+        resources: [],
+      };
+
+      utils.firstEntity(resources, name)
+        .catch((err) => {
+          expect(err).to.be.an('error');
+          done();
+        });
+    });
+  });
+
+  describe('.generateS3ServiceName', () => {
+    it('should concat and lowercase owner and repository name', (done) => {
+      const owner = 'Hello';
+      const repository = 'Hello World';
+      const expected = 'owner-hello-repo-hello-world';
+
+      expect(utils.generateS3ServiceName(owner, repository)).to.equal(expected);
+      done();
+    });
+
+    it('should convert to string when the owner and repository is a number', (done) => {
+      const owner = 12345;
+      const repository = 'Hello World';
+      const expected = 'owner-12345-repo-hello-world';
+
+      expect(utils.generateS3ServiceName(owner, repository)).to.equal(expected);
+      done();
+    });
+
+    it('should return undefined when owner or repository or both are undefined or empty strings', (done) => {
+      const aString = 'hello';
+      const emptyString = '';
+
+      expect(utils.generateS3ServiceName(aString)).to.be.undefined;
+      expect(utils.generateS3ServiceName(undefined, aString)).to.be.undefined;
+      expect(utils.generateS3ServiceName()).to.be.undefined;
+      expect(utils.generateS3ServiceName(emptyString, emptyString)).to.be.undefined;
+      done();
+    });
+  });
+
   describe('.isPastAuthThreshold', () => {
     const threshAmount = config.policies.authRevalidationMinutes;
 

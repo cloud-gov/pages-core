@@ -1,5 +1,4 @@
-const expect = require('chai').expect;
-const config = require('../../../../config');
+const { expect } = require('chai');
 const factory = require('../../support/factory');
 const { Site } = require('../../../../api/models');
 
@@ -21,12 +20,11 @@ describe('Site model', () => {
     it('returns the site object with user association', () => {
       factory.site({
         users: Promise.all([factory.user()]),
-      })
-      .then(site => Site.withUsers(site.id))
-      .then((site) => {
-        expect(site.Users).to.be.an('array');
-        expect(site.Users.length).to.equal(1);
-      });
+      }).then(site => Site.withUsers(site.id))
+        .then((site) => {
+          expect(site.Users).to.be.an('array');
+          expect(site.Users.length).to.equal(1);
+        });
     });
   });
 
@@ -35,7 +33,7 @@ describe('Site model', () => {
       it('should return a proxy link if there is no custom domain', (done) => {
         factory.site({ defaultBranch: 'default-branch' }).then((site) => {
           const viewLink = site.viewLinkForBranch('default-branch');
-          expect(viewLink).to.equal(`${config.app.preview_hostname}/site/${site.owner}/${site.repository}/`);
+          expect(viewLink).to.equal(`https://${site.awsBucketName}.app.cloud.gov/site/${site.owner}/${site.repository}/`);
           done();
         }).catch(done);
       });
@@ -55,7 +53,7 @@ describe('Site model', () => {
         const defaultBranch = 'defau/lt-branch';
         factory.site({ defaultBranch }).then((site) => {
           const viewLink = site.viewLinkForBranch(defaultBranch);
-          expect(viewLink).to.equal(`${config.app.preview_hostname}/site/${site.owner}/${site.repository}/`);
+          expect(viewLink).to.equal(`https://${site.awsBucketName}.app.cloud.gov/site/${site.owner}/${site.repository}/`);
           done();
         }).catch(done);
       });
@@ -65,7 +63,7 @@ describe('Site model', () => {
       it('should return a proxy demo link if there is no demo domain', (done) => {
         factory.site({ demoBranch: 'demo-branch' }).then((site) => {
           const viewLink = site.viewLinkForBranch('demo-branch');
-          expect(viewLink).to.equal(`${config.app.preview_hostname}/demo/${site.owner}/${site.repository}/`);
+          expect(viewLink).to.equal(`https://${site.awsBucketName}.app.cloud.gov/demo/${site.owner}/${site.repository}/`);
           done();
         }).catch(done);
       });
@@ -85,7 +83,7 @@ describe('Site model', () => {
         const demoBranch = 'dem/o-branch';
         factory.site({ demoBranch }).then((site) => {
           const viewLink = site.viewLinkForBranch(demoBranch);
-          expect(viewLink).to.equal(`${config.app.preview_hostname}/demo/${site.owner}/${site.repository}/`);
+          expect(viewLink).to.equal(`https://${site.awsBucketName}.app.cloud.gov/demo/${site.owner}/${site.repository}/`);
           done();
         }).catch(done);
       });
@@ -95,7 +93,7 @@ describe('Site model', () => {
       it('should return a federalist preview link', (done) => {
         factory.site().then((site) => {
           const viewLink = site.viewLinkForBranch('preview-branch');
-          expect(viewLink).to.equal(`${config.app.preview_hostname}/preview/${site.owner}/${site.repository}/preview-branch/`);
+          expect(viewLink).to.equal(`https://${site.awsBucketName}.app.cloud.gov/preview/${site.owner}/${site.repository}/preview-branch/`);
           done();
         }).catch(done);
       });
@@ -103,7 +101,7 @@ describe('Site model', () => {
       it('should return a federalist preview link withouth branch', (done) => {
         factory.site().then((site) => {
           const viewLink = site.viewLinkForBranch();
-          expect(viewLink).to.equal(`${config.app.preview_hostname}/preview/${site.owner}/${site.repository}/`);
+          expect(viewLink).to.equal(`https://${site.awsBucketName}.app.cloud.gov/preview/${site.owner}/${site.repository}/`);
           done();
         }).catch(done);
       });
@@ -165,8 +163,7 @@ describe('Site model', () => {
   it('should validate the demo branch name is valid', (done) => {
     factory.site({
       demoBranch: 'in@valid',
-    })
-    .catch((err) => {
+    }).catch((err) => {
       expect(err.status).to.equal(403);
       expect(err.message).to.equal('demoBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
       done();
@@ -186,8 +183,7 @@ describe('Site model', () => {
   it('should validate the demo branch name is valid no trailing slashes', (done) => {
     factory.site({
       demoBranch: 'invalid/',
-    })
-    .catch((err) => {
+    }).catch((err) => {
       expect(err.status).to.equal(403);
       expect(err.message).to.equal('demoBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
       done();
@@ -207,10 +203,39 @@ describe('Site model', () => {
   it('should validate the demo branch name is valid no trailing hyphen', (done) => {
     factory.site({
       demoBranch: 'invalid-',
-    })
-    .catch((err) => {
+    }).catch((err) => {
       expect(err.status).to.equal(403);
       expect(err.message).to.equal('demoBranch: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
+      done();
+    });
+  });
+
+  it('should not let s3ServiceName field be null', (done) => {
+    factory.site({
+      s3ServiceName: undefined,
+    }).catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('s3ServiceName: Site.s3ServiceName cannot be null');
+      done();
+    });
+  });
+
+  it('should not let awsBucketName field be null', (done) => {
+    factory.site({
+      awsBucketName: undefined,
+    }).catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('awsBucketName: Site.awsBucketName cannot be null');
+      done();
+    });
+  });
+
+  it('should not let awsBucketRegion field be null', (done) => {
+    factory.site({
+      awsBucketRegion: undefined,
+    }).catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('awsBucketRegion: Site.awsBucketRegion cannot be null');
       done();
     });
   });

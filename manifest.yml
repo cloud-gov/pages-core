@@ -2,7 +2,7 @@
 applications:
 - name: federalistapp
 buildpack: nodejs_buildpack
-stack: cflinuxfs2
+stack: cflinuxfs3
 routes:
 - route: federalistapp.18f.gov
 - route: federalistapp.fr.cloud.gov
@@ -17,10 +17,16 @@ services:
 - federalist-site-wide-error
 - federalist-production-sqs-creds
 - federalist-production-redis
+- federalist-production-space
+- federalist-deploy-user
+- federalist-production-proxy
+- federalist-production-domain
 env:
   NODE_ENV: production
   APP_ENV: production
   APP_HOSTNAME: https://federalistapp.18f.gov
+  CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
+  CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
   HOMEPAGE_URL: https://federalist.18f.gov
   LOG_LEVEL: info
   NPM_CONFIG_PRODUCTION: true

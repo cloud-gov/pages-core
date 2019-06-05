@@ -123,7 +123,11 @@ describe('GithubBuildStatusReporter', () => {
 
         factory.build({
           state: 'success',
-          site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
+          site: factory.site({
+            owner: 'test-owner',
+            repository: 'test-repo',
+            awsBucketName: 'test-bucket',
+          }),
           commitSha,
           branch: 'preview-branch',
         }).then((build) => {
@@ -131,7 +135,7 @@ describe('GithubBuildStatusReporter', () => {
             owner: 'test-owner',
             repo: 'test-repo',
             sha: commitSha,
-            targetURL: `${config.app.preview_hostname}/preview/test-owner/test-repo/preview-branch/`,
+            targetURL: 'https://test-bucket.app.cloud.gov/preview/test-owner/test-repo/preview-branch/',
           });
 
           return GithubBuildStatusReporter.reportBuildStatus(build);

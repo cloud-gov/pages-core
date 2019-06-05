@@ -43,9 +43,18 @@ export class App extends React.Component {
   }
 
   render() {
-    const { user, children, notifications } = this.props;
+    const {
+      user,
+      children,
+      notifications,
+      sites,
+    } = this.props;
 
     if (user.isLoading) {
+      return <LoadingIndicator />;
+    }
+
+    if (sites.isLoading) {
       return <LoadingIndicator />;
     }
 
@@ -85,6 +94,11 @@ App.propTypes = {
       uid: PropTypes.number.isRequired,
     })
   ),
+  sites: PropTypes.shape({
+    isLoading: PropTypes.bool.isRequired,
+    currentSite: PropTypes.object,
+    data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  }),
 };
 
 App.defaultProps = {
@@ -93,11 +107,22 @@ App.defaultProps = {
   location: null,
   user: false,
   notifications: [],
+  sites: {
+    isLoading: false,
+    currentSite: {},
+    data: [],
+  },
 };
 
-const mapStateToProps = ({ alert, notifications, user }) => ({
+const mapStateToProps = ({
   alert,
   notifications,
+  sites,
+  user,
+}) => ({
+  alert,
+  notifications,
+  sites,
   user,
 });
 

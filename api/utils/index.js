@@ -5,6 +5,40 @@ const moment = require('moment');
 const config = require('../../config');
 const { logger } = require('../../winston');
 
+function filterEntity(res, name, field = 'name') {
+  const filtered = res.resources.filter(item => item.entity[field] === name);
+
+  if (filtered.length === 1) return filtered[0];
+  return Promise.reject(new Error({
+    message: 'Not found',
+    name,
+    field,
+  }));
+}
+
+function firstEntity(res, name) {
+  if (res.resources.length === 0) {
+    return Promise.reject(new Error({
+      message: 'Not found',
+      name,
+    }));
+  }
+
+  return res.resources[0];
+}
+
+function generateS3ServiceName(owner, repository) {
+  if (!owner || !repository) return undefined;
+
+  const format = str => str
+    .toString()
+    .toLowerCase()
+    .split(' ')
+    .join('-');
+
+  return `owner-${format(owner)}-repo-${format(repository)}`;
+}
+
 function isPastAuthThreshold(authDate) {
   return moment().isAfter(
     moment(authDate).add(config.policies.authRevalidationMinutes, 'minutes')
@@ -45,9 +79,8 @@ function loadProductionManifest() {
 }
 
 function loadAssetManifest() {
-  return process.env.NODE_ENV === 'development' ?
-    loadDevelopmentManifest() :
-    loadProductionManifest();
+  return process.env.NODE_ENV === 'development'
+    ? loadDevelopmentManifest() : loadProductionManifest();
 }
 
 function getSiteDisplayEnv() {
@@ -62,6 +95,9 @@ function shouldIncludeTracking() {
 }
 
 module.exports = {
+  filterEntity,
+  firstEntity,
+  generateS3ServiceName,
   getDirectoryFiles,
   getSiteDisplayEnv,
   isPastAuthThreshold,

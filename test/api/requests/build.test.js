@@ -1,8 +1,9 @@
 const expect = require('chai').expect;
 const nock = require('nock');
 const request = require('supertest');
-
+const { stub } = require('sinon');
 const app = require('../../../app');
+const SQS = require('../../../api/services/SQS');
 const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
 const { authenticatedSession, unauthenticatedSession } = require('../support/session');
@@ -13,6 +14,16 @@ const csrfToken = require('../support/csrfToken');
 const commitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
 
 describe('Build API', () => {
+  let sendMessageStub;
+
+  beforeEach(() => {
+    sendMessageStub = stub(SQS, 'sendBuildMessage').returns(Promise.resolve());
+  });
+
+  afterEach(() => {
+    sendMessageStub.restore();
+  });
+
   const buildResponseExpectations = (response, build) => {
     if (build.completedAt) {
       expect(build.completedAt.toISOString()).to.equal(response.completedAt);
@@ -414,29 +425,27 @@ describe('Build API', () => {
     it('shouldn\'t list more than 100 builds', (done) => {
       const userPromise = factory.user();
       const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-      const buildsPromise = Promise.all(
-        Array(110).fill(0).map(() => factory.build({ site: sitePromise }))
-      );
       const cookiePromise = authenticatedSession(userPromise);
 
       Promise.props({
         site: sitePromise,
         cookie: cookiePromise,
-        builds: buildsPromise,
+        user: userPromise,
       })
-      .then(({ site, cookie }) =>
-        request(app)
+        .then(props => factory
+          .bulkBuild({ site: props.site.id, user: props.user.id }, 110)
+          .then(() => props))
+        .then(({ site, cookie }) => request(app)
           .get(`/v0/site/${site.id}/build`)
           .set('Cookie', cookie)
-          .expect(200)
-      )
-      .then((response) => {
-        expect(response.body).to.be.an('array');
-        expect(response.body).to.have.length(100);
-        done();
-      })
-      .catch(done);
-    }).timeout(7500); // this test can take a long time because of all the builds it creates
+          .expect(200))
+        .then((response) => {
+          expect(response.body).to.be.an('array');
+          expect(response.body).to.have.length(100);
+          done();
+        })
+        .catch(done);
+    });
 
     it('should not display unfound build', (done) => {
       const userPromise = factory.user();

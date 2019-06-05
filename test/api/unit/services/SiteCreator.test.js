@@ -2,47 +2,57 @@ const crypto = require('crypto');
 const { expect } = require('chai');
 const nock = require('nock');
 const { stub } = require('sinon');
+const config = require('../../../../config/env/test');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
+const mockTokenRequest = require('../../support/cfAuthNock');
+const apiNocks = require('../../support/cfAPINocks');
 const SiteCreator = require('../../../../api/services/SiteCreator');
 const TemplateResolver = require('../../../../api/services/TemplateResolver');
 const { Build, Site, User } = require('../../../../api/models');
 
 describe('SiteCreator', () => {
-  beforeEach(() => {
-    nock.cleanAll();
-  });
+  afterEach(() => nock.cleanAll());
 
   describe('.createSite', () => {
-    const validateSiteExpectations = (site, owner, repository, user) => {
+    const validateSiteExpectations = (
+      site,
+      owner,
+      repository,
+      user,
+      s3ServiceName = 'federalist-dev-s3',
+      awsBucketName = 'cg-123456789',
+      awsBucketRegion = 'us-gov-west-1'
+    ) => {
       expect(site).to.not.be.undefined;
       expect(site.owner).to.equal(owner);
       expect(site.repository).to.equal(repository);
+      expect(site.s3ServiceName).to.equal(s3ServiceName);
+      expect(site.awsBucketName).to.equal(awsBucketName);
+      expect(site.awsBucketRegion).to.equal(awsBucketRegion);
       expect(site.Users).to.have.length(1);
       expect(site.Users[0].id).to.equal(user.id);
       expect(site.Builds).to.have.length(1);
       expect(site.Builds[0].user).to.equal(user.id);
     };
 
-    const afterCreateSite = (owner, repository) =>
-      Site.findOne({
-        where: {
-          owner,
-          repository,
-        },
-        include: [User, Build],
-      });
+    const afterCreateSite = (owner, repository) => Site.findOne({
+      where: {
+        owner,
+        repository,
+      },
+      include: [User, Build],
+    });
 
     context('from a GitHub repo', () => {
       let user;
       let webhookNock;
 
-      const setupWebhook = (accessToken, owner, repo) =>
-        githubAPINocks.webhook({
-          accessToken,
-          owner,
-          repo,
-        });
+      const setupWebhook = (accessToken, owner, repo) => githubAPINocks.webhook({
+        accessToken,
+        owner,
+        repo,
+      });
 
       context('when the owner of the repo is an authorized federalist org', () => {
         it('creates new site record for the given repository, adds the user, webhook, and build', (done) => {
@@ -68,18 +78,18 @@ describe('SiteCreator', () => {
 
             return SiteCreator.createSite({ user, siteParams });
           })
-          .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
-          .then((site) => {
-            validateSiteExpectations(
-              site,
-              siteParams.owner,
-              siteParams.repository,
-              user
-            );
-            expect(webhookNock.isDone()).to.equal(true);
-            done();
-          })
-          .catch(done);
+            .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
+            .then((site) => {
+              validateSiteExpectations(
+                site,
+                siteParams.owner,
+                siteParams.repository,
+                user
+              );
+              expect(webhookNock.isDone()).to.equal(true);
+              done();
+            })
+            .catch(done);
         });
 
         it('ignores case when comparing org name', (done) => {
@@ -100,17 +110,17 @@ describe('SiteCreator', () => {
 
             return SiteCreator.createSite({ user, siteParams });
           })
-          .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
-          .then((site) => {
-            validateSiteExpectations(
-              site,
-              siteParams.owner,
-              siteParams.repository,
-              user
-            );
-            done();
-          })
-          .catch(done);
+            .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
+            .then((site) => {
+              validateSiteExpectations(
+                site,
+                siteParams.owner,
+                siteParams.repository,
+                user
+              );
+              done();
+            })
+            .catch(done);
         });
       });
 
@@ -133,19 +143,19 @@ describe('SiteCreator', () => {
 
             return SiteCreator.createSite({ user, siteParams });
           })
-          .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
-          .then((site) => {
-            validateSiteExpectations(
-              site,
-              siteParams.owner,
-              siteParams.repository,
-              user
-            );
+            .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
+            .then((site) => {
+              validateSiteExpectations(
+                site,
+                siteParams.owner,
+                siteParams.repository,
+                user
+              );
 
-            expect(webhookNock.isDone()).to.equal(true);
-            done();
-          })
-          .catch(done);
+              expect(webhookNock.isDone()).to.equal(true);
+              done();
+            })
+            .catch(done);
         });
       });
 
@@ -161,10 +171,12 @@ describe('SiteCreator', () => {
             accessToken: user.accessToken,
             owner: siteParams.owner,
             repo: siteParams.repository,
-            response: [200, { permissions: {
-              admin: false,
-              push: true,
-            } }],
+            response: [200, {
+              permissions: {
+                admin: false,
+                push: true,
+              },
+            }],
           });
           return SiteCreator.createSite({ user, siteParams });
         }).catch((err) => {
@@ -176,17 +188,17 @@ describe('SiteCreator', () => {
 
       it('should reject if the site already exists in Federalist', (done) => {
         Promise.props({ site: factory.site(), user: factory.user() })
-        .then((values) => {
-          const siteParams = {
-            owner: values.site.owner,
-            repository: values.site.repository,
-          };
-          return SiteCreator.createSite({ user: values.user, siteParams });
-        }).catch((err) => {
-          expect(err.status).to.equal(400);
-          expect(err.message).to.equal('This site has already been added to Federalist.');
-          done();
-        }).catch(done);
+          .then((values) => {
+            const siteParams = {
+              owner: values.site.owner,
+              repository: values.site.repository,
+            };
+            return SiteCreator.createSite({ user: values.user, siteParams });
+          }).catch((err) => {
+            expect(err.status).to.equal(400);
+            expect(err.message).to.equal('This site has already been added to Federalist.');
+            done();
+          }).catch(done);
       });
 
       it('should reject if the GitHub repository does not exist', (done) => {
@@ -218,25 +230,25 @@ describe('SiteCreator', () => {
         };
 
         factory.user()
-        .then((model) => {
-          user = model;
-          githubAPINocks.repo();
-          githubAPINocks.userOrganizations({
-            accessToken: user.githubAccessToken,
-            organizations: [{ login: 'some-other-org' }],
+          .then((model) => {
+            user = model;
+            githubAPINocks.repo();
+            githubAPINocks.userOrganizations({
+              accessToken: user.githubAccessToken,
+              organizations: [{ login: 'some-other-org' }],
+            });
+
+            return SiteCreator.createSite({ user, siteParams });
+          })
+          .catch((err) => {
+            const expectedError = `Federalist can't confirm org permissions for '${siteParams.owner}'.`
+            + `Either '${siteParams.owner}' hasn't approved access for Federalist or you aren't an org member.`
+            + 'Ensure you are an org member and ask an org owner to authorize Federalist for the organization.';
+
+            expect(err.message).to.equal(expectedError);
+            expect(err.status).to.equal(403);
+            done();
           });
-
-          return SiteCreator.createSite({ user, siteParams });
-        })
-        .catch((err) => {
-          const expectedError = `Federalist can't confirm org permissions for '${siteParams.owner}'. ` +
-            `Either '${siteParams.owner}' hasn't approved access for Federalist or you aren't an org member. ` +
-            'Ensure you are an org member and ask an org owner to authorize Federalist for the organization.';
-
-          expect(err.message).to.equal(expectedError);
-          expect(err.status).to.equal(403);
-          done();
-        });
       });
     });
 
@@ -273,20 +285,20 @@ describe('SiteCreator', () => {
           expect(site.Users[0].id).to.equal(user.id);
           done();
         })
-        .catch(done);
+          .catch(done);
       });
 
       it('should use jekyll as the build engine', (done) => {
         factory.user()
-        .then((model) => {
-          user = model;
-          githubAPINocks.createRepoForOrg();
-          githubAPINocks.webhook();
-          return SiteCreator.createSite({ siteParams, user });
-        }).then((site) => {
-          expect(site.engine).to.equal('jekyll');
-          done();
-        }).catch(done);
+          .then((model) => {
+            user = model;
+            githubAPINocks.createRepoForOrg();
+            githubAPINocks.webhook();
+            return SiteCreator.createSite({ siteParams, user });
+          }).then((site) => {
+            expect(site.engine).to.equal('jekyll');
+            done();
+          }).catch(done);
       });
 
       it('should trigger a build that pushes the source repo to the destiantion repo', (done) => {
@@ -315,51 +327,51 @@ describe('SiteCreator', () => {
 
           done();
         })
-        .catch(done);
+          .catch(done);
       });
 
       it('should create a webhook for the new site', (done) => {
         let webhookNock;
 
         factory.user()
-        .then((model) => {
-          user = model;
-          githubAPINocks.createRepoForOrg();
-          webhookNock = githubAPINocks.webhook({
-            accessToken: user.githubAccessToken,
-            owner: siteParams.owner,
-            repo: siteParams.repository,
-          });
-          return SiteCreator.createSite({ user, siteParams });
-        })
-        .then(() => {
-          expect(webhookNock.isDone()).to.equal(true);
-          done();
-        })
-        .catch(done);
+          .then((model) => {
+            user = model;
+            githubAPINocks.createRepoForOrg();
+            webhookNock = githubAPINocks.webhook({
+              accessToken: user.githubAccessToken,
+              owner: siteParams.owner,
+              repo: siteParams.repository,
+            });
+            return SiteCreator.createSite({ user, siteParams });
+          })
+          .then(() => {
+            expect(webhookNock.isDone()).to.equal(true);
+            done();
+          })
+          .catch(done);
       });
 
       it('should reject if the repo already exists on GitHub', (done) => {
         factory.user()
-        .then((model) => {
-          user = model;
+          .then((model) => {
+            user = model;
 
-          githubAPINocks.createRepoForOrg({
-            accessToken: user.accessToken,
-            org: siteParams.owner,
-            repo: siteParams.repository,
-            response: [422, {
-              errors: [{ message: 'name already exists on this account' }],
-            }],
-          });
-          return SiteCreator.createSite({ user, siteParams });
-        })
-        .catch((err) => {
-          expect(err.status).to.equal(400);
-          expect(err.message).to.equal('A repo with that name already exists.');
-          done();
-        })
-        .catch(done);
+            githubAPINocks.createRepoForOrg({
+              accessToken: user.accessToken,
+              org: siteParams.owner,
+              repo: siteParams.repository,
+              response: [422, {
+                errors: [{ message: 'name already exists on this account' }],
+              }],
+            });
+            return SiteCreator.createSite({ user, siteParams });
+          })
+          .catch((err) => {
+            expect(err.status).to.equal(400);
+            expect(err.message).to.equal('A repo with that name already exists.');
+            done();
+          })
+          .catch(done);
       });
 
       it('should reject if the template does not exist', (done) => {
@@ -370,15 +382,15 @@ describe('SiteCreator', () => {
         };
 
         factory.user()
-        .then((model) => {
-          user = model;
-          return SiteCreator.createSite({ user, siteParams: badSiteParams });
-        }).catch((err) => {
-          expect(err.status).to.eq(400);
-          expect(err.message).to.eq('No such template: not-a-template');
-          done();
-        })
-        .catch(done);
+          .then((model) => {
+            user = model;
+            return SiteCreator.createSite({ user, siteParams: badSiteParams });
+          }).catch((err) => {
+            expect(err.status).to.eq(400);
+            expect(err.message).to.eq('No such template: not-a-template');
+            done();
+          })
+          .catch(done);
       });
     });
 
@@ -390,48 +402,171 @@ describe('SiteCreator', () => {
         let webhookNock;
 
         factory.user()
-        .then((userModel) => {
-          user = userModel;
+          .then((userModel) => {
+            user = userModel;
 
-          return factory.site({ owner: user.username });
-        })
-        .then((siteModel) => {
-          site = siteModel;
+            return factory.site({ owner: user.username });
+          })
+          .then((siteModel) => {
+            site = siteModel;
 
-          return { site, user };
-        })
-        .then((values) => {
-          siteParams = {
-            owner: crypto.randomBytes(3).toString('hex'),
-            repository: crypto.randomBytes(3).toString('hex'),
-            defaultBranch: 'master',
-            source: {
-              owner: values.site.owner,
-              repo: values.site.repository,
-            },
-          };
+            return { site, user };
+          })
+          .then((values) => {
+            siteParams = {
+              owner: crypto.randomBytes(3).toString('hex'),
+              repository: crypto.randomBytes(3).toString('hex'),
+              defaultBranch: 'master',
+              source: {
+                owner: values.site.owner,
+                repo: values.site.repository,
+              },
+            };
 
+            githubAPINocks.repo();
+            githubAPINocks.createRepoForOrg();
+            webhookNock = githubAPINocks.webhook();
+
+            return SiteCreator.createSite({ user: values.user, siteParams })
+              .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
+              .then((model) => {
+                site = model;
+
+                validateSiteExpectations(
+                  site,
+                  siteParams.owner,
+                  siteParams.repository,
+                  user
+                );
+
+                expect(webhookNock.isDone()).to.equal(true);
+                done();
+              })
+              .catch(done);
+          });
+      });
+    });
+
+    context('with a private S3 bucket', () => {
+      let user;
+      let webhookNock;
+
+      const setupWebhook = (accessToken, owner, repo) => githubAPINocks.webhook({
+        accessToken,
+        owner,
+        repo,
+      });
+
+      it('creates new bucket and site record for the given repository, adds the user, webhook, and build', (done) => {
+        const siteParams = {
+          owner: crypto.randomBytes(3).toString('hex'),
+          repository: crypto.randomBytes(3).toString('hex'),
+          sharedBucket: false,
+        };
+
+        const name = `owner-${siteParams.owner}-repo-${siteParams.repository}`;
+        const guid = 'mapped-12345';
+        const appGuid = 'app-12345';
+        const routeGuid = 'route-12345';
+        const keyName = `${name}-key`;
+        const planName = 'basic-public';
+        const planGuid = 'plan-guid';
+        const bucketGuid = 'bucket-guid';
+        const accessKeyId = crypto.randomBytes(3).toString('hex');
+        const secretAccessKey = crypto.randomBytes(3).toString('hex');
+        const region = 'us-gov-other-1';
+        const bucket = 'testing-bucket';
+
+        const instanceRequestBody = { name, service_plan_guid: planGuid };
+        const keyRequestBody = { name, service_instance_guid: bucketGuid };
+
+        const planResponses = {
+          resources: [
+            factory.responses.service({ guid: planGuid }, { name: planName }),
+          ],
+        };
+        const bucketResponse = factory.responses.service({ guid: bucketGuid }, { name });
+        const keyResponse = factory.responses.service({}, {
+          name: keyName,
+          service_instance_guid: bucketGuid,
+          credentials: factory.responses.credentials({
+            access_key_id: accessKeyId,
+            secret_access_key: secretAccessKey,
+            region,
+            bucket,
+          }),
+        });
+
+        const buildResponses = {
+          resources: [
+            factory.responses.service({}, {
+              name,
+              service_instance_guid: bucketGuid,
+              credentials: factory.responses.credentials({
+                access_key_id: accessKeyId,
+                secret_access_key: secretAccessKey,
+                region,
+                bucket,
+              }),
+            }),
+          ],
+        };
+
+        const serviceCredentialsResponses = {
+          resources: [keyResponse],
+        };
+
+        const routeResponse = factory.responses.service({ guid: routeGuid });
+        const mapResponse = factory.responses.service({ guid }, {
+          app_guid: appGuid,
+          route_guid: routeGuid,
+        });
+
+        mockTokenRequest();
+        apiNocks.mockFetchS3ServicePlanGUID(planResponses);
+        apiNocks.mockCreateS3ServiceInstance(instanceRequestBody, bucketResponse);
+        apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
+        apiNocks.mockFetchServiceInstancesRequest(buildResponses);
+        apiNocks.mockFetchServiceInstanceCredentialsRequest('test-guid', serviceCredentialsResponses);
+        apiNocks.mockCreateRoute(routeResponse, {
+          domain_guid: config.env.cfDomainGuid,
+          space_guid: config.env.cfSpaceGuid,
+          host: bucket,
+        });
+        apiNocks.mockMapRoute(mapResponse);
+
+        factory.user().then((model) => {
+          user = model;
           githubAPINocks.repo();
-          githubAPINocks.createRepoForOrg();
-          webhookNock = githubAPINocks.webhook();
 
-          return SiteCreator.createSite({ user: values.user, siteParams })
+          githubAPINocks.userOrganizations({
+            accessToken: user.githubAccessToken,
+            organizations: [{ login: siteParams.owner }],
+          });
+
+          webhookNock = setupWebhook(
+            user.githubAccessToken,
+            siteParams.owner,
+            siteParams.repository
+          );
+
+          return SiteCreator.createSite({ user, siteParams });
+        })
           .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
-          .then((model) => {
-            site = model;
-
+          .then((site) => {
             validateSiteExpectations(
               site,
               siteParams.owner,
               siteParams.repository,
-              user
+              user,
+              name,
+              bucket,
+              region
             );
-
             expect(webhookNock.isDone()).to.equal(true);
             done();
           })
           .catch(done);
-        });
       });
     });
   });

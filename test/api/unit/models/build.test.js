@@ -5,6 +5,16 @@ const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
 
 describe('Build model', () => {
+  let sendMessageStub;
+
+  beforeEach(() => {
+    sendMessageStub = stub(SQS, 'sendBuildMessage');
+  });
+
+  afterEach(() => {
+    sendMessageStub.restore();
+  });
+
   describe('before validate hook', () => {
     it('should add a build token', (done) => {
       let build;
@@ -42,27 +52,20 @@ describe('Build model', () => {
   });
 
   describe('after create hook', () => {
-    let sendMessageStub;
-
-    beforeEach(() => {
-      sendMessageStub = stub(SQS, 'sendBuildMessage');
-    });
-
-    afterEach(() => {
-      sendMessageStub.restore();
-    });
-
     it('should send a build new build message', (done) => {
       factory.build()
-      .then((build) => {
-        const queuedBuild = sendMessageStub.getCall(0).args[0];
+        .then(build => build.completeJob())
+        .then((build) => {
+          const queuedBuild = sendMessageStub.getCall(0).args[0];
+          const buildCount = sendMessageStub.getCall(0).args[1];
 
-        expect(sendMessageStub.called).to.be.true;
-        expect(queuedBuild.id).to.equal(build.id);
+          expect(sendMessageStub.called).to.be.true;
+          expect(queuedBuild.id).to.equal(build.id);
+          expect(buildCount).to.equal(1);
 
-        done();
-      })
-      .catch(done);
+          done();
+        })
+        .catch(done);
     });
   });
 
