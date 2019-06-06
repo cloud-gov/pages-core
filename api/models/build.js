@@ -11,9 +11,9 @@ const afterCreate = (build) => {
     where: { id: build.id },
     include: [User, Site],
   }).then((foundBuild) => {
-    Build.findAndCountAll({
+    Build.count({
       where: { site: foundBuild.site },
-    }).then(result => SQS.sendBuildMessage(foundBuild, result.count));
+    }).then(count => SQS.sendBuildMessage(foundBuild, count));
   });
 };
 
