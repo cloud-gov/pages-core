@@ -122,13 +122,13 @@ if (config.redis) {
     sub.on('connect', () => {
       socket.adapter(redisAdapter({ pubClient: pub, subClient: sub }));
       redisAdapter.pubClient.on('error', (err) => {
-        logger.error(`redisAdapter pubClient error:  ${err}`);
+        logger.error(`redisAdapter pubClient error: ${err}`);
       });
       redisAdapter.subClient.on('error', (err) => {
-        logger.error(`redisAdapter pubClient error:  ${err}`);
+        logger.error(`redisAdapter pubClient error: ${err}`);
       });
       socket.of('/').adapter.on('error', (err) => {
-        logger.error(`redisAdapter error:  ${err}`);
+        logger.error(`redisAdapter error: ${err}`);
       });
     });
   });
@@ -170,6 +170,9 @@ socket.use((_socket, next) => {
 })
 .on('connection', (_socket) => {
   SocketIOSubscriber.joinRooms(_socket);
+})
+.on('error', (err) => {
+  logger.error(`socket auth/subscribe error: ${err}`);
 });
 
 if (process.env.CF_INSTANCE_INDEX === '0') {
