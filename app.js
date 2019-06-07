@@ -125,7 +125,7 @@ if (config.redis) {
         logger.error(`redisAdapter pubClient error: ${err}`);
       });
       redisAdapter.subClient.on('error', (err) => {
-        logger.error(`redisAdapter pubClient error: ${err}`);
+        logger.error(`redisAdapter subClient error: ${err}`);
       });
       socket.of('/').adapter.on('error', (err) => {
         logger.error(`redisAdapter error: ${err}`);
