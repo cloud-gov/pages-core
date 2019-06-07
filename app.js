@@ -114,9 +114,25 @@ app.server = http.Server(app);
 const socket = io(app.server);
 if (config.redis) {
   const redisCreds = { auth_pass: config.redis.password };
+
   const pub = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
-  const sub = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
-  socket.adapter(redisAdapter({ pubClient: pub, subClient: sub }));
+
+  pub.on('connect', () => {
+    const sub = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
+    sub.on('connect', () => {
+      socket.adapter(redisAdapter({ pubClient: pub, subClient: sub }));
+      redisAdapter.pubClient.on('error', (err) => {
+        logger.error('redisAdapter pubClient error: ' + err);
+      });
+      redisAdapter.subClient.on('error', (err) => {
+        logger.error('redisAdapter pubClient error: ' + err);
+      });
+      socket.of('/').adapter.on('error', (err) => {
+        logger.error('redisAdapter error: ' + err);
+      });
+    });
+  })
+
 }
 
 app.use((req, res, next) => {
