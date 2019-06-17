@@ -118,7 +118,7 @@
     "nock": "^10.0.6",
     "node-sass": "^4.11.0",
     "nodemon": "^1.18.10",
-    "nyc": "^13.3.0",
+    "nyc": "^14.1.1",
     "postcss-loader": "^3.0.0",
     "promise-props": "^1.0.0",
     "prop-types": "^15.5.10",
