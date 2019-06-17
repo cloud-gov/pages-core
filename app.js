@@ -115,15 +115,15 @@ const socket = io(app.server);
 if (config.redis) {
   const redisCreds = { auth_pass: config.redis.password };
 
-  socket.adapter(redisAdapter({
-    pubClient: redis.createClient(config.redis.port, config.redis.hostname, redisCreds),
-    subClient: redis.createClient(config.redis.port, config.redis.hostname, redisCreds),
-  }));
+  const pubClient = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
+  const subClient = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
 
-  redisAdapter.pubClient.on('error', (err) => {
+  socket.adapter(redisAdapter({ pubClient, subClient }));
+
+  pubClient.on('error', (err) => {
     logger.error(`redisAdapter pubClient error: ${err}`);
   });
-  redisAdapter.subClient.on('error', (err) => {
+  subClient.on('error', (err) => {
     logger.error(`redisAdapter subClient error: ${err}`);
   });
   socket.of('/').adapter.on('error', (err) => {
