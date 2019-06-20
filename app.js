@@ -114,9 +114,21 @@ app.server = http.Server(app);
 const socket = io(app.server);
 if (config.redis) {
   const redisCreds = { auth_pass: config.redis.password };
-  const pub = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
-  const sub = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
-  socket.adapter(redisAdapter({ pubClient: pub, subClient: sub }));
+
+  const pubClient = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
+  const subClient = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
+
+  socket.adapter(redisAdapter({ pubClient, subClient }));
+
+  pubClient.on('error', (err) => {
+    logger.error(`redisAdapter pubClient error: ${err}`);
+  });
+  subClient.on('error', (err) => {
+    logger.error(`redisAdapter subClient error: ${err}`);
+  });
+  socket.of('/').adapter.on('error', (err) => {
+    logger.error(`redisAdapter error: ${err}`);
+  });
 }
 
 app.use((req, res, next) => {
@@ -155,6 +167,9 @@ socket.use((_socket, next) => {
 })
 .on('connection', (_socket) => {
   SocketIOSubscriber.joinRooms(_socket);
+})
+.on('error', (err) => {
+  logger.error(`socket auth/subscribe error: ${err}`);
 });
 
 if (process.env.CF_INSTANCE_INDEX === '0') {
