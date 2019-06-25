@@ -20,7 +20,7 @@ describe('External authentication request', () => {
       .then(site => {
         request(app)
           .get(`/external/auth/github?site_id=${domain}`)
-          // .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
+          .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
           .expect(302, done);
       });
     });
@@ -53,7 +53,7 @@ describe('External authentication request', () => {
       .then(site => {
         request(app)
           .get(`/external/auth/github?site_id=${domain}`)
-          // .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
+          .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
           .expect(302, done);
       });
     });
