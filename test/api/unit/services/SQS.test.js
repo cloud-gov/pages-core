@@ -9,6 +9,8 @@ const factory = require('../../support/factory');
 const SQS = require('../../../../api/services/SQS');
 const { Build, Site, User } = require('../../../../api/models');
 
+const isS3BucketDedicated = () => false;
+
 describe('SQS', () => {
   afterEach(() => nock.cleanAll());
 
@@ -36,6 +38,7 @@ describe('SQS', () => {
           engine: 'jekyll',
           defaultBranch: 'master',
           s3ServiceName: config.s3.serviceName,
+          isS3BucketDedicated: isS3BucketDedicated,
         },
         User: {
           passport: {
@@ -80,6 +83,7 @@ describe('SQS', () => {
           engine: 'jekyll',
           defaultBranch: 'master',
           s3ServiceName: config.s3.serviceName,
+          isS3BucketDedicated: isS3BucketDedicated,
         },
         User: {
           passport: {

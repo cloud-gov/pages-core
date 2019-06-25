@@ -1,4 +1,5 @@
 const validator = require('validator');
+const config = require('../../config');
 
 const { branchRegex, isValidYaml } = require('../utils/validators');
 
@@ -113,6 +114,10 @@ function isEmptyOrUrl(value) {
   }
 }
 
+function isS3BucketDedicated() {
+  return this.s3ServiceName !== `federalist-${config.app.app_env}-s3`
+}
+
 module.exports = (sequelize, DataTypes) => {
   const Site = sequelize.define('Site', {
     demoBranch: {
@@ -209,6 +214,7 @@ module.exports = (sequelize, DataTypes) => {
   Site.prototype.siteUrl = siteUrl;
   Site.prototype.demoUrl = demoUrl;
   Site.prototype.branchPreviewUrl = branchPreviewUrl;
+  Site.prototype.isS3BucketDedicated = isS3BucketDedicated;
 
   Site.withUsers = id => Site.findByPk(id, { include: [sequelize.models.User] });
 

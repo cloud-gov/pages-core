@@ -4,14 +4,86 @@ const githubAPINocks = require('../support/githubAPINocks');
 const { sessionForCookie } = require('../support/cookieSession');
 const { unauthenticatedSession } = require('../support/session');
 const app = require('../../../app');
+const factory = require('../support/factory');
+const config = require('../../../config');
 
 describe('External authentication request', () => {
   describe('GET /external/auth/github', () => {
     it('should redirect to GitHub for OAuth2 authentication', (done) => {
+      const domain = 'https://cg.test1-site.gov:80'
+      const s3ServiceName = 'my-dedicated-bucket'
+      factory.site({
+        domain,
+        s3ServiceName,
+        users: Promise.all([factory.user()]),
+      })
+      .then(site => {
+        request(app)
+          .get(`/external/auth/github?site_id=${domain}`)
+          // .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
+          .expect(302, done);
+      });
+    });
+
+    it('should redirect to GitHub for OAuth2 authentication - demoDomain', (done) => {
+      const demoDomain = 'https://cg.test4-site.gov'
+      const s3ServiceName = 'my-dedicated-bucket'
+      factory.site({
+        demoDomain,
+        s3ServiceName,
+        users: Promise.all([factory.user()]),
+      })
+      .then(site => {
+        request(app)
+          .get(`/external/auth/github?site_id=${demoDomain}`)
+          .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
+          .expect(302, done);
+      });
+    });
+
+    it('should redirect to GitHub for OAuth2 authentication - bucketname', (done) => {
+      const domain = 'https://cg.test3-site.gov'
+      const s3ServiceName = 'my-dedicated-bucket'
+      const awsBucketName = 'cg'
+      factory.site({
+        s3ServiceName,
+        awsBucketName,
+        users: Promise.all([factory.user()]),
+      })
+      .then(site => {
+        request(app)
+          .get(`/external/auth/github?site_id=${domain}`)
+          // .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
+          .expect(302, done);
+      });
+    });
+  });
+
+  it('should not redirect to GitHub for OAuth2 authentication shared bucket', (done) => {
+    const domain = 'https://test2-site.gov'
+    const s3ServiceName = `federalist-${config.app.app_env}-s3`
+    factory.site({
+      domain,
+      s3ServiceName,
+      users: Promise.all([factory.user()]),
+    })
+    .then(site => {
       request(app)
-        .get('/external/auth/github')
-        .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
-        .expect(302, done);
+        .get(`/external/auth/github?site_id=${domain}`)
+        .expect(403, done);
+    });
+  });
+
+  it('should not redirect to GitHub for OAuth2 authentication w/o site_id', (done) => {
+    const s3ServiceName = `federalist-${config.app.app_env}-s3`
+    factory.site({
+      s3ServiceName,
+      users: Promise.all([factory.user()]),
+    })
+    .then(site => {
+      request(app)
+        .get(`/external/auth/github`)
+        .expect(403, done);
     });
   });
 
