@@ -38,7 +38,7 @@ describe('SQS', () => {
           engine: 'jekyll',
           defaultBranch: 'master',
           s3ServiceName: config.s3.serviceName,
-          isS3BucketDedicated: isS3BucketDedicated,
+          isS3BucketDedicated,
         },
         User: {
           passport: {
@@ -83,7 +83,7 @@ describe('SQS', () => {
           engine: 'jekyll',
           defaultBranch: 'master',
           s3ServiceName: config.s3.serviceName,
-          isS3BucketDedicated: isS3BucketDedicated,
+          isS3BucketDedicated,
         },
         User: {
           passport: {

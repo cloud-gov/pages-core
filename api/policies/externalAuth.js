@@ -18,9 +18,8 @@ module.exports = function externalAuth(req, res, next) {
       });
     })
     .catch(() => res.forbidden({
-        message: 'You are not permitted to perform this action.',
-      })
-    );
+      message: 'You are not permitted to perform this action.',
+    }));
   }
   return res.forbidden({
     message: 'You are not permitted to perform this action.',

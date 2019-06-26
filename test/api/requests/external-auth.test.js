@@ -18,7 +18,7 @@ describe('External authentication request', () => {
         s3ServiceName,
         users: Promise.all([factory.user()]),
       })
-      .then(site => {
+      .then(() => {
         request(app)
           .get(`/external/auth/github?site_id=${siteId}`)
           .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
@@ -35,7 +35,7 @@ describe('External authentication request', () => {
         s3ServiceName,
         users: Promise.all([factory.user()]),
       })
-      .then(site => {
+      .then(() => {
         request(app)
           .get(`/external/auth/github?site_id=${siteId}`)
           .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
@@ -45,15 +45,14 @@ describe('External authentication request', () => {
 
     it('should redirect to GitHub for OAuth2 authentication - bucketname', (done) => {
       const siteId = 'cg.test3-site.gov';
-      const demoDomain = `https://${siteId}`;
       const s3ServiceName = 'my-dedicated-bucket';
-      const awsBucketName = 'cg'
+      const awsBucketName = 'cg';
       factory.site({
         s3ServiceName,
         awsBucketName,
         users: Promise.all([factory.user()]),
       })
-      .then(site => {
+      .then(() => {
         request(app)
           .get(`/external/auth/github?site_id=${siteId}`)
           .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
@@ -71,7 +70,7 @@ describe('External authentication request', () => {
       s3ServiceName,
       users: Promise.all([factory.user()]),
     })
-    .then(site => {
+    .then(() => {
       request(app)
         .get(`/external/auth/github?site_id=${siteId}`)
         .expect(403, done);
@@ -84,9 +83,9 @@ describe('External authentication request', () => {
       s3ServiceName,
       users: Promise.all([factory.user()]),
     })
-    .then(site => {
+    .then(() => {
       request(app)
-        .get(`/external/auth/github`)
+        .get('/external/auth/github')
         .expect(403, done);
     });
   });
