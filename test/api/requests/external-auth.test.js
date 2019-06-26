@@ -10,9 +10,9 @@ const config = require('../../../config');
 describe('External authentication request', () => {
   describe('GET /external/auth/github', () => {
     it('should redirect to GitHub for OAuth2 authentication', (done) => {
-      const site_id = 'cg.test1-site.gov'
-      const domain = `https://${site_id}`
-      const s3ServiceName = 'my-dedicated-bucket'
+      const siteId = 'cg.test1-site.gov';
+      const domain = `https://${siteId}`;
+      const s3ServiceName = 'my-dedicated-bucket';
       factory.site({
         domain,
         s3ServiceName,
@@ -20,16 +20,16 @@ describe('External authentication request', () => {
       })
       .then(site => {
         request(app)
-          .get(`/external/auth/github?site_id=${site_id}`)
+          .get(`/external/auth/github?site_id=${siteId}`)
           .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
           .expect(302, done);
       });
     });
 
     it('should redirect to GitHub for OAuth2 authentication - demoDomain', (done) => {
-      const site_id = 'cg.test4-site.gov'
-      const demoDomain = `https://${site_id}`
-      const s3ServiceName = 'my-dedicated-bucket'
+      const siteId = 'cg.test4-site.gov';
+      const demoDomain = `https://${siteId}`;
+      const s3ServiceName = 'my-dedicated-bucket';
       factory.site({
         demoDomain,
         s3ServiceName,
@@ -37,16 +37,16 @@ describe('External authentication request', () => {
       })
       .then(site => {
         request(app)
-          .get(`/external/auth/github?site_id=${site_id}`)
+          .get(`/external/auth/github?site_id=${siteId}`)
           .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
           .expect(302, done);
       });
     });
 
     it('should redirect to GitHub for OAuth2 authentication - bucketname', (done) => {
-      const site_id = 'cg.test3-site.gov'
-      const demoDomain = `https://${site_id}`
-      const s3ServiceName = 'my-dedicated-bucket'
+      const siteId = 'cg.test3-site.gov';
+      const demoDomain = `https://${siteId}`;
+      const s3ServiceName = 'my-dedicated-bucket';
       const awsBucketName = 'cg'
       factory.site({
         s3ServiceName,
@@ -55,7 +55,7 @@ describe('External authentication request', () => {
       })
       .then(site => {
         request(app)
-          .get(`/external/auth/github?site_id=${site_id}`)
+          .get(`/external/auth/github?site_id=${siteId}`)
           .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
           .expect(302, done);
       });
@@ -63,9 +63,9 @@ describe('External authentication request', () => {
   });
 
   it('should not redirect to GitHub for OAuth2 authentication shared bucket', (done) => {
-    const site_id = 'test2-site.gov'
-    const domain = `https://${site_id}`
-    const s3ServiceName = `federalist-${config.app.app_env}-s3`
+    const siteId = 'test2-site.gov';
+    const domain = `https://${siteId}`;
+    const s3ServiceName = `federalist-${config.app.app_env}-s3`;
     factory.site({
       domain,
       s3ServiceName,
@@ -73,13 +73,13 @@ describe('External authentication request', () => {
     })
     .then(site => {
       request(app)
-        .get(`/external/auth/github?site_id=${domain}`)
+        .get(`/external/auth/github?site_id=${siteId}`)
         .expect(403, done);
     });
   });
 
   it('should not redirect to GitHub for OAuth2 authentication w/o site_id', (done) => {
-    const s3ServiceName = `federalist-${config.app.app_env}-s3`
+    const s3ServiceName = `federalist-${config.app.app_env}-s3`;
     factory.site({
       s3ServiceName,
       users: Promise.all([factory.user()]),

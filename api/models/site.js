@@ -115,7 +115,7 @@ function isEmptyOrUrl(value) {
 }
 
 function isS3BucketDedicated() {
-  return this.s3ServiceName !== `federalist-${config.app.app_env}-s3`
+  return this.s3ServiceName !== `federalist-${config.app.app_env}-s3`;
 }
 
 module.exports = (sequelize, DataTypes) => {
