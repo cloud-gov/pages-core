@@ -85,7 +85,6 @@ passport.deserializeUser((id, next) => {
 });
 
 const externalCallback = (accessToken, _refreshToken, _profile, callback) => {
-  logger.info(`\n\nprofile:\n${JSON.stringify(_profile)}\n\n`)
   GitHub.validateUser(accessToken)
     .then(() => callback(null, { accessToken }))
     .catch((err) => {
