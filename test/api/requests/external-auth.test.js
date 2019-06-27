@@ -6,14 +6,19 @@ const { unauthenticatedSession } = require('../support/session');
 const app = require('../../../app');
 const factory = require('../support/factory');
 const config = require('../../../config');
+const { generateS3ServiceName } = require('../../../api/utils');
 
 describe('External authentication request', () => {
   describe('GET /external/auth/github', () => {
     it('should redirect to GitHub for OAuth2 authentication', (done) => {
       const siteId = 'cg.test1-site.gov';
       const domain = `https://${siteId}`;
-      const s3ServiceName = 'my-dedicated-bucket';
+      const repository = 'repo1'
+      const owner = 'owner1'
+      const s3ServiceName =  `owner-${owner}-repo-${repository}`;
       factory.site({
+        repository,
+        owner,
         domain,
         s3ServiceName,
         users: Promise.all([factory.user()]),
@@ -29,8 +34,12 @@ describe('External authentication request', () => {
     it('should redirect to GitHub for OAuth2 authentication - demoDomain', (done) => {
       const siteId = 'cg.test4-site.gov';
       const demoDomain = `https://${siteId}`;
-      const s3ServiceName = 'my-dedicated-bucket';
+      const repository = 'repo2'
+      const owner = 'owner2'
+      const s3ServiceName =  `owner-${owner}-repo-${repository}`;
       factory.site({
+        repository,
+        owner,
         demoDomain,
         s3ServiceName,
         users: Promise.all([factory.user()]),
@@ -45,9 +54,13 @@ describe('External authentication request', () => {
 
     it('should redirect to GitHub for OAuth2 authentication - bucketname', (done) => {
       const siteId = 'cg.test3-site.gov';
-      const s3ServiceName = 'my-dedicated-bucket';
       const awsBucketName = 'cg';
+      const repository = 'repo1'
+      const owner = 'owner1'
+      const s3ServiceName =  `owner-${owner}-repo-${repository}`;
       factory.site({
+        repository,
+        owner,
         s3ServiceName,
         awsBucketName,
         users: Promise.all([factory.user()]),
@@ -78,8 +91,12 @@ describe('External authentication request', () => {
   });
 
   it('should not redirect to GitHub for OAuth2 authentication w/o site_id', (done) => {
-    const s3ServiceName = `federalist-${config.app.app_env}-s3`;
+    const repository = 'repo3'
+    const owner = 'owner3'
+    const s3ServiceName =  `owner-${owner}-repo-${repository}`;
     factory.site({
+      repository,
+      owner,
       s3ServiceName,
       users: Promise.all([factory.user()]),
     })

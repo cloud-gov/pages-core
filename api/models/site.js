@@ -1,5 +1,6 @@
 const validator = require('validator');
 const config = require('../../config');
+const { generateS3ServiceName } = require('../utils');
 
 const { branchRegex, isValidYaml } = require('../utils/validators');
 
@@ -115,7 +116,7 @@ function isEmptyOrUrl(value) {
 }
 
 function isS3BucketDedicated() {
-  return this.s3ServiceName !== `federalist-${config.app.app_env}-s3`;
+  return this.s3ServiceName == generateS3ServiceName(this.owner, this.repository);
 }
 
 module.exports = (sequelize, DataTypes) => {
