@@ -266,15 +266,16 @@ const getOrganizationMembers = ({ accessToken, organization, role, per_page, pag
   role = role || 'all';
   /* eslint-enable no-param-reassign */
 
-  let orgMembers = [];
+  const orgMembers = [];
   for (let i = 0; i < (per_page + 1); i += 1) {
     if ((i % 50) === 0) {
-      orgMembers.push({ login: `admin-${organization}-${i}`, role: 'admin' });
-    } else {
-      orgMembers.push({ login: `user-${organization}-${i}`, role: 'member' });
+      if (role !== 'member') {
+        orgMembers.push({ login: `admin-${organization}-${i}` });
+      }
+    } else if (role !== 'admin') {
+      orgMembers.push({ login: `user-${organization}-${i}` });
     }
   }
-  if (role !== 'all') { orgMembers = orgMembers.filter(o => o.role === role); }
 
   return nock('https://api.github.com')
     .get(`/orgs/${organization}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}&role=${role}`)
