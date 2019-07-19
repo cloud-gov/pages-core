@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const proxyquire = require('proxyquire').noCallThru();
+const proxyquire = require('proxyquire').noCallThru().noPreserveCache();
 
 const factory = require('../../support/factory');
 const MockGitHub = require('../../support/mockGitHub');
@@ -103,6 +103,31 @@ describe('FederalistUsersHelper', () => {
             expect(f81.length).to.equal(0);
             federalistUsers = MockGitHub.getOrganizationMembers('token', 'federalist-users');
             expect(federalistUsers.length).to.equal(10);
+            done();
+          })
+          .catch(done);
+      });
+
+      it('identify org admins in 18F org', (done) => {
+        let auditorUsername;
+
+        factory.user()
+          .then((user) => {
+            auditorUsername = user.username;
+            return fedUserHelper.federalistUsersAdmins(auditorUsername);
+          })
+          .then((admins) => {
+            expect(admins.length).to.equal(1);
+            MockGitHub.addOrganizationMember('federalist-users', 'non-18F-admin', 'admin');
+            return fedUserHelper.federalistUsersAdmins(auditorUsername);
+          })
+          .then((admins) => {
+            expect(admins.length).to.equal(2);
+            MockGitHub.removeOrganizationMember('token','federalist-users', 'non-18F-admin');
+            return fedUserHelper.federalistUsersAdmins(auditorUsername);
+          })
+          .then((admins) => {
+            expect(admins.length).to.equal(1);
             done();
           })
           .catch(done);

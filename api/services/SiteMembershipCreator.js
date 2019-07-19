@@ -1,23 +1,41 @@
 const GitHub = require('./GitHub');
 const { Site, User } = require('../models');
 const siteErrors = require('../responses/siteErrors');
+const FederalistUsersHelper = require('../services/FederalistUsersHelper');
 
-const checkGithubRepository = ({ user, owner, repository }) =>
-  GitHub.getRepository(user, owner, repository).then((repo) => {
-    if (!repo) {
-      throw {
-        message: `The repository ${owner}/${repository} does not exist.`,
-        status: 400,
-      };
-    }
-    if (!repo.permissions.push) {
-      throw {
-        message: siteErrors.WRITE_ACCESS_REQUIRED,
-        status: 400,
-      };
-    }
-    return true;
-  });
+const checkGithubRepository = ({ user, owner, repository }) => {
+  let repo;
+  return GitHub.getRepository(user, owner, repository)
+    .then((_repo) => {
+      repo = _repo;
+      if (!repo) {
+        throw {
+          message: `The repository ${owner}/${repository} does not exist.`,
+          status: 400,
+        };
+      }
+    })
+    .then(() => {
+      if (!repo.permissions.push) {
+        return FederalistUsersHelper.federalistUsersAdmins(user.username)
+          .then((admins) => {
+            if (!admins.includes(user.username)) {
+              throw {
+                message: siteErrors.WRITE_ACCESS_REQUIRED,
+                status: 400,
+              };
+            }
+          })
+          .catch((err) => {
+            throw {
+              message: siteErrors.WRITE_ACCESS_REQUIRED,
+              status: 400,
+            };
+          });
+      }
+      return true;
+    });
+}
 
 const paramsForExistingSite = siteParams => ({
   owner: siteParams.owner ? siteParams.owner.toLowerCase() : null,

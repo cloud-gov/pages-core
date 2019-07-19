@@ -257,7 +257,7 @@ const getBranch = ({ accessToken, owner, repo, branch, expected }) => {
 };
 
 /* eslint-disable camelcase */
-const getOrganizationMembers = ({ accessToken, organization, role, per_page, page, response }) => {
+const getOrganizationMembers = ({ accessToken, organization, role, per_page, page, response, responseCode }) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   organization = organization || 'test-org';
@@ -278,7 +278,7 @@ const getOrganizationMembers = ({ accessToken, organization, role, per_page, pag
 
   return nock('https://api.github.com')
     .get(`/orgs/${organization}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}&role=${role}`)
-    .reply(response || 200, orgMembers.slice(((page - 1) * per_page), (page * per_page)));
+    .reply(responseCode || 200, response || orgMembers.slice(((page - 1) * per_page), (page * per_page)));
 };
 
 const getTeamMembers = ({ accessToken, team_id, per_page, page, response } = {}) => {

@@ -44,4 +44,14 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
     });
 };
 
-module.exports = { audit18F };
+const federalistUsersAdmins = (auditorUsername = null) => {
+  return User.findOne({ where: { username: auditorUsername } })
+    .then((_auditor) => {
+      auditor = _auditor;
+      return GitHub.getOrganizationMembers(auditor.githubAccessToken, 'federalist-users', 'admin');
+    })
+    .then((members) =>  Promise.all(members.filter(member => member.role === 'admin').map(admin => admin.login)));
+
+}
+
+module.exports = { audit18F, federalistUsersAdmins };
