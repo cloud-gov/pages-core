@@ -26,7 +26,7 @@ const checkGithubRepository = ({ user, owner, repository }) => {
               };
             }
           })
-          .catch((err) => {
+          .catch(() => {
             throw {
               message: siteErrors.WRITE_ACCESS_REQUIRED,
               status: 400,
@@ -35,7 +35,7 @@ const checkGithubRepository = ({ user, owner, repository }) => {
       }
       return true;
     });
-}
+};
 
 const paramsForExistingSite = siteParams => ({
   owner: siteParams.owner ? siteParams.owner.toLowerCase() : null,

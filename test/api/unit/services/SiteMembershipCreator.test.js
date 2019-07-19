@@ -165,7 +165,7 @@ describe('SiteMembershipCreator', () => {
           organization: 'federalist-users',
           role: 'admin',
           response: [{ login: user.username, role: 'admin' }],
-        })
+        });
 
         githubAPINocks.getOrganizationMembers({
           accessToken: user.githubAccessToken,
@@ -173,7 +173,7 @@ describe('SiteMembershipCreator', () => {
           role: 'admin',
           page: 2,
           response: [],
-        })
+        });
 
         return SiteMembershipCreator.createSiteMembership({
           user,

@@ -123,7 +123,7 @@ describe('FederalistUsersHelper', () => {
           })
           .then((admins) => {
             expect(admins.length).to.equal(2);
-            MockGitHub.removeOrganizationMember('token','federalist-users', 'non-18F-admin');
+            MockGitHub.removeOrganizationMember('token', 'federalist-users', 'non-18F-admin');
             return fedUserHelper.federalistUsersAdmins(auditorUsername);
           })
           .then((admins) => {
