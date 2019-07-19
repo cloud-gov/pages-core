@@ -44,7 +44,7 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
     });
 };
 
-const federalistUsersAdmins = (auditorUsername) =>
+const federalistUsersAdmins = auditorUsername =>
   User.findOne({ where: { username: auditorUsername } })
     .then(auditor =>
       GitHub.getOrganizationMembers(auditor.githubAccessToken, 'federalist-users', 'admin'))
