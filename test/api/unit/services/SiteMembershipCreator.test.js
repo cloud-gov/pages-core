@@ -58,7 +58,7 @@ describe('SiteMembershipCreator', () => {
       let user;
 
       Promise.props({
-        userProm: factory.user(),
+        userProm: factory.user({ githubAccessToken: 'mytoken' }),
         siteProm: factory.site(),
       })
       .then(({ siteProm, userProm }) => {
@@ -67,13 +67,26 @@ describe('SiteMembershipCreator', () => {
 
         nock.cleanAll();
         githubAPINocks.repo({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           owner: site.owner,
           repo: site.repository,
           response: [200, { permissions: {
             admin: false,
             push: false,
           } }],
+        });
+
+        githubAPINocks.getOrganizationMembers({
+          accessToken: user.githubAccessToken,
+          organization: 'federalist-users',
+          role: 'admin',
+        });
+        githubAPINocks.getOrganizationMembers({
+          accessToken: user.githubAccessToken,
+          organization: 'federalist-users',
+          role: 'admin',
+          page: 2,
+          response: [],
         });
 
         return SiteMembershipCreator.createSiteMembership({
@@ -122,6 +135,57 @@ describe('SiteMembershipCreator', () => {
         expect(err.message).to.equal("You've already added this site to Federalist");
         done();
       }).catch(done);
+    });
+
+    it('should add the user to the site if user is federalist-users admin', (done) => {
+      let site;
+      let user;
+
+      Promise.props({
+        userProm: factory.user(),
+        siteProm: factory.site(),
+      })
+      .then(({ siteProm, userProm }) => {
+        user = userProm;
+        site = siteProm;
+
+        nock.cleanAll();
+        githubAPINocks.repo({
+          accessToken: user.githubAccessToken,
+          owner: site.owner,
+          repo: site.repository,
+          response: [200, { permissions: {
+            admin: false,
+            push: false,
+          } }],
+        });
+
+        githubAPINocks.getOrganizationMembers({
+          accessToken: user.githubAccessToken,
+          organization: 'federalist-users',
+          role: 'admin',
+          response: [{ login: user.username, role: 'admin' }],
+        });
+
+        githubAPINocks.getOrganizationMembers({
+          accessToken: user.githubAccessToken,
+          organization: 'federalist-users',
+          role: 'admin',
+          page: 2,
+          response: [],
+        });
+
+        return SiteMembershipCreator.createSiteMembership({
+          user,
+          siteParams: { owner: site.owner, repository: site.repository },
+        });
+      })
+      .then(() => site.getUsers({ where: { id: user.id } }))
+      .then((users) => {
+        expect(users).to.have.lengthOf(1);
+        done();
+      })
+      .catch(done);
     });
 
     it('should reject if the repository does not exist', (done) => {
