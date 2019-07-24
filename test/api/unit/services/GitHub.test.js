@@ -471,4 +471,67 @@ describe('GitHub', () => {
     });
     /* eslint-enable camelcase */
   });
+
+  describe('.sendCreateGithubStatusRequest', () => {
+    it('sends a github status request and passes on last attempt', (done) => {
+      const accessToken = 'token';
+      const context = `federalist-${config.app.app_env}/build`;
+      const targetURL = `${config.app.hostname}/sites/1/builds/1/logs`;
+      const options = {
+        owner: 'test-owner',
+        repo: 'test-repo',
+        sha: '12344',
+        state: 'success',
+        targetURL,
+        target_url: targetURL,
+        context,
+      };
+
+      const failOptions = Object.assign({}, options);
+      failOptions.response = [404, 'File not found'];
+
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+      const statusNock = githubAPINocks.status(options);
+
+      GitHub.sendCreateGithubStatusRequest(accessToken, options)
+        .then(() => {
+          expect(statusNock.isDone()).to.be.true;
+          done();
+        }).catch(done);
+    });
+
+    it('sends a github status request and failOptions', (done) => {
+      const accessToken = 'token';
+      const context = `federalist-${config.app.app_env}/build`;
+      const targetURL = `${config.app.hostname}/sites/1/builds/1/logs`;
+      const options = {
+        owner: 'test-owner',
+        repo: 'test-repo',
+        sha: '12344',
+        state: 'success',
+        targetURL,
+        target_url: targetURL,
+        context,
+      };
+
+      const failOptions = Object.assign({}, options);
+      failOptions.response = [404, 'File not found'];
+
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+
+      GitHub.sendCreateGithubStatusRequest(accessToken, options)
+        .catch((err) => {
+          expect(err.status).to.equal('Not Found');
+          expect(err.message).to.equal('File not found');
+          done();
+        }).catch(done);
+    });
+  });
 });
