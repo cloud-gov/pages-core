@@ -87,7 +87,6 @@ const generateDefaultCredentials = build => ({
   SKIP_LOGGING: config.app.app_env === 'development',
   AUTH_BASEURL: process.env.APP_HOSTNAME,
   AUTH_ENDPOINT: 'external/auth/github',
-  BUCKET_TYPE: build.Site.isS3BucketDedicated() ? 'dedicated' : 'shared',
 });
 
 const buildContainerEnvironment = (build) => {
