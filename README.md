@@ -5,7 +5,7 @@
 [![Test Coverage](https://codeclimate.com/github/18F/federalist/badges/coverage.svg)](https://codeclimate.com/github/18F/federalist/coverage)
 [![Known Vulnerabilities](https://snyk.io/test/github/18F/federalist/badge.svg)](https://snyk.io/test/github/18F/federalist)
 
-***Federalist is updated regularly. [Join our public chat room](https://chat.18f.gov/) to talk to us and stay informed. You can also check out our [documentation](https://federalist-docs.18f.gov/) to learn more.***
+***Federalist is updated regularly. [Join our public chat room](https://chat.18f.gov/) to talk to us and stay informed. You can also check out our [documentation](https://federalist.18f.gov/) to learn more.***
 
 ## About Federalist
 
