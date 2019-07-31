@@ -89,6 +89,7 @@ module.exports = {
 
   status: (req, res) => {
     const message = decodeb64(req.body.message);
+    let build;
     Promise.resolve(Number(req.params.id))
     .then((id) => {
       if (isNaN(id)) {
@@ -96,20 +97,21 @@ module.exports = {
       }
       return Build.findByPk(id);
     })
-    .then((build) => {
-      if (!build) {
+    .then((_build) => {
+      if (!_build) {
         throw 404;
-      } else if (build.token !== req.params.token) {
+      } else if (_build.token !== req.params.token) {
         throw 403;
       } else {
-        return build.completeJob(message);
+        return _build.completeJob(message);
       }
     })
-    .then(build => Promise.all([
-      emitBuildStatus(res.socket, build),
-      GithubBuildStatusReporter.reportBuildStatus(build),
-    ]))
+    .then((_build) => {
+      build = _build;
+      return GithubBuildStatusReporter.reportBuildStatus(build)
+    })
     .then(() => res.ok())
-    .catch(res.error);
+    .catch(res.error)
+    .then(() => emitBuildStatus(res.socket, build));
   },
 };
