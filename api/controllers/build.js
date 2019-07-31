@@ -108,7 +108,7 @@ module.exports = {
     })
     .then((_build) => {
       build = _build;
-      return GithubBuildStatusReporter.reportBuildStatus(build)
+      return GithubBuildStatusReporter.reportBuildStatus(build);
     })
     .then(() => res.ok())
     .catch(res.error)
