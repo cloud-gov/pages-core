@@ -105,10 +105,10 @@ module.exports = {
         return build.completeJob(message);
       }
     })
-    .then(build => Promise.all([
-      emitBuildStatus(res.socket, build),
-      GithubBuildStatusReporter.reportBuildStatus(build),
-    ]))
+    .then((build) => {
+      emitBuildStatus(res.socket, build);
+      return GithubBuildStatusReporter.reportBuildStatus(build);
+    })
     .then(() => res.ok())
     .catch(res.error);
   },

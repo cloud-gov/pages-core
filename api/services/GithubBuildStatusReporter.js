@@ -69,6 +69,7 @@ const loadBuildUserAccessToken = build =>
 
 const reportBuildStatus = (build) => {
   let site;
+  let options = {};
 
   return new Promise((resolve, reject) => {
     if (!build || !build.commitSha) {
@@ -89,7 +90,7 @@ const reportBuildStatus = (build) => {
     const context = config.app.app_env === 'production'
       ? 'federalist/build' : `federalist-${config.app.app_env}/build`;
 
-    const options = {
+    options = {
       owner: site.owner,
       repo: site.repository,
       sha: build.commitSha,
@@ -112,7 +113,7 @@ const reportBuildStatus = (build) => {
     return GitHub.sendCreateGithubStatusRequest(accessToken, options);
   })
   .catch((error) => {
-    logger.error('Error reporting build status to GitHub: ', error);
+    logger.error(`Error reporting build status ${JSON.stringify(options)} to GitHub: `, error);
   });
 };
 

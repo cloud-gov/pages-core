@@ -169,7 +169,7 @@ const repo = ({ accessToken, owner, repo, response } = {}) => {
 };
 
 // eslint-disable-next-line no-shadow
-const status = ({ accessToken, owner, repo, sha, state, targetURL } = {}) => {
+const status = ({ accessToken, owner, repo, sha, state, targetURL, response } = {}) => {
   let path;
   if (owner && repo && sha) {
     path = `/repos/${owner}/${repo}/statuses/${sha}`;
@@ -198,7 +198,16 @@ const status = ({ accessToken, owner, repo, sha, state, targetURL } = {}) => {
     statusNock = statusNock.query(true);
   }
 
-  return statusNock.reply(201, { id: 1 });
+  const typicalResponse = { id: 1 };
+
+  let resp = response || 201;
+  if (typeof resp === 'number') {
+    resp = [resp, typicalResponse];
+  } else if (resp[1] === undefined) {
+    resp[1] = typicalResponse;
+  }
+
+  return statusNock.reply(...resp);
 };
 
 // eslint-disable-next-line no-shadow
@@ -257,7 +266,7 @@ const getBranch = ({ accessToken, owner, repo, branch, expected }) => {
 };
 
 /* eslint-disable camelcase */
-const getOrganizationMembers = ({ accessToken, organization, role, per_page, page, response }) => {
+const getOrganizationMembers = ({ accessToken, organization, role, per_page, page, response, responseCode }) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   organization = organization || 'test-org';
@@ -266,19 +275,20 @@ const getOrganizationMembers = ({ accessToken, organization, role, per_page, pag
   role = role || 'all';
   /* eslint-enable no-param-reassign */
 
-  let orgMembers = [];
+  const orgMembers = [];
   for (let i = 0; i < (per_page + 1); i += 1) {
     if ((i % 50) === 0) {
-      orgMembers.push({ login: `admin-${organization}-${i}`, role: 'admin' });
-    } else {
-      orgMembers.push({ login: `user-${organization}-${i}`, role: 'member' });
+      if (role !== 'member') {
+        orgMembers.push({ login: `admin-${organization}-${i}` });
+      }
+    } else if (role !== 'admin') {
+      orgMembers.push({ login: `user-${organization}-${i}` });
     }
   }
-  if (role !== 'all') { orgMembers = orgMembers.filter(o => o.role === role); }
 
   return nock('https://api.github.com')
     .get(`/orgs/${organization}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}&role=${role}`)
-    .reply(response || 200, orgMembers.slice(((page - 1) * per_page), (page * per_page)));
+    .reply(responseCode || 200, response || orgMembers.slice(((page - 1) * per_page), (page * per_page)));
 };
 
 const getTeamMembers = ({ accessToken, team_id, per_page, page, response } = {}) => {
