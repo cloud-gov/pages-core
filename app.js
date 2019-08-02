@@ -174,14 +174,14 @@ socket.use((_socket, next) => {
 
 if (process.env.CF_INSTANCE_INDEX === '0') {
   // verify site's repositories exist
-  schedule.scheduleJob('0 0 * * *', () => {
+  schedule.scheduleJob('10 0 * * *', () => {
     logger.info('Verifying Repos');
     RepositoryVerifier.verifyRepos()
       .catch(logger.error);
   });
 
   // audit users and remove sites w/o repo push permissions
-  schedule.scheduleJob('0 0 * * *', () => {
+  schedule.scheduleJob('15 0 * * *', () => {
     logger.info('Auditing All Sites');
     SiteUserAuditor.auditAllSites()
       .catch(logger.error);
@@ -189,9 +189,18 @@ if (process.env.CF_INSTANCE_INDEX === '0') {
 
   if (config.app.app_env === 'production') {
     // audit federalist-users 18F teams daily at midnight
-    schedule.scheduleJob('0 0 * * *', () => {
+    schedule.scheduleJob('0 20 * * *', () => {
       logger.info('Auditing federalist-users 18F Staff & Org Teams');
       FederalistUsersHelper.audit18F({})
+        .catch(logger.error);
+    });
+  }
+
+  if (config.app.app_env === 'production') {
+    // audit federalist-users 18F teams daily at midnight
+    schedule.scheduleJob('0 0 * * *', () => {
+      logger.info('Running nightlyBuilds');
+      ScheduledBuilderHelper.nightlyBuilds()
         .catch(logger.error);
     });
   }
