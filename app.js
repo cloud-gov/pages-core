@@ -34,7 +34,7 @@ const jwtHelper = require('./api/services/jwtHelper');
 const FederalistUsersHelper = require('./api/services/FederalistUsersHelper');
 const RepositoryVerifier = require('./api/services/RepositoryVerifier');
 const SiteUserAuditor = require('./api/services/SiteUserAuditor');
-const ScheduledBuilderHelper = require('./api/services/ScheduledBuilderHelper');
+const ScheduledBuildHelper = require('./api/services/ScheduledBuildHelper');
 
 const app = express();
 const sequelize = require('./api/models').sequelize;
@@ -201,7 +201,7 @@ if (process.env.CF_INSTANCE_INDEX === '0') {
     // audit federalist-users 18F teams daily at midnight
     schedule.scheduleJob('0 0 * * *', () => {
       logger.info('Running nightlyBuilds');
-      ScheduledBuilderHelper.nightlyBuilds()
+      ScheduledBuildHelper.nightlyBuilds()
         .catch(logger.error);
     });
   }
