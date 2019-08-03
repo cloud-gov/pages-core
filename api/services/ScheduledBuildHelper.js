@@ -19,6 +19,7 @@ const buildSite = site =>
     if (config.schedule === 'nightly') {
       return buildBranch(site, site.defaultBranch);
     }
+    return Promise.resolve();
   })
   .catch(err =>
     logger.error(`Error siteBuilds: (${site.owner}/${site.repository}@${site.demoBranch})\n${err}`))
@@ -27,6 +28,7 @@ const buildSite = site =>
     if (demoConfig.schedule === 'nightly') {
       return buildBranch(site, site.demoBranch);
     }
+    return Promise.resolve();
   })
   .catch(err =>
     logger.error(`Error siteBuilds: (${site.owner}/${site.repository}@${site.demoBranch})\n${err}`));
