@@ -33,7 +33,7 @@ describe('ScheduledBuildHelper', () => {
         expect(sites.length).to.eql(2);
         return ScheduledBuildHelper.nightlyBuilds()
       })
-      .then(() => Build.findAll({ site: sites.map(site => site.id) }))
+      .then(() => Build.findAll({ where: { site: sites.map(site => site.id) } }))
       .then((builds) => {
         expect(builds.length).to.eql(2);
         expect(builds.filter(build => build.branch === 'master').length).to.eql(1);
