@@ -12,7 +12,6 @@ const buildBranch = (site, branch) =>
     }))
     .catch(err =>
       logger.error(`Error creating build: ${site.owner}/${site.repository}@${branch}\n${err}`));
-    
 
 const buildSite = site =>
   Promise.resolve(yaml.safeLoad(site.config))
@@ -57,9 +56,9 @@ const nightlyBuilds = () =>
           },
         },
       ],
-    }
+    },
   })
   .then(sites => Promise.all(sites.map(site => buildSite(site))))
-  .catch(err => logger.error(`Error scheduling all builds:\t${err}`));  
+  .catch(err => logger.error(`Error scheduling all builds:\t${err}`));
 
 module.exports = { nightlyBuilds };

@@ -34,6 +34,7 @@ const jwtHelper = require('./api/services/jwtHelper');
 const FederalistUsersHelper = require('./api/services/FederalistUsersHelper');
 const RepositoryVerifier = require('./api/services/RepositoryVerifier');
 const SiteUserAuditor = require('./api/services/SiteUserAuditor');
+const ScheduledBuilderHelper = require('./api/services/ScheduledBuilderHelper');
 
 const app = express();
 const sequelize = require('./api/models').sequelize;
