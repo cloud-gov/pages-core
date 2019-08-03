@@ -14,7 +14,7 @@ describe('ScheduledBuildHelper', () => {
   context('nightlyBuilds', () => {
     it('it should remove sites without push from user and site w/o repo', (done) => {
       let sites;
-      config = { schedule: 'nightly' };
+      const config = { schedule: 'nightly' };
       factory.site({
         owner: 'scheduled',
         config: yaml.safeDump(config),
@@ -28,10 +28,10 @@ describe('ScheduledBuildHelper', () => {
         demoConfig: yaml.safeDump(config),
       }))
       .then(() => Site.findAll({ where: { owner: 'scheduled' } }))
-      .then(_sites => {
+      .then((_sites) => {
         sites = _sites;
         expect(sites.length).to.eql(2);
-        return ScheduledBuildHelper.nightlyBuilds()
+        return ScheduledBuildHelper.nightlyBuilds();
       })
       .then(() => Build.findAll({ where: { site: sites.map(site => site.id) } }))
       .then((builds) => {
