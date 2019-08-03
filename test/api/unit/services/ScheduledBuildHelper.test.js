@@ -13,23 +13,27 @@ describe('ScheduledBuildHelper', () => {
 
   context('nightlyBuilds', () => {
     it('it should remove sites without push from user and site w/o repo', (done) => {
+      let sites;
       config = { schedule: 'nightly' };
       factory.site({
+        owner: 'scheduled',
         config: yaml.safeDump(config),
         defaultBranch: 'master',
         demoConfig: yaml.safeDump(config),
         demoBranch: 'staging',
       })
       .then(() => factory.site({
+        owner: 'scheduled',
         config: yaml.safeDump(config),
         demoConfig: yaml.safeDump(config),
       }))
-      .then(() => Site.count())
-      .then(count => {
-        expect(count).to.eql(2);
+      .then(() => Site.findAll({ where: { owner: 'scheduled' } }))
+      .then(_sites => {
+        sites = _sites;
+        expect(sites.length).to.eql(2);
+        return ScheduledBuildHelper.nightlyBuilds()
       })
-      .then(() => ScheduledBuildHelper.nightlyBuilds())
-      .then(() => Build.findAll())
+      .then(() => Build.findAll({ site: sites.map(site => site.id) }))
       .then((builds) => {
         expect(builds.length).to.eql(2);
         expect(builds.filter(build => build.branch === 'master').length).to.eql(1);
