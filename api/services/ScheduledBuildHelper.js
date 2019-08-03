@@ -25,7 +25,7 @@ const buildSite = site =>
     logger.error(`Error siteBuilds: (${site.owner}/${site.repository}@${site.demoBranch})\n${err}`))
   .then(() => Promise.resolve(yaml.safeLoad(site.demoConfig)))
   .then((demoConfig) => {
-    if (demoConfig.schedule === 'nightly') {
+    if (site.demoBranch && demoConfig.schedule === 'nightly') {
       return buildBranch(site, site.demoBranch);
     }
     return Promise.resolve();
@@ -46,6 +46,8 @@ const nightlyBuilds = () =>
               [Op.like]: '%schedule: nightly%',
             },
           },
+        },
+        {
           [Op.and]: {
             demoBranch: {
               [Op.ne]: null,

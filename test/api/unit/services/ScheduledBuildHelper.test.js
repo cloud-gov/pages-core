@@ -24,21 +24,27 @@ describe('ScheduledBuildHelper', () => {
       })
       .then(() => factory.site({
         owner: 'scheduled',
-        config: yaml.safeDump(config),
+        demoBranch: 'staging',
         demoConfig: yaml.safeDump(config),
+      }))
+      .then(() => factory.site({
+        owner: 'scheduled',
+        demoConfig: yaml.safeDump(config),
+      }))
+      .then(() => factory.site({
+        owner: 'scheduled',
       }))
       .then(() => Site.findAll({ where: { owner: 'scheduled' } }))
       .then((_sites) => {
         sites = _sites;
-        expect(sites.length).to.eql(2);
+        expect(sites.length).to.eql(4);
         return ScheduledBuildHelper.nightlyBuilds();
       })
       .then(() => Build.findAll({ where: { site: sites.map(site => site.id) } }))
       .then((builds) => {
-        expect(builds.length).to.eql(2);
+        expect(builds.length).to.eql(3);
         expect(builds.filter(build => build.branch === 'master').length).to.eql(1);
-        expect(builds.filter(build => build.branch === 'staging').length).to.eql(1);
-        expect(builds[0].site).to.eql(builds[1].site);
+        expect(builds.filter(build => build.branch === 'staging').length).to.eql(2);
         done();
       })
       .catch(done);
