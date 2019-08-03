@@ -5,13 +5,13 @@ const { Build, Site, User } = require('../models');
 
 const buildBranch = (site, branch) =>
   User.findOne({ where: { username: process.env.USER_AUDITOR } })
-    .then(user => Build.create({
-      site: site.id,
-      user: user.id,
-      branch,
-    }))
-    .catch(err =>
-      logger.error(`Error creating build: ${site.owner}/${site.repository}@${branch}\n${err}`));
+    .then(user =>
+      Build.create({
+        site: site.id,
+        user: user.id,
+        branch,
+      })
+    );
 
 const buildSite = site =>
   Promise.resolve(yaml.safeLoad(site.config))
@@ -19,7 +19,6 @@ const buildSite = site =>
     if (config.schedule === 'nightly') {
       return buildBranch(site, site.defaultBranch);
     }
-    return Promise.resolve();
   })
   .catch(err =>
     logger.error(`Error siteBuilds: (${site.owner}/${site.repository}@${site.demoBranch})\n${err}`))
@@ -28,7 +27,6 @@ const buildSite = site =>
     if (demoConfig.schedule === 'nightly') {
       return buildBranch(site, site.demoBranch);
     }
-    return Promise.resolve();
   })
   .catch(err =>
     logger.error(`Error siteBuilds: (${site.owner}/${site.repository}@${site.demoBranch})\n${err}`));
@@ -58,7 +56,6 @@ const nightlyBuilds = () =>
       ],
     },
   })
-  .then(sites => Promise.all(sites.map(site => buildSite(site))))
-  .catch(err => logger.error(`Error scheduling all builds:\t${err}`));
+  .then(sites => Promise.all(sites.map(site => buildSite(site))));
 
 module.exports = { nightlyBuilds };
