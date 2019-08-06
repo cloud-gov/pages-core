@@ -190,7 +190,7 @@ if (process.env.CF_INSTANCE_INDEX === '0') {
 
   if (config.app.app_env === 'production') {
     // audit federalist-users 18F teams daily at midnight
-    schedule.scheduleJob('0 20 * * *', () => {
+    schedule.scheduleJob('20 0 * * *', () => {
       logger.info('Auditing federalist-users 18F Staff & Org Teams');
       FederalistUsersHelper.audit18F({})
         .catch(logger.error);
