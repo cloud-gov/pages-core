@@ -75,7 +75,7 @@ class SiteSettings extends React.Component {
             target="_blank"
             rel="noopener noreferrer"
             title="Federalist documentation on settings"
-            href="https://federalist-docs.18f.gov/pages/using-federalist/#managing-site-settings"
+            href="https://federalist.18f.gov/documentation/#managing-site-settings"
           >
             these settings
           </a>
@@ -86,7 +86,7 @@ class SiteSettings extends React.Component {
             target="_blank"
             rel="noopener noreferrer"
             title="Federalist documentation on previews"
-            href="https://federalist-docs.18f.gov/pages/using-federalist/previews/"
+            href="https://federalist.18f.gov/documentation/previews/"
           >
             viewing site previews
           </a>.
