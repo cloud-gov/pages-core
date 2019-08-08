@@ -28,6 +28,7 @@
 # RUNNING THE SCRIPT
 
 COMMAND=$1
+SHARED_BUCKET_SERVICE='federalist-staging-s3'
 
 ## Start an ssh session
 function startssh() {
@@ -65,38 +66,75 @@ function set_s3_credentials() {
   export AWS_DEFAULT_REGION=`echo "$S3_CREDENTIALS" | jq -r '.region'`
 }
 
+## Check if s3 bucket file
+function is_bucket_file() {
+    file_name=$(echo $1 | rev | cut -d'/' -f1 | rev)
+
+    if [[ $file_name == *.* ]]; then
+        echo 'true'
+    else
+        echo 'false'
+    fi
+}
+
 ## Copy Site from shared to dedicated bucket
 function cp_site() {
     shared_service=$1
     owner=$2
     repo=$3
+    directory=$4
     proxy_url='https://federalist-proxy-staging.app.cloud.gov'
     dedicated_service="owner-$owner-repo-$repo"
-    tmp_dir="./tmp-$dedicated_service"
-    site_path="/site/$owner/$repo/"
+    site_path="/$directory/$owner/$repo/"
+    tmp_dir="./tmp-$directory-$owner-$repo"
+
+    mkdir -p $tmp_dir
 
     set_s3_credentials $shared_service
 
     echo "Copying site from \"$BUCKET_NAME$site_path\""
-    # aws s3 sync s3://$BUCKET_NAME$site_path $tmp_dir --content-encoding
 
-    file_urls=$(aws s3 ls --recursive s3://$BUCKET_NAME/site/$owner/$repo/ | tr -s ' ' '^' | cut -d'^' -f4)
+    file_urls=$(aws s3 ls --recursive s3://$BUCKET_NAME$site_path | tr -s ' ' '^' | cut -d'^' -f4)
 
     for file_url in $file_urls; do
-        # echo "$tmp_dir/$file_url"
-        curl $proxy_url/$file_url --create-dirs -o "$tmp_dir/$file_url"
+        is_file=$(is_bucket_file $file_url)
+
+        if [[ $is_file == "false" ]]; then
+            continue
+        fi
+
+        echo $is_file
+        echo $file_url
+        curl --create-dirs -o "$tmp_dir/$file_url" $proxy_url/$file_url
     done
 
     set_s3_credentials $dedicated_service
 
     echo "Copying site to \"$BUCKET_NAME$site_path\""
-    aws s3 sync $tmp_dir/site s3://$BUCKET_NAME/site
+    aws s3 sync $tmp_dir/$directory s3://$BUCKET_NAME/$directory
 
     rm -rf $tmp_dir
 }
 
 if [ "$COMMAND" == "cp_site" ] && [ "$2" != "help" ]; then
-    cp_site $2 $3 $4
+    cp_site $2 $3 $4 $5
+fi
+
+
+## Start psql session
+function startpsql() {
+    user=$1
+    password=$2
+    host=$3
+    port=$4
+    name=$5
+    connection_string="postgres://$user:$password@$host:$port/$name"
+
+    psql $connection_string
+}
+
+if [ "$COMMAND" == "startpsql" ] && [ "$2" != "help" ]; then
+    startpsql $2 $3 $4 $5 $6
 fi
 
 ## Get a list of sites to migrate
@@ -111,6 +149,7 @@ from site
     and \"deletedAt\" is NULL;
 "
 
+## List Sites ready to be migrated
 function getsites() {
     user=$1
     password=$2
@@ -136,21 +175,33 @@ if [ "$COMMAND" == "getsites" ] && [ "$2" == "help" ]; then
 fi
 
 
-## Start psql session
-function startpsql() {
-    user=$1
-    password=$2
-    host=$3
-    port=$4
-    name=$5
+## Update site s3ServiceName and awsBucketName after infrastructure migration
+function update_site_table() {
+    owner=$1
+    repository=$2
+    user=$3
+    password=$4
+    host=$5
+    port=$6
+    name=$7
+    dedicated_service="owner-$owner-repo-$repo"
     connection_string="postgres://$user:$password@$host:$port/$name"
 
-    psql $connection_string
-}
+    # Set credentials to get new bucket name
+    set_s3_credentials $dedicated_service
 
-if [ "$COMMAND" == "startpsql" ] && [ "$2" != "help" ]; then
-    startpsql $2 $3 $4 $5 $6
-fi
+    UPDATE_SQL="
+    update site
+        set
+            \"s3ServiceName\" = '$dedicated_service',
+            \"awsBucketName\" = '$BUCKET_NAME'
+        where
+            owner = '$owner' and
+            repository = '$repository';
+    "
+
+    psql $connection_string -c "$UPDATE_SQL"
+}
 
 
 ## Setup Bucket Website
@@ -245,11 +296,33 @@ function update_cdn() {
 
 ## Run site migration
 function migrate() {
-    shared_service=$1
-    owner=$2
-    repo=$3
-    proxy_app=$4
-    space=$5
+    shared_service=${1}
+    owner=${2}
+    repo=${3}
+    proxy_app=${4}
+    space=${5}
+    user=${6}
+    password=${7}
+    host=${8}
+    port=${9}
+    name=${10}
+
+    echo ""
+    echo "Migration Settings"
+    echo "shared_service $shared_service"
+    echo "owner $owner"
+    echo "repo $repo"
+    echo "proxy_app $proxy_app"
+    echo "space $space"
+    echo "user $user"
+    echo "password $password"
+    echo "host $host"
+    echo "port $port"
+    echo "name $name"
+    echo ""
+
+    # Start time
+    start_time=$(date +%s)
 
     # Set CF space
     cf target -s $space;
@@ -258,18 +331,30 @@ function migrate() {
     create_infrastructure $owner $repo $proxy_app $space;
 
     # Copy site from shared bucket into dedicated bucket
-    cp_site $shared_service $owner $repo;
+    cp_site $shared_service $owner $repo "site";
+    cp_site $shared_service $owner $repo "demo";
+    cp_site $shared_service $owner $repo "preview";
+
+    # Update database with new s3ServiceName and awsBucketName
+    update_site_table $owner $repo $user $password $host $port $name
+
+    # End time
+    end_time=$(date +%s)
+    run_time=$(((end_time-start_time)/60))
+    echo ""
+    echo "Total Time: $run_time minutes"
+    echo ""
 }
 
 if [ "$COMMAND" == "migrate" ] && [ "$2" != "help" ]; then
-    migrate $2 $3 $4 $5 $6
+    migrate ${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9} ${10} ${11}
 fi
 
 if [ "$COMMAND" == "create_infrastructure" ] && [ "$2" == "help" ]; then
-    echo 'HELP'
-    echo ''
+    echo "HELP"
+    echo ""
     echo "\"$COMMAND\" takes three arguments in order: shared bucket service name, owner, repository, proxy_app_name, cf space"
     echo "      sEXAMPLE: $> ./scripts/migrate-site-bucket.sh migrate <s3 shared service> <owner> <repo> <proxy app name> <space name>"
-    echo ''
-    echo ''
+    echo ""
+    echo ""
 fi
