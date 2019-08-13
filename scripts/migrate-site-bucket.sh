@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 # README
 # This script migrates a site using the shared bucket into its own dedicated bucket
@@ -281,10 +281,11 @@ function update_cdn() {
     bucket=$2
     owner=$3
     repo=$4
+    deploymnent=$5
 
     domain_route="$domain-route"
     origin="$bucket.app.cloud.gov"
-    path="/site/$owner/$repo"
+    path="/$deploymnent/$owner/$repo"
 
     cf target -s sites;
 
@@ -293,6 +294,9 @@ function update_cdn() {
         -c "{\"domain\": \"$domain\",\"origin\": \"$origin\", \"path\": \"$path\"}";
 }
 
+if [ "$COMMAND" == "update_cdn" ] && [ "$2" != "help" ]; then
+    update_cdn ${2} ${3} ${4} ${5}
+fi
 
 ## Run site migration
 function migrate() {
@@ -306,6 +310,8 @@ function migrate() {
     host=${8}
     port=${9}
     name=${10}
+    site_url=${11}
+    demo_url=${12}
 
     echo ""
     echo "Migration Settings"
@@ -319,7 +325,12 @@ function migrate() {
     echo "host $host"
     echo "port $port"
     echo "name $name"
+    echo "site_url $site_url"
+    echo "demo_url $demo_url"
     echo ""
+
+    # Set additional variables
+    s3_service_name="owner-$owner-repo-$repo"
 
     # Start time
     start_time=$(date +%s)
@@ -338,6 +349,27 @@ function migrate() {
     # Update database with new s3ServiceName and awsBucketName
     update_site_table $owner $repo $user $password $host $port $name
 
+
+    # Set CF space to get AWS info
+    cf target -s $space;
+
+    # Grab AWS credentials
+    set_s3_credentials $s3_service_name
+
+    if [[ ! -z $site_url ]]; then
+        update_cdn $site_url $BUCKET_NAME $owner $repo "site"
+    fi
+
+    # Reset CF space to get AWS info
+    cf target -s $space;
+
+    # Grab AWS credentials
+    set_s3_credentials $s3_service_name
+
+    if [[ ! -z $demo_url ]]; then
+        update_cdn $demo_url $BUCKET_NAME $owner $repo "demo"
+    fi
+
     # End time
     end_time=$(date +%s)
     run_time=$(((end_time-start_time)/60))
@@ -347,14 +379,26 @@ function migrate() {
 }
 
 if [ "$COMMAND" == "migrate" ] && [ "$2" != "help" ]; then
-    migrate ${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9} ${10} ${11}
+    migrate ${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9} ${10} ${11} ${12} ${13}
 fi
 
-if [ "$COMMAND" == "create_infrastructure" ] && [ "$2" == "help" ]; then
+if [ "$COMMAND" == "migrate" ] && [ "$2" == "help" ]; then
     echo "HELP"
     echo ""
     echo "\"$COMMAND\" takes three arguments in order: shared bucket service name, owner, repository, proxy_app_name, cf space"
-    echo "      sEXAMPLE: $> ./scripts/migrate-site-bucket.sh migrate <s3 shared service> <owner> <repo> <proxy app name> <space name>"
+    echo "      sEXAMPLE: $> ./scripts/migrate-site-bucket.sh migrate \ "
+    echo "                    <shared_service> \ "
+    echo "                    <owner> \ "
+    echo "                    <repo> \ "
+    echo "                    <proxy_app> \ "
+    echo "                    <space> \ "
+    echo "                    <user> \ "
+    echo "                    <password> \ "
+    echo "                    <host> \ "
+    echo "                    <port> \ "
+    echo "                    <name> \ "
+    echo "                    <site_url> \ "
+    echo "                    <demo_url>  "
     echo ""
     echo ""
 fi
