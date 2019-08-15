@@ -27,18 +27,62 @@
 
 # RUNNING THE SCRIPT
 
-COMMAND=$1
-SHARED_BUCKET_SERVICE='federalist-staging-s3'
+# The steps to start migrating sites
 
-## Start an ssh session
+# In a seperate terminal tab or window start an database ssh session by running
+#         Run `$ bash ./scripts/migrate-site-bucket.sh startssh <CF Space => "staging">`
+
+#         Save all of the database username, password, host, port, and name
+
+# Open a new terminal tab to see all available sites to migrate
+#         Run `$ bash ./scripts/migrate-site-bucket.sh getsites db_user db_password db_host db_port db_name`
+
+#         This returns all applicable site owner, repository, domain, demo domain, s3 service name, s3 bucket name
+
+# Select a site to migrate and run the migration script
+#         Run ```
+#             $ bash ./scripts/migrate-site-bucket.sh migrate \
+#                 <owner> \
+#                 <repo> \
+#                 <cf space> \
+#                 <db user> \
+#                 <db password> \
+#                 <db host> \
+#                 <db port> \
+#                 <db name> \
+#                 <site url> \
+#                 <demo url>
+#         ```
+
+COMMAND=$1
+
+## Set variables base of space environment
+function set_environment() {
+    space=$1
+
+    if [[ "$space" == "production" ]]; then
+        federalist_app='federalistapp'
+        shared_bucket_service='federalist-production-s3'
+        database_service='federalist-production-rds'
+        proxy_app='federalist-proxy'
+    else
+        federalist_app='federalistapp-staging'
+        shared_bucket_service='federalist-staging-s3'
+        database_service='federalist-staging-rds'
+        proxy_app='federalist-proxy-staging'
+    fi
+}
+
+## Start an ssh session based on a CF space
 function startssh() {
-    app=$1
-    service=$2
-    cf connect-to-service --no-client $app $service
+    space=$1
+    set_environment $space
+
+    cf connect-to-service --no-client $federalist_app $database_service
 }
 
 if [ "$COMMAND" == "startssh" ]; then
-    startssh $2 $3
+    startssh $2
 fi
 
 function waitfor() {
@@ -146,7 +190,9 @@ GET_SITES_SQL="select
     \"s3ServiceName\"
 from site
     where \"s3ServiceName\" = 'federalist-staging-s3'
-    and \"deletedAt\" is NULL;
+    and \"deletedAt\" is NULL
+order by
+    owner asc;
 "
 
 ## List Sites ready to be migrated
@@ -219,38 +265,41 @@ function put_bucket() {
 function create_infrastructure() {
     owner=$1
     repo=$2
-    proxy_app=$3
-    space=$4
-    s3_service_name="owner-$owner-repo-$repo"
+    space=$3
 
-    cf cs s3 basic-public $s3_service_name
-    cf csk $s3_service_name "$s3_service_name-key"
+    set_environment $space
+    dedicated_bucket_service="owner-$owner-repo-$repo"
 
-    set_s3_credentials $s3_service_name
+    # Set CF space
+    cf target -s $space
+
+    # Create dedicated bucket service and service key
+    cf cs s3 basic-public $dedicated_bucket_service
+    cf csk $dedicated_bucket_service "$dedicated_bucket_service-key"
+
+    set_s3_credentials $dedicated_bucket_service
 
     # Wait for credentials to be provisioned
-    waitfor 10 "Provisioning S3 credentials for $s3_service_name"
+    waitfor 10 "Provisioning S3 credentials for $dedicated_bucket_service"
 
+    # Put S3 bucket website confirguration on new, dedicated bucket service
     put_bucket $owner $repo $BUCKET_NAME
 
+    # Create and map route for proxy based on <aws-bucket-name>.app.cloud.gov
     echo "Proxy: $proxy_app"
     cf create-route $space app.cloud.gov --hostname $BUCKET_NAME $proxy_app
     cf map-route $proxy_app app.cloud.gov --hostname $BUCKET_NAME
 }
 
 if [ "$COMMAND" == "create_infrastructure" ] && [ "$2" != "help" ]; then
-    create_infrastructure $2 $3 $4 $5
-    echo $AWS_ACCESS_KEY_ID
-    echo $AWS_SECRET_ACCESS_KEY
-    echo $BUCKET_NAME
-    echo $AWS_DEFAULT_REGION
+    create_infrastructure $2 $3 $4
 fi
 
 if [ "$COMMAND" == "create_infrastructure" ] && [ "$2" == "help" ]; then
     echo 'HELP'
     echo ''
-    echo "\"$COMMAND\" takes three arguments in order: owner, repository, proxy_app_name"
-    echo "      sEXAMPLE: $> ./scripts/migrate-site-bucket.sh create_infrastructure <owner> <repo> <proxy app name>"
+    echo "\"$COMMAND\" takes three arguments in order: owner, repository, CF space"
+    echo "      sEXAMPLE: $> ./scripts/migrate-site-bucket.sh create_infrastructure <owner> <repo> <CF space>"
     echo ''
     echo ''
 fi
@@ -259,14 +308,20 @@ fi
 function delete_infrastructure() {
     owner=$1
     repo=$2
-    s3_service_name="owner-$owner-repo-$repo"
-    s3_service_key="$s3_service_name-key"
+    space=$3
+    dedicated_bucket_service="owner-$owner-repo-$repo"
+    s3_service_key="$dedicated_bucket_service-key"
 
-    set_s3_credentials $s3_service_name
+    # Set CF space
+    cf target -s $space
 
+    # Set AWS credentials for dedicated bucket
+    set_s3_credentials $dedicated_bucket_service
+
+    # Delete aws s3 objects and destroy infrastructure
     aws s3 rm --recursive s3://$BUCKET_NAME
-    cf dsk $s3_service_name $s3_service_key -f
-    cf ds $s3_service_name -f
+    cf dsk $dedicated_bucket_service $s3_service_key -f
+    cf ds $dedicated_bucket_service -f
     cf delete-route app.cloud.gov --hostname $BUCKET_NAME -f
 }
 
@@ -287,7 +342,7 @@ function update_cdn() {
     origin="$bucket.app.cloud.gov"
     path="/$deploymnent/$owner/$repo"
 
-    cf target -s sites;
+    cf target -s "sites";
 
     cf update-service \
         $domain_route \
@@ -300,26 +355,22 @@ fi
 
 ## Run site migration
 function migrate() {
-    shared_service=${1}
-    owner=${2}
-    repo=${3}
-    proxy_app=${4}
-    space=${5}
-    user=${6}
-    password=${7}
-    host=${8}
-    port=${9}
-    name=${10}
-    site_url=${11}
-    demo_url=${12}
+    owner=${1}
+    repo=${2}
+    space=${3}
+    user=${4}
+    password=${5}
+    host=${6}
+    port=${7}
+    name=${8}
+    site_url=${9}
+    demo_url=${10}
 
     echo ""
     echo "Migration Settings"
-    echo "shared_service $shared_service"
     echo "owner $owner"
     echo "repo $repo"
-    echo "proxy_app $proxy_app"
-    echo "space $space"
+    echo "cf space $space"
     echo "user $user"
     echo "password $password"
     echo "host $host"
@@ -329,32 +380,34 @@ function migrate() {
     echo "demo_url $demo_url"
     echo ""
 
-    # Set additional variables
-    s3_service_name="owner-$owner-repo-$repo"
+    # Set dedicated bucket service name
+    dedicated_bucket_service="owner-$owner-repo-$repo"
 
     # Start time
     start_time=$(date +%s)
+
+    # Set space environment variables
+    set_environment $space
 
     # Set CF space
     cf target -s $space;
 
     # Create bucket, key, and route
-    create_infrastructure $owner $repo $proxy_app $space;
+    create_infrastructure $owner $repo $space;
 
     # Copy site from shared bucket into dedicated bucket
-    cp_site $shared_service $owner $repo "site";
-    cp_site $shared_service $owner $repo "demo";
-    cp_site $shared_service $owner $repo "preview";
+    cp_site $shared_bucket_service $owner $repo "site";
+    cp_site $shared_bucket_service $owner $repo "demo";
+    cp_site $shared_bucket_service $owner $repo "preview";
 
     # Update database with new s3ServiceName and awsBucketName
     update_site_table $owner $repo $user $password $host $port $name
-
 
     # Set CF space to get AWS info
     cf target -s $space;
 
     # Grab AWS credentials
-    set_s3_credentials $s3_service_name
+    set_s3_credentials $dedicated_bucket_service
 
     if [[ ! -z $site_url ]]; then
         update_cdn $site_url $BUCKET_NAME $owner $repo "site"
@@ -364,7 +417,7 @@ function migrate() {
     cf target -s $space;
 
     # Grab AWS credentials
-    set_s3_credentials $s3_service_name
+    set_s3_credentials $dedicated_bucket_service
 
     if [[ ! -z $demo_url ]]; then
         update_cdn $demo_url $BUCKET_NAME $owner $repo "demo"
@@ -385,12 +438,13 @@ fi
 if [ "$COMMAND" == "migrate" ] && [ "$2" == "help" ]; then
     echo "HELP"
     echo ""
-    echo "\"$COMMAND\" takes three arguments in order: shared bucket service name, owner, repository, proxy_app_name, cf space"
+    echo "\"$COMMAND\" takes three arguments in order: "
+    echo "      owner, repository, cf space, "
+    echo "      db user, db password, db host, db port, db name, site url, demo url"
+    echo ""
     echo "      sEXAMPLE: $> ./scripts/migrate-site-bucket.sh migrate \ "
-    echo "                    <shared_service> \ "
     echo "                    <owner> \ "
     echo "                    <repo> \ "
-    echo "                    <proxy_app> \ "
     echo "                    <space> \ "
     echo "                    <user> \ "
     echo "                    <password> \ "
