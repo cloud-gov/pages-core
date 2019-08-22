@@ -1,6 +1,6 @@
 const validator = require('validator');
 
-const { branchRegex, isValidYaml } = require('../utils/validators');
+const { branchRegex, isValidJSON } = require('../utils/validators');
 
 const afterValidate = (site) => {
   if (site.defaultBranch === site.demoBranch) {
@@ -113,6 +113,18 @@ function isEmptyOrUrl(value) {
   }
 }
 
+function config() {
+  return JSON.parse(this.config);
+}
+
+function demoConfig() {
+  return JSON.parse(this.demoConfig);
+}
+
+function previewConfig() {
+  return JSON.parse(this.previewConfig);
+}
+
 module.exports = (sequelize, DataTypes) => {
   const Site = sequelize.define('Site', {
     demoBranch: {
@@ -128,9 +140,9 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     config: {
-      type: DataTypes.STRING,
+      type: DataTypes.JSONB,
       validate: {
-        isValidYaml,
+        isValidJSON,
       },
     },
     defaultBranch: {
@@ -156,15 +168,15 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     previewConfig: {
-      type: DataTypes.STRING,
+      type: DataTypes.JSONB,
       validate: {
-        isValidYaml,
+        isValidJSON,
       },
     },
     demoConfig: {
-      type: DataTypes.STRING,
+      type: DataTypes.JSONB,
       validate: {
-        isValidYaml,
+        isValidJSON,
       },
     },
     publishedAt: {
@@ -209,6 +221,9 @@ module.exports = (sequelize, DataTypes) => {
   Site.prototype.siteUrl = siteUrl;
   Site.prototype.demoUrl = demoUrl;
   Site.prototype.branchPreviewUrl = branchPreviewUrl;
+  Site.prototype.config = config;
+  Site.prototype.demoConfig = demoConfig;
+  Site.prototype.previewConfig = previewConfig;
 
   Site.withUsers = id => Site.findByPk(id, { include: [sequelize.models.User] });
 

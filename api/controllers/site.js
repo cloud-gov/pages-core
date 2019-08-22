@@ -1,4 +1,5 @@
 const _ = require('underscore');
+const yaml = require('js-yaml');
 const authorizer = require('../authorizers/site');
 const S3SiteRemover = require('../services/S3SiteRemover');
 const SiteCreator = require('../services/SiteCreator');
@@ -182,9 +183,9 @@ module.exports = {
         return site.update({
           demoBranch: params.demoBranch,
           demoDomain: params.demoDomain,
-          config: params.config,
-          previewConfig: params.previewConfig,
-          demoConfig: params.demoConfig,
+          config: yaml.safeLoad(params.config),
+          previewConfig: yaml.safeLoad(params.previewConfig),
+          demoConfig: yaml.safeLoad(params.demoConfig),
           defaultBranch: params.defaultBranch,
           domain: params.domain,
           engine: params.engine,

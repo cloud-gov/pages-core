@@ -41,3 +41,4 @@ cf-ssh.yml
 current-sites.csv
 .vscode
 credentials*.json
+tmp

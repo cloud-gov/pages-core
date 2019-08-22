@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
 import SelectSiteEngine from '../../SelectSiteEngine';
+import { isValidYaml } from '../../../util/validators';
 
 
 export const AdvancedSiteSettingsForm = ({

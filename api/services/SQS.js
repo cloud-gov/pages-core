@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const url = require('url');
+const yaml = require('js-yaml');
 const S3Helper = require('./S3Helper');
 const config = require('../../config');
 const { logger } = require('../../winston');
@@ -76,7 +77,7 @@ const generateDefaultCredentials = build => ({
   BASEURL: baseURLForBuild(build),
   CACHE_CONTROL: buildConfig.cacheControl,
   BRANCH: sourceForBuild(build).branch || build.branch,
-  CONFIG: siteConfig(build),
+  CONFIG: yaml.safeDump(siteConfig(build)),
   REPOSITORY: build.Site.repository,
   OWNER: build.Site.owner,
   SITE_PREFIX: pathForBuild(build),
