@@ -1,0 +1,12 @@
+applications:
+- name: federalist-bucket-migrator-worker-staging
+docker:
+  image: apburnes/bucket-migrator:latest
+stack: cflinuxfs3
+disk_quota: 2G
+memory: 256MB
+command: (ls -l && echo SUCCESS || echo FAIL) && sleep infinity
+services:
+- federalist-deploy-user
+- federalist-sites-user
+- federalist-staging-rds

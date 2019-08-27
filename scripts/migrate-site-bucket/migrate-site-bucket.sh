@@ -1,60 +1,43 @@
 #!/bin/bash
 
-# README
-# This script migrates a site using the shared bucket into its own dedicated bucket
-
-# DEPENDENCIES
-# - Cloud Foundry CLI (https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
-# - CF Service Connect (https://github.com/18F/cf-service-connect#readme)
-# - PSQL (https://www.postgresql.org/docs/current/app-psql.html)
-# - AWS CLI (https://aws.amazon.com/cli/)
-# - JQ CLI (https://stedolan.github.io/jq/)
-
-# PERMISSIONS
-# User running the script must have the authorization to access the `gsa-18f-federalist`
-
-# CREATING AN SSH SESSION
-# To get connection to the database you will need to open up an ssh session using the
-# `cf connect-to-service` in another terminal session.  You can start a session with this script
-# by running `$> bash ./scripts/migrate-site-bucket startssh <APP NAME> <DATABASE SERVICE NAME>`
-
-# Use the values to connect to the database
-# Host: <host>
-# Port: <port>
-# Username: <database user>
-# Password: <database password>
-# Name: <database name>
-
-# RUNNING THE SCRIPT
-
-# The steps to start migrating sites
-
-# In a seperate terminal tab or window start an database ssh session by running
-#         Run `$ bash ./scripts/migrate-site-bucket.sh startssh <CF Space => "staging">`
-
-#         Save all of the database username, password, host, port, and name
-
-# Open a new terminal tab to see all available sites to migrate
-#         Run `$ bash ./scripts/migrate-site-bucket.sh getsites db_user db_password db_host db_port db_name`
-
-#         This returns all applicable site owner, repository, domain, demo domain, s3 service name, s3 bucket name
-
-# Select a site to migrate and run the migration script
-#         Run ```
-#             $ bash ./scripts/migrate-site-bucket.sh migrate \
-#                 <owner> \
-#                 <repo> \
-#                 <cf space> \
-#                 <db user> \
-#                 <db password> \
-#                 <db host> \
-#                 <db port> \
-#                 <db name> \
-#                 <site url> \
-#                 <demo url>
-#         ```
-
 COMMAND=$1
+
+
+## Get and assign user credentials
+function set_vcap_vars() {
+    export DEPLOY_USER_USERNAME=`echo $VCAP_SERVICES | jq -r '."user-provided"[0].credentials.DEPLOY_USER_USERNAME'`
+    export DEPLOY_USER_PASSWORD=`echo $VCAP_SERVICES | jq -r '."user-provided"[0].credentials.DEPLOY_USER_PASSWORD'`
+    export SITES_USER_USERNAME=`echo $VCAP_SERVICES | jq -r '."user-provided"[1].credentials.SITES_USER_USERNAME'`
+    export SITES_USER_PASSWORD=`echo $VCAP_SERVICES | jq -r '."user-provided"[1].credentials.SITES_USER_PASSWORD'`
+    export CF_ORGANIZATION_NAME=`echo $VCAP_APPLICATION | jq -r '."organization_name"'`
+    export CF_SPACE_NAME=`echo $VCAP_APPLICATION | jq -r '."space_name"'`
+    export CF_API="https://api.fr.cloud.gov"
+}
+
+
+## Sign in deploy user
+function sign_in_deploy_user() {
+    set_vcap_vars
+    cf api $CF_API
+    cf login -u $DEPLOY_USER_USERNAME -p $DEPLOY_USER_PASSWORD -o $CF_ORGANIZATION_NAME -s $CF_SPACE_NAME
+}
+
+if [ "$COMMAND" == "sign_in_deploy_user" ] && [ "$2" != "help" ]; then
+    sign_in_deploy_user
+fi
+
+
+## Sign in sites user
+function sign_in_sites_user() {
+    set_vcap_vars
+    cf api $CF_API
+    cf login -u $SITES_USER_USERNAME -p $SITES_USER_PASSWORD -o $CF_ORGANIZATION_NAME -s 'sites'
+}
+
+if [ "$COMMAND" == "sign_in_sites_user" ] && [ "$2" != "help" ]; then
+    sign_in_sites_user
+fi
+
 
 ## Set variables base of space environment
 function set_environment() {
@@ -72,6 +55,7 @@ function set_environment() {
         proxy_app='federalist-proxy-staging'
     fi
 }
+
 
 ## Start an ssh session based on a CF space
 function startssh() {
@@ -127,7 +111,7 @@ function cp_site() {
     owner=$2
     repo=$3
     directory=$4
-    proxy_url='https://federalist-proxy-staging.app.cloud.gov'
+    proxy_url="https://$proxy_app.app.cloud.gov"
     dedicated_service="owner-$owner-repo-$repo"
     site_path="/$directory/$owner/$repo/"
     tmp_dir="./tmp-$directory-$owner-$repo"
@@ -202,7 +186,13 @@ function getsites() {
     host=$3
     port=$4
     name=$5
-    connection_string="postgres://$user:$password@$host:$port/$name"
+
+
+    if [[ -z $DATABASE_URL ]]; then
+        connection_string="postgres://$user:$password@$host:$port/$name"
+    else
+        connection_string=$DATABASE_URL
+    fi
 
     psql $connection_string -c "$GET_SITES_SQL"
 }
@@ -231,7 +221,13 @@ function update_site_table() {
     port=$6
     name=$7
     dedicated_service="owner-$owner-repo-$repo"
-    connection_string="postgres://$user:$password@$host:$port/$name"
+
+    # Set connection string
+    if [[ -z $DATABASE_URL ]]; then
+        connection_string="postgres://$user:$password@$host:$port/$name"
+    else
+        connection_string=$DATABASE_URL
+    fi
 
     # Set credentials to get new bucket name
     set_s3_credentials $dedicated_service
@@ -353,8 +349,111 @@ if [ "$COMMAND" == "update_cdn" ] && [ "$2" != "help" ]; then
     update_cdn ${2} ${3} ${4} ${5}
 fi
 
-## Run site migration
+## Run site migration in CF Task
 function migrate() {
+    owner=${1}
+    repo=${2}
+    site_url=${9}
+    demo_url=${10}
+
+    echo ""
+    echo "Migration Settings"
+    echo "owner $owner"
+    echo "repo $repo"
+    echo "site_url $site_url"
+    echo "demo_url $demo_url"
+    echo ""
+
+    # Set CF environment variables
+    set_vcap_vars
+
+    # Set dedicated bucket service name
+    dedicated_bucket_service="owner-$owner-repo-$repo"
+
+    # Start time
+    start_time=$(date +%s)
+
+    # Set space environment variables
+    set_environment $CF_SPACE_NAME
+
+    # CF sign in as deploy user
+    sign_in_deploy_user
+
+    # Set CF space
+    cf target -s $CF_SPACE_NAME;
+
+    # Create bucket, key, and route
+    create_infrastructure $owner $repo $CF_SPACE_NAME;
+
+    # Copy site from shared bucket into dedicated bucket
+    cp_site $shared_bucket_service $owner $repo "site";
+    cp_site $shared_bucket_service $owner $repo "demo";
+    cp_site $shared_bucket_service $owner $repo "preview";
+
+    # Update database with new s3ServiceName and awsBucketName
+    update_site_table $owner $repo
+
+    # Set CF space
+    cf target -s $CF_SPACE_NAME;
+
+    # Grab AWS credentials
+    set_s3_credentials $dedicated_bucket_service
+
+    if [[ ! -z $site_url ]]; then
+        # CF sign in sites user
+        sign_in_sites_user
+
+        # Update CDN
+        update_cdn $site_url $BUCKET_NAME $owner $repo "site"
+    fi
+
+    # CF sign in deploy user
+    sign_in_deploy_user
+
+    # Reset CF space to get AWS info
+    cf target -s $CF_SPACE_NAME;
+
+    # Grab AWS credentials
+    set_s3_credentials $dedicated_bucket_service
+
+    if [[ ! -z $demo_url ]]; then
+        # CF sign in sites user
+        sign_in_sites_user
+
+        # Update CDN
+        update_cdn $demo_url $BUCKET_NAME $owner $repo "demo"
+    fi
+
+    # End time
+    end_time=$(date +%s)
+    run_time=$(((end_time-start_time)/60))
+    echo ""
+    echo "Total Time: $run_time minutes"
+    echo ""
+}
+
+if [ "$COMMAND" == "migrate" ] && [ "$2" != "help" ]; then
+    migrate ${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9} ${10} ${11} ${12} ${13}
+fi
+
+if [ "$COMMAND" == "migrate" ] && [ "$2" == "help" ]; then
+    echo "HELP"
+    echo ""
+    echo "\"$COMMAND\" takes three arguments in order: "
+    echo "      owner, repository, cf space, "
+    echo "      db user, db password, db host, db port, db name, site url, demo url"
+    echo ""
+    echo "      sEXAMPLE: $> ./scripts/migrate-site-bucket.sh migrate \ "
+    echo "                    <owner> \ "
+    echo "                    <repo> \ "
+    echo "                    <site_url> \ "
+    echo "                    <demo_url>  "
+    echo ""
+    echo ""
+fi
+
+## Run site migration in CF Task
+function migrate_local() {
     owner=${1}
     repo=${2}
     space=${3}
@@ -431,18 +530,18 @@ function migrate() {
     echo ""
 }
 
-if [ "$COMMAND" == "migrate" ] && [ "$2" != "help" ]; then
+if [ "$COMMAND" == "migrate_local" ] && [ "$2" != "help" ]; then
     migrate ${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9} ${10} ${11} ${12} ${13}
 fi
 
-if [ "$COMMAND" == "migrate" ] && [ "$2" == "help" ]; then
+if [ "$COMMAND" == "migrate_local" ] && [ "$2" == "help" ]; then
     echo "HELP"
     echo ""
     echo "\"$COMMAND\" takes three arguments in order: "
     echo "      owner, repository, cf space, "
     echo "      db user, db password, db host, db port, db name, site url, demo url"
     echo ""
-    echo "      sEXAMPLE: $> ./scripts/migrate-site-bucket.sh migrate \ "
+    echo "      sEXAMPLE: $> ./scripts/migrate-site-bucket.sh migrate_local \ "
     echo "                    <owner> \ "
     echo "                    <repo> \ "
     echo "                    <space> \ "
