@@ -383,15 +383,24 @@ function migrate() {
     cf target -s $CF_SPACE_NAME;
 
     # Create bucket, key, and route
+    echo "Creating Infrastructure"
+    create_infrastructure_start=$(date +%s)
     create_infrastructure $owner $repo $CF_SPACE_NAME;
+    echo "Created Infrastructure after $(($(date +%s)-$create_infrastructure_start)) seconds"
 
     # Copy site from shared bucket into dedicated bucket
+    echo "Copying S3 site data to new site"
+    copy_start=$(date +%s)
     cp_site $shared_bucket_service $owner $repo "site";
     cp_site $shared_bucket_service $owner $repo "demo";
     cp_site $shared_bucket_service $owner $repo "preview";
+    echo "Copied S3 site data after $((($(date +%s)-$copy_start)/60)) minutes"
 
     # Update database with new s3ServiceName and awsBucketName
+    echo "Updating site table in database"
+    update_site_start=$(date +%s)
     update_site_table $owner $repo
+    echo "Updated site table after $(($(date +%s)-$update_site_start)) seconds"
 
     # Set CF space
     cf target -s $CF_SPACE_NAME;
@@ -401,10 +410,13 @@ function migrate() {
 
     if [[ ! -z $site_url ]]; then
         # CF sign in sites user
+        echo "Updating site url CDN"
+        site_cdn_start=$(date +%s)
         sign_in_sites_user
 
         # Update CDN
         update_cdn $site_url $BUCKET_NAME $owner $repo "site"
+        echo "Updated site cdn after $(($(date +%s)-$site_cdn_start)) seconds"
     fi
 
     # CF sign in deploy user
@@ -418,10 +430,13 @@ function migrate() {
 
     if [[ ! -z $demo_url ]]; then
         # CF sign in sites user
+        echo "Updating demo url CDN"
+        demo_cdn_start=$(date +%s)
         sign_in_sites_user
 
         # Update CDN
         update_cdn $demo_url $BUCKET_NAME $owner $repo "demo"
+        echo "Updated demo cdn after $(($(date +%s)-$demo_cdn_start)) seconds"
     fi
 
     # End time
@@ -433,7 +448,7 @@ function migrate() {
 }
 
 if [ "$COMMAND" == "migrate" ] && [ "$2" != "help" ]; then
-    migrate ${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9} ${10} ${11} ${12} ${13}
+    migrate ${2} ${3} ${4} ${5}
 fi
 
 if [ "$COMMAND" == "migrate" ] && [ "$2" == "help" ]; then
@@ -531,7 +546,7 @@ function migrate_local() {
 }
 
 if [ "$COMMAND" == "migrate_local" ] && [ "$2" != "help" ]; then
-    migrate ${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9} ${10} ${11} ${12} ${13}
+    migrate_local ${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9} ${10} ${11} ${12} ${13}
 fi
 
 if [ "$COMMAND" == "migrate_local" ] && [ "$2" == "help" ]; then

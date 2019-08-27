@@ -13,7 +13,10 @@ $ cf push -f manifest-staging.yml --health-check-type none --no-route
 $ cf push -f manifest.yml --health-check-type none --no-route
 
 # Running the tasks in staging example
-$ cf run-task federalist-bucket-migrator-worker-staging "ls -l"
+$ cf run-task federalist-bucket-migrator-worker-staging "/app/migrate-site-bucket.sh migrate <owner> <repo> [site url] [demo url]"
+
+# Check on tasks
+$ cf tasks federalist-bucket-migrator-worker-staging
 ```
 
 ## Running the script locally
