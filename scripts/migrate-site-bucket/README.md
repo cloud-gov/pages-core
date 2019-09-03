@@ -3,7 +3,13 @@ migrate site bucket
 
 A guide to migrating a site from the shared bucket to the dedicated bucket
 
-## Deploying the task runner
+## Using CF task runners
+
+Using Cloud Foundry's task runners for site migration
+
+### Deploying the task runner
+
+**NOTE - If the task runner is already deployed (federalist-bucket-migrator-worker-production in production) or (federalist-bucket-migrator-worker-staging in staging) then it is not necessary to redeploy the task runner.  You can just start running tasks.**
 
 ```bash
 # Migrating the staging sites
@@ -11,17 +17,38 @@ $ cf push -f manifest-staging.yml --health-check-type none --no-route
 
 # Migrating the production sites
 $ cf push -f manifest.yml --health-check-type none --no-route
+```
 
+### Getting a list of sites that should be migrated
+
+```bash
+# SSH into the task runner
+$ cf ssh federalist-bucket-migrator-worker-staging
+
+# Query the list of sites needed to be migrated
+$ /app/migrate-site-bucket.sh getsites
+```
+
+### Starting a task to run a site migration
+
+**Note: Tasks will run asynchronously in the background so you are able to start and run multiple tasks concurrently**
+
+```bash
 # Running the tasks in staging example
-$ cf run-task federalist-bucket-migrator-worker-staging "/app/migrate-site-bucket.sh migrate <owner> <repo> [site url] [demo url]"
+## NOTE - Make sure to remove "https://" when adding the <[site | demo] domain> arguments
+$ cf run-task federalist-bucket-migrator-worker-staging "/app/migrate-site-bucket.sh migrate <owner> <repo> [site domain] [demo domain]"
+```
 
+
+### Checking on task statuses
+
+```bash
 # Check on tasks
 $ cf tasks federalist-bucket-migrator-worker-staging
 ```
 
-## Running the script locally
 
-This script migrates a site using the shared bucket into its own dedicated bucket
+## About
 
 ### DEPENDENCIES
 - Cloud Foundry CLI (https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
@@ -29,6 +56,16 @@ This script migrates a site using the shared bucket into its own dedicated bucke
 - PSQL (https://www.postgresql.org/docs/current/app-psql.html)
 - AWS CLI (https://aws.amazon.com/cli/)
 - JQ CLI (https://stedolan.github.io/jq/)
+
+
+### CF Task Runner Dockerfile
+
+All the dependencies come preinstalled with the script in the [Dockerfile](./Dockerfile).
+
+
+## Running the script locally **(Not Recommended)**
+
+This script migrates a site using the shared bucket into its own dedicated bucket
 
 ### PERMISSIONS
 User running the script must have the authorization to access the `gsa-18f-federalist`

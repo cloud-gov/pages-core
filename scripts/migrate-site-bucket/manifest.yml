@@ -1,5 +1,5 @@
 applications:
-- name: federalist-bucket-migrator-worker-staging
+- name: federalist-bucket-migrator-worker-production
 docker:
   image: apburnes/bucket-migrator:latest
 stack: cflinuxfs3
@@ -11,4 +11,4 @@ health-check-type: none
 services:
 - federalist-deploy-user
 - federalist-sites-user
-- federalist-staging-rds
+- federalist-production-rds

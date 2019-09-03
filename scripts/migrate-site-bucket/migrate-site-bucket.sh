@@ -353,8 +353,8 @@ fi
 function migrate() {
     owner=${1}
     repo=${2}
-    site_url=${9}
-    demo_url=${10}
+    site_url=${3}
+    demo_url=${4}
 
     echo ""
     echo "Migration Settings"
@@ -393,7 +393,8 @@ function migrate() {
     copy_start=$(date +%s)
     cp_site $shared_bucket_service $owner $repo "site";
     cp_site $shared_bucket_service $owner $repo "demo";
-    cp_site $shared_bucket_service $owner $repo "preview";
+    # Ignore copying over branches due to time and size constraints
+    # cp_site $shared_bucket_service $owner $repo "preview";
     echo "Copied S3 site data after $((($(date +%s)-$copy_start)/60)) minutes"
 
     # Update database with new s3ServiceName and awsBucketName
@@ -512,7 +513,8 @@ function migrate_local() {
     # Copy site from shared bucket into dedicated bucket
     cp_site $shared_bucket_service $owner $repo "site";
     cp_site $shared_bucket_service $owner $repo "demo";
-    cp_site $shared_bucket_service $owner $repo "preview";
+    # Ignore copying over branches due to time and size constraints
+    # cp_site $shared_bucket_service $owner $repo "preview";
 
     # Update database with new s3ServiceName and awsBucketName
     update_site_table $owner $repo $user $password $host $port $name
