@@ -58,6 +58,7 @@ BranchViewLink.propTypes = {
 
 BranchViewLink.defaultProps = {
   showIcon: false,
+  completedAt: null,
 };
 
 export default connect()(BranchViewLink);
