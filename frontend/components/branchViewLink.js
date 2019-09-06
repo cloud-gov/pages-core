@@ -16,7 +16,7 @@ const getUrlAndViewText = (branchName, site, completedAt) => {
   }
 
   // temp for migration - should if block be removed by end of year 2019
-  if (completedAt && ((new Date(completedAt) < new Date('2019-09-06'))) && (site.createdAt && (new Date(site.createdAt) < new Date('2019-06-05')))) {
+  if (completedAt && ((new Date(completedAt) < new Date('2019-09-06'))) && site.createdAt && (new Date(site.createdAt) < new Date('2019-06-05'))) {
     return {
       url: `https://federalist-proxy.app.cloud.gov/preview/${site.owner}/${site.repository}/${branchName}/`,
       viewText: 'Preview site',
@@ -48,6 +48,7 @@ export const BranchViewLink = ({ branchName, site, showIcon, completedAt }) => {
   return (<a href={url} target="_blank" rel="noopener noreferrer">{ viewText }</a>);
 };
 
+// Note: remove completedAt propType from compoent at end of 2018
 BranchViewLink.propTypes = {
   branchName: PropTypes.string.isRequired,
   site: SITE.isRequired,
