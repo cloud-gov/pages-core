@@ -15,8 +15,8 @@ const getUrlAndViewText = (branchName, site, completedAt) => {
     return { url: site.demoViewLink, viewText: 'View demo' };
   }
 
-  // temp for migration - should be removed by end of year 2019
-  if (completedAt && ((new Date(completedAt) < new Date('2019-09-06')))) {
+  // temp for migration - should if block be removed by end of year 2019
+  if (completedAt && ((new Date(completedAt) < new Date('2019-09-06'))) && (site.createdAt && (new Date(site.createdAt) < new Date('2019-06-05')))) {
     return {
       url: `https://federalist-proxy.app.cloud.gov/preview/${site.owner}/${site.repository}/${branchName}/`,
       viewText: 'Preview site',
