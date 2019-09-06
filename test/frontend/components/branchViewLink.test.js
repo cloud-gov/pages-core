@@ -21,7 +21,7 @@ describe('<BranchViewLink/>', () => {
     props = {
       branchName: 'branch-name',
       site: testSite,
-      previewHostname: 'https://preview-hostname.com',
+      // previewHostname: 'https://preview-hostname.com',
     };
   });
 
@@ -61,6 +61,45 @@ describe('<BranchViewLink/>', () => {
     expect(anchor.length).to.equal(1);
     expect(anchor.prop('href')).to.equal(
       'https://test-bucket.app.cloud.gov/preview/test-owner/test-repo/release_1.2.3/'
+    );
+    expect(anchor.text()).equal('Preview site');
+  });
+
+  it('renders a preview link to the other branches created last year', () => {
+    props.branchName = 'some-another-branch';
+    props.completedAt = '2019-01-01'
+    props.site.createdAt = '2019-01-01'
+    const wrapper = shallow(<BranchViewLink {...props} />);
+    const anchor = wrapper.find('a');
+    expect(anchor.length).to.equal(1);
+    expect(anchor.prop('href')).to.equal(
+      'https://federalist-proxy.app.cloud.gov/preview/test-owner/test-repo/some-another-branch/'
+    );
+    expect(anchor.text()).equal('Preview site');
+  });
+
+  it('renders a preview link to the other branches', () => {
+    props.branchName = 'some-other-other-branch';
+    props.completedAt = '2019-10-01'
+    props.site.createdAt = '2019-01-01'
+    const wrapper = shallow(<BranchViewLink {...props} />);
+    const anchor = wrapper.find('a');
+    expect(anchor.length).to.equal(1);
+    expect(anchor.prop('href')).to.equal(
+      'https://test-bucket.app.cloud.gov/preview/test-owner/test-repo/some-other-other-branch/'
+    );
+    expect(anchor.text()).equal('Preview site');
+  });
+
+  it('renders a preview link to the other branches', () => {
+    props.branchName = 'some-other-another-branch';
+    props.completedAt = '2019-01-01'
+    props.site.createdAt = '2019-10-01'
+    const wrapper = shallow(<BranchViewLink {...props} />);
+    const anchor = wrapper.find('a');
+    expect(anchor.length).to.equal(1);
+    expect(anchor.prop('href')).to.equal(
+      'https://test-bucket.app.cloud.gov/preview/test-owner/test-repo/some-other-another-branch/'
     );
     expect(anchor.text()).equal('Preview site');
   });
