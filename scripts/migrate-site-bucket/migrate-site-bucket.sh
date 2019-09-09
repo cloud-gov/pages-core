@@ -112,7 +112,7 @@ function cp_site() {
     repo=$3
     directory=$4
     proxy_url="https://$proxy_app.app.cloud.gov"
-    dedicated_service="owner-$owner-repo-$repo"
+    dedicated_service=`generate_service_name $owner $repo`
     site_path="/$directory/$owner/$repo/"
     tmp_dir="./tmp-$directory-$owner-$repo"
 
@@ -220,7 +220,7 @@ function update_site_table() {
     host=$5
     port=$6
     name=$7
-    dedicated_service="owner-$owner-repo-$repo"
+    dedicated_service=`generate_service_name $owner $repo`
 
     # Set connection string
     if [[ -z $DATABASE_URL ]]; then
@@ -257,6 +257,26 @@ function put_bucket() {
          "{\"ErrorDocument\": {\"Key\": \"site/$owner/$repo/404.html\"},\"IndexDocument\": {\"Suffix\": \"index.html\"}}"
  }
 
+
+## Generate service name
+function generate_service_name() {
+    owner=$1
+    repo=$2
+    service_name="o-$owner-r-$repo"
+    service_length=`expr length $service_name`
+    day=`date +%d`
+    month=`date +%m`
+    year=`date +%Y | cut -c3-4`
+
+    if [[ $service_length > 46 ]]; then
+        service_name=`echo $service_name | cut -c1-39`;
+        service_name="$service_name-$day$month$year";
+    fi
+
+    echo $service_name
+}
+
+
 ## Create new infrastructure for site
 function create_infrastructure() {
     owner=$1
@@ -264,7 +284,7 @@ function create_infrastructure() {
     space=$3
 
     set_environment $space
-    dedicated_bucket_service="owner-$owner-repo-$repo"
+    dedicated_bucket_service=`generate_service_name $owner $repo`
 
     # Set CF space
     cf target -s $space
@@ -305,7 +325,7 @@ function delete_infrastructure() {
     owner=$1
     repo=$2
     space=$3
-    dedicated_bucket_service="owner-$owner-repo-$repo"
+    dedicated_bucket_service=`generate_service_name $owner $repo`
     s3_service_key="$dedicated_bucket_service-key"
 
     # Set CF space
@@ -368,7 +388,7 @@ function migrate() {
     set_vcap_vars
 
     # Set dedicated bucket service name
-    dedicated_bucket_service="owner-$owner-repo-$repo"
+    dedicated_bucket_service=`generate_service_name $owner $repo`
 
     # Start time
     start_time=$(date +%s)
@@ -496,7 +516,7 @@ function migrate_local() {
     echo ""
 
     # Set dedicated bucket service name
-    dedicated_bucket_service="owner-$owner-repo-$repo"
+    dedicated_bucket_service=`generate_service_name $owner $repo`
 
     # Start time
     start_time=$(date +%s)
