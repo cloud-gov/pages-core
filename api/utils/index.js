@@ -36,7 +36,18 @@ function generateS3ServiceName(owner, repository) {
     .split(' ')
     .join('-');
 
-  return `owner-${format(owner)}-repo-${format(repository)}`;
+  const serviceName = `o-${format(owner)}-r-${format(repository)}`;
+
+  if (serviceName.length < 47) {
+    return serviceName;
+  }
+
+  const today = new Date();
+  const day = today.getDate();
+  const month = today.getMonth();
+  const year = today.getFullYear().toString().slice(2);
+  const slicedServiceName = `${serviceName.slice(0, 39)}-${day}${month}${year}`;
+  return slicedServiceName;
 }
 
 function isPastAuthThreshold(authDate) {

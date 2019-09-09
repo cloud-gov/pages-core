@@ -92,7 +92,7 @@ describe('utils', () => {
     it('should concat and lowercase owner and repository name', (done) => {
       const owner = 'Hello';
       const repository = 'Hello World';
-      const expected = 'owner-hello-repo-hello-world';
+      const expected = 'o-hello-r-hello-world';
 
       expect(utils.generateS3ServiceName(owner, repository)).to.equal(expected);
       done();
@@ -101,7 +101,20 @@ describe('utils', () => {
     it('should convert to string when the owner and repository is a number', (done) => {
       const owner = 12345;
       const repository = 'Hello World';
-      const expected = 'owner-12345-repo-hello-world';
+      const expected = 'o-12345-r-hello-world';
+
+      expect(utils.generateS3ServiceName(owner, repository)).to.equal(expected);
+      done();
+    });
+
+    it('should truncate names over 46 characters to account for CF service name limits', (done) => {
+      const owner = 'hello-world-owner';
+      const repository = 'hello-world-really-long-repository-name';
+      const today = new Date();
+      const day = today.getDate();
+      const month = today.getMonth();
+      const year = today.getFullYear().toString().slice(2);
+      const expected = `o-hello-world-owner-r-hello-world-reall-${day}${month}${year}`;
 
       expect(utils.generateS3ServiceName(owner, repository)).to.equal(expected);
       done();
