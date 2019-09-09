@@ -42,11 +42,17 @@ function generateS3ServiceName(owner, repository) {
     return serviceName;
   }
 
-  const today = new Date();
-  const day = today.getDate();
-  const month = today.getMonth();
-  const year = today.getFullYear().toString().slice(2);
-  const slicedServiceName = `${serviceName.slice(0, 39)}-${day}${month}${year}`;
+  function makeId() {
+    let result = '';
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    for (let i = 0; i < 6; i += 1) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  }
+
+  const slicedServiceName = `${serviceName.slice(0, 39)}-${makeId()}`;
   return slicedServiceName;
 }
 

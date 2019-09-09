@@ -110,13 +110,11 @@ describe('utils', () => {
     it('should truncate names over 46 characters to account for CF service name limits', (done) => {
       const owner = 'hello-world-owner';
       const repository = 'hello-world-really-long-repository-name';
-      const today = new Date();
-      const day = today.getDate();
-      const month = today.getMonth();
-      const year = today.getFullYear().toString().slice(2);
-      const expected = `o-hello-world-owner-r-hello-world-reall-${day}${month}${year}`;
+      const output = utils.generateS3ServiceName(owner, repository);
+      const expectedPre = 'o-hello-world-owner-r-hello-world-reall-';
 
-      expect(utils.generateS3ServiceName(owner, repository)).to.equal(expected);
+      expect(output.length).to.equal(46);
+      expect(output.slice(0, 40)).to.equal(expectedPre);
       done();
     });
 
