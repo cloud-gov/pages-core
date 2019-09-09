@@ -36,7 +36,24 @@ function generateS3ServiceName(owner, repository) {
     .split(' ')
     .join('-');
 
-  return `owner-${format(owner)}-repo-${format(repository)}`;
+  const serviceName = `o-${format(owner)}-r-${format(repository)}`;
+
+  if (serviceName.length < 47) {
+    return serviceName;
+  }
+
+  function makeId() {
+    let result = '';
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    for (let i = 0; i < 6; i += 1) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  }
+
+  const slicedServiceName = `${serviceName.slice(0, 39)}-${makeId()}`;
+  return slicedServiceName;
 }
 
 function isPastAuthThreshold(authDate) {
