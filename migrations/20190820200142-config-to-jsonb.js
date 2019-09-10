@@ -7,15 +7,15 @@ const convertSiteConfigsToJSON = (db, site) => {
   
   const atts = [];
   if (site.config) {
-    atts.push(`config = '${JSON.stringify(yaml.safeLoad(site.config.trim()))}'`);
+    atts.push(`${"config = '" + JSON.stringify(yaml.safeLoad(site.config.trim())) + "'"}`);
   }
 
   if (site.demoConfig) {
-    atts.push(`"demoConfig" = '${JSON.stringify(yaml.safeLoad(site.demoConfig.trim()))}'`);
+    atts.push(`${"\"demoConfig\" = '" + JSON.stringify(yaml.safeLoad(site.demoConfig.trim())) + "'"}`);
   }
 
   if (site.previewConfig) {
-    atts.push(`"previewConfig" = '${JSON.stringify(yaml.safeLoad(site.previewConfig.trim()))}'`);
+    atts.push(`${"\"previewConfig\" = '" + JSON.stringify(yaml.safeLoad(site.previewConfig.trim())) + "'"}`);
   }
 
   const cmdUpdateSiteRecord = `
