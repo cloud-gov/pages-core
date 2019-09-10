@@ -111,14 +111,12 @@ class CloudFoundryAPIClient {
       .then(key => key.entity.credentials);
   }
 
-  fetchServiceInstances(name=null) {
-    let url = '/v2/service_instances';
-    if (name) {
-      url = `${url}?q=name:${name}`;
-    }
+  fetchServiceInstances(name = null) {
+    const path = `/v2/service_instances${name ? `?q=name:${name}` : ''}`;
+
     return this.accessToken().then(token => this.request(
       'GET',
-      url,
+      path,
       token
     ));
   }
@@ -192,7 +190,8 @@ class CloudFoundryAPIClient {
         json,
       }, (error, response, body) => {
         if (error) {
-          reject(error);
+          const stringed = JSON.stringify(error, null, 2);
+          reject(new Error(stringed));
         } else if (response.statusCode > 399) {
           const errorMessage = `Received status code: ${response.statusCode}`;
           reject(new Error(body || errorMessage));
