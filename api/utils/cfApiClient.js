@@ -96,7 +96,7 @@ class CloudFoundryAPIClient {
   }
 
   fetchServiceInstance(name) {
-    return this.fetchServiceInstances()
+    return this.fetchServiceInstances(name)
       .then(res => filterEntity(res, name));
   }
 
@@ -111,10 +111,14 @@ class CloudFoundryAPIClient {
       .then(key => key.entity.credentials);
   }
 
-  fetchServiceInstances() {
+  fetchServiceInstances(name=null) {
+    let url = '/v2/service_instances';
+    if (name) {
+      url = `${url}?q=name:${name}`;
+    }
     return this.accessToken().then(token => this.request(
       'GET',
-      '/v2/service_instances',
+      url,
       token
     ));
   }
