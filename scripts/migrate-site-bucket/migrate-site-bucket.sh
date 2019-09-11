@@ -165,20 +165,6 @@ if [ "$COMMAND" == "startpsql" ] && [ "$2" != "help" ]; then
     startpsql $2 $3 $4 $5 $6
 fi
 
-## Get a list of sites to migrate
-GET_SITES_SQL="select
-    owner,
-    repository,
-    domain, \"demoDomain\",
-    \"awsBucketName\",
-    \"s3ServiceName\"
-from site
-    where \"s3ServiceName\" = 'federalist-staging-s3'
-    and \"deletedAt\" is NULL
-order by
-    owner asc;
-"
-
 ## List Sites ready to be migrated
 function getsites() {
     user=$1
@@ -187,6 +173,21 @@ function getsites() {
     port=$4
     name=$5
 
+    set_vcap_vars
+
+    ## Get a list of sites to migrate
+    GET_SITES_SQL="select
+        owner,
+        repository,
+        domain, \"demoDomain\",
+        \"awsBucketName\",
+        \"s3ServiceName\"
+    from site
+        where \"s3ServiceName\" = 'federalist-$CF_SPACE_NAME-s3'
+        and \"deletedAt\" is NULL
+    order by
+        owner asc;
+    "
 
     if [[ -z $DATABASE_URL ]]; then
         connection_string="postgres://$user:$password@$host:$port/$name"
