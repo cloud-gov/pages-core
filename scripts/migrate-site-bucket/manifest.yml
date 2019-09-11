@@ -3,7 +3,7 @@ applications:
 docker:
   image: apburnes/bucket-migrator:latest
 stack: cflinuxfs3
-disk_quota: 2G
+disk_quota: 4G
 memory: 256MB
 command: (echo SUCCESS || echo FAIL) && sleep infinity
 no-route: true
