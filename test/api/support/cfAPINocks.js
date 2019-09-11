@@ -29,7 +29,7 @@ const mockDeleteRoute = (host, guid) => {
 
 const mockDeleteService = (name, guid) => {
   nock(url, reqheaders)
-    .get('/v2/service_instances')
+    .get(`/v2/service_instances?q=name:${name}`)
     .reply(200, {
       resources: [{
         metadata: { guid },
@@ -50,8 +50,8 @@ const mockFetchServiceKeyRequest = (guid, resources) => nock(url, reqheaders)
   .get(`/v2/service_keys/${guid}`)
   .reply(200, resources);
 
-const mockFetchServiceInstancesRequest = resources => nock(url, reqheaders)
-  .get('/v2/service_instances')
+const mockFetchServiceInstancesRequest = (resources, name = null) => nock(url, reqheaders)
+  .get(`/v2/service_instances${name ? `?q=name:${name}` : ''}`)
   .reply(200, resources);
 
 const mockFetchServiceInstanceCredentialsRequest = (guid, resources) => nock(url, reqheaders)
@@ -75,7 +75,7 @@ const mockDefaultCredentials = () => {
 
   nock(url, reqheaders)
     .persist()
-    .get('/v2/service_instances')
+    .get('/v2/service_instances?q=name:federalist-dev-s3')
     .reply(200, instanceResponses);
 
   nock(url, reqheaders)

@@ -165,7 +165,7 @@ class SiteBuilds extends React.Component {
                           </p>
                           <div>
                             { previewBuilds[build.branch] === build.id && build.state === 'success' &&
-                            <BranchViewLink branchName={build.branch} site={site} showIcon /> }
+                            <BranchViewLink branchName={build.branch} site={site} showIcon completedAt={build.completedAt} /> }
                           </div>
                         </div>
                       </th>

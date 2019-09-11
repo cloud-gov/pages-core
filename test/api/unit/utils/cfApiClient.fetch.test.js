@@ -44,7 +44,7 @@ describe('CloudFoundryAPIClient', () => {
       };
 
       mockTokenRequest();
-      apiNocks.mockFetchServiceInstancesRequest(instanceResponses);
+      apiNocks.mockFetchServiceInstancesRequest(instanceResponses, name);
 
       const apiClient = new CloudFoundryAPIClient();
       apiClient.fetchServiceInstance(name)
@@ -71,7 +71,7 @@ describe('CloudFoundryAPIClient', () => {
       };
 
       mockTokenRequest();
-      apiNocks.mockFetchServiceInstancesRequest(instancesResponse);
+      apiNocks.mockFetchServiceInstancesRequest(instancesResponse, name);
 
       const apiClient = new CloudFoundryAPIClient();
       apiClient.fetchServiceInstance(name)
@@ -117,7 +117,7 @@ describe('CloudFoundryAPIClient', () => {
       };
 
       mockTokenRequest();
-      apiNocks.mockFetchServiceInstancesRequest(instanceResponses);
+      apiNocks.mockFetchServiceInstancesRequest(instanceResponses, name);
       apiNocks.mockFetchServiceInstanceCredentialsRequest(guid, keyResponses);
 
       const apiClient = new CloudFoundryAPIClient();
