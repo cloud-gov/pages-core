@@ -14,7 +14,7 @@ const mockCreateRoute = (resource, body) => nock(url, reqheaders)
 
 const mockDeleteRoute = (host, guid) => {
   nock(url, reqheaders)
-    .get('/v2/routes')
+    .get(`/v2/routes?q=host:${host}`)
     .reply(200, {
       resources: [{
         metadata: { guid },
