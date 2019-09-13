@@ -22,8 +22,10 @@ module.exports = class BuildStatusNotifier {
           socket.on('build status', (build) => {
             this.notify(build);
           });
+          return true;
         }
       }
+      return false;
     }
 
     BuildStatusNotifier.listening = true;
@@ -32,11 +34,11 @@ module.exports = class BuildStatusNotifier {
         .then((permission) => connectSocket(permission));
     } catch (error) {
       if (error instanceof TypeError) {
-        Notification.requestPermission((permission) => {
+        return Promise.resolve(Notification.requestPermission((permission) => {
           connectSocket(permission);
-        });
+        }));
       } else {
-        throw error;
+        return Promise.reject(error);
       }
     }
   }
