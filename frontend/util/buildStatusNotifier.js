@@ -31,7 +31,7 @@ module.exports = class BuildStatusNotifier {
     BuildStatusNotifier.listening = true;
     try {
       return Notification.requestPermission()
-        .then((permission) => connectSocket(permission));
+        .then(permission => connectSocket(permission));
     } catch (error) {
       if (error instanceof TypeError) {
         return Promise.resolve(Notification.requestPermission((permission) => {
