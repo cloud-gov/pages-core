@@ -26,7 +26,7 @@ module.exports = class BuildStatusNotifier {
         }
       }
       return false;
-    }
+    };
 
     BuildStatusNotifier.listening = true;
     try {
@@ -35,11 +35,10 @@ module.exports = class BuildStatusNotifier {
     } catch (error) {
       if (error instanceof TypeError) {
         return Promise.resolve(Notification.requestPermission((permission) => {
-          connectSocket(permission);
+          return connectSocket(permission);
         }));
-      } else {
-        return Promise.reject(error);
       }
+      return Promise.reject(error);
     }
   }
 
