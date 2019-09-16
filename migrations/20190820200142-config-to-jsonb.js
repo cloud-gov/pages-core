@@ -55,7 +55,7 @@ exports.up = (db, callback) => {
 const convertSiteConfigsToYAML = (db, site) => {
   
   const atts = [];
-  if (site.config) {
+  if (site.defaultConfig) {
     atts.push(`config = '${yaml.safeDump(site.defaultConfig)}'`);
   }
 
