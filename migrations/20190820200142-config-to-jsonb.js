@@ -9,7 +9,7 @@ const convertSiteConfigsToJSON = (db, site) => {
   
   const atts = [];
   if (site.config && site.config.trim().length > 0) {
-    atts.push(`${"defaultConfig = '" + JSON.stringify(yaml.safeLoad(site.config.trim())) + "'::jsonb"}`);
+    atts.push(`${"\"defaultConfig\" = '" + JSON.stringify(yaml.safeLoad(site.config.trim())) + "'::jsonb"}`);
   }
 
   if (site.demoConfig && site.demoConfig.trim().length > 0) {
