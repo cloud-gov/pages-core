@@ -17,9 +17,9 @@ const toJSON = (site) => {
   if (object.demoBranch) {
     object.demoViewLink = site.demoUrl();
   }
-console.log(`\n\nsite.config:\t${typeof site.config}\n\n`)
-  if (object.config) {
-    object.config = yaml.safeDump(site.config);
+
+  if (object.defaultConfig) {
+    object.defaultConfig = yaml.safeDump(site.defaultConfig);
   }
 
   if (object.demoConfig) {

@@ -127,7 +127,7 @@ module.exports = (sequelize, DataTypes) => {
         isEmptyOrUrl,
       },
     },
-    config: {
+    defaultConfig: {
       type: DataTypes.JSONB,
       validate: {
         isValidJSON,

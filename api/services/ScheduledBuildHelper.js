@@ -14,7 +14,7 @@ const buildBranch = (site, branch) =>
     );
 
 const buildSite = site =>
-  Promise.resolve(yaml.safeLoad(site.config))
+  Promise.resolve(yaml.safeLoad(site.defaultConfig))
   .then((config) => {
     if (config.schedule === 'nightly') {
       return buildBranch(site, site.defaultBranch);

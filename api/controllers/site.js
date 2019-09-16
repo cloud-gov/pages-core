@@ -183,7 +183,7 @@ module.exports = {
         return site.update({
           demoBranch: params.demoBranch,
           demoDomain: params.demoDomain,
-          config: yaml.safeLoad(params.config),
+          defaultConfig: yaml.safeLoad(params.defaultConfig),
           previewConfig: yaml.safeLoad(params.previewConfig),
           demoConfig: yaml.safeLoad(params.demoConfig),
           defaultBranch: params.defaultBranch,

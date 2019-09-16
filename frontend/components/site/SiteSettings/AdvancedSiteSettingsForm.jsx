@@ -39,10 +39,10 @@ export const AdvancedSiteSettingsForm = ({
           {' '}
           <code>_config.yml</code> file when we build your site&apos;s primary branch.
         </p>
-        <label htmlFor="config">Site configuration</label>
+        <label htmlFor="defaultConfig">Site configuration</label>
         <Field
           component="textarea"
-          name="config"
+          name="defaultConfig"
           className="form-control-mono"
         />
       </fieldset>
@@ -104,7 +104,7 @@ AdvancedSiteSettingsForm.propTypes = {
   // initialValues is what the initial form values are based on
   initialValues: PropTypes.shape({
     engine: PropTypes.string.isRequired,
-    config: PropTypes.string,
+    defaultConfig: PropTypes.string,
     demoConfig: PropTypes.string,
     previewConfig: PropTypes.string,
   }).isRequired,

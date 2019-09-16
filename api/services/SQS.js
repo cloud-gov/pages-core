@@ -15,7 +15,7 @@ const demoBranch = build => build.branch === build.Site.demoBranch;
 
 const siteConfig = (build) => {
   if (defaultBranch(build)) {
-    return build.Site.config;
+    return build.Site.defaultConfig;
   }
   if (demoBranch(build)) {
     return build.Site.demoConfig;
