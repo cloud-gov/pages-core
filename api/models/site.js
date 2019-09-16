@@ -1,6 +1,6 @@
 const validator = require('validator');
 
-const { branchRegex, isValidJSON } = require('../utils/validators');
+const { branchRegex } = require('../utils/validators');
 
 const afterValidate = (site) => {
   if (site.defaultBranch === site.demoBranch) {
@@ -129,9 +129,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     defaultConfig: {
       type: DataTypes.JSONB,
-      validate: {
-        isValidJSON,
-      },
     },
     defaultBranch: {
       type: DataTypes.STRING,
@@ -157,15 +154,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     previewConfig: {
       type: DataTypes.JSONB,
-      validate: {
-        isValidJSON,
-      },
     },
     demoConfig: {
       type: DataTypes.JSONB,
-      validate: {
-        isValidJSON,
-      },
     },
     publishedAt: {
       type: DataTypes.DATE,

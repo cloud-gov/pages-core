@@ -19,4 +19,5 @@ module.exports = {
   branchRegex,
   shaRegex,
   githubUsernameRegex,
+  isValidJSON,
 };
