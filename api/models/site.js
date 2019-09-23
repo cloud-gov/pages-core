@@ -1,6 +1,6 @@
 const validator = require('validator');
 
-const { branchRegex } = require('../utils/validators');
+const { branchRegex, parseSiteConfigs } = require('../utils/validators');
 
 const afterValidate = (site) => {
   if (site.defaultBranch === site.demoBranch) {
@@ -51,6 +51,17 @@ const beforeValidate = (site) => {
   if (site.owner) {
     site.owner = site.owner.toLowerCase(); // eslint-disable-line no-param-reassign
   }
+
+  let siteConfigs = {
+    defaultConfig: { value: site.defaultConfig, label: 'Site configuration' },
+    demoConfig: { value: site.demoConfig, label: 'Demo configuration' },
+    previewConfig: { value: site.previewConfig, label: 'Preview configuration' },
+  };
+
+  siteConfigs = parseSiteConfigs(siteConfigs);
+  site.defaultConfig = siteConfigs.defaultConfig;
+  site.demoConfig = siteConfigs.demoConfig;
+  site.previewConfig = siteConfigs.previewConfig;
 };
 
 function domainWithSlash(url) {

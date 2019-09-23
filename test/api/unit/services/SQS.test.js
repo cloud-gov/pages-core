@@ -381,15 +381,16 @@ describe('SQS', () => {
     it('should set CONFIG in the message to the YAML config for the site on the default branch', (done) => {
       factory.site({
         defaultBranch: 'master',
-        config: 'plugins_dir: _plugins',
-        demoConfig: 'plugins_dir: _demo_plugins',
-        previewConfig: 'plugins_dir: _preview_plugins',
+        defaultConfig: { plugins_dir: '_plugins' },
+        demoConfig: { plugins_dir: '_demo_plugins' },
+        previewConfig: { plugins_dir: '_preview_plugins' },
       })
         .then(site => factory.build({ site, branch: 'master' }))
         .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then(build => SQS.messageBodyForBuild(build))
         .then((message) => {
-          expect(messageEnv(message, 'CONFIG')).to.equal('plugins_dir: _plugins');
+          console.log(`\n\nmessage:\t${JSON.stringify(message)}\n\n`);
+          expect(messageEnv(message, 'CONFIG')).to.equal('plugins_dir: _plugins\n');
           done();
         })
         .catch(done);
@@ -398,15 +399,15 @@ describe('SQS', () => {
     it('should set CONFIG in the message to the YAML config for the site on a demo branch', (done) => {
       factory.site({
         demoBranch: 'demo',
-        config: 'plugins_dir: _plugins',
-        demoConfig: 'plugins_dir: _demo_plugins',
-        previewConfig: 'plugins_dir: _preview_plugins',
+        defaultConfig: { plugins_dir: '_plugins' },
+        demoConfig: { plugins_dir: '_demo_plugins' },
+        previewConfig: { plugins_dir: '_preview_plugins' },
       })
         .then(site => factory.build({ site, branch: 'demo' }))
         .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then(build => SQS.messageBodyForBuild(build))
         .then((message) => {
-          expect(messageEnv(message, 'CONFIG')).to.equal('plugins_dir: _demo_plugins');
+          expect(messageEnv(message, 'CONFIG')).to.equal('plugins_dir: _demo_plugins\n');
           done();
         })
         .catch(done);
@@ -415,15 +416,15 @@ describe('SQS', () => {
     it('should set CONFIG in the message to the YAML config for the site on a preview branch', (done) => {
       factory.site({
         defaultBranch: 'master',
-        config: 'plugins_dir: _plugins',
-        demoConfig: 'plugins_dir: _demo_plugins',
-        previewConfig: 'plugins_dir: _preview_plugins',
+        defaultConfig: { plugins_dir: '_plugins' },
+        demoConfig: { plugins_dir: '_demo_plugins' },
+        previewConfig: { plugins_dir: '_preview_plugins' },
       })
         .then(site => factory.build({ site, branch: 'preview' }))
         .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then(build => SQS.messageBodyForBuild(build))
         .then((message) => {
-          expect(messageEnv(message, 'CONFIG')).to.equal('plugins_dir: _preview_plugins');
+          expect(messageEnv(message, 'CONFIG')).to.equal('plugins_dir: _preview_plugins\n');
           done();
         })
         .catch(done);

@@ -17,19 +17,19 @@ describe('ScheduledBuildHelper', () => {
       const config = { schedule: 'nightly' };
       factory.site({
         owner: 'scheduled',
-        config: yaml.safeDump(config),
+        defaultConfig: config,
         defaultBranch: 'master',
-        demoConfig: yaml.safeDump(config),
+        demoConfig: config,
         demoBranch: 'staging',
       })
       .then(() => factory.site({
         owner: 'scheduled',
         demoBranch: 'staging',
-        demoConfig: yaml.safeDump(config),
+        demoConfig: config,
       }))
       .then(() => factory.site({
         owner: 'scheduled',
-        demoConfig: yaml.safeDump(config),
+        demoConfig: config,
       }))
       .then(() => factory.site({
         owner: 'scheduled',

@@ -14,14 +14,18 @@ const defaultBranch = build => build.branch === build.Site.defaultBranch;
 const demoBranch = build => build.branch === build.Site.demoBranch;
 
 const siteConfig = (build) => {
+  let config = '';
   if (defaultBranch(build)) {
-    return build.Site.defaultConfig;
+    config = build.Site.defaultConfig;
   }
-  if (demoBranch(build)) {
-    return build.Site.demoConfig;
+  else if (demoBranch(build)) {
+    config = build.Site.demoConfig;
+  } else {
+    config = build.Site.previewConfig;
   }
-  return build.Site.previewConfig;
+  return config;
 };
+
 
 const pathForBuild = (build) => {
   if (defaultBranch(build)) {
