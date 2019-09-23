@@ -19,12 +19,10 @@ function isValidYaml(yamlString) {
 
 function parseSiteConfig(siteConfig, configName = null) {
 
-  if (!siteConfig) { return null; }
-
-  let obj = {};
+  let obj = null;
 
   try {
-    if ((typeof siteConfig) === 'string'){
+    if ((typeof siteConfig) === 'string' && siteConfig.length > 0) {
       obj = yaml.safeLoad(siteConfig);
     }
 
