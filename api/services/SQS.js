@@ -23,7 +23,7 @@ const siteConfig = (build) => {
   } else {
     config = build.Site.previewConfig;
   }
-  return config;
+  return config || '';  // to be safedumped
 };
 
 
