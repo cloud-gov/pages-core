@@ -52,7 +52,7 @@ const beforeValidate = (site) => {
     site.owner = site.owner.toLowerCase(); // eslint-disable-line no-param-reassign
   }
 
-  let siteConfigs = {
+  const siteConfigs = {
     defaultConfig: { value: site.defaultConfig, label: 'Site configuration' },
     demoConfig: { value: site.demoConfig, label: 'Demo configuration' },
     previewConfig: { value: site.previewConfig, label: 'Preview configuration' },

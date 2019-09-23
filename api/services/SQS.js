@@ -14,15 +14,15 @@ const defaultBranch = build => build.branch === build.Site.defaultBranch;
 const demoBranch = build => build.branch === build.Site.demoBranch;
 
 const siteConfig = (build) => {
-  let buildConfig = '';
+  let siteBuildConfig = '';
   if (defaultBranch(build)) {
-    buildConfig = build.Site.defaultConfig;
+    siteBuildConfig = build.Site.defaultConfig;
   } else if (demoBranch(build)) {
-    buildConfig = build.Site.demoConfig;
+    siteBuildConfig = build.Site.demoConfig;
   } else {
-    buildConfig = build.Site.previewConfig;
+    siteBuildConfig = build.Site.previewConfig;
   }
-  return buildConfig || '';  // to be safedumped
+  return siteBuildConfig || '';  // to be safedumped
 };
 
 

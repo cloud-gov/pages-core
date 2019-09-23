@@ -42,7 +42,7 @@ function parseSiteConfig(siteConfig, configName = null) {
 
 function parseSiteConfigs(siteConfigs) {
   let siteConfig;
-  let parsedSiteConfigs = {};
+  const parsedSiteConfigs = {};
   Object.keys(siteConfigs).forEach((configName) => {
     siteConfig = siteConfigs[configName];
     parsedSiteConfigs[configName] = parseSiteConfig(siteConfig.value, siteConfig.label);
