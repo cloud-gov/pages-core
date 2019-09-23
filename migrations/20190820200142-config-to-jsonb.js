@@ -28,9 +28,10 @@ const convertSiteConfigsToJSON = (db, site) => {
       id = ${site.id};`;
 
   return db.runSql(cmdUpdateSiteRecord);
-}
+};
 
-const convertAllSitesConfigsToJSON = (db, sites) => Promise.all(sites.rows.map(site => convertSiteConfigsToJSON(db,site)));
+const convertAllSitesConfigsToJSON = (db, sites) =>
+  Promise.all(sites.rows.map(site => convertSiteConfigsToJSON(db, site)));
 
 exports.up = (db, callback) => {
   let sites;
@@ -49,10 +50,9 @@ exports.up = (db, callback) => {
     .then(() => db.removeColumn('site', 'config'))
     .then(() => callback())
     .catch(callback);
-}
+};
 
 const convertSiteConfigsToYAML = (db, site) => {
-  
   const atts = [];
   if (site.defaultConfig) {
     atts.push(`config = '${yaml.safeDump(site.defaultConfig)}'`);
@@ -75,14 +75,15 @@ const convertSiteConfigsToYAML = (db, site) => {
       id = ${site.id}`;
 
   return db.runSql(cmdUpdateSiteRecord);
-}
+};
 
 const cmdGetSitesJSON = 'SELECT id, "defaultConfig", "demoConfig", "previewConfig" from site where '
   + '("defaultConfig" is not null)'
   + ' OR ("demoConfig" is not null)'
   + ' OR ("previewConfig" is not null)';
 
-const convertAllSitesConfigsToYAML = (db, sites) => Promise.all(sites.rows.map(site => convertSiteConfigsToYAML(db,site)));
+const convertAllSitesConfigsToYAML = (db, sites) =>
+  Promise.all(sites.rows.map(site => convertSiteConfigsToYAML(db, site)));
 
 exports.down = (db, callback) => {
   let sites;
@@ -101,4 +102,4 @@ exports.down = (db, callback) => {
     .then(() => db.renameColumn('site', 'tempPreviewConfig', 'previewConfig'))
     .then(() => callback())
     .catch(callback);
-}
+};

@@ -389,7 +389,6 @@ describe('SQS', () => {
         .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then(build => SQS.messageBodyForBuild(build))
         .then((message) => {
-          console.log(`\n\nmessage:\t${JSON.stringify(message)}\n\n`);
           expect(messageEnv(message, 'CONFIG')).to.equal('plugins_dir: _plugins\n');
           done();
         })

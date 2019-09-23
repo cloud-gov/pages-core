@@ -18,7 +18,6 @@ function isValidYaml(yamlString) {
 }
 
 function parseSiteConfig(siteConfig, configName = null) {
-
   let obj = null;
 
   try {
@@ -26,32 +25,32 @@ function parseSiteConfig(siteConfig, configName = null) {
       obj = yaml.safeLoad(siteConfig);
     }
 
-    if ((typeof siteConfig ) === 'object') { return siteConfig; }
+    if ((typeof siteConfig) === 'object') { return siteConfig; }
   } catch (e) {
     // on invalid values
     let msg = 'input is not valid YAML';
     if (configName) {
-      msg = `${configName}: ` + msg;
+      msg = `${configName}: ${msg}`;
     }
 
     obj = new Error(msg);
-    obj.name = 'InvalidYaml'
+    obj.name = 'InvalidYaml';
     obj.status = 403;
   }
   return obj;
 }
 
 function parseSiteConfigs(siteConfigs) {
-  const configs = []
   let siteConfig;
+  let parsedSiteConfigs = {};
   Object.keys(siteConfigs).forEach((configName) => {
     siteConfig = siteConfigs[configName];
-    siteConfigs[configName] = parseSiteConfig(siteConfig.value, siteConfig.label);
+    parsedSiteConfigs[configName] = parseSiteConfig(siteConfig.value, siteConfig.label);
   });
   const errorMsgs = [];
-  Object.keys(siteConfigs).forEach((configName) => {
-    if (siteConfigs[configName] && siteConfigs[configName].status) {
-      errorMsgs.push(siteConfigs[configName].message);
+  Object.keys(parsedSiteConfigs).forEach((configName) => {
+    if (parsedSiteConfigs[configName] && parsedSiteConfigs[configName].status) {
+      errorMsgs.push(parsedSiteConfigs[configName].message);
     }
   });
 
@@ -61,7 +60,7 @@ function parseSiteConfigs(siteConfigs) {
     error.status = '403';
     throw error;
   }
-  return siteConfigs;
+  return parsedSiteConfigs;
 }
 
 module.exports = {

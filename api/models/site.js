@@ -58,10 +58,7 @@ const beforeValidate = (site) => {
     previewConfig: { value: site.previewConfig, label: 'Preview configuration' },
   };
 
-  siteConfigs = parseSiteConfigs(siteConfigs);
-  site.defaultConfig = siteConfigs.defaultConfig;
-  site.demoConfig = siteConfigs.demoConfig;
-  site.previewConfig = siteConfigs.previewConfig;
+  Object.assign(site, parseSiteConfigs(siteConfigs));
 };
 
 function domainWithSlash(url) {

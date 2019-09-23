@@ -1,4 +1,5 @@
 const yaml = require('js-yaml');
+
 const validBranchName = s => /^[\w._]+(?:[/-]*[\w._])*$/.test(s);
 
 function isValidYaml(yamlString) {

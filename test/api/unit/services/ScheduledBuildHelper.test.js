@@ -1,5 +1,4 @@
 const expect = require('chai').expect;
-const yaml = require('js-yaml');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
 const ScheduledBuildHelper = require('../../../../api/services/ScheduledBuildHelper');

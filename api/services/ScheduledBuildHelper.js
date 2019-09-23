@@ -1,4 +1,3 @@
-const yaml = require('js-yaml');
 const { Op } = require('sequelize');
 const { logger } = require('../../winston');
 const { Build, Site, User } = require('../models');
@@ -15,19 +14,17 @@ const buildBranch = (site, branch) =>
     .catch(err =>
       logger.error(`Error siteBuilds: (${site.owner}/${site.repository}@${site.branch})\n${err}`));
 
-const buildSite = site => {
-    let builds = [];
-    if (site.defaultConfig && site.defaultConfig.schedule === 'nightly') {
-      builds.push(buildBranch(site, site.defaultBranch));
-    }
+const buildSite = (site) => {
+  const builds = [];
+  if (site.defaultConfig && site.defaultConfig.schedule === 'nightly') {
+    builds.push(buildBranch(site, site.defaultBranch));
+  }
 
-    if (site.demoConfig && site.demoConfig.schedule === 'nightly') {
-      builds.push(buildBranch(site, site.demoBranch));
-    }
-    return Promise.all(builds);
-}
-  
-  
+  if (site.demoConfig && site.demoConfig.schedule === 'nightly') {
+    builds.push(buildBranch(site, site.demoBranch));
+  }
+  return Promise.all(builds);
+};
 
 const nightlyBuilds = () =>
   Site.findAll({
@@ -40,7 +37,7 @@ const nightlyBuilds = () =>
             },
             defaultConfig: {
               schedule: {
-                [Op.eq]: 'nightly',    
+                [Op.eq]: 'nightly',
               },
             },
           },
@@ -52,7 +49,7 @@ const nightlyBuilds = () =>
             },
             demoConfig: {
               schedule: {
-                [Op.eq]: 'nightly',    
+                [Op.eq]: 'nightly',
               },
             },
           },

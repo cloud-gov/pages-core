@@ -1425,7 +1425,7 @@ describe('Site API', () => {
       const userPromise = factory.user();
       const sitePromise = factory.site({
         users: Promise.all([userPromise]),
-        defaultConfig:  { 'old-config': true },
+        defaultConfig: { 'old-config': true },
         domain: 'https://example.com',
       });
       const cookiePromise = authenticatedSession(userPromise);

@@ -1,5 +1,4 @@
 const _ = require('underscore');
-const yaml = require('js-yaml');
 const authorizer = require('../authorizers/site');
 const S3SiteRemover = require('../services/S3SiteRemover');
 const SiteCreator = require('../services/SiteCreator');
