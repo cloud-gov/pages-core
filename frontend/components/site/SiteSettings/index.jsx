@@ -61,7 +61,7 @@ class SiteSettings extends React.Component {
 
     const advancedInitialValues = {
       engine: site.engine,
-      config: site.config || '',
+      defaultConfig: site.defaultConfig || '',
       demoConfig: site.demoConfig || '',
       previewConfig: site.previewConfig || '',
     };

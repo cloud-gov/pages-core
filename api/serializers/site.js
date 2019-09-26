@@ -1,3 +1,4 @@
+const yaml = require('js-yaml');
 const { Site, User } = require('../models');
 const userSerializer = require('../serializers/user');
 
@@ -15,6 +16,18 @@ const toJSON = (site) => {
 
   if (object.demoBranch) {
     object.demoViewLink = site.demoUrl();
+  }
+
+  if (object.defaultConfig) {
+    object.defaultConfig = yaml.safeDump(site.defaultConfig);
+  }
+
+  if (object.demoConfig) {
+    object.demoConfig = yaml.safeDump(site.demoConfig);
+  }
+
+  if (object.previewConfig) {
+    object.previewConfig = yaml.safeDump(site.previewConfig);
   }
 
   object.previewLink = site.branchPreviewUrl();
