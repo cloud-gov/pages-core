@@ -182,7 +182,7 @@ module.exports = {
         return site.update({
           demoBranch: params.demoBranch,
           demoDomain: params.demoDomain,
-          config: params.config,
+          defaultConfig: params.defaultConfig,
           previewConfig: params.previewConfig,
           demoConfig: params.demoConfig,
           defaultBranch: params.defaultBranch,

@@ -3,6 +3,7 @@ const { expect } = require('chai');
 const nock = require('nock');
 const request = require('supertest');
 const sinon = require('sinon');
+const yaml = require('js-yaml');
 
 const app = require('../../../app');
 const config = require('../../../config');
@@ -1290,8 +1291,17 @@ describe('Site API', () => {
     it('should allow a user to update a site associated with their account', (done) => {
       let site;
       let response;
-
-      factory.site({ config: 'old-config', demoConfig: 'old-demo-config', previewConfig: 'old-preview-config' })
+      const origConfigs = {
+        defaultConfig: { name: 'old-config' },
+        demoConfig: { name: 'old-demo-config' },
+        previewConfig: { name: 'old-preview-config' },
+      };
+      const newConfigs = {
+        defaultConfig: yaml.safeDump({ name: 'new-config' }),
+        demoConfig: yaml.safeDump({ name: 'new-demo-config' }),
+        previewConfig: yaml.safeDump({ name: 'new-preview-config' }),
+      };
+      factory.site(origConfigs)
         .then(s => Site.findByPk(s.id, { include: [User] }))
         .then((model) => {
           site = model;
@@ -1300,11 +1310,7 @@ describe('Site API', () => {
         .then(cookie => request(app)
           .put(`/v0/site/${site.id}`)
           .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            config: 'new-config',
-            demoConfig: 'new-demo-config',
-            previewConfig: 'new-preview-config',
-          })
+          .send(newConfigs)
           .set('Cookie', cookie)
           .expect(200)
         )
@@ -1314,13 +1320,12 @@ describe('Site API', () => {
         })
         .then((foundSite) => {
           validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
-
-          expect(response.body.config).to.equal('new-config');
-          expect(foundSite.config).to.equal('new-config');
-          expect(response.body.demoConfig).to.equal('new-demo-config');
-          expect(foundSite.demoConfig).to.equal('new-demo-config');
-          expect(response.body.previewConfig).to.equal('new-preview-config');
-          expect(foundSite.previewConfig).to.equal('new-preview-config');
+          expect(yaml.safeLoad(response.body.defaultConfig).name).to.equal('new-config');
+          expect(foundSite.defaultConfig.name).to.equal('new-config');
+          expect(yaml.safeLoad(response.body.demoConfig).name).to.equal('new-demo-config');
+          expect(foundSite.demoConfig.name).to.equal('new-demo-config');
+          expect(yaml.safeLoad(response.body.previewConfig).name).to.equal('new-preview-config');
+          expect(foundSite.previewConfig.name).to.equal('new-preview-config');
           siteResponseExpectations(response.body, foundSite);
           done();
         })
@@ -1420,7 +1425,7 @@ describe('Site API', () => {
       const userPromise = factory.user();
       const sitePromise = factory.site({
         users: Promise.all([userPromise]),
-        config: 'old-config: true',
+        defaultConfig: { 'old-config': true },
         domain: 'https://example.com',
       });
       const cookiePromise = authenticatedSession(userPromise);
@@ -1437,7 +1442,7 @@ describe('Site API', () => {
           .put(`/v0/site/${site.id}`)
           .set('x-csrf-token', csrfToken.getToken())
           .send({
-            config: '',
+            defaultConfig: '',
             domain: '',
           })
           .set('Cookie', results.cookie)
@@ -1448,7 +1453,7 @@ describe('Site API', () => {
         return Site.findByPk(site.id);
       })
       .then((foundSite) => {
-        expect(foundSite.config).to.equal('');
+        expect(foundSite.defaultConfig).to.equal(null);
         expect(foundSite.domain).to.equal('');
         done();
       })
@@ -1460,7 +1465,7 @@ describe('Site API', () => {
       const userPromise = factory.user();
       const sitePromise = factory.site({
         users: Promise.all([userPromise]),
-        config: 'old-config: true',
+        defaultConfig: { old: true },
         domain: 'https://example.com',
       });
       const cookiePromise = authenticatedSession(userPromise);
@@ -1477,7 +1482,7 @@ describe('Site API', () => {
           .put(`/v0/site/${site.id}`)
           .set('x-csrf-token', csrfToken.getToken())
           .send({
-            config: 'new-config: true',
+            defaultConfig: 'new: true',
           })
           .set('Cookie', results.cookie)
           .expect(200);
@@ -1487,7 +1492,7 @@ describe('Site API', () => {
         return Site.findByPk(site.id);
       })
       .then((foundSite) => {
-        expect(foundSite.config).to.equal('new-config: true');
+        expect(foundSite.defaultConfig).to.deep.equal({ new: true });
         expect(foundSite.domain).to.equal('https://example.com');
         done();
       })
@@ -1514,7 +1519,7 @@ describe('Site API', () => {
             .put(`/v0/site/${site.id}`)
             .set('x-csrf-token', csrfToken.getToken())
             .send({
-              config: ': badyaml1',
+              defaultConfig: ': badyaml1',
               demoConfig: ': badyaml2',
               previewConfig: ': badyaml3',
             })
@@ -1523,9 +1528,9 @@ describe('Site API', () => {
         })
         .then((response) => {
           expect(response.body.message).to.equal([
-            'config: input is not valid YAML',
-            'previewConfig: input is not valid YAML',
-            'demoConfig: input is not valid YAML',
+            'Site configuration: input is not valid YAML',
+            'Demo configuration: input is not valid YAML',
+            'Preview configuration: input is not valid YAML',
           ].join('\n'));
           validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
           done();

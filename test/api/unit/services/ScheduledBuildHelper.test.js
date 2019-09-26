@@ -1,5 +1,4 @@
 const expect = require('chai').expect;
-const yaml = require('js-yaml');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
 const ScheduledBuildHelper = require('../../../../api/services/ScheduledBuildHelper');
@@ -17,19 +16,19 @@ describe('ScheduledBuildHelper', () => {
       const config = { schedule: 'nightly' };
       factory.site({
         owner: 'scheduled',
-        config: yaml.safeDump(config),
+        defaultConfig: config,
         defaultBranch: 'master',
-        demoConfig: yaml.safeDump(config),
+        demoConfig: config,
         demoBranch: 'staging',
       })
       .then(() => factory.site({
         owner: 'scheduled',
         demoBranch: 'staging',
-        demoConfig: yaml.safeDump(config),
+        demoConfig: config,
       }))
       .then(() => factory.site({
         owner: 'scheduled',
-        demoConfig: yaml.safeDump(config),
+        demoConfig: config,
       }))
       .then(() => factory.site({
         owner: 'scheduled',

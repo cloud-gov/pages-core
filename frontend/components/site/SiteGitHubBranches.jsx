@@ -9,7 +9,7 @@ import githubBranchActions from '../../actions/githubBranchActions';
 import buildActions from '../../actions/buildActions';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
-import validBranchName from '../../util/validators';
+import { validBranchName } from '../../util/validators';
 
 // we only want to link branch names that are alphanumeric plus _, -, and .
 const isLinkable = s => validBranchName(s);

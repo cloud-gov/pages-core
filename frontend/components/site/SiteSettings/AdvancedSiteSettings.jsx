@@ -27,7 +27,7 @@ AdvancedSiteSettings.propTypes = {
   // initialValues is what the initial form values are based on
   initialValues: PropTypes.shape({
     engine: PropTypes.string.isRequired,
-    config: PropTypes.string,
+    defaultConfig: PropTypes.string,
     demoConfig: PropTypes.string,
     previewConfig: PropTypes.string,
   }).isRequired,

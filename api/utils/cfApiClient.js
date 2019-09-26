@@ -66,14 +66,14 @@ class CloudFoundryAPIClient {
       .then(route => this.mapRoute(route.metadata.guid));
   }
 
-  deleteRoute(name) {
+  deleteRoute(host) {
     return this.accessToken()
       .then(token => this.request(
         'GET',
-        '/v2/routes',
+        `/v2/routes?q=host:${host}`,
         token
       ))
-      .then(res => filterEntity(res, name, 'host'))
+      .then(res => filterEntity(res, host, 'host'))
       .then(entity => this.accessToken()
         .then(token => this.request(
           'DELETE',
@@ -190,8 +190,7 @@ class CloudFoundryAPIClient {
         json,
       }, (error, response, body) => {
         if (error) {
-          const stringed = JSON.stringify(error, null, 2);
-          reject(new Error(stringed));
+          reject(error);
         } else if (response.statusCode > 399) {
           const errorMessage = `Received status code: ${response.statusCode}`;
           reject(new Error(body || errorMessage));
