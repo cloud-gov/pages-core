@@ -1,6 +1,6 @@
 const validator = require('validator');
 
-const { branchRegex, isValidYaml } = require('../utils/validators');
+const { branchRegex, parseSiteConfigs } = require('../utils/validators');
 
 const afterValidate = (site) => {
   if (site.defaultBranch === site.demoBranch) {
@@ -51,6 +51,14 @@ const beforeValidate = (site) => {
   if (site.owner) {
     site.owner = site.owner.toLowerCase(); // eslint-disable-line no-param-reassign
   }
+
+  const siteConfigs = {
+    defaultConfig: { value: site.defaultConfig, label: 'Site configuration' },
+    demoConfig: { value: site.demoConfig, label: 'Demo configuration' },
+    previewConfig: { value: site.previewConfig, label: 'Preview configuration' },
+  };
+
+  Object.assign(site, parseSiteConfigs(siteConfigs));
 };
 
 function domainWithSlash(url) {
@@ -127,11 +135,8 @@ module.exports = (sequelize, DataTypes) => {
         isEmptyOrUrl,
       },
     },
-    config: {
-      type: DataTypes.STRING,
-      validate: {
-        isValidYaml,
-      },
+    defaultConfig: {
+      type: DataTypes.JSONB,
     },
     defaultBranch: {
       type: DataTypes.STRING,
@@ -156,16 +161,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     previewConfig: {
-      type: DataTypes.STRING,
-      validate: {
-        isValidYaml,
-      },
+      type: DataTypes.JSONB,
     },
     demoConfig: {
-      type: DataTypes.STRING,
-      validate: {
-        isValidYaml,
-      },
+      type: DataTypes.JSONB,
     },
     publishedAt: {
       type: DataTypes.DATE,

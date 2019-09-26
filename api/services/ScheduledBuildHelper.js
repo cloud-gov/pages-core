@@ -1,4 +1,3 @@
-const yaml = require('js-yaml');
 const { Op } = require('sequelize');
 const { logger } = require('../../winston');
 const { Build, Site, User } = require('../models');
@@ -11,27 +10,21 @@ const buildBranch = (site, branch) =>
         user: user.id,
         branch,
       })
-    );
+    )
+    .catch(err =>
+      logger.error(`Error siteBuilds: (${site.owner}/${site.repository}@${site.branch})\n${err}`));
 
-const buildSite = site =>
-  Promise.resolve(yaml.safeLoad(site.config))
-  .then((config) => {
-    if (config.schedule === 'nightly') {
-      return buildBranch(site, site.defaultBranch);
-    }
-    return Promise.resolve();
-  })
-  .catch(err =>
-    logger.error(`Error siteBuilds: (${site.owner}/${site.repository}@${site.demoBranch})\n${err}`))
-  .then(() => Promise.resolve(yaml.safeLoad(site.demoConfig)))
-  .then((demoConfig) => {
-    if (site.demoBranch && demoConfig.schedule === 'nightly') {
-      return buildBranch(site, site.demoBranch);
-    }
-    return Promise.resolve();
-  })
-  .catch(err =>
-    logger.error(`Error siteBuilds: (${site.owner}/${site.repository}@${site.demoBranch})\n${err}`));
+const buildSite = (site) => {
+  const builds = [];
+  if (site.defaultConfig && site.defaultConfig.schedule === 'nightly') {
+    builds.push(buildBranch(site, site.defaultBranch));
+  }
+
+  if (site.demoConfig && site.demoConfig.schedule === 'nightly') {
+    builds.push(buildBranch(site, site.demoBranch));
+  }
+  return Promise.all(builds);
+};
 
 const nightlyBuilds = () =>
   Site.findAll({
@@ -42,8 +35,10 @@ const nightlyBuilds = () =>
             defaultBranch: {
               [Op.ne]: null,
             },
-            config: {
-              [Op.like]: '%schedule: nightly%',
+            defaultConfig: {
+              schedule: {
+                [Op.eq]: 'nightly',
+              },
             },
           },
         },
@@ -53,7 +48,9 @@ const nightlyBuilds = () =>
               [Op.ne]: null,
             },
             demoConfig: {
-              [Op.like]: '%schedule: nightly%',
+              schedule: {
+                [Op.eq]: 'nightly',
+              },
             },
           },
         },

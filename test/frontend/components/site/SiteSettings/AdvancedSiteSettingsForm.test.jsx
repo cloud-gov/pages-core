@@ -10,7 +10,7 @@ describe('<AdvancedSiteSettingsForm/>', () => {
     {
       initialValues: {
         engine: 'jekyll',
-        config: 'boop: beep',
+        defaultConfig: 'boop: beep',
       },
       handleSubmit: spy(),
       reset: spy(),
@@ -29,7 +29,7 @@ describe('<AdvancedSiteSettingsForm/>', () => {
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('Field')).to.have.length(4);
     expect(wrapper.find('Field[name="engine"]').exists()).to.be.true;
-    expect(wrapper.find('Field[name="config"]').exists()).to.be.true;
+    expect(wrapper.find('Field[name="defaultConfig"]').exists()).to.be.true;
     expect(wrapper.find('Field[name="demoConfig"]').exists()).to.be.true;
     expect(wrapper.find('Field[name="previewConfig"]').exists()).to.be.true;
   });
