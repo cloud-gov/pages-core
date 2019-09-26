@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const url = require('url');
+const yaml = require('js-yaml');
 const S3Helper = require('./S3Helper');
 const config = require('../../config');
 const { logger } = require('../../winston');
@@ -13,14 +14,17 @@ const defaultBranch = build => build.branch === build.Site.defaultBranch;
 const demoBranch = build => build.branch === build.Site.demoBranch;
 
 const siteConfig = (build) => {
+  let siteBuildConfig = '';
   if (defaultBranch(build)) {
-    return build.Site.config;
+    siteBuildConfig = build.Site.defaultConfig;
+  } else if (demoBranch(build)) {
+    siteBuildConfig = build.Site.demoConfig;
+  } else {
+    siteBuildConfig = build.Site.previewConfig;
   }
-  if (demoBranch(build)) {
-    return build.Site.demoConfig;
-  }
-  return build.Site.previewConfig;
+  return siteBuildConfig || '';  // to be safedumped
 };
+
 
 const pathForBuild = (build) => {
   if (defaultBranch(build)) {
@@ -76,7 +80,7 @@ const generateDefaultCredentials = build => ({
   BASEURL: baseURLForBuild(build),
   CACHE_CONTROL: buildConfig.cacheControl,
   BRANCH: sourceForBuild(build).branch || build.branch,
-  CONFIG: siteConfig(build),
+  CONFIG: yaml.safeDump(siteConfig(build)),
   REPOSITORY: build.Site.repository,
   OWNER: build.Site.owner,
   SITE_PREFIX: pathForBuild(build),
