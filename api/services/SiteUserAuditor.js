@@ -70,7 +70,7 @@ const auditSite = (auditor, site, userIndex = 0) => {
           const r = site.removeUser(u)
             .then(() => UserActionCreator.addRemoveAction({
               userId: auditor.id,
-              targetId: user.id,
+              targetId: u.id,
               targetType: 'user',
               siteId: site.id,
             }))
