@@ -22,7 +22,7 @@ const siteConfig = (build) => {
   } else {
     siteBuildConfig = build.Site.previewConfig;
   }
-  return siteBuildConfig || '';  // to be safedumped
+  return siteBuildConfig ? yaml.safeDump(siteBuildConfig) : ''; // to be safedumped
 };
 
 
@@ -80,7 +80,7 @@ const generateDefaultCredentials = build => ({
   BASEURL: baseURLForBuild(build),
   CACHE_CONTROL: buildConfig.cacheControl,
   BRANCH: sourceForBuild(build).branch || build.branch,
-  CONFIG: yaml.safeDump(siteConfig(build)),
+  CONFIG: siteConfig(build),
   REPOSITORY: build.Site.repository,
   OWNER: build.Site.owner,
   SITE_PREFIX: pathForBuild(build),
