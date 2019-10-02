@@ -111,7 +111,7 @@ module.exports = {
     })
     .then(() => res.ok())
     .catch((err) => {
-      logger.error(`Error build/status reporting to GitHub: `, err);
+      logger.error('Error build/status reporting to GitHub: ', err);
       res.error(err);
     });
   },
