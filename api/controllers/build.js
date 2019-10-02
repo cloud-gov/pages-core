@@ -110,6 +110,9 @@ module.exports = {
       return GithubBuildStatusReporter.reportBuildStatus(build);
     })
     .then(() => res.ok())
-    .catch(res.error);
+    .catch((err) => {
+      logger.error(`Error build/status reporting to GitHub: `, err);
+      res.error(err);
+    });
   },
 };
