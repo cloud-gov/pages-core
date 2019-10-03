@@ -18,12 +18,18 @@ const auditUser = (user, auditor) => {
         const repoFound = repos.find(repo => repo.full_name.toUpperCase() === fullName)
         if (!repoFound || !repoFound.permissions.push) { // site does not have push permissions
           const r = site.removeUser(user)
-            .then(() => UserActionCreator.addRemoveAction({
-              userId: auditor.id,
-              targetId: user.id,
-              targetType: 'user',
-              siteId: site.id,
-            }))
+            .then(() => {
+              const msg = [];
+              msg.push(`auditUser remove ${user.username} from ${site.owner}/${site.repository}`);
+              if (repoFound) { msg.push(`:${repoFound.full_name} => ${JSON.stringify(repoFound.permissions)}`); }
+              logger.info(msg.join('\t'));
+              return UserActionCreator.addRemoveAction({
+                userId: auditor.id,
+                targetId: user.id,
+                targetType: 'user',
+                siteId: site.id,
+              });
+            })
             .catch(logger.error);
           removed.push(r);
         }
@@ -67,12 +73,18 @@ const auditSite = (auditor, site, userIndex = 0) => {
         const removed = [];
         usersToRemove.forEach((u) => {
           const r = site.removeUser(u)
-            .then(() => UserActionCreator.addRemoveAction({
-              userId: auditor.id,
-              targetId: u.id,
-              targetType: 'user',
-              siteId: site.id,
-            }))
+            .then(() => {
+              const msg = [];
+              msg.push(`auditSite - remove ${u.username} from ${site.owner}/${site.repository}:`);
+              msg.push(`${JSON.stringify(collaborators.find(c => c.login === u.username))}`);
+              logger.info(msg.join('\t'));
+              return UserActionCreator.addRemoveAction({
+                userId: auditor.id,
+                targetId: u.id,
+                targetType: 'user',
+                siteId: site.id,
+              });
+            })
             .catch(logger.error);
           removed.push(r);
         });
