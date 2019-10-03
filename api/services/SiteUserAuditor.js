@@ -15,9 +15,8 @@ const auditUser = (user, auditor) => {
       const removed = [];
       sites.forEach((site) => {
         const fullName = [site.owner, site.repository].join('/').toUpperCase();
-        if (!(repos.find(repo => repo.full_name.toUpperCase() === fullName)) || // site not in repos
-          (repos.find(repo => repo.full_name.toUpperCase() === fullName &&
-          !repo.permissions.push))) { // site does not have push permissions
+        const repoFound = repos.find(repo => repo.full_name.toUpperCase() === fullName)
+        if (!repoFound || !repoFound.permissions.push) { // site does not have push permissions
           const r = site.removeUser(user)
             .then(() => UserActionCreator.addRemoveAction({
               userId: auditor.id,
