@@ -113,14 +113,13 @@ const reportBuildStatus = (build) => {
     return GitHub.sendCreateGithubStatusRequest(accessToken, options);
   })
   .catch((error) => {
-    const msg = []
-    msg.push("Error reporting build status:");
+    const msg = [];
+    msg.push('Error reporting build status:');
     msg.push(error);
-    if (options) { msg.push(`options:\t${JSON.stringify(options)}`) };
-    if (site) { msg.push(`site:\t${site.owner}/${site.repository}`) };
-    if (build) { msg.push(`build:\t${JSON.stringify(build)}`) };
+    if (options) { msg.push(`options:\t${JSON.stringify(options)}`); }
+    if (site) { msg.push(`site:\t${site.owner}/${site.repository}`); }
+    if (build) { msg.push(`build:\t${JSON.stringify(build)}`); }
     logger.error(msg.join('\n'));
-
   });
 };
 
