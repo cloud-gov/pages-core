@@ -18,12 +18,14 @@ const checkAccessTokenPermissions = (users, site) => {
 
     return GitHub.checkPermissions(user, site.owner, site.repository)
     .then((permissions) => {
-      if (permissions.admin) {
+      if (permissions.push) {
         return Promise.resolve(user.githubAccessToken);
       }
-
       count += 1;
-
+      return getNextToken(users[count]);
+    })
+    .catch((e) => {
+      count += 1;
       return getNextToken(users[count]);
     });
   };
@@ -56,7 +58,13 @@ const loadBuildUserAccessToken = build =>
     const user = foundBuild.User;
 
     if (user.githubAccessToken) {
-      return user.githubAccessToken;
+      return checkAccessTokenPermissions([user], foundBuild.Site)
+      .then((token) => {
+        if(token) {
+          return Promise.resolve(token);
+        }
+        return loadSiteUserAccessToken(foundBuild.Site);
+      });
     }
 
     /**
@@ -115,7 +123,7 @@ const reportBuildStatus = (build) => {
   .catch((error) => {
     const msg = [];
     msg.push('Error reporting build status:');
-    msg.push(error);
+    msg.push(error.stack);
     if (options) { msg.push(`options:\t${JSON.stringify(options)}`); }
     if (site) { msg.push(`site:\t${site.owner}/${site.repository}`); }
     if (build) { msg.push(`build:\t${JSON.stringify(build)}`); }
