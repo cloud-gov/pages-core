@@ -227,16 +227,22 @@ describe('Build API', () => {
           const statusNock = githubAPINocks.status({ state: 'pending' });
 
           promiseProps
-          .then(promisedValues =>
-            validCreateRequest(
+          .then(promisedValues => {
+            githubAPINocks.repo({
+              accessToken: promisedValues.user.githubAccessToken,
+              owner: promisedValues.site.owner,
+              repo: promisedValues.site.repository,
+              username: promisedValues.user.username,
+            });
+            return validCreateRequest(
               csrfToken.getToken(),
               promisedValues.cookie,
               {
                 buildId: promisedValues.build.id,
                 siteId: promisedValues.build.site,
               }
-            )
-          )
+            );
+          })
           .then(() => {
             expect(statusNock.isDone()).to.be.true;
             done();
@@ -595,15 +601,26 @@ describe('Build API', () => {
     it('should report the build\'s status back to github', (done) => {
       nock.cleanAll();
       const statusNock = githubAPINocks.status({ state: 'success' });
+      let build;
+      let user;
 
       factory.build({ commitSha })
-      .then(build =>
-        postBuildStatus({
+      .then((_build) => {
+        build = _build;
+        return Promise.all([build.getUser(), build.getSite()]);
+      }).then(([user,site]) => {
+        githubAPINocks.repo({
+          accessToken: user.githubAccessToken,
+          owner: site.owner,
+          repo: site.repository,
+          username: user.username,
+        });
+        return  postBuildStatus({
           build,
           status: '0',
           message: '',
-        })
-      )
+        });
+      })
       .then(() => {
         expect(statusNock.isDone()).to.be.true;
         done();
