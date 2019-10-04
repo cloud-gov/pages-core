@@ -24,7 +24,7 @@ const checkAccessTokenPermissions = (users, site) => {
       count += 1;
       return getNextToken(users[count]);
     })
-    .catch((e) => {
+    .catch(() => {
       count += 1;
       return getNextToken(users[count]);
     });
@@ -60,7 +60,7 @@ const loadBuildUserAccessToken = build =>
     if (user.githubAccessToken) {
       return checkAccessTokenPermissions([user], foundBuild.Site)
       .then((token) => {
-        if(token) {
+        if (token) {
           return Promise.resolve(token);
         }
         return loadSiteUserAccessToken(foundBuild.Site);

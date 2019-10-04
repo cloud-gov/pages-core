@@ -227,7 +227,7 @@ describe('Build API', () => {
           const statusNock = githubAPINocks.status({ state: 'pending' });
 
           promiseProps
-          .then(promisedValues => {
+          .then((promisedValues) => {
             githubAPINocks.repo({
               accessToken: promisedValues.user.githubAccessToken,
               owner: promisedValues.site.owner,
@@ -602,20 +602,19 @@ describe('Build API', () => {
       nock.cleanAll();
       const statusNock = githubAPINocks.status({ state: 'success' });
       let build;
-      let user;
 
       factory.build({ commitSha })
       .then((_build) => {
         build = _build;
         return Promise.all([build.getUser(), build.getSite()]);
-      }).then(([user,site]) => {
+      }).then(([user, site]) => {
         githubAPINocks.repo({
           accessToken: user.githubAccessToken,
           owner: site.owner,
           repo: site.repository,
           username: user.username,
         });
-        return  postBuildStatus({
+        return postBuildStatus({
           build,
           status: '0',
           message: '',

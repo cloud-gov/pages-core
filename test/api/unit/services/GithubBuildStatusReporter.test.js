@@ -6,7 +6,6 @@ const config = require('../../../../config');
 const { logger } = require('../../../../winston');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
-const { Site, User } = require('../../../../api/models');
 
 const GithubBuildStatusReporter = require('../../../../api/services/GithubBuildStatusReporter');
 
@@ -51,7 +50,8 @@ describe('GithubBuildStatusReporter', () => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
 
       it("should report that the status if the build user does not have permission'", (done) => {
@@ -65,7 +65,7 @@ describe('GithubBuildStatusReporter', () => {
           site = _site;
           return factory.build({
             state: 'processing',
-            site: site,
+            site,
             commitSha,
           });
         }).then((_build) => {
@@ -74,12 +74,12 @@ describe('GithubBuildStatusReporter', () => {
         }).then((users) => {
           let i;
           let options;
-          for (i=0; i < users.length; i += 1) {
+          for (i = 0; i < users.length; i += 1) {
             options = {
               accessToken: users[i].githubAccessToken,
               owner: 'test-owner',
               repo: 'test-repo',
-              username: users[i].username, 
+              username: users[i].username,
             };
             if (users[i].id === build.user) { options.response = [201, { permissions: {} }]; }
             repoNocks.push(githubAPINocks.repo(options));
@@ -94,11 +94,13 @@ describe('GithubBuildStatusReporter', () => {
           });
 
           return GithubBuildStatusReporter.reportBuildStatus(build);
-        }).then(() => {
-          repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true)
+        })
+        .then(() => {
+          repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
           expect(statusNock.isDone()).to.be.true;
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
 
       it("should report that the status if the build user does not have token'", (done) => {
@@ -112,9 +114,9 @@ describe('GithubBuildStatusReporter', () => {
           site = _site;
           return factory.build({
             state: 'processing',
-            site: site,
+            site,
             commitSha,
-            user: factory.user({ site, githubAccessToken: null })
+            user: factory.user({ site, githubAccessToken: null }),
           });
         }).then((_build) => {
           build = _build;
@@ -122,12 +124,12 @@ describe('GithubBuildStatusReporter', () => {
         }).then((users) => {
           let i;
           let options;
-          for (i=0; i < users.length; i += 1) {
+          for (i = 0; i < users.length; i += 1) {
             options = {
               accessToken: users[i].githubAccessToken,
               owner: 'test-owner',
               repo: 'test-repo',
-              username: users[i].username, 
+              username: users[i].username,
             };
             if (users[i].id === build.user) {
               options.response = [403, { permissions: {} }];
@@ -144,11 +146,13 @@ describe('GithubBuildStatusReporter', () => {
           });
 
           return GithubBuildStatusReporter.reportBuildStatus(build);
-        }).then(() => {
-          repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true)
+        })
+        .then(() => {
+          repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
           expect(statusNock.isDone()).to.be.true;
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
 
       it("should not report that the status if the build user does not have token'", (done) => {
