@@ -157,7 +157,7 @@ describe('GithubBuildStatusReporter', () => {
 
       it("should not report that the status if the build user does not have token'", (done) => {
         let statusNock;
-        let repoNocks = [];
+        const repoNocks = [];
         let build;
         let site;
         const loggerSpy = spy(logger, 'error');
@@ -167,7 +167,7 @@ describe('GithubBuildStatusReporter', () => {
           site = _site;
           return factory.build({
             state: 'processing',
-            site: site,
+            site,
             commitSha,
           });
         }).then((_build) => {
@@ -176,31 +176,35 @@ describe('GithubBuildStatusReporter', () => {
         }).then((users) => {
           let i;
           let options;
-          for (i=0; i < users.length; i += 1) {
+          for (i = 0; i < users.length; i += 1) {
             options = {
               owner: 'test-owner',
               repo: 'test-repo',
-              username: users[i].username, 
+              username: users[i].username,
               response: [403, { permissions: {} }],
-            }
+            };
             repoNocks.push(githubAPINocks.repo(options));
           }
           return Promise.all(repoNocks);
-        }).then(() => githubAPINocks.status({
+        })
+        .then(() => githubAPINocks.status({
           owner: 'test-owner',
           repo: 'test-repo',
           repository: 'test-repo',
           sha: commitSha,
           state: 'pending',
-        })).then((_statusNock) => {
+        }))
+        .then((_statusNock) => {
           statusNock = _statusNock;
           return GithubBuildStatusReporter.reportBuildStatus(build);
-        }).then(() => {
+        })
+        .then(() => {
           expect(statusNock.isDone()).to.be.false;
           expect(loggerSpy.called).to.be.true;
           loggerSpy.restore();
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
 
       it('should set the target uri to the build logs', (done) => {
@@ -234,7 +238,8 @@ describe('GithubBuildStatusReporter', () => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
     });
 
@@ -277,7 +282,8 @@ describe('GithubBuildStatusReporter', () => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
     });
 
@@ -313,7 +319,8 @@ describe('GithubBuildStatusReporter', () => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
 
       it('should set the target uri to the preview link', (done) => {
@@ -352,7 +359,8 @@ describe('GithubBuildStatusReporter', () => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
     });
 
@@ -388,7 +396,8 @@ describe('GithubBuildStatusReporter', () => {
           expect(statusNock.isDone()).to.be.true;
           expect(repoNock.isDone()).to.be.true;
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
 
       it('should set the target uri to the build logs', (done) => {
@@ -422,7 +431,8 @@ describe('GithubBuildStatusReporter', () => {
           expect(statusNock.isDone()).to.be.true;
           expect(repoNock.isDone()).to.be.true;
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
     });
 
@@ -457,8 +467,10 @@ describe('GithubBuildStatusReporter', () => {
           return GithubBuildStatusReporter.reportBuildStatus(build);
         }).then(() => {
           expect(statusNock.isDone()).to.be.true;
+          expect(repoNock.isDone()).to.be.true;
           done();
-        }).catch(done);
+        })
+        .catch(done);
       });
     });
 
