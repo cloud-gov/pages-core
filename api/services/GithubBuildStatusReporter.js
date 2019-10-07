@@ -25,7 +25,7 @@ const checkAccessTokenPermissions = (users, site) => {
       return getNextToken(users[count]);
     })
     .catch((err) => {
-      const errMsg = `Error checking ${site.owner}/${site.repository} permissions for ${user.username}`;
+      const errMsg = `Permisssions for ${user.username} on ${site.owner}/${site.repository}`;
       logger.error(errMsg, err);
       count += 1;
       return getNextToken(users[count]);
