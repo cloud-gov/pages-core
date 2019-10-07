@@ -135,7 +135,7 @@ const githubAuth = (username, organizations) => {
 };
 
 // eslint-disable-next-line no-shadow
-const repo = ({ accessToken, owner, repo, response } = {}) => {
+const repo = ({ accessToken, owner, repo, username, response } = {}) => {
   let webhookNock = nock('https://api.github.com');
 
   if (owner && repo) {
@@ -144,8 +144,12 @@ const repo = ({ accessToken, owner, repo, response } = {}) => {
     webhookNock = webhookNock.get(/\/repos\/.*\/.*/);
   }
 
-  if (accessToken) {
+  if (accessToken && username) {
+    webhookNock = webhookNock.query({ access_token: accessToken, username });
+  } else if (accessToken) {
     webhookNock = webhookNock.query({ access_token: accessToken });
+  } else if (username) {
+    webhookNock = webhookNock.query({ username });
   } else {
     webhookNock = webhookNock.query(true);
   }
