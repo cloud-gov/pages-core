@@ -24,7 +24,9 @@ const checkAccessTokenPermissions = (users, site) => {
       count += 1;
       return getNextToken(users[count]);
     })
-    .catch(() => {
+    .catch((err) => {
+      const errMsg = `Error checking ${site.owner}/${site.repository} permissions for ${user.username}`;
+      logger.error(errMsg, err);
       count += 1;
       return getNextToken(users[count]);
     });
