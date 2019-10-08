@@ -34,3 +34,4 @@ env:
   FEDERALIST_PREVIEW_HOSTNAME: https://federalist-proxy-staging.app.cloud.gov
   SOCKET_HOST: https://federalistapp-staging.fr.cloud.gov
   USER_AUDITOR: federalist
+  FEDERALIST_S3_BROKER_GUID: F36820DC-FDB6-496C-9D96-68861F5D0D95

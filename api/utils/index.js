@@ -7,7 +7,9 @@ const { logger } = require('../../winston');
 
 function filterEntity(res, name, field = 'name') {
   const filtered = res.resources.filter(item => item.entity[field] === name);
-
+  if (name === 'basic-public') {
+    return filtered.find(f => f.entity.unique_id === config.app.federalistS3BrokerGuid);
+  }
   if (filtered.length === 1) return filtered[0];
   return Promise.reject(new Error({
     message: 'Not found',
