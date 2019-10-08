@@ -55,14 +55,14 @@ const baseURLForBuild = (build) => {
 };
 
 const statusCallbackURL = build => [
-  url.resolve(config.app.hostname, '/v0/build'),
+  url.resolve(config.app.internal_hostname, '/v0/build'),
   build.id,
   'status',
   build.token,
 ].join('/');
 
 const buildLogCallbackURL = build => [
-  url.resolve(config.app.hostname, '/v0/build'),
+  url.resolve(config.app.internal_hostname, '/v0/build'),
   build.id,
   'log',
   build.token,
