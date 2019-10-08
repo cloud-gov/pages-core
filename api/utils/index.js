@@ -7,15 +7,25 @@ const { logger } = require('../../winston');
 
 function filterEntity(res, name, field = 'name') {
   const filtered = res.resources.filter(item => item.entity[field] === name);
-  if (name === 'basic-public') {
-    return filtered.find(f => f.entity.unique_id === config.app.federalistS3BrokerGuid);
+  if (filtered.length === 0) {
+    return Promise.reject(new Error({
+      message: `Entity not found: @${field} = ${name}`,
+      name,
+      field,
+    }));
   }
-  if (filtered.length === 1) return filtered[0];
-  return Promise.reject(new Error({
-    message: 'Not found',
-    name,
-    field,
-  }));
+  if (name === 'basic-public') {
+    const servicePlan = filtered.find(f => f.entity.unique_id === config.app.s3ServicePlanId);
+    if (!servicePlan) {
+      return Promise.reject(new Error({
+        message: `basic-public service plan (${config.app.s3ServicePlanId}) not found`,
+        name,
+        field,
+      }));
+    }
+    return servicePlan;
+  }
+  return filtered[0];
 }
 
 function firstEntity(res, name) {
