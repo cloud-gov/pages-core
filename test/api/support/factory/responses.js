@@ -17,6 +17,7 @@ const entity = overrides => Object.assign({
   name: 'test-service',
   service_plan_guid: 'test-service-plan-guid',
   credentials: credentials(),
+  unique_id: config.app.s3ServicePlanId,
 }, overrides);
 
 const service = (metadataOverrides, entityOverrides) => ({
