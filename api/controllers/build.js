@@ -91,7 +91,13 @@ module.exports = {
     let message;
     Promise.resolve(decodeb64(req.body.message))
     .catch((err) => {
-      logger.error([`Error decoding build status message: ${req.body.message}`, err].join('\n'));
+      const errMsg =  [
+        'Error decoding build status message',
+        `build@id=${req.params.id}`,
+        `status message: ${req.body.message}`,
+        err,
+      ];
+      logger.error(errMsg.join('\n'));
       return Promise.resolve('build status message parsing error');
     })
     .then((_message) => {
