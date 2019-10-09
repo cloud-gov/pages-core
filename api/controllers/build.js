@@ -88,8 +88,12 @@ module.exports = {
   },
 
   status: (req, res) => {
-    const message = decodeb64(req.body.message);
-    Promise.resolve(Number(req.params.id))
+    let message;
+    Promise.resolve(decodeb64(req.body.message))
+    .then((_message) => {
+      message = _message;
+      return Promise.resolve(Number(req.params.id));
+    })
     .then((id) => {
       if (isNaN(id)) {
         throw 404;
@@ -111,7 +115,7 @@ module.exports = {
     })
     .then(() => res.ok())
     .catch((err) => {
-      logger.error('Error build/status reporting to GitHub: ', err);
+      logger.error(['Error build status reporting to GitHub', err, err.stack].join('\n'));
       res.error(err);
     });
   },
