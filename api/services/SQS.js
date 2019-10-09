@@ -54,15 +54,17 @@ const baseURLForBuild = (build) => {
   return `/${pathForBuild(build)}`;
 };
 
+const callbackURL = () => config.app.internal_hostname || config.app.hostname;
+
 const statusCallbackURL = build => [
-  url.resolve(config.app.hostname, '/v0/build'),
+  url.resolve(callbackURL(), '/v0/build'),
   build.id,
   'status',
   build.token,
 ].join('/');
 
 const buildLogCallbackURL = build => [
-  url.resolve(config.app.hostname, '/v0/build'),
+  url.resolve(callbackURL(), '/v0/build'),
   build.id,
   'log',
   build.token,
