@@ -37,4 +37,16 @@ cf login -u $CF_USERNAME -p $CF_PASSWORD -o $CF_ORGANIZATION -s $CF_SPACE
 echo "Deploying to $CF_SPACE space."
 cf zero-downtime-push $CF_APP -f $CF_MANIFEST
 
+if [ "$CIRCLE_BRANCH" == "master" ]; then
+  cf add-network-policy federalist-build-container-1 --destination-app $CF_APP --protocol tcp --port 8080
+  cf add-network-policy federalist-build-container-2 --destination-app $CF_APP --protocol tcp --port 8080
+  cf add-network-policy federalist-build-container-3 --destination-app $CF_APP --protocol tcp --port 8080
+  cf add-network-policy federalist-build-container-4 --destination-app $CF_APP --protocol tcp --port 8080
+  cf add-network-policy federalist-build-container-5 --destination-app $CF_APP --protocol tcp --port 8080
+  cf add-network-policy federalist-build-container-6 --destination-app $CF_APP --protocol tcp --port 8080
+elif [ "$CIRCLE_BRANCH" == "staging" ]; then
+  cf add-network-policy federalist-build-container-staging-1 --destination-app $CF_APP --protocol tcp --port 8080
+  cf add-network-policy federalist-build-container-staging-2 --destination-app $CF_APP --protocol tcp --port 8080
+fi
+
 cf logout
