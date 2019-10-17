@@ -26,7 +26,6 @@ env:
   NODE_ENV: production
   APP_ENV: staging
   APP_HOSTNAME: https://federalistapp-staging.18f.gov
-  APP_INTERNAL_HOSTNAME: http://federalistapp-staging.apps.internal:8080
   CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
   CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
   HOMEPAGE_URL: https://federalist-staging.18f.gov
