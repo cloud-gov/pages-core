@@ -291,7 +291,7 @@ function create_infrastructure() {
     cf target -s $space
 
     # Create dedicated bucket service and service key
-    cf cs s3 basic-public $dedicated_bucket_service
+    cf cs federalist-s3 basic-public $dedicated_bucket_service
     cf csk $dedicated_bucket_service "$dedicated_bucket_service-key"
 
     set_s3_credentials $dedicated_bucket_service
