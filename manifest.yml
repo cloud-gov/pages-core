@@ -7,6 +7,7 @@ routes:
 - route: federalistapp.18f.gov
 - route: federalistapp.fr.cloud.gov
 - route: federalist.fr.cloud.gov
+- route: federalistapp.apps.internal
 disk_quota: 2G
 memory: 256MB
 instances: 5

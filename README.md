@@ -21,7 +21,7 @@ Partner agencies across the federal government use Federalist to host websites. 
 - [Natural Resources Revenue Data](https://revenuedata.doi.gov/)
 - [NSF Small Business Innovation Research program](https://seedfund.nsf.gov)
 
-More examples can be found at [https://federalist.18f.gov/content/examples](https://federalist.18f.gov/content/examples).
+More examples can be found at [https://federalist.18f.gov/success-stories/](https://federalist.18f.gov/success-stories/).
 
 ## Setting up a local Federalist development environment
 

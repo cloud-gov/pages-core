@@ -88,8 +88,29 @@ module.exports = {
   },
 
   status: (req, res) => {
-    const message = decodeb64(req.body.message);
-    Promise.resolve(Number(req.params.id))
+    let message;
+
+    const getStatusMessage = (statusRequest) => {
+      let statusMessage;
+      try {
+        statusMessage = decodeb64(statusRequest.body.message);
+      } catch (err) {
+        statusMessage = 'build status message parsing error';
+        const errMsg = [
+          `Error decoding build status message for build@id=${statusRequest.params.id}`,
+          `build@message: ${statusRequest.body.message}`,
+          err,
+        ];
+        logger.error(errMsg.join('\n'));
+      }
+      return statusMessage;
+    };
+
+    Promise.resolve(getStatusMessage(req))
+    .then((_message) => {
+      message = _message;
+      return Promise.resolve(Number(req.params.id));
+    })
     .then((id) => {
       if (isNaN(id)) {
         throw 404;
@@ -111,7 +132,7 @@ module.exports = {
     })
     .then(() => res.ok())
     .catch((err) => {
-      logger.error('Error build/status reporting to GitHub: ', err);
+      logger.error(['Error build status reporting to GitHub', err, err.stack].join('\n'));
       res.error(err);
     });
   },

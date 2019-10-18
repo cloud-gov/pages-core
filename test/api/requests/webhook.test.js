@@ -154,6 +154,13 @@ describe('Webhook API', () => {
           payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
           const signature = signWebhookPayload(payload);
 
+          githubAPINocks.repo({
+            accessToken: user.githubAccessToken,
+            owner: site.owner,
+            repo: site.repository,
+            username: user.username,
+          });
+
           return request(app)
             .post('/webhook/github')
             .send(payload)
