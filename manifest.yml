@@ -9,7 +9,7 @@ routes:
 - route: federalist.fr.cloud.gov
 - route: federalistapp.apps.internal
 disk_quota: 2G
-memory: 256MB
+memory: 512MB
 instances: 5
 services:
 - federalist-production-rds
