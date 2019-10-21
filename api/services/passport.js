@@ -4,7 +4,6 @@ const config = require('../../config');
 const { User } = require('../models');
 const { logger } = require('../../winston');
 const GitHub = require('./GitHub');
-const SiteUserAuditor = require('./SiteUserAuditor');
 const RepositoryVerifier = require('./RepositoryVerifier');
 
 const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
@@ -30,9 +29,6 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
       });
     })
     .then(() => {
-      User.findOne({ where: { username: process.env.USER_AUDITOR } })
-        .then(auditor => SiteUserAuditor.auditUser(user, auditor)); // audit user's sites post auth
-
       RepositoryVerifier.verifyUserRepos(user); // verify user's site's repos
       callback(null, user);
     })
