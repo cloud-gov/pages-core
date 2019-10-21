@@ -4,7 +4,6 @@ const config = require('../../config');
 const { User } = require('../models');
 const { logger } = require('../../winston');
 const GitHub = require('./GitHub');
-const SiteUserAuditor = require('./SiteUserAuditor');
 const RepositoryVerifier = require('./RepositoryVerifier');
 
 const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
