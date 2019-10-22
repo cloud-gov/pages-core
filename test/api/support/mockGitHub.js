@@ -94,7 +94,11 @@ function getCollaborators(githubAccessToken, owner, repo, size = 10) {
     if ((i % 10) === 0) {
       members.push({ login: `username-${i}`, permissions: { push: false } });
     } else {
-      members.push({ login: `username-${i}`, permissions: { push: true } });
+      if(( i % 2) === 0) {
+        members.push({ login: `username-${i}`, permissions: { push: true } });
+      } else {
+        members.push({ login: `userName-${i}`, permissions: { push: true } });
+      }
     }
   }
   return Promise.resolve(members);
