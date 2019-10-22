@@ -68,7 +68,8 @@ const auditSite = (auditor, site, userIndex = 0) => {
     .catch(logger.warn)
     .then(() => {
       if (collaborators && collaborators.length > 0) {
-        const pushCollabs = collaborators.filter(c => c.permissions.push).map(c => c.login);
+        const pushCollabs = collaborators.filter(c => c.permissions.push)
+          .map(c => c.login.toLowerCase());
         const usersToRemove = site.Users.filter(u => !pushCollabs.includes(u.username));
         const removed = [];
         usersToRemove.forEach((u) => {
