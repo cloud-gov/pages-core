@@ -18,6 +18,7 @@ describe('<SiteBuildLogs/>', () => {
         isLoading: false,
         data: [{ id: 1, source: 'theSource', createdAt: '2018-11-05T13:15:30Z', output: 'blahblah' }],
       },
+      actions: { fetchBuildLogs: sinon.spy() }
     };
   });
 
@@ -56,7 +57,6 @@ describe('<SiteBuildLogs/>', () => {
     props.actions = { fetchBuildLogs: spy };
 
     const wrapper = shallow(<SiteBuildLogs {...props} />);
-    wrapper.instance().componentDidMount();
     expect(spy.calledOnce).to.equal(true);
   });
 
@@ -97,7 +97,6 @@ describe('<SiteBuildLogs/>', () => {
       props.actions = { fetchBuildLogs: spy };
 
       const wrapper = shallow(<SiteBuildLogs {...props} />);
-      wrapper.instance().componentDidMount();
       wrapper.setState({ autoRefresh: true });
       clock.tick(REFRESH_INTERVAL + 1000);
       expect(spy.callCount).to.equal(2);
@@ -109,7 +108,6 @@ describe('<SiteBuildLogs/>', () => {
       props.actions = { fetchBuildLogs: spy };
 
       const wrapper = shallow(<SiteBuildLogs {...props} />);
-      wrapper.instance().componentDidMount();
       clock.tick(REFRESH_INTERVAL + 1000);
       expect(spy.callCount).to.equal(1);
     });
