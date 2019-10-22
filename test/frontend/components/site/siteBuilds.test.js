@@ -51,8 +51,6 @@ describe('<SiteBuilds/>', () => {
   const columnIndex = (wrapper, name) => {
     let index;
     wrapper.find('tr').children().forEach((child, childIndex) => {
-
-      const userCell = wrapper.find('td[data-title="User"]');
       if (child.contains(name)) {
         index = childIndex;
       }
@@ -153,7 +151,7 @@ describe('<SiteBuilds/>', () => {
   it('should fetch the builds on mount', () => {
     const spy = props.actions.fetchBuilds;
 
-    const wrapper = shallow(<SiteBuilds {...props} />);
+    shallow(<SiteBuilds {...props} />);
     expect(spy.calledOnce).to.equal(true);
   });
 
@@ -200,7 +198,7 @@ describe('<SiteBuilds/>', () => {
     it('should NOT refresh builds when `auto refresh` is turned off', () => {
       const spy = props.actions.fetchBuilds;
 
-      const wrapper = shallow(<SiteBuilds {...props} />);
+      shallow(<SiteBuilds {...props} />);
       clock.tick(REFRESH_INTERVAL + 1000);
       expect(spy.callCount).to.equal(1);
     });
