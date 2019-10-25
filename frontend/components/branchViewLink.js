@@ -18,7 +18,7 @@ const getUrlAndViewText = (branchName, site, completedAt) => {
   // temp for migration - should if block be removed by end of year 2019
   if (site.s3ServiceName && (site.s3ServiceName !== 'federalist-production-s3')
     && site.createdAt && (new Date(site.createdAt) < new Date('2019-06-05T20:09Z'))
-    && completedAt && ((new Date(completedAt) < new Date('2019-10-25T20:00Z')))) {
+    && completedAt && ((new Date(completedAt) < new Date('2019-10-25T17:00Z')))) {
     return {
       url: `https://federalist-proxy.app.cloud.gov/preview/${site.owner}/${site.repository}/${branchName}/`,
       viewText: 'Preview site',
