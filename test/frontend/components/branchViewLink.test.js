@@ -13,6 +13,7 @@ describe('<BranchViewLink/>', () => {
     owner: 'test-owner',
     repository: 'test-repo',
     awsBucketName: 'test-bucket',
+    s3ServiceName: 'federalist-production-s3',
   };
 
   let props;
@@ -69,6 +70,7 @@ describe('<BranchViewLink/>', () => {
     props.branchName = 'some-another-branch';
     props.completedAt = '2019-01-01';
     props.site.createdAt = '2019-01-01';
+    props.site.s3ServiceName = 'myServiceName';
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
@@ -82,6 +84,7 @@ describe('<BranchViewLink/>', () => {
     props.branchName = 'some-other-other-branch';
     props.completedAt = '2019-10-31';
     props.site.createdAt = '2019-01-01';
+    props.site.s3ServiceName = 'myServiceName';
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
@@ -95,6 +98,7 @@ describe('<BranchViewLink/>', () => {
     props.branchName = 'some-other-another-branch';
     props.completedAt = '2019-01-01';
     props.site.createdAt = '2019-10-01';
+    props.site.s3ServiceName = 'myServiceName';
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
