@@ -23,6 +23,7 @@ const io = require('socket.io');
 const redis = require('redis');
 const redisAdapter = require('socket.io-redis');
 const schedule = require('node-schedule');
+const formData = require('express-form-data');
 
 const responses = require('./api/responses');
 const passport = require('./api/services/passport');
@@ -63,6 +64,7 @@ app.use((req, res, next) => {
 });
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: '2mb' }));
+app.use(formData.parse({ autoClean: true }));
 app.use(methodOverride());
 app.use(flash());
 app.use(responses);

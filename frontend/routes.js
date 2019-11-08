@@ -14,6 +14,7 @@ import SiteSettings from './components/site/SiteSettings';
 import AddSite from './components/AddSite';
 import NotFound from './components/NotFound';
 import NotificationSettings from './components/site/NotificationSettings';
+import ScanUpload from './components/scan/ScanUpload';
 
 import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
@@ -46,6 +47,10 @@ export default (
       <Redirect from="*" to="/not-found" />
     </Route>
     <Route path="/not-found" component={NotFound} />
+    <Route path="scans">
+      <IndexRoute component={SiteList} />
+      <Route path="upload" component={ScanUpload} />
+    </Route>
     <Redirect from="*" to="/sites" />
   </Route>
 );

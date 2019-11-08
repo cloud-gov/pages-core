@@ -22,6 +22,7 @@ const SiteUser = sequelize.import(path.join(__dirname, '/site-user'));
 const User = sequelize.import(path.join(__dirname, '/user'));
 const UserAction = sequelize.import(path.join(__dirname, '/user-action'));
 const ActionType = sequelize.import(path.join(__dirname, '/action-type'));
+const Scan = sequelize.import(path.join(__dirname, '/scan'));
 /* eslint-enable no-unused-vars */
 
 Object.keys(sequelize.models).forEach(key =>

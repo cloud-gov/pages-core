@@ -16,5 +16,6 @@ router.get('/sites(/*)?', csrfProtection, MainController.app);
 router.get('/robots.txt', MainController.robots);
 
 router.get('/404-not-found/', MainController.notFound);
+router.get('/scans(/*)?', csrfProtection, MainController.app);
 
 module.exports = router;

@@ -137,4 +137,14 @@ export default {
       handleHttpError: false,
     });
   },
+
+  uploadScan(data) {
+    console.log(`\n\nuploadScan:\t${JSON.stringify(data)}`)
+    return this.fetch('scan/upload', {
+      method: 'POST',
+      file: data,
+    }, {
+      handleHttpError: false,
+    });
+  },
 };

@@ -49,16 +49,23 @@ function parseJSON(response) {
 function fetchWrapper(url, configs = {}) {
   const baseConfigs = {
     credentials: configs.credentials || credentials,
-    headers: Object.assign({}, defaultHeaders, configs.headers || {}),
+    headers: Object.assign({}, configs.file ? {} : defaultHeaders, configs.headers || {}),
     method: configs.method || defaultMethod,
   };
 
   let requestConfigs;
 
   if (configs.method && !(/get|delete/i).test(configs.method)) {
-    requestConfigs = Object.assign(baseConfigs, {}, {
-      body: JSON.stringify(configs.data),
-    });
+    if ((/post/i).test(configs.method) && configs.file) {
+      console.log(`\n\nconfigs.file:\t${configs.file}\n\n`)
+      requestConfigs = Object.assign(baseConfigs, {}, {
+        body: configs.file,
+      });
+    } else {
+      requestConfigs = Object.assign(baseConfigs, {}, {
+        body: JSON.stringify(configs.data),
+      });
+    }
   } else {
     requestConfigs = baseConfigs;
   }

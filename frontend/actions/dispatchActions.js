@@ -18,6 +18,11 @@ import {
 
 import { pushHistory } from './routeActions';
 
+import {
+  scanUploaded as createScanUploadedAction,
+  scanUploadStarted as createScanUploadStartedAction,
+} from './actionCreators/scanActions';
+
 const updateRouterToSitesUri = () => {
   pushHistory('/sites');
 };
@@ -70,6 +75,14 @@ const dispatchSetCurrentSiteAction = siteId => dispatch(setCurrentSiteAction(sit
 
 const dispatchResetFormAction = formName => dispatch(reset(formName));
 
+const dispatchScanUploadedAction = () => {
+  dispatch(createScanUploadedAction());
+};
+
+const dispatchScanUploadStartedAction = () => {
+  dispatch(createScanUploadStartedAction());
+};
+
 export {
   updateRouterToSitesUri,
   updateRouterToSiteBuildsUri,
@@ -85,4 +98,6 @@ export {
   dispatchSetCurrentSiteAction,
   dispatchResetFormAction,
   dispatchSiteUserUpdatedAction,
+  dispatchScanUploadedAction,
+  dispatchScanUploadStartedAction,
 };
