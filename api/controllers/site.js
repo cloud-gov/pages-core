@@ -78,7 +78,7 @@ module.exports = {
         res.json(siteJSON);
       })
       .catch((err) => {
-        logger.error([err, err.stack].join('\n\n'));
+        logger.error([err.message, err.stack].join('\n\n'));
         res.error(err);
       });
   },

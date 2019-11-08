@@ -43,7 +43,7 @@ const removeInfrastructure = (site) => {
     return apiClient.deleteRoute(site.awsBucketName)
       .then(apiClient.deleteServiceInstance(site.s3ServiceName))
       .catch((err) => {
-        logger.error([err, err.stack].join('\n\n'));
+        logger.error([err.message, err.stack].join('\n\n'));
         throw err;
       });
   }
@@ -86,7 +86,7 @@ const removeSite = (site) => {
       });
     })
     .catch((err) => {
-      logger.error([err, err.stack].join('\n\n'));
+      logger.error([err.message, err.stack].join('\n\n'));
       throw err;
     });
 };
