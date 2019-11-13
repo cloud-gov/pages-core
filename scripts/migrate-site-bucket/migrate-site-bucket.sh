@@ -133,7 +133,7 @@ function cp_site() {
 
         echo $is_file
         echo $file_url
-        curl --create-dirs -o "$tmp_dir/$file_url" $proxy_url/$file_url
+        curl -s --create-dirs -o "$tmp_dir/$file_url" $proxy_url/$file_url
     done
 
     set_s3_credentials $dedicated_service
@@ -291,7 +291,7 @@ function create_infrastructure() {
     cf target -s $space
 
     # Create dedicated bucket service and service key
-    cf cs federalist-s3 basic-public $dedicated_bucket_service
+    cf cs federalist-s3 basic-public $dedicated_bucket_service || { echo "Create bucket failed for $owner $repo" ; exit 1; }
     cf csk $dedicated_bucket_service "$dedicated_bucket_service-key"
 
     set_s3_credentials $dedicated_bucket_service

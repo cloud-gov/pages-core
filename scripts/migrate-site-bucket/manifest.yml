@@ -4,7 +4,7 @@ docker:
   image: apburnes/bucket-migrator:latest
 stack: cflinuxfs3
 disk_quota: 4G
-memory: 256MB
+memory: 6G
 command: (echo SUCCESS || echo FAIL) && sleep infinity
 no-route: true
 health-check-type: none
