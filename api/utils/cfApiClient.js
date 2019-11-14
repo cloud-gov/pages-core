@@ -3,7 +3,6 @@ const url = require('url');
 const { filterEntity, firstEntity } = require('./');
 const CloudFoundryAuthClient = require('./cfAuthClient');
 const config = require('../../config');
-const { logger } = require('../../winston');
 
 class CloudFoundryAPIClient {
   constructor() {
