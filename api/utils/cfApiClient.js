@@ -3,6 +3,7 @@ const url = require('url');
 const { filterEntity, firstEntity } = require('./');
 const CloudFoundryAuthClient = require('./cfAuthClient');
 const config = require('../../config');
+const { logger } = require('../../winston');
 
 class CloudFoundryAPIClient {
   constructor() {
@@ -193,7 +194,7 @@ class CloudFoundryAPIClient {
           reject(error);
         } else if (response.statusCode > 399) {
           const errorMessage = `Received status code: ${response.statusCode}`;
-          reject(new Error(body || errorMessage));
+          reject(new Error(body.description || errorMessage));
         } else {
           this.parser(body, resolve);
         }
