@@ -1,7 +1,18 @@
 const S3Helper = require('./S3Helper');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const config = require('../../config');
-const { logger } = require('../../winston');
+
+const handleError = err => {
+  let message;
+  try {
+    message = JSON.parse(err.message);
+    if (!((message.message).match(/Not found/))) {
+      throw err;
+    }
+  } catch (e) {
+    throw err;
+  }
+}
 
 const apiClient = new CloudFoundryAPIClient();
 /**
@@ -85,18 +96,6 @@ const removeSite = (site) => {
     })
     .catch(err => handleError(err));
 };
-
-const handleError = e => {
-  let message;
-  try {
-    message = JSON.parse(err.message);
-    if (!((message.message).match(/Not found/))) {
-      throw err;
-    }
-  } catch(e) {
-    throw err;
-  }
-}
 
 module.exports = {
   removeInfrastructure,
