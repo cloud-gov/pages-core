@@ -2,7 +2,7 @@ const S3Helper = require('./S3Helper');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const config = require('../../config');
 
-const handleError = err => {
+const handleError = (err) => {
   let message;
   try {
     message = JSON.parse(err.message);
@@ -12,7 +12,7 @@ const handleError = err => {
   } catch (e) {
     throw err;
   }
-}
+};
 
 const apiClient = new CloudFoundryAPIClient();
 /**
