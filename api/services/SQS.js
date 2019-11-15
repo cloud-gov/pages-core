@@ -89,6 +89,7 @@ const generateDefaultCredentials = build => ({
   SOURCE_REPO: sourceForBuild(build).repository,
   SOURCE_OWNER: sourceForBuild(build).owner,
   SKIP_LOGGING: config.app.app_env === 'development',
+  BUILD_ID: build.id,
 });
 
 const buildContainerEnvironment = (build) => {
