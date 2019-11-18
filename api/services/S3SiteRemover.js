@@ -2,6 +2,7 @@ const S3Helper = require('./S3Helper');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const config = require('../../config');
 
+// handle error if service is not found an throw all other errors
 const handleError = (err) => {
   let message;
   try {
@@ -52,9 +53,9 @@ const getKeys = (s3Client, prefix) => s3Client.listObjects(prefix)
 const removeInfrastructure = (site) => {
   if (site.s3ServiceName !== config.s3.serviceName && site.awsBucketName !== config.s3.bucket) {
     return apiClient.deleteRoute(site.awsBucketName)
-      .catch(handleError)
+      .catch(handleError) // if route does not exist continue to delete service instance
       .then(apiClient.deleteServiceInstance(site.s3ServiceName))
-      .catch(handleError);
+      .catch(handleError); // if service instance does not exist handle error & delete site
   }
 
   return Promise.resolve();
