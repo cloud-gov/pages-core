@@ -12,34 +12,50 @@ const mockCreateRoute = (resource, body) => nock(url, reqheaders)
   .post('/v2/routes', body)
   .reply(200, resource);
 
-const mockDeleteRoute = (host, guid) => {
-  nock(url, reqheaders)
-    .get(`/v2/routes?q=host:${host}`)
-    .reply(200, {
-      resources: [{
-        metadata: { guid },
-        entity: { host },
-      }],
-    });
+const mockDeleteRoute = (host, guid, exists = true) => {
+  if (exists) {
+    nock(url, reqheaders)
+      .get(`/v2/routes?q=host:${host}`)
+      .reply(200, {
+        resources: [{
+          metadata: { guid },
+          entity: { host },
+        }],
+      });
 
-  nock(url, reqheaders)
-    .delete(`/v2/routes/${guid}?recursive=true&async=true`)
-    .reply(200, { metadata: { guid } });
+    nock(url, reqheaders)
+      .delete(`/v2/routes/${guid}?recursive=true&async=true`)
+      .reply(200, { metadata: { guid } });
+  } else {
+    nock(url, reqheaders)
+      .get(`/v2/routes?q=host:${host}`)
+      .reply(200, {
+        resources: [],
+      });
+  }
 };
 
-const mockDeleteService = (name, guid) => {
-  nock(url, reqheaders)
-    .get(`/v2/service_instances?q=name:${name}`)
-    .reply(200, {
-      resources: [{
-        metadata: { guid },
-        entity: { name },
-      }],
-    });
+const mockDeleteService = (name, guid, exists = true) => {
+  if (exists) {
+    nock(url, reqheaders)
+      .get(`/v2/service_instances?q=name:${name}`)
+      .reply(200, {
+        resources: [{
+          metadata: { guid },
+          entity: { name },
+        }],
+      });
 
-  nock(url, reqheaders)
-    .delete(`/v2/service_instances/${guid}?accepts_incomplete=true&recursive=true&async=true`)
-    .reply(200, { metadata: { guid } });
+    nock(url, reqheaders)
+      .delete(`/v2/service_instances/${guid}?accepts_incomplete=true&recursive=true&async=true`)
+      .reply(200, { metadata: { guid } });
+  } else {
+    nock(url, reqheaders)
+      .get(`/v2/service_instances?q=name:${name}`)
+      .reply(200, {
+        resources: [],
+      });
+  }
 };
 
 const mockFetchServiceKeysRequest = resources => nock(url, reqheaders)

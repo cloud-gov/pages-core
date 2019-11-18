@@ -7,6 +7,7 @@ const apiNocks = require('../../support/cfAPINocks');
 const factory = require('../../support/factory');
 const config = require('../../../../config');
 const S3SiteRemover = require('../../../../api/services/S3SiteRemover');
+const { Site } = require('../../../../api/models');
 
 const mapSiteContents = objects => ({
   Contents: objects.map(Key => ({ Key })),
@@ -212,6 +213,28 @@ describe('S3SiteRemover', () => {
         return S3SiteRemover.removeInfrastructure(site);
       }).then(done)
         .catch(done);
+    });
+
+    it('should resolve when services do not exist', (done) => {
+      let site;
+      const s3Service = 'this-is-a-s3-service';
+      const s3Guid = '8675-three-o-9';
+      const routeName = 'route-hostname-is-bucket-name';
+      const routeGuid = 'bev-hills-90210';
+
+      mockTokenRequest();
+      apiNocks.mockDeleteService(s3Service, s3Guid, false);
+      apiNocks.mockDeleteRoute(routeName, routeGuid, false);
+
+      factory.site({
+        s3ServiceName: s3Service,
+        awsBucketName: routeName,
+      }).then((model) => {
+        site = model;
+
+        return S3SiteRemover.removeInfrastructure(site);
+      })
+      .then(done);
     });
   });
 });

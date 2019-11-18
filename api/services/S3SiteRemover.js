@@ -5,8 +5,8 @@ const config = require('../../config');
 const handleError = (err) => {
   let message;
   try {
-    message = JSON.parse(err.message);
-    if (!((message.message).match(/Not found/))) {
+    message = JSON.parse(err.message).message;
+    if (!message.match(/Not found/)) {
       throw err;
     }
   } catch (e) {
@@ -52,9 +52,9 @@ const getKeys = (s3Client, prefix) => s3Client.listObjects(prefix)
 const removeInfrastructure = (site) => {
   if (site.s3ServiceName !== config.s3.serviceName && site.awsBucketName !== config.s3.bucket) {
     return apiClient.deleteRoute(site.awsBucketName)
-      .catch(err => handleError(err))
+      .catch(handleError)
       .then(apiClient.deleteServiceInstance(site.s3ServiceName))
-      .catch(err => handleError(err));
+      .catch(handleError);
   }
 
   return Promise.resolve();
