@@ -94,7 +94,7 @@ const removeSite = (site) => {
       }
       return deleteObjects(s3Client, mergedKeys);
     })
-    .catch(err => handleError(err));
+    .catch(handleError);
 };
 
 module.exports = {
