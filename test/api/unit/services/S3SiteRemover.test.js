@@ -150,6 +150,15 @@ describe('S3SiteRemover', () => {
         .then(done)
         .catch(done);
     });
+
+    it('should resolve if no bucket exists', (done) => {
+      mockTokenRequest();
+      apiNocks.mockDefaultCredentials(false);
+
+      factory.site()
+        .then(site => S3SiteRemover.removeSite(site))
+        .then(done);
+    });
   });
 
   describe('.removeInfrastructure', () => {
