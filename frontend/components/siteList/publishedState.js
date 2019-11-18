@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { dateAndTime } from '../../util/datetime';
 
@@ -16,8 +17,8 @@ const PublishedState = ({ site = {} }) =>
   </p>;
 
 PublishedState.propTypes = {
-  site: React.PropTypes.shape({
-    publishedAt: React.PropTypes.string,
+  site: PropTypes.shape({
+    publishedAt: PropTypes.string,
   }),
 };
 

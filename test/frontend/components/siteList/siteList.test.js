@@ -71,9 +71,7 @@ describe('<SiteList />', () => {
 
     it('renders sites in ascending order by id', () => {
       const items = wrapper.find(SiteListItem);
-      expect(items.nodes[0].key).to.equal('2');
-      expect(items.nodes[1].key).to.equal('5');
-      expect(items.nodes[2].key).to.equal('8');
+      expect(items.getElements().map(e => e.key)).to.deep.equal(['2', '5', '8']);
     });
   });
 });
