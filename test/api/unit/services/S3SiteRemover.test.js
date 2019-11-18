@@ -7,7 +7,6 @@ const apiNocks = require('../../support/cfAPINocks');
 const factory = require('../../support/factory');
 const config = require('../../../../config');
 const S3SiteRemover = require('../../../../api/services/S3SiteRemover');
-const { Site } = require('../../../../api/models');
 
 const mapSiteContents = objects => ({
   Contents: objects.map(Key => ({ Key })),
