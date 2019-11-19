@@ -192,9 +192,9 @@ describe('S3SiteRemover', () => {
 
         return S3SiteRemover.removeInfrastructure(site);
       }).then((res) => {
-        expect(res.metadata.guid).to.equal(routeGuid);
+        expect(res.metadata.guid).to.equal(s3Guid);
         done();
-      }).catch(done);
+      });
     });
 
     it('should resolve without deleting services when site bucket name matches shared', (done) => {

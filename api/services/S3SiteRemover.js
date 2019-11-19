@@ -54,7 +54,7 @@ const removeInfrastructure = (site) => {
   if (site.s3ServiceName !== config.s3.serviceName && site.awsBucketName !== config.s3.bucket) {
     return apiClient.deleteRoute(site.awsBucketName)
       .catch(handleError) // if route does not exist continue to delete service instance
-      .then(apiClient.deleteServiceInstance(site.s3ServiceName))
+      .then(() => apiClient.deleteServiceInstance(site.s3ServiceName))
       .catch(handleError); // if service instance does not exist handle error & delete site
   }
 
