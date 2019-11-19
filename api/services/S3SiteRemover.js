@@ -67,10 +67,10 @@ const removeSite = (site) => {
     `demo/${site.owner}/${site.repository}`,
     `preview/${site.owner}/${site.repository}`,
   ];
-  let s3Client;
+
   return apiClient.fetchServiceInstanceCredentials(site.s3ServiceName)
     .then((credentials) => {
-      s3Client = new S3Helper.S3Client({
+      const s3Client = new S3Helper.S3Client({
         accessKeyId: credentials.access_key_id,
         secretAccessKey: credentials.secret_access_key,
         region: credentials.region,
