@@ -30,10 +30,10 @@ function filterEntity(res, name, field = 'name') {
 
 function firstEntity(res, name) {
   if (res.resources.length === 0) {
-    return Promise.reject(new Error(JSON.stringify({
+    throw new Error(JSON.stringify({
       message: 'Not found',
       name,
-    })));
+    }));
   }
 
   return res.resources[0];
