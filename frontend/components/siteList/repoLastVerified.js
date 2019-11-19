@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { dateAndTime } from '../../util/datetime';
 
@@ -24,13 +25,13 @@ const RepoLastVerified = ({ site, daysNotVerified = 5, userUpdated }) => {
 };
 
 RepoLastVerified.propTypes = {
-  site: React.PropTypes.shape({
-    repoLastVerified: React.PropTypes.string,
-    createdAt: React.PropTypes.string,
-    userUpdated: React.PropTypes.string,
+  site: PropTypes.shape({
+    repoLastVerified: PropTypes.string,
+    createdAt: PropTypes.string,
+    userUpdated: PropTypes.string,
   }),
-  daysNotVerified: React.PropTypes.number,
-  userUpdated: React.PropTypes.string,
+  daysNotVerified: PropTypes.number,
+  userUpdated: PropTypes.string,
 };
 
 RepoLastVerified.defaultProps = {
