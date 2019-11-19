@@ -101,7 +101,7 @@ describe('S3SiteRemover', () => {
         expect(objectsToDelete.length).to.equal(0);
 
         done();
-      }).catch(done);
+      });
     });
 
     it('should delete objects in batches of 1000 at a time', (done) => {
@@ -127,8 +127,7 @@ describe('S3SiteRemover', () => {
         // 2250 objects means 3 groups of 1000
           expect(deleteObjectsCallCount).to.equal(3);
           done();
-        })
-        .catch(done);
+        });
     });
 
     it('should not delete anything if there is nothing to delete', (done) => {
@@ -169,8 +168,7 @@ describe('S3SiteRemover', () => {
         site = model;
 
         return S3SiteRemover.removeInfrastructure(site);
-      }).then(done)
-        .catch(done);
+      }).then(done);
     });
 
     it('should delete the bucket and proxy route service when site is in a private bucket', (done) => {
@@ -206,8 +204,7 @@ describe('S3SiteRemover', () => {
         site = model;
 
         return S3SiteRemover.removeInfrastructure(site);
-      }).then(done)
-        .catch(done);
+      }).then(done);
     });
 
     it('should resolve without deleting services when site s3 service name matches shared', (done) => {
@@ -219,8 +216,7 @@ describe('S3SiteRemover', () => {
         site = model;
 
         return S3SiteRemover.removeInfrastructure(site);
-      }).then(done)
-        .catch(done);
+      }).then(done);
     });
 
     it('should resolve when services do not exist', (done) => {
