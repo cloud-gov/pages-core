@@ -6,22 +6,20 @@ const config = require('../../config');
 const { logger } = require('../../winston');
 
 function filterEntity(res, name, field = 'name') {
+  let errMsg = `Not found: Entity @${field} = ${name}`;
   const filtered = res.resources.filter(item => item.entity[field] === name);
   if (filtered.length === 0) {
-    return Promise.reject(new Error(JSON.stringify({
-      message: `Not found: Entity @${field} = ${name}`,
-      name,
-      field,
-    })));
+    const error = new Error(errMsg);
+    error.name = name;
+    return Promise.reject(error);
   }
   if (name === 'basic-public') {
     const servicePlan = filtered.find(f => f.entity.unique_id === config.app.s3ServicePlanId);
     if (!servicePlan) {
-      return Promise.reject(new Error(JSON.stringify({
-        message: `Not found: basic-public service plan (${config.app.s3ServicePlanId})`,
-        name,
-        field,
-      })));
+      errMsg = `${errMsg} @basic-public service plan = (${config.app.s3ServicePlanId})`;
+      const error = new Error(errMsg);
+      error.name = name;
+      return Promise.reject(error);
     }
     return servicePlan;
   }
@@ -30,10 +28,9 @@ function filterEntity(res, name, field = 'name') {
 
 function firstEntity(res, name) {
   if (res.resources.length === 0) {
-    return Promise.reject(new Error(JSON.stringify({
-      message: 'Not found',
-      name,
-    })));
+    const error = new Error('Not found');
+    error.name = name;
+    return Promise.reject(error);
   }
 
   return res.resources[0];

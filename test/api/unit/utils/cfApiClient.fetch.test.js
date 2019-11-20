@@ -57,11 +57,7 @@ describe('CloudFoundryAPIClient', () => {
     it('should reject when service instance does not exist', (done) => {
       const name = 'not-an-instance';
 
-      const message = new Error({
-        message: 'Not found',
-        name,
-        field: 'name',
-      });
+      const message = `Not found: Entity @name = ${name}`;
 
       const instancesResponse = {
         resources: [
@@ -76,7 +72,8 @@ describe('CloudFoundryAPIClient', () => {
       const apiClient = new CloudFoundryAPIClient();
       apiClient.fetchServiceInstance(name)
         .catch((err) => {
-          expect(err).to.deep.equal(message);
+          expect(err.message).to.deep.equal(message);
+          expect(err.name).to.equal(name);
           done();
         });
     });
@@ -179,11 +176,7 @@ describe('CloudFoundryAPIClient', () => {
     it('should reject when service key does not exist', (done) => {
       const name = 'not-a-key';
 
-      const message = new Error({
-        message: 'Not found',
-        name,
-        field: 'name',
-      });
+      const message = `Not found: Entity @name = ${name}`;
 
       const keysResponse = {
         resources: [
@@ -198,7 +191,8 @@ describe('CloudFoundryAPIClient', () => {
       const apiClient = new CloudFoundryAPIClient();
       apiClient.fetchServiceKey(name)
         .catch((err) => {
-          expect(err).to.deep.equal(message);
+          expect(err.message).to.equal(message);
+          expect(err.name).to.equal(name);
           done();
         });
     });
@@ -231,11 +225,7 @@ describe('CloudFoundryAPIClient', () => {
     it('should reject when service plan is not found', (done) => {
       const name = 'not-a-service-plan';
 
-      const message = new Error({
-        message: 'Not found',
-        name,
-        field: 'name',
-      });
+      const message = `Not found: Entity @name = ${name}`;
 
       const response = {
         resources: [
@@ -250,7 +240,8 @@ describe('CloudFoundryAPIClient', () => {
       const apiClient = new CloudFoundryAPIClient();
       apiClient.fetchS3ServicePlanGUID(name)
         .catch((err) => {
-          expect(err).to.deep.equal(message);
+          expect(err.message).to.equal(message);
+          expect(err.name).to.equal(name);
           done();
         });
     });
