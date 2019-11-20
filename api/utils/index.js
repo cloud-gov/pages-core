@@ -8,20 +8,20 @@ const { logger } = require('../../winston');
 function filterEntity(res, name, field = 'name') {
   const filtered = res.resources.filter(item => item.entity[field] === name);
   if (filtered.length === 0) {
-    return Promise.reject(new Error({
-      message: `Entity not found: @${field} = ${name}`,
+    return Promise.reject(new Error(JSON.stringify({
+      message: `Not found: Entity @${field} = ${name}`,
       name,
       field,
-    }));
+    })));
   }
   if (name === 'basic-public') {
     const servicePlan = filtered.find(f => f.entity.unique_id === config.app.s3ServicePlanId);
     if (!servicePlan) {
-      return Promise.reject(new Error({
-        message: `basic-public service plan (${config.app.s3ServicePlanId}) not found`,
+      return Promise.reject(new Error(JSON.stringify({
+        message: `Not found: basic-public service plan (${config.app.s3ServicePlanId})`,
         name,
         field,
-      }));
+      })));
     }
     return servicePlan;
   }
@@ -101,8 +101,9 @@ function loadDevelopmentManifest() {
 function loadProductionManifest() {
   const manifestFile = 'webpack-manifest.json';
   if (!fs.existsSync(manifestFile)) {
-    logger.error('webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?');
-    throw new Error();
+    const msg = 'webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?';
+    logger.error(msg);
+    throw new Error(msg);
   }
   return JSON.parse(fs.readFileSync(manifestFile, 'utf-8'));
 }
