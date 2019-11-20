@@ -101,7 +101,7 @@ describe('S3SiteRemover', () => {
         expect(objectsToDelete.length).to.equal(0);
 
         done();
-      }).catch(done);
+      });
     });
 
     it('should delete objects in batches of 1000 at a time', (done) => {
@@ -127,8 +127,7 @@ describe('S3SiteRemover', () => {
         // 2250 objects means 3 groups of 1000
           expect(deleteObjectsCallCount).to.equal(3);
           done();
-        })
-        .catch(done);
+        });
     });
 
     it('should not delete anything if there is nothing to delete', (done) => {
@@ -150,6 +149,15 @@ describe('S3SiteRemover', () => {
         .then(done)
         .catch(done);
     });
+
+    it('should resolve if no bucket exists', (done) => {
+      mockTokenRequest();
+      apiNocks.mockDefaultCredentials(false);
+
+      factory.site()
+        .then(site => S3SiteRemover.removeSite(site))
+        .then(done);
+    });
   });
 
   describe('.removeInfrastructure', () => {
@@ -160,8 +168,7 @@ describe('S3SiteRemover', () => {
         site = model;
 
         return S3SiteRemover.removeInfrastructure(site);
-      }).then(done)
-        .catch(done);
+      }).then(done);
     });
 
     it('should delete the bucket and proxy route service when site is in a private bucket', (done) => {
@@ -183,9 +190,9 @@ describe('S3SiteRemover', () => {
 
         return S3SiteRemover.removeInfrastructure(site);
       }).then((res) => {
-        expect(res.metadata.guid).to.equal(routeGuid);
+        expect(res.metadata.guid).to.equal(s3Guid);
         done();
-      }).catch(done);
+      });
     });
 
     it('should resolve without deleting services when site bucket name matches shared', (done) => {
@@ -197,8 +204,7 @@ describe('S3SiteRemover', () => {
         site = model;
 
         return S3SiteRemover.removeInfrastructure(site);
-      }).then(done)
-        .catch(done);
+      }).then(done);
     });
 
     it('should resolve without deleting services when site s3 service name matches shared', (done) => {
@@ -210,8 +216,29 @@ describe('S3SiteRemover', () => {
         site = model;
 
         return S3SiteRemover.removeInfrastructure(site);
-      }).then(done)
-        .catch(done);
+      }).then(done);
+    });
+
+    it('should resolve when services do not exist', (done) => {
+      let site;
+      const s3Service = 'this-is-a-s3-service';
+      const s3Guid = '8675-three-o-9';
+      const routeName = 'route-hostname-is-bucket-name';
+      const routeGuid = 'bev-hills-90210';
+
+      mockTokenRequest();
+      apiNocks.mockDeleteService(s3Service, s3Guid, false);
+      apiNocks.mockDeleteRoute(routeName, routeGuid, false);
+
+      factory.site({
+        s3ServiceName: s3Service,
+        awsBucketName: routeName,
+      }).then((model) => {
+        site = model;
+
+        return S3SiteRemover.removeInfrastructure(site);
+      })
+      .then(done);
     });
   });
 });
