@@ -193,7 +193,7 @@ class CloudFoundryAPIClient {
           reject(error);
         } else if (response.statusCode > 399) {
           const errorMessage = `Received status code: ${response.statusCode}`;
-          reject(new Error(body.description || errorMessage));
+          reject(new Error(body || errorMessage));
         } else {
           this.parser(body, resolve);
         }
