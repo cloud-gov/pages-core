@@ -54,7 +54,7 @@ describe('utils', () => {
   });
 
   describe('.firstEntity', () => {
-    it('should return first entity from an objects resources array', (done) => {
+    it('should return first entity from an objects resources array', () => {
       const name = 'one';
       const field = 'name';
       const entity = { [field]: name };
@@ -68,23 +68,21 @@ describe('utils', () => {
           },
         ],
       };
+
       const result = utils.firstEntity(resources, name);
 
       expect(result).to.deep.equal({ entity });
-      done();
     });
 
-    it('should reject a promise if no resources returned', (done) => {
+    it('should throw an error if no resources returned', () => {
       const name = 'one';
       const resources = {
         resources: [],
       };
 
-      utils.firstEntity(resources, name)
-        .catch((err) => {
-          expect(err).to.be.an('error');
-          done();
-        });
+      const fn = () => utils.firstEntity(resources, name);
+
+      expect(fn).to.throw(Error, 'Not found');
     });
   });
 

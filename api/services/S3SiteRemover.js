@@ -1,7 +1,17 @@
 const S3Helper = require('./S3Helper');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const config = require('../../config');
-const { logger } = require('../../winston');
+
+// handle error if service is not found an throw all other errors
+const handleError = (err) => {
+  try {
+    if (!err.message.match(/Not found/)) {
+      throw err;
+    }
+  } catch (e) {
+    throw err;
+  }
+};
 
 const apiClient = new CloudFoundryAPIClient();
 /**
@@ -41,11 +51,9 @@ const getKeys = (s3Client, prefix) => s3Client.listObjects(prefix)
 const removeInfrastructure = (site) => {
   if (site.s3ServiceName !== config.s3.serviceName && site.awsBucketName !== config.s3.bucket) {
     return apiClient.deleteRoute(site.awsBucketName)
-      .then(apiClient.deleteServiceInstance(site.s3ServiceName))
-      .catch((err) => {
-        logger.error([err.message, err.stack].join('\n\n'));
-        throw err;
-      });
+      .catch(handleError) // if route does not exist continue to delete service instance
+      .then(() => apiClient.deleteServiceInstance(site.s3ServiceName))
+      .catch(handleError); // if service instance does not exist handle error & delete site
   }
 
   return Promise.resolve();
@@ -57,10 +65,10 @@ const removeSite = (site) => {
     `demo/${site.owner}/${site.repository}`,
     `preview/${site.owner}/${site.repository}`,
   ];
-
+  let s3Client;
   return apiClient.fetchServiceInstanceCredentials(site.s3ServiceName)
     .then((credentials) => {
-      const s3Client = new S3Helper.S3Client({
+      s3Client = new S3Helper.S3Client({
         accessKeyId: credentials.access_key_id,
         secretAccessKey: credentials.secret_access_key,
         region: credentials.region,
@@ -69,26 +77,23 @@ const removeSite = (site) => {
 
       return Promise.all(
         prefixes.map(prefix => getKeys(s3Client, `${prefix}/`))
-      ).then((keys) => {
-        let mergedKeys = [].concat(...keys);
-
-        if (mergedKeys.length) {
-          /**
-           * The federalist build container puts redirect objects in the root of each user's folder
-           * which correspond to the name of each site prefix. Because each site prefix is suffixed
-           * with a trailing `/`, `listObjects will no longer see them.
-           * Therefore, they are manually added to the array of keys marked for deletion.
-           */
-          mergedKeys = mergedKeys.concat(prefixes.slice(0));
-        }
-
-        return deleteObjects(s3Client, mergedKeys);
-      });
+      );
     })
-    .catch((err) => {
-      logger.error([err.message, err.stack].join('\n\n'));
-      throw err;
-    });
+    .then((keys) => {
+      let mergedKeys = [].concat(...keys);
+
+      if (mergedKeys.length) {
+        /**
+         * The federalist build container puts redirect objects in the root of each user's folder
+         * which correspond to the name of each site prefix. Because each site prefix is suffixed
+         * with a trailing `/`, `listObjects will no longer see them.
+         * Therefore, they are manually added to the array of keys marked for deletion.
+         */
+        mergedKeys = mergedKeys.concat(prefixes.slice(0));
+      }
+      return deleteObjects(s3Client, mergedKeys);
+    })
+    .catch(handleError);
 };
 
 module.exports = {

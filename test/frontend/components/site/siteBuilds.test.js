@@ -39,7 +39,11 @@ describe('<SiteBuilds/>', () => {
       },
       site,
       params: {
-        id: 5,
+        id: '5',
+      },
+      actions: {
+        fetchBuilds: sinon.spy(),
+        restartBuild: sinon.spy(),
       },
     };
   });
@@ -65,9 +69,8 @@ describe('<SiteBuilds/>', () => {
   it('should render an empty string for the username for builds where there is no user', () => {
     build.user = undefined;
     const wrapper = shallow(<SiteBuilds {...props} />);
-    const userIndex = columnIndex(wrapper, 'User');
 
-    const userCell = wrapper.find('tr').at(0).find('td').at(userIndex);
+    const userCell = wrapper.find('td[data-title="User"]');
     expect(userCell.text()).to.equal('');
   });
 
@@ -113,10 +116,8 @@ describe('<SiteBuilds/>', () => {
   });
 
   it('should render an empty state if no builds are present', () => {
-    props = {
-      builds: { isLoading: false, data: [] },
-      site: { id: 5 },
-    };
+    props.builds = { isLoading: false, data: [] };
+    props.site = { id: 5 };
     const wrapper = shallow(<SiteBuilds {...props} />);
 
     expect(wrapper.find('table')).to.have.length(0);
@@ -138,7 +139,8 @@ describe('<SiteBuilds/>', () => {
   });
 
   it('should render a loading state if the builds are loading', () => {
-    props = { builds: { isLoading: true }, site: { id: 5 } };
+    props.builds = { isLoading: true };
+    props.site = { id: 5 };
 
     const wrapper = shallow(<SiteBuilds {...props} />);
 
@@ -147,12 +149,9 @@ describe('<SiteBuilds/>', () => {
   });
 
   it('should fetch the builds on mount', () => {
-    const spy = sinon.spy();
+    const spy = props.actions.fetchBuilds;
 
-    props.actions = { fetchBuilds: spy };
-
-    const wrapper = shallow(<SiteBuilds {...props} />);
-    wrapper.instance().componentDidMount();
+    shallow(<SiteBuilds {...props} />);
     expect(spy.calledOnce).to.equal(true);
   });
 
@@ -188,24 +187,18 @@ describe('<SiteBuilds/>', () => {
     });
 
     it('should refresh builds according to the refresh interval when `auto refresh` is on', () => {
-      const spy = sinon.spy();
-
-      props.actions = { fetchBuilds: spy };
+      const spy = props.actions.fetchBuilds;
 
       const wrapper = shallow(<SiteBuilds {...props} />);
-      wrapper.instance().componentDidMount();
       wrapper.setState({ autoRefresh: true });
       clock.tick(REFRESH_INTERVAL + 1000);
       expect(spy.callCount).to.equal(2);
     });
 
     it('should NOT refresh builds when `auto refresh` is turned off', () => {
-      const spy = sinon.spy();
+      const spy = props.actions.fetchBuilds;
 
-      props.actions = { fetchBuilds: spy };
-
-      const wrapper = shallow(<SiteBuilds {...props} />);
-      wrapper.instance().componentDidMount();
+      shallow(<SiteBuilds {...props} />);
       clock.tick(REFRESH_INTERVAL + 1000);
       expect(spy.callCount).to.equal(1);
     });
