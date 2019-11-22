@@ -82,7 +82,7 @@ describe('utils', () => {
 
       const fn = () => utils.firstEntity(resources, name);
 
-      expect(fn).to.throw();
+      expect(fn).to.throw(Error, 'Not found');
     });
   });
 
