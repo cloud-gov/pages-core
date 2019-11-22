@@ -4,10 +4,8 @@ const config = require('../../config');
 
 // handle error if service is not found an throw all other errors
 const handleError = (err) => {
-  let message;
   try {
-    message = JSON.parse(err.message).message;
-    if (!message.match(/Not found/)) {
+    if (!err.message.match(/Not found/)) {
       throw err;
     }
   } catch (e) {
