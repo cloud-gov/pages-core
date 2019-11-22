@@ -30,7 +30,7 @@ function firstEntity(res, name) {
   if (res.resources.length === 0) {
     const error = new Error('Not found');
     error.name = name;
-    return Promise.reject(error);
+    throw error;
   }
 
   return res.resources[0];
