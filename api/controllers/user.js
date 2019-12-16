@@ -14,7 +14,7 @@ module.exports = {
       .catch(err => res.error(err));
   },
 
-  me: (req, res) => {
+  me(req, res) {
     res.json(userSerializer.toJSON(req.user));
   },
 };
