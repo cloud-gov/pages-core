@@ -2,7 +2,7 @@ const userSerializer = require('../serializers/user');
 const { User } = require('../models');
 
 module.exports = {
-  usernames(req, res) {
+  usernames(req, res, next) {
     User.findAll()
       .then((users) => {
         const usernames = users.map(user => ({
@@ -11,7 +11,7 @@ module.exports = {
         }));
         return res.json(usernames);
       })
-      .catch(err => res.error(err));
+      .catch(next);
   },
 
   me(req, res) {
