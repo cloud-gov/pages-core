@@ -11,7 +11,7 @@ function filterEntity(res, name, field = 'name') {
   if (filtered.length === 0) {
     const error = new Error(errMsg);
     error.name = name;
-    return Promise.reject(error);
+    throw error;
   }
   if (name === 'basic-public') {
     const servicePlan = filtered.find(f => f.entity.unique_id === config.app.s3ServicePlanId);
@@ -19,7 +19,7 @@ function filterEntity(res, name, field = 'name') {
       errMsg = `${errMsg} @basic-public service plan = (${config.app.s3ServicePlanId})`;
       const error = new Error(errMsg);
       error.name = name;
-      return Promise.reject(error);
+      throw error;
     }
     return servicePlan;
   }

@@ -14,42 +14,47 @@ const utils = proxyquire('../../../../api/utils', { '../../webpack.development.c
 
 describe('utils', () => {
   describe('.filterEntity', () => {
-    it('should filter out the named entity from an objects resources array', (done) => {
-      const name = 'one';
-      const field = 'name';
-      const entity = { [field]: name };
-      const resources = {
-        resources: [
-          {
-            entity,
-          },
-          {
-            entity: { [field]: 'two' },
-          },
-        ],
-      };
-      const result = utils.filterEntity(resources, name, field);
+    const name = 'one';
+    const field = 'name';
+    const entity1 = { [field]: name };
+    const entity2 = { [field]: 'two' };
 
-      expect(result).to.deep.equal({ entity });
-      done();
+    it('should filter out the named entity from an objects resources array', () => {
+      const resources = [{ entity: entity1 }, { entity: entity2 }];
+
+      const result = utils.filterEntity({ resources }, name, field);
+
+      expect(result).to.deep.equal({ entity: entity1 });
     });
 
-    it('should reject a promise if entity not found', (done) => {
-      const name = 'one';
-      const field = 'name';
-      const resources = {
-        resources: [
-          {
-            entity: { [field]: 'two' },
-          },
-        ],
-      };
+    it('should throw an error if entity not found', () => {
+      const resources = [{ entity: entity2 }];
 
-      utils.filterEntity(resources, name, field)
-        .catch((err) => {
-          expect(err).to.be.an('error');
-          done();
-        });
+      const fn = () => utils.filterEntity({ resources }, name, field);
+
+      expect(fn).to.throw(Error, `Not found: Entity @${field} = ${name}`);
+    });
+
+    describe('when name is `basic-public`', () => {
+      it('returns the entity that matches the configured S3 plan', () => {
+        const basicPublic = 'basic-public';
+        const entity = { [field]: basicPublic, unique_id: config.app.s3ServicePlanId };
+        const resources = [{ entity }, { entity: entity2 }];
+
+        const result = utils.filterEntity({ resources }, basicPublic, field);
+
+        expect(result).to.deep.equal({ entity });
+      });
+
+      it('throws an error if none of the filtered entities match the configured S3 plan', () => {
+        const basicPublic = 'basic-public';
+        const entity = { [field]: basicPublic, unique_id: 'foobar' };
+        const resources = [{ entity }];
+
+        const fn = () => utils.filterEntity({ resources }, basicPublic, field);
+
+        expect(fn).to.throw(Error, `Not found: Entity @${field} = ${basicPublic} @basic-public service plan = (${config.app.s3ServicePlanId})`);
+      });
     });
   });
 
