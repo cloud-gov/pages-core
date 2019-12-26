@@ -1,26 +1,26 @@
-const { User } = require("../../../../api/models")
+const { User } = require('../../../../api/models');
 
-const user = (overrides) => {
-  return Promise.props(_attributes(overrides)).then(attributes => {
-    return User.create(attributes)
-  })
+let userNameStep = 1;
+function generateUniqueUserName() {
+  // eslint-disable-next-line no-plusplus
+  return `user${userNameStep++}`;
 }
 
-const _attributes = (overrides) => {
-  const username = _generateUniqueUserName()
+function userAttributes(overrides) {
+  const username = generateUniqueUserName();
 
   return Object.assign({
     email: `${username}@example.com`,
-    username: username,
-    githubAccessToken: "fake-access-token",
+    username,
+    githubAccessToken: 'fake-access-token',
     githubUserId: 12345,
     signedInAt: new Date(),
-  }, overrides)
+  }, overrides);
 }
 
-let _userNameStep = 1
-const _generateUniqueUserName = () => {
-  return `user${_userNameStep++}`
+function user(overrides) {
+  const attributes = userAttributes(overrides);
+  return User.create(attributes);
 }
 
-module.exports = user
+module.exports = user;
