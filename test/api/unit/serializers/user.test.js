@@ -10,7 +10,7 @@ describe('UserSerializer', () => {
   describe('.toJSON(serializable)', () => {
     it('should serialize a user object correctly', async () => {
       const user = await factory.user();
-      const userJson = UserSerializer.toJSON(user); 
+      const userJson = UserSerializer.toJSON(user);
       const result = validateJSONSchema(userJson, userSchema);
 
       expect(result.errors).to.be.empty;
