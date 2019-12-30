@@ -21,7 +21,7 @@ module.exports = {
         throw 404;
       } else if (build.token !== req.params.token) {
         throw 403;
-      } 
+      }
 
       if (build.state === 'queued') {
         return build.update({ state: 'processing' });
