@@ -20,7 +20,7 @@ jobs:
       - checkout
       - run:
           name: Install yarn
-          command: sudo npm install -g yarn
+          command: sudo npm install -fg yarn
       - run:
           name: Display versions
           command: |
