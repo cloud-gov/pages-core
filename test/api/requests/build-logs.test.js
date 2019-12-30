@@ -68,7 +68,7 @@ describe('Build Log API', () => {
         return Build.findByPk(build.id);
       }).then((model) => {
         build = model;
-        // build state should be updated to processing when logs are received
+        // only queued build state should be updated to processing when logs are received
         expect(build.state).to.eq('success');
         done();
 
