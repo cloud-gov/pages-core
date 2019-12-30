@@ -24,18 +24,17 @@ module.exports = {
       }
 
       if (build.state === 'queued') {
-        return build.update({ state: 'processing' })
-      } else {
-        return Promise.resolve(build);
+        return build.update({ state: 'processing' });
       }
+
+      return Promise.resolve(build);
     })
-    .then((build) => {
-      return BuildLog.create({
+    .then((build) => BuildLog.create({
         build: build.id,
         output: decodeb64(req.body.output),
         source: req.body.source,
-      });
-    })
+      })
+    )
     .then(buildLog => buildLogSerializer.serialize(buildLog))
     .then((buildLogJSON) => { res.json(buildLogJSON); })
     .catch((err) => {

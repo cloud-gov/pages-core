@@ -33,12 +33,12 @@ describe('Build Log API', () => {
         expect(logs[0]).to.have.property('source', 'build.sh');
         expect(logs[0]).to.have.property('output', 'This is the output for build.sh');
         return Build.findByPk(build.id);
-      }).then((model) => {
+      })
+      .then((model) => {
         build = model;
         // build state should be updated to processing when logs are received
         expect(build.state).to.eq('processing');
         done();
-
       })
       .catch(done);
     });
@@ -66,12 +66,12 @@ describe('Build Log API', () => {
         expect(logs[0]).to.have.property('source', 'build.sh');
         expect(logs[0]).to.have.property('output', 'This is the 2nd output for build.sh');
         return Build.findByPk(build.id);
-      }).then((model) => {
+      })
+      .then((model) => {
         build = model;
         // only queued build state should be updated to processing when logs are received
         expect(build.state).to.eq('success');
         done();
-
       })
       .catch(done);
     });
