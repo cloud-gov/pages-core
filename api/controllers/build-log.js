@@ -11,33 +11,31 @@ function decodeb64(str) {
 
 module.exports = {
   create: (req, res) => {
-    let build;
     Promise.resolve(Number(req.params.build_id))
     .then((id) => {
       if (isNaN(id)) { throw 404; }
       return Build.findByPk(id);
     })
-    .then((model) => {
-      build = model;
+    .then((build) => {
       if (!build) {
         throw 404;
       } else if (build.token !== req.params.token) {
         throw 403;
       } 
 
-      return BuildLog.create({
-        build: build.id,
-        output: decodeb64(req.body.output),
-        source: req.body.source,
-      });
-    })
-    .then(buildLog => buildLogSerializer.serialize(buildLog))
-    .then((buildLogJSON) => { res.json(buildLogJSON); })
-    .then(() => {
       if (build.state === 'queued') {
         return build.update({ state: 'processing' });
       }
+
+      return Promise.resolve(build);
     })
+    .then(build => BuildLog.create({
+      build: build.id,
+      output: decodeb64(req.body.output),
+      source: req.body.source,
+    }))
+    .then(buildLog => buildLogSerializer.serialize(buildLog))
+    .then((buildLogJSON) => { res.json(buildLogJSON); })
     .catch((err) => {
       res.error(err);
     });
