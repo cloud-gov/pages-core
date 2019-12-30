@@ -88,13 +88,16 @@ module.exports = {
   },
 
   status: (req, res) => {
-    let message;
+    let buildStatus;
 
-    const getStatusMessage = (statusRequest) => {
+    const getBuildStatus = (statusRequest) => {
+      let status;
       let statusMessage;
       try {
+        status = decodeb64(statusRequest.body.status);
         statusMessage = decodeb64(statusRequest.body.message);
       } catch (err) {
+        status = 'error';
         statusMessage = 'build status message parsing error';
         const errMsg = [
           `Error decoding build status message for build@id=${statusRequest.params.id}`,
@@ -103,12 +106,12 @@ module.exports = {
         ];
         logger.error(errMsg.join('\n'));
       }
-      return statusMessage;
+      return { status, message };
     };
 
-    Promise.resolve(getStatusMessage(req))
-    .then((_message) => {
-      message = _message;
+    Promise.resolve(getBuildStatus(req))
+    .then((_buildStatus) => {
+      buildStatus = _buildStatus;
       return Promise.resolve(Number(req.params.id));
     })
     .then((id) => {
@@ -123,7 +126,7 @@ module.exports = {
       } else if (build.token !== req.params.token) {
         throw 403;
       } else {
-        return build.completeJob(message);
+        return build.updateJobStatus(buildStatus);
       }
     })
     .then((build) => {

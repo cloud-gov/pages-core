@@ -44,27 +44,31 @@ const beforeValidate = (build) => {
 
 const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
 
-const completeJobErrorMessage = (err) => {
-  let message = 'An unknown error occurred';
-  if (err) {
-    message = err.message || err;
+const jobStatusMessage = ({ message }) => {
+  if (!message) {
+    message = 'An unknown error occurred';
   }
   return sanitizeCompleteJobErrorMessage(message);
 };
 
-const completeJobStateUpdate = (err, build, completedAt) => {
-  if (err) {
+const jobStateUpdate = (buildStatus, build, completedAt) => {
+  if (buildStatus.status === 'error') {
     return build.update({
       state: 'error',
-      error: completeJobErrorMessage(err),
+      error: jobStatusMessage(buildStatus),
+      completedAt,
+    });
+  } else if (buildStatus === 'processing') {
+    return build.update({
+      state: 'processing',
+    });
+  } else {
+    return build.update({
+      state: 'success',
+      error: '',
       completedAt,
     });
   }
-  return build.update({
-    state: 'success',
-    error: '',
-    completedAt,
-  });
 };
 
 const completeJobSiteUpdate = (build, completedAt) => {
@@ -79,10 +83,10 @@ const completeJobSiteUpdate = (build, completedAt) => {
   return Promise.resolve();
 };
 
-function completeJob(err) {
+function updateJobStatus(buildStatus) {
   const completedAt = new Date();
 
-  return completeJobStateUpdate(err, this, completedAt)
+  return jobStateUpdate(buildStatus, this, completedAt)
     .then(build => completeJobSiteUpdate(build, completedAt)
       .then(() => build));
 }
@@ -112,8 +116,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     state: {
       type: DataTypes.ENUM,
-      values: ['error', 'processing', 'skipped', 'success'],
-      defaultValue: 'processing',
+      values: ['error', 'processing', 'skipped', 'success', 'queued'],
+      defaultValue: 'queued',
       allowNull: false,
     },
     token: {
@@ -137,7 +141,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Build.associate = associate;
-  Build.prototype.completeJob = completeJob;
+  Build.prototype.updateJobStatus = updateJobStatus;
 
   return Build;
 };

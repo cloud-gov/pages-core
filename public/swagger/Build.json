@@ -54,7 +54,8 @@
         "error",
         "processing",
         "skipped",
-        "success"
+        "success",
+        "queued"
       ]
     },
     "updatedAt": {
