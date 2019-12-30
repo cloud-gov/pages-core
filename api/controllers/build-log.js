@@ -22,19 +22,17 @@ module.exports = {
       } else if (build.token !== req.params.token) {
         throw 403;
       }
-
-      if (build.state === 'queued') {
+      else if (build.state === 'queued') {
         return build.update({ state: 'processing' });
       }
 
       return Promise.resolve(build);
     })
-    .then((build) => BuildLog.create({
-        build: build.id,
-        output: decodeb64(req.body.output),
-        source: req.body.source,
-      })
-    )
+    .then(build => BuildLog.create({
+      build: build.id,
+      output: decodeb64(req.body.output),
+      source: req.body.source,
+    }))
     .then(buildLog => buildLogSerializer.serialize(buildLog))
     .then((buildLogJSON) => { res.json(buildLogJSON); })
     .catch((err) => {
