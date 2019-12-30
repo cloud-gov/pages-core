@@ -43,6 +43,39 @@ describe('Build Log API', () => {
       .catch(done);
     });
 
+    it('should create a build log with unchages build tatus', (done) => {
+      let build;
+
+      factory.build({ state: 'success' }).then((model) => {
+        build = model;
+        expect(build.state).to.eq('success');
+        return request(app)
+          .post(`/v0/build/${build.id}/log/${build.token}`)
+          .type('json')
+          .send({ source: 'build.sh', output: encode64('This is the 2nd output for build.sh') })
+          .expect(200);
+      }).then((response) => {
+        validateAgainstJSONSchema('POST', '/build/{build_id}/log/{token}', 200, response.body);
+
+        expect(response.body).to.have.property('source', 'build.sh');
+        expect(response.body).to.have.property('output', 'This is the 2nd output for build.sh');
+
+        return BuildLog.findAll({ where: { build: build.id } });
+      }).then((logs) => {
+        expect(logs).to.have.length(1);
+        expect(logs[0]).to.have.property('source', 'build.sh');
+        expect(logs[0]).to.have.property('output', 'This is the 2nd output for build.sh');
+        return Build.findByPk(build.id);
+      }).then((model) => {
+        build = model;
+        // build state should be updated to processing when logs are received
+        expect(build.state).to.eq('success');
+        done();
+
+      })
+      .catch(done);
+    });
+
     it('should respond with a 400 if the params are not correct', (done) => {
       factory.build().then(build => request(app)
           .post(`/v0/build/${build.id}/log/${build.token}`)
