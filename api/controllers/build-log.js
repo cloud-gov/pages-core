@@ -23,6 +23,13 @@ module.exports = {
         throw 403;
       }
 
+      if (build.state === 'queued') {
+        return build.update({ state: 'processing' })
+      } else {
+        return Promise.resolve(build);
+      }
+    })
+    .then((build) => {
       return BuildLog.create({
         build: build.id,
         output: decodeb64(req.body.output),

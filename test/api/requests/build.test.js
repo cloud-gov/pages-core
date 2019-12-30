@@ -663,7 +663,7 @@ describe('Build API', () => {
       .then(() => Build.findByPk(build.id))
       .then((unmodifiedBuild) => {
         expect(unmodifiedBuild).to.not.be.undefined;
-        expect(unmodifiedBuild.state).to.equal('processing');
+        expect(unmodifiedBuild.state).to.equal('queued');
         done();
       })
       .catch(done);

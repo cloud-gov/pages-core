@@ -4,7 +4,7 @@ const app = require('../../../app');
 const factory = require('../support/factory');
 const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
-const { BuildLog, Site, User } = require('../../../api/models');
+const { BuildLog, Site, User, Build } = require('../../../api/models');
 
 describe('Build Log API', () => {
   describe('POST /v0/build/:build_id/log/:token', () => {
@@ -15,7 +15,7 @@ describe('Build Log API', () => {
 
       factory.build().then((model) => {
         build = model;
-
+        expect(build.state).to.eq('queued');
         return request(app)
           .post(`/v0/build/${build.id}/log/${build.token}`)
           .type('json')
@@ -32,7 +32,13 @@ describe('Build Log API', () => {
         expect(logs).to.have.length(1);
         expect(logs[0]).to.have.property('source', 'build.sh');
         expect(logs[0]).to.have.property('output', 'This is the output for build.sh');
+        return Build.findByPk(build.id);
+      }).then((model) => {
+        build = model;
+        // build state should be updated to processing when logs are received
+        expect(build.state).to.eq('processing');
         done();
+
       })
       .catch(done);
     });
