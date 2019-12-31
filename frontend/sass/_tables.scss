@@ -145,7 +145,7 @@
     .log-source-header {
       background-color: #112e51;//#eef4fb;//#112e51;//$color-black;
       padding: 0.5rem;
-      a {
+      > * {
         color: $color-white;//#eef4fb;//#112e51;//$color-white;
       }
     }
