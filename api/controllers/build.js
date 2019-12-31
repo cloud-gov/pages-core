@@ -92,13 +92,13 @@ module.exports = {
 
     const getBuildStatus = (statusRequest) => {
       let status;
-      let statusMessage;
+      let message;
       try {
         status = decodeb64(statusRequest.body.status);
-        statusMessage = decodeb64(statusRequest.body.message);
+        message = decodeb64(statusRequest.body.message);
       } catch (err) {
         status = 'error';
-        statusMessage = 'build status message parsing error';
+        message = 'build status message parsing error';
         const errMsg = [
           `Error decoding build status message for build@id=${statusRequest.params.id}`,
           `build@message: ${statusRequest.body.message}`,
@@ -110,33 +110,33 @@ module.exports = {
     };
 
     Promise.resolve(getBuildStatus(req))
-    .then((_buildStatus) => {
-      buildStatus = _buildStatus;
-      return Promise.resolve(Number(req.params.id));
-    })
-    .then((id) => {
-      if (isNaN(id)) {
-        throw 404;
-      }
-      return Build.findByPk(id);
-    })
-    .then((build) => {
-      if (!build) {
-        throw 404;
-      } else if (build.token !== req.params.token) {
-        throw 403;
-      } else {
-        return build.updateJobStatus(buildStatus);
-      }
-    })
-    .then((build) => {
-      emitBuildStatus(res.socket, build);
-      return GithubBuildStatusReporter.reportBuildStatus(build);
-    })
-    .then(() => res.ok())
-    .catch((err) => {
-      logger.error(['Error build status reporting to GitHub', err, err.stack].join('\n'));
-      res.error(err);
-    });
+      .then((_buildStatus) => {
+        buildStatus = _buildStatus;
+        return Promise.resolve(Number(req.params.id));
+      })
+      .then((id) => {
+        if (isNaN(id)) {
+          throw 404;
+        }
+        return Build.findByPk(id);
+      })
+      .then((build) => {
+        if (!build) {
+          throw 404;
+        } else if (build.token !== req.params.token) {
+          throw 403;
+        } else {
+          return build.updateJobStatus(buildStatus);
+        }
+      })
+      .then((build) => {
+        emitBuildStatus(res.socket, build);
+        return GithubBuildStatusReporter.reportBuildStatus(build);
+      })
+      .then(() => res.ok())
+      .catch((err) => {
+        logger.error(['Error build status reporting to GitHub', err, err.stack].join('\n'));
+        res.error(err);
+      });
   },
 };

@@ -508,7 +508,7 @@ describe('Build API', () => {
         .post(`/v0/build/${options.build.id}/status/${buildToken}`)
         .type('json')
         .send({
-          status: options.status,
+          status: encode64(options.status),
           message: encode64(options.message),
         });
     };
@@ -518,7 +518,7 @@ describe('Build API', () => {
       githubAPINocks.status();
     });
 
-    it('should mark a build successful if status is 0 and message is blank', (done) => {
+    it('should mark a build processing', (done) => {
       let build;
 
       factory.build({ commitSha })
@@ -528,7 +528,32 @@ describe('Build API', () => {
       .then(() =>
         postBuildStatus({
           build,
-          status: '0',
+          status: 'processing',
+          message: '',
+        }).expect(200)
+      )
+      .then(() => Build.findByPk(build.id))
+      .then((updatedBuild) => {
+        expect(updatedBuild).to.not.be.undefined;
+        expect(updatedBuild.state).to.equal('processing');
+        expect(updatedBuild.error).to.be.null;
+        expect(updatedBuild.completedAt).to.be.null;
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should mark a build successful', (done) => {
+      let build;
+
+      factory.build({ commitSha })
+      .then((model) => {
+        build = model;
+      })
+      .then(() =>
+        postBuildStatus({
+          build,
+          status: 'success',
           message: '',
         }).expect(200)
       )
@@ -536,14 +561,14 @@ describe('Build API', () => {
       .then((updatedBuild) => {
         expect(updatedBuild).to.not.be.undefined;
         expect(updatedBuild.state).to.equal('success');
-        expect(updatedBuild.error).to.equal('');
+        expect(updatedBuild.error).to.be.null;
         expect(new Date() - updatedBuild.completedAt).to.be.below(1000);
         done();
       })
       .catch(done);
     });
 
-    it('should mark a build errored if the status is non-zero and should set the message', (done) => {
+    it('should mark a build errored and should set the message', (done) => {
       let build;
 
       factory.build({ commitSha })
@@ -553,7 +578,7 @@ describe('Build API', () => {
       .then(() =>
         postBuildStatus({
           build,
-          status: '1',
+          status: 'error',
           message: 'The build failed for a reason',
         }).expect(200)
       )
@@ -585,7 +610,7 @@ describe('Build API', () => {
 
         return postBuildStatus({
           build: promisedValues.build,
-          status: '0',
+          status: 'success',
           message: '',
         });
       })
@@ -616,7 +641,7 @@ describe('Build API', () => {
         });
         return postBuildStatus({
           build,
-          status: '0',
+          status: 'success',
           message: '',
         });
       })
@@ -630,7 +655,7 @@ describe('Build API', () => {
     it('should respond with a 404 for an id that is NaN', (done) => {
       postBuildStatus({
         build: { id: 'invalid-build-id', token: 'invalid-token' },
-        status: '0',
+        status: 'success',
         message: '',
       }).expect(404, done);
     });
@@ -640,7 +665,7 @@ describe('Build API', () => {
       build.id = -1;
       postBuildStatus({
         build,
-        status: '0',
+        status: 'success',
         message: '',
       }).expect(404, done);
     });
@@ -656,14 +681,14 @@ describe('Build API', () => {
         postBuildStatus({
           build,
           buildToken: 'invalid-token',
-          status: '0',
+          status: 'success',
           message: '',
         }).expect(403)
       )
       .then(() => Build.findByPk(build.id))
       .then((unmodifiedBuild) => {
         expect(unmodifiedBuild).to.not.be.undefined;
-        expect(unmodifiedBuild.state).to.equal('processing');
+        expect(unmodifiedBuild.state).to.equal('queued');
         done();
       })
       .catch(done);

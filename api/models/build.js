@@ -58,14 +58,13 @@ const jobStateUpdate = (buildStatus, build, completedAt) => {
       error: jobStatusMessage(buildStatus),
       completedAt,
     });
-  } else if (buildStatus === 'processing') {
+  } else if (buildStatus.status === 'processing') {
     return build.update({
       state: 'processing',
     });
   } else {
     return build.update({
       state: 'success',
-      error: '',
       completedAt,
     });
   }
