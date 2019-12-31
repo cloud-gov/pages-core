@@ -104,7 +104,7 @@ describe('Build model', () => {
 
     it('should sanitize GitHub access tokens from error message', (done) => {
       factory.build().then(build =>
-        build.updateJobStatus( { status: 'error', message: 'http://123abc@github.com' })
+        build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' })
       ).then((build) => {
         expect(build.state).to.equal('error');
         expect(build.error).not.to.match(/123abc/);

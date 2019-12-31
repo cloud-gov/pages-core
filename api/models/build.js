@@ -44,30 +44,24 @@ const beforeValidate = (build) => {
 
 const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
 
-const jobStatusMessage = ({ message }) => {
-  if (!message) {
-    message = 'An unknown error occurred';
-  }
-  return sanitizeCompleteJobErrorMessage(message);
-};
+const jobErrorMessage = ({ message = 'An unknown error occurred' }) => sanitizeCompleteJobErrorMessage(message);
 
 const jobStateUpdate = (buildStatus, build, completedAt) => {
   if (buildStatus.status === 'error') {
     return build.update({
       state: 'error',
-      error: jobStatusMessage(buildStatus),
+      error: jobErrorMessage(buildStatus),
       completedAt,
     });
   } else if (buildStatus.status === 'processing') {
     return build.update({
       state: 'processing',
     });
-  } else {
-    return build.update({
-      state: 'success',
-      completedAt,
-    });
   }
+  return build.update({
+    state: 'success',
+    completedAt,
+  });
 };
 
 const completeJobSiteUpdate = (build, completedAt) => {
