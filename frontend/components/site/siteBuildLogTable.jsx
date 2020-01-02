@@ -10,9 +10,11 @@ function SiteBuildLogTable({ buildLogs }) {
         {buildLogs.map((log => (
           <tr key={log.id}>
             <td>
+              {log.source !== 'ALL' && (
               <pre className="log-source-header">
-                <a name={`${log.source}-${log.id}`}>{log.source}</a>
+                <span name={`${log.source}-${log.id}`}>{log.source}</span>
               </pre>
+              )}
               <pre>
                 {log.output}
               </pre>
