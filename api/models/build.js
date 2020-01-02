@@ -47,21 +47,18 @@ const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@git
 const jobErrorMessage = (message = 'An unknown error occurred') => sanitizeCompleteJobErrorMessage(message);
 
 const jobStateUpdate = (buildStatus, build, completedAt) => {
+  let error = null;
   if (buildStatus.status === 'error') {
-    return build.update({
-      state: 'error',
-      error: jobErrorMessage(buildStatus.message),
-      completedAt,
-    });
-  } else if (buildStatus.status === 'processing') {
-    return build.update({
-      state: 'processing',
-    });
+    error = jobErrorMessage(buildStatus.message);
+  }
+  if (!['error', 'success'].includes(buildStatus.status)) {
+    completedAt = null;
   }
   return build.update({
-    state: 'success',
-    completedAt,
-  });
+      state: buildStatus.status,
+      error,
+      completedAt,
+    });
 };
 
 const completeJobSiteUpdate = (build, completedAt) => {
@@ -73,15 +70,13 @@ const completeJobSiteUpdate = (build, completedAt) => {
       { where: { id: build.site } }
     );
   }
-  return Promise.resolve();
 };
 
-function updateJobStatus(buildStatus) {
+async function updateJobStatus(buildStatus) {
   const completedAt = new Date();
-
-  return jobStateUpdate(buildStatus, this, completedAt)
-    .then(build => completeJobSiteUpdate(build, completedAt)
-      .then(() => build));
+  const build = await jobStateUpdate(buildStatus, this, completedAt);
+  await completeJobSiteUpdate(build, completedAt);
+  return build;
 }
 
 module.exports = (sequelize, DataTypes) => {
