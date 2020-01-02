@@ -94,7 +94,7 @@ module.exports = {
       let status;
       let message;
       try {
-        status = decodeb64(statusRequest.body.status);
+        status = statusRequest.body.status;
         message = decodeb64(statusRequest.body.message);
       } catch (err) {
         status = 'error';

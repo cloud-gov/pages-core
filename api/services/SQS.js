@@ -161,8 +161,12 @@ SQS.sendBuildMessage = (build, buildCount) => SQS.messageBodyForBuild(build)
       .then(() => {
         SQS.sqsClient.sendMessage(params, (err) => {
           if (err) {
-            logger.error('There was an error, adding the job to SQS: ', err);
-            build.completeJob(err);
+            const errMsg = `There was an error, adding the job to SQS: ${err}`;
+            logger.error(errMsg);
+            build.completeJob({
+              status: 'error',
+              message: errMsg,
+            });
           }
         });
       });

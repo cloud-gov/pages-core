@@ -508,7 +508,7 @@ describe('Build API', () => {
         .post(`/v0/build/${options.build.id}/status/${buildToken}`)
         .type('json')
         .send({
-          status: encode64(options.status),
+          status: options.status,
           message: encode64(options.message),
         });
     };
