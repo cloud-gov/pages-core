@@ -118,6 +118,14 @@ describe('<SiteBuilds/>', () => {
     expect(wrapper.find(params)).to.have.length(0);
   });
 
+  it('should not error if state is unkown/unexpected', () => {
+    props.builds.data[0].state = 'unexpected';
+    const wrapper = shallow(<SiteBuilds {...props} />);
+    const siteBuild = props.builds.data[0];
+    const params = { branchName: siteBuild.branch, site: props.site, showIcon: true };
+    expect(wrapper.find(params)).to.have.length(0);
+  });
+
   it('should render a button to refresh builds', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
     expect(wrapper.find('RefreshBuildsButton')).to.have.length(1);

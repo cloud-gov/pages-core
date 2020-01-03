@@ -18,24 +18,27 @@ import { IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner } from '
 export const REFRESH_INTERVAL = 15 * 1000;
 
 const buildStateData = (buildState) => {
-  const mapping = {
-    error: {
-      message: 'Failed', icon: IconExclamationCircle,
-    },
-    processing: {
-      message: 'In progress', icon: IconSpinner,
-    },
-    skipped: {
-      message: 'Skipped', icon: null,
-    },
-    success: {
-      message: 'Completed', icon: IconCheckCircle,
-    },
-    queued: {
-      message: 'Queued', icon: IconClock,
-    },
-  };
-  return mapping[buildState];
+  let messageIcon;
+  switch (buildState) {
+    case 'error':
+      messageIcon = { message: 'Failed', icon: IconExclamationCircle };
+      break;
+    case 'processing':
+      messageIcon = { message: 'In progress', icon: IconSpinner };
+      break;
+    case 'skipped':
+      messageIcon = { message: 'Skipped', icon: null };
+      break;
+    case 'queued':
+      messageIcon = { message: 'Queued', icon: IconClock };
+      break;
+    case 'success':
+      messageIcon = { message: 'Completed', icon: IconCheckCircle };
+      break;
+    default:
+      messageIcon = { message: buildState, icon: null };
+  }
+  return messageIcon;
 };
 
 class SiteBuilds extends React.Component {
