@@ -13,7 +13,7 @@ import { duration, timeFrom } from '../../util/datetime';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
 import BranchViewLink from '../branchViewLink';
-import { IconCheckCircle, IconExclamationCircle, IconSpinner } from '../icons';
+import { IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner } from '../icons';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
@@ -30,6 +30,9 @@ const buildStateData = (buildState) => {
     },
     success: {
       message: 'Completed', icon: IconCheckCircle,
+    },
+    queued: {
+      message: 'Queued', icon: IconClock,
     },
   };
   return mapping[buildState];

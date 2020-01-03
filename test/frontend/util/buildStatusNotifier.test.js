@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+  import { expect } from 'chai';
 import { spy, stub } from 'sinon';
 import proxyquire from 'proxyquire';
 
@@ -97,7 +97,27 @@ describe('buildStatusNotifier', () => {
       BuildStatusNotifier.notify.reset();
     });
 
+    it('build state is neither queued, success nor error', (done) => {
+      msg.state = 'other';
+      expect(BuildStatusNotifier.notify.called).to.be.false;
+      pushNote = BuildStatusNotifier.notify(msg);
+      expect(BuildStatusNotifier.notify.calledOnce).to.be.true;
+      expect(pushNote).to.be.undefined;
+      done();
+    });
+
+    it('build is queued', (done) => {
+      msg.state = 'queued';
+      expect(BuildStatusNotifier.notify.called).to.be.false;
+      pushNote = BuildStatusNotifier.notify(msg);
+      expect(BuildStatusNotifier.notify.calledOnce).to.be.true;
+      expect(pushNote.title).to.eql('Build Queued');
+      expect(pushNote.options).to.deep.eql(options);
+      done();
+    });
+
     it('build is successful', (done) => {
+      msg.state = 'success';
       expect(BuildStatusNotifier.notify.called).to.be.false;
       pushNote = BuildStatusNotifier.notify(msg);
       expect(BuildStatusNotifier.notify.calledOnce).to.be.true;
