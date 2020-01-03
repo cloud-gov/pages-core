@@ -56,7 +56,7 @@ module.exports = class BuildStatusNotifier {
         titleStatus = 'Successful Build';
         break;
       default:
-        return;
+        return null;
     }
     const icon = '/images/favicons/favicon.ico';
     const note = new Notification(`${titleStatus}`, { body: `Site: ${build.owner}/${build.repository}   Branch: ${build.branch}`, icon });

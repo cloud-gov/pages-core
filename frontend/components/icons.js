@@ -17,6 +17,7 @@ export {
   IconBranch,
   IconCheckCircle,
   IconCloudUpload,
+  IconClock,
   IconEnvelope,
   IconExclamationCircle,
   IconGear,

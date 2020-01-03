@@ -1,4 +1,4 @@
-  import { expect } from 'chai';
+import { expect } from 'chai';
 import { spy, stub } from 'sinon';
 import proxyquire from 'proxyquire';
 
@@ -102,7 +102,7 @@ describe('buildStatusNotifier', () => {
       expect(BuildStatusNotifier.notify.called).to.be.false;
       pushNote = BuildStatusNotifier.notify(msg);
       expect(BuildStatusNotifier.notify.calledOnce).to.be.true;
-      expect(pushNote).to.be.undefined;
+      expect(pushNote).to.be.null;
       done();
     });
 
