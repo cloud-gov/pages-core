@@ -191,7 +191,7 @@ class SiteBuilds extends React.Component {
                       <td data-title="Actions" className="table-actions">
                         <span>
                           {
-                            build.state !== 'processing' &&
+                            ['error', 'success'].includes(build.state) &&
                             <CreateBuildLink
                               handlerParams={{ buildId: build.id, siteId: site.id }}
                               handleClick={actions.restartBuild}
