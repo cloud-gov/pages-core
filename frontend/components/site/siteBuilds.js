@@ -13,26 +13,32 @@ import { duration, timeFrom } from '../../util/datetime';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
 import BranchViewLink from '../branchViewLink';
-import { IconCheckCircle, IconExclamationCircle, IconSpinner } from '../icons';
+import { IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner } from '../icons';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
 const buildStateData = (buildState) => {
-  const mapping = {
-    error: {
-      message: 'Failed', icon: IconExclamationCircle,
-    },
-    processing: {
-      message: 'In progress', icon: IconSpinner,
-    },
-    skipped: {
-      message: 'Skipped', icon: null,
-    },
-    success: {
-      message: 'Completed', icon: IconCheckCircle,
-    },
-  };
-  return mapping[buildState];
+  let messageIcon;
+  switch (buildState) {
+    case 'error':
+      messageIcon = { message: 'Failed', icon: IconExclamationCircle };
+      break;
+    case 'processing':
+      messageIcon = { message: 'In progress', icon: IconSpinner };
+      break;
+    case 'skipped':
+      messageIcon = { message: 'Skipped', icon: null };
+      break;
+    case 'queued':
+      messageIcon = { message: 'Queued', icon: IconClock };
+      break;
+    case 'success':
+      messageIcon = { message: 'Completed', icon: IconCheckCircle };
+      break;
+    default:
+      messageIcon = { message: buildState, icon: null };
+  }
+  return messageIcon;
 };
 
 class SiteBuilds extends React.Component {
@@ -185,7 +191,7 @@ class SiteBuilds extends React.Component {
                       <td data-title="Actions" className="table-actions">
                         <span>
                           {
-                            build.state !== 'processing' &&
+                            ['error', 'success'].includes(build.state) &&
                             <CreateBuildLink
                               handlerParams={{ buildId: build.id, siteId: site.id }}
                               handleClick={actions.restartBuild}

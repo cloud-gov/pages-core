@@ -54,7 +54,7 @@ describe('Build model', () => {
   describe('after create hook', () => {
     it('should send a build new build message', (done) => {
       factory.build()
-        .then(build => build.completeJob())
+        .then(build => build.updateJobStatus({ status: 'complete' }))
         .then((build) => {
           const queuedBuild = sendMessageStub.getCall(0).args[0];
           const buildCount = sendMessageStub.getCall(0).args[1];
@@ -70,35 +70,10 @@ describe('Build model', () => {
   });
 
   describe('.completeJob(message)', () => {
-    it('should mark a build successful if there is no error', (done) => {
+    it('should mark a build errored with a message', (done) => {
       factory.build().then(build =>
-        build.completeJob()
+        build.updateJobStatus({ status: 'error', message: 'this is an error' })
       ).then((build) => {
-        expect(build.state).to.equal('success');
-        expect(build.error).to.equal('');
-        expect(new Date() - build.completedAt).to.be.below(1000);
-        expect(build.completedAt.toISOString()).to.equal(build.toJSON().completedAt.toISOString());
-        done();
-      })
-      .catch(done);
-    });
-
-    it('should mark a build errored with a message if the error is a string', (done) => {
-      factory.build().then(build =>
-        build.completeJob('this is an error')
-      ).then((build) => {
-        expect(build.state).to.equal('error');
-        expect(build.error).to.equal('this is an error');
-        done();
-      })
-      .catch(done);
-    });
-
-    it('should mark a build errored with the error\'s message if the error is an error object', (done) => {
-      factory.build().then((build) => {
-        const error = new Error('this is an error');
-        return build.completeJob(error);
-      }).then((build) => {
         expect(build.state).to.equal('error');
         expect(build.error).to.equal('this is an error');
         done();
@@ -117,7 +92,7 @@ describe('Build model', () => {
         site = promisedValues.site;
         expect(site.publishedAt).to.be.null;
 
-        return promisedValues.build.completeJob();
+        return promisedValues.build.updateJobStatus({ status: 'success' });
       }).then(() => Site.findByPk(site.id))
       .then((model) => {
         expect(model.publishedAt).to.be.a('date');
@@ -129,7 +104,7 @@ describe('Build model', () => {
 
     it('should sanitize GitHub access tokens from error message', (done) => {
       factory.build().then(build =>
-        build.completeJob('http://123abc@github.com')
+        build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' })
       ).then((build) => {
         expect(build.state).to.equal('error');
         expect(build.error).not.to.match(/123abc/);

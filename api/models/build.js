@@ -44,27 +44,21 @@ const beforeValidate = (build) => {
 
 const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
 
-const completeJobErrorMessage = (err) => {
-  let message = 'An unknown error occurred';
-  if (err) {
-    message = err.message || err;
-  }
-  return sanitizeCompleteJobErrorMessage(message);
-};
+const jobErrorMessage = (message = 'An unknown error occurred') => sanitizeCompleteJobErrorMessage(message);
 
-const completeJobStateUpdate = (err, build, completedAt) => {
-  if (err) {
-    return build.update({
-      state: 'error',
-      error: completeJobErrorMessage(err),
-      completedAt,
-    });
+const jobStateUpdate = (buildStatus, build, completedAt) => {
+  let error = null;
+  if (buildStatus.status === 'error') {
+    error = jobErrorMessage(buildStatus.message);
+  }
+  if (!['error', 'success'].includes(buildStatus.status)) {
+    completedAt = null;
   }
   return build.update({
-    state: 'success',
-    error: '',
-    completedAt,
-  });
+      state: buildStatus.status,
+      error,
+      completedAt,
+    });
 };
 
 const completeJobSiteUpdate = (build, completedAt) => {
@@ -76,15 +70,13 @@ const completeJobSiteUpdate = (build, completedAt) => {
       { where: { id: build.site } }
     );
   }
-  return Promise.resolve();
 };
 
-function completeJob(err) {
+async function updateJobStatus(buildStatus) {
   const completedAt = new Date();
-
-  return completeJobStateUpdate(err, this, completedAt)
-    .then(build => completeJobSiteUpdate(build, completedAt)
-      .then(() => build));
+  const build = await jobStateUpdate(buildStatus, this, completedAt);
+  await completeJobSiteUpdate(build, completedAt);
+  return build;
 }
 
 module.exports = (sequelize, DataTypes) => {
@@ -112,8 +104,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     state: {
       type: DataTypes.ENUM,
-      values: ['error', 'processing', 'skipped', 'success'],
-      defaultValue: 'processing',
+      values: ['error', 'processing', 'skipped', 'success', 'queued'],
+      defaultValue: 'queued',
       allowNull: false,
     },
     token: {
@@ -137,7 +129,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Build.associate = associate;
-  Build.prototype.completeJob = completeJob;
+  Build.prototype.updateJobStatus = updateJobStatus;
 
   return Build;
 };
