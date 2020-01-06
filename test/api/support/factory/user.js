@@ -2,20 +2,22 @@ const { User } = require('../../../../api/models');
 
 let userNameStep = 1;
 function generateUniqueUserName() {
-  // eslint-disable-next-line no-plusplus
-  return `user${userNameStep++}`;
+  const userName = `user${userNameStep}`;
+  userNameStep += 1;
+  return userName;
 }
 
-function userAttributes(overrides) {
-  const username = generateUniqueUserName();
+function userAttributes({ username, ...rest } = {}) {
+  const uname = username || generateUniqueUserName();
 
-  return Object.assign({
-    email: `${username}@example.com`,
-    username,
+  return {
+    email: `${uname}@example.com`,
+    username: uname,
     githubAccessToken: 'fake-access-token',
     githubUserId: 12345,
     signedInAt: new Date(),
-  }, overrides);
+    ...rest,
+  };
 }
 
 function user(overrides) {
