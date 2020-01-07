@@ -48,34 +48,34 @@ const jobErrorMessage = (message = 'An unknown error occurred') => sanitizeCompl
 
 const jobStateUpdate = (buildStatus, build, completedAt) => {
   let error = null;
+  let completed = null;
   if (buildStatus.status === 'error') {
     error = jobErrorMessage(buildStatus.message);
   }
-  if (!['error', 'success'].includes(buildStatus.status)) {
-    completedAt = null;
+  if (['error', 'success'].includes(buildStatus.status)) {
+    completed = completedAt;
   }
   return build.update({
-      state: buildStatus.status,
-      error,
-      completedAt,
-    });
+    state: buildStatus.status,
+    error,
+    completedAt: completed,
+  });
 };
 
 const completeJobSiteUpdate = (build, completedAt) => {
   const { Site } = build.sequelize.models;
-
-  if (build.state === 'success') {
-    return Site.update(
-      { publishedAt: completedAt },
-      { where: { id: build.site } }
-    );
-  }
+  return Site.update(
+    { publishedAt: completedAt },
+    { where: { id: build.site } }
+  );
 };
 
 async function updateJobStatus(buildStatus) {
   const completedAt = new Date();
   const build = await jobStateUpdate(buildStatus, this, completedAt);
-  await completeJobSiteUpdate(build, completedAt);
+  if (build.state === 'success') {
+    await completeJobSiteUpdate(build, completedAt);
+  }
   return build;
 }
 
@@ -126,10 +126,17 @@ module.exports = (sequelize, DataTypes) => {
       afterCreate,
       beforeValidate,
     },
+    scopes: {
+      forUser: user => ({
+        where: {
+          user: user.id,
+        },
+      }),
+    },
   });
 
   Build.associate = associate;
   Build.prototype.updateJobStatus = updateJobStatus;
-
+  Build.forUser = user => Build.scope({ method: ['forUser', user] });
   return Build;
 };

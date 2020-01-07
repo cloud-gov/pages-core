@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const { stub } = require('sinon');
+const { SequelizeDatabaseError } = require('sequelize');
 const SQS = require('../../../../api/services/SQS');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
@@ -30,7 +31,7 @@ describe('Build model', () => {
         expect(build.token).to.be.okay;
         done();
       })
-      .catch(done);
+        .catch(done);
     });
 
     it('should not override a build token if one exists', (done) => {
@@ -47,7 +48,7 @@ describe('Build model', () => {
         expect(build.token).to.equal('123abc');
         done();
       })
-      .catch(done);
+        .catch(done);
     });
   });
 
@@ -71,14 +72,12 @@ describe('Build model', () => {
 
   describe('.completeJob(message)', () => {
     it('should mark a build errored with a message', (done) => {
-      factory.build().then(build =>
-        build.updateJobStatus({ status: 'error', message: 'this is an error' })
-      ).then((build) => {
+      factory.build().then(build => build.updateJobStatus({ status: 'error', message: 'this is an error' })).then((build) => {
         expect(build.state).to.equal('error');
         expect(build.error).to.equal('this is an error');
         done();
       })
-      .catch(done);
+        .catch(done);
     });
 
     it('should update the site\'s publishedAt timestamp if the build is successful', (done) => {
@@ -94,23 +93,21 @@ describe('Build model', () => {
 
         return promisedValues.build.updateJobStatus({ status: 'success' });
       }).then(() => Site.findByPk(site.id))
-      .then((model) => {
-        expect(model.publishedAt).to.be.a('date');
-        expect(new Date().getTime() - model.publishedAt.getTime()).to.be.below(500);
-        done();
-      })
-      .catch(done);
+        .then((model) => {
+          expect(model.publishedAt).to.be.a('date');
+          expect(new Date().getTime() - model.publishedAt.getTime()).to.be.below(500);
+          done();
+        })
+        .catch(done);
     });
 
     it('should sanitize GitHub access tokens from error message', (done) => {
-      factory.build().then(build =>
-        build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' })
-      ).then((build) => {
+      factory.build().then(build => build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' })).then((build) => {
         expect(build.state).to.equal('error');
         expect(build.error).not.to.match(/123abc/);
         done();
       })
-      .catch(done);
+        .catch(done);
     });
   });
 
@@ -119,28 +116,24 @@ describe('Build model', () => {
       Build.create({
         user: 1,
         site: null,
-      }).then(() =>
-        done(new Error('Expected a validation error'))
-      ).catch((err) => {
+      }).then(() => done(new Error('Expected a validation error'))).catch((err) => {
         expect(err.name).to.equal('SequelizeValidationError');
         expect(err.errors[0].path).to.equal('site');
         done();
       })
-      .catch(done);
+        .catch(done);
     });
 
     it('should require a user object before saving', (done) => {
       Build.create({
         user: null,
         site: 1,
-      }).then(() =>
-        done(new Error('Expected a validation error'))
-      ).catch((err) => {
+      }).then(() => done(new Error('Expected a validation error'))).catch((err) => {
         expect(err.name).to.equal('SequelizeValidationError');
         expect(err.errors[0].path).to.equal('user');
         done();
       })
-      .catch(done);
+        .catch(done);
     });
 
     it('should require a valid sha before saving', (done) => {
@@ -149,12 +142,12 @@ describe('Build model', () => {
         site: 1,
         commitSha: 'not-a-real-sha.biz',
       })
-      .then(done)
-      .catch((error) => {
-        expect(error.name).to.equal('SequelizeValidationError');
-        expect(error.errors[0].path).to.equal('commitSha');
-        done();
-      });
+        .then(done)
+        .catch((error) => {
+          expect(error.name).to.equal('SequelizeValidationError');
+          expect(error.errors[0].path).to.equal('commitSha');
+          done();
+        });
     });
 
     it('requires a valid branch name before saving', (done) => {
@@ -164,12 +157,12 @@ describe('Build model', () => {
         commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: 'not*real',
       })
-      .then(done)
-      .catch((error) => {
-        expect(error.name).to.equal('SequelizeValidationError');
-        expect(error.errors[0].path).to.equal('branch');
-        done();
-      });
+        .then(done)
+        .catch((error) => {
+          expect(error.name).to.equal('SequelizeValidationError');
+          expect(error.errors[0].path).to.equal('branch');
+          done();
+        });
     });
     it('requires a valid branch name before saving no end slash', (done) => {
       Build.create({
@@ -178,12 +171,12 @@ describe('Build model', () => {
         commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: 'not-real/',
       })
-      .then(done)
-      .catch((error) => {
-        expect(error.name).to.equal('SequelizeValidationError');
-        expect(error.errors[0].path).to.equal('branch');
-        done();
-      });
+        .then(done)
+        .catch((error) => {
+          expect(error.name).to.equal('SequelizeValidationError');
+          expect(error.errors[0].path).to.equal('branch');
+          done();
+        });
     });
     it('requires a valid branch name before saving no begin /', (done) => {
       Build.create({
@@ -192,12 +185,69 @@ describe('Build model', () => {
         commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: '/not-real',
       })
-      .then(done)
-      .catch((error) => {
-        expect(error.name).to.equal('SequelizeValidationError');
-        expect(error.errors[0].path).to.equal('branch');
-        done();
-      });
+        .then(done)
+        .catch((error) => {
+          expect(error.name).to.equal('SequelizeValidationError');
+          expect(error.errors[0].path).to.equal('branch');
+          done();
+        });
+    });
+  });
+
+  describe('querying', () => {
+    it('does not return a build when pk is null', async () => {
+      const pk = null;
+
+      const buildQuery = await Build.findByPk(pk);
+
+      expect(buildQuery).to.be.null;
+    });
+
+    it('returns a build when pk is a string', async () => {
+      const build = await factory.build();
+      const pk = String(build.id);
+
+      const buildQuery = await Build.findByPk(pk);
+
+      expect(buildQuery).to.not.be.null;
+      expect(buildQuery.id).to.equal(build.id);
+    });
+
+    it('throws when pk is Nan', () => {
+      const pk = NaN;
+
+      const buildQuery = Build.findByPk(pk);
+
+      return expect(buildQuery).to.be.rejectedWith(SequelizeDatabaseError);
+    });
+
+    it('throws when pk is non-number string', () => {
+      const pk = 'foobar';
+
+      const buildQuery = Build.findByPk(pk);
+
+      return expect(buildQuery).to.be.rejectedWith(SequelizeDatabaseError);
+    });
+  });
+
+  describe('forUser scope', () => {
+    it('returns the build for the associated user', async () => {
+      const user = await factory.user();
+      const build = await factory.build({ user });
+
+      const buildQuery = await Build.forUser(user).findByPk(build.id);
+
+      expect(buildQuery).to.not.be.null;
+      expect(buildQuery.id).to.equal(build.id);
+    });
+
+    it('does not return the build for a different user', async () => {
+      const user = { id: 99999 };
+      const build = await factory.build();
+
+      const buildQuery = await Build.forUser(user).findByPk(build.id);
+
+      expect(buildQuery).to.be.null;
     });
   });
 });
