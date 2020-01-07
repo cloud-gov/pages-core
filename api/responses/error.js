@@ -1,3 +1,5 @@
+const { DatabaseError } = require('sequelize');
+
 module.exports = (error = {}, { res }) => {
   let finalError = error;
 
@@ -9,6 +11,10 @@ module.exports = (error = {}, { res }) => {
     finalError = {
       status: 400,
       message: 'The request parameters were invalid.',
+    };
+  } else if (error instanceof DatabaseError) {
+    finalError = {
+      status: 404,
     };
   }
 

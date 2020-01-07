@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const { stub } = require('sinon');
-const { SequelizeDatabaseError } = require('sequelize');
+const { DatabaseError } = require('sequelize');
 const SQS = require('../../../../api/services/SQS');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
@@ -218,7 +218,7 @@ describe('Build model', () => {
 
       const buildQuery = Build.findByPk(pk);
 
-      return expect(buildQuery).to.be.rejectedWith(SequelizeDatabaseError);
+      return expect(buildQuery).to.be.rejectedWith(DatabaseError);
     });
 
     it('throws when pk is non-number string', () => {
@@ -226,7 +226,7 @@ describe('Build model', () => {
 
       const buildQuery = Build.findByPk(pk);
 
-      return expect(buildQuery).to.be.rejectedWith(SequelizeDatabaseError);
+      return expect(buildQuery).to.be.rejectedWith(DatabaseError);
     });
   });
 

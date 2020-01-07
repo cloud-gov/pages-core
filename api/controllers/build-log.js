@@ -1,3 +1,4 @@
+const { wrapHandlers } = require('../utils');
 const buildLogSerializer = require('../serializers/build-log');
 const { Build, BuildLog } = require('../models');
 
@@ -8,31 +9,27 @@ function decodeb64(str) {
   return null;
 }
 
-module.exports = {
-  create: (req, res) => {
-    Promise.resolve(Number(req.params.build_id))
-      .then((id) => {
-        if (isNaN(id)) { throw 404; }
-        return Build.findByPk(id);
-      })
-      .then((build) => {
-        if (!build) {
-          throw 404;
-        } else if (build.token !== req.params.token) {
-          throw 403;
-        }
+module.exports = wrapHandlers({
+  create: async (req, res) => {
+    const { build_id: buildId, token } = req.params;
 
-        return BuildLog.create({
-          build: build.id,
-          output: decodeb64(req.body.output),
-          source: req.body.source,
-        });
-      })
-      .then(buildLog => buildLogSerializer.serialize(buildLog))
-      .then((buildLogJSON) => { res.json(buildLogJSON); })
-      .catch((err) => {
-        res.error(err);
-      });
+    const build = await Build.findOne({ where: { id: buildId, token } });
+
+    if (!build) {
+      return res.notFound();
+    }
+
+    const { output, source } = req.body;
+
+    const buildLog = await BuildLog.create({
+      build: build.id,
+      output: decodeb64(output),
+      source,
+    });
+
+    const buildLogJSON = await buildLogSerializer.serialize(buildLog);
+
+    return res.ok(buildLogJSON);
   },
 
   find: async (req, res) => {
@@ -43,7 +40,7 @@ module.exports = {
     const build = await Build.forUser(user).findByPk(buildId);
 
     if (!build) {
-      return res.status(404).send('Not Found');
+      return res.notFound();
     }
 
     const buildLogs = await BuildLog.findAll({
@@ -56,6 +53,6 @@ module.exports = {
 
     const serializedBuildLogs = await buildLogSerializer.serialize(buildLogs);
 
-    return res.json(serializedBuildLogs);
+    return res.ok(serializedBuildLogs);
   },
-};
+});
