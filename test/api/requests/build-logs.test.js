@@ -6,7 +6,7 @@ const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const { BuildLog } = require('../../../api/models');
 
-describe.only('Build Log API', () => {
+describe('Build Log API', () => {
   describe('POST /v0/build/:build_id/log/:token', () => {
     const encode64 = str => Buffer.from(str, 'utf8').toString('base64');
 
@@ -237,6 +237,69 @@ describe.only('Build Log API', () => {
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 404, response.body);
         done();
       }).catch(done);
+    });
+
+    describe.only('build logs with source =`ALL`', () => {
+      let build;
+      let cookie;
+
+      beforeEach(async () => {
+        const user = await factory.user();
+        const site = await factory.site({ users: [user] });
+        cookie = await authenticatedSession(user);
+        build = await factory.build({ user, site });
+      });
+
+      it('returns legacy paginated build logs if no logs with source=`ALL` exist', async () => {
+        const numLogs = 6;
+        const limit = 5;
+
+        await Promise.all(Array(numLogs).fill(0).map(() => factory.buildLog({ build, source: 'foobar' })));
+
+        const response = await request(app)
+          .get(`/v0/build/${build.id}/log/page/1`)
+          .set('Cookie', cookie)
+          .expect(200);
+
+        validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
+        expect(response.body).to.be.an('array');
+        expect(response.body).to.have.length(limit);
+      });
+
+      it('only returns new build logs if source=`ALL` exists', async () => {
+        const numLogs = 3;
+
+        await Promise.all([
+          ...Array(numLogs).fill(0).map(() => factory.buildLog({ build, source: 'foobar' })),
+          ...Array(numLogs).fill(0).map(() => factory.buildLog({ build, source: 'ALL' })),
+        ]);
+
+        const { body } = await request(app)
+          .get(`/v0/build/${build.id}/log/page/1`)
+          .set('Cookie', cookie)
+          .expect(200);
+
+        validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, body);
+        expect(body).to.be.an('array');
+        expect(body).to.have.length(numLogs);
+        expect(body.map(l => l.source)).to.have.members(Array(numLogs).fill('ALL'));
+      });
+
+      it('paginates new build logs by groups of lines', async () => {
+        const numLogs = 6;
+
+        await Promise.all(Array(numLogs).fill(0).map(() => factory.buildLog({ build, source: 'ALL' })));
+
+        const { body } = await request(app)
+          .get(`/v0/build/${build.id}/log/page/1`)
+          .set('Cookie', cookie)
+          .expect(200);
+
+        validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, body);
+        expect(body).to.be.an('array');
+        expect(body).to.have.length(numLogs);
+        expect(body.map(l => l.source)).to.have.members(Array(numLogs).fill('ALL'));
+      });
     });
   });
 });
