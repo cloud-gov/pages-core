@@ -7,6 +7,7 @@ const ConnectSession = require('connect-session-sequelize');
 const nunjucks = require('nunjucks');
 const flash = require('connect-flash');
 const http = require('http');
+const { SequelizeDatabaseError } = require('sequelize');
 const io = require('socket.io');
 const redis = require('redis');
 const redisAdapter = require('socket.io-redis');
@@ -150,9 +151,12 @@ app.use((err, req, res, next) => {
 });
 
 // Generic error handler
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line
 app.use((err, _req, res, _next) => {
-  res.status(500).send({ message: `An unexpected error occurred: ${err.message}` });
+  if (err instanceof SequelizeDatabaseError) {
+    return res.status(404).send('Not Found');
+  }
+  return res.status(500).send({ message: `An unexpected error occurred: ${err.message}` });
 });
 
 socket.use((_socket, next) => {
