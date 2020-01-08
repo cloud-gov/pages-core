@@ -239,7 +239,7 @@ describe('Build Log API', () => {
       }).catch(done);
     });
 
-    describe.only('build logs with source =`ALL`', () => {
+    describe('build logs with source =`ALL`', () => {
       let build;
       let cookie;
 
