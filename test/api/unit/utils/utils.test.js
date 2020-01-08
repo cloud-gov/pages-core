@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
 const moment = require('moment');
 const fsMock = require('mock-fs');
 const proxyquire = require('proxyquire').noCallThru();
@@ -246,6 +247,58 @@ describe('utils', () => {
     it('returns the app_env when app_env is not production', () => {
       config.app.app_env = 'development';
       expect(utils.getSiteDisplayEnv()).to.equal('development');
+    });
+  });
+
+  describe('.mapValues', () => {
+    it('maps a function over the values of an object and returns a new object with the original keys and updated values', () => {
+      const obj = {
+        foo: 1,
+        bar: 5,
+      };
+
+      const fn = d => d * 2;
+
+      expect(utils.mapValues(fn, obj)).to.deep.equal({ foo: 2, bar: 10 });
+    });
+  });
+
+  describe('.wrapHandler', () => {
+    it('wraps an async function with a catch clause and calls the `error` function of the 2nd argument', async () => {
+      const spy = sinon.spy();
+      const error = new Error('foobar');
+
+      // eslint-disable-next-line no-unused-vars
+      const handler = async (_req, _res, _next) => {
+        throw error;
+      };
+
+      const wrappedFn = utils.wrapHandler(handler);
+
+      await wrappedFn({}, { error: spy }, () => {});
+
+      expect(spy.calledWith(error));
+    });
+  });
+
+  describe('.wrapHandlers', () => {
+    it('maps `wrapHandler` over the values of an object', async () => {
+      const spy = sinon.spy();
+      const error = new Error('foobar');
+
+      const handlers = {
+        // eslint-disable-next-line no-unused-vars
+        foo: async (_req, _res, _next) => {
+          throw error;
+        },
+        bar: async () => {},
+      };
+
+      const wrappedObj = utils.wrapHandlers(handlers);
+
+      await wrappedObj.foo({}, { error: spy }, () => {});
+
+      expect(spy.calledWith(error));
     });
   });
 });
