@@ -140,21 +140,11 @@ async function createData({ githubUsername }) {
       source: 'fake-build-step1',
       build: site2Builds[0].id,
     }),
-    BuildLog.create({
+    Promise.all(Array(20).fill(0).map(() => BuildLog.create({
       output: log('This log has a source of ALL'),
       source: 'ALL',
       build: site2Builds[0].id,
-    }),
-    BuildLog.create({
-      output: log('This log has a source of ALL'),
-      source: 'ALL',
-      build: site2Builds[0].id,
-    }),
-    BuildLog.create({
-      output: log('This log has a source of ALL'),
-      source: 'ALL',
-      build: site2Builds[0].id,
-    }),
+    }))),
   ]);
 
   console.log('Creating user actions...');
