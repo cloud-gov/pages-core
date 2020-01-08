@@ -88,6 +88,7 @@ describe('Build model', () => {
         site: sitePromise,
         build: factory.build({ site: sitePromise }),
       }).then((promisedValues) => {
+        // eslint-disable-next-line prefer-destructuring
         site = promisedValues.site;
         expect(site.publishedAt).to.be.null;
 
