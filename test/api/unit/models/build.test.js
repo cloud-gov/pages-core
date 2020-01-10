@@ -53,9 +53,9 @@ describe('Build model', () => {
 
   describe('after create hook', () => {
     it('should send a build new build message', (done) => {
-      let startedAt = new Date();
+      const startedAt = new Date();
       factory.build({ state: 'processing', startedAt })
-        .then(build => {
+        .then((build) => {
           expect(build.completedAt).to.be.null;
           return build.updateJobStatus({ status: 'success' });
         })
@@ -77,7 +77,7 @@ describe('Build model', () => {
 
     it('should send a build new build message', (done) => {
       factory.build()
-        .then(build => {
+        .then((build) => {
           expect(build.startedAt).to.be.null;
           return build.updateJobStatus({ status: 'processing' });
         })
@@ -100,7 +100,7 @@ describe('Build model', () => {
   describe('.completeJob(message)', () => {
     it('should mark a build errored with a message', (done) => {
       factory.build({ state: 'processing', startedAt: new Date() })
-      .then(build => {
+      .then((build) => {
         expect(build.completedAt).to.be.null;
         expect(build.startedAt).to.be.a('date');
         return build.updateJobStatus({ status: 'error', message: 'this is an error' });

@@ -706,7 +706,7 @@ describe('Build API', () => {
     it('should update the publishedAt from processing -> processing status', (done) => {
       let siteId;
       let buildId;
-      let startedAt = new Date();
+      const startedAt = new Date();
       const sitePromise = factory.site();
 
       Promise.props({
