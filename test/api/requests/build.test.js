@@ -623,6 +623,127 @@ describe('Build API', () => {
       .catch(done);
     });
 
+    it('should update the publishedAt from processing -> success status', (done) => {
+      let siteId;
+      let buildId;
+      const sitePromise = factory.site();
+
+      Promise.props({
+        site: sitePromise,
+        build: factory.build({
+          site: sitePromise,
+          commitSha,
+          state: 'processing',
+          startedAt: new Date(),
+        }),
+      })
+      .then((promisedValues) => {
+        expect(promisedValues.site.publishedAt).to.be.null;
+        siteId = promisedValues.site.id;
+        buildId = promisedValues.build.id;
+
+        return postBuildStatus({
+          build: promisedValues.build,
+          status: 'success',
+          message: '',
+        });
+      })
+      .then(() => Site.findByPk(siteId))
+      .then((site) => {
+        expect(site.publishedAt).to.be.a('date');
+        return Build.findByPk(buildId);
+      })
+      .then((build) => {
+        expect(build.state).to.eql('success');
+        expect(build.startedAt).to.be.a('date');
+        expect(build.completedAt).to.be.a('date');
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should update the publishedAt from processing -> error status', (done) => {
+      let siteId;
+      let buildId;
+      const message = 'because';
+      const sitePromise = factory.site();
+
+      Promise.props({
+        site: sitePromise,
+        build: factory.build({
+          site: sitePromise,
+          commitSha,
+          state: 'processing',
+          startedAt: new Date(),
+        }),
+      })
+      .then((promisedValues) => {
+        expect(promisedValues.site.publishedAt).to.be.null;
+        siteId = promisedValues.site.id;
+        buildId = promisedValues.build.id;
+
+        return postBuildStatus({
+          build: promisedValues.build,
+          status: 'error',
+          message,
+        });
+      })
+      .then(() => Site.findByPk(siteId))
+      .then((site) => {
+        expect(site.publishedAt).to.be.null;
+        return Build.findByPk(buildId);
+      })
+      .then((build) => {
+        expect(build.state).to.eql('error');
+        expect(build.completedAt).to.be.a('date');
+        expect(build.startedAt).to.be.a('date');
+        expect(build.error).to.eql(message);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should update the publishedAt from processing -> processing status', (done) => {
+      let siteId;
+      let buildId;
+      let startedAt = new Date();
+      const sitePromise = factory.site();
+
+      Promise.props({
+        site: sitePromise,
+        build: factory.build({
+          site: sitePromise,
+          commitSha,
+          state: 'skipped',
+          startedAt,
+        }),
+      })
+      .then((promisedValues) => {
+        expect(promisedValues.site.publishedAt).to.be.null;
+        siteId = promisedValues.site.id;
+        buildId = promisedValues.build.id;
+
+        return postBuildStatus({
+          build: promisedValues.build,
+          status: 'processing',
+          message: '',
+
+        });
+      })
+      .then(() => Site.findByPk(siteId))
+      .then((site) => {
+        expect(site.publishedAt).to.be.null;
+        return Build.findByPk(buildId);
+      })
+      .then((build) => {
+        expect(build.state).to.eql('processing');
+        expect(build.startedAt).to.eql(startedAt);
+        expect(build.completedAt).to.be.null;
+        done();
+      })
+      .catch(done);
+    });
+
     it('should report the build\'s status back to github', (done) => {
       nock.cleanAll();
       const statusNock = githubAPINocks.status({ state: 'success' });

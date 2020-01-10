@@ -53,8 +53,12 @@ describe('Build model', () => {
 
   describe('after create hook', () => {
     it('should send a build new build message', (done) => {
-      factory.build()
-        .then(build => build.updateJobStatus({ status: 'complete' }))
+      let startedAt = new Date();
+      factory.build({ state: 'processing', startedAt })
+        .then(build => {
+          expect(build.completedAt).to.be.null;
+          return build.updateJobStatus({ status: 'success' });
+        })
         .then((build) => {
           const queuedBuild = sendMessageStub.getCall(0).args[0];
           const buildCount = sendMessageStub.getCall(0).args[1];
@@ -62,6 +66,30 @@ describe('Build model', () => {
           expect(sendMessageStub.called).to.be.true;
           expect(queuedBuild.id).to.equal(build.id);
           expect(buildCount).to.equal(1);
+          expect(build.state).to.eql('success');
+          expect(build.completedAt).to.be.a('date');
+          expect(build.startedAt).to.eql(startedAt);
+
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should send a build new build message', (done) => {
+      factory.build()
+        .then(build => {
+          expect(build.startedAt).to.be.null;
+          return build.updateJobStatus({ status: 'processing' });
+        })
+        .then((build) => {
+          const queuedBuild = sendMessageStub.getCall(0).args[0];
+          const buildCount = sendMessageStub.getCall(0).args[1];
+
+          expect(sendMessageStub.called).to.be.true;
+          expect(queuedBuild.id).to.equal(build.id);
+          expect(buildCount).to.equal(1);
+          expect(build.state).to.eql('processing');
+          expect(build.startedAt).to.be.a('date');
 
           done();
         })
@@ -71,11 +99,16 @@ describe('Build model', () => {
 
   describe('.completeJob(message)', () => {
     it('should mark a build errored with a message', (done) => {
-      factory.build().then(build =>
-        build.updateJobStatus({ status: 'error', message: 'this is an error' })
-      ).then((build) => {
+      factory.build({ state: 'processing', startedAt: new Date() })
+      .then(build => {
+        expect(build.completedAt).to.be.null;
+        expect(build.startedAt).to.be.a('date');
+        return build.updateJobStatus({ status: 'error', message: 'this is an error' });
+      }).then((build) => {
         expect(build.state).to.equal('error');
         expect(build.error).to.equal('this is an error');
+        expect(build.completedAt).to.be.a('date');
+        expect(build.startedAt).to.be.a('date');
         done();
       })
       .catch(done);
