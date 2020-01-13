@@ -223,20 +223,24 @@ describe('Build Log API', () => {
       authenticatedSession().then(cookie => request(app)
         .get('/v0/build/fake-id/log')
         .set('Cookie', cookie)
-        .expect(404)).then((response) => {
+        .expect(404))
+      .then((response) => {
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 404, response.body);
         done();
-      }).catch(done);
+      })
+      .catch(done);
     });
 
     it('should response with a 404 if the given build does not exist', (done) => {
       authenticatedSession().then(cookie => request(app)
         .get('/v0/build/-100/log')
         .set('Cookie', cookie)
-        .expect(404)).then((response) => {
+        .expect(404))
+      .then((response) => {
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 404, response.body);
         done();
-      }).catch(done);
+      })
+      .catch(done);
     });
 
     describe('build logs with source =`ALL`', () => {
