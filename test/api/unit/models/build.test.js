@@ -72,11 +72,15 @@ describe('Build model', () => {
 
   describe('.completeJob(message)', () => {
     it('should mark a build errored with a message', (done) => {
-      factory.build().then(build => build.updateJobStatus({ status: 'error', message: 'this is an error' })).then((build) => {
-        expect(build.state).to.equal('error');
-        expect(build.error).to.equal('this is an error');
-        done();
-      })
+      factory.build()
+        .then(build =>
+          build.updateJobStatus({ status: 'error', message: 'this is an error' })
+        )
+        .then((build) => {
+          expect(build.state).to.equal('error');
+          expect(build.error).to.equal('this is an error');
+          done();
+        })
         .catch(done);
     });
 
@@ -103,11 +107,15 @@ describe('Build model', () => {
     });
 
     it('should sanitize GitHub access tokens from error message', (done) => {
-      factory.build().then(build => build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' })).then((build) => {
-        expect(build.state).to.equal('error');
-        expect(build.error).not.to.match(/123abc/);
-        done();
-      })
+      factory.build()
+        .then(build =>
+          build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' })
+        )
+        .then((build) => {
+          expect(build.state).to.equal('error');
+          expect(build.error).not.to.match(/123abc/);
+          done();
+        })
         .catch(done);
     });
   });
@@ -117,11 +125,13 @@ describe('Build model', () => {
       Build.create({
         user: 1,
         site: null,
-      }).then(() => done(new Error('Expected a validation error'))).catch((err) => {
-        expect(err.name).to.equal('SequelizeValidationError');
-        expect(err.errors[0].path).to.equal('site');
-        done();
       })
+        .then(() => done(new Error('Expected a validation error')))
+        .catch((err) => {
+          expect(err.name).to.equal('SequelizeValidationError');
+          expect(err.errors[0].path).to.equal('site');
+          done();
+        })
         .catch(done);
     });
 
@@ -129,11 +139,13 @@ describe('Build model', () => {
       Build.create({
         user: null,
         site: 1,
-      }).then(() => done(new Error('Expected a validation error'))).catch((err) => {
-        expect(err.name).to.equal('SequelizeValidationError');
-        expect(err.errors[0].path).to.equal('user');
-        done();
       })
+        .then(() => done(new Error('Expected a validation error')))
+        .catch((err) => {
+          expect(err.name).to.equal('SequelizeValidationError');
+          expect(err.errors[0].path).to.equal('user');
+          done();
+        })
         .catch(done);
     });
 
