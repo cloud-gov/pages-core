@@ -20,34 +20,38 @@ describe('Build model', () => {
     it('should add a build token', (done) => {
       let build;
 
-      factory.site().then((site) => {
-        build = Build.build({
-          site: site.id,
-          user: 1,
-        });
+      factory.site()
+        .then((site) => {
+          build = Build.build({
+            site: site.id,
+            user: 1,
+          });
 
-        return build.validate();
-      }).then(() => {
-        expect(build.token).to.be.okay;
-        done();
-      })
+          return build.validate();
+        })
+        .then(() => {
+          expect(build.token).to.be.okay;
+          done();
+        })
         .catch(done);
     });
 
     it('should not override a build token if one exists', (done) => {
       let build;
 
-      factory.site().then((site) => {
-        build = Build.build({
-          site: site.id,
-          token: '123abc',
-          user: 1,
-        });
-        return build.validate();
-      }).then(() => {
-        expect(build.token).to.equal('123abc');
-        done();
-      })
+      factory.site()
+        .then((site) => {
+          build = Build.build({
+            site: site.id,
+            token: '123abc',
+            user: 1,
+          });
+          return build.validate();
+        })
+        .then(() => {
+          expect(build.token).to.equal('123abc');
+          done();
+        })
         .catch(done);
     });
   });
@@ -55,7 +59,9 @@ describe('Build model', () => {
   describe('after create hook', () => {
     it('should send a build new build message', (done) => {
       factory.build()
-        .then(build => build.updateJobStatus({ status: 'complete' }))
+        .then(build =>
+          build.updateJobStatus({ status: 'complete' })
+        )
         .then((build) => {
           const queuedBuild = sendMessageStub.getCall(0).args[0];
           const buildCount = sendMessageStub.getCall(0).args[1];
@@ -126,7 +132,9 @@ describe('Build model', () => {
         user: 1,
         site: null,
       })
-        .then(() => done(new Error('Expected a validation error')))
+        .then(() =>
+          done(new Error('Expected a validation error'))
+        )
         .catch((err) => {
           expect(err.name).to.equal('SequelizeValidationError');
           expect(err.errors[0].path).to.equal('site');
@@ -140,7 +148,9 @@ describe('Build model', () => {
         user: null,
         site: 1,
       })
-        .then(() => done(new Error('Expected a validation error')))
+        .then(() =>
+          done(new Error('Expected a validation error'))
+        )
         .catch((err) => {
           expect(err.name).to.equal('SequelizeValidationError');
           expect(err.errors[0].path).to.equal('user');
