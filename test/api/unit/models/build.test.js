@@ -60,7 +60,7 @@ describe('Build model', () => {
 
     it('should update the site\'s publishedAt timestamp if the build is successful', async () => {
       const site = await factory.site();
-      const build = await factory.build({ site: site });
+      const build = await factory.build({ site });
       
       expect(site.publishedAt).to.be.null;
 
