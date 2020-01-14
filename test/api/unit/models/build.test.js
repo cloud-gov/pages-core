@@ -17,130 +17,87 @@ describe('Build model', () => {
   });
 
   describe('before validate hook', () => {
-    it('should add a build token', (done) => {
-      let build;
+    it('should add a build token', async () => {
+      const site = await factory.site();
+      const build = await Build.build({ site: site.id, user: 1 });
 
-      factory.site()
-        .then((site) => {
-          build = Build.build({
-            site: site.id,
-            user: 1,
-          });
+      build.validate();
 
-          return build.validate();
-        })
-        .then(() => {
-          expect(build.token).to.be.okay;
-          done();
-        })
-        .catch(done);
+      expect(build.token).to.be.okay;
     });
 
-    it('should not override a build token if one exists', (done) => {
-      let build;
+    it('should not override a build token if one exists', async () => {
+      const site = await factory.site();
+      const build = await Build.build({ site: site.id, token: '123abc', user: 1 });
+      
+      build.validate();
 
-      factory.site()
-        .then((site) => {
-          build = Build.build({
-            site: site.id,
-            token: '123abc',
-            user: 1,
-          });
-          return build.validate();
-        })
-        .then(() => {
-          expect(build.token).to.equal('123abc');
-          done();
-        })
-        .catch(done);
+      expect(build.token).to.equal('123abc');
     });
   });
 
   describe('after create hook', () => {
-    it('should send a build new build message', (done) => {
-      factory.build()
-        .then(build =>
-          build.updateJobStatus({ status: 'complete' })
-        )
-        .then((build) => {
-          const queuedBuild = sendMessageStub.getCall(0).args[0];
-          const buildCount = sendMessageStub.getCall(0).args[1];
+    it('should send a build new build message', async () => {
+      const build = await factory.build();
+      await build.updateJobStatus({ status: 'complete' });
+        
+      const [queuedBuild, buildCount] = sendMessageStub.getCall(0).args;
 
-          expect(sendMessageStub.called).to.be.true;
-          expect(queuedBuild.id).to.equal(build.id);
-          expect(buildCount).to.equal(1);
-
-          done();
-        })
-        .catch(done);
+      expect(sendMessageStub.called).to.be.true;
+      expect(queuedBuild.id).to.equal(build.id);
+      expect(buildCount).to.equal(1);
     });
   });
 
   describe('.completeJob(message)', () => {
-    it('should mark a build errored with a message', (done) => {
-      factory.build()
-        .then(build =>
-          build.updateJobStatus({ status: 'error', message: 'this is an error' })
-        )
-        .then((build) => {
-          expect(build.state).to.equal('error');
-          expect(build.error).to.equal('this is an error');
-          done();
-        })
-        .catch(done);
+    it('should mark a build errored with a message', async () => {
+      const build = await factory.build();
+      await build.updateJobStatus({ status: 'error', message: 'this is an error' });
+
+      expect(build.state).to.equal('error');
+      expect(build.error).to.equal('this is an error');
     });
 
-    it('should update the site\'s publishedAt timestamp if the build is successful', (done) => {
-      let site;
+    it('should update the site\'s publishedAt timestamp if the build is successful', async () => {
+      const site = await factory.site();
+      const build = await factory.build({ site: site });
+      
+      expect(site.publishedAt).to.be.null;
 
-      const sitePromise = factory.site();
-      Promise.props({
-        site: sitePromise,
-        build: factory.build({ site: sitePromise }),
-      }).then((promisedValues) => {
-        // eslint-disable-next-line prefer-destructuring
-        site = promisedValues.site;
-        expect(site.publishedAt).to.be.null;
+      await build.updateJobStatus({ status: 'success' });
+      await site.reload();
 
-        return promisedValues.build.updateJobStatus({ status: 'success' });
-      }).then(() => Site.findByPk(site.id))
-        .then((model) => {
-          expect(model.publishedAt).to.be.a('date');
-          expect(new Date().getTime() - model.publishedAt.getTime()).to.be.below(500);
-          done();
-        })
-        .catch(done);
+      expect(site.publishedAt).to.be.a('date');
+      expect(new Date().getTime() - site.publishedAt.getTime()).to.be.below(500);
     });
 
-    it('should sanitize GitHub access tokens from error message', (done) => {
-      factory.build()
-        .then(build =>
-          build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' })
-        )
-        .then((build) => {
-          expect(build.state).to.equal('error');
-          expect(build.error).not.to.match(/123abc/);
-          done();
-        })
-        .catch(done);
+    it('should sanitize GitHub access tokens from error message', async () => {
+      const build = await factory.build();
+      await build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' });
+      
+      expect(build.state).to.equal('error');
+      expect(build.error).not.to.match(/123abc/);
     });
   });
 
   describe('validations', () => {
-    it('should require a site object before saving', (done) => {
-      Build.create({
-        user: 1,
-        site: null,
-      })
-        .then(() =>
-          done(new Error('Expected a validation error'))
-        )
-        .catch((err) => {
-          expect(err.name).to.equal('SequelizeValidationError');
-          expect(err.errors[0].path).to.equal('site');
-          done();
-        })
-        .catch(done);
+    it.only('should require a site object before saving', () => {
+      // Build.create({
+      //   user: 1,
+      //   site: null,
+      // })
+      //   .then(() =>
+      //     done(new Error('Expected a validation error'))
+      //   )
+      //   .catch((err) => {
+      //     expect(err.name).to.equal('SequelizeValidationError');
+      //     expect(err.errors[0].path).to.equal('site');
+      //     done();
+      //   })
+      //   .catch(done);
+
+        const build = Build.create({ user: 1, site: null });
+        return expect(build).to.be.rejectedWith(SequelizeValidationError, 'site')
     });
 
     it('should require a user object before saving', (done) => {
