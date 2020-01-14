@@ -116,7 +116,6 @@ describe('Build model', () => {
         
       return expect(buildPromise).to.be
         .rejectedWith(ValidationError, 'Validation error: Validation is on branch failed');
-
     });
 
     it('requires a valid branch name before saving no end slash', () => {
