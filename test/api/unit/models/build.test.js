@@ -72,56 +72,51 @@ describe('Build model', () => {
   });
 
   describe('.updateJobStatus', () => {
-    describe('.startJob(message)', () => {
-      it('should update build status to processing and startedAt', (done) => {
+    describe('.completeJob(message)', () => {
+      it('should mark a build errored with a message', (done) => {
         factory.build()
           .then((build) => {
+            expect(build.state).to.eql('queued');
             expect(build.startedAt).to.be.null;
             return build.updateJobStatus({ status: 'processing' });
           })
           .then((build) => {
-            expect(build.state).to.eql('processing');
+            expect(build.completedAt).to.be.null;
             expect(build.startedAt).to.be.a('date');
-            expect(new Date().getTime() - build.startedAt.getTime()).to.be.below(500);
+            expect(build.startedAt.getTime()).to.above(build.createdAt);
+            return build.updateJobStatus({ status: 'error', message: 'this is an error' });
+          }).then((build) => {
+            expect(build.state).to.equal('error');
+            expect(build.error).to.equal('this is an error');
+            expect(build.completedAt).to.be.a('date');
+            expect(build.completedAt.getTime()).to.above(build.startedAt.getTime());
+            return Site.findByPk(build.site);
+          }).then((site) => {
+            expect(site.publishedAt).to.be.null;
             done();
           })
           .catch(done);
       });
-    });
-
-    describe('.completeJob(message)', () => {
-      it('should mark a build errored with a message', (done) => {
-        const startedAt = new Date();
-        factory.build({ state: 'processing', startedAt })
-        .then((build) => {
-          expect(build.completedAt).to.be.null;
-          expect(build.startedAt).to.eql(startedAt);
-          return build.updateJobStatus({ status: 'error', message: 'this is an error' });
-        }).then((build) => {
-          expect(build.state).to.equal('error');
-          expect(build.error).to.equal('this is an error');
-          expect(build.completedAt).to.be.a('date');
-          expect(build.completedAt.getTime()).to.above(build.startedAt.getTime());
-          done();
-        })
-        .catch(done);
-      });
 
       it('should update the site\'s publishedAt timestamp if the build is successful', (done) => {
-        let site;
-
-        const sitePromise = factory.site();
-        Promise.props({
-          site: sitePromise,
-          build: factory.build({ site: sitePromise, state: 'processing', startedAt: new Date() }),
-        }).then((promisedValues) => {
-          site = promisedValues.site;
-          expect(site.publishedAt).to.be.null;
-          return promisedValues.build.updateJobStatus({ status: 'success' });
-        }).then(() => Site.findByPk(site.id))
-        .then((model) => {
-          expect(model.publishedAt).to.be.a('date');
-          expect(new Date().getTime() - model.publishedAt.getTime()).to.be.below(500);
+        factory.build()
+        .then((build) => {
+          expect(build.state).to.eql('queued');
+          expect(build.startedAt).to.be.null;
+          return build.updateJobStatus({ status: 'processing' });
+        }).then((build) => {
+          expect(build.completedAt).to.be.null;
+          expect(build.startedAt).to.be.a('date');
+          expect(build.startedAt.getTime()).to.above(build.createdAt.getTime());
+          return build.updateJobStatus({ status: 'success' });
+        }).then((build) => {
+          expect(build.completedAt).to.be.a('date');
+          expect(build.completedAt.getTime()).to.above(build.startedAt.getTime());
+          expect(build.state).to.be.eql('success');
+          return Promise.all([Promise.resolve(build), Site.findByPk(build.site)]);
+        }).then(([build, site]) => {
+          expect(site.publishedAt).to.be.a('date');
+          expect(build.completedAt.getTime()).to.eql(site.publishedAt.getTime());
           done();
         })
         .catch(done);
