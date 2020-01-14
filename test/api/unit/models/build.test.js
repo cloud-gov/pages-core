@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const { stub } = require('sinon');
-const { DatabaseError } = require('sequelize');
+const { DatabaseError, ValidationError } = require('sequelize');
 const SQS = require('../../../../api/services/SQS');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
@@ -81,96 +81,66 @@ describe('Build model', () => {
   });
 
   describe('validations', () => {
-    it.only('should require a site object before saving', () => {
-      // Build.create({
-      //   user: 1,
-      //   site: null,
-      // })
-      //   .then(() =>
-      //     done(new Error('Expected a validation error'))
-      //   )
-      //   .catch((err) => {
-      //     expect(err.name).to.equal('SequelizeValidationError');
-      //     expect(err.errors[0].path).to.equal('site');
-      //     done();
-      //   })
-      //   .catch(done);
+    it('should require a site object before saving', () => {
+      const buildPromise = Build.create({ user: 1, site: null });
 
-        const build = Build.create({ user: 1, site: null });
-        return expect(build).to.be.rejectedWith(SequelizeValidationError, 'site')
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'notNull Violation: Build.site cannot be null');
     });
 
-    it('should require a user object before saving', (done) => {
-      Build.create({
-        user: null,
-        site: 1,
-      })
-        .then(() =>
-          done(new Error('Expected a validation error'))
-        )
-        .catch((err) => {
-          expect(err.name).to.equal('SequelizeValidationError');
-          expect(err.errors[0].path).to.equal('user');
-          done();
-        })
-        .catch(done);
+    it('should require a user object before saving', () => {
+      const buildPromise = Build.create({ user: null, site: 1 });
+
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'notNull Violation: Build.user cannot be null');
     });
 
-    it('should require a valid sha before saving', (done) => {
-      Build.create({
+    it('should require a valid sha before saving', () => {
+      const buildPromise = Build.create({
         user: 1,
         site: 1,
-        commitSha: 'not-a-real-sha.biz',
-      })
-        .then(done)
-        .catch((error) => {
-          expect(error.name).to.equal('SequelizeValidationError');
-          expect(error.errors[0].path).to.equal('commitSha');
-          done();
-        });
+        commitSha: 'not-a-real-sha.biz'
+      });
+      
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'Validation error: Validation is on commitSha failed');
     });
 
-    it('requires a valid branch name before saving', (done) => {
-      Build.create({
+    it('requires a valid branch name before saving', () => {
+      const buildPromise = Build.create({
         user: 1,
         site: 1,
         commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: 'not*real',
-      })
-        .then(done)
-        .catch((error) => {
-          expect(error.name).to.equal('SequelizeValidationError');
-          expect(error.errors[0].path).to.equal('branch');
-          done();
-        });
+      });
+        
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'Validation error: Validation is on branch failed');
+
     });
-    it('requires a valid branch name before saving no end slash', (done) => {
-      Build.create({
+
+    it('requires a valid branch name before saving no end slash', () => {
+      const buildPromise = Build.create({
         user: 1,
         site: 1,
         commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: 'not-real/',
-      })
-        .then(done)
-        .catch((error) => {
-          expect(error.name).to.equal('SequelizeValidationError');
-          expect(error.errors[0].path).to.equal('branch');
-          done();
-        });
+      });
+
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'Validation error: Validation is on branch failed');
     });
-    it('requires a valid branch name before saving no begin /', (done) => {
-      Build.create({
+
+    it('requires a valid branch name before saving no begin /', () => {
+      const buildPromise = Build.create({
         user: 1,
         site: 1,
         commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: '/not-real',
-      })
-        .then(done)
-        .catch((error) => {
-          expect(error.name).to.equal('SequelizeValidationError');
-          expect(error.errors[0].path).to.equal('branch');
-          done();
-        });
+      });
+
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'Validation error: Validation is on branch failed');
     });
   });
 
