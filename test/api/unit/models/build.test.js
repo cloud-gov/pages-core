@@ -53,7 +53,7 @@ describe('Build model', () => {
   });
 
   describe('after create hook', () => {
-    it('should send a build new build message', async() => {
+    it('should send a build new build message', async () => {
       const startedAt = new Date();
       let build = await factory.build();
       // create delay while s3 infra create will be removed with 1 bucket federalist

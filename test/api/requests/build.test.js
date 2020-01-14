@@ -8,7 +8,7 @@ const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
 const { authenticatedSession, unauthenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
-const { Build, Site } = require('../../../api/models');
+const { Build } = require('../../../api/models');
 const csrfToken = require('../support/csrfToken');
 
 const commitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
