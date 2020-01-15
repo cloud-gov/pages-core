@@ -83,7 +83,7 @@ describe('Build model', () => {
           .then((build) => {
             expect(build.completedAt).to.be.null;
             expect(build.startedAt).to.be.a('date');
-            expect(build.startedAt.getTime()).to.above(build.createdAt);
+            expect(build.startedAt.getTime()).to.be.above(build.createdAt);
             return build.updateJobStatus({ status: 'error', message: 'this is an error' });
           }).then((build) => {
             expect(build.state).to.equal('error');
