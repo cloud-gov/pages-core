@@ -12,6 +12,9 @@ const toJSON = (build) => {
   if (object.completedAt) {
     object.completedAt = object.completedAt.toISOString();
   }
+  if (object.startedAt) {
+    object.startedAt = object.startedAt.toISOString();
+  }
   Object.keys(object).forEach((key) => {
     if (object[key] === null) {
       delete object[key];

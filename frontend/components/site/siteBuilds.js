@@ -185,7 +185,7 @@ class SiteBuilds extends React.Component {
                       <td data-title="Completed"><span>{ timeFrom(build.completedAt) }</span></td>
                       <td data-title="Duration">
                         <span>
-                          { duration(build.createdAt, build.completedAt) }
+                          { duration(build.startedAt, build.completedAt) }
                         </span>
                       </td>
                       <td data-title="Actions" className="table-actions">

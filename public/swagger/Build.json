@@ -45,6 +45,9 @@
         }
       }
     },
+    "startedAt": {
+      "type": "string"
+    },
     "site": {
       "type": "object"
     },

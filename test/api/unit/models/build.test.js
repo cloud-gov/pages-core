@@ -52,54 +52,75 @@ describe('Build model', () => {
   });
 
   describe('after create hook', () => {
-    it('should send a build new build message', (done) => {
-      factory.build()
-        .then(build => build.updateJobStatus({ status: 'complete' }))
-        .then((build) => {
-          const queuedBuild = sendMessageStub.getCall(0).args[0];
-          const buildCount = sendMessageStub.getCall(0).args[1];
+    it('should send a build new build message', async () => {
+      const wait = (ms = 1000) => new Promise(resolve => setTimeout(resolve, ms));
+      const startedAt = new Date();
+      const build = await factory.build();
+      // create delay while s3 infra created ... will be removed with 1 bucket federalist
+      await wait();
+      expect(build.completedAt).to.be.null;
+      expect(build.startedAt).to.be.null;
 
-          expect(sendMessageStub.called).to.be.true;
-          expect(queuedBuild.id).to.equal(build.id);
-          expect(buildCount).to.equal(1);
+      const queuedBuild = sendMessageStub.getCall(0).args[0];
+      const buildCount = sendMessageStub.getCall(0).args[1];
 
-          done();
-        })
-        .catch(done);
+      expect(sendMessageStub.called).to.be.true;
+      expect(queuedBuild.id).to.equal(build.id);
+      expect(buildCount).to.equal(1);
+      expect(build.state).to.eql('queued');
     });
   });
 
-  describe('.completeJob(message)', () => {
-    it('should mark a build errored with a message', (done) => {
-      factory.build().then(build =>
-        build.updateJobStatus({ status: 'error', message: 'this is an error' })
-      ).then((build) => {
-        expect(build.state).to.equal('error');
-        expect(build.error).to.equal('this is an error');
-        done();
-      })
-      .catch(done);
-    });
+  describe('.updateJobStatus', () => {
+    describe('.completeJob(message)', () => {
+      it('should mark a build errored with a message', (done) => {
+        factory.build()
+          .then((build) => {
+            expect(build.state).to.eql('queued');
+            expect(build.startedAt).to.be.null;
+            return build.updateJobStatus({ status: 'processing' });
+          })
+          .then((build) => {
+            expect(build.completedAt).to.be.null;
+            expect(build.startedAt).to.be.a('date');
+            expect(build.startedAt.getTime()).to.be.above(build.createdAt);
+            return build.updateJobStatus({ status: 'error', message: 'this is an error' });
+          }).then((build) => {
+            expect(build.state).to.equal('error');
+            expect(build.error).to.equal('this is an error');
+            expect(build.completedAt).to.be.a('date');
+            expect(build.completedAt.getTime()).to.be.above(build.startedAt.getTime());
+            return Site.findByPk(build.site);
+          }).then((site) => {
+            expect(site.publishedAt).to.be.null;
+            done();
+          })
+          .catch(done);
+      });
 
-    it('should update the site\'s publishedAt timestamp if the build is successful', (done) => {
-      let site;
-
-      const sitePromise = factory.site();
-      Promise.props({
-        site: sitePromise,
-        build: factory.build({ site: sitePromise }),
-      }).then((promisedValues) => {
-        site = promisedValues.site;
-        expect(site.publishedAt).to.be.null;
-
-        return promisedValues.build.updateJobStatus({ status: 'success' });
-      }).then(() => Site.findByPk(site.id))
-      .then((model) => {
-        expect(model.publishedAt).to.be.a('date');
-        expect(new Date().getTime() - model.publishedAt.getTime()).to.be.below(500);
-        done();
-      })
-      .catch(done);
+      it('should update the site\'s publishedAt timestamp if the build is successful', (done) => {
+        factory.build()
+        .then((build) => {
+          expect(build.state).to.eql('queued');
+          expect(build.startedAt).to.be.null;
+          return build.updateJobStatus({ status: 'processing' });
+        }).then((build) => {
+          expect(build.completedAt).to.be.null;
+          expect(build.startedAt).to.be.a('date');
+          expect(build.startedAt.getTime()).to.be.above(build.createdAt.getTime());
+          return build.updateJobStatus({ status: 'success' });
+        }).then((build) => {
+          expect(build.completedAt).to.be.a('date');
+          expect(build.completedAt.getTime()).to.above(build.startedAt.getTime());
+          expect(build.state).to.be.eql('success');
+          return Promise.all([Promise.resolve(build), Site.findByPk(build.site)]);
+        }).then(([build, site]) => {
+          expect(site.publishedAt).to.be.a('date');
+          expect(build.completedAt.getTime()).to.eql(site.publishedAt.getTime());
+          done();
+        })
+        .catch(done);
+      });
     });
 
     it('should sanitize GitHub access tokens from error message', (done) => {

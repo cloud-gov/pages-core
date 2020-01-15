@@ -28,6 +28,7 @@ describe('<SiteBuilds/>', () => {
       id: 1,
       branch: 'master',
       createdAt: '2016-12-28T12:00:00',
+      startedAt: '2016-12-28T12:01:00',
       completedAt: '2016-12-28T12:05:00',
       state: 'success',
       commitSha: '123A',
