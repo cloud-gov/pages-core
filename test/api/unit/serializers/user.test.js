@@ -7,32 +7,13 @@ const factory = require('../../support/factory');
 const UserSerializer = require('../../../../api/serializers/user');
 
 describe('UserSerializer', () => {
-  describe('.serialize(serializable)', () => {
-    it('should serialize an object correctly', (done) => {
-      factory.user()
-      .then(user => UserSerializer.serialize(user))
-      .then((object) => {
-        const result = validateJSONSchema(object, userSchema);
+  describe('.toJSON(serializable)', () => {
+    it('should serialize a user object correctly', async () => {
+      const user = await factory.user();
+      const userJson = UserSerializer.toJSON(user);
+      const result = validateJSONSchema(userJson, userSchema);
 
-        expect(result.errors).to.be.empty;
-        done();
-      }).catch(done);
-    });
-
-    it('should serialize an array correctly', (done) => {
-      const userPromises = Array(3).fill(0).map(() => factory.user());
-
-      Promise.all(userPromises)
-      .then(users => UserSerializer.serialize(users))
-      .then((object) => {
-        const arraySchema = {
-          type: 'array',
-          items: userSchema,
-        };
-        const result = validateJSONSchema(object, arraySchema);
-        expect(result.errors).to.be.empty;
-        done();
-      }).catch(done);
+      expect(result.errors).to.be.empty;
     });
   });
 });
