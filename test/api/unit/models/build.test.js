@@ -1,6 +1,5 @@
 const { expect } = require('chai');
 const { stub } = require('sinon');
-const _ = require('underscore');
 const SQS = require('../../../../api/services/SQS');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
@@ -54,10 +53,11 @@ describe('Build model', () => {
 
   describe('after create hook', () => {
     it('should send a build new build message', async () => {
+      const wait = (ms = 1000) => new Promise(resolve => setTimeout(resolve, ms));
       const startedAt = new Date();
-      let build = await factory.build();
-      // create delay while s3 infra create will be removed with 1 bucket federalist
-      await factory.site();
+      const build = await factory.build();
+      // create delay while s3 infra created ... will be removed with 1 bucket federalist
+      await wait();
       expect(build.completedAt).to.be.null;
       expect(build.startedAt).to.be.null;
 
@@ -89,7 +89,7 @@ describe('Build model', () => {
             expect(build.state).to.equal('error');
             expect(build.error).to.equal('this is an error');
             expect(build.completedAt).to.be.a('date');
-            expect(build.completedAt.getTime()).to.above(build.startedAt.getTime());
+            expect(build.completedAt.getTime()).to.be.above(build.startedAt.getTime());
             return Site.findByPk(build.site);
           }).then((site) => {
             expect(site.publishedAt).to.be.null;
@@ -107,7 +107,7 @@ describe('Build model', () => {
         }).then((build) => {
           expect(build.completedAt).to.be.null;
           expect(build.startedAt).to.be.a('date');
-          expect(build.startedAt.getTime()).to.above(build.createdAt.getTime());
+          expect(build.startedAt.getTime()).to.be.above(build.createdAt.getTime());
           return build.updateJobStatus({ status: 'success' });
         }).then((build) => {
           expect(build.completedAt).to.be.a('date');
