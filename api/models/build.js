@@ -46,20 +46,24 @@ const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@git
 
 const jobErrorMessage = (message = 'An unknown error occurred') => sanitizeCompleteJobErrorMessage(message);
 
-const jobStateUpdate = (buildStatus, build, completedAt) => {
-  let error = null;
-  let completed = null;
-  if (buildStatus.status === 'error') {
-    error = jobErrorMessage(buildStatus.message);
-  }
-  if (['error', 'success'].includes(buildStatus.status)) {
-    completed = completedAt;
-  }
-  return build.update({
+const jobStateUpdate = (buildStatus, build, timestamp) => {
+  const atts = {
     state: buildStatus.status,
-    error,
-    completedAt: completed,
-  });
+  };
+
+  if (buildStatus.status === 'error') {
+    atts.error = jobErrorMessage(buildStatus.message);
+  }
+
+  if (['error', 'success'].includes(buildStatus.status)) {
+    atts.completedAt = timestamp;
+  }
+
+  if (build.state === 'queued' && buildStatus.status === 'processing') {
+    atts.startedAt = timestamp;
+  }
+
+  return build.update(atts);
 };
 
 const completeJobSiteUpdate = (build, completedAt) => {
@@ -71,10 +75,10 @@ const completeJobSiteUpdate = (build, completedAt) => {
 };
 
 async function updateJobStatus(buildStatus) {
-  const completedAt = new Date();
-  const build = await jobStateUpdate(buildStatus, this, completedAt);
+  const timestamp = new Date();
+  const build = await jobStateUpdate(buildStatus, this, timestamp);
   if (build.state === 'success') {
-    await completeJobSiteUpdate(build, completedAt);
+    await completeJobSiteUpdate(build, timestamp);
   }
   return build;
 }
@@ -119,6 +123,9 @@ module.exports = (sequelize, DataTypes) => {
     user: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    startedAt: {
+      type: DataTypes.DATE,
     },
   }, {
     tableName: 'build',

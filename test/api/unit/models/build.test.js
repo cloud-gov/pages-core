@@ -5,6 +5,9 @@ const SQS = require('../../../../api/services/SQS');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
 
+// eslint-disable-next-line scanjs-rules/call_setTimeout
+const wait = (ms = 1000) => new Promise(resolve => setTimeout(resolve, ms));
+
 describe('Build model', () => {
   let sendMessageStub;
 
@@ -29,7 +32,7 @@ describe('Build model', () => {
     it('should not override a build token if one exists', async () => {
       const site = await factory.site();
       const build = await Build.build({ site: site.id, token: '123abc', user: 1 });
-      
+
       build.validate();
 
       expect(build.token).to.equal('123abc');
@@ -39,44 +42,93 @@ describe('Build model', () => {
   describe('after create hook', () => {
     it('should send a build new build message', async () => {
       const build = await factory.build();
-      await build.updateJobStatus({ status: 'complete' });
-        
+      // create delay while s3 infra created ... will be removed with 1 bucket federalist
+      await wait();
+
+      expect(build.completedAt).to.be.null;
+      expect(build.startedAt).to.be.null;
+
       const [queuedBuild, buildCount] = sendMessageStub.getCall(0).args;
 
       expect(sendMessageStub.called).to.be.true;
       expect(queuedBuild.id).to.equal(build.id);
       expect(buildCount).to.equal(1);
+      expect(build.state).to.eql('queued');
     });
   });
 
-  describe('.completeJob(message)', () => {
-    it('should mark a build errored with a message', async () => {
-      const build = await factory.build();
-      await build.updateJobStatus({ status: 'error', message: 'this is an error' });
+  describe('.updateJobStatus', () => {
+    describe('from `queued`', () => {
+      let build;
 
-      expect(build.state).to.equal('error');
-      expect(build.error).to.equal('this is an error');
+      beforeEach(async () => {
+        build = await factory.build();
+      });
+
+      describe('to `processing`', () => {
+        it('should update the startedAt and state', async () => {
+          await build.updateJobStatus({ status: 'processing' });
+
+          expect(build.state).to.equal('processing');
+          expect(build.startedAt).to.be.a('date');
+          expect(build.startedAt).to.be.above(build.createdAt);
+          expect(build.completedAt).to.be.null;
+        });
+      });
+
+      describe('to `error`', () => {
+        it('should mark a build errored with a message', async () => {
+          await build.updateJobStatus({ status: 'error', message: 'this is an error' });
+
+          expect(build.state).to.equal('error');
+          expect(build.error).to.equal('this is an error');
+          expect(build.startedAt).to.be.null;
+          expect(build.completedAt).to.be.a('date');
+          expect(build.completedAt).to.be.above(build.createdAt);
+        });
+
+        it('should sanitize GitHub access tokens from error message', async () => {
+          await build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' });
+
+          expect(build.error).not.to.match(/123abc/);
+        });
+      });
     });
 
-    it('should update the site\'s publishedAt timestamp if the build is successful', async () => {
-      const site = await factory.site();
-      const build = await factory.build({ site });
-      
-      expect(site.publishedAt).to.be.null;
+    describe('from `processing`', () => {
+      const startedAt = new Date();
+      let build;
 
-      await build.updateJobStatus({ status: 'success' });
-      await site.reload();
+      beforeEach(async () => {
+        build = await factory.build({ status: 'processing', startedAt });
+      });
 
-      expect(site.publishedAt).to.be.a('date');
-      expect(new Date().getTime() - site.publishedAt.getTime()).to.be.below(500);
-    });
+      describe('to `success`', () => {
+        it('should update the site\'s publishedAt timestamp if the build is successful', async () => {
+          await build.updateJobStatus({ status: 'success' });
 
-    it('should sanitize GitHub access tokens from error message', async () => {
-      const build = await factory.build();
-      await build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' });
-      
-      expect(build.state).to.equal('error');
-      expect(build.error).not.to.match(/123abc/);
+          expect(build.state).to.be.eql('success');
+          expect(build.completedAt).to.be.a('date');
+          expect(build.completedAt).to.be.above(build.startedAt);
+
+          const site = await Site.findByPk(build.site);
+
+          expect(site.publishedAt).to.be.a('date');
+          expect(build.completedAt.getTime()).to.eql(site.publishedAt.getTime());
+        });
+      });
+
+      describe('to `error`', () => {
+        it('should mark a build errored with a message', async () => {
+          await build.updateJobStatus({ status: 'error', message: 'this is an error' });
+
+          expect(build.state).to.equal('error');
+          expect(build.error).to.equal('this is an error');
+          expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
+          expect(build.completedAt).to.be.a('date');
+          expect(build.completedAt).to.be.above(build.startedAt);
+        });
+      });
     });
   });
 
@@ -99,9 +151,9 @@ describe('Build model', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        commitSha: 'not-a-real-sha.biz'
+        commitSha: 'not-a-real-sha.biz',
       });
-      
+
       return expect(buildPromise).to.be
         .rejectedWith(ValidationError, 'Validation error: Validation is on commitSha failed');
     });
@@ -113,7 +165,7 @@ describe('Build model', () => {
         commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: 'not*real',
       });
-        
+
       return expect(buildPromise).to.be
         .rejectedWith(ValidationError, 'Validation error: Validation is on branch failed');
     });

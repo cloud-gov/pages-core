@@ -8,7 +8,7 @@ const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
 const { authenticatedSession, unauthenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
-const { Build, Site } = require('../../../api/models');
+const { Build } = require('../../../api/models');
 const csrfToken = require('../support/csrfToken');
 
 const commitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
@@ -518,110 +518,6 @@ describe('Build API', () => {
       githubAPINocks.status();
     });
 
-    it('should mark a build processing', (done) => {
-      let build;
-
-      factory.build({ commitSha })
-      .then((model) => {
-        build = model;
-      })
-      .then(() =>
-        postBuildStatus({
-          build,
-          status: 'processing',
-          message: '',
-        }).expect(200)
-      )
-      .then(() => Build.findByPk(build.id))
-      .then((updatedBuild) => {
-        expect(updatedBuild).to.not.be.undefined;
-        expect(updatedBuild.state).to.equal('processing');
-        expect(updatedBuild.error).to.be.null;
-        expect(updatedBuild.completedAt).to.be.null;
-        done();
-      })
-      .catch(done);
-    });
-
-    it('should mark a build successful', (done) => {
-      let build;
-
-      factory.build({ commitSha })
-      .then((model) => {
-        build = model;
-      })
-      .then(() =>
-        postBuildStatus({
-          build,
-          status: 'success',
-          message: '',
-        }).expect(200)
-      )
-      .then(() => Build.findByPk(build.id))
-      .then((updatedBuild) => {
-        expect(updatedBuild).to.not.be.undefined;
-        expect(updatedBuild.state).to.equal('success');
-        expect(updatedBuild.error).to.be.null;
-        expect(new Date() - updatedBuild.completedAt).to.be.below(1000);
-        done();
-      })
-      .catch(done);
-    });
-
-    it('should mark a build errored and should set the message', (done) => {
-      let build;
-
-      factory.build({ commitSha })
-      .then((model) => {
-        build = model;
-      })
-      .then(() =>
-        postBuildStatus({
-          build,
-          status: 'error',
-          message: 'The build failed for a reason',
-        }).expect(200)
-      )
-      .then(() => Build.findByPk(build.id))
-      .then((updatedBuild) => {
-        expect(updatedBuild).to.not.be.undefined;
-        expect(updatedBuild.state).to.equal('error');
-        expect(updatedBuild.error).to.equal('The build failed for a reason');
-        expect(new Date() - updatedBuild.completedAt).to.be.below(1000);
-        done();
-      })
-      .catch(done);
-    });
-
-    it('should update the publishedAt field for the site if the build is successful', (done) => {
-      let siteId;
-      const sitePromise = factory.site();
-
-      Promise.props({
-        site: sitePromise,
-        build: factory.build({
-          site: sitePromise,
-          commitSha,
-        }),
-      })
-      .then((promisedValues) => {
-        expect(promisedValues.site.publishedAt).to.be.null;
-        siteId = promisedValues.site.id;
-
-        return postBuildStatus({
-          build: promisedValues.build,
-          status: 'success',
-          message: '',
-        });
-      })
-      .then(() => Site.findByPk(siteId))
-      .then((site) => {
-        expect(site.publishedAt).to.be.a('date');
-        expect(new Date().getTime() - site.publishedAt.getTime()).to.be.below(500);
-        done();
-      })
-      .catch(done);
-    });
 
     it('should report the build\'s status back to github', (done) => {
       nock.cleanAll();
