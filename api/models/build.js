@@ -68,19 +68,18 @@ const jobStateUpdate = (buildStatus, build, timestamp) => {
 
 const completeJobSiteUpdate = (build, completedAt) => {
   const { Site } = build.sequelize.models;
-
-  if (build.state === 'success') {
-    return Site.update(
-      { publishedAt: completedAt },
-      { where: { id: build.site } }
-    );
-  }
+  return Site.update(
+    { publishedAt: completedAt },
+    { where: { id: build.site } }
+  );
 };
 
 async function updateJobStatus(buildStatus) {
   const timestamp = new Date();
   const build = await jobStateUpdate(buildStatus, this, timestamp);
-  await completeJobSiteUpdate(build, timestamp);
+  if (build.state === 'success') {
+    await completeJobSiteUpdate(build, timestamp);
+  }
   return build;
 }
 
@@ -134,10 +133,17 @@ module.exports = (sequelize, DataTypes) => {
       afterCreate,
       beforeValidate,
     },
+    scopes: {
+      forUser: user => ({
+        where: {
+          user: user.id,
+        },
+      }),
+    },
   });
 
   Build.associate = associate;
   Build.prototype.updateJobStatus = updateJobStatus;
-
+  Build.forUser = user => Build.scope({ method: ['forUser', user] });
   return Build;
 };

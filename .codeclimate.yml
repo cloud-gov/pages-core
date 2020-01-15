@@ -4,7 +4,7 @@ engines:
     enabled: false
   eslint:
     enabled: true
-    channel: "eslint-3"
+    channel: "eslint-5"
     checks:
       import/no-unresolved:
         enabled: false

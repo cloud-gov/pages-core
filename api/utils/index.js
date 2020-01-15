@@ -121,6 +121,28 @@ function shouldIncludeTracking() {
   return config.app.app_env === 'production';
 }
 
+function mapValues(fn, obj) {
+  const reducer = (acc, key) => {
+    acc[key] = fn(obj[key]);
+    return acc;
+  };
+  return Object.keys(obj).reduce(reducer, {});
+}
+
+function wrapHandler(fn) {
+  return (...args) => fn(...args).catch(args[1].error);
+  // We really want to just call `next` (args[2]) with the error
+  // but we currently have this other error handling that is short
+  // circuiting the typical Express error handling stack. Save
+  // refactoring it for another day.
+  // This will call `res.error(err)`, see logic in api/responses.
+  // return (...args) => fn(...args).catch(args[2]);
+}
+
+function wrapHandlers(handlers) {
+  return mapValues(wrapHandler, handlers);
+}
+
 module.exports = {
   filterEntity,
   firstEntity,
@@ -131,5 +153,8 @@ module.exports = {
   loadAssetManifest,
   loadDevelopmentManifest,
   loadProductionManifest,
+  mapValues,
   shouldIncludeTracking,
+  wrapHandler,
+  wrapHandlers,
 };
