@@ -150,7 +150,7 @@ app.use((err, req, res, next) => {
 });
 
 // Generic error handler
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line
 app.use((err, _req, res, _next) => {
   res.status(500).send({ message: `An unexpected error occurred: ${err.message}` });
 });

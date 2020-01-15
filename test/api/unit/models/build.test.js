@@ -1,8 +1,12 @@
 const { expect } = require('chai');
 const { stub } = require('sinon');
+const { DatabaseError, ValidationError } = require('sequelize');
 const SQS = require('../../../../api/services/SQS');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
+
+// eslint-disable-next-line scanjs-rules/call_setTimeout
+const wait = (ms = 1000) => new Promise(resolve => setTimeout(resolve, ms));
 
 describe('Build model', () => {
   let sendMessageStub;
@@ -16,188 +20,235 @@ describe('Build model', () => {
   });
 
   describe('before validate hook', () => {
-    it('should add a build token', (done) => {
-      let build;
+    it('should add a build token', async () => {
+      const site = await factory.site();
+      const build = await Build.build({ site: site.id, user: 1 });
 
-      factory.site().then((site) => {
-        build = Build.build({
-          site: site.id,
-          user: 1,
-        });
+      build.validate();
 
-        return build.validate();
-      }).then(() => {
-        expect(build.token).to.be.okay;
-        done();
-      })
-      .catch(done);
+      expect(build.token).to.be.okay;
     });
 
-    it('should not override a build token if one exists', (done) => {
-      let build;
+    it('should not override a build token if one exists', async () => {
+      const site = await factory.site();
+      const build = await Build.build({ site: site.id, token: '123abc', user: 1 });
 
-      factory.site().then((site) => {
-        build = Build.build({
-          site: site.id,
-          token: '123abc',
-          user: 1,
-        });
-        return build.validate();
-      }).then(() => {
-        expect(build.token).to.equal('123abc');
-        done();
-      })
-      .catch(done);
+      build.validate();
+
+      expect(build.token).to.equal('123abc');
     });
   });
 
   describe('after create hook', () => {
-    it('should send a build new build message', (done) => {
-      factory.build()
-        .then(build => build.updateJobStatus({ status: 'complete' }))
-        .then((build) => {
-          const queuedBuild = sendMessageStub.getCall(0).args[0];
-          const buildCount = sendMessageStub.getCall(0).args[1];
+    it('should send a build new build message', async () => {
+      const build = await factory.build();
+      // create delay while s3 infra created ... will be removed with 1 bucket federalist
+      await wait();
 
-          expect(sendMessageStub.called).to.be.true;
-          expect(queuedBuild.id).to.equal(build.id);
-          expect(buildCount).to.equal(1);
+      expect(build.completedAt).to.be.null;
+      expect(build.startedAt).to.be.null;
 
-          done();
-        })
-        .catch(done);
+      const [queuedBuild, buildCount] = sendMessageStub.getCall(0).args;
+
+      expect(sendMessageStub.called).to.be.true;
+      expect(queuedBuild.id).to.equal(build.id);
+      expect(buildCount).to.equal(1);
+      expect(build.state).to.eql('queued');
     });
   });
 
-  describe('.completeJob(message)', () => {
-    it('should mark a build errored with a message', (done) => {
-      factory.build().then(build =>
-        build.updateJobStatus({ status: 'error', message: 'this is an error' })
-      ).then((build) => {
-        expect(build.state).to.equal('error');
-        expect(build.error).to.equal('this is an error');
-        done();
-      })
-      .catch(done);
+  describe('.updateJobStatus', () => {
+    describe('from `queued`', () => {
+      let build;
+
+      beforeEach(async () => {
+        build = await factory.build();
+      });
+
+      describe('to `processing`', () => {
+        it('should update the startedAt and state', async () => {
+          await build.updateJobStatus({ status: 'processing' });
+
+          expect(build.state).to.equal('processing');
+          expect(build.startedAt).to.be.a('date');
+          expect(build.startedAt).to.be.above(build.createdAt);
+          expect(build.completedAt).to.be.null;
+        });
+      });
+
+      describe('to `error`', () => {
+        it('should mark a build errored with a message', async () => {
+          await build.updateJobStatus({ status: 'error', message: 'this is an error' });
+
+          expect(build.state).to.equal('error');
+          expect(build.error).to.equal('this is an error');
+          expect(build.startedAt).to.be.null;
+          expect(build.completedAt).to.be.a('date');
+          expect(build.completedAt).to.be.above(build.createdAt);
+        });
+
+        it('should sanitize GitHub access tokens from error message', async () => {
+          await build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' });
+
+          expect(build.error).not.to.match(/123abc/);
+        });
+      });
     });
 
-    it('should update the site\'s publishedAt timestamp if the build is successful', (done) => {
-      let site;
+    describe('from `processing`', () => {
+      const startedAt = new Date();
+      let build;
 
-      const sitePromise = factory.site();
-      Promise.props({
-        site: sitePromise,
-        build: factory.build({ site: sitePromise }),
-      }).then((promisedValues) => {
-        site = promisedValues.site;
-        expect(site.publishedAt).to.be.null;
+      beforeEach(async () => {
+        build = await factory.build({ status: 'processing', startedAt });
+      });
 
-        return promisedValues.build.updateJobStatus({ status: 'success' });
-      }).then(() => Site.findByPk(site.id))
-      .then((model) => {
-        expect(model.publishedAt).to.be.a('date');
-        expect(new Date().getTime() - model.publishedAt.getTime()).to.be.below(500);
-        done();
-      })
-      .catch(done);
-    });
+      describe('to `success`', () => {
+        it('should update the site\'s publishedAt timestamp if the build is successful', async () => {
+          await build.updateJobStatus({ status: 'success' });
 
-    it('should sanitize GitHub access tokens from error message', (done) => {
-      factory.build().then(build =>
-        build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' })
-      ).then((build) => {
-        expect(build.state).to.equal('error');
-        expect(build.error).not.to.match(/123abc/);
-        done();
-      })
-      .catch(done);
+          expect(build.state).to.be.eql('success');
+          expect(build.completedAt).to.be.a('date');
+          expect(build.completedAt).to.be.above(build.startedAt);
+
+          const site = await Site.findByPk(build.site);
+
+          expect(site.publishedAt).to.be.a('date');
+          expect(build.completedAt.getTime()).to.eql(site.publishedAt.getTime());
+        });
+      });
+
+      describe('to `error`', () => {
+        it('should mark a build errored with a message', async () => {
+          await build.updateJobStatus({ status: 'error', message: 'this is an error' });
+
+          expect(build.state).to.equal('error');
+          expect(build.error).to.equal('this is an error');
+          expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
+          expect(build.completedAt).to.be.a('date');
+          expect(build.completedAt).to.be.above(build.startedAt);
+        });
+      });
     });
   });
 
   describe('validations', () => {
-    it('should require a site object before saving', (done) => {
-      Build.create({
-        user: 1,
-        site: null,
-      }).then(() =>
-        done(new Error('Expected a validation error'))
-      ).catch((err) => {
-        expect(err.name).to.equal('SequelizeValidationError');
-        expect(err.errors[0].path).to.equal('site');
-        done();
-      })
-      .catch(done);
+    it('should require a site object before saving', () => {
+      const buildPromise = Build.create({ user: 1, site: null });
+
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'notNull Violation: Build.site cannot be null');
     });
 
-    it('should require a user object before saving', (done) => {
-      Build.create({
-        user: null,
-        site: 1,
-      }).then(() =>
-        done(new Error('Expected a validation error'))
-      ).catch((err) => {
-        expect(err.name).to.equal('SequelizeValidationError');
-        expect(err.errors[0].path).to.equal('user');
-        done();
-      })
-      .catch(done);
+    it('should require a user object before saving', () => {
+      const buildPromise = Build.create({ user: null, site: 1 });
+
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'notNull Violation: Build.user cannot be null');
     });
 
-    it('should require a valid sha before saving', (done) => {
-      Build.create({
+    it('should require a valid sha before saving', () => {
+      const buildPromise = Build.create({
         user: 1,
         site: 1,
         commitSha: 'not-a-real-sha.biz',
-      })
-      .then(done)
-      .catch((error) => {
-        expect(error.name).to.equal('SequelizeValidationError');
-        expect(error.errors[0].path).to.equal('commitSha');
-        done();
       });
+
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'Validation error: Validation is on commitSha failed');
     });
 
-    it('requires a valid branch name before saving', (done) => {
-      Build.create({
+    it('requires a valid branch name before saving', () => {
+      const buildPromise = Build.create({
         user: 1,
         site: 1,
         commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: 'not*real',
-      })
-      .then(done)
-      .catch((error) => {
-        expect(error.name).to.equal('SequelizeValidationError');
-        expect(error.errors[0].path).to.equal('branch');
-        done();
       });
+
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'Validation error: Validation is on branch failed');
     });
-    it('requires a valid branch name before saving no end slash', (done) => {
-      Build.create({
+
+    it('requires a valid branch name before saving no end slash', () => {
+      const buildPromise = Build.create({
         user: 1,
         site: 1,
         commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: 'not-real/',
-      })
-      .then(done)
-      .catch((error) => {
-        expect(error.name).to.equal('SequelizeValidationError');
-        expect(error.errors[0].path).to.equal('branch');
-        done();
       });
+
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'Validation error: Validation is on branch failed');
     });
-    it('requires a valid branch name before saving no begin /', (done) => {
-      Build.create({
+
+    it('requires a valid branch name before saving no begin /', () => {
+      const buildPromise = Build.create({
         user: 1,
         site: 1,
         commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: '/not-real',
-      })
-      .then(done)
-      .catch((error) => {
-        expect(error.name).to.equal('SequelizeValidationError');
-        expect(error.errors[0].path).to.equal('branch');
-        done();
       });
+
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'Validation error: Validation is on branch failed');
+    });
+  });
+
+  describe('querying', () => {
+    it('does not return a build when pk is null', async () => {
+      const pk = null;
+
+      const buildQuery = await Build.findByPk(pk);
+
+      expect(buildQuery).to.be.null;
+    });
+
+    it('returns a build when pk is a string', async () => {
+      const build = await factory.build();
+      const pk = String(build.id);
+
+      const buildQuery = await Build.findByPk(pk);
+
+      expect(buildQuery).to.not.be.null;
+      expect(buildQuery.id).to.equal(build.id);
+    });
+
+    it('throws when pk is Nan', () => {
+      const pk = NaN;
+
+      const buildQuery = Build.findByPk(pk);
+
+      return expect(buildQuery).to.be.rejectedWith(DatabaseError);
+    });
+
+    it('throws when pk is non-number string', () => {
+      const pk = 'foobar';
+
+      const buildQuery = Build.findByPk(pk);
+
+      return expect(buildQuery).to.be.rejectedWith(DatabaseError);
+    });
+  });
+
+  describe('forUser scope', () => {
+    it('returns the build for the associated user', async () => {
+      const user = await factory.user();
+      const build = await factory.build({ user });
+
+      const buildQuery = await Build.forUser(user).findByPk(build.id);
+
+      expect(buildQuery).to.not.be.null;
+      expect(buildQuery.id).to.equal(build.id);
+    });
+
+    it('does not return the build for a different user', async () => {
+      const user = { id: 99999 };
+      const build = await factory.build();
+
+      const buildQuery = await Build.forUser(user).findByPk(build.id);
+
+      expect(buildQuery).to.be.null;
     });
   });
 });

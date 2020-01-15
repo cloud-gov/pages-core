@@ -1,4 +1,5 @@
-const siteAuthorizer = require('../authorizers/site');
+const Seq = require('sequelize');
+const { wrapHandlers } = require('../utils');
 const buildLogSerializer = require('../serializers/build-log');
 const { Build, BuildLog } = require('../models');
 
@@ -9,74 +10,75 @@ function decodeb64(str) {
   return null;
 }
 
-module.exports = {
-  create: (req, res) => {
-    Promise.resolve(Number(req.params.build_id))
-    .then((id) => {
-      if (isNaN(id)) { throw 404; }
-      return Build.findByPk(id);
-    })
-    .then((build) => {
-      if (!build) {
-        throw 404;
-      } else if (build.token !== req.params.token) {
-        throw 403;
-      }
+module.exports = wrapHandlers({
+  create: async (req, res) => {
+    const { build_id: buildId, token } = req.params;
 
-      return BuildLog.create({
-        build: build.id,
-        output: decodeb64(req.body.output),
-        source: req.body.source,
-      });
-    })
-    .then(buildLog => buildLogSerializer.serialize(buildLog))
-    .then((buildLogJSON) => { res.json(buildLogJSON); })
-    .catch((err) => {
-      res.error(err);
+    const build = await Build.findOne({ where: { id: buildId, token } });
+
+    if (!build) {
+      return res.notFound();
+    }
+
+    const { output, source } = req.body;
+
+    const buildLog = await BuildLog.create({
+      build: build.id,
+      output: decodeb64(output),
+      source,
     });
+
+    const buildLogJSON = await buildLogSerializer.serialize(buildLog);
+
+    return res.ok(buildLogJSON);
   },
 
-  find: (req, res) => {
-    let build;
+  find: async (req, res) => {
     const limit = 5;
+    // A page is set to a maximum of 200,000 characters. Assuming
+    // a each log line is about 200 characters, that is roughly
+    // equal to 1,000 lines
+    const lineLimit = 5 * 1000;
 
-    const isPlaintext = req.query.format &&
-      req.query.format.toLowerCase() === 'text';
+    const { params, user } = req;
+    const { build_id: buildId, page = 1 } = params;
 
-    return Promise.resolve(Number(req.params.build_id))
-      .then((id) => {
-        if (isNaN(id)) {
-          throw 404;
-        }
-        return Build.findByPk(id);
-      }).then((model) => {
-        build = model;
-        if (!build) {
-          throw 404;
-        }
-        return siteAuthorizer.findOne(req.user, { id: build.site });
-      })
-      .then(() =>
-        Promise.resolve(Number(req.params.page) || 1)
-        .then(page => BuildLog.findAll({
-          attributes: ['id'],
-          where: { build: build.id },
-          order: [['id', 'ASC']],
-          offset: (limit * (page - 1)),
-          limit,
-        }))
-      )
-      .then(buildLogs => buildLogSerializer.serialize(buildLogs, { isPlaintext }))
-      .then((serializedBuildLogs) => {
-        if (isPlaintext) {
-          // .findAll always resolves to an array, so join is available
-          res.type('text').send(serializedBuildLogs.join('\n\n'));
-        } else {
-          res.json(serializedBuildLogs);
-        }
-      })
-      .catch((err) => {
-        res.error(err);
+    const build = await Build.forUser(user).findByPk(buildId);
+
+    if (!build) {
+      return res.notFound();
+    }
+
+    // I think it will be more efficient to aggregate these at the db level...
+    // attributes: [[Seq.fn('STRING_AGG', Seq.col('output'), '\n'), 'output']]
+    // group: ['build', 'source']
+    let buildLogs = await BuildLog.findAll({
+      where: {
+        build: build.id,
+        source: 'ALL',
+      },
+      order: [['id', 'ASC']],
+      offset: (lineLimit * (page - 1)),
+      lineLimit,
+      include: [Build],
+    });
+
+    // Support legacy build logs
+    if (buildLogs.length === 0) {
+      buildLogs = await BuildLog.findAll({
+        where: {
+          build: build.id,
+          source: { [Seq.Op.ne]: 'ALL' },
+        },
+        order: [['id', 'ASC']],
+        offset: (limit * (page - 1)),
+        limit,
+        include: [Build],
       });
+    }
+
+    const serializedBuildLogs = await buildLogSerializer.serialize(buildLogs);
+
+    return res.ok(serializedBuildLogs);
   },
-};
+});
