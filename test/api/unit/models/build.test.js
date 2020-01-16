@@ -231,12 +231,23 @@ describe('Build model', () => {
     });
   });
 
-  describe('forUser scope', () => {
+  describe('forSiteUser scope', () => {
     it('returns the build for the associated user', async () => {
       const user = await factory.user();
       const build = await factory.build({ user });
 
-      const buildQuery = await Build.forUser(user).findByPk(build.id);
+      const buildQuery = await Build.forSiteUser(user).findByPk(build.id);
+
+      expect(buildQuery).to.not.be.null;
+      expect(buildQuery.id).to.equal(build.id);
+    });
+
+    it('returns the build for any user who has access to the site', async () => {
+      const [user1, user2] = await Promise.all([factory.user(), factory.user()]);
+      const site = await factory.site({ users: [user1, user2] });
+      const build = await factory.build({ user: user1, site });
+
+      const buildQuery = await Build.forSiteUser(user2).findByPk(build.id);
 
       expect(buildQuery).to.not.be.null;
       expect(buildQuery.id).to.equal(build.id);
@@ -246,7 +257,7 @@ describe('Build model', () => {
       const user = { id: 99999 };
       const build = await factory.build();
 
-      const buildQuery = await Build.forUser(user).findByPk(build.id);
+      const buildQuery = await Build.forSiteUser(user).findByPk(build.id);
 
       expect(buildQuery).to.be.null;
     });
