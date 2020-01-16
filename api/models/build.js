@@ -134,16 +134,22 @@ module.exports = (sequelize, DataTypes) => {
       beforeValidate,
     },
     scopes: {
-      forUser: user => ({
-        where: {
-          user: user.id,
-        },
+      forSiteUser: (user, Site, User) => ({
+        include: [{
+          model: Site,
+          required: true,
+          include: [{
+            model: User,
+            where: {
+              id: user.id
+            },
+          }],
+        }],
       }),
     },
   });
 
   Build.associate = associate;
   Build.prototype.updateJobStatus = updateJobStatus;
-  Build.forUser = user => Build.scope({ method: ['forUser', user] });
   return Build;
 };

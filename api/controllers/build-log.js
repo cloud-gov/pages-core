@@ -43,7 +43,7 @@ module.exports = wrapHandlers({
     const { params, user } = req;
     const { build_id: buildId, page = 1 } = params;
 
-    const build = await Build.forUser(user).findByPk(buildId);
+    const build = await Build.forSiteUser(user).findByPk(buildId);
 
     if (!build) {
       return res.notFound();
