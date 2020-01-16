@@ -141,7 +141,7 @@ module.exports = (sequelize, DataTypes) => {
           include: [{
             model: User,
             where: {
-              id: user.id
+              id: user.id,
             },
           }],
         }],
