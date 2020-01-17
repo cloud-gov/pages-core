@@ -103,8 +103,6 @@ if (logger.levels[logger.level] >= 2) {
   app.use(expressLogger);
 }
 
-app.use(expressErrorLogger);
-
 const limiter = new RateLimit(config.rateLimiting);
 app.use(limiter); // must be set before router is added to app
 
@@ -139,20 +137,10 @@ app.use(router);
 
 app.use((req, res) => res.status(404).redirect(302, '/404-not-found/'));
 
-// error handler middleware for custom CSRF error responses
-// note that error handling middlewares must come last in the stack
-app.use((err, req, res, next) => {
-  if (err.code === 'EBADCSRFTOKEN') {
-    res.forbidden({ message: 'Invalid CSRF token' });
-    return;
-  }
-  next(err);
-});
+app.use(expressErrorLogger);
 
-// Generic error handler
-// eslint-disable-next-line
-app.use((err, _req, res, _next) => {
-  res.status(500).send({ message: `An unexpected error occurred: ${err.message}` });
+app.use((err, req, res, next) => {
+  res.error(err);
 });
 
 socket.use((_socket, next) => {
