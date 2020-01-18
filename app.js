@@ -139,6 +139,7 @@ app.use((req, res) => res.status(404).redirect(302, '/404-not-found/'));
 
 app.use(expressErrorLogger);
 
+// eslint-disable-next-line
 app.use((err, req, res, next) => {
   res.error(err);
 });
