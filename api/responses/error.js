@@ -7,6 +7,11 @@ module.exports = (error = {}, { res }) => {
     finalError = {
       status: error,
     };
+  } else if (error.code === 'EBADCSRFTOKEN') {
+    finalError = {
+      status: 403,
+      message: 'Invalid CSRF token',
+    };
   } else if (error.name && error.name === 'SequelizeValidationError') {
     finalError = {
       status: 400,

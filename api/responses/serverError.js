@@ -1,11 +1,12 @@
 const { logger } = require('../../winston');
 
 module.exports = (error = {}, { res }) => {
-  logger.error('Sending 500: %o', error);
+  // TODO - remove when refactoring error handling/logging
+  logger.error('Sending 500: ', error);
 
   res.status(500);
   return res.json({
-    message: 'Internal server error',
+    message: 'An unexpected error occurred',
     status: 500,
   });
 };
