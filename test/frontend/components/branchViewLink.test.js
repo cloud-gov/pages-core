@@ -8,8 +8,8 @@ describe('<BranchViewLink/>', () => {
   const testSite = {
     defaultBranch: 'default-branch',
     demoBranch: 'demo-branch',
-    viewLink: 'https://prod-url.com',
-    demoViewLink: 'https://demo-url.com',
+    domain: 'https://prod-url.com',
+    demoDomain: 'https://demo-url.com',
     owner: 'test-owner',
     repository: 'test-repo',
     awsBucketName: 'test-bucket',
@@ -18,12 +18,12 @@ describe('<BranchViewLink/>', () => {
 
   const getBuildURL = (build) => {
     if (build.site.defaultBranch === build.branchName) {
-      return `${build.site.awsBucketName}.app.cloud.gov/site/${build.site.owner}/${build.site.repository}`;
+      return `https://${build.site.awsBucketName}.app.cloud.gov/site/${build.site.owner}/${build.site.repository}`;
     }
     if (build.site.demoBranch === build.branchName) {
-      return `${build.site.awsBucketName}.app.cloud.gov/demo/${build.site.owner}/${build.site.repository}`;
+      return `https://${build.site.awsBucketName}.app.cloud.gov/demo/${build.site.owner}/${build.site.repository}`;
     }
-    return `${build.site.awsBucketName}.app.cloud.gov/preview/${build.site.owner}/${build.site.repository}/${build.branchName}`;
+    return `https://${build.site.awsBucketName}.app.cloud.gov/preview/${build.site.owner}/${build.site.repository}/${build.branchName}`;
   };
 
   let props;
@@ -41,7 +41,7 @@ describe('<BranchViewLink/>', () => {
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
-    expect(anchor.prop('href')).to.equal('https://prod-url.com');
+    expect(anchor.prop('href')).to.equal('https://prod-url.com/');
     expect(anchor.text()).equal('View site');
   });
 
@@ -50,7 +50,7 @@ describe('<BranchViewLink/>', () => {
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
-    expect(anchor.prop('href')).to.equal('https://demo-url.com');
+    expect(anchor.prop('href')).to.equal('https://demo-url.com/');
     expect(anchor.text()).equal('View demo');
   });
 

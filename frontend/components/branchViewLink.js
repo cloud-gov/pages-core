@@ -8,17 +8,28 @@ const isDefaultBranch = (branchName, site) => branchName === site.defaultBranch;
 const isDemoBranch = (branchName, site) => branchName === site.demoBranch;
 
 const getUrlAndViewText = (branchName, buildURL, site, completedAt) => {
-  if (isDefaultBranch(branchName, site)) {
-    return { url: site.viewLink, viewText: 'View site' };
-  }
-  if (isDemoBranch(branchName, site)) {
-    return { url: site.demoViewLink, viewText: 'View demo' };
-  }
-
-  return {
-    url: `https://${buildURL}/`,
-    viewText: 'Preview site',
+  const urlWithSlash = (rawUrl) => {
+    if (rawUrl && !rawUrl.endsWith('/')) {
+      return `${rawUrl}/`;
+    }
+    return rawUrl;
   };
+
+  let url = buildURL;
+  let viewText = 'Preview site';
+  if (isDefaultBranch(branchName, site)) {
+    viewText = 'View site';
+    if (site.domain) {
+      url = site.domain;
+    };
+  } else if (isDemoBranch(branchName, site)) {
+    viewText = 'View demo';
+    if (site.demoDomain) {
+      url = site.demoDomain;
+    };
+  }
+  url = urlWithSlash(url);
+  return { url, viewText };
 };
 
 export const BranchViewLink = ({ branchName, buildURL, site, showIcon, completedAt }) => {
