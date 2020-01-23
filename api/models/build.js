@@ -104,9 +104,9 @@ function urlWithSlash(rawUrl) {
 }
 
 function urlWithProtocol(rawUrl) {
-    if (rawUrl && (!rawUrl.startsWith('https://') || !rawUrl.startsWith('http://'))) {
-      rawUrl = `https://${rawUrl}`;
-    }
+  if (rawUrl && (!rawUrl.startsWith('https://') || !rawUrl.startsWith('http://'))) {
+    rawUrl = `https://${rawUrl}`;
+  }
   return rawUrl;
 }
 const viewLink = (build, site) => new Promise((resolve, reject) => {
@@ -115,7 +115,7 @@ const viewLink = (build, site) => new Promise((resolve, reject) => {
     if ((build.branch === site.defaultBranch) && site.domain) {
       link = site.domain;
     } else if ((build.branch === site.demoBranch) && site.demoDomain) {
-     link = site.demoDomain;
+      link = site.demoDomain;
     }
 
     link = urlWithSlash(link);
