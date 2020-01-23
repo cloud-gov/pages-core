@@ -153,7 +153,7 @@ describe('Build model', () => {
     it('non-default/demo branch url start with preview', async () => {
       let build = await factory.build({ branch: 'other', site });
       build = await Build.findByPk(build.id);
-      expect(build.url).to.eql(`${site.awsBucketName}.app.cloud.gov/preview/${site.owner}/${site.repository}/other`); 
+      expect(build.url).to.eql(`${site.awsBucketName}.app.cloud.gov/preview/${site.owner}/${site.repository}/other`);
     });
   });
 

@@ -17,14 +17,14 @@ describe('<BranchViewLink/>', () => {
   };
 
   const getBuildURL = (build) => {
-    if(build.site.defaultBranch === build.branchName) {
+    if (build.site.defaultBranch === build.branchName) {
       return `${build.site.awsBucketName}.app.cloud.gov/site/${build.site.owner}/${build.site.repository}`;
     }
-    if(build.site.demoBranch === build.branchName) {
+    if (build.site.demoBranch === build.branchName) {
       return `${build.site.awsBucketName}.app.cloud.gov/demo/${build.site.owner}/${build.site.repository}`;
     }
     return `${build.site.awsBucketName}.app.cloud.gov/preview/${build.site.owner}/${build.site.repository}/${build.branchName}`;
-  }
+  };
 
   let props;
 

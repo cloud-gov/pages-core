@@ -12,11 +12,11 @@ const afterCreate = (build) => {
     where: { id: build.id },
     include: [User, Site],
   })
-  .then((foundBuild) => {
-    Build.count({
-      where: { site: foundBuild.site },
-    }).then(count => SQS.sendBuildMessage(foundBuild, count));
-  });
+    .then((foundBuild) => {
+      Build.count({
+        where: { site: foundBuild.site },
+      }).then(count => SQS.sendBuildMessage(foundBuild, count));
+    });
 };
 
 const beforeCreate = async (build) => {
@@ -89,43 +89,43 @@ const getDomain = (site) => `${site.awsBucketName}.app.cloud.gov`;
 const getPath = (build, site) => {
   if (build.branch === site.defaultBranch) {
     return `/site/${site.owner}/${site.repository}`;
-  } else if (build.branch === site.demoBranch) {
+  }
+  if (build.branch === site.demoBranch) {
     return `/demo/${site.owner}/${site.repository}`;
   }
   return `/preview/${site.owner}/${site.repository}/${build.branch}`;
-}
+};
 
 function urlWithSlash(rawUrl) {
-  if (rawUrl) {
-    if (!rawUrl.endsWith('/')) {
-      return `${rawUrl}/`;
-    }
+  if (rawUrl && !rawUrl.endsWith('/')) {
+    return `${rawUrl}/`;
   }
   return rawUrl;
 }
 
 function urlWithProtocol(rawUrl) {
-  if (rawUrl) {
-    if (!rawUrl.startsWith('https://') || !rawUrl.startsWith('http://')) {
-        rawUrl = `https://${rawUrl}`;
-      }
-  }
+    if (rawUrl && (!rawUrl.startsWith('https://') || !rawUrl.startsWith('http://'))) {
+      rawUrl = `https://${rawUrl}`;
+    }
   return rawUrl;
 }
 const viewLink = (build, site) => new Promise((resolve, reject) => {
-    try {
-      let link = build.url;
-      if ((build.branch === site.defaultBranch) && site.domain) { link = site.domain; }
-      if ((build.branch === site.demoBranch) && site.demoDomain) { link = site.demoDomain; }
-
-      link = urlWithSlash(link);
-      link = urlWithProtocol(link);
-
-      resolve(link);
-    } catch (e) {
-      reject(e);
+  try {
+    let link = build.url;
+    if ((build.branch === site.defaultBranch) && site.domain) {
+      link = site.domain;
+    } else if ((build.branch === site.demoBranch) && site.demoDomain) {
+     link = site.demoDomain;
     }
-  });
+
+    link = urlWithSlash(link);
+    link = urlWithProtocol(link);
+
+    resolve(link);
+  } catch (e) {
+    reject(e);
+  }
+});
 
 async function updateJobStatus(buildStatus) {
   const timestamp = new Date();
