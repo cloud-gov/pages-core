@@ -24,7 +24,7 @@ const beforeCreate = async (build) => {
   const domain = getDomain(site);
   const path = getPath(build, site);
   const url = `${[domain, path].join('')}`;
-  build.url = url;
+  build.url = url; // eslint-disable-line no-param-reassign
 };
 
 const associate = ({
@@ -84,7 +84,7 @@ const completeJobSiteUpdate = (build, completedAt) => {
   );
 };
 
-const getDomain = (site) => `${site.awsBucketName}.app.cloud.gov`;
+const getDomain = site => `${site.awsBucketName}.app.cloud.gov`;
 
 const getPath = (build, site) => {
   if (build.branch === site.defaultBranch) {
@@ -105,7 +105,7 @@ function urlWithSlash(rawUrl) {
 
 function urlWithProtocol(rawUrl) {
   if (rawUrl && (!rawUrl.startsWith('https://') || !rawUrl.startsWith('http://'))) {
-    rawUrl = `https://${rawUrl}`;
+    return `https://${rawUrl}`;
   }
   return rawUrl;
 }

@@ -10,6 +10,10 @@ engines:
         enabled: false
       import/extensions:
         enabled: false
+      implicit-arrow-linebreak:
+        enabled: false
+      no-use-before-define:
+        enabled: false
     config:
       extensions:
       - .js
