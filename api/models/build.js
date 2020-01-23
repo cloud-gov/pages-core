@@ -200,7 +200,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Build.associate = associate;
   Build.prototype.updateJobStatus = updateJobStatus;
-  Build.prototype.viewLink = viewLink;
+  Build.viewLink = viewLink;
   Build.viewLink = viewLink;
   return Build;
 };

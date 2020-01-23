@@ -157,6 +157,38 @@ describe('Build model', () => {
     });
   });
 
+  describe('viewLink', () => {
+    let site;
+    const defaultBranch = 'master';
+    const demoBranch = 'demo';
+    const domain = 'https://www.master.com';
+    const demoDomain = 'https://www.demo.com';
+    before(async () => {
+      site = await factory.site({ defaultBranch, demoBranch, domain, demoDomain });
+    });
+
+    it('default branch url start with site', async () => {
+      let build = await factory.build({ branch: site.defaultBranch, site });
+      build = await Build.findByPk(build.id);
+      const viewLink = await Build.viewLink(build, site);
+      expect(viewLink).to.eql(`${domain}/`);
+    });
+
+    it('demo branch url start with demo', async () => {
+      let build = await factory.build({ branch: site.demoBranch, site });
+      build = await Build.findByPk(build.id);
+      const viewLink = await Build.viewLink(build, site);
+      expect(viewLink).to.eql(`${demoDomain}/`);
+    });
+
+    it('non-default/demo branch url start with preview', async () => {
+      let build = await factory.build({ branch: 'other', site });
+      build = await Build.findByPk(build.id);
+      const viewLink = await Build.viewLink(build, site);
+      expect(viewLink).to.eql(`${build.url}/`);
+    });
+  });
+
   describe('validations', () => {
     it('should require a site object before saving', () => {
       const buildPromise = Build.create({ user: 1, site: null });
