@@ -14,6 +14,8 @@ engines:
         enabled: false
       no-use-before-define:
         enabled: false
+      object-curly-newline:
+        enabled: false
     config:
       extensions:
       - .js
