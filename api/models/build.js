@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
+const validator = require('validator');
 const SQS = require('../services/SQS');
 
 const { branchRegex, shaRegex } = require('../utils/validators');
@@ -10,7 +11,9 @@ const afterCreate = (build) => {
   return Build.findOne({
     where: { id: build.id },
     include: [User, Site],
-  }).then((foundBuild) => {
+  })
+  .then(foundBuild => updateURL(foundBuild))
+  .then((foundBuild) => {
     Build.count({
       where: { site: foundBuild.site },
     }).then(count => SQS.sendBuildMessage(foundBuild, count));
@@ -74,6 +77,24 @@ const completeJobSiteUpdate = (build, completedAt) => {
   );
 };
 
+const getDomain = (site) => `${site.awsBucketName}.app.cloud.gov`;
+
+const getPath = (build, site) => {
+  if (build.branch === site.defaultBranch) {
+    return `/site/${site.owner}/${site.repository}`;
+  } else if (build.branch === site.demoBranch) {
+    return `/demo/${site.owner}/${site.repository}`;
+  }
+  return `/preview/${site.owner}/${site.repository}/${build.branch}`;
+}
+
+const updateURL = async (build) => {
+  const domain = getDomain(build.Site);
+  const path = getPath(build, build.Site);
+  const url = `${[domain, path].join('')}`;
+  return build.update({ url });
+}
+
 async function updateJobStatus(buildStatus) {
   const timestamp = new Date();
   const build = await jobStateUpdate(buildStatus, this, timestamp);
@@ -126,6 +147,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     startedAt: {
       type: DataTypes.DATE,
+    },
+    url: {
+      type: DataTypes.STRING,
+      validate: validator.isURL,
     },
   }, {
     tableName: 'build',

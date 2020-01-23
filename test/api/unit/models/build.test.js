@@ -132,6 +132,31 @@ describe('Build model', () => {
     });
   });
 
+  describe('.updateURL', () => {
+    let site;
+    before(async () => {
+      site = await factory.site({ defaultBranch: 'master', demoBranch: 'staging' });
+    });
+
+    it('default branch url start with site', async () => {
+      let build = await factory.build({ branch: site.defaultBranch, site });
+      build = await Build.findByPk(build.id);
+      expect(build.url).to.eql(`${site.awsBucketName}.app.cloud.gov/site/${site.owner}/${site.repository}`);
+    });
+
+    it('demo branch url start with demo', async () => {
+      let build = await factory.build({ branch: site.demoBranch, site });
+      build = await Build.findByPk(build.id);
+      expect(build.url).to.eql(`${site.awsBucketName}.app.cloud.gov/demo/${site.owner}/${site.repository}`);
+    });
+
+    it('non-default/demo branch url start with preview', async () => {
+      let build = await factory.build({ branch: 'other', site });
+      build = await Build.findByPk(build.id);
+      expect(build.url).to.eql(`${site.awsBucketName}.app.cloud.gov/preview/${site.owner}/${site.repository}/other`); 
+    });
+  });
+
   describe('validations', () => {
     it('should require a site object before saving', () => {
       const buildPromise = Build.create({ user: 1, site: null });
