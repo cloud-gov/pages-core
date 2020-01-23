@@ -96,10 +96,12 @@ const reportBuildStatus = (build) => {
     }
     site = model;
     return Build.viewLink(build, site);
-  }).then((_viewLink) => {
+  })
+  .then((_viewLink) => {
     viewLink = _viewLink;
     return loadBuildUserAccessToken(build);
-  }).then((accessToken) => {
+  })
+  .then((accessToken) => {
     const context = config.app.app_env === 'production'
       ? 'federalist/build' : `federalist-${config.app.app_env}/build`;
 

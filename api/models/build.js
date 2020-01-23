@@ -84,7 +84,7 @@ const completeJobSiteUpdate = (build, completedAt) => {
   );
 };
 
-const getDomain = site => `${site.awsBucketName}.app.cloud.gov`;
+const getDomain = site => `https://${site.awsBucketName}.app.cloud.gov`;
 
 const getPath = (build, site) => {
   if (build.branch === site.defaultBranch) {
@@ -103,12 +103,6 @@ function urlWithSlash(rawUrl) {
   return rawUrl;
 }
 
-function urlWithProtocol(rawUrl) {
-  if (rawUrl && (!rawUrl.startsWith('https://') || !rawUrl.startsWith('http://'))) {
-    return `https://${rawUrl}`;
-  }
-  return rawUrl;
-}
 const viewLink = (build, site) => new Promise((resolve, reject) => {
   try {
     let link = build.url;
@@ -118,10 +112,7 @@ const viewLink = (build, site) => new Promise((resolve, reject) => {
       link = site.demoDomain;
     }
 
-    link = urlWithSlash(link);
-    link = urlWithProtocol(link);
-
-    resolve(link);
+    resolve(urlWithSlash(link));
   } catch (e) {
     reject(e);
   }
