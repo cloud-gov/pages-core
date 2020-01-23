@@ -161,10 +161,6 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Site.associate = associate;
-  // Site.prototype.viewLinkForBranch = viewLinkForBranch;
-  // Site.prototype.siteUrl = siteUrl;
-  // Site.prototype.demoUrl = demoUrl;
-  // Site.prototype.branchPreviewUrl = branchPreviewUrl;
 
   Site.withUsers = id => Site.findByPk(id, { include: [sequelize.models.User] });
 
