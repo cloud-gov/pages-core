@@ -80,6 +80,7 @@ const loadBuildUserAccessToken = build =>
 const reportBuildStatus = (build) => {
   let site;
   let options = {};
+  let viewLink;
 
   return new Promise((resolve, reject) => {
     if (!build || !build.commitSha) {
@@ -94,7 +95,9 @@ const reportBuildStatus = (build) => {
       throw new Error('Unable to find a site for the given build');
     }
     site = model;
-
+    return Build.viewLink(build, site);
+  }).then((_viewLink) => {
+    viewLink = _viewLink;
     return loadBuildUserAccessToken(build);
   }).then((accessToken) => {
     const context = config.app.app_env === 'production'
@@ -113,7 +116,7 @@ const reportBuildStatus = (build) => {
       options.description = 'The build is running.';
     } else if (build.state === 'success') {
       options.state = 'success';
-      options.target_url = site.viewLinkForBranch(build.branch);
+      options.target_url = viewLink;
       options.description = 'The build is complete!';
     } else if (build.state === 'error') {
       options.state = 'error';

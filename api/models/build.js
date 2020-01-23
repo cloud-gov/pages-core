@@ -12,12 +12,19 @@ const afterCreate = (build) => {
     where: { id: build.id },
     include: [User, Site],
   })
-  .then(foundBuild => updateURL(foundBuild))
   .then((foundBuild) => {
     Build.count({
       where: { site: foundBuild.site },
     }).then(count => SQS.sendBuildMessage(foundBuild, count));
   });
+};
+
+const beforeCreate = async (build) => {
+  const site = await build.getSite();
+  const domain = getDomain(site);
+  const path = getPath(build, site);
+  const url = `${[domain, path].join('')}`;
+  build.url = url;
 };
 
 const associate = ({
@@ -88,12 +95,37 @@ const getPath = (build, site) => {
   return `/preview/${site.owner}/${site.repository}/${build.branch}`;
 }
 
-const updateURL = async (build) => {
-  const domain = getDomain(build.Site);
-  const path = getPath(build, build.Site);
-  const url = `${[domain, path].join('')}`;
-  return build.update({ url });
+function urlWithSlash(rawUrl) {
+  if (rawUrl) {
+    if (!rawUrl.endsWith('/')) {
+      return `${rawUrl}/`;
+    }
+  }
+  return rawUrl;
 }
+
+function urlWithProtocol(rawUrl) {
+  if (rawUrl) {
+    if (!rawUrl.startsWith('https://') || !rawUrl.startsWith('http://')) {
+        rawUrl = `https://${rawUrl}`;
+      }
+  }
+  return rawUrl;
+}
+const viewLink = (build, site) => new Promise((resolve, reject) => {
+    try {
+      let link = build.url;
+      if ((build.branch === site.defaultBranch) && site.domain) { link = site.domain; }
+      if ((build.branch === site.demoBranch) && site.demoDomain) { link = site.demoDomain; }
+
+      link = urlWithSlash(link);
+      link = urlWithProtocol(link);
+
+      resolve(link);
+    } catch (e) {
+      reject(e);
+    }
+  });
 
 async function updateJobStatus(buildStatus) {
   const timestamp = new Date();
@@ -157,6 +189,7 @@ module.exports = (sequelize, DataTypes) => {
     hooks: {
       afterCreate,
       beforeValidate,
+      beforeCreate,
     },
     scopes: {
       forSiteUser: (user, Site, User) => ({
@@ -176,5 +209,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Build.associate = associate;
   Build.prototype.updateJobStatus = updateJobStatus;
+  Build.prototype.viewLink = viewLink;
+  Build.viewLink = viewLink;
   return Build;
 };

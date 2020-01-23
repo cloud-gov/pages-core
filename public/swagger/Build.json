@@ -6,7 +6,8 @@
     "site",
     "state",
     "updatedAt",
-    "user"
+    "user",
+    "url"
   ],
   "not": {
     "required": ["token"]
@@ -62,6 +63,9 @@
       ]
     },
     "updatedAt": {
+      "type": "string"
+    },
+    "url": {
       "type": "string"
     },
     "user": {

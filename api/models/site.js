@@ -61,49 +61,6 @@ const beforeValidate = (site) => {
   Object.assign(site, parseSiteConfigs(siteConfigs));
 };
 
-function domainWithSlash(url) {
-  if (url) {
-    if (!url.endsWith('/')) {
-      return `${url}/`;
-    }
-  }
-  return url;
-}
-
-function siteUrl() {
-  if (this.domain) {
-    return domainWithSlash(this.domain);
-  }
-  return `https://${this.awsBucketName}.app.cloud.gov/site/${this.owner}/${this.repository}/`;
-}
-
-function demoUrl() {
-  if (this.demoDomain) {
-    return domainWithSlash(this.demoDomain);
-  }
-  return `https://${this.awsBucketName}.app.cloud.gov/demo/${this.owner}/${this.repository}/`;
-}
-
-function branchPreviewUrl(branch = null) {
-  let url = `https://${this.awsBucketName}.app.cloud.gov/preview/${this.owner}/${this.repository}/`;
-  if (branch) {
-    url = `${url}${branch}/`;
-  }
-  return url;
-}
-
-function viewLinkForBranch(branch) {
-  if (branch === this.defaultBranch) {
-    return this.siteUrl();
-  }
-
-  if (branch === this.demoBranch) {
-    return this.demoUrl();
-  }
-
-  return this.branchPreviewUrl(branch);
-}
-
 function isEmptyOrBranch(value) {
   if (value && value.length && !branchRegex.test(value)) {
     throw new Error('Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
@@ -204,10 +161,10 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Site.associate = associate;
-  Site.prototype.viewLinkForBranch = viewLinkForBranch;
-  Site.prototype.siteUrl = siteUrl;
-  Site.prototype.demoUrl = demoUrl;
-  Site.prototype.branchPreviewUrl = branchPreviewUrl;
+  // Site.prototype.viewLinkForBranch = viewLinkForBranch;
+  // Site.prototype.siteUrl = siteUrl;
+  // Site.prototype.demoUrl = demoUrl;
+  // Site.prototype.branchPreviewUrl = branchPreviewUrl;
 
   Site.withUsers = id => Site.findByPk(id, { include: [sequelize.models.User] });
 
