@@ -19,12 +19,12 @@ const getUrlAndViewText = (branchName, buildURL, site, completedAt) => {
   let viewText = 'Preview site';
   if (isDefaultBranch(branchName, site)) {
     viewText = 'View site';
-    if (site.domain) {
+    if (site.domain && (site.domain.length > 0)) {
       url = site.domain;
     }
   } else if (isDemoBranch(branchName, site)) {
     viewText = 'View demo';
-    if (site.demoDomain) {
+    if (site.demoDomain && (site.demoDomain.length > 0)) {
       url = site.demoDomain;
     }
   }
