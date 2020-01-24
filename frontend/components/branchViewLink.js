@@ -21,12 +21,12 @@ const getUrlAndViewText = (branchName, buildURL, site, completedAt) => {
     viewText = 'View site';
     if (site.domain) {
       url = site.domain;
-    };
+    }
   } else if (isDemoBranch(branchName, site)) {
     viewText = 'View demo';
     if (site.demoDomain) {
       url = site.demoDomain;
-    };
+    }
   }
   url = urlWithSlash(url);
   return { url, viewText };
