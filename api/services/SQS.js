@@ -25,26 +25,11 @@ const siteConfig = (build) => {
   return siteBuildConfig ? yaml.safeDump(siteBuildConfig) : ''; // to be safedumped
 };
 
-const sitePrefixForBuild = build => pathForBuild(build).replace(/^\//, '');
-const pathForBuild = build => baseURLForDomain(build.url);
+const sitePrefixForBuild = buildUrl => baseURLForDomain(buildUrl).replace(/^\//, '');
 
-const baseURLForDomain = (rawDomain) => {
-  let domain = rawDomain;
-  if (!domain.match(/https?:\/\//)) {
-    domain = `https://${domain}`;
-  }
-  return url.parse(domain).path.replace(/\/$/, '');
-};
+const baseURLForDomain = (rawDomain) => url.parse(rawDomain).path.replace(/\/$/, '');
 
-const baseURLForBuild = (build) => {
-  if (defaultBranch(build) && build.Site.domain) {
-    return baseURLForDomain(build.Site.domain);
-  }
-  if (demoBranch(build) && build.Site.demoDomain) {
-    return baseURLForDomain(build.Site.demoDomain);
-  }
-  return `${pathForBuild(build)}`;
-};
+const baseURLForBuild = (build) => baseURLForDomain(build.viewLink(build, build.Site));
 
 const statusCallbackURL = build => [
   url.resolve(config.app.hostname, '/v0/build'),
@@ -75,7 +60,7 @@ const generateDefaultCredentials = build => ({
   CONFIG: siteConfig(build),
   REPOSITORY: build.Site.repository,
   OWNER: build.Site.owner,
-  SITE_PREFIX: sitePrefixForBuild(build),
+  SITE_PREFIX: sitePrefixForBuild(build.url),
   GITHUB_TOKEN: build.User.githubAccessToken,
   GENERATOR: build.Site.engine,
   SOURCE_REPO: sourceForBuild(build).repository,

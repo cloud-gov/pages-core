@@ -169,22 +169,19 @@ describe('Build model', () => {
 
     it('default branch url start with site', async () => {
       let build = await factory.build({ branch: site.defaultBranch, site });
-      build = await Build.findByPk(build.id);
-      const viewLink = await Build.viewLink(build, site);
+      const viewLink = Build.viewLink(build, site);
       expect(viewLink).to.eql(`${domain}/`);
     });
 
     it('demo branch url start with demo', async () => {
       let build = await factory.build({ branch: site.demoBranch, site });
-      build = await Build.findByPk(build.id);
-      const viewLink = await Build.viewLink(build, site);
+      const viewLink = Build.viewLink(build, site);
       expect(viewLink).to.eql(`${demoDomain}/`);
     });
 
     it('non-default/demo branch url start with preview', async () => {
       let build = await factory.build({ branch: 'other', site });
-      build = await Build.findByPk(build.id);
-      const viewLink = await Build.viewLink(build, site);
+      const viewLink = Build.viewLink(build, site);
       expect(viewLink).to.eql(`${build.url}/`);
     });
   });

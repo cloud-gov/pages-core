@@ -16,14 +16,16 @@ describe('<BranchViewLink/>', () => {
     s3ServiceName: 'federalist-production-s3',
   };
 
-  const getBuildURL = (build) => {
+  const getViewLink = (build) => {
     if (build.site.defaultBranch === build.branchName) {
-      return `https://${build.site.awsBucketName}.app.cloud.gov/site/${build.site.owner}/${build.site.repository}`;
+      if(build.site.domain) { return build.site.domain; }
+      return `https://${build.site.awsBucketName}.app.cloud.gov/site/${build.site.owner}/${build.site.repository}/`;
     }
     if (build.site.demoBranch === build.branchName) {
-      return `https://${build.site.awsBucketName}.app.cloud.gov/demo/${build.site.owner}/${build.site.repository}`;
+      if(build.site.demoDomain) { return build.site.demoDomain; }
+      return `https://${build.site.awsBucketName}.app.cloud.gov/demo/${build.site.owner}/${build.site.repository}/`;
     }
-    return `https://${build.site.awsBucketName}.app.cloud.gov/preview/${build.site.owner}/${build.site.repository}/${build.branchName}`;
+    return `https://${build.site.awsBucketName}.app.cloud.gov/preview/${build.site.owner}/${build.site.repository}/${build.branchName}/`;
   };
 
   let props;
@@ -32,12 +34,12 @@ describe('<BranchViewLink/>', () => {
     props = {
       branchName: 'branch-name',
       site: testSite,
-      // previewHostname: 'https://preview-hostname.com',
     };
   });
 
   it('renders a link to the default branch\'s site', () => {
     props.branchName = 'default-branch';
+    props.viewLink = `${testSite.domain}/`;
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
@@ -47,6 +49,7 @@ describe('<BranchViewLink/>', () => {
 
   it('renders a link to the demo branch\'s site', () => {
     props.branchName = 'demo-branch';
+    props.viewLink = `${testSite.demoDomain}/`;
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
@@ -56,7 +59,7 @@ describe('<BranchViewLink/>', () => {
 
   it('renders a preview link to the other branches', () => {
     props.branchName = 'some-other-branch';
-    props.buildURL = getBuildURL(props);
+    props.viewLink = getViewLink(props);
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
@@ -68,7 +71,7 @@ describe('<BranchViewLink/>', () => {
 
   it('allows some special characters', () => {
     props.branchName = 'release_1.2.3';
-    props.buildURL = getBuildURL(props);
+    props.viewLink = getViewLink(props);
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);

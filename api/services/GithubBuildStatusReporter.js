@@ -95,10 +95,6 @@ const reportBuildStatus = (build) => {
       throw new Error('Unable to find a site for the given build');
     }
     site = model;
-    return Build.viewLink(build, site);
-  })
-  .then((_viewLink) => {
-    viewLink = _viewLink;
     return loadBuildUserAccessToken(build);
   })
   .then((accessToken) => {
@@ -118,7 +114,7 @@ const reportBuildStatus = (build) => {
       options.description = 'The build is running.';
     } else if (build.state === 'success') {
       options.state = 'success';
-      options.target_url = viewLink;
+      options.target_url = Build.viewLink(build, site);
       options.description = 'The build is complete!';
     } else if (build.state === 'error') {
       options.state = 'error';

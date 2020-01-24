@@ -7,33 +7,18 @@ import { IconView } from './icons';
 const isDefaultBranch = (branchName, site) => branchName === site.defaultBranch;
 const isDemoBranch = (branchName, site) => branchName === site.demoBranch;
 
-const getUrlAndViewText = (branchName, buildURL, site, completedAt) => {
-  const urlWithSlash = (rawUrl) => {
-    if (rawUrl && !rawUrl.endsWith('/')) {
-      return `${rawUrl}/`;
-    }
-    return rawUrl;
-  };
-
-  let url = buildURL;
+const getUrlAndViewText = (branchName, viewLink, site, completedAt) => {
   let viewText = 'Preview site';
   if (isDefaultBranch(branchName, site)) {
     viewText = 'View site';
-    if (site.domain && (site.domain.length > 0)) {
-      url = site.domain;
-    }
   } else if (isDemoBranch(branchName, site)) {
     viewText = 'View demo';
-    if (site.demoDomain && (site.demoDomain.length > 0)) {
-      url = site.demoDomain;
-    }
   }
-  url = urlWithSlash(url);
-  return { url, viewText };
+  return { url: viewLink, viewText };
 };
 
-export const BranchViewLink = ({ branchName, buildURL, site, showIcon, completedAt }) => {
-  const { url, viewText } = getUrlAndViewText(branchName, buildURL, site, completedAt);
+export const BranchViewLink = ({ branchName, viewLink, site, showIcon, completedAt }) => {
+  const { url, viewText } = getUrlAndViewText(branchName, viewLink, site, completedAt);
 
   if (showIcon) {
     return (
@@ -54,7 +39,7 @@ export const BranchViewLink = ({ branchName, buildURL, site, showIcon, completed
 // Note: remove completedAt propType from compoent at end of 2018
 BranchViewLink.propTypes = {
   branchName: PropTypes.string.isRequired,
-  buildURL: PropTypes.string.isRequired,
+  viewLink: PropTypes.string.isRequired,
   site: SITE.isRequired,
   showIcon: PropTypes.bool,
   completedAt: PropTypes.string,

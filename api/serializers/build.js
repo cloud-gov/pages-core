@@ -15,6 +15,11 @@ const toJSON = (build) => {
   if (object.startedAt) {
     object.startedAt = object.startedAt.toISOString();
   }
+
+  if (build.Site) {
+    object.viewLink = Build.viewLink(build, build.Site);
+  }
+
   Object.keys(object).forEach((key) => {
     if (object[key] === null) {
       delete object[key];

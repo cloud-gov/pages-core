@@ -96,27 +96,15 @@ const getPath = (build, site) => {
   return `/preview/${site.owner}/${site.repository}/${build.branch}`;
 };
 
-function urlWithSlash(rawUrl) {
-  if (rawUrl && !rawUrl.endsWith('/')) {
-    return `${rawUrl}/`;
+const viewLink = (build, site) => {
+  let link = build.url;
+  if ((build.branch === site.defaultBranch) && site.domain) {
+    link = site.domain;
+  } else if ((build.branch === site.demoBranch) && site.demoDomain) {
+    link = site.demoDomain;
   }
-  return rawUrl;
-}
-
-const viewLink = (build, site) => new Promise((resolve, reject) => {
-  try {
-    let link = build.url;
-    if ((build.branch === site.defaultBranch) && site.domain) {
-      link = site.domain;
-    } else if ((build.branch === site.demoBranch) && site.demoDomain) {
-      link = site.demoDomain;
-    }
-
-    resolve(urlWithSlash(link));
-  } catch (e) {
-    reject(e);
-  }
-});
+  return `${link}/`;
+};
 
 async function updateJobStatus(buildStatus) {
   const timestamp = new Date();
@@ -200,7 +188,6 @@ module.exports = (sequelize, DataTypes) => {
 
   Build.associate = associate;
   Build.prototype.updateJobStatus = updateJobStatus;
-  Build.viewLink = viewLink;
   Build.viewLink = viewLink;
   return Build;
 };
