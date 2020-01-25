@@ -3,7 +3,8 @@ const URLSafeBase64 = require('urlsafe-base64');
 const validator = require('validator');
 const SQS = require('../services/SQS');
 
-const { branchRegex, shaRegex } = require('../utils/validators');
+const { branchRegex, shaRegex, isEmptyOrUrl } = require('../utils/validators');
+const { buildUrl } = require('../utils/build');
 
 const afterCreate = (build) => {
   const { Site, User, Build } = build.sequelize.models;
@@ -17,14 +18,6 @@ const afterCreate = (build) => {
         where: { site: foundBuild.site },
       }).then(count => SQS.sendBuildMessage(foundBuild, count));
     });
-};
-
-const beforeCreate = async (build) => {
-  const site = await build.getSite();
-  const domain = getDomain(site);
-  const path = getPath(build, site);
-  const url = `${[domain, path].join('')}`;
-  build.url = url; // eslint-disable-line no-param-reassign
 };
 
 const associate = ({
@@ -56,7 +49,7 @@ const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@git
 
 const jobErrorMessage = (message = 'An unknown error occurred') => sanitizeCompleteJobErrorMessage(message);
 
-const jobStateUpdate = (buildStatus, build, timestamp) => {
+const jobStateUpdate = (buildStatus, build, site, timestamp) => {
   const atts = {
     state: buildStatus.status,
   };
@@ -69,6 +62,10 @@ const jobStateUpdate = (buildStatus, build, timestamp) => {
     atts.completedAt = timestamp;
   }
 
+  if (buildStatus.status === 'success') {
+    atts.url = buildUrl(build, site);
+  }
+
   if (build.state === 'queued' && buildStatus.status === 'processing') {
     atts.startedAt = timestamp;
   }
@@ -76,41 +73,14 @@ const jobStateUpdate = (buildStatus, build, timestamp) => {
   return build.update(atts);
 };
 
-const completeJobSiteUpdate = (build, completedAt) => {
-  const { Site } = build.sequelize.models;
-  return Site.update(
-    { publishedAt: completedAt },
-    { where: { id: build.site } }
-  );
-};
-
-const getDomain = site => `https://${site.awsBucketName}.app.cloud.gov`;
-
-const getPath = (build, site) => {
-  if (build.branch === site.defaultBranch) {
-    return `/site/${site.owner}/${site.repository}`;
-  }
-  if (build.branch === site.demoBranch) {
-    return `/demo/${site.owner}/${site.repository}`;
-  }
-  return `/preview/${site.owner}/${site.repository}/${build.branch}`;
-};
-
-const viewLink = (build, site) => {
-  let link = build.url;
-  if ((build.branch === site.defaultBranch) && site.domain) {
-    link = site.domain;
-  } else if ((build.branch === site.demoBranch) && site.demoDomain) {
-    link = site.demoDomain;
-  }
-  return `${link}/`;
-};
+const completeJobSiteUpdate = (site, completedAt) => site.update({ publishedAt: completedAt });
 
 async function updateJobStatus(buildStatus) {
   const timestamp = new Date();
-  const build = await jobStateUpdate(buildStatus, this, timestamp);
+  const site = await this.getSite();
+  const build = await jobStateUpdate(buildStatus, this, site, timestamp);
   if (build.state === 'success') {
-    await completeJobSiteUpdate(build, timestamp);
+    await completeJobSiteUpdate(site, timestamp);
   }
   return build;
 }
@@ -161,14 +131,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     url: {
       type: DataTypes.STRING,
-      validate: validator.isURL,
+      validate: isEmptyOrUrl,
     },
   }, {
     tableName: 'build',
     hooks: {
       afterCreate,
       beforeValidate,
-      beforeCreate,
     },
     scopes: {
       forSiteUser: (user, Site, User) => ({
@@ -188,6 +157,5 @@ module.exports = (sequelize, DataTypes) => {
 
   Build.associate = associate;
   Build.prototype.updateJobStatus = updateJobStatus;
-  Build.viewLink = viewLink;
   return Build;
 };

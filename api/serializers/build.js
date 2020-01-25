@@ -1,6 +1,7 @@
 const { Build, User, Site } = require('../models');
 const siteSerializer = require('../serializers/site');
 const userSerializer = require('../serializers/user');
+const { buildViewLink } = require('../utils/build');
 
 const toJSON = (build) => {
   const object = Object.assign({}, build.get({
@@ -17,7 +18,7 @@ const toJSON = (build) => {
   }
 
   if (build.Site) {
-    object.viewLink = Build.viewLink(build, build.Site);
+    object.viewLink = buildViewLink(build, build.Site);
   }
 
   Object.keys(object).forEach((key) => {

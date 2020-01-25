@@ -5,6 +5,7 @@ const S3Helper = require('./S3Helper');
 const config = require('../../config');
 const { logger } = require('../../winston');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
+const { buildViewLink, buildUrl } = require('../utils/build');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -25,11 +26,11 @@ const siteConfig = (build) => {
   return siteBuildConfig ? yaml.safeDump(siteBuildConfig) : ''; // to be safedumped
 };
 
-const sitePrefixForBuild = buildUrl => baseURLForDomain(buildUrl).replace(/^\//, '');
+const sitePrefixForBuild = buildUrl => baseURLForDomain(buildUrl).replace(/^(\/)+/, '');
 
-const baseURLForDomain = (rawDomain) => url.parse(rawDomain).path.replace(/\/$/, '');
+const baseURLForDomain = rawDomain => url.parse(rawDomain).path.replace(/(\/)+$/, '');
 
-const baseURLForBuild = (build) => baseURLForDomain(build.viewLink(build, build.Site));
+const baseURLForBuild = build => baseURLForDomain(buildViewLink(build, build.Site));
 
 const statusCallbackURL = build => [
   url.resolve(config.app.hostname, '/v0/build'),
@@ -60,7 +61,7 @@ const generateDefaultCredentials = build => ({
   CONFIG: siteConfig(build),
   REPOSITORY: build.Site.repository,
   OWNER: build.Site.owner,
-  SITE_PREFIX: sitePrefixForBuild(build.url),
+  SITE_PREFIX: sitePrefixForBuild(buildUrl(build, build.Site)),
   GITHUB_TOKEN: build.User.githubAccessToken,
   GENERATOR: build.Site.engine,
   SOURCE_REPO: sourceForBuild(build).repository,

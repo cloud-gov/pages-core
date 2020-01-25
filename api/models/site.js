@@ -1,6 +1,6 @@
 const validator = require('validator');
 
-const { branchRegex, parseSiteConfigs } = require('../utils/validators');
+const { branchRegex, parseSiteConfigs, isEmptyOrUrl } = require('../utils/validators');
 
 const afterValidate = (site) => {
   if (site.defaultBranch === site.demoBranch) {
@@ -64,17 +64,6 @@ const beforeValidate = (site) => {
 function isEmptyOrBranch(value) {
   if (value && value.length && !branchRegex.test(value)) {
     throw new Error('Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
-  }
-}
-
-function isEmptyOrUrl(value) {
-  const validUrlOptions = {
-    require_protocol: true,
-    protocols: ['https'],
-  };
-
-  if (value && value.length && !validator.isURL(value, validUrlOptions)) {
-    throw new Error('URL must start with https://');
   }
 }
 

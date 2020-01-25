@@ -53,4 +53,25 @@ describe('validators', () => {
       multiExpect(validators.isValidYaml, badTestCases, 'throw');
     });
   });
+
+  describe('.isEmptyOrUrl', () => {
+    it('should allow null', () => {
+      expect(validators.isEmptyOrUrl(null)).to.be.undefined;
+    });
+    it('should allow empty string', () => {
+      expect(validators.isEmptyOrUrl('')).to.be.undefined;
+    });
+    it('should allow url', () => {
+      expect(validators.isEmptyOrUrl('https://hello.world')).to.be.undefined;
+    });
+    it('should not allow non url', () => {
+      const err = new Error('URL must start with https://');
+      try {
+        validators.isEmptyOrUrl('hu');
+        throw 'should not pass';
+      } catch (e) {
+       expect(e).to.be.an('error');
+      }
+    });
+  })
 });

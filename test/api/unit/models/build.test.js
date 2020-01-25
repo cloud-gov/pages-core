@@ -100,12 +100,12 @@ describe('Build model', () => {
       let build;
 
       beforeEach(async () => {
-        build = await factory.build({ status: 'processing', startedAt });
+        build = await factory.build({ status: 'processing', startedAt, branch: 'some-branch' });
       });
 
       describe('to `success`', () => {
         it('should update the site\'s publishedAt timestamp if the build is successful', async () => {
-          await build.updateJobStatus({ status: 'success' });
+          build = await build.updateJobStatus({ status: 'success' });
 
           expect(build.state).to.be.eql('success');
           expect(build.completedAt).to.be.a('date');
@@ -115,6 +115,11 @@ describe('Build model', () => {
 
           expect(site.publishedAt).to.be.a('date');
           expect(build.completedAt.getTime()).to.eql(site.publishedAt.getTime());
+          const url = [
+            `https://${site.awsBucketName}.app.cloud.gov`,
+            `/preview/${site.owner}/${site.repository}/${build.branch}`,
+          ].join('');
+          expect(build.url).to.eql(url)
         });
       });
 
@@ -129,60 +134,6 @@ describe('Build model', () => {
           expect(build.completedAt).to.be.above(build.startedAt);
         });
       });
-    });
-  });
-
-  describe('build.url settting', () => {
-    let site;
-    before(async () => {
-      site = await factory.site({ defaultBranch: 'master', demoBranch: 'staging' });
-    });
-
-    it('default branch url start with site', async () => {
-      let build = await factory.build({ branch: site.defaultBranch, site });
-      build = await Build.findByPk(build.id);
-      expect(build.url).to.eql(`https://${site.awsBucketName}.app.cloud.gov/site/${site.owner}/${site.repository}`);
-    });
-
-    it('demo branch url start with demo', async () => {
-      let build = await factory.build({ branch: site.demoBranch, site });
-      build = await Build.findByPk(build.id);
-      expect(build.url).to.eql(`https://${site.awsBucketName}.app.cloud.gov/demo/${site.owner}/${site.repository}`);
-    });
-
-    it('non-default/demo branch url start with preview', async () => {
-      let build = await factory.build({ branch: 'other', site });
-      build = await Build.findByPk(build.id);
-      expect(build.url).to.eql(`https://${site.awsBucketName}.app.cloud.gov/preview/${site.owner}/${site.repository}/other`);
-    });
-  });
-
-  describe('viewLink', () => {
-    let site;
-    const defaultBranch = 'master';
-    const demoBranch = 'demo';
-    const domain = 'https://www.master.com';
-    const demoDomain = 'https://www.demo.com';
-    before(async () => {
-      site = await factory.site({ defaultBranch, demoBranch, domain, demoDomain });
-    });
-
-    it('default branch url start with site', async () => {
-      let build = await factory.build({ branch: site.defaultBranch, site });
-      const viewLink = Build.viewLink(build, site);
-      expect(viewLink).to.eql(`${domain}/`);
-    });
-
-    it('demo branch url start with demo', async () => {
-      let build = await factory.build({ branch: site.demoBranch, site });
-      const viewLink = Build.viewLink(build, site);
-      expect(viewLink).to.eql(`${demoDomain}/`);
-    });
-
-    it('non-default/demo branch url start with preview', async () => {
-      let build = await factory.build({ branch: 'other', site });
-      const viewLink = Build.viewLink(build, site);
-      expect(viewLink).to.eql(`${build.url}/`);
     });
   });
 

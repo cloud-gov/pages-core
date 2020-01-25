@@ -6,8 +6,7 @@
     "site",
     "state",
     "updatedAt",
-    "user",
-    "url"
+    "user"
   ],
   "not": {
     "required": ["token"]
@@ -66,6 +65,9 @@
       "type": "string"
     },
     "url": {
+      "type": "string"
+    },
+    "viewLink": {
       "type": "string"
     },
     "user": {
