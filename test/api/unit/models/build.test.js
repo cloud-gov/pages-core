@@ -119,7 +119,7 @@ describe('Build model', () => {
             `https://${site.awsBucketName}.app.cloud.gov`,
             `/preview/${site.owner}/${site.repository}/${build.branch}`,
           ].join('');
-          expect(build.url).to.eql(url)
+          expect(build.url).to.eql(url);
         });
       });
 

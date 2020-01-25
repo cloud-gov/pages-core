@@ -18,11 +18,11 @@ describe('<BranchViewLink/>', () => {
 
   const getViewLink = (build) => {
     if (build.site.defaultBranch === build.branchName) {
-      if(build.site.domain) { return build.site.domain; }
+      if (build.site.domain) { return build.site.domain; }
       return `https://${build.site.awsBucketName}.app.cloud.gov/site/${build.site.owner}/${build.site.repository}/`;
     }
     if (build.site.demoBranch === build.branchName) {
-      if(build.site.demoDomain) { return build.site.demoDomain; }
+      if (build.site.demoDomain) { return build.site.demoDomain; }
       return `https://${build.site.awsBucketName}.app.cloud.gov/demo/${build.site.owner}/${build.site.repository}/`;
     }
     return `https://${build.site.awsBucketName}.app.cloud.gov/preview/${build.site.owner}/${build.site.repository}/${build.branchName}/`;

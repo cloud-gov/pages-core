@@ -65,12 +65,11 @@ describe('validators', () => {
       expect(validators.isEmptyOrUrl('https://hello.world')).to.be.undefined;
     });
     it('should not allow non url', () => {
-      const err = new Error('URL must start with https://');
       try {
         validators.isEmptyOrUrl('hu');
         throw 'should not pass';
       } catch (e) {
-       expect(e).to.be.an('error');
+        expect(e).to.be.an('error');
       }
     });
   })

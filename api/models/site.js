@@ -1,5 +1,3 @@
-const validator = require('validator');
-
 const { branchRegex, parseSiteConfigs, isEmptyOrUrl } = require('../utils/validators');
 
 const afterValidate = (site) => {

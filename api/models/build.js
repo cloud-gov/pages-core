@@ -1,6 +1,5 @@
 const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
-const validator = require('validator');
 const SQS = require('../services/SQS');
 
 const { branchRegex, shaRegex, isEmptyOrUrl } = require('../utils/validators');

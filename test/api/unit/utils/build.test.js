@@ -19,16 +19,16 @@ describe('buildUrl', () => {
   });
 
   it('demo branch url start with demo', async () => {
-    let build = await factory.build({ branch: site.demoBranch, site });
+    const build = await factory.build({ branch: site.demoBranch, site });
     const url = [
       `https://${site.awsBucketName}.app.cloud.gov`,
-      `/demo/${site.owner}/${site.repository}`
+      `/demo/${site.owner}/${site.repository}`,
     ].join('');
     expect(buildUrl(build, site)).to.eql(url);
   });
 
   it('non-default/demo branch url start with preview', async () => {
-    let build = await factory.build({ branch: 'other', site });
+    const build = await factory.build({ branch: 'other', site });
     const url = [
       `https://${site.awsBucketName}.app.cloud.gov`,
       `/preview/${site.owner}/${site.repository}/other`,
@@ -48,17 +48,17 @@ describe('viewLink', () => {
   });
 
   it('default branch url start with site', async () => {
-    let build = await factory.build({ branch: site.defaultBranch, site });
+    const build = await factory.build({ branch: site.defaultBranch, site });
     expect(buildViewLink(build, site)).to.eql(`${domain}/`);
   });
 
   it('demo branch url start with demo', async () => {
-    let build = await factory.build({ branch: site.demoBranch, site });
+    const build = await factory.build({ branch: site.demoBranch, site });
     expect(buildViewLink(build, site)).to.eql(`${demoDomain}/`);
   });
 
   it('non-default/demo branch url start with preview', async () => {
-    let build = await factory.build({ branch: 'other', site });
-    expect(buildViewLink(build, site)).to.eql(`${buildUrl(build,site)}/`);
+    const build = await factory.build({ branch: 'other', site });
+    expect(buildViewLink(build, site)).to.eql(`${buildUrl(build, site)}/`);
   });
 });

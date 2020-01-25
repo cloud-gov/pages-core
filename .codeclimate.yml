@@ -16,6 +16,12 @@ engines:
         enabled: false
       object-curly-newline:
         enabled: false
+      no-unsanitized/method:
+        enabled: false
+      no-unsanitized/property:
+        enabled: false
+      prefer-destructuring:
+        enabled: false
     config:
       extensions:
       - .js

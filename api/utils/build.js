@@ -6,7 +6,7 @@ function buildViewLink(build, site) {
     link = site.demoDomain;
   }
   return `${link}/`;
-};
+}
 
 function buildUrl(build, site) {
   let path = `/preview/${site.owner}/${site.repository}/${build.branch}`;
@@ -14,7 +14,7 @@ function buildUrl(build, site) {
     path = `/site/${site.owner}/${site.repository}`;
   } else if (build.branch === site.demoBranch) {
     path = `/demo/${site.owner}/${site.repository}`;
-  }  
+  }
   return `${[`https://${site.awsBucketName}.app.cloud.gov`, path].join('')}`;
 }
 
