@@ -35,10 +35,8 @@ module.exports = wrapHandlers({
 
   find: async (req, res) => {
     const limit = 5;
-    // A page is set to a maximum of 200,000 characters. Assuming
-    // a each log line is about 200 characters, that is roughly
-    // equal to 1,000 lines
-    const lineLimit = 5 * 1000;
+    // 1,000 lines/records
+    const lineLimit = 1000;
 
     const { params, user } = req;
     const { build_id: buildId, page = 1 } = params;
