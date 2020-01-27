@@ -8,8 +8,8 @@ describe('<BranchViewLink/>', () => {
   const testSite = {
     defaultBranch: 'default-branch',
     demoBranch: 'demo-branch',
-    viewLink: 'https://prod-url.com',
-    demoViewLink: 'https://demo-url.com',
+    domain: 'https://prod-url.com',
+    demoDomain: 'https://demo-url.com',
     owner: 'test-owner',
     repository: 'test-repo',
     awsBucketName: 'test-bucket',
@@ -22,89 +22,46 @@ describe('<BranchViewLink/>', () => {
     props = {
       branchName: 'branch-name',
       site: testSite,
-      // previewHostname: 'https://preview-hostname.com',
     };
   });
 
   it('renders a link to the default branch\'s site', () => {
     props.branchName = 'default-branch';
+    props.viewLink = 'https://some-domain.gov/';
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
-    expect(anchor.prop('href')).to.equal('https://prod-url.com');
+    expect(anchor.prop('href')).to.equal('https://some-domain.gov/');
     expect(anchor.text()).equal('View site');
   });
 
   it('renders a link to the demo branch\'s site', () => {
     props.branchName = 'demo-branch';
+    props.viewLink = 'https://some-other-domain.gov/';
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
-    expect(anchor.prop('href')).to.equal('https://demo-url.com');
+    expect(anchor.prop('href')).to.equal('https://some-other-domain.gov/');
     expect(anchor.text()).equal('View demo');
   });
 
   it('renders a preview link to the other branches', () => {
     props.branchName = 'some-other-branch';
+    props.viewLink = 'https://random-url.com/';
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
-    expect(anchor.prop('href')).to.equal(
-      'https://test-bucket.app.cloud.gov/preview/test-owner/test-repo/some-other-branch/'
-    );
+    expect(anchor.prop('href')).to.equal('https://random-url.com/');
     expect(anchor.text()).equal('Preview site');
   });
 
   it('allows some special characters', () => {
     props.branchName = 'release_1.2.3';
+    props.viewLink = 'https://release_1.2.3.gov/';
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
-    expect(anchor.prop('href')).to.equal(
-      'https://test-bucket.app.cloud.gov/preview/test-owner/test-repo/release_1.2.3/'
-    );
-    expect(anchor.text()).equal('Preview site');
-  });
-
-  it('renders a preview link to the other branches created last year', () => {
-    props.branchName = 'some-another-branch';
-    props.completedAt = '2019-01-01';
-    props.site.createdAt = '2019-01-01';
-    props.site.s3ServiceName = 'myServiceName';
-    const wrapper = shallow(<BranchViewLink {...props} />);
-    const anchor = wrapper.find('a');
-    expect(anchor.length).to.equal(1);
-    expect(anchor.prop('href')).to.equal(
-      'https://federalist-proxy.app.cloud.gov/preview/test-owner/test-repo/some-another-branch/'
-    );
-    expect(anchor.text()).equal('Preview site');
-  });
-
-  it('renders a preview link to the other branches', () => {
-    props.branchName = 'some-other-other-branch';
-    props.completedAt = '2019-10-31';
-    props.site.createdAt = '2019-01-01';
-    props.site.s3ServiceName = 'myServiceName';
-    const wrapper = shallow(<BranchViewLink {...props} />);
-    const anchor = wrapper.find('a');
-    expect(anchor.length).to.equal(1);
-    expect(anchor.prop('href')).to.equal(
-      'https://test-bucket.app.cloud.gov/preview/test-owner/test-repo/some-other-other-branch/'
-    );
-    expect(anchor.text()).equal('Preview site');
-  });
-
-  it('renders a preview link to the other branches', () => {
-    props.branchName = 'some-other-another-branch';
-    props.completedAt = '2019-01-01';
-    props.site.createdAt = '2019-10-01';
-    props.site.s3ServiceName = 'myServiceName';
-    const wrapper = shallow(<BranchViewLink {...props} />);
-    const anchor = wrapper.find('a');
-    expect(anchor.length).to.equal(1);
-    expect(anchor.prop('href')).to.equal(
-      'https://test-bucket.app.cloud.gov/preview/test-owner/test-repo/some-other-another-branch/'
-    );
+    expect(anchor.prop('href')).to.equal('https://release_1.2.3.gov/');
     expect(anchor.text()).equal('Preview site');
   });
 });

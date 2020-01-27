@@ -13,7 +13,7 @@ describe('getSafeRepoName', () => {
   });
 });
 
-describe.only('groupLogs', () => {
+describe('groupLogs', () => {
   it('groups the logs by source', () => {
     const logs = [
       { source: 'source1', output: 'hello' },

@@ -10,6 +10,18 @@ engines:
         enabled: false
       import/extensions:
         enabled: false
+      implicit-arrow-linebreak:
+        enabled: false
+      no-use-before-define:
+        enabled: false
+      object-curly-newline:
+        enabled: false
+      no-unsanitized/method:
+        enabled: false
+      no-unsanitized/property:
+        enabled: false
+      prefer-destructuring:
+        enabled: false
     config:
       extensions:
       - .js

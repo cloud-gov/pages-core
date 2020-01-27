@@ -2,7 +2,8 @@ const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
 const SQS = require('../services/SQS');
 
-const { branchRegex, shaRegex } = require('../utils/validators');
+const { branchRegex, shaRegex, isEmptyOrUrl } = require('../utils/validators');
+const { buildUrl } = require('../utils/build');
 
 const afterCreate = (build) => {
   const { Site, User, Build } = build.sequelize.models;
@@ -10,11 +11,12 @@ const afterCreate = (build) => {
   return Build.findOne({
     where: { id: build.id },
     include: [User, Site],
-  }).then((foundBuild) => {
-    Build.count({
-      where: { site: foundBuild.site },
-    }).then(count => SQS.sendBuildMessage(foundBuild, count));
-  });
+  })
+    .then((foundBuild) => {
+      Build.count({
+        where: { site: foundBuild.site },
+      }).then(count => SQS.sendBuildMessage(foundBuild, count));
+    });
 };
 
 const associate = ({
@@ -46,7 +48,7 @@ const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@git
 
 const jobErrorMessage = (message = 'An unknown error occurred') => sanitizeCompleteJobErrorMessage(message);
 
-const jobStateUpdate = (buildStatus, build, timestamp) => {
+const jobStateUpdate = (buildStatus, build, site, timestamp) => {
   const atts = {
     state: buildStatus.status,
   };
@@ -59,6 +61,10 @@ const jobStateUpdate = (buildStatus, build, timestamp) => {
     atts.completedAt = timestamp;
   }
 
+  if (buildStatus.status === 'success') {
+    atts.url = buildUrl(build, site);
+  }
+
   if (build.state === 'queued' && buildStatus.status === 'processing') {
     atts.startedAt = timestamp;
   }
@@ -66,19 +72,12 @@ const jobStateUpdate = (buildStatus, build, timestamp) => {
   return build.update(atts);
 };
 
-const completeJobSiteUpdate = (build, completedAt) => {
-  const { Site } = build.sequelize.models;
-  return Site.update(
-    { publishedAt: completedAt },
-    { where: { id: build.site } }
-  );
-};
-
 async function updateJobStatus(buildStatus) {
   const timestamp = new Date();
-  const build = await jobStateUpdate(buildStatus, this, timestamp);
+  const site = await this.getSite();
+  const build = await jobStateUpdate(buildStatus, this, site, timestamp);
   if (build.state === 'success') {
-    await completeJobSiteUpdate(build, timestamp);
+    await site.update({ publishedAt: timestamp });
   }
   return build;
 }
@@ -126,6 +125,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     startedAt: {
       type: DataTypes.DATE,
+    },
+    url: {
+      type: DataTypes.STRING,
+      validate: isEmptyOrUrl,
     },
   }, {
     tableName: 'build',

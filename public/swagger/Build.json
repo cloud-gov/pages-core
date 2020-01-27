@@ -64,6 +64,9 @@
     "updatedAt": {
       "type": "string"
     },
+    "viewLink": {
+      "type": "string"
+    },
     "user": {
       "type": "object",
       "not": {

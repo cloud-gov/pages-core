@@ -12,12 +12,6 @@ const toJSON = (site) => {
   object.createdAt = object.createdAt.toISOString();
   object.updatedAt = object.updatedAt.toISOString();
 
-  object.viewLink = site.siteUrl();
-
-  if (object.demoBranch) {
-    object.demoViewLink = site.demoUrl();
-  }
-
   if (object.defaultConfig) {
     object.defaultConfig = yaml.safeDump(site.defaultConfig);
   }
@@ -29,8 +23,6 @@ const toJSON = (site) => {
   if (object.previewConfig) {
     object.previewConfig = yaml.safeDump(site.previewConfig);
   }
-
-  object.previewLink = site.branchPreviewUrl();
 
   Object.keys(object).forEach((key) => {
     if (object[key] === null) {
