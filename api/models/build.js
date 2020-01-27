@@ -72,14 +72,12 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
   return build.update(atts);
 };
 
-const completeJobSiteUpdate = (site, completedAt) => site.update({ publishedAt: completedAt });
-
 async function updateJobStatus(buildStatus) {
   const timestamp = new Date();
   const site = await this.getSite();
   const build = await jobStateUpdate(buildStatus, this, site, timestamp);
   if (build.state === 'success') {
-    await completeJobSiteUpdate(site, timestamp);
+    await site.update({ publishedAt: timestamp });
   }
   return build;
 }

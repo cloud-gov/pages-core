@@ -64,9 +64,6 @@
     "updatedAt": {
       "type": "string"
     },
-    "url": {
-      "type": "string"
-    },
     "viewLink": {
       "type": "string"
     },

@@ -27,6 +27,7 @@ const toJSON = (build) => {
     }
   });
   delete object.token;
+  delete object.url;
   return object;
 };
 
