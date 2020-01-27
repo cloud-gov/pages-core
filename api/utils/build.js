@@ -15,7 +15,7 @@ function buildUrl(build, site) {
   } else if (build.branch === site.demoBranch) {
     path = `/demo/${site.owner}/${site.repository}`;
   }
-  return `${[`https://${site.awsBucketName}.app.cloud.gov`, path].join('')}`;
+  return `https://${site.awsBucketName}.app.cloud.gov` +  path;
 }
 
 module.exports = { buildViewLink, buildUrl };
