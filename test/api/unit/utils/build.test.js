@@ -41,7 +41,7 @@ describe('viewLink', () => {
   let site;
   const defaultBranch = 'master';
   const demoBranch = 'demo';
-  const domain = 'https://www.master.com';
+  const domain = 'https://www.master.com/'; // test ending slash formatting
   const demoDomain = 'https://www.demo.com';
   before(async () => {
     site = await factory.site({ defaultBranch, demoBranch, domain, demoDomain });
@@ -49,7 +49,7 @@ describe('viewLink', () => {
 
   it('default branch url start with site', async () => {
     const build = await factory.build({ branch: site.defaultBranch, site });
-    expect(buildViewLink(build, site)).to.eql(`${domain}/`);
+    expect(buildViewLink(build, site)).to.eql('https://www.master.com/');
   });
 
   it('demo branch url start with demo', async () => {
@@ -57,8 +57,15 @@ describe('viewLink', () => {
     expect(buildViewLink(build, site)).to.eql(`${demoDomain}/`);
   });
 
-  it('non-default/demo branch url start with preview', async () => {
-    const build = await factory.build({ branch: 'other', site });
-    expect(buildViewLink(build, site)).to.eql(`${buildUrl(build, site)}/`);
+  describe('non-default/demo branch url start with preview', () => {
+    it('default to build.url', async () => {
+      const build = await factory.build({ branch: 'other', site, url: 'https://the.url' });
+      expect(buildViewLink(build, site)).to.eql('https://the.url/');
+    });
+
+    it('build.url does not exist', async () => {
+      const build = await factory.build({ branch: 'other', site });
+      expect(buildViewLink(build, site)).to.eql(`${buildUrl(build, site)}/`);
+    });
   });
 });

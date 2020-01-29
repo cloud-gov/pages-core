@@ -1,11 +1,11 @@
 function buildViewLink(build, site) {
-  let link = buildUrl(build, site);
+  let link = build.url || buildUrl(build, site); // user build.url shared bucket builds
   if ((build.branch === site.defaultBranch) && site.domain) {
     link = site.domain;
   } else if ((build.branch === site.demoBranch) && site.demoDomain) {
     link = site.demoDomain;
   }
-  return `${link}/`;
+  return `${link.replace(/\/+$/, '')}/`;
 }
 
 function buildUrl(build, site) {
