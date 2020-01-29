@@ -59,8 +59,8 @@ describe('viewLink', () => {
 
   describe('non-default/demo branch url start with preview', () => {
     it('default to build.url', async () => {
-      const build = await factory.build({ branch: 'other', site, url: `https://the.url` });
-      expect(buildViewLink(build, site)).to.eql(`https://the.url/`);
+      const build = await factory.build({ branch: 'other', site, url: 'https://the.url' });
+      expect(buildViewLink(build, site)).to.eql('https://the.url/');
     });
 
     it('build.url does not exist', async () => {
