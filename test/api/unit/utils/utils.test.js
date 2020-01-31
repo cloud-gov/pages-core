@@ -301,4 +301,20 @@ describe('utils', () => {
       expect(spy.calledWith(error));
     });
   });
+
+  describe('.pick', () => {
+    it('returns an object only containing specified keys', () => {
+      const keys = ['foo', 'bar'];
+      const obj = {
+        foo: 'hi',
+        bar: undefined,
+        baz: 'bye'
+      };
+
+      expect(utils.pick(keys, obj)).to.deep.equal({
+        foo: 'hi',
+        bar: undefined,
+      });
+    });
+  });
 });

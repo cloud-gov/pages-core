@@ -138,6 +138,17 @@ function wrapHandlers(handlers) {
   return mapValues(wrapHandler, handlers);
 }
 
+function pick(keys, obj) {
+  const objKeys = Object.keys(obj);
+  const pickedObj = keys.reduce((picked, key) => {
+    if (objKeys.includes(key)) {
+      picked[key] = obj[key];
+    }
+    return picked;
+  }, {});
+  return pickedObj;
+}
+
 module.exports = {
   filterEntity,
   firstEntity,
@@ -149,6 +160,7 @@ module.exports = {
   loadDevelopmentManifest,
   loadProductionManifest,
   mapValues,
+  pick,
   shouldIncludeTracking,
   wrapHandler,
   wrapHandlers,
