@@ -308,7 +308,7 @@ describe('utils', () => {
       const obj = {
         foo: 'hi',
         bar: undefined,
-        baz: 'bye'
+        baz: 'bye',
       };
 
       expect(utils.pick(keys, obj)).to.deep.equal({

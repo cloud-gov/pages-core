@@ -142,7 +142,7 @@ function pick(keys, obj) {
   const objKeys = Object.keys(obj);
   const pickedObj = keys.reduce((picked, key) => {
     if (objKeys.includes(key)) {
-      picked[key] = obj[key];
+      picked[key] = obj[key]; // eslint-disable-line no-param-reassign
     }
     return picked;
   }, {});

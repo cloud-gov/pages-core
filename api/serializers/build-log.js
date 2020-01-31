@@ -4,7 +4,7 @@ const whitelist = [
   'createdAt',
   'output',
   'source',
-]
+];
 
 function serialize(buildLog) {
   const object = buildLog.get({

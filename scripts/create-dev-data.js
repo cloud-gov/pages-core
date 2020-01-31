@@ -158,7 +158,7 @@ async function createData({ githubUsername }) {
       output: log('This log should not be visible'),
       source: 'fake-build-step1',
       build: nodeSiteBuilds[0].id,
-    }
+    },
   ]);
 
   await BuildLog.bulkCreate(
@@ -170,7 +170,7 @@ async function createData({ githubUsername }) {
   );
 
   await BuildLog.bulkCreate(
-    Array(2000).fill(0).map((_v, idx) =>({
+    Array(2000).fill(0).map((_v, idx) => ({
       output: log(`Message ${idx}`),
       source: 'ALL',
       build: goSiteBuilds[0].id,
