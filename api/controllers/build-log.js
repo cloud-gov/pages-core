@@ -28,7 +28,7 @@ module.exports = wrapHandlers({
       source,
     });
 
-    const buildLogJSON = await buildLogSerializer.serialize(buildLog);
+    const buildLogJSON = buildLogSerializer.serialize(buildLog);
 
     return res.ok(buildLogJSON);
   },
@@ -73,7 +73,7 @@ module.exports = wrapHandlers({
       });
     }
 
-    const serializedBuildLogs = await buildLogSerializer.serializeMany(buildLogs);
+    const serializedBuildLogs = buildLogSerializer.serializeMany(buildLogs);
 
     return res.ok(serializedBuildLogs);
   },
