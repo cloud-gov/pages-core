@@ -8,24 +8,16 @@ function SiteBuildLogTable({ buildLogs }) {
   const groupedLogs = groupLogs(buildLogs);
 
   return (
-    <table className="usa-table-borderless log-table log-table__site-build-log table-full-width">
-      <tbody className="log-data">
-        {Object.keys(groupedLogs).map(source => (
-          <tr>
-            <td>
-              {source !== 'ALL' && (
-              <pre className="log-source-header">
-                <span>{source}</span>
-              </pre>
-              )}
-              <pre>
-                {groupedLogs[source].join('\n')}
-              </pre>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <pre className="build-log">
+      {Object.keys(groupedLogs).map(source => (
+        <React.Fragment>
+          {source !== 'ALL' && (
+            <span className="log-source-header">{source}</span>
+          )}
+          {groupedLogs[source].join('\n')}
+        </React.Fragment>
+      ))}
+    </pre>
   );
 }
 

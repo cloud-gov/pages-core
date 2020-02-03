@@ -12,8 +12,7 @@ const {
 } = require('../api/models');
 const { site: siteFactory } = require('../test/api/support/factory');
 
-const loremIpsum = `
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
   Nullam fringilla, arcu ut ultricies auctor, elit quam
   consequat neque, eu blandit metus lorem non turpis.
   Ut luctus nec turpis pellentesque dignissim. Vivamus
@@ -171,7 +170,7 @@ async function createData({ githubUsername }) {
 
   await BuildLog.bulkCreate(
     Array(2000).fill(0).map((_v, idx) => ({
-      output: log(`Message ${idx}`),
+      output: log(`Message ${idx} - A much longer log message to test that the horizontal scrolling is working the way we want.`),
       source: 'ALL',
       build: goSiteBuilds[0].id,
     }))
