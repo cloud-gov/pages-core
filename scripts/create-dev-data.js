@@ -46,7 +46,7 @@ async function createData({ githubUsername }) {
   ]);
 
   console.log('Creating sites...');
-  const [site1, site2] = await Promise.all([
+  const [site1, nodeSite, goSite] = await Promise.all([
     siteFactory({
       demoBranch: 'demo-branch',
       demoDomain: 'https://demo.example.gov',
@@ -60,6 +60,13 @@ async function createData({ githubUsername }) {
       engine: 'node.js',
       owner: user1.username,
       repository: 'example-node-site',
+      users: [user1],
+    }),
+
+    siteFactory({
+      engine: 'hugo',
+      owner: user1.username,
+      repository: 'example-go-site',
       users: [user1],
     }),
   ]);
@@ -94,58 +101,81 @@ async function createData({ githubUsername }) {
     }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2' })),
   ]);
 
-  const site2Builds = await Promise.all([
+  const nodeSiteBuilds = await Promise.all([
     Build.create({
-      branch: site2.defaultBranch,
+      branch: nodeSite.defaultBranch,
       completedAt: new Date(),
       source: 'fake-build',
       state: 'success',
-      site: site2.id,
+      site: nodeSite.id,
       user: user1.id,
       token: 'fake-token',
     }),
     Build.create({
       branch: 'dc/fixes',
       source: 'fake-build',
-      site: site2.id,
+      site: nodeSite.id,
       user: user1.id,
       token: 'fake-token',
     }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1' })),
   ]);
 
+  const goSiteBuilds = await Promise.all([
+    Build.create({
+      branch: goSite.defaultBranch,
+      completedAt: new Date(),
+      source: 'fake-build',
+      state: 'success',
+      site: goSite.id,
+      user: user1.id,
+      token: 'fake-token',
+    }),
+  ]);
+
   console.log('Creating build logs...');
-  await Promise.all([
-    BuildLog.create({
+  await BuildLog.bulkCreate([
+    {
       output: loremIpsum,
       source: 'fake-build-step1',
       build: site1Builds[0].id,
-    }),
-    BuildLog.create({
+    },
+    {
       output: loremIpsum,
       source: 'fake-build-step2',
       build: site1Builds[0].id,
-    }),
-    BuildLog.create({
+    },
+    {
       output: loremIpsum,
       source: 'fake-build-step1',
       build: site1Builds[1].id,
-    }),
-    BuildLog.create({
+    },
+    {
       output: loremIpsum,
       source: 'fake-build-step1',
       build: site1Builds[2].id,
-    }),
-    BuildLog.create({
+    },
+    {
       output: log('This log should not be visible'),
       source: 'fake-build-step1',
-      build: site2Builds[0].id,
-    }),
-    Promise.all(Array(20).fill(0).map(() => BuildLog.create({
+      build: nodeSiteBuilds[0].id,
+    },
+  ]);
+
+  await BuildLog.bulkCreate(
+    Array(20).fill(0).map(() => ({
       output: log('This log has a source of ALL'),
       source: 'ALL',
-      build: site2Builds[0].id,
-    }))),
-  ]);
+      build: nodeSiteBuilds[0].id,
+    }))
+  );
+
+  await BuildLog.bulkCreate(
+    Array(2000).fill(0).map((_v, idx) => ({
+      output: log(`Message ${idx}`),
+      source: 'ALL',
+      build: goSiteBuilds[0].id,
+    }))
+  );
 
   console.log('Creating user actions...');
   const removeAction = await ActionType.findOne({ where: { action: 'remove' } });

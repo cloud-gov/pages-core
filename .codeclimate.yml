@@ -30,5 +30,10 @@ ratings:
   paths:
   - "**.js"
   - "**.jsx"
-exclude_paths:
-- node_modules/
+exclude_patterns:
+  - "node_modules/"
+  - "migrations/"
+  - "test/"
+  - "scripts/"
+  - "coverage/"
+  - "migrate.js"

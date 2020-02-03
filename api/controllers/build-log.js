@@ -58,7 +58,6 @@ module.exports = wrapHandlers({
       order: [['id', 'ASC']],
       offset: (lineLimit * (page - 1)),
       lineLimit,
-      include: [Build],
     });
 
     // Support legacy build logs
@@ -71,11 +70,10 @@ module.exports = wrapHandlers({
         order: [['id', 'ASC']],
         offset: (limit * (page - 1)),
         limit,
-        include: [Build],
       });
     }
 
-    const serializedBuildLogs = await buildLogSerializer.serialize(buildLogs);
+    const serializedBuildLogs = await buildLogSerializer.serializeMany(buildLogs);
 
     return res.ok(serializedBuildLogs);
   },
