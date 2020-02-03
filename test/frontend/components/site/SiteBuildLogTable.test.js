@@ -13,11 +13,12 @@ describe('<SiteBuildLogTable/>', () => {
     };
 
     const wrapper = shallow(<SiteBuildLogTable {...props} />);
-    expect(wrapper.find('table')).to.have.length(1);
-    expect(wrapper.find('table td').contains('output 1')).to.be.true;
-    expect(wrapper.find('table td').contains('output 1')).to.be.true;
-    expect(wrapper.find('table td').contains('source 1')).to.be.true;
-    expect(wrapper.find('table td').contains('output 2')).to.be.true;
-    expect(wrapper.find('table td').contains('source 2')).to.be.true;
+    const el = wrapper.find('.build-log');
+    expect(el).to.have.length(1);
+    expect(el.contains('output 1')).to.be.true;
+    expect(el.contains('output 1')).to.be.true;
+    expect(el.contains('source 1')).to.be.true;
+    expect(el.contains('output 2')).to.be.true;
+    expect(el.contains('source 2')).to.be.true;
   });
 });
