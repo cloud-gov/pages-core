@@ -68,7 +68,7 @@ const createRepoForOrg = ({ accessToken, org, repo, response } = {}) => {
 
 const createRepoForUser = ({ accessToken, repo, response } = {}) => {
   let createRepoNock = nock('https://api.github.com');
-  
+
   if (repo) {
     createRepoNock = createRepoNock.post('/user/repos', {
       name: repo,
@@ -76,7 +76,7 @@ const createRepoForUser = ({ accessToken, repo, response } = {}) => {
   } else {
     createRepoNock = createRepoNock.post('/user/repos');
   }
-  
+
   if (accessToken) {
     createRepoNock = withAuth(createRepoNock, accessToken);
   }
@@ -145,7 +145,7 @@ const githubAuth = (username, organizations) => {
 // eslint-disable-next-line no-shadow
 const repo = ({ accessToken, owner, repo, username, response } = {}) => {
   let webhookNock = nock('https://api.github.com');
-  
+
   if (owner && repo) {
     webhookNock = webhookNock.get(`/repos/${owner}/${repo}`);
   } else {
