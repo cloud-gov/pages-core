@@ -11,7 +11,7 @@ function filterEntity(res, name, field = 'name') {
   if (filtered.length === 0) {
     const error = new Error(errMsg);
     error.name = name;
-    return Promise.reject(error);
+    throw error;
   }
   if (name === 'basic-public') {
     const servicePlan = filtered.find(f => f.entity.unique_id === config.app.s3ServicePlanId);
@@ -19,7 +19,7 @@ function filterEntity(res, name, field = 'name') {
       errMsg = `${errMsg} @basic-public service plan = (${config.app.s3ServicePlanId})`;
       const error = new Error(errMsg);
       error.name = name;
-      return Promise.reject(error);
+      throw error;
     }
     return servicePlan;
   }
@@ -121,6 +121,34 @@ function shouldIncludeTracking() {
   return config.app.app_env === 'production';
 }
 
+function mapValues(fn, obj) {
+  const reducer = (acc, key) => {
+    acc[key] = fn(obj[key]);
+    return acc;
+  };
+  return Object.keys(obj).reduce(reducer, {});
+}
+
+function wrapHandler(fn) {
+  // calls `next(error)`
+  return (...args) => fn(...args).catch(args[2]);
+}
+
+function wrapHandlers(handlers) {
+  return mapValues(wrapHandler, handlers);
+}
+
+function pick(keys, obj) {
+  const objKeys = Object.keys(obj);
+  const pickedObj = keys.reduce((picked, key) => {
+    if (objKeys.includes(key)) {
+      picked[key] = obj[key]; // eslint-disable-line no-param-reassign
+    }
+    return picked;
+  }, {});
+  return pickedObj;
+}
+
 module.exports = {
   filterEntity,
   firstEntity,
@@ -131,5 +159,9 @@ module.exports = {
   loadAssetManifest,
   loadDevelopmentManifest,
   loadProductionManifest,
+  mapValues,
+  pick,
   shouldIncludeTracking,
+  wrapHandler,
+  wrapHandlers,
 };

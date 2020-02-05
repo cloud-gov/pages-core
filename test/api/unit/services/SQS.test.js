@@ -30,6 +30,7 @@ describe('SQS', () => {
       SQS.sendBuildMessage({
         branch: 'master',
         state: 'processing',
+        url: 'testBucket.gov/boo/hoo',
         Site: {
           owner: 'owner',
           repository: 'formatted-message-repo',
@@ -74,6 +75,7 @@ describe('SQS', () => {
       SQS.sendBuildMessage({
         branch: 'master',
         state: 'processing',
+        url: 'testBucket.gov/boo/hoo',
         Site: {
           owner,
           repository,

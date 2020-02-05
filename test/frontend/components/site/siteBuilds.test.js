@@ -28,6 +28,7 @@ describe('<SiteBuilds/>', () => {
       id: 1,
       branch: 'master',
       createdAt: '2016-12-28T12:00:00',
+      startedAt: '2016-12-28T12:01:00',
       completedAt: '2016-12-28T12:05:00',
       state: 'success',
       commitSha: '123A',
@@ -104,6 +105,22 @@ describe('<SiteBuilds/>', () => {
 
   it('should not render a `BranchViewLink` component if state is not successful', () => {
     props.builds.data[0].state = 'error';
+    const wrapper = shallow(<SiteBuilds {...props} />);
+    const siteBuild = props.builds.data[0];
+    const params = { branchName: siteBuild.branch, site: props.site, showIcon: true };
+    expect(wrapper.find(params)).to.have.length(0);
+  });
+
+  it('should not render a `BranchViewLink` component if state is queued', () => {
+    props.builds.data[0].state = 'queued';
+    const wrapper = shallow(<SiteBuilds {...props} />);
+    const siteBuild = props.builds.data[0];
+    const params = { branchName: siteBuild.branch, site: props.site, showIcon: true };
+    expect(wrapper.find(params)).to.have.length(0);
+  });
+
+  it('should not error if state is unkown/unexpected', () => {
+    props.builds.data[0].state = 'unexpected';
     const wrapper = shallow(<SiteBuilds {...props} />);
     const siteBuild = props.builds.data[0];
     const params = { branchName: siteBuild.branch, site: props.site, showIcon: true };

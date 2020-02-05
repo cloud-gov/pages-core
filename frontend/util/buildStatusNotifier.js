@@ -49,9 +49,14 @@ module.exports = class BuildStatusNotifier {
       case 'processing':
         titleStatus = 'Build In-Progress';
         break;
-      default:
+      case 'queued':
+        titleStatus = 'Build Queued';
+        break;
+      case 'success':
         titleStatus = 'Successful Build';
         break;
+      default:
+        return null;
     }
     const icon = '/images/favicons/favicon.ico';
     const note = new Notification(`${titleStatus}`, { body: `Site: ${build.owner}/${build.repository}   Branch: ${build.branch}`, icon });
