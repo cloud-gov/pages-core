@@ -1,21 +1,9 @@
-const config = require('./config');
-const { logger, expressLogger, expressErrorLogger } = require('./winston');
-
-// If settings present, start New Relic
-const env = require('./services/environment.js')();
-
-if (env.NEW_RELIC_APP_NAME && env.NEW_RELIC_LICENSE_KEY) {
-  logger.info(`Activating New Relic: ${env.NEW_RELIC_APP_NAME}`);
-  require('newrelic'); // eslint-disable-line global-require
-} else {
-  logger.warn('Skipping New Relic Activation');
-}
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
+const RateLimit = require('express-rate-limit');
 const session = require('express-session');
-const PostgresStore = require('connect-session-sequelize')(session.Store);
+const ConnectSession = require('connect-session-sequelize');
 const nunjucks = require('nunjucks');
 const flash = require('connect-flash');
 const http = require('http');
@@ -23,10 +11,11 @@ const io = require('socket.io');
 const redis = require('redis');
 const redisAdapter = require('socket.io-redis');
 const schedule = require('node-schedule');
-
+const env = require('./services/environment.js')();
 const responses = require('./api/responses');
 const passport = require('./api/services/passport');
-const RateLimit = require('express-rate-limit');
+const { logger, expressLogger, expressErrorLogger } = require('./winston');
+const config = require('./config');
 const router = require('./api/routers');
 const devMiddleware = require('./api/services/devMiddleware');
 const SocketIOSubscriber = require('./api/services/SocketIOSubscriber');
@@ -35,10 +24,19 @@ const FederalistUsersHelper = require('./api/services/FederalistUsersHelper');
 const RepositoryVerifier = require('./api/services/RepositoryVerifier');
 const SiteUserAuditor = require('./api/services/SiteUserAuditor');
 const ScheduledBuildHelper = require('./api/services/ScheduledBuildHelper');
+const { sequelize } = require('./api/models');
+
+// If settings present, start New Relic
+if (env.NEW_RELIC_APP_NAME && env.NEW_RELIC_LICENSE_KEY) {
+  logger.info(`Activating New Relic: ${env.NEW_RELIC_APP_NAME}`);
+  require('newrelic'); // eslint-disable-line global-require
+} else {
+  logger.warn('Skipping New Relic Activation');
+}
 
 const app = express();
-const sequelize = require('./api/models').sequelize;
 
+const PostgresStore = ConnectSession(session.Store);
 config.session.store = new PostgresStore({ db: sequelize });
 
 nunjucks.configure('views', {
@@ -105,8 +103,6 @@ if (logger.levels[logger.level] >= 2) {
   app.use(expressLogger);
 }
 
-app.use(expressErrorLogger);
-
 const limiter = new RateLimit(config.rateLimiting);
 app.use(limiter); // must be set before router is added to app
 
@@ -138,40 +134,38 @@ app.use((req, res, next) => {
 });
 
 app.use(router);
-// error handler middleware for custom CSRF error responses
-// note that error handling middlewares must come last in the stack
-app.use((err, req, res, next) => {
-  if (err.code === 'EBADCSRFTOKEN') {
-    res.forbidden({ message: 'Invalid CSRF token' });
-    return;
-  }
-  next(err);
-});
 
 app.use((req, res) => res.status(404).redirect(302, '/404-not-found/'));
 
+app.use(expressErrorLogger);
+
+// eslint-disable-next-line
+app.use((err, req, res, next) => {
+  res.error(err);
+});
+
 socket.use((_socket, next) => {
-   /* eslint-disable no-param-reassign */
+  /* eslint-disable no-param-reassign */
   if (_socket.handshake.query && _socket.handshake.query.accessToken) {
     jwtHelper.verify(_socket.handshake.query.accessToken, { expiresIn: 60 * 60 * 24 }) // expire 24h
-    .then((decoded) => {
-      _socket.user = decoded.user;
-    })
-    .then(() => next())
-    .catch((e) => {
-      logger.warn(e);
-      next();
-    });
+      .then((decoded) => {
+        _socket.user = decoded.user;
+      })
+      .then(() => next())
+      .catch((e) => {
+        logger.warn(e);
+        next();
+      });
   } else {
     next();
   }
 })
-.on('connection', (_socket) => {
-  SocketIOSubscriber.joinRooms(_socket);
-})
-.on('error', (err) => {
-  logger.error(`socket auth/subscribe error: ${err}`);
-});
+  .on('connection', (_socket) => {
+    SocketIOSubscriber.joinRooms(_socket);
+  })
+  .on('error', (err) => {
+    logger.error(`socket auth/subscribe error: ${err}`);
+  });
 
 if (process.env.CF_INSTANCE_INDEX === '0') {
   // verify site's repositories exist

@@ -1,23 +1,11 @@
 {
   "type": "object",
   "required": [
-    "id",
-    "build",
     "createdAt",
     "output",
-    "source",
-    "updatedAt"
+    "source"
   ],
   "properties": {
-    "id": {
-      "type": "integer"
-    },
-    "build": {
-      "type": "object",
-      "not": {
-        "required": ["token"]
-      }
-    },
     "createdAt": {
       "type": "string"
     },
@@ -25,9 +13,6 @@
       "type": "string"
     },
     "source": {
-      "type": "string"
-    },
-    "updatedAt": {
       "type": "string"
     }
   }
