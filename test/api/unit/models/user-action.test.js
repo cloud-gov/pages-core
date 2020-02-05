@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const { UserAction } = require('../../../../api/models');
-const userActionSerializer = require('../../../../api/serializers/user-action');
+const userActionSerializer = require('../../../../api/serializers/user');
 
 const props = {
   userId: 1,

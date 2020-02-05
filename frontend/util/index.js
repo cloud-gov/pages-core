@@ -8,11 +8,3 @@ export function getSafeRepoName(name) {
     .replace(/^-+/g, '') // remove starting hyphens
     .replace(/-+$/g, ''); // remove ending hyphens
 }
-
-export function groupLogs(logs) {
-  return logs.reduce((groups, log) => {
-    // eslint-disable-next-line no-param-reassign
-    groups[log.source] = (groups[log.source] || []).concat([log.output]);
-    return groups;
-  }, {});
-}

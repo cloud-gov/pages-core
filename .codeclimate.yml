@@ -4,23 +4,11 @@ engines:
     enabled: false
   eslint:
     enabled: true
-    channel: "eslint-5"
+    channel: "eslint-3"
     checks:
       import/no-unresolved:
         enabled: false
       import/extensions:
-        enabled: false
-      implicit-arrow-linebreak:
-        enabled: false
-      no-use-before-define:
-        enabled: false
-      object-curly-newline:
-        enabled: false
-      no-unsanitized/method:
-        enabled: false
-      no-unsanitized/property:
-        enabled: false
-      prefer-destructuring:
         enabled: false
     config:
       extensions:
@@ -30,10 +18,5 @@ ratings:
   paths:
   - "**.js"
   - "**.jsx"
-exclude_patterns:
-  - "node_modules/"
-  - "migrations/"
-  - "test/"
-  - "scripts/"
-  - "coverage/"
-  - "migrate.js"
+exclude_paths:
+- node_modules/

@@ -7,18 +7,32 @@ import { IconView } from './icons';
 const isDefaultBranch = (branchName, site) => branchName === site.defaultBranch;
 const isDemoBranch = (branchName, site) => branchName === site.demoBranch;
 
-const getUrlAndViewText = (branchName, viewLink, site, completedAt) => {
-  let viewText = 'Preview site';
+const getUrlAndViewText = (branchName, site, completedAt) => {
   if (isDefaultBranch(branchName, site)) {
-    viewText = 'View site';
-  } else if (isDemoBranch(branchName, site)) {
-    viewText = 'View demo';
+    return { url: site.viewLink, viewText: 'View site' };
   }
-  return { url: viewLink, viewText };
+  if (isDemoBranch(branchName, site)) {
+    return { url: site.demoViewLink, viewText: 'View demo' };
+  }
+
+  // temp for migration - should if block be removed by end of year 2019
+  if (site.s3ServiceName && (site.s3ServiceName !== 'federalist-production-s3')
+    && site.createdAt && (new Date(site.createdAt) < new Date('2019-06-05T20:09Z'))
+    && completedAt && ((new Date(completedAt) < new Date('2019-10-25T17:00Z')))) {
+    return {
+      url: `https://federalist-proxy.app.cloud.gov/preview/${site.owner}/${site.repository}/${branchName}/`,
+      viewText: 'Preview site',
+    };
+  }
+
+  return {
+    url: `https://${site.awsBucketName}.app.cloud.gov/preview/${site.owner}/${site.repository}/${branchName}/`,
+    viewText: 'Preview site',
+  };
 };
 
-export const BranchViewLink = ({ branchName, viewLink, site, showIcon, completedAt }) => {
-  const { url, viewText } = getUrlAndViewText(branchName, viewLink, site, completedAt);
+export const BranchViewLink = ({ branchName, site, showIcon, completedAt }) => {
+  const { url, viewText } = getUrlAndViewText(branchName, site, completedAt);
 
   if (showIcon) {
     return (
@@ -39,7 +53,6 @@ export const BranchViewLink = ({ branchName, viewLink, site, showIcon, completed
 // Note: remove completedAt propType from compoent at end of 2018
 BranchViewLink.propTypes = {
   branchName: PropTypes.string.isRequired,
-  viewLink: PropTypes.string.isRequired,
   site: SITE.isRequired,
   showIcon: PropTypes.bool,
   completedAt: PropTypes.string,

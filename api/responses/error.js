@@ -1,5 +1,3 @@
-const { DatabaseError } = require('sequelize');
-
 module.exports = (error = {}, { res }) => {
   let finalError = error;
 
@@ -7,19 +5,10 @@ module.exports = (error = {}, { res }) => {
     finalError = {
       status: error,
     };
-  } else if (error.code === 'EBADCSRFTOKEN') {
-    finalError = {
-      status: 403,
-      message: 'Invalid CSRF token',
-    };
   } else if (error.name && error.name === 'SequelizeValidationError') {
     finalError = {
       status: 400,
       message: 'The request parameters were invalid.',
-    };
-  } else if (error instanceof DatabaseError) {
-    finalError = {
-      status: 404,
     };
   }
 

@@ -2,22 +2,25 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { BUILD_LOG } from '../../propTypes';
-import { groupLogs } from '../../util';
 
 function SiteBuildLogTable({ buildLogs }) {
-  const groupedLogs = groupLogs(buildLogs);
-
   return (
-    <pre className="build-log">
-      {Object.keys(groupedLogs).map(source => (
-        <React.Fragment>
-          {source !== 'ALL' && (
-            <span className="log-source-header">{source}</span>
-          )}
-          {groupedLogs[source].join('\n')}
-        </React.Fragment>
-      ))}
-    </pre>
+    <table className="usa-table-borderless log-table log-table__site-build-log table-full-width">
+      <tbody className="log-data">
+        {buildLogs.map((log => (
+          <tr key={log.id}>
+            <td>
+              <pre className="log-source-header">
+                <a name={`${log.source}-${log.id}`}>{log.source}</a>
+              </pre>
+              <pre>
+                {log.output}
+              </pre>
+            </td>
+          </tr>
+        )))}
+      </tbody>
+    </table>
   );
 }
 

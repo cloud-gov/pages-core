@@ -1,8 +1,3 @@
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-
-chai.use(chaiAsPromised);
-
 Promise.props = require('promise-props');
 
 require('./support/aws-mocks');

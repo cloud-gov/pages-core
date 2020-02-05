@@ -28,6 +28,4 @@ Object.keys(sequelize.models).forEach(key =>
   sequelize.models[key].associate(sequelize.models)
 );
 
-Build.forSiteUser = user => Build.scope({ method: ['forSiteUser', user, Site, User] });
-
 module.exports = Object.assign({ sequelize }, sequelize.models);

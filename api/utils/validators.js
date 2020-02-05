@@ -1,5 +1,4 @@
 const yaml = require('js-yaml');
-const validator = require('validator');
 
 const branchRegex = /^[\w.]+(?:[/-]*[\w.])*$/;
 const githubUsernameRegex = /^[^-][a-zA-Z-]+$/;
@@ -64,22 +63,10 @@ function parseSiteConfigs(siteConfigs) {
   return parsedSiteConfigs;
 }
 
-function isEmptyOrUrl(value) {
-  const validUrlOptions = {
-    require_protocol: true,
-    protocols: ['https'],
-  };
-
-  if (value && value.length && !validator.isURL(value, validUrlOptions)) {
-    throw new Error('URL must start with https://');
-  }
-}
-
 module.exports = {
   branchRegex,
   shaRegex,
   githubUsernameRegex,
   isValidYaml,
   parseSiteConfigs,
-  isEmptyOrUrl,
 };

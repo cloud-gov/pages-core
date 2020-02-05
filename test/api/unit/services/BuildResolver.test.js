@@ -140,8 +140,7 @@ describe('BuildResolver', () => {
           branch,
           siteId: values.site.id,
           sha,
-        })
-        .then(done);
+        });
       })
       .catch((err) => {
         expect(err.status).to.equal(404);
