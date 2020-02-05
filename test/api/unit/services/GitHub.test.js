@@ -9,7 +9,7 @@ describe('GitHub', () => {
     it('should resolve with the repository data if the repo exists', (done) => {
       factory.user().then((user) => {
         githubAPINocks.repo({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           owner: 'repo-owner',
           repo: 'repo-name',
           response: [200, {
@@ -37,7 +37,7 @@ describe('GitHub', () => {
     it('should resolve with null if the repo does not exist', (done) => {
       factory.user().then((user) => {
         githubAPINocks.repo({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           owner: 'repo-owner',
           repo: 'repo-name',
           response: [200, {
@@ -60,7 +60,7 @@ describe('GitHub', () => {
 
       factory.user().then((user) => {
         createRepoNock = githubAPINocks.createRepoForUser({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           repo: 'repo-name',
         });
 
@@ -76,7 +76,7 @@ describe('GitHub', () => {
 
       factory.user().then((user) => {
         createRepoNock = githubAPINocks.createRepoForOrg({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           org: 'org-name',
           repo: 'repo-name',
         });
@@ -93,7 +93,7 @@ describe('GitHub', () => {
 
       factory.user().then((user) => {
         createRepoNock = githubAPINocks.createRepoForUser({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           repo: 'repo-name',
         });
 
@@ -107,7 +107,7 @@ describe('GitHub', () => {
     it('should reject if the user is not authorized to create a repository', (done) => {
       factory.user().then((user) => {
         githubAPINocks.createRepoForOrg({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           org: 'org-name',
           repo: 'repo-name',
           response: [403, {
@@ -126,7 +126,7 @@ describe('GitHub', () => {
     it('should reject if the repo already exists', (done) => {
       factory.user().then((user) => {
         githubAPINocks.createRepoForOrg({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           org: 'org-name',
           repo: 'repo-name',
           response: [422, {
@@ -156,7 +156,7 @@ describe('GitHub', () => {
         .then((model) => {
           site = model;
           githubAPINocks.webhook({
-            accessToken: user.accessToken,
+            accessToken: user.githubAccessToken,
             owner: site.owner,
             repo: site.repository,
             response: 201,
@@ -181,7 +181,7 @@ describe('GitHub', () => {
         .then((model) => {
           site = model;
           githubAPINocks.webhook({
-            accessToken: user.accessToken,
+            accessToken: user.githubAccessToken,
             owner: site.owner,
             repo: site.repository,
             response: [400, {
@@ -208,7 +208,7 @@ describe('GitHub', () => {
         .then((model) => {
           site = model;
           githubAPINocks.webhook({
-            accessToken: user.accessToken,
+            accessToken: user.githubAccessToken,
             owner: site.owner,
             repo: site.repository,
             response: [404, {
