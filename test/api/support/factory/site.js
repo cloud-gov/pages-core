@@ -28,7 +28,6 @@ function makeAttributes(overrides = {}) {
     s3ServiceName: 'federalist-dev-s3',
     awsBucketName: 'cg-123456789',
     awsBucketRegion: 'us-gov-west-1',
-    defaultBranch: 'master',
     users,
   }, overrides);
 }

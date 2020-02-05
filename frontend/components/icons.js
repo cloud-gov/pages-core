@@ -1,7 +1,6 @@
 import IconBook from '../../public/images/icons/icon-book.svg';
 import IconBranch from '../../public/images/icons/icon-branch.svg';
 import IconCheckCircle from '../../public/images/icons/icon-check-circle-solid.svg';
-import IconClock from '../../public/images/icons/icon-clock.svg';
 import IconCloudUpload from '../../public/images/icons/icon-cloud_upload.svg';
 import IconEnvelope from '../../public/images/icons/icon-envelope.svg';
 import IconExclamationCircle from '../../public/images/icons/icon-exclamation-circle-solid.svg';
@@ -17,7 +16,6 @@ export {
   IconBranch,
   IconCheckCircle,
   IconCloudUpload,
-  IconClock,
   IconEnvelope,
   IconExclamationCircle,
   IconGear,

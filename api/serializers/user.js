@@ -1,3 +1,5 @@
+const { User } = require('../models');
+
 const protectedAttributes = [
   'githubAccessToken',
   'githubUserId',
@@ -26,4 +28,20 @@ const toJSON = (user) => {
   });
 };
 
-module.exports = { toJSON };
+const serializeObject = user => toJSON(user);
+
+const serialize = (serializable) => {
+  if (serializable.length !== undefined) {
+    const userIds = serializable.map(user => user.id);
+    const query = User.findAll({ where: { id: userIds } });
+
+    return query.then(users => users.map(serializeObject));
+  }
+
+  const query = User.findByPk(serializable.id);
+
+  return query.then(serializeObject);
+};
+
+
+module.exports = { serialize, toJSON };

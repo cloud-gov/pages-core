@@ -6,6 +6,7 @@
     "engine",
     "owner",
     "repository",
+    "viewLink",
     "users"
   ],
   "properties": {
@@ -16,6 +17,9 @@
       "type": "string"
     },
     "demoDomain": {
+      "type": "string"
+    },
+    "demoViewLink": {
       "type": "string"
     },
     "config": {
@@ -45,6 +49,9 @@
       "format": "date-time"
     },
     "repository": {
+      "type": "string"
+    },
+    "viewLink": {
       "type": "string"
     },
     "users": {

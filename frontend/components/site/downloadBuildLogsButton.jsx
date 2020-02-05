@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import fileDownload from 'js-file-download';
 import { BUILD_LOG } from '../../propTypes';
-import { groupLogs } from '../../util';
 
 class DownloadBuildLogsButton extends React.Component {
   constructor(props) {
@@ -12,15 +11,14 @@ class DownloadBuildLogsButton extends React.Component {
   }
 
   downloadBuildLogs() {
-    const { buildLogsData = [], buildId } = this.props;
-    const groupedLogs = groupLogs(buildLogsData);
-    const text = Object.keys(groupedLogs).map(source => `${source}\n${groupedLogs[source].join('\n')}`).join('\n\n');
-    fileDownload(text, `build-log-${buildId}.txt`);
+    let buildLogsData = this.props.buildLogsData || [];
+    buildLogsData = buildLogsData.map(data => [`Source: ${data.source}`, `Timestamp: ${(new Date(data.createdAt)).toISOString()}`, `Output:\n${data.output}`].join('\n'));
+    fileDownload(buildLogsData.join('\n\n'), `build-log-${this.props.buildId}.txt`);
   }
 
   render() {
     return (
-      <button type="button" className="usa-button" onClick={this.downloadBuildLogs}>Download logs</button>
+      <button className="usa-button" onClick={this.downloadBuildLogs}>Download logs</button>
     );
   }
 }

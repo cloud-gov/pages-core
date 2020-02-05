@@ -13,32 +13,26 @@ import { duration, timeFrom } from '../../util/datetime';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
 import BranchViewLink from '../branchViewLink';
-import { IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner } from '../icons';
+import { IconCheckCircle, IconExclamationCircle, IconSpinner } from '../icons';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
 const buildStateData = (buildState) => {
-  let messageIcon;
-  switch (buildState) {
-    case 'error':
-      messageIcon = { message: 'Failed', icon: IconExclamationCircle };
-      break;
-    case 'processing':
-      messageIcon = { message: 'In progress', icon: IconSpinner };
-      break;
-    case 'skipped':
-      messageIcon = { message: 'Skipped', icon: null };
-      break;
-    case 'queued':
-      messageIcon = { message: 'Queued', icon: IconClock };
-      break;
-    case 'success':
-      messageIcon = { message: 'Completed', icon: IconCheckCircle };
-      break;
-    default:
-      messageIcon = { message: buildState, icon: null };
-  }
-  return messageIcon;
+  const mapping = {
+    error: {
+      message: 'Failed', icon: IconExclamationCircle,
+    },
+    processing: {
+      message: 'In progress', icon: IconSpinner,
+    },
+    skipped: {
+      message: 'Skipped', icon: null,
+    },
+    success: {
+      message: 'Completed', icon: IconCheckCircle,
+    },
+  };
+  return mapping[buildState];
 };
 
 class SiteBuilds extends React.Component {
@@ -171,7 +165,7 @@ class SiteBuilds extends React.Component {
                           </p>
                           <div>
                             { previewBuilds[build.branch] === build.id && build.state === 'success' &&
-                            <BranchViewLink branchName={build.branch} viewLink={build.viewLink} site={site} showIcon completedAt={build.completedAt} /> }
+                            <BranchViewLink branchName={build.branch} site={site} showIcon completedAt={build.completedAt} /> }
                           </div>
                         </div>
                       </th>
@@ -185,13 +179,13 @@ class SiteBuilds extends React.Component {
                       <td data-title="Completed"><span>{ timeFrom(build.completedAt) }</span></td>
                       <td data-title="Duration">
                         <span>
-                          { duration(build.startedAt, build.completedAt) }
+                          { duration(build.createdAt, build.completedAt) }
                         </span>
                       </td>
                       <td data-title="Actions" className="table-actions">
                         <span>
                           {
-                            ['error', 'success'].includes(build.state) &&
+                            build.state !== 'processing' &&
                             <CreateBuildLink
                               handlerParams={{ buildId: build.id, siteId: site.id }}
                               handleClick={actions.restartBuild}

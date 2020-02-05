@@ -45,9 +45,6 @@
         }
       }
     },
-    "startedAt": {
-      "type": "string"
-    },
     "site": {
       "type": "object"
     },
@@ -57,14 +54,10 @@
         "error",
         "processing",
         "skipped",
-        "success",
-        "queued"
+        "success"
       ]
     },
     "updatedAt": {
-      "type": "string"
-    },
-    "viewLink": {
       "type": "string"
     },
     "user": {
