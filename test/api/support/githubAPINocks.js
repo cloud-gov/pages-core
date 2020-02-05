@@ -1,8 +1,6 @@
 const nock = require('nock');
 const config = require('../../../config');
 
-const API_ENDPOINT = 'https://api.github.com';
-
 const withAuth = (nok, accessToken) =>
   nok.matchHeader('authorization', `token ${accessToken}`);
 
