@@ -1,6 +1,7 @@
 const { Build, User, Site } = require('../models');
 const siteSerializer = require('../serializers/site');
 const userSerializer = require('../serializers/user');
+const { buildViewLink } = require('../utils/build');
 
 const toJSON = (build) => {
   const object = Object.assign({}, build.get({
@@ -12,12 +13,21 @@ const toJSON = (build) => {
   if (object.completedAt) {
     object.completedAt = object.completedAt.toISOString();
   }
+  if (object.startedAt) {
+    object.startedAt = object.startedAt.toISOString();
+  }
+
+  if (build.Site) {
+    object.viewLink = buildViewLink(build, build.Site);
+  }
+
   Object.keys(object).forEach((key) => {
     if (object[key] === null) {
       delete object[key];
     }
   });
   delete object.token;
+  delete object.url;
   return object;
 };
 
