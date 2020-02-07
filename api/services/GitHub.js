@@ -23,7 +23,7 @@ const getBranch = (github, { owner, repo, branch }) =>
 const githubClient = accessToken => new Promise((resolve) => {
   const client = octokit();
   client.authenticate({
-    type: 'oauth',
+    type: 'token',
     token: accessToken,
   });
   resolve(client);
