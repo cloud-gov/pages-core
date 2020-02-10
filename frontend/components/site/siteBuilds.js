@@ -169,32 +169,32 @@ class SiteBuilds extends React.Component {
                       <tr key={build.id}>
                         <th scope="row" data-title="Branch">
                           <div>
-                <p className="commit-link truncate">
-                            { React.createElement(icon) }
-                            { SiteBuilds.commitLink(build) }
-                          </p>
-                <div>
-                            { previewBuilds[build.branch] === build.id && build.state === 'success'
+                            <p className="commit-link truncate">
+                              { React.createElement(icon) }
+                              { SiteBuilds.commitLink(build) }
+                            </p>
+                            <div>
+                              { previewBuilds[build.branch] === build.id && build.state === 'success'
                             && <BranchViewLink branchName={build.branch} viewLink={build.viewLink} site={site} showIcon completedAt={build.completedAt} /> }
+                            </div>
                           </div>
-              </div>
                         </th>
                         <td data-title="Message">
                           <div>
-                <p>{ message }</p>
-                { SiteBuilds.buildLogsLink(build) }
-              </div>
+                            <p>{ message }</p>
+                            { SiteBuilds.buildLogsLink(build) }
+                          </div>
                         </td>
                         <td data-title="User"><span>{ SiteBuilds.getUsername(build) }</span></td>
                         <td data-title="Completed"><span>{ timeFrom(build.completedAt) }</span></td>
                         <td data-title="Duration">
                           <span>
-                { duration(build.startedAt, build.completedAt) }
-              </span>
+                            { duration(build.startedAt, build.completedAt) }
+                          </span>
                         </td>
                         <td data-title="Actions" className="table-actions">
                           <span>
-                {
+                            {
                             ['error', 'success'].includes(build.state)
                             && (
                             <CreateBuildLink
@@ -206,7 +206,7 @@ class SiteBuilds extends React.Component {
                             </CreateBuildLink>
                             )
                           }
-              </span>
+                          </span>
                         </td>
                       </tr>
                     );
