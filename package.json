@@ -61,7 +61,7 @@
     "test:server:file": "NODE_ENV=test JWT_SECRET=shh USER_AUDITOR=user_auditor mocha --exit --timeout 2500 test/api/bootstrap.test.js",
     "test:server:watch": "watch 'yarn test:server' ./api ./test/api",
     "test:client:watch": "watch 'yarn test:client' ./frontend ./test/frontend",
-    "lint": "eslint ./api/**/*.js ./config/**/*.js ./frontend/**/*.js ./migrations/**/*.js ./scripts/**/*.js ./services/**/*.js",
+    "lint": "eslint ./api/**/*.js ./config/**/*.js ./frontend/**/*.js ./scripts/**/*.js ./services/**/*.js",
     "lint:diff": "./scripts/lint-diff.sh",
     "migrate:create": "node migrate.js create",
     "migrate:up": "node migrate.js up || true",
