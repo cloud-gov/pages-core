@@ -44,15 +44,17 @@ export const SITE_NAVIGATION_CONFIG = [
 
 export class SiteContainer extends React.Component {
   componentDidMount() {
-    siteActions.setCurrentSite(this.props.params.id);
+    const { params: { id } } = this.props;
+    siteActions.setCurrentSite(id);
   }
 
   componentWillReceiveProps(nextProps) {
+    const { params: { id } } = this.props;
     const { sites } = nextProps;
     const { currentSite, data } = sites;
 
     if (data.length && !currentSite) {
-      siteActions.setCurrentSite(this.props.params.id);
+      siteActions.setCurrentSite(id);
     }
   }
 
@@ -97,7 +99,7 @@ export class SiteContainer extends React.Component {
 
     return (
       <div className="usa-grid site">
-        <SideNav siteId={site.id} />
+        <SideNav siteId={site.id} config={SITE_NAVIGATION_CONFIG} />
         <div className="usa-width-five-sixths site-main" id="pages-container">
 
           <AlertBanner
@@ -139,7 +141,7 @@ SiteContainer.propTypes = {
   sites: PropTypes.shape({
     isLoading: PropTypes.bool.isRequired,
     currentSite: PropTypes.object.isRequired,
-    sites: PropTypes.arrayOf(PropTypes.object).isRequired,
+    data: PropTypes.array,
   }),
   alert: ALERT,
 };

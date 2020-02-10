@@ -7,13 +7,15 @@ const rejectBuild = msg => Promise.reject({
   message: msg,
 });
 
-const getBranchFromGithub = ({ user, site, branch }) => GitHub.getBranch(user, site.owner, site.repository, branch)
-  .then(branchInfo => ({
-    branch: branchInfo.name,
-    site: site.id,
-    commitSha: branchInfo.commit.sha,
-  }))
-  .catch(() => rejectBuild(buildErrors.BRANCH_NOT_FOUND));
+function getBranchFromGithub({ user, site, branch }) {
+  return GitHub.getBranch(user, site.owner, site.repository, branch)
+    .then(branchInfo => ({
+      branch: branchInfo.name,
+      site: site.id,
+      commitSha: branchInfo.commit.sha,
+    }))
+    .catch(() => rejectBuild(buildErrors.BRANCH_NOT_FOUND));
+}
 
 const getBuildById = (user, params) => {
   const { buildId, siteId } = params;

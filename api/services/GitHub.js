@@ -12,7 +12,9 @@ const getOrganizations = github => github.users.getOrgs({}).then(orgs => orgs.da
 
 const getRepository = (github, options) => github.repos.get(options).then(repos => repos.data);
 
-const getBranch = (github, { owner, repo, branch }) => github.repos.getBranch({ owner, repo, branch }).then(branchInfo => branchInfo.data);
+const getBranch = (github, { owner, repo, branch }) => github.repos
+  .getBranch({ owner, repo, branch })
+  .then(branchInfo => branchInfo.data);
 
 const githubClient = accessToken => new Promise((resolve) => {
   const client = octokit();
@@ -93,29 +95,36 @@ const getOrganizationMembers = (github, org, role = 'all', page = 1) => github.o
 })
   .then(orgs => Promise.resolve(orgs.data));
 
-const getNextOrganizationMembers = (github, org, role = 'all', page = 1, allMembers = []) => getOrganizationMembers(github, org, role, page)
-  .then((members) => {
-    if (members.length > 0) {
-      allMembers = allMembers.concat(members); // eslint-disable-line no-param-reassign
-      return getNextOrganizationMembers(github, org, role, page + 1, allMembers);
-    }
-    return Promise.resolve(allMembers);
-  });
+function getNextOrganizationMembers(github, org, role = 'all', page = 1, allMembers = []) {
+  return getOrganizationMembers(github, org, role, page)
+    .then((members) => {
+      if (members.length > 0) {
+        allMembers = allMembers.concat(members); // eslint-disable-line no-param-reassign
+        return getNextOrganizationMembers(github, org, role, page + 1, allMembers);
+      }
+      return Promise.resolve(allMembers);
+    });
+}
 
 /* eslint-disable camelcase */
-const getTeamMembers = (github, team_id, page = 1) => github.teams.listMembers({ team_id, per_page: 100, page }).then(teams => teams.data);
+const getTeamMembers = (github, team_id, page = 1) => github.teams
+  .listMembers({ team_id, per_page: 100, page })
+  .then(teams => teams.data);
 
-const getNextTeamMembers = (github, team_id, page = 1, allMembers = []) => getTeamMembers(github, team_id, page)
-  .then((members) => {
-    if (members.length > 0) {
-      allMembers = allMembers.concat(members); // eslint-disable-line no-param-reassign
-      return getNextTeamMembers(github, team_id, page + 1, allMembers);
-    }
-    return Promise.resolve(allMembers);
-  });
+function getNextTeamMembers(github, team_id, page = 1, allMembers = []) {
+  return getTeamMembers(github, team_id, page)
+    .then((members) => {
+      if (members.length > 0) {
+        allMembers = allMembers.concat(members); // eslint-disable-line no-param-reassign
+        return getNextTeamMembers(github, team_id, page + 1, allMembers);
+      }
+      return Promise.resolve(allMembers);
+    });
+}
 /* eslint-enable camelcase */
 
-const removeOrganizationMember = (github, org, username) => github.orgs.removeMember({ org, username });
+const removeOrganizationMember = (github, org, username) => github.orgs
+  .removeMember({ org, username });
 
 const getRepositories = (github, page = 1) => github.repos.getAll({ per_page: 100, page })
   .then(repos => Promise.resolve(repos.data));
@@ -134,14 +143,16 @@ const getCollaborators = (github, owner, repo, page = 1) => github.repos.listCol
 })
   .then(collabs => Promise.resolve(collabs.data));
 
-const getNextCollaborators = (github, owner, repo, page = 1, allCollabs = []) => getCollaborators(github, owner, repo, page)
-  .then((collabs) => {
-    if (collabs.length > 0) {
-      allCollabs = allCollabs.concat(collabs); // eslint-disable-line no-param-reassign
-      return getNextCollaborators(github, owner, repo, page + 1, allCollabs);
-    }
-    return Promise.resolve(allCollabs);
-  });
+function getNextCollaborators(github, owner, repo, page = 1, allCollabs = []) {
+  return getCollaborators(github, owner, repo, page)
+    .then((collabs) => {
+      if (collabs.length > 0) {
+        allCollabs = allCollabs.concat(collabs); // eslint-disable-line no-param-reassign
+        return getNextCollaborators(github, owner, repo, page + 1, allCollabs);
+      }
+      return Promise.resolve(allCollabs);
+    });
+}
 
 module.exports = {
   checkPermissions: (user, owner, repo) => githubClient(user.githubAccessToken)
@@ -210,7 +221,8 @@ module.exports = {
     return githubClient(accessToken)
       .then(github => getOrganizations(github))
       .then((organizations) => {
-        const approvedOrg = organizations.find(organization => approvedOrgs.indexOf(organization.id) >= 0);
+        const approvedOrg = organizations
+          .find(organization => approvedOrgs.indexOf(organization.id) >= 0);
 
         if (!approvedOrg) {
           throw new Error('Unauthorized');

@@ -3,7 +3,8 @@ const { Site, User } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const FederalistUsersHelper = require('../services/FederalistUsersHelper');
 
-const checkGithubRepository = ({ user, owner, repository }) => GitHub.getRepository(user, owner, repository)
+const checkGithubRepository = ({ user, owner, repository }) => GitHub
+  .getRepository(user, owner, repository)
   .then((repo) => {
     if (!repo) {
       throw {
@@ -63,7 +64,8 @@ const createSiteMembership = ({ user, siteParams }) => {
     }).then(() => site.addUser(user)).then(() => site);
 };
 
-const revokeSiteMembership = ({ user, site, userId }) => GitHub.checkPermissions(user, site.owner, site.repository)
+const revokeSiteMembership = ({ user, site, userId }) => GitHub
+  .checkPermissions(user, site.owner, site.repository)
   .then((permissions) => {
     if (user.id !== Number(userId) && !permissions.admin) {
       throw {

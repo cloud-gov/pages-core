@@ -2,7 +2,8 @@ const { Op } = require('sequelize');
 const { logger } = require('../../winston');
 const { Build, Site, User } = require('../models');
 
-const buildBranch = (site, branch) => User.findOne({ where: { username: process.env.USER_AUDITOR } })
+const buildBranch = (site, branch) => User
+  .findOne({ where: { username: process.env.USER_AUDITOR } })
   .then(user => Build.create({
     site: site.id,
     user: user.id,

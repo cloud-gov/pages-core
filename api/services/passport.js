@@ -13,6 +13,7 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
     .then(() => User.findOrCreate({
       where: { username: profile.username.toLowerCase() },
       defaults: {
+        // eslint-disable-next-line no-underscore-dangle
         email: profile._json.email,
         username: profile.username,
       },

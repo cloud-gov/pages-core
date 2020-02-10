@@ -27,7 +27,8 @@ module.exports = {
         return PublishedBranchSerializer.serialize(site, branch);
       })
       .then((branchJSON) => {
-        pagedFilesResponse.files = pagedFilesResponse.files.map(file => Object.assign(file, { publishedBranch: branchJSON }));
+        pagedFilesResponse.files = pagedFilesResponse.files
+          .map(file => Object.assign(file, { publishedBranch: branchJSON }));
 
         res.json(pagedFilesResponse);
       })
