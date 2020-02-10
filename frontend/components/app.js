@@ -9,7 +9,6 @@ import LoadingIndicator from './LoadingIndicator';
 import BuildStatusNotifier from '../util/buildStatusNotifier';
 
 export class App extends React.Component {
-
   componentWillMount() {
     BuildStatusNotifier.listen();
   }

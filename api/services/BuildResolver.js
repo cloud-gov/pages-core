@@ -2,14 +2,12 @@ const { Build, Site } = require('../models');
 const buildErrors = require('../responses/buildErrors');
 const GitHub = require('../services/GitHub');
 
-const rejectBuild = msg =>
-  Promise.reject({
-    status: 404,
-    message: msg,
-  });
+const rejectBuild = msg => Promise.reject({
+  status: 404,
+  message: msg,
+});
 
-const getBranchFromGithub = ({ user, site, branch }) =>
-  GitHub.getBranch(user, site.owner, site.repository, branch)
+const getBranchFromGithub = ({ user, site, branch }) => GitHub.getBranch(user, site.owner, site.repository, branch)
   .then(branchInfo => ({
     branch: branchInfo.name,
     site: site.id,
@@ -26,13 +24,13 @@ const getBuildById = (user, params) => {
       site: siteId,
     },
   })
-  .then((model) => {
-    if (model) {
-      return model;
-    }
+    .then((model) => {
+      if (model) {
+        return model;
+      }
 
-    return rejectBuild(buildErrors.BUILD_NOT_FOUND);
-  });
+      return rejectBuild(buildErrors.BUILD_NOT_FOUND);
+    });
 };
 
 const getBuildByBranch = (user, params) => {
@@ -49,21 +47,21 @@ const getBuildByBranch = (user, params) => {
       required: false,
     },
   })
-  .then((model) => {
-    const site = model;
-    const build = site.Builds && site.Builds[0];
+    .then((model) => {
+      const site = model;
+      const build = site.Builds && site.Builds[0];
 
-    // The branch we want to create a new build from has been built via federalist before
-    if (build) {
-      return Object.assign({}, build.toJSON(), {
-        commitSha: build.commitSha || sha,
-      });
-    }
+      // The branch we want to create a new build from has been built via federalist before
+      if (build) {
+        return Object.assign({}, build.toJSON(), {
+          commitSha: build.commitSha || sha,
+        });
+      }
 
-    // We don't have a build record, using this branch, go to github and check if the
-    // requested branch is a valid one for the current site.
-    return getBranchFromGithub({ user, site, branch });
-  });
+      // We don't have a build record, using this branch, go to github and check if the
+      // requested branch is a valid one for the current site.
+      return getBranchFromGithub({ user, site, branch });
+    });
 };
 
 const BuildResolver = {

@@ -6,8 +6,7 @@ const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter
 const { Build, User, Site } = require('../models');
 const { logger } = require('../../winston');
 
-const signBlob = (key, blob) =>
-  `sha1=${crypto.createHmac('sha1', key).update(blob).digest('hex')}`;
+const signBlob = (key, blob) => `sha1=${crypto.createHmac('sha1', key).update(blob).digest('hex')}`;
 
 const findUserForWebhookRequest = (request) => {
   const username = request.body.sender.login;
@@ -16,13 +15,13 @@ const findUserForWebhookRequest = (request) => {
     where: { username: username.toLowerCase() },
     defaults: { username },
   })
-  .then((users) => {
-    if (!users.length) {
-      throw new Error(`Unable to find or create Federalist user with username ${username}`);
-    } else {
-      return users[0];
-    }
-  });
+    .then((users) => {
+      if (!users.length) {
+        throw new Error(`Unable to find or create Federalist user with username ${username}`);
+      } else {
+        return users[0];
+      }
+    });
 };
 
 const findSiteForWebhookRequest = (request) => {
@@ -36,13 +35,13 @@ const findSiteForWebhookRequest = (request) => {
       buildStatus: { [Sequelize.Op.ne]: 'inactive' },
     },
   })
-  .then((site) => {
-    if (!site) {
-      throw new Error(`Unable to find an active Federalist site with ${owner}/${repository}`);
-    } else {
-      return site;
-    }
-  });
+    .then((site) => {
+      if (!site) {
+        throw new Error(`Unable to find an active Federalist site with ${owner}/${repository}`);
+      } else {
+        return site;
+      }
+    });
 };
 
 const addUserToSite = ({ user, site }) => user.addSite(site);
@@ -76,12 +75,12 @@ const createBuildForWebhookRequest = (request) => {
     };
     return addUserToSite(buildParams);
   })
-  .then(() => Build.create({
-    branch: request.body.ref.replace('refs/heads/', ''),
-    commitSha: request.body.after,
-    site: buildParams.site.id,
-    user: buildParams.user.id,
-  }));
+    .then(() => Build.create({
+      branch: request.body.ref.replace('refs/heads/', ''),
+      commitSha: request.body.after,
+      site: buildParams.site.id,
+      user: buildParams.user.id,
+    }));
 };
 
 module.exports = {
@@ -93,27 +92,27 @@ module.exports = {
 
       return null;
     })
-    .then((build) => {
-      if (!build) {
-        res.ok('No new commits found. No build scheduled.');
-        return null;
-      }
+      .then((build) => {
+        if (!build) {
+          res.ok('No new commits found. No build scheduled.');
+          return null;
+        }
 
-      return GithubBuildStatusReporter.reportBuildStatus(build)
-      .then(() => buildSerializer.serialize(build));
-    })
-    .then((buildJSON) => {
-      if (buildJSON) {
-        res.json(buildJSON);
-      }
-    })
-    .catch((err) => {
-      if (err.message) {
-        res.badRequest(err);
-      } else {
-        logger.error(err);
-        res.badRequest();
-      }
-    });
+        return GithubBuildStatusReporter.reportBuildStatus(build)
+          .then(() => buildSerializer.serialize(build));
+      })
+      .then((buildJSON) => {
+        if (buildJSON) {
+          res.json(buildJSON);
+        }
+      })
+      .catch((err) => {
+        if (err.message) {
+          res.badRequest(err);
+        } else {
+          logger.error(err);
+          res.badRequest();
+        }
+      });
   },
 };

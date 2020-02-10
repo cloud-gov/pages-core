@@ -29,11 +29,14 @@ const genericErrorMsg = (
       <li>log out and back in to your account</li>
     </ol>
     If this error persists, please contact us, we apologize for the inconvenience.
-</span>);
+  </span>
+);
 
 const cloudDotGovErrorRegex = /^404 Not Found: Requested route \('.*'\) does not exist./;
 
-const AlertBanner = ({ children, header, message, status, alertRole }) => {
+const AlertBanner = ({
+  children, header, message, status, alertRole,
+}) => {
   if (!message) {
     return null;
   }

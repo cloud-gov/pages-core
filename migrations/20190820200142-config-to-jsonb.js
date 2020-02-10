@@ -30,8 +30,7 @@ const convertSiteConfigsToJSON = (db, site) => {
   return db.runSql(cmdUpdateSiteRecord);
 };
 
-const convertAllSitesConfigsToJSON = (db, sites) =>
-  Promise.all(sites.rows.map(site => convertSiteConfigsToJSON(db, site)));
+const convertAllSitesConfigsToJSON = (db, sites) => Promise.all(sites.rows.map(site => convertSiteConfigsToJSON(db, site)));
 
 exports.up = (db, callback) => {
   let sites;
@@ -82,8 +81,7 @@ const cmdGetSitesJSON = 'SELECT id, "defaultConfig", "demoConfig", "previewConfi
   + ' OR ("demoConfig" is not null)'
   + ' OR ("previewConfig" is not null)';
 
-const convertAllSitesConfigsToYAML = (db, sites) =>
-  Promise.all(sites.rows.map(site => convertSiteConfigsToYAML(db, site)));
+const convertAllSitesConfigsToYAML = (db, sites) => Promise.all(sites.rows.map(site => convertSiteConfigsToYAML(db, site)));
 
 exports.down = (db, callback) => {
   let sites;

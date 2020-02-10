@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y git
 RUN mkdir -p /app
 
 WORKDIR /app
-ADD . /app
+COPY . /app
 
 RUN yarn config set cache-folder /app/.yarn-cache
 

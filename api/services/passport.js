@@ -62,8 +62,8 @@ passport.callback = (req, res) => {
     } else {
       req.flash('error', {
         title: 'Unauthorized',
-        message: 'Apologies; you don\'t have access to Federalist! ' +
-                 'Please contact the Federalist team if this is in error.',
+        message: 'Apologies; you don\'t have access to Federalist! '
+                 + 'Please contact the Federalist team if this is in error.',
       });
       res.redirect('/');
     }

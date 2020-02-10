@@ -66,7 +66,9 @@ export class SiteContainer extends React.Component {
   }
 
   render() {
-    const { sites, children, params, location, alert } = this.props;
+    const {
+      sites, children, params, location, alert,
+    } = this.props;
 
     if (sites.isLoading || !sites.data) {
       return <LoadingIndicator />;

@@ -17,7 +17,9 @@ const getUrlAndViewText = (branchName, viewLink, site, completedAt) => {
   return { url: viewLink, viewText };
 };
 
-export const BranchViewLink = ({ branchName, viewLink, site, showIcon, completedAt }) => {
+export const BranchViewLink = ({
+  branchName, viewLink, site, showIcon, completedAt,
+}) => {
   const { url, viewText } = getUrlAndViewText(branchName, viewLink, site, completedAt);
 
   if (showIcon) {

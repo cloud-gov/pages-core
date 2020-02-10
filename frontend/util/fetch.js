@@ -12,8 +12,8 @@ const defaultHeaders = {
 
 function mergeParams(url, params) {
   return Object.keys(params).reduce((memo, param, index) => (
-    `${memo}${!index ? '?' : '&'}${param}=${params[param]}`)
-  , url);
+    `${memo}${!index ? '?' : '&'}${param}=${params[param]}`),
+  url);
 }
 
 function checkStatus(response) {
