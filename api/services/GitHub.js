@@ -93,16 +93,16 @@ const sendCreateGithubStatusRequest = (github, options, attempt = 0) => {
 const getOrganizationMembers = (github, org, role = 'all', page = 1) => github.orgs.listMembers({
   org, per_page: 100, page, role,
 })
-  .then(orgs => Promise.resolve(orgs.data));
+  .then(orgs => orgs.data);
 
-function getNextOrganizationMembers(github, org, role = 'all', page = 1, allMembers = []) {
+function getNextOrganizationMembers(github, org, role = 'all', { page = 1, allMembers = [] } = {}) {
   return getOrganizationMembers(github, org, role, page)
     .then((members) => {
       if (members.length > 0) {
         allMembers = allMembers.concat(members); // eslint-disable-line no-param-reassign
-        return getNextOrganizationMembers(github, org, role, page + 1, allMembers);
+        return getNextOrganizationMembers(github, org, role, { page: page + 1, allMembers });
       }
-      return Promise.resolve(allMembers);
+      return allMembers;
     });
 }
 
@@ -118,7 +118,7 @@ function getNextTeamMembers(github, team_id, page = 1, allMembers = []) {
         allMembers = allMembers.concat(members); // eslint-disable-line no-param-reassign
         return getNextTeamMembers(github, team_id, page + 1, allMembers);
       }
-      return Promise.resolve(allMembers);
+      return allMembers;
     });
 }
 /* eslint-enable camelcase */
@@ -127,7 +127,7 @@ const removeOrganizationMember = (github, org, username) => github.orgs
   .removeMember({ org, username });
 
 const getRepositories = (github, page = 1) => github.repos.getAll({ per_page: 100, page })
-  .then(repos => Promise.resolve(repos.data));
+  .then(repos => repos.data);
 
 const getNextRepositories = (github, page = 1, allRepos = []) => getRepositories(github, page)
   .then((repos) => {
@@ -135,22 +135,22 @@ const getNextRepositories = (github, page = 1, allRepos = []) => getRepositories
       allRepos = allRepos.concat(repos); // eslint-disable-line no-param-reassign
       return getNextRepositories(github, page + 1, allRepos);
     }
-    return Promise.resolve(allRepos);
+    return allRepos;
   });
 
 const getCollaborators = (github, owner, repo, page = 1) => github.repos.listCollaborators({
   owner, repo, per_page: 100, page,
 })
-  .then(collabs => Promise.resolve(collabs.data));
+  .then(collabs => collabs.data);
 
-function getNextCollaborators(github, owner, repo, page = 1, allCollabs = []) {
+function getNextCollaborators(github, owner, repo, { page = 1, allCollabs = [] } = {}) {
   return getCollaborators(github, owner, repo, page)
     .then((collabs) => {
       if (collabs.length > 0) {
         allCollabs = allCollabs.concat(collabs); // eslint-disable-line no-param-reassign
-        return getNextCollaborators(github, owner, repo, page + 1, allCollabs);
+        return getNextCollaborators(github, owner, repo, { page: page + 1, allCollabs });
       }
-      return Promise.resolve(allCollabs);
+      return allCollabs;
     });
 }
 
