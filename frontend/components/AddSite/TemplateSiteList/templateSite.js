@@ -55,29 +55,32 @@ class TemplateSite extends React.Component {
         <div className="federalist-template-list-item-content">
           <h3 className="federalist-template-title">{this.props.title}</h3>
           <p>{this.props.description}</p>
-          {this.getFormVisible() ?
-            <form
-              className="new-site-form"
-              onSubmit={this.handleSubmit}
-            >
-              <label htmlFor="repository">What GitHub account will own your site?</label>
-              <input
-                name="owner"
-                type="text"
-                value={this.state.owner}
-                onChange={this.handleChange}
-              />
-              <label htmlFor="repository">Name your new site</label>
-              <input
-                name="repository"
-                type="text"
-                value={this.state.repository}
-                onChange={this.handleChange}
-              />
-              <input type="submit" className="usa-button usa-button-primary" value="Create site" />
-            </form>
-          : null}
-          {!this.getFormVisible() &&
+          {this.getFormVisible()
+            ? (
+              <form
+                className="new-site-form"
+                onSubmit={this.handleSubmit}
+              >
+                <label htmlFor="repository">What GitHub account will own your site?</label>
+                <input
+                  name="owner"
+                  type="text"
+                  value={this.state.owner}
+                  onChange={this.handleChange}
+                />
+                <label htmlFor="repository">Name your new site</label>
+                <input
+                  name="repository"
+                  type="text"
+                  value={this.state.repository}
+                  onChange={this.handleChange}
+                />
+                <input type="submit" className="usa-button usa-button-primary" value="Create site" />
+              </form>
+            )
+            : null}
+          {!this.getFormVisible()
+            && (
             <div>
               <a
                 href={this.props.example}
@@ -96,6 +99,7 @@ class TemplateSite extends React.Component {
                 Use this template
               </button>
             </div>
+            )
           }
         </div>
       </div>

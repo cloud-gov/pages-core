@@ -62,16 +62,18 @@ class SiteBuildLogs extends React.Component {
                   onClick={this.toggleAutoRefresh}
                   data-test="toggle-auto-refresh"
                 >
-                  Auto Refresh: <b>{autoRefresh ? 'ON' : 'OFF'}</b>
+                  Auto Refresh:
+                  {' '}
+                  <b>{autoRefresh ? 'ON' : 'OFF'}</b>
                 </a>
               </div>
               <RefreshBuildLogsButton buildId={buildId} />
             </li>
           </ul>
         </div>
-        { buildLogs.isLoading ?
-          <LoadingIndicator /> :
-          <SiteBuildLogTable buildLogs={buildLogs.data} />
+        { buildLogs.isLoading
+          ? <LoadingIndicator />
+          : <SiteBuildLogTable buildLogs={buildLogs.data} />
         }
       </div>
     );

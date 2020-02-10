@@ -29,7 +29,7 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const publishedFiles = nextProps.publishedFiles;
+    const { publishedFiles } = nextProps;
 
     if (publishedFiles.data && !publishedFiles.isLoading) {
       const files = publishedFiles.data.files || [];
@@ -61,7 +61,7 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   nextPage() {
-    const currentPage = this.state.currentPage;
+    const { currentPage } = this.state;
     const nextPage = currentPage + 1;
 
     if (this.shouldDisableNextPage()) {
@@ -107,14 +107,18 @@ class SitePublishedFilesTable extends React.Component {
           disabled={this.shouldDisablePreviousPage()}
           onClick={this.previousPage}
           title="View the previous page of published files"
-        >&laquo; Previous</button>
+        >
+&laquo; Previous
+        </button>
 
         <button
           className={nextButtonClass}
           disabled={this.shouldDisableNextPage()}
           onClick={this.nextPage}
           title="View the next page of published files"
-        >Next &raquo;</button>
+        >
+Next &raquo;
+        </button>
       </nav>
     );
   }
@@ -182,7 +186,7 @@ class SitePublishedFilesTable extends React.Component {
 
     if (this.props.publishedFiles.isLoading) {
       return this.renderLoadingState();
-    } else if (!files.length) {
+    } if (!files.length) {
       return this.renderEmptyState();
     }
     return this.renderPublishedFilesTable(files);

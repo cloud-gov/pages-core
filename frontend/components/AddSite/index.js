@@ -42,7 +42,9 @@ export class AddSite extends React.Component {
 
   onCreateSiteSubmit({ repoUrl, engine, defaultBranch }) {
     const { owner, repository } = getOwnerAndRepo(repoUrl);
-    siteActions.addSite({ owner, repository, engine, defaultBranch });
+    siteActions.addSite({
+      owner, repository, engine, defaultBranch,
+    });
   }
 
   onSubmitTemplate(site) {
@@ -58,8 +60,8 @@ export class AddSite extends React.Component {
   render() {
     // select the function to use on form submit based on
     // the showAddNewSiteFields flag
-    const formSubmitFunc = this.props.showAddNewSiteFields ?
-      this.onCreateSiteSubmit : this.onAddUserSubmit;
+    const formSubmitFunc = this.props.showAddNewSiteFields
+      ? this.onCreateSiteSubmit : this.onAddUserSubmit;
     const { alert } = this.props;
 
     return (

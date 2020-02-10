@@ -5,10 +5,12 @@ import { IconGitHub } from './icons';
 
 const BASE = 'https://github.com';
 
-const GitHubLink = ({ owner, repository, text, branch, sha, ...props }) => {
+const GitHubLink = ({
+  owner, repository, text, branch, sha, ...props
+}) => {
   const baseHref = `${BASE}/${owner}/${repository}`;
 
-  let title = props.title;
+  let { title } = props;
   let href = baseHref;
 
   if (branch) {
@@ -27,7 +29,8 @@ const GitHubLink = ({ owner, repository, text, branch, sha, ...props }) => {
       target="_blank"
       rel="noopener noreferrer"
     >
-      {text}&nbsp;<IconGitHub />
+      {text}
+      <IconGitHub />
     </a>
   );
 };

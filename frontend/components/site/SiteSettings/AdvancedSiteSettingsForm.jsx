@@ -20,13 +20,13 @@ export const AdvancedSiteSettingsForm = ({
       <Field
         name="engine"
         id="engine"
-        component={p =>
+        component={p => (
           <SelectSiteEngine
             value={p.input.value}
             onChange={p.input.onChange}
             className="form-control"
           />
-        }
+        )}
       />
     </div>
     <div className="well">
@@ -36,7 +36,9 @@ export const AdvancedSiteSettingsForm = ({
         <p className="well-text">
           Add additional configuration in yaml to be added to your
           {' '}
-          <code>_config.yml</code> file when we build your site&apos;s primary branch.
+          <code>_config.yml</code>
+          {' '}
+file when we build your site&apos;s primary branch.
         </p>
         <label htmlFor="defaultConfig">Site configuration</label>
         <Field
@@ -53,7 +55,9 @@ export const AdvancedSiteSettingsForm = ({
         <p className="well-text">
           Add additional configuration in yaml to be added to your
           {' '}
-          <code>_config.yml</code> file when we build your site&apos;s demo branch.
+          <code>_config.yml</code>
+          {' '}
+file when we build your site&apos;s demo branch.
         </p>
         <label htmlFor="demoConfig">Demo configuration</label>
         <Field
@@ -70,7 +74,9 @@ export const AdvancedSiteSettingsForm = ({
         <p className="well-text">
           Add additional configuration in yaml to be added to your
           {' '}
-          <code>_config.yml</code> file when we build a preview branch for your site.
+          <code>_config.yml</code>
+          {' '}
+file when we build a preview branch for your site.
         </p>
         <label htmlFor="previewConfig">Preview configuration</label>
         <Field

@@ -48,13 +48,13 @@ export const AddRepoSiteForm = ({
           <Field
             name="engine"
             id="engine"
-            component={p =>
+            component={p => (
               <SelectSiteEngine
                 value={p.input.value}
                 onChange={p.input.onChange}
                 className="form-control"
               />
-            }
+            )}
           />
         </div>
         <div className="form-group">
@@ -69,7 +69,7 @@ export const AddRepoSiteForm = ({
           />
         </div>
       </div>
-    )}
+      )}
     <button
       type="submit"
       className="usa-button usa-button-primary"

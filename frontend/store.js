@@ -1,5 +1,7 @@
 /* global window */
-import { combineReducers, compose, createStore, applyMiddleware } from 'redux';
+import {
+  combineReducers, compose, createStore, applyMiddleware,
+} from 'redux';
 import logger from 'redux-logger';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { routerReducer } from 'react-router-redux';
@@ -40,7 +42,7 @@ const store = createStore(
   compose(...enhancers)(...middlewares)
 );
 
-const dispatch = store.dispatch;
+const { dispatch } = store;
 
 export { dispatch };
 export default store;

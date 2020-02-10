@@ -13,7 +13,9 @@ import { duration, timeFrom } from '../../util/datetime';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
 import BranchViewLink from '../branchViewLink';
-import { IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner } from '../icons';
+import {
+  IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner,
+} from '../icons';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
@@ -42,7 +44,6 @@ const buildStateData = (buildState) => {
 };
 
 class SiteBuilds extends React.Component {
-
   static getUsername(build) {
     if (build.user) {
       return build.user.username;
@@ -108,8 +109,8 @@ class SiteBuilds extends React.Component {
   }
 
   renderEmptyState() {
-    const message = 'If this site was just added, the ' +
-      'first build should be available within a few minutes.';
+    const message = 'If this site was just added, the '
+      + 'first build should be available within a few minutes.';
     return (
       <AlertBanner
         status="info"
@@ -136,62 +137,66 @@ class SiteBuilds extends React.Component {
               onClick={this.toggleAutoRefresh}
               data-test="toggle-auto-refresh"
             >
-              Auto Refresh: <b>{autoRefresh ? 'ON' : 'OFF'}</b>
+              Auto Refresh:
+              {' '}
+              <b>{autoRefresh ? 'ON' : 'OFF'}</b>
             </a>
             <RefreshBuildsButton site={site} />
           </div>
         </div>
-        { builds.isLoading ?
-          <LoadingIndicator /> :
-          <div className="table-container">
-            <table
-              className="usa-table-borderless log-table log-table__site-builds table-full-width"
-            >
-              <thead>
-                <tr>
-                  <th scope="col">Branch</th>
-                  <th scope="col">Message</th>
-                  <th scope="col">User</th>
-                  <th scope="col">Completed</th>
-                  <th scope="col">Duration</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {builds.data.map((build) => {
-                  const { message, icon } = buildStateData(build.state);
+        { builds.isLoading
+          ? <LoadingIndicator />
+          : (
+            <div className="table-container">
+              <table
+                className="usa-table-borderless log-table log-table__site-builds table-full-width"
+              >
+                <thead>
+                  <tr>
+                    <th scope="col">Branch</th>
+                    <th scope="col">Message</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Completed</th>
+                    <th scope="col">Duration</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {builds.data.map((build) => {
+                    const { message, icon } = buildStateData(build.state);
 
-                  return (
-                    <tr key={build.id}>
-                      <th scope="row" data-title="Branch">
-                        <div>
-                          <p className="commit-link truncate">
+                    return (
+                      <tr key={build.id}>
+                        <th scope="row" data-title="Branch">
+                          <div>
+                <p className="commit-link truncate">
                             { React.createElement(icon) }
                             { SiteBuilds.commitLink(build) }
                           </p>
-                          <div>
-                            { previewBuilds[build.branch] === build.id && build.state === 'success' &&
-                            <BranchViewLink branchName={build.branch} viewLink={build.viewLink} site={site} showIcon completedAt={build.completedAt} /> }
+                <div>
+                            { previewBuilds[build.branch] === build.id && build.state === 'success'
+                            && <BranchViewLink branchName={build.branch} viewLink={build.viewLink} site={site} showIcon completedAt={build.completedAt} /> }
                           </div>
-                        </div>
-                      </th>
-                      <td data-title="Message">
-                        <div>
-                          <p>{ message }</p>
-                          { SiteBuilds.buildLogsLink(build) }
-                        </div>
-                      </td>
-                      <td data-title="User"><span>{ SiteBuilds.getUsername(build) }</span></td>
-                      <td data-title="Completed"><span>{ timeFrom(build.completedAt) }</span></td>
-                      <td data-title="Duration">
-                        <span>
-                          { duration(build.startedAt, build.completedAt) }
-                        </span>
-                      </td>
-                      <td data-title="Actions" className="table-actions">
-                        <span>
-                          {
-                            ['error', 'success'].includes(build.state) &&
+              </div>
+                        </th>
+                        <td data-title="Message">
+                          <div>
+                <p>{ message }</p>
+                { SiteBuilds.buildLogsLink(build) }
+              </div>
+                        </td>
+                        <td data-title="User"><span>{ SiteBuilds.getUsername(build) }</span></td>
+                        <td data-title="Completed"><span>{ timeFrom(build.completedAt) }</span></td>
+                        <td data-title="Duration">
+                          <span>
+                { duration(build.startedAt, build.completedAt) }
+              </span>
+                        </td>
+                        <td data-title="Actions" className="table-actions">
+                          <span>
+                {
+                            ['error', 'success'].includes(build.state)
+                            && (
                             <CreateBuildLink
                               handlerParams={{ buildId: build.id, siteId: site.id }}
                               handleClick={actions.restartBuild}
@@ -199,16 +204,18 @@ class SiteBuilds extends React.Component {
                             >
                               Rebuild
                             </CreateBuildLink>
+                            )
                           }
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            { builds.data.length >= 100 ? <p>List only displays 100 most recent builds.</p> : null }
-          </div>}
+              </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              { builds.data.length >= 100 ? <p>List only displays 100 most recent builds.</p> : null }
+            </div>
+          )}
       </div>
     );
   }

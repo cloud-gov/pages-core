@@ -89,7 +89,8 @@ class SiteSettings extends React.Component {
             href="https://federalist.18f.gov/documentation/previews/"
           >
             viewing site previews
-          </a>.
+          </a>
+.
         </p>
         <BasicSiteSettings
           initialValues={basicInitialValues}

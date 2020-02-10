@@ -19,22 +19,27 @@ function getViewLink(viewLink, repo) {
       rel="noopener noreferrer"
       className="view-site-link"
     >
-      View site <IconView />
-    </a>);
+      View site
+      {' '}
+      <IconView />
+    </a>
+  );
 }
 
 const handleRemoveSite = (site, user) => (event) => {
   event.preventDefault();
   siteActions.removeUserFromSite(site.id, user.id)
-  .then(() => siteActions.fetchSites());
+    .then(() => siteActions.fetchSites());
 };
 
-const SiteListItem = ({ site, user }) =>
-  (<li className="sites-list-item">
+const SiteListItem = ({ site, user }) => (
+  <li className="sites-list-item">
     <div className="sites-list-item-text">
       <h4 className="site-list-item-title">
         <Link to={`/sites/${site.id}`} title="View site settings">
-          { site.owner }/{ site.repository }
+          { site.owner }
+/
+          { site.repository }
         </Link>
         {' '}
       </h4>
@@ -46,7 +51,8 @@ const SiteListItem = ({ site, user }) =>
       { getViewLink(site.viewLink, site.repository) }
       <ButtonLink clickHandler={handleRemoveSite(site, user)}>Remove</ButtonLink>
     </div>
-  </li>);
+  </li>
+);
 
 SiteListItem.propTypes = {
   site: PropTypes.shape({

@@ -46,7 +46,8 @@ export class SiteGitHubBranches extends React.Component {
           <span className="commit-link">
             <GitHubLink text={name} owner={owner} repository={repository} branch={name} />
           </span>
-          { isDefault && ' (live branch)' }{ isDemo && ' (demo branch)' }
+          { isDefault && ' (live branch)' }
+          { isDemo && ' (demo branch)' }
           <div className="branch-link">
             {
               isLinkable(name)
