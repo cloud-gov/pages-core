@@ -10,10 +10,10 @@ class CreateBuildLink extends React.Component {
 
   handleClick(event) {
     event.preventDefault();
-    const { handlerParams } = this.props;
+    const { handleClick, handlerParams } = this.props;
     const args = Object.keys(handlerParams).map(key => handlerParams[key]);
 
-    this.props.handleClick.apply(null, args);
+    handleClick.apply(null, args);
   }
 
   render() {

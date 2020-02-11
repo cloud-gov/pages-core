@@ -60,7 +60,9 @@ export class AddSite extends React.Component {
   render() {
     // select the function to use on form submit based on
     // the showAddNewSiteFields flag
-    const formSubmitFunc = this.props.showAddNewSiteFields
+    const { showAddNewSiteFields } = this.props;
+
+    const formSubmitFunc = showAddNewSiteFields
       ? this.onCreateSiteSubmit : this.onAddUserSubmit;
     const { alert } = this.props;
 
@@ -85,7 +87,7 @@ export class AddSite extends React.Component {
           <h2>Use your own GitHub repository</h2>
           <AddRepoSiteForm
             initialValues={{ engine: 'jekyll', defaultBranch: 'master' }}
-            showAddNewSiteFields={this.props.showAddNewSiteFields}
+            showAddNewSiteFields={showAddNewSiteFields}
             onSubmit={formSubmitFunc}
           />
           <TemplateSiteList

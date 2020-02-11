@@ -19,8 +19,11 @@ class NotificationSettings extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
+    const { site: { id } } = this.props;
+    const { value } = this.state;
+
     // eslint-disable-next-line no-alert
-    siteActions.updateSiteUser(this.props.site.id, { buildNotificationSetting: this.state.value });
+    siteActions.updateSiteUser(id, { buildNotificationSetting: value });
   }
 
   handleChange(event) {
@@ -28,6 +31,8 @@ class NotificationSettings extends React.Component {
   }
 
   render() {
+    const { value } = this.state;
+
     return (
       <div>
         <form onSubmit={this.handleSubmit}>
@@ -35,7 +40,7 @@ class NotificationSettings extends React.Component {
             Recieve build notifications:
             <select
               id="buildNotificationSetting"
-              value={this.state.value}
+              value={value}
               onChange={this.handleChange}
             >
               <option value="none">None</option>

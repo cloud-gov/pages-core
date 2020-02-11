@@ -30,49 +30,60 @@ class TemplateSite extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    const repository = getSafeRepoName(this.state.repository);
-    const site = Object.assign({}, this.state, { repository });
+    const { handleSubmit } = this.props;
+    const { repository } = this.state;
 
-    this.props.handleSubmit(site);
+    const safeRepository = getSafeRepoName(repository);
+    const site = Object.assign({}, this.state, { repository: safeRepository });
+
+    handleSubmit(site);
   }
 
   handleChooseActive() {
-    this.props.handleChooseActive(this.props.index);
+    const { index, handleChooseActive } = this.props;
+    handleChooseActive(index);
   }
 
   render() {
+    const {
+      description, example, thumb, title,
+    } = this.props;
+    const { owner, repository } = this.state;
+
     return (
       <div className="federalist-template-list-item">
         <div className="federalist-template-list-item-img">
           <img
             data-action="name-site"
             className="thumbnail"
-            src={this.props.thumb}
-            alt={`Thumbnail screenshot for the ${this.props.title} template`}
+            src={thumb}
+            alt={`Thumbnail screenshot for the ${title} template`}
           />
 
         </div>
         <div className="federalist-template-list-item-content">
-          <h3 className="federalist-template-title">{this.props.title}</h3>
-          <p>{this.props.description}</p>
+          <h3 className="federalist-template-title">{title}</h3>
+          <p>{description}</p>
           {this.getFormVisible()
             ? (
               <form
                 className="new-site-form"
                 onSubmit={this.handleSubmit}
               >
-                <label htmlFor="repository">What GitHub account will own your site?</label>
+                <label htmlFor="owner">What GitHub account will own your site?</label>
                 <input
+                  id="owner"
                   name="owner"
                   type="text"
-                  value={this.state.owner}
+                  value={owner}
                   onChange={this.handleChange}
                 />
                 <label htmlFor="repository">Name your new site</label>
                 <input
+                  id="repository"
                   name="repository"
                   type="text"
-                  value={this.state.repository}
+                  value={repository}
                   onChange={this.handleChange}
                 />
                 <input type="submit" className="usa-button usa-button-primary" value="Create site" />
@@ -83,7 +94,7 @@ class TemplateSite extends React.Component {
             && (
             <div>
               <a
-                href={this.props.example}
+                href={example}
                 target="_blank"
                 rel="noopener noreferrer"
                 role="button"
