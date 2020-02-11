@@ -95,19 +95,23 @@ the original site in Federalist before the copied code
   }
 
   renderSubmit() {
+    const { pristine } = this.props;
+
     return (
       <input
         type="submit"
         className="usa-button usa-button-primary"
         value="Copy site"
-        disabled={this.props.pristine}
+        disabled={pristine}
       />
     );
   }
 
   render() {
+    const { handleSubmit } = this.props;
+
     return (
-      <form onSubmit={this.props.handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <AlertBanner
           status="warning"
           header="This is an alpha feature!"

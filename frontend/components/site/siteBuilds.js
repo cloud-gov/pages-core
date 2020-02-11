@@ -77,11 +77,14 @@ class SiteBuilds extends React.Component {
 
   /* eslint-disable scanjs-rules/call_setInterval */
   componentDidMount() {
-    const { fetchBuilds } = this.props.actions;
-    fetchBuilds({ id: this.props.params.id });
+    const { actions, params } = this.props;
+
+    const { fetchBuilds } = actions;
+    fetchBuilds({ id: params.id });
     this.intervalHandle = setInterval(() => {
-      if (this.state.autoRefresh) {
-        fetchBuilds({ id: this.props.params.id });
+      const { autoRefresh } = this.state;
+      if (autoRefresh) {
+        fetchBuilds({ id: params.id });
       }
     }, REFRESH_INTERVAL);
   }
@@ -109,6 +112,7 @@ class SiteBuilds extends React.Component {
   }
 
   renderEmptyState() {
+    const { site } = this.props;
     const message = 'If this site was just added, the '
       + 'first build should be available within a few minutes.';
     return (
@@ -117,7 +121,7 @@ class SiteBuilds extends React.Component {
         header="This site does not yet have any builds."
         message={message}
       >
-        <RefreshBuildsButton site={this.props.site} />
+        <RefreshBuildsButton site={site} />
       </AlertBanner>
     );
   }
@@ -175,7 +179,15 @@ class SiteBuilds extends React.Component {
                             </p>
                             <div>
                               { previewBuilds[build.branch] === build.id && build.state === 'success'
-                            && <BranchViewLink branchName={build.branch} viewLink={build.viewLink} site={site} showIcon completedAt={build.completedAt} /> }
+                            && (
+                            <BranchViewLink
+                              branchName={build.branch}
+                              viewLink={build.viewLink}
+                              site={site}
+                              showIcon
+                              completedAt={build.completedAt}
+                            />
+                            ) }
                             </div>
                           </div>
                         </th>
@@ -213,7 +225,9 @@ class SiteBuilds extends React.Component {
                   })}
                 </tbody>
               </table>
-              { builds.data.length >= 100 ? <p>List only displays 100 most recent builds.</p> : null }
+              { builds.data.length >= 100
+                ? <p>List only displays 100 most recent builds.</p>
+                : null }
             </div>
           )}
       </div>
@@ -233,7 +247,7 @@ class SiteBuilds extends React.Component {
 
 SiteBuilds.propTypes = {
   builds: PropTypes.shape({
-    isLoading: PropTypes.boolean,
+    isLoading: PropTypes.bool,
     data: PropTypes.arrayOf(BUILD),
   }),
   site: PropTypes.shape({

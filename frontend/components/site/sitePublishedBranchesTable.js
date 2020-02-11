@@ -10,15 +10,16 @@ import AlertBanner from '../alertBanner';
 
 class SitePublishedBranchesTable extends React.Component {
   componentDidMount() {
-    const { id } = this.props.site;
+    const { site: { id } } = this.props;
     publishedBranchActions.fetchPublishedBranches({ id });
   }
 
   publishedBranches() {
-    if (this.props.publishedBranches.isLoading || !this.props.publishedBranches.data) {
+    const { publishedBranches } = this.props;
+    if (publishedBranches.isLoading || !publishedBranches.data) {
       return [];
     }
-    return this.props.publishedBranches.data;
+    return publishedBranches.data;
   }
 
   renderPublishedBranchesTable() {
@@ -44,13 +45,14 @@ class SitePublishedBranchesTable extends React.Component {
   }
 
   renderPublishedBranchRow(branch) {
+    const { site } = this.props;
     return (
       <tr key={branch.name}>
         <td>{branch.name}</td>
         <td>
           <ul className="usa-unstyled-list">
             <li>
-              <BranchViewLink branchName={branch.name} site={this.props.site} />
+              <BranchViewLink branchName={branch.name} site={site} />
             </li>
             <li>
               {this.renderBranchFilesLink(branch)}
@@ -81,8 +83,9 @@ class SitePublishedBranchesTable extends React.Component {
   }
 
   render() {
+    const { publishedBranches } = this.props;
     const branches = this.publishedBranches();
-    if (this.props.publishedBranches.isLoading) {
+    if (publishedBranches.isLoading) {
       return this.renderLoadingState();
     } if (!branches.length) {
       return this.renderEmptyState();

@@ -75,7 +75,7 @@ SiteList.propTypes = {
     data: PropTypes.arrayOf(SITE),
     isLoading: PropTypes.bool,
   }),
-  user: USER,
+  user: USER.isRequired,
 };
 
 SiteList.defaultProps = {

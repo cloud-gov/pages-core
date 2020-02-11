@@ -21,8 +21,10 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   componentDidMount() {
-    const site = { id: this.props.params.id };
-    const branch = this.props.params.name;
+    const { params } = this.props;
+
+    const site = { id: params.id };
+    const branch = params.name;
 
     const startAtKey = null; // start without a startAtKey
     publishedFileActions.fetchPublishedFiles(site, branch, startAtKey);
@@ -47,21 +49,26 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   shouldDisablePreviousPage() {
-    return !this.state.currentPage;
+    const { currentPage } = this.state;
+    return !currentPage;
   }
 
   previousPage() {
-    if (this.state.currentPage > 0) {
-      this.setState({ currentPage: this.state.currentPage - 1 });
+    const { currentPage } = this.state;
+    if (currentPage > 0) {
+      this.setState({ currentPage: currentPage - 1 });
     }
   }
 
   shouldDisableNextPage() {
-    return this.state.currentPage === this.state.lastPage;
+    const { currentPage, lastPage } = this.state;
+    return currentPage === lastPage;
   }
 
   nextPage() {
-    const { currentPage } = this.state;
+    const { params } = this.props;
+    const { currentPage, filesByPage } = this.state;
+
     const nextPage = currentPage + 1;
 
     if (this.shouldDisableNextPage()) {
@@ -71,22 +78,23 @@ class SitePublishedFilesTable extends React.Component {
 
     this.setState({ currentPage: nextPage });
 
-    if (this.state.filesByPage[nextPage]) {
+    if (filesByPage[nextPage]) {
       // short-circuit if already have next files in state
       return;
     }
 
     // else dispatch action to fetch next page of files
-    const site = { id: this.props.params.id };
-    const branch = this.props.params.name;
-    const files = this.state.filesByPage[currentPage];
+    const site = { id: params.id };
+    const branch = params.name;
+    const files = filesByPage[currentPage];
     const startAtKey = files[files.length - 1].key;
 
     publishedFileActions.fetchPublishedFiles(site, branch, startAtKey);
   }
 
   shouldShowButtons() {
-    if (this.state.lastPage !== null && this.state.lastPage === 0) {
+    const { lastPage } = this.state;
+    if (lastPage !== null && lastPage === 0) {
       return false;
     }
     return true;
@@ -124,9 +132,11 @@ Next &raquo;
   }
 
   renderPublishedFilesTable(files) {
+    const { params } = this.props;
+
     return (
       <div>
-        <h3>{this.props.params.name}</h3>
+        <h3>{params.name}</h3>
         <p>
           Use this page to audit the files that Federalist has publicly published.
           Up to 200 files are shown per page.
@@ -182,9 +192,12 @@ Next &raquo;
   }
 
   render() {
-    const files = this.state.filesByPage[this.state.currentPage] || [];
+    const { publishedFiles } = this.props;
+    const { currentPage, filesByPage } = this.state;
 
-    if (this.props.publishedFiles.isLoading) {
+    const files = filesByPage[currentPage] || [];
+
+    if (publishedFiles.isLoading) {
       return this.renderLoadingState();
     } if (!files.length) {
       return this.renderEmptyState();

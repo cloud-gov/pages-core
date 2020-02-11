@@ -63,8 +63,8 @@ SiteListItem.propTypes = {
     repoLastVerified: PropTypes.string,
     createdAt: PropTypes.string,
     viewLink: PropTypes.string,
-  }),
-  user: USER,
+  }).isRequired,
+  user: USER.isRequired,
 };
 
 export default SiteListItem;
