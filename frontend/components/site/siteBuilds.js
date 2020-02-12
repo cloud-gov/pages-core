@@ -166,7 +166,7 @@ class SiteBuilds extends React.Component {
                       <th scope="row" data-title="Branch">
                         <div>
                           <p className="commit-link truncate">
-                            { React.createElement(icon) }
+                            { icon && React.createElement(icon) }
                             { SiteBuilds.commitLink(build) }
                           </p>
                           <div>
