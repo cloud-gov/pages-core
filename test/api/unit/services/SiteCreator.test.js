@@ -464,7 +464,7 @@ describe('SiteCreator', () => {
           sharedBucket: false,
         };
 
-        const name = `owner-${siteParams.owner}-repo-${siteParams.repository}`;
+        const name = `o-${siteParams.owner}-r-${siteParams.repository}`;
         const guid = 'mapped-12345';
         const appGuid = 'app-12345';
         const routeGuid = 'route-12345';

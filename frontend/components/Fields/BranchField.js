@@ -1,6 +1,6 @@
 import React from 'react';
 import { Field } from 'redux-form';
-import validBranchName from '../../util/validators';
+import { validBranchName } from '../../util/validators';
 import InputWithErrorField from './InputWithErrorField';
 
 export const validateBranchName = (value) => {

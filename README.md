@@ -5,7 +5,7 @@
 [![Test Coverage](https://codeclimate.com/github/18F/federalist/badges/coverage.svg)](https://codeclimate.com/github/18F/federalist/coverage)
 [![Known Vulnerabilities](https://snyk.io/test/github/18F/federalist/badge.svg)](https://snyk.io/test/github/18F/federalist)
 
-***Federalist is updated regularly. [Join our public chat room](https://chat.18f.gov/) to talk to us and stay informed. You can also check out our [documentation](https://federalist-docs.18f.gov/) to learn more.***
+***Federalist is updated regularly. [Join our public chat room](https://chat.18f.gov/) to talk to us and stay informed. You can also check out our [documentation](https://federalist.18f.gov/) to learn more.***
 
 ## About Federalist
 
@@ -21,7 +21,7 @@ Partner agencies across the federal government use Federalist to host websites. 
 - [Natural Resources Revenue Data](https://revenuedata.doi.gov/)
 - [NSF Small Business Innovation Research program](https://seedfund.nsf.gov)
 
-More examples can be found at [https://federalist.18f.gov/content/examples](https://federalist.18f.gov/content/examples).
+More examples can be found at [https://federalist.18f.gov/success-stories/](https://federalist.18f.gov/success-stories/).
 
 ## Setting up a local Federalist development environment
 

@@ -9,7 +9,7 @@ describe('GitHub', () => {
     it('should resolve with the repository data if the repo exists', (done) => {
       factory.user().then((user) => {
         githubAPINocks.repo({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           owner: 'repo-owner',
           repo: 'repo-name',
           response: [200, {
@@ -37,7 +37,7 @@ describe('GitHub', () => {
     it('should resolve with null if the repo does not exist', (done) => {
       factory.user().then((user) => {
         githubAPINocks.repo({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           owner: 'repo-owner',
           repo: 'repo-name',
           response: [200, {
@@ -60,7 +60,7 @@ describe('GitHub', () => {
 
       factory.user().then((user) => {
         createRepoNock = githubAPINocks.createRepoForUser({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           repo: 'repo-name',
         });
 
@@ -76,7 +76,7 @@ describe('GitHub', () => {
 
       factory.user().then((user) => {
         createRepoNock = githubAPINocks.createRepoForOrg({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           org: 'org-name',
           repo: 'repo-name',
         });
@@ -93,7 +93,7 @@ describe('GitHub', () => {
 
       factory.user().then((user) => {
         createRepoNock = githubAPINocks.createRepoForUser({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           repo: 'repo-name',
         });
 
@@ -107,7 +107,7 @@ describe('GitHub', () => {
     it('should reject if the user is not authorized to create a repository', (done) => {
       factory.user().then((user) => {
         githubAPINocks.createRepoForOrg({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           org: 'org-name',
           repo: 'repo-name',
           response: [403, {
@@ -126,7 +126,7 @@ describe('GitHub', () => {
     it('should reject if the repo already exists', (done) => {
       factory.user().then((user) => {
         githubAPINocks.createRepoForOrg({
-          accessToken: user.accessToken,
+          accessToken: user.githubAccessToken,
           org: 'org-name',
           repo: 'repo-name',
           response: [422, {
@@ -156,7 +156,7 @@ describe('GitHub', () => {
         .then((model) => {
           site = model;
           githubAPINocks.webhook({
-            accessToken: user.accessToken,
+            accessToken: user.githubAccessToken,
             owner: site.owner,
             repo: site.repository,
             response: 201,
@@ -181,7 +181,7 @@ describe('GitHub', () => {
         .then((model) => {
           site = model;
           githubAPINocks.webhook({
-            accessToken: user.accessToken,
+            accessToken: user.githubAccessToken,
             owner: site.owner,
             repo: site.repository,
             response: [400, {
@@ -208,7 +208,7 @@ describe('GitHub', () => {
         .then((model) => {
           site = model;
           githubAPINocks.webhook({
-            accessToken: user.accessToken,
+            accessToken: user.githubAccessToken,
             owner: site.owner,
             repo: site.repository,
             response: [404, {
@@ -470,5 +470,68 @@ describe('GitHub', () => {
         });
     });
     /* eslint-enable camelcase */
+  });
+
+  describe('.sendCreateGithubStatusRequest', () => {
+    it('sends a github status request and passes on last attempt', (done) => {
+      const accessToken = 'token';
+      const context = `federalist-${config.app.app_env}/build`;
+      const targetURL = `${config.app.hostname}/sites/1/builds/1/logs`;
+      const options = {
+        owner: 'test-owner',
+        repo: 'test-repo',
+        sha: '12344',
+        state: 'success',
+        targetURL,
+        target_url: targetURL,
+        context,
+      };
+
+      const failOptions = Object.assign({}, options);
+      failOptions.response = [404, 'File not found'];
+
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+      const statusNock = githubAPINocks.status(options);
+
+      GitHub.sendCreateGithubStatusRequest(accessToken, options)
+        .then(() => {
+          expect(statusNock.isDone()).to.be.true;
+          done();
+        }).catch(done);
+    });
+
+    it('sends a github status request and failOptions', (done) => {
+      const accessToken = 'token';
+      const context = `federalist-${config.app.app_env}/build`;
+      const targetURL = `${config.app.hostname}/sites/1/builds/1/logs`;
+      const options = {
+        owner: 'test-owner',
+        repo: 'test-repo',
+        sha: '12344',
+        state: 'success',
+        targetURL,
+        target_url: targetURL,
+        context,
+      };
+
+      const failOptions = Object.assign({}, options);
+      failOptions.response = [404, 'File not found'];
+
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+      githubAPINocks.status(failOptions);
+
+      GitHub.sendCreateGithubStatusRequest(accessToken, options)
+        .catch((err) => {
+          expect(err.status).to.equal('Not Found');
+          expect(err.message).to.equal('File not found');
+          done();
+        }).catch(done);
+    });
   });
 });

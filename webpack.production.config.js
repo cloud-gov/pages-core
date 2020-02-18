@@ -53,7 +53,14 @@ module.exports = {
             include: path.resolve(__dirname, 'public/images/icons'),
             use: [
               'babel-loader',
-              'react-svg-loader',
+              {
+                loader: 'react-svg-loader',
+                options: {
+                  svgo: {
+                    plugins: [{ removeViewBox: false }],
+                  },
+                },
+              },
             ],
           },
           {

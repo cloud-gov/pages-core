@@ -1,9 +1,11 @@
 const AWS = require('aws-sdk');
 const url = require('url');
+const yaml = require('js-yaml');
 const S3Helper = require('./S3Helper');
 const config = require('../../config');
 const { logger } = require('../../winston');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
+const { buildViewLink, buildUrl } = require('../utils/build');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -13,42 +15,22 @@ const defaultBranch = build => build.branch === build.Site.defaultBranch;
 const demoBranch = build => build.branch === build.Site.demoBranch;
 
 const siteConfig = (build) => {
+  let siteBuildConfig = '';
   if (defaultBranch(build)) {
-    return build.Site.config;
+    siteBuildConfig = build.Site.defaultConfig;
+  } else if (demoBranch(build)) {
+    siteBuildConfig = build.Site.demoConfig;
+  } else {
+    siteBuildConfig = build.Site.previewConfig;
   }
-  if (demoBranch(build)) {
-    return build.Site.demoConfig;
-  }
-  return build.Site.previewConfig;
+  return siteBuildConfig ? yaml.safeDump(siteBuildConfig) : ''; // to be safedumped
 };
 
-const pathForBuild = (build) => {
-  if (defaultBranch(build)) {
-    return `site/${build.Site.owner}/${build.Site.repository}`;
-  }
-  if (demoBranch(build)) {
-    return `demo/${build.Site.owner}/${build.Site.repository}`;
-  }
-  return `preview/${build.Site.owner}/${build.Site.repository}/${build.branch}`;
-};
+const sitePrefixForBuild = rawDomain => baseURLForDomain(rawDomain).replace(/^(\/)+/, '');
 
-const baseURLForCustomDomain = (rawDomain) => {
-  let domain = rawDomain;
-  if (!domain.match(/https?:\/\//)) {
-    domain = `https://${domain}`;
-  }
-  return url.parse(domain).path.replace(/\/$/, '');
-};
+const baseURLForDomain = rawDomain => url.parse(rawDomain).path.replace(/(\/)+$/, '');
 
-const baseURLForBuild = (build) => {
-  if (defaultBranch(build) && build.Site.domain) {
-    return baseURLForCustomDomain(build.Site.domain);
-  }
-  if (demoBranch(build) && build.Site.demoDomain) {
-    return baseURLForCustomDomain(build.Site.demoDomain);
-  }
-  return `/${pathForBuild(build)}`;
-};
+const baseURLForBuild = build => baseURLForDomain(buildViewLink(build, build.Site));
 
 const statusCallbackURL = build => [
   url.resolve(config.app.hostname, '/v0/build'),
@@ -79,7 +61,7 @@ const generateDefaultCredentials = build => ({
   CONFIG: siteConfig(build),
   REPOSITORY: build.Site.repository,
   OWNER: build.Site.owner,
-  SITE_PREFIX: pathForBuild(build),
+  SITE_PREFIX: sitePrefixForBuild(buildUrl(build, build.Site)),
   GITHUB_TOKEN: build.User.githubAccessToken,
   GENERATOR: build.Site.engine,
   SOURCE_REPO: sourceForBuild(build).repository,
@@ -87,6 +69,7 @@ const generateDefaultCredentials = build => ({
   SKIP_LOGGING: config.app.app_env === 'development',
   AUTH_BASEURL: process.env.APP_HOSTNAME,
   AUTH_ENDPOINT: 'external/auth/github',
+  BUILD_ID: build.id,
 });
 
 const buildContainerEnvironment = (build) => {
@@ -158,8 +141,12 @@ SQS.sendBuildMessage = (build, buildCount) => SQS.messageBodyForBuild(build)
       .then(() => {
         SQS.sqsClient.sendMessage(params, (err) => {
           if (err) {
-            logger.error('There was an error, adding the job to SQS: ', err);
-            build.completeJob(err);
+            const errMsg = `There was an error, adding the job to SQS: ${err}`;
+            logger.error(errMsg);
+            build.updateJobStatus({
+              status: 'error',
+              message: errMsg,
+            });
           }
         });
       });

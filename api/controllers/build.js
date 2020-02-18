@@ -88,28 +88,55 @@ module.exports = {
   },
 
   status: (req, res) => {
-    const message = decodeb64(req.body.message);
-    Promise.resolve(Number(req.params.id))
-    .then((id) => {
-      if (isNaN(id)) {
-        throw 404;
+    let buildStatus;
+
+    const getBuildStatus = (statusRequest) => {
+      let status;
+      let message;
+      try {
+        status = statusRequest.body.status;
+        message = decodeb64(statusRequest.body.message);
+      } catch (err) {
+        status = 'error';
+        message = 'build status message parsing error';
+        const errMsg = [
+          `Error decoding build status message for build@id=${statusRequest.params.id}`,
+          `build@message: ${statusRequest.body.message}`,
+          err,
+        ];
+        logger.error(errMsg.join('\n'));
       }
-      return Build.findByPk(id);
-    })
-    .then((build) => {
-      if (!build) {
-        throw 404;
-      } else if (build.token !== req.params.token) {
-        throw 403;
-      } else {
-        return build.completeJob(message);
-      }
-    })
-    .then(build => Promise.all([
-      emitBuildStatus(res.socket, build),
-      GithubBuildStatusReporter.reportBuildStatus(build),
-    ]))
-    .then(() => res.ok())
-    .catch(res.error);
+      return { status, message };
+    };
+
+    Promise.resolve(getBuildStatus(req))
+      .then((_buildStatus) => {
+        buildStatus = _buildStatus;
+        return Promise.resolve(Number(req.params.id));
+      })
+      .then((id) => {
+        if (isNaN(id)) {
+          throw 404;
+        }
+        return Build.findByPk(id);
+      })
+      .then((build) => {
+        if (!build) {
+          throw 404;
+        } else if (build.token !== req.params.token) {
+          throw 403;
+        } else {
+          return build.updateJobStatus(buildStatus);
+        }
+      })
+      .then((build) => {
+        emitBuildStatus(res.socket, build);
+        return GithubBuildStatusReporter.reportBuildStatus(build);
+      })
+      .then(() => res.ok())
+      .catch((err) => {
+        logger.error(['Error build status reporting to GitHub', err, err.stack].join('\n'));
+        res.error(err);
+      });
   },
 };

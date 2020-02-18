@@ -2,7 +2,8 @@ const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
 const SQS = require('../services/SQS');
 
-const { branchRegex, shaRegex } = require('../utils/validators');
+const { branchRegex, shaRegex, isEmptyOrUrl } = require('../utils/validators');
+const { buildUrl } = require('../utils/build');
 
 const afterCreate = (build) => {
   const { Site, User, Build } = build.sequelize.models;
@@ -10,11 +11,12 @@ const afterCreate = (build) => {
   return Build.findOne({
     where: { id: build.id },
     include: [User, Site],
-  }).then((foundBuild) => {
-    Build.count({
-      where: { site: foundBuild.site },
-    }).then(count => SQS.sendBuildMessage(foundBuild, count));
-  });
+  })
+    .then((foundBuild) => {
+      Build.count({
+        where: { site: foundBuild.site },
+      }).then(count => SQS.sendBuildMessage(foundBuild, count));
+    });
 };
 
 const associate = ({
@@ -44,47 +46,40 @@ const beforeValidate = (build) => {
 
 const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
 
-const completeJobErrorMessage = (err) => {
-  let message = 'An unknown error occurred';
-  if (err) {
-    message = err.message || err;
+const jobErrorMessage = (message = 'An unknown error occurred') => sanitizeCompleteJobErrorMessage(message);
+
+const jobStateUpdate = (buildStatus, build, site, timestamp) => {
+  const atts = {
+    state: buildStatus.status,
+  };
+
+  if (buildStatus.status === 'error') {
+    atts.error = jobErrorMessage(buildStatus.message);
   }
-  return sanitizeCompleteJobErrorMessage(message);
+
+  if (['error', 'success'].includes(buildStatus.status)) {
+    atts.completedAt = timestamp;
+  }
+
+  if (buildStatus.status === 'success') {
+    atts.url = buildUrl(build, site);
+  }
+
+  if (build.state === 'queued' && buildStatus.status === 'processing') {
+    atts.startedAt = timestamp;
+  }
+
+  return build.update(atts);
 };
 
-const completeJobStateUpdate = (err, build, completedAt) => {
-  if (err) {
-    return build.update({
-      state: 'error',
-      error: completeJobErrorMessage(err),
-      completedAt,
-    });
-  }
-  return build.update({
-    state: 'success',
-    error: '',
-    completedAt,
-  });
-};
-
-const completeJobSiteUpdate = (build, completedAt) => {
-  const { Site } = build.sequelize.models;
-
+async function updateJobStatus(buildStatus) {
+  const timestamp = new Date();
+  const site = await this.getSite();
+  const build = await jobStateUpdate(buildStatus, this, site, timestamp);
   if (build.state === 'success') {
-    return Site.update(
-      { publishedAt: completedAt },
-      { where: { id: build.site } }
-    );
+    await site.update({ publishedAt: timestamp });
   }
-  return Promise.resolve();
-};
-
-function completeJob(err) {
-  const completedAt = new Date();
-
-  return completeJobStateUpdate(err, this, completedAt)
-    .then(build => completeJobSiteUpdate(build, completedAt)
-      .then(() => build));
+  return build;
 }
 
 module.exports = (sequelize, DataTypes) => {
@@ -112,8 +107,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     state: {
       type: DataTypes.ENUM,
-      values: ['error', 'processing', 'skipped', 'success'],
-      defaultValue: 'processing',
+      values: ['error', 'processing', 'skipped', 'success', 'queued'],
+      defaultValue: 'queued',
       allowNull: false,
     },
     token: {
@@ -128,16 +123,36 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    startedAt: {
+      type: DataTypes.DATE,
+    },
+    url: {
+      type: DataTypes.STRING,
+      validate: isEmptyOrUrl,
+    },
   }, {
     tableName: 'build',
     hooks: {
       afterCreate,
       beforeValidate,
     },
+    scopes: {
+      forSiteUser: (user, Site, User) => ({
+        include: [{
+          model: Site,
+          required: true,
+          include: [{
+            model: User,
+            where: {
+              id: user.id,
+            },
+          }],
+        }],
+      }),
+    },
   });
 
   Build.associate = associate;
-  Build.prototype.completeJob = completeJob;
-
+  Build.prototype.updateJobStatus = updateJobStatus;
   return Build;
 };

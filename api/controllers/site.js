@@ -7,6 +7,7 @@ const UserActionCreator = require('../services/UserActionCreator');
 const siteSerializer = require('../serializers/site');
 const { User, Site, Build } = require('../models');
 const siteErrors = require('../responses/siteErrors');
+const { logger } = require('../../winston');
 
 const sendJSON = (site, res) => siteSerializer
   .serialize(site)
@@ -77,6 +78,7 @@ module.exports = {
         res.json(siteJSON);
       })
       .catch((err) => {
+        logger.error([err.message, err.stack].join('\n\n'));
         res.error(err);
       });
   },
@@ -156,6 +158,7 @@ module.exports = {
         res.json(siteJSON);
       })
       .catch((err) => {
+        logger.error([JSON.stringify(err), err.stack].join('\n\n'));
         res.error(err);
       });
   },
@@ -182,7 +185,7 @@ module.exports = {
         return site.update({
           demoBranch: params.demoBranch,
           demoDomain: params.demoDomain,
-          config: params.config,
+          defaultConfig: params.defaultConfig,
           previewConfig: params.previewConfig,
           demoConfig: params.demoConfig,
           defaultBranch: params.defaultBranch,

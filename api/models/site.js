@@ -1,7 +1,4 @@
-const validator = require('validator');
-const config = require('../../config');
-
-const { branchRegex, isValidYaml } = require('../utils/validators');
+const { branchRegex, parseSiteConfigs, isEmptyOrUrl } = require('../utils/validators');
 
 const afterValidate = (site) => {
   if (site.defaultBranch === site.demoBranch) {
@@ -52,65 +49,19 @@ const beforeValidate = (site) => {
   if (site.owner) {
     site.owner = site.owner.toLowerCase(); // eslint-disable-line no-param-reassign
   }
+
+  const siteConfigs = {
+    defaultConfig: { value: site.defaultConfig, label: 'Site configuration' },
+    demoConfig: { value: site.demoConfig, label: 'Demo configuration' },
+    previewConfig: { value: site.previewConfig, label: 'Preview configuration' },
+  };
+
+  Object.assign(site, parseSiteConfigs(siteConfigs));
 };
-
-function domainWithSlash(url) {
-  if (url) {
-    if (!url.endsWith('/')) {
-      return `${url}/`;
-    }
-  }
-  return url;
-}
-
-function siteUrl() {
-  if (this.domain) {
-    return domainWithSlash(this.domain);
-  }
-  return `https://${this.awsBucketName}.app.cloud.gov/site/${this.owner}/${this.repository}/`;
-}
-
-function demoUrl() {
-  if (this.demoDomain) {
-    return domainWithSlash(this.demoDomain);
-  }
-  return `https://${this.awsBucketName}.app.cloud.gov/demo/${this.owner}/${this.repository}/`;
-}
-
-function branchPreviewUrl(branch = null) {
-  let url = `https://${this.awsBucketName}.app.cloud.gov/preview/${this.owner}/${this.repository}/`;
-  if (branch) {
-    url = `${url}${branch}/`;
-  }
-  return url;
-}
-
-function viewLinkForBranch(branch) {
-  if (branch === this.defaultBranch) {
-    return this.siteUrl();
-  }
-
-  if (branch === this.demoBranch) {
-    return this.demoUrl();
-  }
-
-  return this.branchPreviewUrl(branch);
-}
 
 function isEmptyOrBranch(value) {
   if (value && value.length && !branchRegex.test(value)) {
     throw new Error('Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
-  }
-}
-
-function isEmptyOrUrl(value) {
-  const validUrlOptions = {
-    require_protocol: true,
-    protocols: ['https'],
-  };
-
-  if (value && value.length && !validator.isURL(value, validUrlOptions)) {
-    throw new Error('URL must start with https://');
   }
 }
 
@@ -128,11 +79,8 @@ module.exports = (sequelize, DataTypes) => {
         isEmptyOrUrl,
       },
     },
-    config: {
-      type: DataTypes.STRING,
-      validate: {
-        isValidYaml,
-      },
+    defaultConfig: {
+      type: DataTypes.JSONB,
     },
     defaultBranch: {
       type: DataTypes.STRING,
@@ -157,16 +105,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     previewConfig: {
-      type: DataTypes.STRING,
-      validate: {
-        isValidYaml,
-      },
+      type: DataTypes.JSONB,
     },
     demoConfig: {
-      type: DataTypes.STRING,
-      validate: {
-        isValidYaml,
-      },
+      type: DataTypes.JSONB,
     },
     publishedAt: {
       type: DataTypes.DATE,
@@ -206,10 +148,6 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Site.associate = associate;
-  Site.prototype.viewLinkForBranch = viewLinkForBranch;
-  Site.prototype.siteUrl = siteUrl;
-  Site.prototype.demoUrl = demoUrl;
-  Site.prototype.branchPreviewUrl = branchPreviewUrl;
 
   Site.withUsers = id => Site.findByPk(id, { include: [sequelize.models.User] });
 

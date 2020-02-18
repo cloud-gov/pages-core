@@ -6,22 +6,31 @@ const config = require('../../config');
 const { logger } = require('../../winston');
 
 function filterEntity(res, name, field = 'name') {
+  let errMsg = `Not found: Entity @${field} = ${name}`;
   const filtered = res.resources.filter(item => item.entity[field] === name);
-
-  if (filtered.length === 1) return filtered[0];
-  return Promise.reject(new Error({
-    message: 'Not found',
-    name,
-    field,
-  }));
+  if (filtered.length === 0) {
+    const error = new Error(errMsg);
+    error.name = name;
+    throw error;
+  }
+  if (name === 'basic-public') {
+    const servicePlan = filtered.find(f => f.entity.unique_id === config.app.s3ServicePlanId);
+    if (!servicePlan) {
+      errMsg = `${errMsg} @basic-public service plan = (${config.app.s3ServicePlanId})`;
+      const error = new Error(errMsg);
+      error.name = name;
+      throw error;
+    }
+    return servicePlan;
+  }
+  return filtered[0];
 }
 
 function firstEntity(res, name) {
   if (res.resources.length === 0) {
-    return Promise.reject(new Error({
-      message: 'Not found',
-      name,
-    }));
+    const error = new Error('Not found');
+    error.name = name;
+    throw error;
   }
 
   return res.resources[0];
@@ -36,7 +45,24 @@ function generateS3ServiceName(owner, repository) {
     .split(' ')
     .join('-');
 
-  return `owner-${format(owner)}-repo-${format(repository)}`;
+  const serviceName = `o-${format(owner)}-r-${format(repository)}`;
+
+  if (serviceName.length < 47) {
+    return serviceName;
+  }
+
+  function makeId() {
+    let result = '';
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    for (let i = 0; i < 6; i += 1) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  }
+
+  const slicedServiceName = `${serviceName.slice(0, 39)}-${makeId()}`;
+  return slicedServiceName;
 }
 
 function isPastAuthThreshold(authDate) {
@@ -72,8 +98,9 @@ function loadDevelopmentManifest() {
 function loadProductionManifest() {
   const manifestFile = 'webpack-manifest.json';
   if (!fs.existsSync(manifestFile)) {
-    logger.error('webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?');
-    throw new Error();
+    const msg = 'webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?';
+    logger.error(msg);
+    throw new Error(msg);
   }
   return JSON.parse(fs.readFileSync(manifestFile, 'utf-8'));
 }
@@ -94,6 +121,34 @@ function shouldIncludeTracking() {
   return config.app.app_env === 'production';
 }
 
+function mapValues(fn, obj) {
+  const reducer = (acc, key) => {
+    acc[key] = fn(obj[key]);
+    return acc;
+  };
+  return Object.keys(obj).reduce(reducer, {});
+}
+
+function wrapHandler(fn) {
+  // calls `next(error)`
+  return (...args) => fn(...args).catch(args[2]);
+}
+
+function wrapHandlers(handlers) {
+  return mapValues(wrapHandler, handlers);
+}
+
+function pick(keys, obj) {
+  const objKeys = Object.keys(obj);
+  const pickedObj = keys.reduce((picked, key) => {
+    if (objKeys.includes(key)) {
+      picked[key] = obj[key]; // eslint-disable-line no-param-reassign
+    }
+    return picked;
+  }, {});
+  return pickedObj;
+}
+
 module.exports = {
   filterEntity,
   firstEntity,
@@ -104,5 +159,9 @@ module.exports = {
   loadAssetManifest,
   loadDevelopmentManifest,
   loadProductionManifest,
+  mapValues,
+  pick,
   shouldIncludeTracking,
+  wrapHandler,
+  wrapHandlers,
 };

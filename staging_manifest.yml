@@ -7,6 +7,7 @@ routes:
 - route: federalistapp-staging.fr.cloud.gov
 - route: federalistapp-staging.18f.gov
 - route: federalist-staging.fr.cloud.gov
+- route: federalistapp-staging.apps.internal
 disk_quota: 2G
 memory: 256MB
 instances: 2
@@ -34,3 +35,4 @@ env:
   FEDERALIST_PREVIEW_HOSTNAME: https://federalist-proxy-staging.app.cloud.gov
   SOCKET_HOST: https://federalistapp-staging.fr.cloud.gov
   USER_AUDITOR: federalist
+  S3_SERVICE_PLAN_ID: 16A19515-C2B9-4982-80BD-69BED6A86C85

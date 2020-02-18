@@ -7,8 +7,9 @@ routes:
 - route: federalistapp.18f.gov
 - route: federalistapp.fr.cloud.gov
 - route: federalist.fr.cloud.gov
+- route: federalistapp.apps.internal
 disk_quota: 2G
-memory: 256MB
+memory: 512MB
 instances: 5
 services:
 - federalist-production-rds
@@ -34,3 +35,4 @@ env:
   FEDERALIST_PREVIEW_HOSTNAME: https://federalist-proxy.app.cloud.gov
   SOCKET_HOST: https://federalistapp.fr.cloud.gov
   USER_AUDITOR: federalist
+  S3_SERVICE_PLAN_ID: 16A19515-C2B9-4982-80BD-69BED6A86C85

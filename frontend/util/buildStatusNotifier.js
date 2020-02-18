@@ -12,10 +12,8 @@ module.exports = class BuildStatusNotifier {
     if (BuildStatusNotifier.listening) {
       return Promise.resolve();
     }
-    BuildStatusNotifier.listening = true;
-    return Notification.requestPermission()
-    .then((permission) => {
-      // If the user accepts, let's create a notification
+
+    const connectSocket = (permission) => {
       if (permission === 'granted') {
         const accessToken = (document.querySelectorAll('meta[name="accessToken"]')[0] || {}).content;
         const socketHost = (document.querySelectorAll('meta[name="socketHost"]')[0] || {}).content;
@@ -24,10 +22,22 @@ module.exports = class BuildStatusNotifier {
           socket.on('build status', (build) => {
             this.notify(build);
           });
+          return true;
         }
       }
-      return Promise.resolve();
-    });
+      return false;
+    };
+
+    BuildStatusNotifier.listening = true;
+    try {
+      return Notification.requestPermission()
+        .then(permission => connectSocket(permission));
+    } catch (error) {
+      if (error instanceof TypeError) {
+        return Promise.resolve(Notification.requestPermission(connectSocket));
+      }
+      return Promise.reject(error);
+    }
   }
 
   static notify(build) {
@@ -39,9 +49,14 @@ module.exports = class BuildStatusNotifier {
       case 'processing':
         titleStatus = 'Build In-Progress';
         break;
-      default:
+      case 'queued':
+        titleStatus = 'Build Queued';
+        break;
+      case 'success':
         titleStatus = 'Successful Build';
         break;
+      default:
+        return null;
     }
     const icon = '/images/favicons/favicon.ico';
     const note = new Notification(`${titleStatus}`, { body: `Site: ${build.owner}/${build.repository}   Branch: ${build.branch}`, icon });

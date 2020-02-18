@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
 const moment = require('moment');
 const fsMock = require('mock-fs');
 const proxyquire = require('proxyquire').noCallThru();
@@ -14,47 +15,52 @@ const utils = proxyquire('../../../../api/utils', { '../../webpack.development.c
 
 describe('utils', () => {
   describe('.filterEntity', () => {
-    it('should filter out the named entity from an objects resources array', (done) => {
-      const name = 'one';
-      const field = 'name';
-      const entity = { [field]: name };
-      const resources = {
-        resources: [
-          {
-            entity,
-          },
-          {
-            entity: { [field]: 'two' },
-          },
-        ],
-      };
-      const result = utils.filterEntity(resources, name, field);
+    const name = 'one';
+    const field = 'name';
+    const entity1 = { [field]: name };
+    const entity2 = { [field]: 'two' };
 
-      expect(result).to.deep.equal({ entity });
-      done();
+    it('should filter out the named entity from an objects resources array', () => {
+      const resources = [{ entity: entity1 }, { entity: entity2 }];
+
+      const result = utils.filterEntity({ resources }, name, field);
+
+      expect(result).to.deep.equal({ entity: entity1 });
     });
 
-    it('should reject a promise if entity not found', (done) => {
-      const name = 'one';
-      const field = 'name';
-      const resources = {
-        resources: [
-          {
-            entity: { [field]: 'two' },
-          },
-        ],
-      };
+    it('should throw an error if entity not found', () => {
+      const resources = [{ entity: entity2 }];
 
-      utils.filterEntity(resources, name, field)
-        .catch((err) => {
-          expect(err).to.be.an('error');
-          done();
-        });
+      const fn = () => utils.filterEntity({ resources }, name, field);
+
+      expect(fn).to.throw(Error, `Not found: Entity @${field} = ${name}`);
+    });
+
+    describe('when name is `basic-public`', () => {
+      it('returns the entity that matches the configured S3 plan', () => {
+        const basicPublic = 'basic-public';
+        const entity = { [field]: basicPublic, unique_id: config.app.s3ServicePlanId };
+        const resources = [{ entity }, { entity: entity2 }];
+
+        const result = utils.filterEntity({ resources }, basicPublic, field);
+
+        expect(result).to.deep.equal({ entity });
+      });
+
+      it('throws an error if none of the filtered entities match the configured S3 plan', () => {
+        const basicPublic = 'basic-public';
+        const entity = { [field]: basicPublic, unique_id: 'foobar' };
+        const resources = [{ entity }];
+
+        const fn = () => utils.filterEntity({ resources }, basicPublic, field);
+
+        expect(fn).to.throw(Error, `Not found: Entity @${field} = ${basicPublic} @basic-public service plan = (${config.app.s3ServicePlanId})`);
+      });
     });
   });
 
   describe('.firstEntity', () => {
-    it('should return first entity from an objects resources array', (done) => {
+    it('should return first entity from an objects resources array', () => {
       const name = 'one';
       const field = 'name';
       const entity = { [field]: name };
@@ -68,23 +74,21 @@ describe('utils', () => {
           },
         ],
       };
+
       const result = utils.firstEntity(resources, name);
 
       expect(result).to.deep.equal({ entity });
-      done();
     });
 
-    it('should reject a promise if no resources returned', (done) => {
+    it('should throw an error if no resources returned', () => {
       const name = 'one';
       const resources = {
         resources: [],
       };
 
-      utils.firstEntity(resources, name)
-        .catch((err) => {
-          expect(err).to.be.an('error');
-          done();
-        });
+      const fn = () => utils.firstEntity(resources, name);
+
+      expect(fn).to.throw(Error, 'Not found');
     });
   });
 
@@ -92,7 +96,7 @@ describe('utils', () => {
     it('should concat and lowercase owner and repository name', (done) => {
       const owner = 'Hello';
       const repository = 'Hello World';
-      const expected = 'owner-hello-repo-hello-world';
+      const expected = 'o-hello-r-hello-world';
 
       expect(utils.generateS3ServiceName(owner, repository)).to.equal(expected);
       done();
@@ -101,9 +105,20 @@ describe('utils', () => {
     it('should convert to string when the owner and repository is a number', (done) => {
       const owner = 12345;
       const repository = 'Hello World';
-      const expected = 'owner-12345-repo-hello-world';
+      const expected = 'o-12345-r-hello-world';
 
       expect(utils.generateS3ServiceName(owner, repository)).to.equal(expected);
+      done();
+    });
+
+    it('should truncate names over 46 characters to account for CF service name limits', (done) => {
+      const owner = 'hello-world-owner';
+      const repository = 'hello-world-really-long-repository-name';
+      const output = utils.generateS3ServiceName(owner, repository);
+      const expectedPre = 'o-hello-world-owner-r-hello-world-reall-';
+
+      expect(output.length).to.equal(46);
+      expect(output.slice(0, 40)).to.equal(expectedPre);
       done();
     });
 
@@ -232,6 +247,74 @@ describe('utils', () => {
     it('returns the app_env when app_env is not production', () => {
       config.app.app_env = 'development';
       expect(utils.getSiteDisplayEnv()).to.equal('development');
+    });
+  });
+
+  describe('.mapValues', () => {
+    it('maps a function over the values of an object and returns a new object with the original keys and updated values', () => {
+      const obj = {
+        foo: 1,
+        bar: 5,
+      };
+
+      const fn = d => d * 2;
+
+      expect(utils.mapValues(fn, obj)).to.deep.equal({ foo: 2, bar: 10 });
+    });
+  });
+
+  describe('.wrapHandler', () => {
+    it('wraps an async function with a catch clause and calls the `error` function of the 2nd argument', async () => {
+      const spy = sinon.spy();
+      const error = new Error('foobar');
+
+      // eslint-disable-next-line no-unused-vars
+      const handler = async (_req, _res, _next) => {
+        throw error;
+      };
+
+      const wrappedFn = utils.wrapHandler(handler);
+
+      await wrappedFn({}, { error: spy }, () => {});
+
+      expect(spy.calledWith(error));
+    });
+  });
+
+  describe('.wrapHandlers', () => {
+    it('maps `wrapHandler` over the values of an object', async () => {
+      const spy = sinon.spy();
+      const error = new Error('foobar');
+
+      const handlers = {
+        // eslint-disable-next-line no-unused-vars
+        foo: async (_req, _res, _next) => {
+          throw error;
+        },
+        bar: async () => {},
+      };
+
+      const wrappedObj = utils.wrapHandlers(handlers);
+
+      await wrappedObj.foo({}, { error: spy }, () => {});
+
+      expect(spy.calledWith(error));
+    });
+  });
+
+  describe('.pick', () => {
+    it('returns an object only containing specified keys', () => {
+      const keys = ['foo', 'bar'];
+      const obj = {
+        foo: 'hi',
+        bar: undefined,
+        baz: 'bye',
+      };
+
+      expect(utils.pick(keys, obj)).to.deep.equal({
+        foo: 'hi',
+        bar: undefined,
+      });
     });
   });
 });

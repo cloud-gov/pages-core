@@ -11,7 +11,7 @@ describe('<AdvancedSiteSettings/>', () => {
       siteId: 9999,
       initialValues: {
         engine: 'jekyll',
-        config: 'boop: beep',
+        defaultConfig: 'boop: beep',
       },
       onDelete: spy(),
       onSubmit: spy(),

@@ -66,14 +66,14 @@ class CloudFoundryAPIClient {
       .then(route => this.mapRoute(route.metadata.guid));
   }
 
-  deleteRoute(name) {
+  deleteRoute(host) {
     return this.accessToken()
       .then(token => this.request(
         'GET',
-        '/v2/routes',
+        `/v2/routes?q=host:${host}`,
         token
       ))
-      .then(res => filterEntity(res, name, 'host'))
+      .then(res => filterEntity(res, host, 'host'))
       .then(entity => this.accessToken()
         .then(token => this.request(
           'DELETE',
@@ -96,7 +96,7 @@ class CloudFoundryAPIClient {
   }
 
   fetchServiceInstance(name) {
-    return this.fetchServiceInstances()
+    return this.fetchServiceInstances(name)
       .then(res => filterEntity(res, name));
   }
 
@@ -111,10 +111,12 @@ class CloudFoundryAPIClient {
       .then(key => key.entity.credentials);
   }
 
-  fetchServiceInstances() {
+  fetchServiceInstances(name = null) {
+    const path = `/v2/service_instances${name ? `?q=name:${name}` : ''}`;
+
     return this.accessToken().then(token => this.request(
       'GET',
-      '/v2/service_instances',
+      path,
       token
     ));
   }

@@ -1,9 +1,8 @@
-const authorizer = require('../authorizers/user');
 const userSerializer = require('../serializers/user');
 const { User } = require('../models');
 
 module.exports = {
-  usernames(req, res) {
+  usernames(req, res, next) {
     User.findAll()
       .then((users) => {
         const usernames = users.map(user => ({
@@ -12,14 +11,10 @@ module.exports = {
         }));
         return res.json(usernames);
       })
-      .catch(err => res.error(err));
+      .catch(next);
   },
 
-  me: (req, res) => {
-    User.findByPk(req.user.id)
-      .then(model => authorizer.me(req.user, model))
-      .then(currentUser => userSerializer.serialize(currentUser))
-      .then(userJSON => res.json(userJSON))
-      .catch(err => res.error(err));
+  me(req, res) {
+    res.json(userSerializer.toJSON(req.user));
   },
 };

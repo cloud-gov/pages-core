@@ -18,7 +18,7 @@ class SiteSettings extends React.Component {
 
   handleDelete() {
     // eslint-disable-next-line no-alert
-    if (window.confirm('Are you sure you want to delete this site for all users? This action will also delete all site builds and take down the live site, if published.')) {
+    if (window.confirm(`${this.props.site.owner}/${this.props.site.repository}\nAre you sure you want to delete this site for all users? This action will also delete all site builds and take down the live site, if published.`)) {
       return siteActions.deleteSite(this.props.site.id);
     }
 
@@ -61,7 +61,7 @@ class SiteSettings extends React.Component {
 
     const advancedInitialValues = {
       engine: site.engine,
-      config: site.config || '',
+      defaultConfig: site.defaultConfig || '',
       demoConfig: site.demoConfig || '',
       previewConfig: site.previewConfig || '',
     };
@@ -75,7 +75,7 @@ class SiteSettings extends React.Component {
             target="_blank"
             rel="noopener noreferrer"
             title="Federalist documentation on settings"
-            href="https://federalist-docs.18f.gov/pages/using-federalist/#managing-site-settings"
+            href="https://federalist.18f.gov/documentation/#managing-site-settings"
           >
             these settings
           </a>
@@ -86,7 +86,7 @@ class SiteSettings extends React.Component {
             target="_blank"
             rel="noopener noreferrer"
             title="Federalist documentation on previews"
-            href="https://federalist-docs.18f.gov/pages/using-federalist/previews/"
+            href="https://federalist.18f.gov/documentation/previews/"
           >
             viewing site previews
           </a>.

@@ -1,6 +1,9 @@
 const nock = require('nock');
 const config = require('../../../config');
 
+const withAuth = (nok, accessToken) =>
+  nok.matchHeader('authorization', `token ${accessToken}`);
+
 const getAccessToken = ({ authorizationCode, accessToken, scope } = {}) => {
   /* eslint-disable no-param-reassign */
   authorizationCode = authorizationCode || 'auth-code-123abc';
@@ -43,10 +46,10 @@ const createRepoForOrg = ({ accessToken, org, repo, response } = {}) => {
   }
 
   if (accessToken) {
-    createRepoNock = createRepoNock.query({ access_token: accessToken });
-  } else {
-    createRepoNock = createRepoNock.query(true);
+    createRepoNock = withAuth(createRepoNock, accessToken);
   }
+
+  createRepoNock = createRepoNock.query(true);
 
   const typicalResponse = {
     owner: { login: org },
@@ -75,10 +78,10 @@ const createRepoForUser = ({ accessToken, repo, response } = {}) => {
   }
 
   if (accessToken) {
-    createRepoNock = createRepoNock.query({ access_token: accessToken });
-  } else {
-    createRepoNock = createRepoNock.query(true);
+    createRepoNock = withAuth(createRepoNock, accessToken);
   }
+
+  createRepoNock = createRepoNock.query(true);
 
   const typicalResponse = {
     owner: { login: 'your-name-here' },
@@ -123,8 +126,13 @@ const userOrganizations = ({ accessToken, organizations, response } = {}) => {
   organizations = organizations || [{ id: 123456 }];
   /* eslint-enable no-param-reassign */
 
-  return nock('https://api.github.com')
-    .get(`/user/orgs?access_token=${accessToken}`)
+  let orgsNock = nock('https://api.github.com');
+
+  if (accessToken) {
+    orgsNock = withAuth(orgsNock, accessToken);
+  }
+
+  return orgsNock.get(`/user/orgs`)
     .reply(response || 200, organizations);
 };
 
@@ -135,7 +143,7 @@ const githubAuth = (username, organizations) => {
 };
 
 // eslint-disable-next-line no-shadow
-const repo = ({ accessToken, owner, repo, response } = {}) => {
+const repo = ({ accessToken, owner, repo, username, response } = {}) => {
   let webhookNock = nock('https://api.github.com');
 
   if (owner && repo) {
@@ -145,7 +153,11 @@ const repo = ({ accessToken, owner, repo, response } = {}) => {
   }
 
   if (accessToken) {
-    webhookNock = webhookNock.query({ access_token: accessToken });
+    webhookNock = withAuth(webhookNock, accessToken);
+  }
+
+  if (username) {
+    webhookNock = webhookNock.query({ username });
   } else {
     webhookNock = webhookNock.query(true);
   }
@@ -169,7 +181,7 @@ const repo = ({ accessToken, owner, repo, response } = {}) => {
 };
 
 // eslint-disable-next-line no-shadow
-const status = ({ accessToken, owner, repo, sha, state, targetURL } = {}) => {
+const status = ({ accessToken, owner, repo, sha, state, targetURL, response } = {}) => {
   let path;
   if (owner && repo && sha) {
     path = `/repos/${owner}/${repo}/statuses/${sha}`;
@@ -193,12 +205,21 @@ const status = ({ accessToken, owner, repo, sha, state, targetURL } = {}) => {
   });
 
   if (accessToken) {
-    statusNock = statusNock.query({ access_token: accessToken });
-  } else {
-    statusNock = statusNock.query(true);
+    statusNock = withAuth(statusNock, accessToken);
   }
 
-  return statusNock.reply(201, { id: 1 });
+  statusNock = statusNock.query(true);
+
+  const typicalResponse = { id: 1 };
+
+  let resp = response || 201;
+  if (typeof resp === 'number') {
+    resp = [resp, typicalResponse];
+  } else if (resp[1] === undefined) {
+    resp[1] = typicalResponse;
+  }
+
+  return statusNock.reply(...resp);
 };
 
 // eslint-disable-next-line no-shadow
@@ -220,10 +241,10 @@ const webhook = ({ accessToken, owner, repo, response } = {}) => {
   }
 
   if (accessToken) {
-    webhookNock = webhookNock.query({ access_token: accessToken });
-  } else {
-    webhookNock = webhookNock.query(true);
+    webhookNock = withAuth(webhookNock, accessToken);
   }
+
+  webhookNock = webhookNock.query(true);
 
   let resp = response || 201;
   if (typeof resp === 'number') {
@@ -241,10 +262,10 @@ const getBranch = ({ accessToken, owner, repo, branch, expected }) => {
   branchNock = branchNock.get(path);
 
   if (accessToken) {
-    branchNock = branchNock.query({ access_token: accessToken });
-  } else {
-    branchNock = branchNock.query(true);
+    branchNock = withAuth(branchNock, accessToken);
   }
+
+  branchNock = branchNock.query(true);
 
   const output = expected || {
     name: 'master',
@@ -257,7 +278,7 @@ const getBranch = ({ accessToken, owner, repo, branch, expected }) => {
 };
 
 /* eslint-disable camelcase */
-const getOrganizationMembers = ({ accessToken, organization, role, per_page, page, response }) => {
+const getOrganizationMembers = ({ accessToken, organization, role, per_page, page, response, responseCode }) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   organization = organization || 'test-org';
@@ -266,19 +287,20 @@ const getOrganizationMembers = ({ accessToken, organization, role, per_page, pag
   role = role || 'all';
   /* eslint-enable no-param-reassign */
 
-  let orgMembers = [];
+  const orgMembers = [];
   for (let i = 0; i < (per_page + 1); i += 1) {
     if ((i % 50) === 0) {
-      orgMembers.push({ login: `admin-${organization}-${i}`, role: 'admin' });
-    } else {
-      orgMembers.push({ login: `user-${organization}-${i}`, role: 'member' });
+      if (role !== 'member') {
+        orgMembers.push({ login: `admin-${organization}-${i}` });
+      }
+    } else if (role !== 'admin') {
+      orgMembers.push({ login: `user-${organization}-${i}` });
     }
   }
-  if (role !== 'all') { orgMembers = orgMembers.filter(o => o.role === role); }
 
-  return nock('https://api.github.com')
-    .get(`/orgs/${organization}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}&role=${role}`)
-    .reply(response || 200, orgMembers.slice(((page - 1) * per_page), (page * per_page)));
+  return withAuth(nock('https://api.github.com'), accessToken)
+    .get(`/orgs/${organization}/members?per_page=${per_page}&page=${page}&role=${role}`)
+    .reply(responseCode || 200, response || orgMembers.slice(((page - 1) * per_page), (page * per_page)));
 };
 
 const getTeamMembers = ({ accessToken, team_id, per_page, page, response } = {}) => {
@@ -294,8 +316,8 @@ const getTeamMembers = ({ accessToken, team_id, per_page, page, response } = {})
     teamMembers.push({ login: `user-${team_id}-${i}` });
   }
 
-  return nock('https://api.github.com')
-    .get(`/teams/${team_id}/members?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
+  return withAuth(nock('https://api.github.com'), accessToken)
+    .get(`/teams/${team_id}/members?per_page=${per_page}&page=${page}`)
     .reply(response || 200, teamMembers.slice(((page - 1) * per_page), page * per_page));
 };
 
@@ -311,8 +333,8 @@ const getRepositories = ({ accessToken, per_page, page, response }) => {
     repos.push({ full_name: `owner/repo-${i}`, permissions: { push: true } });
   }
 
-  return nock('https://api.github.com')
-    .get(`/user/repos?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
+  return withAuth(nock('https://api.github.com'), accessToken)
+    .get(`/user/repos?per_page=${per_page}&page=${page}`)
     .reply(response || 200, repos.slice(((page - 1) * per_page), (page * per_page)));
 };
 
@@ -330,8 +352,8 @@ const getCollaborators = ({ accessToken, owner, repository, per_page, page, resp
     collabs.push({ login: `collaborator-${i}`, permissions: { push: true } });
   }
 
-  return nock('https://api.github.com')
-    .get(`/repos/${owner}/${repository}/collaborators?access_token=${accessToken}&per_page=${per_page}&page=${page}`)
+  return withAuth(nock('https://api.github.com'), accessToken)
+    .get(`/repos/${owner}/${repository}/collaborators?per_page=${per_page}&page=${page}`)
     .reply(response || 200, collabs.slice(((page - 1) * per_page), (page * per_page)));
 };
 /* eslint-enable camelcase */

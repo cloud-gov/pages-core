@@ -12,34 +12,50 @@ const mockCreateRoute = (resource, body) => nock(url, reqheaders)
   .post('/v2/routes', body)
   .reply(200, resource);
 
-const mockDeleteRoute = (host, guid) => {
-  nock(url, reqheaders)
-    .get('/v2/routes')
-    .reply(200, {
-      resources: [{
-        metadata: { guid },
-        entity: { host },
-      }],
-    });
+const mockDeleteRoute = (host, guid, exists = true) => {
+  if (exists) {
+    nock(url, reqheaders)
+      .get(`/v2/routes?q=host:${host}`)
+      .reply(200, {
+        resources: [{
+          metadata: { guid },
+          entity: { host },
+        }],
+      });
 
-  nock(url, reqheaders)
-    .delete(`/v2/routes/${guid}?recursive=true&async=true`)
-    .reply(200, { metadata: { guid } });
+    nock(url, reqheaders)
+      .delete(`/v2/routes/${guid}?recursive=true&async=true`)
+      .reply(200, { metadata: { guid } });
+  } else {
+    nock(url, reqheaders)
+      .get(`/v2/routes?q=host:${host}`)
+      .reply(200, {
+        resources: [],
+      });
+  }
 };
 
-const mockDeleteService = (name, guid) => {
-  nock(url, reqheaders)
-    .get('/v2/service_instances')
-    .reply(200, {
-      resources: [{
-        metadata: { guid },
-        entity: { name },
-      }],
-    });
+const mockDeleteService = (name, guid, exists = true) => {
+  if (exists) {
+    nock(url, reqheaders)
+      .get(`/v2/service_instances?q=name:${name}`)
+      .reply(200, {
+        resources: [{
+          metadata: { guid },
+          entity: { name },
+        }],
+      });
 
-  nock(url, reqheaders)
-    .delete(`/v2/service_instances/${guid}?accepts_incomplete=true&recursive=true&async=true`)
-    .reply(200, { metadata: { guid } });
+    nock(url, reqheaders)
+      .delete(`/v2/service_instances/${guid}?accepts_incomplete=true&recursive=true&async=true`)
+      .reply(200, { metadata: { guid } });
+  } else {
+    nock(url, reqheaders)
+      .get(`/v2/service_instances?q=name:${name}`)
+      .reply(200, {
+        resources: [],
+      });
+  }
 };
 
 const mockFetchServiceKeysRequest = resources => nock(url, reqheaders)
@@ -50,8 +66,8 @@ const mockFetchServiceKeyRequest = (guid, resources) => nock(url, reqheaders)
   .get(`/v2/service_keys/${guid}`)
   .reply(200, resources);
 
-const mockFetchServiceInstancesRequest = resources => nock(url, reqheaders)
-  .get('/v2/service_instances')
+const mockFetchServiceInstancesRequest = (resources, name = null) => nock(url, reqheaders)
+  .get(`/v2/service_instances${name ? `?q=name:${name}` : ''}`)
   .reply(200, resources);
 
 const mockFetchServiceInstanceCredentialsRequest = (guid, resources) => nock(url, reqheaders)
@@ -62,20 +78,22 @@ const mockFetchS3ServicePlanGUID = resources => nock(url, reqheaders)
   .get('/v2/service_plans')
   .reply(200, resources);
 
-const mockDefaultCredentials = () => {
+const mockDefaultCredentials = (exists = true) => {
   const serviceGuid = 'testing-guid';
   const serviceName = 'federalist-dev-s3';
   const instanceResponses = {
-    resources: [factory.responses.service({ guid: serviceGuid }, { name: serviceName })],
+    resources: exists ?
+      [factory.responses.service({ guid: serviceGuid }, { name: serviceName })] : [],
   };
 
   const keyResponses = {
-    resources: [factory.responses.service({}, { credentials: factory.responses.credentials() })],
+    resources: exists ?
+      [factory.responses.service({}, { credentials: factory.responses.credentials() })] : [],
   };
 
   nock(url, reqheaders)
     .persist()
-    .get('/v2/service_instances')
+    .get('/v2/service_instances?q=name:federalist-dev-s3')
     .reply(200, instanceResponses);
 
   nock(url, reqheaders)
