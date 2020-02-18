@@ -26,9 +26,9 @@ const siteConfig = (build) => {
   return siteBuildConfig ? yaml.safeDump(siteBuildConfig) : ''; // to be safedumped
 };
 
-const sitePrefixForBuild = rawDomain => baseURLForDomain(rawDomain).replace(/^(\/)+/, '');
-
 const baseURLForDomain = rawDomain => url.parse(rawDomain).path.replace(/(\/)+$/, '');
+
+const sitePrefixForBuild = rawDomain => baseURLForDomain(rawDomain).replace(/^(\/)+/, '');
 
 const baseURLForBuild = build => baseURLForDomain(buildViewLink(build, build.Site));
 
