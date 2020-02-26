@@ -6,6 +6,11 @@
     "engine",
     "owner",
     "repository",
+    "s3ServiceName",
+    "awsBucketName",
+    "viewLink",
+    "demoViewLink",
+    "previewLink",
     "users"
   ],
   "properties": {
@@ -45,6 +50,21 @@
       "format": "date-time"
     },
     "repository": {
+      "type": "string"
+    },
+    "s3ServiceName": {
+      "type": "string"
+    },
+    "awsBucketName": {
+      "type": "string"
+    },
+    "viewLink": {
+      "type": "string"
+    },
+    "demoViewLink": {
+      "type": "string"
+    },
+    "previewLink": {
       "type": "string"
     },
     "users": {
