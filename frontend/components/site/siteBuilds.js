@@ -110,15 +110,10 @@ class SiteBuilds extends React.Component {
 
   renderEmptyState() {
     const { site } = this.props;
-    const message = `
-      If this site was just added, the first build should be available within a few minutes.
-    `;
+    const header = 'This site does not yet have any builds.';
+    const message = 'If this site was just added, the first build should be available within a few minutes.';
     return (
-      <AlertBanner
-        status="info"
-        header="This site does not yet have any builds."
-        message={message}
-      >
+      <AlertBanner status="info" header={header} message={message}>
         <RefreshBuildsButton site={site} />
       </AlertBanner>
     );
