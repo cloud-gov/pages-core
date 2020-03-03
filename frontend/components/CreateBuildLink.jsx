@@ -13,7 +13,7 @@ class CreateBuildLink extends React.Component {
     const { handleClick, handlerParams } = this.props;
     const args = Object.keys(handlerParams).map(key => handlerParams[key]);
 
-    handleClick.apply(null, args);
+    handleClick(...args);
   }
 
   render() {

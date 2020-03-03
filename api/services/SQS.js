@@ -32,8 +32,6 @@ const sitePrefixForBuild = rawDomain => baseURLForDomain(rawDomain).replace(/^(\
 
 const baseURLForBuild = build => baseURLForDomain(buildViewLink(build, build.Site));
 
-const sitePrefixForBuild = rawDomain => baseURLForDomain(rawDomain).replace(/^(\/)+/, '');
-
 const statusCallbackURL = build => [
   url.resolve(config.app.hostname, '/v0/build'),
   build.id,
