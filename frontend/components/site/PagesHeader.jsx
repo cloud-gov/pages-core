@@ -12,9 +12,7 @@ const PagesHeader = ({
     <div className="usa-width-two-thirds">
       <div className="header-title">
         <h1>
-          {owner}
-/
-          {repository}
+          {`${owner}/${repository}`}
         </h1>
       </div>
       <h2>{title}</h2>
