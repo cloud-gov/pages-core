@@ -45,10 +45,7 @@ const buildStateData = (buildState) => {
 
 class SiteBuilds extends React.Component {
   static getUsername(build) {
-    if (build.user) {
-      return build.user.username;
-    }
-    return '';
+    return build.user ? build.user.username : '';
   }
 
   static buildLogsLink(build) {
@@ -113,8 +110,9 @@ class SiteBuilds extends React.Component {
 
   renderEmptyState() {
     const { site } = this.props;
-    const message = 'If this site was just added, the '
-      + 'first build should be available within a few minutes.';
+    const message = `
+      If this site was just added, the first build should be available within a few minutes.
+    `;
     return (
       <AlertBanner
         status="info"
