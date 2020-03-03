@@ -28,6 +28,8 @@ const siteConfig = (build) => {
 
 const baseURLForDomain = rawDomain => url.parse(rawDomain).path.replace(/(\/)+$/, '');
 
+const sitePrefixForBuild = rawDomain => baseURLForDomain(rawDomain).replace(/^(\/)+/, '');
+
 const baseURLForBuild = build => baseURLForDomain(buildViewLink(build, build.Site));
 
 const sitePrefixForBuild = rawDomain => baseURLForDomain(rawDomain).replace(/^(\/)+/, '');
@@ -67,6 +69,8 @@ const generateDefaultCredentials = build => ({
   SOURCE_REPO: sourceForBuild(build).repository,
   SOURCE_OWNER: sourceForBuild(build).owner,
   SKIP_LOGGING: config.app.app_env === 'development',
+  AUTH_BASEURL: process.env.APP_HOSTNAME,
+  AUTH_ENDPOINT: 'external/auth/github',
   BUILD_ID: build.id,
 });
 
