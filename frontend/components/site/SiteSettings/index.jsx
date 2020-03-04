@@ -92,7 +92,7 @@ class SiteSettings extends React.Component {
           >
             viewing site previews
           </a>
-.
+          .
         </p>
         <BasicSiteSettings
           initialValues={basicInitialValues}

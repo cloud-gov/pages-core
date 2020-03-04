@@ -23,12 +23,11 @@ export const DeleteSiteForm = ({
           <br />
           {' '}
           <i>
-Trying
-          to remove a site from your list of Federalist sites? Go to the
+            Trying to remove a site from your list of Federalist sites? Go to the
             {' '}
             <a href={`/sites/${siteId}/users`}>collaborators page</a>
             {' '}
-and remove yourself.
+            and remove yourself.
           </i>
         </p>
         <AlertBanner

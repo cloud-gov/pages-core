@@ -63,10 +63,11 @@ const SiteUsers = ({ site, user }) => {
               </td>
               <td>
                 {
-                  isSiteOwner(rowUser, site.owner) ? '-'
+                  isSiteOwner(rowUser, site.owner)
+                    ? '-'
                     : (
                       <ButtonLink clickHandler={handleClick(rowUser)}>
-                    Remove user
+                        Remove user
                       </ButtonLink>
                     )
                 }

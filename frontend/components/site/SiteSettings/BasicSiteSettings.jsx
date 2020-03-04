@@ -21,8 +21,7 @@ export const BasicSiteSettings = ({
         <legend>Live site</legend>
         <p className="well-text">
           Set the primary branch Federalist uses to build your site.
-          After your DNS is pointed to Federalist, you&apos;ll set
-          the
+          After your DNS is pointed to Federalist, you&apos;ll set the
           {' '}
           <a
             href="https://federalist.18f.gov/pages/how-federalist-works/custom-urls/"
@@ -33,7 +32,7 @@ export const BasicSiteSettings = ({
             live URL
           </a>
           {' '}
-to ensure the site builds correctly.
+          to ensure the site builds correctly.
         </p>
         <BranchField
           label="Branch name:"
@@ -61,8 +60,7 @@ to ensure the site builds correctly.
           {' '}
           <code>demo.example.gov</code>
           {' '}
-instead
-          of a standard Federalist preview URL.
+          instead of a standard Federalist preview URL.
         </p>
         <BranchField
           label="Branch name:"
