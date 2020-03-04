@@ -37,9 +37,7 @@ const SiteListItem = ({ site, user }) => (
     <div className="sites-list-item-text">
       <h4 className="site-list-item-title">
         <Link to={`/sites/${site.id}`} title="View site settings">
-          { site.owner }
-/
-          { site.repository }
+          {`${site.owner}/${site.repository}`}
         </Link>
         {' '}
       </h4>

@@ -46,7 +46,7 @@ const addWebsiteButton = () => (
   >
     <IconPlus />
     {' '}
-Add site
+    Add site
   </Link>
 );
 

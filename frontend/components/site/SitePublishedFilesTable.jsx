@@ -115,8 +115,9 @@ class SitePublishedFilesTable extends React.Component {
           disabled={this.shouldDisablePreviousPage()}
           onClick={this.previousPage}
           title="View the previous page of published files"
+          type="button"
         >
-&laquo; Previous
+          &laquo; Previous
         </button>
 
         <button
@@ -124,8 +125,9 @@ class SitePublishedFilesTable extends React.Component {
           disabled={this.shouldDisableNextPage()}
           onClick={this.nextPage}
           title="View the next page of published files"
+          type="button"
         >
-Next &raquo;
+          Next &raquo;
         </button>
       </nav>
     );

@@ -38,7 +38,7 @@ export const AdvancedSiteSettingsForm = ({
           {' '}
           <code>_config.yml</code>
           {' '}
-file when we build your site&apos;s primary branch.
+          file when we build your site&apos;s primary branch.
         </p>
         <label htmlFor="defaultConfig">Site configuration</label>
         <Field
@@ -57,7 +57,7 @@ file when we build your site&apos;s primary branch.
           {' '}
           <code>_config.yml</code>
           {' '}
-file when we build your site&apos;s demo branch.
+          file when we build your site&apos;s demo branch.
         </p>
         <label htmlFor="demoConfig">Demo configuration</label>
         <Field
@@ -76,7 +76,7 @@ file when we build your site&apos;s demo branch.
           {' '}
           <code>_config.yml</code>
           {' '}
-file when we build a preview branch for your site.
+          file when we build a preview branch for your site.
         </p>
         <label htmlFor="previewConfig">Preview configuration</label>
         <Field
