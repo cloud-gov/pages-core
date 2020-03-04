@@ -57,7 +57,7 @@ describe('<SiteListItem />', () => {
     wrapper = shallow(<Fixture site={testSite} user={testUser} />);
     expect(wrapper.find(Link).props()).to.deep.equals({
       to: `/sites/${testSite.id}`,
-      children: [testSite.owner, '/', testSite.repository],
+      children: `${testSite.owner}/${testSite.repository}`,
       title: 'View site settings',
     });
     expect(wrapper.find(Link)).to.have.length(1);
