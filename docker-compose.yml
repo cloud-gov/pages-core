@@ -7,8 +7,6 @@ services:
     command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "watch"]
     volumes:
       - .:/app:delegated
-      - node-modules:/app/node_modules/
-      - yarn-cache:/app/.yarn-cache/
     ports:
       - "1337:1337" # for the app itself
       - "8888:8888" # for viewing analyze-webpack
@@ -31,6 +29,3 @@ services:
       POSTGRES_TEST_DB: federalist-test
 volumes:
   db-data:
-  yarn-cache:
-  node-modules:
-

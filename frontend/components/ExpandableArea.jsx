@@ -19,26 +19,30 @@ class ExpandableArea extends React.Component {
   }
 
   toggle() {
-    this.setState({ isExpanded: !this.state.isExpanded });
+    const { isExpanded } = this.state;
+    this.setState({ isExpanded: !isExpanded });
   }
 
   render() {
+    const { children, title } = this.props;
+    const { isExpanded } = this.state;
+
     return (
       <div className="usa-accordion">
         <button
           onClick={this.toggle}
           className="usa-accordion-button"
-          aria-expanded={this.state.isExpanded}
+          aria-expanded={isExpanded}
           aria-controls={this.id}
         >
-          {this.props.title}
+          {title}
         </button>
         <div
           id={this.id}
           className="usa-accordion-content"
-          aria-hidden={!this.state.isExpanded}
+          aria-hidden={!isExpanded}
         >
-          {this.props.children}
+          {children}
         </div>
       </div>
     );

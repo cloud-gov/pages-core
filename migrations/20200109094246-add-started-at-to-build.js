@@ -1,7 +1,5 @@
-exports.up = (db, callback) =>
-  db.addColumn('build', 'startedAt', {
-    type: 'timestamp',
-  }, callback);
+exports.up = (db, callback) => db.addColumn('build', 'startedAt', {
+  type: 'timestamp',
+}, callback);
 
-exports.down = (db, callback) =>
-  db.removeColumn('build', 'timestamp', callback);
+exports.down = (db, callback) => db.removeColumn('build', 'timestamp', callback);

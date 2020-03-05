@@ -20,11 +20,13 @@ class SiteBuildLogs extends React.Component {
 
   /* eslint-disable scanjs-rules/call_setInterval */
   componentDidMount() {
-    const { fetchBuildLogs } = this.props.actions;
-    fetchBuildLogs({ id: this.props.params.buildId });
+    const { actions: { fetchBuildLogs }, params } = this.props;
+
+    fetchBuildLogs({ id: params.buildId });
     this.intervalHandle = setInterval(() => {
-      if (this.state.autoRefresh) {
-        fetchBuildLogs({ id: this.props.params.buildId });
+      const { autoRefresh } = this.state;
+      if (autoRefresh) {
+        fetchBuildLogs({ id: params.buildId });
       }
     }, REFRESH_INTERVAL);
   }
@@ -36,9 +38,9 @@ class SiteBuildLogs extends React.Component {
 
   /* eslint-disable jsx-a11y/href-no-hash */
   render() {
-    const { buildLogs } = this.props;
+    const { buildLogs, params } = this.props;
     const { autoRefresh } = this.state;
-    const buildId = parseInt(this.props.params.buildId, 10);
+    const buildId = parseInt(params.buildId, 10);
 
     if (!buildLogs.isLoading && (!buildLogs || !buildLogs.data || !buildLogs.data.length)) {
       return (
@@ -62,16 +64,18 @@ class SiteBuildLogs extends React.Component {
                   onClick={this.toggleAutoRefresh}
                   data-test="toggle-auto-refresh"
                 >
-                  Auto Refresh: <b>{autoRefresh ? 'ON' : 'OFF'}</b>
+                  Auto Refresh:
+                  {' '}
+                  <b>{autoRefresh ? 'ON' : 'OFF'}</b>
                 </a>
               </div>
               <RefreshBuildLogsButton buildId={buildId} />
             </li>
           </ul>
         </div>
-        { buildLogs.isLoading ?
-          <LoadingIndicator /> :
-          <SiteBuildLogTable buildLogs={buildLogs.data} />
+        { buildLogs.isLoading
+          ? <LoadingIndicator />
+          : <SiteBuildLogTable buildLogs={buildLogs.data} />
         }
       </div>
     );

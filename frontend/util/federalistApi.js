@@ -7,8 +7,8 @@ export const API = '/v0';
 
 export default {
   fetch(endpoint, params = {}, { handleHttpError = true } = {}) {
-    const csrfToken = typeof window !== 'undefined' ?
-      window.CSRF_TOKEN : global.CSRF_TOKEN;
+    const csrfToken = typeof window !== 'undefined'
+      ? window.CSRF_TOKEN : global.CSRF_TOKEN;
 
     const defaultHeaders = {
       'x-csrf-token': csrfToken,
@@ -104,8 +104,7 @@ export default {
   deleteSite(siteId) {
     return this.fetch(`site/${siteId}`,
       { method: 'DELETE' },
-      { handleHttpError: false }
-    );
+      { handleHttpError: false });
   },
 
   restartBuild(buildId, siteId) {

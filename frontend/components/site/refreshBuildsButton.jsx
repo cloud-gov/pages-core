@@ -11,7 +11,8 @@ class RefreshBuildsButton extends React.Component {
   }
 
   refreshBuilds() {
-    buildActions.fetchBuilds(this.props.site);
+    const { site } = this.props;
+    buildActions.fetchBuilds(site);
   }
 
   render() {

@@ -13,7 +13,9 @@ import { duration, timeFrom } from '../../util/datetime';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
 import BranchViewLink from '../branchViewLink';
-import { IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner } from '../icons';
+import {
+  IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner,
+} from '../icons';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
@@ -42,12 +44,8 @@ const buildStateData = (buildState) => {
 };
 
 class SiteBuilds extends React.Component {
-
   static getUsername(build) {
-    if (build.user) {
-      return build.user.username;
-    }
-    return '';
+    return build.user ? build.user.username : '';
   }
 
   static buildLogsLink(build) {
@@ -76,11 +74,14 @@ class SiteBuilds extends React.Component {
 
   /* eslint-disable scanjs-rules/call_setInterval */
   componentDidMount() {
-    const { fetchBuilds } = this.props.actions;
-    fetchBuilds({ id: this.props.params.id });
+    const { actions, params } = this.props;
+
+    const { fetchBuilds } = actions;
+    fetchBuilds({ id: params.id });
     this.intervalHandle = setInterval(() => {
-      if (this.state.autoRefresh) {
-        fetchBuilds({ id: this.props.params.id });
+      const { autoRefresh } = this.state;
+      if (autoRefresh) {
+        fetchBuilds({ id: params.id });
       }
     }, REFRESH_INTERVAL);
   }
@@ -108,15 +109,12 @@ class SiteBuilds extends React.Component {
   }
 
   renderEmptyState() {
-    const message = 'If this site was just added, the ' +
-      'first build should be available within a few minutes.';
+    const { site } = this.props;
+    const header = 'This site does not yet have any builds.';
+    const message = 'If this site was just added, the first build should be available within a few minutes.';
     return (
-      <AlertBanner
-        status="info"
-        header="This site does not yet have any builds."
-        message={message}
-      >
-        <RefreshBuildsButton site={this.props.site} />
+      <AlertBanner status="info" header={header} message={message}>
+        <RefreshBuildsButton site={site} />
       </AlertBanner>
     );
   }
@@ -136,62 +134,74 @@ class SiteBuilds extends React.Component {
               onClick={this.toggleAutoRefresh}
               data-test="toggle-auto-refresh"
             >
-              Auto Refresh: <b>{autoRefresh ? 'ON' : 'OFF'}</b>
+              Auto Refresh:
+              {' '}
+              <b>{autoRefresh ? 'ON' : 'OFF'}</b>
             </a>
             <RefreshBuildsButton site={site} />
           </div>
         </div>
-        { builds.isLoading ?
-          <LoadingIndicator /> :
-          <div className="table-container">
-            <table
-              className="usa-table-borderless log-table log-table__site-builds table-full-width"
-            >
-              <thead>
-                <tr>
-                  <th scope="col">Branch</th>
-                  <th scope="col">Message</th>
-                  <th scope="col">User</th>
-                  <th scope="col">Completed</th>
-                  <th scope="col">Duration</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {builds.data.map((build) => {
-                  const { message, icon } = buildStateData(build.state);
+        { builds.isLoading
+          ? <LoadingIndicator />
+          : (
+            <div className="table-container">
+              <table
+                className="usa-table-borderless log-table log-table__site-builds table-full-width"
+              >
+                <thead>
+                  <tr>
+                    <th scope="col">Branch</th>
+                    <th scope="col">Message</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Completed</th>
+                    <th scope="col">Duration</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {builds.data.map((build) => {
+                    const { message, icon } = buildStateData(build.state);
 
-                  return (
-                    <tr key={build.id}>
-                      <th scope="row" data-title="Branch">
-                        <div>
-                          <p className="commit-link truncate">
-                            { icon && React.createElement(icon) }
-                            { SiteBuilds.commitLink(build) }
-                          </p>
+                    return (
+                      <tr key={build.id}>
+                        <th scope="row" data-title="Branch">
                           <div>
-                            { previewBuilds[build.branch] === build.id && build.state === 'success' &&
-                            <BranchViewLink branchName={build.branch} viewLink={build.viewLink} site={site} showIcon completedAt={build.completedAt} /> }
+                            <p className="commit-link truncate">
+                              { icon && React.createElement(icon) }
+                              { SiteBuilds.commitLink(build) }
+                            </p>
+                            <div>
+                              { previewBuilds[build.branch] === build.id && build.state === 'success'
+                            && (
+                            <BranchViewLink
+                              branchName={build.branch}
+                              viewLink={build.viewLink}
+                              site={site}
+                              showIcon
+                              completedAt={build.completedAt}
+                            />
+                            ) }
+                            </div>
                           </div>
-                        </div>
-                      </th>
-                      <td data-title="Message">
-                        <div>
-                          <p>{ message }</p>
-                          { SiteBuilds.buildLogsLink(build) }
-                        </div>
-                      </td>
-                      <td data-title="User"><span>{ SiteBuilds.getUsername(build) }</span></td>
-                      <td data-title="Completed"><span>{ timeFrom(build.completedAt) }</span></td>
-                      <td data-title="Duration">
-                        <span>
-                          { duration(build.startedAt, build.completedAt) }
-                        </span>
-                      </td>
-                      <td data-title="Actions" className="table-actions">
-                        <span>
-                          {
-                            ['error', 'success'].includes(build.state) &&
+                        </th>
+                        <td data-title="Message">
+                          <div>
+                            <p>{ message }</p>
+                            { SiteBuilds.buildLogsLink(build) }
+                          </div>
+                        </td>
+                        <td data-title="User"><span>{ SiteBuilds.getUsername(build) }</span></td>
+                        <td data-title="Completed"><span>{ timeFrom(build.completedAt) }</span></td>
+                        <td data-title="Duration">
+                          <span>
+                            { duration(build.startedAt, build.completedAt) }
+                          </span>
+                        </td>
+                        <td data-title="Actions" className="table-actions">
+                          <span>
+                            {
+                            ['error', 'success'].includes(build.state)
+                            && (
                             <CreateBuildLink
                               handlerParams={{ buildId: build.id, siteId: site.id }}
                               handleClick={actions.restartBuild}
@@ -199,16 +209,20 @@ class SiteBuilds extends React.Component {
                             >
                               Rebuild
                             </CreateBuildLink>
+                            )
                           }
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            { builds.data.length >= 100 ? <p>List only displays 100 most recent builds.</p> : null }
-          </div>}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              { builds.data.length >= 100
+                ? <p>List only displays 100 most recent builds.</p>
+                : null }
+            </div>
+          )}
       </div>
     );
   }
@@ -226,7 +240,7 @@ class SiteBuilds extends React.Component {
 
 SiteBuilds.propTypes = {
   builds: PropTypes.shape({
-    isLoading: PropTypes.boolean,
+    isLoading: PropTypes.bool,
     data: PropTypes.arrayOf(BUILD),
   }),
   site: PropTypes.shape({

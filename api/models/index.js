@@ -4,9 +4,9 @@ const config = require('../../config');
 const { databaseLogger } = require('../../winston');
 
 const postgresConfig = config.postgres;
-const database = postgresConfig.database;
+const { database } = postgresConfig;
 const username = postgresConfig.user;
-const password = postgresConfig.password;
+const { password } = postgresConfig;
 
 const sequelize = new Sequelize(database, username, password, {
   dialect: 'postgres',
@@ -24,9 +24,7 @@ const UserAction = sequelize.import(path.join(__dirname, '/user-action'));
 const ActionType = sequelize.import(path.join(__dirname, '/action-type'));
 /* eslint-enable no-unused-vars */
 
-Object.keys(sequelize.models).forEach(key =>
-  sequelize.models[key].associate(sequelize.models)
-);
+Object.keys(sequelize.models).forEach(key => sequelize.models[key].associate(sequelize.models));
 
 Build.forSiteUser = user => Build.scope({ method: ['forSiteUser', user, Site, User] });
 

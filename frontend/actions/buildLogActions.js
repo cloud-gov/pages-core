@@ -14,8 +14,7 @@ const dispatchBuildLogsReceivedAction = (logs) => {
   dispatch(createBuildLogsReceivedAction(logs));
 };
 
-const fetchNextBuildLogsPage = (build, page) =>
-  api.fetchBuildLogs(build, page)
+const fetchNextBuildLogsPage = (build, page) => api.fetchBuildLogs(build, page)
   .then((buildLogs) => {
     dispatchBuildLogsReceivedAction(buildLogs);
     if (buildLogs && buildLogs.length > 0) {

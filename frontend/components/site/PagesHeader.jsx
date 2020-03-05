@@ -5,12 +5,14 @@ import { Link } from 'react-router';
 import { IconView } from '../icons';
 import GitHubLink from '../GitHubLink';
 
-const PagesHeader = ({ owner, repository, title, viewLink }) => (
+const PagesHeader = ({
+  owner, repository, title, viewLink,
+}) => (
   <div className="page-header usa-grid-full">
     <div className="usa-width-two-thirds">
       <div className="header-title">
         <h1>
-          {owner}/{repository}
+          {`${owner}/${repository}`}
         </h1>
       </div>
       <h2>{title}</h2>
@@ -25,7 +27,8 @@ const PagesHeader = ({ owner, repository, title, viewLink }) => (
         className="view-site-link"
         to={viewLink}
       >
-        View site<IconView />
+        View site
+        <IconView />
       </Link>
     </div>
   </div>

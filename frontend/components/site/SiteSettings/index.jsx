@@ -17,16 +17,18 @@ class SiteSettings extends React.Component {
   }
 
   handleDelete() {
+    const { site } = this.props;
     // eslint-disable-next-line no-alert
-    if (window.confirm(`${this.props.site.owner}/${this.props.site.repository}\nAre you sure you want to delete this site for all users? This action will also delete all site builds and take down the live site, if published.`)) {
-      return siteActions.deleteSite(this.props.site.id);
+    if (window.confirm(`${site.owner}/${site.repository}\nAre you sure you want to delete this site for all users? This action will also delete all site builds and take down the live site, if published.`)) {
+      return siteActions.deleteSite(site.id);
     }
 
     return Promise.resolve();
   }
 
   handleUpdate(values) {
-    siteActions.updateSite(this.props.site, values);
+    const { site } = this.props;
+    siteActions.updateSite(site, values);
   }
 
   handleCopySite({ newBaseBranch, newRepoName, targetOwner }) {
@@ -89,7 +91,8 @@ class SiteSettings extends React.Component {
             href="https://federalist.18f.gov/documentation/previews/"
           >
             viewing site previews
-          </a>.
+          </a>
+          .
         </p>
         <BasicSiteSettings
           initialValues={basicInitialValues}

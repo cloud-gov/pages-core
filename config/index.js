@@ -6,10 +6,10 @@ const config = {};
 
 function validConfigFile(filename) {
   return (
-    path.extname(filename) === '.js' &&
-    filename !== 'index.js' &&
-    filename !== 'local.js' &&
-    !filename.match(/.*\.sample\.js/)
+    path.extname(filename) === '.js'
+    && filename !== 'index.js'
+    && filename !== 'local.js'
+    && !filename.match(/.*\.sample\.js/)
   );
 }
 

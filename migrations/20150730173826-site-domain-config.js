@@ -1,15 +1,16 @@
-var dbm = global.dbm || require('db-migrate');
-var type = dbm.dataType;
+const dbm = global.dbm || require('db-migrate');
 
-exports.up = function(db, callback) {
-  db.runSql('ALTER TABLE site ADD COLUMN domain text, ADD COLUMN config text', function(err) {
+const type = dbm.dataType;
+
+exports.up = function (db, callback) {
+  db.runSql('ALTER TABLE site ADD COLUMN domain text, ADD COLUMN config text', (err) => {
     if (err) throw err;
     callback();
   });
 };
 
-exports.down = function(db, callback) {
-  db.runSql('ALTER TABLE site DROP COLUMN domain, DROP COLUMN config', function(err) {
+exports.down = function (db, callback) {
+  db.runSql('ALTER TABLE site DROP COLUMN domain, DROP COLUMN config', (err) => {
     if (err) throw err;
     callback();
   });

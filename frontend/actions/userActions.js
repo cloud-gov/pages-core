@@ -11,14 +11,11 @@ const dispatchUserFetchStartedAction = () => {
   dispatch(createUserFetchStartedAction());
 };
 
-const dispatchUserReceivedAction = user =>
-  dispatch(createUserReceivedAction(user));
+const dispatchUserReceivedAction = user => dispatch(createUserReceivedAction(user));
 
-const dispatchUserActionFetchStarted = () =>
-  dispatch(createUserActionFetchStarted());
+const dispatchUserActionFetchStarted = () => dispatch(createUserActionFetchStarted());
 
-const dispatchUserActionReceived = userActions =>
-  dispatch(createUserActionReceived(userActions));
+const dispatchUserActionReceived = userActions => dispatch(createUserActionReceived(userActions));
 
 export default {
   fetchUser() {

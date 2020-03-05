@@ -44,11 +44,13 @@ const addWebsiteButton = () => (
     className="usa-button button-add-website"
     alt="Add a new site"
   >
-    <IconPlus /> Add site
+    <IconPlus />
+    {' '}
+    Add site
   </Link>
 );
 
-export const SiteList = ({ sites, user, alert }) =>
+export const SiteList = ({ sites, user, alert }) => (
   <div>
     <div className="page-header usa-grid-full">
       <div className="usa-width-two-thirds">
@@ -64,7 +66,8 @@ export const SiteList = ({ sites, user, alert }) =>
     <AlertBanner {...alert} />
     {getSites(sites, user)}
     <a href="#top" className="back-to-top">Return to top</a>
-  </div>;
+  </div>
+);
 
 SiteList.propTypes = {
   alert: ALERT,
@@ -72,7 +75,7 @@ SiteList.propTypes = {
     data: PropTypes.arrayOf(SITE),
     isLoading: PropTypes.bool,
   }),
-  user: USER,
+  user: USER.isRequired,
 };
 
 SiteList.defaultProps = {
@@ -87,4 +90,3 @@ const mapStateToProps = ({ alert, sites, user }) => ({
 });
 
 export default connect(mapStateToProps)(SiteList);
-

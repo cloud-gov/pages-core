@@ -42,7 +42,9 @@ export class AddSite extends React.Component {
 
   onCreateSiteSubmit({ repoUrl, engine, defaultBranch }) {
     const { owner, repository } = getOwnerAndRepo(repoUrl);
-    siteActions.addSite({ owner, repository, engine, defaultBranch });
+    siteActions.addSite({
+      owner, repository, engine, defaultBranch,
+    });
   }
 
   onSubmitTemplate(site) {
@@ -58,8 +60,10 @@ export class AddSite extends React.Component {
   render() {
     // select the function to use on form submit based on
     // the showAddNewSiteFields flag
-    const formSubmitFunc = this.props.showAddNewSiteFields ?
-      this.onCreateSiteSubmit : this.onAddUserSubmit;
+    const { showAddNewSiteFields } = this.props;
+
+    const formSubmitFunc = showAddNewSiteFields
+      ? this.onCreateSiteSubmit : this.onAddUserSubmit;
     const { alert } = this.props;
 
     return (
@@ -83,7 +87,7 @@ export class AddSite extends React.Component {
           <h2>Use your own GitHub repository</h2>
           <AddRepoSiteForm
             initialValues={{ engine: 'jekyll', defaultBranch: 'master' }}
-            showAddNewSiteFields={this.props.showAddNewSiteFields}
+            showAddNewSiteFields={showAddNewSiteFields}
             onSubmit={formSubmitFunc}
           />
           <TemplateSiteList

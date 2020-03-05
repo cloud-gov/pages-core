@@ -77,14 +77,14 @@ export default {
 
   removeUserFromSite(siteId, userId, me = false) {
     return federalist.removeUserFromSite(siteId, userId)
-    .then(this.fetchSites)
-    .then(() => {
-      if (me) { return updateRouterToSitesUri(); }
+      .then(this.fetchSites)
+      .then(() => {
+        if (me) { return updateRouterToSitesUri(); }
 
-      return userActions.fetchUser;
-    })
-    .then(() => alertActions.alertSuccess('Successfully removed.'))
-    .catch(alertError);
+        return userActions.fetchUser;
+      })
+      .then(() => alertActions.alertSuccess('Successfully removed.'))
+      .catch(alertError);
   },
 
   updateSite(site, data) {
