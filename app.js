@@ -26,14 +26,6 @@ const SiteUserAuditor = require('./api/services/SiteUserAuditor');
 const ScheduledBuildHelper = require('./api/services/ScheduledBuildHelper');
 const { sequelize } = require('./api/models');
 
-// If settings present, start New Relic
-if (env.NEW_RELIC_APP_NAME && env.NEW_RELIC_LICENSE_KEY) {
-  logger.info(`Activating New Relic: ${env.NEW_RELIC_APP_NAME}`);
-  require('newrelic'); // eslint-disable-line global-require
-} else {
-  logger.warn('Skipping New Relic Activation');
-}
-
 const app = express();
 
 const PostgresStore = ConnectSession(session.Store);
