@@ -357,40 +357,44 @@ describe('Webhook API', () => {
         expect(build.user).to.eq(user2.id);
       });
 
-      it('should report the status of the new build to GitHub', (done) => {
+      it('should report the status of the new build to GitHub', async () => {
         nock.cleanAll();
         const statusNock = githubAPINocks.status({ state: 'pending' });
 
         const userProm = factory.user();
-        const siteProm = factory.site({ users: Promise.all([userProm]) });
-        Promise.props({ user: userProm, site: siteProm })
-          .then(({ user, site }) => {
-            const payload = buildWebhookPayload(user, site);
-            payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
-            const signature = signWebhookPayload(payload);
+        const site = await factory.site({ users: Promise.all([userProm]) });
+        const user = await userProm;
+        await Build.create({
+          site: site.id,
+          user: user.id,
+          branch: 'master',
+          commitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
+          state: 'queued',
+          token: 'token',
+        }, { hooks: false });
 
-            githubAPINocks.repo({
-              accessToken: user.githubAccessToken,
-              owner: site.owner,
-              repo: site.repository,
-              username: user.username,
-            });
+        const payload = buildWebhookPayload(user, site);
+        payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
+        const signature = signWebhookPayload(payload);
 
-            return request(app)
-              .post('/webhook/github')
-              .send(payload)
-              .set({
-                'X-GitHub-Event': 'push',
-                'X-Hub-Signature': signature,
-                'X-GitHub-Delivery': '123abc',
-              })
-              .expect(200);
+        githubAPINocks.repo({
+          accessToken: user.githubAccessToken,
+          owner: site.owner,
+          repo: site.repository,
+          username: user.username,
+        });
+
+        await request(app)
+          .post('/webhook/github')
+          .send(payload)
+          .set({
+            'X-GitHub-Event': 'push',
+            'X-Hub-Signature': signature,
+            'X-GitHub-Delivery': '123abc',
           })
-          .then(() => {
-            expect(statusNock.isDone()).to.be.true;
-            done();
-          })
-          .catch(done);
+          .expect(200);
+
+        expect(statusNock.isDone()).to.be.true;
       });
     });
   });
