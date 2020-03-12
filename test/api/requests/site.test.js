@@ -32,14 +32,14 @@ describe('Site API', () => {
   describe('GET /v0/site', () => {
     it('should require authentication', (done) => {
       factory.build().then(() => request(app)
-          .get('/v0/site')
-          .expect(403))
-          .then((response) => {
-            validateAgainstJSONSchema('GET', '/site', 403, response.body);
-            expect(response.body.message).to.equal(authErrorMessage);
-            done();
-          })
-          .catch(done);
+        .get('/v0/site')
+        .expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('GET', '/site', 403, response.body);
+          expect(response.body.message).to.equal(authErrorMessage);
+          done();
+        })
+        .catch(done);
     });
 
     it('should render a list of sites associated with the user', (done) => {
@@ -55,28 +55,28 @@ describe('Site API', () => {
         sites = models;
         return authenticatedSession(user);
       }).then(cookie => request(app)
-          .get('/v0/site')
-          .set('Cookie', cookie)
-          .expect(200))
-          .then((resp) => {
-            response = resp;
+        .get('/v0/site')
+        .set('Cookie', cookie)
+        .expect(200))
+        .then((resp) => {
+          response = resp;
 
-            validateAgainstJSONSchema('GET', '/site', 200, response.body);
+          validateAgainstJSONSchema('GET', '/site', 200, response.body);
 
-            expect(response.body).to.be.a('array');
-            expect(response.body).to.have.length(3);
+          expect(response.body).to.be.a('array');
+          expect(response.body).to.have.length(3);
 
-            return Promise.all(sites.map(site => Site.findByPk(site.id, { include: [User] })));
-          })
-          .then((foundSites) => {
-            foundSites.forEach((site) => {
-              const responseSite = response.body.find(candidate => candidate.id === site.id);
-              expect(responseSite).not.to.be.undefined;
-              siteResponseExpectations(responseSite, site);
-            });
-            done();
-          })
-          .catch(done);
+          return Promise.all(sites.map(site => Site.findByPk(site.id, { include: [User] })));
+        })
+        .then((foundSites) => {
+          foundSites.forEach((site) => {
+            const responseSite = response.body.find(candidate => candidate.id === site.id);
+            expect(responseSite).not.to.be.undefined;
+            siteResponseExpectations(responseSite, site);
+          });
+          done();
+        })
+        .catch(done);
     });
 
     it('should not render any sites not associated with the user', (done) => {
@@ -86,30 +86,30 @@ describe('Site API', () => {
         expect(site).to.have.length(3);
         return authenticatedSession(factory.user());
       }).then(cookie => request(app)
-          .get('/v0/site')
-          .set('Cookie', cookie)
-          .expect(200))
-          .then((response) => {
-            validateAgainstJSONSchema('GET', '/site', 200, response.body);
-            expect(response.body).to.be.a('array');
-            expect(response.body).to.be.empty;
-            done();
-          })
-          .catch(done);
+        .get('/v0/site')
+        .set('Cookie', cookie)
+        .expect(200))
+        .then((response) => {
+          validateAgainstJSONSchema('GET', '/site', 200, response.body);
+          expect(response.body).to.be.a('array');
+          expect(response.body).to.be.empty;
+          done();
+        })
+        .catch(done);
     });
   });
 
   describe('GET /v0/site/:id', () => {
     it('should require authentication', (done) => {
       factory.site().then(site => request(app)
-          .get(`/v0/site/${site.id}`)
-          .expect(403))
-          .then((response) => {
-            validateAgainstJSONSchema('GET', '/site/{id}', 403, response.body);
-            expect(response.body.message).to.equal(authErrorMessage);
-            done();
-          })
-          .catch(done);
+        .get(`/v0/site/${site.id}`)
+        .expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('GET', '/site/{id}', 403, response.body);
+          expect(response.body.message).to.equal(authErrorMessage);
+          done();
+        })
+        .catch(done);
     });
 
     it('should render a JSON representation of the site', (done) => {
@@ -124,8 +124,7 @@ describe('Site API', () => {
         .then(cookie => request(app)
           .get(`/v0/site/${site.id}`)
           .set('Cookie', cookie)
-          .expect(200)
-        )
+          .expect(200))
         .then((response) => {
           validateAgainstJSONSchema('GET', '/site/{id}', 200, response.body);
           siteResponseExpectations(response.body, site);
@@ -141,14 +140,14 @@ describe('Site API', () => {
         site = model;
         return authenticatedSession(factory.user());
       }).then(cookie => request(app)
-          .get(`/v0/site/${site.id}`)
-          .set('Cookie', cookie)
-          .expect(403))
-          .then((response) => {
-            validateAgainstJSONSchema('GET', '/site/{id}', 403, response.body);
-            done();
-          })
-          .catch(done);
+        .get(`/v0/site/${site.id}`)
+        .set('Cookie', cookie)
+        .expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('GET', '/site/{id}', 403, response.body);
+          done();
+        })
+        .catch(done);
     });
   });
 
@@ -266,14 +265,13 @@ describe('Site API', () => {
           engine: 'jekyll',
         })
         .set('Cookie', cookie)
-        .expect(403)
-      )
-      .then((response) => {
-        validateAgainstJSONSchema('POST', '/site', 403, response.body);
-        expect(response.body.message).to.equal('Invalid CSRF token');
-        done();
-      })
-      .catch(done);
+        .expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site', 403, response.body);
+          expect(response.body.message).to.equal('Invalid CSRF token');
+          done();
+        })
+        .catch(done);
     });
 
     it('should require authentication', (done) => {
@@ -308,40 +306,39 @@ describe('Site API', () => {
       cfMockServices(siteOwner, siteRepository);
 
       factory.user()
-      .then((user) => {
-        githubAPINocks.userOrganizations({
-          accessToken: user.githubAccessToken,
-          organizations: [{ login: siteOwner }],
-        });
+        .then((user) => {
+          githubAPINocks.userOrganizations({
+            accessToken: user.githubAccessToken,
+            organizations: [{ login: siteOwner }],
+          });
 
-        return authenticatedSession(user);
-      })
-      .then(cookie =>
-        request(app)
-        .post('/v0/site')
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({
-          owner: siteOwner,
-          repository: siteRepository,
-          defaultBranch: 'master',
-          engine: 'jekyll',
+          return authenticatedSession(user);
         })
-        .set('Cookie', cookie)
-        .expect(200))
-      .then((response) => {
-        validateAgainstJSONSchema('POST', '/site', 200, response.body);
-        return Site.findOne({
-          where: {
+        .then(cookie => request(app)
+          .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
             owner: siteOwner,
             repository: siteRepository,
-          },
-        });
-      })
-      .then((site) => {
-        expect(site).to.not.be.undefined;
-        done();
-      })
-      .catch(done);
+            defaultBranch: 'master',
+            engine: 'jekyll',
+          })
+          .set('Cookie', cookie)
+          .expect(200))
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site', 200, response.body);
+          return Site.findOne({
+            where: {
+              owner: siteOwner,
+              repository: siteRepository,
+            },
+          });
+        })
+        .then((site) => {
+          expect(site).to.not.be.undefined;
+          done();
+        })
+        .catch(done);
     });
 
     it('should create a new repo and site from a template', (done) => {
@@ -360,66 +357,66 @@ describe('Site API', () => {
       });
 
       authenticatedSession().then(cookie => request(app)
-          .post('/v0/site')
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            owner: siteOwner,
-            repository: siteRepository,
-            defaultBranch: 'master',
-            engine: 'jekyll',
-            template: 'uswds',
-          })
-          .set('Cookie', cookie)
-          .expect(200))
-          .then((response) => {
-            validateAgainstJSONSchema('POST', '/site', 200, response.body);
-            return Site.findOne({
-              where: {
-                owner: siteOwner,
-                repository: siteRepository,
-              },
-            });
-          })
-          .then((site) => {
-            expect(site).to.not.be.undefined;
-            expect(createRepoNock.isDone()).to.equal(true);
-            done();
-          })
-          .catch(done);
+        .post('/v0/site')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          owner: siteOwner,
+          repository: siteRepository,
+          defaultBranch: 'master',
+          engine: 'jekyll',
+          template: 'uswds2',
+        })
+        .set('Cookie', cookie)
+        .expect(200))
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site', 200, response.body);
+          return Site.findOne({
+            where: {
+              owner: siteOwner,
+              repository: siteRepository,
+            },
+          });
+        })
+        .then((site) => {
+          expect(site).to.not.be.undefined;
+          expect(createRepoNock.isDone()).to.equal(true);
+          done();
+        })
+        .catch(done);
     });
 
     it('should respond with a 403 if no user or repository is specified', (done) => {
       authenticatedSession().then(cookie => request(app)
-          .post('/v0/site')
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            defaultBranch: 'master',
-            engine: 'jekyll',
-            template: 'gatsby',
-          })
-          .set('Cookie', cookie)
-          .expect(403)).then((response) => {
-            validateAgainstJSONSchema('POST', '/site', 403, response.body);
-            done();
-          }).catch(done);
+        .post('/v0/site')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          defaultBranch: 'master',
+          engine: 'jekyll',
+          template: 'gatsby',
+        })
+        .set('Cookie', cookie)
+        .expect(403)).then((response) => {
+        validateAgainstJSONSchema('POST', '/site', 403, response.body);
+        done();
+      }).catch(done);
     });
 
     it('should respond with a 400 if template specified does not exist', (done) => {
       authenticatedSession().then(cookie => request(app)
-          .post('/v0/site')
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            owner: 'siteOwner',
-            repository: 'siteRepository',
-            defaultBranch: 'master',
-            engine: 'jekyll',
-            template: 'fake-template',
-          })
-          .set('Cookie', cookie)
-          .expect(400)).then((response) => {
-            validateAgainstJSONSchema('POST', '/site', 400, response.body);
-            done();
-          }).catch(done);
+        .post('/v0/site')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          owner: 'siteOwner',
+          repository: 'siteRepository',
+          defaultBranch: 'master',
+          engine: 'jekyll',
+          template: 'fake-template',
+        })
+        .set('Cookie', cookie)
+        .expect(400)).then((response) => {
+        validateAgainstJSONSchema('POST', '/site', 400, response.body);
+        done();
+      }).catch(done);
     });
 
     it('should respond with a 400 if the site already exists', (done) => {
@@ -430,20 +427,20 @@ describe('Site API', () => {
         site: factory.site(),
         cookie: authenticatedSession(userPromise),
       }).then(({ site, cookie }) => request(app)
-          .post('/v0/site')
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            owner: site.owner,
-            repository: site.repository,
-            defaultBranch: 'master',
-            engine: 'jekyll',
-          })
-          .set('Cookie', cookie)
-          .expect(400)).then((response) => {
-            validateAgainstJSONSchema('POST', '/site', 400, response.body);
-            expect(response.body.message).to.equal('This site has already been added to Federalist.');
-            done();
-          }).catch(done);
+        .post('/v0/site')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          owner: site.owner,
+          repository: site.repository,
+          defaultBranch: 'master',
+          engine: 'jekyll',
+        })
+        .set('Cookie', cookie)
+        .expect(400)).then((response) => {
+        validateAgainstJSONSchema('POST', '/site', 400, response.body);
+        expect(response.body.message).to.equal('This site has already been added to Federalist.');
+        done();
+      }).catch(done);
     });
 
     it('should respond with a 400 if the user does not have admin access to the repository', (done) => {
@@ -471,10 +468,10 @@ describe('Site API', () => {
         })
         .set('Cookie', cookie)
         .expect(400)).then((response) => {
-          validateAgainstJSONSchema('POST', '/site', 400, response.body);
-          expect(response.body.message).to.equal('You do not have admin access to this repository');
-          done();
-        })
+        validateAgainstJSONSchema('POST', '/site', 400, response.body);
+        expect(response.body.message).to.equal('You do not have admin access to this repository');
+        done();
+      })
         .catch(done);
     });
 
@@ -495,25 +492,25 @@ describe('Site API', () => {
       cfMockServices(siteOwner, siteRepository);
 
       factory.user()
-      .then((user) => {
-        githubAPINocks.userOrganizations({
-          accessToken: user.githubAccessToken,
-          organizations: [{ login: siteOwner }],
-        });
+        .then((user) => {
+          githubAPINocks.userOrganizations({
+            accessToken: user.githubAccessToken,
+            organizations: [{ login: siteOwner }],
+          });
 
-        return authenticatedSession(user);
-      })
-      .then(cookie => request(app)
-        .post('/v0/site')
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({
-          owner: siteOwner,
-          repository: siteRepository,
-          defaultBranch: 'master',
-          engine: 'jekyll',
+          return authenticatedSession(user);
         })
-        .set('Cookie', cookie)
-        .expect(400)).then((response) => {
+        .then(cookie => request(app)
+          .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            owner: siteOwner,
+            repository: siteRepository,
+            defaultBranch: 'master',
+            engine: 'jekyll',
+          })
+          .set('Cookie', cookie)
+          .expect(400)).then((response) => {
           validateAgainstJSONSchema('POST', '/site', 400, response.body);
           expect(response.body.message).to.equal('You do not have admin access to this repository');
           done();
@@ -537,14 +534,13 @@ describe('Site API', () => {
           repository: 'partner-site',
         })
         .set('Cookie', cookie)
-        .expect(403)
-      )
-      .then((response) => {
-        validateAgainstJSONSchema('POST', '/site/user', 403, response.body);
-        expect(response.body.message).to.equal('Invalid CSRF token');
-        done();
-      })
-      .catch(done);
+        .expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site/user', 403, response.body);
+          expect(response.body.message).to.equal('Invalid CSRF token');
+          done();
+        })
+        .catch(done);
     });
 
     it('should require authentication', (done) => {
@@ -609,14 +605,12 @@ describe('Site API', () => {
 
     it('should respond with a 400 if no user or repository is specified', (done) => {
       authenticatedSession()
-        .then(cookie =>
-          request(app)
-            .post('/v0/site/user')
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .send({})
-            .expect(400)
-        )
+        .then(cookie => request(app)
+          .post('/v0/site/user')
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .send({})
+          .expect(400))
         .then((response) => {
           validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
           done();
@@ -630,17 +624,15 @@ describe('Site API', () => {
         site: factory.site({ users: Promise.all([userPromise]) }),
         cookie: authenticatedSession(userPromise),
       })
-        .then(({ site, cookie }) =>
-          request(app)
-            .post('/v0/site/user')
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .send({
-              owner: site.owner,
-              repository: site.repository,
-            })
-            .expect(400)
-        )
+        .then(({ site, cookie }) => request(app)
+          .post('/v0/site/user')
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .send({
+            owner: site.owner,
+            repository: site.repository,
+          })
+          .expect(400))
         .then((response) => {
           validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
           expect(response.body.message).to.eq("You've already added this site to Federalist");
@@ -666,41 +658,37 @@ describe('Site API', () => {
       Promise.props({
         cookie: authenticatedSession(),
         site: factory.site({ owner: siteOwner, repository: siteRepository }),
-      }).then(({ cookie, site }) =>
-        request(app)
-          .post('/v0/site/user')
-          .set('x-csrf-token', csrfToken.getToken())
-          .set('Cookie', cookie)
-          .send({
-            owner: site.owner,
-            repository: site.repository,
-          })
-          .expect(400)
-      ).then((response) => {
+      }).then(({ cookie, site }) => request(app)
+        .post('/v0/site/user')
+        .set('x-csrf-token', csrfToken.getToken())
+        .set('Cookie', cookie)
+        .send({
+          owner: site.owner,
+          repository: site.repository,
+        })
+        .expect(400)).then((response) => {
         validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
         expect(response.body.message).to.eq('You do not have write access to this repository');
         done();
       })
-      .catch(done);
+        .catch(done);
     });
 
     it('should respond with a 404 if the site does not exist', (done) => {
-      authenticatedSession().then(cookie =>
-        request(app)
-          .post('/v0/site/user')
-          .set('x-csrf-token', csrfToken.getToken())
-          .set('Cookie', cookie)
-          .send({
-            owner: 'this-is',
-            repository: 'not-real',
-          })
-          .expect(404)
-      ).then((response) => {
+      authenticatedSession().then(cookie => request(app)
+        .post('/v0/site/user')
+        .set('x-csrf-token', csrfToken.getToken())
+        .set('Cookie', cookie)
+        .send({
+          owner: 'this-is',
+          repository: 'not-real',
+        })
+        .expect(404)).then((response) => {
         validateAgainstJSONSchema('POST', '/site/user', 404, response.body);
         expect(response.body.message).to.eq('The site you are trying to add does not exist');
         done();
       })
-      .catch(done);
+        .catch(done);
     });
   });
 
@@ -713,14 +701,13 @@ describe('Site API', () => {
         .delete(requestPath(1, 1))
         .set('x-csrf-token', 'bad-token')
         .set('Cookie', cookie)
-        .expect(403)
-      )
-      .then((response) => {
-        validateAgainstJSONSchema('DELETE', path, 403, response.body);
-        expect(response.body.message).to.equal('Invalid CSRF token');
-        done();
-      })
-      .catch(done);
+        .expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('DELETE', path, 403, response.body);
+          expect(response.body.message).to.equal('Invalid CSRF token');
+          done();
+        })
+        .catch(done);
     });
 
     it('should require authentication', (done) => {
@@ -749,17 +736,15 @@ describe('Site API', () => {
         site: factory.site(),
         cookie: authenticatedSession(userPromise),
       })
-      .then(models =>
-        request(app).delete(requestPath('a-site', 'a-user'))
+        .then(models => request(app).delete(requestPath('a-site', 'a-user'))
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', models.cookie)
-          .expect(400)
-      ).then((response) => {
-        validateAgainstJSONSchema('DELETE', path, 400, response.body);
-        expect(response.body.message).to.equal('Bad Request');
-        done();
-      })
-      .catch(done);
+          .expect(400)).then((response) => {
+          validateAgainstJSONSchema('DELETE', path, 400, response.body);
+          expect(response.body.message).to.equal('Bad Request');
+          done();
+        })
+        .catch(done);
     });
 
     it('should return a 404 if the site cannot be found', (done) => {
@@ -770,17 +755,15 @@ describe('Site API', () => {
         site: factory.site(),
         cookie: authenticatedSession(userPromise),
       })
-      .then(models =>
-        request(app).delete(requestPath(1000, models.user.id))
+        .then(models => request(app).delete(requestPath(1000, models.user.id))
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', models.cookie)
-          .expect(404)
-      ).then((response) => {
-        validateAgainstJSONSchema('DELETE', path, 404, response.body);
-        expect(response.body.message).to.equal('Not found');
-        done();
-      })
-      .catch(done);
+          .expect(404)).then((response) => {
+          validateAgainstJSONSchema('DELETE', path, 404, response.body);
+          expect(response.body.message).to.equal('Not found');
+          done();
+        })
+        .catch(done);
     });
 
     it('should remove the user from the site', (done) => {
@@ -816,7 +799,7 @@ describe('Site API', () => {
         expect(fetchedSite.Users.length).to.equal(1);
         done();
       })
-      .catch(done);
+        .catch(done);
     });
 
     it('should allow the owner to remove a user from the site', (done) => {
@@ -838,30 +821,30 @@ describe('Site API', () => {
         cookie: authenticatedSession(userPromise),
         anotherUser,
       })
-      .then((models) => {
-        currentSite = models.site;
+        .then((models) => {
+          currentSite = models.site;
 
-        githubAPINocks.repo({
-          owner: username,
-          repository: models.site.repo,
-          response: [200, {
-            permissions: { admin: true, push: true },
-          }],
-        });
+          githubAPINocks.repo({
+            owner: username,
+            repository: models.site.repo,
+            response: [200, {
+              permissions: { admin: true, push: true },
+            }],
+          });
 
-        return request(app).delete(requestPath(models.site.id, models.anotherUser.id))
-          .set('x-csrf-token', csrfToken.getToken())
-          .set('Cookie', models.cookie)
-          .expect(200);
-      }).then((response) => {
-        validateAgainstJSONSchema('DELETE', path, 200, response.body);
-        return Site.withUsers(currentSite.id);
-      }).then((fetchedSite) => {
-        expect(fetchedSite.Users).to.be.an('array');
-        expect(fetchedSite.Users.length).to.equal(1);
-        done();
-      })
-      .catch(done);
+          return request(app).delete(requestPath(models.site.id, models.anotherUser.id))
+            .set('x-csrf-token', csrfToken.getToken())
+            .set('Cookie', models.cookie)
+            .expect(200);
+        }).then((response) => {
+          validateAgainstJSONSchema('DELETE', path, 200, response.body);
+          return Site.withUsers(currentSite.id);
+        }).then((fetchedSite) => {
+          expect(fetchedSite.Users).to.be.an('array');
+          expect(fetchedSite.Users.length).to.equal(1);
+          done();
+        })
+        .catch(done);
     });
 
     it('should respond with a 400 when deleting the final user', (done) => {
@@ -872,17 +855,15 @@ describe('Site API', () => {
         site: factory.site({ users: Promise.all([userPromise]) }),
         cookie: authenticatedSession(userPromise),
       })
-      .then(({ user, site, cookie }) =>
-        request(app).delete(requestPath(site.id, user.id))
+        .then(({ user, site, cookie }) => request(app).delete(requestPath(site.id, user.id))
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
-          .expect(400)
-      ).then((response) => {
-        validateAgainstJSONSchema('DELETE', path, 400, response.body);
-        expect(response.body.message).to.equal(siteErrors.USER_REQUIRED);
-        done();
-      })
-      .catch(done);
+          .expect(400)).then((response) => {
+          validateAgainstJSONSchema('DELETE', path, 400, response.body);
+          expect(response.body.message).to.equal(siteErrors.USER_REQUIRED);
+          done();
+        })
+        .catch(done);
     });
 
     it('should respond with a 404 when the user to delete is not found', (done) => {
@@ -895,25 +876,25 @@ describe('Site API', () => {
         site: factory.site({ users: Promise.all([userPromise, otherUser]) }),
         cookie: authenticatedSession(userPromise),
       })
-      .then((models) => {
-        githubAPINocks.repo({
-          owner: 'james',
-          repository: models.site.repo,
-          response: [200, {
-            permissions: { admin: true, push: true },
-          }],
-        });
+        .then((models) => {
+          githubAPINocks.repo({
+            owner: 'james',
+            repository: models.site.repo,
+            response: [200, {
+              permissions: { admin: true, push: true },
+            }],
+          });
 
-        return request(app).delete(requestPath(models.site.id, 100000))
-          .set('x-csrf-token', csrfToken.getToken())
-          .set('Cookie', models.cookie)
-          .expect(404);
-      }).then((response) => {
-        validateAgainstJSONSchema('DELETE', path, 404, response.body);
-        expect(response.body.message).to.equal(siteErrors.NO_ASSOCIATED_USER);
-        done();
-      })
-      .catch(done);
+          return request(app).delete(requestPath(models.site.id, 100000))
+            .set('x-csrf-token', csrfToken.getToken())
+            .set('Cookie', models.cookie)
+            .expect(404);
+        }).then((response) => {
+          validateAgainstJSONSchema('DELETE', path, 404, response.body);
+          expect(response.body.message).to.equal(siteErrors.NO_ASSOCIATED_USER);
+          done();
+        })
+        .catch(done);
     });
 
     it('should respond with a 400 when any user attempts to remove the owner', (done) => {
@@ -933,25 +914,25 @@ describe('Site API', () => {
         site: factory.site(siteProps),
         cookie: authenticatedSession(normalUser),
       })
-      .then(({ user, site, cookie }) => {
-        githubAPINocks.repo({
-          owner: ownerName,
-          repository: site.repo,
-          response: [200, {
-            permissions: { admin: true, push: true },
-          }],
-        });
+        .then(({ user, site, cookie }) => {
+          githubAPINocks.repo({
+            owner: ownerName,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: true, push: true },
+            }],
+          });
 
-        return request(app).delete(requestPath(site.id, user.id))
-          .set('x-csrf-token', csrfToken.getToken())
-          .set('Cookie', cookie)
-          .expect(400);
-      }).then((response) => {
-        validateAgainstJSONSchema('DELETE', path, 400, response.body);
-        expect(response.body.message).to.equal(siteErrors.OWNER_REMOVE);
-        done();
-      })
-      .catch(done);
+          return request(app).delete(requestPath(site.id, user.id))
+            .set('x-csrf-token', csrfToken.getToken())
+            .set('Cookie', cookie)
+            .expect(400);
+        }).then((response) => {
+          validateAgainstJSONSchema('DELETE', path, 400, response.body);
+          expect(response.body.message).to.equal(siteErrors.OWNER_REMOVE);
+          done();
+        })
+        .catch(done);
     });
 
     it('should respond with a 400 when the site owner attempts to remove themselves', (done) => {
@@ -970,25 +951,25 @@ describe('Site API', () => {
         site: factory.site(siteProps),
         cookie: authenticatedSession(userPromise),
       })
-      .then(({ user, site, cookie }) => {
-        githubAPINocks.repo({
-          owner: username,
-          repository: site.repo,
-          response: [200, {
-            permissions: { admin: true, push: true },
-          }],
-        });
+        .then(({ user, site, cookie }) => {
+          githubAPINocks.repo({
+            owner: username,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: true, push: true },
+            }],
+          });
 
-        return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
-          .set('x-csrf-token', csrfToken.getToken())
-          .set('Cookie', cookie)
-          .expect(400);
-      }).then((response) => {
-        validateAgainstJSONSchema('DELETE', path, 400, response.body);
-        expect(response.body.message).to.equal(siteErrors.OWNER_REMOVE);
-        done();
-      })
-      .catch(done);
+          return request(app).delete(`/v0/site/${site.id}/user/${user.id}`)
+            .set('x-csrf-token', csrfToken.getToken())
+            .set('Cookie', cookie)
+            .expect(400);
+        }).then((response) => {
+          validateAgainstJSONSchema('DELETE', path, 400, response.body);
+          expect(response.body.message).to.equal(siteErrors.OWNER_REMOVE);
+          done();
+        })
+        .catch(done);
     });
 
     it('should respond with a 400 if the user does not have admin access', (done) => {
@@ -1026,7 +1007,7 @@ describe('Site API', () => {
         expect(response.body.message).to.equal(siteErrors.ADMIN_ACCESS_REQUIRED);
         done();
       })
-      .catch(done);
+        .catch(done);
     });
 
     it('should allow a user to remove themselves even if they are not a repo write user', (done) => {
@@ -1069,7 +1050,7 @@ describe('Site API', () => {
         expect(fetchedSite.Users.length).to.equal(1);
         done();
       })
-      .catch(done);
+        .catch(done);
     });
   });
 
@@ -1102,8 +1083,7 @@ describe('Site API', () => {
           .delete(`/v0/site/${site.id}`)
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
-          .expect(403)
-        )
+          .expect(403))
         .then((response) => {
           validateAgainstJSONSchema('DELETE', '/site/{id}', 403, response.body);
           expect(response.body.message).to.equal(authErrorMessage);
@@ -1124,8 +1104,7 @@ describe('Site API', () => {
           .delete(`/v0/site/${site.id}`)
           .set('x-csrf-token', 'bad-token')
           .set('Cookie', cookie)
-          .expect(403)
-        )
+          .expect(403))
         .then((response) => {
           validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
           expect(response.body.message).to.equal('Invalid CSRF token');
@@ -1156,8 +1135,7 @@ describe('Site API', () => {
           .delete(`/v0/site/${site.id}`)
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
-          .expect(200)
-        )
+          .expect(200))
         .then((response) => {
           validateAgainstJSONSchema('DELETE', '/site/{id}', 200, response.body);
           siteResponseExpectations(response.body, site);
@@ -1183,8 +1161,7 @@ describe('Site API', () => {
           .delete(`/v0/site/${site.id}`)
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
-          .expect(403)
-        )
+          .expect(403))
         .then((response) => {
           validateAgainstJSONSchema('DELETE', '/site/{id}', 403, response.body);
           return Site.findAll({ where: { id: site.id } });
@@ -1228,11 +1205,11 @@ describe('Site API', () => {
           .set('Cookie', results.cookie)
           .expect(200);
       })
-      .then(() => {
-        expect(S3SiteRemover.removeSite.calledOnce).to.equal(true);
-        done();
-      })
-      .catch(done);
+        .then(() => {
+          expect(S3SiteRemover.removeSite.calledOnce).to.equal(true);
+          done();
+        })
+        .catch(done);
     });
   });
 
@@ -1252,8 +1229,7 @@ describe('Site API', () => {
             defaultBranch: 'master',
           })
           .set('Cookie', cookie)
-          .expect(403)
-        )
+          .expect(403))
         .then((response) => {
           validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
           expect(response.body.message).to.equal(authErrorMessage);
@@ -1277,8 +1253,7 @@ describe('Site API', () => {
             defaultBranch: 'master',
           })
           .set('Cookie', cookie)
-          .expect(403)
-        )
+          .expect(403))
         .then((response) => {
           validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
           expect(response.body.message).to.equal('Invalid CSRF token');
@@ -1311,8 +1286,7 @@ describe('Site API', () => {
           .set('x-csrf-token', csrfToken.getToken())
           .send(newConfigs)
           .set('Cookie', cookie)
-          .expect(200)
-        )
+          .expect(200))
         .then((resp) => {
           response = resp;
           return Site.findByPk(site.id, { include: [User] });
@@ -1340,14 +1314,13 @@ describe('Site API', () => {
           return authenticatedSession(factory.user());
         })
         .then(cookie => request(app)
-            .put(`/v0/site/${siteModel.id}`)
-            .set('x-csrf-token', csrfToken.getToken())
-            .send({
-              repository: 'new-repo-name',
-            })
-            .set('Cookie', cookie)
-            .expect(403)
-        )
+          .put(`/v0/site/${siteModel.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            repository: 'new-repo-name',
+          })
+          .set('Cookie', cookie)
+          .expect(403))
         .then((response) => {
           validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
           return Site.findByPk(siteModel.id);
@@ -1375,8 +1348,7 @@ describe('Site API', () => {
             repository: 'new-repo-name',
           })
           .set('Cookie', cookie)
-          .expect(200)
-        )
+          .expect(200))
         .then(() => Site.findByPk(siteModel.id, { include: [User, Build] }))
         .then((site) => {
           expect(site.Builds).to.have.length(1);
@@ -1393,30 +1365,30 @@ describe('Site API', () => {
         demoBranch: 'demo',
         demoDomain: 'https://demo.example.gov',
       })
-      .then(site => Site.findByPk(site.id, { include: [User, Build] }))
-      .then((model) => {
-        siteModel = model;
-        expect(siteModel.Builds).to.have.length(0);
-        return authenticatedSession(siteModel.Users[0]);
-      })
-      .then(cookie => request(app)
-        .put(`/v0/site/${siteModel.id}`)
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({
-          repository: 'new-repo-name',
+        .then(site => Site.findByPk(site.id, { include: [User, Build] }))
+        .then((model) => {
+          siteModel = model;
+          expect(siteModel.Builds).to.have.length(0);
+          return authenticatedSession(siteModel.Users[0]);
         })
-        .set('Cookie', cookie)
-        .expect(200)
-      )
-      .then(() => Site.findByPk(siteModel.id, { include: [User, Build] }))
-      .then((site) => {
-        expect(site.Builds).to.have.length(2);
-        const demoBuild = site.Builds.find(
-          candidateBuild => candidateBuild.branch === site.demoBranch);
-        expect(demoBuild).to.not.be.undefined;
-        done();
-      })
-      .catch(done);
+        .then(cookie => request(app)
+          .put(`/v0/site/${siteModel.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            repository: 'new-repo-name',
+          })
+          .set('Cookie', cookie)
+          .expect(200))
+        .then(() => Site.findByPk(siteModel.id, { include: [User, Build] }))
+        .then((site) => {
+          expect(site.Builds).to.have.length(2);
+          const demoBuild = site.Builds.find(
+            candidateBuild => candidateBuild.branch === site.demoBranch
+          );
+          expect(demoBuild).to.not.be.undefined;
+          done();
+        })
+        .catch(done);
     });
 
     it('should update attributes when the value in the request body is an empty string', (done) => {
@@ -1434,29 +1406,29 @@ describe('Site API', () => {
         site: sitePromise,
         cookie: cookiePromise,
       })
-      .then((results) => {
-        site = results.site;
+        .then((results) => {
+          site = results.site;
 
-        return request(app)
-          .put(`/v0/site/${site.id}`)
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            defaultConfig: '',
-            domain: '',
-          })
-          .set('Cookie', results.cookie)
-          .expect(200);
-      })
-      .then((response) => {
-        validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
-        return Site.findByPk(site.id);
-      })
-      .then((foundSite) => {
-        expect(foundSite.defaultConfig).to.equal(null);
-        expect(foundSite.domain).to.equal('');
-        done();
-      })
-      .catch(done);
+          return request(app)
+            .put(`/v0/site/${site.id}`)
+            .set('x-csrf-token', csrfToken.getToken())
+            .send({
+              defaultConfig: '',
+              domain: '',
+            })
+            .set('Cookie', results.cookie)
+            .expect(200);
+        })
+        .then((response) => {
+          validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
+          return Site.findByPk(site.id);
+        })
+        .then((foundSite) => {
+          expect(foundSite.defaultConfig).to.equal(null);
+          expect(foundSite.domain).to.equal('');
+          done();
+        })
+        .catch(done);
     });
 
     it('should not override existing attributes if they are not present in the request body', (done) => {
@@ -1474,28 +1446,28 @@ describe('Site API', () => {
         site: sitePromise,
         cookie: cookiePromise,
       })
-      .then((results) => {
-        site = results.site;
+        .then((results) => {
+          site = results.site;
 
-        return request(app)
-          .put(`/v0/site/${site.id}`)
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            defaultConfig: 'new: true',
-          })
-          .set('Cookie', results.cookie)
-          .expect(200);
-      })
-      .then((response) => {
-        validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
-        return Site.findByPk(site.id);
-      })
-      .then((foundSite) => {
-        expect(foundSite.defaultConfig).to.deep.equal({ new: true });
-        expect(foundSite.domain).to.equal('https://example.com');
-        done();
-      })
-      .catch(done);
+          return request(app)
+            .put(`/v0/site/${site.id}`)
+            .set('x-csrf-token', csrfToken.getToken())
+            .send({
+              defaultConfig: 'new: true',
+            })
+            .set('Cookie', results.cookie)
+            .expect(200);
+        })
+        .then((response) => {
+          validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
+          return Site.findByPk(site.id);
+        })
+        .then((foundSite) => {
+          expect(foundSite.defaultConfig).to.deep.equal({ new: true });
+          expect(foundSite.domain).to.equal('https://example.com');
+          done();
+        })
+        .catch(done);
     });
 
     it('should respond with an error if config values are not valid YAML', (done) => {
