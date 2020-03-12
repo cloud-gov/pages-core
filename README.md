@@ -149,8 +149,6 @@ The app expects the following user provided services to be provided:
   - `GITHUB_CLIENT_SECRET`: The client secret used for GitHub authentication
   - `GITHUB_WEBHOOK_SECRET`: The secret used to sign and verify webhook requests from GitHub
   - `GITHUB_WEBHOOK_URL`: The url where GitHub webhook requests should be sent
-  - `NEW_RELIC_APP_NAME`: The app name to report to New Relic
-  - `NEW_RELIC_LICENSE_KEY`: The license key to use with New Relic
 - `federalist-<environment>-sqs-creds`: A user-provided service that provides the application with SQS credentials that cannot be added to `manifest.yml` b/c that file is under version control; this service provides the following:
   - `access_key`: The AWS access key for SQS queue
   - `secret_key`: The AWS secret key for SQS queue
