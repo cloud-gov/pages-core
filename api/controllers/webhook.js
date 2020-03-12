@@ -62,36 +62,50 @@ const signWebhookRequest = request => new Promise((resolve, reject) => {
   }
 });
 
-const createBuildForWebhookRequest = (request) => {
-  let buildParams;
+const createBuildForWebhookRequest = async (request) => {
+  const [user, site] = await Promise.all([
+    findUserForWebhookRequest(request),
+    findSiteForWebhookRequest(request),
+  ]);
 
-  const user = findUserForWebhookRequest(request);
-  const site = findSiteForWebhookRequest(request);
+  await addUserToSite({ user, site });
 
-  return Promise.all([user, site]).then((models) => {
-    buildParams = {
-      user: models[0],
-      site: models[1],
-    };
-    return addUserToSite(buildParams);
-  })
-    .then(() => Build.create({
-      branch: request.body.ref.replace('refs/heads/', ''),
-      commitSha: request.body.after,
-      site: buildParams.site.id,
-      user: buildParams.user.id,
-    }));
+  const branch = request.body.ref.replace('refs/heads/', '');
+  const commitSha = request.body.after;
+
+  const queuedBuild = await Build.findOne({
+    where: {
+      branch,
+      state: 'queued',
+      site: site.id,
+    },
+  });
+
+  if (queuedBuild) {
+    return queuedBuild.update({
+      commitSha,
+      user: user.id,
+    });
+  }
+
+  return Build.create({
+    branch,
+    commitSha,
+    site: site.id,
+    user: user.id,
+  });
 };
 
 module.exports = {
   github(req, res) {
-    signWebhookRequest(req).then(() => {
-      if (req.body.commits && req.body.commits.length > 0) {
-        return createBuildForWebhookRequest(req);
-      }
+    signWebhookRequest(req)
+      .then(() => {
+        if (req.body.commits && req.body.commits.length > 0) {
+          return createBuildForWebhookRequest(req);
+        }
 
-      return null;
-    })
+        return null;
+      })
       .then((build) => {
         if (!build) {
           res.ok('No new commits found. No build scheduled.');

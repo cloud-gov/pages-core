@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const nock = require('nock');
 const request = require('supertest');
 const app = require('../../../app');
@@ -11,7 +11,7 @@ const { Build, Site, User } = require('../../../api/models');
 
 describe('Webhook API', () => {
   const signWebhookPayload = (payload) => {
-    const secret = config.webhook.secret;
+    const { secret } = config.webhook;
     const blob = JSON.stringify(payload);
     return `sha1=${crypto.createHmac('sha1', secret).update(blob).digest('hex')}`;
   };
@@ -28,8 +28,7 @@ describe('Webhook API', () => {
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.status();
-      githubAPINocks.repo({ response: [201, { permissions: { admin: false } }],
-      });
+      githubAPINocks.repo({ response: [201, { permissions: { admin: false } }] });
     });
 
     it('should create a new site build for the sender', (done) => {
@@ -237,27 +236,27 @@ describe('Webhook API', () => {
     it('should respond with a 400 if the site is inactive on Federalist', (done) => {
       let user;
       factory.user()
-      .then((model) => {
-        user = model;
-        return factory.site({ users: [user], buildStatus: 'inactive' });
-      })
-      .then((site) => {
-        const payload = buildWebhookPayload(user, {
-          owner: site.owner,
-          repository: site.repository,
-        });
-        const signature = signWebhookPayload(payload);
+        .then((model) => {
+          user = model;
+          return factory.site({ users: [user], buildStatus: 'inactive' });
+        })
+        .then((site) => {
+          const payload = buildWebhookPayload(user, {
+            owner: site.owner,
+            repository: site.repository,
+          });
+          const signature = signWebhookPayload(payload);
 
-        request(app)
-          .post('/webhook/github')
-          .send(payload)
-          .set({
-            'X-GitHub-Event': 'push',
-            'X-Hub-Signature': signature,
-            'X-GitHub-Delivery': '123abc',
-          })
-          .expect(400, done);
-      }).catch(done);
+          request(app)
+            .post('/webhook/github')
+            .send(payload)
+            .set({
+              'X-GitHub-Event': 'push',
+              'X-Hub-Signature': signature,
+              'X-GitHub-Delivery': '123abc',
+            })
+            .expect(400, done);
+        }).catch(done);
     });
 
     it('should respond with a 400 if the signature is invalid', (done) => {
@@ -282,6 +281,117 @@ describe('Webhook API', () => {
             .expect(400, done);
         })
         .catch(done);
+    });
+
+    describe('when a queued build for the branch exists', () => {
+      it('should not create a new build', async () => {
+        const userProm = factory.user();
+        const site = await factory.site({ users: Promise.all([userProm]) });
+        const user = await userProm;
+        await Build.create({
+          site: site.id,
+          user: user.id,
+          branch: 'master',
+          commitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
+          state: 'queued',
+          token: 'token',
+        }, { hooks: false });
+
+        const numBuildsBefore = await Build.count({ where: { site: site.id, user: user.id } });
+
+        expect(numBuildsBefore).to.eq(1);
+
+        const payload = buildWebhookPayload(user, site);
+        const signature = signWebhookPayload(payload);
+
+        await request(app)
+          .post('/webhook/github')
+          .send(payload)
+          .set({
+            'X-GitHub-Event': 'push',
+            'X-Hub-Signature': signature,
+            'X-GitHub-Delivery': '123abc',
+          })
+          .expect(200);
+
+        const numBuildsAfter = await Build.count({ where: { site: site.id, user: user.id } });
+
+        expect(numBuildsAfter).to.eq(1);
+      });
+
+      it('should update the commitSha and user of build', async () => {
+        const branch = 'master';
+        const origSha = 'aaa2b66a31319d456a448041a5b3c2a70c32d8b7';
+        const userProms = Promise.all([factory.user(), factory.user()]);
+        const site = await factory.site({ users: userProms });
+        const [user1, user2] = await userProms;
+        await Build.create({
+          site: site.id,
+          user: user1.id,
+          branch,
+          commitSha: origSha,
+          state: 'queued',
+          token: 'token',
+        }, { hooks: false });
+
+        const numBuildsBefore = await Build.count({ where: { site: site.id, branch } });
+
+        expect(numBuildsBefore).to.eq(1);
+
+        const payload = buildWebhookPayload(user2, site);
+        const signature = signWebhookPayload(payload);
+
+        await request(app)
+          .post('/webhook/github')
+          .send(payload)
+          .set({
+            'X-GitHub-Event': 'push',
+            'X-Hub-Signature': signature,
+            'X-GitHub-Delivery': '123abc',
+          })
+          .expect(200);
+
+        const build = await Build.findOne({ where: { site: site.id, branch }, include: [User] });
+
+        expect(build.commitSha).to.eq(payload.after);
+        expect(build.user).to.eq(user2.id);
+      });
+
+      it('should report the status of the new build to GitHub', (done) => {
+        nock.cleanAll();
+        const statusNock = githubAPINocks.status({ state: 'pending' });
+
+        const userProm = factory.user();
+        const siteProm = factory.site({ users: Promise.all([userProm]) });
+        Promise.props({ user: userProm, site: siteProm })
+          .then(({ user, site }) => {
+            const payload = buildWebhookPayload(user, site);
+            payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
+            const signature = signWebhookPayload(payload);
+
+            githubAPINocks.repo({
+              accessToken: user.githubAccessToken,
+              owner: site.owner,
+              repo: site.repository,
+              username: user.username,
+            });
+
+            return request(app)
+              .post('/webhook/github')
+              .send(payload)
+              .set({
+                'X-GitHub-Event': 'push',
+                'X-Hub-Signature': signature,
+                'X-GitHub-Delivery': '123abc',
+              })
+              .expect(200);
+          })
+          .then(() => {
+            expect(statusNock.isDone()).to.be.true;
+            done();
+          })
+          .catch(done);
+      });
     });
   });
 });
