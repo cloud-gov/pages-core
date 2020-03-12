@@ -11,7 +11,6 @@ const io = require('socket.io');
 const redis = require('redis');
 const redisAdapter = require('socket.io-redis');
 const schedule = require('node-schedule');
-const env = require('./services/environment.js')();
 const responses = require('./api/responses');
 const passport = require('./api/services/passport');
 const { logger, expressLogger, expressErrorLogger } = require('./winston');
