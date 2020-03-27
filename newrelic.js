@@ -1,5 +1,3 @@
-const env = require('./services/environment.js')();
-
 /**
  * New Relic agent configuration.
  *
@@ -11,8 +9,8 @@ const env = require('./services/environment.js')();
 exports.config = {
   // Grab NEW_RELIC_APP_NAME and NEW_RELIC_LICENSE_KEY from the cloud.gov
   // user-provided service
-  app_name: [env.NEW_RELIC_APP_NAME],
-  license_key: env.NEW_RELIC_LICENSE_KEY,
+  app_name: [process.env.NEW_RELIC_APP_NAME],
+  license_key: process.env.NEW_RELIC_LICENSE_KEY,
   logging: {
     level: 'info',
   },
