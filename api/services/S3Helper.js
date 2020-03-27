@@ -127,7 +127,7 @@ class S3Client {
 
     return new Promise((resolve, reject) => {
       const request = () => {
-      start = new Date().getTime();
+        start = new Date().getTime();
         client.putBucketWebsite(params, (err, data) => {
           if (err && attempt < max) {
             putBucketLogger('info', bucket, 'Retry', { start, attempt });
