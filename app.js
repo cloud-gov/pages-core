@@ -141,7 +141,6 @@ app.use(expressErrorLogger);
 
 // eslint-disable-next-line
 app.use((err, req, res, next) => {
-  logger.error(err.stack);
   res.error(err);
 });
 
