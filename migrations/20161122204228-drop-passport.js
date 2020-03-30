@@ -1,40 +1,35 @@
-const Promise = require("bluebird")
+const Promise = require('bluebird');
 
 const dbm = global.dbm || require('db-migrate');
+
 const type = dbm.dataType;
 
-const addColumnsToUserTable = (db) => {
-  return new Promise((resolve, reject) => {
-    db.addColumn("user", "githubAccessToken", "text", err => {
+const addColumnsToUserTable = db => new Promise((resolve, reject) => {
+  db.addColumn('user', 'githubAccessToken', 'text', (err) => {
+    if (err) {
+      reject(err);
+      return;
+    }
+    db.addColumn('user', 'githubUserId', 'text', (err) => {
       if (err) {
-        reject(err)
-        return
-      }
-      db.addColumn("user", "githubUserId", "text", err => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      })
-    })
-  })
-}
-
-
-const loadUsers = (db) => {
-  return new Promise((resolve, reject) => {
-    db.all("SELECT * FROM \"user\"", (err, results) => {
-      if (err) {
-        reject(err)
+        reject(err);
       } else {
-        resolve(Object.keys(results).map(key => {
-          return results[key]
-        }))
+        resolve();
       }
-    })
-  })
-}
+    });
+  });
+});
+
+
+const loadUsers = db => new Promise((resolve, reject) => {
+  db.all('SELECT * FROM "user"', (err, results) => {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(Object.keys(results).map(key => results[key]));
+    }
+  });
+});
 
 const loadPassportForUser = (user, db) => {
   const sql = `
@@ -42,95 +37,83 @@ const loadPassportForUser = (user, db) => {
     FROM "passport"
     WHERE "user" = '${user.id}'
     ORDER BY "createdAt" DESC
-  `
+  `;
 
   return new Promise((resolve, reject) => {
     db.all(sql, (err, results) => {
       if (err) {
-        reject(err)
+        reject(err);
+      } else if (results) {
+        const resultArray = results['0'].row.slice(1, -1).split(',');
+        resolve({
+          identifier: resultArray[0],
+          tokens: {
+            accessToken: resultArray[1],
+          },
+        });
       } else {
-        if (results) {
-          let resultArray = results["0"]["row"].slice(1, -1).split(",")
-          resolve({
-            identifier: resultArray[0],
-            tokens: {
-              accessToken: resultArray[1],
-            },
-          })
-        } else {
-          resolve()
-        }
+        resolve();
       }
-    })
-  })
-}
+    });
+  });
+};
 
 const updateUserWithPassport = (user, passport, db) => {
   const sql = `
     UPDATE "user"
     SET "githubAccessToken"='${passport.tokens.accessToken}', "githubUserId"='${passport.identifier}'
     WHERE "id" = '${user.id}'
-  `
+  `;
 
   return new Promise((resolve, reject) => {
-    db.runSql(sql, err => {
+    db.runSql(sql, (err) => {
       if (err) {
-        reject(err)
+        reject(err);
       } else {
-        resolve()
+        resolve();
       }
-    })
-  })
-}
+    });
+  });
+};
 
-const dropPassportTable = (db) => {
-  return new Promise((reject, resolve) => {
-    db.dropTable("passport", err => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve()
-      }
-    })
-  })
-}
-
-const migrateUpUserData = (user, db) => {
-  return loadPassportForUser(user, db).then(passport => {
-    if (passport) {
-      return updateUserWithPassport(user, passport, db)
+const dropPassportTable = db => new Promise((reject, resolve) => {
+  db.dropTable('passport', (err) => {
+    if (err) {
+      reject(err);
     } else {
-      console.warn(`Unable to find passport for user: ${user.username}`)
-      return Promise.resolve()
+      resolve();
     }
-  })
-}
+  });
+});
+
+const migrateUpUserData = (user, db) => loadPassportForUser(user, db).then((passport) => {
+  if (passport) {
+    return updateUserWithPassport(user, passport, db);
+  }
+  console.warn(`Unable to find passport for user: ${user.username}`);
+  return Promise.resolve();
+});
 
 const migrateUpNextUser = (users, db) => {
   if (users.length > 0) {
-    let user = users.pop()
+    const user = users.pop();
     return migrateUpUserData(user, db).then(() => {
-      console.log(`Migrated user: ${user.username}`)
-      return migrateUpNextUser(users, db)
-    })
-  } else {
-    return Promise.resolve()
+      console.log(`Migrated user: ${user.username}`);
+      return migrateUpNextUser(users, db);
+    });
   }
-}
+  return Promise.resolve();
+};
 
-exports.up = function(db, callback) {
-  addColumnsToUserTable(db).then(() => {
-    return loadUsers(db)
-  }).then(users => {
-    return migrateUpNextUser(users, db)
-  }).then(() => {
-    return dropPassportTable(db)
-  }).then(() => {
-    callback()
-  }).catch(err => {
-    callback(err)
-  })
-}
+exports.up = function (db, callback) {
+  addColumnsToUserTable(db).then(() => loadUsers(db)).then(users => migrateUpNextUser(users, db)).then(() => dropPassportTable(db))
+    .then(() => {
+      callback();
+    })
+    .catch((err) => {
+      callback(err);
+    });
+};
 
 const createPassportTable = (db) => {
   const sql = `
@@ -146,81 +129,74 @@ const createPassportTable = (db) => {
       "createdAt" timestamp with time zone,
       "updatedAt" timestamp with time zone
     );
-  `
+  `;
 
   return new Promise((resolve, reject) => {
-    db.runSql(sql, err => {
+    db.runSql(sql, (err) => {
       if (err) {
-        reject(err)
+        reject(err);
       } else {
-        resolve()
+        resolve();
       }
-    })
-  })
-}
+    });
+  });
+};
 
 const insertPassportRowForUser = (user, db) => {
   if (!user.githubUserId || !user.githubAccessToken) {
-    console.warn(`Unable to find passport data for user: ${user.username}`)
-    return Promise.resolve()
+    console.warn(`Unable to find passport data for user: ${user.username}`);
+    return Promise.resolve();
   }
 
   const sql = `
     INSERT INTO passport ("protocol", "provider", "identifier", "tokens", "user")
     VALUES ('oauth2', 'github', '${user.githubUserId}', '{ "accessToken": "${user.githubAccessToken}" }', '${user.id}');
-  `
+  `;
 
   return new Promise((resolve, reject) => {
-    db.runSql(sql, err => {
+    db.runSql(sql, (err) => {
       if (err) {
-        reject(err)
+        reject(err);
       } else {
-        resolve()
+        resolve();
       }
-    })
-  })
-}
+    });
+  });
+};
 
-const removeColumsFromUserTable = (db) => {
-  return new Promise((resolve, reject) => {
-    db.removeColumn("user", "githubAccessToken", err => {
+const removeColumsFromUserTable = db => new Promise((resolve, reject) => {
+  db.removeColumn('user', 'githubAccessToken', (err) => {
+    if (err) {
+      reject(err);
+      return;
+    }
+    db.removeColumn('user', 'githubUserId', (err) => {
       if (err) {
-        reject(err)
-        return
+        reject(err);
+      } else {
+        resolve();
       }
-      db.removeColumn("user", "githubUserId", err => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      })
-    })
-  })
-}
+    });
+  });
+});
 
 const migrateDownNextUser = (users, db) => {
   if (users.length > 0) {
-    let user = users.pop()
+    const user = users.pop();
     return insertPassportRowForUser(user, db).then(() => {
-      console.log(`Migrated user: ${user.username}`)
-      return migrateDownNextUser(users, db)
-    })
-  } else {
-    return Promise.resolve()
+      console.log(`Migrated user: ${user.username}`);
+      return migrateDownNextUser(users, db);
+    });
   }
-}
+  return Promise.resolve();
+};
 
-exports.down = function(db, callback) {
-  createPassportTable(db).then(() => {
-    return loadUsers(db)
-  }).then(users => {
-    return migrateDownNextUser(users, db)
-  }).then(() => {
-    return removeColumsFromUserTable(db)
-  }).then(() => {
-    callback()
-  }).catch(err => {
-    callback(err)
-  })
-}
+exports.down = function (db, callback) {
+  createPassportTable(db).then(() => loadUsers(db)).then(users => migrateDownNextUser(users, db)).then(() => removeColumsFromUserTable(db))
+    .then(() => {
+      callback();
+    })
+    .catch((err) => {
+      callback(err);
+    });
+};

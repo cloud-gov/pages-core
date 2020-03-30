@@ -22,7 +22,8 @@ export class TemplateList extends React.Component {
   }
 
   render() {
-    const { templates } = this.props;
+    const { defaultOwner, handleSubmitTemplate, templates } = this.props;
+    const { activeChildId } = this.state;
 
     const templateGrid = Object.keys(templates).map((templateKey, index) => {
       const template = templates[templateKey];
@@ -33,10 +34,10 @@ export class TemplateList extends React.Component {
             templateKey={templateKey}
             index={index}
             thumb={template.thumb}
-            active={this.state.activeChildId}
+            active={activeChildId}
             handleChooseActive={this.handleChooseActive}
-            handleSubmit={this.props.handleSubmitTemplate}
-            defaultOwner={this.props.defaultOwner}
+            handleSubmit={handleSubmitTemplate}
+            defaultOwner={defaultOwner}
             {...template}
           />
         </div>

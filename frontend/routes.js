@@ -1,5 +1,7 @@
 import React from 'react';
-import { Route, IndexRedirect, IndexRoute, Redirect } from 'react-router';
+import {
+  Route, IndexRedirect, IndexRoute, Redirect,
+} from 'react-router';
 
 import App from './components/app';
 import SiteList from './components/siteList/siteList';

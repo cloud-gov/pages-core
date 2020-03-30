@@ -1,20 +1,19 @@
-var dbm = global.dbm || require('db-migrate');
-var type = dbm.dataType;
+const dbm = global.dbm || require('db-migrate');
 
-exports.up = function(db, callback) {
-  var cmd = 'ALTER TABLE build ADD COLUMN "source" JSON';
-  db.runSql(cmd, function(err) {
+const type = dbm.dataType;
+
+exports.up = function (db, callback) {
+  const cmd = 'ALTER TABLE build ADD COLUMN "source" JSON';
+  db.runSql(cmd, (err) => {
     if (err) throw err;
     callback();
   });
-
 };
 
-exports.down = function(db, callback) {
-  var cmd = 'ALTER TABLE build DROP COLUMN "source"';
-  db.runSql(cmd, function(err) {
+exports.down = function (db, callback) {
+  const cmd = 'ALTER TABLE build DROP COLUMN "source"';
+  db.runSql(cmd, (err) => {
     if (err) throw err;
     callback();
   });
-
 };

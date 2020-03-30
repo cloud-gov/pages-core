@@ -20,30 +20,30 @@ module.exports = {
       }
       return siteAuthorizer.findOne(req.user, site);
     })
-    .then(() => S3PublishedFileLister.listPublishedPreviews(site))
-    .then((branchNames) => {
-      let combinedBranchNames = branchNames.slice(0);
+      .then(() => S3PublishedFileLister.listPublishedPreviews(site))
+      .then((branchNames) => {
+        let combinedBranchNames = branchNames.slice(0);
 
-      if (site.demoBranch) {
-        combinedBranchNames = branchNames.filter(branchName => branchName !== site.demoBranch);
-        combinedBranchNames = [site.demoBranch].concat(combinedBranchNames);
-      }
+        if (site.demoBranch) {
+          combinedBranchNames = branchNames.filter(branchName => branchName !== site.demoBranch);
+          combinedBranchNames = [site.demoBranch].concat(combinedBranchNames);
+        }
 
-      combinedBranchNames = [site.defaultBranch].concat(combinedBranchNames);
+        combinedBranchNames = [site.defaultBranch].concat(combinedBranchNames);
 
-      return PublishedBranchSerializer.serialize(site, combinedBranchNames);
-    })
-    .then((branches) => {
-      res.json(branches);
-    })
-    .catch((err) => {
-      res.error(err);
-    });
+        return PublishedBranchSerializer.serialize(site, combinedBranchNames);
+      })
+      .then((branches) => {
+        res.json(branches);
+      })
+      .catch((err) => {
+        res.error(err);
+      });
   },
 
   findOne: (req, res) => {
     let site;
-    const branch = req.params.branch;
+    const { branch } = req.params;
 
     Promise.resolve(Number(req.params.site_id)).then((id) => {
       if (isNaN(id)) {
@@ -51,18 +51,18 @@ module.exports = {
       }
       return Site.findByPk(id);
     })
-    .then((model) => {
-      if (model) {
-        site = model;
-      } else {
-        throw 404;
-      }
-      return siteAuthorizer.findOne(req.user, site);
-    })
-    .then(() => PublishedBranchSerializer.serialize(site, branch))
-    .then((branchJSON) => {
-      res.json(branchJSON);
-    })
-    .catch(res.error);
+      .then((model) => {
+        if (model) {
+          site = model;
+        } else {
+          throw 404;
+        }
+        return siteAuthorizer.findOne(req.user, site);
+      })
+      .then(() => PublishedBranchSerializer.serialize(site, branch))
+      .then((branchJSON) => {
+        res.json(branchJSON);
+      })
+      .catch(res.error);
   },
 };

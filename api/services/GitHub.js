@@ -2,23 +2,19 @@ const octokit = require('@octokit/rest');
 const config = require('../../config');
 const { User } = require('../models');
 
-const createRepoForOrg = (github, options) =>
-  github.repos.createForOrg(options);
+const createRepoForOrg = (github, options) => github.repos.createForOrg(options);
 
-const createRepoForUser = (github, options) =>
-  github.repos.create(options);
+const createRepoForUser = (github, options) => github.repos.create(options);
 
-const createWebhook = (github, options) =>
-  github.repos.createHook(options);
+const createWebhook = (github, options) => github.repos.createHook(options);
 
-const getOrganizations = github =>
-  github.users.getOrgs({}).then(orgs => orgs.data);
+const getOrganizations = github => github.users.getOrgs({}).then(orgs => orgs.data);
 
-const getRepository = (github, options) =>
-  github.repos.get(options).then(repos => repos.data);
+const getRepository = (github, options) => github.repos.get(options).then(repos => repos.data);
 
-const getBranch = (github, { owner, repo, branch }) =>
-  github.repos.getBranch({ owner, repo, branch }).then(branchInfo => branchInfo.data);
+const getBranch = (github, { owner, repo, branch }) => github.repos
+  .getBranch({ owner, repo, branch })
+  .then(branchInfo => branchInfo.data);
 
 const githubClient = accessToken => new Promise((resolve) => {
   const client = octokit();
@@ -80,8 +76,7 @@ const handleWebhookError = (err) => {
   }
 };
 
-const sendNextCreateGithubStatusRequest = (github, options) =>
-  github.repos.createStatus(options);
+const sendNextCreateGithubStatusRequest = (github, options) => github.repos.createStatus(options);
 
 const sendCreateGithubStatusRequest = (github, options, attempt = 0) => {
   const maxTries = 5;
@@ -95,105 +90,104 @@ const sendCreateGithubStatusRequest = (github, options, attempt = 0) => {
     });
 };
 
-const getOrganizationMembers = (github, org, role = 'all', page = 1) =>
-  github.orgs.listMembers({ org, per_page: 100, page, role })
-    .then(orgs => Promise.resolve(orgs.data));
+const getOrganizationMembers = (github, org, role = 'all', page = 1) => github.orgs.listMembers({
+  org, per_page: 100, page, role,
+})
+  .then(orgs => orgs.data);
 
-const getNextOrganizationMembers = (github, org, role = 'all', page = 1, allMembers = []) =>
-  getOrganizationMembers(github, org, role, page)
+function getNextOrganizationMembers(github, org, role = 'all', { page = 1, allMembers = [] } = {}) {
+  return getOrganizationMembers(github, org, role, page)
     .then((members) => {
       if (members.length > 0) {
-        allMembers = allMembers.concat(members);  // eslint-disable-line no-param-reassign
-        return getNextOrganizationMembers(github, org, role, page + 1, allMembers);
+        allMembers = allMembers.concat(members); // eslint-disable-line no-param-reassign
+        return getNextOrganizationMembers(github, org, role, { page: page + 1, allMembers });
       }
-      return Promise.resolve(allMembers);
+      return allMembers;
     });
+}
 
 /* eslint-disable camelcase */
-const getTeamMembers = (github, team_id, page = 1) =>
-  github.teams.listMembers({ team_id, per_page: 100, page }).then(teams => teams.data);
+const getTeamMembers = (github, team_id, page = 1) => github.teams
+  .listMembers({ team_id, per_page: 100, page })
+  .then(teams => teams.data);
 
-const getNextTeamMembers = (github, team_id, page = 1, allMembers = []) =>
-  getTeamMembers(github, team_id, page)
+function getNextTeamMembers(github, team_id, page = 1, allMembers = []) {
+  return getTeamMembers(github, team_id, page)
     .then((members) => {
       if (members.length > 0) {
-        allMembers = allMembers.concat(members);  // eslint-disable-line no-param-reassign
+        allMembers = allMembers.concat(members); // eslint-disable-line no-param-reassign
         return getNextTeamMembers(github, team_id, page + 1, allMembers);
       }
-      return Promise.resolve(allMembers);
+      return allMembers;
     });
+}
 /* eslint-enable camelcase */
 
-const removeOrganizationMember = (github, org, username) =>
-  github.orgs.removeMember({ org, username });
+const removeOrganizationMember = (github, org, username) => github.orgs
+  .removeMember({ org, username });
 
-const getRepositories = (github, page = 1) =>
-  github.repos.getAll({ per_page: 100, page })
-    .then(repos => Promise.resolve(repos.data));
+const getRepositories = (github, page = 1) => github.repos.getAll({ per_page: 100, page })
+  .then(repos => repos.data);
 
-const getNextRepositories = (github, page = 1, allRepos = []) =>
-  getRepositories(github, page)
-    .then((repos) => {
-      if (repos.length > 0) {
-        allRepos = allRepos.concat(repos);  // eslint-disable-line no-param-reassign
-        return getNextRepositories(github, page + 1, allRepos);
-      }
-      return Promise.resolve(allRepos);
-    });
+const getNextRepositories = (github, page = 1, allRepos = []) => getRepositories(github, page)
+  .then((repos) => {
+    if (repos.length > 0) {
+      allRepos = allRepos.concat(repos); // eslint-disable-line no-param-reassign
+      return getNextRepositories(github, page + 1, allRepos);
+    }
+    return allRepos;
+  });
 
-const getCollaborators = (github, owner, repo, page = 1) =>
-  github.repos.listCollaborators({ owner, repo, per_page: 100, page })
-    .then(collabs => Promise.resolve(collabs.data));
+const getCollaborators = (github, owner, repo, page = 1) => github.repos.listCollaborators({
+  owner, repo, per_page: 100, page,
+})
+  .then(collabs => collabs.data);
 
-const getNextCollaborators = (github, owner, repo, page = 1, allCollabs = []) =>
-  getCollaborators(github, owner, repo, page)
+function getNextCollaborators(github, owner, repo, { page = 1, allCollabs = [] } = {}) {
+  return getCollaborators(github, owner, repo, page)
     .then((collabs) => {
       if (collabs.length > 0) {
-        allCollabs = allCollabs.concat(collabs);  // eslint-disable-line no-param-reassign
-        return getNextCollaborators(github, owner, repo, page + 1, allCollabs);
+        allCollabs = allCollabs.concat(collabs); // eslint-disable-line no-param-reassign
+        return getNextCollaborators(github, owner, repo, { page: page + 1, allCollabs });
       }
-      return Promise.resolve(allCollabs);
+      return allCollabs;
     });
+}
 
 module.exports = {
-  checkPermissions: (user, owner, repo) =>
-    githubClient(user.githubAccessToken)
-      .then(github => getRepository(github, { owner, repo, username: user.username }))
-      .then(repository => repository.permissions),
+  checkPermissions: (user, owner, repo) => githubClient(user.githubAccessToken)
+    .then(github => getRepository(github, { owner, repo, username: user.username }))
+    .then(repository => repository.permissions),
 
-  checkOrganizations: (user, orgName) =>
-    githubClient(user.githubAccessToken)
+  checkOrganizations: (user, orgName) => githubClient(user.githubAccessToken)
     .then(github => getOrganizations(github))
     .then(orgs => orgs.some(org => org.login.toLowerCase() === orgName)),
 
-  createRepo: (user, owner, repository) =>
-    githubClient(user.githubAccessToken)
-      .then((github) => {
-        if (user.username.toLowerCase() === owner.toLowerCase()) {
-          return createRepoForUser(github, {
-            name: repository,
-          });
-        }
-
-        return createRepoForOrg(github, {
+  createRepo: (user, owner, repository) => githubClient(user.githubAccessToken)
+    .then((github) => {
+      if (user.username.toLowerCase() === owner.toLowerCase()) {
+        return createRepoForUser(github, {
           name: repository,
-          org: owner,
         });
-      })
-      .catch(handleCreateRepoError),
+      }
 
-  getRepository: (user, owner, repo) =>
-    githubClient(user.githubAccessToken)
-      .then(github => getRepository(github, { owner, repo }))
-      .catch((err) => {
-        if (err.status === 404) {
-          return null;
-        }
-        throw err;
-      }),
+      return createRepoForOrg(github, {
+        name: repository,
+        org: owner,
+      });
+    })
+    .catch(handleCreateRepoError),
 
-  getBranch: (user, owner, repo, branch) =>
-    githubClient(user.githubAccessToken)
+  getRepository: (user, owner, repo) => githubClient(user.githubAccessToken)
+    .then(github => getRepository(github, { owner, repo }))
+    .catch((err) => {
+      if (err.status === 404) {
+        return null;
+      }
+      throw err;
+    }),
+
+  getBranch: (user, owner, repo, branch) => githubClient(user.githubAccessToken)
     .then(github => getBranch(github, { owner, repo, branch }))
     .catch((err) => {
       if (err.status === 404) {
@@ -227,9 +221,8 @@ module.exports = {
     return githubClient(accessToken)
       .then(github => getOrganizations(github))
       .then((organizations) => {
-        const approvedOrg = organizations.find(organization =>
-          approvedOrgs.indexOf(organization.id) >= 0
-        );
+        const approvedOrg = organizations
+          .find(organization => approvedOrgs.indexOf(organization.id) >= 0);
 
         if (!approvedOrg) {
           throw new Error('Unauthorized');
@@ -237,33 +230,27 @@ module.exports = {
       });
   },
 
-  sendCreateGithubStatusRequest: (accessToken, options) =>
-    githubClient(accessToken)
-      .then(github => sendCreateGithubStatusRequest(github, options)),
+  sendCreateGithubStatusRequest: (accessToken, options) => githubClient(accessToken)
+    .then(github => sendCreateGithubStatusRequest(github, options)),
 
-  getOrganizationMembers: (accessToken, organization, role = 'all') =>
-    githubClient(accessToken)
-      .then(github => getNextOrganizationMembers(github, organization, role)),
+  getOrganizationMembers: (accessToken, organization, role = 'all') => githubClient(accessToken)
+    .then(github => getNextOrganizationMembers(github, organization, role)),
 
-  getTeamMembers: (accessToken, teamId) =>
-    githubClient(accessToken)
-      .then(github => getNextTeamMembers(github, teamId)),
+  getTeamMembers: (accessToken, teamId) => githubClient(accessToken)
+    .then(github => getNextTeamMembers(github, teamId)),
 
-  removeOrganizationMember: (accessToken, organization, member) =>
-    githubClient(accessToken)
-      .then(github => removeOrganizationMember(github, organization, member))
-      .catch((err) => {
-        if (err.code === 404) {
-          return null;
-        }
-        throw err;
-      }),
+  removeOrganizationMember: (accessToken, organization, member) => githubClient(accessToken)
+    .then(github => removeOrganizationMember(github, organization, member))
+    .catch((err) => {
+      if (err.code === 404) {
+        return null;
+      }
+      throw err;
+    }),
 
-  getRepositories: accessToken =>
-    githubClient(accessToken)
-      .then(github => getNextRepositories(github)),
+  getRepositories: accessToken => githubClient(accessToken)
+    .then(github => getNextRepositories(github)),
 
-  getCollaborators: (accessToken, owner, repo) =>
-    githubClient(accessToken)
-      .then(github => getNextCollaborators(github, owner, repo)),
+  getCollaborators: (accessToken, owner, repo) => githubClient(accessToken)
+    .then(github => getNextCollaborators(github, owner, repo)),
 };

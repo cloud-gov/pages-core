@@ -3,18 +3,19 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 
 import * as icons from '../icons';
-import { SITE_NAVIGATION_CONFIG } from '../siteContainer';
 
-const SideNav = ({ siteId }) => (
+const SideNav = ({ config, siteId }) => (
   <div className="usa-width-one-sixth side-nav">
     <ul className="usa-sidenav-list">
       {
-        SITE_NAVIGATION_CONFIG.map((conf) => {
+        config.map((conf) => {
           const IconComponent = icons[conf.icon];
           return (
             <li key={conf.route}>
               <Link to={`/sites/${siteId}/${conf.route}`}>
-                <IconComponent /> {conf.display}
+                <IconComponent />
+                {' '}
+                {conf.display}
               </Link>
             </li>
           );
@@ -25,6 +26,11 @@ const SideNav = ({ siteId }) => (
 );
 
 SideNav.propTypes = {
+  config: PropTypes.arrayOf(PropTypes.shape({
+    display: PropTypes.string.isRequired,
+    route: PropTypes.string.isRequired,
+    icon: PropTypes.string.isRequired,
+  })).isRequired,
   siteId: PropTypes.number.isRequired,
 };
 

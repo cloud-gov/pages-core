@@ -1,6 +1,8 @@
 const { Op } = require('sequelize');
 
-const associate = ({ User, Build, Site, UserAction, SiteUser }) => {
+const associate = ({
+  User, Build, Site, UserAction, SiteUser,
+}) => {
   User.hasMany(Build, {
     foreignKey: 'user',
   });

@@ -1,41 +1,35 @@
-var dbm = global.dbm || require('db-migrate');
-var type = dbm.dataType;
-var fs = require('fs');
+const dbm = global.dbm || require('db-migrate');
 
-const dropTable = (db, table) => {
-  return new Promise((resolve, reject) => {
-    db.dropTable(table, (err) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve()
-      }
-    })
-  })
-}
+const type = dbm.dataType;
+const fs = require('fs');
 
-exports.up = function(db, callback) {
-  fs.readFile(__dirname + '/initial.sql', { encoding: 'utf-8' }, function(err, data) {
+const dropTable = (db, table) => new Promise((resolve, reject) => {
+  db.dropTable(table, (err) => {
+    if (err) {
+      reject(err);
+    } else {
+      resolve();
+    }
+  });
+});
+
+exports.up = function (db, callback) {
+  fs.readFile(`${__dirname}/initial.sql`, { encoding: 'utf-8' }, (err, data) => {
     if (err) throw err;
-    db.runSql(data, function() {
+    db.runSql(data, () => {
       if (err) throw err;
       callback();
     });
   });
 };
 
-exports.down = function(db, callback) {
-  db.runSql("DELETE FROM migrations", (err) => {
-    dropTable(db, "build").then(() => {
-      return dropTable(db, "passport")
-    }).then(() => {
-      return dropTable(db, "site")
-    }).then(() => {
-      return dropTable(db, "site_users__user_sites")
-    }).then(() => {
-      return dropTable(db, "user")
-    }).then(() => {
-      callback()
-    }).catch(err => callback(err))
-  })
+exports.down = function (db, callback) {
+  db.runSql('DELETE FROM migrations', (err) => {
+    dropTable(db, 'build').then(() => dropTable(db, 'passport')).then(() => dropTable(db, 'site')).then(() => dropTable(db, 'site_users__user_sites'))
+      .then(() => dropTable(db, 'user'))
+      .then(() => {
+        callback();
+      })
+      .catch(err => callback(err));
+  });
 };

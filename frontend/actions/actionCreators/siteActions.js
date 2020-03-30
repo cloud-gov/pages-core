@@ -7,6 +7,7 @@ const siteUserAddedType = 'SITE_USER_ADDED';
 const siteUserRemovedType = 'SITE_USER_REMOVED';
 const setCurrentSiteType = 'SET_CURRENT_SITE';
 const siteUserUpdatedType = 'SITE_USER_UPDATED';
+const siteBranchesReceivedType = 'SITE_BRANCHES_RECIEVED';
 
 const sitesFetchStarted = () => ({
   type: sitesFetchStartedType,
@@ -64,4 +65,5 @@ export {
   siteUserRemoved, siteUserRemovedType,
   setCurrentSiteType, setCurrentSite,
   siteUserUpdated, siteUserUpdatedType,
+  siteBranchesReceivedType,
 };
