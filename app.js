@@ -26,8 +26,8 @@ const ScheduledBuildHelper = require('./api/services/ScheduledBuildHelper');
 const { sequelize } = require('./api/models');
 
 // If settings present, start New Relic
-if (process.env.NEW_RELIC_APP_NAME && process.env.NEW_RELIC_LICENSE_KEY) {
-  logger.info(`Activating New Relic: ${process.env.NEW_RELIC_APP_NAME}`);
+if (config.env.newRelicAppName && config.env.newRelicLicenseKey) {
+  logger.info(`Activating New Relic: ${config.env.newRelicAppName}`);
   require('newrelic'); // eslint-disable-line global-require
 } else {
   logger.warn('Skipping New Relic Activation');
