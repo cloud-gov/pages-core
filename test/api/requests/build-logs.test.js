@@ -294,18 +294,36 @@ describe('Build Log API', () => {
       it('paginates new build logs by groups of lines', async () => {
         const numLogs = 6;
 
-        await Promise.all(Array(numLogs).fill(0).map(() => factory.buildLog({ build, source: 'ALL' })));
+        await factory.bulkBuildLogs((1000 + numLogs),{ buildId: build.id, source: 'ALL' });
 
-        const { body } = await request(app)
+        let resp = await request(app)
           .get(`/v0/build/${build.id}/log/page/1`)
           .set('Cookie', cookie)
           .expect(200);
 
-        validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, body);
-        expect(body).to.be.an('array');
-        expect(body).to.have.length(numLogs);
-        expect(body.map(l => l.source)).to.have.members(Array(numLogs).fill('ALL'));
-      });
+        validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, resp.body);
+        expect(resp.body).to.be.an('array');
+        expect(resp.body).to.have.length(1000);
+        expect(resp.body.map(l => l.source)).to.have.members(Array(1000).fill('ALL'));
+
+        resp = await request(app)
+          .get(`/v0/build/${build.id}/log/page/2`)
+          .set('Cookie', cookie)
+          .expect(200);
+
+        validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, resp.body);
+        expect(resp.body).to.be.an('array');
+        expect(resp.body).to.have.length(numLogs);
+        expect(resp.body.map(l => l.source)).to.have.members(Array(numLogs).fill('ALL'));
+
+        resp = await request(app)
+          .get(`/v0/build/${build.id}/log/page/3`)
+          .set('Cookie', cookie)
+          .expect(200);
+
+        expect(resp.body).to.be.an('array');
+        expect(resp.body).to.have.length(0);
+      }).timeout(5000);
     });
   });
 });
