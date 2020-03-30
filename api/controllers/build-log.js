@@ -57,7 +57,7 @@ module.exports = wrapHandlers({
       },
       order: [['id', 'ASC']],
       offset: (lineLimit * (page - 1)),
-      lineLimit,
+      limit: lineLimit,
     });
 
     // Support legacy build logs
