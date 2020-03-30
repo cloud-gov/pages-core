@@ -6,7 +6,7 @@
  * See node_modules/lib/config.defaults.js in the agent distribution for a more complete
  * description of configuration variables and their potential values.
  */
- const config = require('./config');
+const config = require('./config');
 exports.config = {
   // Grab NEW_RELIC_APP_NAME and NEW_RELIC_LICENSE_KEY from the cloud.gov
   // user-provided service
