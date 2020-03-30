@@ -7,6 +7,7 @@
  * description of configuration variables and their potential values.
  */
 const config = require('./config');
+
 exports.config = {
   // Grab NEW_RELIC_APP_NAME and NEW_RELIC_LICENSE_KEY from the cloud.gov
   // user-provided service
