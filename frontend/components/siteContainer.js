@@ -66,7 +66,8 @@ export class SiteContainer extends React.Component {
     if (!site) {
       const errorMessage = (
         <span>
-          You don&apos;t have access to this site, please contact the site owner if you believe this is an error.
+          You don&apos;t have access to this site,
+          please contact the site owner if you believe this is an error.
         </span>
       );
       return (
