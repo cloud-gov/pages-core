@@ -107,7 +107,7 @@ app.use(limiter); // must be set before router is added to app
 
 app.server = http.Server(app);
 
-const socket = io(app.server);
+const socket = io(app.server, { cookie: false });
 if (config.redis) {
   const redisCreds = { auth_pass: config.redis.password };
 
