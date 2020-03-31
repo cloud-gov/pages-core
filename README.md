@@ -135,6 +135,8 @@ The following environment variables are set on the Cloud Foundry environment in 
 - `NODE_MODULES_CACHE`: This should be set to true in Cloud Foundry to prevent caching node modules since those are vendored by Federalist
 - `APP_NAME`: The name of the Cloud Foundry application
 - `APP_DOMAIN`: The hostname where the application runs in Cloud Foundry
+- `NEW_RELIC_APP_NAME`: The app name to report to New Relic
+- `NEW_RELIC_LICENSE_KEY`: The license key to use with New Relic
 
 Secrets cannot be kept in the application manifest so they are provided by Cloud Foundry services.
 The app expects the following user provided services to be provided:
@@ -149,8 +151,6 @@ The app expects the following user provided services to be provided:
   - `GITHUB_CLIENT_SECRET`: The client secret used for GitHub authentication
   - `GITHUB_WEBHOOK_SECRET`: The secret used to sign and verify webhook requests from GitHub
   - `GITHUB_WEBHOOK_URL`: The url where GitHub webhook requests should be sent
-  - `NEW_RELIC_APP_NAME`: The app name to report to New Relic
-  - `NEW_RELIC_LICENSE_KEY`: The license key to use with New Relic
 - `federalist-<environment>-sqs-creds`: A user-provided service that provides the application with SQS credentials that cannot be added to `manifest.yml` b/c that file is under version control; this service provides the following:
   - `access_key`: The AWS access key for SQS queue
   - `secret_key`: The AWS secret key for SQS queue
