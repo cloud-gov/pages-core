@@ -7,7 +7,6 @@ import {
   siteDeleted, siteDeletedType,
   siteUserAdded, siteUserAddedType,
   siteUserRemoved, siteUserRemovedType,
-  setCurrentSite, setCurrentSiteType,
 } from '../../../../frontend/actions/actionCreators/siteActions';
 
 describe('siteActions actionCreators', () => {
@@ -129,17 +128,6 @@ describe('siteActions actionCreators', () => {
       const action = siteUserRemoved(site);
       expect(action.type).to.equal(siteUserRemovedType);
       expect(action.site).to.equal(site);
-    });
-  });
-
-  describe('setCurrentSite', () => {
-    it('constructs properly', () => {
-      const siteId = 1;
-
-      const action = setCurrentSite(siteId);
-
-      expect(action.type).to.equal(setCurrentSiteType);
-      expect(action.siteId).to.equal(siteId);
     });
   });
 });

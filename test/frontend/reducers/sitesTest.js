@@ -20,7 +20,6 @@ describe('sitesReducer', () => {
   const initialState = {
     isLoading: false,
     data: [],
-    currentSite: null,
   };
 
   beforeEach(() => {
@@ -33,7 +32,6 @@ describe('sitesReducer', () => {
         siteBranchesReceivedType: SITE_BRANCHES_RECEIVED,
         siteDeletedType: SITE_DELETED,
         siteUserAddedType: SITE_USER_ADDED,
-        setCurrentSiteType: SET_CURRENT_SITE,
       },
       '../actions/actionCreators/buildActions': {
         buildRestartedType: BUILD_RESTARTED,
@@ -252,22 +250,5 @@ describe('sitesReducer', () => {
     expect(actual.data.length).to.equal(2);
     expect(actual.data[0].users[0].username).to.equal('jane');
     expect(actual.data[1]).to.deep.equal(state.data[1]);
-  });
-
-  it('sets the current site', () => {
-    const state = {
-      isLoading: false,
-      data: [{
-        id: 2, owner: 'person2', repository: 'b', users: [],
-      }],
-      currentSite: null,
-    };
-
-    const actual = siteReducer(state, {
-      type: SET_CURRENT_SITE,
-      siteId: 2,
-    });
-
-    expect(actual.currentSite).to.deep.equal(state.data[0]);
   });
 });

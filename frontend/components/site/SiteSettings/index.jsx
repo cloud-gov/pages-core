@@ -9,6 +9,7 @@ import BasicSiteSettings from './BasicSiteSettings';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
 import CopyRepoForm from './CopyRepoForm';
 import siteActions from '../../../actions/siteActions';
+import { currentSite } from '../../../selectors/site';
 
 class SiteSettings extends React.Component {
   constructor(props) {
@@ -122,8 +123,8 @@ SiteSettings.defaultProps = {
   site: null,
 };
 
-const mapStateToProps = ({ sites }) => ({
-  site: sites.currentSite,
+const mapStateToProps = ({ sites }, { params: { id } }) => ({
+  site: currentSite(sites, id),
 });
 
 export { SiteSettings };

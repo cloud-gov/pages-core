@@ -7,6 +7,7 @@ import { Link } from 'react-router';
 import GitHubLink from '../GitHubLink';
 import { BUILD } from '../../propTypes';
 import buildActions from '../../actions/buildActions';
+import { currentSite } from '../../selectors/site';
 import LoadingIndicator from '../LoadingIndicator';
 import RefreshBuildsButton from './refreshBuildsButton';
 import { duration, timeFrom } from '../../util/datetime';
@@ -264,9 +265,9 @@ SiteBuilds.defaultProps = {
   },
 };
 
-const mapStateToProps = state => ({
-  builds: state.builds,
-  site: state.sites.currentSite,
+const mapStateToProps = ({ builds, sites }, { params: { id } }) => ({
+  builds,
+  site: currentSite(sites, id),
 });
 
 export { SiteBuilds };

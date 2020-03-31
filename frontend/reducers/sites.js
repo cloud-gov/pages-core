@@ -7,7 +7,6 @@ import {
   siteBranchesReceivedType as SITE_BRANCHES_RECEIVED,
   siteUserAddedType as SITE_USER_ADDED,
   siteUserRemovedType as SITE_USER_REMOVED,
-  setCurrentSiteType as SET_CURRENT_SITE,
   siteUserUpdatedType as SITE_USER_UPDATED,
 } from '../actions/actionCreators/siteActions';
 
@@ -17,7 +16,6 @@ import {
 
 const initialState = {
   isLoading: false,
-  currentSite: null,
   data: [],
 };
 
@@ -35,22 +33,12 @@ export default function sites(state = initialState, action) {
       return { ...state, isLoading: true };
 
     case SITES_RECEIVED: {
-      let currentSite = null;
       const nextSites = action.sites || state.data;
-      if (state.currentSite) {
-        currentSite = nextSites.find(site => site.id === state.currentSite.id);
-      }
       return {
         ...state,
         isLoading: false,
         data: nextSites,
-        currentSite,
       };
-    }
-
-    case SET_CURRENT_SITE: {
-      const id = Number(action.siteId);
-      return { ...state, currentSite: state.data.find(site => site.id === id) };
     }
 
     case SITE_ADDED:

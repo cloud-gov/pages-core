@@ -4,6 +4,7 @@ import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 
 import publishedFileActions from '../../actions/publishedFileActions';
+import { currentSite } from '../../selectors/site';
 import LoadingIndicator from '../LoadingIndicator';
 import AlertBanner from '../alertBanner';
 
@@ -235,9 +236,9 @@ SitePublishedFilesTable.defaultProps = {
   publishedFiles: null,
 };
 
-const mapStateToProps = ({ publishedFiles, sites }) => ({
+const mapStateToProps = ({ publishedFiles, sites }, { params: { id } }) => ({
   publishedFiles,
-  site: sites.currentSite,
+  site: currentSite(sites, id),
 });
 
 export { SitePublishedFilesTable };
