@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import publishedBranchActions from '../../actions/publishedBranchActions';
+import { currentSite } from '../../selectors/site';
 import LoadingIndicator from '../LoadingIndicator';
 import BranchViewLink from '../branchViewLink';
 import { SITE } from '../../propTypes';
@@ -107,9 +108,9 @@ SitePublishedBranchesTable.defaultProps = {
   site: null,
 };
 
-const mapStateToProps = ({ publishedBranches, sites }) => ({
+const mapStateToProps = ({ publishedBranches, sites }, { params: { id } }) => ({
   publishedBranches,
-  site: sites.currentSite,
+  site: currentSite(sites, id),
 });
 
 export { SitePublishedBranchesTable };

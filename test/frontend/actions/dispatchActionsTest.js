@@ -17,7 +17,6 @@ describe('dispatchActions', () => {
   let userRemovedFromSiteActionCreator;
   let showAddNewSiteFieldsActionCreator;
   let hideAddNewSiteFieldsActionCreator;
-  let setCurrentSiteActionCreator;
   let reset;
 
   const action = { whatever: 'bub' };
@@ -34,7 +33,6 @@ describe('dispatchActions', () => {
     userRemovedFromSiteActionCreator = stub();
     showAddNewSiteFieldsActionCreator = stub();
     hideAddNewSiteFieldsActionCreator = stub();
-    setCurrentSiteActionCreator = stub();
     pushHistory = stub();
     reset = stub();
 
@@ -47,7 +45,6 @@ describe('dispatchActions', () => {
         siteDeleted: siteDeletedActionCreator,
         siteUserAdded: userAddedToSiteActionCreator,
         siteUserRemoved: userRemovedFromSiteActionCreator,
-        setCurrentSite: setCurrentSiteActionCreator,
       },
       './actionCreators/addNewSiteFieldsActions': {
         showAddNewSiteFields: showAddNewSiteFieldsActionCreator,
@@ -139,13 +136,6 @@ describe('dispatchActions', () => {
     hideAddNewSiteFieldsActionCreator.withArgs(site).returns(action);
 
     fixture.dispatchHideAddNewSiteFieldsAction();
-
-    expect(dispatch.calledOnce).to.be.true;
-  });
-
-  it('dispatchSetCurrentSiteAction', () => {
-    setCurrentSiteActionCreator.withArgs(1).returns(action);
-    fixture.dispatchSetCurrentSiteAction();
 
     expect(dispatch.calledOnce).to.be.true;
   });
