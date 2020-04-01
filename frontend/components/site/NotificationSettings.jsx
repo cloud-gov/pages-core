@@ -38,7 +38,7 @@ class NotificationSettings extends React.Component {
       <div>
         <form onSubmit={this.handleSubmit}>
           <label htmlFor="buildNotificationSetting">
-            Recieve build notifications:
+            Receive build notifications:
             <select
               id="buildNotificationSetting"
               value={value}
