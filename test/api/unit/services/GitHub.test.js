@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const config = require('../../../../config');
 const factory = require('../../support/factory');
 const GitHub = require('../../../../api/services/GitHub');
@@ -265,6 +265,74 @@ describe('GitHub', () => {
     });
   });
 
+  describe('.validateAdmin(accessToken)', () => {
+    it('should resolve if the user is an admin for federalist-users', async () => {
+      const users = await Promise.all([
+        factory.user().then(user => user.dataValues),
+        factory.user().then(user => user.dataValues),
+      ]);
+      const { id, username, email } = users[0];
+      const accessToken = 'token';
+
+      githubAPINocks.userAuthenticated({
+        githubUserId: id,
+        accessToken,
+        username,
+        email,
+      });
+      githubAPINocks.getOrganizationMembers({
+        accessToken,
+        organization: 'federalist-users',
+        role: 'admin',
+        response: users,
+      });
+
+      const expected = await GitHub.validateAdmin(accessToken);
+      expect(expected).to.equal();
+    });
+
+    it('should reject if the user is not an admin for federalist-users', async () => {
+      const users = await Promise.all([
+        factory.user().then(user => user.dataValues),
+        factory.user().then(user => user.dataValues),
+      ]);
+
+      const accessToken = 'token';
+
+      githubAPINocks.userAuthenticated({
+        accessToken,
+        githubUserId: '123456',
+        username: 'a-user',
+        email: 'a-user@example.com',
+      });
+      githubAPINocks.getOrganizationMembers({
+        accessToken,
+        organization: 'federalist-users',
+        role: 'admin',
+        response: users,
+      });
+
+      try {
+        await GitHub.validateAdmin(accessToken);
+      } catch (error) {
+        expect(error.message).to.equal('Unauthorized');
+      }
+    });
+
+    it('should reject if access token is not a valid GitHub access token', async () => {
+      githubAPINocks.userAuthenticated({
+        statusCode: 403,
+      });
+
+      try {
+        await GitHub.validateAdmin('123abc');
+      } catch (error) {
+        expect(error.name).to.equal('HttpError');
+        expect(error.code).to.equal(403);
+      }
+    });
+  });
+
   describe('.getBranch', () => {
     let promised;
     let mockGHRequest;
@@ -293,14 +361,14 @@ describe('GitHub', () => {
 
         return GitHub.getBranch(values.user, owner, repository, branch);
       })
-      .then((branchInfo) => {
-        expect(branchInfo).to.be.defined;
-        expect(branchInfo.name).to.be.defined;
-        expect(branchInfo.commit).to.be.defined;
-        expect(mockGHRequest.isDone()).to.be.true;
-        done();
-      })
-      .catch(done);
+        .then((branchInfo) => {
+          expect(branchInfo).to.be.defined;
+          expect(branchInfo.name).to.be.defined;
+          expect(branchInfo.commit).to.be.defined;
+          expect(mockGHRequest.isDone()).to.be.true;
+          done();
+        })
+        .catch(done);
     });
 
     it('returns an error if branch is not defined', (done) => {
@@ -323,7 +391,7 @@ describe('GitHub', () => {
             done();
           });
       })
-      .catch(done);
+        .catch(done);
     });
   });
 
@@ -360,8 +428,18 @@ describe('GitHub', () => {
       const repository = 'repo';
 
       githubAPINocks.getCollaborators({ accessToken, owner, repository });
-      githubAPINocks.getCollaborators({ accessToken, owner, repository, page: 2 });
-      githubAPINocks.getCollaborators({ accessToken, owner, repository, page: 3 });
+      githubAPINocks.getCollaborators({
+        accessToken,
+        owner,
+        repository,
+        page: 2,
+      });
+      githubAPINocks.getCollaborators({
+        accessToken,
+        owner,
+        repository,
+        page: 3,
+      });
 
       GitHub.getCollaborators(accessToken, owner, repository)
         .then((collabs) => {
@@ -415,8 +493,18 @@ describe('GitHub', () => {
       const organization = 'testOrg';
 
       githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'admin' });
-      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'admin', page: 2 });
-      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'admin', page: 3 });
+      githubAPINocks.getOrganizationMembers({
+        accessToken,
+        organization,
+        role: 'admin',
+        page: 2,
+      });
+      githubAPINocks.getOrganizationMembers({
+        accessToken,
+        organization,
+        role: 'admin',
+        page: 3,
+      });
       GitHub.getOrganizationMembers(accessToken, organization, 'admin')
         .then((members) => {
           expect(members.length).to.equal(3);
@@ -430,8 +518,18 @@ describe('GitHub', () => {
       const organization = 'testOrg';
 
       githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'member' });
-      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'member', page: 2 });
-      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'member', page: 3 });
+      githubAPINocks.getOrganizationMembers({
+        accessToken,
+        organization,
+        role: 'member',
+        page: 2,
+      });
+      githubAPINocks.getOrganizationMembers({
+        accessToken,
+        organization,
+        role: 'member',
+        page: 3,
+      });
       GitHub.getOrganizationMembers(accessToken, organization, 'member')
         .then((members) => {
           expect(members.length).to.equal(98);
