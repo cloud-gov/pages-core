@@ -95,7 +95,6 @@ App.propTypes = {
   ),
   sites: PropTypes.shape({
     isLoading: PropTypes.bool.isRequired,
-    currentSite: PropTypes.object,
     data: PropTypes.arrayOf(PropTypes.object).isRequired,
   }),
 };
@@ -108,7 +107,6 @@ App.defaultProps = {
   notifications: [],
   sites: {
     isLoading: false,
-    currentSite: {},
     data: [],
   },
 };

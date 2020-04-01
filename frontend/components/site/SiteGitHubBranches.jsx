@@ -7,6 +7,7 @@ import GitHubLink from '../GitHubLink';
 import BranchViewLink from '../branchViewLink';
 import githubBranchActions from '../../actions/githubBranchActions';
 import buildActions from '../../actions/buildActions';
+import { currentSite } from '../../selectors/site';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
 import { validBranchName } from '../../util/validators';
@@ -135,9 +136,9 @@ SiteGitHubBranches.defaultProps = {
   githubBranches: null,
 };
 
-const mapStateToProps = ({ githubBranches, sites }) => ({
+const mapStateToProps = ({ githubBranches, sites }, { params: { id } }) => ({
   githubBranches,
-  site: sites.currentSite,
+  site: currentSite(sites, id),
 });
 
 export default connect(mapStateToProps)(SiteGitHubBranches);
