@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { ALERT } from '../propTypes';
-import siteActions from '../actions/siteActions';
+import { currentSite } from '../selectors/site';
 import SideNav from './site/SideNav';
 import PagesHeader from './site/PagesHeader';
 import AlertBanner from './alertBanner';
@@ -43,19 +43,6 @@ export const SITE_NAVIGATION_CONFIG = [
 ];
 
 export class SiteContainer extends React.Component {
-  componentDidMount() {
-    siteActions.setCurrentSite(this.props.params.id);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { sites } = nextProps;
-    const { currentSite, data } = sites;
-
-    if (data.length && !currentSite) {
-      siteActions.setCurrentSite(this.props.params.id);
-    }
-  }
-
   getPageTitle(pathname) {
     const route = pathname.split('/').pop();
     const routeConf = SITE_NAVIGATION_CONFIG.find(conf => conf.route === route);
@@ -66,26 +53,27 @@ export class SiteContainer extends React.Component {
   }
 
   render() {
-    const { sites, children, params, location, alert } = this.props;
+    const {
+      sites, children, params, location, alert,
+    } = this.props;
 
     if (sites.isLoading || !sites.data) {
       return <LoadingIndicator />;
     }
 
-    const site = sites.currentSite;
+    const site = currentSite(sites, params.id);
 
     if (!site) {
       const errorMessage = (
         <span>
-          Apologies; you don&apos;t have access to this site in Federalist!
-          <br />
-          Please contact the site owner if you should have access.
+          You don&apos;t have access to this site,
+          please contact the site owner if you believe this is an error.
         </span>
       );
       return (
         <AlertBanner
           status="error"
-          header="Unavailable"
+          header=""
           message={errorMessage}
         />
       );
@@ -95,7 +83,7 @@ export class SiteContainer extends React.Component {
 
     return (
       <div className="usa-grid site">
-        <SideNav siteId={site.id} />
+        <SideNav siteId={site.id} config={SITE_NAVIGATION_CONFIG} />
         <div className="usa-width-five-sixths site-main" id="pages-container">
 
           <AlertBanner
@@ -136,15 +124,17 @@ SiteContainer.propTypes = {
   ]),
   sites: PropTypes.shape({
     isLoading: PropTypes.bool.isRequired,
-    currentSite: PropTypes.object.isRequired,
-    sites: PropTypes.arrayOf(PropTypes.object).isRequired,
+    data: PropTypes.array,
   }),
   alert: ALERT,
 };
 
 SiteContainer.defaultProps = {
   children: null,
-  sites: null,
+  sites: {
+    isLoading: false,
+    data: [],
+  },
   alert: {},
 };
 

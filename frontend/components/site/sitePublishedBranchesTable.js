@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import publishedBranchActions from '../../actions/publishedBranchActions';
+import { currentSite } from '../../selectors/site';
 import LoadingIndicator from '../LoadingIndicator';
 import BranchViewLink from '../branchViewLink';
 import { SITE } from '../../propTypes';
@@ -10,15 +11,16 @@ import AlertBanner from '../alertBanner';
 
 class SitePublishedBranchesTable extends React.Component {
   componentDidMount() {
-    const { id } = this.props.site;
+    const { site: { id } } = this.props;
     publishedBranchActions.fetchPublishedBranches({ id });
   }
 
   publishedBranches() {
-    if (this.props.publishedBranches.isLoading || !this.props.publishedBranches.data) {
+    const { publishedBranches } = this.props;
+    if (publishedBranches.isLoading || !publishedBranches.data) {
       return [];
     }
-    return this.props.publishedBranches.data;
+    return publishedBranches.data;
   }
 
   renderPublishedBranchesTable() {
@@ -44,13 +46,14 @@ class SitePublishedBranchesTable extends React.Component {
   }
 
   renderPublishedBranchRow(branch) {
+    const { site } = this.props;
     return (
       <tr key={branch.name}>
         <td>{branch.name}</td>
         <td>
           <ul className="usa-unstyled-list">
             <li>
-              <BranchViewLink branchName={branch.name} site={this.props.site} />
+              <BranchViewLink branchName={branch.name} site={site} />
             </li>
             <li>
               {this.renderBranchFilesLink(branch)}
@@ -81,10 +84,11 @@ class SitePublishedBranchesTable extends React.Component {
   }
 
   render() {
+    const { publishedBranches } = this.props;
     const branches = this.publishedBranches();
-    if (this.props.publishedBranches.isLoading) {
+    if (publishedBranches.isLoading) {
       return this.renderLoadingState();
-    } else if (!branches.length) {
+    } if (!branches.length) {
       return this.renderEmptyState();
     }
     return this.renderPublishedBranchesTable();
@@ -104,9 +108,9 @@ SitePublishedBranchesTable.defaultProps = {
   site: null,
 };
 
-const mapStateToProps = ({ publishedBranches, sites }) => ({
+const mapStateToProps = ({ publishedBranches, sites }, { params: { id } }) => ({
   publishedBranches,
-  site: sites.currentSite,
+  site: currentSite(sites, id),
 });
 
 export { SitePublishedBranchesTable };

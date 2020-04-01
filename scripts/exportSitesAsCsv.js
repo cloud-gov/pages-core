@@ -13,7 +13,7 @@ function resolveDestination(d) {
   if (d.match(relativePathRegex)) {
     destination = ['..', d].join('/');
     return path.resolve([__dirname, destination].join('/'));
-  } else if (d.match(fullPathRegex)) {
+  } if (d.match(fullPathRegex)) {
     return destination;
   }
   return destination;

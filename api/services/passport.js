@@ -13,6 +13,7 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
     .then(() => User.findOrCreate({
       where: { username: profile.username.toLowerCase() },
       defaults: {
+        // eslint-disable-next-line no-underscore-dangle
         email: profile._json.email,
         username: profile.username,
       },
@@ -62,8 +63,8 @@ passport.callback = (req, res) => {
     } else {
       req.flash('error', {
         title: 'Unauthorized',
-        message: 'Apologies; you don\'t have access to Federalist! ' +
-                 'Please contact the Federalist team if this is in error.',
+        message: 'Apologies; you don\'t have access to Federalist! '
+                 + 'Please contact the Federalist team if this is in error.',
       });
       res.redirect('/');
     }

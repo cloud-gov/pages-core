@@ -4,6 +4,7 @@ import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 
 import publishedFileActions from '../../actions/publishedFileActions';
+import { currentSite } from '../../selectors/site';
 import LoadingIndicator from '../LoadingIndicator';
 import AlertBanner from '../alertBanner';
 
@@ -21,15 +22,17 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   componentDidMount() {
-    const site = { id: this.props.params.id };
-    const branch = this.props.params.name;
+    const { params } = this.props;
+
+    const site = { id: params.id };
+    const branch = params.name;
 
     const startAtKey = null; // start without a startAtKey
     publishedFileActions.fetchPublishedFiles(site, branch, startAtKey);
   }
 
   componentWillReceiveProps(nextProps) {
-    const publishedFiles = nextProps.publishedFiles;
+    const { publishedFiles } = nextProps;
 
     if (publishedFiles.data && !publishedFiles.isLoading) {
       const files = publishedFiles.data.files || [];
@@ -47,21 +50,26 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   shouldDisablePreviousPage() {
-    return !this.state.currentPage;
+    const { currentPage } = this.state;
+    return !currentPage;
   }
 
   previousPage() {
-    if (this.state.currentPage > 0) {
-      this.setState({ currentPage: this.state.currentPage - 1 });
+    const { currentPage } = this.state;
+    if (currentPage > 0) {
+      this.setState({ currentPage: currentPage - 1 });
     }
   }
 
   shouldDisableNextPage() {
-    return this.state.currentPage === this.state.lastPage;
+    const { currentPage, lastPage } = this.state;
+    return currentPage === lastPage;
   }
 
   nextPage() {
-    const currentPage = this.state.currentPage;
+    const { params } = this.props;
+    const { currentPage, filesByPage } = this.state;
+
     const nextPage = currentPage + 1;
 
     if (this.shouldDisableNextPage()) {
@@ -71,22 +79,23 @@ class SitePublishedFilesTable extends React.Component {
 
     this.setState({ currentPage: nextPage });
 
-    if (this.state.filesByPage[nextPage]) {
+    if (filesByPage[nextPage]) {
       // short-circuit if already have next files in state
       return;
     }
 
     // else dispatch action to fetch next page of files
-    const site = { id: this.props.params.id };
-    const branch = this.props.params.name;
-    const files = this.state.filesByPage[currentPage];
+    const site = { id: params.id };
+    const branch = params.name;
+    const files = filesByPage[currentPage];
     const startAtKey = files[files.length - 1].key;
 
     publishedFileActions.fetchPublishedFiles(site, branch, startAtKey);
   }
 
   shouldShowButtons() {
-    if (this.state.lastPage !== null && this.state.lastPage === 0) {
+    const { lastPage } = this.state;
+    if (lastPage !== null && lastPage === 0) {
       return false;
     }
     return true;
@@ -107,22 +116,30 @@ class SitePublishedFilesTable extends React.Component {
           disabled={this.shouldDisablePreviousPage()}
           onClick={this.previousPage}
           title="View the previous page of published files"
-        >&laquo; Previous</button>
+          type="button"
+        >
+          &laquo; Previous
+        </button>
 
         <button
           className={nextButtonClass}
           disabled={this.shouldDisableNextPage()}
           onClick={this.nextPage}
           title="View the next page of published files"
-        >Next &raquo;</button>
+          type="button"
+        >
+          Next &raquo;
+        </button>
       </nav>
     );
   }
 
   renderPublishedFilesTable(files) {
+    const { params } = this.props;
+
     return (
       <div>
-        <h3>{this.props.params.name}</h3>
+        <h3>{params.name}</h3>
         <p>
           Use this page to audit the files that Federalist has publicly published.
           Up to 200 files are shown per page.
@@ -178,11 +195,14 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   render() {
-    const files = this.state.filesByPage[this.state.currentPage] || [];
+    const { publishedFiles } = this.props;
+    const { currentPage, filesByPage } = this.state;
 
-    if (this.props.publishedFiles.isLoading) {
+    const files = filesByPage[currentPage] || [];
+
+    if (publishedFiles.isLoading) {
       return this.renderLoadingState();
-    } else if (!files.length) {
+    } if (!files.length) {
       return this.renderEmptyState();
     }
     return this.renderPublishedFilesTable(files);
@@ -216,9 +236,9 @@ SitePublishedFilesTable.defaultProps = {
   publishedFiles: null,
 };
 
-const mapStateToProps = ({ publishedFiles, sites }) => ({
+const mapStateToProps = ({ publishedFiles, sites }, { params: { id } }) => ({
   publishedFiles,
-  site: sites.currentSite,
+  site: currentSite(sites, id),
 });
 
 export { SitePublishedFilesTable };

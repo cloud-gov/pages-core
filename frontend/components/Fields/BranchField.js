@@ -11,11 +11,12 @@ export const validateBranchName = (value) => {
   return undefined;
 };
 
-const BranchField = ({ ...props }) =>
+const BranchField = ({ ...props }) => (
   <Field
     component={InputWithErrorField}
     validate={[validateBranchName]}
     {...props}
-  />;
+  />
+);
 
 export default BranchField;

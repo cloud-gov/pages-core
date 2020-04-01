@@ -1,13 +1,10 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import { expect } from 'chai';
-import { spy } from 'sinon';
 
 import { SiteContainer } from '../../../frontend/components/siteContainer';
-import siteActions from '../../../frontend/actions/siteActions';
 
 let props;
-let setCurrentSite;
 const site = {
   id: 1,
   defaultBranch: 'master',
@@ -20,7 +17,6 @@ const site = {
 
 describe('<SiteContainer/>', () => {
   beforeEach(() => {
-    setCurrentSite = spy(siteActions, 'setCurrentSite');
     props = {
       alert: {},
       user: {
@@ -34,7 +30,6 @@ describe('<SiteContainer/>', () => {
       sites: {
         isLoading: false,
         data: [site],
-        currentSite: site,
       },
       location: {
         pathname: '',
@@ -45,10 +40,6 @@ describe('<SiteContainer/>', () => {
         fileName: 'boop.txt',
       },
     };
-  });
-
-  afterEach(() => {
-    setCurrentSite.restore();
   });
 
   it('renders a LoadingIndicator while sites are loading', () => {
@@ -62,9 +53,6 @@ describe('<SiteContainer/>', () => {
   it('renders after sites have loaded', () => {
     const wrapper = shallow(<SiteContainer {...props} />);
 
-    wrapper.instance().componentDidMount();
-
-    expect(setCurrentSite.called).to.be.true;
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
     expect(wrapper.find('SideNav')).to.have.length(1);
     expect(wrapper.find('AlertBanner')).to.have.length(1);
@@ -72,7 +60,7 @@ describe('<SiteContainer/>', () => {
   });
 
   it('renders an error after sites have loaded but no matching site', () => {
-    props.sites.currentSite = null;
+    props.params.id = '2';
     const wrapper = shallow(<SiteContainer {...props} />);
     const alert = wrapper.find('AlertBanner');
 
@@ -82,6 +70,7 @@ describe('<SiteContainer/>', () => {
   });
 
   it('displays a page title if one is configured for the location', () => {
+    // eslint-disable-next-line scanjs-rules/assign_to_pathname
     props.location.pathname = 'settings';
     const wrapper = shallow(<SiteContainer {...props} />);
     expect(wrapper.find('PagesHeader').prop('title')).to.equal('Site settings');

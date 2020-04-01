@@ -11,21 +11,21 @@ const joinRooms = (_socket) => {
       where: { id: userId },
       include: [{ model: Site }],
     })
-    .then((user) => {
-      user.Sites.forEach((s) => {
-        switch (s.SiteUser.buildNotificationSetting) {
-          case 'builds':
-            _socket.join(getBuilderRoom(s.id, user.id));
-            break;
-          case 'none':
-            break;
-          default:
-            _socket.join(getSiteRoom(s.id));
-        }
-      });
-      return Promise.resolve();
-    })
-    .catch(err => logger.error(err));
+      .then((user) => {
+        user.Sites.forEach((s) => {
+          switch (s.SiteUser.buildNotificationSetting) {
+            case 'builds':
+              _socket.join(getBuilderRoom(s.id, user.id));
+              break;
+            case 'none':
+              break;
+            default:
+              _socket.join(getSiteRoom(s.id));
+          }
+        });
+        return Promise.resolve();
+      })
+      .catch(err => logger.error(err));
   }
   return Promise.resolve();
 };

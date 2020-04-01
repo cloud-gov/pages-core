@@ -7,7 +7,6 @@ const initialState = { isLoading: false };
 
 export default function publishedBranches(state = initialState, action) {
   switch (action.type) {
-
     case PUBLISHED_BRANCHES_FETCH_STARTED:
       return { isLoading: true };
     case PUBLISHED_BRANCHES_RECEIVED:

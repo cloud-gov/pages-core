@@ -36,11 +36,11 @@ module.exports = {
       BuildCounter.countBuildsFromPastWeek(),
       Site.count(),
     ])
-    .then(([builds, sites]) => {
-      context.buildCount = builds;
-      context.siteCount = sites;
-      res.render('home.njk', context);
-    });
+      .then(([builds, sites]) => {
+        context.buildCount = builds;
+        context.siteCount = sites;
+        res.render('home.njk', context);
+      });
   },
 
   examples(req, res) {
@@ -94,8 +94,8 @@ module.exports = {
     res.set('Content-Type', 'text/plain');
 
     // If this is the production instance and the request came to the production hostname
-    if (config.app.app_env === 'production' &&
-      config.app.hostname === `https://${req.hostname}`) {
+    if (config.app.app_env === 'production'
+      && config.app.hostname === `https://${req.hostname}`) {
       // then send the production robots.txt content
       return res.send(PROD_CONTENT);
     }

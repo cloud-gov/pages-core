@@ -11,7 +11,6 @@ const io = require('socket.io');
 const redis = require('redis');
 const redisAdapter = require('socket.io-redis');
 const schedule = require('node-schedule');
-const env = require('./services/environment.js')();
 const responses = require('./api/responses');
 const passport = require('./api/services/passport');
 const { logger, expressLogger, expressErrorLogger } = require('./winston');
@@ -27,8 +26,8 @@ const ScheduledBuildHelper = require('./api/services/ScheduledBuildHelper');
 const { sequelize } = require('./api/models');
 
 // If settings present, start New Relic
-if (env.NEW_RELIC_APP_NAME && env.NEW_RELIC_LICENSE_KEY) {
-  logger.info(`Activating New Relic: ${env.NEW_RELIC_APP_NAME}`);
+if (config.env.newRelicAppName && config.env.newRelicLicenseKey) {
+  logger.info(`Activating New Relic: ${config.env.newRelicAppName}`);
   require('newrelic'); // eslint-disable-line global-require
 } else {
   logger.warn('Skipping New Relic Activation');
@@ -108,7 +107,7 @@ app.use(limiter); // must be set before router is added to app
 
 app.server = http.Server(app);
 
-const socket = io(app.server);
+const socket = io(app.server, { cookie: false });
 if (config.redis) {
   const redisCreds = { auth_pass: config.redis.password };
 

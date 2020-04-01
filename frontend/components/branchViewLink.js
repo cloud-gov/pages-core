@@ -7,7 +7,7 @@ import { IconView } from './icons';
 const isDefaultBranch = (branchName, site) => branchName === site.defaultBranch;
 const isDemoBranch = (branchName, site) => branchName === site.demoBranch;
 
-const getUrlAndViewText = (branchName, viewLink, site, completedAt) => {
+const getUrlAndViewText = (branchName, viewLink, site) => {
   let viewText = 'Preview site';
   if (isDefaultBranch(branchName, site)) {
     viewText = 'View site';
@@ -17,8 +17,10 @@ const getUrlAndViewText = (branchName, viewLink, site, completedAt) => {
   return { url: viewLink, viewText };
 };
 
-export const BranchViewLink = ({ branchName, viewLink, site, showIcon, completedAt }) => {
-  const { url, viewText } = getUrlAndViewText(branchName, viewLink, site, completedAt);
+export const BranchViewLink = ({
+  branchName, viewLink, site, showIcon,
+}) => {
+  const { url, viewText } = getUrlAndViewText(branchName, viewLink, site);
 
   if (showIcon) {
     return (
@@ -36,18 +38,15 @@ export const BranchViewLink = ({ branchName, viewLink, site, showIcon, completed
   return (<a href={url} target="_blank" rel="noopener noreferrer">{ viewText }</a>);
 };
 
-// Note: remove completedAt propType from compoent at end of 2018
 BranchViewLink.propTypes = {
   branchName: PropTypes.string.isRequired,
   viewLink: PropTypes.string.isRequired,
   site: SITE.isRequired,
   showIcon: PropTypes.bool,
-  completedAt: PropTypes.string,
 };
 
 BranchViewLink.defaultProps = {
   showIcon: false,
-  completedAt: null,
 };
 
 export default connect()(BranchViewLink);

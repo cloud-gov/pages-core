@@ -8,7 +8,7 @@ const associate = ({ BuildLog, Build }) => {
 };
 
 const sanitizeBuildSecrets = (buildLog) => {
-  const models = buildLog.sequelize.models;
+  const { models } = buildLog.sequelize;
   return models.Build.findOne({
     where: { id: buildLog.build },
     include: [models.User],

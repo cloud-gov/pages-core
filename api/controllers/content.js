@@ -1,7 +1,9 @@
 const path = require('path');
 
 const BuildCounter = require('../services/BuildCounter');
-const { getDirectoryFiles, loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
+const {
+  getDirectoryFiles, loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking,
+} = require('../utils');
 
 const CONTENT_DIR = 'content';
 const CONTENT_PATH = path.join('views', CONTENT_DIR);

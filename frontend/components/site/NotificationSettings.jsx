@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import { SITE, USER } from '../../propTypes';
 import siteActions from '../../actions/siteActions';
+import { currentSite } from '../../selectors/site';
 
 
 class NotificationSettings extends React.Component {
@@ -19,8 +20,11 @@ class NotificationSettings extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
-  // eslint-disable-next-line no-alert
-    siteActions.updateSiteUser(this.props.site.id, { buildNotificationSetting: this.state.value });
+    const { site: { id } } = this.props;
+    const { value } = this.state;
+
+    // eslint-disable-next-line no-alert
+    siteActions.updateSiteUser(id, { buildNotificationSetting: value });
   }
 
   handleChange(event) {
@@ -28,14 +32,16 @@ class NotificationSettings extends React.Component {
   }
 
   render() {
+    const { value } = this.state;
+
     return (
       <div>
         <form onSubmit={this.handleSubmit}>
           <label htmlFor="buildNotificationSetting">
-            Recieve build notifications:
+            Receive build notifications:
             <select
               id="buildNotificationSetting"
-              value={this.state.value}
+              value={value}
               onChange={this.handleChange}
             >
               <option value="none">None</option>
@@ -60,9 +66,9 @@ NotificationSettings.defaultProps = {
   user: null,
 };
 
-const mapStateToProps = ({ user, sites }) => ({
+const mapStateToProps = ({ user, sites }, { params: { id } }) => ({
   user: user.data,
-  site: sites.currentSite,
+  site: currentSite(sites, id),
 });
 
 export { NotificationSettings };

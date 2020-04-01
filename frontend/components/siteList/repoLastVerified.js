@@ -17,9 +17,11 @@ const RepoLastVerified = ({ site, daysNotVerified = 5, userUpdated }) => {
   const minutesAgo = fromDate => (new Date() - new Date(fromDate)) / (60 * 1000);
   if ((daysAgo(site.repoLastVerified || site.createdAt) > daysNotVerified)
     && (userUpdated && (minutesAgo(userUpdated) > 4))) { // user logged in 4 mins
-    return (<p className="repo-verification">
-      {getRepoLastVerified(site)}
-    </p>);
+    return (
+      <p className="repo-verification">
+        {getRepoLastVerified(site)}
+      </p>
+    );
   }
   return (null);
 };

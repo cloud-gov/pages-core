@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 
-const secret = config.jwt.secret;
+const { secret } = config.jwt;
 
 module.exports = {
 
   sign: (payload, options = {}) => {
-     /* eslint-disable no-param-reassign */
+    /* eslint-disable no-param-reassign */
     options.expiresIn = options.expiresIn || '1d';
     return jwt.sign(payload, secret, options);
   },

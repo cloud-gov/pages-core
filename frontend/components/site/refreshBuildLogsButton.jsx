@@ -11,7 +11,9 @@ class RefreshBuildLogsButton extends React.Component {
   }
 
   refreshBuildLogs() {
-    buildLogActions.fetchBuildLogs({ id: this.props.buildId });
+    const { buildId } = this.props;
+
+    buildLogActions.fetchBuildLogs({ id: buildId });
   }
 
   render() {

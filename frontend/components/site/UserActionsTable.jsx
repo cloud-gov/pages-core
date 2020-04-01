@@ -7,7 +7,8 @@ import userActions from '../../actions/userActions';
 
 class UserActionsTable extends React.Component {
   componentDidMount() {
-    userActions.fetchUserActions(this.props.site);
+    const { site } = this.props;
+    userActions.fetchUserActions(site);
   }
 
   renderRow(action) {
@@ -43,7 +44,7 @@ class UserActionsTable extends React.Component {
   }
 
   render() {
-    const actions = this.props.userActions;
+    const { userActions: actions } = this.props;
 
     if (!actions || !actions.length) {
       return null;

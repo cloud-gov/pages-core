@@ -18,10 +18,17 @@ export const DeleteSiteForm = ({
         <p className="well-text">
           Deleting a Federalist site removes the published site from our servers and
           disconnects the Federalist admin interface for all users. This will bring the
-          entire site offline and make it inaccessible for users.<br /><br /> <i>Trying
-          to remove a site from your list of Federalist sites? Go to the
+          entire site offline and make it inaccessible for users.
+          <br />
+          <br />
           {' '}
-            <a href={`/sites/${siteId}/users`}>collaborators page</a> and remove yourself.</i>
+          <i>
+            Trying to remove a site from your list of Federalist sites? Go to the
+            {' '}
+            <a href={`/sites/${siteId}/users`}>collaborators page</a>
+            {' '}
+            and remove yourself.
+          </i>
         </p>
         <AlertBanner
           status="warning"

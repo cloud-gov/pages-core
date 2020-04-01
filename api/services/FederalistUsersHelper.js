@@ -25,8 +25,9 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
     })
     .then((admins) => {
       adminFedUsers = admins.map(member => member.login);
-      return Promise.all(fedUserTeams.map(team =>
-        GitHub.getTeamMembers(auditor.githubAccessToken, team)));
+      return Promise.all(
+        fedUserTeams.map(team => GitHub.getTeamMembers(auditor.githubAccessToken, team))
+      );
     })
     .then((teams) => {
       const removed = [];
@@ -44,10 +45,9 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
     });
 };
 
-const federalistUsersAdmins = auditorUsername =>
-  User.findOne({ where: { username: auditorUsername } })
-    .then(auditor =>
-      GitHub.getOrganizationMembers(auditor.githubAccessToken, 'federalist-users', 'admin'))
-    .then(admins => Promise.all(admins.map(admin => admin.login)));
+const federalistUsersAdmins = auditorUsername => User
+  .findOne({ where: { username: auditorUsername } })
+  .then(auditor => GitHub.getOrganizationMembers(auditor.githubAccessToken, 'federalist-users', 'admin'))
+  .then(admins => Promise.all(admins.map(admin => admin.login)));
 
 module.exports = { audit18F, federalistUsersAdmins };

@@ -21,13 +21,12 @@ const verifyNextRepo = (site, userIndex = 0) => {
     });
 };
 
-const verifyRepos = () =>
-  Site.findAll({
-    include: [User.scope('withGithub')],
-    order: [
-      [User, 'signedInAt', 'DESC'],
-    ],
-  })
+const verifyRepos = () => Site.findAll({
+  include: [User.scope('withGithub')],
+  order: [
+    [User, 'signedInAt', 'DESC'],
+  ],
+})
   .then(sites => Promise.all(sites.map(site => verifyNextRepo(site))));
 
 const verifyUserRepos = (user) => {

@@ -9,48 +9,46 @@ const { logger } = require('../../winston');
 const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
 
 const emitBuildStatus = (socket, build) => Site.findByPk(build.site)
-    .then((site) => {
-      const msg = {
-        id: build.id,
-        state: build.state,
-        site: build.site,
-        branch: build.branch,
-        owner: site.owner,
-        repository: site.repository,
-      };
-      const siteRoom = SocketIOSubscriber.getSiteRoom(build.site);
-      socket.to(siteRoom).emit('build status', msg);
-      const builderRoom = SocketIOSubscriber.getBuilderRoom(build.site, build.user);
-      socket.to(builderRoom).emit('build status', msg);
-      return Promise.resolve();
-    })
-    .catch(err => logger.error(err));
+  .then((site) => {
+    const msg = {
+      id: build.id,
+      state: build.state,
+      site: build.site,
+      branch: build.branch,
+      owner: site.owner,
+      repository: site.repository,
+    };
+    const siteRoom = SocketIOSubscriber.getSiteRoom(build.site);
+    socket.to(siteRoom).emit('build status', msg);
+    const builderRoom = SocketIOSubscriber.getBuilderRoom(build.site, build.user);
+    socket.to(builderRoom).emit('build status', msg);
+    return Promise.resolve();
+  })
+  .catch(err => logger.error(err));
 
 module.exports = {
   find: (req, res) => {
     let site;
 
     Promise.resolve(Number(req.params.site_id))
-    .then((id) => {
-      if (isNaN(id)) { throw 404; }
-      return Site.findByPk(id);
-    })
-    .then((model) => {
-      if (!model) { throw 404; }
-      site = model;
-      return siteAuthorizer.findOne(req.user, site);
-    })
-    .then(() =>
-      Build.findAll({
+      .then((id) => {
+        if (isNaN(id)) { throw 404; }
+        return Site.findByPk(id);
+      })
+      .then((model) => {
+        if (!model) { throw 404; }
+        site = model;
+        return siteAuthorizer.findOne(req.user, site);
+      })
+      .then(() => Build.findAll({
         attributes: ['id'],
         where: { site: site.id },
         order: [['createdAt', 'desc']],
         limit: 100,
-      })
-    )
-    .then(builds => buildSerializer.serialize(builds))
-    .then(buildJSON => res.json(buildJSON))
-    .catch(res.error);
+      }))
+      .then(builds => buildSerializer.serialize(builds))
+      .then(buildJSON => res.json(buildJSON))
+      .catch(res.error);
   },
 
   /**
@@ -68,23 +66,19 @@ module.exports = {
    */
   create: (req, res) => {
     siteAuthorizer.createBuild(req.user, { id: req.body.siteId })
-    .then(() => BuildResolver.getBuild(req.user, req.body))
-    .then(build =>
-      Build.create({
+      .then(() => BuildResolver.getBuild(req.user, req.body))
+      .then(build => Build.create({
         branch: build.branch,
         site: build.site,
         user: req.user.id,
         commitSha: build.commitSha,
-      })
-    )
-    .then(build =>
-      GithubBuildStatusReporter
-      .reportBuildStatus(build)
-      .then(() => build)
-    )
-    .then(build => buildSerializer.serialize(build))
-    .then(buildJSON => res.json(buildJSON))
-    .catch(res.error);
+      }))
+      .then(build => GithubBuildStatusReporter
+        .reportBuildStatus(build)
+        .then(() => build))
+      .then(build => buildSerializer.serialize(build))
+      .then(buildJSON => res.json(buildJSON))
+      .catch(res.error);
   },
 
   status: (req, res) => {

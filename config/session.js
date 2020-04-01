@@ -4,6 +4,7 @@ module.exports = {
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
   },
   key: 'federalist.sid',
   secret: env.FEDERALIST_SESSION_SECRET || 'keyboard-cat',

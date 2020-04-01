@@ -3,11 +3,11 @@ import { connect } from 'react-redux';
 import { SITE, USER } from '../../propTypes';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
+import { currentSite } from '../../selectors/site';
 import UserActionsTable from './UserActionsTable';
 import { IconGitHub } from '../icons';
 
-const isSiteOwner = (user, siteOwner) =>
-  user.username.toLowerCase() === siteOwner.toLowerCase();
+const isSiteOwner = (user, siteOwner) => user.username.toLowerCase() === siteOwner.toLowerCase();
 
 const SiteUsers = ({ site, user }) => {
   // sort users by lower-cased usernames
@@ -24,7 +24,7 @@ const SiteUsers = ({ site, user }) => {
     const userToRemoveId = userToRemove.id;
 
     siteActions.removeUserFromSite(site.id, userToRemoveId, userToRemoveId === user.id)
-    .then(() => siteActions.fetchSites());
+      .then(() => siteActions.fetchSites());
   };
 
   return (
@@ -47,8 +47,8 @@ const SiteUsers = ({ site, user }) => {
           </tr>
         </thead>
         <tbody>
-          {users.map(rowUser =>
-            (<tr key={rowUser.username}>
+          {users.map(rowUser => (
+            <tr key={rowUser.username}>
               <td>
                 <a
                   href={`https://github.com/${rowUser.username}`}
@@ -64,14 +64,17 @@ const SiteUsers = ({ site, user }) => {
               </td>
               <td>
                 {
-                  isSiteOwner(rowUser, site.owner) ? '-' :
-                  <ButtonLink clickHandler={handleClick(rowUser)}>
-                    Remove user
-                  </ButtonLink>
+                  isSiteOwner(rowUser, site.owner)
+                    ? '-'
+                    : (
+                      <ButtonLink clickHandler={handleClick(rowUser)}>
+                        Remove user
+                      </ButtonLink>
+                    )
                 }
               </td>
-            </tr>)
-          )}
+            </tr>
+          ))}
         </tbody>
       </table>
       <UserActionsTable site={site.id} />
@@ -89,9 +92,9 @@ SiteUsers.defaultProps = {
   user: null,
 };
 
-const mapStateToProps = ({ user, sites }) => ({
+const mapStateToProps = ({ user, sites }, { params: { id } }) => ({
   user: user.data,
-  site: sites.currentSite,
+  site: currentSite(sites, id),
 });
 
 export { SiteUsers };

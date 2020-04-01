@@ -16,27 +16,27 @@ const authorize = ({ id }, site) => (
 
 const authorizeAdmin = (user, site) => (
   GitHub.checkPermissions(user, site.owner, site.repository)
-  .then((permissions) => {
-    if (!permissions.admin) {
+    .then((permissions) => {
+      if (!permissions.admin) {
+        return Promise.reject({
+          message: siteErrors.ADMIN_ACCESS_REQUIRED,
+          status: 403,
+        });
+      }
+      return Promise.resolve(site.id);
+    })
+    .catch((error) => {
+      if (error.code === 404) {
+      // authorize user if the site's repo does not exist:
+      // When a user attempts to delete a site after deleting the repo, Federalist
+      // attempts to fetch the repo but it no longer exists and receives a 404
+        return Promise.resolve(site.id);
+      }
       return Promise.reject({
         message: siteErrors.ADMIN_ACCESS_REQUIRED,
         status: 403,
       });
-    }
-    return Promise.resolve(site.id);
-  })
-  .catch((error) => {
-    if (error.code === 404) {
-      // authorize user if the site's repo does not exist:
-      // When a user attempts to delete a site after deleting the repo, Federalist
-      // attempts to fetch the repo but it no longer exists and receives a 404
-      return Promise.resolve(site.id);
-    }
-    return Promise.reject({
-      message: siteErrors.ADMIN_ACCESS_REQUIRED,
-      status: 403,
-    });
-  })
+    })
 );
 
 // create is allowed for all
@@ -53,7 +53,7 @@ const update = (user, site) => authorize(user, site);
 
 const destroy = (user, site) => (
   authorize(user, site)
-  .then(() => authorizeAdmin(user, site))
+    .then(() => authorizeAdmin(user, site))
 );
 
 const removeUser = (user, site) => authorize(user, site);

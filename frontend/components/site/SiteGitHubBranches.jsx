@@ -7,6 +7,7 @@ import GitHubLink from '../GitHubLink';
 import BranchViewLink from '../branchViewLink';
 import githubBranchActions from '../../actions/githubBranchActions';
 import buildActions from '../../actions/buildActions';
+import { currentSite } from '../../selectors/site';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
 import { validBranchName } from '../../util/validators';
@@ -16,10 +17,13 @@ const isLinkable = s => validBranchName(s);
 
 export class SiteGitHubBranches extends React.Component {
   componentDidMount() {
-    githubBranchActions.fetchBranches(this.props.site);
+    const { site } = this.props;
+    githubBranchActions.fetchBranches(site);
   }
 
   renderRowActions(name, commit) {
+    const { site } = this.props;
+
     if (!isLinkable(name)) {
       return <span>Unlinkable branch name</span>;
     }
@@ -27,7 +31,7 @@ export class SiteGitHubBranches extends React.Component {
     return (
       <span>
         <CreateBuildLink
-          handlerParams={{ commit: commit.sha, branch: name, siteId: this.props.site.id }}
+          handlerParams={{ commit: commit.sha, branch: name, siteId: site.id }}
           handleClick={buildActions.createBuild}
           className="usa-button usa-button-secondary"
         >
@@ -38,7 +42,9 @@ export class SiteGitHubBranches extends React.Component {
   }
 
   renderRow({ name, commit }, { isDefault = false, isDemo = false }) {
-    const { owner, repository } = this.props.site;
+    const { site } = this.props;
+
+    const { owner, repository } = site;
 
     return (
       <tr key={name}>
@@ -46,11 +52,12 @@ export class SiteGitHubBranches extends React.Component {
           <span className="commit-link">
             <GitHubLink text={name} owner={owner} repository={repository} branch={name} />
           </span>
-          { isDefault && ' (live branch)' }{ isDemo && ' (demo branch)' }
+          { isDefault && ' (live branch)' }
+          { isDemo && ' (demo branch)' }
           <div className="branch-link">
             {
               isLinkable(name)
-                && <BranchViewLink branchName={name} site={this.props.site} showIcon />
+                && <BranchViewLink branchName={name} site={site} showIcon />
             }
           </div>
         </td>
@@ -129,9 +136,9 @@ SiteGitHubBranches.defaultProps = {
   githubBranches: null,
 };
 
-const mapStateToProps = ({ githubBranches, sites }) => ({
+const mapStateToProps = ({ githubBranches, sites }, { params: { id } }) => ({
   githubBranches,
-  site: sites.currentSite,
+  site: currentSite(sites, id),
 });
 
 export default connect(mapStateToProps)(SiteGitHubBranches);

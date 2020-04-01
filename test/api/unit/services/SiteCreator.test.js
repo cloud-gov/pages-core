@@ -256,7 +256,7 @@ describe('SiteCreator', () => {
       const siteParams = {
         owner: crypto.randomBytes(3).toString('hex'),
         repository: crypto.randomBytes(3).toString('hex'),
-        template: 'uswds',
+        template: 'uswds2',
       };
       let user;
 
