@@ -32,7 +32,7 @@ module.exports = {
 
     Promise.resolve(Number(req.params.site_id))
       .then((id) => {
-        if (isNaN(id)) { throw 404; }
+        if (Number.isNaN(Number(id))) { throw 404; }
         return Site.findByPk(id);
       })
       .then((model) => {
@@ -49,6 +49,23 @@ module.exports = {
       .then(builds => buildSerializer.serialize(builds))
       .then(buildJSON => res.json(buildJSON))
       .catch(res.error);
+  },
+
+  findAllBuilds: async (req, res) => {
+    const { limit = 50, offset = 0 } = req.query;
+
+    try {
+      const builds = await Build.findAll({
+        order: [['createdAt', 'DESC']],
+        limit,
+        offset,
+      });
+
+      const buildJSON = await buildSerializer.serialize(builds);
+      return res.json(buildJSON);
+    } catch (error) {
+      return res.error(error);
+    }
   },
 
   /**
@@ -109,7 +126,7 @@ module.exports = {
         return Promise.resolve(Number(req.params.id));
       })
       .then((id) => {
-        if (isNaN(id)) {
+        if (Number.isNaN(Number(id))) {
           throw 404;
         }
         return Build.findByPk(id);

@@ -1,0 +1,88 @@
+swagger: '2.0'
+info:
+  title: Federalist Admin API
+  description: API for interacting with Federalist
+  version: "0.0.0"
+host: federalist-staging.fr.cloud.gov
+schemes:
+  - https
+basePath: /admin
+produces:
+  - application/json
+paths:
+  /site/{site_id}/build:
+    get:
+      summary: Fetch all of the builds
+      responses:
+        200:
+          description: An array of builds
+          schema:
+            type: array
+            items:
+              $ref: "Build.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          descriptions: Not found
+          schema:
+            $ref: "Error.json"
+  /builds:
+    get:
+      summary: Fetch a build by its ID
+      responses:
+        200:
+            description: An array of builds
+            schema:
+              type: array
+              items:
+                $ref: "Build.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+  /sites:
+    get:
+      summary: Fetch all of the sites
+      responses:
+        200:
+            description: An array of sites
+            schema:
+              type: array
+              items:
+                $ref: "Site.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+  /site/{id}:
+    parameters:
+    - name: id
+      in: path
+      description: The id of the site
+      type: integer
+      required: true
+    get:
+      summary: Fetch the data for a Federalist site
+      responses:
+        200:
+          description: The site object for the given ID
+          schema:
+            $ref: "Site.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
