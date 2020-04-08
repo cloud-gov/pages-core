@@ -74,7 +74,7 @@ describe('SQS', () => {
 
       AWSMocks.mocks.S3.putObject = (params, callback) => {
         expect(params).to.deep.equal({
-          Body: 'User-agent: *\nDisallow: /',
+          Body: 'User-agent: *\nDisallow: /\n',
           Key: 'robots.txt',
           Bucket: config.s3.bucket,
           CacheControl: 'max-age=60',
