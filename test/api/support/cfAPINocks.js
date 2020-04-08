@@ -82,19 +82,27 @@ const mockDefaultCredentials = (exists = true) => {
   const serviceGuid = 'testing-guid';
   const serviceName = 'federalist-dev-s3';
   const instanceResponses = {
-    resources: exists ?
-      [factory.responses.service({ guid: serviceGuid }, { name: serviceName })] : [],
+    resources: exists
+      ? [factory.responses.service({ guid: serviceGuid }, { name: serviceName })] : [],
   };
 
   const keyResponses = {
-    resources: exists ?
-      [factory.responses.service({}, { credentials: factory.responses.credentials() })] : [],
+    resources: exists
+      ? [factory.responses.service({}, { credentials: factory.responses.credentials() })] : [],
   };
 
   nock(url, reqheaders)
     .persist()
     .get('/v2/service_instances?q=name:federalist-dev-s3')
     .reply(200, instanceResponses);
+
+  nock(url, reqheaders)
+    .persist()
+    .get('/v2/service_instances?q=name:foo-s3-service')
+    .reply(200, {
+      resources: exists
+        ? [factory.responses.service({ guid: serviceGuid }, { name: 'foo-s3-service' })] : [],
+    });
 
   nock(url, reqheaders)
     .persist()
