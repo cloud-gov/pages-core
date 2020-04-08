@@ -149,12 +149,13 @@ class S3Client {
     });
   }
 
-  putObject(body, key) {
+  putObject(body, key, extras = {}) {
     const { bucket, client } = this;
     const params = {
       Body: body,
       Bucket: bucket,
       Key: key,
+      ...extras,
     };
 
     return new Promise((resolve, reject) => {
