@@ -109,7 +109,7 @@ const setupBucket = (build, buildCount) => {
       });
 
       return s3Client.putBucketWebsite(build.Site.owner, build.Site.repository, 30)
-        .then(() => s3Client.putObject('User-agent: *\nDisallow: /', 'robots.txt', {
+        .then(() => s3Client.putObject('User-agent: *\nDisallow: /\n', 'robots.txt', {
           CacheControl: 'max-age=60',
           ServerSideEncryption: 'AES256',
           ContentType: 'text/plain',
