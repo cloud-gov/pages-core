@@ -127,10 +127,13 @@ describe('S3Helper', () => {
     it('should successfully put object in bucket', (done) => {
       const body = 'Hello World';
       const key = 'hello.html';
+      const extras = { ContentType: 'text/html' };
+
       const expected = {
         Bucket: config.s3.bucket,
         Body: body,
         Key: key,
+        ...extras,
       };
 
       AWSMocks.mocks.S3.putObject = (params, callback) => {
@@ -139,7 +142,7 @@ describe('S3Helper', () => {
       };
 
       const client = new S3Helper.S3Client(config.s3);
-      client.putObject(body, key)
+      client.putObject(body, key, extras)
         .then(done)
         .catch(done);
     });
