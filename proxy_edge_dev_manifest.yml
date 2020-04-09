@@ -22,7 +22,7 @@ services:
 - federalist-deploy-user
 - federalist-staging-proxy
 - federalist-staging-domain
-- federalist-staging-dyanamodb-creds
+- federalist-staging-dynamodb-creds
 env:
   NODE_ENV: production
   APP_ENV: staging
