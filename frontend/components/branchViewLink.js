@@ -8,13 +8,18 @@ const isDefaultBranch = (branchName, site) => branchName === site.defaultBranch;
 const isDemoBranch = (branchName, site) => branchName === site.demoBranch;
 
 const getUrlAndViewText = (branchName, viewLink, site) => {
+  let url;
   let viewText = 'Preview site';
   if (isDefaultBranch(branchName, site)) {
     viewText = 'View site';
+    url = `https://site${site.id}.sites-dev.federalist.18f.gov/site/${site.owner}/${site.repository}/`
   } else if (isDemoBranch(branchName, site)) {
     viewText = 'View demo';
+    url = `https://site${site.id}.sites-dev.federalist.18f.gov/demo/${site.owner}/${site.repository}/`
+  } else {
+    url = `https://site${site.id}.sites-dev.federalist.18f.gov/preview/${site.owner}/${site.repository}/${branchName}/`
   }
-  return { url: viewLink, viewText };
+  return { url, viewText };
 };
 
 export const BranchViewLink = ({

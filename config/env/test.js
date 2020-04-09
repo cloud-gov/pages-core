@@ -15,6 +15,11 @@ module.exports = {
     bucket: 'cg-123456789',
     serviceName: 'federalist-dev-s3',
   },
+  dynamoDB: {
+    accessKeyId: '123abc',
+    secretAccessKey: '456def',
+    region: 'us-gov-west-1',
+  },
   passport: {
     github: {
       options: {
@@ -52,5 +57,6 @@ module.exports = {
     cfSpaceGuid: '123abc-456def-789ghi',
     cfOauthTokenUrl: 'https://login.example.com/oauth/token',
     cfApiHost: 'https://api.example.com',
+    proxySiteTable: 'testSiteTable'
   },
 };
