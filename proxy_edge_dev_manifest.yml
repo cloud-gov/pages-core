@@ -38,4 +38,3 @@ env:
   USER_AUDITOR: federalist
   S3_SERVICE_PLAN_ID: 16A19515-C2B9-4982-80BD-69BED6A86C85
   PROXY_SITE_TABLE: federalist-proxy-dev
-  # PROXY_SITE_TABLE: federalist-proxy-site-staging
