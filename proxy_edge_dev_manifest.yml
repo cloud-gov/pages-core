@@ -5,9 +5,6 @@ buildpack: nodejs_buildpack
 stack: cflinuxfs3
 routes:
 - route: federalistapp-proxy-edge-dev.fr.cloud.gov
-- route: federalistapp-proxy-edge-dev.18f.gov
-- route: federalist-proxy-edge-dev.fr.cloud.gov
-- route: federalistapp-proxy-edge-dev.apps.internal
 disk_quota: 2G
 memory: 256MB
 instances: 1
@@ -26,7 +23,7 @@ services:
 env:
   NODE_ENV: production
   APP_ENV: staging
-  APP_HOSTNAME: https://federalistapp-proxy-edge-dev.18f.gov
+  APP_HOSTNAME: https://federalistapp-proxy-edge-dev.fr.cloud.gov
   CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
   CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
   HOMEPAGE_URL: https://federalist-staging.18f.gov
