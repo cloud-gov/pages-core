@@ -51,32 +51,29 @@ class DynamoDBDocumentClient {
     });
   }
 
-  batchWrite(params, max = 10) {
-    let attempt = 0;
-    let start;
+  batchWrite(TableName, items) {
     const { docClient } = this;
-    const str = `${params.TableName}: batchWrite`;
-    return new Promise((resolve, reject) => {
-      const request = () => {
-        start = new Date().getTime();
-        docClient.batchWrite(params, (err, data) => {
-          if (err && attempt < max) {
-            putItemLogger('info', str, 'Retry', { start, attempt });
-            attempt += 1;
-            return _.delay(request, 500);
-          }
 
-          if (err && attempt >= max) {
-            putItemLogger('error', str, err, { start, attempt });
-            return reject(err);
-          }
-
-          putItemLogger('info', str, 'Success', { start, attempt });
-          return resolve(data);
-        });
-      };
-      request();
+    const request = (params) => new Promise((resolve, reject) => {
+      docClient.batchWrite(params, (err, data) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(data);
+      });
     });
+
+    const allRequests = [];
+    const RequestItems = {}
+    let params;
+    let i = 0;
+    const maxItems = 15;
+    for (i = 0; i < items.length; i += maxItems) {
+      RequestItems[TableName] = items.slice(i, i + maxItems);
+      params = { RequestItems };
+      allRequests << request(params);
+    }
+    return Promise.all(allRequests);
   }
 
 

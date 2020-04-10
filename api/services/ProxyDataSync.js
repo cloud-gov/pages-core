@@ -30,15 +30,11 @@ const saveSite = (site) => {
 const saveSites = (sites) => {
 	const docClient = new DynamoDBDocumentClient(config.dynamoDB);
 	const items = sites.map(site => ({ PutRequest: { Item: siteToItem(site) } }));
-	const RequestItems = {}
-	RequestItems[TableName] = items;
-	const params = { RequestItems };
-	// console.log(`\n\nparams\n=>\n${JSON.stringify(params)}\n\n`)
-	return docClient.batchWrite(params);
-	// return Promise.resolve(params);
+	return docClient.batchWrite(TableName, items);
 };
 
 const siteToItem = (site) => {
+	console.log(`\n\nsite:\t${JSON.stringify(site)}\n\n`);
 	const item = {
 		owner_repository: getSiteKey(site),		
 		settings: {
