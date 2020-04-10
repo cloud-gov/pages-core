@@ -14,21 +14,20 @@ class DynamoDBDocumentHelper {
     let attempt = 0;
     let start;
     const { docClient } = this;
-    // const itemStr = `${params.TableName}: ${itemKey}@${params.Item[itemKey]}`;
-    // return new Promise((resolve, reject) => {
-      const request = (params) => new Promise((resolve, reject) => {
-        docClient.put(params, (err, data) => {
-          if (err) {
-            return reject(err);
-          }
-          return resolve(data);
-        });
+
+    const request = (params) => new Promise((resolve, reject) => {
+      docClient.put(params, (err, data) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(data);
       });
-      const params = {
-        TableName,
-        Item
-      };
-      return request(params);
+    });
+    const params = {
+      TableName,
+      Item
+    };
+    return request(params);
   }
 
   batchWrite(TableName, items) {
@@ -37,6 +36,7 @@ class DynamoDBDocumentHelper {
     const request = (params) => new Promise((resolve, reject) => {
       docClient.batchWrite(params, (err, data) => {
         if (err) {
+          logger.error(`failed save: \n${JSON.stringify(params)}`, err);
           return reject(err);
         }
         return resolve(data);

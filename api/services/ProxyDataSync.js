@@ -11,21 +11,21 @@ const removeSite = (site) => {
 	const key = {
 	    owner_repository: getSiteKey(site),
 	};
-	console.log(`\n\ndelete site\t=>\t${JSON.stringify(key)}\n\n`);
+	// console.log(`\n\ndelete site\t=>\t${JSON.stringify(key)}\n\n`);
 	return docClient.delete(tableName, key);
 };
 
 const saveSite = (site) => {
 	const docClient = new DynamoDBDocumentHelper(config.dynamoDB);
 	const item = siteToItem(site);
-	console.log(`\n\nsave site\t=>\t${JSON.stringify(item)}\n\n`);
+	// console.log(`\n\nsave site\t=>\t${JSON.stringify(item)}\n\n`);
 	return docClient.put(tableName, item);
 };
 
 const saveSites = (sites) => {
 	const docClient = new DynamoDBDocumentHelper(config.dynamoDB);
 	const items = sites.map(site => ({ PutRequest: { Item: siteToItem(site) } }));
-	console.log(`\n\nsave sites\t=>\t${JSON.stringify(items)}\n\n`);
+	// console.log(`\n\nsave sites\t=>\t${JSON.stringify(items)}\n\n`);
 	return docClient.batchWrite(tableName, items);
 };
 
