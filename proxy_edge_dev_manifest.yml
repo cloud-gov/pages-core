@@ -26,14 +26,14 @@ services:
 env:
   NODE_ENV: production
   APP_ENV: staging
-  APP_HOSTNAME: https://federalistapp-proxy-edge.18f.gov
+  APP_HOSTNAME: https://federalistapp-proxy-edge-dev.18f.gov
   CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
   CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
   HOMEPAGE_URL: https://federalist-staging.18f.gov
   LOG_LEVEL: verbose
   NPM_CONFIG_PRODUCTION: true
   NODE_MODULES_CACHE: false
-  FEDERALIST_PREVIEW_HOSTNAME: https://federalist-proxy-staging.app.cloud.gov
+  FEDERALIST_PREVIEW_HOSTNAME: https://federalist-proxy.sites-dev.federalist.18f.gov
   SOCKET_HOST: https://federalistapp-proxy-edge-dev.fr.cloud.gov
   USER_AUDITOR: federalist
   S3_SERVICE_PLAN_ID: 16A19515-C2B9-4982-80BD-69BED6A86C85
