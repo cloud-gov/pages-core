@@ -1,5 +1,5 @@
 // use dynamodb helper to write items to dynamodb
-const { DynamoDBDocumentClient } = require('./dynamoDBDocumentHelper');
+const { DynamoDBDocumentClient } = require('./DynamoDBDocumentHelper');
 const config = require('../../config');
 const TableName = config.app.proxySiteTable; //for now only 1 table
 const siteKey = 'owner_repository';
