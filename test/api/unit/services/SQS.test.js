@@ -57,7 +57,9 @@ describe('SQS', () => {
         done();
       };
 
-      AWSMocks.mocks.S3.putBucketWebsite = (params, callback) => {
+      AWSMocks.mocks.S3.headBucket = () => ({ promise: () => Promise.resolve() });
+
+      AWSMocks.mocks.S3.putBucketWebsite = (params) => {
         expect(params).to.deep.equal({
           Bucket: config.s3.bucket,
           WebsiteConfiguration: {
@@ -69,10 +71,10 @@ describe('SQS', () => {
             },
           },
         });
-        callback(null, null);
+        return { promise: () => Promise.resolve() };
       };
 
-      AWSMocks.mocks.S3.putObject = (params, callback) => {
+      AWSMocks.mocks.S3.putObject = (params) => {
         expect(params).to.deep.equal({
           Body: 'User-agent: *\nDisallow: /\n',
           Key: 'robots.txt',
@@ -81,7 +83,7 @@ describe('SQS', () => {
           ServerSideEncryption: 'AES256',
           ContentType: 'text/plain',
         });
-        callback(null, null);
+        return { promise: () => Promise.resolve() };
       };
 
       SQS.sendBuildMessage({

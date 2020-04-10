@@ -1,6 +1,5 @@
 const AWS = require('aws-sdk');
-const _ = require('underscore');
-const { logger } = require('../../winston');
+const { retry } = require('../utils');
 
 const S3_DEFAULT_MAX_KEYS = 1000;
 
@@ -38,18 +37,6 @@ function createWebsiteParams(owner, repository, bucket) {
   };
 }
 
-function putBucketLogger(type, bucket, message, { start, attempt }) {
-  const current = new Date().getTime();
-
-  logger[type](`\
-    bucket-website-config:\
-    Bucket=${bucket};\
-    ${message};\
-    Attempt=${attempt};\
-    TotalTime(ms)=${current - start}\
-  `);
-}
-
 function resolveCallback(resolve, reject) {
   return (err, objects) => {
     if (err) {
@@ -68,6 +55,11 @@ class S3Client {
       secretAccessKey: credentials.secretAccessKey,
       region: credentials.region,
     });
+  }
+
+  waitForCredentials() {
+    const { bucket, client } = this;
+    return retry(() => client.headBucket({ Bucket: bucket }).promise(), { waitTime: 2000 });
   }
 
   listCommonPrefixes(prefix) {
@@ -117,36 +109,11 @@ class S3Client {
     });
   }
 
-  // Add delay due to initial credentials provisioning time for S3
   // ToDo refactor and move `putBucketWebsite` config in site creation flow
-  putBucketWebsite(owner, repository, max = 10) {
-    let attempt = 0;
-    let start;
+  putBucketWebsite(owner, repository) {
     const { bucket, client } = this;
     const params = createWebsiteParams(owner, repository, bucket);
-
-    return new Promise((resolve, reject) => {
-      const request = () => {
-        start = new Date().getTime();
-        client.putBucketWebsite(params, (err, data) => {
-          if (err && attempt < max) {
-            putBucketLogger('info', bucket, 'Retry', { start, attempt });
-            attempt += 1;
-            return _.delay(request, 500);
-          }
-
-          if (err && attempt >= max) {
-            putBucketLogger('error', bucket, err, { start, attempt });
-            return reject(err);
-          }
-
-          putBucketLogger('info', bucket, 'Success', { start, attempt });
-          return resolve(data);
-        });
-      };
-
-      request();
-    });
+    return client.putBucketWebsite(params).promise();
   }
 
   putObject(body, key, extras = {}) {
@@ -158,16 +125,7 @@ class S3Client {
       ...extras,
     };
 
-    return new Promise((resolve, reject) => {
-      client.putObject(params, (err, data) => {
-        if (err) {
-          logger.error(`aws-putObject:Bucket=${bucket};${err}`);
-          return reject(err);
-        }
-
-        return resolve(data);
-      });
-    });
+    return client.putObject(params).promise();
   }
 
   // Private Methods

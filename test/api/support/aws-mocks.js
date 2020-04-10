@@ -12,6 +12,7 @@ const mockableFunctions = {
     'deleteObjects',
     'putBucketWebsite',
     'putObject',
+    'headBucket',
   ],
   SQS: ['sendMessage'],
 };
@@ -20,9 +21,14 @@ Object.keys(mockableFunctions).forEach((service) => {
   AWS[service] = function mock() {};
 
   mockableFunctions[service].forEach((functionName) => {
+    // eslint-disable-next-line consistent-return
     AWS[service].prototype[functionName] = (params, cb) => {
       if (mocks[service][functionName]) {
+        if (!cb) {
+          return mocks[service][functionName](params);
+        }
         mocks[service][functionName](params, cb);
+        // eslint-disable-next-line consistent-return
         return;
       }
       cb(null, {});
