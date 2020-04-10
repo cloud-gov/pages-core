@@ -14,6 +14,11 @@ const handleError = (err) => {
 };
 
 const apiClient = new CloudFoundryAPIClient();
+
+function usesDedicatedBucket(site, s3) {
+  return site.s3ServiceName !== s3.serviceName && site.awsBucketName !== s3.bucket;
+}
+
 /**
   Deletes the array of S3 objects passed to it.
   Since AWS limits the number of objects that can be deleted at a time, this
@@ -45,11 +50,26 @@ const deleteObjects = (s3Client, keys) => {
   }).then(() => deleteObjects(s3Client, keysToDeleteLater));
 };
 
+const deleteRobots = s3Client => new Promise((resolve, reject) => {
+  s3Client.client.deleteObjects({
+    Bucket: s3Client.bucket,
+    Delete: {
+      Objects: [{ Key: 'robots.txt' }],
+    },
+  }, (err, data) => {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(data);
+    }
+  });
+});
+
 const getKeys = (s3Client, prefix) => s3Client.listObjects(prefix)
   .then(objects => objects.map(o => o.Key));
 
 const removeInfrastructure = (site) => {
-  if (site.s3ServiceName !== config.s3.serviceName && site.awsBucketName !== config.s3.bucket) {
+  if (usesDedicatedBucket(site, config.s3)) {
     return apiClient.deleteRoute(site.awsBucketName)
       .catch(handleError) // if route does not exist continue to delete service instance
       .then(() => apiClient.deleteServiceInstance(site.s3ServiceName))
@@ -59,41 +79,47 @@ const removeInfrastructure = (site) => {
   return Promise.resolve();
 };
 
-const removeSite = (site) => {
+const removeSite = async (site) => {
   const prefixes = [
     `site/${site.owner}/${site.repository}`,
     `demo/${site.owner}/${site.repository}`,
     `preview/${site.owner}/${site.repository}`,
   ];
-  let s3Client;
-  return apiClient.fetchServiceInstanceCredentials(site.s3ServiceName)
-    .then((credentials) => {
-      s3Client = new S3Helper.S3Client({
-        accessKeyId: credentials.access_key_id,
-        secretAccessKey: credentials.secret_access_key,
-        region: credentials.region,
-        bucket: credentials.bucket,
-      });
 
-      return Promise.all(
-        prefixes.map(prefix => getKeys(s3Client, `${prefix}/`))
-      );
-    })
-    .then((keys) => {
-      let mergedKeys = [].concat(...keys);
+  try {
+    const credentials = await apiClient.fetchServiceInstanceCredentials(site.s3ServiceName);
 
-      if (mergedKeys.length) {
-        /**
-         * The federalist build container puts redirect objects in the root of each user's folder
-         * which correspond to the name of each site prefix. Because each site prefix is suffixed
-         * with a trailing `/`, `listObjects will no longer see them.
-         * Therefore, they are manually added to the array of keys marked for deletion.
-         */
-        mergedKeys = mergedKeys.concat(prefixes.slice(0));
-      }
-      return deleteObjects(s3Client, mergedKeys);
-    })
-    .catch(handleError);
+    const s3Client = new S3Helper.S3Client({
+      accessKeyId: credentials.access_key_id,
+      secretAccessKey: credentials.secret_access_key,
+      region: credentials.region,
+      bucket: credentials.bucket,
+    });
+
+    const keys = await Promise.all(
+      prefixes.map(prefix => getKeys(s3Client, `${prefix}/`))
+    );
+
+    let mergedKeys = [].concat(...keys);
+
+    if (mergedKeys.length) {
+      /**
+       * The federalist build container puts redirect objects in the root of each user's folder
+       * which correspond to the name of each site prefix. Because each site prefix is suffixed
+       * with a trailing `/`, `listObjects will no longer see them.
+       * Therefore, they are manually added to the array of keys marked for deletion.
+       */
+      mergedKeys = mergedKeys.concat(prefixes.slice(0));
+    }
+
+    await deleteObjects(s3Client, mergedKeys);
+
+    if (usesDedicatedBucket(site, config.s3)) {
+      await deleteRobots(s3Client);
+    }
+  } catch (error) {
+    handleError(error);
+  }
 };
 
 module.exports = {

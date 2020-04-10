@@ -108,7 +108,12 @@ const setupBucket = (build, buildCount) => {
         region,
       });
 
-      return s3Client.putBucketWebsite(build.Site.owner, build.Site.repository, 30);
+      return s3Client.putBucketWebsite(build.Site.owner, build.Site.repository, 30)
+        .then(() => s3Client.putObject('User-agent: *\nDisallow: /\n', 'robots.txt', {
+          CacheControl: 'max-age=60',
+          ServerSideEncryption: 'AES256',
+          ContentType: 'text/plain',
+        }));
     });
 };
 

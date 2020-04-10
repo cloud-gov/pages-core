@@ -72,6 +72,18 @@ describe('SQS', () => {
         callback(null, null);
       };
 
+      AWSMocks.mocks.S3.putObject = (params, callback) => {
+        expect(params).to.deep.equal({
+          Body: 'User-agent: *\nDisallow: /\n',
+          Key: 'robots.txt',
+          Bucket: config.s3.bucket,
+          CacheControl: 'max-age=60',
+          ServerSideEncryption: 'AES256',
+          ContentType: 'text/plain',
+        });
+        callback(null, null);
+      };
+
       SQS.sendBuildMessage({
         branch: 'master',
         state: 'processing',

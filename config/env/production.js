@@ -75,6 +75,9 @@ const cfDomain = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-domai
 const cfProxy = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-proxy`);
 const cfOauthTokenUrl = process.env.CLOUD_FOUNDRY_OAUTH_TOKEN_URL;
 const cfApiHost = process.env.CLOUD_FOUNDRY_API_HOST;
+// optional environment vaiables
+const newRelicAppName = process.env.NEW_RELIC_APP_NAME;
+const newRelicLicenseKey = process.env.NEW_RELIC_LICENSE_KEY;
 
 if (cfSpace && cfOauthTokenUrl && cfApiHost && cfDomain && cfProxy) {
   module.exports.env = {
@@ -83,6 +86,8 @@ if (cfSpace && cfOauthTokenUrl && cfApiHost && cfDomain && cfProxy) {
     cfSpaceGuid: cfSpace.guid,
     cfOauthTokenUrl,
     cfApiHost,
+    newRelicAppName,
+    newRelicLicenseKey,
   };
 } else {
   throw new Error('Missing environment variables for build space, cloud founders host url and token url.');
