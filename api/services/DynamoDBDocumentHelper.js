@@ -18,6 +18,7 @@ class DynamoDBDocumentHelper {
     const request = (params) => new Promise((resolve, reject) => {
       docClient.put(params, (err, data) => {
         if (err) {
+          logger.error(err);
           return reject(err);
         }
         return resolve(data);
@@ -36,7 +37,7 @@ class DynamoDBDocumentHelper {
     const request = (params) => new Promise((resolve, reject) => {
       docClient.batchWrite(params, (err, data) => {
         if (err) {
-          logger.error(`failed save: \n${JSON.stringify(params)}`, err);
+          logger.error(err);
           return reject(err);
         }
         return resolve(data);
@@ -65,6 +66,7 @@ class DynamoDBDocumentHelper {
     const request = (params) => new Promise((resolve, reject) => {
       docClient.delete(params, (err, data) => {
         if (err) {
+          logger.error(err);
           return reject(err);
         }
         return resolve(data);

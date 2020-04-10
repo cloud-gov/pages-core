@@ -30,7 +30,7 @@ const saveSites = (sites) => {
 };
 
 const siteToItem = (site) => {
-	console.log(`\n\nsite:\t${JSON.stringify(site)}\n\n`);
+	// console.log(`\n\nsite:\t${JSON.stringify(site)}\n\n`);
 	const item = {
 		owner_repository: getSiteKey(site),		
 		settings: {
