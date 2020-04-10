@@ -97,8 +97,8 @@ if (cfSpace && cfOauthTokenUrl && cfApiHost && cfDomain && cfProxy) {
 const dynamoDBCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-dynamodb-creds`);
 if (dynamoDBCreds) {
   module.exports.dynamoDB = {
-    accessKeyId: dynamoDBCreds.access_key,
-    secretAccessKey: dynamoDBCreds.secret_key,
+    accessKeyId: dynamoDBCreds.access_key_id,
+    secretAccessKey: dynamoDBCreds.secret_access_key,
     region: dynamoDBCreds.region,
   };
 } else {
