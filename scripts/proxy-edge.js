@@ -3,7 +3,7 @@ const { saveSites, removeSite, saveSite } = require('../api/services/ProxyDataSy
 const { Site } = require('../api/models');
  
 // let site;
-Site.findAll({ attributes: ['owner', 'repository', 'awsBucketName', 'awsBucketRegion'] })
+Site.findAll({ attributes: ['id', 'owner', 'repository', 'awsBucketName', 'awsBucketRegion'] })
 	.then(saveSites);
 	// .then((sites) => {
 	// 	site = sites[0];

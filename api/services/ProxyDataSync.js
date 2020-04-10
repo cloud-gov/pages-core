@@ -1,36 +1,32 @@
 // use dynamodb helper to write items to dynamodb
-const { DynamoDBDocumentClient } = require('./DynamoDBDocumentHelper');
+const { DynamoDBDocumentHelper } = require('./DynamoDBDocumentHelper');
 const config = require('../../config');
-const TableName = config.app.proxySiteTable; //for now only 1 table
+const tableName = config.app.proxySiteTable; //for now only 1 table
 const siteKey = 'owner_repository';
 const getSiteKey = (site) => [site.owner, site.repository].join('/');
 
 const removeSite = (site) => {
 	
-	const docClient = new DynamoDBDocumentClient(config.dynamoDB);
-	var params = {
-	  TableName,
-	  Key: {
+	const docClient = new DynamoDBDocumentHelper(config.dynamoDB);
+	const key = {
 	    owner_repository: getSiteKey(site),
-	  }
 	};
-	console.log(`\n\nparams\n=>\n${JSON.stringify(params)}\n\n`)
-	return docClient.delete(params);
+	console.log(`\n\ndelete site\t=>\t${JSON.stringify(key)}\n\n`);
+	return docClient.delete(tableName, key);
 };
 
 const saveSite = (site) => {
-	const docClient = new DynamoDBDocumentClient(config.dynamoDB);
-	const params = {
-		TableName,
-		Item: siteToItem(site),
-	};
-	return docClient.put(params, siteKey);
+	const docClient = new DynamoDBDocumentHelper(config.dynamoDB);
+	const item = siteToItem(site);
+	console.log(`\n\nsave site\t=>\t${JSON.stringify(item)}\n\n`);
+	return docClient.put(tableName, item);
 };
 
 const saveSites = (sites) => {
-	const docClient = new DynamoDBDocumentClient(config.dynamoDB);
+	const docClient = new DynamoDBDocumentHelper(config.dynamoDB);
 	const items = sites.map(site => ({ PutRequest: { Item: siteToItem(site) } }));
-	return docClient.batchWrite(TableName, items);
+	console.log(`\n\nsave sites\t=>\t${JSON.stringify(items)}\n\n`);
+	return docClient.batchWrite(tableName, items);
 };
 
 const siteToItem = (site) => {
@@ -40,12 +36,16 @@ const siteToItem = (site) => {
 		settings: {
 			bucket_name: site.awsBucketName,
 			bucket_region: site.awsBucketRegion,
-			basic_auth: {
-				user: site.owner.toLowerCase(),
-				password: site.repository.toLowerCase(),
-			},
 		},
 	};
+
+	if (site.id % 2) { // test - set for odd ids
+		item.settings.basic_auth = {
+			user: site.owner.toLowerCase(),
+			password: site.repository.toLowerCase(),
+		};
+	}
+
 	item[siteKey] = getSiteKey(site);
 	return item;
 }
