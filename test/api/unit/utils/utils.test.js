@@ -327,7 +327,7 @@ describe('utils', () => {
       const end = Date.now();
 
       // Some extra padding for execution time
-      expect(end - start).to.within(time, time + 20);
+      expect(end - start).to.within(time - 10, time + 20);
     });
   });
 
