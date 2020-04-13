@@ -24,6 +24,10 @@ const buildSiteObjects = (qualifier = 'site', site, bucket) => {
 };
 
 describe('S3SiteRemover', () => {
+  beforeEach(() => {
+    AWSMocks.mocks.S3.headBucket = () => ({ promise: () => Promise.resolve() });
+  });
+
   after(() => {
     AWSMocks.resetMocks();
   });

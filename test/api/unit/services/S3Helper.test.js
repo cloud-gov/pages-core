@@ -77,7 +77,7 @@ describe('S3Helper', () => {
       AWSMocks.resetMocks();
     });
 
-    it('should successfully send params to bucket', (done) => {
+    it('should successfully send params to bucket', async () => {
       const owner = 'an-owner';
       const repository = 'a-reposistory';
       const expected = {
@@ -92,30 +92,21 @@ describe('S3Helper', () => {
         },
       };
 
-      AWSMocks.mocks.S3.putBucketWebsite = (params, callback) => {
+      AWSMocks.mocks.S3.putBucketWebsite = (params) => {
         expect(params).to.deep.equal(expected);
-        callback(null, null);
+        return { promise: () => Promise.resolve() };
       };
 
       const client = new S3Helper.S3Client(config.s3);
-      client.putBucketWebsite(owner, repository)
-        .then(done)
-        .catch(done);
+      await client.putBucketWebsite(owner, repository);
     });
 
-    it('should reject with promise', function specialTest(done) {
-      this.timeout(10000);
-
-      AWSMocks.mocks.S3.putBucketWebsite = (params, callback) => {
-        callback(new Error());
-      };
+    it('should reject with promise', async () => {
+      AWSMocks.mocks.S3.putBucketWebsite = () => ({ promise: () => Promise.reject(new Error()) });
 
       const client = new S3Helper.S3Client(config.s3);
-      client.putBucketWebsite()
-        .catch((err) => {
-          expect(err).to.be.an('error');
-          done();
-        });
+      const err = await client.putBucketWebsite().catch(error => error);
+      expect(err).to.be.an('error');
     });
   });
 
@@ -124,7 +115,7 @@ describe('S3Helper', () => {
       AWSMocks.resetMocks();
     });
 
-    it('should successfully put object in bucket', (done) => {
+    it('should successfully put object in bucket', async () => {
       const body = 'Hello World';
       const key = 'hello.html';
       const extras = { ContentType: 'text/html' };
@@ -136,31 +127,24 @@ describe('S3Helper', () => {
         ...extras,
       };
 
-      AWSMocks.mocks.S3.putObject = (params, callback) => {
+      AWSMocks.mocks.S3.putObject = (params) => {
         expect(params).to.deep.equal(expected);
-        callback(null, null);
+        return { promise: () => Promise.resolve() };
       };
 
       const client = new S3Helper.S3Client(config.s3);
-      client.putObject(body, key, extras)
-        .then(done)
-        .catch(done);
+      await client.putObject(body, key, extras);
     });
 
-    it('should reject with promise', (done) => {
+    it('should reject with promise', async () => {
       const body = 'Hello World';
       const key = 'hello.html';
 
-      AWSMocks.mocks.S3.putObject = (params, callback) => {
-        callback(new Error());
-      };
+      AWSMocks.mocks.S3.putObject = () => ({ promise: () => Promise.reject(new Error()) });
 
       const client = new S3Helper.S3Client(config.s3);
-      client.putObject(body, key)
-        .catch((err) => {
-          expect(err).to.be.an('error');
-          done();
-        });
+      const err = await client.putObject(body, key).catch(error => error);
+      expect(err).to.be.an('error');
     });
   });
 
