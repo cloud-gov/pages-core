@@ -3080,20 +3080,20 @@ date-now@^0.1.4:
   resolved "https://registry.yarnpkg.com/date-now/-/date-now-0.1.4.tgz#eaf439fd4d4848ad74e5cc7dbef200672b9e345b"
   integrity sha1-6vQ5/U1ISK105cx9vvIAZyueNFs=
 
-db-migrate-base@^1.6.3:
-  version "1.6.3"
-  resolved "https://registry.yarnpkg.com/db-migrate-base/-/db-migrate-base-1.6.3.tgz#5fa63e2745fd353ffd90be6754a0d79b41167cd8"
-  integrity sha512-O6Kh72Yh0DfvRAKg9QKzu1KkMwI5iI0dFHO6RmDLvbiYvtRW3faFXJNFwJYeioVBx22QA3AkVFbDIcw4j4QxGw==
+db-migrate-base@^2.0.0:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/db-migrate-base/-/db-migrate-base-2.1.1.tgz#babd7a6a1c6d752fa2dfbca2665c846a80cbd942"
+  integrity sha512-VFqAeVJ1Bf5Vo5Y5RfgXI/E3GuVYVwwATMAy7Cd/1HsE8WPXm0YkRGmywQ5RboqFqaeSCdRf8RmEFoomKCtlMw==
   dependencies:
     bluebird "^3.1.1"
 
-db-migrate-pg@^0.5:
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/db-migrate-pg/-/db-migrate-pg-0.5.1.tgz#d42ca6ed497fe5aa1a39c762bd844f89e1e1e8c4"
-  integrity sha512-vbWE4uEjvddENHYgghomTcFAU/JW7sO+U7EYgNZWDl64f64KYtF2oqUr8iKHXKvCPGzhbub+88lV0s7ZCdJ8nA==
+db-migrate-pg@^1.1:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/db-migrate-pg/-/db-migrate-pg-1.1.0.tgz#8cded8efde72332c9f3068f3f54881b03f827fd8"
+  integrity sha512-ZUUoQDAytQOzw725nunpo4UbWP8E2eVE4N8ojG2wTUWy3OjwrsD9Af+xJLjND50g7+H9EUDMwyPvMXEl5saSaQ==
   dependencies:
     bluebird "^3.1.1"
-    db-migrate-base "^1.6.3"
+    db-migrate-base "^2.0.0"
     pg "^7.8.0"
     semver "^5.0.3"
 
