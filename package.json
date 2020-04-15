@@ -114,7 +114,7 @@
     "inquirer": "^5.0.1",
     "json-schema-deref-sync": "^0.10.0",
     "jsonschema": "^1.1.1",
-    "mini-css-extract-plugin": "^0.5.0",
+    "mini-css-extract-plugin": "^0.9.0",
     "mocha": "6.2.0",
     "mock-fs": "^4.8.0",
     "nock": "^10.0.6",
