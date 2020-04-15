@@ -11002,11 +11002,7 @@ type-detect@^1.0.0:
   resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-1.0.0.tgz#762217cc06db258ec48908a1298e8b95121e8ea2"
   integrity sha1-diIXzAbbJY7EiQihKY6LlRIejqI=
 
-<<<<<<< HEAD
-type-fest@^0.8.1:
-=======
 type-fest@^0.8.0, type-fest@^0.8.1:
->>>>>>> cbc56a88dfc6e775c53c2bfe28338d46b6e42a68
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.8.1.tgz#09e249ebde851d3b1e48d27c105444667f17b83d"
   integrity sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==
