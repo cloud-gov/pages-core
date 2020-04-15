@@ -140,7 +140,7 @@
     "redux-logger": "^3.0.6",
     "sass-loader": "^6.0.5",
     "shortid": "^2.2.8",
-    "sinon": "1.17.2",
+    "sinon": "9.0.2",
     "style-loader": "^0.23.1",
     "supertest": "^4.0.2",
     "watch": "^1.0.2",
