@@ -98,7 +98,7 @@
     "cookie": "^0.3.1",
     "css-loader": "^3.1.0",
     "date-fns": "^1.29.0",
-    "enzyme": "^3.10.0",
+    "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.1",
     "eslint": "^5.15.0",
     "eslint-config-airbnb": "^17.1.0",
