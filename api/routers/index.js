@@ -16,6 +16,7 @@ apiRouter.use(require('./user'));
 apiRouter.use(require('./published-file'));
 apiRouter.use(require('./site'));
 apiRouter.use(require('./user-action'));
+apiRouter.use(require('./user-environment-variable'));
 
 // prefix all api routes with "/v0"
 mainRouter.use('/v0', apiRouter);
