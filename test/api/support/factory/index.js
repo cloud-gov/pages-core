@@ -4,6 +4,7 @@ const build = require('./build');
 const responses = require('./responses');
 const site = require('./site');
 const user = require('./user');
+const userEnvironmentVariable = require('./user-environment-variable');
 
 module.exports = {
   buildLog,
@@ -13,4 +14,5 @@ module.exports = {
   responses,
   site,
   user,
+  userEnvironmentVariable,
 };

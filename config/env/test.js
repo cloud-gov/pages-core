@@ -53,4 +53,7 @@ module.exports = {
     cfOauthTokenUrl: 'https://login.example.com/oauth/token',
     cfApiHost: 'https://api.example.com',
   },
+  userEnvVar: {
+    key: 'shhhhhhhhhhh',
+  },
 };

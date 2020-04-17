@@ -1,11 +1,9 @@
+const { userEnvVar } = require('../../config');
 const { wrapHandlers } = require('../utils');
 const { serialize, serializeMany } = require('../serializers/user-environment-variable');
+const { encrypt } = require('../services/Encryptor');
 const { ValidationError } = require('../utils/validators');
 const { Site, UserEnvironmentVariable } = require('../models');
-
-function encrypt(value) {
-  return value;
-}
 
 function validate({ name, value }) {
   if (name && name.length && value && value.length) {
@@ -20,11 +18,11 @@ module.exports = wrapHandlers({
     const { params, user } = req;
     const { site_id: siteId } = params;
 
-    const userEnvVars = await UserEnvironmentVariable
+    const uevs = await UserEnvironmentVariable
       .forSiteUser(user)
       .findAll({ where: { siteId } });
 
-    const json = serializeMany(userEnvVars);
+    const json = serializeMany(uevs);
 
     res.ok(json);
   },
@@ -40,16 +38,14 @@ module.exports = wrapHandlers({
     }
 
     const { name, value } = validate(body);
+    const { ciphertext, hint } = encrypt(value, userEnvVar.key);
 
-    const hint = value.slice(-4);
-    const cipher = encrypt(value);
-
-    const userEnvVar = await UserEnvironmentVariable
+    const uev = await UserEnvironmentVariable
       .create({
-        site, name, cipher, hint,
+        site, name, ciphertext, hint,
       });
 
-    const json = serialize(userEnvVar);
+    const json = serialize(uev);
 
     return res.ok(json);
   },
@@ -58,7 +54,7 @@ module.exports = wrapHandlers({
     const { params, user } = req;
     const { id, site_id: siteId } = params;
 
-    const userEnvVar = await UserEnvironmentVariable
+    const uev = await UserEnvironmentVariable
       .forSiteUser(user)
       .findOne({
         where: {
@@ -66,11 +62,11 @@ module.exports = wrapHandlers({
         },
       });
 
-    if (!userEnvVar) {
+    if (!uev) {
       return res.notFound();
     }
 
-    await userEnvVar.destroy();
+    await uev.destroy();
 
     return res.ok();
   },

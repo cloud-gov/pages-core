@@ -17,7 +17,7 @@ exports.up = (db) => {
       }      
     },
     name: { type: 'string', notNull: true },
-    cipher: { type: 'string', notNull: true },
+    ciphertext: { type: 'string', notNull: true },
     hint: { type: 'string', notNull: true },
     createdAt: { type: 'date', notNull: true },
   })
