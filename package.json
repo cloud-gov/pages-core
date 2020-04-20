@@ -37,7 +37,7 @@
     "rc": "^1.2.8",
     "request": "^2.88.0",
     "sequelize": "^5.21.2",
-    "socket.io": "^2.2.0",
+    "socket.io": "^2.3.0",
     "socket.io-redis": "^5.2.0",
     "underscore": "^1.8.3",
     "urlsafe-base64": "^1.0.0",
