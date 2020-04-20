@@ -128,7 +128,7 @@
     "react": "^16.10.2",
     "react-autobind": "^1.0.6",
     "react-dom": "^16.10.2",
-    "react-notification-system": "^0.2.14",
+    "react-notification-system": "^0.3.0",
     "react-notification-system-redux": "^1.1.2",
     "react-redux": "^5.0.5",
     "react-router": "^3.0.5",
