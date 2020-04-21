@@ -1,5 +1,3 @@
-const BuildCounter = require('../services/BuildCounter');
-const { Site } = require('../models');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const config = require('../../config');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
@@ -32,15 +30,13 @@ module.exports = {
     }
     const context = defaultContext(req);
 
-    return Promise.all([
-      BuildCounter.countBuildsFromPastWeek(),
-      Site.count(),
-    ])
-      .then(([builds, sites]) => {
-        context.buildCount = builds;
-        context.siteCount = sites;
-        res.render('home.njk', context);
-      });
+    return res.render('home.njk', context);
+  },
+
+  systemUse(req, res) {
+    const context = defaultContext(req);
+
+    return res.render('system-use.njk', context);
   },
 
   examples(req, res) {
