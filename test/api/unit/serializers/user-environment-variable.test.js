@@ -18,8 +18,8 @@ describe('UserEnvironmentSerializer', () => {
 
       const json = serialize(obj);
 
-      const result = validateJSONSchema(json, schema);
-      expect(result.errors).to.be.empty;
+      const { errors } = validateJSONSchema(json, schema);
+      expect(errors).to.be.empty;
     });
 
     describe('.serializeMany', () => {
@@ -28,8 +28,8 @@ describe('UserEnvironmentSerializer', () => {
 
         const json = serializeMany(objs);
 
-        const result = validateJSONSchema(json, arraySchema);
-        expect(result.errors).to.be.empty;
+        const { errors } = validateJSONSchema(json, arraySchema);
+        expect(errors).to.be.empty;
       });
     });
   });

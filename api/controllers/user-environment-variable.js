@@ -18,13 +18,19 @@ module.exports = wrapHandlers({
     const { params, user } = req;
     const { site_id: siteId } = params;
 
+    const site = await Site.forUser(user).findByPk(siteId);
+
+    if (!site) {
+      return res.notFound();
+    }
+
     const uevs = await UserEnvironmentVariable
       .forSiteUser(user)
       .findAll({ where: { siteId } });
 
     const json = serializeMany(uevs);
 
-    res.ok(json);
+    return res.ok(json);
   },
 
   async create(req, res) {
