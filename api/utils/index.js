@@ -149,6 +149,30 @@ function pick(keys, obj) {
   return pickedObj;
 }
 
+function wait(time = 500) {
+  // eslint-disable-next-line scanjs-rules/call_setTimeout
+  return new Promise((r => setTimeout(r, time)));
+}
+
+// Retry an async function with exponential backoff
+async function retry(fn, { maxAttempts = 5, waitTime = 100 } = {}) {
+  let attempts = 0;
+  while (attempts < maxAttempts) {
+    attempts += 1;
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      return await fn();
+    } catch (err) {
+      if (attempts >= maxAttempts) {
+        throw err;
+      }
+      // eslint-disable-next-line no-await-in-loop
+      await wait(waitTime * (2 ** (attempts - 1)));
+    }
+  }
+  throw new Error('Exited retry loop without returning...');
+}
+
 module.exports = {
   filterEntity,
   firstEntity,
@@ -161,7 +185,9 @@ module.exports = {
   loadProductionManifest,
   mapValues,
   pick,
+  retry,
   shouldIncludeTracking,
+  wait,
   wrapHandler,
   wrapHandlers,
 };
