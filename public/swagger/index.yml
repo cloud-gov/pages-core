@@ -529,17 +529,19 @@ paths:
           schema:
             $ref: "Error.json"
   /site/{site_id}/user-environment-variable/{user-environment-variable_id}:
+    parameters:
+      - name: site_id
+        in: path
+        description: the id of the site
+        type: integer
+        required: true
+      - name: user-environment-variable_id
+        in: path
+        description: the id of the user environment variable to remove from the site
+        type: integer
+        required: true
     delete:
       summary: Remove a user environment variable from a site
-      parameters:
-        - name: site_id
-          in: path
-          description: the id of the site
-          type: integer
-        - name: user-environment-variable_id
-          in: path
-          description: the id of the user environment variable to remove from the site
-          type: integer
       responses:
         200:
           description: Delete successful
@@ -579,13 +581,9 @@ paths:
           description: Not found
           schema:
             $ref: "Error.json"            
-  /site/{site_id}/user-environment-variable:
     post:
       summary: Add the user environment variable to a site based on the site id
       parameters:
-        - name: site_id
-          in: path
-          description: the id of the site
         - name: user-environment-variable 
           schema:
             type: object
@@ -613,7 +611,6 @@ paths:
           description: The site of the user environment variable is to be added to cannot be found
           schema:
             $ref: "Error.json"
-
   /me:
     get:
       summary: Fetch data for the current user

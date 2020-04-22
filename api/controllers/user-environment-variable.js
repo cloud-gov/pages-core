@@ -48,7 +48,7 @@ module.exports = wrapHandlers({
 
     const uev = await UserEnvironmentVariable
       .create({
-        site, name, ciphertext, hint,
+        siteId: site.id, name, ciphertext, hint,
       });
 
     const json = serialize(uev);

@@ -41,6 +41,7 @@ module.exports = {
   },
   log: {
     level: 'error',
+    silent: true,
   },
   deployUser: {
     username: 'deploy_user',
