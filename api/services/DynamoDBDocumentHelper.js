@@ -52,7 +52,7 @@ class DynamoDBDocumentHelper {
     for (i = 0; i < items.length; i += maxItems) {
       RequestItems[TableName] = items.slice(i, i + maxItems);
       params = { RequestItems };
-      allRequests << request(params);
+      allRequests.push(request(params));
     }
     return Promise.all(allRequests);
   }
