@@ -155,8 +155,10 @@ function getNextCollaborators(github, owner, repo, { page = 1, allCollabs = [] }
 }
 
 const isAdminMember = async (github) => {
-  const { data } = await github.users.getAuthenticated();
-  const adminMembers = await getOrganizationMembers(github, 'federalist-users', 'admin');
+  const [{ data }, adminMembers] = await Promise.all([
+    github.users.getAuthenticated(),
+    getOrganizationMembers(github, 'federalist-users', 'admin'),
+  ]);
   const isAdmin = adminMembers.map(member => member.id).includes(data.id);
   return isAdmin;
 };
@@ -236,17 +238,6 @@ module.exports = {
         }
       });
   },
-
-  // Promise syntax
-  // validateAdmin: (accessToken) => {
-  //   return githubClient(accessToken)
-  //     .then(isAdminMember)
-  //     .then(isAdmin => {
-  //       if (!isAdmin) {
-  //         throw new Error('Unauthorized');
-  //       }
-  //     });
-  // },
 
   validateAdmin: async (accessToken) => {
     const github = await githubClient(accessToken);

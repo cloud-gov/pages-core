@@ -320,12 +320,22 @@ describe('GitHub', () => {
     });
 
     it('should reject if access token is not a valid GitHub access token', async () => {
+      const accessToken = 'token';
+
       githubAPINocks.userAuthenticated({
+        accessToken,
         statusCode: 403,
       });
 
+      githubAPINocks.getOrganizationMembers({
+        accessToken,
+        organization: 'federalist-users',
+        role: 'admin',
+        responseCode: 403,
+      });
+
       try {
-        await GitHub.validateAdmin('123abc');
+        await GitHub.validateAdmin(accessToken);
       } catch (error) {
         expect(error.name).to.equal('HttpError');
         expect(error.code).to.equal(403);
