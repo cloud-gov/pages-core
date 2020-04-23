@@ -33,5 +33,5 @@ env:
   FEDERALIST_PREVIEW_HOSTNAME: https://federalist-proxy.sites-dev.federalist.18f.gov
   SOCKET_HOST: https://federalistapp-proxy-edge-dev.fr.cloud.gov
   USER_AUDITOR: federalist
-  S3_SERVICE_PLAN_ID: 16A19515-C2B9-4982-80BD-69BED6A86C85
+  S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
   PROXY_SITE_TABLE: federalist-proxy-dev
