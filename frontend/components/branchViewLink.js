@@ -12,12 +12,12 @@ const getUrlAndViewText = (branchName, viewLink, site) => {
   let viewText = 'Preview site';
   if (isDefaultBranch(branchName, site)) {
     viewText = 'View site';
-    url = `https://site${site.id}.sites-dev.federalist.18f.gov/site/${site.owner}/${site.repository}/`
+    url = `https://site-${site.id}.sites-dev.federalist.18f.gov/site/${site.owner}/${site.repository}/`
   } else if (isDemoBranch(branchName, site)) {
     viewText = 'View demo';
-    url = `https://site${site.id}.sites-dev.federalist.18f.gov/demo/${site.owner}/${site.repository}/`
+    url = `https://site-${site.id}.sites-dev.federalist.18f.gov/demo/${site.owner}/${site.repository}/`
   } else {
-    url = `https://site${site.id}.sites-dev.federalist.18f.gov/preview/${site.owner}/${site.repository}/${branchName}/`
+    url = `https://site-${site.id}.sites-dev.federalist.18f.gov/preview/${site.owner}/${site.repository}/${branchName}/`
   }
   return { url, viewText };
 };
