@@ -21,6 +21,7 @@ describe('ProxyDataSync', () => {
 		const args = putStub.args[0];
 		expect(args[0]).to.be.a('string');
 		expect(args[1]).to.deep.equal(siteToItem(site));
+		expect(args.length).to.equal(2);
 		done();
   });
 
@@ -30,6 +31,7 @@ describe('ProxyDataSync', () => {
 		const args = deleteStub.args[0];
 		expect(args[0]).to.be.a('string');
    	expect(args[1]).to.deep.equal({ id: getSiteKey(site)});
+    expect(args.length).to.equal(2);
    	done();
   });
 
@@ -39,6 +41,7 @@ describe('ProxyDataSync', () => {
    	const args = batchWriteStub.args[0];
 		expect(args[0]).to.be.a('string');
    	expect(args[1]).to.deep.equal([{ PutRequest: { Item: siteToItem(site) } }]);
+    expect(args.length).to.equal(2);
    	done();
   });
 
