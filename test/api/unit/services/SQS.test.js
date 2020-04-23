@@ -169,7 +169,8 @@ describe('SQS', () => {
 
     it('should set USER_ENVIRONMENT_VARIABLES in the message when present', (done) => {
       factory.build()
-        .then(build => factory.userEnvironmentVariable.create({ site: { id: build.site } }).then(() => build))
+        .then(build => factory.userEnvironmentVariable.create({ site: { id: build.site } })
+          .then(() => build))
         .then(build => Build.findByPk(build.id, {
           include: [{
             model: Site,
