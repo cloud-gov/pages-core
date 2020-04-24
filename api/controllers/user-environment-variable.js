@@ -74,6 +74,6 @@ module.exports = wrapHandlers({
 
     await uev.destroy();
 
-    return res.ok();
+    return res.ok({});
   },
 });

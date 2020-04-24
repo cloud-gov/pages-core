@@ -31,7 +31,8 @@ describe("alertActions actionCreators", () => {
       expect(actual).to.deep.equal({
         type: httpErrorType,
         status: "error",
-        message
+        message,
+        payload: {}
       });
     });
 

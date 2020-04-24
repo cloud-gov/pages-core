@@ -5,6 +5,7 @@ import {
 import logger from 'redux-logger';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { routerReducer } from 'react-router-redux';
+import thunk from 'redux-thunk';
 
 import reducers from './reducers';
 import { reroute, createNotifier } from './middleware';
@@ -25,6 +26,7 @@ const FRONTEND_CONFIG = typeof window !== 'undefined'
 const middlewares = [
   reroute,
   createNotifier(notificationSettings),
+  thunk,
 ];
 
 const enhancers = [
