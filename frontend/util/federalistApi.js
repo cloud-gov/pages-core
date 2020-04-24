@@ -138,11 +138,11 @@ export default {
   },
 
   fetchUserEnvironmentVariables(siteId) {
-    return this.fetch(`/site/${siteId}/user-environment-variable`);
+    return this.fetch(`site/${siteId}/user-environment-variable`);
   },
 
   deleteUserEnvironmentVariable(siteId, uevId) {
-    return this.fetch(`/site/${siteId}/user-environment-variable/${uevId}`, {
+    return this.fetch(`site/${siteId}/user-environment-variable/${uevId}`, {
       method: 'DELETE',
     }, {
       handleHttpError: false,
@@ -150,7 +150,7 @@ export default {
   },
 
   createUserEnvironmentVariable(siteId, uev) {
-    return this.fetch(`/site/${siteId}/user-environment-variable/`, {
+    return this.fetch(`site/${siteId}/user-environment-variable`, {
       method: 'POST',
       data: {
         name: uev.name,

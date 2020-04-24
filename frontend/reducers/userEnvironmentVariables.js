@@ -65,7 +65,7 @@ export default function userEnvironmentVariables(state = initialState, action) {
         ...state,
         [siteId]: {
           isLoading: false,
-          data: [...state[siteId].data, uev],
+          data: [...((state[siteId] && state[siteId].data) || []), uev],
         },
       };
     }

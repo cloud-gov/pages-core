@@ -33,7 +33,7 @@ const enhancers = [
   applyMiddleware,
 ];
 
-if (process.env.NODE_ENV !== 'production') {
+if (!['production', 'test'].includes(process.env.NODE_ENV)) {
   middlewares.push(logger);
   enhancers.unshift(composeWithDevTools);
 }
