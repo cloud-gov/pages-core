@@ -48,7 +48,8 @@ describe('useEnvironmentVariableActions', () => {
 
       it('1) dispatches `userEnvironmentVariablesFetchStarted` action with the site id', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.firstCall, userEnvironmentVariablesFetchStarted(siteId));
+          sinon.assert.calledWith(stubs.dispatch.firstCall,
+            userEnvironmentVariablesFetchStarted(siteId));
         };
 
         fetchUserEnvironmentVariables(siteId)(stubs.dispatch)
@@ -68,7 +69,8 @@ describe('useEnvironmentVariableActions', () => {
 
       it('3) dispatches `userEnvironmentVariablesReceived` with the site id and received uevs', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.secondCall, userEnvironmentVariablesReceived(siteId, uevs));
+          sinon.assert.calledWith(stubs.dispatch.secondCall,
+            userEnvironmentVariablesReceived(siteId, uevs));
         };
 
         fetchUserEnvironmentVariables(siteId)(stubs.dispatch)
@@ -84,7 +86,8 @@ describe('useEnvironmentVariableActions', () => {
 
       it('1) dispatches `userEnvironmentVariablesFetchStarted` action with the site id', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.firstCall, userEnvironmentVariablesFetchStarted(siteId));
+          sinon.assert.calledWith(stubs.dispatch.firstCall,
+            userEnvironmentVariablesFetchStarted(siteId));
         };
 
         fetchUserEnvironmentVariables(siteId)(stubs.dispatch)
@@ -104,7 +107,8 @@ describe('useEnvironmentVariableActions', () => {
 
       it('3) dispatches `httpError` action with the error message and site id', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.secondCall, httpError(error.message, { siteId }));
+          sinon.assert.calledWith(stubs.dispatch.secondCall,
+            httpError(error.message, { siteId }));
         };
 
         fetchUserEnvironmentVariables(siteId)(stubs.dispatch)
@@ -124,7 +128,8 @@ describe('useEnvironmentVariableActions', () => {
 
       it('does NOT dispatch `userEnvironmentVariablesReceived`', (done) => {
         const assertion = () => {
-          sinon.assert.neverCalledWith(stubs.dispatch, userEnvironmentVariablesReceived(siteId, uevs));
+          sinon.assert.neverCalledWith(stubs.dispatch,
+            userEnvironmentVariablesReceived(siteId, uevs));
         };
 
         fetchUserEnvironmentVariables(siteId)(stubs.dispatch)
@@ -161,7 +166,8 @@ describe('useEnvironmentVariableActions', () => {
 
       it('2) dispatches `userEnvironmentVariableDeleted` with the site id and uev id', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.firstCall, userEnvironmentVariableDeleted(siteId, uevId));
+          sinon.assert.calledWith(stubs.dispatch.firstCall,
+            userEnvironmentVariableDeleted(siteId, uevId));
         };
 
         deleteUserEnvironmentVariable(siteId, uevId)(stubs.dispatch)
@@ -207,7 +213,8 @@ describe('useEnvironmentVariableActions', () => {
 
       it('does NOT dispatch `userEnvironmentVariableDeleted`', (done) => {
         const assertion = () => {
-          sinon.assert.neverCalledWith(stubs.dispatch, userEnvironmentVariableDeleted(siteId, uevId));
+          sinon.assert.neverCalledWith(stubs.dispatch,
+            userEnvironmentVariableDeleted(siteId, uevId));
         };
 
         deleteUserEnvironmentVariable(siteId, uevId)(stubs.dispatch)
@@ -244,7 +251,8 @@ describe('useEnvironmentVariableActions', () => {
 
       it('2) dispatches `userEnvironmentVariableDeleted` with the site id and uev id', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.firstCall, userEnvironmentVariableAdded(siteId, uev));
+          sinon.assert.calledWith(stubs.dispatch.firstCall,
+            userEnvironmentVariableAdded(siteId, uev));
         };
 
         addUserEnvironmentVariable(siteId, uev)(stubs.dispatch)

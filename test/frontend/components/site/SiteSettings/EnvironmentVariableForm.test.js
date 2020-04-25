@@ -37,35 +37,37 @@ describe('<EnvironmentVariableForm/>', () => {
 
     it('a `name` Field', () => {
       const wrapper = shallow(<EnvironmentVariableForm {...defaultProps} />);
-      expect(wrapper.exists({ name: 'name' })).to.be.true;
+      expect(wrapper.find({ name: 'name' })).to.have.lengthOf(1);
     });
 
     it('a `value` Field', () => {
       const wrapper = shallow(<EnvironmentVariableForm {...defaultProps} />);
-      expect(wrapper.exists({ name: 'value' })).to.be.true;
+      expect(wrapper.find({ name: 'value' })).to.have.lengthOf(1);
     });
 
     it('an enabled submit button', () => {
       const wrapper = shallow(<EnvironmentVariableForm {...defaultProps} />);
-      const submitButton = wrapper.find('button[type="submit"]').first();
-      expect(submitButton.exists()).to.be.true;
-      expect(submitButton.prop('disabled')).to.be.false;
+      const submitButton = wrapper.find('button[type="submit"]');
+      expect(submitButton).to.have.lengthOf(1);
+      expect(submitButton.first().prop('disabled')).to.be.false;
     });
 
     it('a disabled clear button', () => {
       const wrapper = shallow(<EnvironmentVariableForm {...defaultProps} />);
-      const clearButton = wrapper.findWhere(n => n.text() === 'Clear').first();
-      expect(clearButton.exists()).to.be.true;
-      expect(clearButton.prop('disabled')).to.be.true;
+      const clearButton = wrapper.find('button[type="button"]');
+      expect(clearButton).to.have.lengthOf(1);
+      expect(clearButton.first().text()).to.eq('Clear');
+      expect(clearButton.first().prop('disabled')).to.be.true;
     });
 
     describe('when `pristine` is false', () => {
       it('a enabled clear button', () => {
         const props = { ...defaultProps, pristine: false };
         const wrapper = shallow(<EnvironmentVariableForm {...props} />);
-        const clearButton = wrapper.findWhere(n => n.text() === 'Clear').first();
-        expect(clearButton.exists()).to.be.true;
-        expect(clearButton.prop('disabled')).to.be.false;
+        const clearButton = wrapper.find('button[type="button"]');
+        expect(clearButton).to.have.lengthOf(1);
+        expect(clearButton.first().text()).to.eq('Clear');
+        expect(clearButton.first().prop('disabled')).to.be.false;
       });
     });
 
@@ -73,18 +75,19 @@ describe('<EnvironmentVariableForm/>', () => {
       it('a disabled submit button', () => {
         const props = { ...defaultProps, submitting: true };
         const wrapper = shallow(<EnvironmentVariableForm {...props} />);
-        const submitButton = wrapper.find('button[type="submit"]').first();
-        expect(submitButton.exists()).to.be.true;
-        expect(submitButton.prop('disabled')).to.be.true;
+        const submitButton = wrapper.find('button[type="submit"]');
+        expect(submitButton).to.have.lengthOf(1);
+        expect(submitButton.first().prop('disabled')).to.be.true;
       });
 
       describe('and `pristine` is true', () => {
         it('a disabled clear button', () => {
           const props = { ...defaultProps, submitting: true };
           const wrapper = shallow(<EnvironmentVariableForm {...props} />);
-          const clearButton = wrapper.findWhere(n => n.text() === 'Clear').first();
-          expect(clearButton.exists()).to.be.true;
-          expect(clearButton.prop('disabled')).to.be.true;
+          const clearButton = wrapper.find('button[type="button"]');
+          expect(clearButton).to.have.lengthOf(1);
+          expect(clearButton.first().text()).to.eq('Clear');
+          expect(clearButton.first().prop('disabled')).to.be.true;
         });
       });
 
@@ -92,9 +95,10 @@ describe('<EnvironmentVariableForm/>', () => {
         it('a disabled clear button', () => {
           const props = { ...defaultProps, submitting: true, pristine: false };
           const wrapper = shallow(<EnvironmentVariableForm {...props} />);
-          const clearButton = wrapper.findWhere(n => n.text() === 'Clear').first();
-          expect(clearButton.exists()).to.be.true;
-          expect(clearButton.prop('disabled')).to.be.true;
+          const clearButton = wrapper.find('button[type="button"]');
+          expect(clearButton).to.have.lengthOf(1);
+          expect(clearButton.first().text()).to.eq('Clear');
+          expect(clearButton.first().prop('disabled')).to.be.true;
         });
       });
     });
@@ -108,8 +112,10 @@ describe('<EnvironmentVariableForm/>', () => {
 
     it('calls `reset` when cleared', () => {
       const wrapper = shallow(<EnvironmentVariableForm {...defaultProps} />);
-      const clearButton = wrapper.findWhere(n => n.text() === 'Clear').first();
-      clearButton.simulate('click');
+      const clearButton = wrapper.find('button[type="button"]');
+      expect(clearButton).to.have.lengthOf(1);
+      expect(clearButton.first().text()).to.eq('Clear');
+      clearButton.first().simulate('click');
       sinon.assert.called(stubs.reset);
     });
   });
