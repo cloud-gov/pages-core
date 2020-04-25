@@ -6,7 +6,7 @@ const { ValidationError } = require('../utils/validators');
 const { Site, UserEnvironmentVariable } = require('../models');
 
 function validate({ name, value }) {
-  if (name && name.length && value && value.length) {
+  if (name && name.length && value && (value.length >= 4)) {
     return { name, value };
   }
 

@@ -3,8 +3,16 @@ import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 import InputWithErrorField from '../../Fields/InputWithErrorField';
 
+export const validateName = name => (!name
+  ? 'name is required'
+  : undefined);
+
+export const validateValue = value => ((!value || value.length < 4)
+  ? 'value is required and must be at least 4 characters'
+  : undefined);
+
 export const EnvironmentVariableForm = ({
-  handleSubmit, pristine, reset, submitting,
+  handleSubmit, invalid, pristine, reset, submitting,
 }) => (
   <form onSubmit={handleSubmit}>
     <fieldset>
@@ -14,15 +22,20 @@ export const EnvironmentVariableForm = ({
         type="text"
         label="Name:"
         component={InputWithErrorField}
+        required
+        validate={[validateName]}
       />
       <Field
         name="value"
         type="text"
         label="Value:"
         component={InputWithErrorField}
+        required
+        minlength={4}
+        validate={[validateValue]}
       />
     </fieldset>
-    <button type="submit" disabled={submitting}>
+    <button type="submit" disabled={invalid || submitting}>
       Add
     </button>
     <button type="button" disabled={pristine || submitting} onClick={reset}>
@@ -33,6 +46,7 @@ export const EnvironmentVariableForm = ({
 
 EnvironmentVariableForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
+  invalid: PropTypes.bool.isRequired,
   pristine: PropTypes.bool.isRequired,
   reset: PropTypes.func.isRequired,
   submitting: PropTypes.bool.isRequired,
