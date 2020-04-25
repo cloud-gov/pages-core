@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 import InputWithErrorField from '../../Fields/InputWithErrorField';
 
-const EnvironmentVariableForm = ({
+export const EnvironmentVariableForm = ({
   handleSubmit, pristine, reset, submitting,
 }) => (
   <form onSubmit={handleSubmit}>
