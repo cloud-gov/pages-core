@@ -138,6 +138,7 @@
     "redux-devtools-extension": "^2.13.2",
     "redux-form": "^7.0.4",
     "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0",
     "sass-loader": "^6.0.5",
     "shortid": "^2.2.8",
     "sinon": "9.0.2",
