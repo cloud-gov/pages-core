@@ -301,7 +301,7 @@ describe('User Environment Variable API', () => {
         config.userEnvVar.key = origConfigVal;
       });
 
-      it('returns a 500', async () => {
+      it('cannot encrypt without key and returns a 500', async () => {
         const userPromise = factory.user();
         const site = await factory.site({ users: Promise.all([userPromise]) });
         const user = await userPromise;
