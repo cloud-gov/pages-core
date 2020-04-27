@@ -21,10 +21,10 @@ function encrypt(value, key, { hintSize = 4 } = {}) {
   // Get the authentication tag
   const authTag = cipher.getAuthTag();
 
-  // Prepend the initialization vector to the encrypted text
+  // Prepend the authentication tag and initialization vector to the encrypted buffer
   const ciphertext = [authTag, iv, encrypted]
-    .map(buf => buf.toString('hex'))
-    .join(':');
+    .map(buf => buf.toString('hex')) // Convert all values to hex
+    .join(':'); // Return a `:` delimited hex string
 
   // Create the hint
   const hint = value.slice(-1 * hintSize);
