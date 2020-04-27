@@ -7,7 +7,9 @@ proxyquire.noCallThru();
 describe('alertActions', () => {
   let fixture;
   let dispatch;
-  let authErrorActionCreator; let httpErrorActionCreator; let httpSuccessActionCreator;
+  let authErrorActionCreator;
+  let httpErrorActionCreator;
+  let httpSuccessActionCreator;
   let setStaleActionCreator;
   let clearActionCreator;
 
