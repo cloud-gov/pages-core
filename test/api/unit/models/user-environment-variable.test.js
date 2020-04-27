@@ -16,7 +16,7 @@ describe('UserEnvironmentVariable model', () => {
       expect(uevs[0].id).to.eq(uev.id);
     });
 
-    it('does not return values for other users', async () => {
+    it('does not return values for other users  not belonging to site', async () => {
       const user1Promise = factories.user();
       const user2 = await factories.user();
       const site = await factories.site({ users: Promise.all([user1Promise]) });
