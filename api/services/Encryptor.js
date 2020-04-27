@@ -1,6 +1,6 @@
 const Crypto = require('crypto');
 
-const ALGORITHM = 'aes-256-cbc';
+const ALGORITHM = 'aes-256-gcm';
 
 function encrypt(value, key, { hintSize = 4 } = {}) {
   // Create a 32 byte hash from the secret key
@@ -12,14 +12,19 @@ function encrypt(value, key, { hintSize = 4 } = {}) {
   // Create the cipher
   const cipher = Crypto.createCipheriv(ALGORITHM, hashedKey, iv);
 
-  // Ensure the value is utf8 encoded
-  const utf8Value = Buffer.from(value).toString();
+  // Convert the value to a buffer
+  const valueBuf = Buffer.from(value);
 
   // Encrypt the value
-  const encrypted = cipher.update(utf8Value, 'utf8', 'hex') + cipher.final('hex');
+  const encrypted = Buffer.concat([cipher.update(valueBuf), cipher.final()]);
+
+  // Get the authentication tag
+  const authTag = cipher.getAuthTag();
 
   // Prepend the initialization vector to the encrypted text
-  const ciphertext = `${iv.toString('hex')}:${encrypted}`;
+  const ciphertext = [authTag, iv, encrypted]
+    .map(buf => buf.toString('hex'))
+    .join(':');
 
   // Create the hint
   const hint = value.slice(-1 * hintSize);
