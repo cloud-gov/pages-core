@@ -10,13 +10,13 @@ import {
 describe('addNewSiteFieldsActions actionCreators', () => {
   it('showAddNewSiteFields()', () => {
     const action = showAddNewSiteFields();
-    expect(showAddNewSiteFieldsType).to.be.defined;
+    expect(showAddNewSiteFieldsType).to.exist;
     expect(action.type).to.equal(showAddNewSiteFieldsType);
   });
 
   it('hideAddNewSiteFields()', () => {
     const action = hideAddNewSiteFields();
-    expect(hideAddNewSiteFieldsType).to.be.defined;
+    expect(hideAddNewSiteFieldsType).to.exist;
     expect(action.type).to.equal(hideAddNewSiteFieldsType);
   });
 });

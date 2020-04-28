@@ -79,7 +79,6 @@ describe('UserAction API', () => {
       .then((response) => {
         const { body } = response;
 
-        expect(body).to.be.defined;
         expect(body.length).to.equal(userActionCount);
 
         let lastCreatedAt = (new Date()).toISOString();
@@ -89,7 +88,7 @@ describe('UserAction API', () => {
           expect(action.actionType).to.have.all.keys('action');
 
           // make sure they are in descending order by createdAt
-          expect(action.createdAt).to.be.lte(lastCreatedAt);
+          expect(new Date(action.createdAt)).to.be.lte(new Date(lastCreatedAt));
           lastCreatedAt = action.createdAt;
         });
 

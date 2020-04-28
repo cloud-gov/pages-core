@@ -84,7 +84,7 @@ describe('federalistApi', () => {
     it('throws an error if handleHttpError is false', (done) => {
       federalistApi.fetch('site/5', { method: 'PUT', data: {} }, { handleHttpError: false })
         .catch((err) => {
-          expect(err).to.be.defined;
+          expect(err).to.exist;
           expect(err.response.status).to.equal(400);
           done();
         });

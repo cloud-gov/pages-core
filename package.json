@@ -91,7 +91,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "babel-register": "^6.26.0",
-    "chai": "^3.5.0",
+    "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-fetch-mock": "^1.0.1",
     "concurrently": "^3.4.0",

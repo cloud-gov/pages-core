@@ -24,9 +24,9 @@ describe('Build model', () => {
       const site = await factory.site();
       const build = await Build.build({ site: site.id, user: 1 });
 
-      build.validate();
+      await build.validate();
 
-      expect(build.token).to.be.okay;
+      expect(build.token).to.exist;
     });
 
     it('should not override a build token if one exists', async () => {
