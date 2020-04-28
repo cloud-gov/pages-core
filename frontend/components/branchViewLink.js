@@ -7,30 +7,25 @@ import { IconView } from './icons';
 const isDefaultBranch = (branchName, site) => branchName === site.defaultBranch;
 const isDemoBranch = (branchName, site) => branchName === site.demoBranch;
 
-const getUrlAndViewText = (branchName, viewLink, site) => {
-  let url;
+const getViewText = (branchName, site) => {
   let viewText = 'Preview site';
   if (isDefaultBranch(branchName, site)) {
     viewText = 'View site';
-    url = `https://site-${site.id}.sites-dev.federalist.18f.gov/site/${site.owner}/${site.repository}/`
   } else if (isDemoBranch(branchName, site)) {
     viewText = 'View demo';
-    url = `https://site-${site.id}.sites-dev.federalist.18f.gov/demo/${site.owner}/${site.repository}/`
-  } else {
-    url = `https://site-${site.id}.sites-dev.federalist.18f.gov/preview/${site.owner}/${site.repository}/${branchName}/`
   }
-  return { url, viewText };
+  return viewText;
 };
 
 export const BranchViewLink = ({
   branchName, viewLink, site, showIcon,
 }) => {
-  const { url, viewText } = getUrlAndViewText(branchName, viewLink, site);
+  const viewText = getUrlAndViewText(branchName, site);
 
   if (showIcon) {
     return (
       <a
-        href={url}
+        href={viewLink}
         target="_blank"
         rel="noopener noreferrer"
         className="view-site-link"
@@ -40,7 +35,7 @@ export const BranchViewLink = ({
       </a>
     );
   }
-  return (<a href={url} target="_blank" rel="noopener noreferrer">{ viewText }</a>);
+  return (<a href={viewLink} target="_blank" rel="noopener noreferrer">{ viewText }</a>);
 };
 
 BranchViewLink.propTypes = {

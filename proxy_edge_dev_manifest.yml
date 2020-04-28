@@ -30,7 +30,7 @@ env:
   LOG_LEVEL: verbose
   NPM_CONFIG_PRODUCTION: true
   NODE_MODULES_CACHE: false
-  FEDERALIST_PREVIEW_HOSTNAME: https://federalist-proxy.sites-dev.federalist.18f.gov
+  FEDERALIST_PREVIEW_HOST: https://*.sites-dev.federalist.18f.gov
   SOCKET_HOST: https://federalistapp-proxy-edge-dev.fr.cloud.gov
   USER_AUDITOR: federalist
   S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
