@@ -198,6 +198,18 @@ describe('Build model', () => {
       return expect(buildPromise).to.be
         .rejectedWith(ValidationError, 'Validation error: Validation is on branch failed');
     });
+
+    it('allow build.branch to contain apostrophe', async () => {
+      const branch = 'hasapos\'trophe';
+      const buildPromise = await Build.create({
+        user: 1,
+        site: 1,
+        commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+        branch,
+      });
+
+      expect(buildPromise.branch).to.equal(branch);
+    });
   });
 
   describe('querying', () => {
