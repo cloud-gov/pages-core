@@ -62,3 +62,9 @@ export const USER_ACTION = PropTypes.shape({
   actionType: PropTypes.shape({ action: PropTypes.string }),
   initiator: USER,
 });
+
+export const USER_ENVIRONMENT_VARIABLE = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired,
+  hint: PropTypes.string.isRequired,
+});

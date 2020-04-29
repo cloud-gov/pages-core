@@ -48,6 +48,13 @@ const buildLogCallbackURL = build => [
 
 const sourceForBuild = build => build.source || {};
 
+const buildUEVs = uevs => (uevs
+  ? uevs.map(uev => ({
+    name: uev.name,
+    ciphertext: uev.ciphertext,
+  }))
+  : []);
+
 const generateDefaultCredentials = build => ({
   AWS_DEFAULT_REGION: config.s3.region,
   AWS_ACCESS_KEY_ID: config.s3.accessKeyId,
@@ -70,6 +77,7 @@ const generateDefaultCredentials = build => ({
   AUTH_BASEURL: process.env.APP_HOSTNAME,
   AUTH_ENDPOINT: 'external/auth/github',
   BUILD_ID: build.id,
+  USER_ENVIRONMENT_VARIABLES: buildUEVs(build.Site.UserEnvironmentVariables),
 });
 
 const buildContainerEnvironment = (build) => {

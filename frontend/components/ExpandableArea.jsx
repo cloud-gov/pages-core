@@ -24,16 +24,17 @@ class ExpandableArea extends React.Component {
   }
 
   render() {
-    const { children, title } = this.props;
+    const { bordered, children, title } = this.props;
     const { isExpanded } = this.state;
 
     return (
-      <div className="usa-accordion">
+      <div className={`usa-accordion${bordered ? '-bordered' : ''}`}>
         <button
           onClick={this.toggle}
           className="usa-accordion-button"
           aria-expanded={isExpanded}
           aria-controls={this.id}
+          type="button"
         >
           {title}
         </button>
@@ -50,8 +51,13 @@ class ExpandableArea extends React.Component {
 }
 
 ExpandableArea.propTypes = {
+  bordered: PropTypes.bool,
   title: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
+};
+
+ExpandableArea.defaultProps = {
+  bordered: false,
 };
 
 export default ExpandableArea;

@@ -22,10 +22,19 @@ const SiteUser = sequelize.import(path.join(__dirname, '/site-user'));
 const User = sequelize.import(path.join(__dirname, '/user'));
 const UserAction = sequelize.import(path.join(__dirname, '/user-action'));
 const ActionType = sequelize.import(path.join(__dirname, '/action-type'));
+const UserEnvironmentVariable = sequelize.import(path.join(__dirname, '/user-environment-variable'));
 /* eslint-enable no-unused-vars */
 
-Object.keys(sequelize.models).forEach(key => sequelize.models[key].associate(sequelize.models));
+Object
+  .keys(sequelize.models)
+  .forEach(key => sequelize.models[key].associate(sequelize.models));
 
-Build.forSiteUser = user => Build.scope({ method: ['forSiteUser', user, Site, User] });
+Site.forUser = user => Site.scope({ method: ['forUser', user, User] });
+
+Build.forSiteUser = user => Build
+  .scope({ method: ['forSiteUser', user, Site, User] });
+
+UserEnvironmentVariable.forSiteUser = user => UserEnvironmentVariable
+  .scope({ method: ['forSiteUser', user, Site, User] });
 
 module.exports = Object.assign({ sequelize }, sequelize.models);

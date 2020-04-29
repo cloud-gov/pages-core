@@ -5,6 +5,7 @@ const branchRegex = /^[\w.]+(?:[/-]*[\w.])*$/;
 const githubUsernameRegex = /^[^-][a-zA-Z-]+$/;
 const shaRegex = /^[a-f0-9]{40}$/;
 
+class ValidationError extends Error {}
 
 function isValidYaml(yamlString) {
   try {
@@ -82,4 +83,5 @@ module.exports = {
   isValidYaml,
   parseSiteConfigs,
   isEmptyOrUrl,
+  ValidationError,
 };

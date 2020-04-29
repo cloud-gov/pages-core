@@ -41,6 +41,7 @@ module.exports = {
   },
   log: {
     level: 'error',
+    silent: true,
   },
   deployUser: {
     username: 'deploy_user',
@@ -52,5 +53,8 @@ module.exports = {
     cfSpaceGuid: '123abc-456def-789ghi',
     cfOauthTokenUrl: 'https://login.example.com/oauth/token',
     cfApiHost: 'https://api.example.com',
+  },
+  userEnvVar: {
+    key: 'shhhhhhhhhhh',
   },
 };

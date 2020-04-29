@@ -528,6 +528,89 @@ paths:
           description: Not found
           schema:
             $ref: "Error.json"
+  /site/{site_id}/user-environment-variable/{user-environment-variable_id}:
+    parameters:
+      - name: site_id
+        in: path
+        description: the id of the site
+        type: integer
+        required: true
+      - name: user-environment-variable_id
+        in: path
+        description: the id of the user environment variable to remove from the site
+        type: integer
+        required: true
+    delete:
+      summary: Remove a user environment variable from a site
+      responses:
+        200:
+          description: Delete successful
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+  /site/{site_id}/user-environment-variable:
+    parameters:
+    - name: site_id
+      in: path
+      description: The id of the site
+      type: integer
+      required: true
+    get:
+      summary: Fetch the list of user environment variables for the given site
+      responses:
+        200:
+          description: A list of user environment variables for the given site
+          schema:
+            type: array
+            items:
+              $ref: "UserEnvironmentVariable.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"            
+    post:
+      summary: Add the user environment variable to a site based on the site id
+      parameters:
+        - name: user-environment-variable 
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The name of the environment variable
+              value:
+                type: string
+                description: The value of the environment variable
+      responses:
+        200:
+          description: An object representing the user environment variable
+          schema:
+            $ref: "UserEnvironmentVariable.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: The site of the user environment variable is to be added to cannot be found
+          schema:
+            $ref: "Error.json"
   /me:
     get:
       summary: Fetch data for the current user
