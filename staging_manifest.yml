@@ -22,6 +22,7 @@ services:
 - federalist-deploy-user
 - federalist-staging-proxy
 - federalist-staging-domain
+- federalist-staging-uev-key
 env:
   NODE_ENV: production
   APP_ENV: staging
