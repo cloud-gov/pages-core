@@ -18,9 +18,13 @@ import EnvironmentVariableTable from './EnvironmentVariableTable';
 const infoContent = (
   <Fragment>
     Certain environment variable names are reserved for Federalist use and will
-    be ignored. See the default variables in
+    be ignored. Warnings for any ignored environment variables will be present
+    in the build logs. See the default variables in
     {' '}
-    <a href="https://federalist.18f.gov/documentation/env-vars-on-federalist-builds/">
+    <a
+      href="https://federalist.18f.gov/documentation/env-vars-on-federalist-builds"
+      rel="noopener"
+    >
       Environment Variables On Federalist Builds
     </a>
     {' '}
@@ -32,8 +36,19 @@ const warningContent = (
   <Fragment>
     Federalist is a
     <b> FISMA Low </b>
-    system. You assume the risk if the values you add contain or allow access
-    to information that is not suitable for this categorization.
+    system, do NOT store variables for systems that are Moderate or High, and
+    only expose variables if it is safe to do so. You assume the risk if the
+    values you add contain, or allow access to information that is not suitable
+    for this categorization. See
+    {' '}
+    <a
+      href="https://csrc.nist.gov/Projects/Risk-Management/Risk-Management-Framework-(RMF)-Overview/Security-Categorization"
+      rel="noopener noreferrer"
+    >
+    FISMA Security Categorization
+    </a>
+    {' '}
+    for more information on FISMA information categorization.
   </Fragment>
 );
 
