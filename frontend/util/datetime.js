@@ -10,7 +10,6 @@ const NO_TIME = '-';
   parse string arguments using the provided parsing utilities.
 
   see https://github.com/date-fns/date-fns/blob/master/CHANGELOG.md#changed-3
-  and https://blog.date-fns.org/post/unicode-tokens-in-date-fns-v2-sreatyki91jg/
   for more details.
  */
 const compat = fn => (...args) => fn(...args.map(arg => (typeof arg === 'string' ? parseISO(arg) : arg)));
