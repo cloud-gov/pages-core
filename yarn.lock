@@ -6274,10 +6274,10 @@ js-base64@^2.1.8, js-base64@^2.1.9:
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.5.1.tgz#1efa39ef2c5f7980bb1784ade4a8af2de3291121"
   integrity sha512-M7kLczedRMYX4L8Mdh4MzyAMM9O5osx+4FcOQuTvr3A9F2D9S5JXheN0ewNbrvK2UatkTRhL5ejGmGSjNMiZuw==
 
-js-file-download@^0.4.1:
-  version "0.4.7"
-  resolved "https://registry.yarnpkg.com/js-file-download/-/js-file-download-0.4.7.tgz#cafea2f7230b63fa1747e80efe1257649b59143e"
-  integrity sha512-9AQYwIpgTz3BqKQQ9kZldCXd0BekFmxvUguEVJwVlTe9cON1slRaT+hqctEbjoXbz9Aj+8Qgl3841zYWeCstuA==
+js-file-download@^0.4.11:
+  version "0.4.11"
+  resolved "https://registry.yarnpkg.com/js-file-download/-/js-file-download-0.4.11.tgz#d18b0b59d461fe5100f47b09949e21e0c4f906ce"
+  integrity sha512-VHrnxlhsZC7lTs+WlQ8Tj+7LVFflll3C6ac3Y0akOT+oEgBFT5WIK2PF7wYWdHh8BfKdy8H0IpUkMWJW12jovQ==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
