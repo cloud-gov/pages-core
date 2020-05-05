@@ -109,7 +109,7 @@
     "eslint-plugin-scanjs-rules": "amirbey/eslint-plugin-scanjs-rules#buffer",
     "fetch-mock": "^5.12.2",
     "file-loader": "^3.0.1",
-    "history": "^4.6.3",
+    "history": "^4.10.1",
     "http-server": "^0.11.1",
     "inquirer": "^5.0.1",
     "json-schema-deref-sync": "^0.10.0",
