@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { dateAndTime } from '../../util/datetime';
 
 const getRepoLastVerified = (site) => {
+  console.log(site.repoLastVerified);
   let msg = 'Repository not found';
   if (site.repoLastVerified) {
     const formattedBuildTime = dateAndTime(site.repoLastVerified);
