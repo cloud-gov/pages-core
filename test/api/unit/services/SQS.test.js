@@ -184,7 +184,7 @@ describe('SQS', () => {
                 name: uev.name,
                 ciphertext: uev.ciphertext,
               }));
-              expect(messageEnv(message, 'USER_ENVIRONMENT_VARIABLES')).to.deep.eq(uevs);
+              expect(JSON.parse(messageEnv(message, 'USER_ENVIRONMENT_VARIABLES'))).to.deep.eq(uevs);
               done();
             });
         })
@@ -202,7 +202,7 @@ describe('SQS', () => {
         .then((build) => { // eslint-disable-line
           return SQS.messageBodyForBuild(build)
             .then((message) => {
-              expect(messageEnv(message, 'USER_ENVIRONMENT_VARIABLES')).to.deep.eq([]);
+              expect(JSON.parse(messageEnv(message, 'USER_ENVIRONMENT_VARIABLES'))).to.deep.eq([]);
               done();
             });
         })

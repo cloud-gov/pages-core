@@ -77,7 +77,7 @@ const generateDefaultCredentials = build => ({
   AUTH_BASEURL: process.env.APP_HOSTNAME,
   AUTH_ENDPOINT: 'external/auth/github',
   BUILD_ID: build.id,
-  USER_ENVIRONMENT_VARIABLES: buildUEVs(build.Site.UserEnvironmentVariables),
+  USER_ENVIRONMENT_VARIABLES: JSON.stringify(buildUEVs(build.Site.UserEnvironmentVariables)),
 });
 
 const buildContainerEnvironment = (build) => {
