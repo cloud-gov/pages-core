@@ -43,7 +43,7 @@
     "urlsafe-base64": "^1.0.0",
     "uswds": "^1.4.4",
     "validator": "^13.0.0",
-    "whatwg-fetch": "^1.0.0",
+    "whatwg-fetch": "^3.0.0",
     "winston": "^3.2.1",
     "yamljs": "^0.3.0"
   },
