@@ -87,11 +87,15 @@ class EnvironmentVariables extends Component {
           ? <LoadingIndicator />
           : (
             <Fragment>
-              <ExpandableArea bordered title="Add a new environment variable">
-                <div className="well">
-                  <EnvironmentVariableForm onSubmit={addUEV} />
-                </div>
-              </ExpandableArea>
+              <ExpandableArea
+                bordered
+                title="Add a new environment variable"
+                render={toggle => (
+                  <div className="well">
+                    <EnvironmentVariableForm onSubmit={params => addUEV(params).then(toggle)} />
+                  </div>
+                )}
+              />
               { showTable
                 && (
                 <EnvironmentVariableTable uevs={data} onDelete={deleteUEV} />

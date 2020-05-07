@@ -17,6 +17,7 @@ describe('<EnvironmentVariableForm/>', () => {
 
     beforeEach(() => {
       stubs.handleSubmit = sinon.stub();
+      stubs.handleSubmit.resolves();
       stubs.reset = sinon.stub();
       defaultProps = {
         handleSubmit: stubs.handleSubmit,
