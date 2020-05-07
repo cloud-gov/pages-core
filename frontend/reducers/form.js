@@ -1,19 +1,3 @@
-import { reducer as form } from 'redux-form';
-import {
-  userEnvironmentVariableAddedType as USER_ENVIRONMENT_VARIABLE_ADDED,
-} from '../actions/actionCreators/userEnvironmentVariableActions';
+import { reducer } from 'redux-form';
 
-export default form.plugin({
-  environmentVariable: (state, action) => {
-    switch (action.type) {
-      case USER_ENVIRONMENT_VARIABLE_ADDED:
-        return {
-          ...state,
-          values: {},
-          registeredFields: {},
-        };
-      default:
-        return state;
-    }
-  },
-});
+export default reducer;

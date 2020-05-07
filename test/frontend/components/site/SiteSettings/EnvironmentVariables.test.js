@@ -89,18 +89,10 @@ describe('<EnvironmentVariables/>', () => {
       expect(wrapper.find('LoadingIndicator')).to.have.lengthOf(0);
     });
 
-    it('renders the "new environment variable" section and form', () => {
+    it('renders the "new environment variable" section', () => {
       const wrapper = shallow(<EnvironmentVariables {...props} />);
       const section = wrapper.findWhere(n => n.name() === 'ExpandableArea' && n.prop('title') === 'Add a new environment variable');
       expect(section).to.have.lengthOf(1);
-
-      const form = wrapper.find('ReduxForm');
-      expect(form).to.have.lengthOf(1);
-
-      const params = {};
-      form.first().prop('onSubmit')(params);
-
-      sinon.assert.calledWith(stubs.addUserEnvironmentVariable, siteId, params);
     });
 
     it('does not render the "uev" table', () => {
@@ -123,18 +115,10 @@ describe('<EnvironmentVariables/>', () => {
       expect(wrapper.find('LoadingIndicator')).to.have.lengthOf(0);
     });
 
-    it('renders the "new environment variable" section and form', () => {
+    it('renders the "new environment variable" section', () => {
       const wrapper = shallow(<EnvironmentVariables {...props} />);
       const section = wrapper.findWhere(n => n.name() === 'ExpandableArea' && n.prop('title') === 'Add a new environment variable');
       expect(section).to.have.lengthOf(1);
-
-      const form = wrapper.find('ReduxForm');
-      expect(form).to.have.lengthOf(1);
-
-      const params = {};
-      form.first().prop('onSubmit')(params);
-
-      sinon.assert.calledWith(stubs.addUserEnvironmentVariable, siteId, params);
     });
 
     it('renders the "uev" table', () => {
