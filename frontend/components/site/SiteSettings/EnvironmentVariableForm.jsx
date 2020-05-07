@@ -14,7 +14,7 @@ export const validateValue = value => ((!value || value.length < 4)
 export const EnvironmentVariableForm = ({
   handleSubmit, invalid, pristine, reset, submitting,
 }) => (
-  <form onSubmit={handleSubmit}>
+  <form onSubmit={data => handleSubmit(data).then(reset)}>
     <fieldset>
       <legend className="sr-only">Add new environment variable</legend>
       <Field
