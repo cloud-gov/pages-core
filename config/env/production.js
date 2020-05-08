@@ -101,3 +101,8 @@ module.exports.rateLimiting = {
   delayAfter: 25, // delay requests by delayMs after 25 are made in a window
   delayMs: 500, // delay requests by 500 ms
 };
+
+const cfUserEnvVar = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-uev-key`);
+module.exports.userEnvVar = {
+  key: cfUserEnvVar.key,
+};

@@ -1,4 +1,5 @@
 const { DatabaseError } = require('sequelize');
+const { ValidationError } = require('../utils/validators');
 
 module.exports = (error = {}, { res }) => {
   let finalError = error;
@@ -12,7 +13,7 @@ module.exports = (error = {}, { res }) => {
       status: 403,
       message: 'Invalid CSRF token',
     };
-  } else if (error.name && error.name === 'SequelizeValidationError') {
+  } else if (error instanceof ValidationError || (error.name && error.name === 'SequelizeValidationError')) {
     finalError = {
       status: 400,
       message: 'The request parameters were invalid.',

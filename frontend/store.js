@@ -5,6 +5,7 @@ import {
 import logger from 'redux-logger';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { routerReducer } from 'react-router-redux';
+import thunk from 'redux-thunk';
 
 import reducers from './reducers';
 import { reroute, createNotifier } from './middleware';
@@ -25,13 +26,14 @@ const FRONTEND_CONFIG = typeof window !== 'undefined'
 const middlewares = [
   reroute,
   createNotifier(notificationSettings),
+  thunk,
 ];
 
 const enhancers = [
   applyMiddleware,
 ];
 
-if (process.env.NODE_ENV !== 'production') {
+if (!['production', 'test'].includes(process.env.NODE_ENV)) {
   middlewares.push(logger);
   enhancers.unshift(composeWithDevTools);
 }

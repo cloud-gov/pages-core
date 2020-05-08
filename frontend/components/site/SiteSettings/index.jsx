@@ -7,6 +7,7 @@ import { SITE } from '../../../propTypes';
 import ExpandableArea from '../../ExpandableArea';
 import BasicSiteSettings from './BasicSiteSettings';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
+import EnvironmentVariables from './EnvironmentVariables';
 import CopyRepoForm from './CopyRepoForm';
 import siteActions from '../../../actions/siteActions';
 import { currentSite } from '../../../selectors/site';
@@ -105,6 +106,11 @@ class SiteSettings extends React.Component {
             initialValues={advancedInitialValues}
             onDelete={this.handleDelete}
             onSubmit={this.handleUpdate}
+          />
+        </ExpandableArea>
+        <ExpandableArea title="Environment variables">
+          <EnvironmentVariables
+            siteId={site.id}
           />
         </ExpandableArea>
         <ExpandableArea title="Copy site">

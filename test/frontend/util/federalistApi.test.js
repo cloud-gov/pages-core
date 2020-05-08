@@ -18,6 +18,7 @@ const testBuild = {
   commitSha: '123abc',
 };
 const buildLogPage = 1;
+const uev = { id: 8 };
 
 function testRouteCalled(routeName, { method = 'GET', body } = {}) {
   const expectedOptions = {
@@ -44,13 +45,16 @@ describe('federalistApi', () => {
     fetchMock.get(`${API}/build/${testBuild.id}/log/page/${buildLogPage}`, { log: true }, { name: 'getBuildLogs' });
     fetchMock.get(
       `${API}/site/${testSite.id}/published-branch`,
-      { branches: [testBranch] }, { name: 'getPublishedBranches' });
+      { branches: [testBranch] }, { name: 'getPublishedBranches' }
+    );
     fetchMock.get(
       `${API}/site/${testSite.id}/published-branch/${testBranch}/published-file`,
-      { files: [] }, { name: 'getPublishedFiles' });
+      { files: [] }, { name: 'getPublishedFiles' }
+    );
     fetchMock.get(
       `${API}/site/${testSite.id}/published-branch/${testBranch}/published-file?startAtKey=boop`,
-      { files: [] }, { name: 'getPublishedFilesWithQueryParam' });
+      { files: [] }, { name: 'getPublishedFilesWithQueryParam' }
+    );
     fetchMock.get(`${API}/site`, { sites: [testSite] }, { name: 'getSites' });
     fetchMock.get(`${API}/me`, { user: 'me' }, { name: 'getMe' });
     fetchMock.post(`${API}/site`, {}, { name: 'postSite' });
@@ -61,6 +65,9 @@ describe('federalistApi', () => {
     fetchMock.put(`${API}/site/5`, 400, { name: 'putSiteError' });
     fetchMock.put(`${API}/site/3/notifications`, {}, { name: 'putSiteUser' });
     fetchMock.put(`${API}/site/5/notifications`, 400, { name: 'putSiteUserError' });
+    fetchMock.get(`${API}/site/6/user-environment-variable`, [uev], { name: 'fetchUserEnvironmentVariables' });
+    fetchMock.post(`${API}/site/6/user-environment-variable`, {}, { name: 'createUserEnvironmentVariable' });
+    fetchMock.delete(`${API}/site/6/user-environment-variable/8`, {}, { name: 'deleteUserEnvironmentVariable' });
   });
 
   after(() => {
@@ -84,7 +91,7 @@ describe('federalistApi', () => {
     it('throws an error if handleHttpError is false', (done) => {
       federalistApi.fetch('site/5', { method: 'PUT', data: {} }, { handleHttpError: false })
         .catch((err) => {
-          expect(err).to.be.defined;
+          expect(err).to.exist;
           expect(err.response.status).to.equal(400);
           done();
         });
@@ -169,5 +176,24 @@ describe('federalistApi', () => {
         },
       });
     });
+  });
+
+  it('defines fetchUserEnvironmentVariables', () => {
+    const siteId = 6;
+    federalistApi.fetchUserEnvironmentVariables(siteId);
+    testRouteCalled('fetchUserEnvironmentVariables');
+  });
+
+  it('defines createUserEnvironmentVariable', () => {
+    const siteId = 6;
+    federalistApi.createUserEnvironmentVariable(siteId, uev);
+    testRouteCalled('createUserEnvironmentVariable', { method: 'POST', body: {} });
+  });
+
+  it('defines deleteUserEnvironmentVariable', () => {
+    const siteId = 6;
+    const uevId = 8;
+    federalistApi.deleteUserEnvironmentVariable(siteId, uevId);
+    testRouteCalled('deleteUserEnvironmentVariable', { method: 'DELETE' });
   });
 });

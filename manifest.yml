@@ -22,6 +22,7 @@ services:
 - federalist-deploy-user
 - federalist-production-proxy
 - federalist-production-domain
+- federalist-production-uev-key
 env:
   NODE_ENV: production
   APP_ENV: production
