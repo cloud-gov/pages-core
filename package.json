@@ -5,7 +5,7 @@
   "description": "",
   "keywords": [],
   "dependencies": {
-    "@octokit/rest": "^15.18",
+    "@octokit/rest": "^17.8",
     "aws-sdk": "^2.673.0",
     "body-parser": "^1.18.3",
     "cfenv": "^1.0.0",
