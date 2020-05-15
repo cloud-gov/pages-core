@@ -98,6 +98,12 @@ if (cfSpace && cfOauthTokenUrl && cfApiHost && cfDomain && cfProxy) {
 module.exports.rateLimiting = {
   windowMs: 1 * 60 * 1000, // 1 minute window
   max: 50, // limit each IP to 50 requests per window
+};
+
+// See https://github.com/nfriedly/express-slow-down/blob/master/README.md
+// for all express-slow-down options available
+module.exports.rateSlowing = {
+  windowMs: 1 * 60 * 1000, // 1 minute window
   delayAfter: 25, // delay requests by delayMs after 25 are made in a window
   delayMs: 500, // delay requests by 500 ms
 };
