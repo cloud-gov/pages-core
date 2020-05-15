@@ -108,7 +108,7 @@
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-scanjs-rules": "amirbey/eslint-plugin-scanjs-rules#buffer",
     "fetch-mock": "^5.12.2",
-    "file-loader": "^3.0.1",
+    "file-loader": "^6.0.0",
     "history": "^4.10.1",
     "inquirer": "^5.0.1",
     "json-schema-deref-sync": "^0.10.0",
