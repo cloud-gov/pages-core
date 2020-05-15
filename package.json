@@ -109,7 +109,7 @@
     "fetch-mock": "^5.12.2",
     "file-loader": "^6.0.0",
     "history": "^4.10.1",
-    "inquirer": "^5.0.1",
+    "inquirer": "^7.1.0",
     "json-schema-deref-sync": "^0.10.0",
     "jsonschema": "^1.2.6",
     "mini-css-extract-plugin": "^0.9.0",
