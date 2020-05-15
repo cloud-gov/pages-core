@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
-const RateLimit = require('express-rate-limit');
+const rateLimit = require('express-rate-limit');
+const slowDown = require('express-slow-down');
 const session = require('express-session');
 const ConnectSession = require('connect-session-sequelize');
 const nunjucks = require('nunjucks');
@@ -102,8 +103,11 @@ if (logger.levels[logger.level] >= 2) {
   app.use(expressLogger);
 }
 
-const limiter = new RateLimit(config.rateLimiting);
-app.use(limiter); // must be set before router is added to app
+const rateLimiter = rateLimit(config.rateLimiting);
+const speedLimiter = slowDown(config.rateSlowing);
+// must be set before router is added to app
+app.use(speedLimiter);
+app.use(rateLimiter);
 
 app.server = http.Server(app);
 
