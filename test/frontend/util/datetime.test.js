@@ -1,5 +1,7 @@
 import { expect } from 'chai';
-import { duration, timeFrom, dateAndTime, timestampUTC } from '../../../frontend/util/datetime';
+import {
+  duration, timeFrom, dateAndTime, timestampUTC,
+} from '../../../frontend/util/datetime';
 
 const NO_DATE = '-';
 
@@ -36,7 +38,7 @@ describe('datetime', () => {
 
   describe('.dateAndTime', () => {
     it('provides a date and time when a valid date is provided', () => {
-      expect(dateAndTime(startTime)).to.equal('February 13th 2016, 6:32:01 pm');
+      expect(dateAndTime(startTime)).to.equal('February 13th 2016, 6:32:01 p.m.');
     });
 
     it('provides a fallback if no date is provided', () => {

@@ -48,6 +48,13 @@ const buildLogCallbackURL = build => [
 
 const sourceForBuild = build => build.source || {};
 
+const buildUEVs = uevs => (uevs
+  ? uevs.map(uev => ({
+    name: uev.name,
+    ciphertext: uev.ciphertext,
+  }))
+  : []);
+
 const generateDefaultCredentials = build => ({
   AWS_DEFAULT_REGION: config.s3.region,
   AWS_ACCESS_KEY_ID: config.s3.accessKeyId,
@@ -70,6 +77,7 @@ const generateDefaultCredentials = build => ({
   AUTH_BASEURL: process.env.APP_HOSTNAME,
   AUTH_ENDPOINT: 'external/auth/github',
   BUILD_ID: build.id,
+  USER_ENVIRONMENT_VARIABLES: JSON.stringify(buildUEVs(build.Site.UserEnvironmentVariables)),
 });
 
 const buildContainerEnvironment = (build) => {
@@ -89,27 +97,35 @@ const buildContainerEnvironment = (build) => {
     }));
 };
 
-const setupBucket = (build, buildCount) => {
-  if (buildCount > 1) return Promise.resolve();
+const setupBucket = async (build, buildCount) => {
+  if (buildCount > 1) return true;
 
-  return apiClient.fetchServiceInstanceCredentials(build.Site.s3ServiceName)
-    .then((credentials) => {
-      const {
-        access_key_id, // eslint-disable-line
-        bucket,
-        region,
-        secret_access_key, // eslint-disable-line
-      } = credentials;
+  const credentials = await apiClient.fetchServiceInstanceCredentials(build.Site.s3ServiceName);
+  const {
+    access_key_id, // eslint-disable-line
+    bucket,
+    region,
+    secret_access_key, // eslint-disable-line
+  } = credentials;
 
-      const s3Client = new S3Helper.S3Client({
-        accessKeyId: access_key_id,
-        secretAccessKey: secret_access_key,
-        bucket,
-        region,
-      });
+  const s3Client = new S3Helper.S3Client({
+    accessKeyId: access_key_id,
+    secretAccessKey: secret_access_key,
+    bucket,
+    region,
+  });
 
-      return s3Client.putBucketWebsite(build.Site.owner, build.Site.repository, 30);
-    });
+  // Wait until AWS credentials are usable in case we had to
+  // provision new ones. This may take up to 10 seconds.
+  await s3Client.waitForCredentials();
+
+  await s3Client.putBucketWebsite(build.Site.owner, build.Site.repository);
+  await s3Client.putObject('User-agent: *\nDisallow: /\n', 'robots.txt', {
+    CacheControl: 'max-age=60',
+    ServerSideEncryption: 'AES256',
+    ContentType: 'text/plain',
+  });
+  return true;
 };
 
 const sqsConfig = config.sqs;

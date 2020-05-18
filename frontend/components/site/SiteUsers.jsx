@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { SITE, USER } from '../../propTypes';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
+import { currentSite } from '../../selectors/site';
 import UserActionsTable from './UserActionsTable';
 import { IconGitHub } from '../icons';
 
@@ -91,9 +92,9 @@ SiteUsers.defaultProps = {
   user: null,
 };
 
-const mapStateToProps = ({ user, sites }) => ({
+const mapStateToProps = ({ user, sites }, { params: { id } }) => ({
   user: user.data,
-  site: sites.currentSite,
+  site: currentSite(sites, id),
 });
 
 export { SiteUsers };

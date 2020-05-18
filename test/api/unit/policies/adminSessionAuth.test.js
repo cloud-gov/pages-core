@@ -66,7 +66,7 @@ describe('adminSessionAuth', () => {
     delete mockReq.session.authenticatedAt;
     sessionAuth(mockReq, mockRes, mockNext)
       .then(() => {
-        expect(mockReq.session.authenticatedAt).is.defined;
+        expect(mockReq.session.authenticatedAt).to.exist;
         expect(moment(mockReq.session.authenticatedAt).isSame(moment(), 'second')).to.equal(true);
         expect(validateAdminSpy.calledOnce).to.equal(true);
         expect(mockNext.calledOnce).to.equal(true);

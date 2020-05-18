@@ -7,8 +7,10 @@ import { SITE } from '../../../propTypes';
 import ExpandableArea from '../../ExpandableArea';
 import BasicSiteSettings from './BasicSiteSettings';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
+import EnvironmentVariables from './EnvironmentVariables';
 import CopyRepoForm from './CopyRepoForm';
 import siteActions from '../../../actions/siteActions';
+import { currentSite } from '../../../selectors/site';
 
 class SiteSettings extends React.Component {
   constructor(props) {
@@ -106,6 +108,11 @@ class SiteSettings extends React.Component {
             onSubmit={this.handleUpdate}
           />
         </ExpandableArea>
+        <ExpandableArea title="Environment variables">
+          <EnvironmentVariables
+            siteId={site.id}
+          />
+        </ExpandableArea>
         <ExpandableArea title="Copy site">
           <CopyRepoForm onSubmit={this.handleCopySite} />
         </ExpandableArea>
@@ -122,8 +129,8 @@ SiteSettings.defaultProps = {
   site: null,
 };
 
-const mapStateToProps = ({ sites }) => ({
-  site: sites.currentSite,
+const mapStateToProps = ({ sites }, { params: { id } }) => ({
+  site: currentSite(sites, id),
 });
 
 export { SiteSettings };

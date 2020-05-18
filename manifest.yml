@@ -22,6 +22,7 @@ services:
 - federalist-deploy-user
 - federalist-production-proxy
 - federalist-production-domain
+- federalist-production-uev-key
 env:
   NODE_ENV: production
   APP_ENV: production
@@ -35,4 +36,4 @@ env:
   FEDERALIST_PREVIEW_HOSTNAME: https://federalist-proxy.app.cloud.gov
   SOCKET_HOST: https://federalistapp.fr.cloud.gov
   USER_AUDITOR: federalist
-  S3_SERVICE_PLAN_ID: 16A19515-C2B9-4982-80BD-69BED6A86C85
+  S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95

@@ -6,11 +6,17 @@ const { branchRegex, shaRegex, isEmptyOrUrl } = require('../utils/validators');
 const { buildUrl } = require('../utils/build');
 
 const afterCreate = (build) => {
-  const { Site, User, Build } = build.sequelize.models;
+  const {
+    Site, User, Build, UserEnvironmentVariable,
+  } = build.sequelize.models;
 
   return Build.findOne({
     where: { id: build.id },
-    include: [User, Site],
+    include: [User, {
+      model: Site,
+      required: true,
+      include: [UserEnvironmentVariable],
+    }],
   })
     .then((foundBuild) => {
       Build.count({
@@ -152,6 +158,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
+  Build.generateToken = generateToken;
   Build.associate = associate;
   Build.prototype.updateJobStatus = updateJobStatus;
   return Build;

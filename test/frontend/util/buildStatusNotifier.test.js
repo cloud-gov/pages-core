@@ -1,29 +1,30 @@
 import { expect } from 'chai';
-import { spy, stub } from 'sinon';
+import sinon from 'sinon';
 import proxyquire from 'proxyquire';
 
-const ioMock = stub();
+const ioMock = sinon.stub();
 
 const BuildStatusNotifier = proxyquire('../../../frontend/util/buildStatusNotifier', {
   'socket.io-client': ioMock,
 });
 
 describe('buildStatusNotifier', () => {
-  before(() => spy(BuildStatusNotifier, 'notify'));
+  beforeEach(() => sinon.spy(BuildStatusNotifier, 'notify'));
+  afterEach(() => {
+    ioMock.reset();
+    sinon.restore();
+  });
 
   context('listen', () => {
     let socketIOEventSubscriptions;
     let onMock;
     beforeEach(() => {
-      BuildStatusNotifier.notify.reset();
-
       // Mock out socket.on calls to register event callbacks in the socketIOEventSubscriptions hash
       socketIOEventSubscriptions = {};
       onMock = (message, cb) => {
         socketIOEventSubscriptions[message] = cb;
       };
 
-      ioMock.reset();
       ioMock.returns({ on: onMock });
     });
 
@@ -92,9 +93,10 @@ describe('buildStatusNotifier', () => {
     let pushNote;
     const icon = '/images/favicons/favicon.ico';
     beforeEach(() => {
-      msg = { state: 'state', owner: 'owner', repository: 'repository', branch: 'branch' };
+      msg = {
+        state: 'state', owner: 'owner', repository: 'repository', branch: 'branch',
+      };
       options = { body: `Site: ${msg.owner}/${msg.repository}   Branch: ${msg.branch}`, icon };
-      BuildStatusNotifier.notify.reset();
     });
 
     it('build state is neither queued, success nor error', (done) => {

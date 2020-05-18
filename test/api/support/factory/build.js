@@ -1,35 +1,38 @@
-const siteFactory = require("./site")
-const userFactory = require("./user")
-const { Build } = require("../../../../api/models")
+const siteFactory = require('./site');
+const userFactory = require('./user');
+const { Build } = require('../../../../api/models');
 
-const build = (overrides) => {
-  return Promise.props(_attributes(overrides)).then(attributes => {
-    Object.keys(attributes).forEach(key => {
-      if (attributes[key].sequelize) {
-        attributes[key] = attributes[key].id
-      }
-    })
-
-    return Build.create(attributes)
-  })
-}
-
+// eslint-disable-next-line no-underscore-dangle
 const _attributes = (overrides = {}) => {
-  let { user, site } = overrides
+  let { user, site } = overrides;
 
   if (!user) {
-    user = userFactory()
+    user = userFactory();
   }
   if (!site) {
-    site = Promise.resolve(user).then(user => {
-      return siteFactory({ users: [user] })
-    })
+    site = Promise.resolve(user).then(u => siteFactory({ users: [u] }));
   }
 
   return Object.assign({
-    site: site,
-    user: user
-  }, overrides)
+    site,
+    user,
+    token: Build.generateToken(),
+  }, overrides);
+};
+
+
+function build(overrides, hooks = false) {
+  return Promise.props(_attributes(overrides))
+    .then((attributes) => {
+      Object.keys(attributes).forEach((key) => {
+        if (attributes[key].sequelize) {
+        // eslint-disable-next-line no-param-reassign
+          attributes[key] = attributes[key].id;
+        }
+      });
+
+      return Build.create(attributes, { hooks });
+    });
 }
 
-module.exports = build
+module.exports = build;

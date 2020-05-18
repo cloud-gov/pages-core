@@ -1055,12 +1055,14 @@ describe('Site API', () => {
   });
 
   describe('DELETE /v0/site/:id', () => {
+    let removeSiteStub;
+
     beforeEach(() => {
-      sinon.stub(S3SiteRemover, 'removeSite', () => Promise.resolve());
+      removeSiteStub = sinon.stub(S3SiteRemover, 'removeSite').resolves();
     });
 
     afterEach(() => {
-      S3SiteRemover.removeSite.restore();
+      sinon.restore();
     });
 
     it('should require authentication', (done) => {
@@ -1112,7 +1114,6 @@ describe('Site API', () => {
         })
         .catch(done);
     });
-
 
     it('should allow a user to delete a site associated with their account', (done) => {
       let site;
@@ -1193,11 +1194,6 @@ describe('Site API', () => {
             permissions: { admin: true, push: true },
           }],
         });
-        S3SiteRemover.removeSite.restore();
-        sinon.stub(S3SiteRemover, 'removeSite', (calledSite) => {
-          expect(calledSite.id).to.equal(site.id);
-          return Promise.resolve();
-        });
 
         return request(app)
           .delete(`/v0/site/${site.id}`)
@@ -1206,7 +1202,8 @@ describe('Site API', () => {
           .expect(200);
       })
         .then(() => {
-          expect(S3SiteRemover.removeSite.calledOnce).to.equal(true);
+          sinon.assert.calledOnce(removeSiteStub);
+          expect(removeSiteStub.firstCall.args[0].id).to.eq(site.id);
           done();
         })
         .catch(done);

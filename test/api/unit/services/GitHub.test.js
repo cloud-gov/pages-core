@@ -371,14 +371,14 @@ describe('GitHub', () => {
 
         return GitHub.getBranch(values.user, owner, repository, branch);
       })
-        .then((branchInfo) => {
-          expect(branchInfo).to.be.defined;
-          expect(branchInfo.name).to.be.defined;
-          expect(branchInfo.commit).to.be.defined;
-          expect(mockGHRequest.isDone()).to.be.true;
-          done();
-        })
-        .catch(done);
+      .then((branchInfo) => {
+        expect(branchInfo).to.exist;
+        expect(branchInfo.name).to.exist;
+        expect(branchInfo.commit).to.exist;
+        expect(mockGHRequest.isDone()).to.be.true;
+        done();
+      })
+      .catch(done);
     });
 
     it('returns an error if branch is not defined', (done) => {

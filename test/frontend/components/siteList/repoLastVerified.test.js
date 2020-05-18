@@ -5,7 +5,7 @@ import RepoLastVerified from '../../../../frontend/components/siteList/repoLastV
 
 const VERIFIED_BASE = 'Repository not found';
 const MOST_RECENT_VERIFIED_TIME = '2015-09-04T15:11:23.000Z';
-const FORMATTED_MOST_RECENT_VERIFIED_TIME = 'September 4th 2015, 3:11:23 pm';
+const FORMATTED_MOST_RECENT_VERIFIED_TIME = 'September 4th 2015, 3:11:23 p.m.';
 const MOST_RECENT_VERIFIED = `. Last seen on ${FORMATTED_MOST_RECENT_VERIFIED_TIME}.`;
 const userUpdated = new Date(new Date() - (10 * 24 * 60 * 60 * 1000)).toString();
 
@@ -53,13 +53,13 @@ describe('<RepoLastVerified />', () => {
   });
 
   it('repoLastVerified today - under the threshold', () => {
-    const repoLastVerified = new Date(new Date() - (3 * 24 * 60 * 60 * 1000)).toString();
+    const repoLastVerified = new Date(new Date() - (3 * 24 * 60 * 60 * 1000)).toISOString();
     wrapper = shallow(<RepoLastVerified site={{ repoLastVerified }} userUpdated={userUpdated} />);
     expect(wrapper.find('p').length).to.equal(0);
   });
 
   it('repoLastVerified under passed threshold', () => {
-    const repoLastVerified = new Date(new Date() - (3 * 24 * 60 * 60 * 1000)).toString();
+    const repoLastVerified = new Date(new Date() - (3 * 24 * 60 * 60 * 1000)).toISOString();
     const site = { repoLastVerified };
     const user = userUpdated;
     wrapper = shallow(<RepoLastVerified site={site} daysNotVerified={2} userUpdated={user} />);
@@ -67,7 +67,7 @@ describe('<RepoLastVerified />', () => {
   });
 
   it('repoLastVerified under passed threshold but user just logged in', () => {
-    const repoLastVerified = new Date(new Date() - (3 * 24 * 60 * 60 * 1000)).toString();
+    const repoLastVerified = new Date(new Date() - (3 * 24 * 60 * 60 * 1000)).toISOString();
     wrapper = shallow(<RepoLastVerified site={{ repoLastVerified }} daysNotVerified={2} />);
     expect(wrapper.find('p').length).to.equal(0);
   });

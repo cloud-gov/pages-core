@@ -1,14 +1,17 @@
-import { expect } from "chai";
-import { spy, stub } from "sinon";
-import proxyquire from "proxyquire";
+import { expect } from 'chai';
+import { spy, stub } from 'sinon';
+import proxyquire from 'proxyquire';
 
 proxyquire.noCallThru();
 
-describe("alertActions", () => {
+describe('alertActions', () => {
   let fixture;
   let dispatch;
-  let authErrorActionCreator, httpErrorActionCreator, httpSuccessActionCreator,
-      setStaleActionCreator, clearActionCreator, update;
+  let authErrorActionCreator;
+  let httpErrorActionCreator;
+  let httpSuccessActionCreator;
+  let setStaleActionCreator;
+  let clearActionCreator;
 
   beforeEach(() => {
     dispatch = spy();
@@ -17,26 +20,25 @@ describe("alertActions", () => {
     httpSuccessActionCreator = stub();
     setStaleActionCreator = stub();
     clearActionCreator = stub();
-    update = stub();
 
-    fixture = proxyquire("../../../frontend/actions/alertActions", {
-      "./actionCreators/alertActions": {
+    fixture = proxyquire('../../../frontend/actions/alertActions', {
+      './actionCreators/alertActions': {
         authError: authErrorActionCreator,
         httpError: httpErrorActionCreator,
         httpSuccess: httpSuccessActionCreator,
         setStale: setStaleActionCreator,
-        clear: clearActionCreator
+        clear: clearActionCreator,
       },
-      "../store": {
-        dispatch: dispatch
-      }
+      '../store': {
+        dispatch,
+      },
     }).default;
   });
 
-  describe("auth error", () => {
-    it("sends an auth error action to the store", () => {
+  describe('auth error', () => {
+    it('sends an auth error action to the store', () => {
       const authErrorAction = {
-        e: "is for error, that's good enough for me"
+        e: "is for error, that's good enough for me",
       };
       authErrorActionCreator.withArgs().returns(authErrorAction);
 
@@ -47,11 +49,11 @@ describe("alertActions", () => {
     });
   });
 
-  describe("http error", () => {
-    it("sends an http error action to the store", () => {
-      const message = "homework should be done";
+  describe('http error', () => {
+    it('sends an http error action to the store', () => {
+      const message = 'homework should be done';
       const httpErrorAction = {
-        e: "is for error, that's good enough for me"
+        e: "is for error, that's good enough for me",
       };
       httpErrorActionCreator.withArgs(message).returns(httpErrorAction);
 
@@ -61,10 +63,10 @@ describe("alertActions", () => {
       expect(dispatch.calledWith(httpErrorAction)).to.be.true;
     });
 
-    it("has alertError as a synonym", () => {
-      const message = "homework should be done";
+    it('has alertError as a synonym', () => {
+      const message = 'homework should be done';
       const httpErrorAction = {
-        e: "is for error, that's good enough for me"
+        e: "is for error, that's good enough for me",
       };
       httpErrorActionCreator.withArgs(message).returns(httpErrorAction);
 
@@ -75,11 +77,11 @@ describe("alertActions", () => {
     });
   });
 
-  describe("alert success", () => {
-    it("sends an http success action to the store", () => {
-      const message = "spell the word";
+  describe('alert success', () => {
+    it('sends an http success action to the store', () => {
+      const message = 'spell the word';
       const httpSuccessAction = {
-        status: "is very successful"
+        status: 'is very successful',
       };
       httpSuccessActionCreator.withArgs(message).returns(httpSuccessAction);
 
@@ -90,10 +92,10 @@ describe("alertActions", () => {
     });
   });
 
-  describe("set stale", () => {
-    it("sends a set stale action to the store", () => {
+  describe('set stale', () => {
+    it('sends a set stale action to the store', () => {
       const setStaleAction = {
-        press: "up, or down if you like"
+        press: 'up, or down if you like',
       };
       setStaleActionCreator.withArgs().returns(setStaleAction);
 
@@ -104,10 +106,10 @@ describe("alertActions", () => {
     });
   });
 
-  describe("clear", () => {
-    it("sends a clear action to the store", () => {
+  describe('clear', () => {
+    it('sends a clear action to the store', () => {
       const clearAction = {
-        monster: "truck racing"
+        monster: 'truck racing',
       };
       clearActionCreator.withArgs().returns(clearAction);
 
@@ -120,7 +122,7 @@ describe("alertActions", () => {
     describe('update()', () => {
       it('sends a clear action if the message is stale', () => {
         const clearAction = {
-          monster: 'mash'
+          monster: 'mash',
         };
 
         spy(fixture, 'clear');
@@ -135,7 +137,7 @@ describe("alertActions", () => {
 
       it('sends a setStale action if the message is not stale', () => {
         const staleAction = {
-          is: 'old'
+          is: 'old',
         };
 
         spy(fixture, 'setStale');

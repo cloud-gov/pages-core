@@ -24,9 +24,9 @@ describe('Build model', () => {
       const site = await factory.site();
       const build = await Build.build({ site: site.id, user: 1 });
 
-      build.validate();
+      await build.validate();
 
-      expect(build.token).to.be.okay;
+      expect(build.token).to.exist;
     });
 
     it('should not override a build token if one exists', async () => {
@@ -41,7 +41,10 @@ describe('Build model', () => {
 
   describe('after create hook', () => {
     it('should send a build new build message', async () => {
-      const build = await factory.build();
+      const site = await factory.site();
+      const uev = await factory.userEnvironmentVariable.create({ site });
+      const build = await factory.build({ site }, true);
+
       // create delay while s3 infra created ... will be removed with 1 bucket federalist
       await wait();
 
@@ -54,6 +57,14 @@ describe('Build model', () => {
       expect(queuedBuild.id).to.equal(build.id);
       expect(buildCount).to.equal(1);
       expect(build.state).to.eql('queued');
+
+      // The build should include the site
+      expect(queuedBuild.Site).to.be.an.instanceof(Site);
+      expect(queuedBuild.Site.id).to.eq(site.id);
+
+      // The site should include the environment variables
+      expect(queuedBuild.Site.UserEnvironmentVariables).to.be.an.instanceof(Array);
+      expect(queuedBuild.Site.UserEnvironmentVariables[0].id).to.eq(uev.id);
     });
   });
 
