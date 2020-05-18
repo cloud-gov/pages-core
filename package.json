@@ -118,7 +118,7 @@
     "mock-fs": "^4.12.0",
     "nock": "^10.0.6",
     "node-sass": "^4.12.0",
-    "nodemon": "^2.0.3",
+    "nodemon": "^2.0.4",
     "nyc": "^15.0.1",
     "postcss-loader": "^3.0.0",
     "promise-props": "^1.0.0",
