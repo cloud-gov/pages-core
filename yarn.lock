@@ -7349,17 +7349,10 @@ module-not-found-error@^1.0.1:
   resolved "https://registry.yarnpkg.com/module-not-found-error/-/module-not-found-error-1.0.1.tgz#cf8b4ff4f29640674d6cdd02b0e3bc523c2bbdc0"
   integrity sha1-z4tP9PKWQGdNbN0CsOO8UjwrvcA=
 
-moment-timezone@^0.5.21:
+moment-timezone@^0.5.21, moment-timezone@^0.5.25:
   version "0.5.28"
   resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.28.tgz#f093d789d091ed7b055d82aa81a82467f72e4338"
   integrity sha512-TDJkZvAyKIVWg5EtVqRzU97w0Rb0YVbfpqyjgu6GwXCAohVRqwZjf4fOzDE6p1Ch98Sro/8hQQi65WDXW5STPw==
-  dependencies:
-    moment ">= 2.9.0"
-
-moment-timezone@^0.5.25:
-  version "0.5.26"
-  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.26.tgz#c0267ca09ae84631aa3dc33f65bedbe6e8e0d772"
-  integrity sha512-sFP4cgEKTCymBBKgoxZjYzlSovC20Y6J7y3nanDc5RoBIXKlZhoYwBoZGe3flwU6A372AcRwScH8KiwV6zjy1g==
   dependencies:
     moment ">= 2.9.0"
 
@@ -9834,10 +9827,10 @@ sequelize-pool@^2.3.0:
   resolved "https://registry.yarnpkg.com/sequelize-pool/-/sequelize-pool-2.3.0.tgz#64f1fe8744228172c474f530604b6133be64993d"
   integrity sha512-Ibz08vnXvkZ8LJTiUOxRcj1Ckdn7qafNZ2t59jYHMX1VIebTAOYefWdRYFt6z6+hy52WGthAHAoLc9hvk3onqA==
 
-sequelize@^5.21.2:
-  version "5.21.8"
-  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-5.21.8.tgz#3e3664dec6e66a63afe756384a40835406abb65d"
-  integrity sha512-UOxGMJ7eSnProTMWX9wRr0T9TcuW0YedFmU7s+YBZT9/RmfJeANYPdJXjXg4E+Yg+dJl4WWvBEu9r2oe+d/1/Q==
+sequelize@^5.21.9:
+  version "5.21.9"
+  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-5.21.9.tgz#6f572d84c89d3819b942f68710142986e5cbc494"
+  integrity sha512-CCUgdaGm92ro9ULF3Pi4CLToAYajB3bCAw6mkruAtAsrb/PkK1sl83kLhBiTIxEzTcrtj5Tt/ZqJ8kKE1cRncA==
   dependencies:
     bluebird "^3.5.0"
     cls-bluebird "^2.1.0"
