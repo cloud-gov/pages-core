@@ -3,7 +3,7 @@ const request = require('supertest');
 
 const app = require('../../../../app');
 const factory = require('../../support/factory');
-const { authenticatedSession } = require('../../support/session');
+const { adminAuthenticatedSession, authenticatedSession } = require('../../support/session');
 const validateAdminJSONSchema = require('../../support/validateAdminJSONSchema');
 
 const { Site, User } = require('../../../../api/models');
@@ -18,15 +18,34 @@ describe('Site Admin API', () => {
     expect(response.defaultBranch).to.equal(site.defaultBranch);
   };
 
-  afterEach(() => {
-    return Site.truncate();
-  });
+  afterEach(() => Site.truncate());
 
   describe('GET /admin/sites', () => {
     it('should require authentication', (done) => {
       factory.build().then(() => request(app)
         .get('/admin/sites')
         .expect(403))
+        .then((response) => {
+          validateAdminJSONSchema('GET', '/sites', 403, response.body);
+          expect(response.body.message).to.equal(authErrorMessage);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should reject a user that is not an admin', (done) => {
+      let user;
+
+      factory.user().then((model) => {
+        user = model;
+        const sitePromises = Array(3).fill(0).map(() => factory.site({ users: [user.id] }));
+        return Promise.all(sitePromises);
+      })
+        .then(() => authenticatedSession(user))
+        .then(cookie => request(app)
+          .get('/admin/sites')
+          .set('Cookie', cookie)
+          .expect(403))
         .then((response) => {
           validateAdminJSONSchema('GET', '/sites', 403, response.body);
           expect(response.body.message).to.equal(authErrorMessage);
@@ -46,7 +65,7 @@ describe('Site Admin API', () => {
         return Promise.all(sitePromises);
       }).then((models) => {
         sites = models;
-        return authenticatedSession(user);
+        return adminAuthenticatedSession(user);
       }).then(cookie => request(app)
         .get('/admin/sites')
         .set('Cookie', cookie)
@@ -85,7 +104,7 @@ describe('Site Admin API', () => {
         .catch(done);
     });
 
-    it('should render a JSON representation of the site', (done) => {
+    it('should reject a user that is not an admin', (done) => {
       let site;
 
       factory.site()
@@ -93,6 +112,27 @@ describe('Site Admin API', () => {
         .then((model) => {
           site = model;
           return authenticatedSession(site.Users[0]);
+        })
+        .then(cookie => request(app)
+          .get(`/admin/site/${site.id}`)
+          .set('Cookie', cookie)
+          .expect(403))
+        .then((response) => {
+          validateAdminJSONSchema('GET', '/site/{id}', 403, response.body);
+          expect(response.body.message).to.equal(authErrorMessage);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should render a JSON representation of the site', (done) => {
+      let site;
+
+      factory.site()
+        .then(s => Site.findByPk(s.id, { include: [User] }))
+        .then((model) => {
+          site = model;
+          return adminAuthenticatedSession(site.Users[0]);
         })
         .then(cookie => request(app)
           .get(`/admin/site/${site.id}`)
@@ -111,7 +151,7 @@ describe('Site Admin API', () => {
 
       factory.site().then((model) => {
         site = model;
-        return authenticatedSession(factory.user());
+        return adminAuthenticatedSession(factory.user());
       }).then(cookie => request(app)
         .get(`/admin/site/${site.id}`)
         .set('Cookie', cookie)

@@ -33,6 +33,17 @@ module.exports = {
     return res.render('home.njk', context);
   },
 
+  // Temporary view until admin details worked out
+  homeAdmin(req, res) {
+    // redirect to admin route if is authenticated
+    if (req.session.authenticated) {
+      return res.redirect('/admin');
+    }
+    const context = defaultContext(req);
+
+    return res.render('home-admin.njk', context);
+  },
+
   systemUse(req, res) {
     const context = defaultContext(req);
 

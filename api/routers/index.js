@@ -26,5 +26,6 @@ mainRouter.use('/content', require('./content'));
 
 // prefix all admin routes with "/admin"
 mainRouter.use('/admin', require('./admin'));
+mainRouter.use('/admin', require('./admin-auth'));
 
 module.exports = mainRouter;

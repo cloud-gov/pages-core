@@ -4,6 +4,7 @@ const MainController = require('../controllers/main');
 const csrfProtection = require('../policies/csrfProtection');
 
 router.get('/', MainController.home);
+router.get('/home-admin', MainController.homeAdmin);
 router.get('/system-use', MainController.systemUse);
 router.get('/case-studies/', MainController.examples);
 router.get('/content/examples/', (req, res) => res.redirect('/case-studies/'));

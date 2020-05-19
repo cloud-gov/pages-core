@@ -4,18 +4,18 @@ const utils = require('../utils');
 module.exports = async function adminSessionAuth(req, res, next) {
   req.session.authRedirectPath = undefined;
 
-  if (!req.session.authenticated) {
+  if (!req.session.adminAuthenticated) {
     return res.forbidden({
       message: 'You are not permitted to perform this action. Are you sure you are logged in?',
     });
   }
 
-  const lastAuthenticatedAt = req.session.authenticatedAt;
+  const lastAuthenticatedAt = req.session.adminAuthenticatedAt;
   if (!lastAuthenticatedAt || utils.isPastAuthThreshold(lastAuthenticatedAt)) {
-    // check that the authenticated user is still an admin member
+    // check that the adminAuthenticated user is still an admin member
     try {
       await GitHub.validateAdmin(req.user.githubAccessToken);
-      req.session.authenticatedAt = new Date();
+      req.session.adminAuthenticatedAt = new Date();
       return next();
     } catch (error) {
       req.logout();

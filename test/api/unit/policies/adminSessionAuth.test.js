@@ -15,9 +15,9 @@ describe('adminSessionAuth', () => {
   beforeEach(() => {
     mockReq = {
       session: {
-        authenticated: true,
+        adminAuthenticated: true,
         authRedirectPath: '🌋',
-        authenticatedAt: new Date(),
+        adminAuthenticatedAt: new Date(),
         destroy: sinon.spy(),
       },
       user: {
@@ -47,7 +47,7 @@ describe('adminSessionAuth', () => {
   });
 
   it('calls res.forbidden when not authenticated', (done) => {
-    mockReq.session.authenticated = false;
+    mockReq.session.adminAuthenticated = false;
     sessionAuth(mockReq, mockRes, mockNext);
     expect(mockRes.forbidden.calledOnce).to.equal(true);
     expect(mockNext.calledOnce).to.equal(false);
@@ -63,11 +63,11 @@ describe('adminSessionAuth', () => {
   });
 
   it('revalidates the user if authenticatedAt is missing', (done) => {
-    delete mockReq.session.authenticatedAt;
+    delete mockReq.session.adminAuthenticatedAt;
     sessionAuth(mockReq, mockRes, mockNext)
       .then(() => {
-        expect(mockReq.session.authenticatedAt).to.exist;
-        expect(moment(mockReq.session.authenticatedAt).isSame(moment(), 'second')).to.equal(true);
+        expect(mockReq.session.adminAuthenticatedAt).to.exist;
+        expect(moment(mockReq.session.adminAuthenticatedAt).isSame(moment(), 'second')).to.equal(true);
         expect(validateAdminSpy.calledOnce).to.equal(true);
         expect(mockNext.calledOnce).to.equal(true);
         expect(mockReq.session.authRedirectPath).to.equal(undefined);
@@ -77,10 +77,10 @@ describe('adminSessionAuth', () => {
   });
 
   it('revalidates the user if authenticatedAt is too old', (done) => {
-    mockReq.session.authenticatedAt = moment().subtract(config.policies.authRevalidationMinutes + 5, 'minutes').toDate();
+    mockReq.session.adminAuthenticatedAt = moment().subtract(config.policies.authRevalidationMinutes + 5, 'minutes').toDate();
     sessionAuth(mockReq, mockRes, mockNext)
       .then(() => {
-        expect(moment(mockReq.session.authenticatedAt).isSame(moment(), 'second')).to.equal(true);
+        expect(moment(mockReq.session.adminAuthenticatedAt).isSame(moment(), 'second')).to.equal(true);
         expect(validateAdminSpy.calledOnce).to.equal(true);
         expect(mockNext.calledOnce).to.equal(true);
         expect(mockReq.session.authRedirectPath).to.equal(undefined);
@@ -90,7 +90,7 @@ describe('adminSessionAuth', () => {
   });
 
   it('ends the session and calls res.forbidden if the user is no longer valid', (done) => {
-    mockReq.session.authenticatedAt = moment().subtract(config.policies.authRevalidationMinutes + 5, 'minutes').toDate();
+    mockReq.session.adminAuthenticatedAt = moment().subtract(config.policies.authRevalidationMinutes + 5, 'minutes').toDate();
     mockReq.user.githubAccessToken = 'bad-user-token';
 
     sessionAuth(mockReq, mockRes, mockNext)
