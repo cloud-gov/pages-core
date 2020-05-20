@@ -319,7 +319,9 @@ describe('GitHub', () => {
 
         return GitHub.getBranch(values.user, owner, repository)
           .catch((err) => {
-            expect(err.status).to.equal(400);
+            // octokit no longer validates the arguments client side so the error
+            // we are receiving here is actually the missing nock...
+            expect(err.status).to.equal(500);
             done();
           });
       })

@@ -121,7 +121,9 @@ function getNextTeamMembers(github, org, team_slug, page = 1, allMembers = []) {
 const removeOrganizationMember = (github, org, username) => github.orgs
   .removeMember({ org, username });
 
-const getRepositories = (github, page = 1) => github.repos.list({ per_page: 100, page })
+const getRepositories = (github, page = 1) => github.repos.listForAuthenticatedUser({
+  per_page: 100, page,
+})
   .then(repos => repos.data);
 
 const getNextRepositories = (github, page = 1, allRepos = []) => getRepositories(github, page)
