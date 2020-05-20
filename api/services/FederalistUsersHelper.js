@@ -28,7 +28,9 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
     .then((admins) => {
       adminFedUsers = admins.map(member => member.login);
       return Promise.all(
-        fedUserTeams.map(team => GitHub.getTeamMembers(auditor.githubAccessToken, federalistOrg, team))
+        fedUserTeams.map(team => GitHub.getTeamMembers(
+          auditor.githubAccessToken, federalistOrg, team
+        ))
       );
     })
     .then((teams) => {
@@ -37,7 +39,9 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
         teams.forEach((team) => {
           team.forEach((member) => {
             if (!members18F.includes(member.login) && !adminFedUsers.includes(member.login)) {
-              removed.push(GitHub.removeOrganizationMember(auditor.githubAccessToken, federalistOrg, member.login));
+              removed.push(GitHub.removeOrganizationMember(
+                auditor.githubAccessToken, federalistOrg, member.login
+              ));
               logger.info(`federalist-users: removed user ${member.login}`);
             }
           });
