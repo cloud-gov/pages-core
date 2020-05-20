@@ -108,7 +108,7 @@ const user = ({ accessToken, githubUserID, username, email } = {}) => {
   /* eslint-enable no-param-reassign */
 
   const expectedHeaders = {
-    reqheaders: { authorization: `Bearer ${accessToken}` },
+    reqheaders: { authorization: `token ${accessToken}` },
   };
 
   return nock('https://api.github.com', expectedHeaders)
@@ -125,6 +125,7 @@ const userOrganizations = ({ accessToken, organizations, response } = {}) => {
   accessToken = accessToken || 'access-token-123abc';
   organizations = organizations || [{ id: 123456 }];
   /* eslint-enable no-param-reassign */
+<<<<<<< Updated upstream
 
   let orgsNock = nock('https://api.github.com');
 
@@ -133,6 +134,13 @@ const userOrganizations = ({ accessToken, organizations, response } = {}) => {
   }
 
   return orgsNock.get(`/user/orgs`)
+=======
+  const expectedHeaders = {
+    reqheaders: { authorization: `token ${accessToken}` },
+  };
+  return nock('https://api.github.com', expectedHeaders)
+    .get(`/user/orgs`)
+>>>>>>> Stashed changes
     .reply(response || 200, organizations);
 };
 
@@ -144,7 +152,10 @@ const githubAuth = (username, organizations) => {
 
 // eslint-disable-next-line no-shadow
 const repo = ({ accessToken, owner, repo, username, response } = {}) => {
-  let webhookNock = nock('https://api.github.com');
+  const expectedHeaders = {
+    reqheaders: { authorization: `token ${accessToken}` },
+  };
+  let webhookNock = nock('https://api.github.com', expectedHeaders);
 
   if (owner && repo) {
     webhookNock = webhookNock.get(`/repos/${owner}/${repo}`);
@@ -152,10 +163,18 @@ const repo = ({ accessToken, owner, repo, username, response } = {}) => {
     webhookNock = webhookNock.get(/\/repos\/.*\/.*/);
   }
 
+<<<<<<< Updated upstream
   if (accessToken) {
     webhookNock = withAuth(webhookNock, accessToken);
   }
 
+=======
+  // if (accessToken && username) {
+  //   webhookNock = webhookNock.query({ access_token: accessToken, username });
+  // } else if (accessToken) {
+  //   webhookNock = webhookNock.query({ access_token: accessToken });
+  // } else 
+>>>>>>> Stashed changes
   if (username) {
     webhookNock = webhookNock.query({ username });
   } else {
