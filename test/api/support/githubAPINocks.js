@@ -109,6 +109,7 @@ const user = ({
   githubUserID,
   username,
   email,
+  tokenType = 'Bearer',
 } = {}) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
@@ -119,7 +120,7 @@ const user = ({
   /* eslint-enable no-param-reassign */
 
   const expectedHeaders = {
-    reqheaders: { authorization: `Bearer ${accessToken}` },
+    reqheaders: { authorization: `${tokenType} ${accessToken}` },
   };
 
   return nock('https://api.github.com', expectedHeaders)
@@ -183,7 +184,6 @@ const githubAuth = (username, organizations) => {
   user({ username });
   userOrganizations({ organizations });
 };
-
 
 const repo = ({
   accessToken,
@@ -351,6 +351,7 @@ const getBranch = ({
 /* eslint-disable camelcase */
 const getOrganizationMembers = ({
   accessToken,
+  username,
   organization,
   role, per_page,
   page,
@@ -366,6 +367,10 @@ const getOrganizationMembers = ({
   /* eslint-enable no-param-reassign */
 
   const orgMembers = [];
+  if (username) {
+    orgMembers.push({ login: username });
+  }
+
   for (let i = 0; i < (per_page + 1); i += 1) {
     if ((i % 50) === 0) {
       if (role !== 'member') {
@@ -382,6 +387,13 @@ const getOrganizationMembers = ({
       responseCode || 200,
       response || orgMembers.slice(((page - 1) * per_page), (page * per_page))
     );
+};
+
+const githubAdminAuth = (username) => {
+  getAccessToken();
+  user({ username });
+  user({ username, tokenType: 'token' });
+  getOrganizationMembers({ username, organization: 'federalist-users', role: 'admin' });
 };
 
 const getTeamMembers = ({
@@ -461,6 +473,7 @@ module.exports = {
   getAccessToken,
   createRepoForOrg,
   createRepoForUser,
+  githubAdminAuth,
   githubAuth,
   repo,
   status,

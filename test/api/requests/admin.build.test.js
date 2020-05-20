@@ -1,11 +1,11 @@
 const { expect } = require('chai');
 const request = require('supertest');
 const { stub } = require('sinon');
-const app = require('../../../../app');
-const SQS = require('../../../../api/services/SQS');
-const factory = require('../../support/factory');
-const { adminAuthenticatedSession, authenticatedSession } = require('../../support/session');
-const validateAdminJSONSchema = require('../../support/validateAdminJSONSchema');
+const app = require('../../../app');
+const SQS = require('../../../api/services/SQS');
+const factory = require('../support/factory');
+const { adminAuthenticatedSession, authenticatedSession } = require('../support/session');
+const validateAdminJSONSchema = require('../support/validateAdminJSONSchema');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 

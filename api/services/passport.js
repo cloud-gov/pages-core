@@ -48,49 +48,46 @@ passport.logout = (req, res) => {
   });
 };
 
+const callbackLogic = (req, res, {
+  errorMessage = 'Apologies; you don\'t have access to Federalist! '
+  + 'Please contact the Federalist team if this is in error.',
+  redirect = '/',
+  isAdmin = false,
+} = {}) => {
+  const sessionKey = isAdmin ? 'adminAuthenticated' : 'authenticated';
+  if (req.user) {
+    req.session[sessionKey] = true;
+    req.session[`${sessionKey}At`] = new Date();
+    req.session.save(() => {
+      if (req.session.authRedirectPath) {
+        res.redirect(req.session.authRedirectPath);
+      } else {
+        res.redirect(redirect);
+      }
+    });
+  } else {
+    req.flash('error', {
+      title: 'Unauthorized',
+      message: errorMessage,
+    });
+    res.redirect(redirect);
+  }
+};
+
 passport.callback = (req, res) => {
   const { pathname } = url.parse(req.originalUrl);
 
   if (pathname === '/admin/auth/github/callback') {
     passport.authenticate('admin-auth')(req, res, () => {
-      if (req.user) {
-        req.session.adminAuthenticated = true;
-        req.session.adminAuthenticatedAt = new Date();
-        req.session.save(() => {
-          if (req.session.authRedirectPath) {
-            res.redirect(req.session.authRedirectPath);
-          } else {
-            res.redirect('/admin');
-          }
-        });
-      } else {
-        req.flash('error', {
-          title: 'Unauthorized',
-          message: 'You don\'t have access to Federalist admin!',
-        });
-        res.redirect('/home-admin');
-      }
+      callbackLogic(req, res, {
+        errorMessage: 'You don\'t have access to Federalist admin!',
+        redirect: '/admin',
+        isAdmin: true,
+      });
     });
   } else {
     passport.authenticate('github')(req, res, () => {
-      if (req.user) {
-        req.session.authenticated = true;
-        req.session.authenticatedAt = new Date();
-        req.session.save(() => {
-          if (req.session.authRedirectPath) {
-            res.redirect(req.session.authRedirectPath);
-          } else {
-            res.redirect('/');
-          }
-        });
-      } else {
-        req.flash('error', {
-          title: 'Unauthorized',
-          message: 'Apologies; you don\'t have access to Federalist! '
-                   + 'Please contact the Federalist team if this is in error.',
-        });
-        res.redirect('/');
-      }
+      callbackLogic(req, res);
     });
   }
 };

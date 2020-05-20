@@ -63,6 +63,34 @@ function authenticatedSession(user) {
     });
 }
 
+function adminUnauthenticatedSession({ oauthState, authRedirectPath } = {}) {
+  const sessionKey = crypto.randomBytes(8).toString('hex');
+
+  const sessionBody = {
+    cookie: {
+      originalMaxAge: null,
+      expires: null,
+      httpOnly: true,
+      path: '/',
+    },
+    flash: {},
+    adminAuthenticated: false,
+    csrfSecret: csrfToken.TEST_CSRF_SECRET,
+    'oauth2:github.com': { state: oauthState },
+    authRedirectPath,
+  };
+
+  return config.session.store.set(sessionKey, sessionBody)
+    .then(() => {
+      const signedSessionKey = `${sessionKey}.${crypto
+        .createHmac('sha256', config.session.secret)
+        .update(sessionKey)
+        .digest('base64')
+        .replace(/=+$/, '')}`;
+      return `${config.session.key}=s%3A${signedSessionKey}`;
+    });
+}
+
 function adminAuthenticatedSession(user) {
   const sessionKey = crypto.randomBytes(8).toString('hex');
 
@@ -97,6 +125,7 @@ function adminAuthenticatedSession(user) {
 
 module.exports = {
   adminAuthenticatedSession,
+  adminUnauthenticatedSession,
   authenticatedSession,
   unauthenticatedSession,
 };
