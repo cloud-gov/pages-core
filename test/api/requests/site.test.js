@@ -351,7 +351,7 @@ describe('Site API', () => {
 
       cfMockServices(siteOwner, siteRepository);
 
-      const createRepoNock = githubAPINocks.createRepoForOrg({
+      const createRepoNock = githubAPINocks.createRepoUsingTemplate({
         org: siteOwner,
         repo: siteRepository,
       });
@@ -577,7 +577,9 @@ describe('Site API', () => {
         cookie: authenticatedSession(userPromise),
       })
         .then((models) => {
+          // eslint-disable-next-line prefer-destructuring
           user = models.user;
+          // eslint-disable-next-line prefer-destructuring
           site = models.site;
 
           return request(app)
@@ -1185,6 +1187,7 @@ describe('Site API', () => {
         site: sitePromise,
         cookie: sessionPromise,
       }).then((results) => {
+        // eslint-disable-next-line prefer-destructuring
         site = results.site;
         nock.cleanAll();
         githubAPINocks.repo({
@@ -1404,6 +1407,7 @@ describe('Site API', () => {
         cookie: cookiePromise,
       })
         .then((results) => {
+          // eslint-disable-next-line prefer-destructuring
           site = results.site;
 
           return request(app)
@@ -1444,6 +1448,7 @@ describe('Site API', () => {
         cookie: cookiePromise,
       })
         .then((results) => {
+          // eslint-disable-next-line prefer-destructuring
           site = results.site;
 
           return request(app)
@@ -1481,6 +1486,7 @@ describe('Site API', () => {
         cookie: cookiePromise,
       })
         .then((results) => {
+          // eslint-disable-next-line prefer-destructuring
           site = results.site;
 
           return request(app)

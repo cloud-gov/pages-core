@@ -253,17 +253,18 @@ describe('SiteCreator', () => {
     });
 
     context('when the site is created from a template', () => {
+      const template = 'uswds2';
       const siteParams = {
         owner: crypto.randomBytes(3).toString('hex'),
         repository: crypto.randomBytes(3).toString('hex'),
-        template: 'uswds2',
+        template,
       };
       let user;
 
       it('should create a new site record for the given repository and add the user', (done) => {
         factory.user().then((model) => {
           user = model;
-          githubAPINocks.createRepoForOrg();
+          githubAPINocks.createRepoUsingTemplate();
           githubAPINocks.webhook();
           return SiteCreator.createSite({ user, siteParams });
         }).then((site) => {
@@ -292,7 +293,7 @@ describe('SiteCreator', () => {
         factory.user()
           .then((model) => {
             user = model;
-            githubAPINocks.createRepoForOrg();
+            githubAPINocks.createRepoUsingTemplate();
             githubAPINocks.webhook();
             return SiteCreator.createSite({ siteParams, user });
           }).then((site) => {
@@ -313,7 +314,7 @@ describe('SiteCreator', () => {
 
         factory.user().then((model) => {
           user = model;
-          githubAPINocks.createRepoForOrg();
+          githubAPINocks.createRepoUsingTemplate();
           githubAPINocks.webhook();
           return SiteCreator.createSite({ siteParams, user });
         }).then(site => Site.findByPk(site.id, { include: [Build] })).then((site) => {
@@ -336,7 +337,7 @@ describe('SiteCreator', () => {
         factory.user()
           .then((model) => {
             user = model;
-            githubAPINocks.createRepoForOrg();
+            githubAPINocks.createRepoUsingTemplate();
             webhookNock = githubAPINocks.webhook({
               accessToken: user.githubAccessToken,
               owner: siteParams.owner,
@@ -356,10 +357,11 @@ describe('SiteCreator', () => {
           .then((model) => {
             user = model;
 
-            githubAPINocks.createRepoForOrg({
+            githubAPINocks.createRepoUsingTemplate({
               accessToken: user.accessToken,
-              org: siteParams.owner,
+              owner: siteParams.owner,
               repo: siteParams.repository,
+              template: TemplateResolver.getTemplate(template),
               response: [422, {
                 errors: [{ message: 'name already exists on this account' }],
               }],
