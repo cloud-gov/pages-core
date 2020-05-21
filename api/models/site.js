@@ -145,6 +145,11 @@ module.exports = (sequelize, DataTypes) => {
       validationFailed,
     },
     paranoid: true,
+    getterMethods: {
+      subdomain() {
+        return this.s3ServiceName;
+      },
+    },
   });
 
   Site.associate = associate;

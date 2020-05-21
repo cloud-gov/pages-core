@@ -2,6 +2,9 @@ const expect = require('chai').expect;
 
 const { buildViewLink, buildUrl } = require('../../../../api/utils/build');
 const factory = require('../../support/factory');
+const config = require('../../../../config');
+
+const getTestDomain = (subdomain) => config.app.proxyPreviewHost.replace('*', subdomain);
 
 describe('buildUrl', () => {
   let site;
@@ -60,12 +63,16 @@ describe('viewLink', () => {
   describe('non-default/demo branch url start with preview', () => {
     it('default to build.url', async () => {
       const build = await factory.build({ branch: 'other', site, url: 'https://the.url' });
-      expect(buildViewLink(build, site)).to.eql('https://the.url/');
+      expect(buildViewLink(build, site)).to.eql(
+      `${getTestDomain(site.subdomain)}/preview/${site.owner}/${site.repository}/${build.branch}/`
+      );
     });
 
     it('build.url does not exist', async () => {
       const build = await factory.build({ branch: 'other', site });
-      expect(buildViewLink(build, site)).to.eql(`${buildUrl(build, site)}/`);
+      expect(buildViewLink(build, site)).to.eql(
+      `${getTestDomain(site.subdomain)}/preview/${site.owner}/${site.repository}/${build.branch}/`
+      );
     });
   });
 });

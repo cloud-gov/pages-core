@@ -20,7 +20,7 @@ const getViewText = (branchName, site) => {
 export const BranchViewLink = ({
   branchName, viewLink, site, showIcon,
 }) => {
-  const viewText = getUrlAndViewText(branchName, site);
+  const viewText = getViewText(branchName, site);
 
   if (showIcon) {
     return (

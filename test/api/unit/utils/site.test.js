@@ -1,24 +1,27 @@
 const { expect } = require('chai');
 
-const { buildSiteLink } = require('../../../../api/utils/site');
+const { siteViewLink } = require('../../../../api/utils/site');
 const factory = require('../../support/factory');
+const config = require('../../../../config');
 
-describe('buildSiteLink', () => {
+const getTestDomain = (subdomain) => config.app.proxyPreviewHost.replace('*', subdomain);
+
+describe('siteViewLink', () => {
   const awsBucketName = 'federalist-bucket';
 
   it('should return a site domain when site domain is set', async () => {
     const deployment = 'site';
     const domain = 'https://example.gov/';
     const site = await factory.site({ awsBucketName, domain });
-    expect(buildSiteLink(deployment, site)).to.eql(domain);
+    expect(siteViewLink(site, deployment)).to.eql(domain);
   });
 
   it('should return proxy domain with the site path when no site domain', async () => {
     const deployment = 'site';
     const domain = null;
     const site = await factory.site({ awsBucketName, domain });
-    expect(buildSiteLink(deployment, site)).to.eql(
-      `https://${awsBucketName}.app.cloud.gov/site/${site.owner}/${site.repository}/`
+    expect(siteViewLink(site, deployment)).to.eql(
+      `${getTestDomain(site.subdomain)}/site/${site.owner}/${site.repository}/`
     );
   });
 
@@ -26,23 +29,23 @@ describe('buildSiteLink', () => {
     const deployment = 'demo';
     const demoDomain = 'https://demo.example.gov/';
     const site = await factory.site({ awsBucketName, demoDomain });
-    expect(buildSiteLink(deployment, site)).to.eql(demoDomain);
+    expect(siteViewLink(site, deployment)).to.eql(demoDomain);
   });
 
   it('should return proxy domain with the demo path when no demoDomain', async () => {
     const deployment = 'demo';
     const demoDomain = null;
     const site = await factory.site({ awsBucketName, demoDomain });
-    expect(buildSiteLink(deployment, site)).to.eql(
-      `https://${awsBucketName}.app.cloud.gov/demo/${site.owner}/${site.repository}/`
+    expect(siteViewLink(site, deployment)).to.eql(
+      `${getTestDomain(site.subdomain)}/demo/${site.owner}/${site.repository}/`
     );
   });
 
   it('should return a proxy route domain with the preview path', async () => {
     const deployment = 'preview';
     const site = await factory.site({ awsBucketName });
-    expect(buildSiteLink(deployment, site)).to.eql(
-      `https://${awsBucketName}.app.cloud.gov/preview/${site.owner}/${site.repository}/`
+    expect(siteViewLink(site, deployment)).to.eql(
+      `${getTestDomain(site.subdomain)}/preview/${site.owner}/${site.repository}/`
     );
   });
 });

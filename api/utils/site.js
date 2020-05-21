@@ -1,6 +1,6 @@
 const config = require('../../config');
 
-function siteViewLink(deployment, site) {
+function siteViewLink(site, deployment = 'site') {
   let link;
   if (deployment === 'site' && site.domain) {
     link = site.domain;
@@ -15,8 +15,7 @@ function siteViewLink(deployment, site) {
 }
 
 function siteViewDomain(site){
-  const subdomain = site.subdomain || `site-${site.id}`;  //temp site id until added in database
-  return config.app.proxyPreviewHost.replace('*', subdomain);// + path;	
+  return config.app.proxyPreviewHost.replace('*', site.subdomain);
 }
 
-module.exports = { buildSiteLink, siteViewDomain };
+module.exports = { siteViewLink, siteViewDomain };

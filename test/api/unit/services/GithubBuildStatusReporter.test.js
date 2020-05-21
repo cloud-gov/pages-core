@@ -6,6 +6,7 @@ const config = require('../../../../config');
 const { logger } = require('../../../../winston');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
+const { buildViewLink } = require('../../../../api/utils/build');
 
 const GithubBuildStatusReporter = require('../../../../api/services/GithubBuildStatusReporter');
 
@@ -339,8 +340,8 @@ describe('GithubBuildStatusReporter', () => {
           branch: 'preview-branch',
         }).then((_build) => {
           build = _build;
-          return build.getUser();
-        }).then((user) => {
+          return Promise.all([build.getUser(), build.getSite()]);
+        }).then(([user, site]) => {
           repoNock = githubAPINocks.repo({
             accessToken: 'fake-access-token',
             owner: 'test-owner',
@@ -351,7 +352,7 @@ describe('GithubBuildStatusReporter', () => {
             owner: 'test-owner',
             repo: 'test-repo',
             sha: commitSha,
-            targetURL: 'https://test-bucket.app.cloud.gov/preview/test-owner/test-repo/preview-branch/',
+            targetURL: buildViewLink(build, site),
           });
 
           return GithubBuildStatusReporter.reportBuildStatus(build);
