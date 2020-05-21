@@ -360,22 +360,22 @@ const getOrganizationMembers = ({
 };
 
 const getTeamMembers = ({
-  accessToken, team_id, per_page, page, response,
+  accessToken, org, team_slug, per_page, page, response,
 } = {}) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
-  team_id = team_id || 'test-team';
+  team_slug = team_slug || 'test-team';
   per_page = per_page || 100;
   page = page || 1;
   /* eslint-enable no-param-reassign */
 
   const teamMembers = [];
   for (let i = 0; i < (per_page + 2); i += 1) {
-    teamMembers.push({ login: `user-${team_id}-${i}` });
+    teamMembers.push({ login: `user-${team_slug}-${i}` });
   }
 
   return withAuth(nock('https://api.github.com'), accessToken)
-    .get(`/teams/${team_id}/members?per_page=${per_page}&page=${page}`)
+    .get(`/orgs/${org}/teams/${team_slug}/members?per_page=${per_page}&page=${page}`)
     .reply(response || 200, teamMembers.slice(((page - 1) * per_page), page * per_page));
 };
 

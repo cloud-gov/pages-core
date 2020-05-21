@@ -545,7 +545,7 @@ describe('GitHub', () => {
     it('returns a branch based on the supplied parameters', (done) => {
       const accessToken = 'token';
       const org = 'federalist-users';
-      const team_slug = 12345;
+      const team_slug = '12345';
 
       githubAPINocks.getTeamMembers({ accessToken, org, team_slug });
       githubAPINocks.getTeamMembers({
