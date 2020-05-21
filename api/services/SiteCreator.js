@@ -197,7 +197,7 @@ function createSiteFromTemplate({ siteParams, user, template }) {
   return validateSite(params)
     .then((model) => {
       site = model;
-      return GitHub.createRepo(user, owner, repository);
+      return GitHub.createRepoFromTemplate(user, owner, repository, template);
     })
     .then(() => saveAndBuildSite({ site, user, template }));
 }
