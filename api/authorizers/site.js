@@ -26,7 +26,7 @@ const authorizeAdmin = (user, site) => (
       return Promise.resolve(site.id);
     })
     .catch((error) => {
-      if (error.code === 404) {
+      if (error.status === 404) {
       // authorize user if the site's repo does not exist:
       // When a user attempts to delete a site after deleting the repo, Federalist
       // attempts to fetch the repo but it no longer exists and receives a 404

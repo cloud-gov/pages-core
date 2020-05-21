@@ -217,8 +217,8 @@ describe('SiteCreator', () => {
           });
           return SiteCreator.createSite({ user, siteParams });
         }).catch((err) => {
-          expect(err.code).to.eq(404);
-          expect(err.status).to.eq('Not Found');
+          expect(err.status).to.eq(400);
+          expect(err.message).to.eq(`The repository ${siteParams.owner}/${siteParams.repository} does not exist.`);
           done();
         }).catch(done);
       });

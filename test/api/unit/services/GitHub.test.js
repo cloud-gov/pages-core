@@ -397,7 +397,9 @@ describe('GitHub', () => {
 
         return GitHub.getBranch(values.user, owner, repository)
           .catch((err) => {
-            expect(err.code).to.equal(400);
+            // octokit no longer validates the arguments client side so the error
+            // we are receiving here is actually the missing nock...
+            expect(err.status).to.equal(500);
             done();
           });
       })
@@ -425,7 +427,7 @@ describe('GitHub', () => {
 
       GitHub.getRepositories(accessToken)
         .catch((err) => {
-          expect(err.code).to.exist;
+          expect(err.status).to.exist;
           done();
         });
     });
@@ -464,7 +466,7 @@ describe('GitHub', () => {
 
       GitHub.getRepositories(accessToken)
         .catch((err) => {
-          expect(err.code).to.exist;
+          expect(err.status).to.exist;
           done();
         });
     });
@@ -493,7 +495,7 @@ describe('GitHub', () => {
       githubAPINocks.getOrganizationMembers({ accessToken, organization });
       GitHub.getOrganizationMembers(accessToken, organization)
         .catch((err) => {
-          expect(err.code).to.exist;
+          expect(err.status).to.exist;
           done();
         });
     });
@@ -553,12 +555,13 @@ describe('GitHub', () => {
     /* eslint-disable camelcase */
     it('returns a branch based on the supplied parameters', (done) => {
       const accessToken = 'token';
-      const team_id = 12345;
+      const org = 'federalist-users';
+      const team_slug = 12345;
 
-      githubAPINocks.getTeamMembers({ accessToken, team_id });
-      githubAPINocks.getTeamMembers({ accessToken, team_id, page: 2 });
-      githubAPINocks.getTeamMembers({ accessToken, team_id, page: 3 });
-      GitHub.getTeamMembers(accessToken, team_id)
+      githubAPINocks.getTeamMembers({ accessToken, org, team_slug });
+      githubAPINocks.getTeamMembers({ accessToken, org, team_slug, page: 2 });
+      githubAPINocks.getTeamMembers({ accessToken, org, team_slug, page: 3 });
+      GitHub.getTeamMembers(accessToken, org, team_slug)
         .then((members) => {
           expect(members.length).to.equal(102);
           done();
@@ -568,12 +571,13 @@ describe('GitHub', () => {
 
     it('returns a branch based on the supplied parameters', (done) => {
       const accessToken = 'token';
-      const team_id = 'failTeam';
+      const org = 'federalist-users';
+      const team_slug = 'failTeam';
 
-      githubAPINocks.getTeamMembers({ accessToken, team_id });
-      GitHub.getTeamMembers(accessToken, team_id)
+      githubAPINocks.getTeamMembers({ accessToken, org, team_slug });
+      GitHub.getTeamMembers(accessToken, org, team_slug)
         .catch((err) => {
-          expect(err.code).to.exist;
+          expect(err.status).to.exist;
           done();
         });
     });
@@ -636,7 +640,7 @@ describe('GitHub', () => {
 
       GitHub.sendCreateGithubStatusRequest(accessToken, options)
         .catch((err) => {
-          expect(err.status).to.equal('Not Found');
+          expect(err.status).to.equal(404);
           expect(err.message).to.equal('File not found');
           done();
         }).catch(done);
