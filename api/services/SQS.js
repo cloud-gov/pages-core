@@ -46,8 +46,6 @@ const buildLogCallbackURL = build => [
   build.token,
 ].join('/');
 
-const sourceForBuild = build => build.source || {};
-
 const buildUEVs = uevs => (uevs
   ? uevs.map(uev => ({
     name: uev.name,
@@ -64,15 +62,13 @@ const generateDefaultCredentials = build => ({
   BUCKET: config.s3.bucket,
   BASEURL: baseURLForBuild(build),
   CACHE_CONTROL: buildConfig.cacheControl,
-  BRANCH: sourceForBuild(build).branch || build.branch,
+  BRANCH: build.branch,
   CONFIG: siteConfig(build),
   REPOSITORY: build.Site.repository,
   OWNER: build.Site.owner,
   SITE_PREFIX: sitePrefixForBuild(buildUrl(build, build.Site)),
   GITHUB_TOKEN: build.User.githubAccessToken,
   GENERATOR: build.Site.engine,
-  SOURCE_REPO: sourceForBuild(build).repository,
-  SOURCE_OWNER: sourceForBuild(build).owner,
   SKIP_LOGGING: config.app.app_env === 'development',
   AUTH_BASEURL: process.env.APP_HOSTNAME,
   AUTH_ENDPOINT: 'external/auth/github',
