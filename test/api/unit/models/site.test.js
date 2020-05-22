@@ -11,6 +11,8 @@ describe('Site model', () => {
       }).then((site) => {
         expect(site.owner).to.equal('repoowner');
         expect(site.repository).to.equal('reponame');
+        expect(site.subdomain).to.equal(site.s3ServiceName);
+        expect(site.subdomain).to.not.be.undefined;
         done();
       }).catch(done);
     });
