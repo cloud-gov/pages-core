@@ -175,6 +175,22 @@ module.exports = {
     })
     .catch(handleCreateRepoError),
 
+  createRepoFromTemplate: (user, owner, name, template) => githubClient(user.githubAccessToken)
+    .then((github) => {
+      const params = {
+        template_owner: template.owner,
+        template_repo: template.repo,
+        name,
+      };
+
+      if (user.username.toLowerCase() !== owner.toLowerCase()) {
+        params.owner = owner;
+      }
+
+      return github.repos.createUsingTemplate(params);
+    })
+    .catch(handleCreateRepoError),
+
   getRepository: (user, owner, repo) => githubClient(user.githubAccessToken)
     .then(github => getRepository(github, { owner, repo }))
     .catch((err) => {
