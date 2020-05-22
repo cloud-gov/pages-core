@@ -577,7 +577,7 @@ describe('Site API', () => {
         cookie: authenticatedSession(userPromise),
       })
         .then((models) => {
-          ({ user, site } = models.user);
+          ({ user, site } = models);
 
           return request(app)
             .post('/v0/site/user')
@@ -1403,7 +1403,7 @@ describe('Site API', () => {
         cookie: cookiePromise,
       })
         .then((results) => {
-          ({ site } = results.site);
+          ({ site } = results);
 
           return request(app)
             .put(`/v0/site/${site.id}`)
