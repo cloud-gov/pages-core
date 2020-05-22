@@ -3,7 +3,7 @@ const { DynamoDBDocumentHelper } = require('./DynamoDBDocumentHelper');
 const config = require('../../config');
 const tableName = config.app.proxySiteTable; //for now only 1 table
 const siteKey = 'id';//'owner_repository';
-const getSiteKey = (site) => `site-${site.id}`;//[site.owner, site.repository].join('/');
+const getSiteKey = (site) => site.subdomain;//[site.owner, site.repository].join('/');
 
 const removeSite = (site) => {
 	const docClient = new DynamoDBDocumentHelper(config.dynamoDB);

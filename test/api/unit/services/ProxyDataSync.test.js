@@ -15,6 +15,11 @@ const site = {
 }
 
 describe('ProxyDataSync', () => {
+  it('uses the site\'s subdomain as the sitekey', (done) => {
+    expect(getSiteKey(site)).to.eql(site.subdomain);
+    done();;
+  });
+
   it('can save an item', (done) => {
   	const putStub = sinon.stub(DynamoDBDocumentHelper.prototype, 'put');//.returns({});
 		saveSite(site);
