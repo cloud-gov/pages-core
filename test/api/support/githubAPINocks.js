@@ -1,8 +1,7 @@
 const nock = require('nock');
 const config = require('../../../config');
 
-const withAuth = (nok, accessToken) =>
-  nok.matchHeader('authorization', `token ${accessToken}`);
+const withAuth = (nok, accessToken) => nok.matchHeader('authorization', `token ${accessToken}`);
 
 const getAccessToken = ({ authorizationCode, accessToken, scope } = {}) => {
   /* eslint-disable no-param-reassign */
@@ -23,9 +22,9 @@ const getAccessToken = ({ authorizationCode, accessToken, scope } = {}) => {
         client_secret: config.passport.github.options.clientSecret,
         code: authorizationCode,
       };
-      return body.client_id === expectedBody.client_id &&
-        body.client_secret === expectedBody.client_secret &&
-        body.code === expectedBody.code;
+      return body.client_id === expectedBody.client_id
+        && body.client_secret === expectedBody.client_secret
+        && body.code === expectedBody.code;
     })
     .reply(200, {
       token_type: 'bearer',
@@ -34,7 +33,9 @@ const getAccessToken = ({ authorizationCode, accessToken, scope } = {}) => {
     });
 };
 
-const createRepoForOrg = ({ accessToken, org, repo, response } = {}) => {
+const createRepoForOrg = ({
+  accessToken, org, repo, response,
+} = {}) => {
   let createRepoNock = nock('https://api.github.com');
 
   if (org && repo) {
@@ -98,7 +99,49 @@ const createRepoForUser = ({ accessToken, repo, response } = {}) => {
   return createRepoNock.reply(...resp);
 };
 
-const user = ({ accessToken, githubUserID, username, email } = {}) => {
+const createRepoUsingTemplate = ({
+  accessToken, repo, owner, template, response,
+} = {}) => {
+  let createRepoNock = nock('https://api.github.com');
+
+  if (repo && template) {
+    const params = {
+      name: repo,
+    };
+
+    if (owner) {
+      params.owner = owner;
+    }
+
+    createRepoNock = createRepoNock.post(`/repos/${template.owner}/${template.repo}/generate`, params);
+  } else {
+    createRepoNock = createRepoNock.post(/\/repos\/.+\/.+\/generate/);
+  }
+
+  if (accessToken) {
+    createRepoNock = withAuth(createRepoNock, accessToken);
+  }
+
+  createRepoNock = createRepoNock.query(true);
+
+  const typicalResponse = {
+    owner: { login: 'your-name-here' },
+    name: repo,
+  };
+
+  let resp = response || 201;
+  if (typeof resp === 'number') {
+    resp = [resp, typicalResponse];
+  } else if (resp[1] === undefined) {
+    resp[1] = typicalResponse;
+  }
+
+  return createRepoNock.reply(...resp);
+};
+
+const user = ({
+  accessToken, githubUserID, username, email,
+} = {}) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
 
@@ -132,7 +175,7 @@ const userOrganizations = ({ accessToken, organizations, response } = {}) => {
     orgsNock = withAuth(orgsNock, accessToken);
   }
 
-  return orgsNock.get(`/user/orgs`)
+  return orgsNock.get('/user/orgs')
     .reply(response || 200, organizations);
 };
 
@@ -142,8 +185,10 @@ const githubAuth = (username, organizations) => {
   userOrganizations({ organizations });
 };
 
-// eslint-disable-next-line no-shadow
-const repo = ({ accessToken, owner, repo, username, response } = {}) => {
+const repo = ({
+  // eslint-disable-next-line no-shadow
+  accessToken, owner, repo, username, response,
+} = {}) => {
   let webhookNock = nock('https://api.github.com');
 
   if (owner && repo) {
@@ -180,8 +225,10 @@ const repo = ({ accessToken, owner, repo, username, response } = {}) => {
   return webhookNock.reply(...resp);
 };
 
-// eslint-disable-next-line no-shadow
-const status = ({ accessToken, owner, repo, sha, state, targetURL, response } = {}) => {
+const status = ({
+  // eslint-disable-next-line no-shadow
+  accessToken, owner, repo, sha, state, targetURL, response,
+} = {}) => {
   let path;
   if (owner && repo && sha) {
     path = `/repos/${owner}/${repo}/statuses/${sha}`;
@@ -197,7 +244,7 @@ const status = ({ accessToken, owner, repo, sha, state, targetURL, response } = 
     const appEnv = config.app.app_env;
     if (appEnv === 'production' && body.context !== 'federalist/build') {
       return false;
-    } else if (appEnv !== 'production' && body.context !== `federalist-${appEnv}/build`) {
+    } if (appEnv !== 'production' && body.context !== `federalist-${appEnv}/build`) {
       return false;
     }
 
@@ -222,8 +269,10 @@ const status = ({ accessToken, owner, repo, sha, state, targetURL, response } = 
   return statusNock.reply(...resp);
 };
 
-// eslint-disable-next-line no-shadow
-const webhook = ({ accessToken, owner, repo, response } = {}) => {
+const webhook = ({
+  // eslint-disable-next-line no-shadow
+  accessToken, owner, repo, response,
+} = {}) => {
   let webhookNock = nock('https://api.github.com');
 
   if (owner && repo) {
@@ -254,8 +303,10 @@ const webhook = ({ accessToken, owner, repo, response } = {}) => {
   return webhookNock.reply(...resp);
 };
 
-// eslint-disable-next-line no-shadow
-const getBranch = ({ accessToken, owner, repo, branch, expected }) => {
+const getBranch = ({
+  // eslint-disable-next-line no-shadow
+  accessToken, owner, repo, branch, expected,
+}) => {
   let branchNock = nock('https://api.github.com');
   const path = `/repos/${owner}/${repo}/branches/${branch}`;
 
@@ -278,7 +329,9 @@ const getBranch = ({ accessToken, owner, repo, branch, expected }) => {
 };
 
 /* eslint-disable camelcase */
-const getOrganizationMembers = ({ accessToken, organization, role, per_page, page, response, responseCode }) => {
+const getOrganizationMembers = ({
+  accessToken, organization, role, per_page, page, response, responseCode,
+}) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   organization = organization || 'test-org';
@@ -300,28 +353,35 @@ const getOrganizationMembers = ({ accessToken, organization, role, per_page, pag
 
   return withAuth(nock('https://api.github.com'), accessToken)
     .get(`/orgs/${organization}/members?per_page=${per_page}&page=${page}&role=${role}`)
-    .reply(responseCode || 200, response || orgMembers.slice(((page - 1) * per_page), (page * per_page)));
+    .reply(
+      responseCode || 200,
+      response || orgMembers.slice(((page - 1) * per_page), (page * per_page))
+    );
 };
 
-const getTeamMembers = ({ accessToken, team_id, per_page, page, response } = {}) => {
+const getTeamMembers = ({
+  accessToken, org, team_slug, per_page, page, response,
+} = {}) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
-  team_id = team_id || 'test-team';
+  team_slug = team_slug || 'test-team';
   per_page = per_page || 100;
   page = page || 1;
   /* eslint-enable no-param-reassign */
 
   const teamMembers = [];
   for (let i = 0; i < (per_page + 2); i += 1) {
-    teamMembers.push({ login: `user-${team_id}-${i}` });
+    teamMembers.push({ login: `user-${team_slug}-${i}` });
   }
 
   return withAuth(nock('https://api.github.com'), accessToken)
-    .get(`/teams/${team_id}/members?per_page=${per_page}&page=${page}`)
+    .get(`/orgs/${org}/teams/${team_slug}/members?per_page=${per_page}&page=${page}`)
     .reply(response || 200, teamMembers.slice(((page - 1) * per_page), page * per_page));
 };
 
-const getRepositories = ({ accessToken, per_page, page, response }) => {
+const getRepositories = ({
+  accessToken, per_page, page, response,
+}) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   per_page = per_page || 100;
@@ -338,7 +398,9 @@ const getRepositories = ({ accessToken, per_page, page, response }) => {
     .reply(response || 200, repos.slice(((page - 1) * per_page), (page * per_page)));
 };
 
-const getCollaborators = ({ accessToken, owner, repository, per_page, page, response }) => {
+const getCollaborators = ({
+  accessToken, owner, repository, per_page, page, response,
+}) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   per_page = per_page || 100;
@@ -362,6 +424,7 @@ module.exports = {
   getAccessToken,
   createRepoForOrg,
   createRepoForUser,
+  createRepoUsingTemplate,
   githubAuth,
   repo,
   status,
