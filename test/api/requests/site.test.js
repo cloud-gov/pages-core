@@ -1443,8 +1443,7 @@ describe('Site API', () => {
         cookie: cookiePromise,
       })
         .then((results) => {
-          // eslint-disable-next-line prefer-destructuring
-          site = results.site;
+          ({ site } = results.site);
 
           return request(app)
             .put(`/v0/site/${site.id}`)
