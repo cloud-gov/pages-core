@@ -1184,7 +1184,7 @@ describe('Site API', () => {
         site: sitePromise,
         cookie: sessionPromise,
       }).then((results) => {
-        ({ site } = results.site);
+        ({ site } = results);
         nock.cleanAll();
         githubAPINocks.repo({
           owner: site.owner,
@@ -1443,7 +1443,7 @@ describe('Site API', () => {
         cookie: cookiePromise,
       })
         .then((results) => {
-          ({ site } = results.site);
+          ({ site } = results);
 
           return request(app)
             .put(`/v0/site/${site.id}`)
@@ -1480,7 +1480,7 @@ describe('Site API', () => {
         cookie: cookiePromise,
       })
         .then((results) => {
-          ({ site } = results.site);
+          ({ site } = results);
 
           return request(app)
             .put(`/v0/site/${site.id}`)
