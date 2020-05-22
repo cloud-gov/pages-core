@@ -8,6 +8,7 @@ const siteSerializer = require('../serializers/site');
 const { User, Site, Build } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const { logger } = require('../../winston');
+const ProxyDataSync = require('../services/ProxyDataSync');
 
 const sendJSON = (site, res) => siteSerializer
   .serialize(site)
@@ -73,6 +74,8 @@ module.exports = {
       })
       .then(() => S3SiteRemover.removeSite(site))
       .then(() => S3SiteRemover.removeInfrastructure(site))
+      .then(() => ProxyDataSync.removeSite(site)
+        .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n'))))
       .then(() => site.destroy())
       .then(() => {
         res.json(siteJSON);
@@ -147,13 +150,18 @@ module.exports = {
     const siteParams = Object.assign({}, body, {
       sharedBucket: false,
     });
-
+    let site;
     authorizer.create(user, siteParams)
       .then(() => SiteCreator.createSite({
         user,
         siteParams,
       }))
-      .then(site => siteSerializer.serialize(site))
+      .then(_site => {
+        site = _site;
+        return ProxyDataSync.saveSite(site)
+          .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+      })
+      .then(() => siteSerializer.serialize(site))
       .then((siteJSON) => {
         res.json(siteJSON);
       })

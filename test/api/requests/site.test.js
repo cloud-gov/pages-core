@@ -18,6 +18,7 @@ const csrfToken = require('../support/csrfToken');
 const { Build, Site, User } = require('../../../api/models');
 const S3SiteRemover = require('../../../api/services/S3SiteRemover');
 const siteErrors = require('../../../api/responses/siteErrors');
+const ProxyDataSync = require('../../../api/services/ProxyDataSync');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 
@@ -243,15 +244,21 @@ describe('Site API', () => {
       mockRouteResponse(s3.bucket);
     }
 
+    let proxyRemoveSiteStub;
+    let proxySaveSiteStub;
+
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.repo();
       githubAPINocks.createRepoForOrg();
       githubAPINocks.webhook();
+      proxyRemoveSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
+      proxySaveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
     });
 
     afterEach(() => {
       nock.cleanAll();
+      sinon.restore();
     });
 
     it('should require a valid csrf token', (done) => {
@@ -1055,10 +1062,10 @@ describe('Site API', () => {
   });
 
   describe('DELETE /v0/site/:id', () => {
-    let removeSiteStub;
+    let s3RemoveSiteStub;
 
     beforeEach(() => {
-      removeSiteStub = sinon.stub(S3SiteRemover, 'removeSite').resolves();
+      s3RemoveSiteStub = sinon.stub(S3SiteRemover, 'removeSite').resolves();
     });
 
     afterEach(() => {
@@ -1202,8 +1209,8 @@ describe('Site API', () => {
           .expect(200);
       })
         .then(() => {
-          sinon.assert.calledOnce(removeSiteStub);
-          expect(removeSiteStub.firstCall.args[0].id).to.eq(site.id);
+          sinon.assert.calledOnce(s3RemoveSiteStub);
+          expect(s3RemoveSiteStub.firstCall.args[0].id).to.eq(site.id);
           done();
         })
         .catch(done);
