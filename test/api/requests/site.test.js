@@ -577,10 +577,7 @@ describe('Site API', () => {
         cookie: authenticatedSession(userPromise),
       })
         .then((models) => {
-          // eslint-disable-next-line prefer-destructuring
-          user = models.user;
-          // eslint-disable-next-line prefer-destructuring
-          site = models.site;
+          ({ user, site } = models.user);
 
           return request(app)
             .post('/v0/site/user')
@@ -1187,8 +1184,7 @@ describe('Site API', () => {
         site: sitePromise,
         cookie: sessionPromise,
       }).then((results) => {
-        // eslint-disable-next-line prefer-destructuring
-        site = results.site;
+        ({ site } = results.site);
         nock.cleanAll();
         githubAPINocks.repo({
           owner: site.owner,
@@ -1407,8 +1403,7 @@ describe('Site API', () => {
         cookie: cookiePromise,
       })
         .then((results) => {
-          // eslint-disable-next-line prefer-destructuring
-          site = results.site;
+          ({ site } = results.site);
 
           return request(app)
             .put(`/v0/site/${site.id}`)
@@ -1486,8 +1481,7 @@ describe('Site API', () => {
         cookie: cookiePromise,
       })
         .then((results) => {
-          // eslint-disable-next-line prefer-destructuring
-          site = results.site;
+          ({ site } = results.site);
 
           return request(app)
             .put(`/v0/site/${site.id}`)
