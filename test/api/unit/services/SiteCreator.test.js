@@ -217,8 +217,8 @@ describe('SiteCreator', () => {
           });
           return SiteCreator.createSite({ user, siteParams });
         }).catch((err) => {
-          expect(err.status).to.eq(400);
-          expect(err.message).to.eq(`The repository ${siteParams.owner}/${siteParams.repository} does not exist.`);
+          expect(err.code).to.eq(404);
+          expect(err.status).to.eq('Not Found');
           done();
         }).catch(done);
       });
@@ -253,18 +253,17 @@ describe('SiteCreator', () => {
     });
 
     context('when the site is created from a template', () => {
-      const template = 'uswds2';
       const siteParams = {
         owner: crypto.randomBytes(3).toString('hex'),
         repository: crypto.randomBytes(3).toString('hex'),
-        template,
+        template: 'uswds2',
       };
       let user;
 
       it('should create a new site record for the given repository and add the user', (done) => {
         factory.user().then((model) => {
           user = model;
-          githubAPINocks.createRepoUsingTemplate();
+          githubAPINocks.createRepoForOrg();
           githubAPINocks.webhook();
           return SiteCreator.createSite({ user, siteParams });
         }).then((site) => {
@@ -293,7 +292,7 @@ describe('SiteCreator', () => {
         factory.user()
           .then((model) => {
             user = model;
-            githubAPINocks.createRepoUsingTemplate();
+            githubAPINocks.createRepoForOrg();
             githubAPINocks.webhook();
             return SiteCreator.createSite({ siteParams, user });
           }).then((site) => {
@@ -314,13 +313,15 @@ describe('SiteCreator', () => {
 
         factory.user().then((model) => {
           user = model;
-          githubAPINocks.createRepoUsingTemplate();
+          githubAPINocks.createRepoForOrg();
           githubAPINocks.webhook();
           return SiteCreator.createSite({ siteParams, user });
         }).then(site => Site.findByPk(site.id, { include: [Build] })).then((site) => {
           expect(site.Builds).to.have.length(1);
           expect(site.Builds[0].user).to.equal(user.id);
           expect(site.Builds[0].branch).to.equal(site.defaultBranch);
+          expect(site.Builds[0].source.repository).to.equal(fakeTemplate.repo);
+          expect(site.Builds[0].source.owner).to.equal(fakeTemplate.owner);
 
           templateResolverStub.restore();
 
@@ -335,7 +336,7 @@ describe('SiteCreator', () => {
         factory.user()
           .then((model) => {
             user = model;
-            githubAPINocks.createRepoUsingTemplate();
+            githubAPINocks.createRepoForOrg();
             webhookNock = githubAPINocks.webhook({
               accessToken: user.githubAccessToken,
               owner: siteParams.owner,
@@ -355,11 +356,10 @@ describe('SiteCreator', () => {
           .then((model) => {
             user = model;
 
-            githubAPINocks.createRepoUsingTemplate({
+            githubAPINocks.createRepoForOrg({
               accessToken: user.accessToken,
-              owner: siteParams.owner,
+              org: siteParams.owner,
               repo: siteParams.repository,
-              template: TemplateResolver.getTemplate(template),
               response: [422, {
                 errors: [{ message: 'name already exists on this account' }],
               }],

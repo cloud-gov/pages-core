@@ -543,6 +543,25 @@ describe('SQS', () => {
         .catch(done);
     });
 
+    it('sets SOURCE_REPO, SOURCE_OWNER, and BRANCH in the repository if the build has a source owner / repo', (done) => {
+      const buildParams = {
+        repository: 'template',
+        owner: '18f',
+        branch: 'my-branch',
+      };
+      factory.site({ engine: 'hugo' })
+        .then(() => factory.build({ source: buildParams }))
+        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
+        .then(build => SQS.messageBodyForBuild(build))
+        .then((message) => {
+          expect(messageEnv(message, 'SOURCE_REPO')).to.equal(buildParams.repository);
+          expect(messageEnv(message, 'SOURCE_OWNER')).to.equal(buildParams.owner);
+          expect(messageEnv(message, 'BRANCH')).to.equal(buildParams.branch);
+          done();
+        })
+        .catch(done);
+    });
+
     describe('SKIP_LOGGING', () => {
       const origAppEnv = config.app.app_env;
 

@@ -15,7 +15,7 @@ function getOrganizationMembers(githubAccessToken, orgName = '18F', role = 'all'
   return this.organizations[orgName];
 }
 
-function getTeamMembers(githubAccessToken, org, teamId) {
+function getTeamMembers(githubAccessToken, teamId) {
   this.teams = this.teams || {};
   this.teams[teamId] = this.teams[teamId] || [];
   return this.teams[teamId];

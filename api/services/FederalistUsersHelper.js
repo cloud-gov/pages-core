@@ -4,8 +4,6 @@ const config = require('../../config');
 
 const { User } = require('../models');
 
-const federalistOrg = 'federalist-users';
-
 const audit18F = ({ auditorUsername, fedUserTeams }) => {
   /* eslint-disable no-param-reassign */
   auditorUsername = auditorUsername || config.federalistUsers.admin;
@@ -23,14 +21,12 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
     })
     .then((members) => {
       members18F = members.map(member => member.login);
-      return GitHub.getOrganizationMembers(auditor.githubAccessToken, federalistOrg, 'admin');
+      return GitHub.getOrganizationMembers(auditor.githubAccessToken, 'federalist-users', 'admin');
     })
     .then((admins) => {
       adminFedUsers = admins.map(member => member.login);
       return Promise.all(
-        fedUserTeams.map(team => GitHub.getTeamMembers(
-          auditor.githubAccessToken, federalistOrg, team
-        ))
+        fedUserTeams.map(team => GitHub.getTeamMembers(auditor.githubAccessToken, team))
       );
     })
     .then((teams) => {
@@ -39,9 +35,7 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
         teams.forEach((team) => {
           team.forEach((member) => {
             if (!members18F.includes(member.login) && !adminFedUsers.includes(member.login)) {
-              removed.push(GitHub.removeOrganizationMember(
-                auditor.githubAccessToken, federalistOrg, member.login
-              ));
+              removed.push(GitHub.removeOrganizationMember(auditor.githubAccessToken, 'federalist-users', member.login));
               logger.info(`federalist-users: removed user ${member.login}`);
             }
           });
@@ -53,7 +47,7 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
 
 const federalistUsersAdmins = auditorUsername => User
   .findOne({ where: { username: auditorUsername } })
-  .then(auditor => GitHub.getOrganizationMembers(auditor.githubAccessToken, federalistOrg, 'admin'))
+  .then(auditor => GitHub.getOrganizationMembers(auditor.githubAccessToken, 'federalist-users', 'admin'))
   .then(admins => Promise.all(admins.map(admin => admin.login)));
 
 module.exports = { audit18F, federalistUsersAdmins };

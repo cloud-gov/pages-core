@@ -351,7 +351,7 @@ describe('Site API', () => {
 
       cfMockServices(siteOwner, siteRepository);
 
-      const createRepoNock = githubAPINocks.createRepoUsingTemplate({
+      const createRepoNock = githubAPINocks.createRepoForOrg({
         org: siteOwner,
         repo: siteRepository,
       });
@@ -577,7 +577,8 @@ describe('Site API', () => {
         cookie: authenticatedSession(userPromise),
       })
         .then((models) => {
-          ({ user, site } = models);
+          user = models.user;
+          site = models.site;
 
           return request(app)
             .post('/v0/site/user')
@@ -1184,7 +1185,7 @@ describe('Site API', () => {
         site: sitePromise,
         cookie: sessionPromise,
       }).then((results) => {
-        ({ site } = results);
+        site = results.site;
         nock.cleanAll();
         githubAPINocks.repo({
           owner: site.owner,
@@ -1403,7 +1404,7 @@ describe('Site API', () => {
         cookie: cookiePromise,
       })
         .then((results) => {
-          ({ site } = results);
+          site = results.site;
 
           return request(app)
             .put(`/v0/site/${site.id}`)
@@ -1443,7 +1444,7 @@ describe('Site API', () => {
         cookie: cookiePromise,
       })
         .then((results) => {
-          ({ site } = results);
+          site = results.site;
 
           return request(app)
             .put(`/v0/site/${site.id}`)
@@ -1480,7 +1481,7 @@ describe('Site API', () => {
         cookie: cookiePromise,
       })
         .then((results) => {
-          ({ site } = results);
+          site = results.site;
 
           return request(app)
             .put(`/v0/site/${site.id}`)

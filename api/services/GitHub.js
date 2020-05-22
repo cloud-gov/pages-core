@@ -1,14 +1,14 @@
-const { Octokit } = require('@octokit/rest');
+const octokit = require('@octokit/rest');
 const config = require('../../config');
 const { User } = require('../models');
 
-const createRepoForOrg = (github, options) => github.repos.createInOrg(options);
+const createRepoForOrg = (github, options) => github.repos.createForOrg(options);
 
-const createRepoForUser = (github, options) => github.repos.createForAuthenticatedUser(options);
+const createRepoForUser = (github, options) => github.repos.create(options);
 
 const createWebhook = (github, options) => github.repos.createHook(options);
 
-const getOrganizations = github => github.orgs.listForAuthenticatedUser().then(orgs => orgs.data);
+const getOrganizations = github => github.users.getOrgs({}).then(orgs => orgs.data);
 
 const getRepository = (github, options) => github.repos.get(options).then(repos => repos.data);
 
@@ -16,16 +16,23 @@ const getBranch = (github, { owner, repo, branch }) => github.repos
   .getBranch({ owner, repo, branch })
   .then(branchInfo => branchInfo.data);
 
-const githubClient = async accessToken => new Octokit({ auth: accessToken });
+const githubClient = accessToken => new Promise((resolve) => {
+  const client = octokit();
+  client.authenticate({
+    type: 'token',
+    token: accessToken,
+  });
+  resolve(client);
+});
 
 const parseGithubErrorMessage = (error) => {
   let githubError = 'Encountered an unexpected GitHub error';
 
   try {
-    githubError = error.errors[0].message;
+    githubError = JSON.parse(error.message).errors[0].message;
   } catch (e) {
     try {
-      githubError = error.message;
+      githubError = JSON.parse(error.message).message;
     } catch (e2) { /* noop */ }
   }
 
@@ -42,7 +49,7 @@ const handleCreateRepoError = (err) => {
   if (githubError === REPO_EXISTS_MESSAGE) {
     error.status = 400;
     error.message = 'A repo with that name already exists.';
-  } else if (githubError && error.status === 403) {
+  } else if (githubError && error.code === 403) {
     error.status = 400;
     error.message = githubError;
   }
@@ -100,18 +107,16 @@ function getNextOrganizationMembers(github, org, role = 'all', { page = 1, allMe
 }
 
 /* eslint-disable camelcase */
-const getTeamMembers = (github, org, team_slug, page = 1) => github.teams
-  .listMembersInOrg({
-    org, team_slug, per_page: 100, page,
-  })
+const getTeamMembers = (github, team_id, page = 1) => github.teams
+  .listMembers({ team_id, per_page: 100, page })
   .then(teams => teams.data);
 
-function getNextTeamMembers(github, org, team_slug, page = 1, allMembers = []) {
-  return getTeamMembers(github, org, team_slug, page)
+function getNextTeamMembers(github, team_id, page = 1, allMembers = []) {
+  return getTeamMembers(github, team_id, page)
     .then((members) => {
       if (members.length > 0) {
         allMembers = allMembers.concat(members); // eslint-disable-line no-param-reassign
-        return getNextTeamMembers(github, org, team_slug, page + 1, allMembers);
+        return getNextTeamMembers(github, team_id, page + 1, allMembers);
       }
       return allMembers;
     });
@@ -121,9 +126,7 @@ function getNextTeamMembers(github, org, team_slug, page = 1, allMembers = []) {
 const removeOrganizationMember = (github, org, username) => github.orgs
   .removeMember({ org, username });
 
-const getRepositories = (github, page = 1) => github.repos.listForAuthenticatedUser({
-  per_page: 100, page,
-})
+const getRepositories = (github, page = 1) => github.repos.getAll({ per_page: 100, page })
   .then(repos => repos.data);
 
 const getNextRepositories = (github, page = 1, allRepos = []) => getRepositories(github, page)
@@ -172,22 +175,6 @@ module.exports = {
         name: repository,
         org: owner,
       });
-    })
-    .catch(handleCreateRepoError),
-
-  createRepoFromTemplate: (user, owner, name, template) => githubClient(user.githubAccessToken)
-    .then((github) => {
-      const params = {
-        template_owner: template.owner,
-        template_repo: template.repo,
-        name,
-      };
-
-      if (user.username.toLowerCase() !== owner.toLowerCase()) {
-        params.owner = owner;
-      }
-
-      return github.repos.createUsingTemplate(params);
     })
     .catch(handleCreateRepoError),
 
@@ -249,13 +236,13 @@ module.exports = {
   getOrganizationMembers: (accessToken, organization, role = 'all') => githubClient(accessToken)
     .then(github => getNextOrganizationMembers(github, organization, role)),
 
-  getTeamMembers: (accessToken, org, teamSlug) => githubClient(accessToken)
-    .then(github => getNextTeamMembers(github, org, teamSlug)),
+  getTeamMembers: (accessToken, teamId) => githubClient(accessToken)
+    .then(github => getNextTeamMembers(github, teamId)),
 
   removeOrganizationMember: (accessToken, organization, member) => githubClient(accessToken)
     .then(github => removeOrganizationMember(github, organization, member))
     .catch((err) => {
-      if (err.status === 404) {
+      if (err.code === 404) {
         return null;
       }
       throw err;
