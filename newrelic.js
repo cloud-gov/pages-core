@@ -19,4 +19,17 @@ exports.config = {
   // Comma-delimited list of HTTP status codes for the error collector to ignore
   // We ignore 403 errors because they are expected for unauthenticated users
   error_collector: { ignore_status_codes: [404, 403] },
+  allow_all_headers: true,
+  exclude: [
+    'request.headers.cookie',
+    'request.headers.authorization',
+    'request.headers.proxyAuthorization',
+    'request.headers.setCookie*',
+    'request.headers.x*',
+    'response.headers.cookie',
+    'response.headers.authorization',
+    'response.headers.proxyAuthorization',
+    'response.headers.setCookie*',
+    'response.headers.x*',
+  ],
 };
