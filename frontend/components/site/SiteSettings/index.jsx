@@ -8,7 +8,6 @@ import ExpandableArea from '../../ExpandableArea';
 import BasicSiteSettings from './BasicSiteSettings';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
 import EnvironmentVariables from './EnvironmentVariables';
-import CopyRepoForm from './CopyRepoForm';
 import siteActions from '../../../actions/siteActions';
 import { currentSite } from '../../../selectors/site';
 
@@ -31,22 +30,6 @@ class SiteSettings extends React.Component {
   handleUpdate(values) {
     const { site } = this.props;
     siteActions.updateSite(site, values);
-  }
-
-  handleCopySite({ newBaseBranch, newRepoName, targetOwner }) {
-    const { site } = this.props;
-    const siteParams = {
-      owner: targetOwner,
-      repository: newRepoName,
-      defaultBranch: newBaseBranch,
-      engine: site.engine,
-      source: {
-        owner: site.owner,
-        repo: site.repository,
-      },
-    };
-
-    siteActions.addSite(siteParams);
   }
 
   render() {
@@ -112,9 +95,6 @@ class SiteSettings extends React.Component {
           <EnvironmentVariables
             siteId={site.id}
           />
-        </ExpandableArea>
-        <ExpandableArea title="Copy site">
-          <CopyRepoForm onSubmit={this.handleCopySite} />
         </ExpandableArea>
       </div>
     );

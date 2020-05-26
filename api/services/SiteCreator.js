@@ -185,17 +185,6 @@ async function createSiteFromTemplate({ siteParams, user, template }) {
   return saveAndBuildSite({ site, user });
 }
 
-function createSiteFromSource({ siteParams, user }) {
-  const { owner, repository, source } = siteParams;
-
-  return checkSiteExists({ owner, repository })
-    .then(() => checkGithubRepository({ user, owner: source.owner, repository: source.repo }))
-    .then(() => checkGithubOrg({ user, owner: source.owner }))
-    .then(() => GitHub.createRepo(user, owner, repository))
-    .then(() => validateSite(siteParams))
-    .then(site => saveAndBuildSite({ site, user }));
-}
-
 function createSite({ user, siteParams }) {
   const templateName = siteParams.template;
 
@@ -204,13 +193,6 @@ function createSite({ user, siteParams }) {
 
   if (template) {
     return createSiteFromTemplate({ siteParams: newSiteParams, template, user });
-  }
-
-  if (siteParams.source) {
-    return createSiteFromSource({
-      siteParams: Object.assign({}, newSiteParams, { source: siteParams.source }),
-      user,
-    });
   }
 
   return createSiteFromExistingRepo({ siteParams: newSiteParams, user });
