@@ -42,7 +42,6 @@ export default (
           <Route path=":buildId/logs" component={SiteBuildLogs} />
         </Route>
         <Route path="users" component={SiteUsers} />
-        <Route path="branches" component={SiteGitHubBranches} />
         <Route path="notifications" component={NotificationSettings} />
       </Route>
       <Redirect from="*" to="/not-found" />
