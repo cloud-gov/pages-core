@@ -394,59 +394,6 @@ describe('SiteCreator', () => {
       });
     });
 
-    context('creating a site from an existing site', () => {
-      it('creates a repo and webhook, new site on federalist for specified user', (done) => {
-        let user;
-        let site;
-        let siteParams;
-        let webhookNock;
-
-        factory.user()
-          .then((userModel) => {
-            user = userModel;
-
-            return factory.site({ owner: user.username });
-          })
-          .then((siteModel) => {
-            site = siteModel;
-
-            return { site, user };
-          })
-          .then((values) => {
-            siteParams = {
-              owner: crypto.randomBytes(3).toString('hex'),
-              repository: crypto.randomBytes(3).toString('hex'),
-              defaultBranch: 'master',
-              source: {
-                owner: values.site.owner,
-                repo: values.site.repository,
-              },
-            };
-
-            githubAPINocks.repo();
-            githubAPINocks.createRepoForOrg();
-            webhookNock = githubAPINocks.webhook();
-
-            return SiteCreator.createSite({ user: values.user, siteParams })
-              .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
-              .then((model) => {
-                site = model;
-
-                validateSiteExpectations(
-                  site,
-                  siteParams.owner,
-                  siteParams.repository,
-                  user
-                );
-
-                expect(webhookNock.isDone()).to.equal(true);
-                done();
-              })
-              .catch(done);
-          });
-      });
-    });
-
     context('with a private S3 bucket', () => {
       let user;
       let webhookNock;
