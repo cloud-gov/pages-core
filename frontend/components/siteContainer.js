@@ -16,11 +16,6 @@ export const SITE_NAVIGATION_CONFIG = [
     icon: 'IconBook',
   },
   {
-    display: 'GitHub branches',
-    route: 'branches',
-    icon: 'IconBranch',
-  },
-  {
     display: 'Uploaded files',
     route: 'published',
     icon: 'IconCloudUpload',
