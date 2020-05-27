@@ -17,7 +17,7 @@ services:
 - federalist-staging-env
 - federalist-site-wide-error
 - federalist-staging-sqs-creds
-- federalist-staging-redis-beta
+- federalist-staging-redis
 - federalist-staging-space
 - federalist-deploy-user
 - federalist-staging-proxy

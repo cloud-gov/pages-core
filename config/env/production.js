@@ -47,17 +47,12 @@ if (sqsCreds) {
 }
 
 // Redis Configs
-let redisServiceName = `federalist-${process.env.APP_ENV}-redis`;
-if (isStaging()) {
-  redisServiceName += '-beta';
-}
-const redisCreds = appEnv.getServiceCreds(redisServiceName);
+const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`);
+const isBetaRedis = !!redisCreds.host;
 if (redisCreds) {
   module.exports.redis = {
-    host: isStaging() ? redisCreds.host : redisCreds.hostname,
-    port: redisCreds.port,
-    password: redisCreds.password,
-    tls: isStaging() ? {} : null,
+    url: redisCreds.uri,
+    tls: isBetaRedis ? {} : null,
   };
 } else {
   throw new Error('No Redis credentials found');
