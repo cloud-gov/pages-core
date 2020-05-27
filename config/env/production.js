@@ -2,8 +2,6 @@ const cfenv = require('cfenv');
 
 const appEnv = cfenv.getAppEnv();
 
-const isStaging = () => process.env.APP_ENV === 'staging';
-
 // Database Config
 const rdsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-rds`);
 if (rdsCreds) {
