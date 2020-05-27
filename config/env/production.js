@@ -2,6 +2,8 @@ const cfenv = require('cfenv');
 
 const appEnv = cfenv.getAppEnv();
 
+const isStaging = () => process.env.APP_ENV === 'staging';
+
 // Database Config
 const rdsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-rds`);
 if (rdsCreds) {
@@ -45,14 +47,17 @@ if (sqsCreds) {
 }
 
 // Redis Configs
-const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`);
+let redisServiceName = `federalist-${process.env.APP_ENV}-redis`;
+if (isStaging()) {
+  redisServiceName += '-beta';
+}
+const redisCreds = appEnv.getServiceCreds(redisServiceName);
 if (redisCreds) {
   module.exports.redis = {
-    hostname: redisCreds.hostname,
-    password: redisCreds.password,
+    host: isStaging() ? redisCreds.host : redisCreds.hostname,
     port: redisCreds.port,
-    ports: redisCreds.ports,
-    uri: redisCreds.uri,
+    password: redisCreds.password,
+    tls: isStaging() ? {} : null,
   };
 } else {
   throw new Error('No Redis credentials found');
