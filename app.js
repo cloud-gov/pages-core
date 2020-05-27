@@ -113,10 +113,8 @@ app.server = http.Server(app);
 
 const socket = io(app.server, { cookie: false });
 if (config.redis) {
-  const redisCreds = { auth_pass: config.redis.password };
-
-  const pubClient = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
-  const subClient = redis.createClient(config.redis.port, config.redis.hostname, redisCreds);
+  const pubClient = redis.createClient(config.redis);
+  const subClient = redis.createClient(config.redis);
 
   socket.adapter(redisAdapter({ pubClient, subClient }));
 
