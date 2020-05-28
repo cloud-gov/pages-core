@@ -22,33 +22,6 @@ const fetchInitialData = () => {
   siteActions.fetchSites();
 };
 
-// export default (
-//   <Route path="/" component={App} onEnter={fetchInitialData}>
-//     <Route path="sites">
-//       <IndexRoute component={SiteList} />
-//       <Route path="new" component={AddSite} />
-//       <Route path=":id" component={SiteContainer}>
-//         <IndexRedirect to="builds" />
-//         <Route path="settings" component={SiteSettings} />
-//         <Route path="published">
-//           <IndexRoute component={SitePublishedBranchesTable} />
-//           <Route path=":name" component={SitePublishedFilesTable} />
-//         </Route>
-//         <Route path="builds">
-//           <IndexRoute component={SiteBuilds} />
-//           <Route path=":buildId/logs" component={SiteBuildLogs} />
-//         </Route>
-//         <Route path="users" component={SiteUsers} />
-//         <Route path="notifications" component={NotificationSettings} />
-//       </Route>
-//       <Redirect from="*" to="/not-found" />
-//     </Route>
-//     <Route path="/not-found" component={NotFound} />
-//     <Redirect from="*" to="/sites" />
-//   </Route>
-// );
-
-
 export default (
   <App path="/" onEnter={fetchInitialData}>
     <SiteList path="sites" />
