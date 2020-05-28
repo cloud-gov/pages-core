@@ -42,7 +42,7 @@
     "socket.io-redis": "^5.2.0",
     "underscore": "^1.8.3",
     "urlsafe-base64": "^1.0.0",
-    "uswds": "^1.4.4",
+    "uswds": "^2.7.0",
     "validator": "^13.0.0",
     "whatwg-fetch": "^3.0.0",
     "winston": "^3.2.1",
