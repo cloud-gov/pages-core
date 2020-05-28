@@ -14,7 +14,7 @@ import { currentSite } from '../../../selectors/site';
 class SiteSettings extends React.Component {
   constructor(props) {
     super(props);
-    autoBind(this, 'handleUpdate', 'handleDelete', 'handleCopySite');
+    autoBind(this, 'handleUpdate', 'handleDelete');
   }
 
   handleDelete() {
@@ -109,7 +109,7 @@ SiteSettings.defaultProps = {
   site: null,
 };
 
-const mapStateToProps = ({ sites }, { params: { id } }) => ({
+const mapStateToProps = ({ sites }, { id }) => ({
   site: currentSite(sites, id),
 });
 

@@ -20,13 +20,13 @@ class SiteBuildLogs extends React.Component {
 
   /* eslint-disable scanjs-rules/call_setInterval */
   componentDidMount() {
-    const { actions: { fetchBuildLogs }, params } = this.props;
+    const { actions: { fetchBuildLogs }, buildId } = this.props;
 
-    fetchBuildLogs({ id: params.buildId });
+    fetchBuildLogs({ id: buildId });
     this.intervalHandle = setInterval(() => {
       const { autoRefresh } = this.state;
       if (autoRefresh) {
-        fetchBuildLogs({ id: params.buildId });
+        fetchBuildLogs({ id: buildId });
       }
     }, REFRESH_INTERVAL);
   }
@@ -38,9 +38,9 @@ class SiteBuildLogs extends React.Component {
 
   /* eslint-disable jsx-a11y/href-no-hash */
   render() {
-    const { buildLogs, params } = this.props;
+    const { buildLogs, buildId: buildIdStr } = this.props;
     const { autoRefresh } = this.state;
-    const buildId = parseInt(params.buildId, 10);
+    const buildId = parseInt(buildIdStr, 10);
 
     if (!buildLogs.isLoading && (!buildLogs || !buildLogs.data || !buildLogs.data.length)) {
       return (
@@ -58,6 +58,7 @@ class SiteBuildLogs extends React.Component {
             <li><DownloadBuildLogsButton buildId={buildId} buildLogsData={buildLogs.data} /></li>
             <li>
               <div>
+                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                 <a
                   href="#"
                   role="button"
@@ -84,9 +85,7 @@ class SiteBuildLogs extends React.Component {
 /* eslint-enable jsx-a11y/href-no-hash */
 
 SiteBuildLogs.propTypes = {
-  params: PropTypes.shape({
-    buildId: PropTypes.string.isRequired,
-  }).isRequired,
+  buildId: PropTypes.string.isRequired,
   buildLogs: PropTypes.shape({
     isLoading: PropTypes.bool,
     data: PropTypes.array,

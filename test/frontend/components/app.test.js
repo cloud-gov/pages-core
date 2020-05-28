@@ -8,6 +8,7 @@ proxyquire.noCallThru();
 
 const alertActionUpdate = stub();
 const buildStatusNotifierListen = stub();
+const onEnter = stub();
 const Header = () => <div />;
 
 const username = 'jenny mcuser';
@@ -27,6 +28,7 @@ const props = {
   location: {
     key: 'a-route',
   },
+  onEnter,
 };
 
 const AppFixture = proxyquire('../../../frontend/components/app', {
@@ -100,6 +102,18 @@ describe('<App/>', () => {
 
     wrapper = shallow(<AppFixture {...newProps} />);
     expect(wrapper.find('LoadingIndicator')).to.have.length(1);
+    expect(buildStatusNotifierListen.called).to.be.true;
+  });
+
+  it('calls onEnter on mount', () => {
+    shallow(<AppFixture {...props} />);
+
+    expect(onEnter.called).to.be.true;
+  });
+
+  it('subscribes to build status events on mount', () => {
+    shallow(<AppFixture {...props} />);
+
     expect(buildStatusNotifierListen.called).to.be.true;
   });
 });

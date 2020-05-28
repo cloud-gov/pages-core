@@ -9,7 +9,9 @@ import LoadingIndicator from './LoadingIndicator';
 import BuildStatusNotifier from '../util/buildStatusNotifier';
 
 export class App extends React.Component {
-  componentWillMount() {
+  componentDidMount() {
+    const { onEnter } = this.props;
+    onEnter();
     BuildStatusNotifier.listen();
   }
 
@@ -75,6 +77,7 @@ App.propTypes = {
   location: PropTypes.shape({
     key: PropTypes.string,
   }),
+  onEnter: PropTypes.func.isRequired,
   user: PropTypes.oneOfType([
     // When the user is not auth'd, this prop is false, which is a little weird
     PropTypes.bool,
