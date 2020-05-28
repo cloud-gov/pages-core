@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
+import { Link } from '@reach/router';
 import publishedBranchActions from '../../actions/publishedBranchActions';
 import { currentSite } from '../../selectors/site';
 import LoadingIndicator from '../LoadingIndicator';
@@ -108,7 +108,7 @@ SitePublishedBranchesTable.defaultProps = {
   site: null,
 };
 
-const mapStateToProps = ({ publishedBranches, sites }, { params: { id } }) => ({
+const mapStateToProps = ({ publishedBranches, sites }, { id }) => ({
   publishedBranches,
   site: currentSite(sites, id),
 });

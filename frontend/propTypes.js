@@ -49,7 +49,6 @@ export const BUILD = PropTypes.shape({
 });
 
 export const BUILD_LOG = PropTypes.shape({
-  id: PropTypes.number.isRequired,
   source: PropTypes.string.isRequired,
   output: PropTypes.string.isRequired,
   createdAt: PropTypes.string.isRequired,

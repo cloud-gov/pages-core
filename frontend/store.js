@@ -4,17 +4,13 @@ import {
 } from 'redux';
 import logger from 'redux-logger';
 import { composeWithDevTools } from 'redux-devtools-extension';
-import { routerReducer } from 'react-router-redux';
 import thunk from 'redux-thunk';
 
 import reducers from './reducers';
-import { reroute, createNotifier } from './middleware';
+import { createNotifier } from './middleware';
 import { notificationSettings } from './util/notificationSettings';
 
-const reducer = combineReducers({
-  ...reducers,
-  routing: routerReducer,
-});
+const reducer = combineReducers(reducers);
 
 // FRONTEND_CONFIG is a global variable rendered into the index
 // template by the Main controller. We use it to initialize our
@@ -24,7 +20,6 @@ const FRONTEND_CONFIG = typeof window !== 'undefined'
   : global.FRONTEND_CONFIG;
 
 const middlewares = [
-  reroute,
   createNotifier(notificationSettings),
   thunk,
 ];

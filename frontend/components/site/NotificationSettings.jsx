@@ -66,7 +66,7 @@ NotificationSettings.defaultProps = {
   user: null,
 };
 
-const mapStateToProps = ({ user, sites }, { params: { id } }) => ({
+const mapStateToProps = ({ user, sites }, { id }) => ({
   user: user.data,
   site: currentSite(sites, id),
 });

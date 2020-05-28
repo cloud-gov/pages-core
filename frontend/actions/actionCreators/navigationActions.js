@@ -1,12 +1,6 @@
-const updateRouterType = 'UPDATE_ROUTER';
+import { navigate } from '@reach/router';
 
-const updateRouter = (path, method) => ({
-  type: updateRouterType,
-  method,
-  arguments: [path],
-});
+const pushRouterHistory = path => navigate(path);
+const replaceRouterHistory = path => navigate(path, { replace: true });
 
-const pushRouterHistory = path => updateRouter(path, 'push');
-const replaceRouterHistory = path => updateRouter(path, 'replace');
-
-export { updateRouterType, pushRouterHistory, replaceRouterHistory };
+export { pushRouterHistory, replaceRouterHistory };
