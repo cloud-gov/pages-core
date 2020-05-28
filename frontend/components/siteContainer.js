@@ -105,11 +105,11 @@ export class SiteContainer extends React.Component {
 }
 
 SiteContainer.propTypes = {
-  id: PropTypes.string,
+  id: PropTypes.string.isRequired,
   params: PropTypes.shape({
     branch: PropTypes.string,
     fileName: PropTypes.string,
-  }).isRequired,
+  }),
   location: PropTypes.shape({
     pathname: PropTypes.string,
   }).isRequired,
@@ -131,10 +131,7 @@ SiteContainer.defaultProps = {
     data: [],
   },
   alert: {},
-  params: {
-    branch: undefined,
-    fileName: undefined,
-  },
+  params: {},
 };
 
 export default connect(state => state)(SiteContainer);

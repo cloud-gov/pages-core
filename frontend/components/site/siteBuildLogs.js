@@ -58,6 +58,7 @@ class SiteBuildLogs extends React.Component {
             <li><DownloadBuildLogsButton buildId={buildId} buildLogsData={buildLogs.data} /></li>
             <li>
               <div>
+                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                 <a
                   href="#"
                   role="button"

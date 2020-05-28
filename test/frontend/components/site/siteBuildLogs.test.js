@@ -11,12 +11,12 @@ let props;
 describe('<SiteBuildLogs/>', () => {
   beforeEach(() => {
     props = {
-      params: {
-        buildId: '123',
-      },
+      buildId: '123',
       buildLogs: {
         isLoading: false,
-        data: [{ id: 1, source: 'theSource', createdAt: '2018-11-05T13:15:30Z', output: 'blahblah' }],
+        data: [{
+          id: 1, source: 'theSource', createdAt: '2018-11-05T13:15:30Z', output: 'blahblah',
+        }],
       },
       actions: { fetchBuildLogs: sinon.spy() },
     };

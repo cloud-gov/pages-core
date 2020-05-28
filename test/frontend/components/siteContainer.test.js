@@ -34,8 +34,8 @@ describe('<SiteContainer/>', () => {
       location: {
         pathname: '',
       },
+      id: '1',
       params: {
-        id: '1',
         branch: 'branch',
         fileName: 'boop.txt',
       },
@@ -60,7 +60,7 @@ describe('<SiteContainer/>', () => {
   });
 
   it('renders an error after sites have loaded but no matching site', () => {
-    props.params.id = '2';
+    props.id = '2';
     const wrapper = shallow(<SiteContainer {...props} />);
     const alert = wrapper.find('AlertBanner');
 

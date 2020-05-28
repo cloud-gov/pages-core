@@ -129,6 +129,7 @@ class SiteBuilds extends React.Component {
       <div>
         <div className="log-tools">
           <div>
+            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a
               href="#"
               role="button"

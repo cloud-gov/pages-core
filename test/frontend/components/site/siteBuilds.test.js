@@ -39,9 +39,7 @@ describe('<SiteBuilds/>', () => {
         isLoading: false,
       },
       site,
-      params: {
-        id: '5',
-      },
+      id: '5',
       actions: {
         fetchBuilds: sinon.spy(),
         restartBuild: sinon.spy(),
@@ -146,9 +144,7 @@ describe('<SiteBuilds/>', () => {
   });
 
   it('should render a paragraph about truncation if 100 or more builds are present', () => {
-    props.builds.data = Array(100).fill(1).map((val, index) =>
-      Object.assign(build, { id: index })
-    );
+    props.builds.data = Array(100).fill(1).map((val, index) => Object.assign(build, { id: index }));
 
     const wrapper = shallow(<SiteBuilds {...props} />);
     expect(wrapper.find('table + p')).to.have.length(1);
