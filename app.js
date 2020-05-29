@@ -37,7 +37,10 @@ if (config.env.newRelicAppName && config.env.newRelicLicenseKey) {
 const app = express();
 
 const PostgresStore = ConnectSession(session.Store);
-config.session.store = new PostgresStore({ db: sequelize });
+config.session.store = new PostgresStore({
+  db: sequelize,
+  modelKey: 'Sessions',
+});
 
 nunjucks.configure('views', {
   autoescape: true,
