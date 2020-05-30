@@ -133,8 +133,7 @@ if (config.redis) {
 }
 
 app.use((req, res, next) => {
-  // eslint-disable-next-line no-underscore-dangle
-  res._socketIO = socketIO;
+  res.socketIO = socketIO;
   next();
 });
 

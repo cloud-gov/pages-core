@@ -124,8 +124,7 @@ module.exports = {
         }
       })
       .then((build) => {
-        // eslint-disable-next-line no-underscore-dangle
-        emitBuildStatus(res._socketIO, build);
+        emitBuildStatus(res.socketIO, build);
         return GithubBuildStatusReporter.reportBuildStatus(build);
       })
       .then(() => res.ok())
