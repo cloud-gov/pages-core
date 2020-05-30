@@ -152,7 +152,7 @@
     "webpack-manifest-plugin": "^2.2.0"
   },
   "engines": {
-    "node": "12.15.x",
+    "node": "12.x.x",
     "npm": "6.x.x"
   }
 }
