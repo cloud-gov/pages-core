@@ -14,6 +14,7 @@ const finalRules = {
       functions: 'never',
     },
   ],
+  'arrow-parens': ['error', 'as-needed'],
 };
 
 const finalPlugins = [];

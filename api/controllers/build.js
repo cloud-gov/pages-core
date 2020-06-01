@@ -7,10 +7,10 @@ const { Build, Site } = require('../models');
 const socketIO = require('../socketIO');
 const { logger } = require('../../winston');
 
-const decodeb64 = (str) => Buffer.from(str, 'base64').toString('utf8');
+const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
 
-const emitBuildStatus = (build) => Site.findByPk(build.site)
-  .then((site) => {
+const emitBuildStatus = build => Site.findByPk(build.site)
+  .then(site => {
     const msg = {
       id: build.id,
       state: build.state,
@@ -25,18 +25,18 @@ const emitBuildStatus = (build) => Site.findByPk(build.site)
     socketIO.to(builderRoom).emit('build status', msg);
     return Promise.resolve();
   })
-  .catch((err) => logger.error(err));
+  .catch(err => logger.error(err));
 
 module.exports = {
   find: (req, res) => {
     let site;
 
     Promise.resolve(Number(req.params.site_id))
-      .then((id) => {
+      .then(id => {
         if (isNaN(id)) { throw 404; }
         return Site.findByPk(id);
       })
-      .then((model) => {
+      .then(model => {
         if (!model) { throw 404; }
         site = model;
         return siteAuthorizer.findOne(req.user, site);
@@ -47,8 +47,8 @@ module.exports = {
         order: [['createdAt', 'desc']],
         limit: 100,
       }))
-      .then((builds) => buildSerializer.serialize(builds))
-      .then((buildJSON) => res.json(buildJSON))
+      .then(builds => buildSerializer.serialize(builds))
+      .then(buildJSON => res.json(buildJSON))
       .catch(res.error);
   },
 
@@ -68,24 +68,24 @@ module.exports = {
   create: (req, res) => {
     siteAuthorizer.createBuild(req.user, { id: req.body.siteId })
       .then(() => BuildResolver.getBuild(req.user, req.body))
-      .then((build) => Build.create({
+      .then(build => Build.create({
         branch: build.branch,
         site: build.site,
         user: req.user.id,
         commitSha: build.commitSha,
       }))
-      .then((build) => GithubBuildStatusReporter
+      .then(build => GithubBuildStatusReporter
         .reportBuildStatus(build)
         .then(() => build))
-      .then((build) => buildSerializer.serialize(build))
-      .then((buildJSON) => res.json(buildJSON))
+      .then(build => buildSerializer.serialize(build))
+      .then(buildJSON => res.json(buildJSON))
       .catch(res.error);
   },
 
   status: (req, res) => {
     let buildStatus;
 
-    const getBuildStatus = (statusRequest) => {
+    const getBuildStatus = statusRequest => {
       let status;
       let message;
       try {
@@ -105,17 +105,17 @@ module.exports = {
     };
 
     Promise.resolve(getBuildStatus(req))
-      .then((_buildStatus) => {
+      .then(_buildStatus => {
         buildStatus = _buildStatus;
         return Promise.resolve(Number(req.params.id));
       })
-      .then((id) => {
+      .then(id => {
         if (isNaN(id)) {
           throw 404;
         }
         return Build.findByPk(id);
       })
-      .then((build) => {
+      .then(build => {
         if (!build) {
           throw 404;
         } else if (build.token !== req.params.token) {
@@ -124,12 +124,12 @@ module.exports = {
           return build.updateJobStatus(buildStatus);
         }
       })
-      .then((build) => {
+      .then(build => {
         emitBuildStatus(build);
         return GithubBuildStatusReporter.reportBuildStatus(build);
       })
       .then(() => res.ok())
-      .catch((err) => {
+      .catch(err => {
         logger.error(['Error build status reporting to GitHub', err, err.stack].join('\n'));
         res.error(err);
       });
