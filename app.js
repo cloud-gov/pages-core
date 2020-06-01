@@ -112,14 +112,14 @@ const speedLimiter = slowDown(config.rateSlowing);
 app.use(speedLimiter);
 app.use(rateLimiter);
 
-app.server = http.Server(app);
+app.server = http.createServer(app);
 
-const socket = io(app.server, { cookie: false });
+const socketIO = io(app.server, { cookie: false });
 if (config.redis) {
   const pubClient = redis.createClient(config.redis);
   const subClient = redis.createClient(config.redis);
 
-  socket.adapter(redisAdapter({ pubClient, subClient }));
+  socketIO.adapter(redisAdapter({ pubClient, subClient }));
 
   pubClient.on('error', (err) => {
     logger.error(`redisAdapter pubClient error: ${err}`);
@@ -127,13 +127,13 @@ if (config.redis) {
   subClient.on('error', (err) => {
     logger.error(`redisAdapter subClient error: ${err}`);
   });
-  socket.of('/').adapter.on('error', (err) => {
+  socketIO.of('/').adapter.on('error', (err) => {
     logger.error(`redisAdapter error: ${err}`);
   });
 }
 
 app.use((req, res, next) => {
-  res.socket = socket;
+  res.socketIO = socketIO;
   next();
 });
 
@@ -148,7 +148,7 @@ app.use((err, req, res, next) => {
   res.error(err);
 });
 
-socket.use((_socket, next) => {
+socketIO.use((_socket, next) => {
   /* eslint-disable no-param-reassign */
   if (_socket.handshake.query && _socket.handshake.query.accessToken) {
     jwtHelper.verify(_socket.handshake.query.accessToken, { expiresIn: 60 * 60 * 24 }) // expire 24h

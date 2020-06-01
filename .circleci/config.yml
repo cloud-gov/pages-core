@@ -1,7 +1,7 @@
 version: 2
 
 default-docker-node: &default-docker-node
-  image: circleci/node:10
+  image: circleci/node:12
   environment:
     YARN_VERSION: 0.24.6-1
     CC_TEST_REPORTER_ID: 101a439651b6abd27e5440028a53b5b8f08fe0889f3948d5f58f6cf9f7c786a0
