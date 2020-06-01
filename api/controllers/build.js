@@ -7,7 +7,7 @@ const { Build, Site } = require('../models');
 const socketIO = require('../socketIO');
 const { logger } = require('../../winston');
 
-const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
+const decodeb64 = (str) => Buffer.from(str, 'base64').toString('utf8');
 
 const emitBuildStatus = (build) => Site.findByPk(build.site)
   .then((site) => {
@@ -25,7 +25,7 @@ const emitBuildStatus = (build) => Site.findByPk(build.site)
     socketIO.to(builderRoom).emit('build status', msg);
     return Promise.resolve();
   })
-  .catch(err => logger.error(err));
+  .catch((err) => logger.error(err));
 
 module.exports = {
   find: (req, res) => {
@@ -47,8 +47,8 @@ module.exports = {
         order: [['createdAt', 'desc']],
         limit: 100,
       }))
-      .then(builds => buildSerializer.serialize(builds))
-      .then(buildJSON => res.json(buildJSON))
+      .then((builds) => buildSerializer.serialize(builds))
+      .then((buildJSON) => res.json(buildJSON))
       .catch(res.error);
   },
 
@@ -68,17 +68,17 @@ module.exports = {
   create: (req, res) => {
     siteAuthorizer.createBuild(req.user, { id: req.body.siteId })
       .then(() => BuildResolver.getBuild(req.user, req.body))
-      .then(build => Build.create({
+      .then((build) => Build.create({
         branch: build.branch,
         site: build.site,
         user: req.user.id,
         commitSha: build.commitSha,
       }))
-      .then(build => GithubBuildStatusReporter
+      .then((build) => GithubBuildStatusReporter
         .reportBuildStatus(build)
         .then(() => build))
-      .then(build => buildSerializer.serialize(build))
-      .then(buildJSON => res.json(buildJSON))
+      .then((build) => buildSerializer.serialize(build))
+      .then((buildJSON) => res.json(buildJSON))
       .catch(res.error);
   },
 
