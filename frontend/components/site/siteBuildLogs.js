@@ -36,7 +36,6 @@ class SiteBuildLogs extends React.Component {
     this.setState(state => ({ autoRefresh: !state.autoRefresh }));
   }
 
-  /* eslint-disable jsx-a11y/href-no-hash */
   render() {
     const { buildLogs, buildId: buildIdStr } = this.props;
     const { autoRefresh } = this.state;
@@ -82,7 +81,6 @@ class SiteBuildLogs extends React.Component {
     );
   }
 }
-/* eslint-enable jsx-a11y/href-no-hash */
 
 SiteBuildLogs.propTypes = {
   buildId: PropTypes.string.isRequired,
