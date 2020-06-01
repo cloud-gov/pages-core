@@ -10,7 +10,7 @@ const { logger } = require('../../winston');
 const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
 
 const emitBuildStatus = build => Site.findByPk(build.site)
-  .then(site => {
+  .then((site) => {
     const msg = {
       id: build.id,
       state: build.state,
@@ -32,11 +32,11 @@ module.exports = {
     let site;
 
     Promise.resolve(Number(req.params.site_id))
-      .then(id => {
+      .then((id) => {
         if (isNaN(id)) { throw 404; }
         return Site.findByPk(id);
       })
-      .then(model => {
+      .then((model) => {
         if (!model) { throw 404; }
         site = model;
         return siteAuthorizer.findOne(req.user, site);
@@ -85,7 +85,7 @@ module.exports = {
   status: (req, res) => {
     let buildStatus;
 
-    const getBuildStatus = statusRequest => {
+    const getBuildStatus = (statusRequest) => {
       let status;
       let message;
       try {
@@ -105,17 +105,17 @@ module.exports = {
     };
 
     Promise.resolve(getBuildStatus(req))
-      .then(_buildStatus => {
+      .then((_buildStatus) => {
         buildStatus = _buildStatus;
         return Promise.resolve(Number(req.params.id));
       })
-      .then(id => {
+      .then((id) => {
         if (isNaN(id)) {
           throw 404;
         }
         return Build.findByPk(id);
       })
-      .then(build => {
+      .then((build) => {
         if (!build) {
           throw 404;
         } else if (build.token !== req.params.token) {
@@ -124,12 +124,12 @@ module.exports = {
           return build.updateJobStatus(buildStatus);
         }
       })
-      .then(build => {
+      .then((build) => {
         emitBuildStatus(build);
         return GithubBuildStatusReporter.reportBuildStatus(build);
       })
       .then(() => res.ok())
-      .catch(err => {
+      .catch((err) => {
         logger.error(['Error build status reporting to GitHub', err, err.stack].join('\n'));
         res.error(err);
       });
