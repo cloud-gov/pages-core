@@ -5,12 +5,32 @@ default-docker-node: &default-docker-node
   environment:
     YARN_VERSION: 0.24.6-1
     CC_TEST_REPORTER_ID: 101a439651b6abd27e5440028a53b5b8f08fe0889f3948d5f58f6cf9f7c786a0
+
 default-docker-postgres: &default-docker-postgres
   image: circleci/postgres:9.6
   environment:
     POSTGRES_USER: ci-test-user
     POSTGRES_DB: federalist-ci-test
     POSTGRES_HOST_AUTH_METHOD: trust
+
+deploy-command: &deploy-command
+  command: |
+    set -o pipefail
+
+    curl -L -o cf7.deb 'https://packages.cloudfoundry.org/stable?release=debian64&version=v7&source=github' \
+      && sudo dpkg -i cf7.deb \
+      && rm cf7.deb
+
+    cf7 api $CF_API
+
+    echo "Logging in to $CF_ORGANIZATION org, $CF_SPACE space."
+    cf7 login -u $CF_USERNAME -p $CF_PASSWORD -o $CF_ORGANIZATION -s $CF_SPACE
+
+    echo "Deploying to $CF_SPACE space."
+    cf7 push $CF_APP --strategy rolling --vars-file $CF_VARS_FILE -f $CF_MANIFEST
+
+    cf7 logout
+
 
 jobs:
   build:
@@ -60,15 +80,64 @@ jobs:
             # Attempt to submit a report, but don't fail the build if this fails (`|| true`)
             ./cc-test-reporter upload-coverage || true
 
-      - deploy:
-          name: Deploy to staging
+  deploy-staging:
+    machine: true    
+    environment:
+      CF_API: https://api.fr.cloud.gov
+      CF_ORGANIZATION: gsa-18f-federalist
+      CF_SPACE: staging
+      CF_APP: federalistapp-staging
+      CF_VARS_FILE: ./.cloudgov/vars/staging.yml
+      CF_MANIFEST: ./.cloudgov/manifest.yml
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "yarn.lock" }}
+      - run:
+          name: Setup Credentials
           command: |
-              if [ "${CIRCLE_BRANCH}" == "staging" ]; then
-                  ./scripts/deploy-circle.sh
-              fi
+            echo "export CF_USERNAME=$CF_USERNAME_STAGING" >> $BASH_ENV
+            echo "export CF_PASSWORD=$CF_PASSWORD_STAGING" >> $BASH_ENV
       - deploy:
-          name: Deploy to production
+          <<: *deploy-command
+
+  deploy-production:
+    machine: true
+    environment:
+      CF_API: https://api.fr.cloud.gov      
+      CF_ORGANIZATION: gsa-18f-federalist
+      CF_SPACE: production
+      CF_APP: federalistapp
+      CF_VARS_FILE: ./.cloudgov/vars/production.yml
+      CF_MANIFEST: ./.cloudgov/manifest.yml
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "yarn.lock" }}
+      - run:
+          name: Setup Credentials
           command: |
-              if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                  ./scripts/deploy-circle.sh
-              fi
+            echo "export CF_USERNAME=$CF_USERNAME_PRODUCTION" >> $BASH_ENV
+            echo "export CF_PASSWORD=$CF_PASSWORD_PRODUCTION" >> $BASH_ENV
+      - deploy:
+          <<: *deploy-command
+
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - build
+      - deploy-staging:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - staging
+      - deploy-production:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
