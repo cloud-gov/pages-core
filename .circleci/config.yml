@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 default-docker-node: &default-docker-node
   image: circleci/node:12
@@ -12,25 +12,6 @@ default-docker-postgres: &default-docker-postgres
     POSTGRES_USER: ci-test-user
     POSTGRES_DB: federalist-ci-test
     POSTGRES_HOST_AUTH_METHOD: trust
-
-deploy-command: &deploy-command
-  command: |
-    set -o pipefail
-
-    curl -L -o cf7.deb 'https://packages.cloudfoundry.org/stable?release=debian64&version=v7&source=github' \
-      && sudo dpkg -i cf7.deb \
-      && rm cf7.deb
-
-    cf7 api $CF_API
-
-    echo "Logging in to $CF_ORGANIZATION org, $CF_SPACE space."
-    cf7 login -u $CF_USERNAME -p $CF_PASSWORD -o $CF_ORGANIZATION -s $CF_SPACE
-
-    echo "Deploying to $CF_SPACE space."
-    cf7 push $CF_APP --strategy rolling --vars-file $CF_VARS_FILE -f $CF_MANIFEST
-
-    cf7 logout
-
 
 jobs:
   build:
@@ -80,64 +61,50 @@ jobs:
             # Attempt to submit a report, but don't fail the build if this fails (`|| true`)
             ./cc-test-reporter upload-coverage || true
 
-  deploy-staging:
+  deploy:
     machine: true    
     environment:
-      CF_API: https://api.fr.cloud.gov
-      CF_ORGANIZATION: gsa-18f-federalist
-      CF_SPACE: staging
-      CF_APP: federalistapp-staging
-      CF_VARS_FILE: ./.cloudgov/vars/staging.yml
       CF_MANIFEST: ./.cloudgov/manifest.yml
     steps:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "yarn.lock" }}
-      - run:
-          name: Setup Credentials
-          command: |
-            echo "export CF_USERNAME=$CF_USERNAME_STAGING" >> $BASH_ENV
-            echo "export CF_PASSWORD=$CF_PASSWORD_STAGING" >> $BASH_ENV
+      - when:
+          equal: [ staging, << pipeline.git.branch >> ]
+          steps:
+            run:
+              name: Setup Staging Environment
+              command: |
+                echo "export CF_USERNAME=$CF_USERNAME_STAGING" >> $BASH_ENV
+                echo "export CF_PASSWORD=$CF_PASSWORD_STAGING" >> $BASH_ENV
+                echo "export CF_SPACE=staging" >> $BASH_ENV
+                echo "export CF_APP=federalistapp-staging" >> $BASH_ENV
+                echo "export CF_VARS_FILE=./.cloudgov/vars/staging.yml" >> $BASH_ENV
+      - when:
+          equal: [ master, << pipeline.git.branch >> ]
+          steps:
+            run:
+              name: Setup Production Environment
+              command: |
+                echo "export CF_USERNAME=$CF_USERNAME_PRODUCTION" >> $BASH_ENV
+                echo "export CF_PASSWORD=$CF_PASSWORD_PRODUCTION" >> $BASH_ENV
+                echo "export CF_SPACE=production" >> $BASH_ENV
+                echo "export CF_APP=federalistapp" >> $BASH_ENV
+                echo "export CF_VARS_FILE=./.cloudgov/vars/production.yml" >> $BASH_ENV
       - deploy:
-          <<: *deploy-command
+          command: ./.cloudgov/deploy.sh
 
-  deploy-production:
-    machine: true
-    environment:
-      CF_API: https://api.fr.cloud.gov      
-      CF_ORGANIZATION: gsa-18f-federalist
-      CF_SPACE: production
-      CF_APP: federalistapp
-      CF_VARS_FILE: ./.cloudgov/vars/production.yml
-      CF_MANIFEST: ./.cloudgov/manifest.yml
-    steps:
-      - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "yarn.lock" }}
-      - run:
-          name: Setup Credentials
-          command: |
-            echo "export CF_USERNAME=$CF_USERNAME_PRODUCTION" >> $BASH_ENV
-            echo "export CF_PASSWORD=$CF_PASSWORD_PRODUCTION" >> $BASH_ENV
-      - deploy:
-          <<: *deploy-command
 
 workflows:
   version: 2
   build-test-deploy:
     jobs:
       - build
-      - deploy-staging:
+      - deploy:
           requires:
             - build
           filters:
             branches:
               only:
                 - staging
-      - deploy-production:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
                 - master
