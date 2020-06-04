@@ -1,10 +1,11 @@
 ---
-engines:
+version: "2"
+plugins:
   duplication:
     enabled: false
   eslint:
     enabled: true
-    channel: "eslint-5"
+    channel: "eslint-6"
     checks:
       import/no-unresolved:
         enabled: false
@@ -26,10 +27,6 @@ engines:
       extensions:
       - .js
       - .jsx
-ratings:
-  paths:
-  - "**.js"
-  - "**.jsx"
 exclude_patterns:
   - "node_modules/"
   - "migrations/"

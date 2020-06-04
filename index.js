@@ -1,6 +1,24 @@
 const { logger } = require('./winston');
-const app = require('./app');
+const config = require('./config');
+const server = require('./api/server');
+const scheduleJobs = require('./api/jobs');
 
-app.server.listen(process.env.PORT || 1337, () => {
+const { PORT = 1337 } = process.env;
+
+const { env: { newRelicAppName, newRelicLicenseKey } } = config;
+
+// If settings present, start New Relic
+if (newRelicAppName && newRelicLicenseKey) {
+  logger.info(`Activating New Relic: ${newRelicAppName}`);
+  require('newrelic'); // eslint-disable-line global-require
+} else {
+  logger.warn('Skipping New Relic Activation');
+}
+
+require('./app');
+
+scheduleJobs();
+
+server.listen(PORT, () => {
   logger.info('Server running!');
 });

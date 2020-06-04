@@ -120,7 +120,6 @@ class SiteBuilds extends React.Component {
     );
   }
 
-  /* eslint-disable jsx-a11y/href-no-hash */
   renderBuildsTable() {
     const { site, builds, actions } = this.props;
     const { autoRefresh } = this.state;
@@ -228,7 +227,6 @@ class SiteBuilds extends React.Component {
       </div>
     );
   }
-  /* eslint-enable jsx-a11y/href-no-hash */
 
   render() {
     const { builds } = this.props;

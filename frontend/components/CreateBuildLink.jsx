@@ -20,7 +20,6 @@ class CreateBuildLink extends React.Component {
     const { children, className } = this.props;
 
     return (
-      /* eslint-disable jsx-a11y/href-no-hash */
       <a
         href="#"
         role="button"
@@ -29,7 +28,6 @@ class CreateBuildLink extends React.Component {
       >
         {children}
       </a>
-      /* eslint-enable jsx-a11y/href-no-hash */
     );
   }
 }

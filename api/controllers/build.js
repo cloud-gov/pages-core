@@ -4,11 +4,12 @@ const siteAuthorizer = require('../authorizers/site');
 const BuildResolver = require('../services/BuildResolver');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const { Build, Site } = require('../models');
+const socketIO = require('../socketIO');
 const { logger } = require('../../winston');
 
 const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
 
-const emitBuildStatus = (socketIO, build) => Site.findByPk(build.site)
+const emitBuildStatus = build => Site.findByPk(build.site)
   .then((site) => {
     const msg = {
       id: build.id,
@@ -124,7 +125,7 @@ module.exports = {
         }
       })
       .then((build) => {
-        emitBuildStatus(res.socketIO, build);
+        emitBuildStatus(build);
         return GithubBuildStatusReporter.reportBuildStatus(build);
       })
       .then(() => res.ok())

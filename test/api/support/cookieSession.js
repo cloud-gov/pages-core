@@ -1,6 +1,6 @@
 const cookieLib = require('cookie');
 
-const config = require('../../../config');
+const sessionConfig = require('../../../api/init/sessionConfig');
 
 const sessionCookieFromResponse = (response) => {
   const header = response.headers['set-cookie'][0];
@@ -12,7 +12,7 @@ const sessionCookieFromResponse = (response) => {
 const sessionForCookie = (cookie) => {
   const sessionID = cookie.replace('federalist.sid=s%3A', '').split('.')[0];
   return new Promise((resolve, reject) => {
-    config.session.store.get(sessionID, (err, sessionBody) => {
+    sessionConfig.store.get(sessionID, (err, sessionBody) => {
       if (err) {
         reject(err);
       } else {
