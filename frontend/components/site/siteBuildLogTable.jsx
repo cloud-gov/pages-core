@@ -10,7 +10,7 @@ function SiteBuildLogTable({ buildLogs }) {
   return (
     <pre className="build-log">
       {Object.keys(groupedLogs).map(source => (
-        <React.Fragment>
+        <React.Fragment key={source}>
           {source !== 'ALL' && (
             <span className="log-source-header">{source}</span>
           )}

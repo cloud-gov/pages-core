@@ -14,6 +14,7 @@ const finalRules = {
       functions: 'never',
     },
   ],
+  'arrow-parens': [2, 'as-needed', { requireForBlockBody: true }],
 };
 
 const finalPlugins = [];

@@ -4,11 +4,12 @@ const siteAuthorizer = require('../authorizers/site');
 const BuildResolver = require('../services/BuildResolver');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const { Build, Site } = require('../models');
+const socketIO = require('../socketIO');
 const { logger } = require('../../winston');
 
 const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
 
-const emitBuildStatus = (socket, build) => Site.findByPk(build.site)
+const emitBuildStatus = build => Site.findByPk(build.site)
   .then((site) => {
     const msg = {
       id: build.id,
@@ -19,9 +20,9 @@ const emitBuildStatus = (socket, build) => Site.findByPk(build.site)
       repository: site.repository,
     };
     const siteRoom = SocketIOSubscriber.getSiteRoom(build.site);
-    socket.to(siteRoom).emit('build status', msg);
+    socketIO.to(siteRoom).emit('build status', msg);
     const builderRoom = SocketIOSubscriber.getBuilderRoom(build.site, build.user);
-    socket.to(builderRoom).emit('build status', msg);
+    socketIO.to(builderRoom).emit('build status', msg);
     return Promise.resolve();
   })
   .catch(err => logger.error(err));
@@ -124,7 +125,7 @@ module.exports = {
         }
       })
       .then((build) => {
-        emitBuildStatus(res.socket, build);
+        emitBuildStatus(build);
         return GithubBuildStatusReporter.reportBuildStatus(build);
       })
       .then(() => res.ok())

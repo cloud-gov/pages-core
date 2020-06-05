@@ -1,10 +1,11 @@
-version: 2
+version: 2.1
 
 default-docker-node: &default-docker-node
-  image: circleci/node:10
+  image: circleci/node:12
   environment:
     YARN_VERSION: 0.24.6-1
     CC_TEST_REPORTER_ID: 101a439651b6abd27e5440028a53b5b8f08fe0889f3948d5f58f6cf9f7c786a0
+
 default-docker-postgres: &default-docker-postgres
   image: circleci/postgres:9.6
   environment:
@@ -60,15 +61,52 @@ jobs:
             # Attempt to submit a report, but don't fail the build if this fails (`|| true`)
             ./cc-test-reporter upload-coverage || true
 
+  deploy:
+    machine: true    
+    environment:
+      CF_MANIFEST: ./.cloudgov/manifest.yml
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "yarn.lock" }}
+      - when:
+          condition:
+            equal: [ staging, << pipeline.git.branch >> ]
+          steps:
+            run:
+              name: Setup Staging Environment
+              command: |
+                echo "export CF_USERNAME=$CF_USERNAME_STAGING" >> $BASH_ENV
+                echo "export CF_PASSWORD=$CF_PASSWORD_STAGING" >> $BASH_ENV
+                echo "export CF_SPACE=staging" >> $BASH_ENV
+                echo "export CF_APP=federalistapp-staging" >> $BASH_ENV
+                echo "export CF_VARS_FILE=./.cloudgov/vars/staging.yml" >> $BASH_ENV
+      - when:
+          condition:
+            equal: [ master, << pipeline.git.branch >> ]
+          steps:
+            run:
+              name: Setup Production Environment
+              command: |
+                echo "export CF_USERNAME=$CF_USERNAME_PRODUCTION" >> $BASH_ENV
+                echo "export CF_PASSWORD=$CF_PASSWORD_PRODUCTION" >> $BASH_ENV
+                echo "export CF_SPACE=production" >> $BASH_ENV
+                echo "export CF_APP=federalistapp" >> $BASH_ENV
+                echo "export CF_VARS_FILE=./.cloudgov/vars/production.yml" >> $BASH_ENV
       - deploy:
-          name: Deploy to staging
-          command: |
-              if [ "${CIRCLE_BRANCH}" == "staging" ]; then
-                  ./scripts/deploy-circle.sh
-              fi
+          command: ./.cloudgov/deploy.sh
+
+
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - build
       - deploy:
-          name: Deploy to production
-          command: |
-              if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                  ./scripts/deploy-circle.sh
-              fi
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - staging
+                - master
