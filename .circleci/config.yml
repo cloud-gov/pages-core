@@ -70,7 +70,8 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ checksum "yarn.lock" }}
       - when:
-          equal: [ staging, << pipeline.git.branch >> ]
+          condition:
+            equal: [ staging, << pipeline.git.branch >> ]
           steps:
             run:
               name: Setup Staging Environment
@@ -81,7 +82,8 @@ jobs:
                 echo "export CF_APP=federalistapp-staging" >> $BASH_ENV
                 echo "export CF_VARS_FILE=./.cloudgov/vars/staging.yml" >> $BASH_ENV
       - when:
-          equal: [ master, << pipeline.git.branch >> ]
+          condition:
+            equal: [ master, << pipeline.git.branch >> ]
           steps:
             run:
               name: Setup Production Environment
