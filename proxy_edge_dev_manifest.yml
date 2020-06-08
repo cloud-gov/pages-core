@@ -20,6 +20,7 @@ services:
 - federalist-staging-proxy
 - federalist-staging-domain
 - federalist-staging-dynamodb-creds
+- federalist-staging-uev-key
 env:
   NODE_ENV: production
   APP_ENV: staging
