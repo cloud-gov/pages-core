@@ -20,6 +20,7 @@ if [ $? -ne 0 ]
 then
   echo "Deployment to $CF_SPACE space failed, cancelling."
   cf7 cancel-deployment $CF_APP
+  exit 1
 fi
 
 cf7 logout
