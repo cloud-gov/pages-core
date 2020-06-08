@@ -62,7 +62,8 @@ jobs:
             ./cc-test-reporter upload-coverage || true
 
   deploy:
-    machine: true    
+    docker:
+      - image: circleci/node:12
     environment:
       CF_MANIFEST: ./.cloudgov/manifest.yml
     steps:
