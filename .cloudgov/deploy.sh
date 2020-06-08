@@ -16,4 +16,10 @@ cf7 login -u $CF_USERNAME -p $CF_PASSWORD -o $CF_ORGANIZATION -s $CF_SPACE
 echo "Deploying to $CF_SPACE space."
 cf7 push $CF_APP --strategy rolling --vars-file $CF_VARS_FILE -f $CF_MANIFEST
 
+if [ $? -ne 0 ]
+then
+  echo "Deployment to $CF_SPACE space failed, cancelling."
+  cf7 cancel-deployment $CF_APP
+fi
+
 cf7 logout
