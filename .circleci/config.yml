@@ -62,13 +62,17 @@ jobs:
             ./cc-test-reporter upload-coverage || true
 
   deploy:
-    machine: true    
+    docker:
+      - image: circleci/node:12
     environment:
       CF_MANIFEST: ./.cloudgov/manifest.yml
     steps:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "yarn.lock" }}
+      - run:
+          name: Build app
+          command: yarn build
       - when:
           condition:
             equal: [ staging, << pipeline.git.branch >> ]
