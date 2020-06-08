@@ -8,7 +8,7 @@ const getSiteKey = site => site.subdomain;
 
 const removeSite = (site) => {
   const docClient = new DynamoDBDocumentHelper(config.dynamoDB);
-  const key = {}
+  const key = {};
   key[siteKey] = getSiteKey(site);
   return docClient.delete(tableName, key);
 };
