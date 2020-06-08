@@ -136,4 +136,29 @@ export default {
       handleHttpError: false,
     });
   },
+
+  fetchUserEnvironmentVariables(siteId) {
+    return this.fetch(`site/${siteId}/user-environment-variable`);
+  },
+
+  deleteUserEnvironmentVariable(siteId, uevId) {
+    return this.fetch(`site/${siteId}/user-environment-variable/${uevId}`, {
+      method: 'DELETE',
+    }, {
+      handleHttpError: false,
+    });
+  },
+
+  createUserEnvironmentVariable(siteId, uev) {
+    return this.fetch(`site/${siteId}/user-environment-variable`, {
+      method: 'POST',
+      data: {
+        name: uev.name,
+        value: uev.value,
+      },
+    }, {
+      handleHttpError: false,
+    });
+  },
+
 };

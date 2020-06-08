@@ -7,7 +7,9 @@ const apiNocks = require('../../support/cfAPINocks');
 const config = require('../../../../config');
 const factory = require('../../support/factory');
 const SQS = require('../../../../api/services/SQS');
-const { Build, Site, User } = require('../../../../api/models');
+const {
+  Build, Site, User, UserEnvironmentVariable,
+} = require('../../../../api/models');
 
 describe('SQS', () => {
   afterEach(() => nock.cleanAll());
@@ -159,6 +161,48 @@ describe('SQS', () => {
           return SQS.messageBodyForBuild(build)
             .then((message) => {
               expect(messageEnv(message, 'LOG_CALLBACK')).to.equal(`http://localhost:1337/v0/build/${build.id}/log/${build.token}`);
+              done();
+            });
+        })
+        .catch(done);
+    });
+
+    it('should set USER_ENVIRONMENT_VARIABLES in the message when present', (done) => {
+      factory.build()
+        .then(build => factory.userEnvironmentVariable.create({ site: { id: build.site } })
+          .then(() => build))
+        .then(build => Build.findByPk(build.id, {
+          include: [{
+            model: Site,
+            include: [UserEnvironmentVariable],
+          }, User],
+        }))
+        .then((build) => { // eslint-disable-line
+          return SQS.messageBodyForBuild(build)
+            .then((message) => {
+              const uevs = build.Site.UserEnvironmentVariables.map(uev => ({
+                name: uev.name,
+                ciphertext: uev.ciphertext,
+              }));
+              expect(JSON.parse(messageEnv(message, 'USER_ENVIRONMENT_VARIABLES'))).to.deep.eq(uevs);
+              done();
+            });
+        })
+        .catch(done);
+    });
+
+    it('should set USER_ENVIRONMENT_VARIABLES to an empty array when absent', (done) => {
+      factory.build()
+        .then(build => Build.findByPk(build.id, {
+          include: [{
+            model: Site,
+            include: [UserEnvironmentVariable],
+          }, User],
+        }))
+        .then((build) => { // eslint-disable-line
+          return SQS.messageBodyForBuild(build)
+            .then((message) => {
+              expect(JSON.parse(messageEnv(message, 'USER_ENVIRONMENT_VARIABLES'))).to.deep.eq([]);
               done();
             });
         })
@@ -494,25 +538,6 @@ describe('SQS', () => {
         .then(build => SQS.messageBodyForBuild(build))
         .then((message) => {
           expect(messageEnv(message, 'GENERATOR')).to.equal('hugo');
-          done();
-        })
-        .catch(done);
-    });
-
-    it('sets SOURCE_REPO, SOURCE_OWNER, and BRANCH in the repository if the build has a source owner / repo', (done) => {
-      const buildParams = {
-        repository: 'template',
-        owner: '18f',
-        branch: 'my-branch',
-      };
-      factory.site({ engine: 'hugo' })
-        .then(() => factory.build({ source: buildParams }))
-        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
-        .then(build => SQS.messageBodyForBuild(build))
-        .then((message) => {
-          expect(messageEnv(message, 'SOURCE_REPO')).to.equal(buildParams.repository);
-          expect(messageEnv(message, 'SOURCE_OWNER')).to.equal(buildParams.owner);
-          expect(messageEnv(message, 'BRANCH')).to.equal(buildParams.branch);
           done();
         })
         .catch(done);

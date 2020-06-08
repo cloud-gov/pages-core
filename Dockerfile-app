@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:12.17
 
 RUN apt-get update && apt-get install -y git
 
@@ -9,4 +9,4 @@ COPY . /app
 
 RUN yarn config set cache-folder /app/.yarn-cache
 
-EXPOSE 1337 8888
+EXPOSE 1337 8888 8080

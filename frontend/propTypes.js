@@ -49,7 +49,6 @@ export const BUILD = PropTypes.shape({
 });
 
 export const BUILD_LOG = PropTypes.shape({
-  id: PropTypes.number.isRequired,
   source: PropTypes.string.isRequired,
   output: PropTypes.string.isRequired,
   createdAt: PropTypes.string.isRequired,
@@ -61,4 +60,10 @@ export const USER_ACTION = PropTypes.shape({
   actionTarget: USER,
   actionType: PropTypes.shape({ action: PropTypes.string }),
   initiator: USER,
+});
+
+export const USER_ENVIRONMENT_VARIABLE = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired,
+  hint: PropTypes.string.isRequired,
 });

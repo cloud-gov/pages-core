@@ -46,6 +46,7 @@ module.exports = {
   },
   log: {
     level: 'error',
+    silent: true,
   },
   deployUser: {
     username: 'deploy_user',
@@ -58,5 +59,8 @@ module.exports = {
     cfOauthTokenUrl: 'https://login.example.com/oauth/token',
     cfApiHost: 'https://api.example.com',
     proxySiteTable: 'testSiteTable',
+  },
+  userEnvVar: {
+    key: 'shhhhhhhhhhh',
   },
 };

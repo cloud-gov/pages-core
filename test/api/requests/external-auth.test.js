@@ -52,7 +52,7 @@ describe('External authentication request', () => {
           })
           .then(() => sessionForCookie(cookie))
           .then((session) => {
-            expect(session.passport).to.be.empty;
+            expect(session.passport).to.be.undefined;
             done();
           })
           .catch(done);

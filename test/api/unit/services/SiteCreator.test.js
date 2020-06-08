@@ -217,8 +217,8 @@ describe('SiteCreator', () => {
           });
           return SiteCreator.createSite({ user, siteParams });
         }).catch((err) => {
-          expect(err.code).to.eq(404);
-          expect(err.status).to.eq('Not Found');
+          expect(err.status).to.eq(400);
+          expect(err.message).to.eq(`The repository ${siteParams.owner}/${siteParams.repository} does not exist.`);
           done();
         }).catch(done);
       });
@@ -253,17 +253,18 @@ describe('SiteCreator', () => {
     });
 
     context('when the site is created from a template', () => {
+      const template = 'uswds2';
       const siteParams = {
         owner: crypto.randomBytes(3).toString('hex'),
         repository: crypto.randomBytes(3).toString('hex'),
-        template: 'uswds2',
+        template,
       };
       let user;
 
       it('should create a new site record for the given repository and add the user', (done) => {
         factory.user().then((model) => {
           user = model;
-          githubAPINocks.createRepoForOrg();
+          githubAPINocks.createRepoUsingTemplate();
           githubAPINocks.webhook();
           return SiteCreator.createSite({ user, siteParams });
         }).then((site) => {
@@ -292,7 +293,7 @@ describe('SiteCreator', () => {
         factory.user()
           .then((model) => {
             user = model;
-            githubAPINocks.createRepoForOrg();
+            githubAPINocks.createRepoUsingTemplate();
             githubAPINocks.webhook();
             return SiteCreator.createSite({ siteParams, user });
           }).then((site) => {
@@ -313,15 +314,13 @@ describe('SiteCreator', () => {
 
         factory.user().then((model) => {
           user = model;
-          githubAPINocks.createRepoForOrg();
+          githubAPINocks.createRepoUsingTemplate();
           githubAPINocks.webhook();
           return SiteCreator.createSite({ siteParams, user });
         }).then(site => Site.findByPk(site.id, { include: [Build] })).then((site) => {
           expect(site.Builds).to.have.length(1);
           expect(site.Builds[0].user).to.equal(user.id);
           expect(site.Builds[0].branch).to.equal(site.defaultBranch);
-          expect(site.Builds[0].source.repository).to.equal(fakeTemplate.repo);
-          expect(site.Builds[0].source.owner).to.equal(fakeTemplate.owner);
 
           templateResolverStub.restore();
 
@@ -336,7 +335,7 @@ describe('SiteCreator', () => {
         factory.user()
           .then((model) => {
             user = model;
-            githubAPINocks.createRepoForOrg();
+            githubAPINocks.createRepoUsingTemplate();
             webhookNock = githubAPINocks.webhook({
               accessToken: user.githubAccessToken,
               owner: siteParams.owner,
@@ -356,10 +355,11 @@ describe('SiteCreator', () => {
           .then((model) => {
             user = model;
 
-            githubAPINocks.createRepoForOrg({
+            githubAPINocks.createRepoUsingTemplate({
               accessToken: user.accessToken,
-              org: siteParams.owner,
+              owner: siteParams.owner,
               repo: siteParams.repository,
+              template: TemplateResolver.getTemplate(template),
               response: [422, {
                 errors: [{ message: 'name already exists on this account' }],
               }],
@@ -391,59 +391,6 @@ describe('SiteCreator', () => {
             done();
           })
           .catch(done);
-      });
-    });
-
-    context('creating a site from an existing site', () => {
-      it('creates a repo and webhook, new site on federalist for specified user', (done) => {
-        let user;
-        let site;
-        let siteParams;
-        let webhookNock;
-
-        factory.user()
-          .then((userModel) => {
-            user = userModel;
-
-            return factory.site({ owner: user.username });
-          })
-          .then((siteModel) => {
-            site = siteModel;
-
-            return { site, user };
-          })
-          .then((values) => {
-            siteParams = {
-              owner: crypto.randomBytes(3).toString('hex'),
-              repository: crypto.randomBytes(3).toString('hex'),
-              defaultBranch: 'master',
-              source: {
-                owner: values.site.owner,
-                repo: values.site.repository,
-              },
-            };
-
-            githubAPINocks.repo();
-            githubAPINocks.createRepoForOrg();
-            webhookNock = githubAPINocks.webhook();
-
-            return SiteCreator.createSite({ user: values.user, siteParams })
-              .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
-              .then((model) => {
-                site = model;
-
-                validateSiteExpectations(
-                  site,
-                  siteParams.owner,
-                  siteParams.repository,
-                  user
-                );
-
-                expect(webhookNock.isDone()).to.equal(true);
-                done();
-              })
-              .catch(done);
-          });
       });
     });
 

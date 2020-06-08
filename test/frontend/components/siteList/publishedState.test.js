@@ -5,7 +5,7 @@ import PublishedState from '../../../../frontend/components/siteList/publishedSt
 
 const PUBLISHED_BASE = 'Please wait for build to complete or check logs for error message.';
 const MOST_RECENT_BUILD_TIME = '2015-09-04T15:11:23.000Z';
-const FORMATTED_MOST_RECENT_BUILD_TIME = 'September 4th 2015, 3:11:23 pm';
+const FORMATTED_MOST_RECENT_BUILD_TIME = 'September 4th 2015, 3:11:23 p.m.';
 const MOST_RECENT_BUILD = `Last published on ${FORMATTED_MOST_RECENT_BUILD_TIME}.`;
 
 let wrapper;

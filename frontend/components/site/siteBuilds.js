@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
+import { Link } from '@reach/router';
 
 import GitHubLink from '../GitHubLink';
 import { BUILD } from '../../propTypes';
@@ -75,14 +75,14 @@ class SiteBuilds extends React.Component {
 
   /* eslint-disable scanjs-rules/call_setInterval */
   componentDidMount() {
-    const { actions, params } = this.props;
+    const { actions, id } = this.props;
 
     const { fetchBuilds } = actions;
-    fetchBuilds({ id: params.id });
+    fetchBuilds({ id });
     this.intervalHandle = setInterval(() => {
       const { autoRefresh } = this.state;
       if (autoRefresh) {
-        fetchBuilds({ id: params.id });
+        fetchBuilds({ id });
       }
     }, REFRESH_INTERVAL);
   }
@@ -120,7 +120,6 @@ class SiteBuilds extends React.Component {
     );
   }
 
-  /* eslint-disable jsx-a11y/href-no-hash */
   renderBuildsTable() {
     const { site, builds, actions } = this.props;
     const { autoRefresh } = this.state;
@@ -129,6 +128,7 @@ class SiteBuilds extends React.Component {
       <div>
         <div className="log-tools">
           <div>
+            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a
               href="#"
               role="button"
@@ -227,7 +227,6 @@ class SiteBuilds extends React.Component {
       </div>
     );
   }
-  /* eslint-enable jsx-a11y/href-no-hash */
 
   render() {
     const { builds } = this.props;
@@ -240,6 +239,7 @@ class SiteBuilds extends React.Component {
 }
 
 SiteBuilds.propTypes = {
+  id: PropTypes.string.isRequired,
   builds: PropTypes.shape({
     isLoading: PropTypes.bool,
     data: PropTypes.arrayOf(BUILD),
@@ -247,9 +247,6 @@ SiteBuilds.propTypes = {
   site: PropTypes.shape({
     id: PropTypes.number,
   }),
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-  }).isRequired,
   actions: PropTypes.shape({
     fetchBuilds: PropTypes.func.isRequired,
     restartBuild: PropTypes.func.isRequired,
@@ -265,7 +262,7 @@ SiteBuilds.defaultProps = {
   },
 };
 
-const mapStateToProps = ({ builds, sites }, { params: { id } }) => ({
+const mapStateToProps = ({ builds, sites }, { id }) => ({
   builds,
   site: currentSite(sites, id),
 });

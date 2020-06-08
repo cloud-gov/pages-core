@@ -5,6 +5,4 @@
 */
 module.exports = {
   max: 0,
-  delayAfter: 0,
-  delayMs: 0,
 };

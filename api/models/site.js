@@ -27,6 +27,7 @@ const associate = ({
   User,
   UserAction,
   SiteUser,
+  UserEnvironmentVariable,
 }) => {
   Site.hasMany(Build, {
     foreignKey: 'site',
@@ -38,6 +39,9 @@ const associate = ({
   });
   Site.hasMany(UserAction, {
     as: 'userActions',
+    foreignKey: 'siteId',
+  });
+  Site.hasMany(UserEnvironmentVariable, {
     foreignKey: 'siteId',
   });
 };
@@ -145,10 +149,22 @@ module.exports = (sequelize, DataTypes) => {
       validationFailed,
     },
     paranoid: true,
+
     getterMethods: {
       subdomain() {
         return this.s3ServiceName;
       },
+    },
+    scopes: {
+      forUser: (user, User) => ({
+        include: [{
+          model: User,
+          required: true,
+          where: {
+            id: user.id,
+          },
+        }],
+      }),
     },
   });
 

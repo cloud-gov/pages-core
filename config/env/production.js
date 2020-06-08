@@ -46,13 +46,14 @@ if (sqsCreds) {
 
 // Redis Configs
 const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`);
+
+// The Beta Redis configuration includes a `host` parameter instead of `hostname`
+const isBetaRedis = !!redisCreds.host;
+
 if (redisCreds) {
   module.exports.redis = {
-    hostname: redisCreds.hostname,
-    password: redisCreds.password,
-    port: redisCreds.port,
-    ports: redisCreds.ports,
-    uri: redisCreds.uri,
+    url: redisCreds.uri,
+    tls: isBetaRedis ? {} : null,
   };
 } else {
   throw new Error('No Redis credentials found');
@@ -110,6 +111,17 @@ if (dynamoDBCreds) {
 module.exports.rateLimiting = {
   windowMs: 1 * 60 * 1000, // 1 minute window
   max: 50, // limit each IP to 50 requests per window
+};
+
+// See https://github.com/nfriedly/express-slow-down/blob/master/README.md
+// for all express-slow-down options available
+module.exports.rateSlowing = {
+  windowMs: 1 * 60 * 1000, // 1 minute window
   delayAfter: 25, // delay requests by delayMs after 25 are made in a window
   delayMs: 500, // delay requests by 500 ms
+};
+
+const cfUserEnvVar = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-uev-key`);
+module.exports.userEnvVar = {
+  key: cfUserEnvVar.key,
 };

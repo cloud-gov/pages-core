@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router';
+import { Link } from '@reach/router';
 import { connect } from 'react-redux';
 
 import { SITE, ALERT, USER } from '../../propTypes';

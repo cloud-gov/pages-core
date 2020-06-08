@@ -8,10 +8,11 @@ const authError = () => ({
   type: authErrorType,
 });
 
-const httpError = message => ({
+const httpError = (message, payload = {}) => ({
   type: httpErrorType,
   status: 'error',
   message,
+  payload,
 });
 
 const httpSuccess = message => ({
