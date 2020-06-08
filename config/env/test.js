@@ -57,6 +57,6 @@ module.exports = {
     cfSpaceGuid: '123abc-456def-789ghi',
     cfOauthTokenUrl: 'https://login.example.com/oauth/token',
     cfApiHost: 'https://api.example.com',
-    proxySiteTable: 'testSiteTable'
+    proxySiteTable: 'testSiteTable',
   },
 };

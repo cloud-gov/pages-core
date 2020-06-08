@@ -156,7 +156,7 @@ module.exports = {
         user,
         siteParams,
       }))
-      .then(_site => {
+      .then((_site) => {
         site = _site;
         return ProxyDataSync.saveSite(site)
           .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));

@@ -11,7 +11,7 @@ const toJSON = (site) => {
   delete object.site_users__user_sites;
 
   object.demoViewLink = siteViewLink(object, 'demo');
-  object.previewLink = siteViewLink(object, 'preview' );
+  object.previewLink = siteViewLink(object, 'preview');
   object.viewLink = siteViewLink(object, 'site');
   object.createdAt = object.createdAt.toISOString();
   object.updatedAt = object.updatedAt.toISOString();

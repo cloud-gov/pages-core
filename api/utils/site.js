@@ -7,14 +7,14 @@ function siteViewLink(site, deployment = 'site') {
   } else if (deployment === 'demo' && site.demoDomain) {
     link = site.demoDomain;
   } else {
-  	const path = `/${deployment}/${site.owner}/${site.repository}`;
-  	link = `${siteViewDomain(site)}${path}`;
+  const path = `/${deployment}/${site.owner}/${site.repository}`;
+    link = `${siteViewDomain(site)}${path}`;
   }
 
   return `${link.replace(/\/+$/, '')}/`;
 }
 
-function siteViewDomain(site){
+function siteViewDomain(site) {
   return config.app.proxyPreviewHost.replace('*', site.subdomain);
 }
 

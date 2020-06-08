@@ -1,5 +1,4 @@
-const config = require('../../config');
-const { siteViewDomain } = require('./site')
+const { siteViewDomain } = require('./site');
 
 function buildUrl(build, site) {
   const path = buildPath(build, site);

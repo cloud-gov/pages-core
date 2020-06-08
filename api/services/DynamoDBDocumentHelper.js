@@ -11,11 +11,9 @@ class DynamoDBDocumentHelper {
   }
 
   put(TableName, Item) {
-    let attempt = 0;
-    let start;
     const { docClient } = this;
 
-    const request = (params) => new Promise((resolve, reject) => {
+    const request = params => new Promise((resolve, reject) => {
       docClient.put(params, (err, data) => {
         if (err) {
           logger.error(err);
@@ -26,7 +24,7 @@ class DynamoDBDocumentHelper {
     });
     const params = {
       TableName,
-      Item
+      Item,
     };
     return request(params);
   }
@@ -34,7 +32,7 @@ class DynamoDBDocumentHelper {
   batchWrite(TableName, items) {
     const { docClient } = this;
 
-    const request = (params) => new Promise((resolve, reject) => {
+    const request = params => new Promise((resolve, reject) => {
       docClient.batchWrite(params, (err, data) => {
         if (err) {
           logger.error(err);
@@ -45,7 +43,7 @@ class DynamoDBDocumentHelper {
     });
 
     const allRequests = [];
-    const RequestItems = {}
+    const RequestItems = {};
     let params;
     let i = 0;
     const maxItems = 15;
@@ -59,11 +57,9 @@ class DynamoDBDocumentHelper {
 
 
   delete(TableName, Key) {
-    let attempt = 0;
-    let start;
     const { docClient } = this;
 
-    const request = (params) => new Promise((resolve, reject) => {
+    const request = params => new Promise((resolve, reject) => {
       docClient.delete(params, (err, data) => {
         if (err) {
           logger.error(err);
