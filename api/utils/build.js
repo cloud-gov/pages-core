@@ -6,7 +6,6 @@ function buildUrl(build, site) {
 }
 
 function buildViewLink(build, site) {
-  
   let link;
   if ((build.branch === site.defaultBranch) && site.domain) {
     link = site.domain;

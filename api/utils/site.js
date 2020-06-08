@@ -7,10 +7,9 @@ function siteViewLink(site, deployment = 'site') {
   } else if (deployment === 'demo' && site.demoDomain) {
     link = site.demoDomain;
   } else {
-  const path = `/${deployment}/${site.owner}/${site.repository}`;
+    const path = `/${deployment}/${site.owner}/${site.repository}`;
     link = `${siteViewDomain(site)}${path}`;
   }
-
   return `${link.replace(/\/+$/, '')}/`;
 }
 
