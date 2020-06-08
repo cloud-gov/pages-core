@@ -2,5 +2,5 @@ name: federalistapp
 memory: 512MB
 instances: 2
 env: production
-env_postfix:
+env_postfix: ''
 log_level: info

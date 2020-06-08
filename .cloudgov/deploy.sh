@@ -1,5 +1,5 @@
 #! /bin/bash
-set -o pipefail
+set -eo pipefail
 
 CF_API="https://api.fr.cloud.gov"
 CF_ORGANIZATION="gsa-18f-federalist"
