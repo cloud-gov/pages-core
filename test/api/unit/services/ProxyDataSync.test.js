@@ -21,7 +21,7 @@ describe('ProxyDataSync', () => {
   });
 
   it('can save an item', (done) => {
-  	const putStub = sinon.stub(DynamoDBDocumentHelper.prototype, 'put');//.returns({});
+  	const putStub = sinon.stub(DynamoDBDocumentHelper.prototype, 'put');
 		saveSite(site);
 		const args = putStub.args[0];
 		expect(args[0]).to.be.a('string');
@@ -31,7 +31,7 @@ describe('ProxyDataSync', () => {
   });
 
   it('can delete an item', (done) => {
-  	const deleteStub = sinon.stub(DynamoDBDocumentHelper.prototype, 'delete');//.returns({});
+  	const deleteStub = sinon.stub(DynamoDBDocumentHelper.prototype, 'delete');
 		removeSite(site);
 		const args = deleteStub.args[0];
 		expect(args[0]).to.be.a('string');
@@ -41,7 +41,7 @@ describe('ProxyDataSync', () => {
   });
 
   it('can save array of sites', (done) => {
-  	const batchWriteStub = sinon.stub(DynamoDBDocumentHelper.prototype, 'batchWrite');//.returns({});
+  	const batchWriteStub = sinon.stub(DynamoDBDocumentHelper.prototype, 'batchWrite');
    	saveSites([site]);
    	const args = batchWriteStub.args[0];
 		expect(args[0]).to.be.a('string');
