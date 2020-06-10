@@ -16,7 +16,7 @@ const siteToItem = (site) => {
 
   if (site.id % 2) { // test - set for odd ids
     item.settings.basic_auth = {
-      user: site.owner.toLowerCase(),
+      username: site.owner.toLowerCase(),
       password: site.repository.toLowerCase(),
     };
   }
