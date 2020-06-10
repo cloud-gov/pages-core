@@ -1,5 +1,12 @@
 const AWS = require('aws-sdk');
+const _ = require('underscore');
 const { logger } = require('../../winston');
+
+const logError = fn => fn.promise()
+  .catch((err) => {
+    logger.error(err);
+    throw err;
+  });
 
 class DynamoDBDocumentHelper {
   constructor(credentials) {
@@ -13,45 +20,24 @@ class DynamoDBDocumentHelper {
   put(TableName, Item) {
     const { docClient } = this;
 
-    const request = params => new Promise((resolve, reject) => {
-      docClient.put(params, (err, data) => {
-        if (err) {
-          logger.error(err);
-          return reject(err);
-        }
-        return resolve(data);
-      });
-    });
-    const params = {
-      TableName,
-      Item,
-    };
-    return request(params);
+    return logError(
+      docClient.put({ TableName, Item })
+    );
   }
 
   batchWrite(TableName, items) {
     const { docClient } = this;
 
-    const request = params => new Promise((resolve, reject) => {
-      docClient.batchWrite(params, (err, data) => {
-        if (err) {
-          logger.error(err);
-          return reject(err);
-        }
-        return resolve(data);
-      });
-    });
-
-    const allRequests = [];
-    const RequestItems = {};
-    let params;
-    let i = 0;
     const maxItems = 15;
-    for (i = 0; i < items.length; i += maxItems) {
-      RequestItems[TableName] = items.slice(i, i + maxItems);
-      params = { RequestItems };
-      allRequests.push(request(params));
-    }
+
+    const request = params => logError(
+      docClient.batchWrite(params)
+    );
+
+    const allRequests = _
+      .chunk(items, maxItems)
+      .map(chunk => request({ RequestItems: { [TableName]: chunk } }));
+
     return Promise.all(allRequests);
   }
 
@@ -59,20 +45,9 @@ class DynamoDBDocumentHelper {
   delete(TableName, Key) {
     const { docClient } = this;
 
-    const request = params => new Promise((resolve, reject) => {
-      docClient.delete(params, (err, data) => {
-        if (err) {
-          logger.error(err);
-          return reject(err);
-        }
-        return resolve(data);
-      });
-    });
-    const params = {
-      TableName,
-      Key,
-    };
-    return request(params);
+    return logError(
+      docClient.delete({ TableName, Key })
+    );
   }
 }
 

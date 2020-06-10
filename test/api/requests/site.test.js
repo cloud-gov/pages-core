@@ -244,16 +244,13 @@ describe('Site API', () => {
       mockRouteResponse(s3.bucket);
     }
 
-    let proxyRemoveSiteStub;
-    let proxySaveSiteStub;
-
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.repo();
       githubAPINocks.createRepoForOrg();
       githubAPINocks.webhook();
-      proxyRemoveSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
-      proxySaveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
+      sinon.stub(ProxyDataSync, 'removeSite').rejects();
+      sinon.stub(ProxyDataSync, 'saveSite').rejects();
     });
 
     afterEach(() => {

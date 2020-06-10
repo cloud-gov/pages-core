@@ -1,6 +1,7 @@
-const AWS = require('aws-sdk');
-const { saveSites, removeSite, saveSite } = require('../api/services/ProxyDataSync');
+const { saveSites } = require('../api/services/ProxyDataSync');
 const { Site } = require('../api/models');
- 
-Site.findAll({ attributes: ['id', 'owner', 'repository', 'awsBucketName', 'awsBucketRegion', 's3ServiceName'] })
-	.then(saveSites);
+
+Site.findAll({
+  attributes: ['id', 'owner', 'repository', 'awsBucketName', 'awsBucketRegion', 's3ServiceName'],
+})
+  .then(saveSites);

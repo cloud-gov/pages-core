@@ -1,119 +1,119 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
 const AWS = require('aws-sdk');
 
 const config = require('../../../../config');
 
 const { DynamoDBDocumentHelper } = require('../../../../api/services/DynamoDBDocumentHelper');
 
-AWS.DynamoDB.DocumentClient = function mock() {};
-
-// AWS.DynamoDB.DocumentClient.prototype.reset = () => AWS.DynamoDB.DocumentClient = {};
+function stubDocDBMethod(method, fn) {
+  return sinon.stub(AWS.DynamoDB, 'DocumentClient')
+    .returns({
+      [method]: params => ({
+        promise: async () => fn(params),
+      }),
+    });
+}
 
 describe('DynamoDBDocumentHelper', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
   describe('put item', () => {
     before(() => {
-      AWS.DynamoDB.DocumentClient.prototype.put = (params, cb) => {
-      	if(!params.TableName || !params.Item) {
-      		cb(new Error(), {});
-      		return;
-      	}
-	    	cb(null, params);
-  	  };
+      stubDocDBMethod('put', (params) => {
+        if (!params.TableName || !params.Item) {
+          throw new Error();
+        }
+        return params;
+      });
     });
 
-    it('can put an item', (done) => {
+    it('can put an item', async () => {
       const docClient = new DynamoDBDocumentHelper(config.dynamoDB);
       const tableName = 'myTable';
       const item = { itemKey: 'itemKeyValue' };
-      docClient.put(tableName, item)
-        .then((params) => {
-          expect(params).to.deep.equal({ TableName: tableName, Item: item });
-          done();
-        })
+
+      const params = await docClient.put(tableName, item);
+
+      expect(params).to.deep.equal({ TableName: tableName, Item: item });
     });
 
-    it('cannot put an item', (done) => {
+    it('cannot put an item', async () => {
       const docClient = new DynamoDBDocumentHelper(config.dynamoDB);
       const tableName = null;
       const item = { itemKey: 'itemKeyValue' };
-      docClient.put(tableName, item)
-        .catch((err) => {
-        	expect(err).to.be.an('error');
-          done();
-        });
+
+      const err = await docClient.put(tableName, item).catch(e => e);
+
+      expect(err).to.be.an('error');
     });
   });
 
   describe('batchWrite', () => {
     before(() => {
-      AWS.DynamoDB.DocumentClient.prototype.batchWrite = (params, cb) => {
-      	if (params.RequestItems['badTable']) {
-      		cb(new Error(), {});
-      		return;
-      	}
-	    	cb(null, params);
-  	  };
+      stubDocDBMethod('batchWrite', (params) => {
+        if (params.RequestItems.badTable) {
+          throw new Error();
+        }
+        return params;
+      });
     });
 
-    it('can put bulk items', (done) => {
+    it('can put bulk items', async () => {
       const docClient = new DynamoDBDocumentHelper(config.dynamoDB);
       const tableName = 'myTable';
       const items = [];
       let i = 0;
       while (i < 40) {
-      	items.push({ itemKey: `itemKeyValue-${i}` })
-      	i += 1;
+        items.push({ itemKey: `itemKeyValue-${i}` });
+        i += 1;
       }
 
-      docClient.batchWrite(tableName, items)
-        .then((params) => {
-          expect(params.length).to.equal(3);
-          done();
-        })
+      const params = await docClient.batchWrite(tableName, items);
+
+      expect(params.length).to.equal(3);
     });
 
-    it('cannot put bulk Items', (done) => {
+    it('cannot put bulk Items', async () => {
       const docClient = new DynamoDBDocumentHelper(config.dynamoDB);
       const tableName = 'badTable';
-      docClient.batchWrite(tableName, [{}])
-        .catch((err) => {
-        	expect(err).to.be.an('error');
-          done();
-        });
+
+      const err = await docClient.batchWrite(tableName, [{}]).catch(e => e);
+
+      expect(err).to.be.an('error');
     });
   });
 
   describe('delete item', () => {
     before(() => {
-      AWS.DynamoDB.DocumentClient.prototype.delete = (params, cb) => {
-      	if(!params.TableName || !params.Key) {
-      		cb(new Error(), {});
-      		return;
-      	}
-	    	cb(null, params);
-  	  };
+      stubDocDBMethod('delete', (params) => {
+        if (!params.TableName || !params.Key) {
+          throw new Error();
+        }
+        return params;
+      });
     });
 
-    it('can delete an item', (done) => {
+    it('can delete an item', async () => {
       const docClient = new DynamoDBDocumentHelper(config.dynamoDB);
       const tableName = 'myTable';
       const key = 'myKey';
-      docClient.delete(tableName, key)
-        .then((params) => {
-          expect(params).to.deep.equal({ TableName: tableName, Key: key });
-          done();
-        })
+
+      const params = await docClient.delete(tableName, key);
+
+      expect(params).to.deep.equal({ TableName: tableName, Key: key });
     });
 
-    it('cannot delete an item', (done) => {
+    it('cannot delete an item', async () => {
       const docClient = new DynamoDBDocumentHelper(config.dynamoDB);
       const tableName = null;
       const key = 'myKey';
-      docClient.delete(tableName, key)
-        .catch((err) => {
-        	expect(err).to.be.an('error');
-          done();
-        });
+
+      const err = await docClient.delete(tableName, key).catch(e => e);
+
+      expect(err).to.be.an('error');
     });
   });
 });
