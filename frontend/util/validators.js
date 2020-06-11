@@ -2,6 +2,10 @@ const yaml = require('js-yaml');
 
 const validBranchName = s => /^[\w._]+(?:[/-]*[\w._])*$/.test(s);
 
+const validBasicAuthUsername = s => /^[a-zA-Z0-9_-]+{3,15}$/.test(s);
+
+const validBasicAuthPassword = s => /^[a-zA-Z0-9_\-\$!@]{6,15}$/.test(s);
+
 function isValidYaml(yamlString) {
   try {
     yaml.safeLoad(yamlString);
@@ -17,4 +21,6 @@ function isValidYaml(yamlString) {
 module.exports = {
   isValidYaml,
   validBranchName,
+  validBasicAuthUsername,
+  validBasicAuthPassword,
 };

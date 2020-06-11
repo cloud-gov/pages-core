@@ -12,6 +12,7 @@ import githubBranches from './reducers/githubBranches';
 import showAddNewSiteFields from './reducers/showAddNewSiteFields';
 import userActions from './reducers/userActions';
 import userEnvironmentVariables from './reducers/userEnvironmentVariables';
+import basicAuthfrom './reducers/basicAuth';
 
 export default {
   buildLogs,
@@ -27,5 +28,6 @@ export default {
   showAddNewSiteFields,
   userActions,
   userEnvironmentVariables,
+  basicAuth,
   FRONTEND_CONFIG: (state = {}) => state,
 };

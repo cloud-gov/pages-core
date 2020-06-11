@@ -8,6 +8,7 @@ import ExpandableArea from '../../ExpandableArea';
 import BasicSiteSettings from './BasicSiteSettings';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
 import EnvironmentVariables from './EnvironmentVariables';
+import BasicAuthSettings from './BasicAuthSettings';
 import siteActions from '../../../actions/siteActions';
 import { currentSite } from '../../../selectors/site';
 
@@ -94,6 +95,13 @@ class SiteSettings extends React.Component {
         <ExpandableArea title="Environment variables">
           <EnvironmentVariables
             siteId={site.id}
+          />
+        </ExpandableArea>
+        <ExpandableArea title="Basic Authentication">
+          <BasicAuthSettings
+            initialValues={basicInitialValues}
+            enableBasicAuth={this.saveBasicAuth}
+            disableBasicAuth={this.disableBasicAuth}
           />
         </ExpandableArea>
       </div>
