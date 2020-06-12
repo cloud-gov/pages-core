@@ -113,7 +113,13 @@ describe('Build Log API', () => {
 
         return Promise.props({ user: userPromise, site: sitePromise, build: buildPromise })
           .then(({ build, user }) => Promise.all([
-            Promise.all(Array(3).fill(0).map(() => factory.buildLog({ build }))),
+            BuildLog.bulkCreate(
+              Array(2000).fill(0).map(() => ({
+                output: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam fringilla, arcu ut ultricies auctor, elit quam consequat neque, eu blandit metus lorem non turpis.',
+                source: 'ALL',
+                build: build.id,
+              }))
+            ),
             authenticatedSession(user),
           ])).then(([logs, cookie]) => {
             const buildId = logs[0].get({ plain: true }).build;
@@ -128,7 +134,8 @@ describe('Build Log API', () => {
       const expectedResponse = (response, done) => {
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
         expect(response.body).to.be.an('array');
-        expect(response.body).to.have.length(3);
+        expect(response.body).to.have.length(1);
+        expect(response.body[0].output.split('\n')).to.have.length(1000);
         done();
       };
 
@@ -287,14 +294,15 @@ describe('Build Log API', () => {
 
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, body);
         expect(body).to.be.an('array');
-        expect(body).to.have.length(numLogs);
-        expect(body.map(l => l.source)).to.have.members(Array(numLogs).fill('ALL'));
+        expect(body).to.have.length(1);
+        expect(body[0].output.split('\n')).to.have.length(3);
+        expect(body.map(l => l.source)).to.have.members(Array(1).fill('ALL'));
       });
 
       it('paginates new build logs by groups of lines', async () => {
         const numLogs = 6;
 
-        await factory.bulkBuildLogs((1000 + numLogs),{ buildId: build.id, source: 'ALL' });
+        await factory.bulkBuildLogs((1000 + numLogs), { buildId: build.id, source: 'ALL' });
 
         let resp = await request(app)
           .get(`/v0/build/${build.id}/log/page/1`)
@@ -303,8 +311,9 @@ describe('Build Log API', () => {
 
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, resp.body);
         expect(resp.body).to.be.an('array');
-        expect(resp.body).to.have.length(1000);
-        expect(resp.body.map(l => l.source)).to.have.members(Array(1000).fill('ALL'));
+        expect(resp.body).to.have.length(1);
+        expect(resp.body[0].output.split('\n')).to.have.length(1000);
+        expect(resp.body.map(l => l.source)).to.have.members(Array(1).fill('ALL'));
 
         resp = await request(app)
           .get(`/v0/build/${build.id}/log/page/2`)
@@ -313,8 +322,9 @@ describe('Build Log API', () => {
 
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, resp.body);
         expect(resp.body).to.be.an('array');
-        expect(resp.body).to.have.length(numLogs);
-        expect(resp.body.map(l => l.source)).to.have.members(Array(numLogs).fill('ALL'));
+        expect(resp.body).to.have.length(1);
+        expect(resp.body[0].output.split('\n')).to.have.length(numLogs);
+        expect(resp.body.map(l => l.source)).to.have.members(Array(1).fill('ALL'));
 
         resp = await request(app)
           .get(`/v0/build/${build.id}/log/page/3`)
