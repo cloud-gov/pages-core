@@ -95,7 +95,7 @@ describe('Build Log API', () => {
     });
   });
 
-  describe.only('GET /v0/build/:build_id/log', () => {
+  describe('GET /v0/build/:build_id/log', () => {
     it('should require authentication', (done) => {
       factory.buildLog().then(buildLog => request(app)
         .get(`/v0/build/${buildLog.build}/log`)
