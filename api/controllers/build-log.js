@@ -1,7 +1,7 @@
 const Seq = require('sequelize');
 const { wrapHandlers } = require('../utils');
 const buildLogSerializer = require('../serializers/build-log');
-const { Build, BuildLog } = require('../models');
+const { Build, BuildLog, sequelize } = require('../models');
 
 function decodeb64(str) {
   if (str) {
@@ -47,17 +47,27 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    // I think it will be more efficient to aggregate these at the db level...
-    // attributes: [[Seq.fn('STRING_AGG', Seq.col('output'), '\n'), 'output']]
-    // group: ['build', 'source']
-    let buildLogs = await BuildLog.findAll({
-      where: {
-        build: build.id,
-        source: 'ALL',
+    const query = `
+        SELECT bl.build, bl.source, STRING_AGG(bl.output, '\n') as output
+          FROM (
+            SELECT build, source, output
+              FROM buildlog
+             WHERE build = :buildid
+               AND source = 'ALL'
+          ORDER BY id
+                   OFFSET :offset
+                   FETCH NEXT :limit ROWS ONLY
+          ) AS bl
+      GROUP BY bl.build, bl.source
+    `;
+
+    let buildLogs = await sequelize.query(query, {
+      model: BuildLog,
+      replacements: {
+        buildid: build.id,
+        limit: lineLimit,
+        offset: (lineLimit * (page - 1)),
       },
-      order: [['id', 'ASC']],
-      offset: (lineLimit * (page - 1)),
-      limit: lineLimit,
     });
 
     // Support legacy build logs
