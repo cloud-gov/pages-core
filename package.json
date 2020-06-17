@@ -69,6 +69,7 @@
     "migrate:down": "node migrate.js down",
     "migrate:test": "node migrate.js up --dry-run",
     "migrate:reset": "node migrate.js reset",
+    "nightly-builds": "node ./scripts/nightly-builds.js",
     "export:sites": "node ./scripts/exportSitesAsCsv.js",
     "analyze-webpack": "webpack-bundle-analyzer -h 0.0.0.0 public/stats.json",
     "serve-coverage": "serve -l 8080 ./coverage",

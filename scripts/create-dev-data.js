@@ -42,6 +42,11 @@ async function createData({ githubUsername }) {
       githubAccessToken: 'fake-access-token',
       githubUserId: 123456,
     }),
+
+    User.create({
+      username: process.env.USER_AUDITOR,
+      email: 'fake-user@example.com',
+    }),
   ]);
 
   console.log('Creating sites...');
