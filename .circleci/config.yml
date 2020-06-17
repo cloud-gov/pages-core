@@ -125,26 +125,19 @@ jobs:
           command: yarn build
       - *maybe-configure-staging
       - *maybe-configure-production
+      - *install-and-log-into-cloudgov
       - deploy:
           command: ./.cloudgov/deploy.sh
+      - *log-out-of-cloudgov
 
-  audit:
-    machine: true
+  nighly-builds:
+    docker:
+      - image: cimg/base:2020.01
     steps:
       - checkout
       - *maybe-configure-staging
       - *maybe-configure-production
-      - *maybe-configure-production
       - *install-and-log-into-cloudgov
-      - run:
-          name: Verify repos
-          command: cf7 run-task $CF_APP --name verify-repos yarn verify-repos
-      - run:
-          name: Audit sites
-          command: cf7 run-task $CF_APP --name audit-sites yarn audit-sites
-      - run:
-          name: Audit federalist-users 18F Staff & Org Teams
-          command: cf7 run-task $CF_APP --name audit-teams yarn audit-teams
       - run:
           name: Run nightly builds
           command: cf7 run-task $CF_APP --name nightly-builds yarn nightly-builds              
@@ -170,11 +163,11 @@ workflows:
   nightly:
     triggers:
       - schedule:
-          cron: "10 0 * * *"
+          cron: "0 0 * * *"
           filters:
             branches:
               only:
                 - staging
                 - master
     jobs:
-      - audit
+      - nightly-builds
