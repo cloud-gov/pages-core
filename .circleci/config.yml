@@ -130,7 +130,7 @@ jobs:
           command: ./.cloudgov/deploy.sh
       - *log-out-of-cloudgov
 
-  nighly-builds:
+  nightly-builds:
     docker:
       - image: cimg/base:2020.01
     steps:
