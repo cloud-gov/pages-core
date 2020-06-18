@@ -140,7 +140,7 @@ jobs:
       - *install-and-log-into-cloudgov
       - run:
           name: Run nightly builds
-          command: cf7 run-task $CF_APP --name nightly-builds yarn nightly-builds              
+          command: cf7 run-task $CF_APP --name nightly-builds --command "yarn nightly-builds"
       - *log-out-of-cloudgov
 
 
