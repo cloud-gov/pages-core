@@ -1,52 +1,83 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
+const sinon = require('sinon');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
 const ScheduledBuildHelper = require('../../../../api/services/ScheduledBuildHelper');
 
 
 describe('ScheduledBuildHelper', () => {
-  before(() => {
-    factory.user({ username: process.env.USER_AUDITOR })
-      .catch();
+  const nightlyConfig = { schedule: 'nightly' };
+
+  before(async () => {
+    await factory.user({ username: process.env.USER_AUDITOR });
   });
 
-  context('nightlyBuilds', () => {
-    it('it should remove sites without push from user and site w/o repo', (done) => {
-      let sites;
-      const config = { schedule: 'nightly' };
+  afterEach(async () => {
+    sinon.restore();
+    await Build.truncate();
+    await Site.truncate();
+  });
+
+  describe('when there is an error', () => {
+    it('does not reject and reports failure', async () => {
+      const stub = sinon.stub(Build, 'create');
+      const error = new Error('YARGH');
+      stub.throws(error);
+
+      await factory.site({
+        owner: 'foo',
+        repository: 'test',
+        defaultConfig: nightlyConfig,
+        defaultBranch: 'master',
+      });
+
+      const result = await ScheduledBuildHelper.nightlyBuilds();
+
+      expect(result.length).to.eq(1);
+      expect(result[0].status).to.eq('rejected');
+      expect(result[0].reason).to.be.an('error');
+    });
+  });
+
+  it('it should remove sites without push from user and site w/o repo and report', async () => {
+    const sites = await Promise.all([
       factory.site({
         owner: 'scheduled',
-        defaultConfig: config,
+        repository: 'test1',
+        defaultConfig: nightlyConfig,
         defaultBranch: 'master',
-        demoConfig: config,
+        demoConfig: nightlyConfig,
         demoBranch: 'staging',
-      })
-      .then(() => factory.site({
+      }),
+      factory.site({
         owner: 'scheduled',
+        repository: 'test2',
         demoBranch: 'staging',
-        demoConfig: config,
-      }))
-      .then(() => factory.site({
+        demoConfig: nightlyConfig,
+      }),
+      factory.site({
         owner: 'scheduled',
-        demoConfig: config,
-      }))
-      .then(() => factory.site({
-        owner: 'scheduled',
-      }))
-      .then(() => Site.findAll({ where: { owner: 'scheduled' } }))
-      .then((_sites) => {
-        sites = _sites;
-        expect(sites.length).to.eql(4);
-        return ScheduledBuildHelper.nightlyBuilds();
-      })
-      .then(() => Build.findAll({ where: { site: sites.map(site => site.id) } }))
-      .then((builds) => {
-        expect(builds.length).to.eql(3);
-        expect(builds.filter(build => build.branch === 'master').length).to.eql(1);
-        expect(builds.filter(build => build.branch === 'staging').length).to.eql(2);
-        done();
-      })
-      .catch(done);
-    });
+        repository: 'test3',
+        demoConfig: nightlyConfig,
+      }),
+      factory.site({
+        owner: 'not-scheduled',
+        repository: 'test4',
+      }),
+    ]);
+
+    const result = await ScheduledBuildHelper.nightlyBuilds();
+
+    expect(result).to.have.deep.members([
+      { status: 'fulfilled', value: 'scheduled/test1@master' },
+      { status: 'fulfilled', value: 'scheduled/test1@staging' },
+      { status: 'fulfilled', value: 'scheduled/test2@staging' },
+    ]);
+
+    const builds = await Build.findAll({ where: { site: sites.map(site => site.id) } });
+
+    expect(builds.length).to.eql(3);
+    expect(builds.filter(build => build.branch === 'master').length).to.eql(1);
+    expect(builds.filter(build => build.branch === 'staging').length).to.eql(2);
   });
 });

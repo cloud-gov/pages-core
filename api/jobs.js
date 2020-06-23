@@ -6,7 +6,6 @@ const config = require('../config');
 const FederalistUsersHelper = require('./services/FederalistUsersHelper');
 const RepositoryVerifier = require('./services/RepositoryVerifier');
 const SiteUserAuditor = require('./services/SiteUserAuditor');
-const ScheduledBuildHelper = require('./services/ScheduledBuildHelper');
 
 const { CF_INSTANCE_INDEX } = process.env;
 
@@ -33,13 +32,6 @@ function scheduleJobs() {
       schedule.scheduleJob('20 0 * * *', () => {
         logger.info('Auditing federalist-users 18F Staff & Org Teams');
         FederalistUsersHelper.audit18F({})
-          .catch(logger.error);
-      });
-
-      // audit federalist-users 18F teams daily at midnight
-      schedule.scheduleJob('0 0 * * *', () => {
-        logger.info('Running nightlyBuilds');
-        ScheduledBuildHelper.nightlyBuilds()
           .catch(logger.error);
       });
     }
