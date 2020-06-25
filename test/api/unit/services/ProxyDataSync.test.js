@@ -16,6 +16,8 @@ const site = {
   repository: 'testRepo',
   awsBucketName: 'testBucket',
   awsBucketRegion: 'testRegion',
+  subdomain: 'www',
+  updatedAt: new Date(),
 };
 
 describe('ProxyDataSync', () => {
@@ -39,7 +41,7 @@ describe('ProxyDataSync', () => {
     removeSite(site);
 
     sinon.assert.calledOnceWithExactly(
-      deleteStub, proxySiteTable, { id: getSiteKey(site) }
+      deleteStub, proxySiteTable, { Id: getSiteKey(site) }
     );
   });
 
@@ -56,14 +58,21 @@ describe('ProxyDataSync', () => {
   });
 
   it('convert site to item', () => {
+    const start = new Date();
+    const obj = siteToItem(site);
     const item = {
-      id: getSiteKey(site),
-      settings: {
-        bucket_name: site.awsBucketName,
-        bucket_region: site.awsBucketRegion,
+      Id: getSiteKey(site),
+      Settings: {
+        BucketName: site.awsBucketName,
+        BucketRegion: site.awsBucketRegion,
       },
+      SiteUpdatedAt: site.updatedAt.toISOString(),
+      UpdatedAt: obj.UpdatedAt,
     };
 
-    expect(item).to.deep.equal(siteToItem(site));
+    expect(item).to.deep.equal(obj);
+    expect(start <= new Date(obj.UpdatedAt)).to.be.true;
+    expect(new Date() >= new Date(obj.UpdatedAt)).to.be.true;
+
   });
 });
