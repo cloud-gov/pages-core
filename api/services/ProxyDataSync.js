@@ -1,6 +1,7 @@
 // use dynamodb helper to write items to dynamodb
 const { DynamoDBDocumentHelper } = require('./DynamoDBDocumentHelper');
 const config = require('../../config');
+const factory = require('../../support/factory');
 
 const tableName = config.app.proxySiteTable;
 const siteKey = 'Id';
@@ -17,7 +18,7 @@ const siteToItem = (site) => {
   };
 
   if (site.id % 2) { // test - set for odd ids
-    item.settings.basicAuth = {
+    item.Settings.BasicAuth = {
       Username: site.owner.toLowerCase(),
       Password: site.repository.toLowerCase(),
     };
