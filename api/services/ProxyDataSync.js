@@ -1,7 +1,6 @@
 // use dynamodb helper to write items to dynamodb
 const { DynamoDBDocumentHelper } = require('./DynamoDBDocumentHelper');
 const config = require('../../config');
-const factory = require('../../support/factory');
 
 const tableName = config.app.proxySiteTable;
 const siteKey = 'Id';
