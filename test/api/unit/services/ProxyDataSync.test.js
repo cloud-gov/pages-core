@@ -18,6 +18,7 @@ const site = {
   awsBucketRegion: 'testRegion',
   subdomain: 'www',
   updatedAt: new Date(),
+
 };
 
 describe('ProxyDataSync', () => {
@@ -26,13 +27,23 @@ describe('ProxyDataSync', () => {
   });
 
   it('can save an item', () => {
-    const putStub = sinon.stub(DynamoDBDocumentHelper.prototype, 'put');
-
+    const putSpy = sinon.spy(DynamoDBDocumentHelper.prototype, 'put');
+    const start = new Date();
     saveSite(site);
 
-    sinon.assert.calledOnceWithExactly(
-      putStub, proxySiteTable, siteToItem(site)
-    );
+    sinon.assert.calledOnce(putSpy);
+    expect(putSpy.args[0][0]).to.equal(proxySiteTable);
+    const siteItem = putSpy.args[0][1];
+    expect(new Date(siteItem.UpdatedAt) >= start).to.be.true;
+    delete siteItem.UpdatedAt;
+    expect(siteItem).to.deep.equal({
+      Id: site.subdomain,
+      Settings: {
+        BucketName: site.awsBucketName,
+        BucketRegion: site.awsBucketRegion,
+      },
+      SiteUpdatedAt: site.updatedAt.toISOString(),
+    });
   });
 
   it('can delete an item', () => {
