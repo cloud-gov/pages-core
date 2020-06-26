@@ -78,12 +78,12 @@ describe('ProxyDataSync', () => {
         BucketRegion: site.awsBucketRegion,
       },
       SiteUpdatedAt: site.updatedAt.toISOString(),
-      UpdatedAt: obj.UpdatedAt,
     };
-
-    expect(item).to.deep.equal(obj);
+    
     expect(start <= new Date(obj.UpdatedAt)).to.be.true;
     expect(new Date() >= new Date(obj.UpdatedAt)).to.be.true;
+    delete obj.UpdatedAt;
+    expect(item).to.deep.equal(obj);
 
   });
 });
