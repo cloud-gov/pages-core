@@ -2,10 +2,10 @@ import React, { Fragment, Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import BasicAuthUserField from '../../Fields/BasicAuthField';
-import BasicAuthPasswordField from '../../Fields/BasicPasswordField';
+import BasicAuthUserField from '../../Fields/BasicAuthUserField';
+import BasicAuthPasswordField from '../../Fields/BasicAuthPasswordField';
 import { siteBasicAuth } from '../../../selectors/basicAuth';
-import { validBasicAuthUsername, validBasicAuthPassword } from '../../util/validators';
+import { validBasicAuthUsername, validBasicAuthPassword } from '../../../util/validators';
 import InputWithErrorField from '../../Fields/InputWithErrorField';
 import LoadingIndicator from '../../LoadingIndicator';
 import {
@@ -13,53 +13,7 @@ import {
   removeBasicAuth,
   fetchBasicAuth,
 } from '../../../actions/basicAuthActions';
-import { BASIC_AUTH } from '../../propTypes';
-
-export const BasicAuthSettings = ({
-  // even though initialValues is not directly used, it is used
-  // by reduxForm, and we want PropType validation on it, so we'll
-  // keep it here but disable the eslint rule below
-  initialValues, // eslint-disable-line no-unused-vars
-  disableBasicAuth,
-  pristine,
-  enableBasicAuth,
-}) => (
-  <form className="settings-form" onSubmit={enableBasicAuth}>
-    <h3>Basic Authentication Settings</h3>
-    <div className="well">
-      <fieldset>
-        <p className="well-text">
-          Set the username and password to enable basica authentication username and password credentials required to preview your site builds.
-        </p>
-        <legend className="sr-only">Add new environment variable</legend>
-        <Field
-          name="name"
-          type="text"
-          label="Name:"
-          component={InputWithErrorField}
-          required
-          validate={[validateBasicAuthUsername]}
-        />
-        <Field
-          name="value"
-          type="text"
-          label="Value:"
-          component={InputWithErrorField}
-          required
-          minlength={4}
-          validate={[validateBasicAuthPassword]}
-        />
-      </fieldset>
-      <button type="submit" disabled={invalid || submitting}>
-        Save
-      </button>
-      <button type="button" disabled={pristine || submitting} onClick={this.disableBasicAuth}>
-        Remove
-      </button>
-      </fieldset>
-    </div>
-  </form>
-);
+import { BASIC_AUTH } from '../../../propTypes';
 
 const infoContent = (
   <Fragment>
@@ -129,7 +83,7 @@ class BasicAuthSettings extends Component {
         { isLoading
           ? <LoadingIndicator />
           : (
-              <form className="settings-form" onSubmit={enableBasicAuth}>
+              <form className="settings-form" onSubmit={saveBasicAuth}>
                 <h3>Basic Authentication Settings</h3>
                 <div className="well">
                   <fieldset>
@@ -158,10 +112,9 @@ class BasicAuthSettings extends Component {
                   <button type="submit" disabled={invalid || submitting}>
                     Save
                   </button>
-                  <button type="button" disabled={pristine || submitting} onClick={this.disableBasicAuth}>
+                  <button type="button" disabled={pristine || submitting} onClick={this.removeBasicAuth}>
                     Remove
                   </button>
-                  </fieldset>
                 </div>
               </form>
           )
@@ -196,5 +149,4 @@ const mapDispatchToProps = dispatch => ({
   }, dispatch),
 });
 
-export { BasicAuthSettings };
 export default connect(mapStateToProps, mapDispatchToProps)(BasicAuthSettings);
