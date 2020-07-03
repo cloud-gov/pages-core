@@ -70,5 +70,5 @@ export const USER_ENVIRONMENT_VARIABLE = PropTypes.shape({
 
 export const BASIC_AUTH = PropTypes.shape({
   username: PropTypes.string,
-  passwored: PropTypes.string,
+  password: PropTypes.string,
 });

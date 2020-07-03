@@ -99,9 +99,7 @@ class SiteSettings extends React.Component {
         </ExpandableArea>
         <ExpandableArea title="Basic Authentication">
           <BasicAuthSettings
-            initialValues={basicInitialValues}
-            enableBasicAuth={this.saveBasicAuth}
-            disableBasicAuth={this.disableBasicAuth}
+            siteId={site.id}
           />
         </ExpandableArea>
       </div>

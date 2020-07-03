@@ -2,12 +2,16 @@ import React, { Fragment, Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import BasicAuthUserField from '../../Fields/BasicAuthUserField';
-import BasicAuthPasswordField from '../../Fields/BasicAuthPasswordField';
-import { siteBasicAuth } from '../../../selectors/basicAuth';
-import { validBasicAuthUsername, validBasicAuthPassword } from '../../../util/validators';
+// import { bindActionCreators, compose } from 'redux';
+// import { Field, reduxForm } from 'redux-form';
+// import BasicAuthUserField from '../../Fields/BasicAuthUserField';
+// import BasicAuthPasswordField from '../../Fields/BasicAuthPasswordField';
+// import { siteBasicAuth } from '../../../selectors/basicAuth';
+// import { validBasicAuthUsername, validBasicAuthPassword } from '../../../util/validators';
+import BasicAuthSettingsForm from './BasicAuthSettingsForm';
 import InputWithErrorField from '../../Fields/InputWithErrorField';
 import LoadingIndicator from '../../LoadingIndicator';
+import AlertBanner from '../../alertBanner';
 import {
   saveBasicAuth,
   removeBasicAuth,
@@ -49,7 +53,6 @@ const warningContent = (
   </Fragment>
 );
 
-
 class BasicAuthSettings extends Component {
   componentDidMount() {
     const { siteId, actions } = this.props;
@@ -59,13 +62,12 @@ class BasicAuthSettings extends Component {
   render() {
     const {
       siteId,
-      basicAuth: { isLoading, data },
+      basicAuth: { isLoading, data: credentials },
       actions,
     } = this.props;
-
-    const addBasicAuth = params => actions.addBasicAuth(siteId, params);
-    const removeBasicAuth = uevId => actions.removeBasicAuth(siteId);
-    const showTable = !isLoading && data.length > 0;
+console.log(`\n\ncredentials:\t${JSON.stringify(credentials)}\n\n`);
+    const setBasicAuth = params => actions.saveBasicAuth(siteId, params);
+    const disableBasicAuth = () => actions.removeBasicAuth(siteId);
 
     return (
       <div className="well">
@@ -83,40 +85,7 @@ class BasicAuthSettings extends Component {
         { isLoading
           ? <LoadingIndicator />
           : (
-              <form className="settings-form" onSubmit={saveBasicAuth}>
-                <h3>Basic Authentication Settings</h3>
-                <div className="well">
-                  <fieldset>
-                    <p className="well-text">
-                      Set the username and password to enable basica authentication username and password credentials required to preview your site builds.
-                    </p>
-                    <legend className="sr-only">Add new environment variable</legend>
-                    <Field
-                      name="name"
-                      type="text"
-                      label="Name:"
-                      component={InputWithErrorField}
-                      required
-                      validate={[validateBasicAuthUsername]}
-                    />
-                    <Field
-                      name="value"
-                      type="text"
-                      label="Value:"
-                      component={InputWithErrorField}
-                      required
-                      minlength={4}
-                      validate={[validateBasicAuthPassword]}
-                    />
-                  </fieldset>
-                  <button type="submit" disabled={invalid || submitting}>
-                    Save
-                  </button>
-                  <button type="button" disabled={pristine || submitting} onClick={this.removeBasicAuth}>
-                    Remove
-                  </button>
-                </div>
-              </form>
+              <BasicAuthSettingsForm initialValues={credentials} onSubmit={setBasicAuth} onRemove={disableBasicAuth}/>
           )
         }
       </div>
@@ -137,8 +106,8 @@ BasicAuthSettings.propTypes = {
   }).isRequired,
 };
 
-const mapStateToProps = ({ basicAuth }, { siteId }) => ({
-  basicAuth: siteBasicAuth(basicAuth, siteId),
+const mapStateToProps = ({ basicAuth }) => ({
+  basicAuth,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -150,3 +119,4 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BasicAuthSettings);
+

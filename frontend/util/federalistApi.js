@@ -166,7 +166,7 @@ export default {
   },
 
   removeBasicAuth(siteId) {
-    return this.fetch(`site/${siteId}/basic_auth`, {
+    return this.fetch(`site/${siteId}/basic-auth`, {
       method: 'DELETE',
     }, {
       handleHttpError: false,
@@ -174,7 +174,7 @@ export default {
   },
 
   saveBasicAuth(siteId, credentials) {
-    return this.fetch(`site/${siteId}/basic_auth`, {
+    return this.fetch(`site/${siteId}/basic-auth`, {
       method: 'POST',
       data: {
         username: credentials.username,
