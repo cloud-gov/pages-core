@@ -138,7 +138,7 @@
     "redux-form": "^8.3.6",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "sass-loader": "^8.0.2",
+    "sass-loader": "^9.0.1",
     "serve": "^11.3.2",
     "shortid": "^2.2.8",
     "sinon": "9.0.2",
