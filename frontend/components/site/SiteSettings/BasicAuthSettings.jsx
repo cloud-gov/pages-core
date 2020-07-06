@@ -7,7 +7,7 @@ import { bindActionCreators } from 'redux';
 // import BasicAuthUserField from '../../Fields/BasicAuthUserField';
 // import BasicAuthPasswordField from '../../Fields/BasicAuthPasswordField';
 // import { siteBasicAuth } from '../../../selectors/basicAuth';
-// import { validBasicAuthUsername, validBasicAuthPassword } from '../../../util/validators';
+import { validBasicAuthUsername, validBasicAuthPassword } from '../../../util/validators';
 import BasicAuthSettingsForm from './BasicAuthSettingsForm';
 import InputWithErrorField from '../../Fields/InputWithErrorField';
 import LoadingIndicator from '../../LoadingIndicator';
@@ -65,7 +65,7 @@ class BasicAuthSettings extends Component {
       basicAuth: { isLoading, data: credentials },
       actions,
     } = this.props;
-console.log(`\n\ncredentials:\t${JSON.stringify(credentials)}\n\n`);
+
     const setBasicAuth = params => actions.saveBasicAuth(siteId, params);
     const disableBasicAuth = () => actions.removeBasicAuth(siteId);
 
@@ -85,7 +85,18 @@ console.log(`\n\ncredentials:\t${JSON.stringify(credentials)}\n\n`);
         { isLoading
           ? <LoadingIndicator />
           : (
-              <BasicAuthSettingsForm initialValues={credentials} onSubmit={setBasicAuth} onRemove={disableBasicAuth}/>
+              credentials.username ?
+                ( 
+                  <p className="well-text">
+                    <b>Username:</b> {credentials.username}<br />
+                    <b>Password:</b> {credentials.password}<br /><br />
+                    <button type="button" className="margin-0" onClick={() => disableBasicAuth()}>
+                      Disable
+                    </button>
+                  </p>
+                )
+                : ( <BasicAuthSettingsForm initialValues={credentials} onSubmit={setBasicAuth} /> )
+              
           )
         }
       </div>

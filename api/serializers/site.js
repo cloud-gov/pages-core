@@ -9,7 +9,7 @@ const toJSON = (site) => {
   }));
 
   delete object.site_users__user_sites;
-  delete object.config; // may contain sensitive info
+  delete object.config; // may contain sensitive info ie: basicAuth
 
   object.demoViewLink = siteViewLink(object, 'demo');
   object.previewLink = siteViewLink(object, 'preview');

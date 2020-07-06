@@ -5,11 +5,8 @@ import BasicAuthUserField from '../../Fields/BasicAuthUserField';
 import BasicAuthPasswordField from '../../Fields/BasicAuthPasswordField';
 import { BASIC_AUTH } from '../../../propTypes';
 
-// const setBasicAuth = params => actions.saveBasicAuth(siteId, params);
-// const disableBasicAuth = siteId => actions.removeBasicAuth(siteId);
-
 export const BasicAuthSettingsForm = ({
-  handleSubmit, invalid, pristine, reset, submitting, onRemove, initialValues,
+  handleSubmit, invalid, pristine, reset, submitting, initialValues,
 }) => (
   <form className="settings-form" onSubmit={data => handleSubmit(data)}>
     <h3>Basic Authentication Settings</h3>
@@ -18,7 +15,6 @@ export const BasicAuthSettingsForm = ({
         <p className="well-text">
           To enable basic authentication, please submit a username and password credentials required to preview your site builds.
         </p>
-        <legend className="sr-only">Set username and password for your site</legend>
         <BasicAuthUserField
           label="username"
           type="text"
@@ -34,11 +30,8 @@ export const BasicAuthSettingsForm = ({
           placeholder="********"
         />
       </fieldset>
-      <button type="submit" disabled={invalid || submitting}>
+      <button type="submit" disabled={invalid || pristine || submitting}>
         Save
-      </button>
-      <button type="button" disabled={pristine || submitting} onClick={onRemove}>
-        Remove
       </button>
     </div>
   </form>
@@ -56,4 +49,5 @@ BasicAuthSettingsForm.propTypes = {
 
 export default reduxForm({
   form: 'basicAuth',
+  enableReinitialize: true,
 })(BasicAuthSettingsForm);

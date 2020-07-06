@@ -528,6 +528,73 @@ paths:
           description: Not found
           schema:
             $ref: "Error.json"
+  /site/{site_id}/basic-auth:
+    parameters:
+      - name: site_id
+        in: path
+        description: The id of the site
+        type: integer
+        required: true
+    get:
+      summary: Fetch the basic auth credentials for the given site
+      responses:
+        200:
+          description: Basic Auth credentials for the given site
+          schema:
+            $ref: "BasicAuth.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+    post:
+      summary: Set the basic auth credentials for a site based on the site id
+      parameters:
+        - name: username
+          in: body
+          type: string
+          required: true
+        - name: password
+          in: body
+          type: string
+          required: true
+      responses:
+        200:
+          description: An object representing the user environment variable
+          schema:
+            $ref: "BasicAuth.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: The site of the user environment variable is to be added to cannot be found
+          schema:
+            $ref: "Error.json"
+    delete:
+      summary: Remove basic auth from a site based on the site id
+      responses:
+        200:
+          description: Delete successful
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
   /site/{site_id}/user-environment-variable/{user-environment-variable_id}:
     parameters:
       - name: site_id

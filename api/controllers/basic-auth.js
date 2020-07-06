@@ -32,7 +32,7 @@ module.exports = wrapHandlers({
     if (!site) {
       return res.notFound();
     }
-console.log(`\n\nfind basic-auth site:\t${JSON.stringify(site)}\n\n`)
+
     const credentials = hideCredentials(site.basicAuth);
 
     return res.ok(credentials);
@@ -40,6 +40,7 @@ console.log(`\n\nfind basic-auth site:\t${JSON.stringify(site)}\n\n`)
 
   async create(req, res) {
     const { body, params, user } = req;
+
     const { site_id: siteId } = params;
 
     let site = await Site.forUser(user).findByPk(siteId);
@@ -48,13 +49,16 @@ console.log(`\n\nfind basic-auth site:\t${JSON.stringify(site)}\n\n`)
       return res.notFound();
     }
 
+    if (!body.username || !body.password) {
+      return res.error(400);
+    }
+
     const credentials = stripCredentials(body);
     
     const config = site.config;
     config.basicAuth = credentials;
     site = await site.update({ config });
-    // site = await site.reload();
-console.log(`\n\ncreate basic-auth site:\t${JSON.stringify(site)}\n\n`)
+
     const hiddenCredentials = hideCredentials(site.basicAuth);
     return res.ok(hiddenCredentials);
   },
@@ -71,9 +75,9 @@ console.log(`\n\ncreate basic-auth site:\t${JSON.stringify(site)}\n\n`)
 
     const config = site.config;
     delete config.basicAuth;
-    site = await site.update({ config });
-console.log(`\n\ndestroy basic-auth site:\t${JSON.stringify(site)}\n\n`)
-    const hiddenCredentials = hideCredentials(site.basicAuth);
-    return res.ok(hiddenCredentials);
+
+    await site.update({ config });
+
+    return res.ok({});
   },
 });

@@ -23,7 +23,7 @@
     "demoDomain": {
       "type": "string"
     },
-    "config": {
+    "defaultConfig": {
       "type": "string"
     },
     "defaultBranch": {
