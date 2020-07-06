@@ -84,7 +84,7 @@
   "author": "dhcole",
   "license": "CC0-1.0",
   "devDependencies": {
-    "@reach/router": "^1.3.3",
+    "@reach/router": "^1.3.4",
     "autoprefixer": "^9.8.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^10.0.1",
