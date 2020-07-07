@@ -1,3 +1,4 @@
+const { logger } = require('../../winston');
 const { wrapHandlers } = require('../utils');
 const {
   ValidationError,
@@ -6,6 +7,7 @@ const {
 } = require('../utils/validators');
 const { Site } = require('../models');
 const siteSerializer = require('../serializers/site');
+const proxyDataSync = require('../services/ProxyDataSync');
 
 function stripCredentials({ username, password }) {
   if (validBasicAuthUsername(username) && validBasicAuthPassword(password)) {
@@ -59,6 +61,9 @@ module.exports = wrapHandlers({
     config.basicAuth = credentials;
     site = await site.update({ config });
 
+    proxyDataSync.saveSite(site) // sync to proxy database
+      .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+
     const hiddenCredentials = hideCredentials(site.basicAuth);
     return res.ok(hiddenCredentials);
   },
@@ -76,7 +81,9 @@ module.exports = wrapHandlers({
     const config = site.config;
     delete config.basicAuth;
 
-    await site.update({ config });
+    site = await site.update({ config });
+    proxyDataSync.saveSite(site) // sync to proxy database
+      .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
 
     return res.ok({});
   },

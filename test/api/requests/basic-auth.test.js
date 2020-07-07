@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const request = require('supertest');
+const sinon = require('sinon');
 const factory = require('../support/factory');
 const csrfToken = require('../support/csrfToken');
 const { authenticatedSession } = require('../support/session');
@@ -7,6 +8,7 @@ const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema'
 const app = require('../../../app');
 const config = require('../../../config');
 const { Site } = require('../../../api/models');
+const ProxyDataSync = require('../../../api/services/ProxyDataSync');
 
 describe('Site basic authentication API', () => {
   describe('DELETE /v0/site/:site_id/basic-auth', () => {
@@ -60,6 +62,10 @@ describe('Site basic authentication API', () => {
     });
 
     describe('when the parameters are valid', () => {
+      beforeEach(() => {
+        sinon.restore();
+      });
+
       it('deletes basic auth from config and returns a 200', async () => {
         const userPromise = await factory.user();
         const config = { 
@@ -73,6 +79,9 @@ describe('Site basic authentication API', () => {
           users: [userPromise],
           config,
         });
+
+        sinon.stub(ProxyDataSync, 'saveSite').resolves();
+
         const cookie = await authenticatedSession(userPromise);
         expect(site.config).to.deep.eq(config);
         const { body } = await request(app)
@@ -270,6 +279,10 @@ describe('Site basic authentication API', () => {
     });
 
     describe('when the parameters are valid', () => {
+      beforeEach(() => {
+        sinon.restore();
+      });
+
       it('sets username and password for basic authentication', async () => {
         const userPromise = await factory.user();
         let site = await factory.site({
@@ -281,6 +294,8 @@ describe('Site basic authentication API', () => {
           username: 'user',
           password: 'password',
         };
+
+        sinon.stub(ProxyDataSync, 'saveSite').resolves();
 
         const { body } = await request(app)
           .post(`/v0/site/${site.id}/basic-auth`)
