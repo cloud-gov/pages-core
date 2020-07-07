@@ -68,4 +68,39 @@ describe('validators', () => {
       expect(() => validators.isEmptyOrUrl('hu')).to.throw(Error, 'URL must start with https://');
     });
   })
+
+  describe('.validBasicAuthUsername', () => {
+    it('only alphanumeric and hypehens allowed', () => {
+      expect(validators.validBasicAuthUsername('hell0-_w0rld')).to.be.true;
+    });
+
+    it('non-alphanumeric and hypehens not allowed', () => {
+      expect(validators.validBasicAuthUsername('hell0-_w0rld')).to.be.true;
+    });
+
+    it('must be 4 characters', () => {
+      expect(validators.validBasicAuthUsername('hel')).to.be.false;
+    });
+
+    it('must be <= 15 characters', () => {
+      expect(validators.validBasicAuthUsername('hell0-_world-_he')).to.be.false;
+    });
+  });
+  describe('.validBasicAuthPassword', () => {
+    it('only alphanumeric, hypehens and $!@ allowed', () => {
+      expect(validators.validBasicAuthPassword('hell0-w0rld$!@')).to.be.true;
+    });
+
+    it('not allowed characters not in !@$', () => {
+      expect(validators.validBasicAuthPassword('hell0-_w0rld&')).to.be.false;
+    });
+
+    it('must be 6 characters', () => {
+      expect(validators.validBasicAuthPassword('hello')).to.be.false;
+    });
+
+    it('must be <= 25 characters', () => {
+      expect(validators.validBasicAuthPassword('hell0-world-hello-hell0-wo')).to.be.false;
+    });
+  });
 });

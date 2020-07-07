@@ -14,6 +14,7 @@ describe('SiteSerializer', () => {
         .then((object) => {
           const result = validateJSONSchema(object, siteSchema);
           expect(result.errors).to.be.empty;
+          expect(object.config).to.be.undefined;
           done();
         })
         .catch(done);
