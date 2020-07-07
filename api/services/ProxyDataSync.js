@@ -14,11 +14,8 @@ const siteToItem = (site) => {
     },
   };
 
-  if (site.id % 2) { // test - set for odd ids
-    item.settings.basic_auth = {
-      username: site.owner.toLowerCase(),
-      password: site.repository.toLowerCase(),
-    };
+  if (site.config.basicAuth && site.config.basicAuth.username && site.config.basicAuth.password) {
+    item.settings.basicAuth = site.config.basicAuth;
   }
 
   item[siteKey] = getSiteKey(site);
