@@ -31,7 +31,7 @@ export default function basicAuth(state = initialState, action) {
     }
 
     case RECEIVED: {
-      const { siteId, basicAuth: credentials } = action.payload;
+      const { basicAuth: credentials } = action.payload;
       return {
         isLoading: false,
           data: credentials,
@@ -39,7 +39,7 @@ export default function basicAuth(state = initialState, action) {
     }
 
     case SAVED: {
-      const { siteId, basicAuth: credentials } = action.payload;
+      const { basicAuth: credentials } = action.payload;
       return {
         isLoading: false,
           data: credentials,
