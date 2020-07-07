@@ -16,6 +16,7 @@ const site = {
   repository: 'testRepo',
   awsBucketName: 'testBucket',
   awsBucketRegion: 'testRegion',
+  config: {},
 };
 
 describe('ProxyDataSync', () => {
@@ -55,7 +56,7 @@ describe('ProxyDataSync', () => {
     );
   });
 
-  it('convert site to item', () => {
+  it('convert site to item w/o basicAuth', () => {
     const item = {
       id: getSiteKey(site),
       settings: {
@@ -65,5 +66,25 @@ describe('ProxyDataSync', () => {
     };
 
     expect(item).to.deep.equal(siteToItem(site));
+  });
+
+  it('convert site to item w/ basicAuth', () => {
+    const basicAuth = {
+      username: 'username',
+      password: 'password',
+    };
+    const protectedSite = { ...site };
+    protectedSite.config.basicAuth = basicAuth;
+
+    const item = {
+      id: getSiteKey(site),
+      settings: {
+        bucket_name: site.awsBucketName,
+        bucket_region: site.awsBucketRegion,
+        basicAuth,
+      },
+    };
+
+    expect(item).to.deep.equal(siteToItem(protectedSite));
   });
 });
