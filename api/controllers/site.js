@@ -9,10 +9,30 @@ const { User, Site, Build } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const { logger } = require('../../winston');
 const ProxyDataSync = require('../services/ProxyDataSync');
+const {
+  ValidationError,
+  validBasicAuthUsername,
+  validBasicAuthPassword
+} = require('../utils/validators');
 
 const sendJSON = (site, res) => siteSerializer
   .serialize(site)
   .then(siteJSON => res.json(siteJSON));
+
+const stripCredentials = ({ username, password }) => {
+  if (validBasicAuthUsername(username) && validBasicAuthPassword(password)) {
+    return { username, password };
+  }
+
+  throw new ValidationError('username or password is not valid.');
+}
+
+const hideCredentials = ({ username, password }) => {
+  if (username && username.length && password && password.length) {
+    return { username, password: '**********' };
+  }
+  return {};
+}
 
 module.exports = {
   findAllForUser: (req, res) => {
@@ -223,5 +243,68 @@ module.exports = {
       .catch((err) => {
         res.error(err);
       });
+  },
+
+  fetchBasicAuth: async (req, res) => {
+    const { params, user } = req;
+    const { site_id: siteId } = params;
+
+    const site = await Site.forUser(user).findByPk(siteId);
+
+    if (!site) {
+      return res.notFound();
+    }
+
+    const credentials = hideCredentials(site.basicAuth);
+
+    return res.ok(credentials);
+  },
+
+  addBasicAuth: async (req, res) => {
+    const { body, params, user } = req;
+
+    const { site_id: siteId } = params;
+
+    let site = await Site.forUser(user).findByPk(siteId);
+
+    if (!site) {
+      return res.notFound();
+    }
+
+    if (!body.username || !body.password) {
+      return res.error(400);
+    }
+
+    const credentials = stripCredentials(body);
+    
+    const config = site.config;
+    config.basicAuth = credentials;
+    site = await site.update({ config });
+
+    ProxyDataSync.saveSite(site) // sync to proxy database
+      .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+
+    const hiddenCredentials = hideCredentials(site.basicAuth);
+    return res.ok(hiddenCredentials);
+  },
+
+  removeBasicAuth: async (req, res) => {
+    const { params, user } = req;
+    const { site_id: siteId } = params;
+
+    let site = await Site.forUser(user).findByPk(siteId);
+
+    if (!site) {
+      return res.notFound();
+    }
+
+    const config = site.config;
+    delete config.basicAuth;
+
+    site = await site.update({ config });
+    ProxyDataSync.saveSite(site) // sync to proxy database
+      .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+
+    return res.ok({});
   },
 };
