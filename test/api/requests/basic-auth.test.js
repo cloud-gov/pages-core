@@ -11,6 +11,9 @@ const { Site } = require('../../../api/models');
 const ProxyDataSync = require('../../../api/services/ProxyDataSync');
 
 describe('Site basic authentication API', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
   describe('DELETE /v0/site/:site_id/basic-auth', () => {
     describe('when the user is not authenticated', () => {
       it('returns a 403', async () => {
@@ -62,10 +65,6 @@ describe('Site basic authentication API', () => {
     });
 
     describe('when the parameters are valid', () => {
-      beforeEach(() => {
-        sinon.restore();
-      });
-
       it('deletes basic auth from config and returns a 200', async () => {
         const userPromise = await factory.user();
         const config = { 
@@ -279,10 +278,6 @@ describe('Site basic authentication API', () => {
     });
 
     describe('when the parameters are valid', () => {
-      beforeEach(() => {
-        sinon.restore();
-      });
-
       it('sets username and password for basic authentication', async () => {
         const userPromise = await factory.user();
         let site = await factory.site({
