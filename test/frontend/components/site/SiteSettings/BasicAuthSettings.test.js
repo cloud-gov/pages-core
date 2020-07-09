@@ -32,34 +32,34 @@ describe('<BasicAuthSettings />', () => {
   });
 
   it('renders successfully', () => {
-    const wrapper = shallow(<BasicAuthSettings { ...defaultProps } />);
+    const wrapper = shallow(<BasicAuthSettings {...defaultProps} />);
     expect(wrapper.exists()).to.be.true;
   });
 
   it('fetches basic auth credentials on mount', () => {
-    shallow(<BasicAuthSettings { ...defaultProps } />);
+    shallow(<BasicAuthSettings {...defaultProps} />);
     sinon.assert.calledWith(stubs.fetchBasicAuth, siteId);
   });
 
   it('renders an informational alert', () => {
-    const wrapper = shallow(<BasicAuthSettings { ...defaultProps } />);
+    const wrapper = shallow(<BasicAuthSettings {...defaultProps} />);
     const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'info');
     expect(alert).to.have.lengthOf(1);
   });
 
   it('renders a warning alert', () => {
-    const wrapper = shallow(<BasicAuthSettings { ...defaultProps } />);
+    const wrapper = shallow(<BasicAuthSettings {...defaultProps} />);
     const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'warning');
     expect(alert).to.have.lengthOf(1);
   });
 
   it('does not render a loading spinner', () => {
-    const wrapper = shallow(<BasicAuthSettings { ...defaultProps } />);
+    const wrapper = shallow(<BasicAuthSettings {...defaultProps} />);
     expect(wrapper.find('LoadingIndicator')).to.have.lengthOf(0);
   });
 
   it('does render the "new basic auth credentials form', () => {
-    const wrapper = shallow(<BasicAuthSettings { ...defaultProps } />);
+    const wrapper = shallow(<BasicAuthSettings {...defaultProps} />);
     expect(wrapper.find('ReduxForm')).to.have.lengthOf(1);
   });
 
@@ -71,12 +71,12 @@ describe('<BasicAuthSettings />', () => {
     });
 
     it('renders a loading spinner', () => {
-      const wrapper = shallow(<BasicAuthSettings { ...props } />);
+      const wrapper = shallow(<BasicAuthSettings {...props} />);
       expect(wrapper.find('LoadingIndicator')).to.have.lengthOf(1);
     });
 
     it('does not render the basicAuth section or form', () => {
-      const wrapper = shallow(<BasicAuthSettings { ...props } />);
+      const wrapper = shallow(<BasicAuthSettings {...props} />);
       expect(wrapper.find('ReduxForm')).to.have.lengthOf(0);
     });
   });
@@ -91,17 +91,17 @@ describe('<BasicAuthSettings />', () => {
     });
 
     it('does not render a loading spinner', () => {
-      const wrapper = shallow(<BasicAuthSettings { ...props } />);
+      const wrapper = shallow(<BasicAuthSettings {...props} />);
       expect(wrapper.find('LoadingIndicator')).to.have.lengthOf(0);
     });
 
     it('does not render the basic auth credentials form', () => {
-      const wrapper = shallow(<BasicAuthSettings { ...props } />);
+      const wrapper = shallow(<BasicAuthSettings {...props} />);
       expect(wrapper.find('ReduxForm')).to.have.lengthOf(0);
     });
 
     it('does render the basic auth credentials disable button', () => {
-      const wrapper = shallow(<BasicAuthSettings { ...props } />);
+      const wrapper = shallow(<BasicAuthSettings {...props} />);
       const submitButton = wrapper.find('#disable-basic-auth-btn');
       expect(submitButton).to.have.lengthOf(1);
     });

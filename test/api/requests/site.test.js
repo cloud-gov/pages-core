@@ -1569,9 +1569,9 @@ describe('Site API', () => {
           const siteConfig = {
             basicAuth: {
               username: 'user',
-              password: 'password'
+              password: 'password',
             },
-            blah: 'blahblah'
+            blah: 'blahblah',
           };
           let site = await factory.site({
             users: [userPromise],
@@ -1670,11 +1670,11 @@ describe('Site API', () => {
           const siteConfig = {
             basicAuth: {
               username: 'user',
-              password: 'password'
+              password: 'password',
             },
           };
           const site = await factory.site({ users: [userPromise], config: siteConfig });
-          
+
           const cookie = await authenticatedSession(userPromise);
 
           const { body } = await request(app)
@@ -1784,7 +1784,7 @@ describe('Site API', () => {
             config: { blah: 'blahblahblah' },
           });
           const cookie = await authenticatedSession(userPromise);
-          const credentials = { 
+          const credentials = {
             username: 'user',
             password: 'password',
           };

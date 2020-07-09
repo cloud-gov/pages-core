@@ -5,7 +5,7 @@ const validBranchName = s => /^[\w._]+(?:[/-]*[\w._])*$/.test(s);
 const validBasicAuthUsername = s => /^[a-zA-Z0-9_-]{4,15}$/.test(s) ? 'value is required and must be at least 4 characters'
   : undefined;
 
-const validBasicAuthPassword = s => /^[a-zA-Z0-9_\-\$!@]{6,25}$/.test(s) ? 'value is required and must be at least 4 characters'
+const validBasicAuthPassword = s => /^[a-zA-Z0-9_\-$!@]{6,25}$/.test(s) ? 'value is required and must be at least 4 characters'
   : undefined;
 
 function isValidYaml(yamlString) {

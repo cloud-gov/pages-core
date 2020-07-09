@@ -37,7 +37,6 @@ describe('basicAuthReducer', () => {
   describe('basicAuthFetchStarted', () => {
     const siteId = 1;
     const action = basicAuthFetchStarted(siteId);
-    const credentials = { username: 'username', password: 'password' };
 
     it('sets isLoading to true for the site basicAuth', () => {
       const result = reducer({}, action);

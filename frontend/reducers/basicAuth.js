@@ -26,7 +26,7 @@ export default function basicAuth(state = initialState, action) {
     case FETCH_STARTED: {
       return {
         isLoading: true,
-          data: {},
+        data: {},
       };
     }
 
@@ -34,7 +34,7 @@ export default function basicAuth(state = initialState, action) {
       const { basicAuth: credentials } = action.payload;
       return {
         isLoading: false,
-          data: credentials,
+        data: credentials,
       };
     }
 
@@ -42,7 +42,7 @@ export default function basicAuth(state = initialState, action) {
       const { basicAuth: credentials } = action.payload;
       return {
         isLoading: false,
-          data: credentials,
+        data: credentials,
       };
     }
 

@@ -22,7 +22,7 @@ export const validateBasicAuthUsername = (value) => {
 };
 
 export const BasicAuthSettingsForm = ({
-  handleSubmit, invalid, pristine, submitting, initialValues,
+  handleSubmit, invalid, pristine, submitting,
 }) => (
   <form className="settings-form" onSubmit={data => handleSubmit(data)}>
     <h3>Basic Authentication Settings</h3>
@@ -64,7 +64,6 @@ BasicAuthSettingsForm.propTypes = {
   invalid: PropTypes.bool.isRequired,
   pristine: PropTypes.bool.isRequired,
   submitting: PropTypes.bool.isRequired,
-  initialValues: BASIC_AUTH.isRequired,
 };
 
 export default reduxForm({

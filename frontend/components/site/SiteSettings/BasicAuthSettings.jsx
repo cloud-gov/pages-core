@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import BasicAuthSettingsForm from './BasicAuthSettingsForm';
-import InputWithErrorField from '../../Fields/InputWithErrorField';
 import LoadingIndicator from '../../LoadingIndicator';
 import AlertBanner from '../../alertBanner';
 import {
@@ -79,18 +78,22 @@ export class BasicAuthSettings extends Component {
         { isLoading
           ? <LoadingIndicator />
           : (
-              credentials.username ?
-                ( 
-                  <p className="well-text">
-                    <b>Username:</b> {credentials.username}<br />
-                    <b>Password:</b> {credentials.password}<br /><br />
-                    <button type="button" className="margin-0" id="disable-basic-auth-btn" onClick={() => disableBasicAuth()}>
-                      Disable
-                    </button>
-                  </p>
-                )
-                : ( <BasicAuthSettingsForm initialValues={credentials} onSubmit={setBasicAuth} /> )
-              
+            credentials.username
+              ? ( 
+                <p className="well-text">
+                  <b>Username:</b>
+                  {credentials.username}
+                  <br />
+                  <b>Password:</b>
+                  {credentials.password}
+                  <br />
+                  <br />
+                  <button type="button" className="margin-0" id="disable-basic-auth-btn" onClick={() => disableBasicAuth()}>
+                    Disable
+                  </button>
+                </p>
+              )
+              : ( <BasicAuthSettingsForm initialValues={credentials} onSubmit={setBasicAuth} /> )
           )
         }
       </div>
@@ -124,4 +127,3 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BasicAuthSettings);
-
