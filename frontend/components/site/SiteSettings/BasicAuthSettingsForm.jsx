@@ -1,9 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm } from 'redux-form';
-import BasicAuthUserField from '../../Fields/BasicAuthUserField';
-import BasicAuthPasswordField from '../../Fields/BasicAuthPasswordField';
+import { Field, reduxForm } from 'redux-form';
+import InputWithErrorField from '../../Fields/InputWithErrorField';
+import { validBasicAuthUsername, validBasicAuthPassword } from '../../../util/validators';
 import { BASIC_AUTH } from '../../../propTypes';
+
+export const validateBasicAuthPassword = (value) => {
+  if (value && value.length && !validBasicAuthPassword(value)) {
+    return 'Password may contain alphanumeric characters and symbols !@$. Minimum length 6 characters.';
+  }
+
+  return undefined;
+};
+
+export const validateBasicAuthUsername = (value) => {
+  if (value && value.length && !validBasicAuthUsername(value)) {
+    return 'Username is invalid. Only alphanumeric characters are allowed. Minimum length 4 characters.';
+  }
+
+  return undefined;
+};
 
 export const BasicAuthSettingsForm = ({
   handleSubmit, invalid, pristine, reset, submitting, initialValues,
@@ -15,19 +31,25 @@ export const BasicAuthSettingsForm = ({
         <p className="well-text">
           To enable basic authentication, please submit a username and password credentials required to preview your site builds.
         </p>
-        <BasicAuthUserField
-          label="username"
-          type="text"
-          id="basicAuthUsernameInput"
+        <Field
           name="username"
+          type="text"
+          label="Username:"
+          component={InputWithErrorField}
+          required
+          validate={[validateBasicAuthUsername]}
           placeholder="username"
+          id="basicAuthUsernameInput"
         />
-        <BasicAuthPasswordField
-          label="password"
-          type="password"
-          id="basicAuthPasswordInput"
+        <Field
           name="password"
-          placeholder="********"
+          type="password"
+          label="Password:"
+          component={InputWithErrorField}
+          required
+          validate={[validateBasicAuthPassword]}
+          placeholder="**********"
+          id="basicAuthPasswordInput"
         />
       </fieldset>
       <button type="submit" disabled={invalid || pristine || submitting}>
