@@ -22,7 +22,7 @@ export const validateBasicAuthUsername = (value) => {
 };
 
 export const BasicAuthSettingsForm = ({
-  handleSubmit, invalid, pristine, reset, submitting, initialValues,
+  handleSubmit, invalid, pristine, submitting, initialValues,
 }) => (
   <form className="settings-form" onSubmit={data => handleSubmit(data)}>
     <h3>Basic Authentication Settings</h3>
@@ -63,9 +63,7 @@ BasicAuthSettingsForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   invalid: PropTypes.bool.isRequired,
   pristine: PropTypes.bool.isRequired,
-  reset: PropTypes.func.isRequired,
   submitting: PropTypes.bool.isRequired,
-  onRemove: PropTypes.func.isRequired,
   initialValues: BASIC_AUTH.isRequired,
 };
 
