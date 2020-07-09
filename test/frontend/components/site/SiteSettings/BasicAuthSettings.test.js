@@ -61,7 +61,6 @@ describe('<BasicAuthSettings />', () => {
 
   it('does render the "new basic auth credentials form', () => {
     const wrapper = shallow(<BasicAuthSettings {...defaultProps} />);
-    expect(wrapper.find('BasicAuthSettingsForm')).to.have.lengthOf(1);
     expect(wrapper.find('ReduxForm')).to.have.lengthOf(1);
   });
 
@@ -79,13 +78,7 @@ describe('<BasicAuthSettings />', () => {
 
     it('does not render the "new environment variable" section or form', () => {
       const wrapper = shallow(<BasicAuthSettings {...props} />);
-      expect(wrapper.find('BasicAuthSettingsForm')).to.have.lengthOf(0);
       expect(wrapper.find('ReduxForm')).to.have.lengthOf(0);
-    });
-
-    it('does not render the basic auth credentials form', () => {
-      const wrapper = shallow(<BasicAuthSettings {...props} />);
-      expect(wrapper.find('BasicAuthSettingsForm')).to.have.lengthOf(0);
     });
   });
 
@@ -105,16 +98,13 @@ describe('<BasicAuthSettings />', () => {
 
     it('does not render the basic auth credentials form', () => {
       const wrapper = shallow(<BasicAuthSettings {...props} />);
-      expect(wrapper.find('BasicAuthSettingsForm')).to.have.lengthOf(0);
       expect(wrapper.find('ReduxForm')).to.have.lengthOf(0);
     });
 
     it('does render the basic auth credentials disable button', () => {
       const wrapper = shallow(<BasicAuthSettings {...props} />);
-      const submitButton = wrapper.find('button[name="disable-basic-auth"]');
+      const submitButton = wrapper.find('#disable-basic-auth-btn');
       expect(submitButton).to.have.lengthOf(1);
-      expect(submitButton.first().prop('disabled')).to.be.false;
-      expect(submitButton.first().prop('value')).to.equal('Disable');
     });
   });
 });

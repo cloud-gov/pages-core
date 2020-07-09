@@ -90,7 +90,7 @@ export class BasicAuthSettings extends Component {
                   <p className="well-text">
                     <b>Username:</b> {credentials.username}<br />
                     <b>Password:</b> {credentials.password}<br /><br />
-                    <button type="button" className="margin-0" name="disable-basic-auth" onClick={() => disableBasicAuth()}>
+                    <button type="button" className="margin-0" id="disable-basic-auth-btn" onClick={() => disableBasicAuth()}>
                       Disable
                     </button>
                   </p>
