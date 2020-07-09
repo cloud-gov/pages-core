@@ -19,6 +19,7 @@ const testBuild = {
 };
 const buildLogPage = 1;
 const uev = { id: 8 };
+const credentials = { username: 'username', password: 'password'};
 
 function testRouteCalled(routeName, { method = 'GET', body } = {}) {
   const expectedOptions = {
@@ -68,6 +69,9 @@ describe('federalistApi', () => {
     fetchMock.get(`${API}/site/6/user-environment-variable`, [uev], { name: 'fetchUserEnvironmentVariables' });
     fetchMock.post(`${API}/site/6/user-environment-variable`, {}, { name: 'createUserEnvironmentVariable' });
     fetchMock.delete(`${API}/site/6/user-environment-variable/8`, {}, { name: 'deleteUserEnvironmentVariable' });
+    fetchMock.get(`${API}/site/8/basic-auth`, credentials, { name: 'fetchBasicAuth' });
+    fetchMock.post(`${API}/site/8/basic-auth`, credentials, { name: 'saveBasicAuth' });
+    fetchMock.delete(`${API}/site/8/basic-auth`, {}, { name: 'removeBasicAuth' });
   });
 
   after(() => {
@@ -195,5 +199,23 @@ describe('federalistApi', () => {
     const uevId = 8;
     federalistApi.deleteUserEnvironmentVariable(siteId, uevId);
     testRouteCalled('deleteUserEnvironmentVariable', { method: 'DELETE' });
+  });
+
+  it('defines fetchUserEnvironmentVariables', () => {
+    const siteId = 8;
+    federalistApi.fetchBasicAuth(siteId);
+    testRouteCalled('fetchBasicAuth');
+  });
+
+  it('defines createUserEnvironmentVariable', () => {
+    const siteId = 8;
+    federalistApi.saveBasicAuth(siteId, credentials);
+    testRouteCalled('saveBasicAuth', { method: 'POST', body: credentials });
+  });
+
+  it('defines deleteUserEnvironmentVariable', () => {
+    const siteId = 8;
+    federalistApi.removeBasicAuth(siteId);
+    testRouteCalled('removeBasicAuth', { method: 'DELETE' });
   });
 });

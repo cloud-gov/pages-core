@@ -53,7 +53,7 @@ const warningContent = (
   </Fragment>
 );
 
-class BasicAuthSettings extends Component {
+export class BasicAuthSettings extends Component {
   componentDidMount() {
     const { siteId, actions } = this.props;
     actions.fetchBasicAuth(siteId);
