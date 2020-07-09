@@ -76,7 +76,7 @@ describe('<BasicAuthSettings />', () => {
       expect(wrapper.find('LoadingIndicator')).to.have.lengthOf(1);
     });
 
-    it('does not render the "new environment variable" section or form', () => {
+    it('does not render the basicAuth section or form', () => {
       const wrapper = shallow(<BasicAuthSettings {...props} />);
       expect(wrapper.find('ReduxForm')).to.have.lengthOf(0);
     });
