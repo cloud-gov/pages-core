@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const validateJSONSchema = require('jsonschema').validate;
 
 const siteSchema = require('../../../../public/swagger/Site.json');
@@ -43,13 +43,13 @@ describe('SiteSerializer', () => {
       const otherUsers = Array(authUserCount).fill(0).map(() => factory.user());
 
       Promise.all(otherUsers.concat(nonGithubUser))
-      .then(users => factory.site({ users }))
-      .then(SiteSerializer.serialize)
-      .then((object) => {
-        expect(object.users.length).to.equal(authUserCount);
-        done();
-      })
-      .catch(done);
+        .then(users => factory.site({ users }))
+        .then(SiteSerializer.serialize)
+        .then((object) => {
+          expect(object.users.length).to.equal(authUserCount);
+          done();
+        })
+        .catch(done);
     });
   });
 });

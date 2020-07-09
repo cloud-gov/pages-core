@@ -19,7 +19,7 @@ const testBuild = {
 };
 const buildLogPage = 1;
 const uev = { id: 8 };
-const credentials = { username: 'username', password: 'password'};
+const credentials = { username: 'username', password: 'password' };
 
 function testRouteCalled(routeName, { method = 'GET', body } = {}) {
   const expectedOptions = {

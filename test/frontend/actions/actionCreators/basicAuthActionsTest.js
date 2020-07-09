@@ -51,7 +51,6 @@ describe('basicAuthActions actionCreators', () => {
   describe('basicAuthRemoved', () => {
     it('constructs properly', () => {
       const siteId = 1;
-      const basicAuth = {};
 
       const actual = basicAuthRemoved(siteId);
 

@@ -12,7 +12,7 @@ const ProxyDataSync = require('../services/ProxyDataSync');
 const {
   ValidationError,
   validBasicAuthUsername,
-  validBasicAuthPassword
+  validBasicAuthPassword,
 } = require('../utils/validators');
 
 const sendJSON = (site, res) => siteSerializer
@@ -25,14 +25,14 @@ const stripCredentials = ({ username, password }) => {
   }
 
   throw new ValidationError('username or password is not valid.');
-}
+};
 
 const hideCredentials = ({ username, password }) => {
   if (username && username.length && password && password.length) {
     return { username, password: '**********' };
   }
   return {};
-}
+};
 
 module.exports = {
   findAllForUser: (req, res) => {
@@ -276,8 +276,8 @@ module.exports = {
     }
 
     const credentials = stripCredentials(body);
-    
-    const config = site.config;
+
+    const { config } = site;
     config.basicAuth = credentials;
     site = await site.update({ config });
 
@@ -298,7 +298,7 @@ module.exports = {
       return res.notFound();
     }
 
-    const config = site.config;
+    const { config } = site;
     delete config.basicAuth;
 
     site = await site.update({ config });

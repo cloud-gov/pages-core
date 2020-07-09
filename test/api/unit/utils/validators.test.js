@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 
 const validators = require('../../../../api/utils/validators');
 
@@ -67,7 +67,7 @@ describe('validators', () => {
     it('should not allow non url', () => {
       expect(() => validators.isEmptyOrUrl('hu')).to.throw(Error, 'URL must start with https://');
     });
-  })
+  });
 
   describe('.validBasicAuthUsername', () => {
     it('only alphanumeric and hypehens allowed', () => {

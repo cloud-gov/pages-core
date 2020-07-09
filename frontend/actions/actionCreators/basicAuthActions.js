@@ -18,7 +18,7 @@ const basicAuthSaved = (siteId, basicAuth) => ({
   payload: { siteId, basicAuth },
 });
 
-const basicAuthRemoved = (siteId) => ({
+const basicAuthRemoved = siteId => ({
   type: basicAuthRemovedType,
   payload: { siteId },
 });
