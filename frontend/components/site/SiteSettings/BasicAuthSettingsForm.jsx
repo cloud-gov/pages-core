@@ -38,7 +38,6 @@ export const BasicAuthSettingsForm = ({
           component={InputWithErrorField}
           required
           validate={[validateBasicAuthUsername]}
-          placeholder="username"
           id="basicAuthUsernameInput"
         />
         <Field
@@ -48,7 +47,6 @@ export const BasicAuthSettingsForm = ({
           component={InputWithErrorField}
           required
           validate={[validateBasicAuthPassword]}
-          placeholder="**********"
           id="basicAuthPasswordInput"
         />
       </fieldset>
