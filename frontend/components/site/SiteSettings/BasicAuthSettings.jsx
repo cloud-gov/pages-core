@@ -20,7 +20,7 @@ const infoContent = (
     {' '}
     <a
       href="https://federalist.18f.gov/documentation/basic-auth"
-      rel="noopener"
+      rel="noopener" target="_blank"
     >
       Basic Authentication on Federalist Preview Builds
     </a>
