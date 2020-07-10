@@ -14,7 +14,7 @@ import { BASIC_AUTH } from '../../../propTypes';
 
 const infoContent = (
   <Fragment>
-    If you would like to add basic authenticaiton to your site previews, please provide a
+    If you would like to add basic authentication to your site previews, please provide a
     username and password for which you will be prompted to enter when previewing your site.
     For more information see
     {' '}
