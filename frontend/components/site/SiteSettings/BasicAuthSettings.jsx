@@ -96,14 +96,5 @@ BasicAuthSettings.propTypes = {
   basicAuth: BASIC_AUTH,
 };
 
-// const mapStateToProps = () => ({});
-
-// const mapDispatchToProps = dispatch => ({
-//   actions: bindActionCreators({
-//     saveSiteBasicAuth: siteActions.saveBasicAuthToSite,
-//     removeSiteBasicAuth: siteActions.removeBasicAuthFromSite,
-//   }, dispatch),
-// });
-
 export default BasicAuthSettings;
 
