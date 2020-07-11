@@ -5,21 +5,20 @@ import {
 } from '../../../frontend/actions/actionCreators/alertActions';
 
 import {
-  basicAuthSaved,
-  basicAuthRemoved,
-  basicAuthFetchStarted,
-  basicAuthReceived,
-} from '../../../frontend/actions/actionCreators/basicAuthActions';
+  siteBasicAuthSaved,
+  siteBasicAuthRemoved,
+  siteBasicAuthFetchStarted,
+  siteBasicAuthReceived,
+} from '../../../frontend/actions/actionCreators/siteActions';
 
 import {
-  fetchBasicAuth,
-  removeBasicAuth,
-  saveBasicAuth,
-} from '../../../frontend/actions/basicAuthActions';
+  removeBasicAuthFromSite,
+  addBasicAuthToSite,
+} from '../../../frontend/actions/siteActions';
 
 let stubs = {};
 
-describe('basicAuthActions', () => {
+describe('siteBasicAuthActions', () => {
   beforeEach(() => {
     stubs.scrollTo = sinon.stub();
     global.window = { scrollTo: stubs.scrollTo };
@@ -31,120 +30,12 @@ describe('basicAuthActions', () => {
     stubs = {};
   });
 
-  describe('.fetchBasicAuth', () => {
-    const siteId = 1;
-    const credentials = { username: 'username', password: 'password' };
-    const error = new Error('foo');
-
-    beforeEach(() => {
-      stubs.fedApi = sinon.stub(federalistApi, 'fetchBasicAuth');
-      stubs.dispatch = sinon.stub();
-    });
-
-    describe('on success', () => {
-      beforeEach(() => {
-        stubs.fedApi.resolves(credentials);
-      });
-
-      it('1) dispatches `basicAuthFetchStarted` action with the site id', (done) => {
-        const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.firstCall,
-            basicAuthFetchStarted(siteId));
-        };
-
-        fetchBasicAuth(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
-      });
-
-      it('2) successfully fetches the basicAuth credentials using the federalist api with the site id', (done) => {
-        const assertion = () => {
-          sinon.assert.calledWith(stubs.fedApi, siteId);
-        };
-
-        fetchBasicAuth(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
-      });
-
-      it('3) dispatches `basicAuthReceived` with the site id and received credentials', (done) => {
-        const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.secondCall,
-            basicAuthReceived(siteId, credentials));
-        };
-
-        fetchBasicAuth(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
-      });
-    });
-
-    describe('on failure', () => {
-      beforeEach(() => {
-        stubs.fedApi.rejects(error);
-      });
-
-      it('1) dispatches `basicAuthFetchStarted` action with the site id', (done) => {
-        const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.firstCall,
-            basicAuthFetchStarted(siteId));
-        };
-
-        fetchBasicAuth(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
-      });
-
-      it('2) unsuccessfully fetches the credentialss using the federalist api with the site id', (done) => {
-        const assertion = () => {
-          sinon.assert.calledWith(stubs.fedApi, siteId);
-        };
-
-        fetchBasicAuth(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
-      });
-
-      it('3) dispatches `httpError` action with the error message and site id', (done) => {
-        const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.secondCall,
-            httpError(error.message, { siteId }));
-        };
-
-        fetchBasicAuth(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
-      });
-
-      it('4) scrolls to the top of the screen', (done) => {
-        const assertion = () => {
-          sinon.assert.calledWith(stubs.scrollTo, 0, 0);
-        };
-
-        fetchBasicAuth(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
-      });
-
-      it('does NOT dispatch `basicAuthReceived`', (done) => {
-        const assertion = () => {
-          sinon.assert.neverCalledWith(stubs.dispatch,
-            basicAuthReceived(siteId, credentials));
-        };
-
-        fetchBasicAuth(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
-      });
-    });
-  });
-
-  describe('.removeBasicAuth', () => {
+  describe('.removeBasicAuthFromSite', () => {
     const siteId = 1;
     const error = new Error('foo');
 
     beforeEach(() => {
-      stubs.fedApi = sinon.stub(federalistApi, 'removeBasicAuth');
+      stubs.fedApi = sinon.stub(federalistApi, 'removeSiteBasicAuth');
       stubs.dispatch = sinon.stub();
     });
 
@@ -158,7 +49,7 @@ describe('basicAuthActions', () => {
           sinon.assert.calledWith(stubs.fedApi, siteId);
         };
 
-        removeBasicAuth(siteId)(stubs.dispatch)
+        removeBasicAuthFromSite(siteId)(stubs.dispatch)
           .then(assertion)
           .then(done);
       });
@@ -166,10 +57,10 @@ describe('basicAuthActions', () => {
       it('2) dispatches `basicAuthRemoved` with the site id', (done) => {
         const assertion = () => {
           sinon.assert.calledWith(stubs.dispatch.firstCall,
-            basicAuthRemoved(siteId));
+            siteBasicAuthRemoved(siteId));
         };
 
-        removeBasicAuth(siteId)(stubs.dispatch)
+        removeBasicAuthFromSite(siteId)(stubs.dispatch)
           .then(assertion)
           .then(done);
       });
@@ -185,7 +76,7 @@ describe('basicAuthActions', () => {
           sinon.assert.calledWith(stubs.fedApi, siteId);
         };
 
-        removeBasicAuth(siteId)(stubs.dispatch)
+        removeBasicAuthFromSite(siteId)(stubs.dispatch)
           .then(assertion)
           .then(done);
       });
@@ -195,7 +86,7 @@ describe('basicAuthActions', () => {
           sinon.assert.calledWith(stubs.dispatch.firstCall, httpError(error.message, { siteId }));
         };
 
-        removeBasicAuth(siteId)(stubs.dispatch)
+        removeBasicAuthFromSite(siteId)(stubs.dispatch)
           .then(assertion)
           .then(done);
       });
@@ -205,7 +96,7 @@ describe('basicAuthActions', () => {
           sinon.assert.calledWith(stubs.scrollTo, 0, 0);
         };
 
-        removeBasicAuth(siteId)(stubs.dispatch)
+        removeBasicAuthFromSite(siteId)(stubs.dispatch)
           .then(assertion)
           .then(done);
       });
@@ -213,10 +104,10 @@ describe('basicAuthActions', () => {
       it('does NOT dispatch `basicAuthRemoved`', (done) => {
         const assertion = () => {
           sinon.assert.neverCalledWith(stubs.dispatch,
-            basicAuthRemoved(siteId));
+            siteBasicAuthRemoved(siteId));
         };
 
-        removeBasicAuth(siteId)(stubs.dispatch)
+        removeBasicAuthFromSite(siteId)(stubs.dispatch)
           .then(assertion)
           .then(done);
       });
@@ -229,7 +120,7 @@ describe('basicAuthActions', () => {
     const error = new Error('foo');
 
     beforeEach(() => {
-      stubs.fedApi = sinon.stub(federalistApi, 'saveBasicAuth');
+      stubs.fedApi = sinon.stub(federalistApi, 'saveSiteBasicAuth');
       stubs.dispatch = sinon.stub();
     });
 
@@ -243,7 +134,7 @@ describe('basicAuthActions', () => {
           sinon.assert.calledWith(stubs.fedApi, siteId, credentials);
         };
 
-        saveBasicAuth(siteId, credentials)(stubs.dispatch)
+        addBasicAuthToSite(siteId, credentials)(stubs.dispatch)
           .then(assertion)
           .then(done);
       });
@@ -251,10 +142,10 @@ describe('basicAuthActions', () => {
       it('2) dispatches `basicAuthRemoved` with the site id', (done) => {
         const assertion = () => {
           sinon.assert.calledWith(stubs.dispatch.firstCall,
-            basicAuthSaved(siteId, credentials));
+            siteBasicAuthSaved(siteId, credentials));
         };
 
-        saveBasicAuth(siteId, credentials)(stubs.dispatch)
+        addBasicAuthToSite(siteId, credentials)(stubs.dispatch)
           .then(assertion)
           .then(done);
       });
@@ -270,7 +161,7 @@ describe('basicAuthActions', () => {
           sinon.assert.calledWith(stubs.fedApi, siteId, credentials);
         };
 
-        saveBasicAuth(siteId, credentials)(stubs.dispatch)
+        addBasicAuthToSite(siteId, credentials)(stubs.dispatch)
           .then(assertion)
           .then(done);
       });
@@ -280,7 +171,7 @@ describe('basicAuthActions', () => {
           sinon.assert.calledWith(stubs.dispatch.firstCall, httpError(error.message, { siteId }));
         };
 
-        saveBasicAuth(siteId, credentials)(stubs.dispatch)
+        saveBSiteasicAuth(siteId, credentials)(stubs.dispatch)
           .then(assertion)
           .then(done);
       });
@@ -290,17 +181,17 @@ describe('basicAuthActions', () => {
           sinon.assert.calledWith(stubs.scrollTo, 0, 0);
         };
 
-        saveBasicAuth(siteId, credentials)(stubs.dispatch)
+        addBasicAuthToSite(siteId, credentials)(stubs.dispatch)
           .then(assertion)
           .then(done);
       });
 
       it('does NOT dispatch `basicAuthSaved`', (done) => {
         const assertion = () => {
-          sinon.assert.neverCalledWith(stubs.dispatch, basicAuthSaved(siteId, credentials));
+          sinon.assert.neverCalledWith(stubs.dispatch, siteBasicAuthSaved(siteId, credentials));
         };
 
-        saveBasicAuth(siteId, credentials)(stubs.dispatch)
+        addBasicAuthToSite(siteId, credentials)(stubs.dispatch)
           .then(assertion)
           .then(done);
       });

@@ -201,21 +201,16 @@ describe('federalistApi', () => {
     testRouteCalled('deleteUserEnvironmentVariable', { method: 'DELETE' });
   });
 
-  it('defines fetchUserEnvironmentVariables', () => {
-    const siteId = 8;
-    federalistApi.fetchBasicAuth(siteId);
-    testRouteCalled('fetchBasicAuth');
-  });
 
-  it('defines createUserEnvironmentVariable', () => {
+  it('defines basicAuth user/pass for site', () => {
     const siteId = 8;
-    federalistApi.saveBasicAuth(siteId, credentials);
+    federalistApi.saveSiteBasicAuth(siteId, credentials);
     testRouteCalled('saveBasicAuth', { method: 'POST', body: credentials });
   });
 
-  it('defines deleteUserEnvironmentVariable', () => {
+  it('removes basicAuth user/pass for site', () => {
     const siteId = 8;
-    federalistApi.removeBasicAuth(siteId);
+    federalistApi.removeSiteBasicAuth(siteId);
     testRouteCalled('removeBasicAuth', { method: 'DELETE' });
   });
 });

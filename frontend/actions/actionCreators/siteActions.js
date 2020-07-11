@@ -7,6 +7,8 @@ const siteUserAddedType = 'SITE_USER_ADDED';
 const siteUserRemovedType = 'SITE_USER_REMOVED';
 const siteUserUpdatedType = 'SITE_USER_UPDATED';
 const siteBranchesReceivedType = 'SITE_BRANCHES_RECIEVED';
+const siteBasicAuthSavedType = 'SITE_BASIC_AUTH_SAVED';
+const siteBasicAuthRemovedType = 'SITE_BASIC_AUTH_REMOVED';
 
 const sitesFetchStarted = () => ({
   type: sitesFetchStartedType,
@@ -49,6 +51,18 @@ const siteUserUpdated = site => ({
   site,
 });
 
+const siteBasicAuthSaved = site => ({
+  type: siteBasicAuthSavedType,
+  siteId: site.id,
+  site,
+});
+
+const siteBasicAuthRemoved = site => ({
+  type: siteBasicAuthRemovedType,
+  siteId: site.id,
+  site,
+});
+
 export {
   sitesFetchStarted, sitesFetchStartedType,
   sitesReceived, sitesReceivedType,
@@ -59,4 +73,6 @@ export {
   siteUserRemoved, siteUserRemovedType,
   siteUserUpdated, siteUserUpdatedType,
   siteBranchesReceivedType,
+  siteBasicAuthSaved, siteBasicAuthSavedType,
+  siteBasicAuthRemoved, siteBasicAuthRemovedType,
 };

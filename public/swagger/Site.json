@@ -76,6 +76,15 @@
           "required": ["githubAccessToken", "githubUserId"]
         }
       }
+    },
+    "basicAuth": {
+      "type": "object",
+      "not": {
+        "required": [
+          "username",
+          "password"
+        ]
+      }
     }
   }
 }

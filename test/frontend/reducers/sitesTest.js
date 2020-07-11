@@ -17,6 +17,8 @@ describe('sitesReducer', () => {
   const SITE_USER_ADDED = 'site user added';
   const SITE_USER_REMOVED = 'SITE_USER_REMOVED';
   const SET_CURRENT_SITE = 'SET_CURRENT_SITE';
+  const SITE_BASIC_AUTH_SAVED = 'SITE_BASIC_AUTH_SAVED';
+  const SITE_BASIC_AUTH_REMOVED = 'SITE_BASIC_AUTH_REMOVED';
   const initialState = {
     isLoading: false,
     data: [],
@@ -32,6 +34,8 @@ describe('sitesReducer', () => {
         siteBranchesReceivedType: SITE_BRANCHES_RECEIVED,
         siteDeletedType: SITE_DELETED,
         siteUserAddedType: SITE_USER_ADDED,
+        siteBasicAuthSavedType: SITE_BASIC_AUTH_SAVED,
+        siteBasicAuthRemovedType: SITE_BASIC_AUTH_REMOVED,
       },
       '../actions/actionCreators/buildActions': {
         buildRestartedType: BUILD_RESTARTED,
@@ -250,5 +254,54 @@ describe('sitesReducer', () => {
     expect(actual.data.length).to.equal(2);
     expect(actual.data[0].users[0].username).to.equal('jane');
     expect(actual.data[1]).to.deep.equal(state.data[1]);
+  });
+
+  it("updates existing site data when given an save basic auth action and the new site's id is found", () => {
+    const siteOne = {
+      id: 'siteToKeep',
+      oldData: true,
+    };
+
+    const siteTwo = {
+      id: 'anotherSiteToKeep',
+      oldData: true,
+    };
+
+    const existingSites = [siteOne, siteTwo];
+
+    const newSite = { id: 'siteToKeep', oldData: false, hi: 'there', basicAuth: { username: 'username', password: 'password' } };
+
+    const actual = fixture({ isLoading: false, data: existingSites }, {
+      type: SITE_BASIC_AUTH_SAVED,
+      siteId: 'siteToKeep',
+      site: newSite,
+    });
+
+    expect(actual.data).to.deep.equal([newSite, siteTwo]);
+  });
+
+  it("updates existing site data when given an save basic auth action and the new site's id is found", () => {
+    const siteOne = {
+      id: 'siteToKeep',
+      oldData: true,
+      basicAuth: { username: 'username', password: 'password' },
+    };
+
+    const siteTwo = {
+      id: 'anotherSiteToKeep',
+      oldData: true,
+    };
+
+    const existingSites = [siteOne, siteTwo];
+
+    const newSite = { id: 'siteToKeep', oldData: false, hi: 'there', basicAuth: {} };
+
+    const actual = fixture({ isLoading: false, data: existingSites }, {
+      type: SITE_BASIC_AUTH_REMOVED,
+      siteId: 'siteToKeep',
+      site: newSite,
+    });
+
+    expect(actual.data).to.deep.equal([newSite, siteTwo]);
   });
 });

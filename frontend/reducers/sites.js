@@ -8,6 +8,8 @@ import {
   siteUserAddedType as SITE_USER_ADDED,
   siteUserRemovedType as SITE_USER_REMOVED,
   siteUserUpdatedType as SITE_USER_UPDATED,
+  siteBasicAuthSavedType as SITE_BASIC_AUTH_SAVED,
+  siteBasicAuthRemovedType as SITE_BASIC_AUTH_REMOVED,
 } from '../actions/actionCreators/siteActions';
 
 import {
@@ -46,6 +48,8 @@ export default function sites(state = initialState, action) {
 
     case SITE_UPDATED:
     case SITE_USER_UPDATED:
+    case SITE_BASIC_AUTH_REMOVED:
+    case SITE_BASIC_AUTH_SAVED:
       return {
         isLoading: false,
         data: mapPropertyToMatchingSite(state.data, action.siteId, action.site),

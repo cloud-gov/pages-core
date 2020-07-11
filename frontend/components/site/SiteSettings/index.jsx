@@ -100,6 +100,7 @@ class SiteSettings extends React.Component {
         <ExpandableArea title="Basic Authentication">
           <BasicAuthSettings
             siteId={site.id}
+            basicAuth={site.basicAuth}
           />
         </ExpandableArea>
       </div>

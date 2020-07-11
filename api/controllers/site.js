@@ -27,13 +27,6 @@ const stripCredentials = ({ username, password }) => {
   throw new ValidationError('username or password is not valid.');
 };
 
-const hideCredentials = ({ username, password }) => {
-  if (username && username.length && password && password.length) {
-    return { username, password: '**********' };
-  }
-  return {};
-};
-
 module.exports = {
   findAllForUser: (req, res) => {
     User.findByPk(req.user.id, { include: [Site] })
@@ -245,21 +238,6 @@ module.exports = {
       });
   },
 
-  fetchBasicAuth: async (req, res) => {
-    const { params, user } = req;
-    const { site_id: siteId } = params;
-
-    const site = await Site.forUser(user).findByPk(siteId);
-
-    if (!site) {
-      return res.notFound();
-    }
-
-    const credentials = hideCredentials(site.basicAuth);
-
-    return res.ok(credentials);
-  },
-
   addBasicAuth: async (req, res) => {
     const { body, params, user } = req;
 
@@ -284,8 +262,8 @@ module.exports = {
     ProxyDataSync.saveSite(site) // sync to proxy database
       .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
 
-    const hiddenCredentials = hideCredentials(site.basicAuth);
-    return res.ok(hiddenCredentials);
+    const siteJSON = await siteSerializer.serialize(site);
+    return res.json(siteJSON);
   },
 
   removeBasicAuth: async (req, res) => {
@@ -305,6 +283,7 @@ module.exports = {
     ProxyDataSync.saveSite(site) // sync to proxy database
       .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
 
-    return res.ok({});
+    const siteJSON = await siteSerializer.serialize(site);
+    return res.json(siteJSON);
   },
 };
