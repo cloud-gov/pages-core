@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import sinon from 'sinon';
 
-import { BasicAuthSettings } from '../../../../../frontend/components/site/SiteSettings/BasicAuthSettings';
+import BasicAuthSettings from '../../../../../frontend/components/site/SiteSettings/BasicAuthSettings';
 
 const stubs = {};
 
@@ -13,16 +13,14 @@ describe('<BasicAuthSettings />', () => {
   let defaultProps;
 
   beforeEach(() => {
-    stubs.fetchBasicAuth = sinon.stub();
     stubs.saveBasicAuth = sinon.stub();
     stubs.removeBasicAuth = sinon.stub();
     defaultProps = {
       siteId,
-      basicAuth: { isLoading: false, data: {} },
+      basicAuth: {},
       actions: {
-        fetchBasicAuth: stubs.fetchBasicAuth,
-        saveBasicAuth: stubs.saveBasicAuth,
-        removeBasicAuth: stubs.removeBasicAuth,
+        saveBasicAuthToSite: stubs.saveBasicAuthToSite,
+        removeBasicAuthFromSite: stubs.removeBasicAuthFromSite,
       },
     };
   });
@@ -34,11 +32,6 @@ describe('<BasicAuthSettings />', () => {
   it('renders successfully', () => {
     const wrapper = shallow(<BasicAuthSettings {...defaultProps} />);
     expect(wrapper.exists()).to.be.true;
-  });
-
-  it('fetches basic auth credentials on mount', () => {
-    shallow(<BasicAuthSettings {...defaultProps} />);
-    sinon.assert.calledWith(stubs.fetchBasicAuth, siteId);
   });
 
   it('renders an informational alert', () => {
@@ -53,32 +46,9 @@ describe('<BasicAuthSettings />', () => {
     expect(alert).to.have.lengthOf(1);
   });
 
-  it('does not render a loading spinner', () => {
-    const wrapper = shallow(<BasicAuthSettings {...defaultProps} />);
-    expect(wrapper.find('LoadingIndicator')).to.have.lengthOf(0);
-  });
-
   it('does render the "new basic auth credentials form', () => {
     const wrapper = shallow(<BasicAuthSettings {...defaultProps} />);
     expect(wrapper.find('ReduxForm')).to.have.lengthOf(1);
-  });
-
-  describe('when loading', () => {
-    let props;
-
-    beforeEach(() => {
-      props = { ...defaultProps, basicAuth: { isLoading: true, data: {} } };
-    });
-
-    it('renders a loading spinner', () => {
-      const wrapper = shallow(<BasicAuthSettings {...props} />);
-      expect(wrapper.find('LoadingIndicator')).to.have.lengthOf(1);
-    });
-
-    it('does not render the basicAuth section or form', () => {
-      const wrapper = shallow(<BasicAuthSettings {...props} />);
-      expect(wrapper.find('ReduxForm')).to.have.lengthOf(0);
-    });
   });
 
   describe('when not loading with credentials', () => {
@@ -87,12 +57,7 @@ describe('<BasicAuthSettings />', () => {
     let props;
 
     beforeEach(() => {
-      props = { ...defaultProps, basicAuth: { isLoading: false, data: credentials } };
-    });
-
-    it('does not render a loading spinner', () => {
-      const wrapper = shallow(<BasicAuthSettings {...props} />);
-      expect(wrapper.find('LoadingIndicator')).to.have.lengthOf(0);
+      props = { ...defaultProps, basicAuth: credentials } ;
     });
 
     it('does not render the basic auth credentials form', () => {

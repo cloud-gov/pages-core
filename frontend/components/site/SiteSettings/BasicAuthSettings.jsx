@@ -3,13 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import BasicAuthSettingsForm from './BasicAuthSettingsForm';
-import LoadingIndicator from '../../LoadingIndicator';
 import AlertBanner from '../../alertBanner';
-import {
-  saveBasicAuth,
-  removeBasicAuth,
-  fetchBasicAuth,
-} from '../../../actions/basicAuthActions';
+import siteActions from '../../../actions/siteActions';
 import { BASIC_AUTH } from '../../../propTypes';
 
 const infoContent = (
@@ -46,21 +41,19 @@ const warningContent = (
   </Fragment>
 );
 
-export class BasicAuthSettings extends Component {
+class BasicAuthSettings extends Component {
   componentDidMount() {
-    const { siteId, actions } = this.props;
-    actions.fetchBasicAuth(siteId);
+    const { siteId, basicAuth } = this.props;
   }
 
   render() {
     const {
       siteId,
-      basicAuth: { isLoading, data: credentials },
-      actions,
+      basicAuth: { username, password },
     } = this.props;
 
-    const setBasicAuth = params => actions.saveBasicAuth(siteId, params);
-    const disableBasicAuth = () => actions.removeBasicAuth(siteId);
+    const saveBasicAuth = params => siteActions.saveBasicAuthToSite(siteId, params);
+    const disableBasicAuth = () => siteActions.removeBasicAuthFromSite(siteId);
 
     return (
       <div className="well">
@@ -75,26 +68,23 @@ export class BasicAuthSettings extends Component {
           alertRole={false}
         />
         <br />
-        { isLoading
-          ? <LoadingIndicator />
-          : (
-            credentials.username
-              ? ( 
-                <p className="well-text">
-                  <b>Username:</b>
-                  {credentials.username}
-                  <br />
-                  <b>Password:</b>
-                  {credentials.password}
-                  <br />
-                  <br />
-                  <button type="button" className="margin-0" id="disable-basic-auth-btn" onClick={() => disableBasicAuth()}>
-                    Disable
-                  </button>
-                </p>
-              )
-              : ( <BasicAuthSettingsForm initialValues={credentials} onSubmit={setBasicAuth} /> )
-          )
+        { 
+          username
+            ? ( 
+              <p className="well-text">
+                <b>Username:</b>
+                {username}
+                <br />
+                <b>Password:</b>
+                {password}
+                <br />
+                <br />
+                <button type="button" className="margin-0" id="disable-basic-auth-btn" onClick={() => disableBasicAuth()}>
+                  Disable
+                </button>
+              </p>
+            )
+            : ( <BasicAuthSettingsForm onSubmit={saveBasicAuth} /> )
         }
       </div>
     );
@@ -103,27 +93,8 @@ export class BasicAuthSettings extends Component {
 
 BasicAuthSettings.propTypes = {
   siteId: PropTypes.number.isRequired,
-  actions: PropTypes.shape({
-    saveBasicAuth: PropTypes.func.isRequired,
-    removeBasicAuth: PropTypes.func.isRequired,
-    fetchBasicAuth: PropTypes.func.isRequired,
-  }).isRequired,
-  basicAuth: PropTypes.shape({
-    isLoading: PropTypes.bool.isRequired,
-    data: BASIC_AUTH,
-  }).isRequired,
+  basicAuth: BASIC_AUTH,
 };
 
-const mapStateToProps = ({ basicAuth }) => ({
-  basicAuth,
-});
+export default BasicAuthSettings;
 
-const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({
-    saveBasicAuth,
-    removeBasicAuth,
-    fetchBasicAuth,
-  }, dispatch),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(BasicAuthSettings);

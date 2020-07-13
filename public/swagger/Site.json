@@ -11,6 +11,7 @@
     "viewLink",
     "demoViewLink",
     "previewLink",
+    "basicAuth",
     "users"
   ],
   "properties": {
@@ -66,6 +67,17 @@
     },
     "previewLink": {
       "type": "string"
+    },
+    "basicAuth": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
     },
     "users": {
       "type": "array",

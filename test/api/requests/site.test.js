@@ -1591,103 +1591,6 @@ describe('Site API', () => {
 
           site = await site.reload();
           expect(site.config).to.deep.eq({ blah: 'blahblah' });
-          expect(body).to.deep.eq({});
-        });
-      });
-    });
-
-    describe('GET /v0/site/:site_id/basic-auth', () => {
-      describe('when the user is not authenticated', () => {
-        it('returns a 403', async () => {
-          const siteId = 1;
-
-          const { body } = await request(app)
-            .get(`/v0/site/${siteId}/basic-auth`)
-            .type('json')
-            .expect(403);
-
-          validateAgainstJSONSchema('GET', '/site/{site_id}/basic-auth', 403, body);
-        });
-      });
-
-      describe('when the site does not exist', () => {
-        it('returns a 404', async () => {
-          const siteId = 1;
-          const user = await factory.user();
-          const cookie = await authenticatedSession(user);
-
-          const { body } = await request(app)
-            .get(`/v0/site/${siteId}/basic-auth`)
-            .set('Cookie', cookie)
-            .type('json')
-            .expect(404);
-
-          validateAgainstJSONSchema('GET', '/site/{site_id}/basic-auth', 404, body);
-        });
-      });
-
-      describe('when the user is not authorized to see the site', () => {
-        it('returns a 404', async () => {
-          const [site, user] = await Promise.all([
-            factory.site(),
-            factory.user(),
-          ]);
-          const cookie = await authenticatedSession(user);
-
-          const { body } = await request(app)
-            .get(`/v0/site/${site.id}/basic-auth`)
-            .set('Cookie', cookie)
-            .type('json')
-            .expect(404);
-
-          validateAgainstJSONSchema('GET', '/site/{site_id}/basic-auth', 404, body);
-        });
-      });
-
-      describe('when basic auth is not implemented for the site', () => {
-        it('returns an empty array', async () => {
-          const siteConfig = { blah: 'blahblah' };
-          const userPromise = await factory.user();
-          let site = await factory.site({ users: [userPromise], config: siteConfig });
-          const cookie = await authenticatedSession(userPromise);
-
-          const { body } = await request(app)
-            .get(`/v0/site/${site.id}/basic-auth`)
-            .set('Cookie', cookie)
-            .type('json')
-            .expect(200);
-
-          validateAgainstJSONSchema('GET', '/site/{site_id}/basic-auth', 200, body);
-          site = await site.reload();
-          expect(site.config).to.deep.eq(siteConfig);
-          expect(body).to.deep.eq({});
-        });
-      });
-
-      describe('when there is basic auth set for the site', () => {
-        it('returns a site with basic auth credentials', async () => {
-          const userPromise = await factory.user();
-          const siteConfig = {
-            basicAuth: {
-              username: 'user',
-              password: 'password',
-            },
-          };
-          const site = await factory.site({ users: [userPromise], config: siteConfig });
-
-          const cookie = await authenticatedSession(userPromise);
-
-          const { body } = await request(app)
-            .get(`/v0/site/${site.id}/basic-auth`)
-            .set('Cookie', cookie)
-            .type('json')
-            .expect(200);
-
-          validateAgainstJSONSchema('GET', '/site/{site_id}/basic-auth', 200, body);
-          expect(body).to.deep.eq({
-            username: siteConfig.basicAuth.username,
-            password: '**********',
-          });
         });
       });
     });
@@ -1805,10 +1708,6 @@ describe('Site API', () => {
           expect(site.config).to.deep.eq({
             basicAuth: credentials,
             blah: 'blahblahblah',
-          });
-          expect(body).to.deep.eq({
-            username: credentials.username,
-            password: '**********',
           });
         });
       });
