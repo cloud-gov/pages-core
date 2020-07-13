@@ -32,7 +32,7 @@ const warningContent = (
     {' '}
     <a
       href="https://csrc.nist.gov/Projects/Risk-Management/Risk-Management-Framework-(RMF)-Overview/Security-Categorization"
-      rel="noopener noreferrer"
+      rel="noopener noreferrer" target="_blank"
     >
     FISMA Security Categorization
     </a>
