@@ -204,13 +204,13 @@ describe('federalistApi', () => {
 
   it('defines basicAuth user/pass for site', () => {
     const siteId = 8;
-    federalistApi.saveSiteBasicAuth(siteId, credentials);
+    federalistApi.saveBasicAuthToSite(siteId, credentials);
     testRouteCalled('saveBasicAuth', { method: 'POST', body: credentials });
   });
 
   it('removes basicAuth user/pass for site', () => {
     const siteId = 8;
-    federalistApi.removeSiteBasicAuth(siteId);
+    federalistApi.removeBasicAuthFromSite(siteId);
     testRouteCalled('removeBasicAuth', { method: 'DELETE' });
   });
 });

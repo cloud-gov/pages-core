@@ -20,11 +20,6 @@ import {
   dispatchSiteBasicAuthSavedAction,
 } from './dispatchActions';
 
-import {
-  siteBasicAuthSaved,
-  siteBasicAuthRemoved,
-} from './actionCreators/siteActions';
-
 import userActions from './userActions';
 import { httpError } from './actionCreators/alertActions';
 
@@ -120,7 +115,7 @@ export default {
   },
 
   removeBasicAuthFromSite(siteId) {
-    return federalist.removeSiteBasicAuth(siteId)
+    return federalist.removeBasicAuthFromSite(siteId)
       .then((site) => {
         if (site) {
           dispatchSiteBasicAuthRemovedAction(site);
@@ -131,7 +126,7 @@ export default {
   },
 
   saveBasicAuthToSite(siteId, basicAuth) {
-    return federalist.saveSiteBasicAuth(siteId, basicAuth)
+    return federalist.saveBasicAuthToSite(siteId, basicAuth)
       .then(site => {
         if (site) {
           dispatchSiteBasicAuthSavedAction(site);

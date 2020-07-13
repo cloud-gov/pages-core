@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import sinon from 'sinon';
 
-import { BasicAuthSettings } from '../../../../../frontend/components/site/SiteSettings/BasicAuthSettings';
+import BasicAuthSettings from '../../../../../frontend/components/site/SiteSettings/BasicAuthSettings';
 
 const stubs = {};
 
@@ -19,9 +19,8 @@ describe('<BasicAuthSettings />', () => {
       siteId,
       basicAuth: {},
       actions: {
-        fetchBasicAuth: stubs.fetchBasicAuth,
-        saveBasicAuth: stubs.saveBasicAuth,
-        removeBasicAuth: stubs.removeBasicAuth,
+        saveBasicAuthToSite: stubs.saveBasicAuthToSite,
+        removeBasicAuthFromSite: stubs.removeBasicAuthFromSite,
       },
     };
   });

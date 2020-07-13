@@ -161,7 +161,7 @@ export default {
     });
   },
 
-  removeSiteBasicAuth(siteId) {
+  removeBasicAuthFromSite(siteId) {
     return this.fetch(`site/${siteId}/basic-auth`, {
       method: 'DELETE',
     }, {
@@ -169,7 +169,7 @@ export default {
     });
   },
 
-  saveSiteBasicAuth(siteId, credentials) {
+  saveBasicAuthToSite(siteId, credentials) {
     return this.fetch(`site/${siteId}/basic-auth`, {
       method: 'POST',
       data: {
