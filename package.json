@@ -45,7 +45,7 @@
     "uswds": "^1.4.4",
     "validator": "^13.1.1",
     "whatwg-fetch": "^3.2.0",
-    "winston": "^3.3.2",
+    "winston": "^3.3.3",
     "yamljs": "^0.3.0"
   },
   "scripts": {
