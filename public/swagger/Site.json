@@ -11,6 +11,7 @@
     "viewLink",
     "demoViewLink",
     "previewLink",
+    "basicAuth",
     "users"
   ],
   "properties": {
@@ -67,6 +68,17 @@
     "previewLink": {
       "type": "string"
     },
+    "basicAuth": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
     "users": {
       "type": "array",
       "items": {
@@ -75,15 +87,6 @@
         "not": {
           "required": ["githubAccessToken", "githubUserId"]
         }
-      }
-    },
-    "basicAuth": {
-      "type": "object",
-      "not": {
-        "required": [
-          "username",
-          "password"
-        ]
       }
     }
   }

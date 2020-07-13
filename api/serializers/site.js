@@ -1,7 +1,7 @@
 const yaml = require('js-yaml');
 const { Site, User } = require('../models');
 const userSerializer = require('../serializers/user');
-const { siteViewLink, scrubBasicAuth } = require('../utils/site');
+const { siteViewLink, hideBasicAuthPassword } = require('../utils/site');
 
 const toJSON = (site) => {
   const object = Object.assign({}, site.get({
@@ -29,7 +29,7 @@ const toJSON = (site) => {
     object.previewConfig = yaml.safeDump(site.previewConfig);
   }
 
-  object.basicAuth = scrubBasicAuth(site.basicAuth);
+  object.basicAuth = hideBasicAuthPassword(site.basicAuth);
 
   Object.keys(object).forEach((key) => {
     if (object[key] === null) {

@@ -9,12 +9,12 @@ const SiteSerializer = require('../../../../api/serializers/site');
 describe('SiteSerializer', () => {
   describe('.serialize(serializable)', () => {
     it('should serialize an object correctly', (done) => {
-      factory.site()
+      factory.site({config: { basicAuth: { username: 'username', password: 'password' } } })
         .then(site => SiteSerializer.serialize(site))
         .then((object) => {
           const result = validateJSONSchema(object, siteSchema);
           expect(result.errors).to.be.empty;
-          expect(object.config).to.be.undefined;
+          expect(object.basicAuth.password).to.eql("**********"); // hide password check
           done();
         })
         .catch(done);
