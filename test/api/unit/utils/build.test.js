@@ -6,7 +6,7 @@ const factory = require('../../support/factory');
 describe('buildUrl', () => {
   let site;
   before(async () => {
-    site = await factory.site({ defaultBranch: 'master', demoBranch: 'staging' });
+    site = await factory.site({ defaultBranch: 'main', demoBranch: 'staging' });
   });
 
   it('default branch url start with site', async () => {
@@ -39,9 +39,9 @@ describe('buildUrl', () => {
 
 describe('viewLink', () => {
   let site;
-  const defaultBranch = 'master';
+  const defaultBranch = 'main';
   const demoBranch = 'demo';
-  const domain = 'https://www.master.com/'; // test ending slash formatting
+  const domain = 'https://www.main.com/'; // test ending slash formatting
   const demoDomain = 'https://www.demo.com';
   before(async () => {
     site = await factory.site({ defaultBranch, demoBranch, domain, demoDomain });
@@ -49,7 +49,7 @@ describe('viewLink', () => {
 
   it('default branch url start with site', async () => {
     const build = await factory.build({ branch: site.defaultBranch, site });
-    expect(buildViewLink(build, site)).to.eql('https://www.master.com/');
+    expect(buildViewLink(build, site)).to.eql('https://www.main.com/');
   });
 
   it('demo branch url start with demo', async () => {

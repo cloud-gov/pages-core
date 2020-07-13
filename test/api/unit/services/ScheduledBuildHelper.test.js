@@ -28,7 +28,7 @@ describe('ScheduledBuildHelper', () => {
         owner: 'foo',
         repository: 'test',
         defaultConfig: nightlyConfig,
-        defaultBranch: 'master',
+        defaultBranch: 'main',
       });
 
       const result = await ScheduledBuildHelper.nightlyBuilds();
@@ -45,7 +45,7 @@ describe('ScheduledBuildHelper', () => {
         owner: 'scheduled',
         repository: 'test1',
         defaultConfig: nightlyConfig,
-        defaultBranch: 'master',
+        defaultBranch: 'main',
         demoConfig: nightlyConfig,
         demoBranch: 'staging',
       }),
@@ -69,7 +69,7 @@ describe('ScheduledBuildHelper', () => {
     const result = await ScheduledBuildHelper.nightlyBuilds();
 
     expect(result).to.have.deep.members([
-      { status: 'fulfilled', value: 'scheduled/test1@master' },
+      { status: 'fulfilled', value: 'scheduled/test1@main' },
       { status: 'fulfilled', value: 'scheduled/test1@staging' },
       { status: 'fulfilled', value: 'scheduled/test2@staging' },
     ]);
@@ -77,7 +77,7 @@ describe('ScheduledBuildHelper', () => {
     const builds = await Build.findAll({ where: { site: sites.map(site => site.id) } });
 
     expect(builds.length).to.eql(3);
-    expect(builds.filter(build => build.branch === 'master').length).to.eql(1);
+    expect(builds.filter(build => build.branch === 'main').length).to.eql(1);
     expect(builds.filter(build => build.branch === 'staging').length).to.eql(2);
   });
 });

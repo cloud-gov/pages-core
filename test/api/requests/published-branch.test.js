@@ -198,32 +198,32 @@ describe('Published Branches API', () => {
     it('should render a JSON response for a pubslished branch', (done) => {
       let site;
       const user = factory.user();
-      const sitePromise = factory.site({ defaultBranch: 'master', users: Promise.all([user]) });
+      const sitePromise = factory.site({ defaultBranch: 'main', users: Promise.all([user]) });
 
       Promise.props({ user, site: sitePromise, cookie: authenticatedSession(user) })
         .then((promisedValues) => {
           ({ site } = promisedValues);
 
           return request(app)
-            .get(`/v0/site/${site.id}/published-branch/master`)
+            .get(`/v0/site/${site.id}/published-branch/main`)
             .set('Cookie', promisedValues.cookie)
             .expect(200);
         }).then((response) => {
           validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}', 200, response.body);
           expect(response.body.site.id).to.equal(site.id);
-          expect(response.body.name).to.equal('master');
+          expect(response.body.name).to.equal('main');
           done();
         }).catch(done);
     });
 
     it('should 403 if the user is not associated with the site', (done) => {
       const user = factory.user();
-      const site = factory.site({ defaultBranch: 'master' });
+      const site = factory.site({ defaultBranch: 'main' });
       const cookie = authenticatedSession(user);
 
       Promise.props({ user, site, cookie })
         .then(promisedValues => request(app)
-          .get(`/v0/site/${promisedValues.site.id}/published-branch/master`)
+          .get(`/v0/site/${promisedValues.site.id}/published-branch/main`)
           .set('Cookie', promisedValues.cookie)
           .expect(403))
         .then((response) => {
@@ -234,11 +234,11 @@ describe('Published Branches API', () => {
 
     it('should require site id is a Number', (done) => {
       const user = factory.user();
-      const site = factory.site({ defaultBranch: 'master', users: Promise.all([user]) });
+      const site = factory.site({ defaultBranch: 'main', users: Promise.all([user]) });
 
       Promise.props({ user, site, cookie: authenticatedSession(user) })
         .then(promisedValues => request(app)
-          .get('/v0/site/NaN/published-branch/master')
+          .get('/v0/site/NaN/published-branch/main')
           .set('Cookie', promisedValues.cookie)
           .expect(404))
         .then((response) => {
@@ -249,11 +249,11 @@ describe('Published Branches API', () => {
 
     it('should require site id is in the sites table', (done) => {
       const user = factory.user();
-      const site = factory.site({ defaultBranch: 'master', users: Promise.all([user]) });
+      const site = factory.site({ defaultBranch: 'main', users: Promise.all([user]) });
 
       Promise.props({ user, site, cookie: authenticatedSession(user) })
         .then(promisedValues => request(app)
-          .get('/v0/site/-1/published-branch/master')
+          .get('/v0/site/-1/published-branch/main')
           .set('Cookie', promisedValues.cookie)
           .expect(404))
         .then((response) => {
