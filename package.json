@@ -112,7 +112,7 @@
     "eslint-plugin-scanjs-rules": "amirbey/eslint-plugin-scanjs-rules#buffer",
     "fetch-mock": "^9.10.3",
     "file-loader": "^6.0.0",
-    "inquirer": "^7.3.0",
+    "inquirer": "^7.3.1",
     "json-schema-deref-sync": "^0.13.0",
     "jsonschema": "^1.2.6",
     "mini-css-extract-plugin": "^0.9.0",
