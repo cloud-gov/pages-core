@@ -1666,13 +1666,17 @@ describe('Site API', () => {
           const userPromise = await factory.user();
           const site = await factory.site({ users: [userPromise] });
           const cookie = await authenticatedSession(userPromise);
+          const credentials = { // invalid password
+            username: 'user',
+            password: 'password',
+          };
 
           const { body } = await request(app)
             .post(`/v0/site/${site.id}/basic-auth`)
             .set('Cookie', cookie)
             .set('x-csrf-token', csrfToken.getToken())
             .type('json')
-            .send({})
+            .send(credentials)
             .expect(400);
 
           validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 400, body);
@@ -1689,7 +1693,7 @@ describe('Site API', () => {
           const cookie = await authenticatedSession(userPromise);
           const credentials = {
             username: 'user',
-            password: 'password',
+            password: 'paSsw0rd',
           };
 
           sinon.stub(ProxyDataSync, 'saveSite').resolves();

@@ -535,21 +535,6 @@ paths:
         description: The id of the site
         type: integer
         required: true
-    get:
-      summary: Fetch the basic auth credentials for the given site
-      responses:
-        200:
-          description: Basic Auth credentials for the given site
-          schema:
-            $ref: "BasicAuth.json"
-        403:
-          description: Not authorized
-          schema:
-            $ref: "Error.json"
-        404:
-          description: Not found
-          schema:
-            $ref: "Error.json"
     post:
       summary: Set the basic auth credentials for a site based on the site id
       parameters:
@@ -565,7 +550,7 @@ paths:
         200:
           description: An object representing the user environment variable
           schema:
-            $ref: "BasicAuth.json"
+            $ref: "Site.json"
         400:
           description: Bad request
           schema:

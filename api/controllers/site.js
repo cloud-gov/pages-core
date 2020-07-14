@@ -249,11 +249,12 @@ module.exports = {
       return res.notFound();
     }
 
-    if (!body.username || !body.password) {
+    let credentials;
+    try{
+      credentials = stripCredentials(body);
+    } catch(err) {
       return res.error(400);
     }
-
-    const credentials = stripCredentials(body);
 
     const { config } = site;
     config.basicAuth = credentials;
