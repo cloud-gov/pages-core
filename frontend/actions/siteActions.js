@@ -121,7 +121,7 @@ export default {
           dispatchSiteBasicAuthRemovedAction(site);
         }
       })
-      .then(() => alertActions.alertSuccess('Successfully removed basic authentcation.'))
+      .then(() => alertActions.alertSuccess('Successfully removed basic authentication.'))
       .catch(alertError);
   },
 
