@@ -3,19 +3,21 @@ const { DynamoDBDocumentHelper } = require('./DynamoDBDocumentHelper');
 const config = require('../../config');
 
 const tableName = config.app.proxySiteTable;
-const siteKey = 'id';
+const siteKey = 'Id';
 const getSiteKey = site => site.subdomain;
 
 const siteToItem = (site) => {
   const item = {
-    settings: {
-      bucket_name: site.awsBucketName,
-      bucket_region: site.awsBucketRegion,
+    Settings: {
+      BucketName: site.awsBucketName,
+      BucketRegion: site.awsBucketRegion,
     },
+    UpdatedAt: new Date().toISOString(),
+    SiteUpdatedAt: site.updatedAt.toISOString(),
   };
 
   if (site.config.basicAuth && site.config.basicAuth.username && site.config.basicAuth.password) {
-    item.settings.basicAuth = site.config.basicAuth;
+    item.Settings.BasicAuth = site.config.basicAuth;
   }
 
   item[siteKey] = getSiteKey(site);
