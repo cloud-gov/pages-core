@@ -2,7 +2,7 @@ module.exports = {
   uswds2: {
     owner: '18f',
     repo: 'federalist-uswds-jekyll',
-    branch: 'master',
+    branch: 'main',
     engine: 'jekyll',
     example: 'https://federalist-ce810add-9092-4627-8246-9b65cf94623c.app.cloud.gov/site/18f/federalist-uswds-jekyll/',
     title: 'Jekyll - U.S. Web Design System v2.0',
@@ -12,7 +12,7 @@ module.exports = {
   gatsby: {
     owner: '18f',
     repo: 'federalist-uswds-gatsby',
-    branch: 'master',
+    branch: 'main',
     engine: 'node.js',
     example: 'https://federalist-b146cf1e-c756-4b1f-bb83-c516cac94fbb.app.cloud.gov/site/18f/federalist-uswds-gatsby/',
     title: 'Gatsby - U.S. Web Design System v2.0',

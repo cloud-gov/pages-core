@@ -58,7 +58,7 @@ This will be the file that holds your S3 and SQS configurations.
       }
     }
     ```
-1. [Register or create a new GitHub organization](https://github.com/settings/organizations) with a name of your choosing. Then find your organization's ID by visiting `https://api.github.com/orgs/<your-org-name>` and copying the `id` into the whitelist of `organizations` in `config/local.js`.
+1. [Register or create a new GitHub organization](https://github.com/settings/organizations) with a name of your choosing. Then find your organization's ID by visiting `https://api.github.com/orgs/<your-org-name>` and copying the `id` into the allowed `organizations` in `config/local.js`.
     ```js
     organizations: [
       99999999 // your org added here

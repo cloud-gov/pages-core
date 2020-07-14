@@ -12,7 +12,7 @@ describe("Site authorizer", () => {
       const params = {
         owner: crypto.randomBytes(3).toString("hex"),
         repository: crypto.randomBytes(3).toString("hex"),
-        defaultBranch: "master",
+        defaultBranch: "main",
         engine: "jekyll",
       }
 

@@ -35,7 +35,7 @@ describe('Published Files API', () => {
       let prefix;
       const userPromise = factory.user();
       const sitePromise = factory.site({
-        defaultBranch: 'master',
+        defaultBranch: 'main',
         users: Promise.all([userPromise]),
       });
       const cookiePromise = authenticatedSession(userPromise);
@@ -66,7 +66,7 @@ describe('Published Files API', () => {
         prefix = `site/${site.owner}/${site.repository}/`;
 
         return request(app)
-          .get(`/v0/site/${site.id}/published-branch/master/published-file`)
+          .get(`/v0/site/${site.id}/published-branch/main/published-file`)
           .set('Cookie', promisedValues.cookie)
           .expect(200);
       }).then((response) => {
@@ -90,7 +90,7 @@ describe('Published Files API', () => {
       let prefix;
       const userPromise = factory.user();
       const sitePromise = factory.site({
-        defaultBranch: 'master',
+        defaultBranch: 'main',
         users: Promise.all([userPromise]),
       });
       const cookiePromise = authenticatedSession(userPromise);
@@ -118,7 +118,7 @@ describe('Published Files API', () => {
         prefix = `site/${site.owner}/${site.repository}/`;
 
         return request(app)
-          .get('/v0/site/NaN/published-branch/master/published-file')
+          .get('/v0/site/NaN/published-branch/main/published-file')
           .set('Cookie', promisedValues.cookie)
           .expect(404);
       }).then((response) => {
@@ -132,7 +132,7 @@ describe('Published Files API', () => {
       let prefix;
       const userPromise = factory.user();
       const sitePromise = factory.site({
-        defaultBranch: 'master',
+        defaultBranch: 'main',
         users: Promise.all([userPromise]),
       });
       const cookiePromise = authenticatedSession(userPromise);
@@ -160,7 +160,7 @@ describe('Published Files API', () => {
         prefix = `site/${site.owner}/${site.repository}/`;
 
         return request(app)
-          .get('/v0/site/-1/published-branch/master/published-file')
+          .get('/v0/site/-1/published-branch/main/published-file')
           .set('Cookie', promisedValues.cookie)
           .expect(404);
       }).then((response) => {
@@ -171,12 +171,12 @@ describe('Published Files API', () => {
 
     it('should 403 if the user is not associated with the site', (done) => {
       const user = factory.user();
-      const site = factory.site({ defaultBranch: 'master' });
+      const site = factory.site({ defaultBranch: 'main' });
       const cookie = authenticatedSession(user);
 
       Promise.props({ user, site, cookie })
         .then(promisedValues => request(app)
-          .get(`/v0/site/${promisedValues.site.id}/published-branch/master/published-file`)
+          .get(`/v0/site/${promisedValues.site.id}/published-branch/main/published-file`)
           .set('Cookie', promisedValues.cookie)
           .expect(403))
         .then((response) => {

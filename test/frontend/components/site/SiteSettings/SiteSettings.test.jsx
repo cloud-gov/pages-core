@@ -24,7 +24,7 @@ describe('<SiteSettings/>', () => {
       owner: 'el-mapache',
       repository: 'federalist-modern-team-template',
       domain: 'https://example.gov',
-      defaultBranch: 'master',
+      defaultBranch: 'main',
       demoBranch: 'demo',
       demoDomain: 'https://demo.example.gov',
       engine: 'jekyll',
