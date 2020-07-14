@@ -5,22 +5,6 @@ import InputWithErrorField from '../../Fields/InputWithErrorField';
 import { validBasicAuthUsername, validBasicAuthPassword } from '../../../util/validators';
 import { BASIC_AUTH } from '../../../propTypes';
 
-export const validateBasicAuthPassword = (value) => {
-  if (value && value.length && !validBasicAuthPassword(value)) {
-    return 'Password may contain alphanumeric characters and symbols !@$. Minimum length 6 characters.';
-  }
-
-  return undefined;
-};
-
-export const validateBasicAuthUsername = (value) => {
-  if (value && value.length && !validBasicAuthUsername(value)) {
-    return 'Username is invalid. Only alphanumeric characters are allowed. Minimum length 4 characters.';
-  }
-
-  return undefined;
-};
-
 export const BasicAuthSettingsForm = ({
   handleSubmit, invalid, pristine, submitting,
 }) => (
@@ -37,7 +21,7 @@ export const BasicAuthSettingsForm = ({
           label="Username:"
           component={InputWithErrorField}
           required
-          validate={[validateBasicAuthUsername]}
+          validate={[validBasicAuthUsername]}
           id="basicAuthUsernameInput"
         />
         <Field
@@ -46,7 +30,7 @@ export const BasicAuthSettingsForm = ({
           label="Password:"
           component={InputWithErrorField}
           required
-          validate={[validateBasicAuthPassword]}
+          validate={[validBasicAuthPassword]}
           id="basicAuthPasswordInput"
         />
       </fieldset>

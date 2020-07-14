@@ -76,9 +76,9 @@ function isEmptyOrUrl(value) {
   }
 }
 
-const validBasicAuthUsername = s => /^[a-zA-Z0-9_-]{4,15}$/.test(s);
+const validBasicAuthUsername = s => /^(?!.*[:])(?=.*[a-zA-Z0-9]).{4,255}$/.test(s);
 
-const validBasicAuthPassword = s => /^[a-zA-Z0-9_\-$!@]{6,25}$/.test(s);
+const validBasicAuthPassword = s => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,255}$/.test(s);
 
 module.exports = {
   branchRegex,

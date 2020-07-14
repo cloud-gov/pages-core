@@ -70,37 +70,50 @@ describe('validators', () => {
   });
 
   describe('.validBasicAuthUsername', () => {
-    it('only alphanumeric and hypehens allowed', () => {
-      expect(validators.validBasicAuthUsername('hell0-_w0rld')).to.be.true;
+    it('accepts valid username', () => {
+      expect(validators.validBasicAuthUsername('username1')).to.be.true;
     });
 
-    it('non-alphanumeric and hypehens not allowed', () => {
-      expect(validators.validBasicAuthUsername('hell0-_w0rld')).to.be.true;
+    it('accepts valid username with symbols that arenot semicolons', () => {
+      expect(validators.validBasicAuthUsername('username1!@#$%^&*()-_+=<>?,./~`{}[]|\\')).to.be.true;
+    });
+
+    it('must contain at least 1 alphanumeric char', () => {
+      expect(validators.validBasicAuthUsername('****')).to.be.false;
     });
 
     it('must be 4 characters', () => {
-      expect(validators.validBasicAuthUsername('hel')).to.be.false;
+      expect(validators.validBasicAuthUsername('use')).to.be.false;
     });
 
-    it('must be <= 15 characters', () => {
-      expect(validators.validBasicAuthUsername('hell0-_world-_he')).to.be.false;
+    it('colons are not allowed in username', () => {
+      expect(validators.validBasicAuthUsername('user:name1')).to.be.false;
     });
   });
+
   describe('.validBasicAuthPassword', () => {
-    it('only alphanumeric, hypehens and $!@ allowed', () => {
-      expect(validators.validBasicAuthPassword('hell0-w0rld$!@')).to.be.true;
+    it('at least 1 uppercase, 1 lowercase and one number required', () => {
+      expect(validators.validBasicAuthPassword('paSsw0rd')).to.be.true;
     });
 
-    it('not allowed characters not in !@$', () => {
-      expect(validators.validBasicAuthPassword('hell0-_w0rld&')).to.be.false;
+    it('at least 1 uppercase, 1 lowercase and one number required w/ symbols', () => {
+      expect(validators.validBasicAuthPassword('paSsw0rd!@#$%^&*()-_+=<>?,./~`{}[]|\\')).to.be.true;
     });
 
-    it('must be 6 characters', () => {
-      expect(validators.validBasicAuthPassword('hello')).to.be.false;
+    it('at least 1 uppercase char required', () => {
+      expect(validators.validBasicAuthPassword('passw0rd')).to.be.false;
     });
 
-    it('must be <= 25 characters', () => {
-      expect(validators.validBasicAuthPassword('hell0-world-hello-hell0-wo')).to.be.false;
+    it('at leaset 1 lowercase char required', () => {
+      expect(validators.validBasicAuthPassword('PASSW0RD')).to.be.false;
+    });
+
+    it('at least one number required', () => {
+      expect(validators.validBasicAuthPassword('paSsword')).to.be.false;
+    });
+
+    it('must be 4 characters', () => {
+      expect(validators.validBasicAuthPassword('Pa5')).to.be.false;
     });
   });
 });

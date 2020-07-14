@@ -2,11 +2,9 @@ const yaml = require('js-yaml');
 
 const validBranchName = s => /^[\w._]+(?:[/-]*[\w._])*$/.test(s);
 
-const validBasicAuthUsername = s => /^[a-zA-Z0-9_-]{4,15}$/.test(s) ? 'value is required and must be at least 4 characters'
-  : undefined;
+const validBasicAuthUsername = s => /^(?!.*[:])(?=.*[a-zA-Z0-9]).{4,255}$/.test(s) ? undefined : 'Value is required and must be at least 4 characters. Allowed symbols: .-_@';
 
-const validBasicAuthPassword = s => /^[a-zA-Z0-9_\-$!@]{6,25}$/.test(s) ? 'value is required and must be at least 4 characters'
-  : undefined;
+const validBasicAuthPassword = s => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,255}$/.test(s) ? undefined : 'Value is required and must be at least 4 characters. At leaset 1 uppercase, 1 lowercase and 1 number is required';
 
 function isValidYaml(yamlString) {
   try {
