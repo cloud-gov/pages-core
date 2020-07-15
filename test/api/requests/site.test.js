@@ -1590,7 +1590,7 @@ describe('Site API', () => {
             .expect(200);
 
           site = await site.reload();
-          expect(site.config).to.deep.eq({ blah: 'blahblah' });
+          expect(site.config).to.deep.equal({ blah: 'blahblah' });
         });
       });
     });
@@ -1709,7 +1709,7 @@ describe('Site API', () => {
 
           validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 200, body);
           site = await site.reload();
-          expect(site.config).to.deep.eq({
+          expect(site.config).to.deep.equal({
             basicAuth: credentials,
             blah: 'blahblahblah',
           });
