@@ -244,7 +244,7 @@ module.exports = {
 
     const { site_id: siteId } = params;
 
-    let site = await Site.forUser(user).findByPk(siteId);
+    const site = await Site.forUser(user).findByPk(siteId);
 
     if (!site) {
       return res.notFound();
@@ -252,9 +252,11 @@ module.exports = {
 
     const credentials = stripCredentials(body);
 
-    const { config } = site;
-    config.basicAuth = credentials;
-    site = await site.update({ config });
+    const config = {
+      ...site.config,
+      basicAuth: credentials,
+    };
+    await site.update({ config });
 
     ProxyDataSync.saveSite(site) // sync to proxy database
       .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
@@ -267,16 +269,16 @@ module.exports = {
     const { params, user } = req;
     const { site_id: siteId } = params;
 
-    let site = await Site.forUser(user).findByPk(siteId);
+    const site = await Site.forUser(user).findByPk(siteId);
 
     if (!site) {
       return res.notFound();
     }
 
-    const { config } = site;
+    const config = { ...site.config };
     delete config.basicAuth;
 
-    site = await site.update({ config });
+    await site.update({ config });
     ProxyDataSync.saveSite(site) // sync to proxy database
       .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
 

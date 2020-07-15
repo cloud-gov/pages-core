@@ -1686,7 +1686,7 @@ describe('Site API', () => {
       describe('when the parameters are valid', () => {
         it('sets username and password for basic authentication', async () => {
           const userPromise = await factory.user();
-          let site = await factory.site({
+          const site = await factory.site({
             users: [userPromise],
             config: { blah: 'blahblahblah' },
           });
@@ -1708,7 +1708,7 @@ describe('Site API', () => {
 
 
           validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 200, body);
-          site = await site.reload();
+          await site.reload();
           expect(site.config).to.deep.equal({
             basicAuth: credentials,
             blah: 'blahblahblah',
