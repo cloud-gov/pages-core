@@ -1,7 +1,5 @@
 import React, { Fragment, Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import BasicAuthSettingsForm from './BasicAuthSettingsForm';
 import AlertBanner from '../../alertBanner';
 import siteActions from '../../../actions/siteActions';
@@ -15,7 +13,8 @@ const infoContent = (
     {' '}
     <a
       href="https://federalist.18f.gov/documentation/basic-auth"
-      rel="noopener" target="_blank"
+      rel="noopener noreferrer"
+      target="_blank"
     >
       Basic Authentication on Federalist Preview Builds
     </a>
@@ -32,7 +31,8 @@ const warningContent = (
     {' '}
     <a
       href="https://csrc.nist.gov/Projects/Risk-Management/Risk-Management-Framework-(RMF)-Overview/Security-Categorization"
-      rel="noopener noreferrer" target="_blank"
+      rel="noopener noreferrer"
+      target="_blank"
     >
     FISMA Security Categorization
     </a>
@@ -42,10 +42,6 @@ const warningContent = (
 );
 
 class BasicAuthSettings extends Component {
-  componentDidMount() {
-    const { siteId, basicAuth } = this.props;
-  }
-
   render() {
     const {
       siteId,
@@ -68,9 +64,9 @@ class BasicAuthSettings extends Component {
           alertRole={false}
         />
         <br />
-        { 
+        {
           username
-            ? ( 
+            ? (
               <p className="well-text">
                 <b>Username:</b>
                 {username}
@@ -84,7 +80,7 @@ class BasicAuthSettings extends Component {
                 </button>
               </p>
             )
-            : ( <BasicAuthSettingsForm onSubmit={saveBasicAuth} /> )
+            : (<BasicAuthSettingsForm onSubmit={saveBasicAuth} />)
         }
       </div>
     );
@@ -96,5 +92,9 @@ BasicAuthSettings.propTypes = {
   basicAuth: BASIC_AUTH,
 };
 
-export default BasicAuthSettings;
+BasicAuthSettings.defaultProps = {
+  siteId: null,
+  basicAuth: {},
+};
 
+export default BasicAuthSettings;

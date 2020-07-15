@@ -21,7 +21,6 @@ import {
 } from './dispatchActions';
 
 import userActions from './userActions';
-import { httpError } from './actionCreators/alertActions';
 
 const alertError = (error) => {
   window.scrollTo(0, 0);
@@ -127,7 +126,7 @@ export default {
 
   saveBasicAuthToSite(siteId, basicAuth) {
     return federalist.saveBasicAuthToSite(siteId, basicAuth)
-      .then(site => {
+      .then((site) => {
         if (site) {
           dispatchSiteBasicAuthSavedAction(site);
         }

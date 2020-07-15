@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 import InputWithErrorField from '../../Fields/InputWithErrorField';
 import { validBasicAuthUsername, validBasicAuthPassword } from '../../../util/validators';
-import { BASIC_AUTH } from '../../../propTypes';
 
 export const BasicAuthSettingsForm = ({
   handleSubmit, invalid, pristine, submitting,
