@@ -89,12 +89,7 @@ class BasicAuthSettings extends Component {
 
 BasicAuthSettings.propTypes = {
   siteId: PropTypes.number.isRequired,
-  basicAuth: BASIC_AUTH,
-};
-
-BasicAuthSettings.defaultProps = {
-  siteId: null,
-  basicAuth: {},
+  basicAuth: BASIC_AUTH.isRequired,
 };
 
 export default BasicAuthSettings;
