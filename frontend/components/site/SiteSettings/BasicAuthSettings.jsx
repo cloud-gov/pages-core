@@ -41,50 +41,42 @@ const warningContent = (
   </Fragment>
 );
 
-class BasicAuthSettings extends Component {
-  render() {
-    const {
-      siteId,
-      basicAuth: { username, password },
-    } = this.props;
-
-    const saveBasicAuth = params => siteActions.saveBasicAuthToSite(siteId, params);
-    const deleteBasicAuth = () => siteActions.removeBasicAuthFromSite(siteId);
-
-    return (
-      <div className="well">
-        <AlertBanner
-          status="info"
-          message={infoContent}
-          alertRole={false}
-        />
-        <AlertBanner
-          status="warning"
-          message={warningContent}
-          alertRole={false}
-        />
-        <br />
-        {
-          username
-            ? (
-              <p className="well-text">
-                <b>Username:</b>
-                {username}
-                <br />
-                <b>Password:</b>
-                {password}
-                <br />
-                <br />
-                <button type="button" className="margin-0" id="delete-basic-auth-btn" onClick={() => deleteBasicAuth()}>
-                  Delete
-                </button>
-              </p>
-            )
-            : (<BasicAuthSettingsForm onSubmit={saveBasicAuth} />)
-        }
-      </div>
-    );
-  }
+const BasicAuthSettings = ({ siteId, basicAuth: { username, password } }) => {
+  const saveBasicAuth = params => siteActions.saveBasicAuthToSite(siteId, params);
+  const deleteBasicAuth = () => siteActions.removeBasicAuthFromSite(siteId);
+  return (
+    <div className="well">
+      <AlertBanner
+        status="info"
+        message={infoContent}
+        alertRole={false}
+      />
+      <AlertBanner
+        status="warning"
+        message={warningContent}
+        alertRole={false}
+      />
+      <br />
+      {
+        username
+          ? (
+            <p className="well-text">
+              <b>Username:</b>
+              {username}
+              <br />
+              <b>Password:</b>
+              {password}
+              <br />
+              <br />
+              <button type="button" className="margin-0" id="delete-basic-auth-btn" onClick={() => deleteBasicAuth()}>
+                Delete
+              </button>
+            </p>
+          )
+          : (<BasicAuthSettingsForm onSubmit={saveBasicAuth} />)
+      }
+    </div>
+  );
 }
 
 BasicAuthSettings.propTypes = {
