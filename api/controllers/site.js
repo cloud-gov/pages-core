@@ -9,10 +9,23 @@ const { User, Site, Build } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const { logger } = require('../../winston');
 const ProxyDataSync = require('../services/ProxyDataSync');
+const {
+  ValidationError,
+  validBasicAuthUsername,
+  validBasicAuthPassword,
+} = require('../utils/validators');
 
 const sendJSON = (site, res) => siteSerializer
   .serialize(site)
   .then(siteJSON => res.json(siteJSON));
+
+const stripCredentials = ({ username, password }) => {
+  if (validBasicAuthUsername(username) && validBasicAuthPassword(password)) {
+    return { username, password };
+  }
+
+  throw new ValidationError('username or password is not valid.');
+};
 
 module.exports = {
   findAllForUser: (req, res) => {
@@ -223,5 +236,55 @@ module.exports = {
       .catch((err) => {
         res.error(err);
       });
+  },
+
+  addBasicAuth: async (req, res) => {
+    const { body, params, user } = req;
+
+    const { site_id: siteId } = params;
+
+    let site = await Site.forUser(user).findByPk(siteId);
+
+    if (!site) {
+      return res.notFound();
+    }
+
+    let credentials;
+    try{
+      credentials = stripCredentials(body);
+    } catch(err) {
+      return res.error(400);
+    }
+
+    const { config } = site;
+    config.basicAuth = credentials;
+    site = await site.update({ config });
+
+    ProxyDataSync.saveSite(site) // sync to proxy database
+      .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+
+    const siteJSON = await siteSerializer.serialize(site);
+    return res.json(siteJSON);
+  },
+
+  removeBasicAuth: async (req, res) => {
+    const { params, user } = req;
+    const { site_id: siteId } = params;
+
+    let site = await Site.forUser(user).findByPk(siteId);
+
+    if (!site) {
+      return res.notFound();
+    }
+
+    const { config } = site;
+    delete config.basicAuth;
+
+    site = await site.update({ config });
+    ProxyDataSync.saveSite(site) // sync to proxy database
+      .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+
+    const siteJSON = await siteSerializer.serialize(site);
+    return res.json(siteJSON);
   },
 };

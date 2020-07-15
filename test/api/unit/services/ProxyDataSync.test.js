@@ -16,9 +16,9 @@ const site = {
   repository: 'testRepo',
   awsBucketName: 'testBucket',
   awsBucketRegion: 'testRegion',
+  config: {},
   subdomain: 'www',
   updatedAt: new Date(),
-
 };
 
 describe('ProxyDataSync', () => {
@@ -68,7 +68,7 @@ describe('ProxyDataSync', () => {
     );
   });
 
-  it('convert site to item', () => {
+  it('convert site to item w/o basicAuth', () => {
     const start = new Date();
     const obj = siteToItem(site);
     const item = {
@@ -85,5 +85,31 @@ describe('ProxyDataSync', () => {
     delete obj.UpdatedAt;
     expect(item).to.deep.equal(obj);
 
+  });
+
+  it('convert site to item w/ basicAuth', () => {
+    const start = new Date();
+    const basicAuth = {
+      username: 'username',
+      password: 'password',
+    };
+    const protectedSite = { ...site };
+    protectedSite.config.basicAuth = basicAuth;
+    const obj = siteToItem(protectedSite);
+
+    const item = {
+      Id: getSiteKey(site),
+      Settings: {
+        BucketName: site.awsBucketName,
+        BucketRegion: site.awsBucketRegion,
+        BasicAuth: basicAuth,
+      },
+      SiteUpdatedAt: site.updatedAt.toISOString(),
+    };
+
+    expect(start <= new Date(obj.UpdatedAt)).to.be.true;
+    expect(new Date() >= new Date(obj.UpdatedAt)).to.be.true;
+    delete obj.UpdatedAt;
+    expect(item).to.deep.equal(obj);
   });
 });

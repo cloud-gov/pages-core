@@ -16,8 +16,12 @@ import {
   dispatchShowAddNewSiteFieldsAction,
   dispatchHideAddNewSiteFieldsAction,
   dispatchResetFormAction,
+  dispatchSiteBasicAuthRemovedAction,
+  dispatchSiteBasicAuthSavedAction,
 } from './dispatchActions';
+
 import userActions from './userActions';
+import { httpError } from './actionCreators/alertActions';
 
 const alertError = (error) => {
   window.scrollTo(0, 0);
@@ -107,6 +111,28 @@ export default {
           dispatchSiteUserUpdatedAction(updatedSite);
         }
       })
+      .catch(alertError);
+  },
+
+  removeBasicAuthFromSite(siteId) {
+    return federalist.removeBasicAuthFromSite(siteId)
+      .then((site) => {
+        if (site) {
+          dispatchSiteBasicAuthRemovedAction(site);
+        }
+      })
+      .then(() => alertActions.alertSuccess('Successfully removed basic authentication.'))
+      .catch(alertError);
+  },
+
+  saveBasicAuthToSite(siteId, basicAuth) {
+    return federalist.saveBasicAuthToSite(siteId, basicAuth)
+      .then(site => {
+        if (site) {
+          dispatchSiteBasicAuthSavedAction(site);
+        }
+      })
+      .then(() => alertActions.alertSuccess('Successfully added basic authentcation.'))
       .catch(alertError);
   },
 };

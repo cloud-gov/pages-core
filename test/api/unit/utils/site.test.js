@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 
-const { siteViewLink } = require('../../../../api/utils/site');
+const { siteViewLink, hideBasicAuthPassword } = require('../../../../api/utils/site');
 const factory = require('../../support/factory');
 const config = require('../../../../config');
 
@@ -47,5 +47,13 @@ describe('siteViewLink', () => {
     expect(siteViewLink(site, deployment)).to.eql(
       `${getTestDomain(site.subdomain)}/preview/${site.owner}/${site.repository}/`
     );
+  });
+
+  it('password should be hidden', async () => {
+    const basicAuth = { usermame: 'username', password: 'password' };;
+    expect(hideBasicAuthPassword(basicAuth)).to.deep.eql({
+      username: basicAuth.username,
+      password: '**********',
+    });
   });
 });

@@ -17,4 +17,11 @@ function siteViewDomain(site) {
   return config.app.proxyPreviewHost.replace('*', site.subdomain);
 }
 
-module.exports = { siteViewLink, siteViewDomain };
+const hideBasicAuthPassword = ({ username, password }) => {
+  if (password && password.length) {
+    return { username, password: '**********' };
+  }
+  return {};
+};
+
+module.exports = { siteViewLink, siteViewDomain, hideBasicAuthPassword };
