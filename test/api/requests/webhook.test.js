@@ -17,7 +17,7 @@ describe('Webhook API', () => {
   };
 
   const buildWebhookPayload = (user, site) => ({
-    ref: 'refs/heads/master',
+    ref: 'refs/heads/main',
     commits: [{ id: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7' }],
     after: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
     sender: { login: user.username },
@@ -291,7 +291,7 @@ describe('Webhook API', () => {
         await Build.create({
           site: site.id,
           user: user.id,
-          branch: 'master',
+          branch: 'main',
           commitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
           state: 'queued',
           token: 'token',
@@ -320,7 +320,7 @@ describe('Webhook API', () => {
       });
 
       it('should update the commitSha and user of build', async () => {
-        const branch = 'master';
+        const branch = 'main';
         const origSha = 'aaa2b66a31319d456a448041a5b3c2a70c32d8b7';
         const userProms = Promise.all([factory.user(), factory.user()]);
         const site = await factory.site({ users: userProms });
@@ -367,7 +367,7 @@ describe('Webhook API', () => {
         await Build.create({
           site: site.id,
           user: user.id,
-          branch: 'master',
+          branch: 'main',
           commitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
           state: 'queued',
           token: 'token',

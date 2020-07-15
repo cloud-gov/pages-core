@@ -265,7 +265,7 @@ describe('Site API', () => {
         .send({
           owner: 'partner-org',
           repository: 'partner-site',
-          defaultBranch: 'master',
+          defaultBranch: 'main',
           engine: 'jekyll',
         })
         .set('Cookie', cookie)
@@ -287,7 +287,7 @@ describe('Site API', () => {
             .send({
               owner: 'partner-org',
               repository: 'partner-site',
-              defaultBranch: 'master',
+              defaultBranch: 'main',
               engine: 'jekyll',
             })
             .set('Cookie', cookie)
@@ -324,7 +324,7 @@ describe('Site API', () => {
           .send({
             owner: siteOwner,
             repository: siteRepository,
-            defaultBranch: 'master',
+            defaultBranch: 'main',
             engine: 'jekyll',
           })
           .set('Cookie', cookie)
@@ -366,7 +366,7 @@ describe('Site API', () => {
         .send({
           owner: siteOwner,
           repository: siteRepository,
-          defaultBranch: 'master',
+          defaultBranch: 'main',
           engine: 'jekyll',
           template: 'uswds2',
         })
@@ -394,7 +394,7 @@ describe('Site API', () => {
         .post('/v0/site')
         .set('x-csrf-token', csrfToken.getToken())
         .send({
-          defaultBranch: 'master',
+          defaultBranch: 'main',
           engine: 'jekyll',
           template: 'gatsby',
         })
@@ -412,7 +412,7 @@ describe('Site API', () => {
         .send({
           owner: 'siteOwner',
           repository: 'siteRepository',
-          defaultBranch: 'master',
+          defaultBranch: 'main',
           engine: 'jekyll',
           template: 'fake-template',
         })
@@ -436,7 +436,7 @@ describe('Site API', () => {
         .send({
           owner: site.owner,
           repository: site.repository,
-          defaultBranch: 'master',
+          defaultBranch: 'main',
           engine: 'jekyll',
         })
         .set('Cookie', cookie)
@@ -467,7 +467,7 @@ describe('Site API', () => {
         .send({
           owner: siteOwner,
           repository: siteRepository,
-          defaultBranch: 'master',
+          defaultBranch: 'main',
           engine: 'jekyll',
         })
         .set('Cookie', cookie)
@@ -510,7 +510,7 @@ describe('Site API', () => {
           .send({
             owner: siteOwner,
             repository: siteRepository,
-            defaultBranch: 'master',
+            defaultBranch: 'main',
             engine: 'jekyll',
           })
           .set('Cookie', cookie)
@@ -1226,7 +1226,7 @@ describe('Site API', () => {
           .put(`/v0/site/${site.id}`)
           .set('x-csrf-token', csrfToken.getToken())
           .send({
-            defaultBranch: 'master',
+            defaultBranch: 'main',
           })
           .set('Cookie', cookie)
           .expect(403))
@@ -1250,7 +1250,7 @@ describe('Site API', () => {
           .put(`/v0/site/${site.id}`)
           .set('x-csrf-token', 'bad-token')
           .send({
-            defaultBranch: 'master',
+            defaultBranch: 'main',
           })
           .set('Cookie', cookie)
           .expect(403))

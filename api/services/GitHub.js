@@ -6,7 +6,7 @@ const createRepoForOrg = (github, options) => github.repos.createInOrg(options);
 
 const createRepoForUser = (github, options) => github.repos.createForAuthenticatedUser(options);
 
-const createWebhook = (github, options) => github.repos.createHook(options);
+const createWebhook = (github, options) => github.repos.createWebhook(options);
 
 const getOrganizations = github => github.orgs.listForAuthenticatedUser().then(orgs => orgs.data);
 
@@ -69,7 +69,9 @@ const handleWebhookError = (err) => {
   }
 };
 
-const sendNextCreateGithubStatusRequest = (github, options) => github.repos.createStatus(options);
+const sendNextCreateGithubStatusRequest = (github, options) => github.repos.createCommitStatus(
+  options
+);
 
 const sendCreateGithubStatusRequest = (github, options, attempt = 0) => {
   const maxTries = 5;

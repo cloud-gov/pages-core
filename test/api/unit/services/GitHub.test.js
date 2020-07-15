@@ -315,7 +315,7 @@ describe('GitHub', () => {
   });
 
   describe('.validateUser(accessToken)', () => {
-    it('should resolve if the user is on a whitelisted team', (done) => {
+    it('should resolve if the user is on an allowed team', (done) => {
       githubAPINocks.userOrganizations({
         accessToken: '123abc',
         organizations: [{ id: config.passport.github.organizations[0] }],
@@ -326,7 +326,7 @@ describe('GitHub', () => {
       }).catch(done);
     });
 
-    it('should reject if the user is not on a whitelisted team', (done) => {
+    it('should reject if the user is not on an allowed team', (done) => {
       const FAKE_INVALID_ORG_ID = 4598345;
 
       githubAPINocks.userOrganizations({
@@ -368,7 +368,7 @@ describe('GitHub', () => {
     it('returns a branch based on the supplied parameters', (done) => {
       promised.then((values) => {
         const { owner, repository } = values.site;
-        const branch = 'master';
+        const branch = 'main';
 
         mockGHRequest = githubAPINocks.getBranch({
           owner,
@@ -391,7 +391,7 @@ describe('GitHub', () => {
     it('returns an error if branch is not defined', (done) => {
       promised.then((values) => {
         const { owner, repository } = values.site;
-        const branch = 'master';
+        const branch = 'main';
 
         mockGHRequest = githubAPINocks.getBranch({
           owner,
@@ -592,7 +592,7 @@ describe('GitHub', () => {
         context,
       };
 
-      const failOptions = Object.assign({}, options);
+      const failOptions = { ...options };
       failOptions.response = [404, 'File not found'];
 
       githubAPINocks.status(failOptions);
@@ -622,7 +622,7 @@ describe('GitHub', () => {
         context,
       };
 
-      const failOptions = Object.assign({}, options);
+      const failOptions = { ...options };
       failOptions.response = [404, 'File not found'];
 
       githubAPINocks.status(failOptions);

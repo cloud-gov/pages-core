@@ -1,14 +1,10 @@
 {
   "type": "object",
   "required": [
-    "createdAt",
     "output",
     "source"
   ],
   "properties": {
-    "createdAt": {
-      "type": "string"
-    },
     "output": {
       "type": "string"
     },

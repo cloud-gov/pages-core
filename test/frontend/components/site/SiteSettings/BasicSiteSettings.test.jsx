@@ -9,7 +9,7 @@ describe('<BasicSiteSettings/>', () => {
   const makeProps = () => (
     {
       initialValues: {
-        defaultBranch: 'master',
+        defaultBranch: 'main',
         domain: 'https://example.gov',
       },
       handleSubmit: spy(),

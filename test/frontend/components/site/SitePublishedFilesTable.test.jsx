@@ -36,9 +36,9 @@ describe('<SitePublishedFilesTable/>', () => {
   });
 
   it('should render the branch name', () => {
-    const publishedBranch = { name: 'master', site: { viewLink: 'www.example.gov/master' } };
+    const publishedBranch = { name: 'main', site: { viewLink: 'www.example.gov/main' } };
     const origProps = {
-      params: { id: '1', name: 'master' },
+      params: { id: '1', name: 'main' },
       publishedFiles: {
         isLoading: true,
       },
@@ -57,7 +57,7 @@ describe('<SitePublishedFilesTable/>', () => {
     const wrapper = shallow(<SitePublishedFilesTable {...origProps} />);
     wrapper.setProps({ publishedFiles });
 
-    expect(wrapper.find('h3').contains('master')).to.be.true;
+    expect(wrapper.find('h3').contains('main')).to.be.true;
   });
 
   it('should render a table with the files for the given branch', () => {
@@ -70,7 +70,7 @@ describe('<SitePublishedFilesTable/>', () => {
       },
     };
     const origProps = {
-      params: { id: '1', name: 'master' },
+      params: { id: '1', name: 'main' },
       publishedFiles: {
         isLoading: true,
       },
@@ -110,7 +110,7 @@ describe('<SitePublishedFilesTable/>', () => {
       },
     };
     const origProps = {
-      params: { id: '1', name: 'master' },
+      params: { id: '1', name: 'main' },
       publishedFiles: {
         isLoading: true,
       },
@@ -143,14 +143,14 @@ describe('<SitePublishedFilesTable/>', () => {
 
   it('should render a table with the files for the given branch', () => {
     const correctBranch = {
-      name: 'master',
+      name: 'main',
       site: {
         viewLink: 'www.example.gov/',
-        defaultBranch: 'master',
+        defaultBranch: 'main',
       },
     };
     const origProps = {
-      params: { id: '1', name: 'master' },
+      params: { id: '1', name: 'main' },
       publishedFiles: {
         isLoading: true,
       },
@@ -182,9 +182,9 @@ describe('<SitePublishedFilesTable/>', () => {
   });
 
   it('should render previous and next buttons if files are truncated', () => {
-    const publishedBranch = { name: 'master', site: { viewLink: 'www.example.gov/master' } };
+    const publishedBranch = { name: 'main', site: { viewLink: 'www.example.gov/main' } };
     const origProps = {
-      params: { id: '1', name: 'master' },
+      params: { id: '1', name: 'main' },
       publishedFiles: {
         isLoading: true,
       },
@@ -217,7 +217,7 @@ describe('<SitePublishedFilesTable/>', () => {
 
   it('should render a loading state if the files are loading', () => {
     const props = {
-      params: { id: '1', name: 'master' },
+      params: { id: '1', name: 'main' },
       publishedFiles: { isLoading: true },
     };
 
@@ -227,7 +227,7 @@ describe('<SitePublishedFilesTable/>', () => {
 
   it('should render an empty state if there are no files', () => {
     const props = {
-      params: { id: '1', name: 'master' },
+      params: { id: '1', name: 'main' },
       publishedFiles: { isLoading: false, data: { isTruncated: false, files: [] } },
     };
 
@@ -241,12 +241,12 @@ describe('<SitePublishedFilesTable/>', () => {
     let nextButton;
 
     const publishedBranch = {
-      name: 'master',
+      name: 'main',
       site: { viewLink: 'https://example.com/' },
     };
 
     const origProps = {
-      params: { id: '1', name: 'master' },
+      params: { id: '1', name: 'main' },
       publishedFiles: {
         isLoading: false,
         data: {
@@ -280,7 +280,7 @@ describe('<SitePublishedFilesTable/>', () => {
       expect(nextButton.prop('disabled')).to.be.false;
       nextButton.simulate('click');
       expect(fetchPublishedFiles.calledOnce).to.be.true;
-      expect(fetchPublishedFiles.calledWith({ id: '1' }, 'master', 'prefix/c')).to.be.true;
+      expect(fetchPublishedFiles.calledWith({ id: '1' }, 'main', 'prefix/c')).to.be.true;
     });
 
     it('cannot go past the last page', () => {

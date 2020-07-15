@@ -30,14 +30,14 @@ describe('SQS', () => {
       };
 
       SQS.sendBuildMessage({
-        branch: 'master',
+        branch: 'main',
         state: 'processing',
         url: 'testBucket.gov/boo/hoo',
         Site: {
           owner: 'owner',
           repository: 'formatted-message-repo',
           engine: 'jekyll',
-          defaultBranch: 'master',
+          defaultBranch: 'main',
           s3ServiceName: config.s3.serviceName,
         },
         User: {
@@ -89,14 +89,14 @@ describe('SQS', () => {
       };
 
       SQS.sendBuildMessage({
-        branch: 'master',
+        branch: 'main',
         state: 'processing',
         url: 'testBucket.gov/boo/hoo',
         Site: {
           owner,
           repository,
           engine: 'jekyll',
-          defaultBranch: 'master',
+          defaultBranch: 'main',
           s3ServiceName: config.s3.serviceName,
         },
         User: {
@@ -217,8 +217,8 @@ describe('SQS', () => {
         ];
 
         const baseurlPromises = domains.map(domain => factory
-          .site({ domain, defaultBranch: 'master' })
-          .then(site => factory.build({ site, branch: 'master' }))
+          .site({ domain, defaultBranch: 'main' })
+          .then(site => factory.build({ site, branch: 'main' }))
           .then(build => Build.findByPk(build.id, { include: [Site, User] }))
           .then(build => SQS.messageBodyForBuild(build))
           .then(message => messageEnv(message, 'BASEURL')));
@@ -235,9 +235,9 @@ describe('SQS', () => {
           domain: '',
           owner: 'owner',
           repository: 'repo',
-          defaultBranch: 'master',
+          defaultBranch: 'main',
         })
-          .then(site => factory.build({ site, branch: 'master' }))
+          .then(site => factory.build({ site, branch: 'main' }))
           .then(build => Build.findByPk(build.id, { include: [Site, User] }))
           .then(build => SQS.messageBodyForBuild(build))
           .then((message) => {
@@ -254,8 +254,8 @@ describe('SQS', () => {
         ];
 
         const baseurlPromises = domains.map(domain => factory
-          .site({ domain, defaultBranch: 'master' })
-          .then(site => factory.build({ site, branch: 'master' }))
+          .site({ domain, defaultBranch: 'main' })
+          .then(site => factory.build({ site, branch: 'main' }))
           .then(build => Build.findByPk(build.id, { include: [Site, User] }))
           .then(build => SQS.messageBodyForBuild(build))
           .then(message => messageEnv(message, 'BASEURL')));
@@ -272,9 +272,9 @@ describe('SQS', () => {
           domain: '',
           owner: 'owner',
           repository: 'repo',
-          defaultBranch: 'master',
+          defaultBranch: 'main',
         })
-          .then(site => factory.build({ site, branch: 'master' }))
+          .then(site => factory.build({ site, branch: 'main' }))
           .then(build => Build.findByPk(build.id, { include: [Site, User] }))
           .then(build => SQS.messageBodyForBuild(build))
           .then((message) => {
@@ -368,7 +368,7 @@ describe('SQS', () => {
             domain: 'https://www.example.com',
             owner: 'owner',
             repository: 'repo',
-            defaultBranch: 'master',
+            defaultBranch: 'main',
           })
           .then(site => factory.build({ site, branch: 'branch' }))
           .then(build => Build.findByPk(build.id, { include: [Site, User] }))
@@ -385,7 +385,7 @@ describe('SQS', () => {
           domain: '',
           owner: 'owner',
           repository: 'repo',
-          defaultBranch: 'master',
+          defaultBranch: 'main',
         })
           .then(site => factory.build({ site, branch: 'branch' }))
           .then(build => Build.findByPk(build.id, { include: [Site, User] }))
@@ -402,7 +402,7 @@ describe('SQS', () => {
           domain: '',
           owner: 'owner',
           repository: 'repo',
-          defaultBranch: 'master',
+          defaultBranch: 'main',
         })
           .then(site => factory.build({ site, branch: 'branch' }))
           .then(build => Build.findByPk(build.id, { include: [Site, User] }))
@@ -427,7 +427,7 @@ describe('SQS', () => {
     });
 
     it("should set BRANCH in the message to the name build's branch", (done) => {
-      factory.site({ domain: '', defaultBranch: 'master' })
+      factory.site({ domain: '', defaultBranch: 'main' })
         .then(site => factory.build({ site, branch: 'branch' }))
         .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then(build => SQS.messageBodyForBuild(build))
@@ -440,12 +440,12 @@ describe('SQS', () => {
 
     it('should set CONFIG in the message to the YAML config for the site on the default branch', (done) => {
       factory.site({
-        defaultBranch: 'master',
+        defaultBranch: 'main',
         defaultConfig: { plugins_dir: '_plugins' },
         demoConfig: { plugins_dir: '_demo_plugins' },
         previewConfig: { plugins_dir: '_preview_plugins' },
       })
-        .then(site => factory.build({ site, branch: 'master' }))
+        .then(site => factory.build({ site, branch: 'main' }))
         .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then(build => SQS.messageBodyForBuild(build))
         .then((message) => {
@@ -474,7 +474,7 @@ describe('SQS', () => {
 
     it('should set CONFIG in the message to the YAML config for the site on a preview branch', (done) => {
       factory.site({
-        defaultBranch: 'master',
+        defaultBranch: 'main',
         defaultConfig: { plugins_dir: '_plugins' },
         demoConfig: { plugins_dir: '_demo_plugins' },
         previewConfig: { plugins_dir: '_preview_plugins' },

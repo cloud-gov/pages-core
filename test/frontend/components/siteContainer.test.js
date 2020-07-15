@@ -7,7 +7,7 @@ import { SiteContainer } from '../../../frontend/components/siteContainer';
 let props;
 const site = {
   id: 1,
-  defaultBranch: 'master',
+  defaultBranch: 'main',
   engine: 'jekyll',
   owner: '18f',
   publishedAt: '2017-06-08T20:53:14.363Z',

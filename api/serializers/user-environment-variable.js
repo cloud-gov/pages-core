@@ -1,6 +1,6 @@
 const { pick } = require('../utils');
 
-const whitelist = [
+const allowedAttributes = [
   'id',
   'name',
   'hint',
@@ -10,7 +10,7 @@ function serialize(userEnvVar) {
   const object = userEnvVar.get({
     plain: true,
   });
-  return pick(whitelist, object);
+  return pick(allowedAttributes, object);
 }
 
 function serializeMany(userEnvVars) {

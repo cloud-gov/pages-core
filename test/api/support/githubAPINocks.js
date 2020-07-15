@@ -319,7 +319,7 @@ const getBranch = ({
   branchNock = branchNock.query(true);
 
   const output = expected || {
-    name: 'master',
+    name: 'main',
     commit: {
       sha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
     },

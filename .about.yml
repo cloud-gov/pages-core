@@ -102,7 +102,7 @@ services:
 licenses:
   federalist:
     name: CC0-1.0
-    url: https://github.com/18F/federalist/blob/master/LICENSE.md
+    url: https://github.com/18F/federalist/blob/main/LICENSE.md
 
 # Blogs or websites associated with project development
 #blog:
