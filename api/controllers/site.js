@@ -14,6 +14,7 @@ const {
   validBasicAuthUsername,
   validBasicAuthPassword,
 } = require('../utils/validators');
+const { wrapHandler } = require('../utils');
 
 const sendJSON = (site, res) => siteSerializer
   .serialize(site)
@@ -238,7 +239,7 @@ module.exports = {
       });
   },
 
-  addBasicAuth: async (req, res) => {
+  addBasicAuth: wrapHandler(async (req, res) => {
     const { body, params, user } = req;
 
     const { site_id: siteId } = params;
@@ -249,12 +250,7 @@ module.exports = {
       return res.notFound();
     }
 
-    let credentials;
-    try{
-      credentials = stripCredentials(body);
-    } catch(err) {
-      return res.error(400);
-    }
+    const credentials = stripCredentials(body);
 
     const { config } = site;
     config.basicAuth = credentials;
@@ -265,9 +261,9 @@ module.exports = {
 
     const siteJSON = await siteSerializer.serialize(site);
     return res.json(siteJSON);
-  },
+  }),
 
-  removeBasicAuth: async (req, res) => {
+  removeBasicAuth: wrapHandler(async (req, res) => {
     const { params, user } = req;
     const { site_id: siteId } = params;
 
@@ -286,5 +282,5 @@ module.exports = {
 
     const siteJSON = await siteSerializer.serialize(site);
     return res.json(siteJSON);
-  },
+  }),
 };
