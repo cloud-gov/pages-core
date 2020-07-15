@@ -65,9 +65,9 @@ describe('<BasicAuthSettings />', () => {
       expect(wrapper.find('ReduxForm')).to.have.lengthOf(0);
     });
 
-    it('does render the basic auth credentials disable button', () => {
+    it('does render the basic auth credentials delete button', () => {
       const wrapper = shallow(<BasicAuthSettings {...props} />);
-      const submitButton = wrapper.find('#disable-basic-auth-btn');
+      const submitButton = wrapper.find('#delete-basic-auth-btn');
       expect(submitButton).to.have.lengthOf(1);
     });
   });

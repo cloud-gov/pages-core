@@ -53,7 +53,7 @@ class BasicAuthSettings extends Component {
     } = this.props;
 
     const saveBasicAuth = params => siteActions.saveBasicAuthToSite(siteId, params);
-    const disableBasicAuth = () => siteActions.removeBasicAuthFromSite(siteId);
+    const deleteBasicAuth = () => siteActions.removeBasicAuthFromSite(siteId);
 
     return (
       <div className="well">
@@ -79,8 +79,8 @@ class BasicAuthSettings extends Component {
                 {password}
                 <br />
                 <br />
-                <button type="button" className="margin-0" id="disable-basic-auth-btn" onClick={() => disableBasicAuth()}>
-                  Disable
+                <button type="button" className="margin-0" id="delete-basic-auth-btn" onClick={() => deleteBasicAuth()}>
+                  Delete
                 </button>
               </p>
             )
