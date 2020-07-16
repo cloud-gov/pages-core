@@ -1,4 +1,4 @@
-import React, { Fragment, Component } from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import BasicAuthSettingsForm from './BasicAuthSettingsForm';
 import AlertBanner from '../../alertBanner';
@@ -77,7 +77,7 @@ const BasicAuthSettings = ({ siteId, basicAuth: { username, password } }) => {
       }
     </div>
   );
-}
+};
 
 BasicAuthSettings.propTypes = {
   siteId: PropTypes.number.isRequired,
