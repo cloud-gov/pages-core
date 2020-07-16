@@ -13,6 +13,8 @@ webpackAssets
 public/stats.json
 dist
 
+## Rollup generated assets
+build
 
 # Node.js / NPM
 lib-cov

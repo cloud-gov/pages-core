@@ -7,6 +7,7 @@ RUN mkdir -p /app
 WORKDIR /app
 COPY . /app
 
-RUN yarn config set cache-folder /app/.yarn-cache
+RUN rm -rf admin-client \
+  yarn config set cache-folder /app/.yarn-cache
 
 EXPOSE 1337 8888 8080

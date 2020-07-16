@@ -154,6 +154,8 @@ function getNextCollaborators(github, owner, repo, { page = 1, allCollabs = [] }
 const isAdminMember = async (github) => {
   const [{ data }, adminMembers] = await Promise.all([
     github.users.getAuthenticated(),
+    // Change org `federalist-users` to testing org name.
+    // Need to create org name env variable for local testing
     getOrganizationMembers(github, 'federalist-users', 'admin'),
   ]);
   const isAdmin = adminMembers.map(member => member.id).includes(data.id);

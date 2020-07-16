@@ -16,6 +16,18 @@ services:
     environment:
       JWT_SECRET: 'shhHhh...'
       USER_AUDITOR: federalist
+  admin-client:
+    build:
+      context: ./admin-client
+    working_dir: /app
+    volumes:
+      - ./admin-client:/app:delegated
+    ports:
+      - "3000:3000"
+      - "10000:10000"
+    depends_on:
+      - db
+    command: ["npm", "run", "dev"]
   db:
     build:
       dockerfile: Dockerfile-db
@@ -25,6 +37,7 @@ services:
     ports:
       - "5433:5432" # expose db on host at port 5433
     environment:
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: federalist
       POSTGRES_TEST_DB: federalist-test
 volumes:
