@@ -11,8 +11,6 @@ describe('Site model', () => {
       }).then((site) => {
         expect(site.owner).to.equal('repoowner');
         expect(site.repository).to.equal('reponame');
-        expect(site.subdomain).to.equal(site.s3ServiceName);
-        expect(site.subdomain).to.not.be.undefined;
         done();
       }).catch(done);
     });
@@ -158,6 +156,16 @@ describe('Site model', () => {
     }).catch((err) => {
       expect(err.status).to.equal(403);
       expect(err.message).to.equal('awsBucketRegion: Site.awsBucketRegion cannot be null');
+      done();
+    });
+  });
+
+  it('should not let subdomain field be null', (done) => {
+    factory.site({
+      subdomain: undefined,
+    }).catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('subdomain: Site.subdomain cannot be null');
       done();
     });
   });
