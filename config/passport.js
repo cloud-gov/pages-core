@@ -3,9 +3,9 @@ const env = require('../services/environment.js')();
 module.exports = {
   github: {
     options: {
-      clientID: env.GITHUB_CLIENT_ID || 'not_set',
-      clientSecret: env.GITHUB_CLIENT_SECRET || 'not_set',
-      callbackURL: env.GITHUB_CLIENT_CALLBACK_URL || 'not_set',
+      clientID: process.env.GITHUB_CLIENT_ID || 'not_set',
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || 'not_set',
+      callbackURL: process.env.GITHUB_CLIENT_CALLBACK_URL || 'not_set',
       scope: ['user', 'repo', 'write:repo_hook'],
       state: true,
     },
