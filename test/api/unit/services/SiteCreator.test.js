@@ -20,6 +20,7 @@ describe('SiteCreator', () => {
       owner,
       repository,
       user,
+      defaultBranch = 'main',
       s3ServiceName = 'federalist-dev-s3',
       awsBucketName = 'cg-123456789',
       awsBucketRegion = 'us-gov-west-1'
@@ -34,6 +35,7 @@ describe('SiteCreator', () => {
       expect(site.Users[0].id).to.equal(user.id);
       expect(site.Builds).to.have.length(1);
       expect(site.Builds[0].user).to.equal(user.id);
+      expect(site.defaultBranch).to.equal(defaultBranch);
     };
 
     const afterCreateSite = (owner, repository) => Site.findOne({
@@ -61,9 +63,11 @@ describe('SiteCreator', () => {
             repository: crypto.randomBytes(3).toString('hex'),
           };
 
+          const defaultBranch = 'myDefaultBranch';
+
           factory.user().then((model) => {
             user = model;
-            githubAPINocks.repo();
+            githubAPINocks.repo({ defaultBranch });
 
             githubAPINocks.userOrganizations({
               accessToken: user.githubAccessToken,
@@ -84,7 +88,8 @@ describe('SiteCreator', () => {
                 site,
                 siteParams.owner,
                 siteParams.repository,
-                user
+                user,
+                defaultBranch
               );
               expect(webhookNock.isDone()).to.equal(true);
               done();
@@ -98,9 +103,11 @@ describe('SiteCreator', () => {
             repository: crypto.randomBytes(3).toString('hex'),
           };
 
+          const defaultBranch = 'myDefaultBranch';
+
           factory.user().then((model) => {
             user = model;
-            githubAPINocks.repo();
+            githubAPINocks.repo({ defaultBranch });
             githubAPINocks.webhook();
 
             githubAPINocks.userOrganizations({
@@ -116,7 +123,8 @@ describe('SiteCreator', () => {
                 site,
                 siteParams.owner,
                 siteParams.repository,
-                user
+                user,
+                defaultBranch
               );
               done();
             })
@@ -506,6 +514,7 @@ describe('SiteCreator', () => {
               siteParams.owner,
               siteParams.repository,
               user,
+              'main',
               name,
               bucket,
               region

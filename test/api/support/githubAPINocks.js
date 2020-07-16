@@ -187,7 +187,7 @@ const githubAuth = (username, organizations) => {
 
 const repo = ({
   // eslint-disable-next-line no-shadow
-  accessToken, owner, repo, username, response,
+  accessToken, owner, repo, username, defaultBranch, response,
 } = {}) => {
   let webhookNock = nock('https://api.github.com');
 
@@ -208,6 +208,7 @@ const repo = ({
   }
 
   const typicalResponse = {
+    default_branch: defaultBranch || 'main',
     permissions: {
       admin: true,
       push: true,
@@ -390,7 +391,11 @@ const getRepositories = ({
 
   const repos = [];
   for (let i = 0; i < (per_page + 1); i += 1) {
-    repos.push({ full_name: `owner/repo-${i}`, permissions: { push: true } });
+    repos.push({
+      full_name: `owner/repo-${i}`,
+      default_branch: 'main',
+      permissions: { push: true },
+    });
   }
 
   return withAuth(nock('https://api.github.com'), accessToken)
