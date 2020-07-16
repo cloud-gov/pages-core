@@ -145,6 +145,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.JSONB,
       defaultValue: {},
     },
+    subdomain: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   }, {
     tableName: 'site',
     hooks: {
@@ -155,9 +159,6 @@ module.exports = (sequelize, DataTypes) => {
     paranoid: true,
 
     getterMethods: {
-      subdomain() {
-        return this.s3ServiceName;
-      },
       basicAuth() {
         return this.config.basicAuth || {};
       },

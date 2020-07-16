@@ -92,6 +92,7 @@ function buildSite(params, s3) {
     s3ServiceName: s3.serviceName,
     awsBucketName: s3.bucket,
     awsBucketRegion: s3.region,
+    subdomain: s3.serviceName,
   });
 
   const site = Site.build(siteParams);
