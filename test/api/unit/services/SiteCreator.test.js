@@ -271,7 +271,7 @@ describe('SiteCreator', () => {
           expect(site).to.not.be.undefined;
           expect(site.owner).to.equal(siteParams.owner);
           expect(site.repository).to.equal(siteParams.repository);
-          expect(site.defaultBranch).to.equal('master');
+          expect(site.defaultBranch).to.equal('main');
 
           return Site.findOne({
             where: {
@@ -307,7 +307,7 @@ describe('SiteCreator', () => {
         const fakeTemplate = {
           repo: 'federalist-template',
           owner: '18f',
-          branch: 'not-master',
+          branch: 'not-main',
         };
 
         templateResolverStub.returns(fakeTemplate);
