@@ -1,7 +1,6 @@
 const { pick } = require('../utils');
 
-const whitelist = [
-  'createdAt',
+const allowedAttributes = [
   'output',
   'source',
 ];
@@ -10,8 +9,7 @@ function serialize(buildLog) {
   const object = buildLog.get({
     plain: true,
   });
-  const filtered = pick(whitelist, object);
-  filtered.createdAt = filtered.createdAt.toISOString();
+  const filtered = pick(allowedAttributes, object);
   return filtered;
 }
 

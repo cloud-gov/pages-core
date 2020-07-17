@@ -1,28 +1,27 @@
-const Sequelize = require('sequelize');
-const path = require('path');
-const config = require('../../config');
+const { Sequelize, DataTypes } = require('sequelize');
+const { postgres } = require('../../config');
 const { databaseLogger } = require('../../winston');
 
-const postgresConfig = config.postgres;
-const { database } = postgresConfig;
-const username = postgresConfig.user;
-const { password } = postgresConfig;
+const {
+  database, host, password, port, user: username,
+} = postgres;
 
 const sequelize = new Sequelize(database, username, password, {
   dialect: 'postgres',
-  host: postgresConfig.host,
-  port: postgresConfig.port,
+  host,
+  port,
   logging: databaseLogger.info.bind(databaseLogger),
 });
+
 /* eslint-disable no-unused-vars */
-const Build = sequelize.import(path.join(__dirname, '/build'));
-const BuildLog = sequelize.import(path.join(__dirname, '/build-log'));
-const Site = sequelize.import(path.join(__dirname, '/site'));
-const SiteUser = sequelize.import(path.join(__dirname, '/site-user'));
-const User = sequelize.import(path.join(__dirname, '/user'));
-const UserAction = sequelize.import(path.join(__dirname, '/user-action'));
-const ActionType = sequelize.import(path.join(__dirname, '/action-type'));
-const UserEnvironmentVariable = sequelize.import(path.join(__dirname, '/user-environment-variable'));
+const Build = require('./build')(sequelize, DataTypes);
+const BuildLog = require('./build-log')(sequelize, DataTypes);
+const Site = require('./site')(sequelize, DataTypes);
+const SiteUser = require('./site-user')(sequelize, DataTypes);
+const User = require('./user')(sequelize, DataTypes);
+const UserAction = require('./user-action')(sequelize, DataTypes);
+const ActionType = require('./action-type')(sequelize, DataTypes);
+const UserEnvironmentVariable = require('./user-environment-variable')(sequelize, DataTypes);
 /* eslint-enable no-unused-vars */
 
 Object
@@ -37,4 +36,4 @@ Build.forSiteUser = user => Build
 UserEnvironmentVariable.forSiteUser = user => UserEnvironmentVariable
   .scope({ method: ['forSiteUser', user, Site, User] });
 
-module.exports = Object.assign({ sequelize }, sequelize.models);
+module.exports = { sequelize, ...sequelize.models };

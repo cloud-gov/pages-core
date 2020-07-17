@@ -6,7 +6,7 @@ const createRepoForOrg = (github, options) => github.repos.createInOrg(options);
 
 const createRepoForUser = (github, options) => github.repos.createForAuthenticatedUser(options);
 
-const createWebhook = (github, options) => github.repos.createHook(options);
+const createWebhook = (github, options) => github.repos.createWebhook(options);
 
 const getOrganizations = github => github.orgs.listForAuthenticatedUser().then(orgs => orgs.data);
 
@@ -69,7 +69,9 @@ const handleWebhookError = (err) => {
   }
 };
 
-const sendNextCreateGithubStatusRequest = (github, options) => github.repos.createStatus(options);
+const sendNextCreateGithubStatusRequest = (github, options) => github.repos.createCommitStatus(
+  options
+);
 
 const sendCreateGithubStatusRequest = (github, options, attempt = 0) => {
   const maxTries = 5;
@@ -183,6 +185,22 @@ module.exports = {
         name: repository,
         org: owner,
       });
+    })
+    .catch(handleCreateRepoError),
+
+  createRepoFromTemplate: (user, owner, name, template) => githubClient(user.githubAccessToken)
+    .then((github) => {
+      const params = {
+        template_owner: template.owner,
+        template_repo: template.repo,
+        name,
+      };
+
+      if (user.username.toLowerCase() !== owner.toLowerCase()) {
+        params.owner = owner;
+      }
+
+      return github.repos.createUsingTemplate(params);
     })
     .catch(handleCreateRepoError),
 

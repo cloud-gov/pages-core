@@ -91,10 +91,10 @@ describe('S3PublishedFileLister', () => {
         });
       };
 
-      factory.site({ defaultBranch: 'master' }).then((model) => {
+      factory.site({ defaultBranch: 'main' }).then((model) => {
         site = model;
         prefix = `site/${site.owner}/${site.repository}/`;
-        return S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'master');
+        return S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'main');
       }).then((publishedFiles) => {
         expect(publishedFiles).to.deep.equal({
           isTruncated: false,
@@ -167,7 +167,7 @@ describe('S3PublishedFileLister', () => {
         });
       };
 
-      factory.site({ defaultBranch: 'master' }).then((model) => {
+      factory.site({ defaultBranch: 'main' }).then((model) => {
         site = model;
         prefix = `preview/${site.owner}/${site.repository}/preview/`;
         return S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'preview');

@@ -22,10 +22,10 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   componentDidMount() {
-    const { params } = this.props;
+    const { id, name } = this.props;
 
-    const site = { id: params.id };
-    const branch = params.name;
+    const site = { id };
+    const branch = name;
 
     const startAtKey = null; // start without a startAtKey
     publishedFileActions.fetchPublishedFiles(site, branch, startAtKey);
@@ -67,7 +67,7 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   nextPage() {
-    const { params } = this.props;
+    const { id, name } = this.props;
     const { currentPage, filesByPage } = this.state;
 
     const nextPage = currentPage + 1;
@@ -85,8 +85,8 @@ class SitePublishedFilesTable extends React.Component {
     }
 
     // else dispatch action to fetch next page of files
-    const site = { id: params.id };
-    const branch = params.name;
+    const site = { id };
+    const branch = name;
     const files = filesByPage[currentPage];
     const startAtKey = files[files.length - 1].key;
 
@@ -135,11 +135,11 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   renderPublishedFilesTable(files) {
-    const { params } = this.props;
+    const { name } = this.props;
 
     return (
       <div>
-        <h3>{params.name}</h3>
+        <h3>{name}</h3>
         <p>
           Use this page to audit the files that Federalist has publicly published.
           Up to 200 files are shown per page.
@@ -210,10 +210,8 @@ class SitePublishedFilesTable extends React.Component {
 }
 
 SitePublishedFilesTable.propTypes = {
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-  }).isRequired,
+  id: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
   publishedFiles: PropTypes.shape({
     isLoading: PropTypes.bool.isRequired,
     data: PropTypes.shape({
@@ -236,7 +234,7 @@ SitePublishedFilesTable.defaultProps = {
   publishedFiles: null,
 };
 
-const mapStateToProps = ({ publishedFiles, sites }, { params: { id } }) => ({
+const mapStateToProps = ({ publishedFiles, sites }, { id }) => ({
   publishedFiles,
   site: currentSite(sites, id),
 });

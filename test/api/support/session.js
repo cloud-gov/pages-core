@@ -1,7 +1,9 @@
 const crypto = require('crypto');
+
+const sessionConfig = require('../../../api/init/sessionConfig');
+
 const factory = require('./factory');
 const csrfToken = require('./csrfToken');
-const config = require('../../../config');
 
 function unauthenticatedSession({ oauthState, authRedirectPath } = {}) {
   const sessionKey = crypto.randomBytes(8).toString('hex');
@@ -20,14 +22,14 @@ function unauthenticatedSession({ oauthState, authRedirectPath } = {}) {
     authRedirectPath,
   };
 
-  return config.session.store.set(sessionKey, sessionBody)
+  return sessionConfig.store.set(sessionKey, sessionBody)
     .then(() => {
       const signedSessionKey = `${sessionKey}.${crypto
-        .createHmac('sha256', config.session.secret)
+        .createHmac('sha256', sessionConfig.secret)
         .update(sessionKey)
         .digest('base64')
         .replace(/=+$/, '')}`;
-      return `${config.session.key}=s%3A${signedSessionKey}`;
+      return `${sessionConfig.key}=s%3A${signedSessionKey}`;
     });
 }
 
@@ -51,15 +53,15 @@ function authenticatedSession(user) {
         authenticatedAt: new Date(),
         csrfSecret: csrfToken.TEST_CSRF_SECRET,
       };
-      return config.session.store.set(sessionKey, sessionBody);
+      return sessionConfig.store.set(sessionKey, sessionBody);
     })
     .then(() => {
       const signedSessionKey = `${sessionKey}.${crypto
-        .createHmac('sha256', config.session.secret)
+        .createHmac('sha256', sessionConfig.secret)
         .update(sessionKey)
         .digest('base64')
         .replace(/=+$/, '')}`;
-      return `${config.session.key}=s%3A${signedSessionKey}`;
+      return `${sessionConfig.key}=s%3A${signedSessionKey}`;
     });
 }
 
@@ -80,14 +82,14 @@ function adminUnauthenticatedSession({ oauthState, authRedirectPath } = {}) {
     authRedirectPath,
   };
 
-  return config.session.store.set(sessionKey, sessionBody)
+  return sessionConfig.store.set(sessionKey, sessionBody)
     .then(() => {
       const signedSessionKey = `${sessionKey}.${crypto
-        .createHmac('sha256', config.session.secret)
+        .createHmac('sha256', sessionConfig.secret)
         .update(sessionKey)
         .digest('base64')
         .replace(/=+$/, '')}`;
-      return `${config.session.key}=s%3A${signedSessionKey}`;
+      return `${sessionConfig.key}=s%3A${signedSessionKey}`;
     });
 }
 
@@ -111,15 +113,15 @@ function adminAuthenticatedSession(user) {
         adminAuthenticatedAt: new Date(),
         csrfSecret: csrfToken.TEST_CSRF_SECRET,
       };
-      return config.session.store.set(sessionKey, sessionBody);
+      return sessionConfig.store.set(sessionKey, sessionBody);
     })
     .then(() => {
       const signedSessionKey = `${sessionKey}.${crypto
-        .createHmac('sha256', config.session.secret)
+        .createHmac('sha256', sessionConfig.secret)
         .update(sessionKey)
         .digest('base64')
         .replace(/=+$/, '')}`;
-      return `${config.session.key}=s%3A${signedSessionKey}`;
+      return `${sessionConfig.key}=s%3A${signedSessionKey}`;
     });
 }
 

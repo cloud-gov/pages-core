@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import { shallow } from 'enzyme';
 import { expect } from 'chai';
@@ -73,11 +74,11 @@ describe('<AddSite/>', () => {
     });
     expect(formProps.onSubmit).to.equal(wrapper.instance().onAddUserSubmit);
     expect(formProps.showAddNewSiteFields).to.equal(propsWithoutError.showAddNewSiteFields);
-    expect(formProps.initialValues).to.deep.equal({ defaultBranch: 'master', engine: 'jekyll' });
+    expect(formProps.initialValues).to.deep.equal({ engine: 'jekyll' });
   });
 
   it('delivers onCreateSiteSubmit when showAddNewSiteFields is true', () => {
-    const props = Object.assign({}, propsWithoutError);
+    const props = { ...propsWithoutError };
     props.showAddNewSiteFields = true;
 
     wrapper = shallow(<Fixture {...props} />);
@@ -95,22 +96,22 @@ describe('<AddSite/>', () => {
   it('calls addSite action when add site form is submitted and showAddNewSiteFields is true', () => {
     const repoUrl = 'https://github.com/boop/beeper-v2';
     const engine = 'vrooooom';
-    const defaultBranch = 'tree';
 
-    const props = Object.assign({}, propsWithoutError);
+    const props = { ...propsWithoutError };
     props.showAddNewSiteFields = true;
     wrapper = shallow(<Fixture {...props} />);
 
-    wrapper.find('ReduxForm').props().onSubmit({ repoUrl, engine, defaultBranch });
-    expect(addSite.calledWith({ owner: 'boop', repository: 'beeper-v2', engine, defaultBranch })).to.be.true;
+    wrapper.find('ReduxForm').props().onSubmit({ repoUrl, engine });
+    expect(addSite.calledWith({ owner: 'boop', repository: 'beeper-v2', engine })).to.be.true;
   });
 
   it('displays an alert banner when add to site action fails', () => {
-    const props = Object.assign({}, propsWithoutError, {
+    const props = {
+      ...propsWithoutError,
       alert: {
         message: 'A site with that name already exists',
       },
-    });
+    };
     wrapper = shallow(<Fixture {...props} />);
 
     expect(wrapper.find(AlertBanner)).to.have.length(1);

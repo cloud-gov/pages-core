@@ -1,17 +1,28 @@
 const { Op } = require('sequelize');
-const { logger } = require('../../winston');
 const { Build, Site, User } = require('../models');
 
+const { USER_AUDITOR } = process.env;
+
+class NightlyBuildError extends Error {
+  constructor(build, cause) {
+    super(build);
+    this.stack = `${build}\n  ${cause.stack}`;
+  }
+}
+
 const buildBranch = (site, branch) => User
-  .findOne({ where: { username: process.env.USER_AUDITOR } })
+  .findOne({ where: { username: USER_AUDITOR } })
   .then(user => Build.create({
     site: site.id,
     user: user.id,
     branch,
   }))
-  .catch(err => logger.error(`Error siteBuilds: (${site.owner}/${site.repository}@${site.branch})\n${err}`));
+  .then(() => `${site.owner}/${site.repository}@${branch}`)
+  .catch((err) => {
+    throw new NightlyBuildError(`${site.owner}/${site.repository}@${branch}`, err);
+  });
 
-const buildSite = (site) => {
+const siteBranches = (site) => {
   const builds = [];
   if (site.defaultConfig && site.defaultConfig.schedule === 'nightly') {
     builds.push(buildBranch(site, site.defaultBranch));
@@ -20,10 +31,10 @@ const buildSite = (site) => {
   if (site.demoConfig && site.demoConfig.schedule === 'nightly') {
     builds.push(buildBranch(site, site.demoBranch));
   }
-  return Promise.all(builds);
+  return builds;
 };
 
-const nightlyBuilds = () => Site.findAll({
+const query = {
   where: {
     [Op.or]: [
       {
@@ -52,7 +63,16 @@ const nightlyBuilds = () => Site.findAll({
       },
     ],
   },
-})
-  .then(sites => Promise.all(sites.map(site => buildSite(site))));
+};
+
+const nightlyBuilds = async () => {
+  const sites = await Site.findAll(query);
+
+  const builds = sites
+    .map(siteBranches)
+    .flat();
+
+  return Promise.allSettled(builds);
+};
 
 module.exports = { nightlyBuilds };

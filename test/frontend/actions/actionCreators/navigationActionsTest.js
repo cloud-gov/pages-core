@@ -1,34 +1,30 @@
-import { expect } from "chai";
+import sinon from 'sinon';
+import * as reachRouter from '@reach/router';
 import {
-  updateRouterType,
   pushRouterHistory,
-  replaceRouterHistory
-} from "../../../../frontend/actions/actionCreators/navigationActions";
+  replaceRouterHistory,
+} from '../../../../frontend/actions/actionCreators/navigationActions';
 
-describe("updateRouter actionCreator", () => {
-  const path = "/what/is/this/path/of/which/you/speak";
+describe('navigationActions', () => {
+  let navigateStub;
 
-  it("constructs a browser history push properly", () => {
-    const actual = pushRouterHistory(path);
-
-    expect(actual).to.deep.equal({
-      type: updateRouterType,
-      method: "push",
-      arguments: [ path ]
-    });
+  beforeEach(() => {
+    navigateStub = sinon.stub(reachRouter, 'navigate').resolves();
   });
 
-  it("constructs a browser history replace properly", () => {
-    const actual = replaceRouterHistory(path);
-
-    expect(actual).to.deep.equal({
-      type: updateRouterType,
-      method: "replace",
-      arguments: [ path ]
-    });
+  afterEach(() => {
+    sinon.restore();
   });
 
-  it("exports its type", () => {
-    expect(updateRouterType).to.equal("UPDATE_ROUTER");
+  const path = '/what/is/this/path/of/which/you/speak';
+
+  describe('.pushRouterHistory', () => {
+    it('navigates', () => pushRouterHistory(path)
+      .then(() => sinon.assert.calledWithExactly(navigateStub, path)));
+  });
+
+  describe('.replaceRouterHistory', () => {
+    it('navigates and replaces history', () => replaceRouterHistory(path)
+      .then(() => sinon.assert.calledWithExactly(navigateStub, path, { replace: true })));
   });
 });

@@ -143,6 +143,91 @@ describe('GitHub', () => {
     });
   });
 
+  describe('.createRepoFromTemplate(user, owner, name, template)', () => {
+    const repo = 'repo-name';
+    const org = 'org-name';
+    const template = {
+      owner: '18f',
+      repo: 'cool-starter-repo',
+    };
+
+    it('should create a repository for the user if the user is the owner', async () => {
+      const user = await factory.user();
+      const createRepoNock = githubAPINocks.createRepoUsingTemplate({
+        accessToken: user.githubAccessToken,
+        repo,
+        template,
+      });
+
+      await GitHub.createRepoFromTemplate(user, user.username, repo, template);
+
+      expect(createRepoNock.isDone()).to.equal(true);
+    });
+
+    it('should create a repository for an org if the user is not the owner', async () => {
+      const user = await factory.user();
+      const createRepoNock = githubAPINocks.createRepoUsingTemplate({
+        accessToken: user.githubAccessToken,
+        owner: org,
+        repo,
+        template,
+      });
+
+      await GitHub.createRepoFromTemplate(user, org, repo, template);
+
+      expect(createRepoNock.isDone()).to.equal(true);
+    });
+
+    it('should create a user repository even if the case for the owner and username don\'t match', async () => {
+      const user = await factory.user();
+      const createRepoNock = githubAPINocks.createRepoUsingTemplate({
+        accessToken: user.githubAccessToken,
+        repo,
+        template,
+      });
+
+      await GitHub.createRepoFromTemplate(user, user.username.toUpperCase(), repo, template);
+
+      expect(createRepoNock.isDone()).to.equal(true);
+    });
+
+    it('should reject if the user is not authorized to create a repository', async () => {
+      const user = await factory.user();
+      githubAPINocks.createRepoUsingTemplate({
+        accessToken: user.githubAccessToken,
+        owner: org,
+        repo,
+        template,
+        response: [403, {
+          message: 'You need admin access to the organization before adding a repository to it.',
+        }],
+      });
+
+      const err = await GitHub.createRepoFromTemplate(user, org, repo, template).catch(e => e);
+
+      expect(err.status).to.equal(400);
+      expect(err.message).to.equal('You need admin access to the organization before adding a repository to it.');
+    });
+
+    it('should reject if the repo already exists', async () => {
+      const user = await factory.user();
+      githubAPINocks.createRepoUsingTemplate({
+        accessToken: user.githubAccessToken,
+        owner: org,
+        repo,
+        template,
+        response: [422, {
+          errors: [{ message: 'name already exists on this account' }],
+        }],
+      });
+
+      const err = await GitHub.createRepoFromTemplate(user, org, repo, template).catch(e => e);
+
+      expect(err.status).to.equal(400);
+      expect(err.message).to.equal('A repo with that name already exists.');
+    });
+  });
+
   describe('.setWebhook(site, user)', () => {
     it('should set a webhook on the repository', (done) => {
       let site;
@@ -230,7 +315,7 @@ describe('GitHub', () => {
   });
 
   describe('.validateUser(accessToken)', () => {
-    it('should resolve if the user is on a whitelisted team', (done) => {
+    it('should resolve if the user is on an allowed team', (done) => {
       githubAPINocks.userOrganizations({
         accessToken: '123abc',
         organizations: [{ id: config.passport.github.organizations[0] }],
@@ -241,7 +326,7 @@ describe('GitHub', () => {
       }).catch(done);
     });
 
-    it('should reject if the user is not on a whitelisted team', (done) => {
+    it('should reject if the user is not on an allowed team', (done) => {
       const FAKE_INVALID_ORG_ID = 4598345;
 
       githubAPINocks.userOrganizations({
@@ -361,7 +446,7 @@ describe('GitHub', () => {
     it('returns a branch based on the supplied parameters', (done) => {
       promised.then((values) => {
         const { owner, repository } = values.site;
-        const branch = 'master';
+        const branch = 'main';
 
         mockGHRequest = githubAPINocks.getBranch({
           owner,
@@ -384,7 +469,7 @@ describe('GitHub', () => {
     it('returns an error if branch is not defined', (done) => {
       promised.then((values) => {
         const { owner, repository } = values.site;
-        const branch = 'master';
+        const branch = 'main';
 
         mockGHRequest = githubAPINocks.getBranch({
           owner,
@@ -441,16 +526,10 @@ describe('GitHub', () => {
 
       githubAPINocks.getCollaborators({ accessToken, owner, repository });
       githubAPINocks.getCollaborators({
-        accessToken,
-        owner,
-        repository,
-        page: 2,
+        accessToken, owner, repository, page: 2,
       });
       githubAPINocks.getCollaborators({
-        accessToken,
-        owner,
-        repository,
-        page: 3,
+        accessToken, owner, repository, page: 3,
       });
 
       GitHub.getCollaborators(accessToken, owner, repository)
@@ -506,16 +585,10 @@ describe('GitHub', () => {
 
       githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'admin' });
       githubAPINocks.getOrganizationMembers({
-        accessToken,
-        organization,
-        role: 'admin',
-        page: 2,
+        accessToken, organization, role: 'admin', page: 2,
       });
       githubAPINocks.getOrganizationMembers({
-        accessToken,
-        organization,
-        role: 'admin',
-        page: 3,
+        accessToken, organization, role: 'admin', page: 3,
       });
       GitHub.getOrganizationMembers(accessToken, organization, 'admin')
         .then((members) => {
@@ -531,16 +604,10 @@ describe('GitHub', () => {
 
       githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'member' });
       githubAPINocks.getOrganizationMembers({
-        accessToken,
-        organization,
-        role: 'member',
-        page: 2,
+        accessToken, organization, role: 'member', page: 2,
       });
       githubAPINocks.getOrganizationMembers({
-        accessToken,
-        organization,
-        role: 'member',
-        page: 3,
+        accessToken, organization, role: 'member', page: 3,
       });
       GitHub.getOrganizationMembers(accessToken, organization, 'member')
         .then((members) => {
@@ -556,11 +623,15 @@ describe('GitHub', () => {
     it('returns a branch based on the supplied parameters', (done) => {
       const accessToken = 'token';
       const org = 'federalist-users';
-      const team_slug = 12345;
+      const team_slug = '12345';
 
       githubAPINocks.getTeamMembers({ accessToken, org, team_slug });
-      githubAPINocks.getTeamMembers({ accessToken, org, team_slug, page: 2 });
-      githubAPINocks.getTeamMembers({ accessToken, org, team_slug, page: 3 });
+      githubAPINocks.getTeamMembers({
+        accessToken, org, team_slug, page: 2,
+      });
+      githubAPINocks.getTeamMembers({
+        accessToken, org, team_slug, page: 3,
+      });
       GitHub.getTeamMembers(accessToken, org, team_slug)
         .then((members) => {
           expect(members.length).to.equal(102);
@@ -599,7 +670,7 @@ describe('GitHub', () => {
         context,
       };
 
-      const failOptions = Object.assign({}, options);
+      const failOptions = { ...options };
       failOptions.response = [404, 'File not found'];
 
       githubAPINocks.status(failOptions);
@@ -629,7 +700,7 @@ describe('GitHub', () => {
         context,
       };
 
-      const failOptions = Object.assign({}, options);
+      const failOptions = { ...options };
       failOptions.response = [404, 'File not found'];
 
       githubAPINocks.status(failOptions);

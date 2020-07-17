@@ -1,0 +1,6 @@
+name: federalistapp-staging
+memory: 256MB
+instances: 2
+env: staging
+env_postfix: -staging
+log_level: verbose

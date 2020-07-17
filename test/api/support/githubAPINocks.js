@@ -1,8 +1,7 @@
 const nock = require('nock');
 const config = require('../../../config');
 
-const withAuth = (nok, accessToken) => nok
-  .matchHeader('authorization', `token ${accessToken}`);
+const withAuth = (nok, accessToken) => nok.matchHeader('authorization', `token ${accessToken}`);
 
 const getAccessToken = ({ authorizationCode, accessToken, scope } = {}) => {
   /* eslint-disable no-param-reassign */
@@ -35,11 +34,7 @@ const getAccessToken = ({ authorizationCode, accessToken, scope } = {}) => {
 };
 
 const createRepoForOrg = ({
-  accessToken,
-  org,
-  // eslint-disable-next-line no-shadow
-  repo,
-  response,
+  accessToken, org, repo, response,
 } = {}) => {
   let createRepoNock = nock('https://api.github.com');
 
@@ -104,12 +99,48 @@ const createRepoForUser = ({ accessToken, repo, response } = {}) => {
   return createRepoNock.reply(...resp);
 };
 
+const createRepoUsingTemplate = ({
+  accessToken, repo, owner, template, response,
+} = {}) => {
+  let createRepoNock = nock('https://api.github.com');
+
+  if (repo && template) {
+    const params = {
+      name: repo,
+    };
+
+    if (owner) {
+      params.owner = owner;
+    }
+
+    createRepoNock = createRepoNock.post(`/repos/${template.owner}/${template.repo}/generate`, params);
+  } else {
+    createRepoNock = createRepoNock.post(/\/repos\/.+\/.+\/generate/);
+  }
+
+  if (accessToken) {
+    createRepoNock = withAuth(createRepoNock, accessToken);
+  }
+
+  createRepoNock = createRepoNock.query(true);
+
+  const typicalResponse = {
+    owner: { login: 'your-name-here' },
+    name: repo,
+  };
+
+  let resp = response || 201;
+  if (typeof resp === 'number') {
+    resp = [resp, typicalResponse];
+  } else if (resp[1] === undefined) {
+    resp[1] = typicalResponse;
+  }
+
+  return createRepoNock.reply(...resp);
+};
+
 const user = ({
-  accessToken,
-  githubUserID,
-  username,
-  email,
-  tokenType = 'Bearer',
+  accessToken, githubUserID, username, email, tokenType = 'Bearer',
 } = {}) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
@@ -186,12 +217,8 @@ const githubAuth = (username, organizations) => {
 };
 
 const repo = ({
-  accessToken,
-  owner,
   // eslint-disable-next-line no-shadow
-  repo,
-  username,
-  response,
+  accessToken, owner, repo, username, defaultBranch, response,
 } = {}) => {
   let webhookNock = nock('https://api.github.com');
 
@@ -212,6 +239,7 @@ const repo = ({
   }
 
   const typicalResponse = {
+    default_branch: defaultBranch || 'main',
     permissions: {
       admin: true,
       push: true,
@@ -230,14 +258,8 @@ const repo = ({
 };
 
 const status = ({
-  accessToken,
-  owner,
   // eslint-disable-next-line no-shadow
-  repo,
-  sha,
-  state,
-  targetURL,
-  response,
+  accessToken, owner, repo, sha, state, targetURL, response,
 } = {}) => {
   let path;
   if (owner && repo && sha) {
@@ -254,9 +276,7 @@ const status = ({
     const appEnv = config.app.app_env;
     if (appEnv === 'production' && body.context !== 'federalist/build') {
       return false;
-    }
-
-    if (appEnv !== 'production' && body.context !== `federalist-${appEnv}/build`) {
+    } if (appEnv !== 'production' && body.context !== `federalist-${appEnv}/build`) {
       return false;
     }
 
@@ -282,11 +302,8 @@ const status = ({
 };
 
 const webhook = ({
-  accessToken,
-  owner,
   // eslint-disable-next-line no-shadow
-  repo,
-  response,
+  accessToken, owner, repo, response,
 } = {}) => {
   let webhookNock = nock('https://api.github.com');
 
@@ -318,14 +335,9 @@ const webhook = ({
   return webhookNock.reply(...resp);
 };
 
-
 const getBranch = ({
-  accessToken,
-  owner,
   // eslint-disable-next-line no-shadow
-  repo,
-  branch,
-  expected,
+  accessToken, owner, repo, branch, expected,
 }) => {
   let branchNock = nock('https://api.github.com');
   const path = `/repos/${owner}/${repo}/branches/${branch}`;
@@ -339,7 +351,7 @@ const getBranch = ({
   branchNock = branchNock.query(true);
 
   const output = expected || {
-    name: 'master',
+    name: 'main',
     commit: {
       sha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
     },
@@ -350,13 +362,7 @@ const getBranch = ({
 
 /* eslint-disable camelcase */
 const getOrganizationMembers = ({
-  accessToken,
-  username,
-  organization,
-  role, per_page,
-  page,
-  response,
-  responseCode,
+  accessToken, username, organization, role, per_page, page, response, responseCode,
 }) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
@@ -396,7 +402,9 @@ const githubAdminAuth = (username) => {
   getOrganizationMembers({ username, organization: 'federalist-users', role: 'admin' });
 };
 
-const getTeamMembers = ({ accessToken, org, team_slug, per_page, page, response } = {}) => {
+const getTeamMembers = ({
+  accessToken, org, team_slug, per_page, page, response,
+} = {}) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   team_slug = team_slug || 'test-team';
@@ -415,10 +423,7 @@ const getTeamMembers = ({ accessToken, org, team_slug, per_page, page, response 
 };
 
 const getRepositories = ({
-  accessToken,
-  per_page,
-  page,
-  response,
+  accessToken, per_page, page, response,
 }) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
@@ -428,7 +433,11 @@ const getRepositories = ({
 
   const repos = [];
   for (let i = 0; i < (per_page + 1); i += 1) {
-    repos.push({ full_name: `owner/repo-${i}`, permissions: { push: true } });
+    repos.push({
+      full_name: `owner/repo-${i}`,
+      default_branch: 'main',
+      permissions: { push: true },
+    });
   }
 
   return withAuth(nock('https://api.github.com'), accessToken)
@@ -437,12 +446,7 @@ const getRepositories = ({
 };
 
 const getCollaborators = ({
-  accessToken,
-  owner,
-  repository,
-  per_page,
-  page,
-  response,
+  accessToken, owner, repository, per_page, page, response,
 }) => {
   /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
@@ -468,6 +472,7 @@ module.exports = {
   createRepoForOrg,
   createRepoForUser,
   githubAdminAuth,
+  createRepoUsingTemplate,
   githubAuth,
   repo,
   status,

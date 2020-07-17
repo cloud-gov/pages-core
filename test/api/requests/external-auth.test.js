@@ -16,7 +16,7 @@ describe('External authentication request', () => {
   });
 
   describe('GET /external/auth/github/callback', () => {
-    it('return unauthorized if the user is not in a whitelisted GitHub organization', (done) => {
+    it('return unauthorized if the user is not in an allowed GitHub organization', (done) => {
       githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
       request(app)
         .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')

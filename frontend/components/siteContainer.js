@@ -16,11 +16,6 @@ export const SITE_NAVIGATION_CONFIG = [
     icon: 'IconBook',
   },
   {
-    display: 'GitHub branches',
-    route: 'branches',
-    icon: 'IconBranch',
-  },
-  {
     display: 'Uploaded files',
     route: 'published',
     icon: 'IconCloudUpload',
@@ -54,14 +49,14 @@ export class SiteContainer extends React.Component {
 
   render() {
     const {
-      sites, children, params, location, alert,
+      id, sites, children, params, location, alert,
     } = this.props;
 
     if (sites.isLoading || !sites.data) {
       return <LoadingIndicator />;
     }
 
-    const site = currentSite(sites, params.id);
+    const site = currentSite(sites, id);
 
     if (!site) {
       const errorMessage = (
@@ -110,11 +105,11 @@ export class SiteContainer extends React.Component {
 }
 
 SiteContainer.propTypes = {
+  id: PropTypes.string.isRequired,
   params: PropTypes.shape({
-    id: PropTypes.string,
     branch: PropTypes.string,
     fileName: PropTypes.string,
-  }).isRequired,
+  }),
   location: PropTypes.shape({
     pathname: PropTypes.string,
   }).isRequired,
@@ -136,6 +131,7 @@ SiteContainer.defaultProps = {
     data: [],
   },
   alert: {},
+  params: {},
 };
 
 export default connect(state => state)(SiteContainer);

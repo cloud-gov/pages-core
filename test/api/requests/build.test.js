@@ -141,7 +141,7 @@ describe('Build API', () => {
             site: sitePromise,
             build: factory.build({
               site: sitePromise,
-              branch: 'master',
+              branch: 'main',
               commitSha,
               user: userPromise,
             }),
@@ -252,7 +252,7 @@ describe('Build API', () => {
       });
 
       it('creates a new build from a branch if that branch exists on GitHub', (done) => {
-        const branch = 'master';
+        const branch = 'main';
         let site;
         let user;
         let mockGHRequest;

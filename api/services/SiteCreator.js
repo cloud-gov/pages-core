@@ -19,24 +19,11 @@ function paramsForNewSite(params) {
   };
 }
 
-function paramsForNewBuildSource(template) {
-  if (template) {
-    return {
-      repository: template.repo,
-      owner: template.owner,
-      branch: template.branch,
-    };
-  }
-
-  return null;
-}
-
-function paramsForNewBuild({ user, site, template = {} }) {
+function paramsForNewBuild({ user, site }) {
   return {
     user: user.id,
     site: site.id,
     branch: site.defaultBranch,
-    source: paramsForNewBuildSource(template),
   };
 }
 
@@ -96,16 +83,17 @@ function checkGithubRepository({ user, owner, repository }) {
           status: 400,
         };
       }
-      return true;
+      return repo;
     });
 }
 
 function buildSite(params, s3) {
-  const siteParams = Object.assign({}, params, {
+  const siteParams = {
+    ...params,
     s3ServiceName: s3.serviceName,
     awsBucketName: s3.bucket,
     awsBucketRegion: s3.region,
-  });
+  };
 
   const site = Site.build(siteParams);
 
@@ -154,7 +142,7 @@ function validateSite(params) {
  *
  * returns the new site record
  */
-function saveAndBuildSite({ site, user, template }) {
+function saveAndBuildSite({ site, user }) {
   let model;
 
   return GitHub.setWebhook(site, user.id)
@@ -165,7 +153,6 @@ function saveAndBuildSite({ site, user, template }) {
       const buildParams = paramsForNewBuild({
         site: model,
         user,
-        template,
       });
 
       return Promise.all([
@@ -176,41 +163,27 @@ function saveAndBuildSite({ site, user, template }) {
     .then(() => model);
 }
 
-function createSiteFromExistingRepo({ siteParams, user }) {
+async function createSiteFromExistingRepo({ siteParams, user }) {
   const { owner, repository } = siteParams;
 
-  return checkSiteExists({ owner, repository })
-    .then(() => checkGithubRepository({ user, owner, repository }))
-    .then(() => checkGithubOrg({ user, owner }))
-    .then(() => validateSite(siteParams))
-    .then(site => saveAndBuildSite({ site, user }));
+  await checkSiteExists({ owner, repository });
+  const repo = await checkGithubRepository({ user, owner, repository });
+  await checkGithubOrg({ user, owner });
+  const site = await validateSite({ ...siteParams, defaultBranch: repo.default_branch });
+  return saveAndBuildSite({ site, user });
 }
 
-function createSiteFromTemplate({ siteParams, user, template }) {
-  const params = Object.assign({}, siteParams, {
+async function createSiteFromTemplate({ siteParams, user, template }) {
+  const params = {
+    ...siteParams,
     defaultBranch: template.branch,
     engine: template.engine,
-  });
+  };
   const { owner, repository } = params;
-  let site;
 
-  return validateSite(params)
-    .then((model) => {
-      site = model;
-      return GitHub.createRepo(user, owner, repository);
-    })
-    .then(() => saveAndBuildSite({ site, user, template }));
-}
-
-function createSiteFromSource({ siteParams, user }) {
-  const { owner, repository, source } = siteParams;
-
-  return checkSiteExists({ owner, repository })
-    .then(() => checkGithubRepository({ user, owner: source.owner, repository: source.repo }))
-    .then(() => checkGithubOrg({ user, owner: source.owner }))
-    .then(() => GitHub.createRepo(user, owner, repository))
-    .then(() => validateSite(siteParams))
-    .then(site => saveAndBuildSite({ site, user, template: siteParams.source }));
+  const site = await validateSite(params);
+  await GitHub.createRepoFromTemplate(user, owner, repository, template);
+  return saveAndBuildSite({ site, user });
 }
 
 function createSite({ user, siteParams }) {
@@ -221,13 +194,6 @@ function createSite({ user, siteParams }) {
 
   if (template) {
     return createSiteFromTemplate({ siteParams: newSiteParams, template, user });
-  }
-
-  if (siteParams.source) {
-    return createSiteFromSource({
-      siteParams: Object.assign({}, newSiteParams, { source: siteParams.source }),
-      user,
-    });
   }
 
   return createSiteFromExistingRepo({ siteParams: newSiteParams, user });
