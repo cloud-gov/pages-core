@@ -1,33 +1,36 @@
-const getEnv = require('../services/environment');
+const getEnv = require('../config/features');
 
-const FLAGS = {};
+const Flags = {
+  /*
+    All feature flags must be explicitly added here so they can be exported
+    and referred to as Flags.<FEATURE_NAME>
+    Ex.
+    AWESOME_FEATURE: 'AWESOME_FEATURE',
+    */
+};
 
-const ENV_VAR_PREFIX = 'FEATURE_';
+const TRUTHY_VALUES = [true, 'True', 'true', 'TRUE'];
 
-function toEnvVar(flag) {
-  return `${ENV_VAR_PREFIX}${flag}`;
+function readEnv(envVar) {
+  return getEnv()[envVar];
 }
 
 class UnknownFeatureFlagError extends Error {
   constructor(flag, ...args) {
-    const flagsStr = Object.keys(FLAGS).join('\n');
-    const msg = `Requested feature status for unknown feature flag ${flag}. Available flags are:\n${flagsStr}.`;
+    const flagsStr = Object.keys(Flags).map(f => `\n- ${f}`).join('');
+    const msg = `Requested feature status for unknown feature flag '${flag}'. Available flags are:${flagsStr}`;
     super(msg, ...args);
   }
 }
 
 function enabled(flag) {
-  if (!Object.keys(FLAGS).includes(flag)) {
+  if (!Object.keys(Flags).includes(flag)) {
     throw new UnknownFeatureFlagError(flag);
   }
 
-  return [true, 'True', 'true', 'TRUE'].includes(getEnv()[toEnvVar(flag)]);
-}
-
-function disabled(flag) {
-  return !enabled(flag);
+  return TRUTHY_VALUES.includes(readEnv(flag));
 }
 
 module.exports = {
-  disabled, enabled, FLAGS, UnknownFeatureFlagError,
+  enabled, Flags, UnknownFeatureFlagError,
 };

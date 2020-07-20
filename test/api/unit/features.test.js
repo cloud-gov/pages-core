@@ -1,41 +1,43 @@
 const { expect } = require('chai');
 const Features = require('../../../api/features');
 
-beforeEach(() => {
-  process.env.FEATURE_MY_AWESOME_FEATURE = 'true';
-  process.env.FEATURE_MY_TERRIBLE_FEATURE = '';
-  Features.FLAGS.MY_AWESOME_FEATURE = 'MY_AWESOME_FEATURE';
-  Features.FLAGS.MY_TERRIBLE_FEATURE = 'MY_TERRIBLE_FEATURE';
-});
-
-afterEach(() => {
-  delete Features.FLAGS.MY_AWESOME_FEATURE;
-  delete Features.FLAGS.MY_TERRIBLE_FEATURE;
-  delete process.env.FEATURE_MY_AWESOME_FEATURE;
-  delete process.env.FEATURE_MY_TERRIBLE_FEATURE;
-});
-
-describe.only('.enabled', () => {
-  context('when the flag exists and is truthy', () => {
-    it('returns true', () => {
-      const result = Features.enabled(Features.FLAGS.MY_AWESOME_FEATURE);
-
-      expect(result).to.be.true;
-    });
+describe('Features', () => {
+  beforeEach(() => {
+    process.env.FEATURE_MY_ENABLED_FEATURE = 'true';
+    process.env.FEATURE_MY_DISABLED_FEATURE = '';
+    Features.Flags.MY_ENABLED_FEATURE = 'MY_ENABLED_FEATURE';
+    Features.Flags.MY_DISABLED_FEATURE = 'MY_DISABLED_FEATURE';
   });
 
-  context('when the flag exists and is NOT truthy', () => {
-    it('returns true', () => {
-      const result = Features.enabled(Features.FLAGS.MY_TERRIBLE_FEATURE);
-
-      expect(result).to.be.true;
-    });
+  afterEach(() => {
+    delete Features.Flags.MY_ENABLED_FEATURE;
+    delete Features.Flags.MY_DISABLED_FEATURE;
+    delete process.env.FEATURE_MY_ENABLED_FEATURE;
+    delete process.env.FEATURE_MY_DISABLED_FEATURE;
   });
 
-  context('when the flag does not exist', () => {
-    it('throws a UnknownFeatureFlagError', () => {
-      const fn = () => Features.enabled('FOOBAR');
-      expect(fn).to.throw(Features.UnknownFeatureFlagError);
+  describe('.enabled', () => {
+    context('when the flag exists and is truthy', () => {
+      it('returns true', () => {
+        const result = Features.enabled(Features.Flags.MY_ENABLED_FEATURE);
+
+        expect(result).to.be.true;
+      });
+    });
+
+    context('when the flag exists and is NOT truthy', () => {
+      it('returns false', () => {
+        const result = Features.enabled(Features.Flags.MY_DISABLED_FEATURE);
+
+        expect(result).to.be.false;
+      });
+    });
+
+    context('when the flag does not exist', () => {
+      it('throws a UnknownFeatureFlagError', () => {
+        const fn = () => Features.enabled('FOOBAR');
+        expect(fn).to.throw(Features.UnknownFeatureFlagError);
+      });
     });
   });
 });

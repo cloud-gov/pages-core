@@ -207,6 +207,54 @@ docker-compose run app yarn lint:diff
 docker-compose run app node_modules/.bin/eslint --fix path/to/file.js
 ```
 
+## Feature Flags
+Environment-specific feature flags are supported for both the api and frontend. Flagged features are assumed to be "off" unless the flag exists (and the value is truthy), thus feature flag conditions should always check for the presence or truthiness of the flag, not for it's absence.
+
+### Api feature flags
+Api feature flags are evaluated at *runtime* and should be created explicitly in the code before the corresponding environment variable can be used. Example:
+
+Given environment variable `FEATURE_AWESOME_SAUCE='true'`
+
+1. Add the flag to the known flags:
+```js
+// api/features.js
+const Flags = {
+  //...
+  AWESOME_SAUCE: 'AWESOME_SAUCE',
+}
+```
+2. Check if the feature is enabled:
+```js
+// some code in a child folder of /api
+const Features = require('../features');
+
+if (Features.enabled(Features.Flags.AWESOME_SAUCE)) {
+  doSomething();
+}
+```
+
+### Frontend feature flags
+Frontend feature flags are evaluated at *compile* time NOT at runtime, resulting in unused codepaths being exluded from the built code. Environment variables with the `FEATURE_` prefix are available globally within the codebase at compile time. This magic is performed by `webpack.DefinePlugin` and minification.
+
+
+Example:
+
+Given environment variable `FEATURE_AWESOME_SAUCE='true'`
+
+```js
+if (FEATURE_AWESOME_SAUCE === 'true') {
+  doSomething();
+}
+```
+
+results in
+
+```js
+doSomething();
+```
+
+.
+
 ## Initial proposal
 
 Federalist is new open source publishing system based on proven open source components and techniques. Once the text has been written, images uploaded, and a page is published, the outward-facing site will act like a simple web site -- fast, reliable, and easily scalable. Administrative tools, which require authentication and additional interactive components, can be responsive with far fewer users.
