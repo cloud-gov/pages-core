@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
+const { getFeatureFlags } = require('./webpack-utils');
 
 const fileLoaderOptions = {
   name: '/styles/webpackAssets/[hash].[ext]',
@@ -79,5 +80,6 @@ module.exports = {
     // bundle
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new ManifestPlugin({ fileName: '../webpack-manifest.json' }),
+    new webpack.DefinePlugin(getFeatureFlags(process.env)),
   ],
 };

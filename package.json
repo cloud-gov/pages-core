@@ -56,7 +56,7 @@
     "watch": "NODE_ENV=development concurrently --kill-others --raw \"nodemon index.js --config nodemon.json\"",
     "test": "yarn test:prepare && yarn test:server && yarn test:client",
     "test:prepare": "NODE_ENV=test yarn migrate:up && yarn build",
-    "test:server": "NODE_ENV=test JWT_SECRET=shh USER_AUDITOR=user_auditor nyc --report-dir ./coverage/server mocha --exit --timeout 2500 test/api/bootstrap.test.js test/api/unit/**/*.test.js test/api/requests/**/*.test.js",
+    "test:server": "NODE_ENV=test JWT_SECRET=shh USER_AUDITOR=user_auditor nyc --report-dir ./coverage/server mocha --exit --timeout 2500 test/api/bootstrap.test.js test/api/**/*.test.js",
     "test:client": "NODE_ENV=test nyc --report-dir ./coverage/client mocha --exit --require babel-core/register test/frontend/support/_bootstrap.js --recursive ./test/frontend",
     "test:client:file": "mocha --exit --require babel-core/register test/frontend/support/_bootstrap.js",
     "test:server:file": "NODE_ENV=test JWT_SECRET=shh USER_AUDITOR=user_auditor mocha --exit --timeout 2500 test/api/bootstrap.test.js",
