@@ -19,16 +19,15 @@ describe('Main Site', () => {
 
     it('should redirect to /sites when authenticated', (done) => {
       authenticatedSession()
-      .then(cookie => request(app)
-        .get('/')
-        .set('Cookie', cookie)
-        .expect(302)
-      )
-      .then((response) => {
-        expect(response.headers.location).to.equal('/sites');
-        done();
-      })
-      .catch(done);
+        .then(cookie => request(app)
+          .get('/')
+          .set('Cookie', cookie)
+          .expect(302))
+        .then((response) => {
+          expect(response.headers.location).to.equal('/sites');
+          done();
+        })
+        .catch(done);
     });
   });
 
@@ -50,8 +49,7 @@ describe('Main Site', () => {
         .then(cookie => request(app)
           .get('/blahblahpage')
           .set('Cookie', cookie)
-          .expect(302)
-        )
+          .expect(302))
         .then((response) => {
           expect(response.headers.location).to.equal('/404-not-found/');
           expect(response.text.indexOf('Found. Redirecting to /404-not-found/')).to.be.above(-1);
@@ -62,29 +60,28 @@ describe('Main Site', () => {
 
     it('should have app content', (done) => {
       authenticatedSession()
-      .then(cookie => request(app)
-        .get('/404-not-found/')
-        .set('Cookie', cookie)
-        .expect(200)
-      )
-      .then((response) => {
-        expect(response.text.indexOf('Log out')).to.be.above(-1);
-        expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
-        done();
-      })
-      .catch(done);
+        .then(cookie => request(app)
+          .get('/404-not-found/')
+          .set('Cookie', cookie)
+          .expect(200))
+        .then((response) => {
+          expect(response.text.indexOf('Log out')).to.be.above(-1);
+          expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
+          done();
+        })
+        .catch(done);
     });
 
     it('should have app content', (done) => {
       request(app)
         .get('/404-not-found/')
         .expect(200)
-      .then((response) => {
-        expect(response.text.indexOf('Log in')).to.be.above(-1);
-        expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
-        done();
-      })
-      .catch(done);
+        .then((response) => {
+          expect(response.text.indexOf('Log in')).to.be.above(-1);
+          expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
+          done();
+        })
+        .catch(done);
     });
   });
 
@@ -102,7 +99,8 @@ describe('Main Site', () => {
           expect(sess.flash.error.length).to.equal(1);
           expect(sess.flash.error[0].title).to.equal('Unauthorized');
           expect(sess.flash.error[0].message).to.equal(
-            'You are not permitted to perform this action. Are you sure you are logged in?');
+            'You are not permitted to perform this action. Are you sure you are logged in?'
+          );
           done();
         })
         .catch(done);
@@ -113,24 +111,22 @@ describe('Main Site', () => {
         .then(cookie => request(app)
           .get('/sites')
           .set('Cookie', cookie)
-          .expect(200)
-        )
+          .expect(200))
         .then(() => done());
     });
 
     it('should have app content', (done) => {
       authenticatedSession()
-      .then(cookie => request(app)
-        .get('/sites')
-        .set('Cookie', cookie)
-        .expect(200)
-      )
-      .then((response) => {
-        expect(response.text.indexOf('Log out')).to.be.above(-1);
-        expect(response.text.indexOf('<div id="js-app" class="usa-grid"></div>')).to.be.above(-1);
-        done();
-      })
-      .catch(done);
+        .then(cookie => request(app)
+          .get('/sites')
+          .set('Cookie', cookie)
+          .expect(200))
+        .then((response) => {
+          expect(response.text.indexOf('Log out')).to.be.above(-1);
+          expect(response.text.indexOf('<div id="js-app" class="usa-grid"></div>')).to.be.above(-1);
+          done();
+        })
+        .catch(done);
     });
 
     it('should contain references to built assets', (done) => {
@@ -138,8 +134,7 @@ describe('Main Site', () => {
         .then(cookie => request(app)
           .get('/sites')
           .set('Cookie', cookie)
-          .expect(200)
-        )
+          .expect(200))
         .then((response) => {
           const stylesBundleRe = /<link rel="stylesheet" href="\/styles\/styles\.[a-z0-9]*\.css">/;
           expect(response.text.search(stylesBundleRe)).to.be.above(-1);
@@ -156,8 +151,7 @@ describe('Main Site', () => {
         .then(cookie => request(app)
           .get('/sites')
           .set('Cookie', cookie)
-          .expect(200)
-        )
+          .expect(200))
         .then((response) => {
           const csrfTokenRe = /window.CSRF_TOKEN = "[a-z0-9_-]+";/i;
           expect(response.text.search(csrfTokenRe)).to.be.above(-1);
@@ -171,11 +165,9 @@ describe('Main Site', () => {
         .then(cookie => request(app)
           .get('/sites')
           .set('Cookie', cookie)
-          .expect(200)
-        )
+          .expect(200))
         .then((response) => {
           expect(response.text.search('FRONTEND_CONFIG')).to.be.above(-1);
-          expect(response.text.search('PREVIEW_HOSTNAME')).to.be.above(-1);
           expect(response.text.search('TEMPLATES')).to.be.above(-1);
           done();
         })
@@ -199,50 +191,46 @@ describe('Main Site', () => {
       });
 
       it('should display a banner for authenticated users', (done) => {
-        authenticatedSession().then(cookie =>
-          request(app)
-            .get('/sites')
-            .set('Cookie', cookie)
-        )
-        .then((response) => {
-          expect(response.text).to.match(/usa-alert-warning/);
-          expect(response.text).to.match(/Error message heading/);
-          expect(response.text).to.match(/Error message body/);
-          done();
-        })
-        .catch(done);
+        authenticatedSession().then(cookie => request(app)
+          .get('/sites')
+          .set('Cookie', cookie))
+          .then((response) => {
+            expect(response.text).to.match(/usa-alert-warning/);
+            expect(response.text).to.match(/Error message heading/);
+            expect(response.text).to.match(/Error message body/);
+            done();
+          })
+          .catch(done);
       });
     });
 
     context('when an error is not present', () => {
       it('should not display a banner for authenticated users', (done) => {
-        authenticatedSession().then(cookie =>
-          request(app)
-            .get('/sites')
-            .set('Cookie', cookie)
-        )
-        .then((response) => {
-          expect(response.text).to.not.match(/usa-alert-warning/);
-          done();
-        })
-        .catch(done);
+        authenticatedSession().then(cookie => request(app)
+          .get('/sites')
+          .set('Cookie', cookie))
+          .then((response) => {
+            expect(response.text).to.not.match(/usa-alert-warning/);
+            done();
+          })
+          .catch(done);
       });
 
       it('should not display a banner for unauthenticated users', (done) => {
         request(app)
           .get('/site')
-        .then((response) => {
-          expect(response.text).to.not.match(/usa-alert-warning/);
-          done();
-        })
-        .catch(done);
+          .then((response) => {
+            expect(response.text).to.not.match(/usa-alert-warning/);
+            done();
+          })
+          .catch(done);
       });
     });
   });
 });
 
 describe('robots.txt', () => {
-  const origAppConfig = Object.assign({}, config.app);
+  const origAppConfig = { ...config.app };
 
   after(() => {
     // reset config.app.app_env to its original value
