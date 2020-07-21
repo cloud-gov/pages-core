@@ -39,22 +39,6 @@ module.exports = {
     return res.render('system-use.njk', context);
   },
 
-  examples(req, res) {
-    return res.redirect(`${config.app.homepageUrl}/case-studies`);
-  },
-
-  contact(req, res) {
-    return res.redirect(`${config.app.homepageUrl}/contact`);
-  },
-
-  features(req, res) {
-    return res.redirect(`${config.app.homepageUrl}/features`);
-  },
-
-  support(req, res) {
-    return res.redirect(`${config.app.homepageUrl}/support`);
-  },
-
   app(req, res) {
     if (!req.session.authenticated) {
       req.flash('error', {
