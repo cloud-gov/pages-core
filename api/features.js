@@ -5,7 +5,7 @@ const Flags = {
     All feature flags must be explicitly added here so they can be exported
     and referred to as Flags.<FEATURE_NAME>
     Ex.
-    AWESOME_FEATURE: 'AWESOME_FEATURE',
+    FEATURE_AWESOME_FEATURE: 'FEATURE_AWESOME_FEATURE',
     */
 };
 

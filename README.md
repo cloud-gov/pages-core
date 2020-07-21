@@ -208,7 +208,7 @@ docker-compose run app node_modules/.bin/eslint --fix path/to/file.js
 ```
 
 ## Feature Flags
-Environment-specific feature flags are supported for both the api and frontend. Flagged features are assumed to be "off" unless the flag exists (and the value is truthy), thus feature flag conditions should always check for the presence or truthiness of the flag, not for it's absence. Environment variables for feature flags *MUST* be prefixed by `FEATURE_`, ex. `FEATURE_BRING_THE_AWESOME`.
+Environment-specific feature flags are supported for both the api and frontend. Flagged features are assumed to be "off" unless the flag exists (and the value is truthy), thus feature flag conditions should always check for the presence or truthiness of the flag, not for it's absence. Environment variables for feature flags *MUST* be prefixed by `FEATURE_`, ex. `FEATURE_BRING_THE_AWESOME` or `FEATURE_BRING_DA_RUCKUS`.
 
 ### Api feature flags
 Api feature flags are evaluated at *runtime* and should be created explicitly in the code before the corresponding environment variable can be used. Example:
@@ -220,7 +220,7 @@ Given environment variable `FEATURE_AWESOME_SAUCE='true'`
 // api/features.js
 const Flags = {
   //...
-  AWESOME_SAUCE: 'AWESOME_SAUCE',
+  FEATURE_AWESOME_SAUCE: 'FEATURE_AWESOME_SAUCE',
 }
 ```
 2. Check if the feature is enabled:
@@ -228,7 +228,7 @@ const Flags = {
 // some code in a child folder of /api
 const Features = require('../features');
 
-if (Features.enabled(Features.Flags.AWESOME_SAUCE)) {
+if (Features.enabled(Features.Flags.FEATURE_AWESOME_SAUCE)) {
   doSomething();
 }
 ```

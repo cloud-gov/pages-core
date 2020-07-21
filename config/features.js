@@ -6,7 +6,7 @@ function getFeatureFlags() {
     .filter(key => key.startsWith('FEATURE_'))
     .reduce((flags, key) => ({
       ...flags,
-      [key.replace('FEATURE_', '')]: env[key],
+      [key]: env[key],
     }), {});
 }
 
