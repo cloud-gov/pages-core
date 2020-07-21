@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 // const moment = require('moment');
 const request = require('supertest');
 
@@ -180,33 +180,6 @@ describe('Main Site', () => {
           done();
         })
         .catch(done);
-    });
-  });
-
-  describe('.examples', () => {
-    // it('renders the page properly', (done) => {
-    //   request(app)
-    //   .get('/content/examples/')
-    //   .expect(200)
-    //   .then((response) => {
-    //     expect(response.text.indexOf('example-sites')).to.be.above(-1);
-    //     done();
-    //   })
-    //   .catch(done);
-    // });
-
-    it('should redirect to http://localhost:4000/case-studies when authenticated', (done) => {
-      authenticatedSession()
-      .then(cookie => request(app)
-        .get('/case-studies')
-        .set('Cookie', cookie)
-        .expect(302)
-      )
-      .then((response) => {
-        expect(response.headers.location).to.equal('http://localhost:4000/case-studies');
-        done();
-      })
-      .catch(done);
     });
   });
 
