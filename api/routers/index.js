@@ -24,8 +24,8 @@ mainRouter.use('/v0', apiRouter);
 // prefix all static content routes with "/content"
 mainRouter.use('/content', require('./content'));
 
-// prefix all admin routes with "/admin"
-mainRouter.use('/admin', require('./admin'));
-mainRouter.use('/admin', require('./admin-auth'));
+if (true) {
+  mainRouter.use('/admin', require('./admin'));
+}
 
 module.exports = mainRouter;
