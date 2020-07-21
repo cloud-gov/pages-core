@@ -75,7 +75,6 @@ module.exports = {
 
     const frontendConfig = {
       TEMPLATES: config.templates,
-      PREVIEW_HOSTNAME: config.app.preview_hostname,
     };
 
     context.frontendConfig = frontendConfig;
