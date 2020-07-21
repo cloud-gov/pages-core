@@ -135,7 +135,7 @@ describe('siteActions', () => {
   });
 
 
-  describe('fetchSites', () => {
+  describe.only('fetchSites', () => {
     it('triggers the fetching of sites and dispatches a sites received action to the store when successful', () => {
       const sites = {
         hi: 'mom',
