@@ -1,11 +1,10 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const factory = require('../../support/factory');
 const MockGitHub = require('../../support/mockGitHub');
 const { SiteUser, UserAction } = require('../../../../api/models');
 
 const SiteUserAuditor = proxyquire('../../../../api/services/SiteUserAuditor', { './GitHub': MockGitHub });
-
 
 describe('SiteUserAuditor', () => {
   before(() => {
@@ -14,7 +13,7 @@ describe('SiteUserAuditor', () => {
   });
 
   context('auditAllUsers', () => {
-    it('it should remove sites without push from user and site w/o repo', (done) => {
+    it.only('it should remove sites without push from user and site w/o repo', (done) => {
       let user;
 
       factory.user()
