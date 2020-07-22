@@ -34,7 +34,7 @@ class TemplateSite extends React.Component {
     const { repository } = this.state;
 
     const safeRepository = getSafeRepoName(repository);
-    const site = Object.assign({}, this.state, { repository: safeRepository });
+    const site = { ...this.state, repository: safeRepository };
 
     handleSubmit(site);
   }
@@ -106,12 +106,12 @@ class TemplateSite extends React.Component {
               <button
                 className="usa-button"
                 onClick={this.handleChooseActive}
+                type="button"
               >
                 Use this template
               </button>
             </div>
-            )
-          }
+            )}
         </div>
       </div>
     );
