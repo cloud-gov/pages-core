@@ -4,7 +4,6 @@ import { shallow } from 'enzyme';
 import proxyquire from 'proxyquire';
 import sinon from 'sinon';
 
-// import { SiteBuilds, REFRESH_INTERVAL } from '../../../../frontend/components/site/siteBuilds';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
 const { SiteBuilds, REFRESH_INTERVAL } = proxyquire('../../../../frontend/components/site/siteBuilds', {
