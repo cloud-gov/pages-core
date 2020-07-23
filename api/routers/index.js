@@ -3,7 +3,6 @@ const express = require('express');
 const mainRouter = express.Router();
 
 mainRouter.use(require('./auth'));
-mainRouter.use(require('./preview'));
 mainRouter.use(require('./webhook'));
 mainRouter.use(require('./main'));
 mainRouter.use(require('./external-auth'));
@@ -20,9 +19,6 @@ apiRouter.use(require('./user-environment-variable'));
 
 // prefix all api routes with "/v0"
 mainRouter.use('/v0', apiRouter);
-
-// prefix all static content routes with "/content"
-mainRouter.use('/content', require('./content'));
 
 if (true) {
   mainRouter.use('/admin', require('./admin'));
