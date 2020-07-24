@@ -5,18 +5,16 @@ const config = require('../../../../config');
 
 const S3Helper = require('../../../../api/services/S3Helper');
 
-const S3Mocks = AWSMocks.mocks.S3;
-
 describe('S3Helper', () => {
   describe('.listObjects(prefix)', () => {
-    after(() => {
+    afterEach(() => {
       AWSMocks.resetMocks();
     });
 
     it('can get objects', (done) => {
       const prefix = 'some-prefix/';
 
-      S3Mocks.listObjectsV2 = (params, callback) => {
+      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
         expect(params.Prefix).to.equal(prefix);
 
@@ -37,7 +35,7 @@ describe('S3Helper', () => {
     it('can get all objects when initial response is truncated', (done) => {
       const prefix = 'abc/123/';
 
-      S3Mocks.listObjectsV2 = (params, callback) => {
+      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
         expect(params.Prefix).to.equal(prefix);
 

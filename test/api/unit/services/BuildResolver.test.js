@@ -107,47 +107,40 @@ describe('BuildResolver', () => {
       });
     });
 
-    it('calls out to github if the branch cannot be found locally', (done) => {
-      pValues
-      .then((values) => {
-        ghStub.returns(Promise.resolve({
-          name: branch,
-          commit: {
-            sha,
-          },
-        }));
+    it('calls out to github if the branch cannot be found locally', () => {
+      ghStub.resolves({
+        name: branch,
+        commit: {
+          sha,
+        },
+      });
 
-        return BuildResolver.getBuild(values.user, {
+      return pValues
+        .then(values => BuildResolver.getBuild(values.user, {
           branch,
           siteId: values.site.id,
           sha,
+        }))
+        .then((build) => {
+          expect(build.branch).to.equal(branch);
+          expect(build.commitSha).to.equal(sha);
         });
-      })
-      .then((build) => {
-        expect(build.branch).to.equal(branch);
-        expect(build.commitSha).to.equal(sha);
-        done();
-      })
-      .catch(done);
     });
 
     it('returns a 404 when a build cannot be started because branch does not exist', (done) => {
-      pValues
-      .then((values) => {
-        ghStub.returns(Promise.reject());
+      ghStub.rejects();
 
-        return BuildResolver.getBuild(values.user, {
+      pValues
+        .then(values => BuildResolver.getBuild(values.user, {
           branch,
           siteId: values.site.id,
           sha,
-        })
-        .then(done);
-      })
-      .catch((err) => {
-        expect(err.status).to.equal(404);
-        expect(err.message).to.equal(buildErrors.BRANCH_NOT_FOUND);
-        done();
-      });
+        }))
+        .catch((err) => {
+          expect(err.status).to.equal(404);
+          expect(err.message).to.equal(buildErrors.BRANCH_NOT_FOUND);
+          done();
+        });
     });
   });
 });
