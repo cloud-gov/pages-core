@@ -392,7 +392,7 @@ describe('siteActions', () => {
     });
 
     it('triggers an error when updating a site fails', () => {
-      saveBasicAuthToSite.withArgs(siteId, basicAuth).returns(rejectedWithErrorPromise);
+      saveBasicAuthToSite.withArgs(siteId, basicAuth).rejects(error);
 
       const actual = fixture.saveBasicAuthToSite(siteId, basicAuth);
 
@@ -421,7 +421,7 @@ describe('siteActions', () => {
     });
 
     it('triggers an error when updating a site fails', () => {
-      removeBasicAuthFromSite.withArgs(siteId).returns(rejectedWithErrorPromise);
+      removeBasicAuthFromSite.withArgs(siteId).rejects(error);
 
       const actual = fixture.removeBasicAuthFromSite(siteId);
 
