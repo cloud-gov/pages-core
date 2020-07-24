@@ -400,7 +400,7 @@ describe('siteActions', () => {
         expect(scrollTo.called).to.be.true;
         expect(scrollTo.getCall(0).args).to.deep.equal([0, 0]);
         expect(dispatchSiteBasicAuthSavedAction.called).to.be.false;
-        validateResultDispatchesHttpAlertError(actual, errorMessage);
+        expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
       });
     });
   });
@@ -429,7 +429,7 @@ describe('siteActions', () => {
         expect(scrollTo.called).to.be.true;
         expect(scrollTo.getCall(0).args).to.deep.equal([0, 0]);
         expect(dispatchSiteBasicAuthRemovedAction.called).to.be.false;
-        validateResultDispatchesHttpAlertError(actual, errorMessage);
+        expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
       });
     });
   });
