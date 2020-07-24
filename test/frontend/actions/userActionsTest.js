@@ -7,16 +7,26 @@ proxyquire.noCallThru();
 describe('userActions', () => {
   let fixture;
   let dispatch;
+  let httpErrorAlertAction;
   let userFetchStartedActionCreator;
   let userReceivedActionCreator;
   let createUserActionFetchStarted;
   let createUserActionReceived;
   let fetchUser;
   let fetchUserActions;
+  const scrollTo = stub();
+
+  before(() => {
+    global.window = { scrollTo };
+  });
+
+  after(() => {
+    global.window = undefined;
+  });
 
   beforeEach(() => {
     dispatch = spy();
-
+    httpErrorAlertAction = spy();
     userFetchStartedActionCreator = stub();
     userReceivedActionCreator = stub();
     fetchUser = stub();
@@ -31,6 +41,9 @@ describe('userActions', () => {
         userReceived: userReceivedActionCreator,
         userActionFetchStarted: createUserActionFetchStarted,
         userActionReceived: createUserActionReceived,
+      },
+      './alertActions': {
+        httpError: httpErrorAlertAction,
       },
       '../util/federalistApi': {
         fetchUser,
@@ -49,16 +62,15 @@ describe('userActions', () => {
         name: 'no thanks',
         favoritePancake: 'buttermilk',
       };
-      const userPromise = Promise.resolve(user);
       const fetchStartedAction = { action: 'started' };
       const receivedAction = { action: 'received' };
-      fetchUser.withArgs().returns(userPromise);
+      fetchUser.withArgs().resolves(user);
       userFetchStartedActionCreator.withArgs().returns(fetchStartedAction);
       userReceivedActionCreator.withArgs(user).returns(receivedAction);
 
       const actual = fixture.fetchUser();
 
-      actual.then(() => {
+      return actual.then(() => {
         expect(dispatch.calledTwice).to.be.true;
         expect(dispatch.calledWith(fetchStartedAction)).to.be.true;
         expect(dispatch.calledWith(receivedAction)).to.be.true;
@@ -66,14 +78,13 @@ describe('userActions', () => {
     });
 
     it('does nothing when fetching the user fails', () => {
-      const rejectedPromise = Promise.reject('ignored');
-      fetchUser.withArgs().returns(rejectedPromise);
+      fetchUser.withArgs().rejects({ message: 'errorMessage' });
 
       const actual = fixture.fetchUser();
 
-      actual.then(() => {
-        expect(dispatch.called).to.be.false;
+      return actual.then(() => {
         expect(userReceivedActionCreator.called).to.be.false;
+        expect(httpErrorAlertAction.calledWith('errorMessage')).to.be.true;
       });
     });
   });
