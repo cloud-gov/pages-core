@@ -1,4 +1,7 @@
+/* global window:true */
+
 import federalist from '../util/federalistApi';
+import alertActions from './alertActions';
 import { dispatch } from '../store';
 import {
   userFetchStarted as createUserFetchStartedAction,
@@ -17,11 +20,17 @@ const dispatchUserActionFetchStarted = () => dispatch(createUserActionFetchStart
 
 const dispatchUserActionReceived = userActions => dispatch(createUserActionReceived(userActions));
 
+const alertError = (error) => {
+  window.scrollTo(0, 0);
+  alertActions.httpError(error.message);
+};
+
 export default {
   fetchUser() {
     dispatchUserFetchStartedAction();
     return federalist.fetchUser()
-      .then(dispatchUserReceivedAction);
+      .then(dispatchUserReceivedAction)
+      .catch(alertError);
   },
 
   fetchUserActions(siteId) {

@@ -91,7 +91,8 @@ describe('<SiteListItem />', () => {
   it('should call `removeUserFromSite` when `Remove` is clicked', () => {
     proxyquire.callThru();
     wrapper = shallow(<Fixture site={testSite} user={testUser} />);
-    const clickSpy = stub(siteActions, 'removeUserFromSite').returns(Promise.resolve());
+    const clickSpy = stub(siteActions, 'removeUserFromSite').resolves();
+    stub(siteActions, 'fetchSites').resolves();
     const removeSiteLink = wrapper.find('ButtonLink').shallow();
 
     expect(removeSiteLink.exists()).to.be.true;

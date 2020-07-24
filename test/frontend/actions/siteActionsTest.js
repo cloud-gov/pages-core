@@ -45,7 +45,6 @@ describe('siteActions', () => {
   const error = {
     message: errorMessage,
   };
-  const rejectedWithErrorPromise = Promise.reject(error);
 
   before(() => {
     global.window = { scrollTo };
@@ -127,14 +126,6 @@ describe('siteActions', () => {
     }).default;
   });
 
-  const expectDispatchOfHttpErrorAlert = errMsg =>
-    expect(httpErrorAlertAction.calledWith(errMsg)).to.be.true;
-
-  const validateResultDispatchesHttpAlertError = (promise, errMsg) => promise.then(() => {
-    expectDispatchOfHttpErrorAlert(errMsg);
-  });
-
-
   describe('fetchSites', () => {
     it('triggers the fetching of sites and dispatches a sites received action to the store when successful', () => {
       const sites = {
@@ -152,11 +143,13 @@ describe('siteActions', () => {
     });
 
     it('triggers an error when fetching of sites fails', () => {
-      fetchSites.withArgs().returns(rejectedWithErrorPromise);
+      fetchSites.withArgs().rejects(error);
 
       const actual = fixture.fetchSites();
 
-      return validateResultDispatchesHttpAlertError(actual, errorMessage);
+      return actual.then(() => {
+        expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
+      });
     });
   });
 
@@ -166,8 +159,7 @@ describe('siteActions', () => {
     };
 
     it('dispatches site added and update router actions to the store when successful', () => {
-      const sitePromise = Promise.resolve(site);
-      addSite.withArgs(siteToAdd).returns(sitePromise);
+      addSite.withArgs(siteToAdd).resolves(site);
 
       const actual = fixture.addSite(siteToAdd);
 
@@ -180,7 +172,7 @@ describe('siteActions', () => {
     it('behaves as a no-op when a site isnt added, but there is no error', () => {
       // addSite returns nothing when the POST request fails,
       // so resolve to nothing
-      addSite.withArgs(siteToAdd).returns(Promise.resolve());
+      addSite.withArgs(siteToAdd).resolves();
 
       const actual = fixture.addSite(siteToAdd);
 
@@ -188,12 +180,11 @@ describe('siteActions', () => {
         expect(dispatchSiteAddedAction.called).to.be.false;
         expect(updateRouterToSiteBuildsUri.called).to.be.false;
         expect(updateRouterToSitesUri.calledOnce).to.be.false;
-        validateResultDispatchesHttpAlertError(actual, errorMessage);
       });
     });
 
     it('triggers an error and resets the add site form when a thrown error is caught', () => {
-      addSite.withArgs(siteToAdd).returns(rejectedWithErrorPromise);
+      addSite.withArgs(siteToAdd).rejects(error);
 
       const actual = fixture.addSite(siteToAdd);
 
@@ -201,7 +192,7 @@ describe('siteActions', () => {
         expect(updateRouterToSitesUri.called).to.be.false;
         expect(dispatchHideAddNewSiteFieldsAction.called).to.be.true;
         expect(dispatchResetFormAction.called).to.be.true;
-        validateResultDispatchesHttpAlertError(actual, errorMessage);
+        expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
       });
     });
   });
@@ -215,8 +206,7 @@ describe('siteActions', () => {
     };
 
     it('triggers the updating of a site and dispatches a site updated action to the store when successful', () => {
-      const sitePromise = Promise.resolve(site);
-      updateSite.withArgs(siteToUpdate, data).returns(sitePromise);
+      updateSite.withArgs(siteToUpdate, data).resolves(site);
 
       const actual = fixture.updateSite(siteToUpdate, data);
 
@@ -226,7 +216,7 @@ describe('siteActions', () => {
     });
 
     it('triggers an error when updating a site fails', () => {
-      updateSite.withArgs(siteToUpdate, data).returns(rejectedWithErrorPromise);
+      updateSite.withArgs(siteToUpdate, data).rejects(error);
 
       const actual = fixture.updateSite(siteToUpdate, data);
 
@@ -234,7 +224,7 @@ describe('siteActions', () => {
         expect(scrollTo.called).to.be.true;
         expect(scrollTo.getCall(0).args).to.deep.equal([0, 0]);
         expect(dispatchSiteUpdatedAction.called).to.be.false;
-        validateResultDispatchesHttpAlertError(actual, errorMessage);
+        expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
       });
     });
   });
@@ -248,8 +238,7 @@ describe('siteActions', () => {
     };
 
     it('triggers the updating of a site and dispatches a site updated action to the store when successful', () => {
-      const sitePromise = Promise.resolve(site);
-      updateSiteUser.withArgs(siteToUpdate, data).returns(sitePromise);
+      updateSiteUser.withArgs(siteToUpdate, data).resolves(site);
 
       const actual = fixture.updateSiteUser(siteToUpdate, data);
 
@@ -259,7 +248,7 @@ describe('siteActions', () => {
     });
 
     it('triggers an error when updating a site fails', () => {
-      updateSiteUser.withArgs(siteToUpdate, data).returns(rejectedWithErrorPromise);
+      updateSiteUser.withArgs(siteToUpdate, data).rejects(error);
 
       const actual = fixture.updateSiteUser(siteToUpdate, data);
 
@@ -267,7 +256,7 @@ describe('siteActions', () => {
         expect(scrollTo.called).to.be.true;
         expect(scrollTo.getCall(0).args).to.deep.equal([0, 0]);
         expect(dispatchSiteUserUpdatedAction.called).to.be.false;
-        validateResultDispatchesHttpAlertError(actual, errorMessage);
+        expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
       });
     });
   });
@@ -277,8 +266,7 @@ describe('siteActions', () => {
       const siteToDelete = {
         completely: 'ignored',
       };
-      const sitePromise = Promise.resolve(siteToDelete);
-      deleteSite.withArgs(siteId).returns(sitePromise);
+      deleteSite.withArgs(siteId).resolves(siteToDelete);
 
       const actual = fixture.deleteSite(siteId);
 
@@ -289,11 +277,13 @@ describe('siteActions', () => {
     });
 
     it('triggers an error when deleting a site fails', () => {
-      deleteSite.withArgs(siteId).returns(rejectedWithErrorPromise);
+      deleteSite.withArgs(siteId).rejects(error);
 
       const actual = fixture.deleteSite(siteId);
 
-      return validateResultDispatchesHttpAlertError(actual, errorMessage);
+      return actual.then(() => {
+        expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
+      });
     });
   });
 
@@ -304,8 +294,7 @@ describe('siteActions', () => {
     };
 
     it('triggers adding adding the current user to the site represented by owner/repository', () => {
-      const sitePromise = Promise.resolve(site);
-      addUserToSite.withArgs(repoToAdd).returns(sitePromise);
+      addUserToSite.withArgs(repoToAdd).resolves(site);
 
       const actual = fixture.addUserToSite(repoToAdd);
 
@@ -316,12 +305,12 @@ describe('siteActions', () => {
     });
 
     it('triggers showing additional add site fields when adding the user fails with 404', () => {
-      const rejectWith404Error = Promise.reject({
+      const rejectWith404Error = {
         response: { status: 404 },
         message: 'Not found',
-      });
+      };
 
-      addUserToSite.withArgs(repoToAdd).returns(rejectWith404Error);
+      addUserToSite.withArgs(repoToAdd).rejects(rejectWith404Error);
 
       const actual = fixture.addUserToSite(repoToAdd);
 
@@ -331,7 +320,7 @@ describe('siteActions', () => {
     });
 
     it('triggers an http alert error, and resets the form when adding the user fails with other than 404', () => {
-      addUserToSite.withArgs(repoToAdd).returns(rejectedWithErrorPromise);
+      addUserToSite.withArgs(repoToAdd).rejects(error);
 
       const actual = fixture.addUserToSite(repoToAdd);
 
@@ -339,35 +328,37 @@ describe('siteActions', () => {
         expect(updateRouterToSitesUri.called).to.be.false;
         expect(dispatchHideAddNewSiteFieldsAction.called).to.be.true;
         expect(dispatchResetFormAction.called).to.be.true;
-
-        validateResultDispatchesHttpAlertError(actual, errorMessage);
+        expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
       });
     });
   });
 
   describe('.removeUserFromSite', () => {
     it('triggers an http success alert when user is removed, and refetches user + site data', () => {
-      removeUserFromSite.withArgs(1, 1).returns(Promise.resolve({}));
+      removeUserFromSite.withArgs(1, 1).resolves({});
+      fetchSites.resolves();
+      fetchUser.resolves();
       const actual = fixture.removeUserFromSite(1, 1);
-      actual.then(() => {
+      return actual.then(() => {
         expect(fetchSites.called).to.be.true;
         expect(fetchUser.called).to.be.true;
         expect(updateRouterToSitesUri.called).to.be.false;
         expect(alertSuccess.called).to.be.true;
-        expect(alertSuccess.calledWith('User successfully removed.')).to.be.true;
+        expect(alertSuccess.calledWith('Successfully removed.')).to.be.true;
         expect(dispatchUserRemovedFromSiteAction.called).to.be.true;
       });
     });
 
     it('triggers a redirect to the sites page when a user removes themselves', () => {
-      removeUserFromSite.withArgs(1, 1).returns(Promise.resolve({}));
+      removeUserFromSite.withArgs(1, 1).resolves({});
+      fetchSites.resolves();
       const actual = fixture.removeUserFromSite(1, 1, true);
-      actual.then(() => {
+      return actual.then(() => {
         expect(fetchUser.called).to.be.false;
         expect(fetchSites.called).to.be.true;
         expect(updateRouterToSitesUri.called).to.be.true;
         expect(alertSuccess.called).to.be.true;
-        expect(alertSuccess.calledWith('User successfully removed.')).to.be.true;
+        expect(alertSuccess.calledWith('Successfully removed.')).to.be.true;
         expect(dispatchUserRemovedFromSiteAction.called).to.be.true;
       });
     });

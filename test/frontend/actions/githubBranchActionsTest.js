@@ -72,11 +72,10 @@ describe("githubBranchActions", () => {
 
     const actual = fixture.fetchBranches(site)
 
-    actual.then(() => {
+    return actual.then(() => {
       expect(dispatch.calledTwice).to.be.true
       expect(dispatch.calledWith(startedAction)).to.be.true
       expect(dispatch.calledWith(errorAction)).to.be.true
-      done()
     })
   })
 })
