@@ -21,6 +21,7 @@ describe('<EnvironmentVariableForm/>', () => {
       stubs.reset = sinon.stub();
       defaultProps = {
         handleSubmit: stubs.handleSubmit,
+        invalid: false,
         reset: stubs.reset,
         pristine: true,
         submitting: false,
