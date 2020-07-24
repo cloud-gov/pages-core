@@ -100,7 +100,7 @@ jobs:
             ./cc-test-reporter before-build
       - run:
           name: Run tests
-          command: yarn test
+          command: yarn test:cover
       - run:
           name: CodeClimate combine and upload coverage
           command: |

@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
-import BranchField from '../Fields/BranchField';
 import GitHubRepoUrlField from '../Fields/GitHubRepoUrlField';
 import SelectSiteEngine from '../SelectSiteEngine';
 import AlertBanner from '../alertBanner';
@@ -44,12 +43,14 @@ export const AddRepoSiteForm = ({
       <div className="add-repo-site-additional-fields">
         {showNewSiteAlert()}
         <div className="form-group">
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label htmlFor="engine">Site engine</label>
           <Field
             name="engine"
-            id="engine"
             component={p => (
               <SelectSiteEngine
+                name="engine"
+                id="engine"
                 value={p.input.value}
                 onChange={p.input.onChange}
                 className="form-control"
@@ -57,18 +58,9 @@ export const AddRepoSiteForm = ({
             )}
           />
         </div>
-        <div className="form-group">
-          <BranchField
-            label="Set the primary branch Federalist will use to build your site"
-            type="text"
-            id="defaultBranch"
-            className="form-control"
-            name="defaultBranch"
-            required
-          />
-        </div>
       </div>
-      )}
+      )
+}
     <button
       type="submit"
       className="usa-button usa-button-primary"
@@ -82,10 +74,8 @@ export const AddRepoSiteForm = ({
 
 AddRepoSiteForm.propTypes = {
   showAddNewSiteFields: PropTypes.bool,
-
   initialValues: PropTypes.shape({
     engine: PropTypes.string.isRequired,
-    defaultBranch: PropTypes.string.isRequired,
   }).isRequired,
   // the following props are from reduxForm:
   handleSubmit: PropTypes.func.isRequired,

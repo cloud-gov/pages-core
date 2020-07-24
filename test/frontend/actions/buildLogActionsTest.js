@@ -1,53 +1,55 @@
-import { expect } from "chai";
-import { spy, stub } from "sinon";
-import proxyquire from "proxyquire";
+import { expect } from 'chai';
+import { spy, stub } from 'sinon';
+import proxyquire from 'proxyquire';
 
 proxyquire.noCallThru();
 
-describe("buildActions", () => {
+describe('buildActions', () => {
   let fixture;
   let dispatch;
-  let buildLogsFetchStartedActionCreator
+  let buildLogsFetchStartedActionCreator;
   let buildLogsReceivedActionCreator;
   let fetchBuildLogs;
 
   beforeEach(() => {
     dispatch = spy();
-    buildLogsFetchStartedActionCreator = stub()
+    buildLogsFetchStartedActionCreator = stub();
     buildLogsReceivedActionCreator = stub();
 
     fetchBuildLogs = stub();
 
-    fixture = proxyquire("../../../frontend/actions/buildLogActions", {
-      "./actionCreators/buildActions": {
+    fixture = proxyquire('../../../frontend/actions/buildLogActions', {
+      './actionCreators/buildLogActions': {
         buildLogsFetchStarted: buildLogsFetchStartedActionCreator,
         buildLogsReceived: buildLogsReceivedActionCreator,
       },
-      "../util/federalistApi": {
-        fetchBuildLogs: fetchBuildLogs,
+      '../util/federalistApi': {
+        fetchBuildLogs,
       },
-      "../store": {
-        dispatch: dispatch,
-      }
+      '../store': {
+        dispatch,
+      },
     }).default;
   });
 
-  it("fetchBuildLogs", () => {
-    const logs = ["Log 1", "Log 2"];
+  it('fetchBuildLogs', () => {
+    const logs = ['Log 1', 'Log 2'];
     const buildLogsPromise = Promise.resolve(logs);
-    const fetchStartedAction = { action: "fetchStarted" }
-    const receivedAction = { action: "received" };
+    const fetchStartedAction = { action: 'fetchStarted' };
+    const receivedAction = { action: 'received' };
     fetchBuildLogs.withArgs().onCall(0).returns(buildLogsPromise);
     fetchBuildLogs.withArgs().onCall(1).returns(Promise.resolve([]));
-    buildLogsFetchStartedActionCreator.withArgs().returns(fetchStartedAction)
+    buildLogsFetchStartedActionCreator.withArgs().returns(fetchStartedAction);
     buildLogsReceivedActionCreator.withArgs(logs).returns(receivedAction);
+    buildLogsReceivedActionCreator.withArgs([]).returns(receivedAction);
 
     const actual = fixture.fetchBuildLogs();
 
-    actual.then(() => {
-      expect(dispatch.calledTwice).to.be.true;
-      expect(dispatch.calledWith(fetchStartedAction)).to.be.true
-      expect(dispatch.calledWith(receivedAction)).to.be.true;
+    return actual.then(() => {
+      expect(dispatch.calledThrice).to.be.true;
+      expect(dispatch.firstCall.calledWith(fetchStartedAction)).to.be.true;
+      expect(dispatch.secondCall.calledWith(receivedAction)).to.be.true;
+      expect(dispatch.thirdCall.calledWith(receivedAction)).to.be.true;
     });
   });
 });

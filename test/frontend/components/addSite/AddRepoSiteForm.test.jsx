@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import { shallow } from 'enzyme';
 import { expect } from 'chai';
@@ -41,7 +42,6 @@ describe('<AddRepoSiteForm />', () => {
 
     let wrapper = shallow(<AddRepoSiteForm {...props} />);
     expect(wrapper.find('Field[name="engine"]')).to.have.length(0);
-    expect(wrapper.find('Field[name="defaultBranch"]')).to.have.length(0);
 
     props.showAddNewSiteFields = true;
     wrapper = shallow(<AddRepoSiteForm {...props} />);
@@ -49,7 +49,6 @@ describe('<AddRepoSiteForm />', () => {
     const alertBanner = wrapper.find('AlertBanner');
 
     expect(wrapper.find('Field[name="engine"]')).to.have.length(1);
-    expect(wrapper.find('BranchField').props().required).to.be.true;
     expect(alertBanner).to.have.length(1);
     expect(alertBanner.prop('header')).to.be.defined;
     expect(alertBanner.prop('message')).to.be.defined;
