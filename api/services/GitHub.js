@@ -160,6 +160,8 @@ const isAdminMember = async (github) => {
     // Need to create org name env variable for local testing
     getOrganizationMembers(github, 'federalist-users', 'admin'),
   ]);
+  console.log({ adminMembers });
+  console.log({ data });
   const isAdmin = adminMembers.map(member => member.id).includes(data.id);
   return isAdmin;
 };

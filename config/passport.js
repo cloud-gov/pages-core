@@ -19,7 +19,7 @@ module.exports = {
       clientID: env.GITHUB_CLIENT_ID || 'not_set',
       clientSecret: env.GITHUB_CLIENT_SECRET || 'not_set',
       callbackURL: env.GITHUB_CLIENT_ADMIN_CALLBACK_URL || 'not_set',
-      scope: ['user', 'repo', 'write:repo_hook'],
+      scope: ['user', 'repo'],
       state: true,
     },
     organizations: [

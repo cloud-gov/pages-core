@@ -6,7 +6,7 @@ services:
       context: .
     command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "watch"]
     volumes:
-      - .:/app:delegated
+      - .:/app
     ports:
       - "1337:1337" # for the app itself
       - "8888:8888" # for viewing analyze-webpack
@@ -21,13 +21,13 @@ services:
       context: ./admin-client
     working_dir: /app
     volumes:
-      - ./admin-client:/app:delegated
+      - ./admin-client:/app
     ports:
       - "3000:3000"
       - "10000:10000"
     depends_on:
       - db
-    command: ["npm", "run", "dev"]
+    command: ["yarn", "dev"]
   db:
     build:
       dockerfile: Dockerfile-db

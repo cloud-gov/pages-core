@@ -20,8 +20,4 @@ apiRouter.use(require('./user-environment-variable'));
 // prefix all api routes with "/v0"
 mainRouter.use('/v0', apiRouter);
 
-if (true) {
-  mainRouter.use('/admin', require('./admin'));
-}
-
 module.exports = mainRouter;

@@ -21,7 +21,7 @@
                 alt="federalist-logo"
                 class="width-2 margin-right-1"
                 src="/images/federalist-logo.svg" />
-              Go to the Federalist
+              Go to Federalist
             </button>
           </a>
         </div>

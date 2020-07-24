@@ -6,7 +6,7 @@ module.exports = {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
   },
-  key: 'federalist.sid',
+  name: 'federalist.sid',
   secret: env.FEDERALIST_SESSION_SECRET || 'keyboard-cat',
   proxy: true,
   resave: true,

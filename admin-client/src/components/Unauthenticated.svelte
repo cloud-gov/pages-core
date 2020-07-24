@@ -5,7 +5,7 @@
 </script>
 
 {#if $session.authenticated}
-  <slot />
+  {goto('/')}
 {:else}
-  {goto('/login')}
+  <slot />
 {/if}

@@ -10,6 +10,7 @@ const flash = require('connect-flash');
 const { logger, expressLogger, expressErrorLogger } = require('../../winston');
 const config = require('../../config');
 
+const adminApp = require('../admin');
 const responses = require('../responses');
 const passport = require('../services/passport');
 const router = require('../routers');
@@ -86,7 +87,7 @@ function errorHandler(err, _req, res, _next) {
 }
 
 function init(app) {
-  configureViews(app);
+  // configureViews(app);
 
   // When deployed we are behind a proxy, but we want to be
   // able to access the requesting user's IP in req.ip, so
@@ -94,32 +95,37 @@ function init(app) {
   app.enable('trust proxy');
 
   app.use(express.static('public'));
-  maybeUseDevMiddleware(app);
-  app.use(session(sessionConfig));
-  app.use(passport.initialize());
-  app.use(passport.session());
-  app.use(setUserInLocals);
-  app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(bodyParser.json({ limit: '2mb' }));
-  app.use(methodOverride());
-  app.use(flash());
-  app.use(responses);
 
-  app.use(frRedirect);
+  // const mainRouter = express.Router();
+  // maybeUseDevMiddleware(mainRouter);
+  // mainRouter.use(session(sessionConfig));
+  // mainRouter.use(passport.initialize());
+  // mainRouter.use(passport.session());
+  // mainRouter.use(setUserInLocals);
+  // mainRouter.use(bodyParser.urlencoded({ extended: false }));
+  // mainRouter.use(bodyParser.json({ limit: '2mb' }));
+  // mainRouter.use(methodOverride());
+  // mainRouter.use(flash());
+  // mainRouter.use(responses);
+
+  // mainRouter.use(frRedirect);
 
   // temporary until federalist.18f.gov is launched
-  app.use(federalistAppRedirect);
+  // mainRouter.use(federalistAppRedirect);
 
-  app.use(cacheControl);
+  // mainRouter.use(cacheControl);
 
-  maybeUseExpressLogger(app);
+  // maybeUseExpressLogger(mainRouter);
 
-  app.use(slowDown(config.rateSlowing));
-  app.use(rateLimit(config.rateLimiting));
-  app.use(router);
-  app.use(fourOhFourhandler);
-  app.use(expressErrorLogger);
-  app.use(errorHandler);
+  // mainRouter.use(slowDown(config.rateSlowing));
+  // mainRouter.use(rateLimit(config.rateLimiting));
+  // mainRouter.use(router);
+  // mainRouter.use(fourOhFourhandler);
+  // mainRouter.use(expressErrorLogger);
+  // mainRouter.use(errorHandler);
+
+  app.use('/admin', adminApp);
+  // app.use('/', mainRouter);
 
   return app;
 }
