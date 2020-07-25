@@ -27,6 +27,5 @@ services:
     environment:
       POSTGRES_DB: federalist
       POSTGRES_TEST_DB: federalist-test
-      POSTGRES_HOST_AUTH_METHOD: trust
 volumes:
   db-data:
