@@ -15,6 +15,7 @@ const {
   validBasicAuthPassword,
 } = require('../utils/validators');
 const { wrapHandler } = require('../utils');
+const Features = require('../features');
 
 const sendJSON = (site, res) => siteSerializer
   .serialize(site)
@@ -88,8 +89,12 @@ module.exports = {
       })
       .then(() => S3SiteRemover.removeSite(site))
       .then(() => S3SiteRemover.removeInfrastructure(site))
-      .then(() => ProxyDataSync.removeSite(site)
-        .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n'))))
+      .then(() => {
+        if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE)) {
+          return ProxyDataSync.removeSite(site)
+            .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+        }
+      })
       .then(() => site.destroy())
       .then(() => {
         res.json(siteJSON);
@@ -172,8 +177,10 @@ module.exports = {
       }))
       .then((_site) => {
         site = _site;
-        return ProxyDataSync.saveSite(site)
-          .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+        if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE)) {
+          return ProxyDataSync.saveSite(site)
+            .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+        }
       })
       .then(() => siteSerializer.serialize(site))
       .then((siteJSON) => {
@@ -257,9 +264,10 @@ module.exports = {
       basicAuth: credentials,
     };
     await site.update({ config });
-
-    ProxyDataSync.saveSite(site) // sync to proxy database
-      .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE)) {
+      ProxyDataSync.saveSite(site) // sync to proxy database
+        .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+    }
 
     const siteJSON = await siteSerializer.serialize(site);
     return res.json(siteJSON);
@@ -279,8 +287,10 @@ module.exports = {
     delete config.basicAuth;
 
     await site.update({ config });
-    ProxyDataSync.saveSite(site) // sync to proxy database
-      .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE)) {
+      ProxyDataSync.saveSite(site) // sync to proxy database
+        .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+    }
 
     const siteJSON = await siteSerializer.serialize(site);
     return res.json(siteJSON);
