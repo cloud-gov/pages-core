@@ -7,7 +7,7 @@ const Flags = {
     Ex.
     FEATURE_AWESOME_FEATURE: 'FEATURE_AWESOME_FEATURE',
     */
-  FEATURE_PROXY_EDGE:  'PROXY_EDGE',
+  FEATURE_PROXY_EDGE:  'FEATURE_PROXY_EDGE',
 };
 
 const TRUTHY_VALUES = [true, 'True', 'true', 'TRUE'];
