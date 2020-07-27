@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { getFeatureFlags } = require('./webpack-utils');
 
 module.exports = {
   mode: 'development',
@@ -84,5 +85,6 @@ module.exports = {
     // which we don't need, so we'll use this plugin to keep them out of the
     // bundle
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new webpack.DefinePlugin(getFeatureFlags(process.env)),
   ],
 };

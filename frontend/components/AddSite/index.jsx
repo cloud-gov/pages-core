@@ -40,10 +40,10 @@ export class AddSite extends React.Component {
     siteActions.addUserToSite({ owner, repository });
   }
 
-  onCreateSiteSubmit({ repoUrl, engine, defaultBranch }) {
+  onCreateSiteSubmit({ repoUrl, engine }) {
     const { owner, repository } = getOwnerAndRepo(repoUrl);
     siteActions.addSite({
-      owner, repository, engine, defaultBranch,
+      owner, repository, engine,
     });
   }
 
@@ -70,6 +70,7 @@ export class AddSite extends React.Component {
       <div>
         <div className="usa-grid">
           <div className="page-header usa-grid-full">
+            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
             <AlertBanner {...alert} />
             <div className="header-title">
               <h1>
@@ -86,7 +87,7 @@ export class AddSite extends React.Component {
           </div>
           <h2>Use your own GitHub repository</h2>
           <AddRepoSiteForm
-            initialValues={{ engine: 'jekyll', defaultBranch: 'master' }}
+            initialValues={{ engine: 'jekyll' }}
             showAddNewSiteFields={showAddNewSiteFields}
             onSubmit={formSubmitFunc}
           />

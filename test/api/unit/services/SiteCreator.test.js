@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const { expect } = require('chai');
 const nock = require('nock');
-const { stub } = require('sinon');
+const sinon = require('sinon');
 const config = require('../../../../config/env/test');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
@@ -10,9 +10,17 @@ const apiNocks = require('../../support/cfAPINocks');
 const SiteCreator = require('../../../../api/services/SiteCreator');
 const TemplateResolver = require('../../../../api/services/TemplateResolver');
 const { Build, Site, User } = require('../../../../api/models');
+const SQS = require('../../../../api/services/SQS');
 
 describe('SiteCreator', () => {
-  afterEach(() => nock.cleanAll());
+  beforeEach(() => {
+    sinon.stub(SQS, 'sendBuildMessage').resolves();
+  });
+
+  afterEach(() => {
+    nock.cleanAll();
+    sinon.restore();
+  });
 
   describe('.createSite', () => {
     const validateSiteExpectations = (
@@ -20,6 +28,7 @@ describe('SiteCreator', () => {
       owner,
       repository,
       user,
+      defaultBranch = 'main',
       s3ServiceName = 'federalist-dev-s3',
       awsBucketName = 'cg-123456789',
       awsBucketRegion = 'us-gov-west-1'
@@ -34,6 +43,7 @@ describe('SiteCreator', () => {
       expect(site.Users[0].id).to.equal(user.id);
       expect(site.Builds).to.have.length(1);
       expect(site.Builds[0].user).to.equal(user.id);
+      expect(site.defaultBranch).to.equal(defaultBranch);
     };
 
     const afterCreateSite = (owner, repository) => Site.findOne({
@@ -61,9 +71,11 @@ describe('SiteCreator', () => {
             repository: crypto.randomBytes(3).toString('hex'),
           };
 
+          const defaultBranch = 'myDefaultBranch';
+
           factory.user().then((model) => {
             user = model;
-            githubAPINocks.repo();
+            githubAPINocks.repo({ defaultBranch });
 
             githubAPINocks.userOrganizations({
               accessToken: user.githubAccessToken,
@@ -84,7 +96,8 @@ describe('SiteCreator', () => {
                 site,
                 siteParams.owner,
                 siteParams.repository,
-                user
+                user,
+                defaultBranch
               );
               expect(webhookNock.isDone()).to.equal(true);
               done();
@@ -98,9 +111,11 @@ describe('SiteCreator', () => {
             repository: crypto.randomBytes(3).toString('hex'),
           };
 
+          const defaultBranch = 'myDefaultBranch';
+
           factory.user().then((model) => {
             user = model;
-            githubAPINocks.repo();
+            githubAPINocks.repo({ defaultBranch });
             githubAPINocks.webhook();
 
             githubAPINocks.userOrganizations({
@@ -116,7 +131,8 @@ describe('SiteCreator', () => {
                 site,
                 siteParams.owner,
                 siteParams.repository,
-                user
+                user,
+                defaultBranch
               );
               done();
             })
@@ -303,7 +319,7 @@ describe('SiteCreator', () => {
       });
 
       it('should trigger a build that pushes the source repo to the destiantion repo', (done) => {
-        const templateResolverStub = stub(TemplateResolver, 'getTemplate');
+        const templateResolverStub = sinon.stub(TemplateResolver, 'getTemplate');
         const fakeTemplate = {
           repo: 'federalist-template',
           owner: '18f',
@@ -506,6 +522,7 @@ describe('SiteCreator', () => {
               siteParams.owner,
               siteParams.repository,
               user,
+              'main',
               name,
               bucket,
               region
