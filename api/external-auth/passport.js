@@ -8,18 +8,18 @@ const passport = new Passport.Passport();
 
 const options = config.passport.github.externalOptions;
 
-const callback = (accessToken, _refreshToken, _profile, cb) => {
+const onSuccess = (accessToken, _refreshToken, _profile, callback) => {
   GitHub.validateUser(accessToken)
-    .then(() => cb(null, { accessToken }))
+    .then(() => callback(null, { accessToken }))
     .catch((err) => {
       if (err.message === 'Unauthorized') {
-        cb(null, false);
+        callback(null, false);
       } else {
-        cb(err);
+        callback(err);
       }
     });
 };
 
-passport.use(new GitHubStrategy(options, callback));
+passport.use(new GitHubStrategy(options, onSuccess));
 
 module.exports = passport;
