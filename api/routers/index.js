@@ -5,7 +5,6 @@ const mainRouter = express.Router();
 mainRouter.use(require('./auth'));
 mainRouter.use(require('./webhook'));
 mainRouter.use(require('./main'));
-mainRouter.use(require('./external-auth'));
 
 const apiRouter = express.Router();
 apiRouter.use(require('./build-log'));
