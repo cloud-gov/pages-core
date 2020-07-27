@@ -10,6 +10,7 @@ const flash = require('connect-flash');
 const { logger, expressLogger, expressErrorLogger } = require('../../winston');
 const config = require('../../config');
 
+const externalAuth = require('../external-auth');
 const responses = require('../responses');
 const passport = require('../services/passport');
 const router = require('../routers');
@@ -51,20 +52,6 @@ function frRedirect(req, res, next) {
   return next();
 }
 
-function federalistAppRedirect(req, res, next) {
-  const host = req.hostname;
-  const redirectUrls = [
-    'federalist.18f.gov',
-    'federalist-staging.18f.gov',
-  ];
-
-  if (redirectUrls.indexOf(host) !== -1) {
-    return res.redirect(302, `https://${host.slice().replace('federalist', 'federalistapp')}`);
-  }
-
-  return next();
-}
-
 function cacheControl(req, res, next) {
   res.set('Cache-Control', 'max-age=0');
   next();
@@ -86,40 +73,43 @@ function errorHandler(err, _req, res, _next) {
 }
 
 function init(app) {
-  configureViews(app);
-
   // When deployed we are behind a proxy, but we want to be
   // able to access the requesting user's IP in req.ip, so
   // 'trust proxy' must be enabled.
   app.enable('trust proxy');
 
   app.use(express.static('public'));
-  maybeUseDevMiddleware(app);
-  app.use(session(sessionConfig));
-  app.use(passport.initialize());
-  app.use(passport.session());
-  app.use(setUserInLocals);
-  app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(bodyParser.json({ limit: '2mb' }));
-  app.use(methodOverride());
-  app.use(flash());
-  app.use(responses);
-
-  app.use(frRedirect);
-
-  // temporary until federalist.18f.gov is launched
-  app.use(federalistAppRedirect);
-
-  app.use(cacheControl);
-
-  maybeUseExpressLogger(app);
 
   app.use(slowDown(config.rateSlowing));
   app.use(rateLimit(config.rateLimiting));
-  app.use(router);
-  app.use(fourOhFourhandler);
-  app.use(expressErrorLogger);
-  app.use(errorHandler);
+
+  app.use(frRedirect);
+
+  maybeUseExpressLogger(app);
+
+  app.use('/external', externalAuth);
+
+  const main = express();
+  configureViews(main);
+  maybeUseDevMiddleware(main);
+  main.use(session(sessionConfig));
+  main.use(passport.initialize());
+  main.use(passport.session());
+  main.use(setUserInLocals);
+  main.use(bodyParser.urlencoded({ extended: false }));
+  main.use(bodyParser.json({ limit: '2mb' }));
+  main.use(methodOverride());
+  main.use(flash());
+  main.use(responses);
+
+  main.use(cacheControl);
+
+  main.use(router);
+  main.use(fourOhFourhandler);
+  main.use(expressErrorLogger);
+  main.use(errorHandler);
+
+  app.use('/', main);
 
   return app;
 }
