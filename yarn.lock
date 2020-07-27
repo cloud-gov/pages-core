@@ -2914,10 +2914,10 @@ ccount@^1.0.0:
   resolved "https://registry.yarnpkg.com/ccount/-/ccount-1.0.5.tgz#ac82a944905a65ce204eb03023157edf29425c17"
   integrity sha512-MOli1W+nfbPLlKEhInaxhRdp7KVLFxLN5ykwzHgLsLI3H3gs5jjFAK4Eoj3OzzcxCtumDaI8onoVDeQyWaNTkw==
 
-cfenv@^1.0.0:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/cfenv/-/cfenv-1.2.2.tgz#5823bbfb63daca06d2f5617e2c7f4d863e1b99a8"
-  integrity sha512-fl8xrG9ezqfO7L664lL+/vkqXun0D/xS/0IJ9++IMHLR6SI0If56C/KIHy9oIGb8jq9swHZFdct1MfN/80yYUw==
+cfenv@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/cfenv/-/cfenv-1.2.3.tgz#37c4fb92e8faae96a6f42418b6693fb121dc09b0"
+  integrity sha512-RDXQdRAVk7NxA4+/7ARr6RWkRnLQGH6o2+W0EQehc4vltfJYsyhRNYiivbfHu7Eh77yG9Rdn6JO/Wz/AuFE46Q==
   dependencies:
     js-yaml "3.13.x"
     ports "1.1.x"
