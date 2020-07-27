@@ -133,7 +133,7 @@
     "react-dom": "^16.10.2",
     "react-notification-system": "^0.4.0",
     "react-notification-system-redux": "^2.0.1",
-    "react-redux": "^7.2.0",
+    "react-redux": "^7.2.1",
     "react-svg-loader": "^3.0.3",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.2",
