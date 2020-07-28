@@ -68,6 +68,8 @@ jobs:
      docker:
        - *default-docker-node
        - *default-docker-postgres
+     environment:
+       FEATURE_ADMIN_AUTH: 'true'
      steps:
       - checkout
       - run:
