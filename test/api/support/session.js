@@ -5,7 +5,7 @@ const sessionConfig = require('../../../api/init/sessionConfig');
 const factory = require('./factory');
 const csrfToken = require('./csrfToken');
 
-function unauthenticatedSession({ oauthState, authRedirectPath } = {}) {
+function unauthenticatedSession({ oauthState, authRedirectPath, cfg = sessionConfig } = {}) {
   const sessionKey = crypto.randomBytes(8).toString('hex');
 
   const sessionBody = {
@@ -22,18 +22,18 @@ function unauthenticatedSession({ oauthState, authRedirectPath } = {}) {
     authRedirectPath,
   };
 
-  return sessionConfig.store.set(sessionKey, sessionBody)
+  return cfg.store.set(sessionKey, sessionBody)
     .then(() => {
       const signedSessionKey = `${sessionKey}.${crypto
-        .createHmac('sha256', sessionConfig.secret)
+        .createHmac('sha256', cfg.secret)
         .update(sessionKey)
         .digest('base64')
         .replace(/=+$/, '')}`;
-      return `${sessionConfig.key}=s%3A${signedSessionKey}`;
+      return `${cfg.key}=s%3A${signedSessionKey}`;
     });
 }
 
-function authenticatedSession(user) {
+function authenticatedSession(user, cfg = sessionConfig) {
   const sessionKey = crypto.randomBytes(8).toString('hex');
 
   return Promise.resolve(user || factory.user())
@@ -53,15 +53,15 @@ function authenticatedSession(user) {
         authenticatedAt: new Date(),
         csrfSecret: csrfToken.TEST_CSRF_SECRET,
       };
-      return sessionConfig.store.set(sessionKey, sessionBody);
+      return cfg.store.set(sessionKey, sessionBody);
     })
     .then(() => {
       const signedSessionKey = `${sessionKey}.${crypto
-        .createHmac('sha256', sessionConfig.secret)
+        .createHmac('sha256', cfg.secret)
         .update(sessionKey)
         .digest('base64')
         .replace(/=+$/, '')}`;
-      return `${sessionConfig.key}=s%3A${signedSessionKey}`;
+      return `${cfg.key}=s%3A${signedSessionKey}`;
     });
 }
 

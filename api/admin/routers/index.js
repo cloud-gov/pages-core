@@ -16,9 +16,9 @@ const ensureAuthenticated = (req, res, next) => {
 const authenticatedRouter = Router();
 authenticatedRouter.use(ensureAuthenticated);
 authenticatedRouter.get('/builds', AdminBuildController.findAllBuilds);
-authenticatedRouter.get('/sites', AdminSiteController.findAllSite);
+authenticatedRouter.get('/sites', AdminSiteController.findAllSites);
 authenticatedRouter.get('/me', UserController.me);
-authenticatedRouter.use('/logout', (req, res) => {
+authenticatedRouter.get('/logout', (req, res) => {
   req.logout();
   res.json({ status: 'logged out' });
 });

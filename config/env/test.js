@@ -29,6 +29,12 @@ module.exports = {
         callbackURL: 'http://localhost:1337/external/auth/github/callback',
         scope: ['user', 'repo'],
       },
+      adminOptions: {
+        clientID: '123abc',
+        clientSecret: '456def',
+        callbackURL: 'http://localhost:1337/admin/auth/github/callback',
+        scope: ['user', 'repo'],
+      },
       organizations: [
         123456,
       ],
