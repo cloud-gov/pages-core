@@ -640,7 +640,7 @@ describe('GitHub', () => {
     });
   });
 
-  describe.only('.ensureFederalistAdmin(accessToken, username)', () => {
+  describe('.ensureFederalistAdmin(accessToken, username)', () => {
     const accessToken = 'abc123';
     const username = 'some-user';
 
