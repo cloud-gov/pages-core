@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const githubAPINocks = require('../support/githubAPINocks');
 const { sessionForCookie } = require('../support/cookieSession');
 const { unauthenticatedSession } = require('../support/session');
-const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
+const GitHub = require('../../../api/services/GitHub');
 const sessionConfig = require('../../../api/admin/sessionConfig');
 
 const app = require('../../../app');
@@ -33,7 +33,7 @@ describe('Admin authentication request', () => {
 
     it('returns unauthorized if the user is not an admin', (done) => {
       githubAPINocks.githubAuth('user', [{ id: 123456 }]);
-      sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins').resolves([]);
+      sinon.stub(GitHub, 'ensureFederalistAdmin').rejects();
       request(app)
         .get('/admin/auth/github/callback?code=auth-code-123abc&state=state-123abc')
         .expect(401, done);
@@ -42,7 +42,7 @@ describe('Admin authentication request', () => {
     describe('when successful', () => {
       beforeEach(() => {
         githubAPINocks.githubAuth('user', [{ id: 123456 }]);
-        sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins').resolves(['USER']);
+        sinon.stub(GitHub, 'ensureFederalistAdmin').resolves();
       });
 
       it('returns a script tag', (done) => {
