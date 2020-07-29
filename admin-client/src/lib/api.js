@@ -4,18 +4,14 @@ import { notification } from '../stores';
 import { logout as authLogout } from './auth';
 
 const apiUrl = API_URL;
-const production = process.env.NODE_ENV === 'production';
 
 const defaultOptions = {
   credentials: 'include',
   headers: {
     'Content-Type': 'application/json',
   },
+  mode: 'cors',
 };
-
-if (!production) {
-  defaultOptions.mode = 'cors';
-}
 
 // eslint-disable-next-line no-underscore-dangle
 async function _fetch(path) {
