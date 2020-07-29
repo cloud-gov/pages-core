@@ -141,8 +141,8 @@ jobs:
           key: dependency-cache-admin-{{ checksum "admin-client/yarn.lock" }}
       - run:
           name: Install dependencies
-          command: yarn --frozen-lockfile --cache-folder ./admin-client/.cache
-          working_directory: ./admin-client
+          command: yarn --frozen-lockfile --cache-folder ./.cache
+          working_directory: ~/admin-client
       - save_cache:
           key: dependency-cache-admin-{{ checksum "admin-client/yarn.lock" }}
           paths:
