@@ -2,7 +2,6 @@
   import { session } from '../stores';
 
   import GridContainer from '../components/GridContainer.svelte';
-  import Hero from '../components/Hero.svelte';
 </script>
 
 <svelte:head>

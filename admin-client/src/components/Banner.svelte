@@ -1,6 +1,6 @@
 <script>
   let bannerOpen = false;
-  const toggleBanner = () => (bannerOpen = !bannerOpen);
+  const toggleBanner = () => { bannerOpen = !bannerOpen; };
 </script>
 
 <section class="usa-banner z-500" aria-label="Official government website">

@@ -1,10 +1,10 @@
 <script>
-  export let href = "https://example.com";
-  export let icon = "externalLink";
+  export let href = 'https://example.com';
+  export let icon = 'externalLink';
 
   const icons = {
-    externalLink: "/img/external-link.svg",
-    github: "/images/icon-github.svg",
+    externalLink: '/img/external-link.svg',
+    github: '/images/icon-github.svg',
   };
 </script>
 

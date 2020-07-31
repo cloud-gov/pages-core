@@ -1,7 +1,4 @@
-/* eslint-disable scanjs-rules/identifier_localStorage */
-/* eslint-disable scanjs-rules/call_addEventListener */
-/* eslint-disable scanjs-rules/call_addEventListener_message */
-/* global localStorage window API_URL */
+/* global API_URL */
 import page from 'page';
 import { session } from '../stores';
 
@@ -23,7 +20,7 @@ async function authenticate() {
     const authWindow = window.open(
       `${apiUrl}/admin/auth/github`,
       'Federalist Admin Auth',
-      `width=${width}, height=${height}, top=${top}, left=${left}`
+      `width=${width}, height=${height}, top=${top}, left=${left}`,
     );
 
     window.addEventListener('message', (e) => {

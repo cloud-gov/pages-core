@@ -22,9 +22,9 @@ services:
     working_dir: /app
     volumes:
       - ./admin-client:/app
+      - ~/Library/Caches/Yarn:/usr/local/share/.cache/yarn
     ports:
       - "3000:3000"
-      - "10000:10000"
     depends_on:
       - app
     command: ["yarn", "dev"]

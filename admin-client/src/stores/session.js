@@ -8,8 +8,8 @@ const initial = {
 const { set, subscribe, update } = writable(initial);
 
 export default {
-  login: user => set({ authenticated: true, user }),
+  login: (user) => set({ authenticated: true, user }),
   logout: () => set(initial),
-  updateUser: user => update(s => ({ ...s, user })),
+  updateUser: (user) => update((s) => ({ ...s, user })),
   subscribe,
 };

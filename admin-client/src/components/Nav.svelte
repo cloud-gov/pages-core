@@ -1,5 +1,5 @@
 <script>
-  import Logout from "./Logout.svelte";
+  import Logout from './Logout.svelte';
 
   let isOpen = false;
 
@@ -7,7 +7,7 @@
     isOpen = !isOpen;
   };
 
-  $: visible = isOpen ? "is-visible" : "";
+  $: visible = isOpen ? 'is-visible' : '';
 </script>
 
 <style>

@@ -1,14 +1,14 @@
 <script>
   import { onMount } from 'svelte';
-  import { fly } from "svelte/transition";
-  import { notification } from "../stores";
+  import { fly } from 'svelte/transition';
+  import { notification } from '../stores';
 
-  import GridContainer from "../components/GridContainer.svelte";
-  import GridRow from "../components/GridRow.svelte";
+  import GridContainer from '../components/GridContainer.svelte';
+  import GridRow from '../components/GridRow.svelte';
 
   onMount(() => {
     setTimeout(() => notification.clear(), 5000);
-  })
+  });
 </script>
 
 {#if $notification.type}

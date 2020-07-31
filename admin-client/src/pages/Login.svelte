@@ -1,24 +1,20 @@
 <script>
-  import page from 'page';
-
-  import { notification, session } from '../stores';
-  import api from '../lib/api';
+  import { notification } from '../stores';
+  import { fetchMe } from '../lib/api';
   import { authenticate, login } from '../lib/auth';
 
   import GridContainer from '../components/GridContainer.svelte';
   import Hero from '../components/Hero.svelte';
-
-  const apiUrl = API_URL;
 
   async function loginHandler() {
     try {
       await authenticate();
       notification.setSuccess('Welcome back!');
 
-      const user = await api.fetchMe();
+      const user = await fetchMe();
       login(user);
     } catch (err) {
-      return notification.setError(`Could not log into site. Error: ${err}`);
+      notification.setError(`Could not log into site. Error: ${err}`);
     }
   }
 </script>

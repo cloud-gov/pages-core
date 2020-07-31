@@ -1,4 +1,3 @@
-/* global document */
 import App from './App.svelte';
 import { init } from './lib/auth';
 

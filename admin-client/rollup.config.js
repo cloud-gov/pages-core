@@ -49,19 +49,23 @@ export default {
       API_URL: JSON.stringify(apiUrl),
     }),
     copy({
-      targets: [{
-        src: `${uswds}/fonts`,
-        dest: 'public',
-      }, {
-        src: `${uswds}/img`,
-        dest: 'public',
-      }, {
-        src: [
-          `${uswds}/css/uswds.min.css`,
-          `${uswds}/css/uswds.min.css.map`,
-        ],
-        dest: 'public',
-      }],
+      targets: [
+        {
+          src: `${uswds}/fonts`,
+          dest: 'public',
+        },
+        {
+          src: `${uswds}/img`,
+          dest: 'public',
+        },
+        {
+          src: [
+            `${uswds}/css/uswds.min.css`,
+            `${uswds}/css/uswds.min.css.map`,
+          ],
+          dest: 'public',
+        },
+      ],
       copyOnce: !production,
     }),
     svelte({

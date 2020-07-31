@@ -1,15 +1,13 @@
 <script>
-  import api from '../lib/api';
+  import { fetchSites } from '../lib/api';
   import GridContainer from '../components/GridContainer.svelte';
   import PageTitle from '../components/PageTitle.svelte';
   import SiteCard from '../components/SiteCard.svelte';
-  
-  const fetchSites = api.fetchSites();
 </script>
 
 <GridContainer>
   <PageTitle>Sites</PageTitle>
-    {#await fetchSites}
+    {#await fetchSites()}
       <p>Loading...</p>
     {:then sites}
       {#if sites.length > 0}

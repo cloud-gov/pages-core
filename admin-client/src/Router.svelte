@@ -6,10 +6,11 @@
 
   let currentPage;
   let redirect;
-  
+
   function ensureAuthenticated(ctx, next) {
-    if (get(session).authenticated) next();
-    else {
+    if (get(session).authenticated) {
+      next();
+    } else {
       redirect = ctx.path;
       page.redirect('/login');
     }
@@ -29,14 +30,14 @@
   }
 
   function render(component) {
-    return (ctx) => {
+    return () => {
       currentPage = component;
     };
   }
 
   // Routes
   page('/login', ensureUnauthenticated, render(Pages.Login));
-  
+
   // Authenticated Routes
   page('*', ensureAuthenticated);
   page('/', checkRedirect, render(Pages.Home));

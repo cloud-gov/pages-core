@@ -1,47 +1,40 @@
 <script>
-  import { slide } from "svelte/transition";
-  import { formatDateTime } from "../helpers/formatter";
+  import { slide } from 'svelte/transition';
+  import { formatDateTime } from '../helpers/formatter';
 
-  import ExternalLink from "./ExternalLink.svelte";
-  import GridContainer from "./GridContainer.svelte";
-  import GridRow from "./GridRow.svelte";
+  import ExternalLink from './ExternalLink.svelte';
 
   export let site = {
-    awsBucketName: "cg-123456789",
-    awsBucketRegion: "us-gov-west-1",
-    buildStatus: "active",
-    createdAt: "2020-07-07T04:53:32.597Z",
-    defaultBranch: "master",
+    awsBucketName: 'cg-123456789',
+    awsBucketRegion: 'us-gov-west-1',
+    buildStatus: 'active',
+    createdAt: '2020-07-07T04:53:32.597Z',
+    defaultBranch: 'master',
     demoViewLink:
-      "https://cg-123456789.app.cloud.gov/demo/apburnes/example-node-site/",
-    engine: "node.js",
+      'https://cg-123456789.app.cloud.gov/demo/apburnes/example-node-site/',
+    engine: 'node.js',
     id: 5,
-    owner: "apburnes",
+    owner: 'apburnes',
     previewLink:
-      "https://cg-123456789.app.cloud.gov/preview/apburnes/example-node-site/",
-    repository: "example-node-site",
-    s3ServiceName: "federalist-dev-s3",
-    updatedAt: "2020-07-07T04:53:32.597Z",
+      'https://cg-123456789.app.cloud.gov/preview/apburnes/example-node-site/',
+    repository: 'example-node-site',
+    s3ServiceName: 'federalist-dev-s3',
+    updatedAt: '2020-07-07T04:53:32.597Z',
     users: [],
     viewLink:
-      "https://cg-123456789.app.cloud.gov/site/apburnes/example-node-site/",
+      'https://cg-123456789.app.cloud.gov/site/apburnes/example-node-site/',
   };
 
   const {
     awsBucketName,
-    awsBucketRegion,
-    buildStatus,
     createdAt,
-    defaultBranch,
     demoViewLink,
     engine,
     id,
     owner,
-    previewLink,
     repository,
     s3ServiceName,
     updatedAt,
-    users,
     viewLink,
   } = site;
 

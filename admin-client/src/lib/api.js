@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-/* global fetch API_URL */
+/* global API_URL */
 import { notification } from '../stores';
 import { logout as authLogout } from './auth';
 
@@ -31,25 +31,25 @@ async function _fetch(path) {
     });
 }
 
-export async function fetchMe() {
+async function fetchMe() {
   return _fetch('/me');
 }
 
-export async function fetchBuilds() {
+async function fetchBuilds() {
   return _fetch('/builds').catch(() => []);
 }
 
-export async function fetchSites() {
+async function fetchSites() {
   return _fetch('/sites').catch(() => []);
 }
 
-export async function logout() {
+async function logout() {
   return _fetch('/logout').catch(() => null);
 }
 
-export default {
-  fetchBuilds,
+export {
   fetchMe,
+  fetchBuilds,
   fetchSites,
   logout,
 };
