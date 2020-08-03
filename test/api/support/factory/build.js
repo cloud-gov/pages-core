@@ -13,15 +13,15 @@ const _attributes = (overrides = {}) => {
     site = Promise.resolve(user).then(u => siteFactory({ users: [u] }));
   }
 
-  return Object.assign({
+  return {
     site,
     user,
     token: Build.generateToken(),
-  }, overrides);
+    ...overrides,
+  };
 };
 
-
-function build(overrides, hooks = false) {
+function build(overrides) {
   return Promise.props(_attributes(overrides))
     .then((attributes) => {
       Object.keys(attributes).forEach((key) => {
@@ -31,7 +31,7 @@ function build(overrides, hooks = false) {
         }
       });
 
-      return Build.create(attributes, { hooks });
+      return Build.create(attributes);
     });
 }
 

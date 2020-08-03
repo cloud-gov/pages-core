@@ -43,7 +43,7 @@ describe('Build model', () => {
     it('should send a build new build message', async () => {
       const site = await factory.site();
       const uev = await factory.userEnvironmentVariable.create({ site });
-      const build = await factory.build({ site }, true);
+      const build = await factory.build({ site });
       await build.enqueue();
 
       // create delay while s3 infra created ... will be removed with 1 bucket federalist
