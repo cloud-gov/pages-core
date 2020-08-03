@@ -53,6 +53,7 @@ passport.logout = (req, res) => {
 passport.callback = (req, res) => {
   passport.authenticate('github')(req, res, () => {
     if (req.user) {
+      console.log({ session: req.session });
       req.session.authenticated = true;
       req.session.authenticatedAt = new Date();
       req.session.save(() => {
