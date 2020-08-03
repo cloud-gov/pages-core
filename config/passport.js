@@ -2,7 +2,7 @@ const env = require('../services/environment.js')();
 
 const clientID = env.GITHUB_CLIENT_ID || 'not_set';
 const clientSecret = env.GITHUB_CLIENT_SECRET || 'not_set';
-const callBackURL = (prefix = '/') => `${env.APP_HOSTNAME}${prefix}/auth/github/callback`;
+const callBackURL = (prefix = '') => `${env.APP_HOSTNAME}${prefix}/auth/github/callback`;
 
 module.exports = {
   github: {
