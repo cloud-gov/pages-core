@@ -83,7 +83,7 @@ describe('Build model', () => {
 
           expect(build.state).to.equal('processing');
           expect(build.startedAt).to.be.a('date');
-          expect(build.startedAt).to.be.above(build.createdAt);
+          expect(build.startedAt).to.be.at.least(build.createdAt);
           expect(build.completedAt).to.be.null;
         });
       });
@@ -96,7 +96,7 @@ describe('Build model', () => {
           expect(build.error).to.equal('this is an error');
           expect(build.startedAt).to.be.null;
           expect(build.completedAt).to.be.a('date');
-          expect(build.completedAt).to.be.above(build.createdAt);
+          expect(build.completedAt).to.be.at.least(build.createdAt);
         });
 
         it('should sanitize GitHub access tokens from error message', async () => {
