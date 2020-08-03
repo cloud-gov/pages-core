@@ -157,7 +157,8 @@ function saveAndBuildSite({ site, user }) {
 
       return Promise.all([
         site.addUser(user.id),
-        Build.create(buildParams),
+        Build.create(buildParams)
+          .then(build => build.enqueue()),
       ]);
     })
     .then(() => model);

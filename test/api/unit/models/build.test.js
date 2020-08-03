@@ -39,11 +39,12 @@ describe('Build model', () => {
     });
   });
 
-  describe('after create hook', () => {
+  describe('enqueue', () => {
     it('should send a build new build message', async () => {
       const site = await factory.site();
       const uev = await factory.userEnvironmentVariable.create({ site });
       const build = await factory.build({ site }, true);
+      await build.enqueue();
 
       // create delay while s3 infra created ... will be removed with 1 bucket federalist
       await wait();
