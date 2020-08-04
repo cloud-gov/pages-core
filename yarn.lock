@@ -1596,10 +1596,10 @@ available-typed-arrays@^1.0.0, available-typed-arrays@^1.0.2:
   dependencies:
     array-filter "^1.0.0"
 
-aws-sdk@^2.720.0:
-  version "2.720.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.720.0.tgz#b834adc6b7458c41621f8e2169602c69c655f504"
-  integrity sha512-899YXs6iWae82GGJM95S5MFBPIG8pE9aq+GlSr47mz7te97hGX0OcjPs3GuGZWA6Nrp0MCR9eMqu6DwBlYGltA==
+aws-sdk@^2.726.0:
+  version "2.726.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.726.0.tgz#075aae1922e67e21285abae1bb081252cff4fec3"
+  integrity sha512-QRQ7MaW5dprdr/T3vCTC+J8TeUfpM45yWsBuATPcCV/oO8afFHVySwygvGLY4oJuo5Mf4mJn3+JYTquo6CqiaA==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
@@ -4398,9 +4398,9 @@ element-closest@^2.0.1:
   integrity sha1-cqdAoQdFM4LijfnOXbtajfD5Zuw=
 
 elliptic@^6.0.0, elliptic@^6.5.2:
-  version "6.5.2"
-  resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.5.2.tgz#05c5678d7173c049d8ca433552224a495d0e3762"
-  integrity sha512-f4x70okzZbIQl/NSRLkI/+tteV/9WqL98zx+SQ69KbXxmVrmjwsNUPn/gYJJ0sHvEak24cZgHIPegRePAtA/xw==
+  version "6.5.3"
+  resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.5.3.tgz#cb59eb2efdaf73a0bd78ccd7015a62ad6e0f93d6"
+  integrity sha512-IMqzv5wNQf+E6aHeIqATs0tOLeOTwj1QKbRcS3jBbYkl5oLAserA8yJTT7/VyHUYG91PRmPyeQDObKLPpeS4dw==
   dependencies:
     bn.js "^4.4.0"
     brorand "^1.0.1"
@@ -4842,10 +4842,10 @@ eslint-visitor-keys@^1.0.0, eslint-visitor-keys@^1.1.0, eslint-visitor-keys@^1.3
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.3.0.tgz#30ebd1ef7c2fdff01c3a4f151044af25fab0523e"
   integrity sha512-6J72N8UNa462wa/KFODt/PJ3IU60SDpC3QXC1Hjc1BXXpfL2C9R5+AU7jhe0F6GREqVMh4Juu+NY7xn+6dipUQ==
 
-eslint@>=5.15.1, eslint@^7.5.0:
-  version "7.5.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-7.5.0.tgz#9ecbfad62216d223b82ac9ffea7ef3444671d135"
-  integrity sha512-vlUP10xse9sWt9SGRtcr1LAC67BENcQMFeV+w5EvLEoFe3xJ8cF1Skd0msziRx/VMC+72B4DxreCE+OR12OA6Q==
+eslint@>=5.15.1, eslint@^7.6.0:
+  version "7.6.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-7.6.0.tgz#522d67cfaea09724d96949c70e7a0550614d64d6"
+  integrity sha512-QlAManNtqr7sozWm5TF4wIH9gmUm2hE3vNRUvyoYAa4y1l5/jxD/PQStEjBMQtCqZmSep8UxrcecI60hOpe61w==
   dependencies:
     "@babel/code-frame" "^7.0.0"
     ajv "^6.10.0"
@@ -5268,10 +5268,10 @@ fecha@^4.2.0:
   resolved "https://registry.yarnpkg.com/fecha/-/fecha-4.2.0.tgz#3ffb6395453e3f3efff850404f0a59b6747f5f41"
   integrity sha512-aN3pcx/DSmtyoovUudctc8+6Hl4T+hI9GBBHLjA76jdZl7+b1sgh5g4k+u/GL3dTy1/pnYzKp69FpJ0OicE3Wg==
 
-fetch-mock@^9.10.5:
-  version "9.10.5"
-  resolved "https://registry.yarnpkg.com/fetch-mock/-/fetch-mock-9.10.5.tgz#b73f6b0a862153733dc443e9cea4fa13b91aaf91"
-  integrity sha512-yA0zctPNNIlHhhm8yEf9V/Smr9FHpTkXgf/MK6v2o0qNueJ5iRvZGPPDpmlJ9ON6WfXCYnkY+lsFuay9GglyUw==
+fetch-mock@^9.10.6:
+  version "9.10.6"
+  resolved "https://registry.yarnpkg.com/fetch-mock/-/fetch-mock-9.10.6.tgz#62c646dbb0c91573e14c9dca3c92b6e6e71c60f1"
+  integrity sha512-kqAV3C8KNmNZcY87e2yP4qBbRD1H4i0Cndw0bKmXNBItuEdTfCmDlDdIGviFbS5bqp0pS9GZ721aAQud+zRmJQ==
   dependencies:
     babel-runtime "^6.26.0"
     core-js "^3.0.0"
@@ -8146,10 +8146,10 @@ nise@^4.0.1:
     just-extend "^4.0.2"
     path-to-regexp "^1.7.0"
 
-nock@^13.0.2:
-  version "13.0.2"
-  resolved "https://registry.yarnpkg.com/nock/-/nock-13.0.2.tgz#3e50f88348edbb90cce1bbbf0a3ea6a068993983"
-  integrity sha512-Wm8H22iT3UKPDf138tmgJ0NRfCLd9f2LByki9T2mGHnB66pEqvJh3gV/up1ZufZF24n7/pDYyLGybdqOzF3JIw==
+nock@^13.0.3:
+  version "13.0.3"
+  resolved "https://registry.yarnpkg.com/nock/-/nock-13.0.3.tgz#9f81f04499af6a87f9c419a023920b623d715110"
+  integrity sha512-hDscKS5chEfyEiF8J1syz8mkkH6Wetp04ECAAPNdL5k6e6WmRgx9FZZNnCrjePNdykgiiPXORBcXbNmMzFOP5w==
   dependencies:
     debug "^4.1.0"
     json-stringify-safe "^5.0.1"
@@ -10475,10 +10475,10 @@ sequelize-pool@^6.0.0:
   resolved "https://registry.yarnpkg.com/sequelize-pool/-/sequelize-pool-6.0.0.tgz#2b2f6570fb633ecb38a338c4fc266c0e42ce2af7"
   integrity sha512-D/VfOX2Z+6JTWqM73lhcqMXp1X4CeqRNVMlndvbOMtyjFAZ2kYzH7rGFGFrLO1r+RZQdc/h+3zQL4nd3cclNLg==
 
-sequelize@^6.3.3:
-  version "6.3.3"
-  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-6.3.3.tgz#930ab26f9e928d9bf2fe1fe477b428a092fef063"
-  integrity sha512-WO/b1ehjSFKlBCHzwZoaPhoW3WyXXy9x74yPrOP8NpE67wzbv0dIucDO4a+THLVyl3lnv3nFMZdJRdkUgb/ZAw==
+sequelize@^6.3.4:
+  version "6.3.4"
+  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-6.3.4.tgz#dd6f4801ba5e4d7a6f845a5ad3e616f24453694f"
+  integrity sha512-W6Y96N5QHTgEz5Q37v2GYbKufSXaw0b3v4rCLTPbcCMfIG0MHI42Ozp7IwiyV9bdNkfFEdY7XP8R6lWrWg4hUw==
   dependencies:
     debug "^4.1.1"
     dottie "^2.0.0"
@@ -12377,10 +12377,10 @@ webpack-sources@^1.1.0, webpack-sources@^1.4.0, webpack-sources@^1.4.1:
     source-list-map "^2.0.0"
     source-map "~0.6.1"
 
-webpack@^4.44.0:
-  version "4.44.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.44.0.tgz#3b08f88a89470175f036f4a9496b8a0428668802"
-  integrity sha512-wAuJxK123sqAw31SpkPiPW3iKHgFUiKvO7E7UZjtdExcsRe3fgav4mvoMM7vvpjLHVoJ6a0Mtp2fzkoA13e0Zw==
+webpack@^4.44.1:
+  version "4.44.1"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.44.1.tgz#17e69fff9f321b8f117d1fda714edfc0b939cc21"
+  integrity sha512-4UOGAohv/VGUNQJstzEywwNxqX417FnjZgZJpJQegddzPmTvph37eBIRbRTfdySXzVtJXLJfbMN3mMYhM6GdmQ==
   dependencies:
     "@webassemblyjs/ast" "1.9.0"
     "@webassemblyjs/helper-module-context" "1.9.0"
