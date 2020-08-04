@@ -5066,13 +5066,13 @@ express-slow-down@^1.3.1:
   dependencies:
     defaults "^1.0.3"
 
-express-winston@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/express-winston/-/express-winston-4.0.3.tgz#7160ddc6eb8efaa1bfc95a246124b05286096699"
-  integrity sha512-qzLLaTYAhajzfbR1d/hKT+N4kEoqDXC9wBqth0ygPg+DrM4QRipXDHLkIkaKSeiQ1L/ulezrT+T7lrKS+OcT7g==
+express-winston@^4.0.5:
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/express-winston/-/express-winston-4.0.5.tgz#de457906eb1ef71b79f7673f5c9a0c6f5acec3b6"
+  integrity sha512-n9M1imjDYqPQKp6HdHArAucfF5WNYYG4S/FQPdJTmS7sysXALosBgtWyen74WFS67WiqtbBpwNV5iX7Rk01AKw==
   dependencies:
     chalk "^2.4.1"
-    lodash "^4.17.15"
+    lodash "^4.17.19"
 
 express@4.17.1, express@^4.17.1:
   version "4.17.1"
