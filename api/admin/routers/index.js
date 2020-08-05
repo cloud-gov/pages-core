@@ -6,9 +6,7 @@ const UserController = require('../controllers/user');
 
 const ensureAuthenticated = (req, res, next) => {
   if (!req.isAuthenticated || !req.isAuthenticated()) {
-    return res.forbidden({
-      message: 'You are not permitted to perform this action.',
-    });
+    return res.unauthorized();
   }
   return next();
 };

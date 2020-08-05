@@ -1,0 +1,9 @@
+.DS_Store
+/node_modules/
+yarn-error.log
+/cypress/screenshots/
+public/build
+public/fonts
+public/img
+public/uswds.min.css
+public/uswds.min.css.map

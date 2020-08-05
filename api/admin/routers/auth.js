@@ -4,7 +4,7 @@ const passport = require('../passport');
 const onSuccess = (req, res) => {
   const script = `
     <script>
-      window.opener.postMessage("success", "http://localhost:3000")
+      window.opener.postMessage("success", "*")
     </script>
   `;
 

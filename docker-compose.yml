@@ -17,6 +17,17 @@ services:
       JWT_SECRET: 'shhHhh...'
       USER_AUDITOR: federalist
       FEATURE_ADMIN_AUTH: 'true'
+  admin-client:
+    image: node:12
+    working_dir: /app
+    volumes:
+      - ./admin-client:/app
+      - ~/Library/Caches/Yarn:/usr/local/share/.cache/yarn
+    ports:
+      - "3000:3000"
+    depends_on:
+      - app
+    command: ["yarn", "dev"]
   db:
     build:
       dockerfile: Dockerfile-db

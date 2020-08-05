@@ -23,7 +23,7 @@ module.exports = {
       clientID,
       clientSecret,
       callbackURL: callBackURL('/admin'),
-      scope: ['user', 'repo'],
+      scope: ['user', 'repo', 'read:org'],
     },
     organizations: [
       14109682, // federalist-users

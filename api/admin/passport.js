@@ -3,39 +3,30 @@ const Passport = require('passport');
 
 const config = require('../../config');
 const { User } = require('../models');
-const FederalistUsersHelper = require('../services/FederalistUsersHelper');
 const GitHub = require('../services/GitHub');
 
 const passport = new Passport.Passport();
 
 const options = config.passport.github.adminOptions;
-const auditorUsername = config.federalistUsers.admin;
 
 const onSuccess = async (accessToken, _refreshToken, profile, callback) => {
   const { _json: { email }, username } = profile;
-  try {
-    await GitHub.validateUser(accessToken);
-    const admins = await FederalistUsersHelper.federalistUsersAdmins(auditorUsername);
-    if (!admins.includes(username)) {
-      throw new Error('Unauthorized');
-    }
 
+  try {
+    await GitHub.ensureFederalistAdmin(accessToken, username);
+  } catch (_) {
+    return callback(null, false);
+  }
+
+  try {
     const user = (await User.findOrCreate({
       where: { username: username.toLowerCase() },
       defaults: { email, username },
     }))[0];
 
-    if (!user) {
-      throw new Error(`Unable to find admin user ${username}`);
-    }
-
-    callback(null, user);
+    return callback(null, user);
   } catch (err) {
-    if (err.message === 'Unauthorized') {
-      callback(null, false);
-    } else {
-      callback(err);
-    }
+    return callback(err);
   }
 };
 

@@ -1,5 +1,13 @@
 {
-  "ignore": ["frontend/", ".tmp/", "public/", "node_modules/", "webpack-manifest.json", "dist/"],
+  "ignore": [
+    "frontend/",
+    ".tmp/",
+    "public/",
+    "node_modules/",
+    "webpack-manifest.json",
+    "dist/",
+    "admin-client/"
+  ],
   "ext": "js,njk",
   "verbose": true
 }
