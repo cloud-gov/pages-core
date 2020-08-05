@@ -142,7 +142,7 @@ jobs:
       - run:
           name: Install dependencies
           command: yarn --frozen-lockfile --cache-folder ./.cache
-          working_directory: ~/admin-client
+          working_directory: ./admin-client
       - save_cache:
           key: dependency-cache-admin-{{ checksum "admin-client/yarn.lock" }}
           paths:
@@ -151,7 +151,7 @@ jobs:
       - run:
           name: Build app
           command: yarn build
-          working_directory: ~/admin-client
+          working_directory: ./admin-client
           environment:
             NODE_ENV: production
             API_URL: https://federalistapp-staging.18f.gov
