@@ -1,4 +1,5 @@
 const config = require('../../config');
+const Features = require('../features');
 
 function siteViewLink(site, deployment = 'site') {
   let link;
@@ -14,7 +15,10 @@ function siteViewLink(site, deployment = 'site') {
 }
 
 function siteViewDomain(site) {
-  return config.app.proxyPreviewHost.replace('*', site.subdomain);
+  if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE)) {
+    return config.app.proxyPreviewHost.replace('*', site.subdomain);
+  }
+  return `https://${site.awsBucketName}.app.cloud.gov`;
 }
 
 const hideBasicAuthPassword = ({ username, password }) => {
