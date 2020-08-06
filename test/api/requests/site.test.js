@@ -244,13 +244,15 @@ describe('Site API', () => {
       mockRouteResponse(s3.bucket);
     }
 
+    let saveSiteStub;
+    let removeSiteStub;
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.repo();
       githubAPINocks.createRepoForOrg();
       githubAPINocks.webhook();
-      sinon.stub(ProxyDataSync, 'removeSite').rejects();
-      sinon.stub(ProxyDataSync, 'saveSite').rejects();
+      removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
+      saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
     });
 
     afterEach(() => {
@@ -340,6 +342,51 @@ describe('Site API', () => {
         })
         .then((site) => {
           expect(site).to.not.be.undefined;
+          expect(saveSiteStub.calledOnce).to.equal(true);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should not call ProxyDataSync.saveSite when FEATURE_PROXY_EDGE_DYNAMO=false', (done) => {
+      const siteOwner = crypto.randomBytes(3).toString('hex');
+      const siteRepository = crypto.randomBytes(3).toString('hex');
+
+      cfMockServices(siteOwner, siteRepository);
+
+      factory.user()
+        .then((user) => {
+          githubAPINocks.userOrganizations({
+            accessToken: user.githubAccessToken,
+            organizations: [{ login: siteOwner }],
+          });
+          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
+          return authenticatedSession(user);
+        })
+        .then(cookie => request(app)
+          .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            owner: siteOwner,
+            repository: siteRepository,
+            defaultBranch: 'main',
+            engine: 'jekyll',
+          })
+          .set('Cookie', cookie)
+          .expect(200))
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site', 200, response.body);
+          return Site.findOne({
+            where: {
+              owner: siteOwner,
+              repository: siteRepository,
+            },
+          });
+        })
+        .then((site) => {
+          expect(site).to.not.be.undefined;
+          expect(saveSiteStub.notCalled).to.equal(true);
+          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
           done();
         })
         .catch(done);
@@ -1059,9 +1106,11 @@ describe('Site API', () => {
 
   describe('DELETE /v0/site/:id', () => {
     let s3RemoveSiteStub;
+    let removeSiteStub;
 
     beforeEach(() => {
       s3RemoveSiteStub = sinon.stub(S3SiteRemover, 'removeSite').resolves();
+      removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
     });
 
     afterEach(() => {
@@ -1147,6 +1196,44 @@ describe('Site API', () => {
         })
         .then((sites) => {
           expect(sites).to.be.empty;
+          expect(removeSiteStub.calledOnce).to.equal(true);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should delete w/o calling ProxyDataSync remove site when env FEATURE_PROXY_EDGE_DYNAMO=false', (done) => {
+      let site;
+
+      factory.site()
+        .then(s => Site.findByPk(s.id, { include: [User] }))
+        .then((model) => {
+          site = model;
+          nock.cleanAll();
+          githubAPINocks.repo({
+            owner: site.owner,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: true, push: true },
+            }],
+          });
+          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
+          return authenticatedSession(site.Users[0]);
+        })
+        .then(cookie => request(app)
+          .delete(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(200))
+        .then((response) => {
+          validateAgainstJSONSchema('DELETE', '/site/{id}', 200, response.body);
+          siteResponseExpectations(response.body, site);
+          return Site.findAll({ where: { id: site.id } });
+        })
+        .then((sites) => {
+          expect(sites).to.be.empty;
+          expect(removeSiteStub.notCalled).to.equal(true);
+          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
           done();
         })
         .catch(done);
@@ -1511,9 +1598,14 @@ describe('Site API', () => {
   });
 
   describe('Site basic authentication API', () => {
+    let saveSiteStub;
+    beforeEach(() => {
+      saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').resolves();
+    });
     afterEach(() => {
       sinon.restore();
     });
+
     describe('DELETE /v0/site/:site_id/basic-auth', () => {
       describe('when the user is not authenticated', () => {
         it('returns a 403', async () => {
@@ -1577,8 +1669,6 @@ describe('Site API', () => {
             users: [userPromise],
             config: siteConfig,
           });
-
-          sinon.stub(ProxyDataSync, 'saveSite').resolves();
 
           const cookie = await authenticatedSession(userPromise);
           expect(site.config).to.deep.eq(siteConfig);
@@ -1696,7 +1786,38 @@ describe('Site API', () => {
             password: 'paSsw0rd',
           };
 
-          sinon.stub(ProxyDataSync, 'saveSite').resolves();
+          const { body } = await request(app)
+            .post(`/v0/site/${site.id}/basic-auth`)
+            .set('Cookie', cookie)
+            .set('x-csrf-token', csrfToken.getToken())
+            .type('json')
+            .send(credentials)
+            .expect(200);
+
+
+          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 200, body);
+          await site.reload();
+          expect(site.config).to.deep.equal({
+            basicAuth: credentials,
+            blah: 'blahblahblah',
+          });
+        });
+      });
+
+      describe('when the parameters are valid', () => {
+        it('sets username and password for basic authentication', async () => {
+          const userPromise = await factory.user();
+          const site = await factory.site({
+            users: [userPromise],
+            config: { blah: 'blahblahblah' },
+          });
+          const cookie = await authenticatedSession(userPromise);
+          const credentials = {
+            username: 'user',
+            password: 'paSsw0rd',
+          };
+
+          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
 
           const { body } = await request(app)
             .post(`/v0/site/${site.id}/basic-auth`)
@@ -1713,6 +1834,8 @@ describe('Site API', () => {
             basicAuth: credentials,
             blah: 'blahblahblah',
           });
+          expect(saveSiteStub.notCalled).to.equal(true);
+          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
         });
       });
     });
