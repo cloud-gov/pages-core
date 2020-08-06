@@ -21,6 +21,16 @@ const siteErrors = require('../../../api/responses/siteErrors');
 const ProxyDataSync = require('../../../api/services/ProxyDataSync');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
+let removeSiteStub;
+let saveSiteStub;
+beforeEach(() => {
+  removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
+  saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
+});
+
+afterEach(() => {
+  sinon.restore();
+});
 
 describe('Site API', () => {
   const siteResponseExpectations = (response, site) => {
@@ -244,15 +254,11 @@ describe('Site API', () => {
       mockRouteResponse(s3.bucket);
     }
 
-    let saveSiteStub;
-    let removeSiteStub;
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.repo();
       githubAPINocks.createRepoForOrg();
       githubAPINocks.webhook();
-      removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
-      saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
     });
 
     afterEach(() => {
@@ -348,7 +354,7 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should not call ProxyDataSync.saveSite when FEATURE_PROXY_EDGE_DYNAMO=false', (done) => {
+    it('should not call ProxyDataSync when FEATURE_PROXY_EDGE_DYNAMO=false', (done) => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
 
@@ -1106,11 +1112,9 @@ describe('Site API', () => {
 
   describe('DELETE /v0/site/:id', () => {
     let s3RemoveSiteStub;
-    let removeSiteStub;
 
     beforeEach(() => {
       s3RemoveSiteStub = sinon.stub(S3SiteRemover, 'removeSite').resolves();
-      removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
     });
 
     afterEach(() => {
@@ -1202,7 +1206,7 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should delete w/o calling ProxyDataSync remove site when env FEATURE_PROXY_EDGE_DYNAMO=false', (done) => {
+    it('should not call ProxyDataSync when env FEATURE_PROXY_EDGE_DYNAMO=false', (done) => {
       let site;
 
       factory.site()
@@ -1598,14 +1602,6 @@ describe('Site API', () => {
   });
 
   describe('Site basic authentication API', () => {
-    let saveSiteStub;
-    beforeEach(() => {
-      saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').resolves();
-    });
-    afterEach(() => {
-      sinon.restore();
-    });
-
     describe('DELETE /v0/site/:site_id/basic-auth', () => {
       describe('when the user is not authenticated', () => {
         it('returns a 403', async () => {
@@ -1681,6 +1677,35 @@ describe('Site API', () => {
 
           site = await site.reload();
           expect(site.config).to.deep.equal({ blah: 'blahblah' });
+        });
+
+        it('should not call ProxyDataSync when env FEATURE_PROXY_EDGE_DYNAMO=false', async () => {
+          const userPromise = await factory.user();
+          const siteConfig = {
+            basicAuth: {
+              username: 'user',
+              password: 'password',
+            },
+            blah: 'blahblah',
+          };
+          let site = await factory.site({
+            users: [userPromise],
+            config: siteConfig,
+          });
+
+          const cookie = await authenticatedSession(userPromise);
+          expect(site.config).to.deep.eq(siteConfig);
+          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
+          const { body } = await request(app)
+            .delete(`/v0/site/${site.id}/basic-auth`)
+            .set('Cookie', cookie)
+            .set('x-csrf-token', csrfToken.getToken())
+            .type('json')
+            .expect(200);
+
+          site = await site.reload();
+          expect(saveSiteStub.notCalled).to.equal(true);
+          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
         });
       });
     });
@@ -1802,10 +1827,8 @@ describe('Site API', () => {
             blah: 'blahblahblah',
           });
         });
-      });
-
-      describe('when the parameters are valid', () => {
-        it('sets username and password for basic authentication', async () => {
+      
+        it('should not call ProxyDataSync when env FEATURE_PROXY_EDGE_DYNAMO=false', async () => {
           const userPromise = await factory.user();
           const site = await factory.site({
             users: [userPromise],
@@ -1829,13 +1852,8 @@ describe('Site API', () => {
 
 
           validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 200, body);
-          await site.reload();
-          expect(site.config).to.deep.equal({
-            basicAuth: credentials,
-            blah: 'blahblahblah',
-          });
           expect(saveSiteStub.notCalled).to.equal(true);
-          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
+          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
         });
       });
     });
