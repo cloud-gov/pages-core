@@ -13,12 +13,11 @@ function buildViewLink(build, site) {
   } else if ((build.branch === site.demoBranch) && site.demoDomain) {
     link = site.demoDomain;
   } else {
-    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE)) {
-      link = siteViewDomain(site);
+    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_LINKS)) {
+      link = `${siteViewDomain(site)}${buildPath(build, site)}`;
     }  else {
       link = build.url || buildUrl(build, site);
     }
-    link = `${link}${buildPath(build, site)}`;
   }
   return `${link.replace(/\/+$/, '')}/`;
 }

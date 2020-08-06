@@ -15,7 +15,7 @@ function siteViewLink(site, deployment = 'site') {
 }
 
 function siteViewDomain(site) {
-  if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE)) {
+  if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_LINKS)) {
     return config.app.proxyPreviewHost.replace('*', site.subdomain);
   }
   return `https://${site.awsBucketName}.app.cloud.gov`;

@@ -16,7 +16,8 @@ services:
     environment:
       JWT_SECRET: 'shhHhh...'
       USER_AUDITOR: federalist
-      FEATURE_PROXY_EDGE: 'true'
+      FEATURE_PROXY_EDGE_LINKS: 'true'
+      FEATURE_PROXY_EDGE_DYNAMO: 'true'
   db:
     build:
       dockerfile: Dockerfile-db

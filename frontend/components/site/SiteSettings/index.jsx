@@ -97,7 +97,7 @@ class SiteSettings extends React.Component {
             siteId={site.id}
           />
         </ExpandableArea>
-        { FEATURE_PROXY_EDGE === 'true' &&
+        { FEATURE_PROXY_EDGE_LINKS === 'true' &&
           <ExpandableArea title="Basic Authentication">
             <BasicAuthSettings
               siteId={site.id}

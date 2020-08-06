@@ -90,7 +90,7 @@ module.exports = {
       .then(() => S3SiteRemover.removeSite(site))
       .then(() => S3SiteRemover.removeInfrastructure(site))
       .then(() => {
-        if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE)) {
+        if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
           return ProxyDataSync.removeSite(site)
             .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
         }
@@ -177,7 +177,7 @@ module.exports = {
       }))
       .then((_site) => {
         site = _site;
-        if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE)) {
+        if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
           return ProxyDataSync.saveSite(site)
             .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
         }
@@ -264,7 +264,7 @@ module.exports = {
       basicAuth: credentials,
     };
     await site.update({ config });
-    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE)) {
+    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
       ProxyDataSync.saveSite(site) // sync to proxy database
         .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
     }
@@ -287,7 +287,7 @@ module.exports = {
     delete config.basicAuth;
 
     await site.update({ config });
-    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE)) {
+    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
       ProxyDataSync.saveSite(site) // sync to proxy database
         .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
     }
