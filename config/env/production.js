@@ -103,9 +103,7 @@ if (dynamoDBCreds) {
     region: dynamoDBCreds.region,
   };
 } else {
-  if (process.env.FEATURE_PROXY_EDGE_DYNAMO === 'true') {
     throw new Error('No DynamoDB credentials found');
-  }
 }
 
 // See https://github.com/nfriedly/express-rate-limit/blob/master/README.md#configuration
