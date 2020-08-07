@@ -23,13 +23,20 @@ const ProxyDataSync = require('../../../api/services/ProxyDataSync');
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 let removeSiteStub;
 let saveSiteStub;
+const defaultProxyEgeLinks = process.env.FEATURE_PROXY_EDGE_LINKS;
+
 beforeEach(() => {
   removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
   saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
+  process.env.FEATURE_PROXY_EDGE_LINKS = 'true'
 });
 
 afterEach(() => {
   sinon.restore();
+});
+
+after(() => {
+  process.env.FEATURE_PROXY_EDGE_LINKS = defaultProxyEgeLinks;
 });
 
 describe('Site API', () => {
