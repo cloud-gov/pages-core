@@ -39,3 +39,4 @@ applications:
     PROXY_SITE_TABLE: federalist-proxy-staging
     FEATURE_PROXY_EDGE_DYNAMO: 'true'
     FEATURE_PROXY_EDGE_LINKS: 'true'
+    FEATURE_ADMIN_AUTH: 'true'

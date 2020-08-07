@@ -22,6 +22,7 @@ applications:
       - federalist-((env))-uev-key
       - federalist-deploy-user
       - federalist-site-wide-error
+      - federalist-((env))-dynamodb-creds
     env:
       NODE_ENV: production
       APP_ENV: ((env))
@@ -36,6 +37,8 @@ applications:
       USER_AUDITOR: federalist
       S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
       FEATURE_ADMIN_AUTH: ((feature_admin_auth))
+      FEDERALIST_PREVIEW_HOSTNAME: https://*.sites((env_postfix)).federalist.18f.gov
+      PROXY_SITE_TABLE: federalist-proxy-((env))
   - name: federalist-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client
