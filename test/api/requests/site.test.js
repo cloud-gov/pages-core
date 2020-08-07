@@ -19,6 +19,7 @@ const { Build, Site, User } = require('../../../api/models');
 const S3SiteRemover = require('../../../api/services/S3SiteRemover');
 const siteErrors = require('../../../api/responses/siteErrors');
 const ProxyDataSync = require('../../../api/services/ProxyDataSync');
+const SQS = require('../../../api/services/SQS');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 let removeSiteStub;
@@ -40,6 +41,14 @@ after(() => {
 });
 
 describe('Site API', () => {
+  beforeEach(() => {
+    sinon.stub(SQS, 'sendBuildMessage').resolves();
+  });
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
   const siteResponseExpectations = (response, site) => {
     expect(response.owner).to.equal(site.owner);
     expect(response.repository).to.equal(site.repository);

@@ -1,16 +1,25 @@
 const { expect } = require('chai');
 const request = require('supertest');
-
+const sinon = require('sinon');
 const app = require('../../../app');
 const factory = require('../support/factory');
 const { authenticatedSession, unauthenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const csrfToken = require('../support/csrfToken');
 const { Site, User } = require('../../../api/models');
+const SQS = require('../../../api/services/SQS');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 
 describe('SiteUser API', () => {
+  beforeEach(() => {
+    sinon.stub(SQS, 'sendBuildMessage').resolves();
+  });
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
   describe('PUT /v0/site/:site_id/notifications', () => {
     it('should require authentication', (done) => {
       let site;

@@ -74,6 +74,7 @@ module.exports = {
         user: req.user.id,
         commitSha: build.commitSha,
       }))
+      .then(build => build.enqueue())
       .then(build => GithubBuildStatusReporter
         .reportBuildStatus(build)
         .then(() => build))

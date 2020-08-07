@@ -1,10 +1,12 @@
 const GitHubStrategy = require('passport-github').Strategy;
-const passport = require('passport');
+const Passport = require('passport');
 const config = require('../../config');
 const { User } = require('../models');
 const { logger } = require('../../winston');
 const GitHub = require('./GitHub');
 const RepositoryVerifier = require('./RepositoryVerifier');
+
+const passport = new Passport.Passport();
 
 const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
   let user;
@@ -80,19 +82,5 @@ passport.deserializeUser((id, next) => {
     next(null, user);
   });
 });
-
-const externalCallback = (accessToken, _refreshToken, _profile, callback) => {
-  GitHub.validateUser(accessToken)
-    .then(() => callback(null, { accessToken }))
-    .catch((err) => {
-      if (err.message === 'Unauthorized') {
-        callback(null, false);
-      } else {
-        callback(err);
-      }
-    });
-};
-
-passport.use('external', new GitHubStrategy(config.passport.github.externalOptions, externalCallback));
 
 module.exports = passport;

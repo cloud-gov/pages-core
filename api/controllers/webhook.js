@@ -93,7 +93,8 @@ const createBuildForWebhookRequest = async (request) => {
     commitSha,
     site: site.id,
     user: user.id,
-  });
+  })
+    .then(build => build.enqueue());
 };
 
 module.exports = {

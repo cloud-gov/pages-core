@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const { expect } = require('chai');
 const nock = require('nock');
-const { stub } = require('sinon');
+const sinon = require('sinon');
 const config = require('../../../../config/env/test');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
@@ -10,9 +10,17 @@ const apiNocks = require('../../support/cfAPINocks');
 const SiteCreator = require('../../../../api/services/SiteCreator');
 const TemplateResolver = require('../../../../api/services/TemplateResolver');
 const { Build, Site, User } = require('../../../../api/models');
+const SQS = require('../../../../api/services/SQS');
 
 describe('SiteCreator', () => {
-  afterEach(() => nock.cleanAll());
+  beforeEach(() => {
+    sinon.stub(SQS, 'sendBuildMessage').resolves();
+  });
+
+  afterEach(() => {
+    nock.cleanAll();
+    sinon.restore();
+  });
 
   describe('.createSite', () => {
     const validateSiteExpectations = (
@@ -311,7 +319,7 @@ describe('SiteCreator', () => {
       });
 
       it('should trigger a build that pushes the source repo to the destiantion repo', (done) => {
-        const templateResolverStub = stub(TemplateResolver, 'getTemplate');
+        const templateResolverStub = sinon.stub(TemplateResolver, 'getTemplate');
         const fakeTemplate = {
           repo: 'federalist-template',
           owner: '18f',

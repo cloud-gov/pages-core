@@ -1,17 +1,14 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const factory = require('../../support/factory');
 const MockGitHub = require('../../support/mockGitHub');
-const { SiteUser, UserAction } = require('../../../../api/models');
+const { SiteUser, User, UserAction } = require('../../../../api/models');
 
 const SiteUserAuditor = proxyquire('../../../../api/services/SiteUserAuditor', { './GitHub': MockGitHub });
 
-
 describe('SiteUserAuditor', () => {
-  before(() => {
-    factory.user({ username: process.env.USER_AUDITOR })
-      .catch();
-  });
+  before(() => factory.user({ username: process.env.USER_AUDITOR }));
+  after(() => User.truncate({ force: true }));
 
   context('auditAllUsers', () => {
     it('it should remove sites without push from user and site w/o repo', (done) => {

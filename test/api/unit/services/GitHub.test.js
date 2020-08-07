@@ -639,4 +639,41 @@ describe('GitHub', () => {
         }).catch(done);
     });
   });
+
+  describe('.ensureFederalistAdmin(accessToken, username)', () => {
+    const accessToken = 'abc123';
+    const username = 'some-user';
+
+    it('rejects when the user is not a member of the team', async () => {
+      githubAPINocks.getMembershipForUserInOrg({ accessToken, username, state: 'unknown' });
+
+      const err = await GitHub.ensureFederalistAdmin(accessToken, username).catch(e => e);
+
+      expect(err.status).to.eq(404);
+    });
+
+    it('rejects when the user is a pending member of the team', async () => {
+      githubAPINocks.getMembershipForUserInOrg({ accessToken, username, state: 'pending' });
+
+      const err = await GitHub.ensureFederalistAdmin(accessToken, username).catch(e => e);
+
+      expect(err.message).to.eq('You are not a Federalist admin.');
+    });
+
+    it('resolves when the user is a member of the team', async () => {
+      githubAPINocks.getMembershipForUserInOrg({ accessToken, username });
+
+      const result = await GitHub.ensureFederalistAdmin(accessToken, username);
+
+      expect(result).to.be.undefined;
+    });
+
+    it('resolves when the user is a maintainer of the team', async () => {
+      githubAPINocks.getMembershipForUserInOrg({ accessToken, username, state: 'maintainer' });
+
+      const result = await GitHub.ensureFederalistAdmin(accessToken, username);
+
+      expect(result).to.be.undefined;
+    });
+  });
 });

@@ -165,11 +165,9 @@ module.exports = {
 
   create: (req, res) => {
     const { body, user } = req;
-
-    const siteParams = Object.assign({}, body, {
-      sharedBucket: false,
-    });
     let site;
+    const siteParams = { ...body, sharedBucket: false };
+
     authorizer.create(user, siteParams)
       .then(() => SiteCreator.createSite({
         user,
@@ -227,13 +225,15 @@ module.exports = {
         site: siteId,
         branch: model.defaultBranch,
       }))
+      .then(build => build.enqueue())
       .then(() => {
         if (site.demoBranch) {
           return Build.create({
             user: req.user.id,
             site: siteId,
             branch: site.demoBranch,
-          });
+          })
+            .then(build => build.enqueue());
         }
         return null;
       })
