@@ -425,6 +425,30 @@ const getCollaborators = ({
 };
 /* eslint-enable camelcase */
 
+const getMembershipForUserInOrg = ({
+  accessToken = 'access-token-123abc',
+  username = 'some-user',
+  state,
+}) => {
+  const nok = withAuth(nock('https://api.github.com'), accessToken)
+    .get(`/orgs/18f/teams/federalist-admins/memberships/${username}`);
+
+  switch (state) {
+    case 'pending':
+      nok.reply(200, { state: 'pending', role: 'member' });
+      break;
+    case 'maintainer':
+      nok.reply(200, { state: 'active', role: 'maintainer' });
+      break;
+    case 'unknown':
+      nok.reply(404);
+      break;
+    default:
+      nok.reply(200, { state: 'active', role: 'member' });
+  }
+  return nok;
+};
+
 module.exports = {
   getAccessToken,
   createRepoForOrg,
@@ -441,4 +465,5 @@ module.exports = {
   getOrganizationMembers,
   getRepositories,
   getCollaborators,
+  getMembershipForUserInOrg,
 };

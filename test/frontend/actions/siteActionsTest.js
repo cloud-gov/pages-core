@@ -279,6 +279,7 @@ describe('siteActions', () => {
         completely: 'ignored',
       };
       deleteSite.withArgs(siteId).resolves(siteToDelete);
+      fetchSites.resolves();
 
       const actual = fixture.deleteSite(siteId);
 

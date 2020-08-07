@@ -1,37 +1,43 @@
 ---
 applications:
-- name: ((name))
-  buildpack: nodejs_buildpack
-  routes:
-    - route: federalist((env_postfix)).fr.cloud.gov
-    - route: federalistapp((env_postfix)).18f.gov
-    - route: federalistapp((env_postfix)).fr.cloud.gov
-    - route: federalistapp((env_postfix)).apps.internal
-  disk_quota: 2G
-  memory: ((memory))
-  instances: ((instances))
-  services:
-    - federalist-((env))-rds
-    - federalist-((env))-s3
-    - federalist-((env))-env
-    - federalist-((env))-sqs-creds
-    - federalist-((env))-redis
-    - federalist-((env))-space
-    - federalist-((env))-proxy
-    - federalist-((env))-domain
-    - federalist-((env))-uev-key
-    - federalist-deploy-user
-    - federalist-site-wide-error
-  env:
-    NODE_ENV: production
-    APP_ENV: ((env))
-    APP_HOSTNAME: https://federalistapp((env_postfix)).18f.gov
-    CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
-    CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
-    HOMEPAGE_URL: https://federalist((env_postfix)).18f.gov
-    LOG_LEVEL: ((log_level))
-    NPM_CONFIG_PRODUCTION: true
-    NODE_MODULES_CACHE: false
-    SOCKET_HOST: https://federalistapp((env_postfix)).fr.cloud.gov
-    USER_AUDITOR: federalist
-    S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
+  - name: ((name))
+    buildpack: nodejs_buildpack
+    routes:
+      - route: federalist((env_postfix)).fr.cloud.gov
+      - route: federalistapp((env_postfix)).18f.gov
+      - route: federalistapp((env_postfix)).fr.cloud.gov
+      - route: federalistapp((env_postfix)).apps.internal
+    disk_quota: 2G
+    memory: ((memory))
+    instances: ((instances))
+    services:
+      - federalist-((env))-rds
+      - federalist-((env))-s3
+      - federalist-((env))-env
+      - federalist-((env))-sqs-creds
+      - federalist-((env))-redis
+      - federalist-((env))-space
+      - federalist-((env))-proxy
+      - federalist-((env))-domain
+      - federalist-((env))-uev-key
+      - federalist-deploy-user
+      - federalist-site-wide-error
+    env:
+      NODE_ENV: production
+      APP_ENV: ((env))
+      APP_HOSTNAME: https://federalistapp((env_postfix)).18f.gov
+      CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
+      CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
+      HOMEPAGE_URL: https://federalist((env_postfix)).18f.gov
+      LOG_LEVEL: ((log_level))
+      NPM_CONFIG_PRODUCTION: true
+      NODE_MODULES_CACHE: false
+      SOCKET_HOST: https://federalistapp((env_postfix)).fr.cloud.gov
+      USER_AUDITOR: federalist
+      S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
+      FEATURE_ADMIN_AUTH: ((feature_admin_auth))
+  - name: federalist-admin((env_postfix))
+    buildpack: staticfile_buildpack
+    path: ../admin-client
+    routes:
+      - route: admin.federalistapp((env_postfix)).18f.gov

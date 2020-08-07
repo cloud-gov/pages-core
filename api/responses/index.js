@@ -4,6 +4,7 @@ const forbidden = require('./forbidden');
 const notFound = require('./notFound');
 const ok = require('./ok');
 const serverError = require('./serverError');
+const unauthorized = require('./unauthorized');
 
 module.exports = (req, res, next) => {
   res.badRequest = data => badRequest(data, { res });
@@ -12,5 +13,6 @@ module.exports = (req, res, next) => {
   res.notFound = data => notFound(data, { res });
   res.ok = data => ok(data, { res });
   res.serverError = data => serverError(data, { res });
+  res.unauthorized = data => unauthorized(data, { res });
   next();
 };

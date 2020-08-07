@@ -1,13 +1,14 @@
 const crypto = require('crypto');
 const { expect } = require('chai');
 const nock = require('nock');
+const sinon = require('sinon');
 const request = require('supertest');
 const app = require('../../../app');
 const config = require('../../../config');
 const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
 const { Build, Site, User } = require('../../../api/models');
-
+const SQS = require('../../../api/services/SQS');
 
 describe('Webhook API', () => {
   const signWebhookPayload = (payload) => {
@@ -29,6 +30,11 @@ describe('Webhook API', () => {
       nock.cleanAll();
       githubAPINocks.status();
       githubAPINocks.repo({ response: [201, { permissions: { admin: false } }] });
+      sinon.stub(SQS, 'sendBuildMessage').resolves();
+    });
+
+    afterEach(() => {
+      sinon.restore();
     });
 
     it('should create a new site build for the sender', (done) => {

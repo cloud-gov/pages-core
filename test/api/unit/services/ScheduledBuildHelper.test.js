@@ -1,21 +1,25 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const factory = require('../../support/factory');
-const { Build, Site } = require('../../../../api/models');
+const { Build, Site, User } = require('../../../../api/models');
 const ScheduledBuildHelper = require('../../../../api/services/ScheduledBuildHelper');
-
+const SQS = require('../../../../api/services/SQS');
 
 describe('ScheduledBuildHelper', () => {
   const nightlyConfig = { schedule: 'nightly' };
 
   before(async () => {
+    sinon.stub(SQS, 'sendBuildMessage').resolves();
     await factory.user({ username: process.env.USER_AUDITOR });
   });
 
   afterEach(async () => {
     sinon.restore();
-    await Build.truncate();
-    await Site.truncate();
+    await Promise.all([
+      Build.truncate(),
+      Site.truncate(),
+      User.truncate({ force: true }),
+    ]);
   });
 
   describe('when there is an error', () => {
