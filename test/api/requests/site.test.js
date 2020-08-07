@@ -28,7 +28,7 @@ const defaultProxyEgeLinks = process.env.FEATURE_PROXY_EDGE_LINKS;
 beforeEach(() => {
   removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
   saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
-  process.env.FEATURE_PROXY_EDGE_LINKS = 'true'
+  process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true'
 });
 
 afterEach(() => {
@@ -36,7 +36,7 @@ afterEach(() => {
 });
 
 after(() => {
-  process.env.FEATURE_PROXY_EDGE_LINKS = defaultProxyEgeLinks;
+  process.env.FEATURE_PROXY_EDGE_DYNAMO = defaultProxyEgeLinks;
 });
 
 describe('Site API', () => {
@@ -399,7 +399,6 @@ describe('Site API', () => {
         .then((site) => {
           expect(site).to.not.be.undefined;
           expect(saveSiteStub.notCalled).to.equal(true);
-          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
           done();
         })
         .catch(done);
@@ -1244,7 +1243,6 @@ describe('Site API', () => {
         .then((sites) => {
           expect(sites).to.be.empty;
           expect(removeSiteStub.notCalled).to.equal(true);
-          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
           done();
         })
         .catch(done);
@@ -1712,7 +1710,6 @@ describe('Site API', () => {
 
           site = await site.reload();
           expect(saveSiteStub.notCalled).to.equal(true);
-          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
         });
       });
     });
@@ -1860,7 +1857,6 @@ describe('Site API', () => {
 
           validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 200, body);
           expect(saveSiteStub.notCalled).to.equal(true);
-          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
         });
       });
     });
