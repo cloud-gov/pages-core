@@ -38,9 +38,9 @@ describe('ProxyDataSync', () => {
     delete siteItem.UpdatedAt;
     expect(siteItem).to.deep.equal({
       Id: site.subdomain,
+      BucketName: site.awsBucketName,
+      BucketRegion: site.awsBucketRegion,
       Settings: {
-        BucketName: site.awsBucketName,
-        BucketRegion: site.awsBucketRegion,
       },
       SiteUpdatedAt: site.updatedAt.toISOString(),
     });
@@ -74,9 +74,9 @@ describe('ProxyDataSync', () => {
     const item = {
       Id: getSiteKey(site),
       Settings: {
-        BucketName: site.awsBucketName,
-        BucketRegion: site.awsBucketRegion,
       },
+      BucketName: site.awsBucketName,
+      BucketRegion: site.awsBucketRegion,
       SiteUpdatedAt: site.updatedAt.toISOString(),
     };
     
@@ -99,9 +99,9 @@ describe('ProxyDataSync', () => {
 
     const item = {
       Id: getSiteKey(site),
+      BucketName: site.awsBucketName,
+      BucketRegion: site.awsBucketRegion,
       Settings: {
-        BucketName: site.awsBucketName,
-        BucketRegion: site.awsBucketRegion,
         BasicAuth: {
           Username: basicAuth.username,
           Password: basicAuth.password,

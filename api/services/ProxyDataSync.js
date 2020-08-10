@@ -8,10 +8,9 @@ const getSiteKey = site => site.subdomain;
 
 const siteToItem = (site) => {
   const item = {
-    Settings: {
-      BucketName: site.awsBucketName,
-      BucketRegion: site.awsBucketRegion,
-    },
+    Settings: {},
+    BucketName: site.awsBucketName,
+    BucketRegion: site.awsBucketRegion,
     UpdatedAt: new Date().toISOString(),
     SiteUpdatedAt: site.updatedAt.toISOString(),
   };
