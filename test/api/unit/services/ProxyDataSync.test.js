@@ -102,7 +102,10 @@ describe('ProxyDataSync', () => {
       Settings: {
         BucketName: site.awsBucketName,
         BucketRegion: site.awsBucketRegion,
-        BasicAuth: basicAuth,
+        BasicAuth: {
+          Username: basicAuth.username,
+          Password: basicAuth.password,
+        },
       },
       SiteUpdatedAt: site.updatedAt.toISOString(),
     };
