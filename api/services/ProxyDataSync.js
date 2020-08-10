@@ -16,8 +16,14 @@ const siteToItem = (site) => {
     SiteUpdatedAt: site.updatedAt.toISOString(),
   };
 
-  if (site.config.basicAuth && site.config.basicAuth.username && site.config.basicAuth.password) {
-    item.Settings.BasicAuth = site.config.basicAuth;
+  if (site.config.basicAuth) {
+    const { username, password } = site.config.basicAuth;
+    if (username && password) {
+      item.Settings.BasicAuth = {
+        Username: username,
+        Password: password,
+      };
+    }
   }
 
   item[siteKey] = getSiteKey(site);
