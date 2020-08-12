@@ -25,7 +25,7 @@ applications:
   env:
     NODE_ENV: production
     APP_ENV: staging
-    APP_HOSTNAME: https://federalistapp-proxy-edge-dev.18f.gov
+    APP_HOSTNAME: https://federalistapp-proxy-edge-dev.fr.cloud.gov
     CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
     CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
     HOMEPAGE_URL: https://federalist-proxy-edge-dev.18f.gov
