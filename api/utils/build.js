@@ -1,4 +1,5 @@
 const { siteViewDomain } = require('./site');
+const Features = require('../features');
 
 function buildUrl(build, site) {
   const path = buildPath(build, site);
@@ -12,7 +13,11 @@ function buildViewLink(build, site) {
   } else if ((build.branch === site.demoBranch) && site.demoDomain) {
     link = site.demoDomain;
   } else {
-    link = `${siteViewDomain(site)}${buildPath(build, site)}`;
+    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_LINKS)) {
+      link = `${siteViewDomain(site)}${buildPath(build, site)}`;
+    }  else {
+      link = build.url || buildUrl(build, site);
+    }
   }
   return `${link.replace(/\/+$/, '')}/`;
 }

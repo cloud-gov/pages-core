@@ -37,3 +37,6 @@ applications:
     USER_AUDITOR: federalist
     S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
     PROXY_SITE_TABLE: federalist-proxy-staging
+    FEATURE_PROXY_EDGE_DYNAMO: 'true'
+    FEATURE_PROXY_EDGE_LINKS: 'true'
+    FEATURE_ADMIN_AUTH: 'true'
