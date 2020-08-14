@@ -1,5 +1,8 @@
 <script>
+  import { router } from '../stores';
   import Logout from './Logout.svelte';
+
+  $: currentPath = $router.pathname;
 
   let isOpen = false;
 
@@ -18,10 +21,16 @@
 
   a.usa-nav__link {
     color: #ffffff;
+    font-weight: normal;
   }
-
-  a.usa-nav__link:hover {
-    color: #005ea2;
+  
+  a.usa-nav__link:hover::after,
+  a.usa-current::after {
+    background-color: #ffffff;
+  }
+  
+  .usa-logo {
+    margin: 0;
   }
 
   .usa-logo a {
@@ -42,7 +51,7 @@
 <header class="usa-header usa-header--basic">
   <div class="usa-nav-container">
     <div class="usa-navbar">
-      <div class="usa-logo" id="basic-logo">
+      <div class="usa-logo">
         <em class="usa-logo__text">
           <a
             class="font-ui-l tablet:font-ui-xl desktop:font-ui-2xl"
@@ -65,12 +74,12 @@
       </button>
       <ul class="usa-nav__primary usa-accordion">
         <li class="usa-nav__primary-item">
-          <a class="usa-nav__link" href="/sites">
+          <a class="usa-nav__link" class:usa-current={currentPath === '/sites'} href="/sites">
             <span>Sites</span>
           </a>
         </li>
         <li class="usa-nav__primary-item">
-          <a class="usa-nav__link" href="/builds">
+          <a class="usa-nav__link"  class:usa-current={currentPath === '/builds'} href="/builds">
             <span>Builds</span>
           </a>
         </li>
