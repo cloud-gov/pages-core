@@ -1,16 +1,22 @@
 <script>
   import page from 'page';
   import { get } from 'svelte/store';
-  import { session } from './stores';
+  import { router, session } from './stores';
   import * as Pages from './pages';
 
   let currentPage;
   let redirect;
 
+  function queryString(ctx, next) {
+    ctx.query = {};
+    new URLSearchParams(ctx.querystring)
+      .forEach((v, k) => { ctx.query[k] = v; });
+    next();
+  }
+
   function ensureAuthenticated(ctx, next) {
-    if (get(session).authenticated) {
-      next();
-    } else {
+    if (get(session).authenticated) next();
+    else {
       redirect = ctx.path;
       page.redirect('/login');
     }
@@ -30,8 +36,9 @@
   }
 
   function render(component) {
-    return () => {
+    return (ctx) => {
       currentPage = component;
+      router.setContext(ctx);
     };
   }
 
@@ -41,8 +48,8 @@
   // Authenticated Routes
   page('*', ensureAuthenticated);
   page('/', checkRedirect, render(Pages.Home));
-  page('/sites', render(Pages.Sites));
-  page('/builds', render(Pages.Builds));
+  page('/sites', queryString, render(Pages.Sites));
+  page('/builds', queryString, render(Pages.Builds));
   page('*', render(Pages.NotFound));
   page();
 </script>

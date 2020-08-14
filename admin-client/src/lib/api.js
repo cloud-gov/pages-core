@@ -39,8 +39,10 @@ async function fetchBuilds() {
   return _fetch('/builds').catch(() => []);
 }
 
-async function fetchSites() {
-  return _fetch('/sites').catch(() => []);
+async function fetchSites({ q }) {
+  const search = new URLSearchParams();
+  search.set('q', q);
+  return _fetch(`/sites?${search.toString()}`).catch(() => []);
 }
 
 async function logout() {
