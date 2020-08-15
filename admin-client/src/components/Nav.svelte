@@ -23,12 +23,12 @@
     color: #ffffff;
     font-weight: normal;
   }
-  
+
   a.usa-nav__link:hover::after,
   a.usa-current::after {
     background-color: #ffffff;
   }
-  
+
   .usa-logo {
     margin: 0;
   }
@@ -70,7 +70,7 @@
       aria-label="Primary navigation"
       class=" bg-primary-darker usa-nav {visible}">
       <button on:click|preventDefault={toggleOpen} class="usa-nav__close">
-        <img src="img/close.svg" alt="close" />
+        <img src="/img/close.svg" alt="close" />
       </button>
       <ul class="usa-nav__primary usa-accordion">
         <li class="usa-nav__primary-item">

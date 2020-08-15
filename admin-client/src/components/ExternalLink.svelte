@@ -1,6 +1,7 @@
 <script>
   export let href = 'https://example.com';
   export let icon = 'externalLink';
+  export let className = '';
 
   const icons = {
     externalLink: '/img/external-link.svg',
@@ -24,7 +25,7 @@
 <a
   rel="noreferrer"
   target="_blank"
-  class="font-code-2xs padding-x-1 text-primary text-ls-neg-3 text-uppercase"
+  class="font-code-2xs text-primary text-ls-neg-3 text-uppercase {className}"
   {href}
   style="--icon-url: url({icons[icon]})">
   <slot />

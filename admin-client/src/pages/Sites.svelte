@@ -61,8 +61,8 @@
       <p>Loading...</p>
     {:then sites}
       {#if sites.length > 0}
-        {#each sites as site}
-          <SiteCard {site} />
+        {#each sites as site, index}
+          <SiteCard {site} {index} />
         {/each}
       {/if}
     {/await}
