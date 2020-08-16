@@ -1,6 +1,6 @@
 <script>
   import { router } from '../stores';
-  import { fetchSites } from '../lib/api';
+  import { fetchBuilds, fetchSites } from '../lib/api';
 
   import {
     BuildList,
@@ -14,7 +14,7 @@
 
 <GridContainer>
   {#await fetchSites({ q: id })}
-    <p>Loading...</p>
+    <p>Loading attributes...</p>
   {:then sites}
     {#if sites.length > 0}
       {#each sites as site}
@@ -23,7 +23,13 @@
       {/each}
     {/if}
   {:catch error}
-    <p>Something went wrong fetching the site: {error.message}</p>
+    <p>Something went wrong fetching the site metadata: {error.message}</p>
   {/await}
-  <BuildList />
+  {#await fetchBuilds({ site: id })}
+    <p>Loading builds...</p>
+  {:then builds}
+    <BuildList {builds} />
+  {:catch error}
+    <p>Something went wrong fetching the site builds: {error.message}</p>
+  {/await}
 </GridContainer>

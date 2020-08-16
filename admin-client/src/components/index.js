@@ -1,4 +1,5 @@
 export { default as Banner } from './Banner.svelte';
+export { default as BuildCard } from './BuildCard.svelte';
 export { default as BuildList } from './BuildList.svelte';
 export { default as ExternalLink } from './ExternalLink.svelte';
 export { default as GridContainer } from './GridContainer.svelte';

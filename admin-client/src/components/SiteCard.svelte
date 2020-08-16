@@ -42,7 +42,7 @@
   const createDate = formatDateTime(createdAt);
   const updateDate = formatDateTime(updatedAt);
 
-  $: bgColor = index % 2 === 0 ? 'bg-white' : 'bg-gray-5';
+  $: bgColor = index % 2 === 0 ? 'bg-gray-5' : 'bg-white';
 </script>
 
 <style>

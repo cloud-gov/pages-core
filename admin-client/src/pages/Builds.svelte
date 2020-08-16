@@ -1,19 +1,22 @@
 <script>
   import { fetchBuilds } from '../lib/api';
+
+  import BuildCard from '../components/BuildCard.svelte';
   import GridContainer from '../components/GridContainer.svelte';
   import PageTitle from '../components/PageTitle.svelte';
-  import SiteCard from '../components/SiteCard.svelte';
 </script>
 
 <GridContainer>
   <PageTitle>Builds</PageTitle>
   {#await fetchBuilds()}
-    <p>Loading...</p>
+    <p>Loading builds...</p>
   {:then builds}
     {#if builds.length > 0}
-      {#each builds as build}
-        <SiteCard />
+      {#each builds as build, index}
+        <BuildCard {build} {index} showSite={true} />
       {/each}
+    {:else}
+      <p>No builds found.</p>
     {/if}
   {/await}
 </GridContainer>
