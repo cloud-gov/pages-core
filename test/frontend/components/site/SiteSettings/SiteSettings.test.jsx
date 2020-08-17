@@ -33,8 +33,10 @@ describe('<SiteSettings/>', () => {
 
   let origWindow;
   let wrapper;
+  const defaultProxyEgeLinks = process.env.FEATURE_PROXY_EDGE_LINKS;
 
   beforeEach(() => {
+    process.env.FEATURE_PROXY_EDGE_LINKS = 'true'
     siteActionsMock.deleteSite = spy();
     siteActionsMock.updateSite = spy();
     siteActionsMock.addSite = spy();
@@ -49,6 +51,7 @@ describe('<SiteSettings/>', () => {
 
   after(() => {
     global.window = origWindow;
+    process.env.FEATURE_PROXY_EDGE_LINKS = defaultProxyEgeLinks;
   });
 
   it('should render', () => {
@@ -99,5 +102,18 @@ describe('<SiteSettings/>', () => {
     wrapper.instance().handleCopySite(newValues);
     expect(siteActionsMock.addSite.calledOnce).to.be.true;
     expect(siteActionsMock.addSite.calledWith(expectedValues)).to.be.true;
+  });
+
+  it('should render BasicAuthSettings', () => {
+    expect(wrapper.exists()).to.be.true;
+    expect(wrapper.find('BasicAuthSettings')).to.have.length(1);
+    expect(wrapper.find('ReduxForm')).to.have.length(1);
+  });
+
+  it('should not render BasicAuthSettings', () => {
+    process.env.FEATURE_PROXY_EDGE_LINKS = 'false'
+    expect(wrapper.exists()).to.be.true;
+    expect(wrapper.find('BasicAuthSettings')).to.have.length(0);
+    process.env.FEATURE_PROXY_EDGE_LINKS = 'true'
   });
 });

@@ -141,6 +141,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    config: {
+      type: DataTypes.JSONB,
+      defaultValue: {},
+    },
+    subdomain: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   }, {
     tableName: 'site',
     hooks: {
@@ -149,6 +157,12 @@ module.exports = (sequelize, DataTypes) => {
       validationFailed,
     },
     paranoid: true,
+
+    getterMethods: {
+      basicAuth() {
+        return this.config.basicAuth || {};
+      },
+    },
     scopes: {
       forUser: (user, User) => ({
         include: [{
