@@ -574,30 +574,30 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@newrelic/aws-sdk@^1.1.1":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@newrelic/aws-sdk/-/aws-sdk-1.1.2.tgz#bccb81bb5ac35e51c60750d4a8866caac821b553"
-  integrity sha512-1YX9Q8xGR/j6Ia7bEAlxiWP0IKS39EaXAuOvW4KimruirQPAFp2EECCQqtkg5psnhGrLELyMCDKNQSJaCUQk8Q==
+"@newrelic/aws-sdk@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@newrelic/aws-sdk/-/aws-sdk-2.0.0.tgz#d506961d64c298e5ddaa8ca0947fd37d2d3b2e2e"
+  integrity sha512-dHqR8a48w6Mq9ECtaObN3nS/ZeiZl3YZ3QMrP4WCVXdTaQcfbrISrd5sJcRX6WPwoPeI1m4ZFp36JsWDiXklAg==
 
-"@newrelic/koa@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@newrelic/koa/-/koa-3.0.0.tgz#048f636c6c06ab4e823674a2ed3d67677a22ed50"
-  integrity sha512-SxfcMqSxiKa3pi7dRmVoCXnh/VLc196GmwyGU2Fr5+vMxS5jPVj2a15v1mn2DGu04XngfXDvyt9Xa6u1JVRDpQ==
+"@newrelic/koa@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@newrelic/koa/-/koa-4.0.0.tgz#215b50eb6bd52f97f5ba9c78fd3e43d7c2c3fd75"
+  integrity sha512-OVOlKUDCY4+clAAZ7TdCPsXmuIR0/VM7+GLicyl7BsYT/XFMYItt2gCwgzvEkOxMjojk6CrnRoDjzE2BcYhAOw==
   dependencies:
     methods "^1.1.2"
 
-"@newrelic/native-metrics@^5.1.0":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@newrelic/native-metrics/-/native-metrics-5.1.0.tgz#03c5b904792a5accff691268d3f8b20be2489776"
-  integrity sha512-AD0C+QuPcmOH0n6hNfLacweJ/Kb35Hp9PChTmMqZ/7+Fflk2GbwrT/L/wVIZRXYrejByRV3Yh6Z1pyzl2g42Zg==
+"@newrelic/native-metrics@^5.3.0":
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/@newrelic/native-metrics/-/native-metrics-5.3.0.tgz#762ffcee0e682b1d4182ad307b6c2d32dda508ec"
+  integrity sha512-GF3AIUz6vGzTLeXtQPlwA54LHlQbmKjIxtwY+SKaiFebyL/C7eD1mwW+9sL07B93DIUcs+pEc/OnHei314mNWg==
   dependencies:
     nan "^2.14.1"
     semver "^5.5.1"
 
-"@newrelic/superagent@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@newrelic/superagent/-/superagent-2.0.1.tgz#8a0280598fedefd1b45fc83bdbc2707d129c47d5"
-  integrity sha512-1kOtaYh00DcK0IZ0LD3M6ja3urvm4a/waplr7TzrT/fDN/zgazpGSuRbYVg+O6zZacE4/Iw7OoKYGZW3bgBjJw==
+"@newrelic/superagent@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@newrelic/superagent/-/superagent-3.0.0.tgz#7759b5f5d9deaed1dfb1caef0e408bf5bc592c56"
+  integrity sha512-ihWTSkjOtYWsWe2CHWDSBeXwpLgHHeYJ9qCbBV9gzyTc4xPk7OrblBIZzpQqmAu5qnF3zbI+K/Celya80Y0bKQ==
   dependencies:
     methods "^1.1.2"
 
@@ -1543,14 +1543,14 @@ async-limiter@~1.0.0:
   resolved "https://registry.yarnpkg.com/async-limiter/-/async-limiter-1.0.1.tgz#dd379e94f0db8310b08291f9d64c3209766617fd"
   integrity sha512-csOlWGAcRFJaI6m+F2WKdnMKr4HhdhFVBk0H/QbJFMCr+uO2kwohwXQPxw/9OCxp05r5ghVBFSyioixx3gfkNQ==
 
-async@^2.1.4, async@^2.6.2:
+async@^2.6.2:
   version "2.6.3"
   resolved "https://registry.yarnpkg.com/async/-/async-2.6.3.tgz#d72625e2344a3656e3a3ad4fa749fa83299d82ff"
   integrity sha512-zflvls11DCy+dQWzTW2dzuilv8Z5X/pjfmZOWba6TNIVDm+2UDaJmXSOXlasHKfNBs8oo3M0aT50fDEWfKZjXg==
   dependencies:
     lodash "^4.17.14"
 
-async@^3.1.0:
+async@^3.1.0, async@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/async/-/async-3.2.0.tgz#b3a2685c5ebb641d3de02d161002c60fc9f85720"
   integrity sha512-TR2mEZFVOj2pLStYxLht7TyfuRzaydfpxr3k9RpHIzMgw7A64dzsdqCxH1WJyQdoe8T10nDXd9wnEigmiuHIZw==
@@ -8083,25 +8083,25 @@ neo-async@^2.5.0, neo-async@^2.6.1, neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-newrelic@^6.11:
-  version "6.11.0"
-  resolved "https://registry.yarnpkg.com/newrelic/-/newrelic-6.11.0.tgz#eb17483f62b09e65eaebd0b32e61d396e7fe0f3a"
-  integrity sha512-+GaI6yfn/ge7zIy2lMUr5yF3VHd6lHtm2wjWPyEHxbseyJhVN3vJWcKMtBnwCFK161AxFrXLcn50Cr22fb38bQ==
+newrelic@^6.12:
+  version "6.12.0"
+  resolved "https://registry.yarnpkg.com/newrelic/-/newrelic-6.12.0.tgz#d4c60a73322b7dd73fccd51fde3a4f0c552c7b85"
+  integrity sha512-yK5orT6SK3Ej3AFs34Vh8+AXxPtepxlT7m+cJrWEaOZZhsDv0iug7NhXI8MVJmDCrn8td9NVHbWZNZkacx4qtg==
   dependencies:
     "@grpc/grpc-js" "1.0.5"
     "@grpc/proto-loader" "^0.5.4"
-    "@newrelic/aws-sdk" "^1.1.1"
-    "@newrelic/koa" "^3.0.0"
-    "@newrelic/superagent" "^2.0.1"
+    "@newrelic/aws-sdk" "^2.0.0"
+    "@newrelic/koa" "^4.0.0"
+    "@newrelic/superagent" "^3.0.0"
     "@tyriar/fibonacci-heap" "^2.0.7"
-    async "^2.1.4"
+    async "^3.2.0"
     concat-stream "^2.0.0"
     https-proxy-agent "^4.0.0"
     json-stringify-safe "^5.0.0"
     readable-stream "^3.6.0"
     semver "^5.3.0"
   optionalDependencies:
-    "@newrelic/native-metrics" "^5.1.0"
+    "@newrelic/native-metrics" "^5.3.0"
 
 nice-try@^1.0.4:
   version "1.0.5"
