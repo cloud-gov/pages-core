@@ -34,3 +34,4 @@ exclude_patterns:
   - "scripts/"
   - "coverage/"
   - "migrate.js"
+  - "admin-client/"
