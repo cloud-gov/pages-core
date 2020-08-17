@@ -39,6 +39,8 @@ applications:
       FEATURE_ADMIN_AUTH: ((feature_admin_auth))
       FEDERALIST_PREVIEW_HOSTNAME: https://*.sites((env_postfix)).federalist.18f.gov
       PROXY_SITE_TABLE: federalist-proxy-((env))
+      FEATURE_PROXY_EDGE_DYNAMO: ((feature_proxy_edge_dynamo))
+      FEATURE_PROXY_EDGE_LINKS: ((feature_proxy_edge_links))
   - name: federalist-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client
