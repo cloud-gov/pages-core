@@ -7,6 +7,8 @@ import {
   siteDeleted, siteDeletedType,
   siteUserAdded, siteUserAddedType,
   siteUserRemoved, siteUserRemovedType,
+  siteBasicAuthSaved, siteBasicAuthSavedType,
+  siteBasicAuthRemoved, siteBasicAuthRemovedType,
 } from '../../../../frontend/actions/actionCreators/siteActions';
 
 describe('siteActions actionCreators', () => {
@@ -128,6 +130,42 @@ describe('siteActions actionCreators', () => {
       const action = siteUserRemoved(site);
       expect(action.type).to.equal(siteUserRemovedType);
       expect(action.site).to.equal(site);
+    });
+  });
+
+  describe('basicAuthSaved', () => {
+    it('constructs properly', () => {
+      const site = {
+        id: 1,
+        owner: 'someone',
+        repository: 'something',
+      };
+      const basicAuth = { username: 'username', password: 'password' };
+
+      const actual = siteBasicAuthSaved(site, basicAuth);
+      expect(actual).to.deep.equal({
+        type: siteBasicAuthSavedType,
+        siteId: site.id,
+        site,
+      });
+    });
+  });
+
+  describe('basicAuthRemoved', () => {
+    it('constructs properly', () => {
+      const site = {
+        id: 1,
+        owner: 'someone',
+        repository: 'something',
+      };
+
+      const actual = siteBasicAuthRemoved(site);
+
+      expect(actual).to.deep.equal({
+        type: siteBasicAuthRemovedType,
+        siteId: site.id,
+        site,
+      });
     });
   });
 });

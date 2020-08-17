@@ -29,6 +29,7 @@ function makeAttributes(overrides = {}) {
     awsBucketName: 'cg-123456789',
     awsBucketRegion: 'us-gov-west-1',
     defaultBranch: 'main',
+    subdomain: 'siteSubDomain',
     users,
   }, overrides);
 }

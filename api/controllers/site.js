@@ -8,10 +8,26 @@ const siteSerializer = require('../serializers/site');
 const { User, Site, Build } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const { logger } = require('../../winston');
+const ProxyDataSync = require('../services/ProxyDataSync');
+const {
+  ValidationError,
+  validBasicAuthUsername,
+  validBasicAuthPassword,
+} = require('../utils/validators');
+const { wrapHandler } = require('../utils');
+const Features = require('../features');
 
 const sendJSON = (site, res) => siteSerializer
   .serialize(site)
   .then(siteJSON => res.json(siteJSON));
+
+const stripCredentials = ({ username, password }) => {
+  if (validBasicAuthUsername(username) && validBasicAuthPassword(password)) {
+    return { username, password };
+  }
+
+  throw new ValidationError('username or password is not valid.');
+};
 
 module.exports = {
   findAllForUser: (req, res) => {
@@ -73,6 +89,12 @@ module.exports = {
       })
       .then(() => S3SiteRemover.removeSite(site))
       .then(() => S3SiteRemover.removeInfrastructure(site))
+      .then(() => {
+        if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
+          ProxyDataSync.removeSite(site)
+            .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+        }
+      })
       .then(() => site.destroy())
       .then(() => {
         res.json(siteJSON);
@@ -143,7 +165,7 @@ module.exports = {
 
   create: (req, res) => {
     const { body, user } = req;
-
+    let site;
     const siteParams = { ...body, sharedBucket: false };
 
     authorizer.create(user, siteParams)
@@ -151,7 +173,14 @@ module.exports = {
         user,
         siteParams,
       }))
-      .then(site => siteSerializer.serialize(site))
+      .then((_site) => {
+        site = _site;
+        if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
+          return ProxyDataSync.saveSite(site)
+            .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+        }
+      })
+      .then(() => siteSerializer.serialize(site))
       .then((siteJSON) => {
         res.json(siteJSON);
       })
@@ -216,4 +245,54 @@ module.exports = {
         res.error(err);
       });
   },
+
+  addBasicAuth: wrapHandler(async (req, res) => {
+    const { body, params, user } = req;
+
+    const { site_id: siteId } = params;
+
+    const site = await Site.forUser(user).findByPk(siteId);
+
+    if (!site) {
+      return res.notFound();
+    }
+
+    const credentials = stripCredentials(body);
+
+    const config = {
+      ...site.config,
+      basicAuth: credentials,
+    };
+    await site.update({ config });
+    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
+      ProxyDataSync.saveSite(site) // sync to proxy database
+        .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+    }
+
+    const siteJSON = await siteSerializer.serialize(site);
+    return res.json(siteJSON);
+  }),
+
+  removeBasicAuth: wrapHandler(async (req, res) => {
+    const { params, user } = req;
+    const { site_id: siteId } = params;
+
+    const site = await Site.forUser(user).findByPk(siteId);
+
+    if (!site) {
+      return res.notFound();
+    }
+
+    const config = { ...site.config };
+    delete config.basicAuth;
+
+    await site.update({ config });
+    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
+      ProxyDataSync.saveSite(site) // sync to proxy database
+        .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+    }
+
+    const siteJSON = await siteSerializer.serialize(site);
+    return res.json(siteJSON);
+  }),
 };

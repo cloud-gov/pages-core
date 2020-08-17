@@ -78,7 +78,8 @@
     "analyze-webpack": "webpack-bundle-analyzer -h 0.0.0.0 public/stats.json",
     "serve-coverage": "serve -l 8080 ./coverage",
     "update-local-config": "node ./scripts/update-local-config.js",
-    "create-dev-data": "node ./scripts/create-dev-data.js"
+    "create-dev-data": "node ./scripts/create-dev-data.js",
+    "update-proxy-db": "node ./scripts/proxy-edge.js"
   },
   "main": "index.js",
   "repository": {

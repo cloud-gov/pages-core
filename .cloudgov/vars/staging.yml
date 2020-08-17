@@ -5,3 +5,5 @@ env: staging
 env_postfix: -staging
 log_level: verbose
 feature_admin_auth: 'true'
+feature_proxy_edge_links: 'true'
+feature_proxy_edge_dynamo: 'true'
