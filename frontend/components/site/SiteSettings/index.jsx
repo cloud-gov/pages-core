@@ -8,6 +8,7 @@ import ExpandableArea from '../../ExpandableArea';
 import BasicSiteSettings from './BasicSiteSettings';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
 import EnvironmentVariables from './EnvironmentVariables';
+import BasicAuthSettings from './BasicAuthSettings';
 import siteActions from '../../../actions/siteActions';
 import { currentSite } from '../../../selectors/site';
 
@@ -96,6 +97,14 @@ class SiteSettings extends React.Component {
             siteId={site.id}
           />
         </ExpandableArea>
+        { FEATURE_PROXY_EDGE_LINKS === 'true' &&
+          <ExpandableArea title="Basic Authentication">
+            <BasicAuthSettings
+              siteId={site.id}
+              basicAuth={site.basicAuth}
+            />
+          </ExpandableArea>
+        }
       </div>
     );
   }

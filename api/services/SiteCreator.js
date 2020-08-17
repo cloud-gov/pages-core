@@ -1,7 +1,7 @@
 const GitHub = require('./GitHub');
 const TemplateResolver = require('./TemplateResolver');
 const { Build, Site, User } = require('../models');
-const { generateS3ServiceName } = require('../utils');
+const { generateS3ServiceName, generateSubdomain } = require('../utils');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const config = require('../../config');
 
@@ -10,11 +10,15 @@ const apiClient = new CloudFoundryAPIClient();
 const defaultEngine = 'jekyll';
 
 function paramsForNewSite(params) {
+  const owner = params.owner ? params.owner.toLowerCase() : null;
+  const repository = params.repository ? params.repository.toLowerCase() : null;
+  const subdomain = generateSubdomain(owner, repository);
   return {
-    owner: params.owner ? params.owner.toLowerCase() : null,
-    repository: params.repository ? params.repository.toLowerCase() : null,
+    owner,
+    repository,
     defaultBranch: params.defaultBranch,
     engine: params.engine || defaultEngine,
+    subdomain,
     sharedBucket: params.sharedBucket === false ? params.sharedBucket : true,
   };
 }
