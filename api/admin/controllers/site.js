@@ -6,6 +6,11 @@ const sendJSON = (site, res) => siteSerializer
   .serialize(site)
   .then(siteJSON => res.json(siteJSON));
 
+function toInt(val) {
+  const result = /^\d+$/.exec(val);
+  return result ? parseInt(result[0], 10) : null;
+}
+
 module.exports = {
   findAllSites: async (req, res) => {
     const { limit = 25, offset = 0, q } = req.query;
@@ -17,16 +22,16 @@ module.exports = {
     };
 
     if (q) {
-      const num = parseInt(q, 10);
-      if (Number.isNaN(num)) {
+      const num = toInt(q);
+      if (num) {
+        query.where = { id: num };
+      } else {
         query.where = {
           [Op.or]: [
             { owner: { [Op.substring]: q } },
             { repository: { [Op.substring]: q } },
           ],
         };
-      } else {
-        query.where = { id: num };
       }
     }
 
