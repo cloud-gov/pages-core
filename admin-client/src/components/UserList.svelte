@@ -15,6 +15,7 @@
       <div class="padding-x-1 padding-y-05 bg-gray-5">
         <LabeledItem label="username" value={user.username} />
         <LabeledItem label="email" value={user.email} />
+        <LabeledItem label="signed in" value={user.signedInAt} />
       </div>
     </div>
   {/each}
