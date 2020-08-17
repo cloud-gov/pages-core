@@ -1,6 +1,5 @@
 <script>
   import Nav from './components/Nav.svelte';
-  import Footer from './components/Footer.svelte';
   import Banner from './components/Banner.svelte';
 
   import NotificationAlert from './containers/NotificationAlert.svelte';
@@ -17,5 +16,3 @@
 <main>
   <Router />
 </main>
-
-<Footer />

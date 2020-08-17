@@ -27,6 +27,7 @@ services:
       - ~/Library/Caches/Yarn:/usr/local/share/.cache/yarn
     ports:
       - "3000:3000"
+      - "35729:35729"
     depends_on:
       - app
     command: ["yarn", "dev"]
