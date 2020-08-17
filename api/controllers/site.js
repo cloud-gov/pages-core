@@ -91,7 +91,7 @@ module.exports = {
       .then(() => S3SiteRemover.removeInfrastructure(site))
       .then(() => {
         if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-          return ProxyDataSync.removeSite(site)
+          ProxyDataSync.removeSite(site)
             .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
         }
       })
