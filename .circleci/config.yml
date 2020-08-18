@@ -70,7 +70,6 @@ jobs:
        - *default-docker-postgres
      environment:
        FEATURE_ADMIN_AUTH: 'true'
-       FEATURE_PROXY_EDGE_LINKS: 'true'
      steps:
       - checkout
       - run:
@@ -119,6 +118,7 @@ jobs:
       - image: circleci/node:12
     environment:
       CF_MANIFEST: ./.cloudgov/manifest.yml
+      FEATURE_PROXY_EDGE_LINKS: 'true'
     steps:
       - checkout
       - restore_cache:
