@@ -7,25 +7,25 @@ import { IconView } from './icons';
 const isDefaultBranch = (branchName, site) => branchName === site.defaultBranch;
 const isDemoBranch = (branchName, site) => branchName === site.demoBranch;
 
-const getUrlAndViewText = (branchName, viewLink, site) => {
+const getViewText = (branchName, site) => {
   let viewText = 'Preview site';
   if (isDefaultBranch(branchName, site)) {
     viewText = 'View site';
   } else if (isDemoBranch(branchName, site)) {
     viewText = 'View demo';
   }
-  return { url: viewLink, viewText };
+  return viewText;
 };
 
 export const BranchViewLink = ({
   branchName, viewLink, site, showIcon,
 }) => {
-  const { url, viewText } = getUrlAndViewText(branchName, viewLink, site);
+  const viewText = getViewText(branchName, site);
 
   if (showIcon) {
     return (
       <a
-        href={url}
+        href={viewLink}
         target="_blank"
         rel="noopener noreferrer"
         className="view-site-link"
@@ -35,7 +35,7 @@ export const BranchViewLink = ({
       </a>
     );
   }
-  return (<a href={url} target="_blank" rel="noopener noreferrer">{ viewText }</a>);
+  return (<a href={viewLink} target="_blank" rel="noopener noreferrer">{ viewText }</a>);
 };
 
 BranchViewLink.propTypes = {

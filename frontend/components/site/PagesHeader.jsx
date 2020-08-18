@@ -19,17 +19,16 @@ const PagesHeader = ({
     </div>
     <div className="usa-width-one-third header-actions">
       <GitHubLink text="View repo" owner={owner} repository={repository} />
-      <Link
-        role="button"
+      <a
         alt="View this site"
         target="_blank"
         rel="noopener noreferrer"
         className="view-site-link"
-        to={viewLink}
+        href={viewLink}
       >
         View site
         <IconView />
-      </Link>
+      </a>
     </div>
   </div>
 );

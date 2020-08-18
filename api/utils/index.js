@@ -65,6 +65,10 @@ function generateS3ServiceName(owner, repository) {
   return slicedServiceName;
 }
 
+function generateSubdomain(owner, repository) {
+  return generateS3ServiceName(owner, repository);
+}
+
 function isPastAuthThreshold(authDate) {
   return moment().isAfter(
     moment(authDate).add(config.policies.authRevalidationMinutes, 'minutes')
@@ -177,6 +181,7 @@ module.exports = {
   filterEntity,
   firstEntity,
   generateS3ServiceName,
+  generateSubdomain,
   getDirectoryFiles,
   getSiteDisplayEnv,
   isPastAuthThreshold,

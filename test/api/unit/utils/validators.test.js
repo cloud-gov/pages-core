@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 
 const validators = require('../../../../api/utils/validators');
 
@@ -67,5 +67,53 @@ describe('validators', () => {
     it('should not allow non url', () => {
       expect(() => validators.isEmptyOrUrl('hu')).to.throw(Error, 'URL must start with https://');
     });
-  })
+  });
+
+  describe('.validBasicAuthUsername', () => {
+    it('accepts valid username', () => {
+      expect(validators.validBasicAuthUsername('username1')).to.be.true;
+    });
+
+    it('accepts valid username with symbols that arenot semicolons', () => {
+      expect(validators.validBasicAuthUsername('username1!@#$%^&*()-_+=<>?,./~`{}[]|\\')).to.be.true;
+    });
+
+    it('must contain at least 1 alphanumeric char', () => {
+      expect(validators.validBasicAuthUsername('****')).to.be.false;
+    });
+
+    it('must be 4 characters', () => {
+      expect(validators.validBasicAuthUsername('use')).to.be.false;
+    });
+
+    it('colons are not allowed in username', () => {
+      expect(validators.validBasicAuthUsername('user:name1')).to.be.false;
+    });
+  });
+
+  describe('.validBasicAuthPassword', () => {
+    it('at least 1 uppercase, 1 lowercase and one number required', () => {
+      expect(validators.validBasicAuthPassword('paSsw0rd')).to.be.true;
+    });
+
+    it('at least 1 uppercase, 1 lowercase and one number required w/ symbols', () => {
+      expect(validators.validBasicAuthPassword('paSsw0rd!@#$%^&*()-_+=<>?,./~`{}[]|\\')).to.be.true;
+    });
+
+    it('at least 1 uppercase char required', () => {
+      expect(validators.validBasicAuthPassword('passw0rd')).to.be.false;
+    });
+
+    it('at leaset 1 lowercase char required', () => {
+      expect(validators.validBasicAuthPassword('PASSW0RD')).to.be.false;
+    });
+
+    it('at least one number required', () => {
+      expect(validators.validBasicAuthPassword('paSsword')).to.be.false;
+    });
+
+    it('must be 4 characters', () => {
+      expect(validators.validBasicAuthPassword('Pa5')).to.be.false;
+    });
+  });
 });

@@ -14,6 +14,8 @@ describe('siteActions', () => {
   let updateSite;
   let updateSiteUser;
   let deleteSite;
+  let saveBasicAuthToSite;
+  let removeBasicAuthFromSite;
   let httpErrorAlertAction;
   let alertSuccess;
   let alertError;
@@ -30,6 +32,8 @@ describe('siteActions', () => {
   let dispatchHideAddNewSiteFieldsAction;
   let dispatchUserAddedToSiteAction;
   let dispatchUserRemovedFromSiteAction;
+  let dispatchSiteBasicAuthRemovedAction;
+  let dispatchSiteBasicAuthSavedAction;
   let dispatchResetFormAction;
   let reset;
   let fetchUser;
@@ -63,6 +67,8 @@ describe('siteActions', () => {
     updateSite = stub();
     updateSiteUser = stub();
     deleteSite = stub();
+    saveBasicAuthToSite = stub();
+    removeBasicAuthFromSite = stub();
     fetchBranches = stub();
     alertSuccess = stub();
     alertError = stub();
@@ -79,6 +85,8 @@ describe('siteActions', () => {
     dispatchHideAddNewSiteFieldsAction = stub();
     dispatchUserAddedToSiteAction = stub();
     dispatchUserRemovedFromSiteAction = stub();
+    dispatchSiteBasicAuthRemovedAction = stub();
+    dispatchSiteBasicAuthSavedAction = stub();
     dispatchResetFormAction = stub();
     fetchUser = stub();
     reset = stub();
@@ -98,6 +106,8 @@ describe('siteActions', () => {
         dispatchHideAddNewSiteFieldsAction,
         dispatchUserAddedToSiteAction,
         dispatchUserRemovedFromSiteAction,
+        dispatchSiteBasicAuthRemovedAction,
+        dispatchSiteBasicAuthSavedAction,
         dispatchResetFormAction,
       },
       './alertActions': {
@@ -113,6 +123,8 @@ describe('siteActions', () => {
         deleteSite,
         addUserToSite,
         removeUserFromSite,
+        saveBasicAuthToSite,
+        removeBasicAuthFromSite,
       },
       '../util/githubApi': {
         fetchBranches,
@@ -361,6 +373,64 @@ describe('siteActions', () => {
         expect(alertSuccess.called).to.be.true;
         expect(alertSuccess.calledWith('Successfully removed.')).to.be.true;
         expect(dispatchUserRemovedFromSiteAction.called).to.be.true;
+      });
+    });
+  });
+
+  describe('addBasicAuthToSite', () => {
+    const basicAuth = { username: 'username', password: 'password' };
+
+    it('triggers the updating of a site and dispatches a site updated action to the store when successful', () => {
+      const basicAuthSite = {...site, config: { basicAuth } }
+      const sitePromise = Promise.resolve(basicAuthSite);
+      saveBasicAuthToSite.withArgs(siteId, basicAuth).returns(sitePromise);
+
+      const actual = fixture.saveBasicAuthToSite(siteId, basicAuth);
+
+      return actual.then(() => {
+        expect(dispatchSiteBasicAuthSavedAction.calledWith(basicAuthSite)).to.be.true;
+      });
+    });
+
+    it('triggers an error when updating a site fails', () => {
+      saveBasicAuthToSite.withArgs(siteId, basicAuth).rejects(error);
+
+      const actual = fixture.saveBasicAuthToSite(siteId, basicAuth);
+
+      return actual.then(() => {
+        expect(scrollTo.called).to.be.true;
+        expect(scrollTo.getCall(0).args).to.deep.equal([0, 0]);
+        expect(dispatchSiteBasicAuthSavedAction.called).to.be.false;
+        expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
+      });
+    });
+  });
+
+  describe('removeBasicAuthFromSite', () => {
+    const basicAuth = { username: 'username', password: 'password' };
+
+    it('triggers the updating of a site and dispatches a site updated action to the store when successful', () => {
+      // const basicAuthSite = {...site, config: { basicAuth } }
+      const sitePromise = Promise.resolve(site);
+      removeBasicAuthFromSite.withArgs(siteId).returns(sitePromise);
+
+      const actual = fixture.removeBasicAuthFromSite(siteId);
+
+      return actual.then(() => {
+        expect(dispatchSiteBasicAuthRemovedAction.calledWith(site)).to.be.true;
+      });
+    });
+
+    it('triggers an error when updating a site fails', () => {
+      removeBasicAuthFromSite.withArgs(siteId).rejects(error);
+
+      const actual = fixture.removeBasicAuthFromSite(siteId);
+
+      return actual.then(() => {
+        expect(scrollTo.called).to.be.true;
+        expect(scrollTo.getCall(0).args).to.deep.equal([0, 0]);
+        expect(dispatchSiteBasicAuthRemovedAction.called).to.be.false;
+        expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
       });
     });
   });

@@ -1,7 +1,7 @@
 const yaml = require('js-yaml');
 const { Site, User } = require('../models');
 const userSerializer = require('../serializers/user');
-const { buildSiteLink } = require('../utils/site');
+const { siteViewLink, hideBasicAuthPassword } = require('../utils/site');
 
 const toJSON = (site) => {
   const object = Object.assign({}, site.get({
@@ -9,10 +9,11 @@ const toJSON = (site) => {
   }));
 
   delete object.site_users__user_sites;
+  delete object.config; // may contain sensitive info ie: basicAuth
 
-  object.demoViewLink = buildSiteLink('demo', object);
-  object.previewLink = buildSiteLink('preview', object);
-  object.viewLink = buildSiteLink('site', object);
+  object.demoViewLink = siteViewLink(object, 'demo');
+  object.previewLink = siteViewLink(object, 'preview');
+  object.viewLink = siteViewLink(object, 'site');
   object.createdAt = object.createdAt.toISOString();
   object.updatedAt = object.updatedAt.toISOString();
 
@@ -27,6 +28,8 @@ const toJSON = (site) => {
   if (object.previewConfig) {
     object.previewConfig = yaml.safeDump(site.previewConfig);
   }
+
+  object.basicAuth = hideBasicAuthPassword(site.basicAuth);
 
   Object.keys(object).forEach((key) => {
     if (object[key] === null) {
