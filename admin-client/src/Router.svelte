@@ -48,6 +48,7 @@
   // Authenticated Routes
   page('*', ensureAuthenticated);
   page('/', checkRedirect, render(Pages.Home));
+  page('/sites/:id', queryString, render(Pages.Site));
   page('/sites', queryString, render(Pages.Sites));
   page('/builds', queryString, render(Pages.Builds));
   page('*', render(Pages.NotFound));

@@ -14,8 +14,22 @@ const defaultOptions = {
 };
 
 // eslint-disable-next-line no-underscore-dangle
-async function _fetch(path) {
-  return fetch(`${apiUrl}/admin${path}`, defaultOptions)
+function _setSearchString(query = {}) {
+  const search = new URLSearchParams();
+
+  // eslint-disable-next-line array-callback-return
+  Object.keys(query).map((key) => {
+    search.set(key, query[key]);
+  });
+  return search.toString();
+}
+
+// eslint-disable-next-line no-underscore-dangle
+async function _fetch(path, query) {
+  const searchString = _setSearchString(query);
+  const qs = searchString !== '' ? `?${searchString}` : '';
+
+  return fetch(`${apiUrl}/admin${path}${qs}`, defaultOptions)
     .then((r) => {
       if (r.ok) return r.json();
       if (r.status === 401) {
@@ -35,14 +49,12 @@ async function fetchMe() {
   return _fetch('/me');
 }
 
-async function fetchBuilds() {
-  return _fetch('/builds').catch(() => []);
+async function fetchBuilds(query = {}) {
+  return _fetch('/builds', query).catch(() => []);
 }
 
-async function fetchSites({ q }) {
-  const search = new URLSearchParams();
-  search.set('q', q);
-  return _fetch(`/sites?${search.toString()}`).catch(() => []);
+async function fetchSites(query = {}) {
+  return _fetch('/sites', query).catch(() => []);
 }
 
 async function logout() {

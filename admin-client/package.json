@@ -6,6 +6,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
+    "lint": "npx eslint src/",
     "start": "sirv public -p 3000 --host --single --dev"
   },
   "devDependencies": {
