@@ -70,6 +70,7 @@ jobs:
        - *default-docker-postgres
      environment:
        FEATURE_ADMIN_AUTH: 'true'
+       FEATURE_PROXY_EDGE_LINKS: 'true'
      steps:
       - checkout
       - run:
