@@ -259,11 +259,8 @@ module.exports = {
 
     const credentials = stripCredentials(body);
 
-    const config = {
-      ...site.config,
-      basicAuth: credentials,
-    };
-    await site.update({ config });
+    await site.update({ basicAuth: credentials });
+
     if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
       ProxyDataSync.saveSite(site) // sync to proxy database
         .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
@@ -283,10 +280,8 @@ module.exports = {
       return res.notFound();
     }
 
-    const config = { ...site.config };
-    delete config.basicAuth;
+    await site.update({ basicAuth: {} });
 
-    await site.update({ config });
     if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
       ProxyDataSync.saveSite(site) // sync to proxy database
         .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));

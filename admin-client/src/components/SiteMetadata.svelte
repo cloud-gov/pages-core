@@ -3,7 +3,6 @@
   import ExternalLink from './ExternalLink.svelte';
   import LabeledItem from './LabeledItem.svelte';
   import SectionHeader from './SectionHeader.svelte';
-  import UserList from './UserList.svelte';
 
   export let site = {};
 
@@ -58,4 +57,3 @@
     </div>
   </div>
 </div>
-<UserList users={site.users}/>

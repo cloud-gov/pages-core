@@ -25,11 +25,8 @@ function _setSearchString(query = {}) {
 }
 
 // eslint-disable-next-line no-underscore-dangle
-async function _fetch(path, query) {
-  const searchString = _setSearchString(query);
-  const qs = searchString !== '' ? `?${searchString}` : '';
-
-  return fetch(`${apiUrl}/admin${path}${qs}`, defaultOptions)
+async function _fetch(path, opts = {}) {
+  return fetch(`${apiUrl}/admin${path}`, { ...defaultOptions, ...opts })
     .then((r) => {
       if (r.ok) return r.json();
       if (r.status === 401) {
@@ -45,25 +42,48 @@ async function _fetch(path, query) {
     });
 }
 
+function get(path, query) {
+  let qs = '';
+  if (query) {
+    const searchString = _setSearchString(query);
+    qs = searchString !== '' ? `?${searchString}` : '';
+  }
+  return _fetch(path + qs);
+}
+
+function put(path, body) {
+  return _fetch(path, { method: 'PUT', body: JSON.stringify(body) });
+}
+
 async function fetchMe() {
-  return _fetch('/me');
+  return get('/me');
 }
 
 async function fetchBuilds(query = {}) {
-  return _fetch('/builds', query).catch(() => []);
+  return get('/builds', query).catch(() => []);
+}
+
+async function fetchSite(id) {
+  return get(`/sites/${id}`).catch(() => null);
 }
 
 async function fetchSites(query = {}) {
-  return _fetch('/sites', query).catch(() => []);
+  return get('/sites', query).catch(() => []);
+}
+
+async function updateSite(id, params) {
+  return put(`/sites/${id}`, params).catch(() => null);
 }
 
 async function logout() {
-  return _fetch('/logout').catch(() => null);
+  return get('/logout').catch(() => null);
 }
 
 export {
   fetchMe,
   fetchBuilds,
+  fetchSite,
   fetchSites,
   logout,
+  updateSite,
 };

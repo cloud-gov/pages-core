@@ -1,17 +1,23 @@
 const { Op } = require('sequelize');
-const siteSerializer = require('../../serializers/site');
 const { Site } = require('../../models');
-
-const sendJSON = (site, res) => siteSerializer
-  .serialize(site)
-  .then(siteJSON => res.json(siteJSON));
+const { pick, wrapHandlers } = require('../../utils');
+const { serializeNew, serializeMany } = require('../../serializers/site');
 
 function toInt(val) {
   const result = /^\d+$/.exec(val);
   return result ? parseInt(result[0], 10) : null;
 }
 
-module.exports = {
+async function fetchSiteById(id) {
+  const numId = toInt(id);
+  return numId ? Site.findByPk(numId) : null;
+}
+
+const updateableAttrs = [
+  'containerConfig',
+];
+
+module.exports = wrapHandlers({
   findAllSites: async (req, res) => {
     const { limit = 25, offset = 0, q } = req.query;
 
@@ -35,12 +41,32 @@ module.exports = {
       }
     }
 
-    try {
-      const sites = await Site.findAll(query);
-
-      return sendJSON(sites, res);
-    } catch (error) {
-      return res.error(error);
-    }
+    const sites = await Site.findAll(query);
+    res.json(serializeMany(sites, true));
   },
-};
+
+  findById: async (req, res) => {
+    const {
+      params: { id },
+    } = req;
+
+    const site = await fetchSiteById(id);
+    if (!site) return res.notFound();
+
+    return res.json(serializeNew(site, true));
+  },
+
+  update: async (req, res) => {
+    const {
+      params: { id },
+      body,
+    } = req;
+
+    const site = await fetchSiteById(id);
+    if (!site) return res.notFound();
+
+    await site.update(pick(updateableAttrs, body));
+
+    return res.json(serializeNew(site, true));
+  },
+});
