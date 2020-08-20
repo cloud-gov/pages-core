@@ -26,5 +26,10 @@ describe('UserEnvironmentVariable model', () => {
 
       expect(uevs).to.be.empty;
     });
+
+    it('always returns an empty string for the hint', async () => {
+      const uev = await factories.userEnvironmentVariable.create({ value: 'abc123' });
+      expect(uev.hint).to.equal('');
+    });
   });
 });

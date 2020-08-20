@@ -38,5 +38,13 @@ describe('Encryptor', () => {
 
       expect(hint.length).to.eq(hintSize);
     });
+
+    it('returns an empty string when specified size is 0', () => {
+      const hintSize = 0;
+
+      const { hint } = Encryptor.encrypt(value, key, { hintSize });
+
+      expect(hint).to.eq('');
+    });
   });
 });
