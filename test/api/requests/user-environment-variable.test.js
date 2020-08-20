@@ -289,6 +289,28 @@ describe('User Environment Variable API', () => {
       });
     });
 
+    describe('when the name already exists', () => {
+      it('returns a 400', async () => {
+        const userPromise = factory.user();
+        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const user = await userPromise;
+        const name = 'my-env-var';
+        await factory.userEnvironmentVariable.create({ name, value: 'secret1234', site });
+        const cookie = await authenticatedSession(user);
+
+        const { body } = await request(app)
+          .post(`/v0/site/${site.id}/user-environment-variable`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .send({ name, value: 'foobar' })
+          .expect(400);
+
+        validateAgainstJSONSchema('POST', '/site/{site_id}/user-environment-variable', 400, body);
+        expect(body.message).to.eq(`A user environment variable with name: "${name}" already exists for this site.`);
+      });
+    });
+
     describe('when something unexpected happens', () => {
       let origConfigVal;
 
