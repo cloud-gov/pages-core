@@ -37,7 +37,7 @@ const viewLinks = {
 };
 
 // Eventually replace `serialize`
-function serializeNew(site, isAdmin = false) {
+function serializeNew(site, isSystemAdmin = false) {
   const object = site.get({ plain: true });
 
   const filtered = pick(allowedAttributes, object);
@@ -55,7 +55,7 @@ function serializeNew(site, isAdmin = false) {
 
   filtered.basicAuth = hideBasicAuthPassword(site.basicAuth);
 
-  if (isAdmin) {
+  if (isSystemAdmin) {
     filtered.containerConfig = site.containerConfig;
   }
 
@@ -63,8 +63,8 @@ function serializeNew(site, isAdmin = false) {
 }
 
 // Eventually replace `serialize` for arrays
-function serializeMany(sites, isAdmin) {
-  return sites.map(site => serializeNew(site, isAdmin));
+function serializeMany(sites, isSystemAdmin) {
+  return sites.map(site => serializeNew(site, isSystemAdmin));
 }
 
 const serializeObject = (site) => {
