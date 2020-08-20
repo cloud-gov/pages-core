@@ -5,26 +5,6 @@ const SQS = require('../services/SQS');
 const { branchRegex, shaRegex, isEmptyOrUrl } = require('../utils/validators');
 const { buildUrl } = require('../utils/build');
 
-const afterCreate = (build) => {
-  const {
-    Site, User, Build, UserEnvironmentVariable,
-  } = build.sequelize.models;
-
-  return Build.findOne({
-    where: { id: build.id },
-    include: [User, {
-      model: Site,
-      required: true,
-      include: [UserEnvironmentVariable],
-    }],
-  })
-    .then((foundBuild) => {
-      Build.count({
-        where: { site: foundBuild.site },
-      }).then(count => SQS.sendBuildMessage(foundBuild, count));
-    });
-};
-
 const associate = ({
   Build,
   BuildLog,
@@ -77,6 +57,31 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
 
   return build.update(atts);
 };
+
+async function enqueue() {
+  const build = this;
+
+  const {
+    Site, User, Build, UserEnvironmentVariable,
+  } = build.sequelize.models;
+
+  const foundBuild = await Build.findOne({
+    where: { id: build.id },
+    include: [User, {
+      model: Site,
+      required: true,
+      include: [UserEnvironmentVariable],
+    }],
+  });
+
+  const count = await Build.count({
+    where: { site: foundBuild.site },
+  });
+
+  await SQS.sendBuildMessage(foundBuild, count);
+
+  return build;
+}
 
 async function updateJobStatus(buildStatus) {
   const timestamp = new Date();
@@ -139,7 +144,6 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     tableName: 'build',
     hooks: {
-      afterCreate,
       beforeValidate,
     },
     scopes: {
@@ -160,6 +164,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Build.generateToken = generateToken;
   Build.associate = associate;
+  Build.prototype.enqueue = enqueue;
   Build.prototype.updateJobStatus = updateJobStatus;
   return Build;
 };

@@ -159,4 +159,14 @@ describe('Site model', () => {
       done();
     });
   });
+
+  it('should not let subdomain field be null', (done) => {
+    factory.site({
+      subdomain: undefined,
+    }).catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('subdomain: Site.subdomain cannot be null');
+      done();
+    });
+  });
 });

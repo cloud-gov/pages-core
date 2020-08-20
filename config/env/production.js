@@ -94,6 +94,18 @@ if (cfSpace && cfOauthTokenUrl && cfApiHost && cfDomain && cfProxy) {
   throw new Error('Missing environment variables for build space, cloud founders host url and token url.');
 }
 
+// DynamoDB Configs
+const dynamoDBCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-dynamodb-creds`);
+if (dynamoDBCreds) {
+  module.exports.dynamoDB = {
+    accessKeyId: dynamoDBCreds.access_key_id,
+    secretAccessKey: dynamoDBCreds.secret_access_key,
+    region: dynamoDBCreds.region,
+  };
+} else {
+    throw new Error('No DynamoDB credentials found');
+}
+
 // See https://github.com/nfriedly/express-rate-limit/blob/master/README.md#configuration
 // for all express-rate-limit options available
 module.exports.rateLimiting = {
