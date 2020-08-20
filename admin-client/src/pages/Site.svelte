@@ -1,30 +1,36 @@
 <script>
-  import { router } from '../stores';
-  import { fetchBuilds, fetchSites } from '../lib/api';
+  import { onMount } from 'svelte';
+  import { notification, router } from '../stores';
+  import { fetchBuilds, fetchSite, updateSite } from '../lib/api';
 
   import {
     BuildList,
     GridContainer,
     PageTitle,
+    SiteForm,
     SiteMetadata,
   } from '../components';
 
   $: id = $router.params.id;
+
+  let site = null;
+
+  async function handleSubmit(params) {
+    site = await updateSite(id, params);
+    notification.setSuccess('Site updated successfully');
+  }
+
+  onMount(async () => { site = await fetchSite(id); });
 </script>
 
 <GridContainer>
-  {#await fetchSites({ q: id })}
-    <p>Loading attributes...</p>
-  {:then sites}
-    {#if sites.length > 0}
-      {#each sites as site}
-          <PageTitle>{site.owner}/{site.repository}</PageTitle>
-          <SiteMetadata {site} />
-      {/each}
-    {/if}
-  {:catch error}
-    <p>Something went wrong fetching the site metadata: {error.message}</p>
-  {/await}
+  {#if site}
+    <PageTitle>{site.owner}/{site.repository}</PageTitle>
+    <SiteMetadata {site} />
+    <SiteForm {site} on:submit={handleSubmit}/>
+  {:else}    
+    <p>Loading site...</p>
+  {/if}
   {#await fetchBuilds({ site: id })}
     <p>Loading builds...</p>
   {:then builds}

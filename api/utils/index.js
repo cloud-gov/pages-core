@@ -153,6 +153,11 @@ function pick(keys, obj) {
   return pickedObj;
 }
 
+function omit(keys, obj) {
+  const pickedKeys = Object.keys(obj).filter(key => !keys.includes(key));
+  return pick(pickedKeys, obj);
+}
+
 function wait(time = 500) {
   // eslint-disable-next-line scanjs-rules/call_setTimeout
   return new Promise((r => setTimeout(r, time)));
@@ -177,6 +182,14 @@ async function retry(fn, { maxAttempts = 5, waitTime = 100 } = {}) {
   throw new Error('Exited retry loop without returning...');
 }
 
+function omitBy(fn, obj) {
+  const pickedKeys = Object
+    .keys(obj)
+    .filter(key => !fn(obj[key], key));
+
+  return pick(pickedKeys, obj);
+}
+
 module.exports = {
   filterEntity,
   firstEntity,
@@ -189,6 +202,8 @@ module.exports = {
   loadDevelopmentManifest,
   loadProductionManifest,
   mapValues,
+  omitBy,
+  omit,
   pick,
   retry,
   shouldIncludeTracking,

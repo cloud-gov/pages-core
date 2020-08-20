@@ -15,6 +15,8 @@ const authenticatedRouter = Router();
 authenticatedRouter.use(ensureAuthenticated);
 authenticatedRouter.get('/builds', AdminBuildController.findAllBuilds);
 authenticatedRouter.get('/sites', AdminSiteController.findAllSites);
+authenticatedRouter.get('/sites/:id', AdminSiteController.findById);
+authenticatedRouter.put('/sites/:id', AdminSiteController.update);
 authenticatedRouter.get('/me', UserController.me);
 authenticatedRouter.get('/logout', (req, res) => {
   req.logout();

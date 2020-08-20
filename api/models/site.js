@@ -149,6 +149,24 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    basicAuth: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return this.config.basicAuth || {};
+      },
+      set(basicAuth) {
+        this.setDataValue('config', { ...this.config, basicAuth });
+      },
+    },
+    containerConfig: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return this.config.containerConfig || {};
+      },
+      set(containerConfig) {
+        this.setDataValue('config', { ...this.config, containerConfig });
+      },
+    },
   }, {
     tableName: 'site',
     hooks: {
@@ -157,12 +175,6 @@ module.exports = (sequelize, DataTypes) => {
       validationFailed,
     },
     paranoid: true,
-
-    getterMethods: {
-      basicAuth() {
-        return this.config.basicAuth || {};
-      },
-    },
     scopes: {
       forUser: (user, User) => ({
         include: [{

@@ -3,6 +3,7 @@ const sinon = require('sinon');
 
 const { app: { proxySiteTable } } = require('../../../../config');
 const { DynamoDBDocumentHelper } = require('../../../../api/services/DynamoDBDocumentHelper');
+const { omit } = require('../../../../api/utils');
 
 const ProxyDataSync = require('../../../../api/services/ProxyDataSync');
 
@@ -59,13 +60,17 @@ describe('ProxyDataSync', () => {
   it('can save array of sites', () => {
     const batchWriteStub = sinon.stub(DynamoDBDocumentHelper.prototype, 'batchWrite');
 
+    const omitKeys = ['UpdatedAt'];
+    const expectedItem = siteToItem(site);
+
     saveSites([site]);
 
-    sinon.assert.calledOnceWithExactly(
-      batchWriteStub,
-      proxySiteTable,
-      [{ PutRequest: { Item: siteToItem(site) } }]
-    );
+    sinon.assert.calledOnce(batchWriteStub);
+    sinon.assert.calledWith(batchWriteStub, proxySiteTable);
+    const obj = batchWriteStub.firstCall.lastArg;
+    const actualItem = obj[0].PutRequest.Item;
+
+    expect(omit(omitKeys, actualItem)).to.deep.equal(omit(omitKeys, expectedItem));
   });
 
   it('convert site to item w/o basicAuth', () => {
@@ -79,12 +84,11 @@ describe('ProxyDataSync', () => {
       BucketRegion: site.awsBucketRegion,
       SiteUpdatedAt: site.updatedAt.toISOString(),
     };
-    
+
     expect(start <= new Date(obj.UpdatedAt)).to.be.true;
     expect(new Date() >= new Date(obj.UpdatedAt)).to.be.true;
     delete obj.UpdatedAt;
     expect(item).to.deep.equal(obj);
-
   });
 
   it('convert site to item w/ basicAuth', () => {

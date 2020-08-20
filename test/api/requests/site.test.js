@@ -1690,7 +1690,7 @@ describe('Site API', () => {
             .expect(200);
 
           site = await site.reload();
-          expect(site.config).to.deep.equal({ blah: 'blahblah' });
+          expect(site.config).to.deep.equal({ basicAuth: {}, blah: 'blahblah' });
         });
 
         it('should not call ProxyDataSync when env FEATURE_PROXY_EDGE_DYNAMO=false', async () => {
