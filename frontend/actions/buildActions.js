@@ -31,7 +31,12 @@ export default {
 
   restartBuild(buildId, siteId) {
     return api.restartBuild(buildId, siteId)
-      .then(dispatchBuildRestartedAction);
+      .then((build) => {
+        if (Object.keys(build).length > 0) {
+          return dispatchBuildRestartedAction(build);
+        }
+        alertActions.alertSuccess(`Build is already queued.`);
+      });
   },
 
   createBuild(sha, branch, siteId) {
