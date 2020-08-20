@@ -330,6 +330,21 @@ describe('utils', () => {
     });
   });
 
+  describe('.omit', () => {
+    it('returns an object omitting containing specified keys', () => {
+      const keys = ['foo', 'bar'];
+      const obj = {
+        foo: 'hi',
+        bar: undefined,
+        baz: 'bye',
+      };
+
+      expect(utils.omit(keys, obj)).to.deep.equal({
+        baz: 'bye',
+      });
+    });
+  });
+
   describe('.wait', () => {
     it('pauses execution for `time` milliseconds', async () => {
       const time = 100;

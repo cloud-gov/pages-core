@@ -153,6 +153,11 @@ function pick(keys, obj) {
   return pickedObj;
 }
 
+function omit(keys, obj) {
+  const pickedKeys = Object.keys(obj).filter(key => !keys.includes(key));
+  return pick(pickedKeys, obj);
+}
+
 function wait(time = 500) {
   // eslint-disable-next-line scanjs-rules/call_setTimeout
   return new Promise((r => setTimeout(r, time)));
@@ -198,6 +203,7 @@ module.exports = {
   loadProductionManifest,
   mapValues,
   omitBy,
+  omit,
   pick,
   retry,
   shouldIncludeTracking,
