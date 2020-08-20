@@ -46,14 +46,23 @@ module.exports = wrapHandlers({
     const { name, value } = validate(body);
     const { ciphertext, hint } = encrypt(value, userEnvVar.key);
 
-    const uev = await UserEnvironmentVariable
-      .create({
-        siteId: site.id, name, ciphertext, hint,
+    try {
+      const uev = await UserEnvironmentVariable
+        .create({
+          siteId: site.id, name, ciphertext, hint,
+        });
+
+      const json = serialize(uev);
+
+      return res.ok(json);
+    } catch (error) {
+      if (error.name !== 'SequelizeUniqueConstraintError') {
+        throw error;
+      }
+      return res.badRequest({
+        message: `A user environment variable with name: "${name}" already exists for this site.`,
       });
-
-    const json = serialize(uev);
-
-    return res.ok(json);
+    }
   },
 
   async destroy(req, res) {
