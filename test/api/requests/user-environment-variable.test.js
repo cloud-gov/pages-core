@@ -364,7 +364,7 @@ describe('User Environment Variable API', () => {
 
         validateAgainstJSONSchema('POST', '/site/{site_id}/user-environment-variable', 200, body);
         expect(body.name).to.eq(name);
-        expect(body.hint).to.eq(value.slice(-4));
+        expect(body.hint).to.eq('');
         expect(afterNumUEVs).to.eq(beforeNumUEVs + 1);
       });
     });

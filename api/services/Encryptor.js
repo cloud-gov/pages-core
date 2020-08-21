@@ -27,7 +27,7 @@ function encrypt(value, key, { hintSize = 4 } = {}) {
     .join(':'); // Return a `:` delimited hex string
 
   // Create the hint
-  const hint = value.slice(-1 * hintSize);
+  const hint = hintSize ? value.slice(-1 * hintSize) : '';
 
   return { ciphertext, hint };
 }
