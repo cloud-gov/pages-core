@@ -2,6 +2,7 @@ const expect = require('chai').expect;
 const nock = require('nock');
 const request = require('supertest');
 const { stub } = require('sinon');
+const { Sequelize } = require('sequelize');
 const app = require('../../../app');
 const SQS = require('../../../api/services/SQS');
 const factory = require('../support/factory');
@@ -140,7 +141,7 @@ describe('Build API', () => {
             { where: //options
               { site: sitePromise.id,
                 branch: 'main',
-                state: 'queued',
+                state: ['created', 'queued'],
               },
             }
           );
@@ -231,7 +232,7 @@ describe('Build API', () => {
           .catch(done);
         });
 
-        it('should NOT create a new build if a branch build already exists in queued', (done) => {
+        it('should NOT create a new build if a branch build already exists @state=queued', (done) => {
           let site;
           let user;
           let build;
@@ -243,7 +244,7 @@ describe('Build API', () => {
             user = promisedValues.user;
             build = promisedValues.build;
             cookie = promisedValues.cookie;
-            return build.update({ state: 'queued'})
+            return build.update({ state: 'queued' })
           })
           .then(() => {
             return validCreateRequest(
@@ -261,7 +262,48 @@ describe('Build API', () => {
               where: {
                 site: site.id,
                 branch: 'my-branch',
-                state: 'queued',
+                state:['created', 'queued'],
+              },
+            });
+          })
+          .then((build) => {
+            expect(build).to.be.null;
+            done();
+          })
+          .catch(done);
+        });
+
+        it('should NOT create a new build if a branch build already exists @state=created', (done) => {
+          let site;
+          let user;
+          let build;
+          let cookie;
+
+          promiseProps
+          .then((promisedValues) => {
+            site = promisedValues.site;
+            user = promisedValues.user;
+            build = promisedValues.build;
+            cookie = promisedValues.cookie;
+            return build.update({ state: 'created' })
+          })
+          .then(() => {
+            return validCreateRequest(
+              csrfToken.getToken(),
+              cookie,
+              {
+                buildId: build.id,
+                siteId: site.id,
+              }
+            );
+          })
+          .then((response) => {
+            expect(response.body).deep.equal({});
+            return Build.findOne({
+              where: {
+                site: site.id,
+                branch: 'my-branch',
+                state: ['created', 'queued'],
               },
             });
           })
@@ -634,7 +676,7 @@ describe('Build API', () => {
       .then(() => Build.findByPk(build.id))
       .then((unmodifiedBuild) => {
         expect(unmodifiedBuild).to.not.be.undefined;
-        expect(unmodifiedBuild.state).to.equal('queued');
+        expect(unmodifiedBuild.state).to.equal('created');
         done();
       })
       .catch(done);
