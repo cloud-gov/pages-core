@@ -76,7 +76,7 @@ const createBuildForWebhookRequest = async (request) => {
   const queuedBuild = await Build.findOne({
     where: {
       branch,
-      state: 'queued',
+      state: ['created', 'queued'],
       site: site.id,
     },
   });

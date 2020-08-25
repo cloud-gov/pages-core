@@ -160,6 +160,7 @@ SQS.sendBuildMessage = (build, buildCount) => SQS.messageBodyForBuild(build)
               message: errMsg,
             });
           }
+          build.updateJobStatus({ state: 'queued' });
         });
       });
   });
