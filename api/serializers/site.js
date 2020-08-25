@@ -22,6 +22,7 @@ const allowedAttributes = [
 const dateFields = [
   'createdAt',
   'updatedAt',
+  'repoLastVerified',
 ];
 
 const yamlFields = [
