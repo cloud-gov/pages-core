@@ -144,6 +144,15 @@ describe('utils', () => {
       expect(utils.generateSubdomain(owner, repository)).to.equal(expected);
       done();
     });
+
+    it('should substitue "." with "--"', (done) => {
+      const owner = 'Hel.lo';
+      const repository = 'Hello.Wo..rld';
+      const expected = 'o-hel--lo-r-hello--wo----rld';
+
+      expect(utils.generateSubdomain(owner, repository)).to.equal(expected);
+      done();
+    });
   });
 
   describe('.isPastAuthThreshold', () => {

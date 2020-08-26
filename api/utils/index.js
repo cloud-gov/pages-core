@@ -66,7 +66,7 @@ function generateS3ServiceName(owner, repository) {
 }
 
 function generateSubdomain(owner, repository) {
-  return generateS3ServiceName(owner, repository);
+  return generateS3ServiceName(owner, repository).replace(/\./g, '--');
 }
 
 function isPastAuthThreshold(authDate) {
