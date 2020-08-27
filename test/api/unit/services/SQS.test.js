@@ -39,6 +39,7 @@ describe('SQS', () => {
           engine: 'jekyll',
           defaultBranch: 'main',
           s3ServiceName: config.s3.serviceName,
+          containerConfig: {},
         },
         User: {
           passport: {
@@ -98,6 +99,7 @@ describe('SQS', () => {
           engine: 'jekyll',
           defaultBranch: 'main',
           s3ServiceName: config.s3.serviceName,
+          containerConfig: {},
         },
         User: {
           passport: {
@@ -148,19 +150,6 @@ describe('SQS', () => {
           return SQS.messageBodyForBuild(build)
             .then((message) => {
               expect(messageEnv(message, 'STATUS_CALLBACK')).to.equal(`http://localhost:1337/v0/build/${build.id}/status/${build.token}`);
-              done();
-            });
-        })
-        .catch(done);
-    });
-
-    it('should set LOG_CALLBACK in the message', (done) => {
-      factory.build()
-        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
-        .then((build) => { // eslint-disable-line
-          return SQS.messageBodyForBuild(build)
-            .then((message) => {
-              expect(messageEnv(message, 'LOG_CALLBACK')).to.equal(`http://localhost:1337/v0/build/${build.id}/log/${build.token}`);
               done();
             });
         })
@@ -543,39 +532,16 @@ describe('SQS', () => {
         .catch(done);
     });
 
-    describe('SKIP_LOGGING', () => {
-      const origAppEnv = config.app.app_env;
-
-      after(() => {
-        // reset to original value after these test cases
-        config.app.app_env = origAppEnv;
-      });
-
-      it('should set SKIP_LOGGING to true if the app_env is "development"', (done) => {
-        config.app.app_env = 'development';
-        factory.site()
-          .then(() => factory.build())
-          .then(build => Build.findByPk(build.id, { include: [Site, User] }))
-          .then(build => SQS.messageBodyForBuild(build))
-          .then((message) => {
-            expect(messageEnv(message, 'SKIP_LOGGING')).to.equal(true);
-            done();
-          })
-          .catch(done);
-      });
-
-      it('should set SKIP_LOGGING to false if the app_env is not "development"', (done) => {
-        config.app.app_env = 'not-development';
-        factory.site()
-          .then(() => factory.build())
-          .then(build => Build.findByPk(build.id, { include: [Site, User] }))
-          .then(build => SQS.messageBodyForBuild(build))
-          .then((message) => {
-            expect(messageEnv(message, 'SKIP_LOGGING')).to.equal(false);
-            done();
-          })
-          .catch(done);
-      });
+    it('should set containerName and containerSize in the message', () => {
+      const containerConfig = { name: 'default', size: 'large' };
+      return factory.site({ containerConfig })
+        .then(site => factory.build({ site }))
+        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
+        .then(build => SQS.messageBodyForBuild(build))
+        .then((message) => {
+          expect(message.containerName).to.deep.equal(containerConfig.name);
+          expect(message.containerSize).to.deep.equal(containerConfig.size);
+        });
     });
   });
 });

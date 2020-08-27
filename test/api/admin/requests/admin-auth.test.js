@@ -1,13 +1,13 @@
 const { expect } = require('chai');
 const request = require('supertest');
 const sinon = require('sinon');
-const githubAPINocks = require('../support/githubAPINocks');
-const { sessionForCookie } = require('../support/cookieSession');
-const { unauthenticatedSession } = require('../support/session');
-const GitHub = require('../../../api/services/GitHub');
-const sessionConfig = require('../../../api/admin/sessionConfig');
+const githubAPINocks = require('../../support/githubAPINocks');
+const { sessionForCookie } = require('../../support/cookieSession');
+const { unauthenticatedSession } = require('../../support/session');
+const GitHub = require('../../../../api/services/GitHub');
+const sessionConfig = require('../../../../api/admin/sessionConfig');
 
-const app = require('../../../app');
+const app = require('../../../../app');
 
 describe('Admin authentication request', () => {
   afterEach(() => {
