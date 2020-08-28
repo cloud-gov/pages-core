@@ -72,7 +72,7 @@ module.exports = {
           where: {
             site: build.site,
             branch: build.branch,
-            state: 'queued'
+            state: ['created', 'queued'],
           },
         })
         .then(queuedBuild => {

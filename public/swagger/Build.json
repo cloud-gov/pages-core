@@ -58,7 +58,8 @@
         "processing",
         "skipped",
         "success",
-        "queued"
+        "queued",
+        "created"
       ]
     },
     "updatedAt": {
