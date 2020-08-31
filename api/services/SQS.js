@@ -3,7 +3,6 @@ const url = require('url');
 const yaml = require('js-yaml');
 const S3Helper = require('./S3Helper');
 const config = require('../../config');
-const { logger } = require('../../winston');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const { buildViewLink, buildUrl } = require('../utils/build');
 
@@ -135,27 +134,16 @@ SQS.messageBodyForBuild = build => buildContainerEnvironment(build)
     containerSize: build.Site.containerConfig.size,
   }));
 
-SQS.sendBuildMessage = (build, buildCount) => SQS.messageBodyForBuild(build)
-  .then((message) => {
-    const params = {
-      QueueUrl: sqsConfig.queue,
-      MessageBody: JSON.stringify(message),
-    };
+SQS.sendBuildMessage = async (build, buildCount) => {
+  const message = await SQS.messageBodyForBuild(build);
+  await setupBucket(build, buildCount);
 
-    return setupBucket(build, buildCount)
-      .then(() => {
-        SQS.sqsClient.sendMessage(params, (err) => {
-          if (err) {
-            const errMsg = `There was an error, adding the job to SQS: ${err}`;
-            logger.error(errMsg);
-            build.updateJobStatus({
-              status: 'error',
-              message: errMsg,
-            });
-          }
-          build.updateJobStatus({ state: 'queued' });
-        });
-      });
-  });
+  const params = {
+    QueueUrl: sqsConfig.queue,
+    MessageBody: JSON.stringify(message),
+  };
+
+  return SQS.sqsClient.sendMessage(params).promise();
+};
 
 module.exports = SQS;

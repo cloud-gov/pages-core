@@ -12,12 +12,15 @@
     "demoViewLink",
     "previewLink",
     "basicAuth",
-    "users",
     "createdAt"
   ],
   "properties": {
     "id": {
       "type": "integer"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
     },
     "demoBranch": {
       "type": "string"

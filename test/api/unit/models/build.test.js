@@ -1,22 +1,13 @@
 const { expect } = require('chai');
-const { stub } = require('sinon');
+const sinon = require('sinon');
 const { DatabaseError, ValidationError } = require('sequelize');
 const SQS = require('../../../../api/services/SQS');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
 
-// eslint-disable-next-line scanjs-rules/call_setTimeout
-const wait = (ms = 1000) => new Promise(resolve => setTimeout(resolve, ms));
-
 describe('Build model', () => {
-  let sendMessageStub;
-
-  beforeEach(() => {
-    sendMessageStub = stub(SQS, 'sendBuildMessage');
-  });
-
   afterEach(() => {
-    sendMessageStub.restore();
+    sinon.restore();
   });
 
   describe('before validate hook', () => {
@@ -41,13 +32,15 @@ describe('Build model', () => {
 
   describe('enqueue', () => {
     it('should send a build new build message', async () => {
+      const sendMessageStub = sinon.stub(SQS, 'sendBuildMessage');
+      sendMessageStub.resolves();
+
       const site = await factory.site();
       const uev = await factory.userEnvironmentVariable.create({ site });
       const build = await factory.build({ site });
       await build.enqueue();
 
-      // create delay while s3 infra created ... will be removed with 1 bucket federalist
-      await wait();
+      await build.reload();
 
       expect(build.completedAt).to.be.null;
       expect(build.startedAt).to.be.null;
@@ -74,7 +67,7 @@ describe('Build model', () => {
       let build;
 
       beforeEach(async () => {
-        build = await factory.build();
+        build = await factory.build({ state: 'queued' });
       });
 
       describe('to `processing`', () => {

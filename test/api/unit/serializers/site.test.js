@@ -9,7 +9,7 @@ const SiteSerializer = require('../../../../api/serializers/site');
 describe('SiteSerializer', () => {
   describe('.serialize(serializable)', () => {
     it('should serialize an object correctly', (done) => {
-      factory.site({ config: { basicAuth: { username: 'username', password: 'password' } } })
+      factory.site({ basicAuth: { username: 'username', password: 'password' } })
         .then(site => SiteSerializer.serialize(site))
         .then((object) => {
           const result = validateJSONSchema(object, siteSchema);
@@ -55,7 +55,7 @@ describe('SiteSerializer', () => {
 
   describe('.serializeNew(serializable)', () => {
     it('should serialize an object correctly', async () => {
-      const site = await factory.site({ config: { basicAuth: { username: 'username', password: 'password' } } });
+      const site = await factory.site({ basicAuth: { username: 'username', password: 'password' } });
 
       const serialized = SiteSerializer.serializeNew(site);
 
