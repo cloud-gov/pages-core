@@ -1,6 +1,5 @@
 const AWS = require('aws-sdk');
 const url = require('url');
-const yaml = require('js-yaml');
 const S3Helper = require('./S3Helper');
 const config = require('../../config');
 const { logger } = require('../../winston');
