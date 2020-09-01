@@ -12,7 +12,8 @@
     "demoViewLink",
     "previewLink",
     "basicAuth",
-    "users"
+    "users",
+    "createdAt"
   ],
   "properties": {
     "id": {
@@ -47,6 +48,10 @@
       "type": "string"
     },
     "publishedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "repoLastVerified": {
       "type": "string",
       "format": "date-time"
     },

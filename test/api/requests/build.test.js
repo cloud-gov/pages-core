@@ -2,6 +2,7 @@ const expect = require('chai').expect;
 const nock = require('nock');
 const request = require('supertest');
 const { stub } = require('sinon');
+const { Sequelize } = require('sequelize');
 const app = require('../../../app');
 const SQS = require('../../../api/services/SQS');
 const factory = require('../support/factory');
@@ -132,15 +133,24 @@ describe('Build API', () => {
       describe('with an existing build', () => {
         let promiseProps;
 
-        beforeEach(() => {
+        beforeEach( async () => {
           const userPromise = factory.user();
-          const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-
+          const sitePromise = await factory.site({ users: Promise.all([userPromise]) });
+          await Build.update(
+            { state: 'success'}, //values
+            { where: //options
+              { site: sitePromise.id,
+                branch: 'main',
+                state: ['created', 'queued'],
+              },
+            }
+          );
           promiseProps = Promise.props({
             user: userPromise,
             site: sitePromise,
             build: factory.build({
               site: sitePromise,
+              state: 'success',
               branch: 'main',
               commitSha,
               user: userPromise,
@@ -217,6 +227,88 @@ describe('Build API', () => {
           })
           .then((build) => {
             expect(build).not.to.be.undefined;
+            done();
+          })
+          .catch(done);
+        });
+
+        it('should NOT create a new build if a branch build already exists @state=queued', (done) => {
+          let site;
+          let user;
+          let build;
+          let cookie;
+
+          promiseProps
+          .then((promisedValues) => {
+            site = promisedValues.site;
+            user = promisedValues.user;
+            build = promisedValues.build;
+            cookie = promisedValues.cookie;
+            return build.update({ state: 'queued' })
+          })
+          .then(() => {
+            return validCreateRequest(
+              csrfToken.getToken(),
+              cookie,
+              {
+                buildId: build.id,
+                siteId: site.id,
+              }
+            );
+          })
+          .then((response) => {
+            expect(response.body).deep.equal({});
+            return Build.findOne({
+              where: {
+                site: site.id,
+                branch: 'my-branch',
+                state:['created', 'queued'],
+              },
+            });
+          })
+          .then((build) => {
+            expect(build).to.be.null;
+            done();
+          })
+          .catch(done);
+        });
+
+        it('should NOT create a new build if a branch build already exists @state=created', (done) => {
+          let site;
+          let user;
+          let build;
+          let cookie;
+
+          promiseProps
+          .then((promisedValues) => {
+            site = promisedValues.site;
+            user = promisedValues.user;
+            build = promisedValues.build;
+            cookie = promisedValues.cookie;
+            return build.update({ state: 'created' })
+          })
+          .then(() => {
+            return validCreateRequest(
+              csrfToken.getToken(),
+              cookie,
+              {
+                buildId: build.id,
+                siteId: site.id,
+              }
+            );
+          })
+          .then((response) => {
+            expect(response.body).deep.equal({});
+            return Build.findOne({
+              where: {
+                site: site.id,
+                branch: 'my-branch',
+                state: ['created', 'queued'],
+              },
+            });
+          })
+          .then((build) => {
+            expect(build).to.be.null;
             done();
           })
           .catch(done);
@@ -584,7 +676,7 @@ describe('Build API', () => {
       .then(() => Build.findByPk(build.id))
       .then((unmodifiedBuild) => {
         expect(unmodifiedBuild).to.not.be.undefined;
-        expect(unmodifiedBuild.state).to.equal('queued');
+        expect(unmodifiedBuild.state).to.equal('created');
         done();
       })
       .catch(done);
