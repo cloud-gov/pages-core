@@ -53,8 +53,8 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
   }
 
   if (['created', 'queued', 'tasked'].includes(build.state) && buildStatus.status === 'processing') {
-    if(['created', 'queued'].includes(build.state)) {
-      logger.warn(`build@id=${build.id} state updated to 'queued' from '${build.state}'`);
+    if(build.state !== 'tasked') {
+      logger.warn(`build@id=${build.id} state updated to 'processing' from '${build.state}'`);
     }
     atts.startedAt = timestamp;
   }
