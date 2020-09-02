@@ -1,6 +1,6 @@
 const nock = require('nock');
 const { expect } = require('chai');
-const { stub } = require('sinon');
+const sinon = require('sinon');
 const AWSMocks = require('../../support/aws-mocks');
 const mockTokenRequest = require('../../support/cfAuthNock');
 const apiNocks = require('../../support/cfAPINocks');
@@ -12,7 +12,10 @@ const {
 } = require('../../../../api/models');
 
 describe('SQS', () => {
-  afterEach(() => nock.cleanAll());
+  afterEach(() => {
+    nock.cleanAll();
+    sinon.restore();
+  });
 
   beforeEach(() => {
     mockTokenRequest();
@@ -20,16 +23,12 @@ describe('SQS', () => {
   });
 
   describe('.sendBuildMessage(build)', () => {
-    it('should send a formatted build message', (done) => {
-      const oldSendMessage = SQS.sqsClient.sendMessage;
-      SQS.sqsClient.sendMessage = (params) => {
-        SQS.sqsClient.sendMessage = oldSendMessage;
-        expect(params).to.have.property('MessageBody');
-        expect(params).to.have.property('QueueUrl', config.sqs.queue);
-        done();
-      };
+    it('should send a formatted build message', async () => {
+      const sendMessageStub = sinon.stub(SQS.sqsClient, 'sendMessage').returns({
+        promise: () => Promise.resolve(),
+      });
 
-      SQS.sendBuildMessage({
+      await SQS.sendBuildMessage({
         branch: 'main',
         state: 'processing',
         url: 'testBucket.gov/boo/hoo',
@@ -39,6 +38,7 @@ describe('SQS', () => {
           engine: 'jekyll',
           defaultBranch: 'main',
           s3ServiceName: config.s3.serviceName,
+          containerConfig: {},
         },
         User: {
           passport: {
@@ -46,18 +46,19 @@ describe('SQS', () => {
           },
         },
       }, 2);
+
+      const params = sendMessageStub.firstCall.args[0];
+      expect(params).to.have.property('MessageBody');
+      expect(params).to.have.property('QueueUrl', config.sqs.queue);
     });
 
-    it('should send a formatted build message and setup S3 bucket config on first built', (done) => {
-      const oldSendMessage = SQS.sqsClient.sendMessage;
+    it('should send a formatted build message and setup S3 bucket config on first built', async () => {
+      const sendMessageStub = sinon.stub(SQS.sqsClient, 'sendMessage').returns({
+        promise: () => Promise.resolve(),
+      });
+
       const owner = 'owner';
       const repository = 'formatted-message-repo';
-      SQS.sqsClient.sendMessage = (params) => {
-        SQS.sqsClient.sendMessage = oldSendMessage;
-        expect(params).to.have.property('MessageBody');
-        expect(params).to.have.property('QueueUrl', config.sqs.queue);
-        done();
-      };
 
       AWSMocks.mocks.S3.headBucket = () => ({ promise: () => Promise.resolve() });
 
@@ -88,7 +89,7 @@ describe('SQS', () => {
         return { promise: () => Promise.resolve() };
       };
 
-      SQS.sendBuildMessage({
+      await SQS.sendBuildMessage({
         branch: 'main',
         state: 'processing',
         url: 'testBucket.gov/boo/hoo',
@@ -98,6 +99,7 @@ describe('SQS', () => {
           engine: 'jekyll',
           defaultBranch: 'main',
           s3ServiceName: config.s3.serviceName,
+          containerConfig: {},
         },
         User: {
           passport: {
@@ -105,6 +107,10 @@ describe('SQS', () => {
           },
         },
       }, 1);
+
+      const params = sendMessageStub.firstCall.args[0];
+      expect(params).to.have.property('MessageBody');
+      expect(params).to.have.property('QueueUrl', config.sqs.queue);
     });
   });
 
@@ -112,7 +118,7 @@ describe('SQS', () => {
     let sendMessageStub;
 
     beforeEach(() => {
-      sendMessageStub = stub(SQS, 'sendBuildMessage').returns({});
+      sendMessageStub = sinon.stub(SQS, 'sendBuildMessage').returns({});
     });
 
     afterEach(() => {
@@ -148,19 +154,6 @@ describe('SQS', () => {
           return SQS.messageBodyForBuild(build)
             .then((message) => {
               expect(messageEnv(message, 'STATUS_CALLBACK')).to.equal(`http://localhost:1337/v0/build/${build.id}/status/${build.token}`);
-              done();
-            });
-        })
-        .catch(done);
-    });
-
-    it('should set LOG_CALLBACK in the message', (done) => {
-      factory.build()
-        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
-        .then((build) => { // eslint-disable-line
-          return SQS.messageBodyForBuild(build)
-            .then((message) => {
-              expect(messageEnv(message, 'LOG_CALLBACK')).to.equal(`http://localhost:1337/v0/build/${build.id}/log/${build.token}`);
               done();
             });
         })
@@ -543,39 +536,16 @@ describe('SQS', () => {
         .catch(done);
     });
 
-    describe('SKIP_LOGGING', () => {
-      const origAppEnv = config.app.app_env;
-
-      after(() => {
-        // reset to original value after these test cases
-        config.app.app_env = origAppEnv;
-      });
-
-      it('should set SKIP_LOGGING to true if the app_env is "development"', (done) => {
-        config.app.app_env = 'development';
-        factory.site()
-          .then(() => factory.build())
-          .then(build => Build.findByPk(build.id, { include: [Site, User] }))
-          .then(build => SQS.messageBodyForBuild(build))
-          .then((message) => {
-            expect(messageEnv(message, 'SKIP_LOGGING')).to.equal(true);
-            done();
-          })
-          .catch(done);
-      });
-
-      it('should set SKIP_LOGGING to false if the app_env is not "development"', (done) => {
-        config.app.app_env = 'not-development';
-        factory.site()
-          .then(() => factory.build())
-          .then(build => Build.findByPk(build.id, { include: [Site, User] }))
-          .then(build => SQS.messageBodyForBuild(build))
-          .then((message) => {
-            expect(messageEnv(message, 'SKIP_LOGGING')).to.equal(false);
-            done();
-          })
-          .catch(done);
-      });
+    it('should set containerName and containerSize in the message', () => {
+      const containerConfig = { name: 'default', size: 'large' };
+      return factory.site({ containerConfig })
+        .then(site => factory.build({ site }))
+        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
+        .then(build => SQS.messageBodyForBuild(build))
+        .then((message) => {
+          expect(message.containerName).to.deep.equal(containerConfig.name);
+          expect(message.containerSize).to.deep.equal(containerConfig.size);
+        });
     });
   });
 });

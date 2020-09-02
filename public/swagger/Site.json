@@ -12,12 +12,15 @@
     "demoViewLink",
     "previewLink",
     "basicAuth",
-    "users",
     "createdAt"
   ],
   "properties": {
     "id": {
       "type": "integer"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
     },
     "demoBranch": {
       "type": "string"
@@ -80,6 +83,17 @@
           "type": "string"
         },
         "password": {
+          "type": "string"
+        }
+      }
+    },
+    "containerConfig": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "size": {
           "type": "string"
         }
       }

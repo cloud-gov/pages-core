@@ -8,7 +8,7 @@
 
   const dispatch = createEventDispatcher();
 
-  const buildContainerTypes = ['default', 'exp'];
+  const buildContainerNames = ['default', 'exp'];
   const buildContainerSizes = ['default', 'large'];
 
   function replaceDefault(val) {
@@ -17,12 +17,12 @@
   
   function handleSubmit(event) {
     submitting = true;
-    const { containerSize, containerType } = event.target.elements;
-  
+    const { containerSize, containerName } = event.target.elements;
+
     dispatch('submit', {
       containerConfig: {
         size: replaceDefault(containerSize.value),
-        type: replaceDefault(containerType.value),
+        name: replaceDefault(containerName.value),
       },
     });
   }
@@ -55,16 +55,16 @@
       </select>
     </div>        
     <div class="grid-row">
-      <label class="usa-label grid-col" for="container-type">Build Container Type</label>
+      <label class="usa-label grid-col" for="container-name">Build Container Name</label>
       <select
         class="usa-select grid-col-4"
-        id="container-type"
-        name="containerType"
-        value={site.containerConfig.type}
+        id="container-name"
+        name="containerName"
+        value={site.containerConfig.name}
       >
-        {#each buildContainerTypes as buildContainerType}
-          <option value={buildContainerType}>
-            {buildContainerType}
+        {#each buildContainerNames as buildContainerName}
+          <option value={buildContainerName}>
+            {buildContainerName}
           </option>
         {/each}
       </select>

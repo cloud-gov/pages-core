@@ -195,6 +195,10 @@ paths:
             type: array
             items:
               $ref: "Site.json"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "Error.json"         
         403:
           description: Not authorized
           schema:
@@ -269,6 +273,10 @@ paths:
           description: The site object for the given ID
           schema:
             $ref: "Site.json"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "Error.json"            
         403:
           description: Not authorized
           schema:

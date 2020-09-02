@@ -9,12 +9,12 @@ const SiteSerializer = require('../../../../api/serializers/site');
 describe('SiteSerializer', () => {
   describe('.serialize(serializable)', () => {
     it('should serialize an object correctly', (done) => {
-      factory.site({config: { basicAuth: { username: 'username', password: 'password' } } })
+      factory.site({ basicAuth: { username: 'username', password: 'password' } })
         .then(site => SiteSerializer.serialize(site))
         .then((object) => {
           const result = validateJSONSchema(object, siteSchema);
           expect(result.errors).to.be.empty;
-          expect(object.basicAuth.password).to.eql("**********"); // hide password check
+          expect(object.basicAuth.password).to.eq('**********'); // hide password check
           done();
         })
         .catch(done);
@@ -50,6 +50,33 @@ describe('SiteSerializer', () => {
           done();
         })
         .catch(done);
+    });
+  });
+
+  describe('.serializeNew(serializable)', () => {
+    it('should serialize an object correctly', async () => {
+      const site = await factory.site({ basicAuth: { username: 'username', password: 'password' } });
+
+      const serialized = SiteSerializer.serializeNew(site);
+
+      const result = validateJSONSchema(serialized, siteSchema);
+      expect(result.errors).to.be.empty;
+      expect(serialized.basicAuth.password).to.eql('**********'); // hide password check
+      expect(serialized.users).to.be.undefined; // does not query for users by default
+      expect(serialized.containerConfig).to.be.undefined;
+    });
+
+    it('includes admin attributes', async () => {
+      const containerConfig = { name: 'name', size: 'size' };
+      const site = await factory.site({ containerConfig });
+
+      const serialized = SiteSerializer.serializeNew(site, true);
+
+      const result = validateJSONSchema(serialized, siteSchema);
+      expect(result.errors).to.be.empty;
+      expect(serialized.basicAuth).to.eql({});
+      expect(serialized.users).to.be.undefined; // does not query for users by default
+      expect(serialized.containerConfig).to.deep.eq(containerConfig);
     });
   });
 });
