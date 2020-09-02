@@ -442,7 +442,7 @@ describe('SQS', () => {
         .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then(build => SQS.messageBodyForBuild(build))
         .then((message) => {
-          expect(messageEnv(message, 'CONFIG')).to.equal('plugins_dir: _plugins\n');
+          expect(messageEnv(message, 'CONFIG')).to.equal(JSON.stringify({ plugins_dir: '_plugins' }));
           done();
         })
         .catch(done);
@@ -459,7 +459,7 @@ describe('SQS', () => {
         .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then(build => SQS.messageBodyForBuild(build))
         .then((message) => {
-          expect(messageEnv(message, 'CONFIG')).to.equal('plugins_dir: _demo_plugins\n');
+          expect(messageEnv(message, 'CONFIG')).to.equal(JSON.stringify({ plugins_dir: '_demo_plugins' }));
           done();
         })
         .catch(done);
@@ -476,7 +476,7 @@ describe('SQS', () => {
         .then(build => Build.findByPk(build.id, { include: [Site, User] }))
         .then(build => SQS.messageBodyForBuild(build))
         .then((message) => {
-          expect(messageEnv(message, 'CONFIG')).to.equal('plugins_dir: _preview_plugins\n');
+          expect(messageEnv(message, 'CONFIG')).to.equal(JSON.stringify({ plugins_dir: '_preview_plugins' }));
           done();
         })
         .catch(done);
