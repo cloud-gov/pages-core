@@ -1,6 +1,5 @@
 const AWS = require('aws-sdk');
 const url = require('url');
-const yaml = require('js-yaml');
 const S3Helper = require('./S3Helper');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
@@ -14,7 +13,7 @@ const defaultBranch = build => build.branch === build.Site.defaultBranch;
 const demoBranch = build => build.branch === build.Site.demoBranch;
 
 const siteConfig = (build) => {
-  let siteBuildConfig = '';
+  let siteBuildConfig;
   if (defaultBranch(build)) {
     siteBuildConfig = build.Site.defaultConfig;
   } else if (demoBranch(build)) {
@@ -22,7 +21,7 @@ const siteConfig = (build) => {
   } else {
     siteBuildConfig = build.Site.previewConfig;
   }
-  return siteBuildConfig ? yaml.safeDump(siteBuildConfig) : ''; // to be safedumped
+  return siteBuildConfig || {};
 };
 
 const baseURLForDomain = rawDomain => url.parse(rawDomain).path.replace(/(\/)+$/, '');
@@ -54,7 +53,7 @@ const generateDefaultCredentials = build => ({
   BASEURL: baseURLForBuild(build),
   CACHE_CONTROL: buildConfig.cacheControl,
   BRANCH: build.branch,
-  CONFIG: siteConfig(build),
+  CONFIG: JSON.stringify(siteConfig(build)),
   REPOSITORY: build.Site.repository,
   OWNER: build.Site.owner,
   SITE_PREFIX: sitePrefixForBuild(buildUrl(build, build.Site)),
