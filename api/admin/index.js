@@ -32,6 +32,11 @@ function errorHandler(err, _req, res, _next) {
   res.error(err);
 }
 
+function cacheControl(_req, res, next) {
+  res.set('Cache-Control', 'no-store');
+  next();
+}
+
 const app = express();
 app.options('*', cors(corsCfg));
 app.use(cors(corsCfg));
@@ -41,6 +46,7 @@ app.use(passport.session());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: '2mb' }));
 app.use(methodOverride());
+app.use(cacheControl);
 app.use(responses);
 app.use(router);
 app.use(expressErrorLogger);
