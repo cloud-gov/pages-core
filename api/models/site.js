@@ -1,4 +1,4 @@
-const { branchRegex, parseSiteConfigs, isEmptyOrUrl } = require('../utils/validators');
+const { branchRegex, parseSiteConfigs, isEmptyOrUrl, isValidSubdomain } = require('../utils/validators');
 
 const afterValidate = (site) => {
   if (site.defaultBranch === site.demoBranch) {
@@ -148,6 +148,9 @@ module.exports = (sequelize, DataTypes) => {
     subdomain: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        isValidSubdomain,
+      },
     },
     basicAuth: {
       type: DataTypes.VIRTUAL,

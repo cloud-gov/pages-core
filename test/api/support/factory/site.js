@@ -1,14 +1,16 @@
 const userFactory = require('./user');
 const { Site } = require('../../../../api/models');
 
-let repositoryNameStep = 1;
+let siteAttsStep = 1;
 
-function generateUniqueRepository() {
+function generateUniqueAtts() {
   const res = {
-    owner: `repo-owner-${repositoryNameStep}`,
-    name: `repo-name-${repositoryNameStep}`,
+    owner: `repo-owner-${siteAttsStep}`,
+    repository: `repo-name-${siteAttsStep}`,
+    subdomain: `siteSubDomain-${siteAttsStep}`,
+
   };
-  repositoryNameStep += 1;
+  siteAttsStep += 1;
   return res;
 }
 
@@ -19,17 +21,17 @@ function makeAttributes(overrides = {}) {
     users = Promise.all([userFactory()]);
   }
 
-  const repository = generateUniqueRepository();
+  const { owner, repository, subdomain } = generateUniqueAtts();
 
   return Object.assign({
-    owner: repository.owner,
-    repository: repository.name,
+    owner,
+    repository,
     engine: 'jekyll',
     s3ServiceName: 'federalist-dev-s3',
     awsBucketName: 'cg-123456789',
     awsBucketRegion: 'us-gov-west-1',
     defaultBranch: 'main',
-    subdomain: 'siteSubDomain',
+    subdomain,
     users,
   }, overrides);
 }

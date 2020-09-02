@@ -169,4 +169,28 @@ describe('Site model', () => {
       done();
     });
   });
+
+  it('should validate that the subdomain is only alpahnumeric and hyphen', (done) => {
+    const subdomain = 'inva.l1d';
+    const errMsg = 'subdomain: Subdomains may only contain up to 63 alphanumeric and hyphen characters.';
+    factory.site({
+      subdomain
+    }).catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal(errMsg);
+      done();
+    }).catch(done);
+  });
+
+  it('should validate that the subdomain is <= 63 characters', (done) => {
+    const subdomain = '0123456789012345678901234567890123456789012345678901234567890123';
+    const errMsg = 'subdomain: Subdomains may only contain up to 63 alphanumeric and hyphen characters.';
+    factory.site({
+      subdomain
+    }).catch((err) => {
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal(errMsg);
+      done();
+    }).catch(done);
+  });
 });
