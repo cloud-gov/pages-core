@@ -176,8 +176,8 @@ describe('User Environment Variable API', () => {
         const userPromise = factory.user();
         const site = await factory.site({ users: Promise.all([userPromise]) });
         const uevs = await Promise.all([
-          factory.userEnvironmentVariable.create({ site }),
-          factory.userEnvironmentVariable.create({ site }),
+          factory.userEnvironmentVariable.create({ site, name: 'foo' }),
+          factory.userEnvironmentVariable.create({ site, name: 'bar' }),
         ]);
         await Promise.all([
           // Different user and site

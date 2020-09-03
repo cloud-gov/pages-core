@@ -1,9 +1,7 @@
 const AWS = require('aws-sdk');
 const url = require('url');
-const yaml = require('js-yaml');
 const S3Helper = require('./S3Helper');
 const config = require('../../config');
-const { logger } = require('../../winston');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const { buildViewLink, buildUrl } = require('../utils/build');
 
@@ -15,7 +13,7 @@ const defaultBranch = build => build.branch === build.Site.defaultBranch;
 const demoBranch = build => build.branch === build.Site.demoBranch;
 
 const siteConfig = (build) => {
-  let siteBuildConfig = '';
+  let siteBuildConfig;
   if (defaultBranch(build)) {
     siteBuildConfig = build.Site.defaultConfig;
   } else if (demoBranch(build)) {
@@ -23,7 +21,7 @@ const siteConfig = (build) => {
   } else {
     siteBuildConfig = build.Site.previewConfig;
   }
-  return siteBuildConfig ? yaml.safeDump(siteBuildConfig) : ''; // to be safedumped
+  return siteBuildConfig || {};
 };
 
 const baseURLForDomain = rawDomain => url.parse(rawDomain).path.replace(/(\/)+$/, '');
@@ -39,13 +37,6 @@ const statusCallbackURL = build => [
   build.token,
 ].join('/');
 
-const buildLogCallbackURL = build => [
-  url.resolve(config.app.hostname, '/v0/build'),
-  build.id,
-  'log',
-  build.token,
-].join('/');
-
 const buildUEVs = uevs => (uevs
   ? uevs.map(uev => ({
     name: uev.name,
@@ -58,18 +49,16 @@ const generateDefaultCredentials = build => ({
   AWS_ACCESS_KEY_ID: config.s3.accessKeyId,
   AWS_SECRET_ACCESS_KEY: config.s3.secretAccessKey,
   STATUS_CALLBACK: statusCallbackURL(build),
-  LOG_CALLBACK: buildLogCallbackURL(build),
   BUCKET: config.s3.bucket,
   BASEURL: baseURLForBuild(build),
   CACHE_CONTROL: buildConfig.cacheControl,
   BRANCH: build.branch,
-  CONFIG: siteConfig(build),
+  CONFIG: JSON.stringify(siteConfig(build)),
   REPOSITORY: build.Site.repository,
   OWNER: build.Site.owner,
   SITE_PREFIX: sitePrefixForBuild(buildUrl(build, build.Site)),
   GITHUB_TOKEN: build.User.githubAccessToken,
   GENERATOR: build.Site.engine,
-  SKIP_LOGGING: config.app.app_env === 'development',
   AUTH_BASEURL: process.env.APP_HOSTNAME,
   AUTH_ENDPOINT: 'external/auth/github',
   BUILD_ID: build.id,
@@ -85,7 +74,8 @@ const buildContainerEnvironment = (build) => {
 
   return apiClient
     .fetchServiceInstanceCredentials(build.Site.s3ServiceName)
-    .then(credentials => Object.assign({}, defaultCredentials, {
+    .then(credentials => ({
+      ...defaultCredentials,
       AWS_DEFAULT_REGION: credentials.region,
       AWS_ACCESS_KEY_ID: credentials.access_key_id,
       AWS_SECRET_ACCESS_KEY: credentials.secret_access_key,
@@ -139,30 +129,20 @@ SQS.messageBodyForBuild = build => buildContainerEnvironment(build)
       name: key,
       value: environment[key],
     })),
-    name: buildConfig.containerName,
+    containerName: build.Site.containerConfig.name,
+    containerSize: build.Site.containerConfig.size,
   }));
 
-SQS.sendBuildMessage = (build, buildCount) => SQS.messageBodyForBuild(build)
-  .then((message) => {
-    const params = {
-      QueueUrl: sqsConfig.queue,
-      MessageBody: JSON.stringify(message),
-    };
+SQS.sendBuildMessage = async (build, buildCount) => {
+  const message = await SQS.messageBodyForBuild(build);
+  await setupBucket(build, buildCount);
 
-    return setupBucket(build, buildCount)
-      .then(() => {
-        SQS.sqsClient.sendMessage(params, (err) => {
-          if (err) {
-            const errMsg = `There was an error, adding the job to SQS: ${err}`;
-            logger.error(errMsg);
-            build.updateJobStatus({
-              status: 'error',
-              message: errMsg,
-            });
-          }
-          build.updateJobStatus({ state: 'queued' });
-        });
-      });
-  });
+  const params = {
+    QueueUrl: sqsConfig.queue,
+    MessageBody: JSON.stringify(message),
+  };
+
+  return SQS.sqsClient.sendMessage(params).promise();
+};
 
 module.exports = SQS;

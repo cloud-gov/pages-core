@@ -44,6 +44,7 @@ function serializeNew(site, isSystemAdmin = false) {
   const filtered = pick(allowedAttributes, object);
 
   dateFields
+    .filter(dateField => object[dateField])
     .forEach((dateField) => { filtered[dateField] = object[dateField].toISOString(); });
 
   yamlFields

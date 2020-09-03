@@ -33,7 +33,7 @@ describe('UserEnvironmentVariable model', () => {
     });
   });
 
-  describe.only('requires unique name per site', () => {
+  describe('requires unique name per site', () => {
     it('allows the same name for different sites', async () => {
       const name = 'foobarbaz';
       const [site1, site2] = await Promise.all([

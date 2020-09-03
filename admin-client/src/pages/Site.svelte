@@ -15,8 +15,8 @@
 
   let site = null;
 
-  async function handleSubmit(params) {
-    site = await updateSite(id, params);
+  async function handleSubmit({ detail }) {
+    site = await updateSite(id, detail);
     notification.setSuccess('Site updated successfully');
   }
 

@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
 const SQS = require('../services/SQS');
+const { logger } = require('../../winston');
 
 const { branchRegex, shaRegex, isEmptyOrUrl } = require('../utils/validators');
 const { buildUrl } = require('../utils/build');
@@ -51,7 +52,7 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
     atts.url = buildUrl(build, site);
   }
 
-  if (build.state === 'queued' && buildStatus.status === 'processing') {
+  if (['created', 'queued', 'tasked'].includes(build.state) && buildStatus.status === 'processing') {
     atts.startedAt = timestamp;
   }
 
@@ -78,7 +79,17 @@ async function enqueue() {
     where: { site: foundBuild.site },
   });
 
-  await SQS.sendBuildMessage(foundBuild, count);
+  try {
+    await SQS.sendBuildMessage(foundBuild, count);
+    await build.updateJobStatus({ status: 'queued' });
+  } catch (err) {
+    const errMsg = `There was an error, adding the job to SQS: ${err}`;
+    logger.error(errMsg);
+    await build.updateJobStatus({
+      status: 'error',
+      message: errMsg,
+    });
+  }
 
   return build;
 }
