@@ -52,7 +52,7 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
     atts.url = buildUrl(build, site);
   }
 
-  if (build.state === 'queued' && buildStatus.status === 'processing') {
+  if (['created', 'queued', 'tasked'].includes(build.state) && buildStatus.status === 'processing') {
     atts.startedAt = timestamp;
   }
 
