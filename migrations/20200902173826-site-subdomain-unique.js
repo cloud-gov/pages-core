@@ -10,7 +10,7 @@ exports.up = function (db, callback) {
 };
 
 exports.down = function (db, callback) {
-  db.runSql('ALTER TABLE site DROP CONSTRAINT "site_subdomain_unique"', (err) => {
+  db.runSql('DROP INDEX site_subdomain_unique', (err) => {
     if (err) throw err;
     callback();
   });
