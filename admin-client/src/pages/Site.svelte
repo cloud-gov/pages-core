@@ -1,10 +1,16 @@
 <script>
   import { onMount } from 'svelte';
   import { notification, router } from '../stores';
-  import { fetchBuilds, fetchSite, updateSite } from '../lib/api';
+  import {
+    destroySite,
+    fetchBuilds,
+    fetchSite,
+    updateSite,
+  } from '../lib/api';
 
   import {
     BuildList,
+    SiteDeleteForm,
     GridContainer,
     PageTitle,
     SiteForm,
@@ -20,6 +26,11 @@
     notification.setSuccess('Site updated successfully');
   }
 
+  async function handleDestroy() {
+    await destroySite(id);
+    notification.setSuccess('Site deleted successfully');
+  }
+
   onMount(async () => { site = await fetchSite(id); });
 </script>
 
@@ -27,8 +38,9 @@
   {#if site}
     <PageTitle>{site.owner}/{site.repository}</PageTitle>
     <SiteMetadata {site} />
-    <SiteForm {site} on:submit={handleSubmit}/>
-  {:else}    
+    <SiteForm {site} on:submit={handleSubmit} />
+    <SiteDeleteForm {site} on:submit={handleDestroy} />
+  {:else}
     <p>Loading site...</p>
   {/if}
   {#await fetchBuilds({ site: id })}
