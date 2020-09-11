@@ -81,7 +81,7 @@ describe("Site authorizer", () => {
   describe(".destroy(user, site)", () => {
     let stub;
     beforeEach(() => {
-       stub = sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins');
+      stub = sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins');
     })
     afterEach(() => {
       stub.restore();
