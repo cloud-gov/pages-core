@@ -69,13 +69,9 @@ const findOne = (user, site) => authorize(user, site);
 
 const update = (user, site) => authorize(user, site);
 
-const destroy = (user, site) => {
-  return authorize(user, site)
-    .then(() => authorizeAdmin(user, site))
-    .catch(() => {
-      return authorizeFederalistUsersAdmin(user);
-    });
-}
+const destroy = (user, site) => authorize(user, site)
+  .then(() => authorizeAdmin(user, site))
+  .catch(() => authorizeFederalistUsersAdmin(user));
 
 const removeUser = (user, site) => authorize(user, site);
 
