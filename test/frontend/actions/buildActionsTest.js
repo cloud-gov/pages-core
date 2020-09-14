@@ -12,6 +12,7 @@ describe("buildActions", () => {
   let buildRestartedActionCreator;
   let fetchBuilds;
   let restartBuild;
+  let alertSuccess;
 
   beforeEach(() => {
     dispatch = spy();
@@ -21,6 +22,8 @@ describe("buildActions", () => {
 
     fetchBuilds = stub()
     restartBuild = stub();
+
+    alertSuccess = stub();
 
     fixture = proxyquire("../../../frontend/actions/buildActions", {
       "./actionCreators/buildActions": {
@@ -34,7 +37,10 @@ describe("buildActions", () => {
       },
       "../store": {
         dispatch: dispatch,
-      }
+      },
+      './alertActions': {
+        alertSuccess,
+      },
     }).default;
   });
 
@@ -59,24 +65,39 @@ describe("buildActions", () => {
     })
   })
 
-  it("restartBuild", done => {
-    const build = {
-      "we": "like to build it's true",
-      "how": "about you?"
-    };
-    const buildPromise = Promise.resolve(build);
-    const action = {
-      action: "action"
-    };
-    restartBuild.withArgs().returns(buildPromise);
-    buildRestartedActionCreator.withArgs(build).returns(action);
+  describe("restartBuild", () => {
+    it("build is restarted", done => {
+      const build = {
+        "we": "like to build it's true",
+        "how": "about you?"
+      };
+      const buildPromise = Promise.resolve(build);
+      const action = {
+        action: "action"
+      };
+      restartBuild.withArgs().returns(buildPromise);
+      buildRestartedActionCreator.withArgs(build).returns(action);
 
-    const actual = fixture.restartBuild();
+      const actual = fixture.restartBuild();
 
-    actual.then(() => {
-      expect(dispatch.calledOnce).to.be.true;
-      expect(dispatch.calledWith(action)).to.be.true;
-      done()
+      actual.then(() => {
+        expect(dispatch.calledOnce).to.be.true;
+        expect(dispatch.calledWith(action)).to.be.true;
+        done()
+      });
+    });
+
+    it("build is NOT restarted", done => {
+      const build = {};
+      const buildPromise = Promise.resolve(build);
+      restartBuild.withArgs().returns(buildPromise);
+      expect(alertSuccess.called).to.be.false;
+      const actual = fixture.restartBuild();
+      actual.then(() => {
+        expect(dispatch.notCalled).to.be.true;
+        expect(alertSuccess.calledWith('Build is already queued.')).to.be.true;
+        done()
+      });
     });
   });
 });

@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const validateJSONSchema = require('jsonschema').validate;
 
 const siteSchema = require('../../../../public/swagger/Site.json');
@@ -9,11 +9,12 @@ const SiteSerializer = require('../../../../api/serializers/site');
 describe('SiteSerializer', () => {
   describe('.serialize(serializable)', () => {
     it('should serialize an object correctly', (done) => {
-      factory.site()
+      factory.site({ basicAuth: { username: 'username', password: 'password' } })
         .then(site => SiteSerializer.serialize(site))
         .then((object) => {
           const result = validateJSONSchema(object, siteSchema);
           expect(result.errors).to.be.empty;
+          expect(object.basicAuth.password).to.eq('**********'); // hide password check
           done();
         })
         .catch(done);
@@ -42,13 +43,40 @@ describe('SiteSerializer', () => {
       const otherUsers = Array(authUserCount).fill(0).map(() => factory.user());
 
       Promise.all(otherUsers.concat(nonGithubUser))
-      .then(users => factory.site({ users }))
-      .then(SiteSerializer.serialize)
-      .then((object) => {
-        expect(object.users.length).to.equal(authUserCount);
-        done();
-      })
-      .catch(done);
+        .then(users => factory.site({ users }))
+        .then(SiteSerializer.serialize)
+        .then((object) => {
+          expect(object.users.length).to.equal(authUserCount);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('.serializeNew(serializable)', () => {
+    it('should serialize an object correctly', async () => {
+      const site = await factory.site({ basicAuth: { username: 'username', password: 'password' } });
+
+      const serialized = SiteSerializer.serializeNew(site);
+
+      const result = validateJSONSchema(serialized, siteSchema);
+      expect(result.errors).to.be.empty;
+      expect(serialized.basicAuth.password).to.eql('**********'); // hide password check
+      expect(serialized.users).to.be.undefined; // does not query for users by default
+      expect(serialized.containerConfig).to.be.undefined;
+    });
+
+    it('includes admin attributes', async () => {
+      const containerConfig = { name: 'name', size: 'size' };
+      const site = await factory.site({ containerConfig });
+
+      const serialized = SiteSerializer.serializeNew(site, true);
+
+      const result = validateJSONSchema(serialized, siteSchema);
+      expect(result.errors).to.be.empty;
+      expect(serialized.basicAuth).to.eql({});
+      expect(serialized.users).to.be.undefined; // does not query for users by default
+      expect(serialized.containerConfig).to.deep.eq(containerConfig);
     });
   });
 });

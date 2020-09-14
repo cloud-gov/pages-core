@@ -30,7 +30,12 @@ module.exports = {
         test: /\.scss$/,
         use: [
           MiniCssExtractPlugin.loader,
-          'css-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              url: url => !url.includes('images'),
+            },
+          },
           {
             loader: 'postcss-loader',
             options: {

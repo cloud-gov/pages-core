@@ -1,44 +1,76 @@
 const yaml = require('js-yaml');
+const { omitBy, pick } = require('../utils');
 const { Site, User } = require('../models');
-const userSerializer = require('../serializers/user');
-const { buildSiteLink } = require('../utils/site');
+const userSerializer = require('./user');
+const { siteViewLink, hideBasicAuthPassword } = require('../utils/site');
 
-const toJSON = (site) => {
-  const object = Object.assign({}, site.get({
-    plain: true,
-  }));
+const allowedAttributes = [
+  'id',
+  'demoBranch',
+  'demoDomain',
+  'defaultBranch',
+  'domain',
+  'engine',
+  'owner',
+  'publishedAt',
+  'repository',
+  's3ServiceName',
+  'awsBucketName',
+  'Users',
+];
 
-  delete object.site_users__user_sites;
+const dateFields = [
+  'createdAt',
+  'updatedAt',
+  'repoLastVerified',
+];
 
-  object.demoViewLink = buildSiteLink('demo', object);
-  object.previewLink = buildSiteLink('preview', object);
-  object.viewLink = buildSiteLink('site', object);
-  object.createdAt = object.createdAt.toISOString();
-  object.updatedAt = object.updatedAt.toISOString();
+const yamlFields = [
+  'defaultConfig',
+  'demoConfig',
+  'previewConfig',
+];
 
-  if (object.defaultConfig) {
-    object.defaultConfig = yaml.safeDump(site.defaultConfig);
-  }
-
-  if (object.demoConfig) {
-    object.demoConfig = yaml.safeDump(site.demoConfig);
-  }
-
-  if (object.previewConfig) {
-    object.previewConfig = yaml.safeDump(site.previewConfig);
-  }
-
-  Object.keys(object).forEach((key) => {
-    if (object[key] === null) {
-      delete object[key];
-    }
-  });
-
-  return object;
+const viewLinks = {
+  demoViewLink: 'demo',
+  previewLink: 'preview',
+  viewLink: 'site',
 };
 
+// Eventually replace `serialize`
+function serializeNew(site, isSystemAdmin = false) {
+  const object = site.get({ plain: true });
+
+  const filtered = pick(allowedAttributes, object);
+
+  dateFields
+    .filter(dateField => object[dateField])
+    .forEach((dateField) => { filtered[dateField] = object[dateField].toISOString(); });
+
+  yamlFields
+    .filter(yamlField => object[yamlField])
+    .forEach((yamlField) => { filtered[yamlField] = yaml.safeDump(object[yamlField]); });
+
+  Object
+    .keys(viewLinks)
+    .forEach((key) => { filtered[key] = siteViewLink(object, viewLinks[key]); });
+
+  filtered.basicAuth = hideBasicAuthPassword(site.basicAuth);
+
+  if (isSystemAdmin) {
+    filtered.containerConfig = site.containerConfig;
+  }
+
+  return omitBy((v => v === null), filtered);
+}
+
+// Eventually replace `serialize` for arrays
+function serializeMany(sites, isSystemAdmin) {
+  return sites.map(site => serializeNew(site, isSystemAdmin));
+}
+
 const serializeObject = (site) => {
-  const json = toJSON(site);
+  const json = serializeNew(site);
 
   if (json.Users) {
     json.users = site.Users.map(u => userSerializer.toJSON(u));
@@ -61,4 +93,6 @@ const serialize = (serializable) => {
   return query.then(serializeObject);
 };
 
-module.exports = { serialize, toJSON };
+module.exports = {
+  serialize, toJSON: serializeNew, serializeNew, serializeMany,
+};

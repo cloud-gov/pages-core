@@ -76,6 +76,10 @@ function isEmptyOrUrl(value) {
   }
 }
 
+const validBasicAuthUsername = s => /^(?!.*[:])(?=.*[a-zA-Z0-9]).{4,255}$/.test(s);
+
+const validBasicAuthPassword = s => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,255}$/.test(s);
+
 module.exports = {
   branchRegex,
   shaRegex,
@@ -84,4 +88,6 @@ module.exports = {
   parseSiteConfigs,
   isEmptyOrUrl,
   ValidationError,
+  validBasicAuthUsername,
+  validBasicAuthPassword,
 };

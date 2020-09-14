@@ -161,4 +161,24 @@ export default {
     });
   },
 
+  removeBasicAuthFromSite(siteId) {
+    return this.fetch(`site/${siteId}/basic-auth`, {
+      method: 'DELETE',
+    }, {
+      handleHttpError: false,
+    });
+  },
+
+  saveBasicAuthToSite(siteId, credentials) {
+    return this.fetch(`site/${siteId}/basic-auth`, {
+      method: 'POST',
+      data: {
+        username: credentials.username,
+        password: credentials.password,
+      },
+    }, {
+      handleHttpError: false,
+    });
+  },
+
 };

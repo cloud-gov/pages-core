@@ -1,22 +1,13 @@
 const { expect } = require('chai');
-const { stub } = require('sinon');
+const sinon = require('sinon');
 const { DatabaseError, ValidationError } = require('sequelize');
 const SQS = require('../../../../api/services/SQS');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
 
-// eslint-disable-next-line scanjs-rules/call_setTimeout
-const wait = (ms = 1000) => new Promise(resolve => setTimeout(resolve, ms));
-
 describe('Build model', () => {
-  let sendMessageStub;
-
-  beforeEach(() => {
-    sendMessageStub = stub(SQS, 'sendBuildMessage');
-  });
-
   afterEach(() => {
-    sendMessageStub.restore();
+    sinon.restore();
   });
 
   describe('before validate hook', () => {
@@ -39,14 +30,17 @@ describe('Build model', () => {
     });
   });
 
-  describe('after create hook', () => {
+  describe('enqueue', () => {
     it('should send a build new build message', async () => {
+      const sendMessageStub = sinon.stub(SQS, 'sendBuildMessage');
+      sendMessageStub.resolves();
+
       const site = await factory.site();
       const uev = await factory.userEnvironmentVariable.create({ site });
-      const build = await factory.build({ site }, true);
+      const build = await factory.build({ site });
+      await build.enqueue();
 
-      // create delay while s3 infra created ... will be removed with 1 bucket federalist
-      await wait();
+      await build.reload();
 
       expect(build.completedAt).to.be.null;
       expect(build.startedAt).to.be.null;
@@ -56,7 +50,7 @@ describe('Build model', () => {
       expect(sendMessageStub.called).to.be.true;
       expect(queuedBuild.id).to.equal(build.id);
       expect(buildCount).to.equal(1);
-      expect(build.state).to.eql('queued');
+      expect(build.state).to.equal('queued');
 
       // The build should include the site
       expect(queuedBuild.Site).to.be.an.instanceof(Site);
@@ -69,11 +63,11 @@ describe('Build model', () => {
   });
 
   describe('.updateJobStatus', () => {
-    describe('from `queued`', () => {
+    describe('from `created`', () => {
       let build;
 
       beforeEach(async () => {
-        build = await factory.build();
+        build = await factory.build({ state: 'created' });
       });
 
       describe('to `processing`', () => {
@@ -82,7 +76,7 @@ describe('Build model', () => {
 
           expect(build.state).to.equal('processing');
           expect(build.startedAt).to.be.a('date');
-          expect(build.startedAt).to.be.above(build.createdAt);
+          expect(build.startedAt).to.be.at.least(build.createdAt);
           expect(build.completedAt).to.be.null;
         });
       });
@@ -95,7 +89,80 @@ describe('Build model', () => {
           expect(build.error).to.equal('this is an error');
           expect(build.startedAt).to.be.null;
           expect(build.completedAt).to.be.a('date');
-          expect(build.completedAt).to.be.above(build.createdAt);
+          expect(build.completedAt).to.be.at.least(build.createdAt);
+        });
+
+        it('should sanitize GitHub access tokens from error message', async () => {
+          await build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' });
+
+          expect(build.error).not.to.match(/123abc/);
+        });
+      });
+    });
+    describe('from `queued`', () => {
+      let build;
+
+      beforeEach(async () => {
+        build = await factory.build({ state: 'queued' });
+      });
+
+      describe('to `processing`', () => {
+        it('should update the startedAt and state', async () => {
+          await build.updateJobStatus({ status: 'processing' });
+
+          expect(build.state).to.equal('processing');
+          expect(build.startedAt).to.be.a('date');
+          expect(build.startedAt).to.be.at.least(build.createdAt);
+          expect(build.completedAt).to.be.null;
+        });
+      });
+
+      describe('to `error`', () => {
+        it('should mark a build errored with a message', async () => {
+          await build.updateJobStatus({ status: 'error', message: 'this is an error' });
+
+          expect(build.state).to.equal('error');
+          expect(build.error).to.equal('this is an error');
+          expect(build.startedAt).to.be.null;
+          expect(build.completedAt).to.be.a('date');
+          expect(build.completedAt).to.be.at.least(build.createdAt);
+        });
+
+        it('should sanitize GitHub access tokens from error message', async () => {
+          await build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' });
+
+          expect(build.error).not.to.match(/123abc/);
+        });
+      });
+    });
+
+    describe('from `tasked`', () => {
+      let build;
+
+      beforeEach(async () => {
+        build = await factory.build({ state: 'tasked' });
+      });
+
+      describe('to `processing`', () => {
+        it('should update the startedAt and state', async () => {
+          await build.updateJobStatus({ status: 'processing' });
+
+          expect(build.state).to.equal('processing');
+          expect(build.startedAt).to.be.a('date');
+          expect(build.startedAt).to.be.at.least(build.createdAt);
+          expect(build.completedAt).to.be.null;
+        });
+      });
+
+      describe('to `error`', () => {
+        it('should mark a build errored with a message', async () => {
+          await build.updateJobStatus({ status: 'error', message: 'this is an error' });
+
+          expect(build.state).to.equal('error');
+          expect(build.error).to.equal('this is an error');
+          expect(build.startedAt).to.be.null;
+          expect(build.completedAt).to.be.a('date');
+          expect(build.completedAt).to.be.at.least(build.createdAt);
         });
 
         it('should sanitize GitHub access tokens from error message', async () => {
@@ -121,6 +188,7 @@ describe('Build model', () => {
           expect(build.state).to.be.eql('success');
           expect(build.completedAt).to.be.a('date');
           expect(build.completedAt).to.be.above(build.startedAt);
+          expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
 
           const site = await Site.findByPk(build.site);
 

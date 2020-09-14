@@ -245,6 +245,18 @@ module.exports = {
       });
   },
 
+  ensureFederalistAdmin: (accessToken, username) => githubClient(accessToken)
+    .then(github => github.teams.getMembershipForUserInOrg({
+      org: config.admin.org,
+      team_slug: config.admin.team,
+      username,
+    }))
+    .then(({ data: { state, role } }) => {
+      if (state !== 'active' || !['member', 'maintainer'].includes(role)) {
+        throw new Error('You are not a Federalist admin.');
+      }
+    }),
+
   sendCreateGithubStatusRequest: (accessToken, options) => githubClient(accessToken)
     .then(github => sendCreateGithubStatusRequest(github, options)),
 

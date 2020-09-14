@@ -16,6 +16,21 @@ services:
     environment:
       JWT_SECRET: 'shhHhh...'
       USER_AUDITOR: federalist
+      FEATURE_PROXY_EDGE_LINKS: 'true'
+      FEATURE_PROXY_EDGE_DYNAMO: 'true'
+      FEATURE_ADMIN_AUTH: 'true'
+  admin-client:
+    image: node:12
+    working_dir: /app
+    volumes:
+      - ./admin-client:/app
+      - ~/Library/Caches/Yarn:/usr/local/share/.cache/yarn
+    ports:
+      - "3000:3000"
+      - "35729:35729"
+    depends_on:
+      - app
+    command: ["yarn", "dev"]
   db:
     build:
       dockerfile: Dockerfile-db

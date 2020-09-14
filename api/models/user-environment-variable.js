@@ -22,6 +22,9 @@ module.exports = (sequelize, DataTypes) => {
     hint: {
       type: DataTypes.STRING,
       allowNull: false,
+      get() {
+        return '';
+      },
     },
   }, {
     tableName: 'user_environment_variable',

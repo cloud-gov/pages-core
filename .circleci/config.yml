@@ -68,6 +68,8 @@ jobs:
      docker:
        - *default-docker-node
        - *default-docker-postgres
+     environment:
+       FEATURE_ADMIN_AUTH: 'true'
      steps:
       - checkout
       - run:
@@ -116,6 +118,7 @@ jobs:
       - image: circleci/node:12
     environment:
       CF_MANIFEST: ./.cloudgov/manifest.yml
+      FEATURE_PROXY_EDGE_LINKS: 'true'
     steps:
       - checkout
       - restore_cache:
@@ -128,6 +131,38 @@ jobs:
       - *install-and-log-into-cloudgov
       - deploy:
           command: ./.cloudgov/deploy.sh
+      - *log-out-of-cloudgov
+
+  deploy-admin:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-admin-{{ checksum "admin-client/yarn.lock" }}
+      - run:
+          name: Install dependencies
+          command: yarn --frozen-lockfile --cache-folder ./.cache
+          working_directory: ./admin-client
+      - save_cache:
+          key: dependency-cache-admin-{{ checksum "admin-client/yarn.lock" }}
+          paths:
+            - ./admin-client/node_modules
+            - ./admin-client/.cache/yarn
+      - run:
+          name: Build app
+          command: yarn build
+          working_directory: ./admin-client
+          environment:
+            NODE_ENV: production
+            API_URL: https://federalistapp-staging.18f.gov
+      - *maybe-configure-staging
+      - *install-and-log-into-cloudgov
+      - run:
+          name: Deploy admin
+          command: cf7 push federalist-admin-staging --vars-file $CF_VARS_FILE -f $CF_MANIFEST
+          environment:
+            CF_MANIFEST: ./.cloudgov/manifest.yml
       - *log-out-of-cloudgov
 
   nightly-builds:
@@ -160,6 +195,12 @@ workflows:
               only:
                 - staging
                 - main
+      - deploy-admin:
+          requires:
+            - build        
+          filters:
+            branches:
+              only: staging
   nightly:
     triggers:
       - schedule:

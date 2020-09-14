@@ -134,6 +134,18 @@ describe('utils', () => {
     });
   });
 
+  describe('.generateSubdomain', () => {
+    it('should equal generateS3ServiceName', (done) => {
+      const owner = 'Hello';
+      const repository = 'Hello World';
+      const expected = 'o-hello-r-hello-world';
+
+      expect(utils.generateSubdomain(owner, repository)).to.equal(utils.generateS3ServiceName(owner, repository));
+      expect(utils.generateSubdomain(owner, repository)).to.equal(expected);
+      done();
+    });
+  });
+
   describe('.isPastAuthThreshold', () => {
     const threshAmount = config.policies.authRevalidationMinutes;
 
@@ -314,6 +326,21 @@ describe('utils', () => {
       expect(utils.pick(keys, obj)).to.deep.equal({
         foo: 'hi',
         bar: undefined,
+      });
+    });
+  });
+
+  describe('.omit', () => {
+    it('returns an object omitting containing specified keys', () => {
+      const keys = ['foo', 'bar'];
+      const obj = {
+        foo: 'hi',
+        bar: undefined,
+        baz: 'bye',
+      };
+
+      expect(utils.omit(keys, obj)).to.deep.equal({
+        baz: 'bye',
       });
     });
   });

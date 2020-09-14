@@ -1,29 +1,10 @@
 const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
 const SQS = require('../services/SQS');
+const { logger } = require('../../winston');
 
 const { branchRegex, shaRegex, isEmptyOrUrl } = require('../utils/validators');
 const { buildUrl } = require('../utils/build');
-
-const afterCreate = (build) => {
-  const {
-    Site, User, Build, UserEnvironmentVariable,
-  } = build.sequelize.models;
-
-  return Build.findOne({
-    where: { id: build.id },
-    include: [User, {
-      model: Site,
-      required: true,
-      include: [UserEnvironmentVariable],
-    }],
-  })
-    .then((foundBuild) => {
-      Build.count({
-        where: { site: foundBuild.site },
-      }).then(count => SQS.sendBuildMessage(foundBuild, count));
-    });
-};
 
 const associate = ({
   Build,
@@ -71,12 +52,47 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
     atts.url = buildUrl(build, site);
   }
 
-  if (build.state === 'queued' && buildStatus.status === 'processing') {
+  if (['created', 'queued', 'tasked'].includes(build.state) && buildStatus.status === 'processing') {
     atts.startedAt = timestamp;
   }
 
   return build.update(atts);
 };
+
+async function enqueue() {
+  const build = this;
+
+  const {
+    Site, User, Build, UserEnvironmentVariable,
+  } = build.sequelize.models;
+
+  const foundBuild = await Build.findOne({
+    where: { id: build.id },
+    include: [User, {
+      model: Site,
+      required: true,
+      include: [UserEnvironmentVariable],
+    }],
+  });
+
+  const count = await Build.count({
+    where: { site: foundBuild.site },
+  });
+
+  try {
+    await SQS.sendBuildMessage(foundBuild, count);
+    await build.updateJobStatus({ status: 'queued' });
+  } catch (err) {
+    const errMsg = `There was an error, adding the job to SQS: ${err}`;
+    logger.error(errMsg);
+    await build.updateJobStatus({
+      status: 'error',
+      message: errMsg,
+    });
+  }
+
+  return build;
+}
 
 async function updateJobStatus(buildStatus) {
   const timestamp = new Date();
@@ -113,8 +129,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     state: {
       type: DataTypes.ENUM,
-      values: ['error', 'processing', 'skipped', 'success', 'queued'],
-      defaultValue: 'queued',
+      values: ['created', 'queued', 'tasked', 'error', 'processing', 'skipped', 'success'],
+      defaultValue: 'created',
       allowNull: false,
     },
     token: {
@@ -139,7 +155,6 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     tableName: 'build',
     hooks: {
-      afterCreate,
       beforeValidate,
     },
     scopes: {
@@ -160,6 +175,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Build.generateToken = generateToken;
   Build.associate = associate;
+  Build.prototype.enqueue = enqueue;
   Build.prototype.updateJobStatus = updateJobStatus;
   return Build;
 };

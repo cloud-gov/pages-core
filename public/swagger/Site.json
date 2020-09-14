@@ -11,11 +11,16 @@
     "viewLink",
     "demoViewLink",
     "previewLink",
-    "users"
+    "basicAuth",
+    "createdAt"
   ],
   "properties": {
     "id": {
       "type": "integer"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
     },
     "demoBranch": {
       "type": "string"
@@ -23,7 +28,7 @@
     "demoDomain": {
       "type": "string"
     },
-    "config": {
+    "defaultConfig": {
       "type": "string"
     },
     "defaultBranch": {
@@ -49,6 +54,10 @@
       "type": "string",
       "format": "date-time"
     },
+    "repoLastVerified": {
+      "type": "string",
+      "format": "date-time"
+    },
     "repository": {
       "type": "string"
     },
@@ -66,6 +75,28 @@
     },
     "previewLink": {
       "type": "string"
+    },
+    "basicAuth": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "containerConfig": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string"
+        }
+      }
     },
     "users": {
       "type": "array",

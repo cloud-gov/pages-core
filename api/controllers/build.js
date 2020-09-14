@@ -68,17 +68,31 @@ module.exports = {
   create: (req, res) => {
     siteAuthorizer.createBuild(req.user, { id: req.body.siteId })
       .then(() => BuildResolver.getBuild(req.user, req.body))
-      .then(build => Build.create({
-        branch: build.branch,
-        site: build.site,
-        user: req.user.id,
-        commitSha: build.commitSha,
-      }))
-      .then(build => GithubBuildStatusReporter
-        .reportBuildStatus(build)
-        .then(() => build))
-      .then(build => buildSerializer.serialize(build))
-      .then(buildJSON => res.json(buildJSON))
+      .then(build => Build.findOne({
+          where: {
+            site: build.site,
+            branch: build.branch,
+            state: ['created', 'queued'],
+          },
+        })
+        .then(queuedBuild => {
+          if (!queuedBuild) {
+            return Build.create({
+              branch: build.branch,
+              site: build.site,
+              user: req.user.id,
+              commitSha: build.commitSha,
+            })
+            .then(build => build.enqueue())
+            .then(build => GithubBuildStatusReporter
+              .reportBuildStatus(build)
+              .then(() => build))
+            .then(build => buildSerializer.serialize(build))
+            .then(buildJSON => res.json(buildJSON));
+          }
+          res.ok({});
+        })
+      )
       .catch(res.error);
   },
 

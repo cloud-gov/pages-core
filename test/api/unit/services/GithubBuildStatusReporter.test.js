@@ -6,6 +6,7 @@ const config = require('../../../../config');
 const { logger } = require('../../../../winston');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
+const { buildViewLink } = require('../../../../api/utils/build');
 
 const GithubBuildStatusReporter = require('../../../../api/services/GithubBuildStatusReporter');
 
@@ -243,6 +244,152 @@ describe('GithubBuildStatusReporter', () => {
       });
     });
 
+    context('with a build in the created state', () => {
+      it("should report that the status is 'pending'", (done) => {
+        let statusNock;
+        let repoNock;
+        let build;
+
+        factory.build({
+          state: 'created',
+          site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
+          commitSha,
+        }).then((_build) => {
+          build = _build;
+          return build.getUser();
+        }).then((user) => {
+          repoNock = githubAPINocks.repo({
+            accessToken: user.githubAccessToken,
+            owner: 'test-owner',
+            repo: 'test-repo',
+            username: user.username,
+          });
+          statusNock = githubAPINocks.status({
+            owner: 'test-owner',
+            repo: 'test-repo',
+            repository: 'test-repo',
+            sha: commitSha,
+            state: 'pending',
+          });
+
+          return GithubBuildStatusReporter.reportBuildStatus(build);
+        }).then(() => {
+          expect(repoNock.isDone()).to.be.true;
+          expect(statusNock.isDone()).to.be.true;
+          done();
+        })
+        .catch(done);
+      });
+
+      it('should set the target uri to the build logs', (done) => {
+        let statusNock;
+        let repoNock;
+        let build;
+
+        factory.build({
+          state: 'created',
+          site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
+          commitSha,
+        }).then((_build) => {
+          build = _build;
+          return build.getUser();
+        }).then((user) => {
+          repoNock = githubAPINocks.repo({
+            accessToken: 'fake-access-token',
+            owner: 'test-owner',
+            repo: 'test-repo',
+            username: user.username,
+          });
+          statusNock = githubAPINocks.status({
+            owner: 'test-owner',
+            repo: 'test-repo',
+            sha: commitSha,
+            targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
+          });
+
+          return GithubBuildStatusReporter.reportBuildStatus(build);
+        }).then(() => {
+          expect(repoNock.isDone()).to.be.true;
+          expect(statusNock.isDone()).to.be.true;
+          done();
+        })
+        .catch(done);
+      });
+    });
+
+    context('with a build in the queued state', () => {
+      it("should report that the status is 'pending'", (done) => {
+        let statusNock;
+        let repoNock;
+        let build;
+
+        factory.build({
+          state: 'queued',
+          site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
+          commitSha,
+        }).then((_build) => {
+          build = _build;
+          return build.getUser();
+        }).then((user) => {
+          repoNock = githubAPINocks.repo({
+            accessToken: user.githubAccessToken,
+            owner: 'test-owner',
+            repo: 'test-repo',
+            username: user.username,
+          });
+          statusNock = githubAPINocks.status({
+            owner: 'test-owner',
+            repo: 'test-repo',
+            repository: 'test-repo',
+            sha: commitSha,
+            state: 'pending',
+          });
+
+          return GithubBuildStatusReporter.reportBuildStatus(build);
+        }).then(() => {
+          expect(repoNock.isDone()).to.be.true;
+          expect(statusNock.isDone()).to.be.true;
+          done();
+        })
+        .catch(done);
+      });
+
+      it('should set the target uri to the build logs', (done) => {
+        let statusNock;
+        let repoNock;
+        let build;
+
+        factory.build({
+          state: 'queued',
+          site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
+          commitSha,
+        }).then((_build) => {
+          build = _build;
+          return build.getUser();
+        }).then((user) => {
+          repoNock = githubAPINocks.repo({
+            accessToken: 'fake-access-token',
+            owner: 'test-owner',
+            repo: 'test-repo',
+            username: user.username,
+          });
+          statusNock = githubAPINocks.status({
+            owner: 'test-owner',
+            repo: 'test-repo',
+            sha: commitSha,
+            targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
+          });
+
+          return GithubBuildStatusReporter.reportBuildStatus(build);
+        }).then(() => {
+          expect(repoNock.isDone()).to.be.true;
+          expect(statusNock.isDone()).to.be.true;
+          done();
+        })
+        .catch(done);
+      });
+    });
+
     context('with every build', () => {
       const origAppEnv = config.app.app_env;
       after(() => {
@@ -339,8 +486,8 @@ describe('GithubBuildStatusReporter', () => {
           branch: 'preview-branch',
         }).then((_build) => {
           build = _build;
-          return build.getUser();
-        }).then((user) => {
+          return Promise.all([build.getUser(), build.getSite()]);
+        }).then(([user, site]) => {
           repoNock = githubAPINocks.repo({
             accessToken: 'fake-access-token',
             owner: 'test-owner',
@@ -351,7 +498,7 @@ describe('GithubBuildStatusReporter', () => {
             owner: 'test-owner',
             repo: 'test-repo',
             sha: commitSha,
-            targetURL: 'https://test-bucket.app.cloud.gov/preview/test-owner/test-repo/preview-branch/',
+            targetURL: buildViewLink(build, site),
           });
 
           return GithubBuildStatusReporter.reportBuildStatus(build);

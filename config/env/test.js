@@ -15,6 +15,11 @@ module.exports = {
     bucket: 'cg-123456789',
     serviceName: 'federalist-dev-s3',
   },
+  dynamoDB: {
+    accessKeyId: '123abc',
+    secretAccessKey: '456def',
+    region: 'us-gov-west-1',
+  },
   passport: {
     github: {
       options: {
@@ -28,6 +33,12 @@ module.exports = {
         clientSecret: '456def',
         callbackURL: 'http://localhost:1337/external/auth/github/callback',
         scope: ['user', 'repo'],
+      },
+      adminOptions: {
+        clientID: '123abc',
+        clientSecret: '456def',
+        callbackURL: 'http://localhost:1337/admin/auth/github/callback',
+        scope: ['user', 'repo', 'read:org'],
       },
       organizations: [
         123456,
@@ -53,6 +64,7 @@ module.exports = {
     cfSpaceGuid: '123abc-456def-789ghi',
     cfOauthTokenUrl: 'https://login.example.com/oauth/token',
     cfApiHost: 'https://api.example.com',
+    proxySiteTable: 'testSiteTable',
   },
   userEnvVar: {
     key: 'shhhhhhhhhhh',

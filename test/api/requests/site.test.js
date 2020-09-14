@@ -18,9 +18,27 @@ const csrfToken = require('../support/csrfToken');
 const { Build, Site, User } = require('../../../api/models');
 const S3SiteRemover = require('../../../api/services/S3SiteRemover');
 const siteErrors = require('../../../api/responses/siteErrors');
+const ProxyDataSync = require('../../../api/services/ProxyDataSync');
 const SQS = require('../../../api/services/SQS');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
+let removeSiteStub;
+let saveSiteStub;
+const defaultProxyEgeLinks = process.env.FEATURE_PROXY_EDGE_LINKS;
+
+beforeEach(() => {
+  removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
+  saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
+  process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true'
+});
+
+afterEach(() => {
+  sinon.restore();
+});
+
+after(() => {
+  process.env.FEATURE_PROXY_EDGE_DYNAMO = defaultProxyEgeLinks;
+});
 
 describe('Site API', () => {
   beforeEach(() => {
@@ -261,6 +279,7 @@ describe('Site API', () => {
 
     afterEach(() => {
       nock.cleanAll();
+      sinon.restore();
     });
 
     it('should require a valid csrf token', (done) => {
@@ -345,6 +364,50 @@ describe('Site API', () => {
         })
         .then((site) => {
           expect(site).to.not.be.undefined;
+          expect(saveSiteStub.calledOnce).to.equal(true);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should not call ProxyDataSync when FEATURE_PROXY_EDGE_DYNAMO=false', (done) => {
+      const siteOwner = crypto.randomBytes(3).toString('hex');
+      const siteRepository = crypto.randomBytes(3).toString('hex');
+
+      cfMockServices(siteOwner, siteRepository);
+
+      factory.user()
+        .then((user) => {
+          githubAPINocks.userOrganizations({
+            accessToken: user.githubAccessToken,
+            organizations: [{ login: siteOwner }],
+          });
+          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
+          return authenticatedSession(user);
+        })
+        .then(cookie => request(app)
+          .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            owner: siteOwner,
+            repository: siteRepository,
+            defaultBranch: 'main',
+            engine: 'jekyll',
+          })
+          .set('Cookie', cookie)
+          .expect(200))
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site', 200, response.body);
+          return Site.findOne({
+            where: {
+              owner: siteOwner,
+              repository: siteRepository,
+            },
+          });
+        })
+        .then((site) => {
+          expect(site).to.not.be.undefined;
+          expect(saveSiteStub.notCalled).to.equal(true);
           done();
         })
         .catch(done);
@@ -1063,10 +1126,10 @@ describe('Site API', () => {
   });
 
   describe('DELETE /v0/site/:id', () => {
-    let removeSiteStub;
+    let s3RemoveSiteStub;
 
     beforeEach(() => {
-      removeSiteStub = sinon.stub(S3SiteRemover, 'removeSite').resolves();
+      s3RemoveSiteStub = sinon.stub(S3SiteRemover, 'removeSite').resolves();
     });
 
     afterEach(() => {
@@ -1152,6 +1215,43 @@ describe('Site API', () => {
         })
         .then((sites) => {
           expect(sites).to.be.empty;
+          expect(removeSiteStub.calledOnce).to.equal(true);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should not call ProxyDataSync when env FEATURE_PROXY_EDGE_DYNAMO=false', (done) => {
+      let site;
+
+      factory.site()
+        .then(s => Site.findByPk(s.id, { include: [User] }))
+        .then((model) => {
+          site = model;
+          nock.cleanAll();
+          githubAPINocks.repo({
+            owner: site.owner,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: true, push: true },
+            }],
+          });
+          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
+          return authenticatedSession(site.Users[0]);
+        })
+        .then(cookie => request(app)
+          .delete(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(200))
+        .then((response) => {
+          validateAgainstJSONSchema('DELETE', '/site/{id}', 200, response.body);
+          siteResponseExpectations(response.body, site);
+          return Site.findAll({ where: { id: site.id } });
+        })
+        .then((sites) => {
+          expect(sites).to.be.empty;
+          expect(removeSiteStub.notCalled).to.equal(true);
           done();
         })
         .catch(done);
@@ -1210,8 +1310,8 @@ describe('Site API', () => {
           .expect(200);
       })
         .then(() => {
-          sinon.assert.calledOnce(removeSiteStub);
-          expect(removeSiteStub.firstCall.args[0].id).to.eq(site.id);
+          sinon.assert.calledOnce(s3RemoveSiteStub);
+          expect(s3RemoveSiteStub.firstCall.args[0].id).to.eq(site.id);
           done();
         })
         .catch(done);
@@ -1512,6 +1612,262 @@ describe('Site API', () => {
           done();
         })
         .catch(done);
+    });
+  });
+
+  describe('Site basic authentication API', () => {
+    describe('DELETE /v0/site/:site_id/basic-auth', () => {
+      describe('when the user is not authenticated', () => {
+        it('returns a 403', async () => {
+          const siteId = 1;
+
+          const { body } = await request(app)
+            .delete(`/v0/site/${siteId}/basic-auth`)
+            .expect(403);
+
+          validateAgainstJSONSchema('DELETE', '/site/{site_id}/basic-auth', 403, body);
+        });
+      });
+
+      describe('when the site does not exist', () => {
+        it('returns a 404', async () => {
+          const siteId = 1;
+          const user = await factory.user();
+          const cookie = await authenticatedSession(user);
+
+          const { body } = await request(app)
+            .delete(`/v0/site/${siteId}/basic-auth`)
+            .set('Cookie', cookie)
+            .set('x-csrf-token', csrfToken.getToken())
+            .type('json')
+            .expect(404);
+
+          validateAgainstJSONSchema('DELETE', '/site/{site_id}/basic-auth', 404, body);
+        });
+      });
+
+      describe('when the user is not authorized to see the site', () => {
+        it('returns a 404', async () => {
+          const [site, user] = await Promise.all([
+            factory.site(),
+            factory.user(),
+          ]);
+          const cookie = await authenticatedSession(user);
+
+          const { body } = await request(app)
+            .delete(`/v0/site/${site.id}/basic-auth`)
+            .set('Cookie', cookie)
+            .set('x-csrf-token', csrfToken.getToken())
+            .type('json')
+            .expect(404);
+
+          validateAgainstJSONSchema('DELETE', '/site/{site_id}/basic-auth', 404, body);
+        });
+      });
+
+      describe('when the parameters are valid', () => {
+        it('deletes basic auth from config and returns a 200', async () => {
+          const userPromise = await factory.user();
+          const siteConfig = {
+            basicAuth: {
+              username: 'user',
+              password: 'password',
+            },
+            blah: 'blahblah',
+          };
+          let site = await factory.site({
+            users: [userPromise],
+            config: siteConfig,
+          });
+
+          const cookie = await authenticatedSession(userPromise);
+          expect(site.config).to.deep.eq(siteConfig);
+          const { body } = await request(app)
+            .delete(`/v0/site/${site.id}/basic-auth`)
+            .set('Cookie', cookie)
+            .set('x-csrf-token', csrfToken.getToken())
+            .type('json')
+            .expect(200);
+
+          site = await site.reload();
+          expect(site.config).to.deep.equal({ basicAuth: {}, blah: 'blahblah' });
+        });
+
+        it('should not call ProxyDataSync when env FEATURE_PROXY_EDGE_DYNAMO=false', async () => {
+          const userPromise = await factory.user();
+          const siteConfig = {
+            basicAuth: {
+              username: 'user',
+              password: 'password',
+            },
+            blah: 'blahblah',
+          };
+          let site = await factory.site({
+            users: [userPromise],
+            config: siteConfig,
+          });
+
+          const cookie = await authenticatedSession(userPromise);
+          expect(site.config).to.deep.eq(siteConfig);
+          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
+          const { body } = await request(app)
+            .delete(`/v0/site/${site.id}/basic-auth`)
+            .set('Cookie', cookie)
+            .set('x-csrf-token', csrfToken.getToken())
+            .type('json')
+            .expect(200);
+
+          site = await site.reload();
+          expect(saveSiteStub.notCalled).to.equal(true);
+        });
+      });
+    });
+
+    describe('POST /v0/site/:site_id/basic-auth', () => {
+      describe('when the user is not authenticated', () => {
+        it('returns a 403', async () => {
+          const siteId = 1;
+
+          const { body } = await request(app)
+            .post(`/v0/site/${siteId}/basic-auth`)
+            .type('json')
+            .expect(403);
+
+          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 403, body);
+        });
+      });
+
+      describe('when there is no csrf token', () => {
+        it('returns a 403', async () => {
+          const siteId = 1;
+          const user = await factory.user();
+          const cookie = await authenticatedSession(user);
+
+          const { body } = await request(app)
+            .post(`/v0/site/${siteId}/basic-auth`)
+            .set('Cookie', cookie)
+            .type('json')
+            .expect(403);
+
+          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 403, body);
+        });
+      });
+
+      describe('when the site does not exist', () => {
+        it('returns a 404', async () => {
+          const siteId = 1;
+          const user = await factory.user();
+          const cookie = await authenticatedSession(user);
+
+          const { body } = await request(app)
+            .post(`/v0/site/${siteId}/basic-auth`)
+            .set('Cookie', cookie)
+            .set('x-csrf-token', csrfToken.getToken())
+            .type('json')
+            .expect(404);
+
+          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 404, body);
+        });
+      });
+
+      describe('when the user is not authorized to see the site', () => {
+        it('returns a 404', async () => {
+          const [site, user] = await Promise.all([
+            factory.site(),
+            factory.user(),
+          ]);
+          const cookie = await authenticatedSession(user);
+
+          const { body } = await request(app)
+            .post(`/v0/site/${site.id}/basic-auth`)
+            .set('Cookie', cookie)
+            .set('x-csrf-token', csrfToken.getToken())
+            .type('json')
+            .expect(404);
+
+          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 404, body);
+        });
+      });
+
+      describe('when the parameters are not valid', () => {
+        it('returns a 400', async () => {
+          const userPromise = await factory.user();
+          const site = await factory.site({ users: [userPromise] });
+          const cookie = await authenticatedSession(userPromise);
+          const credentials = { // invalid password
+            username: 'user',
+            password: 'password',
+          };
+
+          const { body } = await request(app)
+            .post(`/v0/site/${site.id}/basic-auth`)
+            .set('Cookie', cookie)
+            .set('x-csrf-token', csrfToken.getToken())
+            .type('json')
+            .send(credentials)
+            .expect(400);
+
+          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 400, body);
+        });
+      });
+
+      describe('when the parameters are valid', () => {
+        it('sets username and password for basic authentication', async () => {
+          const userPromise = await factory.user();
+          const site = await factory.site({
+            users: [userPromise],
+            config: { blah: 'blahblahblah' },
+          });
+          const cookie = await authenticatedSession(userPromise);
+          const credentials = {
+            username: 'user',
+            password: 'paSsw0rd',
+          };
+
+          const { body } = await request(app)
+            .post(`/v0/site/${site.id}/basic-auth`)
+            .set('Cookie', cookie)
+            .set('x-csrf-token', csrfToken.getToken())
+            .type('json')
+            .send(credentials)
+            .expect(200);
+
+
+          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 200, body);
+          await site.reload();
+          expect(site.config).to.deep.equal({
+            basicAuth: credentials,
+            blah: 'blahblahblah',
+          });
+        });
+      
+        it('should not call ProxyDataSync when env FEATURE_PROXY_EDGE_DYNAMO=false', async () => {
+          const userPromise = await factory.user();
+          const site = await factory.site({
+            users: [userPromise],
+            config: { blah: 'blahblahblah' },
+          });
+          const cookie = await authenticatedSession(userPromise);
+          const credentials = {
+            username: 'user',
+            password: 'paSsw0rd',
+          };
+
+          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
+
+          const { body } = await request(app)
+            .post(`/v0/site/${site.id}/basic-auth`)
+            .set('Cookie', cookie)
+            .set('x-csrf-token', csrfToken.getToken())
+            .type('json')
+            .send(credentials)
+            .expect(200);
+
+
+          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 200, body);
+          expect(saveSiteStub.notCalled).to.equal(true);
+        });
+      });
     });
   });
 });

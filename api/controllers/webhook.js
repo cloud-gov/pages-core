@@ -76,7 +76,7 @@ const createBuildForWebhookRequest = async (request) => {
   const queuedBuild = await Build.findOne({
     where: {
       branch,
-      state: 'queued',
+      state: ['created', 'queued'],
       site: site.id,
     },
   });
@@ -93,7 +93,8 @@ const createBuildForWebhookRequest = async (request) => {
     commitSha,
     site: site.id,
     user: user.id,
-  });
+  })
+    .then(build => build.enqueue());
 };
 
 module.exports = {
