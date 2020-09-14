@@ -42,5 +42,6 @@ services:
     environment:
       POSTGRES_DB: federalist
       POSTGRES_TEST_DB: federalist-test
+      POSTGRES_PASSWORD: password
 volumes:
   db-data:
