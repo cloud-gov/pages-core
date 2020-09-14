@@ -32,7 +32,7 @@ export default function userEnvironmentVariables(state = initialState, action) {
         ...state,
         [siteId]: {
           isLoading: false,
-          data: [],
+          data: (state[siteId] || {}).data || [],
         },
       };
     }

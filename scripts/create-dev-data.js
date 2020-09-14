@@ -116,6 +116,16 @@ async function createData({ githubUsername }) {
       token: 'fake-token',
     }),
     Build.create({
+      branch: nodeSite.defaultBranch,
+      completedAt: new Date(),
+      source: 'fake-build',
+      state: 'error',
+      site: nodeSite.id,
+      user: user1.id,
+      token: 'fake-token',
+      error: 'The build timed out',
+    }),
+    Build.create({
       branch: 'dc/fixes',
       source: 'fake-build',
       site: nodeSite.id,

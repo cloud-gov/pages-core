@@ -456,6 +456,12 @@ describe('Build API', () => {
       const buildsPromise = Promise.all([
         factory.build({ site: sitePromise }),
         factory.build({ site: sitePromise, user: userPromise }),
+        factory.build({
+          site: sitePromise,
+          user: userPromise,
+          state: 'error',
+          error: 'The build timed out',
+        }),
       ]);
 
       Promise.props({
@@ -474,7 +480,7 @@ describe('Build API', () => {
       })
       .then((response) => {
         expect(response.body).to.be.a('Array');
-        expect(response.body).to.have.length(2);
+        expect(response.body).to.have.length(3);
 
         builds.forEach((build) => {
           const responseBuild = response.body.find(candidate => candidate.id === build.id);
