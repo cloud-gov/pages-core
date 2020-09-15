@@ -41,7 +41,7 @@ const authorizeAdmin = (user, site) => (
 );
 
 const authorizeFederalistUsersAdmin = (user) =>
-  FederalistUsersHelper.federalistUsersAdmins(user.username)
+  FederalistUsersHelper.federalistUsersAdmins(user.githubAccessToken)
     .then((admins) => {
       if (!admins.includes(user.username)) {
         return Promise.reject({
