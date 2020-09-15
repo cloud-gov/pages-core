@@ -119,10 +119,17 @@ describe('userEnvironmentVariablesReducer', () => {
       expect(result[siteId].isLoading).to.be.false;
     });
 
-    it('clears data for the site', () => {
-      const result = reducer({}, action);
+    it('does not clear data for the site', () => {
+      const state = {
+        [siteId]: {
+          isLoading: true,
+          data: ['foo'],
+        },
+      };
 
-      expect(result[siteId].data).to.be.empty;
+      const result = reducer(state, action);
+
+      expect(result[siteId].data).to.equal(state[siteId].data);
     });
   });
 });
