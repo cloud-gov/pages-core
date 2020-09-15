@@ -20,11 +20,14 @@ import {
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
-const buildStateData = (buildState) => {
+const buildStateData = ({ state, error }) => {
   let messageIcon;
-  switch (buildState) {
+  switch (state) {
     case 'error':
-      messageIcon = { message: 'Failed', icon: IconExclamationCircle };
+      messageIcon = {
+        message: error === 'The build timed out' ? 'Timed out' : 'Failed',
+        icon: IconExclamationCircle,
+      };
       break;
     case 'processing':
       messageIcon = { message: 'In progress', icon: IconSpinner };
@@ -39,7 +42,7 @@ const buildStateData = (buildState) => {
       messageIcon = { message: 'Completed', icon: IconCheckCircle };
       break;
     default:
-      messageIcon = { message: buildState, icon: null };
+      messageIcon = { message: state, icon: null };
   }
   return messageIcon;
 };
@@ -161,7 +164,7 @@ class SiteBuilds extends React.Component {
                 </thead>
                 <tbody>
                   {builds.data.map((build) => {
-                    const { message, icon } = buildStateData(build.state);
+                    const { message, icon } = buildStateData(build);
 
                     return (
                       <tr key={build.id}>
