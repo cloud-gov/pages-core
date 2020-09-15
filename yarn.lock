@@ -1621,10 +1621,10 @@ available-typed-arrays@^1.0.0, available-typed-arrays@^1.0.2:
   dependencies:
     array-filter "^1.0.0"
 
-aws-sdk@^2.748.0:
-  version "2.748.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.748.0.tgz#660d9d8202b1e48820ae9e018abad8d7b51af0b1"
-  integrity sha512-H+DCioQ4AChoBxGMtagcJ3a0mM0lOh3ta/dWIrfPTECAlRIuxlrBDp78cRhPgvdYYUxW54kB/IaHGR2xPP8JXw==
+aws-sdk@^2.752.0:
+  version "2.752.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.752.0.tgz#0d6e38bd43f023f44ad5db66be6f6afc0d9a1278"
+  integrity sha512-0/8Pt8/qEgxt02IEvRjinR3cEj1YmmPlJqie4NhCWmmXmI4wDmEb5Em3A2XvU1dNwS0fpQEcuRcaQ/pWi/mScg==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
