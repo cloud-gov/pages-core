@@ -26,27 +26,20 @@ let removeSiteStub;
 let saveSiteStub;
 const defaultProxyEgeLinks = process.env.FEATURE_PROXY_EDGE_LINKS;
 
-beforeEach(() => {
-  removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
-  saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
-  process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true'
-});
-
-afterEach(() => {
-  sinon.restore();
-});
-
-after(() => {
-  process.env.FEATURE_PROXY_EDGE_DYNAMO = defaultProxyEgeLinks;
-});
-
 describe('Site API', () => {
   beforeEach(() => {
+    process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
+    removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
+    saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
     sinon.stub(SQS, 'sendBuildMessage').resolves();
   });
 
   afterEach(() => {
     sinon.restore();
+  });
+
+  after(() => {
+    process.env.FEATURE_PROXY_EDGE_DYNAMO = defaultProxyEgeLinks;
   });
 
   const siteResponseExpectations = (response, site) => {
@@ -1682,7 +1675,7 @@ describe('Site API', () => {
 
           const cookie = await authenticatedSession(userPromise);
           expect(site.config).to.deep.eq(siteConfig);
-          const { body } = await request(app)
+          await request(app)
             .delete(`/v0/site/${site.id}/basic-auth`)
             .set('Cookie', cookie)
             .set('x-csrf-token', csrfToken.getToken())
@@ -1710,7 +1703,7 @@ describe('Site API', () => {
           const cookie = await authenticatedSession(userPromise);
           expect(site.config).to.deep.eq(siteConfig);
           process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
-          const { body } = await request(app)
+          await request(app)
             .delete(`/v0/site/${site.id}/basic-auth`)
             .set('Cookie', cookie)
             .set('x-csrf-token', csrfToken.getToken())
@@ -1832,7 +1825,6 @@ describe('Site API', () => {
             .send(credentials)
             .expect(200);
 
-
           validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 200, body);
           await site.reload();
           expect(site.config).to.deep.equal({
@@ -1840,7 +1832,7 @@ describe('Site API', () => {
             blah: 'blahblahblah',
           });
         });
-      
+
         it('should not call ProxyDataSync when env FEATURE_PROXY_EDGE_DYNAMO=false', async () => {
           const userPromise = await factory.user();
           const site = await factory.site({
@@ -1862,7 +1854,6 @@ describe('Site API', () => {
             .type('json')
             .send(credentials)
             .expect(200);
-
 
           validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 200, body);
           expect(saveSiteStub.notCalled).to.equal(true);
