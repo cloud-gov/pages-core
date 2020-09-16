@@ -1,8 +1,10 @@
 <script>
-  import { router } from '../stores';
-  import Logout from './Logout.svelte';
+  import { login, logout } from '../flows';
+  import { router, session } from '../stores';
+  import NavButton from './NavButton.svelte';
 
   $: currentPath = $router.pathname;
+  $: authenticated = $session.authenticated;
 
   let isOpen = false;
 
@@ -74,17 +76,25 @@
       </button>
       <ul class="usa-nav__primary usa-accordion">
         <li class="usa-nav__primary-item">
-          <a class="usa-nav__link" class:usa-current={currentPath === '/sites'} href="/sites">
-            <span>Sites</span>
-          </a>
+          {#if authenticated}
+            <a class="usa-nav__link" class:usa-current={currentPath === '/sites'} href="/sites">
+              <span>Sites</span>
+            </a>
+          {/if}
         </li>
         <li class="usa-nav__primary-item">
-          <a class="usa-nav__link"  class:usa-current={currentPath === '/builds'} href="/builds">
-            <span>Builds</span>
-          </a>
+          {#if authenticated}
+            <a class="usa-nav__link"  class:usa-current={currentPath === '/builds'} href="/builds">
+              <span>Builds</span>
+            </a>
+          {/if}
         </li>
         <li class="usa-nav__primary-item">
-          <Logout />
+          {#if authenticated}
+            <NavButton action={logout}>Logout</NavButton>
+          {:else }
+            <NavButton action={login}>Login</NavButton>
+          {/if}
         </li>
       </ul>
     </nav>
