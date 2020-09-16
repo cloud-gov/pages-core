@@ -44,10 +44,7 @@ const authorizeFederalistUsersAdmin = (user) =>
   FederalistUsersHelper.federalistUsersAdmins(user.githubAccessToken)
     .then((admins) => {
       if (!admins.includes(user.username)) {
-        throw {
-          message: siteErrors.ADMIN_ACCESS_REQUIRED,
-          status: 403,
-        };
+        throw 'user is not a system operator';
       }
     })
     .catch((error) => {
