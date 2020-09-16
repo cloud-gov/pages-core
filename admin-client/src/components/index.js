@@ -10,6 +10,7 @@ export { default as LabeledItem } from './LabeledItem.svelte';
 export { default as Logout } from './Logout.svelte';
 export { default as Modal } from './Modal.svelte';
 export { default as Nav } from './Nav.svelte';
+export { default as NavButton } from './NavButton.svelte';
 export { default as PageTitle } from './PageTitle.svelte';
 export { default as SectionHeader } from './SectionHeader.svelte';
 export { default as SiteCard } from './SiteCard.svelte';

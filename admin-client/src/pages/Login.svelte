@@ -1,22 +1,10 @@
 <script>
-  import { notification } from '../stores';
-  import { fetchMe } from '../lib/api';
-  import { authenticate, login } from '../lib/auth';
+  import { login } from '../flows';
 
-  import GridContainer from '../components/GridContainer.svelte';
-  import Hero from '../components/Hero.svelte';
-
-  async function loginHandler() {
-    try {
-      await authenticate();
-      notification.setSuccess('Welcome back!');
-
-      const user = await fetchMe();
-      login(user);
-    } catch (err) {
-      notification.setError(`Could not log into site. Error: ${err}`);
-    }
-  }
+  import {
+    GridContainer,
+    Hero,
+  } from '../components';
 </script>
 
 <svelte:head>
@@ -39,23 +27,11 @@
         </p>
         <div class="grid-row flex-column flex-align-center">
           <div class="margin-y-3">
-            <form on:submit|preventDefault={loginHandler}>
-              <button class="usa-button usa-button--outline">
-                <div class="grid-row flex-row flex-align-center">
-                  <img
-                    alt="github-logo"
-                    class="width-2 margin-right-1"
-                    src="/images/github-logo.png" />
-                  Continue with GitHub
-                </div>
-              </button>
-            </form>
+            <button class="usa-button usa-button--outline" on:click={login}>
+              Continue with GitHub
+            </button>
           </div>
         </div>
-        <p class="text-center">
-          Federalist admins are authenticated with GitHub OAuth.
-          <br />
-        </p>
       </div>
       <div class="usa-width-one-third">&nbsp;</div>
     </div>
