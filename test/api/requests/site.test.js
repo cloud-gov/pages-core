@@ -20,6 +20,7 @@ const S3SiteRemover = require('../../../api/services/S3SiteRemover');
 const siteErrors = require('../../../api/responses/siteErrors');
 const ProxyDataSync = require('../../../api/services/ProxyDataSync');
 const SQS = require('../../../api/services/SQS');
+const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 let removeSiteStub;
@@ -1312,6 +1313,78 @@ describe('Site API', () => {
         .then(() => {
           sinon.assert.calledOnce(s3RemoveSiteStub);
           expect(s3RemoveSiteStub.firstCall.args[0].id).to.eq(site.id);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should not allow a user to delete a site associated with their account if not admin', (done) => {
+      let site;
+
+      factory.site()
+        .then(s => Site.findByPk(s.id, { include: [User] }))
+        .then((model) => {
+          site = model;
+          nock.cleanAll();
+          githubAPINocks.repo({
+            owner: site.owner,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: false, push: true },
+            }],
+          });
+          sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins').resolves(['org-admin']);
+          return authenticatedSession(site.Users[0]);
+        })
+        .then(cookie => request(app)
+          .delete(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('DELETE', '/site/{id}', 403, response.body);
+          expect(response.body.message).to.equal('You do not have administrative access to this repository');
+          return Site.findAll({ where: { id: site.id } });
+        })
+        .then((sites) => {
+          expect(sites).to.not.be.empty;
+          expect(removeSiteStub.called).to.equal(false);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should allow a user to delete a site associated with their account if federalist admin', (done) => {
+      let site;
+
+      factory.site()
+        .then(s => Site.findByPk(s.id, { include: [User] }))
+        .then((model) => {
+          site = model;
+          nock.cleanAll();
+          githubAPINocks.repo({
+            owner: site.owner,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: false, push: true },
+            }],
+          });
+          sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins').resolves([site.Users[0].username]);
+          return authenticatedSession(site.Users[0]);
+        })
+        .then(cookie => request(app)
+          .delete(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(200))
+        .then((response) => {
+          validateAgainstJSONSchema('DELETE', '/site/{id}', 200, response.body);
+          siteResponseExpectations(response.body, site);
+          return Site.findAll({ where: { id: site.id } });
+        })
+        .then((sites) => {
+          expect(sites).to.be.empty;
+          expect(removeSiteStub.calledOnce).to.equal(true);
           done();
         })
         .catch(done);

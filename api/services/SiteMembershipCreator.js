@@ -13,7 +13,7 @@ const checkGithubRepository = ({ user, owner, repository }) => GitHub
       };
     }
     if (!repo.permissions || !repo.permissions.push) {
-      return FederalistUsersHelper.federalistUsersAdmins(user.username)
+      return FederalistUsersHelper.federalistUsersAdmins(user.githubAccessToken)
         .then((admins) => {
           if (!admins.includes(user.username)) {
             throw {

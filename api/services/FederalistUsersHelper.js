@@ -51,9 +51,7 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
     });
 };
 
-const federalistUsersAdmins = auditorUsername => User
-  .findOne({ where: { username: auditorUsername } })
-  .then(auditor => GitHub.getOrganizationMembers(auditor.githubAccessToken, federalistOrg, 'admin'))
+const federalistUsersAdmins = githubAccessToken => GitHub.getOrganizationMembers(githubAccessToken, federalistOrg, 'admin')
   .then(admins => Promise.all(admins.map(admin => admin.login)));
 
 module.exports = { audit18F, federalistUsersAdmins };
