@@ -19,10 +19,10 @@ const authorizeAdmin = (user, site) => (
   GitHub.checkPermissions(user, site.owner, site.repository)
     .then((permissions) => {
       if (!permissions.admin) {
-        return Promise.reject({
+        throw {
           message: siteErrors.ADMIN_ACCESS_REQUIRED,
           status: 403,
-        });
+        };
       }
       return Promise.resolve(site.id);
     })
@@ -33,10 +33,10 @@ const authorizeAdmin = (user, site) => (
       // attempts to fetch the repo but it no longer exists and receives a 404
         return Promise.resolve(site.id);
       }
-      return Promise.reject({
+      throw {
         message: siteErrors.ADMIN_ACCESS_REQUIRED,
         status: 403,
-      });
+      };
     })
 );
 
@@ -44,17 +44,17 @@ const authorizeFederalistUsersAdmin = (user) =>
   FederalistUsersHelper.federalistUsersAdmins(user.githubAccessToken)
     .then((admins) => {
       if (!admins.includes(user.username)) {
-        return Promise.reject({
+        throw {
           message: siteErrors.ADMIN_ACCESS_REQUIRED,
           status: 403,
-        });
+        };
       }
     })
     .catch((error) => {
-      return Promise.reject({
+      throw {
         message: siteErrors.ADMIN_ACCESS_REQUIRED,
         status: 403,
-      });
+      };
     });
 
 // create is allowed for all
