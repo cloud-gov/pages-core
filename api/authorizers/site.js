@@ -24,14 +24,13 @@ const authorizeAdmin = (user, site) => (
           status: 403,
         };
       }
-      return Promise.resolve(site.id);
     })
     .catch((error) => {
       if (error.status === 404) {
       // authorize user if the site's repo does not exist:
       // When a user attempts to delete a site after deleting the repo, Federalist
       // attempts to fetch the repo but it no longer exists and receives a 404
-        return Promise.resolve(site.id);
+        return Promise.resolve();
       }
       throw {
         message: siteErrors.ADMIN_ACCESS_REQUIRED,
