@@ -16,7 +16,7 @@ describe('FederalistUsersHelper', () => {
     return orgs[orgName];
   }
 
-  const populateOrg = (orgName) => {
+  const seedOrg = (orgName) => {
     orgs[orgName] = Array(10).fill(0).map((a, index) => ({ login: `member-${index}`, team: `${index % 2}` }));
     return orgs[orgName];
   }
@@ -27,8 +27,8 @@ describe('FederalistUsersHelper', () => {
 
   beforeEach(() => {
     orgs = {};
-    populateOrg('federalist-users');
-    populateOrg('18F');
+    seedOrg('federalist-users');
+    seedOrg('18F');
 
     sinon.stub(GitHub, 'getOrganizationMembers').callsFake((githubAccessToken, orgName, role = 'all') => Promise.resolve(getOrg(orgName, role)));
     
