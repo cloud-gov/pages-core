@@ -29,7 +29,7 @@ const defaultProxyEgeLinks = process.env.FEATURE_PROXY_EDGE_LINKS;
 describe('Site API', () => {
   beforeEach(() => {
     process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
-    removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
+    removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').resolves();
     saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
     sinon.stub(SQS, 'sendBuildMessage').resolves();
   });

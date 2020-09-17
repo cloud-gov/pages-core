@@ -1,21 +1,10 @@
 const { Op } = require('sequelize');
 const { Site } = require('../../models');
-const Features = require('../../features');
-const ProxyDataSync = require('../../services/ProxyDataSync');
-const S3SiteRemover = require('../../services/S3SiteRemover');
-const { pick, wrapHandlers } = require('../../utils');
+const SiteDestroyer = require('../../services/SiteDestroyer');
+const { fetchModelById } = require('../../utils/queryDatabase');
+const { pick, toInt, wrapHandlers } = require('../../utils');
 const { serializeNew, serializeMany } = require('../../serializers/site');
 const { logger } = require('../../../winston');
-
-function toInt(val) {
-  const result = /^\d+$/.exec(val);
-  return result ? parseInt(result[0], 10) : null;
-}
-
-async function fetchSiteById(id) {
-  const numId = toInt(id);
-  return numId ? Site.findByPk(numId) : null;
-}
 
 const updateableAttrs = [
   'containerConfig',
@@ -54,7 +43,7 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const site = await fetchSiteById(id);
+    const site = await fetchModelById(id, Site);
     if (!site) return res.notFound();
 
     return res.json(serializeNew(site, true));
@@ -66,7 +55,7 @@ module.exports = wrapHandlers({
       body,
     } = req;
 
-    const site = await fetchSiteById(id);
+    const site = await fetchModelById(id, Site);
     if (!site) return res.notFound();
 
     await site.update(pick(updateableAttrs, body));
@@ -79,17 +68,11 @@ module.exports = wrapHandlers({
     const { id } = req.params;
 
     try {
-      site = await fetchSiteById(id);
-      await S3SiteRemover.removeSite(site);
-      await S3SiteRemover.removeInfrastructure(site);
-
-      if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-        await ProxyDataSync.removeSite(site);
-      }
-
-      await site.destroy();
+      site = await fetchModelById(id, Site);
+      await SiteDestroyer.destroySite(site);
       return res.json(serializeNew(site, true));
     } catch (error) {
+      // Todo - make use of the future audit event
       logger.error([`site@id=${site.id}`, error.message, error.stack].join('\n\n'));
       return res.error(error);
     }

@@ -6,33 +6,18 @@
   export let site;
 
   const dispatch = createEventDispatcher();
-
   let submitting = false;
-  let verifiedMismatch = false;
 
   function handleCancel() {
     submitting = false;
-    verifiedMismatch = false;
   }
 
   function handleSubmit() {
     submitting = true;
   }
 
-  function handleVerification(event) {
-    const { siteNameVerification } = event.target.elements;
-    const isVerified = siteNameVerification.value === site.repository;
-
-    if (isVerified) {
-      dispatch('submit');
-      handleCancel();
-    } else {
-      verifiedMismatch = true;
-    }
-  }
-
-  function resetInputError() {
-    verifiedMismatch = false;
+  function handleVerification() {
+    return dispatch('submit');
   }
 </script>
 
@@ -61,34 +46,12 @@
       on:submit|preventDefault={handleVerification}>
       <fieldset class="usa-fieldset">
         <legend>
-          Please verify the site's name to delete it. Enter
+          Are you sure you want to delete site
           <span class="font-code-sm bg-base-lightest padding-x-05">
             {site.repository}
           </span>
-          into the input.
+          ?
         </legend>
-        <div class="grid-row">
-          <div class="usa-form-group width-full">
-            <label class="usa-label" for="container-size">Site name</label>
-            <input
-              on:input={resetInputError}
-              class="usa-input"
-              class:usa-input--error={verifiedMismatch}
-              id="site-name-verification"
-              name="siteNameVerification"
-              type="text"
-              required
-              aria-required="true" />
-            {#if verifiedMismatch}
-              <span
-                class="usa-error-message"
-                id="input-error-message"
-                role="alert">
-                Input name did not match site name.
-              </span>
-            {/if}
-          </div>
-        </div>
         <div class="grid-row">
           <input
             class="usa-button usa-button--secondary"

@@ -7,7 +7,6 @@ export { default as GridContainer } from './GridContainer.svelte';
 export { default as GridRow } from './GridRow.svelte';
 export { default as Hero } from './Hero.svelte';
 export { default as LabeledItem } from './LabeledItem.svelte';
-export { default as Logout } from './Logout.svelte';
 export { default as Modal } from './Modal.svelte';
 export { default as Nav } from './Nav.svelte';
 export { default as NavButton } from './NavButton.svelte';
