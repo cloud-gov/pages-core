@@ -158,6 +158,11 @@ function omit(keys, obj) {
   return pick(pickedKeys, obj);
 }
 
+function toInt(val) {
+  const result = /^\d+$/.exec(val);
+  return result ? parseInt(result[0], 10) : null;
+}
+
 function wait(time = 500) {
   // eslint-disable-next-line scanjs-rules/call_setTimeout
   return new Promise((r => setTimeout(r, time)));
@@ -207,6 +212,7 @@ module.exports = {
   pick,
   retry,
   shouldIncludeTracking,
+  toInt,
   wait,
   wrapHandler,
   wrapHandlers,
