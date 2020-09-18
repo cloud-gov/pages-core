@@ -91,7 +91,7 @@ jobs:
             - ~/.cache/yarn
 
       - run:
-          name: Lint changed files
+          name: Lint api and user client
           command: yarn lint
 
       - run:
