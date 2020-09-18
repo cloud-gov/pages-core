@@ -15,7 +15,8 @@ export class App extends React.Component {
     notifier.listen();
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { alert } = this.props;
 
     if (alert.message) {
