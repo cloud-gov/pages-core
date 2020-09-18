@@ -7,7 +7,6 @@ const org = 'gsa-18f-federalist';
 const credsUpsName = 'federalist-staging-env';
 const localConfigPath = './config/local-from-staging.js';
 
-
 function showUsage({ alreadyLoggedIn = true } = {}) {
   /* eslint-disable no-console */
   console.log('\nWhoops, something went wrong.');

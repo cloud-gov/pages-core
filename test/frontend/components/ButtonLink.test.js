@@ -15,12 +15,12 @@ describe('<ButtonLink />', () => {
     wrapper = shallow(<ButtonLink {...props} />);
   });
 
-  it('should render an anchor tag', () => {
-    expect(wrapper.find('a')).to.have.length(1);
+  it('should render a button tag', () => {
+    expect(wrapper.find('button')).to.have.length(1);
   });
 
-  it('should assign a role of `button` to underlying anchor', () => {
-    expect(wrapper.find('a').prop('role')).to.equal('button');
+  it('should assign a type of `button` to underlying anchor', () => {
+    expect(wrapper.find('button').prop('type')).to.equal('button');
   });
 
   it('should render its children', () => {
@@ -36,7 +36,7 @@ describe('<ButtonLink />', () => {
   });
 
   it('should call the clickHandler', () => {
-    wrapper.find('a').simulate('click');
+    wrapper.find('button').simulate('click');
 
     expect(props.clickHandler.calledOnce).to.be.true;
   });

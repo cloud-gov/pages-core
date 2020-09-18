@@ -1,4 +1,3 @@
-
 const showAddNewSiteFieldsType = 'ADD_NEW_SITE_FIELDS_SHOW';
 const hideAddNewSiteFieldsType = 'ADD_NEW_SITE_FIELDS_HIDE';
 

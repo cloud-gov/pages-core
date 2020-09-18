@@ -1,6 +1,5 @@
 const cfenv = require('cfenv');
 
-
 const loadSiteWideError = () => {
   const appEnv = cfenv.getAppEnv();
   const siteWideErrorEnv = appEnv.getServiceCreds('federalist-site-wide-error');

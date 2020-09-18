@@ -97,14 +97,16 @@ class SiteSettings extends React.Component {
             siteId={site.id}
           />
         </ExpandableArea>
-        { FEATURE_PROXY_EDGE_LINKS === 'true' &&
+        {/* eslint-disable-next-line no-undef */}
+        { FEATURE_PROXY_EDGE_LINKS === 'true'
+          && (
           <ExpandableArea title="Basic Authentication">
             <BasicAuthSettings
               siteId={site.id}
               basicAuth={site.basicAuth}
             />
           </ExpandableArea>
-        }
+          )}
       </div>
     );
   }

@@ -1,4 +1,3 @@
-
 import {
   showAddNewSiteFieldsType as ADD_NEW_SITE_FIELDS_SHOW,
   hideAddNewSiteFieldsType as ADD_NEW_SITE_FIELDS_HIDE,

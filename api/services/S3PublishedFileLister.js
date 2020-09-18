@@ -83,7 +83,6 @@ function listPublishedPreviews(site) {
     });
 }
 
-
 function listPagedPublishedFilesForBranch(site, branch, startAtKey) {
   let filepath;
   if (site.defaultBranch === branch) {
@@ -106,6 +105,5 @@ function listPagedPublishedFilesForBranch(site, branch, startAtKey) {
       return listFilesPaged(s3Client, filepath, startAtKey);
     });
 }
-
 
 module.exports = { listPublishedPreviews, listPagedPublishedFilesForBranch };

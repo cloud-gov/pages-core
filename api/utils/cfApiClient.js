@@ -1,6 +1,6 @@
 const request = require('request');
 const url = require('url');
-const { filterEntity, firstEntity } = require('./');
+const { filterEntity, firstEntity } = require('.');
 const CloudFoundryAuthClient = require('./cfAuthClient');
 const config = require('../../config');
 

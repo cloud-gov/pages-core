@@ -26,10 +26,11 @@ function makeOptions(opts) {
   ));
 }
 
-const SelectSiteEngine = ({ value, onChange, ...props }) => (
+const SelectSiteEngine = ({
+  value, onChange, name, id, className,
+}) => (
   <select
-    {...props}
-    className="form-control"
+    {...{ name, id, className }}
     value={value}
     onChange={onChange}
   >
@@ -40,9 +41,13 @@ const SelectSiteEngine = ({ value, onChange, ...props }) => (
 SelectSiteEngine.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func,
+  name: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
+  className: PropTypes.string,
 };
 
 SelectSiteEngine.defaultProps = {
+  className: '',
   onChange: () => {},
 };
 

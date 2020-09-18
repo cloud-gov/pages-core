@@ -20,14 +20,13 @@ class CreateBuildLink extends React.Component {
     const { children, className } = this.props;
 
     return (
-      <a
-        href="#"
-        role="button"
+      <button
+        type="button"
         onClick={this.handleClick}
         className={className}
       >
         {children}
-      </a>
+      </button>
     );
   }
 }
