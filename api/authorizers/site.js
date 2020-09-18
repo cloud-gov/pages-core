@@ -40,19 +40,20 @@ const authorizeAdmin = (user, site) => (
     })
 );
 
-const authorizeFederalistUsersAdmin = (user) =>
-  FederalistUsersHelper.federalistUsersAdmins(user.githubAccessToken)
+function authorizeFederalistUsersAdmin(user) {
+  return FederalistUsersHelper.federalistUsersAdmins(user.githubAccessToken)
     .then((admins) => {
       if (!admins.includes(user.username)) {
         throw 'user is not a system operator';
       }
     })
-    .catch((error) => {
+    .catch(() => {
       throw {
         message: siteErrors.ADMIN_ACCESS_REQUIRED,
         status: 403,
       };
     });
+}
 
 // create is allowed for all
 const create = () => Promise.resolve();

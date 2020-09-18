@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import BasicAuthSettingsForm from './BasicAuthSettingsForm';
 import AlertBanner from '../../alertBanner';
@@ -6,7 +6,7 @@ import siteActions from '../../../actions/siteActions';
 import { BASIC_AUTH } from '../../../propTypes';
 
 const infoContent = (
-  <Fragment>
+  <>
     If you would like to add basic authentication to your site previews, please provide a
     username and password for which you will be prompted to enter when previewing your site.
     For more information see
@@ -20,11 +20,11 @@ const infoContent = (
     </a>
     {' '}
     for an up-to-date list.
-  </Fragment>
+  </>
 );
 
 const warningContent = (
-  <Fragment>
+  <>
     Federalist is a
     <b> FISMA Low </b>
     system, do NOT reuse credentials from other secure systems. See
@@ -34,11 +34,11 @@ const warningContent = (
       rel="noopener noreferrer"
       target="_blank"
     >
-    FISMA Security Categorization
+      FISMA Security Categorization
     </a>
     {' '}
     for more information on FISMA information categorization.
-  </Fragment>
+  </>
 );
 
 const BasicAuthSettings = ({ siteId, basicAuth: { username, password } }) => {

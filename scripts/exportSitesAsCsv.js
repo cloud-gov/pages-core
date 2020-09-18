@@ -35,10 +35,9 @@ function consolidateOnSiteId(sites) {
     const sitesById = _.where(sites, { id });
     const users = sitesById.map(site => site.users[0]);
 
-    return Object.assign({}, sites[i], { users });
+    return { ...sites[i], users };
   });
 }
-
 
 const args = Array.prototype.slice.call(process.argv);
 const destination = resolveDestination(args[2] || './current-sites.csv');
@@ -48,7 +47,7 @@ console.log('\tUse yarn export:sites -- /other/path/file.csv to change');
 User.findAll({ include: [Site] })
   .then(sitesFromUsers)
   .then(consolidateOnSiteId)
-  .then(sites => sites.map(site => Object.assign({}, site, { users: site.users.join(', ') })))
+  .then(sites => sites.map(site => ({ ...site, users: site.users.join(', ') })))
   .then((sites) => {
     console.log(`Found ${sites.length} unique sites`);
     return sites;

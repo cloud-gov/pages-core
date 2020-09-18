@@ -1,7 +1,7 @@
 const GitHub = require('./GitHub');
 const { Site, User } = require('../models');
 const siteErrors = require('../responses/siteErrors');
-const FederalistUsersHelper = require('../services/FederalistUsersHelper');
+const FederalistUsersHelper = require('./FederalistUsersHelper');
 
 const checkGithubRepository = ({ user, owner, repository }) => GitHub
   .getRepository(user, owner, repository)

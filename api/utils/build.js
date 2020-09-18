@@ -12,12 +12,10 @@ function buildViewLink(build, site) {
     link = site.domain;
   } else if ((build.branch === site.demoBranch) && site.demoDomain) {
     link = site.demoDomain;
+  } else if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_LINKS)) {
+    link = `${siteViewDomain(site)}${buildPath(build, site)}`;
   } else {
-    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_LINKS)) {
-      link = `${siteViewDomain(site)}${buildPath(build, site)}`;
-    }  else {
-      link = build.url || buildUrl(build, site);
-    }
+    link = build.url || buildUrl(build, site);
   }
   return `${link.replace(/\/+$/, '')}/`;
 }

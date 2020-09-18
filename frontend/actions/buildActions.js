@@ -35,7 +35,7 @@ export default {
         if (Object.keys(build).length > 0) {
           return dispatchBuildRestartedAction(build);
         }
-        alertActions.alertSuccess(`Build is already queued.`);
+        alertActions.alertSuccess('Build is already queued.');
       });
   },
 

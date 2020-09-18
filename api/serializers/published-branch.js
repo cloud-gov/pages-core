@@ -1,4 +1,4 @@
-const siteSerializer = require('../serializers/site');
+const siteSerializer = require('./site');
 
 const serializeObject = (site, name) => ({
   name,

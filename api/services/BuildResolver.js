@@ -1,6 +1,6 @@
 const { Build, Site } = require('../models');
 const buildErrors = require('../responses/buildErrors');
-const GitHub = require('../services/GitHub');
+const GitHub = require('./GitHub');
 
 const rejectBuild = msg => Promise.reject({
   status: 404,
@@ -55,9 +55,7 @@ const getBuildByBranch = (user, params) => {
 
       // The branch we want to create a new build from has been built via federalist before
       if (build) {
-        return Object.assign({}, build.toJSON(), {
-          commitSha: build.commitSha || sha,
-        });
+        return { ...build.toJSON(), commitSha: build.commitSha || sha };
       }
 
       // We don't have a build record, using this branch, go to github and check if the

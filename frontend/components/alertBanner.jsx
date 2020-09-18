@@ -13,14 +13,6 @@ const renderHeader = (text) => {
   );
 };
 
-const addRole = (shouldAddRole) => {
-  if (shouldAddRole) {
-    return { role: 'alert' };
-  }
-
-  return {};
-};
-
 const genericErrorMsg = (
   <span>
     We are experiencing an unexpected problem, please wait a few moments and try the following:
@@ -46,7 +38,7 @@ const AlertBanner = ({
   return (
     <div
       className={`usa-alert usa-alert-${status}`}
-      {...addRole(alertRole)}
+      role={alertRole ? 'alert' : null}
     >
       <div className="usa-alert-body">
         { renderHeader(header) }

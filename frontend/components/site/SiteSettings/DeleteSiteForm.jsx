@@ -4,7 +4,6 @@ import { reduxForm } from 'redux-form';
 
 import AlertBanner from '../../alertBanner';
 
-
 export const DeleteSiteForm = ({
   siteId,
   handleSubmit,

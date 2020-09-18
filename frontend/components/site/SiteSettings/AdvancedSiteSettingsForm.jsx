@@ -4,7 +4,6 @@ import { Field, reduxForm } from 'redux-form';
 
 import SelectSiteEngine from '../../SelectSiteEngine';
 
-
 export const AdvancedSiteSettingsForm = ({
   // even though initialValues is not directly used, it is used
   // by reduxForm, and we want PropType validation on it, so we'll

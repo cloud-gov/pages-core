@@ -15,6 +15,11 @@ const finalRules = {
     },
   ],
   'arrow-parens': [2, 'as-needed', { requireForBlockBody: true }],
+
+  // Allow prop spreading for React components, but not for html elements
+  'react/jsx-props-no-spreading': [2, {
+    custom: 'ignore',
+  }],
 };
 
 const finalPlugins = [];
