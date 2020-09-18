@@ -53,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
     },
     model: {
-      type: type: DataTypes.ENUM,
+      type: DataTypes.ENUM,
       values: Object.values(models),
     },
     body: {
