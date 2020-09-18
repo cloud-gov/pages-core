@@ -92,7 +92,7 @@ jobs:
 
       - run:
           name: Lint changed files
-          command: scripts/lint-ci-pr.sh
+          command: yarn lint
 
       - run:
           name: CodeClimate before-build

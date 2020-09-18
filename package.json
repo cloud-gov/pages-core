@@ -67,7 +67,6 @@
     "test:server:watch": "watch 'yarn test:server' ./api ./test/api",
     "test:client:watch": "watch 'yarn test:client' ./frontend ./test/frontend",
     "lint": "eslint ./api ./config ./frontend ./scripts ./services --ext js,jsx",
-    "lint:diff": "./scripts/lint-diff.sh",
     "migrate:create": "node migrate.js create",
     "migrate:up": "node migrate.js up || true",
     "migrate:down": "node migrate.js down",
