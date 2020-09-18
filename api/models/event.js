@@ -1,6 +1,6 @@
 const config = require('../../config');
 
-const type = {
+const types = {
   ERROR: 'error',
   AUDIT: 'audit',
   REQUEST: 'request',
