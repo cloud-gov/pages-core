@@ -2,7 +2,7 @@ const { Build, Site } = require('../models');
 const buildErrors = require('../responses/buildErrors');
 const GitHub = require('./GitHub');
 
-const rejectBuild = msg => Promise.reject({
+const rejectBuild = msg => ({
   status: 404,
   message: msg,
 });
@@ -14,7 +14,7 @@ function getBranchFromGithub({ user, site, branch }) {
       site: site.id,
       commitSha: branchInfo.commit.sha,
     }))
-    .catch(() => rejectBuild(buildErrors.BRANCH_NOT_FOUND));
+    .catch(() => { throw rejectBuild(buildErrors.BRANCH_NOT_FOUND); });
 }
 
 const getBuildById = (user, params) => {
@@ -31,7 +31,7 @@ const getBuildById = (user, params) => {
         return model;
       }
 
-      return rejectBuild(buildErrors.BUILD_NOT_FOUND);
+      throw rejectBuild(buildErrors.BUILD_NOT_FOUND);
     });
 };
 

@@ -15,12 +15,14 @@ export const AdvancedSiteSettingsForm = ({
 }) => (
   <form className="settings-form settings-form-advanced" onSubmit={handleSubmit}>
     <div className="well">
+      {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
       <label htmlFor="engine">Site engine</label>
       <Field
         name="engine"
-        id="engine"
         component={p => (
           <SelectSiteEngine
+            name="engine"
+            id="engine"
             value={p.input.value}
             onChange={p.input.onChange}
             className="form-control"
@@ -39,10 +41,12 @@ export const AdvancedSiteSettingsForm = ({
           {' '}
           file when we build your site&apos;s primary branch.
         </p>
+        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
         <label htmlFor="defaultConfig">Site configuration</label>
         <Field
           component="textarea"
           name="defaultConfig"
+          id="defaultConfig"
           className="form-control-mono"
         />
       </fieldset>
@@ -58,10 +62,12 @@ export const AdvancedSiteSettingsForm = ({
           {' '}
           file when we build your site&apos;s demo branch.
         </p>
+        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
         <label htmlFor="demoConfig">Demo configuration</label>
         <Field
           component="textarea"
           name="demoConfig"
+          id="demoConfig"
           className="form-control-mono"
         />
       </fieldset>
@@ -77,10 +83,12 @@ export const AdvancedSiteSettingsForm = ({
           {' '}
           file when we build a preview branch for your site.
         </p>
+        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
         <label htmlFor="previewConfig">Preview configuration</label>
         <Field
           component="textarea"
           name="previewConfig"
+          id="previewConfig"
           className="form-control-mono"
         />
       </fieldset>

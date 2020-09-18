@@ -38,7 +38,7 @@ const AlertBanner = ({
   return (
     <div
       className={`usa-alert usa-alert-${status}`}
-      role={alertRole ? 'alert' : null}
+      role={alertRole ? 'alert' : undefined}
     >
       <div className="usa-alert-body">
         { renderHeader(header) }

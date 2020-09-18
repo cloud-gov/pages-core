@@ -19,6 +19,7 @@ const finalRules = {
   // Allow prop spreading for React components, but not for html elements
   'react/jsx-props-no-spreading': [2, {
     custom: 'ignore',
+    explicitSpread: 'ignore',
   }],
 };
 

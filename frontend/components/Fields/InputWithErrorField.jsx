@@ -17,7 +17,9 @@ const InputWithErrorField = ({
     { help }
     {touched && (error && <span className="usa-input-error-message">{error}</span>)}
     <input
+      // eslint-disable-next-line react/jsx-props-no-spreading
       {...input}
+      // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
       placeholder={placeholder}
       type={type}

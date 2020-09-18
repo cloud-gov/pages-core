@@ -2,6 +2,7 @@ const PublishedBranchSerializer = require('../serializers/published-branch');
 const S3PublishedFileLister = require('../services/S3PublishedFileLister');
 const siteAuthorizer = require('../authorizers/site');
 const { Site } = require('../models');
+const { fetchModelById } = require('../utils/queryDatabase');
 
 module.exports = {
   find: (req, res) => {
@@ -11,17 +12,14 @@ module.exports = {
 
     const startAtKey = req.query.startAtKey || null;
 
-    Promise.resolve(Number(req.params.site_id)).then((siteId) => {
-      if (isNaN(siteId)) {
-        throw 404;
-      }
-      return Site.findByPk(siteId);
-    }).then((model) => {
-      if (!model) { throw 404; }
+    fetchModelById(req.params.site_id, Site)
+      .then((model) => {
+        if (!model) { throw 404; }
 
-      site = model;
-      return siteAuthorizer.findOne(req.user, site);
-    }).then(() => S3PublishedFileLister.listPagedPublishedFilesForBranch(site, branch, startAtKey))
+        site = model;
+        return siteAuthorizer.findOne(req.user, site);
+      })
+      .then(() => S3PublishedFileLister.listPagedPublishedFilesForBranch(site, branch, startAtKey))
       .then((response) => {
         pagedFilesResponse = response;
         return PublishedBranchSerializer.serialize(site, branch);

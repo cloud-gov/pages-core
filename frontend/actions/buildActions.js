@@ -33,7 +33,7 @@ export default {
     return api.restartBuild(buildId, siteId)
       .then((build) => {
         if (Object.keys(build).length > 0) {
-          return dispatchBuildRestartedAction(build);
+          dispatchBuildRestartedAction(build);
         }
         alertActions.alertSuccess('Build is already queued.');
       });

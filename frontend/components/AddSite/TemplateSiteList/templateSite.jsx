@@ -70,6 +70,7 @@ class TemplateSite extends React.Component {
                 className="new-site-form"
                 onSubmit={this.handleSubmit}
               >
+                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                 <label htmlFor="owner">What GitHub account will own your site?</label>
                 <input
                   id="owner"
@@ -78,6 +79,7 @@ class TemplateSite extends React.Component {
                   value={owner}
                   onChange={this.handleChange}
                 />
+                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                 <label htmlFor="repository">Name your new site</label>
                 <input
                   id="repository"
