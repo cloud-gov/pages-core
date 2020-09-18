@@ -10,9 +10,9 @@ import BuildStatusNotifier from '../util/buildStatusNotifier';
 
 export class App extends React.Component {
   componentDidMount() {
-    const { onEnter } = this.props;
+    const { notifier, onEnter } = this.props;
     onEnter();
-    BuildStatusNotifier.listen();
+    notifier.listen();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -96,6 +96,9 @@ App.propTypes = {
       uid: PropTypes.number.isRequired,
     })
   ),
+  notifier: PropTypes.shape({
+    listen: PropTypes.func.isRequired,
+  }),
   sites: PropTypes.shape({
     isLoading: PropTypes.bool.isRequired,
     data: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -108,6 +111,7 @@ App.defaultProps = {
   location: null,
   user: false,
   notifications: [],
+  notifier: new BuildStatusNotifier(),
   sites: {
     isLoading: false,
     data: [],
