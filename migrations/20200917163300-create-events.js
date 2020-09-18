@@ -10,7 +10,7 @@ exports.up = (db, callback) => db.createTable('event', {
   hiddenAt: 'timestamp',
   body: 'jsonb',
 })
-  .then(() => db.runSql('CREATE INDEX "idxEventBody" ON site USING gin ("body");')
+  .then(() => db.runSql('CREATE INDEX "idxEventBody" ON site USING gin ("body");'))
   .then(() => callback())
   .catch(callback);
 
