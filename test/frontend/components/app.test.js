@@ -28,6 +28,9 @@ const props = {
   location: {
     key: 'a-route',
   },
+  notifier: {
+    listen: buildStatusNotifierListen,
+  },
   onEnter,
 };
 
@@ -35,7 +38,6 @@ const AppFixture = proxyquire('../../../frontend/components/app', {
   '../store': {},
   '../actions/alertActions': { update: alertActionUpdate },
   './header': Header,
-  '../util/buildStatusNotifier': { listen: buildStatusNotifierListen },
 }).App;
 
 describe('<App/>', () => {
@@ -49,9 +51,10 @@ describe('<App/>', () => {
   });
 
   it('renders children', () => {
-    const newProps = Object.assign({}, props, {
+    const newProps = {
+      ...props,
       children: (<div id="app-child">child!</div>),
-    });
+    };
     wrapper = shallow(<AppFixture {...newProps} />);
 
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);

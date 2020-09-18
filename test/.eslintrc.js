@@ -9,6 +9,9 @@ module.exports = {
     /* ScanJS rule overrides from main .eslintrc */
     'scanjs-rules/assign_to_search': 0,
     'scanjs-rules/assign_to_hostname': 0,
+
+    // Ok in tests
+    'react/jsx-props-no-spreading': 0,
   },
   plugins: [
     'no-only-tests',
