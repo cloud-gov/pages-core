@@ -16,8 +16,8 @@ export default {
 
     const url = `${API}/${endpoint}`;
 
-    const headers = Object.assign({}, defaultHeaders, params.headers || {});
-    const finalParams = Object.assign({}, params, { headers });
+    const headers = { ...defaultHeaders, ...params.headers || {} };
+    const finalParams = { ...params, headers };
 
     return fetch(url, finalParams)
       .catch((error) => {

@@ -42,6 +42,10 @@ async function _fetch(path, opts = {}) {
     });
 }
 
+function destroy(path) {
+  return _fetch(path, { method: 'DELETE' });
+}
+
 function get(path, query) {
   let qs = '';
   if (query) {
@@ -53,6 +57,10 @@ function get(path, query) {
 
 function put(path, body) {
   return _fetch(path, { method: 'PUT', body: JSON.stringify(body) });
+}
+
+async function destroySite(id) {
+  return destroy(`/sites/${id}`).catch(() => null);
 }
 
 async function fetchMe() {
@@ -80,6 +88,7 @@ async function logout() {
 }
 
 export {
+  destroySite,
   fetchMe,
   fetchBuilds,
   fetchSite,

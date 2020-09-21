@@ -1,7 +1,7 @@
 const GitHub = require('./GitHub');
 const { Site, User } = require('../models');
 const siteErrors = require('../responses/siteErrors');
-const FederalistUsersHelper = require('../services/FederalistUsersHelper');
+const FederalistUsersHelper = require('./FederalistUsersHelper');
 
 const checkGithubRepository = ({ user, owner, repository }) => GitHub
   .getRepository(user, owner, repository)
@@ -13,7 +13,7 @@ const checkGithubRepository = ({ user, owner, repository }) => GitHub
       };
     }
     if (!repo.permissions || !repo.permissions.push) {
-      return FederalistUsersHelper.federalistUsersAdmins(user.username)
+      return FederalistUsersHelper.federalistUsersAdmins(user.githubAccessToken)
         .then((admins) => {
           if (!admins.includes(user.username)) {
             throw {

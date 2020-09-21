@@ -1,16 +1,15 @@
 const siteSerializer = require('../serializers/site');
 const { SiteUser } = require('../models');
+const { toInt } = require('../utils');
 
 module.exports = {
   updateNotificationSettings: (req, res) => {
-    Promise.resolve(Number(req.params.site_id))
-      .then((siteId) => {
-        if (isNaN(siteId)) {
-          throw 404;
-        }
-        // same function as site authorizer
-        return SiteUser.findOne({ where: { user_sites: req.user.id, site_users: siteId } });
-      })
+    const siteId = toInt(req.params.site_id);
+    if (!siteId) {
+      throw 404;
+    }
+
+    SiteUser.findOne({ where: { user_sites: req.user.id, site_users: siteId } })
       .then((siteUser) => {
         if (!siteUser) {
           throw 404;

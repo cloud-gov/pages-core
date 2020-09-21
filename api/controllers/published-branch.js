@@ -2,24 +2,21 @@ const PublishedBranchSerializer = require('../serializers/published-branch');
 const S3PublishedFileLister = require('../services/S3PublishedFileLister');
 const siteAuthorizer = require('../authorizers/site');
 const { Site } = require('../models');
+const { fetchModelById } = require('../utils/queryDatabase');
 
 module.exports = {
   find: (req, res) => {
     let site;
 
-    Promise.resolve(Number(req.params.site_id)).then((id) => {
-      if (isNaN(id)) {
-        throw 404;
-      }
-      return Site.findByPk(id);
-    }).then((model) => {
-      if (model) {
-        site = model;
-      } else {
-        throw 404;
-      }
-      return siteAuthorizer.findOne(req.user, site);
-    })
+    fetchModelById(req.params.site_id, Site)
+      .then((model) => {
+        if (model) {
+          site = model;
+        } else {
+          throw 404;
+        }
+        return siteAuthorizer.findOne(req.user, site);
+      })
       .then(() => S3PublishedFileLister.listPublishedPreviews(site))
       .then((branchNames) => {
         let combinedBranchNames = branchNames.slice(0);
@@ -45,12 +42,7 @@ module.exports = {
     let site;
     const { branch } = req.params;
 
-    Promise.resolve(Number(req.params.site_id)).then((id) => {
-      if (isNaN(id)) {
-        throw 404;
-      }
-      return Site.findByPk(id);
-    })
+    fetchModelById(req.params.site_id, Site)
       .then((model) => {
         if (model) {
           site = model;

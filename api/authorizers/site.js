@@ -1,16 +1,17 @@
 const GitHub = require('../services/GitHub');
 const siteErrors = require('../responses/siteErrors');
 const { User, Site } = require('../models');
+const FederalistUsersHelper = require('../services/FederalistUsersHelper');
 
 const authorize = ({ id }, site) => (
   User.findByPk(id, { include: [Site] })
     .then((user) => {
       const hasSite = user.Sites.some(s => site.id === s.id);
       if (hasSite) {
-        return Promise.resolve(site.id);
+        return site.id;
       }
 
-      return Promise.reject(403);
+      throw 403;
     })
 );
 
@@ -18,26 +19,41 @@ const authorizeAdmin = (user, site) => (
   GitHub.checkPermissions(user, site.owner, site.repository)
     .then((permissions) => {
       if (!permissions.admin) {
-        return Promise.reject({
+        throw {
           message: siteErrors.ADMIN_ACCESS_REQUIRED,
           status: 403,
-        });
+        };
       }
-      return Promise.resolve(site.id);
+      return site.id;
     })
     .catch((error) => {
       if (error.status === 404) {
       // authorize user if the site's repo does not exist:
       // When a user attempts to delete a site after deleting the repo, Federalist
       // attempts to fetch the repo but it no longer exists and receives a 404
-        return Promise.resolve(site.id);
+        return site.id;
       }
-      return Promise.reject({
+      throw {
         message: siteErrors.ADMIN_ACCESS_REQUIRED,
         status: 403,
-      });
+      };
     })
 );
+
+function authorizeFederalistUsersAdmin(user) {
+  return FederalistUsersHelper.federalistUsersAdmins(user.githubAccessToken)
+    .then((admins) => {
+      if (!admins.includes(user.username)) {
+        throw 'user is not a system operator';
+      }
+    })
+    .catch(() => {
+      throw {
+        message: siteErrors.ADMIN_ACCESS_REQUIRED,
+        status: 403,
+      };
+    });
+}
 
 // create is allowed for all
 const create = () => Promise.resolve();
@@ -51,10 +67,9 @@ const findOne = (user, site) => authorize(user, site);
 
 const update = (user, site) => authorize(user, site);
 
-const destroy = (user, site) => (
-  authorize(user, site)
-    .then(() => authorizeAdmin(user, site))
-);
+const destroy = (user, site) => authorize(user, site)
+  .then(() => authorizeAdmin(user, site))
+  .catch(() => authorizeFederalistUsersAdmin(user));
 
 const removeUser = (user, site) => authorize(user, site);
 

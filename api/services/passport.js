@@ -21,7 +21,7 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
       },
     }))
     .then((models) => {
-      user = models[0];
+      [user] = models;
       if (!user) {
         throw new Error(`Unable to find or create user ${profile.username}`);
       }

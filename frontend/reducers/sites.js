@@ -23,7 +23,7 @@ const initialState = {
 
 const mapPropertyToMatchingSite = (data, siteId, properties) => data.map((site) => {
   if (site.id !== siteId) return site;
-  return Object.assign({}, site, properties);
+  return { ...site, ...properties };
 });
 
 export default function sites(state = initialState, action) {

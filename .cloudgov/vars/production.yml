@@ -4,6 +4,6 @@ instances: 2
 env: production
 env_postfix: ''
 log_level: info
-feature_admin_auth: 'false'
+feature_admin_auth: 'true'
 feature_proxy_edge_links: 'false'
 feature_proxy_edge_dynamo: 'false'
