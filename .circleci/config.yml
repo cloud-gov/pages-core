@@ -18,8 +18,10 @@ commands:
         type: string
       task-name:
         type: string
+        default: ""
       task-command:
         type: string
+        default: ""
     steps:
       - run:
           name: Setup environment
@@ -98,10 +100,11 @@ jobs:
           POSTGRES_USER: ci-test-user
           POSTGRES_DB: federalist-ci-test
           POSTGRES_HOST_AUTH_METHOD: trust
-     environment:
-       FEATURE_ADMIN_AUTH: 'true'
-     steps:
+    environment:
+      FEATURE_ADMIN_AUTH: 'true'
+    steps:
       - checkout
+
       - run:
           name: Display versions
           command: |
