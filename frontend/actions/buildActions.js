@@ -34,8 +34,9 @@ export default {
       .then((build) => {
         if (Object.keys(build).length > 0) {
           dispatchBuildRestartedAction(build);
+        } else {
+          alertActions.alertSuccess('Build is already queued.');
         }
-        alertActions.alertSuccess('Build is already queued.');
       });
   },
 
