@@ -32,6 +32,8 @@ const models = {
   ACTION_TYPE: 'action_type',
 };
 
+const associate = () => {};
+
 module.exports = (sequelize, DataTypes) => {
   const Event = sequelize.define('Event', {
     category: {
@@ -69,5 +71,6 @@ module.exports = (sequelize, DataTypes) => {
   Event.types = types;
   Event.names = names;
   Event.models = models;
+  Event.associate = associate;
   return Event;
 };
