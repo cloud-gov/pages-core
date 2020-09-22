@@ -241,9 +241,7 @@ workflows:
             - build
           filters:
             branches:
-              only:
-                - staging
-                - dc/deploy-admin-in-prod
+              only: staging
 
       - deploy:
           name: deploy-production
@@ -262,9 +260,7 @@ workflows:
             - build  
           filters:
             branches:
-              only:
-                - staging
-                - dc/deploy-admin-in-prod
+              only: staging
 
       - deploy-admin-client:
           name: deploy-admin-production
