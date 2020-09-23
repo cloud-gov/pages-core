@@ -78,7 +78,8 @@
     "serve-coverage": "serve -l 8080 ./coverage",
     "update-local-config": "node ./scripts/update-local-config.js",
     "create-dev-data": "node ./scripts/create-dev-data.js",
-    "update-proxy-db": "node ./scripts/proxy-edge.js"
+    "update-proxy-db": "node ./scripts/proxy-edge.js",
+    "timeout-builds": "node ./scripts/timeout-builds.js"
   },
   "main": "index.js",
   "repository": {

@@ -225,6 +225,21 @@ jobs:
           task-command: yarn nightly-builds
 
 
+  timeout-builds:
+    docker:
+      - image: circleci/node:12
+    parameters:
+      app:
+        type: string
+    steps:
+      - checkout
+
+      - deploy-to-cg:
+          app: << parameters.app >>
+          action: task
+          task-name: timeout-builds
+          task-command: yarn timeout-builds
+
 ##################################
 ##          Workflows           ##
 ##################################
@@ -295,4 +310,29 @@ workflows:
           app: federalistapp
           filters:
             branches:
-              only: main              
+              only: main
+
+
+  every-ten-minutes:
+    triggers:
+      - schedule:
+          cron: "0,10,20,30,40,50 * * * *"
+          filters:
+            branches:
+              only:
+                - staging
+                - main
+    jobs:
+      - timeout-builds:
+          name: timeout-builds-staging
+          app: federalistapp-staging
+          filters:
+            branches:
+              only: staging
+
+      - timeout-builds:
+          name: timeout-builds-production
+          app: federalistapp
+          filters:
+            branches:
+              only: main
