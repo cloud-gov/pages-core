@@ -1,54 +1,17 @@
-const config = require('../../config');
-
-const types = {
-  ERROR: 'error',
-  AUDIT: 'audit',
-  REQUEST: 'request',
-};
-const categories = {
-  BUILD: 'build',
-  SITE: 'site',
-  USER: 'user',
-  INFRASTRUCTURE: 'infrastructure',
-  ANALYTICS: 'analytics',
-  QUERY_TIMING: 'query_timing',
-};
-const names = {
-  TIMING: 'timing',
-  REMOVED: 'removed', // ie: site/site-user/infrastructure removed
-  DISABLED: 'disabled', // ie: sites not build/visible, user cannot login/removed Federalist users
-  ADDED: 'added',
-  UPDATED: 'updated', // ie: site settings updated, build status change,
-  AUTHENTICATED: 'authenticated', // ie: everytime user authenticated
-
-};
-const models = {
-  SITE: 'site',
-  BUILD: 'build',
-  USER: 'user',
-  BUILD_LOG: 'build_log',
-  SITE_USER: 'site_user',
-  USER_ENVIRONMENT_VARIABLE: 'user_environment_variable',
-  ACTION_TYPE: 'action_type',
-};
+const { types, labels } = require('../utils/event');
 
 const associate = () => {};
 
 module.exports = (sequelize, DataTypes) => {
   const Event = sequelize.define('Event', {
-    category: {
-      type: DataTypes.ENUM,
-      values: Object.values(categories),
-      allowNull: false,
-    },
-    type: {
+    types: {
       type: DataTypes.ENUM,
       values: Object.values(types),
       allowNull: false,
     },
-    name: {
+    label: {
       type: DataTypes.ENUM,
-      values: Object.values(names),
+      values: Object.values(labels),
       allowNull: false,
     },
     modelId: {
@@ -56,21 +19,16 @@ module.exports = (sequelize, DataTypes) => {
     },
     model: {
       type: DataTypes.ENUM,
-      values: Object.values(models),
+      values: sequelize.models.map(m => m.name),
     },
     body: {
       type: DataTypes.JSONB,
-    },
-    hiddenAt: {
-      type: DataTypes.DATE,
+      defaultValue: {},
     },
   }, {
     tableName: 'event',
   });
-  Event.categories = categories;
-  Event.types = types;
-  Event.names = names;
-  Event.models = models;
+
   Event.associate = associate;
   return Event;
 };

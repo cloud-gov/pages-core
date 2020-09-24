@@ -1,16 +1,14 @@
 exports.up = (db, callback) => db.createTable('event', {
   id: { type: 'int', primaryKey: true, autoIncrement: true },
   type: 'string',
-  category: 'string',
-  name: 'string',
+  label: 'string',
   model: 'string',
   modelId: 'int',
   createdAt: 'timestamp',
   updatedAt: 'timestamp',
-  hiddenAt: 'timestamp',
   body: 'jsonb',
 })
-  .then(() => db.runSql('CREATE INDEX "idxEventBody" ON site USING gin ("body");'))
+  .then(() => db.runSql('CREATE INDEX "idxEventBody" ON event USING gin ("body");'))
   .then(() => callback())
   .catch(callback);
 

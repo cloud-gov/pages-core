@@ -1,10 +1,11 @@
 const GitHubStrategy = require('passport-github').Strategy;
 const Passport = require('passport');
 const config = require('../../config');
-const { User } = require('../models');
+const { User, Event } = require('../models');
 const { logger } = require('../../winston');
 const GitHub = require('./GitHub');
 const RepositoryVerifier = require('./RepositoryVerifier');
+const { types: eventTypes, labels: eventLabels, } = require('../utils/event');
 
 const passport = new Passport.Passport();
 
@@ -25,6 +26,17 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
       if (!user) {
         throw new Error(`Unable to find or create user ${profile.username}`);
       }
+
+      Event.create({
+        type: eventTypes.AUDIT,
+        label: eventLabels.AUTHENTICATION,
+        model: user.modelName,
+        modelId: user.id,
+        body: {
+          action: 'login',
+        },
+      });
+
       return user.update({
         githubAccessToken: accessToken,
         githubUserId: profile.id,
@@ -45,6 +57,15 @@ passport.use(new GitHubStrategy(config.passport.github.options, githubVerifyCall
 
 passport.logout = (req, res) => {
   req.logout();
+  Event.create({
+    type: eventTypes.AUDIT,
+    label: eventLabels.AUTHENTICATION,
+    model: user.modelName,
+    modelId: user.id,
+    body: {
+      action: 'logout',
+    },
+  });
   req.session.destroy(() => {
     res.redirect(config.app.homepageUrl);
   });
