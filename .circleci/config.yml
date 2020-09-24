@@ -153,10 +153,6 @@ jobs:
   deploy:
     docker:
       - image: circleci/node:12
-    environment:
-        if [ "$CIRCLE_BRANCH" = "staging" ]; then
-          FEATURE_PROXY_EDGE_LINKS: 'true'
-        fi 
     parameters:
       app:
         type: string
@@ -165,6 +161,12 @@ jobs:
 
       - restore_cache:
           key: dependency-cache-{{ checksum "yarn.lock" }}
+      - run:
+          name: Set build specific environment variables
+          command: |
+            if [ "$CIRCLE_BRANCH" = "staging" ]; then
+              echo "export FEATURE_PROXY_EDGE_LINKS=true" >> $BASH_ENV
+            fi
 
       - run:
           name: Build app
