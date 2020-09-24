@@ -154,7 +154,9 @@ jobs:
     docker:
       - image: circleci/node:12
     environment:
-      FEATURE_PROXY_EDGE_LINKS: 'true'
+        if [ "$CIRCLE_BRANCH" = "staging" ]; then
+          FEATURE_PROXY_EDGE_LINKS: 'true'
+        fi 
     parameters:
       app:
         type: string
