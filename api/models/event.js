@@ -27,6 +27,8 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'event',
+    timestamps: true,
+    updatedAt: false,
   });
 
   Event.associate = associate;
