@@ -153,11 +153,12 @@ jobs:
   deploy:
     docker:
       - image: circleci/node:12
-    environment:
-      FEATURE_PROXY_EDGE_LINKS: 'true'
     parameters:
       app:
         type: string
+      feature_proxy_edge_links:
+        type: string
+        default: "false"
     steps:
       - checkout
 
@@ -166,6 +167,8 @@ jobs:
 
       - run:
           name: Build app
+          environment:
+            FEATURE_PROXY_EDGE_LINKS: << parameters.feature_proxy_edge_links >>
           command: yarn build
 
       - deploy-to-cg:
@@ -251,7 +254,8 @@ workflows:
 
       - deploy:
           name: deploy-staging
-          app: federalistapp-staging        
+          app: federalistapp-staging
+          feature_proxy_edge_links: "true"
           requires:
             - build
           filters:
