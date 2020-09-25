@@ -156,20 +156,18 @@ jobs:
     parameters:
       app:
         type: string
+      feature_proxy_edge_links:
+        type: string
+        default: "false"
     steps:
       - checkout
 
       - restore_cache:
           key: dependency-cache-{{ checksum "yarn.lock" }}
       - run:
-          name: Set build specific environment variables
-          command: |
-            if [ "$CIRCLE_BRANCH" = "staging" ]; then
-              echo "export FEATURE_PROXY_EDGE_LINKS=true" >> $BASH_ENV
-            fi
-
-      - run:
           name: Build app
+          environment:
+            FEATURE_PROXY_EDGE_LINKS: << parameters.feature_proxy_edge_links >>
           command: yarn build
 
       - deploy-to-cg:
@@ -255,7 +253,8 @@ workflows:
 
       - deploy:
           name: deploy-staging
-          app: federalistapp-staging        
+          app: federalistapp-staging
+          feature_proxy_edge_links: "true"
           requires:
             - build
           filters:
