@@ -4,7 +4,7 @@ const associate = () => {};
 
 module.exports = (sequelize, DataTypes) => {
   const Event = sequelize.define('Event', {
-    types: {
+    type: {
       type: DataTypes.ENUM,
       values: Object.values(types),
       allowNull: false,
@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     model: {
       type: DataTypes.ENUM,
-      values: sequelize.models.map(m => m.name),
+      values: Object.keys(sequelize.models),
     },
     body: {
       type: DataTypes.JSONB,

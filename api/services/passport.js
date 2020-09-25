@@ -30,12 +30,13 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
       Event.create({
         type: eventTypes.AUDIT,
         label: eventLabels.AUTHENTICATION,
-        model: user.modelName,
+        model: user.constructor.name,
         modelId: user.id,
         body: {
           action: 'login',
         },
-      });
+      })
+      .catch(logger.warn);
 
       return user.update({
         githubAccessToken: accessToken,
@@ -56,16 +57,20 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
 passport.use(new GitHubStrategy(config.passport.github.options, githubVerifyCallback));
 
 passport.logout = (req, res) => {
+  const user = req.user;
   req.logout();
-  Event.create({
-    type: eventTypes.AUDIT,
-    label: eventLabels.AUTHENTICATION,
-    model: user.modelName,
-    modelId: user.id,
-    body: {
-      action: 'logout',
-    },
-  });
+  if (user) {
+    Event.create({
+      type: eventTypes.AUDIT,
+      label: eventLabels.AUTHENTICATION,
+      model: user.constructor.name,
+      modelId: user.id,
+      body: {
+        action: 'logout',
+      },
+    })
+    .catch(logger.warn);
+  }
   req.session.destroy(() => {
     res.redirect(config.app.homepageUrl);
   });

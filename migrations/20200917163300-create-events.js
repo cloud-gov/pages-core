@@ -13,7 +13,7 @@ exports.up = (db, callback) => db.createTable('event', {
     db.runSql('CREATE INDEX IF NOT EXISTS "model" ON event USING btree ("model");'),
     db.runSql('CREATE INDEX IF NOT EXISTS "modelId" ON event USING btree ("modelId");'),
     db.runSql('CREATE INDEX IF NOT EXISTS "idxEventBody" ON event USING gin ("body");'),
-  ])
+  ]))
   .then(() => callback())
   .catch(callback);
 
