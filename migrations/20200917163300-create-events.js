@@ -1,7 +1,7 @@
 exports.up = (db, callback) => db.createTable('event', {
   id: { type: 'int', primaryKey: true, autoIncrement: true },
-  type: 'string',
-  label: 'string',
+  type: { type: 'string', notNull: true },
+  label: { type: 'string', notNull: true },
   model: 'string',
   modelId: 'int',
   createdAt: { type: 'date', notNull: true },
