@@ -27,7 +27,7 @@ class CloudFoundryAPIClient {
 
   fetchTaskByName(name) {
     return this.fetchTasks({ names: name })
-      .then(tasks => tasks.filter(task => task.name === name));
+      .then(tasks => tasks.find(task => task.name === name));
   }
 
   fetchTasks(params) {
