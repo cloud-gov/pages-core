@@ -1,4 +1,4 @@
-const { isValidType, isValidLabel } = require('../utils/event');
+const { isValidType, isValidLabel, isValidModel } = require('../utils/event');
 
 const associate = () => {};
 
@@ -22,8 +22,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
     },
     model: {
-      type: DataTypes.ENUM,
-      values: Object.keys(sequelize.models),
+      type: DataTypes.STRING,
+      validate: {
+        isValidModel,
+      },
     },
     body: {
       type: DataTypes.JSONB,

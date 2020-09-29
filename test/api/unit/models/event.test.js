@@ -6,6 +6,7 @@ describe('Event model', () => {
     factory.event({
       type: 'audit',
       label: 'timing',
+      model: 'User',
     })
     .then((event) => {
       expect(event.type).to.equal('audit');
@@ -14,24 +15,38 @@ describe('Event model', () => {
     });
   });
 
-  it('should validate the type', (done) => {
+  it('should not allow invalid type', (done) => {
     factory.event({
-      type: 'invalid',
+      type: 'invalidType',
       label: 'timing',
+      model: 'User',
     })
     .catch((err) => {
-      expect(err.message).to.equal('Validation error: Invalid event type: invalid');
+      expect(err.message).to.equal('Validation error: Invalid event type: invalidType');
       done();
     });
   });
 
-  it('should validate the label', (done) => {
+  it('should not allow invalid label', (done) => {
     factory.event({
       type: 'audit',
-      label: 'invalid',
+      label: 'invalidLabel',
+      model: 'User',
     })
     .catch((err) => {
-      expect(err.message).to.equal('Validation error: Invalid event label: invalid');
+      expect(err.message).to.equal('Validation error: Invalid event label: invalidLabel');
+      done();
+    });
+  });
+
+  it('should not allow invalid model', (done) => {
+    factory.event({
+      type: 'audit',
+      label: 'timing',
+      model: 'invalidModel',
+    })
+    .catch((err) => {
+      expect(err.message).to.equal('Validation error: Invalid event model: invalidModel');
       done();
     });
   });

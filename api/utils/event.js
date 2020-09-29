@@ -6,10 +6,15 @@ const types = {
 const labels = {
   TIMING: 'timing',
   ADDED: 'added',
-  REMOVED: 'removed', // ie: site/site-user/infrastructure removed
-  UPDATED: 'updated', // ie: site settings updated, build status change
-  AUTHENTICATION: 'authentication', // ie: everytime user authenticated
+  REMOVED: 'removed',
+  UPDATED: 'updated',
+  AUTHENTICATION: 'authentication',
 };
+
+const modelNames = [
+  'Build', 'Site', 'BuildLog', 'User',
+  'UserEnvironmentVariable', 'SiteUser',
+];
 
 const isValidType = (value) => {
   if (!Object.values(types).includes(value)) {
@@ -23,4 +28,10 @@ const isValidLabel = (value) => {
   }
 }
 
-module.exports = { types, labels, isValidLabel, isValidType };
+const isValidModel = (value) => {
+  if (!modelNames.includes(value)) {
+    throw new Error(`Invalid event model: ${value}`);
+  }
+}
+
+module.exports = { types, labels, isValidLabel, isValidType, isValidModel };
