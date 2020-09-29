@@ -3,8 +3,8 @@ const { Event } = require('../models');
 const { types: eventTypes, labels: eventLabels } = require('../utils/event');
 
 const userLoggedIn = (user) => Event.create({
-        type: eventTypes.AUDIT,
-        label: eventLabels.AUTHENTICATION,
+        type: Event.types.AUDIT,
+        label: Event.labels.AUTHENTICATION,
         model: user.constructor.name,
         modelId: user.id,
         body: {
@@ -14,8 +14,8 @@ const userLoggedIn = (user) => Event.create({
       .catch(logger.warn);
 
 const userLoggedOut = (user) => Event.create({
-        type: eventTypes.AUDIT,
-        label: eventLabels.AUTHENTICATION,
+        type: Event.types.AUDIT,
+        label: Event.labels.AUTHENTICATION,
         model: user.constructor.name,
         modelId: user.id,
         body: {
