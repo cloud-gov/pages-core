@@ -4,7 +4,7 @@ const { userLoggedIn, userLoggedOut } = require('../../../../api/services/EventC
 
 describe('EventCreateor', () => {
   
-  it('.UserLoggedIn', (done) => {
+  it('.userLoggedIn', (done) => {
     factory.user()
       .then(user => userLoggedIn(user)
         .then((event) => {
@@ -17,7 +17,7 @@ describe('EventCreateor', () => {
         }));  
   });
 
-  it('.UserLoggedOut', (done) => {
+  it('.userLoggedOut', (done) => {
     factory.user()
       .then(user => userLoggedOut(user)
         .then((event) => {
