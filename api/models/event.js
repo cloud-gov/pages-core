@@ -1,18 +1,22 @@
-const { types, labels } = require('../utils/event');
+const { isValidType, isValidLabel } = require('../utils/event');
 
 const associate = () => {};
 
 module.exports = (sequelize, DataTypes) => {
   const Event = sequelize.define('Event', {
     type: {
-      type: DataTypes.ENUM,
-      values: Object.values(types),
+      type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        isValidType,
+      },
     },
     label: {
-      type: DataTypes.ENUM,
-      values: Object.values(labels),
+      type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        isValidLabel,
+      },
     },
     modelId: {
       type: DataTypes.INTEGER,
