@@ -1,7 +1,7 @@
 const GitHubStrategy = require('passport-github').Strategy;
 const Passport = require('passport');
 const config = require('../../config');
-const { User, Event } = require('../models');
+const { User } = require('../models');
 const { logger } = require('../../winston');
 const GitHub = require('./GitHub');
 const RepositoryVerifier = require('./RepositoryVerifier');
