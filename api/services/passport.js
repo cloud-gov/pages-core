@@ -5,7 +5,7 @@ const { User, Event } = require('../models');
 const { logger } = require('../../winston');
 const GitHub = require('./GitHub');
 const RepositoryVerifier = require('./RepositoryVerifier');
-const { types: eventTypes, labels: eventLabels, } = require('../utils/event');
+const EventCreator = require('../services/EventCreator')
 
 const passport = new Passport.Passport();
 
@@ -27,16 +27,7 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
         throw new Error(`Unable to find or create user ${profile.username}`);
       }
 
-      Event.create({
-        type: eventTypes.AUDIT,
-        label: eventLabels.AUTHENTICATION,
-        model: user.constructor.name,
-        modelId: user.id,
-        body: {
-          action: 'login',
-        },
-      })
-      .catch(logger.warn);
+      EventCreator.userLoggedIn(user);
 
       return user.update({
         githubAccessToken: accessToken,
@@ -60,16 +51,7 @@ passport.logout = (req, res) => {
   const user = req.user;
   req.logout();
   if (user) {
-    Event.create({
-      type: eventTypes.AUDIT,
-      label: eventLabels.AUTHENTICATION,
-      model: user.constructor.name,
-      modelId: user.id,
-      body: {
-        action: 'logout',
-      },
-    })
-    .catch(logger.warn);
+    EventCreator.userLoggedOut(user);
   }
   req.session.destroy(() => {
     res.redirect(config.app.homepageUrl);
