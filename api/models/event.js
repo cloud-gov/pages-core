@@ -1,8 +1,5 @@
-const { isValidType, isValidLabel, isValidModel } = require('../utils/event');
-
-const associate = () => {};
-
 module.exports = (sequelize, DataTypes) => {
+
   const types = {
     ERROR: 'error',
     AUDIT: 'audit',
@@ -38,6 +35,8 @@ module.exports = (sequelize, DataTypes) => {
       throw new Error(`Invalid event model: ${value}`);
     }
   }
+
+  const associate = () => {};
 
   const Event = sequelize.define('Event', {
     type: {

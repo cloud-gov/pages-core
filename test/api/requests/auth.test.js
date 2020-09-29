@@ -12,11 +12,9 @@ const { User } = require('../../../api/models');
 const EventCreator = require('../../../api/services/EventCreator');
 
 describe('Authentication request', () => {
-  let userLoggedInStub;
-  let userLoggedOutStub;
+  let eventAuditStub;
   beforeEach(() => {
-    userLoggedInStub = sinon.stub(EventCreator, 'userLoggedIn').resolves();
-    userLoggedOutStub = sinon.stub(EventCreator, 'userLoggedOut').resolves();
+    eventAuditStub = sinon.stub(EventCreator, 'audit').resolves();
   })
   afterEach(() => {
     sinon.restore();
@@ -66,7 +64,7 @@ describe('Authentication request', () => {
           .expect(302);
       })
         .then(() => {
-          expect(userLoggedOutStub.called).to.equal(true);
+          expect(eventAuditStub.called).to.equal(true);
           return sessionForCookie(cookie);
         })
         .then((nonAuthSession) => {
@@ -107,7 +105,7 @@ describe('Authentication request', () => {
           .then((authSession) => {
             expect(authSession.authenticated).to.equal(true);
             expect(authSession.passport.user).to.equal(user.id);
-            expect(userLoggedInStub.calledOnce).to.equal(true);
+            expect(eventAuditStub.calledOnce).to.equal(true);
             done();
           })
           .catch(done);
@@ -190,7 +188,7 @@ describe('Authentication request', () => {
             expect(user).to.have.property('username', `user-${githubUserID}`);
             expect(user).to.have.property('githubUserId', `${githubUserID}`);
             expect(user).to.have.property('githubAccessToken', 'access-token-123abc');
-            expect(userLoggedInStub.calledOnce).to.equal(true);
+            expect(eventAuditStub.calledOnce).to.equal(true);
             done();
           })
           .catch(done);
@@ -227,7 +225,7 @@ describe('Authentication request', () => {
             'Apologies; you don\'t have access to Federalist! '
           + 'Please contact the Federalist team if this is in error.'
           );
-          expect(userLoggedInStub.called).to.equal(false);
+          expect(eventAuditStub.called).to.equal(false);
           done();
         })
         .catch(done);
@@ -256,7 +254,7 @@ describe('Authentication request', () => {
             'Apologies; you don\'t have access to Federalist! '
           + 'Please contact the Federalist team if this is in error.'
           );
-          expect(userLoggedInStub.called).to.equal(false);
+          expect(eventAuditStub.called).to.equal(false);
           done();
         })
         .catch(done);

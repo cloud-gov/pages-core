@@ -1,30 +1,41 @@
 const { logger } = require('../../winston');
 const { Event } = require('../models');
-const { types: eventTypes, labels: eventLabels } = require('../utils/event');
 
-const userLoggedIn = (user) => Event.create({
-        type: Event.types.AUDIT,
-        label: Event.labels.AUTHENTICATION,
-        model: user.constructor.name,
-        modelId: user.id,
-        body: {
-          action: 'login',
-        },
-      })
-      .catch(logger.warn);
+const createEvent = (obj) => {
 
-const userLoggedOut = (user) => Event.create({
-        type: Event.types.AUDIT,
-        label: Event.labels.AUTHENTICATION,
-        model: user.constructor.name,
-        modelId: user.id,
-        body: {
-          action: 'logout',
-        },
-      })
-      .catch(logger.warn);
+  const { label, type, model, body } = obj;
+  let modelId;// = null;
+  let modelName;// = null;
+
+  if(model) {
+    modelId = model.id;
+    modelName = model.constructor.name;
+  }
+
+  return Event.create({
+    label,
+    type,
+    model: modelName,
+    modelId,
+    body,
+  })
+    .catch(logger.warn);
+}
+
+const audit = (label, model, body) => createEvent({
+  type: Event.types.AUDIT,
+  label,
+  model,
+  body,
+});
+
+const error = (label, body) => createEvent({
+  type: Event.types.ERROR,
+  label,
+  body
+});
 
 module.exports = {
-  userLoggedIn,
-  userLoggedOut,
+  audit,
+  error,
 };
