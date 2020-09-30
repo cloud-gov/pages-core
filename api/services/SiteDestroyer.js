@@ -14,9 +14,9 @@ async function destroySite(site) {
   }
 
   await Promise.all(destroyComponents);
-  return site
+  return site;
 }
 
 module.exports = {
-  destroySite
+  destroySite,
 };

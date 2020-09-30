@@ -49,7 +49,7 @@ function parseJSON(response) {
 function fetchWrapper(url, configs = {}) {
   const baseConfigs = {
     credentials: configs.credentials || credentials,
-    headers: Object.assign({}, defaultHeaders, configs.headers || {}),
+    headers: { ...defaultHeaders, ...configs.headers || {} },
     method: configs.method || defaultMethod,
   };
 

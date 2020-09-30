@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const ButtonLink = ({ clickHandler, children }) => (
-  <a
-    href="#"
-    role="button"
+  <button
+    type="button"
     onClick={clickHandler}
+    className="usa-button usa-button-secondary"
   >
     {children}
-  </a>
+  </button>
 );
 
 ButtonLink.propTypes = {

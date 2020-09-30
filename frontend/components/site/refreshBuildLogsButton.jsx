@@ -18,7 +18,7 @@ class RefreshBuildLogsButton extends React.Component {
 
   render() {
     return (
-      <button className="usa-button" onClick={this.refreshBuildLogs}>Refresh logs</button>
+      <button type="button" className="usa-button" onClick={this.refreshBuildLogs}>Refresh logs</button>
     );
   }
 }

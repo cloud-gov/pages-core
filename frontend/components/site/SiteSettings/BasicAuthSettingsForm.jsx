@@ -12,7 +12,8 @@ export const BasicAuthSettingsForm = ({
     <div className="well">
       <fieldset>
         <p className="well-text">
-          To enable basic authentication, please submit a username and password credentials required to preview your site builds.
+          To enable basic authentication, please submit a username and password
+          credentials required to preview your site builds.
         </p>
         <Field
           name="username"

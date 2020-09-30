@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 
+import { BUILD_LOG } from '../../propTypes';
 import buildLogActions from '../../actions/buildLogActions';
 import LoadingIndicator from '../LoadingIndicator';
 import SiteBuildLogTable from './siteBuildLogTable';
@@ -75,8 +76,7 @@ class SiteBuildLogs extends React.Component {
         </div>
         { buildLogs.isLoading
           ? <LoadingIndicator />
-          : <SiteBuildLogTable buildLogs={buildLogs.data} />
-        }
+          : <SiteBuildLogTable buildLogs={buildLogs.data} />}
       </div>
     );
   }
@@ -86,7 +86,7 @@ SiteBuildLogs.propTypes = {
   buildId: PropTypes.string.isRequired,
   buildLogs: PropTypes.shape({
     isLoading: PropTypes.bool,
-    data: PropTypes.array,
+    data: PropTypes.arrayOf(BUILD_LOG),
   }),
   actions: PropTypes.shape({
     fetchBuildLogs: PropTypes.func.isRequired,

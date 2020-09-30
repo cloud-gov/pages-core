@@ -21,7 +21,6 @@ const userActionReceived = userActions => ({
   userActions,
 });
 
-
 export {
   userFetchStarted, userFetchStartedType,
   userReceived, userReceivedType,
