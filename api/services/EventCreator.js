@@ -4,22 +4,26 @@ const { Event } = require('../models');
 const createEvent = (obj) => {
 
   const { label, type, model, body } = obj;
-  let modelId;// = null;
-  let modelName;// = null;
+  let modelId;
+  let modelName;
 
   if(model) {
     modelId = model.id;
     modelName = model.constructor.name;
   }
 
-  return Event.create({
+  const atts = {
     label,
     type,
     model: modelName,
     modelId,
     body,
-  })
-    .catch(logger.warn);
+  };
+
+  return Event.create(atts)
+    .catch((err) => {
+      logger.warn([`Failed to create Event(${JSON.stringify(atts)}`, err].join('\n'));
+    });
 }
 
 const audit = (label, model, body) => createEvent({
