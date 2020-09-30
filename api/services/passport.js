@@ -52,7 +52,9 @@ passport.logout = (req, res) => {
   req.logout();
   if (user) {
     const eventBody = { action: 'logout' };
-    EventCreator.audit(Event.labels.AUTHENTICATION, user, eventBody);
+    res.on('finish', () => {
+      EventCreator.audit(Event.labels.AUTHENTICATION, user, eventBody);
+    });
   }
   req.session.destroy(() => {
     res.redirect(config.app.homepageUrl);
