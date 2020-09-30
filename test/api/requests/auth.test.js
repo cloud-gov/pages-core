@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const nock = require('nock');
 const request = require('supertest');
+const sinon = require('sinon');
 const app = require('../../../app');
 const config = require('../../../config');
 const factory = require('../support/factory');
@@ -8,8 +9,16 @@ const githubAPINocks = require('../support/githubAPINocks');
 const { authenticatedSession, unauthenticatedSession } = require('../support/session');
 const { sessionForCookie } = require('../support/cookieSession');
 const { User } = require('../../../api/models');
+const EventCreator = require('../../../api/services/EventCreator');
 
 describe('Authentication request', () => {
+  let eventAuditStub;
+  beforeEach(() => {
+    eventAuditStub = sinon.stub(EventCreator, 'audit').resolves();
+  })
+  afterEach(() => {
+    sinon.restore();
+  });
   describe('GET /auth/github', () => {
     it('should redirect to GitHub for OAuth2 authentication', (done) => {
       request(app)
@@ -54,7 +63,10 @@ describe('Authentication request', () => {
           .expect('Location', 'http://localhost:4000')
           .expect(302);
       })
-        .then(() => sessionForCookie(cookie))
+        .then(() => {
+          expect(eventAuditStub.called).to.equal(true);
+          return sessionForCookie(cookie);
+        })
         .then((nonAuthSession) => {
           expect(nonAuthSession).to.equal(null);
           done();
@@ -93,6 +105,7 @@ describe('Authentication request', () => {
           .then((authSession) => {
             expect(authSession.authenticated).to.equal(true);
             expect(authSession.passport.user).to.equal(user.id);
+            expect(eventAuditStub.calledOnce).to.equal(true);
             done();
           })
           .catch(done);
@@ -175,6 +188,7 @@ describe('Authentication request', () => {
             expect(user).to.have.property('username', `user-${githubUserID}`);
             expect(user).to.have.property('githubUserId', `${githubUserID}`);
             expect(user).to.have.property('githubAccessToken', 'access-token-123abc');
+            expect(eventAuditStub.calledOnce).to.equal(true);
             done();
           })
           .catch(done);
@@ -211,6 +225,7 @@ describe('Authentication request', () => {
             'Apologies; you don\'t have access to Federalist! '
           + 'Please contact the Federalist team if this is in error.'
           );
+          expect(eventAuditStub.called).to.equal(false);
           done();
         })
         .catch(done);
@@ -239,6 +254,7 @@ describe('Authentication request', () => {
             'Apologies; you don\'t have access to Federalist! '
           + 'Please contact the Federalist team if this is in error.'
           );
+          expect(eventAuditStub.called).to.equal(false);
           done();
         })
         .catch(done);
