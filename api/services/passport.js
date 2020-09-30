@@ -5,7 +5,7 @@ const { User, Event } = require('../models');
 const { logger } = require('../../winston');
 const GitHub = require('./GitHub');
 const RepositoryVerifier = require('./RepositoryVerifier');
-const EventCreator = require('../services/EventCreator')
+const EventCreator = require('./EventCreator');
 
 const passport = new Passport.Passport();
 
@@ -48,7 +48,7 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
 passport.use(new GitHubStrategy(config.passport.github.options, githubVerifyCallback));
 
 passport.logout = (req, res) => {
-  const user = req.user;
+  const { user } = req;
   req.logout();
   if (user) {
     const eventBody = { action: 'logout' };

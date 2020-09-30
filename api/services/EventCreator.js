@@ -2,12 +2,13 @@ const { logger } = require('../../winston');
 const { Event } = require('../models');
 
 const createEvent = (obj) => {
-
-  const { label, type, model, body } = obj;
+  const {
+    label, type, model, body,
+  } = obj;
   let modelId;
   let modelName;
 
-  if(model) {
+  if (model) {
     modelId = model.id;
     modelName = model.constructor.name;
   }
@@ -24,7 +25,7 @@ const createEvent = (obj) => {
     .catch((err) => {
       logger.warn([`Failed to create Event(${JSON.stringify(atts)}`, err].join('\n'));
     });
-}
+};
 
 const audit = (label, model, body) => createEvent({
   type: Event.types.AUDIT,
@@ -36,7 +37,7 @@ const audit = (label, model, body) => createEvent({
 const error = (label, body) => createEvent({
   type: Event.types.ERROR,
   label,
-  body
+  body,
 });
 
 module.exports = {
