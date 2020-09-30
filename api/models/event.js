@@ -13,11 +13,6 @@ module.exports = (sequelize, DataTypes) => {
     AUTHENTICATION: 'authentication',
   };
 
-  const modelNames = [
-    'Build', 'Site', 'BuildLog', 'User',
-    'UserEnvironmentVariable', 'SiteUser',
-  ];
-
   function isValidType(value) {
     if (!Object.values(types).includes(value)) {
       throw new Error(`Invalid event type: ${value}`);
