@@ -37,4 +37,4 @@ Build.forSiteUser = user => Build
 UserEnvironmentVariable.forSiteUser = user => UserEnvironmentVariable
   .scope({ method: ['forSiteUser', user, Site, User] });
 
-module.exports = { sequelize, ...sequelize.models, modelNames: Object.keys(sequelize.models) };
+module.exports = { sequelize, ...sequelize.models };
