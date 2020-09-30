@@ -10,7 +10,7 @@
     "body-parser": "^1.18.3",
     "cfenv": "^1.2.3",
     "connect-flash": "^0.1.1",
-    "connect-session-sequelize": "^7.0.1",
+    "connect-session-sequelize": "^7.0.3",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
     "csurf": "^1.11.0",

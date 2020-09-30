@@ -3642,10 +3642,10 @@ connect-history-api-fallback@^1.6.0:
   resolved "https://registry.yarnpkg.com/connect-history-api-fallback/-/connect-history-api-fallback-1.6.0.tgz#8b32089359308d111115d81cad3fceab888f97bc"
   integrity sha512-e54B99q/OUoH64zYYRf3HBP5z24G38h5D3qXu23JGRoigpX5Ss4r9ZnDk3g0Z8uQC2x2lPaJ+UlWBc1ZWBWdLg==
 
-connect-session-sequelize@^7.0.1:
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/connect-session-sequelize/-/connect-session-sequelize-7.0.1.tgz#ba4fe44a57a10f1f154e42663871b376fc315d62"
-  integrity sha512-EDsHbhewpVigA+ZQtCKSNAnLmSp2/Nm6gUXmxUPzU7uAIbqThcZeDBO94GHimJvLN4UBe49yxeuZ9uFfGuXpzw==
+connect-session-sequelize@^7.0.3:
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/connect-session-sequelize/-/connect-session-sequelize-7.0.3.tgz#305d15116e8b109aac2c17c5e3a21a23ecae60ea"
+  integrity sha512-25/Uee2BTrwIN4LQvK1ye2iq+HqC8VVzpNuuKTuq4ivkeFY6uKU/edd6wItv3kjknX2o71MbkNioNL3jCAk7og==
   dependencies:
     debug "^4.1.1"
     deep-equal "^2.0.3"
