@@ -1,4 +1,4 @@
-import React, { Fragment, Component } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -16,7 +16,7 @@ import EnvironmentVariableForm from './EnvironmentVariableForm';
 import EnvironmentVariableTable from './EnvironmentVariableTable';
 
 const infoContent = (
-  <Fragment>
+  <>
     Certain environment variable names are reserved for Federalist use and will
     be ignored. Warnings for any ignored environment variables will be present
     in the build logs. See the default variables in
@@ -29,11 +29,11 @@ const infoContent = (
     </a>
     {' '}
     for an up-to-date list.
-  </Fragment>
+  </>
 );
 
 const warningContent = (
-  <Fragment>
+  <>
     Federalist is a
     <b> FISMA Low </b>
     system, do NOT store variables for systems that are Moderate or High, and
@@ -45,13 +45,12 @@ const warningContent = (
       href="https://csrc.nist.gov/Projects/Risk-Management/Risk-Management-Framework-(RMF)-Overview/Security-Categorization"
       rel="noopener noreferrer"
     >
-    FISMA Security Categorization
+      FISMA Security Categorization
     </a>
     {' '}
     for more information on FISMA information categorization.
-  </Fragment>
+  </>
 );
-
 
 class EnvironmentVariables extends Component {
   componentDidMount() {
@@ -86,7 +85,7 @@ class EnvironmentVariables extends Component {
         { isLoading
           ? <LoadingIndicator />
           : (
-            <Fragment>
+            <>
               <ExpandableArea
                 bordered
                 title="Add a new environment variable"
@@ -99,11 +98,9 @@ class EnvironmentVariables extends Component {
               { showTable
                 && (
                 <EnvironmentVariableTable uevs={data} onDelete={deleteUEV} />
-                )
-              }
-            </Fragment>
-          )
-        }
+                )}
+            </>
+          )}
       </div>
     );
   }

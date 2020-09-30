@@ -5,7 +5,6 @@ import { SITE, USER } from '../../propTypes';
 import siteActions from '../../actions/siteActions';
 import { currentSite } from '../../selectors/site';
 
-
 class NotificationSettings extends React.Component {
   constructor(props) {
     super(props);

@@ -103,7 +103,7 @@ if (dynamoDBCreds) {
     region: dynamoDBCreds.region,
   };
 } else {
-    throw new Error('No DynamoDB credentials found');
+  throw new Error('No DynamoDB credentials found');
 }
 
 // See https://github.com/nfriedly/express-rate-limit/blob/master/README.md#configuration

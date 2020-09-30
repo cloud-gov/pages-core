@@ -1,8 +1,8 @@
 const { Build, Site } = require('../models');
 const buildErrors = require('../responses/buildErrors');
-const GitHub = require('../services/GitHub');
+const GitHub = require('./GitHub');
 
-const rejectBuild = msg => Promise.reject({
+const rejectBuild = msg => ({
   status: 404,
   message: msg,
 });
@@ -14,7 +14,7 @@ function getBranchFromGithub({ user, site, branch }) {
       site: site.id,
       commitSha: branchInfo.commit.sha,
     }))
-    .catch(() => rejectBuild(buildErrors.BRANCH_NOT_FOUND));
+    .catch(() => { throw rejectBuild(buildErrors.BRANCH_NOT_FOUND); });
 }
 
 const getBuildById = (user, params) => {
@@ -31,7 +31,7 @@ const getBuildById = (user, params) => {
         return model;
       }
 
-      return rejectBuild(buildErrors.BUILD_NOT_FOUND);
+      throw rejectBuild(buildErrors.BUILD_NOT_FOUND);
     });
 };
 
@@ -55,9 +55,7 @@ const getBuildByBranch = (user, params) => {
 
       // The branch we want to create a new build from has been built via federalist before
       if (build) {
-        return Object.assign({}, build.toJSON(), {
-          commitSha: build.commitSha || sha,
-        });
+        return { ...build.toJSON(), commitSha: build.commitSha || sha };
       }
 
       // We don't have a build record, using this branch, go to github and check if the

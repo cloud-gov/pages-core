@@ -50,7 +50,6 @@ const loadSiteUserAccessToken = site => site.getUsers({
     throw new Error('Unable to find valid access token to report build status');
   }));
 
-
 const loadBuildUserAccessToken = build => Build.findByPk(build.id, { include: [Site, User] })
   .then((foundBuild) => {
     const user = foundBuild.User;
@@ -128,6 +127,5 @@ const reportBuildStatus = (build) => {
       logger.error(msg.join('\n'));
     });
 };
-
 
 module.exports = { reportBuildStatus };

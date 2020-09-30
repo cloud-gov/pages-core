@@ -29,12 +29,6 @@ export const SITE = PropTypes.shape({
   users: PropTypes.arrayOf(USER),
 });
 
-export const GITHUB_BRANCHES = PropTypes.shape({
-  error: PropTypes.object,
-  isLoading: PropTypes.bool.isRequired,
-  data: PropTypes.array,
-});
-
 export const BUILD = PropTypes.shape({
   id: PropTypes.number,
   state: PropTypes.string,
