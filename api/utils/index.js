@@ -195,6 +195,16 @@ function omitBy(fn, obj) {
   return pick(pickedKeys, obj);
 }
 
+function objToQueryParams(obj) {
+  const qs = new URLSearchParams();
+  Object
+    .entries(obj)
+    .forEach(([key, value]) => {
+      qs.append(key, value);
+    });
+  return qs;
+}
+
 module.exports = {
   filterEntity,
   firstEntity,
@@ -207,6 +217,7 @@ module.exports = {
   loadDevelopmentManifest,
   loadProductionManifest,
   mapValues,
+  objToQueryParams,
   omitBy,
   omit,
   pick,
