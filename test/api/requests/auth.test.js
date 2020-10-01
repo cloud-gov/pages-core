@@ -60,7 +60,7 @@ describe('Authentication request', () => {
         return request(app)
           .get('/logout')
           .set('Cookie', cookie)
-          .expect('Location', 'http://localhost:4000')
+          .expect('Location', config.app.hostname)
           .expect(302);
       })
         .then(() => {
@@ -77,7 +77,7 @@ describe('Authentication request', () => {
     it('should redirect to the root URL for an unauthenticated user', (done) => {
       request(app)
         .get('/logout')
-        .expect('Location', 'http://localhost:4000')
+        .expect('Location', config.app.hostname)
         .expect(302, done);
     });
   });
