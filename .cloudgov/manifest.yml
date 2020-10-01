@@ -29,7 +29,7 @@ applications:
       APP_HOSTNAME: https://federalistapp((env_postfix)).18f.gov
       CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
-      HOMEPAGE_URL: https://federalist((env_postfix)).18f.gov
+      HOMEPAGE_URL: https://federalist.18f.gov
       LOG_LEVEL: ((log_level))
       NPM_CONFIG_PRODUCTION: true
       NODE_MODULES_CACHE: false
