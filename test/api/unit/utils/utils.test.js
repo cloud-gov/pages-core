@@ -413,4 +413,17 @@ describe('utils', () => {
       });
     });
   });
+
+  describe('.objToQueryParams', () => {
+    it('returns an instance of URLSearchParams with the correct values', () => {
+      const obj = { foo: 'bar', baz: 'foo' };
+
+      const result = utils.objToQueryParams(obj);
+
+      expect(result).to.be.an.instanceOf(URLSearchParams);
+      Object.entries(obj).forEach(([key, value]) => {
+        expect(result.get(key)).to.equal(value);
+      });
+    });
+  });
 });

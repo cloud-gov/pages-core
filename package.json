@@ -6,7 +6,7 @@
   "keywords": [],
   "dependencies": {
     "@octokit/rest": "^18.0.6",
-    "aws-sdk": "^2.758.0",
+    "aws-sdk": "^2.765.0",
     "body-parser": "^1.18.3",
     "cfenv": "^1.2.3",
     "connect-flash": "^0.1.1",
@@ -78,7 +78,8 @@
     "serve-coverage": "serve -l 8080 ./coverage",
     "update-local-config": "node ./scripts/update-local-config.js",
     "create-dev-data": "node ./scripts/create-dev-data.js",
-    "update-proxy-db": "node ./scripts/proxy-edge.js"
+    "update-proxy-db": "node ./scripts/proxy-edge.js",
+    "timeout-builds": "node ./scripts/timeout-builds.js"
   },
   "main": "index.js",
   "repository": {
