@@ -50,6 +50,11 @@ const attributes = DataTypes => ({
     unique: true,
     allowNull: false,
   },
+  isActive: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  }
 });
 
 const options = {

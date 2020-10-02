@@ -3,6 +3,7 @@ const Sequelize = require('sequelize');
 const config = require('../../config');
 const buildSerializer = require('../serializers/build');
 const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
+const FederalistUsersHelper = require('../services/FederalistUsersHelper');
 const { Build, User, Site } = require('../models');
 const { logger } = require('../../winston');
 
@@ -13,7 +14,10 @@ const findUserForWebhookRequest = (request) => {
 
   return User.findOrCreate({
     where: { username: username.toLowerCase() },
-    defaults: { username },
+    defaults: {
+      username,
+      active: false,
+    },
   })
     .then((users) => {
       if (!users.length) {
@@ -122,10 +126,23 @@ module.exports = {
         }
       })
       .catch((err) => {
+        logger.error(err);
         if (err.message) {
           res.badRequest(err);
         } else {
-          logger.error(err);
+          res.badRequest();
+        }
+
+      });
+  },
+  organization(req, res) {
+    signWebhookRequest(req)
+      .then(() => FederalistUsersHelper.organizationAction(req.body))
+      .catch((err) => {
+        logger.error(err);
+        if (err.message) {
+          res.badRequest(err);
+        } else {
           res.badRequest();
         }
       });

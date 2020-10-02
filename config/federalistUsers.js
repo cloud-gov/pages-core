@@ -6,4 +6,5 @@ module.exports = {
     '18f-org', // 3040935
   ],
   admin: (env.FEDERALIST_USERS_ADMIN || process.env.FEDERALIST_USERS_ADMIN),
+  orgName: 'federalist-users',
 };

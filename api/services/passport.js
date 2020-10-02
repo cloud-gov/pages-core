@@ -19,6 +19,7 @@ const githubVerifyCallback = (accessToken, refreshToken, profile, callback) => {
         // eslint-disable-next-line no-underscore-dangle
         email: profile._json.email,
         username: profile.username,
+        isActive: true,
       },
     }))
     .then((models) => {

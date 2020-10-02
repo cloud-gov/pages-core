@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     REMOVED: 'removed',
     UPDATED: 'updated',
     AUTHENTICATION: 'authentication',
+    FEDERALIST_USERS: 'federalist-users',
   };
 
   function isValidType(value) {
