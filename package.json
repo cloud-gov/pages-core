@@ -6,7 +6,7 @@
   "keywords": [],
   "dependencies": {
     "@octokit/rest": "^18.0.6",
-    "aws-sdk": "^2.765.0",
+    "aws-sdk": "^2.767.0",
     "body-parser": "^1.18.3",
     "cfenv": "^1.2.3",
     "connect-flash": "^0.1.1",
