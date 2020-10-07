@@ -180,6 +180,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       validate: isEmptyOrUrl,
     },
+    logsS3Key: {
+      type: DataTypes.STRING,
+    },
   }, {
     tableName: 'build',
     hooks: {

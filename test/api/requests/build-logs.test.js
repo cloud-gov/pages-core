@@ -152,60 +152,6 @@ describe('Build Log API', () => {
       });
     });
 
-    describe('successfully fetching build logs with pagination', () => {
-      const fetchLogData = ({ logLen, page }, status = 200) => {
-        const userPromise = factory.user();
-        const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-        const buildPromise = factory.build({ user: userPromise, site: sitePromise });
-
-        return Promise.props({ user: userPromise, build: buildPromise })
-          .then(({ user, build }) => Promise.props({
-            logs: Promise.all(Array(logLen).fill(0).map(() => factory.buildLog({ build }))),
-            cookie: authenticatedSession(user),
-            page,
-          })).then(({ logs, cookie }) => {
-            const buildId = logs[0].get({ plain: true }).build;
-            return request(app)
-              .get(`/v0/build/${buildId}/log/page/${page}`)
-              .set('Cookie', cookie)
-              .expect(status);
-          });
-      };
-
-      const expectedResponse = (logsOnPage, response, done) => {
-        validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
-        expect(response.body).to.be.an('array');
-        expect(response.body).to.have.length(logsOnPage);
-        done();
-      };
-
-      it('should render builds logs for the given build on page 1', (done) => {
-        fetchLogData({ logLen: 6, page: 1 })
-          .then(response => expectedResponse(5, response, done))
-          .catch(done);
-      });
-
-      it('should render builds logs for the given build on page 2', (done) => {
-        fetchLogData({ logLen: 8, page: 2 })
-          .then(response => expectedResponse(3, response, done))
-          .catch(done);
-      });
-
-      it('should render builds logs for the given build on empty page 3', (done) => {
-        fetchLogData({ logLen: 10, page: 3 })
-          .then(response => expectedResponse(0, response, done))
-          .catch(done);
-      });
-
-      it('should respond with a 404 if page is 0', (done) => {
-        fetchLogData({ logLen: 10, page: 0 }, 404)
-          .then((response) => {
-            validateAgainstJSONSchema('GET', '/build/{build_id}/log', 404, response.body);
-            done();
-          });
-      });
-    });
-
     it("should respond with a 404 if the given build is not associated with one of the user's sites", (done) => {
       let build;
 
@@ -261,22 +207,6 @@ describe('Build Log API', () => {
         const site = await factory.site({ users: [user] });
         cookie = await authenticatedSession(user);
         build = await factory.build({ user, site });
-      });
-
-      it('returns legacy paginated build logs if no logs with source=`ALL` exist', async () => {
-        const numLogs = 6;
-        const limit = 5;
-
-        await Promise.all(Array(numLogs).fill(0).map(() => factory.buildLog({ build, source: 'foobar' })));
-
-        const response = await request(app)
-          .get(`/v0/build/${build.id}/log/page/1`)
-          .set('Cookie', cookie)
-          .expect(200);
-
-        validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
-        expect(response.body).to.be.an('array');
-        expect(response.body).to.have.length(limit);
       });
 
       it('only returns new build logs if source=`ALL` exists', async () => {
