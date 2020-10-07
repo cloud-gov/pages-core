@@ -79,7 +79,8 @@
     "update-local-config": "node ./scripts/update-local-config.js",
     "create-dev-data": "NODE_ENV=development node ./scripts/create-dev-data.js",
     "update-proxy-db": "node ./scripts/proxy-edge.js",
-    "timeout-builds": "node ./scripts/timeout-builds.js"
+    "timeout-builds": "node ./scripts/timeout-builds.js",
+    "archive-build-logs": "node ./scripts/archive-build-logs.js"
   },
   "main": "index.js",
   "repository": {
