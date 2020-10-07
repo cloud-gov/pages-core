@@ -128,6 +128,16 @@ class S3Client {
     return client.putObject(params).promise();
   }
 
+  getObject(key, extras = {}) {
+    const { bucket, client } = this;
+    const params = {
+      Bucket: bucket,
+      Key: key,
+      ...extras,
+    };
+    return client.getObject(params).promise();
+  }
+
   // Private Methods
   listObjectsHelper(currObjects, extraS3Params = {}, opts = {}, callback) {
     const listObjectArgs = { Bucket: this.bucket, ...extraS3Params };

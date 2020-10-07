@@ -26,6 +26,7 @@ const toJSON = (build) => {
   });
   delete object.token;
   delete object.url;
+  delete object.logsS3Key;
   // only return first 80 chars in case it's long
   if (object.error) {
     object.error = object.error.slice(0, 80);

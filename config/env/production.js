@@ -31,6 +31,18 @@ if (s3Creds) {
   throw new Error('No S3 credentials found');
 }
 
+const s3BuildLogsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-s3-build-logs`);
+if (s3BuildLogsCreds) {
+  module.exports.s3BuildLogs = {
+    accessKeyId: s3BuildLogsCreds.access_key_id,
+    secretAccessKey: s3BuildLogsCreds.secret_access_key,
+    region: s3BuildLogsCreds.region,
+    bucket: s3BuildLogsCreds.bucket,
+  };
+} else {
+  throw new Error('No S3 Build Logs credentials found');
+}
+
 // SQS Configs
 const sqsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-sqs-creds`);
 if (sqsCreds) {
