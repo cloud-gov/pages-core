@@ -128,11 +128,19 @@ class S3Client {
     return client.putObject(params).promise();
   }
 
+  getObject(key, extras = {}) {
+    const { bucket, client } = this;
+    const params = {
+      Bucket: bucket,
+      Key: key,
+      ...extras,
+    };
+    return client.getObject(params).promise();
+  }
+
   // Private Methods
   listObjectsHelper(currObjects, extraS3Params = {}, opts = {}, callback) {
-    const listObjectArgs = Object.assign({}, {
-      Bucket: this.bucket,
-    }, extraS3Params);
+    const listObjectArgs = { Bucket: this.bucket, ...extraS3Params };
 
     this.client.listObjectsV2(listObjectArgs, (err, data) => {
       if (err) {
@@ -153,9 +161,10 @@ class S3Client {
       // otherwise continue as normal (ie, not paged)
 
       if (data.IsTruncated) {
-        const newExtraParams = Object.assign({},
-          extraS3Params,
-          { ContinuationToken: data.NextContinuationToken });
+        const newExtraParams = {
+          ...extraS3Params,
+          ContinuationToken: data.NextContinuationToken,
+        };
         // call recursively
         return this.listObjectsHelper(objects, newExtraParams, opts, callback);
       }

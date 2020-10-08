@@ -8,14 +8,14 @@ export const notificationDefaults = {
   autoDismiss: 3, // seconds
 };
 
-
 export const notificationSettings = {
   // Map of action types to notification settings
   [SITE_UPDATED]: {
     type: 'success',
-    params: Object.assign({}, {
+    params: {
       title: 'Success',
       message: 'Site settings have been updated!',
-    }, notificationDefaults),
+      ...notificationDefaults,
+    },
   },
 };

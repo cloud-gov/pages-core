@@ -1,4 +1,3 @@
-
 // We'll have other exported functions here eventually
 // so prefer-default-export is disabled here for now
 // eslint-disable-next-line import/prefer-default-export

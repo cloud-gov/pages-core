@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { ALERT } from '../propTypes';
+import { ALERT, SITE } from '../propTypes';
 import { currentSite } from '../selectors/site';
 import SideNav from './site/SideNav';
 import PagesHeader from './site/PagesHeader';
@@ -119,7 +119,7 @@ SiteContainer.propTypes = {
   ]),
   sites: PropTypes.shape({
     isLoading: PropTypes.bool.isRequired,
-    data: PropTypes.array,
+    data: PropTypes.arrayOf(SITE),
   }),
   alert: ALERT,
 };

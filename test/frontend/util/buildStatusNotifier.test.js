@@ -1,17 +1,16 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
-import proxyquire from 'proxyquire';
-
-const ioMock = sinon.stub();
-
-const BuildStatusNotifier = proxyquire('../../../frontend/util/buildStatusNotifier', {
-  'socket.io-client': ioMock,
-});
+import BuildStatusNotifier from '../../../frontend/util/buildStatusNotifier';
 
 describe('buildStatusNotifier', () => {
-  beforeEach(() => sinon.spy(BuildStatusNotifier, 'notify'));
+  let buildStatusNotifier;
+  let ioMock;
+  beforeEach(() => {
+    buildStatusNotifier = new BuildStatusNotifier();
+    ioMock = sinon.stub(buildStatusNotifier, 'io');
+    sinon.spy(buildStatusNotifier, 'notify');
+  });
   afterEach(() => {
-    ioMock.reset();
     sinon.restore();
   });
 
@@ -28,23 +27,19 @@ describe('buildStatusNotifier', () => {
       ioMock.returns({ on: onMock });
     });
 
-    afterEach(() => {
-      BuildStatusNotifier.listening = undefined;
-    });
-
     context('when notification permissions are granted', () => {
       it('adds a socket io listener that forward to BuildStatusNotifier.notify', (done) => {
-        BuildStatusNotifier.listen().then(() => {
+        buildStatusNotifier.listen().then(() => {
           expect(ioMock.called).to.eq(true);
           expect(socketIOEventSubscriptions['build status']).to.be.a('Function');
-          expect(BuildStatusNotifier.notify.called).to.eq(false);
+          expect(buildStatusNotifier.notify.called).to.eq(false);
 
           // Call the build status event that listen registered
           const build = { asdf: 1234 };
-          socketIOEventSubscriptions['build status'].call(BuildStatusNotifier, build);
+          socketIOEventSubscriptions['build status'].call(buildStatusNotifier, build);
 
-          expect(BuildStatusNotifier.notify.called).to.eq(true);
-          expect(BuildStatusNotifier.notify.firstCall.args[0]).to.eq(build);
+          expect(buildStatusNotifier.notify.called).to.eq(true);
+          expect(buildStatusNotifier.notify.firstCall.args[0]).to.eq(build);
           done();
         }).catch(done);
       });
@@ -60,7 +55,7 @@ describe('buildStatusNotifier', () => {
       });
 
       it('does not add a socket io listener', (done) => {
-        BuildStatusNotifier.listen().then(() => {
+        buildStatusNotifier.listen().then(() => {
           expect(ioMock.called).to.eq(false);
           expect(socketIOEventSubscriptions).to.deep.equal({});
           done();
@@ -69,16 +64,12 @@ describe('buildStatusNotifier', () => {
     });
 
     context('when the build status has been set', () => {
-      before(() => {
-        BuildStatusNotifier.listening = true;
-      });
-
-      after(() => {
-        BuildStatusNotifier.listening = undefined;
+      beforeEach(() => {
+        buildStatusNotifier.listening = true;
       });
 
       it('does not add a socket io listener', (done) => {
-        BuildStatusNotifier.listen().then(() => {
+        buildStatusNotifier.listen().then(() => {
           expect(ioMock.called).to.eq(false);
           expect(socketIOEventSubscriptions).to.deep.equal({});
           done();
@@ -101,18 +92,18 @@ describe('buildStatusNotifier', () => {
 
     it('build state is neither queued, success nor error', (done) => {
       msg.state = 'other';
-      expect(BuildStatusNotifier.notify.called).to.be.false;
-      pushNote = BuildStatusNotifier.notify(msg);
-      expect(BuildStatusNotifier.notify.calledOnce).to.be.true;
+      expect(buildStatusNotifier.notify.called).to.be.false;
+      pushNote = buildStatusNotifier.notify(msg);
+      expect(buildStatusNotifier.notify.calledOnce).to.be.true;
       expect(pushNote).to.be.null;
       done();
     });
 
     it('build is queued', (done) => {
       msg.state = 'queued';
-      expect(BuildStatusNotifier.notify.called).to.be.false;
-      pushNote = BuildStatusNotifier.notify(msg);
-      expect(BuildStatusNotifier.notify.calledOnce).to.be.true;
+      expect(buildStatusNotifier.notify.called).to.be.false;
+      pushNote = buildStatusNotifier.notify(msg);
+      expect(buildStatusNotifier.notify.calledOnce).to.be.true;
       expect(pushNote.title).to.eql('Build Queued');
       expect(pushNote.options).to.deep.eql(options);
       done();
@@ -120,9 +111,9 @@ describe('buildStatusNotifier', () => {
 
     it('build is successful', (done) => {
       msg.state = 'success';
-      expect(BuildStatusNotifier.notify.called).to.be.false;
-      pushNote = BuildStatusNotifier.notify(msg);
-      expect(BuildStatusNotifier.notify.calledOnce).to.be.true;
+      expect(buildStatusNotifier.notify.called).to.be.false;
+      pushNote = buildStatusNotifier.notify(msg);
+      expect(buildStatusNotifier.notify.calledOnce).to.be.true;
       expect(pushNote.title).to.eql('Successful Build');
       expect(pushNote.options).to.deep.eql(options);
       done();
@@ -130,18 +121,18 @@ describe('buildStatusNotifier', () => {
 
     it('build is errored', (done) => {
       msg.state = 'error';
-      expect(BuildStatusNotifier.notify.called).to.be.false;
-      pushNote = BuildStatusNotifier.notify(msg);
-      expect(BuildStatusNotifier.notify.calledOnce).to.be.true;
+      expect(buildStatusNotifier.notify.called).to.be.false;
+      pushNote = buildStatusNotifier.notify(msg);
+      expect(buildStatusNotifier.notify.calledOnce).to.be.true;
       expect(pushNote.title).to.eql('Failed Build: Please review logs.');
       done();
     });
 
     it('build is processing', (done) => {
       msg.state = 'processing';
-      expect(BuildStatusNotifier.notify.called).to.be.false;
-      pushNote = BuildStatusNotifier.notify(msg);
-      expect(BuildStatusNotifier.notify.calledOnce).to.be.true;
+      expect(buildStatusNotifier.notify.called).to.be.false;
+      pushNote = buildStatusNotifier.notify(msg);
+      expect(buildStatusNotifier.notify.calledOnce).to.be.true;
       expect(pushNote.title).to.eql('Build In-Progress');
       done();
     });

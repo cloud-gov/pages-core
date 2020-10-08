@@ -1,6 +1,13 @@
 const config = require('../../config');
 const Features = require('../features');
 
+function siteViewDomain(site) {
+  if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_LINKS)) {
+    return config.app.proxyPreviewHost.replace('*', site.subdomain);
+  }
+  return `https://${site.awsBucketName}.app.cloud.gov`;
+}
+
 function siteViewLink(site, deployment = 'site') {
   let link;
   if (deployment === 'site' && site.domain) {
@@ -12,13 +19,6 @@ function siteViewLink(site, deployment = 'site') {
     link = `${siteViewDomain(site)}${path}`;
   }
   return `${link.replace(/\/+$/, '')}/`;
-}
-
-function siteViewDomain(site) {
-  if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_LINKS)) {
-    return config.app.proxyPreviewHost.replace('*', site.subdomain);
-  }
-  return `https://${site.awsBucketName}.app.cloud.gov`;
 }
 
 const hideBasicAuthPassword = ({ username, password }) => {

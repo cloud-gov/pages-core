@@ -1,7 +1,7 @@
-const Seq = require('sequelize');
 const { wrapHandlers } = require('../utils');
 const buildLogSerializer = require('../serializers/build-log');
 const { Build, BuildLog, sequelize } = require('../models');
+const BuildLogs = require('../services/build-logs');
 
 function decodeb64(str) {
   if (str) {
@@ -34,17 +34,29 @@ module.exports = wrapHandlers({
   },
 
   find: async (req, res) => {
-    const limit = 5;
-    // 1,000 lines/records
     const lineLimit = 1000;
+    const byteLimit = lineLimit * 100;
 
     const { params, user } = req;
-    const { build_id: buildId, page = 1 } = params;
+    const { build_id: buildId, page: pageStr = '1' } = params;
+    const page = parseInt(pageStr, 10);
+
+    const lineOffset = lineLimit * (page - 1);
+    const byteOffset = byteLimit * (page - 1);
 
     const build = await Build.forSiteUser(user).findByPk(buildId);
 
     if (!build) {
       return res.notFound();
+    }
+
+    if (build.logsS3Key) {
+      const buildLogs = [];
+      const output = await BuildLogs.getBuildLogs(build, byteOffset, byteOffset + byteLimit - 1);
+      if (output) {
+        buildLogs.push({ source: 'ALL', output });
+      }
+      return res.ok(buildLogs);
     }
 
     const query = `
@@ -61,27 +73,14 @@ module.exports = wrapHandlers({
       GROUP BY bl.build, bl.source
     `;
 
-    let buildLogs = await sequelize.query(query, {
+    const buildLogs = await sequelize.query(query, {
       model: BuildLog,
       replacements: {
         buildid: build.id,
         limit: lineLimit,
-        offset: (lineLimit * (page - 1)),
+        offset: lineOffset,
       },
     });
-
-    // Support legacy build logs
-    if (buildLogs.length === 0) {
-      buildLogs = await BuildLog.findAll({
-        where: {
-          build: build.id,
-          source: { [Seq.Op.ne]: 'ALL' },
-        },
-        order: [['id', 'ASC']],
-        offset: (limit * (page - 1)),
-        limit,
-      });
-    }
 
     const serializedBuildLogs = buildLogSerializer.serializeMany(buildLogs);
 

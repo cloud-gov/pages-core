@@ -55,7 +55,7 @@ function login(user) {
 function logout() {
   localStorage.removeItem('user');
   session.logout();
-  page('/');
+  page('/login');
 }
 
 export {

@@ -14,19 +14,19 @@ const initialState = {
 export default function alert(state = initialState, action) {
   switch (action.type) {
     case HTTP_ERROR:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         message: action.message,
         status: action.status,
-      });
+      };
     case HTTP_SUCCESS:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         message: action.message,
         status: action.status,
-      });
+      };
     case SET_STALE:
-      return Object.assign({}, state, {
-        stale: true,
-      });
+      return { ...state, stale: true };
     case CLEAR:
       return initialState;
     default:

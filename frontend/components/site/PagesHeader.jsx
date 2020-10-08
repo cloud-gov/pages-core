@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from '@reach/router';
 
 import { IconView } from '../icons';
 import GitHubLink from '../GitHubLink';

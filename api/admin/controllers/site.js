@@ -1,17 +1,10 @@
 const { Op } = require('sequelize');
 const { Site } = require('../../models');
-const { pick, wrapHandlers } = require('../../utils');
+const SiteDestroyer = require('../../services/SiteDestroyer');
+const { fetchModelById } = require('../../utils/queryDatabase');
+const { pick, toInt, wrapHandlers } = require('../../utils');
 const { serializeNew, serializeMany } = require('../../serializers/site');
-
-function toInt(val) {
-  const result = /^\d+$/.exec(val);
-  return result ? parseInt(result[0], 10) : null;
-}
-
-async function fetchSiteById(id) {
-  const numId = toInt(id);
-  return numId ? Site.findByPk(numId) : null;
-}
+const { logger } = require('../../../winston');
 
 const updateableAttrs = [
   'containerConfig',
@@ -50,7 +43,7 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const site = await fetchSiteById(id);
+    const site = await fetchModelById(id, Site);
     if (!site) return res.notFound();
 
     return res.json(serializeNew(site, true));
@@ -62,11 +55,26 @@ module.exports = wrapHandlers({
       body,
     } = req;
 
-    const site = await fetchSiteById(id);
+    const site = await fetchModelById(id, Site);
     if (!site) return res.notFound();
 
     await site.update(pick(updateableAttrs, body));
 
     return res.json(serializeNew(site, true));
+  },
+
+  destroy: async (req, res) => {
+    let site;
+    const { id } = req.params;
+
+    try {
+      site = await fetchModelById(id, Site);
+      await SiteDestroyer.destroySite(site);
+      return res.json(serializeNew(site, true));
+    } catch (error) {
+      // Todo - make use of the future audit event
+      logger.error([`site@id=${site.id}`, error.message, error.stack].join('\n\n'));
+      return res.error(error);
+    }
   },
 });

@@ -1,63 +1,88 @@
 version: 2.1
 
 ##################################
-##            Anchors           ##
+##            Commands          ##
 ##################################
-default-docker-node: &default-docker-node
-  image: circleci/node:12
-  environment:
-    YARN_VERSION: 0.24.6-1
-    CC_TEST_REPORTER_ID: 101a439651b6abd27e5440028a53b5b8f08fe0889f3948d5f58f6cf9f7c786a0
-
-default-docker-postgres: &default-docker-postgres
-  image: circleci/postgres:9.6
-  environment:
-    POSTGRES_USER: ci-test-user
-    POSTGRES_DB: federalist-ci-test
-    POSTGRES_HOST_AUTH_METHOD: trust
-
-maybe-configure-staging: &maybe-configure-staging
-  when:
-    condition:
-      equal: [ staging, << pipeline.git.branch >> ]
+commands:
+  deploy-to-cg:
+    description: Deploy a cloud foundry app to cloud.gov
+    parameters:
+      manifest:
+        type: string
+        default: ./.cloudgov/manifest.yml
+      action:
+        type: enum
+        enum: ["deploy", "task"]
+        default: "deploy"
+      app:
+        type: string
+      task-name:
+        type: string
+        default: ""
+      task-command:
+        type: string
+        default: ""
     steps:
-      run:
-        name: Setup Staging Environment
-        command: |
-          echo "export CF_USERNAME=$CF_USERNAME_STAGING" >> $BASH_ENV
-          echo "export CF_PASSWORD=$CF_PASSWORD_STAGING" >> $BASH_ENV
-          echo "export CF_SPACE=staging" >> $BASH_ENV
-          echo "export CF_APP=federalistapp-staging" >> $BASH_ENV
-          echo "export CF_VARS_FILE=./.cloudgov/vars/staging.yml" >> $BASH_ENV
+      - run:
+          name: Setup environment
+          command: |
+            if [ "$CIRCLE_BRANCH" = "main" ]; then
+              echo "export CF_SPACE=production" >> $BASH_ENV
+              echo "export CF_USERNAME=$CF_USERNAME_PRODUCTION" >> $BASH_ENV
+              echo "export CF_PASSWORD=$CF_PASSWORD_PRODUCTION" >> $BASH_ENV
+            else
+              echo "export CF_SPACE=staging" >> $BASH_ENV
+              echo "export CF_USERNAME=$CF_USERNAME_STAGING" >> $BASH_ENV
+              echo "export CF_PASSWORD=$CF_PASSWORD_STAGING" >> $BASH_ENV  
+            fi
 
-maybe-configure-production: &maybe-configure-production
-  when:
-    condition:
-      equal: [ main, << pipeline.git.branch >> ]
-    steps:
-      run:
-        name: Setup Production Environment
-        command: |
-          echo "export CF_USERNAME=$CF_USERNAME_PRODUCTION" >> $BASH_ENV
-          echo "export CF_PASSWORD=$CF_PASSWORD_PRODUCTION" >> $BASH_ENV
-          echo "export CF_SPACE=production" >> $BASH_ENV
-          echo "export CF_APP=federalistapp" >> $BASH_ENV
-          echo "export CF_VARS_FILE=./.cloudgov/vars/production.yml" >> $BASH_ENV
+      - run:
+          name: Install cloud foundry cli
+          command: |
+            curl -L -o cf.deb 'https://packages.cloudfoundry.org/stable?release=debian64&version=v7&source=github'
+            sudo dpkg -i cf.deb
+            rm cf.deb
 
-install-and-log-into-cloudgov: &install-and-log-into-cloudgov
-  run:
-    name: Install and log into CF7
-    command: |
-      curl -L -o cf7.deb 'https://packages.cloudfoundry.org/stable?release=debian64&version=v7&source=github'
-      sudo dpkg -i cf7.deb
-      rm cf7.deb
-      cf7 api https://api.fr.cloud.gov
-      cf7 login -u $CF_USERNAME -p $CF_PASSWORD -o gsa-18f-federalist -s $CF_SPACE
+      - run:
+          name: Log into cloud.gov
+          command: |
+            cf api https://api.fr.cloud.gov
+            cf login -u $CF_USERNAME -p $CF_PASSWORD -o gsa-18f-federalist -s $CF_SPACE
 
-log-out-of-cloudgov: &log-out-of-cloudgov
-  run:
-    name: Log out from Cloud.gov
-    command: cf7 logout
+      - when:
+          condition:
+            equal: ["deploy", << parameters.action >> ]
+          steps:
+            - run:
+                name: Deploy app '<< parameters.app >>'
+                command: |
+                  set +e
+
+                  onerr() {
+                    echo "Deployment failed, cancelling."
+                    cf7 cancel-deployment << parameters.app >>
+                    cf7 logout
+                    exit 1
+                  }
+                  trap 'onerr' ERR
+
+                  cf push << parameters.app >> \
+                    --strategy rolling \
+                    --vars-file "./.cloudgov/vars/${CF_SPACE}.yml" \
+                    -f << parameters.manifest >>
+
+      - when:
+          condition:
+            equal: ["task", << parameters.action >> ]
+          steps:
+            - run:
+                name: Run task '<< parameters.task-name >>' from app '<< parameters.app >>'
+                command: |
+                  cf run-task << parameters.app >> --name << parameters.task-name >> --command "<< parameters.task-command >>"
+
+      - run:
+          name: Log out from cloud.gov
+          command: cf logout
 
 
 ##################################
@@ -65,13 +90,21 @@ log-out-of-cloudgov: &log-out-of-cloudgov
 ##################################
 jobs:
   build:
-     docker:
-       - *default-docker-node
-       - *default-docker-postgres
-     environment:
-       FEATURE_ADMIN_AUTH: 'true'
-     steps:
+    docker:
+      - image: circleci/node:12
+        environment:
+          YARN_VERSION: 0.24.6-1
+          CC_TEST_REPORTER_ID: 101a439651b6abd27e5440028a53b5b8f08fe0889f3948d5f58f6cf9f7c786a0
+      - image: circleci/postgres:9.6
+        environment:
+          POSTGRES_USER: ci-test-user
+          POSTGRES_DB: federalist-ci-test
+          POSTGRES_HOST_AUTH_METHOD: trust
+    environment:
+      FEATURE_ADMIN_AUTH: 'true'
+    steps:
       - checkout
+
       - run:
           name: Display versions
           command: |
@@ -81,9 +114,11 @@ jobs:
 
       - restore_cache:
           key: dependency-cache-{{ checksum "yarn.lock" }}
+
       - run:
           name: Install dependencies
           command: yarn --pure-lockfile
+
       - save_cache:
           key: dependency-cache-{{ checksum "yarn.lock" }}
           paths:
@@ -91,8 +126,8 @@ jobs:
             - ~/.cache/yarn
 
       - run:
-          name: Lint changed files
-          command: scripts/lint-ci-pr.sh
+          name: Lint api and user client
+          command: yarn lint
 
       - run:
           name: CodeClimate before-build
@@ -100,9 +135,11 @@ jobs:
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
             ./cc-test-reporter before-build
+
       - run:
           name: Run tests
           command: yarn test:cover
+
       - run:
           name: CodeClimate combine and upload coverage
           command: |
@@ -116,68 +153,95 @@ jobs:
   deploy:
     docker:
       - image: circleci/node:12
-    environment:
-      CF_MANIFEST: ./.cloudgov/manifest.yml
-      FEATURE_PROXY_EDGE_LINKS: 'true'
+    parameters:
+      app:
+        type: string
+      feature_proxy_edge_links:
+        type: string
+        default: "false"
     steps:
       - checkout
+
       - restore_cache:
           key: dependency-cache-{{ checksum "yarn.lock" }}
+
       - run:
           name: Build app
+          environment:
+            FEATURE_PROXY_EDGE_LINKS: << parameters.feature_proxy_edge_links >>
           command: yarn build
-      - *maybe-configure-staging
-      - *maybe-configure-production
-      - *install-and-log-into-cloudgov
-      - deploy:
-          command: ./.cloudgov/deploy.sh
-      - *log-out-of-cloudgov
 
-  deploy-admin:
+      - deploy-to-cg:
+          app: << parameters.app >>
+
+
+  deploy-admin-client:
     docker:
       - image: circleci/node:12
+    parameters:
+      app:
+        type: string
+      api-url:
+        type: string
     steps:
       - checkout
+
       - restore_cache:
           key: dependency-cache-admin-{{ checksum "admin-client/yarn.lock" }}
+
       - run:
           name: Install dependencies
           command: yarn --frozen-lockfile --cache-folder ./.cache
           working_directory: ./admin-client
+
       - save_cache:
           key: dependency-cache-admin-{{ checksum "admin-client/yarn.lock" }}
           paths:
             - ./admin-client/node_modules
             - ./admin-client/.cache/yarn
+
       - run:
           name: Build app
           command: yarn build
           working_directory: ./admin-client
           environment:
             NODE_ENV: production
-            API_URL: https://federalistapp-staging.18f.gov
-      - *maybe-configure-staging
-      - *install-and-log-into-cloudgov
-      - run:
-          name: Deploy admin
-          command: cf7 push federalist-admin-staging --vars-file $CF_VARS_FILE -f $CF_MANIFEST
-          environment:
-            CF_MANIFEST: ./.cloudgov/manifest.yml
-      - *log-out-of-cloudgov
+            API_URL: << parameters.api-url >>
+
+      - deploy-to-cg:
+          app: << parameters.app >>
+
 
   nightly-builds:
     docker:
       - image: cimg/base:2020.01
+    parameters:
+      app:
+        type: string
     steps:
       - checkout
-      - *maybe-configure-staging
-      - *maybe-configure-production
-      - *install-and-log-into-cloudgov
-      - run:
-          name: Run nightly builds
-          command: cf7 run-task $CF_APP --name nightly-builds --command "yarn nightly-builds"
-      - *log-out-of-cloudgov
 
+      - deploy-to-cg:
+          app: << parameters.app >>
+          action: task
+          task-name: nightly-builds
+          task-command: yarn nightly-builds
+
+
+  timeout-builds:
+    docker:
+      - image: circleci/node:12
+    parameters:
+      app:
+        type: string
+    steps:
+      - checkout
+
+      - deploy-to-cg:
+          app: << parameters.app >>
+          action: task
+          task-name: timeout-builds
+          task-command: yarn timeout-builds
 
 ##################################
 ##          Workflows           ##
@@ -187,20 +251,47 @@ workflows:
   build-test-deploy:
     jobs:
       - build
+
       - deploy:
+          name: deploy-staging
+          app: federalistapp-staging
+          feature_proxy_edge_links: "true"
           requires:
             - build
           filters:
             branches:
-              only:
-                - staging
-                - main
-      - deploy-admin:
+              only: staging
+
+      - deploy:
+          name: deploy-production
+          app: federalistapp
           requires:
-            - build        
+            - build
+          filters:
+            branches:
+              only: main
+
+      - deploy-admin-client:
+          name: deploy-admin-staging
+          app: federalist-admin-staging
+          api-url: https://federalistapp-staging.18f.gov
+          requires:
+            - build  
           filters:
             branches:
               only: staging
+
+      - deploy-admin-client:
+          name: deploy-admin-production
+          app: federalist-admin
+          api-url: https://federalistapp.18f.gov
+          requires:
+            - build  
+          filters:
+            branches:
+              only: main
+
+
   nightly:
     triggers:
       - schedule:
@@ -211,4 +302,41 @@ workflows:
                 - staging
                 - main
     jobs:
-      - nightly-builds
+      - nightly-builds:
+          name: nightly-builds-staging
+          app: federalistapp-staging
+          filters:
+            branches:
+              only: staging
+
+      - nightly-builds:
+          name: nightly-builds-production
+          app: federalistapp
+          filters:
+            branches:
+              only: main
+
+
+  every-ten-minutes:
+    triggers:
+      - schedule:
+          cron: "0,10,20,30,40,50 * * * *"
+          filters:
+            branches:
+              only:
+                - staging
+                - main
+    jobs:
+      - timeout-builds:
+          name: timeout-builds-staging
+          app: federalistapp-staging
+          filters:
+            branches:
+              only: staging
+
+      - timeout-builds:
+          name: timeout-builds-production
+          app: federalistapp
+          filters:
+            branches:
+              only: main

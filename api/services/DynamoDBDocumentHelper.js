@@ -41,7 +41,6 @@ class DynamoDBDocumentHelper {
     return Promise.all(allRequests);
   }
 
-
   delete(TableName, Key) {
     const { docClient } = this;
 

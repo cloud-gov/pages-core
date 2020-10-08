@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { stub } = require('sinon');
+const sinon = require('sinon');
 const factory = require('../../support/factory');
 const BuildResolver = require('../../../../api/services/BuildResolver');
 const GitHub = require('../../../../api/services/GitHub');
@@ -8,11 +8,11 @@ const buildErrors = require('../../../../api/responses/buildErrors');
 describe('BuildResolver', () => {
   let ghStub;
   beforeEach(() => {
-    ghStub = stub(GitHub, 'getBranch');
+    ghStub = sinon.stub(GitHub, 'getBranch');
   });
 
   afterEach(() => {
-    ghStub.restore();
+    sinon.restore();
   });
 
   it('returns a 404 when a build cannot be found by build id', (done) => {
@@ -96,18 +96,11 @@ describe('BuildResolver', () => {
   describe('checking for branch on github', () => {
     const branch = 'staging';
     const sha = '123abc';
-    const user = factory.user();
-    const site = factory.site({ users: Promise.all([user]) });
-    let pValues;
 
-    beforeEach(() => {
-      pValues = Promise.props({
-        user,
-        site,
-      });
-    });
+    it('calls out to github if the branch cannot be found locally', async () => {
+      const user = await factory.user();
+      const site = await factory.site({ users: Promise.resolve([user]) });
 
-    it('calls out to github if the branch cannot be found locally', () => {
       ghStub.resolves({
         name: branch,
         commit: {
@@ -115,32 +108,31 @@ describe('BuildResolver', () => {
         },
       });
 
-      return pValues
-        .then(values => BuildResolver.getBuild(values.user, {
-          branch,
-          siteId: values.site.id,
-          sha,
-        }))
-        .then((build) => {
-          expect(build.branch).to.equal(branch);
-          expect(build.commitSha).to.equal(sha);
-        });
+      const build = await BuildResolver.getBuild(user, {
+        branch,
+        siteId: site.id,
+        sha,
+      });
+
+      expect(build.branch).to.equal(branch);
+      expect(build.commitSha).to.equal(sha);
     });
 
-    it('returns a 404 when a build cannot be started because branch does not exist', (done) => {
+    it('returns a 404 when a build cannot be started because branch does not exist', async () => {
+      const user = await factory.user();
+      const site = await factory.site({ users: Promise.resolve([user]) });
+
       ghStub.rejects();
 
-      pValues
-        .then(values => BuildResolver.getBuild(values.user, {
-          branch,
-          siteId: values.site.id,
-          sha,
-        }))
-        .catch((err) => {
-          expect(err.status).to.equal(404);
-          expect(err.message).to.equal(buildErrors.BRANCH_NOT_FOUND);
-          done();
-        });
+      const err = await BuildResolver.getBuild(user, {
+        branch,
+        siteId: site.id,
+        sha,
+      })
+        .catch(e => e);
+
+      expect(err.status).to.equal(404);
+      expect(err.message).to.equal(buildErrors.BRANCH_NOT_FOUND);
     });
   });
 });

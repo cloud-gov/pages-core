@@ -98,7 +98,14 @@ class SitePublishedBranchesTable extends React.Component {
 SitePublishedBranchesTable.propTypes = {
   publishedBranches: PropTypes.shape({
     isLoading: PropTypes.bool.isRequired,
-    data: PropTypes.array,
+    data: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string,
+        site: PropTypes.shape({
+          id: PropTypes.number,
+        }),
+      })
+    ),
   }),
   site: SITE,
 };

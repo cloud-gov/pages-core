@@ -1,3 +1,6 @@
+const { logger } = require('../../winston');
+
+const { fetchModelById } = require('../utils/queryDatabase');
 const buildSerializer = require('../serializers/build');
 const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
 const siteAuthorizer = require('../authorizers/site');
@@ -5,7 +8,6 @@ const BuildResolver = require('../services/BuildResolver');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const { Build, Site } = require('../models');
 const socketIO = require('../socketIO');
-const { logger } = require('../../winston');
 
 const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
 
@@ -31,11 +33,7 @@ module.exports = {
   find: (req, res) => {
     let site;
 
-    Promise.resolve(Number(req.params.site_id))
-      .then((id) => {
-        if (isNaN(id)) { throw 404; }
-        return Site.findByPk(id);
-      })
+    fetchModelById(req.params.site_id, Site)
       .then((model) => {
         if (!model) { throw 404; }
         site = model;
@@ -68,31 +66,30 @@ module.exports = {
   create: (req, res) => {
     siteAuthorizer.createBuild(req.user, { id: req.body.siteId })
       .then(() => BuildResolver.getBuild(req.user, req.body))
-      .then(build => Build.findOne({
-          where: {
-            site: build.site,
-            branch: build.branch,
-            state: ['created', 'queued'],
-          },
-        })
-        .then(queuedBuild => {
+      .then(b => Build.findOne({
+        where: {
+          site: b.site,
+          branch: b.branch,
+          state: ['created', 'queued'],
+        },
+      })
+        .then((queuedBuild) => {
           if (!queuedBuild) {
             return Build.create({
-              branch: build.branch,
-              site: build.site,
+              branch: b.branch,
+              site: b.site,
               user: req.user.id,
-              commitSha: build.commitSha,
+              commitSha: b.commitSha,
             })
-            .then(build => build.enqueue())
-            .then(build => GithubBuildStatusReporter
-              .reportBuildStatus(build)
-              .then(() => build))
-            .then(build => buildSerializer.serialize(build))
-            .then(buildJSON => res.json(buildJSON));
+              .then(build => build.enqueue())
+              .then(build => GithubBuildStatusReporter
+                .reportBuildStatus(build)
+                .then(() => build))
+              .then(build => buildSerializer.serialize(build))
+              .then(buildJSON => res.json(buildJSON));
           }
-          res.ok({});
-        })
-      )
+          return res.ok({});
+        }))
       .catch(res.error);
   },
 
@@ -123,12 +120,7 @@ module.exports = {
         buildStatus = _buildStatus;
         return Promise.resolve(Number(req.params.id));
       })
-      .then((id) => {
-        if (isNaN(id)) {
-          throw 404;
-        }
-        return Build.findByPk(id);
-      })
+      .then(id => fetchModelById(id, Build))
       .then((build) => {
         if (!build) {
           throw 404;

@@ -1,7 +1,7 @@
 const _ = require('underscore');
 const authorizer = require('../authorizers/site');
-const S3SiteRemover = require('../services/S3SiteRemover');
 const SiteCreator = require('../services/SiteCreator');
+const SiteDestroyer = require('../services/SiteDestroyer');
 const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const UserActionCreator = require('../services/UserActionCreator');
 const siteSerializer = require('../serializers/site');
@@ -16,6 +16,7 @@ const {
 } = require('../utils/validators');
 const { wrapHandler } = require('../utils');
 const Features = require('../features');
+const { fetchModelById } = require('../utils/queryDatabase');
 
 const sendJSON = (site, res) => siteSerializer
   .serialize(site)
@@ -64,45 +65,20 @@ module.exports = {
       });
   },
 
-  destroy: (req, res) => {
-    let site;
-    let siteJSON;
+  destroy: async (req, res) => {
+    const { id } = req.params;
 
-    Promise.resolve(Number(req.params.id))
-      .then((id) => {
-        if (_.isNaN(id)) {
-          throw 404;
-        }
-        return Site.findByPk(id);
-      })
-      .then((model) => {
-        if (model) {
-          site = model;
-        } else {
-          throw 404;
-        }
-        return siteSerializer.serialize(site);
-      })
-      .then((json) => {
-        siteJSON = json;
-        return authorizer.destroy(req.user, site);
-      })
-      .then(() => S3SiteRemover.removeSite(site))
-      .then(() => S3SiteRemover.removeInfrastructure(site))
-      .then(() => {
-        if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-          ProxyDataSync.removeSite(site)
-            .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
-        }
-      })
-      .then(() => site.destroy())
-      .then(() => {
-        res.json(siteJSON);
-      })
-      .catch((err) => {
-        logger.error([err.message, err.stack].join('\n\n'));
-        res.error(err);
-      });
+    try {
+      const site = await fetchModelById(id, Site);
+      const siteJSON = await siteSerializer.serialize(site);
+      await authorizer.destroy(req.user, site);
+      await SiteDestroyer.destroySite(site);
+      return res.json(siteJSON);
+    } catch (error) {
+      // ToDo - move to the future audit events
+      logger.error([error.message, error.stack].join('\n\n'));
+      return res.error(error);
+    }
   },
 
   addUser: (req, res) => {
@@ -179,6 +155,8 @@ module.exports = {
           return ProxyDataSync.saveSite(site)
             .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
         }
+
+        return null;
       })
       .then(() => siteSerializer.serialize(site))
       .then((siteJSON) => {

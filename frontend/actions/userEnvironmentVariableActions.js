@@ -8,7 +8,6 @@ import {
   userEnvironmentVariableDeleted,
 } from './actionCreators/userEnvironmentVariableActions';
 
-
 export function fetchUserEnvironmentVariables(siteId) {
   return (dispatch) => {
     dispatch(userEnvironmentVariablesFetchStarted(siteId));

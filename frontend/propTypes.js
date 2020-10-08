@@ -29,12 +29,6 @@ export const SITE = PropTypes.shape({
   users: PropTypes.arrayOf(USER),
 });
 
-export const GITHUB_BRANCHES = PropTypes.shape({
-  error: PropTypes.object,
-  isLoading: PropTypes.bool.isRequired,
-  data: PropTypes.array,
-});
-
 export const BUILD = PropTypes.shape({
   id: PropTypes.number,
   state: PropTypes.string,
@@ -51,7 +45,6 @@ export const BUILD = PropTypes.shape({
 export const BUILD_LOG = PropTypes.shape({
   source: PropTypes.string.isRequired,
   output: PropTypes.string.isRequired,
-  createdAt: PropTypes.string.isRequired,
 });
 
 export const USER_ACTION = PropTypes.shape({

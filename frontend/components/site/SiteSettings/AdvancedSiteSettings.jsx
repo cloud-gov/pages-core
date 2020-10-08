@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import AdvancedSiteSettingsForm from './AdvancedSiteSettingsForm';
 import DeleteSiteForm from './DeleteSiteForm';
 
-
 export const AdvancedSiteSettings = ({
   siteId,
   initialValues,

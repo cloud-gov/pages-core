@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 const inquirer = require('inquirer');
 Promise.props = require('promise-props');
-
+const BuildLogs = require('../api/services/build-logs');
 const cleanDatabase = require('../api/utils/cleanDatabase');
 const {
   ActionType,
@@ -116,6 +116,16 @@ async function createData({ githubUsername }) {
       token: 'fake-token',
     }),
     Build.create({
+      branch: nodeSite.defaultBranch,
+      completedAt: new Date(),
+      source: 'fake-build',
+      state: 'error',
+      site: nodeSite.id,
+      user: user1.id,
+      token: 'fake-token',
+      error: 'The build timed out',
+    }),
+    Build.create({
       branch: 'dc/fixes',
       source: 'fake-build',
       site: nodeSite.id,
@@ -190,6 +200,13 @@ async function createData({ githubUsername }) {
     actionId: removeAction.id,
     siteId: site1.id,
   });
+
+  console.log('Uploading logs to S3');
+  try {
+    await BuildLogs.archiveBuildLogs(nodeSite, nodeSiteBuilds[0]);
+  } catch (error) {
+    console.error('Failed to upload logs to S3, probably because the credentials are not configured locally. This can be ignored.');
+  }
 }
 
 const confirm = {

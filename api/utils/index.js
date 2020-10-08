@@ -158,6 +158,11 @@ function omit(keys, obj) {
   return pick(pickedKeys, obj);
 }
 
+function toInt(val) {
+  const result = /^\d+$/.exec(val);
+  return result ? parseInt(result[0], 10) : null;
+}
+
 function wait(time = 500) {
   // eslint-disable-next-line scanjs-rules/call_setTimeout
   return new Promise((r => setTimeout(r, time)));
@@ -190,6 +195,16 @@ function omitBy(fn, obj) {
   return pick(pickedKeys, obj);
 }
 
+function objToQueryParams(obj) {
+  const qs = new URLSearchParams();
+  Object
+    .entries(obj)
+    .forEach(([key, value]) => {
+      qs.append(key, value);
+    });
+  return qs;
+}
+
 module.exports = {
   filterEntity,
   firstEntity,
@@ -202,11 +217,13 @@ module.exports = {
   loadDevelopmentManifest,
   loadProductionManifest,
   mapValues,
+  objToQueryParams,
   omitBy,
   omit,
   pick,
   retry,
   shouldIncludeTracking,
+  toInt,
   wait,
   wrapHandler,
   wrapHandlers,

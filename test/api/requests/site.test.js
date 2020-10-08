@@ -20,33 +20,27 @@ const S3SiteRemover = require('../../../api/services/S3SiteRemover');
 const siteErrors = require('../../../api/responses/siteErrors');
 const ProxyDataSync = require('../../../api/services/ProxyDataSync');
 const SQS = require('../../../api/services/SQS');
+const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 let removeSiteStub;
 let saveSiteStub;
 const defaultProxyEgeLinks = process.env.FEATURE_PROXY_EDGE_LINKS;
 
-beforeEach(() => {
-  removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').rejects();
-  saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
-  process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true'
-});
-
-afterEach(() => {
-  sinon.restore();
-});
-
-after(() => {
-  process.env.FEATURE_PROXY_EDGE_DYNAMO = defaultProxyEgeLinks;
-});
-
 describe('Site API', () => {
   beforeEach(() => {
+    process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
+    removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').resolves();
+    saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
     sinon.stub(SQS, 'sendBuildMessage').resolves();
   });
 
   afterEach(() => {
     sinon.restore();
+  });
+
+  after(() => {
+    process.env.FEATURE_PROXY_EDGE_DYNAMO = defaultProxyEgeLinks;
   });
 
   const siteResponseExpectations = (response, site) => {
@@ -1316,6 +1310,78 @@ describe('Site API', () => {
         })
         .catch(done);
     });
+
+    it('should not allow a user to delete a site associated with their account if not admin', (done) => {
+      let site;
+
+      factory.site()
+        .then(s => Site.findByPk(s.id, { include: [User] }))
+        .then((model) => {
+          site = model;
+          nock.cleanAll();
+          githubAPINocks.repo({
+            owner: site.owner,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: false, push: true },
+            }],
+          });
+          sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins').resolves(['org-admin']);
+          return authenticatedSession(site.Users[0]);
+        })
+        .then(cookie => request(app)
+          .delete(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('DELETE', '/site/{id}', 403, response.body);
+          expect(response.body.message).to.equal('You do not have administrative access to this repository');
+          return Site.findAll({ where: { id: site.id } });
+        })
+        .then((sites) => {
+          expect(sites).to.not.be.empty;
+          expect(removeSiteStub.called).to.equal(false);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should allow a user to delete a site associated with their account if federalist admin', (done) => {
+      let site;
+
+      factory.site()
+        .then(s => Site.findByPk(s.id, { include: [User] }))
+        .then((model) => {
+          site = model;
+          nock.cleanAll();
+          githubAPINocks.repo({
+            owner: site.owner,
+            repository: site.repo,
+            response: [200, {
+              permissions: { admin: false, push: true },
+            }],
+          });
+          sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins').resolves([site.Users[0].username]);
+          return authenticatedSession(site.Users[0]);
+        })
+        .then(cookie => request(app)
+          .delete(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', cookie)
+          .expect(200))
+        .then((response) => {
+          validateAgainstJSONSchema('DELETE', '/site/{id}', 200, response.body);
+          siteResponseExpectations(response.body, site);
+          return Site.findAll({ where: { id: site.id } });
+        })
+        .then((sites) => {
+          expect(sites).to.be.empty;
+          expect(removeSiteStub.calledOnce).to.equal(true);
+          done();
+        })
+        .catch(done);
+    });
   });
 
   describe('PUT /v0/site/:id', () => {
@@ -1682,7 +1748,7 @@ describe('Site API', () => {
 
           const cookie = await authenticatedSession(userPromise);
           expect(site.config).to.deep.eq(siteConfig);
-          const { body } = await request(app)
+          await request(app)
             .delete(`/v0/site/${site.id}/basic-auth`)
             .set('Cookie', cookie)
             .set('x-csrf-token', csrfToken.getToken())
@@ -1710,7 +1776,7 @@ describe('Site API', () => {
           const cookie = await authenticatedSession(userPromise);
           expect(site.config).to.deep.eq(siteConfig);
           process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
-          const { body } = await request(app)
+          await request(app)
             .delete(`/v0/site/${site.id}/basic-auth`)
             .set('Cookie', cookie)
             .set('x-csrf-token', csrfToken.getToken())
@@ -1832,7 +1898,6 @@ describe('Site API', () => {
             .send(credentials)
             .expect(200);
 
-
           validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 200, body);
           await site.reload();
           expect(site.config).to.deep.equal({
@@ -1840,7 +1905,7 @@ describe('Site API', () => {
             blah: 'blahblahblah',
           });
         });
-      
+
         it('should not call ProxyDataSync when env FEATURE_PROXY_EDGE_DYNAMO=false', async () => {
           const userPromise = await factory.user();
           const site = await factory.site({
@@ -1862,7 +1927,6 @@ describe('Site API', () => {
             .type('json')
             .send(credentials)
             .expect(200);
-
 
           validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 200, body);
           expect(saveSiteStub.notCalled).to.equal(true);

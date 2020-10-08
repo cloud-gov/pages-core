@@ -1,9 +1,29 @@
 const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
 const SQS = require('../services/SQS');
+const { logger } = require('../../winston');
 
 const { branchRegex, shaRegex, isEmptyOrUrl } = require('../utils/validators');
 const { buildUrl } = require('../utils/build');
+
+const States = (function createStates() {
+  const values = {
+    Created: 'created',
+    Queued: 'queued',
+    Tasked: 'tasked',
+    Error: 'error',
+    Processing: 'processing',
+    Skipped: 'skipped', // remove?
+    Success: 'success',
+  };
+
+  return {
+    ...values,
+    values() {
+      return Object.values(values);
+    },
+  };
+}());
 
 const associate = ({
   Build,
@@ -39,19 +59,19 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
     state: buildStatus.status,
   };
 
-  if (buildStatus.status === 'error') {
+  if (buildStatus.status === States.Error) {
     atts.error = jobErrorMessage(buildStatus.message);
   }
 
-  if (['error', 'success'].includes(buildStatus.status)) {
+  if (build.canComplete(buildStatus.status)) {
     atts.completedAt = timestamp;
   }
 
-  if (buildStatus.status === 'success') {
+  if (buildStatus.status === States.Success) {
     atts.url = buildUrl(build, site);
   }
 
-  if (build.state === 'queued' && buildStatus.status === 'processing') {
+  if (build.canStart(buildStatus.status)) {
     atts.startedAt = timestamp;
   }
 
@@ -78,7 +98,17 @@ async function enqueue() {
     where: { site: foundBuild.site },
   });
 
-  await SQS.sendBuildMessage(foundBuild, count);
+  try {
+    await SQS.sendBuildMessage(foundBuild, count);
+    await build.updateJobStatus({ status: States.Queued });
+  } catch (err) {
+    const errMsg = `There was an error, adding the job to SQS: ${err}`;
+    logger.error(errMsg);
+    await build.updateJobStatus({
+      status: States.Error,
+      message: errMsg,
+    });
+  }
 
   return build;
 }
@@ -87,10 +117,19 @@ async function updateJobStatus(buildStatus) {
   const timestamp = new Date();
   const site = await this.getSite();
   const build = await jobStateUpdate(buildStatus, this, site, timestamp);
-  if (build.state === 'success') {
+  if (build.state === States.Success) {
     await site.update({ publishedAt: timestamp });
   }
   return build;
+}
+
+function canComplete(state) {
+  return [States.Error, States.Success].includes(state);
+}
+
+function canStart(state) {
+  return [States.Created, States.Queued, States.Tasked].includes(this.state)
+    && state === States.Processing;
 }
 
 module.exports = (sequelize, DataTypes) => {
@@ -118,8 +157,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     state: {
       type: DataTypes.ENUM,
-      values: ['created', 'queued', 'tasked', 'error', 'processing', 'skipped', 'success'],
-      defaultValue: 'created',
+      values: States.values(),
+      defaultValue: States.Created,
       allowNull: false,
     },
     token: {
@@ -140,6 +179,9 @@ module.exports = (sequelize, DataTypes) => {
     url: {
       type: DataTypes.STRING,
       validate: isEmptyOrUrl,
+    },
+    logsS3Key: {
+      type: DataTypes.STRING,
     },
   }, {
     tableName: 'build',
@@ -166,5 +208,8 @@ module.exports = (sequelize, DataTypes) => {
   Build.associate = associate;
   Build.prototype.enqueue = enqueue;
   Build.prototype.updateJobStatus = updateJobStatus;
+  Build.prototype.canComplete = canComplete;
+  Build.prototype.canStart = canStart;
+  Build.States = States;
   return Build;
 };

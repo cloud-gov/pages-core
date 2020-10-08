@@ -1,5 +1,4 @@
-
-const { models } = require('../../api/models').sequelize;
+const { models } = require('../models').sequelize;
 
 function cleanDatabase() {
   const promises = Object.keys(models).map((name) => {

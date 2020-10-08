@@ -31,7 +31,8 @@ class SitePublishedFilesTable extends React.Component {
     publishedFileActions.fetchPublishedFiles(site, branch, startAtKey);
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { publishedFiles } = nextProps;
 
     if (publishedFiles.data && !publishedFiles.isLoading) {

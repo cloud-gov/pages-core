@@ -32,7 +32,6 @@ function getUTCDate(dateString = Date.now()) {
   );
 }
 
-
 /**
  * Return a human-readable duration between two date strings
  * @param  {String | Date} endTime    format "YYYY-DD-DDT00:00:00.000Z"
@@ -47,7 +46,6 @@ export const duration = compat((startTime, endTime) => {
   const baseTime = endTime || new Date();
   return formatDistance(startTime, baseTime);
 });
-
 
 /**
  * Return a human-readable time since the supplied date, like '5 hours ago'
