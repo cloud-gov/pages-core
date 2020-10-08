@@ -143,7 +143,7 @@ module.exports = {
     const { body, user } = req;
     let site;
     const siteParams = { ...body, sharedBucket: false };
-    
+
     authorizer.create(user, siteParams)
       .then(() => SiteCreator.createSite({
         user,
@@ -152,7 +152,7 @@ module.exports = {
       .then((_site) => {
         site = _site;
         if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-          ProxyDataSync.saveSite(site)
+          return ProxyDataSync.saveSite(site)
             .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
         }
 
@@ -163,7 +163,6 @@ module.exports = {
         res.json(siteJSON);
       })
       .catch((err) => {
-        console.error(err)
         logger.error([JSON.stringify(err), err.stack].join('\n\n'));
         res.error(err);
       });
