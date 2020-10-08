@@ -1,4 +1,6 @@
-const { branchRegex, parseSiteConfigs, isEmptyOrUrl, isValidSubdomain } = require('../utils/validators');
+const {
+  branchRegex, parseSiteConfigs, isEmptyOrUrl, isValidSubdomain,
+} = require('../utils/validators');
 
 const afterValidate = (site) => {
   if (site.defaultBranch === site.demoBranch) {

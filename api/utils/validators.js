@@ -4,7 +4,7 @@ const validator = require('validator');
 const branchRegex = /^[\w.]+(?:[/-]*[\w.])*$/;
 const githubUsernameRegex = /^[^-][a-zA-Z-]+$/;
 const shaRegex = /^[a-f0-9]{40}$/;
-const subdomainRegex = /^[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?$/
+const subdomainRegex = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/;
 
 class ValidationError extends Error {}
 
@@ -78,7 +78,7 @@ function isEmptyOrUrl(value) {
 }
 
 function isValidSubdomain(value) {
-  const msg = `Subdomains may only contain up to 63 alphanumeric and hyphen characters.`;
+  const msg = 'Subdomains may only contain up to 63 alphanumeric and hyphen characters.';
   if (!subdomainRegex.test(value)) {
     throw new Error(msg);
   }
