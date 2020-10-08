@@ -23,7 +23,7 @@ function makeAttributes(overrides = {}) {
 
   const { owner, repository, subdomain } = generateUniqueAtts();
 
-  return Object.assign({
+  return {
     owner,
     repository,
     engine: 'jekyll',
@@ -33,7 +33,8 @@ function makeAttributes(overrides = {}) {
     defaultBranch: 'main',
     subdomain,
     users,
-  }, overrides);
+    ...overrides,
+  };
 }
 
 function site(overrides) {

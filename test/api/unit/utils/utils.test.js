@@ -134,24 +134,40 @@ describe('utils', () => {
     });
   });
 
-  describe('.generateSubdomain', () => {
-    it('should equal generateS3ServiceName', (done) => {
-      const owner = 'Hello';
-      const repository = 'Hello World';
-      const expected = 'o-hello-r-hello-world';
+  describe('.toSubdomainPart', () => {
+    it('replaces invalid character sequences with single `-`, removes leading and trailing `-`, and lowercases', () => {
+      const str = '*&^He_?llo--Wo`--';
+      const expected = 'he-llo-wo';
 
-      expect(utils.generateSubdomain(owner, repository)).to.equal(utils.generateS3ServiceName(owner, repository));
-      expect(utils.generateSubdomain(owner, repository)).to.equal(expected);
-      done();
+      expect(utils.toSubdomainPart(str)).to.equal(expected);
     });
 
-    it('should substitue "." with "--"', (done) => {
+    it('pads the value with random alpha chars to have a minimum length of 5', () => {
+      const str = '2';
+
+      expect(utils.toSubdomainPart(str).length).to.equal(5);
+    });
+
+    it('restricts the value to 63 chars', () => {
+      const str = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz';
+      const expected = str.substring(0, 62);
+      expect(utils.toSubdomainPart(str)).to.equal(expected);
+    });
+  });
+
+  describe('.generateSubdomain', () => {
+    it('should return toSubdomainPart of owner and repo separated by `--`', () => {
       const owner = 'Hel.lo';
       const repository = 'Hello.Wo..rld';
-      const expected = 'o-hel--lo-r-hello--wo----rld';
+      const expected = `${utils.toSubdomainPart(owner)}--${utils.toSubdomainPart(repository)}`;
 
       expect(utils.generateSubdomain(owner, repository)).to.equal(expected);
-      done();
+    });
+
+    it('should return null if owner or repository are missing', () => {
+      const owner = 'Hel.lo';
+
+      expect(utils.generateSubdomain(owner, null)).to.be.null;
     });
   });
 

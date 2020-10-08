@@ -194,15 +194,13 @@ describe('Site model', () => {
     });
   });
 
-  it('should validate that the subdomain is unique', (done) => {
+  it('should validate that the subdomain is unique', async () => {
     const errMsg = 'subdomain: Subdomains may only contain up to 63 alphanumeric and hyphen characters.';
-    factory.site()
-      .then(site => factory.site({
-        subdomain: site.subdomain,
-      }))
-      .catch((err) => {
-        expect(err.message).to.equal("Validation error");
-        done();
-      });
+    const site = await factory.site();
+
+    const error = await factory.site({ subdomain: site.subdomain }).catch(e => e);
+
+    expect(error).to.be.a('error');
+    expect(error.message).to.equal('Validation error');
   });
 });
