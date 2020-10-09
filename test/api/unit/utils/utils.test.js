@@ -136,8 +136,8 @@ describe('utils', () => {
 
   describe('.toSubdomainPart', () => {
     it('replaces invalid character sequences with single `-`, removes leading and trailing `-`, and lowercases', () => {
-      const str = '*&^He_?llo--Wo`--';
-      const expected = 'he-llo-wo';
+      const str = '*&^He_?llo--W9o`--';
+      const expected = 'he-llo-w9o';
 
       expect(utils.toSubdomainPart(str)).to.equal(expected);
     });

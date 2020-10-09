@@ -69,7 +69,7 @@ function toSubdomainPart(str) {
   const characters = 'abcdefghijklmnopqrstuvwxyz';
   let subdomain = str
     // replace all invalid chars with '-'
-    .replace(/[^a-zA-Z-]+/g, '-')
+    .replace(/[^a-zA-Z0-9-]+/g, '-')
     // remove leading and trailing '-'
     .replace(/(^[-]+|[-]+$)/g, '')
     // replace multiple sequential '-' with a single '-'
