@@ -91,6 +91,7 @@ describe('Authentication request', () => {
         const oauthState = 'state-123abc';
         factory.user().then((model) => {
           user = model;
+          expect(user.isActive).to.be.false;
           return githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
         })
           .then(() => unauthenticatedSession({ oauthState }))
@@ -106,17 +107,25 @@ describe('Authentication request', () => {
             expect(authSession.authenticated).to.equal(true);
             expect(authSession.passport.user).to.equal(user.id);
             expect(eventAuditStub.calledOnce).to.equal(true);
+            return user.reload();
+          })
+          .then((model) => {
+            user = model
+            expect(user.isActive).to.be.false;
             done();
           })
           .catch(done);
       });
 
       it('should not create a new user', (done) => {
+        let user;
         let userCount;
         const oauthState = 'state-123abc';
-        factory.user()
-          .then((user) => {
+        factory.user({ isActive: true })
+          .then((model) => {
+            user = model;
             githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
+            expect(user.isActive).to.be.true;
             return User.count();
           })
           .then((count) => {
@@ -130,6 +139,11 @@ describe('Authentication request', () => {
           .then(() => User.count())
           .then((count) => {
             expect(count).to.equal(userCount);
+            return user.reload();
+          })
+          .then((model) => {
+            user = model
+            expect(user.isActive).to.be.true;
             done();
           })
           .catch(done);
@@ -189,6 +203,7 @@ describe('Authentication request', () => {
             expect(user).to.have.property('githubUserId', `${githubUserID}`);
             expect(user).to.have.property('githubAccessToken', 'access-token-123abc');
             expect(eventAuditStub.calledOnce).to.equal(true);
+            expect(user.isActive).to.be.true;
             done();
           })
           .catch(done);
