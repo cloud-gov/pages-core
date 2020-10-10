@@ -570,8 +570,7 @@ describe('Webhook API', () => {
           user = model;
           expect(user.isActive).to.be.false;
           done();
-        })
-        .catch(done);
+        });
     });
 
     it('should set a user to Active if added to federalist-users', (done) => {
@@ -600,8 +599,7 @@ describe('Webhook API', () => {
           user = model;
           expect(user.isActive).to.be.true;
           done();
-        })
-        .catch(done);
+        });
     });
 
     it('should only create event if org webhook for non user', (done) => {
@@ -622,8 +620,7 @@ describe('Webhook API', () => {
         .then(() => {
           expect(auditStub.calledOnceWith(Event.labels.FEDERALIST_USERS, user, payload)).to.be.true;
           done()
-        })
-        .catch(done);
+        });
     });
 
     it('should do nothing if not federalist-org webhook', (done) => {
@@ -644,8 +641,7 @@ describe('Webhook API', () => {
         .then(() => {
           expect(auditStub.notCalled).to.be.true;
           done();
-        })
-        .catch(done);
+        });
     });
 
     it('should do nothing if action not added, removed nor invited', (done) => {
@@ -668,8 +664,7 @@ describe('Webhook API', () => {
         .then(() => {
           expect(auditStub.notCalled).to.be.true;
           done();
-        })
-        .catch(done);
+        });
     });
   });
 });
