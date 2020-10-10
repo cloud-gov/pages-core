@@ -627,13 +627,9 @@ describe('Webhook API', () => {
     });
 
     it('should do nothing if not federalist-org webhook', (done) => {
-      let user;
-      let payload;
-
       factory.user({ isActive: true })
-        .then((model) => {
-          user = model;
-          payload = organizationWebhookPayload('member_removed', user.username, 'not-federalist-users');
+        .then((user) => {
+          const payload = organizationWebhookPayload('member_removed', user.username, 'not-federalist-users');
           const signature = signWebhookPayload(payload);
           return request(app)
             .post('/webhook/organization')
@@ -653,14 +649,10 @@ describe('Webhook API', () => {
     });
 
     it('should do nothing if action not added, removed nor invited', (done) => {
-      let user;
-      let payload;
-
       factory.user({ isActive: true })
-        .then((model) => {
-          user = model;
+        .then((user) => {
           expect(user.isActive).to.be.true;
-          payload = organizationWebhookPayload('member_ignored_action', user.username);
+          const payload = organizationWebhookPayload('member_ignored_action', user.username);
           const signature = signWebhookPayload(payload);
 
           return request(app)
