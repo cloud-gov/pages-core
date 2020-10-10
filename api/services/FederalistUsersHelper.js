@@ -54,35 +54,4 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
 const federalistUsersAdmins = githubAccessToken => GitHub.getOrganizationMembers(githubAccessToken, federalistOrg, 'admin')
   .then(admins => Promise.resolve(admins.map(admin => admin.login)));
 
-const organizationAction = async(payload) => {
-  const { action, memberhip, sender, organization } = payload;
-
-  const { login: orgName } = organization;
-  if (orgName !== federalistOrg) {
-    logger.warn(`Not a ${federalistOrg} membership action:\t${JSON.Stringify(payload)}`);
-    return;
-  }
-
-  const { user: { login } } = membership;
-  const username = login.toLowerCase();
-  const user = await User.findOne({ where: { username } });
-
-  if (['member_added', 'member_removed', 'member_invited'].includes(action)) {
-    await EventCreator.audit(Event.labels.FEDERALIST_USERS, user || User.build({ username }), payload);
-  }
-
-  if (user) {
-    if ('member_added' === action) {
-      await user.update({ isActive: true });
-      EventCreator.audit(Event.labels.UPDATED, user, { action: { isActive: true } });
-    }
-
-    if ('member_removed' === action) {
-      await user.update({ isActive: false });
-      EventCreator.audit(Event.labels.UPDATED, user, { action: { isActive: false } });
-    }
-  }
-
-}
-
-module.exports = { audit18F, federalistUsersAdmins, organizationAction };
+module.exports = { audit18F, federalistUsersAdmins };

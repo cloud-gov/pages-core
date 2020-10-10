@@ -7,8 +7,9 @@ const app = require('../../../app');
 const config = require('../../../config');
 const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
-const { Build, Site, User } = require('../../../api/models');
+const { Build, Site, User, Event } = require('../../../api/models');
 const SQS = require('../../../api/services/SQS');
+const EventCreator = require('../../../api/services/EventCreator');
 
 describe('Webhook API', () => {
   const signWebhookPayload = (payload) => {
@@ -23,6 +24,19 @@ describe('Webhook API', () => {
     after: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
     sender: { login: user.username },
     repository: { full_name: `${site.owner}/${site.repository}` },
+  });
+
+  const organizationWebhookPayload = (action, login, organization='federalist-users') => ({
+    action,
+    membership: {
+      user: {
+        login,
+      },
+    },
+    organization: {
+      login: organization,
+      id: 123,
+    }
   });
 
   describe('POST /webhook/github', () => {
@@ -109,6 +123,7 @@ describe('Webhook API', () => {
         .then((user) => {
           expect(user.Sites).to.have.length(1);
           expect(user.Sites[0].id).to.equal(site.id);
+          expect(user.isActive).to.be.false;
           done();
         })
         .catch(done);
@@ -517,6 +532,152 @@ describe('Webhook API', () => {
 
         expect(statusNock.isDone()).to.be.true;
       });
+    });
+  });
+  describe.only('POST /webhook/organization', () => {
+    let auditStub;
+    beforeEach(() => {
+      auditStub = sinon.stub(EventCreator, 'audit').resolves();
+    });
+
+    afterEach(() => {
+      sinon.restore();
+    });
+
+    it('should set a user to inActive if removed from federalist-users', (done) => {
+      let user;
+      let payload;
+
+      factory.user({ isActive: true })
+        .then((model) => {
+          user = model;
+          expect(user.isActive).to.be.true;
+          payload = organizationWebhookPayload('member_removed', user.username);
+          const signature = signWebhookPayload(payload);
+
+          return request(app)
+            .post('/webhook/organization')
+            .send(payload)
+            .set({
+              'X-GitHub-Event': 'push',
+              'X-Hub-Signature': signature,
+              'X-GitHub-Delivery': '123abc',
+            })
+            .expect(200);
+        })
+        .then(() => user.reload())
+        .then((model) => {
+          user = model;
+          expect(user.isActive).to.be.false;
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should set a user to Active if added to federalist-users', (done) => {
+      let user;
+      let payload;
+
+      factory.user()
+        .then((model) => {
+          user = model;
+          expect(user.isActive).to.be.false;
+          payload = organizationWebhookPayload('member_added', user.username);
+          const signature = signWebhookPayload(payload);
+
+          return request(app)
+            .post('/webhook/organization')
+            .send(payload)
+            .set({
+              'X-GitHub-Event': 'push',
+              'X-Hub-Signature': signature,
+              'X-GitHub-Delivery': '123abc',
+            })
+            .expect(200);
+        })
+        .then(() => user.reload())
+        .then((model) => {
+          user = model;
+          expect(user.isActive).to.be.true;
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should only create event if org webhook for non user', (done) => {
+      let payload;
+      const user = User.build({ username: 'rando-user' })
+      payload = organizationWebhookPayload('member_invited', user.username);
+      const signature = signWebhookPayload(payload);
+
+      request(app)
+        .post('/webhook/organization')
+        .send(payload)
+        .set({
+          'X-GitHub-Event': 'push',
+          'X-Hub-Signature': signature,
+          'X-GitHub-Delivery': '123abc',
+        })
+        .expect(200)
+        .then(() => {
+          expect(auditStub.calledOnceWith(Event.labels.FEDERALIST_USERS, user, payload)).to.be.true;
+          done()
+        })
+        .catch(done);
+    });
+
+    it.only('should do nothing if not federalist-org webhook', (done) => {
+      let user;
+      let payload;
+
+      factory.user({ isActive: true })
+        .then((model) => {
+          user = model;
+          payload = organizationWebhookPayload('member_removed', user.username, 'not-federalist-users');
+          const signature = signWebhookPayload(payload);
+          return request(app)
+            .post('/webhook/organization')
+            .send(payload)
+            .set({
+              'X-GitHub-Event': 'push',
+              'X-Hub-Signature': signature,
+              'X-GitHub-Delivery': '123abc',
+            })
+            .expect(200);
+        })
+        .then(() => {
+          expect(auditStub.notCalled).to.be.true;
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should do nothing if action not added, removed nor invited', (done) => {
+      let user;
+      let payload;
+
+      factory.user({ isActive: true })
+        .then((model) => {
+          user = model;
+          expect(user.isActive).to.be.true;
+          payload = organizationWebhookPayload('member_ignored_action', user.username);
+          const signature = signWebhookPayload(payload);
+
+          return request(app)
+            .post('/webhook/organization')
+            .send(payload)
+            .set({
+              'X-GitHub-Event': 'push',
+              'X-Hub-Signature': signature,
+              'X-GitHub-Delivery': '123abc',
+            })
+            .expect(200);
+        })
+        .then(() => {
+          expect(auditStub.notCalled).to.be.true;
+          done();
+        })
+        .catch(done);
     });
   });
 });

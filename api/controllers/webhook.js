@@ -4,7 +4,8 @@ const config = require('../../config');
 const buildSerializer = require('../serializers/build');
 const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
 const FederalistUsersHelper = require('../services/FederalistUsersHelper');
-const { Build, User, Site } = require('../models');
+const EventCreator = require('../services/EventCreator');
+const { Build, User, Site, Event } = require('../models');
 const { logger } = require('../../winston');
 
 const signBlob = (key, blob) => `sha1=${crypto.createHmac('sha1', key).update(blob).digest('hex')}`;
@@ -47,6 +48,35 @@ const findSiteForWebhookRequest = (request) => {
       }
     });
 };
+
+const organizationWebhookRequest = async(payload) => {
+  const { action, membership, sender, organization } = payload;
+  const { login: orgName } = organization;
+  if (orgName !== config.federalistUsers.orgName) {
+    logger.warn(`Not a ${config.federalistUsers.orgName} membership action:\t${JSON.stringify(payload)}`);
+    return;
+  }
+
+  const { user: { login } } = membership;
+  const username = login.toLowerCase();
+  const user = await User.findOne({ where: { username } });
+
+  if (['member_added', 'member_removed', 'member_invited'].includes(action)) {
+    EventCreator.audit(Event.labels.FEDERALIST_USERS, user || User.build({ username }), payload);
+  }
+
+  if (user) {
+    if ('member_added' === action) {
+      await user.update({ isActive: true });
+      EventCreator.audit(Event.labels.UPDATED, user, { action: { isActive: true } });
+    }
+
+    if ('member_removed' === action) {
+      await user.update({ isActive: false });
+      EventCreator.audit(Event.labels.UPDATED, user, { action: { isActive: false } });
+    }
+  }
+}
 
 const addUserToSite = ({ user, site }) => user.addSite(site);
 
@@ -137,7 +167,8 @@ module.exports = {
   },
   organization(req, res) {
     signWebhookRequest(req)
-      .then(() => FederalistUsersHelper.organizationAction(req.body))
+      .then(() => organizationWebhookRequest(req.body))
+      .then(() => res.ok())
       .catch((err) => {
         logger.error(err);
         if (err.message) {
