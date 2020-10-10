@@ -534,7 +534,7 @@ describe('Webhook API', () => {
       });
     });
   });
-  describe.only('POST /webhook/organization', () => {
+  describe('POST /webhook/organization', () => {
     let auditStub;
     beforeEach(() => {
       auditStub = sinon.stub(EventCreator, 'audit').resolves();
@@ -626,7 +626,7 @@ describe('Webhook API', () => {
         .catch(done);
     });
 
-    it.only('should do nothing if not federalist-org webhook', (done) => {
+    it('should do nothing if not federalist-org webhook', (done) => {
       let user;
       let payload;
 
