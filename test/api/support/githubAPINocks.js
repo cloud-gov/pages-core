@@ -270,50 +270,6 @@ const status = ({
   return statusNock.reply(...resp);
 };
 
-const organization = ({
-  // eslint-disable-next-line no-shadow
-  accessToken, owner, repo, sha, state, targetURL, response,
-} = {}) => {
-  let path;
-  if (owner && repo && sha) {
-    path = `/repos/${owner}/${repo}/statuses/${sha}`;
-  } else {
-    path = /\/repos\/.+\/.+\/statuses\/.+/;
-  }
-
-  let statusNock = nock('https://api.github.com').post(path, (body) => {
-    if (state && body.state != state) { return false; }// eslint-disable-line eqeqeq
-
-    if (targetURL && body.target_url !== targetURL) { return false; }
-
-    const appEnv = config.app.app_env;
-    if (appEnv === 'production' && body.context !== 'federalist/build') {
-      return false;
-    } if (appEnv !== 'production' && body.context !== `federalist-${appEnv}/build`) {
-      return false;
-    }
-
-    return true;
-  });
-
-  if (accessToken) {
-    statusNock = withAuth(statusNock, accessToken);
-  }
-
-  statusNock = statusNock.query(true);
-
-  const typicalResponse = { id: 1 };
-
-  let resp = response || 201;
-  if (typeof resp === 'number') {
-    resp = [resp, typicalResponse];
-  } else if (resp[1] === undefined) {
-    resp[1] = typicalResponse;
-  }
-
-  return statusNock.reply(...resp);
-};
-
 const webhook = ({
   // eslint-disable-next-line no-shadow
   accessToken, owner, repo, response,
