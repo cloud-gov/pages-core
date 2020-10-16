@@ -270,12 +270,15 @@ describe('SiteCreator', () => {
 
     context('when the site is created from a template', () => {
       const template = 'uswds2';
-      const siteParams = {
-        owner: crypto.randomBytes(3).toString('hex'),
-        repository: crypto.randomBytes(3).toString('hex'),
-        template,
-      };
+      let siteParams;
       let user;
+      beforeEach(() => {
+        siteParams = {
+          owner: crypto.randomBytes(3).toString('hex'),
+          repository: crypto.randomBytes(3).toString('hex'),
+          template,
+        };
+      });
 
       it('should create a new site record for the given repository and add the user', (done) => {
         factory.user().then((model) => {

@@ -1,5 +1,6 @@
 const userFactory = require('./user');
 const { Site } = require('../../../../api/models');
+const { generateSubdomain } = require('../../../../api/utils');
 
 let repositoryNameStep = 1;
 
@@ -21,7 +22,7 @@ function makeAttributes(overrides = {}) {
 
   const repository = generateUniqueRepository();
 
-  return Object.assign({
+  return {
     owner: repository.owner,
     repository: repository.name,
     engine: 'jekyll',
@@ -29,9 +30,10 @@ function makeAttributes(overrides = {}) {
     awsBucketName: 'cg-123456789',
     awsBucketRegion: 'us-gov-west-1',
     defaultBranch: 'main',
-    subdomain: 'siteSubDomain',
+    subdomain: generateSubdomain(repository.owner, repository.name),
     users,
-  }, overrides);
+    ...overrides,
+  };
 }
 
 function site(overrides) {
@@ -52,6 +54,5 @@ function site(overrides) {
     })
     .then(() => Site.findByPk(site.id));
 }
-
 
 module.exports = site;

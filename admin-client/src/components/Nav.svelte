@@ -91,6 +91,13 @@
         </li>
         <li class="usa-nav__primary-item">
           {#if authenticated}
+            <a class="usa-nav__link"  class:usa-current={currentPath === '/events'} href="/events">
+              <span>Events</span>
+            </a>
+          {/if}
+        </li>        
+        <li class="usa-nav__primary-item">
+          {#if authenticated}
             <NavButton action={logout}>Logout</NavButton>
           {:else }
             <NavButton action={login}>Login</NavButton>
