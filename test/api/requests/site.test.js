@@ -452,19 +452,22 @@ describe('Site API', () => {
     });
 
     it('should respond with a 403 if no user or repository is specified', (done) => {
-      authenticatedSession().then(cookie => request(app)
-        .post('/v0/site')
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({
-          defaultBranch: 'main',
-          engine: 'jekyll',
-          template: 'gatsby',
+      authenticatedSession()
+        .then(cookie => request(app)
+          .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            defaultBranch: 'main',
+            engine: 'jekyll',
+            template: 'gatsby',
+          })
+          .set('Cookie', cookie)
+          .expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site', 403, response.body);
+          done();
         })
-        .set('Cookie', cookie)
-        .expect(403)).then((response) => {
-        validateAgainstJSONSchema('POST', '/site', 403, response.body);
-        done();
-      }).catch(done);
+        .catch(done);
     });
 
     it('should respond with a 400 if template specified does not exist', (done) => {

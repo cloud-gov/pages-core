@@ -65,8 +65,31 @@ function generateS3ServiceName(owner, repository) {
   return slicedServiceName;
 }
 
+function toSubdomainPart(str) {
+  const characters = 'abcdefghijklmnopqrstuvwxyz';
+  let subdomain = str
+    // replace all invalid chars with '-'
+    .replace(/[^a-zA-Z0-9-]+/g, '-')
+    // remove leading and trailing '-'
+    .replace(/(^[-]+|[-]+$)/g, '')
+    // replace multiple sequential '-' with a single '-'
+    .replace(/[-]{2,}/g, '-')
+    .substring(0, 62)
+    .toLowerCase();
+
+  // pretty arbitrary, but require it is at least 2 chars
+  if (subdomain.length < 2) {
+    // If we generate parts, make it longer
+    while (subdomain.length < 5) {
+      subdomain += characters[Math.floor(Math.random() * Math.floor(characters.length))];
+    }
+  }
+  return subdomain;
+}
+
 function generateSubdomain(owner, repository) {
-  return generateS3ServiceName(owner, repository);
+  if (!owner || !repository) return null;
+  return `${toSubdomainPart(owner)}--${toSubdomainPart(repository)}`;
 }
 
 function isPastAuthThreshold(authDate) {
@@ -224,6 +247,7 @@ module.exports = {
   retry,
   shouldIncludeTracking,
   toInt,
+  toSubdomainPart,
   wait,
   wrapHandler,
   wrapHandlers,

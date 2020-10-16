@@ -23,6 +23,7 @@ applications:
       - federalist-deploy-user
       - federalist-site-wide-error
       - federalist-((env))-dynamodb-creds
+      - federalist-((env))-s3-build-logs
     env:
       NODE_ENV: production
       APP_ENV: ((env))

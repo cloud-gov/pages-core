@@ -77,9 +77,10 @@
     "analyze-webpack": "webpack-bundle-analyzer -h 0.0.0.0 public/stats.json",
     "serve-coverage": "serve -l 8080 ./coverage",
     "update-local-config": "node ./scripts/update-local-config.js",
-    "create-dev-data": "node ./scripts/create-dev-data.js",
+    "create-dev-data": "NODE_ENV=development node ./scripts/create-dev-data.js",
     "update-proxy-db": "node ./scripts/proxy-edge.js",
-    "timeout-builds": "node ./scripts/timeout-builds.js"
+    "timeout-builds": "node ./scripts/timeout-builds.js",
+    "archive-build-logs": "node ./scripts/archive-build-logs.js"
   },
   "main": "index.js",
   "repository": {
@@ -100,7 +101,7 @@
     "babel-loader": "^8.0.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "chai-fetch-mock": "^2.0.0",
+    "chai-fetch-mock": "^3.0.0",
     "concurrently": "^5.3.0",
     "cookie": "^0.4.1",
     "css-loader": "^4.3.0",
@@ -148,7 +149,7 @@
     "shortid": "^2.2.8",
     "sinon": "9.0.3",
     "style-loader": "^1.2.1",
-    "supertest": "^4.0.2",
+    "supertest": "^5.0.0",
     "watch": "^1.0.2",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12",
