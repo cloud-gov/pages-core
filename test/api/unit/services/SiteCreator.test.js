@@ -67,8 +67,8 @@ describe('SiteCreator', () => {
       context('when the owner of the repo is an authorized federalist org', () => {
         it('creates new site record for the given repository, adds the user, webhook, and build', (done) => {
           const siteParams = {
-            owner: crypto.randomBytes(3).toString('hex'),
-            repository: crypto.randomBytes(3).toString('hex'),
+            owner: crypto.randomBytes(10).toString('hex'),
+            repository: crypto.randomBytes(10).toString('hex'),
           };
 
           const defaultBranch = 'myDefaultBranch';
@@ -107,8 +107,8 @@ describe('SiteCreator', () => {
 
         it('ignores case when comparing org name', (done) => {
           const siteParams = {
-            owner: crypto.randomBytes(3).toString('hex'),
-            repository: crypto.randomBytes(3).toString('hex'),
+            owner: crypto.randomBytes(10).toString('hex'),
+            repository: crypto.randomBytes(10).toString('hex'),
           };
 
           const defaultBranch = 'myDefaultBranch';
@@ -143,7 +143,7 @@ describe('SiteCreator', () => {
       context('when the user that owns the repo is a federalist user', () => {
         it('creates new site record for the given repository, adds the user, webhook, and build', (done) => {
           const siteParams = {
-            repository: crypto.randomBytes(3).toString('hex'),
+            repository: crypto.randomBytes(10).toString('hex'),
           };
 
           factory.user().then((model) => {
@@ -177,8 +177,8 @@ describe('SiteCreator', () => {
 
       it('should reject if the user does not have admin access to the site', (done) => {
         const siteParams = {
-          owner: crypto.randomBytes(3).toString('hex'),
-          repository: crypto.randomBytes(3).toString('hex'),
+          owner: crypto.randomBytes(10).toString('hex'),
+          repository: crypto.randomBytes(10).toString('hex'),
         };
 
         factory.user().then((model) => {
@@ -219,8 +219,8 @@ describe('SiteCreator', () => {
 
       it('should reject if the GitHub repository does not exist', (done) => {
         const siteParams = {
-          owner: crypto.randomBytes(3).toString('hex'),
-          repository: crypto.randomBytes(3).toString('hex'),
+          owner: crypto.randomBytes(10).toString('hex'),
+          repository: crypto.randomBytes(10).toString('hex'),
         };
 
         factory.user().then((model) => {
@@ -241,8 +241,8 @@ describe('SiteCreator', () => {
 
       it('rejects if the org that owns the repo has not authorized federalist', (done) => {
         const siteParams = {
-          owner: crypto.randomBytes(3).toString('hex'),
-          repository: crypto.randomBytes(3).toString('hex'),
+          owner: crypto.randomBytes(10).toString('hex'),
+          repository: crypto.randomBytes(10).toString('hex'),
         };
 
         factory.user()
@@ -270,12 +270,13 @@ describe('SiteCreator', () => {
 
     context('when the site is created from a template', () => {
       const template = 'uswds2';
-      let siteParams;
       let user;
+      let siteParams;
+
       beforeEach(() => {
         siteParams = {
-          owner: crypto.randomBytes(3).toString('hex'),
-          repository: crypto.randomBytes(3).toString('hex'),
+          owner: crypto.randomBytes(10).toString('hex'),
+          repository: crypto.randomBytes(10).toString('hex'),
           template,
         };
       });
@@ -395,8 +396,8 @@ describe('SiteCreator', () => {
 
       it('should reject if the template does not exist', (done) => {
         const badSiteParams = {
-          owner: crypto.randomBytes(3).toString('hex'),
-          repository: crypto.randomBytes(3).toString('hex'),
+          owner: crypto.randomBytes(10).toString('hex'),
+          repository: crypto.randomBytes(10).toString('hex'),
           template: 'not-a-template',
         };
 
@@ -425,8 +426,8 @@ describe('SiteCreator', () => {
 
       it('creates new bucket and site record for the given repository, adds the user, webhook, and build', (done) => {
         const siteParams = {
-          owner: crypto.randomBytes(3).toString('hex'),
-          repository: crypto.randomBytes(3).toString('hex'),
+          owner: crypto.randomBytes(10).toString('hex'),
+          repository: crypto.randomBytes(10).toString('hex'),
           sharedBucket: false,
         };
 
@@ -438,8 +439,8 @@ describe('SiteCreator', () => {
         const planName = 'basic-public';
         const planGuid = 'plan-guid';
         const bucketGuid = 'bucket-guid';
-        const accessKeyId = crypto.randomBytes(3).toString('hex');
-        const secretAccessKey = crypto.randomBytes(3).toString('hex');
+        const accessKeyId = crypto.randomBytes(10).toString('hex');
+        const secretAccessKey = crypto.randomBytes(10).toString('hex');
         const region = 'us-gov-other-1';
         const bucket = 'testing-bucket';
 

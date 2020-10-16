@@ -4,6 +4,7 @@ const validator = require('validator');
 const branchRegex = /^[\w.]+(?:[/-]*[\w.])*$/;
 const githubUsernameRegex = /^[^-][a-zA-Z-]+$/;
 const shaRegex = /^[a-f0-9]{40}$/;
+const subdomainRegex = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/;
 
 class ValidationError extends Error {}
 
@@ -76,6 +77,13 @@ function isEmptyOrUrl(value) {
   }
 }
 
+function isValidSubdomain(value) {
+  const msg = 'Subdomains may only contain up to 63 alphanumeric and hyphen characters.';
+  if (!subdomainRegex.test(value)) {
+    throw new Error(msg);
+  }
+}
+
 const validBasicAuthUsername = s => /^(?!.*[:])(?=.*[a-zA-Z0-9]).{4,255}$/.test(s);
 
 const validBasicAuthPassword = s => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,255}$/.test(s);
@@ -90,4 +98,5 @@ module.exports = {
   ValidationError,
   validBasicAuthUsername,
   validBasicAuthPassword,
+  isValidSubdomain,
 };
