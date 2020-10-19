@@ -51,7 +51,7 @@
   },
   "scripts": {
     "postinstall": "yarn migrate:up",
-    "build": "webpack -p --config webpack.production.config.js",
+    "build": "webpack --config webpack.production.config.js",
     "start": "node index.js",
     "debug": "node --inspect index.js",
     "watch": "NODE_ENV=development concurrently --kill-others --raw \"nodemon index.js --config nodemon.json\"",
