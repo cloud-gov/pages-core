@@ -228,6 +228,30 @@ function objToQueryParams(obj) {
   return qs;
 }
 
+async function paginate(model, serialize, params, query) {
+  const limit = toInt(params.limit) || 25;
+  const page = toInt(params.page) || 1;
+  const offset = limit * (page - 1);
+
+  const pQuery = {
+    limit,
+    offset,
+    order: [['createdAt', 'DESC']],
+    ...query,
+  };
+
+  const { rows, count } = await model.findAndCountAll(pQuery);
+
+  const totalPages = Math.trunc(count / limit) + (count % limit === 0 ? 0 : 1);
+
+  return {
+    currentPage: page,
+    totalPages,
+    totalItems: count,
+    data: serialize(rows),
+  };
+}
+
 module.exports = {
   filterEntity,
   firstEntity,
@@ -243,6 +267,7 @@ module.exports = {
   objToQueryParams,
   omitBy,
   omit,
+  paginate,
   pick,
   retry,
   shouldIncludeTracking,

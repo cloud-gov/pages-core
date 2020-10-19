@@ -1,5 +1,6 @@
 const userFactory = require('./user');
 const { Site } = require('../../../../api/models');
+const { generateSubdomain } = require('../../../../api/utils');
 
 let siteAttsStep = 1;
 
@@ -7,7 +8,6 @@ function generateUniqueAtts() {
   const res = {
     owner: `repo-owner-${siteAttsStep}`,
     repository: `repo-name-${siteAttsStep}`,
-    subdomain: `siteSubDomain-${siteAttsStep}`,
 
   };
   siteAttsStep += 1;
@@ -21,7 +21,7 @@ function makeAttributes(overrides = {}) {
     users = Promise.all([userFactory()]);
   }
 
-  const { owner, repository, subdomain } = generateUniqueAtts();
+  const { owner, repository } = generateUniqueAtts();
 
   return {
     owner,
@@ -31,7 +31,7 @@ function makeAttributes(overrides = {}) {
     awsBucketName: 'cg-123456789',
     awsBucketRegion: 'us-gov-west-1',
     defaultBranch: 'main',
-    subdomain,
+    subdomain: generateSubdomain(owner, repository),
     users,
     ...overrides,
   };
@@ -55,6 +55,5 @@ function site(overrides) {
     })
     .then(() => Site.findByPk(site.id));
 }
-
 
 module.exports = site;
