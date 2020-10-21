@@ -291,6 +291,7 @@ workflows:
               only:
                 - staging
                 - main
+
     jobs:
       - run-task:
           name: archive-build-logs-staging
@@ -310,23 +311,23 @@ workflows:
             branches:
               only: main
 
-        - run-task:
-            name: nightly-builds-staging
-            app: federalistapp-staging
-            task-name: nightly-builds
-            task-command: yarn nightly-builds
-            filters:
-              branches:
-                only: staging
+      - run-task:
+          name: nightly-builds-staging
+          app: federalistapp-staging
+          task-name: nightly-builds
+          task-command: yarn nightly-builds
+          filters:
+            branches:
+              only: staging
 
-        - run-task:
-            name: nightly-builds-production
-            app: federalistapp
-            task-name: nightly-builds
-            task-command: yarn nightly-builds
-            filters:
-              branches:
-                only: main
+      - run-task:
+          name: nightly-builds-production
+          app: federalistapp
+          task-name: nightly-builds
+          task-command: yarn nightly-builds
+          filters:
+            branches:
+              only: main
 
 
   every-ten-minutes:
