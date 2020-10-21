@@ -1259,6 +1259,18 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
+"@supercharge/goodies@~1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@supercharge/goodies/-/goodies-1.5.1.tgz#7ec3327419fd700074770b9363eafd6053e6a3e6"
+  integrity sha512-LrbIgboxJ9labELaN6JUcZEWAdKveohRI3u11ILb/rqrKbeXkN8/ezoLvWJ0oo9s/HeBf0REFTD3XpVEio053g==
+
+"@supercharge/promise-pool@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@supercharge/promise-pool/-/promise-pool-1.5.0.tgz#047a9b7cdfca24f90f28332090493fec3ddc57ee"
+  integrity sha512-pAXVR60vr7ozOkNv2EWPyYuK4gH6SQBQY7C+x/U7ehqx2OlvA4WQNP6oAOh5PKmoMbWaDTtl3Vdd4vPYPWyYZQ==
+  dependencies:
+    "@supercharge/goodies" "~1.5.1"
+
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@szmarczak/http-timer/-/http-timer-1.1.2.tgz#b1665e2c461a2cd92f4c1bbf50d5454de0d4b421"
