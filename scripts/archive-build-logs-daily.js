@@ -44,8 +44,7 @@ async function runArchiveBuildLogsDaily(dateStr) {
     const { errors } = await PromisePool
       .withConcurrency(5)
       .for(builds)
-      .process(async () => { throw new Error('Yah'); });
-      // .process(archiveBuildLogs);
+      .process(archiveBuildLogs);
 
     if (errors.length === 0) {
       console.log('\nAll build logs archived successfully!');
