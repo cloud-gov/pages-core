@@ -187,9 +187,10 @@ describe('FederalistUsersHelper', () => {
       }));
       expect(getOrg('federalist-users').length).to.equal(20);
       await FederalistUsersHelper.removeInactiveMembers({ auditorUsername: admin.username });
-      expect(removeOrganizationMemberStub.callCount).to.equal(11);
-      expect(getOrg('federalist-users').length).to.equal(9);
+      expect(removeOrganizationMemberStub.callCount).to.equal(10);
+      expect(getOrg('federalist-users').length).to.equal(10);
     });
+
     it('should remove a member if they have not logged in for > 90 days', async () => {
       const now = new Date();
       const past = new Date('2000-01-01');
