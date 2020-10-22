@@ -3,9 +3,10 @@ const Sequelize = require('sequelize');
 const config = require('../../config');
 const buildSerializer = require('../serializers/build');
 const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
-const FederalistUsersHelper = require('../services/FederalistUsersHelper');
 const EventCreator = require('../services/EventCreator');
-const { Build, User, Site, Event } = require('../models');
+const {
+  Build, User, Site, Event,
+} = require('../models');
 const { logger } = require('../../winston');
 
 const signBlob = (key, blob) => `sha1=${crypto.createHmac('sha1', key).update(blob).digest('hex')}`;
@@ -49,8 +50,10 @@ const findSiteForWebhookRequest = (request) => {
     });
 };
 
-const organizationWebhookRequest = async(payload) => {
-  const { action, membership, sender, organization } = payload;
+const organizationWebhookRequest = async (payload) => {
+  const {
+    action, membership, organization,
+  } = payload;
   const { login: orgName } = organization;
   if (orgName !== config.federalistUsers.orgName) {
     logger.warn(`Not a ${config.federalistUsers.orgName} membership action:\t${JSON.stringify(payload)}`);
@@ -66,17 +69,17 @@ const organizationWebhookRequest = async(payload) => {
   }
 
   if (user) {
-    if ('member_added' === action) {
+    if (action === 'member_added') {
       await user.update({ isActive: true });
       EventCreator.audit(Event.labels.UPDATED, user, { action: { isActive: true } });
     }
 
-    if ('member_removed' === action) {
+    if (action === 'member_removed') {
       await user.update({ isActive: false });
       EventCreator.audit(Event.labels.UPDATED, user, { action: { isActive: false } });
     }
   }
-}
+};
 
 const addUserToSite = ({ user, site }) => user.addSite(site);
 
@@ -162,7 +165,6 @@ module.exports = {
         } else {
           res.badRequest();
         }
-
       });
   },
   organization(req, res) {

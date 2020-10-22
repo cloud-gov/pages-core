@@ -54,7 +54,7 @@ const attributes = DataTypes => ({
     type: DataTypes.BOOLEAN,
     defaultValue: false,
     allowNull: false,
-  }
+  },
 });
 
 const options = {

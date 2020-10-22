@@ -7,4 +7,5 @@ module.exports = {
   ],
   admin: (env.FEDERALIST_USERS_ADMIN || process.env.FEDERALIST_USERS_ADMIN),
   orgName: 'federalist-users',
+  maxDaysSinceLogin: process.env.MAX_DAYS_SINCE_LOGIN || 90,
 };
