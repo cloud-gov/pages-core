@@ -123,11 +123,11 @@ describe('FederalistUsersHelper', () => {
   });
   describe('refreshIsActiveUsers', () => {
     let eventSpy;
-    beforeEach(() => {
+    beforeEach( async() => {
       eventStub = sinon.stub(EventCreator, 'audit').resolves();
+      await User.truncate();
     });
     afterEach( async () => {
-      await User.truncate();
       await Event.truncate();
     })
 
