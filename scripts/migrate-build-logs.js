@@ -41,7 +41,7 @@ async function runMigrateBuildLogs(startDateStr) {
 
     // eslint-disable-next-line no-plusplus
     for (let n = 1; n <= 180; n++) {
-      const date = startDate.clone().substract(n, 'days');
+      const date = startDate.clone().subtract(n, 'days');
       console.log(`\nArchiving build logs for ${date}`);
 
       // eslint-disable-next-line no-await-in-loop
