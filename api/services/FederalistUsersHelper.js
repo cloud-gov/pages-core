@@ -58,7 +58,7 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
 const federalistUsersAdmins = githubAccessToken => GitHub.getOrganizationMembers(githubAccessToken, FEDERALIST_ORG, 'admin')
   .then(admins => Promise.resolve(admins.map(admin => admin.login)));
 
-const refreshIsActiveUsers = async ( auditorUsername = config.federalistUsers.admin) => {
+const refreshIsActiveUsers = async (auditorUsername = config.federalistUsers.admin) => {
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
   const members = await GitHub.getOrganizationMembers(githubAccessToken, FEDERALIST_ORG);
   const logins = members.map(m => m.login.toLowerCase());
@@ -69,8 +69,7 @@ const refreshIsActiveUsers = async ( auditorUsername = config.federalistUsers.ad
         isActive: false,
       },
       returning: ['id', 'isActive'],
-    },
-  );
+    });
 
   const [, inActiveUsers] = await User.update({ isActive: false },
     {
@@ -79,18 +78,19 @@ const refreshIsActiveUsers = async ( auditorUsername = config.federalistUsers.ad
         isActive: true,
       },
       returning: ['id', 'isActive'],
-    },
-  );
+    });
   const users = activeUsers.concat(inActiveUsers);
-  users.map(user => EventCreator.audit(Event.labels.UPDATED, user, { action: { isActive: user.isActive } }));
+  users.map(user => EventCreator.audit(Event.labels.UPDATED, user, {
+    action: { isActive: user.isActive },
+  }));
 };
 
-const removeMember = (githubAccessToken, login) => GitHub.
-  removeOrganizationMember(githubAccessToken, FEDERALIST_ORG, login)
-    .catch(error => EventCreator.error(Event.labels.FEDERALIST_USERS, { error, login, action: 'removeOrgMember' }));
+const removeMember = (githubAccessToken, login) => GitHub
+  .removeOrganizationMember(githubAccessToken, FEDERALIST_ORG, login)
+  .catch(error => EventCreator.error(Event.labels.FEDERALIST_USERS, { error, login, action: 'removeOrgMember' }));
 
 // remove users from org who are not using Federalist
-const removeInactiveAuthenticatedMembers =  async (githubAccessToken, cutoff, memberLogins) => {
+const removeInactiveAuthenticatedMembers = async (githubAccessToken, cutoff, memberLogins) => {
   const inActiveUsers = await User.findAll({
     attributes: ['id', 'username'],
     where: {
@@ -106,8 +106,9 @@ const removeInactiveAuthenticatedMembers =  async (githubAccessToken, cutoff, me
 
   const inActiveUsernames = inActiveUsers.map(user => user.username.toLowerCase());
 
-  return Promise.all(inActiveUsernames.map(inActiveUsername => removeMember(githubAccessToken, inActiveUsername)));
-}
+  return Promise.all(inActiveUsernames
+    .map(inActiveUsername => removeMember(githubAccessToken, inActiveUsername)));
+};
 
 // remove org members (> x days) that are not in users table
 const removeInactiveNeverAuthenticatedMembers = async (githubAccessToken, cutoff, memberLogins) => {
@@ -122,7 +123,8 @@ const removeInactiveNeverAuthenticatedMembers = async (githubAccessToken, cutoff
 
   const allAuthedUsernames = allAuthedUsers.map(u => u.username.toLowerCase());
 
-  const memberLoginsNeverAuthed = memberLogins.filter(memberLogin => !allAuthedUsernames.includes(memberLogin.toLowerCase()));
+  const memberLoginsNeverAuthed = memberLogins
+    .filter(memberLogin => !allAuthedUsernames.includes(memberLogin.toLowerCase()));
 
   const recentMemberAddedEvents = await Event.findAll({ // find members added within cutoff date
     attributes: ['body'],
@@ -133,37 +135,44 @@ const removeInactiveNeverAuthenticatedMembers = async (githubAccessToken, cutoff
         [Op.gte]: cutoff.toDate(),
       },
       body: {
-        action:
-        {
-          [Op.eq]: 'member_added',
-        },
-      },
-      body: {
-        'membership,user,login': {
-          [Op.in]: memberLoginsNeverAuthed,
-        },
+        [Op.and]: [
+          {
+            action: { [Op.eq]: 'member_added' },
+          },
+          {
+            'membership,user,login': { [Op.in]: memberLoginsNeverAuthed },
+          },
+        ],
       },
     },
   });
 
-  const recentlyAddedMembersNeverAuthed = recentMemberAddedEvents.map(m => m.body.membership.user.login);
+  const recentlyAddedMembersNeverAuthed = recentMemberAddedEvents
+    .map(m => m.body.membership.user.login);
 
   const membersToRemove = memberLoginsNeverAuthed
     .filter(memberLogin => !recentlyAddedMembersNeverAuthed.includes(memberLogin));
 
-  return Promise.all(membersToRemove.map(memberToRemove => removeMember(githubAccessToken, memberToRemove)));
-}
+  return Promise.all(membersToRemove
+    .map(memberToRemove => removeMember(githubAccessToken, memberToRemove)));
+};
 
 const removeInactiveMembers = async ({ auditorUsername }) => {
+  /* eslint-disable no-param-reassign */
   auditorUsername = auditorUsername || config.federalistUsers.admin;
+  /* eslint-enable no-param-reassign */
   const now = moment(new Date());
   const cutoff = now.clone().subtract(MAX_DAYS_SINCE_LOGIN, 'days');
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
 
-  const members = await GitHub.getOrganizationMembers(githubAccessToken, config.federalistUsers.orgName);
+  const members = await GitHub
+    .getOrganizationMembers(githubAccessToken, config.federalistUsers.orgName);
+
   const memberLogins = members.map(m => m.login);
 
   await removeInactiveAuthenticatedMembers(githubAccessToken, cutoff, memberLogins);
   await removeInactiveNeverAuthenticatedMembers(githubAccessToken, cutoff, memberLogins);
-}
-module.exports = { audit18F, federalistUsersAdmins, refreshIsActiveUsers, removeInactiveMembers };
+};
+module.exports = {
+  audit18F, federalistUsersAdmins, refreshIsActiveUsers, removeInactiveMembers,
+};

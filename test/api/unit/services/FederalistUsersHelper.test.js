@@ -80,7 +80,10 @@ describe('FederalistUsersHelper', () => {
       expect(isOrgMember('federalist-users', 'new-member-3')).to.be.true;
 
       factory.user()
-        .then(user => FederalistUsersHelper.audit18F({ auditorUsername: user.username, fedUserTeams: ['1'] }))
+        .then(user => FederalistUsersHelper.audit18F({
+          auditorUsername: user.username,
+          fedUserTeams: ['1']
+        }))
         .then(() => {
           expect(getOrg('federalist-users').length).to.equal(11);
           expect(isOrgMember('federalist-users', 'new-member-1')).to.be.true;
@@ -174,6 +177,19 @@ describe('FederalistUsersHelper', () => {
   });
 
   describe('removeInactiveMembers', () => {
+    it('should remove a member if they have not logged in for > 90 days', async () => {
+      const signedInAt = new Date();
+      const admin = await factory.user();
+
+      await Promise.all(Array(10).fill(0).map( async (a, index) => {
+        const u = await factory.user({ isActive: true, signedInAt })
+        addMember('federalist-users', u.username)
+      }));
+      expect(getOrg('federalist-users').length).to.equal(20);
+      await FederalistUsersHelper.removeInactiveMembers({ auditorUsername: admin.username });
+      expect(removeOrganizationMemberStub.callCount).to.equal(11);
+      expect(getOrg('federalist-users').length).to.equal(9);
+    });
     it('should remove a member if they have not logged in for > 90 days', async () => {
       const now = new Date();
       const past = new Date('2000-01-01');

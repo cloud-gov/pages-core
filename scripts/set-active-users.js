@@ -1,4 +1,4 @@
 /* eslint-disable no-console */
-const { refresthIsActiveUsers } = require('../api/services/FederalistUsersHelper');
+const { refreshIsActiveUsers } = require('../api/services/FederalistUsersHelper');
 
-await refreshIsActiveUsers();
+refreshIsActiveUsers();
