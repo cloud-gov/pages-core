@@ -6,6 +6,7 @@
   "keywords": [],
   "dependencies": {
     "@octokit/rest": "^18.0.6",
+    "@supercharge/promise-pool": "^1.5.0",
     "aws-sdk": "^2.774.0",
     "body-parser": "^1.18.3",
     "cfenv": "^1.2.3",
@@ -80,7 +81,9 @@
     "create-dev-data": "NODE_ENV=development node ./scripts/create-dev-data.js",
     "update-proxy-db": "node ./scripts/proxy-edge.js",
     "timeout-builds": "node ./scripts/timeout-builds.js",
-    "archive-build-logs": "node ./scripts/archive-build-logs.js"
+    "archive-build-logs": "node ./scripts/archive-build-logs.js",
+    "archive-build-logs-daily": "node ./scripts/archive-build-logs-daily.js",
+    "migrate-build-logs": "node ./scripts/migrate-build-logs.js"
   },
   "main": "index.js",
   "repository": {

@@ -150,6 +150,7 @@ jobs:
             # Attempt to submit a report, but don't fail the build if this fails (`|| true`)
             ./cc-test-reporter upload-coverage || true
 
+
   deploy:
     docker:
       - image: circleci/node:12
@@ -212,36 +213,25 @@ jobs:
           app: << parameters.app >>
 
 
-  nightly-builds:
+  run-task:
     docker:
       - image: cimg/base:2020.01
     parameters:
       app:
         type: string
-    steps:
-      - checkout
-
-      - deploy-to-cg:
-          app: << parameters.app >>
-          action: task
-          task-name: nightly-builds
-          task-command: yarn nightly-builds
-
-
-  timeout-builds:
-    docker:
-      - image: circleci/node:12
-    parameters:
-      app:
+      task-name:
         type: string
+      task-command:
+        type: string        
     steps:
       - checkout
 
       - deploy-to-cg:
           app: << parameters.app >>
           action: task
-          task-name: timeout-builds
-          task-command: yarn timeout-builds
+          task-name: << parameters.task-name >>
+          task-command: << parameters.task-command >>
+
 
 ##################################
 ##          Workflows           ##
@@ -295,23 +285,46 @@ workflows:
   nightly:
     triggers:
       - schedule:
-          cron: "0 0 * * *"
+          cron: "0 23 * * *"
           filters:
             branches:
               only:
                 - staging
                 - main
+
     jobs:
-      - nightly-builds:
-          name: nightly-builds-staging
+      - run-task:
+          name: archive-build-logs-staging
           app: federalistapp-staging
+          task-name: archive-build-logs-$(date "%Y-%m-%d")
+          task-command: yarn archive-build-logs-daily $(date "%Y-%m-%d")
           filters:
             branches:
               only: staging
 
-      - nightly-builds:
+      - run-task:
+          name: archive-build-logs-production
+          app: federalistapp
+          task-name: archive-build-logs-$(date "%Y-%m-%d")
+          task-command: yarn archive-build-logs-daily $(date "%Y-%m-%d")
+          filters:
+            branches:
+              only: main
+
+      - run-task:
+          name: nightly-builds-staging
+          app: federalistapp-staging
+          task-name: nightly-builds
+          task-command: yarn nightly-builds
+          filters:
+            branches:
+              only: staging
+
+      - run-task:
           name: nightly-builds-production
           app: federalistapp
+          task-name: nightly-builds
+          task-command: yarn nightly-builds
           filters:
             branches:
               only: main
@@ -327,16 +340,20 @@ workflows:
                 - staging
                 - main
     jobs:
-      - timeout-builds:
+      - run-task:
           name: timeout-builds-staging
           app: federalistapp-staging
+          task-name: timeout-builds
+          task-command: yarn timeout-builds
           filters:
             branches:
               only: staging
 
-      - timeout-builds:
+      - run-task:
           name: timeout-builds-production
           app: federalistapp
+          task-name: timeout-builds
+          task-command: yarn timeout-builds
           filters:
             branches:
               only: main
