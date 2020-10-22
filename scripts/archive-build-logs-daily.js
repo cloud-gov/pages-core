@@ -2,19 +2,8 @@
 const moment = require('moment');
 const PromisePool = require('@supercharge/promise-pool');
 const { Op } = require('sequelize');
-const { Build, Site } = require('../api/models');
+const { Build } = require('../api/models');
 const BuildLogs = require('../api/services/build-logs');
-
-async function archiveBuildLogs({ id }) {
-  const build = await Build.findOne({
-    where: { id },
-    include: [{
-      model: Site,
-      required: true,
-    }],
-  });
-  return BuildLogs.archiveBuildLogs(build.Site, build);
-}
 
 /**
  * Archive build logs for all builds that completed on the provided date
@@ -40,18 +29,17 @@ async function runArchiveBuildLogsDaily(dateStr) {
 
     console.log(`\nFound ${builds.length} builds.`);
 
-    // Let's do 5 at a time
     const { errors } = await PromisePool
       .withConcurrency(5)
       .for(builds)
-      .process(archiveBuildLogs);
+      .process(({ id }) => BuildLogs.archiveBuildLogsForBuildId(id));
 
     if (errors.length === 0) {
       console.log('\nAll build logs archived successfully!');
       process.exit(0);
     }
 
-    console.error(`\nArchive build logs for ${dateStr}completed with the following errors:`);
+    console.error(`\nArchive build logs for ${dateStr} completed with the following errors:`);
     console.error(errors.map(e => `  ${e.item.id}: ${e.message}`).join('\n'));
     process.exit(1);
   } catch (error) {
