@@ -174,7 +174,7 @@ describe('FederalistUsersHelper', () => {
   });
 
   describe('removeInactiveMembers', () => {
-    it('should remove a user from a team', async () => {
+    it('should remove a member if they have not logged in for > 90 days', async () => {
       const now = new Date();
       const past = new Date('2000-01-01');
       const admin = await factory.user();
@@ -205,7 +205,7 @@ describe('FederalistUsersHelper', () => {
       await FederalistUsersHelper.removeInactiveMembers({ auditorUsername: admin.username });
       expect(removeOrganizationMemberStub.callCount).to.equal(11);
       expect(getOrg('federalist-users').length).to.equal(9);
-    })
+    });
 
   });
 });
