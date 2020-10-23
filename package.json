@@ -79,7 +79,9 @@
     "update-local-config": "node ./scripts/update-local-config.js",
     "create-dev-data": "node ./scripts/create-dev-data.js",
     "update-proxy-db": "node ./scripts/proxy-edge.js",
-    "timeout-builds": "node ./scripts/timeout-builds.js"
+    "timeout-builds": "node ./scripts/timeout-builds.js",
+    "remove-inactivate-federalist-users": "node ./scripts/remove-inactive-federalist-users.js",
+    "sync-active-federalist-users":  "node ./scripts/sync-active-users.js"
   },
   "main": "index.js",
   "repository": {
