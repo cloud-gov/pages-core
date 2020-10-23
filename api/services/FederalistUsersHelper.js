@@ -161,7 +161,7 @@ const removeInactiveMembers = async ({ auditorUsername }) => {
   /* eslint-disable no-param-reassign */
   auditorUsername = auditorUsername || config.federalistUsers.admin;
   /* eslint-enable no-param-reassign */
-  const now = moment(new Date());
+  const now = moment();
   const cutoff = now.clone().subtract(MAX_DAYS_SINCE_LOGIN, 'days');
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
 
