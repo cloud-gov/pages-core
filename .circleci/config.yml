@@ -285,7 +285,7 @@ workflows:
   nightly:
     triggers:
       - schedule:
-          cron: "0 23 * * *"
+          cron: "0 5 * * *"
           filters:
             branches:
               only:
@@ -296,8 +296,8 @@ workflows:
       - run-task:
           name: archive-build-logs-staging
           app: federalistapp-staging
-          task-name: archive-build-logs-$(date "%Y-%m-%d")
-          task-command: yarn archive-build-logs-daily $(date "%Y-%m-%d")
+          task-name: archive-build-logs
+          task-command: yarn archive-build-logs-daily
           filters:
             branches:
               only: staging
@@ -305,8 +305,8 @@ workflows:
       - run-task:
           name: archive-build-logs-production
           app: federalistapp
-          task-name: archive-build-logs-$(date "%Y-%m-%d")
-          task-command: yarn archive-build-logs-daily $(date "%Y-%m-%d")
+          task-name: archive-build-logs
+          task-command: yarn archive-build-logs-daily
           filters:
             branches:
               only: main

@@ -48,9 +48,9 @@ async function runArchiveBuildLogsDaily(dateStr) {
   }
 }
 
-const dateStr = process.argv[2];
+let dateStr = process.argv[2];
 if (!dateStr) {
-  console.error('\nMissing required argument `dateStr` in format "YYYY-MM-dd"\n');
-  process.exit(1);
+  dateStr = moment().subtract(1, 'days').format('YYYY-MM-DD');
+  console.log(`\nNo date provided, using the previous date ${dateStr}\n`);
 }
 runArchiveBuildLogsDaily(dateStr);
