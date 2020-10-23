@@ -56,7 +56,7 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
 };
 
 const federalistUsersAdmins = githubAccessToken => GitHub.getOrganizationMembers(githubAccessToken, FEDERALIST_ORG, 'admin')
-  .then(admins => Promise.resolve(admins.map(admin => admin.login)));
+  .then(admins => admins.map(admin => admin.login));
 
 const refreshIsActiveUsers = async (auditorUsername = config.federalistUsers.admin) => {
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
