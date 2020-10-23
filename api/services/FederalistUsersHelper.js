@@ -91,7 +91,7 @@ const removeMember = (githubAccessToken, login) => GitHub
 
 // remove users from org who are not using Federalist
 const removeInactiveAuthenticatedMembers = async (githubAccessToken, cutoff, memberLogins) => {
-  const inActiveUsers = await User.findAll({
+  const inactiveUsers = await User.findAll({
     attributes: ['id', 'username'],
     where: {
       isActive: true,
@@ -104,10 +104,10 @@ const removeInactiveAuthenticatedMembers = async (githubAccessToken, cutoff, mem
     },
   });
 
-  const inActiveUsernames = inActiveUsers.map(user => user.username.toLowerCase());
+  const inactiveUsernames = inactiveUsers.map(user => user.username.toLowerCase());
 
-  return Promise.all(inActiveUsernames
-    .map(inActiveUsername => removeMember(githubAccessToken, inActiveUsername)));
+  return Promise.all(inactiveUsernames
+    .map(inactiveUsername => removeMember(githubAccessToken, inactiveUsername)));
 };
 
 // remove org members (> x days) that are not in users table
