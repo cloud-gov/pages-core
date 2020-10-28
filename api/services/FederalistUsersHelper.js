@@ -56,7 +56,7 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
 };
 
 const federalistUsersAdmins = githubAccessToken => GitHub.getOrganizationMembers(githubAccessToken, FEDERALIST_ORG, 'admin')
-  .then(admins => Promise.resolve(admins.map(admin => admin.login)));
+  .then(admins => admins.map(admin => admin.login));
 
 const refreshIsActiveUsers = async (auditorUsername = config.federalistUsers.admin) => {
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
@@ -91,7 +91,7 @@ const removeMember = (githubAccessToken, login) => GitHub
 
 // remove users from org who are not using Federalist
 const removeInactiveAuthenticatedMembers = async (githubAccessToken, cutoff, memberLogins) => {
-  const inActiveUsers = await User.findAll({
+  const inactiveUsers = await User.findAll({
     attributes: ['id', 'username'],
     where: {
       isActive: true,
@@ -104,10 +104,10 @@ const removeInactiveAuthenticatedMembers = async (githubAccessToken, cutoff, mem
     },
   });
 
-  const inActiveUsernames = inActiveUsers.map(user => user.username.toLowerCase());
+  const inactiveUsernames = inactiveUsers.map(user => user.username.toLowerCase());
 
-  return Promise.all(inActiveUsernames
-    .map(inActiveUsername => removeMember(githubAccessToken, inActiveUsername)));
+  return Promise.all(inactiveUsernames
+    .map(inactiveUsername => removeMember(githubAccessToken, inactiveUsername)));
 };
 
 // remove org members (> x days) that are not in users table
@@ -161,7 +161,7 @@ const removeInactiveMembers = async ({ auditorUsername }) => {
   /* eslint-disable no-param-reassign */
   auditorUsername = auditorUsername || config.federalistUsers.admin;
   /* eslint-enable no-param-reassign */
-  const now = moment(new Date());
+  const now = moment();
   const cutoff = now.clone().subtract(MAX_DAYS_SINCE_LOGIN, 'days');
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
 

@@ -18,7 +18,7 @@ const findUserForWebhookRequest = (request) => {
     where: { username: username.toLowerCase() },
     defaults: {
       username,
-      active: false,
+      isActive: false,
     },
   })
     .then((users) => {
