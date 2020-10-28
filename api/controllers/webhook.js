@@ -55,12 +55,12 @@ const organizationWebhookRequest = async (payload) => {
     action, membership, organization,
   } = payload;
   const { login: orgName } = organization;
+
   if (orgName !== config.federalistUsers.orgName) {
-    logger.warn(`Not a ${config.federalistUsers.orgName} membership action:\t${JSON.stringify(payload)}`);
     return;
   }
 
-  const { user: { login } } = membership;
+  const { login } = membership.user;
   const username = login.toLowerCase();
   const user = await User.findOne({ where: { username } });
 
@@ -68,16 +68,17 @@ const organizationWebhookRequest = async (payload) => {
     EventCreator.audit(Event.labels.FEDERALIST_USERS, user || User.build({ username }), payload);
   }
 
-  if (user) {
-    if (action === 'member_added') {
+  if (action === 'member_added') {
+    if (!user) {
+      await User.create({
+        username,
+        active: false,
+      });
+    } else if (!user.isActive) {
       await user.update({ isActive: true });
-      EventCreator.audit(Event.labels.UPDATED, user, { action: { isActive: true } });
     }
-
-    if (action === 'member_removed') {
-      await user.update({ isActive: false });
-      EventCreator.audit(Event.labels.UPDATED, user, { action: { isActive: false } });
-    }
+  } else if (action === 'member_removed' && user && user.isActive) {
+    await user.update({ isActive: false });
   }
 };
 
@@ -100,12 +101,14 @@ const signWebhookRequest = request => new Promise((resolve, reject) => {
 });
 
 const createBuildForWebhookRequest = async (request) => {
-  const [user, site] = await Promise.all([
-    findUserForWebhookRequest(request),
-    findSiteForWebhookRequest(request),
-  ]);
+  const { login } = request.body.sender;
+  const username = login.toLowerCase();
+  const user = return User.findOne({ where: { username } });
+  const site = findSiteForWebhookRequest(request);
 
-  await addUserToSite({ user, site });
+  if (user) {
+    await addUserToSite({ user, site });
+  }
 
   const branch = request.body.ref.replace('refs/heads/', '');
   const commitSha = request.body.after;
@@ -121,7 +124,7 @@ const createBuildForWebhookRequest = async (request) => {
   if (queuedBuild) {
     return queuedBuild.update({
       commitSha,
-      user: user.id,
+      username,
     });
   }
 
@@ -129,7 +132,7 @@ const createBuildForWebhookRequest = async (request) => {
     branch,
     commitSha,
     site: site.id,
-    user: user.id,
+    username,
   })
     .then(build => build.enqueue());
 };
@@ -141,30 +144,16 @@ module.exports = {
         if (req.body.commits && req.body.commits.length > 0) {
           return createBuildForWebhookRequest(req);
         }
-
-        return null;
       })
       .then((build) => {
-        if (!build) {
-          res.ok('No new commits found. No build scheduled.');
-          return null;
-        }
-
-        return GithubBuildStatusReporter.reportBuildStatus(build)
-          .then(() => buildSerializer.serialize(build));
-      })
-      .then((buildJSON) => {
-        if (buildJSON) {
-          res.json(buildJSON);
+        if (build) {
+          return GithubBuildStatusReporter.reportBuildStatus(build);
         }
       })
+      .then(() => res.ok())
       .catch((err) => {
         logger.error(err);
-        if (err.message) {
-          res.badRequest(err);
-        } else {
-          res.badRequest();
-        }
+        res.badRequest();
       });
   },
   organization(req, res) {
@@ -173,11 +162,7 @@ module.exports = {
       .then(() => res.ok())
       .catch((err) => {
         logger.error(err);
-        if (err.message) {
-          res.badRequest(err);
-        } else {
-          res.badRequest();
-        }
+        res.badRequest();
       });
   },
 };
