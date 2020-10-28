@@ -11,25 +11,6 @@ const { logger } = require('../../winston');
 
 const signBlob = (key, blob) => `sha1=${crypto.createHmac('sha1', key).update(blob).digest('hex')}`;
 
-const findUserForWebhookRequest = (request) => {
-  const username = request.body.sender.login;
-
-  return User.findOrCreate({
-    where: { username: username.toLowerCase() },
-    defaults: {
-      username,
-      isActive: false,
-    },
-  })
-    .then((users) => {
-      if (!users.length) {
-        throw new Error(`Unable to find or create Federalist user with username ${username}`);
-      } else {
-        return users[0];
-      }
-    });
-};
-
 const findSiteForWebhookRequest = (request) => {
   const owner = request.body.repository.full_name.split('/')[0].toLowerCase();
   const repository = request.body.repository.full_name.split('/')[1].toLowerCase();
@@ -103,10 +84,11 @@ const signWebhookRequest = request => new Promise((resolve, reject) => {
 const createBuildForWebhookRequest = async (request) => {
   const { login } = request.body.sender;
   const username = login.toLowerCase();
-  const user = return User.findOne({ where: { username } });
+  const user = await User.findOne({ where: { username } });
   const site = findSiteForWebhookRequest(request);
 
   if (user) {
+    await user.update({ pushedAt: new Date() })
     await addUserToSite({ user, site });
   }
 
