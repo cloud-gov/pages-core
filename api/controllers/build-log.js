@@ -23,7 +23,7 @@ const buildLogsQuery = `
         FROM buildlog
       WHERE build = :buildid
         AND source = 'ALL'
-    ORDER BY id
+      ORDER BY id
             OFFSET :offset
             FETCH NEXT :limit ROWS ONLY
     ) AS bl
