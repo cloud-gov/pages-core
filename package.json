@@ -149,7 +149,7 @@
     "sass": "^1.26.11",
     "sass-loader": "^10.0.2",
     "serve": "^11.3.2",
-    "shortid": "^2.2.8",
+    "shortid": "^2.2.16",
     "sinon": "9.2.0",
     "style-loader": "^2.0.0",
     "supertest": "^5.0.0",
