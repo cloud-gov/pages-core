@@ -55,6 +55,8 @@ const BuildLogs = {
       include: [{
         model: Site,
         required: true,
+        // If the site has been deleted we still want to archive the logs
+        paranoid: false,
       }],
     });
     return this.archiveBuildLogs(build.Site, build);

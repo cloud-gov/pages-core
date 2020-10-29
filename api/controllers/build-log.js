@@ -1,3 +1,4 @@
+const moment = require('moment');
 const { wrapHandlers } = require('../utils');
 const buildLogSerializer = require('../serializers/build-log');
 const { Build, BuildLog, sequelize } = require('../models');
@@ -8,6 +9,38 @@ function decodeb64(str) {
     return Buffer.from(str, 'base64').toString('utf8');
   }
   return null;
+}
+
+async function getBuildLogsFromS3(build, offset, limit) {
+  const output = await BuildLogs.getBuildLogs(build, offset, offset + limit - 1);
+  return output ? [{ source: 'ALL', output }] : [];
+}
+
+const buildLogsQuery = `
+  SELECT bl.build, bl.source, STRING_AGG(bl.output, '\n') as output
+    FROM (
+      SELECT build, source, output
+        FROM buildlog
+      WHERE build = :buildid
+        AND source = 'ALL'
+      ORDER BY id
+            OFFSET :offset
+            FETCH NEXT :limit ROWS ONLY
+    ) AS bl
+  GROUP BY bl.build, bl.source
+`;
+
+async function getBuildLogsFromDatabase(build, offset, limit) {
+  const buildLogs = await sequelize.query(buildLogsQuery, {
+    model: BuildLog,
+    replacements: {
+      buildid: build.id,
+      limit,
+      offset,
+    },
+  });
+
+  return buildLogSerializer.serializeMany(buildLogs);
 }
 
 module.exports = wrapHandlers({
@@ -50,40 +83,17 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    if (build.logsS3Key) {
-      const buildLogs = [];
-      const output = await BuildLogs.getBuildLogs(build, byteOffset, byteOffset + byteLimit - 1);
-      if (output) {
-        buildLogs.push({ source: 'ALL', output });
+    const buildLogs = build.logsS3Key
+      ? await getBuildLogsFromS3(build, byteOffset, byteLimit)
+      : await getBuildLogsFromDatabase(build, lineOffset, lineLimit);
+
+    if (buildLogs.length === 0 && page === 1) {
+      const isExpired = moment(build.completedAt).isBefore(moment().subtract(179, 'days'));
+      if (isExpired) {
+        buildLogs.push({ source: 'ALL', output: 'Build logs are only retained for 180 days.' });
       }
-      return res.ok(buildLogs);
     }
 
-    const query = `
-        SELECT bl.build, bl.source, STRING_AGG(bl.output, '\n') as output
-          FROM (
-            SELECT build, source, output
-              FROM buildlog
-             WHERE build = :buildid
-               AND source = 'ALL'
-          ORDER BY id
-                   OFFSET :offset
-                   FETCH NEXT :limit ROWS ONLY
-          ) AS bl
-      GROUP BY bl.build, bl.source
-    `;
-
-    const buildLogs = await sequelize.query(query, {
-      model: BuildLog,
-      replacements: {
-        buildid: build.id,
-        limit: lineLimit,
-        offset: lineOffset,
-      },
-    });
-
-    const serializedBuildLogs = buildLogSerializer.serializeMany(buildLogs);
-
-    return res.ok(serializedBuildLogs);
+    return res.ok(buildLogs);
   },
 });
