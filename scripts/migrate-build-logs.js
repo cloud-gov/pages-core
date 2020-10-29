@@ -45,9 +45,9 @@ async function runMigrateBuildLogs(startDateStr) {
       console.log(`\nArchiving build logs for ${date}`);
 
       // eslint-disable-next-line no-await-in-loop
-      const { results, errors } = await runArchiveBuildLogsDaily(date);
-      console.log(`  Success: ${results.length - errors.length} Failure: ${errors.length}`);
-      totalResults += results.length;
+      const { builds, errors } = await runArchiveBuildLogsDaily(date);
+      console.log(`  Success: ${builds.length - errors.length} Failure: ${errors.length}`);
+      totalResults += builds.length;
       totalErrors += errors.length;
     }
 
