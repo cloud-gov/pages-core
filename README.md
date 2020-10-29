@@ -255,6 +255,28 @@ doSomething();
 
 .
 
+## Build Logs
+
+Build logs are streamed directly to the database in realtime so they are immediately viewable by customers in the UI. Every night, build logs for completed builds for the day are archived in an S3 bucket and deleted from the database. This prevents the database from growing unreasonably. The S3 bucket (with assistance from cloud.gov) is configured with a lifecycle policy that expires the logs after 180 days in accordance with [cloud.gov's policies on log retention](https://cloud.gov/docs/deployment/logs/#web-based-logs-with-historic-log-data).
+
+Lifecycle policy:
+```
+{
+  Bucket: <bucket>,
+  LifecycleConfiguration: {
+    Rules: [
+      {
+        Expiration: {
+          Days: 180
+        },
+        ID: "Archive all objects 180 days after creation"
+        Status: "Enabled",
+      }
+    ]
+  }
+}
+```
+
 ## Initial proposal
 
 Federalist is new open source publishing system based on proven open source components and techniques. Once the text has been written, images uploaded, and a page is published, the outward-facing site will act like a simple web site -- fast, reliable, and easily scalable. Administrative tools, which require authentication and additional interactive components, can be responsive with far fewer users.
