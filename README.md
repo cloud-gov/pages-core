@@ -116,15 +116,17 @@ If you are working on the front end of the application, the things you need to k
 
 To analyze the contents of the front end JavaScript bundle, use `docker-compose run --service-ports app yarn analyze-webpack` after a build. Then visit http://127.0.0.1:8888 to see a visualization of the the bundle contents.
 
-### Environment variables
+### Deployment
 
-#### In Production
+#### Environment Variables
+
+Here `<environment>` refers the value set for the `APP_ENV` environment variable (ie: `production` or `staging`.
 
 We have a few environment variables that the application uses.
 In production, those variables are provided to the application either through the Cloud Foundry environment or through Cloud Foundry services.
 
-To inspect the way the environment is provided to the application in production and staging, look at `manifest.yml` and `staging_manifest.yml` respectively.
-To see how the application receives those configurations, looks at `config/env/production.js`.
+To inspect the way the environment is provided to the application in production and staging, look at `./.cloudgov/manifest.yml`.
+To see how the application receives those configurations, looks at `config/env/<environment>.js`.
 
 The following environment variables are set on the Cloud Foundry environment in the application manifest:
 
@@ -157,7 +159,9 @@ The app expects the following user provided services to be provided:
   - `region`: The AWS region
   - `sqs_url`: The AWS SQS queue URL
 
-Here `<environment>` refers the value set for the `APP_ENV` environment variable.
+#### Deploy in CloudFoundry
+To deploy to CloudFoundry submit the following:
+`cf push federalistapp --strategy rolling --vars-file "./.cloudgov/vars/${CF_SPACE}.yml" -f ./cloudgov/manifest.yml`
 
 ### Testing
 
