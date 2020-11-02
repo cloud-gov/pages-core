@@ -42,7 +42,7 @@ describe('BuildLogs Service', () => {
       const build = await factory.build();
       await factory.bulkBuildLogs(numLogs, { buildId: build.id, output: 'Foobarbaz' });
 
-      const logStr = await BuildLogs.fetchBuildLogs(build);
+      const { logs: logStr } = await BuildLogs.fetchBuildLogs(build);
 
       expect(logStr).to.be.a('string');
       expect(logStr.split('\n').length).to.equal(numLogs);
@@ -55,7 +55,7 @@ describe('BuildLogs Service', () => {
       it('returns null', async () => {
         const build = await factory.build();
 
-        const logStr = await BuildLogs.fetchBuildLogs(build);
+        const { logs: logStr } = await BuildLogs.fetchBuildLogs(build);
 
         expect(logStr).to.be.null;
       });

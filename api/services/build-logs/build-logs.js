@@ -66,7 +66,7 @@ const BuildLogs = {
   async getBuildLogs(build, startBytes, endBytes) {
     const params = {};
     try {
-      if (startBytes && endBytes) {
+      if (startBytes !== undefined && endBytes !== undefined) {
         params.Range = `bytes=${startBytes}-${endBytes}`;
       }
       const response = await this.s3().getObject(build.logsS3Key, params);
