@@ -144,7 +144,8 @@ Secrets cannot be kept in the application manifest so they are provided by Cloud
 The app expects the following user provided services to be provided:
 
 - `federalist-<environment>-rds`: A cloud.gov brokered service that allows the application to use RDS Postgres for its database
-- `federalist-<environment>-s3`: A cloud.gov brokered service that allows the application to work with the S3 bucket where Federalist's sites live
+- `federalist-<environment>-uev`: A user-provided service that provides the application with the secret key to securely encrypt user environment variable; this service provides the following credential:
+  - `key`: The encryption key to decrypt user environment variables
 - `federalist-<environment>-env`: A user-provided service that provides the application with secrets that cannot be added to `manifest.yml` b/c that file is under version control; this service provides the following:
   - `FEDERALIST_SESSION_SECRET`: The session secret used to sign entries in Federalist's session store
   - `GITHUB_CLIENT_CALLBACK_URL`: The callback URL used for GitHub authentication
