@@ -67,6 +67,23 @@ async function fetchMe() {
   return get('/me');
 }
 
+async function fetchBuildLogEventSource(id, onMessage) {
+  const es = new EventSource(`${apiUrl}/admin/builds/${id}/log`, { withCredentials: true });
+  es.addEventListener('message', onMessage);
+  es.addEventListener('error', (error) => {
+    // eslint-disable-next-line no-console
+    console.error('EventSource failed:', error);
+    if (es) {
+      es.close();
+    }
+  });
+  return es;
+}
+
+async function fetchBuild(id) {
+  return get(`/builds/${id}`).catch(() => null);
+}
+
 async function fetchBuilds(query = {}) {
   return get('/builds', query).catch(() => []);
 }
@@ -94,6 +111,8 @@ async function logout() {
 export {
   destroySite,
   fetchMe,
+  fetchBuildLogEventSource,
+  fetchBuild,
   fetchBuilds,
   fetchEvents,
   fetchSite,

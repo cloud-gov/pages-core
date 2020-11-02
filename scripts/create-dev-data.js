@@ -186,7 +186,7 @@ async function createData({ githubUsername }) {
   );
 
   await BuildLog.bulkCreate(
-    Array(2000).fill(0).map((_v, idx) => ({
+    Array(1000).fill(0).map((_v, idx) => ({
       output: log(`Message ${idx} - A much longer log message to test that the horizontal scrolling is working the way we want.`),
       source: 'ALL',
       build: goSiteBuilds[0].id,

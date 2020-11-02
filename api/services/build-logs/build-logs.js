@@ -14,32 +14,33 @@ const BuildLogs = {
     return `${site.owner}/${site.repository}/${build.id}`;
   },
 
-  async fetchBuildLogs(build) {
+  async fetchBuildLogs(build, offset) {
     const query = `
-      SELECT STRING_AGG(bl.output, '\n') as output
+      SELECT COUNT(*) as numlines,
+             STRING_AGG(bl.output, '\n') as logs
         FROM (
           SELECT output
             FROM buildlog
           WHERE build = :buildid
         ORDER BY id
+        ${offset ? 'OFFSET :offset' : ''}
         ) AS bl
     `;
 
-    const { output } = await sequelize.query(query, {
+    return sequelize.query(query, {
       replacements: {
         buildid: build.id,
+        offset,
       },
       plain: true,
       raw: true,
       type: QueryTypes.SELECT,
     });
-
-    return output;
   },
 
   async archiveBuildLogs(site, build) {
     const key = this.buildKey(site, build);
-    const logs = await this.fetchBuildLogs(build);
+    const { logs } = await this.fetchBuildLogs(build);
     if (!logs) {
       return;
     }
@@ -63,8 +64,11 @@ const BuildLogs = {
   },
 
   async getBuildLogs(build, startBytes, endBytes) {
+    const params = {};
     try {
-      const params = { Range: `bytes=${startBytes}-${endBytes}` };
+      if (startBytes && endBytes) {
+        params.Range = `bytes=${startBytes}-${endBytes}`;
+      }
       const response = await this.s3().getObject(build.logsS3Key, params);
       return response.Body.toString();
     } catch (error) {
