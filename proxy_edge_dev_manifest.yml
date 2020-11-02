@@ -3,8 +3,7 @@ applications:
 - name: federalistapp-proxy-edge-dev
   buildpack: nodejs_buildpack
   routes:
-    - route: federalist-proxy-edge-dev.fr.cloud.gov
-    - route: federalistapp-proxy-edge-dev.fr.cloud.gov
+    - route: federalistapp-proxy-edge-dev.18f.gov
     - route: federalistapp-proxy-edge-dev.apps.internal
   disk_quota: 2G
   memory: 256MB
@@ -25,7 +24,7 @@ applications:
   env:
     NODE_ENV: production
     APP_ENV: staging
-    APP_HOSTNAME: https://federalistapp-proxy-edge-dev.fr.cloud.gov
+    APP_HOSTNAME: https://federalistapp-proxy-edge-dev.18f.gov
     CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
     CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
     HOMEPAGE_URL: https://federalist-proxy-edge-dev.18f.gov
@@ -33,7 +32,7 @@ applications:
     NPM_CONFIG_PRODUCTION: true
     NODE_MODULES_CACHE: false
     FEDERALIST_PREVIEW_HOSTNAME: https://*.sites-staging.federalist.18f.gov
-    SOCKET_HOST: https://federalistapp-proxy-edge-dev.fr.cloud.gov
+    SOCKET_HOST: https://federalistapp-proxy-edge-dev.18f.gov
     USER_AUDITOR: federalist
     S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
     PROXY_SITE_TABLE: federalist-proxy-staging
