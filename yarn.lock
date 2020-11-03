@@ -6733,10 +6733,10 @@ json-parse-better-errors@^1.0.1, json-parse-better-errors@^1.0.2:
   resolved "https://registry.yarnpkg.com/json-parse-better-errors/-/json-parse-better-errors-1.0.2.tgz#bb867cfb3450e69107c131d1c514bab3dc8bcaa9"
   integrity sha512-mrqyZKfX5EhL7hvqcV6WG1yYjnjeuYDzDhhcAAUrq8Po85NBQBJP+ZDUT75qZQ98IkUoBqdkExkukOU7Ts2wrw==
 
-json-schema-deref-sync@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/json-schema-deref-sync/-/json-schema-deref-sync-0.13.0.tgz#cb08b4ff435a48b5a149652d7750fdd071009823"
-  integrity sha512-YBOEogm5w9Op337yb6pAT6ZXDqlxAsQCanM3grid8lMWNxRJO/zWEJi3ZzqDL8boWfwhTFym5EFrNgWwpqcBRg==
+json-schema-deref-sync@^0.14.0:
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/json-schema-deref-sync/-/json-schema-deref-sync-0.14.0.tgz#d55cdb8e3d7c26f63f28ffe67601ad2f69bfd779"
+  integrity sha512-yGR1xmhdiD6R0MSrwWcFxQzAj5b3i5Gb/mt5tvQKgFMMeNe0KZYNEN/jWr7G+xn39Azqgcvk4ZKMs8dQl8e4wA==
   dependencies:
     clone "^2.1.2"
     dag-map "~1.0.0"
