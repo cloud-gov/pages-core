@@ -20,7 +20,7 @@ services:
       FEATURE_PROXY_EDGE_DYNAMO: 'true'
       FEATURE_ADMIN_AUTH: 'true'
   admin-client:
-    image: node:12
+    image: node:14.15
     working_dir: /app
     volumes:
       - ./admin-client:/app
