@@ -39,20 +39,6 @@ function setUserInLocals(req, res, next) {
   return next();
 }
 
-function frRedirect(req, res, next) {
-  const host = req.hostname;
-  const redirectUrls = [
-    'federalist.fr.cloud.gov',
-    'federalist-staging.fr.cloud.gov',
-  ];
-
-  if (redirectUrls.indexOf(host) !== -1) {
-    return res.redirect(301, `https://${host.slice().replace('fr.cloud', '18f')}`);
-  }
-
-  return next();
-}
-
 function cacheControl(req, res, next) {
   res.set('Cache-Control', 'max-age=0');
   next();
@@ -83,8 +69,6 @@ function init(app) {
 
   app.use(slowDown(config.rateSlowing));
   app.use(rateLimit(config.rateLimiting));
-
-  app.use(frRedirect);
 
   maybeUseExpressLogger(app);
 

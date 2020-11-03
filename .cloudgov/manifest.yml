@@ -3,9 +3,7 @@ applications:
   - name: ((name))
     buildpack: nodejs_buildpack
     routes:
-      - route: federalist((env_postfix)).fr.cloud.gov
       - route: federalistapp((env_postfix)).18f.gov
-      - route: federalistapp((env_postfix)).fr.cloud.gov
       - route: federalistapp((env_postfix)).apps.internal
     disk_quota: 2G
     memory: ((memory))
@@ -34,7 +32,7 @@ applications:
       LOG_LEVEL: ((log_level))
       NPM_CONFIG_PRODUCTION: true
       NODE_MODULES_CACHE: false
-      SOCKET_HOST: https://federalistapp((env_postfix)).fr.cloud.gov
+      SOCKET_HOST: https://federalistapp((env_postfix)).18f.gov
       USER_AUDITOR: federalist
       S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
       FEATURE_ADMIN_AUTH: ((feature_admin_auth))

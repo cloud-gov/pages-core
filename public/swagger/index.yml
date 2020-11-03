@@ -3,7 +3,7 @@ info:
   title: Federalist API
   description: API for interacting with Federalist
   version: "0.0.0"
-host: federalist-staging.fr.cloud.gov
+host: federalistapp-staging.18f.gov
 schemes:
   - https
 basePath: /v0
