@@ -37,7 +37,7 @@
   });
 
   onDestroy(() => {
-    if (buildLogEventSource) {
+    if (buildLogEventSource && buildLogEventSource.readyState !== 2) {
       buildLogEventSource.close();
     }
   });
