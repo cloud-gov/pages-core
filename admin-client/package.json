@@ -9,6 +9,10 @@
     "lint": "eslint src/",
     "start": "sirv public -p 3000 --host --single --dev"
   },
+  "engines": {
+    "node": "14.x.x",
+    "npm": "6.x.x"
+  },  
   "devDependencies": {
     "@rollup/plugin-commonjs": "^12.0.0",
     "@rollup/plugin-node-resolve": "^8.0.0",
