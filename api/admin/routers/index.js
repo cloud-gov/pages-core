@@ -15,6 +15,8 @@ const ensureAuthenticated = (req, res, next) => {
 const authenticatedRouter = Router();
 authenticatedRouter.use(ensureAuthenticated);
 authenticatedRouter.get('/builds', AdminBuildController.findAllBuilds);
+authenticatedRouter.get('/builds/:id', AdminBuildController.findById);
+authenticatedRouter.get('/builds/:id/log', AdminBuildController.findBuildLog);
 authenticatedRouter.get('/events', AdminEventController.list);
 authenticatedRouter.get('/sites', AdminSiteController.findAllSites);
 authenticatedRouter.get('/sites/:id', AdminSiteController.findById);
