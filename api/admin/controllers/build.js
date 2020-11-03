@@ -8,7 +8,6 @@ const { wait } = require('../../utils');
 function safeWrite(res, data) {
   if (data && !res.writableEnded) {
     res.write(`data: ${JSON.stringify(data)}\n\n`);
-    res.flush();
   }
 }
 
