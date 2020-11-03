@@ -67,7 +67,7 @@ async function fetchMe() {
   return get('/me');
 }
 
-async function fetchBuildLogEventSource(id, onMessage) {
+function fetchBuildLogEventSource(id, onMessage) {
   const es = new EventSource(`${apiUrl}/admin/builds/${id}/log`, { withCredentials: true });
   es.addEventListener('message', onMessage);
   es.addEventListener('error', (error) => {
