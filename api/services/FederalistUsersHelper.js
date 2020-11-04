@@ -71,11 +71,11 @@ const refreshIsActiveUsers = async (auditorUsername = config.federalistUsers.adm
       },
       returning: ['id', 'isActive'],
     });
-  
+
   activeUsers.map(user => EventCreator.audit(Event.labels.UPDATED, user, {
     action: { isActive: user.isActive },
   }));
-  
+
   const [, inactiveUsers] = await User.update({ isActive: false },
     {
       where: {
@@ -126,19 +126,22 @@ const removeMembersWhoAreNotUsers = async ({ auditorUsername }) => {
   /* eslint-disable no-param-reassign */
   auditorUsername = auditorUsername || config.federalistUsers.admin;
   /* eslint-enable no-param-reassign */
-  
+
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
 
   const allUsers = await User.findAll({ attributes: ['username'] });
   const allUsernames = allUsers.map(user => user.username);
 
-  const allMembers = await GitHub.getOrganizationMembers(githubAccessToken, config.federalistUsers.orgName);
+  const allMembers = await GitHub
+    .getOrganizationMembers(githubAccessToken, config.federalistUsers.orgName);
   const allMemberLogins = allMembers.map(member => member.login);
 
-  const memberLoginsToRemove = allMemberLogins.filter(login => !allUsernames.includes(login.toLowerCase()));
+  const memberLoginsToRemove = allMemberLogins
+    .filter(login => !allUsernames.includes(login.toLowerCase()));
   return Promise.all(memberLoginsToRemove.map(login => removeMember(githubAccessToken, login)));
 };
 
 module.exports = {
-  audit18F, federalistUsersAdmins, refreshIsActiveUsers, revokeMembershipForInactiveUsers, removeMembersWhoAreNotUsers
+  audit18F, federalistUsersAdmins, refreshIsActiveUsers,
+  revokeMembershipForInactiveUsers, removeMembersWhoAreNotUsers,
 };

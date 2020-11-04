@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 const Sequelize = require('sequelize');
 const config = require('../../config');
-const buildSerializer = require('../serializers/build');
 const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
 const EventCreator = require('../services/EventCreator');
 const {
@@ -83,13 +82,13 @@ const signWebhookRequest = request => new Promise((resolve, reject) => {
 
 const createBuildForWebhookRequest = async (request) => {
   const { login } = request.body.sender;
-  const { pushed_at } = request.body.repository;
+  const { pushed_at: pushedAt } = request.body.repository;
   const username = login.toLowerCase();
   const user = await User.findOne({ where: { username } });
   const site = findSiteForWebhookRequest(request);
 
   if (user) {
-    await user.update({ pushedAt: new Date(pushed_at * 1000) });
+    await user.update({ pushedAt: new Date(pushedAt * 1000) });
     await addUserToSite({ user, site });
   }
 
@@ -121,25 +120,25 @@ const createBuildForWebhookRequest = async (request) => {
 };
 
 module.exports = {
-  github(req, res) {
+  github: (req, res) => {
     signWebhookRequest(req)
-      .then(() => {
-        if (req.body.commits && req.body.commits.length > 0) {
-          return createBuildForWebhookRequest(req);
-        }
-      })
-      .then((build) => {
-        if (build) {
-          return GithubBuildStatusReporter.reportBuildStatus(build);
-        }
-      })
-      .then(() => res.ok())
-      .catch((err) => {
-        logger.error(err);
-        res.badRequest();
-      });
+    .then(() => {
+      if (req.body.commits && req.body.commits.length > 0) {
+        return createBuildForWebhookRequest(req);
+      }
+    })
+    .then((build) => {
+      if (build) {
+        return GithubBuildStatusReporter.reportBuildStatus(build);
+      }
+    })
+    .then(() => res.ok())
+    .catch((err) => {
+      logger.error(err);
+      res.badRequest();
+    });
   },
-  organization(req, res) {
+  organization: (req, res) => {
     signWebhookRequest(req)
       .then(() => organizationWebhookRequest(req.body))
       .then(() => res.ok())
