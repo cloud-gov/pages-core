@@ -142,6 +142,9 @@ const removeMembersWhoAreNotUsers = async ({ auditorUsername }) => {
 };
 
 module.exports = {
-  audit18F, federalistUsersAdmins, refreshIsActiveUsers,
-  revokeMembershipForInactiveUsers, removeMembersWhoAreNotUsers,
+  audit18F,
+  federalistUsersAdmins,
+  refreshIsActiveUsers,
+  revokeMembershipForInactiveUsers,
+  removeMembersWhoAreNotUsers,
 };

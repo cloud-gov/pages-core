@@ -120,31 +120,29 @@ const createBuildForWebhookRequest = async (request) => {
 };
 
 module.exports = {
-  github: (req, res) => {
-    signWebhookRequest(req)
+  github: (req, res) => signWebhookRequest(req)
     .then(() => {
       if (req.body.commits && req.body.commits.length > 0) {
         return createBuildForWebhookRequest(req);
       }
+      return Promise.resolve();
     })
     .then((build) => {
       if (build) {
         return GithubBuildStatusReporter.reportBuildStatus(build);
       }
+      return Promise.resolve();
     })
     .then(() => res.ok())
     .catch((err) => {
       logger.error(err);
       res.badRequest();
-    });
-  },
-  organization: (req, res) => {
-    signWebhookRequest(req)
-      .then(() => organizationWebhookRequest(req.body))
-      .then(() => res.ok())
-      .catch((err) => {
-        logger.error(err);
-        res.badRequest();
-      });
-  },
+    }),
+  organization: (req, res) => signWebhookRequest(req)
+    .then(() => organizationWebhookRequest(req.body))
+    .then(() => res.ok())
+    .catch((err) => {
+      logger.error(err);
+      res.badRequest();
+    }),
 };
