@@ -2,7 +2,9 @@
 const { revokeMembershipForInactiveUsers, removeMembersWhoAreNotUsers } = require('../api/services/FederalistUsersHelper');
 
 Promise.all([
-	revokeMembershipForInactiveUsers(),
-	removeMembersWhoAreNotUsers()
-])
-.catch(logger.);
+  revokeMembershipForInactiveUsers(),
+  removeMembersWhoAreNotUsers(),
+]).catch((err) => {
+  console.error(err);
+  throw err;
+});
