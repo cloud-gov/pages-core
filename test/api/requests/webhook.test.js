@@ -572,16 +572,39 @@ describe('Webhook API', () => {
           done();
         });
     });
+    it('should create a new user added to federalist-users', (done) => {
+      const username = 'added_member';
+      User.findOne({ where: { username } })
+        .then((user) => {
+          expect(user).to.be.null;
+          const payload = organizationWebhookPayload('member_added', username);
+          const signature = signWebhookPayload(payload);
 
-    it('should set a user to Active if added to federalist-users', (done) => {
+          return request(app)
+            .post('/webhook/organization')
+            .send(payload)
+            .set({
+              'X-GitHub-Event': 'push',
+              'X-Hub-Signature': signature,
+              'X-GitHub-Delivery': '123abc',
+            })
+            .expect(200);
+        })
+        .then(() => User.findOne({ where: { username } }))
+        .then((user) => {
+          expect(user.isActive).to.be.true;
+          done();
+        });
+    });
+
+    it('should set an existing user to Active if added to federalist-users', (done) => {
       let user;
-      let payload;
 
       factory.user()
         .then((model) => {
           user = model;
           expect(user.isActive).to.be.false;
-          payload = organizationWebhookPayload('member_added', user.username);
+          const payload = organizationWebhookPayload('member_added', user.username);
           const signature = signWebhookPayload(payload);
 
           return request(app)

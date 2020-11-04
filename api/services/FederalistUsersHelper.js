@@ -76,7 +76,7 @@ const refreshIsActiveUsers = async (auditorUsername = config.federalistUsers.adm
     action: { isActive: user.isActive },
   }));
   
-  const [, inActiveUsers] = await User.update({ isActive: false },
+  const [, inactiveUsers] = await User.update({ isActive: false },
     {
       where: {
         username: { [Op.notIn]: logins },
@@ -94,11 +94,12 @@ const removeMember = (githubAccessToken, login) => GitHub
   .removeOrganizationMember(githubAccessToken, FEDERALIST_ORG, login)
   .catch(error => EventCreator.error(Event.labels.FEDERALIST_USERS, { error, login, action: 'removeOrgMember' }));
 
-const removeInactiveUsers = async ({ auditorUsername }) => {
+const revokeMembershipForInactiveUsers = async ({ auditorUsername }) => {
   /* eslint-disable no-param-reassign */
   auditorUsername = auditorUsername || config.federalistUsers.admin;
   /* eslint-enable no-param-reassign */
-  
+  const now = moment();
+  const cutoff = now.clone().subtract(MAX_DAYS_SINCE_LOGIN, 'days');
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
 
   const users = await User.findAll({
@@ -117,9 +118,10 @@ const removeInactiveUsers = async ({ auditorUsername }) => {
     },
   });
 
-  await Promise.all(users.map(user => removeMember(githubAccessToken, user.username)));
+  return Promise.all(users.map(user => removeMember(githubAccessToken, user.username)));
 };
 
+// remove GitHub org members that are not in the user table
 const removeMembersWhoAreNotUsers = async ({ auditorUsername }) => {
   /* eslint-disable no-param-reassign */
   auditorUsername = auditorUsername || config.federalistUsers.admin;
@@ -127,19 +129,16 @@ const removeMembersWhoAreNotUsers = async ({ auditorUsername }) => {
   
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
 
-  // remove GitHub org members that are not in the user table
-  const allUsers = await User.findAll({ attributes: [username] });
+  const allUsers = await User.findAll({ attributes: ['username'] });
   const allUsernames = allUsers.map(user => user.username);
 
-  const members = await GitHub
-    .getOrganizationMembers(githubAccessToken, config.federalistUsers.orgName);
-  const memberLogins = members.map(member => member.login);
+  const allMembers = await GitHub.getOrganizationMembers(githubAccessToken, config.federalistUsers.orgName);
+  const allMemberLogins = allMembers.map(member => member.login);
 
-  const membersNotUsers = memberLogins.filter(login => !allUsernames.includes(login.toLowerCase()));
-
-  await Promise.all(membersNotUser.map(member => removeMember(githubAccessToken, member.login)));
+  const memberLoginsToRemove = allMemberLogins.filter(login => !allUsernames.includes(login.toLowerCase()));
+  return Promise.all(memberLoginsToRemove.map(login => removeMember(githubAccessToken, login)));
 };
 
 module.exports = {
-  audit18F, federalistUsersAdmins, refreshIsActiveUsers, removeInactiveMembers, removeMembersWhoAreNotUsers
+  audit18F, federalistUsersAdmins, refreshIsActiveUsers, revokeMembershipForInactiveUsers, removeMembersWhoAreNotUsers
 };

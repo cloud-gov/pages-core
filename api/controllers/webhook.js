@@ -53,7 +53,7 @@ const organizationWebhookRequest = async (payload) => {
     if (!user) {
       await User.create({
         username,
-        active: false,
+        isActive: true,
       });
     } else if (!user.isActive) {
       await user.update({ isActive: true });
@@ -83,12 +83,13 @@ const signWebhookRequest = request => new Promise((resolve, reject) => {
 
 const createBuildForWebhookRequest = async (request) => {
   const { login } = request.body.sender;
+  const { pushed_at } = request.body.repository;
   const username = login.toLowerCase();
   const user = await User.findOne({ where: { username } });
   const site = findSiteForWebhookRequest(request);
 
   if (user) {
-    await user.update({ pushedAt: new Date() })
+    await user.update({ pushedAt: new Date(pushed_at * 1000) });
     await addUserToSite({ user, site });
   }
 

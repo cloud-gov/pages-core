@@ -1,5 +1,8 @@
 /* eslint-disable no-console */
-const { removeInactiveMembers, removeMembersWhoAreNotUsers } = require('../api/services/FederalistUsersHelper');
+const { revokeMembershipForInactiveUsers, removeMembersWhoAreNotUsers } = require('../api/services/FederalistUsersHelper');
 
-removeInactiveMembers();
-removeMembersWhoAreNotUsers();
+Promise.all([
+	revokeMembershipForInactiveUsers(),
+	removeMembersWhoAreNotUsers()
+])
+.catch(logger.);
