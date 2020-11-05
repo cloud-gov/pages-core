@@ -30,7 +30,7 @@ const generateToken = () => URLSafeBase64.encode(crypto.randomBytes(32));
 const beforeValidate = (build) => {
   const { token, username } = build;
   build.token = token || generateToken(); // eslint-disable-line no-param-reassign
-  build.username = username && username.toLowerCase();
+  build.username = username && username.toLowerCase(); // eslint-disable-line no-param-reassign
 };
 
 const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');

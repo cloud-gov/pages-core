@@ -48,7 +48,6 @@ const buildStateData = ({ state, error }) => {
 };
 
 class SiteBuilds extends React.Component {
-
   static buildLogsLink(build) {
     return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>View logs</Link>;
   }
