@@ -41,6 +41,7 @@ describe('<SiteBuilds/>', () => {
       completedAt: '2016-12-28T12:05:00',
       state: 'success',
       commitSha: '123A',
+      username: 'build-username',
     };
     props = {
       builds: {
@@ -71,11 +72,11 @@ describe('<SiteBuilds/>', () => {
     const userIndex = columnIndex(wrapper, 'User');
 
     const userCell = wrapper.find('tr').at(1).find('td').at(userIndex - 1);
-    expect(userCell.text()).to.equal(user.username);
+    expect(userCell.text()).to.equal(build.username);
   });
 
   it('should render an empty string for the username for builds where there is no user', () => {
-    build.user = undefined;
+    build.username = undefined;
     const wrapper = shallow(<SiteBuilds {...props} />);
 
     const userCell = wrapper.find('td[data-title="User"]');

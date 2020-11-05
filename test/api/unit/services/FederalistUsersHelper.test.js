@@ -176,76 +176,66 @@ describe('FederalistUsersHelper', () => {
     });
   });
 
-  describe('removeInactiveMembers', () => {
+  describe('revokeMembershipForInactiveUsers', () => {
     afterEach( async () => {
-      await Event.truncate();
-    })
-    it('should not remove a member if they have logged in within 90 days', async () => {
-      const signedInAt = new Date();
-      const admin = await factory.user();
-
-      await Promise.all(Array(10).fill(0).map( async (a, index) => {
-        const u = await factory.user({ isActive: true, signedInAt })
-        addMember('federalist-users', u.username)
-      }));
-      expect(getOrg('federalist-users').length).to.equal(20);
-      await FederalistUsersHelper.removeInactiveMembers({ auditorUsername: admin.username });
-      expect(removeOrganizationMemberStub.callCount).to.equal(10);
-      expect(getOrg('federalist-users').length).to.equal(10);
+      await User.truncate();
     });
-
-    it('should remove a member if they have not logged in for > 90 days or never', async () => {
+    it('should remove user created, pushed and signed in before x cutoff days', async () => {
+      const admin = await factory.user();
+      const before = new Date('2020-02-02');
       const now = new Date();
-      const past = new Date('2000-01-01');
-      const admin = await factory.user();
-
-      await Promise.all(Array(10).fill(0).map( async (a, index) => {
-        const u = await factory.user({ isActive: true, signedInAt: (index > 6 ? past : now ) })
-        addMember('federalist-users', u.username)
-      }));
-
-      expect(getOrg('federalist-users').length).to.equal(20);
-      await FederalistUsersHelper.removeInactiveMembers({ auditorUsername: admin.username });
-      expect(removeOrganizationMemberStub.callCount).to.equal(13);
-      expect(getOrg('federalist-users').length).to.equal(7);
+      const inactiveUsers = await Promise.all([
+        factory.user({ pushedAt: before, signedInAt: before, isActive: true }),
+        factory.user({ pushedAt: before, signedInAt: before, isActive: true }),
+      ]);
+      await sequelize.query(`UPDATE "user" set "createdAt" = '2000-01-01' where id in (${inactiveUsers.map(u => u.id).join(',')});`);
+      const activeUsers = await Promise.all([
+        factory.user({ isActive: true }),
+        factory.user({ isActive: true }),
+        factory.user({ isActive: true }),
+      ]);
+      const newUsers = inactiveUsers.concat(activeUsers);
+      newUsers.forEach(user => addMember('federalist-users', user.username));
+      expect(getOrg('federalist-users').length).to.equal(15);
+      await FederalistUsersHelper.revokeMembershipForInactiveUsers({ auditorUsername: admin.username });
+      expect(removeOrganizationMemberStub.callCount).to.equal(2);
+      expect(getOrg('federalist-users').length).to.equal(13);
     });
 
-    it('should not remove a member if never logged in within 90 days of joining', async () => {
+    it('should not remove user if created, pushed or signed in within x cutoff days', async () => {
       const admin = await factory.user();
-
-      await Promise.all(getOrg('federalist-users')
-        .map(member => EventCreator.audit(Event.labels.FEDERALIST_USERS, User.build(), {
-          action: 'member_added',
-          membership: { user: { login: member.login } },
-        })));
-
-      expect(getOrg('federalist-users').length).to.equal(10);
-      await FederalistUsersHelper.removeInactiveMembers({ auditorUsername: admin.username });
+      const before = new Date('2020-02-02');
+      const now = new Date();
+      const oldCreatedAtUsers = await Promise.all([
+        factory.user({ pushedAt: before, signedInAt: now, isActive: true }),
+        factory.user({ pushedAt: now, signedInAt: before, isActive: true }),
+      ]);
+      await sequelize.query(`UPDATE "user" set "createdAt" = '2000-01-01' where id in (${oldCreatedAtUsers.map(u => u.id).join(',')});`);
+      const newCreatedAtUsers = await Promise.all([
+        factory.user({ pushedAt: before, signedInAt: before, isActive: true }),
+        factory.user({ isActive: true }),
+        factory.user({ isActive: true }),
+      ]);
+      const testUsers = oldCreatedAtUsers.concat(newCreatedAtUsers);    
+      testUsers.forEach(user => addMember('federalist-users', user.username));
+      expect(getOrg('federalist-users').length).to.equal(15);
+      await FederalistUsersHelper.revokeMembershipForInactiveUsers({ auditorUsername: admin.username });
       expect(removeOrganizationMemberStub.callCount).to.equal(0);
-      expect(getOrg('federalist-users').length).to.equal(10);
+      expect(getOrg('federalist-users').length).to.equal(15);
     });
+  });
 
-    it('should remove a member if never logged in after 90 days of joining', async () => {
+  describe('removeMembersWhoAreNotUsers', () => {
+    afterEach( async () => {
+      await User.truncate();
+    });
+    it('should only remove github org members who are not users', async () => {
       const admin = await factory.user();
-
-      const events = await Promise.all(getOrg('federalist-users')
-        .map((member, index) => {
-        if(index < 7) {
-          return EventCreator.audit(Event.labels.FEDERALIST_USERS, User.build(), {
-            action: 'member_added',
-            membership: { user: { login: member.login } },
-          });
-        }
-      }));
-
-      const eventIds = events.slice(0,3).map(e => e.id);
-      await sequelize.query(`UPDATE event set "createdAt" = '2000-01-01' where id in (${eventIds.join(',')});`);
-
-      expect(getOrg('federalist-users').length).to.equal(10);
-      await FederalistUsersHelper.removeInactiveMembers({ auditorUsername: admin.username });
-      expect(removeOrganizationMemberStub.callCount).to.equal(6);
-      expect(getOrg('federalist-users').length).to.equal(4);
+      const users = await Promise.all(Array(5).fill(0).map((i) => factory.user()));
+      users.forEach(user => addMember('federalist-users', user.username));
+      expect(getOrg('federalist-users').length).to.equal(15);
+      await FederalistUsersHelper.removeMembersWhoAreNotUsers({ auditorUsername: admin.username });
+      expect(getOrg('federalist-users').length).to.equal(5);
     });
-
   });
 });

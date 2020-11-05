@@ -10,6 +10,7 @@ const githubAPINocks = require('../support/githubAPINocks');
 const { Build, Site, User, Event } = require('../../../api/models');
 const SQS = require('../../../api/services/SQS');
 const EventCreator = require('../../../api/services/EventCreator');
+const GithubBuildStatusReporter = require('../../../api/services/GithubBuildStatusReporter');
 
 describe('Webhook API', () => {
   const signWebhookPayload = (payload) => {
@@ -18,12 +19,12 @@ describe('Webhook API', () => {
     return `sha1=${crypto.createHmac('sha1', secret).update(blob).digest('hex')}`;
   };
 
-  const buildWebhookPayload = (user, site) => ({
+  const buildWebhookPayload = (user, site, pushedAt = new Date().getTime()/1000) => ({
     ref: 'refs/heads/main',
     commits: [{ id: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7' }],
     after: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
     sender: { login: user.username },
-    repository: { full_name: `${site.owner}/${site.repository}` },
+    repository: { full_name: `${site.owner}/${site.repository}`, pushed_at: pushedAt },
   });
 
   const organizationWebhookPayload = (action, login, organization='federalist-users') => ({
@@ -94,7 +95,7 @@ describe('Webhook API', () => {
         .catch(done);
     });
 
-    it('should create a user associated with the site for the sender if no user exists', (done) => {
+    it('should not create a user associated with the site for the sender if no user exists', (done) => {
       let site;
       const username = crypto.randomBytes(3).toString('hex');
 
@@ -115,21 +116,17 @@ describe('Webhook API', () => {
             })
             .expect(200);
         })
-        .then(response => Build.findByPk(response.body.id, { include: [User] }))
+        .then(() => Build.findOne({ where: { username }, limit: 1, order: [ [ 'createdAt', 'DESC' ]], include: [User] }))
         .then((build) => {
-          expect(build.User.username).to.equal(username);
-          return User.findByPk(build.User.id, { include: [Site] });
-        })
-        .then((user) => {
-          expect(user.Sites).to.have.length(1);
-          expect(user.Sites[0].id).to.equal(site.id);
-          expect(user.isActive).to.be.false;
+          expect(build.username).to.equal(username);
+          expect(build.User).to.be.null;
           done();
         })
         .catch(done);
     });
 
     it('should find the site by the lowercased owner and repository and upper cased github user', (done) => {
+      const reporterSpy = sinon.spy(GithubBuildStatusReporter, 'reportBuildStatus');
       let site;
       let user;
       const userPromise = factory.user();
@@ -144,6 +141,7 @@ describe('Webhook API', () => {
           const payload = buildWebhookPayload(user, site);
           payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
           const signature = signWebhookPayload(payload);
+          expect(reporterSpy.calledOnce).to.be.false;
 
           return request(app)
             .post('/webhook/github')
@@ -155,8 +153,15 @@ describe('Webhook API', () => {
             })
             .expect(200);
         })
-        .then((response) => {
-          expect(response.body.site.id).to.equal(site.id);
+        .then(() => Build.findOne({
+          where: { username: user.username.toLowerCase() },
+          limit: 1,
+          order: [ [ 'createdAt', 'DESC' ]],
+          include: [User],
+        }))
+        .then((build) => {
+          expect(reporterSpy.calledOnce).to.be.true;
+          expect(reporterSpy.args[0][0].id).to.equal(build.id);
           done();
         })
         .catch(done);
@@ -316,6 +321,7 @@ describe('Webhook API', () => {
           commitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
           state: 'queued',
           token: 'token',
+          username: user.username,
         }, { hooks: false });
 
         const numBuildsBefore = await Build.count({ where: { site: site.id, user: user.id } });
@@ -353,6 +359,7 @@ describe('Webhook API', () => {
           commitSha: origSha,
           state: 'queued',
           token: 'token',
+          username: user1.username,
         }, { hooks: false });
 
         const numBuildsBefore = await Build.count({ where: { site: site.id, branch } });
@@ -392,6 +399,7 @@ describe('Webhook API', () => {
           commitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
           state: 'queued',
           token: 'token',
+          username: user.username,
         }, { hooks: false });
 
         const payload = buildWebhookPayload(user, site);
@@ -431,6 +439,7 @@ describe('Webhook API', () => {
           commitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
           state: 'created',
           token: 'token',
+          username: user.username,
         }, { hooks: false });
 
         const numBuildsBefore = await Build.count({ where: { site: site.id, user: user.id } });
@@ -468,6 +477,7 @@ describe('Webhook API', () => {
           commitSha: origSha,
           state: 'created',
           token: 'token',
+          username: user1.username,
         }, { hooks: false });
 
         const numBuildsBefore = await Build.count({ where: { site: site.id, branch } });
@@ -507,6 +517,7 @@ describe('Webhook API', () => {
           commitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
           state: 'created',
           token: 'token',
+          username: user.username,
         }, { hooks: false });
 
         const payload = buildWebhookPayload(user, site);
@@ -572,16 +583,39 @@ describe('Webhook API', () => {
           done();
         });
     });
+    it('should create a new user added to federalist-users', (done) => {
+      const username = 'added_member';
+      User.findOne({ where: { username } })
+        .then((user) => {
+          expect(user).to.be.null;
+          const payload = organizationWebhookPayload('member_added', username);
+          const signature = signWebhookPayload(payload);
 
-    it('should set a user to Active if added to federalist-users', (done) => {
+          return request(app)
+            .post('/webhook/organization')
+            .send(payload)
+            .set({
+              'X-GitHub-Event': 'push',
+              'X-Hub-Signature': signature,
+              'X-GitHub-Delivery': '123abc',
+            })
+            .expect(200);
+        })
+        .then(() => User.findOne({ where: { username } }))
+        .then((user) => {
+          expect(user.isActive).to.be.true;
+          done();
+        });
+    });
+
+    it('should set an existing user to Active if added to federalist-users', (done) => {
       let user;
-      let payload;
 
       factory.user()
         .then((model) => {
           user = model;
           expect(user.isActive).to.be.false;
-          payload = organizationWebhookPayload('member_added', user.username);
+          const payload = organizationWebhookPayload('member_added', user.username);
           const signature = signWebhookPayload(payload);
 
           return request(app)

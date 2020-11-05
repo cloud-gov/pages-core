@@ -55,6 +55,9 @@ const attributes = DataTypes => ({
     defaultValue: false,
     allowNull: false,
   },
+  pushedAt: {
+    type: DataTypes.DATE,
+  },
 });
 
 const options = {

@@ -134,8 +134,8 @@ describe('Build API', () => {
         let promiseProps;
 
         beforeEach( async () => {
-          const userPromise = factory.user();
-          const sitePromise = await factory.site({ users: Promise.all([userPromise]) });
+          const userPromise = await factory.user();
+          const sitePromise = await factory.site({ users: [userPromise] });
           await Build.update(
             { state: 'success'}, //values
             { where: //options
@@ -537,7 +537,7 @@ describe('Build API', () => {
         user: userPromise,
       })
         .then(props => factory
-          .bulkBuild({ site: props.site.id, user: props.user.id }, 110)
+          .bulkBuild({ site: props.site.id, user: props.user.id, username: props.user.username }, 110)
           .then(() => props))
         .then(({ site, cookie }) => request(app)
           .get(`/v0/site/${site.id}/build`)

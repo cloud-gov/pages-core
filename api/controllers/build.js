@@ -79,6 +79,7 @@ module.exports = {
               branch: b.branch,
               site: b.site,
               user: req.user.id,
+              username: req.user.username,
               commitSha: b.commitSha,
             })
               .then(build => build.enqueue())

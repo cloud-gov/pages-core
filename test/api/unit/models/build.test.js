@@ -13,7 +13,7 @@ describe('Build model', () => {
   describe('before validate hook', () => {
     it('should add a build token', async () => {
       const site = await factory.site();
-      const build = await Build.build({ site: site.id, user: 1 });
+      const build = await Build.build({ site: site.id, user: 1, username: 'username' });
 
       await build.validate();
 
@@ -224,11 +224,11 @@ describe('Build model', () => {
         .rejectedWith(ValidationError, 'notNull Violation: Build.site cannot be null');
     });
 
-    it('should require a user object before saving', () => {
-      const buildPromise = Build.create({ user: null, site: 1 });
+    it('should require a username before saving', () => {
+      const buildPromise = Build.create({ useranme: null, site: 1 });
 
       return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'notNull Violation: Build.user cannot be null');
+        .rejectedWith(ValidationError, 'notNull Violation: Build.username cannot be null');
     });
 
     it('should require a valid sha before saving', () => {

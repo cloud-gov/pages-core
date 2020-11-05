@@ -1,4 +1,8 @@
 /* eslint-disable no-console */
 const { refreshIsActiveUsers } = require('../api/services/FederalistUsersHelper');
 
-refreshIsActiveUsers();
+refreshIsActiveUsers()
+  .catch((err) => {
+    console.error(err);
+    throw err;
+  });
