@@ -228,6 +228,22 @@ jobs:
           task-command: yarn nightly-builds
 
 
+  remove-inactive-federalist-users:
+    docker:
+      - image: cimg/base:2020.01
+    parameters:
+      app:
+        type: string
+    steps:
+      - checkout
+
+      - deploy-to-cg:
+          app: << parameters.app >>
+          action: task
+          task-name: remove-inactive-federalist-users
+          task-command: yarn remove-inactive-federalist-users
+
+
   timeout-builds:
     docker:
       - image: circleci/node:12
@@ -311,6 +327,21 @@ workflows:
 
       - nightly-builds:
           name: nightly-builds-production
+          app: federalistapp
+          filters:
+            branches:
+              only: main
+  -federalist-users-daily:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - remove-inactive-federalist-users:
+          name: remove-inactive-federalist-users
           app: federalistapp
           filters:
             branches:
