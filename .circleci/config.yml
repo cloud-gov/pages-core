@@ -328,7 +328,7 @@ workflows:
           filters:
             branches:
               only: main
-      -run-task:
+      - run-task:
           name: remove-inactive-federalist-users-production
           app: federalistapp
           task-name: remove-inactive-federalist-users
