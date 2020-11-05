@@ -224,11 +224,11 @@ describe('Build model', () => {
         .rejectedWith(ValidationError, 'notNull Violation: Build.site cannot be null');
     });
 
-    it('should require a user object before saving', () => {
-      const buildPromise = Build.create({ user: null, site: 1 });
+    it('should require a username before saving', () => {
+      const buildPromise = Build.create({ useranme: null, site: 1 });
 
       return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'notNull Violation: Build.user cannot be null');
+        .rejectedWith(ValidationError, 'notNull Violation: Build.username cannot be null');
     });
 
     it('should require a valid sha before saving', () => {
