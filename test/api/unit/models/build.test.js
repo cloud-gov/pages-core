@@ -13,7 +13,7 @@ describe('Build model', () => {
   describe('before validate hook', () => {
     it('should add a build token', async () => {
       const site = await factory.site();
-      const build = await Build.build({ site: site.id, user: 1 });
+      const build = await Build.build({ site: site.id, user: 1, username: 'username' });
 
       await build.validate();
 

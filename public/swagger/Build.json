@@ -6,7 +6,7 @@
     "site",
     "state",
     "updatedAt",
-    "user"
+    "username"
   ],
   "not": {
     "required": ["token"]
@@ -73,6 +73,9 @@
       "not": {
         "required": ["githubAccessToken", "githubUserId"]
       }
+    },
+    "username": {
+      "type": "string"
     }
   }
 }
