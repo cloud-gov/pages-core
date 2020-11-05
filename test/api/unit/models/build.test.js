@@ -22,7 +22,7 @@ describe('Build model', () => {
 
     it('should not override a build token if one exists', async () => {
       const site = await factory.site();
-      const build = await Build.build({ site: site.id, token: '123abc', user: 1 });
+      const build = await Build.build({ site: site.id, token: '123abc', username: 'username' });
 
       build.validate();
 
