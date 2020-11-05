@@ -1,3 +1,4 @@
+export { default as Build } from './Build.svelte';
 export { default as Builds } from './Builds.svelte';
 export { default as Events } from './Events.svelte';
 export { default as Home } from './Home.svelte';

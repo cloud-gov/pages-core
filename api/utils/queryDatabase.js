@@ -7,9 +7,9 @@ function buildWhereQuery(queryOptions = {}, queryFields = []) {
   return options;
 }
 
-async function fetchModelById(id, Model) {
+async function fetchModelById(id, Model, opts = {}) {
   const numId = utils.toInt(id);
-  return numId ? Model.findByPk(numId) : null;
+  return numId ? Model.findByPk(numId, opts) : null;
 }
 
 module.exports = {

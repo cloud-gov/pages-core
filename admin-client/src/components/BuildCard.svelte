@@ -4,19 +4,7 @@
   import LabeledItem from './LabeledItem.svelte';
 
   export let index = 0;
-  export let build = {
-    id: 3,
-    branch: 'demo-branch',
-    commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2',
-    completedAt: '2020-08-14T13:35:08.579Z',
-    source: 'fake-build',
-    state: 'error',
-    site: {},
-    user: {},
-    createdAt: '2020-08-14T13:35:08.580Z',
-    updatedAt: '2020-08-14T13:35:08.614Z',
-    viewLink: 'https://demo.example.gov/',
-  };
+  export let build = {};
   export let showSite = false;
 
   const {
@@ -34,25 +22,25 @@
 
   $: bgColor = index % 2 === 0 ? 'bg-gray-5' : 'bg-white';
 
-  const stateColors = {
-    error: 'bg-red',
-    queued: 'bg-gold',
+  const stateColor = (buildState) => ({
     success: 'bg-mint',
-  };
+    error: 'bg-red',
+    processing: 'bg-gold',
+  }[buildState] || 'bg-gray-30');
 </script>
 
 <div class="padding-2 {bgColor}">
   <div class="grid-container padding-top-1 shadow-2 bg-white">
     {#if showSite}
       <div class="grid-row padding-bottom-1">
-        <a href="/sites/{site.id}">
+        <a href="/builds/{id}">
           <h3 class="text-bold margin-0">{site.owner}/{site.repository}</h3>
         </a>
       </div>
     {/if}
     <div class="grid-row grid-gap">
       <div class="grid-col-auto padding-bottom-1">
-        <span class="usa-tag radius-pill {stateColors[state]}">{state}</span>
+        <span class="usa-tag radius-pill {stateColor(state)}">{state}</span>
       </div>
       <div class="grid-col-auto padding-bottom-1">
         <LabeledItem label="id" value={id} />

@@ -127,6 +127,10 @@ function canComplete(state) {
   return [States.Error, States.Success].includes(state);
 }
 
+function isComplete() {
+  return [States.Error, States.Success].includes(this.state);
+}
+
 function canStart(state) {
   return [States.Created, States.Queued, States.Tasked].includes(this.state)
     && state === States.Processing;
@@ -209,6 +213,7 @@ module.exports = (sequelize, DataTypes) => {
   Build.prototype.enqueue = enqueue;
   Build.prototype.updateJobStatus = updateJobStatus;
   Build.prototype.canComplete = canComplete;
+  Build.prototype.isComplete = isComplete;
   Build.prototype.canStart = canStart;
   Build.States = States;
   return Build;
