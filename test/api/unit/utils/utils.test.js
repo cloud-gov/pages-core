@@ -134,15 +134,40 @@ describe('utils', () => {
     });
   });
 
-  describe('.generateSubdomain', () => {
-    it('should equal generateS3ServiceName', (done) => {
-      const owner = 'Hello';
-      const repository = 'Hello World';
-      const expected = 'o-hello-r-hello-world';
+  describe('.toSubdomainPart', () => {
+    it('replaces invalid character sequences with single `-`, removes leading and trailing `-`, and lowercases', () => {
+      const str = '*&^He_?llo--W9o`--';
+      const expected = 'he-llo-w9o';
 
-      expect(utils.generateSubdomain(owner, repository)).to.equal(utils.generateS3ServiceName(owner, repository));
+      expect(utils.toSubdomainPart(str)).to.equal(expected);
+    });
+
+    it('pads the value with random alpha chars to have a minimum length of 5', () => {
+      const str = '2';
+
+      expect(utils.toSubdomainPart(str).length).to.equal(5);
+    });
+
+    it('restricts the value to 63 chars', () => {
+      const str = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz';
+      const expected = str.substring(0, 62);
+      expect(utils.toSubdomainPart(str)).to.equal(expected);
+    });
+  });
+
+  describe('.generateSubdomain', () => {
+    it('should return toSubdomainPart of owner and repo separated by `--`', () => {
+      const owner = 'Hel.lo';
+      const repository = 'Hello.Wo..rld';
+      const expected = `${utils.toSubdomainPart(owner)}--${utils.toSubdomainPart(repository)}`;
+
       expect(utils.generateSubdomain(owner, repository)).to.equal(expected);
-      done();
+    });
+
+    it('should return null if owner or repository are missing', () => {
+      const owner = 'Hel.lo';
+
+      expect(utils.generateSubdomain(owner, null)).to.be.null;
     });
   });
 
@@ -410,6 +435,19 @@ describe('utils', () => {
       it('resolves with the value with which `fn` resolves', async () => {
         const result = await utils.retry(spy);
         expect(result).to.eq(value);
+      });
+    });
+  });
+
+  describe('.objToQueryParams', () => {
+    it('returns an instance of URLSearchParams with the correct values', () => {
+      const obj = { foo: 'bar', baz: 'foo' };
+
+      const result = utils.objToQueryParams(obj);
+
+      expect(result).to.be.an.instanceOf(URLSearchParams);
+      Object.entries(obj).forEach(([key, value]) => {
+        expect(result.get(key)).to.equal(value);
       });
     });
   });

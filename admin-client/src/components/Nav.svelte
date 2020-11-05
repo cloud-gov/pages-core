@@ -75,27 +75,30 @@
         <img src="/img/close.svg" alt="close" />
       </button>
       <ul class="usa-nav__primary usa-accordion">
-        <li class="usa-nav__primary-item">
-          {#if authenticated}
+        {#if authenticated}
+          <li class="usa-nav__primary-item">
             <a class="usa-nav__link" class:usa-current={currentPath === '/sites'} href="/sites">
               <span>Sites</span>
             </a>
-          {/if}
-        </li>
-        <li class="usa-nav__primary-item">
-          {#if authenticated}
+          </li>
+          <li class="usa-nav__primary-item">
             <a class="usa-nav__link"  class:usa-current={currentPath === '/builds'} href="/builds">
               <span>Builds</span>
             </a>
-          {/if}
-        </li>
-        <li class="usa-nav__primary-item">
-          {#if authenticated}
+          </li>
+          <li class="usa-nav__primary-item">
+            <a class="usa-nav__link"  class:usa-current={currentPath === '/events'} href="/events">
+              <span>Events</span>
+            </a>
+          </li>
+          <li class="usa-nav__primary-item">
             <NavButton action={logout}>Logout</NavButton>
-          {:else }
+          </li>
+        {:else}
+          <li class="usa-nav__primary-item">
             <NavButton action={login}>Login</NavButton>
-          {/if}
-        </li>
+          </li>
+        {/if}
       </ul>
     </nav>
   </div>

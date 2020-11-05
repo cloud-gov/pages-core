@@ -1,12 +1,40 @@
 const request = require('request');
 const url = require('url');
-const { filterEntity, firstEntity } = require('.');
-const CloudFoundryAuthClient = require('./cfAuthClient');
 const config = require('../../config');
+const CloudFoundryAuthClient = require('./cfAuthClient');
+const { filterEntity, firstEntity, objToQueryParams } = require('.');
 
 class CloudFoundryAPIClient {
   constructor() {
     this.authClient = new CloudFoundryAuthClient();
+  }
+
+  cancelTask(taskGuid) {
+    return this.authRequest('POST', `/v3/tasks/${taskGuid}/actions/cancel`);
+  }
+
+  async cancelBuildTask(buildId) {
+    const buildTask = await this.fetchBuildTask(buildId);
+    if (!buildTask) {
+      throw new Error(`There are no tasks for build id: ${buildId}`);
+    }
+    return this.cancelTask(buildTask.guid);
+  }
+
+  fetchBuildTask(buildId) {
+    return this.fetchTaskByName(`build-${buildId}`);
+  }
+
+  fetchTaskByName(name) {
+    return this.fetchTasks({ names: name })
+      .then(tasks => tasks.find(task => task.name === name));
+  }
+
+  fetchTasks(params) {
+    const qs = objToQueryParams(params);
+
+    return this.authRequest('GET', `/v3/tasks?${qs.toString()}`)
+      .then(body => body.resources);
   }
 
   createRoute(name) {
@@ -199,6 +227,10 @@ class CloudFoundryAPIClient {
         }
       });
     });
+  }
+
+  authRequest(method, path, json) {
+    return this.accessToken().then(token => this.request(method, path, token, json));
   }
 }
 

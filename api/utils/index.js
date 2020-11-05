@@ -65,8 +65,31 @@ function generateS3ServiceName(owner, repository) {
   return slicedServiceName;
 }
 
+function toSubdomainPart(str) {
+  const characters = 'abcdefghijklmnopqrstuvwxyz';
+  let subdomain = str
+    // replace all invalid chars with '-'
+    .replace(/[^a-zA-Z0-9-]+/g, '-')
+    // remove leading and trailing '-'
+    .replace(/(^[-]+|[-]+$)/g, '')
+    // replace multiple sequential '-' with a single '-'
+    .replace(/[-]{2,}/g, '-')
+    .substring(0, 62)
+    .toLowerCase();
+
+  // pretty arbitrary, but require it is at least 2 chars
+  if (subdomain.length < 2) {
+    // If we generate parts, make it longer
+    while (subdomain.length < 5) {
+      subdomain += characters[Math.floor(Math.random() * Math.floor(characters.length))];
+    }
+  }
+  return subdomain;
+}
+
 function generateSubdomain(owner, repository) {
-  return generateS3ServiceName(owner, repository);
+  if (!owner || !repository) return null;
+  return `${toSubdomainPart(owner)}--${toSubdomainPart(repository)}`;
 }
 
 function isPastAuthThreshold(authDate) {
@@ -195,6 +218,40 @@ function omitBy(fn, obj) {
   return pick(pickedKeys, obj);
 }
 
+function objToQueryParams(obj) {
+  const qs = new URLSearchParams();
+  Object
+    .entries(obj)
+    .forEach(([key, value]) => {
+      qs.append(key, value);
+    });
+  return qs;
+}
+
+async function paginate(model, serialize, params, query) {
+  const limit = toInt(params.limit) || 25;
+  const page = toInt(params.page) || 1;
+  const offset = limit * (page - 1);
+
+  const pQuery = {
+    limit,
+    offset,
+    order: [['createdAt', 'DESC']],
+    ...query,
+  };
+
+  const { rows, count } = await model.findAndCountAll(pQuery);
+
+  const totalPages = Math.trunc(count / limit) + (count % limit === 0 ? 0 : 1);
+
+  return {
+    currentPage: page,
+    totalPages,
+    totalItems: count,
+    data: serialize(rows),
+  };
+}
+
 module.exports = {
   filterEntity,
   firstEntity,
@@ -207,12 +264,15 @@ module.exports = {
   loadDevelopmentManifest,
   loadProductionManifest,
   mapValues,
+  objToQueryParams,
   omitBy,
   omit,
+  paginate,
   pick,
   retry,
   shouldIncludeTracking,
   toInt,
+  toSubdomainPart,
   wait,
   wrapHandler,
   wrapHandlers,

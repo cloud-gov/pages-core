@@ -56,7 +56,7 @@ passport.logout = (req, res) => {
     EventCreator.audit(Event.labels.AUTHENTICATION, user, eventBody);
   }
   req.session.destroy(() => {
-    res.redirect(config.app.homepageUrl);
+    res.redirect(config.app.hostname);
   });
 };
 

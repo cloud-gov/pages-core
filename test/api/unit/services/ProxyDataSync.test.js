@@ -27,10 +27,10 @@ describe('ProxyDataSync', () => {
     expect(getSiteKey(site)).to.eql(site.subdomain);
   });
 
-  it('can save an item', () => {
-    const putSpy = sinon.spy(DynamoDBDocumentHelper.prototype, 'put');
+  it('can save an item', async () => {
+    const putSpy = sinon.stub(DynamoDBDocumentHelper.prototype, 'put');
     const start = new Date();
-    saveSite(site);
+    await saveSite(site);
 
     sinon.assert.calledOnce(putSpy);
     expect(putSpy.args[0][0]).to.equal(proxySiteTable);
@@ -47,23 +47,23 @@ describe('ProxyDataSync', () => {
     });
   });
 
-  it('can delete an item', () => {
+  it('can delete an item', async () => {
     const deleteStub = sinon.stub(DynamoDBDocumentHelper.prototype, 'delete');
 
-    removeSite(site);
+    await removeSite(site);
 
     sinon.assert.calledOnceWithExactly(
       deleteStub, proxySiteTable, { Id: getSiteKey(site) }
     );
   });
 
-  it('can save array of sites', () => {
+  it('can save array of sites', async () => {
     const batchWriteStub = sinon.stub(DynamoDBDocumentHelper.prototype, 'batchWrite');
 
     const omitKeys = ['UpdatedAt'];
     const expectedItem = siteToItem(site);
 
-    saveSites([site]);
+    await saveSites([site]);
 
     sinon.assert.calledOnce(batchWriteStub);
     sinon.assert.calledWith(batchWriteStub, proxySiteTable);

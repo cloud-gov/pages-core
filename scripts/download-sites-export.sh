@@ -8,9 +8,9 @@ fi
 
 # Make sure we're using the correct app
 if cf target | grep "space: \s*staging"; then
-  APP_NAME="federalist-staging"
+  APP_NAME="federalistapp-staging"
 elif cf target | grep "space: \s*production"; then
-  APP_NAME="federalist"
+  APP_NAME="federalistapp"
 fi
 
 # Cleanup any old data

@@ -26,6 +26,7 @@ const toJSON = (build) => {
   });
   delete object.token;
   delete object.url;
+  delete object.logsS3Key;
   // only return first 80 chars in case it's long
   if (object.error) {
     object.error = object.error.slice(0, 80);
@@ -35,9 +36,11 @@ const toJSON = (build) => {
 
 function serializeObject(build) {
   const json = toJSON(build);
-  json.user = userSerializer.toJSON(build.User);
+  if (build.User) {
+    json.user = userSerializer.toJSON(build.User);
+    delete json.User;
+  }
   json.site = siteSerializer.toJSON(build.Site);
-  delete json.User;
   delete json.Site;
   return json;
 }
@@ -58,4 +61,4 @@ const serialize = (serializable) => {
   return query.then(serializeObject);
 };
 
-module.exports = { serialize, toJSON };
+module.exports = { serialize, serializeObject, toJSON };

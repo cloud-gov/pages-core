@@ -25,45 +25,40 @@
 </style>
 
 <GridContainer>
-  <PageTitle>
-    <div class="grid-row">
-      <div class="grid-col-4">
-        Sites
-      </div>
-      <div class="grid-col-4"></div>
-      <div class="grid-col-4">
-        <form
-          class="usa-search usa-search--small"
-          role="search"
-          on:submit|preventDefault={handleSubmit}
+  <PageTitle>Sites</PageTitle>
+  <div class="grid-row flex-justify-end padding-bottom-2 border-bottom margin-bottom-2">
+    <div>
+      <form
+        class="usa-search usa-search--small"
+        role="search"
+        on:submit|preventDefault={handleSubmit}
+      >
+        <label class="usa-sr-only" for="search">Search by id or owner/repository text:</label>
+        <input
+          class="usa-input"
+          id="search"
+          name="search"
+          type="search"
+          autocapitalize="off"
+          autocorrect="off"
+          value={search}
         >
-          <label class="usa-sr-only" for="search">Search:</label>
-          <input
-            class="usa-input"
-            id="search"
-            name="search"
-            type="search"
-            autocapitalize="off"
-            autocorrect="off"
-            value={search}
-          >
-          <button class="usa-button" type="submit">
-            <span class="usa-sr-only">Search</span>
-          </button>
-        </form>
-        <p class="usa-form__note">
-          Search by id or owner/repository text
-        </p>
-      </div>
+        <button class="usa-button" type="submit">
+          <span class="usa-sr-only">Search</span>
+        </button>
+      </form>
+      <p class="usa-form__note">
+        Search by id or owner/repository text
+      </p>
     </div>
-  </PageTitle>
-    {#await query}
-      <p>Loading...</p>
-    {:then sites}
-      {#if sites.length > 0}
-        {#each sites as site, index}
-          <SiteCard {site} {index} />
-        {/each}
-      {/if}
-    {/await}
+  </div>
+  {#await query}
+    <p>Loading...</p>
+  {:then sites}
+    {#if sites.length > 0}
+      {#each sites as site, index}
+        <SiteCard {site} {index} />
+      {/each}
+    {/if}
+  {/await}
 </GridContainer>

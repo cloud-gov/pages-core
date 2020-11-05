@@ -50,7 +50,9 @@
   page('/', checkRedirect, render(Pages.Home));
   page('/sites/:id', queryString, render(Pages.Site));
   page('/sites', queryString, render(Pages.Sites));
+  page('/builds/:id', queryString, render(Pages.Build));
   page('/builds', queryString, render(Pages.Builds));
+  page('/events', queryString, render(Pages.Events));
   page('*', render(Pages.NotFound));
   page();
 </script>

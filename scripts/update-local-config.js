@@ -1,7 +1,7 @@
 const { exec } = require('child_process');
 const fs = require('fs');
 
-const app = 'federalist-staging';
+const app = 'federalistapp-staging';
 const space = 'staging';
 const org = 'gsa-18f-federalist';
 const credsUpsName = 'federalist-staging-env';

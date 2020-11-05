@@ -91,7 +91,7 @@ commands:
 jobs:
   build:
     docker:
-      - image: circleci/node:12
+      - image: circleci/node:14.15
         environment:
           YARN_VERSION: 0.24.6-1
           CC_TEST_REPORTER_ID: 101a439651b6abd27e5440028a53b5b8f08fe0889f3948d5f58f6cf9f7c786a0
@@ -150,9 +150,10 @@ jobs:
             # Attempt to submit a report, but don't fail the build if this fails (`|| true`)
             ./cc-test-reporter upload-coverage || true
 
+
   deploy:
     docker:
-      - image: circleci/node:12
+      - image: circleci/node:14.15
     parameters:
       app:
         type: string
@@ -177,7 +178,7 @@ jobs:
 
   deploy-admin-client:
     docker:
-      - image: circleci/node:12
+      - image: circleci/node:14.15
     parameters:
       app:
         type: string
@@ -212,52 +213,25 @@ jobs:
           app: << parameters.app >>
 
 
-  nightly-builds:
+  run-task:
     docker:
       - image: cimg/base:2020.01
     parameters:
       app:
         type: string
-    steps:
-      - checkout
-
-      - deploy-to-cg:
-          app: << parameters.app >>
-          action: task
-          task-name: nightly-builds
-          task-command: yarn nightly-builds
-
-
-  remove-inactive-federalist-users:
-    docker:
-      - image: cimg/base:2020.01
-    parameters:
-      app:
+      task-name:
         type: string
+      task-command:
+        type: string        
     steps:
       - checkout
 
       - deploy-to-cg:
           app: << parameters.app >>
           action: task
-          task-name: remove-inactive-federalist-users
-          task-command: yarn remove-inactive-federalist-users
+          task-name: << parameters.task-name >>
+          task-command: << parameters.task-command >>
 
-
-  timeout-builds:
-    docker:
-      - image: circleci/node:12
-    parameters:
-      app:
-        type: string
-    steps:
-      - checkout
-
-      - deploy-to-cg:
-          app: << parameters.app >>
-          action: task
-          task-name: timeout-builds
-          task-command: yarn timeout-builds
 
 ##################################
 ##          Workflows           ##
@@ -311,42 +285,56 @@ workflows:
   nightly:
     triggers:
       - schedule:
-          cron: "0 0 * * *"
+          cron: "0 5 * * *"
           filters:
             branches:
               only:
                 - staging
                 - main
+
     jobs:
-      - nightly-builds:
-          name: nightly-builds-staging
+      - run-task:
+          name: archive-build-logs-staging
           app: federalistapp-staging
+          task-name: archive-build-logs
+          task-command: yarn archive-build-logs-daily
           filters:
             branches:
               only: staging
 
-      - nightly-builds:
-          name: nightly-builds-production
+      - run-task:
+          name: archive-build-logs-production
           app: federalistapp
-          filters:
-            branches:
-              only: main
-  -federalist-users-daily:
-    triggers:
-      - schedule:
-          cron: "0 0 * * *"
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - remove-inactive-federalist-users:
-          name: remove-inactive-federalist-users
-          app: federalistapp
+          task-name: archive-build-logs
+          task-command: yarn archive-build-logs-daily
           filters:
             branches:
               only: main
 
+      - run-task:
+          name: nightly-builds-staging
+          app: federalistapp-staging
+          task-name: nightly-builds
+          task-command: yarn nightly-builds
+          filters:
+            branches:
+              only: staging
+
+      - run-task:
+          name: nightly-builds-production
+          app: federalistapp
+          task-name: nightly-builds
+          task-command: yarn nightly-builds
+          filters:
+            branches:
+              only: main
+      -run-task:
+          name: remove-inactive-federalist-users-production
+          app: federalistapp
+          task-name: remove-inactive-federalist-users
+          filters:
+            branches:
+              only: main
 
   every-ten-minutes:
     triggers:
@@ -358,16 +346,20 @@ workflows:
                 - staging
                 - main
     jobs:
-      - timeout-builds:
+      - run-task:
           name: timeout-builds-staging
           app: federalistapp-staging
+          task-name: timeout-builds
+          task-command: yarn timeout-builds
           filters:
             branches:
               only: staging
 
-      - timeout-builds:
+      - run-task:
           name: timeout-builds-production
           app: federalistapp
+          task-name: timeout-builds
+          task-command: yarn timeout-builds
           filters:
             branches:
               only: main

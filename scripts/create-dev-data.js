@@ -1,12 +1,14 @@
 /* eslint-disable no-console */
 const inquirer = require('inquirer');
 Promise.props = require('promise-props');
-
+const BuildLogs = require('../api/services/build-logs');
+const EventCreator = require('../api/services/EventCreator');
 const cleanDatabase = require('../api/utils/cleanDatabase');
 const {
   ActionType,
   Build,
   BuildLog,
+  Event,
   User,
   UserAction,
 } = require('../api/models');
@@ -184,7 +186,7 @@ async function createData({ githubUsername }) {
   );
 
   await BuildLog.bulkCreate(
-    Array(2000).fill(0).map((_v, idx) => ({
+    Array(1000).fill(0).map((_v, idx) => ({
       output: log(`Message ${idx} - A much longer log message to test that the horizontal scrolling is working the way we want.`),
       source: 'ALL',
       build: goSiteBuilds[0].id,
@@ -200,6 +202,19 @@ async function createData({ githubUsername }) {
     actionId: removeAction.id,
     siteId: site1.id,
   });
+
+  console.log('Uploading logs to S3');
+  try {
+    await BuildLogs.archiveBuildLogs(nodeSite, nodeSiteBuilds[0]);
+  } catch (error) {
+    console.error('Failed to upload logs to S3, probably because the credentials are not configured locally. This can be ignored.');
+  }
+
+  console.log('Creating Events');
+  await Promise.all([
+    EventCreator.audit(Event.labels.AUTHENTICATION, user1, { action: 'login' }),
+    EventCreator.audit(Event.labels.AUTHENTICATION, user2, { action: 'login' }),
+  ]);
 }
 
 const confirm = {

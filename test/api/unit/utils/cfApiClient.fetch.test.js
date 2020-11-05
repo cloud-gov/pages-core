@@ -1,12 +1,16 @@
 const { expect } = require('chai');
 const nock = require('nock');
+const sinon = require('sinon');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
 const mockTokenRequest = require('../../support/cfAuthNock');
 const apiNocks = require('../../support/cfAPINocks');
 const responses = require('../../support/factory/responses');
 
 describe('CloudFoundryAPIClient', () => {
-  afterEach(() => nock.cleanAll());
+  afterEach(() => {
+    nock.cleanAll();
+    sinon.restore();
+  });
 
   describe('.fetchServiceInstances', () => {
     it('should return the service instances for a space', (done) => {
@@ -244,6 +248,160 @@ describe('CloudFoundryAPIClient', () => {
           expect(err.name).to.equal(name);
           done();
         });
+    });
+  });
+
+  describe('.fetchBuildTask', () => {
+    it('returns the value of `fetchTaskByName` with the correct name', async () => {
+      const stubResult = 'foo';
+      const buildId = 23423;
+
+      const apiClient = new CloudFoundryAPIClient();
+
+      const fetchTaskByNameStub = sinon.stub(apiClient, 'fetchTaskByName');
+      fetchTaskByNameStub.resolves(stubResult);
+
+      const result = await apiClient.fetchBuildTask(buildId);
+
+      sinon.assert.calledOnceWithExactly(fetchTaskByNameStub, `build-${buildId}`);
+      expect(result).to.equal(stubResult);
+    });
+  });
+
+  describe('.fetchTaskByName', () => {
+    describe('when the task is found', () => {
+      it('returns the only the named task from the results of `fetchTasks`', async () => {
+        const name = 'foo';
+        const stubResult = [
+          { name },
+          { name: 'bar' },
+        ];
+
+        const apiClient = new CloudFoundryAPIClient();
+
+        const fetchTasksStub = sinon.stub(apiClient, 'fetchTasks');
+        fetchTasksStub.resolves(stubResult);
+
+        const result = await apiClient.fetchTaskByName(name);
+
+        expect(result).to.deep.equal({ name });
+        sinon.assert.calledOnceWithExactly(fetchTasksStub, { names: name });
+      });
+    });
+
+    describe('when the task is not found', () => {
+      it('returns undefined', async () => {
+        const name = 'foo';
+        const stubResult = [
+          { name: 'baz' },
+          { name: 'bar' },
+        ];
+
+        const apiClient = new CloudFoundryAPIClient();
+
+        const fetchTasksStub = sinon.stub(apiClient, 'fetchTasks');
+        fetchTasksStub.resolves(stubResult);
+
+        const result = await apiClient.fetchTaskByName(name);
+
+        sinon.assert.calledOnceWithExactly(fetchTasksStub, { names: name });
+        expect(result).to.be.undefined;
+      });
+    });
+  });
+
+  describe('.fetchTasks', () => {
+    it('makes an authenticated request to the GET tasks endpoint with appropriate query parameters', async () => {
+      const tasks = [
+        { name: 'foo' },
+        { name: 'bar' },
+      ];
+      const stubResult = { resources: tasks };
+
+      const apiClient = new CloudFoundryAPIClient();
+
+      const authRequestStub = sinon.stub(apiClient, 'authRequest');
+      authRequestStub.resolves(stubResult);
+
+      const result = await apiClient.fetchTasks({ names: 'foo' });
+
+      sinon.assert.calledOnceWithExactly(authRequestStub, 'GET', '/v3/tasks?names=foo');
+      expect(result).to.deep.equal(tasks);
+    });
+  });
+
+  describe('cancelBuildTask', () => {
+    describe('when successful', () => {
+      it('fetches the build task and cancels it', async () => {
+        const buildId = 12345;
+        const taskGuid = 'abc123';
+
+        const apiClient = new CloudFoundryAPIClient();
+        const fetchBuildTaskStub = sinon.stub(apiClient, 'fetchBuildTask');
+        fetchBuildTaskStub.resolves({ guid: taskGuid });
+
+        const cancelTaskStub = sinon.stub(apiClient, 'cancelTask');
+        cancelTaskStub.resolves();
+
+        await apiClient.cancelBuildTask(buildId);
+
+        sinon.assert.calledOnceWithExactly(fetchBuildTaskStub, buildId);
+        sinon.assert.calledOnceWithExactly(cancelTaskStub, taskGuid);
+      });
+    });
+
+    describe('when the task does not exist', async () => {
+      it('throws and does not try to cancel the task', async () => {
+        const buildId = 12345;
+
+        const apiClient = new CloudFoundryAPIClient();
+        const fetchBuildTaskStub = sinon.stub(apiClient, 'fetchBuildTask');
+        fetchBuildTaskStub.resolves(undefined);
+
+        const cancelTaskStub = sinon.stub(apiClient, 'cancelTask');
+        cancelTaskStub.resolves();
+
+        const error = await apiClient.cancelBuildTask(buildId).catch(e => e);
+
+        sinon.assert.calledOnceWithExactly(fetchBuildTaskStub, buildId);
+        sinon.assert.notCalled(cancelTaskStub);
+        expect(error).to.be.an('error');
+      });
+    });
+
+    describe('when the task has already completed', () => {
+      it('throws', async () => {
+        const buildId = 12345;
+        const taskGuid = 'abc123';
+
+        const apiClient = new CloudFoundryAPIClient();
+        const fetchBuildTaskStub = sinon.stub(apiClient, 'fetchBuildTask');
+        fetchBuildTaskStub.resolves({ guid: taskGuid });
+
+        const cancelTaskStub = sinon.stub(apiClient, 'cancelTask');
+        cancelTaskStub.rejects();
+
+        const error = await apiClient.cancelBuildTask(buildId).catch(e => e);
+
+        sinon.assert.calledOnceWithExactly(fetchBuildTaskStub, buildId);
+        sinon.assert.calledOnceWithExactly(cancelTaskStub, taskGuid);
+        expect(error).to.be.an('error');
+      });
+    });
+  });
+
+  describe('.cancelTask', () => {
+    it('makes an authenticated request to the task cancel endpoint', async () => {
+      const taskGuid = 'abc123';
+
+      const apiClient = new CloudFoundryAPIClient();
+
+      const authRequestStub = sinon.stub(apiClient, 'authRequest');
+      authRequestStub.resolves();
+
+      await apiClient.cancelTask(taskGuid);
+
+      sinon.assert.calledOnceWithExactly(authRequestStub, 'POST', `/v3/tasks/${taskGuid}/actions/cancel`);
     });
   });
 });
