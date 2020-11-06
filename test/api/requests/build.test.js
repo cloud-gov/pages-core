@@ -133,7 +133,7 @@ describe('Build API', () => {
       describe('with an existing build', () => {
         let promiseProps;
 
-        beforeEach( async () => {
+        beforeEach(async () => {
           const userPromise = await factory.user();
           const sitePromise = await factory.site({ users: [userPromise] });
           await Build.update(
