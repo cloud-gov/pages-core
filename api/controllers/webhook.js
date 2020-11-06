@@ -100,8 +100,11 @@ const createBuildForWebhookRequest = async (request) => {
   const { login } = request.body.sender;
   const { pushed_at: pushedAt } = request.body.repository;
   const username = login.toLowerCase();
-  const user = await User.findOne({ where: { username } });
-  const site = await findSiteForWebhookRequest(request);
+  const [user, site] = await Promise.all([
+    User.findOne({ where: { username } }),
+    findSiteForWebhookRequest(request),
+  ])
+    
 
   if (user) {
     await user.update({ pushedAt: new Date(pushedAt * 1000) });
