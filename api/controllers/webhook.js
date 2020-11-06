@@ -59,7 +59,23 @@ const organizationWebhookRequest = async (payload) => {
     }
   } else if (action === 'member_removed' && user && user.isActive) {
     await user.update({ isActive: false });
+  // move this up higher, before we even query for the user since we're not going to handle it
+  if (!['member_added', 'member_removed'].includes(action)) {
+    return;
   }
+   
+  const isActive = action === 'member_added'
+  
+  if (!user) {
+    return User.create({ username, isActive });
+  }
+  
+  if (isActive !== user.isActive) {
+    return user.update({ isActive });
+  }
+  
+  
+   
 };
 
 const addUserToSite = ({ user, site }) => user.addSite(site);
