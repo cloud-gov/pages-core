@@ -225,7 +225,7 @@ describe('Build model', () => {
     });
 
     it('should require a username before saving', () => {
-      const buildPromise = Build.create({ useranme: null, site: 1 });
+      const buildPromise = Build.create({ username: null, site: 1 });
 
       return expect(buildPromise).to.be
         .rejectedWith(ValidationError, 'notNull Violation: Build.username cannot be null');
