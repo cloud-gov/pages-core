@@ -1278,10 +1278,10 @@
   resolved "https://registry.yarnpkg.com/@supercharge/goodies/-/goodies-1.5.1.tgz#7ec3327419fd700074770b9363eafd6053e6a3e6"
   integrity sha512-LrbIgboxJ9labELaN6JUcZEWAdKveohRI3u11ILb/rqrKbeXkN8/ezoLvWJ0oo9s/HeBf0REFTD3XpVEio053g==
 
-"@supercharge/promise-pool@^1.5.0":
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/@supercharge/promise-pool/-/promise-pool-1.5.0.tgz#047a9b7cdfca24f90f28332090493fec3ddc57ee"
-  integrity sha512-pAXVR60vr7ozOkNv2EWPyYuK4gH6SQBQY7C+x/U7ehqx2OlvA4WQNP6oAOh5PKmoMbWaDTtl3Vdd4vPYPWyYZQ==
+"@supercharge/promise-pool@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@supercharge/promise-pool/-/promise-pool-1.6.0.tgz#033aa064a4fdbe316f57d0ae1072d4ba05b02973"
+  integrity sha512-/zQnPJ2CMfGdVI1OlWn7fUfYSyLjTUHWxQ3svvrCwNznrpxZsa+nMC1QDkJ5LCiVzYrfQx7sK5pYcSSaQpmE+w==
   dependencies:
     "@supercharge/goodies" "~1.5.1"
 
