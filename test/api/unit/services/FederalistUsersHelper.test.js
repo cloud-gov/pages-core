@@ -121,60 +121,6 @@ describe('FederalistUsersHelper', () => {
       });
     });
   });
-  describe('refreshIsActiveUsers', () => {
-    let eventSpy;
-    beforeEach( async() => {
-      eventStub = sinon.stub(EventCreator, 'audit').resolves();
-      await User.truncate();
-    });
-    afterEach( async () => {
-      await Event.truncate();
-    })
-
-    it('set inactive users to Active if in federalist-users', async () => {
-      let users = await Promise.all([
-        factory.user(),
-        factory.user(),
-        factory.user(),
-      ]);
-
-      addMember('federalist-users', users[0].username);
-      addMember('federalist-users', users[1].username);
-      expect(users.filter(user => user.isActive).length).to.equal(0);
-      await FederalistUsersHelper.refreshIsActiveUsers(users[0].username);
-      users = await User.findAll({
-        where: {
-          id: {
-            [Op.in]: users.map(user => user.id),
-          }
-        }
-      });
-      expect(users.filter(user => user.isActive).length).to.equal(2);
-      expect(eventStub.callCount).to.equal(2);
-    });
-
-    it('set active users to inactive if not in federalist-users', async () => {
-      let users = await Promise.all([
-        factory.user({ isActive: true }),
-        factory.user({ isActive: true }),
-        factory.user({ isActive: true }),
-      ]);
-
-      addMember('federalist-users', users[0].username);
-
-      expect(users.filter(user => user.isActive).length).to.equal(3);
-      await FederalistUsersHelper.refreshIsActiveUsers(users[0].username);
-      users = await User.findAll({
-        where: {
-          id: {
-            [Op.in]: users.map(user => user.id),
-          }
-        }
-      });
-      expect(users.filter(user => user.isActive).length).to.equal(1);
-      expect(eventStub.callCount).to.equal(2);
-    });
-  });
 
   describe('revokeMembershipForInactiveUsers', () => {
     afterEach( async () => {

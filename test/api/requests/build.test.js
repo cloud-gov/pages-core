@@ -134,28 +134,28 @@ describe('Build API', () => {
         let promiseProps;
 
         beforeEach(async () => {
-          const userPromise = await factory.user();
-          const sitePromise = await factory.site({ users: [userPromise] });
+          const user = await factory.user();
+          const site = await factory.site({ users: [user] });
           await Build.update(
             { state: 'success'}, //values
             { where: //options
-              { site: sitePromise.id,
+              { site: site.id,
                 branch: 'main',
                 state: ['created', 'queued'],
               },
             }
           );
           promiseProps = Promise.props({
-            user: userPromise,
-            site: sitePromise,
+            user,
+            site,
             build: factory.build({
-              site: sitePromise,
+              site,
               state: 'success',
               branch: 'main',
               commitSha,
-              user: userPromise,
+              user,
             }),
-            cookie: authenticatedSession(userPromise),
+            cookie: authenticatedSession(user),
           });
         });
 

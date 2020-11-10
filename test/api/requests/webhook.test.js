@@ -611,7 +611,7 @@ describe('Webhook API', () => {
     it('should set an existing user to Active if added to federalist-users', (done) => {
       let user;
 
-      factory.user()
+      factory.user({ isActive: false})
         .then((model) => {
           user = model;
           expect(user.isActive).to.be.false;
@@ -633,10 +633,11 @@ describe('Webhook API', () => {
           user = model;
           expect(user.isActive).to.be.true;
           done();
-        });
+        })
+        .catch(done);
     });
 
-    it('should only create event if org webhook for non user', (done) => {
+    it('should do nothing if org webhook for non added/removed_member', (done) => {
       let payload;
       const user = User.build({ username: 'rando-user' })
       payload = organizationWebhookPayload('member_invited', user.username);
@@ -652,7 +653,7 @@ describe('Webhook API', () => {
         })
         .expect(200)
         .then(() => {
-          expect(auditStub.calledOnceWith(Event.labels.FEDERALIST_USERS, user, payload)).to.be.true;
+          expect(auditStub.notCalled).to.be.true;
           done()
         });
     });

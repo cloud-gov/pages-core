@@ -44,38 +44,18 @@ const organizationWebhookRequest = async (payload) => {
   const username = login.toLowerCase();
   const user = await User.findOne({ where: { username } });
 
-  if (['member_added', 'member_removed', 'member_invited'].includes(action)) {
+  if (['member_added', 'member_removed'].includes(action)) {
     EventCreator.audit(Event.labels.FEDERALIST_USERS, user || User.build({ username }), payload);
-  }
+    const isActive = action === 'member_added'
 
-  if (action === 'member_added') {
     if (!user) {
-      await User.create({
-        username,
-        isActive: true,
-      });
-    } else if (!user.isActive) {
-      await user.update({ isActive: true });
+      return User.create({ username });
     }
-  } else if (action === 'member_removed' && user && user.isActive) {
-    await user.update({ isActive: false });
-  // move this up higher, before we even query for the user since we're not going to handle it
-  if (!['member_added', 'member_removed'].includes(action)) {
-    return;
+
+    if (isActive !== user.isActive) {
+      return user.update({ isActive });
+    }
   }
-   
-  const isActive = action === 'member_added'
-  
-  if (!user) {
-    return User.create({ username, isActive });
-  }
-  
-  if (isActive !== user.isActive) {
-    return user.update({ isActive });
-  }
-  
-  
-   
 };
 
 const addUserToSite = ({ user, site }) => user.addSite(site);
@@ -103,8 +83,8 @@ const createBuildForWebhookRequest = async (request) => {
   const [user, site] = await Promise.all([
     User.findOne({ where: { username } }),
     findSiteForWebhookRequest(request),
-  ])
-    
+  ]);
+
 
   if (user) {
     await user.update({ pushedAt: new Date(pushedAt * 1000) });

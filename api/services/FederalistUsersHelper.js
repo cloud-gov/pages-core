@@ -7,7 +7,7 @@ const config = require('../../config');
 const EventCreator = require('./EventCreator');
 const { User, Event } = require('../models');
 
-const FEDERALIST_ORG = config.federalistUsers.orgName;
+const FEDERALIST_USERS_ORG = config.federalistUsers.orgName;
 const MAX_DAYS_SINCE_LOGIN = config.federalistUsers.maxDaysSinceLogin;
 
 const audit18F = ({ auditorUsername, fedUserTeams }) => {
@@ -27,13 +27,13 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
     })
     .then((members) => {
       members18F = members.map(member => member.login);
-      return GitHub.getOrganizationMembers(auditor.githubAccessToken, FEDERALIST_ORG, 'admin');
+      return GitHub.getOrganizationMembers(auditor.githubAccessToken, FEDERALIST_USERS_ORG, 'admin');
     })
     .then((admins) => {
       adminFedUsers = admins.map(member => member.login);
       return Promise.all(
         fedUserTeams.map(team => GitHub.getTeamMembers(
-          auditor.githubAccessToken, FEDERALIST_ORG, team
+          auditor.githubAccessToken, FEDERALIST_USERS_ORG, team
         ))
       );
     })
@@ -44,7 +44,7 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
           team.forEach((member) => {
             if (!members18F.includes(member.login) && !adminFedUsers.includes(member.login)) {
               removed.push(GitHub.removeOrganizationMember(
-                auditor.githubAccessToken, FEDERALIST_ORG, member.login
+                auditor.githubAccessToken, FEDERALIST_USERS_ORG, member.login
               ));
               logger.info(`federalist-users: removed user ${member.login}`);
             }
@@ -55,43 +55,11 @@ const audit18F = ({ auditorUsername, fedUserTeams }) => {
     });
 };
 
-const federalistUsersAdmins = githubAccessToken => GitHub.getOrganizationMembers(githubAccessToken, FEDERALIST_ORG, 'admin')
+const federalistUsersAdmins = githubAccessToken => GitHub.getOrganizationMembers(githubAccessToken, FEDERALIST_USERS_ORG, 'admin')
   .then(admins => admins.map(admin => admin.login));
 
-const refreshIsActiveUsers = async (auditorUsername = config.federalistUsers.admin) => {
-  const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
-  const members = await GitHub.getOrganizationMembers(githubAccessToken, FEDERALIST_ORG);
-  const logins = members.map(m => m.login.toLowerCase());
-
-  const [, activeUsers] = await User.update({ isActive: true },
-    {
-      where: {
-        username: { [Op.in]: logins },
-        isActive: false,
-      },
-      returning: ['id', 'isActive'],
-    });
-
-  activeUsers.map(user => EventCreator.audit(Event.labels.UPDATED, user, {
-    action: { isActive: user.isActive },
-  }));
-
-  const [, inactiveUsers] = await User.update({ isActive: false },
-    {
-      where: {
-        username: { [Op.notIn]: logins },
-        isActive: true,
-      },
-      returning: ['id', 'isActive'],
-    });
-
-  inactiveUsers.map(user => EventCreator.audit(Event.labels.UPDATED, user, {
-    action: { isActive: user.isActive },
-  }));
-};
-
-const removeMember = (githubAccessToken, login) => GitHub
-  .removeOrganizationMember(githubAccessToken, FEDERALIST_ORG, login)
+const removeMemberFromFederalistUsersOrg = (githubAccessToken, login) => GitHub
+  .removeOrganizationMember(githubAccessToken, FEDERALIST_USERS_ORG, login)
   .catch(error => EventCreator.error(Event.labels.FEDERALIST_USERS, { error, login, action: 'removeOrgMember' }));
 
 const revokeMembershipForInactiveUsers = async ({ auditorUsername }) => {
@@ -118,7 +86,7 @@ const revokeMembershipForInactiveUsers = async ({ auditorUsername }) => {
     },
   });
 
-  return Promise.all(users.map(user => removeMember(githubAccessToken, user.username)));
+  return Promise.all(users.map(user => removeMemberFromFederalistUsersOrg(githubAccessToken, user.username)));
 };
 
 // remove GitHub org members that are not in the user table
@@ -138,13 +106,12 @@ const removeMembersWhoAreNotUsers = async ({ auditorUsername }) => {
 
   const memberLoginsToRemove = allMemberLogins
     .filter(login => !allUsernames.includes(login.toLowerCase()));
-  return Promise.all(memberLoginsToRemove.map(login => removeMember(githubAccessToken, login)));
+  return Promise.all(memberLoginsToRemove.map(login => removeMemberFromFederalistUsersOrg(githubAccessToken, login)));
 };
 
 module.exports = {
   audit18F,
   federalistUsersAdmins,
-  refreshIsActiveUsers,
   revokeMembershipForInactiveUsers,
   removeMembersWhoAreNotUsers,
 };
