@@ -102,7 +102,7 @@ const reportBuildStatus = (build) => {
         context,
       };
 
-      if (['processing', 'queued', 'created'].includes(build.state)) {
+      if (build.isInProgress()) {
         options.state = 'pending';
         options.target_url = url.resolve(config.app.hostname, `/sites/${site.id}/builds/${build.id}/logs`);
         options.description = 'The build is running.';
