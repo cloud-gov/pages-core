@@ -42,7 +42,7 @@ const organizationWebhookRequest = async (payload) => {
 
   if (orgName === config.federalistUsers.orgName) {
     if (['member_added', 'member_removed'].includes(action)) {
-      EventCreator.audit(Event.labels.FEDERALIST_USERS, user || User.build({ username }), payload);
+      EventCreator.audit(Event.labels.FEDERALIST_USERS_MEMBERSHIP, user || User.build({ username }), payload);
       const isActive = action === 'member_added';
 
       if (!user) {
