@@ -86,7 +86,8 @@ const revokeMembershipForInactiveUsers = async ({ auditorUsername }) => {
     },
   });
 
-  return Promise.all(users.map(user => removeMemberFromFederalistUsersOrg(githubAccessToken, user.username)));
+  return Promise.all(users
+    .map(user => removeMemberFromFederalistUsersOrg(githubAccessToken, user.username)));
 };
 
 // remove GitHub org members that are not in the user table
@@ -106,7 +107,8 @@ const removeMembersWhoAreNotUsers = async ({ auditorUsername }) => {
 
   const memberLoginsToRemove = allMemberLogins
     .filter(login => !allUsernames.includes(login.toLowerCase()));
-  return Promise.all(memberLoginsToRemove.map(login => removeMemberFromFederalistUsersOrg(githubAccessToken, login)));
+  return Promise.all(memberLoginsToRemove
+    .map(login => removeMemberFromFederalistUsersOrg(githubAccessToken, login)));
 };
 
 module.exports = {

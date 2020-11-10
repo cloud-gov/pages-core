@@ -46,14 +46,14 @@ const organizationWebhookRequest = async (payload) => {
 
   if (['member_added', 'member_removed'].includes(action)) {
     EventCreator.audit(Event.labels.FEDERALIST_USERS, user || User.build({ username }), payload);
-    const isActive = action === 'member_added'
+    const isActive = action === 'member_added';
 
     if (!user) {
-      return User.create({ username });
+      await User.create({ username });
     }
 
     if (isActive !== user.isActive) {
-      return user.update({ isActive });
+      await user.update({ isActive });
     }
   }
 };
@@ -84,7 +84,6 @@ const createBuildForWebhookRequest = async (request) => {
     User.findOne({ where: { username } }),
     findSiteForWebhookRequest(request),
   ]);
-
 
   if (user) {
     await user.update({ pushedAt: new Date(pushedAt * 1000) });
