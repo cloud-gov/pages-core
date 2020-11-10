@@ -37,7 +37,7 @@ const organizationWebhookRequest = async (payload) => {
   const { login: orgName } = organization;
 
   if (orgName !== config.federalistUsers.orgName) {
-    return
+    return;
   }
 
   const { login } = membership.user;
