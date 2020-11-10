@@ -36,24 +36,20 @@ const organizationWebhookRequest = async (payload) => {
   } = payload;
   const { login: orgName } = organization;
 
-  if (orgName !== config.federalistUsers.orgName) {
-    return;
-  }
-
   const { login } = membership.user;
   const username = login.toLowerCase();
   const user = await User.findOne({ where: { username } });
 
-  if (['member_added', 'member_removed'].includes(action)) {
-    EventCreator.audit(Event.labels.FEDERALIST_USERS, user || User.build({ username }), payload);
-    const isActive = action === 'member_added';
+  if (orgName === config.federalistUsers.orgName) {
+    if (['member_added', 'member_removed'].includes(action)) {
+      EventCreator.audit(Event.labels.FEDERALIST_USERS, user || User.build({ username }), payload);
+      const isActive = action === 'member_added';
 
-    if (!user) {
-      await User.create({ username });
-    }
-
-    if (isActive !== user.isActive) {
-      await user.update({ isActive });
+      if (!user) {
+        await User.create({ username });
+      } else if (isActive !== user.isActive) {
+        await user.update({ isActive });
+      }
     }
   }
 };
