@@ -580,6 +580,8 @@ describe('Webhook API', () => {
         .then((model) => {
           user = model;
           expect(user.isActive).to.be.false;
+          expect(auditStub.args[0][0]).to.equal(Event.labels.FEDERALIST_USERS_MEMBERSHIP);
+          expect(auditStub.args[0][1].id).to.eql(user.id);
           done();
         });
     });
@@ -604,6 +606,8 @@ describe('Webhook API', () => {
         .then(() => User.findOne({ where: { username } }))
         .then((user) => {
           expect(user.isActive).to.be.true;
+          expect(auditStub.args[0][0]).to.equal(Event.labels.FEDERALIST_USERS_MEMBERSHIP);
+          expect(auditStub.args[0][1].id).to.eql(null);
           done();
         });
     });
@@ -632,6 +636,8 @@ describe('Webhook API', () => {
         .then((model) => {
           user = model;
           expect(user.isActive).to.be.true;
+          expect(auditStub.args[0][0]).to.equal(Event.labels.FEDERALIST_USERS_MEMBERSHIP);
+          expect(auditStub.args[0][1].id).to.eql(user.id);
           done();
         })
         .catch(done);
