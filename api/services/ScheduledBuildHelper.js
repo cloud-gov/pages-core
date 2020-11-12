@@ -16,6 +16,7 @@ const buildBranch = (site, branch) => User
     site: site.id,
     user: user.id,
     branch,
+    username: user.username,
   }))
   .then(build => build.enqueue())
   .then(() => `${site.owner}/${site.repository}@${branch}`)

@@ -4,7 +4,7 @@ const { Build } = require('../../../../api/models');
 
 // eslint-disable-next-line no-underscore-dangle
 const _attributes = (overrides = {}) => {
-  let { user, site } = overrides;
+  let { user, site, username } = overrides;
 
   if (!user) {
     user = userFactory();
@@ -13,9 +13,13 @@ const _attributes = (overrides = {}) => {
     site = Promise.resolve(user).then(u => siteFactory({ users: [u] }));
   }
 
+  if (!username) {
+    username = Promise.resolve(user).then(u => u.username);
+  }
   return {
     site,
     user,
+    username,
     token: Build.generateToken(),
     ...overrides,
   };

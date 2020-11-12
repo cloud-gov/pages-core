@@ -47,7 +47,9 @@ const associate = ({
 const generateToken = () => URLSafeBase64.encode(crypto.randomBytes(32));
 
 const beforeValidate = (build) => {
-  build.token = build.token || generateToken(); // eslint-disable-line no-param-reassign
+  const { token, username } = build;
+  build.token = token || generateToken(); // eslint-disable-line no-param-reassign
+  build.username = username && username.toLowerCase(); // eslint-disable-line no-param-reassign
 };
 
 const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
@@ -179,7 +181,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     user: {
       type: DataTypes.INTEGER,
-      allowNull: false,
     },
     startedAt: {
       type: DataTypes.DATE,
@@ -187,6 +188,10 @@ module.exports = (sequelize, DataTypes) => {
     url: {
       type: DataTypes.STRING,
       validate: isEmptyOrUrl,
+    },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     logsS3Key: {
       type: DataTypes.STRING,

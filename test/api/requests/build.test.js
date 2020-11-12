@@ -133,29 +133,29 @@ describe('Build API', () => {
       describe('with an existing build', () => {
         let promiseProps;
 
-        beforeEach( async () => {
-          const userPromise = factory.user();
-          const sitePromise = await factory.site({ users: Promise.all([userPromise]) });
+        beforeEach(async () => {
+          const user = await factory.user();
+          const site = await factory.site({ users: [user] });
           await Build.update(
             { state: 'success'}, //values
             { where: //options
-              { site: sitePromise.id,
+              { site: site.id,
                 branch: 'main',
                 state: ['created', 'queued'],
               },
             }
           );
           promiseProps = Promise.props({
-            user: userPromise,
-            site: sitePromise,
+            user,
+            site,
             build: factory.build({
-              site: sitePromise,
+              site,
               state: 'success',
               branch: 'main',
               commitSha,
-              user: userPromise,
+              user,
             }),
-            cookie: authenticatedSession(userPromise),
+            cookie: authenticatedSession(user),
           });
         });
 
@@ -537,7 +537,7 @@ describe('Build API', () => {
         user: userPromise,
       })
         .then(props => factory
-          .bulkBuild({ site: props.site.id, user: props.user.id }, 110)
+          .bulkBuild({ site: props.site.id, user: props.user.id, username: props.user.username }, 110)
           .then(() => props))
         .then(({ site, cookie }) => request(app)
           .get(`/v0/site/${site.id}/build`)

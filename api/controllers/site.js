@@ -202,6 +202,7 @@ module.exports = {
         user: req.user.id,
         site: siteId,
         branch: model.defaultBranch,
+        username: req.user.username,
       }))
       .then(build => build.enqueue())
       .then(() => {
@@ -210,6 +211,7 @@ module.exports = {
             user: req.user.id,
             site: siteId,
             branch: site.demoBranch,
+            username: req.user.username,
           })
             .then(build => build.enqueue());
         }
