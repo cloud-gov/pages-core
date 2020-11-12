@@ -7,8 +7,6 @@ const { buildViewLink, buildUrl } = require('../utils/build');
 
 const apiClient = new CloudFoundryAPIClient();
 
-const buildConfig = config.build;
-
 const defaultBranch = build => build.branch === build.Site.defaultBranch;
 const demoBranch = build => build.branch === build.Site.demoBranch;
 
@@ -51,7 +49,6 @@ const generateDefaultCredentials = build => ({
   STATUS_CALLBACK: statusCallbackURL(build),
   BUCKET: config.s3.bucket,
   BASEURL: baseURLForBuild(build),
-  CACHE_CONTROL: buildConfig.cacheControl,
   BRANCH: build.branch,
   CONFIG: JSON.stringify(siteConfig(build)),
   REPOSITORY: build.Site.repository,
@@ -59,8 +56,6 @@ const generateDefaultCredentials = build => ({
   SITE_PREFIX: sitePrefixForBuild(buildUrl(build, build.Site)),
   GITHUB_TOKEN: build.User.githubAccessToken,
   GENERATOR: build.Site.engine,
-  AUTH_BASEURL: process.env.APP_HOSTNAME,
-  AUTH_ENDPOINT: 'external/auth/github',
   BUILD_ID: build.id,
   USER_ENVIRONMENT_VARIABLES: JSON.stringify(buildUEVs(build.Site.UserEnvironmentVariables)),
 });
