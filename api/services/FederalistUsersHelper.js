@@ -67,7 +67,7 @@ const revokeMembershipForInactiveUsers = async ({ auditorUsername }) => {
   auditorUsername = auditorUsername || config.federalistUsers.admin;
   /* eslint-enable no-param-reassign */
   const now = moment();
-  const cutoff = now.clone().subtract(MAX_DAYS_SINCE_LOGIN, 'days');
+  const cutoff = now.clone().subtract(MAX_DAYS_SINCE_LOGIN, 'days').toDate();
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
 
   const users = await User.findAll({
@@ -75,13 +75,13 @@ const revokeMembershipForInactiveUsers = async ({ auditorUsername }) => {
     where: {
       isActive: true,
       signedInAt: {
-        [Op.lt]: cutoff.toDate(),
+        [Op.lt]: cutoff,
       },
       pushedAt: {
-        [Op.lt]: cutoff.toDate(),
+        [Op.lt]: cutoff,
       },
       createdAt: {
-        [Op.lt]: cutoff.toDate(),
+        [Op.lt]: cutoff,
       },
     },
   });
