@@ -113,7 +113,7 @@
     "date-fns": "^2.16.1",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.4",
-    "eslint": "^7.12.1",
+    "eslint": "^7.13.0",
     "eslint-config-airbnb": "^18.2.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
