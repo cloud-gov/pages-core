@@ -664,6 +664,34 @@ describe('Webhook API', () => {
         });
     });
 
+    it('should do nothing if org webhook for removal of non-existent user', (done) => {
+      let payload;
+      let origUserCount;
+      payload = organizationWebhookPayload('member_removed', 'rando-user');
+      const signature = signWebhookPayload(payload);
+      User.count()
+        .then((count) => {
+          origUserCount = count;
+          return request(app)
+            .post('/webhook/organization')
+            .send(payload)
+            .set({
+              'X-GitHub-Event': 'push',
+              'X-Hub-Signature': signature,
+              'X-GitHub-Delivery': '123abc',
+            })
+            .expect(200);
+        })
+        .then(() => {
+          expect(auditStub.notCalled).to.be.true;
+          return User.count();
+        })
+        .then((count) => {
+          expect(count).to.equal(origUserCount);
+          done()
+        });
+    });
+
     it('should do nothing if not federalist-org webhook', (done) => {
       factory.user({ isActive: true })
         .then((user) => {
