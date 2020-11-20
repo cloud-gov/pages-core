@@ -47,15 +47,15 @@ const organizationWebhookRequest = async (payload) => {
   if (['member_added', 'member_removed'].includes(action)) {
     const isActive = action === 'member_added';
 
-    if (!user && isActive) {
+    if (!user) {
       user = await User.create({ username });
     }
-    if (user) {
-      if (isActive !== user.isActive) {
-        await user.update({ isActive });
-      }
-      EventCreator.audit(Event.labels.FEDERALIST_USERS_MEMBERSHIP, user, payload);
+
+    if (isActive !== user.isActive) {
+      await user.update({ isActive });
     }
+
+    EventCreator.audit(Event.labels.FEDERALIST_USERS_MEMBERSHIP, user, payload);
   }
 };
 
