@@ -129,7 +129,7 @@
     "mini-css-extract-plugin": "^1.2.1",
     "mocha": "^8.2.0",
     "mock-fs": "^4.13.0",
-    "nock": "^13.0.4",
+    "nock": "^13.0.5",
     "nodemon": "^2.0.6",
     "nyc": "^15.1.0",
     "postcss-loader": "^3.0.0",
