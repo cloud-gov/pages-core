@@ -12,7 +12,7 @@ const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema'
 const { Build } = require('../../../api/models');
 const csrfToken = require('../support/csrfToken');
 
-const commitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
+const webhookCommitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
 
 describe('Build API', () => {
   let sendMessageStub;
@@ -34,7 +34,7 @@ describe('Build API', () => {
     /* eslint-disable eqeqeq */
     expect(build.error == response.error).to.be.ok;
     expect(build.branch == response.branch).to.be.ok;
-    expect(build.commitSha == response.commitSha).to.be.ok;
+    expect(build.webhookCommitSha == response.webhookCommitSha).to.be.ok;
     /* eslint-enable eqeqeq */
     expect(response.site.id).to.equal(build.site || build.Site.id);
     expect(response.user.id).to.equal(build.user || build.User.id);
@@ -152,7 +152,7 @@ describe('Build API', () => {
               site,
               state: 'success',
               branch: 'main',
-              commitSha,
+              webhookCommitSha,
               user,
             }),
             cookie: authenticatedSession(user),
@@ -184,7 +184,7 @@ describe('Build API', () => {
                 site: site.id,
                 user: user.id,
                 branch: 'my-branch',
-                commitSha,
+                webhookCommitSha,
               },
             });
           })
@@ -210,7 +210,7 @@ describe('Build API', () => {
               {
                 branch: promisedValues.build.branch,
                 siteId: promisedValues.build.site,
-                sha: promisedValues.build.commitSha,
+                sha: promisedValues.build.webhookCommitSha,
               }
             );
           })
@@ -221,7 +221,7 @@ describe('Build API', () => {
                 site: site.id,
                 user: user.id,
                 branch: 'my-branch',
-                commitSha,
+                webhookCommitSha,
               },
             });
           })
@@ -366,7 +366,7 @@ describe('Build API', () => {
             branch,
             expected: {
               name: branch,
-              commit: { sha: commitSha },
+              commit: { sha: webhookCommitSha },
             },
           });
 
@@ -376,7 +376,7 @@ describe('Build API', () => {
             {
               branch,
               siteId: site.id,
-              sha: commitSha,
+              sha: webhookCommitSha,
             }
           );
         })
@@ -387,7 +387,7 @@ describe('Build API', () => {
               site: site.id,
               user: user.id,
               branch,
-              commitSha,
+              webhookCommitSha,
             },
           });
         })
@@ -622,7 +622,7 @@ describe('Build API', () => {
       const statusNock = githubAPINocks.status({ state: 'success' });
       let build;
 
-      factory.build({ commitSha })
+      factory.build({ webhookCommitSha })
       .then((_build) => {
         build = _build;
         return Promise.all([build.getUser(), build.getSite()]);
@@ -655,7 +655,7 @@ describe('Build API', () => {
     });
 
     it('should respond with a 404 for a build that does not exist', (done) => {
-      const build = factory.build({ commitSha });
+      const build = factory.build({ webhookCommitSha });
       build.id = -1;
       postBuildStatus({
         build,

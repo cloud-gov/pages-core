@@ -80,7 +80,7 @@ module.exports = {
               site: b.site,
               user: req.user.id,
               username: req.user.username,
-              commitSha: b.commitSha,
+              webhookCommitSha: b.webhookCommitSha,
             })
               .then(build => build.enqueue())
               .then(build => GithubBuildStatusReporter

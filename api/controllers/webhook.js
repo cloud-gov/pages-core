@@ -92,7 +92,7 @@ const createBuildForWebhookRequest = async (request) => {
   }
 
   const branch = request.body.ref.replace('refs/heads/', '');
-  const commitSha = request.body.after;
+  const webhookCommitSha = request.body.after;
 
   const queuedBuild = await Build.findOne({
     where: {
@@ -104,7 +104,7 @@ const createBuildForWebhookRequest = async (request) => {
 
   if (queuedBuild) {
     return queuedBuild.update({
-      commitSha,
+      webhookCommitSha,
       user: user ? user.id : null,
       username,
     });
@@ -112,7 +112,7 @@ const createBuildForWebhookRequest = async (request) => {
 
   return Build.create({
     branch,
-    commitSha,
+    webhookCommitSha,
     site: site.id,
     user: user ? user.id : null,
     username,

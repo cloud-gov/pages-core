@@ -15,7 +15,7 @@ const testBuild = {
   id: 5,
   site: testSite,
   branch: testBranch,
-  commitSha: '123abc',
+  webhookCommitSha: '123abc',
 };
 const buildLogPage = 1;
 const uev = { id: 8 };

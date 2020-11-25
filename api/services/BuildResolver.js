@@ -12,7 +12,7 @@ function getBranchFromGithub({ user, site, branch }) {
     .then(branchInfo => ({
       branch: branchInfo.name,
       site: site.id,
-      commitSha: branchInfo.commit.sha,
+      webhookCommitSha: branchInfo.commit.sha,
     }))
     .catch(() => { throw rejectBuild(buildErrors.BRANCH_NOT_FOUND); });
 }
@@ -55,7 +55,7 @@ const getBuildByBranch = (user, params) => {
 
       // The branch we want to create a new build from has been built via federalist before
       if (build) {
-        return { ...build.toJSON(), commitSha: build.commitSha || sha };
+        return { ...build.toJSON(), webhookCommitSha: build.webhookCommitSha || sha };
       }
 
       // We don't have a build record, using this branch, go to github and check if the

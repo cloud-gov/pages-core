@@ -150,7 +150,7 @@ module.exports = (sequelize, DataTypes) => {
         is: branchRegex,
       },
     },
-    commitSha: {
+    webhookCommitSha: {
       type: DataTypes.STRING,
       validate: {
         is: shaRegex,

@@ -235,18 +235,18 @@ describe('Build model', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        commitSha: 'not-a-real-sha.biz',
+        webhookCommitSha: 'not-a-real-sha.biz',
       });
 
       return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'Validation error: Validation is on commitSha failed');
+        .rejectedWith(ValidationError, 'Validation error: Validation is on webhookCommitSha failed');
     });
 
     it('requires a valid branch name before saving', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+        webhookCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: 'not*real',
       });
 
@@ -258,7 +258,7 @@ describe('Build model', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+        webhookCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: 'not-real/',
       });
 
@@ -270,7 +270,7 @@ describe('Build model', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+        webhookCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: '/not-real',
       });
 
