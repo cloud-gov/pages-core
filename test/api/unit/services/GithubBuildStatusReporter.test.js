@@ -11,6 +11,7 @@ const { buildViewLink } = require('../../../../api/utils/build');
 const GithubBuildStatusReporter = require('../../../../api/services/GithubBuildStatusReporter');
 
 const webhookCommitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
+const cloneCommitSha = '7b8d23c07a2c3b5a140844a654d91e13c66b271a';
 
 describe('GithubBuildStatusReporter', () => {
   afterEach(() => {
@@ -406,6 +407,7 @@ describe('GithubBuildStatusReporter', () => {
           state: 'success',
           site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
           webhookCommitSha,
+          cloneCommitSha
         }).then((_build) => {
           build = _build;
           return build.getUser();
@@ -420,7 +422,7 @@ describe('GithubBuildStatusReporter', () => {
           statusNock = githubAPINocks.status({
             owner: 'test-owner',
             repo: 'test-repo',
-            sha: webhookCommitSha,
+            sha: cloneCommitSha,
             state: 'success',
           });
 
@@ -444,6 +446,7 @@ describe('GithubBuildStatusReporter', () => {
           state: 'success',
           site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
           webhookCommitSha,
+          cloneCommitSha,
         }).then((_build) => {
           build = _build;
           return build.getUser();
@@ -457,7 +460,7 @@ describe('GithubBuildStatusReporter', () => {
           statusNock = githubAPINocks.status({
             owner: 'test-owner',
             repo: 'test-repo',
-            sha: webhookCommitSha,
+            sha: cloneCommitSha,
             state: 'success',
           });
 
@@ -483,6 +486,7 @@ describe('GithubBuildStatusReporter', () => {
             awsBucketName: 'test-bucket',
           }),
           webhookCommitSha,
+          cloneCommitSha,
           branch: 'preview-branch',
         }).then((_build) => {
           build = _build;
@@ -497,7 +501,7 @@ describe('GithubBuildStatusReporter', () => {
           statusNock = githubAPINocks.status({
             owner: 'test-owner',
             repo: 'test-repo',
-            sha: webhookCommitSha,
+            sha: cloneCommitSha,
             targetURL: buildViewLink(build, site),
           });
 
@@ -512,7 +516,7 @@ describe('GithubBuildStatusReporter', () => {
     });
 
     context('with a build in the error state', () => {
-      it("should report that the status is 'error'", (done) => {
+      it("should report that the status is 'error' with webhookCommitSha", (done) => {
         let statusNock;
         let repoNock;
         let build;
@@ -535,6 +539,42 @@ describe('GithubBuildStatusReporter', () => {
             owner: 'test-owner',
             repo: 'test-repo',
             sha: webhookCommitSha,
+            state: 'error',
+          });
+
+          return GithubBuildStatusReporter.reportBuildStatus(build);
+        }).then(() => {
+          expect(statusNock.isDone()).to.be.true;
+          expect(repoNock.isDone()).to.be.true;
+          done();
+        })
+        .catch(done);
+      });
+
+      it("should report that the status is 'error' with cloneCommitSha", (done) => {
+        let statusNock;
+        let repoNock;
+        let build;
+
+        factory.build({
+          state: 'error',
+          site: factory.site({ owner: 'test-owner', repository: 'test-repo' }),
+          webhookCommitSha,
+          cloneCommitSha,
+        }).then((_build) => {
+          build = _build;
+          return build.getUser();
+        }).then((user) => {
+          repoNock = githubAPINocks.repo({
+            accessToken: 'fake-access-token',
+            owner: 'test-owner',
+            repo: 'test-repo',
+            username: user.username,
+          });
+          statusNock = githubAPINocks.status({
+            owner: 'test-owner',
+            repo: 'test-repo',
+            sha: cloneCommitSha,
             state: 'error',
           });
 

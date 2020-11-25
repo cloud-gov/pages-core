@@ -21,6 +21,9 @@
     "webhookCommitSha": {
       "type": "string"
     },
+    "cloneCommitSha": {
+      "type": "string"
+    },
     "createdAt": {
       "type": "string"
     },

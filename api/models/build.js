@@ -61,6 +61,10 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
     state: buildStatus.status,
   };
 
+  if (buildStatus.commitSha && buildStatus.commitSha !== build.cloneCommitSha) {
+    atts.cloneCommitSha = buildStatus.commitSha;
+  }
+
   if (buildStatus.status === States.Error) {
     atts.error = jobErrorMessage(buildStatus.message);
   }
@@ -195,6 +199,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     logsS3Key: {
       type: DataTypes.STRING,
+    },
+    cloneCommitSha: {
+      type: DataTypes.STRING,
+      validate: {
+        is: shaRegex,
+      },
     },
   }, {
     tableName: 'build',

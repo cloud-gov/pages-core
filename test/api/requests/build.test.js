@@ -13,6 +13,7 @@ const { Build } = require('../../../api/models');
 const csrfToken = require('../support/csrfToken');
 
 const webhookCommitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
+const cloneCommitSha = '7b8d23c07a2c3b5a140844a654d91e13c66b271a';
 
 describe('Build API', () => {
   let sendMessageStub;
@@ -608,6 +609,7 @@ describe('Build API', () => {
         .send({
           status: options.status,
           message: encode64(options.message),
+          commitSha: options.commitSha,
         });
     };
 
@@ -619,7 +621,7 @@ describe('Build API', () => {
 
     it('should report the build\'s status back to github', (done) => {
       nock.cleanAll();
-      const statusNock = githubAPINocks.status({ state: 'success' });
+      const statusNock = githubAPINocks.status({ state: 'success', commitSha: cloneCommitSha });
       let build;
 
       factory.build({ webhookCommitSha })
@@ -637,6 +639,7 @@ describe('Build API', () => {
           build,
           status: 'success',
           message: '',
+          commitSha: cloneCommitSha,
         });
       })
       .then(() => {
@@ -651,6 +654,7 @@ describe('Build API', () => {
         build: { id: 'invalid-build-id', token: 'invalid-token' },
         status: 'success',
         message: '',
+        commitSha: cloneCommitSha,
       }).expect(404, done);
     });
 
@@ -661,6 +665,7 @@ describe('Build API', () => {
         build,
         status: 'success',
         message: '',
+        commitSha: cloneCommitSha,
       }).expect(404, done);
     });
 
@@ -677,6 +682,7 @@ describe('Build API', () => {
           buildToken: 'invalid-token',
           status: 'success',
           message: '',
+          commitSha: cloneCommitSha,
         }).expect(403)
       )
       .then(() => Build.findByPk(build.id))

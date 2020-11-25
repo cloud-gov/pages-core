@@ -100,9 +100,11 @@ module.exports = {
     const getBuildStatus = (statusRequest) => {
       let status;
       let message;
+      let commitSha;
       try {
         status = statusRequest.body.status;
         message = decodeb64(statusRequest.body.message);
+        commitSha = statusRequest.body.commit_sha;
       } catch (err) {
         status = 'error';
         message = 'build status message parsing error';
@@ -113,7 +115,7 @@ module.exports = {
         ];
         logger.error(errMsg.join('\n'));
       }
-      return { status, message };
+      return { status, message, commitSha };
     };
 
     Promise.resolve(getBuildStatus(req))

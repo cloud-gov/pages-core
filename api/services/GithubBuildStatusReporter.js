@@ -77,10 +77,10 @@ const reportBuildStatus = (build) => {
   let options = {};
 
   return new Promise((resolve, reject) => {
-    if (!build || !build.webhookCommitSha) {
-      reject(new Error('Build or commit sha undefined. Unable to report build status'));
-    } else {
+    if (build && (build.webhookCommitSha || build.cloneCommitSha)) {
       resolve();
+    } else {
+      reject(new Error('Build or commit sha undefined. Unable to report build status'));
     }
   })
     .then(() => Site.findByPk(build.site))
@@ -98,7 +98,7 @@ const reportBuildStatus = (build) => {
       options = {
         owner: site.owner,
         repo: site.repository,
-        sha: build.webhookCommitSha,
+        sha: build.cloneCommitSha || build.webhookCommitSha,
         context,
       };
 

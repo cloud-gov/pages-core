@@ -183,12 +183,14 @@ describe('Build model', () => {
 
       describe('to `success`', () => {
         it('should update the site\'s publishedAt timestamp if the build is successful', async () => {
-          build = await build.updateJobStatus({ status: 'success' });
+          const commitSha = 'abcdef0123456789001234567890012345678901';
+          build = await build.updateJobStatus({ status: 'success', commitSha });
 
           expect(build.state).to.be.eql('success');
           expect(build.completedAt).to.be.a('date');
           expect(build.completedAt).to.be.above(build.startedAt);
           expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
+          expect(build.cloneCommitSha).to.equal(commitSha);
 
           const site = await Site.findByPk(build.site);
 
@@ -203,12 +205,26 @@ describe('Build model', () => {
       });
 
       describe('to `error`', () => {
-        it('should mark a build errored with a message', async () => {
+        it('should mark a build errored with a message and w/o commitSha', async () => {
           await build.updateJobStatus({ status: 'error', message: 'this is an error' });
 
           expect(build.state).to.equal('error');
           expect(build.error).to.equal('this is an error');
           expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
+          expect(build.completedAt).to.be.a('date');
+          expect(build.completedAt).to.be.above(build.startedAt);
+          expect(build.cloneCommitSha).to.be.null;
+        });
+
+        it('should mark a build errored with a message and commitSha', async () => {
+          const commitSha = 'abcdef0123456789001234567890012345678901';
+          const message = 'this is an error with commitsha';
+          await build.updateJobStatus({ status: 'error', message , commitSha });
+
+          expect(build.state).to.equal('error');
+          expect(build.error).to.equal(message);
+          expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
+          expect(build.cloneCommitSha).to.equal(commitSha);
           expect(build.completedAt).to.be.a('date');
           expect(build.completedAt).to.be.above(build.startedAt);
         });
@@ -231,7 +247,7 @@ describe('Build model', () => {
         .rejectedWith(ValidationError, 'notNull Violation: Build.username cannot be null');
     });
 
-    it('should require a valid sha before saving', () => {
+    it('should require a valid webhookCommitSha before saving', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
@@ -240,6 +256,17 @@ describe('Build model', () => {
 
       return expect(buildPromise).to.be
         .rejectedWith(ValidationError, 'Validation error: Validation is on webhookCommitSha failed');
+    });
+
+    it('should require a valid cloneCommitSha before saving', () => {
+      const buildPromise = Build.create({
+        user: 1,
+        site: 1,
+        cloneCommitSha: 'not-a-real-sha.biz',
+      });
+
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'Validation error: Validation is on cloneCommitSha failed');
     });
 
     it('requires a valid branch name before saving', () => {
