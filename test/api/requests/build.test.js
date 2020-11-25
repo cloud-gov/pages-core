@@ -689,6 +689,7 @@ describe('Build API', () => {
       .then((unmodifiedBuild) => {
         expect(unmodifiedBuild).to.not.be.undefined;
         expect(unmodifiedBuild.state).to.equal('created');
+        expect(unmodifiedBuild.cloneCommitSha).to.be.null;
         done();
       })
       .catch(done);
