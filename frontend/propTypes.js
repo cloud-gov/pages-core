@@ -35,6 +35,7 @@ export const BUILD = PropTypes.shape({
   error: PropTypes.string,
   branch: PropTypes.string,
   requestedCommitSha: PropTypes.string,
+  clonedCommitSha: PropTypes.string,
   completedAt: PropTypes.string,
   createdAt: PropTypes.string,
   user: PropTypes.shape({

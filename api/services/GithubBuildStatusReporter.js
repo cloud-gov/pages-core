@@ -77,7 +77,7 @@ const reportBuildStatus = (build) => {
   let options = {};
 
   return new Promise((resolve, reject) => {
-    if (build && (build.requestedCommitSha || build.clonedCommitSha)) {
+    if (build && build.requestedCommitSha) {
       resolve();
     } else {
       reject(new Error('Build or commit sha undefined. Unable to report build status'));
