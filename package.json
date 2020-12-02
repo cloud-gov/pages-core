@@ -34,6 +34,7 @@
     "nunjucks": "^3.2.2",
     "passport": "^0.4.0",
     "passport-github": "^1.0.0",
+    "passport-oauth2": "^1.5.0",
     "pg": "^8.5.1",
     "pg-native": "^3.0.0",
     "rc": "^1.2.8",
@@ -82,7 +83,7 @@
     "update-proxy-db": "node ./scripts/proxy-edge.js",
     "timeout-builds": "node ./scripts/timeout-builds.js",
     "remove-inactive-federalist-users": "node ./scripts/remove-inactive-federalist-users.js",
-    "remove-federalist-users-org-members-not-users":  "node ./scripts/remove-federalist-users-org-members-not-users.js",
+    "remove-federalist-users-org-members-not-users": "node ./scripts/remove-federalist-users-org-members-not-users.js",
     "archive-build-logs": "node ./scripts/archive-build-logs.js",
     "archive-build-logs-daily": "node ./scripts/archive-build-logs-daily.js",
     "migrate-build-logs": "node ./scripts/migrate-build-logs.js"
