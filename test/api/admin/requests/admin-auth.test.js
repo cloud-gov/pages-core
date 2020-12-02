@@ -1,11 +1,13 @@
 const { expect } = require('chai');
 const request = require('supertest');
 const sinon = require('sinon');
-const githubAPINocks = require('../../support/githubAPINocks');
+const cfUAANock = require('../../support/cfUAANock');
+const userFactory = require('../../support/factory/user');
 const { sessionForCookie } = require('../../support/cookieSession');
 const { unauthenticatedSession } = require('../../support/session');
-const GitHub = require('../../../../api/services/GitHub');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
+
+const { options: uaaConfig } = require('../../../../config').passport.uaa;
 
 const app = require('../../../../app');
 
@@ -14,40 +16,40 @@ describe('Admin authentication request', () => {
     sinon.restore();
   });
 
-  describe('GET /admin/auth/github', () => {
-    it('should redirect to GitHub for OAuth2 authentication', (done) => {
+  describe('GET /admin/login', () => {
+    it('should redirect to the configured cloud.gov authorization endpoint', (done) => {
+      const locationRE = new RegExp(`^${uaaConfig.authorizationURL}`);
       request(app)
-        .get('/admin/auth/github')
-        .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
+        .get('/admin/login')
+        .expect('Location', locationRE)
         .expect(302, done);
     });
   });
 
-  describe('GET /admin/auth/github/callback', () => {
-    it('returns unauthorized if the user is not in an allowed GitHub organization', (done) => {
-      githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
-      request(app)
-        .get('/admin/auth/github/callback?code=auth-code-123abc&state=state-123abc')
-        .expect(401, done);
-    });
-
+  describe('GET /admin/auth/uaa/callback', () => {
     it('returns unauthorized if the user is not an admin', (done) => {
-      githubAPINocks.githubAuth('user', [{ id: 123456 }]);
-      sinon.stub(GitHub, 'ensureFederalistAdmin').rejects();
+      const code = 'code';
+      const profile = { email: 'hello@example.com' };
+
+      cfUAANock.uaaAuth(profile, code);
+
       request(app)
-        .get('/admin/auth/github/callback?code=auth-code-123abc&state=state-123abc')
+        .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
         .expect(401, done);
     });
 
     describe('when successful', () => {
-      beforeEach(() => {
-        githubAPINocks.githubAuth('user', [{ id: 123456 }]);
-        sinon.stub(GitHub, 'ensureFederalistAdmin').resolves();
+      const code = 'code';
+      const adminEmail = 'david.corwin@gsa.gov';
+
+      beforeEach(async () => {
+        cfUAANock.uaaAuth({ email: adminEmail }, code);
+        await userFactory({ adminEmail });
       });
 
       it('returns a script tag', (done) => {
         request(app)
-          .get('/admin/auth/github/callback?code=auth-code-123abc&state=state-123abc')
+          .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
           .expect((res) => {
             expect(res.text.trim()).to.match(/^<script>(.|\n)*<\/script>$/g);
           })
@@ -57,7 +59,7 @@ describe('Admin authentication request', () => {
       it('authenticates the session', async () => {
         const cookie = await unauthenticatedSession({ oauthState: 'state-123abc', cfg: sessionConfig });
         await request(app)
-          .get('/admin/auth/github/callback?code=auth-code-123abc&state=state-123abc')
+          .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
           .set('Cookie', cookie)
           .expect(200)
           .expect((res) => {

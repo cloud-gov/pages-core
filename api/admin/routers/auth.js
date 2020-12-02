@@ -13,7 +13,11 @@ const onSuccess = (req, res) => {
 
 const router = Router();
 
-router.get('/auth/github', passport.authenticate('github'));
-router.get('/auth/github/callback', passport.authenticate('github'), onSuccess);
+router.get('/login', passport.authenticate('uaa'));
+router.get('/logout', passport.logout);
+
+// Callbacks need to be registered with CF UAA service
+router.get('/auth/uaa/callback', passport.authenticate('uaa'), onSuccess);
+router.get('/auth/uaa/logout', onSuccess);
 
 module.exports = router;

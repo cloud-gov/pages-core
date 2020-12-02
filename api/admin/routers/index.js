@@ -1,9 +1,9 @@
 const { Router } = require('express');
-const auth = require('./auth');
 const AdminBuildController = require('../controllers/build');
 const AdminEventController = require('../controllers/event');
 const AdminSiteController = require('../controllers/site');
 const UserController = require('../controllers/user');
+const auth = require('./auth');
 
 const ensureAuthenticated = (req, res, next) => {
   if (!req.isAuthenticated || !req.isAuthenticated()) {
@@ -23,10 +23,6 @@ authenticatedRouter.get('/sites/:id', AdminSiteController.findById);
 authenticatedRouter.put('/sites/:id', AdminSiteController.update);
 authenticatedRouter.delete('/sites/:id', AdminSiteController.destroy);
 authenticatedRouter.get('/me', UserController.me);
-authenticatedRouter.get('/logout', (req, res) => {
-  req.logout();
-  res.json({ status: 'logged out' });
-});
 
 const adminRouter = Router();
 adminRouter.use(auth);
