@@ -190,7 +190,7 @@ describe('Build model', () => {
           expect(build.completedAt).to.be.a('date');
           expect(build.completedAt).to.be.above(build.startedAt);
           expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
-          expect(build.cloneCommitSha).to.equal(commitSha);
+          expect(build.clonedCommitSha).to.equal(commitSha);
 
           const site = await Site.findByPk(build.site);
 
@@ -213,7 +213,7 @@ describe('Build model', () => {
           expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
           expect(build.completedAt).to.be.a('date');
           expect(build.completedAt).to.be.above(build.startedAt);
-          expect(build.cloneCommitSha).to.be.null;
+          expect(build.clonedCommitSha).to.be.null;
         });
 
         it('should mark a build errored with a message and commitSha', async () => {
@@ -224,7 +224,7 @@ describe('Build model', () => {
           expect(build.state).to.equal('error');
           expect(build.error).to.equal(message);
           expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
-          expect(build.cloneCommitSha).to.equal(commitSha);
+          expect(build.clonedCommitSha).to.equal(commitSha);
           expect(build.completedAt).to.be.a('date');
           expect(build.completedAt).to.be.above(build.startedAt);
         });
@@ -247,33 +247,33 @@ describe('Build model', () => {
         .rejectedWith(ValidationError, 'notNull Violation: Build.username cannot be null');
     });
 
-    it('should require a valid webhookCommitSha before saving', () => {
+    it('should require a valid requestedCommitSha before saving', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        webhookCommitSha: 'not-a-real-sha.biz',
+        requestedCommitSha: 'not-a-real-sha.biz',
       });
 
       return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'Validation error: Validation is on webhookCommitSha failed');
+        .rejectedWith(ValidationError, 'Validation error: Validation is on requestedCommitSha failed');
     });
 
-    it('should require a valid cloneCommitSha before saving', () => {
+    it('should require a valid clonedCommitSha before saving', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        cloneCommitSha: 'not-a-real-sha.biz',
+        clonedCommitSha: 'not-a-real-sha.biz',
       });
 
       return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'Validation error: Validation is on cloneCommitSha failed');
+        .rejectedWith(ValidationError, 'Validation error: Validation is on clonedCommitSha failed');
     });
 
     it('requires a valid branch name before saving', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        webhookCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+        requestedCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: 'not*real',
       });
 
@@ -285,7 +285,7 @@ describe('Build model', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        webhookCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+        requestedCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: 'not-real/',
       });
 
@@ -297,7 +297,7 @@ describe('Build model', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        webhookCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+        requestedCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: '/not-real',
       });
 

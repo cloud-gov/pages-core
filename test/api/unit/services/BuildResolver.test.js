@@ -87,7 +87,7 @@ describe('BuildResolver', () => {
     )
     .then((response) => {
       expect(response.branch).to.equal(branch);
-      expect(response.webhookCommitSha).to.equal(sha);
+      expect(response.requestedCommitSha).to.equal(sha);
       done();
     })
     .catch(done);
@@ -115,7 +115,7 @@ describe('BuildResolver', () => {
       });
 
       expect(build.branch).to.equal(branch);
-      expect(build.webhookCommitSha).to.equal(sha);
+      expect(build.requestedCommitSha).to.equal(sha);
     });
 
     it('returns a 404 when a build cannot be started because branch does not exist', async () => {

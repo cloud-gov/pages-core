@@ -18,10 +18,10 @@
     "branch": {
       "type": ["string", "null"]
     },
-    "webhookCommitSha": {
+    "requestedCommitSha": {
       "type": "string"
     },
-    "cloneCommitSha": {
+    "clonedCommitSha": {
       "type": "string"
     },
     "createdAt": {

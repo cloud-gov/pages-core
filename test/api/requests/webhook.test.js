@@ -85,7 +85,7 @@ describe('Webhook API', () => {
             site: site.id,
             user: user.id,
             branch: payload.ref.split('/')[2],
-            webhookCommitSha: payload.after,
+            requestedCommitSha: payload.after,
           },
         }))
         .then((builds) => {
@@ -318,7 +318,7 @@ describe('Webhook API', () => {
           site: site.id,
           user: user.id,
           branch: 'main',
-          webhookCommitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
+          requestedCommitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
           state: 'queued',
           token: 'token',
           username: user.username,
@@ -346,7 +346,7 @@ describe('Webhook API', () => {
         expect(numBuildsAfter).to.eq(1);
       });
 
-      it('should update the webhookCommitSha and user of build', async () => {
+      it('should update the requestedCommitSha and user of build', async () => {
         const branch = 'main';
         const origSha = 'aaa2b66a31319d456a448041a5b3c2a70c32d8b7';
         const userProms = Promise.all([factory.user(), factory.user()]);
@@ -356,7 +356,7 @@ describe('Webhook API', () => {
           site: site.id,
           user: user1.id,
           branch,
-          webhookCommitSha: origSha,
+          requestedCommitSha: origSha,
           state: 'queued',
           token: 'token',
           username: user1.username,
@@ -381,7 +381,7 @@ describe('Webhook API', () => {
 
         const build = await Build.findOne({ where: { site: site.id, branch }, include: [User] });
 
-        expect(build.webhookCommitSha).to.eq(payload.after);
+        expect(build.requestedCommitSha).to.eq(payload.after);
         expect(build.user).to.eq(user2.id);
       });
 
@@ -396,7 +396,7 @@ describe('Webhook API', () => {
           site: site.id,
           user: user.id,
           branch: 'main',
-          webhookCommitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
+          requestedCommitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
           state: 'queued',
           token: 'token',
           username: user.username,
@@ -436,7 +436,7 @@ describe('Webhook API', () => {
           site: site.id,
           user: user.id,
           branch: 'main',
-          webhookCommitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
+          requestedCommitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
           state: 'created',
           token: 'token',
           username: user.username,
@@ -464,7 +464,7 @@ describe('Webhook API', () => {
         expect(numBuildsAfter).to.eq(1);
       });
 
-      it('should update the webhookCommitSha and user of build', async () => {
+      it('should update the requestedCommitSha and user of build', async () => {
         const branch = 'main';
         const origSha = 'aaa2b66a31319d456a448041a5b3c2a70c32d8b7';
         const userProms = Promise.all([factory.user(), factory.user()]);
@@ -474,7 +474,7 @@ describe('Webhook API', () => {
           site: site.id,
           user: user1.id,
           branch,
-          webhookCommitSha: origSha,
+          requestedCommitSha: origSha,
           state: 'created',
           token: 'token',
           username: user1.username,
@@ -499,7 +499,7 @@ describe('Webhook API', () => {
 
         const build = await Build.findOne({ where: { site: site.id, branch }, include: [User] });
 
-        expect(build.webhookCommitSha).to.eq(payload.after);
+        expect(build.requestedCommitSha).to.eq(payload.after);
         expect(build.user).to.eq(user2.id);
       });
 
@@ -514,7 +514,7 @@ describe('Webhook API', () => {
           site: site.id,
           user: user.id,
           branch: 'main',
-          webhookCommitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
+          requestedCommitSha: 'a172b66a31319d456a448041a5b3c2a70c32d8b7',
           state: 'created',
           token: 'token',
           username: user.username,

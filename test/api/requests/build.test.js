@@ -12,8 +12,8 @@ const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema'
 const { Build } = require('../../../api/models');
 const csrfToken = require('../support/csrfToken');
 
-const webhookCommitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
-const cloneCommitSha = '7b8d23c07a2c3b5a140844a654d91e13c66b271a';
+const requestedCommitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
+const clonedCommitSha = '7b8d23c07a2c3b5a140844a654d91e13c66b271a';
 
 describe('Build API', () => {
   let sendMessageStub;
@@ -35,7 +35,7 @@ describe('Build API', () => {
     /* eslint-disable eqeqeq */
     expect(build.error == response.error).to.be.ok;
     expect(build.branch == response.branch).to.be.ok;
-    expect(build.webhookCommitSha == response.webhookCommitSha).to.be.ok;
+    expect(build.requestedCommitSha == response.requestedCommitSha).to.be.ok;
     /* eslint-enable eqeqeq */
     expect(response.site.id).to.equal(build.site || build.Site.id);
     expect(response.user.id).to.equal(build.user || build.User.id);
@@ -153,7 +153,7 @@ describe('Build API', () => {
               site,
               state: 'success',
               branch: 'main',
-              webhookCommitSha,
+              requestedCommitSha,
               user,
             }),
             cookie: authenticatedSession(user),
@@ -185,7 +185,7 @@ describe('Build API', () => {
                 site: site.id,
                 user: user.id,
                 branch: 'my-branch',
-                webhookCommitSha,
+                requestedCommitSha,
               },
             });
           })
@@ -211,7 +211,7 @@ describe('Build API', () => {
               {
                 branch: promisedValues.build.branch,
                 siteId: promisedValues.build.site,
-                sha: promisedValues.build.webhookCommitSha,
+                sha: promisedValues.build.requestedCommitSha,
               }
             );
           })
@@ -222,7 +222,7 @@ describe('Build API', () => {
                 site: site.id,
                 user: user.id,
                 branch: 'my-branch',
-                webhookCommitSha,
+                requestedCommitSha,
               },
             });
           })
@@ -367,7 +367,7 @@ describe('Build API', () => {
             branch,
             expected: {
               name: branch,
-              commit: { sha: webhookCommitSha },
+              commit: { sha: requestedCommitSha },
             },
           });
 
@@ -377,7 +377,7 @@ describe('Build API', () => {
             {
               branch,
               siteId: site.id,
-              sha: webhookCommitSha,
+              sha: requestedCommitSha,
             }
           );
         })
@@ -388,7 +388,7 @@ describe('Build API', () => {
               site: site.id,
               user: user.id,
               branch,
-              webhookCommitSha,
+              requestedCommitSha,
             },
           });
         })
@@ -621,10 +621,10 @@ describe('Build API', () => {
 
     it('should report the build\'s status back to github', (done) => {
       nock.cleanAll();
-      const statusNock = githubAPINocks.status({ state: 'success', commitSha: cloneCommitSha });
+      const statusNock = githubAPINocks.status({ state: 'success', commitSha: clonedCommitSha });
       let build;
 
-      factory.build({ webhookCommitSha })
+      factory.build({ requestedCommitSha })
       .then((_build) => {
         build = _build;
         return Promise.all([build.getUser(), build.getSite()]);
@@ -639,7 +639,7 @@ describe('Build API', () => {
           build,
           status: 'success',
           message: '',
-          commitSha: cloneCommitSha,
+          commitSha: clonedCommitSha,
         });
       })
       .then(() => {
@@ -654,18 +654,18 @@ describe('Build API', () => {
         build: { id: 'invalid-build-id', token: 'invalid-token' },
         status: 'success',
         message: '',
-        commitSha: cloneCommitSha,
+        commitSha: clonedCommitSha,
       }).expect(404, done);
     });
 
     it('should respond with a 404 for a build that does not exist', (done) => {
-      const build = factory.build({ webhookCommitSha });
+      const build = factory.build({ requestedCommitSha });
       build.id = -1;
       postBuildStatus({
         build,
         status: 'success',
         message: '',
-        commitSha: cloneCommitSha,
+        commitSha: clonedCommitSha,
       }).expect(404, done);
     });
 
@@ -682,14 +682,14 @@ describe('Build API', () => {
           buildToken: 'invalid-token',
           status: 'success',
           message: '',
-          commitSha: cloneCommitSha,
+          commitSha: clonedCommitSha,
         }).expect(403)
       )
       .then(() => Build.findByPk(build.id))
       .then((unmodifiedBuild) => {
         expect(unmodifiedBuild).to.not.be.undefined;
         expect(unmodifiedBuild.state).to.equal('created');
-        expect(unmodifiedBuild.cloneCommitSha).to.be.null;
+        expect(unmodifiedBuild.clonedCommitSha).to.be.null;
         done();
       })
       .catch(done);
