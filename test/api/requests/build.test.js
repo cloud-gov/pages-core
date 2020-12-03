@@ -194,7 +194,7 @@ describe('Build API', () => {
             });
           })
           .then(([newBuild]) => {
-            expect(newBuild.id).to.not.equal(origBuild.id)
+            expect(newBuild.id).to.be.above(origBuild.id)
             expect(newBuild.requestedCommitSha).to.equal(origBuild.clonedCommitSha);
             done();
           })

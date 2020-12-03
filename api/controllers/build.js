@@ -70,7 +70,7 @@ module.exports = {
           site: req.body.siteId,
         },
       }))
-      .then(b => {
+      .then((b) => {
         if (!b) {
           throw 404;
         }
@@ -98,7 +98,8 @@ module.exports = {
                 .then(buildJSON => res.json(buildJSON));
             }
             return res.ok({});
-          })})
+          });
+      })
       .catch(res.error);
   },
 
