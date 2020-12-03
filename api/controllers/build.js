@@ -4,7 +4,6 @@ const { fetchModelById } = require('../utils/queryDatabase');
 const buildSerializer = require('../serializers/build');
 const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
 const siteAuthorizer = require('../authorizers/site');
-const BuildResolver = require('../services/BuildResolver');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const { Build, Site } = require('../models');
 const socketIO = require('../socketIO');
