@@ -139,7 +139,9 @@ module.exports.userEnvVar = {
 };
 
 const uaaCredentials = appEnv.getServiceCreds('uaa-client');
-module.exports.uaa.options = {
-  clientID: uaaCredentials.client_id,
-  clientSecret: uaaCredentials.client_secret,
+module.exports.uaa = {
+  options: {
+    clientID: uaaCredentials.client_id,
+    clientSecret: uaaCredentials.client_secret,
+  },
 };
