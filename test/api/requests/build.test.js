@@ -154,6 +154,7 @@ describe('Build API', () => {
               state: 'success',
               branch: 'main',
               requestedCommitSha,
+              clonedCommitSha,
               user,
             }),
             cookie: authenticatedSession(user),
@@ -163,11 +164,13 @@ describe('Build API', () => {
         it('should create a new build for the site given an existing build id', (done) => {
           let site;
           let user;
+          let origBuild;
 
           promiseProps
           .then((promisedValues) => {
             site = promisedValues.site;
             user = promisedValues.user;
+            origBuild = promisedValues.build;
 
             return validCreateRequest(
               csrfToken.getToken(),
@@ -180,54 +183,19 @@ describe('Build API', () => {
           })
           .then((response) => {
             validateAgainstJSONSchema('POST', '/build', 200, response.body);
-            return Build.findOne({
+            return Build.findAll({
               where: {
                 site: site.id,
                 user: user.id,
-                branch: 'my-branch',
-                requestedCommitSha,
+                branch: origBuild.branch,
               },
+              order: [ [ 'createdAt', 'DESC' ]],
+              limit: 1,
             });
           })
-          .then((build) => {
-            expect(build).not.to.be.undefined;
-            done();
-          })
-          .catch(done);
-        });
-
-        it('creates a new build from a branch name given an existing build of that branch', (done) => {
-          let site;
-          let user;
-
-          promiseProps
-          .then((promisedValues) => {
-            site = promisedValues.site;
-            user = promisedValues.user;
-
-            return validCreateRequest(
-              csrfToken.getToken(),
-              promisedValues.cookie,
-              {
-                branch: promisedValues.build.branch,
-                siteId: promisedValues.build.site,
-                sha: promisedValues.build.requestedCommitSha,
-              }
-            );
-          })
-          .then((response) => {
-            validateAgainstJSONSchema('POST', '/build', 200, response.body);
-            return Build.findOne({
-              where: {
-                site: site.id,
-                user: user.id,
-                branch: 'my-branch',
-                requestedCommitSha,
-              },
-            });
-          })
-          .then((build) => {
-            expect(build).not.to.be.undefined;
+          .then(([newBuild]) => {
+            expect(newBuild.id).to.not.equal(origBuild.id)
+            expect(newBuild.requestedCommitSha).to.equal(origBuild.clonedCommitSha);
             done();
           })
           .catch(done);
@@ -245,7 +213,7 @@ describe('Build API', () => {
             user = promisedValues.user;
             build = promisedValues.build;
             cookie = promisedValues.cookie;
-            return build.update({ state: 'queued' })
+            return build.update({ state: 'queued', branch: 'queued-branch' })
           })
           .then(() => {
             return validCreateRequest(
@@ -259,16 +227,18 @@ describe('Build API', () => {
           })
           .then((response) => {
             expect(response.body).deep.equal({});
-            return Build.findOne({
+            return Build.findAll({
               where: {
                 site: site.id,
-                branch: 'my-branch',
+                branch: 'queued-branch',
                 state:['created', 'queued'],
               },
+              order: [ [ 'createdAt', 'DESC' ]],
+              limit: 1,
             });
           })
-          .then((build) => {
-            expect(build).to.be.null;
+          .then(([lastBuild]) => {
+            expect(lastBuild.id).to.equal(build.id);
             done();
           })
           .catch(done);
@@ -286,7 +256,7 @@ describe('Build API', () => {
             user = promisedValues.user;
             build = promisedValues.build;
             cookie = promisedValues.cookie;
-            return build.update({ state: 'created' })
+            return build.update({ state: 'created', branch: 'created-branch' })
           })
           .then(() => {
             return validCreateRequest(
@@ -300,16 +270,18 @@ describe('Build API', () => {
           })
           .then((response) => {
             expect(response.body).deep.equal({});
-            return Build.findOne({
+            return Build.findAll({
               where: {
                 site: site.id,
-                branch: 'my-branch',
+                branch: 'created-branch',
                 state: ['created', 'queued'],
               },
+              order: [ [ 'createdAt', 'DESC' ]],
+              limit: 1,
             });
           })
-          .then((build) => {
-            expect(build).to.be.null;
+          .then(([lastBuild]) => {
+            expect(lastBuild.id).to.equal(build.id);
             done();
           })
           .catch(done);
@@ -342,63 +314,6 @@ describe('Build API', () => {
           })
           .catch(done);
         });
-      });
-
-      it('creates a new build from a branch if that branch exists on GitHub', (done) => {
-        const branch = 'main';
-        let site;
-        let user;
-        let mockGHRequest;
-
-        const userPromise = factory.user();
-
-        Promise.props({
-          user: userPromise,
-          site: factory.site({ users: Promise.all([userPromise]) }),
-          cookie: authenticatedSession(userPromise),
-        })
-        .then((promisedValues) => {
-          site = promisedValues.site;
-          user = promisedValues.user;
-
-          mockGHRequest = githubAPINocks.getBranch({
-            owner: site.owner,
-            repo: site.repository,
-            branch,
-            expected: {
-              name: branch,
-              commit: { sha: requestedCommitSha },
-            },
-          });
-
-          return validCreateRequest(
-            csrfToken.getToken(),
-            promisedValues.cookie,
-            {
-              branch,
-              siteId: site.id,
-              sha: requestedCommitSha,
-            }
-          );
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/build', 200, response.body);
-          return Build.findOne({
-            where: {
-              site: site.id,
-              user: user.id,
-              branch,
-              requestedCommitSha,
-            },
-          });
-        })
-        .then((build) => {
-          expect(build).to.not.be.undefined;
-          expect(build.branch).to.equal(branch);
-          expect(mockGHRequest.isDone()).to.equal(true);
-          done();
-        })
-        .catch(done);
       });
     });
 
@@ -485,7 +400,6 @@ describe('Build API', () => {
 
         builds.forEach((build) => {
           const responseBuild = response.body.find(candidate => candidate.id === build.id);
-          expect(responseBuild).not.to.be.undefined;
           buildResponseExpectations(responseBuild, build);
         });
 
@@ -687,7 +601,6 @@ describe('Build API', () => {
       )
       .then(() => Build.findByPk(build.id))
       .then((unmodifiedBuild) => {
-        expect(unmodifiedBuild).to.not.be.undefined;
         expect(unmodifiedBuild.state).to.equal('created');
         expect(unmodifiedBuild.clonedCommitSha).to.be.null;
         done();

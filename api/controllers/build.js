@@ -65,32 +65,41 @@ module.exports = {
    */
   create: (req, res) => {
     siteAuthorizer.createBuild(req.user, { id: req.body.siteId })
-      .then(() => BuildResolver.getBuild(req.user, req.body))
-      .then(b => Build.findOne({
+      .then(() => Build.findOne({
         where: {
-          site: b.site,
-          branch: b.branch,
-          state: ['created', 'queued'],
+          id: req.body.buildId,
+          site: req.body.siteId,
         },
-      })
-        .then((queuedBuild) => {
-          if (!queuedBuild) {
-            return Build.create({
-              branch: b.branch,
-              site: b.site,
-              user: req.user.id,
-              username: req.user.username,
-              requestedCommitSha: b.requestedCommitSha,
-            })
-              .then(build => build.enqueue())
-              .then(build => GithubBuildStatusReporter
-                .reportBuildStatus(build)
-                .then(() => build))
-              .then(build => buildSerializer.serialize(build))
-              .then(buildJSON => res.json(buildJSON));
-          }
-          return res.ok({});
-        }))
+      }))
+      .then(b => {
+        if (!b) {
+          throw 404;
+        }
+        return Build.findOne({
+          where: {
+            site: b.site,
+            branch: b.branch,
+            state: ['created', 'queued'],
+          },
+        })
+          .then((queuedBuild) => {
+            if (!queuedBuild) {
+              return Build.create({
+                branch: b.branch,
+                site: b.site,
+                user: req.user.id,
+                username: req.user.username,
+                requestedCommitSha: b.clonedCommitSha || b.requestedCommitSha,
+              })
+                .then(build => build.enqueue())
+                .then(build => GithubBuildStatusReporter
+                  .reportBuildStatus(build)
+                  .then(() => build))
+                .then(build => buildSerializer.serialize(build))
+                .then(buildJSON => res.json(buildJSON));
+            }
+            return res.ok({});
+          })})
       .catch(res.error);
   },
 
