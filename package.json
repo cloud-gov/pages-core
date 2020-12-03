@@ -146,7 +146,7 @@
     "react-svg-loader": "^3.0.3",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.2",
-    "redux-form": "^8.3.6",
+    "redux-form": "^8.3.7",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
     "sass": "^1.28.0",
