@@ -43,7 +43,7 @@
     "sequelize": "^6.3.5",
     "socket.io": "^2.3.0",
     "socket.io-redis": "^6.0.1",
-    "underscore": "^1.11.0",
+    "underscore": "^1.12.0",
     "urlsafe-base64": "^1.0.0",
     "uswds": "^1.4.4",
     "validator": "^13.1.17",
