@@ -183,17 +183,16 @@ describe('Build API', () => {
           })
           .then((response) => {
             validateAgainstJSONSchema('POST', '/build', 200, response.body);
-            return Build.findAll({
+            return Build.findOne({
               where: {
                 site: site.id,
                 user: user.id,
                 branch: origBuild.branch,
               },
               order: [ [ 'createdAt', 'DESC' ]],
-              limit: 1,
             });
           })
-          .then(([newBuild]) => {
+          .then((newBuild) => {
             expect(newBuild.id).to.be.above(origBuild.id)
             expect(newBuild.requestedCommitSha).to.equal(origBuild.clonedCommitSha);
             done();
@@ -227,17 +226,16 @@ describe('Build API', () => {
           })
           .then((response) => {
             expect(response.body).deep.equal({});
-            return Build.findAll({
+            return Build.findOne({
               where: {
                 site: site.id,
                 branch: 'queued-branch',
                 state:['created', 'queued'],
               },
               order: [ [ 'createdAt', 'DESC' ]],
-              limit: 1,
             });
           })
-          .then(([lastBuild]) => {
+          .then((lastBuild) => {
             expect(lastBuild.id).to.equal(build.id);
             done();
           })
@@ -270,17 +268,16 @@ describe('Build API', () => {
           })
           .then((response) => {
             expect(response.body).deep.equal({});
-            return Build.findAll({
+            return Build.findOne({
               where: {
                 site: site.id,
                 branch: 'created-branch',
                 state: ['created', 'queued'],
               },
               order: [ [ 'createdAt', 'DESC' ]],
-              limit: 1,
             });
           })
-          .then(([lastBuild]) => {
+          .then((lastBuild) => {
             expect(lastBuild.id).to.equal(build.id);
             done();
           })
