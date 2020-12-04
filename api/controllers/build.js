@@ -2,7 +2,7 @@ const { logger } = require('../../winston');
 
 const { fetchModelById } = require('../utils/queryDatabase');
 const buildSerializer = require('../serializers/build');
-const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
+const GithubBuildHelper = require('../services/GithubBuildHelper');
 const siteAuthorizer = require('../authorizers/site');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const { Build, Site } = require('../models');
@@ -91,7 +91,7 @@ module.exports = {
                 requestedCommitSha: b.clonedCommitSha || b.requestedCommitSha,
               })
                 .then(build => build.enqueue())
-                .then(build => GithubBuildStatusReporter
+                .then(build => GithubBuildHelper
                   .reportBuildStatus(build)
                   .then(() => build))
                 .then(build => buildSerializer.serialize(build))
@@ -144,7 +144,7 @@ module.exports = {
       })
       .then((build) => {
         emitBuildStatus(build);
-        return GithubBuildStatusReporter.reportBuildStatus(build);
+        return GithubBuildHelper.reportBuildStatus(build);
       })
       .then(() => res.ok())
       .catch((err) => {

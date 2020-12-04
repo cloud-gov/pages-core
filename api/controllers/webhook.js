@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const Sequelize = require('sequelize');
 const config = require('../../config');
-const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
+const GithubBuildHelper = require('../services/GithubBuildHelper');
 const EventCreator = require('../services/EventCreator');
 const {
   Build, User, Site, Event,
@@ -130,7 +130,7 @@ module.exports = {
     })
     .then((build) => {
       if (build) {
-        return GithubBuildStatusReporter.reportBuildStatus(build);
+        return GithubBuildHelper.reportBuildStatus(build);
       }
       return Promise.resolve();
     })

@@ -8,12 +8,12 @@ const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const { buildViewLink } = require('../../../../api/utils/build');
 
-const GithubBuildStatusReporter = require('../../../../api/services/GithubBuildStatusReporter');
+const GithubBuildHelper = require('../../../../api/services/GithubBuildHelper');
 
 const requestedCommitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
 const clonedCommitSha = '7b8d23c07a2c3b5a140844a654d91e13c66b271a';
 
-describe('GithubBuildStatusReporter', () => {
+describe('GithubBuildHelper', () => {
   afterEach(() => {
     nock.cleanAll();
   });
@@ -47,7 +47,7 @@ describe('GithubBuildStatusReporter', () => {
             state: 'pending',
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         }).then(() => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
@@ -95,7 +95,7 @@ describe('GithubBuildStatusReporter', () => {
             state: 'pending',
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         })
         .then(() => {
           repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
@@ -147,7 +147,7 @@ describe('GithubBuildStatusReporter', () => {
             state: 'pending',
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         })
         .then(() => {
           repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
@@ -198,7 +198,7 @@ describe('GithubBuildStatusReporter', () => {
         }))
         .then((_statusNock) => {
           statusNock = _statusNock;
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         })
         .then(() => {
           expect(statusNock.isDone()).to.be.false;
@@ -235,7 +235,7 @@ describe('GithubBuildStatusReporter', () => {
             targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         }).then(() => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
@@ -273,7 +273,7 @@ describe('GithubBuildStatusReporter', () => {
             state: 'pending',
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         }).then(() => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
@@ -308,7 +308,7 @@ describe('GithubBuildStatusReporter', () => {
             targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         }).then(() => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
@@ -346,7 +346,7 @@ describe('GithubBuildStatusReporter', () => {
             state: 'pending',
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         }).then(() => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
@@ -381,7 +381,7 @@ describe('GithubBuildStatusReporter', () => {
             targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         }).then(() => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
@@ -426,7 +426,7 @@ describe('GithubBuildStatusReporter', () => {
             state: 'success',
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         }).then(() => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
@@ -464,7 +464,7 @@ describe('GithubBuildStatusReporter', () => {
             state: 'success',
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         }).then(() => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
@@ -505,7 +505,7 @@ describe('GithubBuildStatusReporter', () => {
             targetURL: buildViewLink(build, site),
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         }).then(() => {
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
@@ -542,7 +542,7 @@ describe('GithubBuildStatusReporter', () => {
             state: 'error',
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         }).then(() => {
           expect(statusNock.isDone()).to.be.true;
           expect(repoNock.isDone()).to.be.true;
@@ -578,7 +578,7 @@ describe('GithubBuildStatusReporter', () => {
             state: 'error',
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         }).then(() => {
           expect(statusNock.isDone()).to.be.true;
           expect(repoNock.isDone()).to.be.true;
@@ -613,7 +613,7 @@ describe('GithubBuildStatusReporter', () => {
             targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         }).then(() => {
           expect(statusNock.isDone()).to.be.true;
           expect(repoNock.isDone()).to.be.true;
@@ -651,7 +651,7 @@ describe('GithubBuildStatusReporter', () => {
             accessToken: 'federalist-user-access-token',
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         }).then(() => {
           expect(statusNock.isDone()).to.be.true;
           expect(repoNock.isDone()).to.be.true;
@@ -720,7 +720,7 @@ describe('GithubBuildStatusReporter', () => {
             }],
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         })
         .then(() => {
           expect(statusNock.isDone()).to.be.true;
@@ -761,7 +761,7 @@ describe('GithubBuildStatusReporter', () => {
             accessToken: githubUser.githubAccessToken,
           });
 
-          return GithubBuildStatusReporter.reportBuildStatus(build);
+          return GithubBuildHelper.reportBuildStatus(build);
         })
         .then(() => {
           expect(loggerSpy.called).to.be.true;

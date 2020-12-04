@@ -10,7 +10,7 @@ const githubAPINocks = require('../support/githubAPINocks');
 const { Build, Site, User, Event } = require('../../../api/models');
 const SQS = require('../../../api/services/SQS');
 const EventCreator = require('../../../api/services/EventCreator');
-const GithubBuildStatusReporter = require('../../../api/services/GithubBuildStatusReporter');
+const GithubBuildHelper = require('../../../api/services/GithubBuildHelper');
 
 describe('Webhook API', () => {
   const signWebhookPayload = (payload) => {
@@ -126,7 +126,7 @@ describe('Webhook API', () => {
     });
 
     it('should find the site by the lowercased owner and repository and upper cased github user', (done) => {
-      const reporterSpy = sinon.spy(GithubBuildStatusReporter, 'reportBuildStatus');
+      const reporterSpy = sinon.spy(GithubBuildHelper, 'reportBuildStatus');
       let site;
       let user;
       const userPromise = factory.user();
