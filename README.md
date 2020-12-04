@@ -159,6 +159,9 @@ The app expects the following user provided services to be provided:
   - `secret_key`: The AWS secret key for SQS queue
   - `region`: The AWS region
   - `sqs_url`: The AWS SQS queue URL
+- `uaa-client`: An instance of cloud.gov's UAA broker to support authentication via SecureAuth. The service binding must include redirect_uris:
+  - `/admin/auth/uaa/callback`
+  - `/admin/auth/uaa/logout`
 
 #### Deploy in CloudFoundry
 To deploy to CloudFoundry submit the following:

@@ -137,3 +137,13 @@ const cfUserEnvVar = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-u
 module.exports.userEnvVar = {
   key: cfUserEnvVar.key,
 };
+
+const uaaCredentials = appEnv.getServiceCreds('uaa-client');
+module.exports.passport = {
+  uaa: {
+    options: {
+      clientID: uaaCredentials.client_id,
+      clientSecret: uaaCredentials.client_secret,
+    },
+  },
+};

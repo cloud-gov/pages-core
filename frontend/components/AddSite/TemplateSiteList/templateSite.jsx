@@ -18,11 +18,6 @@ class TemplateSite extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  getFormVisible() {
-    const { active, index } = this.props;
-    return active === index;
-  }
-
   handleChange(event) {
     const { name, value } = event.target;
     this.setState({ [name]: value });
@@ -42,6 +37,11 @@ class TemplateSite extends React.Component {
   handleChooseActive() {
     const { index, handleChooseActive } = this.props;
     handleChooseActive(index);
+  }
+
+  getFormVisible() {
+    const { active, index } = this.props;
+    return active === index;
   }
 
   render() {
