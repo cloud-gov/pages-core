@@ -100,9 +100,9 @@ jobs:
           POSTGRES_USER: ci-test-user
           POSTGRES_DB: federalist-ci-test
           POSTGRES_HOST_AUTH_METHOD: trust
-          AUTH_IDP: uaa
     environment:
       FEATURE_ADMIN_AUTH: 'true'
+      AUTH_IDP: uaa
     steps:
       - checkout
 
