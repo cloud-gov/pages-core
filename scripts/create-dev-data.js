@@ -88,7 +88,6 @@ async function createData({ githubUsername }) {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-      username: user1.username,
     }),
     Build.create({
       branch: site1.defaultBranch,
@@ -97,7 +96,6 @@ async function createData({ githubUsername }) {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-      username: user1.username,
     }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1' })),
     Build.create({
       branch: site1.demoBranch,
@@ -109,7 +107,6 @@ async function createData({ githubUsername }) {
       state: 'error',
       error: 'Something bad happened here',
       completedAt: new Date(),
-      username: user1.username,
     }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2' })),
   ]);
 
@@ -123,7 +120,6 @@ async function createData({ githubUsername }) {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-      username: user1.username,
     }),
     Build.create({
       branch: nodeSite.defaultBranch,
@@ -135,7 +131,6 @@ async function createData({ githubUsername }) {
       username: user1.username,
       token: 'fake-token',
       error: 'The build timed out',
-      username: user1.username,
     }),
     Build.create({
       branch: 'dc/fixes',
@@ -144,7 +139,6 @@ async function createData({ githubUsername }) {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-      username: user1.username,
     }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1' })),
   ]);
 
@@ -158,7 +152,6 @@ async function createData({ githubUsername }) {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-      username: user1.username,
     }),
   ]);
 
