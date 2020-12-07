@@ -5,6 +5,7 @@ const protectedAttributes = [
   'SiteUser',
   'pushedAt',
   'isActive',
+  'adminEmail',
 ];
 
 const toJSON = (user) => {

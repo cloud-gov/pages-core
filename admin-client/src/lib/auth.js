@@ -5,34 +5,52 @@ import { session } from '../stores';
 const apiUrl = API_URL;
 
 const calcWindow = () => ({
-  width: 600,
-  height: 600,
-  left: window.screen.width / 2 - 600 / 2,
-  top: window.screen.height / 2 - 600 / 2,
+  width: 800,
+  height: 800,
+  left: window.screen.width / 2 - 800 / 2,
+  top: window.screen.height / 2 - 800 / 2,
 });
 
-async function authenticate() {
+// async
+function externalAuth(path, action, hidden = false) {
   return new Promise((resolve, reject) => {
-    const {
-      width, height, top, left,
-    } = calcWindow();
+    const url = `${apiUrl}${path}`;
+    let opts;
+    if (hidden) {
+      opts = 'width=1,height=1,top=0,left=0';
+    } else {
+      const {
+        width, height, top, left,
+      } = calcWindow();
+      opts = `resizable=yes,scrollbars=yes,width=${width},height=${height},top=${top},left=${left}`;
+    }
 
-    const authWindow = window.open(
-      `${apiUrl}/admin/auth/github`,
-      'Federalist Admin Auth',
-      `width=${width}, height=${height}, top=${top}, left=${left}`,
-    );
+    const authWindow = window.open(url, 'authWindow', opts);
 
-    window.addEventListener('message', (e) => {
+    const handleMessage = (e) => {
       if (e.origin === apiUrl && e.data === 'success') {
         authWindow.close();
         return resolve(true);
       }
-      return reject(new Error('Authentication failed'));
-    }, { once: true });
+      return reject(new Error(`${action} failed`));
+    };
 
-    authWindow.focus();
+    window.addEventListener('message', handleMessage, { once: true });
+
+    if (!hidden) {
+      authWindow.focus();
+    }
   });
+}
+
+// async
+function authenticate() {
+  return externalAuth('/admin/login', 'Authentication');
+}
+
+// async
+function deauthenticate() {
+  return externalAuth('/admin/logout', 'Logout', true);
 }
 
 function init() {
@@ -60,6 +78,7 @@ function logout() {
 
 export {
   authenticate,
+  deauthenticate,
   init,
   login,
   logout,

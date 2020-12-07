@@ -58,6 +58,12 @@ const attributes = DataTypes => ({
   pushedAt: {
     type: DataTypes.DATE,
   },
+  adminEmail: {
+    type: DataTypes.STRING,
+    validate: {
+      isEmail: true,
+    },
+  },
 });
 
 const options = {

@@ -86,27 +86,27 @@ async function createData({ githubUsername }) {
       state: 'success',
       site: site1.id,
       user: user1.id,
-      token: 'fake-token',
       username: user1.username,
+      token: 'fake-token',
     }),
     Build.create({
       branch: site1.defaultBranch,
       source: 'fake-build',
       site: site1.id,
       user: user1.id,
-      token: 'fake-token',
       username: user1.username,
+      token: 'fake-token',
     }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1' })),
     Build.create({
       branch: site1.demoBranch,
       source: 'fake-build',
       site: site1.id,
       user: user1.id,
+      username: user1.username,
       token: 'fake-token',
       state: 'error',
       error: 'Something bad happened here',
       completedAt: new Date(),
-      username: user1.username,
     }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2' })),
   ]);
 
@@ -118,8 +118,8 @@ async function createData({ githubUsername }) {
       state: 'success',
       site: nodeSite.id,
       user: user1.id,
-      token: 'fake-token',
       username: user1.username,
+      token: 'fake-token',
     }),
     Build.create({
       branch: nodeSite.defaultBranch,
@@ -128,17 +128,17 @@ async function createData({ githubUsername }) {
       state: 'error',
       site: nodeSite.id,
       user: user1.id,
+      username: user1.username,
       token: 'fake-token',
       error: 'The build timed out',
-      username: user1.username,
     }),
     Build.create({
       branch: 'dc/fixes',
       source: 'fake-build',
       site: nodeSite.id,
       user: user1.id,
-      token: 'fake-token',
       username: user1.username,
+      token: 'fake-token',
     }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1' })),
   ]);
 
@@ -150,8 +150,8 @@ async function createData({ githubUsername }) {
       state: 'success',
       site: goSite.id,
       user: user1.id,
-      token: 'fake-token',
       username: user1.username,
+      token: 'fake-token',
     }),
   ]);
 
@@ -221,6 +221,13 @@ async function createData({ githubUsername }) {
   await Promise.all([
     EventCreator.audit(Event.labels.AUTHENTICATION, user1, { action: 'login' }),
     EventCreator.audit(Event.labels.AUTHENTICATION, user2, { action: 'login' }),
+  ]);
+
+  console.log('Creating Admin Users');
+  await Promise.all([
+    User.upsert({ username: 'amirbey', email: 'amirbey@example.com', adminEmail: 'amir.reavis-bey@gsa.gov' }),
+    User.upsert({ username: 'apburnes', email: 'apburnes@example.com', adminEmail: 'andrew.burnes@gsa.gov' }),
+    User.upsert({ username: 'davemcorwin', email: 'davemcorwin@example.com', adminEmail: 'david.corwin@gsa.gov' }),
   ]);
 }
 
