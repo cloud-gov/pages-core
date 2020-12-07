@@ -1,99 +1,100 @@
+/* eslint-disable no-underscore-dangle */
 const { expect } = require('chai');
 const nock = require('nock');
 const request = require('supertest');
 const sinon = require('sinon');
 const app = require('../../../app');
 const config = require('../../../config');
-const factory = require('../support/factory');
-const githubAPINocks = require('../support/githubAPINocks');
-const { authenticatedSession, unauthenticatedSession } = require('../support/session');
-const { sessionForCookie } = require('../support/cookieSession');
 const { User } = require('../../../api/models');
 const EventCreator = require('../../../api/services/EventCreator');
+const factory = require('../support/factory');
+const githubAPINocks = require('../support/githubAPINocks');
+const cfUAANocks = require('../support/cfUAANock');
+const { authenticatedSession, unauthenticatedSession } = require('../support/session');
+const { sessionForCookie } = require('../support/cookieSession');
 
-describe('Authentication request', () => {
+const { authIDP } = config.env;
+const { options } = config.passport[authIDP];
+
+const authorizationURL = authIDP === 'github' ? 'https://github.com/login/oauth/authorize' : options.authorizationURL;
+
+describe('Authentication requests', () => {
   let eventAuditStub;
-  beforeEach(() => {
+  beforeEach(async () => {
     eventAuditStub = sinon.stub(EventCreator, 'audit').resolves();
-  })
-  afterEach(() => {
-    sinon.restore();
+    await User.truncate();
   });
-  describe('GET /auth/github', () => {
-    it('should redirect to GitHub for OAuth2 authentication', (done) => {
+  afterEach(async () => {
+    sinon.restore();
+    await User.truncate();
+  });
+
+  describe('GET /login', () => {
+    it('should redirect to the configured IdP for authentication', (done) => {
       request(app)
-        .get('/auth/github')
-        .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
+        .get('/login')
+        .expect('Location', new RegExp(`^${authorizationURL}`))
         .expect(302, done);
     });
 
     it('should redirect to the root URL if the users is logged in', (done) => {
       authenticatedSession().then((cookie) => {
         request(app)
-          .get('/auth/github')
+          .get('/login')
           .set('Cookie', cookie)
-          .expect('Location', 'http://localhost:4000')
+          .expect('Location', '/')
           .expect(302, done);
       });
     });
   });
 
   describe('GET /logout', () => {
-    it('should de-authenticate and remove the user from the session', (done) => {
-      let user;
-      let cookie;
+    const logoutRedirectURL = authIDP === 'github' ? '/' : new RegExp(`^${options.logoutURL}`);
 
-      const userPromise = factory.user();
-      const sessionPromise = authenticatedSession(userPromise);
+    it('should de-authenticate and remove the user from the session', async () => {
+      const user = await factory.user();
+      const cookie = await authenticatedSession(user);
+      const authSession = await sessionForCookie(cookie);
 
-      Promise.props({
-        user: userPromise,
-        cookie: sessionPromise,
-      }).then((results) => {
-        user = results.user;
-        cookie = results.cookie;
-        return sessionForCookie(cookie);
-      }).then((authSession) => {
-        expect(authSession.authenticated).to.be.equal(true);
-        expect(authSession.passport.user).to.equal(user.id);
+      expect(authSession.authenticated).to.be.equal(true);
+      expect(authSession.passport.user).to.equal(user.id);
 
-        return request(app)
-          .get('/logout')
-          .set('Cookie', cookie)
-          .expect('Location', 'http://localhost:1337')
-          .expect(302);
-      })
-        .then(() => {
-          expect(eventAuditStub.called).to.equal(true);
-          return sessionForCookie(cookie);
-        })
-        .then((nonAuthSession) => {
-          expect(nonAuthSession).to.equal(null);
-          done();
-        })
-        .catch(done);
+      await request(app)
+        .get('/logout')
+        .set('Cookie', cookie)
+        .expect('Location', logoutRedirectURL)
+        .expect(302);
+
+      expect(eventAuditStub.called).to.equal(true);
+
+      const nonAuthSession = await sessionForCookie(cookie);
+
+      expect(nonAuthSession).to.equal(null);
+
+      expect(eventAuditStub.called).to.equal(true);
     });
 
     it('should redirect to the root URL for an unauthenticated user', (done) => {
       request(app)
         .get('/logout')
-        .expect('Location', 'http://localhost:1337')
+        .expect('Location', logoutRedirectURL)
         .expect(302, done);
     });
   });
 
-  describe('GET /auth/github/callback', () => {
-    context('when the user exists in the database', () => {
-      it('should authenticate the user', (done) => {
-        let user;
-        let cookie;
-        nock.cleanAll();
-        const oauthState = 'state-123abc';
-        factory.user()
-          .then((model) => {
-            user = model;
-            return githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
-          })
+  context('github callbacks', () => {
+    describe('GET /auth/github/callback', () => {
+      context('when the user exists in the database', () => {
+        it('should authenticate the user', (done) => {
+          let user;
+          let cookie;
+          nock.cleanAll();
+          const oauthState = 'state-123abc';
+          factory.user()
+            .then((model) => {
+              user = model;
+              return githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
+            })
             .then(() => unauthenticatedSession({ oauthState }))
             .then((session) => {
               cookie = session;
@@ -110,187 +111,230 @@ describe('Authentication request', () => {
               return user.reload();
             })
             .then((model) => {
-              user = model
+              user = model;
               done();
             });
+        });
+
+        it('should not create a new user', (done) => {
+          let user;
+          let userCount;
+          const oauthState = 'state-123abc';
+          factory.user({ isActive: true })
+            .then((model) => {
+              user = model;
+              githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
+              expect(user.isActive).to.be.true;
+              return User.count();
+            })
+            .then((count) => {
+              userCount = count;
+              return unauthenticatedSession({ oauthState });
+            })
+            .then(cookie => request(app)
+              .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
+              .set('Cookie', cookie)
+              .expect(302))
+            .then(() => User.count())
+            .then((count) => {
+              expect(count).to.equal(userCount);
+              return user.reload();
+            })
+            .then((model) => {
+              user = model;
+              expect(user.isActive).to.be.true;
+              done();
+            })
+            .catch(done);
+        });
+
+        it("should update the user's GitHub access token and test auth for uppercased named github user", (done) => {
+          let user;
+          const oauthState = 'state-123abc';
+
+          factory.user()
+            .then((model) => {
+              user = model;
+              expect(user.githubAccessToken).not.to.equal('access-token-123abc');
+
+              githubAPINocks.githubAuth(user.username.toUpperCase(), [{ id: 123456 }]);
+
+              return unauthenticatedSession({ oauthState });
+            }).then(cookie => request(app)
+              .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
+              .set('Cookie', cookie)
+              .expect(302))
+            .then(() => User.findByPk(user.id))
+            .then((foundUser) => {
+              expect(foundUser.githubAccessToken).to.equal('access-token-123abc');
+              done();
+            })
+            .catch(done);
+        });
       });
 
-      it('should not create a new user', (done) => {
-        let user;
-        let userCount;
-        const oauthState = 'state-123abc';
-        factory.user({ isActive: true })
-          .then((model) => {
-            user = model;
-            githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
-            expect(user.isActive).to.be.true;
-            return User.count();
-          })
-          .then((count) => {
-            userCount = count;
-            return unauthenticatedSession({ oauthState });
-          })
-          .then(cookie => request(app)
-            .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
-            .set('Cookie', cookie)
-            .expect(302))
-          .then(() => User.count())
-          .then((count) => {
-            expect(count).to.equal(userCount);
-            return user.reload();
-          })
-          .then((model) => {
-            user = model
-            expect(user.isActive).to.be.true;
-            done();
-          })
-          .catch(done);
+      context('when the user does not exist in the database', () => {
+        it('should create and authenticate the user', (done) => {
+          let cookie;
+          const oauthState = 'state-123abc';
+          const githubUserID = Math.floor(Math.random() * 10000);
+          nock.cleanAll();
+          githubAPINocks.getAccessToken();
+          githubAPINocks.user({ githubUserID });
+          githubAPINocks.userOrganizations();
+
+          unauthenticatedSession({ oauthState })
+            .then((session) => {
+              cookie = session;
+              return request(app)
+                .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
+                .set('Cookie', cookie)
+                .expect(302);
+            }).then(() => sessionForCookie(cookie))
+            .then((authSession) => {
+              expect(authSession.authenticated).to.equal(true);
+              const userID = authSession.passport.user;
+              return User.findByPk(userID);
+            })
+            .then((user) => {
+              expect(user).to.have.property('email', `user-${githubUserID}@example.com`);
+              expect(user).to.have.property('username', `user-${githubUserID}`);
+              expect(user).to.have.property('githubUserId', `${githubUserID}`);
+              expect(user).to.have.property('githubAccessToken', 'access-token-123abc');
+              expect(eventAuditStub.calledOnce).to.equal(true);
+              expect(user.isActive).to.be.true;
+              done();
+            })
+            .catch(done);
+        });
       });
 
-      it("should update the user's GitHub access token and test auth for uppercased named github user", (done) => {
-        let user;
-        const oauthState = 'state-123abc';
-
-        factory.user()
-          .then((model) => {
-            user = model;
-            expect(user.githubAccessToken).not.to.equal('access-token-123abc');
-
-            githubAPINocks.githubAuth(user.username.toUpperCase(), [{ id: 123456 }]);
-
-            return unauthenticatedSession({ oauthState });
-          }).then(cookie => request(app)
-            .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
-            .set('Cookie', cookie)
-            .expect(302))
-          .then(() => User.findByPk(user.id))
-          .then((foundUser) => {
-            expect(foundUser.githubAccessToken).to.equal('access-token-123abc');
-            done();
-          })
-          .catch(done);
-      });
-    });
-
-    context('when the user does not exist in the database', () => {
-      it('should create and authenticate the user', (done) => {
+      it('should redirect to the home page with a flash error if the user is not in a allowed GitHub organization', (done) => {
         let cookie;
         const oauthState = 'state-123abc';
-        const githubUserID = Math.floor(Math.random() * 10000);
-        nock.cleanAll();
-        githubAPINocks.getAccessToken();
-        githubAPINocks.user({ githubUserID });
-        githubAPINocks.userOrganizations();
-
+        githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
         unauthenticatedSession({ oauthState })
           .then((session) => {
             cookie = session;
             return request(app)
               .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
-              .set('Cookie', cookie)
-              .expect(302);
-          }).then(() => sessionForCookie(cookie))
-          .then((authSession) => {
-            expect(authSession.authenticated).to.equal(true);
-            const userID = authSession.passport.user;
-            return User.findByPk(userID);
+              .set('Cookie', cookie);
           })
-          .then((user) => {
-            expect(user).to.have.property('email', `user-${githubUserID}@example.com`);
-            expect(user).to.have.property('username', `user-${githubUserID}`);
-            expect(user).to.have.property('githubUserId', `${githubUserID}`);
-            expect(user).to.have.property('githubAccessToken', 'access-token-123abc');
-            expect(eventAuditStub.calledOnce).to.equal(true);
-            expect(user.isActive).to.be.true;
+          .then((response) => {
+            expect(response.statusCode).to.equal(302);
+            expect(response.header.location).to.equal('/');
+            return sessionForCookie(cookie);
+          })
+          .then((sess) => {
+            expect(sess.flash.error.length).to.equal(1);
+            expect(sess.flash.error[0]).to.equal(
+              'Apologies; you don\'t have access to Federalist! Please contact the Federalist team if this is in error.'
+            );
+            expect(eventAuditStub.called).to.equal(false);
+            done();
+          })
+          .catch(done);
+      });
+
+      it('should redirect to a redirect path if one is set in the session', (done) => {
+        const authRedirectPath = '/path/to/something';
+        const oauthState = 'state-123abc';
+
+        factory.user()
+          .then(user => githubAPINocks.githubAuth(user.username, [{ id: 123456 }]))
+          .then(() => unauthenticatedSession({ oauthState, authRedirectPath }))
+          .then(session => request(app)
+            .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
+            .set('Cookie', session)
+            .expect(302))
+          .then((response) => {
+            expect(response.header.location).to.equal(authRedirectPath);
             done();
           })
           .catch(done);
       });
     });
+  });
 
-    it('should redirect to the home page with a flash error if the authorization code is invalid', (done) => {
-      let cookie;
-      const oauthState = 'state-123abc';
-      nock('https://github.com')
-        .post('/login/oauth/access_token', {
-          client_id: config.passport.github.options.clientID,
-          client_secret: config.passport.github.options.clientSecret,
-          code: 'invalid-code',
-        })
-        .reply(401);
-      unauthenticatedSession({ oauthState })
-        .then((session) => {
-          cookie = session;
-          return request(app)
-            .get(`/auth/github/callback?code=invalid-code&state=${oauthState}`)
-            .set('Cookie', cookie);
-        })
-        .then((response) => {
-          expect(response.statusCode).to.equal(302);
-          expect(response.header.location).to.equal('/');
+  context('uaa callbacks', () => {
+    describe('GET /auth/uaa/callback', () => {
+      context('when the admin user exists in the database', () => {
+        it('should authenticate the user', async () => {
+          nock.cleanAll();
+          const user = await factory.user({
+            adminEmail: 'admin@example.com',
+          });
+          const oauthState = 'state-123abc';
+          const code = 'code';
 
-          return sessionForCookie(cookie);
-        })
-        .then((sess) => {
-          expect(sess.flash.error.length).to.equal(1);
-          expect(sess.flash.error[0].title).to.equal('Unauthorized');
-          expect(sess.flash.error[0].message).to.equal(
-            'Apologies; you don\'t have access to Federalist! '
-          + 'Please contact the Federalist team if this is in error.'
+          cfUAANocks.uaaAuth({ email: user.adminEmail }, code);
+
+          const cookie = await unauthenticatedSession({ oauthState });
+
+          await request(app)
+            .get(`/auth/uaa/callback?code=${code}&state=${oauthState}`)
+            .set('Cookie', cookie)
+            .expect(302);
+
+          const authSession = await sessionForCookie(cookie);
+
+          expect(authSession.authenticated).to.equal(true);
+          expect(authSession.passport.user).to.equal(user.id);
+          expect(eventAuditStub.calledOnce).to.equal(true);
+        });
+      });
+
+      context('when the admin user does not exist in the database', () => {
+        it('should fail to authenticate, redirect the user and provide a flash message', async () => {
+          const code = 'code';
+          const oauthState = 'state-123abc';
+
+          cfUAANocks.uaaAuth({ email: 'foo@bar.com' }, code);
+
+          const cookie = await unauthenticatedSession({ oauthState });
+
+          await request(app)
+            .get(`/auth/uaa/callback?code=${code}&state=${oauthState}`)
+            .set('Cookie', cookie)
+            .expect('Location', '/')
+            .expect(302);
+
+          const session = await sessionForCookie(cookie);
+
+          expect(session.flash.error.length).to.equal(1);
+          expect(session.flash.error[0]).to.equal(
+            'Apologies; you don\'t have access to Federalist! Please contact the Federalist team if this is in error.'
           );
           expect(eventAuditStub.called).to.equal(false);
-          done();
-        })
-        .catch(done);
-    });
+        });
+      });
 
-    it('should redirect to the home page with a flash error if the user is not in a allowed GitHub organization', (done) => {
-      let cookie;
-      const oauthState = 'state-123abc';
-      githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
-      unauthenticatedSession({ oauthState })
-        .then((session) => {
-          cookie = session;
-          return request(app)
-            .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
-            .set('Cookie', cookie);
-        })
-        .then((response) => {
-          expect(response.statusCode).to.equal(302);
-          expect(response.header.location).to.equal('/');
-          return sessionForCookie(cookie);
-        })
-        .then((sess) => {
-          expect(sess.flash.error.length).to.equal(1);
-          expect(sess.flash.error[0].title).to.equal('Unauthorized');
-          expect(sess.flash.error[0].message).to.equal(
-            'Apologies; you don\'t have access to Federalist! '
-          + 'Please contact the Federalist team if this is in error.'
-          );
-          expect(eventAuditStub.called).to.equal(false);
-          done();
-        })
-        .catch(done);
-    });
+      it('should redirect to a redirect path if one is set in the session', async () => {
+        const authRedirectPath = '/path/to/something';
+        const oauthState = 'state-123abc';
+        const code = 'code';
 
-    it('should redirect to a redirect path if one is set in the session', (done) => {
-      // const redirectPath = '/path/to/something';
-      const authRedirectPath = '/path/to/something';
-      const oauthState = 'state-123abc';
+        const user = await factory.user({
+          adminEmail: 'admin@example.com',
+        });
 
-      factory.user()
-        .then(user => githubAPINocks.githubAuth(user.username, [{ id: 123456 }]))
-        .then(() => unauthenticatedSession({ oauthState, authRedirectPath }))
-        .then(session => request(app)
-          .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
+        cfUAANocks.uaaAuth({ email: user.adminEmail }, code);
+
+        const session = await unauthenticatedSession({ oauthState, authRedirectPath });
+
+        await request(app)
+          .get(`/auth/uaa/callback?code=${code}&state=${oauthState}`)
           .set('Cookie', session)
-          .expect(302))
-        .then((response) => {
-        // expect(response.header.location).to.equal(redirectPath);
-          expect(response.header.location).to.equal(authRedirectPath);
-          done();
-        })
-        .catch(done);
+          .expect('Location', authRedirectPath)
+          .expect(302);
+      });
+    });
+
+    describe('GET /auth/uaa/logout', () => {
+      it('redirects to the root', () => request(app)
+        .get('/auth/uaa/logout')
+        .expect('Location', '/')
+        .expect(302));
     });
   });
 });

@@ -1,5 +1,5 @@
-const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const config = require('../../config');
+const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
 const jwtHelper = require('../services/jwtHelper');
 
@@ -17,6 +17,7 @@ function defaultContext(req) {
     siteDisplayEnv: getSiteDisplayEnv(),
     homepageUrl: config.app.homepageUrl,
     webpackAssets,
+    isUAA: config.env.authIDP === 'uaa',
   };
 
   return context;
@@ -41,10 +42,7 @@ module.exports = {
 
   app(req, res) {
     if (!req.session.authenticated) {
-      req.flash('error', {
-        title: 'Unauthorized',
-        message: 'You are not permitted to perform this action. Are you sure you are logged in?',
-      });
+      req.flash('error', 'You are not permitted to perform this action. Are you sure you are logged in?');
       return res.redirect('/');
     }
 
