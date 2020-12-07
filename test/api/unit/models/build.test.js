@@ -183,12 +183,14 @@ describe('Build model', () => {
 
       describe('to `success`', () => {
         it('should update the site\'s publishedAt timestamp if the build is successful', async () => {
-          build = await build.updateJobStatus({ status: 'success' });
+          const commitSha = 'abcdef0123456789001234567890012345678901';
+          build = await build.updateJobStatus({ status: 'success', commitSha });
 
           expect(build.state).to.be.eql('success');
           expect(build.completedAt).to.be.a('date');
           expect(build.completedAt).to.be.above(build.startedAt);
           expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
+          expect(build.clonedCommitSha).to.equal(commitSha);
 
           const site = await Site.findByPk(build.site);
 
@@ -203,12 +205,26 @@ describe('Build model', () => {
       });
 
       describe('to `error`', () => {
-        it('should mark a build errored with a message', async () => {
+        it('should mark a build errored with a message and w/o commitSha', async () => {
           await build.updateJobStatus({ status: 'error', message: 'this is an error' });
 
           expect(build.state).to.equal('error');
           expect(build.error).to.equal('this is an error');
           expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
+          expect(build.completedAt).to.be.a('date');
+          expect(build.completedAt).to.be.above(build.startedAt);
+          expect(build.clonedCommitSha).to.be.null;
+        });
+
+        it('should mark a build errored with a message and commitSha', async () => {
+          const commitSha = 'abcdef0123456789001234567890012345678901';
+          const message = 'this is an error with commitsha';
+          await build.updateJobStatus({ status: 'error', message , commitSha });
+
+          expect(build.state).to.equal('error');
+          expect(build.error).to.equal(message);
+          expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
+          expect(build.clonedCommitSha).to.equal(commitSha);
           expect(build.completedAt).to.be.a('date');
           expect(build.completedAt).to.be.above(build.startedAt);
         });
@@ -231,22 +247,33 @@ describe('Build model', () => {
         .rejectedWith(ValidationError, 'notNull Violation: Build.username cannot be null');
     });
 
-    it('should require a valid sha before saving', () => {
+    it('should require a valid requestedCommitSha before saving', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        commitSha: 'not-a-real-sha.biz',
+        requestedCommitSha: 'not-a-real-sha.biz',
       });
 
       return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'Validation error: Validation is on commitSha failed');
+        .rejectedWith(ValidationError, 'Validation error: Validation is on requestedCommitSha failed');
+    });
+
+    it('should require a valid clonedCommitSha before saving', () => {
+      const buildPromise = Build.create({
+        user: 1,
+        site: 1,
+        clonedCommitSha: 'not-a-real-sha.biz',
+      });
+
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'Validation error: Validation is on clonedCommitSha failed');
     });
 
     it('requires a valid branch name before saving', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+        requestedCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: 'not*real',
       });
 
@@ -258,7 +285,7 @@ describe('Build model', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+        requestedCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: 'not-real/',
       });
 
@@ -270,7 +297,7 @@ describe('Build model', () => {
       const buildPromise = Build.create({
         user: 1,
         site: 1,
-        commitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+        requestedCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
         branch: '/not-real',
       });
 
