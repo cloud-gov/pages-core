@@ -59,8 +59,8 @@ class SiteBuilds extends React.Component {
       <GitHubLink
         owner={owner}
         repository={repository}
-        sha={build.commitSha}
-        branch={build.commitSha ? null : build.branch}
+        sha={build.requestedCommitSha}
+        branch={build.requestedCommitSha ? null : build.branch}
         text={build.branch}
       />
     );

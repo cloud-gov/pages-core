@@ -75,13 +75,16 @@ const loadBuildUserAccessToken = build => Build.findByPk(build.id, { include: [S
 const reportBuildStatus = (build) => {
   let site;
   let options = {};
+  let sha;
 
   return new Promise((resolve, reject) => {
-    if (!build || !build.commitSha) {
-      reject(new Error('Build or commit sha undefined. Unable to report build status'));
-    } else {
-      resolve();
+    if (build) {
+      sha = build.clonedCommitSha || build.requestedCommitSha;
+      if (sha) {
+        resolve();
+      }
     }
+    reject(new Error('Build or commit sha undefined. Unable to report build status'));
   })
     .then(() => Site.findByPk(build.site))
     .then((model) => {
@@ -98,7 +101,7 @@ const reportBuildStatus = (build) => {
       options = {
         owner: site.owner,
         repo: site.repository,
-        sha: build.commitSha,
+        sha,
         context,
       };
 
