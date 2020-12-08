@@ -36,8 +36,8 @@ async function verifyGithub(accessToken, _refreshToken, profile, callback) {
 
     EventCreator.audit(Event.labels.AUTHENTICATION, user, { action: 'login' });
 
-    // should we wait for this?
     RepositoryVerifier.verifyUserRepos(user);
+
     return callback(null, user);
   } catch (err) {
     logger.warn('Authentication error: ', err);
@@ -61,9 +61,8 @@ async function verifyUAA(accessToken, _refreshToken, profile, callback) {
 
     EventCreator.audit(Event.labels.AUTHENTICATION, user, { action: 'login' });
 
-    // should we wait for this?
-    // do i need to do this?
     RepositoryVerifier.verifyUserRepos(user);
+
     return callback(null, user);
   } catch (err) {
     return callback(err);
