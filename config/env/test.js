@@ -43,6 +43,10 @@ module.exports = {
         clientID: '123abc',
         clientSecret: '456def',
       },
+      adminOptions: {
+        clientID: '123abc',
+        clientSecret: '456def',
+      },
     },
   },
   postgres: {

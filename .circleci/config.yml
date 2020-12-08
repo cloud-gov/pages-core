@@ -102,6 +102,7 @@ jobs:
           POSTGRES_HOST_AUTH_METHOD: trust
     environment:
       FEATURE_ADMIN_AUTH: 'true'
+      AUTH_IDP: uaa
     steps:
       - checkout
 

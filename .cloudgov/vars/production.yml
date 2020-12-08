@@ -7,3 +7,4 @@ log_level: info
 feature_admin_auth: 'true'
 feature_proxy_edge_links: 'false'
 feature_proxy_edge_dynamo: 'false'
+auth_idp: github

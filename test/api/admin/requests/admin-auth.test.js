@@ -7,7 +7,7 @@ const { sessionForCookie } = require('../../support/cookieSession');
 const { unauthenticatedSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 
-const { options: uaaConfig } = require('../../../../config').passport.uaa;
+const { adminOptions: uaaConfig } = require('../../../../config').passport.uaa;
 
 const app = require('../../../../app');
 

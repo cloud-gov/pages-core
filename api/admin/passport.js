@@ -1,11 +1,11 @@
 const Passport = require('passport');
 const config = require('../../config');
 const { User } = require('../models');
-const uaaStrategy = require('./uaaStrategy');
+const { createUAAStrategy } = require('../services/uaaStrategy');
 
 const passport = new Passport.Passport();
 
-const uaaOptions = config.passport.uaa.options;
+const uaaOptions = config.passport.uaa.adminOptions;
 
 const verify = async (accessToken, _refreshToken, profile, callback) => {
   const { email } = profile;
@@ -23,7 +23,9 @@ const verify = async (accessToken, _refreshToken, profile, callback) => {
   }
 };
 
-passport.use('uaa', uaaStrategy(uaaOptions, verify));
+const uaaStrategy = createUAAStrategy(uaaOptions, verify);
+
+passport.use('uaa', uaaStrategy);
 
 passport.serializeUser((user, next) => {
   next(null, user.id);
@@ -37,10 +39,7 @@ passport.deserializeUser((id, next) => {
 
 passport.logout = (req, res) => {
   req.logout();
-  const params = new URLSearchParams();
-  params.set('redirect', uaaOptions.logoutCallbackURL);
-  params.set('client_id', uaaOptions.clientID);
-  res.redirect(`${uaaOptions.logoutURL}?${params.toString()}`);
+  res.redirect(uaaStrategy.logoutRedirectURL);
 };
 
 module.exports = passport;
