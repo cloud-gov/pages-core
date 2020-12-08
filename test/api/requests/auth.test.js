@@ -228,7 +228,7 @@ describe('Authentication requests', () => {
           .then((sess) => {
             expect(sess.flash.error.length).to.equal(1);
             expect(sess.flash.error[0]).to.equal(
-              'Apologies; you don\'t have access to Federalist! Please contact the Federalist team if this is in error.'
+              'Apologies; you are not authorized to access Federalist! Please contact the Federalist team if this is in error.'
             );
             expect(eventAuditStub.called).to.equal(false);
             done();
@@ -303,7 +303,7 @@ describe('Authentication requests', () => {
 
           expect(session.flash.error.length).to.equal(1);
           expect(session.flash.error[0]).to.equal(
-            'Apologies; you don\'t have access to Federalist! Please contact the Federalist team if this is in error.'
+            'Apologies; you are not authorized to access Federalist! Please contact the Federalist team if this is in error.'
           );
           expect(eventAuditStub.called).to.equal(false);
         });
