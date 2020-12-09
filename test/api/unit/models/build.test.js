@@ -13,7 +13,7 @@ describe('Build model', () => {
   describe('before validate hook', () => {
     it('should add a build token', async () => {
       const site = await factory.site();
-      const build = await Build.build({ site: site.id, user: 1, username: 'username' });
+      const build = await Build.build({ site: site.id, user: 1, username: 'username', branch: 'branch' });
 
       await build.validate();
 
@@ -22,7 +22,7 @@ describe('Build model', () => {
 
     it('should not override a build token if one exists', async () => {
       const site = await factory.site();
-      const build = await Build.build({ site: site.id, token: '123abc', username: 'username' });
+      const build = await Build.build({ site: site.id, token: '123abc', username: 'username', branch: 'branch' });
 
       build.validate();
 
@@ -267,6 +267,13 @@ describe('Build model', () => {
 
       return expect(buildPromise).to.be
         .rejectedWith(ValidationError, 'Validation error: Validation is on clonedCommitSha failed');
+    });
+
+    it('should require a branch before saving', () => {
+      const buildPromise = Build.create({ username: 'username', site: 1 });
+
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, 'notNull Violation: Build.branch cannot be null');
     });
 
     it('requires a valid branch name before saving', () => {
