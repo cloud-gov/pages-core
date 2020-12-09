@@ -283,25 +283,24 @@ module.exports = {
   getCollaborators: (accessToken, owner, repo) => githubClient(accessToken)
     .then(github => getNextCollaborators(github, owner, repo)),
 
-  getContent: (accessToken, owner, repo, path, ref = null) => githubClient(accessToken)
-    .then((github) => {
+  getContent: async (accessToken, owner, repo, path, ref = null) => {
+    try {
+      const github = await githubClient(accessToken);
       const options = { owner, repo, path };
       if (ref) {
         options.ref = ref;
       }
-      return getContent(github, options);
-    })
-    .then(({ data }) => {
+      const { data } = await getContent(github, options);
       if (data.type === 'file') { // return file body
         const { content, encoding } = data;
         return Buffer.from(content, encoding).toString('utf8');
       }
       return data; // return folder/files
-    })
-    .catch((err) => {
+    } catch (err) {
       if (err.status === 404) {
         return null;
       }
       throw err;
-    }),
+    }
+  },
 };

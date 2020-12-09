@@ -677,9 +677,9 @@ describe('GitHub', () => {
     });
   });
 
-  describe('.getContents', () => {
+  describe('.getContent', () => {
     /* eslint-disable camelcase */
-    it('returns a file based on the supplied parameters', (done) => {
+    it('returns a file based on the supplied parameters', async () => {
       const accessToken = 'token';
       const owner = 'repo-owner';
       const repo = 'repo-name';
@@ -689,15 +689,11 @@ describe('GitHub', () => {
 
       githubAPINocks.getContent({ accessToken, owner, repo, path, ref, content });
 
-      GitHub.getContent(accessToken, owner, repo, path, ref)
-        .then((resp) => {
-          expect(resp).to.equal('helloworld');
-          done();
-        })
-        .catch(done);
+      const resp = await GitHub.getContent(accessToken, owner, repo, path, ref);
+      expect(resp).to.equal('helloworld');
     });
 
-    it('returns a file based on the supplied parameters without ref (sha/branch)', (done) => {
+    it('returns a file based on the supplied parameters without ref (sha/branch)', async () => {
       const accessToken = 'token';
       const owner = 'repo-owner';
       const repo = 'repo-name';
@@ -706,15 +702,11 @@ describe('GitHub', () => {
 
       githubAPINocks.getContent({ accessToken, owner, repo, path, content });
 
-      GitHub.getContent(accessToken, owner, repo, path)
-        .then((resp) => {
-          expect(resp).to.equal('helloworld');
-          done();
-        })
-        .catch(done);
+      const resp = await GitHub.getContent(accessToken, owner, repo, path);
+      expect(resp).to.equal('helloworld');
     });
 
-    it('returns an array (ie: dir files meta data) based on the supplied parameters', (done) => {
+    it('returns an array (ie: dir files meta data) based on the supplied parameters', async () => {
       const accessToken = 'token';
       const owner = 'repo-owner';
       const repo = 'repo-name';
@@ -725,15 +717,11 @@ describe('GitHub', () => {
 
       githubAPINocks.getContent({ accessToken, owner, repo, path, ref, content, type });
 
-      GitHub.getContent(accessToken, owner, repo, path, ref)
-        .then((resp) => {
-          expect(resp).to.eql(content);
-          done();
-        })
-        .catch(done);
+      const resp = await GitHub.getContent(accessToken, owner, repo, path, ref);
+      expect(resp).to.eql(content);
     });
 
-    it('returns a 404 based on invalid supplied parameters', (done) => {
+    it('returns a 404 based on invalid supplied parameters', async () => {
       const accessToken = 'token';
       const owner = 'repo-owner';
       const repo = 'repo-name';
@@ -742,14 +730,11 @@ describe('GitHub', () => {
 
       githubAPINocks.getContent({ accessToken, owner, repo, path, ref, responseCode: 404 });
 
-      GitHub.getContent(accessToken, owner, repo, path, ref)
-        .then((content) => {
-          expect(content).to.be.null;
-          done();
-        });
+      const content = await GitHub.getContent(accessToken, owner, repo, path, ref);
+      expect(content).to.be.null;
     });
 
-    it('returns a 403 based on invalid supplied parameters', (done) => {
+    it('returns a 403 based on invalid supplied parameters', async () => {
       const accessToken = 'token';
       const owner = 'repo-owner';
       const repo = 'repo-name';
@@ -758,12 +743,9 @@ describe('GitHub', () => {
 
       githubAPINocks.getContent({ accessToken, owner, repo, path, ref, responseCode: 403 });
 
-      GitHub.getContent(accessToken, owner, repo, path, ref)
-        .catch((err) => {
-          expect(err.status).to.equal(403);
-          expect(err.message).to.equal('Error Encountered');
-          done();
-        })
+      const err = await GitHub.getContent(accessToken, owner, repo, path, ref).catch(err => err);
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('Error Encountered');
     });
     /* eslint-enable camelcase */
   });
