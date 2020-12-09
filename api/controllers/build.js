@@ -5,10 +5,14 @@ const buildSerializer = require('../serializers/build');
 const GithubBuildHelper = require('../services/GithubBuildHelper');
 const siteAuthorizer = require('../authorizers/site');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
-const { Build, Site } = require('../models');
+const EventCreator = require('../services/EventCreator');
+const ProxyDataSync = require('../services/ProxyDataSync');
+const { Build, Site, Event } = require('../models');
 const socketIO = require('../socketIO');
+const Features = require('../features');
 
 const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
+const BUILD_SETTINGS_FILE = 'federalist.json';
 
 const emitBuildStatus = build => Site.findByPk(build.site)
   .then((site) => {
@@ -27,6 +31,17 @@ const emitBuildStatus = build => Site.findByPk(build.site)
     return Promise.resolve();
   })
   .catch(err => logger.error(err));
+
+const saveBuildToProxy = async (build, status) => {
+  if (status === Build.States.Success) {
+    const buildSettings = await GithubBuildHelper.fetchContent(build, BUILD_SETTINGS_FILE);
+    if (buildSettings) {
+      const settings = JSON.parse(buildSettings);
+      await ProxyDataSync.saveBuild(build, settings);
+      EventCreator.audit(Event.labels.UPDATED, build, `${BUILD_SETTINGS_FILE} saved to proxy database`);
+    }
+  }
+};
 
 module.exports = {
   find: (req, res) => {
@@ -103,9 +118,7 @@ module.exports = {
       .catch(res.error);
   },
 
-  status: (req, res) => {
-    let buildStatus;
-
+  status: async (req, res) => {
     const getBuildStatus = (statusRequest) => {
       let status;
       let message;
@@ -126,30 +139,31 @@ module.exports = {
       }
       return { status, message, commitSha };
     };
+    try {
+      const buildStatus = getBuildStatus(req);
+      const buildId = Number(req.params.id);
+      let build = await fetchModelById(buildId, Build);
 
-    Promise.resolve(getBuildStatus(req))
-      .then((_buildStatus) => {
-        buildStatus = _buildStatus;
-        return Promise.resolve(Number(req.params.id));
-      })
-      .then(id => fetchModelById(id, Build))
-      .then((build) => {
-        if (!build) {
-          throw 404;
-        } else if (build.token !== req.params.token) {
-          throw 403;
-        } else {
-          return build.updateJobStatus(buildStatus);
-        }
-      })
-      .then((build) => {
-        emitBuildStatus(build);
-        return GithubBuildHelper.reportBuildStatus(build);
-      })
-      .then(() => res.ok())
-      .catch((err) => {
-        logger.error(['Error build status reporting to GitHub', err, err.stack].join('\n'));
-        res.error(err);
-      });
+      if (!build) {
+        throw 404;
+      } else if (build.token !== req.params.token) {
+        throw 403;
+      } else {
+        build = await build.updateJobStatus(buildStatus);
+      }
+
+      emitBuildStatus(build);
+
+      await GithubBuildHelper.reportBuildStatus(build);
+
+      if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
+        await saveBuildToProxy(build, buildStatus.status);
+      }
+
+      res.ok();
+    } catch (err) {
+      EventCreator.error(Event.labels.UPDATED, ['Error build status reporting to GitHub', err, err.stack].join('\n'));
+      res.error(err);
+    }
   },
 };

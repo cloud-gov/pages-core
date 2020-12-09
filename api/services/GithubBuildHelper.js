@@ -47,7 +47,7 @@ const loadSiteUserAccessToken = site => site.getUsers({
       return githubAccessToken;
     }
 
-    throw new Error('Unable to find valid access token to report build status');
+    throw new Error(`Unable to find valid access token for site@id=${site.id}`);
   }));
 
 const loadBuildUserAccessToken = build => Build.findByPk(build.id, { include: [Site, User] })
@@ -131,4 +131,19 @@ const reportBuildStatus = (build) => {
     });
 };
 
-module.exports = { reportBuildStatus };
+const fetchContent = async (build, path = null) => {
+  if (!build.clonedCommitSha) {
+    throw new Error(`Build or commit sha undefined. Unable to fetch ${path} for build@id=${build.id}`);
+  }
+
+  const site = await Site.findByPk(build.site);
+  if (!site) {
+    throw new Error(`Unable to find a site for build@id=${build.id}`);
+  }
+
+  const accessToken = await loadBuildUserAccessToken(build);
+  const { owner, repository } = site;
+  return GitHub.getContent(accessToken, owner, repository, path, build.clonedCommitSha);
+};
+
+module.exports = { reportBuildStatus, fetchContent };

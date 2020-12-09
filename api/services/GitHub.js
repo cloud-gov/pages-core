@@ -12,6 +12,8 @@ const getOrganizations = github => github.orgs.listForAuthenticatedUser().then(o
 
 const getRepository = (github, options) => github.repos.get(options).then(repos => repos.data);
 
+const getContent = (github, options) => github.repos.getContent(options);
+
 const getBranch = (github, { owner, repo, branch }) => github.repos
   .getBranch({ owner, repo, branch })
   .then(branchInfo => branchInfo.data);
@@ -280,4 +282,26 @@ module.exports = {
 
   getCollaborators: (accessToken, owner, repo) => githubClient(accessToken)
     .then(github => getNextCollaborators(github, owner, repo)),
+
+  getContent: (accessToken, owner, repo, path, ref = null) => githubClient(accessToken)
+    .then((github) => {
+      const options = { owner, repo, path };
+      if (ref) {
+        options.ref = ref;
+      }
+      return getContent(github, options);
+    })
+    .then(({ data }) => {
+      if (data.type === 'file') { // return file body
+        const { content, encoding } = data;
+        return Buffer.from(content, encoding).toString('utf8');
+      }
+      return data; // return folder/files
+    })
+    .catch((err) => {
+      if (err.status === 404) {
+        return null;
+      }
+      throw err;
+    }),
 };

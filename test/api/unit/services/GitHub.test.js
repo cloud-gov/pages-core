@@ -676,4 +676,95 @@ describe('GitHub', () => {
       expect(result).to.be.undefined;
     });
   });
+
+  describe('.getContents', () => {
+    /* eslint-disable camelcase */
+    it('returns a file based on the supplied parameters', (done) => {
+      const accessToken = 'token';
+      const owner = 'repo-owner';
+      const repo = 'repo-name';
+      const path = 'file-path.json';
+      const ref = 'theRef';
+      const content = 'helloworld';
+
+      githubAPINocks.getContent({ accessToken, owner, repo, path, ref, content });
+
+      GitHub.getContent(accessToken, owner, repo, path, ref)
+        .then((resp) => {
+          expect(resp).to.equal('helloworld');
+          done();
+        })
+        .catch(done);
+    });
+
+    it('returns a file based on the supplied parameters without ref (sha/branch)', (done) => {
+      const accessToken = 'token';
+      const owner = 'repo-owner';
+      const repo = 'repo-name';
+      const path = 'file-path.json';
+      const content = 'helloworld';
+
+      githubAPINocks.getContent({ accessToken, owner, repo, path, content });
+
+      GitHub.getContent(accessToken, owner, repo, path)
+        .then((resp) => {
+          expect(resp).to.equal('helloworld');
+          done();
+        })
+        .catch(done);
+    });
+
+    it('returns an array (ie: dir files meta data) based on the supplied parameters', (done) => {
+      const accessToken = 'token';
+      const owner = 'repo-owner';
+      const repo = 'repo-name';
+      const path = 'file-path.json';
+      const ref = 'theRef';
+      const content = [1, 2, 3];
+      const type = undefined;
+
+      githubAPINocks.getContent({ accessToken, owner, repo, path, ref, content, type });
+
+      GitHub.getContent(accessToken, owner, repo, path, ref)
+        .then((resp) => {
+          expect(resp).to.eql(content);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('returns a 404 based on invalid supplied parameters', (done) => {
+      const accessToken = 'token';
+      const owner = 'repo-owner';
+      const repo = 'repo-name';
+      const path = 'wrong-file-path.json';
+      const ref = 'theRef';
+
+      githubAPINocks.getContent({ accessToken, owner, repo, path, ref, responseCode: 404 });
+
+      GitHub.getContent(accessToken, owner, repo, path, ref)
+        .then((content) => {
+          expect(content).to.be.null;
+          done();
+        });
+    });
+
+    it('returns a 403 based on invalid supplied parameters', (done) => {
+      const accessToken = 'token';
+      const owner = 'repo-owner';
+      const repo = 'repo-name';
+      const path = 'wrong-file-path.json';
+      const ref = 'theRef';
+
+      githubAPINocks.getContent({ accessToken, owner, repo, path, ref, responseCode: 403 });
+
+      GitHub.getContent(accessToken, owner, repo, path, ref)
+        .catch((err) => {
+          expect(err.status).to.equal(403);
+          expect(err.message).to.equal('Error Encountered');
+          done();
+        })
+    });
+    /* eslint-enable camelcase */
+  });
 });

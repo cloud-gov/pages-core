@@ -1,13 +1,13 @@
 const crypto = require('crypto');
 const { expect } = require('chai');
-const { spy } = require('sinon');
+const sinon = require('sinon');
 const nock = require('nock');
 const config = require('../../../../config');
 const { logger } = require('../../../../winston');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const { buildViewLink } = require('../../../../api/utils/build');
-
+const GitHub = require('../../../../api/services/GitHub');
 const GithubBuildHelper = require('../../../../api/services/GithubBuildHelper');
 
 const requestedCommitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
@@ -16,6 +16,7 @@ const clonedCommitSha = '7b8d23c07a2c3b5a140844a654d91e13c66b271a';
 describe('GithubBuildHelper', () => {
   afterEach(() => {
     nock.cleanAll();
+    sinon.restore();
   });
 
   describe('reportBuildStatus(build)', () => {
@@ -162,7 +163,7 @@ describe('GithubBuildHelper', () => {
         const repoNocks = [];
         let build;
         let site;
-        const loggerSpy = spy(logger, 'error');
+        const loggerSpy = sinon.spy(logger, 'error');
 
         factory.site({ owner: 'test-owner', repository: 'test-repo' })
         .then((_site) => {
@@ -203,7 +204,6 @@ describe('GithubBuildHelper', () => {
         .then(() => {
           expect(statusNock.isDone()).to.be.false;
           expect(loggerSpy.called).to.be.true;
-          loggerSpy.restore();
           done();
         })
         .catch(done);
@@ -733,7 +733,7 @@ describe('GithubBuildHelper', () => {
 
       it('reports an error if no users with valid permissions are found', (done) => {
         const githubUser = factory.user(invalidUserParams());
-        const loggerSpy = spy(logger, 'error');
+        const loggerSpy = sinon.spy(logger, 'error');
 
         factory.site({
           owner: 'test-owner',
@@ -765,11 +765,44 @@ describe('GithubBuildHelper', () => {
         })
         .then(() => {
           expect(loggerSpy.called).to.be.true;
-          loggerSpy.restore();
           done();
         })
         .catch(done);
       });
+    });
+  });
+
+  describe('fetchContent(build, path)', () => {
+    it('should fetch the content requested', async() => {
+      const fetchContentGitStub = sinon.stub(GitHub, 'getContent').resolves('testContent');
+      const checkPermissionsGitStub = sinon.stub(GitHub, 'checkPermissions').resolves({ push: true });
+
+      const user = await factory.user();
+      const site = await factory.site({ owner: 'test-owner', repository: 'test-repo', users: [user], username: user.username });
+      const build = await factory.build({
+        site,
+        requestedCommitSha,
+        clonedCommitSha,
+        user
+      });
+        
+      const content = await GithubBuildHelper.fetchContent(build, 'filePath.txt');
+      expect(content).to.equal('testContent');
+    });
+
+    it('should not fetch the content requested w/o clonedCommitSha', async () => {
+      const path = 'filePath.txt';
+
+      const user = await factory.user();
+      const site = await factory.site({ owner: 'test-owner', repository: 'test-repo', users: [user] });
+      const build = await factory.build({
+        requestedCommitSha,
+        user: user.id,
+        username: user.username,
+      });
+
+      const err = await GithubBuildHelper.fetchContent(build, path).catch(e => e);
+      expect(err.message).to.equal(`Build or commit sha undefined. Unable to fetch ${path} for build@id=${build.id}`);
     });
   });
 });
