@@ -49,6 +49,15 @@ describe('build utils', () => {
       ].join('');
       expect(buildUrl(build, site)).to.eql(url);
     });
+
+    it('non-default/demo branch url start with preview w/ slash named branch', async () => {
+      const build = await factory.build({ branch: 'ot/her', site });
+      const url = [
+        `https://${site.awsBucketName}.app.cloud.gov`,
+        `/preview/${site.owner}/${site.repository}/ot-her`,
+      ].join('');
+      expect(buildUrl(build, site)).to.eql(url);
+    });
   });
 
   describe('viewLink', () => {

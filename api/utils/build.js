@@ -2,7 +2,8 @@ const { siteViewDomain } = require('./site');
 const Features = require('../features');
 
 function buildPath(build, site) {
-  let path = `/preview/${site.owner}/${site.repository}/${build.branch}`;
+  const branchPath = build.branch.replace(/[\/]+/g, '-'); // if branch contains '/' replace with '-'
+  let path = `/preview/${site.owner}/${site.repository}/${branchPath}`;
   if (build.branch === site.defaultBranch) {
     path = `/site/${site.owner}/${site.repository}`;
   } else if (build.branch === site.demoBranch) {
