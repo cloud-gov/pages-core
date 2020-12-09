@@ -270,7 +270,7 @@ describe('Build model', () => {
     });
 
     it('should require a branch before saving', () => {
-      const buildPromise = Build.create({ username: 'username', site: 1 });
+      const buildPromise = Build.create({ username: 'username', site: 1, branch: null });
 
       return expect(buildPromise).to.be
         .rejectedWith(ValidationError, 'notNull Violation: Build.branch cannot be null');
