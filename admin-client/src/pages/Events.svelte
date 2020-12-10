@@ -4,6 +4,7 @@
   import {
     GridContainer,
     PageTitle,
+    PaginationBanner,
   } from '../components';
 
   const defaultParams = {
@@ -17,97 +18,50 @@
   $: params = { ...defaultParams, ...($router.query || {}) };
   $: query = fetchEvents(params);
   $: (async () => { results = await query; })();
-  
-  function toParams(updates = {}) {
-    const p = { ...params, ...updates };
-    const searchParams = new URLSearchParams();
-    Object.keys(p).forEach((key) => {
-      searchParams.set(key, p[key]);
-    });
-    return searchParams.toString();
-  }
 </script>
 
 <style>
-  a:not([href]) {
-    opacity: .5;
+
+  td code {
+    word-wrap: anywhere;
   }
 </style>
 
-<GridContainer>
+<GridContainer classes={['padding-bottom-3']}>
   <PageTitle>Events</PageTitle>
-  <div class="grid-row flex-justify border-bottom padding-bottom-2">
-    <div>
-      {#if results}
-        <form method="GET" action="/events">
-          <input type="hidden" name="limit" value={params.limit}/>
-          <input type="hidden" name="page" value="1"/>
-          <label for="type">Event Type</label>
-          <select name="type" id="type" value={params.type}>
-            <option value="">-</option>
-            {#each results.meta.eventTypes as type}
-              <option value={type}>{type}</option>
-            {/each}
-          </select>
-          <label for="label">Event Label</label>
-          <select name="label" id="label" value={params.label}>
-            <option value="">-</option>
-            {#each results.meta.eventLabels as label}
-              <option value={label}>{label}</option>
-            {/each}
-          </select>
-          <button type="submit">Search</button>
-        </form>
-      {/if}
-    </div>
+  <div class="grid-row margin-bottom-3">
     {#if results}
-      <span>Viewing page <b>{results.currentPage}</b> of <b>{results.totalPages}</b> (total results: {results.totalItems})</span>
+      <form method="GET" action="/events" class="font-body-md">
+        <input type="hidden" name="limit" value={params.limit}/>
+        <input type="hidden" name="page" value="1"/>
+        <label for="type">Event Type</label>
+        <select name="type" id="type" value={params.type}>
+          <option value="">-</option>
+          {#each results.meta.eventTypes as type}
+            <option value={type}>{type}</option>
+          {/each}
+        </select>
+        <label for="label">Event Label</label>
+        <select name="label" id="label" value={params.label}>
+          <option value="">-</option>
+          {#each results.meta.eventLabels as label}
+            <option value={label}>{label}</option>
+          {/each}
+        </select>
+        <button type="submit">Search</button>
+      </form>
     {/if}
-    <ul class="usa-button-group usa-button-group--segmented flex-justify-end">
-      {#if results}
-        <li>
-          <a
-            href={results.currentPage !== 1 ? `?${toParams({ page: 1 })}` : null}
-            class="padding-x-1"
-          >
-            First
-          </a>
-        </li>
-        <li>
-          <a
-            href={results.currentPage > 1 ? `?${toParams({ page: results.currentPage - 1 })}` : null}
-            class="padding-x-1"
-          >
-            Previous
-          </a>
-        </li>
-        <li>
-          <a
-            href={results.currentPage < results.totalPages ? `?${toParams({ page: results.currentPage + 1 })}` : null}
-            class="padding-x-1"
-          >
-            Next
-          </a>
-        </li>
-        <li>
-          <a
-            href={results.totalPages > 0 && results.currentPage !== results.totalPages ? `?${toParams({ page: results.totalPages })}` : null}
-            class="padding-x-1"
-          >
-            Last
-          </a>
-        </li>        
-      {/if}
-    </ul>
   </div>
+
+  <hr class="margin-bottom-3"/>
 
   <div class="padding-x-1">
     {#await query}
       <p>Loading events...</p>
     {:then payload}
       {#if payload.data.length > 0}
-
-        <table class="usa-table usa-table--borderless width-full">
+        <PaginationBanner pagination={results} extraParams={params}/>
+        <table class="usa-table usa-table--borderless width-full margin-top-05">
           <thead>
             <th scope="col">Name</th>
             <th scope="col">Model</th>
@@ -123,6 +77,7 @@
             {/each}
           </tbody>
         </table>
+        <PaginationBanner pagination={results} extraParams={params}/>
       {:else}
         <p>No events found.</p>
       {/if}

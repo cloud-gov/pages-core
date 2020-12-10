@@ -16,3 +16,11 @@
 <main>
   <Router />
 </main>
+
+<style>
+  :global(.grid-container),
+  :global(.usa-nav-container),
+  :global(.usa-banner__inner) {
+    max-width: 72rem;
+  }
+</style>
