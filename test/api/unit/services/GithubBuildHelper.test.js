@@ -773,7 +773,7 @@ describe('GithubBuildHelper', () => {
   });
 
   describe('fetchContent(build, path)', () => {
-    it('should fetch the content requested', async() => {
+    it('should fetch the content requested', async () => {
       const fetchContentGitStub = sinon.stub(GitHub, 'getContent').resolves('testContent');
       const checkPermissionsGitStub = sinon.stub(GitHub, 'checkPermissions').resolves({ push: true });
 
