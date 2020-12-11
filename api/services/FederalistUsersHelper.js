@@ -62,7 +62,7 @@ const removeMemberFromFederalistUsersOrg = (githubAccessToken, login) => GitHub
   .removeOrganizationMember(githubAccessToken, FEDERALIST_USERS_ORG, login)
   .catch(error => EventCreator.error(Event.labels.FEDERALIST_USERS, { error, login, action: 'removeOrgMember' }));
 
-const revokeMembershipForInactiveUsers = async ({ auditorUsername }) => {
+const revokeMembershipForInactiveUsers = async ({ auditorUsername } = {}) => {
   /* eslint-disable no-param-reassign */
   auditorUsername = auditorUsername || config.federalistUsers.admin;
   /* eslint-enable no-param-reassign */
@@ -91,7 +91,7 @@ const revokeMembershipForInactiveUsers = async ({ auditorUsername }) => {
 };
 
 // remove GitHub org members that are not in the user table
-const removeMembersWhoAreNotUsers = async ({ auditorUsername }) => {
+const removeMembersWhoAreNotUsers = async ({ auditorUsername } = {}) => {
   /* eslint-disable no-param-reassign */
   auditorUsername = auditorUsername || config.federalistUsers.admin;
   /* eslint-enable no-param-reassign */
