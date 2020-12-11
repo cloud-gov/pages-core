@@ -1,28 +1,21 @@
-const GitHubStrategy = require('passport-github').Strategy;
 const Passport = require('passport');
-
 const config = require('../../config');
 const { User } = require('../models');
-const GitHub = require('../services/GitHub');
+const { createUAAStrategy } = require('../services/uaaStrategy');
 
 const passport = new Passport.Passport();
 
-const options = config.passport.github.adminOptions;
+const uaaOptions = config.passport.uaa.adminOptions;
 
-const onSuccess = async (accessToken, _refreshToken, profile, callback) => {
-  const { _json: { email }, username } = profile;
-
-  try {
-    await GitHub.ensureFederalistAdmin(accessToken, username);
-  } catch (_) {
-    return callback(null, false);
-  }
+const verify = async (accessToken, _refreshToken, profile, callback) => {
+  const { email } = profile;
 
   try {
-    const user = (await User.findOrCreate({
-      where: { username: username.toLowerCase() },
-      defaults: { email, username },
-    }))[0];
+    const user = await User.findOne({ where: { adminEmail: email } });
+
+    if (!user) {
+      return callback(null, false);
+    }
 
     return callback(null, user);
   } catch (err) {
@@ -30,7 +23,9 @@ const onSuccess = async (accessToken, _refreshToken, profile, callback) => {
   }
 };
 
-passport.use(new GitHubStrategy(options, onSuccess));
+const uaaStrategy = createUAAStrategy(uaaOptions, verify);
+
+passport.use('uaa', uaaStrategy);
 
 passport.serializeUser((user, next) => {
   next(null, user.id);
@@ -41,5 +36,10 @@ passport.deserializeUser((id, next) => {
     next(null, user);
   });
 });
+
+passport.logout = (req, res) => {
+  req.logout();
+  res.redirect(uaaStrategy.logoutRedirectURL);
+};
 
 module.exports = passport;

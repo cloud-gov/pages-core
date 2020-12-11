@@ -7,6 +7,7 @@ const buildAttributes = (overrides = {}) => Object.assign({
   user: 1,
   token: URLSafeBase64.encode(crypto.randomBytes(32)),
   state: 'success',
+  branch: 'test-branch-1',
 }, overrides);
 
 const bulkBuild = (overrides, count) => {

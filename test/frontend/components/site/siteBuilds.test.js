@@ -40,7 +40,8 @@ describe('<SiteBuilds/>', () => {
       startedAt: '2016-12-28T12:01:00',
       completedAt: '2016-12-28T12:05:00',
       state: 'success',
-      commitSha: '123A',
+      requestedCommitSha: '123A',
+      username: 'build-username',
     };
     props = {
       builds: {
@@ -71,11 +72,11 @@ describe('<SiteBuilds/>', () => {
     const userIndex = columnIndex(wrapper, 'User');
 
     const userCell = wrapper.find('tr').at(1).find('td').at(userIndex - 1);
-    expect(userCell.text()).to.equal(user.username);
+    expect(userCell.text()).to.equal(build.username);
   });
 
   it('should render an empty string for the username for builds where there is no user', () => {
-    build.user = undefined;
+    build.username = undefined;
     const wrapper = shallow(<SiteBuilds {...props} />);
 
     const userCell = wrapper.find('td[data-title="User"]');
@@ -83,7 +84,7 @@ describe('<SiteBuilds/>', () => {
   });
 
   it('should render a `-` if the commit SHA is absent', () => {
-    build.commitSha = null;
+    build.requestedCommitSha = null;
     build.state = 'processing';
 
     const siteBuild = props.builds.data[0];
@@ -97,10 +98,10 @@ describe('<SiteBuilds/>', () => {
   it('should render a `GitHubLink` component if commit SHA present', () => {
     const wrapper = shallow(<SiteBuilds {...props} />);
     const siteBuild = props.builds.data[0];
-    const { commitSha } = siteBuild;
+    const { requestedCommitSha } = siteBuild;
     const { owner, repository } = siteBuild.site;
 
-    expect(wrapper.find({ owner, repository, sha: commitSha })).to.have.length(1);
+    expect(wrapper.find({ owner, repository, sha: requestedCommitSha })).to.have.length(1);
   });
 
   it('should render a `BranchViewLink` component if state is successful', () => {

@@ -47,7 +47,9 @@ const associate = ({
 const generateToken = () => URLSafeBase64.encode(crypto.randomBytes(32));
 
 const beforeValidate = (build) => {
-  build.token = build.token || generateToken(); // eslint-disable-line no-param-reassign
+  const { token, username } = build;
+  build.token = token || generateToken(); // eslint-disable-line no-param-reassign
+  build.username = username && username.toLowerCase(); // eslint-disable-line no-param-reassign
 };
 
 const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
@@ -58,6 +60,10 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
   const atts = {
     state: buildStatus.status,
   };
+
+  if (buildStatus.commitSha && buildStatus.commitSha !== build.clonedCommitSha) {
+    atts.clonedCommitSha = buildStatus.commitSha;
+  }
 
   if (buildStatus.status === States.Error) {
     atts.error = jobErrorMessage(buildStatus.message);
@@ -131,6 +137,10 @@ function isComplete() {
   return [States.Error, States.Success].includes(this.state);
 }
 
+function isInProgress() {
+  return [States.Created, States.Queued, States.Tasked, States.Processing].includes(this.state);
+}
+
 function canStart(state) {
   return [States.Created, States.Queued, States.Tasked].includes(this.state)
     && state === States.Processing;
@@ -143,8 +153,9 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         is: branchRegex,
       },
+      allowNull: false,
     },
-    commitSha: {
+    requestedCommitSha: {
       type: DataTypes.STRING,
       validate: {
         is: shaRegex,
@@ -175,7 +186,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     user: {
       type: DataTypes.INTEGER,
-      allowNull: false,
     },
     startedAt: {
       type: DataTypes.DATE,
@@ -184,8 +194,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       validate: isEmptyOrUrl,
     },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     logsS3Key: {
       type: DataTypes.STRING,
+    },
+    clonedCommitSha: {
+      type: DataTypes.STRING,
+      validate: {
+        is: shaRegex,
+      },
     },
   }, {
     tableName: 'build',
@@ -214,6 +234,7 @@ module.exports = (sequelize, DataTypes) => {
   Build.prototype.updateJobStatus = updateJobStatus;
   Build.prototype.canComplete = canComplete;
   Build.prototype.isComplete = isComplete;
+  Build.prototype.isInProgress = isInProgress;
   Build.prototype.canStart = canStart;
   Build.States = States;
   return Build;

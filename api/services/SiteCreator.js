@@ -28,6 +28,7 @@ function paramsForNewBuild({ user, site }) {
     user: user.id,
     site: site.id,
     branch: site.defaultBranch,
+    username: user.username,
   };
 }
 

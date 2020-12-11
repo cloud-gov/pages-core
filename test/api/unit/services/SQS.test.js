@@ -408,17 +408,6 @@ describe('SQS', () => {
       });
     });
 
-    it('should set CACHE_CONTROL in the message', (done) => {
-      factory.build()
-        .then(build => Build.findByPk(build.id, { include: [Site, User] }))
-        .then(build => SQS.messageBodyForBuild(build))
-        .then((message) => {
-          expect(messageEnv(message, 'CACHE_CONTROL')).to.equal(config.build.cacheControl);
-          done();
-        })
-        .catch(done);
-    });
-
     it("should set BRANCH in the message to the name build's branch", (done) => {
       factory.site({ domain: '', defaultBranch: 'main' })
         .then(site => factory.build({ site, branch: 'branch' }))

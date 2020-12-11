@@ -48,10 +48,6 @@ const buildStateData = ({ state, error }) => {
 };
 
 class SiteBuilds extends React.Component {
-  static getUsername(build) {
-    return build.user ? build.user.username : '';
-  }
-
   static buildLogsLink(build) {
     return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>View logs</Link>;
   }
@@ -63,8 +59,8 @@ class SiteBuilds extends React.Component {
       <GitHubLink
         owner={owner}
         repository={repository}
-        sha={build.commitSha}
-        branch={build.commitSha ? null : build.branch}
+        sha={build.requestedCommitSha}
+        branch={build.requestedCommitSha ? null : build.branch}
         text={build.branch}
       />
     );
@@ -194,7 +190,7 @@ class SiteBuilds extends React.Component {
                             { SiteBuilds.buildLogsLink(build) }
                           </div>
                         </td>
-                        <td data-title="User"><span>{ SiteBuilds.getUsername(build) }</span></td>
+                        <td data-title="User"><span>{ build.username }</span></td>
                         <td data-title="Completed"><span>{ timeFrom(build.completedAt) }</span></td>
                         <td data-title="Duration">
                           <span>

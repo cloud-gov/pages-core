@@ -22,6 +22,7 @@ applications:
       - federalist-site-wide-error
       - federalist-((env))-dynamodb-creds
       - federalist-((env))-s3-build-logs
+      - uaa-client
     env:
       NODE_ENV: production
       APP_ENV: ((env))
@@ -40,6 +41,7 @@ applications:
       PROXY_SITE_TABLE: federalist-proxy-((env))
       FEATURE_PROXY_EDGE_DYNAMO: ((feature_proxy_edge_dynamo))
       FEATURE_PROXY_EDGE_LINKS: ((feature_proxy_edge_links))
+      AUTH_IDP: ((auth_idp))
   - name: federalist-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client

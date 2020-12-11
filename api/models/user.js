@@ -50,6 +50,20 @@ const attributes = DataTypes => ({
     unique: true,
     allowNull: false,
   },
+  isActive: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+    allowNull: false,
+  },
+  pushedAt: {
+    type: DataTypes.DATE,
+  },
+  adminEmail: {
+    type: DataTypes.STRING,
+    validate: {
+      isEmail: true,
+    },
+  },
 });
 
 const options = {

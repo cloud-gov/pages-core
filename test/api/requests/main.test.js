@@ -97,8 +97,7 @@ describe('Main Site', () => {
         })
         .then((sess) => {
           expect(sess.flash.error.length).to.equal(1);
-          expect(sess.flash.error[0].title).to.equal('Unauthorized');
-          expect(sess.flash.error[0].message).to.equal(
+          expect(sess.flash.error[0]).to.equal(
             'You are not permitted to perform this action. Are you sure you are logged in?'
           );
           done();

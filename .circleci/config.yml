@@ -39,9 +39,9 @@ commands:
       - run:
           name: Install cloud foundry cli
           command: |
-            curl -L -o cf.deb 'https://packages.cloudfoundry.org/stable?release=debian64&version=v7&source=github'
-            sudo dpkg -i cf.deb
-            rm cf.deb
+            curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=v7&source=github" | tar -zx
+            sudo mv cf7 /usr/local/bin/cf
+            cf version
 
       - run:
           name: Log into cloud.gov
@@ -60,8 +60,8 @@ commands:
 
                   onerr() {
                     echo "Deployment failed, cancelling."
-                    cf7 cancel-deployment << parameters.app >>
-                    cf7 logout
+                    cf cancel-deployment << parameters.app >>
+                    cf logout
                     exit 1
                   }
                   trap 'onerr' ERR
@@ -102,6 +102,7 @@ jobs:
           POSTGRES_HOST_AUTH_METHOD: trust
     environment:
       FEATURE_ADMIN_AUTH: 'true'
+      AUTH_IDP: uaa
     steps:
       - checkout
 
@@ -329,6 +330,14 @@ workflows:
             branches:
               only: main
 
+      - run-task:
+          name: remove-inactive-federalist-users-production
+          app: federalistapp
+          task-name: remove-inactive-federalist-users
+          task-command: yarn remove-inactive-federalist-users
+          filters:
+            branches:
+              only: main
 
   every-ten-minutes:
     triggers:

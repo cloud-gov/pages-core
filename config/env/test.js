@@ -34,15 +34,19 @@ module.exports = {
         callbackURL: 'http://localhost:1337/external/auth/github/callback',
         scope: ['user', 'repo'],
       },
-      adminOptions: {
-        clientID: '123abc',
-        clientSecret: '456def',
-        callbackURL: 'http://localhost:1337/admin/auth/github/callback',
-        scope: ['user', 'repo', 'read:org'],
-      },
       organizations: [
         123456,
       ],
+    },
+    uaa: {
+      options: {
+        clientID: '123abc',
+        clientSecret: '456def',
+      },
+      adminOptions: {
+        clientID: '123abc',
+        clientSecret: '456def',
+      },
     },
   },
   postgres: {

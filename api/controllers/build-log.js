@@ -4,13 +4,6 @@ const buildLogSerializer = require('../serializers/build-log');
 const { Build, BuildLog, sequelize } = require('../models');
 const BuildLogs = require('../services/build-logs');
 
-function decodeb64(str) {
-  if (str) {
-    return Buffer.from(str, 'base64').toString('utf8');
-  }
-  return null;
-}
-
 async function getBuildLogsFromS3(build, offset, limit) {
   const output = await BuildLogs.getBuildLogs(build, offset, offset + limit - 1);
   return output ? [{ source: 'ALL', output }] : [];
@@ -44,28 +37,6 @@ async function getBuildLogsFromDatabase(build, offset, limit) {
 }
 
 module.exports = wrapHandlers({
-  create: async (req, res) => {
-    const { build_id: buildId, token } = req.params;
-
-    const build = await Build.findOne({ where: { id: buildId, token } });
-
-    if (!build) {
-      return res.notFound();
-    }
-
-    const { output, source } = req.body;
-
-    const buildLog = await BuildLog.create({
-      build: build.id,
-      output: decodeb64(output),
-      source,
-    });
-
-    const buildLogJSON = buildLogSerializer.serialize(buildLog);
-
-    return res.ok(buildLogJSON);
-  },
-
   find: async (req, res) => {
     const lineLimit = 1000;
     const byteLimit = lineLimit * 100;

@@ -19,6 +19,8 @@ services:
       FEATURE_PROXY_EDGE_LINKS: 'true'
       FEATURE_PROXY_EDGE_DYNAMO: 'true'
       FEATURE_ADMIN_AUTH: 'true'
+      APP_HOSTNAME: http://localhost:1337
+      AUTH_IDP: uaa
   admin-client:
     image: node:14.15
     working_dir: /app

@@ -28,7 +28,7 @@
         <div class="grid-row flex-column flex-align-center">
           <div class="margin-y-3">
             <button class="usa-button usa-button--outline" on:click={login}>
-              Continue with GitHub
+              Continue
             </button>
           </div>
         </div>

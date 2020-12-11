@@ -6,7 +6,7 @@
     "site",
     "state",
     "updatedAt",
-    "user"
+    "username"
   ],
   "not": {
     "required": ["token"]
@@ -18,7 +18,10 @@
     "branch": {
       "type": ["string", "null"]
     },
-    "commitSha": {
+    "requestedCommitSha": {
+      "type": "string"
+    },
+    "clonedCommitSha": {
       "type": "string"
     },
     "createdAt": {
@@ -73,6 +76,9 @@
       "not": {
         "required": ["githubAccessToken", "githubUserId"]
       }
+    },
+    "username": {
+      "type": "string"
     }
   }
 }

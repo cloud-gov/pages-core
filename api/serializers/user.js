@@ -3,6 +3,9 @@ const protectedAttributes = [
   'githubUserId',
   'signedInAt',
   'SiteUser',
+  'pushedAt',
+  'isActive',
+  'adminEmail',
 ];
 
 const toJSON = (user) => {

@@ -4,7 +4,6 @@ const { fetchModelById } = require('../utils/queryDatabase');
 const buildSerializer = require('../serializers/build');
 const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
 const siteAuthorizer = require('../authorizers/site');
-const BuildResolver = require('../services/BuildResolver');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const { Build, Site } = require('../models');
 const socketIO = require('../socketIO');
@@ -65,31 +64,42 @@ module.exports = {
    */
   create: (req, res) => {
     siteAuthorizer.createBuild(req.user, { id: req.body.siteId })
-      .then(() => BuildResolver.getBuild(req.user, req.body))
-      .then(b => Build.findOne({
+      .then(() => Build.findOne({
         where: {
-          site: b.site,
-          branch: b.branch,
-          state: ['created', 'queued'],
+          id: req.body.buildId,
+          site: req.body.siteId,
         },
+      }))
+      .then((b) => {
+        if (!b) {
+          throw 404;
+        }
+        return Build.findOne({
+          where: {
+            site: b.site,
+            branch: b.branch,
+            state: ['created', 'queued'],
+          },
+        })
+          .then((queuedBuild) => {
+            if (!queuedBuild) {
+              return Build.create({
+                branch: b.branch,
+                site: b.site,
+                user: req.user.id,
+                username: req.user.username,
+                requestedCommitSha: b.clonedCommitSha || b.requestedCommitSha,
+              })
+                .then(build => build.enqueue())
+                .then(build => GithubBuildStatusReporter
+                  .reportBuildStatus(build)
+                  .then(() => build))
+                .then(build => buildSerializer.serialize(build))
+                .then(buildJSON => res.json(buildJSON));
+            }
+            return res.ok({});
+          });
       })
-        .then((queuedBuild) => {
-          if (!queuedBuild) {
-            return Build.create({
-              branch: b.branch,
-              site: b.site,
-              user: req.user.id,
-              commitSha: b.commitSha,
-            })
-              .then(build => build.enqueue())
-              .then(build => GithubBuildStatusReporter
-                .reportBuildStatus(build)
-                .then(() => build))
-              .then(build => buildSerializer.serialize(build))
-              .then(buildJSON => res.json(buildJSON));
-          }
-          return res.ok({});
-        }))
       .catch(res.error);
   },
 
@@ -99,9 +109,11 @@ module.exports = {
     const getBuildStatus = (statusRequest) => {
       let status;
       let message;
+      let commitSha;
       try {
         status = statusRequest.body.status;
         message = decodeb64(statusRequest.body.message);
+        commitSha = statusRequest.body.commit_sha;
       } catch (err) {
         status = 'error';
         message = 'build status message parsing error';
@@ -112,7 +124,7 @@ module.exports = {
         ];
         logger.error(errMsg.join('\n'));
       }
-      return { status, message };
+      return { status, message, commitSha };
     };
 
     Promise.resolve(getBuildStatus(req))
