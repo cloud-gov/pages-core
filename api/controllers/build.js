@@ -146,11 +146,11 @@ module.exports = {
 
       if (!build) {
         throw 404;
-      } else if (build.token !== req.params.token) {
-        throw 403;
-      } else {
-        build = await build.updateJobStatus(buildStatus);
       }
+      if (build.token !== req.params.token) {
+        throw 403;
+      }
+      await build.updateJobStatus(buildStatus);
 
       emitBuildStatus(build);
 
