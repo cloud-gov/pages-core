@@ -54,7 +54,7 @@ const generateDefaultCredentials = build => ({
   REPOSITORY: build.Site.repository,
   OWNER: build.Site.owner,
   SITE_PREFIX: sitePrefixForBuild(buildUrl(build, build.Site)),
-  GITHUB_TOKEN: build.User.githubAccessToken,
+  GITHUB_TOKEN: (build.User || {}).githubAccessToken, // temp hot-fix
   GENERATOR: build.Site.engine,
   BUILD_ID: build.id,
   USER_ENVIRONMENT_VARIABLES: JSON.stringify(buildUEVs(build.Site.UserEnvironmentVariables)),
