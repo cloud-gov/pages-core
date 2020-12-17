@@ -156,9 +156,11 @@ function getNextCollaborators(github, owner, repo, { page = 1, allCollabs = [] }
 }
 
 module.exports = {
-  checkPermissions: (user, owner, repo) => githubClient(user.githubAccessToken)
-    .then(github => getRepository(github, { owner, repo, username: user.username }))
-    .then(repository => repository.permissions),
+  checkPermissions: async (user, owner, repo) => {
+    const github = await githubClient(user.githubAccessToken);
+    const repository = await getRepository(github, { owner, repo, username: user.username });
+    return repository.permissions;
+  },
 
   checkOrganizations: (user, orgName) => githubClient(user.githubAccessToken)
     .then(github => getOrganizations(github))
