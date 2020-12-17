@@ -6,7 +6,6 @@ const EventCreator = require('../services/EventCreator');
 const {
   Build, User, Site, Event,
 } = require('../models');
-const { logger } = require('../../winston');
 
 const signBlob = (key, blob) => `sha1=${crypto.createHmac('sha1', key).update(blob).digest('hex')}`;
 
@@ -62,7 +61,7 @@ const organizationWebhookRequest = async (payload) => {
 
 const addUserToSite = ({ user, site }) => user.addSite(site);
 
-const signWebhookRequest = request => {
+const signWebhookRequest = (request) => {
   const webhookSecret = config.webhook.secret;
   const requestBody = JSON.stringify(request.body);
 
@@ -134,7 +133,7 @@ module.exports = {
         });
         await GithubBuildHelper.reportBuildStatus(build, site, site.Users);
       }
-      return res.ok();
+      res.ok();
     } catch (err) {
       EventCreator.error(Event.labels.BUILD_REQUEST, ['Error processing push webhook', JSON.stringify(req.body), err]);
       res.badRequest();
@@ -142,10 +141,10 @@ module.exports = {
   },
   organization: async (req, res) => {
     try {
-      signWebhookRequest(req)
+      signWebhookRequest(req);
       await organizationWebhookRequest(req.body);
-      return res.ok();
-    } catch(err) {
+      res.ok();
+    } catch (err) {
       EventCreator.error(Event.labels.FEDERALIST_USERS_MEMBERSHIP, ['Error processing organization webhook', JSON.stringify(req.body), err]);
       res.badRequest();
     }

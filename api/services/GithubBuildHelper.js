@@ -1,22 +1,19 @@
 const url = require('url');
-const Sequelize = require('sequelize');
-const { logger } = require('../../winston');
 const GitHub = require('./GitHub');
 const config = require('../../config');
 const { buildViewLink } = require('../utils/build');
-const { Build, Site, User } = require('../models');
 
 // Loops through supplied list of users, until it
 // finds a user with a valid access token
 const getAccessTokenWithPushPermissions = async (site, siteUsers) => {
   let count = 0;
   const users = siteUsers.filter(u => u.githubAccessToken && u.signedInAt)
-    .sort((a,b) => b.signedInAt - a.signedInAt);
+    .sort((a, b) => b.signedInAt - a.signedInAt);
 
   const getNextToken = async (user) => {
     try {
       if (!user) {
-        return;
+        return null;
       }
 
       const permissions = await GitHub.checkPermissions(user, site.owner, site.repository);
@@ -26,11 +23,10 @@ const getAccessTokenWithPushPermissions = async (site, siteUsers) => {
       }
       count += 1;
       return getNextToken(users[count]);
-    
-    } catch(err) {
+    } catch (err) {
       count += 1;
       return getNextToken(users[count]);
-    };
+    }
   };
 
   return getNextToken(users[count]);
@@ -51,20 +47,20 @@ const loadBuildUserAccessToken = async (build, site, users) => {
     githubAccessToken = await getAccessTokenWithPushPermissions(site, users);
   }
 
-  if(!githubAccessToken) {
+  if (!githubAccessToken) {
     throw new Error(`Unable to find valid access token to report build@id=${build.id} status`);
   }
   return githubAccessToken;
-}
+};
 
 const reportBuildStatus = async (build, site, users) => {
   const sha = build.clonedCommitSha || build.requestedCommitSha;
-  if(!sha) {
+  if (!sha) {
     throw new Error('Build or commit sha undefined. Unable to report build status');
   }
 
-  const accessToken =  await loadBuildUserAccessToken(build, site, users);
-    
+  const accessToken = await loadBuildUserAccessToken(build, site, users);
+
   const context = config.app.app_env === 'production'
     ? 'federalist/build' : `federalist-${config.app.app_env}/build`;
 

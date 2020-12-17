@@ -7,7 +7,9 @@ const siteAuthorizer = require('../authorizers/site');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const EventCreator = require('../services/EventCreator');
 const ProxyDataSync = require('../services/ProxyDataSync');
-const { Build, Site, User, Event } = require('../models');
+const {
+  Build, Site, User, Event,
+} = require('../models');
 const socketIO = require('../socketIO');
 const Features = require('../features');
 
@@ -78,7 +80,7 @@ module.exports = {
   create: async (req, res) => {
     try {
       await siteAuthorizer.createBuild(req.user, { id: req.body.siteId });
-      const requestBuild = await Build.findOne({
+      const reqBuild = await Build.findOne({
         where: {
           id: req.body.buildId,
           site: req.body.siteId,
@@ -86,37 +88,36 @@ module.exports = {
         include: [{ model: Site, include: [{ model: User }] }],
       });
 
-      if (!requestBuild) {
+      if (!reqBuild) {
         throw 404;
       }
       const queuedBuild = await Build.findOne({
         where: {
-          site: requestBuild.site,
-          branch: requestBuild.branch,
+          site: reqBuild.site,
+          branch: reqBuild.branch,
           state: ['created', 'queued'],
         },
-      })
+      });
 
       if (!queuedBuild) {
         const rebuild = await Build.create({
-          branch: requestBuild.branch,
-          site: requestBuild.site,
+          branch: reqBuild.branch,
+          site: reqBuild.site,
           user: req.user.id,
           username: req.user.username,
-          requestedCommitSha: requestBuild.clonedCommitSha || requestBuild.requestedCommitSha,
+          requestedCommitSha: reqBuild.clonedCommitSha || reqBuild.requestedCommitSha,
         });
         await rebuild.enqueue();
-        const err = await GithubBuildHelper.reportBuildStatus(rebuild, requestBuild.Site, requestBuild.Site.Users);
+        await GithubBuildHelper.reportBuildStatus(rebuild, reqBuild.Site, reqBuild.Site.Users);
         const rebuildJSON = await buildSerializer.serialize(rebuild);
-        return res.json(rebuildJSON);
+        res.json(rebuildJSON);
+        return;
       }
-
-      return res.ok({});
-      
-    } catch(err) {
+      res.ok({});
+    } catch (err) {
       EventCreator.error(Event.labels.BUILD_REQUEST, ['Error processing rebuild request', JSON.stringify(req.body), err]);
       res.error(err);
-    };
+    }
   },
 
   status: async (req, res) => {
@@ -141,7 +142,9 @@ module.exports = {
       return { status, message, commitSha };
     };
     try {
-      const build = await fetchModelById(req.params.id, Build, { include: [{ model: Site, include: [{ model: User}] }] });
+      const build = await fetchModelById(req.params.id, Build, {
+        include: [{ model: Site, include: [{ model: User }] }],
+      });
 
       if (!build) {
         throw 404;
@@ -165,7 +168,7 @@ module.exports = {
 
       res.ok();
     } catch (err) {
-      EventCreator.error(Event.labels.BUILD_STATUS, [`Error processing build status request`, JSON.stringify(req.params), JSON.stringify(req.body), err]);
+      EventCreator.error(Event.labels.BUILD_STATUS, ['Error processing build status request', JSON.stringify(req.params), JSON.stringify(req.body), err]);
       res.error(err);
     }
   },
