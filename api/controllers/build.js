@@ -34,8 +34,8 @@ const emitBuildStatus = build => Site.findByPk(build.site)
   })
   .catch(err => logger.error(err));
 
-const saveBuildToProxy = async (build, site) => {
-  const buildSettings = await GithubBuildHelper.fetchContent(site, build, BUILD_SETTINGS_FILE);
+const saveBuildToProxy = async (build) => {
+  const buildSettings = await GithubBuildHelper.fetchContent(build, BUILD_SETTINGS_FILE);
   if (buildSettings) {
     const settings = JSON.parse(buildSettings);
     await ProxyDataSync.saveBuild(build, settings);
@@ -80,7 +80,7 @@ module.exports = {
   create: async (req, res) => {
     try {
       await siteAuthorizer.createBuild(req.user, { id: req.body.siteId });
-      const reqBuild = await Build.findOne({
+      const requestBuild = await Build.findOne({
         where: {
           id: req.body.buildId,
           site: req.body.siteId,
@@ -88,27 +88,28 @@ module.exports = {
         include: [{ model: Site, include: [{ model: User }] }],
       });
 
-      if (!reqBuild) {
+      if (!requestBuild) {
         throw 404;
       }
       const queuedBuild = await Build.findOne({
         where: {
-          site: reqBuild.site,
-          branch: reqBuild.branch,
+          site: requestBuild.site,
+          branch: requestBuild.branch,
           state: ['created', 'queued'],
         },
       });
 
       if (!queuedBuild) {
         const rebuild = await Build.create({
-          branch: reqBuild.branch,
-          site: reqBuild.site,
+          branch: requestBuild.branch,
+          site: requestBuild.site,
           user: req.user.id,
           username: req.user.username,
-          requestedCommitSha: reqBuild.clonedCommitSha || reqBuild.requestedCommitSha,
+          requestedCommitSha: requestBuild.clonedCommitSha || requestBuild.requestedCommitSha,
         });
         await rebuild.enqueue();
-        await GithubBuildHelper.reportBuildStatus(rebuild, reqBuild.Site, reqBuild.Site.Users);
+        rebuild.Site = requestBuild.Site;
+        await GithubBuildHelper.reportBuildStatus(rebuild);
         const rebuildJSON = await buildSerializer.serialize(rebuild);
         res.json(rebuildJSON);
         return;
@@ -158,11 +159,11 @@ module.exports = {
 
       emitBuildStatus(build);
 
-      await GithubBuildHelper.reportBuildStatus(build, build.Site, build.Site.Users);
+      await GithubBuildHelper.reportBuildStatus(build);
 
       if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
         if (buildStatus.status === Build.States.Success) {
-          await saveBuildToProxy(build, build.Site);
+          await saveBuildToProxy(build);
         }
       }
 

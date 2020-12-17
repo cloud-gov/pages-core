@@ -4,6 +4,7 @@ const sinon = require('sinon');
 const nock = require('nock');
 const config = require('../../../../config');
 const { logger } = require('../../../../winston');
+const { Build, Site, User } = require('../../../../api/models');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const { buildViewLink } = require('../../../../api/utils/build');
@@ -51,8 +52,8 @@ describe('GithubBuildHelper', () => {
           sha: requestedCommitSha,
           state: 'pending',
         });
-
-          await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
 
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
@@ -88,7 +89,8 @@ describe('GithubBuildHelper', () => {
           state: 'pending',
         });
 
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
         repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
         expect(statusNock.isDone()).to.be.true;
       });
@@ -117,7 +119,8 @@ describe('GithubBuildHelper', () => {
           state: 'pending',
         });
 
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
         repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
         expect(statusNock.isDone()).to.be.true;
       });
@@ -147,7 +150,8 @@ describe('GithubBuildHelper', () => {
           state: 'pending',
         });
 
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
         repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
         expect(statusNock.isDone()).to.be.true;
       });
@@ -180,7 +184,8 @@ describe('GithubBuildHelper', () => {
           sha: requestedCommitSha,
           state: 'pending',
         });
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
         repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
         expect(statusNock.isDone()).to.be.true;
       });
@@ -213,7 +218,8 @@ describe('GithubBuildHelper', () => {
           sha: requestedCommitSha,
           state: 'pending',
         });
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
         repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
         expect(statusNock.isDone()).to.be.true;
       });
@@ -244,7 +250,8 @@ describe('GithubBuildHelper', () => {
           response: [403, { permissions: {} }],
         }));
         
-        const err =  await GithubBuildHelper.reportBuildStatus(build, site, users).catch(e => e);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        const err =  await GithubBuildHelper.reportBuildStatus(build).catch(e => e);
         repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
         expect(statusSpy.called).to.be.false;
         expect(err.message).to.equal(`Unable to find valid access token to report build@id=${build.id} status`);
@@ -276,7 +283,8 @@ describe('GithubBuildHelper', () => {
           response: [201, { permissions: {} }],
         }));
         
-        const err =  await GithubBuildHelper.reportBuildStatus(build, site, users).catch(e => e);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        const err =  await GithubBuildHelper.reportBuildStatus(build).catch(e => e);
         repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
         expect(statusSpy.called).to.be.false;
         expect(err.message).to.equal(`Unable to find valid access token to report build@id=${build.id} status`);
@@ -295,7 +303,8 @@ describe('GithubBuildHelper', () => {
           sha: requestedCommitSha,
           targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
         });
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
         expect(repoNock.isDone()).to.be.true;
         expect(statusNock.isDone()).to.be.true;
       });
@@ -333,7 +342,8 @@ describe('GithubBuildHelper', () => {
           state: 'pending',
         });
 
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
         expect(repoNock.isDone()).to.be.true;
         expect(statusNock.isDone()).to.be.true;
       });
@@ -352,7 +362,8 @@ describe('GithubBuildHelper', () => {
           targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
         });
 
-        await  GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await  GithubBuildHelper.reportBuildStatus(build);
         expect(repoNock.isDone()).to.be.true;
         expect(statusNock.isDone()).to.be.true;
          
@@ -390,7 +401,8 @@ describe('GithubBuildHelper', () => {
           state: 'pending',
         });
 
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
         expect(repoNock.isDone()).to.be.true;
         expect(statusNock.isDone()).to.be.true;
       });
@@ -409,7 +421,8 @@ describe('GithubBuildHelper', () => {
           targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
         });
 
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
         expect(repoNock.isDone()).to.be.true;
         expect(statusNock.isDone()).to.be.true;
       });
@@ -454,7 +467,8 @@ describe('GithubBuildHelper', () => {
           state: 'success',
         });
 
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
         expect(repoNock.isDone()).to.be.true;
         expect(statusNock.isDone()).to.be.true;
       });
@@ -491,7 +505,8 @@ describe('GithubBuildHelper', () => {
           state: 'success',
         });
 
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
         expect(repoNock.isDone()).to.be.true;
         expect(statusNock.isDone()).to.be.true;
       });
@@ -511,7 +526,8 @@ describe('GithubBuildHelper', () => {
           targetURL: buildViewLink(build, site),
         });
 
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
         expect(repoNock.isDone()).to.be.true;
         expect(statusNock.isDone()).to.be.true;
       });
@@ -547,13 +563,14 @@ describe('GithubBuildHelper', () => {
           state: 'error',
         });
 
-        await  GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await  GithubBuildHelper.reportBuildStatus(build);
         expect(statusNock.isDone()).to.be.true;
         expect(repoNock.isDone()).to.be.true;
       });
 
       it("should report that the status is 'error' with clonedCommitSha", async () => {
-        build.update({ clonedCommitSha });
+        await build.update({ clonedCommitSha });
         
         const repoNock = githubAPINocks.repo({
           accessToken: user.githubAccessToken,
@@ -569,7 +586,8 @@ describe('GithubBuildHelper', () => {
           targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
         });
 
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
         expect(statusNock.isDone()).to.be.true;
         expect(repoNock.isDone()).to.be.true;
       });
@@ -592,7 +610,8 @@ describe('GithubBuildHelper', () => {
           targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
         });
 
-        await GithubBuildHelper.reportBuildStatus(build, site, users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await GithubBuildHelper.reportBuildStatus(build);
       
         expect(statusNock.isDone()).to.be.true;
         expect(repoNock.isDone()).to.be.true;
@@ -605,6 +624,7 @@ describe('GithubBuildHelper', () => {
     let site;
     let build;
     let users;
+    const path = 'filePath.txt';
     beforeEach(async() => {
       user = await factory.user();
       site = await  factory.site({ users: [user] })
@@ -621,16 +641,15 @@ describe('GithubBuildHelper', () => {
     it('should fetch the content requested', async () => {
       const fetchContentGitStub = sinon.stub(GitHub, 'getContent').resolves('testContent');
       const checkPermissionsGitStub = sinon.stub(GitHub, 'checkPermissions').resolves({ push: true });
-        
-      const content = await GithubBuildHelper.fetchContent(build, site, users, 'filePath.txt');
+      await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+      const content = await GithubBuildHelper.fetchContent(build, path);
       expect(content).to.equal('testContent');
     });
 
     it('should not fetch the content requested w/o clonedCommitSha', async () => {
-      const path = 'filePath.txt';
       await build.update({ requestedCommitSha:null, clonedCommitSha: null });
-
-      const err = await GithubBuildHelper.fetchContent(build, site, users, path).catch(e => e);
+      await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+      const err = await GithubBuildHelper.fetchContent(build, path).catch(e => e);
       expect(err.message).to.equal(`Build or commit sha undefined. Unable to fetch ${path} for build@id=${build.id}`);
     });
   });
@@ -657,7 +676,8 @@ describe('GithubBuildHelper', () => {
         repo: site.repository,
         username: user.username,
       });
-      const githubAccessToken = await GithubBuildHelper.loadBuildUserAccessToken(build, site, users);
+      await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+      const githubAccessToken = await GithubBuildHelper.loadBuildUserAccessToken(build);
       expect(githubAccessToken).to.equal(user.githubAccessToken);
       expect(repoNock.isDone()).to.be.true;
     });
@@ -680,7 +700,8 @@ describe('GithubBuildHelper', () => {
         repo: site.repository,
         username: siteUser.username,
       }));
-      const githubAccessToken = await GithubBuildHelper.loadBuildUserAccessToken(build, site, users);
+      await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+      const githubAccessToken = await GithubBuildHelper.loadBuildUserAccessToken(build);
       expect(githubAccessToken).to.equal(siteUser.githubAccessToken);
       repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
     });
@@ -703,7 +724,8 @@ describe('GithubBuildHelper', () => {
         repo: site.repository,
         username: siteUser.username,
       }));
-      const githubAccessToken = await GithubBuildHelper.loadBuildUserAccessToken(build, site, users);
+      await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+      const githubAccessToken = await GithubBuildHelper.loadBuildUserAccessToken(build);
       expect(githubAccessToken).to.equal(siteUser.githubAccessToken);
       repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
     });
@@ -734,7 +756,8 @@ describe('GithubBuildHelper', () => {
         username: user.username,
         response: [403, { permissions: {} }],
       }));
-      const err = await GithubBuildHelper.loadBuildUserAccessToken(build, site, users).catch(e => e);
+      await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+      const err = await GithubBuildHelper.loadBuildUserAccessToken(build).catch(e => e);
       repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
       expect(err.message).to.equal(`Unable to find valid access token to report build@id=${build.id} status`);
     });
@@ -765,7 +788,8 @@ describe('GithubBuildHelper', () => {
         username: user.username,
         response: [201, { permissions: {} }],
       }));
-      const err = await GithubBuildHelper.loadBuildUserAccessToken(build, site, users).catch(e => e);
+      await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+      const err = await GithubBuildHelper.loadBuildUserAccessToken(build).catch(e => e);
       repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
       expect(err.message).to.equal(`Unable to find valid access token to report build@id=${build.id} status`);
     });

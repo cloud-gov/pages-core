@@ -32,8 +32,10 @@ const getAccessTokenWithPushPermissions = async (site, siteUsers) => {
   return getNextToken(users[count]);
 };
 
-const loadBuildUserAccessToken = async (build, site, users) => {
+const loadBuildUserAccessToken = async (build) => {
   let githubAccessToken;
+  const site = build.Site;
+  const users = site.Users;
   const buildUser = users.find(u => u.id === build.user);
   if (buildUser) {
     githubAccessToken = await getAccessTokenWithPushPermissions(site, [buildUser]);
@@ -53,16 +55,18 @@ const loadBuildUserAccessToken = async (build, site, users) => {
   return githubAccessToken;
 };
 
-const reportBuildStatus = async (build, site, users) => {
+const reportBuildStatus = async (build) => {
   const sha = build.clonedCommitSha || build.requestedCommitSha;
   if (!sha) {
     throw new Error('Build or commit sha undefined. Unable to report build status');
   }
 
-  const accessToken = await loadBuildUserAccessToken(build, site, users);
+  const accessToken = await loadBuildUserAccessToken(build);
 
   const context = config.app.app_env === 'production'
     ? 'federalist/build' : `federalist-${config.app.app_env}/build`;
+
+  const site = build.Site;
 
   const options = {
     owner: site.owner,
@@ -87,13 +91,13 @@ const reportBuildStatus = async (build, site, users) => {
   return GitHub.sendCreateGithubStatusRequest(accessToken, options);
 };
 
-const fetchContent = async (build, site, users, path) => {
+const fetchContent = async (build, path) => {
   if (!build.clonedCommitSha) {
     throw new Error(`Build or commit sha undefined. Unable to fetch ${path} for build@id=${build.id}`);
   }
 
-  const accessToken = await loadBuildUserAccessToken(build, site, users);
-  const { owner, repository } = site;
+  const accessToken = await loadBuildUserAccessToken(build);
+  const { owner, repository } = build.Site;
   return GitHub.getContent(accessToken, owner, repository, path, build.clonedCommitSha);
 };
 

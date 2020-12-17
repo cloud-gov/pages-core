@@ -59,8 +59,6 @@ const organizationWebhookRequest = async (payload) => {
   }
 };
 
-const addUserToSite = ({ user, site }) => user.addSite(site);
-
 const signWebhookRequest = (request) => {
   const webhookSecret = config.webhook.secret;
   const requestBody = JSON.stringify(request.body);
@@ -79,14 +77,17 @@ const createBuildForWebhookRequest = async (request) => {
   const { login } = request.body.sender;
   const { pushed_at: pushedAt } = request.body.repository;
   const username = login.toLowerCase();
-  const [user, site] = await Promise.all([
-    User.findOne({ where: { username } }),
-    findSiteForWebhookRequest(request),
-  ]);
+  const site = await findSiteForWebhookRequest(request);
 
+  let user = site.Users.find(u => u.username === username);
+  if (!user) {
+    user = await User.findOne({ where: { username } });
+    if (user) {
+      await site.addUser(user);
+    }
+  }
   if (user) {
     await user.update({ pushedAt: new Date(pushedAt * 1000) });
-    await addUserToSite({ user, site });
   }
 
   const branch = request.body.ref.replace('refs/heads/', '');
@@ -125,13 +126,8 @@ module.exports = {
       signWebhookRequest(req);
       if (req.body.commits && req.body.commits.length > 0) {
         build = await createBuildForWebhookRequest(req);
-      }
-      if (build) {
-        const site = await Site.findOne({
-          where: { id: build.site },
-          include: [{ model: User }],
-        });
-        await GithubBuildHelper.reportBuildStatus(build, site, site.Users);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }] });
+        await GithubBuildHelper.reportBuildStatus(build);
       }
       res.ok();
     } catch (err) {

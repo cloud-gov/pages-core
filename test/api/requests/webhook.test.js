@@ -174,40 +174,27 @@ describe('Webhook API', () => {
         .catch(done);
     });
 
-    it('should not schedule a build if there are no new commits', (done) => {
-      let site;
-      let user;
+    it('should not schedule a build if there are no new commits', async () => {
+      const user = await factory.user();
+      const site = await factory.site({ users: [user] });
+      let builds = await Build.findAll({ where: { site: site.id, user: user.id } });
+      expect(builds).to.have.length(0);
 
-      factory.site()
-        .then(s => Site.findByPk(s.id, { include: [User] }))
-        .then((model) => {
-          site = model;
-          user = site.Users[0];
-          return Build.findAll({ where: { site: site.id, user: user.id } });
-        })
-        .then((builds) => {
-          expect(builds).to.have.length(0);
+      const payload = buildWebhookPayload(user, site);
+      payload.commits = [];
+      const signature = signWebhookPayload(payload);
 
-          const payload = buildWebhookPayload(user, site);
-          payload.commits = [];
-          const signature = signWebhookPayload(payload);
-
-          return request(app)
-            .post('/webhook/github')
-            .send(payload)
-            .set({
-              'X-GitHub-Event': 'push',
-              'X-Hub-Signature': signature,
-              'X-GitHub-Delivery': '123abc',
-            })
-            .expect(200);
+      await request(app)
+        .post('/webhook/github')
+        .send(payload)
+        .set({
+          'X-GitHub-Event': 'push',
+          'X-Hub-Signature': signature,
+          'X-GitHub-Delivery': '123abc',
         })
-        .then(() => Build.findAll({ where: { site: site.id, user: user.id } }))
-        .then((builds) => {
-          expect(builds).to.have.length(0);
-          done();
-        })
-        .catch(done);
+        .expect(200);
+      builds = await Build.findAll({ where: { site: site.id, user: user.id } });
+      expect(builds).to.have.length(0);
     });
 
     it('should respond with a 400 if the site does not exist on Federalist', (done) => {
