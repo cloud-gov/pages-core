@@ -20,6 +20,7 @@ const findSiteForWebhookRequest = (request) => {
       repository,
       buildStatus: { [Sequelize.Op.ne]: 'inactive' },
     },
+    include: [{ model: User }],
   })
     .then((site) => {
       if (!site) {
@@ -61,7 +62,7 @@ const organizationWebhookRequest = async (payload) => {
 
 const addUserToSite = ({ user, site }) => user.addSite(site);
 
-const signWebhookRequest = request => new Promise((resolve, reject) => {
+const signWebhookRequest = request => {
   const webhookSecret = config.webhook.secret;
   const requestBody = JSON.stringify(request.body);
 
@@ -69,13 +70,11 @@ const signWebhookRequest = request => new Promise((resolve, reject) => {
   const signedRequestBody = signBlob(webhookSecret, requestBody);
 
   if (!signature) {
-    reject(new Error('No X-Hub-Signature found on request'));
+    throw new Error('No X-Hub-Signature found on request');
   } else if (signature !== signedRequestBody) {
-    reject(new Error('X-Hub-Signature does not match blob signature'));
-  } else {
-    resolve(true);
+    throw new Error('X-Hub-Signature does not match blob signature');
   }
-});
+};
 
 const createBuildForWebhookRequest = async (request) => {
   const { login } = request.body.sender;
@@ -121,29 +120,34 @@ const createBuildForWebhookRequest = async (request) => {
 };
 
 module.exports = {
-  github: (req, res) => signWebhookRequest(req)
-    .then(() => {
+  github: async (req, res) => {
+    try {
+      let build;
+      signWebhookRequest(req);
       if (req.body.commits && req.body.commits.length > 0) {
-        return createBuildForWebhookRequest(req);
+        build = await createBuildForWebhookRequest(req);
       }
-      return Promise.resolve();
-    })
-    .then((build) => {
       if (build) {
-        return GithubBuildHelper.reportBuildStatus(build);
+        const site = await Site.findOne({
+          where: { id: build.site },
+          include: [{ model: User }],
+        });
+        await GithubBuildHelper.reportBuildStatus(build, site, site.Users);
       }
-      return Promise.resolve();
-    })
-    .then(() => res.ok())
-    .catch((err) => {
-      logger.error(err);
+      return res.ok();
+    } catch (err) {
+      EventCreator.error(Event.labels.BUILD_REQUEST, ['Error processing push webhook', JSON.stringify(req.body), err]);
       res.badRequest();
-    }),
-  organization: (req, res) => signWebhookRequest(req)
-    .then(() => organizationWebhookRequest(req.body))
-    .then(() => res.ok())
-    .catch((err) => {
-      logger.error(err);
+    }
+  },
+  organization: async (req, res) => {
+    try {
+      signWebhookRequest(req)
+      await organizationWebhookRequest(req.body);
+      return res.ok();
+    } catch(err) {
+      EventCreator.error(Event.labels.FEDERALIST_USERS_MEMBERSHIP, ['Error processing organization webhook', JSON.stringify(req.body), err]);
       res.badRequest();
-    }),
+    }
+  },
 };

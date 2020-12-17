@@ -60,293 +60,173 @@ describe('Build API', () => {
       nock.cleanAll();
       githubAPINocks.status();
     });
-
-    it('should require authentication', (done) => {
-      Promise.props({
-        cookie: unauthenticatedSession(),
-      })
-      .then(cookie =>
-        request(app)
+    describe('unsuccessful requests', () => {
+      it('should require authentication', async () => {
+        const cookie = await unauthenticatedSession();
+        const response = await request(app)
           .post('/v0/build/')
           .set('x-csrf-token', csrfToken.getToken())
           .send({
             buildId: 1,
           })
           .set('Cookie', cookie)
-          .expect(403)
-      )
-      .then((response) => {
+          .expect(403);
         validateAgainstJSONSchema('POST', '/build', 403, response.body);
-        done();
-      })
-      .catch(done);
-    });
+      });
 
-    it('should require a valid csrf token', (done) => {
-      const userPromise = factory.user();
-      const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-
-      Promise.props({
-        user: userPromise,
-        site: sitePromise,
-        cookie: authenticatedSession(userPromise),
-      })
-      .then(promises =>
-        request(app)
+      it('should require a valid csrf token', async () => {
+        const user = await factory.user();
+        const cookie = await authenticatedSession(user);
+        const response = await request(app)
           .post('/v0/build/')
           .set('x-csrf-token', 'bad-token')
           .send({
             buildId: 1,
           })
-          .set('Cookie', promises.cookie)
-          .expect(403)
-      )
-      .then((response) => {
-        validateAgainstJSONSchema('POST', '/build', 403, response.body);
-        expect(response.body.message).to.equal('Invalid CSRF token');
-        done();
-      })
-      .catch(done);
-    });
-
-    it('returns a 404 if a build to restart is not associated with the site', (done) => {
-      const userPromise = factory.user();
-      const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-
-      Promise.props({
-        user: userPromise,
-        site: sitePromise,
-        cookie: authenticatedSession(userPromise),
-      }).then(promises =>
-        request(app)
-          .post('/v0/build/')
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            buildId: 1,
-            siteId: promises.site.id,
-          })
-          .set('Cookie', promises.cookie)
-          .expect(404)
-      )
-      .then((response) => {
-        validateAgainstJSONSchema('POST', '/build', 404, response.body);
-        done();
-      })
-      .catch(done);
-    });
-
-    describe('successful requests', () => {
-      describe('with an existing build', () => {
-        let promiseProps;
-
-        beforeEach(async () => {
-          const user = await factory.user();
-          const site = await factory.site({ users: [user] });
-          await Build.update(
-            { state: 'success'}, //values
-            { where: //options
-              { site: site.id,
-                branch: 'main',
-                state: ['created', 'queued'],
-              },
-            }
-          );
-          promiseProps = Promise.props({
-            user,
-            site,
-            build: factory.build({
-              site,
-              state: 'success',
-              branch: 'main',
-              requestedCommitSha,
-              clonedCommitSha,
-              user,
-            }),
-            cookie: authenticatedSession(user),
-          });
-        });
-
-        it('should create a new build for the site given an existing build id', (done) => {
-          let site;
-          let user;
-          let origBuild;
-
-          promiseProps
-          .then((promisedValues) => {
-            site = promisedValues.site;
-            user = promisedValues.user;
-            origBuild = promisedValues.build;
-
-            return validCreateRequest(
-              csrfToken.getToken(),
-              promisedValues.cookie,
-              {
-                buildId: promisedValues.build.id,
-                siteId: site.id,
-              }
-            );
-          })
-          .then((response) => {
-            validateAgainstJSONSchema('POST', '/build', 200, response.body);
-            return Build.findOne({
-              where: {
-                site: site.id,
-                user: user.id,
-                branch: origBuild.branch,
-              },
-              order: [ [ 'createdAt', 'DESC' ]],
-            });
-          })
-          .then((newBuild) => {
-            expect(newBuild.id).to.be.above(origBuild.id)
-            expect(newBuild.requestedCommitSha).to.equal(origBuild.clonedCommitSha);
-            done();
-          })
-          .catch(done);
-        });
-
-        it('should NOT create a new build if a branch build already exists @state=queued', (done) => {
-          let site;
-          let user;
-          let build;
-          let cookie;
-
-          promiseProps
-          .then((promisedValues) => {
-            site = promisedValues.site;
-            user = promisedValues.user;
-            build = promisedValues.build;
-            cookie = promisedValues.cookie;
-            return build.update({ state: 'queued', branch: 'queued-branch' })
-          })
-          .then(() => {
-            return validCreateRequest(
-              csrfToken.getToken(),
-              cookie,
-              {
-                buildId: build.id,
-                siteId: site.id,
-              }
-            );
-          })
-          .then((response) => {
-            expect(response.body).deep.equal({});
-            return Build.findOne({
-              where: {
-                site: site.id,
-                branch: 'queued-branch',
-                state:['created', 'queued'],
-              },
-              order: [ [ 'createdAt', 'DESC' ]],
-            });
-          })
-          .then((lastBuild) => {
-            expect(lastBuild.id).to.equal(build.id);
-            done();
-          })
-          .catch(done);
-        });
-
-        it('should NOT create a new build if a branch build already exists @state=created', (done) => {
-          let site;
-          let user;
-          let build;
-          let cookie;
-
-          promiseProps
-          .then((promisedValues) => {
-            site = promisedValues.site;
-            user = promisedValues.user;
-            build = promisedValues.build;
-            cookie = promisedValues.cookie;
-            return build.update({ state: 'created', branch: 'created-branch' })
-          })
-          .then(() => {
-            return validCreateRequest(
-              csrfToken.getToken(),
-              cookie,
-              {
-                buildId: build.id,
-                siteId: site.id,
-              }
-            );
-          })
-          .then((response) => {
-            expect(response.body).deep.equal({});
-            return Build.findOne({
-              where: {
-                site: site.id,
-                branch: 'created-branch',
-                state: ['created', 'queued'],
-              },
-              order: [ [ 'createdAt', 'DESC' ]],
-            });
-          })
-          .then((lastBuild) => {
-            expect(lastBuild.id).to.equal(build.id);
-            done();
-          })
-          .catch(done);
-        });
-
-        it('should report the new build\'s status to GitHub', (done) => {
-          nock.cleanAll();
-          const statusNock = githubAPINocks.status({ state: 'pending' });
-
-          promiseProps
-          .then((promisedValues) => {
-            githubAPINocks.repo({
-              accessToken: promisedValues.user.githubAccessToken,
-              owner: promisedValues.site.owner,
-              repo: promisedValues.site.repository,
-              username: promisedValues.user.username,
-            });
-            return validCreateRequest(
-              csrfToken.getToken(),
-              promisedValues.cookie,
-              {
-                buildId: promisedValues.build.id,
-                siteId: promisedValues.build.site,
-              }
-            );
-          })
-          .then(() => {
-            expect(statusNock.isDone()).to.be.true;
-            done();
-          })
-          .catch(done);
-        });
+          .set('Cookie', cookie)
+          .expect(403);
+        
+          validateAgainstJSONSchema('POST', '/build', 403, response.body);
+          expect(response.body.message).to.equal('Invalid CSRF token');
       });
-    });
 
-    it('should render a 403 if the user is not associated with the given site', (done) => {
-      const userProm = factory.user();
-      const notAuthorizedSiteProm = factory.site();
-      const buildPromise = factory.build({ site: notAuthorizedSiteProm });
-      const cookieProm = authenticatedSession(userProm);
-
-      Promise.props({
-        user: userProm,
-        notAuthorizedSite: notAuthorizedSiteProm,
-        build: buildPromise,
-        cookie: cookieProm,
-      })
-      .then(({ build, cookie }) =>
-        request(app)
+      it('returns a 404 if a build to restart is not associated with the site', async () => {
+        const user =  await factory.user();
+        const site = await factory.site({ users: [user] });
+        const build = await factory.build({ user });
+        const cookie = await authenticatedSession(user);
+        const response = request(app)
           .post('/v0/build/')
           .set('x-csrf-token', csrfToken.getToken())
           .send({
             buildId: build.id,
-            siteId: 1,
+            siteId: site.id,
           })
           .set('Cookie', cookie)
-          .expect(403)
-      )
-      .then((response) => {
-        validateAgainstJSONSchema('POST', '/build', 403, response.body);
-        done();
-      })
-      .catch(done);
+          .expect(404);
+        validateAgainstJSONSchema('POST', '/build', 404, response.body);
+      });
+
+      it('should render a 403 if the user is not associated with the given site', async () => {
+        const user = await factory.user();
+        const site = await factory.site();
+        const build = await factory.build({ site });
+        const cookie = await authenticatedSession(user);
+
+        const response = request(app)
+          .post('/v0/build/')
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            buildId: build.id,
+            siteId: site.id,
+          })
+          .set('Cookie', cookie)
+          .expect(403);
+ 
+          validateAgainstJSONSchema('POST', '/build', 403, response.body);
+      });
+    });
+
+    describe('successful requests', () => {
+      describe('with an existing build', () => {
+        let user;
+        let site;
+        let reqBuild;
+        let cookie;
+
+        beforeEach(async () => {
+          nock.cleanAll();
+          user = await factory.user();
+          site = await factory.site({ users: [user] });
+          reqBuild = await factory.build({
+            site,
+            state: 'success',
+            branch: 'main',
+            requestedCommitSha,
+            clonedCommitSha,
+            user,
+          });
+          cookie = await authenticatedSession(user);
+        });
+
+        it('should create a new build for the site given an existing build id', async () => {
+          const statusNock = githubAPINocks.status({
+            owner: site.owner,
+            repo: site.repository,
+            repository: site.repository,
+            sha: clonedCommitSha,
+            state: 'pending',
+          });
+          const repoNock = githubAPINocks.repo({
+            accessToken: user.githubAccessToken,
+            owner: site.owner,
+            repo: site.repository,
+            username: user.username,
+          });
+          const response = await validCreateRequest(
+            csrfToken.getToken(),
+            cookie,
+            {
+              buildId: reqBuild.id,
+              siteId: site.id,
+            }
+          );
+          validateAgainstJSONSchema('POST', '/build', 200, response.body);
+          const latestBuild = await Build.findOne({
+            where: {
+              site: site.id,
+              branch: reqBuild.branch,
+            },
+            order: [ [ 'createdAt', 'DESC' ]],
+          });
+          expect(latestBuild.id).to.be.above(reqBuild.id);
+          expect(latestBuild.requestedCommitSha).to.equal(reqBuild.clonedCommitSha);
+          expect(repoNock.isDone()).to.be.true;
+          expect(statusNock.isDone()).to.be.true;
+        });
+
+        it('should NOT create a new build if a branch build already exists @state=queued', async () => {
+          await reqBuild.update({ state: 'queued'});
+          const response = await validCreateRequest(
+            csrfToken.getToken(),
+            cookie,
+            {
+              buildId: reqBuild.id,
+              siteId: site.id,
+            }
+          );
+          expect(response.body).deep.equal({});
+          const latestBuild = await Build.findOne({
+            where: {
+              site: site.id,
+              branch: reqBuild.branch,
+            },
+            order: [ [ 'createdAt', 'DESC' ]],
+          });
+          expect(latestBuild.id).to.equal(reqBuild.id);
+        });
+
+        it('should NOT create a new build if a branch build already exists @state=created', async () => {
+          await reqBuild.update({ state: 'created'});
+          const response = await validCreateRequest(
+            csrfToken.getToken(),
+            cookie,
+            {
+              buildId: reqBuild.id,
+              siteId: site.id,
+            }
+          );
+          expect(response.body).deep.equal({});
+          const latestBuild = await Build.findOne({
+            where: {
+              site: site.id,
+              branch: reqBuild.branch,
+            },
+            order: [ [ 'createdAt', 'DESC' ]],
+          });
+          expect(latestBuild.id).to.equal(reqBuild.id);
+        });
+      });
     });
   });
 
@@ -540,7 +420,7 @@ describe('Build API', () => {
       const statusNock = githubAPINocks.status({ status: 'pending', commitSha: clonedCommitSha });
       const fetchContentStub = sinon.stub(GithubBuildHelper, 'fetchContent').resolves('{}');
       const saveBuildStub = sinon.stub(ProxyDataSync, 'saveBuild').returns();
-      const build = await factory.build({ requestedCommitSha, state: 'processing' });
+      const build = await factory.build({ requestedCommitSha });
       const user = await build.getUser();
       const site = await build.getSite();
 
@@ -552,11 +432,13 @@ describe('Build API', () => {
       });
       await postBuildStatus({
         build,
-        status: 'pending',
+        status: Build.States.Processing,
         message: '',
         commitSha: requestedCommitSha,
       });
 
+      await build.reload();
+      expect(build.state).to.equal(Build.States.Processing);
       expect(statusNock.isDone()).to.be.true;
       expect(fetchContentStub.notCalled).to.be.true;
       expect(saveBuildStub.notCalled).to.be.true;
@@ -579,11 +461,13 @@ describe('Build API', () => {
       });
       await postBuildStatus({
         build,
-        status: 'success',
+        status: Build.States.Success,
         message: '',
         commitSha: clonedCommitSha,
       });
 
+      await build.reload();
+      expect(build.state).to.equal(Build.States.Success);
       expect(statusNock.isDone()).to.be.true;
       expect(fetchContentStub.calledOnce).to.be.true;
       expect(saveBuildStub.calledOnce).to.be.true;
@@ -606,11 +490,13 @@ describe('Build API', () => {
       });
       await postBuildStatus({
         build,
-        status: 'success',
+        status: Build.States.Success,
         message: '',
         commitSha: clonedCommitSha,
       });
 
+      await build.reload();
+      expect(build.state).to.equal(Build.States.Success);
       expect(statusNock.isDone()).to.be.true;
       expect(fetchContentStub.calledOnce).to.be.true;
       expect(saveBuildStub.notCalled).to.be.true;
@@ -626,8 +512,7 @@ describe('Build API', () => {
     });
 
     it('should respond with a 404 for a build that does not exist', (done) => {
-      const build = factory.build({ requestedCommitSha });
-      build.id = -1;
+      const build = { id: -1, token: 'good-token' };
       postBuildStatus({
         build,
         status: 'success',
