@@ -20,10 +20,14 @@ const emitBuildStatus = build => Site.findByPk(build.site)
       owner: site.owner,
       repository: site.repository,
     };
+
+    const emitCallback = (err, resp) => {
+      if (err) { logger.error(err); }
+    };
     const siteRoom = SocketIOSubscriber.getSiteRoom(build.site);
-    socketIO.to(siteRoom).emit('build status', msg);
+    socketIO.to(siteRoom).emit('build status', emitCallback);
     const builderRoom = SocketIOSubscriber.getBuilderRoom(build.site, build.user);
-    socketIO.to(builderRoom).emit('build status', msg);
+    socketIO.to(builderRoom).emit('build status', msg, emitCallback);
     return Promise.resolve();
   })
   .catch(err => logger.error(err));
