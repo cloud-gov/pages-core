@@ -26,7 +26,7 @@ const emitBuildStatus = build => Site.findByPk(build.site)
     };
     /* eslint-enable no-unused-vars */
     const siteRoom = SocketIOSubscriber.getSiteRoom(build.site);
-    socketIO.to(siteRoom).emit('build status', emitCallback);
+    socketIO.to(siteRoom).emit('build status', msg, emitCallback);
     const builderRoom = SocketIOSubscriber.getBuilderRoom(build.site, build.user);
     socketIO.to(builderRoom).emit('build status', msg, emitCallback);
     return Promise.resolve();
