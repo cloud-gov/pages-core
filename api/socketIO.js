@@ -15,14 +15,15 @@ if (redisConfig) {
   const pubClient = redis.createClient(redisConfig);
   const subClient = redis.createClient(redisConfig);
 
-  socketIO.adapter(redisAdapter({ pubClient, subClient }));
-
   pubClient.on('error', (err) => {
     logger.error(`redisAdapter pubClient error: ${err}`);
   });
   subClient.on('error', (err) => {
     logger.error(`redisAdapter subClient error: ${err}`);
   });
+
+  socketIO.adapter(redisAdapter({ pubClient, subClient }));
+
   socketIO.of('/').adapter.on('error', (err) => {
     logger.error(`redisAdapter error: ${err}`);
   });
