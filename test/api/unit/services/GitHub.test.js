@@ -678,13 +678,13 @@ describe('GitHub', () => {
   });
 
   describe('.getContent', () => {
+    const accessToken = 'token';
+    const owner = 'repo-owner';
+    const repo = 'repo-name';
+    const path = 'file-path.json';
+    const ref = 'theRef';
     /* eslint-disable camelcase */
     it('returns a file based on the supplied parameters', async () => {
-      const accessToken = 'token';
-      const owner = 'repo-owner';
-      const repo = 'repo-name';
-      const path = 'file-path.json';
-      const ref = 'theRef';
       const content = 'helloworld';
 
       githubAPINocks.getContent({ accessToken, owner, repo, path, ref, content });
@@ -694,10 +694,6 @@ describe('GitHub', () => {
     });
 
     it('returns a file based on the supplied parameters without ref (sha/branch)', async () => {
-      const accessToken = 'token';
-      const owner = 'repo-owner';
-      const repo = 'repo-name';
-      const path = 'file-path.json';
       const content = 'helloworld';
 
       githubAPINocks.getContent({ accessToken, owner, repo, path, content });
@@ -707,11 +703,6 @@ describe('GitHub', () => {
     });
 
     it('returns an array (ie: dir files meta data) based on the supplied parameters', async () => {
-      const accessToken = 'token';
-      const owner = 'repo-owner';
-      const repo = 'repo-name';
-      const path = 'file-path.json';
-      const ref = 'theRef';
       const content = [1, 2, 3];
       const type = undefined;
 
@@ -722,12 +713,6 @@ describe('GitHub', () => {
     });
 
     it('returns a 404 based on invalid supplied parameters', async () => {
-      const accessToken = 'token';
-      const owner = 'repo-owner';
-      const repo = 'repo-name';
-      const path = 'wrong-file-path.json';
-      const ref = 'theRef';
-
       githubAPINocks.getContent({ accessToken, owner, repo, path, ref, responseCode: 404 });
 
       const content = await GitHub.getContent(accessToken, owner, repo, path, ref);
@@ -735,12 +720,6 @@ describe('GitHub', () => {
     });
 
     it('returns a 403 based on invalid supplied parameters', async () => {
-      const accessToken = 'token';
-      const owner = 'repo-owner';
-      const repo = 'repo-name';
-      const path = 'wrong-file-path.json';
-      const ref = 'theRef';
-
       githubAPINocks.getContent({ accessToken, owner, repo, path, ref, responseCode: 403 });
 
       const err = await GitHub.getContent(accessToken, owner, repo, path, ref).catch(err => err);
