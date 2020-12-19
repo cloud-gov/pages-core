@@ -22,7 +22,7 @@ describe('Build API', () => {
 
   beforeEach(() => {
     process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
-    sinon.stub(SQS, 'sendBuildMessage').returns(Promise.resolve());
+    sinon.stub(SQS, 'sendBuildMessage').resolves();
     sinon.stub(EventCreator, 'audit').resolves();
     sinon.stub(EventCreator, 'error').resolves();
   });
@@ -419,7 +419,7 @@ describe('Build API', () => {
       nock.cleanAll();
       const statusNock = githubAPINocks.status({ status: 'pending', commitSha: clonedCommitSha });
       const fetchContentStub = sinon.stub(GithubBuildHelper, 'fetchContent').resolves('{}');
-      const saveBuildStub = sinon.stub(ProxyDataSync, 'saveBuild').returns();
+      const saveBuildStub = sinon.stub(ProxyDataSync, 'saveBuild').resolves();
       const build = await factory.build({ requestedCommitSha });
       const user = await build.getUser();
       const site = await build.getSite();
@@ -448,7 +448,7 @@ describe('Build API', () => {
       nock.cleanAll();
       const statusNock = githubAPINocks.status({ state: 'success', commitSha: clonedCommitSha });
       const fetchContentStub = sinon.stub(GithubBuildHelper, 'fetchContent').resolves('{}');
-      const saveBuildStub = sinon.stub(ProxyDataSync, 'saveBuild').returns();
+      const saveBuildStub = sinon.stub(ProxyDataSync, 'saveBuild').resolves();
       const build = await factory.build({ requestedCommitSha, clonedCommitSha });
       const user = await build.getUser();
       const site = await build.getSite();
@@ -477,7 +477,7 @@ describe('Build API', () => {
       nock.cleanAll();
       const statusNock = githubAPINocks.status({ state: 'success', commitSha: clonedCommitSha });
       const fetchContentStub = sinon.stub(GithubBuildHelper, 'fetchContent').resolves(null);
-      const saveBuildStub = sinon.stub(ProxyDataSync, 'saveBuild').returns();
+      const saveBuildStub = sinon.stub(ProxyDataSync, 'saveBuild').resolves();
       const build = await factory.build({ requestedCommitSha, clonedCommitSha });
       const user = await build.getUser();
       const site = await build.getSite();
