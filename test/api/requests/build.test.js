@@ -411,12 +411,10 @@ describe('Build API', () => {
 
     beforeEach(() => {
       nock.cleanAll();
-      githubAPINocks.status();
     });
 
 
     it('should report the build\'s status back to github', async () => {
-      nock.cleanAll();
       const statusNock = githubAPINocks.status({ status: 'pending', commitSha: clonedCommitSha });
       const fetchContentStub = sinon.stub(GithubBuildHelper, 'fetchContent').resolves('{}');
       const saveBuildStub = sinon.stub(ProxyDataSync, 'saveBuild').resolves();
@@ -445,7 +443,6 @@ describe('Build API', () => {
     });
 
     it('should report the build\'s success status back to github and save build settings to proxy db', async () => {
-      nock.cleanAll();
       const statusNock = githubAPINocks.status({ state: 'success', commitSha: clonedCommitSha });
       const fetchContentStub = sinon.stub(GithubBuildHelper, 'fetchContent').resolves('{}');
       const saveBuildStub = sinon.stub(ProxyDataSync, 'saveBuild').resolves();
@@ -474,7 +471,6 @@ describe('Build API', () => {
     });
 
     it('should report the build\'s success status back to github w/o build settings file', async () => {
-      nock.cleanAll();
       const statusNock = githubAPINocks.status({ state: 'success', commitSha: clonedCommitSha });
       const fetchContentStub = sinon.stub(GithubBuildHelper, 'fetchContent').resolves(null);
       const saveBuildStub = sinon.stub(ProxyDataSync, 'saveBuild').resolves();
