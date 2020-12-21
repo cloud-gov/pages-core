@@ -39,7 +39,7 @@ const saveBuildToProxy = async (build) => {
   if (buildSettings) {
     const settings = JSON.parse(buildSettings);
     await ProxyDataSync.saveBuild(build, settings);
-    EventCreator.audit(Event.labels.UPDATED, build, `${BUILD_SETTINGS_FILE} saved to proxy database`);
+    EventCreator.audit(Event.labels.BUILD_STATUS, build, `${BUILD_SETTINGS_FILE} saved to proxy database`);
   }
 };
 
