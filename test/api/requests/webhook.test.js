@@ -10,7 +10,7 @@ const githubAPINocks = require('../support/githubAPINocks');
 const { Build, Site, User, Event } = require('../../../api/models');
 const SQS = require('../../../api/services/SQS');
 const EventCreator = require('../../../api/services/EventCreator');
-const GithubBuildStatusReporter = require('../../../api/services/GithubBuildStatusReporter');
+const GithubBuildHelper = require('../../../api/services/GithubBuildHelper');
 
 describe('Webhook API', () => {
   const signWebhookPayload = (payload) => {
@@ -44,7 +44,7 @@ describe('Webhook API', () => {
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.status();
-      githubAPINocks.repo({ response: [201, { permissions: { admin: false } }] });
+      githubAPINocks.repo({ response: [201, { permissions: { admin: false, push: true } }] });
       sinon.stub(SQS, 'sendBuildMessage').resolves();
     });
 
@@ -52,119 +52,90 @@ describe('Webhook API', () => {
       sinon.restore();
     });
 
-    it('should create a new site build for the sender', (done) => {
-      let site;
-      let user;
-      let payload;
+    it('should create a new site build for the sender', async () => {
+      let builds;
+      const user = await factory.user();
+      const site = await factory.site({ users: [user] });
+      builds = await Build.findAll({ where: { site: site.id, user: user.id } });
+      expect(builds).to.have.length(0);
 
-      factory.site()
-        .then(s => Site.findByPk(s.id, { include: [User] }))
-        .then((model) => {
-          site = model;
-          user = site.Users[0];
-          return Build.findAll({ where: { site: site.id, user: user.id } });
-        })
-        .then((builds) => {
-          expect(builds).to.have.length(0);
+      const payload = buildWebhookPayload(user, site);
+      const signature = signWebhookPayload(payload);
 
-          payload = buildWebhookPayload(user, site);
-          const signature = signWebhookPayload(payload);
-
-          return request(app)
-            .post('/webhook/github')
-            .send(payload)
-            .set({
-              'X-GitHub-Event': 'push',
-              'X-Hub-Signature': signature,
-              'X-GitHub-Delivery': '123abc',
-            })
-            .expect(200);
+      await request(app)
+        .post('/webhook/github')
+        .send(payload)
+        .set({
+          'X-GitHub-Event': 'push',
+          'X-Hub-Signature': signature,
+          'X-GitHub-Delivery': '123abc',
         })
-        .then(() => Build.findAll({
-          where: {
-            site: site.id,
-            user: user.id,
-            branch: payload.ref.split('/')[2],
-            requestedCommitSha: payload.after,
-          },
-        }))
-        .then((builds) => {
-          expect(builds).to.have.length(1);
-          done();
-        })
-        .catch(done);
+        .expect(200);
+      builds = await Build.findAll({
+        where: {
+          site: site.id,
+          user: user.id,
+          branch: payload.ref.split('/')[2],
+          requestedCommitSha: payload.after,
+        },
+      });
+        
+      expect(builds).to.have.length(1);
+        
     });
 
-    it('should not create a user associated with the site for the sender if no user exists', (done) => {
-      let site;
+    it('should not create a user associated with the site for the sender if no user exists', async () => {
       const username = crypto.randomBytes(3).toString('hex');
 
-      factory.site()
-        .then((model) => {
-          site = model;
+      const site = await factory.site();
+      const payload = buildWebhookPayload({ username }, site);
+      const signature = signWebhookPayload(payload);
 
-          const payload = buildWebhookPayload({ username }, site);
-          const signature = signWebhookPayload(payload);
+      await request(app)
+        .post('/webhook/github')
+        .send(payload)
+        .set({
+          'X-GitHub-Event': 'push',
+          'X-Hub-Signature': signature,
+          'X-GitHub-Delivery': '123abc',
+        })
+        .expect(200);
 
-          return request(app)
-            .post('/webhook/github')
-            .send(payload)
-            .set({
-              'X-GitHub-Event': 'push',
-              'X-Hub-Signature': signature,
-              'X-GitHub-Delivery': '123abc',
-            })
-            .expect(200);
-        })
-        .then(() => Build.findOne({ where: { username }, limit: 1, order: [ [ 'createdAt', 'DESC' ]], include: [User] }))
-        .then((build) => {
-          expect(build.username).to.equal(username);
-          expect(build.User).to.be.null;
-          done();
-        })
-        .catch(done);
+        const build = await Build.findOne({ where: { username }, limit: 1, order: [ [ 'createdAt', 'DESC' ]], include: [User] });
+        expect(build.username).to.equal(username);
+        expect(build.User).to.be.null;
     });
 
-    it('should find the site by the lowercased owner and repository and upper cased github user', (done) => {
-      const reporterSpy = sinon.spy(GithubBuildStatusReporter, 'reportBuildStatus');
-      let site;
-      let user;
-      const userPromise = factory.user();
-      const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+    it('should find the site by the lowercased owner and repository and upper cased github user', async () => {
+      const reporterSpy = sinon.spy(GithubBuildHelper, 'reportBuildStatus');
+      const user = await factory.user();
+      const site = await factory.site({ users: [user] });
 
-      Promise.props({ user: userPromise, site: sitePromise })
-        .then((models) => {
-          site = models.site;
-          user = models.user;
-          user.username = user.username.toUpperCase();
+      user.username = user.username.toUpperCase();
 
-          const payload = buildWebhookPayload(user, site);
-          payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
-          const signature = signWebhookPayload(payload);
-          expect(reporterSpy.calledOnce).to.be.false;
+      const payload = buildWebhookPayload(user, site);
+      payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
+      const signature = signWebhookPayload(payload);
+      expect(reporterSpy.calledOnce).to.be.false;
 
-          return request(app)
-            .post('/webhook/github')
-            .send(payload)
-            .set({
-              'X-GitHub-Event': 'push',
-              'X-Hub-Signature': signature,
-              'X-GitHub-Delivery': '123abc',
-            })
-            .expect(200);
+      await request(app)
+        .post('/webhook/github')
+        .send(payload)
+        .set({
+          'X-GitHub-Event': 'push',
+          'X-Hub-Signature': signature,
+          'X-GitHub-Delivery': '123abc',
         })
-        .then(() => Build.findOne({
-          where: { username: user.username.toLowerCase() },
-          limit: 1,
-          order: [ [ 'createdAt', 'DESC' ]],
-          include: [User],
-        }))
-        .then((build) => {
-          expect(reporterSpy.calledOnce).to.be.true;
-          expect(reporterSpy.args[0][0].id).to.equal(build.id);
-          done();
-        })
-        .catch(done);
+        .expect(200);
+
+      const build = await Build.findOne({
+        where: { username: user.username.toLowerCase() },
+        limit: 1,
+        order: [ [ 'createdAt', 'DESC' ]],
+        include: [User],
+      });
+      expect(reporterSpy.calledOnce).to.be.true;
+      expect(reporterSpy.args[0][0].id).to.equal(build.id);
     });
 
     it('should report the status of the new build to GitHub', (done) => {
@@ -203,40 +174,27 @@ describe('Webhook API', () => {
         .catch(done);
     });
 
-    it('should not schedule a build if there are no new commits', (done) => {
-      let site;
-      let user;
+    it('should not schedule a build if there are no new commits', async () => {
+      const user = await factory.user();
+      const site = await factory.site({ users: [user] });
+      let builds = await Build.findAll({ where: { site: site.id, user: user.id } });
+      expect(builds).to.have.length(0);
 
-      factory.site()
-        .then(s => Site.findByPk(s.id, { include: [User] }))
-        .then((model) => {
-          site = model;
-          user = site.Users[0];
-          return Build.findAll({ where: { site: site.id, user: user.id } });
-        })
-        .then((builds) => {
-          expect(builds).to.have.length(0);
+      const payload = buildWebhookPayload(user, site);
+      payload.commits = [];
+      const signature = signWebhookPayload(payload);
 
-          const payload = buildWebhookPayload(user, site);
-          payload.commits = [];
-          const signature = signWebhookPayload(payload);
-
-          return request(app)
-            .post('/webhook/github')
-            .send(payload)
-            .set({
-              'X-GitHub-Event': 'push',
-              'X-Hub-Signature': signature,
-              'X-GitHub-Delivery': '123abc',
-            })
-            .expect(200);
+      await request(app)
+        .post('/webhook/github')
+        .send(payload)
+        .set({
+          'X-GitHub-Event': 'push',
+          'X-Hub-Signature': signature,
+          'X-GitHub-Delivery': '123abc',
         })
-        .then(() => Build.findAll({ where: { site: site.id, user: user.id } }))
-        .then((builds) => {
-          expect(builds).to.have.length(0);
-          done();
-        })
-        .catch(done);
+        .expect(200);
+      builds = await Build.findAll({ where: { site: site.id, user: user.id } });
+      expect(builds).to.have.length(0);
     });
 
     it('should respond with a 400 if the site does not exist on Federalist', (done) => {
@@ -311,9 +269,8 @@ describe('Webhook API', () => {
 
     describe('when a queued build for the branch exists', () => {
       it('should not create a new build', async () => {
-        const userProm = factory.user();
-        const site = await factory.site({ users: Promise.all([userProm]) });
-        const user = await userProm;
+        const user = await factory.user();
+        const site = await factory.site({ users: [user] });
         await Build.create({
           site: site.id,
           user: user.id,
