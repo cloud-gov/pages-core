@@ -19,6 +19,10 @@ if (process.env.NODE_ENV !== 'test') {
           clientID: 'UAA_OAUTH_CLIENT_ID',
           clientSecret: 'UAA_OAUTH_CLIENT_SECRET',
         },
+        adminOptions: {
+          clientID: 'UAA_OAUTH_CLIENT_ID',
+          clientSecret: 'UAA_OAUTH_CLIENT_SECRET',
+        },
       },
     },
     s3: {},

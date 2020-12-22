@@ -234,7 +234,7 @@ module.exports = {
       .catch(handleWebhookError);
   },
 
-  validateUser: (accessToken) => {
+  validateUser: (accessToken, throwOnUnauthorized = true) => {
     const approvedOrgs = config.passport.github.organizations || [];
 
     return githubClient(accessToken)
@@ -243,9 +243,11 @@ module.exports = {
         const approvedOrg = organizations
           .find(organization => approvedOrgs.indexOf(organization.id) >= 0);
 
-        if (!approvedOrg) {
+        if (!approvedOrg && throwOnUnauthorized) {
           throw new Error('Unauthorized');
         }
+
+        return !!approvedOrg;
       });
   },
 

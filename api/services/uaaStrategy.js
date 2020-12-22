@@ -1,7 +1,9 @@
 const { Strategy } = require('passport-oauth2');
 
-module.exports = function uaaStrategy(options, verify) {
-  const { userURL, ...rest } = options;
+function createUAAStrategy(options, verify) {
+  const {
+    logoutCallbackURL, logoutURL, userURL, ...rest
+  } = options;
 
   const opts = { ...rest, scope: ['openid'] };
 
@@ -22,5 +24,13 @@ module.exports = function uaaStrategy(options, verify) {
     });
   };
 
+  const params = new URLSearchParams();
+  params.set('redirect', logoutCallbackURL);
+  params.set('client_id', opts.clientID);
+
+  strategy.logoutRedirectURL = `${logoutURL}?${params.toString()}`;
+
   return strategy;
-};
+}
+
+module.exports = { createUAAStrategy };

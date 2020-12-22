@@ -5,6 +5,13 @@ const clientSecret = env.GITHUB_CLIENT_SECRET || 'not_set';
 
 const url = path => `${env.APP_HOSTNAME}${path}`;
 
+const uaaOptions = {
+  authorizationURL: 'https://login.fr.cloud.gov/oauth/authorize',
+  tokenURL: 'https://uaa.fr.cloud.gov/oauth/token',
+  userURL: 'https://uaa.fr.cloud.gov/userinfo',
+  logoutURL: 'https://uaa.fr.cloud.gov/logout.do',
+};
+
 module.exports = {
   github: {
     options: {
@@ -26,10 +33,12 @@ module.exports = {
   },
   uaa: {
     options: {
-      authorizationURL: 'https://login.fr.cloud.gov/oauth/authorize',
-      tokenURL: 'https://uaa.fr.cloud.gov/oauth/token',
-      userURL: 'https://uaa.fr.cloud.gov/userinfo',
-      logoutURL: 'https://uaa.fr.cloud.gov/logout.do',
+      ...uaaOptions,
+      callbackURL: url('/auth/uaa/callback'),
+      logoutCallbackURL: url('/auth/uaa/logout'),
+    },
+    adminOptions: {
+      ...uaaOptions,
       callbackURL: url('/admin/auth/uaa/callback'),
       logoutCallbackURL: url('/admin/auth/uaa/logout'),
     },

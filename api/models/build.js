@@ -153,6 +153,7 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         is: branchRegex,
       },
+      allowNull: false,
     },
     requestedCommitSha: {
       type: DataTypes.STRING,

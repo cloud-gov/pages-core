@@ -12,10 +12,22 @@
         <div class="usa-width-one-third">
           <p>This is a U.S. government service. Your use indicates your consent to monitoring, recording, and no expectation of privacy. Misuse is subject to criminal and civil penalties. <a href="/system-use">Read more details.</a><br></p>
           <div class="hero-heading">
-            <a href="/auth/github"><button class="usa-button"><img src="/images/github-logo.png"> Agree and continue with GitHub</button></a>
+            <a href="/login">
+              <button class="usa-button">
+                {% if isUAA %}
+                  Agree and continue with SecureAuth
+                  {% else %}
+                  <img src="/images/github-logo.png"> Agree and continue with GitHub
+                {% endif %}
+              </button>
+            </a>
           </div>
-          <p>Federalist users are authenticated with GitHub OAuth.<br></p>
-          <p>If your office uses Federalist, ask your team’s primary contact to send an email to federalist-support@gsa.gov with the GitHub usernames that need access.</p>
+          <p></p>
+          <p>Federalist users are authenticated with {% if isUAA %} SecureAuth {% else %} GitHub OAuth {% endif %}.<br></p>
+          {% if isUAA %}
+          {% else %}
+            <p>If your office uses Federalist, ask your team’s primary contact to send an email to federalist-support@gsa.gov with the GitHub usernames that need access.</p>
+          {% endif %}
         </div>
         <div class="usa-width-one-third">
           &nbsp;
