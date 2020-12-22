@@ -9,7 +9,7 @@ const server = require('./server');
 const SocketIOSubscriber = require('./services/SocketIOSubscriber');
 const jwtHelper = require('./services/jwtHelper');
 
-const socketIO = io(server, { cookie: false });
+const socketIO = io(server);
 
 if (redisConfig) {
   const pubClient = redis.createClient(redisConfig);
