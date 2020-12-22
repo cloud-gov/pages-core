@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+const factory = require('../../support/factory');
 
 const { app: { proxySiteTable } } = require('../../../../config');
 const { DynamoDBDocumentHelper } = require('../../../../api/services/DynamoDBDocumentHelper');
@@ -8,7 +9,7 @@ const { omit } = require('../../../../api/utils');
 const ProxyDataSync = require('../../../../api/services/ProxyDataSync');
 
 const {
-  saveSite, saveSites, removeSite, siteToItem, getSiteKey,
+  saveSite, saveSites, removeSite, siteToItem, getSiteKey, saveBuild
 } = ProxyDataSync;
 
 const site = {
@@ -23,6 +24,11 @@ const site = {
 };
 
 describe('ProxyDataSync', () => {
+
+  afterEach(() => {
+    sinon.restore();
+  });
+  
   it('uses the site\'s subdomain as the sitekey', () => {
     expect(getSiteKey(site)).to.eql(site.subdomain);
   });
@@ -118,5 +124,25 @@ describe('ProxyDataSync', () => {
     expect(new Date() >= new Date(obj.UpdatedAt)).to.be.true;
     delete obj.UpdatedAt;
     expect(item).to.deep.equal(obj);
+  });
+
+  it('can save a build to item', async () => {
+    const buildSettings = { test: 'settings' };
+    const build = await factory.build({ url: 'https://buildomain.gov/buildPath'});
+    const site = await build.getSite();
+    const putSpy = sinon.stub(DynamoDBDocumentHelper.prototype, 'put');
+    const start = new Date();
+
+    await saveBuild(build, buildSettings);
+
+    sinon.assert.calledOnce(putSpy);
+    expect(putSpy.args[0][0]).to.equal(proxySiteTable);
+    const buildItem = putSpy.args[0][1];
+    expect(new Date(buildItem.UpdatedAt) >= start).to.be.true;
+    delete buildItem.UpdatedAt;
+    expect(buildItem).to.eql({
+      Id: 'buildomain.gov/buildPath',
+      Settings: buildSettings,
+    });
   });
 });

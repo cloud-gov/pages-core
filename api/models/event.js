@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
     UPDATED: 'updated',
     AUTHENTICATION: 'authentication',
     FEDERALIST_USERS_MEMBERSHIP: 'federalist-users-membership',
+    BUILD_STATUS: 'build-status',
+    BUILD_REQUEST: 'build-request',
   };
 
   function isValidType(value) {
