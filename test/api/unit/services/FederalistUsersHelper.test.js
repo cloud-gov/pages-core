@@ -191,9 +191,6 @@ describe('FederalistUsersHelper', () => {
       eventStub = sinon.stub(EventCreator, 'audit').resolves();
       await User.truncate();
     });
-    // afterEach( async () => {
-    //   await Event.truncate();
-    // })
 
     it('set inactive users to Active if in federalist-users', async () => {
       const admin = await factory.user();
