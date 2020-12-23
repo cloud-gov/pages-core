@@ -116,7 +116,9 @@ module.exports = {
       }
       res.ok({});
     } catch (err) {
-      EventCreator.error(Event.labels.BUILD_REQUEST, ['Error processing rebuild request', JSON.stringify(req.body), err]);
+      const errBody = ['Error processing rebuild request', JSON.stringify(req.body), err];
+      EventCreator.error(Event.labels.BUILD_REQUEST, errBody);
+      logger.error(errBody);
       res.error(err);
     }
   },
@@ -169,7 +171,9 @@ module.exports = {
 
       res.ok();
     } catch (err) {
-      EventCreator.error(Event.labels.BUILD_STATUS, ['Error processing build status request', JSON.stringify(req.params), JSON.stringify(req.body), err]);
+      const errBody = ['Error processing build status request', JSON.stringify(req.params), JSON.stringify(req.body), err];
+      EventCreator.error(Event.labels.BUILD_STATUS, errBody);
+      logger.error(errBody);
       res.error(err);
     }
   },
