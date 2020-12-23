@@ -13,11 +13,11 @@ const onSuccess = (req, res) => {
 
 const router = Router();
 
-router.get('/login', passport.authenticate('uaa'));
+router.get('/login', passport.authenticate('sso'));
 router.get('/logout', passport.logout);
 
-// Callbacks need to be registered with CF UAA service
-router.get('/auth/uaa/callback', passport.authenticate('uaa'), onSuccess);
-router.get('/auth/uaa/logout', onSuccess);
+// Callbacks need to be registered with SSO service
+router.get('/auth/sso/callback', passport.authenticate('sso'), onSuccess);
+router.get('/auth/sso/logout', onSuccess);
 
 module.exports = router;

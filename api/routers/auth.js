@@ -27,9 +27,10 @@ router.get('/logout', passport.logout(idp));
 router.get('/login', redirectIfAuthenticated, passport.authenticate(idp));
 
 router.get('/auth/github/callback', passport.authenticate('github', opts), onSuccess);
+router.get('/auth/gitlab/callback', passport.authenticate('gitlab', opts), onSuccess);
 
-// Callbacks need to be registered with CF UAA service
-router.get('/auth/uaa/callback', passport.authenticate('uaa', opts), onSuccess);
-router.get('/auth/uaa/logout', (_req, res) => res.redirect('/'));
+// Callbacks need to be registered with SSO service
+router.get('/auth/sso/callback', passport.authenticate('sso', opts), onSuccess);
+router.get('/auth/sso/logout', (_req, res) => res.redirect('/'));
 
 module.exports = router;

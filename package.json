@@ -7,6 +7,7 @@
   "dependencies": {
     "@octokit/rest": "^18.0.12",
     "@supercharge/promise-pool": "^1.5.0",
+    "@gitbeaker/node": "^26.0.0",
     "aws-sdk": "^2.804.0",
     "body-parser": "^1.18.3",
     "cfenv": "^1.2.3",
@@ -34,6 +35,7 @@
     "nunjucks": "^3.2.2",
     "passport": "^0.4.0",
     "passport-github": "^1.0.0",
+    "passport-gitlab2": "^5.0.0",
     "passport-oauth2": "^1.5.0",
     "pg": "^8.5.1",
     "pg-native": "^3.0.0",

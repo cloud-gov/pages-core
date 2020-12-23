@@ -14,17 +14,21 @@
           <div class="hero-heading">
             <a href="/login">
               <button class="usa-button">
-                {% if isUAA %}
+                {% if globalIDP == 'sso' %}
                   Agree and continue with SecureAuth
-                  {% else %}
+                {% elif globalIDP == 'github' %}
                   <img src="/images/github-logo.png"> Agree and continue with GitHub
+                {% elif globalIDP == 'gitlab' %}
+                  <img src="/images/gitlab-logo.png"> Agree and continue with GitLab
+                {% else %}
+                  AUTHENTICATION PROVIDER INVALID
                 {% endif %}
               </button>
             </a>
           </div>
           <p></p>
-          <p>Federalist users are authenticated with {% if isUAA %} SecureAuth {% else %} GitHub OAuth {% endif %}.<br></p>
-          {% if isUAA %}
+          <p>Federalist users are authenticated with {% if isSSO %} SecureAuth {% else %} GitHub OAuth {% endif %}.<br></p>
+          {% if globalIDP == 'sso' %}
           {% else %}
             <p>If your office uses Federalist, ask your team’s primary contact to send an email to federalist-support@gsa.gov with the GitHub usernames that need access.</p>
           {% endif %}

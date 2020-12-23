@@ -22,7 +22,7 @@ applications:
       - federalist-site-wide-error
       - federalist-((env))-dynamodb-creds
       - federalist-((env))-s3-build-logs
-      - uaa-client
+      - sso-client
     env:
       NODE_ENV: production
       APP_ENV: ((env))

@@ -17,7 +17,7 @@ function defaultContext(req) {
     siteDisplayEnv: getSiteDisplayEnv(),
     homepageUrl: config.app.homepageUrl,
     webpackAssets,
-    isUAA: config.env.authIDP === 'uaa',
+    globalIDP: ['github', 'gitlab', 'sso'].indexOf(config.env.authIDP) >= 0 ? config.env.authIDP : 'github',
   };
 
   return context;
@@ -30,6 +30,7 @@ module.exports = {
       return res.redirect('/sites');
     }
     const context = defaultContext(req);
+    console.log(context);
 
     return res.render('home.njk', context);
   },

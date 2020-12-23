@@ -1,11 +1,11 @@
 const { Strategy } = require('passport-oauth2');
 
-function createUAAStrategy(options, verify) {
+function createSSOStrategy(options, verify) {
   const {
     logoutCallbackURL, logoutURL, userURL, ...rest
   } = options;
 
-  const opts = { ...rest, scope: ['openid'] };
+  const opts = { ...rest, scope: ['read_write'] };
 
   const strategy = new Strategy(opts, verify);
 
@@ -13,6 +13,7 @@ function createUAAStrategy(options, verify) {
     // eslint-disable-next-line no-underscore-dangle
     strategy._oauth2.get(userURL, accessToken, (err, body) => {
       if (err) {
+        console.log(err)
         return callback(err);
       }
 
@@ -33,4 +34,4 @@ function createUAAStrategy(options, verify) {
   return strategy;
 }
 
-module.exports = { createUAAStrategy };
+module.exports = { createSSOStrategy };

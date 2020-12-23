@@ -1,29 +1,32 @@
 const env = require('../services/environment.js')();
 
-const clientID = env.GITHUB_CLIENT_ID || 'not_set';
-const clientSecret = env.GITHUB_CLIENT_SECRET || 'not_set';
+const GithubClientID = env.GITHUB_CLIENT_ID || 'not_set';
+const GithubClientSecret = env.GITHUB_CLIENT_SECRET || 'not_set';
+
+const GitlabClientID = env.GITHUB_CLIENT_ID || 'not_set';
+const GitlabClientSecret = env.GITHUB_CLIENT_SECRET || 'not_set';
 
 const url = path => `${env.APP_HOSTNAME}${path}`;
 
-const uaaOptions = {
-  authorizationURL: 'https://login.fr.cloud.gov/oauth/authorize',
-  tokenURL: 'https://uaa.fr.cloud.gov/oauth/token',
-  userURL: 'https://uaa.fr.cloud.gov/userinfo',
-  logoutURL: 'https://uaa.fr.cloud.gov/logout.do',
+const ssoOptions = {
+  authorizationURL: 'http://localhost:8080',
+  tokenURL: 'http://localhost:8080',
+  userURL: 'http://localhost:8080',
+  logoutURL: 'http://localhost:8080',
 };
 
 module.exports = {
   github: {
     options: {
-      clientID,
-      clientSecret,
+      GithubClientID,
+      GithubClientSecret,
       callbackURL: url('/auth/github/callback'),
       scope: ['user', 'repo', 'write:repo_hook'],
       state: true,
     },
     externalOptions: {
-      clientID,
-      clientSecret,
+      GithubClientID,
+      GithubClientSecret,
       callbackURL: url('/external/auth/github/callback'),
       scope: ['user', 'repo'],
     },
@@ -31,16 +34,34 @@ module.exports = {
       14109682, // federalist-users
     ],
   },
-  uaa: {
+  gitlab: {
     options: {
-      ...uaaOptions,
-      callbackURL: url('/auth/uaa/callback'),
-      logoutCallbackURL: url('/auth/uaa/logout'),
+      GitlabClientID,
+      GitlabClientSecret,
+      callbackURL: url('/auth/gitlab/callback'),
+      scope: ['api'],
+      state: true,
+    },
+    externalOptions: {
+      GitlabClientID,
+      GitlabClientSecret,
+      callbackURL: url('/external/auth/github/callback'),
+      scope: ['read_user'],
+    },
+    organizations: [
+      14109682, // federalist-users
+    ],
+  },
+  sso: {
+    options: {
+      ...ssoOptions,
+      callbackURL: url('/auth/sso/callback'),
+      logoutCallbackURL: url('/auth/sso/logout'),
     },
     adminOptions: {
-      ...uaaOptions,
-      callbackURL: url('/admin/auth/uaa/callback'),
-      logoutCallbackURL: url('/admin/auth/uaa/logout'),
+      ...ssoOptions,
+      callbackURL: url('/admin/auth/sso/callback'),
+      logoutCallbackURL: url('/admin/auth/sso/logout'),
     },
   },
 };

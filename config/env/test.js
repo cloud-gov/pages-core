@@ -38,7 +38,7 @@ module.exports = {
         123456,
       ],
     },
-    uaa: {
+    sso: {
       options: {
         clientID: '123abc',
         clientSecret: '456def',

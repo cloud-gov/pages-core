@@ -1,11 +1,11 @@
 const Passport = require('passport');
 const config = require('../../config');
 const { User } = require('../models');
-const { createUAAStrategy } = require('../services/uaaStrategy');
+const { createSSOStrategy } = require('../services/ssoStrategy');
 
 const passport = new Passport.Passport();
 
-const uaaOptions = config.passport.uaa.adminOptions;
+const ssoOptions = config.passport.sso.adminOptions;
 
 const verify = async (accessToken, _refreshToken, profile, callback) => {
   const { email } = profile;
@@ -23,9 +23,9 @@ const verify = async (accessToken, _refreshToken, profile, callback) => {
   }
 };
 
-const uaaStrategy = createUAAStrategy(uaaOptions, verify);
+const ssoStrategy = createSSOStrategy(ssoOptions, verify);
 
-passport.use('uaa', uaaStrategy);
+passport.use('sso', ssoStrategy);
 
 passport.serializeUser((user, next) => {
   next(null, user.id);
@@ -39,7 +39,7 @@ passport.deserializeUser((id, next) => {
 
 passport.logout = (req, res) => {
   req.logout();
-  res.redirect(uaaStrategy.logoutRedirectURL);
+  res.redirect(ssoStrategy.logoutRedirectURL);
 };
 
 module.exports = passport;

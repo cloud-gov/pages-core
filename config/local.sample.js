@@ -14,7 +14,7 @@ if (process.env.NODE_ENV !== 'test') {
           1234567, // YOUR GITHUB ORGANIZATION ID
         ],
       },
-      uaa: {
+      sso: {
         options: {
           clientID: 'UAA_OAUTH_CLIENT_ID',
           clientSecret: 'UAA_OAUTH_CLIENT_SECRET',
