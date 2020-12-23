@@ -84,7 +84,7 @@
     "update-proxy-db": "node ./scripts/proxy-edge.js",
     "timeout-builds": "node ./scripts/timeout-builds.js",
     "remove-inactive-federalist-users": "node ./scripts/remove-inactive-federalist-users.js",
-    "remove-federalist-users-org-members-not-users": "node ./scripts/remove-federalist-users-org-members-not-users.js",
+    "deactivate-users-who-are-not-federalist-users-members": "node ./scripts/deactivate-users-who-are-not-federalist-users-members.js",
     "archive-build-logs": "node ./scripts/archive-build-logs.js",
     "archive-build-logs-daily": "node ./scripts/archive-build-logs-daily.js",
     "migrate-build-logs": "node ./scripts/migrate-build-logs.js"
