@@ -12,6 +12,8 @@ const getOrganizations = github => github.orgs.listForAuthenticatedUser().then(o
 
 const getRepository = (github, options) => github.repos.get(options).then(repos => repos.data);
 
+const getContent = (github, options) => github.repos.getContent(options);
+
 const getBranch = (github, { owner, repo, branch }) => github.repos
   .getBranch({ owner, repo, branch })
   .then(branchInfo => branchInfo.data);
@@ -154,9 +156,11 @@ function getNextCollaborators(github, owner, repo, { page = 1, allCollabs = [] }
 }
 
 module.exports = {
-  checkPermissions: (user, owner, repo) => githubClient(user.githubAccessToken)
-    .then(github => getRepository(github, { owner, repo, username: user.username }))
-    .then(repository => repository.permissions),
+  checkPermissions: async (user, owner, repo) => {
+    const github = await githubClient(user.githubAccessToken);
+    const repository = await getRepository(github, { owner, repo, username: user.username });
+    return repository.permissions;
+  },
 
   checkOrganizations: (user, orgName) => githubClient(user.githubAccessToken)
     .then(github => getOrganizations(github))
@@ -282,4 +286,25 @@ module.exports = {
 
   getCollaborators: (accessToken, owner, repo) => githubClient(accessToken)
     .then(github => getNextCollaborators(github, owner, repo)),
+
+  getContent: async (accessToken, owner, repo, path, ref = null) => {
+    try {
+      const github = await githubClient(accessToken);
+      const options = { owner, repo, path };
+      if (ref) {
+        options.ref = ref;
+      }
+      const { data } = await getContent(github, options);
+      if (data.type === 'file') { // return file body
+        const { content, encoding } = data;
+        return Buffer.from(content, encoding).toString('utf8');
+      }
+      return data; // return folder/files
+    } catch (err) {
+      if (err.status === 404) {
+        return null;
+      }
+      throw err;
+    }
+  },
 };
