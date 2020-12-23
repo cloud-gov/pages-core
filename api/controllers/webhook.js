@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const Sequelize = require('sequelize');
 const config = require('../../config');
+const { logger } = require('../../winston');
 const GithubBuildHelper = require('../services/GithubBuildHelper');
 const EventCreator = require('../services/EventCreator');
 const {
