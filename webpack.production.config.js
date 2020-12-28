@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const ManifestPlugin = require('webpack-manifest-plugin');
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { getFeatureFlags } = require('./webpack-utils');
 
 const fileLoaderOptions = {
@@ -84,7 +84,7 @@ module.exports = {
     // which we don't need, so we'll use this plugin to keep them out of the
     // bundle
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new ManifestPlugin({ fileName: '../webpack-manifest.json' }),
+    new WebpackManifestPlugin({ fileName: '../webpack-manifest.json' }),
     new webpack.DefinePlugin(getFeatureFlags(process.env)),
   ],
 };
