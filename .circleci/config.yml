@@ -368,10 +368,20 @@ workflows:
             parameters:
               app:
                 - federalistapp
-                - federalistapp-staging
                 - federalist-admin
-                - federalist-admin-staging
+          filters:
+            branches:
+              only: main
 
+      - restage:
+          matrix:
+            parameters:
+              app:
+                - federalistapp-staging
+                - federalist-admin-staging
+          filters:
+            branches:
+              only: staging
 
   every-ten-minutes:
     triggers:
