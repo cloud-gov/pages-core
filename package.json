@@ -24,7 +24,7 @@
     "express-slow-down": "^1.4.0",
     "express-winston": "^4.0.5",
     "js-file-download": "^0.4.11",
-    "js-yaml": "^3.14.0",
+    "js-yaml": "^3.14.1",
     "json-to-csv": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
     "method-override": "^3.0.0",
