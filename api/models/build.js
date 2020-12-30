@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
 const SQS = require('../services/SQS');
-const { logger } = require('../../winston');
+const EventCreator = require('../services/EventCreator');
 
 const { branchRegex, shaRegex, isEmptyOrUrl } = require('../utils/validators');
 const { buildUrl } = require('../utils/build');
@@ -109,7 +109,7 @@ async function enqueue() {
     await build.updateJobStatus({ status: States.Queued });
   } catch (err) {
     const errMsg = `There was an error, adding the job to SQS: ${err}`;
-    logger.error(errMsg);
+    EventCreator.error(Event.labels.BUILD_REQUEST, errMsg);
     await build.updateJobStatus({
       status: States.Error,
       message: errMsg,
