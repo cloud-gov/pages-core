@@ -1,30 +1,39 @@
 const { logger } = require('../../winston');
 const { Event } = require('../models');
 
-const createEvent = (obj) => {
-  const {
-    label, type, model, body,
-  } = obj;
-  let modelId;
-  let modelName;
+const createEvent = async (obj) => {
+  let event;
+  try {
+    const {
+      label, type, model, body,
+    } = obj;
+    let modelId;
+    let modelName;
 
-  if (model) {
-    modelId = model.id;
-    modelName = model.constructor.name;
-  }
+    if (model) {
+      modelId = model.id;
+      modelName = model.constructor.name;
+    }
 
-  const atts = {
-    label,
-    type,
-    model: modelName,
-    modelId,
-    body,
+    const atts = {
+      label,
+      type,
+      model: modelName,
+      modelId,
+      body,
+    };
+
+    event = await Event.create(atts);
+    if (event.type === Event.types.ERROR) {
+      logger.error(JSON.stringify(event));
+    }
+    else {
+      logger.info(JSON.stringify(event));
+    }
+  } catch(err) {
+    logger.warn([`Failed to create Event(${JSON.stringify(obj)}`, err.stack].join('\n'));
   };
-
-  return Event.create(atts)
-    .catch((err) => {
-      logger.warn([`Failed to create Event(${JSON.stringify(atts)}`, err].join('\n'));
-    });
+  return event;
 };
 
 const audit = (label, model, body) => createEvent({
