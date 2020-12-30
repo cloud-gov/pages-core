@@ -3,7 +3,8 @@ const redis = require('redis');
 const redisAdapter = require('socket.io-redis');
 
 const { redis: redisConfig } = require('../config');
-const { logger } = require('../winston');
+const { Event } = require('./models');
+const EventCreator = require('./services/EventCreator');
 
 const server = require('./server');
 const SocketIOSubscriber = require('./services/SocketIOSubscriber');
@@ -18,13 +19,13 @@ if (redisConfig) {
   socketIO.adapter(redisAdapter({ pubClient, subClient }));
 
   pubClient.on('error', (err) => {
-    logger.error(`redisAdapter pubClient error: ${err}`);
+    EventCreator.error(Event.labels.SOCKET_IO, `redisAdapter pubClient error: ${err}`);
   });
   subClient.on('error', (err) => {
-    logger.error(`redisAdapter subClient error: ${err}`);
+    EventCreator.error(Event.labels.SOCKET_IO, `redisAdapter subClient error: ${err}`);
   });
   socketIO.of('/').adapter.on('error', (err) => {
-    logger.error(`redisAdapter error: ${err}`);
+    EventCreator.error(Event.labels.SOCKET_IO, `redisAdapter error: ${err}`);
   });
 }
 
@@ -37,7 +38,7 @@ socketIO.use((socket, next) => {
       })
       .then(() => next())
       .catch((e) => {
-        logger.warn(e);
+        EventCreator.error(Event.labels.SOCKET_IO, `handshake error: ${e}`);
         next();
       });
   } else {
@@ -50,7 +51,7 @@ socketIO.on('connection', (socket) => {
 });
 
 socketIO.on('error', (err) => {
-  logger.error(`socket auth/subscribe error: ${err}`);
+  EventCreator.error(Event.labels.SOCKET_IO, `socket auth/subscribe error: ${err}`);
 });
 
 module.exports = socketIO;

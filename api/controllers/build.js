@@ -1,5 +1,3 @@
-const { logger } = require('../../winston');
-
 const { fetchModelById } = require('../utils/queryDatabase');
 const buildSerializer = require('../serializers/build');
 const GithubBuildHelper = require('../services/GithubBuildHelper');
@@ -32,14 +30,25 @@ const emitBuildStatus = build => Site.findByPk(build.site)
     socketIO.to(builderRoom).emit('build status', msg);
     return Promise.resolve();
   })
-  .catch(err => logger.error(err));
+  .catch((err) => {
+    const errBody = {
+      message: `Failed to emit build@id=${build.id} status: ${build.state}`,
+      error:  err.stack,
+    };
+    EventCreator.error(Event.labels.SOCKET_IO, errBody);
+  });
 
 const saveBuildToProxy = async (build) => {
   const buildSettings = await GithubBuildHelper.fetchContent(build, BUILD_SETTINGS_FILE);
   if (buildSettings) {
     const settings = JSON.parse(buildSettings);
     await ProxyDataSync.saveBuild(build, settings);
-    EventCreator.audit(Event.labels.BUILD_STATUS, build, `${BUILD_SETTINGS_FILE} saved to proxy database`);
+    const body = {
+      filename: BUILD_SETTINGS_FILE,
+      content: settings,
+      message: `${BUILD_SETTINGS_FILE} saved to proxy database`,
+    }
+    EventCreator.audit(Event.labels.BUILD_STATUS, build, body);
   }
 };
 
@@ -116,9 +125,17 @@ module.exports = {
       }
       res.ok({});
     } catch (err) {
-      const errBody = ['Error processing rebuild request', JSON.stringify(req.body), err];
+      const errBody = {
+        request: {
+          path: req.path,
+          params: req.params,
+          body: req.body,
+        },
+        message: 'Error processing rebuild request',
+        error: err.stack,  
+      };
+      
       EventCreator.error(Event.labels.BUILD_REQUEST, errBody);
-      logger.error(errBody);
       res.error(err);
     }
   },
@@ -135,12 +152,15 @@ module.exports = {
       } catch (err) {
         status = 'error';
         message = 'build status message parsing error';
-        const errMsg = [
-          `Error decoding build status message for build@id=${statusRequest.params.id}`,
-          `build@message: ${statusRequest.body.message}`,
-          err,
-        ];
-        EventCreator.error(Event.labels.BUILD_STATUS, errMsg);
+        const errBody = {
+          message: 'Error decoding build status message',
+          request: {
+            params: statusRequest.params,
+            body: statusRequest.body,
+          },
+          error: err.stack,
+        };
+        EventCreator.error(Event.labels.BUILD_STATUS, errBody);
       }
       return { status, message, commitSha };
     };
@@ -171,9 +191,16 @@ module.exports = {
 
       res.ok();
     } catch (err) {
-      const errBody = ['Error processing build status request', JSON.stringify(req.params), JSON.stringify(req.body), err];
+      const errBody = {
+        request: {
+          path: req.path,
+          params: req.params,
+          body: req.body,
+        },
+        error: err.stack,
+        message: 'Error processing build status request',
+      };
       EventCreator.error(Event.labels.BUILD_STATUS, errBody);
-      logger.error(errBody);
       res.error(err);
     }
   },

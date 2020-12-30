@@ -1,11 +1,11 @@
 const request = require('supertest');
 const { expect } = require('chai');
-const { restore, stub } = require('sinon');
+const { restore, stub, spy } = require('sinon');
 
 const validateAgainstJSONSchema = require('../../support/validateAgainstJSONSchema');
 const { authenticatedSession } = require('../../support/session');
 const factory = require('../../support/factory');
-
+const EventCreator = require('../../../../api/services/EventCreator');
 const { Site, User } = require('../../../../api/models');
 const S3SiteRemover = require('../../../../api/services/S3SiteRemover');
 const ProxyDataSync = require('../../../../api/services/ProxyDataSync');
@@ -26,6 +26,10 @@ const itShouldRequireAdminAuthentication = (path, schema, method = 'get') => {
 };
 
 describe('Admin - Site API', () => {
+  let eventCreatorSpy;
+  beforeEach(() => {
+    eventCreatorSpy = spy(EventCreator, 'error');
+  })
   afterEach(() => Promise.all([
     User.truncate(),
     Site.truncate(),
@@ -220,6 +224,7 @@ describe('Admin - Site API', () => {
 
         expect(body.message).to.equal('An unexpected error occurred');
         expect(body.status).to.equal(500);
+        expect(eventCreatorSpy.calledOnce).to.be.true;
       });
     });
   });

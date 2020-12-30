@@ -3,7 +3,8 @@ const { wrapHandlers } = require('../utils');
 const { serialize, serializeMany } = require('../serializers/user-environment-variable');
 const { encrypt } = require('../services/Encryptor');
 const { ValidationError } = require('../utils/validators');
-const { Site, UserEnvironmentVariable } = require('../models');
+const { Site, UserEnvironmentVariable, Event } = require('../models');
+const EventCreator = require('../services/EventCreator');
 
 function validate({ name, value }) {
   if (name && name.length && value && (value.length >= 4)) {
@@ -55,9 +56,20 @@ module.exports = wrapHandlers({
       const json = serialize(uev);
 
       return res.ok(json);
-    } catch (error) {
-      if (error.name !== 'SequelizeUniqueConstraintError') {
-        throw error;
+    } catch (err) {
+      const errBody = {
+        request: {
+          path: req.path,
+          params: req.params,
+          body: { name: req.body.name }, // only env var name not value
+        },
+        message: 'Error creating user environment variable',
+        error: err.stack,  
+      };
+      
+      EventCreator.error(Event.labels.BUILD_REQUEST, errBody);
+      if (err.name !== 'SequelizeUniqueConstraintError') {
+        throw err;
       }
       return res.badRequest({
         message: `A user environment variable with name: "${name}" already exists for this site.`,
@@ -66,23 +78,35 @@ module.exports = wrapHandlers({
   },
 
   async destroy(req, res) {
-    const { params, user } = req;
-    const { id, site_id: siteId } = params;
+    try {
+      const { params, user } = req;
+      const { id, site_id: siteId } = params;
 
-    const uev = await UserEnvironmentVariable
-      .forSiteUser(user)
-      .findOne({
-        where: {
-          id, siteId,
+      const uev = await UserEnvironmentVariable
+        .forSiteUser(user)
+        .findOne({
+          where: {
+            id, siteId,
+          },
+        });
+
+      if (!uev) {
+        return res.notFound();
+      }
+
+      await uev.destroy();
+
+      return res.ok({});
+    } catch (err) {
+      const errBody = {
+        request: {
+          path: req.path,
+          params: req.params,
         },
-      });
-
-    if (!uev) {
-      return res.notFound();
+        message: 'Error destroying user environment variable',
+        error: err.stack,  
+      };
+      return res.error();
     }
-
-    await uev.destroy();
-
-    return res.ok({});
   },
 });

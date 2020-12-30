@@ -3,7 +3,7 @@ const path = require('path');
 const moment = require('moment');
 
 const config = require('../../config');
-const { logger } = require('../../winston');
+const EventCreator = require('../services/EventCreator');
 
 function filterEntity(res, name, field = 'name') {
   let errMsg = `Not found: Entity @${field} = ${name}`;
@@ -126,7 +126,7 @@ function loadProductionManifest() {
   const manifestFile = 'webpack-manifest.json';
   if (!fs.existsSync(manifestFile)) {
     const msg = 'webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?';
-    logger.error(msg);
+    EventCreator.error(Event.labels.DEPLOYMENT, msg);
     throw new Error(msg);
   }
   return JSON.parse(fs.readFileSync(manifestFile, 'utf-8'));

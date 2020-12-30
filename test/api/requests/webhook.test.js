@@ -40,16 +40,21 @@ describe('Webhook API', () => {
     }
   });
 
+  let eventCreatorErrorStub;
+  beforeEach(() => {
+    eventCreatorErrorStub = sinon.stub(EventCreator, 'error').resolves();
+  });
+
+  afterEach(() => {
+    sinon.restore();
+  });
+  
   describe('POST /webhook/github', () => {
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.status();
       githubAPINocks.repo({ response: [201, { permissions: { admin: false, push: true } }] });
       sinon.stub(SQS, 'sendBuildMessage').resolves();
-    });
-
-    afterEach(() => {
-      sinon.restore();
     });
 
     it('should create a new site build for the sender', async () => {

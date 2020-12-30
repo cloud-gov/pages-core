@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 const Sequelize = require('sequelize');
 const config = require('../../config');
-const { logger } = require('../../winston');
 const GithubBuildHelper = require('../services/GithubBuildHelper');
 const EventCreator = require('../services/EventCreator');
 const {
@@ -132,9 +131,15 @@ module.exports = {
       }
       res.ok();
     } catch (err) {
-      const errBody = ['Error processing push webhook', JSON.stringify(req.body), err];
+      const errBody = {
+        message: 'Error encountered when processing GitHub push webhook',
+        error: err.stack,
+        request: {
+          body: req.body,
+          path: req.path,
+        }
+      };
       EventCreator.error(Event.labels.BUILD_REQUEST, errBody);
-      logger.error(errBody);
       res.badRequest();
     }
   },
@@ -144,9 +149,15 @@ module.exports = {
       await organizationWebhookRequest(req.body);
       res.ok();
     } catch (err) {
-      const errBody = ['Error processing organization webhook', JSON.stringify(req.body), err];
+      const errBody = {
+        message: 'Error encountered when processing GitHub organization webhook',
+        error: err.stack,
+        request: {
+          body: req.body,
+          path: req.path,
+        }
+      };
       EventCreator.error(Event.labels.FEDERALIST_USERS_MEMBERSHIP, errBody);
-      logger.error(errBody);
       res.badRequest();
     }
   },

@@ -5,9 +5,9 @@ const SiteDestroyer = require('../services/SiteDestroyer');
 const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const UserActionCreator = require('../services/UserActionCreator');
 const siteSerializer = require('../serializers/site');
-const { User, Site, Build } = require('../models');
+const { User, Site, Build, Event } = require('../models');
 const siteErrors = require('../responses/siteErrors');
-const { logger } = require('../../winston');
+const EventCreator = require('../services/EventCreator');
 const ProxyDataSync = require('../services/ProxyDataSync');
 const {
   ValidationError,
@@ -74,10 +74,17 @@ module.exports = {
       await authorizer.destroy(req.user, site);
       await SiteDestroyer.destroySite(site);
       return res.json(siteJSON);
-    } catch (error) {
-      // ToDo - move to the future audit events
-      logger.error([error.message, error.stack].join('\n\n'));
-      return res.error(error);
+    } catch (err) {
+      const errBody = {
+        message: 'Error encountered when destroying site',
+        error: err.stack,
+        request: {
+          params: req.params,
+          path: req.path,
+        }
+      };
+      EventCreator.error(Event.labels.SITE_DESTROY, errBody);
+      return res.error(err);
     }
   },
 
@@ -98,6 +105,16 @@ module.exports = {
         res.json(siteJSON);
       })
       .catch((err) => {
+        const errBody = {
+          message: 'Error encountered when adding user to site',
+          error: err.stack,
+          request: {
+            body: req.body,
+            params: req.params,
+            path: req.path,
+          }
+        };
+        EventCreator.error(Event.labels.SITE_USER, errBody);
         res.error(err);
       });
   },
@@ -124,7 +141,6 @@ module.exports = {
           message: siteErrors.USER_REQUIRED,
         };
       }
-
       return authorizer.removeUser(req.user, site);
     })
       .then(() => SiteMembershipCreator
@@ -136,7 +152,18 @@ module.exports = {
         siteId: site.id,
       }))
       .then(() => sendJSON(site, res))
-      .catch(res.error);
+      .catch((err) => {
+        const errBody = {
+          message: 'Error encountered when removing user from site',
+          error: err.stack,
+          request: {
+            params: req.params,
+            path: req.path,
+          }
+        };
+        EventCreator.error(Event.labels.SITE_USER, errBody);
+        res.error(err);
+      });
   },
 
   create: (req, res) => {
@@ -153,7 +180,14 @@ module.exports = {
         site = _site;
         if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
           return ProxyDataSync.saveSite(site)
-            .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
+            .catch((err) => {
+              const errBody = {
+                message: `Error saving new site@id=${site.id} to proxy database`,
+                error: err.stack,
+                site,
+              };
+              EventCreator.error(Event.labels.PROXY_EDGE, errBody);
+            });
         }
 
         return null;
@@ -163,7 +197,15 @@ module.exports = {
         res.json(siteJSON);
       })
       .catch((err) => {
-        logger.error([JSON.stringify(err), err.stack].join('\n\n'));
+        const errBody = {
+          message: 'Error encountered when adding a new site',
+          error: err.stack,
+          request: {
+            body: req.body,
+            path: req.path,
+          }
+        };
+        EventCreator.error(Event.labels.SITE_ADD, errBody);
         res.error(err);
       });
   },
@@ -222,52 +264,88 @@ module.exports = {
         res.json(siteJSON);
       })
       .catch((err) => {
+        const errBody = {
+          message: 'Error encountered when updating an existing site',
+          error: err.stack,
+          request: {
+            params: req.params,
+            body: req.body,
+            path: req.path,
+          }
+        };
+        EventCreator.error(Event.labels.SITE_UPDATE, errBody);
         res.error(err);
       });
   },
 
   addBasicAuth: wrapHandler(async (req, res) => {
-    const { body, params, user } = req;
+    try {
+      const { body, params, user } = req;
 
-    const { site_id: siteId } = params;
+      const { site_id: siteId } = params;
 
-    const site = await Site.forUser(user).findByPk(siteId);
+      const site = await Site.forUser(user).findByPk(siteId);
 
-    if (!site) {
-      return res.notFound();
+      if (!site) {
+        return res.notFound();
+      }
+
+      const credentials = stripCredentials(body);
+
+      await site.update({ basicAuth: credentials });
+
+      if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
+        ProxyDataSync.saveSite(site) // sync to proxy database
+          .catch(err => EventCreator.error(Event.labels.SITE_UPDATE, [`site@id=${site.id}`, err.stack]));
+      }
+
+      const siteJSON = await siteSerializer.serialize(site);
+      return res.json(siteJSON);
+    } catch (err) {
+      const errBody = {
+        message: 'Error encountered when adding basic auth to a site',
+        error: err.stack,
+        request: {
+          params: req.params,
+          path: req.path,
+        }
+      };
+      EventCreator.error(Event.labels.SITE_UPDATE, errBody);
+      res.error(err);
     }
-
-    const credentials = stripCredentials(body);
-
-    await site.update({ basicAuth: credentials });
-
-    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-      ProxyDataSync.saveSite(site) // sync to proxy database
-        .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
-    }
-
-    const siteJSON = await siteSerializer.serialize(site);
-    return res.json(siteJSON);
   }),
 
   removeBasicAuth: wrapHandler(async (req, res) => {
-    const { params, user } = req;
-    const { site_id: siteId } = params;
+    try {
+      const { params, user } = req;
+      const { site_id: siteId } = params;
 
-    const site = await Site.forUser(user).findByPk(siteId);
+      const site = await Site.forUser(user).findByPk(siteId);
 
-    if (!site) {
-      return res.notFound();
+      if (!site) {
+        return res.notFound();
+      }
+
+      await site.update({ basicAuth: {} });
+
+      if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
+        ProxyDataSync.saveSite(site) // sync to proxy database
+          .catch(err => EventCreator.error(Event.labels.SITE_UPDATE, [`site@id=${site.id}`, err.stack]));
+      }
+
+      const siteJSON = await siteSerializer.serialize(site);
+      return res.json(siteJSON);
+    } catch (err) {
+      const errBody = {
+        message: 'Error encountered when removing basic auth from a site',
+        error: err.stack,
+        request: {
+          params: req.params,
+          path: req.path,
+        }
+      };
+      EventCreator.error(Event.labels.SITE_UPDATE, errBody);
+      res.error(err);
     }
-
-    await site.update({ basicAuth: {} });
-
-    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-      ProxyDataSync.saveSite(site) // sync to proxy database
-        .catch(err => logger.error([`site@id=${site.id}`, err, err.stack].join('\n')));
-    }
-
-    const siteJSON = await siteSerializer.serialize(site);
-    return res.json(siteJSON);
   }),
 };

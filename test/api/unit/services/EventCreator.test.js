@@ -1,10 +1,10 @@
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const factory = require('../../support/factory');
-const { audit, error } = require('../../../../api/services/EventCreator');
+const EventCreator = require('../../../../api/services/EventCreator');
 const { logger } = require('../../../../winston');
 
-describe('EventCreateor', () => {
+describe('EventCreator', () => {
   let loggerSpy;
   beforeEach(() => {
     loggerSpy = sinon.spy(logger, 'warn');
@@ -12,9 +12,9 @@ describe('EventCreateor', () => {
   afterEach(() => {
     sinon.restore();
   })
-  it('.audit event created', (done) => {
+  it.only('.audit event created', (done) => {
     factory.user()
-      .then(user => audit('authentication', user, { hi: 'bye' })
+      .then(user => EventCreator.audit('authentication', user, { hi: 'bye' })
         .then((event) => {
           expect(event.type).to.equal('audit');
           expect(event.label).to.equal('authentication');
@@ -22,7 +22,11 @@ describe('EventCreateor', () => {
           expect(event.modelId).to.equal(user.id);
           expect(event.body.hi).to.equal('bye');
           done();
-        }));  
+        }))
+        .catch(e => {
+          console.log(e);
+          done(e);
+        });  
   });
 
   it('.audit event fail', (done) => {
