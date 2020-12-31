@@ -1,5 +1,5 @@
 const { logger } = require('../../winston');
-const Event = require('../models/Event');
+const { Event } = require('../models');
 
 const createEvent = async (obj) => {
   let event;

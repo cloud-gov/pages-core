@@ -8,10 +8,10 @@ describe('EventCreateor', () => {
   let loggerSpy;
   beforeEach(() => {
     loggerSpy = sinon.spy(logger, 'warn');
-  })
+  });
   afterEach(() => {
     sinon.restore();
-  })
+  });
   it('.audit event created', (done) => {
     factory.user()
       .then(user => audit('authentication', user, { hi: 'bye' })
@@ -22,7 +22,7 @@ describe('EventCreateor', () => {
           expect(event.modelId).to.equal(user.id);
           expect(event.body.hi).to.equal('bye');
           done();
-        }));  
+      }));
   });
 
   it('.audit event fail', (done) => {
