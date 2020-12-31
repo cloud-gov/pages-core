@@ -106,6 +106,7 @@ module.exports = wrapHandlers({
         message: 'Error destroying user environment variable',
         error: err.stack,
       };
+      EventCreator.error(Event.labels.UEV_DESTROY, errBody);
       return res.error();
     }
   },

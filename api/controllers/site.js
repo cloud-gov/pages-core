@@ -313,7 +313,7 @@ module.exports = {
         },
       };
       EventCreator.error(Event.labels.SITE_UPDATE, errBody);
-      res.error(err);
+      return res.error(err);
     }
   }),
 
@@ -347,7 +347,7 @@ module.exports = {
         },
       };
       EventCreator.error(Event.labels.SITE_UPDATE, errBody);
-      res.error(err);
+      return res.error(err);
     }
   }),
 };

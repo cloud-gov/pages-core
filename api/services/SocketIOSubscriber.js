@@ -1,4 +1,3 @@
-const { logger } = require('../../winston');
 const { User, Site, Event } = require('../models');
 const EventCreator = require('./EventCreator');
 

@@ -92,12 +92,12 @@ const auditSite = (auditor, site, userIndex = 0) => {
             }))
             .then(() => {
               EventCreator.audit(Event.labels.SITE_USER, user, {
-                message: `Removed user from site@id=${site.id}: User does not have write permisisons to ${fullName}`,
+                message: `Removed user@id=${user.id} from site@id=${site.id}: User does not have write permisisons`,
               });
             })
             .catch((err) => {
               EventCreator.error(Event.labels.SITE_USER, {
-                message: `Failed to remove user from site@id=${site.id}: User does not have write permisisons to ${fullName}`,
+                message: `Failed to remove user@id=${user.id} from site@id=${site.id}: User does not have write permisisons`,
                 erorr: err.stack,
               });
             });
