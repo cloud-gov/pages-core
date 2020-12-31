@@ -5,7 +5,9 @@ const SiteDestroyer = require('../services/SiteDestroyer');
 const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const UserActionCreator = require('../services/UserActionCreator');
 const siteSerializer = require('../serializers/site');
-const { User, Site, Build, Event } = require('../models');
+const {
+  User, Site, Build, Event,
+} = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const EventCreator = require('../services/EventCreator');
 const ProxyDataSync = require('../services/ProxyDataSync');
@@ -81,7 +83,7 @@ module.exports = {
         request: {
           params: req.params,
           path: req.path,
-        }
+        },
       };
       EventCreator.error(Event.labels.SITE_DESTROY, errBody);
       return res.error(err);
@@ -112,7 +114,7 @@ module.exports = {
             body: req.body,
             params: req.params,
             path: req.path,
-          }
+          },
         };
         EventCreator.error(Event.labels.SITE_USER, errBody);
         res.error(err);
@@ -159,7 +161,7 @@ module.exports = {
           request: {
             params: req.params,
             path: req.path,
-          }
+          },
         };
         EventCreator.error(Event.labels.SITE_USER, errBody);
         res.error(err);
@@ -203,7 +205,7 @@ module.exports = {
           request: {
             body: req.body,
             path: req.path,
-          }
+          },
         };
         EventCreator.error(Event.labels.SITE_ADD, errBody);
         res.error(err);
@@ -271,7 +273,7 @@ module.exports = {
             params: req.params,
             body: req.body,
             path: req.path,
-          }
+          },
         };
         EventCreator.error(Event.labels.SITE_UPDATE, errBody);
         res.error(err);
@@ -308,7 +310,7 @@ module.exports = {
         request: {
           params: req.params,
           path: req.path,
-        }
+        },
       };
       EventCreator.error(Event.labels.SITE_UPDATE, errBody);
       res.error(err);
@@ -342,7 +344,7 @@ module.exports = {
         request: {
           params: req.params,
           path: req.path,
-        }
+        },
       };
       EventCreator.error(Event.labels.SITE_UPDATE, errBody);
       res.error(err);

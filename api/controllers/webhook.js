@@ -137,7 +137,7 @@ module.exports = {
         request: {
           body: req.body,
           path: req.path,
-        }
+        },
       };
       EventCreator.error(Event.labels.BUILD_REQUEST, errBody);
       res.badRequest();
@@ -155,7 +155,7 @@ module.exports = {
         request: {
           body: req.body,
           path: req.path,
-        }
+        },
       };
       EventCreator.error(Event.labels.FEDERALIST_USERS_MEMBERSHIP, errBody);
       res.badRequest();

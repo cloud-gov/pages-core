@@ -3,7 +3,7 @@ const { User, Site, Event } = require('../models');
 const GitHub = require('./GitHub');
 const { logger } = require('../../winston');
 const UserActionCreator = require('./UserActionCreator');
-const EventCreator = require('../services/EventCreator');
+const EventCreator = require('./EventCreator');
 
 const auditUser = (user, auditor) => {
   let repos;
@@ -36,7 +36,7 @@ const auditUser = (user, auditor) => {
                 erorr: err.stack,
               });
             });
-            removed.push(r);
+          removed.push(r);
         }
       });
       return Promise.all(removed);

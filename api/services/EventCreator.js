@@ -26,13 +26,12 @@ const createEvent = async (obj) => {
     event = await Event.create(atts);
     if (event.type === Event.types.ERROR) {
       logger.error(JSON.stringify(event));
-    }
-    else {
+    } else {
       logger.info(JSON.stringify(event));
     }
-  } catch(err) {
+  } catch (err) {
     logger.warn([`Failed to create Event(${JSON.stringify(obj)}`, err.stack].join('\n'));
-  };
+  }
   return event;
 };
 

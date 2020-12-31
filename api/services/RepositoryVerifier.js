@@ -1,7 +1,7 @@
 const GitHub = require('./GitHub');
 const { User, Site, Event } = require('../models');
 const { logger } = require('../../winston');
-const EventCreator = require('../services/EventCreator');
+const EventCreator = require('./EventCreator');
 
 const verifyNextRepo = (site, userIndex = 0) => {
   let found;
@@ -50,7 +50,7 @@ const verifyUserRepos = (user) => {
     })
     .catch(err => EventCreator.error(Event.labels.SITE_USER, {
       error: err.stack,
-      message: `Unable to verify repositories for user@id=${user.id}`
+      message: `Unable to verify repositories for user@id=${user.id}`,
     }));
 };
 

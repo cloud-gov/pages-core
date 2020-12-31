@@ -33,7 +33,7 @@ const emitBuildStatus = build => Site.findByPk(build.site)
   .catch((err) => {
     const errBody = {
       message: `Failed to emit build@id=${build.id} status: ${build.state}`,
-      error:  err.stack,
+      error: err.stack,
     };
     EventCreator.error(Event.labels.SOCKET_IO, errBody);
   });
@@ -47,7 +47,7 @@ const saveBuildToProxy = async (build) => {
       filename: BUILD_SETTINGS_FILE,
       content: settings,
       message: `${BUILD_SETTINGS_FILE} saved to proxy database`,
-    }
+    };
     EventCreator.audit(Event.labels.BUILD_STATUS, build, body);
   }
 };
