@@ -5,9 +5,13 @@ const { audit, error } = require('../../../../api/services/EventCreator');
 const { logger } = require('../../../../winston');
 
 describe('EventCreateor', () => {
-  let loggerSpy;
+  let warnSpy;
+  let infoSpy;
+  let errorSpy;
   beforeEach(() => {
     warnSpy = sinon.spy(logger, 'warn');
+    infoSpy = sinon.spy(logger, 'info');
+    errorSpy = sinon.spy(logger, 'error');
   });
   afterEach(() => {
     sinon.restore();
@@ -21,6 +25,8 @@ describe('EventCreateor', () => {
           expect(event.model).to.equal('User');
           expect(event.modelId).to.equal(user.id);
           expect(event.body.hi).to.equal('bye');
+          expect(infoSpy.called).to.be.true;
+          expect(warnSpy.called).to.be.false;
           done();
       }));
   });
@@ -30,6 +36,7 @@ describe('EventCreateor', () => {
       .then(user => audit('invalidLabel', user, { hi: 'bye' }))
         .then(() => {
           expect(warnSpy.called).to.be.true;
+          expect(infoSpy.called).to.be.false;
           done();
         });
   });
@@ -42,6 +49,9 @@ describe('EventCreateor', () => {
         expect(event.model).to.be.null;
         expect(event.modelId).to.be.null;
         expect(event.body.bye).to.equal('hi');
+        expect(errorSpy.called).to.be.true;
+        expect(warnSpy.called).to.be.false;
+        expect(infoSpy.called).to.be.false;
         done();
       });
   });
@@ -51,6 +61,8 @@ describe('EventCreateor', () => {
       .then(user => error('invalidLabel', { hi: 'bye' }))
         .then(() => {
           expect(warnSpy.called).to.be.true;
+          expect(errorSpy.called).to.be.false;
+          expect(infoSpy.called).to.be.false;
           done();
         });
   });
