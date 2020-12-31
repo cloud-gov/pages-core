@@ -676,4 +676,56 @@ describe('GitHub', () => {
       expect(result).to.be.undefined;
     });
   });
+
+  describe('.getContent', () => {
+    const accessToken = 'token';
+    const owner = 'repo-owner';
+    const repo = 'repo-name';
+    const path = 'file-path.json';
+    const ref = 'theRef';
+    /* eslint-disable camelcase */
+    it('returns a file based on the supplied parameters', async () => {
+      const content = 'helloworld';
+
+      githubAPINocks.getContent({ accessToken, owner, repo, path, ref, content });
+
+      const resp = await GitHub.getContent(accessToken, owner, repo, path, ref);
+      expect(resp).to.equal('helloworld');
+    });
+
+    it('returns a file based on the supplied parameters without ref (sha/branch)', async () => {
+      const content = 'helloworld';
+
+      githubAPINocks.getContent({ accessToken, owner, repo, path, content });
+
+      const resp = await GitHub.getContent(accessToken, owner, repo, path);
+      expect(resp).to.equal('helloworld');
+    });
+
+    it('returns an array (ie: dir files meta data) based on the supplied parameters', async () => {
+      const content = [1, 2, 3];
+      const type = undefined;
+
+      githubAPINocks.getContent({ accessToken, owner, repo, path, ref, content, type });
+
+      const resp = await GitHub.getContent(accessToken, owner, repo, path, ref);
+      expect(resp).to.eql(content);
+    });
+
+    it('returns a 404 based on invalid supplied parameters', async () => {
+      githubAPINocks.getContent({ accessToken, owner, repo, path, ref, responseCode: 404 });
+
+      const content = await GitHub.getContent(accessToken, owner, repo, path, ref);
+      expect(content).to.be.null;
+    });
+
+    it('returns a 403 based on invalid supplied parameters', async () => {
+      githubAPINocks.getContent({ accessToken, owner, repo, path, ref, responseCode: 403 });
+
+      const err = await GitHub.getContent(accessToken, owner, repo, path, ref).catch(err => err);
+      expect(err.status).to.equal(403);
+      expect(err.message).to.equal('Error Encountered');
+    });
+    /* eslint-enable camelcase */
+  });
 });

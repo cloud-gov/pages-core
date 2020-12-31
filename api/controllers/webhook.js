@@ -1,12 +1,11 @@
 const crypto = require('crypto');
 const Sequelize = require('sequelize');
 const config = require('../../config');
-const GithubBuildStatusReporter = require('../services/GithubBuildStatusReporter');
+const GithubBuildHelper = require('../services/GithubBuildHelper');
 const EventCreator = require('../services/EventCreator');
 const {
   Build, User, Site, Event,
 } = require('../models');
-const { logger } = require('../../winston');
 
 const signBlob = (key, blob) => `sha1=${crypto.createHmac('sha1', key).update(blob).digest('hex')}`;
 
@@ -20,6 +19,7 @@ const findSiteForWebhookRequest = (request) => {
       repository,
       buildStatus: { [Sequelize.Op.ne]: 'inactive' },
     },
+    include: [{ model: User }],
   })
     .then((site) => {
       if (!site) {
@@ -59,9 +59,7 @@ const organizationWebhookRequest = async (payload) => {
   }
 };
 
-const addUserToSite = ({ user, site }) => user.addSite(site);
-
-const signWebhookRequest = request => new Promise((resolve, reject) => {
+const signWebhookRequest = (request) => {
   const webhookSecret = config.webhook.secret;
   const requestBody = JSON.stringify(request.body);
 
@@ -69,26 +67,27 @@ const signWebhookRequest = request => new Promise((resolve, reject) => {
   const signedRequestBody = signBlob(webhookSecret, requestBody);
 
   if (!signature) {
-    reject(new Error('No X-Hub-Signature found on request'));
+    throw new Error('No X-Hub-Signature found on request');
   } else if (signature !== signedRequestBody) {
-    reject(new Error('X-Hub-Signature does not match blob signature'));
-  } else {
-    resolve(true);
+    throw new Error('X-Hub-Signature does not match blob signature');
   }
-});
+};
 
 const createBuildForWebhookRequest = async (request) => {
   const { login } = request.body.sender;
   const { pushed_at: pushedAt } = request.body.repository;
   const username = login.toLowerCase();
-  const [user, site] = await Promise.all([
-    User.findOne({ where: { username } }),
-    findSiteForWebhookRequest(request),
-  ]);
+  const site = await findSiteForWebhookRequest(request);
 
+  let user = site.Users.find(u => u.username === username);
+  if (!user) {
+    user = await User.findOne({ where: { username } });
+    if (user) {
+      await site.addUser(user);
+    }
+  }
   if (user) {
     await user.update({ pushedAt: new Date(pushedAt * 1000) });
-    await addUserToSite({ user, site });
   }
 
   const branch = request.body.ref.replace('refs/heads/', '');
@@ -121,29 +120,29 @@ const createBuildForWebhookRequest = async (request) => {
 };
 
 module.exports = {
-  github: (req, res) => signWebhookRequest(req)
-    .then(() => {
+  github: async (req, res) => {
+    try {
+      let build;
+      signWebhookRequest(req);
       if (req.body.commits && req.body.commits.length > 0) {
-        return createBuildForWebhookRequest(req);
+        build = await createBuildForWebhookRequest(req);
+        await build.reload({ include: [{ model: Site, include: [{ model: User }] }] });
+        await GithubBuildHelper.reportBuildStatus(build);
       }
-      return Promise.resolve();
-    })
-    .then((build) => {
-      if (build) {
-        return GithubBuildStatusReporter.reportBuildStatus(build);
-      }
-      return Promise.resolve();
-    })
-    .then(() => res.ok())
-    .catch((err) => {
-      logger.error(err);
+      res.ok();
+    } catch (err) {
+      EventCreator.error(Event.labels.BUILD_REQUEST, ['Error processing push webhook', JSON.stringify(req.body), err]);
       res.badRequest();
-    }),
-  organization: (req, res) => signWebhookRequest(req)
-    .then(() => organizationWebhookRequest(req.body))
-    .then(() => res.ok())
-    .catch((err) => {
-      logger.error(err);
+    }
+  },
+  organization: async (req, res) => {
+    try {
+      signWebhookRequest(req);
+      await organizationWebhookRequest(req.body);
+      res.ok();
+    } catch (err) {
+      EventCreator.error(Event.labels.FEDERALIST_USERS_MEMBERSHIP, ['Error processing organization webhook', JSON.stringify(req.body), err]);
       res.badRequest();
-    }),
+    }
+  },
 };

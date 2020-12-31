@@ -449,6 +449,34 @@ const getMembershipForUserInOrg = ({
   return nok;
 };
 
+const getContent = ({
+  accessToken, owner, repo, path, ref, content, encoding, type, responseCode,
+}) => {
+  /* eslint-disable no-param-reassign */
+  accessToken = accessToken || 'access-token-123abc';
+  responseCode = responseCode || 200;
+  /* eslint-enable no-param-reassign */
+  let requestPath = `/repos/${owner}/${repo}/contents/${path}`;
+  if (ref) {
+    requestPath = `${requestPath}?ref=${ref}`;
+  }
+  const nok = withAuth(nock('https://api.github.com'), accessToken)
+    .get(requestPath);
+
+  if (responseCode >= 400) {
+    nok.reply(responseCode, { message: 'Error Encountered'});
+  } else if (Array.isArray(content)) {
+      nok.reply(responseCode, content);  
+  } else {
+    const response = {};
+    response.encoding = encoding || 'base64';
+    response.type = type || 'file';
+    response.content = Buffer.from(content || 'blah').toString(response.encoding);
+    nok.reply(responseCode, response);
+  }
+  return nok;
+};
+
 module.exports = {
   getAccessToken,
   createRepoForOrg,
@@ -466,4 +494,5 @@ module.exports = {
   getRepositories,
   getCollaborators,
   getMembershipForUserInOrg,
+  getContent,
 };

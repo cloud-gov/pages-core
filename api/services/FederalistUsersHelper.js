@@ -111,9 +111,32 @@ const removeMembersWhoAreNotUsers = async ({ auditorUsername } = {}) => {
     .map(login => removeMemberFromFederalistUsersOrg(githubAccessToken, login)));
 };
 
+const deactivateUsersWhoAreNotMembers = async ({ auditorUsername } = {}) => {
+  /* eslint-disable no-param-reassign */
+  auditorUsername = auditorUsername || config.federalistUsers.admin;
+  /* eslint-enable no-param-reassign */
+  const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
+  const members = await GitHub.getOrganizationMembers(githubAccessToken, FEDERALIST_USERS_ORG);
+  const logins = members.map(m => m.login.toLowerCase());
+
+  const [, inactiveUsers] = await User.update({ isActive: false },
+    {
+      where: {
+        username: { [Op.notIn]: logins },
+        isActive: true,
+      },
+      returning: ['id', 'isActive'],
+    });
+
+  inactiveUsers.map(user => EventCreator.audit('deactivated', user, { // function for 1 time init use - to be deleted
+    action: { isActive: user.isActive },
+  }));
+};
+
 module.exports = {
   audit18F,
   federalistUsersAdmins,
   revokeMembershipForInactiveUsers,
   removeMembersWhoAreNotUsers,
+  deactivateUsersWhoAreNotMembers,
 };

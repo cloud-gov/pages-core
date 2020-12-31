@@ -12,7 +12,7 @@ commands:
         default: ./.cloudgov/manifest.yml
       action:
         type: enum
-        enum: ["deploy", "task"]
+        enum: ["deploy", "restage", "task"]
         default: "deploy"
       app:
         type: string
@@ -79,6 +79,16 @@ commands:
                 name: Run task '<< parameters.task-name >>' from app '<< parameters.app >>'
                 command: |
                   cf run-task << parameters.app >> --name << parameters.task-name >> --command "<< parameters.task-command >>"
+
+      - when:
+          condition:
+            equal: ["restage", << parameters.action >> ]
+          steps:
+            - run:
+                name: Restage app '<< parameters.app >>'
+                command: |
+                  cf restage << parameters.app >> --strategy rolling
+
 
       - run:
           name: Log out from cloud.gov
@@ -214,6 +224,20 @@ jobs:
           app: << parameters.app >>
 
 
+  restage:
+    docker:
+      - image: cimg/base:2020.01
+    parameters:
+      app:
+        type: string
+    steps:
+      - checkout
+
+      - deploy-to-cg:
+          app: << parameters.app >>
+          action: restage
+
+
   run-task:
     docker:
       - image: cimg/base:2020.01
@@ -338,6 +362,26 @@ workflows:
           filters:
             branches:
               only: main
+
+      - restage:
+          matrix:
+            parameters:
+              app:
+                - federalistapp
+                - federalist-admin
+          filters:
+            branches:
+              only: main
+
+      - restage:
+          matrix:
+            parameters:
+              app:
+                - federalistapp-staging
+                - federalist-admin-staging
+          filters:
+            branches:
+              only: staging
 
   every-ten-minutes:
     triggers:
