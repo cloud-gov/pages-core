@@ -1,4 +1,11 @@
 version: '3'
+
+volumes:
+  db-data:
+  yarn:
+  nm-app:
+  nm-admin:
+
 services:
   app:
     build:
@@ -6,7 +13,10 @@ services:
       context: .
     command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "watch"]
     volumes:
-      - .:/app:delegated
+      - yarn:/usr/local/share/.cache/yarn
+      - .:/app
+      - /app/admin-client/
+      - nm-app:/app/node_modules
     ports:
       - "1337:1337" # for the app itself
       - "8888:8888" # for viewing analyze-webpack
@@ -22,11 +32,13 @@ services:
       APP_HOSTNAME: http://localhost:1337
       AUTH_IDP: uaa
   admin-client:
-    image: node:14.15
-    working_dir: /app
+    build:
+      dockerfile: ./admin-client/Dockerfile-admin
+      context: .
     volumes:
+      - yarn:/usr/local/share/.cache/yarn
       - ./admin-client:/app
-      - ~/Library/Caches/Yarn:/usr/local/share/.cache/yarn
+      - nm-admin:/app/node_modules
     ports:
       - "3000:3000"
       - "35729:35729"
@@ -45,5 +57,3 @@ services:
       POSTGRES_DB: federalist
       POSTGRES_TEST_DB: federalist-test
       POSTGRES_PASSWORD: password
-volumes:
-  db-data:
