@@ -21,6 +21,7 @@ const siteErrors = require('../../../api/responses/siteErrors');
 const ProxyDataSync = require('../../../api/services/ProxyDataSync');
 const SQS = require('../../../api/services/SQS');
 const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
+const EventCreator = require('../../../api/services/EventCreator');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 let removeSiteStub;
@@ -33,6 +34,7 @@ describe('Site API', () => {
     removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').resolves();
     saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').rejects();
     sinon.stub(SQS, 'sendBuildMessage').resolves();
+    sinon.stub(EventCreator, 'error').resolves();
   });
 
   afterEach(() => {
