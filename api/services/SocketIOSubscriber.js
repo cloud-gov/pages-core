@@ -1,5 +1,6 @@
 const { logger } = require('../../winston');
-const { User, Site } = require('../models');
+const { User, Site, Event } = require('../models');
+const EventCreator = require('./EventCreator');
 
 const getSiteRoom = siteId => `site-${siteId}`;
 const getBuilderRoom = (siteId, userId) => `site-${siteId}-user-${userId}`;
@@ -25,7 +26,11 @@ const joinRooms = (_socket) => {
         });
         return Promise.resolve();
       })
-      .catch(err => logger.error(err));
+      .catch(err => EventCreator.error(Event.labels.SOCKET_IO, {
+        message: 'User is unable to join site rooms',
+        error: err.stack,
+        userId,
+      }));
   }
   return Promise.resolve();
 };
