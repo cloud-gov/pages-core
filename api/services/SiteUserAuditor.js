@@ -1,8 +1,9 @@
 const Sequelize = require('sequelize');
-const { User, Site } = require('../models');
+const { User, Site, Event } = require('../models');
 const GitHub = require('./GitHub');
 const { logger } = require('../../winston');
 const UserActionCreator = require('./UserActionCreator');
+const EventCreator = require('../services/EventCreator');
 
 const auditUser = (user, auditor) => {
   let repos;
@@ -25,18 +26,27 @@ const auditUser = (user, auditor) => {
               siteId: site.id,
             }))
             .then(() => {
-              const msg = [];
-              msg.push(`auditUser remove ${user.username} from ${site.owner}/${site.repository}`);
-              if (repoFound) { msg.push(`:${repoFound.full_name} => ${JSON.stringify(repoFound.permissions)}`); }
-              logger.info(msg.join('\t'));
+              EventCreator.audit(Event.labels.SITE_USER, user, {
+                message: `Removed user from site@id=${site.id}: User does not have write permisisons to ${fullName}`,
+              });
             })
-            .catch(logger.error);
-          removed.push(r);
+            .catch((err) => {
+              EventCreator.error(Event.labels.SITE_USER, {
+                message: `Failed to remove user from site@id=${site.id}: User does not have write permisisons to ${fullName}`,
+                erorr: err.stack,
+              });
+            });
+            removed.push(r);
         }
       });
       return Promise.all(removed);
     })
-    .catch(logger.error);
+    .catch((err) => {
+      EventCreator.error(Event.labels.SITE_USER, {
+        message: `Failed to audit sites for user@${user.id}`,
+        erorr: err.stack,
+      });
+    });
 };
 
 const auditAllUsers = () => {
@@ -81,19 +91,28 @@ const auditSite = (auditor, site, userIndex = 0) => {
               siteId: site.id,
             }))
             .then(() => {
-              const msg = [];
-              msg.push(`auditSite - remove ${u.username} from ${site.owner}/${site.repository}:`);
-              msg.push(`${JSON.stringify(collaborators.find(c => c.login === u.username))}`);
-              logger.info(msg.join('\t'));
+              EventCreator.audit(Event.labels.SITE_USER, user, {
+                message: `Removed user from site@id=${site.id}: User does not have write permisisons to ${fullName}`,
+              });
             })
-            .catch(logger.error);
+            .catch((err) => {
+              EventCreator.error(Event.labels.SITE_USER, {
+                message: `Failed to remove user from site@id=${site.id}: User does not have write permisisons to ${fullName}`,
+                erorr: err.stack,
+              });
+            });
           removed.push(r);
         });
         return Promise.all(removed);
       }
       return auditSite(auditor, site, userIndex + 1);
     })
-    .catch(logger.error);
+    .catch((err) => {
+      EventCreator.error(Event.labels.SITE_USER, {
+        message: `Failed to audit site users for site@${site.id}`,
+        erorr: err.stack,
+      });
+    });
 };
 
 const auditAllSites = () => {
