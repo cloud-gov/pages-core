@@ -7,7 +7,7 @@ const { logger } = require('../../../../winston');
 describe('EventCreateor', () => {
   let loggerSpy;
   beforeEach(() => {
-    loggerSpy = sinon.spy(logger, 'warn');
+    warnSpy = sinon.spy(logger, 'warn');
   });
   afterEach(() => {
     sinon.restore();
@@ -29,7 +29,7 @@ describe('EventCreateor', () => {
     factory.user()
       .then(user => audit('invalidLabel', user, { hi: 'bye' }))
         .then(() => {
-          expect(loggerSpy.called).to.be.true;
+          expect(warnSpy.called).to.be.true;
           done();
         });
   });
@@ -50,7 +50,7 @@ describe('EventCreateor', () => {
     factory.user()
       .then(user => error('invalidLabel', { hi: 'bye' }))
         .then(() => {
-          expect(loggerSpy.called).to.be.true;
+          expect(warnSpy.called).to.be.true;
           done();
         });
   });
