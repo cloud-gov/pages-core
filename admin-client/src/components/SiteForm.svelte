@@ -30,45 +30,43 @@
   afterUpdate(() => { submitting = false; });
 </script>
 
-<SectionHeader>
-  Config
-</SectionHeader>
-<form
-  class="usa-form width-full maxw-none padding-1"
-  on:submit|preventDefault={handleSubmit}
->
-  <fieldset class="usa-fieldset">
-    <legend class="usa-legend usa-sr-only">Build Container</legend>
-    <div class="grid-row">
-      <label class="usa-label grid-col" for="container-size">Build Container Size</label>
-      <select
-        class="usa-select grid-col-4"
-        id="container-size"
-        name="containerSize"
-        value={site.containerConfig.size}
-      >
-        {#each buildContainerSizes as buildContainerSize}
-          <option value={buildContainerSize}>
-            {buildContainerSize}
-          </option>
-        {/each}
-      </select>
-    </div>        
-    <div class="grid-row">
-      <label class="usa-label grid-col" for="container-name">Build Container Name</label>
-      <select
-        class="usa-select grid-col-4"
-        id="container-name"
-        name="containerName"
-        value={site.containerConfig.name}
-      >
-        {#each buildContainerNames as buildContainerName}
-          <option value={buildContainerName}>
-            {buildContainerName}
-          </option>
-        {/each}
-      </select>
-    </div>     
-  </fieldset>
-  <input class="usa-button" type="submit" value="Save" disabled={submitting}>
-</form>
+<div class="grid-row">
+  <form
+    class="usa-form padding-1 grid-col-8 grid-offset-4"
+    on:submit|preventDefault={handleSubmit}
+  >
+    <h3 class="margin-0">Build Container Configuration</h3>
+    <fieldset class="usa-fieldset">
+      <legend class="usa-legend">Build Container Size</legend>
+      {#each buildContainerSizes as buildContainerSize}
+        <div class="usa-radio">
+          <input
+            class="usa-radio__input usa-radio__input--tile"
+            type="radio"
+            name="containerSize"
+            id={buildContainerSize}
+            value={buildContainerSize}
+            checked={(site.containerConfig?.size || 'default') === buildContainerSize}>
+          <label class="usa-radio__label" for={buildContainerSize}>{buildContainerSize}</label>
+        </div>
+      {/each}
+    </fieldset>
+
+    <fieldset class="usa-fieldset">
+      <legend class="usa-legend">Build Container Name</legend>
+      {#each buildContainerNames as buildContainerName}
+        <div class="usa-radio">
+          <input
+            class="usa-radio__input usa-radio__input--tile"
+            type="radio"
+            name="containerName"
+            id={buildContainerName}
+            value={buildContainerName}
+            checked={(site.containerConfig?.name || 'default') === buildContainerName}>
+          <label class="usa-radio__label" for={buildContainerName}>{buildContainerName}</label>
+        </div>
+      {/each}
+    </fieldset>
+    <input class="usa-button" type="submit" value="Save" disabled={submitting}>
+  </form>
+</div>

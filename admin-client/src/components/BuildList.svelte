@@ -5,10 +5,6 @@
   export let builds = [];
 </script>
 
-
-<SectionHeader>
-  Builds
-</SectionHeader>
 {#if builds.length === 0}
   <p>No builds are available.</p>
 {/if}

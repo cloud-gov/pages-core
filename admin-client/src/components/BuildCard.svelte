@@ -29,18 +29,18 @@
   }[buildState] || 'bg-gray-30');
 </script>
 
-<div class="padding-2 {bgColor}">
-  <div class="grid-container padding-top-1 shadow-2 bg-white">
+<a href="/builds/{id}" class="card-link">
+  <div class="card grid-container padding-top-1 shadow-2 bg-white margin-bottom-1 text-black">
     {#if showSite}
       <div class="grid-row padding-bottom-1">
-        <a href="/builds/{id}">
+        <a href="/sites/{site.id}">
           <h3 class="text-bold margin-0">{site.owner}/{site.repository}</h3>
         </a>
       </div>
     {/if}
     <div class="grid-row grid-gap">
       <div class="grid-col-auto padding-bottom-1">
-        <span class="usa-tag radius-pill {stateColor(state)}">{state}</span>
+        <span class="usa-tag radius-pill {stateColor(state)} ">{state}</span>
       </div>
       <div class="grid-col-auto padding-bottom-1">
         <LabeledItem label="id" value={id} />
@@ -59,4 +59,14 @@
       </div>
     </div>
   </div>
-</div>
+</a>
+
+<style>
+  .card-link {
+    text-decoration: none;
+  }
+  .card:hover {
+    background-color:  #f8f8f8;
+    
+  }
+</style>

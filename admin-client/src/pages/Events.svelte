@@ -7,8 +7,12 @@
     PaginationBanner,
   } from '../components';
 
+  const limits = [
+    '10', '25', '50', '100'
+  ];
+
   const defaultParams = {
-    limit: 25,
+    limit: '25',
     page: 1,
     type: '',
     label: '',
@@ -21,18 +25,15 @@
 </script>
 
 <style>
-
   td code {
     word-wrap: anywhere;
   }
 </style>
-
 <GridContainer classes={['padding-bottom-3']}>
   <PageTitle>Events</PageTitle>
   <div class="grid-row margin-bottom-3">
     {#if results}
       <form method="GET" action="/events" class="font-body-md">
-        <input type="hidden" name="limit" value={params.limit}/>
         <input type="hidden" name="page" value="1"/>
         <label for="type">Event Type</label>
         <select name="type" id="type" value={params.type}>
@@ -48,6 +49,12 @@
             <option value={label}>{label}</option>
           {/each}
         </select>
+        <label for="limit">Num Results</label>
+        <select name="limit" id="limit" value={params.limit}>
+          {#each limits as limit}
+            <option value={limit}>{limit}</option>
+          {/each}
+        </select>        
         <button type="submit">Search</button>
       </form>
     {/if}

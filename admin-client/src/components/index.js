@@ -1,3 +1,5 @@
+export { default as Accordion } from './Accordion.svelte';
+export { default as AccordionContent } from './AccordionContent.svelte';
 export { default as Alert } from './Alert.svelte';
 export { default as Banner } from './Banner.svelte';
 export { default as BuildCard } from './BuildCard.svelte';

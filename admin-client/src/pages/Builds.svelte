@@ -11,8 +11,8 @@
   {#await fetchBuilds()}
     <p>Loading builds...</p>
   {:then builds}
-    {#if builds.length > 0}
-      {#each builds as build, index}
+    {#if builds.data.length > 0}
+      {#each builds.data as build, index}
         <BuildCard {build} {index} showSite={true} />
       {/each}
     {:else}
