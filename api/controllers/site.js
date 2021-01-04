@@ -304,7 +304,7 @@ module.exports = {
               path: req.path
             },
             error: err.stack,
-          });
+          }));
       }
 
       const siteJSON = await siteSerializer.serialize(site);

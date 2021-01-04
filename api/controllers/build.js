@@ -32,7 +32,7 @@ const emitBuildStatus = build => Site.findByPk(build.site)
   })
   .catch((err) => {
     const errBody = {
-      message: `Failed to emit build status`,
+      message: 'Failed to emit build status',
       error: err.stack,
       buildId: build.id,
     };
