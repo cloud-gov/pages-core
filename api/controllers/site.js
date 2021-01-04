@@ -184,7 +184,7 @@ module.exports = {
           return ProxyDataSync.saveSite(site)
             .catch((err) => {
               const errBody = {
-                message: `Error saving new site@id=${site.id} to proxy database`,
+                message: `Error saving new site to proxy database`,
                 error: err.stack,
                 site,
               };
@@ -298,7 +298,13 @@ module.exports = {
 
       if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
         ProxyDataSync.saveSite(site) // sync to proxy database
-          .catch(err => EventCreator.error(Event.labels.SITE_UPDATE, [`site@id=${site.id}`, err.stack]));
+          .catch(err => EventCreator.error(Event.labels.PROXY_EDGE, {
+            request: {
+              params: req.params,
+              path: req.path
+            },
+            error: err.stack,
+          });
       }
 
       const siteJSON = await siteSerializer.serialize(site);
@@ -332,7 +338,13 @@ module.exports = {
 
       if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
         ProxyDataSync.saveSite(site) // sync to proxy database
-          .catch(err => EventCreator.error(Event.labels.SITE_UPDATE, [`site@id=${site.id}`, err.stack]));
+          .catch(err => EventCreator.error(Event.labels.PROXY_EDGE, {
+            request: {
+              params: req.params,
+              path: req.path,
+            },
+            error: err.stack,
+          });
       }
 
       const siteJSON = await siteSerializer.serialize(site);

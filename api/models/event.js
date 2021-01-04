@@ -21,6 +21,8 @@ module.exports = (sequelize, DataTypes) => {
     SITE_ADD: 'site-add',
     SITE_DESTROY: 'site-destroy',
     PROXY_EDGE: 'proxy-edge',
+    UEV_ADD: 'uev-add',
+    UEV_DESTROY: 'uev-add',
   };
 
   function isValidType(value) {

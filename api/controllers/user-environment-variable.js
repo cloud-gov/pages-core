@@ -67,7 +67,7 @@ module.exports = wrapHandlers({
         error: err.stack,
       };
 
-      EventCreator.error(Event.labels.BUILD_REQUEST, errBody);
+      EventCreator.error(Event.labels.UEV_ADD, errBody);
       if (err.name !== 'SequelizeUniqueConstraintError') {
         throw err;
       }

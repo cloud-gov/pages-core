@@ -27,13 +27,15 @@ const auditUser = (user, auditor) => {
             }))
             .then(() => {
               EventCreator.audit(Event.labels.SITE_USER, user, {
-                message: `Removed user from site@id=${site.id}: User does not have write permisisons to ${fullName}`,
+                message: 'Removed user from site. User does not have write permisisons',
+                siteId: site.id,
               });
             })
             .catch((err) => {
               EventCreator.error(Event.labels.SITE_USER, {
-                message: `Failed to remove user from site@id=${site.id}: User does not have write permisisons to ${fullName}`,
+                message: 'Failed to remove user from site. User does not have write permisisons',
                 erorr: err.stack,
+                siteId: site.id,
               });
             });
           removed.push(r);
@@ -92,13 +94,16 @@ const auditSite = (auditor, site, userIndex = 0) => {
             }))
             .then(() => {
               EventCreator.audit(Event.labels.SITE_USER, user, {
-                message: `Removed user@id=${user.id} from site@id=${site.id}: User does not have write permisisons`,
+                message: `Removed user from site. User does not have write permisisons`,
+                siteId: site.id,
               });
             })
             .catch((err) => {
               EventCreator.error(Event.labels.SITE_USER, {
-                message: `Failed to remove user@id=${user.id} from site@id=${site.id}: User does not have write permisisons`,
+                message: `Failed to remove user from site. User does not have write permisisons`,
                 erorr: err.stack,
+                userId: u.id,
+                siteId: site.id,
               });
             });
           removed.push(r);
@@ -109,8 +114,9 @@ const auditSite = (auditor, site, userIndex = 0) => {
     })
     .catch((err) => {
       EventCreator.error(Event.labels.SITE_USER, {
-        message: `Failed to audit site users for site@${site.id}`,
+        message: 'Failed to audit site users for site',
         erorr: err.stack,
+        siteId: site.id,
       });
     });
 };

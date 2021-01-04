@@ -32,8 +32,9 @@ const emitBuildStatus = build => Site.findByPk(build.site)
   })
   .catch((err) => {
     const errBody = {
-      message: `Failed to emit build@id=${build.id} status: ${build.state}`,
+      message: `Failed to emit build status`,
       error: err.stack,
+      buildId: build.id,
     };
     EventCreator.error(Event.labels.SOCKET_IO, errBody);
   });
