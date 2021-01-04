@@ -184,7 +184,7 @@ module.exports = {
           return ProxyDataSync.saveSite(site)
             .catch((err) => {
               const errBody = {
-                message: `Error saving new site to proxy database`,
+                message: 'Error saving new site to proxy database',
                 error: err.stack,
                 site,
               };
@@ -301,7 +301,7 @@ module.exports = {
           .catch(err => EventCreator.error(Event.labels.PROXY_EDGE, {
             request: {
               params: req.params,
-              path: req.path
+              path: req.path,
             },
             error: err.stack,
           }));
@@ -344,7 +344,7 @@ module.exports = {
               path: req.path,
             },
             error: err.stack,
-          });
+          }));
       }
 
       const siteJSON = await siteSerializer.serialize(site);
