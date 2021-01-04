@@ -32,7 +32,7 @@ const emitBuildStatus = build => Site.findByPk(build.site)
     socketIO.to(builderRoom).emit('build status', msg);
     return Promise.resolve();
   })
-  .catch(err => logger.error(err));
+  .catch(err => logger.error(err.stack));
 
 const saveBuildToProxy = async (build) => {
   const buildSettings = await GithubBuildHelper.fetchContent(build, BUILD_SETTINGS_FILE);
@@ -116,7 +116,7 @@ module.exports = {
       }
       res.ok({});
     } catch (err) {
-      EventCreator.error(Event.labels.BUILD_REQUEST, ['Error processing rebuild request', JSON.stringify(req.body), err]);
+      EventCreator.error(Event.labels.BUILD_REQUEST, ['Error processing rebuild request', JSON.stringify(req.body), err.stack]);
       res.error(err);
     }
   },
@@ -136,7 +136,7 @@ module.exports = {
         const errMsg = [
           `Error decoding build status message for build@id=${statusRequest.params.id}`,
           `build@message: ${statusRequest.body.message}`,
-          err,
+          err.stack,
         ];
         EventCreator.error(Event.labels.BUILD_STATUS, errMsg);
       }
@@ -169,7 +169,7 @@ module.exports = {
 
       res.ok();
     } catch (err) {
-      EventCreator.error(Event.labels.BUILD_STATUS, ['Error processing build status request', JSON.stringify(req.params), JSON.stringify(req.body), err]);
+      EventCreator.error(Event.labels.BUILD_STATUS, ['Error processing build status request', JSON.stringify(req.params), JSON.stringify(req.body), err.stack]);
       res.error(err);
     }
   },
