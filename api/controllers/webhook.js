@@ -131,7 +131,7 @@ module.exports = {
       }
       res.ok();
     } catch (err) {
-      EventCreator.error(Event.labels.BUILD_REQUEST, ['Error processing push webhook', JSON.stringify(req.body), err]);
+      EventCreator.error(Event.labels.BUILD_REQUEST, ['Error processing push webhook', JSON.stringify(req.body), err.stack]);
       res.badRequest();
     }
   },
@@ -141,7 +141,7 @@ module.exports = {
       await organizationWebhookRequest(req.body);
       res.ok();
     } catch (err) {
-      EventCreator.error(Event.labels.FEDERALIST_USERS_MEMBERSHIP, ['Error processing organization webhook', JSON.stringify(req.body), err]);
+      EventCreator.error(Event.labels.FEDERALIST_USERS_MEMBERSHIP, ['Error processing organization webhook', JSON.stringify(req.body), err.stack]);
       res.badRequest();
     }
   },
