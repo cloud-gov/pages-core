@@ -116,7 +116,7 @@ module.exports = {
       }
       res.ok({});
     } catch (err) {
-      EventCreator.error(Event.labels.BUILD_REQUEST, ['Error processing rebuild request', JSON.stringify(req.body), err]);
+      EventCreator.error(Event.labels.BUILD_REQUEST, ['Error processing rebuild request', JSON.stringify(req.body), err.stack]);
       res.error(err);
     }
   },
