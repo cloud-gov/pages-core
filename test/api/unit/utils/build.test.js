@@ -51,10 +51,10 @@ describe('build utils', () => {
     });
 
     it('non-default/demo branch url start with preview w/ slash named branch', async () => {
-      const build = await factory.build({ branch: 'ot/h//e///r', site });
+      const build = await factory.build({ branch: 'o-t-/h//e///r', site });
       const url = [
         `https://${site.awsBucketName}.app.cloud.gov`,
-        `/preview/${site.owner}/${site.repository}/ot-h-e-r`,
+        `/preview/${site.owner}/${site.repository}/o-t---h--e--r`,
       ].join('');
       expect(buildUrl(build, site)).to.eql(url);
     });
