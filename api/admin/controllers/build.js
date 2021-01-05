@@ -12,12 +12,11 @@ function safeWrite(res, data) {
 }
 
 module.exports = wrapHandlers({
-  async list(req, res) {    
+  async list(req, res) {
     const {
       limit, page, ...options
     } = req.query;
 
-    
     const queryFields = Object.keys(Build.rawAttributes);
 
     const query = {
@@ -89,5 +88,5 @@ module.exports = wrapHandlers({
     safeWrite(res, result.logs);
 
     return res.end();
-  }
+  },
 });
