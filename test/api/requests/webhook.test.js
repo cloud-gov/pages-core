@@ -206,12 +206,13 @@ describe('Webhook API', () => {
       expect(builds).to.have.length(0);
     });
 
-    it('should respond with a 400 if the site does not exist on Federalist', async () => {
+    it('should respond with a 200 if the site does not exist on Federalist', async () => {
       const user = await factory.user();
       const payload = buildWebhookPayload(user, {
         owner: user.username,
         repository: 'fake-repo-name',
       });
+      const startCount = await Build.count();
       const signature = signWebhookPayload(payload);
 
       await request(app)
@@ -223,11 +224,12 @@ describe('Webhook API', () => {
           'X-GitHub-Delivery': '123abc',
         })
         .expect(200);
-
+        const endCount = await Build.count();
+        expect(endCount).to.equal(startCount);
         expect(warnStub.calledOnce).to.be.true;
     });
 
-    it('should respond with a 400 if the site is inactive on Federalist', async () => {
+    it('should respond with a 200 if the site is inactive on Federalist', async () => {
       const user = await factory.user();
       const site = await factory.site({ users: [user], buildStatus: 'inactive' });
       const payload = buildWebhookPayload(user, {
@@ -235,7 +237,7 @@ describe('Webhook API', () => {
         repository: site.repository,
       });
       const signature = signWebhookPayload(payload);
-
+      const startCount = await Build.count();
       await request(app)
         .post('/webhook/github')
         .send(payload)
@@ -245,6 +247,9 @@ describe('Webhook API', () => {
           'X-GitHub-Delivery': '123abc',
         })
         .expect(200);
+
+        const endCount = await Build.count();
+        expect(endCount).to.equal(startCount);
     });
 
     it('should respond with a 400 if the signature is invalid', (done) => {
