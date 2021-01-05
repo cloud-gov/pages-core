@@ -24,11 +24,6 @@
   $: (async () => { results = await query; })();
 </script>
 
-<style>
-  td code {
-    word-wrap: anywhere;
-  }
-</style>
 <GridContainer classes={['padding-bottom-3']}>
   <PageTitle>Events</PageTitle>
   <div class="grid-row margin-bottom-3">
@@ -91,3 +86,9 @@
     {/await}
     </div>
 </GridContainer>
+
+<style>
+  td code {
+    word-wrap: anywhere;
+  }
+</style>

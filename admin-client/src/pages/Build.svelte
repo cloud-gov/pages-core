@@ -56,16 +56,20 @@
 <GridContainer>
   {#if build}
     <PageTitle>
-      <div class="display-flex flex-justify flex-align-center">
-        {site.owner}/{site.repository}#{build.branch}
+      Build {build.id}
+    </PageTitle>
+    <h3>
+      <div class="display-flex flex-justify flex-align-center font-sans-lg">
+        <span><a href="/sites/{site.id}">{site.owner}/{site.repository}</a>#{build.branch}</span>
         <span class="usa-tag radius-pill padding-y-1 {stateColor(build.state)}">{build.state}</span>
       </div>
-    </PageTitle>
+    </h3>
     <div class="grid-row">
       <div class="tablet:grid-col-fill padding-bottom-1">
         <LabeledItem label="id" value={build.id} />
         <LabeledItem label="branch" value={build.branch} />
-        <LabeledItem label="commit" value={build.commitSha} />
+        <LabeledItem label="requested commit" value={build.requestedCommitSha} />
+        <LabeledItem label="cloned commit" value={build.clonedCommitSha} />
         <LabeledItem label="created at" value={formatDateTime(build.createdAt)} />
         <LabeledItem label="updated at" value={formatDateTime(build.updatedAt)} />
       </div>

@@ -12,7 +12,7 @@
   import {
     Accordion,
     AccordionContent,
-    BuildList,
+    BuildTable,
     SiteDeleteForm,
     GridContainer,
     PageTitle,
@@ -45,10 +45,10 @@
       </AccordionContent>
       <AccordionContent title="Recent Builds">
         {#if id}
-          {#await fetchBuilds({ site: id })}
+          {#await fetchBuilds({ site: id, limit: 10 })}
             <p>Loading builds...</p>
           {:then builds}
-            <BuildList builds={builds.data} />
+            <BuildTable builds={builds.data} />
           {:catch error}
             <p>Something went wrong fetching the site builds: {error.message}</p>
           {/await}
