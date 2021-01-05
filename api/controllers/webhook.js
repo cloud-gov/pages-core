@@ -73,11 +73,10 @@ const signWebhookRequest = (request) => {
   }
 };
 
-const createBuildForWebhookRequest = async (request) => {
+const createBuildForWebhookRequest = async (request, site) => {
   const { login } = request.body.sender;
   const { pushed_at: pushedAt } = request.body.repository;
   const username = login.toLowerCase();
-  const site = await findSiteForWebhookRequest(request);
 
   let user = site.Users.find(u => u.username === username);
   if (!user) {
@@ -125,9 +124,23 @@ module.exports = {
       let build;
       signWebhookRequest(req);
       if (req.body.commits && req.body.commits.length > 0) {
-        build = await createBuildForWebhookRequest(req);
-        await build.reload({ include: [{ model: Site, include: [{ model: User }] }] });
-        await GithubBuildHelper.reportBuildStatus(build);
+        const site = await findSiteForWebhookRequest(req)
+          .catch((err) => {
+            EventCreator.warn({
+              error: err.stack,
+              request: {
+                path: req.path,
+                params: req.params,
+                body: req.body,
+              },
+            });
+            return null;
+          });
+        if (site) {
+          build = await createBuildForWebhookRequest(req, site);
+          await build.reload({ include: [{ model: Site, include: [{ model: User }] }] });
+          await GithubBuildHelper.reportBuildStatus(build);
+        }
       }
       res.ok();
     } catch (err) {

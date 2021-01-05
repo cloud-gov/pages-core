@@ -42,9 +42,11 @@ describe('Webhook API', () => {
 
   let errorStub;
   let auditStub;
+  let warnStub;
   beforeEach(() => {
     errorStub = sinon.stub(EventCreator, 'error').resolves();
     auditStub = sinon.stub(EventCreator, 'audit').resolves();
+    warnStub = sinon.stub(EventCreator, 'warn').resolves();
   });
 
   afterEach(() => {
@@ -204,50 +206,45 @@ describe('Webhook API', () => {
       expect(builds).to.have.length(0);
     });
 
-    it('should respond with a 400 if the site does not exist on Federalist', (done) => {
-      factory.user().then((user) => {
-        const payload = buildWebhookPayload(user, {
-          owner: user.username,
-          repository: 'fake-repo-name',
-        });
-        const signature = signWebhookPayload(payload);
+    it('should respond with a 400 if the site does not exist on Federalist', async () => {
+      const user = await factory.user();
+      const payload = buildWebhookPayload(user, {
+        owner: user.username,
+        repository: 'fake-repo-name',
+      });
+      const signature = signWebhookPayload(payload);
 
-        request(app)
-          .post('/webhook/github')
-          .send(payload)
-          .set({
-            'X-GitHub-Event': 'push',
-            'X-Hub-Signature': signature,
-            'X-GitHub-Delivery': '123abc',
-          })
-          .expect(400, done);
-      }).catch(done);
+      await request(app)
+        .post('/webhook/github')
+        .send(payload)
+        .set({
+          'X-GitHub-Event': 'push',
+          'X-Hub-Signature': signature,
+          'X-GitHub-Delivery': '123abc',
+        })
+        .expect(200);
+
+        expect(warnStub.calledOnce).to.be.true;
     });
 
-    it('should respond with a 400 if the site is inactive on Federalist', (done) => {
-      let user;
-      factory.user()
-        .then((model) => {
-          user = model;
-          return factory.site({ users: [user], buildStatus: 'inactive' });
-        })
-        .then((site) => {
-          const payload = buildWebhookPayload(user, {
-            owner: site.owner,
-            repository: site.repository,
-          });
-          const signature = signWebhookPayload(payload);
+    it('should respond with a 400 if the site is inactive on Federalist', async () => {
+      const user = await factory.user();
+      const site = await factory.site({ users: [user], buildStatus: 'inactive' });
+      const payload = buildWebhookPayload(user, {
+        owner: site.owner,
+        repository: site.repository,
+      });
+      const signature = signWebhookPayload(payload);
 
-          request(app)
-            .post('/webhook/github')
-            .send(payload)
-            .set({
-              'X-GitHub-Event': 'push',
-              'X-Hub-Signature': signature,
-              'X-GitHub-Delivery': '123abc',
-            })
-            .expect(400, done);
-        }).catch(done);
+      await request(app)
+        .post('/webhook/github')
+        .send(payload)
+        .set({
+          'X-GitHub-Event': 'push',
+          'X-Hub-Signature': signature,
+          'X-GitHub-Delivery': '123abc',
+        })
+        .expect(200);
     });
 
     it('should respond with a 400 if the signature is invalid', (done) => {

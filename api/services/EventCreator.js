@@ -26,6 +26,8 @@ const createEvent = async (obj) => {
     event = await Event.create(atts);
     if (event.type === Event.types.ERROR) {
       logger.error(JSON.stringify(event));
+    } else if (event.type === Event.types.WARN) {
+      logger.warn(JSON.stringify(event));
     } else {
       logger.info(JSON.stringify(event));
     }
@@ -48,7 +50,14 @@ const error = (label, body) => createEvent({
   body,
 });
 
+const warn = (label, body) => createEvent({
+  type: Event.types.WARNING,
+  label,
+  body,
+});
+
 module.exports = {
   audit,
   error,
+  warn,
 };
