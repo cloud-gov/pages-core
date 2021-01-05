@@ -184,4 +184,32 @@ describe('FederalistUsersHelper', () => {
       expect(getOrg('federalist-users').length).to.equal(5);
     });
   });
+
+  describe('deactivateUsersWhoAreNotMembers', () => {
+    let eventStub;
+    beforeEach( async() => {
+      eventStub = sinon.stub(EventCreator, 'audit').resolves();
+      await User.truncate();
+    });
+
+    it('set inactive users to Active if in federalist-users', async () => {
+      const admin = await factory.user();
+      addMember('federalist-users', admin.username);
+      const users = [admin];
+      let i;
+      for (i = 0; i < 4; i += 1) {
+        const user = await await factory.user();
+        users.push(user);
+        if (i < 2 ) {
+          addMember('federalist-users', user.username.toUpperCase());
+        }  
+      }
+      expect(users.filter(user => user.isActive).length).to.equal(5);
+      await FederalistUsersHelper.deactivateUsersWhoAreNotMembers({ auditorUsername: admin.username });
+      const allUsers = await User.findAll();
+      expect(allUsers.filter(user => user.isActive).length).to.equal(3);
+      expect(allUsers.filter(user => !user.isActive).length).to.equal(2);
+      expect(eventStub.callCount).to.equal(2);
+    });
+  });
 });

@@ -10,13 +10,11 @@ const server = require('./server');
 const SocketIOSubscriber = require('./services/SocketIOSubscriber');
 const jwtHelper = require('./services/jwtHelper');
 
-const socketIO = io(server, { cookie: false });
+const socketIO = io(server);
 
 if (redisConfig) {
   const pubClient = redis.createClient(redisConfig);
   const subClient = redis.createClient(redisConfig);
-
-  socketIO.adapter(redisAdapter({ pubClient, subClient }));
 
   pubClient.on('error', (err) => {
     EventCreator.error(Event.labels.SOCKET_IO, {
@@ -30,6 +28,9 @@ if (redisConfig) {
       error: err.stack,
     });
   });
+
+  socketIO.adapter(redisAdapter({ pubClient, subClient }));
+
   socketIO.of('/').adapter.on('error', (err) => {
     EventCreator.error(Event.labels.SOCKET_IO, {
       message: 'redisAdapter error',
