@@ -161,7 +161,7 @@
     "webpack": "^4.44.2",
     "webpack-cli": "^4.1.0",
     "webpack-dev-middleware": "^4.0.2",
-    "webpack-dev-server": "^3.1.14",
+    "webpack-dev-server": "^3.11.1",
     "webpack-manifest-plugin": "^3.0.0"
   },
   "engines": {
