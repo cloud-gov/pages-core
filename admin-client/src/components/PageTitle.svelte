@@ -2,7 +2,7 @@
   import GridRow from './GridRow.svelte';
 </script>
 
-<GridRow className="">
+<GridRow>
   <h1 class="text-bold width-full">
     <slot />
   </h1>

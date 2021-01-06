@@ -7,10 +7,12 @@
     updateSite,
   } from '../lib/api';
 
-  import { destroySite } from '../flows';
+  // import { destroySite } from '../flows';
 
   import {
-    BuildList,
+    Accordion,
+    AccordionContent,
+    BuildTable,
     SiteDeleteForm,
     GridContainer,
     PageTitle,
@@ -34,18 +36,32 @@
   {#if site}
     <PageTitle>{site.owner}/{site.repository}</PageTitle>
     <SiteMetadata {site} />
-    <SiteForm {site} on:submit={handleSubmit} />
-    <SiteDeleteForm {site} on:submit={destroySite(id)} />
+    <Accordion multiselect bordered>
+      <AccordionContent title="User Configuration">
+        <p>TBD</p>
+      </AccordionContent>
+      <AccordionContent title="Admin Configuration">
+        <SiteForm {site} on:submit={handleSubmit} />
+      </AccordionContent>
+      <AccordionContent title="Recent Builds">
+        {#if id}
+          {#await fetchBuilds({ site: id, limit: 10 })}
+            <p>Loading builds...</p>
+          {:then builds}
+            <BuildTable builds={builds.data} />
+          {:catch error}
+            <p>Something went wrong fetching the site builds: {error.message}</p>
+          {/await}
+        {/if}
+      </AccordionContent>
+      <AccordionContent title="Collaborators">
+        <p>TBD</p>
+      </AccordionContent>
+    </Accordion>
+    
+    <!-- <SiteDeleteForm {site} on:submit={destroySite(id)} /> -->
   {:else}
     <p>Loading site...</p>
   {/if}
-  {#if id}
-    {#await fetchBuilds({ site: id })}
-      <p>Loading builds...</p>
-    {:then builds}
-      <BuildList {builds} />
-    {:catch error}
-      <p>Something went wrong fetching the site builds: {error.message}</p>
-    {/await}
-  {/if}
+  
 </GridContainer>
