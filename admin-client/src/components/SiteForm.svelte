@@ -46,7 +46,7 @@
             name="containerSize"
             id={buildContainerSize}
             value={buildContainerSize}
-            checked={(site.containerConfig?.size || 'default') === buildContainerSize}>
+            checked={((site.containerConfig || {}).size || 'default') === buildContainerSize}>
           <label class="usa-radio__label" for={buildContainerSize}>{buildContainerSize}</label>
         </div>
       {/each}
@@ -62,7 +62,7 @@
             name="containerName"
             id={buildContainerName}
             value={buildContainerName}
-            checked={(site.containerConfig?.name || 'default') === buildContainerName}>
+            checked={((site.containerConfig || {}).name || 'default') === buildContainerName}>
           <label class="usa-radio__label" for={buildContainerName}>{buildContainerName}</label>
         </div>
       {/each}
