@@ -67,21 +67,8 @@ module.exports = wrapHandlers({
     let site;
     const { id } = req.params;
 
-    try {
-      site = await fetchModelById(id, Site);
-      await SiteDestroyer.destroySite(site);
-      return res.json(serializeNew(site, true));
-    } catch (error) {
-      const errorBody = {
-        request: {
-          params: req.params,
-          path: req.patth,
-        },
-        error: error.stack,
-        message: 'Error encountered while destroying site',
-      };
-      EventCreator.error(Event.labels.ADMIN, errorBody);
-      return res.error(error);
-    }
+    site = await fetchModelById(id, Site);
+    await SiteDestroyer.destroySite(site);
+    return res.json(serializeNew(site, true));
   },
 });

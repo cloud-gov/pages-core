@@ -57,17 +57,6 @@ module.exports = wrapHandlers({
 
       return res.ok(json);
     } catch (err) {
-      const errBody = {
-        request: {
-          path: req.path,
-          params: req.params,
-          body: { name: req.body.name }, // only env var name not value
-        },
-        message: 'Error creating user environment variable',
-        error: err.stack,
-      };
-
-      EventCreator.error(Event.labels.UEV_ADD, errBody);
       if (err.name !== 'SequelizeUniqueConstraintError') {
         throw err;
       }
@@ -78,36 +67,23 @@ module.exports = wrapHandlers({
   },
 
   async destroy(req, res) {
-    try {
-      const { params, user } = req;
-      const { id, site_id: siteId } = params;
+    const { params, user } = req;
+    const { id, site_id: siteId } = params;
 
-      const uev = await UserEnvironmentVariable
-        .forSiteUser(user)
-        .findOne({
-          where: {
-            id, siteId,
-          },
-        });
-
-      if (!uev) {
-        return res.notFound();
-      }
-
-      await uev.destroy();
-
-      return res.ok({});
-    } catch (err) {
-      const errBody = {
-        request: {
-          path: req.path,
-          params: req.params,
+    const uev = await UserEnvironmentVariable
+      .forSiteUser(user)
+      .findOne({
+        where: {
+          id, siteId,
         },
-        message: 'Error destroying user environment variable',
-        error: err.stack,
-      };
-      EventCreator.error(Event.labels.UEV_DESTROY, errBody);
-      return res.error();
+      });
+
+    if (!uev) {
+      return res.notFound();
     }
+
+    await uev.destroy();
+
+    return res.ok({});
   },
 });

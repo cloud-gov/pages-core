@@ -6,24 +6,13 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   const labels = {
-    TIMING: 'timing',
-    ADDED: 'added',
-    REMOVED: 'removed',
-    UPDATED: 'updated',
     AUTHENTICATION: 'authentication',
     FEDERALIST_USERS_MEMBERSHIP: 'federalist-users-membership',
     BUILD_STATUS: 'build-status',
-    BUILD_REQUEST: 'build-request',
-    SERVER_STATUS: 'server-status',
     ADMIN: 'admin',
-    DEPLOYMENT: 'deployment',
     SOCKET_IO: 'socket.io',
     SITE_USER: 'site-user',
-    SITE_ADD: 'site-add',
-    SITE_DESTROY: 'site-destroy',
-    PROXY_EDGE: 'proxy-edge',
-    UEV_ADD: 'uev-add',
-    UEV_DESTROY: 'uev-add',
+    REQUEST_HANDLER: 'request-handler',
   };
 
   function isValidType(value) {

@@ -34,7 +34,7 @@ const auditUser = (user, auditor) => {
             .catch((err) => {
               EventCreator.error(Event.labels.SITE_USER, {
                 message: 'Failed to remove user from site. User does not have write permisisons',
-                erorr: err.stack,
+                error: err.stack,
                 siteId: site.id,
               });
             });
@@ -46,7 +46,7 @@ const auditUser = (user, auditor) => {
     .catch((err) => {
       EventCreator.error(Event.labels.SITE_USER, {
         message: `Failed to audit sites for user@${user.id}`,
-        erorr: err.stack,
+        error: err.stack,
       });
     });
 };
@@ -101,7 +101,7 @@ const auditSite = (auditor, site, userIndex = 0) => {
             .catch((err) => {
               EventCreator.error(Event.labels.SITE_USER, {
                 message: 'Failed to remove user from site. User does not have write permisisons',
-                erorr: err.stack,
+                error: err.stack,
                 userId: u.id,
                 siteId: site.id,
               });
@@ -115,7 +115,7 @@ const auditSite = (auditor, site, userIndex = 0) => {
     .catch((err) => {
       EventCreator.error(Event.labels.SITE_USER, {
         message: 'Failed to audit site users for site',
-        erorr: err.stack,
+        error: err.stack,
         siteId: site.id,
       });
     });

@@ -5,6 +5,7 @@ const siteAuthorizer = require('../authorizers/site');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const EventCreator = require('../services/EventCreator');
 const ProxyDataSync = require('../services/ProxyDataSync');
+const { wrapHandlers } = require('../utils');
 const {
   Build, Site, User, Event,
 } = require('../models');
@@ -14,8 +15,9 @@ const Features = require('../features');
 const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
 const BUILD_SETTINGS_FILE = 'federalist.json';
 
-const emitBuildStatus = build => Site.findByPk(build.site)
-  .then((site) => {
+const emitBuildStatus = async (build) => {
+  try {
+    const site = await Site.findByPk(build.site);
     const msg = {
       id: build.id,
       state: build.state,
@@ -28,16 +30,10 @@ const emitBuildStatus = build => Site.findByPk(build.site)
     socketIO.to(siteRoom).emit('build status', msg);
     const builderRoom = SocketIOSubscriber.getBuilderRoom(build.site, build.user);
     socketIO.to(builderRoom).emit('build status', msg);
-    return Promise.resolve();
-  })
-  .catch((err) => {
-    const errBody = {
-      message: 'Failed to emit build status',
-      error: err.stack,
-      buildId: build.id,
-    };
-    EventCreator.error(Event.labels.SOCKET_IO, errBody);
-  });
+  } catch(err) {
+    EventCreator.error(Event.labels.SOCKET_IO, err, { buildId: build.id });
+  }
+};
 
 const saveBuildToProxy = async (build) => {
   const buildSettings = await GithubBuildHelper.fetchContent(build, BUILD_SETTINGS_FILE);
@@ -46,32 +42,28 @@ const saveBuildToProxy = async (build) => {
     await ProxyDataSync.saveBuild(build, settings);
     const body = {
       filename: BUILD_SETTINGS_FILE,
-      content: settings,
-      message: `${BUILD_SETTINGS_FILE} saved to proxy database`,
+      commitSha: build.clonedCommitSha,
     };
-    EventCreator.audit(Event.labels.BUILD_STATUS, build, body);
+    const message = `${BUILD_SETTINGS_FILE} saved to proxy database`;
+    EventCreator.audit(Event.labels.PROXY_EDGE, build, message, body);
   }
 };
 
-module.exports = {
-  find: (req, res) => {
-    let site;
-
-    fetchModelById(req.params.site_id, Site)
-      .then((model) => {
-        if (!model) { throw 404; }
-        site = model;
-        return siteAuthorizer.findOne(req.user, site);
-      })
-      .then(() => Build.findAll({
-        attributes: ['id'],
-        where: { site: site.id },
-        order: [['createdAt', 'desc']],
-        limit: 100,
-      }))
-      .then(builds => buildSerializer.serialize(builds))
-      .then(buildJSON => res.json(buildJSON))
-      .catch(res.error);
+module.exports = wrapHandlers({
+  async find(req, res) {
+    const site = await fetchModelById(req.params.site_id, Site);
+    if (!site) {
+      throw 404;
+    }
+    await siteAuthorizer.findOne(req.user, site);
+    const builds = await Build.findAll({
+      attributes: ['id'],
+      where: { site: site.id },
+      order: [['createdAt', 'desc']],
+      limit: 100,
+    });
+    const buildJSON = await buildSerializer.serialize(builds);
+    res.json(buildJSON);
   },
 
   /**
@@ -87,61 +79,46 @@ module.exports = {
    *
    * e.g. `sites/1/builds/1`
    */
-  create: async (req, res) => {
-    try {
-      await siteAuthorizer.createBuild(req.user, { id: req.body.siteId });
-      const requestBuild = await Build.findOne({
-        where: {
-          id: req.body.buildId,
-          site: req.body.siteId,
-        },
-        include: [{ model: Site, include: [{ model: User }] }],
-      });
+  async create(req, res) {
+    await siteAuthorizer.createBuild(req.user, { id: req.body.siteId });
+    const requestBuild = await Build.findOne({
+      where: {
+        id: req.body.buildId,
+        site: req.body.siteId,
+      },
+      include: [{ model: Site, include: [{ model: User }] }],
+    });
 
-      if (!requestBuild) {
-        throw 404;
-      }
-      const queuedBuild = await Build.findOne({
-        where: {
-          site: requestBuild.site,
-          branch: requestBuild.branch,
-          state: ['created', 'queued'],
-        },
-      });
-
-      if (!queuedBuild) {
-        const rebuild = await Build.create({
-          branch: requestBuild.branch,
-          site: requestBuild.site,
-          user: req.user.id,
-          username: req.user.username,
-          requestedCommitSha: requestBuild.clonedCommitSha || requestBuild.requestedCommitSha,
-        });
-        await rebuild.enqueue();
-        rebuild.Site = requestBuild.Site;
-        await GithubBuildHelper.reportBuildStatus(rebuild);
-        const rebuildJSON = await buildSerializer.serialize(rebuild);
-        res.json(rebuildJSON);
-        return;
-      }
-      res.ok({});
-    } catch (err) {
-      const errBody = {
-        request: {
-          path: req.path,
-          params: req.params,
-          body: req.body,
-        },
-        message: 'Error processing rebuild request',
-        error: err.stack,
-      };
-
-      EventCreator.error(Event.labels.BUILD_REQUEST, errBody);
-      res.error(err);
+    if (!requestBuild) {
+      throw 404;
     }
+    const queuedBuild = await Build.findOne({
+      where: {
+        site: requestBuild.site,
+        branch: requestBuild.branch,
+        state: ['created', 'queued'],
+      },
+    });
+
+    if (!queuedBuild) {
+      const rebuild = await Build.create({
+        branch: requestBuild.branch,
+        site: requestBuild.site,
+        user: req.user.id,
+        username: req.user.username,
+        requestedCommitSha: requestBuild.clonedCommitSha || requestBuild.requestedCommitSha,
+      });
+      await rebuild.enqueue();
+      rebuild.Site = requestBuild.Site;
+      await GithubBuildHelper.reportBuildStatus(rebuild);
+      const rebuildJSON = await buildSerializer.serialize(rebuild);
+      res.json(rebuildJSON);
+      return;
+    }
+    res.ok({});
   },
 
-  status: async (req, res) => {
+  async status(req, res) {
     const getBuildStatus = (statusRequest) => {
       let status;
       let message;
@@ -151,58 +128,35 @@ module.exports = {
         message = decodeb64(statusRequest.body.message);
         commitSha = statusRequest.body.commit_sha;
       } catch (err) {
-        status = 'error';
-        message = 'build status message parsing error';
-        const errBody = {
-          message: 'Error decoding build status message',
-          request: {
-            params: statusRequest.params,
-            body: statusRequest.body,
-          },
-          error: err.stack,
-        };
-        EventCreator.error(Event.labels.BUILD_STATUS, errBody);
+        EventCreator.requestError(req, err);
       }
       return { status, message, commitSha };
     };
-    try {
-      const build = await fetchModelById(req.params.id, Build, {
-        include: [{ model: Site, include: [{ model: User }] }],
-      });
+  
+    const build = await fetchModelById(req.params.id, Build, {
+      include: [{ model: Site, include: [{ model: User }] }],
+    });
 
-      if (!build) {
-        throw 404;
-      }
-      if (build.token !== req.params.token) {
-        throw 403;
-      }
-
-      const buildStatus = getBuildStatus(req);
-      await build.updateJobStatus(buildStatus);
-
-      emitBuildStatus(build);
-
-      await GithubBuildHelper.reportBuildStatus(build);
-
-      if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-        if (buildStatus.status === Build.States.Success) {
-          await saveBuildToProxy(build);
-        }
-      }
-
-      res.ok();
-    } catch (err) {
-      const errBody = {
-        request: {
-          path: req.path,
-          params: req.params,
-          body: req.body,
-        },
-        error: err.stack,
-        message: 'Error processing build status request',
-      };
-      EventCreator.error(Event.labels.BUILD_STATUS, errBody);
-      res.error(err);
+    if (!build) {
+      throw 404;
     }
+    if (build.token !== req.params.token) {
+      throw 403;
+    }
+
+    const buildStatus = getBuildStatus(req);
+    await build.updateJobStatus(buildStatus);
+
+    emitBuildStatus(build);
+
+    await GithubBuildHelper.reportBuildStatus(build);
+
+    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
+      if (buildStatus.status === Build.States.Success) {
+        await saveBuildToProxy(build);
+      }
+    }
+
+    res.ok();
   },
-};
+});
