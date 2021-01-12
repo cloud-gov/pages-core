@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const url = require('url');
+const GithubBuildHelper = require('./GithubBuildHelper');
 const S3Helper = require('./S3Helper');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
