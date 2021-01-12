@@ -60,11 +60,15 @@ const generateDefaultCredentials = build => ({
   USER_ENVIRONMENT_VARIABLES: JSON.stringify(buildUEVs(build.Site.UserEnvironmentVariables)),
 });
 
-const buildContainerEnvironment = (build) => {
+const buildContainerEnvironment = async (build) => {
   const defaultCredentials = generateDefaultCredentials(build);
 
+  if (!defaultCredentials.GITHUB_TOKEN) {
+    defaultCredentials.GITHUB_TOKEN = await GithubBuildHelper.loadBuildUserAccessToken(build);
+  }
+  
   if (build.Site.s3ServiceName === config.s3.serviceName) {
-    return Promise.resolve(defaultCredentials);
+    return defaultCredentials;
   }
 
   return apiClient
