@@ -60,7 +60,7 @@ const federalistUsersAdmins = githubAccessToken => GitHub.getOrganizationMembers
 
 const removeMemberFromFederalistUsersOrg = (githubAccessToken, login) => GitHub
   .removeOrganizationMember(githubAccessToken, FEDERALIST_USERS_ORG, login)
-  .catch(error => EventCreator.error(Event.labels.FEDERALIST_USERS, { error, login, action: 'removeOrgMember' }));
+  .catch(error => EventCreator.error(Event.labels.FEDERALIST_USERS, error, { login }));
 
 const revokeMembershipForInactiveUsers = async ({ auditorUsername } = {}) => {
   /* eslint-disable no-param-reassign */
@@ -127,10 +127,9 @@ const deactivateUsersWhoAreNotMembers = async ({ auditorUsername } = {}) => {
       },
       returning: ['id', 'isActive'],
     });
-
-  inactiveUsers.map(user => EventCreator.audit('deactivated', user, { // function for 1 time init use - to be deleted
-    action: { isActive: user.isActive },
-  }));
+  // function for 1 time init use - to be deleted
+  inactiveUsers.map(user => EventCreator
+    .audit(Event.labels.FEDERALIST_USERS_MEMBERSHIP, user, 'Deactivated user', { userId: user.id }));
 };
 
 module.exports = {

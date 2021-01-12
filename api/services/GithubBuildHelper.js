@@ -105,7 +105,8 @@ const fetchContent = async (build, path) => {
       EventCreator.warn(Event.labels.BUILD_STATUS, {
         buildId: build.id,
         path,
-        err: err.stack,
+        commitSha: build.clonedCommitSha,
+        error: err.stack,
       });
     });
 };

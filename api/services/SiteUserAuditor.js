@@ -26,15 +26,14 @@ const auditUser = (user, auditor) => {
               siteId: site.id,
             }))
             .then(() => {
-              EventCreator.audit(Event.labels.SITE_USER, user, {
-                message: 'Removed user from site. User does not have write permisisons',
+              const message = 'Removed user from site. User does not have write permisisons';
+              EventCreator.audit(Event.labels.SITE_USER, user, message, {
                 siteId: site.id,
               });
             })
             .catch((err) => {
-              EventCreator.error(Event.labels.SITE_USER, {
-                message: 'Failed to remove user from site. User does not have write permisisons',
-                error: err.stack,
+              EventCreator.error(Event.labels.SITE_USER, err, {
+                userId: user.id,
                 siteId: site.id,
               });
             });
@@ -44,9 +43,8 @@ const auditUser = (user, auditor) => {
       return Promise.all(removed);
     })
     .catch((err) => {
-      EventCreator.error(Event.labels.SITE_USER, {
-        message: `Failed to audit sites for user@${user.id}`,
-        error: err.stack,
+      EventCreator.error(Event.labels.SITE_USER, err, {
+        userId: user.id,
       });
     });
 };
@@ -99,9 +97,7 @@ const auditSite = (auditor, site, userIndex = 0) => {
               });
             })
             .catch((err) => {
-              EventCreator.error(Event.labels.SITE_USER, {
-                message: 'Failed to remove user from site. User does not have write permisisons',
-                error: err.stack,
+              EventCreator.error(Event.labels.SITE_USER, err, {
                 userId: u.id,
                 siteId: site.id,
               });
@@ -113,9 +109,7 @@ const auditSite = (auditor, site, userIndex = 0) => {
       return auditSite(auditor, site, userIndex + 1);
     })
     .catch((err) => {
-      EventCreator.error(Event.labels.SITE_USER, {
-        message: 'Failed to audit site users for site',
-        error: err.stack,
+      EventCreator.error(Event.labels.SITE_USER, err, {
         siteId: site.id,
       });
     });

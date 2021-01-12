@@ -34,7 +34,7 @@ async function verifyGithub(accessToken, _refreshToken, profile, callback) {
       signedInAt: new Date(),
     });
 
-    EventCreator.audit(Event.labels.AUTHENTICATION, user, { action: 'login' });
+    EventCreator.audit(Event.labels.AUTHENTICATION, user, 'GitHub login');
 
     RepositoryVerifier.verifyUserRepos(user);
 
@@ -59,7 +59,7 @@ async function verifyUAA(accessToken, _refreshToken, profile, callback) {
       signedInAt: new Date(),
     });
 
-    EventCreator.audit(Event.labels.AUTHENTICATION, user, { action: 'login' });
+    EventCreator.audit(Event.labels.AUTHENTICATION, user, 'UAA login');
 
     RepositoryVerifier.verifyUserRepos(user);
 
@@ -80,7 +80,7 @@ passport.logout = (idp) => {
     const { user } = req;
     req.logout();
     if (user) {
-      EventCreator.audit(Event.labels.AUTHENTICATION, user, { action: 'logout' });
+      EventCreator.audit(Event.labels.AUTHENTICATION, user, 'logout');
     }
     req.session.destroy(() => {
       res.redirect(redirectURL);

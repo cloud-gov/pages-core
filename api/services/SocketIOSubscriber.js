@@ -25,11 +25,7 @@ const joinRooms = (_socket) => {
         });
         return Promise.resolve();
       })
-      .catch(err => EventCreator.error(Event.labels.SOCKET_IO, {
-        message: 'User is unable to join site rooms',
-        error: err.stack,
-        userId,
-      }));
+      .catch(err => EventCreator.error(Event.labels.SOCKET_IO, err, { userId }));
   }
   return Promise.resolve();
 };

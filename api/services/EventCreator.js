@@ -47,13 +47,13 @@ const audit = (label, model, message, body = {}) => createEvent({
 const error = (label, error, body = {}) => createEvent({
   type: Event.types.ERROR,
   label,
-  body: { ...{}, message: error.message, ...body, error: error.stack },
+  body: { ...{}, error: error.stack, message: error.message, ...body },
 });
 
 const warn = (label, message, body = {}) => createEvent({
   type: Event.types.WARNING,
   label,
-  body: { ...body, ...{ message } },
+  body: { ...body, message } ,
 });
 
 const handlerError = async (request, error) => {
