@@ -1,10 +1,10 @@
 const AWS = require('aws-sdk');
 const url = require('url');
-const GithubBuildHelper = require('./GithubBuildHelper');
-const S3Helper = require('./S3Helper');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const { buildViewLink, buildUrl } = require('../utils/build');
+const GithubBuildHelper = require('./GithubBuildHelper');
+const S3Helper = require('./S3Helper');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -67,7 +67,7 @@ const buildContainerEnvironment = async (build) => {
   if (!defaultCredentials.GITHUB_TOKEN) {
     defaultCredentials.GITHUB_TOKEN = await GithubBuildHelper.loadBuildUserAccessToken(build);
   }
-  
+
   if (build.Site.s3ServiceName === config.s3.serviceName) {
     return defaultCredentials;
   }

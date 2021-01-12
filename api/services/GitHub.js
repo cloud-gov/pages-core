@@ -1,6 +1,5 @@
 const { Octokit } = require('@octokit/rest');
 const config = require('../../config');
-const { User } = require('../models');
 
 const createRepoForOrg = (github, options) => github.repos.createInOrg(options);
 
@@ -215,24 +214,19 @@ module.exports = {
       throw err;
     }),
 
-  setWebhook: (site, user) => {
-    const userId = user.id || user;
-
-    return User.findByPk(userId)
-      .then(fetchedFederalistUser => githubClient(fetchedFederalistUser.githubAccessToken))
-      .then(github => createWebhook(github, {
-        owner: site.owner,
-        repo: site.repository,
-        name: 'web',
-        active: true,
-        config: {
-          url: config.webhook.endpoint,
-          secret: config.webhook.secret,
-          content_type: 'json',
-        },
-      }))
-      .catch(handleWebhookError);
-  },
+  setWebhook: (site, githubAccessToken) => githubClient(githubAccessToken)
+    .then(github => createWebhook(github, {
+      owner: site.owner,
+      repo: site.repository,
+      name: 'web',
+      active: true,
+      config: {
+        url: config.webhook.endpoint,
+        secret: config.webhook.secret,
+        content_type: 'json',
+      },
+    }))
+    .catch(handleWebhookError),
 
   validateUser: (accessToken, throwOnUnauthorized = true) => {
     const approvedOrgs = config.passport.github.organizations || [];

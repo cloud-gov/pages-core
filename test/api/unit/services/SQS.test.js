@@ -6,6 +6,7 @@ const mockTokenRequest = require('../../support/cfAuthNock');
 const apiNocks = require('../../support/cfAPINocks');
 const config = require('../../../../config');
 const factory = require('../../support/factory');
+const GithubBuildHelper = require('../../../../api/services/GithubBuildHelper');
 const SQS = require('../../../../api/services/SQS');
 const {
   Build, Site, User, UserEnvironmentVariable,
@@ -41,9 +42,7 @@ describe('SQS', () => {
           containerConfig: {},
         },
         User: {
-          passport: {
-            tokens: { accessToken: '123abc' },
-          },
+          githubAccessToken: '123abc',
         },
       }, 2);
 
@@ -102,9 +101,7 @@ describe('SQS', () => {
           containerConfig: {},
         },
         User: {
-          passport: {
-            tokens: { accessToken: '123abc' },
-          },
+          githubAccessToken: '123abc',
         },
       }, 1);
 
@@ -511,6 +508,23 @@ describe('SQS', () => {
           done();
         })
         .catch(done);
+    });
+
+    it('should find a github access token for a site user when the current user does not have one', async () => {
+      const [user1, user2] = await Promise.all([
+        factory.user(),
+        factory.user(),
+      ]);
+      await user1.update({ githubAccessToken: null });
+      const site = await factory.site({ users: [user1, user2] });
+      const build = await factory.build({ user: user1, site });
+      await build.reload({ include: [Site, User] });
+      
+      sinon.stub(GithubBuildHelper, 'loadBuildUserAccessToken').resolves(user2.githubAccessToken);
+
+      const message = await SQS.messageBodyForBuild(build);
+
+      expect(messageEnv(message, 'GITHUB_TOKEN')).to.equal(user2.githubAccessToken);
     });
 
     it("should set GENERATOR in the message to the site's build engine (e.g. 'jekyll')", (done) => {
