@@ -96,7 +96,7 @@ async function enqueue() {
     include: [User, {
       model: Site,
       required: true,
-      include: [UserEnvironmentVariable],
+      include: [UserEnvironmentVariable, User],
     }],
   });
 
