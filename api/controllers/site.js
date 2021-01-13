@@ -64,7 +64,7 @@ module.exports = wrapHandlers({
       throw 400;
     }
 
-    await authorizer.addUser(user, body)
+    await authorizer.addUser(user, body);
     const site = await SiteMembershipCreator.createSiteMembership({
       user,
       siteParams: body,
@@ -103,7 +103,7 @@ module.exports = wrapHandlers({
     sendJSON(site, res);
   },
 
-  async create (req, res) {
+  async create(req, res) {
     const { body, user } = req;
     const siteParams = { ...body, sharedBucket: false };
 
@@ -112,7 +112,7 @@ module.exports = wrapHandlers({
       user,
       siteParams,
     });
-      
+
     if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
       ProxyDataSync.saveSite(site)
         .catch(err => EventCreator.handlerError(req, err));
@@ -121,72 +121,70 @@ module.exports = wrapHandlers({
     res.json(siteJSON);
   },
 
-  async update (req, res) {
+  async update(req, res) {
     let build;
 
     const site = await fetchModelById(req.params.id, Site);
-      if (!site) {
-        throw 404;
-      }
-      await authorizer.update(req.user, site);
-      const params = Object.assign(site, req.body);
-      await site.update({
-        demoBranch: params.demoBranch,
-        demoDomain: params.demoDomain,
-        defaultConfig: params.defaultConfig,
-        previewConfig: params.previewConfig,
-        demoConfig: params.demoConfig,
-        defaultBranch: params.defaultBranch,
-        domain: params.domain,
-        engine: params.engine,
-      });
+    if (!site) {
+      throw 404;
+    }
+    await authorizer.update(req.user, site);
+    const params = Object.assign(site, req.body);
+    await site.update({
+      demoBranch: params.demoBranch,
+      demoDomain: params.demoDomain,
+      defaultConfig: params.defaultConfig,
+      previewConfig: params.previewConfig,
+      demoConfig: params.demoConfig,
+      defaultBranch: params.defaultBranch,
+      domain: params.domain,
+      engine: params.engine,
+    });
+    build = await Build.create({
+      user: req.user.id,
+      site: site.id,
+      branch: site.defaultBranch,
+      username: req.user.username,
+    });
+    await build.enqueue();
+    if (site.demoBranch) {
       build = await Build.create({
         user: req.user.id,
         site: site.id,
-        branch: site.defaultBranch,
+        branch: site.demoBranch,
         username: req.user.username,
       });
       await build.enqueue();
-      if (site.demoBranch) {
-         build = await Build.create({
-          user: req.user.id,
-          site: site.id,
-          branch: site.demoBranch,
-          username: req.user.username,
-        });
-        await build.enqueue();
-      }
-      const siteJSON = await siteSerializer.serialize(site);
-      res.json(siteJSON);
+    }
+    const siteJSON = await siteSerializer.serialize(site);
+    res.json(siteJSON);
   },
 
-  async addBasicAuth (req, res) {
+  async addBasicAuth(req, res) {
+    const { body, params, user } = req;
 
-      const { body, params, user } = req;
+    const { site_id: siteId } = params;
 
-      const { site_id: siteId } = params;
+    const site = await Site.forUser(user).findByPk(siteId);
 
-      const site = await Site.forUser(user).findByPk(siteId);
+    if (!site) {
+      return res.notFound();
+    }
 
-      if (!site) {
-        return res.notFound();
-      }
+    const credentials = stripCredentials(body);
 
-      const credentials = stripCredentials(body);
+    await site.update({ basicAuth: credentials });
 
-      await site.update({ basicAuth: credentials });
+    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
+      ProxyDataSync.saveSite(site) // sync to proxy database
+        .catch(err => EventCreator.handlerError(req, err));
+    }
 
-      if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-        ProxyDataSync.saveSite(site) // sync to proxy database
-          .catch(err => EventCreator.handlerError(req, err));
-      }
-
-      const siteJSON = await siteSerializer.serialize(site);
-      return res.json(siteJSON);
+    const siteJSON = await siteSerializer.serialize(site);
+    return res.json(siteJSON);
   },
 
-  async removeBasicAuth (req, res) {
-
+  async removeBasicAuth(req, res) {
     const { params, user } = req;
     const { site_id: siteId } = params;
 

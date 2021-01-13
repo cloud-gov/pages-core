@@ -30,7 +30,7 @@ const emitBuildStatus = async (build) => {
     socketIO.to(siteRoom).emit('build status', msg);
     const builderRoom = SocketIOSubscriber.getBuilderRoom(build.site, build.user);
     socketIO.to(builderRoom).emit('build status', msg);
-  } catch(err) {
+  } catch (err) {
     EventCreator.error(Event.labels.SOCKET_IO, err, { buildId: build.id });
   }
 };
@@ -132,7 +132,7 @@ module.exports = wrapHandlers({
       }
       return { status, message, commitSha };
     };
-  
+
     const build = await fetchModelById(req.params.id, Build, {
       include: [{ model: Site, include: [{ model: User }] }],
     });
