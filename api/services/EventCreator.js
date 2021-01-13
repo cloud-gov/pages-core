@@ -52,20 +52,11 @@ const error = (label, err, body = {}) => createEvent({
   },
 });
 
-const warn = (label, message, err, body = {}) => {
-  if (err) {
-    body.error = err.stack;
-    body.message = err.message;
-  }
-  if (message && message.length) {
-    body.message = message;
-  }
-  return createEvent({
-    type: Event.types.WARNING,
-    label,
-    body,
-  });
-};
+const warn = (label, message, body = {}) => createEvent({
+  type: Event.types.WARNING,
+  label,
+  body: { ...body, message },
+});
 
 const handlerError = async (request, err) => {
   const { path, params, body } = request;
