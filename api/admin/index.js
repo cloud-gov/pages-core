@@ -7,7 +7,7 @@ const session = require('express-session');
 const config = require('../../config');
 const { expressErrorLogger } = require('../../winston');
 const responses = require('../responses');
-
+const EventCreator = require('../services/EventCreator');
 const router = require('./routers');
 const passport = require('./passport');
 const sessionConfig = require('./sessionConfig');
@@ -29,6 +29,7 @@ const corsCfg = {
 
 // eslint-disable-next-line no-unused-vars
 function errorHandler(err, _req, res, _next) {
+  EventCreator.handlerError(_req, err);
   res.error(err);
 }
 
