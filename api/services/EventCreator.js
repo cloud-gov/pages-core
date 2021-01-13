@@ -52,11 +52,20 @@ const error = (label, err, body = {}) => createEvent({
   },
 });
 
-const warn = (label, message, body = {}) => createEvent({
-  type: Event.types.WARNING,
-  label,
-  body: { ...body, message },
-});
+const warn = (label, message, err, body = {}) => {
+  if (err) {
+    body.err = err.stack; // eslint-disable-line no-param-reassign
+    body.message = err.message; // eslint-disable-line no-param-reassign
+  }
+  if (message && message.length) {
+    body.message = message; // eslint-disable-line no-param-reassign
+  }
+  return createEvent({
+    type: Event.types.WARNING,
+    label,
+    body,
+  });
+};
 
 const handlerError = async (request, err) => {
   const { path, params, body } = request;

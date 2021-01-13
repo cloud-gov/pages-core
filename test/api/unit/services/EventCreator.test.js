@@ -79,7 +79,7 @@ describe('EventCreator', () => {
   describe('.warn', () => {
     const message = 'the message';
     it('.warn event created', async () => {
-      const event = await warn('request-handler', message, { hi: 'bye' })
+      const event = await warn('request-handler', message, new Error('the error'), { hi: 'bye' })
       expect(event.type).to.equal('warning');
       expect(event.label).to.equal('request-handler');
       expect(event.model).to.be.null;
@@ -88,14 +88,24 @@ describe('EventCreator', () => {
       expect(event.body.message).to.equal(message);
     });
 
-    it('.warn event created - override message in body', async () => {
-      const event = await warn('request-handler', 'override', { hi: 'bye', message })
+    it('.warn event created w/o error', async () => {
+      const event = await warn('request-handler', message, null, { hi: 'bye' })
       expect(event.type).to.equal('warning');
       expect(event.label).to.equal('request-handler');
       expect(event.model).to.be.null;
       expect(event.modelId).to.be.null;
       expect(event.body.hi).to.equal('bye');
-      expect(event.body.message).to.equal('override');
+      expect(event.body.message).to.equal(message);
+    });
+
+    it('.warn event created w/o message', async () => {
+      const event = await warn('request-handler', null, new Error('the error'), { hi: 'bye' })
+      expect(event.type).to.equal('warning');
+      expect(event.label).to.equal('request-handler');
+      expect(event.model).to.be.null;
+      expect(event.modelId).to.be.null;
+      expect(event.body.hi).to.equal('bye');
+      expect(event.body.message).to.equal('the error');
     });
 
     it('.warn event fail', async () => {

@@ -126,8 +126,7 @@ module.exports = {
       if (req.body.commits && req.body.commits.length > 0) {
         const site = await findSiteForWebhookRequest(req)
           .catch((err) => {
-            EventCreator.warn(Event.labels.REQUEST_HANDLER, err.message, {
-              error: err.stack,
+            EventCreator.warn(Event.labels.REQUEST_HANDLER, null, err, {
               request: {
                 path: req.path,
                 params: req.params,
