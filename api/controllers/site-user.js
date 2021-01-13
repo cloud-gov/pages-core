@@ -1,5 +1,5 @@
 const siteSerializer = require('../serializers/site');
-const { SiteUser, Event } = require('../models');
+const { SiteUser } = require('../models');
 const { toInt, wrapHandlers } = require('../utils');
 
 module.exports = wrapHandlers({
@@ -9,7 +9,9 @@ module.exports = wrapHandlers({
       throw 404;
     }
 
-    const siteUser = await SiteUser.findOne({ where: { user_sites: req.user.id, site_users: siteId } });
+    const siteUser = await SiteUser.findOne({
+      where: { user_sites: req.user.id, site_users: siteId },
+    });
 
     if (!siteUser) {
       throw 404;

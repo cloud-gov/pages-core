@@ -3,8 +3,7 @@ const { wrapHandlers } = require('../utils');
 const { serialize, serializeMany } = require('../serializers/user-environment-variable');
 const { encrypt } = require('../services/Encryptor');
 const { ValidationError } = require('../utils/validators');
-const { Site, UserEnvironmentVariable, Event } = require('../models');
-const EventCreator = require('../services/EventCreator');
+const { Site, UserEnvironmentVariable } = require('../models');
 
 function validate({ name, value }) {
   if (name && name.length && value && (value.length >= 4)) {

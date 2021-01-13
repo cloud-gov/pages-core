@@ -5,9 +5,7 @@ const SiteDestroyer = require('../services/SiteDestroyer');
 const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const UserActionCreator = require('../services/UserActionCreator');
 const siteSerializer = require('../serializers/site');
-const {
-  User, Site, Build, Event,
-} = require('../models');
+const { User, Site, Build } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const EventCreator = require('../services/EventCreator');
 const ProxyDataSync = require('../services/ProxyDataSync');
@@ -198,7 +196,7 @@ module.exports = wrapHandlers({
 
     if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
       ProxyDataSync.saveSite(site) // sync to proxy database
-        .catch(err => EventCreator.handlerError(req, error));
+        .catch(err => EventCreator.handlerError(req, err));
     }
 
     const siteJSON = await siteSerializer.serialize(site);

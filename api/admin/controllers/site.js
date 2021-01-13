@@ -1,10 +1,9 @@
 const { Op } = require('sequelize');
-const { Site, Event } = require('../../models');
+const { Site } = require('../../models');
 const SiteDestroyer = require('../../services/SiteDestroyer');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { pick, toInt, wrapHandlers } = require('../../utils');
 const { serializeNew, serializeMany } = require('../../serializers/site');
-const EventCreator = require('../../services/EventCreator');
 
 const updateableAttrs = [
   'containerConfig',
@@ -64,10 +63,9 @@ module.exports = wrapHandlers({
   },
 
   destroy: async (req, res) => {
-    let site;
     const { id } = req.params;
 
-    site = await fetchModelById(id, Site);
+    const site = await fetchModelById(id, Site);
     await SiteDestroyer.destroySite(site);
     return res.json(serializeNew(site, true));
   },

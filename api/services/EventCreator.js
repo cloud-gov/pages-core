@@ -44,11 +44,11 @@ const audit = (label, model, message, body = {}) => createEvent({
   body: { ...body, message },
 });
 
-const error = (label, error, body = {}) => createEvent({
+const error = (label, err, body = {}) => createEvent({
   type: Event.types.ERROR,
   label,
   body: {
-    ...{}, error: error.stack, message: error.message, ...body,
+    ...{}, error: err.stack, message: err.message, ...body,
   },
 });
 
@@ -58,13 +58,13 @@ const warn = (label, message, body = {}) => createEvent({
   body: { ...body, message },
 });
 
-const handlerError = async (request, error) => {
+const handlerError = async (request, err) => {
   const { path, params, body } = request;
   const errBody = { ...{}, ...{ path, params, body } };
   // remove secrets
   delete errBody.body.password; // basicAuth password
   delete errBody.body.value; // uev value
-  return error(Event.labels.REQUEST_HANDLER, error, errBody);
+  return error(Event.labels.REQUEST_HANDLER, err, errBody);
 };
 
 module.exports = {
