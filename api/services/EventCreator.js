@@ -60,7 +60,7 @@ const warn = (label, message, body = {}) => createEvent({
 
 const handlerError = async (request, err) => {
   const { path, params, body } = request;
-  const errBody = { ...{}, ...{ path, params, body } };
+  const errBody = { request: { path, params, body } };
   // remove secrets
   delete errBody.body.password; // basicAuth password
   delete errBody.body.value; // uev value

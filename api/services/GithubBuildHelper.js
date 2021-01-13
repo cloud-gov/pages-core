@@ -102,7 +102,7 @@ const fetchContent = async (build, path) => {
   const { owner, repository } = build.Site;
   return GitHub.getContent(accessToken, owner, repository, path, build.clonedCommitSha)
     .catch((err) => {
-      EventCreator.warn(Event.labels.BUILD_STATUS, {
+      EventCreator.warn(Event.labels.BUILD_STATUS, err.message, {
         buildId: build.id,
         path,
         commitSha: build.clonedCommitSha,

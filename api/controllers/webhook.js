@@ -126,7 +126,7 @@ module.exports = {
       if (req.body.commits && req.body.commits.length > 0) {
         const site = await findSiteForWebhookRequest(req)
           .catch((err) => {
-            EventCreator.warn({
+            EventCreator.warn(Event.labels.REQUEST_HANDLER, err.message, {
               error: err.stack,
               request: {
                 path: req.path,
@@ -144,15 +144,7 @@ module.exports = {
       }
       res.ok();
     } catch (err) {
-      const errBody = {
-        message: 'Error encountered when processing GitHub push webhook',
-        error: err.stack,
-        request: {
-          body: req.body,
-          path: req.path,
-        },
-      };
-      EventCreator.error(Event.labels.BUILD_REQUEST, errBody);
+      EventCreator.handlerError(req, err);
       res.badRequest();
     }
   },
@@ -162,15 +154,7 @@ module.exports = {
       await organizationWebhookRequest(req.body);
       res.ok();
     } catch (err) {
-      const errBody = {
-        message: 'Error encountered when processing GitHub organization webhook',
-        error: err.stack,
-        request: {
-          body: req.body,
-          path: req.path,
-        },
-      };
-      EventCreator.error(Event.labels.FEDERALIST_USERS_MEMBERSHIP, errBody);
+      EventCreator.handlerError(req, err);
       res.badRequest();
     }
   },
