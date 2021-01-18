@@ -150,7 +150,7 @@
     "redux-form": "^8.3.7",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "sass": "^1.30.0",
+    "sass": "^1.32.4",
     "sass-loader": "^10.1.0",
     "serve": "^11.3.2",
     "shortid": "^2.2.16",
