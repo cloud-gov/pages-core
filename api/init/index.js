@@ -55,8 +55,8 @@ function fourOhFourhandler(req, res) {
 }
 
 // eslint-disable-next-line no-unused-vars
-function errorHandler(err, _req, res, _next) {
-  EventCreator.handlerError(_req, err);
+function errorHandler(err, req, res, _next) {
+  EventCreator.handlerError(req, err);
   res.error(err);
 }
 
