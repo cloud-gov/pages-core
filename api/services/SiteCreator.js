@@ -150,7 +150,7 @@ function validateSite(params) {
 function saveAndBuildSite({ site, user }) {
   let model;
 
-  return GitHub.setWebhook(site, user.id)
+  return GitHub.setWebhook(site, user.githubAccessToken)
     .then(() => site.save())
     .then((createdSite) => {
       model = createdSite;

@@ -228,7 +228,7 @@ describe('GitHub', () => {
     });
   });
 
-  describe('.setWebhook(site, user)', () => {
+  describe('.setWebhook(site, githubAccessToken)', () => {
     it('should set a webhook on the repository', (done) => {
       let site;
       let user;
@@ -246,7 +246,7 @@ describe('GitHub', () => {
             repo: site.repository,
             response: 201,
           });
-          return GitHub.setWebhook(site, user.id);
+          return GitHub.setWebhook(site, user.githubAccessToken);
         })
         .then(() => {
           done();
@@ -273,7 +273,7 @@ describe('GitHub', () => {
               errors: [{ message: 'Hook already exists on this repository' }],
             }],
           });
-          return GitHub.setWebhook(site, user.id);
+          return GitHub.setWebhook(site, user.githubAccessToken);
         })
         .then(() => {
           done();
@@ -300,7 +300,7 @@ describe('GitHub', () => {
               message: 'Not Found',
             }],
           });
-          return GitHub.setWebhook(site, user.id);
+          return GitHub.setWebhook(site, user.githubAccessToken);
         })
         .then(() => {
           throw new Error('Expected admin access error');

@@ -7,6 +7,8 @@
   let currentPage;
   let redirect;
 
+  const HOME = '/sites';
+
   function queryString(ctx, next) {
     ctx.query = {};
     new URLSearchParams(ctx.querystring)
@@ -47,7 +49,7 @@
 
   // Authenticated Routes
   page('*', ensureAuthenticated);
-  page('/', checkRedirect, render(Pages.Home));
+  page('/', checkRedirect, () => page.redirect(HOME));
   page('/sites/:id', queryString, render(Pages.Site));
   page('/sites', queryString, render(Pages.Sites));
   page('/builds/:id', queryString, render(Pages.Build));

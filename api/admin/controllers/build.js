@@ -3,7 +3,7 @@ const buildSerializer = require('../../serializers/build');
 const BuildLogs = require('../../services/build-logs');
 const { Build, Site } = require('../../models');
 const { buildWhereQuery, fetchModelById } = require('../../utils/queryDatabase');
-const { wait } = require('../../utils');
+const { paginate, wait, wrapHandlers } = require('../../utils');
 
 function safeWrite(res, data) {
   if (data && !res.writableEnded) {
@@ -11,32 +11,29 @@ function safeWrite(res, data) {
   }
 }
 
-module.exports = {
-  findAllBuilds: async (req, res) => {
-    const { limit = 50, offset = 0, ...options } = req.query;
-
-    const query = {
-      where: {},
-      order: [['createdAt', 'DESC']],
-      limit,
-      offset,
-    };
+module.exports = wrapHandlers({
+  async list(req, res) {
+    const {
+      limit, page, ...options
+    } = req.query;
 
     const queryFields = Object.keys(Build.rawAttributes);
-    const where = buildWhereQuery(options, queryFields);
-    query.where = where;
 
-    try {
-      const builds = await Build.findAll(query);
+    const query = {
+      where: buildWhereQuery(options, queryFields),
+    };
 
-      const buildJSON = await buildSerializer.serialize(builds);
-      return res.json(buildJSON);
-    } catch (error) {
-      return res.error(error);
-    }
+    const pagination = await paginate(Build, buildSerializer.serialize, { limit, page }, query);
+
+    const json = {
+      meta: {},
+      ...pagination,
+    };
+
+    res.json(json);
   },
 
-  findById: async (req, res) => {
+  async findById(req, res) {
     const {
       params: { id },
     } = req;
@@ -47,7 +44,7 @@ module.exports = {
     return res.json(buildSerializer.serializeObject(build));
   },
 
-  findBuildLog: async (req, res) => {
+  async findBuildLog(req, res) {
     const {
       params: { id },
     } = req;
@@ -92,4 +89,4 @@ module.exports = {
 
     return res.end();
   },
-};
+});
