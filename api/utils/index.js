@@ -157,8 +157,7 @@ function mapValues(fn, obj) {
 }
 
 function wrapHandler(fn) {
-  // calls `next(error)`
-  return (...args) => fn(...args).catch(args[2]);
+  return (req, res, next) => fn(req, res).catch(next);
 }
 
 function wrapHandlers(handlers) {
