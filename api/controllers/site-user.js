@@ -6,7 +6,7 @@ module.exports = wrapHandlers({
   async updateNotificationSettings(req, res) {
     const siteId = toInt(req.params.site_id);
     if (!siteId) {
-      throw 404;
+      return res.notFound();
     }
 
     const siteUser = await SiteUser.findOne({
@@ -14,7 +14,7 @@ module.exports = wrapHandlers({
     });
 
     if (!siteUser) {
-      throw 404;
+      return res.notFound();
     }
 
     const attrs = {};
@@ -23,6 +23,6 @@ module.exports = wrapHandlers({
     }
     await siteUser.update(attrs);
     const siteJSON = await siteSerializer.serialize({ id: siteUser.site_users });
-    res.json(siteJSON);
+    return res.json(siteJSON);
   },
 });

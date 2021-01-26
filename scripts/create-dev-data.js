@@ -219,8 +219,8 @@ async function createData({ githubUsername }) {
 
   console.log('Creating Events');
   await Promise.all([
-    EventCreator.audit(Event.labels.AUTHENTICATION, user1, { action: 'login' }),
-    EventCreator.audit(Event.labels.AUTHENTICATION, user2, { action: 'login' }),
+    EventCreator.audit(Event.labels.AUTHENTICATION, user1, 'UAA login'),
+    EventCreator.audit(Event.labels.AUTHENTICATION, user2, 'UAA login'),
   ]);
 
   console.log('Creating Admin Users');

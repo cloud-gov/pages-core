@@ -53,8 +53,9 @@ module.exports = wrapHandlers({
   async find(req, res) {
     const site = await fetchModelById(req.params.site_id, Site);
     if (!site) {
-      throw 404;
+      return res.notFound();
     }
+
     await siteAuthorizer.findOne(req.user, site);
     const builds = await Build.findAll({
       attributes: ['id'],
@@ -63,7 +64,7 @@ module.exports = wrapHandlers({
       limit: 100,
     });
     const buildJSON = await buildSerializer.serialize(builds);
-    res.json(buildJSON);
+    return res.json(buildJSON);
   },
 
   /**
@@ -90,8 +91,9 @@ module.exports = wrapHandlers({
     });
 
     if (!requestBuild) {
-      throw 404;
+      return res.notFound();
     }
+
     const queuedBuild = await Build.findOne({
       where: {
         site: requestBuild.site,
@@ -112,39 +114,36 @@ module.exports = wrapHandlers({
       rebuild.Site = requestBuild.Site;
       await GithubBuildHelper.reportBuildStatus(rebuild);
       const rebuildJSON = await buildSerializer.serialize(rebuild);
-      res.json(rebuildJSON);
-      return;
+      return res.json(rebuildJSON);
     }
-    res.ok({});
+    return res.ok({});
   },
 
   async status(req, res) {
-    const getBuildStatus = (statusRequest) => {
-      let status;
-      let message;
-      let commitSha;
-      try {
-        status = statusRequest.body.status;
-        message = decodeb64(statusRequest.body.message);
-        commitSha = statusRequest.body.commit_sha;
-      } catch (err) {
-        EventCreator.requestError(req, err);
-      }
-      return { status, message, commitSha };
-    };
+    const { params, body } = req;
 
-    const build = await fetchModelById(req.params.id, Build, {
+    const build = await fetchModelById(params.id, Build, {
       include: [{ model: Site, include: [{ model: User }] }],
     });
 
     if (!build) {
-      throw 404;
+      return res.notFound();
     }
-    if (build.token !== req.params.token) {
-      throw 403;
+    if (build.token !== params.token) {
+      return res.forbidden();
     }
 
-    const buildStatus = getBuildStatus(req);
+    const buildStatus = {
+      status: body.status,
+      commitSha: body.commit_sha,
+    };
+
+    try {
+      buildStatus.message = decodeb64(body.message);
+    } catch (err) {
+      EventCreator.error(Event.labels.BUILD_STATUS, err, { buildId: build.id });
+    }
+
     await build.updateJobStatus(buildStatus);
 
     emitBuildStatus(build);
@@ -157,6 +156,6 @@ module.exports = wrapHandlers({
       }
     }
 
-    res.ok();
+    return res.ok();
   },
 });

@@ -12,31 +12,23 @@ const jwtHelper = require('./services/jwtHelper');
 
 const socketIO = io(server);
 
+function handleError(message, body = {}) {
+  return err => EventCreator.error(Event.labels.SOCKET_IO, err, {
+    message,
+    ...body,
+  });
+}
+
 if (redisConfig) {
   const pubClient = redis.createClient(redisConfig);
   const subClient = redis.createClient(redisConfig);
 
-  pubClient.on('error', (err) => {
-    EventCreator.error(Event.labels.SOCKET_IO, {
-      message: 'redisAdapter pubClient error',
-      error: err.stack,
-    });
-  });
-  subClient.on('error', (err) => {
-    EventCreator.error(Event.labels.SOCKET_IO, {
-      message: 'redisAdapter subClient error',
-      error: err.stack,
-    });
-  });
+  pubClient.on('error', handleError('redisAdapter pubClient error'));
+  subClient.on('error', handleError('redisAdapter subClient error'));
 
   socketIO.adapter(redisAdapter({ pubClient, subClient }));
 
-  socketIO.of('/').adapter.on('error', (err) => {
-    EventCreator.error(Event.labels.SOCKET_IO, {
-      message: 'redisAdapter error',
-      error: err.stadck,
-    });
-  });
+  socketIO.of('/').adapter.on('error', handleError('redisAdapter error'));
 }
 
 socketIO.use((socket, next) => {
@@ -48,10 +40,7 @@ socketIO.use((socket, next) => {
       })
       .then(() => next())
       .catch((err) => {
-        EventCreator.error(Event.labels.SOCKET_IO, {
-          message: 'handshake error',
-          error: err.stack,
-        });
+        handleError('handshake error')(err);
         next();
       });
   } else {
@@ -60,14 +49,11 @@ socketIO.use((socket, next) => {
 });
 
 socketIO.on('connection', (socket) => {
-  SocketIOSubscriber.joinRooms(socket);
+  SocketIOSubscriber
+    .joinRooms(socket)
+    .catch(handleError('socketIO subscription join room error', { userId: socket.user }));
 });
 
-socketIO.on('error', (err) => {
-  EventCreator.error(Event.labels.SOCKET_IO, {
-    message: 'socket auth/subscribe error',
-    error: err.stack,
-  });
-});
+socketIO.on('error', handleError('socket auth/subscribe error'));
 
 module.exports = socketIO;

@@ -2,8 +2,6 @@ const url = require('url');
 const GitHub = require('./GitHub');
 const config = require('../../config');
 const { buildViewLink } = require('../utils/build');
-const EventCreator = require('./EventCreator');
-const { Event } = require('../models');
 
 // Loops through supplied list of users, until it
 // finds a user with a valid access token
@@ -100,14 +98,7 @@ const fetchContent = async (build, path) => {
 
   const accessToken = await loadBuildUserAccessToken(build);
   const { owner, repository } = build.Site;
-  return GitHub.getContent(accessToken, owner, repository, path, build.clonedCommitSha)
-    .catch((err) => {
-      EventCreator.warn(Event.labels.BUILD_STATUS, null, err, {
-        buildId: build.id,
-        path,
-        commitSha: build.clonedCommitSha,
-      });
-    });
+  return GitHub.getContent(accessToken, owner, repository, path, build.clonedCommitSha);
 };
 
 module.exports = { reportBuildStatus, fetchContent, loadBuildUserAccessToken };

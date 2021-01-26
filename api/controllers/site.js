@@ -7,7 +7,6 @@ const UserActionCreator = require('../services/UserActionCreator');
 const siteSerializer = require('../serializers/site');
 const { User, Site, Build } = require('../models');
 const siteErrors = require('../responses/siteErrors');
-const EventCreator = require('../services/EventCreator');
 const ProxyDataSync = require('../services/ProxyDataSync');
 const {
   ValidationError,
@@ -17,11 +16,6 @@ const {
 const { wrapHandlers } = require('../utils');
 const Features = require('../features');
 const { fetchModelById } = require('../utils/queryDatabase');
-
-const sendJSON = async (site, res) => {
-  const siteJSON = await siteSerializer.serialize(site);
-  return res.json(siteJSON);
-};
 
 const stripCredentials = ({ username, password }) => {
   if (validBasicAuthUsername(username) && validBasicAuthPassword(password)) {
@@ -34,22 +28,37 @@ const stripCredentials = ({ username, password }) => {
 module.exports = wrapHandlers({
   async findAllForUser(req, res) {
     const user = await fetchModelById(req.user.id, User, { include: [Site] });
-    sendJSON(user.Sites, res);
+
+    if (!user) {
+      return res.notFound();
+    }
+
+    const siteJSON = await siteSerializer.serialize(user.Sites);
+    return res.json(siteJSON);
   },
 
   async findById(req, res) {
     const site = await fetchModelById(req.params.id, Site);
+
     if (!site) {
-      throw 404;
+      return res.notFound();
     }
+
     await authorizer.findOne(req.user, site);
+
     const siteJSON = await siteSerializer.serialize(site);
-    res.json(siteJSON);
+    return res.json(siteJSON);
   },
 
   async destroy(req, res) {
     const { id } = req.params;
+
     const site = await fetchModelById(id, Site);
+
+    if (!site) {
+      return res.notFound();
+    }
+
     const siteJSON = await siteSerializer.serialize(site);
     await authorizer.destroy(req.user, site);
     await SiteDestroyer.destroySite(site);
@@ -59,7 +68,7 @@ module.exports = wrapHandlers({
   async addUser(req, res) {
     const { body, user } = req;
     if (!body.owner || !body.repository) {
-      throw 400;
+      return res.badRequest();
     }
 
     await authorizer.addUser(user, body);
@@ -68,7 +77,7 @@ module.exports = wrapHandlers({
       siteParams: body,
     });
     const siteJSON = await siteSerializer.serialize(site);
-    res.json(siteJSON);
+    return res.json(siteJSON);
   },
 
   async removeUser(req, res) {
@@ -76,20 +85,18 @@ module.exports = wrapHandlers({
     const userId = Number(req.params.user_id);
 
     if (_.isNaN(siteId) || _.isNaN(userId)) {
-      throw 400;
+      return res.badRequest();
     }
 
     const site = await Site.withUsers(siteId);
     if (!site) {
-      throw 404;
+      return res.notFound();
     }
 
     if (site.Users.length === 1) {
-      throw {
-        status: 400,
-        message: siteErrors.USER_REQUIRED,
-      };
+      return res.badRequest({ message: siteErrors.USER_REQUIRED });
     }
+
     await authorizer.removeUser(req.user, site);
     await SiteMembershipCreator.revokeSiteMembership({ user: req.user, site, userId });
     await UserActionCreator.addRemoveAction({
@@ -98,7 +105,8 @@ module.exports = wrapHandlers({
       targetType: 'user',
       siteId: site.id,
     });
-    sendJSON(site, res);
+    const siteJSON = await siteSerializer.serialize(site);
+    return res.json(siteJSON);
   },
 
   async create(req, res) {
@@ -112,21 +120,22 @@ module.exports = wrapHandlers({
     });
 
     if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-      ProxyDataSync.saveSite(site)
-        .catch(err => EventCreator.handlerError(req, err));
+      await ProxyDataSync.saveSite(site);
     }
+
     const siteJSON = await siteSerializer.serialize(site);
-    res.json(siteJSON);
+    return res.json(siteJSON);
   },
 
   async update(req, res) {
-    let build;
-
     const site = await fetchModelById(req.params.id, Site);
+
     if (!site) {
-      throw 404;
+      return res.notFound();
     }
+
     await authorizer.update(req.user, site);
+
     const params = Object.assign(site, req.body);
     await site.update({
       demoBranch: params.demoBranch,
@@ -138,24 +147,27 @@ module.exports = wrapHandlers({
       domain: params.domain,
       engine: params.engine,
     });
-    build = await Build.create({
+
+    await Build.create({
       user: req.user.id,
       site: site.id,
       branch: site.defaultBranch,
       username: req.user.username,
-    });
-    await build.enqueue();
+    })
+      .then(b => b.enqueue());
+
     if (site.demoBranch) {
-      build = await Build.create({
+      await Build.create({
         user: req.user.id,
         site: site.id,
         branch: site.demoBranch,
         username: req.user.username,
-      });
-      await build.enqueue();
+      })
+        .then(b => b.enqueue());
     }
+
     const siteJSON = await siteSerializer.serialize(site);
-    res.json(siteJSON);
+    return res.json(siteJSON);
   },
 
   async addBasicAuth(req, res) {
@@ -174,8 +186,7 @@ module.exports = wrapHandlers({
     await site.update({ basicAuth: credentials });
 
     if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-      ProxyDataSync.saveSite(site) // sync to proxy database
-        .catch(err => EventCreator.handlerError(req, err));
+      await ProxyDataSync.saveSite(site);
     }
 
     const siteJSON = await siteSerializer.serialize(site);
@@ -195,8 +206,7 @@ module.exports = wrapHandlers({
     await site.update({ basicAuth: {} });
 
     if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-      ProxyDataSync.saveSite(site) // sync to proxy database
-        .catch(err => EventCreator.handlerError(req, err));
+      await ProxyDataSync.saveSite(site);
     }
 
     const siteJSON = await siteSerializer.serialize(site);

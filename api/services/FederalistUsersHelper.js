@@ -59,8 +59,7 @@ const federalistUsersAdmins = githubAccessToken => GitHub.getOrganizationMembers
   .then(admins => admins.map(admin => admin.login));
 
 const removeMemberFromFederalistUsersOrg = (githubAccessToken, login) => GitHub
-  .removeOrganizationMember(githubAccessToken, FEDERALIST_USERS_ORG, login)
-  .catch(error => EventCreator.error(Event.labels.FEDERALIST_USERS, error, { login }));
+  .removeOrganizationMember(githubAccessToken, FEDERALIST_USERS_ORG, login);
 
 const revokeMembershipForInactiveUsers = async ({ auditorUsername } = {}) => {
   /* eslint-disable no-param-reassign */
@@ -86,7 +85,7 @@ const revokeMembershipForInactiveUsers = async ({ auditorUsername } = {}) => {
     },
   });
 
-  return Promise.all(users
+  return Promise.allSettled(users
     .map(user => removeMemberFromFederalistUsersOrg(githubAccessToken, user.username)));
 };
 
@@ -107,7 +106,7 @@ const removeMembersWhoAreNotUsers = async ({ auditorUsername } = {}) => {
 
   const memberLoginsToRemove = allMemberLogins
     .filter(login => !allUsernames.includes(login.toLowerCase()));
-  return Promise.all(memberLoginsToRemove
+  return Promise.allSettled(memberLoginsToRemove
     .map(login => removeMemberFromFederalistUsersOrg(githubAccessToken, login)));
 };
 

@@ -30,7 +30,9 @@ const corsCfg = {
 // eslint-disable-next-line no-unused-vars
 function errorHandler(err, req, res, _next) {
   EventCreator.handlerError(req, err);
-  res.error(err);
+  if (!res.headersSent) {
+    res.error(err);
+  }
 }
 
 function cacheControl(_req, res, next) {

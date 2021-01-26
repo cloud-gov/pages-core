@@ -30,22 +30,11 @@ const auditUser = (user, auditor) => {
               EventCreator.audit(Event.labels.SITE_USER, user, message, {
                 siteId: site.id,
               });
-            })
-            .catch((err) => {
-              EventCreator.error(Event.labels.SITE_USER, err, {
-                userId: user.id,
-                siteId: site.id,
-              });
             });
           removed.push(r);
         }
       });
       return Promise.all(removed);
-    })
-    .catch((err) => {
-      EventCreator.error(Event.labels.SITE_USER, err, {
-        userId: user.id,
-      });
     });
 };
 
@@ -91,48 +80,31 @@ const auditSite = (auditor, site, userIndex = 0) => {
               siteId: site.id,
             }))
             .then(() => {
-              EventCreator.audit(Event.labels.SITE_USER, user, {
-                message: 'Removed user from site. User does not have write permisisons',
-                siteId: site.id,
-              });
-            })
-            .catch((err) => {
-              EventCreator.error(Event.labels.SITE_USER, err, {
-                userId: u.id,
-                siteId: site.id,
-              });
+              EventCreator.audit(Event.labels.SITE_USER, user,
+                'Removed user from site. User does not have write permissions',
+                { siteId: site.id });
             });
+
           removed.push(r);
         });
         return Promise.all(removed);
       }
       return auditSite(auditor, site, userIndex + 1);
-    })
-    .catch((err) => {
-      EventCreator.error(Event.labels.SITE_USER, err, {
-        siteId: site.id,
-      });
     });
 };
 
-const auditAllSites = () => {
-  let auditor;
-  return User.findOne({ where: { username: process.env.USER_AUDITOR } })
-    .then((model) => {
-      auditor = model;
-      return Site.findAll({
-        attributes: ['id', 'owner', 'repository'],
-        include: [{
-          model: User.scope('withGithub'),
-          attributes: ['id', 'username', 'githubAccessToken', 'signedInAt'],
-        }],
-        order: [[User, 'signedInAt', 'DESC']],
-      });
-    })
-    .then((sites) => {
-      const auditedSites = [];
-      sites.forEach(site => auditedSites.push(auditSite(auditor, site)));
-      return Promise.all(auditedSites);
-    });
+const auditAllSites = async () => {
+  const auditor = await User.findOne({ where: { username: process.env.USER_AUDITOR } });
+  const sites = await Site.findAll({
+    attributes: ['id', 'owner', 'repository'],
+    include: [{
+      model: User.scope('withGithub'),
+      attributes: ['id', 'username', 'githubAccessToken', 'signedInAt'],
+    }],
+    order: [[User, 'signedInAt', 'DESC']],
+  });
+  const auditedSites = sites.map(site => auditSite(auditor, site));
+  return Promise.allSettled(auditedSites);
 };
+
 module.exports = { auditAllUsers, auditAllSites, auditUser };

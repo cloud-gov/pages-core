@@ -1,7 +1,6 @@
 const GitHub = require('./GitHub');
-const { User, Site, Event } = require('../models');
+const { User, Site } = require('../models');
 const { logger } = require('../../winston');
-const EventCreator = require('./EventCreator');
 
 const verifyNextRepo = (site, userIndex = 0) => {
   let found;
@@ -30,27 +29,22 @@ const verifyRepos = () => Site.findAll({
 })
   .then(sites => Promise.all(sites.map(site => verifyNextRepo(site))));
 
-const verifyUserRepos = (user) => {
-  let repos;
-  return GitHub.getRepositories(user.githubAccessToken)
-    .then((_repos) => {
-      repos = _repos;
-      return user.getSites();
+const verifyUserRepos = async (user) => {
+  const repoLastVerified = new Date();
+
+  const [repos, sites] = await Promise.all([
+    GitHub.getRepositories(user.githubAccessToken),
+    user.getSites(),
+  ]);
+
+  const verified = sites
+    .filter((site) => {
+      const fullName = [site.owner, site.repository].join('/').toUpperCase();
+      return repos.find(repo => repo.full_name.toUpperCase() === fullName);
     })
-    .then((sites) => {
-      const verified = [];
-      const repoLastVerified = new Date();
-      sites.forEach((site) => {
-        const fullName = [site.owner, site.repository].join('/').toUpperCase();
-        if (repos.find(repo => repo.full_name.toUpperCase() === fullName)) {
-          verified.push(site.update({ repoLastVerified }));
-        }
-      });
-      return Promise.all(verified);
-    })
-    .catch(err => EventCreator.error(Event.labels.SITE_USER, err, {
-      userId: user.id,
-    }));
+    .map(site => site.update({ repoLastVerified }));
+
+  return Promise.all(verified);
 };
 
 module.exports = { verifyRepos, verifyUserRepos };

@@ -36,7 +36,10 @@ async function verifyGithub(accessToken, _refreshToken, profile, callback) {
 
     EventCreator.audit(Event.labels.AUTHENTICATION, user, 'GitHub login');
 
-    RepositoryVerifier.verifyUserRepos(user);
+    RepositoryVerifier.verifyUserRepos(user)
+      .catch(err => EventCreator.error(Event.labels.SITE_USER, err, {
+        userId: user.id,
+      }));
 
     return callback(null, user);
   } catch (err) {
@@ -61,7 +64,10 @@ async function verifyUAA(accessToken, _refreshToken, profile, callback) {
 
     EventCreator.audit(Event.labels.AUTHENTICATION, user, 'UAA login');
 
-    RepositoryVerifier.verifyUserRepos(user);
+    RepositoryVerifier.verifyUserRepos(user)
+      .catch(err => EventCreator.error(Event.labels.SITE_USER, err, {
+        userId: user.id,
+      }));
 
     return callback(null, user);
   } catch (err) {
