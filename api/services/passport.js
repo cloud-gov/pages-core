@@ -34,9 +34,12 @@ async function verifyGithub(accessToken, _refreshToken, profile, callback) {
       signedInAt: new Date(),
     });
 
-    EventCreator.audit(Event.labels.AUTHENTICATION, user, { action: 'login' });
+    EventCreator.audit(Event.labels.AUTHENTICATION, user, 'GitHub login');
 
-    RepositoryVerifier.verifyUserRepos(user);
+    RepositoryVerifier.verifyUserRepos(user)
+      .catch(err => EventCreator.error(Event.labels.SITE_USER, err, {
+        userId: user.id,
+      }));
 
     return callback(null, user);
   } catch (err) {
@@ -59,9 +62,12 @@ async function verifyUAA(accessToken, _refreshToken, profile, callback) {
       signedInAt: new Date(),
     });
 
-    EventCreator.audit(Event.labels.AUTHENTICATION, user, { action: 'login' });
+    EventCreator.audit(Event.labels.AUTHENTICATION, user, 'UAA login');
 
-    RepositoryVerifier.verifyUserRepos(user);
+    RepositoryVerifier.verifyUserRepos(user)
+      .catch(err => EventCreator.error(Event.labels.SITE_USER, err, {
+        userId: user.id,
+      }));
 
     return callback(null, user);
   } catch (err) {
@@ -80,7 +86,7 @@ passport.logout = (idp) => {
     const { user } = req;
     req.logout();
     if (user) {
-      EventCreator.audit(Event.labels.AUTHENTICATION, user, { action: 'logout' });
+      EventCreator.audit(Event.labels.AUTHENTICATION, user, 'logout');
     }
     req.session.destroy(() => {
       res.redirect(redirectURL);

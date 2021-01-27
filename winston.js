@@ -25,13 +25,15 @@ const databaseLogger = winston.createLogger({
   silent: config.log.silent,
 });
 
+expressWinston.requestWhitelist.push('body');
+expressWinston.bodyBlacklist.push('password', 'value');
+
 const expressLogger = expressWinston.logger({
   format: winston.format.combine(
     winston.format.simple(),
     winston.format.colorize()
   ),
   transports: [new winston.transports.Console()],
-  requestWhitelist: expressWinston.requestWhitelist.concat('body'),
   skip: () => config.log.silent,
 });
 

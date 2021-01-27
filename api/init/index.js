@@ -16,7 +16,7 @@ const responses = require('../responses');
 const passport = require('../services/passport');
 const router = require('../routers');
 const devMiddleware = require('../services/devMiddleware');
-
+const EventCreator = require('../services/EventCreator');
 const sessionConfig = require('./sessionConfig');
 
 const { NODE_ENV } = process.env;
@@ -55,8 +55,11 @@ function fourOhFourhandler(req, res) {
 }
 
 // eslint-disable-next-line no-unused-vars
-function errorHandler(err, _req, res, _next) {
-  res.error(err);
+function errorHandler(err, req, res, _next) {
+  EventCreator.handlerError(req, err);
+  if (!res.headersSent) {
+    res.error(err);
+  }
 }
 
 function init(app) {

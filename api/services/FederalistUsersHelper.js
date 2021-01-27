@@ -59,8 +59,7 @@ const federalistUsersAdmins = githubAccessToken => GitHub.getOrganizationMembers
   .then(admins => admins.map(admin => admin.login));
 
 const removeMemberFromFederalistUsersOrg = (githubAccessToken, login) => GitHub
-  .removeOrganizationMember(githubAccessToken, FEDERALIST_USERS_ORG, login)
-  .catch(error => EventCreator.error(Event.labels.FEDERALIST_USERS, { error, login, action: 'removeOrgMember' }));
+  .removeOrganizationMember(githubAccessToken, FEDERALIST_USERS_ORG, login);
 
 const revokeMembershipForInactiveUsers = async ({ auditorUsername } = {}) => {
   /* eslint-disable no-param-reassign */
@@ -86,7 +85,7 @@ const revokeMembershipForInactiveUsers = async ({ auditorUsername } = {}) => {
     },
   });
 
-  return Promise.all(users
+  return Promise.allSettled(users
     .map(user => removeMemberFromFederalistUsersOrg(githubAccessToken, user.username)));
 };
 
@@ -107,7 +106,7 @@ const removeMembersWhoAreNotUsers = async ({ auditorUsername } = {}) => {
 
   const memberLoginsToRemove = allMemberLogins
     .filter(login => !allUsernames.includes(login.toLowerCase()));
-  return Promise.all(memberLoginsToRemove
+  return Promise.allSettled(memberLoginsToRemove
     .map(login => removeMemberFromFederalistUsersOrg(githubAccessToken, login)));
 };
 
@@ -127,10 +126,9 @@ const deactivateUsersWhoAreNotMembers = async ({ auditorUsername } = {}) => {
       },
       returning: ['id', 'isActive'],
     });
-
-  inactiveUsers.map(user => EventCreator.audit('deactivated', user, { // function for 1 time init use - to be deleted
-    action: { isActive: user.isActive },
-  }));
+  // function for 1 time init use - to be deleted
+  inactiveUsers.map(user => EventCreator
+    .audit(Event.labels.FEDERALIST_USERS_MEMBERSHIP, user, 'Deactivated user', { userId: user.id }));
 };
 
 module.exports = {

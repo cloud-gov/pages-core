@@ -55,9 +55,9 @@ module.exports = wrapHandlers({
       const json = serialize(uev);
 
       return res.ok(json);
-    } catch (error) {
-      if (error.name !== 'SequelizeUniqueConstraintError') {
-        throw error;
+    } catch (err) {
+      if (err.name !== 'SequelizeUniqueConstraintError') {
+        throw err;
       }
       return res.badRequest({
         message: `A user environment variable with name: "${name}" already exists for this site.`,

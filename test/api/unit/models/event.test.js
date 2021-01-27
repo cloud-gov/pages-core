@@ -5,12 +5,12 @@ describe('Event model', () => {
   it('should validate the type', (done) => {
     factory.event({
       type: 'audit',
-      label: 'timing',
+      label: 'request-handler',
       model: 'User',
     })
     .then((event) => {
       expect(event.type).to.equal('audit');
-      expect(event.label).to.equal('timing');
+      expect(event.label).to.equal('request-handler');
       done();
     });
   });
@@ -18,7 +18,7 @@ describe('Event model', () => {
   it('should not allow invalid type', (done) => {
     factory.event({
       type: 'invalidType',
-      label: 'timing',
+      label: 'request-handler',
       model: 'User',
     })
     .catch((err) => {
@@ -42,7 +42,7 @@ describe('Event model', () => {
   it('should not allow invalid model', (done) => {
     factory.event({
       type: 'audit',
-      label: 'timing',
+      label: 'request-handler',
       model: 'invalidModel',
     })
     .catch((err) => {

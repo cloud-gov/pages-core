@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const request = require('supertest');
+const sinon = require('sinon');
 const factory = require('../support/factory');
 const csrfToken = require('../support/csrfToken');
 const { authenticatedSession } = require('../support/session');
@@ -7,8 +8,17 @@ const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema'
 const app = require('../../../app');
 const config = require('../../../config');
 const { UserEnvironmentVariable } = require('../../../api/models');
+const EventCreator = require('../../../api/services/EventCreator');
 
 describe('User Environment Variable API', () => {
+  beforeEach(() => {
+    sinon.stub(EventCreator, 'error').resolves();
+  });
+
+  afterEach(() => {
+    sinon.restore()
+  });
+
   describe('DELETE /v0/site/:site_id/user-environment-variable/:uev_id', () => {
     describe('when the user is not authenticated', () => {
       it('returns a 403', async () => {

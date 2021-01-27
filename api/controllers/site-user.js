@@ -1,28 +1,28 @@
 const siteSerializer = require('../serializers/site');
 const { SiteUser } = require('../models');
-const { toInt } = require('../utils');
+const { toInt, wrapHandlers } = require('../utils');
 
-module.exports = {
-  updateNotificationSettings: (req, res) => {
+module.exports = wrapHandlers({
+  async updateNotificationSettings(req, res) {
     const siteId = toInt(req.params.site_id);
     if (!siteId) {
-      throw 404;
+      return res.notFound();
     }
 
-    SiteUser.findOne({ where: { user_sites: req.user.id, site_users: siteId } })
-      .then((siteUser) => {
-        if (!siteUser) {
-          throw 404;
-        }
+    const siteUser = await SiteUser.findOne({
+      where: { user_sites: req.user.id, site_users: siteId },
+    });
 
-        const attrs = {};
-        if (req.body.buildNotificationSetting) {
-          attrs.buildNotificationSetting = req.body.buildNotificationSetting;
-        }
-        return siteUser.update(attrs);
-      })
-      .then(siteUser => siteSerializer.serialize({ id: siteUser.site_users }))
-      .then(siteJSON => res.json(siteJSON))
-      .catch(res.error);
+    if (!siteUser) {
+      return res.notFound();
+    }
+
+    const attrs = {};
+    if (req.body.buildNotificationSetting) {
+      attrs.buildNotificationSetting = req.body.buildNotificationSetting;
+    }
+    await siteUser.update(attrs);
+    const siteJSON = await siteSerializer.serialize({ id: siteUser.site_users });
+    return res.json(siteJSON);
   },
-};
+});
