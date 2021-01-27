@@ -1,6 +1,5 @@
 <script>
   import { afterUpdate, createEventDispatcher } from 'svelte';
-  import SectionHeader from './SectionHeader.svelte';
 
   export let site;
   

@@ -104,6 +104,14 @@ async function updateSite(id, params) {
   return put(`/sites/${id}`, params).catch(() => null);
 }
 
+async function fetchUser(id) {
+  return get(`/users/${id}`).catch(() => null);
+}
+
+async function fetchUsers(query = {}) {
+  return get('/users', query).catch(() => []);
+}
+
 async function logout() {
   return get('/logout').catch(() => null);
 }
@@ -117,6 +125,8 @@ export {
   fetchEvents,
   fetchSite,
   fetchSites,
+  fetchUser,
+  fetchUsers,
   logout,
   updateSite,
 };

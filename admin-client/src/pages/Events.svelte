@@ -8,7 +8,7 @@
   } from '../components';
 
   const limits = [
-    '10', '25', '50', '100'
+    '10', '25', '50', '100',
   ];
 
   const defaultParams = {
@@ -16,6 +16,7 @@
     page: 1,
     type: '',
     label: '',
+    model: '',
   };
   
   let results;
@@ -42,6 +43,13 @@
           <option value="">-</option>
           {#each results.meta.eventLabels as label}
             <option value={label}>{label}</option>
+          {/each}
+        </select>
+        <label for="model">Model</label>
+        <select name="model" id="model" value={params.model}>
+          <option value="">-</option>
+          {#each results.meta.models as model}
+            <option value={model}>{model}</option>
           {/each}
         </select>
         <label for="limit">Num Results</label>

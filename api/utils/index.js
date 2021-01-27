@@ -227,7 +227,7 @@ function objToQueryParams(obj) {
   return qs;
 }
 
-async function paginate(model, serialize, params, query) {
+async function paginate(model, serialize, params, query = {}) {
   const limit = toInt(params.limit) || 25;
   const page = toInt(params.page) || 1;
   const offset = limit * (page - 1);
