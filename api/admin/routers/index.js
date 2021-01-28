@@ -23,6 +23,8 @@ authenticatedRouter.get('/sites/:id', AdminSiteController.findById);
 authenticatedRouter.put('/sites/:id', AdminSiteController.update);
 authenticatedRouter.delete('/sites/:id', AdminSiteController.destroy);
 authenticatedRouter.get('/me', UserController.me);
+authenticatedRouter.get('/users', UserController.list);
+authenticatedRouter.get('/users/:id', UserController.findById);
 
 const adminRouter = Router();
 adminRouter.use(auth);

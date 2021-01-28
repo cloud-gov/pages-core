@@ -5,11 +5,11 @@
     BuildTable,
     GridContainer,
     PageTitle,
-    PaginationBanner
+    PaginationBanner,
   } from '../components';
   
   const limits = [
-    '10', '25', '50', '100'
+    '10', '25', '50', '100',
   ];
 
   const defaultParams = {

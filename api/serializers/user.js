@@ -1,33 +1,55 @@
-const protectedAttributes = [
-  'githubAccessToken',
-  'githubUserId',
-  'signedInAt',
+const { pick } = require('../utils');
+
+const allowedAttributes = [
+  'id',
+  'email',
+  'username',
   'SiteUser',
+];
+
+const adminAllowedAttributes = [
+  'createdAt',
+  'updatedAt',
+  'signedInAt',
   'pushedAt',
   'isActive',
   'adminEmail',
+  'deletedAt',
 ];
 
-const toJSON = (user) => {
-  const record = user.get({
-    plain: true,
-  });
+const dateFields = [
+  'createdAt',
+  'updatedAt',
+  'signedInAt',
+  'pushedAt',
+  'deletedAt',
+];
 
-  return {
-    ...Object.keys(record).reduce((out, attr) => {
-      if (protectedAttributes.indexOf(attr) === -1) {
-        out[attr] = record[attr]; // eslint-disable-line no-param-reassign
-      }
+const toJSON = (user, isSystemAdmin = false) => {
+  const object = user.get({ plain: true });
 
-      if (attr === 'SiteUser' && record[attr] && record[attr].buildNotificationSetting) {
-      // eslint-disable-next-line no-param-reassign
-        out.buildNotificationSetting = record[attr].buildNotificationSetting;
-      }
-      return out;
-    }, {}),
-    createdAt: record.createdAt.toISOString(),
-    updatedAt: record.updatedAt.toISOString(),
-  };
+  const attributes = allowedAttributes;
+  if (isSystemAdmin) {
+    attributes.push(...adminAllowedAttributes);
+  }
+
+  const filtered = pick(attributes, object);
+
+  dateFields
+    .filter(dateField => filtered[dateField])
+    .forEach((dateField) => {
+      filtered[dateField] = filtered[dateField].toISOString();
+    });
+
+  if (filtered.SiteUser && filtered.SiteUser.buildNotificationSetting) {
+    filtered.buildNotificationSetting = filtered.SiteUser.buildNotificationSetting;
+  }
+
+  return filtered;
 };
 
-module.exports = { toJSON };
+function serializeMany(users, isSystemAdmin) {
+  return users.map(user => toJSON(user, isSystemAdmin));
+}
+
+module.exports = { serializeMany, toJSON };

@@ -2,7 +2,7 @@
   let counter = 0;
   export function incCounter() {
     counter += 1;
-    return `a-${counter}`
+    return `a-${counter}`;
   }
 </script>
 
@@ -14,7 +14,7 @@
 <div
   class="usa-accordion"
   class:usa-accordion--bordered={bordered}
-  aria-multiselectable={multiselect ? "true" : "false"}
+  aria-multiselectable={multiselect ? 'true' : 'false'}
 >
   <slot></slot>
 </div>

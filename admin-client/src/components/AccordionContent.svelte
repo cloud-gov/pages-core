@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { incCounter } from './Accordion.svelte'
+  import { incCounter } from './Accordion.svelte';
 
   export let title;
   export let expanded = false;

@@ -13,7 +13,6 @@
     Accordion,
     AccordionContent,
     BuildTable,
-    SiteDeleteForm,
     GridContainer,
     PageTitle,
     SiteForm,
