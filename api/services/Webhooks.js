@@ -21,11 +21,17 @@ const findSiteForWebhookRequest = (payload) => {
 
 const organizationWebhookRequest = async (payload) => {
   const {
-    action, membership, organization,
+    action,
+    membership,
+    organization: {
+      login: orgName,
+    },
   } = payload;
-  const { login: orgName } = organization;
 
-  if (orgName !== config.federalistUsers.orgName) {
+  if (
+    orgName !== config.federalistUsers.orgName
+    || !['member_added', 'member_removed'].includes(action)
+  ) {
     return;
   }
 
@@ -33,18 +39,16 @@ const organizationWebhookRequest = async (payload) => {
   const username = login.toLowerCase();
   let user = await User.findOne({ where: { username } });
 
-  if (['member_added', 'member_removed'].includes(action)) {
-    const isActive = action === 'member_added';
+  const isActive = action === 'member_added';
 
-    if (!user && isActive) {
-      user = await User.create({ username });
+  if (!user && isActive) {
+    user = await User.create({ username });
+  }
+  if (user) {
+    if (isActive !== user.isActive) {
+      await user.update({ isActive });
     }
-    if (user) {
-      if (isActive !== user.isActive) {
-        await user.update({ isActive });
-      }
-      EventCreator.audit(Event.labels.FEDERALIST_USERS_MEMBERSHIP, user, action);
-    }
+    EventCreator.audit(Event.labels.FEDERALIST_USERS_MEMBERSHIP, user, action);
   }
 };
 
