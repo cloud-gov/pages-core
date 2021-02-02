@@ -24,6 +24,34 @@ const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 const log = msg => `${(new Date()).toUTCString()} INFO [main] - ${msg}`;
 
+function memberAddedPayload() {
+  return {
+    action: 'member_added',
+    sender: {
+      id: 693815, url: 'https://api.github.com/users/apburnes', type: 'User', login: 'apburnes', node_id: 'MDQ6VXNlcjY5MzgxNQ==', html_url: 'https://github.com/apburnes', gists_url: 'https://api.github.com/users/apburnes/gists{/gist_id}', repos_url: 'https://api.github.com/users/apburnes/repos', avatar_url: 'https://avatars.githubusercontent.com/u/693815?v=4', events_url: 'https://api.github.com/users/apburnes/events{/privacy}', site_admin: false, gravatar_id: '', starred_url: 'https://api.github.com/users/apburnes/starred{/owner}{/repo}', followers_url: 'https://api.github.com/users/apburnes/followers', following_url: 'https://api.github.com/users/apburnes/following{/other_user}', organizations_url: 'https://api.github.com/users/apburnes/orgs', subscriptions_url: 'https://api.github.com/users/apburnes/subscriptions', received_events_url: 'https://api.github.com/users/apburnes/received_events',
+    },
+    membership: {
+      url: 'https://api.github.com/orgs/federalist-users/memberships/maryclair',
+      role: 'member',
+      user: {
+        id: 32960241, url: 'https://api.github.com/users/maryclair', type: 'User', login: 'maryclair', node_id: 'MDQ6VXNlcjMyOTYwMjQx', html_url: 'https://github.com/maryclair', gists_url: 'https://api.github.com/users/maryclair/gists{/gist_id}', repos_url: 'https://api.github.com/users/maryclair/repos', avatar_url: 'https://avatars.githubusercontent.com/u/32960241?v=4', events_url: 'https://api.github.com/users/maryclair/events{/privacy}', site_admin: false, gravatar_id: '', starred_url: 'https://api.github.com/users/maryclair/starred{/owner}{/repo}', followers_url: 'https://api.github.com/users/maryclair/followers', following_url: 'https://api.github.com/users/maryclair/following{/other_user}', organizations_url: 'https://api.github.com/users/maryclair/orgs', subscriptions_url: 'https://api.github.com/users/maryclair/subscriptions', received_events_url: 'https://api.github.com/users/maryclair/received_events',
+      },
+      state: 'pending',
+      organization_url: 'https://api.github.com/orgs/federalist-users',
+    },
+    organization: {
+      id: 14109682, url: 'https://api.github.com/orgs/federalist-users', login: 'federalist-users', node_id: 'MDEyOk9yZ2FuaXphdGlvbjE0MTA5Njgy', hooks_url: 'https://api.github.com/orgs/federalist-users/hooks', repos_url: 'https://api.github.com/orgs/federalist-users/repos', avatar_url: 'https://avatars.githubusercontent.com/u/14109682?v=4', events_url: 'https://api.github.com/orgs/federalist-users/events', issues_url: 'https://api.github.com/orgs/federalist-users/issues', description: 'federalist.18f.gov Users', members_url: 'https://api.github.com/orgs/federalist-users/members{/member}', public_members_url: 'https://api.github.com/orgs/federalist-users/public_members{/member}',
+    },
+  };
+}
+
+function socketIOError() {
+  return {
+    error: "AbortError: PUBLISH can't be processed. The connection is already closed.\n at handle_offline_command (/home/vcap/app/node_modules/redis/index.js:779:15)\n at RedisClient.internal_send_command (/home/vcap/app/node_modules/redis/index.js:813:9)\n at RedisClient.publish (/home/vcap/app/node_modules/redis/lib/commands.js:46:25)\n at RedisAdapter.broadcast (/home/vcap/app/node_modules/socket.io-redis/dist/index.js:265:28)\n at Namespace.emit (/home/vcap/app/node_modules/socket.io/dist/namespace.js:175:22)\n at Server.<computed> [as emit] (/home/vcap/app/node_modules/socket.io/dist/index.js:445:33)\n at emitBuildStatus (/home/vcap/app/api/controllers/build.js:32:30)\n at runMicrotasks (<anonymous>)\n at processTicksAndRejections (internal/process/task_queues.js:93:5)",
+    message: 'redisAdapter pubClient error',
+  };
+}
+
 async function createData({ githubUsername }) {
   console.log('Cleaning database...');
   await cleanDatabase();
@@ -221,6 +249,7 @@ async function createData({ githubUsername }) {
   await Promise.all([
     EventCreator.audit(Event.labels.AUTHENTICATION, user1, 'UAA login'),
     EventCreator.audit(Event.labels.AUTHENTICATION, user2, 'UAA login'),
+    EventCreator.audit(Event.labels.AUTHENTICATION, user1, 'member_added', memberAddedPayload()),
   ]);
 
   console.log('Creating Admin Users');
@@ -228,6 +257,12 @@ async function createData({ githubUsername }) {
     User.upsert({ username: 'amirbey', email: 'amirbey@example.com', adminEmail: 'amir.reavis-bey@gsa.gov' }),
     User.upsert({ username: 'apburnes', email: 'apburnes@example.com', adminEmail: 'andrew.burnes@gsa.gov' }),
     User.upsert({ username: 'davemcorwin', email: 'davemcorwin@example.com', adminEmail: 'david.corwin@gsa.gov' }),
+  ]);
+
+  console.log('Crearing Error Events');
+  await Promise.all([
+    EventCreator.error(Event.labels.REQUEST_HANDLER, new Error('A sample error'), { some: 'info' }),
+    EventCreator.error(Event.labels.REQUEST_HANDLER, socketIOError, { some: 'info' }),
   ]);
 }
 

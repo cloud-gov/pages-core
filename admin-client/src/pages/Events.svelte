@@ -1,8 +1,10 @@
 <script>
   import { fetchEvents } from '../lib/api';
+  import { formatDateTime } from '../helpers/formatter';
   import { router } from '../stores';
   import {
     GridContainer,
+    JSONTreeView,
     PageTitle,
     PaginationBanner,
   } from '../components';
@@ -31,14 +33,14 @@
     {#if results}
       <form method="GET" action="/events" class="font-body-md">
         <input type="hidden" name="page" value="1"/>
-        <label for="type">Event Type</label>
+        <label for="type">Type</label>
         <select name="type" id="type" value={params.type}>
           <option value="">-</option>
           {#each results.meta.eventTypes as type}
             <option value={type}>{type}</option>
           {/each}
         </select>
-        <label for="label">Event Label</label>
+        <label for="label">Label</label>
         <select name="label" id="label" value={params.label}>
           <option value="">-</option>
           {#each results.meta.eventLabels as label}
@@ -74,15 +76,19 @@
         <table class="usa-table usa-table--borderless width-full margin-top-05">
           <thead>
             <th scope="col">Name</th>
+            <th scope="col">Created</th>
             <th scope="col">Model</th>
+            <th scope="col">Message</th>
             <th scope="col">Body</th>
           </thead>
           <tbody>
             {#each payload.data as event, index}
               <tr>
                 <th scope="row"><b>{event.type}</b> | {event.label}</th>
+                <td>{formatDateTime(event.createdAt)}</td>
                 <td>{#if event.model}{event.model}: {event.modelId}{/if}</td>
-                <td><code>{JSON.stringify(event.body)}</code></td>
+                <td>{event.body.message || '--'}</td>
+                <td><JSONTreeView data={event.body}/></td>
               </tr>
             {/each}
           </tbody>
@@ -94,9 +100,3 @@
     {/await}
     </div>
 </GridContainer>
-
-<style>
-  td code {
-    word-wrap: anywhere;
-  }
-</style>
