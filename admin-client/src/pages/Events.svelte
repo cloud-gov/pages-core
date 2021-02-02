@@ -100,9 +100,3 @@
     {/await}
     </div>
 </GridContainer>
-
-<style>
-  td code {
-    word-wrap: anywhere;
-  }
-</style>
