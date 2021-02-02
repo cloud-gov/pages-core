@@ -8,6 +8,7 @@
     Accordion,
     AccordionContent,
     GridContainer,
+    JSONTreeView,
     LabeledItem,
     PageTitle,
   } from '../components';
@@ -53,6 +54,7 @@
                     <tr>
                       <th>Label</th>
                       <th>Created</th>
+                      <th>Message</th>
                       <th>Body</th>
                     </tr>
                   </thead>
@@ -61,7 +63,8 @@
                       <tr>
                         <td>{event.label}</td>
                         <td>{formatDateTime(event.createdAt)}</td>
-                        <td><code>{JSON.stringify(event.body)}</code></td>
+                        <td>{event.body.message || '--'}</td>
+                        <td><JSONTreeView data={event.body}/></td>
                       </tr>
                     {/each}
                   </tbody>
