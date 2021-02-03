@@ -1,3 +1,4 @@
+const _ = require('underscore');
 const { logger } = require('../../winston');
 const { Event } = require('../models');
 
@@ -45,6 +46,12 @@ const error = (label, err, body = {}) => createEvent({
   },
 });
 
+const requestDenyList = [
+  'accessToken', //Github access token
+  'password', // basicAuth password
+  'value', // uev value
+];
+
 /**
  * Create an error event from an Express request
  * @param {object} request The Event label
@@ -53,13 +60,15 @@ const error = (label, err, body = {}) => createEvent({
  * @return {Promise<Event>}
  */
 const handlerError = async (request, err) => {
-  const { path, params, body } = request;
-  const errBody = { request: { path, params, body } };
-  // remove secrets
-  if (body) {
-    delete errBody.body.password; // basicAuth password
-    delete errBody.body.value; // uev value
+  const { path, params = {}, body = {} } = request;
+  const errBody = {
+    request: {
+      path,
+      params: _.omit(params, requestDenyList),
+      body: _.omit(body, requestDenyList),
+    },
   }
+  
   return error(Event.labels.REQUEST_HANDLER, err, errBody);
 };
 
