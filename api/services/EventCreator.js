@@ -47,7 +47,7 @@ const error = (label, err, body = {}) => createEvent({
 });
 
 const requestDenyList = [
-  'accessToken', //Github access token
+  'accessToken', // Github access token
   'password', // basicAuth password
   'value', // uev value
 ];
@@ -67,8 +67,8 @@ const handlerError = async (request, err) => {
       params: _.omit(params, requestDenyList),
       body: _.omit(body, requestDenyList),
     },
-  }
-  
+  };
+
   return error(Event.labels.REQUEST_HANDLER, err, errBody);
 };
 
