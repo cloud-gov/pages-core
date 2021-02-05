@@ -88,6 +88,10 @@ async function fetchBuilds(query = {}) {
   return get('/builds', query).catch(() => []);
 }
 
+async function fetchBuildLog(id) {
+  return get(`/builds/${id}/log`).catch(() => null);
+}
+
 async function fetchEvents(query = {}) {
   return get('/events', query).catch(() => []);
 }
@@ -122,6 +126,7 @@ export {
   fetchBuildLogEventSource,
   fetchBuild,
   fetchBuilds,
+  fetchBuildLog,
   fetchEvents,
   fetchSite,
   fetchSites,

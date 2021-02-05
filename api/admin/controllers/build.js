@@ -3,13 +3,7 @@ const buildSerializer = require('../../serializers/build');
 const BuildLogs = require('../../services/build-logs');
 const { Build, Site } = require('../../models');
 const { buildWhereQuery, fetchModelById } = require('../../utils/queryDatabase');
-const { paginate, wait, wrapHandlers } = require('../../utils');
-
-function safeWrite(res, data) {
-  if (data && !res.writableEnded) {
-    res.write(`data: ${JSON.stringify(data)}\n\n`);
-  }
-}
+const { paginate, wrapHandlers } = require('../../utils');
 
 module.exports = wrapHandlers({
   async list(req, res) {
@@ -52,41 +46,10 @@ module.exports = wrapHandlers({
     const build = await fetchModelById(id, Build);
     if (!build) return res.notFound();
 
-    res.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-    });
-    res.flushHeaders();
-    res.on('close', () => { res.end(); });
-    res.write('\n');
+    const buildLogs = build.logsS3Key
+      ? await BuildLogs.getBuildLogs(build)
+      : await BuildLogs.fetchBuildLogs(build).then(r => r.logs);
 
-    if (build.logsS3Key) {
-      const logs = await BuildLogs.getBuildLogs(build);
-      safeWrite(res, logs);
-      return res.end();
-    }
-
-    let result = await BuildLogs.fetchBuildLogs(build);
-    safeWrite(res, result.logs);
-
-    if (build.isComplete()) {
-      return res.end();
-    }
-
-    let offset = result.numlines;
-    do {
-      await wait();
-
-      result = await BuildLogs.fetchBuildLogs(build, offset);
-      safeWrite(res, result.logs);
-
-      offset += result.numlines;
-      await build.reload();
-    } while (!build.isComplete() && !res.writableEnded);
-
-    result = await BuildLogs.fetchBuildLogs(build, offset);
-    safeWrite(res, result.logs);
-
-    return res.end();
+    return res.json(buildLogs);
   },
 });

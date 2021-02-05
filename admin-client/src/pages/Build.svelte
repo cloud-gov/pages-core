@@ -1,48 +1,18 @@
 <script>
-  import { onDestroy, onMount } from 'svelte';
   import { router } from '../stores';
-  import { fetchBuild, fetchBuildLogEventSource } from '../lib/api';
+  import { fetchBuild, fetchBuildLog } from '../lib/api';
   import { formatDateTime } from '../helpers/formatter';
   import {
     Await,
+    ExternalLink,
     GridContainer,
     PageTitle,
-    LabeledItem, ExternalLink,
+    LabeledItem,
   } from '../components';
-
-  export let tailLogs = true;
-
-  let buildLogEventSource;
 
   $: id = $router.params.id;
   $: buildPromise = fetchBuild(id);
-
-  function handleBuildLogMessage({ data }) {
-    const logs = document.getElementById('logs');
-    if (logs) {
-      logs.innerHTML += JSON.parse(data);
-    }
-    if (tailLogs) {
-      const anchor = document.getElementById('anchor');
-      if (anchor) {
-        anchor.scrollIntoView(false);
-      }
-    }
-  }
-
-  onMount(async () => {
-    buildLogEventSource = fetchBuildLogEventSource(id, handleBuildLogMessage);
-  });
-
-  onDestroy(() => {
-    if (buildLogEventSource && buildLogEventSource.readyState !== 2) {
-      buildLogEventSource.close();
-    }
-  });
-
-  function toggleTail() {
-    tailLogs = !tailLogs;
-  }
+  $: buildlogPromise = fetchBuildLog(id);
 
   const stateColor = (state) => ({
     success: 'bg-mint',
@@ -90,12 +60,10 @@
     {#if build.error}
       <b>Error: </b>{build.error}
     {/if}
-    <button on:click={toggleTail}>
-      {tailLogs ? 'stop tail' : 'start tail'}
-    </button>
     <pre class="grid-row font-mono-3xs padding-1">
-      <span id="logs"></span>
-      <span id="anchor"></span>
+      <Await on={buildlogPromise} let:response={log}>
+        <span id="logs">{log}</span>
+      </Await>
     </pre>
   </Await>
 </GridContainer>
@@ -105,8 +73,5 @@
     height: 600px;
     overflow: auto;
     box-shadow: inset 0 0 3px gray;
-  }
-  #anchor {
-    height: 1px;
   }
 </style>
