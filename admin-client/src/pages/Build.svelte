@@ -4,18 +4,18 @@
   import { fetchBuild, fetchBuildLogEventSource } from '../lib/api';
   import { formatDateTime } from '../helpers/formatter';
   import {
+    Await,
     GridContainer,
     PageTitle,
     LabeledItem, ExternalLink,
   } from '../components';
 
-  $: id = $router.params.id;
-
   export let tailLogs = true;
 
-  let build = null;
-  let site = null;
-  let buildLogEventSource = null;
+  let buildLogEventSource;
+
+  $: id = $router.params.id;
+  $: buildPromise = fetchBuild(id);
 
   function handleBuildLogMessage({ data }) {
     const logs = document.getElementById('logs');
@@ -31,9 +31,7 @@
   }
 
   onMount(async () => {
-    build = await fetchBuild(id);
-    site = build.site;
-    buildLogEventSource = fetchBuildLogEventSource(build.id, handleBuildLogMessage);
+    buildLogEventSource = fetchBuildLogEventSource(id, handleBuildLogMessage);
   });
 
   onDestroy(() => {
@@ -54,13 +52,13 @@
 </script>
 
 <GridContainer>
-  {#if build}
-    <PageTitle>
-      Build {build.id}
-    </PageTitle>
+  <PageTitle>
+    Build {id}
+  </PageTitle>
+  <Await on={buildPromise} let:response={build}>
     <h3>
       <div class="display-flex flex-justify flex-align-center font-sans-lg">
-        <span><a href="/sites/{site.id}">{site.owner}/{site.repository}</a>#{build.branch}</span>
+        <span><a href="/sites/{build.site.id}">{build.site.owner}/{build.site.repository}</a>#{build.branch}</span>
         <span class="usa-tag radius-pill padding-y-1 {stateColor(build.state)}">{build.state}</span>
       </div>
     </h3>
@@ -82,7 +80,7 @@
             <ExternalLink href={build.viewLink}>Live</ExternalLink>
             <ExternalLink
               icon="github"
-              href="https://github.com/{site.owner}/{site.repository}">
+              href="https://github.com/{build.site.owner}/{build.site.repository}">
               Repository
             </ExternalLink>
           </div>
@@ -99,9 +97,7 @@
       <span id="logs"></span>
       <span id="anchor"></span>
     </pre>
-  {:else}
-    <p>Loading build...</p>
-  {/if}
+  </Await>
 </GridContainer>
 
 <style>

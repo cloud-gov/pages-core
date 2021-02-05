@@ -1,28 +1,27 @@
 <script>
-  import { onMount } from 'svelte';
   import { router } from '../stores';
   import { fetchEvents, fetchUser } from '../lib/api';
   import { formatDateTime } from '../helpers/formatter';
-
   import {
     Accordion,
     AccordionContent,
+    Await,
+    EventTable,
     GridContainer,
-    JSONTreeView,
     LabeledItem,
     PageTitle,
   } from '../components';
-
+  
   $: id = $router.params.id;
-
-  let user = null;
-
-  onMount(async () => { user = await fetchUser(id); });
+  $: userPromise = fetchUser(id);
+  $: auditEventsPromise = fetchEvents({
+    limit: 25, page: 1, type: 'audit', model: 'User', modelId: id,
+  });
 </script>
 
 <GridContainer>
-  {#if user}
-  <PageTitle>{user.username}</PageTitle>
+  <Await on={userPromise} let:response={user}>
+    <PageTitle>{user.username}</PageTitle>
     <div class="grid-row">
       <div class="tablet:grid-col-fill padding-bottom-1">
         <LabeledItem label="id" value={user.id} />
@@ -41,46 +40,10 @@
     </div>
     <Accordion multiselect bordered>
       <AccordionContent title="Recent Audit Activity" expanded={true}>
-        {#if id}
-          {#await fetchEvents({
-            limit: 25, page: 1, type: 'audit', model: 'User', modelId: id,
-          })}
-            <p>Loading audit activity...</p>
-          {:then payload}
-            {#if payload.data.length > 0}
-              <div class="usa-table-container--scrollable">
-                <table class="usa-table usa-table--striped usa-table--borderless width-full font-sans-2xs">
-                  <thead>
-                    <tr>
-                      <th>Label</th>
-                      <th>Created</th>
-                      <th>Message</th>
-                      <th>Body</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {#each payload.data as event}
-                      <tr>
-                        <td>{event.label}</td>
-                        <td>{formatDateTime(event.createdAt)}</td>
-                        <td>{event.body.message || '--'}</td>
-                        <td><JSONTreeView data={event.body}/></td>
-                      </tr>
-                    {/each}
-                  </tbody>
-                </table>  
-              </div>
-            {:else}
-              <p>No events found.</p>
-            {/if}
-          {:catch error}
-            <p>Something went wrong fetching the audit activity: {error.message}</p>
-          {/await}
-        {/if}
+        <Await on={auditEventsPromise} let:response={events}>
+          <EventTable events={events.data} borderless={true} modelAudit={true}/>
+        </Await>
       </AccordionContent>
     </Accordion>
-  {:else}
-    <p>Loading user...</p>
-  {/if}
-  
+  </Await>
 </GridContainer>

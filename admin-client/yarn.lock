@@ -1867,7 +1867,7 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
-uswds@^2.8.0:
+uswds@^2.10.0:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/uswds/-/uswds-2.10.0.tgz#c7ecb779c82302fa189b36ca3eefe59dfde7f782"
   integrity sha512-A6HjL42ryf9pdfbm6JrGxZywKzCZraHO4v3Ve21uFDqoA3ijoNjiSYME+3SG86CIgC6zRasrbQVuI3bvd3Xv2w==
