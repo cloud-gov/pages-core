@@ -1,8 +1,11 @@
 export { default as Accordion } from './Accordion.svelte';
 export { default as AccordionContent } from './AccordionContent.svelte';
 export { default as Alert } from './Alert.svelte';
+export { default as Await } from './Await.svelte';
 export { default as Banner } from './Banner.svelte';
 export { default as BuildTable } from './BuildTable.svelte';
+export { default as DataTable } from './DataTable.svelte';
+export { default as EventTable } from './EventTable.svelte';
 export { default as ExternalLink } from './ExternalLink.svelte';
 export { default as GridContainer } from './GridContainer.svelte';
 export { default as GridRow } from './GridRow.svelte';
@@ -20,3 +23,4 @@ export { default as SiteDeleteForm } from './SiteDeleteForm.svelte';
 export { default as SiteForm } from './SiteForm.svelte';
 export { default as SiteMetadata } from './SiteMetadata.svelte';
 export { default as UserList } from './UserList.svelte';
+export { default as UserTable } from './UserTable.svelte';
