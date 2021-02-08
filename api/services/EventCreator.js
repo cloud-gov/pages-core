@@ -60,14 +60,24 @@ const requestDenyList = [
  * @return {Promise<Event>}
  */
 const handlerError = async (request, err) => {
-  const { path, params = {}, body = {} } = request;
+  const {
+    body, method, params, path,
+  } = request;
+
   const errBody = {
     request: {
+      method,
       path,
-      params: _.omit(params, requestDenyList),
-      body: _.omit(body, requestDenyList),
     },
   };
+
+  if (params) {
+    errBody.request.params = _.omit(params, requestDenyList);
+  }
+
+  if (body) {
+    errBody.request.body = _.omit(body, requestDenyList);
+  }
 
   return error(Event.labels.REQUEST_HANDLER, err, errBody);
 };
