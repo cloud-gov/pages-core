@@ -1,8 +1,9 @@
 const Sequelize = require('sequelize');
-const { User, Site } = require('../models');
+const { User, Site, Event } = require('../models');
 const GitHub = require('./GitHub');
 const { logger } = require('../../winston');
 const UserActionCreator = require('./UserActionCreator');
+const EventCreator = require('./EventCreator');
 
 const auditUser = (user, auditor) => {
   let repos;
@@ -25,18 +26,16 @@ const auditUser = (user, auditor) => {
               siteId: site.id,
             }))
             .then(() => {
-              const msg = [];
-              msg.push(`auditUser remove ${user.username} from ${site.owner}/${site.repository}`);
-              if (repoFound) { msg.push(`:${repoFound.full_name} => ${JSON.stringify(repoFound.permissions)}`); }
-              logger.info(msg.join('\t'));
-            })
-            .catch(logger.error);
+              const message = 'Removed user from site. User does not have write permisisons';
+              EventCreator.audit(Event.labels.SITE_USER, user, message, {
+                siteId: site.id,
+              });
+            });
           removed.push(r);
         }
       });
       return Promise.all(removed);
-    })
-    .catch(logger.error);
+    });
 };
 
 const auditAllUsers = () => {
@@ -81,39 +80,31 @@ const auditSite = (auditor, site, userIndex = 0) => {
               siteId: site.id,
             }))
             .then(() => {
-              const msg = [];
-              msg.push(`auditSite - remove ${u.username} from ${site.owner}/${site.repository}:`);
-              msg.push(`${JSON.stringify(collaborators.find(c => c.login === u.username))}`);
-              logger.info(msg.join('\t'));
-            })
-            .catch(logger.error);
+              EventCreator.audit(Event.labels.SITE_USER, user,
+                'Removed user from site. User does not have write permissions',
+                { siteId: site.id });
+            });
+
           removed.push(r);
         });
         return Promise.all(removed);
       }
       return auditSite(auditor, site, userIndex + 1);
-    })
-    .catch(logger.error);
-};
-
-const auditAllSites = () => {
-  let auditor;
-  return User.findOne({ where: { username: process.env.USER_AUDITOR } })
-    .then((model) => {
-      auditor = model;
-      return Site.findAll({
-        attributes: ['id', 'owner', 'repository'],
-        include: [{
-          model: User.scope('withGithub'),
-          attributes: ['id', 'username', 'githubAccessToken', 'signedInAt'],
-        }],
-        order: [[User, 'signedInAt', 'DESC']],
-      });
-    })
-    .then((sites) => {
-      const auditedSites = [];
-      sites.forEach(site => auditedSites.push(auditSite(auditor, site)));
-      return Promise.all(auditedSites);
     });
 };
+
+const auditAllSites = async () => {
+  const auditor = await User.findOne({ where: { username: process.env.USER_AUDITOR } });
+  const sites = await Site.findAll({
+    attributes: ['id', 'owner', 'repository'],
+    include: [{
+      model: User.scope('withGithub'),
+      attributes: ['id', 'username', 'githubAccessToken', 'signedInAt'],
+    }],
+    order: [[User, 'signedInAt', 'DESC']],
+  });
+  const auditedSites = sites.map(site => auditSite(auditor, site));
+  return Promise.allSettled(auditedSites);
+};
+
 module.exports = { auditAllUsers, auditAllSites, auditUser };

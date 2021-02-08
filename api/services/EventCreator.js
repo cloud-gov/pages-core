@@ -1,46 +1,89 @@
+const _ = require('underscore');
 const { logger } = require('../../winston');
 const { Event } = require('../models');
 
-const createEvent = (obj) => {
-  const {
-    label, type, model, body,
-  } = obj;
-  let modelId;
-  let modelName;
+const createEvent = obj => Event
+  .create(obj)
+  .catch((err) => {
+    logger.error([`Failed to create Event(${JSON.stringify(obj)}`, err.stack].join('\n'));
+  });
 
-  if (model) {
-    modelId = model.id;
-    modelName = model.constructor.name;
-  }
-
-  const atts = {
-    label,
-    type,
-    model: modelName,
-    modelId,
-    body,
-  };
-
-  return Event.create(atts)
-    .catch((err) => {
-      logger.warn([`Failed to create Event(${JSON.stringify(atts)}`, err].join('\n'));
-    });
-};
-
-const audit = (label, model, body) => createEvent({
+/**
+ * Create an audit event
+ * @param {string} label The Event label
+ * @param {object} model An instance of the target Sequelize model
+ * @param {string} message A brief description of the event
+ * @param {object} [body] Additional attributes
+ *
+ * @return {Promise<Event>}
+ */
+const audit = (label, model, message, body = {}) => createEvent({
   type: Event.types.AUDIT,
   label,
-  model,
-  body,
+  model: model.constructor.name,
+  modelId: model.id,
+  body: {
+    message,
+    ...body,
+  },
 });
 
-const error = (label, body) => createEvent({
+/**
+ * Create an error event
+ * @param {string} label The Event label
+ * @param {Error} err The underlying error
+ * @param {object} [body] Additional attributes
+ *
+ * @return {Promise<Event>}
+ */
+const error = (label, err, body = {}) => createEvent({
   type: Event.types.ERROR,
   label,
-  body,
+  body: {
+    error: err.stack,
+    message: err.message,
+    ...body,
+  },
 });
+
+const requestDenyList = [
+  'accessToken', // Github access token
+  'password', // basicAuth password
+  'value', // uev value
+];
+
+/**
+ * Create an error event from an Express request
+ * @param {object} request The Event label
+ * @param {Error} err The underlying error
+ *
+ * @return {Promise<Event>}
+ */
+const handlerError = async (request, err) => {
+  const {
+    body, method, params, path,
+  } = request;
+
+  const errBody = {
+    request: {
+      method,
+      path,
+    },
+  };
+
+  if (params) {
+    errBody.request.params = _.omit(params, requestDenyList);
+  }
+
+  if (body) {
+    errBody.request.body = _.omit(body, requestDenyList);
+  }
+
+  return error(Event.labels.REQUEST_HANDLER, err, errBody);
+};
 
 module.exports = {
   audit,
   error,
+  handlerError,
 };

@@ -1,50 +1,18 @@
 <script>
-  import { onDestroy, onMount } from 'svelte';
   import { router } from '../stores';
-  import { fetchBuild, fetchBuildLogEventSource } from '../lib/api';
+  import { fetchBuild, fetchBuildLog } from '../lib/api';
   import { formatDateTime } from '../helpers/formatter';
   import {
+    Await,
+    ExternalLink,
     GridContainer,
     PageTitle,
-    LabeledItem, ExternalLink,
+    LabeledItem,
   } from '../components';
 
   $: id = $router.params.id;
-
-  export let tailLogs = true;
-
-  let build = null;
-  let site = null;
-  let buildLogEventSource = null;
-
-  function handleBuildLogMessage({ data }) {
-    const logs = document.getElementById('logs');
-    if (logs) {
-      logs.innerHTML += JSON.parse(data);
-    }
-    if (tailLogs) {
-      const anchor = document.getElementById('anchor');
-      if (anchor) {
-        anchor.scrollIntoView(false);
-      }
-    }
-  }
-
-  onMount(async () => {
-    build = await fetchBuild(id);
-    site = build.site;
-    buildLogEventSource = fetchBuildLogEventSource(build.id, handleBuildLogMessage);
-  });
-
-  onDestroy(() => {
-    if (buildLogEventSource && buildLogEventSource.readyState !== 2) {
-      buildLogEventSource.close();
-    }
-  });
-
-  function toggleTail() {
-    tailLogs = !tailLogs;
-  }
+  $: buildPromise = fetchBuild(id);
+  $: buildlogPromise = fetchBuildLog(id);
 
   const stateColor = (state) => ({
     success: 'bg-mint',
@@ -54,13 +22,13 @@
 </script>
 
 <GridContainer>
-  {#if build}
-    <PageTitle>
-      Build {build.id}
-    </PageTitle>
+  <PageTitle>
+    Build {id}
+  </PageTitle>
+  <Await on={buildPromise} let:response={build}>
     <h3>
       <div class="display-flex flex-justify flex-align-center font-sans-lg">
-        <span><a href="/sites/{site.id}">{site.owner}/{site.repository}</a>#{build.branch}</span>
+        <span><a href="/sites/{build.site.id}">{build.site.owner}/{build.site.repository}</a>#{build.branch}</span>
         <span class="usa-tag radius-pill padding-y-1 {stateColor(build.state)}">{build.state}</span>
       </div>
     </h3>
@@ -82,7 +50,7 @@
             <ExternalLink href={build.viewLink}>Live</ExternalLink>
             <ExternalLink
               icon="github"
-              href="https://github.com/{site.owner}/{site.repository}">
+              href="https://github.com/{build.site.owner}/{build.site.repository}">
               Repository
             </ExternalLink>
           </div>
@@ -92,16 +60,12 @@
     {#if build.error}
       <b>Error: </b>{build.error}
     {/if}
-    <button on:click={toggleTail}>
-      {tailLogs ? 'stop tail' : 'start tail'}
-    </button>
     <pre class="grid-row font-mono-3xs padding-1">
-      <span id="logs"></span>
-      <span id="anchor"></span>
+      <Await on={buildlogPromise} let:response={log}>
+        <span id="logs">{log}</span>
+      </Await>
     </pre>
-  {:else}
-    <p>Loading build...</p>
-  {/if}
+  </Await>
 </GridContainer>
 
 <style>
@@ -109,8 +73,5 @@
     height: 600px;
     overflow: auto;
     box-shadow: inset 0 0 3px gray;
-  }
-  #anchor {
-    height: 1px;
   }
 </style>

@@ -1,12 +1,12 @@
 <script>
-  import { fetchBuilds } from '../lib/api';
+  import { fetchUsers } from '../lib/api';
   import { router } from '../stores';
   import {
     Await,
-    BuildTable,
     GridContainer,
     PageTitle,
     PaginationBanner,
+    UserTable,
   } from '../components';
   
   const limits = [
@@ -19,12 +19,12 @@
   };
   
   $: params = { ...defaultParams, ...($router.query || {}) };
-  $: buildsPromise = fetchBuilds(params);
+  $: usersPromise = fetchUsers(params);
 </script>
 
 <GridContainer>
-  <PageTitle>Builds</PageTitle>
-  <Await on={buildsPromise} let:response={payload}>
+  <PageTitle>Users</PageTitle>
+  <Await on={usersPromise} let:response={payload}>
     <div class="grid-row margin-bottom-3">
       <form method="GET" action="/builds" class="font-body-md">
         <input type="hidden" name="page" value="1"/>
@@ -42,7 +42,7 @@
     
     <div class="padding-x-1">
       <PaginationBanner pagination={payload} extraParams={params}/>
-      <BuildTable builds={payload.data} showSite={true} />
+      <UserTable users={payload.data}/>
       <PaginationBanner pagination={payload} extraParams={params}/>
     </div>
   </Await>

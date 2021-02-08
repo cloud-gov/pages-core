@@ -157,8 +157,7 @@ function mapValues(fn, obj) {
 }
 
 function wrapHandler(fn) {
-  // calls `next(error)`
-  return (...args) => fn(...args).catch(args[2]);
+  return (req, res, next) => fn(req, res).catch(next);
 }
 
 function wrapHandlers(handlers) {
@@ -228,7 +227,7 @@ function objToQueryParams(obj) {
   return qs;
 }
 
-async function paginate(model, serialize, params, query) {
+async function paginate(model, serialize, params, query = {}) {
   const limit = toInt(params.limit) || 25;
   const page = toInt(params.page) || 1;
   const offset = limit * (page - 1);

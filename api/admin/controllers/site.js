@@ -4,7 +4,6 @@ const SiteDestroyer = require('../../services/SiteDestroyer');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { pick, toInt, wrapHandlers } = require('../../utils');
 const { serializeNew, serializeMany } = require('../../serializers/site');
-const { logger } = require('../../../winston');
 
 const updateableAttrs = [
   'containerConfig',
@@ -64,17 +63,10 @@ module.exports = wrapHandlers({
   },
 
   destroy: async (req, res) => {
-    let site;
     const { id } = req.params;
 
-    try {
-      site = await fetchModelById(id, Site);
-      await SiteDestroyer.destroySite(site);
-      return res.json(serializeNew(site, true));
-    } catch (error) {
-      // Todo - make use of the future audit event
-      logger.error([`site@id=${site.id}`, error.message, error.stack].join('\n\n'));
-      return res.error(error);
-    }
+    const site = await fetchModelById(id, Site);
+    await SiteDestroyer.destroySite(site);
+    return res.json(serializeNew(site, true));
   },
 });

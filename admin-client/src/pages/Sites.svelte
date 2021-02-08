@@ -2,6 +2,7 @@
   import page from 'page';
   import { fetchSites } from '../lib/api';
   import {
+    Await,
     GridContainer,
     PageTitle,
     SiteCard,
@@ -9,20 +10,12 @@
   import { router } from '../stores';
 
   $: search = $router.query.q || '';
-  $: query = fetchSites({ q: search });
+  $: sitesPromise = fetchSites({ q: search });
 
   function handleSubmit(event) {
     page(`/sites?q=${event.target.elements.search.value}`);
   }
 </script>
-
-<style>
-  .usa-form__note {
-    float: none;
-    font-weight: normal;
-    margin-bottom: 0;
-  }
-</style>
 
 <GridContainer>
   <PageTitle>Sites</PageTitle>
@@ -52,13 +45,19 @@
       </p>
     </div>
   </div>
-  {#await query}
-    <p>Loading...</p>
-  {:then sites}
+  <Await on={sitesPromise} let:response={sites}>
     {#if sites.length > 0}
       {#each sites as site, index}
         <SiteCard {site} {index} />
       {/each}
     {/if}
-  {/await}
+  </Await>
 </GridContainer>
+
+<style>
+  .usa-form__note {
+    float: none;
+    font-weight: normal;
+    margin-bottom: 0;
+  }
+</style>

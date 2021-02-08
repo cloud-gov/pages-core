@@ -54,6 +54,8 @@
   page('/sites', queryString, render(Pages.Sites));
   page('/builds/:id', queryString, render(Pages.Build));
   page('/builds', queryString, render(Pages.Builds));
+  page('/users/:id', queryString, render(Pages.User));
+  page('/users', queryString, render(Pages.Users));
   page('/events', queryString, render(Pages.Events));
   page('*', render(Pages.NotFound));
   page();

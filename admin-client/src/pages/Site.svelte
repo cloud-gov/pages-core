@@ -1,39 +1,34 @@
 <script>
-  import { onMount } from 'svelte';
   import { notification, router } from '../stores';
   import {
-    fetchBuilds,
-    fetchSite,
-    updateSite,
-  } from '../lib/api';
-
-  // import { destroySite } from '../flows';
-
+    fetchBuilds, fetchSite, fetchUsers, updateSite,
+} from '../lib/api';
   import {
     Accordion,
     AccordionContent,
+    Await,
     BuildTable,
-    SiteDeleteForm,
     GridContainer,
     PageTitle,
     SiteForm,
     SiteMetadata,
+    UserTable,
   } from '../components';
 
   $: id = $router.params.id;
-
-  let site = null;
+  $: sitePromise = fetchSite(id);
+  $: buildsPromise = fetchBuilds({ site: id, limit: 10 });
+  $: usersPromise = fetchUsers({ site: id });
 
   async function handleSubmit({ detail }) {
-    site = await updateSite(id, detail);
+    sitePromise = updateSite(id, detail);
+    await sitePromise;
     notification.setSuccess('Site updated successfully');
   }
-
-  onMount(async () => { site = await fetchSite(id); });
 </script>
 
 <GridContainer>
-  {#if site}
+  <Await on={sitePromise} let:response={site}>
     <PageTitle>{site.owner}/{site.repository}</PageTitle>
     <SiteMetadata {site} />
     <Accordion multiselect bordered>
@@ -44,24 +39,15 @@
         <SiteForm {site} on:submit={handleSubmit} />
       </AccordionContent>
       <AccordionContent title="Recent Builds">
-        {#if id}
-          {#await fetchBuilds({ site: id, limit: 10 })}
-            <p>Loading builds...</p>
-          {:then builds}
-            <BuildTable builds={builds.data} />
-          {:catch error}
-            <p>Something went wrong fetching the site builds: {error.message}</p>
-          {/await}
-        {/if}
+        <Await on={buildsPromise} let:response={builds}>
+          <BuildTable builds={builds.data} borderless={true}/>
+        </Await>
       </AccordionContent>
       <AccordionContent title="Collaborators">
-        <p>TBD</p>
+        <Await on={usersPromise} let:response={users}>
+          <UserTable users={users.data} borderless={true}/>
+        </Await>
       </AccordionContent>
     </Accordion>
-    
-    <!-- <SiteDeleteForm {site} on:submit={destroySite(id)} /> -->
-  {:else}
-    <p>Loading site...</p>
-  {/if}
-  
+  </Await>
 </GridContainer>

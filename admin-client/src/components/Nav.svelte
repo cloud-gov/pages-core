@@ -87,6 +87,11 @@
             </a>
           </li>
           <li class="usa-nav__primary-item">
+            <a class="usa-nav__link"  class:usa-current={currentPath === '/users'} href="/users">
+              <span>Users</span>
+            </a>
+          </li>          
+          <li class="usa-nav__primary-item">
             <a class="usa-nav__link"  class:usa-current={currentPath === '/events'} href="/events">
               <span>Events</span>
             </a>

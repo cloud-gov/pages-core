@@ -2,15 +2,14 @@ const { showActions } = require('../authorizers/site');
 const { UserAction } = require('../models');
 const userActionSerializer = require('../serializers/user-action');
 const { toInt } = require('../utils');
+const { wrapHandlers } = require('../utils');
 
-module.exports = {
-  find(req, res) {
+module.exports = wrapHandlers({
+  async find(req, res) {
     const id = toInt(req.params.site_id);
-    showActions(req.user, { id })
-      .then(siteId => UserAction.findAllBySite(siteId))
-      .then(userActions => userActions || [])
-      .then(userActionSerializer.serialize)
-      .then(serialized => res.json(serialized))
-      .catch(res.error);
+    const siteId = await showActions(req.user, { id });
+    const userActions = await UserAction.findAllBySite(siteId);
+    const serialized = await userActionSerializer.serialize(userActions || []);
+    res.json(serialized);
   },
-};
+});

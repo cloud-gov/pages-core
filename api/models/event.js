@@ -5,14 +5,13 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   const labels = {
-    TIMING: 'timing',
-    ADDED: 'added',
-    REMOVED: 'removed',
-    UPDATED: 'updated',
     AUTHENTICATION: 'authentication',
     FEDERALIST_USERS_MEMBERSHIP: 'federalist-users-membership',
     BUILD_STATUS: 'build-status',
-    BUILD_REQUEST: 'build-request',
+    ADMIN: 'admin',
+    SOCKET_IO: 'socket.io',
+    SITE_USER: 'site-user',
+    REQUEST_HANDLER: 'request-handler',
   };
 
   function isValidType(value) {
