@@ -147,7 +147,7 @@ module.exports = wrapHandlers({
     await build.updateJobStatus(buildStatus);
 
     emitBuildStatus(build);
-    
+
     // The `requestedCommitSha` will not be present for initial builds
     // and there is no need to report status to Github
     if (build.requestedCommitSha) {
