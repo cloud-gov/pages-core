@@ -111,6 +111,47 @@ describe('SiteBuildQueue', () => {
     });
   });
 
+  describe('.sendBuildMessage(build) with FEATURE_BULL_SITE_BUILD_QUEUE', () => {
+    before(() => {
+      process.env.FEATURE_BULL_SITE_BUILD_QUEUE = true;
+    });
+
+    after(() => {
+      process.env.FEATURE_BULL_SITE_BUILD_QUEUE = false;
+    });
+
+    it('should send a formatted build message', async () => {
+      const sendMessageStub = sinon.stub(SiteBuildQueue.bullClient, 'add').returns({
+        promise: () => Promise.resolve(),
+      });
+
+      const build = {
+        branch: 'main',
+        state: 'processing',
+        url: 'testBucket.gov/boo/hoo',
+        Site: {
+          owner: 'owner',
+          repository: 'formatted-message-repo',
+          engine: 'jekyll',
+          defaultBranch: 'main',
+          s3ServiceName: config.s3.serviceName,
+          containerConfig: {},
+        },
+        User: {
+          githubAccessToken: '123abc',
+        },
+      };
+
+      await SiteBuildQueue.sendBuildMessage(build, 2);
+
+      const params = sendMessageStub.firstCall.args[0];
+      expect(params).to.have.property('environment');
+      expect(params.environment.length).to.equal(15);
+      expect(params).to.have.property('containerName');
+      expect(params).to.have.property('containerName');
+    });
+  });
+
   describe('.messageBodyForBuild(build)', () => {
     let sendMessageStub;
 

@@ -141,7 +141,7 @@ SiteBuildQueue.sendBuildMessage = async (build, buildCount) => {
   await setupBucket(build, buildCount);
 
   if (Features.enabled(Features.Flags.FEATURE_BULL_SITE_BUILD_QUEUE)) {
-    return SiteBuildQueue.queueClient.add(message);
+    return SiteBuildQueue.bullClient.add(message);
   }
 
   const params = {
