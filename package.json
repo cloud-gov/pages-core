@@ -9,6 +9,7 @@
     "@supercharge/promise-pool": "^1.5.0",
     "aws-sdk": "^2.804.0",
     "body-parser": "^1.18.3",
+    "bull": "^3.20.1",
     "cfenv": "^1.2.3",
     "connect-flash": "^0.1.1",
     "connect-session-sequelize": "^7.0.1",

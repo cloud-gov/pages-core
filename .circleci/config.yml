@@ -33,7 +33,7 @@ commands:
             else
               echo "export CF_SPACE=staging" >> $BASH_ENV
               echo "export CF_USERNAME=$CF_USERNAME_STAGING" >> $BASH_ENV
-              echo "export CF_PASSWORD=$CF_PASSWORD_STAGING" >> $BASH_ENV  
+              echo "export CF_PASSWORD=$CF_PASSWORD_STAGING" >> $BASH_ENV
             fi
 
       - run:
@@ -110,6 +110,9 @@ jobs:
           POSTGRES_USER: ci-test-user
           POSTGRES_DB: federalist-ci-test
           POSTGRES_HOST_AUTH_METHOD: trust
+      - image: circleci/redis
+        environment:
+          REDIS_PORT: 6379
     environment:
       FEATURE_ADMIN_AUTH: 'true'
       AUTH_IDP: uaa
@@ -247,7 +250,7 @@ jobs:
       task-name:
         type: string
       task-command:
-        type: string        
+        type: string
     steps:
       - checkout
 
@@ -291,7 +294,7 @@ workflows:
           app: federalist-admin-staging
           api-url: https://federalistapp-staging.18f.gov
           requires:
-            - build  
+            - build
           filters:
             branches:
               only: staging
@@ -301,7 +304,7 @@ workflows:
           app: federalist-admin
           api-url: https://federalistapp.18f.gov
           requires:
-            - build  
+            - build
           filters:
             branches:
               only: main
