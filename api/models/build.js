@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
-const SQS = require('../services/SQS');
+const SiteBuildQueue = require('../services/SiteBuildQueue');
 
 const { branchRegex, shaRegex, isEmptyOrUrl } = require('../utils/validators');
 const { buildUrl } = require('../utils/build');
@@ -104,10 +104,10 @@ async function enqueue() {
   });
 
   try {
-    await SQS.sendBuildMessage(foundBuild, count);
+    await SiteBuildQueue.sendBuildMessage(foundBuild, count);
     await build.updateJobStatus({ status: States.Queued });
   } catch (err) {
-    const errMsg = `There was an error, adding the job to SQS: ${err}`;
+    const errMsg = `There was an error, adding the job to SiteBuildQueue: ${err}`;
     await build.updateJobStatus({
       status: States.Error,
       message: errMsg,

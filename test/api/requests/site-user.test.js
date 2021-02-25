@@ -7,14 +7,14 @@ const { authenticatedSession, unauthenticatedSession } = require('../support/ses
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const csrfToken = require('../support/csrfToken');
 const { Site, User } = require('../../../api/models');
-const SQS = require('../../../api/services/SQS');
+const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
 const EventCreator = require('../../../api/services/EventCreator');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 
 describe('SiteUser API', () => {
   beforeEach(() => {
-    sinon.stub(SQS, 'sendBuildMessage').resolves();
+    sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
     sinon.stub(EventCreator, 'error').resolves();
   });
 

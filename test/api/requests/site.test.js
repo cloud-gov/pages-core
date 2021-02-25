@@ -19,7 +19,7 @@ const { Build, Site, User } = require('../../../api/models');
 const S3SiteRemover = require('../../../api/services/S3SiteRemover');
 const siteErrors = require('../../../api/responses/siteErrors');
 const ProxyDataSync = require('../../../api/services/ProxyDataSync');
-const SQS = require('../../../api/services/SQS');
+const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
 const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
 const EventCreator = require('../../../api/services/EventCreator');
 
@@ -33,7 +33,7 @@ describe('Site API', () => {
     process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
     removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').resolves();
     saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').resolves();
-    sinon.stub(SQS, 'sendBuildMessage').resolves();
+    sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
     sinon.stub(EventCreator, 'error').resolves();
   });
 

@@ -2,9 +2,11 @@ const AWS = require('aws-sdk');
 const url = require('url');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
+const BullQueueClient = require('../utils/bullQueueClient');
 const { buildViewLink, buildUrl } = require('../utils/build');
 const GithubBuildHelper = require('./GithubBuildHelper');
 const S3Helper = require('./S3Helper');
+const Features = require('../features');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -115,15 +117,16 @@ const setupBucket = async (build, buildCount) => {
 };
 
 const sqsConfig = config.sqs;
-const SQS = {
+const SiteBuildQueue = {
   sqsClient: new AWS.SQS({
     accessKeyId: sqsConfig.accessKeyId,
     secretAccessKey: sqsConfig.secretAccessKey,
     region: sqsConfig.region,
   }),
+  bullClient: new BullQueueClient('site-build-queue'),
 };
 
-SQS.messageBodyForBuild = build => buildContainerEnvironment(build)
+SiteBuildQueue.messageBodyForBuild = build => buildContainerEnvironment(build)
   .then(environment => ({
     environment: Object.keys(environment).map(key => ({
       name: key,
@@ -133,16 +136,20 @@ SQS.messageBodyForBuild = build => buildContainerEnvironment(build)
     containerSize: build.Site.containerConfig.size,
   }));
 
-SQS.sendBuildMessage = async (build, buildCount) => {
-  const message = await SQS.messageBodyForBuild(build);
+SiteBuildQueue.sendBuildMessage = async (build, buildCount) => {
+  const message = await SiteBuildQueue.messageBodyForBuild(build);
   await setupBucket(build, buildCount);
+
+  if (Features.enabled(Features.Flags.FEATURE_BULL_SITE_BUILD_QUEUE)) {
+    return SiteBuildQueue.queueClient.add(message);
+  }
 
   const params = {
     QueueUrl: sqsConfig.queue,
     MessageBody: JSON.stringify(message),
   };
 
-  return SQS.sqsClient.sendMessage(params).promise();
+  return SiteBuildQueue.sqsClient.sendMessage(params).promise();
 };
 
-module.exports = SQS;
+module.exports = SiteBuildQueue;
