@@ -1,7 +1,13 @@
 const { Op } = require('sequelize');
 
 const associate = ({
-  User, Build, Site, UserAction, SiteUser,
+  Build,
+  Organization,
+  OrganizationRole,
+  Site,
+  SiteUser,
+  User,
+  UserAction,
 }) => {
   User.hasMany(Build, {
     foreignKey: 'user',
@@ -20,6 +26,11 @@ const associate = ({
     as: 'actionTarget',
     foreignKey: 'targetId',
     unique: false,
+  });
+  User.belongsToMany(Organization, {
+    through: OrganizationRole,
+    foreignKey: 'userId',
+    otherKey: 'organizationId',
   });
 };
 

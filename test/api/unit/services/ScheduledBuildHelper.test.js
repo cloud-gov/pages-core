@@ -18,7 +18,7 @@ describe('ScheduledBuildHelper', () => {
     await Promise.all([
       Build.truncate(),
       Site.truncate(),
-      User.truncate({ force: true }),
+      User.truncate({ force: true, cascade: true }),
     ]);
   });
 
