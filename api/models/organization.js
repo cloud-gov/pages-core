@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       unique: true,
     },
   }, {
+    paranoid: true,
     tableName: 'organization',
   });
 

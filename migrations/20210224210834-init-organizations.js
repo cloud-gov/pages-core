@@ -12,6 +12,7 @@ const ORGANIZATION_TABLE = {
   name: { type: 'string', notNull: true, unique: true },
   createdAt: { type: 'timestamp', notNull: true },
   updatedAt: { type: 'timestamp', notNull: true },
+  deletedAt: { type: 'timestamp', allowNull: true },
 };
 
 const organizationRole = 'organization_role';

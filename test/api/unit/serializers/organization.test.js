@@ -4,9 +4,18 @@ const validateJSONSchema = require('jsonschema').validate;
 const orgSchema = require('../../../../public/swagger/Organization.json');
 const OrgFactory = require('../../support/factory/organization');
 
+const { Organization } = require('../../../../api/models');
 const OrganizationSerializer = require('../../../../api/serializers/organization');
 
-describe.only('OrganizationSerializer', () => {
+function clean() {
+  return Organization.truncate({ force: true, cascade: true });
+}
+
+describe('OrganizationSerializer', () => {
+  beforeEach(clean);
+
+  after(clean);
+
   describe('.serialize(serializable)', () => {
     it('should serialize an organization object correctly', async () => {
       const org = await OrgFactory.create();

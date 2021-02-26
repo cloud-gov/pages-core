@@ -3,7 +3,7 @@ const { Role, Organization, User } = require('../../../../api/models');
 
 function clean() {
   return Promise.all([
-    Organization.truncate({ cascade: true }),
+    Organization.truncate({ force: true, cascade: true }),
     Role.truncate({ cascade: true }),
     User.truncate({ force: true, cascade: true }),
   ]);
