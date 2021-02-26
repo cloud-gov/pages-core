@@ -2,16 +2,16 @@ const role = 'role';
 const ROLE_TABLE = {
   id: { type: 'int', primaryKey: true, autoIncrement: true },
   name: { type: 'string', notNull: true, unique: true },
-  createdAt: { type: 'date', notNull: true },
-  updatedAt: { type: 'date', notNull: true },
+  createdAt: { type: 'timestamp', notNull: true },
+  updatedAt: { type: 'timestamp', notNull: true },
 };
 
 const organization = 'organization';
 const ORGANIZATION_TABLE = {
   id: { type: 'int', primaryKey: true, autoIncrement: true },
   name: { type: 'string', notNull: true, unique: true },
-  createdAt: { type: 'date', notNull: true },
-  updatedAt: { type: 'date', notNull: true },
+  createdAt: { type: 'timestamp', notNull: true },
+  updatedAt: { type: 'timestamp', notNull: true },
 };
 
 const organizationRole = 'organization_role';
@@ -56,8 +56,8 @@ const ORGANIZATION_ROLE_TABLE = {
       },
     },
   },
-  createdAt: { type: 'date', notNull: true },
-  updatedAt: { type: 'date', notNull: true },
+  createdAt: { type: 'timestamp', notNull: true },
+  updatedAt: { type: 'timestamp', notNull: true },
 };
 
 exports.up = async db => {

@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const AdminBuildController = require('../controllers/build');
 const AdminEventController = require('../controllers/event');
+const AdminOrganizationController = require('../controllers/organization');
 const AdminSiteController = require('../controllers/site');
 const UserController = require('../controllers/user');
 const auth = require('./auth');
@@ -18,6 +19,10 @@ authenticatedRouter.get('/builds', AdminBuildController.list);
 authenticatedRouter.get('/builds/:id', AdminBuildController.findById);
 authenticatedRouter.get('/builds/:id/log', AdminBuildController.findBuildLog);
 authenticatedRouter.get('/events', AdminEventController.list);
+authenticatedRouter.get('/organizations', AdminOrganizationController.list);
+authenticatedRouter.post('/organizations', AdminOrganizationController.create);
+authenticatedRouter.get('/organizations/:id', AdminOrganizationController.findById);
+authenticatedRouter.put('/organizations/:id', AdminOrganizationController.update);
 authenticatedRouter.get('/sites', AdminSiteController.findAllSites);
 authenticatedRouter.get('/sites/:id', AdminSiteController.findById);
 authenticatedRouter.put('/sites/:id', AdminSiteController.update);
