@@ -289,6 +289,12 @@ async function createData({ githubUsername }) {
     agencyOrg.addUser(agencyManager, { through: { roleId: managerRole.id } }),
     agencyOrg.addUser(user1, { through: { roleId: userRole.id } }),
   ]);
+
+  console.log('Assigning Organization Sites');
+  await Promise.all([
+    agencyOrg.addSite(nodeSite),
+    agencyOrg.addSite(goSite),
+  ]);
 }
 
 const confirm = {

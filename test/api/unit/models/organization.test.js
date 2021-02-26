@@ -1,11 +1,14 @@
 const { expect } = require('chai');
-const { Role, Organization, User } = require('../../../../api/models');
-const organization = require('../../../../api/models/organization');
+const { Role, Site, Organization, User } = require('../../../../api/models');
+
+const createSite = require('../../support/factory/site');
+const createUser = require('../../support/factory/user');
 
 function clean() {
   return Promise.all([
     Organization.truncate({ force: true, cascade: true }),
     Role.truncate({ cascade: true }),
+    Site.truncate({ force: true, cascade: true }),
     User.truncate({ force: true, cascade: true }),
   ]);
 }
@@ -36,8 +39,8 @@ describe('Organization model', () => {
     const [org, role, user1, user2] = await Promise.all([
       Organization.create({ name: 'org' }),
       Role.create({ name: 'role' }),
-      User.create({ username: 'user1' }),
-      User.create({ username: 'user2' }),
+      createUser(),
+      createUser(),
     ]);
 
     expect(await org.hasUser(user1)).to.be.false;
@@ -57,7 +60,7 @@ describe('Organization model', () => {
       Organization.create({ name: 'org' }),
       Role.create({ name: 'role1' }),
       Role.create({ name: 'role2' }),
-      User.create({ username: 'user' }),
+      createUser(),
     ]);
 
     expect(await org.hasUser(user)).to.be.false;
@@ -71,5 +74,37 @@ describe('Organization model', () => {
       expect(error).to.be.an('error');
       expect(error.name).to.eq('SequelizeUniqueConstraintError');
     });
+  });
+
+  it('can have many sites', async () => {
+    const [org, site1, site2] = await Promise.all([
+      Organization.create({ name: 'org' }),
+      createSite(),
+      createSite(),
+    ]);
+
+    expect(await org.hasSite(site1)).to.be.false;
+    expect(await org.hasSite(site2)).to.be.false;
+    
+    await Promise.all([
+      org.addSite(site1),
+      org.addSite(site2),
+    ]);
+
+    expect(await org.hasSite(site1)).to.be.true;
+    expect(await org.hasSite(site2)).to.be.true;
+  });
+
+  it('can only have a site once', async () => {
+    const [org, site] = await Promise.all([
+      Organization.create({ name: 'org' }),
+      createSite(),
+    ]);
+    await org.addSite(site);
+    const numSites = await org.countSites();
+
+    await org.addSite(site);
+
+    expect(await org.countSites()).to.eq(numSites);
   });
 });

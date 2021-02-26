@@ -52,7 +52,7 @@ const ORGANIZATION_ROLE_TABLE = {
       table: 'role',
       mapping: 'id',
       rules: {
-        onDelete: 'CASCADE',
+        onDelete: 'RESTRICT',
         onUpdate: 'RESTRICT',
       },
     },
@@ -61,14 +61,30 @@ const ORGANIZATION_ROLE_TABLE = {
   updatedAt: { type: 'timestamp', notNull: true },
 };
 
+
+const siteOrganizationColumn = {
+  type: 'int',
+  foreignKey: {
+    name: 'organization_id_fk',
+    table: 'organization',
+    mapping: 'id',
+    rules: {
+      onDelete: 'RESTRICT',
+      onUpdate: 'RESTRICT',
+    },
+  },
+};
+
 exports.up = async db => {
   await db.createTable(role, ROLE_TABLE);
   await db.createTable(organization, ORGANIZATION_TABLE);
   await db.createTable(organizationRole, ORGANIZATION_ROLE_TABLE);
-  return db.addIndex(organizationRole, 'organization_role_organization_user_idx', ['organizationId', 'userId'], true);
+  await db.addIndex(organizationRole, 'organization_role_organization_user_idx', ['organizationId', 'userId'], true);
+  return db.addColumn('site', 'organizationId', siteOrganizationColumn);
 };
 
 exports.down = async db => {
+  await db.removeColumn('site', 'organizationId');
   await db.dropTable(organizationRole);
   await db.dropTable(organization);
   return db.dropTable(role);

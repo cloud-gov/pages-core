@@ -19,7 +19,12 @@ function create(params) {
   return build(params).save();
 }
 
+function truncate() {
+  return Organization.truncate({ force: true, cascade: true });
+}
+
 module.exports = {
   build,
   create,
+  truncate,
 };

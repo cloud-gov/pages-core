@@ -1,12 +1,16 @@
 const associate = ({
   Organization,
   OrganizationRole,
+  Site,
   User,
 }) => {
   Organization.belongsToMany(User, {
     through: OrganizationRole,
     foreignKey: 'organizationId',
     otherKey: 'userId',
+  });
+  Organization.hasMany(Site, {
+    foreignKey: 'organizationId',
   });
 };
 

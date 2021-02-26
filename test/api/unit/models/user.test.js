@@ -1,9 +1,10 @@
 const { expect } = require('chai');
-const { Role, Organization, User } = require('../../../../api/models');
+const { Role, User } = require('../../../../api/models');
+const orgFactory = require('../../support/factory/organization');
 
 function clean() {
   return Promise.all([
-    Organization.truncate({ force: true, cascade: true }),
+    orgFactory.truncate(),
     Role.truncate({ cascade: true }),
     User.truncate({ force: true, cascade: true }),
   ]);
@@ -60,8 +61,8 @@ describe('User model', () => {
 
   it('can have many organizations', async () => {
     const [org1, org2, role, user] = await Promise.all([
-      Organization.create({ name: 'org1' }),
-      Organization.create({ name: 'org2' }),
+      orgFactory.create(),
+      orgFactory.create(),
       Role.create({ name: 'role' }),
       User.create({ username: 'user' }),
     ]);
@@ -80,7 +81,7 @@ describe('User model', () => {
 
   it('can only have one role in an organization', async () => {
     const [org, role1, role2, user] = await Promise.all([
-      Organization.create({ name: 'org' }),
+      orgFactory.create(),
       Role.create({ name: 'role1' }),
       Role.create({ name: 'role2' }),
       User.create({ username: 'user' }),
