@@ -54,6 +54,9 @@ module.exports = {
     user: process.env.CI ? 'ci-test-user' : 'postgres',
     host: process.env.CI ? 'localhost' : 'db',
   },
+  redis: {
+    url: process.env.CI ? 'redis://localhost:6379' : 'redis://redis:6379',
+  },
   log: {
     level: 'error',
     silent: true,

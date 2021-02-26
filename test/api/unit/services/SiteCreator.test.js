@@ -10,11 +10,11 @@ const apiNocks = require('../../support/cfAPINocks');
 const SiteCreator = require('../../../../api/services/SiteCreator');
 const TemplateResolver = require('../../../../api/services/TemplateResolver');
 const { Build, Site, User } = require('../../../../api/models');
-const SQS = require('../../../../api/services/SQS');
+const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
 
 describe('SiteCreator', () => {
   beforeEach(() => {
-    sinon.stub(SQS, 'sendBuildMessage').resolves();
+    sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
   });
 
   afterEach(() => {

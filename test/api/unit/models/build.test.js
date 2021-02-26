@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const { DatabaseError, ValidationError } = require('sequelize');
-const SQS = require('../../../../api/services/SQS');
+const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
 
@@ -32,7 +32,7 @@ describe('Build model', () => {
 
   describe('enqueue', () => {
     it('should send a build new build message', async () => {
-      const sendMessageStub = sinon.stub(SQS, 'sendBuildMessage');
+      const sendMessageStub = sinon.stub(SiteBuildQueue, 'sendBuildMessage');
       sendMessageStub.resolves();
 
       const site = await factory.site();

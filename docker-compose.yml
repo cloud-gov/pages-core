@@ -23,6 +23,7 @@ services:
       - "8080:8080" # for serving test coverage html
     depends_on:
       - db
+      - redis
     environment:
       JWT_SECRET: 'shhHhh...'
       USER_AUDITOR: federalist
@@ -57,3 +58,7 @@ services:
       POSTGRES_DB: federalist
       POSTGRES_TEST_DB: federalist-test
       POSTGRES_PASSWORD: password
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
