@@ -55,7 +55,7 @@ module.exports = {
     host: process.env.CI ? 'localhost' : 'db',
   },
   redis: {
-    uri: process.env.CI ? 'redis://localhost:6379' : 'redis://redis:6379',
+    url: process.env.CI ? 'redis://localhost:6379' : 'redis://redis:6379',
   },
   log: {
     level: 'error',

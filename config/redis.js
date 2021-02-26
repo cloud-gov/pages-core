@@ -1,3 +1,3 @@
 module.exports = {
-  uri: 'redis://redis:6379',
+  url: 'redis://redis:6379',
 };

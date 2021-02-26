@@ -18,10 +18,10 @@ class BullQueueClient {
       settings,
     } = {}
   ) {
-    const { uri, tls } = config.redis;
+    const { url, tls } = config.redis;
     const updateRedis = { tls, ...redis };
     const updatedSettings = { drainDelay: 20, ...settings };
-    return new Queue(queueName, uri, {
+    return new Queue(queueName, url, {
       createClient,
       redis: updateRedis,
       limiter,
