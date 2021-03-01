@@ -32,6 +32,20 @@ const associate = ({
     foreignKey: 'userId',
     otherKey: 'organizationId',
   });
+
+  User.addScope('byOrg', id => ({
+    include: [{
+      model: Organization,
+      where: { id },
+    }],
+  }));
+
+  User.addScope('bySite', id => ({
+    include: [{
+      model: Organization,
+      where: { id },
+    }],
+  }));
 };
 
 function beforeValidate(user) {
