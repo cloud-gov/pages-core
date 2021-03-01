@@ -9,11 +9,15 @@
   } from '../components';
   import { router } from '../stores';
 
-  $: search = $router.query.q || '';
-  $: sitesPromise = fetchSites({ q: search });
+  const defaultParams = {
+    search: '',
+  };
+
+  $: params = { ...defaultParams, ...($router.query || {}) };
+  $: sitesPromise = fetchSites(params);
 
   function handleSubmit(event) {
-    page(`/sites?q=${event.target.elements.search.value}`);
+    page(`/sites?q=${event.target.elements.search.value}&organization=${params.organization}`);
   }
 </script>
 
@@ -34,7 +38,7 @@
           type="search"
           autocapitalize="off"
           autocorrect="off"
-          value={search}
+          value={params.search}
         >
         <button class="usa-button" type="submit">
           <span class="usa-sr-only">Search</span>

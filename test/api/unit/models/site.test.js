@@ -2,7 +2,15 @@ const { expect } = require('chai');
 const factory = require('../../support/factory');
 const { Site } = require('../../../../api/models');
 
+function clean() {
+  return factory.organization.truncate();
+}
+
 describe('Site model', () => {
+  beforeEach(clean);
+
+  after(clean);
+
   describe('before validate hook', () => {
     it('should lowercase the owner and repository values', (done) => {
       factory.site({
@@ -202,5 +210,18 @@ describe('Site model', () => {
 
     expect(error).to.be.a('error');
     expect(error.message).to.equal('Validation error');
+  });
+
+  it('can belong to an organization', async () => {
+    const [site, org] = await Promise.all([
+      factory.site(),
+      factory.organization.create(),
+    ]);
+
+    expect(await site.getOrganization()).to.be.null;
+
+    await site.setOrganization(org);
+
+    expect((await site.getOrganization()).equals(org)).to.be.true;
   });
 });

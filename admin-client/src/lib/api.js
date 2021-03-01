@@ -55,6 +55,10 @@ function get(path, query) {
   return _fetch(path + qs);
 }
 
+function post(path, body) {
+  return _fetch(path, { method: 'POST', body: JSON.stringify(body) });
+}
+
 function put(path, body) {
   return _fetch(path, { method: 'PUT', body: JSON.stringify(body) });
 }
@@ -96,6 +100,22 @@ async function fetchEvents(query = {}) {
   return get('/events', query).catch(() => []);
 }
 
+async function createOrganization(params) {
+  return post('/organizations', params).catch(() => null);
+}
+
+async function fetchOrganization(id) {
+  return get(`/organizations/${id}`).catch(() => null);
+}
+
+async function fetchOrganizations(query = {}) {
+  return get('/organizations', query).catch(() => []);
+}
+
+async function updateOrganization(id, params) {
+  return put(`/organizations/${id}`, params).catch(() => null);
+}
+
 async function fetchSite(id) {
   return get(`/sites/${id}`).catch(() => null);
 }
@@ -128,6 +148,10 @@ export {
   fetchBuilds,
   fetchBuildLog,
   fetchEvents,
+  createOrganization,
+  fetchOrganization,
+  fetchOrganizations,
+  updateOrganization,
   fetchSite,
   fetchSites,
   fetchUser,

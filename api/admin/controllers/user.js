@@ -1,4 +1,4 @@
-const { Site, User } = require('../../models');
+const { Organization, Site, User } = require('../../models');
 const { paginate, wrapHandlers } = require('../../utils');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const userSerializer = require('../../serializers/user');
@@ -10,7 +10,7 @@ module.exports = wrapHandlers({
 
   async list(req, res) {
     const {
-      limit, page, site,
+      limit, page, site, organization,
     } = req.query;
 
     const serialize = users => userSerializer.serializeMany(users, true);
@@ -23,6 +23,17 @@ module.exports = wrapHandlers({
           model: Site,
           where: {
             id: site,
+          },
+        }],
+      };
+    }
+
+    if (organization) {
+      query = {
+        include: [{
+          model: Organization,
+          where: {
+            id: organization,
           },
         }],
       };

@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Site } = require('../../models');
+const { Organization, Site } = require('../../models');
 const SiteDestroyer = require('../../services/SiteDestroyer');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { pick, toInt, wrapHandlers } = require('../../utils');
@@ -11,7 +11,9 @@ const updateableAttrs = [
 
 module.exports = wrapHandlers({
   findAllSites: async (req, res) => {
-    const { limit = 25, offset = 0, q } = req.query;
+    const {
+      limit = 25, offset = 0, q, organization,
+    } = req.query;
 
     const query = {
       order: ['repository'],
@@ -31,6 +33,15 @@ module.exports = wrapHandlers({
           ],
         };
       }
+    }
+
+    if (organization) {
+      query.include = [{
+        model: Organization,
+        where: {
+          id: organization,
+        },
+      }];
     }
 
     const sites = await Site.findAll(query);

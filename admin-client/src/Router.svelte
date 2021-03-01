@@ -57,6 +57,7 @@
   page('/users/:id', queryString, render(Pages.User));
   page('/users', queryString, render(Pages.Users));
   page('/events', queryString, render(Pages.Events));
+  page('/organizations', queryString, render(Pages.Organizations));
   page('*', render(Pages.NotFound));
   page();
 </script>

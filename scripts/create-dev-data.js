@@ -9,6 +9,8 @@ const {
   Build,
   BuildLog,
   Event,
+  Organization,
+  Role,
   User,
   UserAction,
 } = require('../api/models');
@@ -60,7 +62,7 @@ async function createData({ githubUsername }) {
   await ActionType.createDefaultActionTypes();
 
   console.log('Creating users...');
-  const [user1, user2] = await Promise.all([
+  const [user1, user2, agencyManager] = await Promise.all([
     User.create({
       username: githubUsername,
       email: `${githubUsername}@example.com`,
@@ -71,6 +73,11 @@ async function createData({ githubUsername }) {
       email: 'fake-user@example.com',
       githubAccessToken: 'fake-access-token',
       githubUserId: 123456,
+    }),
+
+    User.create({
+      username: 'agency_manager',
+      email: 'agency-manager@example.com',
     }),
 
     User.create({
@@ -263,6 +270,30 @@ async function createData({ githubUsername }) {
   await Promise.all([
     EventCreator.error(Event.labels.REQUEST_HANDLER, new Error('A sample error'), { some: 'info' }),
     EventCreator.error(Event.labels.REQUEST_HANDLER, socketIOError, { some: 'info' }),
+  ]);
+
+  console.log('Creating Roles');
+  const [userRole, managerRole] = await Promise.all([
+    Role.create({ name: 'user' }),
+    Role.create({ name: 'manager' }),
+  ]);
+
+  console.log('Creating Organizations');
+  const [agencyOrg] = await Promise.all([
+    Organization.create({ name: 'agency' }),
+    Organization.create({ name: 'empty' }),
+  ]);
+
+  console.log('Assigning Organization Roles');
+  await Promise.all([
+    agencyOrg.addUser(agencyManager, { through: { roleId: managerRole.id } }),
+    agencyOrg.addUser(user1, { through: { roleId: userRole.id } }),
+  ]);
+
+  console.log('Assigning Organization Sites');
+  await Promise.all([
+    agencyOrg.addSite(nodeSite),
+    agencyOrg.addSite(goSite),
   ]);
 }
 

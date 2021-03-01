@@ -24,11 +24,12 @@ const validationFailed = (site, options, validationError) => {
 };
 
 const associate = ({
-  Site,
   Build,
+  Organization,
+  Site,
+  SiteUser,
   User,
   UserAction,
-  SiteUser,
   UserEnvironmentVariable,
 }) => {
   Site.hasMany(Build, {
@@ -45,6 +46,9 @@ const associate = ({
   });
   Site.hasMany(UserEnvironmentVariable, {
     foreignKey: 'siteId',
+  });
+  Site.belongsTo(Organization, {
+    foreignKey: 'organizationId',
   });
 };
 
@@ -171,6 +175,10 @@ module.exports = (sequelize, DataTypes) => {
       set(containerConfig) {
         this.setDataValue('config', { ...this.config, containerConfig });
       },
+    },
+    organizationId: {
+      type: DataTypes.INTEGER,
+      references: 'Organization',
     },
   }, {
     tableName: 'site',

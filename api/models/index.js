@@ -23,11 +23,16 @@ const UserAction = require('./user-action')(sequelize, DataTypes);
 const ActionType = require('./action-type')(sequelize, DataTypes);
 const UserEnvironmentVariable = require('./user-environment-variable')(sequelize, DataTypes);
 const Event = require('./event')(sequelize, DataTypes);
+const Role = require('./role')(sequelize, DataTypes);
+const Organization = require('./organization')(sequelize, DataTypes);
+const OrganizationRole = require('./organization-role')(sequelize, DataTypes);
 /* eslint-enable no-unused-vars */
 
 Object
   .keys(sequelize.models)
-  .forEach(key => sequelize.models[key].associate(sequelize.models));
+  .map(key => sequelize.models[key])
+  .filter(model => model.associate)
+  .forEach(model => model.associate(sequelize.models));
 
 Site.forUser = user => Site.scope({ method: ['forUser', user, User] });
 
