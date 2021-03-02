@@ -1,17 +1,16 @@
 <script>
   import page from 'page';
+  import { formToObj, objToQueryString } from '../lib/utils';
   import { router } from '../stores';
   import {
     Await,
     GridContainer,
-    PageTitle,
     PaginationBanner,
-    UserTable,
-  } from '../components';
+  } from '.';
 
   export let query;
   export let path;
-  export let fields = [];
+  export let fields = {};
   export let title = null;
   export let expanded = false;
 
@@ -27,32 +26,27 @@
   const defaultParams = {
     limit: '25',
     page: 1,
+    search: '',
   };
 
   $: params = { ...defaultParams, ...($router.query || {}) };
   $: queryPromise = query(params);
-  $: fieldArray = Object.keys(fields).map(key => ({ ...fields[key], name: key }));
-
-  function formToObj(form) {
-    return [...form.elements]
-      .filter(e => e.name)
-      .reduce((acc, e) => ({ ...acc, [e.name]: e.value }), {});
-  }
+  $: fieldKeys = Object.keys(fields);
+  $: fieldArray = fieldKeys.map((key) => ({ ...fields[key], name: key }));
+  $: hasFilters = fieldKeys.length > 0;
+  $: filtersWithValues = fieldKeys.filter((field) => params[field]);
   
-  function objToQuery(obj = {}) {
-    const searchParams = new URLSearchParams();
-    Object.keys(obj).forEach((key) => {
-      searchParams.set(key, obj[key]);
-    });
-    return searchParams.toString();
-  }
-
   function handleSubmit(event) {
     const obj = formToObj(event.target);
-    const query = objToQuery({ ...params, ...obj });
-    toggle();
-    page(`/${path}?${query}`);
-  }  
+    const queryString = objToQueryString({ ...params, ...obj });
+    expanded = false;
+    page(`/${path}?${queryString}`);
+  }
+
+  function handleTagClick(param = {}) {
+    const queryString = objToQueryString({ ...params, ...param });
+    page(`/${path}?${queryString}`);
+  }
 </script>
 
 <Await on={queryPromise} let:response={payload}>
@@ -68,62 +62,97 @@
         <button class="usa-nav__close">
           <img src="/assets/img/usa-icons/close.svg" role="img" alt="close">
         </button>
-        <ul class="usa-nav__primary usa-accordion">
-          <li class="usa-nav__primary-item">
-            <button
-              class="usa-accordion__button usa-nav__link"
-              aria-expanded={expanded}
-              aria-controls="basic-mega-nav-section-one"
-              on:click={toggle}
-            >
-              <span>Filter</span>
-            </button>
-            <div
-              id="basic-mega-nav-section-one"
-              class="usa-nav__submenu usa-megamenu"
-              {hidden}
-            >
-              <div class="grid-row grid-gap-4">
-                <form class="usa-form maxw-none width-full" on:submit|preventDefault={handleSubmit}>
-                  <div class="controls display-flex flex-wrap">
-                    <fieldset class="usa-fieldset">
-                      <label class="usa-label" for="limit">Num Results</label>
-                      <select class="usa-select" name="limit" id="limit" value={params.limit}>
-                        {#each limits as limit}
-                          <option value={limit}>{limit}</option>
-                        {/each}
-                      </select>
-                    </fieldset>
-                    {#each fieldArray as field}
-                      {#if field.type === 'select'}
-                        <fieldset class="usa-fieldset">
-                          <label class="usa-label" for={field.name}>{field.label || field.name}</label>
-                          <select class="usa-select" name={field.name} id={field.name}>
-                            <option value="">-</option>
-                            {#each field.options(payload.meta) as opt}
-                              <option value={opt.value} selected={`${opt.value}` === params[field.name]}>
-                                {opt.name}
-                              </option>
-                            {/each}
-                          </select>
-                        </fieldset>
-                      {/if}
-                    {/each}
-                  </div>
-                  <input class="usa-button" type="submit" value="Search">
-                </form>
+        {#if hasFilters}
+          <ul class="usa-nav__primary usa-accordion">
+            <li class="usa-nav__primary-item">
+              <button
+                class="usa-accordion__button usa-nav__link"
+                aria-expanded={expanded}
+                aria-controls="basic-mega-nav-section-one"
+                on:click={toggle}
+              >
+                <span>Filter</span>
+              </button>
+              <div
+                id="basic-mega-nav-section-one"
+                class="usa-nav__submenu usa-megamenu"
+                {hidden}
+              >
+                <div class="grid-row grid-gap-4">
+                  <form
+                    class="usa-form maxw-none width-full"
+                    on:submit|preventDefault={handleSubmit}
+                  >
+                    <div class="controls display-flex flex-wrap">
+                      {#each fieldArray as field}
+                        {#if field.type === 'select'}
+                          <fieldset class="usa-fieldset">
+                            <label class="usa-label" for={field.name}>{field.label || field.name}</label>
+                            <select class="usa-select" name={field.name} id={field.name}>
+                              <option value="">-</option>
+                              {#each field.options(payload.meta) as opt}
+                                <option value={opt.value} selected={`${opt.value}` === params[field.name]}>
+                                  {opt.name}
+                                </option>
+                              {/each}
+                            </select>
+                          </fieldset>
+                        {/if}
+                      {/each}
+                    </div>
+                    <input class="usa-button" type="submit" value="Search">
+                  </form>
+                </div>
               </div>
-            </div>
-          </li>
-        </ul>
-        <form class="usa-search usa-search--small" role="search">
-          <label class="usa-sr-only" for="basic-mega-search-field-small">Search small</label>
-          <input class="usa-input" id="basic-mega-search-field-small" type="search" name="search">
+            </li>
+          </ul>
+        {/if}
+        <form
+          class="usa-search usa-search--small flex-align-center"
+          role="search"
+          on:submit|preventDefault={handleSubmit}
+        >
+          <label class="usa-label margin-top-0 margin-right-1" for="limit">Limit:</label>
+          <select
+            class="usa-select height-4 line-height-sans-1 margin-right-2"
+            name="limit"
+            id="limit"
+            value={params.limit}
+          >
+            {#each limits as limit}
+              <option value={limit}>{limit}</option>
+            {/each}
+          </select>
+          <label class="usa-sr-only" for="basic-mega-search-field-small">
+            Search
+          </label>
+          <input
+            class="usa-input"
+            id="basic-mega-search-field-small"
+            type="search"
+            name="search"
+            value={params.search}
+          >
           <button class="usa-button" type="submit">
             <span class="usa-sr-only">Search</span>
           </button>
         </form>
       </nav>
+    </div>
+    <div class="tag-container usa-nav-container margin-bottom-2">
+      {#each filtersWithValues as key}
+        <span class="usa-tag">
+          <button
+            class="usa-button usa-button--unstyled"
+            on:click={() => handleTagClick({ [key]: '' })}
+          >
+          <svg class="usa-icon margin-right-1" aria-hidden="true" focusable="false" role="img">
+            <use xlink:href="/img/sprite.svg#close"></use>
+          </svg>
+          </button>
+          {key}: <b>{params[key]}</b>
+        </span>
+      {/each}
     </div>
   </header>
   <GridContainer>
@@ -134,7 +163,8 @@
 </Await>
 
 <style>
-  .usa-logo__text{
+  .usa-logo__text,
+  .usa-label {
     text-transform: capitalize;
   }
   #basic-mega-nav-section-one,
@@ -152,5 +182,28 @@
   
   .usa-form .controls > fieldset {
     margin-right: 2rem;
+  }
+
+  .usa-search {
+    max-width: 24rem;
+  }
+
+  .usa-select {
+    margin-top: 0;
+    width: auto;
+  }
+
+  .tag-container {
+    justify-content: end;
+  }
+
+  .usa-tag {
+    border: 1px solid #005ea2;
+    background-color: #d9e8f6;
+    color: #005ea2;
+    display: flex;
+    padding-left: .25rem;
+    align-items: center;
+    text-transform: lowercase;
   }
 </style>
