@@ -138,14 +138,12 @@ module.exports.userEnvVar = {
   key: cfUserEnvVar.key,
 };
 
-const uaaCredentials = appEnv.getServiceCreds('uaa-client');
-const uaaOptions = {
-  clientID: uaaCredentials.client_id,
-  clientSecret: uaaCredentials.client_secret,
-};
+const uaaAppCredentials = appEnv.getServiceCreds(`app-${process.env.APP_ENV}-uaa-client`);
+const uaaAdminCredentials = appEnv.getServiceCreds(`admin-${process.env.APP_ENV}-uaa-client`);
+
 module.exports.passport = {
   uaa: {
-    options: uaaOptions,
-    adminOptions: uaaOptions,
+    options: uaaAppCredentials,
+    adminOptions: uaaAdminCredentials,
   },
 };
