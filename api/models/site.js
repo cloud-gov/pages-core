@@ -1,3 +1,5 @@
+const { Op } = require('sequelize');
+const { toInt } = require('../utils');
 const {
   branchRegex, parseSiteConfigs, isEmptyOrUrl, isValidSubdomain,
 } = require('../utils/validators');
@@ -32,6 +34,7 @@ const associate = ({
   UserAction,
   UserEnvironmentVariable,
 }) => {
+  // Associations
   Site.hasMany(Build, {
     foreignKey: 'site',
   });
@@ -50,6 +53,30 @@ const associate = ({
   Site.belongsTo(Organization, {
     foreignKey: 'organizationId',
   });
+
+  // Scopes
+  Site.addScope('byIdOrText', (search) => {
+    const query = {};
+
+    const id = toInt(search);
+    if (id) {
+      query.where = { id };
+    } else {
+      query.where = {
+        [Op.or]: [
+          { owner: { [Op.substring]: search } },
+          { repository: { [Op.substring]: search } },
+        ],
+      };
+    }
+    return query;
+  });
+  Site.addScope('byOrg', id => ({
+    include: [{
+      model: Organization,
+      where: { id },
+    }],
+  }));
 };
 
 const beforeValidate = (site) => {
@@ -204,6 +231,7 @@ module.exports = (sequelize, DataTypes) => {
   Site.associate = associate;
 
   Site.withUsers = id => Site.findByPk(id, { include: [sequelize.models.User] });
-
+  Site.orgScope = id => ({ method: ['byOrg', id] });
+  Site.searchScope = search => ({ method: ['byIdOrText', search] });
   return Site;
 };

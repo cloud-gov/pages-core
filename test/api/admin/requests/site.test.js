@@ -47,9 +47,9 @@ describe('Admin - Site API', () => {
         .set('Cookie', cookie)
         .expect(200);
 
-      validateAgainstJSONSchema('GET', '/site', 200, body);
-      expect(body.map(site => site.id)).to.deep.equal(sites.map(s => s.id));
-      expect(body[0].containerConfig).to.deep.equal({});
+      validateAgainstJSONSchema('GET', '/site', 200, body.data);
+      expect(body.data.map(site => site.id)).to.deep.equal(sites.map(s => s.id));
+      expect(body.data[0].containerConfig).to.deep.equal({});
     });
   });
 

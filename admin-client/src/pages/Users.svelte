@@ -1,9 +1,6 @@
 <script>
   import { fetchUsers } from '../lib/api';
-  import {
-    PaginatedQueryPage,
-    UserTable,
-  } from '../components';
+  import { PaginatedQueryPage, UserTable } from '../components';
 
   const fields = {
     organization: {
