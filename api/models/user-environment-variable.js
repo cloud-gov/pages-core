@@ -1,8 +1,23 @@
-const associate = ({ Site, UserEnvironmentVariable }) => {
+const associate = ({ Site, User, UserEnvironmentVariable }) => {
+  // Associations
   UserEnvironmentVariable.belongsTo(Site, {
     foreignKey: 'siteId',
     allowNull: false,
   });
+
+  // Scopes
+  UserEnvironmentVariable.addScope('forSiteUser', user => ({
+    include: [{
+      model: Site,
+      required: true,
+      include: [{
+        model: User,
+        where: {
+          id: user.id,
+        },
+      }],
+    }],
+  }));
 };
 
 module.exports = (sequelize, DataTypes) => {
@@ -30,21 +45,9 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'user_environment_variable',
     timestamps: true,
     updatedAt: false,
-    scopes: {
-      forSiteUser: (user, Site, User) => ({
-        include: [{
-          model: Site,
-          required: true,
-          include: [{
-            model: User,
-            where: {
-              id: user.id,
-            },
-          }],
-        }],
-      }),
-    },
   });
   UserEnvironmentVariable.associate = associate;
+  UserEnvironmentVariable.forSiteUser = user => UserEnvironmentVariable
+    .scope({ method: ['forSiteUser', user] });
   return UserEnvironmentVariable;
 };

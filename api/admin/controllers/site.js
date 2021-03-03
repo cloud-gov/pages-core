@@ -1,8 +1,7 @@
-const { Op } = require('sequelize');
 const { Organization, Site } = require('../../models');
 const SiteDestroyer = require('../../services/SiteDestroyer');
 const { fetchModelById } = require('../../utils/queryDatabase');
-const { pick, toInt, wrapHandlers } = require('../../utils');
+const { paginate, pick, wrapHandlers } = require('../../utils');
 const { serializeNew, serializeMany } = require('../../serializers/site');
 
 const updateableAttrs = [
@@ -10,42 +9,36 @@ const updateableAttrs = [
 ];
 
 module.exports = wrapHandlers({
-  findAllSites: async (req, res) => {
+  list: async (req, res) => {
     const {
-      limit = 25, offset = 0, q, organization,
+      limit, page, organization, search,
     } = req.query;
 
-    const query = {
-      order: ['repository'],
-      limit,
-      offset,
-    };
+    const query = { order: ['owner', 'repository'] };
 
-    if (q) {
-      const num = toInt(q);
-      if (num) {
-        query.where = { id: num };
-      } else {
-        query.where = {
-          [Op.or]: [
-            { owner: { [Op.substring]: q } },
-            { repository: { [Op.substring]: q } },
-          ],
-        };
-      }
+    const serialize = sites => serializeMany(sites, true);
+
+    const scopes = [];
+
+    if (search) {
+      scopes.push(Site.searchScope(search));
     }
 
     if (organization) {
-      query.include = [{
-        model: Organization,
-        where: {
-          id: organization,
-        },
-      }];
+      scopes.push(Site.orgScope(organization));
     }
 
-    const sites = await Site.findAll(query);
-    res.json(serializeMany(sites, true));
+    const [pagination, orgs] = await Promise.all([
+      paginate(Site.scope(scopes), serialize, { limit, page }, query),
+      Organization.findAll({ attributes: ['id', 'name'], raw: true }),
+    ]);
+
+    const json = {
+      meta: { orgs },
+      ...pagination,
+    };
+
+    return res.json(json);
   },
 
   findById: async (req, res) => {

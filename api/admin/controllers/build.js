@@ -2,29 +2,32 @@
 const buildSerializer = require('../../serializers/build');
 const BuildLogs = require('../../services/build-logs');
 const { Build, Site } = require('../../models');
-const { buildWhereQuery, fetchModelById } = require('../../utils/queryDatabase');
+const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, wrapHandlers } = require('../../utils');
 
 module.exports = wrapHandlers({
   async list(req, res) {
     const {
-      limit, page, ...options
+      limit, page, site,
     } = req.query;
 
-    const queryFields = Object.keys(Build.rawAttributes);
+    const scopes = [];
 
-    const query = {
-      where: buildWhereQuery(options, queryFields),
-    };
+    if (site) {
+      scopes.push(Build.siteScope(site));
+    }
 
-    const pagination = await paginate(Build, buildSerializer.serialize, { limit, page }, query);
+    const [pagination, sites] = await Promise.all([
+      paginate(Build.scope(scopes), buildSerializer.serialize, { limit, page }),
+      Site.findAll({ attributes: ['id', 'owner', 'repository'], raw: true }),
+    ]);
 
     const json = {
-      meta: {},
+      meta: { sites },
       ...pagination,
     };
 
-    res.json(json);
+    return res.json(json);
   },
 
   async findById(req, res) {

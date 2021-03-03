@@ -17,6 +17,7 @@ export { default as Nav } from './Nav.svelte';
 export { default as NavButton } from './NavButton.svelte';
 export { default as OrganizationTable } from './OrganizationTable.svelte';
 export { default as PageTitle } from './PageTitle.svelte';
+export { default as PaginatedQueryPage } from './PaginatedQueryPage.svelte';
 export { default as PaginationBanner } from './PaginationBanner.svelte';
 export { default as SectionHeader } from './SectionHeader.svelte';
 export { default as SiteCard } from './SiteCard.svelte';

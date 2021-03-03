@@ -1,4 +1,3 @@
-const { Op } = require('sequelize');
 const { serialize, serializeMany } = require('../../serializers/organization');
 const { paginate, wrapHandlers } = require('../../utils');
 const { Organization } = require('../../models');
@@ -6,17 +5,15 @@ const { fetchModelById } = require('../../utils/queryDatabase');
 
 module.exports = wrapHandlers({
   async list(req, res) {
-    const { limit, page, name } = req.query;
+    const { limit, page, search } = req.query;
 
-    const query = {};
+    const scopes = [];
 
-    if (name) {
-      query.where = {
-        name: { [Op.substring]: name },
-      };
+    if (search) {
+      scopes.push(Organization.searchScope(search));
     }
 
-    const pagination = await paginate(Organization, serializeMany, { limit, page }, query);
+    const pagination = await paginate(Organization.scope(scopes), serializeMany, { limit, page });
 
     const json = {
       meta: {},

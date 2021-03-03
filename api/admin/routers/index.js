@@ -23,7 +23,7 @@ authenticatedRouter.get('/organizations', AdminOrganizationController.list);
 authenticatedRouter.post('/organizations', AdminOrganizationController.create);
 authenticatedRouter.get('/organizations/:id', AdminOrganizationController.findById);
 authenticatedRouter.put('/organizations/:id', AdminOrganizationController.update);
-authenticatedRouter.get('/sites', AdminSiteController.findAllSites);
+authenticatedRouter.get('/sites', AdminSiteController.list);
 authenticatedRouter.get('/sites/:id', AdminSiteController.findById);
 authenticatedRouter.put('/sites/:id', AdminSiteController.update);
 authenticatedRouter.delete('/sites/:id', AdminSiteController.destroy);
