@@ -1,4 +1,3 @@
-const fs = require('fs');
 const { Sequelize, DataTypes } = require('sequelize');
 const { postgres } = require('../../config');
 const { databaseLogger } = require('../../winston');
