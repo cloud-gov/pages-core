@@ -60,6 +60,18 @@ const associate = ({
       where: { id },
     }],
   }));
+  Build.addScope('forSiteUser', user => ({
+    include: [{
+      model: Site,
+      required: true,
+      include: [{
+        model: User,
+        where: {
+          id: user.id,
+        },
+      }],
+    }],
+  }));
 };
 
 const generateToken = () => URLSafeBase64.encode(crypto.randomBytes(32));
@@ -229,20 +241,6 @@ module.exports = (sequelize, DataTypes) => {
     hooks: {
       beforeValidate,
     },
-    scopes: {
-      forSiteUser: (user, Site, User) => ({
-        include: [{
-          model: Site,
-          required: true,
-          include: [{
-            model: User,
-            where: {
-              id: user.id,
-            },
-          }],
-        }],
-      }),
-    },
   });
 
   Build.generateToken = generateToken;
@@ -256,5 +254,6 @@ module.exports = (sequelize, DataTypes) => {
   Build.States = States;
   Build.orgScope = id => ({ method: ['byOrg', id] });
   Build.siteScope = id => ({ method: ['bySite', id] });
+  Build.forSiteUser = user => Build.scope({ method: ['forSiteUser', user] });
   return Build;
 };

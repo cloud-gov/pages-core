@@ -77,6 +77,15 @@ const associate = ({
       where: { id },
     }],
   }));
+  Site.addScope('forUser', user => ({
+    include: [{
+      model: User,
+      required: true,
+      where: {
+        id: user.id,
+      },
+    }],
+  }));
 };
 
 const beforeValidate = (site) => {
@@ -215,23 +224,12 @@ module.exports = (sequelize, DataTypes) => {
       validationFailed,
     },
     paranoid: true,
-    scopes: {
-      forUser: (user, User) => ({
-        include: [{
-          model: User,
-          required: true,
-          where: {
-            id: user.id,
-          },
-        }],
-      }),
-    },
   });
 
   Site.associate = associate;
-
   Site.withUsers = id => Site.findByPk(id, { include: [sequelize.models.User] });
   Site.orgScope = id => ({ method: ['byOrg', id] });
   Site.searchScope = search => ({ method: ['byIdOrText', search] });
+  Site.forUser = user => Site.scope({ method: ['forUser', user] });
   return Site;
 };
