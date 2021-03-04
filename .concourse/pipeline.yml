@@ -1,0 +1,27 @@
+---
+resources:
+  - name: app-git
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/18F/federalist
+
+jobs:
+  - name: build
+    plan:
+      - get: app-git
+        trigger: true
+      - task:
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: node
+              tag: 14.16
+          inputs:
+            - name: app-git
+          run: |
+            echo "Node Version: $(node --version)"
+
+
