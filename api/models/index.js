@@ -25,6 +25,7 @@ require('./event')(sequelize, DataTypes);
 require('./role')(sequelize, DataTypes);
 require('./organization')(sequelize, DataTypes);
 require('./organization-role')(sequelize, DataTypes);
+require('./uaa-identity')(sequelize, DataTypes);
 
 Object
   .keys(sequelize.models)

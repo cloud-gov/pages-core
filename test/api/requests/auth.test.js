@@ -5,9 +5,10 @@ const request = require('supertest');
 const sinon = require('sinon');
 const app = require('../../../app');
 const config = require('../../../config');
-const { User } = require('../../../api/models');
+const { UAAIdentity, User } = require('../../../api/models');
 const EventCreator = require('../../../api/services/EventCreator');
 const factory = require('../support/factory');
+const { uaaUser } = require('../support/factory/uaa-identity');
 const githubAPINocks = require('../support/githubAPINocks');
 const cfUAANocks = require('../support/cfUAANock');
 const { authenticatedSession, unauthenticatedSession } = require('../support/session');
@@ -257,17 +258,33 @@ describe('Authentication requests', () => {
   });
 
   context('uaa callbacks', () => {
+    beforeEach(() => UAAIdentity.truncate());
+
+    after(() => UAAIdentity.truncate());
+
     describe('GET /auth/uaa/callback', () => {
       context('when the admin user exists in the database', () => {
         it('should authenticate the user', async () => {
           nock.cleanAll();
-          const user = await factory.user({
-            adminEmail: 'admin@example.com',
+          const uaaId = 'uaa-admin-authenticated';
+          const profile = { email: 'hello@example.com', user_id: uaaId };
+          const userProfile = uaaUser({
+            id: uaaId,
+            groups: [{
+              display: 'pages.admin',
+            }],
+            ...profile,
+          });
+          const user = await factory.user();
+          await factory.uaaIdentity({
+            uaaId,
+            userId: user.id,
           });
           const oauthState = 'state-123abc';
           const code = 'code';
 
-          cfUAANocks.uaaAuth({ email: user.adminEmail }, code);
+          cfUAANocks.uaaAuth(profile, code);
+          cfUAANocks.getUser(uaaId, userProfile);
 
           const cookie = await unauthenticatedSession({ oauthState });
 
@@ -286,10 +303,20 @@ describe('Authentication requests', () => {
 
       context('when the admin user does not exist in the database', () => {
         it('should fail to authenticate, redirect the user and provide a flash message', async () => {
-          const code = 'code';
+          const uaaId = 'uaa-admin-does-not-exist';
+          const profile = { email: 'hello@example.com', user_id: uaaId };
+          const userProfile = uaaUser({
+            id: uaaId,
+            groups: [{
+              display: 'pages.admin',
+            }],
+            ...profile,
+          });
           const oauthState = 'state-123abc';
+          const code = 'code';
 
-          cfUAANocks.uaaAuth({ email: 'foo@bar.com' }, code);
+          cfUAANocks.uaaAuth(profile, code);
+          cfUAANocks.getUser(uaaId, userProfile);
 
           const cookie = await unauthenticatedSession({ oauthState });
 
@@ -310,15 +337,26 @@ describe('Authentication requests', () => {
       });
 
       it('should redirect to a redirect path if one is set in the session', async () => {
+        const uaaId = 'uaa-admin-auth-redirect';
+        const profile = { email: 'hello@example.com', user_id: uaaId };
+        const userProfile = uaaUser({
+          id: uaaId,
+          groups: [{
+            display: 'pages.admin',
+          }],
+          ...profile,
+        });
+        const user = await factory.user();
+        await factory.uaaIdentity({
+          uaaId,
+          userId: user.id,
+        });
         const authRedirectPath = '/path/to/something';
         const oauthState = 'state-123abc';
         const code = 'code';
 
-        const user = await factory.user({
-          adminEmail: 'admin@example.com',
-        });
-
-        cfUAANocks.uaaAuth({ email: user.adminEmail }, code);
+        cfUAANocks.uaaAuth(profile, code);
+        cfUAANocks.getUser(uaaId, userProfile);
 
         const session = await unauthenticatedSession({ oauthState, authRedirectPath });
 

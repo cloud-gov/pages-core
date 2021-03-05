@@ -6,7 +6,7 @@ const { User, Event } = require('../models');
 const GitHub = require('./GitHub');
 const RepositoryVerifier = require('./RepositoryVerifier');
 const EventCreator = require('./EventCreator');
-const { createUAAStrategy } = require('./uaaStrategy');
+const { createUAAStrategy, verifyUAAUser } = require('./uaaStrategy');
 
 const passport = new Passport.Passport();
 
@@ -48,26 +48,19 @@ async function verifyGithub(accessToken, _refreshToken, profile, callback) {
   }
 }
 
-async function verifyUAA(accessToken, _refreshToken, profile, callback) {
-  const { email } = profile;
+async function verifyUAA(accessToken, refreshToken, profile, callback) {
+  const { user_id: uaaId } = profile;
 
   try {
-    const user = await User.findOne({ where: { adminEmail: email } });
+    const user = await verifyUAAUser(accessToken, refreshToken, uaaId, 'pages.admin', callback);
 
-    if (!user) {
-      return callback(null, false);
-    }
+    if (!user) return callback(null, false);
 
     await user.update({
       signedInAt: new Date(),
     });
 
     EventCreator.audit(Event.labels.AUTHENTICATION, user, 'UAA login');
-
-    RepositoryVerifier.verifyUserRepos(user)
-      .catch(err => EventCreator.error(Event.labels.SITE_USER, err, {
-        userId: user.id,
-      }));
 
     return callback(null, user);
   } catch (err) {

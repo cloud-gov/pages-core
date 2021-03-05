@@ -1,8 +1,9 @@
 const { expect } = require('chai');
 const request = require('supertest');
-const sinon = require('sinon');
+const { UAAIdentity, User } = require('../../../../api/models');
 const cfUAANock = require('../../support/cfUAANock');
 const userFactory = require('../../support/factory/user');
+const { uaaUser, createUAAIdentity } = require('../../support/factory/uaa-identity');
 const { sessionForCookie } = require('../../support/cookieSession');
 const { unauthenticatedSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
@@ -12,9 +13,10 @@ const { adminOptions: uaaConfig } = require('../../../../config').passport.uaa;
 const app = require('../../../../app');
 
 describe('Admin authentication request', () => {
-  afterEach(() => {
-    sinon.restore();
-  });
+  after(() => Promise.all([
+    User.truncate(),
+    UAAIdentity.truncate(),
+  ]));
 
   describe('GET /admin/login', () => {
     it('should redirect to the configured cloud.gov authorization endpoint', (done) => {
@@ -27,24 +29,54 @@ describe('Admin authentication request', () => {
   });
 
   describe('GET /admin/auth/uaa/callback', () => {
-    it('returns unauthorized if the user is not an admin', (done) => {
+    it('returns unauthorized if the user is not an admin', async () => {
+      const uaaId = 'user_id_1';
       const code = 'code';
-      const profile = { email: 'hello@example.com' };
+      const profile = { email: 'hello@example.com', user_id: uaaId };
+      const user = await userFactory();
+      await createUAAIdentity({
+        uaaId,
+        userId: user.id,
+      });
+      const userProfile = uaaUser({
+        id: uaaId,
+        groups: [{
+          display: 'not.admin',
+        }],
+        ...profile,
+      });
 
       cfUAANock.uaaAuth(profile, code);
+      cfUAANock.getUser(uaaId, userProfile);
 
-      request(app)
+      return request(app)
         .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
-        .expect(401, done);
+        .expect(401);
     });
 
     describe('when successful', () => {
+      const uaaId = 'admin_id_1';
       const code = 'code';
-      const adminEmail = 'david.corwin@gsa.gov';
+      const profile = { email: 'hello@example.com', user_id: uaaId };
+      const userProfile = uaaUser({
+        id: uaaId,
+        groups: [{
+          display: 'pages.admin',
+        }],
+        ...profile,
+      });
 
-      beforeEach(async () => {
-        cfUAANock.uaaAuth({ email: adminEmail }, code);
-        await userFactory({ adminEmail });
+      before(async () => {
+        const user = await userFactory();
+        await createUAAIdentity({
+          uaaId,
+          userId: user.id,
+        });
+      });
+
+      beforeEach(() => {
+        cfUAANock.uaaAuth(profile, code);
+        cfUAANock.getUser(uaaId, userProfile);
       });
 
       it('returns a script tag', (done) => {

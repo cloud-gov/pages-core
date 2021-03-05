@@ -39,6 +39,7 @@ module.exports = {
       ],
     },
     uaa: {
+      host: 'https://uaa.example.com',
       options: {
         clientID: '123abc',
         clientSecret: '456def',
@@ -72,6 +73,7 @@ module.exports = {
     cfOauthTokenUrl: 'https://login.example.com/oauth/token',
     cfApiHost: 'https://api.example.com',
     proxySiteTable: 'testSiteTable',
+    uaaHost: 'https://uaa.example.com',
   },
   userEnvVar: {
     key: 'shhhhhhhhhhh',
