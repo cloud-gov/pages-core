@@ -15,143 +15,145 @@ jobs:
 
   - name: build
     plan:
-      - get: staging
-        trigger: true
-        params: {depth: 1}
-      - get: redis
-        params: {save: true}
-      - get: postgres
-        params: {save: true}
-      - get: node
-        params: {save: true}        
-      - in_parallel:
-        - do:
-          - task: api-install-deps
-            config:
-              platform: linux
-              image_resource:
-                <<: *node-image
-              inputs: [name: staging]
-              outputs: [name: staging]
-              run:
-                dir: staging
-                path: bash
-                args: [-c, yarn --pure-lockfile]
-            output_mapping: {staging: staging-api}
+      - do:
+        - in_parallel:
+          - get: staging
+            trigger: true
+            params: {depth: 1}
+          - get: redis
+            params: {save: true}
+          - get: postgres
+            params: {save: true}
+          - get: node
+            params: {save: true}        
+        - in_parallel:
+          - do:
+            - task: api-install-deps
+              config:
+                platform: linux
+                image_resource:
+                  <<: *node-image
+                inputs: [name: staging]
+                outputs: [name: staging]
+                run:
+                  dir: staging
+                  path: bash
+                  args: [-c, yarn --pure-lockfile]
+              output_mapping: {staging: staging-api}
 
-          - task: api-lint
-            config:
-              platform: linux
-              image_resource:
-                <<: *node-image
-              inputs: [name: staging-api]
-              run:
-                dir: staging-api
-                path: bash
-                args: [-c, yarn lint]
+            - task: api-lint
+              config:
+                platform: linux
+                image_resource:
+                  <<: *node-image
+                inputs: [name: staging-api]
+                run:
+                  dir: staging-api
+                  path: bash
+                  args: [-c, yarn lint]
 
-          - task: api-test
-            privileged: true
-            config:
-              platform: linux
-              image_resource:
-                type: docker-image
-                source:
-                  repository: karlkfi/concourse-dcind
-              inputs:
-                - name: staging-api
-                - name: redis
-                - name: postgres
-                - name: node
-              run:
-                dir: staging-api
-                path: .concourse/entrypoint.sh
-                args:
-                  - bash
-                  - -ceux
-                  - |
-                    docker-compose -f .concourse/integration.yml run app app/.concourse/test-api.sh
-                    docker-compose -f .concourse/integration.yml down
-                    docker volume rm $(docker volume ls -q)
+            - task: api-test
+              privileged: true
+              config:
+                platform: linux
+                image_resource:
+                  type: docker-image
+                  source:
+                    repository: karlkfi/concourse-dcind
+                inputs:
+                  - name: staging-api
+                  - name: redis
+                  - name: postgres
+                  - name: node
+                run:
+                  dir: staging-api
+                  path: .concourse/entrypoint.sh
+                  args:
+                    - bash
+                    - -ceux
+                    - |
+                      docker-compose -f .concourse/integration.yml run app app/.concourse/test-api.sh
+                      docker-compose -f .concourse/integration.yml down
+                      docker volume rm $(docker volume ls -q)
 
-          - task: api-build
-            config:
-              platform: linux
-              image_resource:
-                <<: *node-image
-              inputs: [name: staging-api]
-              outputs: [name: staging-api]
+            - task: api-build
+              config:
+                platform: linux
+                image_resource:
+                  <<: *node-image
+                inputs: [name: staging-api]
+                outputs: [name: staging-api]
+                params:
+                  FEATURE_PROXY_EDGE_LINKS: "false"
+                run:
+                  dir: staging-api
+                  path: bash
+                  args: [-c, yarn build]
+
+            - put: api-deploy
+              resource: cf-env
+              inputs: [staging-api]
               params:
-                FEATURE_PROXY_EDGE_LINKS: "false"
-              run:
-                dir: staging-api
-                path: bash
-                args: [-c, yarn build]
+                command: push
+                space: staging
+                app_name: federalistapp-staging
+                manifest: staging-api/.cloudgov/manifest.yml
+                vars_files: [staging-api/.cloudgov/vars/staging.yml]
+                strategy: rolling
+                path: staging-api
 
-          - put: api-deploy
-            resource: cf-env
-            inputs: [staging-api]
-            params:
-              command: push
-              space: staging
-              app_name: federalistapp-staging
-              manifest: staging-api/.cloudgov/manifest.yml
-              vars_files: [staging-api/.cloudgov/vars/staging.yml]
-              strategy: rolling
-              path: staging-api
+          - do:
+            - task: admin-client-install-deps
+              config:
+                platform: linux
+                image_resource:
+                  <<: *node-image
+                inputs: [name: staging]
+                outputs: [name: staging]
+                run:
+                  dir:  staging/admin-client
+                  path: bash
+                  args: [-c, yarn --pure-lockfile]
+              output_mapping: {staging: staging-admin}
 
-        - do:
-          - task: admin-client-install-deps
-            config:
-              platform: linux
-              image_resource:
-                <<: *node-image
-              inputs: [name: staging]
-              outputs: [name: staging]
-              run:
-                dir:  staging/admin-client
-                path: bash
-                args: [-c, yarn --pure-lockfile]
-            output_mapping: {staging: staging-admin}
+            - task: admin-client-lint
+              config:
+                platform: linux
+                image_resource:
+                  <<: *node-image
+                inputs: [name: staging-admin]
+                run:
+                  dir: staging-admin/admin-client
+                  path: bash
+                  args: [-c, yarn lint]
 
-          - task: admin-client-lint
-            config:
-              platform: linux
-              image_resource:
-                <<: *node-image
-              inputs: [name: staging-admin]
-              run:
-                dir: staging-admin/admin-client
-                path: bash
-                args: [-c, yarn lint]
+            - task: admin-client-build
+              config:
+                platform: linux
+                image_resource:
+                  <<: *node-image
+                inputs: [name: staging-admin]
+                outputs: [name: staging-admin]
+                params:
+                  API_URL: https://federalistapp-staging.18f.gov
+                  NODE_ENV: production           
+                run:
+                  dir: staging-admin/admin-client
+                  path: bash
+                  args: [-c, yarn build]
 
-          - task: admin-client-build
-            config:
-              platform: linux
-              image_resource:
-                <<: *node-image
-              inputs: [name: staging-admin]
-              outputs: [name: staging-admin]
+            - put: admin-client-deploy
+              resource: cf-env
+              inputs: [staging-admin]
               params:
-                API_URL: https://federalistapp-staging.18f.gov
-                NODE_ENV: production           
-              run:
-                dir: staging-admin/admin-client
-                path: bash
-                args: [-c, yarn build]
-
-          - put: admin-client-deploy
-            resource: cf-env
-            inputs: [staging-admin]
-            params:
-              command: push
-              space: staging
-              app_name: federalist-admin-staging
-              manifest: staging-admin/.cloudgov/manifest.yml
-              vars_files: [staging-admin/.cloudgov/vars/staging.yml]
-              strategy: rolling
-              path: staging-admin/admin-client
-        
+                command: push
+                space: staging
+                app_name: federalist-admin-staging
+                manifest: staging-admin/.cloudgov/manifest.yml
+                vars_files: [staging-admin/.cloudgov/vars/staging.yml]
+                strategy: rolling
+                path: staging-admin/admin-client
+          
   - name: nightly-tasks
     plan:
       - get: nightly
@@ -212,7 +214,8 @@ resources:
     icon: github
     source:
       uri: https://github.com/18F/federalist   
-      branch: staging
+      # branch: staging
+      branch: dc/concourse
 
   - name: nightly
     type: time
