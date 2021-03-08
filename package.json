@@ -54,7 +54,6 @@
     "yamljs": "^0.3.0"
   },
   "scripts": {
-    "postinstall": "yarn migrate:up",
     "build": "webpack --config webpack.production.config.js",
     "start": "node index.js",
     "debug": "node --inspect index.js",
