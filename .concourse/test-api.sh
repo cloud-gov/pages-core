@@ -18,4 +18,6 @@ status="$(yarn test:cover)"
 # Attempt to submit a report, but don't fail the build if this fails (`|| true`)
 ./cc-test-reporter upload-coverage || true
 
+echo "Here is my status: $status"
+
 exit "$status"
