@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
 cd app
@@ -8,8 +7,8 @@ curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-lin
 chmod +x ./cc-test-reporter
 ./cc-test-reporter before-build
 
-yarn install
-status="$(yarn test:cover)"
+# yarn install
+yarn test:cover; status=$?
 
 # Combine the test coverage reports in coverage/server/ and coverage/client/
 ./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.client.json coverage/client/lcov.info
@@ -18,6 +17,4 @@ status="$(yarn test:cover)"
 # Attempt to submit a report, but don't fail the build if this fails (`|| true`)
 ./cc-test-reporter upload-coverage || true
 
-echo "Here is my status: $status"
-
-exit "$status"
+exit $status
