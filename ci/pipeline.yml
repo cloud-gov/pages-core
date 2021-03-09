@@ -419,5 +419,3 @@ resource_types:
     type: docker-image
     source:
       repository: cfcommunity/slack-notification-resource
-
-# fly -t pages-staging sp -p federalistapp-pipeline -c ./.concourse/pipeline.yml -l ./.concourse/vars/.staging.yml
