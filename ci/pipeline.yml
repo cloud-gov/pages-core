@@ -290,15 +290,18 @@ jobs:
         username: ((slack-username))
         icon_url: ((slack-icon-url))
           
-  - name: nightly-tasks
+  - name: nightly-tasks-staging
     plan:
+      - get: src
+        resource: src-staging
+        params: {depth: 1}
       - get: nightly
         trigger: true
       - task: restage-api
         config:
           <<: *cf-image
           run:
-            path: src-staging-admin/ci/tasks/restage.sh
+            path: src/ci/tasks/restage.sh
         params:
           <<: *staging-cf
           CF_APP_NAME: federalistapp-staging
@@ -307,7 +310,7 @@ jobs:
           config:
             <<: *cf-image
             run:
-              path: src-staging-admin/ci/tasks/run-task.sh
+              path: src/ci/tasks/run-task.sh
           params:
             <<: *staging-cf
             CF_APP_NAME: federalistapp-staging
@@ -317,7 +320,7 @@ jobs:
           config:
             <<: *cf-image
             run:
-              path: src-staging-admin/ci/tasks/run-task.sh
+              path: src/ci/tasks/run-task.sh
           params:
             <<: *staging-cf
             CF_APP_NAME: federalistapp-staging
@@ -327,22 +330,25 @@ jobs:
           config:
             <<: *cf-image
             run:
-              path: src-staging-admin/ci/tasks/run-task.sh
+              path: src/ci/tasks/run-task.sh
           params:
             <<: *staging-cf
             CF_APP_NAME: federalistapp-staging
             CF_TASK_NAME: remove-inactive-federalist-users
             CF_TASK_COMMAND: yarn remove-inactive-federalist-users
 
-  - name: every-ten-minutes
+  - name: every-ten-minutes-staging
     plan:
+      - get: src
+        resource: src-staging
+        params: {depth: 1}
       - get: every-10m
         trigger: true
       - task: timeout-builds
         config:
           <<: *cf-image
           run:
-            path: src-staging-admin/ci/tasks/run-task.sh
+            path: src/ci/tasks/run-task.sh
         params:
           <<: *staging-cf
           CF_APP_NAME: federalistapp-staging
