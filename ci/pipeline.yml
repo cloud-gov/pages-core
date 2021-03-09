@@ -76,6 +76,8 @@ test-api: &test-api
             - -ceux
             - |
               pushd ..
+                pwd
+                ls
                 docker load -i redis/image
                 docker tag "$(cat redis/image-id)" "$(cat redis/repository):$(cat redis/tag)"
                 docker load -i postgres/image
