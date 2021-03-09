@@ -75,16 +75,16 @@ test-api: &test-api
             - bash
             - -ceux
             - |
-              pushd ..
-                pwd
-                ls
-                docker load -i redis/image
-                docker tag "$(cat redis/image-id)" "$(cat redis/repository):$(cat redis/tag)"
-                docker load -i postgres/image
-                docker tag "$(cat postgres/image-id)" "$(cat postgres/repository):$(cat postgres/tag)"
-                docker load -i node/image
-                docker tag "$(cat node/image-id)" "$(cat node/repository):$(cat node/tag)"
-              popd
+              echo "check"
+              pwd
+              ls
+              echo "go time"
+              docker load -i redis/image
+              docker tag "$(cat redis/image-id)" "$(cat redis/repository):$(cat redis/tag)"
+              docker load -i postgres/image
+              docker tag "$(cat postgres/image-id)" "$(cat postgres/repository):$(cat postgres/tag)"
+              docker load -i node/image
+              docker tag "$(cat node/image-id)" "$(cat node/repository):$(cat node/tag)"
               docker-compose -f ci/docker/docker-compose.yml run app app/ci/tasks/test-api.sh
               docker-compose -f ci/docker/docker-compose.yml down
               docker volume rm $(docker volume ls -q)    
