@@ -1,0 +1,423 @@
+---
+############################
+#  SHARED
+
+staging-cf: &staging-cf
+  CF_API: https://api.fr.cloud.gov
+  CF_USERNAME: ((cf-username))
+  CF_PASSWORD: ((cf-password))
+  CF_ORG: gsa-18f-federalist
+  CF_SPACE: staging
+
+node-image: &node-image
+  type: docker-image
+  source:
+    repository: node
+    tag: 14
+
+cf-image: &cf-image
+  platform: linux
+  image_resource:
+    type: docker-image
+    source:
+      repository: 18fgsa/concourse-task
+
+test-api: &test-api
+  - in_parallel:
+    - get: redis
+      params: {save: true}
+    - get: postgres
+      params: {save: true}
+    - get: node
+      params: {save: true}
+
+  - task: install-deps-api
+    config:
+      platform: linux
+      image_resource:
+        <<: *node-image
+      inputs: [name: src-api]
+      outputs: [name: src-api]
+      run:
+        dir: src-api
+        path: bash
+        args: [-c, yarn --pure-lockfile]
+
+  - in_parallel:
+    - task: lint-api
+      config:
+        platform: linux
+        image_resource:
+          <<: *node-image
+        inputs: [name: src-api]
+        run:
+          dir: src-api
+          path: bash
+          args: [-c, yarn lint]
+
+    - task: test-api
+      privileged: true
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: karlkfi/concourse-dcind
+        inputs:
+          - name: src-api
+          - name: redis
+          - name: postgres
+          - name: node
+        run:
+          dir: src-api
+          path: ci/docker/entrypoint.sh
+          args:
+            - bash
+            - -ceux
+            - |
+              pushd ../..
+                docker load -i redis/image
+                docker tag "$(cat redis/image-id)" "$(cat redis/repository):$(cat redis/tag)"
+                docker load -i postgres/image
+                docker tag "$(cat postgres/image-id)" "$(cat postgres/repository):$(cat postgres/tag)"
+                docker load -i node/image
+                docker tag "$(cat node/image-id)" "$(cat node/repository):$(cat node/tag)"
+              popd
+              docker-compose -f ci/docker/docker-compose.yml run app app/ci/tasks/test-api.sh
+              docker-compose -f ci/docker/docker-compose.yml down
+              docker volume rm $(docker volume ls -q)    
+
+test-admin-client: &test-admin-client
+  - task: install-deps-admin-client
+    config:
+      platform: linux
+      image_resource:
+        <<: *node-image
+      inputs: [name: src-admin-client]
+      outputs: [name: src-admin-client]
+      run:
+        dir:  src-admin-client/admin-client
+        path: bash
+        args: [-c, yarn --pure-lockfile]
+
+  - task: lint-admin-client
+    config:
+      platform: linux
+      image_resource:
+        <<: *node-image
+      inputs: [name: src-admin-client]
+      run:
+        dir: src-admin-client/admin-client
+        path: bash
+        args: [-c, yarn lint]
+
+  - task: build-admin-client
+    config:
+      platform: linux
+      image_resource:
+        <<: *node-image
+      inputs: [name: src-admin-client]
+      outputs: [name: src-admin-client]
+      params:
+        API_URL: https://federalistapp-staging.18f.gov
+        NODE_ENV: production           
+      run:
+        dir: src-admin-client/admin-client
+        path: bash
+        args: [-c, yarn build]
+
+############################
+#  JOBS
+
+jobs:
+
+  - name: test-api
+    plan:
+      - get: src-api
+        resource: src-any
+        trigger: true
+        params: {depth: 1}
+      - do: *test-api
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: FAILED: pages api tests
+          ((build-url))
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
+
+  - name: test-admin-client
+    plan:
+      - get: src-admin-client
+        resource: src-any
+        trigger: true
+        params: {depth: 1}
+      - do: *test-admin-client
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: FAILED pages admin client tests
+          ((build-url))
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
+
+  - name: test-and-deploy-api-staging
+    plan:
+      - get: src-api
+        resource: src-staging
+        trigger: true
+        params: {depth: 1}
+      - do: *test-api
+      - task: build-api
+        config:
+          platform: linux
+          image_resource:
+            <<: *node-image
+          inputs: [name: src-api]
+          outputs: [name: src-api]
+          params:
+            FEATURE_PROXY_EDGE_LINKS: "false"
+          run:
+            dir: src-api
+            path: bash
+            args: [-c, yarn build]
+
+      - task: deploy-api
+        config:
+          <<: *cf-image
+          inputs: [name: src-api]
+          run:
+            path: src-api/ci/tasks/deploy.sh
+        params:
+          <<: *staging-cf
+          CF_APP_NAME: federalistapp-staging
+          CF_MANIFEST: src-api/.cloudgov/manifest.yml
+          CF_VARS_FILE: src-api/.cloudgov/vars/staging.yml
+        on_failure:
+          try:
+            task: cancel-api-deployment
+            config:
+              <<: *cf-image
+              inputs: [name: src-api]
+              run:
+                path: src-api/ci/tasks/cancel-deployment.sh
+            params:
+              <<: *staging-cf
+              CF_APP_NAME: federalistapp-staging
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: FAILED: pages api deployment on staging
+          ((build-url))
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: SUCCESS: Successfully deployed pages api on staging
+          ((build-url))
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
+
+  - name: test-and-deploy-admin-client-staging
+    plan:
+      - get: src-admin-client
+        resource: src-staging
+        trigger: true
+        params: {depth: 1}
+      - do: *test-admin-client
+      - task: build-admin-client
+        config:
+          platform: linux
+          image_resource:
+            <<: *node-image
+          inputs: [name: src-admin-client]
+          outputs: [name: src-admin-client]
+          params:
+            API_URL: https://federalistapp-staging.18f.gov
+            NODE_ENV: production           
+          run:
+            dir: src-admin-client/admin-client
+            path: bash
+            args: [-c, yarn build]
+
+      - task: deploy-admin-client
+        config:
+          <<: *cf-image
+          inputs: [name: src-admin-client]
+          run:
+            path: src-admin-client/ci/tasks/deploy.sh
+        params:
+          <<: *staging-cf
+          CF_APP_NAME: federalist-admin-staging
+          CF_MANIFEST: src-admin-client/.cloudgov/manifest.yml
+          CF_VARS_FILE: src-admin-client/.cloudgov/vars/staging.yml
+        on_failure:
+          try:
+            task: cancel-admin-client-deployment
+            config:
+              <<: *cf-image
+              inputs: [name: src-admin-client]
+              run:
+                path: src-admin-client/ci/tasks/cancel-deployment.sh
+            params:
+              <<: *staging-cf
+              CF_APP_NAME: federalist-admin-staging      
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: FAILED: pages admin client deployment on staging
+          ((build-url))
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: SUCCESS: Successfully deployed pages admin client on staging
+          ((build-url))
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
+          
+  - name: nightly-tasks
+    plan:
+      - get: nightly
+        trigger: true
+      - task: restage-api
+        config:
+          <<: *cf-image
+          run:
+            path: src-staging-admin/ci/tasks/restage.sh
+        params:
+          <<: *staging-cf
+          CF_APP_NAME: federalistapp-staging
+      - in_parallel:
+        - task: archive-build-logs
+          config:
+            <<: *cf-image
+            run:
+              path: src-staging-admin/ci/tasks/run-task.sh
+          params:
+            <<: *staging-cf
+            CF_APP_NAME: federalistapp-staging
+            CF_TASK_NAME: archive-build-logs
+            CF_TASK_COMMAND: yarn archive-build-logs-daily
+        - task: nightly-builds
+          config:
+            <<: *cf-image
+            run:
+              path: src-staging-admin/ci/tasks/run-task.sh
+          params:
+            <<: *staging-cf
+            CF_APP_NAME: federalistapp-staging
+            CF_TASK_NAME: nightly-builds
+            CF_TASK_COMMAND: yarn nightly-builds
+        - task: remove-inactive-federalist-users
+          config:
+            <<: *cf-image
+            run:
+              path: src-staging-admin/ci/tasks/run-task.sh
+          params:
+            <<: *staging-cf
+            CF_APP_NAME: federalistapp-staging
+            CF_TASK_NAME: remove-inactive-federalist-users
+            CF_TASK_COMMAND: yarn remove-inactive-federalist-users
+
+  - name: every-ten-minutes
+    plan:
+      - get: every-10m
+        trigger: true
+      - task: timeout-builds
+        config:
+          <<: *cf-image
+          run:
+            path: src-staging-admin/ci/tasks/run-task.sh
+        params:
+          <<: *staging-cf
+          CF_APP_NAME: federalistapp-staging
+          CF_TASK_NAME: timeout-builds
+          CF_TASK_COMMAND: yarn timeout-builds
+
+
+############################
+#  RESOURCES
+
+resources:
+
+  - name: src-any
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/18F/federalist
+
+  - name: src-staging
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/18F/federalist   
+      # branch: staging
+      branch: dc/concourse
+
+  # - name: src-production
+  #   type: git
+  #   icon: github
+  #   source:
+  #     uri: https://github.com/18F/federalist   
+  #     branch: main
+
+  - name: nightly
+    type: time
+    source:
+      start: 12:00 AM
+      stop: 1:00 AM
+      location: America/New_York
+
+  - name: every-10m
+    type: time
+    source: {interval: 10m}
+
+  - name: redis
+    type: docker-image
+    source:
+      repository: redis
+      tag: 5-alpine
+
+  - name: postgres
+    type: docker-image
+    source:
+      repository: postgres
+      tag: 11-alpine
+
+  - name: node
+    type: docker-image
+    source:
+      repository: node
+      tag: 14
+
+  - name: slack
+    type: slack-notification
+    source:
+      url: ((slack-webhook-url))
+
+############################
+#  RESOURCE TYPES
+
+resource_types:
+
+  - name: slack-notification
+    type: docker-image
+    source:
+      repository: cfcommunity/slack-notification-resource
+
+# fly -t pages-staging sp -p federalistapp-pipeline -c ./.concourse/pipeline.yml -l ./.concourse/vars/.staging.yml
