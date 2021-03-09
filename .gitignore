@@ -42,3 +42,4 @@ current-sites.csv
 .vscode
 credentials*.json
 tmp
+ci/vars/.*
