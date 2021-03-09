@@ -131,39 +131,39 @@ test-admin-client: &test-admin-client
 
 jobs:
 
-  # - name: test-api
-  #   plan:
-  #     - get: src-api
-  #       resource: src-any
-  #       trigger: true
-  #       params: {depth: 1}
-  #     - do: *test-api
-  #   on_failure:
-  #     put: slack
-  #     params:
-  #       text: |
-  #         :x: FAILED: pages api tests
-  #         ((build-url))
-  #       channel: ((slack-channel))
-  #       username: ((slack-username))
-  #       icon_url: ((slack-icon-url))
+  - name: test-api
+    plan:
+      - get: src-api
+        resource: src-dev
+        trigger: true
+        params: {depth: 1}
+      - do: *test-api
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: FAILED: pages api tests
+          ((build-url))
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
 
-  # - name: test-admin-client
-  #   plan:
-  #     - get: src-admin-client
-  #       resource: src-any
-  #       trigger: true
-  #       params: {depth: 1}
-  #     - do: *test-admin-client
-  #   on_failure:
-  #     put: slack
-  #     params:
-  #       text: |
-  #         :x: FAILED pages admin client tests
-  #         ((build-url))
-  #       channel: ((slack-channel))
-  #       username: ((slack-username))
-  #       icon_url: ((slack-icon-url))
+  - name: test-admin-client
+    plan:
+      - get: src-admin-client
+        resource: src-dev
+        trigger: true
+        params: {depth: 1}
+      - do: *test-admin-client
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: FAILED pages admin client tests
+          ((build-url))
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
 
   - name: test-and-deploy-api-staging
     plan:
@@ -363,11 +363,12 @@ jobs:
 
 resources:
 
-  # - name: src-any
-  #   type: git
-  #   icon: github
-  #   source:
-  #     uri: https://github.com/18F/federalist
+  - name: src-dev
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/18F/federalist
+      tag_filter: "!(main|dc/concourse)"
 
   - name: src-staging
     type: git
