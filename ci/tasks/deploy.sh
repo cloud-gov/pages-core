@@ -7,10 +7,4 @@ cf auth
 
 cf t -o $CF_ORG -s $CF_SPACE
 
-echo "current dir"
-pwd
-echo "path"
-echo $CF_PATH
-echo "end current dir"
-
 cf push $CF_APP_NAME -p $CF_PATH -f $CF_MANIFEST --strategy rolling --vars-file $CF_VARS_FILE
