@@ -131,10 +131,45 @@ test-admin-client: &test-admin-client
 
 jobs:
 
+  # - name: pr
+  #   plan:
+  #     - get: pull-request
+  #       trigger: true
+  #       version: every
+  #       params: {git_depth: 1}
+  #     - put: pull-request
+  #       params:
+  #         path: pull-request
+  #         status: pending
+  #     - task: test-admin-client
+  #       config:
+  #         platform: linux
+  #         image_resource:
+  #           <<: *node-image
+  #         inputs: [name: pull-request]
+  #         run:
+  #           dir:  pull-request/admin-client
+  #           path: bash
+  #           args:
+  #             - -c
+  #             - |
+  #               yarn --pure-lockfile
+  #               yarn lint
+  #               yarn build
+  #       on_failure:
+  #         put: pull-request
+  #         params:
+  #           path: pull-request
+  #           status: failure
+  #     - put: pull-request
+  #       params:
+  #         path: pull-request
+  #         status: success
+
   - name: test-api
     plan:
       - get: src-api
-        resource: src-dev
+        resource: src-all
         trigger: true
         params: {depth: 1}
       - do: *test-api
@@ -151,9 +186,9 @@ jobs:
   - name: test-admin-client
     plan:
       - get: src-admin-client
-        resource: src-dev
+        resource: src-all
         trigger: true
-        params: {depth: 1}
+        params: {depth: 1}        
       - do: *test-admin-client
     on_failure:
       put: slack
@@ -234,6 +269,18 @@ jobs:
         resource: src-staging
         trigger: true
         params: {depth: 1}
+      - task: send-pending-status
+        config:
+          platform: linux
+          image_resource:
+            <<: *node-image
+          inputs: [name: src-admin-client]
+          run:
+            path: src-admin-client/ci/tasks/send-status.sh
+        params:
+          GITHUB_STATE: pending
+          GITHUB_ACCESS_TOKEN: ((gh-access-token))
+          BUILD_URL: ((build-url))
       - do: *test-admin-client
       - task: build-admin-client
         config:
@@ -249,7 +296,6 @@ jobs:
             dir: src-admin-client/admin-client
             path: bash
             args: [-c, yarn build]
-
       - task: deploy-admin-client
         config:
           <<: *cf-image
@@ -274,23 +320,55 @@ jobs:
               <<: *staging-cf
               CF_APP_NAME: federalist-admin-staging
     on_failure:
-      put: slack
-      params:
-        text: |
-          :x: FAILED: pages admin client deployment on staging
-          ((build-url))
-        channel: ((slack-channel))
-        username: ((slack-username))
-        icon_url: ((slack-icon-url))
+      do:
+        - get: src-failure
+          resource: src-staging
+          params: {depth: 1}
+        - task: send-failure-status
+          config:
+            platform: linux
+            image_resource:
+              <<: *node-image
+            inputs: [name: src-failure]
+            run:
+              path: src/ci/tasks/send-status.sh
+          params:
+            GITHUB_STATE: failure
+            GITHUB_ACCESS_TOKEN: ((gh-access-token))
+            BUILD_URL: ((build-url))
+        - put: slack
+          params:
+            text: |
+              :x: FAILED: pages admin client deployment on staging
+              ((build-url))
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
     on_success:
-      put: slack
-      params:
-        text: |
-          :white_check_mark: SUCCESS: Successfully deployed pages admin client on staging
-          ((build-url))
-        channel: ((slack-channel))
-        username: ((slack-username))
-        icon_url: ((slack-icon-url))
+      do:
+        - get: src-success
+          resource: src-staging
+          params: {depth: 1}
+        - task: send-success-status
+          config:
+            platform: linux
+            image_resource:
+              <<: *node-image
+            inputs: [name: src-success]
+            run:
+              path: src/ci/tasks/send-status.sh
+          params:
+            GITHUB_STATE: success
+            GITHUB_ACCESS_TOKEN: ((gh-access-token))
+            BUILD_URL: ((build-url))      
+        - put: slack
+          params:
+            text: |
+              :white_check_mark: SUCCESS: Successfully deployed pages admin client on staging
+              ((build-url))
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
           
   - name: nightly-tasks-staging
     plan:
@@ -363,12 +441,11 @@ jobs:
 
 resources:
 
-  - name: src-dev
+  - name: src-all
     type: git
     icon: github
     source:
       uri: https://github.com/18F/federalist
-      tag_filter: "!(main|dc/concourse)"
 
   - name: src-staging
     type: git
@@ -414,6 +491,16 @@ resources:
       repository: node
       tag: 14
 
+  # - name: pull-request
+  #   type: pull-request
+  #   # webhook_token: ((webhook-token))
+  #   source:
+  #     repository: itsdalmo/test-repository
+  #     base_branch: staging
+  #     disable_forks: true
+  #     ignore_drafts: false
+  #     access_token: ((gh-access-token))
+  
   - name: slack
     type: slack-notification
     source:
@@ -423,6 +510,11 @@ resources:
 #  RESOURCE TYPES
 
 resource_types:
+
+  # - name: pull-request
+  #   type: docker-image
+  #   source:
+  #     repository: teliaoss/github-pr-resource
 
   - name: slack-notification
     type: docker-image
