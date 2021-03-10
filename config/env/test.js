@@ -1,3 +1,27 @@
+function dbConfig(env) {
+  if (env.CONCOURSE) {
+    return {
+      database: 'postgres',
+      user: 'postgres',
+      host: 'db',
+    };
+  }
+
+  if (env.CI) {
+    return {
+      database: 'federalist-ci-test',
+      user: 'ci-test-user',
+      host: 'localhost',
+    };
+  }
+
+  return {
+    database: 'federalist-test',
+    user: 'postgres',
+    host: 'db',
+  };
+}
+
 module.exports = {
   build: {
     token: '123abc',
@@ -49,11 +73,7 @@ module.exports = {
       },
     },
   },
-  postgres: {
-    database: process.env.CI ? 'federalist-ci-test' : 'federalist-test',
-    user: process.env.CI ? 'ci-test-user' : 'postgres',
-    host: process.env.CI ? 'localhost' : 'db',
-  },
+  postgres: dbConfig(process.env),
   redis: {
     url: process.env.CI ? 'redis://localhost:6379' : 'redis://redis:6379',
   },
