@@ -30,10 +30,6 @@ commands:
               echo "export CF_SPACE=production" >> $BASH_ENV
               echo "export CF_USERNAME=$CF_USERNAME_PRODUCTION" >> $BASH_ENV
               echo "export CF_PASSWORD=$CF_PASSWORD_PRODUCTION" >> $BASH_ENV
-            else
-              echo "export CF_SPACE=staging" >> $BASH_ENV
-              echo "export CF_USERNAME=$CF_USERNAME_STAGING" >> $BASH_ENV
-              echo "export CF_PASSWORD=$CF_PASSWORD_STAGING" >> $BASH_ENV
             fi
 
       - run:
