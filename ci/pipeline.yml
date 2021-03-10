@@ -281,6 +281,7 @@ jobs:
         params:
           GITHUB_STATE: pending
           GITHUB_ACCESS_TOKEN: ((gh-access-token))
+          BUILD_NAME:
       - do: *test-admin-client
       - task: build-admin-client
         config:
