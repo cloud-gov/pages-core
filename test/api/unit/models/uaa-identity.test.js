@@ -16,13 +16,6 @@ describe('UAAIdentity model', () => {
 
   after(clean);
 
-  it('`uuaId` is required', async () => {
-    const error = await UAAIdentity.create({}).catch(e => e);
-
-    expect(error).to.be.an('error');
-    expect(error.name).to.eq('SequelizeValidationError');
-  });
-
   it('`uuaId` is unique', async () => {
     const [user1, user2] = await Promise.all([createUser(), createUser()]);
     const uaaId = 'test-uuaId';

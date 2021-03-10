@@ -49,10 +49,13 @@ async function verifyGithub(accessToken, _refreshToken, profile, callback) {
 }
 
 async function verifyUAA(accessToken, refreshToken, profile, callback) {
-  const { user_id: uaaId } = profile;
-
   try {
-    const user = await verifyUAAUser(accessToken, refreshToken, uaaId, 'pages.admin', callback);
+    const user = await verifyUAAUser(
+      accessToken,
+      refreshToken,
+      profile,
+      ['pages.user', 'pages.admin']
+    );
 
     if (!user) return callback(null, false);
 

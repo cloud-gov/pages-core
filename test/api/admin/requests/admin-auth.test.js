@@ -3,7 +3,7 @@ const request = require('supertest');
 const { UAAIdentity, User } = require('../../../../api/models');
 const cfUAANock = require('../../support/cfUAANock');
 const userFactory = require('../../support/factory/user');
-const { uaaUser, createUAAIdentity } = require('../../support/factory/uaa-identity');
+const { uaaUser, uaaProfile, createUAAIdentity } = require('../../support/factory/uaa-identity');
 const { sessionForCookie } = require('../../support/cookieSession');
 const { unauthenticatedSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
@@ -57,26 +57,31 @@ describe('Admin authentication request', () => {
     describe('when successful', () => {
       const uaaId = 'admin_id_1';
       const code = 'code';
-      const profile = { email: 'hello@example.com', user_id: uaaId };
-      const userProfile = uaaUser({
-        id: uaaId,
+      const email = 'hello@example.com';
+      const uaaUserProfile = uaaProfile({
+        userId: uaaId,
+        email,
+      });
+      const uaaUserInfo = uaaUser({
+        uaaId,
+        email,
         groups: [{
           display: 'pages.admin',
         }],
-        ...profile,
       });
 
       before(async () => {
         const user = await userFactory();
         await createUAAIdentity({
           uaaId,
+          email,
           userId: user.id,
         });
       });
 
       beforeEach(() => {
-        cfUAANock.uaaAuth(profile, code);
-        cfUAANock.getUser(uaaId, userProfile);
+        cfUAANock.uaaAuth(uaaUserProfile, code);
+        cfUAANock.getUser(uaaId, uaaUserInfo);
       });
 
       it('returns a script tag', (done) => {

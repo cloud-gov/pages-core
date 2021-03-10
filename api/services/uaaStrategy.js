@@ -35,15 +35,17 @@ function createUAAStrategy(options, verify) {
   return strategy;
 }
 
-async function verifyUAAUser(accessToken, refreshToken, uaaId, uaaGroup) {
+async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
+  const { user_id: uaaId, email } = profile;
+
   const client = new UAAClient(accessToken);
-  const isVerified = await client.verifyUserGroup(uaaId, uaaGroup);
+  const isVerified = await client.verifyUserGroup(uaaId, uaaGroups);
 
   if (!isVerified) {
     return null;
   }
 
-  const identity = await UAAIdentity.findOne({ where: { uaaId } });
+  const identity = await UAAIdentity.findOne({ where: { email } });
 
   if (!identity) {
     return null;
@@ -55,6 +57,7 @@ async function verifyUAAUser(accessToken, refreshToken, uaaId, uaaGroup) {
     return null;
   }
 
+  identity.uaaId = uaaId;
   identity.accessToken = accessToken;
   identity.refreshToken = refreshToken;
   await identity.save();

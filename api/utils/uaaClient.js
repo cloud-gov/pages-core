@@ -7,21 +7,24 @@ class UAAClient {
     this.accessToken = accessToken;
   }
 
-  async verifyUserGroup(userId, groupName) {
+  async verifyUserGroup(userId, groupNames = []) {
     const { groups, origin, verified } = await this.request('GET', `/Users/${userId}`);
     if (origin === 'cloud.gov' && !verified) {
       return false;
     }
 
-    return groups.filter(group => group.display === groupName).length === 1;
+    return groups.filter(group => groupNames.indexOf(group.display) > -1).length > 0;
   }
 
   request(method, path, json) {
+    const host = config.env.uaaHost === 'http://localhost:9000'
+      ? 'http://uaa:8080' : config.env.uaaHost;
+
     return new Promise((resolve, reject) => {
       request({
         method: method.toUpperCase(),
         url: url.resolve(
-          config.env.uaaHost,
+          host,
           path
         ),
         headers: {

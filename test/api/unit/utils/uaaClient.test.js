@@ -13,6 +13,7 @@ describe('UAAClient', () => {
       const accessToken = 'a-token';
       const username = 'a-user@example.gov';
       const groupName = 'users-group';
+      const groupNames = [groupName];
       const groups = [{ display: 'group-1' }, { display: groupName }];
       const userIdentity = uaaUser({ username, groups });
 
@@ -20,7 +21,23 @@ describe('UAAClient', () => {
 
       cfUAANock.getUser(userIdentity.id, userIdentity, accessToken);
 
-      const verified = await uaaClient.verifyUserGroup(userIdentity.id, groupName);
+      const verified = await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
+      return expect(verified).to.be.true;
+    });
+
+    it('should verify an active user when one of the group names matches', async () => {
+      const accessToken = 'a-token';
+      const username = 'a-user@example.gov';
+      const groupName = 'users-group';
+      const groupNames = [groupName, 'another-group'];
+      const groups = [{ display: 'group-1' }, { display: groupName }];
+      const userIdentity = uaaUser({ username, groups });
+
+      const uaaClient = new UAAClient(accessToken);
+
+      cfUAANock.getUser(userIdentity.id, userIdentity, accessToken);
+
+      const verified = await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
       return expect(verified).to.be.true;
     });
 
@@ -28,16 +45,19 @@ describe('UAAClient', () => {
       const accessToken = 'a-token';
       const username = 'a-user@example.gov';
       const groupName = 'users-group';
+      const groupNames = [groupName];
       const groups = [{ display: 'group-1' }, { display: groupName }];
       const origin = 'cloud.gov';
       const verified = true;
-      const userIdentity = uaaUser({ username, groups, origin, verified });
+      const userIdentity = uaaUser({
+        username, groups, origin, verified,
+      });
 
       const uaaClient = new UAAClient(accessToken);
 
       cfUAANock.getUser(userIdentity.id, userIdentity, accessToken);
 
-      const userVerified = await uaaClient.verifyUserGroup(userIdentity.id, groupName);
+      const userVerified = await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
       return expect(userVerified).to.be.true;
     });
 
@@ -45,6 +65,7 @@ describe('UAAClient', () => {
       const accessToken = 'a-token';
       const username = 'a-user@example.gov';
       const groupName = 'users-group';
+      const groupNames = [groupName];
       const groups = [{ display: 'group-1' }, { display: groupName }];
       const origin = 'cloud.gov';
       const verified = false;
@@ -54,7 +75,7 @@ describe('UAAClient', () => {
 
       cfUAANock.getUser(userIdentity.id, userIdentity, accessToken);
 
-      const userVerified = await uaaClient.verifyUserGroup(userIdentity.id, groupName);
+      const userVerified = await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
       return expect(userVerified).to.be.false;
     });
 
@@ -62,6 +83,7 @@ describe('UAAClient', () => {
       const accessToken = 'a-token';
       const username = 'a-user@example.gov';
       const groupName = 'user-not-a-member-group';
+      const groupNames = [groupName];
       const groups = [{ display: 'group-1' }, { display: 'group-2' }];
       const userIdentity = uaaUser({ username, groups });
 
@@ -69,13 +91,14 @@ describe('UAAClient', () => {
 
       cfUAANock.getUser(userIdentity.id, userIdentity, accessToken);
 
-      const userVerified = await uaaClient.verifyUserGroup(userIdentity.id, groupName);
+      const userVerified = await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
       return expect(userVerified).to.be.false;
     });
 
     it('should throw and error when uaa returns an error message', async () => {
       const accessToken = 'a-token';
       const groupName = 'a-group';
+      const groupNames = [groupName];
       const userIdentity = uaaUser();
       const errorMessage = { error: 'User not allowed' };
 
@@ -84,7 +107,7 @@ describe('UAAClient', () => {
       cfUAANock.getUser(userIdentity.id, errorMessage, accessToken);
 
       try {
-        return await uaaClient.verifyUserGroup(userIdentity.id, groupName);
+        return await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
       } catch (error) {
         return expect(error).to.be.throw;
       }
@@ -93,6 +116,7 @@ describe('UAAClient', () => {
     it('should throw and error when status code greater than 399', async () => {
       const accessToken = 'a-token';
       const groupName = 'a-group';
+      const groupNames = [groupName];
       const userIdentity = uaaUser();
       const errorMessage = { error: 'Server not responding' };
       const uaaPath = `/Users/${userIdentity.id}`;
@@ -102,7 +126,7 @@ describe('UAAClient', () => {
       cfUAANock.serverErrorStatus(500, uaaPath, errorMessage, accessToken);
 
       try {
-        return await uaaClient.verifyUserGroup(userIdentity.id, groupName);
+        return await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
       } catch (error) {
         return expect(error).to.be.throw;
       }
@@ -111,6 +135,7 @@ describe('UAAClient', () => {
     it('should throw an error when uaa server is down', async () => {
       const accessToken = 'a-token';
       const groupName = 'a-group';
+      const groupNames = [groupName];
       const userIdentity = uaaUser();
       const errorMessage = { error: 'Server not responding' };
       const uaaPath = `/Users/${userIdentity.id}`;
@@ -120,7 +145,7 @@ describe('UAAClient', () => {
       cfUAANock.serverError(uaaPath, errorMessage, accessToken);
 
       try {
-        return await uaaClient.verifyUserGroup(userIdentity.id, groupName);
+        return await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
       } catch (error) {
         return expect(error).to.be.throw;
       }

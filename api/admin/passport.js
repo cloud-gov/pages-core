@@ -8,10 +8,8 @@ const passport = new Passport.Passport();
 const uaaOptions = config.passport.uaa.adminOptions;
 
 const verify = async (accessToken, refreshToken, profile, callback) => {
-  const { user_id: uaaId } = profile;
-
   try {
-    const user = await verifyUAAUser(accessToken, refreshToken, uaaId, 'pages.admin');
+    const user = await verifyUAAUser(accessToken, refreshToken, profile, ['pages.admin']);
 
     if (!user) return callback(null, false);
 

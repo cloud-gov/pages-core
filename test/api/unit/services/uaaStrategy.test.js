@@ -3,7 +3,7 @@ const { verifyUAAUser } = require('../../../../api/services/uaaStrategy');
 const { UAAIdentity, User } = require('../../../../api/models');
 const cfUAANock = require('../../support/cfUAANock');
 const createUser = require('../../support/factory/user');
-const { createUAAIdentity, uaaUser } = require('../../support/factory/uaa-identity');
+const { createUAAIdentity, uaaUser, uaaProfile } = require('../../support/factory/uaa-identity');
 
 function clean() {
   return Promise.all([
@@ -22,8 +22,9 @@ describe('verifyUAAUser', () => {
     const refreshToken = 'refresh-token';
     const user = await createUser();
     const identity = await createUAAIdentity({ userId: user.id });
-    const profile = uaaUser({
-      id: identity.uaaId,
+    const { uaaId } = identity;
+    const uaaUserResponse = uaaUser({
+      uaaId,
       groups: [{
         display: 'group.one',
       }, {
@@ -31,13 +32,18 @@ describe('verifyUAAUser', () => {
       }],
     });
 
-    cfUAANock.getUser(identity.uaaId, profile, accessToken);
+    const uaaUserProfile = uaaProfile({
+      userId: uaaId,
+      email: identity.email,
+    });
+
+    cfUAANock.getUser(uaaId, uaaUserResponse, accessToken);
 
     expect(identity.accessToken).to.be.null;
     expect(identity.refreshToken).to.be.null;
 
     const verifiedUser = await verifyUAAUser(
-      accessToken, refreshToken, identity.uaaId, 'group.one'
+      accessToken, refreshToken, uaaUserProfile, ['group.one']
     );
 
     await identity.reload();
@@ -51,9 +57,10 @@ describe('verifyUAAUser', () => {
     const accessToken = 'a-token';
     const refreshToken = 'refresh-token';
     const user = await createUser();
-    const { uaaId } = await createUAAIdentity({ userId: user.id });
-    const profile = uaaUser({
-      id: uaaId,
+    const identity = await createUAAIdentity({ userId: user.id });
+    const { uaaId } = identity;
+    const uaaUserResponse = uaaUser({
+      uaaId,
       groups: [{
         display: 'group.one',
       }, {
@@ -61,9 +68,14 @@ describe('verifyUAAUser', () => {
       }],
     });
 
-    cfUAANock.getUser(uaaId, profile, accessToken);
+    const uaaUserProfile = uaaProfile({
+      userId: uaaId,
+      email: identity.email,
+    });
 
-    const result = await verifyUAAUser(accessToken, refreshToken, uaaId, 'group.three');
+    cfUAANock.getUser(uaaId, uaaUserResponse, accessToken);
+
+    const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, ['group.three']);
     return expect(result).to.be.null;
   });
 
@@ -71,8 +83,9 @@ describe('verifyUAAUser', () => {
     const accessToken = 'a-token';
     const refreshToken = 'refresh-token';
     const uaaId = 'not-a-saved-identity';
-    const profile = uaaUser({
-      id: uaaId,
+    const email = 'not-a-saved-identity@example.com';
+    const uaaUserResponse = uaaUser({
+      uaaId,
       groups: [{
         display: 'group.one',
       }, {
@@ -80,9 +93,14 @@ describe('verifyUAAUser', () => {
       }],
     });
 
-    cfUAANock.getUser(uaaId, profile, accessToken);
+    const uaaUserProfile = uaaProfile({
+      userId: uaaId,
+      email,
+    });
 
-    const result = await verifyUAAUser(accessToken, refreshToken, uaaId, 'group.three');
+    cfUAANock.getUser(uaaId, uaaUserResponse, accessToken);
+
+    const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, ['group.three']);
     return expect(result).to.be.null;
   });
 
@@ -90,9 +108,10 @@ describe('verifyUAAUser', () => {
     const accessToken = 'a-token';
     const refreshToken = 'refresh-token';
     const user = await createUser();
-    const { uaaId } = await createUAAIdentity({ userId: user.id });
-    const profile = uaaUser({
-      id: uaaId,
+    const identity = await createUAAIdentity({ userId: user.id });
+    const { uaaId } = identity;
+    const uaaUserResponse = uaaUser({
+      uaaId,
       groups: [{
         display: 'group.one',
       }, {
@@ -100,11 +119,16 @@ describe('verifyUAAUser', () => {
       }],
     });
 
-    cfUAANock.getUser(uaaId, profile, accessToken);
+    const uaaUserProfile = uaaProfile({
+      userId: uaaId,
+      email: identity.email,
+    });
+
+    cfUAANock.getUser(uaaId, uaaUserResponse, accessToken);
 
     await user.destroy();
 
-    const result = await verifyUAAUser(accessToken, refreshToken, uaaId, 'group.one');
+    const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, ['group.one']);
     return expect(result).to.be.null;
   });
 });

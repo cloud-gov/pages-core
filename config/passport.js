@@ -6,10 +6,10 @@ const clientSecret = env.GITHUB_CLIENT_SECRET || 'not_set';
 const url = path => `${env.APP_HOSTNAME}${path}`;
 
 const uaaOptions = {
-  authorizationURL: 'https://login.fr.cloud.gov/oauth/authorize',
-  tokenURL: `https://${env.UAA_HOST}/oauth/token`,
-  userURL: `https://${env.UAA_HOST}/userinfo`,
-  logoutURL: `https://${env.UAA_HOST}/logout.do`,
+  authorizationURL: `${env.UAA_HOST}/oauth/authorize`,
+  tokenURL: `${env.UAA_HOST}/oauth/token`,
+  userURL: `${env.UAA_HOST}/userinfo`,
+  logoutURL: `${env.UAA_HOST}/logout.do`,
 };
 
 module.exports = {
