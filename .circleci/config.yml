@@ -271,16 +271,6 @@ workflows:
       - build
 
       - deploy:
-          name: deploy-staging
-          app: federalistapp-staging
-          feature_proxy_edge_links: "true"
-          requires:
-            - build
-          filters:
-            branches:
-              only: staging
-
-      - deploy:
           name: deploy-production
           app: federalistapp
           requires:
@@ -288,16 +278,6 @@ workflows:
           filters:
             branches:
               only: main
-
-      - deploy-admin-client:
-          name: deploy-admin-staging
-          app: federalist-admin-staging
-          api-url: https://federalistapp-staging.18f.gov
-          requires:
-            - build
-          filters:
-            branches:
-              only: staging
 
       - deploy-admin-client:
           name: deploy-admin-production
@@ -317,18 +297,7 @@ workflows:
           filters:
             branches:
               only:
-                - staging
                 - main
-
-    jobs:
-      - run-task:
-          name: archive-build-logs-staging
-          app: federalistapp-staging
-          task-name: archive-build-logs
-          task-command: yarn archive-build-logs-daily
-          filters:
-            branches:
-              only: staging
 
       - run-task:
           name: archive-build-logs-production
@@ -338,15 +307,6 @@ workflows:
           filters:
             branches:
               only: main
-
-      - run-task:
-          name: nightly-builds-staging
-          app: federalistapp-staging
-          task-name: nightly-builds
-          task-command: yarn nightly-builds
-          filters:
-            branches:
-              only: staging
 
       - run-task:
           name: nightly-builds-production
@@ -376,16 +336,6 @@ workflows:
             branches:
               only: main
 
-      - restage:
-          matrix:
-            parameters:
-              app:
-                - federalistapp-staging
-                - federalist-admin-staging
-          filters:
-            branches:
-              only: staging
-
   every-ten-minutes:
     triggers:
       - schedule:
@@ -393,18 +343,8 @@ workflows:
           filters:
             branches:
               only:
-                - staging
                 - main
     jobs:
-      - run-task:
-          name: timeout-builds-staging
-          app: federalistapp-staging
-          task-name: timeout-builds
-          task-command: yarn timeout-builds
-          filters:
-            branches:
-              only: staging
-
       - run-task:
           name: timeout-builds-production
           app: federalistapp
