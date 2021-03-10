@@ -281,7 +281,6 @@ jobs:
         params:
           GITHUB_STATE: pending
           GITHUB_ACCESS_TOKEN: ((gh-access-token))
-          BUILD_URL: ((build-url))
       - do: *test-admin-client
       - task: build-admin-client
         config:
@@ -337,7 +336,6 @@ jobs:
           params:
             GITHUB_STATE: failure
             GITHUB_ACCESS_TOKEN: ((gh-access-token))
-            BUILD_URL: ((build-url))
         - put: slack
           params:
             text: |
@@ -362,8 +360,7 @@ jobs:
               path: ci/tasks/send-status.sh
           params:
             GITHUB_STATE: success
-            GITHUB_ACCESS_TOKEN: ((gh-access-token))
-            BUILD_URL: ((build-url))      
+            GITHUB_ACCESS_TOKEN: ((gh-access-token))      
         - put: slack
           params:
             text: |
