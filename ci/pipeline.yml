@@ -276,7 +276,8 @@ jobs:
             <<: *node-image
           inputs: [name: src-admin-client]
           run:
-            path: src-admin-client/ci/tasks/send-status.sh
+            dir: src-admin-client
+            path: ci/tasks/send-status.sh
         params:
           GITHUB_STATE: pending
           GITHUB_ACCESS_TOKEN: ((gh-access-token))
@@ -331,7 +332,8 @@ jobs:
               <<: *node-image
             inputs: [name: src-failure]
             run:
-              path: src/ci/tasks/send-status.sh
+              dir: src-failure
+              path: ci/tasks/send-status.sh
           params:
             GITHUB_STATE: failure
             GITHUB_ACCESS_TOKEN: ((gh-access-token))
@@ -356,7 +358,8 @@ jobs:
               <<: *node-image
             inputs: [name: src-success]
             run:
-              path: src/ci/tasks/send-status.sh
+              dir: src-success
+              path: ci/tasks/send-status.sh
           params:
             GITHUB_STATE: success
             GITHUB_ACCESS_TOKEN: ((gh-access-token))
