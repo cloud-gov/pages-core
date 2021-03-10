@@ -299,6 +299,7 @@ workflows:
               only:
                 - main
 
+    jobs:
       - run-task:
           name: archive-build-logs-production
           app: federalistapp
