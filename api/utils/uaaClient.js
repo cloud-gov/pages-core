@@ -23,10 +23,7 @@ class UAAClient {
     return new Promise((resolve, reject) => {
       request({
         method: method.toUpperCase(),
-        url: url.resolve(
-          host,
-          path
-        ),
+        url: url.resolve(host, path),
         headers: {
           Authorization: `Bearer ${this.accessToken}`,
         },
