@@ -10,39 +10,33 @@ module.exports = wrapHandlers({
 
   async list(req, res) {
     const {
-      limit, page, site, organization,
+      limit, page, organization, search, site,
     } = req.query;
 
     const serialize = users => userSerializer.serializeMany(users, true);
 
-    let query = {};
+    const scopes = [];
+
+    if (search) {
+      scopes.push(User.searchScope(search));
+    }
 
     if (site) {
-      query = {
-        include: [{
-          model: Site,
-          where: {
-            id: site,
-          },
-        }],
-      };
+      scopes.push(User.siteScope(site));
     }
 
     if (organization) {
-      query = {
-        include: [{
-          model: Organization,
-          where: {
-            id: organization,
-          },
-        }],
-      };
+      scopes.push(User.orgScope(organization));
     }
 
-    const pagination = await paginate(User, serialize, { limit, page }, query);
+    const [pagination, orgs, sites] = await Promise.all([
+      paginate(User.scope(scopes), serialize, { limit, page }),
+      Organization.findAll({ attributes: ['id', 'name'], raw: true }),
+      Site.findAll({ attributes: ['id', 'owner', 'repository'], raw: true }),
+    ]);
 
     const json = {
-      meta: {},
+      meta: { orgs, sites },
       ...pagination,
     };
 

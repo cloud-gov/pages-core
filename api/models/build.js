@@ -27,9 +27,11 @@ const States = (function createStates() {
 const associate = ({
   Build,
   BuildLog,
+  Organization,
   Site,
   User,
 }) => {
+  // Associations
   Build.hasMany(BuildLog, {
     foreignKey: 'build',
   });
@@ -41,6 +43,35 @@ const associate = ({
     foreignKey: 'user',
     allowNull: false,
   });
+
+  // Scopes
+  Build.addScope('byOrg', id => ({
+    include: [{
+      model: Site,
+      include: [{
+        model: Organization,
+        where: { id },
+      }],
+    }],
+  }));
+  Build.addScope('bySite', id => ({
+    include: [{
+      model: Site,
+      where: { id },
+    }],
+  }));
+  Build.addScope('forSiteUser', user => ({
+    include: [{
+      model: Site,
+      required: true,
+      include: [{
+        model: User,
+        where: {
+          id: user.id,
+        },
+      }],
+    }],
+  }));
 };
 
 const generateToken = () => URLSafeBase64.encode(crypto.randomBytes(32));
@@ -210,20 +241,6 @@ module.exports = (sequelize, DataTypes) => {
     hooks: {
       beforeValidate,
     },
-    scopes: {
-      forSiteUser: (user, Site, User) => ({
-        include: [{
-          model: Site,
-          required: true,
-          include: [{
-            model: User,
-            where: {
-              id: user.id,
-            },
-          }],
-        }],
-      }),
-    },
   });
 
   Build.generateToken = generateToken;
@@ -235,5 +252,8 @@ module.exports = (sequelize, DataTypes) => {
   Build.prototype.isInProgress = isInProgress;
   Build.prototype.canStart = canStart;
   Build.States = States;
+  Build.orgScope = id => ({ method: ['byOrg', id] });
+  Build.siteScope = id => ({ method: ['bySite', id] });
+  Build.forSiteUser = user => Build.scope({ method: ['forSiteUser', user] });
   return Build;
 };
