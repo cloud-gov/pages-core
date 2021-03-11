@@ -1,7 +1,7 @@
 const uaaIdentity = 'uaa_identity';
 const UAA_IDENTITY_TABLE = {
   id: { type: 'int', primaryKey: true, autoIncrement: true },
-  uaaId: { type: 'string', unique: true },
+  uaaId: { type: 'string', notNull: true, unique: true },
   userName: { type: 'string', notNull: true, unique: true },
   email: { type: 'string', notNull: true, unique: true },
   origin: { type: 'string', notNull: true },

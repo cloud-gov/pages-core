@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
   const UAAIdentity = sequelize.define('UAAIdentity', {
     uaaId: {
       type: DataTypes.STRING,
+      allowNull: false,
       unique: true,
       validate: {
         notEmpty: true,

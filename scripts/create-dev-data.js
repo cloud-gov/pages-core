@@ -88,6 +88,7 @@ async function createData({ githubUsername }) {
 
   console.log('Create fake-user@example.com uaa identity');
   await user2.createUAAIdentity({
+    uaaId: 'fake-user-placeholder-id',
     email: user2.email,
     userName: user2.email,
     origin: 'example.com',
@@ -278,18 +279,21 @@ async function createData({ githubUsername }) {
   await Promise.all([
     User.findOne({ where: { email: 'amirbey@example.com' } })
       .then(user => user.createUAAIdentity({
+        uaaId: 'amirbey-placeholder-id',
         email: user.email,
         userName: user.email,
         origin: 'example.com',
       })),
     User.findOne({ where: { email: 'apburnes@example.com' } })
       .then(user => user.createUAAIdentity({
+        uaaId: 'apburnes-placeholder-id',
         email: user.email,
         userName: user.email,
         origin: 'example.com',
       })),
     User.findOne({ where: { email: 'davemcorwin@example.com' } })
       .then(user => user.createUAAIdentity({
+        uaaId: 'davemcorwin-placeholder-id',
         email: user.email,
         userName: user.email,
         origin: 'example.com',

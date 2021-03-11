@@ -13,7 +13,7 @@ class UAAClient {
       return false;
     }
 
-    return groups.filter(group => groupNames.indexOf(group.display) > -1).length > 0;
+    return groups.filter(group => groupNames.includes(group.display)).length > 0;
   }
 
   request(method, path, json) {
