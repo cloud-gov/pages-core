@@ -98,6 +98,7 @@ module.exports = {
     cfApiHost: 'https://api.example.com',
     proxySiteTable: 'testSiteTable',
     uaaHost: 'https://uaa.example.com',
+    uaaHostUrl: 'https://uaa.example.com',
   },
   userEnvVar: {
     key: 'shhhhhhhhhhh',
