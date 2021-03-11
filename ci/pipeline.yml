@@ -131,63 +131,63 @@ test-admin-client: &test-admin-client
 
 jobs:
 
-  - name: test-api
-    plan:
-      - get: src-api
-        resource: src-all
-        trigger: true
-        params: {depth: 1}
-      - put: gh-status
-        inputs: [src-api]
-        params: {state: pending}
-      - do: *test-api
-    on_failure:
-      in_parallel:
-        - put: gh-status
-          inputs: [src-api]
-          params: {state: failure}      
-        - put: slack
-          params:
-            text: |
-              :x: FAILED: pages api tests
-              ((build-url))
-              <@U01J8B463T5> <@U01J0M3E8NS> <@U01J7LKV5MZ>
-            channel: ((slack-channel))
-            username: ((slack-username))
-            icon_url: ((slack-icon-url))
-    on_success:
-      put: gh-status
-      inputs: [src-api]
-      params: {state: success}
+  # - name: test-api
+  #   plan:
+  #     - get: src-api
+  #       resource: src-all
+  #       trigger: true
+  #       params: {depth: 1}
+  #     - put: gh-status
+  #       inputs: [src-api]
+  #       params: {state: pending}
+  #     - do: *test-api
+  #   on_failure:
+  #     in_parallel:
+  #       - put: gh-status
+  #         inputs: [src-api]
+  #         params: {state: failure}      
+  #       - put: slack
+  #         params:
+  #           text: |
+  #             :x: FAILED: pages api tests
+  #             ((build-url))
+  #             <@U01J8B463T5> <@U01J0M3E8NS> <@U01J7LKV5MZ>
+  #           channel: ((slack-channel))
+  #           username: ((slack-username))
+  #           icon_url: ((slack-icon-url))
+  #   on_success:
+  #     put: gh-status
+  #     inputs: [src-api]
+  #     params: {state: success}
 
-  - name: test-admin-client
-    plan:
-      - get: src-admin-client
-        resource: src-all
-        trigger: true
-        params: {depth: 1}
-      - put: gh-status
-        inputs: [src-admin-client]
-        params: {state: pending}        
-      - do: *test-admin-client
-    on_failure:
-      in_parallel:
-        - put: gh-status
-          inputs: [src-admin-client]
-          params: {state: failure}          
-        - put: slack
-          params:
-            text: |
-              :x: FAILED pages admin client tests
-              ((build-url))
-              <@U01J8B463T5> <@U01J0M3E8NS> <@U01J7LKV5MZ>
-            channel: ((slack-channel))
-            username: ((slack-username))
-            icon_url: ((slack-icon-url))
-    on_success:
-      put: gh-status
-      inputs: [src-admin-client]
-      params: {state: success}
+  # - name: test-admin-client
+  #   plan:
+  #     - get: src-admin-client
+  #       resource: src-all
+  #       trigger: true
+  #       params: {depth: 1}
+  #     - put: gh-status
+  #       inputs: [src-admin-client]
+  #       params: {state: pending}        
+  #     - do: *test-admin-client
+  #   on_failure:
+  #     in_parallel:
+  #       - put: gh-status
+  #         inputs: [src-admin-client]
+  #         params: {state: failure}          
+  #       - put: slack
+  #         params:
+  #           text: |
+  #             :x: FAILED pages admin client tests
+  #             ((build-url))
+  #             <@U01J8B463T5> <@U01J0M3E8NS> <@U01J7LKV5MZ>
+  #           channel: ((slack-channel))
+  #           username: ((slack-username))
+  #           icon_url: ((slack-icon-url))
+  #   on_success:
+  #     put: gh-status
+  #     inputs: [src-admin-client]
+  #     params: {state: success}
 
   - name: test-and-deploy-api-staging
     plan:
@@ -411,11 +411,11 @@ jobs:
 
 resources:
 
-  - name: src-all
-    type: git
-    icon: github
-    source:
-      uri: https://github.com/18F/federalist
+  # - name: src-all
+  #   type: git
+  #   icon: github
+  #   source:
+  #     uri: https://github.com/18F/federalist
 
   - name: src-staging
     type: git
