@@ -178,6 +178,20 @@ The app expects the following user provided services to be provided:
 To deploy to CloudFoundry submit the following:
 `cf push federalistapp --strategy rolling --vars-file "./.cloudgov/vars/${CF_SPACE}.yml" -f ./cloudgov/manifest.yml`
 
+#### Continuous Integration
+We are in the process of migrating from CircleCI to an internal instance of Concourse CI, starting with our staging environment. To use Concourse, one must have appropriate permissions in UAA as administered by the cloud.gov operators. Access to Concourse also requires using the GSA VPN.
+
+Until CredHub is up and running, credentials must be passed by setting pipelines locally.
+
+1. To get started install and authenticate with the `fly` CLI:
+- `brew install --cask fly`
+- `fly -t pages-staging login -n pages -c <concourse url>`
+
+2. Update local credential files (see ci/vars/example.yml)
+
+3. Set a pipeline:
+`fly -t pages-staging sp -p <pipeline name> -c ci/pipeline.yml -l ci/vars/.<env>.yml`
+
 ### Testing
 
 When making code changes, be sure to write new or modify existing tests to cover your changes.
