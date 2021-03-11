@@ -17,13 +17,10 @@ class UAAClient {
   }
 
   request(method, path, json) {
-    const host = config.env.uaaHost === 'http://localhost:9000'
-      ? 'http://uaa:8080' : config.env.uaaHost;
-
     return new Promise((resolve, reject) => {
       request({
         method: method.toUpperCase(),
-        url: url.resolve(host, path),
+        url: url.resolve(config.env.uaaHostUrl, path),
         headers: {
           Authorization: `Bearer ${this.accessToken}`,
         },

@@ -34,6 +34,7 @@ services:
       APP_HOSTNAME: http://localhost:1337
       AUTH_IDP: uaa
       UAA_HOST: http://localhost:9000
+      UAA_HOST_DOCKER_URL: http://uaa:8080
   admin-client:
     build:
       dockerfile: ./admin-client/Dockerfile-admin
