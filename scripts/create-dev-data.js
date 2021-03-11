@@ -86,6 +86,15 @@ async function createData({ githubUsername }) {
     }),
   ]);
 
+  console.log('Create fake-user@example.com uaa identity');
+  await user2.createUAAIdentity({
+    uaaId: 'fake-user-placeholder-id',
+    email: user2.email,
+    userName: user2.email,
+    origin: 'example.com',
+    userId: user2.id,
+  });
+
   console.log('Creating sites...');
   const [site1, nodeSite, goSite] = await Promise.all([
     siteFactory({
@@ -264,6 +273,31 @@ async function createData({ githubUsername }) {
     User.upsert({ username: 'amirbey', email: 'amirbey@example.com', adminEmail: 'amir.reavis-bey@gsa.gov' }),
     User.upsert({ username: 'apburnes', email: 'apburnes@example.com', adminEmail: 'andrew.burnes@gsa.gov' }),
     User.upsert({ username: 'davemcorwin', email: 'davemcorwin@example.com', adminEmail: 'david.corwin@gsa.gov' }),
+  ]);
+
+  console.log('Creating Admin User UAA Identities');
+  await Promise.all([
+    User.findOne({ where: { email: 'amirbey@example.com' } })
+      .then(user => user.createUAAIdentity({
+        uaaId: 'amirbey-placeholder-id',
+        email: user.email,
+        userName: user.email,
+        origin: 'example.com',
+      })),
+    User.findOne({ where: { email: 'apburnes@example.com' } })
+      .then(user => user.createUAAIdentity({
+        uaaId: 'apburnes-placeholder-id',
+        email: user.email,
+        userName: user.email,
+        origin: 'example.com',
+      })),
+    User.findOne({ where: { email: 'davemcorwin@example.com' } })
+      .then(user => user.createUAAIdentity({
+        uaaId: 'davemcorwin-placeholder-id',
+        email: user.email,
+        userName: user.email,
+        origin: 'example.com',
+      })),
   ]);
 
   console.log('Crearing Error Events');

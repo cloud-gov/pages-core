@@ -1,4 +1,6 @@
 const { Strategy } = require('passport-oauth2');
+const UAAClient = require('../utils/uaaClient');
+const { UAAIdentity, User } = require('../models');
 
 function createUAAStrategy(options, verify) {
   const {
@@ -33,4 +35,25 @@ function createUAAStrategy(options, verify) {
   return strategy;
 }
 
-module.exports = { createUAAStrategy };
+async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
+  const { user_id: uaaId, email } = profile;
+
+  const client = new UAAClient(accessToken);
+  const isVerified = await client.verifyUserGroup(uaaId, uaaGroups);
+
+  if (!isVerified) {
+    return null;
+  }
+
+  const identity = await UAAIdentity.findOne({ where: { email }, include: User });
+
+  if (!identity) {
+    return null;
+  }
+
+  await identity.update({ uaaId, accessToken, refreshToken });
+
+  return identity.User;
+}
+
+module.exports = { createUAAStrategy, verifyUAAUser };

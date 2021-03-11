@@ -24,6 +24,7 @@ services:
     depends_on:
       - db
       - redis
+      - uaa
     environment:
       JWT_SECRET: 'shhHhh...'
       USER_AUDITOR: federalist
@@ -32,6 +33,8 @@ services:
       FEATURE_ADMIN_AUTH: 'true'
       APP_HOSTNAME: http://localhost:1337
       AUTH_IDP: uaa
+      UAA_HOST: http://localhost:9000
+      UAA_HOST_DOCKER_URL: http://uaa:8080
   admin-client:
     build:
       dockerfile: ./admin-client/Dockerfile-admin
@@ -62,3 +65,18 @@ services:
     image: redis
     ports:
       - 6379:6379
+  uaa:
+    build:
+      dockerfile: ./Dockerfile-uaa
+      context: .
+    ports:
+      - 9000:8080
+    environment:
+      POSTGRES_DB: federalist
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    depends_on:
+      - db
+    command: ["/tomcat/bin/catalina.sh", "run"]

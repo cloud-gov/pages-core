@@ -5,6 +5,7 @@ const event = require('./event');
 const organization = require('./organization');
 const responses = require('./responses');
 const site = require('./site');
+const { createUAAIdentity } = require('./uaa-identity');
 const user = require('./user');
 const userEnvironmentVariable = require('./user-environment-variable');
 
@@ -17,6 +18,7 @@ module.exports = {
   organization,
   responses,
   site,
+  uaaIdentity: createUAAIdentity,
   user,
   userEnvironmentVariable,
 };
