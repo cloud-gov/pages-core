@@ -7,6 +7,7 @@ const associate = ({
   OrganizationRole,
   Site,
   SiteUser,
+  UAAIdentity,
   User,
   UserAction,
 }) => {
@@ -33,6 +34,9 @@ const associate = ({
     through: OrganizationRole,
     foreignKey: 'userId',
     otherKey: 'organizationId',
+  });
+  User.hasOne(UAAIdentity, {
+    foreignKey: 'userId',
   });
 
   // Scopes

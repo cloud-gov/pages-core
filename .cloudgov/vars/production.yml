@@ -9,3 +9,4 @@ feature_proxy_edge_links: 'false'
 feature_proxy_edge_dynamo: 'false'
 feature_bull_site_build_queue: 'false'
 auth_idp: github
+uaa_host: https://uaa.fr.cloud.gov

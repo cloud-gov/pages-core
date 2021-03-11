@@ -14,14 +14,20 @@ if (process.env.NODE_ENV !== 'test') {
           1234567, // YOUR GITHUB ORGANIZATION ID
         ],
       },
+      // Keep these options below in your local.js config
+      // to connect the the docker-compose uaa service
       uaa: {
         options: {
-          clientID: 'UAA_OAUTH_CLIENT_ID',
-          clientSecret: 'UAA_OAUTH_CLIENT_SECRET',
+          clientID: 'user-client',
+          clientSecret: 'user-client-secret',
+          tokenURL: 'http://uaa:8080/oauth/token',
+          userURL: 'http://uaa:8080/userinfo',
         },
         adminOptions: {
-          clientID: 'UAA_OAUTH_CLIENT_ID',
-          clientSecret: 'UAA_OAUTH_CLIENT_SECRET',
+          clientID: 'admin-client',
+          clientSecret: 'admin-client-secret',
+          tokenURL: 'http://uaa:8080/oauth/token',
+          userURL: 'http://uaa:8080/userinfo',
         },
       },
     },

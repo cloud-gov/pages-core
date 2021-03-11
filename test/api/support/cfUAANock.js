@@ -1,5 +1,5 @@
 const nock = require('nock');
-const { options: uaaConfig } = require('../../../config').passport.uaa;
+const { options: uaaConfig, host: uaaHost } = require('../../../config').passport.uaa;
 
 function userProfile(profile, accessToken) {
   const url = new URL(uaaConfig.userURL);
@@ -32,6 +32,45 @@ function uaaAuth(profile, code) {
   userProfile(profile, accessToken);
 }
 
+function getUser(userId, profile, accessToken = 'accessToken') {
+  return nock(uaaHost, {
+    reqheaders: {
+      authorization: `Bearer ${accessToken}`,
+    },
+  })
+    .get(`/Users/${userId}`)
+    .reply(200, {
+      ...profile,
+    });
+}
+
+function serverError(path, message, accessToken, method = 'get') {
+  const httpMethod = method.toLowerCase();
+  return nock(uaaHost, {
+    reqheaders: {
+      authorization: `Bearer ${accessToken}`,
+    },
+  })[httpMethod](path)
+    .replyWithError({
+      ...message,
+    });
+}
+
+function serverErrorStatus(status, path, message, accessToken, method = 'get') {
+  const httpMethod = method.toLowerCase();
+  return nock(uaaHost, {
+    reqheaders: {
+      authorization: `Bearer ${accessToken}`,
+    },
+  })[httpMethod](path)
+    .reply(status, {
+      ...message,
+    });
+}
+
 module.exports = {
   uaaAuth,
+  getUser,
+  serverError,
+  serverErrorStatus,
 };
