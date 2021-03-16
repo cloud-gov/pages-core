@@ -31,6 +31,11 @@
             {user.isActive ? 'Active' : 'Inactive'}
           </span>
         </LabeledItem>
+        <LabeledItem label="uaa user id" value={user.uaa?.userId} />
+        <LabeledItem label="uaa id" value={user.uaa?.uaaId} />
+        <LabeledItem label="uaa origin" value={user.uaa?.origin} />        
+        <LabeledItem label="uaa email" value={user.uaa?.email} />
+        <LabeledItem label="uaa username" value={user.uaa?.username} />
       </div>
       <div class="tablet:grid-col-auto padding-bottom-1">
         <LabeledItem label="created at" value={formatDateTime(user.createdAt)} />

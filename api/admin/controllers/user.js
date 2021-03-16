@@ -15,7 +15,7 @@ module.exports = wrapHandlers({
 
     const serialize = users => userSerializer.serializeMany(users, true);
 
-    const scopes = [];
+    const scopes = ['withUAAIdentity'];
 
     if (search) {
       scopes.push(User.searchScope(search));
@@ -48,7 +48,7 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const user = await fetchModelById(id, User);
+    const user = await fetchModelById(id, User.scope('withUAAIdentity'));
     if (!user) {
       return res.notFound();
     }
