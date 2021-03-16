@@ -68,6 +68,9 @@ const associate = ({
       where: { id },
     }],
   }));
+  User.addScope('withUAAIdentity', {
+    include: UAAIdentity,
+  });
 };
 
 function beforeValidate(user) {
