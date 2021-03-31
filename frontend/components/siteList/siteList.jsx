@@ -7,7 +7,21 @@ import { SITE, ALERT, USER } from '../../propTypes';
 import AlertBanner from '../alertBanner';
 import SiteListItem from './siteListItem';
 import LoadingIndicator from '../LoadingIndicator';
+import GithubAuthButton from '../GithubAuthButton';
 import { IconPlus } from '../icons';
+import alertActions from '../../actions/alertActions';
+import userActions from '../../actions/userActions';
+
+const hasGithubAuth = user => !!user.email;
+
+const onGithubAuthSuccess = () => {
+  userActions.fetchUser();
+  alertActions.alertSuccess('Github authorization successful');
+};
+
+const onGithubAuthFailure = (error) => {
+  alertActions.alertError(error.message);
+};
 
 const getSites = (sites, user) => {
   const { isLoading, data } = sites;
@@ -37,19 +51,6 @@ const getSites = (sites, user) => {
   );
 };
 
-const addWebsiteButton = () => (
-  <Link
-    to="/sites/new"
-    role="button"
-    className="usa-button button-add-website"
-    alt="Add a new site"
-  >
-    <IconPlus />
-    {' '}
-    Add site
-  </Link>
-);
-
 export const SiteList = ({ sites, user, alert }) => (
   <div>
     <div className="page-header usa-grid-full">
@@ -59,7 +60,22 @@ export const SiteList = ({ sites, user, alert }) => (
         </h1>
       </div>
       <div className="usa-width-one-third header-actions">
-        {addWebsiteButton()}
+        {
+          hasGithubAuth(user)
+            ? (
+              <Link
+                to="/sites/new"
+                role="button"
+                className="usa-button button-add-website"
+                alt="Add a new site"
+              >
+                <IconPlus />
+                {' '}
+                Add site
+              </Link>
+            )
+            : <GithubAuthButton onSuccess={onGithubAuthSuccess} onFailure={onGithubAuthFailure} />
+        }
       </div>
     </div>
 
