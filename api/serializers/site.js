@@ -1,6 +1,6 @@
 const yaml = require('js-yaml');
 const { omitBy, pick } = require('../utils');
-const { Site, User } = require('../models');
+const { Organization, Site, User } = require('../models');
 const userSerializer = require('./user');
 const { siteViewLink, hideBasicAuthPassword } = require('../utils/site');
 
@@ -16,6 +16,7 @@ const allowedAttributes = [
   'repository',
   's3ServiceName',
   'awsBucketName',
+  'Organization',
   'Users',
 ];
 
@@ -77,11 +78,16 @@ const serializeObject = (site) => {
     delete json.Users;
   }
 
+  if (json.Organization) {
+    json.organization = site.Organization.name;
+    delete json.Organization;
+  }
+
   return json;
 };
 
 const serialize = (serializable) => {
-  const include = [User.scope('withGithub')];
+  const include = [User.scope('withGithub'), Organization];
 
   if (serializable.length !== undefined) {
     const siteIds = serializable.map(site => site.id);

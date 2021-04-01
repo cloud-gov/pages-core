@@ -48,6 +48,13 @@ export const BUILD_LOG = PropTypes.shape({
   output: PropTypes.string.isRequired,
 });
 
+export const ORGANIZATION = PropTypes.shape({
+  createdAt: PropTypes.string,
+  id: PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired,
+  updatedAt: PropTypes.string,
+});
+
 export const USER_ACTION = PropTypes.shape({
   targetType: PropTypes.string,
   createdAt: PropTypes.string,
