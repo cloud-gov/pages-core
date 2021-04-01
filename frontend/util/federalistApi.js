@@ -37,6 +37,10 @@ export default {
     return this.fetch(`build/${build.id}/log/page/${page}`);
   },
 
+  fetchOrganizations() {
+    return this.fetch('organization');
+  },
+
   fetchPublishedBranches(site) {
     return this.fetch(`site/${site.id}/published-branch`);
   },

@@ -185,6 +185,24 @@ paths:
           description: Not found
           schema:
             $ref: "Error.json"
+  /organization:
+    get:
+      summary: Fetch all of the current user's organizations
+      responses:
+        200:
+          description: An array of all organizations associated with the current user
+          schema:
+            type: array
+            items:
+              $ref: "Organization.json"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
   /site:
     get:
       summary: Fetch all of the current user's sites
@@ -198,7 +216,7 @@ paths:
         401:
           description: Unauthorized
           schema:
-            $ref: "Error.json"         
+            $ref: "Error.json"
         403:
           description: Not authorized
           schema:
@@ -276,7 +294,7 @@ paths:
         401:
           description: Unauthorized
           schema:
-            $ref: "Error.json"            
+            $ref: "Error.json"
         403:
           description: Not authorized
           schema:
@@ -640,11 +658,11 @@ paths:
         404:
           description: Not found
           schema:
-            $ref: "Error.json"            
+            $ref: "Error.json"
     post:
       summary: Add the user environment variable to a site based on the site id
       parameters:
-        - name: user-environment-variable 
+        - name: user-environment-variable
           schema:
             type: object
             properties:

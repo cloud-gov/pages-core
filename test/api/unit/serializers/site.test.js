@@ -51,6 +51,19 @@ describe('SiteSerializer', () => {
         })
         .catch(done);
     });
+
+    it('includes organization name when associated to site', async () => {
+      const site = await factory.site({ basicAuth: { username: 'username', password: 'password' } });
+      const org = await factory.organization.create();
+      await org.addSite(site.id);
+      await site.reload();
+      const object = await SiteSerializer.serialize(site);
+
+      const result = validateJSONSchema(object, siteSchema);
+      expect(result.errors).to.be.empty;
+      expect(object.basicAuth.password).to.eq('**********');
+      expect(object.organization).to.equal(org.name);
+    });
   });
 
   describe('.serializeNew(serializable)', () => {
