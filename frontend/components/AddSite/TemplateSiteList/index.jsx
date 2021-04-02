@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import { ORGANIZATION } from '../../../propTypes';
 import TemplateSite from './templateSite';
 
 export class TemplateList extends React.Component {
@@ -22,7 +23,9 @@ export class TemplateList extends React.Component {
   }
 
   render() {
-    const { defaultOwner, handleSubmitTemplate, templates } = this.props;
+    const {
+      defaultOwner, handleSubmitTemplate, orgData, templates,
+    } = this.props;
     const { activeChildId } = this.state;
 
     const templateGrid = Object.keys(templates).map((templateKey, index) => {
@@ -38,6 +41,7 @@ export class TemplateList extends React.Component {
             handleChooseActive={this.handleChooseActive}
             handleSubmit={handleSubmitTemplate}
             defaultOwner={defaultOwner}
+            orgData={orgData}
             {...template}
           />
         </div>
@@ -58,6 +62,7 @@ TemplateList.propTypes = {
   // chellenging to describe with proptypes. Ignoring the rule here.
   // eslint-disable-next-line react/forbid-prop-types
   templates: PropTypes.object.isRequired,
+  orgData: PropTypes.arrayOf(ORGANIZATION).isRequired,
   handleSubmitTemplate: PropTypes.func.isRequired,
   defaultOwner: PropTypes.string.isRequired,
 };
