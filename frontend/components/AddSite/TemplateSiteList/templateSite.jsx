@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { getSafeRepoName } from '../../../util';
+import { ORGANIZATION } from '../../../propTypes';
+import { getOrgId, getSafeRepoName } from '../../../util';
+import UserOrgSelect from '../../organization/UserOrgSelect';
 
 class TemplateSite extends React.Component {
   constructor(props) {
@@ -11,6 +13,7 @@ class TemplateSite extends React.Component {
       owner: props.defaultOwner,
       repository: '',
       template: props.templateKey,
+      organizationId: '',
     };
 
     this.handleChooseActive = this.handleChooseActive.bind(this);
@@ -25,11 +28,16 @@ class TemplateSite extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    const { handleSubmit } = this.props;
-    const { repository } = this.state;
+    const { handleSubmit, orgData } = this.props;
+    const { repository, organizationId } = this.state;
 
+    const organization = getOrgId(organizationId, orgData);
     const safeRepository = getSafeRepoName(repository);
-    const site = { ...this.state, repository: safeRepository };
+    const site = {
+      ...this.state,
+      organizationId: organization,
+      repository: safeRepository,
+    };
 
     handleSubmit(site);
   }
@@ -46,9 +54,9 @@ class TemplateSite extends React.Component {
 
   render() {
     const {
-      description, example, thumb, title,
+      description, example, orgData, thumb, title,
     } = this.props;
-    const { owner, repository } = this.state;
+    const { owner, organizationId, repository } = this.state;
 
     return (
       <div className="federalist-template-list-item">
@@ -79,6 +87,19 @@ class TemplateSite extends React.Component {
                   value={owner}
                   onChange={this.handleChange}
                 />
+                {
+                  orgData ? (
+                    <div className="form-group">
+                      <UserOrgSelect
+                        id="organizationId"
+                        name="organizationId"
+                        value={organizationId}
+                        onChange={this.handleChange}
+                        orgData={orgData}
+                      />
+                    </div>
+                  ) : null
+                }
                 {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                 <label htmlFor="repository">Name your new site</label>
                 <input
@@ -131,6 +152,7 @@ TemplateSite.propTypes = {
   handleChooseActive: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
+  orgData: PropTypes.arrayOf(ORGANIZATION).isRequired,
 };
 
 export default TemplateSite;
