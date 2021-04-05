@@ -10,7 +10,7 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    const siteJSON = await organizationSerializer.serializeMany(organizations);
+    const siteJSON = organizationSerializer.serializeMany(organizations);
     return res.json(siteJSON);
   },
 });
