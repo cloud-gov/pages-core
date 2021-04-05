@@ -1,17 +1,16 @@
 const organizationSerializer = require('../serializers/organization');
-const { User, Organization } = require('../models');
+const { Organization } = require('../models');
 const { wrapHandlers } = require('../utils');
-const { fetchModelById } = require('../utils/queryDatabase');
 
 module.exports = wrapHandlers({
-  async findAllForUser(req, res) {
-    const user = await fetchModelById(req.user.id, User, { include: [Organization] });
+  async findAllForUser({ user }, res) {
+    const organizations = await Organization.forUser(user).findAll();
 
-    if (!user) {
+    if (!organizations) {
       return res.notFound();
     }
 
-    const siteJSON = await organizationSerializer.serializeMany(user.Organizations);
+    const siteJSON = await organizationSerializer.serializeMany(organizations);
     return res.json(siteJSON);
   },
 });

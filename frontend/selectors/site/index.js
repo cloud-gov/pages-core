@@ -1,23 +1,21 @@
-import _ from 'underscore';
-
 export const currentSite = (state, id) => state.data.find(site => site.id === Number(id));
-export const groupSitesByOrg = (sites, organizations) => {
-  const groupedSites = _.groupBy(sites.data, 'organization');
+export const groupSitesByOrg = (state, orgId) => {
+  if (orgId === 'all-options') return state;
 
-  if (groupedSites.undefined) {
-    groupedSites.unassociated = groupedSites.undefined;
-    delete groupedSites.undefined;
+  if (orgId === 'unassociated') {
+    const data = state.data.filter(site => !site.organizationId);
+
+    return {
+      ...state,
+      data,
+    };
   }
 
-  const orgNames = _.object(
-    _.map(
-      _.pluck(organizations.data, 'name'), name => [name, []]
-    )
-  );
+  const data = state.data.filter(site => site.organizationId === Number(orgId));
 
   return {
-    ...orgNames,
-    ...groupedSites,
+    ...state,
+    data,
   };
 };
 export default {

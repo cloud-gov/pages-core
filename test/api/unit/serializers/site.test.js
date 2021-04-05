@@ -62,7 +62,7 @@ describe('SiteSerializer', () => {
       const result = validateJSONSchema(object, siteSchema);
       expect(result.errors).to.be.empty;
       expect(object.basicAuth.password).to.eq('**********');
-      expect(object.organization).to.equal(org.name);
+      expect(object.organizationId).to.equal(org.id);
     });
   });
 
