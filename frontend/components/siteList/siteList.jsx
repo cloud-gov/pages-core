@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from '@reach/router';
 import { connect } from 'react-redux';
@@ -6,14 +6,22 @@ import { connect } from 'react-redux';
 import {
   SITE, ALERT, USER, ORGANIZATION,
 } from '../../propTypes';
+import { getOrgById, orgFilter } from '../../selectors/organization';
 import { groupSitesByOrg } from '../../selectors/site';
 import AlertBanner from '../alertBanner';
+import UserOrgSelect from '../organization/UserOrgSelect';
 import SiteListItem from './siteListItem';
 import LoadingIndicator from '../LoadingIndicator';
 import { IconPlus } from '../icons';
 
-const getSites = (sites, user) => {
-  if (!sites || !sites.length) {
+const getSites = (organizations, sites, user) => {
+  const { isLoading, data } = sites;
+
+  if (isLoading) {
+    return <LoadingIndicator />;
+  }
+
+  if (!data || !data.length) {
     return (
       <div className="usa-grid">
         <h1>No sites yet.</h1>
@@ -25,10 +33,21 @@ const getSites = (sites, user) => {
   return (
     <ul className="sites-list usa-unstyled-list">
       {
-        sites
+        data
           .slice() // create a copy so that sort doesn't modify the original
           .sort((a, b) => a.id - b.id) // sort by id ascending
-          .map(site => <SiteListItem key={site.id} site={site} user={user} />)
+          .map((site) => {
+            const { organizationId } = site;
+            const organization = getOrgById(organizations, organizationId);
+            return (
+              <SiteListItem
+                key={site.id}
+                organization={organization}
+                site={site}
+                user={user}
+              />
+            );
+          })
       }
     </ul>
   );
@@ -47,66 +66,48 @@ const addWebsiteButton = () => (
   </Link>
 );
 
-const getOrganizations = (organizations, sites, users) => {
-  const { isLoading: orgsLoading, data: orgData } = organizations;
-  const { isLoading: sitesLoading, data: siteData } = sites;
-
-  if (orgsLoading || sitesLoading) {
-    return <LoadingIndicator />;
-  }
-
-  if (!orgData || orgData.length === 0) return getSites(siteData, users);
-
-  const groupedSitesByOrg = groupSitesByOrg(sites, organizations);
-
-  return Object.keys(groupedSitesByOrg).map((group) => {
-    const isOrg = group !== 'unassociated';
-    const orgTitle = isOrg ? (
-      <h3>
-        <span style={{ fontWeight: 'normal' }}>Organization:</span>
-        <span
-          style={{
-            paddingLeft: '1rem',
-            textTransform: 'uppercase',
-          }}
-        >
-          {group}
-        </span>
-      </h3>
-    ) : null;
-
-    return (
-      <div
-        className={isOrg ? 'well' : ''}
-        key={`org-${group}`}
-      >
-        {orgTitle}
-        {getSites(groupedSitesByOrg[group], users)}
-      </div>
-    );
-  });
-};
-
 export const SiteList = ({
-  organizations, sites, user, alert,
-}) => (
-  <div>
-    <div className="page-header usa-grid-full">
-      <div className="usa-width-two-thirds">
-        <h1>
-          Your sites
-        </h1>
-      </div>
-      <div className="usa-width-one-third header-actions">
-        {addWebsiteButton()}
-      </div>
-    </div>
+  organizations, orgFilterOptions, sites, user, alert,
+}) => {
+  const [orgFilterValue, setOrgFilterValue] = useState('all-options');
+  const groupedSites = groupSitesByOrg(sites, orgFilterValue);
 
-    <AlertBanner {...alert} />
-    {getOrganizations(organizations, sites, user)}
-    <a href="#top" className="back-to-top">Return to top</a>
-  </div>
-);
+  return (
+    <div>
+      <div className="page-header usa-grid-full">
+        <div className="usa-width-two-thirds">
+          <h1>
+            Your sites
+          </h1>
+        </div>
+        <div className="usa-width-one-third header-actions">
+          {addWebsiteButton()}
+        </div>
+      </div>
+      {
+        orgFilterOptions
+          ? (
+            <div className="page-header usa-grid-full">
+              <div className="usa-width-one-third">
+                <UserOrgSelect
+                  id="filter-sites-by-org"
+                  label="Filter sites by organization."
+                  name="filter-sites-by-org"
+                  orgData={orgFilterOptions}
+                  value={orgFilterValue}
+                  onChange={({ target: { value } }) => setOrgFilterValue(value)}
+                />
+              </div>
+            </div>
+          ) : null
+      }
+
+      <AlertBanner {...alert} />
+      {getSites(organizations, groupedSites, user)}
+      <a href="#top" className="back-to-top">Return to top</a>
+    </div>
+  );
+};
 
 SiteList.propTypes = {
   alert: ALERT,
@@ -114,6 +115,7 @@ SiteList.propTypes = {
     data: PropTypes.arrayOf(ORGANIZATION),
     isLoading: PropTypes.bool,
   }),
+  orgFilterOptions: PropTypes.arrayOf(PropTypes.object),
   sites: PropTypes.shape({
     data: PropTypes.arrayOf(SITE),
     isLoading: PropTypes.bool,
@@ -124,6 +126,7 @@ SiteList.propTypes = {
 SiteList.defaultProps = {
   alert: null,
   organizations: null,
+  orgFilterOptions: null,
   sites: null,
 };
 
@@ -132,6 +135,7 @@ const mapStateToProps = ({
 }) => ({
   alert,
   organizations,
+  orgFilterOptions: orgFilter(organizations),
   sites,
   user: user.data,
 });

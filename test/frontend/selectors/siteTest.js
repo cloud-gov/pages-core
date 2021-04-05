@@ -23,38 +23,39 @@ describe('siteSelectors', () => {
 
   describe('.groupSitesByOrg', () => {
     const sites = {
+      isLoading: true,
       data: [
-        { id: 1, organization: 'org-1' },
-        { id: 2, organization: 'org-2' },
-        { id: 3 },
+        { id: 1, organizationId: 1 },
+        { id: 2, organizationId: 1 },
+        { id: 3, organizationId: 2 },
+        { id: 4 },
       ],
     };
 
     it('returns object indexed by org name and groups org-less sites as "undefined"', () => {
-      const keys = ['org-1', 'org-2', 'unassociated'];
-      const organizations = {
-        data: [
-          { name: 'org-1' },
-          { name: 'org-2' },
-        ],
-      };
-      const grouped = groupSitesByOrg(sites, organizations);
-      expect(grouped).to.have.keys(keys);
-      keys.map(key => expect(grouped[key].length).to.equal(1));
+      const orgId = 1;
+      const grouped = groupSitesByOrg(sites, orgId);
+      expect(grouped.data).to.have.length(2);
+      grouped.data.map(group => expect(group.organizationId).to.equal(orgId));
     });
 
-    it('returns object indexed by org name with empty areas when no site organizations match', () => {
-      const keys = ['org-1', 'org-2', 'unassociated', 'other-org'];
-      const organizations = {
-        data: [
-          { name: 'org-1' },
-          { name: 'org-2' },
-          { name: 'other-org' },
-        ],
-      };
-      const grouped = groupSitesByOrg(sites, organizations);
-      expect(grouped).to.have.keys(keys);
-      expect(grouped['other-org']).to.have.length(0);
+    it('returns all sites with organization Id equals "all-options"', () => {
+      const orgId = 'all-options';
+      const grouped = groupSitesByOrg(sites, orgId);
+      expect(grouped.data).to.deep.equal(sites.data);
+    });
+
+    it('returns all sites without an organization Id associated', () => {
+      const orgId = 'unassociated';
+      const grouped = groupSitesByOrg(sites, orgId);
+      expect(grouped.data).to.have.length(1);
+      expect(grouped.data).to.deep.equal([sites.data[3]]);
+    });
+
+    it('returns an sites data as an empty array with organization Id is not associated to any sites', () => {
+      const orgId = 100;
+      const grouped = groupSitesByOrg(sites, orgId);
+      expect(grouped.data).to.deep.equal([]);
     });
   });
 });

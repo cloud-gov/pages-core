@@ -16,11 +16,11 @@ function makeOptions(opts) {
 }
 
 const UserOrgSelect = ({
-  className, id, name, onChange, orgData, value,
+  className, id, label, name, onChange, orgData, value,
 }) => (
   <>
     {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-    <label htmlFor={name}>Select the site&apos;s organization</label>
+    <label htmlFor={name}>{label}</label>
     <select
       {...{ name, id, className }}
       value={value}
@@ -37,6 +37,7 @@ UserOrgSelect.propTypes = {
     PropTypes.string,
     PropTypes.number,
   ]).isRequired,
+  label: PropTypes.string,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func,
   orgData: PropTypes.arrayOf(ORGANIZATION).isRequired,
@@ -48,6 +49,7 @@ UserOrgSelect.propTypes = {
 
 UserOrgSelect.defaultProps = {
   className: 'form-control',
+  label: 'Select the site\'s organization',
   onChange: () => {},
 };
 

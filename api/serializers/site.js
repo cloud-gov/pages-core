@@ -79,7 +79,7 @@ const serializeObject = (site) => {
   }
 
   if (json.Organization) {
-    json.organization = site.Organization.name;
+    json.organizationId = site.Organization.id;
     delete json.Organization;
   }
 
