@@ -15,8 +15,8 @@ const STORE_WITH_SITES = {
   sites: { isLoading: false, data: [{ id: 5 }, { id: 2 }, { id: 8 }] },
   user: {},
 };
-const STORE_WITH_NO_SITES = { sites: { isLoading: false, data: [] }, user: {} };
-const STORE_LOADING_SITES = { sites: { isLoading: true }, user: {} };
+const STORE_WITH_NO_SITES = { sites: { isLoading: false, data: [] }, user: { email: 'foo@bar.com' } };
+const STORE_LOADING_SITES = { sites: { isLoading: true }, user: { email: 'foo@bar.com' } };
 
 describe('<SiteList />', () => {
   let SiteList;
