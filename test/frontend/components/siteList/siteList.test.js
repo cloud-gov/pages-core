@@ -13,9 +13,10 @@ const NO_SITE_TEXT = 'No sites yet.';
 // sites can be empty as the test is rendering empty divs for children.
 const STORE_WITH_SITES = {
   sites: { isLoading: false, data: [{ id: 5 }, { id: 2 }, { id: 8 }] },
-  user: {},
+  user: { email: 'foo@bar.com' },
 };
 const STORE_WITH_NO_SITES = { sites: { isLoading: false, data: [] }, user: { email: 'foo@bar.com' } };
+const STORE_WITH_NO_SITES_OR_GH_AUTH = { sites: { isLoading: false, data: [] }, user: {} };
 const STORE_LOADING_SITES = { sites: { isLoading: true }, user: { email: 'foo@bar.com' } };
 
 describe('<SiteList />', () => {
@@ -48,8 +49,22 @@ describe('<SiteList />', () => {
       expect(wrapper.find('.page-header h1')).to.have.length(1);
     });
 
-    it('renders 1 `add new site` button', () => {
-      expect(wrapper.find('Link[to="/sites/new"]')).to.have.length(1);
+    context('when the user has authorized Github', () => {
+      it('renders 1 `add new site` button', () => {
+        expect(wrapper.find('Link[to="/sites/new"]')).to.have.length(1);
+        expect(wrapper.find('GithubAuthButton')).to.have.length(0);
+      });
+    });
+
+    context('when the user has NOT authorized Github', () => {
+      beforeEach(() => {
+        wrapper = shallow(<SiteList {...STORE_WITH_NO_SITES_OR_GH_AUTH} />);
+      });
+
+      it('renders 1 `Connect with Github` button', () => {
+        expect(wrapper.find('Link[to="/sites/new"]')).to.have.length(0);
+        expect(wrapper.find('GithubAuthButton')).to.have.length(1);
+      });
     });
 
     it('renders fallback content when user has no sites', () => {

@@ -65,7 +65,7 @@ async function createData({ githubUsername }) {
   const [user1, user2, agencyManager] = await Promise.all([
     User.create({
       username: githubUsername,
-      email: `${githubUsername}@example.com`,
+      // email: `${githubUsername}@example.com`,
     }),
 
     User.create({
