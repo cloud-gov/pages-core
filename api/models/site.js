@@ -84,6 +84,7 @@ const associate = ({
       where: {
         id: user.id,
       },
+      Organization,
     }],
   }));
 };
