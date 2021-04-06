@@ -43,12 +43,9 @@ const SiteListItem = ({ organization, site, user }) => (
       </h4>
       {
         organization ? (
-          <h6>
-            <Link to={`/organizations/${organization.id}`} title="View organization settings">
-              {`organization - ${organization.name}`}
-            </Link>
-            {' '}
-          </h6>
+          <h5>
+            {`organization - ${organization.name}`}
+          </h5>
         ) : null
       }
       <RepoLastVerified site={site} userUpdated={user.updatedAt} />

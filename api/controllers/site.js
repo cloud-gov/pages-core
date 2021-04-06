@@ -5,9 +5,7 @@ const SiteDestroyer = require('../services/SiteDestroyer');
 const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const UserActionCreator = require('../services/UserActionCreator');
 const siteSerializer = require('../serializers/site');
-const {
-  User, Site, Build, Organization,
-} = require('../models');
+const { Site, Build } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const ProxyDataSync = require('../services/ProxyDataSync');
 const {
@@ -29,15 +27,14 @@ const stripCredentials = ({ username, password }) => {
 
 module.exports = wrapHandlers({
   async findAllForUser(req, res) {
-    const user = await fetchModelById(req.user.id, User, {
-      include: [Site, Organization],
-    });
+    const sites = await Site.forUser(req.user).findAll();
 
-    if (!user) {
+    if (!sites) {
       return res.notFound();
     }
 
-    const siteJSON = await siteSerializer.serialize(user.Sites);
+    const siteJSON = await siteSerializer.serialize(sites);
+
     return res.json(siteJSON);
   },
 
