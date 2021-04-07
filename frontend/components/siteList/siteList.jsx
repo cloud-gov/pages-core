@@ -14,6 +14,24 @@ import SiteListItem from './siteListItem';
 import LoadingIndicator from '../LoadingIndicator';
 import { IconPlus } from '../icons';
 
+const mapSites = (organizations, siteData, user) => (
+  siteData
+    .slice() // create a copy so that sort doesn't modify the original
+    .sort((a, b) => a.id - b.id) // sort by id ascending
+    .map((site) => {
+      const { organizationId } = site;
+      const organization = getOrgById(organizations, organizationId);
+      return (
+        <SiteListItem
+          key={site.id}
+          organization={organization}
+          site={site}
+          user={user}
+        />
+      );
+    })
+);
+
 const getSites = (organizations, sites, user) => {
   const { isLoading, data } = sites;
 
@@ -32,23 +50,7 @@ const getSites = (organizations, sites, user) => {
 
   return (
     <ul className="sites-list usa-unstyled-list">
-      {
-        data
-          .slice() // create a copy so that sort doesn't modify the original
-          .sort((a, b) => a.id - b.id) // sort by id ascending
-          .map((site) => {
-            const { organizationId } = site;
-            const organization = getOrgById(organizations, organizationId);
-            return (
-              <SiteListItem
-                key={site.id}
-                organization={organization}
-                site={site}
-                user={user}
-              />
-            );
-          })
-      }
+      {mapSites(organizations, data, user)}
     </ul>
   );
 };
