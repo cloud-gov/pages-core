@@ -27,7 +27,7 @@ services:
       - uaa
     environment:
       JWT_SECRET: 'shhHhh...'
-      USER_AUDITOR: federalist
+      USER_AUDITOR: auditor
       FEATURE_PROXY_EDGE_LINKS: 'true'
       FEATURE_PROXY_EDGE_DYNAMO: 'true'
       FEATURE_ADMIN_AUTH: 'true'
