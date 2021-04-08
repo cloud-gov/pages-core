@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-const inquirer = require('inquirer');
 Promise.props = require('promise-props');
 const BuildLogs = require('../api/services/build-logs');
 const EventCreator = require('../api/services/EventCreator');
@@ -390,22 +389,8 @@ async function createData() {
   ]);
 }
 
-const confirm = {
-  type: 'confirm',
-  default: false,
-  name: 'userAgrees',
-  message: 'This will DELETE all data in your development database. Are you sure you want to continue?',
-};
-
-inquirer.prompt(confirm)
-  .then(({ userAgrees }) => {
-    // exit if the user did not agree to the confirmation
-    if (!userAgrees) {
-      console.log('Exiting without making any changes.');
-      process.exit();
-    }
-  })
-  .then(createData)
+console.log('This will DELETE all data in your development database.');
+createData()
   .then(() => {
     console.log('Done!');
     console.log('You may have to log out and then back in to your local development instance of Federalist.');
