@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { currentSite } from '../../../frontend/selectors/site';
+import { currentSite, groupSitesByOrg } from '../../../frontend/selectors/site';
 
 describe('siteSelectors', () => {
   describe('.currentSite', () => {
@@ -18,6 +18,44 @@ describe('siteSelectors', () => {
     it('returns the null if there is not site for the given id', () => {
       const site = currentSite(state, '4');
       expect(site).to.be.undefined;
+    });
+  });
+
+  describe('.groupSitesByOrg', () => {
+    const sites = {
+      isLoading: true,
+      data: [
+        { id: 1, organizationId: 1 },
+        { id: 2, organizationId: 1 },
+        { id: 3, organizationId: 2 },
+        { id: 4 },
+      ],
+    };
+
+    it('returns object indexed by org name and groups org-less sites as "undefined"', () => {
+      const orgId = 1;
+      const grouped = groupSitesByOrg(sites, orgId);
+      expect(grouped.data).to.have.length(2);
+      grouped.data.map(group => expect(group.organizationId).to.equal(orgId));
+    });
+
+    it('returns all sites with organization Id equals "all-options"', () => {
+      const orgId = 'all-options';
+      const grouped = groupSitesByOrg(sites, orgId);
+      expect(grouped.data).to.deep.equal(sites.data);
+    });
+
+    it('returns all sites without an organization Id associated', () => {
+      const orgId = 'unassociated';
+      const grouped = groupSitesByOrg(sites, orgId);
+      expect(grouped.data).to.have.length(1);
+      expect(grouped.data).to.deep.equal([sites.data[3]]);
+    });
+
+    it('returns an sites data as an empty array with organization Id is not associated to any sites', () => {
+      const orgId = 100;
+      const grouped = groupSitesByOrg(sites, orgId);
+      expect(grouped.data).to.deep.equal([]);
     });
   });
 });

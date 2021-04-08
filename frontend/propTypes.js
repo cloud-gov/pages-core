@@ -26,6 +26,10 @@ export const SITE = PropTypes.shape({
   s3ServiceName: PropTypes.string,
   awsBucketName: PropTypes.string,
   awsBucketRegion: PropTypes.string,
+  organizationId: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
   users: PropTypes.arrayOf(USER),
 });
 
@@ -46,6 +50,16 @@ export const BUILD = PropTypes.shape({
 export const BUILD_LOG = PropTypes.shape({
   source: PropTypes.string.isRequired,
   output: PropTypes.string.isRequired,
+});
+
+export const ORGANIZATION = PropTypes.shape({
+  createdAt: PropTypes.string,
+  id: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string,
+  ]).isRequired,
+  name: PropTypes.string.isRequired,
+  updatedAt: PropTypes.string,
 });
 
 export const USER_ACTION = PropTypes.shape({

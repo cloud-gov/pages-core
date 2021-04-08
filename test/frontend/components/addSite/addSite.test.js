@@ -24,7 +24,13 @@ const user = {
   },
 };
 
+const orgData = [{
+  id: 1,
+  name: 'org-1',
+}];
+
 const propsWithoutError = {
+  orgData,
   user,
   showAddNewSiteFields: false,
 };
@@ -71,10 +77,14 @@ describe('<AddSite/>', () => {
     expect(templateListProps).to.deep.equal({
       handleSubmitTemplate: wrapper.instance().onSubmitTemplate,
       defaultOwner: propsWithoutError.user.data.username,
+      orgData: propsWithoutError.orgData,
     });
     expect(formProps.onSubmit).to.equal(wrapper.instance().onAddUserSubmit);
     expect(formProps.showAddNewSiteFields).to.equal(propsWithoutError.showAddNewSiteFields);
-    expect(formProps.initialValues).to.deep.equal({ engine: 'jekyll' });
+    expect(formProps.initialValues).to.deep.equal({
+      engine: 'jekyll',
+      siteOrganizationId: orgData[0].id,
+    });
   });
 
   it('delivers onCreateSiteSubmit when showAddNewSiteFields is true', () => {
@@ -102,7 +112,12 @@ describe('<AddSite/>', () => {
     wrapper = shallow(<Fixture {...props} />);
 
     wrapper.find('ReduxForm').props().onSubmit({ repoUrl, engine });
-    expect(addSite.calledWith({ owner: 'boop', repository: 'beeper-v2', engine })).to.be.true;
+    expect(addSite.calledWith({
+      owner: 'boop',
+      repository: 'beeper-v2',
+      engine,
+      organizationId: orgData[0].id,
+    })).to.be.true;
   });
 
   it('displays an alert banner when add to site action fails', () => {
