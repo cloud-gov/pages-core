@@ -17,6 +17,14 @@ const adminAllowedAttributes = [
   'deletedAt',
 ];
 
+const uaaAdminAllowedAttributes = [
+  'uaaId',
+  'userId',
+  'username',
+  'email',
+  'origin',
+];
+
 const dateFields = [
   'createdAt',
   'updatedAt',
@@ -43,6 +51,10 @@ const toJSON = (user, isSystemAdmin = false) => {
 
   if (filtered.SiteUser && filtered.SiteUser.buildNotificationSetting) {
     filtered.buildNotificationSetting = filtered.SiteUser.buildNotificationSetting;
+  }
+
+  if (isSystemAdmin && object.UAAIdentity) {
+    filtered.uaa = pick(uaaAdminAllowedAttributes, object.UAAIdentity);
   }
 
   return filtered;

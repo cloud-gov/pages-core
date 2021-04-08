@@ -14,16 +14,24 @@ const NO_SITE_TEXT = 'No sites yet.';
 const STORE_WITH_SITES = {
   organizations: { isLoading: false, data: [{ id: 1 }] },
   sites: { isLoading: false, data: [{ id: 5 }, { id: 2 }, { id: 8 }] },
-  user: {},
+  user: { email: 'foo@bar.com' },
 };
+
 const STORE_WITH_NO_SITES = {
   organizations: { isLoading: false, data: [] },
   sites: { isLoading: false, data: [] },
-  user: {},
+  user: { email: 'foo@bar.com' },
 };
+
 const STORE_LOADING_SITES = {
   organizations: { isLoading: true },
   sites: { isLoading: true },
+  user: { email: 'foo@bar.com' },
+};
+
+const STORE_WITH_NO_SITES_OR_GH_AUTH = {
+  organizations: { isLoading: false, data: [] },
+  sites: { isLoading: false, data: [] },
   user: {},
 };
 
@@ -57,8 +65,22 @@ describe('<SiteList />', () => {
       expect(wrapper.find('.page-header h1')).to.have.length(1);
     });
 
-    it('renders 1 `add new site` button', () => {
-      expect(wrapper.find('Link[to="/sites/new"]')).to.have.length(1);
+    context('when the user has authorized Github', () => {
+      it('renders 1 `add new site` button', () => {
+        expect(wrapper.find('Link[to="/sites/new"]')).to.have.length(1);
+        expect(wrapper.find('GithubAuthButton')).to.have.length(0);
+      });
+    });
+
+    context('when the user has NOT authorized Github', () => {
+      beforeEach(() => {
+        wrapper = shallow(<SiteList {...STORE_WITH_NO_SITES_OR_GH_AUTH} />);
+      });
+
+      it('renders 1 `Connect with Github` button', () => {
+        expect(wrapper.find('Link[to="/sites/new"]')).to.have.length(0);
+        expect(wrapper.find('GithubAuthButton')).to.have.length(1);
+      });
     });
 
     it('renders fallback content when user has no sites', () => {
