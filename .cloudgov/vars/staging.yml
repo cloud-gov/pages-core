@@ -5,8 +5,8 @@ env: staging
 env_postfix: -staging
 log_level: verbose
 feature_admin_auth: 'true'
-feature_proxy_edge_links: 'true'
-feature_proxy_edge_dynamo: 'true'
+feature_proxy_edge_links: 'false'
+feature_proxy_edge_dynamo: 'false'
 feature_bull_site_build_queue: 'true'
 auth_idp: uaa
 uaa_host: https://uaa.fr-stage.cloud.gov
