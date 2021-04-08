@@ -110,7 +110,6 @@ jobs:
         environment:
           REDIS_PORT: 6379
     environment:
-      FEATURE_ADMIN_AUTH: 'true'
       AUTH_IDP: uaa
     steps:
       - checkout
