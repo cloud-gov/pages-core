@@ -28,9 +28,8 @@ services:
     environment:
       JWT_SECRET: 'shhHhh...'
       USER_AUDITOR: federalist
-      FEATURE_PROXY_EDGE_LINKS: 'true'
-      FEATURE_PROXY_EDGE_DYNAMO: 'true'
-      FEATURE_ADMIN_AUTH: 'true'
+      FEATURE_PROXY_EDGE_LINKS: 'false'
+      FEATURE_PROXY_EDGE_DYNAMO: 'false'
       APP_HOSTNAME: http://localhost:1337
       AUTH_IDP: uaa
       UAA_HOST: http://localhost:9000
