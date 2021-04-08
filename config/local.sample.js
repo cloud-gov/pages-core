@@ -6,6 +6,10 @@ if (process.env.NODE_ENV !== 'test') {
           clientID: 'GITHUB_OAUTH_CLIENT_ID',
           clientSecret: 'GITHUB_OAUTH_CLIENT_SECRET',
         },
+        authorizationOptions: {
+          clientID: 'GITHUB_OAUTH_CLIENT_ID',
+          clientSecret: 'GITHUB_OAUTH_CLIENT_SECRET',
+        },
         externalOptions: {
           clientID: 'GITHUB_OAUTH_CLIENT_ID',
           clientSecret: 'GITHUB_OAUTH_CLIENT_SECRET',
