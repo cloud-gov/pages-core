@@ -349,6 +349,7 @@ jobs:
         trigger: true
       - task: restage-api
         config:
+          inputs: [name: src]
           <<: *cf-image
           run:
             path: src/ci/tasks/restage.sh
@@ -358,6 +359,7 @@ jobs:
       - in_parallel:
         - task: archive-build-logs
           config:
+            inputs: [name: src]
             <<: *cf-image
             run:
               path: src/ci/tasks/run-task.sh
@@ -368,6 +370,7 @@ jobs:
             CF_TASK_COMMAND: yarn archive-build-logs-daily
         - task: nightly-builds
           config:
+            inputs: [name: src]
             <<: *cf-image
             run:
               path: src/ci/tasks/run-task.sh
@@ -378,6 +381,7 @@ jobs:
             CF_TASK_COMMAND: yarn nightly-builds
         - task: remove-inactive-federalist-users
           config:
+            inputs: [name: src]
             <<: *cf-image
             run:
               path: src/ci/tasks/run-task.sh
@@ -396,6 +400,7 @@ jobs:
         trigger: true
       - task: timeout-builds
         config:
+          inputs: [name: src]
           <<: *cf-image
           run:
             path: src/ci/tasks/run-task.sh
