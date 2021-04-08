@@ -13,11 +13,13 @@ function paramsForNewSite(params) {
   const owner = params.owner ? params.owner.toLowerCase() : null;
   const repository = params.repository ? params.repository.toLowerCase() : null;
   const subdomain = generateSubdomain(owner, repository);
+  const organizationId = params.organizationId ? parseInt(params.organizationId, 10) : null;
   return {
     owner,
     repository,
     defaultBranch: params.defaultBranch,
     engine: params.engine || defaultEngine,
+    organizationId,
     subdomain,
     sharedBucket: params.sharedBucket === false ? params.sharedBucket : true,
   };

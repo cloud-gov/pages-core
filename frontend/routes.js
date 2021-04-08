@@ -16,10 +16,12 @@ import NotificationSettings from './components/site/NotificationSettings';
 
 import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
+import organizationActions from './actions/organizationActions';
 
 const fetchInitialData = () => {
   userActions.fetchUser();
   siteActions.fetchSites();
+  organizationActions.fetchOrganizations();
 };
 
 export default (
