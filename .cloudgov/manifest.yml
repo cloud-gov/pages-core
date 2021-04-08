@@ -37,7 +37,6 @@ applications:
       SOCKET_HOST: https://federalistapp((env_postfix)).18f.gov
       USER_AUDITOR: federalist
       S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
-      FEATURE_ADMIN_AUTH: ((feature_admin_auth))
       FEDERALIST_PREVIEW_HOSTNAME: https://*.sites((env_postfix)).federalist.18f.gov
       PROXY_SITE_TABLE: federalist-proxy-((env))
       FEATURE_PROXY_EDGE_DYNAMO: ((feature_proxy_edge_dynamo))

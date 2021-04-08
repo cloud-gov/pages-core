@@ -10,7 +10,7 @@ const flash = require('connect-flash');
 const { logger, expressLogger, expressErrorLogger } = require('../../winston');
 const config = require('../../config');
 
-const Features = require('../features');
+const adminApi = require('../admin');
 const externalAuth = require('../external-auth');
 const responses = require('../responses');
 const passport = require('../services/passport');
@@ -75,12 +75,9 @@ function init(app) {
 
   maybeUseExpressLogger(app);
 
-  app.use('/external', externalAuth);
+  app.use('/admin', adminApi);
 
-  if (Features.enabled(Features.Flags.FEATURE_ADMIN_AUTH)) {
-    // eslint-disable-next-line global-require
-    app.use('/admin', require('../admin'));
-  }
+  app.use('/external', externalAuth);
 
   const main = express();
   configureViews(main);
