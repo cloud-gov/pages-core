@@ -11,7 +11,10 @@ const { createUAAStrategy, verifyUAAUser } = require('./uaaStrategy');
 const passport = new Passport.Passport();
 
 const {
-  github: { options: githubOptions },
+  github: {
+    options: githubOptions,
+    authorizationOptions: githubAuthorizationOptions,
+  },
   uaa: { options: uaaOptions },
 } = config.passport;
 
@@ -48,6 +51,26 @@ async function verifyGithub(accessToken, _refreshToken, profile, callback) {
   }
 }
 
+async function verifyGithub2(accessToken, _refreshToken, profile, callback) {
+  try {
+    const username = profile.username.toLowerCase();
+    // eslint-disable-next-line no-underscore-dangle
+    const { email } = profile._json;
+
+    const user = {
+      username,
+      email,
+      githubAccessToken: accessToken,
+      githubUserId: profile.id,
+    };
+
+    return callback(null, user);
+  } catch (err) {
+    logger.warn('Github authentication error: ', err);
+    return callback(err);
+  }
+}
+
 async function verifyUAA(accessToken, refreshToken, profile, callback) {
   try {
     const user = await verifyUAAUser(
@@ -73,7 +96,8 @@ async function verifyUAA(accessToken, refreshToken, profile, callback) {
 
 const uaaStrategy = createUAAStrategy(uaaOptions, verifyUAA);
 
-passport.use(new GitHubStrategy(githubOptions, verifyGithub));
+passport.use('github', new GitHubStrategy(githubOptions, verifyGithub));
+passport.use('github2', new GitHubStrategy(githubAuthorizationOptions, verifyGithub2));
 passport.use('uaa', uaaStrategy);
 
 passport.logout = (idp) => {

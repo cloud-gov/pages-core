@@ -54,47 +54,148 @@ function socketIOError() {
   };
 }
 
-async function createData({ githubUsername }) {
+// Chainable helpers
+async function createUAAIdentity(user) {
+  await user.createUAAIdentity({
+    uaaId: `${user.username}-placeholder-id`,
+    email: `${user.username}@example.com`,
+    userName: `${user.username}@example.com`,
+    origin: 'example.com',
+  });
+  return user;
+}
+
+async function addUserToOrg(user, org, role) {
+  await org.addUser(user, { through: { roleId: role.id } });
+  return user;
+}
+
+async function addSiteToOrg(site, org) {
+  await org.addSite(site);
+  return site;
+}
+
+/** *****************************************
+ *        Where the magic happens!!
+ */
+async function createData() {
   console.log('Cleaning database...');
   await cleanDatabase();
 
+  /** *****************************************
+   *              Action Types
+   */
   console.log('Creating default action types...');
   await ActionType.createDefaultActionTypes();
 
-  console.log('Creating users...');
-  const [user1, user2, agencyManager] = await Promise.all([
-    User.create({
-      username: githubUsername,
-      email: `${githubUsername}@example.com`,
-    }),
+  /** *****************************************
+   *                  Roles
+   */
+  console.log('Creating Roles');
+  const [userRole, managerRole] = await Promise.all([
+    Role.create({ name: 'user' }),
+    Role.create({ name: 'manager' }),
+  ]);
 
+  /** *****************************************
+   *              Organizations
+   */
+  console.log('Creating Organizations');
+  const [agency1, agency2] = await Promise.all([
+    Organization.create({ name: 'agency1' }),
+    Organization.create({ name: 'agency2' }),
+  ]);
+
+  /** *****************************************
+   *                 Users
+   */
+  console.log('Creating users...');
+  const [
+    user1,
+    user2,
+    managerNoGithub,
+    managerWithGithub,
+  ] = await Promise.all([
+
+    /**
+     * Fake users
+     */
+
+    // Users with Github credentials
+    User
+      .create({
+        username: 'user1',
+        email: 'user1@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      })
+      .then(createUAAIdentity)
+      .then(user => addUserToOrg(user, agency1, userRole))
+      .then(user => addUserToOrg(user, agency2, userRole)),
+
+    User
+      .create({
+        username: 'user2',
+        email: 'user2@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      })
+      .then(createUAAIdentity)
+      .then(user => addUserToOrg(user, agency1, userRole)),
+
+    // Manager without Github credentials
+    User
+      .create({ username: 'manager_no_github' })
+      .then(createUAAIdentity)
+      .then(user => addUserToOrg(user, agency1, managerRole)),
+
+    // Manager with Github credentials
+    User
+      .create({
+        username: 'manager_with_github',
+        email: 'manager_with_github@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      })
+      .then(createUAAIdentity)
+      .then(user => addUserToOrg(user, agency1, userRole))
+      .then(user => addUserToOrg(user, agency2, managerRole)),
+
+    /**
+     * Actual Github users
+     *
+     * Initialized without Github credentials so we can test the process
+     */
+    User
+      .create({ username: 'amirbey', adminEmail: 'amir.reavis-bey@gsa.gov' })
+      .then(createUAAIdentity),
+
+    User
+      .create({ username: 'apburnes', adminEmail: 'andrew.burnes@gsa.gov' })
+      .then(createUAAIdentity),
+
+    User
+      .create({ username: 'davemcorwin', adminEmail: 'david.corwin@gsa.gov' })
+      .then(createUAAIdentity),
+
+    // User without UAA
     User.create({
-      username: 'fake-user',
-      email: 'fake-user@example.com',
-      githubAccessToken: 'fake-access-token',
+      username: 'user_no_uaa',
+      email: 'user_no_uaa@example.com',
+      githubAccessToken: 'access-token',
       githubUserId: 123456,
     }),
 
-    User.create({
-      username: 'agency_manager',
-      email: 'agency-manager@example.com',
-    }),
-
+    // Auditor
     User.create({
       username: process.env.USER_AUDITOR,
-      email: 'fake-user@example.com',
+      email: 'auditor@example.com',
     }),
   ]);
 
-  console.log('Create fake-user@example.com uaa identity');
-  await user2.createUAAIdentity({
-    uaaId: 'fake-user-placeholder-id',
-    email: user2.email,
-    userName: user2.email,
-    origin: 'example.com',
-    userId: user2.id,
-  });
-
+  /** *****************************************
+   *                 Sites
+   */
   console.log('Creating sites...');
   const [site1, nodeSite, goSite] = await Promise.all([
     siteFactory({
@@ -103,24 +204,29 @@ async function createData({ githubUsername }) {
       domain: 'https://example.gov',
       owner: user1.username,
       repository: 'example-site',
-      users: [user1, user2],
+      users: [user1],
     }),
 
     siteFactory({
       engine: 'node.js',
       owner: user1.username,
       repository: 'example-node-site',
-      users: [user1],
-    }),
+      users: [user1, managerWithGithub],
+    })
+      .then(site => addSiteToOrg(site, agency1)),
 
     siteFactory({
       engine: 'hugo',
       owner: user1.username,
       repository: 'example-go-site',
-      users: [user1],
-    }),
+      users: [user1, user2, managerNoGithub],
+    })
+      .then(site => addSiteToOrg(site, agency2)),
   ]);
 
+  /** *****************************************
+   *                 Builds
+   */
   console.log('Creating builds...');
   const site1Builds = await Promise.all([
     Build.create({
@@ -199,6 +305,9 @@ async function createData({ githubUsername }) {
     }),
   ]);
 
+  /** *****************************************
+   *               Build Logs
+   */
   console.log('Creating build logs...');
   await BuildLog.bulkCreate([
     {
@@ -244,6 +353,16 @@ async function createData({ githubUsername }) {
     }))
   );
 
+  console.log('Uploading logs to S3');
+  try {
+    await BuildLogs.archiveBuildLogs(nodeSite, nodeSiteBuilds[0]);
+  } catch (error) {
+    console.error('Failed to upload logs to S3, probably because the credentials are not configured locally. This can be ignored.');
+  }
+
+  /** *****************************************
+   *              User Actions
+   */
   console.log('Creating user actions...');
   const removeAction = await ActionType.findOne({ where: { action: 'remove' } });
   await UserAction.create({
@@ -254,13 +373,9 @@ async function createData({ githubUsername }) {
     siteId: site1.id,
   });
 
-  console.log('Uploading logs to S3');
-  try {
-    await BuildLogs.archiveBuildLogs(nodeSite, nodeSiteBuilds[0]);
-  } catch (error) {
-    console.error('Failed to upload logs to S3, probably because the credentials are not configured locally. This can be ignored.');
-  }
-
+  /** *****************************************
+   *                Events
+   */
   console.log('Creating Events');
   await Promise.all([
     EventCreator.audit(Event.labels.AUTHENTICATION, user1, 'UAA login'),
@@ -268,66 +383,10 @@ async function createData({ githubUsername }) {
     EventCreator.audit(Event.labels.AUTHENTICATION, user1, 'member_added', memberAddedPayload()),
   ]);
 
-  console.log('Creating Admin Users');
-  await Promise.all([
-    User.upsert({ username: 'amirbey', email: 'amirbey@example.com', adminEmail: 'amir.reavis-bey@gsa.gov' }),
-    User.upsert({ username: 'apburnes', email: 'apburnes@example.com', adminEmail: 'andrew.burnes@gsa.gov' }),
-    User.upsert({ username: 'davemcorwin', email: 'davemcorwin@example.com', adminEmail: 'david.corwin@gsa.gov' }),
-  ]);
-
-  console.log('Creating Admin User UAA Identities');
-  await Promise.all([
-    User.findOne({ where: { email: 'amirbey@example.com' } })
-      .then(user => user.createUAAIdentity({
-        uaaId: 'amirbey-placeholder-id',
-        email: user.email,
-        userName: user.email,
-        origin: 'example.com',
-      })),
-    User.findOne({ where: { email: 'apburnes@example.com' } })
-      .then(user => user.createUAAIdentity({
-        uaaId: 'apburnes-placeholder-id',
-        email: user.email,
-        userName: user.email,
-        origin: 'example.com',
-      })),
-    User.findOne({ where: { email: 'davemcorwin@example.com' } })
-      .then(user => user.createUAAIdentity({
-        uaaId: 'davemcorwin-placeholder-id',
-        email: user.email,
-        userName: user.email,
-        origin: 'example.com',
-      })),
-  ]);
-
-  console.log('Crearing Error Events');
+  console.log('Creating Error Events');
   await Promise.all([
     EventCreator.error(Event.labels.REQUEST_HANDLER, new Error('A sample error'), { some: 'info' }),
     EventCreator.error(Event.labels.REQUEST_HANDLER, socketIOError, { some: 'info' }),
-  ]);
-
-  console.log('Creating Roles');
-  const [userRole, managerRole] = await Promise.all([
-    Role.create({ name: 'user' }),
-    Role.create({ name: 'manager' }),
-  ]);
-
-  console.log('Creating Organizations');
-  const [agencyOrg] = await Promise.all([
-    Organization.create({ name: 'agency' }),
-    Organization.create({ name: 'empty' }),
-  ]);
-
-  console.log('Assigning Organization Roles');
-  await Promise.all([
-    agencyOrg.addUser(agencyManager, { through: { roleId: managerRole.id } }),
-    agencyOrg.addUser(user1, { through: { roleId: userRole.id } }),
-  ]);
-
-  console.log('Assigning Organization Sites');
-  await Promise.all([
-    agencyOrg.addSite(nodeSite),
-    agencyOrg.addSite(goSite),
   ]);
 }
 
@@ -338,13 +397,6 @@ const confirm = {
   message: 'This will DELETE all data in your development database. Are you sure you want to continue?',
 };
 
-// questions to collect necessary info to bootstrap the db
-const questions = [{
-  type: 'input',
-  name: 'githubUsername',
-  message: 'What is your GitHub username?',
-}];
-
 inquirer.prompt(confirm)
   .then(({ userAgrees }) => {
     // exit if the user did not agree to the confirmation
@@ -353,7 +405,6 @@ inquirer.prompt(confirm)
       process.exit();
     }
   })
-  .then(() => inquirer.prompt(questions))
   .then(createData)
   .then(() => {
     console.log('Done!');

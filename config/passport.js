@@ -21,6 +21,13 @@ module.exports = {
       scope: ['user', 'repo', 'write:repo_hook'],
       state: true,
     },
+    authorizationOptions: {
+      clientID,
+      clientSecret,
+      callbackURL: url('/auth/github2/callback'),
+      scope: ['user', 'repo', 'write:repo_hook'],
+      state: true,
+    },
     externalOptions: {
       clientID,
       clientSecret,
