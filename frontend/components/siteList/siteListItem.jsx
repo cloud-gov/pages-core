@@ -8,7 +8,7 @@ import RepoLastVerified from './repoLastVerified';
 import GitHubLink from '../GitHubLink';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
-import { USER } from '../../propTypes';
+import { ORGANIZATION, USER } from '../../propTypes';
 
 function getViewLink(viewLink, repo) {
   return (
@@ -32,7 +32,7 @@ const handleRemoveSite = (site, user) => (event) => {
     .then(() => siteActions.fetchSites());
 };
 
-const SiteListItem = ({ site, user }) => (
+const SiteListItem = ({ organization, site, user }) => (
   <li className="sites-list-item">
     <div className="sites-list-item-text">
       <h4 className="site-list-item-title">
@@ -41,6 +41,13 @@ const SiteListItem = ({ site, user }) => (
         </Link>
         {' '}
       </h4>
+      {
+        organization ? (
+          <h5>
+            {`organization - ${organization.name}`}
+          </h5>
+        ) : null
+      }
       <RepoLastVerified site={site} userUpdated={user.updatedAt} />
       <PublishedState site={site} />
     </div>
@@ -53,6 +60,7 @@ const SiteListItem = ({ site, user }) => (
 );
 
 SiteListItem.propTypes = {
+  organization: ORGANIZATION,
   site: PropTypes.shape({
     repository: PropTypes.string,
     owner: PropTypes.string,
@@ -63,6 +71,10 @@ SiteListItem.propTypes = {
     viewLink: PropTypes.string,
   }).isRequired,
   user: USER.isRequired,
+};
+
+SiteListItem.defaultProps = {
+  organization: null,
 };
 
 export default SiteListItem;

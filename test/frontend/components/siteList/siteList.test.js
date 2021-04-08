@@ -12,11 +12,20 @@ const NO_SITE_TEXT = 'No sites yet.';
 
 // sites can be empty as the test is rendering empty divs for children.
 const STORE_WITH_SITES = {
+  organizations: { isLoading: false, data: [{ id: 1 }] },
   sites: { isLoading: false, data: [{ id: 5 }, { id: 2 }, { id: 8 }] },
   user: {},
 };
-const STORE_WITH_NO_SITES = { sites: { isLoading: false, data: [] }, user: {} };
-const STORE_LOADING_SITES = { sites: { isLoading: true }, user: {} };
+const STORE_WITH_NO_SITES = {
+  organizations: { isLoading: false, data: [] },
+  sites: { isLoading: false, data: [] },
+  user: {},
+};
+const STORE_LOADING_SITES = {
+  organizations: { isLoading: true },
+  sites: { isLoading: true },
+  user: {},
+};
 
 describe('<SiteList />', () => {
   let SiteList;
