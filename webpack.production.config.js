@@ -85,6 +85,9 @@ module.exports = {
     // bundle
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new WebpackManifestPlugin({ fileName: '../webpack-manifest.json' }),
-    new webpack.DefinePlugin(getFeatureFlags(process.env)),
+    new webpack.DefinePlugin({
+      ...getFeatureFlags(process.env),
+      APP_HOSTNAME: JSON.stringify(process.env.APP_HOSTNAME),
+    }),
   ],
 };
