@@ -15,7 +15,9 @@ const { authenticatedSession, unauthenticatedSession } = require('../support/ses
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const csrfToken = require('../support/csrfToken');
 
-const { Build, Site, User } = require('../../../api/models');
+const {
+  Build, Organization, Site, User,
+} = require('../../../api/models');
 const S3SiteRemover = require('../../../api/services/S3SiteRemover');
 const siteErrors = require('../../../api/responses/siteErrors');
 const ProxyDataSync = require('../../../api/services/ProxyDataSync');
@@ -366,6 +368,51 @@ describe('Site API', () => {
         .catch(done);
     });
 
+    it('should create a new site from an existing repository and associate it to an org', async ( ) => {
+      const siteOwner = crypto.randomBytes(3).toString('hex');
+      const siteRepository = crypto.randomBytes(3).toString('hex');
+      const org = await factory.organization.create();
+
+      cfMockServices(siteOwner, siteRepository);
+
+      return factory.user()
+        .then((user) => {
+          githubAPINocks.userOrganizations({
+            accessToken: user.githubAccessToken,
+            organizations: [{ login: siteOwner }],
+          });
+
+          return authenticatedSession(user);
+        })
+        .then(cookie => request(app)
+          .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            owner: siteOwner,
+            repository: siteRepository,
+            defaultBranch: 'main',
+            engine: 'jekyll',
+            organizationId: org.id,
+          })
+          .set('Cookie', cookie)
+          .expect(200))
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site', 200, response.body);
+          return Site.findOne({
+            where: {
+              owner: siteOwner,
+              repository: siteRepository,
+            },
+            include: [Organization],
+          });
+        })
+        .then((site) => {
+          expect(site).to.not.be.undefined;
+          expect(site.Organization.id).to.equal(org.id);
+          expect(saveSiteStub.calledOnce).to.equal(true);
+        });
+    });
+
     it('should not call ProxyDataSync when FEATURE_PROXY_EDGE_DYNAMO=false', (done) => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
@@ -451,6 +498,52 @@ describe('Site API', () => {
           done();
         })
         .catch(done);
+    });
+
+    it('should create a new repo and site from a template and associate it to an org', async () => {
+      const siteOwner = crypto.randomBytes(3).toString('hex');
+      const siteRepository = crypto.randomBytes(3).toString('hex');
+      const org = await factory.organization.create();
+
+      nock.cleanAll();
+      githubAPINocks.repo();
+      githubAPINocks.webhook();
+
+      cfMockServices(siteOwner, siteRepository);
+
+      const createRepoNock = githubAPINocks.createRepoUsingTemplate({
+        org: siteOwner,
+        repo: siteRepository,
+      });
+
+      return authenticatedSession().then(cookie => request(app)
+        .post('/v0/site')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          owner: siteOwner,
+          repository: siteRepository,
+          defaultBranch: 'main',
+          engine: 'jekyll',
+          organizationId: org.id,
+          template: 'uswds2',
+        })
+        .set('Cookie', cookie)
+        .expect(200))
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site', 200, response.body);
+          return Site.findOne({
+            where: {
+              owner: siteOwner,
+              repository: siteRepository,
+            },
+            include: [Organization],
+          });
+        })
+        .then((site) => {
+          expect(site).to.not.be.undefined;
+          expect(site.Organization.id).to.equal(org.id);
+          expect(createRepoNock.isDone()).to.equal(true);
+        });
     });
 
     it('should respond with a 403 if no user or repository is specified', (done) => {

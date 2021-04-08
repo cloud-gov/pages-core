@@ -31,6 +31,16 @@ const associate = ({
     }
     return query;
   });
+
+  Organization.addScope('forUser', user => ({
+    include: [{
+      model: User,
+      required: true,
+      where: {
+        id: user.id,
+      },
+    }],
+  }));
 };
 
 module.exports = (sequelize, DataTypes) => {
@@ -47,5 +57,6 @@ module.exports = (sequelize, DataTypes) => {
 
   Organization.associate = associate;
   Organization.searchScope = search => ({ method: ['byIdOrName', search] });
+  Organization.forUser = user => Organization.scope({ method: ['forUser', user] });
   return Organization;
 };
