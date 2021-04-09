@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { ORGANIZATION } from '../../../propTypes';
-import { getOrgId, getSafeRepoName } from '../../../util';
+import { getOrgIdFromOrgData } from '../../../selectors/organization';
+import { getSafeRepoName } from '../../../util';
 import UserOrgSelect from '../../organization/UserOrgSelect';
 
 class TemplateSite extends React.Component {
@@ -31,7 +32,7 @@ class TemplateSite extends React.Component {
     const { handleSubmit, orgData } = this.props;
     const { repository, organizationId } = this.state;
 
-    const organization = getOrgId(organizationId, orgData);
+    const organization = getOrgIdFromOrgData(organizationId, orgData);
     const safeRepository = getSafeRepoName(repository);
     const site = {
       ...this.state,
@@ -152,7 +153,11 @@ TemplateSite.propTypes = {
   handleChooseActive: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
-  orgData: PropTypes.arrayOf(ORGANIZATION).isRequired,
+  orgData: PropTypes.arrayOf(ORGANIZATION),
+};
+
+TemplateSite.defaultProps = {
+  orgData: null,
 };
 
 export default TemplateSite;

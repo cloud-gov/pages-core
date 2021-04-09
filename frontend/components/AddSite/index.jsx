@@ -9,7 +9,7 @@ import AddRepoSiteForm from './AddRepoSiteForm';
 import AlertBanner from '../alertBanner';
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
-import { getOrgId } from '../../util';
+import { getOrgData, getOrgIdFromOrgData } from '../../selectors/organization';
 
 function getOwnerAndRepo(repoUrl) {
   const owner = repoUrl.split('/')[3];
@@ -44,7 +44,7 @@ export class AddSite extends React.Component {
   onCreateSiteSubmit({ repoUrl, engine, siteOrganizationId }) {
     const { orgData } = this.props;
     const { owner, repository } = getOwnerAndRepo(repoUrl);
-    const organizationId = getOrgId(siteOrganizationId, orgData);
+    const organizationId = getOrgIdFromOrgData(siteOrganizationId, orgData);
     siteActions.addSite({
       owner, repository, engine, organizationId,
     });
@@ -90,7 +90,7 @@ export class AddSite extends React.Component {
           </div>
           <h2>Use your own GitHub repository</h2>
           <AddRepoSiteForm
-            initialValues={{ engine: 'jekyll', siteOrganizationId: orgData[0] ? orgData[0].id : '' }}
+            initialValues={{ engine: 'jekyll', siteOrganizationId: orgData ? orgData[0].id : '' }}
             orgData={orgData}
             showAddNewSiteFields={showAddNewSiteFields}
             onSubmit={formSubmitFunc}
@@ -108,13 +108,14 @@ export class AddSite extends React.Component {
 
 AddSite.propTypes = {
   alert: ALERT,
-  orgData: PropTypes.arrayOf(ORGANIZATION).isRequired,
+  orgData: PropTypes.arrayOf(ORGANIZATION),
   showAddNewSiteFields: PropTypes.bool,
   user: USER,
 };
 
 AddSite.defaultProps = {
   alert: null,
+  orgData: null,
   showAddNewSiteFields: false,
   user: null,
 };
@@ -122,7 +123,7 @@ AddSite.defaultProps = {
 const mapStateToProps = ({
   alert, organizations, showAddNewSiteFields, user,
 }) => {
-  const orgData = organizations.data || [];
+  const orgData = getOrgData(organizations);
 
   return ({
     alert,

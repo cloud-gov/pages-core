@@ -94,7 +94,7 @@ export const AddRepoSiteForm = ({
 );
 
 AddRepoSiteForm.propTypes = {
-  orgData: PropTypes.arrayOf(ORGANIZATION).isRequired,
+  orgData: PropTypes.arrayOf(ORGANIZATION),
   showAddNewSiteFields: PropTypes.bool,
   initialValues: PropTypes.shape({
     engine: PropTypes.string.isRequired,
@@ -109,6 +109,7 @@ AddRepoSiteForm.propTypes = {
 };
 
 AddRepoSiteForm.defaultProps = {
+  orgData: null,
   showAddNewSiteFields: false,
 };
 
