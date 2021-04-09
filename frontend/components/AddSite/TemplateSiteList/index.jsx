@@ -78,9 +78,13 @@ TemplateList.propTypes = {
   // chellenging to describe with proptypes. Ignoring the rule here.
   // eslint-disable-next-line react/forbid-prop-types
   templates: PropTypes.object.isRequired,
-  orgData: PropTypes.arrayOf(ORGANIZATION).isRequired,
+  orgData: PropTypes.arrayOf(ORGANIZATION),
   handleSubmitTemplate: PropTypes.func.isRequired,
   defaultOwner: PropTypes.string.isRequired,
+};
+
+TemplateList.defaultProps = {
+  orgData: null,
 };
 
 const mapStateToProps = state => ({
