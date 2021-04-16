@@ -85,7 +85,7 @@ const revokeMembershipForInactiveUsers = async ({ auditorUsername } = {}) => {
       },
       username: {
         [Op.notIn]: orgAdmins.map(a => a.toLowerCase()),
-      }
+      },
     },
   });
 
