@@ -9,19 +9,15 @@ export const getOrgData = (state) => {
   return data;
 };
 
-export const getOrgIdFromOrgData = (id, orgDataArray) => {
-  if (!id && !orgDataArray) {
-    return null;
-  }
+export const hasOrgs = (state) => {
+  const { data } = state;
 
-  if (!id) {
-    return orgDataArray[0].id;
-  }
+  if (!data || data.length === 0) return false;
 
-  return id;
+  return true;
 };
 
-export const orgFilter = (state) => {
+export const orgFilterOptions = (state) => {
   const data = getOrgData(state);
 
   if (!data) return null;
@@ -36,6 +32,6 @@ export const orgFilter = (state) => {
 export default {
   getOrgById,
   getOrgData,
-  getOrgIdFromOrgData,
-  orgFilter,
+  hasOrgs,
+  orgFilterOptions,
 };

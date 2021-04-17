@@ -2,8 +2,8 @@ import { expect } from 'chai';
 import {
   getOrgById,
   getOrgData,
-  getOrgIdFromOrgData,
-  orgFilter,
+  hasOrgs,
+  orgFilterOptions,
 } from '../../../frontend/selectors/organization';
 
 describe('organzizationSelectors', () => {
@@ -45,32 +45,25 @@ describe('organzizationSelectors', () => {
     });
   });
 
-  describe('.getOrgIdFromOrgData', () => {
-    it('should return the id if it is defined', () => {
-      const id = 1;
-      const orgs = [{ id: 2 }, { id: 3 }];
-
-      expect(getOrgIdFromOrgData(id, orgs)).to.equal(id);
+  describe('.hasOrgs', () => {
+    it('returns true if organizations array has items', () => {
+      expect(hasOrgs(state)).to.be.true;
     });
 
-    it('should return the first org id from the array of orgs if id is undefined', () => {
-      const id = undefined;
-      const orgs = [{ id: 2 }, { id: 3 }];
-
-      expect(getOrgIdFromOrgData(id, orgs)).to.equal(orgs[0].id);
+    it('returns false if organizations data is an empty array', () => {
+      const noOrgState = { data: [] };
+      expect(hasOrgs(noOrgState)).to.be.false;
     });
 
-    it('should return null if org and id are undefined', () => {
-      const id = undefined;
-      const orgs = undefined;
-
-      expect(getOrgIdFromOrgData(id, orgs)).to.be.null;
+    it('returns false if organizations data is undefined', () => {
+      const noOrgState = {};
+      expect(hasOrgs(noOrgState)).to.be.false;
     });
   });
 
-  describe('.orgFilter', () => {
+  describe('.orgFilterOptions', () => {
     it('returns array of objects with id and name while adding the "All" and "Unassociated" options', () => {
-      const grouped = orgFilter(state);
+      const grouped = orgFilterOptions(state);
       expect(grouped[0]).to.deep.equal({ id: 'all-options', name: 'All' });
       expect(grouped[grouped.length - 1]).to.deep.equal({
         id: 'unassociated',
@@ -81,7 +74,7 @@ describe('organzizationSelectors', () => {
 
     it('returns null if there is not organizations', () => {
       const noOrganizations = {};
-      const grouped = orgFilter(noOrganizations);
+      const grouped = orgFilterOptions(noOrganizations);
       expect(grouped).to.be.null;
     });
   });
