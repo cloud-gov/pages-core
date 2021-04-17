@@ -142,7 +142,7 @@ describe('FederalistUsersHelper', () => {
       ]);
       const newUsers = inactiveUsers.concat(activeUsers);
       newUsers.forEach(user => addMember('federalist-users', user.username));
-      addMember('federalist-users', admin.username, 'admin');
+      addMember('federalist-users', admin.username.toUpperCase(), 'admin');
       expect(getOrg('federalist-users').length).to.equal(16);
       await FederalistUsersHelper.revokeMembershipForInactiveUsers({ auditorUsername: admin.username });
       expect(removeOrganizationMemberStub.callCount).to.equal(2);
