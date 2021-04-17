@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
-import { ORGANIZATION } from '../../propTypes';
+import { ORGANIZATIONS } from '../../propTypes';
 import GitHubRepoUrlField from '../Fields/GitHubRepoUrlField';
 import UserOrgSelect from '../organization/UserOrgSelect';
 import SelectSiteEngine from '../SelectSiteEngine';
 import AlertBanner from '../alertBanner';
+import { hasOrgs } from '../../selectors/organization';
 
 const showNewSiteAlert = () => {
   const message = (
@@ -27,7 +28,7 @@ export const AddRepoSiteForm = ({
   initialValues, // eslint-disable-line no-unused-vars
   pristine,
   handleSubmit,
-  orgData,
+  organizations,
   showAddNewSiteFields,
 }) => (
   <form onSubmit={handleSubmit}>
@@ -41,17 +42,20 @@ export const AddRepoSiteForm = ({
         readOnly={showAddNewSiteFields}
       />
       {
-        orgData ? (
+        hasOrgs(organizations) ? (
           <div className="form-group">
             <Field
-              name="siteOrganizationId"
+              name="repoOrganizationId"
+              type="select"
               component={p => (
                 <UserOrgSelect
-                  id="siteOrganizationId"
-                  name="siteOrganizationId"
+                  id="repoOrganizationId"
+                  name="repoOrganizationId"
                   value={p.input.value}
                   onChange={p.input.onChange}
-                  orgData={orgData}
+                  orgData={organizations.data}
+                  mustChooseOption
+                  {...p.meta}
                 />
               )}
             />
@@ -94,14 +98,10 @@ export const AddRepoSiteForm = ({
 );
 
 AddRepoSiteForm.propTypes = {
-  orgData: PropTypes.arrayOf(ORGANIZATION),
+  organizations: ORGANIZATIONS.isRequired,
   showAddNewSiteFields: PropTypes.bool,
   initialValues: PropTypes.shape({
     engine: PropTypes.string.isRequired,
-    siteOrganizationId: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number,
-    ]).isRequired,
   }).isRequired,
   // the following props are from reduxForm:
   handleSubmit: PropTypes.func.isRequired,
@@ -109,9 +109,23 @@ AddRepoSiteForm.propTypes = {
 };
 
 AddRepoSiteForm.defaultProps = {
-  orgData: null,
   showAddNewSiteFields: false,
 };
 
 // create a higher-order component with reduxForm and export that
-export default reduxForm({ form: 'addRepoSite' })(AddRepoSiteForm);
+export default reduxForm({
+  form: 'addRepoSite',
+  validate: ({ repoOrganizationId, repoUrl }, { organizations }) => {
+    const errors = {};
+
+    if (!repoUrl) {
+      errors.repoUrl = 'Please enter a Github repository URL';
+    }
+
+    if (hasOrgs(organizations) && !repoOrganizationId) {
+      errors.repoOrganizationId = 'Please select an Organization.';
+    }
+
+    return errors;
+  },
+})(AddRepoSiteForm);

@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 
-import { ALERT, ORGANIZATION, USER } from '../../propTypes';
+import { ALERT, ORGANIZATIONS, USER } from '../../propTypes';
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
 import AlertBanner from '../alertBanner';
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
-import { getOrgData, getOrgIdFromOrgData } from '../../selectors/organization';
+import { hasOrgs } from '../../selectors/organization';
 
 function getOwnerAndRepo(repoUrl) {
   const owner = repoUrl.split('/')[3];
@@ -41,10 +41,11 @@ export class AddSite extends React.Component {
     siteActions.addUserToSite({ owner, repository });
   }
 
-  onCreateSiteSubmit({ repoUrl, engine, siteOrganizationId }) {
-    const { orgData } = this.props;
+  onCreateSiteSubmit({ repoUrl, engine, repoOrganizationId }) {
+    const { organizations } = this.props;
     const { owner, repository } = getOwnerAndRepo(repoUrl);
-    const organizationId = getOrgIdFromOrgData(siteOrganizationId, orgData);
+
+    const organizationId = hasOrgs(organizations) ? repoOrganizationId : null;
     siteActions.addSite({
       owner, repository, engine, organizationId,
     });
@@ -63,7 +64,7 @@ export class AddSite extends React.Component {
   render() {
     // select the function to use on form submit based on
     // the showAddNewSiteFields flag
-    const { orgData, showAddNewSiteFields } = this.props;
+    const { organizations, showAddNewSiteFields } = this.props;
 
     const formSubmitFunc = showAddNewSiteFields
       ? this.onCreateSiteSubmit : this.onAddUserSubmit;
@@ -90,15 +91,15 @@ export class AddSite extends React.Component {
           </div>
           <h2>Use your own GitHub repository</h2>
           <AddRepoSiteForm
-            initialValues={{ engine: 'jekyll', siteOrganizationId: orgData ? orgData[0].id : '' }}
-            orgData={orgData}
+            initialValues={{ engine: 'jekyll' }}
+            organizations={organizations}
             showAddNewSiteFields={showAddNewSiteFields}
             onSubmit={formSubmitFunc}
           />
           <TemplateSiteList
             handleSubmitTemplate={this.onSubmitTemplate}
             defaultOwner={this.defaultOwner()}
-            orgData={orgData}
+            organizations={organizations}
           />
         </div>
       </div>
@@ -108,29 +109,24 @@ export class AddSite extends React.Component {
 
 AddSite.propTypes = {
   alert: ALERT,
-  orgData: PropTypes.arrayOf(ORGANIZATION),
+  organizations: ORGANIZATIONS.isRequired,
   showAddNewSiteFields: PropTypes.bool,
   user: USER,
 };
 
 AddSite.defaultProps = {
   alert: null,
-  orgData: null,
   showAddNewSiteFields: false,
   user: null,
 };
 
 const mapStateToProps = ({
   alert, organizations, showAddNewSiteFields, user,
-}) => {
-  const orgData = getOrgData(organizations);
-
-  return ({
-    alert,
-    orgData,
-    showAddNewSiteFields,
-    user,
-  });
-};
+}) => ({
+  alert,
+  organizations,
+  showAddNewSiteFields,
+  user,
+});
 
 export default connect(mapStateToProps)(AddSite);

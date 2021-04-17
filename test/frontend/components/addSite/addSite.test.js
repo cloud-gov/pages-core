@@ -24,13 +24,24 @@ const user = {
   },
 };
 
-const orgData = [{
-  id: 1,
-  name: 'org-1',
-}];
+const organizations = {
+  data: [{
+    id: 1,
+    name: 'org-1',
+  }],
+};
 
 const propsWithoutError = {
-  orgData,
+  organizations,
+  user,
+  showAddNewSiteFields: false,
+};
+
+const propsWithoutOrgs = {
+  organizations: {
+    isLoading: false,
+    data: [],
+  },
   user,
   showAddNewSiteFields: false,
 };
@@ -77,13 +88,12 @@ describe('<AddSite/>', () => {
     expect(templateListProps).to.deep.equal({
       handleSubmitTemplate: wrapper.instance().onSubmitTemplate,
       defaultOwner: propsWithoutError.user.data.username,
-      orgData: propsWithoutError.orgData,
+      organizations: propsWithoutError.organizations,
     });
     expect(formProps.onSubmit).to.equal(wrapper.instance().onAddUserSubmit);
     expect(formProps.showAddNewSiteFields).to.equal(propsWithoutError.showAddNewSiteFields);
     expect(formProps.initialValues).to.deep.equal({
       engine: 'jekyll',
-      siteOrganizationId: orgData[0].id,
     });
   });
 
@@ -106,8 +116,26 @@ describe('<AddSite/>', () => {
   it('calls addSite action when add site form is submitted and showAddNewSiteFields is true', () => {
     const repoUrl = 'https://github.com/boop/beeper-v2';
     const engine = 'vrooooom';
+    const repoOrganizationId = organizations.data[0].id;
 
     const props = { ...propsWithoutError };
+    props.showAddNewSiteFields = true;
+    wrapper = shallow(<Fixture {...props} />);
+
+    wrapper.find('ReduxForm').props().onSubmit({ repoUrl, engine, repoOrganizationId });
+    expect(addSite.calledWith({
+      owner: 'boop',
+      repository: 'beeper-v2',
+      engine,
+      organizationId: repoOrganizationId,
+    })).to.be.true;
+  });
+
+  it('calls addSite action when form is submitted with showAddNewSiteFields user has no orgs', () => {
+    const repoUrl = 'https://github.com/boop/beeper-v2';
+    const engine = 'vrooooom';
+
+    const props = { ...propsWithoutOrgs };
     props.showAddNewSiteFields = true;
     wrapper = shallow(<Fixture {...props} />);
 
@@ -116,7 +144,7 @@ describe('<AddSite/>', () => {
       owner: 'boop',
       repository: 'beeper-v2',
       engine,
-      organizationId: orgData[0].id,
+      organizationId: null,
     })).to.be.true;
   });
 
