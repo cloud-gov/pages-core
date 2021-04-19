@@ -21,7 +21,7 @@ describe('FederalistUsersHelper', () => {
   }
 
   const seedOrg = (orgName) => {
-    orgs[orgName] = Array(10).fill(0).map((a, index) => ({ login: `member-${index}`, team: `${index % 2}` }));
+    orgs[orgName] = Array(10).fill(0).map((a, index) => ({ login: `member-${index}`, role: 'member', team: `${index % 2}` }));
     return orgs[orgName];
   }
 
@@ -126,10 +126,10 @@ describe('FederalistUsersHelper', () => {
     afterEach( async () => {
       await User.truncate();
     });
-    it('should remove user created, pushed and signed in before x cutoff days', async () => {
-      const admin = await factory.user();
+    it('should remove user (not org admin) created, pushed and signed in before x cutoff days', async () => {
       const before = new Date('2020-02-02');
       const now = new Date();
+      const admin = await factory.user({ pushedAt: before, signedInAt: before, isActive: true });
       const inactiveUsers = await Promise.all([
         factory.user({ pushedAt: before, signedInAt: before, isActive: true }),
         factory.user({ pushedAt: before, signedInAt: before, isActive: true }),
@@ -142,10 +142,11 @@ describe('FederalistUsersHelper', () => {
       ]);
       const newUsers = inactiveUsers.concat(activeUsers);
       newUsers.forEach(user => addMember('federalist-users', user.username));
-      expect(getOrg('federalist-users').length).to.equal(15);
+      addMember('federalist-users', admin.username.toUpperCase(), 'admin');
+      expect(getOrg('federalist-users').length).to.equal(16);
       await FederalistUsersHelper.revokeMembershipForInactiveUsers({ auditorUsername: admin.username });
       expect(removeOrganizationMemberStub.callCount).to.equal(2);
-      expect(getOrg('federalist-users').length).to.equal(13);
+      expect(getOrg('federalist-users').length).to.equal(14);
     });
 
     it('should not remove user if created, pushed or signed in within x cutoff days', async () => {
@@ -164,10 +165,11 @@ describe('FederalistUsersHelper', () => {
       ]);
       const testUsers = oldCreatedAtUsers.concat(newCreatedAtUsers);    
       testUsers.forEach(user => addMember('federalist-users', user.username));
-      expect(getOrg('federalist-users').length).to.equal(15);
+      addMember('federalist-users', admin.username, 'admin');
+      expect(getOrg('federalist-users').length).to.equal(16);
       await FederalistUsersHelper.revokeMembershipForInactiveUsers({ auditorUsername: admin.username });
       expect(removeOrganizationMemberStub.callCount).to.equal(0);
-      expect(getOrg('federalist-users').length).to.equal(15);
+      expect(getOrg('federalist-users').length).to.equal(16);
     });
   });
 
@@ -179,9 +181,11 @@ describe('FederalistUsersHelper', () => {
       const admin = await factory.user();
       const users = await Promise.all(Array(5).fill(0).map((i) => factory.user()));
       users.forEach(user => addMember('federalist-users', user.username));
-      expect(getOrg('federalist-users').length).to.equal(15);
+      addMember('federalist-users', admin.username, 'admin');
+      addMember('federalist-users', 'non-user-admin', 'admin');
+      expect(getOrg('federalist-users').length).to.equal(17);
       await FederalistUsersHelper.removeMembersWhoAreNotUsers({ auditorUsername: admin.username });
-      expect(getOrg('federalist-users').length).to.equal(5);
+      expect(getOrg('federalist-users').length).to.equal(7);
     });
   });
 
