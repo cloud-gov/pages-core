@@ -52,10 +52,11 @@
 <Await on={queryPromise} let:response={payload}>
   <header class="usa-header usa-header--basic usa-header--megamenu">
     <div class="usa-nav-container">
-      <div class="usa-navbar">
+      <div class="usa-navbar controls">
         <div class="usa-logo" id="basic-mega-logo">
           <em class="usa-logo__text">{title || path}</em>
         </div>
+        <button class="usa-button usa-button--outline">+</button>
         <button class="usa-menu-btn">Menu</button>
       </div>
       <nav class="usa-nav">
@@ -205,5 +206,29 @@
     padding-left: .25rem;
     align-items: center;
     text-transform: lowercase;
+  }
+
+  .usa-logo {
+    margin: 0;
+  }
+  .usa-nav {
+    padding: 0;
+  }
+  .usa-header--megamenu {
+    height: 5rem;
+  }
+  .usa-nav-container {
+    height: 100%;
+    align-items: center;
+  }
+  .usa-header--megamenu {
+    height: 5rem;
+  }
+  .usa-navbar.controls {
+    display: flex;
+    align-items: center;
+  }
+  .usa-navbar.controls > *{
+    margin-right: 2rem;
   }
 </style>

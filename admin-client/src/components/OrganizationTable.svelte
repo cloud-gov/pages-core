@@ -15,7 +15,9 @@
     <th scope="col">Actions</th>
   </tr>
   <tr slot="item" let:item={org}>
-    <th scope="row">{org.name}</th>
+    <th scope="row">
+      <a href="/organizations/{org.id}/edit">{org.name}</a>
+    </th>
     <td>{formatDateTime(org.createdAt)}</td>
     <td>{formatDateTime(org.updatedAt)}</td>
     <td>

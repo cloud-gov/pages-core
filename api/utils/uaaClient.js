@@ -2,9 +2,12 @@ const request = require('request');
 const url = require('url');
 const config = require('../../config');
 
+const uaaOptions = config.passport.uaa;
+
 class UAAClient {
-  constructor(accessToken) {
+  constructor(accessToken, role) {
     this.accessToken = accessToken;
+    this.clientId = role === 'admin' ? uaaOptions.adminOptions.clientID : uaaOptions.options.clientID;
   }
 
   async verifyUserGroup(userId, groupNames = []) {
@@ -16,16 +19,19 @@ class UAAClient {
     return groups.filter(group => groupNames.includes(group.display)).length > 0;
   }
 
+  async inviteUser(email) {
+    const params = new URLSearchParams();
+    params.set('redirect_uri', config.hostname);
+    params.set('client_id', this.clientId);
+
+    const { new_invites: [invite] } = await this.request('POST', `/invite_users?${params.toString()}`, { emails: [email] });
+
+    return invite;
+  }
+
   request(method, path, json) {
     return new Promise((resolve, reject) => {
-      request({
-        method: method.toUpperCase(),
-        url: url.resolve(config.env.uaaHostUrl, path),
-        headers: {
-          Authorization: `Bearer ${this.accessToken}`,
-        },
-        json,
-      }, (error, response, body) => {
+      const callback = (error, response, body) => {
         const result = body ? JSON.parse(body) : {};
         const { error: bodyError } = result;
 
@@ -37,7 +43,22 @@ class UAAClient {
         } else {
           resolve(result);
         }
-      });
+      };
+
+      const options = {
+        method: method.toUpperCase(),
+        url: url.resolve(config.env.uaaHostUrl, path),
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+        },
+      };
+
+      if (json) {
+        options.json = true;
+        options.body = json;
+      }
+
+      request(options, callback);
     });
   }
 }
