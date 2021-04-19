@@ -58,6 +58,8 @@
   page('/users', queryString, render(Pages.Users));
   page('/events', queryString, render(Pages.Events));
   page('/organizations', queryString, render(Pages.Organizations));
+  page('/organizations/new', queryString, render(Pages.Organization));
+  page('/organizations/:id/edit', queryString, render(Pages.Organization));
   page('*', render(Pages.NotFound));
   page();
 </script>
