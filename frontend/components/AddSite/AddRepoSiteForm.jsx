@@ -8,6 +8,7 @@ import UserOrgSelect from '../organization/UserOrgSelect';
 import SelectSiteEngine from '../SelectSiteEngine';
 import AlertBanner from '../alertBanner';
 import { hasOrgs } from '../../selectors/organization';
+import { validAddRepoSiteForm } from '../../util/validators';
 
 const showNewSiteAlert = () => {
   const message = (
@@ -115,17 +116,5 @@ AddRepoSiteForm.defaultProps = {
 // create a higher-order component with reduxForm and export that
 export default reduxForm({
   form: 'addRepoSite',
-  validate: ({ repoOrganizationId, repoUrl }, { organizations }) => {
-    const errors = {};
-
-    if (!repoUrl) {
-      errors.repoUrl = 'Please enter a Github repository URL';
-    }
-
-    if (hasOrgs(organizations) && !repoOrganizationId) {
-      errors.repoOrganizationId = 'Please select an Organization.';
-    }
-
-    return errors;
-  },
+  validate: validAddRepoSiteForm,
 })(AddRepoSiteForm);
