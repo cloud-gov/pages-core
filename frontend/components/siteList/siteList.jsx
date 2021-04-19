@@ -4,9 +4,9 @@ import { Link } from '@reach/router';
 import { connect } from 'react-redux';
 
 import {
-  SITE, ALERT, USER, ORGANIZATION,
+  SITE, ALERT, USER, ORGANIZATIONS,
 } from '../../propTypes';
-import { getOrgById, orgFilter } from '../../selectors/organization';
+import { getOrgById, orgFilterOptions, hasOrgs } from '../../selectors/organization';
 import { groupSitesByOrg } from '../../selectors/site';
 import AlertBanner from '../alertBanner';
 import UserOrgSelect from '../organization/UserOrgSelect';
@@ -70,7 +70,7 @@ const getSites = (organizations, sites, user) => {
 };
 
 export const SiteList = ({
-  organizations, orgFilterOptions, sites, user, alert,
+  organizations, sites, user, alert,
 }) => {
   const [orgFilterValue, setOrgFilterValue] = useState('all-options');
   const groupedSites = groupSitesByOrg(sites, orgFilterValue);
@@ -103,7 +103,7 @@ export const SiteList = ({
         </div>
       </div>
       {
-        orgFilterOptions
+        hasOrgs(organizations)
           ? (
             <div className="page-header usa-grid-full">
               <div className="usa-width-one-third">
@@ -111,7 +111,7 @@ export const SiteList = ({
                   id="filter-sites-by-org"
                   label="Filter sites by organization."
                   name="filter-sites-by-org"
-                  orgData={orgFilterOptions}
+                  orgData={orgFilterOptions(organizations)}
                   value={orgFilterValue}
                   onChange={({ target: { value } }) => setOrgFilterValue(value)}
                 />
@@ -129,11 +129,7 @@ export const SiteList = ({
 
 SiteList.propTypes = {
   alert: ALERT,
-  organizations: PropTypes.shape({
-    data: PropTypes.arrayOf(ORGANIZATION),
-    isLoading: PropTypes.bool,
-  }),
-  orgFilterOptions: PropTypes.arrayOf(PropTypes.object),
+  organizations: ORGANIZATIONS.isRequired,
   sites: PropTypes.shape({
     data: PropTypes.arrayOf(SITE),
     isLoading: PropTypes.bool,
@@ -143,8 +139,6 @@ SiteList.propTypes = {
 
 SiteList.defaultProps = {
   alert: null,
-  organizations: null,
-  orgFilterOptions: null,
   sites: null,
 };
 
@@ -153,7 +147,6 @@ const mapStateToProps = ({
 }) => ({
   alert,
   organizations,
-  orgFilterOptions: orgFilter(organizations),
   sites,
   user: user.data,
 });

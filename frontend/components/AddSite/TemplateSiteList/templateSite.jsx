@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ORGANIZATION } from '../../../propTypes';
-import { getOrgId, getSafeRepoName } from '../../../util';
+import { ORGANIZATIONS } from '../../../propTypes';
+import { hasOrgs } from '../../../selectors/organization';
+import { getSafeRepoName } from '../../../util';
 import UserOrgSelect from '../../organization/UserOrgSelect';
 
 class TemplateSite extends React.Component {
@@ -10,36 +11,45 @@ class TemplateSite extends React.Component {
     super(props);
 
     this.state = {
+      error: null,
       owner: props.defaultOwner,
       repository: '',
       template: props.templateKey,
       organizationId: '',
+      touched: false,
     };
 
     this.handleChooseActive = this.handleChooseActive.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.validateOrgSelect = this.validateOrgSelect.bind(this);
   }
 
   handleChange(event) {
     const { name, value } = event.target;
-    this.setState({ [name]: value });
+    const orgValidation = this.validateOrgSelect(name, value);
+    this.setState({ [name]: value, ...orgValidation });
   }
 
   handleSubmit(event) {
     event.preventDefault();
-    const { handleSubmit, orgData } = this.props;
-    const { repository, organizationId } = this.state;
+    const { handleSubmit, organizations } = this.props;
+    const { repository, templateOrganizationId, ...rest } = this.state;
+    const validOrg = this.validateOrgSelect('templateOrganizationId', templateOrganizationId);
 
-    const organization = getOrgId(organizationId, orgData);
+    if (!validOrg.touched || validOrg.error) {
+      return this.setState({ ...validOrg });
+    }
+
+    const organizationId = hasOrgs(organizations) ? templateOrganizationId : null;
     const safeRepository = getSafeRepoName(repository);
     const site = {
-      ...this.state,
-      organizationId: organization,
+      ...rest,
+      organizationId,
       repository: safeRepository,
     };
 
-    handleSubmit(site);
+    return handleSubmit(site);
   }
 
   handleChooseActive() {
@@ -52,11 +62,23 @@ class TemplateSite extends React.Component {
     return active === index;
   }
 
+  validateOrgSelect(name, value) {
+    const { organizations } = this.props;
+
+    if (name === 'templateOrganizationId' && hasOrgs(organizations)) {
+      if (!value) return { touched: true, error: 'Please select an organization' };
+    }
+
+    return { touched: true, error: null };
+  }
+
   render() {
     const {
-      description, example, orgData, thumb, title,
+      description, example, organizations, thumb, title,
     } = this.props;
-    const { owner, organizationId, repository } = this.state;
+    const {
+      error, owner, organizationId, repository, touched,
+    } = this.state;
 
     return (
       <div className="federalist-template-list-item">
@@ -88,14 +110,17 @@ class TemplateSite extends React.Component {
                   onChange={this.handleChange}
                 />
                 {
-                  orgData ? (
+                  hasOrgs(organizations) ? (
                     <div className="form-group">
                       <UserOrgSelect
-                        id="organizationId"
-                        name="organizationId"
+                        error={error}
+                        id="templateOrganizationId"
+                        name="templateOrganizationId"
                         value={organizationId}
                         onChange={this.handleChange}
-                        orgData={orgData}
+                        orgData={organizations.data}
+                        mustChooseOption
+                        touched={touched}
                       />
                     </div>
                   ) : null
@@ -152,7 +177,7 @@ TemplateSite.propTypes = {
   handleChooseActive: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
-  orgData: PropTypes.arrayOf(ORGANIZATION).isRequired,
+  organizations: ORGANIZATIONS.isRequired,
 };
 
 export default TemplateSite;

@@ -1,31 +1,8 @@
 import { expect } from 'chai';
 
 import {
-  getOrgId, getSafeRepoName, groupLogs,
+  getSafeRepoName, groupLogs,
 } from '../../../frontend/util';
-
-describe('getOrgId', () => {
-  it('should return the id if it is defined', () => {
-    const id = 1;
-    const orgs = [{ id: 2 }, { id: 3 }];
-
-    expect(getOrgId(id, orgs)).to.equal(id);
-  });
-
-  it('should return the first org id from the array of orgs if id is undefined', () => {
-    const id = undefined;
-    const orgs = [{ id: 2 }, { id: 3 }];
-
-    expect(getOrgId(id, orgs)).to.equal(orgs[0].id);
-  });
-
-  it('should return null if org and id are undefined', () => {
-    const id = undefined;
-    const orgs = undefined;
-
-    expect(getOrgId(id, orgs)).to.be.null;
-  });
-});
 
 describe('getSafeRepoName', () => {
   it('returns safe repo names', () => {
