@@ -112,6 +112,7 @@ async function createData() {
   const [
     user1,
     user2,
+    userOrgless,
     managerNoGithub,
     managerWithGithub,
   ] = await Promise.all([
@@ -141,6 +142,15 @@ async function createData() {
       })
       .then(createUAAIdentity)
       .then(user => addUserToOrg(user, agency1, userRole)),
+
+    User
+      .create({
+        username: 'userorgless',
+        email: 'userorgless@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      })
+      .then(createUAAIdentity),
 
     // Manager without Github credentials
     User
@@ -203,7 +213,7 @@ async function createData() {
       domain: 'https://example.gov',
       owner: user1.username,
       repository: 'example-site',
-      users: [user1],
+      users: [user1, userOrgless],
     }),
 
     siteFactory({
