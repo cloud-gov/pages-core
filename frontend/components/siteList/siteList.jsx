@@ -17,8 +17,6 @@ import { IconPlus } from '../icons';
 import alertActions from '../../actions/alertActions';
 import userActions from '../../actions/userActions';
 
-const hasGithubAuth = user => !!user.email;
-
 const onGithubAuthSuccess = () => {
   userActions.fetchUser();
   alertActions.alertSuccess('Github authorization successful');
@@ -85,7 +83,7 @@ export const SiteList = ({
         </div>
         <div className="usa-width-one-third header-actions">
           {
-            hasGithubAuth(user)
+            user.hasGithubAuth
               ? (
                 <Link
                   to="/sites/new"
