@@ -10,19 +10,15 @@ const FederalistUsersHelper = require('../../../../api/services/FederalistUsersH
 
 describe('Site authorizer', () => {
   describe('.create(user, params)', () => {
-    beforeEach(() => {
-      Promise.all([
-        factory.organization.truncate(),
-        factory.role.truncate(),
-      ]);
-    });
+    beforeEach(() => Promise.all([
+      factory.organization.truncate(),
+      factory.role.truncate(),
+    ]));
 
-    afterEach(() => {
-      Promise.all([
-        factory.organization.truncate(),
-        factory.role.truncate(),
-      ]);
-    });
+    afterEach(() => Promise.all([
+      factory.organization.truncate(),
+      factory.role.truncate(),
+    ]));
 
     it('should resolve', async () => {
       const user = await factory.user();
@@ -57,7 +53,24 @@ describe('Site authorizer', () => {
       return expect(expected).to.be.undefined;
     });
 
-    // eslint-disable-next-line consistent-return
+    it('should throw an error for user without organizations and organizationId specified', async () => {
+      const user = await factory.user();
+      const params = {
+        owner: crypto.randomBytes(3).toString('hex'),
+        repository: crypto.randomBytes(3).toString('hex'),
+        defaultBranch: 'main',
+        engine: 'jekyll',
+        organizationId: 1,
+      };
+
+      const error = await authorizer.create(user, params)
+        .catch(err => err);
+
+      expect(error).to.be.throw;
+      expect(error.status).to.equal(404);
+      return expect(error.message).to.equal(siteErrors.NO_ASSOCIATED_ORGANIZATION);
+    });
+
     it('should throw an error for user with organizations and no organizationId specified', async () => {
       const [user, org, role] = await Promise.all([
         factory.user(),
@@ -72,15 +85,13 @@ describe('Site authorizer', () => {
       };
 
       await org.addUser(user, { through: { roleId: role.id } });
+      const error = await authorizer.create(user, params)
+        .catch(err => err);
 
-      try {
-        await authorizer.create(user, params);
-      } catch (error) {
-        return expect(error.message).to.equal(siteErrors.ORGANIZATION_REQUIRED);
-      }
+      expect(error).to.be.throw;
+      return expect(error.message).to.equal(siteErrors.ORGANIZATION_REQUIRED);
     });
 
-    // eslint-disable-next-line consistent-return
     it('should throw an error for user trying to add a site to an org they do not belong to', async () => {
       const [user, org, role] = await Promise.all([
         factory.user(),
@@ -96,13 +107,12 @@ describe('Site authorizer', () => {
       };
 
       await org.addUser(user, { through: { roleId: role.id } });
+      const error = await authorizer.create(user, params)
+        .catch(err => err);
 
-      try {
-        await authorizer.create(user, params);
-      } catch (error) {
-        expect(error.status).to.equal(404);
-        return expect(error.message).to.equal(siteErrors.NO_ASSOCIATED_ORGANIZATION);
-      }
+      expect(error).to.be.throw;
+      expect(error.status).to.equal(404);
+      return expect(error.message).to.equal(siteErrors.NO_ASSOCIATED_ORGANIZATION);
     });
   });
 
@@ -115,16 +125,13 @@ describe('Site authorizer', () => {
       return expect(expected).to.equal(site.id);
     });
 
-    // eslint-disable-next-line consistent-return
     it('should reject if the user is not associated with the site', async () => {
-      const user = await factory.user();
-      const site = await factory.site();
+      const [user, site] = await Promise.all([factory.user(), factory.site()]);
+      const error = await authorizer.findOne(user, site)
+        .catch(err => err);
 
-      try {
-        await authorizer.findOne(user, site);
-      } catch (error) {
-        return expect(error).to.equal(403);
-      }
+      expect(error).to.be.throw;
+      return expect(error).to.equal(403);
     });
   });
 
@@ -138,14 +145,12 @@ describe('Site authorizer', () => {
     });
 
     it('should reject if the user is not associated with the site', async () => {
-      const user = await factory.user();
-      const site = await factory.site();
+      const [user, site] = await Promise.all([factory.user(), factory.site()]);
+      const error = await authorizer.update(user, site)
+        .catch(err => err);
 
-      try {
-        await authorizer.update(user, site);
-      } catch (error) {
-        expect(error).to.equal(403);
-      }
+      expect(error).to.be.throw;
+      return expect(error).to.equal(403);
     });
   });
 
@@ -176,8 +181,7 @@ describe('Site authorizer', () => {
     });
 
     it('should reject if the user is not associated with the site', async () => {
-      const user = await factory.user();
-      const site = await factory.site();
+      const [user, site] = await Promise.all([factory.user(), factory.site()]);
 
       stub.rejects();
 
@@ -189,16 +193,15 @@ describe('Site authorizer', () => {
         }],
       });
 
-      try {
-        await authorizer.destroy(user, site);
-      } catch (error) {
-        expect(error.status).to.equal(403);
-      }
+      const error = await authorizer.destroy(user, site)
+        .catch(err => err);
+
+      expect(error).to.be.throw;
+      return expect(error.status).to.equal(403);
     });
 
     it('should accept if user is not assoc with the site but is feralist-users admin', async () => {
-      const user = await factory.user();
-      const site = await factory.site();
+      const [user, site] = await Promise.all([factory.user(), factory.site()]);
 
       stub.resolves([user.username]);
       githubAPINocks.repo({
@@ -213,7 +216,6 @@ describe('Site authorizer', () => {
       return expect(expected).to.be.undefined;
     });
 
-    // eslint-disable-next-line consistent-return
     it('should reject if the user is associated with the site but not an admin', async () => {
       const user = await factory.user();
       const site = await factory.site({ users: Promise.all([user]) });
@@ -227,12 +229,12 @@ describe('Site authorizer', () => {
         }],
       });
 
-      try {
-        await authorizer.destroy(user, site);
-      } catch (error) {
-        expect(error.status).to.equal(403);
-        return expect(error.message).to.equal(siteErrors.ADMIN_ACCESS_REQUIRED);
-      }
+      const error = await authorizer.destroy(user, site)
+        .catch(err => err);
+
+      expect(error).to.be.throw;
+      expect(error.status).to.equal(403);
+      return expect(error.message).to.equal(siteErrors.ADMIN_ACCESS_REQUIRED);
     });
 
     it('should accept if the user is associated with the site but site does not exist', async () => {
@@ -249,7 +251,6 @@ describe('Site authorizer', () => {
       return expect(expected).to.equal(site.id);
     });
 
-    // eslint-disable-next-line consistent-return
     it('should reject if the user is associated with the site but returns error', async () => {
       const user = await factory.user();
       const site = await factory.site({ users: Promise.all([user]) });
@@ -261,12 +262,12 @@ describe('Site authorizer', () => {
         response: [400, {}],
       });
 
-      try {
-        await authorizer.destroy(user, site);
-      } catch (error) {
-        expect(error.status).to.equal(403);
-        return expect(error.message).to.equal(siteErrors.ADMIN_ACCESS_REQUIRED);
-      }
+      const error = await authorizer.destroy(user, site)
+        .catch(err => err);
+
+      expect(error).to.be.throw;
+      expect(error.status).to.equal(403);
+      return expect(error.message).to.equal(siteErrors.ADMIN_ACCESS_REQUIRED);
     });
   });
 });

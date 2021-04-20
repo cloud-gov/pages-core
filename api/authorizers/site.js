@@ -60,6 +60,15 @@ const create = async (user, siteParams) => {
   const { organizationId } = siteParams;
   const organizations = await Organization.forUser(user).findAll();
 
+  if (organizations.length === 0 && !organizationId) return;
+
+  if (organizations.length === 0 && organizationId) {
+    throw {
+      message: siteErrors.NO_ASSOCIATED_ORGANIZATION,
+      status: 404,
+    };
+  }
+
   if (organizations.length > 0 && !organizationId) {
     throw {
       message: siteErrors.ORGANIZATION_REQUIRED,
