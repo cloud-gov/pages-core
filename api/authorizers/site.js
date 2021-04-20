@@ -55,34 +55,42 @@ function authorizeFederalistUsersAdmin(user) {
     });
 }
 
-const create = async (user, siteParams) => {
-  const { organizationId } = siteParams;
-  const organizations = await Organization.forUser(user).findAll();
+const createWithOrgs = (organizations, organizationId) => {
+  if (!organizationId) {
+    throw {
+      message: siteErrors.ORGANIZATION_REQUIRED,
+    };
+  }
 
-  if (organizations.length === 0) {
-    if (!organizationId) return;
+  const hasOrg = organizations.find(org => org.id === organizationId);
 
+  if (!hasOrg) {
     throw {
       message: siteErrors.NO_ASSOCIATED_ORGANIZATION,
       status: 404,
     };
   }
+};
+
+const createWithoutOrgs = (organizationId) => {
+  if (!organizationId) return;
+
+  throw {
+    message: siteErrors.NO_ASSOCIATED_ORGANIZATION,
+    status: 404,
+  };
+};
+
+const create = async (user, siteParams) => {
+  const { organizationId } = siteParams;
+  const organizations = await Organization.forUser(user).findAll();
+
+  if (organizations.length === 0) {
+    createWithoutOrgs(organizationId);
+  }
 
   if (organizations.length > 0) {
-    if (!organizationId) {
-      throw {
-        message: siteErrors.ORGANIZATION_REQUIRED,
-      };
-    }
-
-    const hasOrg = organizations.find(org => org.id === organizationId);
-
-    if (!hasOrg) {
-      throw {
-        message: siteErrors.NO_ASSOCIATED_ORGANIZATION,
-        status: 404,
-      };
-    }
+    createWithOrgs(organizations, organizationId);
   }
 };
 
