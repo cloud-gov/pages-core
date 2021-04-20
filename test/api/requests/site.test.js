@@ -37,10 +37,20 @@ describe('Site API', () => {
     saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').resolves();
     sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
     sinon.stub(EventCreator, 'error').resolves();
+
+    return Promise.all([
+      factory.organization.truncate(),
+      factory.role.truncate(),
+    ]);
   });
 
   afterEach(() => {
     sinon.restore();
+
+    return Promise.all([
+      factory.organization.truncate(),
+      factory.role.truncate(),
+    ]);
   });
 
   after(() => {
@@ -368,14 +378,17 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should create a new site from an existing repository and associate it to an org', async ( ) => {
+    it('should create a new site from an existing repository and associate it to an org', async () => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
       const org = await factory.organization.create();
+      const role = await factory.role.create();
 
       cfMockServices(siteOwner, siteRepository);
 
       return factory.user()
+        .then(user => org.addUser(user, { through: { roleId: role.id } })
+          .then(() => user))
         .then((user) => {
           githubAPINocks.userOrganizations({
             accessToken: user.githubAccessToken,
@@ -503,7 +516,12 @@ describe('Site API', () => {
     it('should create a new repo and site from a template and associate it to an org', async () => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
+      const user = await factory.user();
       const org = await factory.organization.create();
+      const role = await factory.role.create();
+      await org.addUser(user, { through: { roleId: role.id } });
+
+      cfMockServices(siteOwner, siteRepository);
 
       nock.cleanAll();
       githubAPINocks.repo();
@@ -516,7 +534,7 @@ describe('Site API', () => {
         repo: siteRepository,
       });
 
-      return authenticatedSession().then(cookie => request(app)
+      return authenticatedSession(user).then(cookie => request(app)
         .post('/v0/site')
         .set('x-csrf-token', csrfToken.getToken())
         .send({
