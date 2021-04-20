@@ -14,32 +14,32 @@ const NO_SITE_TEXT = 'No sites yet.';
 const STORE_WITH_SITES = {
   organizations: { isLoading: false, data: [] },
   sites: { isLoading: false, data: [{ id: 5 }, { id: 2 }, { id: 8 }] },
-  user: { email: 'foo@bar.com' },
+  user: { hasGithubAuth: true },
 };
 
 const STORE_WITH_SITES_WITH_ORGS = {
   hasOrganizations: true,
   organizations: { isLoading: false, data: [{ id: 1, name: 'org-1' }] },
   sites: { isLoading: false, data: [{ id: 5 }, { id: 2 }, { id: 8 }] },
-  user: { email: 'foo@bar.com' },
+  user: { hasGithubAuth: true },
 };
 
 const STORE_WITH_NO_SITES = {
   organizations: { isLoading: false, data: [] },
   sites: { isLoading: false, data: [] },
-  user: { email: 'foo@bar.com' },
+  user: { hasGithubAuth: true },
 };
 
 const STORE_LOADING_SITES = {
   organizations: { isLoading: true },
   sites: { isLoading: true },
-  user: { email: 'foo@bar.com' },
+  user: { hasGithubAuth: true },
 };
 
 const STORE_WITH_NO_SITES_OR_GH_AUTH = {
   organizations: { isLoading: false, data: [] },
   sites: { isLoading: false, data: [] },
-  user: {},
+  user: { hasGithubAuth: false },
 };
 
 describe('<SiteList />', () => {
