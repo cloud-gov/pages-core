@@ -68,6 +68,7 @@ const revokeMembershipForInactiveUsers = async ({ auditorUsername } = {}) => {
   const now = moment();
   const cutoff = now.clone().subtract(MAX_DAYS_SINCE_LOGIN, 'days').toDate();
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
+  const orgAdmins = await federalistUsersAdmins(githubAccessToken);
 
   const users = await User.findAll({
     attributes: ['username'],
@@ -81,6 +82,9 @@ const revokeMembershipForInactiveUsers = async ({ auditorUsername } = {}) => {
       },
       createdAt: {
         [Op.lt]: cutoff,
+      },
+      username: {
+        [Op.notIn]: orgAdmins.map(a => a.toLowerCase()),
       },
     },
   });
@@ -101,9 +105,8 @@ const removeMembersWhoAreNotUsers = async ({ auditorUsername } = {}) => {
   const allUsernames = allUsers.map(user => user.username);
 
   const allMembers = await GitHub
-    .getOrganizationMembers(githubAccessToken, config.federalistUsers.orgName);
+    .getOrganizationMembers(githubAccessToken, config.federalistUsers.orgName, 'member');
   const allMemberLogins = allMembers.map(member => member.login);
-
   const memberLoginsToRemove = allMemberLogins
     .filter(login => !allUsernames.includes(login.toLowerCase()));
   return Promise.allSettled(memberLoginsToRemove

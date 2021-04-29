@@ -12,27 +12,34 @@ const NO_SITE_TEXT = 'No sites yet.';
 
 // sites can be empty as the test is rendering empty divs for children.
 const STORE_WITH_SITES = {
-  organizations: { isLoading: false, data: [{ id: 1 }] },
+  organizations: { isLoading: false, data: [] },
   sites: { isLoading: false, data: [{ id: 5 }, { id: 2 }, { id: 8 }] },
-  user: { email: 'foo@bar.com' },
+  user: { hasGithubAuth: true },
+};
+
+const STORE_WITH_SITES_WITH_ORGS = {
+  hasOrganizations: true,
+  organizations: { isLoading: false, data: [{ id: 1, name: 'org-1' }] },
+  sites: { isLoading: false, data: [{ id: 5 }, { id: 2 }, { id: 8 }] },
+  user: { hasGithubAuth: true },
 };
 
 const STORE_WITH_NO_SITES = {
   organizations: { isLoading: false, data: [] },
   sites: { isLoading: false, data: [] },
-  user: { email: 'foo@bar.com' },
+  user: { hasGithubAuth: true },
 };
 
 const STORE_LOADING_SITES = {
   organizations: { isLoading: true },
   sites: { isLoading: true },
-  user: { email: 'foo@bar.com' },
+  user: { hasGithubAuth: true },
 };
 
 const STORE_WITH_NO_SITES_OR_GH_AUTH = {
   organizations: { isLoading: false, data: [] },
   sites: { isLoading: false, data: [] },
-  user: {},
+  user: { hasGithubAuth: false },
 };
 
 describe('<SiteList />', () => {
@@ -106,6 +113,19 @@ describe('<SiteList />', () => {
     it('renders sites in ascending order by id', () => {
       const items = wrapper.find(SiteListItem);
       expect(items.getElements().map(e => e.key)).to.deep.equal(['2', '5', '8']);
+    });
+  });
+
+  describe('when organizations are received as props', () => {
+    it('renders a container for the filtering of sites by org', () => {
+      wrapper = shallow(<SiteList {...STORE_WITH_SITES_WITH_ORGS} />);
+      expect(wrapper.find('#filter-sites-by-org')).to.have.length(1);
+    });
+
+    it('renders no container for the filtering of sites by org', () => {
+      const store = { ...STORE_WITH_SITES };
+      wrapper = shallow(<SiteList {...store} />);
+      expect(wrapper.find('#filter-sites-by-org')).to.have.length(0);
     });
   });
 });

@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { ORGANIZATION } from '../../../propTypes';
+import { ORGANIZATIONS } from '../../../propTypes';
 import TemplateSite from './templateSite';
 
 const templateGrid = (
@@ -10,7 +10,7 @@ const templateGrid = (
   defaultOwner,
   handleChooseActive,
   handleSubmit,
-  orgData,
+  organizations,
   templates
 ) => (
   Object.keys(templates).map((templateKey, index) => {
@@ -26,7 +26,7 @@ const templateGrid = (
           handleChooseActive={handleChooseActive}
           handleSubmit={handleSubmit}
           defaultOwner={defaultOwner}
-          orgData={orgData}
+          organizations={organizations}
           {...template}
         />
       </div>
@@ -53,7 +53,7 @@ export class TemplateList extends React.Component {
 
   render() {
     const {
-      defaultOwner, handleSubmitTemplate, orgData, templates,
+      defaultOwner, handleSubmitTemplate, organizations, templates,
     } = this.props;
     const { handleChooseActive, state: { activeChildId } } = this;
 
@@ -65,7 +65,7 @@ export class TemplateList extends React.Component {
           defaultOwner,
           handleChooseActive,
           handleSubmitTemplate,
-          orgData,
+          organizations,
           templates
         )}
       </div>
@@ -78,12 +78,13 @@ TemplateList.propTypes = {
   // chellenging to describe with proptypes. Ignoring the rule here.
   // eslint-disable-next-line react/forbid-prop-types
   templates: PropTypes.object.isRequired,
-  orgData: PropTypes.arrayOf(ORGANIZATION).isRequired,
+  organizations: ORGANIZATIONS.isRequired,
   handleSubmitTemplate: PropTypes.func.isRequired,
   defaultOwner: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = ({ organizations, ...state }) => ({
+  organizations,
   templates: state.FRONTEND_CONFIG.TEMPLATES,
 });
 

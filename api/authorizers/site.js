@@ -1,6 +1,6 @@
 const GitHub = require('../services/GitHub');
 const siteErrors = require('../responses/siteErrors');
-const { User, Site } = require('../models');
+const { Organization, Site, User } = require('../models');
 const FederalistUsersHelper = require('../services/FederalistUsersHelper');
 
 const authorize = ({ id }, site) => (
@@ -55,8 +55,45 @@ function authorizeFederalistUsersAdmin(user) {
     });
 }
 
-// create is allowed for all
-const create = () => Promise.resolve();
+const createWithOrgs = (organizations, organizationId) => {
+  if (!organizationId) {
+    throw {
+      message: siteErrors.ORGANIZATION_REQUIRED,
+    };
+  }
+
+  const hasOrg = organizations.find(org => org.id === organizationId);
+
+  if (!hasOrg) {
+    throw {
+      message: siteErrors.NO_ASSOCIATED_ORGANIZATION,
+      status: 404,
+    };
+  }
+};
+
+const createWithoutOrgs = (organizationId) => {
+  if (!organizationId) return;
+
+  throw {
+    message: siteErrors.NO_ASSOCIATED_ORGANIZATION,
+    status: 404,
+  };
+};
+
+const create = async (user, siteParams) => {
+  const { organizationId } = siteParams;
+  const organizations = await Organization.forUser(user).findAll();
+
+  if (organizations.length === 0) {
+    createWithoutOrgs(organizationId);
+  }
+
+  if (organizations.length > 0) {
+    createWithOrgs(organizations, organizationId);
+  }
+};
+
 const addUser = () => Promise.resolve();
 
 const createBuild = (user, site) => authorize(user, site);
