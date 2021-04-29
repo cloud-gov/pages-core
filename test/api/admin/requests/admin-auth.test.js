@@ -8,7 +8,7 @@ const { sessionForCookie } = require('../../support/cookieSession');
 const { unauthenticatedSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 
-const { adminOptions: uaaConfig } = require('../../../../config').passport.uaa;
+const { options: uaaConfig } = require('../../../../config').passport.uaa;
 
 const app = require('../../../../app');
 
@@ -46,8 +46,8 @@ describe('Admin authentication request', () => {
         ...profile,
       });
 
-      cfUAANock.uaaAuth(profile, code);
-      cfUAANock.getUser(uaaId, userProfile);
+      cfUAANock.mockUAAAuth(profile, code);
+      cfUAANock.mockVerifyUserGroup(uaaId, userProfile);
 
       return request(app)
         .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
@@ -80,8 +80,8 @@ describe('Admin authentication request', () => {
       });
 
       beforeEach(() => {
-        cfUAANock.uaaAuth(uaaUserProfile, code);
-        cfUAANock.getUser(uaaId, uaaUserInfo);
+        cfUAANock.mockUAAAuth(uaaUserProfile, code);
+        cfUAANock.mockVerifyUserGroup(uaaId, uaaUserInfo);
       });
 
       it('returns a script tag', (done) => {

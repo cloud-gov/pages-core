@@ -29,36 +29,23 @@ oauth:
   user:
     authorities:
       - openid
-      - scim.me
-      - scim.read
+      - scim.invite
+      - groups.update
 
   clients:
-    admin-client:
-      id: admin-client
-      name: Admin client
-      override: true
-      scope: scim.read,openid
-      authorized-grant-types: authorization_code,client_credentials,refresh_token
-      authorities: uaa.none
-      access-token-validity: 600
-      refresh-token-validity: 259200
-      autoapprove: true
-      app-launch-url: http://localhost:1337
-      redirect-uri: http://localhost:1337/admin/auth/uaa/callback
-      secret: admin-client-secret
     user-client:
-      id: user-client
+      id: client-id
       name: User client
       override: true
-      scope: scim.read,openid
-      authorized-grant-types: authorization_code,client_credentials,refresh_token
-      authorities: uaa.none
+      scope: openid,scim.invite,groups.update
+      authorized-grant-types: authorization_code,client_credentials
+      authorities: scim.write,scim.read
       access-token-validity: 600
       refresh-token-validity: 259200
       autoapprove: true
       app-launch-url: http://localhost:1337
-      redirect-uri: http://localhost:1337/auth/uaa/callback
-      secret: user-client-secret
+      redirect-uri: http://localhost:1337/auth/uaa/callback,http://localhost:1337/admin/auth/uaa/callback
+      secret: client-secret
 login:
   serviceProviderKey: |
     -----BEGIN RSA PRIVATE KEY-----

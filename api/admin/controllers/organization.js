@@ -37,15 +37,20 @@ module.exports = wrapHandlers({
 
   async create(req, res) {
     const {
-      body: { githubUsername, managerUAAEmail, name },
+      body: { managerGithubUsername, managerUAAEmail, name },
       user,
     } = req;
 
-    const org = await OrganizationService.createOrganization(
-      user, name, managerUAAEmail, githubUsername
+    const [org, invite] = await OrganizationService.createOrganization(
+      user, name, managerUAAEmail, managerGithubUsername
     );
 
-    return res.json(serialize(org));
+    const json = {
+      invite: invite && { email: invite.email, link: invite.inviteLink },
+      org: serialize(org),
+    };
+
+    return res.json(json);
   },
 
   async update(req, res) {

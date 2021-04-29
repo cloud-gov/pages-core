@@ -8,8 +8,9 @@
     PaginationBanner,
   } from '.';
 
-  export let query;
   export let path;
+  export let query;
+  export let addAction = false;
   export let fields = {};
   export let title = null;
   export let expanded = false;
@@ -56,7 +57,11 @@
         <div class="usa-logo" id="basic-mega-logo">
           <em class="usa-logo__text">{title || path}</em>
         </div>
-        <button class="usa-button usa-button--outline">+</button>
+        {#if addAction}
+          <a class="usa-button usa-button--outline" href={`${path}/new`}>
+            +
+          </a>
+        {/if}
         <button class="usa-menu-btn">Menu</button>
       </div>
       <nav class="usa-nav">
@@ -143,13 +148,11 @@
     <div class="tag-container usa-nav-container margin-bottom-2">
       {#each filtersWithValues as key}
         <span class="usa-tag">
-          <button
-            class="usa-button usa-button--unstyled"
-            on:click={() => handleTagClick({ [key]: '' })}
-          >
-          <svg class="usa-icon margin-right-1" aria-hidden="true" focusable="false" role="img">
-            <use xlink:href="/img/sprite.svg#close"></use>
-          </svg>
+          <button class="usa-button usa-button--unstyled"
+                  on:click={() => handleTagClick({ [key]: '' })}>
+            <svg class="usa-icon margin-right-1" aria-hidden="true" focusable="false" role="img">
+              <use xlink:href="/img/sprite.svg#close"></use>
+            </svg>
           </button>
           {key}: <b>{params[key]}</b>
         </span>

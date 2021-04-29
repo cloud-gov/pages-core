@@ -294,8 +294,8 @@ describe('Authentication requests', () => {
           const oauthState = 'state-123abc';
           const code = 'code';
 
-          cfUAANocks.uaaAuth(uaaUserProfile, code);
-          cfUAANocks.getUser(uaaId, uaaUserInfo);
+          cfUAANocks.mockUAAAuth(uaaUserProfile, code);
+          cfUAANocks.mockVerifyUserGroup(uaaId, uaaUserInfo);
 
           const cookie = await unauthenticatedSession({ oauthState });
 
@@ -326,8 +326,8 @@ describe('Authentication requests', () => {
           const oauthState = 'state-123abc';
           const code = 'code';
 
-          cfUAANocks.uaaAuth(profile, code);
-          cfUAANocks.getUser(uaaId, userProfile);
+          cfUAANocks.mockUAAAuth(profile, code);
+          cfUAANocks.mockVerifyUserGroup(uaaId, userProfile);
 
           const cookie = await unauthenticatedSession({ oauthState });
 
@@ -371,8 +371,8 @@ describe('Authentication requests', () => {
         const oauthState = 'state-123abc';
         const code = 'code';
 
-        cfUAANocks.uaaAuth(uaaUserProfile, code);
-        cfUAANocks.getUser(uaaId, uaaUserInfo);
+        cfUAANocks.mockUAAAuth(uaaUserProfile, code);
+        cfUAANocks.mockVerifyUserGroup(uaaId, uaaUserInfo);
 
         const session = await unauthenticatedSession({ oauthState, authRedirectPath });
 

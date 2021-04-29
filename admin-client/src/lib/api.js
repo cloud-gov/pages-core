@@ -101,7 +101,7 @@ async function fetchEvents(query = {}) {
 }
 
 async function createOrganization(params) {
-  return post('/organizations', params).catch(() => null);
+  return post('/organizations', params);
 }
 
 async function fetchOrganization(id) {
@@ -113,7 +113,7 @@ async function fetchOrganizations(query = {}) {
 }
 
 async function updateOrganization(id, params) {
-  return put(`/organizations/${id}`, params).catch(() => null);
+  return put(`/organizations/${id}`, params);
 }
 
 async function fetchSite(id) {
