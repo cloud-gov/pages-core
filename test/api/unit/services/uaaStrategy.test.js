@@ -37,7 +37,7 @@ describe('verifyUAAUser', () => {
       email: identity.email,
     });
 
-    cfUAANock.getUser(uaaId, uaaUserResponse, accessToken);
+    cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
 
     expect(identity.accessToken).to.be.null;
     expect(identity.refreshToken).to.be.null;
@@ -73,7 +73,7 @@ describe('verifyUAAUser', () => {
       email: identity.email,
     });
 
-    cfUAANock.getUser(uaaId, uaaUserResponse, accessToken);
+    cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
 
     const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, ['group.three']);
     return expect(result).to.be.null;
@@ -98,7 +98,7 @@ describe('verifyUAAUser', () => {
       email,
     });
 
-    cfUAANock.getUser(uaaId, uaaUserResponse, accessToken);
+    cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
 
     const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, ['group.three']);
     return expect(result).to.be.null;
@@ -124,7 +124,7 @@ describe('verifyUAAUser', () => {
       email: identity.email,
     });
 
-    cfUAANock.getUser(uaaId, uaaUserResponse, accessToken);
+    cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
 
     await user.destroy();
 

@@ -5,13 +5,6 @@ const clientSecret = env.GITHUB_CLIENT_SECRET || 'not_set';
 
 const url = path => `${env.APP_HOSTNAME}${path}`;
 
-const uaaOptions = {
-  authorizationURL: `${env.UAA_HOST}/oauth/authorize`,
-  tokenURL: `${env.UAA_HOST}/oauth/token`,
-  userURL: `${env.UAA_HOST}/userinfo`,
-  logoutURL: `${env.UAA_HOST}/logout.do`,
-};
-
 module.exports = {
   github: {
     options: {
@@ -39,16 +32,12 @@ module.exports = {
     ],
   },
   uaa: {
-    host: env.UAA_HOST,
     options: {
-      ...uaaOptions,
-      callbackURL: url('/auth/uaa/callback'),
-      logoutCallbackURL: url('/auth/uaa/logout'),
-    },
-    adminOptions: {
-      ...uaaOptions,
-      callbackURL: url('/admin/auth/uaa/callback'),
-      logoutCallbackURL: url('/admin/auth/uaa/logout'),
+      authorizationURL: `${env.UAA_HOST}/oauth/authorize`,
+      tokenURL: `${env.UAA_HOST_DOCKER_URL || env.UAA_HOST}/oauth/token`,
+      userURL: `${env.UAA_HOST_DOCKER_URL || env.UAA_HOST}/userinfo`,
+      logoutURL: `${env.UAA_HOST}/logout.do`,
+      scope: ['openid', 'scim.invite', 'groups.update'],
     },
   },
 };

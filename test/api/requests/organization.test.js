@@ -19,7 +19,6 @@ describe('Organization API', () => {
   function clean() {
     return Promise.all([
       Organization.truncate({ force: true, cascade: true }),
-      Role.truncate({ cascade: true }),
       User.truncate({ force: true, cascade: true }),
     ]);
   }
@@ -43,8 +42,8 @@ describe('Organization API', () => {
         factory.user(),
         factory.organization.create(),
         factory.organization.create(),
-        Role.create({ name: 'role1' }),
-        Role.create({ name: 'role2' }),
+        Role.findOne({ name: 'user' }),
+        Role.findOne({ name: 'manager' }),
         factory.organization.create(),
       ]);
 

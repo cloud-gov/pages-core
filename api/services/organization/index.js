@@ -1,6 +1,6 @@
-const { createOrganization, inviteUserToOrganization } = require('./Organization');
+const OrganizationService = require('./Organization');
 
 module.exports = {
-  createOrganization,
-  inviteUserToOrganization,
+  createOrganization: OrganizationService.createOrganization.bind(OrganizationService),
+  inviteUserToOrganization: OrganizationService.inviteUserToOrganization.bind(OrganizationService),
 };

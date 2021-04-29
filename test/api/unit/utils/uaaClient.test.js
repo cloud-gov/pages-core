@@ -6,149 +6,149 @@ const cfUAANock = require('../../support/cfUAANock');
 const { uaaUser } = require('../../support/factory/uaa-identity');
 
 describe('UAAClient', () => {
+  let uaaClient;
+
+  beforeEach(() => {
+    uaaClient = new UAAClient();
+  });
+
+  afterEach(() => nock.cleanAll());
+
   describe('.verifyUserGroup()', () => {
-    afterEach(() => nock.cleanAll());
-
     it('should verify an active user', async () => {
-      const accessToken = 'a-token';
-      const username = 'a-user@example.gov';
       const groupName = 'users-group';
-      const groupNames = [groupName];
-      const groups = [{ display: 'group-1' }, { display: groupName }];
-      const userIdentity = uaaUser({ username, groups });
+      const allowedGroupNames = [groupName];
+      const userGroups = [{ display: 'group-1' }, { display: groupName }];
+      const userIdentity = uaaUser({ groups: userGroups });
 
-      const uaaClient = new UAAClient(accessToken);
+      cfUAANock.mockVerifyUserGroup(userIdentity.id, userIdentity);
 
-      cfUAANock.getUser(userIdentity.id, userIdentity, accessToken);
+      const verified = await uaaClient.verifyUserGroup(userIdentity.id, allowedGroupNames);
 
-      const verified = await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
       return expect(verified).to.be.true;
     });
 
     it('should verify an active user when one of the group names matches', async () => {
-      const accessToken = 'a-token';
-      const username = 'a-user@example.gov';
       const groupName = 'users-group';
-      const groupNames = [groupName, 'another-group'];
-      const groups = [{ display: 'group-1' }, { display: groupName }];
-      const userIdentity = uaaUser({ username, groups });
+      const allowedGroupNames = [groupName, 'another-group'];
+      const userGroups = [{ display: 'group-1' }, { display: groupName }];
+      const userIdentity = uaaUser({ groups: userGroups });
 
-      const uaaClient = new UAAClient(accessToken);
+      cfUAANock.mockVerifyUserGroup(userIdentity.id, userIdentity);
 
-      cfUAANock.getUser(userIdentity.id, userIdentity, accessToken);
+      const verified = await uaaClient.verifyUserGroup(userIdentity.id, allowedGroupNames);
 
-      const verified = await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
       return expect(verified).to.be.true;
     });
 
     it('should verify a user with cloud.gov origin and verified email', async () => {
-      const accessToken = 'a-token';
-      const username = 'a-user@example.gov';
       const groupName = 'users-group';
-      const groupNames = [groupName];
-      const groups = [{ display: 'group-1' }, { display: groupName }];
-      const origin = 'cloud.gov';
-      const verified = true;
+      const allowedGroupNames = [groupName];
+      const userGroups = [{ display: 'group-1' }, { display: groupName }];
       const userIdentity = uaaUser({
-        username, groups, origin, verified,
+        groups: userGroups,
+        origin: 'cloud.gov',
+        verified: true,
       });
 
-      const uaaClient = new UAAClient(accessToken);
+      cfUAANock.mockVerifyUserGroup(userIdentity.id, userIdentity);
 
-      cfUAANock.getUser(userIdentity.id, userIdentity, accessToken);
+      const userVerified = await uaaClient.verifyUserGroup(userIdentity.id, allowedGroupNames);
 
-      const userVerified = await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
       return expect(userVerified).to.be.true;
     });
 
     it('should not verify a user with cloud.gov origin and unverified verified email', async () => {
-      const accessToken = 'a-token';
-      const username = 'a-user@example.gov';
       const groupName = 'users-group';
-      const groupNames = [groupName];
-      const groups = [{ display: 'group-1' }, { display: groupName }];
-      const origin = 'cloud.gov';
-      const verified = false;
-      const userIdentity = uaaUser({ username, groups, origin, verified });
+      const allowedGroupNames = [groupName];
+      const userGroups = [{ display: 'group-1' }, { display: groupName }];
+      const userIdentity = uaaUser({
+        groups: userGroups,
+        origin: 'cloud.gov',
+        verified: false,
+      });
 
-      const uaaClient = new UAAClient(accessToken);
+      cfUAANock.mockVerifyUserGroup(userIdentity.id, userIdentity);
 
-      cfUAANock.getUser(userIdentity.id, userIdentity, accessToken);
+      const userVerified = await uaaClient.verifyUserGroup(userIdentity.id, allowedGroupNames);
 
-      const userVerified = await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
       return expect(userVerified).to.be.false;
     });
 
     it('should not verify a user not in the specified group', async () => {
-      const accessToken = 'a-token';
-      const username = 'a-user@example.gov';
       const groupName = 'user-not-a-member-group';
-      const groupNames = [groupName];
-      const groups = [{ display: 'group-1' }, { display: 'group-2' }];
-      const userIdentity = uaaUser({ username, groups });
+      const allowedGroupNames = [groupName];
+      const userGroups = [{ display: 'group-1' }, { display: 'group-2' }];
+      const userIdentity = uaaUser({ groups: userGroups });
 
-      const uaaClient = new UAAClient(accessToken);
+      cfUAANock.mockVerifyUserGroup(userIdentity.id, userIdentity);
 
-      cfUAANock.getUser(userIdentity.id, userIdentity, accessToken);
+      const userVerified = await uaaClient.verifyUserGroup(userIdentity.id, allowedGroupNames);
 
-      const userVerified = await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
       return expect(userVerified).to.be.false;
+    });
+  });
+
+  describe('.inviteUser()', () => {
+    context('happy path', () => {
+      it('returns the invite', async () => {
+        const email = 'foo@bar.com';
+        const userToken = 'user-token';
+
+        cfUAANock.mockInviteUserToUserGroup(email, userToken, 'pages.user');
+
+        const invite = await uaaClient.inviteUserToUserGroup(email, userToken);
+
+        expect(invite.email).to.eq(email);
+      });
+    });
+  });
+
+  describe('.request()', () => {
+    it('should throw an error when uaa server is down', async () => {
+      const error = await uaaClient.request('/foobar').catch(e => e);
+
+      expect(error).to.be.an('Error');
+      expect(error.message).to.eq('getaddrinfo ENOTFOUND uaa.example.com');
     });
 
     it('should throw and error when uaa returns an error message', async () => {
-      const accessToken = 'a-token';
-      const groupName = 'a-group';
-      const groupNames = [groupName];
-      const userIdentity = uaaUser();
+      const path = '/foobar';
+      const token = 'token';
       const errorMessage = { error: 'User not allowed' };
 
-      const uaaClient = new UAAClient(accessToken);
+      cfUAANock.mockServerErrorStatus(200, path, errorMessage, token);
 
-      cfUAANock.getUser(userIdentity.id, errorMessage, accessToken);
+      const error = await uaaClient.request(path, { token }).catch(e => e);
 
-      try {
-        return await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
-      } catch (error) {
-        return expect(error).to.be.throw;
-      }
+      expect(error).to.be.an('Error');
+      expect(error.message).to.eq(errorMessage.error);
     });
 
     it('should throw and error when status code greater than 399', async () => {
-      const accessToken = 'a-token';
-      const groupName = 'a-group';
-      const groupNames = [groupName];
-      const userIdentity = uaaUser();
-      const errorMessage = { error: 'Server not responding' };
-      const uaaPath = `/Users/${userIdentity.id}`;
+      const path = '/foobar';
+      const token = 'token';
 
-      const uaaClient = new UAAClient(accessToken);
+      cfUAANock.mockServerErrorStatus(500, path, undefined, token);
 
-      cfUAANock.serverErrorStatus(500, uaaPath, errorMessage, accessToken);
+      const error = await uaaClient.request(path, { token }).catch(e => e);
 
-      try {
-        return await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
-      } catch (error) {
-        return expect(error).to.be.throw;
-      }
+      expect(error.message).to.eq('Received status code: 500');
     });
 
-    it('should throw an error when uaa server is down', async () => {
-      const accessToken = 'a-token';
-      const groupName = 'a-group';
-      const groupNames = [groupName];
-      const userIdentity = uaaUser();
-      const errorMessage = { error: 'Server not responding' };
-      const uaaPath = `/Users/${userIdentity.id}`;
+    context('when the user does not have the appropriate scope', () => {
+      it('throws a 403 error', async () => {
+        const path = '/foobar';
+        const token = 'token';
+        const errorMessage = { error: 'User not allowed' };
 
-      const uaaClient = new UAAClient(accessToken);
+        cfUAANock.mockServerErrorStatus(403, path, errorMessage, token);
 
-      cfUAANock.serverError(uaaPath, errorMessage, accessToken);
+        const error = await uaaClient.request(path, { token }).catch(e => e);
 
-      try {
-        return await uaaClient.verifyUserGroup(userIdentity.id, groupNames);
-      } catch (error) {
-        return expect(error).to.be.throw;
-      }
+        expect(error).to.be.an('Error');
+        expect(error.message).to.eq(errorMessage.error);
+      });
     });
   });
 });
