@@ -13,6 +13,7 @@ scim:
     - davemcorwin@example.com|password|davemcorwin@example.com|David|Admin|pages.admin
     - user1@example.com|password|user1@example.com|User1|User|pages.user
     - user2@example.com|password|user2@example.com|User2|User|pages.user
+    - userorgless@example.com|password|userorgless@example.com|UserOrgless|User|pages.user
     - manager_no_github@example.com|password|manager_no_github@example.com|ManagerNoGithub|User|pages.user
     - manager_with_github@example.com|password|manager_with_github@example.com|ManagerWithGithub|User|pages.user
 

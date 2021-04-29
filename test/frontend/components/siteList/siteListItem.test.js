@@ -25,6 +25,11 @@ const testUser = {
   updatedAt: new Date(new Date() - (10 * 24 * 60 * 60 * 1000)).toString(),
 };
 
+const testOrganization = {
+  id: 1,
+  name: 'org-1',
+};
+
 describe('<SiteListItem />', () => {
   let Fixture;
   let wrapper;
@@ -63,10 +68,34 @@ describe('<SiteListItem />', () => {
     expect(wrapper.find(Link)).to.have.length(1);
   });
 
+  it('outputs an h5 with the site\'s organization', () => {
+    const organizationId = testOrganization.id;
+    const updatedSite = { ...testSite, organizationId };
+    wrapper = shallow(
+      <Fixture
+        site={updatedSite}
+        user={testUser}
+        organization={testOrganization}
+      />
+    );
+    expect(wrapper.find('h5')).to.have.length(1);
+  });
+
+  it('outputs without an h5 with the site\'s organization', () => {
+    wrapper = shallow(
+      <Fixture
+        site={testSite}
+        user={testUser}
+      />
+    );
+    expect(wrapper.find('h5')).to.have.length(0);
+  });
+
   it('outputs a link tag to view the site', () => {
-    const siteWithBuilds = Object.assign({}, testSite, {
+    const siteWithBuilds = {
+      ...testSite,
       builds: [{}],
-    });
+    };
 
     wrapper = shallow(<Fixture site={siteWithBuilds} user={testUser} />);
     const viewLink = wrapper.find('.sites-list-item-actions a');

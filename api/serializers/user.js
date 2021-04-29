@@ -57,6 +57,8 @@ const toJSON = (user, isSystemAdmin = false) => {
     filtered.uaa = pick(uaaAdminAllowedAttributes, object.UAAIdentity);
   }
 
+  filtered.hasGithubAuth = !!object.githubAccessToken;
+
   return filtered;
 };
 

@@ -62,6 +62,11 @@ export const ORGANIZATION = PropTypes.shape({
   updatedAt: PropTypes.string,
 });
 
+export const ORGANIZATIONS = PropTypes.shape({
+  data: PropTypes.arrayOf(ORGANIZATION),
+  isLoading: PropTypes.bool,
+});
+
 export const USER_ACTION = PropTypes.shape({
   targetType: PropTypes.string,
   createdAt: PropTypes.string,
