@@ -18,7 +18,7 @@ if (process.env.NODE_ENV !== 'test') {
       // to connect the the docker-compose uaa service
       uaa: {
         options: {
-          clientID: 'client-id',
+          clientID: 'pages-client',
           clientSecret: 'client-secret',
         },
       },
