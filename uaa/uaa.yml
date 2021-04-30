@@ -34,9 +34,8 @@ oauth:
       - groups.update
 
   clients:
-    user-client:
-      id: client-id
-      name: User client
+    pages-client:
+      name: Pages client
       override: true
       scope: openid,scim.invite,groups.update
       authorized-grant-types: authorization_code,client_credentials
