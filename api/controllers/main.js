@@ -18,6 +18,7 @@ function defaultContext(req) {
     homepageUrl: config.app.homepageUrl,
     webpackAssets,
     isUAA: config.env.authIDP === 'uaa',
+    hasMultiAuth: config.env.multiAuth || true,
   };
 
   return context;
