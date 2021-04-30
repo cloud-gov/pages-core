@@ -7,8 +7,12 @@ const GitHub = require('./GitHub');
 const RepositoryVerifier = require('./RepositoryVerifier');
 const EventCreator = require('./EventCreator');
 const { createUAAStrategy, verifyUAAUser } = require('./uaaStrategy');
+const Features = require('../features');
 
 const passport = new Passport.Passport();
+const flashMessage = {
+  message: 'Apologies; you are not authorized to access Federalist! Please contact the Federalist team if this is in error.',
+};
 
 const {
   github: {
@@ -22,12 +26,24 @@ async function verifyGithub(accessToken, _refreshToken, profile, callback) {
   try {
     const isValidUser = await GitHub.validateUser(accessToken, false);
     if (!isValidUser) {
-      return callback(null, false);
+      return callback(null, false, flashMessage);
     }
 
     const username = profile.username.toLowerCase();
     // eslint-disable-next-line no-underscore-dangle
     const { email } = profile._json;
+
+    if (Features.enabled(Features.Flags.FEATURE_HAS_MULTI_AUTH)) {
+      const currentUser = await User.scope('withUAAIdentity')
+        .findOne(
+          { where: { username } }
+        );
+
+      if (currentUser && currentUser.UAAIdentity) {
+        EventCreator.audit(Event.labels.AUTHENTICATION, currentUser, 'UAA user attempting GitHub login');
+        return callback(null, false, { message: 'You must login with you UAA account. Pleas try again.' });
+      }
+    }
 
     const [user] = await User.upsert({
       username,
@@ -80,7 +96,7 @@ async function verifyUAA(accessToken, refreshToken, profile, callback) {
       ['pages.user', 'pages.admin']
     );
 
-    if (!user) return callback(null, false);
+    if (!user) return callback(null, false, flashMessage);
 
     await user.update({
       signedInAt: new Date(),

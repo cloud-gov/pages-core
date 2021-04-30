@@ -12,15 +12,27 @@
         <div class="usa-width-one-third">
           <p>This is a U.S. government service. Your use indicates your consent to monitoring, recording, and no expectation of privacy. Misuse is subject to criminal and civil penalties. <a href="/system-use">Read more details.</a><br></p>
           <div class="hero-heading">
-            <a href="/login">
-              <button class="usa-button">
-                {% if isUAA %}
+            {% if hasMultiAuth %}
+              <a href="/login">
+                <button class="usa-button">
                   Agree and continue with SecureAuth
-                  {% else %}
+                </button>
+              </a>
+              {% if isUaa %}
+              {% else %}
+                <a href="/login/github">
+                  <button class="usa-button">
+                    <img src="/images/github-logo.png"> Agree and continue with GitHub
+                  </button>
+                </a>
+              {% endif%}
+            {% else %}
+              <a href="/login">
+                <button class="usa-button">
                   <img src="/images/github-logo.png"> Agree and continue with GitHub
-                {% endif %}
-              </button>
-            </a>
+                </button>
+              </a>
+            {% endif %}
           </div>
           <p></p>
           <p>Federalist users are authenticated with {% if isUAA %} SecureAuth {% else %} GitHub OAuth {% endif %}.<br></p>
