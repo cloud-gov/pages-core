@@ -38,12 +38,28 @@
             </a>
           </li>
           {% if isAuthenticated %}
-          <li class="nav-action">
-            <a class="usa-button usa-button-white" href="/logout">Log out</a>
-          </li>
+            <li class="nav-action">
+              {% if hasMultiAuth %}
+                {% if hasUAAIdentity %}
+                  <a class="usa-button usa-button-white" href="/logout">Log out</a>
+                {% else %}
+                  <a class="usa-button usa-button-white" href="/logout/github">Log out</a>
+                {% endif %}
+              {% else %}
+                {% if isUaa %}
+                  <a class="usa-button usa-button-white" href="/logout">Log out</a>
+                {% else %}
+                  <a class="usa-button usa-button-white" href="/logout/github">Log out</a>
+                {% endif %}
+              {% endif %}
+            </li>
           {% else %}
             <li  class="nav-action">
-              <a href="/login" class="usa-button usa-button-white">Log in</a>
+              {% if isUaa %}
+                <a href="/login" class="usa-button usa-button-white">Log in</a>
+              {% else %}
+                <a href="/login/github" class="usa-button usa-button-white">Log in</a>
+              {% endif %}
             </li>
           {% endif %}
         </ul>

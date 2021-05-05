@@ -28,6 +28,7 @@ services:
     environment:
       JWT_SECRET: 'shhHhh...'
       USER_AUDITOR: federalist
+      FEATURE_HAS_MULTI_AUTH: 'true'
       FEATURE_PROXY_EDGE_LINKS: 'false'
       FEATURE_PROXY_EDGE_DYNAMO: 'false'
       APP_HOSTNAME: http://localhost:1337

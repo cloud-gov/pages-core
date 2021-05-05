@@ -13,12 +13,28 @@
           <p>This is a U.S. government service. Your use indicates your consent to monitoring, recording, and no expectation of privacy. Misuse is subject to criminal and civil penalties. <a href="/system-use">Read more details.</a><br></p>
           <div class="hero-heading">
             {% if hasMultiAuth %}
-              <a href="/login">
-                <button class="usa-button">
-                  Agree and continue with SecureAuth
-                </button>
-              </a>
+              <div class="well">
+                <a href="/login/github">
+                  <button class="usa-button">
+                    <img src="/images/github-logo.png"> Agree and continue with GitHub
+                  </button>
+                </a>
+              </div>
+              <div class="well-gray-lightest">
+                <h5>Did we invite to use your cloud.gov account?</h5>
+                <a href="/login">
+                  <button class="usa-button">
+                    Agree and continue with cloud.gov
+                  </button>
+                </a>
+              </div>
+            {% else %}
               {% if isUaa %}
+                <a href="/login">
+                  <button class="usa-button">
+                    Agree and continue with cloud.gov's SecureAuth
+                  </button>
+                </a>
               {% else %}
                 <a href="/login/github">
                   <button class="usa-button">
@@ -26,12 +42,6 @@
                   </button>
                 </a>
               {% endif%}
-            {% else %}
-              <a href="/login">
-                <button class="usa-button">
-                  <img src="/images/github-logo.png"> Agree and continue with GitHub
-                </button>
-              </a>
             {% endif %}
           </div>
           <p></p>
