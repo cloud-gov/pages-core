@@ -22,6 +22,21 @@ const {
   uaa: { options: uaaOptions },
 } = config.passport;
 
+// eslint-disable-next-line consistent-return
+async function checkMultiAuth(username, callback) {
+  if (Features.enabled(Features.Flags.FEATURE_HAS_MULTI_AUTH)) {
+    const currentUser = await User.scope('withUAAIdentity')
+      .findOne(
+        { where: { username } }
+      );
+
+    if (currentUser && currentUser.UAAIdentity) {
+      EventCreator.audit(Event.labels.AUTHENTICATION, currentUser, 'UAA user attempting GitHub login');
+      return callback(null, false, { message: 'You must login with you UAA account. Pleas try again.' });
+    }
+  }
+}
+
 async function verifyGithub(accessToken, _refreshToken, profile, callback) {
   try {
     const isValidUser = await GitHub.validateUser(accessToken, false);
@@ -33,17 +48,7 @@ async function verifyGithub(accessToken, _refreshToken, profile, callback) {
     // eslint-disable-next-line no-underscore-dangle
     const { email } = profile._json;
 
-    if (Features.enabled(Features.Flags.FEATURE_HAS_MULTI_AUTH)) {
-      const currentUser = await User.scope('withUAAIdentity')
-        .findOne(
-          { where: { username } }
-        );
-
-      if (currentUser && currentUser.UAAIdentity) {
-        EventCreator.audit(Event.labels.AUTHENTICATION, currentUser, 'UAA user attempting GitHub login');
-        return callback(null, false, { message: 'You must login with you UAA account. Pleas try again.' });
-      }
-    }
+    await checkMultiAuth(username, callback);
 
     const [user] = await User.upsert({
       username,
@@ -135,9 +140,10 @@ passport.serializeUser((user, next) => {
 });
 
 passport.deserializeUser((id, next) => {
-  User.findByPk(id).then((user) => {
-    next(null, user);
-  });
+  User.scope('withUAAIdentity').findByPk(id)
+    .then((user) => {
+      next(null, user);
+    });
 });
 
 module.exports = passport;
