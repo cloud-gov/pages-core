@@ -30,6 +30,8 @@ authenticatedRouter.delete('/sites/:id', AdminSiteController.destroy);
 authenticatedRouter.get('/me', UserController.me);
 authenticatedRouter.get('/users', UserController.list);
 authenticatedRouter.get('/users/:id', UserController.findById);
+authenticatedRouter.post('/users/invite', UserController.invite);
+authenticatedRouter.post('/users/resend-invite', UserController.resendInvite);
 
 const adminRouter = Router();
 adminRouter.use(auth);

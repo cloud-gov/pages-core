@@ -39,12 +39,12 @@ oauth:
       override: true
       scope: openid,scim.invite,groups.update
       authorized-grant-types: authorization_code,client_credentials
-      authorities: scim.write,scim.read
+      authorities: scim.write,scim.read,scim.create
       access-token-validity: 600
       refresh-token-validity: 259200
       autoapprove: true
       app-launch-url: http://localhost:1337
-      redirect-uri: http://localhost:1337/auth/uaa/callback,http://localhost:1337/admin/auth/uaa/callback
+      redirect-uri: http://localhost:1337,http://localhost:1337/auth/uaa/callback,http://localhost:1337/admin/auth/uaa/callback
       secret: client-secret
 login:
   serviceProviderKey: |

@@ -1,6 +1,6 @@
 <script>
-  import { fetchUsers } from '../lib/api';
-  import { PaginatedQueryPage, UserTable } from '../components';
+  import { fetchUsers } from '../../lib/api';
+  import { PaginatedQueryPage, UserTable } from '../../components';
 
   const fields = {
     organization: {
@@ -20,6 +20,6 @@
   };
 </script>
 
-<PaginatedQueryPage path="users" query={fetchUsers} {fields} let:data>
+<PaginatedQueryPage path="users" query={fetchUsers} {fields} addAction let:data>
   <UserTable users={data}/>
 </PaginatedQueryPage>

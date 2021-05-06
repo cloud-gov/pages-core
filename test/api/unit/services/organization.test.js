@@ -42,7 +42,7 @@ function stubUAAClient(method) {
 
 describe('OrganizationService', () => {
   beforeEach(clean);
-  afterEach(sinon.restore);
+  afterEach(() => sinon.restore());
   after(clean);
 
   describe('.inviteUAAUser', () => {
@@ -66,10 +66,10 @@ describe('OrganizationService', () => {
     });
   });
 
-  describe('.findUAAUser', () => {
+  describe('.findUserByUAAIdentity', () => {
     context('when no UAA Identity with the email exists', () => {
       it('returns null', async () => {
-        const user = await OrganizationService.findUAAUser('foo@bar.com');
+        const user = await OrganizationService.findUserByUAAIdentity('foo@bar.com');
 
         expect(user).to.be.null;
       });
@@ -80,7 +80,7 @@ describe('OrganizationService', () => {
         const uaaEmail = await createUserWithUAAIdentity()
           .then(user => user.UAAIdentity.email);
 
-        const user = await OrganizationService.findUAAUser(uaaEmail);
+        const user = await OrganizationService.findUserByUAAIdentity(uaaEmail);
 
         expect(user.UAAIdentity.email).to.eq(uaaEmail);
       });
@@ -123,7 +123,7 @@ describe('OrganizationService', () => {
           const uaaEmail = 'foo@bar.com';
           const currentUser = await createUserWithUAAIdentity();
 
-          expect(await OrganizationService.findUAAUser(uaaEmail)).to.be.null;
+          expect(await OrganizationService.findUserByUAAIdentity(uaaEmail)).to.be.null;
 
           const [user, invite] = await OrganizationService.findOrCreateUAAUser(
             currentUser.UAAIdentity, uaaEmail
@@ -131,7 +131,7 @@ describe('OrganizationService', () => {
 
           sinon.assert.calledOnceWithExactly(inviteUAAUserStub, currentUser.UAAIdentity, uaaEmail);
 
-          const userWithUAAIdentity = await OrganizationService.findUAAUser(uaaEmail);
+          const userWithUAAIdentity = await OrganizationService.findUserByUAAIdentity(uaaEmail);
           expect(userWithUAAIdentity.UAAIdentity.email).to.eq(uaaEmail);
           expect(user.username).to.eq(uaaEmail);
           expect(invite.email).to.eq(uaaEmail);
@@ -143,7 +143,7 @@ describe('OrganizationService', () => {
           const uaaEmail = 'foo@bar.com';
           const currentUser = await createUserWithUAAIdentity();
 
-          expect(await OrganizationService.findUAAUser(uaaEmail)).to.be.null;
+          expect(await OrganizationService.findUserByUAAIdentity(uaaEmail)).to.be.null;
 
           const [user, invite] = await OrganizationService.findOrCreateUAAUser(
             currentUser.UAAIdentity, uaaEmail, 'githubUsername'
@@ -151,7 +151,7 @@ describe('OrganizationService', () => {
 
           sinon.assert.calledOnceWithExactly(inviteUAAUserStub, currentUser.UAAIdentity, uaaEmail);
 
-          const userWithUAAIdentity = await OrganizationService.findUAAUser(uaaEmail);
+          const userWithUAAIdentity = await OrganizationService.findUserByUAAIdentity(uaaEmail);
           expect(userWithUAAIdentity.UAAIdentity.email).to.eq(uaaEmail);
           expect(user.username).to.eq(uaaEmail);
           expect(invite.email).to.eq(uaaEmail);
@@ -166,18 +166,109 @@ describe('OrganizationService', () => {
 
           await userFactory({ username: githubUsername });
 
-          expect(await OrganizationService.findUAAUser(uaaEmail)).to.be.null;
+          expect(await OrganizationService.findUserByUAAIdentity(uaaEmail)).to.be.null;
 
           const [user, invite] = await OrganizationService.findOrCreateUAAUser(
             currentUser.UAAIdentity, uaaEmail, githubUsername
           );
           sinon.assert.calledOnceWithExactly(inviteUAAUserStub, currentUser.UAAIdentity, uaaEmail);
 
-          const userWithUAAIdentity = await OrganizationService.findUAAUser(uaaEmail);
+          const userWithUAAIdentity = await OrganizationService.findUserByUAAIdentity(uaaEmail);
           expect(userWithUAAIdentity.UAAIdentity.email).to.eq(uaaEmail);
           expect(user.username).to.eq(githubUsername.toLowerCase());
           expect(invite.email).to.eq(uaaEmail);
         });
+      });
+    });
+  });
+
+  describe('.resendInvite', () => {
+    context('when the current user does not have a UAA Identity', () => {
+      it('throws an error', async () => {
+        const currentUser = await userFactory();
+
+        const error = await OrganizationService.resendInvite(
+          currentUser, '', '', ''
+        ).catch(e => e);
+
+        expect(error).to.be.an('Error');
+        expect(error.message).to.contain('must have a UAA Identity');
+      });
+    });
+
+    context('when the current user has a UAA identity', () => {
+      it('creates and returns the UAA invite', async () => {
+        const userToken = 'user-token';
+        const email = 'foo@bar.com';
+        const currentUser = await createUserWithUAAIdentity();
+
+        const refreshTokenStub = sinon.stub(OrganizationService, 'refreshToken');
+        refreshTokenStub.resolves(userToken);
+
+        const inviteUserStubResponse = { email };
+        const inviteUserStub = stubUAAClient('inviteUser');
+        inviteUserStub.resolves(inviteUserStubResponse);
+
+        const invite = await OrganizationService.resendInvite(currentUser, email);
+
+        sinon.assert.calledOnceWithExactly(inviteUserStub, email, userToken);
+        expect(invite).to.eq(inviteUserStubResponse);
+      });
+    });
+  });
+
+  describe('.inviteUserToPlatform', () => {
+    context('when the current user does not have a UAA Identity', () => {
+      it('throws an error', async () => {
+        const currentUser = await userFactory();
+
+        const error = await OrganizationService.inviteUserToPlatform(
+          currentUser, '', '', ''
+        ).catch(e => e);
+
+        expect(error).to.be.an('Error');
+        expect(error.message).to.contain('must have a UAA Identity');
+      });
+    });
+
+    context('when the current user is not a Pages admin in UAA', () => {
+      it('throws an error', async () => {
+        const currentUser = await createUserWithUAAIdentity();
+        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
+        isUAAAdminStub.resolves(false);
+
+        const error = await OrganizationService.inviteUserToPlatform(
+          currentUser, '', ''
+        ).catch(e => e);
+
+        expect(error).to.be.an('Error');
+        expect(error.message).to.contain('must be a Pages admin in UAA');
+      });
+    });
+
+    context('when the target user does not exist', () => {
+      it('invites them to the platform', async () => {
+        const email = 'foo@bar.com';
+        const githubUsername = 'github';
+
+        const currentUser = await createUserWithUAAIdentity();
+        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
+        isUAAAdminStub.resolves(true);
+
+        const findOrCreateUAAUserResponse = ['user', 'invite'];
+
+        const findOrCreateUAAUserStub = sinon.stub(OrganizationService, 'findOrCreateUAAUser');
+        findOrCreateUAAUserStub.resolves(findOrCreateUAAUserResponse);
+
+        const [user, invite] = await OrganizationService.inviteUserToPlatform(
+          currentUser, email, githubUsername
+        );
+
+        sinon.assert.calledOnceWithMatch(findOrCreateUAAUserStub,
+          sinon.match({ id: currentUser.UAAIdentity.id }), email, githubUsername);
+
+        expect(user).to.eq(findOrCreateUAAUserResponse[0]);
+        expect(invite).to.eq(findOrCreateUAAUserResponse[1]);
       });
     });
   });
@@ -192,6 +283,7 @@ describe('OrganizationService', () => {
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
+        expect(error.message).to.contain('must have a UAA Identity');
       });
     });
 
@@ -208,6 +300,7 @@ describe('OrganizationService', () => {
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
+        expect(error.message).to.contain('must be a manager of the target organization');
       });
     });
 
@@ -227,6 +320,7 @@ describe('OrganizationService', () => {
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
+        expect(error.message).to.contain('must be a manager of the target organization');
       });
     });
 
@@ -246,11 +340,12 @@ describe('OrganizationService', () => {
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
+        expect(error.message).to.contain('Invalid role name');
       });
     });
 
-    context('happy path', () => {
-      it('invites the target user and adds them to the org with the provided role', async () => {
+    context('when the target user exists in Pages and UAA', () => {
+      it('adds them to the org with the provided role', async () => {
         const role = 'user';
         const githubUsername = 'username';
         const orgName = 'org';
@@ -258,7 +353,7 @@ describe('OrganizationService', () => {
 
         const targetUser = await createUserWithUAAIdentity();
         const findOrCreateUAAUserStub = sinon.stub(OrganizationService, 'findOrCreateUAAUser');
-        findOrCreateUAAUserStub.callsFake(() => Promise.resolve([targetUser]));
+        findOrCreateUAAUserStub.resolves([targetUser]);
 
         const [currentUser, org, managerRole] = await Promise.all([
           createUserWithUAAIdentity(),
@@ -314,18 +409,36 @@ describe('OrganizationService', () => {
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
+        expect(error.message).to.contain('must have a UAA Identity');
       });
     });
 
-    context('happy path', () => {
-      it('invites the target user and creates and adds them to the org with the manager role', async () => {
+    context('when the current user is not a Pages admin in UAA', () => {
+      it('throws an error', async () => {
+        const currentUser = await createUserWithUAAIdentity();
+        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
+        isUAAAdminStub.resolves(false);
+
+        const error = await OrganizationService.createOrganization(
+          currentUser, '', ''
+        ).catch(e => e);
+
+        expect(error).to.be.an('Error');
+        expect(error.message).to.contain('must be a Pages admin in UAA');
+      });
+    });
+
+    context('when the target user exists in Pages and UAA', () => {
+      it('adds them to the org with the manager role', async () => {
         const githubUsername = 'username';
         const orgName = 'org';
         const uaaEmail = 'foo@bar.com';
 
         const targetUser = await createUserWithUAAIdentity();
+        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
+        isUAAAdminStub.resolves(true);
         const findOrCreateUAAUserStub = sinon.stub(OrganizationService, 'findOrCreateUAAUser');
-        findOrCreateUAAUserStub.callsFake(() => Promise.resolve([targetUser]));
+        findOrCreateUAAUserStub.resolves([targetUser]);
 
         const currentUser = await createUserWithUAAIdentity();
 

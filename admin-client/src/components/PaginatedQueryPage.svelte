@@ -2,12 +2,10 @@
   import page from 'page';
   import { formToObj, objToQueryString } from '../lib/utils';
   import { router } from '../stores';
-  import {
-    Await,
-    GridContainer,
-    PaginationBanner,
-  } from '.';
-
+  import Await from './Await.svelte';
+  import GridContainer from './GridContainer.svelte';
+  import PaginationBanner from './PaginationBanner.svelte';
+  
   export let path;
   export let query;
   export let addAction = false;

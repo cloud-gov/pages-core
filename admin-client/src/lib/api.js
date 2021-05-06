@@ -33,7 +33,7 @@ async function _fetch(path, opts = {}) {
         authLogout();
         return null;
       }
-      throw r;
+      throw new Error(r.statusText);
     })
     .catch((e) => {
       notification.setError(`API request failed: ${e.message}`);
@@ -136,6 +136,14 @@ async function fetchUsers(query = {}) {
   return get('/users', query).catch(() => []);
 }
 
+async function inviteUser(params) {
+  return post('/users/invite', params);
+}
+
+async function resendInvite(params) {
+  return post('/users/resend-invite', params);
+}
+
 async function logout() {
   return get('/logout').catch(() => null);
 }
@@ -156,6 +164,8 @@ export {
   fetchSites,
   fetchUser,
   fetchUsers,
+  inviteUser,
+  resendInvite,
   logout,
   updateSite,
 };
