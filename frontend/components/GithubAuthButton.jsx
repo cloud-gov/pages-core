@@ -42,19 +42,22 @@ function authorize() {
 }
 
 const GithubAuthButton = ({ onFailure, onSuccess }) => (
-  <button
-    type="button"
-    className="usa-button github-auth-button"
-    onClick={
-      () => authorize()
-        .then(onSuccess)
-        .catch(onFailure)
-    }
-  >
-    <IconGitHub />
-    {' '}
-    Connect with Github
-  </button>
+  <div className="well-gray-lightest">
+    <p>Sign in to your Github account to add sites to the platform.</p>
+    <button
+      type="button"
+      className="usa-button github-auth-button"
+      onClick={
+        () => authorize()
+          .then(onSuccess)
+          .catch(onFailure)
+      }
+    >
+      <IconGitHub />
+      {' '}
+      Connect with Github
+    </button>
+  </div>
 );
 
 GithubAuthButton.propTypes = {

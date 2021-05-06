@@ -26,6 +26,17 @@ function defaultContext(req) {
   return context;
 }
 
+function alertGithubAuthDeprecation(hasUAAIdentity, context) {
+  if (!hasUAAIdentity && context.hasMultiAuth) {
+    context.messages = {
+      ...context.messages,
+      warnings: [
+        'Authenticating with Github is being deprecated soon. Contact federalist-support@gsa.gov to setup a cloud.gov account.',
+      ],
+    };
+  }
+}
+
 module.exports = {
   home(req, res) {
     // redirect to main app if is authenticated
@@ -66,14 +77,7 @@ module.exports = {
 
     context.frontendConfig = frontendConfig;
 
-    if (!hasUAAIdentity && context.hasMultiAuth) {
-      context.messages = {
-        ...context.messages,
-        warnings: [
-          'Authenticating with Github is being deprecated soon. Contact federalist-support@gsa.gov to setup a cloud.gov account.',
-        ],
-      };
-    }
+    alertGithubAuthDeprecation(hasUAAIdentity, context);
 
     return res.render('app.njk', context);
   },
