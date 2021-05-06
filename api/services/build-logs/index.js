@@ -5,4 +5,5 @@ module.exports = {
   archiveBuildLogsForBuildId: BuildLogs.archiveBuildLogsForBuildId.bind(BuildLogs),
   fetchBuildLogs: BuildLogs.fetchBuildLogs.bind(BuildLogs),
   getBuildLogs: BuildLogs.getBuildLogs.bind(BuildLogs),
+  archiveBuildLogsByDate: BuildLogs.archiveBuildLogsByDate.bind(BuildLogs),
 };

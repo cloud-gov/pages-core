@@ -199,6 +199,7 @@ async function createData() {
     User.create({
       username: process.env.USER_AUDITOR,
       email: 'auditor@example.com',
+      githubAccessToken: 'access-token',
     }),
   ]);
 

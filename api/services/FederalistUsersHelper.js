@@ -59,7 +59,11 @@ const federalistUsersAdmins = githubAccessToken => GitHub.getOrganizationMembers
   .then(admins => admins.map(admin => admin.login));
 
 const removeMemberFromFederalistUsersOrg = (githubAccessToken, login) => GitHub
-  .removeOrganizationMember(githubAccessToken, FEDERALIST_USERS_ORG, login);
+  .removeOrganizationMember(githubAccessToken, FEDERALIST_USERS_ORG, login)
+  .catch(err => {
+    EventCreator.error(Event.labels.FEDERALIST_USERS_MEMBERSHIP, err, { login });
+    throw err;
+  });
 
 const revokeMembershipForInactiveUsers = async ({ auditorUsername } = {}) => {
   /* eslint-disable no-param-reassign */

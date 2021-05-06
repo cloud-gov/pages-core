@@ -51,7 +51,11 @@ const timeoutBuilds = async (date = new Date()) => {
 
   const [, builds] = await Build.update(atts, options);
   const buildIds = builds.map(b => b.id);
-  const cancels = await Promise.allSettled(buildIds.map(buildId => cfApi.cancelBuildTask(buildId)));
+  const cancels = await Promise.allSettled(buildIds.map(buildId => cfApi.cancelBuildTask(buildId)
+    .catch(err => {
+      EventCreator.error(Event.labels.BUILD_STATUS, err, { buildId });
+      throw err;
+    })));
   return zip(buildIds, cancels);
 };
 

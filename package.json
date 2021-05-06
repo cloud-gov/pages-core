@@ -56,6 +56,7 @@
   "scripts": {
     "build": "webpack --config webpack.production.config.js",
     "start": "node index.js",
+    "start-workers": "NODE_ENV=development NODE_DEBUG=bull node ./api/workers/index.js",
     "debug": "node --inspect index.js",
     "watch": "NODE_ENV=development concurrently --kill-others --raw \"nodemon index.js --config nodemon.json\"",
     "test": "yarn test:prepare && yarn test:server && yarn test:client",

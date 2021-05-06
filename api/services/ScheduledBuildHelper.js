@@ -21,7 +21,9 @@ const buildBranch = (site, branch) => User
   .then(build => build.enqueue())
   .then(() => `${site.owner}/${site.repository}@${branch}`)
   .catch((err) => {
-    throw new NightlyBuildError(`${site.owner}/${site.repository}@${branch}`, err);
+    const error = new NightlyBuildError(`${site.owner}/${site.repository}@${branch}`, err);
+    EventCreator.error(Event.labels.BUILD_STATUS, error, { siteId: site.id, branch });
+    throw error;
   });
 
 const siteBranches = (site) => {

@@ -7,7 +7,9 @@ applications:
       - route: federalistapp((env_postfix)).apps.internal
     disk_quota: 2G
     memory: ((memory))
-    instances: ((instances))
+    processes:
+      - type: web
+        instances: ((instances))
     services:
       - admin-((env))-uaa-client
       - app-((env))-uaa-client

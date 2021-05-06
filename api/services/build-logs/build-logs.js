@@ -1,9 +1,12 @@
 const { QueryTypes } = require('sequelize');
 const config = require('../../../config');
 const {
-  Build, BuildLog, Site, sequelize,
+  Build, BuildLog, Site, Event, sequelize,
 } = require('../../models');
 const S3Helper = require('../S3Helper');
+const { Op } = require('sequelize');
+const PromisePool = require('@supercharge/promise-pool');
+const EventCreator = require('../EventCreator');
 
 const BuildLogs = {
   s3() {
@@ -77,6 +80,28 @@ const BuildLogs = {
       }
       throw error;
     }
+  },
+
+  async archiveBuildLogsByDate(startDate, endDate) {
+    if(startDate > endDate) {
+      throw new Error('end date must be after start date');
+    }
+    const builds = await Build.findAll({
+      attributes: ['id'],
+      where: {
+        completedAt: {
+          [Op.gte]: startDate,//.toDate(),
+          [Op.lt]: endDate, //.toDate(),
+        },
+      },
+    });
+
+    return PromisePool
+      .withConcurrency(5)
+      .for(builds)
+      .process(build => BuildLogs.archiveBuildLogsForBuildId(build.id)
+        .then(() => EventCreator.audit(Event.labels.BUILDLOG_ARCHIVED, build, 'archived build logs'))
+        .catch(err => EventCreator.error(Event.labels.BUILDLOG_ARCHIVED, err, { buildId: build.id })));
   },
 };
 
