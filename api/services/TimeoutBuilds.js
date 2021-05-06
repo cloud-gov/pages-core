@@ -2,15 +2,16 @@ const moment = require('moment');
 const { Op } = require('sequelize');
 const { zip } = require('underscore');
 
-const { Build } = require('../models');
+const { Build, Event } = require('../models');
 const CFApi = require('../utils/cfApiClient');
+const EventCreator = require('./EventCreator');
 
 const TIMEOUT = process.env.BUILD_TIMEOUT || 45;
 
-const timeoutBuilds = async (date = new Date()) => {
+const timeoutBuilds = async ({ date }) => {
   const cfApi = new CFApi();
 
-  const now = moment(date);
+  const now = moment(date || new Date());  
   const buildTimout = now.clone().subtract(TIMEOUT, 'minutes');
   const taskTimeout = now.clone().subtract(5, 'minutes');
 

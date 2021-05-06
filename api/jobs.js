@@ -45,7 +45,7 @@ function scheduleJobs() {
       // audit federalist-users 18F teams daily at midnight
       schedule.scheduleJob('20 0 * * *', () => {
         logger.info('Auditing federalist-users 18F Staff & Org Teams');
-        FederalistUsersHelper.audit18F({})
+        FederalistUsersHelper.audit18F()
           .catch(logger.error);
       });
     }

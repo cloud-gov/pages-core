@@ -10,11 +10,9 @@ const { User, Event } = require('../models');
 const FEDERALIST_USERS_ORG = config.federalistUsers.orgName;
 const MAX_DAYS_SINCE_LOGIN = config.federalistUsers.maxDaysSinceLogin;
 
-const audit18F = ({ auditorUsername, fedUserTeams }) => {
-  /* eslint-disable no-param-reassign */
-  auditorUsername = auditorUsername || config.federalistUsers.admin;
-  fedUserTeams = fedUserTeams || config.federalistUsers.teams18F;
-  /* eslint-enable no-param-reassign */
+const audit18F = () => {
+  const auditorUsername = config.federalistUsers.admin;
+  const fedUserTeams = config.federalistUsers.teams18F;
 
   let members18F;
   let adminFedUsers;
@@ -65,10 +63,8 @@ const removeMemberFromFederalistUsersOrg = (githubAccessToken, login) => GitHub
     throw err;
   });
 
-const revokeMembershipForInactiveUsers = async ({ auditorUsername } = {}) => {
-  /* eslint-disable no-param-reassign */
-  auditorUsername = auditorUsername || config.federalistUsers.admin;
-  /* eslint-enable no-param-reassign */
+const revokeMembershipForInactiveUsers = async () => {
+  const auditorUsername = config.federalistUsers.admin;
   const now = moment();
   const cutoff = now.clone().subtract(MAX_DAYS_SINCE_LOGIN, 'days').toDate();
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
@@ -98,10 +94,8 @@ const revokeMembershipForInactiveUsers = async ({ auditorUsername } = {}) => {
 };
 
 // remove GitHub org members that are not in the user table
-const removeMembersWhoAreNotUsers = async ({ auditorUsername } = {}) => {
-  /* eslint-disable no-param-reassign */
-  auditorUsername = auditorUsername || config.federalistUsers.admin;
-  /* eslint-enable no-param-reassign */
+const removeMembersWhoAreNotUsers = async () => {
+  const auditorUsername = config.federalistUsers.admin;
 
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
 
@@ -117,9 +111,9 @@ const removeMembersWhoAreNotUsers = async ({ auditorUsername } = {}) => {
     .map(login => removeMemberFromFederalistUsersOrg(githubAccessToken, login)));
 };
 
-const deactivateUsersWhoAreNotMembers = async ({ auditorUsername } = {}) => {
+const deactivateUsersWhoAreNotMembers = async () => {
   /* eslint-disable no-param-reassign */
-  auditorUsername = auditorUsername || config.federalistUsers.admin;
+  const auditorUsername = config.federalistUsers.admin;
   /* eslint-enable no-param-reassign */
   const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
   const members = await GitHub.getOrganizationMembers(githubAccessToken, FEDERALIST_USERS_ORG);

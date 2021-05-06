@@ -60,7 +60,7 @@ describe('TimeoutBuilds', () => {
       factory.build({ state: Processing }),
     ]);
 
-    const results = await timeoutBuilds(now);
+    const results = await timeoutBuilds({ date: now });
 
     expect(results.length).to.equal(3);
     expect(results.map(r => r[0])).to.have.members([b1.id, b2.id, b3.id]);

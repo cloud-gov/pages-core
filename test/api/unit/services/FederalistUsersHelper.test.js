@@ -2,6 +2,7 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 const { Op } = require('sequelize');
 
+const config = require('../../../../config');
 const factory = require('../../support/factory');
 const { User, Event, sequelize } = require('../../../../api/models');
 const GitHub = require('../../../../api/services/GitHub');
@@ -11,7 +12,6 @@ const FederalistUsersHelper = require('../../../../api/services/FederalistUsersH
 describe('FederalistUsersHelper', () => {
   let orgs;
   let removeOrganizationMemberStub;
-  const fedUserTeams = ['0', '1'];
 
   const getOrg = (orgName, role = 'all') => {
     if(role !== 'all') {
@@ -48,8 +48,17 @@ describe('FederalistUsersHelper', () => {
   afterEach(() => sinon.restore())
 
   describe('audit18F', () => {
+    let admin;
+    before(async () => {
+      admin = await factory.user();
+      config.federalistUsers.admin = admin.username;
+    });
 
-    it('remove federalist-users all in 18F team not in 18F org ', (done) => {
+    beforeEach(() => {
+      config.federalistUsers.teams18F = ['0', '1'];
+    });
+
+    it('remove federalist-users all in 18F team not in 18F org ', async () => {
       expect(getOrg('federalist-users').length).to.equal(10);
       addMember('federalist-users', 'new-member-1', 'member', '0');
       addMember('federalist-users', 'new-member-2', 'member', '0');
@@ -58,17 +67,14 @@ describe('FederalistUsersHelper', () => {
       expect(isOrgMember('federalist-users', 'new-member-1')).to.be.true;
       expect(isOrgMember('federalist-users', 'new-member-2')).to.be.true;
 
-      factory.user()
-        .then(user => FederalistUsersHelper.audit18F({ auditorUsername: user.username, fedUserTeams }))
-        .then(() => {
-          expect(getOrg('federalist-users').length).to.equal(10);
-          expect(isOrgMember('federalist-users', 'new-member-1')).to.be.false;
-          expect(isOrgMember('federalist-users', 'new-member-2')).to.be.false;
-          done();
-        });
+      await FederalistUsersHelper.audit18F();
+      expect(getOrg('federalist-users').length).to.equal(10);
+      expect(isOrgMember('federalist-users', 'new-member-1')).to.be.false;
+      expect(isOrgMember('federalist-users', 'new-member-2')).to.be.false;
     });
 
-    it('remove federalist-users in 18F team not in 18F org', (done) => {
+    it('remove federalist-users in 18F team not in 18F org', async () => {
+      config.federalistUsers.teams18F = ['1'];
       expect(getOrg('federalist-users').length).to.equal(10);
       addMember('federalist-users', 'new-member-1', 'member', '0');
       addMember('federalist-users', 'new-member-2', 'member', '1');
@@ -79,31 +85,22 @@ describe('FederalistUsersHelper', () => {
       expect(isOrgMember('federalist-users', 'new-member-2')).to.be.true;
       expect(isOrgMember('federalist-users', 'new-member-3')).to.be.true;
 
-      factory.user()
-        .then(user => FederalistUsersHelper.audit18F({
-          auditorUsername: user.username,
-          fedUserTeams: ['1']
-        }))
-        .then(() => {
-          expect(getOrg('federalist-users').length).to.equal(11);
-          expect(isOrgMember('federalist-users', 'new-member-1')).to.be.true;
-          expect(isOrgMember('federalist-users', 'new-member-2')).to.be.false;
-          expect(isOrgMember('federalist-users', 'new-member-3')).to.be.false;
-          done();
-        });
+      await FederalistUsersHelper.audit18F();
+      expect(getOrg('federalist-users').length).to.equal(11);
+      expect(isOrgMember('federalist-users', 'new-member-1')).to.be.true;
+      expect(isOrgMember('federalist-users', 'new-member-2')).to.be.false;
+      expect(isOrgMember('federalist-users', 'new-member-3')).to.be.false;
     });
 
-    it('should not remove org admins not in 18F org ', (done) => {
+    it('should not remove org admins not in 18F org ', async () => {
       expect(getOrg('federalist-users').length).to.equal(10);
       addMember('federalist-users', 'new-admin-1', 'admin', '0');
       expect(getOrg('federalist-users').length).to.equal(11);
-      factory.user()
-        .then(user => FederalistUsersHelper.audit18F({ auditorUsername: user.username, fedUserTeams }))
-        .then(() => {
-          expect(getOrg('federalist-users').length).to.equal(11);
-          done();
-        });
+
+      await FederalistUsersHelper.audit18F();
+      expect(getOrg('federalist-users').length).to.equal(11);
     });
+
     describe('federalistUsersAdmins', () => {
       it('identify org admins in federalist-users', (done) => {
         addMember('federalist-users', 'new-admin-1', 'admin', '0');
@@ -123,6 +120,11 @@ describe('FederalistUsersHelper', () => {
   });
 
   describe('revokeMembershipForInactiveUsers', () => {
+    let admin;
+    beforeEach(async () => {
+      admin = await factory.user();
+      config.federalistUsers.admin = admin.username;
+    })
     afterEach( async () => {
       await User.truncate();
     });
@@ -144,13 +146,12 @@ describe('FederalistUsersHelper', () => {
       newUsers.forEach(user => addMember('federalist-users', user.username));
       addMember('federalist-users', admin.username.toUpperCase(), 'admin');
       expect(getOrg('federalist-users').length).to.equal(16);
-      await FederalistUsersHelper.revokeMembershipForInactiveUsers({ auditorUsername: admin.username });
+      await FederalistUsersHelper.revokeMembershipForInactiveUsers();
       expect(removeOrganizationMemberStub.callCount).to.equal(2);
       expect(getOrg('federalist-users').length).to.equal(14);
     });
 
     it('should not remove user if created, pushed or signed in within x cutoff days', async () => {
-      const admin = await factory.user();
       const before = new Date('2020-02-02');
       const now = new Date();
       const oldCreatedAtUsers = await Promise.all([
@@ -167,37 +168,43 @@ describe('FederalistUsersHelper', () => {
       testUsers.forEach(user => addMember('federalist-users', user.username));
       addMember('federalist-users', admin.username, 'admin');
       expect(getOrg('federalist-users').length).to.equal(16);
-      await FederalistUsersHelper.revokeMembershipForInactiveUsers({ auditorUsername: admin.username });
+      await FederalistUsersHelper.revokeMembershipForInactiveUsers();
       expect(removeOrganizationMemberStub.callCount).to.equal(0);
       expect(getOrg('federalist-users').length).to.equal(16);
     });
   });
 
   describe('removeMembersWhoAreNotUsers', () => {
+    let admin;
+    beforeEach(async () => {
+      admin = await factory.user();
+      config.federalistUsers.admin = admin.username;
+    });
     afterEach( async () => {
       await User.truncate();
     });
     it('should only remove github org members who are not users', async () => {
-      const admin = await factory.user();
       const users = await Promise.all(Array(5).fill(0).map((i) => factory.user()));
       users.forEach(user => addMember('federalist-users', user.username));
       addMember('federalist-users', admin.username, 'admin');
       addMember('federalist-users', 'non-user-admin', 'admin');
       expect(getOrg('federalist-users').length).to.equal(17);
-      await FederalistUsersHelper.removeMembersWhoAreNotUsers({ auditorUsername: admin.username });
+      await FederalistUsersHelper.removeMembersWhoAreNotUsers();
       expect(getOrg('federalist-users').length).to.equal(7);
     });
   });
 
   describe('deactivateUsersWhoAreNotMembers', () => {
     let eventStub;
+    let admin;
     beforeEach( async() => {
       eventStub = sinon.stub(EventCreator, 'audit').resolves();
       await User.truncate();
+      admin = await factory.user();
+      config.federalistUsers.admin = admin.username;
     });
 
     it('set inactive users to Active if in federalist-users', async () => {
-      const admin = await factory.user();
       addMember('federalist-users', admin.username);
       const users = [admin];
       let i;
@@ -209,7 +216,7 @@ describe('FederalistUsersHelper', () => {
         }  
       }
       expect(users.filter(user => user.isActive).length).to.equal(5);
-      await FederalistUsersHelper.deactivateUsersWhoAreNotMembers({ auditorUsername: admin.username });
+      await FederalistUsersHelper.deactivateUsersWhoAreNotMembers();
       const allUsers = await User.findAll();
       expect(allUsers.filter(user => user.isActive).length).to.equal(3);
       expect(allUsers.filter(user => !user.isActive).length).to.equal(2);
