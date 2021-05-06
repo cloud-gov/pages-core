@@ -3,6 +3,17 @@ const config = require('../../config');
 
 const uaaOptions = config.passport.uaa;
 
+/**
+ * @typedef {object} UAAInvite
+ * @property {string} email
+ * @property {string} userId
+ * @property {string} origin
+ * @property {boolean} success
+ * @property {string=} errorCode
+ * @property {string=} errorMessage
+ * @property {string=} inviteLink
+ */
+
 class UAAClient {
   constructor() {
     this.clientId = uaaOptions.options.clientID;
@@ -20,18 +31,27 @@ class UAAClient {
   /**
    * @param {string} targetUserEmail - the email address of the user to add
    * @param {string} userToken - a user token with the `scim.invite` scope
-   * @returns {PromiseLike<UAAInvite>}
    *
    * Invites the target user to UAA and adds them to the `pages.user` UAA group
    */
   async inviteUserToUserGroup(targetUserEmail, userToken) {
-    const [invite, groupId] = await Promise.all([
-      this.inviteUser(targetUserEmail, userToken),
-      this.fetchClientToken()
-        .then(clientToken => this.fetchGroupId('pages.user', clientToken)),
-    ]);
+    const groupName = 'pages.user';
 
-    await this.addUserToGroup(groupId, invite, userToken);
+    const clientToken = await this.fetchClientToken();
+
+    const uaaUser = await this.fetchUserByEmail(targetUserEmail, clientToken);
+    const isInGroup = uaaUser && this.userInGroup(uaaUser.groups, [groupName]);
+    if (isInGroup) {
+      return null;
+    }
+
+    const invite = uaaUser ? null : await this.inviteUser(targetUserEmail, userToken);
+
+    const { origin } = invite || uaaUser;
+    const userId = (invite && invite.userId) || uaaUser.id;
+
+    const groupId = await this.fetchGroupId(groupName, clientToken);
+    await this.addUserToGroup(groupId, { origin, userId }, userToken);
 
     return invite;
   }
@@ -42,7 +62,7 @@ class UAAClient {
    *
    * Verifies that the UAA user is in the specified UAA group
    */
-  async verifyUserGroup(userId, groupNames = []) {
+  async verifyUserGroup(userId, groupNames) {
     const clientToken = await this.fetchClientToken();
     const { groups, origin, verified } = await this.fetchUser(userId, clientToken);
 
@@ -50,7 +70,21 @@ class UAAClient {
       return false;
     }
 
-    return groups.filter(group => groupNames.includes(group.display)).length > 0;
+    return this.userInGroup(groups, groupNames);
+  }
+
+  /**
+   *
+   * Utility
+   *
+   */
+
+  /**
+   * @param {[{display: string}]} userGroups - groups that the user belongs to
+   * @param {[string]} groupNames - allowed UAA group names, ex: ['pages.user']
+   */
+  userInGroup(userGroups, groupNames) {
+    return userGroups.filter(group => groupNames.includes(group.display)).length > 0;
   }
 
   /**
@@ -65,7 +99,7 @@ class UAAClient {
    * @param {{origin: string, userId: string}} userInfo - the origin and user id of the uaa user
    * @param {string} userToken - a user token with the `groups.update` scope
    *
-   * Adds the UAA user to the specific UAA group
+   * Adds the UAA user to the specific UAA group, ignores an error if the user is a member.
    */
   async addUserToGroup(groupId, { origin, userId }, userToken) {
     const path = `/Groups/${groupId}/members`;
@@ -75,11 +109,18 @@ class UAAClient {
       token: userToken,
     };
 
-    return this.request(path, options);
+    try {
+      return await this.request(path, options);
+    } catch (error) {
+      if (error.message === 'member_already_exists') {
+        return null;
+      }
+      throw error;
+    }
   }
 
   /**
-   * @returns {PromiseLike<string>} a client token
+   * @returns {Promise<string>} a client token
    *
    * Fetches a new client token with scopes matching the configured client `authorities`
    */
@@ -103,7 +144,7 @@ class UAAClient {
   /**
    * @param {string} groupName - a uaa group name, ex: `pages.user`
    * @param {string} clientToken - a client token with the `scim.read` scope
-   * @returns {PromiseLike<string>} the uaa group id
+   * @returns {Promise<string>} the uaa group id
    *
    * Fetches the UAA group id for the specified group name
    */
@@ -117,6 +158,24 @@ class UAAClient {
     const { resources: [{ id }] } = await this.request(path, options);
 
     return id;
+  }
+
+  /**
+   * @param {string} email - a UAA user email
+   * @param {string} clientToken - a client token with the `scim.read` scope
+   *
+   * Fetches a UAA user by email
+   */
+  async fetchUserByEmail(email, clientToken) {
+    const path = '/Users';
+    const options = {
+      params: { filter: `email eq "${email}"` },
+      token: clientToken,
+    };
+
+    const { resources: [user] } = await this.request(path, options);
+
+    return user;
   }
 
   /**
@@ -135,7 +194,7 @@ class UAAClient {
   /**
    * @param {string} targetUserEmail - the email address of the user to add
    * @param {string} userToken - a user token with the `scim.invite` scope
-   * @returns {PromiseLike<UAAInvite>}
+   * @returns {Promise<UAAInvite>}
    */
   async inviteUser(targetUserEmail, userToken) {
     const path = '/invite_users';
@@ -147,13 +206,12 @@ class UAAClient {
     };
 
     const { new_invites: [invite] } = await this.request(path, options);
-
     return invite;
   }
 
   /**
    * @param {string} token - a user refresh token
-   * @returns {PromiseLike<{accessToken: string, refreshToken: string}>}
+   * @returns {Promise<{accessToken: string, refreshToken: string}>}
    * an object containing a `refreshToken` and `accessToken` for the user
    */
   async refreshToken(token) {
@@ -193,11 +251,11 @@ class UAAClient {
         }
 
         if (result.error) {
-          let msg = result.error;
+          const err = new Error(result.error);
           if (result.error_description) {
-            msg += `: ${result.error_description}`;
+            err.description = result.error_description;
           }
-          return reject(new Error(msg));
+          return reject(err);
         }
 
         if (response.statusCode > 399) {

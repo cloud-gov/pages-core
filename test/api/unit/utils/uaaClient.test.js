@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const nock = require('nock');
+const sinon = require('sinon');
 
 const UAAClient = require('../../../../api/utils/uaaClient');
 const cfUAANock = require('../../support/cfUAANock');
@@ -12,7 +13,133 @@ describe('UAAClient', () => {
     uaaClient = new UAAClient();
   });
 
-  afterEach(() => nock.cleanAll());
+  afterEach(() => {
+    nock.cleanAll();
+    sinon.restore();
+  });
+
+  describe('.fetchGroupId()', () => {
+    const clientToken = 'client-token';
+
+    it('throws if the group does not exist', async () => {
+      cfUAANock.mockFetchGroupId('foo', 1, clientToken);
+
+      const error = await uaaClient.fetchGroupId('bar', clientToken).catch(e => e);
+
+      expect(error).to.an('Error');
+    });
+
+    it('returns the group id if the group exists', async () => {
+      const groupName = 'group-name';
+      const groupId = 1;
+
+      cfUAANock.mockFetchGroupId(groupName, groupId, clientToken);
+
+      const result = await uaaClient.fetchGroupId(groupName, clientToken);
+
+      expect(result).to.eq(groupId);
+    });
+  });
+
+  describe('.fetchUserByEmail()', () => {
+    const clientToken = 'client-token';
+
+    it('returns undefined if the user does not exist', async () => {
+      const email = 'foo@bar.com';
+
+      cfUAANock.mockFetchUserByEmail(email, clientToken);
+
+      const result = await uaaClient.fetchUserByEmail(email, clientToken);
+
+      expect(result).to.be.undefined;
+    });
+
+    it('returns the user if it exists', async () => {
+      const email = 'foo@bar.com';
+      const user = { email };
+
+      cfUAANock.mockFetchUserByEmail(email, clientToken, user);
+
+      const result = await uaaClient.fetchUserByEmail(email, clientToken);
+
+      expect(result.email).to.eq(user.email);
+    });
+  });
+
+  describe('.inviteUser()', () => {
+    const userToken = 'user-token';
+
+    it('returns undefined if an invite could not be created', async () => {
+      const email = 'foo@bar.com';
+
+      cfUAANock.mockInviteUser(email, userToken);
+
+      const invite = await uaaClient.inviteUser(email, userToken);
+
+      expect(invite).to.be.undefined;
+    });
+
+    it('returns the invite', async () => {
+      const email = 'foo@bar.com';
+      const profile = {
+        userId: 'userId',
+        origin: 'example.com',
+      };
+
+      cfUAANock.mockInviteUser(email, userToken, profile);
+
+      const invite = await uaaClient.inviteUser(email, userToken);
+
+      expect(invite.email).to.eq(email);
+      expect(invite.userId).to.eq(profile.userId);
+    });
+  });
+
+  describe('.addUserToGroup()', () => {
+    const userToken = 'user-token';
+
+    it('does not throw when user is already in the group', async () => {
+      const groupId = 1;
+      const profile = {
+        origin: 'example.com',
+        userId: 'abc123',
+      };
+
+      cfUAANock.mockAddUserToGroup(groupId, profile, userToken, { error: 'member_already_exists' });
+
+      await uaaClient.addUserToGroup(groupId, profile, userToken);
+
+      expect(true).to.be.true;
+    });
+
+    it('throws other errors', async () => {
+      const groupId = 1;
+      const profile = {
+        origin: 'example.com',
+        userId: 'abc123',
+      };
+
+      cfUAANock.mockAddUserToGroup(groupId, profile, userToken, { error: 'something else' });
+
+      const error = await uaaClient.addUserToGroup(groupId, profile, userToken).catch(e => e);
+
+      expect(error).to.be.an('Error');
+    });
+
+    it('succeeds', async () => {
+      const groupId = 1;
+      const profile = {
+        origin: 'example.com',
+        userId: 'abc123',
+      };
+
+      cfUAANock.mockAddUserToGroup(groupId, profile, userToken);
+
+      await uaaClient.addUserToGroup(groupId, profile, userToken);
+
+      expect(true).to.be.true;
+    });
+  });
 
   describe('.verifyUserGroup()', () => {
     it('should verify an active user', async () => {
@@ -89,17 +216,87 @@ describe('UAAClient', () => {
     });
   });
 
-  describe('.inviteUser()', () => {
-    context('happy path', () => {
-      it('returns the invite', async () => {
+  describe('.inviteUserToUserGroup()', () => {
+    const clientToken = 'client-token';
+
+    beforeEach(async () => {
+      cfUAANock.mockFetchClientToken(clientToken);
+    });
+
+    context('when the UAA user exists, but is not in the group', () => {
+      it('does not send an invite but adds to the group', async () => {
         const email = 'foo@bar.com';
+        const origin = 'example.com';
+        const userId = '1';
+        const user = {
+          id: userId,
+          email,
+          groups: [],
+          origin,
+        };
+        const groupId = 1;
         const userToken = 'user-token';
 
-        cfUAANock.mockInviteUserToUserGroup(email, userToken, 'pages.user');
+        cfUAANock.mockFetchUserByEmail(email, clientToken, user);
+        cfUAANock.mockFetchGroupId('pages.user', groupId, clientToken);
+        cfUAANock.mockAddUserToGroup(groupId, { origin, userId }, userToken);
+        const inviteUserSpy = sinon.spy(uaaClient, 'inviteUser');
+        const addUserToGroupSpy = sinon.spy(uaaClient, 'addUserToGroup');
 
         const invite = await uaaClient.inviteUserToUserGroup(email, userToken);
 
+        sinon.assert.notCalled(inviteUserSpy);
+        sinon.assert.calledOnceWithMatch(addUserToGroupSpy,
+          groupId, sinon.match({ origin, userId }), userToken);
+        expect(invite).to.be.null;
+      });
+    });
+
+    context('when the UAA user exists and is in the group', () => {
+      it('does not send an invite or add to group', async () => {
+        const email = 'foo@bar.com';
+        const origin = 'example.com';
+        const userId = '1';
+        const user = {
+          id: userId,
+          email,
+          groups: [{ display: 'pages.user' }],
+          origin,
+        };
+
+        cfUAANock.mockFetchUserByEmail(email, clientToken, user);
+        const inviteUserSpy = sinon.spy(uaaClient, 'inviteUser');
+        const addUserToGroupSpy = sinon.spy(uaaClient, 'addUserToGroup');
+
+        const invite = await uaaClient.inviteUserToUserGroup(email, '');
+
+        sinon.assert.notCalled(inviteUserSpy);
+        sinon.assert.notCalled(addUserToGroupSpy);
+        expect(invite).to.be.null;
+      });
+    });
+
+    context('when the UAA user does not exist', () => {
+      it('returns the invite and adds the new user to the group', async () => {
+        const email = 'foo@bar.com';
+        const origin = 'example.com';
+        const userId = '1';
+        const groupId = 1;
+        const userToken = 'user-token';
+
+        cfUAANock.mockFetchUserByEmail(email, clientToken);
+        cfUAANock.mockInviteUser(email, userToken, { userId, origin });
+        cfUAANock.mockFetchGroupId('pages.user', groupId, clientToken);
+        cfUAANock.mockAddUserToGroup(groupId, { origin, userId }, userToken);
+
+        const addUserToGroupSpy = sinon.spy(uaaClient, 'addUserToGroup');
+
+        const invite = await uaaClient.inviteUserToUserGroup(email, userToken);
+
+        sinon.assert.calledOnceWithMatch(addUserToGroupSpy,
+          groupId, sinon.match({ origin, userId }), userToken);
         expect(invite.email).to.eq(email);
+        expect(invite.userId).to.eq(userId);
       });
     });
   });

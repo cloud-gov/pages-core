@@ -24,11 +24,17 @@ function tokenAuth(token) {
  * @param {string} groupId
  * @param {{origin:string, userId: string}}
  * @param {string} token
+ * @param {{error:string}=} error
  */
-function mockAddUserToGroup(groupId, { origin, userId }, token) {
-  return nock(uaaHost, tokenAuth(token))
-    .post(`/Groups/${groupId}/members`, { origin, type: 'USER', value: userId })
-    .reply(200, {});
+function mockAddUserToGroup(groupId, { origin, userId }, token, error) {
+  const n = nock(uaaHost, tokenAuth(token))
+    .post(`/Groups/${groupId}/members`, { origin, type: 'USER', value: userId });
+
+  if (error) {
+    return n.reply(400, error);
+  }
+
+  return n.reply(200, {});
 }
 
 /**
@@ -75,21 +81,34 @@ function mockFetchUser(userId, profile, token) {
 /**
  * @param {string} email
  * @param {string} token
+ * @param {object?} profile - UAA user profile attributes
  */
-function mockInviteUser(email, token) {
+function mockFetchUserByEmail(email, token, profile) {
+  return nock(uaaHost, tokenAuth(token))
+    .get('/Users')
+    .query({ filter: `email eq "${email}"` })
+    .reply(200, {
+      resources: profile ? [profile] : [],
+    });
+}
+
+/**
+ * @param {string} email
+ * @param {string} token
+ */
+function mockInviteUser(email, token, profile) {
   return nock(uaaHost, tokenAuth(token))
     .post('/invite_users', { emails: [email] })
     .query({ redirect_uri: config.app.hostname })
     .reply(200, {
-      new_invites: [
+      new_invites: profile ? [
         {
           email,
-          userId: 'userId',
-          origin: 'example.com',
           success: true,
           inviteLink: '',
+          ...profile,
         },
-      ],
+      ] : [],
     });
 }
 
@@ -171,11 +190,13 @@ function mockVerifyUserGroup(userId, profile) {
 function mockInviteUserToUserGroup(email, userToken, groupName) {
   const clientToken = 'token';
   const groupId = '1';
+  const profile = { groups: [groupName], userId: 'userId', origin: 'example.com' };
 
-  mockInviteUser(email, userToken);
   mockFetchClientToken(clientToken);
+  mockFetchUserByEmail(email, clientToken);
+  mockInviteUser(email, userToken);
   mockFetchGroupId(groupName, groupId, clientToken);
-  mockAddUserToGroup(groupId, { userId: 'userId', origin: 'example.com' }, userToken);
+  mockAddUserToGroup(groupId, profile, userToken);
 }
 
 /**
@@ -204,6 +225,7 @@ module.exports = {
   mockFetchClientToken,
   mockFetchGroupId,
   mockFetchUser,
+  mockFetchUserByEmail,
   mockInviteUser,
   mockInviteUserToUserGroup,
   mockRefreshToken,
