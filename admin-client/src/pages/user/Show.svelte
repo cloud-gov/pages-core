@@ -76,7 +76,7 @@
       {#if user.hasGithubAuth}
         <div class="tablet:grid-col-fill padding-bottom-1">
           <LabeledItem label="github email" value={user.email} />
-          <LabeledItem label="github username" value={user.uaa ? '' : user.username} />
+          <LabeledItem label="github username" value={user.username} />
         </div>
       {:else}
       <p>User is not connected to Github</p>
