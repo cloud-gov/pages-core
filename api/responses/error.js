@@ -1,5 +1,5 @@
 const { DatabaseError } = require('sequelize');
-const { ValidationError } = require('../utils/validators');
+const { CustomError, ValidationError } = require('../utils/validators');
 
 module.exports = (error = {}, { res }) => {
   let finalError = error;
@@ -21,6 +21,11 @@ module.exports = (error = {}, { res }) => {
   } else if (error instanceof DatabaseError) {
     finalError = {
       status: 404,
+    };
+  } else if (error instanceof CustomError) {
+    finalError = {
+      message: error.message,
+      status: error.status,
     };
   }
 

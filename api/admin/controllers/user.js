@@ -2,6 +2,7 @@ const { Organization, Site, User } = require('../../models');
 const { paginate, wrapHandlers } = require('../../utils');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const userSerializer = require('../../serializers/user');
+const OrganizationService = require('../../services/organization');
 
 module.exports = wrapHandlers({
   async me(req, res) {
@@ -56,5 +57,37 @@ module.exports = wrapHandlers({
     const userJSON = userSerializer.toJSON(user, true);
 
     return res.json(userJSON);
+  },
+
+  async invite(req, res) {
+    const {
+      body: { uaaEmail, githubUsername },
+      user,
+    } = req;
+
+    const [, invite] = await OrganizationService.inviteUserToPlatform(
+      user, uaaEmail, githubUsername
+    );
+
+    const json = {
+      invite: invite && { email: invite.email, link: invite.inviteLink },
+    };
+
+    return res.json(json);
+  },
+
+  async resendInvite(req, res) {
+    const {
+      body: { uaaEmail },
+      user,
+    } = req;
+
+    const invite = await OrganizationService.resendInvite(user, uaaEmail);
+
+    const json = {
+      invite: { email: invite.email, link: invite.inviteLink },
+    };
+
+    return res.json(json);
   },
 });
