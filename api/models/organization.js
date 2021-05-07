@@ -13,6 +13,9 @@ const associate = ({
     foreignKey: 'organizationId',
     otherKey: 'userId',
   });
+  Organization.hasMany(OrganizationRole, {
+    foreignKey: 'organizationId',
+  });
   Organization.hasMany(Site, {
     foreignKey: 'organizationId',
   });

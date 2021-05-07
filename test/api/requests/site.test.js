@@ -16,7 +16,7 @@ const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema'
 const csrfToken = require('../support/csrfToken');
 
 const {
-  Build, Organization, Site, User,
+  Build, Organization, Role, Site, User,
 } = require('../../../api/models');
 const S3SiteRemover = require('../../../api/services/S3SiteRemover');
 const siteErrors = require('../../../api/responses/siteErrors');
@@ -38,19 +38,13 @@ describe('Site API', () => {
     sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
     sinon.stub(EventCreator, 'error').resolves();
 
-    return Promise.all([
-      factory.organization.truncate(),
-      factory.role.truncate(),
-    ]);
+    return factory.organization.truncate();
   });
 
   afterEach(() => {
     sinon.restore();
 
-    return Promise.all([
-      factory.organization.truncate(),
-      factory.role.truncate(),
-    ]);
+    return factory.organization.truncate();
   });
 
   after(() => {
@@ -382,7 +376,7 @@ describe('Site API', () => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
       const org = await factory.organization.create();
-      const role = await factory.role.create();
+      const role = await Role.findOne({ name: 'user' });
 
       cfMockServices(siteOwner, siteRepository);
 
@@ -518,7 +512,7 @@ describe('Site API', () => {
       const siteRepository = crypto.randomBytes(3).toString('hex');
       const user = await factory.user();
       const org = await factory.organization.create();
-      const role = await factory.role.create();
+      const role = await Role.findOne({ name: 'user' });
       await org.addUser(user, { through: { roleId: role.id } });
 
       cfMockServices(siteOwner, siteRepository);

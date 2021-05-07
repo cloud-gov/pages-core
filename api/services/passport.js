@@ -15,8 +15,13 @@ const {
     options: githubOptions,
     authorizationOptions: githubAuthorizationOptions,
   },
-  uaa: { options: uaaOptions },
 } = config.passport;
+
+const uaaOptions = {
+  ...config.passport.uaa.options,
+  callbackURL: `${config.app.hostname}/auth/uaa/callback`,
+  logoutCallbackURL: `${config.app.hostname}/auth/uaa/logout`,
+};
 
 async function verifyGithub(accessToken, _refreshToken, profile, callback) {
   try {
