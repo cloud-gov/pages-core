@@ -138,7 +138,7 @@ module.exports.userEnvVar = {
   key: cfUserEnvVar.key,
 };
 
-const uaaCredentials = appEnv.getServiceCreds(`${process.env.APP_ENV}-uaa-client`);
+const uaaCredentials = appEnv.getServiceCreds(`app-${process.env.APP_ENV}-uaa-client`);
 
 module.exports.passport = {
   uaa: {
