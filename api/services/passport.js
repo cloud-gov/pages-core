@@ -32,7 +32,7 @@ async function checkMultiAuth(username, callback) {
 
     if (currentUser && currentUser.UAAIdentity) {
       EventCreator.audit(Event.labels.AUTHENTICATION, currentUser, 'UAA user attempting GitHub login');
-      return callback(null, false, { message: 'You must login with you UAA account. Pleas try again.' });
+      return callback(null, false, { message: 'You must login with you UAA account. Please try again.' });
     }
   }
 }
