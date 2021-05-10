@@ -208,6 +208,7 @@ jobs:
           outputs: [name: src-api]
           params:
             FEATURE_PROXY_EDGE_LINKS: "false"
+            APP_HOSTNAME: https://federalistapp-staging.18f.gov
           run:
             dir: src-api
             path: bash
