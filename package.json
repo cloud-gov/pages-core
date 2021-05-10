@@ -43,7 +43,7 @@
     "request": "^2.88.2",
     "sequelize": "^6.3.5",
     "socket.io": "^3.0.4",
-    "socket.io-client": "^3.0.4",
+    "socket.io-client": "^4.0.2",
     "socket.io-redis": "^6.0.1",
     "underscore": "^1.12.1",
     "urlsafe-base64": "^1.0.0",
