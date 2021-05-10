@@ -306,7 +306,7 @@ describe('UAAClient', () => {
       const error = await uaaClient.request('/foobar').catch(e => e);
 
       expect(error).to.be.an('Error');
-      expect(error.message).to.eq('getaddrinfo ENOTFOUND uaa.example.com');
+      expect(error.message).to.eq('Error: getaddrinfo ENOTFOUND uaa.example.com');
     });
 
     it('should throw and error when uaa returns an error message', async () => {
@@ -319,7 +319,7 @@ describe('UAAClient', () => {
       const error = await uaaClient.request(path, { token }).catch(e => e);
 
       expect(error).to.be.an('Error');
-      expect(error.message).to.eq(errorMessage.error);
+      expect(error.message).to.eq(`Error: ${errorMessage.error}`);
     });
 
     it('should throw and error when status code greater than 399', async () => {
@@ -330,7 +330,7 @@ describe('UAAClient', () => {
 
       const error = await uaaClient.request(path, { token }).catch(e => e);
 
-      expect(error.message).to.eq('Received status code: 500');
+      expect(error.message).to.eq('Error: Received status code: 500');
     });
 
     context('when the user does not have the appropriate scope', () => {
@@ -344,7 +344,7 @@ describe('UAAClient', () => {
         const error = await uaaClient.request(path, { token }).catch(e => e);
 
         expect(error).to.be.an('Error');
-        expect(error.message).to.eq(errorMessage.error);
+        expect(error.message).to.eq(`Error: ${errorMessage.error}`);
       });
     });
   });

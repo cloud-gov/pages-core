@@ -112,7 +112,7 @@ class UAAClient {
     try {
       return await this.request(path, options);
     } catch (error) {
-      if (error.message === 'member_already_exists') {
+      if (error.message.includes('member_already_exists')) {
         return null;
       }
       throw error;
@@ -252,8 +252,8 @@ class UAAClient {
 
         if (result.error) {
           const msg = `${result.error}
-          ${result.error_description}
-          ${result.scope}`;
+          ${result.error_description || ''}
+          ${result.scope || ''}`.trim();
           return reject(new Error(msg));
         }
 
