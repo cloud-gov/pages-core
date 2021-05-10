@@ -251,11 +251,10 @@ class UAAClient {
         }
 
         if (result.error) {
-          const err = new Error(result.error);
-          if (result.error_description) {
-            err.description = result.error_description;
-          }
-          return reject(err);
+          const msg = `${result.error}
+          ${result.error_description}
+          ${result.scope}`;
+          return reject(new Error(msg));
         }
 
         if (response.statusCode > 399) {
@@ -295,7 +294,7 @@ class UAAClient {
       }
 
       request(options, callback);
-    });
+    }).catch((e) => { throw new Error(e); });
   }
 }
 
