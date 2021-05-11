@@ -16,17 +16,6 @@ const UAAClient = require('../../utils/uaaClient');
  * @typedef {object} UAAIdentityType
  */
 
-/**
- * @typedef {object} UAAInvite
- * @property {string} email
- * @property {string} userId
- * @property {string} origin
- * @property {boolean} success
- * @property {string=} errorCode
- * @property {string=} errorMessage
- * @property {string=} inviteLink
- */
-
 function throwError(message) {
   throw new CustomError(message, 422);
 }
@@ -52,7 +41,7 @@ module.exports = {
   /**
    * @param {UAAIdentityType} currentUserUAAIdentity
    * @param {string} targetUserEmail - the email address of the user to invite
-   * @returns {Promise<UAAInvite>}
+   * @returns {Promise<UAAClient.UAAUserAttributes>}
    */
   async inviteUAAUser(currentUserUAAIdentity, targetUserEmail) {
     const accessToken = await this.refreshToken(currentUserUAAIdentity);
@@ -89,7 +78,7 @@ module.exports = {
    * @param {string=} targetUserGithubUsername - the github username of the user to invite,
    * if they are a current Federalist user
    *
-   * @returns {Promise<[UserType, (UAAInvite | undefined)]>}
+   * @returns {Promise<[UserType, UAAClient.UAAUserAttributes]>}
    */
   async findOrCreateUAAUser(currentUserUAAIdentity, targetUserEmail, targetUserGithubUsername = '') {
     let user = await this.findUserByUAAIdentity(targetUserEmail);
@@ -98,31 +87,30 @@ module.exports = {
       return [user];
     }
 
-    const invite = await this.inviteUAAUser(currentUserUAAIdentity, targetUserEmail);
+    const uaaUserAttributes = await this.inviteUAAUser(currentUserUAAIdentity, targetUserEmail);
 
     user = await User.findOne({
       where: { username: targetUserGithubUsername && targetUserGithubUsername.toLowerCase() },
     });
 
     if (!user) {
-      user = await User.create({ username: invite.email });
+      user = await User.create({ username: uaaUserAttributes.email });
     }
 
     await user.createUAAIdentity({
-      uaaId: invite.userId,
-      userName: invite.email,
-      email: invite.email,
-      origin: invite.origin,
+      uaaId: uaaUserAttributes.userId,
+      userName: uaaUserAttributes.email,
+      email: uaaUserAttributes.email,
+      origin: uaaUserAttributes.origin,
     });
 
-    return [user, invite];
+    return [user, uaaUserAttributes];
   },
 
   /**
    *
    * @param {UserType} currentUser
    * @param {string} targetUserEmail
-   * @returns
    */
   async resendInvite(currentUser, targetUserEmail) {
     const currentUserUAAIdentity = await currentUser.getUAAIdentity();
@@ -141,7 +129,7 @@ module.exports = {
    * @param {UserType} currentUser
    * @param {string} targetUserEmail - the email address of the user to invite
    * @param {string=} targetUserGithubUsername
-   * @returns {Promise<[UserType, (UAAInvite | undefined)]>}
+   * @returns {Promise<[UserType, UAAClient.UAAUserAttributes]>}
    */
   async inviteUserToPlatform(currentUser, targetUserEmail, targetUserGithubUsername) {
     const currentUserUAAIdentity = await currentUser.getUAAIdentity();
@@ -156,11 +144,11 @@ module.exports = {
       throwError(`Current user ${currentUser.username} must be a Pages admin in UAA to invite a user.`);
     }
 
-    const [user, invite] = await this.findOrCreateUAAUser(
+    const [user, uaaUserAttributes] = await this.findOrCreateUAAUser(
       currentUserUAAIdentity, targetUserEmail, targetUserGithubUsername
     );
 
-    return [user, invite];
+    return [user, uaaUserAttributes];
   },
 
   /**
@@ -169,7 +157,7 @@ module.exports = {
    * @param {('manager'|'user')} orgRoleName
    * @param {string} targetUserEmail - the email address of the user to invite
    * @param {string=} targetUserGithubUsername
-   * @returns {Promise<[OrgType, (UAAInvite | undefined)]>}
+   * @returns {Promise<[OrgType, UAAClient.UAAUserAttributes>}
    */
   async inviteUserToOrganization(
     currentUser, orgName, orgRoleName, targetUserEmail, targetUserGithubUsername
@@ -211,13 +199,13 @@ module.exports = {
       throwError(`Invalid role name ${orgRoleName} provided, valid values are 'user' or 'manager'.`);
     }
 
-    const [user, invite] = await this.findOrCreateUAAUser(
+    const [user, uaaUserAttributes] = await this.findOrCreateUAAUser(
       currentUserUAAIdentity, targetUserEmail, targetUserGithubUsername
     );
 
     await org.addUser(user, { through: { roleId: role.id } });
 
-    return [org, invite];
+    return [org, uaaUserAttributes];
   },
 
   /**
@@ -225,7 +213,7 @@ module.exports = {
    * @param {string} orgName
    * @param {string} targetUserEmail
    * @param {string=} targetUserGithubUsername
-   * @returns {Promise<[OrgType, (UAAInvite | undefined)]>}
+   * @returns {Promise<[OrgType, UAAClient.UAAUserAttributes]>}
    */
   async createOrganization(
     currentUser, orgName, targetUserEmail, targetUserGithubUsername
@@ -242,7 +230,7 @@ module.exports = {
       throwError(`Current user ${currentUser.username} must be a Pages admin in UAA to create an organization.`);
     }
 
-    const [user, invite] = await this.findOrCreateUAAUser(
+    const [user, uaaUserAttributes] = await this.findOrCreateUAAUser(
       currentUserUAAIdentity, targetUserEmail, targetUserGithubUsername
     );
 
@@ -251,6 +239,6 @@ module.exports = {
     const org = await Organization.create({ name: orgName });
     await org.addUser(user, { through: { roleId: managerRole.id } });
 
-    return [org, invite];
+    return [org, uaaUserAttributes];
   },
 };
