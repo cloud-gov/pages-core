@@ -13,7 +13,7 @@ const {
   validBasicAuthUsername,
   validBasicAuthPassword,
 } = require('../utils/validators');
-const { wrapHandlers } = require('../utils');
+const { toInt, wrapHandlers } = require('../utils');
 const Features = require('../features');
 const { fetchModelById } = require('../utils/queryDatabase');
 
@@ -111,8 +111,20 @@ module.exports = wrapHandlers({
   },
 
   async create(req, res) {
-    const { body, user } = req;
-    const siteParams = { ...body, sharedBucket: false };
+    const {
+      body: {
+        owner, template, organizationId, repository,
+      },
+      user,
+    } = req;
+
+    const siteParams = {
+      owner,
+      template,
+      organizationId: toInt(organizationId),
+      repository,
+      sharedBucket: false,
+    };
 
     await authorizer.create(user, siteParams);
     const site = await SiteCreator.createSite({
