@@ -116,6 +116,10 @@ async function updateOrganization(id, params) {
   return put(`/organizations/${id}`, params);
 }
 
+async function fetchRoles() {
+  return get('/roles').catch(() => []);
+}
+
 async function fetchSite(id) {
   return get(`/sites/${id}`).catch(() => null);
 }
@@ -160,6 +164,7 @@ export {
   fetchOrganization,
   fetchOrganizations,
   updateOrganization,
+  fetchRoles,
   fetchSite,
   fetchSites,
   fetchUser,
