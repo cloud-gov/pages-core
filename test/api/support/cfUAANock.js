@@ -196,7 +196,7 @@ function mockInviteUserToUserGroup(email, userToken, groupName) {
   mockFetchUserByEmail(email, clientToken);
   mockInviteUser(email, userToken);
   mockFetchGroupId(groupName, groupId, clientToken);
-  mockAddUserToGroup(groupId, profile, userToken);
+  mockAddUserToGroup(groupId, profile, clientToken);
 }
 
 /**
