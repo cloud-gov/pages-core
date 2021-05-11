@@ -15,7 +15,7 @@ class TemplateSite extends React.Component {
       owner: props.defaultOwner,
       repository: '',
       template: props.templateKey,
-      organizationId: '',
+      templateOrganizationId: '',
       touched: false,
     };
 
@@ -77,7 +77,7 @@ class TemplateSite extends React.Component {
       description, example, organizations, thumb, title,
     } = this.props;
     const {
-      error, owner, organizationId, repository, touched,
+      error, owner, templateOrganizationId, repository, touched,
     } = this.state;
 
     return (
@@ -116,7 +116,7 @@ class TemplateSite extends React.Component {
                         error={error}
                         id="templateOrganizationId"
                         name="templateOrganizationId"
-                        value={organizationId}
+                        value={templateOrganizationId}
                         onChange={this.handleChange}
                         orgData={organizations.data}
                         mustChooseOption
