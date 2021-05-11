@@ -14,6 +14,17 @@ const uaaOptions = config.passport.uaa;
  * @property {string=} inviteLink
  */
 
+/**
+ * @typedef {object} UAAUserAttributes
+ * @property {string} userId
+ * @property {string} email
+ * @property {string} origin
+ * @property {string=} inviteLink
+ */
+
+/**
+ * A wrapper around the UAA API
+ */
 class UAAClient {
   constructor() {
     this.clientId = uaaOptions.options.clientID;
@@ -31,29 +42,44 @@ class UAAClient {
   /**
    * @param {string} targetUserEmail - the email address of the user to add
    * @param {string} userToken - a user token with the `scim.invite` scope
+   * @returns {UAAUserAttributes} - User or invite attributes
    *
    * Invites the target user to UAA and adds them to the `pages.user` UAA group
    */
   async inviteUserToUserGroup(targetUserEmail, userToken) {
+    let userInviteAttributes;
+
     const groupName = 'pages.user';
 
     const clientToken = await this.fetchClientToken();
 
     const uaaUser = await this.fetchUserByEmail(targetUserEmail, clientToken);
-    const isInGroup = uaaUser && this.userInGroup(uaaUser.groups, [groupName]);
-    if (isInGroup) {
-      return null;
+    if (uaaUser) {
+      userInviteAttributes = {
+        userId: uaaUser.id,
+        email: uaaUser.userName,
+        origin: uaaUser.origin,
+      };
+
+      const isInGroup = this.userInGroup(uaaUser.groups, [groupName]);
+
+      if (isInGroup) {
+        return userInviteAttributes;
+      }
+    } else {
+      const invite = await this.inviteUser(targetUserEmail, userToken);
+      userInviteAttributes = {
+        userId: invite.userId,
+        email: invite.email,
+        origin: invite.origin,
+        inviteLink: invite.inviteLink,
+      };
     }
 
-    const invite = uaaUser ? null : await this.inviteUser(targetUserEmail, userToken);
-
-    const { origin } = invite || uaaUser;
-    const userId = (invite && invite.userId) || uaaUser.id;
-
     const groupId = await this.fetchGroupId(groupName, clientToken);
-    await this.addUserToGroup(groupId, { origin, userId }, clientToken);
+    await this.addUserToGroup(groupId, userInviteAttributes, clientToken);
 
-    return invite;
+    return userInviteAttributes;
   }
 
   /**
