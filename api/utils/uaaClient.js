@@ -51,7 +51,7 @@ class UAAClient {
     const userId = (invite && invite.userId) || uaaUser.id;
 
     const groupId = await this.fetchGroupId(groupName, clientToken);
-    await this.addUserToGroup(groupId, { origin, userId }, userToken);
+    await this.addUserToGroup(groupId, { origin, userId }, clientToken);
 
     return invite;
   }
@@ -97,16 +97,16 @@ class UAAClient {
   /**
    * @param {string} groupId - a UAA group id
    * @param {{origin: string, userId: string}} userInfo - the origin and user id of the uaa user
-   * @param {string} userToken - a user token with the `groups.update` scope
+   * @param {string} clientToken - a client token with the `groups.update` scope
    *
    * Adds the UAA user to the specific UAA group, ignores an error if the user is a member.
    */
-  async addUserToGroup(groupId, { origin, userId }, userToken) {
+  async addUserToGroup(groupId, { origin, userId }, clientToken) {
     const path = `/Groups/${groupId}/members`;
     const options = {
       body: { origin, type: 'USER', value: userId },
       method: 'POST',
-      token: userToken,
+      token: clientToken,
     };
 
     try {
@@ -180,7 +180,7 @@ class UAAClient {
 
   /**
    * @param {string} userId - a UAA user id
-   * @param {string} clientToken - a client token with the `scim.write` scope
+   * @param {string} clientToken - a client token with the `scim.read` scope
    *
    * Fetches a UAA user by id
    */

@@ -31,15 +31,14 @@ oauth:
     authorities:
       - openid
       - scim.invite
-      - groups.update
 
   clients:
     pages-client:
       name: Pages client
       override: true
-      scope: openid,scim.invite,groups.update
+      scope: openid,scim.invite
       authorized-grant-types: authorization_code,client_credentials
-      authorities: scim.write,scim.read,scim.create
+      authorities: groups.update,scim.read
       access-token-validity: 600
       refresh-token-validity: 259200
       autoapprove: true

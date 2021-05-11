@@ -96,7 +96,7 @@ describe('UAAClient', () => {
   });
 
   describe('.addUserToGroup()', () => {
-    const userToken = 'user-token';
+    const clientToken = 'client-token';
 
     it('does not throw when user is already in the group', async () => {
       const groupId = 1;
@@ -105,9 +105,9 @@ describe('UAAClient', () => {
         userId: 'abc123',
       };
 
-      cfUAANock.mockAddUserToGroup(groupId, profile, userToken, { error: 'member_already_exists' });
+      cfUAANock.mockAddUserToGroup(groupId, profile, clientToken, { error: 'member_already_exists' });
 
-      await uaaClient.addUserToGroup(groupId, profile, userToken);
+      await uaaClient.addUserToGroup(groupId, profile, clientToken);
 
       expect(true).to.be.true;
     });
@@ -119,9 +119,9 @@ describe('UAAClient', () => {
         userId: 'abc123',
       };
 
-      cfUAANock.mockAddUserToGroup(groupId, profile, userToken, { error: 'something else' });
+      cfUAANock.mockAddUserToGroup(groupId, profile, clientToken, { error: 'something else' });
 
-      const error = await uaaClient.addUserToGroup(groupId, profile, userToken).catch(e => e);
+      const error = await uaaClient.addUserToGroup(groupId, profile, clientToken).catch(e => e);
 
       expect(error).to.be.an('Error');
     });
@@ -133,9 +133,9 @@ describe('UAAClient', () => {
         userId: 'abc123',
       };
 
-      cfUAANock.mockAddUserToGroup(groupId, profile, userToken);
+      cfUAANock.mockAddUserToGroup(groupId, profile, clientToken);
 
-      await uaaClient.addUserToGroup(groupId, profile, userToken);
+      await uaaClient.addUserToGroup(groupId, profile, clientToken);
 
       expect(true).to.be.true;
     });
@@ -239,7 +239,7 @@ describe('UAAClient', () => {
 
         cfUAANock.mockFetchUserByEmail(email, clientToken, user);
         cfUAANock.mockFetchGroupId('pages.user', groupId, clientToken);
-        cfUAANock.mockAddUserToGroup(groupId, { origin, userId }, userToken);
+        cfUAANock.mockAddUserToGroup(groupId, { origin, userId }, clientToken);
         const inviteUserSpy = sinon.spy(uaaClient, 'inviteUser');
         const addUserToGroupSpy = sinon.spy(uaaClient, 'addUserToGroup');
 
@@ -247,7 +247,7 @@ describe('UAAClient', () => {
 
         sinon.assert.notCalled(inviteUserSpy);
         sinon.assert.calledOnceWithMatch(addUserToGroupSpy,
-          groupId, sinon.match({ origin, userId }), userToken);
+          groupId, sinon.match({ origin, userId }), clientToken);
         expect(invite).to.be.null;
       });
     });
@@ -287,14 +287,14 @@ describe('UAAClient', () => {
         cfUAANock.mockFetchUserByEmail(email, clientToken);
         cfUAANock.mockInviteUser(email, userToken, { userId, origin });
         cfUAANock.mockFetchGroupId('pages.user', groupId, clientToken);
-        cfUAANock.mockAddUserToGroup(groupId, { origin, userId }, userToken);
+        cfUAANock.mockAddUserToGroup(groupId, { origin, userId }, clientToken);
 
         const addUserToGroupSpy = sinon.spy(uaaClient, 'addUserToGroup');
 
         const invite = await uaaClient.inviteUserToUserGroup(email, userToken);
 
         sinon.assert.calledOnceWithMatch(addUserToGroupSpy,
-          groupId, sinon.match({ origin, userId }), userToken);
+          groupId, sinon.match({ origin, userId }), clientToken);
         expect(invite.email).to.eq(email);
         expect(invite.userId).to.eq(userId);
       });

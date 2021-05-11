@@ -37,7 +37,7 @@ module.exports = {
       tokenURL: `${env.UAA_HOST_DOCKER_URL || env.UAA_HOST}/oauth/token`,
       userURL: `${env.UAA_HOST_DOCKER_URL || env.UAA_HOST}/userinfo`,
       logoutURL: `${env.UAA_HOST}/logout.do`,
-      scope: ['openid', 'scim.invite', 'groups.update'],
+      scope: ['openid', 'scim.invite'],
     },
   },
 };
