@@ -243,12 +243,12 @@ describe('UAAClient', () => {
         const inviteUserSpy = sinon.spy(uaaClient, 'inviteUser');
         const addUserToGroupSpy = sinon.spy(uaaClient, 'addUserToGroup');
 
-        const invite = await uaaClient.inviteUserToUserGroup(email, userToken);
+        const uaaUserAttributes = await uaaClient.inviteUserToUserGroup(email, userToken);
 
         sinon.assert.notCalled(inviteUserSpy);
         sinon.assert.calledOnceWithMatch(addUserToGroupSpy,
           groupId, sinon.match({ origin, userId }), clientToken);
-        expect(invite).to.be.null;
+        expect(uaaUserAttributes.inviteLink).to.be.undefined;
       });
     });
 
@@ -268,11 +268,11 @@ describe('UAAClient', () => {
         const inviteUserSpy = sinon.spy(uaaClient, 'inviteUser');
         const addUserToGroupSpy = sinon.spy(uaaClient, 'addUserToGroup');
 
-        const invite = await uaaClient.inviteUserToUserGroup(email, '');
+        const uaaUserAttributes = await uaaClient.inviteUserToUserGroup(email, '');
 
         sinon.assert.notCalled(inviteUserSpy);
         sinon.assert.notCalled(addUserToGroupSpy);
-        expect(invite).to.be.null;
+        expect(uaaUserAttributes.inviteLink).to.be.undefined;
       });
     });
 
@@ -291,12 +291,12 @@ describe('UAAClient', () => {
 
         const addUserToGroupSpy = sinon.spy(uaaClient, 'addUserToGroup');
 
-        const invite = await uaaClient.inviteUserToUserGroup(email, userToken);
+        const uaaUserAttributes = await uaaClient.inviteUserToUserGroup(email, userToken);
 
         sinon.assert.calledOnceWithMatch(addUserToGroupSpy,
           groupId, sinon.match({ origin, userId }), clientToken);
-        expect(invite.email).to.eq(email);
-        expect(invite.userId).to.eq(userId);
+        expect(uaaUserAttributes.email).to.eq(email);
+        expect(uaaUserAttributes.userId).to.eq(userId);
       });
     });
   });

@@ -41,12 +41,12 @@ module.exports = wrapHandlers({
       user,
     } = req;
 
-    const [org, invite] = await OrganizationService.createOrganization(
+    const [org, uaaUserAttributes] = await OrganizationService.createOrganization(
       user, name, managerUAAEmail, managerGithubUsername
     );
 
     const json = {
-      invite: invite && { email: invite.email, link: invite.inviteLink },
+      invite: { email: uaaUserAttributes.email, link: uaaUserAttributes.inviteLink },
       org: serialize(org),
     };
 
