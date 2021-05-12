@@ -65,13 +65,8 @@ function serializeNew(site, isSystemAdmin = false) {
   return omitBy((v => v === null), filtered);
 }
 
-// Eventually replace `serialize` for arrays
-function serializeMany(sites, isSystemAdmin) {
-  return sites.map(site => serializeNew(site, isSystemAdmin));
-}
-
-const serializeObject = (site) => {
-  const json = serializeNew(site);
+const serializeObject = (site, isSystemAdmin) => {
+  const json = serializeNew(site, isSystemAdmin);
 
   if (json.Users) {
     json.users = site.Users.map(u => userSerializer.toJSON(u));
@@ -85,6 +80,11 @@ const serializeObject = (site) => {
 
   return json;
 };
+
+// Eventually replace `serialize` for arrays
+function serializeMany(sites, isSystemAdmin) {
+  return sites.map(site => serializeObject(site, isSystemAdmin));
+}
 
 const serialize = (serializable) => {
   const include = [User.scope('withGithub'), Organization];
