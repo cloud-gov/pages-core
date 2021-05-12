@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     SOCKET_IO: 'socket.io',
     SITE_USER: 'site-user',
     REQUEST_HANDLER: 'request-handler',
-    BUILDLOG_ARCHIVED: 'buildlog_archived',
+    BUILDLOG_ARCHIVED: 'buildlog-archived',
   };
 
   function isValidType(value) {

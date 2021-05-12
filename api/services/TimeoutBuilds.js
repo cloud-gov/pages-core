@@ -11,7 +11,7 @@ const TIMEOUT = process.env.BUILD_TIMEOUT || 45;
 const timeoutBuilds = async ({ date }) => {
   const cfApi = new CFApi();
 
-  const now = moment(date || new Date());  
+  const now = moment(date || new Date());
   const buildTimout = now.clone().subtract(TIMEOUT, 'minutes');
   const taskTimeout = now.clone().subtract(5, 'minutes');
 
@@ -53,7 +53,7 @@ const timeoutBuilds = async ({ date }) => {
   const [, builds] = await Build.update(atts, options);
   const buildIds = builds.map(b => b.id);
   const cancels = await Promise.allSettled(buildIds.map(buildId => cfApi.cancelBuildTask(buildId)
-    .catch(err => {
+    .catch((err) => {
       EventCreator.error(Event.labels.BUILD_STATUS, err, { buildId });
       throw err;
     })));

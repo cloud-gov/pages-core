@@ -4,8 +4,8 @@ const BullQueueClient = require('../utils/bullQueueClient');
 async function initialize(queueName, { processJob, queueOptions, jobData = {} }) {
   const bullQueue = new BullQueueClient(queueName);
   await bullQueue.queue.empty();
-  bullQueue.queue.process(async (job) => processJob(job.data));
-  
+  bullQueue.queue.process(async job => processJob(job.data));
+
   bullQueue.queue.on('completed', (job, result) => {
     logger.info(`COMPLETED: ${queueName} job@id=${job.id} completed! Result: ${result}`);
   });
@@ -14,7 +14,7 @@ async function initialize(queueName, { processJob, queueOptions, jobData = {} })
     logger.error(`FAILED: ${queueName} job@id=${job.id} failed! Error: ${err.stack}`);
   });
 
-  bullQueue.queue.on('cleaned', function(jobs, type) {
+  bullQueue.queue.on('cleaned', (jobs, type) => {
     logger.info('Cleaned %s %s jobs', jobs.length, type);
   });
 

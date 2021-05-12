@@ -58,7 +58,7 @@ const federalistUsersAdmins = githubAccessToken => GitHub.getOrganizationMembers
 
 const removeMemberFromFederalistUsersOrg = (githubAccessToken, login) => GitHub
   .removeOrganizationMember(githubAccessToken, FEDERALIST_USERS_ORG, login)
-  .catch(err => {
+  .catch((err) => {
     EventCreator.error(Event.labels.FEDERALIST_USERS_MEMBERSHIP, err, { login });
     throw err;
   });
