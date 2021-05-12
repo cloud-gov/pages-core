@@ -28,6 +28,7 @@ const validationFailed = (site, options, validationError) => {
 const associate = ({
   Build,
   Organization,
+  OrganizationRole,
   Site,
   SiteUser,
   User,
@@ -78,14 +79,20 @@ const associate = ({
     }],
   }));
   Site.addScope('forUser', user => ({
-    include: [{
-      model: User,
-      required: true,
-      where: {
-        id: user.id,
+    include: [
+      {
+        model: User,
+        required: true,
+        where: { id: user.id },
       },
-      Organization,
-    }],
+      {
+        model: Organization,
+        include: [{
+          model: OrganizationRole,
+          where: { userId: user.id },
+        }],
+      },
+    ],
   }));
 };
 
