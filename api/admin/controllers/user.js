@@ -1,5 +1,5 @@
 const { Organization, Site, User } = require('../../models');
-const { paginate, wrapHandlers } = require('../../utils');
+const { paginate, toInt, wrapHandlers } = require('../../utils');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const userSerializer = require('../../serializers/user');
 const OrganizationService = require('../../services/organization');
@@ -61,16 +61,21 @@ module.exports = wrapHandlers({
 
   async invite(req, res) {
     const {
-      body: { uaaEmail, githubUsername },
+      body: {
+        uaaEmail,
+        githubUsername,
+        organizationId,
+        roleId,
+      },
       user,
     } = req;
 
-    const [, invite] = await OrganizationService.inviteUserToPlatform(
-      user, uaaEmail, githubUsername
+    const { email, inviteLink: link } = await OrganizationService.inviteUserToOrganization(
+      user, toInt(organizationId), toInt(roleId), uaaEmail, githubUsername
     );
 
     const json = {
-      invite: invite && { email: invite.email, link: invite.inviteLink },
+      invite: { email, link },
     };
 
     return res.json(json);
