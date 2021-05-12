@@ -5,7 +5,9 @@ const SiteDestroyer = require('../services/SiteDestroyer');
 const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const UserActionCreator = require('../services/UserActionCreator');
 const siteSerializer = require('../serializers/site');
-const { Site, Build } = require('../models');
+const {
+  Build, Organization, Site, User,
+} = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const ProxyDataSync = require('../services/ProxyDataSync');
 const {
@@ -27,41 +29,45 @@ const stripCredentials = ({ username, password }) => {
 
 module.exports = wrapHandlers({
   async findAllForUser(req, res) {
-    const sites = await Site.forUser(req.user).findAll();
+    const { user } = req;
+
+    const sites = await Site.forUser(user).findAll();
 
     if (!sites) {
       return res.notFound();
     }
 
-    const siteJSON = await siteSerializer.serialize(sites);
+    const siteJSON = siteSerializer.serializeMany(sites);
 
     return res.json(siteJSON);
   },
 
   async findById(req, res) {
-    const site = await fetchModelById(req.params.id, Site);
+    const { user, params: { id: siteid } } = req;
+
+    const site = await fetchModelById(siteid, Site.forUser(user));
 
     if (!site) {
       return res.notFound();
     }
 
-    await authorizer.findOne(req.user, site);
+    await authorizer.findOne(user, site);
 
-    const siteJSON = await siteSerializer.serialize(site);
+    const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
   },
 
   async destroy(req, res) {
-    const { id } = req.params;
+    const { user, params: { id: siteId } } = req;
 
-    const site = await fetchModelById(id, Site);
+    const site = await fetchModelById(siteId, Site.forUser(user));
 
     if (!site) {
       return res.notFound();
     }
 
-    const siteJSON = await siteSerializer.serialize(site);
-    await authorizer.destroy(req.user, site);
+    await authorizer.destroy(user, site);
+    const siteJSON = siteSerializer.serializeNew(site);
     await SiteDestroyer.destroySite(site);
     return res.json(siteJSON);
   },
@@ -136,20 +142,23 @@ module.exports = wrapHandlers({
       await ProxyDataSync.saveSite(site);
     }
 
-    const siteJSON = await siteSerializer.serialize(site);
+    await site.reload({ include: [Organization, User] });
+    const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
   },
 
   async update(req, res) {
-    const site = await fetchModelById(req.params.id, Site);
+    const { user, params: { id: siteId }, body } = req;
+
+    const site = await fetchModelById(siteId, Site.forUser(user));
 
     if (!site) {
       return res.notFound();
     }
 
-    await authorizer.update(req.user, site);
+    await authorizer.update(user, site);
 
-    const params = Object.assign(site, req.body);
+    const params = Object.assign(site, body);
     await site.update({
       demoBranch: params.demoBranch,
       demoDomain: params.demoDomain,
@@ -179,7 +188,7 @@ module.exports = wrapHandlers({
         .then(b => b.enqueue());
     }
 
-    const siteJSON = await siteSerializer.serialize(site);
+    const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
   },
 
@@ -188,7 +197,7 @@ module.exports = wrapHandlers({
 
     const { site_id: siteId } = params;
 
-    const site = await Site.forUser(user).findByPk(siteId);
+    const site = await fetchModelById(siteId, Site.forUser(user));
 
     if (!site) {
       return res.notFound();
@@ -202,7 +211,7 @@ module.exports = wrapHandlers({
       await ProxyDataSync.saveSite(site);
     }
 
-    const siteJSON = await siteSerializer.serialize(site);
+    const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
   },
 
@@ -210,7 +219,7 @@ module.exports = wrapHandlers({
     const { params, user } = req;
     const { site_id: siteId } = params;
 
-    const site = await Site.forUser(user).findByPk(siteId);
+    const site = await fetchModelById(siteId, Site.forUser(user));
 
     if (!site) {
       return res.notFound();
@@ -222,7 +231,7 @@ module.exports = wrapHandlers({
       await ProxyDataSync.saveSite(site);
     }
 
-    const siteJSON = await siteSerializer.serialize(site);
+    const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
   },
 });
