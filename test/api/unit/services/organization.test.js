@@ -217,69 +217,13 @@ describe('OrganizationService', () => {
     });
   });
 
-  describe('.inviteUserToPlatform', () => {
-    context('when the current user does not have a UAA Identity', () => {
-      it('throws an error', async () => {
-        const currentUser = await userFactory();
-
-        const error = await OrganizationService.inviteUserToPlatform(
-          currentUser, '', '', ''
-        ).catch(e => e);
-
-        expect(error).to.be.an('Error');
-        expect(error.message).to.contain('must have a UAA Identity');
-      });
-    });
-
-    context('when the current user is not a Pages admin in UAA', () => {
-      it('throws an error', async () => {
-        const currentUser = await createUserWithUAAIdentity();
-        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
-        isUAAAdminStub.resolves(false);
-
-        const error = await OrganizationService.inviteUserToPlatform(
-          currentUser, '', ''
-        ).catch(e => e);
-
-        expect(error).to.be.an('Error');
-        expect(error.message).to.contain('must be a Pages admin in UAA');
-      });
-    });
-
-    context('when the target user does not exist', () => {
-      it('invites them to the platform', async () => {
-        const email = 'foo@bar.com';
-        const githubUsername = 'github';
-
-        const currentUser = await createUserWithUAAIdentity();
-        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
-        isUAAAdminStub.resolves(true);
-
-        const findOrCreateUAAUserResponse = ['user', 'invite'];
-
-        const findOrCreateUAAUserStub = sinon.stub(OrganizationService, 'findOrCreateUAAUser');
-        findOrCreateUAAUserStub.resolves(findOrCreateUAAUserResponse);
-
-        const [user, invite] = await OrganizationService.inviteUserToPlatform(
-          currentUser, email, githubUsername
-        );
-
-        sinon.assert.calledOnceWithMatch(findOrCreateUAAUserStub,
-          sinon.match({ id: currentUser.UAAIdentity.id }), email, githubUsername);
-
-        expect(user).to.eq(findOrCreateUAAUserResponse[0]);
-        expect(invite).to.eq(findOrCreateUAAUserResponse[1]);
-      });
-    });
-  });
-
   describe('.inviteUserToOrganization', () => {
     context('when the current user does not have a UAA Identity', () => {
       it('throws an error', async () => {
         const currentUser = await userFactory();
 
         const error = await OrganizationService.inviteUserToOrganization(
-          currentUser, '', '', ''
+          currentUser, null, null, ''
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
@@ -287,89 +231,98 @@ describe('OrganizationService', () => {
       });
     });
 
-    context('when the current user is not in the target org', () => {
+    context('when the current user is not in the target org or an admin', () => {
       it('throws an error', async () => {
-        const orgName = 'org';
-        const [currentUser] = await Promise.all([
+        const [currentUser, org] = await Promise.all([
           createUserWithUAAIdentity(),
-          Organization.create({ name: orgName }),
+          Organization.create({ name: 'foo' }),
         ]);
 
+        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
+        isUAAAdminStub.resolves(false);
+
         const error = await OrganizationService.inviteUserToOrganization(
-          currentUser, orgName, '', ''
+          currentUser, org.id, null, ''
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
-        expect(error.message).to.contain('must be a manager of the target organization');
+        expect(error.message).to.contain('a manager of the target organization');
       });
     });
 
-    context('when the current user is not a manager in the target org', () => {
+    context('when the current user is not a manager in the target org or an admin', () => {
       it('throws an error', async () => {
-        const orgName = 'org';
         const [currentUser, org, userRole] = await Promise.all([
           createUserWithUAAIdentity(),
-          Organization.create({ name: orgName }),
+          Organization.create({ name: 'foo' }),
           Role.findOne({ where: { name: 'user' } }),
         ]);
 
         await org.addUser(currentUser, { through: { roleId: userRole.id } });
 
+        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
+        isUAAAdminStub.resolves(false);
+
         const error = await OrganizationService.inviteUserToOrganization(
-          currentUser, orgName, '', ''
+          currentUser, org.id, null, ''
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
-        expect(error.message).to.contain('must be a manager of the target organization');
+        expect(error.message).to.contain('a manager of the target organization');
       });
     });
 
-    context('when an invalid role name is provided', () => {
+    context('when an invalid role id is provided', () => {
       it('throws an error', async () => {
-        const orgName = 'org';
         const [currentUser, org, managerRole] = await Promise.all([
           createUserWithUAAIdentity(),
-          Organization.create({ name: orgName }),
+          Organization.create({ name: 'foo' }),
           Role.findOne({ where: { name: 'manager' } }),
         ]);
 
         await org.addUser(currentUser, { through: { roleId: managerRole.id } });
 
+        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
+        isUAAAdminStub.resolves(true);
+
         const error = await OrganizationService.inviteUserToOrganization(
-          currentUser, orgName, 'invalidRoleName', ''
+          currentUser, org.id, 999999999, ''
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
-        expect(error.message).to.contain('Invalid role name');
+        expect(error.message).to.contain('Invalid role id');
       });
     });
 
-    context('when the target user exists in Pages and UAA', () => {
+    context('when the current user is a manager in the target org and the target user exists in Pages and UAA', () => {
       it('adds them to the org with the provided role', async () => {
-        const role = 'user';
         const githubUsername = 'username';
-        const orgName = 'org';
         const uaaEmail = 'foo@bar.com';
+
+        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
+        isUAAAdminStub.resolves(false);
 
         const targetUser = await createUserWithUAAIdentity();
         const findOrCreateUAAUserStub = sinon.stub(OrganizationService, 'findOrCreateUAAUser');
-        findOrCreateUAAUserStub.resolves([targetUser]);
+        findOrCreateUAAUserStub.resolves([targetUser, {
+          userId: targetUser.UAAIdentity.id,
+          email: targetUser.UAAIdentity.email,
+        }]);
 
-        const [currentUser, org, managerRole] = await Promise.all([
+        const [currentUser, org, managerRole, userRole] = await Promise.all([
           createUserWithUAAIdentity(),
-          Organization.create({ name: orgName }),
+          Organization.create({ name: 'foo' }),
           Role.findOne({ where: { name: 'manager' } }),
+          Role.findOne({ where: { name: 'user' } }),
         ]);
 
         await org.addUser(currentUser, { through: { roleId: managerRole.id } });
 
         expect((await targetUser.getOrganizations()).length).to.eq(0);
 
-        const [orgAgain, invite] = await OrganizationService.inviteUserToOrganization(
-          currentUser, orgName, role, uaaEmail, githubUsername
+        const uaaUserAttributes = await OrganizationService.inviteUserToOrganization(
+          currentUser, org.id, userRole.id, uaaEmail, githubUsername
         );
-
-        expect(orgAgain.id).to.eq(org.id);
 
         sinon.assert.calledOnceWithMatch(findOrCreateUAAUserStub,
           sinon.match({ id: currentUser.UAAIdentity.id }), uaaEmail, githubUsername);
@@ -377,7 +330,7 @@ describe('OrganizationService', () => {
         const targetUserOrgs = await targetUser.getOrganizations();
         expect(targetUserOrgs.length).to.eq(1);
         expect(targetUserOrgs[0].id).to.eq(org.id);
-        expect(invite).to.be.undefined;
+        expect(uaaUserAttributes.inviteLink).to.be.undefined;
 
         const orgRole = await OrganizationRole.findOne({
           where: { organizationId: org.id },
@@ -389,7 +342,61 @@ describe('OrganizationService', () => {
             },
             {
               model: Role,
-              where: { name: role },
+              where: { id: userRole.id },
+              required: true,
+            },
+          ],
+        });
+        expect(orgRole).to.not.be.null;
+      });
+    });
+
+    context('when the current user is a uaa admin and the target user exists in Pages and UAA', () => {
+      it('adds them to the org with the provided role', async () => {
+        const githubUsername = 'username';
+        const uaaEmail = 'foo@bar.com';
+
+        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
+        isUAAAdminStub.resolves(true);
+
+        const targetUser = await createUserWithUAAIdentity();
+        const findOrCreateUAAUserStub = sinon.stub(OrganizationService, 'findOrCreateUAAUser');
+        findOrCreateUAAUserStub.resolves([targetUser, {
+          userId: targetUser.UAAIdentity.id,
+          email: targetUser.UAAIdentity.email,
+        }]);
+
+        const [currentUser, org, userRole] = await Promise.all([
+          createUserWithUAAIdentity(),
+          Organization.create({ name: 'foo' }),
+          Role.findOne({ where: { name: 'user' } }),
+        ]);
+
+        expect((await targetUser.getOrganizations()).length).to.eq(0);
+
+        const uaaUserAttributes = await OrganizationService.inviteUserToOrganization(
+          currentUser, org.id, userRole.id, uaaEmail, githubUsername
+        );
+
+        sinon.assert.calledOnceWithMatch(findOrCreateUAAUserStub,
+          sinon.match({ id: currentUser.UAAIdentity.id }), uaaEmail, githubUsername);
+
+        const targetUserOrgs = await targetUser.getOrganizations();
+        expect(targetUserOrgs.length).to.eq(1);
+        expect(targetUserOrgs[0].id).to.eq(org.id);
+        expect(uaaUserAttributes.inviteLink).to.be.undefined;
+
+        const orgRole = await OrganizationRole.findOne({
+          where: { organizationId: org.id },
+          include: [
+            {
+              model: User,
+              where: { id: targetUser.id },
+              required: true,
+            },
+            {
+              model: Role,
+              where: { id: userRole.id },
               required: true,
             },
           ],
