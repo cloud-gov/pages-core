@@ -162,7 +162,7 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should respond with a 403 if the user is not associated with the site', (done) => {
+    it('should respond with a 404 if the user is not associated with the site', (done) => {
       let site;
 
       factory.site().then((model) => {
@@ -171,9 +171,9 @@ describe('Site API', () => {
       }).then(cookie => request(app)
         .get(`/v0/site/${site.id}`)
         .set('Cookie', cookie)
-        .expect(403))
+        .expect(404))
         .then((response) => {
-          validateAgainstJSONSchema('GET', '/site/{id}', 403, response.body);
+          validateAgainstJSONSchema('GET', '/site/{id}', 404, response.body);
           done();
         })
         .catch(done);
@@ -1374,9 +1374,9 @@ describe('Site API', () => {
           .delete(`/v0/site/${site.id}`)
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
-          .expect(403))
+          .expect(404))
         .then((response) => {
-          validateAgainstJSONSchema('DELETE', '/site/{id}', 403, response.body);
+          validateAgainstJSONSchema('DELETE', '/site/{id}', 404, response.body);
           return Site.findAll({ where: { id: site.id } });
         })
         .then((sites) => {
@@ -1601,9 +1601,9 @@ describe('Site API', () => {
             repository: 'new-repo-name',
           })
           .set('Cookie', cookie)
-          .expect(403))
+          .expect(404))
         .then((response) => {
-          validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
+          validateAgainstJSONSchema('PUT', '/site/{id}', 404, response.body);
           return Site.findByPk(siteModel.id);
         })
         .then((site) => {
