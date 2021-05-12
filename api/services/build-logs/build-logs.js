@@ -100,10 +100,10 @@ const BuildLogs = {
       .withConcurrency(5)
       .for(builds)
       .process(build => BuildLogs.archiveBuildLogsForBuildId(build.id)
-        .then(() =>
-          EventCreator.audit(Event.labels.BUILDLOG_ARCHIVED, build, 'archived build logs'))
-        .catch(err =>
-          EventCreator.error(Event.labels.BUILDLOG_ARCHIVED, err, { buildId: build.id })));
+        .then(() => EventCreator.audit(Event.labels.BUILDLOG_ARCHIVED, build, ''))
+        .catch(err => EventCreator.error(Event.labels.BUILDLOG_ARCHIVED, err, {
+          buildId: build.id,
+        })));
   },
 };
 
