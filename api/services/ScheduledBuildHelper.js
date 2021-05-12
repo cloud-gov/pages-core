@@ -1,5 +1,7 @@
 const { Op } = require('sequelize');
-const { Build, Site, User, Event } = require('../models');
+const {
+  Build, Site, User, Event,
+} = require('../models');
 const EventCreator = require('./EventCreator');
 
 const { USER_AUDITOR } = process.env;
