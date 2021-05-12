@@ -90,8 +90,8 @@ const BuildLogs = {
       attributes: ['id'],
       where: {
         completedAt: {
-          [Op.gte]: startDate, // .toDate(),
-          [Op.lt]: endDate, // .toDate(),
+          [Op.gte]: startDate,
+          [Op.lt]: endDate,
         },
       },
     });
