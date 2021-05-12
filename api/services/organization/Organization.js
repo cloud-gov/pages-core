@@ -20,6 +20,10 @@ function throwError(message) {
   throw new CustomError(message, 422);
 }
 
+function hasManager(org, user) {
+  return org.OrganizationRoles.some(or => or.User.id === user.id && or.Role.name === 'manager');
+}
+
 module.exports = {
   /**
    * @param {UAAIdentityType} currentUserUAAIdentity
@@ -127,40 +131,14 @@ module.exports = {
 
   /**
    * @param {UserType} currentUser
-   * @param {string} targetUserEmail - the email address of the user to invite
-   * @param {string=} targetUserGithubUsername
-   * @returns {Promise<[UserType, UAAClient.UAAUserAttributes]>}
-   */
-  async inviteUserToPlatform(currentUser, targetUserEmail, targetUserGithubUsername) {
-    const currentUserUAAIdentity = await currentUser.getUAAIdentity();
-
-    if (!currentUserUAAIdentity) {
-      throwError(`Current user ${currentUser.username} must have a UAA Identity to invite a user.`);
-    }
-
-    const isAdmin = await this.isUAAAdmin(currentUserUAAIdentity);
-
-    if (!isAdmin) {
-      throwError(`Current user ${currentUser.username} must be a Pages admin in UAA to invite a user.`);
-    }
-
-    const [user, uaaUserAttributes] = await this.findOrCreateUAAUser(
-      currentUserUAAIdentity, targetUserEmail, targetUserGithubUsername
-    );
-
-    return [user, uaaUserAttributes];
-  },
-
-  /**
-   * @param {UserType} currentUser
-   * @param {string} orgName
-   * @param {('manager'|'user')} orgRoleName
+   * @param {number} organizationId
+   * @param {number} roleId
    * @param {string} targetUserEmail - the email address of the user to invite
    * @param {string=} targetUserGithubUsername
    * @returns {Promise<[OrgType, UAAClient.UAAUserAttributes>}
    */
   async inviteUserToOrganization(
-    currentUser, orgName, orgRoleName, targetUserEmail, targetUserGithubUsername
+    currentUser, organizationId, roleId, targetUserEmail, targetUserGithubUsername
   ) {
     const currentUserUAAIdentity = await currentUser.getUAAIdentity();
 
@@ -168,35 +146,25 @@ module.exports = {
       throwError(`Current user ${currentUser.username} must have a UAA Identity to invite a user to an organization.`);
     }
 
-    // The current user must have the `manager` role on the target organization
-    const org = await Organization.findOne({
-      where: { name: orgName },
-      include: [{
-        model: OrganizationRole,
-        required: true,
-        include: [
-          {
-            model: User,
-            where: { id: currentUser.id },
-            required: true,
-          },
-          {
-            model: Role,
-            where: { name: 'manager' },
-            required: true,
-          },
-        ],
-      }],
-    });
+    const [isAdmin, org] = await Promise.all([
+      this.isUAAAdmin(currentUserUAAIdentity),
+      Organization.findOne({
+        where: { id: organizationId },
+        include: [{
+          model: OrganizationRole,
+          include: [Role, User],
+        }],
+      }),
+    ]);
 
-    if (!org) {
-      throwError(`Current user ${currentUser.username} must be a manager of the target organization to invite a user.`);
+    if (!isAdmin && !hasManager(org, currentUser)) {
+      throwError(`Current user ${currentUser.username} must be a Pages admin in UAA OR a manager of the target organization to invite a user.`);
     }
 
-    const role = await Role.findOne({ where: { name: orgRoleName } });
+    const role = await Role.findByPk(roleId);
 
     if (!role) {
-      throwError(`Invalid role name ${orgRoleName} provided, valid values are 'user' or 'manager'.`);
+      throwError(`Invalid role id ${roleId} provided.`);
     }
 
     const [user, uaaUserAttributes] = await this.findOrCreateUAAUser(
@@ -205,7 +173,7 @@ module.exports = {
 
     await org.addUser(user, { through: { roleId: role.id } });
 
-    return [org, uaaUserAttributes];
+    return uaaUserAttributes;
   },
 
   /**
