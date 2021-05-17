@@ -131,34 +131,57 @@ test-admin-client: &test-admin-client
 
 jobs:
 
-  # - name: test-api
-  #   plan:
-  #     - get: src-api
-  #       resource: src-all
-  #       trigger: true
-  #       params: {depth: 1}
-  #     - put: gh-status
-  #       inputs: [src-api]
-  #       params: {state: pending}
-  #     - do: *test-api
-  #   on_failure:
-  #     in_parallel:
-  #       - put: gh-status
-  #         inputs: [src-api]
-  #         params: {state: failure}      
-  #       - put: slack
-  #         params:
-  #           text: |
-  #             :x: FAILED: pages api tests
-  #             ((build-url))
-  #             <@U01J8B463T5> <@U01J0M3E8NS> <@U01J7LKV5MZ>
-  #           channel: ((slack-channel))
-  #           username: ((slack-username))
-  #           icon_url: ((slack-icon-url))
-  #   on_success:
-  #     put: gh-status
-  #     inputs: [src-api]
-  #     params: {state: success}
+  - name: test-api-staging
+    plan:
+      - get: src-api
+        resource: pr-staging
+        trigger: true
+        version: every
+      - put: src-api
+        resource: pr-staging
+        params:
+          path: src-api
+          status: pending
+          base_context: concourse
+          context: test
+      - do: *test-api
+
+    on_failure:
+      in_parallel:
+        - put: src-api
+          resource: pr-staging
+          params:
+            path: src-api
+            status: failure
+            base_context: concourse
+            context: test
+        - put: slack
+          params:
+            text: |
+              :x: FAILED: pages api tests on staging
+              ((build-url))
+              <@U01J8B463T5> <@U01J0M3E8NS> <@U01J7LKV5MZ>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+
+    on_success:
+      in_parallel:
+        - put: src-api
+          resource: pr-staging
+          params:
+            path: src-api
+            status: success
+            base_context: concourse
+            context: test
+        - put: slack
+          params:
+            text: |
+              :white_check_mark: SUCCESS: Successfully tested pages api on staging
+              ((build-url))
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))   
 
   # - name: test-admin-client
   #   plan:
@@ -417,11 +440,15 @@ jobs:
 
 resources:
 
-  # - name: src-all
-  #   type: git
-  #   icon: github
-  #   source:
-  #     uri: https://github.com/18F/federalist
+  - name: pr-staging
+    type: pull-request
+    check_every: 1m
+    source:
+      repository: 18F/federalist
+      access_token: ((gh-access-token))
+      base_branch: staging
+      disable_forks: true
+      ignore_drafts: false
 
   - name: src-staging
     type: git
@@ -429,13 +456,6 @@ resources:
     source:
       uri: https://github.com/18F/federalist   
       branch: staging
-
-  # - name: src-production
-  #   type: git
-  #   icon: github
-  #   source:
-  #     uri: https://github.com/18F/federalist   
-  #     branch: main
 
   - name: nightly
     type: time
@@ -491,6 +511,11 @@ resource_types:
     check_every: 24h
     source:
       repository: pix4d/cogito
+
+  - name: pull-request
+    type: docker-image
+    source:
+      repository: teliaoss/github-pr-resource
 
   - name: slack-notification
     type: docker-image

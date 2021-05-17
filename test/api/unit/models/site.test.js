@@ -26,14 +26,15 @@ describe('Site model', () => {
   });
 
   describe('.withUsers', () => {
-    it('returns the site object with user association', () => {
-      factory.site({
+    it('returns the site object with user association', async () => {
+      const { id: siteId } = await factory.site({
         users: Promise.all([factory.user()]),
-      }).then(site => Site.withUsers(site.id))
-        .then((site) => {
-          expect(site.Users).to.be.an('array');
-          expect(site.Users.length).to.equal(1);
-        });
+      });
+
+      const site = await Site.withUsers(siteId);
+
+      expect(site.Users).to.be.an('array');
+      expect(site.Users.length).to.equal(1);
     });
   });
 
