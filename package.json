@@ -100,7 +100,7 @@
     "@babel/core": "^7.12.10",
     "@babel/polyfill": "^7.0.0",
     "@babel/preset-env": "^7.13.15",
-    "@babel/preset-react": "^7.12.10",
+    "@babel/preset-react": "^7.13.13",
     "@babel/register": "^7.12.10",
     "@reach/router": "^1.3.4",
     "autoprefixer": "^9.8.6",
