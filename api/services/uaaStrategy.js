@@ -7,7 +7,7 @@ function createUAAStrategy(options, verify) {
     logoutCallbackURL, logoutURL, userURL, ...rest
   } = options;
 
-  const opts = { ...rest, scope: ['openid'] };
+  const opts = rest;
 
   const strategy = new Strategy(opts, verify);
 
@@ -30,7 +30,7 @@ function createUAAStrategy(options, verify) {
   params.set('redirect', logoutCallbackURL);
   params.set('client_id', opts.clientID);
 
-  strategy.logoutRedirectURL = `${logoutURL}?${params.toString()}`;
+  strategy.logoutRedirectURL = `${logoutURL}?${params}`;
 
   return strategy;
 }
@@ -38,7 +38,7 @@ function createUAAStrategy(options, verify) {
 async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
   const { user_id: uaaId, email } = profile;
 
-  const client = new UAAClient(accessToken);
+  const client = new UAAClient();
   const isVerified = await client.verifyUserGroup(uaaId, uaaGroups);
 
   if (!isVerified) {

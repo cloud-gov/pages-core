@@ -38,6 +38,9 @@ const associate = ({
   User.hasOne(UAAIdentity, {
     foreignKey: 'userId',
   });
+  User.hasMany(OrganizationRole, {
+    foreignKey: 'userId',
+  });
 
   // Scopes
   User.addScope('byIdOrText', (search) => {

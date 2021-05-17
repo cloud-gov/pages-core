@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { Role, Site, Organization, User } = require('../../../../api/models');
+const {
+  Role, Site, Organization, User,
+} = require('../../../../api/models');
 
 const createSite = require('../../support/factory/site');
 const createUser = require('../../support/factory/user');
@@ -7,7 +9,6 @@ const createUser = require('../../support/factory/user');
 function clean() {
   return Promise.all([
     Organization.truncate({ force: true, cascade: true }),
-    Role.truncate({ cascade: true }),
     Site.truncate({ force: true, cascade: true }),
     User.truncate({ force: true, cascade: true }),
   ]);
@@ -27,7 +28,7 @@ describe('Organization model', () => {
 
   it('`name` is unique', async () => {
     const name = 'name';
-    const role1 = await Organization.create({ name });
+    await Organization.create({ name });
 
     const error = await Organization.create({ name }).catch(e => e);
 
@@ -38,14 +39,14 @@ describe('Organization model', () => {
   it('can have many users', async () => {
     const [org, role, user1, user2] = await Promise.all([
       Organization.create({ name: 'org' }),
-      Role.create({ name: 'role' }),
+      Role.findOne({ name: 'user' }),
       createUser(),
       createUser(),
     ]);
 
     expect(await org.hasUser(user1)).to.be.false;
     expect(await org.hasUser(user2)).to.be.false;
-    
+
     await Promise.all([
       org.addUser(user1, { through: { roleId: role.id } }),
       org.addUser(user2, { through: { roleId: role.id } }),
@@ -58,18 +59,18 @@ describe('Organization model', () => {
   it('can only have one role for a user', async () => {
     const [org, role1, role2, user] = await Promise.all([
       Organization.create({ name: 'org' }),
-      Role.create({ name: 'role1' }),
-      Role.create({ name: 'role2' }),
+      Role.findOne({ name: 'user' }),
+      Role.findOne({ name: 'manager' }),
       createUser(),
     ]);
 
     expect(await org.hasUser(user)).to.be.false;
-    
+
     await org.addUser(user, { through: { roleId: role1.id } });
-    
+
     expect(await org.hasUser(user)).to.be.true;
 
-    [role1, role2].forEach(async role => {
+    [role1, role2].forEach(async (role) => {
       const error = await org.addUser(user, { through: { roleId: role.id } }).catch(e => e);
       expect(error).to.be.an('error');
       expect(error.name).to.eq('SequelizeUniqueConstraintError');
@@ -85,7 +86,7 @@ describe('Organization model', () => {
 
     expect(await org.hasSite(site1)).to.be.false;
     expect(await org.hasSite(site2)).to.be.false;
-    
+
     await Promise.all([
       org.addSite(site1),
       org.addSite(site2),

@@ -5,20 +5,15 @@ const sinon = require('sinon');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const authorizer = require('../../../../api/authorizers/site.js');
+const { Role } = require('../../../../api/models');
 const siteErrors = require('../../../../api/responses/siteErrors');
 const FederalistUsersHelper = require('../../../../api/services/FederalistUsersHelper');
 
 describe('Site authorizer', () => {
   describe('.create(user, params)', () => {
-    beforeEach(() => Promise.all([
-      factory.organization.truncate(),
-      factory.role.truncate(),
-    ]));
+    beforeEach(() => factory.organization.truncate());
 
-    afterEach(() => Promise.all([
-      factory.organization.truncate(),
-      factory.role.truncate(),
-    ]));
+    afterEach(() => factory.organization.truncate());
 
     it('should resolve', async () => {
       const user = await factory.user();
@@ -37,7 +32,7 @@ describe('Site authorizer', () => {
       const [user, org, role] = await Promise.all([
         factory.user(),
         factory.organization.create(),
-        factory.role.create(),
+        Role.findOne({ name: 'user' }),
       ]);
       const params = {
         owner: crypto.randomBytes(3).toString('hex'),
@@ -75,7 +70,7 @@ describe('Site authorizer', () => {
       const [user, org, role] = await Promise.all([
         factory.user(),
         factory.organization.create(),
-        factory.role.create(),
+        Role.findOne({ name: 'user' }),
       ]);
       const params = {
         owner: crypto.randomBytes(3).toString('hex'),
@@ -96,7 +91,7 @@ describe('Site authorizer', () => {
       const [user, org, role] = await Promise.all([
         factory.user(),
         factory.organization.create(),
-        factory.role.create(),
+        Role.findOne({ name: 'user' }),
       ]);
       const params = {
         owner: crypto.randomBytes(3).toString('hex'),
@@ -122,7 +117,7 @@ describe('Site authorizer', () => {
       const site = await factory.site({ users: Promise.all([user]) });
       const expected = await authorizer.findOne(user, site);
 
-      return expect(expected).to.equal(site.id);
+      return expect(expected.id).to.equal(site.id);
     });
 
     it('should reject if the user is not associated with the site', async () => {
@@ -141,7 +136,7 @@ describe('Site authorizer', () => {
       const site = await factory.site({ users: Promise.all([user]) });
       const expected = await authorizer.update(user, site);
 
-      return expect(expected).to.equal(site.id);
+      return expect(expected.id).to.equal(site.id);
     });
 
     it('should reject if the user is not associated with the site', async () => {

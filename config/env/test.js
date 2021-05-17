@@ -67,14 +67,10 @@ module.exports = {
       options: {
         clientID: '123abc',
         clientSecret: '456def',
+        authorizationURL: 'https://uaa.example.com/oauth/authorize',
         tokenURL: 'https://uaa.example.com/oauth/token',
         userURL: 'https://uaa.example.com/userinfo',
-      },
-      adminOptions: {
-        clientID: '123abc',
-        clientSecret: '456def',
-        tokenURL: 'https://uaa.example.com/oauth/token',
-        userURL: 'https://uaa.example.com/userinfo',
+        logoutURL: 'https://uaa.example.com/logout.do',
       },
     },
   },
