@@ -26,14 +26,15 @@ describe('Site model', () => {
   });
 
   describe('.withUsers', () => {
-    it('returns the site object with user association', () => {
-      factory.site({
+    it('returns the site object with user association', async () => {
+      const { id: siteId } = await factory.site({
         users: Promise.all([factory.user()]),
-      }).then(site => Site.withUsers(site.id))
-        .then((site) => {
-          expect(site.Users).to.be.an('array');
-          expect(site.Users.length).to.equal(1);
-        });
+      });
+
+      const site = await Site.withUsers(siteId);
+
+      expect(site.Users).to.be.an('array');
+      expect(site.Users.length).to.equal(1);
     });
   });
 
@@ -204,7 +205,6 @@ describe('Site model', () => {
   });
 
   it('should validate that the subdomain is unique', async () => {
-    const errMsg = 'subdomain: Subdomains may only contain up to 63 alphanumeric and hyphen characters.';
     const site = await factory.site();
 
     const error = await factory.site({ subdomain: site.subdomain }).catch(e => e);
