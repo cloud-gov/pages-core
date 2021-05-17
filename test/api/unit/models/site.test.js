@@ -205,7 +205,6 @@ describe('Site model', () => {
   });
 
   it('should validate that the subdomain is unique', async () => {
-    const errMsg = 'subdomain: Subdomains may only contain up to 63 alphanumeric and hyphen characters.';
     const site = await factory.site();
 
     const error = await factory.site({ subdomain: site.subdomain }).catch(e => e);
