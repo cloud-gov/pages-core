@@ -143,7 +143,7 @@ jobs:
           path: src-api
           status: pending
           base_context: concourse
-          context: test
+          context: test-api
       - do: *test-api
 
     on_failure:
@@ -154,7 +154,7 @@ jobs:
             path: src-api
             status: failure
             base_context: concourse
-            context: test
+            context: test-api
         - put: slack
           params:
             text: |
@@ -173,7 +173,7 @@ jobs:
             path: src-api
             status: success
             base_context: concourse
-            context: test
+            context: test-api
         - put: slack
           params:
             text: |
@@ -183,34 +183,57 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))   
 
-  # - name: test-admin-client
-  #   plan:
-  #     - get: src-admin-client
-  #       resource: src-all
-  #       trigger: true
-  #       params: {depth: 1}
-  #     - put: gh-status
-  #       inputs: [src-admin-client]
-  #       params: {state: pending}        
-  #     - do: *test-admin-client
-  #   on_failure:
-  #     in_parallel:
-  #       - put: gh-status
-  #         inputs: [src-admin-client]
-  #         params: {state: failure}          
-  #       - put: slack
-  #         params:
-  #           text: |
-  #             :x: FAILED pages admin client tests
-  #             ((build-url))
-  #             <@U01J8B463T5> <@U01J0M3E8NS> <@U01J7LKV5MZ>
-  #           channel: ((slack-channel))
-  #           username: ((slack-username))
-  #           icon_url: ((slack-icon-url))
-  #   on_success:
-  #     put: gh-status
-  #     inputs: [src-admin-client]
-  #     params: {state: success}
+  - name: test-admin-client-staging
+    plan:
+      - get: src-admin-client
+        resource: pr-staging
+        trigger: true
+        version: every
+      - put: src-admin-client
+        resource: pr-staging
+        params:
+          path: src-admin-client
+          status: pending
+          base_context: concourse
+          context: test-admin-client
+      - do: *test-admin-client
+      
+    on_failure:
+      in_parallel:
+        - put: src-admin-client
+          resource: pr-staging
+          params:
+            path: src-admin-client
+            status: failure
+            base_context: concourse
+            context: test-admin-client
+        - put: slack
+          params:
+            text: |
+              :x: FAILED: pages admin client tests on staging
+              ((build-url))
+              <@U01J8B463T5> <@U01J0M3E8NS> <@U01J7LKV5MZ>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+
+    on_success:
+      in_parallel:
+        - put: src-admin-client
+          resource: pr-staging
+          params:
+            path: src-admin-client
+            status: success
+            base_context: concourse
+            context: test-admin-client
+        - put: slack
+          params:
+            text: |
+              :white_check_mark: SUCCESS: Successfully tested pages admin client on staging
+              ((build-url))
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))   
 
   - name: test-and-deploy-api-staging
     plan:
