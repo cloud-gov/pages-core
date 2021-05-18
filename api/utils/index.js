@@ -109,7 +109,7 @@ function getDirectoryFiles(dir, existingFileList) {
 }
 
 function loadDevelopmentManifest() {
-  const webpackConfig = require('../../webpack.development.config.js'); // eslint-disable-line global-require
+  const webpackConfig = require('../../webpack.development.config.js'); // eslint-disable-line global-require,import/extensions
   const { filename: jsFilename, publicPath } = webpackConfig.output;
 
   // This requires that MiniCssExtractPlugin be the first plugin in the

@@ -1,9 +1,7 @@
-version: 2
-updates:
-- package-ecosystem: npm
-  directory: "/"
+config: &config
+  package-ecosystem: npm
   schedule:
-    interval: weekly
+    interval: monthly
     time: "09:00"
   open-pull-requests-limit: 10
   reviewers:
@@ -11,87 +9,33 @@ updates:
   - amirbey
   assignees:
   - davemcorwin
+
+version: 2
+updates:
+- directory: "/"
+  <<: *config
   ignore:
-  - dependency-name: webpack
-    versions:
-    - 5.18.0
-    - 5.19.0
-    - 5.20.2
-    - 5.21.2
-    - 5.22.0
-    - 5.23.0
-    - 5.24.2
-    - 5.24.3
-    - 5.24.4
-    - 5.25.1
-    - 5.27.1
-    - 5.28.0
-    - 5.30.0
-    - 5.31.0
-    - 5.31.2
-  - dependency-name: eslint
-    versions:
-    - 7.18.0
-    - 7.19.0
-    - 7.20.0
-    - 7.24.0
-  - dependency-name: mini-css-extract-plugin
-    versions:
-    - 1.4.1
-  - dependency-name: js-yaml
-    versions:
-    - 4.0.0
-  - dependency-name: inquirer
-    versions:
-    - 8.0.0
-  - dependency-name: "@babel/preset-env"
-    versions:
-    - 7.12.11
-    - 7.12.13
-    - 7.12.16
-    - 7.12.17
-    - 7.13.10
-    - 7.13.12
-    - 7.13.5
-    - 7.13.9
-  - dependency-name: aws-sdk
-    versions:
-    - 2.831.0
-    - 2.834.0
-    - 2.838.0
-    - 2.839.0
-    - 2.843.0
-    - 2.848.0
-    - 2.852.0
-    - 2.853.0
-    - 2.854.0
-    - 2.856.0
-    - 2.858.0
-    - 2.861.0
-    - 2.862.0
-    - 2.863.0
-    - 2.868.0
-    - 2.874.0
-  - dependency-name: "@octokit/rest"
-    versions:
-    - 18.3.4
-    - 18.3.5
-  - dependency-name: socket.io
-    versions:
-    - 3.1.2
-    - 4.0.0
-  - dependency-name: mocha
-    versions:
-    - 8.3.1
-  - dependency-name: core-js
-    versions:
-    - 3.8.3
-    - 3.9.0
-  - dependency-name: sass
-    versions:
-    - 1.32.5
-    - 1.32.6
-    - 1.32.7
-  - dependency-name: webpack-cli
-    versions:
-    - 4.4.0
+    # Permanent
+    - dependency-name: "uswds"
+    # Temporary
+    - dependency-name: "autoprefixer"
+    - dependency-name: "js-yaml"
+    - dependency-name: "postcss-loader"
+    - dependency-name: "react"
+    - dependency-name: "react-dom"
+    - dependency-name: "sass-loader"
+    - dependency-name: "socker.io"
+    - dependency-name: "socket.io-client"
+    - dependency-name: "webpack"
+- directory: "/admin-client"
+  <<: *config
+  ignore:
+    # Temporary
+    - dependency-name: "@rollup/plugin-commonjs"
+    - dependency-name: "@rollup/plugin-node-resolve"
+    - dependency-name: "@rollup/plugin-replace"
+    - dependency-name: "rollup"
+    - dependency-name: "rollup-plugin-copy"
+    - dependency-name: "rollup-plugin-livereload"
+    - dependency-name: "rollup-plugin-svelte"
+    - dependency-name: "svelte"
