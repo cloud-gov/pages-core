@@ -1,4 +1,4 @@
-const getEnv = require('../services/environment.js');
+const getEnv = require('../services/environment');
 
 function getFeatureFlags() {
   const env = getEnv();
