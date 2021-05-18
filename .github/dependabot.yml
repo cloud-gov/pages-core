@@ -29,3 +29,13 @@ updates:
     - dependency-name: "webpack"
 - directory: "/admin-client"
   <<: *config
+  ignore:
+    # Temporary
+    - dependency-name: "@rollup/plugin-commonjs"
+    - dependency-name: "@rollup/plugin-node-resolve"
+    - dependency-name: "@rollup/plugin-replace"
+    - dependency-name: "rollup"
+    - dependency-name: "rollup-plugin-copy"
+    - dependency-name: "rollup-plugin-livereload"
+    - dependency-name: "rollup-plugin-svelte"
+    - dependency-name: "svelte"
