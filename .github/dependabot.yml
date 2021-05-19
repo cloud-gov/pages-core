@@ -1,19 +1,16 @@
-config: &config
+version: 2
+updates:
+- directory: "/"
   package-ecosystem: npm
   schedule:
     interval: monthly
     time: "09:00"
   open-pull-requests-limit: 10
   reviewers:
-  - davemcorwin
-  - amirbey
+    - davemcorwin
+    - amirbey
   assignees:
-  - davemcorwin
-
-version: 2
-updates:
-- directory: "/"
-  <<: *config
+    - davemcorwin
   ignore:
     # Permanent
     - dependency-name: "uswds"
@@ -28,7 +25,16 @@ updates:
     - dependency-name: "socket.io-client"
     - dependency-name: "webpack"
 - directory: "/admin-client"
-  <<: *config
+  package-ecosystem: npm
+  schedule:
+    interval: monthly
+    time: "09:00"
+  open-pull-requests-limit: 10
+  reviewers:
+    - davemcorwin
+    - amirbey
+  assignees:
+    - davemcorwin
   ignore:
     # Temporary
     - dependency-name: "@rollup/plugin-commonjs"
