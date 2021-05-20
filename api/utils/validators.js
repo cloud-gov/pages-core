@@ -18,7 +18,7 @@ class CustomError extends Error {
 
 function isValidYaml(yamlString) {
   try {
-    yaml.safeLoad(yamlString);
+    yaml.load(yamlString);
   } catch (e) {
     // for Sequelize validators, we need to throw an error
     // on invalid values
@@ -33,7 +33,7 @@ function parseSiteConfig(siteConfig, configName = null) {
 
   try {
     if ((typeof siteConfig) === 'string' && siteConfig.length > 0) {
-      obj = yaml.safeLoad(siteConfig);
+      obj = yaml.load(siteConfig);
     }
 
     if ((typeof siteConfig) === 'object') { return siteConfig; }
