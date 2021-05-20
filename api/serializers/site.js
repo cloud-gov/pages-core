@@ -50,7 +50,7 @@ function serializeNew(site, isSystemAdmin = false) {
 
   yamlFields
     .filter(yamlField => object[yamlField])
-    .forEach((yamlField) => { filtered[yamlField] = yaml.safeDump(object[yamlField]); });
+    .forEach((yamlField) => { filtered[yamlField] = yaml.dump(object[yamlField]); });
 
   Object
     .keys(viewLinks)
