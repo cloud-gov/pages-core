@@ -58,14 +58,10 @@ if (sqsCreds) {
 
 // Redis Configs
 const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`);
-
 if (redisCreds) {
-  // The Beta Redis configuration includes a `host` parameter instead of `hostname`
-  const isBetaRedis = !!redisCreds.host;
-
   module.exports.redis = {
     url: redisCreds.uri,
-    tls: isBetaRedis ? {} : null,
+    tls: {},
   };
 } else {
   throw new Error('No Redis credentials found');
