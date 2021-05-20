@@ -1552,9 +1552,9 @@ describe('Site API', () => {
         previewConfig: { name: 'old-preview-config' },
       };
       const newConfigs = {
-        defaultConfig: yaml.safeDump({ name: 'new-config' }),
-        demoConfig: yaml.safeDump({ name: 'new-demo-config' }),
-        previewConfig: yaml.safeDump({ name: 'new-preview-config' }),
+        defaultConfig: yaml.dump({ name: 'new-config' }),
+        demoConfig: yaml.dump({ name: 'new-demo-config' }),
+        previewConfig: yaml.dump({ name: 'new-preview-config' }),
       };
       factory.site(origConfigs)
         .then(s => Site.findByPk(s.id, { include: [User] }))
@@ -1574,11 +1574,11 @@ describe('Site API', () => {
         })
         .then((foundSite) => {
           validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
-          expect(yaml.safeLoad(response.body.defaultConfig).name).to.equal('new-config');
+          expect(yaml.load(response.body.defaultConfig).name).to.equal('new-config');
           expect(foundSite.defaultConfig.name).to.equal('new-config');
-          expect(yaml.safeLoad(response.body.demoConfig).name).to.equal('new-demo-config');
+          expect(yaml.load(response.body.demoConfig).name).to.equal('new-demo-config');
           expect(foundSite.demoConfig.name).to.equal('new-demo-config');
-          expect(yaml.safeLoad(response.body.previewConfig).name).to.equal('new-preview-config');
+          expect(yaml.load(response.body.previewConfig).name).to.equal('new-preview-config');
           expect(foundSite.previewConfig.name).to.equal('new-preview-config');
           siteResponseExpectations(response.body, foundSite);
           done();

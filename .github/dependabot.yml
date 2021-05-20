@@ -16,7 +16,6 @@ updates:
     - dependency-name: "uswds"
     # Temporary
     - dependency-name: "autoprefixer"
-    - dependency-name: "js-yaml"
     - dependency-name: "postcss-loader"
     - dependency-name: "sass-loader"
     - dependency-name: "socker.io"
