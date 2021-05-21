@@ -22,7 +22,6 @@ updates:
     - dependency-name: "sass-loader"
     - dependency-name: "socker.io"
     - dependency-name: "socket.io-client"
-    - dependency-name: "webpack"
 - directory: "/admin-client"
   package-ecosystem: npm
   schedule:
