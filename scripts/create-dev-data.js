@@ -255,7 +255,9 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1' })),
+    }).then(build => build.update({
+      requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
+    })),
     Build.create({
       branch: site1.demoBranch,
       source: 'fake-build',
@@ -266,7 +268,10 @@ async function createData() {
       state: 'error',
       error: 'Something bad happened here',
       completedAt: new Date(),
-    }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2' })),
+    }).then(build => build.update({
+      requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2',
+      clonedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2',
+    })),
   ]);
 
   const nodeSiteBuilds = await Promise.all([
@@ -298,7 +303,9 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1' })),
+    }).then(build => build.update({
+      requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
+    })),
   ]);
 
   const goSiteBuilds = await Promise.all([
