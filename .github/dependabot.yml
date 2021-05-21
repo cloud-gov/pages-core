@@ -15,8 +15,6 @@ updates:
     # Permanent
     - dependency-name: "uswds"
     # Temporary
-    - dependency-name: "autoprefixer"
-    - dependency-name: "postcss-loader"
     - dependency-name: "react"
     - dependency-name: "react-dom"
     - dependency-name: "socker.io"
