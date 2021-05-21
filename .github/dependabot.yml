@@ -19,7 +19,6 @@ updates:
     - dependency-name: "postcss-loader"
     - dependency-name: "react"
     - dependency-name: "react-dom"
-    - dependency-name: "sass-loader"
     - dependency-name: "socker.io"
     - dependency-name: "socket.io-client"
 - directory: "/admin-client"
