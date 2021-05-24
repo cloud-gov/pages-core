@@ -1,6 +1,6 @@
 const io = require('socket.io');
 const redis = require('redis');
-const redisAdapter = require('socket.io-redis');
+const redisAdapter = require('@socket.io/redis-adapter');
 
 const { redis: redisConfig } = require('../config');
 const { Event } = require('./models');
@@ -21,12 +21,12 @@ function handleError(message, body = {}) {
 
 if (redisConfig) {
   const pubClient = redis.createClient(redisConfig);
-  const subClient = redis.createClient(redisConfig);
+  const subClient = pubClient.duplicate();
 
   pubClient.on('error', handleError('redisAdapter pubClient error'));
   subClient.on('error', handleError('redisAdapter subClient error'));
 
-  socketIO.adapter(redisAdapter({ pubClient, subClient }));
+  socketIO.adapter(redisAdapter(pubClient, subClient));
 
   socketIO.of('/').adapter.on('error', handleError('redisAdapter error'));
 }
