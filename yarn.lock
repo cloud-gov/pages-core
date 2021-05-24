@@ -10260,15 +10260,15 @@ snapdragon@^0.8.1:
     source-map-resolve "^0.5.0"
     use "^3.1.0"
 
-socket.io-adapter@^2.2.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-2.3.0.tgz#63090df6dd6d289b0806acff4a0b2f1952ffe37e"
-  integrity sha512-jdIbSFRWOkaZpo5mXy8T7rXEN6qo3bOFuq4nVeX1ZS7AtFlkbk39y153xTXEIW7W94vZfhVOux1wTU88YxcM1w==
-
 socket.io-adapter@~2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-2.1.0.tgz#edc5dc36602f2985918d631c1399215e97a1b527"
   integrity sha512-+vDov/aTsLjViYTwS9fPy5pEtTkrbEKsw2M+oVSoFGw6OD1IpvlV1VPhUzNbofCQ8oyMbdYJqDtGdmHQK6TdPg==
+
+socket.io-adapter@~2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-2.2.0.tgz#43af9157c4609e74b8addc6867873ac7eb48fda2"
+  integrity sha512-rG49L+FwaVEwuAdeBRq49M97YI3ElVabJPzvHT9S6a2CWhDKnjSFasvwAwSYPRhQzfn4NtDIbCaGYgOCOU/rlg==
 
 socket.io-client@^3.0.4:
   version "3.1.3"
@@ -10292,15 +10292,15 @@ socket.io-parser@~4.0.3, socket.io-parser@~4.0.4:
     component-emitter "~1.3.0"
     debug "~4.3.1"
 
-socket.io-redis@^6.0.1:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/socket.io-redis/-/socket.io-redis-6.1.0.tgz#8b22a108672dee428169a9bb6fef97b65e0cb7e0"
-  integrity sha512-2xdfTJ2+wsnLkai503ULRSEO7vpzM7KkkszHcWbWyw2H7fcX6wFUo9VBKtyAP8IfWnpg8IaGfC4Z4h9ZyasFoQ==
+socket.io-redis@^6.1.1:
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/socket.io-redis/-/socket.io-redis-6.1.1.tgz#2361029a6c0b25c602d1422e1beb41907fd0e8bf"
+  integrity sha512-jeaXe3TGKC20GMSlPHEdwTUIWUpay/L7m5+S9TQcOf22p9Llx44/RkpJV08+buXTZ8E+aivOotj2RdeFJJWJJQ==
   dependencies:
     debug "~4.3.1"
     notepack.io "~2.2.0"
     redis "^3.0.0"
-    socket.io-adapter "^2.2.0"
+    socket.io-adapter "~2.2.0"
     uid2 "0.0.3"
 
 socket.io@^3.0.4:
