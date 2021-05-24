@@ -15,12 +15,8 @@ updates:
     # Permanent
     - dependency-name: "uswds"
     # Temporary
-    - dependency-name: "autoprefixer"
-    - dependency-name: "postcss-loader"
     - dependency-name: "react"
     - dependency-name: "react-dom"
-    - dependency-name: "sass-loader"
-    - dependency-name: "webpack"
 - directory: "/admin-client"
   package-ecosystem: npm
   schedule:

@@ -39,7 +39,9 @@ module.exports = {
           {
             loader: 'postcss-loader',
             options: {
-              plugins: [autoprefixer],
+              postcssOptions: {
+                plugins: [autoprefixer],
+              },
             },
           },
           'sass-loader',
@@ -84,7 +86,10 @@ module.exports = {
     // which we don't need, so we'll use this plugin to keep them out of the
     // bundle
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new WebpackManifestPlugin({ fileName: '../webpack-manifest.json' }),
+    new WebpackManifestPlugin({
+      fileName: '../webpack-manifest.json',
+      publicPath: '',
+    }),
     new webpack.DefinePlugin({
       ...getFeatureFlags(process.env),
       APP_HOSTNAME: JSON.stringify(process.env.APP_HOSTNAME),
