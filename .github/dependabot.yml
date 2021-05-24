@@ -17,8 +17,6 @@ updates:
     # Temporary
     - dependency-name: "react"
     - dependency-name: "react-dom"
-    - dependency-name: "socker.io"
-    - dependency-name: "socket.io-client"
 - directory: "/admin-client"
   package-ecosystem: npm
   schedule:
