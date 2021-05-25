@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 
 import publishedFileActions from '../../actions/publishedFileActions';
@@ -18,7 +17,8 @@ class SitePublishedFilesTable extends React.Component {
       lastPage: null,
     };
 
-    autoBind(this, 'previousPage', 'nextPage');
+    this.previousPage = this.previousPage.bind(this);
+    this.nextPage = this.nextPage.bind(this);
   }
 
   componentDidMount() {
