@@ -12,6 +12,7 @@ exports.config = {
   // Grab NEW_RELIC_APP_NAME and NEW_RELIC_LICENSE_KEY from the cloud.gov
   // user-provided service
   app_name: [config.env.newRelicAppName],
+  host: 'gov-collector.newrelic.com',
   license_key: config.env.newRelicLicenseKey,
   logging: {
     level: 'info',
@@ -20,16 +21,18 @@ exports.config = {
   // We ignore 403 errors because they are expected for unauthenticated users
   error_collector: { ignore_status_codes: [404, 403] },
   allow_all_headers: true,
-  exclude: [
-    'request.headers.cookie',
-    'request.headers.authorization',
-    'request.headers.proxyAuthorization',
-    'request.headers.setCookie*',
-    'request.headers.x*',
-    'response.headers.cookie',
-    'response.headers.authorization',
-    'response.headers.proxyAuthorization',
-    'response.headers.setCookie*',
-    'response.headers.x*',
-  ],
+  attributes: {
+    exclude: [
+      'request.headers.cookie',
+      'request.headers.authorization',
+      'request.headers.proxyAuthorization',
+      'request.headers.setCookie*',
+      'request.headers.x*',
+      'response.headers.cookie',
+      'response.headers.authorization',
+      'response.headers.proxyAuthorization',
+      'response.headers.setCookie*',
+      'response.headers.x*',
+    ],
+  },
 };
