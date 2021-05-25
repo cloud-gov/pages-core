@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 
 import { ALERT, ORGANIZATIONS, USER } from '../../propTypes';
@@ -21,13 +20,7 @@ function getOwnerAndRepo(repoUrl) {
 export class AddSite extends React.Component {
   constructor(props) {
     super(props);
-
-    autoBind(
-      this,
-      'onAddUserSubmit',
-      'onCreateSiteSubmit',
-      'onSubmitTemplate'
-    );
+    this.onCreateSiteSubmit = this.onCreateSiteSubmit.bind(this);
   }
 
   componentWillUnmount() {

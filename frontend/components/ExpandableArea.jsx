@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import shortid from 'shortid';
-import autoBind from 'react-autobind';
 
 // Based on the USWDS Accordion, but only ever has a single
 // item that can be expanded or collapsed
@@ -15,7 +14,7 @@ class ExpandableArea extends React.Component {
       isExpanded: false,
     };
 
-    autoBind(this, 'toggle');
+    this.toggle = this.toggle.bind(this);
   }
 
   toggle() {
