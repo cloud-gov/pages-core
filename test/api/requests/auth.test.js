@@ -206,7 +206,7 @@ describe('Authentication requests', () => {
                 .then((sess) => {
                   expect(sess.flash.error.length).to.equal(1);
                   expect(sess.flash.error[0]).to.equal(
-                    'You must login with you UAA account. Pleas try again.'
+                    'You must login with you UAA account. Please try again.'
                   );
                   expect(eventAuditStub.called).to.equal(true);
                   done();
@@ -431,8 +431,8 @@ describe('Authentication requests', () => {
             const oauthState = 'state-123abc';
             const code = 'code';
 
-            cfUAANocks.uaaAuth(uaaUserProfile, code);
-            cfUAANocks.getUser(uaaId, uaaUserInfo);
+            cfUAANocks.mockUAAAuth(uaaUserProfile, code);
+            cfUAANocks.mockVerifyUserGroup(uaaId, uaaUserInfo);
 
             const cookie = await unauthenticatedSession({ oauthState });
 
@@ -463,8 +463,8 @@ describe('Authentication requests', () => {
             const oauthState = 'state-123abc';
             const code = 'code';
 
-            cfUAANocks.uaaAuth(profile, code);
-            cfUAANocks.getUser(uaaId, userProfile);
+            cfUAANocks.mockUAAAuth(profile, code);
+            cfUAANocks.mockVerifyUserGroup(uaaId, userProfile);
 
             const cookie = await unauthenticatedSession({ oauthState });
 
@@ -508,8 +508,8 @@ describe('Authentication requests', () => {
           const oauthState = 'state-123abc';
           const code = 'code';
 
-          cfUAANocks.uaaAuth(uaaUserProfile, code);
-          cfUAANocks.getUser(uaaId, uaaUserInfo);
+          cfUAANocks.mockUAAAuth(uaaUserProfile, code);
+          cfUAANocks.mockVerifyUserGroup(uaaId, uaaUserInfo);
 
           const session = await unauthenticatedSession({ oauthState, authRedirectPath });
 

@@ -11,7 +11,7 @@
 <DataTable data={users} {borderless}>
   <tr slot="header">
     <th>Id</th>
-    <th>Github Username</th>
+    <th>Username</th>
     <th>Github Email</th>
     <th>UAA Email</th>
     <th>Created</th>
