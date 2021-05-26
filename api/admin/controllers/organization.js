@@ -1,6 +1,7 @@
 const { serialize, serializeMany } = require('../../serializers/organization');
 const { paginate, wrapHandlers } = require('../../utils');
 const { Organization } = require('../../models');
+const OrganizationService = require('../../services/organization');
 const { fetchModelById } = require('../../utils/queryDatabase');
 
 module.exports = wrapHandlers({
@@ -36,12 +37,20 @@ module.exports = wrapHandlers({
 
   async create(req, res) {
     const {
-      body: { name },
+      body: { managerGithubUsername, managerUAAEmail, name },
+      user,
     } = req;
 
-    const org = await Organization.create({ name });
+    const [org, uaaUserAttributes] = await OrganizationService.createOrganization(
+      user, name, managerUAAEmail, managerGithubUsername
+    );
 
-    return res.json(serialize(org));
+    const json = {
+      invite: { email: uaaUserAttributes.email, link: uaaUserAttributes.inviteLink },
+      org: serialize(org),
+    };
+
+    return res.json(json);
   },
 
   async update(req, res) {

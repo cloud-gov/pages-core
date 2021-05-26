@@ -9,7 +9,6 @@ applications:
     memory: ((memory))
     instances: ((instances))
     services:
-      - admin-((env))-uaa-client
       - app-((env))-uaa-client
       - federalist-((env))-rds
       - federalist-((env))-s3

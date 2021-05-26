@@ -2,9 +2,8 @@ const { expect } = require('chai');
 const { Role } = require('../../../../api/models');
 
 describe('Role model', () => {
-  beforeEach(() => Role.truncate({ cascade: true }));
-
-  after(() => Role.truncate({ cascade: true }));
+  const roleName = 'name';
+  afterEach(() => Role.destroy({ where: { name: roleName } }));
 
   it('`name` is required', async () => {
     const error = await Role.create({}).catch(e => e);
@@ -14,10 +13,9 @@ describe('Role model', () => {
   });
 
   it('`name` is unique', async () => {
-    const name = 'name';
-    const role1 = await Role.create({ name });
+    await Role.create({ name: roleName });
 
-    const error = await Role.create({ name }).catch(e => e);
+    const error = await Role.create({ name: roleName }).catch(e => e);
 
     expect(error).to.be.an('error');
     expect(error.name).to.eq('SequelizeUniqueConstraintError');

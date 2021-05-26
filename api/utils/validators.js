@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 const yaml = require('js-yaml');
 const validator = require('validator');
 
@@ -7,6 +8,13 @@ const shaRegex = /^[a-f0-9]{40}$/;
 const subdomainRegex = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/;
 
 class ValidationError extends Error {}
+
+class CustomError extends Error {
+  constructor(message, status = 400) {
+    super(message);
+    this.status = status;
+  }
+}
 
 function isValidYaml(yamlString) {
   try {
@@ -90,6 +98,7 @@ const validBasicAuthPassword = s => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,255}$/.t
 
 module.exports = {
   branchRegex,
+  CustomError,
   shaRegex,
   githubUsernameRegex,
   isValidYaml,

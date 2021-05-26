@@ -1,3 +1,17 @@
+const associate = ({
+  OrganizationRole,
+  Role,
+  User,
+}) => {
+  // Associations
+  OrganizationRole.belongsTo(User, {
+    foreignKey: 'userId',
+  });
+  OrganizationRole.belongsTo(Role, {
+    foreignKey: 'roleId',
+  });
+};
+
 module.exports = (sequelize, DataTypes) => {
   const OrganizationRole = sequelize.define('OrganizationRole', {
     organizationId: {
@@ -20,6 +34,8 @@ module.exports = (sequelize, DataTypes) => {
       name: 'organization_role_organization_user_idx',
     }],
   });
+
+  OrganizationRole.associate = associate;
 
   return OrganizationRole;
 };
