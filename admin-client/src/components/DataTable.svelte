@@ -20,7 +20,9 @@
     </table>  
   </div>
 {:else}
-  <p>No data found.</p>
+  <slot name="empty">
+    <p>No data found.</p>
+  </slot>
 {/if}
 
 <style>
