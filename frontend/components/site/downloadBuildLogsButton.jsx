@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import autoBind from 'react-autobind';
 import fileDownload from 'js-file-download';
 import { BUILD_LOG } from '../../propTypes';
 import { groupLogs } from '../../util';
@@ -8,7 +7,7 @@ import { groupLogs } from '../../util';
 class DownloadBuildLogsButton extends React.Component {
   constructor(props) {
     super(props);
-    autoBind(this, 'downloadBuildLogs');
+    this.downloadBuildLogs = this.downloadBuildLogs.bind(this);
   }
 
   downloadBuildLogs() {

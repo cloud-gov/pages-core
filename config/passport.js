@@ -1,4 +1,4 @@
-const env = require('../services/environment.js')();
+const env = require('../services/environment')();
 
 const clientID = env.GITHUB_CLIENT_ID || 'not_set';
 const clientSecret = env.GITHUB_CLIENT_SECRET || 'not_set';

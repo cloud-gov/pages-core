@@ -483,50 +483,50 @@ describe('Authentication requests', () => {
             expect(eventAuditStub.called).to.equal(false);
           });
         });
+      });
 
-        it('should redirect to a redirect path if one is set in the session', async () => {
-          const uaaId = 'uaa-admin-auth-redirect';
-          const email = 'uaa-admin-auth-redirect@example.com';
-          const uaaUserProfile = uaaProfile({
-            userId: uaaId,
-            email,
-          });
-          const uaaUserInfo = uaaUser({
-            uaaId,
-            email,
-            groups: [{
-              display: 'pages.admin',
-            }],
-          });
-          const user = await factory.user();
-          await factory.uaaIdentity({
-            uaaId,
-            email,
-            userId: user.id,
-          });
-          const authRedirectPath = '/path/to/something';
-          const oauthState = 'state-123abc';
-          const code = 'code';
-
-          cfUAANocks.mockUAAAuth(uaaUserProfile, code);
-          cfUAANocks.mockVerifyUserGroup(uaaId, uaaUserInfo);
-
-          const session = await unauthenticatedSession({ oauthState, authRedirectPath });
-
-          await request(app)
-            .get(`/auth/uaa/callback?code=${code}&state=${oauthState}`)
-            .set('Cookie', session)
-            .expect('Location', authRedirectPath)
-            .expect(302);
+      it('should redirect to a redirect path if one is set in the session', async () => {
+        const uaaId = 'uaa-admin-auth-redirect';
+        const email = 'uaa-admin-auth-redirect@example.com';
+        const uaaUserProfile = uaaProfile({
+          userId: uaaId,
+          email,
         });
-      });
+        const uaaUserInfo = uaaUser({
+          uaaId,
+          email,
+          groups: [{
+            display: 'pages.admin',
+          }],
+        });
+        const user = await factory.user();
+        await factory.uaaIdentity({
+          uaaId,
+          email,
+          userId: user.id,
+        });
+        const authRedirectPath = '/path/to/something';
+        const oauthState = 'state-123abc';
+        const code = 'code';
 
-      describe('GET /auth/uaa/logout', () => {
-        it('redirects to the root', () => request(app)
-          .get('/auth/uaa/logout')
-          .expect('Location', '/')
-          .expect(302));
+        cfUAANocks.mockUAAAuth(uaaUserProfile, code);
+        cfUAANocks.mockVerifyUserGroup(uaaId, uaaUserInfo);
+
+        const session = await unauthenticatedSession({ oauthState, authRedirectPath });
+
+        await request(app)
+          .get(`/auth/uaa/callback?code=${code}&state=${oauthState}`)
+          .set('Cookie', session)
+          .expect('Location', authRedirectPath)
+          .expect(302);
       });
+    });
+
+    describe('GET /auth/uaa/logout', () => {
+      it('redirects to the root', () => request(app)
+        .get('/auth/uaa/logout')
+        .expect('Location', '/')
+        .expect(302));
     });
   });
 });

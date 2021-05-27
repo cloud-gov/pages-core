@@ -1,0 +1,40 @@
+version: 2
+updates:
+- directory: "/"
+  package-ecosystem: npm
+  schedule:
+    interval: monthly
+    time: "09:00"
+  open-pull-requests-limit: 10
+  reviewers:
+    - davemcorwin
+    - amirbey
+  assignees:
+    - davemcorwin
+  ignore:
+    # Permanent
+    - dependency-name: "uswds"
+    # Temporary
+    - dependency-name: "react"
+    - dependency-name: "react-dom"
+- directory: "/admin-client"
+  package-ecosystem: npm
+  schedule:
+    interval: monthly
+    time: "09:00"
+  open-pull-requests-limit: 10
+  reviewers:
+    - davemcorwin
+    - amirbey
+  assignees:
+    - davemcorwin
+  ignore:
+    # Temporary
+    - dependency-name: "@rollup/plugin-commonjs"
+    - dependency-name: "@rollup/plugin-node-resolve"
+    - dependency-name: "@rollup/plugin-replace"
+    - dependency-name: "rollup"
+    - dependency-name: "rollup-plugin-copy"
+    - dependency-name: "rollup-plugin-livereload"
+    - dependency-name: "rollup-plugin-svelte"
+    - dependency-name: "svelte"

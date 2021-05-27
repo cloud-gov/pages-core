@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import autoBind from 'react-autobind';
 
 import buildActions from '../../actions/buildActions';
 
 class RefreshBuildsButton extends React.Component {
   constructor(props) {
     super(props);
-    autoBind(this, 'refreshBuilds');
+    this.refreshBuilds = this.refreshBuilds.bind(this);
   }
 
   refreshBuilds() {

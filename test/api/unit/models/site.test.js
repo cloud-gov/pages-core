@@ -1,6 +1,7 @@
 const { expect } = require('chai');
+
 const factory = require('../../support/factory');
-const { Site } = require('../../../../api/models');
+const { Role, Site } = require('../../../../api/models');
 
 function clean() {
   return factory.organization.truncate();
@@ -25,14 +26,15 @@ describe('Site model', () => {
   });
 
   describe('.withUsers', () => {
-    it('returns the site object with user association', () => {
-      factory.site({
+    it('returns the site object with user association', async () => {
+      const { id: siteId } = await factory.site({
         users: Promise.all([factory.user()]),
-      }).then(site => Site.withUsers(site.id))
-        .then((site) => {
-          expect(site.Users).to.be.an('array');
-          expect(site.Users.length).to.equal(1);
-        });
+      });
+
+      const site = await Site.withUsers(siteId);
+
+      expect(site.Users).to.be.an('array');
+      expect(site.Users.length).to.equal(1);
     });
   });
 
@@ -203,7 +205,6 @@ describe('Site model', () => {
   });
 
   it('should validate that the subdomain is unique', async () => {
-    const errMsg = 'subdomain: Subdomains may only contain up to 63 alphanumeric and hyphen characters.';
     const site = await factory.site();
 
     const error = await factory.site({ subdomain: site.subdomain }).catch(e => e);
@@ -223,5 +224,58 @@ describe('Site model', () => {
     await site.setOrganization(org);
 
     expect((await site.getOrganization()).equals(org)).to.be.true;
+  });
+
+  describe('forUser scope', () => {
+    it('returns sites in the org of the user and non-org sites', async () => {
+      const [user1, user2, org1, org2, userRole] = await Promise.all([
+        factory.user(),
+        factory.user(),
+        factory.organization.create(),
+        factory.organization.create(),
+        Role.findOne({ where: { name: 'user' } }),
+      ]);
+
+      const [
+        nonOrgSiteForUser,
+        orgSiteForUser,
+        nonOrgSiteForOtherUser,
+        orgSiteForOtherUserOrg,
+      ] = await Promise.all([
+        factory.site({ users: [user1] }),
+        factory.site({ users: [user1] }),
+        factory.site({ users: [user2] }),
+        factory.site({ users: [user1, user2] }),
+      ]);
+
+      await Promise.all([
+        org1.addUser(user1, { through: { roleId: userRole.id } }),
+        org2.addUser(user2, { through: { roleId: userRole.id } }),
+        org1.addSite(orgSiteForUser),
+        org2.addSite(orgSiteForOtherUserOrg),
+      ]);
+
+      const expectedMemberIds = [
+        nonOrgSiteForUser,
+        orgSiteForUser,
+        orgSiteForOtherUserOrg,
+      ].map(site => site.id);
+
+      const expectedNonMemberIds = [
+        nonOrgSiteForOtherUser,
+      ].map(site => site.id);
+
+      const sites = await Site.forUser(user1).findAll();
+      const siteIds = sites.map(site => site.id);
+
+      expect(siteIds).to.have.members(expectedMemberIds);
+      expect(siteIds).to.not.have.members(expectedNonMemberIds);
+
+      // includes the Organization and OrganizationRole models
+      const orgSite = sites.find(site => site.id === orgSiteForUser.id);
+      expect(orgSite.Organization.id).to.eq(org1.id);
+      expect(orgSite.Organization.OrganizationRoles[0].userId).to.eq(user1.id);
+      expect(orgSite.Organization.OrganizationRoles[0].roleId).to.eq(userRole.id);
+    });
   });
 });
