@@ -20,7 +20,7 @@
     </table>  
   </div>
 {:else}
-  <p>No events found.</p>
+  <p>No data found.</p>
 {/if}
 
 <style>
