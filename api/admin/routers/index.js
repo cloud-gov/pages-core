@@ -4,6 +4,7 @@ const AdminEventController = require('../controllers/event');
 const AdminOrganizationController = require('../controllers/organization');
 const AdminRoleController = require('../controllers/role');
 const AdminSiteController = require('../controllers/site');
+const UserEnvironmentVariableController = require('../controllers/user-environment-variable');
 const UserController = require('../controllers/user');
 const auth = require('./auth');
 
@@ -30,6 +31,7 @@ authenticatedRouter.get('/sites/:id', AdminSiteController.findById);
 authenticatedRouter.put('/sites/:id', AdminSiteController.update);
 authenticatedRouter.delete('/sites/:id', AdminSiteController.destroy);
 authenticatedRouter.get('/me', UserController.me);
+authenticatedRouter.get('/user-environment-variables', UserEnvironmentVariableController.list);
 authenticatedRouter.get('/users', UserController.list);
 authenticatedRouter.get('/users/:id', UserController.findById);
 authenticatedRouter.post('/users/invite', UserController.invite);
