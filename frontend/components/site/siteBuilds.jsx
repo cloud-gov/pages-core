@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 import { Link } from '@reach/router';
 
@@ -69,7 +68,7 @@ class SiteBuilds extends React.Component {
   constructor(props) {
     super(props);
     this.state = { autoRefresh: false };
-    autoBind(this, 'toggleAutoRefresh');
+    this.toggleAutoRefresh = this.toggleAutoRefresh.bind(this);
   }
 
   /* eslint-disable scanjs-rules/call_setInterval */

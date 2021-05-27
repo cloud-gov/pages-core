@@ -117,7 +117,7 @@ describe('Site authorizer', () => {
       const site = await factory.site({ users: Promise.all([user]) });
       const expected = await authorizer.findOne(user, site);
 
-      return expect(expected).to.equal(site.id);
+      return expect(expected.id).to.equal(site.id);
     });
 
     it('should reject if the user is not associated with the site', async () => {
@@ -136,7 +136,7 @@ describe('Site authorizer', () => {
       const site = await factory.site({ users: Promise.all([user]) });
       const expected = await authorizer.update(user, site);
 
-      return expect(expected).to.equal(site.id);
+      return expect(expected.id).to.equal(site.id);
     });
 
     it('should reject if the user is not associated with the site', async () => {

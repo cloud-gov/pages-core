@@ -1,4 +1,3 @@
-const yaml = require('js-yaml');
 const { generateSubdomain, generateS3ServiceName } = require('../api/utils');
 
 const getSites = 'SELECT id, owner, repository from site';

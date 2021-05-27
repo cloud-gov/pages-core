@@ -2,7 +2,7 @@
 module.exports = () => {
   const webpack = require('webpack');
   const webpackDevMiddleware = require('webpack-dev-middleware');
-  const webpackConfig = require('../../webpack.development.config.js');
+  const webpackConfig = require('../../webpack.development.config');
   const compiler = webpack(webpackConfig);
 
   return webpackDevMiddleware(compiler, {

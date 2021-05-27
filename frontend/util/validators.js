@@ -23,7 +23,7 @@ const validBasicAuthPassword = s => (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,255}$/.
 
 function isValidYaml(yamlString) {
   try {
-    yaml.safeLoad(yamlString);
+    yaml.load(yamlString);
   } catch (e) {
     // for Sequelize validators, we need to throw an error
     // on invalid values

@@ -1,19 +1,15 @@
 const GitHub = require('../services/GitHub');
 const siteErrors = require('../responses/siteErrors');
-const { Organization, Site, User } = require('../models');
+const { Organization, Site } = require('../models');
 const FederalistUsersHelper = require('../services/FederalistUsersHelper');
 
-const authorize = ({ id }, site) => (
-  User.findByPk(id, { include: [Site] })
-    .then((user) => {
-      const hasSite = user.Sites.some(s => site.id === s.id);
-      if (hasSite) {
-        return site.id;
-      }
-
-      throw 403;
-    })
-);
+const authorize = async ({ id: userId }, { id: siteId }) => {
+  const site = await Site.forUser({ id: userId }).findByPk(siteId);
+  if (!site) {
+    throw 403;
+  }
+  return site;
+};
 
 const authorizeAdmin = (user, site) => (
   GitHub.checkPermissions(user, site.owner, site.repository)

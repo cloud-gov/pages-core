@@ -1,7 +1,7 @@
 /*
  * Settings for the build process
  */
-const envFn = require('../services/environment.js');
+const envFn = require('../services/environment');
 
 const env = envFn();
 
