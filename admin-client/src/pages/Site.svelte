@@ -62,27 +62,24 @@
     <Accordion multiselect bordered>
       <AccordionContent title="User Configuration">
         <h3>Domains</h3>
-        {#if domains(site).length}
-          <DataTable data={domains(site)} borderless={true}>
-            <tr slot="header">
-              <th>Branch</th>
-              <th>Domain</th>
-            </tr>
-            <tr slot="item" let:item={domain}>
-              <td>{domain.branch}</td>
-              <td>{domain.domain}</td>
-            </tr>
-          </DataTable>
-        {:else}
-        No domains configured.
-        {/if}
+        <DataTable data={domains(site)} borderless={true}>
+          <tr slot="header">
+            <th>Branch</th>
+            <th>Domain</th>
+          </tr>
+          <tr slot="item" let:item={domain}>
+            <td>{domain.branch}</td>
+            <td>{domain.domain}</td>
+          </tr>
+          <p slot="empty">No domains configured</p>
+        </DataTable>
 
         <h3>Jekyll Configuration</h3>
         {#each configs(site) as config}
           <h5 class="text-uppercase">{config.name}</h5>
           <p><code class="bg-base-lightest padding-1 font-mono-xs">{config.value}</code></p>
         {:else}
-        No Jekyll configuration
+        <p>No Jekyll configuration</p>
         {/each}
 
         <h3>Environment Variables</h3>
@@ -96,6 +93,7 @@
               <td>{uev.name}</td>
               <td>{uev.hint}</td>
             </tr>
+            <p slot="empty">No environment variables configured</p>
           </DataTable>
         </Await>
       </AccordionContent>
