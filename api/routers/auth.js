@@ -35,7 +35,7 @@ router.get('/auth/uaa/logout', (_req, res) => res.redirect('/'));
 const onGithubSuccess = async (req, res) => {
   const githubUser = req.user;
 
-  const user = await User.findByPk(req.session.passport.user.id);
+  const user = await User.findByPk(req.session.passport.user);
   await user.update({
     ...githubUser,
     signedInAt: new Date(),
