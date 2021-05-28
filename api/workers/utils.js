@@ -16,21 +16,6 @@ function monitorQueue(queueEvents) {
   queueEvents.on('failed', (job, failedReason) => {
     log(job, failedReason);
   });
-  queueEvents.on('waiting', (job) => {
-    log(job);
-  });
-
-  queueEvents.on('active', (job) => {
-    log(job);
-  });
-
-  queueEvents.on('progress', (job) => {
-    log(job);
-  });
-
-  queueEvents.on('drained', (job) => {
-    log(job);
-  });
 }
 
 function handleWorker(worker) {
