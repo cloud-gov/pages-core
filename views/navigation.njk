@@ -39,26 +39,18 @@
           </li>
           {% if isAuthenticated %}
             <li class="nav-action">
-              {% if hasMultiAuth %}
-                {% if hasUAAIdentity %}
-                  <a class="usa-button usa-button-white" href="/logout">Log out</a>
-                {% else %}
-                  <a class="usa-button usa-button-white" href="/logout/github">Log out</a>
-                {% endif %}
+              {% if hasUAAIdentity %}
+                <a class="usa-button usa-button-white" href="/logout">Log out</a>
               {% else %}
-                {% if isUaa %}
-                  <a class="usa-button usa-button-white" href="/logout">Log out</a>
-                {% else %}
-                  <a class="usa-button usa-button-white" href="/logout/github">Log out</a>
-                {% endif %}
+                <a class="usa-button usa-button-white" href="/logout/github">Log out</a>
               {% endif %}
             </li>
           {% else %}
             <li  class="nav-action">
-              {% if isUaa %}
-                <a href="/login" class="usa-button usa-button-white">Log in</a>
+              {% if authUAA %}
+                <a href="/login" class="usa-button usa-button-white">Log in with cloud.gov</a>
               {% else %}
-                <a href="/login/github" class="usa-button usa-button-white">Log in</a>
+                <a href="/login/github" class="usa-button usa-button-white">Log in Github</a>
               {% endif %}
             </li>
           {% endif %}

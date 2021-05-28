@@ -7,7 +7,6 @@ const GitHub = require('./GitHub');
 const RepositoryVerifier = require('./RepositoryVerifier');
 const EventCreator = require('./EventCreator');
 const { createUAAStrategy, verifyUAAUser } = require('./uaaStrategy');
-const Features = require('../features');
 
 const passport = new Passport.Passport();
 const flashMessage = {
@@ -28,21 +27,12 @@ const uaaOptions = {
 };
 
 async function checkUAAIdentity(username) {
-  if (Features.enabled(Features.Flags.FEATURE_HAS_MULTI_AUTH)) {
-    const currentUser = await User.scope('withUAAIdentity')
-      .findOne(
-        { where: { username } }
-      );
+  const currentUser = await User.scope('withUAAIdentity')
+    .findOne(
+      { where: { username } }
+    );
 
-    if (currentUser && currentUser.UAAIdentity) {
-      EventCreator.audit(Event.labels.AUTHENTICATION, currentUser, 'UAA user attempting GitHub login');
-      return true;
-    }
-
-    return false;
-  }
-
-  return false;
+  return (!!currentUser && !!currentUser.UAAIdentity);
 }
 
 async function updateUser({

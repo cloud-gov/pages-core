@@ -18,8 +18,8 @@ function defaultContext(req) {
     siteDisplayEnv: getSiteDisplayEnv(),
     homepageUrl: config.app.homepageUrl,
     webpackAssets,
-    isUAA: config.env.authIDP === 'uaa',
-    hasMultiAuth: Features.enabled(Features.Flags.FEATURE_HAS_MULTI_AUTH),
+    authGithub: Features.enabled(Features.Flags.FEATURE_AUTH_GITHUB),
+    authUAA: Features.enabled(Features.Flags.FEATURE_AUTH_UAA),
     hasUAAIdentity: false,
   };
 
@@ -27,7 +27,7 @@ function defaultContext(req) {
 }
 
 function alertGithubAuthDeprecation(hasUAAIdentity, context) {
-  if (!hasUAAIdentity && context.hasMultiAuth) {
+  if (!hasUAAIdentity && context.authUAA) {
     context.messages = {
       ...context.messages,
       warnings: [
