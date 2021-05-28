@@ -1,6 +1,6 @@
 const { Queue } = require('bullmq');
 const { logger } = require('../../winston');
-const { ScheduledWorker } = require('./scheduled');
+const { ScheduledWorker } = require('./scheduledWorker');
 
 async function startScheduledWorker() {
   const nightly = '0 5 * * *';
