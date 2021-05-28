@@ -27,8 +27,7 @@ const uaaOptions = {
   logoutCallbackURL: `${config.app.hostname}/auth/uaa/logout`,
 };
 
-// eslint-disable-next-line consistent-return
-async function checkMultiAuth(username, callback) {
+async function checkUAAIdentity(username) {
   if (Features.enabled(Features.Flags.FEATURE_HAS_MULTI_AUTH)) {
     const currentUser = await User.scope('withUAAIdentity')
       .findOne(
@@ -37,9 +36,34 @@ async function checkMultiAuth(username, callback) {
 
     if (currentUser && currentUser.UAAIdentity) {
       EventCreator.audit(Event.labels.AUTHENTICATION, currentUser, 'UAA user attempting GitHub login');
-      return callback(null, false, { message: 'You must login with you UAA account. Please try again.' });
+      return true;
     }
+
+    return false;
   }
+
+  return false;
+}
+
+async function updateUser({
+  username,
+  email,
+  githubAccessToken,
+  githubUserId,
+}) {
+  const user = await User.findOne({ where: { username } });
+
+  if (!user) return user;
+
+  await user.update({
+    username,
+    email,
+    githubAccessToken,
+    githubUserId,
+    signedInAt: new Date(),
+  });
+
+  return user;
 }
 
 async function verifyGithub(accessToken, _refreshToken, profile, callback) {
@@ -53,15 +77,22 @@ async function verifyGithub(accessToken, _refreshToken, profile, callback) {
     // eslint-disable-next-line no-underscore-dangle
     const { email } = profile._json;
 
-    await checkMultiAuth(username, callback);
+    const hasUAA = await checkUAAIdentity(username, callback);
 
-    const [user] = await User.upsert({
+    if (hasUAA) {
+      return callback(null, false, { message: 'You must login with you UAA account. Please try again.' });
+    }
+
+    const user = await updateUser({
       username,
       email,
       githubAccessToken: accessToken,
       githubUserId: profile.id,
-      signedInAt: new Date(),
     });
+
+    if (!user) {
+      return callback(null, false, flashMessage);
+    }
 
     EventCreator.audit(Event.labels.AUTHENTICATION, user, 'GitHub login');
 

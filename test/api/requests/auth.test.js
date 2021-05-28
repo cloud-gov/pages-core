@@ -15,6 +15,7 @@ const { authenticatedSession, unauthenticatedSession } = require('../support/ses
 const { sessionForCookie } = require('../support/cookieSession');
 
 const { github, uaa } = config.passport;
+const flashMessage = 'Apologies; you are not authorized to access Federalist! Please contact the Federalist team if this is in error.';
 
 describe('Authentication requests', () => {
   let eventAuditStub;
@@ -259,7 +260,7 @@ describe('Authentication requests', () => {
         });
 
         context('when the user does not exist in the database', () => {
-          it('should create and authenticate the user', (done) => {
+          it('should not authenticate the user', (done) => {
             let cookie;
             const oauthState = 'state-123abc';
             const githubUserID = Math.floor(Math.random() * 10000);
@@ -275,19 +276,11 @@ describe('Authentication requests', () => {
                   .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
                   .set('Cookie', cookie)
                   .expect(302);
-              }).then(() => sessionForCookie(cookie))
-              .then((authSession) => {
-                expect(authSession.authenticated).to.equal(true);
-                const userID = authSession.passport.user;
-                return User.findByPk(userID);
               })
-              .then((user) => {
-                expect(user).to.have.property('email', `user-${githubUserID}@example.com`);
-                expect(user).to.have.property('username', `user-${githubUserID}`);
-                expect(user).to.have.property('githubUserId', `${githubUserID}`);
-                expect(user).to.have.property('githubAccessToken', 'access-token-123abc');
-                expect(eventAuditStub.calledOnce).to.equal(true);
-                expect(user.isActive).to.be.true;
+              .then(() => sessionForCookie(cookie))
+              .then((sess) => {
+                expect(sess.flash.error.length).to.equal(1);
+                expect(sess.flash.error[0]).to.equal(flashMessage);
                 done();
               })
               .catch(done);
@@ -312,9 +305,7 @@ describe('Authentication requests', () => {
             })
             .then((sess) => {
               expect(sess.flash.error.length).to.equal(1);
-              expect(sess.flash.error[0]).to.equal(
-                'Apologies; you are not authorized to access Federalist! Please contact the Federalist team if this is in error.'
-              );
+              expect(sess.flash.error[0]).to.equal(flashMessage);
               expect(eventAuditStub.called).to.equal(false);
               done();
             })
@@ -477,9 +468,7 @@ describe('Authentication requests', () => {
             const session = await sessionForCookie(cookie);
 
             expect(session.flash.error.length).to.equal(1);
-            expect(session.flash.error[0]).to.equal(
-              'Apologies; you are not authorized to access Federalist! Please contact the Federalist team if this is in error.'
-            );
+            expect(session.flash.error[0]).to.equal(flashMessage);
             expect(eventAuditStub.called).to.equal(false);
           });
         });
