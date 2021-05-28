@@ -16,6 +16,8 @@ async function processJob(job) {
       return jobProcessor.runNightlyBuilds();
     case 'verifyRepos':
       return jobProcessor.runVerifyRepos();
+    case 'revokeMembershipForInactiveUsers':
+      return jobProcessor.runRevokeMembershipForInactiveUsers();
     default:
       throw new Error(`No processor found for job@name=${job.name}.`);
   }

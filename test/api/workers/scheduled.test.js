@@ -6,6 +6,7 @@ const BuildLogs = require('../../../api/services/build-logs');
 const TimeoutBuilds = require('../../../api/services/TimeoutBuilds');
 const ScheduledBuildHelper = require('../../../api/services/ScheduledBuildHelper');
 const RepositoryVerifier = require('../../../api/services/RepositoryVerifier');
+const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
 const { done } = require('fetch-mock');
 const factory = require('../support/factory');
 const jobProcessor = require('../../../api/workers/jobProcessor');
@@ -51,6 +52,13 @@ describe('Scheduled', () => {
       it('verifyRepos', async () => {
         const stub = sinon.stub(jobProcessor, 'runVerifyRepos').resolves();
         const job = { name: 'verifyRepos' };
+        await ScheduledWorker.processJob(job);
+        expect(stub.called).to.be.true;
+      });
+
+      it('revokeMembershipForInactiveUsers', async () => {
+        const stub = sinon.stub(jobProcessor, 'runRevokeMembershipForInactiveUsers').resolves();
+        const job = { name: 'revokeMembershipForInactiveUsers' };
         await ScheduledWorker.processJob(job);
         expect(stub.called).to.be.true;
       });
@@ -153,6 +161,28 @@ describe('Scheduled', () => {
           const result = await jobProcessor.runVerifyRepos().catch(e => e);
           expect(result).to.not.be.an('error');
         });
+      });
+    });
+
+    context('runRemoveInactiveFederalistUsers', () => {
+      it('failed to remove all inactive members', async () => {
+        sinon.stub(FederalistUsersHelper, 'revokeMembershipForInactiveUsers').resolves([
+          { status: 'fulfilled', value: '1' },
+          { status: 'fulfilled', value: '2' },
+          { status: 'rejected', reason: 'because' },
+        ]);
+        const result = await jobProcessor.runRevokeMembershipForInactiveUsers().catch(e => e);
+        expect(result).to.be.an('error');
+        expect(result.message.split('.')[0]).to.equal('Invactive federalist-users removed with 2 successes and 1 failures');
+      });
+
+      it('removed all inactive members successfully', async () => {
+        sinon.stub(FederalistUsersHelper, 'revokeMembershipForInactiveUsers').resolves([
+          { status: 'fulfilled', value: '1' },
+          { status: 'fulfilled', value: '2' },
+        ]);
+        const result = await jobProcessor.runRevokeMembershipForInactiveUsers().catch(e => e);
+        expect(result).to.not.be.an('error');
       });
     });
   });
