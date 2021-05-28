@@ -172,90 +172,37 @@ describe('Authentication requests', () => {
         });
 
         context('when the user exists and has a uaa identity', () => {
-          describe('With feature FEATURE_HAS_MULTI_AUTH', () => {
-            beforeEach(() => {
-              process.env.FEATURE_HAS_MULTI_AUTH = 'true';
-            });
-
-            afterEach(() => {
-              process.env.FEATURE_HAS_MULTI_AUTH = 'false';
-            });
-
-            it('should not authenticate the user', (done) => {
-              let user;
-              let cookie;
-              nock.cleanAll();
-              const oauthState = 'state-123abc';
-              factory.user()
-                .then((model) => {
-                  user = model;
-                  return factory.uaaIdentity({ userId: user.id });
-                })
-                .then(() => githubAPINocks.githubAuth(user.username, [{ id: 123456 }]))
-                .then(() => unauthenticatedSession({ oauthState }))
-                .then((session) => {
-                  cookie = session;
-                  return request(app)
-                    .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
-                    .set('Cookie', cookie);
-                })
-                .then((response) => {
-                  expect(response.statusCode).to.equal(302);
-                  expect(response.header.location).to.equal('/');
-                  return sessionForCookie(cookie);
-                })
-                .then((sess) => {
-                  expect(sess.flash.error.length).to.equal(1);
-                  expect(sess.flash.error[0]).to.equal(
-                    'You must login with you UAA account. Please try again.'
-                  );
-                  expect(eventAuditStub.called).to.equal(true);
-                  done();
-                })
-                .catch(done);
-            });
-          });
-
-          describe('Without feature FEATURE_HAS_MULTI_AUTH', () => {
-            beforeEach(() => {
-              process.env.FEATURE_HAS_MULTI_AUTH = 'false';
-            });
-
-            afterEach(() => {
-              process.env.FEATURE_HAS_MULTI_AUTH = 'false';
-            });
-
-            it('should authenticate the user', (done) => {
-              let user;
-              let cookie;
-              nock.cleanAll();
-              const oauthState = 'state-123abc';
-              factory.user()
-                .then((model) => {
-                  user = model;
-                  return factory.uaaIdentity({ userId: user.id });
-                })
-                .then(() => githubAPINocks.githubAuth(user.username, [{ id: 123456 }]))
-                .then(() => unauthenticatedSession({ oauthState }))
-                .then((session) => {
-                  cookie = session;
-                  return request(app)
-                    .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
-                    .set('Cookie', cookie)
-                    .expect(302);
-                })
-                .then(() => sessionForCookie(cookie))
-                .then((authSession) => {
-                  expect(authSession.authenticated).to.equal(true);
-                  expect(authSession.passport.user).to.equal(user.id);
-                  expect(eventAuditStub.calledOnce).to.equal(true);
-                  return user.reload();
-                })
-                .then((model) => {
-                  user = model;
-                  done();
-                });
-            });
+          it('should not authenticate the user', (done) => {
+            let user;
+            let cookie;
+            nock.cleanAll();
+            const oauthState = 'state-123abc';
+            factory.user()
+              .then((model) => {
+                user = model;
+                return factory.uaaIdentity({ userId: user.id });
+              })
+              .then(() => githubAPINocks.githubAuth(user.username, [{ id: 123456 }]))
+              .then(() => unauthenticatedSession({ oauthState }))
+              .then((session) => {
+                cookie = session;
+                return request(app)
+                  .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
+                  .set('Cookie', cookie);
+              })
+              .then((response) => {
+                expect(response.statusCode).to.equal(302);
+                expect(response.header.location).to.equal('/');
+                return sessionForCookie(cookie);
+              })
+              .then((sess) => {
+                expect(sess.flash.error.length).to.equal(1);
+                expect(sess.flash.error[0]).to.equal(
+                  'You must login with you UAA account. Please try again.'
+                );
+                done();
+              })
+              .catch(done);
           });
         });
 

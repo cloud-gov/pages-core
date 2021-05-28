@@ -38,7 +38,8 @@ applications:
       S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
       FEDERALIST_PREVIEW_HOSTNAME: https://*.sites((env_postfix)).federalist.18f.gov
       PROXY_SITE_TABLE: federalist-proxy-((env))
-      FEATURE_HAS_MULTI_AUTH: ((feature_has_multi_auth))
+      FEATURE_AUTH_GITHUB: ((feature_auth_github))
+      FEATURE_AUTH_UAA: ((feature_auth_uaa))
       FEATURE_PROXY_EDGE_DYNAMO: ((feature_proxy_edge_dynamo))
       FEATURE_PROXY_EDGE_LINKS: ((feature_proxy_edge_links))
       FEATURE_BULL_SITE_BUILD_QUEUE: ((feature_bull_site_build_queue))
