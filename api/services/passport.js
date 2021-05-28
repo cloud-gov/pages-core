@@ -26,24 +26,24 @@ const uaaOptions = {
   logoutCallbackURL: `${config.app.hostname}/auth/uaa/logout`,
 };
 
-async function checkUAAIdentity(username) {
-  const currentUser = await User.scope('withUAAIdentity')
-    .findOne(
-      { where: { username } }
-    );
-
-  return (!!currentUser && !!currentUser.UAAIdentity);
-}
-
-async function updateUser({
+async function checkUpdateUser({
   username,
   email,
   githubAccessToken,
   githubUserId,
 }) {
-  const user = await User.findOne({ where: { username } });
+  const user = await User.scope('withUAAIdentity')
+    .findOne(
+      { where: { username } }
+    );
 
-  if (!user) return user;
+  if (!user) {
+    return { flashMessage };
+  }
+
+  if (user.UAAIdentity) {
+    return { flashMessage: 'You must login with you UAA account. Please try again.' };
+  }
 
   await user.update({
     username,
@@ -67,21 +67,15 @@ async function verifyGithub(accessToken, _refreshToken, profile, callback) {
     // eslint-disable-next-line no-underscore-dangle
     const { email } = profile._json;
 
-    const hasUAA = await checkUAAIdentity(username, callback);
-
-    if (hasUAA) {
-      return callback(null, false, { message: 'You must login with you UAA account. Please try again.' });
-    }
-
-    const user = await updateUser({
+    const user = await checkUpdateUser({
       username,
       email,
       githubAccessToken: accessToken,
       githubUserId: profile.id,
     });
 
-    if (!user) {
-      return callback(null, false, flashMessage);
+    if (user.flashMessage) {
+      return callback(null, false, user.flashMessage);
     }
 
     EventCreator.audit(Event.labels.AUTHENTICATION, user, 'GitHub login');
