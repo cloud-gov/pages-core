@@ -30,69 +30,84 @@ export const AdvancedSiteSettingsForm = ({
         )}
       />
     </div>
-    <div className="well">
-      {/* CUSTOM CONFIG */}
-      <fieldset>
-        <legend>Live site</legend>
-        <p className="well-text">
-          Add additional configuration in yaml to be added to your
-          {' '}
-          <code>_config.yml</code>
-          {' '}
-          file when we build your site&apos;s primary branch.
-        </p>
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-        <label htmlFor="defaultConfig">Site configuration</label>
-        <Field
-          component="textarea"
-          name="defaultConfig"
-          id="defaultConfig"
-          className="form-control-mono"
-        />
-      </fieldset>
-    </div>
-    <div className="well">
-      {/* DEMO CONFIG */}
-      <fieldset>
-        <legend>Demo site</legend>
-        <p className="well-text">
-          Add additional configuration in yaml to be added to your
-          {' '}
-          <code>_config.yml</code>
-          {' '}
-          file when we build your site&apos;s demo branch.
-        </p>
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-        <label htmlFor="demoConfig">Demo configuration</label>
-        <Field
-          component="textarea"
-          name="demoConfig"
-          id="demoConfig"
-          className="form-control-mono"
-        />
-      </fieldset>
-    </div>
-    <div className="well">
-      {/* PREVIEW CONFIG */}
-      <fieldset>
-        <legend>Preview site</legend>
-        <p className="well-text">
-          Add additional configuration in yaml to be added to your
-          {' '}
-          <code>_config.yml</code>
-          {' '}
-          file when we build a preview branch for your site.
-        </p>
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-        <label htmlFor="previewConfig">Preview configuration</label>
-        <Field
-          component="textarea"
-          name="previewConfig"
-          id="previewConfig"
-          className="form-control-mono"
-        />
-      </fieldset>
-    </div>
+    {
+      initialValues.defaultConfig
+      && (
+      <div className="well">
+        {/* CUSTOM CONFIG */}
+        <fieldset>
+          <legend>Live site</legend>
+          <p className="well-text">
+            Add additional configuration in yaml to be added to your
+            {' '}
+            <code>_config.yml</code>
+            {' '}
+            file when we build your site&apos;s primary branch.
+          </p>
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+          <label htmlFor="defaultConfig">Site configuration</label>
+          <Field
+            component="textarea"
+            name="defaultConfig"
+            id="defaultConfig"
+            className="form-control-mono"
+          />
+        </fieldset>
+      </div>
+      )
+    }
+    {
+      initialValues.demoConfig
+      && (
+      <div className="well">
+        {/* DEMO CONFIG */}
+        <fieldset>
+          <legend>Demo site</legend>
+          <p className="well-text">
+            Add additional configuration in yaml to be added to your
+            {' '}
+            <code>_config.yml</code>
+            {' '}
+            file when we build your site&apos;s demo branch.
+          </p>
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+          <label htmlFor="demoConfig">Demo configuration</label>
+          <Field
+            component="textarea"
+            name="demoConfig"
+            id="demoConfig"
+            className="form-control-mono"
+          />
+        </fieldset>
+      </div>
+      )
+    }
+    {
+      initialValues.previewConfig
+      && (
+      <div className="well">
+        {/* PREVIEW CONFIG */}
+        <fieldset>
+          <legend>Preview site</legend>
+          <p className="well-text">
+            Add additional configuration in yaml to be added to your
+            {' '}
+            <code>_config.yml</code>
+            {' '}
+            file when we build a preview branch for your site.
+          </p>
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+          <label htmlFor="previewConfig">Preview configuration</label>
+          <Field
+            component="textarea"
+            name="previewConfig"
+            id="previewConfig"
+            className="form-control-mono"
+          />
+        </fieldset>
+      </div>
+      )
+    }
     <button
       type="button"
       className="usa-button usa-button-secondary"
