@@ -24,7 +24,7 @@
                 <h5>Did we invite to use your cloud.gov account?</h5>
                 <a href="/login">
                   <button class="usa-button">
-                    Agree and continue with cloud.gov
+                    Agree and continue with cloud.gov authentication
                   </button>
                 </a>
               </div>
@@ -32,7 +32,7 @@
               {% if isUaa %}
                 <a href="/login">
                   <button class="usa-button">
-                    Agree and continue with cloud.gov
+                    Agree and continue with cloud.gov authentication
                   </button>
                 </a>
               {% else %}
@@ -45,7 +45,7 @@
             {% endif %}
           </div>
           <p></p>
-          <p>Federalist users are authenticated with {% if isUAA %} SecureAuth {% else %} GitHub OAuth {% endif %}.<br></p>
+          <p>Federalist users are authenticated with {% if isUAA %} cloud.gov {% else %} GitHub OAuth {% endif %}.<br></p>
           {% if isUAA %}
           {% else %}
             <p>If your office uses Federalist, ask your team’s primary contact to send an email to federalist-support@gsa.gov with the GitHub usernames that need access.</p>
