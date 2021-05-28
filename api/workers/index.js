@@ -3,8 +3,8 @@ const { logger } = require('../../winston');
 const { ScheduledWorker } = require('./scheduled');
 
 async function startScheduledWorker() {
-  const nightly = '* * * * *'; // '0 5 * * *';
-  const everyTenMinutes = '* * * * *'; // '0,10,20,30,40,50 * * * *';
+  const nightly = '0 5 * * *';
+  const everyTenMinutes = '0,10,20,30,40,50 * * * *';
 
   const scheduledWorker = new ScheduledWorker();
   const scheduledQueue = new Queue(scheduledWorker.QUEUE_NAME, {
