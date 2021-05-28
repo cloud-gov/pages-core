@@ -35,10 +35,10 @@
   function domains(site) {
     const ary = [];
     if (site.domain) {
-      ary.push({ branch: site.defaultBranch, domain: site.domain });
+      ary.push({ type: 'default', branch: site.defaultBranch, domain: site.domain });
     }
     if (site.demoDomain) {
-      ary.push({ branch: site.demoBranch, domain: site.demoDomain });
+      ary.push({ type: 'demo', branch: site.demoBranch, domain: site.demoDomain });
     }
     return ary;
   }
@@ -64,10 +64,12 @@
         <h3>Domains</h3>
         <DataTable data={domains(site)} borderless={true}>
           <tr slot="header">
+            <th>Type</th>
             <th>Branch</th>
             <th>Domain</th>
           </tr>
           <tr slot="item" let:item={domain}>
+            <td>{domain.type}</td>
             <td>{domain.branch}</td>
             <td>{domain.domain}</td>
           </tr>
