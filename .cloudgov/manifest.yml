@@ -5,9 +5,17 @@ applications:
     routes:
       - route: federalistapp((env_postfix)).18f.gov
       - route: federalistapp((env_postfix)).apps.internal
-    disk_quota: 2G
-    memory: ((memory))
-    instances: ((instances))
+    processes:
+      - type: web
+        command: yarn start
+        disk_quota: 2G
+        instances: ((instances))
+        memory: ((memory))
+      - type: worker
+        command: yarn start-workers
+        disk_quota: 2G
+        instances: 1
+        memory: ((memory))
     services:
       - app-((env))-uaa-client
       - federalist-((env))-rds
