@@ -55,4 +55,4 @@ const timeoutBuilds = async (date = new Date()) => {
   return zip(buildIds, cancels);
 };
 
-module.exports = timeoutBuilds;
+module.exports = { timeoutBuilds };

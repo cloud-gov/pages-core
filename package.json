@@ -10,6 +10,7 @@
     "aws-sdk": "^2.879.0",
     "body-parser": "^1.18.3",
     "bull": "^3.20.1",
+    "bullmq": "^1.26.5",
     "cfenv": "^1.2.3",
     "connect-flash": "^0.1.1",
     "connect-session-sequelize": "^7.0.1",
@@ -56,6 +57,7 @@
   "scripts": {
     "build": "webpack --config webpack.production.config.js",
     "start": "node index.js",
+    "start-workers": "node ./api/workers/index.js",
     "debug": "node --inspect index.js",
     "watch": "NODE_ENV=development concurrently --kill-others --raw \"nodemon index.js --config nodemon.json\"",
     "test": "yarn test:prepare && yarn test:server && yarn test:client",
