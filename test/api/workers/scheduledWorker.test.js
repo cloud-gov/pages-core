@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const ScheduledWorker = require('../../../api/workers/scheduled');
+const ScheduledWorker = require('../../../api/workers/scheduledWorker');
 const { done } = require('fetch-mock');
 const factory = require('../support/factory');
 const jobProcessor = require('../../../api/workers/jobProcessor');
