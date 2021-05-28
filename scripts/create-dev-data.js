@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 Promise.props = require('promise-props');
 const BuildLogs = require('../api/services/build-logs');
+const { encrypt } = require('../api/services/Encryptor');
 const EventCreator = require('../api/services/EventCreator');
 const cleanDatabase = require('../api/utils/cleanDatabase');
 const {
@@ -214,6 +215,7 @@ async function createData() {
       owner: user1.username,
       repository: 'example-site',
       users: [user1, userOrgless],
+      defaultConfig: { hello: 'world' },
     }),
 
     siteFactory({
@@ -232,6 +234,11 @@ async function createData() {
     })
       .then(site => addSiteToOrg(site, agency2)),
   ]);
+
+  await site1.createUserEnvironmentVariable({
+    name: 'MY_ENV_VAR',
+    ...encrypt('supersecretstuff', 'ABC123ABC123ABC123ABC123ABC123'),
+  });
 
   /** *****************************************
    *                 Builds
