@@ -13,22 +13,27 @@ async function startScheduledWorker() {
 
   await scheduledQueue.drain(); // clear the queue
 
-  await scheduledQueue.add('timeoutBuilds', {}, {
-    repeat: { cron: everyTenMinutes },
-    priority: 1,
-  });
+  // await scheduledQueue.add('timeoutBuilds', {}, {
+  //   repeat: { cron: everyTenMinutes },
+  //   priority: 1,
+  // });
 
-  await scheduledQueue.add('archiveBuildLogsDaily', {}, {
-    repeat: { cron: nightly },
-    priority: 10,
-  });
+  // await scheduledQueue.add('archiveBuildLogsDaily', {}, {
+  //   repeat: { cron: nightly },
+  //   priority: 10,
+  // });
 
-  await scheduledQueue.add('nightlyBuilds', {}, {
-    repeat: { cron: nightly },
-    priority: 10,
-  });
+  // await scheduledQueue.add('nightlyBuilds', {}, {
+  //   repeat: { cron: nightly },
+  //   priority: 10,
+  // });
 
-  await scheduledQueue.add('verifyRepos', {}, {
+  // await scheduledQueue.add('verifyRepos', {}, {
+  //   repeat: { cron: nightly },
+  //   priority: 10,
+  // });
+
+  await scheduledQueue.add('revokeMembershipForInactiveUsers', {}, {
     repeat: { cron: nightly },
     priority: 10,
   });
