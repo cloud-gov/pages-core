@@ -132,6 +132,10 @@ async function updateSite(id, params) {
   return put(`/sites/${id}`, params).catch(() => null);
 }
 
+async function fetchUserEnvironmentVariables(query = {}) {
+  return get('/user-environment-variables', query).catch(() => []);
+}
+
 async function fetchUser(id) {
   return get(`/users/${id}`).catch(() => null);
 }
@@ -167,6 +171,7 @@ export {
   fetchRoles,
   fetchSite,
   fetchSites,
+  fetchUserEnvironmentVariables,
   fetchUser,
   fetchUsers,
   inviteUser,
