@@ -9,7 +9,7 @@ const BuildLogs = require('../services/build-logs');
 const FederalistUsersHelper = require('../services/FederalistUsersHelper');
 const { logger } = require('../../winston');
 
-async function runTimeoutBuilds() {
+async function timeoutBuilds() {
   const results = await TimeoutBuilds.timeoutBuilds();
   const allBuildIds = results.map(r => r[0]);
   logger.info(`${results.length} total builds timed out: [${allBuildIds.join(', ')}]`);
@@ -24,7 +24,7 @@ async function runTimeoutBuilds() {
   throw new Error(`${failedCancels.length} build tasks could not be canceled:\n${details}`);
 }
 
-async function runArchiveBuildLogsDaily() {
+async function archiveBuildLogsDaily() {
   const startDate = moment().subtract(1, 'days').startOf('day');
   const endDate = startDate.clone().add(1, 'days');
 
@@ -60,7 +60,7 @@ async function runArchiveBuildLogsDaily() {
   throw new Error(errMsg);
 }
 
-async function runNightlyBuilds() {
+async function nightlyBuilds() {
   const results = await ScheduledBuildHelper.nightlyBuilds();
 
   const successes = results
@@ -87,7 +87,7 @@ async function runNightlyBuilds() {
   logger.info(msg.join('\n'));
 }
 
-async function runVerifyRepos() {
+async function verifyRepos() {
   const results = await RepositoryVerifier.verifyRepos();
   const successes = results
     .filter(result => result.status === 'fulfilled')
@@ -113,7 +113,7 @@ async function runVerifyRepos() {
   logger.info(msg.join('\n'));
 }
 
-async function runRevokeMembershipForInactiveUsers() {
+async function revokeMembershipForInactiveUsers() {
   const results = await FederalistUsersHelper.revokeMembershipForInactiveUsers();
   const successes = results
     .filter(result => result.status === 'fulfilled')
@@ -133,9 +133,9 @@ async function runRevokeMembershipForInactiveUsers() {
 }
 
 module.exports = {
-  runArchiveBuildLogsDaily,
-  runNightlyBuilds,
-  runTimeoutBuilds,
-  runVerifyRepos,
-  runRevokeMembershipForInactiveUsers,
+  archiveBuildLogsDaily,
+  nightlyBuilds,
+  timeoutBuilds,
+  verifyRepos,
+  revokeMembershipForInactiveUsers,
 };
