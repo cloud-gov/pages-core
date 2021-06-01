@@ -9,6 +9,5 @@ feature_auth_uaa: 'true'
 feature_proxy_edge_links: 'false'
 feature_proxy_edge_dynamo: 'false'
 feature_bull_site_build_queue: 'true'
-auth_idp: uaa
 uaa_host: https://uaa.fr-stage.cloud.gov
 new_relic_app_name: web-staging
