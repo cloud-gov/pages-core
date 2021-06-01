@@ -1,4 +1,4 @@
-const { Worker, QueueScheduler, QueueEvents } = require('bullmq');
+const { Worker, Queue, QueueScheduler, QueueEvents } = require('bullmq');
 const IORedis = require('ioredis');
 const { logger } = require('../../winston');
 const config = require('../../config');
@@ -7,30 +7,20 @@ const jobProcessor = require('./jobProcessor');
 
 async function processJob(job) {
   logger.info(`Processing Job: ${JSON.stringify(job)}`);
-  switch (job.name) {
-    case 'timeoutBuilds':
-      return jobProcessor.runTimeoutBuilds();
-    case 'archiveBuildLogsDaily':
-      return jobProcessor.runArchiveBuildLogsDaily();
-    case 'nightlyBuilds':
-      return jobProcessor.runNightlyBuilds();
-    case 'verifyRepos':
-      return jobProcessor.runVerifyRepos();
-    case 'revokeMembershipForInactiveUsers':
-      return jobProcessor.runRevokeMembershipForInactiveUsers();
-    default:
-      throw new Error(`No processor found for job@name=${job.name}.`);
+  if (jobProcessor[job.name]) {
+    return jobProcessor[job.name]();
   }
+  throw new Error(`No processor found for job@name=${job.name}.`);
 }
 
-class ScheduledWorker {
-  constructor(queueName = 'scheduled', { concurrency = 5 } = {}) {
+class QueueWorker {
+  constructor(queueName, { concurrency = 5 } = {}) {
+    this.QUEUE_NAME = queueName;
     const connection = new IORedis(config.redis.url);
+    this.connection = connection;
     this.worker = new Worker(queueName, processJob, { connection, concurrency });
     this.queueEvents = new QueueEvents(queueName, { connection: connection.duplicate() });
     this.scheduler = new QueueScheduler(queueName, { connection: connection.duplicate() });
-    this.QUEUE_NAME = queueName;
-    this.connection = connection;
 
     handleWorker(this.worker);
     monitorQueue(this.queueEvents); // generic
@@ -38,6 +28,6 @@ class ScheduledWorker {
 }
 
 module.exports = {
-  ScheduledWorker,
+  QueueWorker,
   processJob,
 };
