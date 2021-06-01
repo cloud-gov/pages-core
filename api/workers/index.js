@@ -6,9 +6,9 @@ async function startScheduledWorker() {
   const nightly = '0 5 * * *';
   const everyTenMinutes = '0,10,20,30,40,50 * * * *';
 
-  const scheduledWorker = new QueueWorker();
+  const scheduledWorker = new QueueWorker('scheduled');
   const scheduledQueue = new Queue(scheduledWorker.QUEUE_NAME, {
-    connection: scheduledWorker.connection,
+    connection: scheduledWorker.connection.duplicate(),
   });
 
   await scheduledQueue.drain(); // clear the queue
