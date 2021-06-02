@@ -13,7 +13,10 @@ SHELL := /bin/bash
 
 .PHONY: help
 help: ## Show this help
-	@egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+db: ## Connect to the database - it must already be running ie with `make start`
+	psql postgresql://postgres:password@localhost:5433/federalist
 
 build-client: ## Build client app - typically only done to test production artifacts
 	docker-compose run -rm app yarn build
@@ -39,6 +42,12 @@ rebuild: ## Rebuild docker images and database volumes
 
 seed: ## (Re)Create seed data
 	docker-compose run --rm app yarn create-dev-data
+
+set-staging-pipeline: ## Set Concourse staging `web` pipeline
+	fly -t pages-staging sp -p web -c ci/pipeline.yml -l ci/vars/.staging.yml`
+
+set-production-pipeline: ## Set Concourse production `web` pipeline
+	fly -t pages-staging sp -p web -c ci/pipeline.yml -l ci/vars/.production.yml`
 
 start: ## Start
 	docker-compose up
