@@ -42,25 +42,25 @@
     <form
       class="usa-form usa-form--large"
       on:submit|preventDefault={handleSubmit} >
-  
+
       <legend class="usa-legend usa-legend--large">Invite User</legend>
-  
+
       <p>
         Required fields are marked with an asterisk (<abbr title="required" class="usa-hint usa-hint--required">*</abbr>).
       </p>
-  
+
       <fieldset class="usa-fieldset">
         <label class="usa-label" for="uaaEmail">UAA Email<abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
         <span class="usa-hint">The user will be created and invited to UAA if necessary.</span>
         <input type="email" class="usa-input" name="uaaEmail" id="uaaEmail" required>
       </fieldset>
-  
+
       <fieldset class="usa-fieldset">
         <label class="usa-label" for="githubUsername">Github Username</label>
         <span class="usa-hint">Required to migrate an existing user.</span>
         <input type="text" class="usa-input" name="githubUsername" id="githubUsername">
       </fieldset>
-  
+
       <fieldset class="usa-fieldset">
         <label class="usa-label" for="organizationId">Organization<abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
         <select class="usa-select" name="organizationId" id="organizationId" required>
@@ -70,7 +70,7 @@
           {/each}
         </select>
       </fieldset>
-  
+
       <fieldset class="usa-fieldset">
         <legend class="usa-legend usa-legend">Select a role<abbr title="required" class="usa-hint usa-hint--required">*</abbr></legend>
         {#each meta.roles as role}
@@ -80,7 +80,7 @@
           </div>
         {/each}
       </fieldset>
-  
+
       <input class="usa-button" type="submit" value="Create" disabled={submitting}>
     </form>
   </Await>

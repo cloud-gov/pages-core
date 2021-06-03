@@ -1,4 +1,3 @@
-const { mock } = require('fetch-mock');
 const nock = require('nock');
 const config = require('../../../config');
 
