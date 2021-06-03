@@ -76,12 +76,12 @@ export const SiteList = ({
   return (
     <div>
       <div className="page-header usa-grid-full">
-        <div className="usa-width-two-thirds">
+        <div className="usa-width-one-half">
           <h1>
             Your sites
           </h1>
         </div>
-        <div className="usa-width-one-third header-actions">
+        <div className="usa-width-one-half header-actions">
           {
             user.hasGithubAuth
               ? (

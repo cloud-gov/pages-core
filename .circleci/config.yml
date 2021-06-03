@@ -109,8 +109,6 @@ jobs:
       - image: circleci/redis
         environment:
           REDIS_PORT: 6379
-    environment:
-      AUTH_IDP: uaa
     steps:
       - checkout
 

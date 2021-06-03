@@ -28,10 +28,11 @@ services:
     environment:
       JWT_SECRET: 'shhHhh...'
       USER_AUDITOR: federalist
+      FEATURE_AUTH_GITHUB: 'false'
+      FEATURE_AUTH_UAA: 'true'
       FEATURE_PROXY_EDGE_LINKS: 'false'
       FEATURE_PROXY_EDGE_DYNAMO: 'false'
       APP_HOSTNAME: http://localhost:1337
-      AUTH_IDP: uaa
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
   admin-client:
