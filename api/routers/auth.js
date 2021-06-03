@@ -1,15 +1,11 @@
 const router = require('express').Router();
-const config = require('../../config');
 const { Event, User } = require('../models');
 const passport = require('../services/passport');
 const EventCreator = require('../services/EventCreator');
 
-const idp = config.env.authIDP;
-
 const opts = {
   failureRedirect: '/',
-  failureFlash:
-    'Apologies; you are not authorized to access Federalist! Please contact the Federalist team if this is in error.',
+  failureFlash: true,
 };
 
 function redirectIfAuthenticated(req, res, next) {
@@ -25,8 +21,10 @@ function onSuccess(req, res) {
   });
 }
 
-router.get('/logout', passport.logout(idp));
-router.get('/login', redirectIfAuthenticated, passport.authenticate(idp));
+router.get('/logout', passport.logout('uaa'));
+router.get('/logout/github', passport.logout('github'));
+router.get('/login', redirectIfAuthenticated, passport.authenticate('uaa'));
+router.get('/login/github', redirectIfAuthenticated, passport.authenticate('github'));
 router.get('/auth/github/callback', passport.authenticate('github', opts), onSuccess);
 
 // Callbacks need to be registered with CF UAA service
