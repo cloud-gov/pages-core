@@ -34,6 +34,26 @@ services:
       AUTH_IDP: uaa
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
+  bull-board:
+    build:
+      dockerfile: Dockerfile-app
+      context: .
+    command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "start-bull-board"]
+    volumes:
+      - yarn:/usr/local/share/.cache/yarn
+      - .:/app
+      - /app/admin-client/
+      - nm-app:/app/node_modules
+    ports:
+      - "1338:1338"
+    depends_on:
+      - db
+      - redis
+      - uaa
+    environment:
+      APP_HOSTNAME: http://localhost:1338
+      UAA_HOST: http://localhost:9000
+      UAA_HOST_DOCKER_URL: http://uaa:8080
   admin-client:
     build:
       dockerfile: ./admin-client/Dockerfile-admin

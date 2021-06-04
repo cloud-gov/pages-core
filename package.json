@@ -5,6 +5,7 @@
   "description": "",
   "keywords": [],
   "dependencies": {
+    "@bull-board/express": "^3.2.4",
     "@octokit/rest": "^18.5.2",
     "@supercharge/promise-pool": "^1.5.0",
     "aws-sdk": "^2.879.0",
@@ -58,6 +59,7 @@
     "build": "webpack --config webpack.production.config.js",
     "start": "node index.js",
     "start-workers": "node ./api/workers/index.js",
+    "start-bull-board": "node ./api/bull-board/index.js",
     "debug": "node --inspect index.js",
     "watch": "NODE_ENV=development concurrently --kill-others --raw \"nodemon index.js --config nodemon.json\"",
     "test": "yarn test:prepare && yarn test:server && yarn test:client",
