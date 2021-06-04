@@ -1,4 +1,6 @@
-const { Worker, Queue, QueueScheduler, QueueEvents } = require('bullmq');
+const {
+  Worker, QueueScheduler, QueueEvents,
+} = require('bullmq');
 const IORedis = require('ioredis');
 const { logger } = require('../../winston');
 const config = require('../../config');
