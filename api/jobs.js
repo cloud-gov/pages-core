@@ -4,7 +4,6 @@ const { logger } = require('../winston');
 const config = require('../config');
 
 const FederalistUsersHelper = require('./services/FederalistUsersHelper');
-const RepositoryVerifier = require('./services/RepositoryVerifier');
 const SiteUserAuditor = require('./services/SiteUserAuditor');
 const EventCreator = require('./services/EventCreator');
 const { Event } = require('./models');
