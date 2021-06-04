@@ -1,6 +1,7 @@
 const { Queue } = require('bullmq');
 const { logger } = require('../../winston');
 const { QueueWorker } = require('./QueueWorker');
+const config = require('../../config');
 
 async function startScheduledWorker() {
   const nightly = '0 5 * * *';
@@ -18,10 +19,12 @@ async function startScheduledWorker() {
     priority: 1,
   });
 
-  await scheduledQueue.add('archiveBuildLogsDaily', {}, {
-    repeat: { cron: nightly },
-    priority: 10,
-  });
+  if (config.app.app_env === 'production') {
+    await scheduledQueue.add('archiveBuildLogsDaily', {}, {
+      repeat: { cron: nightly },
+      priority: 10,
+    });
+  }
 
   await scheduledQueue.add('nightlyBuilds', {}, {
     repeat: { cron: nightly },
