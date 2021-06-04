@@ -954,6 +954,31 @@
     "@babel/helper-validator-identifier" "^7.14.0"
     to-fast-properties "^2.0.0"
 
+"@bull-board/api@3.2.4":
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-3.2.4.tgz#aa0517bb0149a24aa61b7482865070ea191a0978"
+  integrity sha512-GGVNkr5TcVgI0l0l4MNO4U6jjMT1JB3ibpx7kMBFJqXLkrzTJlb5G9pcti8ewH/Ox8NXfvgkAYNWU003QqIGMw==
+  dependencies:
+    redis-info "^3.0.8"
+
+"@bull-board/express@^3.2.4":
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-3.2.4.tgz#b718fd963df5259739e4591cf34aff9cf7507794"
+  integrity sha512-Sin/QEPkuXGWAZWaCnsOiGyXy7X7ZzIT2JG1U2OvP0QNjvHChii2MPJu5/WXAuKvCPASz4z+6jJTHCYybIILzg==
+  dependencies:
+    "@bull-board/api" "3.2.4"
+    "@bull-board/ui" "3.2.4"
+    ejs "3.1.6"
+    express "4.17.1"
+
+"@bull-board/ui@3.2.4":
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-3.2.4.tgz#b67c50ac3e1cf7be349040fcc92a07f97899f181"
+  integrity sha512-qdedoTwK3b5guKgDZ4vFGtj7F1B+RroeXNOWa17pS2x2LQyt2oGU+DDpID2Q2PWxqD/LSu61dZptluG5B2u7bw==
+  dependencies:
+    "@bull-board/api" "3.2.4"
+    react-paginate "^7.1.3"
+
 "@dabh/diagnostics@^2.0.2":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@dabh/diagnostics/-/diagnostics-2.0.2.tgz#290d08f7b381b8f94607dc8f471a12c675f9db31"
@@ -2028,6 +2053,11 @@ async-limiter@~1.0.0:
   resolved "https://registry.yarnpkg.com/async-limiter/-/async-limiter-1.0.1.tgz#dd379e94f0db8310b08291f9d64c3209766617fd"
   integrity sha512-csOlWGAcRFJaI6m+F2WKdnMKr4HhdhFVBk0H/QbJFMCr+uO2kwohwXQPxw/9OCxp05r5ghVBFSyioixx3gfkNQ==
 
+async@0.9.x, async@~0.9.0:
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/async/-/async-0.9.2.tgz#aea74d5e61c1f899613bf64bda66d4c78f2fd17d"
+  integrity sha1-rqdNXmHB+JlhO/ZL2mbUx48v0X0=
+
 async@^2.6.2:
   version "2.6.3"
   resolved "https://registry.yarnpkg.com/async/-/async-2.6.3.tgz#d72625e2344a3656e3a3ad4fa749fa83299d82ff"
@@ -2039,11 +2069,6 @@ async@^3.1.0, async@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/async/-/async-3.2.0.tgz#b3a2685c5ebb641d3de02d161002c60fc9f85720"
   integrity sha512-TR2mEZFVOj2pLStYxLht7TyfuRzaydfpxr3k9RpHIzMgw7A64dzsdqCxH1WJyQdoe8T10nDXd9wnEigmiuHIZw==
-
-async@~0.9.0:
-  version "0.9.2"
-  resolved "https://registry.yarnpkg.com/async/-/async-0.9.2.tgz#aea74d5e61c1f899613bf64bda66d4c78f2fd17d"
-  integrity sha1-rqdNXmHB+JlhO/ZL2mbUx48v0X0=
 
 async@~1.0.0:
   version "1.0.0"
@@ -4198,6 +4223,13 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
   integrity sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=
 
+ejs@3.1.6:
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/ejs/-/ejs-3.1.6.tgz#5bfd0a0689743bb5268b3550cceeebbc1702822a"
+  integrity sha512-9lt9Zse4hPucPkoP7FHDF0LQAlGyF9JVpnClFLFH3aSSbxmyoqINRpp/9wePWJTUl4KOQwRL72Iw3InHPDkoGw==
+  dependencies:
+    jake "^10.6.1"
+
 electron-to-chromium@^1.3.723:
   version "1.3.730"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.730.tgz#6e1fad8f250827f5524672e572f823b34a6417e1"
@@ -5077,6 +5109,13 @@ file-uri-to-path@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz#553a7b8446ff6f684359c445f1e37a05dacc33dd"
   integrity sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==
+
+filelist@^1.0.1:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/filelist/-/filelist-1.0.2.tgz#80202f21462d4d1c2e214119b1807c1bc0380e5b"
+  integrity sha512-z7O0IS8Plc39rTCq6i6iHxk43duYOn8uFJiWSewIq0Bww1RNybVHSCjahmcC87ZqAm4OTvFzlzeGu3XAzG1ctQ==
+  dependencies:
+    minimatch "^3.0.4"
 
 fill-keys@^1.0.2:
   version "1.0.2"
@@ -6715,6 +6754,16 @@ istanbul-reports@^3.0.2:
   dependencies:
     html-escaper "^2.0.0"
     istanbul-lib-report "^3.0.0"
+
+jake@^10.6.1:
+  version "10.8.2"
+  resolved "https://registry.yarnpkg.com/jake/-/jake-10.8.2.tgz#ebc9de8558160a66d82d0eadc6a2e58fbc500a7b"
+  integrity sha512-eLpKyrfG3mzvGE2Du8VoPbeSkRry093+tyNjdYaBbJS9v17knImYGNXQCUV0gLxQtF82m3E8iRb/wdSQZLoq7A==
+  dependencies:
+    async "0.9.x"
+    chalk "^2.4.2"
+    filelist "^1.0.1"
+    minimatch "^3.0.4"
 
 jmespath@0.15.0:
   version "0.15.0"
@@ -9448,6 +9497,13 @@ react-notification-system@^0.4.0:
     object-assign "^4.0.1"
     prop-types "^15.5.6"
 
+react-paginate@^7.1.3:
+  version "7.1.3"
+  resolved "https://registry.yarnpkg.com/react-paginate/-/react-paginate-7.1.3.tgz#51a2ccb13febc7f96d28405bdf6e029510227206"
+  integrity sha512-cHTXXE90Z3DlKSJiIQFzAcWoIFs9mq6r1/+rQF099NPvdJpbR8f6E/ES32tlUw4qe1R6qWLOrPZYhvAy4UgHLA==
+  dependencies:
+    prop-types "^15.6.1"
+
 react-redux@^7.2.2:
   version "7.2.4"
   resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-7.2.4.tgz#1ebb474032b72d806de2e0519cd07761e222e225"
@@ -9623,6 +9679,13 @@ redis-errors@^1.0.0, redis-errors@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/redis-errors/-/redis-errors-1.2.0.tgz#eb62d2adb15e4eaf4610c04afe1529384250abad"
   integrity sha1-62LSrbFeTq9GEMBK/hUpOEJQq60=
+
+redis-info@^3.0.8:
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/redis-info/-/redis-info-3.0.8.tgz#27e696778c100d716324fa68b92cccf390487e02"
+  integrity sha512-L7yPuGzRq+gu+ZYl/aO0TDgc4nNcMpDTaTN4P3bBi8ZENp1fk8gvtZQpidrYL5uAJYMIcMN81fgUz28qUpTeVA==
+  dependencies:
+    lodash "^4.17.11"
 
 redis-parser@^3.0.0:
   version "3.0.0"
