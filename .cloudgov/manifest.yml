@@ -56,3 +56,22 @@ applications:
     path: ../admin-client
     routes:
       - route: admin.federalistapp((env_postfix)).18f.gov
+  - name: federalist-queues((env_postfix))
+    buildpack: nodejs_buildpack
+    command: yarn start-bull-board
+    disk_quota: 2G
+    instances: 1
+    memory: ((memory))
+    routes:
+      - route: queues.federalistapp((env_postfix)).18f.gov
+    services:
+      - app-((env))-uaa-client
+      - federalist-((env))-redis
+      - federalist-((env))-rds
+    env:
+      NODE_ENV: production
+      APP_ENV: ((env))
+      APP_HOSTNAME: https://queues.federalistapp((env_postfix)).18f.gov
+      LOG_LEVEL: ((log_level))
+      NPM_CONFIG_PRODUCTION: true
+      NODE_MODULES_CACHE: false
