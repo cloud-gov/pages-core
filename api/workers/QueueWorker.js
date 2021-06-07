@@ -5,12 +5,12 @@ const IORedis = require('ioredis');
 const { logger } = require('../../winston');
 const config = require('../../config');
 const { handleWorker, monitorQueue } = require('./utils');
-const jobProcessor = require('./jobProcessor');
+const jobProcessors = require('./jobProcessors');
 
 async function processJob(job) {
   logger.info(`Processing Job: ${JSON.stringify(job)}`);
-  if (jobProcessor[job.name]) {
-    return jobProcessor[job.name]();
+  if (jobProcessors[job.name]) {
+    return jobProcessors[job.name]();
   }
   throw new Error(`No processor found for job@name=${job.name}.`);
 }

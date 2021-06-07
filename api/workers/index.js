@@ -31,7 +31,7 @@ async function startScheduledWorker() {
     priority: 10,
   });
 
-  await scheduledQueue.add('verifyRepos', {}, {
+  await scheduledQueue.add('verifyRepositories', {}, {
     repeat: { cron: nightly },
     priority: 10,
   });
