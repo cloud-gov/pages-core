@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const QueueWorker = require('../../../api/workers/QueueWorker');
 const { done } = require('fetch-mock');
 const factory = require('../support/factory');
-const jobProcessor = require('../../../api/workers/jobProcessor');
+const jobProcessors = require('../../../api/workers/jobProcessors');
 
 describe('Scheduled', () => {
   afterEach(() => {
@@ -22,35 +22,35 @@ describe('Scheduled', () => {
 
     describe('processJob', () => {
       it('nightlyJobs', async () => {
-        const stub = sinon.stub(jobProcessor, 'nightlyBuilds').resolves();
+        const stub = sinon.stub(jobProcessors, 'nightlyBuilds').resolves();
         const job = { name: 'nightlyBuilds' };
         await QueueWorker.processJob(job);
         expect(stub.called).to.be.true;
       });
 
       it('timeoutBuilds', async () => {
-        const stub = sinon.stub(jobProcessor, 'timeoutBuilds').resolves();
+        const stub = sinon.stub(jobProcessors, 'timeoutBuilds').resolves();
         const job = { name: 'timeoutBuilds' };
         await QueueWorker.processJob(job);
         expect(stub.called).to.be.true;
       });
 
       it('archiveBuildLogsDaily', async () => {
-        const stub = sinon.stub(jobProcessor, 'archiveBuildLogsDaily').resolves();
+        const stub = sinon.stub(jobProcessors, 'archiveBuildLogsDaily').resolves();
         const job = { name: 'archiveBuildLogsDaily' };
         await QueueWorker.processJob(job);
         expect(stub.called).to.be.true;
       });
 
       it('verifyRepos', async () => {
-        const stub = sinon.stub(jobProcessor, 'verifyRepos').resolves();
-        const job = { name: 'verifyRepos' };
+        const stub = sinon.stub(jobProcessors, 'verifyRepositories').resolves();
+        const job = { name: 'verifyRepositories' };
         await QueueWorker.processJob(job);
         expect(stub.called).to.be.true;
       });
 
       it('revokeMembershipForInactiveUsers', async () => {
-        const stub = sinon.stub(jobProcessor, 'revokeMembershipForInactiveUsers').resolves();
+        const stub = sinon.stub(jobProcessors, 'revokeMembershipForInactiveUsers').resolves();
         const job = { name: 'revokeMembershipForInactiveUsers' };
         await QueueWorker.processJob(job);
         expect(stub.called).to.be.true;

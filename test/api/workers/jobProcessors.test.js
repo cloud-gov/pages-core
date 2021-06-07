@@ -7,7 +7,7 @@ const ScheduledBuildHelper = require('../../../api/services/ScheduledBuildHelper
 const RepositoryVerifier = require('../../../api/services/RepositoryVerifier');
 const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
 const factory = require('../support/factory');
-const jobProcessor = require('../../../api/workers/jobProcessor');
+const jobProcessors = require('../../../api/workers/jobProcessors');
 
 
 describe('job processors', () => {
@@ -22,7 +22,7 @@ describe('job processors', () => {
         { status: 'fulfilled', value: '2' },
         { status: 'rejected', reason: 'because' },
       ]);
-      const result = await jobProcessor.nightlyBuilds().catch(e => e);
+      const result = await jobProcessors.nightlyBuilds().catch(e => e);
       expect(result).to.be.an('error');
       expect(result.message.split('.')[0]).to.equal('Queued nightly builds with 2 successes and 1 failures');
     });
@@ -32,7 +32,7 @@ describe('job processors', () => {
         { status: 'fulfilled', value: '1' },
         { status: 'fulfilled', value: '2' },
       ]);
-      const result = await jobProcessor.nightlyBuilds().catch(e => e);
+      const result = await jobProcessors.nightlyBuilds().catch(e => e);
       expect(result).to.not.be.an('error');
     });
   });
@@ -44,7 +44,7 @@ describe('job processors', () => {
         [2, { status: 'fulfilled', value: '2' }],
         [3, { status: 'rejected', reason: 'because' }],
       ]);
-      const result = await jobProcessor.timeoutBuilds().catch(e => e);
+      const result = await jobProcessors.timeoutBuilds().catch(e => e);
       expect(result).to.be.an('error');
       expect(result.message).to.equal('1 build tasks could not be canceled:\n3: because');
     });
@@ -55,7 +55,7 @@ describe('job processors', () => {
         [2, { status: 'fulfilled', value: '2' }],
         [3, { status: 'fulfilled', value: '3' }],
       ]);
-      const result = await jobProcessor.timeoutBuilds();
+      const result = await jobProcessors.timeoutBuilds();
       expect(result).to.not.be.an('error');
     });
   });
@@ -69,13 +69,13 @@ describe('job processors', () => {
 
     it('all archived successfully', async () => {
       sinon.stub(BuildLogs, 'archiveBuildLogsForBuildId').resolves();
-      const result = await jobProcessor.archiveBuildLogsDaily();
+      const result = await jobProcessors.archiveBuildLogsDaily();
       expect(result).to.not.be.an('error');
     });
 
     it('fails to archive successfully', async () => {
       sinon.stub(BuildLogs, 'archiveBuildLogsForBuildId').rejects('erred out');
-      const result = await jobProcessor.archiveBuildLogsDaily().catch(e => e);
+      const result = await jobProcessors.archiveBuildLogsDaily().catch(e => e);
       expect(result).to.be.an('error');
       const dateStr = moment().subtract(1, 'days').startOf('day').format('YYYY-MM-DD');
       expect(result.message.split(',')[0]).to
@@ -90,7 +90,7 @@ describe('job processors', () => {
         { status: 'fulfilled', value: '2' },
         { status: 'rejected', reason: 'because' },
       ]);
-      const result = await jobProcessor.verifyRepos().catch(e => e);
+      const result = await jobProcessors.verifyRepositories().catch(e => e);
       expect(result).to.be.an('error');
       expect(result.message.split('.')[0]).to.equal('Repositories verified with 2 successes and 1 failures');
     });
@@ -100,7 +100,7 @@ describe('job processors', () => {
         { status: 'fulfilled', value: '1' },
         { status: 'fulfilled', value: '2' },
       ]);
-      const result = await jobProcessor.verifyRepos().catch(e => e);
+      const result = await jobProcessors.verifyRepositories().catch(e => e);
       expect(result).to.not.be.an('error');
     });
   });
@@ -112,7 +112,7 @@ describe('job processors', () => {
         { status: 'fulfilled', value: '2' },
         { status: 'rejected', reason: 'because' },
       ]);
-      const result = await jobProcessor.revokeMembershipForInactiveUsers().catch(e => e);
+      const result = await jobProcessors.revokeMembershipForInactiveUsers().catch(e => e);
       expect(result).to.be.an('error');
       expect(result.message.split('.')[0]).to.equal('Invactive federalist-users removed with 2 successes and 1 failures');
     });
@@ -122,7 +122,7 @@ describe('job processors', () => {
         { status: 'fulfilled', value: '1' },
         { status: 'fulfilled', value: '2' },
       ]);
-      const result = await jobProcessor.revokeMembershipForInactiveUsers().catch(e => e);
+      const result = await jobProcessors.revokeMembershipForInactiveUsers().catch(e => e);
       expect(result).to.not.be.an('error');
     });
   });
