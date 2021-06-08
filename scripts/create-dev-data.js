@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 Promise.props = require('promise-props');
 const BuildLogs = require('../api/services/build-logs');
+const { encrypt } = require('../api/services/Encryptor');
 const EventCreator = require('../api/services/EventCreator');
 const cleanDatabase = require('../api/utils/cleanDatabase');
 const {
@@ -214,6 +215,7 @@ async function createData() {
       owner: user1.username,
       repository: 'example-site',
       users: [user1, userOrgless],
+      defaultConfig: { hello: 'world' },
     }),
 
     siteFactory({
@@ -232,6 +234,11 @@ async function createData() {
     })
       .then(site => addSiteToOrg(site, agency2)),
   ]);
+
+  await site1.createUserEnvironmentVariable({
+    name: 'MY_ENV_VAR',
+    ...encrypt('supersecretstuff', 'ABC123ABC123ABC123ABC123ABC123'),
+  });
 
   /** *****************************************
    *                 Builds
@@ -255,7 +262,9 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1' })),
+    }).then(build => build.update({
+      requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
+    })),
     Build.create({
       branch: site1.demoBranch,
       source: 'fake-build',
@@ -266,7 +275,10 @@ async function createData() {
       state: 'error',
       error: 'Something bad happened here',
       completedAt: new Date(),
-    }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2' })),
+    }).then(build => build.update({
+      requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2',
+      clonedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2',
+    })),
   ]);
 
   const nodeSiteBuilds = await Promise.all([
@@ -298,7 +310,9 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }).then(build => build.update({ commitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1' })),
+    }).then(build => build.update({
+      requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
+    })),
   ]);
 
   const goSiteBuilds = await Promise.all([
