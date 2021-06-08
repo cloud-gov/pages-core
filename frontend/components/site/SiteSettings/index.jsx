@@ -1,6 +1,5 @@
 /* global window:true */
 import React from 'react';
-import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 
 import { SITE } from '../../../propTypes';
@@ -15,7 +14,8 @@ import { currentSite } from '../../../selectors/site';
 class SiteSettings extends React.Component {
   constructor(props) {
     super(props);
-    autoBind(this, 'handleUpdate', 'handleDelete');
+    this.handleUpdate = this.handleUpdate.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
   handleDelete() {

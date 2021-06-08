@@ -9,6 +9,9 @@ const EventCreator = require('./EventCreator');
 const { createUAAStrategy, verifyUAAUser } = require('./uaaStrategy');
 
 const passport = new Passport.Passport();
+const flashMessage = {
+  message: 'Apologies; you are not authorized to access Federalist! Please contact the Federalist team if this is in error.',
+};
 
 const {
   github: {
@@ -23,24 +26,57 @@ const uaaOptions = {
   logoutCallbackURL: `${config.app.hostname}/auth/uaa/logout`,
 };
 
+async function checkUpdateUser({
+  username,
+  email,
+  githubAccessToken,
+  githubUserId,
+}) {
+  const user = await User.scope('withUAAIdentity')
+    .findOne(
+      { where: { username } }
+    );
+
+  if (!user) {
+    return { flashMessage };
+  }
+
+  if (user.UAAIdentity) {
+    return { flashMessage: 'You must login with you UAA account. Please try again.' };
+  }
+
+  await user.update({
+    username,
+    email,
+    githubAccessToken,
+    githubUserId,
+    signedInAt: new Date(),
+  });
+
+  return user;
+}
+
 async function verifyGithub(accessToken, _refreshToken, profile, callback) {
   try {
     const isValidUser = await GitHub.validateUser(accessToken, false);
     if (!isValidUser) {
-      return callback(null, false);
+      return callback(null, false, flashMessage);
     }
 
     const username = profile.username.toLowerCase();
     // eslint-disable-next-line no-underscore-dangle
     const { email } = profile._json;
 
-    const [user] = await User.upsert({
+    const user = await checkUpdateUser({
       username,
       email,
       githubAccessToken: accessToken,
       githubUserId: profile.id,
-      signedInAt: new Date(),
     });
+
+    if (user.flashMessage) {
+      return callback(null, false, user.flashMessage);
+    }
 
     EventCreator.audit(Event.labels.AUTHENTICATION, user, 'GitHub login');
 
@@ -85,7 +121,7 @@ async function verifyUAA(accessToken, refreshToken, profile, callback) {
       ['pages.user', 'pages.admin']
     );
 
-    if (!user) return callback(null, false);
+    if (!user) return callback(null, false, flashMessage);
 
     await user.update({
       signedInAt: new Date(),
@@ -124,9 +160,10 @@ passport.serializeUser((user, next) => {
 });
 
 passport.deserializeUser((id, next) => {
-  User.findByPk(id).then((user) => {
-    next(null, user);
-  });
+  User.scope('withUAAIdentity').findByPk(id)
+    .then((user) => {
+      next(null, user);
+    });
 });
 
 module.exports = passport;

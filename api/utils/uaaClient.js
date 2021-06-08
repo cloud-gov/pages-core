@@ -1,5 +1,5 @@
-const request = require('request');
 const config = require('../../config');
+const HttpClient = require('./httpClient');
 
 const uaaOptions = config.passport.uaa;
 
@@ -29,6 +29,7 @@ class UAAClient {
   constructor() {
     this.clientId = uaaOptions.options.clientID;
     this.clientSecret = uaaOptions.options.clientSecret;
+    this.httpClient = new HttpClient(config.env.uaaHostUrl);
   }
 
   /**
@@ -261,66 +262,33 @@ class UAAClient {
   }
 
   request(path, opts = {}) {
-    return new Promise((resolve, reject) => {
-      const callback = (error, response, body) => {
-        if (error) {
-          return reject(error);
+    const {
+      body,
+      form,
+      method = 'get',
+      params,
+      token,
+    } = opts;
+
+    return this.httpClient.request({
+      data: body || (form && new URLSearchParams(form).toString()),
+      headers: token && {
+        Authorization: `Bearer ${token}`,
+      },
+      method,
+      params,
+      url: path,
+    })
+      .then((response) => {
+        if (response.data.error) {
+          const msg = `${response.data.error}
+          ${response.data.error_description || ''}
+          ${response.data.scope || ''}`.trim();
+          throw new Error(msg);
         }
-
-        let result = {};
-        // I don't think we should have to do this, the responses should all be json strings.
-        // However, nock seems to sometimes return a json string or an object, soooooo
-        if (body) {
-          result = typeof body === 'string'
-            ? JSON.parse(body)
-            : body;
-        }
-
-        if (result.error) {
-          const msg = `${result.error}
-          ${result.error_description || ''}
-          ${result.scope || ''}`.trim();
-          return reject(new Error(msg));
-        }
-
-        if (response.statusCode > 399) {
-          const errorMessage = body || `Received status code: ${response.statusCode}`;
-          return reject(new Error(errorMessage));
-        }
-
-        return resolve(result);
-      };
-
-      const {
-        body,
-        form,
-        method = 'GET',
-        params,
-        token,
-      } = opts;
-
-      const options = {
-        baseUrl: config.env.uaaHostUrl,
-        method: method.toUpperCase(),
-        qs: params,
-        uri: path,
-      };
-
-      if (token) {
-        options.auth = { bearer: token };
-      }
-
-      if (body) {
-        options.json = true;
-        options.body = body;
-      }
-
-      if (form) {
-        options.form = form;
-      }
-
-      request(options, callback);
-    }).catch((e) => { throw new Error(e); });
+        return response.data;
+      })
+      .catch((e) => { throw new Error(e); });
   }
 }
 

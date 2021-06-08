@@ -92,6 +92,17 @@
         </div>
         {% endfor %}
       {% endif %}
+      {% if messages.warnings %}
+        {% for warning in messages.warnings %}
+        <div class="usa-alert-home">
+          <div class="usa-alert usa-alert-warning usa-alert-slim" role="alert">
+            <div class="usa-alert-body">
+              <p class="usa-alert-text"> {{ warning }}</p>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% endif %}
     {% endblock %}
 
     <div class="main-content">
@@ -123,7 +134,7 @@
                 <a class="usa-nav-link" href="https://federalist.statuspage.io">
                   <span>Status<span>
                 </a>
-              </li>              
+              </li>
             </ul>
             <div class="usa-footer-primary-content usa-footer-contact_info">
               <p>

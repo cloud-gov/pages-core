@@ -2,6 +2,7 @@ const config = require('../../config');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
 const jwtHelper = require('../services/jwtHelper');
+const Features = require('../features');
 
 const webpackAssets = loadAssetManifest();
 
@@ -17,10 +18,23 @@ function defaultContext(req) {
     siteDisplayEnv: getSiteDisplayEnv(),
     homepageUrl: config.app.homepageUrl,
     webpackAssets,
-    isUAA: config.env.authIDP === 'uaa',
+    authGithub: Features.enabled(Features.Flags.FEATURE_AUTH_GITHUB),
+    authUAA: Features.enabled(Features.Flags.FEATURE_AUTH_UAA),
+    hasUAAIdentity: false,
   };
 
   return context;
+}
+
+function alertGithubAuthDeprecation(hasUAAIdentity, context) {
+  if (!hasUAAIdentity && context.authUAA) {
+    context.messages = {
+      ...context.messages,
+      warnings: [
+        'Authenticating with Github is deprecated and will be removed soon. Contact your agreement owner or federalist-support@gsa.gov to setup a cloud.gov account.',
+      ],
+    };
+  }
 }
 
 module.exports = {
@@ -47,6 +61,7 @@ module.exports = {
     }
 
     const context = defaultContext(req);
+    const hasUAAIdentity = !!req.user.UAAIdentity;
 
     context.isAuthenticated = true;
     context.username = req.user.username;
@@ -54,12 +69,15 @@ module.exports = {
     context.csrfToken = req.csrfToken();
     context.accessToken = jwtHelper.sign({ user: req.user.id });
     context.socketHost = process.env.SOCKET_HOST;
+    context.hasUAAIdentity = !!hasUAAIdentity;
 
     const frontendConfig = {
       TEMPLATES: config.templates,
     };
 
     context.frontendConfig = frontendConfig;
+
+    alertGithubAuthDeprecation(hasUAAIdentity, context);
 
     return res.render('app.njk', context);
   },

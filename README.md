@@ -159,14 +159,14 @@ The app expects the following user provided services to be provided:
   - `secret_key`: The AWS secret key for SQS queue
   - `region`: The AWS region
   - `sqs_url`: The AWS SQS queue URL
-- `admin-<environment>-uaa-client`: Credentials for cloud.gov's UAA to support authentication for the admin app via SecureAuth. This service provides the following:
+- `admin-<environment>-uaa-client`: Credentials for cloud.gov's UAA to support authentication for the admin app. This service provides the following:
   - `clientID`: The UAA client id for the environments admin app
   - `clientSecret`: The UAA client secret for the environments admin app
   - `authorizationURL`: The url to login and authorize a user
   - `tokenURL`: The UAA url to get a user's token
   - `userURL`: The UAA url to get a user's info
   - `logoutURL`: The UAA url to logout a user
-- `app-<environment>-uaa-client`: Credentials for cloud.gov's UAA to support authentication for the app via SecureAuth. This service provides the following:
+- `app-<environment>-uaa-client`: Credentials for cloud.gov's UAA to support authentication for the app. This service provides the following:
   - `clientID`: The UAA client id for the environments app
   - `clientSecret`: The UAA client secret for the environments app
   - `authorizationURL`: The url to login and authorize a user
@@ -242,6 +242,14 @@ docker-compose run app node_modules/.bin/eslint --fix path/to/file.js
 
 ## Feature Flags
 Environment-specific feature flags are supported for both the api and frontend. Flagged features are assumed to be "off" unless the flag exists (and the value is truthy), thus feature flag conditions should always check for the presence or truthiness of the flag, not for it's absence. Environment variables for feature flags *MUST* be prefixed by `FEATURE_`, ex. `FEATURE_BRING_THE_AWESOME` or `FEATURE_BRING_DA_RUCKUS`.
+
+### Current available features
+
+`FEATURE_AUTH_GITHUB`: Used in [`api/controllers/main.js`](./api/controllers/main.js) to enable authentication with Github oauth.
+`FEATURE_AUTH_UAA`: Used in [`api/controllers/main.js`](./api/controllers/main.js) to enable authentication with the cloud.gov UAA.
+`FEATURE_BULL_SITE_BUILD_QUEUE`: Used to enable to use of the redis backed bull queue.
+`FEATURE_PROXY_EDGE_DYNAMO`: Used to enable lambda@edge dynamo db.
+`FEATURE_PROXY_EDGE_LINKS`: Used to enable lambda@edge proxy.
 
 ### Api feature flags
 Api feature flags are evaluated at *runtime* and should be created explicitly in the code before the corresponding environment variable can be used. Example:
