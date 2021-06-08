@@ -386,76 +386,67 @@ jobs:
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
-          
-  - name: nightly-tasks-staging
-    plan:
-      - get: src
-        resource: src-staging
-        params: {depth: 1}
-      - get: nightly
-        trigger: true
-      - task: restage-api
-        config:
-          inputs: [name: src]
-          <<: *cf-image
-          run:
-            path: src/ci/tasks/restage.sh
-        params:
-          <<: *staging-cf
-          CF_APP_NAME: federalistapp-staging
-      - in_parallel:
-        - task: archive-build-logs
-          config:
-            inputs: [name: src]
-            <<: *cf-image
-            run:
-              path: src/ci/tasks/run-task.sh
-          params:
-            <<: *staging-cf
-            CF_APP_NAME: federalistapp-staging
-            CF_TASK_NAME: archive-build-logs
-            CF_TASK_COMMAND: yarn archive-build-logs-daily
-        - task: nightly-builds
-          config:
-            inputs: [name: src]
-            <<: *cf-image
-            run:
-              path: src/ci/tasks/run-task.sh
-          params:
-            <<: *staging-cf
-            CF_APP_NAME: federalistapp-staging
-            CF_TASK_NAME: nightly-builds
-            CF_TASK_COMMAND: yarn nightly-builds
-        - task: remove-inactive-federalist-users
-          config:
-            inputs: [name: src]
-            <<: *cf-image
-            run:
-              path: src/ci/tasks/run-task.sh
-          params:
-            <<: *staging-cf
-            CF_APP_NAME: federalistapp-staging
-            CF_TASK_NAME: remove-inactive-federalist-users
-            CF_TASK_COMMAND: yarn remove-inactive-federalist-users
 
-  - name: every-ten-minutes-staging
+  - name: deploy-queues-ui-staging
     plan:
-      - get: src
+      - get: src-queues-ui
         resource: src-staging
-        params: {depth: 1}
-      - get: every-10m
         trigger: true
-      - task: timeout-builds
+        params: {depth: 1}
+      - put: gh-status
+        inputs: [src-queues-ui]
+        params: {state: pending}
+      - task: deploy-queues-ui
         config:
-          inputs: [name: src]
           <<: *cf-image
+          inputs: [name: src-queues-ui]
           run:
-            path: src/ci/tasks/run-task.sh
+            path: src-queues-ui/ci/tasks/deploy.sh
         params:
           <<: *staging-cf
-          CF_APP_NAME: federalistapp-staging
-          CF_TASK_NAME: timeout-builds
-          CF_TASK_COMMAND: yarn timeout-builds
+          CF_APP_NAME: federalist-queues-staging
+          CF_MANIFEST: src-queues-ui/.cloudgov/manifest.yml
+          CF_VARS_FILE: src-queues-ui/.cloudgov/vars/staging.yml
+          CF_PATH: src-queues-ui/api/bull-board
+        on_failure:
+          try:
+            task: cancel-queues-ui-deployment
+            config:
+              <<: *cf-image
+              inputs: [name: src-queues-ui]
+              run:
+                path: src-queues-ui/ci/tasks/cancel-deployment.sh
+            params:
+              <<: *staging-cf
+              CF_APP_NAME: federalist-queues-staging
+    on_failure:
+      in_parallel:
+        - put: gh-status
+          inputs: [src-queues-ui]
+          params: {state: failure}  
+        - put: slack
+          params:
+            text: |
+              :x: FAILED: pages queues UI deployment on staging
+              ((build-url))
+              <@U01J8B463T5> <@U01J0M3E8NS> <@U01J7LKV5MZ>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+    on_success:
+      in_parallel:
+        - put: gh-status
+          inputs: [src-queues-ui]
+          params: {state: success}
+        - put: slack
+          params:
+            text: |
+              :white_check_mark: SUCCESS: Successfully deployed pages queues UI on staging
+              ((build-url))
+              <@U01J8B463T5> <@U01J0M3E8NS> <@U01J7LKV5MZ>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
 
 
 ############################
@@ -479,17 +470,6 @@ resources:
     source:
       uri: https://github.com/18F/federalist   
       branch: staging
-
-  - name: nightly
-    type: time
-    source:
-      start: 12:00 AM
-      stop: 1:00 AM
-      location: America/New_York
-
-  - name: every-10m
-    type: time
-    source: {interval: 10m}
 
   - name: redis
     type: docker-image
