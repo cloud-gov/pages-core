@@ -56,7 +56,7 @@ applications:
     path: ../admin-client
     routes:
       - route: admin.federalistapp((env_postfix)).18f.gov
-  - name: federalist-queues((env_postfix))
+  - name: federalist-queues-ui((env_postfix))
     buildpack: nodejs_buildpack
     command: yarn start-bull-board
     disk_quota: 2G
