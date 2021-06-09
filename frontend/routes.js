@@ -2,6 +2,7 @@ import React from 'react';
 import { Redirect } from '@reach/router';
 
 import App from './components/app';
+import * as Organization from './components/organization';
 import SiteList from './components/siteList/siteList';
 import SiteContainer from './components/siteContainer';
 import SiteBuilds from './components/site/siteBuilds';
@@ -26,6 +27,8 @@ const fetchInitialData = () => {
 
 export default (
   <App path="/" onEnter={fetchInitialData}>
+    <Organization.List path="organizations" />
+    <Organization.Edit path="organizations/:id" />
     <SiteList path="sites" />
     <AddSite path="sites/new" />
     <SiteContainer path="sites/:id">
@@ -39,7 +42,7 @@ export default (
       <NotificationSettings path="notifications" />
     </SiteContainer>
     <Redirect noThrow from="*" to="/not-found" />
-    <NotFound path="/not-found" />
+    <NotFound path="/not-found" default />
     <Redirect noThrow from="*" to="/sites" />
   </App>
 );

@@ -4,6 +4,7 @@ const { toInt } = require('../utils');
 const associate = ({
   Organization,
   OrganizationRole,
+  Role,
   Site,
   User,
 }) => {
@@ -36,12 +37,38 @@ const associate = ({
   });
 
   Organization.addScope('forUser', user => ({
+    include: [
+      {
+        model: User,
+        required: true,
+        where: {
+          id: user.id,
+        },
+      },
+      {
+        model: OrganizationRole,
+        required: true,
+        where: {
+          userId: user.id,
+        },
+      },
+    ],
+  }));
+
+  Organization.addScope('forManagerRole', user => ({
     include: [{
-      model: User,
+      model: OrganizationRole,
       required: true,
       where: {
-        id: user.id,
+        userId: user.id,
       },
+      include: [{
+        model: Role,
+        required: true,
+        where: {
+          name: 'manager',
+        },
+      }],
     }],
   }));
 };
@@ -61,5 +88,6 @@ module.exports = (sequelize, DataTypes) => {
   Organization.associate = associate;
   Organization.searchScope = search => ({ method: ['byIdOrName', search] });
   Organization.forUser = user => Organization.scope({ method: ['forUser', user] });
+  Organization.forManagerRole = user => Organization.scope({ method: ['forManagerRole', user] });
   return Organization;
 };
