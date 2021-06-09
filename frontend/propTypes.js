@@ -67,6 +67,28 @@ export const ORGANIZATIONS = PropTypes.shape({
   isLoading: PropTypes.bool,
 });
 
+export const ROLE = PropTypes.shape({
+  createdAt: PropTypes.string,
+  id: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string,
+  ]).isRequired,
+  name: PropTypes.string.isRequired,
+  updatedAt: PropTypes.string,
+});
+
+export const ORGANIZATION_ROLE = PropTypes.shape({
+  createdAt: PropTypes.string,
+  Organization: ORGANIZATION.isRequired,
+  Role: ROLE.isRequired,
+  updatedAt: PropTypes.string,
+});
+
+export const ORGANIZATION_ROLES = PropTypes.shape({
+  data: PropTypes.arrayOf(ORGANIZATION_ROLE),
+  isLoading: PropTypes.bool,
+});
+
 export const USER_ACTION = PropTypes.shape({
   targetType: PropTypes.string,
   createdAt: PropTypes.string,

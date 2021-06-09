@@ -10,6 +10,7 @@ const apiRouter = express.Router();
 apiRouter.use(require('./build-log'));
 apiRouter.use(require('./build'));
 apiRouter.use(require('./organization'));
+apiRouter.use(require('./organization-role'));
 apiRouter.use(require('./published-branch'));
 apiRouter.use(require('./user'));
 apiRouter.use(require('./published-file'));

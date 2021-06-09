@@ -8,5 +8,8 @@ const csrfProtection = require('../policies/csrfProtection');
 router.use(csrfProtection);
 
 router.get('/organization', sessionAuth, OrganizationController.findAllForUser);
+router.get('/organization/:id', sessionAuth, OrganizationController.findOneForUser);
+router.put('/organization/:id', sessionAuth, OrganizationController.update);
+router.post('/organization/:id/invite', sessionAuth, OrganizationController.invite);
 
 module.exports = router;

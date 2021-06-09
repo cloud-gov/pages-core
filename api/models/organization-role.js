@@ -1,4 +1,5 @@
 const associate = ({
+  Organization,
   OrganizationRole,
   Role,
   User,
@@ -7,9 +8,23 @@ const associate = ({
   OrganizationRole.belongsTo(User, {
     foreignKey: 'userId',
   });
+  OrganizationRole.belongsTo(Organization, {
+    foreignKey: 'organizationId',
+  });
   OrganizationRole.belongsTo(Role, {
     foreignKey: 'roleId',
   });
+
+  // Scopes
+  OrganizationRole.addScope('forUser', user => ({
+    where: {
+      userId: user.id,
+    },
+    include: [
+      Organization,
+      Role,
+    ],
+  }));
 };
 
 module.exports = (sequelize, DataTypes) => {
@@ -36,6 +51,6 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   OrganizationRole.associate = associate;
-
+  OrganizationRole.forUser = user => OrganizationRole.scope({ method: ['forUser', user] });
   return OrganizationRole;
 };

@@ -98,16 +98,6 @@ describe('<App/>', () => {
     expect(buildStatusNotifierListen.called).to.be.true;
   });
 
-  it('renders a loading indicator when the user is loading', () => {
-    const newProps = Object.assign({}, props, {
-      user: { isLoading: true, data: null },
-    });
-
-    wrapper = shallow(<AppFixture {...newProps} />);
-    expect(wrapper.find('LoadingIndicator')).to.have.length(1);
-    expect(buildStatusNotifierListen.called).to.be.true;
-  });
-
   it('calls onEnter on mount', () => {
     shallow(<AppFixture {...props} />);
 

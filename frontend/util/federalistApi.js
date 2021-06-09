@@ -5,44 +5,89 @@ import alertActions from '../actions/alertActions';
 
 export const API = '/v0';
 
+function request(endpoint, params = {}, { handleHttpError = true } = {}) {
+  const csrfToken = typeof window !== 'undefined'
+    ? window.CSRF_TOKEN : global.CSRF_TOKEN;
+
+  const defaultHeaders = {
+    'x-csrf-token': csrfToken,
+  };
+
+  const url = `${API}/${endpoint}`;
+
+  const headers = { ...defaultHeaders, ...params.headers || {} };
+  const finalParams = { ...params, headers };
+
+  return fetch(url, finalParams)
+    .catch((error) => {
+      if (handleHttpError) {
+        alertActions.httpError(error.message);
+      } else {
+        throw error;
+      }
+    });
+}
+
 export default {
-  fetch(endpoint, params = {}, { handleHttpError = true } = {}) {
-    const csrfToken = typeof window !== 'undefined'
-      ? window.CSRF_TOKEN : global.CSRF_TOKEN;
-
-    const defaultHeaders = {
-      'x-csrf-token': csrfToken,
-    };
-
-    const url = `${API}/${endpoint}`;
-
-    const headers = { ...defaultHeaders, ...params.headers || {} };
-    const finalParams = { ...params, headers };
-
-    return fetch(url, finalParams)
-      .catch((error) => {
-        if (handleHttpError) {
-          alertActions.httpError(error.message);
-        } else {
-          throw error;
-        }
-      });
-  },
+  request,
 
   fetchBuilds(site) {
-    return this.fetch(`site/${site.id}/build`);
+    return request(`site/${site.id}/build`);
   },
 
   fetchBuildLogs(build, page = 1) {
-    return this.fetch(`build/${build.id}/log/page/${page}`);
+    return request(`build/${build.id}/log/page/${page}`);
+  },
+
+  fetchOrganization(id) {
+    return request(`organization/${id}`);
   },
 
   fetchOrganizations() {
-    return this.fetch('organization');
+    return request('organization');
+  },
+
+  fetchOrganizationRoles() {
+    return request('organization-role');
+  },
+
+  inviteToOrganization(id, data) {
+    return request(`organization/${id}/invite`, {
+      method: 'POST',
+      data,
+    });
+  },
+
+  updateOrganization(id, name) {
+    return request(`organization/${id}`, {
+      method: 'PUT',
+      data: { name },
+    });
+  },
+
+  updateOrganizationRole({ organizationId, roleId, userId }) {
+    return request('organization-role', {
+      method: 'PUT',
+      data: {
+        organizationId,
+        roleId,
+        userId,
+      },
+    });
+  },
+
+  removeOrganizationRole({ organizationId, userId }) {
+    return request('organization-role', {
+      method: 'DELETE',
+      data: {
+        organizationId,
+        userId,
+      },
+    });
   },
 
   fetchPublishedBranches(site) {
-    return this.fetch(`site/${site.id}/published-branch`);
+    return request(`site/${site.id}/published-branch`);
   },
 
   fetchPublishedFiles(site, branch, startAtKey = null) {
@@ -50,23 +95,23 @@ export default {
     if (startAtKey) {
       path += `?startAtKey=${startAtKey}`;
     }
-    return this.fetch(path);
+    return request(path);
   },
 
   fetchSites() {
-    return this.fetch('site');
+    return request('site');
   },
 
   fetchUser() {
-    return this.fetch('me');
+    return request('me');
   },
 
   fetchUserActions(siteId) {
-    return this.fetch(`site/${siteId}/user-action`);
+    return request(`site/${siteId}/user-action`);
   },
 
   addUserToSite({ owner, repository }) {
-    return this.fetch('site/user', {
+    return request('site/user', {
       method: 'POST',
       data: {
         owner,
@@ -80,7 +125,7 @@ export default {
   },
 
   removeUserFromSite(siteId, userId) {
-    return this.fetch(
+    return request(
       `site/${siteId}/user/${userId}`,
       { method: 'DELETE' },
       { handleHttpError: false }
@@ -88,7 +133,7 @@ export default {
   },
 
   addSite(site) {
-    return this.fetch('site', {
+    return request('site', {
       method: 'POST',
       data: site,
     }, {
@@ -97,7 +142,7 @@ export default {
   },
 
   updateSite(site, data) {
-    return this.fetch(`site/${site.id}`, {
+    return request(`site/${site.id}`, {
       method: 'PUT',
       data,
     }, {
@@ -106,13 +151,13 @@ export default {
   },
 
   deleteSite(siteId) {
-    return this.fetch(`site/${siteId}`,
+    return request(`site/${siteId}`,
       { method: 'DELETE' },
       { handleHttpError: false });
   },
 
   restartBuild(buildId, siteId) {
-    return this.fetch('build/', {
+    return request('build/', {
       method: 'POST',
       data: {
         buildId,
@@ -122,7 +167,7 @@ export default {
   },
 
   createBuild(sha, branch, siteId) {
-    return this.fetch('build/', {
+    return request('build/', {
       method: 'POST',
       data: {
         sha,
@@ -133,7 +178,7 @@ export default {
   },
 
   updateSiteUser(siteId, data) {
-    return this.fetch(`site/${siteId}/notifications`, {
+    return request(`site/${siteId}/notifications`, {
       method: 'PUT',
       data,
     }, {
@@ -142,11 +187,11 @@ export default {
   },
 
   fetchUserEnvironmentVariables(siteId) {
-    return this.fetch(`site/${siteId}/user-environment-variable`);
+    return request(`site/${siteId}/user-environment-variable`);
   },
 
   deleteUserEnvironmentVariable(siteId, uevId) {
-    return this.fetch(`site/${siteId}/user-environment-variable/${uevId}`, {
+    return request(`site/${siteId}/user-environment-variable/${uevId}`, {
       method: 'DELETE',
     }, {
       handleHttpError: false,
@@ -154,7 +199,7 @@ export default {
   },
 
   createUserEnvironmentVariable(siteId, uev) {
-    return this.fetch(`site/${siteId}/user-environment-variable`, {
+    return request(`site/${siteId}/user-environment-variable`, {
       method: 'POST',
       data: {
         name: uev.name,
@@ -166,7 +211,7 @@ export default {
   },
 
   removeBasicAuthFromSite(siteId) {
-    return this.fetch(`site/${siteId}/basic-auth`, {
+    return request(`site/${siteId}/basic-auth`, {
       method: 'DELETE',
     }, {
       handleHttpError: false,
@@ -174,7 +219,7 @@ export default {
   },
 
   saveBasicAuthToSite(siteId, credentials) {
-    return this.fetch(`site/${siteId}/basic-auth`, {
+    return request(`site/${siteId}/basic-auth`, {
       method: 'POST',
       data: {
         username: credentials.username,
