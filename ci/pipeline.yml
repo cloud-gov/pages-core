@@ -404,10 +404,10 @@ jobs:
             path: src-queues-ui/ci/tasks/deploy.sh
         params:
           <<: *staging-cf
-          CF_APP_NAME: federalist-queues-staging
+          CF_APP_NAME: federalist-queues-ui-staging
           CF_MANIFEST: src-queues-ui/.cloudgov/manifest.yml
           CF_VARS_FILE: src-queues-ui/.cloudgov/vars/staging.yml
-          CF_PATH: src-queues-ui/api/bull-board
+          CF_PATH: src-queues-ui
         on_failure:
           try:
             task: cancel-queues-ui-deployment
@@ -418,7 +418,7 @@ jobs:
                 path: src-queues-ui/ci/tasks/cancel-deployment.sh
             params:
               <<: *staging-cf
-              CF_APP_NAME: federalist-queues-staging
+              CF_APP_NAME: federalist-queues-ui-staging
     on_failure:
       in_parallel:
         - put: gh-status
