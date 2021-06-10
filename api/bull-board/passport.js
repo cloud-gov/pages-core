@@ -1,5 +1,5 @@
 const Passport = require('passport');
-const config = require('../../config');
+const config = require('./config');
 const { User } = require('../models');
 const { createUAAStrategy, verifyUAAUser } = require('../services/uaaStrategy');
 

@@ -9,7 +9,7 @@ const { ExpressAdapter } = require('@bull-board/express');
 const IORedis = require('ioredis');
 const passport = require('./passport');
 const sessionConfig = require('./sessionConfig');
-const config = process.env.NODE_ENV === 'production' ? require('./config') : require('../../config');
+const config = require('./config');
 
 const connection = new IORedis(config.redis.url);
 
