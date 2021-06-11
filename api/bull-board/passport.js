@@ -1,9 +1,7 @@
 const passport = require('passport');
 const config = require('./config');
-const { User } = require('../models');
 const { createUAAStrategy } = require('../services/uaaStrategy');
 const UAAClient = require('./uaaClient');
-const envConfig = require('../../config/env');
 
 const uaaOptions = {
   ...config.passport.uaa.options,
@@ -12,7 +10,6 @@ const uaaOptions = {
 };
 
 async function verifyUAAUser(profile, uaaGroups) {
-
   const { user_id: uaaId } = profile;
   const client = new UAAClient();
   const isVerified = await client.verifyUserGroup(uaaId, uaaGroups);

@@ -1,7 +1,6 @@
-const config = require('./config');
 const HttpClient = require('../utils/httpClient');
 const { uaa: uaaOptions } = require('../../config/passport');
-const { uaaHostUrl } = require('../../config/env')
+const { uaaHostUrl } = require('../../config/env');
 
 /**
  * @typedef {object} UAAInvite
@@ -78,7 +77,6 @@ class UAAClient {
    * These methods each make one call to the api
    */
 
-
   /**
    * @returns {Promise<string>} a client token
    *
@@ -113,8 +111,6 @@ class UAAClient {
 
     return this.request(path, options);
   }
-
-  
 
   request(path, opts = {}) {
     const {
