@@ -1,19 +1,12 @@
-const { Store } = require('express-session');
-const connectSession = require('connect-session-sequelize');
+const session = require('express-session')
+const IORedis = require('ioredis');
+const RedisStore = require('connect-redis')(session);
+const { logger } = require('../../winston');
+const sessionConfig = require('../../config/session');
+const config = require('./config');
 
-const origSessionConfig = require('../../config/session');
-
-const { sequelize } = require('../models');
-
-const PostgresStore = connectSession(Store);
-const store = new PostgresStore({
-  db: sequelize,
-  modelKey: 'Sessions',
-});
-
-const sessionConfig = { ...origSessionConfig, store };
-
-module.exports = sessionConfig;
+const client = new IORedis(config.redis.url);
+client.on('error', logger.error);
 
 module.exports = {
   ...sessionConfig,
@@ -22,4 +15,5 @@ module.exports = {
   key: 'federalist-bull-board.sid',
   // Use a different secret
   secret: `${sessionConfig.secret}bull-board`,
+  store: new RedisStore({ client, prefix: 'bullboardSess' }),
 };
