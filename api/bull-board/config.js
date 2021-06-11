@@ -27,6 +27,10 @@ if (process.env.NODE_ENV === 'production') {
   module.exports.env = {
     uaaHostUrl: process.env.UAA_HOST_DOCKER_URL || process.env.UAA_HOST || 'http://uaa.example.com',
   };
+
+  module.exports.log = {
+    level: process.env.LOG_LEVEL || 'info',
+  };
 } else {
   module.exports = require('../../config'); // eslint-disable-line global-require
 }

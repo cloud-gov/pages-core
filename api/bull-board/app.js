@@ -10,6 +10,7 @@ const IORedis = require('ioredis');
 const passport = require('./passport');
 const sessionConfig = require('./sessionConfig');
 const config = require('./config');
+const { expressErrorLogger } = require('./winston');
 
 const connection = new IORedis(config.redis.url);
 
@@ -60,5 +61,7 @@ app.get('/auth/uaa/callback', passport.authenticate('uaa'), onSuccess);
 app.get('/auth/uaa/logout', (_req, res) => res.redirect('/'));
 
 app.use('/', ensureAuthenticated, serverAdapter.getRouter());
+
+app.use(expressErrorLogger);
 
 module.exports = app;

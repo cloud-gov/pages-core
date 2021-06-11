@@ -1,6 +1,6 @@
 const http = require('http');
 const app = require('./app');
-const { logger } = require('../../winston');
+const { logger } = require('./winston');
 
 const { PORT = 1338 } = process.env;
 
