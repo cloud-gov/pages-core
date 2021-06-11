@@ -48,7 +48,6 @@ services:
     ports:
       - "1338:1338"
     depends_on:
-      - db
       - redis
       - uaa
     environment:

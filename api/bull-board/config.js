@@ -2,19 +2,6 @@ if (process.env.NODE_ENV === 'production') {
   const cfenv = require('cfenv'); // eslint-disable-line global-require
   const appEnv = cfenv.getAppEnv();
 
-  const rdsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-rds`);
-  if (rdsCreds) {
-    module.exports.postgres = {
-      database: rdsCreds.db_name,
-      host: rdsCreds.host,
-      user: rdsCreds.username,
-      password: rdsCreds.password,
-      port: rdsCreds.port,
-    };
-  } else {
-    throw new Error('No database credentials found.');
-  }
-
   const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`);
   if (redisCreds) {
     module.exports.redis = {
@@ -35,6 +22,10 @@ if (process.env.NODE_ENV === 'production') {
 
   module.exports.app = {
     hostname: process.env.APP_HOSTNAME || 'http://localhost:1338',
+  };
+
+  module.exports.env = {
+    uaaHostUrl: process.env.UAA_HOST_DOCKER_URL || process.env.UAA_HOST || 'http://uaa.example.com',
   };
 } else {
   module.exports = require('../../config'); // eslint-disable-line global-require
