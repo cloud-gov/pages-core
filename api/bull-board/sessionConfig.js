@@ -1,4 +1,4 @@
-const session = require('express-session')
+const session = require('express-session');
 const IORedis = require('ioredis');
 const RedisStore = require('connect-redis')(session);
 const { logger } = require('../../winston');

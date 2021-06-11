@@ -1,6 +1,5 @@
 if (process.env.NODE_ENV === 'production') {
-  const cfenv = require('cfenv');
-
+  const cfenv = require('cfenv'); // eslint-disable-line global-require
   const appEnv = cfenv.getAppEnv();
 
   const rdsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-rds`);
@@ -37,7 +36,6 @@ if (process.env.NODE_ENV === 'production') {
   module.exports.app = {
     hostname: process.env.APP_HOSTNAME || 'http://localhost:1338',
   };
-
 } else {
-  module.exports = require('../../config');
+  module.exports = require('../../config'); // eslint-disable-line global-require
 }
