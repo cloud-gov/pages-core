@@ -1,16 +1,63 @@
 const { expect } = require('chai');
 const request = require('supertest');
+const crypto = require('crypto');
+const csrfToken = require('../../support/csrfToken');
 const { UAAIdentity, User } = require('../../../../api/models');
 const cfUAANock = require('../../support/cfUAANock');
 const userFactory = require('../../support/factory/user');
 const { uaaUser, uaaProfile, createUAAIdentity } = require('../../support/factory/uaa-identity');
-const { sessionForCookie } = require('../../support/cookieSession');
-const { unauthenticatedSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/bull-board/sessionConfig');
-
 const { options: uaaConfig } = require('../../../../config').passport.uaa;
-
 const app = require('../../../../api/bull-board/app');
+
+function unauthenticatedSession({ oauthState, authRedirectPath, cfg = sessionConfig } = {}) {
+  return new Promise((resolve, reject ) => {
+    const sessionKey = crypto.randomBytes(8).toString('hex');
+
+    const sessionBody = {
+      cookie: {
+        originalMaxAge: null,
+        expires: null,
+        httpOnly: true,
+        path: '/',
+      },
+      flash: {},
+      authenticated: false,
+      csrfSecret: csrfToken.TEST_CSRF_SECRET,
+      'oauth2:github.com': { state: oauthState },
+      authRedirectPath,
+    };
+    const cb = (err, result) => {
+      if (err) {
+        reject(err);
+      }
+      try {
+        const signedSessionKey = `${sessionKey}.${crypto
+          .createHmac('sha256', cfg.secret)
+          .update(sessionKey)
+          .digest('base64')
+          .replace(/=+$/, '')}`;
+        resolve(`${cfg.key}=s%3A${signedSessionKey}`);
+      } catch (e) {
+        throw e;
+      }
+    };
+    cfg.store.set(sessionKey, sessionBody, cb);
+  });
+}
+
+const sessionForCookie = (cookie, sid = 'federalist-bull-board.sid') => {
+  const sessionID = cookie.replace(`${sid}=s%3A`, '').split('.')[0];
+  return new Promise((resolve, reject) => {
+    sessionConfig.store.get(sessionID, (err, sessionBody) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(sessionBody);
+      }
+    });
+  });
+};
 
 describe('bull board authentication request', () => {
   after(() => Promise.all([
@@ -19,12 +66,12 @@ describe('bull board authentication request', () => {
   ]));
 
   describe('GET /login', () => {
-    it('should redirect to the configured cloud.gov authorization endpoint', (done) => {
+    it('should redirect to the configured cloud.gov authorization endpoint', () => {
       const locationRE = new RegExp(`^${uaaConfig.authorizationURL}`);
       request(app)
         .get('/login')
         .expect('Location', locationRE)
-        .expect(302, done);
+        .expect(302);
     });
   });
 
@@ -100,7 +147,10 @@ describe('bull board authentication request', () => {
 
       it('authenticates the session', async () => {
         const oauthState = 'state-123abc';
-        const cookie = await unauthenticatedSession({ oauthState, cfg: sessionConfig });
+        const seshConfig = { ...sessionConfig };
+        const uaaIdentity = await user.getUAAIdentity();
+        const cookie = await unauthenticatedSession({ oauthState, cfg: sessionConfig }).catch(e => e);
+
         await request(app)
           .get(`/auth/uaa/callback?code=${code}&state=${oauthState}`)
           .set('Cookie', cookie)
@@ -111,7 +161,7 @@ describe('bull board authentication request', () => {
 
         expect(authSession.passport.user).to.exist;
         expect(authSession.authenticated).to.equal(true);
-        expect(authSession.passport.user).to.equal(user.id);
+        expect(authSession.passport.user).to.equal(uaaIdentity.uaaId);
       });
     });
 
