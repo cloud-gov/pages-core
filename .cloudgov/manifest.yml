@@ -69,7 +69,6 @@ applications:
     services:
       - app-((env))-uaa-client
       - federalist-((env))-redis
-      - federalist-((env))-rds
     env:
       NODE_ENV: production
       APP_ENV: ((env))
@@ -77,3 +76,4 @@ applications:
       LOG_LEVEL: ((log_level))
       NPM_CONFIG_PRODUCTION: true
       NODE_MODULES_CACHE: false
+      UAA_HOST: ((uaa_host))
