@@ -23,7 +23,7 @@ const sessionConfig = require('./sessionConfig');
 
 const { NODE_ENV } = process.env;
 
-function randomNonce(_, res, next) => {
+function randomNonce(_, res, next) {
   res.locals.cspNonce = crypto.randomBytes(16).toString('hex');
   next();
 }
@@ -77,7 +77,7 @@ function init(app) {
 
   app.disable('x-powered-by');
 
-  app.use(randomNonce));
+  app.use(randomNonce);
 
   app.use(helmet(config.helmet));
 
