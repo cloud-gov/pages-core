@@ -1,6 +1,6 @@
 /*
- Options to pass to the RateLimit constructor
- See https://github.com/nfriedly/express-rate-limit/blob/master/README.md#configuration
+ Options to pass to helmet
+ See https://helmetjs.github.io/
  for all options available
 */
 module.exports = {
