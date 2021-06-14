@@ -1,0 +1,29 @@
+/*
+ Options to pass to the RateLimit constructor
+ See https://github.com/nfriedly/express-rate-limit/blob/master/README.md#configuration
+ for all options available
+*/
+module.exports = {
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      'script-src': [
+        "'self'",
+        'www.googletagmanager.com',
+        'dap.digitalgov.gov',
+        'www.google-analytics.com',
+        (_, res) => `'nonce-${res.locals.cspNonce}'`,
+      ],
+      'connect-src': [
+        "'self'",
+        'www.google-analytics.com',
+      ],
+      'report-uri': '/_/csp-violation-report',
+    },
+    reportOnly: true,
+  },
+  frameguard: {
+    action: 'deny',
+  },
+  xssFilter: false,
+};
