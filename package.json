@@ -23,7 +23,7 @@
     "deep-extend": "^0.6",
     "express": "4.17.1",
     "express-rate-limit": "^5.2.3",
-    "express-session": "^1.15.6",
+    "express-session": "^1.17.2",
     "express-slow-down": "^1.4.0",
     "express-winston": "^4.0.5",
     "helmet": "^4.6.0",
