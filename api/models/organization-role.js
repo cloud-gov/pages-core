@@ -2,6 +2,7 @@ const associate = ({
   Organization,
   OrganizationRole,
   Role,
+  UAAIdentity,
   User,
 }) => {
   // Associations
@@ -23,6 +24,19 @@ const associate = ({
     include: [
       Organization,
       Role,
+    ],
+  }));
+
+  OrganizationRole.addScope('forOrganization', org => ({
+    where: {
+      organizationId: org.id,
+    },
+    include: [
+      Role,
+      {
+        model: User,
+        include: UAAIdentity,
+      },
     ],
   }));
 };
@@ -52,5 +66,6 @@ module.exports = (sequelize, DataTypes) => {
 
   OrganizationRole.associate = associate;
   OrganizationRole.forUser = user => OrganizationRole.scope({ method: ['forUser', user] });
+  OrganizationRole.forOrganization = org => OrganizationRole.scope({ method: ['forOrganization', org] });
   return OrganizationRole;
 };

@@ -1,22 +1,10 @@
-const { pick } = require('../utils');
+const base = require('./base');
 
-const allowedAttributes = [
-  'id',
-  'name',
-  'createdAt',
-  'updatedAt',
-];
+const attributes = {
+  id: '',
+  name: '',
+  createdAt: 'date',
+  updatedAt: 'date',
+};
 
-function serialize(model) {
-  const object = model.get({ plain: true });
-  const filtered = pick(allowedAttributes, object);
-  filtered.createdAt = filtered.createdAt.toISOString();
-  filtered.updatedAt = filtered.updatedAt.toISOString();
-  return filtered;
-}
-
-function serializeMany(models) {
-  return models.map(serialize);
-}
-
-module.exports = { serialize, serializeMany };
+module.exports = base(attributes);

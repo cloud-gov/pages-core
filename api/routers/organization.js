@@ -11,5 +11,6 @@ router.get('/organization', sessionAuth, OrganizationController.findAllForUser);
 router.get('/organization/:id', sessionAuth, OrganizationController.findOneForUser);
 router.put('/organization/:id', sessionAuth, OrganizationController.update);
 router.post('/organization/:id/invite', sessionAuth, OrganizationController.invite);
+router.get('/organization/:id/members', sessionAuth, OrganizationController.members);
 
 module.exports = router;

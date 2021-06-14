@@ -60,3 +60,21 @@ select {
     margin-top: 2rem;
   }
 }
+
+.update-user-form {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 0;
+
+  fieldset {
+    margin: 0;
+    display: inline;
+  }
+
+  select {
+    height: 3.6rem;
+    padding-bottom: 1px;
+    padding-top: 1px;
+  }
+}
