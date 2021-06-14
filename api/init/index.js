@@ -23,6 +23,11 @@ const sessionConfig = require('./sessionConfig');
 
 const { NODE_ENV } = process.env;
 
+function randomNonce(_, res, next) => {
+  res.locals.cspNonce = crypto.randomBytes(16).toString('hex');
+  next();
+}
+
 function configureViews(app) {
   nunjucks.configure('views', {
     autoescape: true,
@@ -72,31 +77,9 @@ function init(app) {
 
   app.disable('x-powered-by');
 
-  app.use((req, res, next) => {
-    res.locals.cspNonce = crypto.randomBytes(16).toString('hex');
-    next();
-  });
+  app.use(randomNonce));
 
-  app.use(helmet({
-    contentSecurityPolicy: {
-      useDefaults: true,
-      directives: {
-        'script-src': [
-          "'self'",
-          'www.googletagmanager.com',
-          'dap.digitalgov.gov',
-          'www.google-analytics.com',
-          (_, res) => `'nonce-${res.locals.cspNonce}'`,
-        ],
-        'connect-src': [
-          "'self'",
-          'www.google-analytics.com',
-        ],
-        'report-uri': '/_/csp-violation-report',
-      },
-      reportOnly: true,
-    },
-  }));
+  app.use(helmet(config.helmet));
 
   app.use(express.static('public'));
 
