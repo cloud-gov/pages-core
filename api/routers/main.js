@@ -12,4 +12,10 @@ router.get('/robots.txt', MainController.robots);
 
 router.get('/404-not-found/', MainController.notFound);
 
+// TODO - remove once enforced
+router.post('/_/csp-violation-report', (req, res) => {
+  // This doesn't actually have to do anything since we can look at the requests in the network tab
+  res.json({});
+});
+
 module.exports = router;

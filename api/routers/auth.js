@@ -44,7 +44,7 @@ const onGithubSuccess = async (req, res) => {
   EventCreator.audit(Event.labels.AUTHENTICATION, user, 'GitHub authentication');
 
   const script = `
-    <script>
+    <script nonce="${res.locals.cspNonce}">
       window.opener.postMessage("success", "*")
     </script>
   `;
