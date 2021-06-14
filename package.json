@@ -8,7 +8,7 @@
     "@octokit/rest": "^18.5.2",
     "@socket.io/redis-adapter": "^7.0.0",
     "@supercharge/promise-pool": "^1.5.0",
-    "aws-sdk": "^2.879.0",
+    "aws-sdk": "^2.928.0",
     "axios": "^0.21.1",
     "body-parser": "^1.18.3",
     "bull": "^3.20.1",
