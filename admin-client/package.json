@@ -28,7 +28,7 @@
     "rollup-plugin-terser": "^7.0.2"
   },
   "dependencies": {
-    "date-fns": "^2.15.0",
+    "date-fns": "^2.22.1",
     "page": "^1.11.6",
     "sirv-cli": "^1.0.0",
     "svelte": "^3.0.0",
