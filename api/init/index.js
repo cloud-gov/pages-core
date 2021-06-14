@@ -46,6 +46,11 @@ function setUserInLocals(req, res, next) {
   return next();
 }
 
+function xssProtection(req, res, next) {
+  res.set('X-XSS-Protection', '1; mode=block');
+  next();
+}
+
 function cacheControl(req, res, next) {
   res.set('Cache-Control', 'max-age=0');
   next();
@@ -80,6 +85,8 @@ function init(app) {
   app.use(randomNonce);
 
   app.use(helmet(config.helmet));
+
+  app.use(xssProtection);
 
   app.use(express.static('public'));
 
