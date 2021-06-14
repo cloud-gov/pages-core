@@ -6,6 +6,8 @@ const slowDown = require('express-slow-down');
 const session = require('express-session');
 const nunjucks = require('nunjucks');
 const flash = require('connect-flash');
+const helmet = require('helmet');
+const crypto = require('crypto');
 
 const { logger, expressLogger, expressErrorLogger } = require('../../winston');
 const config = require('../../config');
@@ -67,6 +69,34 @@ function init(app) {
   // able to access the requesting user's IP in req.ip, so
   // 'trust proxy' must be enabled.
   app.enable('trust proxy');
+
+  app.disable('x-powered-by');
+
+  app.use((req, res, next) => {
+    res.locals.cspNonce = crypto.randomBytes(16).toString('hex');
+    next();
+  });
+
+  app.use(helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        'script-src': [
+          "'self'",
+          'www.googletagmanager.com',
+          'dap.digitalgov.gov',
+          'www.google-analytics.com',
+          (_, res) => `'nonce-${res.locals.cspNonce}'`,
+        ],
+        'connect-src': [
+          "'self'",
+          'www.google-analytics.com',
+        ],
+        'report-uri': '/_/csp-violation-report',
+      },
+      reportOnly: true,
+    },
+  }));
 
   app.use(express.static('public'));
 

@@ -1,7 +1,7 @@
 {% extends "base.njk" %}
 
 {% block head_extra %}
-  <script>
+  <script nonce="{{ nonce }}">
     window.FRONTEND_CONFIG = {{ frontendConfig | dump | safe }};
   </script>
 {% endblock %}
@@ -25,7 +25,7 @@
 {% block main_content %}
   <div id="js-app" class="usa-grid"></div>
 
-  <script>
+  <script nonce="{{ nonce }}">
     window.CSRF_TOKEN = "{{ csrfToken }}";
   </script>
   <script src="/{{ webpackAssets['main.js'] }}"></script>

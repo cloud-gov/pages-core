@@ -3,7 +3,7 @@ const passport = require('../passport');
 
 const onSuccess = (req, res) => {
   const script = `
-    <script>
+    <script nonce="${res.locals.cspNonce}">
       window.opener.postMessage("success", "*")
     </script>
   `;
