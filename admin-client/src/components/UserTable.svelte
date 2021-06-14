@@ -23,7 +23,7 @@
     <td><a href="/users/{user.id}">{user.id}</a></td>
     <td>{user.username || '-'}</td>
     <td>{user.email || '-'}</td>
-    <td>{user.uaa?.email || '-'}</td>
+    <td>{user.UAAIdentity?.email || '-'}</td>
     <td>{formatDateTime(user.createdAt)}</td>
     <td>{formatDateTime(user.signedInAt)}</td>
     <td>{formatDateTime(user.pushedAt)}</td>

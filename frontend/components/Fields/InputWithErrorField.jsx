@@ -31,8 +31,8 @@ const InputWithErrorField = ({
 
 InputWithErrorField.propTypes = {
   id: PropTypes.string.isRequired,
-  placeholder: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
+  placeholder: PropTypes.string,
+  label: PropTypes.string,
   help: PropTypes.node,
   meta: PropTypes.shape({
     touched: PropTypes.bool,
@@ -43,6 +43,8 @@ InputWithErrorField.propTypes = {
 
 InputWithErrorField.defaultProps = {
   help: null,
+  label: null,
+  placeholder: '',
   type: 'url',
 };
 

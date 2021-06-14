@@ -1,5 +1,6 @@
 const organizationSerializer = require('../serializers/organization');
-const { Organization } = require('../models');
+const organizationRoleSerializer = require('../serializers/organization-role');
+const { Organization, OrganizationRole, User } = require('../models');
 const OrganizationService = require('../services/organization');
 const { toInt, wrapHandlers } = require('../utils');
 const { fetchModelById } = require('../utils/queryDatabase');
@@ -58,10 +59,34 @@ module.exports = wrapHandlers({
       user, toInt(id), toInt(roleId), uaaEmail, githubUsername
     );
 
+    // TODO - refactor above method to return user so this extra query is not necessary
+    const newUser = await User.byUAAEmail(email).findOne();
+    const member = await OrganizationRole.forOrganization({ id })
+      .findOne({ where: { userId: newUser.id } });
+
     const json = {
+      member: organizationRoleSerializer.serialize(member),
       invite: { email, link },
     };
 
+    return res.json(json);
+  },
+
+  async members(req, res) {
+    const {
+      params: { id },
+      user,
+    } = req;
+
+    const org = await fetchModelById(id, Organization.forManagerRole(user));
+
+    if (!org) {
+      return res.notFound();
+    }
+
+    const members = await OrganizationRole.forOrganization(org).findAll();
+
+    const json = organizationRoleSerializer.serializeMany(members);
     return res.json(json);
   },
 });

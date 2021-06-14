@@ -2,7 +2,6 @@ const {
   Organization,
   OrganizationRole,
   Role,
-  UAAIdentity,
   User,
 } = require('../../models');
 const { CustomError } = require('../../utils/validators');
@@ -67,13 +66,7 @@ module.exports = {
    * @returns {Promise<UserType | null>}
    */
   findUserByUAAIdentity(uaaEmail) {
-    return User.findOne({
-      include: [{
-        model: UAAIdentity,
-        where: { email: uaaEmail },
-        required: true,
-      }],
-    });
+    return User.byUAAEmail(uaaEmail).findOne();
   },
 
   /**
@@ -135,7 +128,7 @@ module.exports = {
    * @param {number} roleId
    * @param {string} targetUserEmail - the email address of the user to invite
    * @param {string=} targetUserGithubUsername
-   * @returns {Promise<[OrgType, UAAClient.UAAUserAttributes>}
+   * @returns {Promise<UAAClient.UAAUserAttributes>}
    */
   async inviteUserToOrganization(
     currentUser, organizationId, roleId, targetUserEmail, targetUserGithubUsername

@@ -51,18 +51,18 @@
 
     <h3>UAA Info</h3>
     <div class="grid-row">
-      {#if user.uaa}
+      {#if user.UAAIdentity}
         <div class="tablet:grid-col-fill padding-bottom-1">
-          <LabeledItem label="uaa user id" value={user.uaa.userId} />
-          <LabeledItem label="uaa id" value={user.uaa.uaaId} />
-          <LabeledItem label="uaa origin" value={user.uaa.origin} />        
-          <LabeledItem label="uaa email" value={user.uaa.email} />
-          <LabeledItem label="uaa username" value={user.uaa.username} />
+          <LabeledItem label="uaa user id" value={user.UAAIdentity.userId} />
+          <LabeledItem label="uaa id" value={user.UAAIdentity.UAAIdentityId} />
+          <LabeledItem label="uaa origin" value={user.UAAIdentity.origin} />        
+          <LabeledItem label="uaa email" value={user.UAAIdentity.email} />
+          <LabeledItem label="uaa username" value={user.UAAIdentity.username} />
         </div>
         <div class="tablet:grid-col-auto padding-bottom-1">
           <button
             class="usa-button"
-            on:click|preventDefault={() => handleResendInvite(user.uaa.email)}>
+            on:click|preventDefault={() => handleResendInvite(user.UAAIdentity.email)}>
             Resend Invite
           </button>
         </div>

@@ -47,8 +47,10 @@ module.exports = wrapHandlers({
     const org = await fetchModelById(organizationId, Organization.forManagerRole(user));
     if (!org) return res.notFound();
 
-    await OrganizationRole.update({ roleId }, { where: { organizationId, userId } });
+    const member = await OrganizationRole.forOrganization(org).findOne({ where: { userId } });
+    await member.update({ roleId });
 
-    return res.json({});
+    const json = organizationRoleSerializer.serialize(member);
+    return res.json(json);
   },
 });

@@ -65,7 +65,7 @@ export default {
     });
   },
 
-  updateOrganizationRole({ organizationId, roleId, userId }) {
+  updateOrganizationRole(organizationId, roleId, userId) {
     return request('organization-role', {
       method: 'PUT',
       data: {
@@ -76,7 +76,7 @@ export default {
     });
   },
 
-  removeOrganizationRole({ organizationId, userId }) {
+  removeOrganizationRole(organizationId, userId) {
     return request('organization-role', {
       method: 'DELETE',
       data: {
@@ -84,6 +84,14 @@ export default {
         userId,
       },
     });
+  },
+
+  fetchRoles() {
+    return request('role');
+  },
+
+  fetchOrganizationMembers(id) {
+    return request(`organization/${id}/members`);
   },
 
   fetchPublishedBranches(site) {

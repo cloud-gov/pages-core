@@ -3,37 +3,33 @@ const _ = require('underscore');
 
 const transforms = {
   '': value => value,
-  date: value => value.toISOString(),
+  date: value => value?.toISOString(),
   yaml: value => yaml.dump(value),
 };
 
-function getTransform(spec) {
-  if (typeof spec === 'function') {
-    return spec;
-  }
-  return transforms[spec];
-}
-
 function generateSerializer(attributes, adminAttributes) {
   function serialize(model, isSystemAdmin = false) {
-    const allowedAttributes = {
+    if (!model) {
+      return null;
+    }
+
+    const allAttributes = {
       ...attributes, ...(isSystemAdmin ? adminAttributes : {}),
     };
 
-    function applyTransforms(val, key) {
-      const transformSpec = allowedAttributes[key];
-      const transform = getTransform(transformSpec);
-      return transform(val);
+    function applyTransforms(spec, attribute) {
+      const transform = (typeof spec === 'function')
+        ? spec
+        : transforms[spec];
+
+      return transform(model.get(attribute), model, isSystemAdmin);
     }
 
-    return _.chain(model.get())
-      .pick(Object.keys(allowedAttributes))
-      .mapObject(applyTransforms)
-      .value();
+    return _.mapObject(allAttributes, applyTransforms);
   }
 
   function serializeMany(models, isSystemAdmin = false) {
-    return models.map(model => this.serialize(model, isSystemAdmin));
+    return models.map(model => serialize(model, isSystemAdmin));
   }
 
   return { serialize, serializeMany };

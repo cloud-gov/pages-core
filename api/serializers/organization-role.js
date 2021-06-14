@@ -1,12 +1,14 @@
 const base = require('./base');
 const organizationSerializer = require('./organization');
 const roleSerializer = require('./role');
+const userSerializer = require('./user');
 
-const allowedAttributes = {
+const attributes = {
   createdAt: 'date',
-  Organization: organizationSerializer.serialize,
-  Role: roleSerializer.serialize,
+  Organization: (org, _, isSystemAdmin) => organizationSerializer.serialize(org, isSystemAdmin),
+  Role: (role, _, isSystemAdmin) => roleSerializer.serialize(role, isSystemAdmin),
+  User: (user, _, isSystemAdmin) => userSerializer.serialize(user, isSystemAdmin),
   updatedAt: 'date',
 };
 
-module.exports = base(allowedAttributes);
+module.exports = base(attributes);
