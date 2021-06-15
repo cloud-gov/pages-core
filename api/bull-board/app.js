@@ -10,7 +10,7 @@ const IORedis = require('ioredis');
 const passport = require('./passport');
 const sessionConfig = require('./sessionConfig');
 const config = require('./config');
-const { expressErrorLogger } = require('./winston');
+const { expressErrorLogger, logger } = require('./winston');
 
 const connection = new IORedis(config.redis.url);
 
@@ -53,6 +53,12 @@ function redirectIfAuthenticated(req, res, next) {
   req.session.authenticated ? res.redirect('/') : next();
 }
 
+// eslint-disable-next-line no-unused-vars
+function errorHandler(err, req, res, _next) {
+  logger.error(err.stack);
+  res.error(err);
+}
+app.get('/hello world');
 app.get('/logout', passport.logout);
 app.get('/login', redirectIfAuthenticated, passport.authenticate('uaa'));
 
@@ -63,5 +69,6 @@ app.get('/auth/uaa/logout', (_req, res) => res.redirect('/'));
 app.use('/', ensureAuthenticated, serverAdapter.getRouter());
 
 app.use(expressErrorLogger);
+app.use(errorHandler);
 
 module.exports = app;
