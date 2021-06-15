@@ -7,7 +7,8 @@ const attributes = {
   username: '',
   buildNotificationSetting: (_, user) => user.SiteUser?.buildNotificationSetting,
   hasGithubAuth: (_, user) => !!user.githubAccessToken,
-  UAAIdentity: (uaaIdentity, _, isSystemAdmin) => uaaIdentitySerializer.serialize(uaaIdentity, isSystemAdmin),
+  UAAIdentity: (uaaIdentity, _, isSystemAdmin) => uaaIdentitySerializer
+    .serialize(uaaIdentity, isSystemAdmin),
 };
 
 const adminAttributes = {
