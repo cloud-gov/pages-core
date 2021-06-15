@@ -55,10 +55,20 @@ function redirectIfAuthenticated(req, res, next) {
 
 // eslint-disable-next-line no-unused-vars
 function errorHandler(err, req, res, _next) {
+  if (!err) {
+    _next();
+  }
   logger.error(err.stack);
   res.error(err);
 }
-app.get('/hello world');
+// eslint-disable-next-line no-unused-vars
+function logRequests(req, res, _next) {
+  logger.info(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
+  _next();
+}
+
+app.use(errorHandler);
+app.use(logRequests);
 app.get('/logout', passport.logout);
 app.get('/login', redirectIfAuthenticated, passport.authenticate('uaa'));
 
@@ -69,6 +79,5 @@ app.get('/auth/uaa/logout', (_req, res) => res.redirect('/'));
 app.use('/', ensureAuthenticated, serverAdapter.getRouter());
 
 app.use(expressErrorLogger);
-app.use(errorHandler);
 
 module.exports = app;
