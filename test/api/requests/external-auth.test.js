@@ -32,7 +32,7 @@ describe('External authentication request', () => {
         request(app)
           .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
           .expect((res) => {
-            expect(res.text.trim()).to.match(/^<script>(.|\n)*<\/script>$/g);
+            expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*<\/script>$/g);
           })
           .expect(200, done);
       });
@@ -47,7 +47,7 @@ describe('External authentication request', () => {
               .set('Cookie', cookie)
               .expect(200)
               .expect((res) => {
-                expect(res.text.trim()).to.match(/^<script>(.|\n)*<\/script>$/g);
+                expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*<\/script>$/g);
               });
           })
           .then(() => sessionForCookie(cookie))
