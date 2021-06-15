@@ -18,9 +18,7 @@ module.exports = {
         "'self'",
         'www.google-analytics.com',
       ],
-      'report-uri': '/_/csp-violation-report',
     },
-    reportOnly: true,
   },
   frameguard: {
     action: 'deny',
