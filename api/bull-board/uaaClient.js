@@ -1,7 +1,7 @@
 const HttpClient = require('../utils/httpClient');
-const { uaa: uaaOptions } = require('../../config/passport');
 const config = require('./config');
 
+const { uaa: uaaOptions } = config.passport;
 /**
  * @typedef {object} UAAInvite
  * @property {string} email
