@@ -53,22 +53,6 @@ function redirectIfAuthenticated(req, res, next) {
   req.session.authenticated ? res.redirect('/') : next();
 }
 
-// eslint-disable-next-line no-unused-vars
-function errorHandler(err, req, res, _next) {
-  if (!err) {
-    _next();
-  }
-  logger.error(err.stack);
-  res.error(err);
-}
-// eslint-disable-next-line no-unused-vars
-function logRequests(req, res, _next) {
-  logger.info(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
-  _next();
-}
-
-app.use(errorHandler);
-app.use(logRequests);
 app.get('/logout', passport.logout);
 app.get('/login', redirectIfAuthenticated, passport.authenticate('uaa'));
 
