@@ -10,7 +10,7 @@ const IORedis = require('ioredis');
 const passport = require('./passport');
 const sessionConfig = require('./sessionConfig');
 const config = require('./config');
-const { expressErrorLogger, logger } = require('./winston');
+const { expressErrorLogger } = require('./winston');
 
 const connection = new IORedis(config.redis.url);
 
