@@ -88,7 +88,7 @@ describe('Admin authentication request', () => {
         request(app)
           .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
           .expect((res) => {
-            expect(res.text.trim()).to.match(/^<script>(.|\n)*<\/script>$/g);
+            expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*<\/script>$/g);
           })
           .expect(200, done);
       });
@@ -100,7 +100,7 @@ describe('Admin authentication request', () => {
           .set('Cookie', cookie)
           .expect(200)
           .expect((res) => {
-            expect(res.text.trim()).to.match(/^<script>(.|\n)*<\/script>$/g);
+            expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*<\/script>$/g);
           });
         const session = await sessionForCookie(cookie, 'federalist-admin.sid');
         expect(session.passport.user).to.exist;
