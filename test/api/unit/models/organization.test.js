@@ -108,4 +108,18 @@ describe('Organization model', () => {
 
     expect(await org.countSites()).to.eq(numSites);
   });
+
+  describe('searchScope', () => {
+    it('returns the org by id.');
+
+    it('returns the org by name substring.');
+  });
+
+  describe('forUser', () => {
+    it('returns all orgs for the user and includes the `OrganizationRole` and `User`.');
+  });
+
+  describe('forManagerRole', () => {
+    it('returns all orgs for which user is a manager and includes the `OrganizationRole` and `Role`.');
+  });
 });
