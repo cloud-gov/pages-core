@@ -6,6 +6,8 @@ const slowDown = require('express-slow-down');
 const session = require('express-session');
 const nunjucks = require('nunjucks');
 const flash = require('connect-flash');
+const helmet = require('helmet');
+const crypto = require('crypto');
 
 const { logger, expressLogger, expressErrorLogger } = require('../../winston');
 const config = require('../../config');
@@ -20,6 +22,11 @@ const EventCreator = require('../services/EventCreator');
 const sessionConfig = require('./sessionConfig');
 
 const { NODE_ENV } = process.env;
+
+function randomNonce(_, res, next) {
+  res.locals.cspNonce = crypto.randomBytes(16).toString('hex');
+  next();
+}
 
 function configureViews(app) {
   nunjucks.configure('views', {
@@ -37,6 +44,11 @@ function maybeUseDevMiddleware(app) {
 function setUserInLocals(req, res, next) {
   res.locals.user = req.user;
   return next();
+}
+
+function xssProtection(req, res, next) {
+  res.set('X-XSS-Protection', '1; mode=block');
+  next();
 }
 
 function cacheControl(req, res, next) {
@@ -67,6 +79,14 @@ function init(app) {
   // able to access the requesting user's IP in req.ip, so
   // 'trust proxy' must be enabled.
   app.enable('trust proxy');
+
+  app.disable('x-powered-by');
+
+  app.use(randomNonce);
+
+  app.use(helmet(config.helmet));
+
+  app.use(xssProtection);
 
   app.use(express.static('public'));
 

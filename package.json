@@ -29,6 +29,7 @@
     "express-session": "^1.15.6",
     "express-slow-down": "^1.4.0",
     "express-winston": "^4.0.5",
+    "helmet": "^4.6.0",
     "js-file-download": "^0.4.11",
     "js-yaml": "^4.1.0",
     "json-to-csv": "^1.0.0",

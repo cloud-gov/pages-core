@@ -6,7 +6,7 @@ const Features = require('../features');
 
 const webpackAssets = loadAssetManifest();
 
-function defaultContext(req) {
+function defaultContext(req, res) {
   const messages = {
     errors: req.flash('error'),
   };
@@ -21,6 +21,7 @@ function defaultContext(req) {
     authGithub: Features.enabled(Features.Flags.FEATURE_AUTH_GITHUB),
     authUAA: Features.enabled(Features.Flags.FEATURE_AUTH_UAA),
     hasUAAIdentity: false,
+    nonce: res.locals.cspNonce,
   };
 
   return context;
@@ -43,13 +44,13 @@ module.exports = {
     if (req.session.authenticated) {
       return res.redirect('/sites');
     }
-    const context = defaultContext(req);
+    const context = defaultContext(req, res);
 
     return res.render('home.njk', context);
   },
 
   systemUse(req, res) {
-    const context = defaultContext(req);
+    const context = defaultContext(req, res);
 
     return res.render('system-use.njk', context);
   },
@@ -60,7 +61,7 @@ module.exports = {
       return res.redirect('/');
     }
 
-    const context = defaultContext(req);
+    const context = defaultContext(req, res);
     const hasUAAIdentity = !!req.user.UAAIdentity;
 
     context.isAuthenticated = true;
@@ -100,7 +101,7 @@ module.exports = {
   },
 
   notFound(req, res) {
-    const context = defaultContext(req);
+    const context = defaultContext(req, res);
     if (req.session.authenticated) {
       context.isAuthenticated = true;
       context.username = req.user.username;
