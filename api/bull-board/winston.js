@@ -25,6 +25,15 @@ const expressErrorLogger = expressWinston.errorLogger({
   skip: () => config.log.silent,
 });
 
+const expressLogger = expressWinston.logger({
+  format: winston.format.combine(
+    winston.format.simple(),
+    winston.format.colorize()
+  ),
+  transports: [new winston.transports.Console()],
+  skip: () => config.log.silent,
+});
+
 module.exports = {
-  logger, expressErrorLogger,
+  logger, expressErrorLogger, expressLogger,
 };

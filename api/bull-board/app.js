@@ -10,7 +10,7 @@ const IORedis = require('ioredis');
 const passport = require('./passport');
 const sessionConfig = require('./sessionConfig');
 const config = require('./config');
-const { expressErrorLogger } = require('./winston');
+const { expressErrorLogger, expressLogger } = require('./winston');
 
 const connection = new IORedis(config.redis.url);
 
@@ -28,7 +28,7 @@ createBullBoard({
 });
 
 const app = express();
-
+app.use(expressLogger);
 app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
