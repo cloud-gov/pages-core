@@ -7,6 +7,8 @@ const { BullAdapter } = require('@bull-board/api/bullAdapter');
 const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
 const { ExpressAdapter } = require('@bull-board/express');
 const IORedis = require('ioredis');
+const helmet = require('helmet');
+
 const passport = require('./passport');
 const sessionConfig = require('./sessionConfig');
 const config = require('./config');
@@ -34,6 +36,13 @@ createBullBoard({
 });
 
 const app = express();
+
+app.enable('trust proxy');
+
+app.disable('x-powered-by');
+
+app.use(helmet(config.helmet));
+
 app.use(expressLogger);
 app.use(session(sessionConfig));
 app.use(passport.initialize());

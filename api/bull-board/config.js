@@ -28,6 +28,23 @@ if (process.env.NODE_ENV === 'production') {
     uaaHostUrl: process.env.UAA_HOST_DOCKER_URL || process.env.UAA_HOST || 'http://uaa.example.com',
   };
 
+  module.exports.helmet = {
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        'script-src': [
+          "'self'",
+          'fonts.gstatic.com',
+          'fonts.googleapis.com',
+        ],
+      },
+    },
+    frameguard: {
+      action: 'deny',
+    },
+    xssFilter: false,
+  };
+
   module.exports.log = {
     level: process.env.LOG_LEVEL || 'info',
   };
