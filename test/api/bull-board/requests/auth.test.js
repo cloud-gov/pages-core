@@ -11,7 +11,7 @@ const { options: uaaConfig } = require('../../../../config').passport.uaa;
 const app = require('../../../../api/bull-board/app');
 
 function unauthenticatedSession({ oauthState, authRedirectPath, cfg = sessionConfig } = {}) {
-  return new Promise((resolve, reject ) => {
+  return new Promise((resolve, reject) => {
     const sessionKey = crypto.randomBytes(8).toString('hex');
 
     const sessionBody = {
@@ -27,19 +27,22 @@ function unauthenticatedSession({ oauthState, authRedirectPath, cfg = sessionCon
       'oauth2:github.com': { state: oauthState },
       authRedirectPath,
     };
-    const cb = (err, result) => {
+
+    const cb = (err) => {
       if (err) {
         reject(err);
       }
+
       try {
         const signedSessionKey = `${sessionKey}.${crypto
           .createHmac('sha256', cfg.secret)
           .update(sessionKey)
           .digest('base64')
           .replace(/=+$/, '')}`;
+
         resolve(`${cfg.key}=s%3A${signedSessionKey}`);
       } catch (e) {
-        throw e;
+        reject(e);
       }
     };
     cfg.store.set(sessionKey, sessionBody, cb);
@@ -147,9 +150,8 @@ describe('bull board authentication request', () => {
 
       it('authenticates the session', async () => {
         const oauthState = 'state-123abc';
-        const seshConfig = { ...sessionConfig };
         const uaaIdentity = await user.getUAAIdentity();
-        const cookie = await unauthenticatedSession({ oauthState, cfg: sessionConfig }).catch(e => e);
+        const cookie = await unauthenticatedSession({ oauthState, cfg: sessionConfig });
 
         await request(app)
           .get(`/auth/uaa/callback?code=${code}&state=${oauthState}`)
@@ -164,6 +166,5 @@ describe('bull board authentication request', () => {
         expect(authSession.passport.user).to.equal(uaaIdentity.uaaId);
       });
     });
-
   });
 });
