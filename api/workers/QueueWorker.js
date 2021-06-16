@@ -18,7 +18,9 @@ async function processJob(job) {
 class QueueWorker {
   constructor(queueName, { concurrency = 5 } = {}) {
     this.QUEUE_NAME = queueName;
-    const connection = new IORedis(config.redis.url);
+    const connection = new IORedis(config.redis.url, {
+      tls: config.redis.tls,
+    });
     this.connection = connection;
     this.worker = new Worker(queueName, processJob, { connection, concurrency });
     this.queueEvents = new QueueEvents(queueName, { connection: connection.duplicate() });
