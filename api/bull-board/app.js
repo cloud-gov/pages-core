@@ -12,9 +12,15 @@ const sessionConfig = require('./sessionConfig');
 const config = require('./config');
 const { expressErrorLogger, expressLogger } = require('./winston');
 
-const connection = new IORedis(config.redis.url);
+const connection = new IORedis(config.redis.url, {
+  tls: config.redis.tls,
+});
 
-const createQueue = name => new Queue(name, config.redis.url);
+const createQueue = name => new Queue(name, config.redis.url, {
+  redis: {
+    tls: config.redis.tls,
+  },
+});
 const createQueueMQ = name => new QueueMQ(name, { connection });
 
 const serverAdapter = new ExpressAdapter();
