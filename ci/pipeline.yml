@@ -448,7 +448,32 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-
+  - name: nightly-tasks-staging
+    plan:
+      - get: src
+        resource: src-staging
+        params: {depth: 1}
+      - get: nightly
+        trigger: true
+      - task: restage-api
+        config:
+          inputs: [name: src]
+          <<: *cf-image
+          run:
+            path: src/ci/tasks/restage.sh
+        params:
+          <<: *staging-cf
+          CF_APP_NAME: federalistapp-staging
+      - in_parallel:
+        - task: restage-queues-ui
+          config:
+            inputs: [name: src]
+            <<: *cf-image
+            run:
+              path: src/ci/tasks/restage.sh
+          params:
+            <<: *staging-cf
+            CF_APP_NAME: federalist-queues-ui-staging
 ############################
 #  RESOURCES
 
@@ -470,6 +495,13 @@ resources:
     source:
       uri: https://github.com/18F/federalist   
       branch: staging
+
+  - name: nightly
+    type: time
+    source:
+      start: 12:00 AM
+      stop: 1:00 AM
+      location: America/New_York
 
   - name: redis
     type: docker-image
