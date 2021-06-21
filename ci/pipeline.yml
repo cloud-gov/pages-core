@@ -455,16 +455,16 @@ jobs:
         params: {depth: 1}
       - get: nightly
         trigger: true
-      - task: restage-api
-        config:
-          inputs: [name: src]
-          <<: *cf-image
-          run:
-            path: src/ci/tasks/restage.sh
-        params:
-          <<: *staging-cf
-          CF_APP_NAME: federalistapp-staging
       - in_parallel:
+        - task: restage-api
+          config:
+            inputs: [name: src]
+            <<: *cf-image
+            run:
+              path: src/ci/tasks/restage.sh
+          params:
+            <<: *staging-cf
+            CF_APP_NAME: federalistapp-staging
         - task: restage-queues-ui
           config:
             inputs: [name: src]
