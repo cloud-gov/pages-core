@@ -195,7 +195,7 @@ module.exports = {
       currentUserUAAIdentity, targetUserEmail, targetUserGithubUsername
     );
 
-    const managerRole = await Role.findOne({ name: 'manager' });
+    const managerRole = await Role.findOne({ where: { name: 'manager' } });
 
     const org = await Organization.create({ name: orgName });
     await org.addUser(user, { through: { roleId: managerRole.id } });

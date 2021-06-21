@@ -16,9 +16,9 @@ function clean() {
 }
 
 const v = new Validator();
-v.addSchema(orgSchema, '/Organization');
-v.addSchema(roleSchema, '/Role');
-v.addSchema(userSchema, '/User');
+v.addSchema(orgSchema, '/Organization.json');
+v.addSchema(roleSchema, '/Role.json');
+v.addSchema(userSchema, '/User.json');
 
 describe('OrganizationRoleSerializer', () => {
   beforeEach(clean);

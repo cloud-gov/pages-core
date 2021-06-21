@@ -16,19 +16,19 @@
     "Organization": {
       "oneOf": [
         { "type": ["null"] },
-        { "$ref": "/Organization" }
+        { "$ref": "Organization.json" }
       ]
     },
     "Role": {
       "oneOf": [
         { "type": ["null"] },
-        { "$ref": "/Role" }
+        { "$ref": "Role.json" }
       ]
     },
     "User": {
       "oneOf": [
         { "type": ["null"] },
-        { "$ref": "/User" }
+        { "$ref": "User.json" }
       ]
     }
   }

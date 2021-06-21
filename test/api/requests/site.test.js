@@ -376,7 +376,7 @@ describe('Site API', () => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
       const org = await factory.organization.create();
-      const role = await Role.findOne({ name: 'user' });
+      const role = await Role.findOne({ where: { name: 'user' } });
 
       cfMockServices(siteOwner, siteRepository);
 
@@ -512,7 +512,7 @@ describe('Site API', () => {
       const siteRepository = crypto.randomBytes(3).toString('hex');
       const user = await factory.user();
       const org = await factory.organization.create();
-      const role = await Role.findOne({ name: 'user' });
+      const role = await Role.findOne({ where: { name: 'user' } });
       await org.addUser(user, { through: { roleId: role.id } });
 
       cfMockServices(siteOwner, siteRepository);

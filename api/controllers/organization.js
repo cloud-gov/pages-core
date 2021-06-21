@@ -24,7 +24,6 @@ module.exports = wrapHandlers({
     } = req;
 
     const org = await fetchModelById(id, Organization.forManagerRole(user));
-
     if (!org) {
       return res.notFound();
     }
@@ -41,7 +40,9 @@ module.exports = wrapHandlers({
     } = req;
 
     const org = await fetchModelById(id, Organization.forManagerRole(user));
-    if (!org) return res.notFound();
+    if (!org) {
+      return res.notFound();
+    }
 
     await org.update({ name });
 
