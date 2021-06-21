@@ -58,7 +58,7 @@ describe('User model', () => {
     const [org1, org2, role, user] = await Promise.all([
       orgFactory.create(),
       orgFactory.create(),
-      Role.findOne({ name: 'user' }),
+      Role.findOne({ where: { name: 'user' } }),
       User.create({ username: 'user' }),
     ]);
 
@@ -77,8 +77,8 @@ describe('User model', () => {
   it('can only have one role in an organization', async () => {
     const [org, role1, role2, user] = await Promise.all([
       orgFactory.create(),
-      Role.findOne({ name: 'user' }),
-      Role.findOne({ name: 'manager' }),
+      Role.findOne({ where: { name: 'user' } }),
+      Role.findOne({ where: { name: 'manager' } }),
       User.create({ username: 'user' }),
     ]);
 
@@ -93,5 +93,21 @@ describe('User model', () => {
       expect(error).to.be.an('error');
       expect(error.name).to.eq('SequelizeUniqueConstraintError');
     });
+  });
+
+  describe('byOrg', () => {
+    it('filters users by org');
+  });
+
+  describe('bySite', () => {
+    it('filters users by site');
+  });
+
+  describe('withUAAIdentity', () => {
+    it('includes the UAAIdentity in the results');
+  });
+
+  describe('byUAAEmail', () => {
+    it('filters users by uaa email');
   });
 });

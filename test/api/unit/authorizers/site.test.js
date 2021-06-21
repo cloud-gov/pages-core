@@ -32,7 +32,7 @@ describe('Site authorizer', () => {
       const [user, org, role] = await Promise.all([
         factory.user(),
         factory.organization.create(),
-        Role.findOne({ name: 'user' }),
+        Role.findOne({ where: { name: 'user' } }),
       ]);
       const params = {
         owner: crypto.randomBytes(3).toString('hex'),
@@ -70,7 +70,7 @@ describe('Site authorizer', () => {
       const [user, org, role] = await Promise.all([
         factory.user(),
         factory.organization.create(),
-        Role.findOne({ name: 'user' }),
+        Role.findOne({ where: { name: 'user' } }),
       ]);
       const params = {
         owner: crypto.randomBytes(3).toString('hex'),
@@ -91,7 +91,7 @@ describe('Site authorizer', () => {
       const [user, org, role] = await Promise.all([
         factory.user(),
         factory.organization.create(),
-        Role.findOne({ name: 'user' }),
+        Role.findOne({ where: { name: 'user' } }),
       ]);
       const params = {
         owner: crypto.randomBytes(3).toString('hex'),

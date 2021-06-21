@@ -203,6 +203,136 @@ paths:
           description: Not authorized
           schema:
             $ref: "Error.json"
+  /organization/{id}:
+    parameters:
+    - name: id
+      in: path
+      description: The id of the organization
+      type: integer
+      required: true
+    get:
+      summary: Fetch an organization by its ID
+      responses:
+        200:
+          description: The organization specified by the ID
+          schema:
+            $ref: "Organization.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+    put:
+      summary: Update the data for a Federalist organization.
+      parameters:
+        - name: name
+          in: body
+          type: string
+          description: The new name of the organization
+          required: true
+      responses:
+        200:
+          description: The updated organization object
+          schema:
+            $ref: "Organization.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+  /organization/{id}/invite:
+    parameters:
+    - name: id
+      in: path
+      description: The id of the organization
+      type: integer
+      required: true
+    post:
+      summary: Invite a user to a Federalist organization and maybe the platform.
+      parameters:
+        - name: roleId
+          in: body
+          type: number
+          description: The id of the role type
+          required: true
+        - name: uaaEmail
+          in: body
+          type: string
+          description: The UAA email of the invited user
+          required: true
+        - name: githubUsername
+          in: body
+          type: string
+          description: The Github username of the invited user if it exists              
+      responses:
+        200:
+          description: The organization role and invite details for the invited user
+          schema:
+            type: object
+            properties:
+              member:
+                description: The organization role for the invited user
+                required: true
+                schema:
+                  $ref: "OrganizationRole.json"
+              invite:
+                description: The invite details
+                required: true
+                schema:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      description: the UAA email for the invited user
+                    link:
+                      type: string
+                      description: The confirmation link for the invited user
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+  /organization/{id}/members:
+    parameters:
+    - name: id
+      in: path
+      description: The id of the organization
+      type: integer
+      required: true
+    get:
+      summary: Fetch members for an organization by its ID
+      responses:
+        200:
+          description: The members for the organization specified by the ID
+          schema:
+            type: array
+            items:
+              $ref: "OrganizationRole.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
   /site:
     get:
       summary: Fetch all of the current user's sites

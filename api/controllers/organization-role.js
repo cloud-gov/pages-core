@@ -9,10 +9,6 @@ module.exports = wrapHandlers({
 
     const organizationRoles = await OrganizationRole.forUser(user).findAll();
 
-    if (!organizationRoles) {
-      return res.notFound();
-    }
-
     const json = organizationRoleSerializer.serializeMany(organizationRoles);
     return res.json(json);
   },
