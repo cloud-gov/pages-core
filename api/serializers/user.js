@@ -1,4 +1,4 @@
-const base = require('./base');
+const BaseSerializer = require('./base');
 const uaaIdentitySerializer = require('./uaa-identity');
 
 const attributes = {
@@ -21,6 +21,6 @@ const adminAttributes = {
   deletedAt: 'date',
 };
 
-const { serialize, serializeMany } = base(attributes, adminAttributes);
+const { serialize, serializeMany } = new BaseSerializer(attributes, adminAttributes);
 
 module.exports = { toJSON: serialize, serialize, serializeMany };
