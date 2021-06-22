@@ -192,6 +192,33 @@ Until CredHub is up and running, credentials must be passed by setting pipelines
 3. Set a pipeline:
 `fly -t pages-staging sp -p <pipeline name> -c ci/pipeline.yml -l ci/vars/.<env>.yml`
 
+##### Accessing Concourse Jumpbox
+
+The Concourse jumpbox will allow users to interact with the CI environment and access/add/alter the credentials available to the CI pipelines via Credhub.  To access the jumpbox, you will need to be on the GSA VPN, have `fly` configured with the correct target, and have the latest version of [cg-scripts](https://github.com/cloud-gov/cg-scripts) locally accessible.
+
+**Using the jumpbox**
+
+1. **Connect to the VPN**
+
+2. **Download or `git pull` the latest version of [cg-scripts](https://github.com/cloud-gov/cg-scripts) to a location on your local drive ie (`~/my-scripts/cg-scripts`)**
+
+3. **Set your environment args to run the jumpbox script**
+- `CG_SCRIPTS_DIR=~/my-scripts/cg-scripts`
+- `CI_TARGET=<fly target (ie pages-staging)>`
+- `CI_ENV=<concourse environment (ie staging)>`
+
+4. **SSH into the jumpbox**
+- `$ cd $CG_SCRIPTS_DIR; ./jumpbox $CI_TARGET $CI_ENV`
+
+5. **Working with credentials once on the jumpbox**
+- Finding a credential
+  - `$ credhub find -n my-credential-name`
+- Getting a credential
+  - `$ credhub get -n /the-full-credhub-path/my-credential-name`
+- Importing a credential with a `.yml`
+  - `$ credhub import -f my-creds.yml`
+
+
 ### Testing
 
 When making code changes, be sure to write new or modify existing tests to cover your changes.
