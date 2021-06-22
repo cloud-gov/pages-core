@@ -1,4 +1,4 @@
-const base = require('./base');
+const BaseSerializer = require('./base');
 
 const attributes = {
   id: '',
@@ -7,4 +7,4 @@ const attributes = {
   updatedAt: 'date',
 };
 
-module.exports = base(attributes);
+module.exports = new BaseSerializer(attributes);

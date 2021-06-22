@@ -62,7 +62,7 @@ module.exports = wrapHandlers({
 
     // TODO - refactor above method to return user so this extra query is not necessary
     const newUser = await User.byUAAEmail(email).findOne();
-    const member = await OrganizationRole.forOrganization({ id })
+    const member = await OrganizationRole.forOrganization({ id: toInt(id) })
       .findOne({ where: { userId: newUser.id } });
 
     const json = {

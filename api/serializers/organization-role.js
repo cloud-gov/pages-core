@@ -1,4 +1,4 @@
-const base = require('./base');
+const BaseSerializer = require('./base');
 const organizationSerializer = require('./organization');
 const roleSerializer = require('./role');
 const userSerializer = require('./user');
@@ -11,4 +11,4 @@ const attributes = {
   updatedAt: 'date',
 };
 
-module.exports = base(attributes);
+module.exports = new BaseSerializer(attributes);

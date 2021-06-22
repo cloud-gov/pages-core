@@ -7,14 +7,21 @@ const transforms = {
   yaml: value => yaml.dump(value),
 };
 
-function generateSerializer(attributes, adminAttributes) {
-  function serialize(model, isSystemAdmin = false) {
+class BaseSerializer {
+  constructor(attributes, adminAttributes) {
+    this.attributes = attributes;
+    this.adminAttributes = adminAttributes;
+    this.serialize = this.serialize.bind(this);
+    this.serializeMany = this.serializeMany.bind(this);
+  }
+
+  serialize(model, isSystemAdmin = false) {
     if (!model) {
       return null;
     }
 
     const allAttributes = {
-      ...attributes, ...(isSystemAdmin ? adminAttributes : {}),
+      ...this.attributes, ...(isSystemAdmin ? this.adminAttributes : {}),
     };
 
     function applyTransforms(spec, attribute) {
@@ -28,11 +35,9 @@ function generateSerializer(attributes, adminAttributes) {
     return _.mapObject(allAttributes, applyTransforms);
   }
 
-  function serializeMany(models, isSystemAdmin = false) {
-    return models.map(model => serialize(model, isSystemAdmin));
+  serializeMany(models, isSystemAdmin = false) {
+    return models.map(model => this.serialize(model, isSystemAdmin));
   }
-
-  return { serialize, serializeMany };
 }
 
-module.exports = generateSerializer;
+module.exports = BaseSerializer;

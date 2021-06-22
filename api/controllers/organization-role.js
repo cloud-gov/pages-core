@@ -1,6 +1,6 @@
 const organizationRoleSerializer = require('../serializers/organization-role');
 const { Organization, OrganizationRole } = require('../models');
-const { wrapHandlers } = require('../utils');
+const { toInt, wrapHandlers } = require('../utils');
 const { fetchModelById } = require('../utils/queryDatabase');
 
 module.exports = wrapHandlers({
@@ -25,7 +25,12 @@ module.exports = wrapHandlers({
     const org = await fetchModelById(organizationId, Organization.forManagerRole(user));
     if (!org) return res.notFound();
 
-    await OrganizationRole.destroy({ where: { organizationId, userId } });
+    await OrganizationRole.destroy({
+      where: {
+        organizationId: toInt(organizationId),
+        userId: toInt(userId),
+      },
+    });
 
     return res.json({});
   },
@@ -43,8 +48,15 @@ module.exports = wrapHandlers({
     const org = await fetchModelById(organizationId, Organization.forManagerRole(user));
     if (!org) return res.notFound();
 
-    const member = await OrganizationRole.forOrganization(org).findOne({ where: { userId } });
-    await member.update({ roleId });
+    await OrganizationRole.update({ roleId: toInt(roleId) }, {
+      where: {
+        organizationId: toInt(organizationId),
+        userId: toInt(userId),
+      },
+    });
+
+    const member = await OrganizationRole.forOrganization(org)
+      .findOne({ where: { userId: toInt(userId) } });
 
     const json = organizationRoleSerializer.serialize(member);
     return res.json(json);

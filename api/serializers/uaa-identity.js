@@ -1,4 +1,4 @@
-const base = require('./base');
+const BaseSerializer = require('./base');
 
 const attributes = {
   userName: '',
@@ -11,4 +11,4 @@ const adminAttributes = {
   origin: '',
 };
 
-module.exports = base(attributes, adminAttributes);
+module.exports = new BaseSerializer(attributes, adminAttributes);
