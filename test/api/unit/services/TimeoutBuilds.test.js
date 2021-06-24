@@ -3,7 +3,7 @@ const moment = require('moment');
 const sinon = require('sinon');
 
 const factory = require('../../support/factory');
-const timeoutBuilds = require('../../../../api/services/TimeoutBuilds');
+const { timeoutBuilds } = require('../../../../api/services/TimeoutBuilds');
 const { Build, sequelize } = require('../../../../api/models');
 const CFApi = require('../../../../api/utils/cfApiClient');
 
