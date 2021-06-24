@@ -219,6 +219,20 @@ jobs:
       - deploy-to-cg:
           app: << parameters.app >>
 
+  deploy-queues-ui:
+    docker:
+      - image: circleci/node:14.15
+    parameters:
+      app:
+        type: string
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: dependency-cache-{{ checksum "yarn.lock" }}
+
+      - deploy-to-cg:
+          app: << parameters.app >>
 
   restage:
     docker:
@@ -282,6 +296,14 @@ workflows:
             branches:
               only: main
 
+      - deploy-queues-ui:
+          name: deploy-queues-ui-production
+          app: federalist-queues-ui
+          requires:
+            - build
+          filters:
+            branches:
+              only: main
 
   nightly:
     triggers:
@@ -293,39 +315,13 @@ workflows:
                 - main
 
     jobs:
-      - run-task:
-          name: archive-build-logs-production
-          app: federalistapp
-          task-name: archive-build-logs
-          task-command: yarn archive-build-logs-daily
-          filters:
-            branches:
-              only: main
-
-      - run-task:
-          name: nightly-builds-production
-          app: federalistapp
-          task-name: nightly-builds
-          task-command: yarn nightly-builds
-          filters:
-            branches:
-              only: main
-
-      - run-task:
-          name: remove-inactive-federalist-users-production
-          app: federalistapp
-          task-name: remove-inactive-federalist-users
-          task-command: yarn remove-inactive-federalist-users
-          filters:
-            branches:
-              only: main
-
       - restage:
           matrix:
             parameters:
               app:
                 - federalistapp
                 - federalist-admin
+                - federalist-queues-ui
           filters:
             branches:
               only: main

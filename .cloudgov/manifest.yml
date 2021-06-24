@@ -5,9 +5,17 @@ applications:
     routes:
       - route: federalistapp((env_postfix)).18f.gov
       - route: federalistapp((env_postfix)).apps.internal
-    disk_quota: 2G
-    memory: ((memory))
-    instances: ((instances))
+    processes:
+      - type: web
+        command: yarn start
+        disk_quota: 2G
+        instances: ((instances))
+        memory: ((memory))
+      - type: worker
+        command: yarn start-workers
+        disk_quota: 2G
+        instances: 1
+        memory: ((memory))
     services:
       - app-((env))-uaa-client
       - federalist-((env))-rds
@@ -50,3 +58,22 @@ applications:
     path: ../admin-client
     routes:
       - route: admin.federalistapp((env_postfix)).18f.gov
+  - name: federalist-queues-ui((env_postfix))
+    buildpack: nodejs_buildpack
+    command: yarn start-bull-board
+    disk_quota: 2G
+    instances: 1
+    memory: ((memory))
+    routes:
+      - route: queues.federalistapp((env_postfix)).18f.gov
+    services:
+      - app-((env))-uaa-client
+      - federalist-((env))-redis
+    env:
+      NODE_ENV: production
+      APP_ENV: ((env))
+      APP_HOSTNAME: https://queues.federalistapp((env_postfix)).18f.gov
+      LOG_LEVEL: ((log_level))
+      NPM_CONFIG_PRODUCTION: true
+      NODE_MODULES_CACHE: false
+      UAA_HOST: ((uaa_host))

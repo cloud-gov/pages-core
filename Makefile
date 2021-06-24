@@ -44,10 +44,10 @@ seed: ## (Re)Create seed data
 	docker-compose run --rm app yarn create-dev-data
 
 set-staging-pipeline: ## Set Concourse staging `web` pipeline
-	fly -t pages-staging sp -p web -c ci/pipeline.yml -l ci/vars/.staging.yml`
+	fly -t pages-staging sp -p web -c ci/pipeline.yml -l ci/vars/.staging.yml
 
 set-production-pipeline: ## Set Concourse production `web` pipeline
-	fly -t pages-staging sp -p web -c ci/pipeline.yml -l ci/vars/.production.yml`
+	fly -t pages-staging sp -p web -c ci/pipeline.yml -l ci/vars/.production.yml
 
 start: ## Start
 	docker-compose up
