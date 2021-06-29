@@ -4,7 +4,6 @@ const { logger } = require('../winston');
 const config = require('../config');
 
 const FederalistUsersHelper = require('./services/FederalistUsersHelper');
-const RepositoryVerifier = require('./services/RepositoryVerifier');
 const SiteUserAuditor = require('./services/SiteUserAuditor');
 const EventCreator = require('./services/EventCreator');
 const { Event } = require('./models');
@@ -27,13 +26,6 @@ function handleResults(results) {
 
 function scheduleJobs() {
   if (CF_INSTANCE_INDEX === '0') {
-    // verify site's repositories exist
-    schedule.scheduleJob('10 0 * * *', () => {
-      logger.info('Verifying Repos');
-      RepositoryVerifier.verifyRepos()
-        .catch(logger.error);
-    });
-
     // audit users and remove sites w/o repo push permissions
     schedule.scheduleJob('15 0 * * *', () => {
       logger.info('Auditing All Sites');
