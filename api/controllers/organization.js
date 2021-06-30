@@ -32,23 +32,6 @@ module.exports = wrapHandlers({
     return res.json(json);
   },
 
-  async update(req, res) {
-    const {
-      body: { name },
-      params: { id },
-      user,
-    } = req;
-
-    const org = await fetchModelById(id, Organization.forManagerRole(user));
-    if (!org) {
-      return res.notFound();
-    }
-
-    await org.update({ name });
-
-    return res.json(organizationSerializer.serialize(org));
-  },
-
   async invite(req, res) {
     const {
       body: { roleId, uaaEmail, githubUsername },

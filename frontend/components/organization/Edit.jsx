@@ -8,7 +8,6 @@ import LoadingIndicator from '../LoadingIndicator';
 import AddUserForm from './AddUserForm';
 import RemoveUserForm from './RemoveUserForm';
 import UpdateUserForm from './UpdateUserForm';
-import OrganizationSettingsForm from './OrganizationSettingsForm';
 import { timeFrom } from '../../util/datetime';
 
 function successNotification(message) {
@@ -37,11 +36,6 @@ function reducer(state, { type, payload }) {
         ...state,
         isLoading: false,
         ...payload,
-      };
-    case 'setOrg':
-      return {
-        ...state,
-        org: payload,
       };
     case 'addMember':
       return {
@@ -109,22 +103,6 @@ function Edit({ actions, id }) {
         <div className="usa-width-one-half">
           <h1>{org.name}</h1>
         </div>
-      </div>
-
-      <div className="well">
-        <h3>Settings</h3>
-        <OrganizationSettingsForm
-          initialValues={{ name: org.name }}
-          onSubmit={
-            ({ name }) => actions.updateOrganization(org.id, name)
-          }
-          onSubmitSuccess={
-            (newOrg, reduxDispatch) => {
-              reduxDispatch(successNotification('Successfully updated organization.'));
-              dispatch({ type: 'setOrg', payload: newOrg });
-            }
-          }
-        />
       </div>
 
       <div className="well">
@@ -220,7 +198,6 @@ Edit.propTypes = {
     fetchRoles: PropTypes.func.isRequired,
     inviteToOrganization: PropTypes.func.isRequired,
     removeOrganizationRole: PropTypes.func.isRequired,
-    updateOrganization: PropTypes.func.isRequired,
     updateOrganizationRole: PropTypes.func.isRequired,
   }).isRequired,
 };
@@ -233,7 +210,6 @@ const WrappedEdit = props => (
       fetchRoles: federalistApi.fetchRoles,
       inviteToOrganization: federalistApi.inviteToOrganization,
       removeOrganizationRole: federalistApi.removeOrganizationRole,
-      updateOrganization: federalistApi.updateOrganization,
       updateOrganizationRole: federalistApi.updateOrganizationRole,
     }}
     {...props}

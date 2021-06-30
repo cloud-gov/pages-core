@@ -15,7 +15,6 @@ describe('<Edit />', () => {
         fetchRoles: () => Promise.resolve(),
         inviteToOrganization: () => Promise.resolve(),
         removeOrganizationRole: () => Promise.resolve(),
-        updateOrganization: () => Promise.resolve(),
         updateOrganizationRole: () => Promise.resolve(),
       },
     };

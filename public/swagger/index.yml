@@ -225,31 +225,6 @@ paths:
           description: Not found
           schema:
             $ref: "Error.json"
-    put:
-      summary: Update the data for a Federalist organization.
-      parameters:
-        - name: name
-          in: body
-          type: string
-          description: The new name of the organization
-          required: true
-      responses:
-        200:
-          description: The updated organization object
-          schema:
-            $ref: "Organization.json"
-        400:
-          description: Bad request
-          schema:
-            $ref: "Error.json"
-        403:
-          description: Not authorized
-          schema:
-            $ref: "Error.json"
-        404:
-          description: Not found
-          schema:
-            $ref: "Error.json"
   /organization/{id}/invite:
     parameters:
     - name: id

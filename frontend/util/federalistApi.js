@@ -58,13 +58,6 @@ export default {
     });
   },
 
-  updateOrganization(id, name) {
-    return request(`organization/${id}`, {
-      method: 'PUT',
-      data: { name },
-    });
-  },
-
   updateOrganizationRole(organizationId, roleId, userId) {
     return request('organization-role', {
       method: 'PUT',
