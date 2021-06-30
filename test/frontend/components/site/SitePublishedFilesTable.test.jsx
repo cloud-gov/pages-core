@@ -2,35 +2,26 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import { spy } from 'sinon';
-import proxyquire from 'proxyquire';
 
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
-
-proxyquire.noCallThru();
+import { SitePublishedFilesTable } from '../../../../frontend/components/site/SitePublishedFilesTable';
 
 const fetchPublishedFiles = spy();
 
-const SitePublishedFilesTable = proxyquire('../../../../frontend/components/site/SitePublishedFilesTable', {
-  '../../actions/publishedFileActions': { fetchPublishedFiles },
-}).SitePublishedFilesTable;
-
-
-const deepCopy = obj => JSON.parse(JSON.stringify(obj));
+const deepCopy = obj => ({ ...obj });
 
 describe('<SitePublishedFilesTable/>', () => {
-  beforeEach(() => {
-    // reset the spy
-    fetchPublishedFiles.reset();
-  });
+  afterEach(() => fetchPublishedFiles.resetHistory());
 
   it('calls fetchPublishedFiles on mount', () => {
     const props = {
-      params: { id: '11', name: 'funkyBranch' },
+      fetchPublishedFiles,
+      id: '11',
+      name: 'funkyBranch',
       publishedFiles: { isLoading: false },
     };
 
-    const wrapper = shallow(<SitePublishedFilesTable {...props} />);
-    wrapper.instance().componentDidMount();
+    shallow(<SitePublishedFilesTable {...props} />);
     expect(fetchPublishedFiles.calledOnce).to.be.true;
     expect(fetchPublishedFiles.calledWith({ id: '11' }, 'funkyBranch', null)).to.be.true;
   });
@@ -38,7 +29,9 @@ describe('<SitePublishedFilesTable/>', () => {
   it('should render the branch name', () => {
     const publishedBranch = { name: 'main', site: { viewLink: 'www.example.gov/main' } };
     const origProps = {
-      params: { id: '1', name: 'main' },
+      fetchPublishedFiles,
+      id: '1',
+      name: 'main',
       publishedFiles: {
         isLoading: true,
       },
@@ -49,7 +42,9 @@ describe('<SitePublishedFilesTable/>', () => {
       data: {
         isTruncated: false,
         files: [
-          { name: 'abc', size: 123, key: 'prefix/abc', publishedBranch },
+          {
+            name: 'abc', size: 123, key: 'prefix/abc', publishedBranch,
+          },
         ],
       },
     };
@@ -70,7 +65,9 @@ describe('<SitePublishedFilesTable/>', () => {
       },
     };
     const origProps = {
-      params: { id: '1', name: 'main' },
+      fetchPublishedFiles,
+      id: '1',
+      name: 'main',
       publishedFiles: {
         isLoading: true,
       },
@@ -110,7 +107,9 @@ describe('<SitePublishedFilesTable/>', () => {
       },
     };
     const origProps = {
-      params: { id: '1', name: 'main' },
+      fetchPublishedFiles,
+      id: '1',
+      name: 'main',
       publishedFiles: {
         isLoading: true,
       },
@@ -150,7 +149,9 @@ describe('<SitePublishedFilesTable/>', () => {
       },
     };
     const origProps = {
-      params: { id: '1', name: 'main' },
+      fetchPublishedFiles,
+      id: '1',
+      name: 'main',
       publishedFiles: {
         isLoading: true,
       },
@@ -184,7 +185,9 @@ describe('<SitePublishedFilesTable/>', () => {
   it('should render previous and next buttons if files are truncated', () => {
     const publishedBranch = { name: 'main', site: { viewLink: 'www.example.gov/main' } };
     const origProps = {
-      params: { id: '1', name: 'main' },
+      fetchPublishedFiles,
+      id: '1',
+      name: 'main',
       publishedFiles: {
         isLoading: true,
       },
@@ -195,7 +198,9 @@ describe('<SitePublishedFilesTable/>', () => {
       data: {
         isTruncated: true,
         files: [
-          { name: 'abc', size: 123, key: 'prefix/abc', publishedBranch },
+          {
+            name: 'abc', size: 123, key: 'prefix/abc', publishedBranch,
+          },
         ],
       },
     };
@@ -217,7 +222,9 @@ describe('<SitePublishedFilesTable/>', () => {
 
   it('should render a loading state if the files are loading', () => {
     const props = {
-      params: { id: '1', name: 'main' },
+      fetchPublishedFiles,
+      id: '1',
+      name: 'main',
       publishedFiles: { isLoading: true },
     };
 
@@ -227,7 +234,9 @@ describe('<SitePublishedFilesTable/>', () => {
 
   it('should render an empty state if there are no files', () => {
     const props = {
-      params: { id: '1', name: 'main' },
+      fetchPublishedFiles,
+      id: '1',
+      name: 'main',
       publishedFiles: { isLoading: false, data: { isTruncated: false, files: [] } },
     };
 
@@ -246,15 +255,23 @@ describe('<SitePublishedFilesTable/>', () => {
     };
 
     const origProps = {
-      params: { id: '1', name: 'main' },
+      fetchPublishedFiles,
+      id: '1',
+      name: 'main',
       publishedFiles: {
         isLoading: false,
         data: {
           isTruncated: true,
           files: [
-            { name: 'a', size: 1, key: 'prefix/a', publishedBranch },
-            { name: 'b', size: 2, key: 'prefix/b', publishedBranch },
-            { name: 'c', size: 3, key: 'prefix/c', publishedBranch },
+            {
+              name: 'a', size: 1, key: 'prefix/a', publishedBranch,
+            },
+            {
+              name: 'b', size: 2, key: 'prefix/b', publishedBranch,
+            },
+            {
+              name: 'c', size: 3, key: 'prefix/c', publishedBranch,
+            },
           ],
         },
       },
@@ -279,7 +296,7 @@ describe('<SitePublishedFilesTable/>', () => {
     it('can go to the next page', () => {
       expect(nextButton.prop('disabled')).to.be.false;
       nextButton.simulate('click');
-      expect(fetchPublishedFiles.calledOnce).to.be.true;
+      expect(fetchPublishedFiles.calledTwice).to.be.true;
       expect(fetchPublishedFiles.calledWith({ id: '1' }, 'main', 'prefix/c')).to.be.true;
     });
 
@@ -298,9 +315,11 @@ describe('<SitePublishedFilesTable/>', () => {
     });
 
     it('can go to the previous page', () => {
+      wrapper.instance().setState({ lastPage: 1 });
+      nextButton = getNextButton(wrapper);
       // click once to go to next page
       nextButton.simulate('click');
-      expect(fetchPublishedFiles.calledOnce).to.be.true;
+      expect(fetchPublishedFiles.calledTwice).to.be.true;
 
       // update props to simulate the fetch of the new page files
       const newProps = deepCopy(origProps);
@@ -313,7 +332,7 @@ describe('<SitePublishedFilesTable/>', () => {
       prevButton.simulate('click');
       // fetch should NOT be called again since the previous page
       // comes from state
-      expect(fetchPublishedFiles.calledTwice).to.be.false;
+      expect(fetchPublishedFiles.calledTwice).to.be.true;
     });
   });
 });
