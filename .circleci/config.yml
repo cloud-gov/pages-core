@@ -167,6 +167,8 @@ jobs:
       feature_proxy_edge_links:
         type: string
         default: "false"
+      app-hostname:
+        type: string        
     steps:
       - checkout
 
@@ -177,6 +179,7 @@ jobs:
           name: Build app
           environment:
             FEATURE_PROXY_EDGE_LINKS: << parameters.feature_proxy_edge_links >>
+            APP_HOSTNAME: << parameters.app-hostname >>
           command: yarn build
 
       - deploy-to-cg:
@@ -280,6 +283,7 @@ workflows:
       - deploy:
           name: deploy-production
           app: federalistapp
+          app-hostname: https://federalistapp.18f.gov
           requires:
             - build
           filters:
