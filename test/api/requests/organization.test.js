@@ -121,50 +121,6 @@ describe('Organization API', () => {
     });
   });
 
-  describe('PUT /v0/organization/:id', () => {
-    requiresAuthentication('PUT', '/organization/1', '/organization/{id}');
-
-    it('returns a 404 if the user is not a manager of the organization', async () => {
-      const name = 'new-name';
-      const org = await factory.organization.create();
-      await currentUser.addOrganization(org, { through: { roleId: userRole.id } });
-
-      const response = await authenticatedRequest
-        .put(`/v0/organization/${org.id}`)
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({ name });
-
-      validateAgainstJSONSchema('PUT', '/organization/{id}', 404, response.body);
-    });
-
-    it('returns a 400 error if the organization cannot be updated', async () => {
-      const name = null;
-      const org = await factory.organization.create();
-      await currentUser.addOrganization(org, { through: { roleId: managerRole.id } });
-
-      const response = await authenticatedRequest
-        .put(`/v0/organization/${org.id}`)
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({ name });
-
-      validateAgainstJSONSchema('PUT', '/organization/{id}', 400, response.body);
-    });
-
-    it('updates the organization and returns the new value', async () => {
-      const name = 'new-name';
-      const org = await factory.organization.create();
-      await currentUser.addOrganization(org, { through: { roleId: managerRole.id } });
-
-      const response = await authenticatedRequest
-        .put(`/v0/organization/${org.id}`)
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({ name });
-
-      validateAgainstJSONSchema('PUT', '/organization/{id}', 200, response.body);
-      expect(response.body.id).to.eq(org.id);
-    });
-  });
-
   describe('POST /v0/organization/:id/invite', () => {
     requiresAuthentication('POST', '/organization/1/invite', '/organization/{id}/invite');
 
