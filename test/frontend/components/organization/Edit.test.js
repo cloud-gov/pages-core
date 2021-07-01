@@ -1,9 +1,18 @@
 import React from 'react';
-import { shallow } from 'enzyme';
 import { expect } from 'chai';
+import { shallow } from 'enzyme';
+import proxyquire from 'proxyquire';
+import sinon from 'sinon';
 
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
-import { Edit } from '../../../../frontend/components/organization/Edit';
+
+proxyquire.noCallThru();
+
+const useSelectorStub = sinon.stub().returns({ id: 1 });
+
+const { Edit } = proxyquire('../../../../frontend/components/organization/Edit', {
+  'react-redux': { useSelector: useSelectorStub },
+});
 
 describe('<Edit />', () => {
   it('shows the loading indicator when data is loading', () => {
