@@ -1,7 +1,8 @@
 /* global window */
 import React, { useEffect, useReducer } from 'react';
-import PropTypes from 'prop-types';
 import { success } from 'react-notification-system-redux';
+import { useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import federalistApi from '../../util/federalistApi';
 import ExpandableArea from '../ExpandableArea';
 import LoadingIndicator from '../LoadingIndicator';
@@ -66,6 +67,7 @@ const initialState = {
 
 function Edit({ actions, id }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const currentUser = useSelector(({ user }) => user.data);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -97,6 +99,11 @@ function Edit({ actions, id }) {
 
   const roleOptions = roles.map(role => ({ value: role.id, label: role.name }));
 
+  const currentMember = members.find(member => member.User.id === currentUser.id);
+  const sortedMembers = members
+    .filter(member => member.User.id !== currentUser.id)
+    .sort((a, b) => a.User.UAAIdentity.email > b.User.UAAIdentity.email);
+
   return (
     <div>
       <div className="page-header usa-grid-full">
@@ -126,7 +133,7 @@ function Edit({ actions, id }) {
           />
         </ExpandableArea>
 
-        <table className="usa-table-borderless log-table log-table__site-builds table-full-width">
+        <table className="usa-table-borderless log-table log-table__site-builds org-member-table table-full-width">
           <thead>
             <tr>
               <th scope="col">Email</th>
@@ -137,7 +144,21 @@ function Edit({ actions, id }) {
             </tr>
           </thead>
           <tbody>
-            {members.map(member => (
+            <tr key={currentMember.User.id}>
+              <th scope="row" data-title="Email">{currentMember.User.UAAIdentity.email}</th>
+              <td data-title="Role">
+                manager
+              </td>
+              <td data-title="Added">
+                {timeFrom(currentMember.createdAt)}
+              </td>
+              <td data-title="Updated">
+                {timeFrom(currentMember.updatedAt)}
+              </td>
+              <td data-title="Actions" className="table-actions" />
+            </tr>
+
+            {sortedMembers.map(member => (
               <tr key={member.User.id}>
                 <th scope="row" data-title="Email">{member.User.UAAIdentity.email}</th>
                 <td data-title="Role">
