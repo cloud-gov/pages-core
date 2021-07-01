@@ -81,7 +81,7 @@ module.exports = {
     let user = await this.findUserByUAAIdentity(targetUserEmail);
 
     if (user) {
-      return [user];
+      return [user, { email: user.UAAIdentity.email }];
     }
 
     const uaaUserAttributes = await this.inviteUAAUser(currentUserUAAIdentity, targetUserEmail);
