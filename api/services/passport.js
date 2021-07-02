@@ -7,6 +7,7 @@ const GitHub = require('./GitHub');
 const RepositoryVerifier = require('./RepositoryVerifier');
 const EventCreator = require('./EventCreator');
 const { createUAAStrategy, verifyUAAUser } = require('./uaaStrategy');
+const Features = require('../features');
 
 const passport = new Passport.Passport();
 const flashMessage = {
@@ -41,8 +42,8 @@ async function checkUpdateUser({
     return { flashMessage };
   }
 
-  if (user.UAAIdentity) {
-    return { flashMessage: 'You must login with you UAA account. Please try again.' };
+  if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA) && user.UAAIdentity) {
+    return { flashMessage: 'You must login with your UAA account. Please try again.' };
   }
 
   await user.update({
