@@ -171,7 +171,17 @@ describe('Authentication requests', () => {
           });
         });
 
-        context('when the user exists and has a uaa identity', () => {
+        context('when the user exists and has a uaa identity and uaa auth is enabled', () => {
+          const uaaAuth = process.env.FEATURE_AUTH_UAA;
+
+          before(() => {
+            process.env.FEATURE_AUTH_UAA = 'true';
+          });
+
+          after(() => {
+            process.env.FEATURE_AUTH_UAA = uaaAuth;
+          });
+
           it('should not authenticate the user', (done) => {
             let user;
             let cookie;
@@ -198,11 +208,54 @@ describe('Authentication requests', () => {
               .then((sess) => {
                 expect(sess.flash.error.length).to.equal(1);
                 expect(sess.flash.error[0]).to.equal(
-                  'You must login with you UAA account. Please try again.'
+                  'You must login with your UAA account. Please try again.'
                 );
                 done();
               })
               .catch(done);
+          });
+        });
+
+        context('when the user exists and has a uaa identity and uaa auth is NOT enabled', () => {
+          const uaaAuth = process.env.FEATURE_AUTH_UAA;
+
+          before(() => {
+            process.env.FEATURE_AUTH_UAA = 'false';
+          });
+
+          after(() => {
+            process.env.FEATURE_AUTH_UAA = uaaAuth;
+          });
+
+          it('should authenticate the user', (done) => {
+            let user;
+            let cookie;
+            nock.cleanAll();
+            const oauthState = 'state-123abc';
+            factory.user()
+              .then((model) => {
+                user = model;
+                return githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
+              })
+              .then(() => unauthenticatedSession({ oauthState }))
+              .then((session) => {
+                cookie = session;
+                return request(app)
+                  .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
+                  .set('Cookie', cookie)
+                  .expect(302);
+              })
+              .then(() => sessionForCookie(cookie))
+              .then((authSession) => {
+                expect(authSession.authenticated).to.equal(true);
+                expect(authSession.passport.user).to.equal(user.id);
+                expect(eventAuditStub.calledOnce).to.equal(true);
+                return user.reload();
+              })
+              .then((model) => {
+                user = model;
+                done();
+              });
           });
         });
 
