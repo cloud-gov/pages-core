@@ -1,9 +1,0 @@
-# Copy and rename to .staging.yml and .production.yml and fill in appropriate missing values
-build-url: <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-cf-username: 
-cf-password: 
-slack-webhook-url: 
-slack-channel: federalist-logs
-slack-username: concourse
-slack-icon-url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
-gh-access-token: 
