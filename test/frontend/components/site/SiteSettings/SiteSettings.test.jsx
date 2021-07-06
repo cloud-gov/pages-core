@@ -10,17 +10,17 @@ proxyquire.noCallThru();
 const siteActionsMock = {
   deleteSite: spy(),
   updateSite: spy(),
-  addSite: spy(),
 };
 
-const SiteSettings = proxyquire(
+const { SiteSettings } = proxyquire(
   '../../../../../frontend/components/site/SiteSettings',
   { '../../../actions/siteActions': siteActionsMock }
-).SiteSettings;
+);
 
 describe('<SiteSettings/>', () => {
   const props = {
     site: {
+      id: 1,
       owner: 'el-mapache',
       repository: 'federalist-modern-team-template',
       domain: 'https://example.gov',
@@ -28,36 +28,35 @@ describe('<SiteSettings/>', () => {
       demoBranch: 'demo',
       demoDomain: 'https://demo.example.gov',
       engine: 'jekyll',
+      basicAuth: {},
     },
   };
 
   let origWindow;
   let wrapper;
-  const defaultProxyEgeLinks = process.env.FEATURE_PROXY_EDGE_LINKS;
-
-  beforeEach(() => {
-    process.env.FEATURE_PROXY_EDGE_LINKS = 'true'
-    siteActionsMock.deleteSite = spy();
-    siteActionsMock.updateSite = spy();
-    siteActionsMock.addSite = spy();
-
-    global.window = { confirm: spy() };
-  });
 
   before(() => {
     origWindow = global.window;
+    global.FEATURE_PROXY_EDGE_LINKS = 'true';
+  });
+
+  beforeEach(() => {
+    siteActionsMock.deleteSite = spy();
+    siteActionsMock.updateSite = spy();
+
+    global.window = { confirm: spy() };
     wrapper = shallow(<SiteSettings {...props} />);
   });
 
   after(() => {
     global.window = origWindow;
-    process.env.FEATURE_PROXY_EDGE_LINKS = defaultProxyEgeLinks;
+    global.FEATURE_PROXY_EDGE_LINKS = process.env.FEATURE_PROXY_EDGE_LINKS;
   });
 
   it('should render', () => {
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('AdvancedSiteSettings')).to.have.length(1);
-    expect(wrapper.find('ReduxForm')).to.have.length(2);
+    expect(wrapper.find('ExpandableArea')).to.have.length(3);
   });
 
   it('should not render if site prop is not defined', () => {
@@ -82,28 +81,6 @@ describe('<SiteSettings/>', () => {
     expect(siteActionsMock.deleteSite.calledWith(props.site.id)).to.be.true;
   });
 
-  it('calls the addSite action', () => {
-    const newValues = {
-      newBaseBranch: 'new-branch',
-      newRepoName: 'repo-two',
-      targetOwner: 'github-user',
-    };
-    const expectedValues = {
-      owner: newValues.targetOwner,
-      repository: newValues.newRepoName,
-      defaultBranch: newValues.newBaseBranch,
-      engine: props.site.engine,
-      source: {
-        owner: props.site.owner,
-        repo: props.site.repository,
-      },
-    };
-
-    wrapper.instance().handleCopySite(newValues);
-    expect(siteActionsMock.addSite.calledOnce).to.be.true;
-    expect(siteActionsMock.addSite.calledWith(expectedValues)).to.be.true;
-  });
-
   it('should render BasicAuthSettings', () => {
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('BasicAuthSettings')).to.have.length(1);
@@ -111,9 +88,10 @@ describe('<SiteSettings/>', () => {
   });
 
   it('should not render BasicAuthSettings', () => {
-    process.env.FEATURE_PROXY_EDGE_LINKS = 'false'
+    global.FEATURE_PROXY_EDGE_LINKS = 'false';
+    wrapper = shallow(<SiteSettings {...props} />);
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('BasicAuthSettings')).to.have.length(0);
-    process.env.FEATURE_PROXY_EDGE_LINKS = 'true'
+    global.FEATURE_PROXY_EDGE_LINKS = 'true';
   });
 });

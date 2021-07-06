@@ -15,8 +15,8 @@ describe('<ExpandableArea/>', () => {
 
     const content = wrapper.find('.usa-accordion-content');
     expect(content.exists()).to.be.true;
-    expect(content.find('p').exists()).to.be.true;
-    expect(content.find('p').text()).to.equal('hello');
+    expect(content.prop('aria-hidden')).to.equal(true);
+    expect(content.find('p').exists()).to.be.false;
 
     const button = wrapper.find('.usa-accordion-button');
     expect(button.prop('aria-controls')).to.equal(content.prop('id'));
