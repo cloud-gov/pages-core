@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const request = require('supertest');
 
 const app = require('../../../app');
@@ -16,11 +16,11 @@ describe('User API', () => {
   describe('GET /v0/me', () => {
     it('should require authentication', (done) => {
       factory.user().then(() => request(app)
-          .get('/v0/me')
-          .expect(403)).then((response) => {
-            validateAgainstJSONSchema('GET', '/me', 403, response.body);
-            done();
-          });
+        .get('/v0/me')
+        .expect(403)).then((response) => {
+        validateAgainstJSONSchema('GET', '/me', 403, response.body);
+        done();
+      });
     });
 
     it('should render the current user', (done) => {
@@ -34,33 +34,10 @@ describe('User API', () => {
         .then(cookie => request(app)
           .get('/v0/me')
           .set('Cookie', cookie)
-          .expect(200)
-        )
+          .expect(200))
         .then((response) => {
           validateAgainstJSONSchema('GET', '/me', 200, response.body);
           userResponseExpectations(response.body, user);
-          done();
-        })
-        .catch(done);
-    });
-  });
-
-  describe('GET /v0/usernames', () => {
-    it('should render the current user', (done) => {
-      let user;
-
-      factory.user()
-        .then((model) => {
-          user = model;
-          return authenticatedSession(user);
-        })
-        .then(cookie => request(app)
-          .get('/v0/usernames')
-          .set('Cookie', cookie)
-          .expect(200)
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('GET', '/usernames', 200, response.body);
           done();
         })
         .catch(done);
