@@ -2,7 +2,7 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import proxyquire from 'proxyquire';
-import { stub } from 'sinon';
+import sinon from 'sinon';
 import siteActions from '../../../../frontend/actions/siteActions';
 
 proxyquire.noCallThru();
@@ -42,6 +42,8 @@ describe('<SiteListItem />', () => {
       '../icons': { IconView: 'IconView' },
     }).default;
   });
+
+  afterEach(sinon.restore);
 
   it('outputs a published state component', () => {
     wrapper = shallow(<Fixture site={testSite} user={testUser} />);
@@ -120,8 +122,8 @@ describe('<SiteListItem />', () => {
   it('should call `removeUserFromSite` when `Remove` is clicked', () => {
     proxyquire.callThru();
     wrapper = shallow(<Fixture site={testSite} user={testUser} />);
-    const clickSpy = stub(siteActions, 'removeUserFromSite').resolves();
-    stub(siteActions, 'fetchSites').resolves();
+    const clickSpy = sinon.stub(siteActions, 'removeUserFromSite').resolves();
+    sinon.stub(siteActions, 'fetchSites').resolves();
     const removeSiteLink = wrapper.find('ButtonLink').shallow();
 
     expect(removeSiteLink.exists()).to.be.true;

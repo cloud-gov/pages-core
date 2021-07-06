@@ -12,7 +12,7 @@ describe('<HttpsUrlField />', () => {
     };
 
     const wrapper = shallow(<HttpsUrlField {...props} />);
-    expect(wrapper).to.be.defined;
+    expect(wrapper).not.to.be.undefined;
     expect(wrapper.find('Field[id="boopId"]')).to.have.length(1);
   });
 
@@ -48,4 +48,3 @@ describe('<HttpsUrlField />', () => {
     });
   });
 });
-
