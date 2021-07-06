@@ -68,7 +68,7 @@
     "test:cover": "yarn test:prepare && yarn test:server:cover && yarn test:client:cover",
     "test:prepare": "NODE_ENV=test yarn migrate:up && yarn build",
     "test:server": "NODE_ENV=test JWT_SECRET=shh USER_AUDITOR=user_auditor mocha --exit --timeout 2500 --recursive ./test/api",
-    "test:client": "NODE_ENV=test mocha --exit --require @babel/register --recursive ./test/frontend",
+    "test:client": "NODE_ENV=test mocha --exit --require @babel/register --recursive \"./test/frontend/**/*.{js,jsx}\"",
     "test:server:cover": "NODE_ENV=test JWT_SECRET=shh USER_AUDITOR=user_auditor nyc --report-dir ./coverage/server mocha --exit --timeout 2500 --recursive ./test/api",
     "test:client:cover": "NODE_ENV=test nyc --report-dir ./coverage/client mocha --exit --require @babel/register --recursive ./test/frontend",
     "test:client:file": "mocha --exit --require @babel/register test/frontend/support/_bootstrap.js",
