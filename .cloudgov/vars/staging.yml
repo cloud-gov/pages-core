@@ -11,3 +11,10 @@ feature_proxy_edge_dynamo: 'false'
 feature_bull_site_build_queue: 'true'
 uaa_host: https://uaa.fr-stage.cloud.gov
 new_relic_app_name: web-staging
+# Interpolated by Credhub in Concourse
+smtp_cert: ((/concourse/pages/web/postfix-smtp-cert.certificate))
+smtp_password: ((/concourse/pages/web/postfix-smtp-password))
+smtp_from: ((/concourse/pages/web/postfix-smtp-from))
+smtp_host: ((/concourse/pages/web/postfix-smtp-host))
+smtp_port: ((/concourse/pages/web/postfix-smtp-port))
+smtp_user: ((/concourse/pages/web/postfix-smtp-user))
