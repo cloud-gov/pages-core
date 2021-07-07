@@ -272,6 +272,12 @@ jobs:
           CF_MANIFEST: src-api/.cloudgov/manifest.yml
           CF_VARS_FILE: src-api/.cloudgov/vars/staging.yml
           CF_PATH: src-api
+          CFVAR_SMTP_CERT: ((postfix-smtp-cert.certificate))
+          CFVAR_SMTP_PASSWORD: ((postfix-smtp-password))
+          CFVAR_SMTP_FROM: ((postfix-smtp-from))
+          CFVAR_SMTP_HOST: ((postfix-smtp-host))
+          CFVAR_SMTP_PORT: ((postfix-smtp-port))
+          CFVAR_SMTP_USER: ((postfix-smtp-user))
         on_failure:
           try:
             task: cancel-api-deployment
