@@ -538,7 +538,7 @@ resources:
     type: docker-image
     source:
       repository: node
-      tag: 14
+      tag: 16
   
   - name: slack
     type: slack-notification
