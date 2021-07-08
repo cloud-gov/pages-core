@@ -13,7 +13,7 @@ node-image: &node-image
   type: docker-image
   source:
     repository: node
-    tag: 14
+    tag: 16
 
 cf-image: &cf-image
   platform: linux
@@ -260,6 +260,25 @@ jobs:
             path: bash
             args: [-c, yarn build]
 
+      - task: interpolate-cf-vars
+        config:
+          platform: linux
+          image_resource:
+            <<: *node-image
+          inputs: [name: src-api]
+          outputs: [name: src-api]
+          params:
+            CF_VARS_FILE: src-api/.cloudgov/vars/staging.yml
+            CFVAR_smtp_cert: ((postfix-smtp-cert.certificate))
+            CFVAR_smtp_password: ((postfix-smtp-password))
+            CFVAR_smtp_from: ((postfix-smtp-from))
+            CFVAR_smtp_host: ((postfix-smtp-host))
+            CFVAR_smtp_port: ((postfix-smtp-port))
+            CFVAR_smtp_user: ((postfix-smtp-user))
+          run:
+            path: node
+            args: [src-api/ci/tasks/interpolate-cf-vars.js]
+
       - task: deploy-api
         config:
           <<: *cf-image
@@ -272,12 +291,6 @@ jobs:
           CF_MANIFEST: src-api/.cloudgov/manifest.yml
           CF_VARS_FILE: src-api/.cloudgov/vars/staging.yml
           CF_PATH: src-api
-          CFVAR_SMTP_CERT: ((postfix-smtp-cert.certificate))
-          CFVAR_SMTP_PASSWORD: ((postfix-smtp-password))
-          CFVAR_SMTP_FROM: ((postfix-smtp-from))
-          CFVAR_SMTP_HOST: ((postfix-smtp-host))
-          CFVAR_SMTP_PORT: ((postfix-smtp-port))
-          CFVAR_SMTP_USER: ((postfix-smtp-user))
         on_failure:
           try:
             task: cancel-api-deployment
@@ -525,7 +538,7 @@ resources:
     type: docker-image
     source:
       repository: node
-      tag: 14
+      tag: 16
   
   - name: slack
     type: slack-notification
