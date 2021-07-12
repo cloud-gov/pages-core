@@ -15,8 +15,9 @@ const arraySchema = {
 describe('UserSerializer', () => {
   describe('.toJSON(serializable)', () => {
     it('should serialize a user object correctly', async () => {
+      const uaaEmail = 'bar@foo.com';
       const user = await factory.user({ adminEmail: 'foo@bar.com' });
-      await user.createUAAIdentity(uaaIdentityFactory.uaaUser());
+      await user.createUAAIdentity(uaaIdentityFactory.uaaUser({ email: uaaEmail }));
       await user.reload({ include: ['UAAIdentity'] });
 
       const userJson = UserSerializer.toJSON(user);
@@ -24,7 +25,7 @@ describe('UserSerializer', () => {
 
       expect(result.errors).to.be.empty;
       expect(userJson.adminEmail).to.be.undefined;
-      expect(userJson.uaa).to.be.undefined;
+      expect(userJson.UAAIdentity.email).to.eq(uaaEmail);
     });
 
     it('includes admin attributes', async () => {
@@ -47,7 +48,7 @@ describe('UserSerializer', () => {
       const result = validateJSONSchema(userJson, userSchema);
 
       expect(result.errors).to.be.empty;
-      expect(userJson.uaa.email).to.eq(uaaEmail);
+      expect(userJson.UAAIdentity.email).to.eq(uaaEmail);
     });
   });
 

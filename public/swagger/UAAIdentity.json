@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "required": [
+    "email",
+    "userName"
+  ],
+  "properties": {
+    "email": {
+      "type": "string"
+    },
+    "userName": {
+      "type": "string"
+    },
+    "uaaId": {
+      "type": "string"
+    },
+    "userId": {
+      "type": "number"
+    },
+    "origin": {
+      "type": "string"
+    }
+  }
+}

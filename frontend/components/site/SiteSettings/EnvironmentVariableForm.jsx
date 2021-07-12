@@ -35,10 +35,10 @@ export const EnvironmentVariableForm = ({
         validate={[validateValue]}
       />
     </fieldset>
-    <button type="submit" disabled={invalid || submitting}>
+    <button type="submit" className="usa-button usa-button-primary" disabled={invalid || submitting}>
       Add
     </button>
-    <button type="button" disabled={pristine || submitting} onClick={reset}>
+    <button type="button" className="usa-button usa-button-secondary" disabled={pristine || submitting} onClick={reset}>
       Clear
     </button>
   </form>
