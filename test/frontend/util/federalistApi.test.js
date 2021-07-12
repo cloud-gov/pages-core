@@ -80,7 +80,7 @@ describe('federalistApi', () => {
 
   describe('handles errors', () => {
     it('does not throw error by default', (done) => {
-      federalistApi.fetch('site/5', { method: 'PUT', data: {} })
+      federalistApi.request('site/5', { method: 'PUT', data: {} })
         .then(() => {
           expect(true).to.be.true;
           done();
@@ -93,7 +93,7 @@ describe('federalistApi', () => {
     });
 
     it('throws an error if handleHttpError is false', (done) => {
-      federalistApi.fetch('site/5', { method: 'PUT', data: {} }, { handleHttpError: false })
+      federalistApi.request('site/5', { method: 'PUT', data: {} }, { handleHttpError: false })
         .catch((err) => {
           expect(err).to.exist;
           expect(err.response.status).to.equal(400);
@@ -200,7 +200,6 @@ describe('federalistApi', () => {
     federalistApi.deleteUserEnvironmentVariable(siteId, uevId);
     testRouteCalled('deleteUserEnvironmentVariable', { method: 'DELETE' });
   });
-
 
   it('defines basicAuth user/pass for site', () => {
     const siteId = 8;
