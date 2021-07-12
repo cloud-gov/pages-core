@@ -74,6 +74,13 @@ const associate = ({
   User.addScope('withUAAIdentity', {
     include: UAAIdentity,
   });
+  User.addScope('byUAAEmail', uaaEmail => ({
+    include: [{
+      model: UAAIdentity,
+      where: { email: uaaEmail },
+      required: true,
+    }],
+  }));
 };
 
 function beforeValidate(user) {
@@ -140,5 +147,6 @@ module.exports = (sequelize, DataTypes) => {
   User.orgScope = id => ({ method: ['byOrg', id] });
   User.siteScope = id => ({ method: ['bySite', id] });
   User.searchScope = search => ({ method: ['byIdOrText', search] });
+  User.byUAAEmail = id => User.scope({ method: ['byUAAEmail', id] });
   return User;
 };

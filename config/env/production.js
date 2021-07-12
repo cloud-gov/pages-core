@@ -157,11 +157,12 @@ module.exports.mail = {
   port: SMTP_PORT,
   pool: true,
   secure: false,
+  requireTLS: true,
   auth: {
     user: SMTP_USER,
     pass: SMTP_PASSWORD,
   },
   tls: {
-    cert: SMTP_CERT,
+    ca: SMTP_CERT,
   },
 };

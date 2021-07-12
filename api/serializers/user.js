@@ -1,69 +1,26 @@
-const { pick } = require('../utils');
+const BaseSerializer = require('./base');
+const uaaIdentitySerializer = require('./uaa-identity');
 
-const allowedAttributes = [
-  'id',
-  'email',
-  'username',
-  'SiteUser',
-];
-
-const adminAllowedAttributes = [
-  'createdAt',
-  'updatedAt',
-  'signedInAt',
-  'pushedAt',
-  'isActive',
-  'adminEmail',
-  'deletedAt',
-];
-
-const uaaAdminAllowedAttributes = [
-  'uaaId',
-  'userId',
-  'username',
-  'email',
-  'origin',
-];
-
-const dateFields = [
-  'createdAt',
-  'updatedAt',
-  'signedInAt',
-  'pushedAt',
-  'deletedAt',
-];
-
-const toJSON = (user, isSystemAdmin = false) => {
-  const object = user.get({ plain: true });
-
-  const attributes = allowedAttributes;
-  if (isSystemAdmin) {
-    attributes.push(...adminAllowedAttributes);
-  }
-
-  const filtered = pick(attributes, object);
-
-  dateFields
-    .filter(dateField => filtered[dateField])
-    .forEach((dateField) => {
-      filtered[dateField] = filtered[dateField].toISOString();
-    });
-
-  if (filtered.SiteUser && filtered.SiteUser.buildNotificationSetting) {
-    filtered.buildNotificationSetting = filtered.SiteUser.buildNotificationSetting;
-  }
-
-  if (isSystemAdmin && object.UAAIdentity) {
-    filtered.uaa = pick(uaaAdminAllowedAttributes, object.UAAIdentity);
-  }
-
-  filtered.hasGithubAuth = !!object.githubAccessToken;
-
-  return filtered;
+const attributes = {
+  id: '',
+  email: '',
+  username: '',
+  buildNotificationSetting: (_, user) => user.SiteUser?.buildNotificationSetting,
+  hasGithubAuth: (_, user) => !!user.githubAccessToken,
+  UAAIdentity: (uaaIdentity, _, isSystemAdmin) => uaaIdentitySerializer
+    .serialize(uaaIdentity, isSystemAdmin),
 };
 
-function serializeMany(users, isSystemAdmin) {
-  return users.map(user => toJSON(user, isSystemAdmin));
-}
+const adminAttributes = {
+  createdAt: 'date',
+  updatedAt: 'date',
+  signedInAt: 'date',
+  pushedAt: 'date',
+  isActive: '',
+  adminEmail: '',
+  deletedAt: 'date',
+};
 
-module.exports = { serializeMany, toJSON };
+const { serialize, serializeMany } = new BaseSerializer(attributes, adminAttributes);
+
+module.exports = { toJSON: serialize, serialize, serializeMany };

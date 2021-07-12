@@ -2,7 +2,6 @@ const {
   Organization,
   OrganizationRole,
   Role,
-  UAAIdentity,
   User,
 } = require('../../models');
 const { CustomError } = require('../../utils/validators');
@@ -67,13 +66,7 @@ module.exports = {
    * @returns {Promise<UserType | null>}
    */
   findUserByUAAIdentity(uaaEmail) {
-    return User.findOne({
-      include: [{
-        model: UAAIdentity,
-        where: { email: uaaEmail },
-        required: true,
-      }],
-    });
+    return User.byUAAEmail(uaaEmail).findOne();
   },
 
   /**
@@ -88,7 +81,7 @@ module.exports = {
     let user = await this.findUserByUAAIdentity(targetUserEmail);
 
     if (user) {
-      return [user];
+      return [user, { email: user.UAAIdentity.email }];
     }
 
     const uaaUserAttributes = await this.inviteUAAUser(currentUserUAAIdentity, targetUserEmail);
@@ -135,7 +128,7 @@ module.exports = {
    * @param {number} roleId
    * @param {string} targetUserEmail - the email address of the user to invite
    * @param {string=} targetUserGithubUsername
-   * @returns {Promise<[OrgType, UAAClient.UAAUserAttributes>}
+   * @returns {Promise<UAAClient.UAAUserAttributes>}
    */
   async inviteUserToOrganization(
     currentUser, organizationId, roleId, targetUserEmail, targetUserGithubUsername
@@ -202,7 +195,7 @@ module.exports = {
       currentUserUAAIdentity, targetUserEmail, targetUserGithubUsername
     );
 
-    const managerRole = await Role.findOne({ name: 'manager' });
+    const managerRole = await Role.findOne({ where: { name: 'manager' } });
 
     const org = await Organization.create({ name: orgName });
     await org.addUser(user, { through: { roleId: managerRole.id } });
