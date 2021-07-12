@@ -1,48 +1,68 @@
-const { Queue } = require('bullmq');
+const { QueueScheduler } = require('bullmq');
+const IORedis = require('ioredis');
+
+const { app: appConfig, redis: redisConfig } = require('../../config');
 const { logger } = require('../../winston');
-const { QueueWorker } = require('./QueueWorker');
-const config = require('../../config');
+const { MailQueueName, ScheduledQueue, ScheduledQueueName } = require('../queues');
+const { buildWorker } = require('./QueueWorker');
+const { EVERY_TEN_MINUTES_CRON, NIGHTLY_CRON, shutdownGracefully } = require('./utils');
 
-async function startScheduledWorker() {
-  const nightly = '0 5 * * *';
-  const everyTenMinutes = '0,10,20,30,40,50 * * * *';
+const everyTenMinutesJobConfig = {
+  repeat: { cron: EVERY_TEN_MINUTES_CRON },
+  priority: 1,
+};
 
-  const scheduledWorker = new QueueWorker('scheduled');
-  const scheduledQueue = new Queue(scheduledWorker.QUEUE_NAME, {
-    connection: scheduledWorker.connection.duplicate(),
-  });
+const nightlyJobConfig = {
+  repeat: { cron: NIGHTLY_CRON },
+  priority: 10,
+};
+
+// in calling code
+// const { Queue } = require('bullmq');
+// const queue = new Queue('mail');
+// await queue.add('jobName', { to: '', subject: '', content: '' })''
+
+const connection = new IORedis(redisConfig.url, {
+  tls: redisConfig.tls,
+});
+
+// Workers
+const workers = [
+  buildWorker(ScheduledQueueName, processJob, connection),
+  buildWorker(MailQueueName, () => {}, connection),
+];
+
+// Schedulers
+const schedulers = [
+  new QueueScheduler(ScheduledQueueName, { connection }),
+];
+
+// Jobs
+async function queueScheduledJobs() {
+  const scheduledQueue = new ScheduledQueue(connection);
 
   await scheduledQueue.drain(); // clear the queue
 
-  await scheduledQueue.add('timeoutBuilds', {}, {
-    repeat: { cron: everyTenMinutes },
-    priority: 1,
-  });
+  const jobs = [
+    scheduledQueue.add('timeoutBuilds', {}, everyTenMinutesJobConfig),
+    scheduledQueue.add('nightlyBuilds', {}, nightlyJobConfig),
+    scheduledQueue.add('verifyRepositories', {}, nightlyJobConfig),
+    scheduledQueue.add('revokeMembershipForInactiveUsers', {}, nightlyJobConfig),
+  ];
 
-  if (config.app.app_env === 'production') {
-    await scheduledQueue.add('archiveBuildLogsDaily', {}, {
-      repeat: { cron: nightly },
-      priority: 10,
-    });
+  if (appConfig.app_env === 'production') {
+    jobs.push(scheduledQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig));
   }
 
-  await scheduledQueue.add('nightlyBuilds', {}, {
-    repeat: { cron: nightly },
-    priority: 10,
-  });
-
-  await scheduledQueue.add('verifyRepositories', {}, {
-    repeat: { cron: nightly },
-    priority: 10,
-  });
-
-  await scheduledQueue.add('revokeMembershipForInactiveUsers', {}, {
-    repeat: { cron: nightly },
-    priority: 10,
-  });
+  return Promise.all(jobs);
 }
 
-Promise.all([
-  startScheduledWorker(),
-])
+shutdownGracefully(() => Promise.all(
+  [
+    ...workers,
+    ...schedulers,
+  ].map(closable => closable.close())
+));
+
+queueScheduledJobs()
   .catch(logger.err);

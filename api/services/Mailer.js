@@ -11,12 +11,11 @@ class Mailer {
     this.send = this.send.bind(this);
   }
 
-  send(to, subject, content) {
+  send({
+    to, subject, text, html,
+  }) {
     return this.transporter.sendMail({
-      to,
-      subject,
-      text: content,
-      html: `<p>${content}</p>`,
+      to, subject, text, html,
     });
   }
 }
