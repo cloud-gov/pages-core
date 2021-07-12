@@ -1,5 +1,5 @@
 const deref = require('json-schema-deref-sync');
-const validate = require('jsonschema').validate;
+const { validate } = require('jsonschema');
 const YAML = require('yamljs');
 
 const swagger = YAML.load('public/swagger/index.yml');

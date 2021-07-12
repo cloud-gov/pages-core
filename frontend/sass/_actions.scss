@@ -27,10 +27,6 @@ a.usa-button,
     background-color: $color-white;
   }
 
-  &.usa-button-primary:disabled {
-    color: #323a45;
-  }
-
   // Buttons containing icons, scale based on the font-size
   img {
     height: 1em;

@@ -113,7 +113,7 @@ describe('OrganizationService', () => {
 
         sinon.assert.notCalled(inviteUAAUserStub);
         expect(user.UAAIdentity.email).to.eq(targetUser.UAAIdentity.email);
-        expect(invite).to.be.undefined;
+        expect(invite.inviteLink).to.be.undefined;
       });
     });
 
