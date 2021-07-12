@@ -7,8 +7,8 @@ import userActions from '../../actions/userActions';
 
 class UserActionsTable extends React.Component {
   componentDidMount() {
-    const { site } = this.props;
-    userActions.fetchUserActions(site);
+    const { fetchUserActions, site } = this.props;
+    fetchUserActions(site);
   }
 
   renderRow(action) {
@@ -63,6 +63,7 @@ class UserActionsTable extends React.Component {
 }
 
 UserActionsTable.propTypes = {
+  fetchUserActions: PropTypes.func.isRequired,
   site: PropTypes.number.isRequired,
   userActions: PropTypes.arrayOf(USER_ACTION),
 };
@@ -75,5 +76,9 @@ const mapStateToProps = state => ({
   userActions: state.userActions.data,
 });
 
+const mapDispatchToProps = () => ({
+  fetchUserActions: userActions.fetchUserActions,
+});
+
 export { UserActionsTable };
-export default connect(mapStateToProps)(UserActionsTable);
+export default connect(mapStateToProps, mapDispatchToProps)(UserActionsTable);

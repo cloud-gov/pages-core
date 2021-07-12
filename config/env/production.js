@@ -141,3 +141,27 @@ module.exports.passport = {
     options: uaaCredentials,
   },
 };
+
+const {
+  SMTP_CERT,
+  SMTP_FROM,
+  SMTP_HOST,
+  SMTP_PASSWORD,
+  SMTP_PORT,
+  SMTP_USER,
+} = process.env;
+
+module.exports.mail = {
+  from: SMTP_FROM,
+  host: SMTP_HOST,
+  port: SMTP_PORT,
+  secure: false,
+  requireTLS: true,
+  auth: {
+    user: SMTP_USER,
+    pass: SMTP_PASSWORD,
+  },
+  tls: {
+    ca: SMTP_CERT,
+  },
+};
