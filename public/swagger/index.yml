@@ -899,17 +899,3 @@ paths:
           description: Not authorized
           schema:
             $ref: "Error.json"
-  /usernames:
-    get:
-      summary: Fetch the usernames for every user in federalist
-      responses:
-        200:
-          description: An array of usernames with an element for each Federalist user
-          schema:
-            type: array
-            items:
-              type: object
-        403:
-          description: Not authorized
-          schema:
-            $ref: "Error.json"

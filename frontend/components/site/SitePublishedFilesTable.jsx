@@ -22,13 +22,13 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   componentDidMount() {
-    const { id, name } = this.props;
+    const { fetchPublishedFiles, id, name } = this.props;
 
     const site = { id };
     const branch = name;
 
     const startAtKey = null; // start without a startAtKey
-    publishedFileActions.fetchPublishedFiles(site, branch, startAtKey);
+    fetchPublishedFiles(site, branch, startAtKey);
   }
 
   // eslint-disable-next-line camelcase
@@ -68,7 +68,7 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   nextPage() {
-    const { id, name } = this.props;
+    const { fetchPublishedFiles, id, name } = this.props;
     const { currentPage, filesByPage } = this.state;
 
     const nextPage = currentPage + 1;
@@ -91,7 +91,7 @@ class SitePublishedFilesTable extends React.Component {
     const files = filesByPage[currentPage];
     const startAtKey = files[files.length - 1].key;
 
-    publishedFileActions.fetchPublishedFiles(site, branch, startAtKey);
+    fetchPublishedFiles(site, branch, startAtKey);
   }
 
   shouldShowButtons() {
@@ -213,6 +213,7 @@ class SitePublishedFilesTable extends React.Component {
 SitePublishedFilesTable.propTypes = {
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
+  fetchPublishedFiles: PropTypes.func.isRequired,
   publishedFiles: PropTypes.shape({
     isLoading: PropTypes.bool.isRequired,
     data: PropTypes.shape({
@@ -240,5 +241,9 @@ const mapStateToProps = ({ publishedFiles, sites }, { id }) => ({
   site: currentSite(sites, id),
 });
 
+const mapDispatchToProps = () => ({
+  fetchPublishedFiles: publishedFileActions.fetchPublishedFiles,
+});
+
 export { SitePublishedFilesTable };
-export default connect(mapStateToProps)(SitePublishedFilesTable);
+export default connect(mapStateToProps, mapDispatchToProps)(SitePublishedFilesTable);

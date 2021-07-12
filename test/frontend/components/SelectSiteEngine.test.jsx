@@ -9,6 +9,8 @@ const expectedEngineValues = ['jekyll', 'hugo', 'static', 'node.js'];
 
 describe('<SelectSiteEngine />', () => {
   const props = {
+    id: 'hello',
+    name: 'hello',
     value: expectedEngineValues[0],
     onChange: spy(),
   };
@@ -28,7 +30,7 @@ describe('<SelectSiteEngine />', () => {
       expect(wrapper.find(`option[value="${engine}"]`)).to.have.length(1);
     });
 
-    const selectSiteEngines = wrapper.nodes[0].props.children.map(engine => engine.key);
+    const selectSiteEngines = wrapper.getElements()[0].props.children.map(engine => engine.key);
     selectSiteEngines.forEach(engine => expect(expectedEngineValues).to.include(engine));
   });
 
