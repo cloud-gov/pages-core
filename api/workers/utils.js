@@ -24,4 +24,23 @@ function handleWorker(worker) {
   });
 }
 
-module.exports = { monitorQueue, handleWorker };
+const EVERY_TEN_MINUTES_CRON = '0,10,20,30,40,50 * * * *';
+const NIGHTLY_CRON = '0 5 * * *';
+
+async function shutdownGracefully(cleanup) {
+  const listener = async () => {
+    await Promise.resolve(cleanup());
+    process.exit(0);
+  };
+  process.on('SIGINT', listener);
+  process.on('SIGTERM', listener);
+  process.on('SIGHUP', listener);
+}
+
+module.exports = {
+  EVERY_TEN_MINUTES_CRON,
+  NIGHTLY_CRON,
+  monitorQueue,
+  handleWorker,
+  shutdownGracefully,
+};
