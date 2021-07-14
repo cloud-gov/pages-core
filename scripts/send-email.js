@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
-const Mailer = require('../api/services/Mailer');
+const Mailer = require('../api/workers/Mailer');
 
-async function sendEmail(to, subject, content) {
+async function sendEmail(to, subject, html) {
   const mailer = new Mailer();
-  const info = await mailer.send(to, subject, content);
+  const info = await mailer.send({ to, subject, html });
   console.log(info.message);
 }
 
-const [,, to, subject, content] = process.argv;
+const [,, to, subject, html] = process.argv;
 
-sendEmail(to, subject, content)
+sendEmail(to, subject, html)
   .catch(console.error);
