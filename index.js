@@ -2,6 +2,7 @@ const { logger } = require('./winston');
 const config = require('./config');
 const server = require('./api/server');
 const scheduleJobs = require('./api/jobs');
+const Mailer = require('./api/services/mailer');
 
 const { PORT = 1337 } = process.env;
 
@@ -18,6 +19,7 @@ if (newRelicAppName && newRelicLicenseKey) {
 require('./app');
 
 scheduleJobs();
+Mailer.init();
 
 server.listen(PORT, () => {
   logger.info('Server running!');

@@ -10,6 +10,7 @@ const csrfToken = require('../support/csrfToken');
 const {
   Organization, OrganizationRole, Role, User,
 } = require('../../../api/models');
+const Mailer = require('../../../api/services/mailer');
 const OrganizationService = require('../../../api/services/organization');
 
 const { requiresAuthentication } = require('./shared');
@@ -159,11 +160,15 @@ describe('Organization API', () => {
         factory.uaaIdentity({ userId: targetUser.id, email: uaaEmail }),
       ]);
 
+      const inviteLink = 'https://example.com';
+
       sinon.stub(OrganizationService, 'inviteUserToOrganization')
         .resolves({
           email: uaaEmail,
-          inviteLink: 'https://example.com',
+          inviteLink,
         });
+
+      sinon.stub(Mailer, 'sendUAAInvite').resolves();
 
       const response = await authenticatedRequest
         .post(`/v0/organization/${org.id}/invite`)
@@ -175,6 +180,7 @@ describe('Organization API', () => {
       expect(invite.email).to.eq(uaaEmail);
       expect(member.Role.id).to.eq(roleId);
       expect(member.User.id).to.eq(targetUser.id);
+      sinon.assert.calledOnceWithExactly(Mailer.sendUAAInvite, uaaEmail, inviteLink);
     });
   });
 

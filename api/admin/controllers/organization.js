@@ -1,6 +1,7 @@
 const { serialize, serializeMany } = require('../../serializers/organization');
 const { paginate, wrapHandlers } = require('../../utils');
 const { Organization } = require('../../models');
+const Mailer = require('../../services/mailer');
 const OrganizationService = require('../../services/organization');
 const { fetchModelById } = require('../../utils/queryDatabase');
 
@@ -41,12 +42,16 @@ module.exports = wrapHandlers({
       user,
     } = req;
 
-    const [org, uaaUserAttributes] = await OrganizationService.createOrganization(
+    const [org, { email, inviteLink: link }] = await OrganizationService.createOrganization(
       user, name, managerUAAEmail, managerGithubUsername
     );
 
+    if (link) {
+      await Mailer.sendUAAInvite(email, link);
+    }
+
     const json = {
-      invite: { email: uaaUserAttributes.email, link: uaaUserAttributes.inviteLink },
+      invite: { email, link },
       org: serialize(org),
     };
 
