@@ -99,3 +99,19 @@ services:
     depends_on:
       - db
     command: ["/tomcat/bin/catalina.sh", "run"]
+  worker:
+    build:
+      dockerfile: Dockerfile-app
+      context: .
+    command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "start-workers"]
+    volumes:
+      - yarn:/usr/local/share/.cache/yarn
+      - .:/app
+      - /app/admin-client/
+      - nm-app:/app/node_modules
+    depends_on:
+      - db
+      - redis
+    environment:
+      APP_HOSTNAME: http://localhost:1337
+      NODE_ENV: development

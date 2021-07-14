@@ -3,9 +3,15 @@ const IORedis = require('ioredis');
 
 const { app: appConfig, redis: redisConfig } = require('../../config');
 const { logger } = require('../../winston');
+
 const { MailQueueName, ScheduledQueue, ScheduledQueueName } = require('../queues');
-const { buildWorker } = require('./QueueWorker');
-const { EVERY_TEN_MINUTES_CRON, NIGHTLY_CRON, shutdownGracefully } = require('./utils');
+
+const Processors = require('./jobProcessors');
+const Mailer = require('./Mailer');
+const QueueWorker = require('./QueueWorker');
+
+const EVERY_TEN_MINUTES_CRON = '0,10,20,30,40,50 * * * *';
+const NIGHTLY_CRON = '0 5 * * *';
 
 const everyTenMinutesJobConfig = {
   repeat: { cron: EVERY_TEN_MINUTES_CRON },
@@ -17,32 +23,58 @@ const nightlyJobConfig = {
   priority: 10,
 };
 
-// in calling code
-// const { Queue } = require('bullmq');
-// const queue = new Queue('mail');
-// await queue.add('jobName', { to: '', subject: '', content: '' })''
+async function start() {
+  const mailer = new Mailer();
+  await mailer.verify();
 
-const connection = new IORedis(redisConfig.url, {
-  tls: redisConfig.tls,
-});
+  const connection = new IORedis(redisConfig.url, {
+    tls: redisConfig.tls,
+  });
 
-// Workers
-const workers = [
-  buildWorker(ScheduledQueueName, processJob, connection),
-  buildWorker(MailQueueName, () => {}, connection),
-];
+  // Processors
+  const scheduledJobProcessor = Processors.multiJobProcessor({
+    archiveBuildLogsDaily: Processors.archiveBuildLogsDaily,
+    nightlyBuilds: Processors.nightlyBuilds,
+    revokeMembershipForInactiveUsers: Processors.revokeMembershipForInactiveUsers,
+    timeoutBuilds: Processors.timeoutBuilds,
+    verifyRepositories: Processors.verifyRepositories,
+  });
 
-// Schedulers
-const schedulers = [
-  new QueueScheduler(ScheduledQueueName, { connection }),
-];
+  const mailJobProcessor = job => mailer.send(job.data);
 
-// Jobs
-async function queueScheduledJobs() {
+  // Workers
+  const workers = [
+    new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
+    new QueueWorker(MailQueueName, connection, mailJobProcessor),
+  ];
+
+  // Schedulers
+  const schedulers = [
+    new QueueScheduler(ScheduledQueueName, { connection }),
+  ];
+
+  // Queues
   const scheduledQueue = new ScheduledQueue(connection);
 
-  await scheduledQueue.drain(); // clear the queue
+  const cleanup = async () => {
+    logger.info('Worker process received request to shutdown, cleaning up and shutting down.');
+    await Promise.all(
+      [
+        ...workers,
+        ...schedulers,
+        scheduledQueue,
+        mailer,
+      ].map(closable => closable.close())
+    );
+    logger.info('Worker process all cleaned up, shutting down.');
+    process.exit(0);
+  };
 
+  process.on('SIGINT', cleanup);
+  process.on('SIGTERM', cleanup);
+  process.on('SIGHUP', cleanup);
+
+  // Jobs
   const jobs = [
     scheduledQueue.add('timeoutBuilds', {}, everyTenMinutesJobConfig),
     scheduledQueue.add('nightlyBuilds', {}, nightlyJobConfig),
@@ -54,15 +86,9 @@ async function queueScheduledJobs() {
     jobs.push(scheduledQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig));
   }
 
-  return Promise.all(jobs);
+  await scheduledQueue.drain(); // clear the queue
+  await Promise.all(jobs);
 }
 
-shutdownGracefully(() => Promise.all(
-  [
-    ...workers,
-    ...schedulers,
-  ].map(closable => closable.close())
-));
-
-queueScheduledJobs()
+start()
   .catch(logger.err);
