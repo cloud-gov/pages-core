@@ -51,6 +51,7 @@ async function start() {
   // Schedulers
   const schedulers = [
     new QueueScheduler(ScheduledQueueName, { connection }),
+    new QueueScheduler(MailQueueName, { connection }),
   ];
 
   // Queues
