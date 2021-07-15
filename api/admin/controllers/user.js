@@ -2,6 +2,7 @@ const { Organization, Site, User } = require('../../models');
 const { paginate, toInt, wrapHandlers } = require('../../utils');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const userSerializer = require('../../serializers/user');
+const Mailer = require('../../services/mailer');
 const OrganizationService = require('../../services/organization');
 
 module.exports = wrapHandlers({
@@ -74,6 +75,10 @@ module.exports = wrapHandlers({
       user, toInt(organizationId), toInt(roleId), uaaEmail, githubUsername
     );
 
+    if (link) {
+      await Mailer.sendUAAInvite(email, link);
+    }
+
     const json = {
       invite: { email, link },
     };
@@ -87,10 +92,14 @@ module.exports = wrapHandlers({
       user,
     } = req;
 
-    const invite = await OrganizationService.resendInvite(user, uaaEmail);
+    const { email, inviteLink: link } = await OrganizationService.resendInvite(user, uaaEmail);
+
+    if (link) {
+      await Mailer.sendUAAInvite(email, link);
+    }
 
     const json = {
-      invite: { email: invite.email, link: invite.inviteLink },
+      invite: { email, link },
     };
 
     return res.json(json);

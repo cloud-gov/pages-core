@@ -1,67 +1,35 @@
+/* eslint-disable no-underscore-dangle */
 const { expect } = require('chai');
-const sinon = require('sinon');
-const QueueWorker = require('../../../api/workers/QueueWorker');
-const { done } = require('fetch-mock');
-const factory = require('../support/factory');
-const jobProcessors = require('../../../api/workers/jobProcessors');
+const IORedis = require('ioredis');
 
-describe('Scheduled', () => {
-  afterEach(() => {
-    sinon.restore();
-  });
-  describe('ScheduledWorker', () => {
-    it('scheduled worker is instantiated', (done) => {
-      const worker = new QueueWorker.QueueWorker('theTest');
-      expect(worker.worker.name).to.equal('theTest');
-      expect(worker.connection.status).to.equal('connecting');
-      expect(worker.QUEUE_NAME).to.equal('theTest');
-      expect(worker.queueEvents.name).to.equal('theTest');
-      expect(worker.scheduler.name).to.equal('theTest');
-      done();
+const { redis: redisConfig } = require('../../../config');
+
+const QueueWorker = require('../../../api/workers/QueueWorker');
+
+describe('QueueWorker', () => {
+  describe('new QueueWorker()', () => {
+    const queueName = 'queue';
+    const processor = () => {};
+
+    let queueWorker;
+
+    before(() => {
+      const connection = new IORedis(redisConfig.url, {
+        tls: redisConfig.tls,
+      });
+      queueWorker = new QueueWorker(queueName, connection, processor);
     });
 
-    describe('processJob', () => {
-      it('nightlyJobs', async () => {
-        const stub = sinon.stub(jobProcessors, 'nightlyBuilds').resolves();
-        const job = { name: 'nightlyBuilds' };
-        await QueueWorker.processJob(job);
-        expect(stub.called).to.be.true;
-      });
+    it('creates a Bull MQ Worker QueueWorker with the provided arguments and defaults', () => {
+      expect(queueWorker.name).to.eq(queueName);
+      expect(queueWorker.processFn).to.eq(processor);
+      expect(queueWorker.opts.concurrency).to.eq(5);
+    });
 
-      it('timeoutBuilds', async () => {
-        const stub = sinon.stub(jobProcessors, 'timeoutBuilds').resolves();
-        const job = { name: 'timeoutBuilds' };
-        await QueueWorker.processJob(job);
-        expect(stub.called).to.be.true;
-      });
-
-      it('archiveBuildLogsDaily', async () => {
-        const stub = sinon.stub(jobProcessors, 'archiveBuildLogsDaily').resolves();
-        const job = { name: 'archiveBuildLogsDaily' };
-        await QueueWorker.processJob(job);
-        expect(stub.called).to.be.true;
-      });
-
-      it('verifyRepos', async () => {
-        const stub = sinon.stub(jobProcessors, 'verifyRepositories').resolves();
-        const job = { name: 'verifyRepositories' };
-        await QueueWorker.processJob(job);
-        expect(stub.called).to.be.true;
-      });
-
-      it('revokeMembershipForInactiveUsers', async () => {
-        const stub = sinon.stub(jobProcessors, 'revokeMembershipForInactiveUsers').resolves();
-        const job = { name: 'revokeMembershipForInactiveUsers' };
-        await QueueWorker.processJob(job);
-        expect(stub.called).to.be.true;
-      });
-
-      it('invalid job name', async () => {
-        const job = { name: 'invalid job name' };
-        const result = await QueueWorker.processJob(job).catch(e => e);
-        expect(result).to.be.an('error');
-        expect(result.message).to.equal(`No processor found for job@name=${job.name}.`);
-      });
+    it('attaches handlers to error, completed, and failed events', () => {
+      expect(queueWorker._events.error).to.have.lengthOf(2);
+      expect(queueWorker._events.completed).to.be.a('function');
+      expect(queueWorker._events.failed).to.be.a('function');
     });
   });
 });
