@@ -155,6 +155,7 @@ module.exports.mail = {
   from: SMTP_FROM,
   host: SMTP_HOST,
   port: SMTP_PORT,
+  pool: true,
   secure: false,
   requireTLS: true,
   auth: {

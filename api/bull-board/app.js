@@ -1,13 +1,14 @@
 const express = require('express');
 const session = require('express-session');
 const Queue = require('bull');
-const { Queue: QueueMQ } = require('bullmq');
 const { createBullBoard } = require('@bull-board/api');
 const { BullAdapter } = require('@bull-board/api/bullAdapter');
 const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
 const { ExpressAdapter } = require('@bull-board/express');
 const IORedis = require('ioredis');
 const helmet = require('helmet');
+
+const { MailQueue, ScheduledQueue } = require('../queues');
 
 const passport = require('./passport');
 const sessionConfig = require('./sessionConfig');
@@ -23,14 +24,14 @@ const createQueue = name => new Queue(name, config.redis.url, {
     tls: config.redis.tls,
   },
 });
-const createQueueMQ = name => new QueueMQ(name, { connection });
 
 const serverAdapter = new ExpressAdapter();
 
 createBullBoard({
   queues: [
     new BullAdapter(createQueue('site-build-queue')),
-    new BullMQAdapter(createQueueMQ('scheduled')),
+    new BullMQAdapter(new MailQueue(connection)),
+    new BullMQAdapter(new ScheduledQueue(connection)),
   ],
   serverAdapter,
 });

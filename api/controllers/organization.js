@@ -1,6 +1,7 @@
 const organizationSerializer = require('../serializers/organization');
 const organizationRoleSerializer = require('../serializers/organization-role');
 const { Organization, OrganizationRole, User } = require('../models');
+const Mailer = require('../services/mailer');
 const OrganizationService = require('../services/organization');
 const { toInt, wrapHandlers } = require('../utils');
 const { fetchModelById } = require('../utils/queryDatabase');
@@ -47,6 +48,10 @@ module.exports = wrapHandlers({
     const newUser = await User.byUAAEmail(email).findOne();
     const member = await OrganizationRole.forOrganization({ id: toInt(id) })
       .findOne({ where: { userId: newUser.id } });
+
+    if (link) {
+      await Mailer.sendUAAInvite(email, link);
+    }
 
     const json = {
       member: organizationRoleSerializer.serialize(member),

@@ -9,7 +9,6 @@ const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelp
 const factory = require('../support/factory');
 const jobProcessors = require('../../../api/workers/jobProcessors');
 
-
 describe('job processors', () => {
   afterEach(() => {
     sinon.restore();
@@ -79,7 +78,7 @@ describe('job processors', () => {
       expect(result).to.be.an('error');
       const dateStr = moment().subtract(1, 'days').startOf('day').format('YYYY-MM-DD');
       expect(result.message.split(',')[0]).to
-        .equal(`Archive build logs for ${dateStr} completed with the following errors:`)
+        .equal(`Archive build logs for ${dateStr} completed with the following errors:`);
     });
   });
 
@@ -124,6 +123,31 @@ describe('job processors', () => {
       ]);
       const result = await jobProcessors.revokeMembershipForInactiveUsers().catch(e => e);
       expect(result).to.not.be.an('error');
+    });
+  });
+
+  describe('multiJobProcessor', () => {
+    context('when a job processor exists for the job', () => {
+      it('invokes the correct job processor', async () => {
+        const jobName = 'job';
+        const job = { name: jobName };
+        const processor = sinon.stub().resolves();
+
+        await jobProcessors.multiJobProcessor({ [jobName]: processor })(job);
+
+        sinon.assert.calledOnceWithExactly(processor, job);
+      });
+    });
+
+    context('when a job processor does not exist for the job', () => {
+      it('throws an error', async () => {
+        const job = { name: 'foo' };
+
+        const error = await jobProcessors.multiJobProcessor({})(job).catch(e => e);
+
+        expect(error).to.be.an('error');
+        expect(error.message).to.eq(`No processor found for job type: ${job.name}.`);
+      });
     });
   });
 });
