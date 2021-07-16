@@ -24,7 +24,7 @@ export const BasicSiteSettings = ({
           After your DNS is pointed to Federalist, you&apos;ll set the
           {' '}
           <a
-            href="https://federalist.18f.gov/pages/how-federalist-works/custom-urls/"
+            href="https://federalist.18f.gov/documentation/custom-domains/#update-your-site-settings"
             target="_blank"
             rel="noopener noreferrer"
             title="Custom URL documentation"
