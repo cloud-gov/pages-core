@@ -40,7 +40,9 @@ module.exports = {
             loader: 'postcss-loader',
             options: {
               sourceMap: true,
-              plugins: [autoprefixer],
+              postcssOptions: {
+                plugins: [autoprefixer],
+              },
             },
           },
           'sass-loader',
@@ -90,6 +92,9 @@ module.exports = {
     // which we don't need, so we'll use this plugin to keep them out of the
     // bundle
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new webpack.DefinePlugin(getFeatureFlags(process.env)),
+    new webpack.DefinePlugin({
+      ...getFeatureFlags(process.env),
+      APP_HOSTNAME: JSON.stringify(process.env.APP_HOSTNAME),
+    }),
   ],
 };

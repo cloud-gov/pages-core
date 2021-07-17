@@ -5,10 +5,19 @@ applications:
     routes:
       - route: federalistapp((env_postfix)).18f.gov
       - route: federalistapp((env_postfix)).apps.internal
-    disk_quota: 2G
-    memory: ((memory))
-    instances: ((instances))
+    processes:
+      - type: web
+        command: yarn start
+        disk_quota: 2G
+        instances: ((instances))
+        memory: ((memory))
+      - type: worker
+        command: yarn start-workers
+        disk_quota: 2G
+        instances: 1
+        memory: ((memory))
     services:
+      - app-((env))-uaa-client
       - federalist-((env))-rds
       - federalist-((env))-s3
       - federalist-((env))-env
@@ -22,7 +31,6 @@ applications:
       - federalist-site-wide-error
       - federalist-((env))-dynamodb-creds
       - federalist-((env))-s3-build-logs
-      - uaa-client
     env:
       NODE_ENV: production
       APP_ENV: ((env))
@@ -36,14 +44,42 @@ applications:
       SOCKET_HOST: https://federalistapp((env_postfix)).18f.gov
       USER_AUDITOR: federalist
       S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
-      FEATURE_ADMIN_AUTH: ((feature_admin_auth))
       FEDERALIST_PREVIEW_HOSTNAME: https://*.sites((env_postfix)).federalist.18f.gov
       PROXY_SITE_TABLE: federalist-proxy-((env))
+      FEATURE_AUTH_GITHUB: ((feature_auth_github))
+      FEATURE_AUTH_UAA: ((feature_auth_uaa))
       FEATURE_PROXY_EDGE_DYNAMO: ((feature_proxy_edge_dynamo))
       FEATURE_PROXY_EDGE_LINKS: ((feature_proxy_edge_links))
-      AUTH_IDP: ((auth_idp))
+      FEATURE_BULL_SITE_BUILD_QUEUE: ((feature_bull_site_build_queue))
+      UAA_HOST: ((uaa_host))
+      NEW_RELIC_APP_NAME: ((new_relic_app_name))
+      SMTP_CERT: ((smtp_cert))
+      SMTP_FROM: ((smtp_from))
+      SMTP_HOST: ((smtp_host))
+      SMTP_PASSWORD: ((smtp_password))
+      SMTP_PORT: ((smtp_port))
+      SMTP_USER: ((smtp_user))
   - name: federalist-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client
     routes:
       - route: admin.federalistapp((env_postfix)).18f.gov
+  - name: federalist-queues-ui((env_postfix))
+    buildpack: nodejs_buildpack
+    command: yarn start-bull-board
+    disk_quota: 2G
+    instances: 1
+    memory: ((memory))
+    routes:
+      - route: queues.federalistapp((env_postfix)).18f.gov
+    services:
+      - app-((env))-uaa-client
+      - federalist-((env))-redis
+    env:
+      NODE_ENV: production
+      APP_ENV: ((env))
+      APP_HOSTNAME: https://queues.federalistapp((env_postfix)).18f.gov
+      LOG_LEVEL: ((log_level))
+      NPM_CONFIG_PRODUCTION: true
+      NODE_MODULES_CACHE: false
+      UAA_HOST: ((uaa_host))

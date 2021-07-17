@@ -33,7 +33,7 @@ async function _fetch(path, opts = {}) {
         authLogout();
         return null;
       }
-      throw r;
+      throw new Error(r.statusText);
     })
     .catch((e) => {
       notification.setError(`API request failed: ${e.message}`);
@@ -53,6 +53,10 @@ function get(path, query) {
     qs = searchString !== '' ? `?${searchString}` : '';
   }
   return _fetch(path + qs);
+}
+
+function post(path, body) {
+  return _fetch(path, { method: 'POST', body: JSON.stringify(body) });
 }
 
 function put(path, body) {
@@ -96,6 +100,26 @@ async function fetchEvents(query = {}) {
   return get('/events', query).catch(() => []);
 }
 
+async function createOrganization(params) {
+  return post('/organizations', params);
+}
+
+async function fetchOrganization(id) {
+  return get(`/organizations/${id}`).catch(() => null);
+}
+
+async function fetchOrganizations(query = {}) {
+  return get('/organizations', query).catch(() => []);
+}
+
+async function updateOrganization(id, params) {
+  return put(`/organizations/${id}`, params);
+}
+
+async function fetchRoles() {
+  return get('/roles').catch(() => []);
+}
+
 async function fetchSite(id) {
   return get(`/sites/${id}`).catch(() => null);
 }
@@ -108,12 +132,24 @@ async function updateSite(id, params) {
   return put(`/sites/${id}`, params).catch(() => null);
 }
 
+async function fetchUserEnvironmentVariables(query = {}) {
+  return get('/user-environment-variables', query).catch(() => []);
+}
+
 async function fetchUser(id) {
   return get(`/users/${id}`).catch(() => null);
 }
 
 async function fetchUsers(query = {}) {
   return get('/users', query).catch(() => []);
+}
+
+async function inviteUser(params) {
+  return post('/users/invite', params);
+}
+
+async function resendInvite(params) {
+  return post('/users/resend-invite', params);
 }
 
 async function logout() {
@@ -128,10 +164,18 @@ export {
   fetchBuilds,
   fetchBuildLog,
   fetchEvents,
+  createOrganization,
+  fetchOrganization,
+  fetchOrganizations,
+  updateOrganization,
+  fetchRoles,
   fetchSite,
   fetchSites,
+  fetchUserEnvironmentVariables,
   fetchUser,
   fetchUsers,
+  inviteUser,
+  resendInvite,
   logout,
   updateSite,
 };

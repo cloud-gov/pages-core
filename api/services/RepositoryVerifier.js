@@ -27,7 +27,7 @@ const verifyRepos = () => Site.findAll({
     [User, 'signedInAt', 'DESC'],
   ],
 })
-  .then(sites => Promise.all(sites.map(site => verifyNextRepo(site))));
+  .then(sites => Promise.allSettled(sites.map(site => verifyNextRepo(site))));
 
 const verifyUserRepos = async (user) => {
   const repoLastVerified = new Date();

@@ -19,6 +19,11 @@ const SideNav = proxyquire('../../../../frontend/components/site/SideNav', {
 describe('<SideNav/>', () => {
   it('should render', () => {
     const props = {
+      config: [{
+        display: 'page',
+        route: 'page',
+        icon: 'IconBook',
+      }],
       siteId: 123,
     };
 

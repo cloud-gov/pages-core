@@ -185,6 +185,222 @@ paths:
           description: Not found
           schema:
             $ref: "Error.json"
+  /organization:
+    get:
+      summary: Fetch all of the current user's organizations
+      responses:
+        200:
+          description: An array of all organizations associated with the current user
+          schema:
+            type: array
+            items:
+              $ref: "Organization.json"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+  /organization/{id}:
+    parameters:
+    - name: id
+      in: path
+      description: The id of the organization
+      type: integer
+      required: true
+    get:
+      summary: Fetch an organization by its ID
+      responses:
+        200:
+          description: The organization specified by the ID
+          schema:
+            $ref: "Organization.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+  /organization/{id}/invite:
+    parameters:
+    - name: id
+      in: path
+      description: The id of the organization
+      type: integer
+      required: true
+    post:
+      summary: Invite a user to a Federalist organization and maybe the platform.
+      parameters:
+        - name: roleId
+          in: body
+          type: number
+          description: The id of the role type
+          required: true
+        - name: uaaEmail
+          in: body
+          type: string
+          description: The UAA email of the invited user
+          required: true
+        - name: githubUsername
+          in: body
+          type: string
+          description: The Github username of the invited user if it exists
+      responses:
+        200:
+          description: The organization role and invite details for the invited user
+          schema:
+            type: object
+            properties:
+              member:
+                description: The organization role for the invited user
+                required: true
+                schema:
+                  $ref: "OrganizationRole.json"
+              invite:
+                description: The invite details
+                required: true
+                schema:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      description: the UAA email for the invited user
+                    link:
+                      type: string
+                      description: The confirmation link for the invited user
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+  /organization/{id}/members:
+    parameters:
+    - name: id
+      in: path
+      description: The id of the organization
+      type: integer
+      required: true
+    get:
+      summary: Fetch members for an organization by its ID
+      responses:
+        200:
+          description: The members for the organization specified by the ID
+          schema:
+            type: array
+            items:
+              $ref: "OrganizationRole.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+  /organization-role:
+    get:
+      summary: Fetch all of the organization roles for the current user
+      responses:
+        200:
+          description: An array of the current users organization roles
+          schema:
+            type: array
+            items:
+              $ref: "OrganizationRole.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+    put:
+      summary: Update the organization role type if the current user has permissions
+      parameters:
+        - name: organizationId
+          in: body
+          type: number
+          description: The id of the organization
+          required: true
+        - name: roleId
+          in: body
+          type: number
+          description: The id of the role type
+          required: true
+        - name: userId
+          in: body
+          type: number
+          description: The id of the target user
+          required: true
+      responses:
+        200:
+          description: The updated organization role object
+          schema:
+            $ref: "OrganizationRole.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+    delete:
+      summary: Delete the organization role if the current user has permissions
+      parameters:
+        - name: organizationId
+          in: body
+          type: number
+          description: The id of the organization
+          required: true
+        - name: userId
+          in: body
+          type: number
+          description: The id of the target user
+          required: true
+      responses:
+        200:
+          description: The updated organization role object
+          schema:
+            type: object
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+  /role:
+    get:
+      summary: Fetch all of the roles
+      responses:
+        200:
+          description: An array of all roles
+          schema:
+            type: array
+            items:
+              $ref: "Role.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"  
   /site:
     get:
       summary: Fetch all of the current user's sites
@@ -198,7 +414,7 @@ paths:
         401:
           description: Unauthorized
           schema:
-            $ref: "Error.json"         
+            $ref: "Error.json"
         403:
           description: Not authorized
           schema:
@@ -276,7 +492,7 @@ paths:
         401:
           description: Unauthorized
           schema:
-            $ref: "Error.json"            
+            $ref: "Error.json"
         403:
           description: Not authorized
           schema:
@@ -640,11 +856,11 @@ paths:
         404:
           description: Not found
           schema:
-            $ref: "Error.json"            
+            $ref: "Error.json"
     post:
       summary: Add the user environment variable to a site based on the site id
       parameters:
-        - name: user-environment-variable 
+        - name: user-environment-variable
           schema:
             type: object
             properties:
@@ -679,20 +895,6 @@ paths:
           description: A user object representing the current Federalist user
           schema:
             $ref: "User.json"
-        403:
-          description: Not authorized
-          schema:
-            $ref: "Error.json"
-  /usernames:
-    get:
-      summary: Fetch the usernames for every user in federalist
-      responses:
-        200:
-          description: An array of usernames with an element for each Federalist user
-          schema:
-            type: array
-            items:
-              type: object
         403:
           description: Not authorized
           schema:

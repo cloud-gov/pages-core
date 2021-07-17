@@ -1,14 +1,11 @@
 <script>
+  import { objToQueryString } from '../lib/utils';
+
   export let pagination;
   export let extraParams = {};
 
   function toParams(updates = {}) {
-    const p = { ...extraParams, ...updates };
-    const searchParams = new URLSearchParams();
-    Object.keys(p).forEach((key) => {
-      searchParams.set(key, p[key]);
-    });
-    return searchParams.toString();
+    return objToQueryString({ ...extraParams, ...updates });
   }
 </script>
 

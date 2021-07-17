@@ -23,14 +23,37 @@ services:
       - "8080:8080" # for serving test coverage html
     depends_on:
       - db
+      - redis
+      - uaa
     environment:
       JWT_SECRET: 'shhHhh...'
       USER_AUDITOR: federalist
-      FEATURE_PROXY_EDGE_LINKS: 'true'
-      FEATURE_PROXY_EDGE_DYNAMO: 'true'
-      FEATURE_ADMIN_AUTH: 'true'
+      FEATURE_AUTH_GITHUB: 'false'
+      FEATURE_AUTH_UAA: 'true'
+      FEATURE_PROXY_EDGE_LINKS: 'false'
+      FEATURE_PROXY_EDGE_DYNAMO: 'false'
       APP_HOSTNAME: http://localhost:1337
-      AUTH_IDP: uaa
+      UAA_HOST: http://localhost:9000
+      UAA_HOST_DOCKER_URL: http://uaa:8080
+  bull-board:
+    build:
+      dockerfile: Dockerfile-app
+      context: .
+    command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "start-bull-board"]
+    volumes:
+      - yarn:/usr/local/share/.cache/yarn
+      - .:/app
+      - /app/admin-client/
+      - nm-app:/app/node_modules
+    ports:
+      - "1338:1338"
+    depends_on:
+      - redis
+      - uaa
+    environment:
+      APP_HOSTNAME: http://localhost:1338
+      UAA_HOST: http://localhost:9000
+      UAA_HOST_DOCKER_URL: http://uaa:8080
   admin-client:
     build:
       dockerfile: ./admin-client/Dockerfile-admin
@@ -57,3 +80,38 @@ services:
       POSTGRES_DB: federalist
       POSTGRES_TEST_DB: federalist-test
       POSTGRES_PASSWORD: password
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+  uaa:
+    build:
+      dockerfile: ./Dockerfile-uaa
+      context: .
+    ports:
+      - 9000:8080
+    environment:
+      POSTGRES_DB: federalist
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    depends_on:
+      - db
+    command: ["/tomcat/bin/catalina.sh", "run"]
+  worker:
+    build:
+      dockerfile: Dockerfile-app
+      context: .
+    command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "start-workers"]
+    volumes:
+      - yarn:/usr/local/share/.cache/yarn
+      - .:/app
+      - /app/admin-client/
+      - nm-app:/app/node_modules
+    depends_on:
+      - db
+      - redis
+    environment:
+      APP_HOSTNAME: http://localhost:1337
+      NODE_ENV: development

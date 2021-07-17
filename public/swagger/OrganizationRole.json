@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "required": [
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "Organization": {
+      "oneOf": [
+        { "type": ["null"] },
+        { "$ref": "Organization.json" }
+      ]
+    },
+    "Role": {
+      "oneOf": [
+        { "type": ["null"] },
+        { "$ref": "Role.json" }
+      ]
+    },
+    "User": {
+      "oneOf": [
+        { "type": ["null"] },
+        { "$ref": "User.json" }
+      ]
+    }
+  }
+}

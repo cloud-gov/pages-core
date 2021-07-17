@@ -21,6 +21,11 @@
                 <span>Sites</span>
               </a>
             </li>
+            <li>
+              <a class="usa-nav-link" href="/organizations">
+                <span>Organizations</span>
+              </a>
+            </li>            
           {% endif %}
           <li>
             <a class="usa-nav-link" href="{{ homepageUrl }}/documentation/">
@@ -38,12 +43,20 @@
             </a>
           </li>
           {% if isAuthenticated %}
-          <li class="nav-action">
-            <a class="usa-button usa-button-white" href="/logout">Log out</a>
-          </li>
+            <li class="nav-action">
+              {% if hasUAAIdentity %}
+                <a class="usa-button usa-button-white" href="/logout">Log out</a>
+              {% else %}
+                <a class="usa-button usa-button-white" href="/logout/github">Log out</a>
+              {% endif %}
+            </li>
           {% else %}
             <li  class="nav-action">
-              <a href="/login" class="usa-button usa-button-white">Log in</a>
+              {% if authUAA %}
+                <a href="/login" class="usa-button usa-button-white">Log in with cloud.gov</a>
+              {% else %}
+                <a href="/login/github" class="usa-button usa-button-white">Log in with Github</a>
+              {% endif %}
             </li>
           {% endif %}
         </ul>

@@ -1,4 +1,4 @@
-const env = require('../services/environment.js')();
+const env = require('../services/environment')();
 
 module.exports = {
   teams18F: [

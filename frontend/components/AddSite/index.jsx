@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 
-import { USER, ALERT } from '../../propTypes';
+import { ALERT, ORGANIZATIONS, USER } from '../../propTypes';
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
 import AlertBanner from '../alertBanner';
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
+import { hasOrgs } from '../../selectors/organization';
 
 function getOwnerAndRepo(repoUrl) {
   const owner = repoUrl.split('/')[3];
@@ -20,13 +20,7 @@ function getOwnerAndRepo(repoUrl) {
 export class AddSite extends React.Component {
   constructor(props) {
     super(props);
-
-    autoBind(
-      this,
-      'onAddUserSubmit',
-      'onCreateSiteSubmit',
-      'onSubmitTemplate'
-    );
+    this.onCreateSiteSubmit = this.onCreateSiteSubmit.bind(this);
   }
 
   componentWillUnmount() {
@@ -40,10 +34,13 @@ export class AddSite extends React.Component {
     siteActions.addUserToSite({ owner, repository });
   }
 
-  onCreateSiteSubmit({ repoUrl, engine }) {
+  onCreateSiteSubmit({ repoUrl, engine, repoOrganizationId }) {
+    const { organizations } = this.props;
     const { owner, repository } = getOwnerAndRepo(repoUrl);
+
+    const organizationId = hasOrgs(organizations) ? repoOrganizationId : null;
     siteActions.addSite({
-      owner, repository, engine,
+      owner, repository, engine, organizationId,
     });
   }
 
@@ -60,7 +57,7 @@ export class AddSite extends React.Component {
   render() {
     // select the function to use on form submit based on
     // the showAddNewSiteFields flag
-    const { showAddNewSiteFields } = this.props;
+    const { organizations, showAddNewSiteFields } = this.props;
 
     const formSubmitFunc = showAddNewSiteFields
       ? this.onCreateSiteSubmit : this.onAddUserSubmit;
@@ -88,12 +85,14 @@ export class AddSite extends React.Component {
           <h2>Use your own GitHub repository</h2>
           <AddRepoSiteForm
             initialValues={{ engine: 'jekyll' }}
+            organizations={organizations}
             showAddNewSiteFields={showAddNewSiteFields}
             onSubmit={formSubmitFunc}
           />
           <TemplateSiteList
             handleSubmitTemplate={this.onSubmitTemplate}
             defaultOwner={this.defaultOwner()}
+            organizations={organizations}
           />
         </div>
       </div>
@@ -103,6 +102,7 @@ export class AddSite extends React.Component {
 
 AddSite.propTypes = {
   alert: ALERT,
+  organizations: ORGANIZATIONS.isRequired,
   showAddNewSiteFields: PropTypes.bool,
   user: USER,
 };
@@ -113,8 +113,11 @@ AddSite.defaultProps = {
   user: null,
 };
 
-const mapStateToProps = ({ alert, showAddNewSiteFields, user }) => ({
+const mapStateToProps = ({
+  alert, organizations, showAddNewSiteFields, user,
+}) => ({
   alert,
+  organizations,
   showAddNewSiteFields,
   user,
 });

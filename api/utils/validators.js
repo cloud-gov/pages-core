@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 const yaml = require('js-yaml');
 const validator = require('validator');
 
@@ -8,9 +9,16 @@ const subdomainRegex = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/;
 
 class ValidationError extends Error {}
 
+class CustomError extends Error {
+  constructor(message, status = 400) {
+    super(message);
+    this.status = status;
+  }
+}
+
 function isValidYaml(yamlString) {
   try {
-    yaml.safeLoad(yamlString);
+    yaml.load(yamlString);
   } catch (e) {
     // for Sequelize validators, we need to throw an error
     // on invalid values
@@ -25,7 +33,7 @@ function parseSiteConfig(siteConfig, configName = null) {
 
   try {
     if ((typeof siteConfig) === 'string' && siteConfig.length > 0) {
-      obj = yaml.safeLoad(siteConfig);
+      obj = yaml.load(siteConfig);
     }
 
     if ((typeof siteConfig) === 'object') { return siteConfig; }
@@ -90,6 +98,7 @@ const validBasicAuthPassword = s => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,255}$/.t
 
 module.exports = {
   branchRegex,
+  CustomError,
   shaRegex,
   githubUsernameRegex,
   isValidYaml,

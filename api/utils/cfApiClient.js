@@ -1,12 +1,12 @@
-const request = require('request');
-const url = require('url');
 const config = require('../../config');
 const CloudFoundryAuthClient = require('./cfAuthClient');
+const HttpClient = require('./httpClient');
 const { filterEntity, firstEntity, objToQueryParams } = require('.');
 
 class CloudFoundryAPIClient {
   constructor() {
     this.authClient = new CloudFoundryAuthClient();
+    this.httpClient = new HttpClient(config.env.cfApiHost);
   }
 
   cancelTask(taskGuid) {
@@ -195,38 +195,16 @@ class CloudFoundryAPIClient {
     return this.authClient.accessToken();
   }
 
-  parser(body, resolver) {
-    try {
-      const parsed = JSON.parse(body);
-      resolver(parsed);
-    } catch (e) {
-      resolver(body);
-    }
-  }
-
   request(method, path, accessToken, json) {
-    return new Promise((resolve, reject) => {
-      request({
-        method: method.toUpperCase(),
-        url: url.resolve(
-          config.env.cfApiHost,
-          path
-        ),
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        json,
-      }, (error, response, body) => {
-        if (error) {
-          reject(error);
-        } else if (response.statusCode > 399) {
-          const errorMessage = `Received status code: ${response.statusCode}`;
-          reject(new Error(JSON.stringify(body) || errorMessage));
-        } else {
-          this.parser(body, resolve);
-        }
-      });
-    });
+    return this.httpClient.request({
+      method,
+      url: path,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      data: json,
+    })
+      .then(response => response.data);
   }
 
   authRequest(method, path, json) {

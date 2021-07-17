@@ -1,4 +1,19 @@
 const yaml = require('js-yaml');
+const { hasOrgs } = require('../selectors/organization');
+
+const validAddRepoSiteForm = ({ repoOrganizationId, repoUrl }, { organizations }) => {
+  const errors = {};
+
+  if (!repoUrl) {
+    errors.repoUrl = 'Please enter a Github repository URL';
+  }
+
+  if (hasOrgs(organizations) && !repoOrganizationId) {
+    errors.repoOrganizationId = 'Please select an organization';
+  }
+
+  return errors;
+};
 
 const validBranchName = s => /^[\w._]+(?:[/-]*[\w._])*$/.test(s);
 
@@ -8,7 +23,7 @@ const validBasicAuthPassword = s => (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,255}$/.
 
 function isValidYaml(yamlString) {
   try {
-    yaml.safeLoad(yamlString);
+    yaml.load(yamlString);
   } catch (e) {
     // for Sequelize validators, we need to throw an error
     // on invalid values
@@ -20,6 +35,7 @@ function isValidYaml(yamlString) {
 
 module.exports = {
   isValidYaml,
+  validAddRepoSiteForm,
   validBranchName,
   validBasicAuthUsername,
   validBasicAuthPassword,

@@ -1,21 +1,21 @@
 const Passport = require('passport');
 const config = require('../../config');
 const { User } = require('../models');
-const { createUAAStrategy } = require('../services/uaaStrategy');
+const { createUAAStrategy, verifyUAAUser } = require('../services/uaaStrategy');
 
 const passport = new Passport.Passport();
 
-const uaaOptions = config.passport.uaa.adminOptions;
+const uaaOptions = {
+  ...config.passport.uaa.options,
+  callbackURL: `${config.app.hostname}/admin/auth/uaa/callback`,
+  logoutCallbackURL: `${config.app.hostname}/admin/auth/uaa/logout`,
+};
 
-const verify = async (accessToken, _refreshToken, profile, callback) => {
-  const { email } = profile;
-
+const verify = async (accessToken, refreshToken, profile, callback) => {
   try {
-    const user = await User.findOne({ where: { adminEmail: email } });
+    const user = await verifyUAAUser(accessToken, refreshToken, profile, ['pages.admin']);
 
-    if (!user) {
-      return callback(null, false);
-    }
+    if (!user) return callback(null, false);
 
     return callback(null, user);
   } catch (err) {

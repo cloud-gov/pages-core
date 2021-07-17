@@ -3,13 +3,13 @@ const sinon = require('sinon');
 const factory = require('../../support/factory');
 const { Build, Site, User } = require('../../../../api/models');
 const ScheduledBuildHelper = require('../../../../api/services/ScheduledBuildHelper');
-const SQS = require('../../../../api/services/SQS');
+const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
 
 describe('ScheduledBuildHelper', () => {
   const nightlyConfig = { schedule: 'nightly' };
 
   before(async () => {
-    sinon.stub(SQS, 'sendBuildMessage').resolves();
+    sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
     await factory.user({ username: process.env.USER_AUDITOR });
   });
 
@@ -18,7 +18,7 @@ describe('ScheduledBuildHelper', () => {
     await Promise.all([
       Build.truncate(),
       Site.truncate(),
-      User.truncate({ force: true }),
+      User.truncate({ force: true, cascade: true }),
     ]);
   });
 

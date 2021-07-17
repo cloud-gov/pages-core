@@ -5,7 +5,7 @@ const sinon = require('sinon');
 const request = require('supertest');
 const app = require('../../../../app');
 const { Build, Site, User, Event } = require('../../../../api/models');
-const SQS = require('../../../../api/services/SQS');
+const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
 const EventCreator = require('../../../../api/services/EventCreator');
 const GithubBuildHelper = require('../../../../api/services/GithubBuildHelper');
 
@@ -46,13 +46,13 @@ describe('Webhooks Service', () => {
   afterEach(() => {
     sinon.restore();
   });
-  
+
   describe('pushWebhookRequest', () => {
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.status();
       githubAPINocks.repo({ response: [201, { permissions: { admin: false, push: true } }] });
-      sinon.stub(SQS, 'sendBuildMessage').resolves();
+      sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
     });
 
     it('should create a new site build for the sender', async () => {
@@ -62,10 +62,10 @@ describe('Webhooks Service', () => {
       expect(numBuildsBefore).to.eq(0);
 
       const payload = buildWebhookPayload(user, site);
-      
+
 
       await Webhooks.pushWebhookRequest(payload);
-      
+
       const numBuildsAfter = await Build.count({
         where: {
           site: site.id,
@@ -74,7 +74,7 @@ describe('Webhooks Service', () => {
           requestedCommitSha: payload.after,
         },
       });
-        
+
       expect(numBuildsAfter).to.eq(1);
     });
 
@@ -83,7 +83,7 @@ describe('Webhooks Service', () => {
 
       const site = await factory.site();
       const payload = buildWebhookPayload({ username }, site);
-      
+
 
       await Webhooks.pushWebhookRequest(payload);
 
@@ -107,7 +107,7 @@ describe('Webhooks Service', () => {
 
       const payload = buildWebhookPayload(user, site);
       payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
-      
+
       expect(reporterSpy.calledOnce).to.be.false;
 
       await Webhooks.pushWebhookRequest(payload);
@@ -132,7 +132,7 @@ describe('Webhooks Service', () => {
         .then(({ user, site }) => {
           const payload = buildWebhookPayload(user, site);
           payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
-          
+
 
           githubAPINocks.repo({
             accessToken: user.githubAccessToken,
@@ -158,10 +158,10 @@ describe('Webhooks Service', () => {
 
       const payload = buildWebhookPayload(user, site);
       payload.commits = [];
-      
+
 
       await Webhooks.pushWebhookRequest(payload);
-      
+
       const numBuildsAfter = await Build.count({ where: { site: site.id, user: user.id } });
       expect(numBuildsAfter).to.eq(0);
     });
@@ -173,10 +173,10 @@ describe('Webhooks Service', () => {
         repository: 'fake-repo-name',
       });
       const startCount = await Build.count();
-      
+
 
       await Webhooks.pushWebhookRequest(payload);
-      
+
       const endCount = await Build.count();
       expect(endCount).to.equal(startCount);
     });
@@ -188,7 +188,7 @@ describe('Webhooks Service', () => {
         owner: site.owner,
         repository: site.repository,
       });
-      
+
       const startCount = await Build.count();
 
       await Webhooks.pushWebhookRequest(payload);
@@ -216,7 +216,7 @@ describe('Webhooks Service', () => {
         expect(numBuildsBefore).to.eq(1);
 
         const payload = buildWebhookPayload(user, site);
-        
+
 
         await Webhooks.pushWebhookRequest(payload);
 
@@ -246,7 +246,7 @@ describe('Webhooks Service', () => {
         expect(numBuildsBefore).to.eq(1);
 
         const payload = buildWebhookPayload(user2, site);
-        
+
 
         await Webhooks.pushWebhookRequest(payload);
 
@@ -275,7 +275,7 @@ describe('Webhooks Service', () => {
 
         const payload = buildWebhookPayload(user, site);
         payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
-        
+
 
         githubAPINocks.repo({
           accessToken: user.githubAccessToken,
@@ -310,7 +310,7 @@ describe('Webhooks Service', () => {
         expect(numBuildsBefore).to.eq(1);
 
         const payload = buildWebhookPayload(user, site);
-        
+
 
         await Webhooks.pushWebhookRequest(payload);
 
@@ -340,7 +340,7 @@ describe('Webhooks Service', () => {
         expect(numBuildsBefore).to.eq(1);
 
         const payload = buildWebhookPayload(user2, site);
-        
+
 
         await Webhooks.pushWebhookRequest(payload);
 
@@ -369,7 +369,7 @@ describe('Webhooks Service', () => {
 
         const payload = buildWebhookPayload(user, site);
         payload.repository.full_name = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
-        
+
 
         githubAPINocks.repo({
           accessToken: user.githubAccessToken,
@@ -395,7 +395,7 @@ describe('Webhooks Service', () => {
           user = model;
           expect(user.isActive).to.be.true;
           payload = organizationWebhookPayload('member_removed', user.username);
-          
+
 
           return Webhooks.organizationWebhookRequest(payload);
         })
@@ -414,7 +414,7 @@ describe('Webhooks Service', () => {
         .then((user) => {
           expect(user).to.be.null;
           const payload = organizationWebhookPayload('member_added', username);
-          
+
 
           return Webhooks.organizationWebhookRequest(payload);
         })
@@ -435,7 +435,7 @@ describe('Webhooks Service', () => {
           user = model;
           expect(user.isActive).to.be.false;
           const payload = organizationWebhookPayload('member_added', user.username);
-          
+
 
           return Webhooks.organizationWebhookRequest(payload);
         })
@@ -453,7 +453,7 @@ describe('Webhooks Service', () => {
     it('should do nothing if org webhook for non added/removed_member', async () => {
       const user = User.build({ username: 'rando-user' })
       const payload = organizationWebhookPayload('member_invited', user.username);
-      
+
 
       await Webhooks.organizationWebhookRequest(payload);
 
@@ -464,7 +464,7 @@ describe('Webhooks Service', () => {
       let payload;
       let origUserCount;
       payload = organizationWebhookPayload('member_removed', 'rando-user');
-      
+
       User.count()
         .then((count) => {
           origUserCount = count;
@@ -484,7 +484,7 @@ describe('Webhooks Service', () => {
       factory.user({ isActive: true })
         .then((user) => {
           const payload = organizationWebhookPayload('member_removed', user.username, 'not-federalist-users');
-          
+
           return Webhooks.organizationWebhookRequest(payload);
         })
         .then(() => {
@@ -498,7 +498,7 @@ describe('Webhooks Service', () => {
         .then((user) => {
           expect(user.isActive).to.be.true;
           const payload = organizationWebhookPayload('member_ignored_action', user.username);
-          
+
 
           return Webhooks.organizationWebhookRequest(payload);
         })

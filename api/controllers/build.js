@@ -148,7 +148,11 @@ module.exports = wrapHandlers({
 
     emitBuildStatus(build);
 
-    await GithubBuildHelper.reportBuildStatus(build);
+    // The `requestedCommitSha` will not be present for initial builds
+    // and there is no need to report status to Github
+    if (build.requestedCommitSha) {
+      await GithubBuildHelper.reportBuildStatus(build);
+    }
 
     if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
       if (buildStatus.status === Build.States.Success) {

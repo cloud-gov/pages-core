@@ -8,7 +8,7 @@ const config = require('../../../config');
 const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
 const { Build, Site, User, Event } = require('../../../api/models');
-const SQS = require('../../../api/services/SQS');
+const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
 const EventCreator = require('../../../api/services/EventCreator');
 const GithubBuildHelper = require('../../../api/services/GithubBuildHelper');
 
@@ -52,7 +52,7 @@ describe('Webhook API', () => {
   afterEach(() => {
     sinon.restore();
   });
-  
+
   describe('POST /webhook/github', () => {
     let pushWebhookRequestStub;
     beforeEach(() => {
@@ -75,7 +75,7 @@ describe('Webhook API', () => {
           'X-GitHub-Delivery': '123abc',
         })
         .expect(400);
-      
+
       sinon.assert.notCalled(pushWebhookRequestStub);
     });
 
@@ -119,7 +119,7 @@ describe('Webhook API', () => {
           'X-GitHub-Delivery': '123abc',
         })
         .expect(400);
-      
+
       sinon.assert.notCalled(organizationWebhookRequestStub);
     });
 

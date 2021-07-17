@@ -1,6 +1,8 @@
 import { expect } from 'chai';
 
-import { getSafeRepoName, groupLogs } from '../../../frontend/util';
+import {
+  getSafeRepoName, groupLogs,
+} from '../../../frontend/util';
 
 describe('getSafeRepoName', () => {
   it('returns safe repo names', () => {

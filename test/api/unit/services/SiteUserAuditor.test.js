@@ -8,7 +8,7 @@ const SiteUserAuditor = proxyquire('../../../../api/services/SiteUserAuditor', {
 
 describe('SiteUserAuditor', () => {
   before(() => factory.user({ username: process.env.USER_AUDITOR }));
-  after(() => User.truncate({ force: true }));
+  after(() => User.truncate({ force: true, cascade: true }));
 
   context('auditAllUsers', () => {
     it('it should remove sites without push from user and site w/o repo', (done) => {

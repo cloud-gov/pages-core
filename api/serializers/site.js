@@ -1,6 +1,6 @@
 const yaml = require('js-yaml');
 const { omitBy, pick } = require('../utils');
-const { Site, User } = require('../models');
+const { Organization, Site, User } = require('../models');
 const userSerializer = require('./user');
 const { siteViewLink, hideBasicAuthPassword } = require('../utils/site');
 
@@ -16,6 +16,7 @@ const allowedAttributes = [
   'repository',
   's3ServiceName',
   'awsBucketName',
+  'Organization',
   'Users',
 ];
 
@@ -49,7 +50,7 @@ function serializeNew(site, isSystemAdmin = false) {
 
   yamlFields
     .filter(yamlField => object[yamlField])
-    .forEach((yamlField) => { filtered[yamlField] = yaml.safeDump(object[yamlField]); });
+    .forEach((yamlField) => { filtered[yamlField] = yaml.dump(object[yamlField]); });
 
   Object
     .keys(viewLinks)
@@ -64,24 +65,29 @@ function serializeNew(site, isSystemAdmin = false) {
   return omitBy((v => v === null), filtered);
 }
 
-// Eventually replace `serialize` for arrays
-function serializeMany(sites, isSystemAdmin) {
-  return sites.map(site => serializeNew(site, isSystemAdmin));
-}
-
-const serializeObject = (site) => {
-  const json = serializeNew(site);
+const serializeObject = (site, isSystemAdmin) => {
+  const json = serializeNew(site, isSystemAdmin);
 
   if (json.Users) {
     json.users = site.Users.map(u => userSerializer.toJSON(u));
     delete json.Users;
   }
 
+  if (json.Organization) {
+    json.organizationId = site.Organization.id;
+    delete json.Organization;
+  }
+
   return json;
 };
 
+// Eventually replace `serialize` for arrays
+function serializeMany(sites, isSystemAdmin) {
+  return sites.map(site => serializeObject(site, isSystemAdmin));
+}
+
 const serialize = (serializable) => {
-  const include = [User.scope('withGithub')];
+  const include = [User.scope('withGithub'), Organization];
 
   if (serializable.length !== undefined) {
     const siteIds = serializable.map(site => site.id);
