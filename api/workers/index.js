@@ -24,8 +24,14 @@ const nightlyJobConfig = {
 };
 
 async function start() {
-  const mailer = new Mailer();
-  await mailer.verify();
+  // Hack to not run the mailer for Federalist until we have a better feature flag
+  const runMailer = process.env.SMTP_HOST !== 'NA';
+
+  let mailer;
+  if (runMailer) {
+    mailer = new Mailer();
+    await mailer.verify();
+  }
 
   const connection = new IORedis(redisConfig.url, {
     tls: redisConfig.tls,
@@ -40,33 +46,41 @@ async function start() {
     verifyRepositories: Processors.verifyRepositories,
   });
 
-  const mailJobProcessor = job => mailer.send(job.data);
-
   // Workers
   const workers = [
     new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
-    new QueueWorker(MailQueueName, connection, mailJobProcessor),
   ];
 
   // Schedulers
   const schedulers = [
     new QueueScheduler(ScheduledQueueName, { connection }),
-    new QueueScheduler(MailQueueName, { connection }),
   ];
+
+  if (runMailer) {
+    const mailJobProcessor = job => mailer.send(job.data);
+    workers.push(new QueueWorker(MailQueueName, connection, mailJobProcessor));
+    schedulers.push(new QueueScheduler(MailQueueName, { connection }));
+  }
 
   // Queues
   const scheduledQueue = new ScheduledQueue(connection);
 
   const cleanup = async () => {
     logger.info('Worker process received request to shutdown, cleaning up and shutting down.');
+    const closables = [
+      ...workers,
+      ...schedulers,
+      scheduledQueue,
+    ];
+
+    if (runMailer) {
+      closables.push(mailer);
+    }
+
     await Promise.all(
-      [
-        ...workers,
-        ...schedulers,
-        scheduledQueue,
-        mailer,
-      ].map(closable => closable.close())
+      closables.map(closable => closable.close())
     );
+
     logger.info('Worker process all cleaned up, shutting down.');
     process.exit(0);
   };
