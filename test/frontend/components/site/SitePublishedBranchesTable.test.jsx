@@ -10,9 +10,9 @@ proxyquire.noCallThru();
 const publishedBranchesSpy = {
   fetchPublishedBranches: spy(),
 };
-const SitePublishedBranchesTable = proxyquire('../../../../frontend/components/site/sitePublishedBranchesTable', {
+const { SitePublishedBranchesTable } = proxyquire('../../../../frontend/components/site/sitePublishedBranchesTable', {
   '../../actions/publishedBranchActions': publishedBranchesSpy,
-}).SitePublishedBranchesTable;
+});
 
 const completeProps = {
   publishedBranches: {
@@ -38,6 +38,9 @@ describe('<SitePublishedBranchesTable/>', () => {
   it('should render a loading state if branch data is loading', () => {
     const props = {
       publishedBranches: { isLoading: true },
+      site: {
+        id: 1,
+      },
     };
 
     const wrapper = shallow(<SitePublishedBranchesTable {...props} />);
@@ -48,6 +51,9 @@ describe('<SitePublishedBranchesTable/>', () => {
   it('should render an empty state if there are no published branches', () => {
     const props = {
       publishedBranches: { isLoading: false, data: [] },
+      site: {
+        id: 1,
+      },
     };
 
     const wrapper = shallow(<SitePublishedBranchesTable {...props} />);

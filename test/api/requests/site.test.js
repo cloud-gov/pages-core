@@ -15,11 +15,13 @@ const { authenticatedSession, unauthenticatedSession } = require('../support/ses
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const csrfToken = require('../support/csrfToken');
 
-const { Build, Site, User } = require('../../../api/models');
+const {
+  Build, Organization, Role, Site, User,
+} = require('../../../api/models');
 const S3SiteRemover = require('../../../api/services/S3SiteRemover');
 const siteErrors = require('../../../api/responses/siteErrors');
 const ProxyDataSync = require('../../../api/services/ProxyDataSync');
-const SQS = require('../../../api/services/SQS');
+const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
 const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
 const EventCreator = require('../../../api/services/EventCreator');
 
@@ -33,12 +35,16 @@ describe('Site API', () => {
     process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
     removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').resolves();
     saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').resolves();
-    sinon.stub(SQS, 'sendBuildMessage').resolves();
+    sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
     sinon.stub(EventCreator, 'error').resolves();
+
+    return factory.organization.truncate();
   });
 
   afterEach(() => {
     sinon.restore();
+
+    return factory.organization.truncate();
   });
 
   after(() => {
@@ -156,7 +162,7 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should respond with a 403 if the user is not associated with the site', (done) => {
+    it('should respond with a 404 if the user is not associated with the site', (done) => {
       let site;
 
       factory.site().then((model) => {
@@ -165,9 +171,9 @@ describe('Site API', () => {
       }).then(cookie => request(app)
         .get(`/v0/site/${site.id}`)
         .set('Cookie', cookie)
-        .expect(403))
+        .expect(404))
         .then((response) => {
-          validateAgainstJSONSchema('GET', '/site/{id}', 403, response.body);
+          validateAgainstJSONSchema('GET', '/site/{id}', 404, response.body);
           done();
         })
         .catch(done);
@@ -366,6 +372,54 @@ describe('Site API', () => {
         .catch(done);
     });
 
+    it('should create a new site from an existing repository and associate it to an org', async () => {
+      const siteOwner = crypto.randomBytes(3).toString('hex');
+      const siteRepository = crypto.randomBytes(3).toString('hex');
+      const org = await factory.organization.create();
+      const role = await Role.findOne({ where: { name: 'user' } });
+
+      cfMockServices(siteOwner, siteRepository);
+
+      return factory.user()
+        .then(user => org.addUser(user, { through: { roleId: role.id } })
+          .then(() => user))
+        .then((user) => {
+          githubAPINocks.userOrganizations({
+            accessToken: user.githubAccessToken,
+            organizations: [{ login: siteOwner }],
+          });
+
+          return authenticatedSession(user);
+        })
+        .then(cookie => request(app)
+          .post('/v0/site')
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            owner: siteOwner,
+            repository: siteRepository,
+            defaultBranch: 'main',
+            engine: 'jekyll',
+            organizationId: org.id,
+          })
+          .set('Cookie', cookie)
+          .expect(200))
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site', 200, response.body);
+          return Site.findOne({
+            where: {
+              owner: siteOwner,
+              repository: siteRepository,
+            },
+            include: [Organization],
+          });
+        })
+        .then((site) => {
+          expect(site).to.not.be.undefined;
+          expect(site.Organization.id).to.equal(org.id);
+          expect(saveSiteStub.calledOnce).to.equal(true);
+        });
+    });
+
     it('should not call ProxyDataSync when FEATURE_PROXY_EDGE_DYNAMO=false', (done) => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
@@ -451,6 +505,57 @@ describe('Site API', () => {
           done();
         })
         .catch(done);
+    });
+
+    it('should create a new repo and site from a template and associate it to an org', async () => {
+      const siteOwner = crypto.randomBytes(3).toString('hex');
+      const siteRepository = crypto.randomBytes(3).toString('hex');
+      const user = await factory.user();
+      const org = await factory.organization.create();
+      const role = await Role.findOne({ where: { name: 'user' } });
+      await org.addUser(user, { through: { roleId: role.id } });
+
+      cfMockServices(siteOwner, siteRepository);
+
+      nock.cleanAll();
+      githubAPINocks.repo();
+      githubAPINocks.webhook();
+
+      cfMockServices(siteOwner, siteRepository);
+
+      const createRepoNock = githubAPINocks.createRepoUsingTemplate({
+        org: siteOwner,
+        repo: siteRepository,
+      });
+
+      return authenticatedSession(user).then(cookie => request(app)
+        .post('/v0/site')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          owner: siteOwner,
+          repository: siteRepository,
+          defaultBranch: 'main',
+          engine: 'jekyll',
+          organizationId: org.id,
+          template: 'uswds2',
+        })
+        .set('Cookie', cookie)
+        .expect(200))
+        .then((response) => {
+          validateAgainstJSONSchema('POST', '/site', 200, response.body);
+          return Site.findOne({
+            where: {
+              owner: siteOwner,
+              repository: siteRepository,
+            },
+            include: [Organization],
+          });
+        })
+        .then((site) => {
+          expect(site).to.not.be.undefined;
+          expect(site.Organization.id).to.equal(org.id);
+          expect(createRepoNock.isDone()).to.equal(true);
+        });
     });
 
     it('should respond with a 403 if no user or repository is specified', (done) => {
@@ -1269,9 +1374,9 @@ describe('Site API', () => {
           .delete(`/v0/site/${site.id}`)
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
-          .expect(403))
+          .expect(404))
         .then((response) => {
-          validateAgainstJSONSchema('DELETE', '/site/{id}', 403, response.body);
+          validateAgainstJSONSchema('DELETE', '/site/{id}', 404, response.body);
           return Site.findAll({ where: { id: site.id } });
         })
         .then((sites) => {
@@ -1447,9 +1552,9 @@ describe('Site API', () => {
         previewConfig: { name: 'old-preview-config' },
       };
       const newConfigs = {
-        defaultConfig: yaml.safeDump({ name: 'new-config' }),
-        demoConfig: yaml.safeDump({ name: 'new-demo-config' }),
-        previewConfig: yaml.safeDump({ name: 'new-preview-config' }),
+        defaultConfig: yaml.dump({ name: 'new-config' }),
+        demoConfig: yaml.dump({ name: 'new-demo-config' }),
+        previewConfig: yaml.dump({ name: 'new-preview-config' }),
       };
       factory.site(origConfigs)
         .then(s => Site.findByPk(s.id, { include: [User] }))
@@ -1469,11 +1574,11 @@ describe('Site API', () => {
         })
         .then((foundSite) => {
           validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
-          expect(yaml.safeLoad(response.body.defaultConfig).name).to.equal('new-config');
+          expect(yaml.load(response.body.defaultConfig).name).to.equal('new-config');
           expect(foundSite.defaultConfig.name).to.equal('new-config');
-          expect(yaml.safeLoad(response.body.demoConfig).name).to.equal('new-demo-config');
+          expect(yaml.load(response.body.demoConfig).name).to.equal('new-demo-config');
           expect(foundSite.demoConfig.name).to.equal('new-demo-config');
-          expect(yaml.safeLoad(response.body.previewConfig).name).to.equal('new-preview-config');
+          expect(yaml.load(response.body.previewConfig).name).to.equal('new-preview-config');
           expect(foundSite.previewConfig.name).to.equal('new-preview-config');
           siteResponseExpectations(response.body, foundSite);
           done();
@@ -1496,9 +1601,9 @@ describe('Site API', () => {
             repository: 'new-repo-name',
           })
           .set('Cookie', cookie)
-          .expect(403))
+          .expect(404))
         .then((response) => {
-          validateAgainstJSONSchema('PUT', '/site/{id}', 403, response.body);
+          validateAgainstJSONSchema('PUT', '/site/{id}', 404, response.body);
           return Site.findByPk(siteModel.id);
         })
         .then((site) => {

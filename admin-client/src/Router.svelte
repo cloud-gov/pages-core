@@ -54,9 +54,13 @@
   page('/sites', queryString, render(Pages.Sites));
   page('/builds/:id', queryString, render(Pages.Build));
   page('/builds', queryString, render(Pages.Builds));
-  page('/users/:id', queryString, render(Pages.User));
-  page('/users', queryString, render(Pages.Users));
+  page('/users', queryString, render(Pages.User.Index));
+  page('/users/new', queryString, render(Pages.User.Invite));
+  page('/users/:id', queryString, render(Pages.User.Show));
   page('/events', queryString, render(Pages.Events));
+  page('/organizations', queryString, render(Pages.Organization.Index));
+  page('/organizations/new', queryString, render(Pages.Organization.New));
+  page('/organizations/:id/edit', queryString, render(Pages.Organization.Edit));
   page('*', render(Pages.NotFound));
   page();
 </script>

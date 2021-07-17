@@ -1,7 +1,9 @@
-const { Site, User } = require('../../models');
-const { paginate, wrapHandlers } = require('../../utils');
+const { Organization, Site, User } = require('../../models');
+const { paginate, toInt, wrapHandlers } = require('../../utils');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const userSerializer = require('../../serializers/user');
+const Mailer = require('../../services/mailer');
+const OrganizationService = require('../../services/organization');
 
 module.exports = wrapHandlers({
   async me(req, res) {
@@ -10,28 +12,33 @@ module.exports = wrapHandlers({
 
   async list(req, res) {
     const {
-      limit, page, site,
+      limit, page, organization, search, site,
     } = req.query;
 
     const serialize = users => userSerializer.serializeMany(users, true);
 
-    let query = {};
+    const scopes = ['withUAAIdentity'];
 
-    if (site) {
-      query = {
-        include: [{
-          model: Site,
-          where: {
-            id: site,
-          },
-        }],
-      };
+    if (search) {
+      scopes.push(User.searchScope(search));
     }
 
-    const pagination = await paginate(User, serialize, { limit, page }, query);
+    if (site) {
+      scopes.push(User.siteScope(site));
+    }
+
+    if (organization) {
+      scopes.push(User.orgScope(organization));
+    }
+
+    const [pagination, orgs, sites] = await Promise.all([
+      paginate(User.scope(scopes), serialize, { limit, page }),
+      Organization.findAll({ attributes: ['id', 'name'], raw: true }),
+      Site.findAll({ attributes: ['id', 'owner', 'repository'], raw: true }),
+    ]);
 
     const json = {
-      meta: {},
+      meta: { orgs, sites },
       ...pagination,
     };
 
@@ -43,7 +50,7 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const user = await fetchModelById(id, User);
+    const user = await fetchModelById(id, User.scope('withUAAIdentity'));
     if (!user) {
       return res.notFound();
     }
@@ -51,5 +58,50 @@ module.exports = wrapHandlers({
     const userJSON = userSerializer.toJSON(user, true);
 
     return res.json(userJSON);
+  },
+
+  async invite(req, res) {
+    const {
+      body: {
+        uaaEmail,
+        githubUsername,
+        organizationId,
+        roleId,
+      },
+      user,
+    } = req;
+
+    const { email, inviteLink: link } = await OrganizationService.inviteUserToOrganization(
+      user, toInt(organizationId), toInt(roleId), uaaEmail, githubUsername
+    );
+
+    if (link) {
+      await Mailer.sendUAAInvite(email, link);
+    }
+
+    const json = {
+      invite: { email, link },
+    };
+
+    return res.json(json);
+  },
+
+  async resendInvite(req, res) {
+    const {
+      body: { uaaEmail },
+      user,
+    } = req;
+
+    const { email, inviteLink: link } = await OrganizationService.resendInvite(user, uaaEmail);
+
+    if (link) {
+      await Mailer.sendUAAInvite(email, link);
+    }
+
+    const json = {
+      invite: { email, link },
+    };
+
+    return res.json(json);
   },
 });

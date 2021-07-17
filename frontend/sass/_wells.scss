@@ -18,6 +18,12 @@
   }
 }
 
+.well-gray-lightest {
+  @extend .well;
+
+  background-color: $color-gray-lightest;
+}
+
 .well-heading {
   margin-bottom: .3rem;
   margin-top: 0;

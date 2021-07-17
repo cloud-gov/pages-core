@@ -4,19 +4,7 @@ import { shallow } from 'enzyme';
 import { expect } from 'chai';
 import { spy } from 'sinon';
 
-import ReduxFormAddRepoSiteForm, { AddRepoSiteForm } from '../../../../frontend/components/AddSite/AddRepoSiteForm';
-
-describe('ReduxForm-enhanced <AddRepoSiteForm />', () => {
-  it('exports a Connect\'d ReduxForm-enhanced component', () => {
-    const props = {
-      showAddNewSiteFields: false,
-      onSubmit: spy(),
-    };
-    const wrapper = shallow(<ReduxFormAddRepoSiteForm {...props} />);
-    expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('Connect(Form(AddRepoSiteForm))')).to.have.length(1);
-  });
-});
+import { AddRepoSiteForm } from '../../../../frontend/components/AddSite/AddRepoSiteForm';
 
 describe('<AddRepoSiteForm />', () => {
   it('renders', () => {
@@ -24,11 +12,15 @@ describe('<AddRepoSiteForm />', () => {
       showAddNewSiteFields: false,
       initialValues: { engine: 'jekyll' },
       handleSubmit: () => {},
+      organizations: {
+        data: null,
+        isLoading: true,
+      },
       pristine: true,
     };
 
     const wrapper = shallow(<AddRepoSiteForm {...props} />);
-    expect(wrapper).to.be.defined;
+    expect(wrapper).not.to.be.undefined;
     expect(wrapper.find('GitHubRepoUrlField[name="repoUrl"]')).to.have.length(1);
   });
 
@@ -37,6 +29,10 @@ describe('<AddRepoSiteForm />', () => {
       showAddNewSiteFields: false,
       initialValues: { engine: 'jekyll' },
       handleSubmit: () => {},
+      organizations: {
+        data: null,
+        isLoading: true,
+      },
       pristine: true,
     };
 
@@ -50,8 +46,8 @@ describe('<AddRepoSiteForm />', () => {
 
     expect(wrapper.find('Field[name="engine"]')).to.have.length(1);
     expect(alertBanner).to.have.length(1);
-    expect(alertBanner.prop('header')).to.be.defined;
-    expect(alertBanner.prop('message')).to.be.defined;
+    expect(alertBanner.prop('header')).not.to.be.undefined;
+    expect(alertBanner.prop('message')).not.to.be.undefined;
   });
 
   it('makes GitHubRepoUrlField readOnly when showAddNewSiteFields is true', () => {
@@ -59,6 +55,10 @@ describe('<AddRepoSiteForm />', () => {
       showAddNewSiteFields: false,
       initialValues: { engine: 'jekyll' },
       handleSubmit: () => {},
+      organizations: {
+        data: null,
+        isLoading: true,
+      },
       pristine: true,
     };
 
@@ -75,6 +75,10 @@ describe('<AddRepoSiteForm />', () => {
       showAddNewSiteFields: false,
       initialValues: { engine: 'jekyll' },
       handleSubmit: () => {},
+      organizations: {
+        data: null,
+        isLoading: true,
+      },
       pristine: true,
     };
 
@@ -91,6 +95,10 @@ describe('<AddRepoSiteForm />', () => {
       showAddNewSiteFields: false,
       initialValues: { engine: 'jekyll' },
       handleSubmit: spy(),
+      organizations: {
+        data: null,
+        isLoading: true,
+      },
       pristine: false,
     };
 

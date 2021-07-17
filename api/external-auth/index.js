@@ -9,7 +9,7 @@ const onSuccess = (req, res) => {
   });
 
   const script = `
-    <script>
+    <script nonce="${res.locals.cspNonce}">
       (function() {
         function receiveMessage(e) {
           window.opener.postMessage(

@@ -1,10 +1,10 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const nock = require('nock');
 const request = require('supertest');
 const sinon = require('sinon');
 const { Sequelize } = require('sequelize');
 const app = require('../../../app');
-const SQS = require('../../../api/services/SQS');
+const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
 const ProxyDataSync = require('../../../api/services/ProxyDataSync');
 const GithubBuildHelper = require('../../../api/services/GithubBuildHelper');
 const EventCreator = require('../../../api/services/EventCreator');
@@ -22,7 +22,7 @@ describe('Build API', () => {
 
   beforeEach(() => {
     process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
-    sinon.stub(SQS, 'sendBuildMessage').resolves();
+    sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
     sinon.stub(EventCreator, 'audit').resolves();
     sinon.stub(EventCreator, 'error').resolves();
   });
@@ -85,7 +85,7 @@ describe('Build API', () => {
           })
           .set('Cookie', cookie)
           .expect(403);
-        
+
           validateAgainstJSONSchema('POST', '/build', 403, response.body);
           expect(response.body.message).to.equal('Invalid CSRF token');
       });
@@ -122,7 +122,7 @@ describe('Build API', () => {
           })
           .set('Cookie', cookie)
           .expect(403);
- 
+
           validateAgainstJSONSchema('POST', '/build', 403, response.body);
       });
     });

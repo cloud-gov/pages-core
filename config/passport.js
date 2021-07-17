@@ -1,16 +1,9 @@
-const env = require('../services/environment.js')();
+const env = require('../services/environment')();
 
 const clientID = env.GITHUB_CLIENT_ID || 'not_set';
 const clientSecret = env.GITHUB_CLIENT_SECRET || 'not_set';
 
 const url = path => `${env.APP_HOSTNAME}${path}`;
-
-const uaaOptions = {
-  authorizationURL: 'https://login.fr.cloud.gov/oauth/authorize',
-  tokenURL: 'https://uaa.fr.cloud.gov/oauth/token',
-  userURL: 'https://uaa.fr.cloud.gov/userinfo',
-  logoutURL: 'https://uaa.fr.cloud.gov/logout.do',
-};
 
 module.exports = {
   github: {
@@ -18,6 +11,13 @@ module.exports = {
       clientID,
       clientSecret,
       callbackURL: url('/auth/github/callback'),
+      scope: ['user', 'repo', 'write:repo_hook'],
+      state: true,
+    },
+    authorizationOptions: {
+      clientID,
+      clientSecret,
+      callbackURL: url('/auth/github2/callback'),
       scope: ['user', 'repo', 'write:repo_hook'],
       state: true,
     },
@@ -33,14 +33,11 @@ module.exports = {
   },
   uaa: {
     options: {
-      ...uaaOptions,
-      callbackURL: url('/auth/uaa/callback'),
-      logoutCallbackURL: url('/auth/uaa/logout'),
-    },
-    adminOptions: {
-      ...uaaOptions,
-      callbackURL: url('/admin/auth/uaa/callback'),
-      logoutCallbackURL: url('/admin/auth/uaa/logout'),
+      authorizationURL: `${env.UAA_HOST}/oauth/authorize`,
+      tokenURL: `${env.UAA_HOST_DOCKER_URL || env.UAA_HOST}/oauth/token`,
+      userURL: `${env.UAA_HOST_DOCKER_URL || env.UAA_HOST}/userinfo`,
+      logoutURL: `${env.UAA_HOST}/logout.do`,
+      scope: ['openid', 'scim.invite'],
     },
   },
 };

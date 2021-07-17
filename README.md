@@ -159,15 +159,65 @@ The app expects the following user provided services to be provided:
   - `secret_key`: The AWS secret key for SQS queue
   - `region`: The AWS region
   - `sqs_url`: The AWS SQS queue URL
-- `uaa-client`: An instance of cloud.gov's UAA broker to support authentication via SecureAuth. The service binding must include redirect_uris:
-  - `<host>/auth/uaa/callback`
-  - `<host>/auth/uaa/logout`
-  - `<host>/admin/auth/uaa/callback`
-  - `<host>/admin/auth/uaa/logout`
+- `admin-<environment>-uaa-client`: Credentials for cloud.gov's UAA to support authentication for the admin app. This service provides the following:
+  - `clientID`: The UAA client id for the environments admin app
+  - `clientSecret`: The UAA client secret for the environments admin app
+  - `authorizationURL`: The url to login and authorize a user
+  - `tokenURL`: The UAA url to get a user's token
+  - `userURL`: The UAA url to get a user's info
+  - `logoutURL`: The UAA url to logout a user
+- `app-<environment>-uaa-client`: Credentials for cloud.gov's UAA to support authentication for the app. This service provides the following:
+  - `clientID`: The UAA client id for the environments app
+  - `clientSecret`: The UAA client secret for the environments app
+  - `authorizationURL`: The url to login and authorize a user
+  - `tokenURL`: The UAA url to get a user's token
+  - `userURL`: The UAA url to get a user's info
+  - `logoutURL`: The UAA url to logout a user
 
 #### Deploy in CloudFoundry
 To deploy to CloudFoundry submit the following:
 `cf push federalistapp --strategy rolling --vars-file "./.cloudgov/vars/${CF_SPACE}.yml" -f ./cloudgov/manifest.yml`
+
+#### Continuous Integration
+We are in the process of migrating from CircleCI to an internal instance of Concourse CI, starting with our staging environment. To use Concourse, one must have appropriate permissions in UAA as administered by the cloud.gov operators. Access to Concourse also requires using the GSA VPN.
+
+Until CredHub is up and running, credentials must be passed by setting pipelines locally.
+
+1. To get started install and authenticate with the `fly` CLI:
+- `brew install --cask fly`
+- `fly -t pages-staging login -n pages -c <concourse url>`
+
+2. Update local credential files (see ci/vars/example.yml)
+
+3. Set a pipeline:
+`fly -t pages-staging sp -p <pipeline name> -c ci/pipeline.yml -l ci/vars/.<env>.yml`
+
+##### Accessing Concourse Jumpbox
+
+The Concourse jumpbox will allow users to interact with the CI environment and access/add/alter the credentials available to the CI pipelines via Credhub.  To access the jumpbox, you will need to be on the GSA VPN, have `fly` configured with the correct target, and have the latest version of [cg-scripts](https://github.com/cloud-gov/cg-scripts) locally accessible.
+
+**Using the jumpbox**
+
+1. **Connect to the VPN**
+
+2. **Download or `git pull` the latest version of [cg-scripts](https://github.com/cloud-gov/cg-scripts) to a location on your local drive ie (`~/my-scripts/cg-scripts`)**
+
+3. **Set your environment args to run the jumpbox script**
+- `CG_SCRIPTS_DIR=~/my-scripts/cg-scripts`
+- `CI_TARGET=<fly target (ie pages-staging)>`
+- `CI_ENV=<concourse environment (ie staging)>`
+
+4. **SSH into the jumpbox**
+- `$ cd $CG_SCRIPTS_DIR; ./jumpbox $CI_TARGET $CI_ENV`
+
+5. **Working with credentials once on the jumpbox**
+- Finding a credential
+  - `$ credhub find -n my-credential-name`
+- Getting a credential
+  - `$ credhub get -n /the-full-credhub-path/my-credential-name`
+- Importing a credential with a `.yml`
+  - `$ credhub import -f my-creds.yml`
+
 
 ### Testing
 
@@ -219,6 +269,14 @@ docker-compose run app node_modules/.bin/eslint --fix path/to/file.js
 
 ## Feature Flags
 Environment-specific feature flags are supported for both the api and frontend. Flagged features are assumed to be "off" unless the flag exists (and the value is truthy), thus feature flag conditions should always check for the presence or truthiness of the flag, not for it's absence. Environment variables for feature flags *MUST* be prefixed by `FEATURE_`, ex. `FEATURE_BRING_THE_AWESOME` or `FEATURE_BRING_DA_RUCKUS`.
+
+### Current available features
+
+`FEATURE_AUTH_GITHUB`: Used in [`api/controllers/main.js`](./api/controllers/main.js) to enable authentication with Github oauth.
+`FEATURE_AUTH_UAA`: Used in [`api/controllers/main.js`](./api/controllers/main.js) to enable authentication with the cloud.gov UAA.
+`FEATURE_BULL_SITE_BUILD_QUEUE`: Used to enable to use of the redis backed bull queue.
+`FEATURE_PROXY_EDGE_DYNAMO`: Used to enable lambda@edge dynamo db.
+`FEATURE_PROXY_EDGE_LINKS`: Used to enable lambda@edge proxy.
 
 ### Api feature flags
 Api feature flags are evaluated at *runtime* and should be created explicitly in the code before the corresponding environment variable can be used. Example:

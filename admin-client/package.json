@@ -10,7 +10,7 @@
     "start": "sirv public -p 3000 --host --single --dev"
   },
   "engines": {
-    "node": "14.x.x",
+    "node": "16.x.x",
     "npm": "6.x.x"
   },
   "devDependencies": {
@@ -20,12 +20,12 @@
     "eslint": "^7.5.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-svelte3": "^2.7.3",
+    "eslint-plugin-svelte3": "^3.2.0",
     "rollup": "^2.3.4",
     "rollup-plugin-copy": "^3.3.0",
     "rollup-plugin-livereload": "^1.0.0",
     "rollup-plugin-svelte": "^5.0.3",
-    "rollup-plugin-terser": "^5.1.2"
+    "rollup-plugin-terser": "^7.0.2"
   },
   "dependencies": {
     "date-fns": "^2.15.0",

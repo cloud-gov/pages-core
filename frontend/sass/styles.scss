@@ -30,6 +30,7 @@ $image-path: '../../node_modules/uswds/src/img';
 @import "_loader";
 @import "_text";
 @import "_wells";
+@import "_site_banner";
 @import "_tables";
 @import "_log-tools";
 @import "_navigation";
@@ -162,4 +163,13 @@ $image-path: '../../node_modules/uswds/src/img';
 
 .commit-link {
   font-weight: bold;
+}
+
+.github-auth-button {
+  display: inline-flex;
+  align-items: center;
+
+  &>svg {
+    margin-right: 1rem;
+  }
 }

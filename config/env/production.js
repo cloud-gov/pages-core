@@ -58,14 +58,10 @@ if (sqsCreds) {
 
 // Redis Configs
 const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`);
-
-// The Beta Redis configuration includes a `host` parameter instead of `hostname`
-const isBetaRedis = !!redisCreds.host;
-
 if (redisCreds) {
   module.exports.redis = {
     url: redisCreds.uri,
-    tls: isBetaRedis ? {} : null,
+    tls: {},
   };
 } else {
   throw new Error('No Redis credentials found');
@@ -138,14 +134,35 @@ module.exports.userEnvVar = {
   key: cfUserEnvVar.key,
 };
 
-const uaaCredentials = appEnv.getServiceCreds('uaa-client');
-const uaaOptions = {
-  clientID: uaaCredentials.client_id,
-  clientSecret: uaaCredentials.client_secret,
-};
+const uaaCredentials = appEnv.getServiceCreds(`app-${process.env.APP_ENV}-uaa-client`);
+
 module.exports.passport = {
   uaa: {
-    options: uaaOptions,
-    adminOptions: uaaOptions,
+    options: uaaCredentials,
+  },
+};
+
+const {
+  SMTP_CERT,
+  SMTP_FROM,
+  SMTP_HOST,
+  SMTP_PASSWORD,
+  SMTP_PORT,
+  SMTP_USER,
+} = process.env;
+
+module.exports.mail = {
+  from: SMTP_FROM,
+  host: SMTP_HOST,
+  port: SMTP_PORT,
+  pool: true,
+  secure: false,
+  requireTLS: true,
+  auth: {
+    user: SMTP_USER,
+    pass: SMTP_PASSWORD,
+  },
+  tls: {
+    ca: SMTP_CERT,
   },
 };

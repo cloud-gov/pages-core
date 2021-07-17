@@ -1,6 +1,34 @@
+function dbConfig(env) {
+  if (env.CONCOURSE) {
+    return {
+      database: 'postgres',
+      user: 'postgres',
+      host: 'db',
+    };
+  }
+
+  if (env.CI) {
+    return {
+      database: 'federalist-ci-test',
+      user: 'ci-test-user',
+      host: 'localhost',
+    };
+  }
+
+  return {
+    database: 'federalist-test',
+    user: 'postgres',
+    host: 'db',
+  };
+}
+
 module.exports = {
   build: {
     token: '123abc',
+  },
+  mail: {
+    from: 'test@page.gov',
+    jsonTransport: true,
   },
   sqs: {
     accessKeyId: '123abc',
@@ -39,20 +67,20 @@ module.exports = {
       ],
     },
     uaa: {
+      host: 'https://uaa.example.com',
       options: {
         clientID: '123abc',
         clientSecret: '456def',
-      },
-      adminOptions: {
-        clientID: '123abc',
-        clientSecret: '456def',
+        authorizationURL: 'https://uaa.example.com/oauth/authorize',
+        tokenURL: 'https://uaa.example.com/oauth/token',
+        userURL: 'https://uaa.example.com/userinfo',
+        logoutURL: 'https://uaa.example.com/logout.do',
       },
     },
   },
-  postgres: {
-    database: process.env.CI ? 'federalist-ci-test' : 'federalist-test',
-    user: process.env.CI ? 'ci-test-user' : 'postgres',
-    host: process.env.CI ? 'localhost' : 'db',
+  postgres: dbConfig(process.env),
+  redis: {
+    url: process.env.CI ? 'redis://localhost:6379' : 'redis://redis:6379',
   },
   log: {
     level: 'error',
@@ -69,6 +97,8 @@ module.exports = {
     cfOauthTokenUrl: 'https://login.example.com/oauth/token',
     cfApiHost: 'https://api.example.com',
     proxySiteTable: 'testSiteTable',
+    uaaHost: 'https://uaa.example.com',
+    uaaHostUrl: 'https://uaa.example.com',
   },
   userEnvVar: {
     key: 'shhhhhhhhhhh',

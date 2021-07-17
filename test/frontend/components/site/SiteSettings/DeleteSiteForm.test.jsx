@@ -14,6 +14,8 @@ describe('<DeleteSiteForm/>', () => {
     const makeProps = () => (
       {
         handleSubmit: spy(),
+        siteId: 1,
+        submitting: false,
       }
     );
 
@@ -31,8 +33,8 @@ describe('<DeleteSiteForm/>', () => {
     it('should render alert banner', () => {
       const alertBanner = wrapper.find('AlertBanner');
       expect(alertBanner).to.have.length(1);
-      expect(alertBanner.prop('header')).to.be.defined;
-      expect(alertBanner.prop('message')).to.be.defined;
+      expect(alertBanner.prop('header')).not.to.be.undefined;
+      expect(alertBanner.prop('message')).not.to.be.undefined;
       expect(alertBanner.prop('alertRole')).to.be.false;
     });
 
@@ -50,6 +52,7 @@ describe('<DeleteSiteForm/>', () => {
 
   it('should render delete button as disabled when submitting', () => {
     const props = {
+      siteId: 1,
       submitting: true,
       handleSubmit: spy(),
     };

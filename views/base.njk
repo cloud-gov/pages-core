@@ -3,7 +3,7 @@
   <head>
     {% if shouldIncludeTracking %}
       <!-- Google Tag Manager -->
-      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      <script nonce="{{ nonce }}">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
       new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
       j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
@@ -76,6 +76,7 @@
     {% block before_header %}
     {% endblock %}
 
+    {% include "site-banner.njk" %}
     {% include "usa-banner.njk" %}
     {% include "navigation.njk" %}
 
@@ -87,6 +88,17 @@
           <div class="usa-alert usa-alert-error usa-alert-slim" role="alert">
             <div class="usa-alert-body">
               <p class="usa-alert-text"> {{ error }}</p>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% endif %}
+      {% if messages.warnings %}
+        {% for warning in messages.warnings %}
+        <div class="usa-alert-home">
+          <div class="usa-alert usa-alert-warning usa-alert-slim" role="alert">
+            <div class="usa-alert-body">
+              <p class="usa-alert-text"> {{ warning }}</p>
             </div>
           </div>
         </div>
@@ -123,7 +135,7 @@
                 <a class="usa-nav-link" href="https://federalist.statuspage.io">
                   <span>Status<span>
                 </a>
-              </li>              
+              </li>
             </ul>
             <div class="usa-footer-primary-content usa-footer-contact_info">
               <p>

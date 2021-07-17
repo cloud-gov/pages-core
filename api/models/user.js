@@ -1,8 +1,17 @@
 const { Op } = require('sequelize');
+const { toInt } = require('../utils');
 
 const associate = ({
-  User, Build, Site, UserAction, SiteUser,
+  Build,
+  Organization,
+  OrganizationRole,
+  Site,
+  SiteUser,
+  UAAIdentity,
+  User,
+  UserAction,
 }) => {
+  // Associations
   User.hasMany(Build, {
     foreignKey: 'user',
   });
@@ -21,6 +30,57 @@ const associate = ({
     foreignKey: 'targetId',
     unique: false,
   });
+  User.belongsToMany(Organization, {
+    through: OrganizationRole,
+    foreignKey: 'userId',
+    otherKey: 'organizationId',
+  });
+  User.hasOne(UAAIdentity, {
+    foreignKey: 'userId',
+  });
+  User.hasMany(OrganizationRole, {
+    foreignKey: 'userId',
+  });
+
+  // Scopes
+  User.addScope('byIdOrText', (search) => {
+    const query = {};
+
+    const id = toInt(search);
+    if (id) {
+      query.where = { id };
+    } else {
+      query.where = {
+        [Op.or]: [
+          { username: { [Op.substring]: search } },
+          { email: { [Op.substring]: search } },
+        ],
+      };
+    }
+    return query;
+  });
+  User.addScope('byOrg', id => ({
+    include: [{
+      model: Organization,
+      where: { id },
+    }],
+  }));
+  User.addScope('bySite', id => ({
+    include: [{
+      model: Site,
+      where: { id },
+    }],
+  }));
+  User.addScope('withUAAIdentity', {
+    include: UAAIdentity,
+  });
+  User.addScope('byUAAEmail', uaaEmail => ({
+    include: [{
+      model: UAAIdentity,
+      where: { email: uaaEmail },
+      required: true,
+    }],
+  }));
 };
 
 function beforeValidate(user) {
@@ -84,5 +144,9 @@ const options = {
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', attributes(DataTypes), options);
   User.associate = associate;
+  User.orgScope = id => ({ method: ['byOrg', id] });
+  User.siteScope = id => ({ method: ['bySite', id] });
+  User.searchScope = search => ({ method: ['byIdOrText', search] });
+  User.byUAAEmail = id => User.scope({ method: ['byUAAEmail', id] });
   return User;
 };

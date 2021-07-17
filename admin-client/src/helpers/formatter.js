@@ -11,7 +11,7 @@ export const formatDateTime = (date) => {
 
 export const formatSha = (commit) => {
   try {
-    return commit.slice(1, 7);
+    return commit.slice(0, 7);
   } catch (error) {
     return 'N/A';
   }

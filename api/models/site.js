@@ -1,3 +1,5 @@
+const { Op } = require('sequelize');
+const { toInt } = require('../utils');
 const {
   branchRegex, parseSiteConfigs, isEmptyOrUrl, isValidSubdomain,
 } = require('../utils/validators');
@@ -24,13 +26,16 @@ const validationFailed = (site, options, validationError) => {
 };
 
 const associate = ({
-  Site,
   Build,
+  Organization,
+  OrganizationRole,
+  Site,
+  SiteUser,
   User,
   UserAction,
-  SiteUser,
   UserEnvironmentVariable,
 }) => {
+  // Associations
   Site.hasMany(Build, {
     foreignKey: 'site',
   });
@@ -46,6 +51,49 @@ const associate = ({
   Site.hasMany(UserEnvironmentVariable, {
     foreignKey: 'siteId',
   });
+  Site.belongsTo(Organization, {
+    foreignKey: 'organizationId',
+  });
+
+  // Scopes
+  Site.addScope('byIdOrText', (search) => {
+    const query = {};
+
+    const id = toInt(search);
+    if (id) {
+      query.where = { id };
+    } else {
+      query.where = {
+        [Op.or]: [
+          { owner: { [Op.substring]: search } },
+          { repository: { [Op.substring]: search } },
+        ],
+      };
+    }
+    return query;
+  });
+  Site.addScope('byOrg', id => ({
+    include: [{
+      model: Organization,
+      where: { id },
+    }],
+  }));
+  Site.addScope('forUser', user => ({
+    include: [
+      {
+        model: User,
+        required: true,
+        where: { id: user.id },
+      },
+      {
+        model: Organization,
+        include: [{
+          model: OrganizationRole,
+          where: { userId: user.id },
+        }],
+      },
+    ],
+  }));
 };
 
 const beforeValidate = (site) => {
@@ -172,6 +220,10 @@ module.exports = (sequelize, DataTypes) => {
         this.setDataValue('config', { ...this.config, containerConfig });
       },
     },
+    organizationId: {
+      type: DataTypes.INTEGER,
+      references: 'Organization',
+    },
   }, {
     tableName: 'site',
     hooks: {
@@ -180,22 +232,12 @@ module.exports = (sequelize, DataTypes) => {
       validationFailed,
     },
     paranoid: true,
-    scopes: {
-      forUser: (user, User) => ({
-        include: [{
-          model: User,
-          required: true,
-          where: {
-            id: user.id,
-          },
-        }],
-      }),
-    },
   });
 
   Site.associate = associate;
-
   Site.withUsers = id => Site.findByPk(id, { include: [sequelize.models.User] });
-
+  Site.orgScope = id => ({ method: ['byOrg', id] });
+  Site.searchScope = search => ({ method: ['byIdOrText', search] });
+  Site.forUser = user => Site.scope({ method: ['forUser', user] });
   return Site;
 };
