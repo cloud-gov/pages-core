@@ -43,7 +43,7 @@ rebuild: ## Rebuild docker images and database volumes
 seed: ## (Re)Create seed data
 	docker-compose run --rm app yarn create-dev-data
 
-set-pipeline: ## Set Concourse staging `web` pipeline
+set-pipeline: ## Set Concourse `web` pipeline
 	fly -t pages-staging sp -p web -c ci/pipeline.yml
 
 start: ## Start
