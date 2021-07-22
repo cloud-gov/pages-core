@@ -12,18 +12,8 @@ const router = require('./routers');
 const passport = require('./passport');
 const sessionConfig = require('./sessionConfig');
 
-const { NODE_ENV } = process.env;
-
-const clientUrl = new URL(config.app.hostname);
-// eslint-disable-next-line scanjs-rules/assign_to_hostname
-clientUrl.hostname = `${config.admin.subdomain}.${clientUrl.hostname}`;
-
-const corsOrigin = NODE_ENV === 'production'
-  ? clientUrl.toString().slice(0, -1) // strip trailing slash
-  : 'http://localhost:3000';
-
 const corsCfg = {
-  origin: corsOrigin,
+  origin: config.app.adminHostname,
   credentials: true,
 };
 
