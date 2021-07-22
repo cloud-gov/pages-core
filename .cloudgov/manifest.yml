@@ -3,8 +3,7 @@ applications:
   - name: ((name))
     buildpack: nodejs_buildpack
     routes:
-      - route: federalistapp((env_postfix)).18f.gov
-      - route: federalistapp((env_postfix)).apps.internal
+      - route: ((app_subdomain))((hostname))
     processes:
       - type: web
         command: yarn start
@@ -34,14 +33,14 @@ applications:
     env:
       NODE_ENV: production
       APP_ENV: ((env))
-      APP_HOSTNAME: https://federalistapp((env_postfix)).18f.gov
+      APP_HOSTNAME: https://((app_subdomain))((hostname))
       CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
       HOMEPAGE_URL: https://federalist.18f.gov
       LOG_LEVEL: ((log_level))
       NPM_CONFIG_PRODUCTION: true
       NODE_MODULES_CACHE: false
-      SOCKET_HOST: https://federalistapp((env_postfix)).18f.gov
+      SOCKET_HOST: https://((app_subdomain))((hostname))
       USER_AUDITOR: federalist
       S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
       FEDERALIST_PREVIEW_HOSTNAME: https://*.sites((env_postfix)).federalist.18f.gov
@@ -59,26 +58,26 @@ applications:
       SMTP_PASSWORD: ((smtp_password))
       SMTP_PORT: ((smtp_port))
       SMTP_USER: ((smtp_user))
-  - name: federalist-admin((env_postfix))
+  - name: ((product))-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client
     routes:
-      - route: admin.federalistapp((env_postfix)).18f.gov
-  - name: federalist-queues-ui((env_postfix))
+      - route: admin.((hostname))
+  - name: ((product))-queues-ui((env_postfix))
     buildpack: nodejs_buildpack
     command: yarn start-bull-board
     disk_quota: 2G
     instances: 1
     memory: ((memory))
     routes:
-      - route: queues.federalistapp((env_postfix)).18f.gov
+      - route: queues.((hostname))
     services:
       - app-((env))-uaa-client
       - federalist-((env))-redis
     env:
       NODE_ENV: production
       APP_ENV: ((env))
-      APP_HOSTNAME: https://queues.federalistapp((env_postfix)).18f.gov
+      APP_HOSTNAME: https://queues.((hostname))
       LOG_LEVEL: ((log_level))
       NPM_CONFIG_PRODUCTION: true
       NODE_MODULES_CACHE: false
