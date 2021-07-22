@@ -33,6 +33,7 @@ applications:
     env:
       NODE_ENV: production
       APP_ENV: ((env))
+      ADMIN_HOSTNAME: https://admin.((domain))
       APP_HOSTNAME: https://((app_subdomain))((domain))
       CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
