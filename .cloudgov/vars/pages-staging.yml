@@ -1,6 +1,6 @@
 product: pages
 name: pages-staging
-hostname: pages-staging.cloud.gov
+domain: pages-staging.cloud.gov
 app_subdomain: app.
 memory: 256MB
 instances: 2

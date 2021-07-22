@@ -3,7 +3,7 @@ applications:
   - name: ((name))
     buildpack: nodejs_buildpack
     routes:
-      - route: ((app_subdomain))((hostname))
+      - route: ((app_subdomain))((domain))
     processes:
       - type: web
         command: yarn start
@@ -33,14 +33,14 @@ applications:
     env:
       NODE_ENV: production
       APP_ENV: ((env))
-      APP_HOSTNAME: https://((app_subdomain))((hostname))
+      APP_HOSTNAME: https://((app_subdomain))((domain))
       CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
       HOMEPAGE_URL: https://federalist.18f.gov
       LOG_LEVEL: ((log_level))
       NPM_CONFIG_PRODUCTION: true
       NODE_MODULES_CACHE: false
-      SOCKET_HOST: https://((app_subdomain))((hostname))
+      SOCKET_HOST: https://((app_subdomain))((domain))
       USER_AUDITOR: federalist
       S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
       FEDERALIST_PREVIEW_HOSTNAME: https://*.sites((env_postfix)).federalist.18f.gov
@@ -62,7 +62,7 @@ applications:
     buildpack: staticfile_buildpack
     path: ../admin-client
     routes:
-      - route: admin.((hostname))
+      - route: admin.((domain))
   - name: ((product))-queues-ui((env_postfix))
     buildpack: nodejs_buildpack
     command: yarn start-bull-board
@@ -70,14 +70,14 @@ applications:
     instances: 1
     memory: ((memory))
     routes:
-      - route: queues.((hostname))
+      - route: queues.((domain))
     services:
       - app-((env))-uaa-client
       - federalist-((env))-redis
     env:
       NODE_ENV: production
       APP_ENV: ((env))
-      APP_HOSTNAME: https://queues.((hostname))
+      APP_HOSTNAME: https://queues.((domain))
       LOG_LEVEL: ((log_level))
       NPM_CONFIG_PRODUCTION: true
       NODE_MODULES_CACHE: false
