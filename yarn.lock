@@ -1046,32 +1046,28 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@newrelic/aws-sdk@^3.1.0":
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/@newrelic/aws-sdk/-/aws-sdk-3.1.0.tgz#0f8dd504a37ad92be608c340e5f836d848abdefa"
-  integrity sha512-SBFqCz1Hhn2HQvlFCEm2VwfHCGpemeokJ+NH7XphlfQ211OVVANQf49DOQCCS0uhnLHGbKMLmir8Layx57y48A==
+"@newrelic/aws-sdk@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@newrelic/aws-sdk/-/aws-sdk-4.0.1.tgz#8a4051a316c19172a3cc80511c2c7265e3f068e6"
+  integrity sha512-6pjPHKODTMItaO6zHDSR3HH7ohvUP9zzQf2pKMKdU4lB/1HV2+Xf6r92X96zPmGQsAnCP9xhgbseUklHD00a1Q==
 
-"@newrelic/koa@^5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@newrelic/koa/-/koa-5.0.0.tgz#ab9668c56a7a68ee37a6791382bd83b3824a7acf"
-  integrity sha512-4jzRXnUe38gQkZI8K4tWQ6CNdCNTi5uKILf1dTkyT6LpGxzDSLPwVyJ6xtMSMzr8SjIPG7lyNoWe42q8wFA7jg==
-  dependencies:
-    methods "^1.1.2"
+"@newrelic/koa@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@newrelic/koa/-/koa-6.0.1.tgz#b59fdc374e150daa39d7c78a84c6b72ae39b5dfa"
+  integrity sha512-LrM0wLBcdngkL6gfAyqlBciqncZJ/Z2DhHCvKQbYSqwG0UxUZ5EZyYqkmU28UIFAdC6ag/6QDEFwYg3PXwJbzQ==
 
-"@newrelic/native-metrics@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@newrelic/native-metrics/-/native-metrics-6.0.0.tgz#8c3b24070f2aebcbfa8329d80d24177f67581467"
-  integrity sha512-EUdlsv25dEMT+8SOV02Xfk2E3UTo2fH33lVmnv/CSllH6+ljJDAfG0Ib5zY92Qmaj+oiThbfRpSYOlUfH+Uuiw==
+"@newrelic/native-metrics@^7.0.1":
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@newrelic/native-metrics/-/native-metrics-7.0.1.tgz#53f3ae545c98af68657659af59355d93b9509b3a"
+  integrity sha512-bsobT/Fb1Y5h07BGpQM/8S8pPrX+fuudEd0C7gEn1y2Bst0Su1O7Lp7eSBjO+N5jVITJhKX+cKCv4hWFu0D8qA==
   dependencies:
-    nan "^2.14.1"
+    nan "^2.14.2"
     semver "^5.5.1"
 
-"@newrelic/superagent@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@newrelic/superagent/-/superagent-4.0.0.tgz#e3c53825b64aa73a3c5f6d98ed0ccc97f86dbc42"
-  integrity sha512-n4iNrsV0908yHNZPNof7rm/mffclHaIxprCCWk15b4IRJik2VrtuIrK3mboUgNdv5pX4P7EZytY/D6kJgFkDGw==
-  dependencies:
-    methods "^1.1.2"
+"@newrelic/superagent@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@newrelic/superagent/-/superagent-5.0.1.tgz#b9a98ed60d514f6fa9efb5df6ab8b220bbceb5a3"
+  integrity sha512-Efn/G0OohcjDkNEgH/eqiie8boWYMFVT++zxHquIj7I8FdTd2ZoKzcxS2lbkbEAKKXO54o8+cShJTwpptkAdGg==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -1695,10 +1691,12 @@ acorn@^8.2.1:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.3.0.tgz#1193f9b96c4e8232f00b11a9edff81b2c8b98b88"
   integrity sha512-tqPKHZ5CaBJw0Xmy0ZZvLs1qTV+BNFSyvn77ASXkpBNfIRk8ev26fKrD9iLGwGA9zedPao52GSHzq8lyZG0NUw==
 
-agent-base@5:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-5.1.1.tgz#e8fb3f242959db44d63be665db7a8e739537a32c"
-  integrity sha512-TMeqbNl2fMW0nMjTEPOwe3J/PRFP4vqeoNuQMG0HlMrtm5QxKqdvAkZ1pRBQ/ulIyDD5Yq0nJ7YbdD8ey0TO3g==
+agent-base@6:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-6.0.2.tgz#49fff58577cfee3f37176feab4c22e00f86d7f77"
+  integrity sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==
+  dependencies:
+    debug "4"
 
 aggregate-error@^3.0.0:
   version "3.1.0"
@@ -5824,12 +5822,12 @@ https-browserify@^1.0.0:
   resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-1.0.0.tgz#ec06c10e0a34c0f2faf199f7fd7fc78fffd03c73"
   integrity sha1-7AbBDgo0wPL68Zn3/X/Hj//QPHM=
 
-https-proxy-agent@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-4.0.0.tgz#702b71fb5520a132a66de1f67541d9e62154d82b"
-  integrity sha512-zoDhWrkR3of1l9QAL8/scJZyLu8j/gBkcwcaQOZh7Gyh/+uJQzGVETdgT30akuwkpL8HTRfssqI3BZuV18teDg==
+https-proxy-agent@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-5.0.0.tgz#e2a90542abb68a762e0a0850f6c9edadfd8506b2"
+  integrity sha512-EkYm5BcKUGiduxzSt3Eppko+PiNWNEpa4ySk9vTC6wDsQJW9rHSa+UhGNJoRYp7bz6Ht1eaRIa6QaJqO5rCFbA==
   dependencies:
-    agent-base "5"
+    agent-base "6"
     debug "4"
 
 human-signals@^2.1.0:
@@ -7689,7 +7687,7 @@ mute-stream@~0.0.4:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
 
-nan@^2.12.1, nan@^2.14.0, nan@^2.14.1:
+nan@^2.12.1, nan@^2.14.0, nan@^2.14.2:
   version "2.14.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.2.tgz#f5376400695168f4cc694ac9393d0c9585eeea19"
   integrity sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==
@@ -7756,25 +7754,25 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-newrelic@^7.0:
-  version "7.5.0"
-  resolved "https://registry.yarnpkg.com/newrelic/-/newrelic-7.5.0.tgz#cab47dea8f07576fb837d8d2c060bb61cb4e3dc4"
-  integrity sha512-t/ako2s8FYGDoCHkLX4GZIU5ONQbVvHJONLNOE7JyDCMMWytlkbxhPNaKH0/bBCSyEOUKkuvI5J5MuEmLMB9Mw==
+newrelic@^8.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/newrelic/-/newrelic-8.0.0.tgz#98a5930dda3d56b57b9566d3113108601cdc96d1"
+  integrity sha512-qPGDAPWasGUsfhizIQ5jQqcVsSDs5n5IytTaJsZjn0+Kq3+ozS0g7057rtP8I6aykx3jQrirsSfropzhLm9BOA==
   dependencies:
     "@grpc/grpc-js" "^1.2.11"
     "@grpc/proto-loader" "^0.5.6"
-    "@newrelic/aws-sdk" "^3.1.0"
-    "@newrelic/koa" "^5.0.0"
-    "@newrelic/superagent" "^4.0.0"
+    "@newrelic/aws-sdk" "^4.0.1"
+    "@newrelic/koa" "^6.0.1"
+    "@newrelic/superagent" "^5.0.1"
     "@tyriar/fibonacci-heap" "^2.0.7"
     async "^3.2.0"
     concat-stream "^2.0.0"
-    https-proxy-agent "^4.0.0"
+    https-proxy-agent "^5.0.0"
     json-stringify-safe "^5.0.0"
     readable-stream "^3.6.0"
     semver "^5.3.0"
   optionalDependencies:
-    "@newrelic/native-metrics" "^6.0.0"
+    "@newrelic/native-metrics" "^7.0.1"
 
 nice-try@^1.0.4:
   version "1.0.5"
