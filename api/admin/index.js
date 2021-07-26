@@ -8,8 +8,8 @@ const { expressErrorLogger } = require('../../winston');
 const { cacheControl, errorHandler } = require('../middlewares');
 const responses = require('../responses');
 
-const { apiRouter, authRouter } = require('./routers');
 const passport = require('./passport');
+const { apiRouter, authRouter } = require('./routers');
 const sessionConfig = require('./sessionConfig');
 
 const corsCfg = {
