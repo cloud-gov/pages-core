@@ -172,12 +172,13 @@ module.exports = {
   /**
    * @param {UserType} currentUser
    * @param {string} orgName
+   * @param {boolean} sandbox
    * @param {string} targetUserEmail
    * @param {string=} targetUserGithubUsername
    * @returns {Promise<[OrgType, UAAClient.UAAUserAttributes]>}
    */
   async createOrganization(
-    currentUser, orgName, targetUserEmail, targetUserGithubUsername
+    currentUser, orgName, sandbox, targetUserEmail, targetUserGithubUsername
   ) {
     const currentUserUAAIdentity = await currentUser.getUAAIdentity();
 
@@ -197,7 +198,7 @@ module.exports = {
 
     const managerRole = await Role.findOne({ where: { name: 'manager' } });
 
-    const org = await Organization.create({ name: orgName });
+    const org = await Organization.create({ name: orgName, isSandbox: sandbox });
     await org.addUser(user, { through: { roleId: managerRole.id } });
 
     return [org, uaaUserAttributes];

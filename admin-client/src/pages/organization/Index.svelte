@@ -8,6 +8,7 @@
   <DataTable data={data}>
     <tr slot="header">
       <th scope="col">Name</th>
+      <th scope="col">Sandbox?</th>
       <th scope="col">Created</th>
       <th scope="col">Updated</th>
       <th scope="col">View</th>
@@ -17,6 +18,11 @@
       <th scope="row">
         <a href="/organizations/{org.id}/edit">{org.name}</a>
       </th>
+      <td>
+        {#if org.isSandbox}
+          <span class="usa-tag bg-orange">sandbox</span>
+        {/if}
+      </td>
       <td>{formatDateTime(org.createdAt)}</td>
       <td>{formatDateTime(org.updatedAt)}</td>
       <td>
