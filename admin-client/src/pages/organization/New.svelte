@@ -8,19 +8,22 @@
 
   async function handleSubmit(event) {
     submitting = true;
-    const { name, managerUAAEmail, managerGithubUsername } = event.target.elements;
+    const {
+      name, managerUAAEmail, managerGithubUsername, sandbox,
+    } = event.target.elements;
 
     const params = {
       name: name.value,
       managerUAAEmail: managerUAAEmail.value,
       managerGithubUsername: managerGithubUsername.value,
+      sandbox: sandbox.value === 'sandbox',
     };
 
     const { invite } = await createOrganization(params);
 
-    if (invite) {
+    if (invite?.link) {
       // eslint-disable-next-line no-alert
-      window.alert(`Created invite for ${invite.email}: ${invite.link}`);
+      window.alert(`Invite sent to ${invite.email}: ${invite.link}`);
     }
 
     page('/organizations');
@@ -56,6 +59,31 @@
       <label class="usa-label" for="managerGithubUsername">Organization Manager Github Username</label>
       <span class="usa-hint">Required to migrate an existing user.</span>
       <input type="text" class="usa-input" name="managerGithubUsername" id="managerGithubUsername">
+    </fieldset>
+
+    <fieldset class="usa-fieldset">
+      <legend class="usa-legend usa-legend">Organization Type</legend>
+      <div class="usa-radio">
+        <input
+          class="usa-radio__input"
+          id="regular"
+          type="radio"
+          name="sandbox"
+          value="regular"
+          checked
+        />
+        <label class="usa-radio__label" for="regular">Regular</label>
+      </div>
+      <div class="usa-radio">
+        <input
+          class="usa-radio__input"
+          id="sandbox"
+          type="radio"
+          name="sandbox"
+          value="sandbox"
+        />
+        <label class="usa-radio__label" for="sandbox">Sandbox</label>
+      </div>
     </fieldset>
 
     <input class="usa-button" type="submit" value="Create" disabled={submitting}>
