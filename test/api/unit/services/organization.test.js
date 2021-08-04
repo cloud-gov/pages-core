@@ -412,7 +412,7 @@ describe('OrganizationService', () => {
         const currentUser = await userFactory();
 
         const error = await OrganizationService.createOrganization(
-          currentUser, '', ''
+          currentUser, '', false, ''
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
@@ -427,7 +427,7 @@ describe('OrganizationService', () => {
         isUAAAdminStub.resolves(false);
 
         const error = await OrganizationService.createOrganization(
-          currentUser, '', ''
+          currentUser, '', false, ''
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
@@ -452,7 +452,7 @@ describe('OrganizationService', () => {
         expect(await Organization.findOne({ where: { name: orgName } })).to.be.null;
 
         const [org, invite] = await OrganizationService.createOrganization(
-          currentUser, orgName, uaaEmail, githubUsername
+          currentUser, orgName, false, uaaEmail, githubUsername
         );
 
         expect(org.name).to.eq(orgName);

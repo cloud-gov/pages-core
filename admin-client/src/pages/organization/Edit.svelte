@@ -12,9 +12,9 @@
 
   async function handleSubmit(event) {
     submitting = true;
-    const { name } = event.target.elements;
+    const { name, sandbox } = event.target.elements;
 
-    const params = { name: name.value };
+    const params = { name: name.value, sandbox: sandbox.value === 'sandbox' };
 
     await updateOrganization(id, params);
 
@@ -42,6 +42,32 @@
         <input type="text" class="usa-input" name="name" id="name" value={org.name} required>
       </fieldset>
   
+      <fieldset class="usa-fieldset">
+        <legend class="usa-legend usa-legend">Organization Type</legend>
+        <div class="usa-radio">
+          <input
+            class="usa-radio__input"
+            id="regular"
+            type="radio"
+            name="sandbox"
+            value="regular"
+            checked={!org.isSandbox}
+          />
+          <label class="usa-radio__label" for="regular">Regular</label>
+        </div>
+        <div class="usa-radio">
+          <input
+            class="usa-radio__input"
+            id="sandbox"
+            type="radio"
+            name="sandbox"
+            value="sandbox"
+            checked={org.isSandbox}
+          />
+          <label class="usa-radio__label" for="sandbox">Sandbox</label>
+        </div>
+      </fieldset>
+
       <input class="usa-button" type="submit" value="Update" disabled={submitting}>
     </form>
   </Await>
