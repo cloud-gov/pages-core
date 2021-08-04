@@ -38,12 +38,14 @@ module.exports = wrapHandlers({
 
   async create(req, res) {
     const {
-      body: { managerGithubUsername, managerUAAEmail, name },
+      body: {
+        managerGithubUsername, managerUAAEmail, name, sandbox,
+      },
       user,
     } = req;
 
     const [org, { email, inviteLink: link }] = await OrganizationService.createOrganization(
-      user, name, managerUAAEmail, managerGithubUsername
+      user, name, sandbox, managerUAAEmail, managerGithubUsername
     );
 
     if (link) {
@@ -60,14 +62,14 @@ module.exports = wrapHandlers({
 
   async update(req, res) {
     const {
-      body: { name },
+      body: { name, sandbox },
       params: { id },
     } = req;
 
     const org = await fetchModelById(id, Organization);
     if (!org) return res.notFound();
 
-    await org.update({ name });
+    await org.update({ isSandbox: sandbox, name });
 
     return res.json(serialize(org));
   },

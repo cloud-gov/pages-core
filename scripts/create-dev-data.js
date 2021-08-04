@@ -101,9 +101,10 @@ async function createData() {
    *              Organizations
    */
   console.log('Creating Organizations');
-  const [agency1, agency2] = await Promise.all([
+  const [agency1, agency2, sandbox] = await Promise.all([
     Organization.create({ name: 'agency1' }),
     Organization.create({ name: 'agency2' }),
+    Organization.create({ name: 'user1@example.com', isSandbox: true }),
   ]);
 
   /** *****************************************
@@ -130,9 +131,15 @@ async function createData() {
         githubAccessToken: 'access-token',
         githubUserId: 123456,
       })
-      .then(createUAAIdentity)
-      .then(user => addUserToOrg(user, agency1, userRole))
-      .then(user => addUserToOrg(user, agency2, userRole)),
+      .then(async (user) => {
+        await Promise.all([
+          createUAAIdentity(user),
+          addUserToOrg(user, agency1, userRole),
+          addUserToOrg(user, agency2, userRole),
+          addUserToOrg(user, sandbox, managerRole),
+        ]);
+        return user;
+      }),
 
     User
       .create({
