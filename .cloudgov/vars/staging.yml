@@ -11,7 +11,7 @@ feature_auth_github: 'true'
 feature_auth_uaa: 'false'
 feature_proxy_edge_links: 'false'
 feature_proxy_edge_dynamo: 'false'
-feature_bull_site_build_queue: 'false'
+feature_bull_site_build_queue: 'true'
 uaa_host: https://uaa.fr-stage.cloud.gov
 new_relic_app_name: web-staging
 smtp_cert: ((smtp_cert))
