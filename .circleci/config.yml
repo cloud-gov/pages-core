@@ -376,7 +376,7 @@ workflows:
                 - main
                 - staging
     jobs:
-      - timeout-builds:
+      - run-task:
           name: timeout-builds-production
           app: federalistapp
           task-name: timeout-builds
@@ -385,7 +385,7 @@ workflows:
             branches:
               only:
                 - main
-      - timeout-builds:
+      - run-task:
           name: timeout-builds-staging
           app: federalistapp-staging
           task-name: timeout-builds
