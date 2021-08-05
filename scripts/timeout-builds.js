@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const { timeoutBuilds } = require('../api/workers/jobProcessors/timeoutBuilds');
+const timeoutBuilds = require('../api/workers/jobProcessors/timeoutBuilds');
 
 timeoutBuilds()
   .catch((err) => {
