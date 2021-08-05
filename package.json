@@ -92,7 +92,8 @@
     "deactivate-users-who-are-not-federalist-users-members": "node ./scripts/deactivate-users-who-are-not-federalist-users-members.js",
     "archive-build-logs": "node ./scripts/archive-build-logs.js",
     "migrate-build-logs": "node ./scripts/migrate-build-logs.js",
-    "send-email": "node ./scripts/send-email.js"
+    "send-email": "node ./scripts/send-email.js",
+    "timeout-builds": "node ./scripts/timeout-builds.js"
   },
   "main": "index.js",
   "repository": {
