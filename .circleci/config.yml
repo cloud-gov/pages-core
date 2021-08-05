@@ -372,9 +372,7 @@ workflows:
           cron: "0,10,20,30,40,50 * * * *"
           filters:
             branches:
-              only:
-                - main
-                - staging
+              only: main
     jobs:
       - run-task:
           name: timeout-builds-production
@@ -383,6 +381,4 @@ workflows:
           task-command: yarn timeout-builds
           filters:
             branches:
-              only:
-                - main
-                - staging
+              only: main
