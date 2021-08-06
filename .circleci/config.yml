@@ -364,6 +364,17 @@ workflows:
             branches:
               only:
                 - main
+
+      - restage:
+          matrix:
+            parameters:
+              app:
+                - federalistapp-staging
+                - federalist-admin-staging
+                - federalist-queues-ui-staging
+          filters:
+            branches:
+              only:
                 - staging
 
   every-ten-minutes:
