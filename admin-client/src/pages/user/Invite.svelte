@@ -4,8 +4,8 @@
   import { Await, GridContainer } from '../../components';
   import { fetchOrganizations, fetchRoles, inviteUser } from '../../lib/api';
 
-  let urlParams = new URLSearchParams(window.location.search);
-  let uaaEmail = urlParams.get('uaaEmail');
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlUAAEmail = urlParams.get('uaaEmail');
   let submitting = false;
 
   $: metaPromise = Promise.all([
@@ -54,7 +54,7 @@
       <fieldset class="usa-fieldset">
         <label class="usa-label" for="uaaEmail">UAA Email<abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
         <span class="usa-hint">The user will be created and invited to UAA if necessary.</span>
-        <input type="email" class="usa-input" name="uaaEmail" id="uaaEmail" value={uaaEmail} required>
+        <input type="email" class="usa-input" name="uaaEmail" id="uaaEmail" value={urlUAAEmail} required>
       </fieldset>
 
       <fieldset class="usa-fieldset">
