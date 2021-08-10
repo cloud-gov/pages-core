@@ -369,8 +369,8 @@ workflows:
             parameters:
               app:
                 - federalistapp-staging
-                - federalist-staging-admin
-                - federalist-staging-queues-ui
+                - federalist-admin-staging
+                - federalist-queues-ui-staging
           filters:
             branches:
               only: staging
