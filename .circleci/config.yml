@@ -364,7 +364,7 @@ workflows:
             branches:
               only: main
 
-      - restage-staging:
+      - restage:
           matrix:
             parameters:
               app:
