@@ -6,14 +6,18 @@
 
   function handleSubmit() {
     const selected = options.reduce(
-      (accumlated, current) => ({...accumlated, [current.name]: current.selected }), {});
-    return onAction(selected)
+      (accumlated, current) => ({
+        ...accumlated,
+        [current.name]: current.selected,
+      }),
+      {},
+    );
+    return onAction(selected);
   }
 
   function enableUpdate() {
-    updateable = true
+    updateable = true;
   }
-
 </script>
 
 <form on:submit|preventDefault={handleSubmit}>

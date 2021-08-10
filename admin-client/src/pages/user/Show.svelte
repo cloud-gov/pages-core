@@ -50,7 +50,7 @@
       }
 
       userPromise = fetchUser(id);
-    }
+    };
   }
 
   function handleRemoveUserOrgRole(organizationId) {
@@ -66,7 +66,7 @@
       }
 
       userPromise = fetchUser(id);
-    }
+    };
   }
 </script>
 
