@@ -20,6 +20,9 @@
     "updatedAt": {
       "type": "string",
       "format": "date-time"
+    },
+    "isSandbox": {
+      "type": "boolean"
     }
   }
 }
