@@ -30,6 +30,10 @@ commands:
               echo "export CF_SPACE=production" >> $BASH_ENV
               echo "export CF_USERNAME=$CF_USERNAME_PRODUCTION" >> $BASH_ENV
               echo "export CF_PASSWORD=$CF_PASSWORD_PRODUCTION" >> $BASH_ENV
+            elif [ "$CIRCLE_BRANCH" = "staging" ]; then
+              echo "export CF_SPACE=staging" >> $BASH_ENV
+              echo "export CF_USERNAME=$CF_USERNAME_STAGING" >> $BASH_ENV
+              echo "export CF_PASSWORD=$CF_PASSWORD_STAGING" >> $BASH_ENV
             fi
 
       - run:
@@ -309,6 +313,35 @@ workflows:
             branches:
               only: main
 
+      - deploy:
+          name: deploy-staging
+          app: federalistapp-staging
+          app-hostname: https://federalistapp-staging.18f.gov
+          requires:
+            - build
+          filters:
+            branches:
+              only: staging
+
+      - deploy-admin-client:
+          name: deploy-admin-staging
+          app: federalist-admin-staging
+          api-url: https://federalistapp-staging.18f.gov
+          requires:
+            - build
+          filters:
+            branches:
+              only: staging
+
+      - deploy-queues-ui:
+          name: deploy-queues-ui-staging
+          app: federalist-queues-ui-staging
+          requires:
+            - build
+          filters:
+            branches:
+              only: staging
+
   nightly:
     triggers:
       - schedule:
@@ -317,6 +350,7 @@ workflows:
             branches:
               only:
                 - main
+                - staging
 
     jobs:
       - restage:
@@ -330,14 +364,24 @@ workflows:
             branches:
               only: main
 
+      - restage:
+          matrix:
+            parameters:
+              app:
+                - federalistapp-staging
+                - federalist-admin-staging
+                - federalist-queues-ui-staging
+          filters:
+            branches:
+              only: staging
+
   every-ten-minutes:
     triggers:
       - schedule:
           cron: "0,10,20,30,40,50 * * * *"
           filters:
             branches:
-              only:
-                - main
+              only: main
     jobs:
       - run-task:
           name: timeout-builds-production
