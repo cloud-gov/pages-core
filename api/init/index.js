@@ -1,6 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const methodOverride = require('method-override');
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
 const session = require('express-session');
@@ -14,11 +12,12 @@ const config = require('../../config');
 
 const adminApi = require('../admin');
 const externalAuth = require('../external-auth');
+const {
+  cacheControl, devMiddleware, errorHandler, parseJson, xssProtection,
+} = require('../middlewares');
 const responses = require('../responses');
 const passport = require('../services/passport');
 const router = require('../routers');
-const devMiddleware = require('../services/devMiddleware');
-const EventCreator = require('../services/EventCreator');
 const sessionConfig = require('./sessionConfig');
 
 const { NODE_ENV } = process.env;
@@ -46,16 +45,6 @@ function setUserInLocals(req, res, next) {
   return next();
 }
 
-function xssProtection(req, res, next) {
-  res.set('X-XSS-Protection', '1; mode=block');
-  next();
-}
-
-function cacheControl(req, res, next) {
-  res.set('Cache-Control', 'max-age=0');
-  next();
-}
-
 function maybeUseExpressLogger(app) {
   if (logger.levels[logger.level] >= 2) {
     app.use(expressLogger);
@@ -64,14 +53,6 @@ function maybeUseExpressLogger(app) {
 
 function fourOhFourhandler(req, res) {
   res.status(404).redirect(302, '/404-not-found/');
-}
-
-// eslint-disable-next-line no-unused-vars
-function errorHandler(err, req, res, _next) {
-  EventCreator.handlerError(req, err);
-  if (!res.headersSent) {
-    res.error(err);
-  }
 }
 
 function init(app) {
@@ -106,13 +87,11 @@ function init(app) {
   main.use(passport.initialize());
   main.use(passport.session());
   main.use(setUserInLocals);
-  main.use(bodyParser.urlencoded({ extended: false }));
-  main.use(bodyParser.json({ limit: '2mb' }));
-  main.use(methodOverride());
+  main.use(parseJson);
   main.use(flash());
   main.use(responses);
 
-  main.use(cacheControl);
+  main.use(cacheControl('max-age=0'));
 
   main.use(router);
   main.use(fourOhFourhandler);
