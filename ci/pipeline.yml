@@ -3,10 +3,10 @@
 
 staging-cf: &staging-cf
   CF_API: https://api.fr.cloud.gov
-  CF_USERNAME: ((staging-cf-username))
-  CF_PASSWORD: ((staging-cf-password))
+  CF_USERNAME: ((pages-staging-cf-username))
+  CF_PASSWORD: ((pages-staging-cf-password))
   CF_ORG: gsa-18f-federalist
-  CF_SPACE: staging
+  CF_SPACE: pages-staging
 
 node-image: &node-image
   type: docker-image
@@ -118,7 +118,7 @@ test-admin-client: &test-admin-client
       inputs: [name: src-admin-client]
       outputs: [name: src-admin-client]
       params:
-        API_URL: https://federalistapp-staging.18f.gov
+        API_URL: https://app.pages-staging.cloud.gov
         NODE_ENV: production           
       run:
         dir: src-admin-client/admin-client
