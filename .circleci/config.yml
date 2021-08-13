@@ -168,9 +168,6 @@ jobs:
     parameters:
       app:
         type: string
-      feature_proxy_edge_links:
-        type: string
-        default: "false"
       app-hostname:
         type: string        
     steps:
@@ -182,7 +179,6 @@ jobs:
       - run:
           name: Build app
           environment:
-            FEATURE_PROXY_EDGE_LINKS: << parameters.feature_proxy_edge_links >>
             APP_HOSTNAME: << parameters.app-hostname >>
           command: yarn build
 
