@@ -69,7 +69,7 @@ applications:
       - route: queues.((domain))
     services:
       - app-((env))-uaa-client
-      - federalist-((env))-redis
+      - ((product))-((env))-redis
     env:
       NODE_ENV: production
       APP_ENV: ((env))
