@@ -2,7 +2,11 @@ if (process.env.NODE_ENV === 'production') {
   const cfenv = require('cfenv'); // eslint-disable-line global-require
   const appEnv = cfenv.getAppEnv();
 
-  const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`);
+  const { space_name: spaceName } = appEnv.app;
+
+  const servicePrefix = spaceName === 'pages-staging' ? spaceName : `federalist-${process.env.APP_ENV}`;
+
+  const redisCreds = appEnv.getServiceCreds(`${servicePrefix}-redis`);
   if (redisCreds) {
     module.exports.redis = {
       url: redisCreds.uri,
