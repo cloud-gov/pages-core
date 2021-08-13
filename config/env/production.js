@@ -2,8 +2,12 @@ const cfenv = require('cfenv');
 
 const appEnv = cfenv.getAppEnv();
 
+const { space_id: cfSpaceGuid, space_name: spaceName } = appEnv.app;
+
+const servicePrefix = spaceName === 'pages-staging' ? spaceName : `federalist-${process.env.APP_ENV}`;
+
 // Database Config
-const rdsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-rds`);
+const rdsCreds = appEnv.getServiceCreds(`${servicePrefix}-rds`);
 if (rdsCreds) {
   module.exports.postgres = {
     database: rdsCreds.db_name,
@@ -17,8 +21,8 @@ if (rdsCreds) {
 }
 
 // S3 Configs
-const s3Creds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-s3`);
-const serviceName = appEnv.getService(`federalist-${process.env.APP_ENV}-s3`).instance_name;
+const s3Creds = appEnv.getServiceCreds(`${servicePrefix}-s3`);
+const serviceName = appEnv.getService(`${servicePrefix}-s3`).instance_name;
 if (s3Creds) {
   module.exports.s3 = {
     accessKeyId: s3Creds.access_key_id,
@@ -31,7 +35,7 @@ if (s3Creds) {
   throw new Error('No S3 credentials found');
 }
 
-const s3BuildLogsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-s3-build-logs`);
+const s3BuildLogsCreds = appEnv.getServiceCreds(`${servicePrefix}-s3-build-logs`);
 if (s3BuildLogsCreds) {
   module.exports.s3BuildLogs = {
     accessKeyId: s3BuildLogsCreds.access_key_id,
@@ -44,7 +48,7 @@ if (s3BuildLogsCreds) {
 }
 
 // SQS Configs
-const sqsCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-sqs-creds`);
+const sqsCreds = appEnv.getServiceCreds(`${servicePrefix}-sqs-creds`);
 if (sqsCreds) {
   module.exports.sqs = {
     accessKeyId: sqsCreds.access_key,
@@ -57,7 +61,7 @@ if (sqsCreds) {
 }
 
 // Redis Configs
-const redisCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-redis`);
+const redisCreds = appEnv.getServiceCreds(`${servicePrefix}-redis`);
 if (redisCreds) {
   module.exports.redis = {
     url: redisCreds.uri,
@@ -79,20 +83,19 @@ if (deployUserCreds) {
 }
 
 // Environment Variables
-const cfSpace = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-space`);
-const cfDomain = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-domain`);
-const cfProxy = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-proxy`);
+const cfDomain = appEnv.getServiceCreds(`${servicePrefix}-domain`);
+const cfProxy = appEnv.getServiceCreds(`${servicePrefix}-proxy`);
 const cfOauthTokenUrl = process.env.CLOUD_FOUNDRY_OAUTH_TOKEN_URL;
 const cfApiHost = process.env.CLOUD_FOUNDRY_API_HOST;
 // optional environment vaiables
 const newRelicAppName = process.env.NEW_RELIC_APP_NAME;
 const newRelicLicenseKey = process.env.NEW_RELIC_LICENSE_KEY;
 
-if (cfSpace && cfOauthTokenUrl && cfApiHost && cfDomain && cfProxy) {
+if (cfOauthTokenUrl && cfApiHost && cfDomain && cfProxy) {
   module.exports.env = {
     cfDomainGuid: cfDomain.guid,
     cfProxyGuid: cfProxy.guid,
-    cfSpaceGuid: cfSpace.guid,
+    cfSpaceGuid,
     cfOauthTokenUrl,
     cfApiHost,
     newRelicAppName,
@@ -100,18 +103,6 @@ if (cfSpace && cfOauthTokenUrl && cfApiHost && cfDomain && cfProxy) {
   };
 } else {
   throw new Error('Missing environment variables for build space, cloud founders host url and token url.');
-}
-
-// DynamoDB Configs
-const dynamoDBCreds = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-dynamodb-creds`);
-if (dynamoDBCreds) {
-  module.exports.dynamoDB = {
-    accessKeyId: dynamoDBCreds.access_key_id,
-    secretAccessKey: dynamoDBCreds.secret_access_key,
-    region: dynamoDBCreds.region,
-  };
-} else {
-  throw new Error('No DynamoDB credentials found');
 }
 
 // See https://github.com/nfriedly/express-rate-limit/blob/master/README.md#configuration
@@ -129,7 +120,7 @@ module.exports.rateSlowing = {
   delayMs: 500, // delay requests by 500 ms
 };
 
-const cfUserEnvVar = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-uev-key`);
+const cfUserEnvVar = appEnv.getServiceCreds(`${servicePrefix}-uev-key`);
 module.exports.userEnvVar = {
   key: cfUserEnvVar.key,
 };
