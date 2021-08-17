@@ -1,5 +1,4 @@
-const { siteViewDomain } = require('./site');
-const Features = require('../features');
+const config = require('../../config');
 
 function buildPath(build, site) {
   let path = `/preview/${site.owner}/${site.repository}/${build.branch}`;
@@ -12,8 +11,9 @@ function buildPath(build, site) {
 }
 
 function buildUrl(build, site) {
+  const { domain } = config.app;
   const path = buildPath(build, site);
-  return `https://${site.awsBucketName}.app.cloud.gov${path}`;
+  return `https://${site.awsBucketName}.${domain}${path}`;
 }
 
 function buildViewLink(build, site) {
@@ -22,8 +22,6 @@ function buildViewLink(build, site) {
     link = site.domain;
   } else if ((build.branch === site.demoBranch) && site.demoDomain) {
     link = site.demoDomain;
-  } else if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_LINKS)) {
-    link = `${siteViewDomain(site)}${buildPath(build, site)}`;
   } else {
     link = build.url || buildUrl(build, site);
   }

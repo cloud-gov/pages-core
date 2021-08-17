@@ -275,8 +275,6 @@ Environment-specific feature flags are supported for both the api and frontend. 
 `FEATURE_AUTH_GITHUB`: Used in [`api/controllers/main.js`](./api/controllers/main.js) to enable authentication with Github oauth.
 `FEATURE_AUTH_UAA`: Used in [`api/controllers/main.js`](./api/controllers/main.js) to enable authentication with the cloud.gov UAA.
 `FEATURE_BULL_SITE_BUILD_QUEUE`: Used to enable to use of the redis backed bull queue.
-`FEATURE_PROXY_EDGE_DYNAMO`: Used to enable lambda@edge dynamo db.
-`FEATURE_PROXY_EDGE_LINKS`: Used to enable lambda@edge proxy.
 
 ### Api feature flags
 Api feature flags are evaluated at *runtime* and should be created explicitly in the code before the corresponding environment variable can be used. Example:

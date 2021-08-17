@@ -9,14 +9,12 @@ const {
   Build, Organization, Site, User,
 } = require('../models');
 const siteErrors = require('../responses/siteErrors');
-const ProxyDataSync = require('../services/ProxyDataSync');
 const {
   ValidationError,
   validBasicAuthUsername,
   validBasicAuthPassword,
 } = require('../utils/validators');
 const { toInt, wrapHandlers } = require('../utils');
-const Features = require('../features');
 const { fetchModelById } = require('../utils/queryDatabase');
 
 const stripCredentials = ({ username, password }) => {
@@ -138,10 +136,6 @@ module.exports = wrapHandlers({
       siteParams,
     });
 
-    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-      await ProxyDataSync.saveSite(site);
-    }
-
     await site.reload({ include: [Organization, User] });
     const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
@@ -207,10 +201,6 @@ module.exports = wrapHandlers({
 
     await site.update({ basicAuth: credentials });
 
-    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-      await ProxyDataSync.saveSite(site);
-    }
-
     const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
   },
@@ -226,10 +216,6 @@ module.exports = wrapHandlers({
     }
 
     await site.update({ basicAuth: {} });
-
-    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-      await ProxyDataSync.saveSite(site);
-    }
 
     const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
