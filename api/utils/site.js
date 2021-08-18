@@ -1,11 +1,9 @@
 const config = require('../../config');
-const Features = require('../features');
+
+const { domain } = config.app;
 
 function siteViewDomain(site) {
-  if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_LINKS)) {
-    return config.app.proxyPreviewHost.replace('*', site.subdomain);
-  }
-  return `https://${site.awsBucketName}.app.cloud.gov`;
+  return `https://${site.awsBucketName}.${domain}`;
 }
 
 function siteViewLink(site, deployment = 'site') {

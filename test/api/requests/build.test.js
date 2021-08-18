@@ -5,7 +5,6 @@ const sinon = require('sinon');
 const { Sequelize } = require('sequelize');
 const app = require('../../../app');
 const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
-const ProxyDataSync = require('../../../api/services/ProxyDataSync');
 const GithubBuildHelper = require('../../../api/services/GithubBuildHelper');
 const EventCreator = require('../../../api/services/EventCreator');
 const factory = require('../support/factory');
@@ -21,7 +20,6 @@ const clonedCommitSha = '7b8d23c07a2c3b5a140844a654d91e13c66b271a';
 describe('Build API', () => {
 
   beforeEach(() => {
-    process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
     sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
     sinon.stub(EventCreator, 'audit').resolves();
     sinon.stub(EventCreator, 'error').resolves();
@@ -417,7 +415,6 @@ describe('Build API', () => {
     it('should report the build\'s status back to github', async () => {
       const statusNock = githubAPINocks.status({ status: 'pending', commitSha: clonedCommitSha });
       const fetchContentStub = sinon.stub(GithubBuildHelper, 'fetchContent').resolves('{}');
-      const saveBuildStub = sinon.stub(ProxyDataSync, 'saveBuild').resolves();
       const build = await factory.build({ requestedCommitSha });
       const user = await build.getUser();
       const site = await build.getSite();
@@ -439,13 +436,10 @@ describe('Build API', () => {
       expect(build.state).to.equal(Build.States.Processing);
       expect(statusNock.isDone()).to.be.true;
       expect(fetchContentStub.notCalled).to.be.true;
-      expect(saveBuildStub.notCalled).to.be.true;
     });
 
-    it('should report the build\'s success status back to github and save build settings to proxy db', async () => {
+    it('should report the build\'s success status back to github', async () => {
       const statusNock = githubAPINocks.status({ state: 'success', commitSha: clonedCommitSha });
-      const fetchContentStub = sinon.stub(GithubBuildHelper, 'fetchContent').resolves('{}');
-      const saveBuildStub = sinon.stub(ProxyDataSync, 'saveBuild').resolves();
       const build = await factory.build({ requestedCommitSha, clonedCommitSha });
       const user = await build.getUser();
       const site = await build.getSite();
@@ -466,14 +460,10 @@ describe('Build API', () => {
       await build.reload();
       expect(build.state).to.equal(Build.States.Success);
       expect(statusNock.isDone()).to.be.true;
-      expect(fetchContentStub.calledOnce).to.be.true;
-      expect(saveBuildStub.calledOnce).to.be.true;
     });
 
     it('should report the build\'s success status back to github w/o build settings file', async () => {
       const statusNock = githubAPINocks.status({ state: 'success', commitSha: clonedCommitSha });
-      const fetchContentStub = sinon.stub(GithubBuildHelper, 'fetchContent').resolves(null);
-      const saveBuildStub = sinon.stub(ProxyDataSync, 'saveBuild').resolves();
       const build = await factory.build({ requestedCommitSha, clonedCommitSha });
       const user = await build.getUser();
       const site = await build.getSite();
@@ -494,8 +484,6 @@ describe('Build API', () => {
       await build.reload();
       expect(build.state).to.equal(Build.States.Success);
       expect(statusNock.isDone()).to.be.true;
-      expect(fetchContentStub.calledOnce).to.be.true;
-      expect(saveBuildStub.notCalled).to.be.true;
     });
 
     it('should respond with a 404 for an id that is NaN', (done) => {
