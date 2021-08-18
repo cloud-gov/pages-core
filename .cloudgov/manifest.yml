@@ -54,6 +54,7 @@ applications:
       SMTP_PASSWORD: ((smtp_password))
       SMTP_PORT: ((smtp_port))
       SMTP_USER: ((smtp_user))
+      PROXY_DOMAIN: ((proxy_domain))
   - name: ((product))-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client

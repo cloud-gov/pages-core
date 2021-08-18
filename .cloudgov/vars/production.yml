@@ -18,3 +18,4 @@ smtp_host: NA
 smtp_password: NA
 smtp_port: NA
 smtp_user: NA
+proxy_domain: app.cloud.gov
