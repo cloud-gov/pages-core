@@ -30,8 +30,6 @@ services:
       USER_AUDITOR: federalist
       FEATURE_AUTH_GITHUB: 'false'
       FEATURE_AUTH_UAA: 'true'
-      FEATURE_PROXY_EDGE_LINKS: 'false'
-      FEATURE_PROXY_EDGE_DYNAMO: 'false'
       APP_HOSTNAME: http://localhost:1337
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080

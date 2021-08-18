@@ -252,8 +252,7 @@ jobs:
           inputs: [name: src-api]
           outputs: [name: src-api]
           params:
-            FEATURE_PROXY_EDGE_LINKS: "false"
-            APP_HOSTNAME: https://app.pages-staging.18f.gov
+            APP_HOSTNAME: https://app.pages-staging.cloud.gov
           run:
             dir: src-api
             path: bash

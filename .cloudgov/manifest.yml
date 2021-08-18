@@ -35,6 +35,7 @@ applications:
       APP_HOSTNAME: https://((app_subdomain))((domain))
       CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
+      DOMAIN: ((domain))
       HOMEPAGE_URL: https://federalist.18f.gov
       LOG_LEVEL: ((log_level))
       NPM_CONFIG_PRODUCTION: true
@@ -42,7 +43,6 @@ applications:
       SOCKET_HOST: https://((app_subdomain))((domain))
       USER_AUDITOR: federalist
       S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
-      FEDERALIST_PREVIEW_HOSTNAME: https://*.sites((env_postfix)).federalist.18f.gov
       FEATURE_AUTH_GITHUB: ((feature_auth_github))
       FEATURE_AUTH_UAA: ((feature_auth_uaa))
       FEATURE_BULL_SITE_BUILD_QUEUE: ((feature_bull_site_build_queue))
