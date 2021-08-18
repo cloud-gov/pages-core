@@ -1,9 +1,9 @@
 const config = require('../../config');
 
-const { domain } = config.app;
+const { proxyDomain } = config.app;
 
 function siteViewDomain(site) {
-  return `https://${site.awsBucketName}.${domain}`;
+  return `https://${site.awsBucketName}.${proxyDomain}`;
 }
 
 function siteViewLink(site, deployment = 'site') {
