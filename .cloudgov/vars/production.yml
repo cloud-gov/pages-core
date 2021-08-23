@@ -12,10 +12,4 @@ feature_auth_uaa: 'false'
 feature_bull_site_build_queue: 'false'
 uaa_host: https://uaa.fr.cloud.gov
 new_relic_app_name: web
-smtp_cert: NA
-smtp_from: NA
-smtp_host: NA
-smtp_password: NA
-smtp_port: NA
-smtp_user: NA
 proxy_domain: app.cloud.gov

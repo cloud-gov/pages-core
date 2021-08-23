@@ -258,25 +258,6 @@ jobs:
             path: bash
             args: [-c, yarn build]
 
-      - task: interpolate-cf-vars
-        config:
-          platform: linux
-          image_resource:
-            <<: *node-image
-          inputs: [name: src-api]
-          outputs: [name: src-api]
-          params:
-            CF_VARS_FILE: src-api/.cloudgov/vars/pages-staging.yml
-            CFVAR_smtp_cert: ((postfix-smtp-cert.certificate))
-            CFVAR_smtp_password: ((postfix-smtp-password))
-            CFVAR_smtp_from: ((postfix-smtp-from))
-            CFVAR_smtp_host: ((postfix-smtp-host))
-            CFVAR_smtp_port: ((postfix-smtp-port))
-            CFVAR_smtp_user: ((postfix-smtp-user))
-          run:
-            path: node
-            args: [src-api/ci/tasks/interpolate-cf-vars.js]
-
       - task: deploy-api
         config:
           <<: *cf-image

@@ -1,28 +1,24 @@
-const nodemailer = require('nodemailer');
-const { htmlToText } = require('nodemailer-html-to-text');
+const HttpClient = require('../utils/httpClient');
 
-const { mail: mailConfig } = require('../../config');
+const { mailer } = require('../../config');
 
 class Mailer {
-  constructor({ from, ...config } = mailConfig) {
-    this.transporter = nodemailer.createTransport(config, { from });
-    this.transporter.use('compile', htmlToText());
-
-    this.close = this.close.bind(this);
-    this.send = this.send.bind(this);
-    this.verify = this.verify.bind(this);
+  constructor({ host, password, username } = mailer) {
+    this.httpClient = new HttpClient(host);
+    this.password = password;
+    this.username = username;
   }
 
-  close() {
-    return this.transporter.close();
-  }
-
-  send({ to, subject, html }) {
-    return this.transporter.sendMail({ to, subject, html });
-  }
-
-  verify() {
-    return this.transporter.verify();
+  send({ html, subject, to }) {
+    return this.httpClient.request({
+      method: 'POST',
+      url: '/send',
+      auth: {
+        password: this.password,
+        username: this.username,
+      },
+      data: { to, subject, html },
+    });
   }
 }
 
