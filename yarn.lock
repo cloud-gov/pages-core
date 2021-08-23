@@ -954,29 +954,29 @@
     "@babel/helper-validator-identifier" "^7.14.0"
     to-fast-properties "^2.0.0"
 
-"@bull-board/api@3.2.7":
-  version "3.2.7"
-  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-3.2.7.tgz#d18809e80b4787525403cf0997f583f2d6fd748f"
-  integrity sha512-tBvOnTxNZW9QO0eSF8UpwMBp0X8Dmk383V7KaDqj5Zp75gD0NclJFvqbAWKe413OTITIyBWPw4JA7nTJM8B4og==
+"@bull-board/api@3.5.2":
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-3.5.2.tgz#abaea5f88ae7648d969c0e975183dd8ddc7b6bac"
+  integrity sha512-LjS0bWTE9pjaYHIjzP6d8LASRpVXMHPqN85/yx2GRqTTs3/HGGc9YqbdwaUKkpQli1Io2Jzlf/zwBOJMBAfDdg==
   dependencies:
     redis-info "^3.0.8"
 
-"@bull-board/express@^3.2.4":
-  version "3.2.7"
-  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-3.2.7.tgz#c613eb694e85c8e444f69e8916fcefd72a901a3f"
-  integrity sha512-on8Kggzuza29P5VIbvdRWtpV/TwRe3RIeQU4lSra6outsyzQsWVRgvBmp11NFdcQrBOAxvnpK3FrlVS7vM4niQ==
+"@bull-board/express@^3.5.2":
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-3.5.2.tgz#51c4ab1ce268cb04659dca0824c0c80a84ef7125"
+  integrity sha512-fXNXHyoePylj8GA9jzgyGBdBlmgXEVkBBvEEbdRpbePAi/KM7jIzR/JBXxTy4mxI1OxyBgztE2u8yWXGVdzQIg==
   dependencies:
-    "@bull-board/api" "3.2.7"
-    "@bull-board/ui" "3.2.7"
+    "@bull-board/api" "3.5.2"
+    "@bull-board/ui" "3.5.2"
     ejs "3.1.6"
     express "4.17.1"
 
-"@bull-board/ui@3.2.7":
-  version "3.2.7"
-  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-3.2.7.tgz#32b1aab64e8eb6a8515907e83d9949f25b3ca0d1"
-  integrity sha512-93kVRqY4T3Oiubc/e1yGecVVhrNHXft5Rh7J+ajiim8z9Ab/+jWSfXFm0LL+2Qoa1ny1uFL3jjYfNhqdkfkkhA==
+"@bull-board/ui@3.5.2":
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-3.5.2.tgz#ece15041074d905afe057d22b07b98ad9a6e7b29"
+  integrity sha512-JjVG4WbVqnRBKz5Kw4TdLwo8BfXr97dHwS/yLlDjp9h2D/E29bUr6lC8si8r19YUV1twDLx/8KRqWTrIqV2QGQ==
   dependencies:
-    "@bull-board/api" "3.2.7"
+    "@bull-board/api" "3.5.2"
 
 "@dabh/diagnostics@^2.0.2":
   version "2.0.2"
