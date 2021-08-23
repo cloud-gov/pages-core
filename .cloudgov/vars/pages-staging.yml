@@ -12,10 +12,4 @@ feature_auth_uaa: 'true'
 feature_bull_site_build_queue: 'true'
 uaa_host: https://uaa.fr-stage.cloud.gov
 new_relic_app_name: web-pages-staging
-smtp_cert: ((smtp_cert))
-smtp_from: ((smtp_from))
-smtp_host: ((smtp_host))
-smtp_password: ((smtp_password))
-smtp_port: ((smtp_port))
-smtp_user: ((smtp_user))
 proxy_domain: sites.pages-staging.cloud.gov

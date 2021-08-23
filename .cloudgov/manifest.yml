@@ -28,6 +28,7 @@ applications:
       - federalist-deploy-user
       - federalist-site-wide-error
       - ((product))-((env))-s3-build-logs
+      - mailer
     env:
       NODE_ENV: production
       APP_ENV: ((env))
@@ -48,12 +49,6 @@ applications:
       FEATURE_BULL_SITE_BUILD_QUEUE: ((feature_bull_site_build_queue))
       UAA_HOST: ((uaa_host))
       NEW_RELIC_APP_NAME: ((new_relic_app_name))
-      SMTP_CERT: ((smtp_cert))
-      SMTP_FROM: ((smtp_from))
-      SMTP_HOST: ((smtp_host))
-      SMTP_PASSWORD: ((smtp_password))
-      SMTP_PORT: ((smtp_port))
-      SMTP_USER: ((smtp_user))
       PROXY_DOMAIN: ((proxy_domain))
   - name: ((product))-admin((env_postfix))
     buildpack: staticfile_buildpack
