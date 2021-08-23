@@ -26,10 +26,6 @@ module.exports = {
   build: {
     token: '123abc',
   },
-  mail: {
-    from: 'test@page.gov',
-    jsonTransport: true,
-  },
   sqs: {
     accessKeyId: '123abc',
     secretAccessKey: '456def',
