@@ -133,27 +133,10 @@ module.exports.passport = {
   },
 };
 
-const {
-  SMTP_CERT,
-  SMTP_FROM,
-  SMTP_HOST,
-  SMTP_PASSWORD,
-  SMTP_PORT,
-  SMTP_USER,
-} = process.env;
+const mailerCredentials = appEnv.getServiceCreds('mailer');
 
-module.exports.mail = {
-  from: SMTP_FROM,
-  host: SMTP_HOST,
-  port: SMTP_PORT,
-  pool: true,
-  secure: false,
-  requireTLS: true,
-  auth: {
-    user: SMTP_USER,
-    pass: SMTP_PASSWORD,
-  },
-  tls: {
-    ca: SMTP_CERT,
-  },
+module.exports.mailer = {
+  host: mailerCredentials.host,
+  password: mailerCredentials.password,
+  username: mailerCredentials.username,
 };
