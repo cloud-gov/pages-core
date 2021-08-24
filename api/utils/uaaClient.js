@@ -188,6 +188,24 @@ class UAAClient {
   }
 
   /**
+   * @param {string} groupId - a uaa group id
+   * @param {string} clientToken - a client token with the `scim.read` scope
+   * @returns {Promise<object>} the uaa users that are members of the group
+   *
+   * Fetches the UAA users that are members of the group specified group id
+   */
+  async fetchGroupMembers(groupId, clientToken) {
+    const path = `/Groups/${groupId}/members`;
+    const options = {
+      params: { returnEntities: true },
+      token: clientToken,
+    };
+
+    const response = await this.request(path, options);
+    return response.map(({ entity }) => entity);
+  }
+
+  /**
    * @param {string} email - a UAA user email
    * @param {string} clientToken - a client token with the `scim.read` scope
    *
