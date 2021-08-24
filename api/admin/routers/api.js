@@ -14,6 +14,8 @@ apiRouter.get('/organizations', AdminControllers.Organization.list);
 apiRouter.post('/organizations', parseJson, AdminControllers.Organization.create);
 apiRouter.get('/organizations/:id', AdminControllers.Organization.findById);
 apiRouter.put('/organizations/:id', parseJson, AdminControllers.Organization.update);
+apiRouter.delete('/organization-role', parseJson, AdminControllers.OrganizationRole.destroy);
+apiRouter.put('/organization-role', parseJson, AdminControllers.OrganizationRole.update);
 apiRouter.get('/roles', AdminControllers.Role.list);
 apiRouter.get('/sites', AdminControllers.Site.list);
 apiRouter.get('/sites/:id', AdminControllers.Site.findById);

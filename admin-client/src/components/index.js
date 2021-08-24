@@ -19,6 +19,7 @@ export { default as PageTitle } from './PageTitle.svelte';
 export { default as PaginatedQueryPage } from './PaginatedQueryPage.svelte';
 export { default as PaginationBanner } from './PaginationBanner.svelte';
 export { default as SectionHeader } from './SectionHeader.svelte';
+export { default as Select } from './Select.svelte';
 export { default as SiteCard } from './SiteCard.svelte';
 export { default as SiteDeleteForm } from './SiteDeleteForm.svelte';
 export { default as SiteForm } from './SiteForm.svelte';
