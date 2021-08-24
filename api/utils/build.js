@@ -11,9 +11,9 @@ function buildPath(build, site) {
 }
 
 function buildUrl(build, site) {
-  const { domain } = config.app;
+  const { proxyDomain } = config.app;
   const path = buildPath(build, site);
-  return `https://${site.awsBucketName}.${domain}${path}`;
+  return `https://${site.awsBucketName}.${proxyDomain}${path}`;
 }
 
 function buildViewLink(build, site) {
