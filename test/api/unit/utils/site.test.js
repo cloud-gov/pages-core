@@ -5,20 +5,11 @@ const factory = require('../../support/factory');
 const config = require('../../../../config');
 
 const awsBucketName = 'federalist-bucket';
-const getTestDomain = (subdomain) => config.app.proxyPreviewHost.replace('*', subdomain);
+
+const url = bucket => `https://${bucket}.${config.app.domain}`;
 
 describe('site utils', () => {
-  const defaultProxyEgeLinks = process.env.FEATURE_PROXY_EDGE_LINKS;
-
-  beforeEach(() => {
-    process.env.FEATURE_PROXY_EDGE_LINKS = 'true'
-  });
-
-  after(() => {
-    process.env.FEATURE_PROXY_EDGE_LINKS = defaultProxyEgeLinks;
-  });
   describe('siteViewLink', () => {
-
     it('should return a site domain when site domain is set', async () => {
       const deployment = 'site';
       const domain = 'https://example.gov/';
@@ -31,7 +22,7 @@ describe('site utils', () => {
       const domain = null;
       const site = await factory.site({ awsBucketName, domain });
       expect(siteViewLink(site, deployment)).to.eql(
-        `${getTestDomain(site.subdomain)}/site/${site.owner}/${site.repository}/`
+        `${url(awsBucketName)}/site/${site.owner}/${site.repository}/`
       );
     });
 
@@ -47,7 +38,7 @@ describe('site utils', () => {
       const demoDomain = null;
       const site = await factory.site({ awsBucketName, demoDomain });
       expect(siteViewLink(site, deployment)).to.eql(
-        `${getTestDomain(site.subdomain)}/demo/${site.owner}/${site.repository}/`
+        `${url(awsBucketName)}/demo/${site.owner}/${site.repository}/`
       );
     });
 
@@ -55,12 +46,12 @@ describe('site utils', () => {
       const deployment = 'preview';
       const site = await factory.site({ awsBucketName });
       expect(siteViewLink(site, deployment)).to.eql(
-        `${getTestDomain(site.subdomain)}/preview/${site.owner}/${site.repository}/`
+        `${url(awsBucketName)}/preview/${site.owner}/${site.repository}/`
       );
     });
 
     it('password should be hidden', async () => {
-      const basicAuth = { usermame: 'username', password: 'password' };;
+      const basicAuth = { usermame: 'username', password: 'password' };
       expect(hideBasicAuthPassword(basicAuth)).to.deep.eql({
         username: basicAuth.username,
         password: '**********',
@@ -69,16 +60,14 @@ describe('site utils', () => {
   });
 
   describe('siteViewDomain', () => {
-    it('should return domain on @host=config.app.proxyPreviewHost', async () => {
+    it('should return domain on @host=config.app.domain', async () => {
       const site = await factory.site({ awsBucketName });
-      expect(siteViewDomain(site)).equals(getTestDomain(site.subdomain));
+      expect(siteViewDomain(site)).equals(url(awsBucketName));
     });
 
-    it('should return domain on app.cloud.gov when when env FEATURE_PROXY_EDGE_LINKS=false', async () => {
-      process.env.FEATURE_PROXY_EDGE_LINKS = 'false';
+    it('should return configured domain', async () => {
       const site = await factory.site({ awsBucketName });
-      expect(siteViewDomain(site)).equals(`https://${site.awsBucketName}.app.cloud.gov`);
-      process.env.FEATURE_PROXY_EDGE_LINKS = 'true';
+      expect(siteViewDomain(site)).equals(`https://${site.awsBucketName}.${config.app.domain}`);
     });
   });
 });

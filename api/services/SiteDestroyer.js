@@ -1,5 +1,3 @@
-const Features = require('../features');
-const ProxyDataSync = require('./ProxyDataSync');
 const S3SiteRemover = require('./S3SiteRemover');
 
 async function destroySite(site) {
@@ -8,10 +6,6 @@ async function destroySite(site) {
       .then(() => S3SiteRemover.removeInfrastructure(site)),
     site.destroy(),
   ];
-
-  if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-    destroyComponents.push(ProxyDataSync.removeSite(site));
-  }
 
   await Promise.all(destroyComponents);
   return site;
