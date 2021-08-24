@@ -42,8 +42,8 @@ async function _fetch(path, opts = {}) {
     });
 }
 
-function destroy(path) {
-  return _fetch(path, { method: 'DELETE' });
+function destroy(path, body) {
+  return _fetch(path, { method: 'DELETE', body: JSON.stringify(body) });
 }
 
 function get(path, query) {
@@ -120,6 +120,14 @@ async function fetchRoles() {
   return get('/roles').catch(() => []);
 }
 
+async function removeUserOrgRole(params) {
+  return destroy('/organization-role', params);
+}
+
+async function updateUserOrgRole(params) {
+  return put('/organization-role', params);
+}
+
 async function fetchSite(id) {
   return get(`/sites/${id}`).catch(() => null);
 }
@@ -168,6 +176,8 @@ export {
   fetchOrganization,
   fetchOrganizations,
   updateOrganization,
+  removeUserOrgRole,
+  updateUserOrgRole,
   fetchRoles,
   fetchSite,
   fetchSites,

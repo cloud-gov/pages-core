@@ -50,7 +50,7 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const user = await fetchModelById(id, User.scope('withUAAIdentity'));
+    const user = await fetchModelById(id, User.scope(['withUAAIdentity', 'withOrganizationRoles']));
     if (!user) {
       return res.notFound();
     }
