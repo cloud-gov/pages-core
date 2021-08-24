@@ -67,6 +67,18 @@ function mockFetchGroupId(groupName, returnGroupId, token) {
 }
 
 /**
+ * @param {string} groupId
+ * @param {[object]} returnUsers
+ * @param {string} token
+ */
+function mockFetchGroupMembers(groupId, returnUsers, token) {
+  return nock(uaaHost, tokenAuth(token))
+    .get(`/Groups/${groupId}/members`)
+    .query({ returnEntities: true })
+    .reply(200, returnUsers.map(u => ({ entity: u })));
+}
+
+/**
  * @param {string} userId
  * @param {object} profile  - UAA user profile attributes
  * @param {string} token
@@ -223,6 +235,7 @@ module.exports = {
   mockUAAAuth,
   mockFetchClientToken,
   mockFetchGroupId,
+  mockFetchGroupMembers,
   mockFetchUser,
   mockFetchUserByEmail,
   mockInviteUser,

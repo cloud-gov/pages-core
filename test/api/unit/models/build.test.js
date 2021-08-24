@@ -4,6 +4,7 @@ const { DatabaseError, ValidationError } = require('sequelize');
 const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
+const config = require('../../../../config');
 
 describe('Build model', () => {
   afterEach(() => {
@@ -197,7 +198,7 @@ describe('Build model', () => {
           expect(site.publishedAt).to.be.a('date');
           expect(build.completedAt.getTime()).to.eql(site.publishedAt.getTime());
           const url = [
-            `https://${site.awsBucketName}.app.cloud.gov`,
+            `https://${site.awsBucketName}.${config.app.domain}`,
             `/preview/${site.owner}/${site.repository}/${build.branch}`,
           ].join('');
           expect(build.url).to.eql(url);
