@@ -20,21 +20,14 @@ const {
 } = require('../../../api/models');
 const S3SiteRemover = require('../../../api/services/S3SiteRemover');
 const siteErrors = require('../../../api/responses/siteErrors');
-const ProxyDataSync = require('../../../api/services/ProxyDataSync');
 const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
 const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
 const EventCreator = require('../../../api/services/EventCreator');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
-let removeSiteStub;
-let saveSiteStub;
-const defaultProxyEgeLinks = process.env.FEATURE_PROXY_EDGE_LINKS;
 
 describe('Site API', () => {
   beforeEach(() => {
-    process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
-    removeSiteStub = sinon.stub(ProxyDataSync, 'removeSite').resolves();
-    saveSiteStub = sinon.stub(ProxyDataSync, 'saveSite').resolves();
     sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
     sinon.stub(EventCreator, 'error').resolves();
 
@@ -45,10 +38,6 @@ describe('Site API', () => {
     sinon.restore();
 
     return factory.organization.truncate();
-  });
-
-  after(() => {
-    process.env.FEATURE_PROXY_EDGE_DYNAMO = defaultProxyEgeLinks;
   });
 
   const siteResponseExpectations = (response, site) => {
@@ -366,7 +355,6 @@ describe('Site API', () => {
         })
         .then((site) => {
           expect(site).to.not.be.undefined;
-          expect(saveSiteStub.calledOnce).to.equal(true);
           done();
         })
         .catch(done);
@@ -416,51 +404,7 @@ describe('Site API', () => {
         .then((site) => {
           expect(site).to.not.be.undefined;
           expect(site.Organization.id).to.equal(org.id);
-          expect(saveSiteStub.calledOnce).to.equal(true);
         });
-    });
-
-    it('should not call ProxyDataSync when FEATURE_PROXY_EDGE_DYNAMO=false', (done) => {
-      const siteOwner = crypto.randomBytes(3).toString('hex');
-      const siteRepository = crypto.randomBytes(3).toString('hex');
-
-      cfMockServices(siteOwner, siteRepository);
-
-      factory.user()
-        .then((user) => {
-          githubAPINocks.userOrganizations({
-            accessToken: user.githubAccessToken,
-            organizations: [{ login: siteOwner }],
-          });
-          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
-          return authenticatedSession(user);
-        })
-        .then(cookie => request(app)
-          .post('/v0/site')
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            owner: siteOwner,
-            repository: siteRepository,
-            defaultBranch: 'main',
-            engine: 'jekyll',
-          })
-          .set('Cookie', cookie)
-          .expect(200))
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/site', 200, response.body);
-          return Site.findOne({
-            where: {
-              owner: siteOwner,
-              repository: siteRepository,
-            },
-          });
-        })
-        .then((site) => {
-          expect(site).to.not.be.undefined;
-          expect(saveSiteStub.notCalled).to.equal(true);
-          done();
-        })
-        .catch(done);
     });
 
     it('should create a new repo and site from a template', (done) => {
@@ -1319,43 +1263,6 @@ describe('Site API', () => {
         })
         .then((sites) => {
           expect(sites).to.be.empty;
-          expect(removeSiteStub.calledOnce).to.equal(true);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should not call ProxyDataSync when env FEATURE_PROXY_EDGE_DYNAMO=false', (done) => {
-      let site;
-
-      factory.site()
-        .then(s => Site.findByPk(s.id, { include: [User] }))
-        .then((model) => {
-          site = model;
-          nock.cleanAll();
-          githubAPINocks.repo({
-            owner: site.owner,
-            repository: site.repo,
-            response: [200, {
-              permissions: { admin: true, push: true },
-            }],
-          });
-          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
-          return authenticatedSession(site.Users[0]);
-        })
-        .then(cookie => request(app)
-          .delete(`/v0/site/${site.id}`)
-          .set('x-csrf-token', csrfToken.getToken())
-          .set('Cookie', cookie)
-          .expect(200))
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', '/site/{id}', 200, response.body);
-          siteResponseExpectations(response.body, site);
-          return Site.findAll({ where: { id: site.id } });
-        })
-        .then((sites) => {
-          expect(sites).to.be.empty;
-          expect(removeSiteStub.notCalled).to.equal(true);
           done();
         })
         .catch(done);
@@ -1451,7 +1358,6 @@ describe('Site API', () => {
         })
         .then((sites) => {
           expect(sites).to.not.be.empty;
-          expect(removeSiteStub.called).to.equal(false);
           done();
         })
         .catch(done);
@@ -1487,7 +1393,6 @@ describe('Site API', () => {
         })
         .then((sites) => {
           expect(sites).to.be.empty;
-          expect(removeSiteStub.calledOnce).to.equal(true);
           done();
         })
         .catch(done);
@@ -1868,34 +1773,6 @@ describe('Site API', () => {
           site = await site.reload();
           expect(site.config).to.deep.equal({ basicAuth: {}, blah: 'blahblah' });
         });
-
-        it('should not call ProxyDataSync when env FEATURE_PROXY_EDGE_DYNAMO=false', async () => {
-          const userPromise = await factory.user();
-          const siteConfig = {
-            basicAuth: {
-              username: 'user',
-              password: 'password',
-            },
-            blah: 'blahblah',
-          };
-          let site = await factory.site({
-            users: [userPromise],
-            config: siteConfig,
-          });
-
-          const cookie = await authenticatedSession(userPromise);
-          expect(site.config).to.deep.eq(siteConfig);
-          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
-          await request(app)
-            .delete(`/v0/site/${site.id}/basic-auth`)
-            .set('Cookie', cookie)
-            .set('x-csrf-token', csrfToken.getToken())
-            .type('json')
-            .expect(200);
-
-          site = await site.reload();
-          expect(saveSiteStub.notCalled).to.equal(true);
-        });
       });
     });
 
@@ -2014,32 +1891,6 @@ describe('Site API', () => {
             basicAuth: credentials,
             blah: 'blahblahblah',
           });
-        });
-
-        it('should not call ProxyDataSync when env FEATURE_PROXY_EDGE_DYNAMO=false', async () => {
-          const userPromise = await factory.user();
-          const site = await factory.site({
-            users: [userPromise],
-            config: { blah: 'blahblahblah' },
-          });
-          const cookie = await authenticatedSession(userPromise);
-          const credentials = {
-            username: 'user',
-            password: 'paSsw0rd',
-          };
-
-          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
-
-          const { body } = await request(app)
-            .post(`/v0/site/${site.id}/basic-auth`)
-            .set('Cookie', cookie)
-            .set('x-csrf-token', csrfToken.getToken())
-            .type('json')
-            .send(credentials)
-            .expect(200);
-
-          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 200, body);
-          expect(saveSiteStub.notCalled).to.equal(true);
         });
       });
     });
