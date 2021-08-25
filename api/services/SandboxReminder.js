@@ -1,7 +1,7 @@
 const moment = require('moment');
 const { Op } = require('sequelize');
 const Mailer = require('./mailer');
-const { User, Organization } = require('../models');
+const { User, Organization, Site } = require('../models');
 const { sandboxDays, sandboxMaxNoticeDays, sandboxNoticeFrequency } = require('../../config').app;
 
 const notifyOrganizations = () => Organization.findAll({
@@ -21,7 +21,16 @@ const notifyOrganizations = () => Organization.findAll({
       },
     ],
   },
-  include: [User],
+  include: [
+    {
+     model: User,
+     required: true,
+    },
+    {
+      model: Site,
+      required: true,
+    },
+  ],
 })
   .then(orgs => Promise.allSettled(orgs // notify every x days
     .filter(({ daysUntilSandboxCleaning: days }) => (days > 0 && !(days % sandboxNoticeFrequency)))
