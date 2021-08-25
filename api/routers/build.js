@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const BuildController = require('../controllers/build');
-const sessionAuth = require('../policies/sessionAuth');
-const csrfProtection = require('../policies/csrfProtection');
+const { csrfProtection, sessionAuth } = require('../middlewares');
 
 router.get('/site/:site_id/build', sessionAuth, BuildController.find);
 router.post('/build', sessionAuth, csrfProtection, BuildController.create);
