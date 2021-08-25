@@ -15,3 +15,23 @@ export function groupLogs(logs) {
     return groups;
   }, {});
 }
+
+export function sandboxOrgMsg(days) {
+  let msg;
+  if (days > 1) {
+    msg = `${days} days`;
+  } else if (days === 1) {
+    msg = `${days} day`;
+  }
+  return `All data for this sandbox organization will be deleted in ${msg}.`;
+}
+
+export function sandboxSiteMsg(days) {
+  let msg;
+  if (days > 1) {
+    msg = `${days} days`;
+  } else if (days === 1) {
+    msg = `${days} day`;
+  }
+  return `All data for this sandbox organization site will be deleted in ${msg}.`;
+}

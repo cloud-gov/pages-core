@@ -28,6 +28,7 @@ const testUser = {
 const testOrganization = {
   id: 1,
   name: 'org-1',
+  isSandbox: false,
 };
 
 describe('<SiteListItem />', () => {
@@ -80,6 +81,20 @@ describe('<SiteListItem />', () => {
         organization={testOrganization}
       />
     );
+    expect(wrapper.find('h5')).to.have.length(1);
+    expect(wrapper.find('p')).to.have.length(0); // is not sandbox
+  });
+  it('outputs an h5 with the site\'s sandbox organization', () => {
+    const organizationId = testOrganization.id;
+    const updatedSite = { ...testSite, organizationId };
+    wrapper = shallow(
+      <Fixture
+        site={updatedSite}
+        user={testUser}
+        organization={{...testOrganization, isSandbox: true, daysUntilSandboxCleaning: 5 }}
+      />
+    );
+    expect(wrapper.find('p')).to.have.length(1); // is sandbox
     expect(wrapper.find('h5')).to.have.length(1);
   });
 

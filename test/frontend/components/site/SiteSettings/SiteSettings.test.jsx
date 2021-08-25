@@ -29,7 +29,12 @@ describe('<SiteSettings/>', () => {
       demoDomain: 'https://demo.example.gov',
       engine: 'jekyll',
       basicAuth: {},
+      organizationId: 1,
     },
+    organization: {
+      id: 1,
+      name: 'org-1',
+    }
   };
 
   let origWindow;
@@ -55,6 +60,14 @@ describe('<SiteSettings/>', () => {
 
   it('should render', () => {
     expect(wrapper.exists()).to.be.true;
+    expect(wrapper.find('AdvancedSiteSettings')).to.have.length(1);
+    expect(wrapper.find('ExpandableArea')).to.have.length(3);
+  });
+
+  it('should not render BasicSettings if sandbox org', () => {
+    wrapper = shallow(<SiteSettings  { ...{...props, organization: { isSandbox: true } } }/>);
+    expect(wrapper.exists()).to.be.true;
+    expect(wrapper.find('BasicSiteSettings')).to.have.length(0);
     expect(wrapper.find('AdvancedSiteSettings')).to.have.length(1);
     expect(wrapper.find('ExpandableArea')).to.have.length(3);
   });

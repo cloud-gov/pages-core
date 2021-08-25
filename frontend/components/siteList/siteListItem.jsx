@@ -9,6 +9,7 @@ import GitHubLink from '../GitHubLink';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
 import { ORGANIZATION, USER } from '../../propTypes';
+import { sandboxSiteMsg } from '../../util';
 
 function getViewLink(viewLink, repo) {
   return (
@@ -49,6 +50,14 @@ const SiteListItem = ({ organization, site, user }) => (
         ) : null
       }
       <RepoLastVerified site={site} userUpdated={user.updatedAt} />
+      { organization?.isSandbox
+          && (
+          <p>
+            <em>
+              {sandboxSiteMsg(organization.daysUntilSandboxCleaning)}
+            </em>
+          </p>
+          )}
       <PublishedState site={site} />
     </div>
     <div className="sites-list-item-actions">

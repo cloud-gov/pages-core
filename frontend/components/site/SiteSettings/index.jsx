@@ -2,7 +2,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { SITE } from '../../../propTypes';
+import { SITE, ORGANIZATION } from '../../../propTypes';
 import ExpandableArea from '../../ExpandableArea';
 import BasicSiteSettings from './BasicSiteSettings';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
@@ -10,6 +10,7 @@ import EnvironmentVariables from './EnvironmentVariables';
 import BasicAuthSettings from './BasicAuthSettings';
 import siteActions from '../../../actions/siteActions';
 import { currentSite } from '../../../selectors/site';
+import { getOrgById } from '../../../selectors/organization';
 
 class SiteSettings extends React.Component {
   constructor(props) {
@@ -34,9 +35,9 @@ class SiteSettings extends React.Component {
   }
 
   render() {
-    const { site } = this.props;
+    const { site, organization } = this.props;
 
-    if (!site) {
+    if (!site || !organization) {
       return null;
     }
 
@@ -80,10 +81,15 @@ class SiteSettings extends React.Component {
           </a>
           .
         </p>
-        <BasicSiteSettings
-          initialValues={basicInitialValues}
-          onSubmit={this.handleUpdate}
-        />
+
+        {!organization.isSandbox
+          && (
+          <BasicSiteSettings
+            initialValues={basicInitialValues}
+            onSubmit={this.handleUpdate}
+          />
+          )}
+
         <ExpandableArea title="Advanced settings">
           <AdvancedSiteSettings
             siteId={site.id}
@@ -114,15 +120,22 @@ class SiteSettings extends React.Component {
 
 SiteSettings.propTypes = {
   site: SITE,
+  organization: ORGANIZATION,
 };
 
 SiteSettings.defaultProps = {
   site: null,
+  organization: null,
 };
 
-const mapStateToProps = ({ sites }, { id }) => ({
-  site: currentSite(sites, id),
-});
+const mapStateToProps = ({ sites, organizations }, { id }) => {
+  const site = currentSite(sites, id);
+  const organization = getOrgById(organizations, site.organizationId);
+  return ({
+    site,
+    organization,
+  });
+};
 
 export { SiteSettings };
 export default connect(mapStateToProps)(SiteSettings);
