@@ -23,8 +23,8 @@ const notifyOrganizations = () => Organization.findAll({
   },
   include: [
     {
-     model: User,
-     required: true,
+      model: User,
+      required: true,
     },
     {
       model: Site,
