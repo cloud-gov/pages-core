@@ -44,6 +44,7 @@ async function start() {
     revokeMembershipForInactiveUsers: Processors.revokeMembershipForInactiveUsers,
     timeoutBuilds: Processors.timeoutBuilds,
     verifyRepositories: Processors.verifyRepositories,
+    sandboxNotifications: Processors.sandboxNotifications,
   });
 
   // Workers
@@ -99,6 +100,7 @@ async function start() {
 
   if (appConfig.app_env === 'production') {
     jobs.push(scheduledQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig));
+    jobs.push(scheduledQueue.add('sandboxNotifications', {}, nightlyJobConfig));
   }
 
   await scheduledQueue.drain(); // clear the queue

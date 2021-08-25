@@ -6,6 +6,7 @@ const TimeoutBuilds = require('../../../api/services/TimeoutBuilds');
 const ScheduledBuildHelper = require('../../../api/services/ScheduledBuildHelper');
 const RepositoryVerifier = require('../../../api/services/RepositoryVerifier');
 const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
+const SandboxReminder = require('../../../api/services/SandboxReminder');
 const factory = require('../support/factory');
 const jobProcessors = require('../../../api/workers/jobProcessors');
 
@@ -122,6 +123,28 @@ describe('job processors', () => {
         { status: 'fulfilled', value: '2' },
       ]);
       const result = await jobProcessors.revokeMembershipForInactiveUsers().catch(e => e);
+      expect(result).to.not.be.an('error');
+    });
+  });
+
+  context('sandboxNotifications', () => {
+    it('failed to notify all sandbox organization members', async () => {
+      sinon.stub(SandboxReminder, 'notifyOrganizations').resolves([
+        { status: 'fulfilled', value: '1' },
+        { status: 'fulfilled', value: '2' },
+        { status: 'rejected', reason: 'because' },
+      ]);
+      const result = await jobProcessors.sandboxNotifications().catch(e => e);
+      expect(result).to.be.an('error');
+      expect(result.message.split('.')[0]).to.equal('Sandbox organization reminders queued with 2 successes and 1 failures');
+    });
+
+    it('notify all sandbox organization members successfully', async () => {
+      sinon.stub(SandboxReminder, 'notifyOrganizations').resolves([
+        { status: 'fulfilled', value: '1' },
+        { status: 'fulfilled', value: '2' },
+      ]);
+      const result = await jobProcessors.sandboxNotifications().catch(e => e);
       expect(result).to.not.be.an('error');
     });
   });

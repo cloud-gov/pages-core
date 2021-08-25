@@ -10,6 +10,8 @@ import AddUserForm from './AddUserForm';
 import RemoveUserForm from './RemoveUserForm';
 import UpdateUserForm from './UpdateUserForm';
 import { timeFrom } from '../../util/datetime';
+import { sandboxOrgMsg } from '../../util';
+import AlertBanner from '../alertBanner';
 
 function successNotification(message) {
   return success({
@@ -104,6 +106,8 @@ function Edit({ actions, id }) {
     .filter(member => member.User.id !== currentUser.id)
     .sort((a, b) => a.User.UAAIdentity.email > b.User.UAAIdentity.email);
 
+  const getSandboxMsg = days => <span>{sandboxOrgMsg(days)}</span>;
+
   return (
     <div>
       <div className="page-header usa-grid-full">
@@ -113,6 +117,14 @@ function Edit({ actions, id }) {
       </div>
 
       <div className="well">
+        { org.isSandbox
+          && (
+          <AlertBanner
+            status="warning"
+            message={getSandboxMsg(org.daysUntilSandboxCleaning)}
+            alertRole={false}
+          />
+          )}
         <h3>Members</h3>
         <ExpandableArea title="Add user" bordered>
           <AddUserForm

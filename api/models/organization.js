@@ -1,5 +1,7 @@
 const { Op } = require('sequelize');
+const moment = require('moment');
 const { toInt } = require('../utils');
+const { sandboxDays } = require('../../config').app;
 
 const associate = ({
   Organization,
@@ -84,6 +86,30 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
+    },
+    sandboxCleanedAt: {
+      type: DataTypes.DATE,
+    },
+    daysUntilSandboxCleaning: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        if (!this.isSandbox) {
+          return null;
+        }
+        const start = moment(this.sandboxCleaningScheduledAt || this.createdAt).endOf('day');
+        const diff = start.diff(moment().endOf('day'));
+        return moment.duration(diff).asDays();
+      },
+    },
+    sandboxCleaningScheduledAt: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        if (!this.isSandbox) {
+          return null;
+        }
+        return moment(this.sandboxCleanedAt || this.createdAt).endOf('day')
+          .add(sandboxDays, 'days').toDate();
+      },
     },
   }, {
     paranoid: true,
