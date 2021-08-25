@@ -5,16 +5,22 @@ const sinon = require('sinon');
 const factory = require('../../support/factory');
 const { notifyOrganizations } = require('../../../../api/services/SandboxReminder');
 const Mailer = require('../../../../api/services/mailer');
-const { Organization, User } = require('../../../../api/models');
+const { Organization, User, Site, Role, SiteUser, OrganizationRole, } = require('../../../../api/models');
 const { sandboxDays,sandboxMaxNoticeDays, sandboxNoticeFrequency } = require('../../../../config').app;
 
 
-const createSandboxOrgDaysRemaining = async (daysRemaining, createdAt = new Date()) =>
-  factory.organization.create({
+const createSandboxOrgDaysRemaining = async (daysRemaining, createdAt = new Date()) => {
+  const org = await factory.organization.create({
     isSandbox: true,
     sandboxCleanedAt: moment().subtract(sandboxDays - daysRemaining, 'days').toDate(),
     createdAt,
    });
+   await factory.site({ organizationId: org.id });
+   const user = await factory.user();
+   const role = await Role.findOne({ where: { name: 'manager' } });
+   await OrganizationRole.create({ userId: user.id, organizationId: org.id, roleId: role.id });
+   return org;//.reload({ include: [User, Site] });
+  }
 
 describe('SandboxReminder', () => {
   let mailerSpy;
@@ -42,7 +48,16 @@ describe('SandboxReminder', () => {
       where: {
         id: orgsToNotify,
       },
-      include: [User],
+      include: [
+        {
+          model: User,
+          required: true,
+         },
+         {
+           model: Site,
+           required: true,
+         },
+        ],
     });
 
     expect(mailerSpy.callCount).to.equal(orgsToNotify.length);
@@ -71,7 +86,7 @@ describe('SandboxReminder', () => {
   });
 
   it('should not notify organizations to be cleaned at EOD', async () => {
-    await createSandboxOrgDaysRemaining(0)
+    await createSandboxOrgDaysRemaining(0);
     await notifyOrganizations();
 
     expect(mailerSpy.notCalled).to.be.true;
@@ -86,10 +101,68 @@ describe('SandboxReminder', () => {
   });
 
   it('should notify sandbox organizations never cleaned', async () => {
-    const createdAt = moment().subtract(sandboxDays - sandboxNoticeFrequency, 'days').toDate();
-    await factory.organization.create({ createdAt, isSandbox: true });
+    const org = await createSandboxOrgDaysRemaining(sandboxNoticeFrequency);
+    await org.update({sandboxCleanedA: null});
     await notifyOrganizations();
 
     expect(mailerSpy.called).to.be.true;
+  });
+
+  it('do not notify if no users are in org', async () => {
+    let org;
+    let orgsToNotify = [];
+    org = await createSandboxOrgDaysRemaining(sandboxNoticeFrequency);
+    orgsToNotify.push(org.id);
+    // do not notify b/c no users in org
+    org = await createSandboxOrgDaysRemaining(sandboxNoticeFrequency);
+    await OrganizationRole.destroy({ where: { organizationId: org.id } });
+    await notifyOrganizations();
+
+    orgsToNotify = await Organization.findAll({
+      where: {
+        id: orgsToNotify,
+      },
+      include: [
+        {
+          model: User,
+          required: true,
+         },
+         {
+           model: Site,
+           required: true,
+         },
+        ],
+    });
+    expect(mailerSpy.callCount).to.equal(orgsToNotify.length);
+    orgsToNotify.forEach(o => expect(mailerSpy.args).to.deep.include([o]));
+  });
+
+  it('do not notify if no sites are in org', async () => {
+    let org;
+    let orgsToNotify = [];
+    org = await createSandboxOrgDaysRemaining(sandboxNoticeFrequency);
+    orgsToNotify.push(org.id);
+    // do not notify b/c no sites in org
+    org = await createSandboxOrgDaysRemaining(sandboxNoticeFrequency);
+    await Site.destroy({ where: { organizationId: org.id } });
+    await notifyOrganizations();
+
+    orgsToNotify = await Organization.findAll({
+      where: {
+        id: orgsToNotify,
+      },
+      include: [
+        {
+          model: User,
+          required: true,
+         },
+         {
+           model: Site,
+           required: true,
+         },
+        ],
+    });
+    expect(mailerSpy.callCount).to.equal(orgsToNotify.length);
+    orgsToNotify.forEach(o => expect(mailerSpy.args).to.deep.include([o]));
   });
 });
