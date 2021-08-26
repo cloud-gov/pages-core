@@ -29,7 +29,7 @@
     "sirv-cli": "^1.0.0"
   },
   "dependencies": {
-    "date-fns": "^2.15.0",
+    "date-fns": "^2.23.0",
     "page": "^1.11.6",
     "svelte": "^3.0.0",
     "uswds": "^2.10.0"
