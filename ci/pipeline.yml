@@ -343,7 +343,7 @@ jobs:
             dir: src-admin-client
             path: ci/tasks/configure-admin-client-nginx.sh
           params:
-            API_DOMAIN: api.pages-staging.cloud.gov
+            API_DOMAIN: app.pages-staging.cloud.gov
       - task: deploy-admin-client
         config:
           <<: *cf-image
