@@ -334,6 +334,16 @@ jobs:
             dir: src-admin-client/admin-client
             path: bash
             args: [-c, yarn build]
+      - task: configure-nginx
+        config:
+          <<: *cf-image
+          inputs: [name: src-admin-client]
+          outputs: [name: src-admin-client]
+          run:
+            dir: src-admin-client
+            path: ci/tasks/configure-admin-client-nginx.sh
+          params:
+            API_DOMAIN: api.pages-staging.cloud.gov
       - task: deploy-admin-client
         config:
           <<: *cf-image
