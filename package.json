@@ -101,7 +101,7 @@
   "author": "dhcole",
   "license": "CC0-1.0",
   "devDependencies": {
-    "@babel/core": "^7.12.10",
+    "@babel/core": "^7.15.0",
     "@babel/polyfill": "^7.0.0",
     "@babel/preset-env": "^7.13.15",
     "@babel/preset-react": "^7.12.10",
