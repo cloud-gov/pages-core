@@ -195,6 +195,7 @@ jobs:
           status: pending
           base_context: concourse
           context: test-admin-client
+
       - do: *test-admin-client
       
     on_failure:
@@ -319,21 +320,9 @@ jobs:
       - put: gh-status
         inputs: [src-admin-client]
         params: {state: pending}
+
       - do: *test-admin-client
-      - task: build-admin-client
-        config:
-          platform: linux
-          image_resource:
-            <<: *node-image
-          inputs: [name: src-admin-client]
-          outputs: [name: src-admin-client]
-          params:
-            API_URL: https://app.pages-staging.cloud.gov
-            NODE_ENV: production           
-          run:
-            dir: src-admin-client/admin-client
-            path: bash
-            args: [-c, yarn build]
+
       - task: configure-nginx
         config:
           <<: *cf-image
@@ -342,20 +331,22 @@ jobs:
           run:
             dir: src-admin-client
             path: ci/tasks/configure-admin-client-nginx.sh
-          params:
-            API_DOMAIN: app.pages-staging.cloud.gov
+        params:
+          API_DOMAIN: app.pages-staging.cloud.gov
+
       - task: deploy-admin-client
         config:
           <<: *cf-image
           inputs: [name: src-admin-client]
           run:
-            path: src-admin-client/ci/tasks/deploy.sh
+            dir: src-admin-client
+            path: ci/tasks/deploy.sh
         params:
           <<: *staging-cf
           CF_APP_NAME: pages-admin-staging
-          CF_MANIFEST: src-admin-client/.cloudgov/manifest.yml
-          CF_VARS_FILE: src-admin-client/.cloudgov/vars/pages-staging.yml
-          CF_PATH: src-admin-client/admin-client
+          CF_MANIFEST: .cloudgov/manifest.yml
+          CF_VARS_FILE: .cloudgov/vars/pages-staging.yml
+          CF_PATH: admin-client
         on_failure:
           try:
             task: cancel-admin-client-deployment
@@ -363,10 +354,12 @@ jobs:
               <<: *cf-image
               inputs: [name: src-admin-client]
               run:
-                path: src-admin-client/ci/tasks/cancel-deployment.sh
+                dir: src-admin-client
+                path: ci/tasks/cancel-deployment.sh
             params:
               <<: *staging-cf
               CF_APP_NAME: pages-admin-staging
+
     on_failure:
       in_parallel:
         - put: gh-status
@@ -381,6 +374,7 @@ jobs:
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
+
     on_success:
       in_parallel:
         - put: gh-status
