@@ -507,5 +507,24 @@ describe('Webhooks Service', () => {
           done();
         });
     });
+
+    it('should do nothing if the user has a uaa identity', async () => {
+      const isActive = false;
+      const user = await factory.user({ isActive });
+      await user.createUAAIdentity({
+        uaaId: `${user.username}-placeholder-id`,
+        email: `${user.username}@example.com`,
+        userName: `${user.username}@example.com`,
+        origin: 'example.com',
+      });
+
+      const payload = organizationWebhookPayload('member_added', user.username);
+
+      await Webhooks.organizationWebhookRequest(payload);
+
+      await user.reload();
+
+      expect(user.isActive).to.be.false;
+    });
   });
 });
