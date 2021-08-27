@@ -5,6 +5,7 @@ const revokeMembershipForInactiveUsers = require('./revokeMembershipForInactiveU
 const timeoutBuilds = require('./timeoutBuilds');
 const verifyRepositories = require('./verifyRepositories');
 const sandboxNotifications = require('./sandboxNotifications');
+const cleanSandboxOrganizations = require('./cleanSandboxOrganizations');
 
 module.exports = {
   archiveBuildLogsDaily,
@@ -14,4 +15,5 @@ module.exports = {
   timeoutBuilds,
   verifyRepositories,
   sandboxNotifications,
+  cleanSandboxOrganizations,
 };

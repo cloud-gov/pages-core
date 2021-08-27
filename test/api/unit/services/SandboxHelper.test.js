@@ -3,10 +3,11 @@ const moment = require('moment');
 const sinon = require('sinon');
 
 const factory = require('../../support/factory');
-const { notifyOrganizations } = require('../../../../api/services/SandboxReminder');
+const { notifyOrganizations, cleanSandboxes } = require('../../../../api/services/SandboxHelper');
 const Mailer = require('../../../../api/services/mailer');
 const { Organization, User, Site, Role, SiteUser, OrganizationRole, } = require('../../../../api/models');
 const { sandboxDays,sandboxMaxNoticeDays, sandboxNoticeFrequency } = require('../../../../config').app;
+const SiteDestroyer = require('../../../../api/services/SiteDestroyer');
 
 
 const createSandboxOrgDaysRemaining = async (daysRemaining, createdAt = new Date()) => {
@@ -19,10 +20,10 @@ const createSandboxOrgDaysRemaining = async (daysRemaining, createdAt = new Date
    const user = await factory.user();
    const role = await Role.findOne({ where: { name: 'manager' } });
    await OrganizationRole.create({ userId: user.id, organizationId: org.id, roleId: role.id });
-   return org;//.reload({ include: [User, Site] });
+   return org.reload({ include: [Site, User]});
   }
 
-describe('SandboxReminder', () => {
+describe('notifyOrganizastions', () => {
   let mailerSpy;
   beforeEach(() => {
     mailerSpy = sinon.spy(Mailer, 'sendSandboxReminder');
@@ -93,16 +94,17 @@ describe('SandboxReminder', () => {
   });
 
   it('should not notify non-sandbox organizations', async () => {
-    const createdAt = moment().subtract(sandboxDays - sandboxNoticeFrequency, 'days').toDate();
-    await factory.organization.create({ createdAt });
+    const org = await createSandboxOrgDaysRemaining(sandboxNoticeFrequency);
+    await org.update({ isSandbox: false });
     await notifyOrganizations();
 
     expect(mailerSpy.notCalled).to.be.true;
   });
 
   it('should notify sandbox organizations never cleaned', async () => {
-    const org = await createSandboxOrgDaysRemaining(sandboxNoticeFrequency);
-    await org.update({sandboxCleanedA: null});
+    const createdAt = moment().subtract(sandboxDays - sandboxNoticeFrequency  , 'days').toDate();
+    const org = await createSandboxOrgDaysRemaining(sandboxNoticeFrequency, createdAt );
+    await org.update({sandboxCleanedAt: null});
     await notifyOrganizations();
 
     expect(mailerSpy.called).to.be.true;
@@ -166,3 +168,41 @@ describe('SandboxReminder', () => {
     orgsToNotify.forEach(o => expect(mailerSpy.args).to.deep.include([o]));
   });
 });
+
+describe('cleanSandboxes', () => {
+  let destroyerStub;
+  beforeEach(() => {
+    destroyerStub = sinon.stub(SiteDestroyer, 'destroySite').resolves();
+  });
+  afterEach(async () => {
+    Organization.truncate();
+    sinon.restore();
+  });
+
+  it('should clean all sites for since last cleaned', async () => {
+    const org  = await createSandboxOrgDaysRemaining(-10);
+    await factory.site({ organizationId: org.id });
+    await org.reload({ include: [Site] });
+    await cleanSandboxes();
+    org.Sites.forEach(s => expect(destroyerStub.args).to.deep.include([s]));
+  });
+
+  it('should not clean sites for for non sandbox org', async () => {
+    const org  = await createSandboxOrgDaysRemaining(-10);
+    org.update({ isSandbox: false })
+    await factory.site({ organizationId: org.id });
+    await org.reload({ include: [Site] });
+    await cleanSandboxes();
+    expect(destroyerStub.notCalled).to.be.true;
+  });
+
+  it('should clean all sites for since never cleaned', async () => {
+    const createdAt = moment().subtract(sandboxDays + 10, 'days').toDate();
+    const org  = await createSandboxOrgDaysRemaining(0, createdAt);
+    await org.update({ sandboxCleanedAt: null });
+    await factory.site({ organizationId: org.id });
+    await org.reload({ include: [Site] });
+    await cleanSandboxes();
+    org.Sites.forEach(s => expect(destroyerStub.args).to.deep.include([s]));
+  });
+})

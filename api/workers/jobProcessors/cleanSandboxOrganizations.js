@@ -1,8 +1,8 @@
 const SandboxHelper = require('../../services/SandboxHelper');
 const { logger } = require('../../../winston');
 
-async function sandboxNotifications() {
-  const results = await SandboxHelper.notifyOrganizations();
+async function cleanSandboxOrganizations() {
+  const results = await Promise.allSettled(SandboxHelper.cleanSandboxes());
   const successes = results
     .filter(result => result.status === 'fulfilled')
     .map(result => result.value);
@@ -27,4 +27,4 @@ async function sandboxNotifications() {
   logger.info(msg.join('\n'));
 }
 
-module.exports = sandboxNotifications;
+module.exports = cleanSandboxOrganizations;
