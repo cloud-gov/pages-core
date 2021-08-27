@@ -45,6 +45,7 @@ async function start() {
     timeoutBuilds: Processors.timeoutBuilds,
     verifyRepositories: Processors.verifyRepositories,
     sandboxNotifications: Processors.sandboxNotifications,
+    cleanSandboxOrganizations: Processors.cleanSandboxOrganizations,
   });
 
   // Workers
@@ -101,6 +102,7 @@ async function start() {
   if (appConfig.app_env === 'production') {
     jobs.push(scheduledQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig));
     jobs.push(scheduledQueue.add('sandboxNotifications', {}, nightlyJobConfig));
+    jobs.push(scheduledQueue.add('cleanSandboxOrganizations', {}, nightlyJobConfig));
   }
 
   await scheduledQueue.drain(); // clear the queue
