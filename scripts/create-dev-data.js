@@ -104,7 +104,7 @@ async function createData() {
   const [agency1, agency2, sandbox] = await Promise.all([
     Organization.create({ name: 'agency1' }),
     Organization.create({ name: 'agency2' }),
-    Organization.create({ name: 'sandbox-agency1', isSandbox: true }),
+    Organization.create({ name: 'user1@example.com', isSandbox: true }),
   ]);
 
   /** *****************************************
@@ -117,7 +117,6 @@ async function createData() {
     userOrgless,
     managerNoGithub,
     managerWithGithub,
-    amirbey,
   ] = await Promise.all([
 
     /**
@@ -186,9 +185,7 @@ async function createData() {
      */
     User
       .create({ username: 'amirbey', adminEmail: 'amir.reavis-bey@gsa.gov' })
-      .then(createUAAIdentity)
-      .then(user => addUserToOrg(user, agency1, userRole))
-      .then(user => addUserToOrg(user, sandbox, managerRole)),
+      .then(createUAAIdentity),
 
     User
       .create({ username: 'apburnes', adminEmail: 'andrew.burnes@gsa.gov' })
@@ -217,7 +214,7 @@ async function createData() {
    *                 Sites
    */
   console.log('Creating sites...');
-  const [site1, nodeSite, goSite, sandboxSite] = await Promise.all([
+  const [site1, nodeSite, goSite] = await Promise.all([
     siteFactory({
       demoBranch: 'demo-branch',
       demoDomain: 'https://demo.example.gov',
@@ -243,17 +240,6 @@ async function createData() {
       users: [user1, user2, managerNoGithub],
     })
       .then(site => addSiteToOrg(site, agency2)),
-
-    siteFactory({
-      demoBranch: 'demo-branch',
-      demoDomain: 'https://demo.example.gov',
-      domain: 'https://example.gov',
-      owner: sandbox.name,
-      repository: 'example-site',
-      users: [user1, amirbey],
-      defaultConfig: { hello: 'world' },
-    })
-      .then(site => addSiteToOrg(site, sandbox)),
   ]);
 
   await site1.createUserEnvironmentVariable({
@@ -349,19 +335,6 @@ async function createData() {
     }),
   ]);
 
-  const sandboxSiteBuilds = await Promise.all([
-    Build.create({
-      branch: sandboxSite.defaultBranch,
-      completedAt: new Date(),
-      source: 'fake-build',
-      state: 'success',
-      site: sandboxSite.id,
-      user: user1.id,
-      username: user1.username,
-      token: 'fake-token',
-    }),
-  ]);
-
   /** *****************************************
    *               Build Logs
    */
@@ -407,14 +380,6 @@ async function createData() {
       output: log(`Message ${idx} - A much longer log message to test that the horizontal scrolling is working the way we want.`),
       source: 'ALL',
       build: goSiteBuilds[0].id,
-    }))
-  );
-
-  await BuildLog.bulkCreate(
-    Array(20).fill(0).map(() => ({
-      output: log('This log has a source of ALL'),
-      source: 'ALL',
-      build: sandboxSiteBuilds[0].id,
     }))
   );
 
