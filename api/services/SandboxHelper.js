@@ -1,34 +1,33 @@
 const moment = require('moment');
-const { Op } = require('sequelize');
+const { Op, fn, col, where: whereClause } = require('sequelize');
 const PromisePool = require('@supercharge/promise-pool');
 const Mailer = require('./mailer');
 const { User, Organization, Site } = require('../models');
-const { sandboxDays, sandboxMaxNoticeDays, sandboxNoticeFrequency } = require('../../config').app;
+const { sandboxDays, sandboxNotices, sandboxNoticeDaysInterval } = require('../../config').app;
 const SiteDestroyer = require('./SiteDestroyer');
 
-const getSandboxOrganizations = (date, { include }) => Organization.findAll({
-  where: {
+const notifyOrganizations = async () => {
+  const getDate = (i) => moment().subtract(sandboxDays - (i * sandboxNoticeDaysInterval), 'days')
+    .format('YYYY-MM-DD');
+  const dates = []
+  let i = 1;
+  for(i=1; i <= sandboxNotices; i += 1) {
+    dates.push(getDate(i));
+  }
+  const where = {
     isSandbox: true,
     [Op.or]: [
+      whereClause(fn('date', col('"sandboxCleanedAt"')), { [Op.in]: dates}),
       {
-        sandboxCleanedAt: {
-          [Op.lte]: date,
-        },
-      },
-      {
-        sandboxCleanedAt: null,
-        createdAt: {
-          [Op.lte]: date,
-        },
+        [Op.and]: [
+          { sandboxCleanedAt: null },
+          whereClause(fn('date', col('Organization."createdAt"')), { [Op.in]: dates}),
+        ],
       },
     ],
-  },
-  include,
-});
-
-const notifyOrganizations = async () => {
-  const date = moment().subtract(sandboxDays - sandboxMaxNoticeDays, 'days').toDate();
-  const orgs = await getSandboxOrganizations(date, {
+  };
+  const orgsToNotify = await Organization.findAll({
+    where,
     include: [
       {
         model: User,
@@ -40,12 +39,11 @@ const notifyOrganizations = async () => {
       },
     ],
   });
-  const orgsToNotify = orgs // notify every x days
-    .filter(({ daysUntilSandboxCleaning: days }) => (days > 0 && !(days % sandboxNoticeFrequency)));
   return Promise.allSettled(orgsToNotify.map(org => Mailer.sendSandboxReminder(org)));
 };
 
-const destroySites = async ({ id, Sites: sites }) => {
+const destroySites = async (organization) => {
+  const { id, Sites: sites } = organization;
   const { errors } = await PromisePool
     .for(sites)
     .withConcurrency(5)
@@ -54,21 +52,37 @@ const destroySites = async ({ id, Sites: sites }) => {
   if (errors.length) {
     const errMsg = [
       `Unable to clean sandbox org@id=${id}. Removing org sites failed with the following errors:`,
-      errors.map(e => `  ${e.item.id}: ${e.message}`).join('\n'),
+      errors.map(e => `  site@id=${e.item.id}: ${e.message}`).join('\n'),
     ].join();
     throw new Error(errMsg);
   }
 };
 
 const cleanSandboxes = async () => {
-  const date = moment().subtract(sandboxDays, 'days').toDate();
-  const orgsToClean = await getSandboxOrganizations(date, {
+  const date = moment().subtract(sandboxDays, 'days').startOf('day').toDate();
+  const orgsToClean = await Organization.findAll({
+    where: {
+      isSandbox: true,
+      [Op.or]: [
+        {
+          sandboxCleanedAt: {
+            [Op.lt]: date,
+          },
+        },
+        {
+          sandboxCleanedAt: null,
+          createdAt: {
+            [Op.lt]: date,
+          },
+        },
+      ],
+    },
     include: {
       model: Site,
       required: true,
     },
   });
-  return orgsToClean.map(org => destroySites(org));
+  return Promise.allSettled(orgsToClean.map(org => destroySites(org)));
 };
 
 module.exports = { notifyOrganizations, cleanSandboxes };

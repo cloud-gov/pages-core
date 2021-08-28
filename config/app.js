@@ -7,6 +7,6 @@ module.exports = {
   proxySiteTable: process.env.PROXY_SITE_TABLE || 'federalist-proxy-dev',
   proxyPreviewHost: process.env.FEDERALIST_PREVIEW_HOSTNAME || 'http://*.sites-local.localhost:1337',
   sandboxDays: Number(process.env.SANDBOX_DAYS || 90),
-  sandboxMaxNoticeDays: Number(process.env.SANDBOX_MAX_NOTICE_DAYS || 15),
-  sandboxNoticeFrequency: Number(process.env.SANDBOX_NOTICE_FREQUENCY || 7),
+  sandboxNotices: Number(process.env.SANDBOX_NOTICES || 2),
+  sandboxNoticeDaysInterval: Number(process.env.SANDBOX_NOTICE_DAYS_INTERVAL || 7),
 };
