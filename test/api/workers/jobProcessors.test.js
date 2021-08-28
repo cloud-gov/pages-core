@@ -151,18 +151,18 @@ describe('job processors', () => {
 
   context('cleanSandboxOrganizations', () => {
     it('notify all sandbox organization members successfully', async () => {
-      sinon.stub(SandboxHelper, 'cleanSandboxes').returns([
-        Promise.resolve('cleaned'),
-        Promise.resolve('cleaned'),
+      sinon.stub(SandboxHelper, 'cleanSandboxes').resolves([
+        { status: 'fulfilled', value: 'cleaned' },
+        { status: 'fulfilled', value: 'cleaned' },
       ]);
       const result = await jobProcessors.cleanSandboxOrganizations();
       expect(result).to.not.be.an('error');
     });
 
     it('failed ot clean sandbox organization', async () => {
-      sinon.stub(SandboxHelper, 'cleanSandboxes').returns([
-        Promise.resolve('cleaned'),
-        Promise.reject('just because'),
+      sinon.stub(SandboxHelper, 'cleanSandboxes').resolves([
+        { status: 'fulfilled', value: 'cleaned' },
+        { status: 'rejected', reason: 'just because' },
       ]);
     
       const result = await jobProcessors.cleanSandboxOrganizations().catch(e => e); 
