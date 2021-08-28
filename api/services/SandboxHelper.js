@@ -1,5 +1,7 @@
 const moment = require('moment');
-const { Op, fn, col, where: whereClause } = require('sequelize');
+const {
+  Op, fn, col, where: whereClause,
+} = require('sequelize');
 const PromisePool = require('@supercharge/promise-pool');
 const Mailer = require('./mailer');
 const { User, Organization, Site } = require('../models');
@@ -7,21 +9,21 @@ const { sandboxDays, sandboxNotices, sandboxNoticeDaysInterval } = require('../.
 const SiteDestroyer = require('./SiteDestroyer');
 
 const notifyOrganizations = async () => {
-  const getDate = (i) => moment().subtract(sandboxDays - (i * sandboxNoticeDaysInterval), 'days')
+  const getDate = i => moment().subtract(sandboxDays - (i * sandboxNoticeDaysInterval), 'days')
     .format('YYYY-MM-DD');
-  const dates = []
+  const dates = [];
   let i = 1;
-  for(i=1; i <= sandboxNotices; i += 1) {
+  for (i = 1; i <= sandboxNotices; i += 1) {
     dates.push(getDate(i));
   }
   const where = {
     isSandbox: true,
     [Op.or]: [
-      whereClause(fn('date', col('"sandboxCleanedAt"')), { [Op.in]: dates}),
+      whereClause(fn('date', col('"sandboxCleanedAt"')), { [Op.in]: dates }),
       {
         [Op.and]: [
           { sandboxCleanedAt: null },
-          whereClause(fn('date', col('Organization."createdAt"')), { [Op.in]: dates}),
+          whereClause(fn('date', col('Organization."createdAt"')), { [Op.in]: dates }),
         ],
       },
     ],
