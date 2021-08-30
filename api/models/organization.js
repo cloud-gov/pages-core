@@ -96,7 +96,7 @@ module.exports = (sequelize, DataTypes) => {
         if (!this.isSandbox) {
           return null;
         }
-        const start = moment(this.sandboxCleaningScheduledAt || this.createdAt).endOf('day');
+        const start = moment(this.sandboxCleaningScheduledAt).endOf('day');
         const diff = start.diff(moment().endOf('day'));
         return moment.duration(diff).asDays();
       },
