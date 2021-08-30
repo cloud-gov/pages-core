@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const sinon = require('sinon');
 const moment = require('moment');
 const proxyquire = require('proxyquire').noCallThru();
@@ -39,7 +39,7 @@ describe('sessionAuth', () => {
       return Promise.reject(new Error('user not valid'));
     });
 
-    sessionAuth = proxyquire('../../../../api/policies/sessionAuth', {
+    sessionAuth = proxyquire('../../../../api/middlewares/session-auth', {
       '../services/GitHub': {
         validateUser: validateUserSpy,
       },
