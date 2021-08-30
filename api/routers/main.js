@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
 const MainController = require('../controllers/main');
-const csrfProtection = require('../policies/csrfProtection');
+const { csrfProtection } = require('../middlewares');
 
 router.get('/', MainController.home);
 router.get('/system-use', MainController.systemUse);
