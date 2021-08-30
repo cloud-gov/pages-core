@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const { Op } = require('sequelize');
 
 const factory = require('../../support/factory');
-const { User, Event, sequelize } = require('../../../../api/models');
+const { User, UAAIdentity, Event, sequelize } = require('../../../../api/models');
 const GitHub = require('../../../../api/services/GitHub');
 const EventCreator = require('../../../../api/services/EventCreator');
 const FederalistUsersHelper = require('../../../../api/services/FederalistUsersHelper');
@@ -170,6 +170,36 @@ describe('FederalistUsersHelper', () => {
       await FederalistUsersHelper.revokeMembershipForInactiveUsers({ auditorUsername: admin.username });
       expect(removeOrganizationMemberStub.callCount).to.equal(0);
       expect(getOrg('federalist-users').length).to.equal(16);
+    });
+  });
+
+  describe('revokeMembershipForUAAUsers', () => {
+    afterEach(async () => {
+      await User.truncate();
+      await UAAIdentity.truncate();
+    });
+
+    it('should remove uaa user (not org admin)', async () => {
+      const admin = await factory.user();
+      const uaaUsers = await Promise.all([
+        factory.user(),
+        factory.user(),
+      ]);
+      const nonUaaUsers = await Promise.all([
+        factory.user(),
+        factory.user(),
+        factory.user(),
+      ]);
+
+      await Promise.all(uaaUsers.map(user => factory.uaaIdentity({ userId: user.id })));
+
+      const allUsers = uaaUsers.concat(nonUaaUsers);
+      allUsers.forEach(user => addMember('federalist-users', user.username));
+      addMember('federalist-users', admin.username.toUpperCase(), 'admin');
+      expect(getOrg('federalist-users').length).to.equal(16);
+      await FederalistUsersHelper.revokeMembershipForUAAUsers({ auditorUsername: admin.username });
+      expect(removeOrganizationMemberStub.callCount).to.equal(2);
+      expect(getOrg('federalist-users').length).to.equal(14);
     });
   });
 

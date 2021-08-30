@@ -41,6 +41,7 @@ async function start() {
     archiveBuildLogsDaily: Processors.archiveBuildLogsDaily,
     nightlyBuilds: Processors.nightlyBuilds,
     revokeMembershipForInactiveUsers: Processors.revokeMembershipForInactiveUsers,
+    revokeMembershipForUAAUsers: Processors.revokeMembershipForUAAUsers,
     timeoutBuilds: Processors.timeoutBuilds,
     verifyRepositories: Processors.verifyRepositories,
   });
@@ -90,6 +91,7 @@ async function start() {
     scheduledQueue.add('nightlyBuilds', {}, nightlyJobConfig),
     scheduledQueue.add('verifyRepositories', {}, nightlyJobConfig),
     scheduledQueue.add('revokeMembershipForInactiveUsers', {}, nightlyJobConfig),
+    scheduledQueue.add('revokeMembershipForUAAUsers', {}, nightlyJobConfig),
   ];
 
   if (appConfig.app_env === 'production') {
