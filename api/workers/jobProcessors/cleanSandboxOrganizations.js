@@ -11,7 +11,7 @@ async function cleanSandboxOrganizations() {
     .filter(result => result.status === 'rejected')
     .map(result => result.reason);
 
-  const msg = [`Sandbox organization reminders queued with ${successes.length} successes and ${failures.length} failures.`];
+  const msg = [`Sandbox organizations cleaned with ${successes.length} successes and ${failures.length} failures.`];
   if (successes.length) {
     msg.push(`   Successes:\n      ${successes.join('\n      ')}`);
   }
@@ -20,7 +20,7 @@ async function cleanSandboxOrganizations() {
   }
 
   if (failures.length) {
-    logger.error(`Exiting with failed queued sandbox organization reminders.  ${msg.join('\n')}`);
+    logger.error(`Exiting with failed cleaning of sandbox organizations.  ${msg.join('\n')}`);
     throw new Error(msg.join('\n'));
   }
 
