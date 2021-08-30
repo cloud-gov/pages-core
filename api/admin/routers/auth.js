@@ -1,5 +1,5 @@
 const { Router } = require('express');
-
+const config = require('../../../config');
 const passport = require('../passport');
 
 const onSuccess = (req, res) => {
@@ -14,7 +14,13 @@ const onSuccess = (req, res) => {
 
 const router = Router();
 
-router.get('/login', passport.authenticate('uaa'));
+// Until Pages SCR
+const authProvider = config.app.product === 'federalist' ? 'github' : 'uaa';
+router.get('/login', passport.authenticate(authProvider));
+router.get('/auth/github2/callback', passport.authenticate('github'), onSuccess);
+//
+
+// router.get('/login', passport.authenticate('uaa'));
 router.get('/logout', passport.logout);
 
 // Callbacks need to be registered with CF UAA service
