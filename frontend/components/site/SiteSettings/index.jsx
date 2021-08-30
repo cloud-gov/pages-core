@@ -37,7 +37,7 @@ class SiteSettings extends React.Component {
   render() {
     const { site, organization } = this.props;
 
-    if (!site || !organization) {
+    if (!site) {
       return null;
     }
 
@@ -82,7 +82,7 @@ class SiteSettings extends React.Component {
           .
         </p>
 
-        {!organization.isSandbox
+        {!organization?.isSandbox
           && (
           <BasicSiteSettings
             initialValues={basicInitialValues}
