@@ -168,7 +168,7 @@ describe('job processors', () => {
       const result = await jobProcessors.cleanSandboxOrganizations().catch(e => e); 
       expect(result).to.be.an('error');
       expect(result.message).to.equal([
-        'Sandbox organization reminders queued with 1 successes and 1 failures.',
+        'Sandbox organizations cleaned with 1 successes and 1 failures.',
         '   Successes:\n      cleaned\n   Failures:\n      just because'
       ].join('\n'));
     });
