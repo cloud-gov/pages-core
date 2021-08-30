@@ -9,12 +9,12 @@ const { sandboxDays, sandboxNotices, sandboxNoticeDaysInterval } = require('../.
 const SiteDestroyer = require('./SiteDestroyer');
 
 const notifyOrganizations = async () => {
-  const getDate = i => moment().subtract(sandboxDays - (i * sandboxNoticeDaysInterval), 'days')
+  const getNoticeDate = i => moment().subtract(sandboxDays - (i * sandboxNoticeDaysInterval), 'days')
     .format('YYYY-MM-DD');
   const dates = [];
   let i = 1;
   for (i = 1; i <= sandboxNotices; i += 1) {
-    dates.push(getDate(i));
+    dates.push(getNoticeDate(i));
   }
   const where = {
     isSandbox: true,
