@@ -6,8 +6,10 @@ const {
   Organization, OrganizationRole, Role, User,
 } = require('../../../../api/models');
 
+const csrfToken = require('../../support/csrfToken');
 const factory = require('../../support/factory');
 const { authenticatedSession } = require('../../support/session');
+const config = require('../../../../config');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const validateAgainstJSONSchema = require('../../support/validateAgainstJSONSchema');
 
@@ -73,6 +75,8 @@ describe('Organization Role Admin API', () => {
       })).to.eq(1);
 
       const response = await authenticatedRequest.delete('/organization-role')
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
         .send({
           organizationId: org.id,
           userId: user.id,
@@ -104,6 +108,8 @@ describe('Organization Role Admin API', () => {
       ]);
 
       const response = await authenticatedRequest.put('/organization-role')
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
         .send({
           organizationId: org.id,
           userId: user.id,
@@ -129,6 +135,8 @@ describe('Organization Role Admin API', () => {
       expect(orgRole.roleId).to.eq(userRole.id);
 
       const response = await authenticatedRequest.put('/organization-role')
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
         .send({
           organizationId: org.id,
           roleId: managerRole.id,

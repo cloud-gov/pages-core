@@ -1,15 +1,18 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
 const initial = {
   authenticated: false,
+  csrfToken: null,
   user: null,
 };
 
-const { set, subscribe, update } = writable(initial);
+const store = writable(initial);
+const { set, subscribe, update } = store;
 
 export default {
-  login: (user) => set({ authenticated: true, user }),
+  csrfToken: () => get(store).csrfToken,
+  login: ({ csrfToken, ...user }) => set({ authenticated: true, csrfToken, user }),
   logout: () => set(initial),
-  updateUser: (user) => update((s) => ({ ...s, user })),
+  updateUser: ({ csrfToken, ...user }) => update((s) => ({ ...s, csrfToken, user })),
   subscribe,
 };
