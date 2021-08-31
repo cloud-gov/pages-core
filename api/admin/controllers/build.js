@@ -55,4 +55,18 @@ module.exports = wrapHandlers({
 
     return res.json(buildLogs);
   },
+
+  async update(req, res) {
+    const {
+      body: { state },
+      params: { id },
+    } = req;
+
+    const build = await fetchModelById(id, Build, { include: [Site] });
+    if (!build) return res.notFound();
+
+    await build.update({ state });
+
+    return res.json(buildSerializer.serializeObject(build));
+  },
 });
