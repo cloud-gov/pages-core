@@ -298,7 +298,7 @@ const webhook = ({
 
   let resp = response || 201;
   if (typeof resp === 'number') {
-    resp = [resp];
+    resp = [resp, { id: 1 }];
   }
 
   return webhookNock.reply(...resp);
