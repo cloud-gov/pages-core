@@ -1,7 +1,9 @@
 const IORedis = require('ioredis');
-const { redis: redisConfig } = require('../../../config');
+const config = require('../../../config');
 const { MailQueue } = require('../../queues');
 const Templates = require('./templates');
+
+const { redis: redisConfig, app: { app_env: appEnv } } = config;
 
 let mailQueue;
 
@@ -30,7 +32,17 @@ async function sendUAAInvite(email, link) {
   });
 }
 
+async function sendAlert(reason, errors) {
+  ensureInit();
+  return mailQueue.add('alert', {
+    to: ['federalist-admins@gsa.gov'],
+    subject: `Federalist ${appEnv} Alert | ${reason}`,
+    html: Templates.alert({ errors, reason }),
+  });
+}
+
 module.exports = {
   init,
   sendUAAInvite,
+  sendAlert,
 };
