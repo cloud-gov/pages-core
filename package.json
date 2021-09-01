@@ -12,7 +12,7 @@
     "aws-sdk": "^2.879.0",
     "axios": "^0.21.1",
     "bull": "^3.20.1",
-    "bullmq": "^1.26.5",
+    "bullmq": "^1.44.2",
     "cfenv": "^1.2.3",
     "connect-flash": "^0.1.1",
     "connect-redis": "^6.0.0",
