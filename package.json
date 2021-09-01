@@ -162,7 +162,7 @@
     "supertest": "^6.0.0",
     "watch": "^1.0.2",
     "webpack": "^5.37.1",
-    "webpack-cli": "^4.7.0",
+    "webpack-cli": "^4.8.0",
     "webpack-dev-middleware": "^4.0.2",
     "webpack-dev-server": "^3.11.2",
     "webpack-manifest-plugin": "^3.0.0"
