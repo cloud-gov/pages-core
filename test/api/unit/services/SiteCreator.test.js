@@ -44,6 +44,7 @@ describe('SiteCreator', () => {
       expect(site.Builds).to.have.length(1);
       expect(site.Builds[0].user).to.equal(user.id);
       expect(site.defaultBranch).to.equal(defaultBranch);
+      expect(site.webhookId).to.not.be.null;
     };
 
     const afterCreateSite = (owner, repository) => Site.findOne({
