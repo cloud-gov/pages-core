@@ -115,7 +115,7 @@
     "chai-fetch-mock": "^3.0.0",
     "concurrently": "^6.1.0",
     "cookie": "^0.4.1",
-    "css-loader": "^5.0.0",
+    "css-loader": "^6.2.0",
     "date-fns": "^2.16.1",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",
