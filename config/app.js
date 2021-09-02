@@ -9,4 +9,7 @@ module.exports = {
   sandboxDays: Number(process.env.SANDBOX_DAYS || 90),
   sandboxNotices: Number(process.env.SANDBOX_NOTICES || 2),
   sandboxNoticeDaysInterval: Number(process.env.SANDBOX_NOTICE_DAYS_INTERVAL || 7),
+  domain: process.env.DOMAIN || 'localhost:1337',
+  proxyDomain: process.env.PROXY_DOMAIN || 'localhost:1337',
+  product: process.env.PRODUCT || 'pages',
 };

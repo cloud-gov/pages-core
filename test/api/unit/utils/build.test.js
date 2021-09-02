@@ -4,19 +4,7 @@ const { buildViewLink, buildUrl } = require('../../../../api/utils/build');
 const factory = require('../../support/factory');
 const config = require('../../../../config');
 
-const getTestDomain = (subdomain) => config.app.proxyPreviewHost.replace('*', subdomain);
-
 describe('build utils', () => {
-  const defaultProxyEgeLinks = process.env.FEATURE_PROXY_EDGE_LINKS;
-
-  beforeEach(() => {
-    process.env.FEATURE_PROXY_EDGE_LINKS = 'true'
-  });
-
-  after(() => {
-    process.env.FEATURE_PROXY_EDGE_LINKS = defaultProxyEgeLinks;
-  });
-
   describe('buildUrl', () => {
     let site;
     before(async () => {
@@ -26,7 +14,7 @@ describe('build utils', () => {
     it('default branch url start with site', async () => {
       let build = await factory.build({ branch: site.defaultBranch, site });
       const url = [
-        `https://${site.awsBucketName}.app.cloud.gov`,
+        `https://${site.awsBucketName}.${config.app.domain}`,
         `/site/${site.owner}/${site.repository}`,
       ].join('');
       expect(buildUrl(build, site)).to.eql(url);
@@ -35,7 +23,7 @@ describe('build utils', () => {
     it('demo branch url start with demo', async () => {
       const build = await factory.build({ branch: site.demoBranch, site });
       const url = [
-        `https://${site.awsBucketName}.app.cloud.gov`,
+        `https://${site.awsBucketName}.${config.app.domain}`,
         `/demo/${site.owner}/${site.repository}`,
       ].join('');
       expect(buildUrl(build, site)).to.eql(url);
@@ -44,7 +32,7 @@ describe('build utils', () => {
     it('non-default/demo branch url start with preview', async () => {
       const build = await factory.build({ branch: 'other', site });
       const url = [
-        `https://${site.awsBucketName}.app.cloud.gov`,
+        `https://${site.awsBucketName}.${config.app.domain}`,
         `/preview/${site.owner}/${site.repository}/other`,
       ].join('');
       expect(buildUrl(build, site)).to.eql(url);
@@ -71,18 +59,7 @@ describe('build utils', () => {
       expect(buildViewLink(build, site)).to.eql(`${demoDomain}/`);
     });
 
-    describe('non-default/demo branch url start with preview', () => {
-      it('default to build.url', async () => {
-        const build = await factory.build({ branch: 'other', site, url: 'https://the.url' });
-        expect(buildViewLink(build, site)).to.eql(
-        `${getTestDomain(site.subdomain)}/preview/${site.owner}/${site.repository}/${build.branch}/`
-        );
-      });
-    });
-
-    describe('should return domain on app.cloud.gov when when env FEATURE_PROXY_EDGE_LINKS=false', () => {
-      beforeEach(() => process.env.FEATURE_PROXY_EDGE_LINKS = 'false');
-      afterEach(() => process.env.FEATURE_PROXY_EDGE_LINKS = 'true');
+    describe('should return configured domain', () => {
       it('build.url does not exist', async () => {
         const build = await factory.build({ branch: 'other', site });
         expect(buildViewLink(build, site)).to.equal(`${buildUrl(build, site)}/`);

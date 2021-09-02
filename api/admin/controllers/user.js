@@ -7,7 +7,10 @@ const OrganizationService = require('../../services/organization');
 
 module.exports = wrapHandlers({
   async me(req, res) {
-    res.json(userSerializer.toJSON(req.user));
+    res.json({
+      ...userSerializer.toJSON(req.user),
+      csrfToken: req.csrfToken(),
+    });
   },
 
   async list(req, res) {
@@ -50,7 +53,7 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const user = await fetchModelById(id, User.scope('withUAAIdentity'));
+    const user = await fetchModelById(id, User.scope(['withUAAIdentity', 'withOrganizationRoles']));
     if (!user) {
       return res.notFound();
     }

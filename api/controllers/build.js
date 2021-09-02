@@ -4,16 +4,13 @@ const GithubBuildHelper = require('../services/GithubBuildHelper');
 const siteAuthorizer = require('../authorizers/site');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const EventCreator = require('../services/EventCreator');
-const ProxyDataSync = require('../services/ProxyDataSync');
 const { wrapHandlers } = require('../utils');
 const {
   Build, Site, User, Event,
 } = require('../models');
 const socketIO = require('../socketIO');
-const Features = require('../features');
 
 const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
-const BUILD_SETTINGS_FILE = 'federalist.json';
 
 const emitBuildStatus = async (build) => {
   try {
@@ -32,20 +29,6 @@ const emitBuildStatus = async (build) => {
     socketIO.to(builderRoom).emit('build status', msg);
   } catch (err) {
     EventCreator.error(Event.labels.SOCKET_IO, err, { buildId: build.id });
-  }
-};
-
-const saveBuildToProxy = async (build) => {
-  const buildSettings = await GithubBuildHelper.fetchContent(build, BUILD_SETTINGS_FILE);
-  if (buildSettings) {
-    const settings = JSON.parse(buildSettings);
-    await ProxyDataSync.saveBuild(build, settings);
-    const body = {
-      filename: BUILD_SETTINGS_FILE,
-      commitSha: build.clonedCommitSha,
-    };
-    const message = `${BUILD_SETTINGS_FILE} saved to proxy database`;
-    EventCreator.audit(Event.labels.PROXY_EDGE, build, message, body);
   }
 };
 
@@ -152,12 +135,6 @@ module.exports = wrapHandlers({
     // and there is no need to report status to Github
     if (build.requestedCommitSha) {
       await GithubBuildHelper.reportBuildStatus(build);
-    }
-
-    if (Features.enabled(Features.Flags.FEATURE_PROXY_EDGE_DYNAMO)) {
-      if (buildStatus.status === Build.States.Success) {
-        await saveBuildToProxy(build);
-      }
     }
 
     return res.ok();

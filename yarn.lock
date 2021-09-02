@@ -3836,11 +3836,6 @@ deep-is@^0.1.3:
   resolved "https://registry.yarnpkg.com/deep-is/-/deep-is-0.1.3.tgz#b369d6fb5dbc13eecf524f91b070feedc357cf34"
   integrity sha1-s2nW+128E+7PUk+RsHD+7cNXzzQ=
 
-deepmerge@^4.2.2:
-  version "4.2.2"
-  resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-4.2.2.tgz#44d2ea3679b8f4d4ffba33f03d865fc1e7bf4955"
-  integrity sha512-FJ3UgI4gIl+PHZm53knsuSFpE+nESMr7M4v9QcgB7S63Kj/6WqMiFQJpBBYz1Pt+66bZpP3Q7Lye0Oo9MPKEdg==
-
 default-gateway@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/default-gateway/-/default-gateway-4.2.0.tgz#167104c7500c2115f6dd69b0a536bb8ed720552b"
@@ -5652,7 +5647,7 @@ hasha@^5.0.0:
     is-stream "^2.0.0"
     type-fest "^0.8.0"
 
-he@1.2.0, he@^1.2.0:
+he@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
@@ -5715,16 +5710,6 @@ html-tags@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/html-tags/-/html-tags-3.1.0.tgz#7b5e6f7e665e9fb41f30007ed9e0d41e97fb2140"
   integrity sha512-1qYz89hW3lFDEazhjW0yVAV87lw8lVkrJocr72XmBkMKsoSVJCQx3W8BXsC7hO2qAt8BoVjYjtAcZ9perqGnNg==
-
-html-to-text@7.1.1:
-  version "7.1.1"
-  resolved "https://registry.yarnpkg.com/html-to-text/-/html-to-text-7.1.1.tgz#69de8d85b91646b4bc14fdf4f850e9e046efff15"
-  integrity sha512-c9QWysrfnRZevVpS8MlE7PyOdSuIOjg8Bt8ZE10jMU/BEngA6j3llj4GRfAmtQzcd1FjKE0sWu5IHXRUH9YxIQ==
-  dependencies:
-    deepmerge "^4.2.2"
-    he "^1.2.0"
-    htmlparser2 "^6.1.0"
-    minimist "^1.2.5"
 
 htmlescape@^1.1.0:
   version "1.1.1"
@@ -7842,18 +7827,6 @@ node-schedule@^2.0.0:
     cron-parser "^3.1.0"
     long-timeout "0.1.1"
     sorted-array-functions "^1.3.0"
-
-nodemailer-html-to-text@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/nodemailer-html-to-text/-/nodemailer-html-to-text-3.2.0.tgz#91b959491fef8f7d91796047abb728aa86d4a12b"
-  integrity sha512-RJUC6640QV1PzTHHapOrc6IzrAJUZtk2BdVdINZ9VTLm+mcQNyBO9LYyhrnufkzqiD9l8hPLJ97rSyK4WanPNg==
-  dependencies:
-    html-to-text "7.1.1"
-
-nodemailer@^6.6.2:
-  version "6.6.2"
-  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-6.6.2.tgz#e184c9ed5bee245a3e0bcabc7255866385757114"
-  integrity sha512-YSzu7TLbI+bsjCis/TZlAXBoM4y93HhlIgo0P5oiA2ua9Z4k+E2Fod//ybIzdJxOlXGRcHIh/WaeCBehvxZb/Q==
 
 nodemon@^2.0.6:
   version "2.0.7"

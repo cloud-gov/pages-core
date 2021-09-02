@@ -17,19 +17,18 @@ applications:
         memory: ((memory))
     services:
       - app-((env))-uaa-client
-      - federalist-((env))-rds
-      - federalist-((env))-s3
-      - federalist-((env))-env
-      - federalist-((env))-sqs-creds
-      - federalist-((env))-redis
-      - federalist-((env))-space
-      - federalist-((env))-proxy
-      - federalist-((env))-domain
-      - federalist-((env))-uev-key
+      - ((product))-((env))-rds
+      - ((product))-((env))-s3
+      - ((product))-((env))-env
+      - ((product))-((env))-sqs-creds
+      - ((product))-((env))-redis
+      - ((product))-((env))-proxy
+      - ((product))-((env))-domain
+      - ((product))-((env))-uev-key
       - federalist-deploy-user
       - federalist-site-wide-error
-      - federalist-((env))-dynamodb-creds
-      - federalist-((env))-s3-build-logs
+      - ((product))-((env))-s3-build-logs
+      - mailer
     env:
       NODE_ENV: production
       APP_ENV: ((env))
@@ -37,6 +36,7 @@ applications:
       APP_HOSTNAME: https://((app_subdomain))((domain))
       CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
+      DOMAIN: ((domain))
       HOMEPAGE_URL: https://federalist.18f.gov
       LOG_LEVEL: ((log_level))
       NPM_CONFIG_PRODUCTION: true
@@ -44,21 +44,13 @@ applications:
       SOCKET_HOST: https://((app_subdomain))((domain))
       USER_AUDITOR: federalist
       S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
-      FEDERALIST_PREVIEW_HOSTNAME: https://*.sites((env_postfix)).federalist.18f.gov
-      PROXY_SITE_TABLE: federalist-proxy-((env))
       FEATURE_AUTH_GITHUB: ((feature_auth_github))
       FEATURE_AUTH_UAA: ((feature_auth_uaa))
-      FEATURE_PROXY_EDGE_DYNAMO: ((feature_proxy_edge_dynamo))
-      FEATURE_PROXY_EDGE_LINKS: ((feature_proxy_edge_links))
       FEATURE_BULL_SITE_BUILD_QUEUE: ((feature_bull_site_build_queue))
       UAA_HOST: ((uaa_host))
       NEW_RELIC_APP_NAME: ((new_relic_app_name))
-      SMTP_CERT: ((smtp_cert))
-      SMTP_FROM: ((smtp_from))
-      SMTP_HOST: ((smtp_host))
-      SMTP_PASSWORD: ((smtp_password))
-      SMTP_PORT: ((smtp_port))
-      SMTP_USER: ((smtp_user))
+      PROXY_DOMAIN: ((proxy_domain))
+      PRODUCT: ((product))
   - name: ((product))-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client
@@ -74,7 +66,7 @@ applications:
       - route: queues.((domain))
     services:
       - app-((env))-uaa-client
-      - federalist-((env))-redis
+      - ((product))-((env))-redis
     env:
       NODE_ENV: production
       APP_ENV: ((env))

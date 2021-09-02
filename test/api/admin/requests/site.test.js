@@ -5,15 +5,14 @@ const { restore, stub } = require('sinon');
 const validateAgainstJSONSchema = require('../../support/validateAgainstJSONSchema');
 const { authenticatedSession } = require('../../support/session');
 const factory = require('../../support/factory');
+const csrfToken = require('../../support/csrfToken');
 
+const config = require('../../../../config');
 const { Site, User } = require('../../../../api/models');
 const S3SiteRemover = require('../../../../api/services/S3SiteRemover');
-const ProxyDataSync = require('../../../../api/services/ProxyDataSync');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const { serializeNew } = require('../../../../api/serializers/site');
 const app = require('../../../../api/admin');
-
-const defaultProxyEgeLinks = process.env.FEATURE_PROXY_EDGE_LINKS;
 
 const itShouldRequireAdminAuthentication = (path, schema, method = 'get') => {
   it('should require admin authentication', async () => {
@@ -45,6 +44,7 @@ describe('Admin - Site API', () => {
       const { body } = await request(app)
         .get('/sites')
         .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
         .expect(200);
 
       validateAgainstJSONSchema('GET', '/site', 200, body.data);
@@ -68,6 +68,7 @@ describe('Admin - Site API', () => {
       const { body } = await request(app)
         .get(`/sites/${site.id}`)
         .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
         .expect(200);
 
       validateAgainstJSONSchema('GET', '/site/{id}', 200, body);
@@ -91,6 +92,8 @@ describe('Admin - Site API', () => {
       const putResponse = await request(app)
         .put(`/sites/${site.id}`)
         .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
         .send({
           containerConfig: newContainerConfig,
         })
@@ -102,6 +105,7 @@ describe('Admin - Site API', () => {
       const getResponse = await request(app)
         .get(`/sites/${site.id}`)
         .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
         .expect(200);
 
       expect(getResponse.body.containerConfig).to.deep.equal(newContainerConfig);
@@ -111,15 +115,13 @@ describe('Admin - Site API', () => {
   describe('DELETE /admin/sites/:id', () => {
     itShouldRequireAdminAuthentication('/sites/1', '/site/{id}', 'delete');
 
-    describe('Without FEATURE_PROXY_EDGE_DYNAMO', () => {
+    describe('default', () => {
       beforeEach(() => {
-        process.env.FEATURE_PROXY_EDGE_DYNAMO = '';
         stub(S3SiteRemover, 'removeSite').resolves();
         stub(S3SiteRemover, 'removeInfrastructure').resolves();
       });
 
       afterEach(() => {
-        process.env.FEATURE_PROXY_EDGE_DYNAMO = defaultProxyEgeLinks;
         restore();
       });
 
@@ -134,6 +136,8 @@ describe('Admin - Site API', () => {
         const deleteResponse = await request(app)
           .delete(`/sites/${site.id}`)
           .set('Cookie', cookie)
+          .set('Origin', config.app.adminHostname)
+          .set('x-csrf-token', csrfToken.getToken())
           .expect(200);
 
         // Check updatedAt is later
@@ -149,56 +153,13 @@ describe('Admin - Site API', () => {
         await request(app)
           .get(`/sites/${site.id}`)
           .set('Cookie', cookie)
-          .expect(404);
-      });
-    });
-
-    describe('With FEATURE_PROXY_EDGE_DYNAMO', () => {
-      beforeEach(() => {
-        process.env.FEATURE_PROXY_EDGE_DYNAMO = 'true';
-        stub(S3SiteRemover, 'removeSite').resolves();
-        stub(S3SiteRemover, 'removeInfrastructure').resolves();
-        stub(ProxyDataSync, 'removeSite').resolves();
-      });
-
-      afterEach(() => {
-        process.env.FEATURE_PROXY_EDGE_DYNAMO = defaultProxyEgeLinks;
-        restore();
-      });
-
-      it('deletes the following site', async () => {
-        const [user, site] = await Promise.all([
-          factory.user(),
-          factory.site(),
-        ]);
-
-        const expectedResponse = serializeNew(site, true);
-        const cookie = await authenticatedSession(user, sessionConfig);
-        const deleteResponse = await request(app)
-          .delete(`/sites/${site.id}`)
-          .set('Cookie', cookie)
-          .expect(200);
-
-        // Check updatedAt is later
-        expect(new Date(deleteResponse.body.updatedAt))
-          .to.be.above(new Date(expectedResponse.updatedAt));
-
-        // Remove updatedAt to deep equal other properties
-        delete deleteResponse.body.updatedAt;
-        delete expectedResponse.updatedAt;
-        expect(deleteResponse.body).to.deep.equal(expectedResponse);
-
-        // Requery
-        await request(app)
-          .get(`/sites/${site.id}`)
-          .set('Cookie', cookie)
+          .set('Origin', config.app.adminHostname)
           .expect(404);
       });
     });
 
     describe('With an error', () => {
       beforeEach(() => {
-        process.env.FEATURE_PROXY_EDGE_DYNAMO = '';
         stub(S3SiteRemover, 'removeSite').rejects();
       });
 
@@ -216,6 +177,8 @@ describe('Admin - Site API', () => {
         const { body } = await request(app)
           .delete(`/sites/${site.id}`)
           .set('Cookie', cookie)
+          .set('Origin', config.app.adminHostname)
+          .set('x-csrf-token', csrfToken.getToken())
           .expect(500);
 
         expect(body.message).to.equal('An unexpected error occurred');

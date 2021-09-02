@@ -37,13 +37,18 @@ const organizationWebhookRequest = async (payload) => {
 
   const { login } = membership.user;
   const username = login.toLowerCase();
-  let user = await User.findOne({ where: { username } });
+  let user = await User.scope('withUAAIdentity').findOne({ where: { username } });
 
   const isActive = action === 'member_added';
 
   if (!user && isActive) {
     user = await User.create({ username });
   }
+
+  if (user?.UAAIdentity) {
+    return;
+  }
+
   if (user) {
     if (isActive !== user.isActive) {
       await user.update({ isActive });

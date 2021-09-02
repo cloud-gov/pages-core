@@ -41,6 +41,28 @@ describe('UAAClient', () => {
     });
   });
 
+  describe('.fetchGroupMembers()', () => {
+    const clientToken = 'client-token';
+
+    it('returns the group members', async () => {
+      const groupId = '1';
+      const users = [
+        {
+          emails: [{ value: 'foo@bar.com' }], id: 'fkjhskfhsd', origin: 'example.com', userName: 'foo',
+        },
+        {
+          emails: [{ value: 'bar@baz.com' }], id: 'sdfkjhsfksfd', origin: 'example.com', userName: 'bar',
+        },
+      ];
+
+      cfUAANock.mockFetchGroupMembers(groupId, users, clientToken);
+
+      const result = await uaaClient.fetchGroupMembers(groupId, clientToken);
+
+      expect(result).to.have.deep.members(users);
+    });
+  });
+
   describe('.fetchUserByEmail()', () => {
     const clientToken = 'client-token';
 
