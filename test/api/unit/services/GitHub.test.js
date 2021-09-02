@@ -1,10 +1,13 @@
 const { expect } = require('chai');
+const nock = require('nock');
 const config = require('../../../../config');
 const factory = require('../../support/factory');
 const GitHub = require('../../../../api/services/GitHub');
 const githubAPINocks = require('../../support/githubAPINocks');
 
 describe('GitHub', () => {
+  afterEach(() => expect(nock.isDone()).to.be.true);
+
   describe('.getRepository(user, owner, repository)', () => {
     it('should resolve with the repository data if the repo exists', (done) => {
       factory.user().then((user) => {
@@ -314,6 +317,114 @@ describe('GitHub', () => {
     });
   });
 
+  describe('.deleteWebhook(site, githubAccessToken)', () => {
+    it('throws when there is an unexpected error', async () => {
+      const webhookId = 1;
+      const [site, user] = await Promise.all([
+        factory.site({ webhookId }),
+        factory.user(),
+      ]);
+
+      githubAPINocks.deleteWebhook({
+        accessToken: user.githubAccessToken,
+        owner: site.owner,
+        repo: site.repository,
+        webhookId,
+        response: [500, {
+          message: 'Uh oh',
+        }],
+      });
+
+      const error = await GitHub.deleteWebhook(site, user.githubAccessToken).catch(e => e);
+
+      expect(error.status).to.equal(500);
+      expect(error.message).to.equal('Uh oh');
+    });
+
+    it('returns null if the user does not have access to the repository or hooks', async () => {
+      const webhookId = 1;
+      const [site, user] = await Promise.all([
+        factory.site({ webhookId }),
+        factory.user(),
+      ]);
+
+      githubAPINocks.deleteWebhook({
+        accessToken: user.githubAccessToken,
+        owner: site.owner,
+        repo: site.repository,
+        webhookId,
+        response: [404, {
+          message: 'Not Found',
+        }],
+      });
+
+      const response = await GitHub.deleteWebhook(site, user.githubAccessToken);
+
+      expect(response).to.be.null;
+    });
+
+    it('returns success if the webhook was deleted', async () => {
+      const webhookId = 1;
+      const [site, user] = await Promise.all([
+        factory.site({ webhookId }),
+        factory.user(),
+      ]);
+
+      githubAPINocks.deleteWebhook({
+        accessToken: user.githubAccessToken,
+        owner: site.owner,
+        repo: site.repository,
+        webhookId,
+        response: [200, {
+          message: 'No content',
+        }],
+      });
+
+      const response = await GitHub.deleteWebhook(site, user.githubAccessToken);
+
+      expect(response.status).to.eq(200);
+    });
+
+    context('when the webhook id is not present', () => {
+      it('finds the webhook id then deletes it', async () => {
+        const webhookId = 1;
+
+        const [site, user] = await Promise.all([
+          factory.site(),
+          factory.user(),
+        ]);
+
+        githubAPINocks.listWebhooks({
+          accessToken: user.githubAccessToken,
+          owner: site.owner,
+          repo: site.repository,
+          response: [200, [
+            {
+              config: {
+                id: webhookId,
+                url: config.webhook.endpoint,
+              },
+            },
+          ]],
+        });
+
+        githubAPINocks.deleteWebhook({
+          accessToken: user.githubAccessToken,
+          owner: site.owner,
+          repo: site.repository,
+          webhookId,
+          response: [200, {
+            message: 'No content',
+          }],
+        });
+
+        const response = await GitHub.deleteWebhook(site, user.githubAccessToken);
+
+        expect(response.status).to.eq(200);
+      });
+    });
+  });
+
   describe('.validateUser(accessToken)', () => {
     it('should resolve if the user is on an allowed team', (done) => {
       githubAPINocks.userOrganizations({
@@ -391,16 +502,6 @@ describe('GitHub', () => {
     it('returns an error if branch is not defined', (done) => {
       promised.then((values) => {
         const { owner, repository } = values.site;
-        const branch = 'main';
-
-        mockGHRequest = githubAPINocks.getBranch({
-          owner,
-          repo: repository,
-          branch,
-          response: [400, {
-            errors: [{ message: 'Not Found' }],
-          }],
-        });
 
         return GitHub.getBranch(values.user, owner, repository)
           .catch((err) => {
@@ -509,9 +610,6 @@ describe('GitHub', () => {
       githubAPINocks.getOrganizationMembers({
         accessToken, organization, role: 'admin', page: 2,
       });
-      githubAPINocks.getOrganizationMembers({
-        accessToken, organization, role: 'admin', page: 3,
-      });
       GitHub.getOrganizationMembers(accessToken, organization, 'admin')
         .then((members) => {
           expect(members.length).to.equal(3);
@@ -527,9 +625,6 @@ describe('GitHub', () => {
       githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'member' });
       githubAPINocks.getOrganizationMembers({
         accessToken, organization, role: 'member', page: 2,
-      });
-      githubAPINocks.getOrganizationMembers({
-        accessToken, organization, role: 'member', page: 3,
       });
       GitHub.getOrganizationMembers(accessToken, organization, 'member')
         .then((members) => {
