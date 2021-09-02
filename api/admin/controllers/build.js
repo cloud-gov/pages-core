@@ -62,7 +62,7 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const build = await fetchModelById(id, Build, { include: [Site] });
+    const build = await fetchModelById(id, Build, { include: [Site, User] });
     if (!build) return res.notFound();
 
     await build.update({ state });

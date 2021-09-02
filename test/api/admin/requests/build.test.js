@@ -112,6 +112,7 @@ describe('Admin - Site API', () => {
         .expect(200);
 
       expect(putResponse.body.state).to.deep.equal(newState);
+      validateAgainstJSONSchema('GET', '/build/{id}', 200, putResponse.body);
 
       // Requery
       const getResponse = await request(app)
@@ -120,8 +121,8 @@ describe('Admin - Site API', () => {
         .set('Origin', config.app.adminHostname)
         .expect(200);        
 
-        expect(putResponse.body.state).to.deep.equal(newState);
-      expect(getResponse.body.state).to.deep.equal(newState);
+        expect(getResponse.body.state).to.deep.equal(newState);
+        validateAgainstJSONSchema('PUT', '/build/{id}', 200, getResponse.body);
     });
   });
   
