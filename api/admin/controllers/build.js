@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 const buildSerializer = require('../../serializers/build');
 const BuildLogs = require('../../services/build-logs');
-const { Build, Site } = require('../../models');
+const { Build, Site, User } = require('../../models');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, wrapHandlers } = require('../../utils');
 
@@ -35,7 +35,7 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const build = await fetchModelById(id, Build, { include: [Site] });
+    const build = await fetchModelById(id, Build, { include: [Site, User] });
     if (!build) return res.notFound();
 
     return res.json(buildSerializer.serializeObject(build));
