@@ -26,7 +26,7 @@ function init(connection) {
 async function sendUAAInvite(email, link) {
   ensureInit();
   return mailQueue.add('uaa-invite', {
-    to: email,
+    to: [email],
     subject: 'Invitation to join cloud.gov Pages',
     html: Templates.uaaInvite({ link }),
   });
@@ -35,7 +35,7 @@ async function sendUAAInvite(email, link) {
 async function sendAlert(reason, errors) {
   ensureInit();
   return mailQueue.add('alert', {
-    to: ['federalist-admins@gsa.gov'],
+    to: ['federalist-alerts@gsa.gov'],
     subject: `Federalist ${appEnv} Alert | ${reason}`,
     html: Templates.alert({ errors, reason }),
   });
