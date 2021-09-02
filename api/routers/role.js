@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const RoleController = require('../controllers/role');
-const sessionAuth = require('../policies/sessionAuth');
-const csrfProtection = require('../policies/csrfProtection');
+const { csrfProtection, sessionAuth } = require('../middlewares');
 
 // enable csrf protection for all site routes
 // note that this must come before the route definitions

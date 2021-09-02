@@ -168,9 +168,6 @@ jobs:
     parameters:
       app:
         type: string
-      feature_proxy_edge_links:
-        type: string
-        default: "false"
       app-hostname:
         type: string        
     steps:
@@ -182,7 +179,6 @@ jobs:
       - run:
           name: Build app
           environment:
-            FEATURE_PROXY_EDGE_LINKS: << parameters.feature_proxy_edge_links >>
             APP_HOSTNAME: << parameters.app-hostname >>
           command: yarn build
 
@@ -195,6 +191,8 @@ jobs:
       - image: circleci/node:16.4
     parameters:
       app:
+        type: string
+      api-domain:
         type: string
       api-url:
         type: string
@@ -222,6 +220,12 @@ jobs:
           environment:
             NODE_ENV: production
             API_URL: << parameters.api-url >>
+
+      - run:
+          name: Configure Nginx
+          command: ci/tasks/configure-admin-client-nginx.sh
+          environment:
+            API_DOMAIN: << parameters.api-domain >>
 
       - deploy-to-cg:
           app: << parameters.app >>
@@ -297,6 +301,7 @@ workflows:
       - deploy-admin-client:
           name: deploy-admin-production
           app: federalist-admin
+          api-domain: federalistapp.18f.gov
           api-url: https://federalistapp.18f.gov
           requires:
             - build
@@ -326,6 +331,7 @@ workflows:
       - deploy-admin-client:
           name: deploy-admin-staging
           app: federalist-admin-staging
+          api-domain: federalistapp-staging.18f.gov
           api-url: https://federalistapp-staging.18f.gov
           requires:
             - build

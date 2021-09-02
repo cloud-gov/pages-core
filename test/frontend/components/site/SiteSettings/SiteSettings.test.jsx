@@ -42,7 +42,6 @@ describe('<SiteSettings/>', () => {
 
   before(() => {
     origWindow = global.window;
-    global.FEATURE_PROXY_EDGE_LINKS = 'true';
   });
 
   beforeEach(() => {
@@ -55,13 +54,12 @@ describe('<SiteSettings/>', () => {
 
   after(() => {
     global.window = origWindow;
-    global.FEATURE_PROXY_EDGE_LINKS = process.env.FEATURE_PROXY_EDGE_LINKS;
   });
 
   it('should render', () => {
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('AdvancedSiteSettings')).to.have.length(1);
-    expect(wrapper.find('ExpandableArea')).to.have.length(3);
+    expect(wrapper.find('ExpandableArea')).to.have.length(2);
   });
 
   it('should not render BasicSettings if sandbox org', () => {
@@ -92,19 +90,5 @@ describe('<SiteSettings/>', () => {
     wrapper.instance().handleDelete();
     expect(siteActionsMock.deleteSite.calledOnce).to.be.true;
     expect(siteActionsMock.deleteSite.calledWith(props.site.id)).to.be.true;
-  });
-
-  it('should render BasicAuthSettings', () => {
-    expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('BasicAuthSettings')).to.have.length(1);
-    expect(wrapper.find('ReduxForm')).to.have.length(1);
-  });
-
-  it('should not render BasicAuthSettings', () => {
-    global.FEATURE_PROXY_EDGE_LINKS = 'false';
-    wrapper = shallow(<SiteSettings {...props} />);
-    expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('BasicAuthSettings')).to.have.length(0);
-    global.FEATURE_PROXY_EDGE_LINKS = 'true';
   });
 });

@@ -1,4 +1,6 @@
 const BaseSerializer = require('./base');
+const organizationSerializer = require('./organization');
+const roleSerializer = require('./role');
 const uaaIdentitySerializer = require('./uaa-identity');
 
 const attributes = {
@@ -9,6 +11,10 @@ const attributes = {
   hasGithubAuth: (_, user) => !!user.githubAccessToken,
   UAAIdentity: (uaaIdentity, _, isSystemAdmin) => uaaIdentitySerializer
     .serialize(uaaIdentity, isSystemAdmin),
+  OrganizationRoles: (orgRoles, _, isSystemAdmin) => orgRoles?.map(orgRole => ({
+    Organization: organizationSerializer.serialize(orgRole.Organization, isSystemAdmin),
+    Role: roleSerializer.serialize(orgRole.Role, isSystemAdmin),
+  })),
 };
 
 const adminAttributes = {

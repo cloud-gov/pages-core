@@ -5,7 +5,7 @@ const GitHub = require('./GitHub');
 const { logger } = require('../../winston');
 const config = require('../../config');
 const EventCreator = require('./EventCreator');
-const { User, Event } = require('../models');
+const { User, UAAIdentity, Event } = require('../models');
 
 const FEDERALIST_USERS_ORG = config.federalistUsers.orgName;
 const MAX_DAYS_SINCE_LOGIN = config.federalistUsers.maxDaysSinceLogin;
@@ -134,10 +134,36 @@ const deactivateUsersWhoAreNotMembers = async ({ auditorUsername } = {}) => {
     .audit(Event.labels.FEDERALIST_USERS_MEMBERSHIP, user, 'Deactivated user', { userId: user.id }));
 };
 
+const revokeMembershipForUAAUsers = async ({ auditorUsername } = {}) => {
+  /* eslint-disable no-param-reassign */
+  auditorUsername = auditorUsername || config.federalistUsers.admin;
+  /* eslint-enable no-param-reassign */
+
+  const { githubAccessToken } = await User.findOne({ where: { username: auditorUsername } });
+  const orgAdmins = await federalistUsersAdmins(githubAccessToken);
+
+  const users = await User.findAll({
+    attributes: ['username'],
+    include: [{
+      model: UAAIdentity,
+      required: true,
+    }],
+    where: {
+      username: {
+        [Op.notIn]: orgAdmins.map(a => a.toLowerCase()),
+      },
+    },
+  });
+
+  return Promise.allSettled(users
+    .map(user => removeMemberFromFederalistUsersOrg(githubAccessToken, user.username)));
+};
+
 module.exports = {
   audit18F,
   federalistUsersAdmins,
   revokeMembershipForInactiveUsers,
   removeMembersWhoAreNotUsers,
   deactivateUsersWhoAreNotMembers,
+  revokeMembershipForUAAUsers,
 };

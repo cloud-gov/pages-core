@@ -4,6 +4,8 @@
   import { Await, GridContainer } from '../../components';
   import { fetchOrganizations, fetchRoles, inviteUser } from '../../lib/api';
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlUAAEmail = urlParams.get('uaaEmail');
   let submitting = false;
 
   $: metaPromise = Promise.all([
@@ -26,7 +28,7 @@
 
     const { invite } = await inviteUser(params);
 
-    if (invite) {
+    if (invite && invite.link) {
       // eslint-disable-next-line no-alert
       window.alert(`Created invite for ${invite.email}: ${invite.link}`);
     }
@@ -52,7 +54,7 @@
       <fieldset class="usa-fieldset">
         <label class="usa-label" for="uaaEmail">UAA Email<abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
         <span class="usa-hint">The user will be created and invited to UAA if necessary.</span>
-        <input type="email" class="usa-input" name="uaaEmail" id="uaaEmail" required>
+        <input type="email" class="usa-input" name="uaaEmail" id="uaaEmail" value={urlUAAEmail} required>
       </fieldset>
 
       <fieldset class="usa-fieldset">

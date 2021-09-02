@@ -5,6 +5,7 @@ const associate = ({
   Build,
   Organization,
   OrganizationRole,
+  Role,
   Site,
   SiteUser,
   UAAIdentity,
@@ -73,6 +74,16 @@ const associate = ({
   }));
   User.addScope('withUAAIdentity', {
     include: UAAIdentity,
+  });
+  User.addScope('withOrganizationRoles', {
+    include: {
+      model: OrganizationRole,
+      include: [
+        Organization,
+        Role,
+      ],
+    },
+    order: [[OrganizationRole, Organization, 'name', 'ASC']],
   });
   User.addScope('byUAAEmail', uaaEmail => ({
     include: [{

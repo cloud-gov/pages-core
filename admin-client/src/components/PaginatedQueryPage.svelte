@@ -5,7 +5,7 @@
   import Await from './Await.svelte';
   import GridContainer from './GridContainer.svelte';
   import PaginationBanner from './PaginationBanner.svelte';
-  
+
   export let path;
   export let query;
   export let addAction = false;
@@ -34,7 +34,7 @@
   $: fieldArray = fieldKeys.map((key) => ({ ...fields[key], name: key }));
   $: hasFilters = fieldKeys.length > 0;
   $: filtersWithValues = fieldKeys.filter((field) => params[field]);
-  
+
   function handleSubmit(event) {
     const obj = formToObj(event.target);
     const queryString = objToQueryString({ ...params, ...obj });
@@ -143,7 +143,7 @@
         </form>
       </nav>
     </div>
-    <div class="tag-container usa-nav-container margin-bottom-2">
+    <div class="tag-container usa-nav-container margin-top-1 margin-bottom-2">
       {#each filtersWithValues as key}
         <span class="usa-tag">
           <button class="usa-button usa-button--unstyled"
@@ -181,7 +181,7 @@
     background-color: #f0f0f0;
     background-image: url(../img/angle-arrow-up-primary.svg),linear-gradient(transparent,transparent);
   }
-  
+
   .usa-form .controls > fieldset {
     margin-right: 2rem;
   }
@@ -216,14 +216,14 @@
     padding: 0;
   }
   .usa-header--megamenu {
-    height: 5rem;
+    min-height: 5rem;
   }
   .usa-nav-container {
     height: 100%;
     align-items: center;
   }
   .usa-header--megamenu {
-    height: 5rem;
+    min-height: 5rem;
   }
   .usa-navbar.controls {
     display: flex;

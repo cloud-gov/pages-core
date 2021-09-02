@@ -1,7 +1,7 @@
 const { QueueScheduler } = require('bullmq');
 const IORedis = require('ioredis');
 
-const { app: appConfig, redis: redisConfig } = require('../../config');
+const { app: appConfig, mailer: mailerConfig, redis: redisConfig } = require('../../config');
 const { logger } = require('../../winston');
 
 const { MailQueueName, ScheduledQueue, ScheduledQueueName } = require('../queues');
@@ -25,12 +25,11 @@ const nightlyJobConfig = {
 
 async function start() {
   // Hack to not run the mailer for Federalist until we have a better feature flag
-  const runMailer = process.env.SMTP_HOST !== 'NA';
+  const runMailer = mailerConfig.host;
 
   let mailer;
   if (runMailer) {
     mailer = new Mailer();
-    await mailer.verify();
   }
 
   const connection = new IORedis(redisConfig.url, {
@@ -42,6 +41,7 @@ async function start() {
     archiveBuildLogsDaily: Processors.archiveBuildLogsDaily,
     nightlyBuilds: Processors.nightlyBuilds,
     revokeMembershipForInactiveUsers: Processors.revokeMembershipForInactiveUsers,
+    revokeMembershipForUAAUsers: Processors.revokeMembershipForUAAUsers,
     timeoutBuilds: Processors.timeoutBuilds,
     verifyRepositories: Processors.verifyRepositories,
     sandboxNotifications: Processors.sandboxNotifications,
@@ -75,10 +75,6 @@ async function start() {
       scheduledQueue,
     ];
 
-    if (runMailer) {
-      closables.push(mailer);
-    }
-
     await Promise.all(
       closables.map(closable => closable.close())
     );
@@ -97,6 +93,7 @@ async function start() {
     scheduledQueue.add('nightlyBuilds', {}, nightlyJobConfig),
     scheduledQueue.add('verifyRepositories', {}, nightlyJobConfig),
     scheduledQueue.add('revokeMembershipForInactiveUsers', {}, nightlyJobConfig),
+    scheduledQueue.add('revokeMembershipForUAAUsers', {}, nightlyJobConfig),
   ];
 
   if (appConfig.app_env === 'production') {
