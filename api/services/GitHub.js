@@ -9,7 +9,8 @@ const createWebhook = (github, options) => github.repos.createWebhook(options);
 
 const deleteWebhook = (github, options) => github.repos.deleteWebhook(options);
 
-const listWebhooks = (github, options) => github.repos.listWebhooks(options);
+const listWebhooks = (github, options) => github.repos.listWebhooks(options)
+  .then(hooks => hooks.data);
 
 const getOrganizations = github => github.orgs.listForAuthenticatedUser().then(orgs => orgs.data);
 
@@ -72,6 +73,13 @@ const handleWebhookError = (err) => {
   } else {
     throw error;
   }
+};
+
+const ignore404 = (error) => {
+  if (error.status !== 404) {
+    throw error;
+  }
+  return null;
 };
 
 const sendNextCreateGithubStatusRequest = (github, options) => github.repos.createCommitStatus(
@@ -163,21 +171,22 @@ async function findWebhookId(github, site) {
 
   const { app_env: appEnv } = config.app;
 
-  //
-  // Hardcoded since:
+  // Hardcoded for staging and production since:
   // - only Federalist webhooks will be missing webhook Ids
   // - webhooks will only be present for production and staging environments
   // - this isn't configured by environment bc if this is Pages, we still want to remove the
   //   Federalist webhook and Pages webhooks will be stored in the site model so this function
   //   will not be called.
-  //
-  const ext = appEnv === 'staging' ? '-staging' : '';
-  const hookUrl = `https://federalistapp${ext}.18f.gov/webhook/github`;
+  const hookUrl = {
+    production: 'https://federalistapp.18f.gov/webhook/github',
+    staging: 'https://federalistapp-staging.18f.gov/webhook/github',
+  }[appEnv] || config.webhook.endpoint;
 
-  const hooks = await listWebhooks(github, { owner, repo });
-  const federalistHook = hooks.data.find(hook => hook.config.url === hookUrl);
+  const hooks = (await listWebhooks(github, { owner, repo }).catch(ignore404)) || [];
 
-  return federalistHook?.id;
+  const federalistHook = hooks.find(hook => hook.config.url === hookUrl);
+
+  return federalistHook?.config.id;
 }
 
 module.exports = {
@@ -257,8 +266,7 @@ module.exports = {
   deleteWebhook: async (site, githubAccessToken) => {
     const github = await githubClient(githubAccessToken);
 
-    const webhookId = site.webhookId || await findWebhookId(github, site)
-      .catch(handleWebhookError);
+    const webhookId = site.webhookId || await findWebhookId(github, site);
 
     if (!webhookId) {
       return null;
@@ -267,7 +275,7 @@ module.exports = {
     const { owner, repository: repo } = site;
 
     return deleteWebhook(github, { owner, repo, hook_id: webhookId })
-      .catch(handleWebhookError);
+      .catch(ignore404);
   },
 
   validateUser: (accessToken, throwOnUnauthorized = true) => {
