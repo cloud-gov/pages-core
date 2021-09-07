@@ -11,11 +11,11 @@ class QueueWorker extends Worker {
     });
 
     this.on('completed', (job) => {
-      logger.info(`Job Complete on '${queueName}' Queue: ${JSON.stringify(job)}`);
+      logger.info(`Job Complete on '${queueName}' Queue: ${job.toJSON()}`);
     });
 
     this.on('failed', (job, failedReason) => {
-      logger.error(`Job Failed on '${queueName}' Queue: ${JSON.stringify(job)}`, failedReason);
+      logger.error(`Job Failed on '${queueName}' Queue: ${job.toJSON()}`, failedReason);
     });
   }
 }
