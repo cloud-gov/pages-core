@@ -140,3 +140,9 @@ module.exports.mailer = {
   password: mailerCredentials.password,
   username: mailerCredentials.username,
 };
+
+const slackCredentials = appEnv.getServiceCreds('slack');
+
+module.exports.mailer = {
+  url: slackCredentials.url,
+};
