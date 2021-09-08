@@ -15,6 +15,9 @@ if (rdsCreds) {
     user: rdsCreds.username,
     password: rdsCreds.password,
     port: rdsCreds.port,
+    ssl: {
+      rejectUnauthorized: false,
+    },
   };
 } else {
   throw new Error('No database credentials found.');
