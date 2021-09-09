@@ -29,6 +29,7 @@ applications:
       - federalist-site-wide-error
       - ((product))-((env))-s3-build-logs
       - mailer
+      - slack
     env:
       NODE_ENV: production
       APP_ENV: ((env))
