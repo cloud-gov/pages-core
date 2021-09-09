@@ -10,7 +10,7 @@ import AddUserForm from './AddUserForm';
 import RemoveUserForm from './RemoveUserForm';
 import UpdateUserForm from './UpdateUserForm';
 import { timeFrom } from '../../util/datetime';
-import { sandboxOrgMsg } from '../../util';
+import { sandboxMsg } from '../../util';
 import AlertBanner from '../alertBanner';
 
 function successNotification(message) {
@@ -106,7 +106,7 @@ function Edit({ actions, id }) {
     .filter(member => member.User.id !== currentUser.id)
     .sort((a, b) => a.User.UAAIdentity.email > b.User.UAAIdentity.email);
 
-  const getSandboxMsg = days => <span>{sandboxOrgMsg(days)}</span>;
+  const getSandboxMsg = days => <span>{sandboxMsg(days)}</span>;
 
   return (
     <div>

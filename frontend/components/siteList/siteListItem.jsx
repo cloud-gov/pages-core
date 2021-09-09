@@ -9,7 +9,7 @@ import GitHubLink from '../GitHubLink';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
 import { ORGANIZATION, USER } from '../../propTypes';
-import { sandboxSiteMsg } from '../../util';
+import { sandboxMsg } from '../../util';
 
 function getViewLink(viewLink, repo) {
   return (
@@ -54,7 +54,7 @@ const SiteListItem = ({ organization, site, user }) => (
           && (
           <p>
             <em>
-              {sandboxSiteMsg(organization.daysUntilSandboxCleaning)}
+              {sandboxMsg(organization.daysUntilSandboxCleaning, 'site')}
             </em>
           </p>
           )}
