@@ -6,7 +6,7 @@ const attributes = {
   createdAt: 'date',
   updatedAt: 'date',
   isSandbox: '',
-  sandboxCleanedAt: 'date',
+  sandboxNextCleaningAt: 'date',
   daysUntilSandboxCleaning: '',
 };
 

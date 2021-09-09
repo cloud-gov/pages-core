@@ -1,11 +1,10 @@
 const { expect } = require('chai');
-
+const moment = require('moment');
 const Mailer = require('../../../../api/services/mailer');
 const Templates = require('../../../../api/services/mailer/templates');
 const factory = require('../../support/factory');
-const { hostname, sandboxDays } = require('../../../../config').app;
-const { Role, User } = require('../../../../api/models');
-const moment = require('moment');
+const { hostname } = require('../../../../config').app;
+const { Role, User, Site, OrganizationRole } = require('../../../../api/models');
 
 describe('mailer', () => {
   describe('.sendUAAInvite()', () => {
@@ -43,33 +42,46 @@ describe('mailer', () => {
         Role.findOne({ where: { name: 'user' } }),
         Role.findOne({ where: { name: 'manager' } }),
       ]);
-    })
-
-    beforeEach(async () => {
       user = await factory.user();
     });
 
-    const createSandboxOrg = async (daysAgo) => {
-      const createdAt = moment().subtract(daysAgo, 'days').toDate();
-      const org = await factory.organization.create({ createdAt, sandboxCleanedAt: createdAt, isSandbox: true });
+    const createSandboxOrg = async (sandboxNextCleaningAt) => {
+      const org = await factory.organization.create({ sandboxNextCleaningAt, isSandbox: true });
       await org.addUser(user, { through: { roleId: managerRole.id } });
-      return await org.reload({ include: [User] });
+      const newUser = await factory.user();
+      await org.addUser(newUser, { through: { roleId: userRole.id } });
+      await factory.site({ organizationId: org.id });
+      await factory.site({ organizationId: org.id });
+      await factory.site({ organizationId: org.id });
+      return org.reload({
+        include: [
+          {
+            model: User,
+            required: true,
+          },
+          {
+            model: Site,
+            required: true,
+          },
+        ],
+      });
     };
 
     context('when the Mailer has been initialized', async () => {
       it('adds a `sandbox-reminder` job to the mail queue', async () => {
         const expiryDays = 5;
-        const dateStr = moment().add(expiryDays, 'day').format('MM-DD-YYYY');
-        const org = await createSandboxOrg(sandboxDays - expiryDays);
-        const organizationLink = `${hostname}/organizations/${org.id}`;
+        const sandboxNextCleaningAt = moment().add(expiryDays, 'days');
+        const dateStr = sandboxNextCleaningAt.format('MM-DD-YYYY');
+        const org = await createSandboxOrg(sandboxNextCleaningAt.toDate());
 
         Mailer.init();
-        const job = await Mailer.sendSandboxReminder(org, hostname);
-
+        const job = await Mailer.sendSandboxReminder(org);
         expect(job.name).to.eq('sandbox-reminder');
-        expect(job.data.to).to.eq(user.email);
-        expect(job.data.subject).to.eq(`Your Pages sandbox organization\'s sites will be deleted in ${expiryDays} days`);
-        expect(job.data.html).to.eq(Templates.sandboxReminder({ organizationLink, dateStr, organizationName: org.name }));
+        org.Users.forEach(u => expect(job.data.to.split('; ')).include(u.email));
+        expect(job.data.subject).to.eq(`Your Pages sandbox organization\'s sites will be removed in ${expiryDays} days`);
+        expect(job.data.html).to.eq(Templates.sandboxReminder({
+          organizationId: org.id, dateStr, organizationName: org.name, hostname, sites: org.Sites,
+        }));
       });
     });
   });

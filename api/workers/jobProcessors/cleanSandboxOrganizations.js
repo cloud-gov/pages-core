@@ -1,8 +1,10 @@
+const moment = require('moment');
 const SandboxHelper = require('../../services/SandboxHelper');
 const { logger } = require('../../../winston');
 
 async function cleanSandboxOrganizations() {
-  const results = await SandboxHelper.cleanSandboxes();
+  const cleaningDate = moment().subtract(1, 'day').endOf('day');
+  const results = await SandboxHelper.cleanSandboxes(cleaningDate);
   const successes = results
     .filter(result => result.status === 'fulfilled')
     .map(result => result.value);

@@ -1,8 +1,11 @@
+const moment = require('moment');
 const SandboxHelper = require('../../services/SandboxHelper');
 const { logger } = require('../../../winston');
+const { sandboxDaysNotice } = require('../../../config').app;
 
 async function sandboxNotifications() {
-  const results = await SandboxHelper.notifyOrganizations();
+  const cleaningDate = moment().add(sandboxDaysNotice, 'day').toDate();
+  const results = await SandboxHelper.notifyOrganizations(cleaningDate);
   const successes = results
     .filter(result => result.status === 'fulfilled')
     .map(result => result.value);

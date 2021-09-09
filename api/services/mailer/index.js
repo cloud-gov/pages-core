@@ -33,26 +33,27 @@ async function sendUAAInvite(email, link) {
 }
 
 async function sendSandboxReminder(organization) {
-  const dateStr = moment(organization.sandboxCleaningScheduledAt).format('MM-DD-YYYY');
+  const dateStr = moment(organization.sandboxNextCleaningAt).format('MM-DD-YYYY');
 
   const {
     id: organizationId,
     name: organizationName,
-    Users,
+    Users: users,
+    Sites: sites,
   } = organization;
 
-  const organizationLink = `${hostname}/organizations/${organizationId}`;
-  const subject = `Your Pages sandbox organization's sites will be deleted in ${organization.daysUntilSandboxCleaning} days`;
-
+  const subject = `Your Pages sandbox organization's sites will be removed in ${organization.daysUntilSandboxCleaning} days`;
   ensureInit();
 
   return mailQueue.add('sandbox-reminder', {
-    to: Users.map(user => user.email).join('; '),
+    to: users.map(user => user.email).join('; '),
     subject,
     html: Templates.sandboxReminder({
       organizationName,
       dateStr,
-      organizationLink,
+      organizationId,
+      sites: sites.map(({ id, owner, repository }) => ({ id, owner, repository })),
+      hostname,
     }),
   });
 }

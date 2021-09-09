@@ -62,14 +62,6 @@ describe('<SiteSettings/>', () => {
     expect(wrapper.find('ExpandableArea')).to.have.length(2);
   });
 
-  it('should not render BasicSettings if sandbox org', () => {
-    wrapper = shallow(<SiteSettings  { ...{...props, organization: { isSandbox: true } } }/>);
-    expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('BasicSiteSettings')).to.have.length(0);
-    expect(wrapper.find('AdvancedSiteSettings')).to.have.length(1);
-    expect(wrapper.find('ExpandableArea')).to.have.length(3);
-  });
-
   it('should not render if site prop is not defined', () => {
     const formlessWrapper = shallow(<SiteSettings {...{}} />);
     expect(formlessWrapper.get(0)).to.be.null;
