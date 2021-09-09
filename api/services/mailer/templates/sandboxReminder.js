@@ -1,4 +1,6 @@
-function sandboxReminder({ organizationId, dateStr, sites, hostname, organizationName }) {
+function sandboxReminder({
+  organizationId, dateStr, sites, hostname, organizationName,
+}) {
   const organizationLink = `${hostname}/organizations/${organizationId}`;
   const sitesList = sites.map(s => `<li><a href="${hostname}/sites/${s.id}/builds">${s.owner}/${s.repository}</a></li>`).join('\n');
   return `

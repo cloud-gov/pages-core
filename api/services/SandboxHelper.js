@@ -4,7 +4,9 @@ const {
 } = require('sequelize');
 const PromisePool = require('@supercharge/promise-pool');
 const Mailer = require('./mailer');
-const { User, Organization, Site, Role } = require('../models');
+const {
+  User, Organization, Site, Role,
+} = require('../models');
 const SiteDestroyer = require('./SiteDestroyer');
 const { sandboxDays } = require('../../config').app;
 
