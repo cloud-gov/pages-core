@@ -19,11 +19,11 @@ applications:
       - app-((env))-uaa-client
       - federalist-((env))-rds
       - federalist-((env))-s3
-      - federalist-((env))-env
+      - ((product))-((env))-env
       - federalist-((env))-sqs-creds
       - federalist-((env))-redis
-      - federalist-((env))-proxy
-      - federalist-((env))-domain
+      - ((product))-((env))-proxy
+      - ((product))-((env))-domain
       - federalist-((env))-uev-key
       - federalist-deploy-user
       - federalist-site-wide-error
