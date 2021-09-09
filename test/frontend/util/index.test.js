@@ -33,18 +33,18 @@ describe('groupLogs', () => {
 
 describe('sandboxOrgMsg', () => {
   it('not 1 day', () => {
-    expect(sandboxOrgMsg(2)).to.equal('All data for this sandbox organization will be deleted in 2 days.');
+    expect(sandboxOrgMsg(2)).to.equal('All data for this sandbox organization will be removed in 2 days.');
   });
   it('1 day', () => {
-    expect(sandboxOrgMsg(1)).to.equal('All data for this sandbox organization will be deleted in 1 day.');
+    expect(sandboxOrgMsg(1)).to.equal('All data for this sandbox organization will be removed in 1 day.');
   });
 });
 
 describe('sandboxSiteMsg', () => {
   it('not 1 day', () => {
-    expect(sandboxSiteMsg(2)).to.equal('All data for this sandbox organization site will be deleted in 2 days.');
+    expect(sandboxSiteMsg(2)).to.equal('All data for this sandbox organization site will be removed in 2 days.');
   });
   it('1 day', () => {
-    expect(sandboxSiteMsg(1)).to.equal('All data for this sandbox organization site will be deleted in 1 day.');
+    expect(sandboxSiteMsg(1)).to.equal('All data for this sandbox organization site will be removed in 1 day.');
   });
 });

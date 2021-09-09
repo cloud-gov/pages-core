@@ -164,7 +164,7 @@ describe('job processors', () => {
         { status: 'fulfilled', value: 'cleaned' },
         { status: 'rejected', reason: 'just because' },
       ]);
-    
+
       const result = await jobProcessors.cleanSandboxOrganizations().catch(e => e); 
       expect(result).to.be.an('error');
       expect(result.message).to.equal([

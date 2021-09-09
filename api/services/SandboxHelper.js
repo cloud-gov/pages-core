@@ -4,36 +4,29 @@ const {
 } = require('sequelize');
 const PromisePool = require('@supercharge/promise-pool');
 const Mailer = require('./mailer');
-const { User, Organization, Site } = require('../models');
-const { sandboxDays, sandboxNotices, sandboxNoticeDaysInterval } = require('../../config').app;
+const { User, Organization, Site, Role } = require('../models');
 const SiteDestroyer = require('./SiteDestroyer');
+const { sandboxDays } = require('../../config').app;
 
-const notifyOrganizations = async () => {
-  const getNoticeDate = i => moment().subtract(sandboxDays - (i * sandboxNoticeDaysInterval), 'days')
-    .format('YYYY-MM-DD');
-  const dates = [];
-  let i = 1;
-  for (i = 1; i <= sandboxNotices; i += 1) {
-    dates.push(getNoticeDate(i));
-  }
-  const where = {
-    isSandbox: true,
-    [Op.or]: [
-      whereClause(fn('date', col('"sandboxCleanedAt"')), { [Op.in]: dates }),
-      {
-        [Op.and]: [
-          { sandboxCleanedAt: null },
-          whereClause(fn('date', col('Organization."createdAt"')), { [Op.in]: dates }),
-        ],
-      },
-    ],
-  };
+const notifyOrganizations = async (cleaningDate) => {
+  const dateStr = moment(cleaningDate).format('YYYY-MM-DD');
+  const managerRole = await Role.findOne({ where: { name: 'manager' } });
   const orgsToNotify = await Organization.findAll({
-    where,
+    where: {
+      [Op.and]: [
+        { isSandbox: true },
+        whereClause(fn('date', col('"sandboxNextCleaningAt"')), dateStr),
+      ],
+    },
     include: [
       {
         model: User,
         required: true,
+        through: {
+          where: {
+            roleId: managerRole.id,
+          },
+        },
       },
       {
         model: Site,
@@ -60,31 +53,22 @@ const destroySites = async (organization) => {
   }
 };
 
-const cleanSandboxes = async () => {
-  const date = moment().subtract(sandboxDays, 'days').startOf('day').toDate();
+const cleanSandboxes = async (cleaningDate) => {
   const orgsToClean = await Organization.findAll({
     where: {
       isSandbox: true,
-      [Op.or]: [
-        {
-          sandboxCleanedAt: {
-            [Op.lt]: date,
-          },
-        },
-        {
-          sandboxCleanedAt: null,
-          createdAt: {
-            [Op.lt]: date,
-          },
-        },
-      ],
+      sandboxNextCleaningAt: {
+        [Op.lte]: cleaningDate,
+      },
     },
     include: {
       model: Site,
       required: true,
     },
   });
-  return Promise.allSettled(orgsToClean.map(org => destroySites(org)));
+  return Promise.allSettled(orgsToClean.map(org => destroySites(org).then(() => org.update({
+    sandboxNextCleaningAt: moment().add(sandboxDays, 'days').toDate(),
+  }))));
 };
 
 module.exports = { notifyOrganizations, cleanSandboxes };

@@ -3,7 +3,6 @@ const moment = require('moment');
 const {
   Role, Site, Organization, OrganizationRole, User,
 } = require('../../../../api/models');
-const { sandboxDays }  = require('../../../../config').app;
 
 const orgFactory = require('../../support/factory/organization');
 const createSite = require('../../support/factory/site');
@@ -188,76 +187,36 @@ describe('Organization model', () => {
   });
 
   describe('daysUntilSandboxCleaning', () => {
-    it('sandboxCleanedAt is defined', async () => {
+    it('sandboxNextCleaningAt is defined', async () => {
       const org = await orgFactory.create({
         isSandbox: true,
-        sandboxCleanedAt: moment().subtract(1, 'day').toDate(),
+        sandboxNextCleaningAt: moment().add(1, 'day').toDate(),
       });
-      expect(org.daysUntilSandboxCleaning).to.equal(sandboxDays - 1);
+      expect(org.daysUntilSandboxCleaning).to.equal(1);
     });
 
-    it('sandboxCleanedAt is not defined', async () => {
-      const org = await orgFactory.create({
-        isSandbox: true,
-        createdAt: moment().subtract(2, 'day').toDate(),
-        sandboxCleanedAt:null,
-      });
-      expect(org.daysUntilSandboxCleaning).to.equal(sandboxDays - 2);
-    });
-
-    it('sandboxCleanedAt is defined for non-sandbox org', async () => {
+    it('sandboxNextCleaningAt is defined for non-sandbox org', async () => {
       const org = await orgFactory.create({
         isSandbox: false,
-        sandboxCleanedAt: moment().subtract(1, 'day').toDate(),
+        sandboxNextCleaningAt: moment().add(1, 'day').toDate(),
       });
       expect(org.daysUntilSandboxCleaning).to.be.null;
     });
 
-    it('sandboxCleanedAt is not defined for non-sandbox org', async () => {
+    it('sandboxNextCleaningAt is not defined for non-sandbox org', async () => {
       const org = await orgFactory.create({
         isSandbox: false,
-        createdAt: moment().subtract(2, 'day').toDate(),
-        sandboxCleanedAt:null,
+        sandboxNextCleaningAt: null,
       });
       expect(org.daysUntilSandboxCleaning).to.be.null;
     });
-  });
 
-  describe('sandboxCleaningScheduledAt', () => {
-    it('sandboxCleanedAt is defined', async () => {
+    it('sandboxNextCleaningAt is not defined for sandbox org', async () => {
       const org = await orgFactory.create({
         isSandbox: true,
-        sandboxCleanedAt: moment().subtract(1, 'day').toDate(),
+        sandboxNextCleaningAt: null,
       });
-      expect(moment(org.sandboxCleaningScheduledAt).format('YYYY-MM-DD')).to
-        .equal(moment(org.sandboxCleanedAt).add(sandboxDays, 'days').endOf('day').format('YYYY-MM-DD'));
-    });
-
-    it('sandboxCleanedAt is not defined', async () => {
-      const org = await orgFactory.create({
-        isSandbox: true,
-        createdAt: moment().subtract(2, 'day').toDate(),
-        sandboxCleanedAt:null,
-      });
-      expect(moment(org.sandboxCleaningScheduledAt).format('YYYY-MM-DD')).to
-        .equal(moment(org.createdAt).add(sandboxDays, 'days').endOf('day').format('YYYY-MM-DD'));
-    });
-
-    it('sandboxCleanedAt is defined for non-sandbox org', async () => {
-      const org = await orgFactory.create({
-        isSandbox: false,
-        sandboxCleanedAt: moment().subtract(1, 'day').toDate(),
-      });
-      expect(org.sandboxCleaningScheduledAt).to.be.null;
-    });
-
-    it('sandboxCleanedAt is not defined for non-sandbox org', async () => {
-      const org = await orgFactory.create({
-        isSandbox: false,
-        createdAt: moment().subtract(2, 'day').toDate(),
-        sandboxCleanedAt:null,
-      });
-      expect(org.sandboxCleaningScheduledAt).to.be.null;
+      expect(org.daysUntilSandboxCleaning).to.be.null;
     });
   });
 });

@@ -16,22 +16,18 @@ export function groupLogs(logs) {
   }, {});
 }
 
-export function sandboxOrgMsg(days) {
-  let msg;
-  if (days > 1) {
-    msg = `${days} days`;
-  } else if (days === 1) {
+const sandboxMsg = (days, isSite = false) => {
+  let msg = `${days} days`;
+  if (days === 1) {
     msg = `${days} day`;
   }
-  return `All data for this sandbox organization will be deleted in ${msg}.`;
+  return `All data for this sandbox organization${isSite ? ' site ' : ' '}will be removed in ${msg}.`;
+};
+
+export function sandboxOrgMsg(days) {
+  return sandboxMsg(days);
 }
 
 export function sandboxSiteMsg(days) {
-  let msg;
-  if (days > 1) {
-    msg = `${days} days`;
-  } else if (days === 1) {
-    msg = `${days} day`;
-  }
-  return `All data for this sandbox organization site will be deleted in ${msg}.`;
+  return sandboxMsg(days, true);
 }

@@ -87,28 +87,18 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: false,
     },
-    sandboxCleanedAt: {
+    sandboxNextCleaningAt: {
       type: DataTypes.DATE,
     },
     daysUntilSandboxCleaning: {
       type: DataTypes.VIRTUAL,
       get() {
-        if (!this.isSandbox) {
+        if (!this.isSandbox || !this.sandboxNextCleaningAt) {
           return null;
         }
-        const start = moment(this.sandboxCleaningScheduledAt).endOf('day');
+        const start = moment(this.sandboxNextCleaningAt).endOf('day');
         const diff = start.diff(moment().endOf('day'));
         return moment.duration(diff).asDays();
-      },
-    },
-    sandboxCleaningScheduledAt: {
-      type: DataTypes.VIRTUAL,
-      get() {
-        if (!this.isSandbox) {
-          return null;
-        }
-        return moment(this.sandboxCleanedAt || this.createdAt).endOf('day')
-          .add(sandboxDays, 'days').toDate();
       },
     },
   }, {

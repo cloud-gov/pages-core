@@ -80,15 +80,11 @@ class SiteSettings extends React.Component {
           </a>
           .
         </p>
-
-        {!organization?.isSandbox
-          && (
-          <BasicSiteSettings
-            initialValues={basicInitialValues}
-            onSubmit={this.handleUpdate}
-          />
-          )}
-
+        <BasicSiteSettings
+          isSandbox={organization?.isSandbox}
+          initialValues={basicInitialValues}
+          onSubmit={this.handleUpdate}
+        />
         <ExpandableArea title="Advanced settings">
           <AdvancedSiteSettings
             siteId={site.id}
