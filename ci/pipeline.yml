@@ -3,10 +3,10 @@
 
 staging-cf: &staging-cf
   CF_API: https://api.fr.cloud.gov
-  CF_USERNAME: ((pages-staging-cf-username))
-  CF_PASSWORD: ((pages-staging-cf-password))
+  CF_USERNAME: ((staging-cf-username))
+  CF_PASSWORD: ((staging-cf-password))
   CF_ORG: gsa-18f-federalist
-  CF_SPACE: pages-staging
+  CF_SPACE: staging
 
 node-image: &node-image
   type: docker-image
