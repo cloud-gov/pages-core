@@ -70,7 +70,9 @@ module.exports = wrapHandlers({
     const { id } = req.params;
 
     const site = await fetchModelById(id, Site);
+
+    // This will not remove the webhook since we don't have permissions
     await SiteDestroyer.destroySite(site);
-    return res.json(serializeNew(site, true));
+    return res.json({});
   },
 });

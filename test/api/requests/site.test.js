@@ -1257,8 +1257,7 @@ describe('Site API', () => {
           .set('Cookie', cookie)
           .expect(200))
         .then((response) => {
-          validateAgainstJSONSchema('DELETE', '/site/{id}', 200, response.body);
-          siteResponseExpectations(response.body, site);
+          expect(response.body).to.deep.eq({});
           return Site.findAll({ where: { id: site.id } });
         })
         .then((sites) => {
@@ -1387,8 +1386,7 @@ describe('Site API', () => {
           .set('Cookie', cookie)
           .expect(200))
         .then((response) => {
-          validateAgainstJSONSchema('DELETE', '/site/{id}', 200, response.body);
-          siteResponseExpectations(response.body, site);
+          expect(response.body).to.deep.eq({});
           return Site.findAll({ where: { id: site.id } });
         })
         .then((sites) => {

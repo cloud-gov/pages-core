@@ -593,7 +593,7 @@ paths:
         200:
           description: Acknowledgement that the site was deleted
           schema:
-            $ref: "Site.json"
+            type: object
         403:
           description: Not authorized
           schema:

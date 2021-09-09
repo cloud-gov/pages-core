@@ -2,14 +2,14 @@ import page from 'page';
 import { notification } from '../stores';
 import { destroySite } from '../lib/api';
 
-function destroy(id) {
+function destroy(site) {
   return async () => {
     try {
-      const result = await destroySite(id);
+      await destroySite(site.id);
       page('/sites');
-      return notification.setSuccess(`Site ${result.id}: ${result.repository} deleted successfully!`);
+      return notification.setSuccess(`Site ${site.id}: ${site.repository} deleted successfully!`);
     } catch (error) {
-      return notification.setError(`Unable to delete site ${id}: ${error.message}`);
+      return notification.setError(`Unable to delete site ${site.id}: ${error.message}`);
     }
   };
 }
