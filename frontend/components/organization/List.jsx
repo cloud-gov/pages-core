@@ -51,7 +51,7 @@ function List({ actions }) {
                       {Organization.name}
                     </h4>
                     {Organization.isSandbox
-                      && <p className="repo-verification">{getSandboxMsg(Organization.daysUntilSandboxCleaning)}</p>}
+                      && <p>{getSandboxMsg(Organization.daysUntilSandboxCleaning)}</p>}
                   </div>
                   <div className="sites-list-item-actions">
                     {
