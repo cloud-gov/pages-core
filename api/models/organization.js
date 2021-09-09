@@ -1,7 +1,6 @@
 const { Op } = require('sequelize');
 const moment = require('moment');
 const { toInt } = require('../utils');
-const { sandboxDays } = require('../../config').app;
 
 const associate = ({
   Organization,
