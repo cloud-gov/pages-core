@@ -121,7 +121,9 @@ class SiteBuilds extends React.Component {
   }
 
   renderBuildsTable() {
-    const { site, builds,organization, actions } = this.props;
+    const {
+      site, builds, organization, actions,
+    } = this.props;
     const { autoRefresh } = this.state;
     const previewBuilds = builds.data && this.latestBuildByBranch(builds.data);
     return (
@@ -279,7 +281,7 @@ SiteBuilds.defaultProps = {
 
 const mapStateToProps = ({ builds, sites, organizations }, { id }) => {
   const site = currentSite(sites, id);
-  const organization = getOrgById(organizations, site.organizationId)
+  const organization = getOrgById(organizations, site.organizationId);
   return ({
     builds,
     site,
