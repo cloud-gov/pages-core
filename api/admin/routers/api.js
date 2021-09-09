@@ -15,6 +15,7 @@ apiRouter.use(csrfProtection);
 apiRouter.get('/builds', AdminControllers.Build.list);
 apiRouter.get('/builds/:id', AdminControllers.Build.findById);
 apiRouter.get('/builds/:id/log', AdminControllers.Build.findBuildLog);
+apiRouter.put('/builds/:id', parseJson, AdminControllers.Build.update);
 apiRouter.get('/events', AdminControllers.Event.list);
 apiRouter.get('/organizations', AdminControllers.Organization.list);
 apiRouter.post('/organizations', parseJson, AdminControllers.Organization.create);

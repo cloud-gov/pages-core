@@ -1,6 +1,7 @@
 <script>
+  import { afterUpdate } from 'svelte';
   import { router } from '../stores';
-  import { fetchBuild, fetchBuildLog } from '../lib/api';
+  import { fetchBuild, fetchBuildLog, updateBuild } from '../lib/api';
   import { formatDateTime } from '../helpers/formatter';
   import {
     Await,
@@ -19,6 +20,16 @@
     error: 'bg-red',
     processing: 'bg-gold',
   }[state] || 'bg-gray-30');
+
+  let submitting = false;
+
+  async function handleCancelSubmit() {
+    submitting = true;
+    const params = { state: 'error' };
+    buildPromise = updateBuild(id, params);
+  }
+
+  afterUpdate(() => { submitting = false; });
 </script>
 
 <GridContainer>
@@ -43,6 +54,11 @@
       </div>
       <div class="tablet:grid-col-auto padding-bottom-1">
         <div class="grid-row flex-column flex-align-end">
+          {#if !['error', 'success'].includes(build.state)}
+            <form on:submit|preventDefault={handleCancelSubmit}>
+              <input type="submit" value="Error build" disabled={submitting}>
+            </form>
+          {/if}
           <LabeledItem label="started at" value={formatDateTime(build.startedAt)} />
           <LabeledItem label="completed at" value={formatDateTime(build.completedAt)} />
           <LabeledItem label="source" value={build.source} />
