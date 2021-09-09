@@ -16,6 +16,8 @@ import BranchViewLink from '../branchViewLink';
 import {
   IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner,
 } from '../icons';
+import { getOrgById } from '../../selectors/organization';
+import { sandboxMsg } from '../../util';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
@@ -119,11 +121,21 @@ class SiteBuilds extends React.Component {
   }
 
   renderBuildsTable() {
-    const { site, builds, actions } = this.props;
+    const { site, builds,organization, actions } = this.props;
     const { autoRefresh } = this.state;
     const previewBuilds = builds.data && this.latestBuildByBranch(builds.data);
     return (
       <div>
+        <div className="well">
+          { organization?.isSandbox
+            && (
+            <AlertBanner
+              status="warning"
+              message={sandboxMsg(organization.daysUntilSandboxCleaning, 'site builds')}
+              alertRole={false}
+            />
+            )}
+        </div>
         <div className="log-tools">
           <div>
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
@@ -245,6 +257,10 @@ SiteBuilds.propTypes = {
   site: PropTypes.shape({
     id: PropTypes.number,
   }),
+  organization: PropTypes.shape({
+    isSandbox: PropTypes.bool,
+    daysUntilSandboxCleaning: PropTypes.number,
+  }),
   actions: PropTypes.shape({
     fetchBuilds: PropTypes.func.isRequired,
     restartBuild: PropTypes.func.isRequired,
@@ -254,16 +270,21 @@ SiteBuilds.propTypes = {
 SiteBuilds.defaultProps = {
   builds: null,
   site: null,
+  organization: null,
   actions: {
     fetchBuilds: buildActions.fetchBuilds,
     restartBuild: buildActions.restartBuild,
   },
 };
 
-const mapStateToProps = ({ builds, sites }, { id }) => ({
-  builds,
-  site: currentSite(sites, id),
-});
-
+const mapStateToProps = ({ builds, sites, organizations }, { id }) => {
+  const site = currentSite(sites, id);
+  const organization = getOrgById(organizations, site.organizationId)
+  return ({
+    builds,
+    site,
+    organization,
+  });
+};
 export { SiteBuilds };
 export default connect(mapStateToProps)(SiteBuilds);

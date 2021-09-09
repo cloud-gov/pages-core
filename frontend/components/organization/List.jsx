@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from '@reach/router';
 import federalistApi from '../../util/federalistApi';
 import LoadingIndicator from '../LoadingIndicator';
-import { sandboxOrgMsg } from '../../util';
+import { sandboxMsg } from '../../util';
 
 function List({ actions }) {
   const [{ isLoading, orgRoles }, setState] = useState({ isLoading: true, orgRoles: null });
@@ -40,7 +40,7 @@ function List({ actions }) {
             );
           }
 
-          const getSandboxMsg = days => <em>{sandboxOrgMsg(days)}</em>;
+          const getSandboxMsg = days => <em>{sandboxMsg(days)}</em>;
 
           return (
             <ul className="sites-list usa-unstyled-list">
