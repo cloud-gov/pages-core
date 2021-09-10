@@ -1,12 +1,11 @@
 const IORedis = require('ioredis');
 const moment = require('moment');
 const PromisePool = require('@supercharge/promise-pool');
-const { redis: redisConfig, app: appConfig } = require('../../../config');
+const { redis: redisConfig, app: { hostname, app_env: appEnv } } = require('../../../config');
 const { MailQueue } = require('../../queues');
 const Templates = require('./templates');
 
 let mailQueue;
-const { hostname, app_env: appEnv } = { ...appConfig };
 
 function ensureInit() {
   if (!mailQueue) {
