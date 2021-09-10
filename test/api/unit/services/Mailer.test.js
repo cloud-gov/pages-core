@@ -1,6 +1,5 @@
 const { expect } = require('chai');
 const moment = require('moment');
-const sinon = require('sinon');
 const Mailer = require('../../../../api/services/mailer');
 const Templates = require('../../../../api/services/mailer/templates');
 const factory = require('../../support/factory');
@@ -8,9 +7,6 @@ const { hostname } = require('../../../../config').app;
 const { Role, User, Site } = require('../../../../api/models');
 
 describe('mailer', () => {
-  afterEach(() => {
-    sinon.restore();
-  });
   context('when the Mailer has not been initialized', () => {
     // This test can only be run once since Mailer is a singleton
     it('throws an error', async () => {
@@ -105,18 +101,6 @@ describe('mailer', () => {
           }));
         });
         expect(jobs.length).to.equal(org.Users.length);
-      });
-
-      it('`sandbox-reminder` fails to add job(s) to the mail queue', async () => {
-        const expiryDays = 5;
-        const sandboxNextCleaningAt = moment().add(expiryDays, 'days');
-        const org = await createSandboxOrg(sandboxNextCleaningAt.toDate());
-        Mailer.init();
-        sinon.stub(Mailer, 'sendOrgMemberSandboxReminder').rejects(new Error('invalid email'));
-        const error = await Mailer.sendSandboxReminder(org).catch(e => e);
-        expect(error).to.be.an('error');
-        expect(error.message).to
-          .equal(`Failed to queue a sandbox reminders for organization@id=${org.id} members:,  user@id=${org.Users[0].id}: invalid email`);
       });
     });
   });

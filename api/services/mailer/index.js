@@ -32,38 +32,32 @@ async function sendUAAInvite(email, link) {
   });
 }
 
-async function sendOrgMemberSandboxReminder(user, organization) {
+async function sendSandboxReminder(organization) {
   const {
     id: organizationId,
     name: organizationName,
     Sites: sites,
+    Users: users,
   } = organization;
 
   const dateStr = moment(organization.sandboxNextCleaningAt).format('MM-DD-YYYY');
   const subject = `Your Pages sandbox organization's sites will be removed in ${organization.daysUntilSandboxCleaning} days`;
 
   ensureInit();
-  return mailQueue.add('sandbox-reminder', {
-    to: [user.email],
-    subject,
-    html: Templates.sandboxReminder({
-      organizationName,
-      dateStr,
-      organizationId,
-      sites: sites.map(({ id, owner, repository }) => ({ id, owner, repository })),
-      hostname,
-    }),
-  });
-}
-async function sendSandboxReminder(organization) {
-  const {
-    id: organizationId,
-    Users: users,
-  } = organization;
 
   const { results, errors } = await PromisePool
     .for(users)
-    .process(user => this.sendOrgMemberSandboxReminder(user, organization));
+    .process(user => mailQueue.add('sandbox-reminder', {
+      to: [user.email],
+      subject,
+      html: Templates.sandboxReminder({
+        organizationName,
+        dateStr,
+        organizationId,
+        sites: sites.map(({ id, owner, repository }) => ({ id, owner, repository })),
+        hostname,
+      }),
+    }));
 
   if (errors.length) {
     const errMsg = [
@@ -89,6 +83,5 @@ module.exports = {
   init,
   sendUAAInvite,
   sendSandboxReminder,
-  sendOrgMemberSandboxReminder,
   sendAlert,
 };
