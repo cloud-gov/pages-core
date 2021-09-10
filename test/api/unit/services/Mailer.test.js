@@ -53,7 +53,7 @@ describe('mailer', () => {
     });
   });
 
-  describe.only('.sendSandboxReminder()', () => {
+  describe('.sendSandboxReminder()', () => {
     let user;
     let userRole;
     let managerRole;
