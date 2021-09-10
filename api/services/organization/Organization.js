@@ -1,4 +1,3 @@
-const moment = require('moment');
 const {
   Organization,
   OrganizationRole,
@@ -7,7 +6,6 @@ const {
 } = require('../../models');
 const { CustomError } = require('../../utils/validators');
 const UAAClient = require('../../utils/uaaClient');
-const { sandboxDays } = require('../../../config').app;
 
 /**
  * Not typing the Sequelize stuff...
@@ -203,7 +201,6 @@ module.exports = {
     const org = await Organization.create({
       name: orgName,
       isSandbox: sandbox,
-      sandboxNextCleaningAt: sandbox ? moment().add(sandboxDays, 'days').endOf('day') : null,
     });
     await org.addUser(user, { through: { roleId: managerRole.id } });
 
