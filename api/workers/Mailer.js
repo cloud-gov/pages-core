@@ -9,7 +9,7 @@ class Mailer {
     this.username = username;
   }
 
-  send({ html, subject, to, cc, bcc }) {
+  send({ html, subject, to }) {
     return this.httpClient.request({
       method: 'POST',
       url: '/send',
@@ -17,7 +17,7 @@ class Mailer {
         password: this.password,
         username: this.username,
       },
-      data: { to, subject, html, cc, bcc },
+      data: { to, subject, html },
     });
   }
 }
