@@ -105,14 +105,16 @@ module.exports = (sequelize, DataTypes) => {
     paranoid: true,
     tableName: 'organization',
     hooks: {
-      beforeValidate: (org, options) => {
+      beforeValidate: (org, options) => { // eslint-disable-line no-unused-vars
+        /* eslint-disable no-param-reassign */
         if (!org.isSandbox) {
           org.sandboxNextCleaningAt = null;
         } else if (!org.sandboxNextCleaningAt) {
           org.sandboxNextCleaningAt = moment().add(sandboxDays, 'days').endOf('day');
         }
+        /* eslint-enable no-param-reassign */
       },
-    }
+    },
   });
 
   Organization.associate = associate;
