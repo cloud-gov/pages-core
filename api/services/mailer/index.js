@@ -46,7 +46,7 @@ async function sendSandboxReminder(organization) {
   ensureInit();
 
   return mailQueue.add('sandbox-reminder', {
-    to: users.map(user => user.email).join('; '),
+    to: users.map(user => user.email),
     subject,
     html: Templates.sandboxReminder({
       organizationName,
