@@ -11,7 +11,6 @@ const config = require('../../../../config');
 const { Site, User } = require('../../../../api/models');
 const S3SiteRemover = require('../../../../api/services/S3SiteRemover');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
-const { serializeNew } = require('../../../../api/serializers/site');
 const app = require('../../../../api/admin');
 
 const itShouldRequireAdminAuthentication = (path, schema, method = 'get') => {
@@ -131,7 +130,8 @@ describe('Admin - Site API', () => {
           factory.site(),
         ]);
 
-        const expectedResponse = serializeNew(site, true);
+        expect(site.isSoftDeleted()).to.be.false;
+
         const cookie = await authenticatedSession(user, sessionConfig);
         const deleteResponse = await request(app)
           .delete(`/sites/${site.id}`)
@@ -140,14 +140,10 @@ describe('Admin - Site API', () => {
           .set('x-csrf-token', csrfToken.getToken())
           .expect(200);
 
-        // Check updatedAt is later
-        expect(new Date(deleteResponse.body.updatedAt))
-          .to.be.above(new Date(expectedResponse.updatedAt));
+        expect(deleteResponse.body).to.deep.eq({});
 
-        // Remove updatedAt to deep equal other properties
-        delete deleteResponse.body.updatedAt;
-        delete expectedResponse.updatedAt;
-        expect(deleteResponse.body).to.deep.equal(expectedResponse);
+        await site.reload({ paranoid: false });
+        expect(site.isSoftDeleted()).to.be.true;
 
         // Requery
         await request(app)
@@ -167,22 +163,33 @@ describe('Admin - Site API', () => {
         restore();
       });
 
-      it('returns a 500 response', async () => {
+      it('deletes the site', async () => {
         const [user, site] = await Promise.all([
           factory.user(),
           factory.site(),
         ]);
 
+        expect(site.isSoftDeleted()).to.be.false;
+
         const cookie = await authenticatedSession(user, sessionConfig);
-        const { body } = await request(app)
+        const deleteResponse = await request(app)
           .delete(`/sites/${site.id}`)
           .set('Cookie', cookie)
           .set('Origin', config.app.adminHostname)
           .set('x-csrf-token', csrfToken.getToken())
-          .expect(500);
+          .expect(200);
 
-        expect(body.message).to.equal('An unexpected error occurred');
-        expect(body.status).to.equal(500);
+        expect(deleteResponse.body).to.deep.eq({});
+
+        await site.reload({ paranoid: false });
+        expect(site.isSoftDeleted()).to.be.true;
+
+        // Requery
+        await request(app)
+          .get(`/sites/${site.id}`)
+          .set('Cookie', cookie)
+          .set('Origin', config.app.adminHostname)
+          .expect(404);
       });
     });
   });

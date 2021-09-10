@@ -304,6 +304,24 @@ const webhook = ({
   return webhookNock.reply(...resp);
 };
 
+function deleteWebhook({
+  accessToken, owner, repo: repository, webhookId, response,
+}) {
+  return nock('https://api.github.com')
+    .matchHeader('authorization', `token ${accessToken}`)
+    .delete(`/repos/${owner}/${repository}/hooks/${webhookId}`)
+    .reply(...response);
+}
+
+function listWebhooks({
+  accessToken, owner, repo: repository, response,
+}) {
+  return nock('https://api.github.com')
+    .matchHeader('authorization', `token ${accessToken}`)
+    .get(`/repos/${owner}/${repository}/hooks`)
+    .reply(...response);
+}
+
 const getBranch = ({
   // eslint-disable-next-line no-shadow
   accessToken, owner, repo, branch, expected,
@@ -488,6 +506,8 @@ module.exports = {
   user,
   userOrganizations,
   webhook,
+  deleteWebhook,
+  listWebhooks,
   getBranch,
   getTeamMembers,
   getOrganizationMembers,
