@@ -105,7 +105,7 @@ module.exports = (sequelize, DataTypes) => {
     paranoid: true,
     tableName: 'organization',
     hooks: {
-      beforeValidate: (org, options) => { // eslint-disable-line no-unused-vars
+      beforeValidate: (org) => {
         /* eslint-disable no-param-reassign */
         if (!org.isSandbox) {
           org.sandboxNextCleaningAt = null;
