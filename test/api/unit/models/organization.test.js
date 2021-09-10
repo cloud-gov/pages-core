@@ -3,6 +3,7 @@ const moment = require('moment');
 const {
   Role, Site, Organization, OrganizationRole, User,
 } = require('../../../../api/models');
+const { sandboxDays } = require('../../../../config').app;
 
 const orgFactory = require('../../support/factory/organization');
 const createSite = require('../../support/factory/site');
@@ -200,6 +201,7 @@ describe('Organization model', () => {
         isSandbox: false,
         sandboxNextCleaningAt: moment().add(1, 'day').toDate(),
       });
+      expect(org.sandboxNextCleaningAt).to.be.null;
       expect(org.daysUntilSandboxCleaning).to.be.null;
     });
 
@@ -208,6 +210,7 @@ describe('Organization model', () => {
         isSandbox: false,
         sandboxNextCleaningAt: null,
       });
+      expect(org.sandboxNextCleaningAt).to.be.null;
       expect(org.daysUntilSandboxCleaning).to.be.null;
     });
 
@@ -216,7 +219,8 @@ describe('Organization model', () => {
         isSandbox: true,
         sandboxNextCleaningAt: null,
       });
-      expect(org.daysUntilSandboxCleaning).to.be.null;
+      expect(org.sandboxNextCleaningAt).to.eql(moment().add(sandboxDays, 'days').endOf('day').toDate());
+      expect(org.daysUntilSandboxCleaning).to.equal(sandboxDays);
     });
   });
 });

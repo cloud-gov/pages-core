@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const moment = require('moment');
 const { toInt } = require('../utils');
+const { sandboxDays } = require('../../config').app;
 
 const associate = ({
   Organization,
@@ -103,6 +104,15 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     paranoid: true,
     tableName: 'organization',
+    hooks: {
+      beforeValidate: (org, options) => {
+        if (!org.isSandbox) {
+          org.sandboxNextCleaningAt = null;
+        } else if (!org.sandboxNextCleaningAt) {
+          org.sandboxNextCleaningAt = moment().add(sandboxDays, 'days').endOf('day');
+        }
+      },
+    }
   });
 
   Organization.associate = associate;
