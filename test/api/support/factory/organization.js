@@ -7,12 +7,13 @@ function increment(key) {
   return `${key}-${counters[key]}`;
 }
 
-function build({ name } = {}) {
-  const params = {
-    name: name || increment('org'),
-  };
+function build(params = {}) {
+  let { name } = params;
+  if (!name) {
+    name = increment('org');
+  }
 
-  return Organization.build(params);
+  return Organization.build({...params, name});
 }
 
 function create(params) {

@@ -198,7 +198,10 @@ module.exports = {
 
     const managerRole = await Role.findOne({ where: { name: 'manager' } });
 
-    const org = await Organization.create({ name: orgName, isSandbox: sandbox });
+    const org = await Organization.create({
+      name: orgName,
+      isSandbox: sandbox,
+    });
     await org.addUser(user, { through: { roleId: managerRole.id } });
 
     return [org, uaaUserAttributes];

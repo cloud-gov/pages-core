@@ -15,3 +15,12 @@ export function groupLogs(logs) {
     return groups;
   }, {});
 }
+
+export function sandboxMsg(days, content = null) {
+  let timeframe = `${days} days`;
+  if (days === 1) {
+    timeframe = `${days} day`;
+  }
+  const str = content ? ` ${content} ` : ' ';
+  return `All${str}data for this sandbox organization will be removed in ${timeframe}.`;
+}

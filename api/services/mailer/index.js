@@ -1,9 +1,9 @@
 const IORedis = require('ioredis');
-const config = require('../../../config');
+const moment = require('moment');
+const PromisePool = require('@supercharge/promise-pool');
+const { redis: redisConfig, app: { hostname, app_env: appEnv } } = require('../../../config');
 const { MailQueue } = require('../../queues');
 const Templates = require('./templates');
-
-const { redis: redisConfig, app: { app_env: appEnv } } = config;
 
 let mailQueue;
 
@@ -32,6 +32,44 @@ async function sendUAAInvite(email, link) {
   });
 }
 
+async function sendSandboxReminder(organization) {
+  const {
+    id: organizationId,
+    name: organizationName,
+    Sites: sites,
+    Users: users,
+  } = organization;
+
+  const dateStr = moment(organization.sandboxNextCleaningAt).format('MM-DD-YYYY');
+  const subject = `Your Pages sandbox organization's sites will be removed in ${organization.daysUntilSandboxCleaning} days`;
+
+  ensureInit();
+
+  const { results, errors } = await PromisePool
+    .for(users)
+    .process(user => mailQueue.add('sandbox-reminder', {
+      to: [user.email],
+      subject,
+      html: Templates.sandboxReminder({
+        organizationName,
+        dateStr,
+        organizationId,
+        sites: sites.map(({ id, owner, repository }) => ({ id, owner, repository })),
+        hostname,
+      }),
+    }));
+
+  if (errors.length) {
+    const errMsg = [
+      `Failed to queue a sandbox reminders for organization@id=${organizationId} members:`,
+      errors.map(e => `  user@id=${e.item.id}: ${e.message}`).join('\n'),
+    ].join();
+    throw new Error(errMsg);
+  }
+
+  return results;
+}
+
 async function sendAlert(reason, errors) {
   ensureInit();
   return mailQueue.add('alert', {
@@ -44,5 +82,6 @@ async function sendAlert(reason, errors) {
 module.exports = {
   init,
   sendUAAInvite,
+  sendSandboxReminder,
   sendAlert,
 };

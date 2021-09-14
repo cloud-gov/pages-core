@@ -13,6 +13,7 @@ export const BasicSiteSettings = ({
   reset,
   pristine,
   handleSubmit,
+  isSandbox,
 }) => (
   <form className="settings-form" onSubmit={handleSubmit}>
     <h3>Basic settings</h3>
@@ -42,13 +43,16 @@ export const BasicSiteSettings = ({
           className="form-control"
           placeholder="Branch name"
         />
-        <HttpsUrlField
-          label="Live URL:"
-          name="domain"
-          id="domainInput"
-          placeholder="https://example.gov"
-          className="form-control"
-        />
+        {!isSandbox
+          && (
+          <HttpsUrlField
+            label="Live URL:"
+            name="domain"
+            id="domainInput"
+            placeholder="https://example.gov"
+            className="form-control"
+          />
+          )}
       </fieldset>
     </div>
     <div className="well">
@@ -70,13 +74,16 @@ export const BasicSiteSettings = ({
           type="text"
           placeholder="Branch name"
         />
-        <HttpsUrlField
-          label="Demo URL:"
-          name="demoDomain"
-          id="demoDomainInput"
-          placeholder="https://demo.example.gov"
-          className="form-control"
-        />
+        {!isSandbox
+          && (
+          <HttpsUrlField
+            label="Demo URL:"
+            name="demoDomain"
+            id="demoDomainInput"
+            placeholder="https://demo.example.gov"
+            className="form-control"
+          />
+          )}
       </fieldset>
     </div>
     <button
@@ -111,6 +118,7 @@ BasicSiteSettings.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   reset: PropTypes.func.isRequired,
   pristine: PropTypes.bool.isRequired,
+  isSandbox: PropTypes.bool.isRequired,
 };
 
 // create a higher-order component with reduxForm and export that

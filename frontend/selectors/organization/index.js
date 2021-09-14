@@ -1,4 +1,4 @@
-export const getOrgById = (state, id) => state.data.find(site => site.id === Number(id));
+export const getOrgById = (state, id) => state.data.find(org => org.id === Number(id));
 
 export const getOrgData = (state) => {
   const { data } = state;
