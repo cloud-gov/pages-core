@@ -1,12 +1,11 @@
 const cfenv = require('cfenv');
 
+const { APP_ENV, PRODUCT } = process.env;
 const appEnv = cfenv.getAppEnv();
 
-const { space_name: spaceName } = appEnv.app;
+const productPrefix = `${PRODUCT}-${APP_ENV}`;
 
-const servicePrefix = spaceName === 'pages-staging' ? spaceName : `federalist-${process.env.APP_ENV}`;
-
-const serviceCredsKey = `${servicePrefix}-env`;
+const serviceCredsKey = `${productPrefix}-env`;
 const federalistCreds = appEnv.getServiceCreds(serviceCredsKey) || {};
 
 module.exports = (key) => {
