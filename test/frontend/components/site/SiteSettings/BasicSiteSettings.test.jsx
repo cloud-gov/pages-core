@@ -54,6 +54,14 @@ describe('<BasicSiteSettings/>', () => {
     });
   });
 
+  it('should not render url fields if sandbox org', () => {
+    const props = makeProps();
+    const sandboxProps = { ...props, isSandbox: true };
+    const wrapper = shallow(<BasicSiteSettings {...sandboxProps} />);
+    expect(wrapper.exists()).to.be.true;
+    expect(wrapper.find('HttpsUrlField')).to.have.length(0);
+  });
+
   it('should have its buttons disabled when pristine', () => {
     const props = makeProps();
     let wrapper = shallow(<BasicSiteSettings {...props} />);
