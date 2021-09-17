@@ -29,7 +29,12 @@ describe('<SiteSettings/>', () => {
       demoDomain: 'https://demo.example.gov',
       engine: 'jekyll',
       basicAuth: {},
+      organizationId: 1,
     },
+    organization: {
+      id: 1,
+      name: 'org-1',
+    }
   };
 
   let origWindow;

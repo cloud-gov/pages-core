@@ -1,10 +1,12 @@
 const cfenv = require('cfenv');
 
+const { APP_ENV, PRODUCT } = process.env;
 const appEnv = cfenv.getAppEnv();
 
-const { space_id: cfSpaceGuid, space_name: spaceName } = appEnv.app;
+const { space_id: cfSpaceGuid } = appEnv.app;
 
-const servicePrefix = spaceName === 'pages-staging' ? spaceName : `federalist-${process.env.APP_ENV}`;
+const servicePrefix = `federalist-${APP_ENV}`;
+const productPrefix = `${PRODUCT}-${APP_ENV}`;
 
 // Database Config
 const rdsCreds = appEnv.getServiceCreds(`${servicePrefix}-rds`);
@@ -15,6 +17,9 @@ if (rdsCreds) {
     user: rdsCreds.username,
     password: rdsCreds.password,
     port: rdsCreds.port,
+    ssl: {
+      rejectUnauthorized: false,
+    },
   };
 } else {
   throw new Error('No database credentials found.');
@@ -83,8 +88,8 @@ if (deployUserCreds) {
 }
 
 // Environment Variables
-const cfDomain = appEnv.getServiceCreds(`${servicePrefix}-domain`);
-const cfProxy = appEnv.getServiceCreds(`${servicePrefix}-proxy`);
+const cfDomain = appEnv.getServiceCreds(`${productPrefix}-domain`);
+const cfProxy = appEnv.getServiceCreds(`${productPrefix}-proxy`);
 const cfOauthTokenUrl = process.env.CLOUD_FOUNDRY_OAUTH_TOKEN_URL;
 const cfApiHost = process.env.CLOUD_FOUNDRY_API_HOST;
 // optional environment vaiables
@@ -139,4 +144,10 @@ module.exports.mailer = {
   host: mailerCredentials.host,
   password: mailerCredentials.password,
   username: mailerCredentials.username,
+};
+
+const slackCredentials = appEnv.getServiceCreds('slack');
+
+module.exports.mailer = {
+  url: slackCredentials.url,
 };

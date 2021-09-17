@@ -3,11 +3,12 @@ const { postgres } = require('../../config');
 const { databaseLogger } = require('../../winston');
 
 const {
-  database, host, password, port, user: username,
+  database, host, password, port, ssl, user: username,
 } = postgres;
 
 const sequelize = new Sequelize(database, username, password, {
   dialect: 'postgres',
+  dialectOptions: { ssl },
   host,
   port,
   logging: databaseLogger.info.bind(databaseLogger),

@@ -1,7 +1,9 @@
 const { expect } = require('chai');
+const moment = require('moment');
 const {
   Role, Site, Organization, OrganizationRole, User,
 } = require('../../../../api/models');
+const { sandboxDays } = require('../../../../config').app;
 
 const orgFactory = require('../../support/factory/organization');
 const createSite = require('../../support/factory/site');
@@ -182,6 +184,43 @@ describe('Organization model', () => {
       expect(orgs[0].OrganizationRoles.length).to.eq(1);
       expect(orgs[0].OrganizationRoles[0].userId).to.eq(user.id);
       expect(orgs[0].OrganizationRoles[0].Role.id).to.eq(managerRole.id);
+    });
+  });
+
+  describe('daysUntilSandboxCleaning', () => {
+    it('sandboxNextCleaningAt is defined', async () => {
+      const org = await orgFactory.create({
+        isSandbox: true,
+        sandboxNextCleaningAt: moment().add(1, 'day').toDate(),
+      });
+      expect(org.daysUntilSandboxCleaning).to.equal(1);
+    });
+
+    it('sandboxNextCleaningAt is defined for non-sandbox org', async () => {
+      const org = await orgFactory.create({
+        isSandbox: false,
+        sandboxNextCleaningAt: moment().add(1, 'day').toDate(),
+      });
+      expect(org.sandboxNextCleaningAt).to.be.null;
+      expect(org.daysUntilSandboxCleaning).to.be.null;
+    });
+
+    it('sandboxNextCleaningAt is not defined for non-sandbox org', async () => {
+      const org = await orgFactory.create({
+        isSandbox: false,
+        sandboxNextCleaningAt: null,
+      });
+      expect(org.sandboxNextCleaningAt).to.be.null;
+      expect(org.daysUntilSandboxCleaning).to.be.null;
+    });
+
+    it('sandboxNextCleaningAt is not defined for sandbox org', async () => {
+      const org = await orgFactory.create({
+        isSandbox: true,
+        sandboxNextCleaningAt: null,
+      });
+      expect(org.sandboxNextCleaningAt).to.eql(moment().add(sandboxDays, 'days').endOf('day').toDate());
+      expect(org.daysUntilSandboxCleaning).to.equal(sandboxDays);
     });
   });
 });

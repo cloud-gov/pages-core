@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
 const UserController = require('../controllers/user');
-const sessionAuth = require('../policies/sessionAuth');
+const { sessionAuth } = require('../middlewares');
 
 router.get('/me', sessionAuth, UserController.me);
 
