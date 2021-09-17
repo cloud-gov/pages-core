@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* global API_URL */
-import { notification } from '../stores';
+import { notification, session } from '../stores';
 import { logout as authLogout } from './auth';
 
 const apiUrl = API_URL;
@@ -26,7 +26,12 @@ function _setSearchString(query = {}) {
 
 // eslint-disable-next-line no-underscore-dangle
 async function _fetch(path, opts = {}) {
-  return fetch(`${apiUrl}/admin${path}`, { ...defaultOptions, ...opts })
+  const options = { ...defaultOptions, ...opts };
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(options.method)) {
+    options.headers['x-csrf-token'] = session.csrfToken();
+  }
+
+  return fetch(`${apiUrl}/admin${path}`, options)
     .then((r) => {
       if (r.ok) return r.json();
       if (r.status === 401) {
@@ -86,6 +91,10 @@ function fetchBuildLogEventSource(id, onMessage) {
 
 async function fetchBuild(id) {
   return get(`/builds/${id}`).catch(() => null);
+}
+
+async function updateBuild(id, params) {
+  return put(`/builds/${id}`, params);
 }
 
 async function fetchBuilds(query = {}) {
@@ -169,6 +178,7 @@ export {
   fetchMe,
   fetchBuildLogEventSource,
   fetchBuild,
+  updateBuild,
   fetchBuilds,
   fetchBuildLog,
   fetchEvents,

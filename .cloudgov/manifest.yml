@@ -17,18 +17,19 @@ applications:
         memory: ((memory))
     services:
       - app-((env))-uaa-client
-      - ((product))-((env))-rds
-      - ((product))-((env))-s3
+      - federalist-((env))-rds
+      - federalist-((env))-s3
       - ((product))-((env))-env
-      - ((product))-((env))-sqs-creds
-      - ((product))-((env))-redis
+      - federalist-((env))-sqs-creds
+      - federalist-((env))-redis
       - ((product))-((env))-proxy
       - ((product))-((env))-domain
-      - ((product))-((env))-uev-key
+      - federalist-((env))-uev-key
       - federalist-deploy-user
       - federalist-site-wide-error
-      - ((product))-((env))-s3-build-logs
+      - federalist-((env))-s3-build-logs
       - mailer
+      - slack
     env:
       NODE_ENV: production
       APP_ENV: ((env))
@@ -66,7 +67,7 @@ applications:
       - route: queues.((domain))
     services:
       - app-((env))-uaa-client
-      - ((product))-((env))-redis
+      - federalist-((env))-redis
     env:
       NODE_ENV: production
       APP_ENV: ((env))

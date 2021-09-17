@@ -65,9 +65,8 @@ module.exports = wrapHandlers({
     }
 
     await authorizer.destroy(user, site);
-    const siteJSON = siteSerializer.serializeNew(site);
-    await SiteDestroyer.destroySite(site);
-    return res.json(siteJSON);
+    await SiteDestroyer.destroySite(site, user);
+    return res.json({});
   },
 
   async addUser(req, res) {

@@ -4,11 +4,14 @@ const IORedis = require('ioredis');
 const { app: appConfig, mailer: mailerConfig, redis: redisConfig } = require('../../config');
 const { logger } = require('../../winston');
 
-const { MailQueueName, ScheduledQueue, ScheduledQueueName } = require('../queues');
+const {
+  MailQueueName, ScheduledQueue, ScheduledQueueName, SlackQueueName,
+} = require('../queues');
 
 const Processors = require('./jobProcessors');
 const Mailer = require('./Mailer');
 const QueueWorker = require('./QueueWorker');
+const Slack = require('./Slack');
 
 const EVERY_TEN_MINUTES_CRON = '0,10,20,30,40,50 * * * *';
 const NIGHTLY_CRON = '0 5 * * *';
@@ -24,42 +27,59 @@ const nightlyJobConfig = {
 };
 
 async function start() {
-  // Hack to not run the mailer for Federalist until we have a better feature flag
-  const runMailer = mailerConfig.host;
-
-  let mailer;
-  if (runMailer) {
-    mailer = new Mailer();
-  }
-
   const connection = new IORedis(redisConfig.url, {
     tls: redisConfig.tls,
   });
 
+  const slack = new Slack();
+
   // Processors
+  let mailJobProcessor;
+
+  // Hack to use Slack for the mailer queue for Federalist
+  if (mailerConfig.username) {
+    const mailer = new Mailer();
+    mailJobProcessor = job => mailer.send(job.data);
+  } else {
+    mailJobProcessor = (job) => {
+      // ignore alerts since they are already sent to both
+      if (job.name === 'alert') {
+        return 'ignored';
+      }
+      return slack.send({
+        channel: 'federalist-supportstream',
+        text: job.data.html,
+        username: 'Federalist Mailer',
+      });
+    };
+  }
+
   const scheduledJobProcessor = Processors.multiJobProcessor({
     archiveBuildLogsDaily: Processors.archiveBuildLogsDaily,
     nightlyBuilds: Processors.nightlyBuilds,
     revokeMembershipForInactiveUsers: Processors.revokeMembershipForInactiveUsers,
+    revokeMembershipForUAAUsers: Processors.revokeMembershipForUAAUsers,
     timeoutBuilds: Processors.timeoutBuilds,
     verifyRepositories: Processors.verifyRepositories,
+    sandboxNotifications: Processors.sandboxNotifications,
+    cleanSandboxOrganizations: Processors.cleanSandboxOrganizations,
   });
+
+  const slackJobProcessor = job => slack.send(job.data);
 
   // Workers
   const workers = [
+    new QueueWorker(MailQueueName, connection, mailJobProcessor),
     new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
+    new QueueWorker(SlackQueueName, connection, slackJobProcessor),
   ];
 
   // Schedulers
   const schedulers = [
+    new QueueScheduler(MailQueueName, { connection }),
     new QueueScheduler(ScheduledQueueName, { connection }),
+    new QueueScheduler(SlackQueueName, { connection }),
   ];
-
-  if (runMailer) {
-    const mailJobProcessor = job => mailer.send(job.data);
-    workers.push(new QueueWorker(MailQueueName, connection, mailJobProcessor));
-    schedulers.push(new QueueScheduler(MailQueueName, { connection }));
-  }
 
   // Queues
   const scheduledQueue = new ScheduledQueue(connection);
@@ -90,10 +110,13 @@ async function start() {
     scheduledQueue.add('nightlyBuilds', {}, nightlyJobConfig),
     scheduledQueue.add('verifyRepositories', {}, nightlyJobConfig),
     scheduledQueue.add('revokeMembershipForInactiveUsers', {}, nightlyJobConfig),
+    scheduledQueue.add('revokeMembershipForUAAUsers', {}, nightlyJobConfig),
   ];
 
   if (appConfig.app_env === 'production') {
     jobs.push(scheduledQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig));
+    jobs.push(scheduledQueue.add('sandboxNotifications', {}, nightlyJobConfig));
+    jobs.push(scheduledQueue.add('cleanSandboxOrganizations', {}, nightlyJobConfig));
   }
 
   await scheduledQueue.drain(); // clear the queue

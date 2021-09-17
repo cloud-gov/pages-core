@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const OrganizationRoleController = require('../controllers/organization-role');
-const sessionAuth = require('../policies/sessionAuth');
-const csrfProtection = require('../policies/csrfProtection');
+const { csrfProtection, sessionAuth } = require('../middlewares');
 
 router.use(sessionAuth);
 router.use(csrfProtection);

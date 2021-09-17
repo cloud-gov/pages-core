@@ -7,7 +7,10 @@ const OrganizationService = require('../../services/organization');
 
 module.exports = wrapHandlers({
   async me(req, res) {
-    res.json(userSerializer.toJSON(req.user));
+    res.json({
+      ...userSerializer.toJSON(req.user),
+      csrfToken: req.csrfToken(),
+    });
   },
 
   async list(req, res) {

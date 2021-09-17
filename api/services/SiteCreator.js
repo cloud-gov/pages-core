@@ -149,26 +149,25 @@ function validateSite(params) {
  *
  * returns the new site record
  */
-function saveAndBuildSite({ site, user }) {
-  let model;
+async function saveAndBuildSite({ site, user }) {
+  const webhook = await GitHub.setWebhook(site, user.githubAccessToken);
 
-  return GitHub.setWebhook(site, user.githubAccessToken)
-    .then(() => site.save())
-    .then((createdSite) => {
-      model = createdSite;
+  // This will be `undefined` if the webhook already exists
+  if (webhook) {
+    site.set('webhookId', webhook.data.id);
+  }
 
-      const buildParams = paramsForNewBuild({
-        site: model,
-        user,
-      });
+  await site.save();
 
-      return Promise.all([
-        site.addUser(user.id),
-        Build.create(buildParams)
-          .then(build => build.enqueue()),
-      ]);
-    })
-    .then(() => model);
+  const buildParams = paramsForNewBuild({ site, user });
+
+  await Promise.all([
+    site.addUser(user.id),
+    Build.create(buildParams)
+      .then(build => build.enqueue()),
+  ]);
+
+  return site;
 }
 
 async function createSiteFromExistingRepo({ siteParams, user }) {

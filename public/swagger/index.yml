@@ -54,6 +54,10 @@ paths:
             type: array
             items:
               $ref: "Build.json"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "Error.json"
         403:
           description: Not authorized
           schema:
@@ -76,6 +80,29 @@ paths:
           description: The build object specified by the ID
           schema:
             $ref: "Build.json"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
+    put:
+      summary: Update the build state
+      responses:
+        200:
+          description: The build object specified by the ID
+          schema:
+            $ref: "Build.json"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "Error.json"
         403:
           description: Not authorized
           schema:
@@ -177,6 +204,10 @@ paths:
             type: array
             items:
               $ref: "BuildLog.json"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "Error.json"
         403:
           description: Not authorized
           schema:
@@ -562,7 +593,7 @@ paths:
         200:
           description: Acknowledgement that the site was deleted
           schema:
-            $ref: "Site.json"
+            type: object
         403:
           description: Not authorized
           schema:

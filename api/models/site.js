@@ -224,6 +224,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       references: 'Organization',
     },
+    webhookId: {
+      type: DataTypes.INTEGER,
+    },
   }, {
     tableName: 'site',
     hooks: {

@@ -6,6 +6,7 @@ const TimeoutBuilds = require('../../../api/services/TimeoutBuilds');
 const ScheduledBuildHelper = require('../../../api/services/ScheduledBuildHelper');
 const RepositoryVerifier = require('../../../api/services/RepositoryVerifier');
 const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
+const SandboxHelper = require('../../../api/services/SandboxHelper');
 const factory = require('../support/factory');
 const jobProcessors = require('../../../api/workers/jobProcessors');
 
@@ -123,6 +124,53 @@ describe('job processors', () => {
       ]);
       const result = await jobProcessors.revokeMembershipForInactiveUsers().catch(e => e);
       expect(result).to.not.be.an('error');
+    });
+  });
+
+  context('sandboxNotifications', () => {
+    it('failed to notify all sandbox organization members', async () => {
+      sinon.stub(SandboxHelper, 'notifyOrganizations').resolves([
+        { status: 'fulfilled', value: '1' },
+        { status: 'fulfilled', value: '2' },
+        { status: 'rejected', reason: 'because' },
+      ]);
+      const result = await jobProcessors.sandboxNotifications().catch(e => e);
+      expect(result).to.be.an('error');
+      expect(result.message.split('.')[0]).to.equal('Sandbox organization reminders queued with 2 successes and 1 failures');
+    });
+
+    it('notify all sandbox organization members successfully', async () => {
+      sinon.stub(SandboxHelper, 'notifyOrganizations').resolves([
+        { status: 'fulfilled', value: '1' },
+        { status: 'fulfilled', value: '2' },
+      ]);
+      const result = await jobProcessors.sandboxNotifications().catch(e => e);
+      expect(result).to.not.be.an('error');
+    });
+  });
+
+  context('cleanSandboxOrganizations', () => {
+    it('notify all sandbox organization members successfully', async () => {
+      sinon.stub(SandboxHelper, 'cleanSandboxes').resolves([
+        { status: 'fulfilled', value: 'cleaned' },
+        { status: 'fulfilled', value: 'cleaned' },
+      ]);
+      const result = await jobProcessors.cleanSandboxOrganizations();
+      expect(result).to.not.be.an('error');
+    });
+
+    it('failed ot clean sandbox organization', async () => {
+      sinon.stub(SandboxHelper, 'cleanSandboxes').resolves([
+        { status: 'fulfilled', value: 'cleaned' },
+        { status: 'rejected', reason: 'just because' },
+      ]);
+
+      const result = await jobProcessors.cleanSandboxOrganizations().catch(e => e); 
+      expect(result).to.be.an('error');
+      expect(result.message).to.equal([
+        'Sandbox organizations cleaned with 1 successes and 1 failures.',
+        '   Successes:\n      cleaned\n   Failures:\n      just because'
+      ].join('\n'));
     });
   });
 

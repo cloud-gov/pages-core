@@ -1,14 +1,21 @@
 const { Router } = require('express');
 
-const { ensureAuthenticated, parseJson } = require('../../middlewares');
+const config = require('../../../config');
+
+const {
+  csrfProtection, ensureAuthenticated, ensureOrigin, parseJson,
+} = require('../../middlewares');
 
 const AdminControllers = require('../controllers');
 
 const apiRouter = Router();
+apiRouter.use(ensureOrigin(config.app.adminHostname));
 apiRouter.use(ensureAuthenticated);
+apiRouter.use(csrfProtection);
 apiRouter.get('/builds', AdminControllers.Build.list);
 apiRouter.get('/builds/:id', AdminControllers.Build.findById);
 apiRouter.get('/builds/:id/log', AdminControllers.Build.findBuildLog);
+apiRouter.put('/builds/:id', parseJson, AdminControllers.Build.update);
 apiRouter.get('/events', AdminControllers.Event.list);
 apiRouter.get('/organizations', AdminControllers.Organization.list);
 apiRouter.post('/organizations', parseJson, AdminControllers.Organization.create);
