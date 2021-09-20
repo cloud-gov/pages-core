@@ -1,17 +1,15 @@
 class MockSocket {
-  constructor(userId = null) {
-    if (userId) {
-      this.user = userId;
-    }
+  constructor(user = null) {
+    this.request = {};
+    this.rooms = new Set([`defaultUserRoom${Math.random() * 1000}`]);
 
-    const defaultUserRoom = `defaultUserRoom${Math.random() * 1000}`;
-    const rooms = {};
-    rooms[defaultUserRoom] = defaultUserRoom;
-    this.rooms = rooms;
+    if (user) {
+      this.request.user = user;
+    }
   }
 
   join(roomName) {
-    this.rooms[roomName] = roomName;
+    this.rooms.add(roomName);
   }
 }
 
