@@ -5,18 +5,20 @@
 */
 module.exports = {
   contentSecurityPolicy: {
-    useDefaults: true,
     directives: {
-      'script-src': [
+      'default-src': [
         "'self'",
-        'www.googletagmanager.com',
-        'dap.digitalgov.gov',
-        'www.google-analytics.com',
-        (_, res) => `'nonce-${res.locals.cspNonce}'`,
+      ],
+      'base-uri': [
+        "'self'",
       ],
       'connect-src': [
         "'self'",
         'www.google-analytics.com',
+      ],
+      'font-src': [
+        "'self'",
+        'https:', 'data:',
       ],
       'frame-ancestors': [
         "'none'",
@@ -24,6 +26,29 @@ module.exports = {
       'form-action': [
         "'self'",
       ],
+      'img-src': [
+        "'self'",
+        'data:',
+      ],
+      'object-src': [
+        "'none'",
+      ],
+      'script-src': [
+        "'self'",
+        'www.googletagmanager.com',
+        'dap.digitalgov.gov',
+        'www.google-analytics.com',
+        (_, res) => `'nonce-${res.locals.cspNonce}'`,
+      ],
+      'script-src-attr': [
+        "'none'",
+      ],
+      'style-src': [
+        "'self'",
+        'https:',
+        "'unsafe-inline'",
+      ],
+      'block-all-mixed-content': [],
     },
   },
   frameguard: {
