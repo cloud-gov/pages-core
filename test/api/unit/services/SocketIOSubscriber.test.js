@@ -1,183 +1,106 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const factory = require('../../support/factory');
 const SocketIOSubscriber = require('../../../../api/services/SocketIOSubscriber');
 const MockSocket = require('../../support/mockSocket');
 const { SiteUser } = require('../../../../api/models');
 
+const times = (length, fn) => Array.from({ length }, fn);
+
 describe('SocketIOSubscriber', () => {
   context('listen', () => {
-    it('a user with sites joinsRooms(socket)', (done) => {
-      let user;
-      let socket;
+    it('a user with sites joinsRooms(socket)', async () => {
+      const numSites = 5;
+      const user = await factory.user();
+      await Promise.all(times(numSites, () => factory.site({ users: [user] })));
+      const socket = new MockSocket(user);
 
-      factory.user()
-        .then((model) => {
-          user = model;
-          return Promise.resolve();
-        })
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => {
-          socket = new MockSocket(user.id);
-          return SocketIOSubscriber.joinRooms(socket);
-        })
-        .then(() => {
-          expect(Object.keys(socket.rooms).length).to.eql(6);
-          done();
-        })
-        .catch(done);
+      await SocketIOSubscriber.joinRooms(socket);
+
+      expect(socket.rooms.size).to.eql(numSites + 1);
     });
 
-    it('a user without sites joinsRooms(socket)', (done) => {
-      let socket;
+    it('a user without sites joinsRooms(socket)', async () => {
+      const user = await factory.user();
+      const socket = new MockSocket(user);
 
-      factory.site()
-        .then(() => factory.user())
-        .then((user) => {
-          socket = new MockSocket(user.id);
-          return SocketIOSubscriber.joinRooms(socket);
-        })
-        .then(() => {
-          expect(Object.keys(socket.rooms).length).to.eql(1);
-          done();
-        })
-        .catch(done);
+      await SocketIOSubscriber.joinRooms(socket);
+
+      expect(socket.rooms.size).to.eql(1);
     });
 
-    it('user 1 and user 2 have different sites', (done) => {
-      let user1;
-      let user2;
-      let socket1;
-      let socket2;
+    it('user 1 and user 2 have different sites', async () => {
+      const user1NumSites = 3;
+      const user2NumSites = 1;
+      const [user1, user2] = await Promise.all(times(2, () => factory.user()));
+      await Promise.all([
+        ...times(user1NumSites, () => factory.site({ users: [user1] })),
+        ...times(user2NumSites, () => factory.site({ users: [user2] })),
+      ]);
+      const socket1 = new MockSocket(user1);
+      const socket2 = new MockSocket(user2);
 
-      factory.user()
-        .then((model) => {
-          user1 = model;
-          return Promise.resolve();
-        })
-        .then(() => factory.site({ users: Promise.all([user1]) }))
-        .then(() => factory.site({ users: Promise.all([user1]) }))
-        .then(() => factory.site({ users: Promise.all([user1]) }))
-        .then(() => factory.user())
-        .then((model) => {
-          user2 = model;
-          return Promise.resolve();
-        })
-        .then(() => factory.site({ users: Promise.all([user2]) }))
-        .then(() => {
-          socket1 = new MockSocket(user1.id);
+      await Promise.all([
+        SocketIOSubscriber.joinRooms(socket1),
+        SocketIOSubscriber.joinRooms(socket2),
+      ]);
 
-          socket2 = new MockSocket(user2.id);
-
-          return Promise.all([
-            SocketIOSubscriber.joinRooms(socket1),
-            SocketIOSubscriber.joinRooms(socket2),
-          ]);
-        })
-        .then(() => {
-          expect(Object.keys(socket1.rooms).length).to.eql(4);
-          expect(Object.keys(socket2.rooms).length).to.eql(2);
-          done();
-        })
-        .catch(done);
+      expect(socket1.rooms.size).to.eql(user1NumSites + 1);
+      expect(socket2.rooms.size).to.eql(user2NumSites + 1);
     });
 
-    it('user 1 and user 2 have 2 same sites', (done) => {
-      let user1;
-      let user2;
-      let socket1;
-      let socket2;
+    it('user 1 and user 2 have 2 same sites', async () => {
+      const user1NumSites = 2;
+      const user2NumSites = 1;
+      const bothNumSites = 2;
+      const [user1, user2] = await Promise.all(times(2, () => factory.user()));
+      await Promise.all([
+        ...times(user1NumSites, () => factory.site({ users: [user1] })),
+        ...times(user2NumSites, () => factory.site({ users: [user2] })),
+        ...times(bothNumSites, () => factory.site({ users: [user1, user2] })),
+      ]);
+      const socket1 = new MockSocket(user1);
+      const socket2 = new MockSocket(user2);
 
-      factory.user()
-        .then((model) => {
-          user1 = model;
-          return Promise.resolve();
-        })
-        .then(() => factory.site({ users: Promise.all([user1]) }))
-        .then(() => factory.site({ users: Promise.all([user1]) }))
-        .then(() => factory.user())
-        .then((model) => {
-          user2 = model;
-          return Promise.resolve();
-        })
-        .then(() => factory.site({ users: Promise.all([user2]) }))
-        .then(() => factory.site({ users: Promise.all([user1, user2]) }))
-        .then(() => factory.site({ users: Promise.all([user1, user2]) }))
-        .then(() => {
-          socket1 = new MockSocket(user1.id);
-          socket2 = new MockSocket(user2.id);
+      await Promise.all([
+        SocketIOSubscriber.joinRooms(socket1),
+        SocketIOSubscriber.joinRooms(socket2),
+      ]);
 
-          return Promise.all([
-            SocketIOSubscriber.joinRooms(socket1),
-            SocketIOSubscriber.joinRooms(socket2),
-          ]);
-        })
-        .then(() => {
-          expect(Object.keys(socket1.rooms).length).to.eql(5);
-          expect(Object.keys(socket2.rooms).length).to.eql(4);
-          const allRooms = Object.assign(socket1.rooms, socket2.rooms);
-          expect(Object.keys(allRooms).length).to.eql(7);
-          done();
-        })
-        .catch(done);
+      expect(socket1.rooms.size).to.eql(user1NumSites + bothNumSites + 1);
+      expect(socket2.rooms.size).to.eql(user2NumSites + bothNumSites + 1);
+      const allRooms = new Set([...socket1.rooms, ...socket2.rooms]);
+      expect(allRooms.size).to.eql(user1NumSites + user2NumSites + bothNumSites + 2);
     });
 
-    it('no id user with sites joinsRooms(socket)', (done) => {
-      let user;
-      let socket;
+    it('no user with sites joinsRooms(socket)', async () => {
+      const numSites = 5;
+      const user = await factory.user();
+      await Promise.all(times(numSites, () => factory.site({ users: [user] })));
+      const socket = new MockSocket();
 
-      factory.user()
-        .then((model) => {
-          user = model;
-          return Promise.resolve();
-        })
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => {
-          socket = new MockSocket();
-          return SocketIOSubscriber.joinRooms(socket);
-        })
-        .then(() => {
-          expect(Object.keys(socket.rooms).length).to.eql(1);
-          done();
-        })
-        .catch(done);
+      await SocketIOSubscriber.joinRooms(socket);
+
+      expect(socket.rooms.size).to.eql(1);
     });
 
-    it('a user with sites with 1 buildsOnly  and 1 none subscription', (done) => {
-      let user;
-      let socket;
+    it('a user with sites with 1 buildsOnly and 1 none subscription', async () => {
+      const numSites = 4;
+      const user = await factory.user();
+      const [site1, site2] = await Promise.all(
+        times(numSites, () => factory.site({ users: [user] }))
+      );
+      await Promise.all([
+        SiteUser.update({ buildNotificationSetting: 'builds' },
+          { where: { user_sites: user.id, site_users: site1.id } }),
+        SiteUser.update({ buildNotificationSetting: 'none' },
+          { where: { user_sites: user.id, site_users: site2.id } }),
+      ]);
+      const socket = new MockSocket(user);
 
-      factory.user()
-        .then((model) => {
-          user = model;
-          return Promise.resolve();
-        })
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(site => SiteUser.update({ buildNotificationSetting: 'builds' },
-            { where: { user_sites: user.id, site_users: site.id } }))
-        .then(() => factory.site({ users: Promise.all([user]) }))
-        .then(site => SiteUser.update({ buildNotificationSetting: 'none' },
-            { where: { user_sites: user.id, site_users: site.id } }))
-        .then(() => {
-          socket = new MockSocket(user.id);
-          return SocketIOSubscriber.joinRooms(socket);
-        })
-        .then(() => {
-          const rooms = Object.keys(socket.rooms);
-          expect(rooms.length).to.eql(4);
-          expect(rooms.filter(room => room.endsWith(`user-${user.id}`)).length).to.eql(1);
-          done();
-        })
-        .catch(done);
+      await SocketIOSubscriber.joinRooms(socket);
+
+      expect(socket.rooms.size).to.eql(numSites - 1 + 1);
+      expect([...socket.rooms].filter(room => room.endsWith(`user-${user.id}`)).length).to.eql(1);
     });
   });
 });

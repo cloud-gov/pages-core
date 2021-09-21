@@ -1,16 +1,16 @@
-const io = require('socket.io');
+const { Server } = require('socket.io');
 const redis = require('redis');
 const redisAdapter = require('@socket.io/redis-adapter');
+const session = require('express-session');
 
 const { redis: redisConfig } = require('../config');
 const { Event } = require('./models');
 const EventCreator = require('./services/EventCreator');
-
-const server = require('./server');
 const SocketIOSubscriber = require('./services/SocketIOSubscriber');
-const jwtHelper = require('./services/jwtHelper');
+const passport = require('./services/passport');
+const sessionConfig = require('./init/sessionConfig');
 
-const socketIO = io(server);
+let socketIO;
 
 function handleError(message, body = {}) {
   return err => EventCreator.error(Event.labels.SOCKET_IO, err, {
@@ -19,41 +19,42 @@ function handleError(message, body = {}) {
   });
 }
 
-if (redisConfig) {
-  const pubClient = redis.createClient(redisConfig);
-  const subClient = pubClient.duplicate();
+const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
 
-  pubClient.on('error', handleError('redisAdapter pubClient error'));
-  subClient.on('error', handleError('redisAdapter subClient error'));
+function init(server) {
+  socketIO = new Server(server);
 
-  socketIO.adapter(redisAdapter(pubClient, subClient));
+  if (redisConfig) {
+    const pubClient = redis.createClient(redisConfig);
+    const subClient = pubClient.duplicate();
 
-  socketIO.of('/').adapter.on('error', handleError('redisAdapter error'));
+    pubClient.on('error', handleError('redisAdapter pubClient error'));
+    subClient.on('error', handleError('redisAdapter subClient error'));
+
+    socketIO.adapter(redisAdapter(pubClient, subClient));
+
+    socketIO.of('/').adapter.on('error', handleError('redisAdapter error'));
+  }
+
+  socketIO.use(wrap(session(sessionConfig)));
+  socketIO.use(wrap(passport.initialize()));
+  socketIO.use(wrap(passport.session()));
+
+  socketIO.use((socket, next) => {
+    if (socket.request.user) {
+      next();
+    } else {
+      next(new Error('unauthorized'));
+    }
+  });
+
+  socketIO.on('connection', (socket) => {
+    SocketIOSubscriber
+      .joinRooms(socket)
+      .catch(handleError('socketIO subscription join room error', { userId: socket.request.user?.id }));
+  });
+
+  socketIO.on('error', handleError('socket auth/subscribe error'));
 }
 
-socketIO.use((socket, next) => {
-  /* eslint-disable no-param-reassign */
-  if (socket.handshake.query && socket.handshake.query.accessToken) {
-    jwtHelper.verify(socket.handshake.query.accessToken, { expiresIn: 60 * 60 * 24 }) // expire 24h
-      .then((decoded) => {
-        socket.user = decoded.user;
-      })
-      .then(() => next())
-      .catch((err) => {
-        handleError('handshake error')(err);
-        next();
-      });
-  } else {
-    next();
-  }
-});
-
-socketIO.on('connection', (socket) => {
-  SocketIOSubscriber
-    .joinRooms(socket)
-    .catch(handleError('socketIO subscription join room error', { userId: socket.user }));
-});
-
-socketIO.on('error', handleError('socket auth/subscribe error'));
-
-module.exports = socketIO;
+module.exports = { init, socketIO };
