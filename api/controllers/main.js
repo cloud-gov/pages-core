@@ -1,7 +1,6 @@
 const config = require('../../config');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
-const jwtHelper = require('../services/jwtHelper');
 const Features = require('../features');
 
 const webpackAssets = loadAssetManifest();
@@ -68,7 +67,6 @@ module.exports = {
     context.username = req.user.username;
     context.siteWideError = SiteWideErrorLoader.loadSiteWideError();
     context.csrfToken = req.csrfToken();
-    context.accessToken = jwtHelper.sign({ user: req.user.id });
     context.socketHost = process.env.SOCKET_HOST;
     context.hasUAAIdentity = !!hasUAAIdentity;
 
@@ -105,7 +103,6 @@ module.exports = {
     if (req.session.authenticated) {
       context.isAuthenticated = true;
       context.username = req.user.username;
-      context.accessToken = jwtHelper.sign({ user: req.user.id });
       context.socketHost = process.env.SOCKET_HOST;
     }
 

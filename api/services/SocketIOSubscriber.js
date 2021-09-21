@@ -4,7 +4,7 @@ const getSiteRoom = siteId => `site-${siteId}`;
 const getBuilderRoom = (siteId, userId) => `site-${siteId}-user-${userId}`;
 
 const joinRooms = async (socket) => {
-  const userId = socket.user;
+  const userId = socket.request.user?.id;
   if (!userId) {
     return;
   }
