@@ -8,7 +8,7 @@ const { wrapHandlers } = require('../utils');
 const {
   Build, Site, User, Event,
 } = require('../models');
-const socketIO = require('../socketIO');
+const { socketIO } = require('../socketIO');
 
 const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
 

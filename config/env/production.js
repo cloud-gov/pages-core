@@ -151,3 +151,11 @@ const slackCredentials = appEnv.getServiceCreds('slack');
 module.exports.mailer = {
   url: slackCredentials.url,
 };
+
+module.exports.helmet = {
+  contentSecurityPolicy: {
+    directives: {
+      'upgrade-insecure-requests': [],
+    },
+  },
+};
