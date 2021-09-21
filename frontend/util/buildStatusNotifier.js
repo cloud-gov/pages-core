@@ -12,7 +12,8 @@ class BuildStatusNotifier {
     }
 
     const socketHost = (document.querySelectorAll('meta[name="socketHost"]')[0] || {}).content;
-    const socket = this.io(socketHost);
+    const socket = this.io(socketHost, { transports: ['websocket'] });
+
     socket.on('build status', (build) => {
       this.notify(build);
     });
