@@ -42,7 +42,6 @@ applications:
       LOG_LEVEL: ((log_level))
       NPM_CONFIG_PRODUCTION: true
       NODE_MODULES_CACHE: false
-      SOCKET_HOST: https://((app_subdomain))((domain))
       USER_AUDITOR: federalist
       S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
       FEATURE_AUTH_GITHUB: ((feature_auth_github))
