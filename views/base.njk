@@ -52,12 +52,6 @@
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:image" content="https://federalist.18f.gov/images/social-cards/twitter-1024x512.png" />
 
-    <!-- For socket.io -->
-    {% if accessToken and socketHost %}
-      <meta name='accessToken' content='{{ accessToken }}' />
-      <meta name='socketHost' content='{{ socketHost }}' />
-    {% endif %}
-
     <script src="/uswds/js/uswds.min.js" type="text/javascript"></script>
     <title>
       Federalist{% if siteDisplayEnv %} | {{ siteDisplayEnv }}{% endif %}

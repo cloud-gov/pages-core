@@ -67,7 +67,6 @@ module.exports = {
     context.username = req.user.username;
     context.siteWideError = SiteWideErrorLoader.loadSiteWideError();
     context.csrfToken = req.csrfToken();
-    context.socketHost = process.env.SOCKET_HOST;
     context.hasUAAIdentity = !!hasUAAIdentity;
 
     const frontendConfig = {
@@ -103,7 +102,6 @@ module.exports = {
     if (req.session.authenticated) {
       context.isAuthenticated = true;
       context.username = req.user.username;
-      context.socketHost = process.env.SOCKET_HOST;
     }
 
     res.render('404.njk', context);
