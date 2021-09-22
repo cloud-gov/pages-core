@@ -32,7 +32,6 @@ services:
       APP_HOSTNAME: http://localhost:1337
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
-      SOCKET_HOST: http://localhost:1337
   bull-board:
     build:
       dockerfile: Dockerfile-app
