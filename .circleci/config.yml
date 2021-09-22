@@ -161,7 +161,6 @@ jobs:
             # Attempt to submit a report, but don't fail the build if this fails (`|| true`)
             ./cc-test-reporter upload-coverage || true
 
-
   deploy:
     docker:
       - image: circleci/node:16.4
@@ -184,7 +183,6 @@ jobs:
 
       - deploy-to-cg:
           app: << parameters.app >>
-
 
   deploy-admin-client:
     docker:
@@ -258,7 +256,6 @@ jobs:
           app: << parameters.app >>
           action: restage
 
-
   run-task:
     docker:
       - image: cimg/base:2020.01
@@ -298,6 +295,18 @@ workflows:
             branches:
               only: main
 
+      - run-task:
+          name: run-migrations-production
+          app: federalistapp
+          task-name: run-migrations
+          task-command: yarn run migrate:up
+          requires:
+            - build
+            - deploy-production
+          filters:
+            branches:
+              only: main
+      
       - deploy-admin-client:
           name: deploy-admin-production
           app: federalist-admin
@@ -324,6 +333,18 @@ workflows:
           app-hostname: https://federalistapp-staging.18f.gov
           requires:
             - build
+          filters:
+            branches:
+              only: staging
+
+      - run-task:
+          name: run-migrations-staging
+          app: federalistapp-staging
+          task-name: run-migrations
+          task-command: yarn run migrate:up
+          requires:
+            - build
+            - deploy-staging
           filters:
             branches:
               only: staging
