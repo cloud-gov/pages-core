@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { error, success } from 'react-notification-system-redux';
+import { SubmissionError } from 'redux-form';
 
 import { ORGANIZATION, SITE, USER } from '../../propTypes';
 import { userSettingsUpdated } from '../../actions/actionCreators/userActions';
@@ -29,6 +30,9 @@ function Settings({
   }
 
   const initialValues = buildInitialValues(sites.data, user);
+
+  const onSubmit = userSettings => actions.updateUserSettings(userSettings)
+    .catch((e) => { throw new SubmissionError({ _error: e.message }); });
 
   const onSubmitFail = (err, dispatch) => {
     dispatch(actions.error({
@@ -64,7 +68,7 @@ function Settings({
           initialValues={initialValues}
           organizations={organizations.data}
           sites={sites.data}
-          onSubmit={actions.updateUserSettings}
+          onSubmit={onSubmit}
           onSubmitFail={onSubmitFail}
           onSubmitSuccess={onSubmitSuccess}
         />
