@@ -9,6 +9,7 @@
     "@octokit/rest": "^18.5.2",
     "@socket.io/redis-adapter": "^7.0.0",
     "@supercharge/promise-pool": "^1.5.0",
+    "ajv": "^8.6.3",
     "aws-sdk": "^2.879.0",
     "axios": "^0.21.1",
     "bull": "^3.20.1",
@@ -91,7 +92,8 @@
     "archive-build-logs": "node ./scripts/archive-build-logs.js",
     "migrate-build-logs": "node ./scripts/migrate-build-logs.js",
     "send-email": "node ./scripts/send-email.js",
-    "bootstrap-admins": "node ./scripts/bootstrap-admins.js"
+    "bootstrap-admins": "node ./scripts/bootstrap-admins.js",
+    "migrate-build-notification-settings": "node ./scripts/migrate-build-notification-settings.js"
   },
   "main": "index.js",
   "repository": {

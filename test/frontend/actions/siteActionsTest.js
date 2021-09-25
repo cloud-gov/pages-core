@@ -78,7 +78,6 @@ describe('siteActions', () => {
     dispatchSitesReceivedAction = stub();
     dispatchSiteAddedAction = stub();
     dispatchSiteUpdatedAction = stub();
-    dispatchSiteUserUpdatedAction = stub();
     dispatchSiteDeletedAction = stub();
     dispatchSiteBranchesReceivedAction = stub();
     dispatchShowAddNewSiteFieldsAction = stub();
@@ -99,7 +98,6 @@ describe('siteActions', () => {
         dispatchSitesReceivedAction,
         dispatchSiteAddedAction,
         dispatchSiteUpdatedAction,
-        dispatchSiteUserUpdatedAction,
         dispatchSiteDeletedAction,
         dispatchSiteBranchesReceivedAction,
         dispatchShowAddNewSiteFieldsAction,
@@ -119,7 +117,6 @@ describe('siteActions', () => {
         fetchSites,
         addSite,
         updateSite,
-        updateSiteUser,
         deleteSite,
         addUserToSite,
         removeUserFromSite,
@@ -241,38 +238,6 @@ describe('siteActions', () => {
     });
   });
 
-  describe('updateSiteUser', () => {
-    const siteToUpdate = {
-      hi: 'pal',
-    };
-    const data = {
-      who: 'knows',
-    };
-
-    it('triggers the updating of a site and dispatches a site updated action to the store when successful', () => {
-      updateSiteUser.withArgs(siteToUpdate, data).resolves(site);
-
-      const actual = fixture.updateSiteUser(siteToUpdate, data);
-
-      return actual.then(() => {
-        expect(dispatchSiteUserUpdatedAction.calledWith(site)).to.be.true;
-      });
-    });
-
-    it('triggers an error when updating a site fails', () => {
-      updateSiteUser.withArgs(siteToUpdate, data).rejects(error);
-
-      const actual = fixture.updateSiteUser(siteToUpdate, data);
-
-      return actual.then(() => {
-        expect(scrollTo.called).to.be.true;
-        expect(scrollTo.getCall(0).args).to.deep.equal([0, 0]);
-        expect(dispatchSiteUserUpdatedAction.called).to.be.false;
-        expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
-      });
-    });
-  });
-
   describe('deleteSite', () => {
     it('triggers the deletion of a site and dispatches a site deleted update router actions to the store when successful', () => {
       const siteToDelete = {
@@ -381,7 +346,7 @@ describe('siteActions', () => {
     const basicAuth = { username: 'username', password: 'password' };
 
     it('triggers the updating of a site and dispatches a site updated action to the store when successful', () => {
-      const basicAuthSite = {...site, config: { basicAuth } }
+      const basicAuthSite = { ...site, config: { basicAuth } };
       const sitePromise = Promise.resolve(basicAuthSite);
       saveBasicAuthToSite.withArgs(siteId, basicAuth).returns(sitePromise);
 

@@ -173,3 +173,11 @@ $image-path: '../../node_modules/uswds/src/img';
     margin-right: 1rem;
   }
 }
+
+.flex {
+  display: flex;
+}
+
+.justify-between {
+  justify-content: space-between;
+}

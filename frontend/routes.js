@@ -3,6 +3,7 @@ import { Redirect } from '@reach/router';
 
 import App from './components/app';
 import * as Organization from './components/organization';
+import UserSettings from './components/user/Settings';
 import SiteList from './components/siteList/siteList';
 import SiteContainer from './components/siteContainer';
 import SiteBuilds from './components/site/siteBuilds';
@@ -13,7 +14,6 @@ import SitePublishedFilesTable from './components/site/SitePublishedFilesTable';
 import SiteSettings from './components/site/SiteSettings';
 import AddSite from './components/AddSite';
 import NotFound from './components/NotFound';
-import NotificationSettings from './components/site/NotificationSettings';
 
 import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
@@ -39,8 +39,8 @@ export default (
       <SiteBuilds path="builds" />
       <SiteBuildLogs path="builds/:buildId/logs" />
       <SiteUsers path="users" />
-      <NotificationSettings path="notifications" />
     </SiteContainer>
+    <UserSettings path="settings" />
     <Redirect noThrow from="*" to="/not-found" />
     <NotFound path="/not-found" default />
     <Redirect noThrow from="*" to="/sites" />
