@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 const { toInt } = require('../utils');
 const {
   branchRegex, parseSiteConfigs, isEmptyOrUrl, isValidSubdomain,
@@ -79,14 +79,21 @@ const associate = ({
     }],
   }));
   Site.addScope('forUser', user => ({
+    where: {
+      [Op.or]: [
+        Sequelize.where(Sequelize.col('Users.id'), Op.not, null),
+        { organizationId: { [Op.not]: null } },
+      ],
+    },
     include: [
       {
         model: User,
-        required: true,
         where: { id: user.id },
+        required: false,
       },
       {
         model: Organization,
+        required: false,
         include: [{
           model: OrganizationRole,
           where: { userId: user.id },

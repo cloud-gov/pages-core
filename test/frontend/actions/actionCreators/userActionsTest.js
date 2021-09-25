@@ -4,6 +4,7 @@ import {
   userFetchStarted, userFetchStartedType,
   userActionFetchStarted, userActionFetchStartedType,
   userActionReceived, userActionReceivedType,
+  userSettingsUpdated, userSettingsUpdatedType,
 } from '../../../../frontend/actions/actionCreators/userActions';
 
 describe('userActions actionCreators', () => {
@@ -67,6 +68,25 @@ describe('userActions actionCreators', () => {
         type: userActionReceivedType,
         userActions,
       });
+    });
+  });
+
+  describe('userSettingsUpdated', () => {
+    it('constructs properly', () => {
+      const user = {
+        bongo: 'drum',
+      };
+
+      const actual = userSettingsUpdated(user);
+
+      expect(actual).to.deep.equal({
+        type: userSettingsUpdatedType,
+        user,
+      });
+    });
+
+    it('exports its type', () => {
+      expect(userSettingsUpdatedType).to.equal('USER_SETTINGS_UPDATED');
     });
   });
 });
