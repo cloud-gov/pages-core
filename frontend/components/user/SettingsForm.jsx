@@ -1,9 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  Field, SubmissionError, clearSubmitErrors, reduxForm,
-} from 'redux-form';
+import { Field, clearSubmitErrors, reduxForm } from 'redux-form';
 
 import { ORGANIZATION, SITE } from '../../propTypes';
 
@@ -18,11 +16,8 @@ function SettingsForm(props) {
     sites,
   } = props;
 
-  const onSubmit = data => handleSubmit(data)
-    .catch((e) => { throw new SubmissionError({ _error: e.message }); });
-
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={handleSubmit}>
       <fieldset>
         <legend className="usa-sr-only">Build Notification Settings</legend>
         <span className="usa-input-error-message" id="input-error-message" role="alert">
