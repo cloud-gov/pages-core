@@ -57,4 +57,11 @@ function init(server) {
   socketIO.on('error', handleError('socket auth/subscribe error'));
 }
 
-module.exports = { init, socketIO };
+function getSocket() {
+  return socketIO;
+}
+
+module.exports = {
+  getSocket,
+  init,
+};
