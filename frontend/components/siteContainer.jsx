@@ -30,11 +30,6 @@ export const SITE_NAVIGATION_CONFIG = [
     route: 'settings',
     icon: 'IconGear',
   },
-  {
-    display: 'Notifications',
-    route: 'notifications',
-    icon: 'IconEnvelope',
-  },
 ];
 
 export class SiteContainer extends React.Component {

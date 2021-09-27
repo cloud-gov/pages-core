@@ -241,11 +241,13 @@ describe('Site model', () => {
         orgSiteForUser,
         nonOrgSiteForOtherUser,
         orgSiteForOtherUserOrg,
+        orgSiteOnlyForUser,
       ] = await Promise.all([
         factory.site({ users: [user1] }),
         factory.site({ users: [user1] }),
         factory.site({ users: [user2] }),
         factory.site({ users: [user1, user2] }),
+        factory.site(),
       ]);
 
       await Promise.all([
@@ -253,12 +255,14 @@ describe('Site model', () => {
         org2.addUser(user2, { through: { roleId: userRole.id } }),
         org1.addSite(orgSiteForUser),
         org2.addSite(orgSiteForOtherUserOrg),
+        org2.addSite(orgSiteOnlyForUser),
       ]);
 
       const expectedMemberIds = [
         nonOrgSiteForUser,
         orgSiteForUser,
         orgSiteForOtherUserOrg,
+        orgSiteOnlyForUser,
       ].map(site => site.id);
 
       const expectedNonMemberIds = [

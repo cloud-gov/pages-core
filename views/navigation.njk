@@ -32,17 +32,12 @@
               <span>Documentation<span>
             </a>
           </li>
-          <li>
-            <a class="usa-nav-link" href="{{ homepageUrl }}/contact/">
-              <span>Contact<span>
-            </a>
-          </li>
-          <li>
-            <a class="usa-nav-link" href="https://federalist.statuspage.io">
-              <span>Status<span>
-            </a>
-          </li>
           {% if isAuthenticated %}
+            <li>
+              <a class="usa-nav-link" href="/settings">
+                <span>Settings<span>
+              </a>
+            </li>
             <li class="nav-action">
               {% if hasUAAIdentity %}
                 <a class="usa-button usa-button-white" href="/logout">Log out</a>
