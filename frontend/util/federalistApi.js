@@ -178,10 +178,10 @@ export default {
     });
   },
 
-  updateSiteUser(siteId, data) {
-    return request(`site/${siteId}/notifications`, {
+  updateUserSettings(userSettings) {
+    return request('me/settings', {
       method: 'PUT',
-      data,
+      data: userSettings,
     }, {
       handleHttpError: false,
     });
@@ -230,5 +230,4 @@ export default {
       handleHttpError: false,
     });
   },
-
 };

@@ -10,7 +10,6 @@ import {
   dispatchSitesReceivedAction,
   dispatchSiteAddedAction,
   dispatchSiteUpdatedAction,
-  dispatchSiteUserUpdatedAction,
   dispatchSiteDeletedAction,
   dispatchUserAddedToSiteAction,
   dispatchUserRemovedFromSiteAction,
@@ -103,16 +102,6 @@ export default {
       .then(dispatchSiteDeletedAction.bind(null, siteId))
       .then(this.fetchSites)
       .then(updateRouterToSitesUri)
-      .catch(alertError);
-  },
-
-  updateSiteUser(site, data) {
-    return federalist.updateSiteUser(site, data)
-      .then((updatedSite) => {
-        if (updatedSite) {
-          dispatchSiteUserUpdatedAction(updatedSite);
-        }
-      })
       .catch(alertError);
   },
 
