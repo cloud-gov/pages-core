@@ -260,13 +260,6 @@ describe('Main Site', () => {
 });
 
 describe('robots.txt', () => {
-  const origAppConfig = { ...config.app };
-
-  after(() => {
-    // reset config.app.app_env to its original value
-    config.app = origAppConfig;
-  });
-
   it('denies robots when not in production', (done) => {
     config.app.app_env = 'boop';
 
@@ -276,38 +269,6 @@ describe('robots.txt', () => {
       .expect('Content-Type', 'text/plain; charset=utf-8')
       .then((response) => {
         expect(response.text).to.equal('User-Agent: *\nDisallow: /\n');
-        done();
-      })
-      .catch(done);
-  });
-
-  it('denies robots when in production but non-production hostname', (done) => {
-    config.app.app_env = 'production';
-    config.app.hostname = 'https://prod-url.com';
-
-    request(app)
-      .get('/robots.txt')
-      .set('host', 'non-prod-url.com')
-      .expect(200)
-      .expect('Content-Type', 'text/plain; charset=utf-8')
-      .then((response) => {
-        expect(response.text).to.equal('User-Agent: *\nDisallow: /\n');
-        done();
-      })
-      .catch(done);
-  });
-
-  it('allows robots when in production and with production hostname', (done) => {
-    config.app.app_env = 'production';
-    config.app.hostname = 'https://prod-url.com';
-
-    request(app)
-      .get('/robots.txt')
-      .set('host', 'prod-url.com')
-      .expect(200)
-      .expect('Content-Type', 'text/plain; charset=utf-8')
-      .then((response) => {
-        expect(response.text).to.equal('User-Agent: *\nDisallow: /preview\n');
         done();
       })
       .catch(done);
