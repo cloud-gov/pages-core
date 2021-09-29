@@ -81,19 +81,11 @@ module.exports = {
   },
 
   robots(req, res) {
-    const PROD_CONTENT = 'User-Agent: *\nDisallow: /preview\n';
     const DENY_ALL_CONTENT = 'User-Agent: *\nDisallow: /\n';
 
     res.set('Content-Type', 'text/plain');
 
-    // If this is the production instance and the request came to the production hostname
-    if (config.app.app_env === 'production'
-      && config.app.hostname === `https://${req.hostname}`) {
-      // then send the production robots.txt content
-      return res.send(PROD_CONTENT);
-    }
-
-    // otherwise send the "deny all" robots.txt content
+    // send the "deny all" robots.txt content
     return res.send(DENY_ALL_CONTENT);
   },
 
