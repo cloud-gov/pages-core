@@ -55,4 +55,5 @@ module.exports = {
     action: 'deny',
   },
   xssFilter: false,
+  hsts: false,
 };
