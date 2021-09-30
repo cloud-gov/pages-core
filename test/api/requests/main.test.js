@@ -85,6 +85,19 @@ describe('Main Site', () => {
     });
   });
 
+  describe('options method', () => {
+    it('should respond with a 404 for an options request without path', async () => {
+      await request(app)
+        .options('/')
+        .expect(404);
+    });
+
+    it('should respond with a 404 for an options request with a path', async () => {
+      await request(app)
+        .options('/boo/hoo')
+        .expect(404);
+    });
+  });
   describe('App /sites', () => {
     it('should redirect to / with a flash error when not authenticated', (done) => {
       request(app)
