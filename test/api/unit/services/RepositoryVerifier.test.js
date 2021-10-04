@@ -1,5 +1,6 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
+const moment = require('moment');
 const factory = require('../../support/factory');
 const RepositoryVerifier = require('../../../../api/services/RepositoryVerifier');
 const { Site, User } = require('../../../../api/models');
@@ -19,7 +20,6 @@ describe('RepositoryVerifier', () => {
         })
         .then((_site) => {
           site = _site;
-          expect(site.repoLastVerified).to.be.null;
           githubAPINocks.repo({
             accessToken: users[0].githubAccessToken,
             owner: site.owner,
@@ -29,7 +29,7 @@ describe('RepositoryVerifier', () => {
         })
         .then(() => Site.findByPk(site.id))
         .then((_site) => {
-          expect(_site.repoLastVerified).to.be.an.instanceOf(Date);
+          expect(_site.repoLastVerified).gt(site.repoLastVerified);
           done();
         })
         .catch(done);
@@ -46,7 +46,6 @@ describe('RepositoryVerifier', () => {
         })
         .then((_site) => {
           site = _site;
-          expect(site.repoLastVerified).to.be.null;
           githubAPINocks.repo({
             accessToken: users[0].githubAccessToken,
             owner: site.owner,
@@ -62,7 +61,7 @@ describe('RepositoryVerifier', () => {
         })
         .then(() => Site.findByPk(site.id))
         .then((_site) => {
-          expect(_site.repoLastVerified).to.be.an.instanceOf(Date);
+          expect(_site.repoLastVerified).gt(site.repoLastVerified);
           done();
         })
         .catch(done);
@@ -79,7 +78,6 @@ describe('RepositoryVerifier', () => {
         })
         .then((_site) => {
           site = _site;
-          expect(site.repoLastVerified).to.be.null;
           githubAPINocks.repo({
             accessToken: users[0].githubAccessToken,
             owner: site.owner,
@@ -96,7 +94,42 @@ describe('RepositoryVerifier', () => {
         })
         .then(() => Site.findByPk(site.id))
         .then((_site) => {
-          expect(_site.repoLastVerified).to.be.null;
+          expect(_site.repoLastVerified).deep.equal(site.repoLastVerified);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('not able to verify sites with users without access tokens', (done) => {
+      let users;
+      let site;
+      Promise.all([
+        factory.user({ githubAccessToken: null }),
+        factory.user({ githubAccessToken: null }),
+      ])
+        .then((_users) => {
+          users = _users;
+          return factory.site({ users });
+        })
+        .then((_site) => {
+          site = _site;
+          githubAPINocks.repo({
+            accessToken: users[0].githubAccessToken,
+            owner: site.owner,
+            repo: site.repository,
+            response: 404,
+          });
+          githubAPINocks.repo({
+            accessToken: users[1].githubAccessToken,
+            owner: site.owner,
+            repo: site.repository,
+            response: 404,
+          });
+          return RepositoryVerifier.verifyRepos();
+        })
+        .then(() => Site.findByPk(site.id))
+        .then((_site) => {
+          expect(_site.repoLastVerified).deep.equal(site.repoLastVerified);
           done();
         })
         .catch(done);
@@ -104,22 +137,22 @@ describe('RepositoryVerifier', () => {
 
     it('verify sites only with users that have githubAccessToken', (done) => {
       let users;
+      const repoLastVerified = moment().subtract(1, 'day').toDate();
       Site.destroy({ where: {}, truncate: true })
-        .then(() => factory.site({ users: [] }))
-        .then(() => factory.user({ githubAccessToken: null }))
-        .then(user => factory.site({ users: [user] }))
+        .then(() => factory.site({ users: [], repoLastVerified }))
+        .then(() => factory.user({ githubAccessToken: null, repoLastVerified }))
+        .then(user => factory.site({ users: [user], repoLastVerified }))
         .then(() => Promise.all([factory.user(), factory.user()]))
         .then((_users) => {
           users = _users;
           return Promise.all([
-            factory.site({ users }),
-            factory.site({ users }),
-            factory.site({ users }),
+            factory.site({ users, repoLastVerified }),
+            factory.site({ users, repoLastVerified }),
+            factory.site({ users, repoLastVerified }),
           ]);
         })
         .then((sites) => {
           sites.forEach((site) => {
-            expect(site.repoLastVerified).to.be.null;
             githubAPINocks.repo({
               accessToken: users[0].githubAccessToken,
               owner: site.owner,
@@ -138,7 +171,7 @@ describe('RepositoryVerifier', () => {
         .then((sites) => {
           expect(sites.length).to.equal(5);
           expect(sites.filter(site => site.Users.length > 0).length).to.equal(4);
-          expect(sites.filter(site => site.repoLastVerified).length).to.equal(3);
+          expect(sites.filter(site => site.repoLastVerified > repoLastVerified).length).to.equal(3);
           done();
         })
         .catch(done);
@@ -151,26 +184,26 @@ describe('RepositoryVerifier', () => {
         { './GitHub': MockGitHub });
       let user;
       let sites;
+      const repoLastVerified = moment().subtract(1, 'day').toDate();
       factory.user()
         .then((model) => {
           user = model;
           const owner = 'owner';
           return Promise.all([
-            factory.site({ owner, repository: 'repo-0', users: [user] }),
-            factory.site({ owner, repository: 'repo-1', users: [user] }),
-            factory.site({ owner, repository: 'repo-2' }),
+            factory.site({ owner, repository: 'repo-0', users: [user], repoLastVerified }),
+            factory.site({ owner, repository: 'repo-1', users: [user], repoLastVerified }),
+            factory.site({ owner, repository: 'repo-2', repoLastVerified }),
           ]);
         })
         .then((models) => {
           sites = models;
-          expect(sites.filter(s => s.repoLastVerified).length).to.equal(0);
           return MockRepositoryVerifier.verifyUserRepos(user);
         })
         .then(() => Site.findAll({ where: { id: sites.map(s => s.id) } }))
         .then((models) => {
           sites = models;
-          expect(sites.filter(s => s.repoLastVerified).length).to.equal(2);
-          expect(sites.filter(s => !s.repoLastVerified).length).to.equal(1);
+          expect(sites.length).equal(3);
+          expect(sites.filter(s => s.repoLastVerified > repoLastVerified).length).to.equal(2);
           done();
         })
         .catch(done);

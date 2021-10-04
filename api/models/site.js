@@ -180,6 +180,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     repoLastVerified: {
       type: DataTypes.DATE,
+      defaultValue: new Date(),
     },
     buildStatus: {
       type: DataTypes.ENUM,
