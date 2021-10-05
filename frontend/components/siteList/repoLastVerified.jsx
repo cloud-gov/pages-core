@@ -7,7 +7,7 @@ const getRepoLastVerified = (site) => {
   return `Repository not found. Last seen on ${formattedBuildTime}.`;
 };
 
-const RepoLastVerified = ({ site, daysNotVerified = 5, userUpdated }) => {
+const RepoLastVerified = ({ site, daysNotVerified, userUpdated }) => {
   const daysAgo = fromDate => (new Date() - new Date(fromDate)) / (24 * 60 * 60 * 1000);
   const minutesAgo = fromDate => (new Date() - new Date(fromDate)) / (60 * 1000);
   if ((daysAgo(site.repoLastVerified) > daysNotVerified)
