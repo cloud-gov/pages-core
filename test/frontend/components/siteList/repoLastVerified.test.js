@@ -35,13 +35,13 @@ describe('<RepoLastVerified />', () => {
     const repoLastVerified = new Date(new Date() - (3 * 24 * 60 * 60 * 1000)).toISOString();
     const site = { repoLastVerified };
     const user = userUpdated;
-    wrapper = shallow(<RepoLastVerified site={site} daysNotVerified={2} userUpdated={user} />);
+    wrapper = shallow(<RepoLastVerified site={site} maxDaysUnverified={2} userUpdated={user} />);
     expect(wrapper.find('p').length).to.equal(1);
   });
 
   it('repoLastVerified under passed threshold but user just logged in', () => {
     const repoLastVerified = new Date(new Date() - (3 * 24 * 60 * 60 * 1000)).toISOString();
-    wrapper = shallow(<RepoLastVerified site={{ repoLastVerified }} daysNotVerified={2} />);
+    wrapper = shallow(<RepoLastVerified site={{ repoLastVerified }} maxDaysUnverified={2} />);
     expect(wrapper.find('p').length).to.equal(0);
   });
 });
