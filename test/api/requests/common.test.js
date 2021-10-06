@@ -22,9 +22,7 @@ commonPaths.forEach((path) => {
 
     describe('tracking scripts', () => {
       const prodTrackingScripts = [
-        'https://www.googletagmanager.com/gtm.js',
         'https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=GSA&subagency=TTS,Federalist',
-        'https://www.googletagmanager.com/ns.html?id=GTM-PRPJKWN',
       ];
 
       const origAppEnv = config.app.app_env;
