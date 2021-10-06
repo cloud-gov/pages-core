@@ -19,6 +19,7 @@ const responses = require('../responses');
 const passport = require('../services/passport');
 const router = require('../routers');
 const sessionConfig = require('./sessionConfig');
+const { defaultContext } = require('../utils');
 
 const { NODE_ENV } = process.env;
 
@@ -52,7 +53,13 @@ function maybeUseExpressLogger(app) {
 }
 
 function fourOhFourhandler(req, res) {
-  res.status(404).redirect(302, '/404-not-found/');
+  const context = defaultContext(req, res);
+  if (req.session.authenticated) {
+    context.isAuthenticated = true;
+    context.username = req.user.username;
+  }
+
+  res.status(404).render('404.njk', context);
 }
 
 function init(app) {
