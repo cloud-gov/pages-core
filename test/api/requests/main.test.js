@@ -37,7 +37,7 @@ describe('Main Site', () => {
         .get('/blahblahpage')
         .expect(404);
 
-      expect(/Log in with (GitHub|cloud\.gov)/.test(response.text)).to.be.true;
+      expect(/Log in with (Github|cloud\.gov)/.test(response.text)).to.be.true;
       expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
     });
 
