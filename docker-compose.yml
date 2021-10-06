@@ -26,12 +26,13 @@ services:
       - redis
       - uaa
     environment:
-      USER_AUDITOR: federalist
+      APP_HOSTNAME: http://localhost:1337
       FEATURE_AUTH_GITHUB: 'false'
       FEATURE_AUTH_UAA: 'true'
-      APP_HOSTNAME: http://localhost:1337
+      PORT: 1337
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
+      USER_AUDITOR: federalist
   bull-board:
     build:
       dockerfile: Dockerfile-app
