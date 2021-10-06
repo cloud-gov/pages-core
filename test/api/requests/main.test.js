@@ -31,7 +31,7 @@ describe('Main Site', () => {
     });
   });
 
-  describe.only('App /404', () => {
+  describe('App /404', () => {
     it('should redirect to / with a flash error when not authenticated', async () => {
       const response = await request(app)
         .get('/blahblahpage')
