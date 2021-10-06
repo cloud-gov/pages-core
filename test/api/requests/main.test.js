@@ -32,13 +32,12 @@ describe('Main Site', () => {
   });
 
   describe('App /404', () => {
-    it.only('should redirect to / with a flash error when not authenticated', async () => {
+    it('should redirect to / with a flash error when not authenticated', async () => {
       const response = await request(app)
         .get('/blahblahpage')
         .expect(404);
 
-      console.log(`response.text:\n${response.text}`);
-      expect(response.text.indexOf('Log in with cloud.gov')).to.be.above(-1);
+      expect(/Log in with (GitHub|cloud.gov)/.test(response.text)).to.be.true;
       expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
     });
 
