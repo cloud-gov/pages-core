@@ -254,6 +254,7 @@ jobs:
           outputs: [name: src-api]
           params:
             APP_HOSTNAME: https://app.pages-staging.cloud.gov
+            PRODUCT: pages
           run:
             dir: src-api
             path: bash
