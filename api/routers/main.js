@@ -10,9 +10,9 @@ router.get('/system-use', MainController.systemUse);
 router.get('/organizations(/*)?', csrfProtection, MainController.app);
 router.get('/sites(/*)?', csrfProtection, MainController.app);
 router.get('/settings', csrfProtection, MainController.app);
+
 router.get('/robots.txt', MainController.robots);
 
-router.get('/404-not-found/', MainController.notFound);
 router.options('(/*)?', (_req, res) => res.notFound());
 
 module.exports = router;
