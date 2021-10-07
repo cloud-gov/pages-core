@@ -4,6 +4,7 @@ const moment = require('moment');
 
 const config = require('../../config');
 const { logger } = require('../../winston');
+const Features = require('../features');
 
 function filterEntity(res, name, field = 'name') {
   let errMsg = `Not found: Entity @${field} = ${name}`;
@@ -254,6 +255,29 @@ async function paginate(model, serialize, params, query = {}) {
   };
 }
 
+function defaultContext(req, res) {
+  const messages = {
+    errors: req.flash('error'),
+  };
+
+  const context = {
+    isAuthenticated: false,
+    messages,
+    shouldIncludeTracking: shouldIncludeTracking(),
+    siteDisplayEnv: getSiteDisplayEnv(),
+    homepageUrl: config.app.homepageUrl,
+    webpackAssets: loadAssetManifest(),
+    authGithub: Features.enabled(Features.Flags.FEATURE_AUTH_GITHUB),
+    authUAA: Features.enabled(Features.Flags.FEATURE_AUTH_UAA),
+    hasUAAIdentity: false,
+    nonce: res.locals.cspNonce,
+    isFederalist: process.env.PRODUCT === 'federalist',
+    isPages: process.env.PRODUCT === 'pages',
+  };
+
+  return context;
+}
+
 module.exports = {
   filterEntity,
   firstEntity,
@@ -278,4 +302,5 @@ module.exports = {
   wait,
   wrapHandler,
   wrapHandlers,
+  defaultContext,
 };

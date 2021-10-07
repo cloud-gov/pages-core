@@ -13,7 +13,7 @@ const config = require('../../config');
 const adminApi = require('../admin');
 const externalAuth = require('../external-auth');
 const {
-  cacheControl, devMiddleware, errorHandler, parseJson, xssProtection,
+  cacheControl, devMiddleware, errorHandler, parseJson, xssProtection, fourOhFourHandler,
 } = require('../middlewares');
 const responses = require('../responses');
 const passport = require('../services/passport');
@@ -49,10 +49,6 @@ function maybeUseExpressLogger(app) {
   if (logger.levels[logger.level] >= 2) {
     app.use(expressLogger);
   }
-}
-
-function fourOhFourhandler(req, res) {
-  res.status(404).redirect(302, '/404-not-found/');
 }
 
 function init(app) {
@@ -94,7 +90,7 @@ function init(app) {
   main.use(cacheControl('max-age=0'));
 
   main.use(router);
-  main.use(fourOhFourhandler);
+  main.use(fourOhFourHandler);
   main.use(expressErrorLogger);
   main.use(errorHandler);
 
