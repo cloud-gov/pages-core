@@ -58,14 +58,13 @@ describe('federalistApi', () => {
     );
     fetchMock.get(`${API}/site`, { sites: [testSite] }, { name: 'getSites' });
     fetchMock.get(`${API}/me`, { user: 'me' }, { name: 'getMe' });
+    fetchMock.put(`${API}/me/settings`, {}, { name: 'putUserSettings' });
     fetchMock.post(`${API}/site`, {}, { name: 'postSite' });
     fetchMock.delete(`${API}/site/2`, {}, { name: 'deleteSite' });
     fetchMock.post(`${API}/build/`, {}, { name: 'postBuild' });
     fetchMock.post(`${API}/site/user`, {}, { name: 'postSiteUser' });
     fetchMock.put(`${API}/site/3`, {}, { name: 'putSite' });
     fetchMock.put(`${API}/site/5`, 400, { name: 'putSiteError' });
-    fetchMock.put(`${API}/site/3/notifications`, {}, { name: 'putSiteUser' });
-    fetchMock.put(`${API}/site/5/notifications`, 400, { name: 'putSiteUserError' });
     fetchMock.get(`${API}/site/6/user-environment-variable`, [uev], { name: 'fetchUserEnvironmentVariables' });
     fetchMock.post(`${API}/site/6/user-environment-variable`, {}, { name: 'createUserEnvironmentVariable' });
     fetchMock.delete(`${API}/site/6/user-environment-variable/8`, {}, { name: 'deleteUserEnvironmentVariable' });
@@ -163,11 +162,10 @@ describe('federalistApi', () => {
     testRouteCalled('putSite', { method: 'PUT', body });
   });
 
-  it('defines updateSiteUser', () => {
-    const site = { id: 3 };
-    const body = { buildNotificationSetting: 'none' };
-    federalistApi.updateSiteUser(site.id, body);
-    testRouteCalled('putSiteUser', { method: 'PUT', body });
+  it('defines updateUserSettings', () => {
+    const body = { buildNotificationSettings: { 3: 'none' } };
+    federalistApi.updateUserSettings(body);
+    testRouteCalled('putUserSettings', { method: 'PUT', body });
   });
 
   describe('restartBuild', () => {

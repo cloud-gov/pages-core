@@ -1,28 +1,25 @@
-const { User, Site } = require('../models');
+const { Site } = require('../models');
 
 const getSiteRoom = siteId => `site-${siteId}`;
 const getBuilderRoom = (siteId, userId) => `site-${siteId}-user-${userId}`;
 
 const joinRooms = async (socket) => {
-  const userId = socket.user;
-  if (!userId) {
+  const { user } = socket.request;
+  if (!user) {
     return;
   }
 
-  const user = await User.findOne({
-    where: { id: userId },
-    include: [{ model: Site }],
-  });
+  const sites = await Site.forUser(user).findAll();
 
-  user.Sites.forEach((s) => {
-    switch (s.SiteUser.buildNotificationSetting) {
+  sites.forEach((site) => {
+    switch (user.buildNotificationSettings[site.id]) {
       case 'builds':
-        socket.join(getBuilderRoom(s.id, user.id));
+        socket.join(getBuilderRoom(site.id, user.id));
         break;
       case 'none':
         break;
       default:
-        socket.join(getSiteRoom(s.id));
+        socket.join(getSiteRoom(site.id));
     }
   });
 };

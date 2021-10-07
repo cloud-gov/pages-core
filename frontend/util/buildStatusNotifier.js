@@ -1,3 +1,4 @@
+/* global APP_HOSTNAME */
 import io from 'socket.io-client';
 
 class BuildStatusNotifier {
@@ -7,24 +8,21 @@ class BuildStatusNotifier {
   }
 
   connectSocket(permission) {
-    if (permission === 'granted') {
-      const accessToken = (document.querySelectorAll('meta[name="accessToken"]')[0] || {}).content;
-      const socketHost = (document.querySelectorAll('meta[name="socketHost"]')[0] || {}).content;
-      if (accessToken) {
-        const socket = this.io(socketHost, { transports: ['websocket'], query: { accessToken } });
-        socket.on('build status', (build) => {
-          this.notify(build);
-        });
-        return true;
-      }
+    if (permission !== 'granted') {
+      return false;
     }
-    return false;
+
+    const socket = this.io(APP_HOSTNAME, { transports: ['websocket'] });
+
+    socket.on('build status', (build) => {
+      this.notify(build);
+    });
+    return true;
   }
 
   listen() {
     /* eslint no-undef: "error" */
     /* eslint-env browser */
-
     if (typeof Notification === 'undefined' || this.listening) {
       return Promise.resolve();
     }

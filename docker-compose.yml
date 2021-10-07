@@ -26,7 +26,6 @@ services:
       - redis
       - uaa
     environment:
-      JWT_SECRET: 'shhHhh...'
       USER_AUDITOR: federalist
       FEATURE_AUTH_GITHUB: 'false'
       FEATURE_AUTH_UAA: 'true'

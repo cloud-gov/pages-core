@@ -9,6 +9,7 @@
     "@octokit/rest": "^18.5.2",
     "@socket.io/redis-adapter": "^7.0.0",
     "@supercharge/promise-pool": "^1.5.0",
+    "ajv": "^8.6.3",
     "aws-sdk": "^2.879.0",
     "axios": "^0.21.1",
     "bull": "^3.20.1",
@@ -62,7 +63,7 @@
     "start-workers": "node ./api/workers/index.js",
     "start-bull-board": "node ./api/bull-board/index.js",
     "debug": "node --inspect index.js",
-    "watch": "NODE_ENV=development concurrently --kill-others --raw \"nodemon index.js --config nodemon.json\"",
+    "watch": "NODE_ENV=development nodemon index.js --config nodemon.json",
     "test": "yarn test:prepare && yarn test:server && yarn test:client",
     "test:cover": "yarn test:prepare && yarn test:server:cover && yarn test:client:cover",
     "test:prepare": "NODE_ENV=test yarn migrate:up && yarn build",
@@ -91,7 +92,8 @@
     "archive-build-logs": "node ./scripts/archive-build-logs.js",
     "migrate-build-logs": "node ./scripts/migrate-build-logs.js",
     "send-email": "node ./scripts/send-email.js",
-    "bootstrap-admins": "node ./scripts/bootstrap-admins.js"
+    "bootstrap-admins": "node ./scripts/bootstrap-admins.js",
+    "migrate-build-notification-settings": "node ./scripts/migrate-build-notification-settings.js"
   },
   "main": "index.js",
   "repository": {
@@ -113,7 +115,6 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-fetch-mock": "^3.0.0",
-    "concurrently": "^6.1.0",
     "cookie": "^0.4.1",
     "css-loader": "^5.0.0",
     "date-fns": "^2.16.1",
