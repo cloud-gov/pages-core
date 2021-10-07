@@ -150,6 +150,9 @@ jobs:
       - run:
           name: Run tests
           command: yarn test:cover
+          environment:
+            APP_HOSTNAME: https://example.com
+            PRODUCT: federalist
 
       - run:
           name: CodeClimate combine and upload coverage
