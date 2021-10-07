@@ -151,7 +151,7 @@ jobs:
           name: Run tests
           command: yarn test:cover
           environment:
-            APP_HOSTNAME: https://example.com
+            APP_HOSTNAME: http://localhost:1337
             PRODUCT: federalist
 
       - run:
