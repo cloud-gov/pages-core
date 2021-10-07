@@ -13,13 +13,12 @@ const config = require('../../config');
 const adminApi = require('../admin');
 const externalAuth = require('../external-auth');
 const {
-  cacheControl, devMiddleware, errorHandler, parseJson, xssProtection,
+  cacheControl, devMiddleware, errorHandler, parseJson, xssProtection, fourOhFourHandler,
 } = require('../middlewares');
 const responses = require('../responses');
 const passport = require('../services/passport');
 const router = require('../routers');
 const sessionConfig = require('./sessionConfig');
-const { defaultContext } = require('../utils');
 
 const { NODE_ENV } = process.env;
 
@@ -50,16 +49,6 @@ function maybeUseExpressLogger(app) {
   if (logger.levels[logger.level] >= 2) {
     app.use(expressLogger);
   }
-}
-
-function fourOhFourhandler(req, res) {
-  const context = defaultContext(req, res);
-  if (req.session.authenticated) {
-    context.isAuthenticated = true;
-    context.username = req.user.username;
-  }
-
-  res.status(404).render('404.njk', context);
 }
 
 function init(app) {
@@ -101,7 +90,7 @@ function init(app) {
   main.use(cacheControl('max-age=0'));
 
   main.use(router);
-  main.use(fourOhFourhandler);
+  main.use(fourOhFourHandler);
   main.use(expressErrorLogger);
   main.use(errorHandler);
 
