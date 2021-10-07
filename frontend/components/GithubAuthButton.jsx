@@ -1,11 +1,14 @@
-/* global window, APP_HOSTNAME */
+/* global window */
 /* eslint-disable scanjs-rules/call_addEventListener */
 /* eslint-disable scanjs-rules/call_addEventListener_message */
 import React from 'react';
 import PropTypes from 'prop-types';
+
+import globals from '../globals';
+
 import { IconGitHub } from './icons';
 
-const apiUrl = APP_HOSTNAME;
+const apiUrl = globals.APP_HOSTNAME;
 const path = '/auth/github2';
 
 const calcWindow = () => ({

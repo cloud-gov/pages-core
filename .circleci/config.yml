@@ -179,6 +179,7 @@ jobs:
           name: Build app
           environment:
             APP_HOSTNAME: << parameters.app-hostname >>
+            PRODUCT: federalist
           command: yarn build
 
       - deploy-to-cg:
