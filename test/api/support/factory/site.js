@@ -8,7 +8,6 @@ function generateUniqueAtts() {
   const res = {
     owner: `repo-owner-${siteAttsStep}`,
     repository: `repo-name-${siteAttsStep}`,
-
   };
   siteAttsStep += 1;
   return res;

@@ -8,7 +8,7 @@ const { wrapHandlers } = require('../utils');
 const {
   Build, Site, User, Event,
 } = require('../models');
-const socketIO = require('../socketIO');
+const { getSocket } = require('../socketIO');
 
 const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
 
@@ -24,9 +24,9 @@ const emitBuildStatus = async (build) => {
       repository: site.repository,
     };
     const siteRoom = SocketIOSubscriber.getSiteRoom(build.site);
-    socketIO.to(siteRoom).emit('build status', msg);
+    getSocket().to(siteRoom).emit('build status', msg);
     const builderRoom = SocketIOSubscriber.getBuilderRoom(build.site, build.user);
-    socketIO.to(builderRoom).emit('build status', msg);
+    getSocket().to(builderRoom).emit('build status', msg);
   } catch (err) {
     EventCreator.error(Event.labels.SOCKET_IO, err, { buildId: build.id });
   }

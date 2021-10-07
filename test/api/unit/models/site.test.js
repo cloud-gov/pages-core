@@ -226,6 +226,11 @@ describe('Site model', () => {
     expect((await site.getOrganization()).equals(org)).to.be.true;
   });
 
+  it('repoLastVerified should not be null by default', async () => {
+    const { repoLastVerified } = await factory.site();
+    expect(repoLastVerified).to.be.an.instanceOf(Date);
+  });
+
   describe('forUser scope', () => {
     it('returns sites in the org of the user and non-org sites', async () => {
       const [user1, user2, org1, org2, userRole] = await Promise.all([
@@ -241,11 +246,13 @@ describe('Site model', () => {
         orgSiteForUser,
         nonOrgSiteForOtherUser,
         orgSiteForOtherUserOrg,
+        orgSiteOnlyForUser,
       ] = await Promise.all([
         factory.site({ users: [user1] }),
         factory.site({ users: [user1] }),
         factory.site({ users: [user2] }),
         factory.site({ users: [user1, user2] }),
+        factory.site(),
       ]);
 
       await Promise.all([
@@ -253,12 +260,14 @@ describe('Site model', () => {
         org2.addUser(user2, { through: { roleId: userRole.id } }),
         org1.addSite(orgSiteForUser),
         org2.addSite(orgSiteForOtherUserOrg),
+        org2.addSite(orgSiteOnlyForUser),
       ]);
 
       const expectedMemberIds = [
         nonOrgSiteForUser,
         orgSiteForUser,
         orgSiteForOtherUserOrg,
+        orgSiteOnlyForUser,
       ].map(site => site.id);
 
       const expectedNonMemberIds = [

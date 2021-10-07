@@ -930,3 +930,19 @@ paths:
           description: Not authorized
           schema:
             $ref: "Error.json"
+  /me/settings:          
+    put:
+      summary: Update user settings
+      responses:
+        200:
+          description: A user object representing the current Federalist user
+          schema:
+            $ref: "User.json"
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"

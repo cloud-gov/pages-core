@@ -1,31 +1,6 @@
 const config = require('../../config');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
-const { loadAssetManifest, getSiteDisplayEnv, shouldIncludeTracking } = require('../utils');
-const jwtHelper = require('../services/jwtHelper');
-const Features = require('../features');
-
-const webpackAssets = loadAssetManifest();
-
-function defaultContext(req, res) {
-  const messages = {
-    errors: req.flash('error'),
-  };
-
-  const context = {
-    isAuthenticated: false,
-    messages,
-    shouldIncludeTracking: shouldIncludeTracking(),
-    siteDisplayEnv: getSiteDisplayEnv(),
-    homepageUrl: config.app.homepageUrl,
-    webpackAssets,
-    authGithub: Features.enabled(Features.Flags.FEATURE_AUTH_GITHUB),
-    authUAA: Features.enabled(Features.Flags.FEATURE_AUTH_UAA),
-    hasUAAIdentity: false,
-    nonce: res.locals.cspNonce,
-  };
-
-  return context;
-}
+const { defaultContext } = require('../utils');
 
 function alertGithubAuthDeprecation(hasUAAIdentity, context) {
   if (!hasUAAIdentity && context.authUAA) {
@@ -68,8 +43,6 @@ module.exports = {
     context.username = req.user.username;
     context.siteWideError = SiteWideErrorLoader.loadSiteWideError();
     context.csrfToken = req.csrfToken();
-    context.accessToken = jwtHelper.sign({ user: req.user.id });
-    context.socketHost = process.env.SOCKET_HOST;
     context.hasUAAIdentity = !!hasUAAIdentity;
 
     const frontendConfig = {
@@ -84,31 +57,11 @@ module.exports = {
   },
 
   robots(req, res) {
-    const PROD_CONTENT = 'User-Agent: *\nDisallow: /preview\n';
     const DENY_ALL_CONTENT = 'User-Agent: *\nDisallow: /\n';
 
     res.set('Content-Type', 'text/plain');
 
-    // If this is the production instance and the request came to the production hostname
-    if (config.app.app_env === 'production'
-      && config.app.hostname === `https://${req.hostname}`) {
-      // then send the production robots.txt content
-      return res.send(PROD_CONTENT);
-    }
-
-    // otherwise send the "deny all" robots.txt content
+    // send the "deny all" robots.txt content
     return res.send(DENY_ALL_CONTENT);
-  },
-
-  notFound(req, res) {
-    const context = defaultContext(req, res);
-    if (req.session.authenticated) {
-      context.isAuthenticated = true;
-      context.username = req.user.username;
-      context.accessToken = jwtHelper.sign({ user: req.user.id });
-      context.socketHost = process.env.SOCKET_HOST;
-    }
-
-    res.render('404.njk', context);
   },
 };
