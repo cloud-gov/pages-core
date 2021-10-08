@@ -7,15 +7,15 @@ class QueueWorker extends Worker {
     super(queueName, processor, { connection, concurrency });
 
     this.on('error', (err) => {
-      logger.error(`Worker Error on '${queueName}' Queue:`, err);
+      logger.error(`Worker Error - Queue: '${queueName}'`, err);
     });
 
     this.on('completed', (job) => {
-      logger.info(`Job Complete on '${queueName}' Queue: ${job.toJSON()}`);
+      logger.info(`Job Complete - Queue: '${queueName}' Job: '${job.name}'`);
     });
 
     this.on('failed', (job, failedReason) => {
-      logger.error(`Job Failed on '${queueName}' Queue: ${job.toJSON()}`, failedReason);
+      logger.error(`Job Failed - Queue: '${queueName}' Job: '${job.name}'`, failedReason);
     });
   }
 }
