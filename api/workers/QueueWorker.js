@@ -11,11 +11,11 @@ class QueueWorker extends Worker {
     });
 
     this.on('completed', (job) => {
-      logger.info(`Job Complete - Queue: '${queueName}' Job: '${job.name}'`);
+      logger.info(`Job Complete - Queue: '${queueName}' Job: '${job.id ?? '--'}|${job.name}'`);
     });
 
     this.on('failed', (job, failedReason) => {
-      logger.error(`Job Failed - Queue: '${queueName}' Job: '${job.name}'`, failedReason);
+      logger.error(`Job Failed - Queue: '${queueName}' Job: '${job.id ?? '--'}|${job.name}'`, failedReason);
     });
   }
 }
