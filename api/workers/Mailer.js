@@ -1,3 +1,5 @@
+const https = require('https');
+
 const HttpClient = require('../utils/httpClient');
 
 const { mailer } = require('../../config');
@@ -13,6 +15,9 @@ class Mailer {
     return this.httpClient.request({
       method: 'POST',
       url: '/send',
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false,
+      }),
       auth: {
         password: this.password,
         username: this.username,
