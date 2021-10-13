@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === 'production') {
   };
 
   module.exports.app = {
-    hostname: process.env.APP_HOSTNAME || 'http://localhost:1338',
+    hostname: process.env.APP_HOSTNAME || 'http://localhost:1340',
   };
 
   module.exports.env = {

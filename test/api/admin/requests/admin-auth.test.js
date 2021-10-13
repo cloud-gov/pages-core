@@ -19,8 +19,11 @@ describe('Admin authentication request', () => {
   ]));
 
   describe('GET /admin/login', () => {
-    it('should redirect to the configured cloud.gov authorization endpoint', (done) => {
-      const locationRE = new RegExp(`^${uaaConfig.authorizationURL}`);
+    it('should redirect to the configured authorization endpoint', (done) => {
+      const locationRE = process.env.PRODUCT === 'pages'
+        ? new RegExp(`^${uaaConfig.authorizationURL}`)
+        : new RegExp('^https://github.com/login/oauth/authorize');
+
       request(app)
         .get('/admin/login')
         .expect('Location', locationRE)
