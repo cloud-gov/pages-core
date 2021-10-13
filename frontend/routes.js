@@ -19,6 +19,10 @@ import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
 import organizationActions from './actions/organizationActions';
 
+import globals from './globals';
+
+const isPages = globals.PRODUCT === 'pages';
+
 const fetchInitialData = () => {
   userActions.fetchUser();
   siteActions.fetchSites();
@@ -27,8 +31,8 @@ const fetchInitialData = () => {
 
 export default (
   <App path="/" onEnter={fetchInitialData}>
-    <Organization.List path="organizations" />
-    <Organization.Edit path="organizations/:id" />
+    {isPages && <Organization.List path="organizations" />}
+    {isPages && <Organization.Edit path="organizations/:id" />}
     <SiteList path="sites" />
     <AddSite path="sites/new" />
     <SiteContainer path="sites/:id">
