@@ -31,14 +31,14 @@ const onSuccess = (accessToken, _refreshToken, _profile, callback) => {
       if (message === 'Unauthorized') {
         message = [
           'Unauthorized:',
-          'You must be an a cloud.gov Pages user with your GitHub account',
+          'You must be a cloud.gov Pages user with your GitHub account',
           'added to your cloud.gov Pages profile.',
         ].join(' ');
       } else if (message === 'SessionExpired') {
         message = [
           'Session Expired:',
           'It has been more than 24 hours since you have logged-in to cloud.gov Pages.',
-          'Please login in to cloud.gov Pages and then try again.',
+          'Please log in to cloud.gov Pages and try again.',
         ].join(' ');
       }
 
