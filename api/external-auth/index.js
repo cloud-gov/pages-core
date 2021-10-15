@@ -2,18 +2,27 @@ const express = require('express');
 const passport = require('./passport');
 
 const onSuccess = (req, res) => {
+  const { accessToken: token, message } = req.user;
   // https://github.com/vencax/netlify-cms-github-oauth-provider/blob/master/index.js
-  const content = JSON.stringify({
-    token: req.user.accessToken,
-    provider: 'github',
-  });
+  let status;
+  let content;
+  if (message) {
+    status = 'error';
+    content = { message };
+  } else {
+    status = 'success';
+    content = {
+      token,
+      provider: 'github',
+    };
+  }
 
   const script = `
     <script nonce="${res.locals.cspNonce}">
       (function() {
         function receiveMessage(e) {
           window.opener.postMessage(
-            'authorization:github:success:${content}',
+            'authorization:github:${status}:${JSON.stringify(content)}',
             e.origin
           )
         }
@@ -23,7 +32,6 @@ const onSuccess = (req, res) => {
       })()
     </script>
   `;
-
   res.send(script);
 };
 
