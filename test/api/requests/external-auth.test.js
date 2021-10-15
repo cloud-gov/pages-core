@@ -23,7 +23,7 @@ describe('External authentication request', () => {
         const res = await request(app)
           .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
           .expect(200);
-        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"Unauthorized: You must be an a cloud.gov Pages user with your GitHub account added to your cloud.gov Pages profile."}(.|\n)*<\/script>$/g);
+        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"Unauthorized: You must be a cloud.gov Pages user with your GitHub account added to your cloud.gov Pages profile."}(.|\n)*<\/script>$/g);
       });
 
       it('return unauthorized if the user is not in an allowed GitHub organization', async () => {
@@ -32,7 +32,7 @@ describe('External authentication request', () => {
         const res = await request(app)
           .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
           .expect(200);
-        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"Session Expired: It has been more than 24 hours since you have logged-in to cloud.gov Pages. Please login in to cloud.gov Pages and then try again."}(.|\n)*<\/script>$/g);
+        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"Session Expired: It has been more than 24 hours since you have logged-in to cloud.gov Pages. Please log in to cloud.gov Pages and try again."}(.|\n)*<\/script>$/g);
       });
     });
 
