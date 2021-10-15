@@ -17,31 +17,25 @@ const onSuccess = (accessToken, _refreshToken, _profile, callback) => {
   })
     .then((user) => {
       if (!user) {
-        throw new Error('Unauthorized');
+        throw new Error([
+          'Unauthorized:',
+          'You must be a cloud.gov Pages user with your GitHub account',
+          'added to your cloud.gov Pages profile.',
+        ].join(' '));
       }
 
       if ((new Date() - user.signedInAt) > config.session.cookie.maxAge) {
-        throw new Error('SessionExpired');
+        throw new Error([
+          'Session Expired:',
+          'It has been more than 24 hours since you have logged-in to cloud.gov Pages.',
+          'Please log in to cloud.gov Pages and try again.',
+        ].join(' '));
       }
 
       callback(null, { accessToken });
     })
     .catch((err) => {
-      let { message } = err;
-      if (message === 'Unauthorized') {
-        message = [
-          'Unauthorized:',
-          'You must be a cloud.gov Pages user with your GitHub account',
-          'added to your cloud.gov Pages profile.',
-        ].join(' ');
-      } else if (message === 'SessionExpired') {
-        message = [
-          'Session Expired:',
-          'It has been more than 24 hours since you have logged-in to cloud.gov Pages.',
-          'Please log in to cloud.gov Pages and try again.',
-        ].join(' ');
-      }
-
+      const { message } = err;
       callback(null, { message });
     });
 };
