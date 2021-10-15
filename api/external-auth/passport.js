@@ -1,5 +1,6 @@
 const GitHubStrategy = require('passport-github').Strategy;
 const Passport = require('passport');
+const inflection = require('inflection');
 const config = require('../../config');
 const { User } = require('../models');
 
@@ -9,6 +10,9 @@ const options = config.passport.github.externalOptions;
 
 const onSuccess = (accessToken, _refreshToken, _profile, callback) => {
   const username = _profile.username.toLowerCase();
+  const { maxAge } = config.session.cookie;
+  const isExpired = (date, timeLimit) => (new Date() - date) > timeLimit;
+
   User.findOne({
     attributes: ['signedInAt'],
     where: {
@@ -16,28 +20,20 @@ const onSuccess = (accessToken, _refreshToken, _profile, callback) => {
     },
   })
     .then((user) => {
+      const productTitle = inflection.titleize(config.app.product);
+
       if (!user) {
-        throw new Error([
-          'Unauthorized:',
-          'You must be a cloud.gov Pages user with your GitHub account',
-          'added to your cloud.gov Pages profile.',
-        ].join(' '));
+        throw new Error(`You must be a ${productTitle} user with your GitHub account added to your ${productTitle} profile.`);
       }
 
-      if ((new Date() - user.signedInAt) > config.session.cookie.maxAge) {
-        throw new Error([
-          'Session Expired:',
-          'It has been more than 24 hours since you have logged-in to cloud.gov Pages.',
-          'Please log in to cloud.gov Pages and try again.',
-        ].join(' '));
+      if (!user.signedInAt || isExpired(user.signedInAt, maxAge)) {
+        const maxAgeHours = Math.ceil(maxAge / (1000 * 60 * 60));
+        throw new Error(`You have not logged-in to ${productTitle} within the past ${maxAgeHours} hours. Please log in to ${productTitle} and try again.`);
       }
 
       callback(null, { accessToken });
     })
-    .catch((err) => {
-      const { message } = err;
-      callback(null, { message });
-    });
+    .catch(callback);
 };
 
 passport.use(new GitHubStrategy(options, onSuccess));
