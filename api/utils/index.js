@@ -139,14 +139,14 @@ function loadAssetManifest() {
 }
 
 function getSiteDisplayEnv() {
-  if (config.app.app_env !== 'production') {
-    return config.app.app_env;
+  if (config.app.appEnv !== 'production') {
+    return config.app.appEnv;
   }
   return null;
 }
 
 function shouldIncludeTracking() {
-  return config.app.app_env === 'production';
+  return config.app.appEnv === 'production';
 }
 
 function mapValues(fn, obj) {

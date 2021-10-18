@@ -113,7 +113,7 @@ async function start() {
     scheduledQueue.add('revokeMembershipForUAAUsers', {}, nightlyJobConfig),
   ];
 
-  if (appConfig.app_env === 'production') {
+  if (appConfig.appEnv === 'production') {
     jobs.push(scheduledQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig));
     jobs.push(scheduledQueue.add('sandboxNotifications', {}, nightlyJobConfig));
     jobs.push(scheduledQueue.add('cleanSandboxOrganizations', {}, nightlyJobConfig));

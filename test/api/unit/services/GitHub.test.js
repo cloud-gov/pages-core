@@ -675,7 +675,7 @@ describe('GitHub', () => {
   describe('.sendCreateGithubStatusRequest', () => {
     it('sends a github status request and passes on last attempt', (done) => {
       const accessToken = 'token';
-      const context = `federalist-${config.app.app_env}/build`;
+      const context = `federalist-${config.app.appEnv}/build`;
       const targetURL = `${config.app.hostname}/sites/1/builds/1/logs`;
       const options = {
         owner: 'test-owner',
@@ -705,7 +705,7 @@ describe('GitHub', () => {
 
     it('sends a github status request and failOptions', (done) => {
       const accessToken = 'token';
-      const context = `federalist-${config.app.app_env}/build`;
+      const context = `federalist-${config.app.appEnv}/build`;
       const targetURL = `${config.app.hostname}/sites/1/builds/1/logs`;
       const options = {
         owner: 'test-owner',

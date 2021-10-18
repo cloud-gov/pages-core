@@ -25,15 +25,15 @@ commonPaths.forEach((path) => {
         'https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=GSA&subagency=TTS,Federalist',
       ];
 
-      const origAppEnv = config.app.app_env;
+      const origAppEnv = config.app.appEnv;
 
       after(() => {
-        // reset config.app.app_env to its original value
-        config.app.app_env = origAppEnv;
+        // reset config.app.appEnv to its original value
+        config.app.appEnv = origAppEnv;
       });
 
-      it('should have tracking scripts when app_env is production', (done) => {
-        config.app.app_env = 'production';
+      it('should have tracking scripts when appEnv is production', (done) => {
+        config.app.appEnv = 'production';
 
         request(app)
           .get(path)
@@ -47,7 +47,7 @@ commonPaths.forEach((path) => {
       });
 
       it('should not have tracking scripts when not in production mode', (done) => {
-        config.app.app_env = 'development';
+        config.app.appEnv = 'development';
 
         request(app)
           .get(path)
@@ -62,15 +62,15 @@ commonPaths.forEach((path) => {
     });
 
     describe('<title> element', () => {
-      const origAppEnv = config.app.app_env;
+      const origAppEnv = config.app.appEnv;
 
       after(() => {
-        // reset config.app.app_env to its original value
-        config.app.app_env = origAppEnv;
+        // reset config.app.appEnv to its original value
+        config.app.appEnv = origAppEnv;
       });
 
-      it('should display the app_env in the title element', (done) => {
-        config.app.app_env = 'testing123';
+      it('should display the appEnv in the title element', (done) => {
+        config.app.appEnv = 'testing123';
         request(app)
           .get(path)
           .then((response) => {
@@ -81,8 +81,8 @@ commonPaths.forEach((path) => {
           .catch(done);
       });
 
-      it('should not display the app_env in the title when it is "production"', (done) => {
-        config.app.app_env = 'production';
+      it('should not display the appEnv in the title when it is "production"', (done) => {
+        config.app.appEnv = 'production';
         request(app)
           .get(path)
           .then((response) => {
