@@ -30,6 +30,7 @@
     "express-slow-down": "^1.4.0",
     "express-winston": "^4.0.5",
     "helmet": "^4.6.0",
+    "inflection": "^1.13.1",
     "ioredis": "^4.27.6",
     "js-file-download": "^0.4.11",
     "js-yaml": "^4.1.0",
