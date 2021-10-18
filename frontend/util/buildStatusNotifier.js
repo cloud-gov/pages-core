@@ -1,5 +1,6 @@
-/* global APP_HOSTNAME */
 import io from 'socket.io-client';
+
+import globals from '../globals';
 
 class BuildStatusNotifier {
   constructor() {
@@ -12,7 +13,7 @@ class BuildStatusNotifier {
       return false;
     }
 
-    const socket = this.io(APP_HOSTNAME, { transports: ['websocket'] });
+    const socket = this.io(globals.APP_HOSTNAME, { transports: ['websocket'] });
 
     socket.on('build status', (build) => {
       this.notify(build);

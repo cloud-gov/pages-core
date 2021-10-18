@@ -43,7 +43,7 @@ oauth:
       refresh-token-validity: 259200
       autoapprove: true
       app-launch-url: http://localhost:1337
-      redirect-uri: http://localhost:1337,http://localhost:1337/auth/uaa/callback,http://localhost:1337/admin/auth/uaa/callback,http://localhost:1338/auth/uaa/callback
+      redirect-uri: http://localhost:1337,http://localhost:1337/auth/uaa/callback,http://localhost:1337/admin/auth/uaa/callback,http://localhost:1340/auth/uaa/callback,http://localhost:1338,http://localhost:1338/auth/uaa/callback,http://localhost:1338/admin/auth/uaa/callback
       secret: client-secret
 login:
   serviceProviderKey: |

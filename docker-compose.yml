@@ -26,12 +26,41 @@ services:
       - redis
       - uaa
     environment:
-      USER_AUDITOR: federalist
-      FEATURE_AUTH_GITHUB: 'false'
-      FEATURE_AUTH_UAA: 'true'
       APP_HOSTNAME: http://localhost:1337
+      DOMAIN: localhost:1337
+      FEATURE_AUTH_GITHUB: 'true'
+      FEATURE_AUTH_UAA: 'false'
+      PORT: 1337
+      PRODUCT: federalist
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
+      USER_AUDITOR: federalist
+  pages:
+    build:
+      dockerfile: Dockerfile-app
+      context: .
+    command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "watch"]
+    volumes:
+      - yarn:/usr/local/share/.cache/yarn
+      - .:/app
+      - /app/admin-client/
+      - nm-app:/app/node_modules
+    ports:
+      - "1338:1338" # for the app itself
+    depends_on:
+      - db
+      - redis
+      - uaa
+    environment:
+      APP_HOSTNAME: http://localhost:1338
+      DOMAIN: localhost:1338
+      FEATURE_AUTH_GITHUB: 'false'
+      FEATURE_AUTH_UAA: 'true'
+      PORT: 1338
+      PRODUCT: pages
+      UAA_HOST: http://localhost:9000
+      UAA_HOST_DOCKER_URL: http://uaa:8080
+      USER_AUDITOR: federalist      
   bull-board:
     build:
       dockerfile: Dockerfile-app
@@ -43,12 +72,13 @@ services:
       - /app/admin-client/
       - nm-app:/app/node_modules
     ports:
-      - "1338:1338"
+      - "1340:1340"
     depends_on:
       - redis
       - uaa
     environment:
-      APP_HOSTNAME: http://localhost:1338
+      APP_HOSTNAME: http://localhost:1340
+      PORT: 1340
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
   admin-client:
