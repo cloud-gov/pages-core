@@ -241,7 +241,7 @@ describe('Main Site', () => {
 
 describe('robots.txt', () => {
   it('denies robots when not in production', (done) => {
-    config.app.app_env = 'boop';
+    config.app.appEnv = 'boop';
 
     request(app)
       .get('/robots.txt')

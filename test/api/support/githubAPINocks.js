@@ -242,7 +242,7 @@ const status = ({
 
     if (targetURL && body.target_url !== targetURL) { return false; }
 
-    const appEnv = config.app.app_env;
+    const { appEnv } = config.app;
     if (appEnv === 'production' && body.context !== 'federalist/build') {
       return false;
     } if (appEnv !== 'production' && body.context !== `federalist-${appEnv}/build`) {
@@ -482,9 +482,9 @@ const getContent = ({
     .get(requestPath);
 
   if (responseCode >= 400) {
-    nok.reply(responseCode, { message: 'Error Encountered'});
+    nok.reply(responseCode, { message: 'Error Encountered' });
   } else if (Array.isArray(content)) {
-      nok.reply(responseCode, content);  
+    nok.reply(responseCode, content);
   } else {
     const response = {};
     response.encoding = encoding || 'base64';
