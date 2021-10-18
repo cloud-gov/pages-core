@@ -63,8 +63,8 @@ const reportBuildStatus = async (build) => {
 
   const accessToken = await loadBuildUserAccessToken(build);
 
-  const context = config.app.app_env === 'production'
-    ? 'federalist/build' : `federalist-${config.app.app_env}/build`;
+  const context = config.app.appEnv === 'production'
+    ? 'federalist/build' : `federalist-${config.app.appEnv}/build`;
 
   const site = build.Site;
 

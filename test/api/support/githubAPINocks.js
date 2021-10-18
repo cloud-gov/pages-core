@@ -242,7 +242,7 @@ const status = ({
 
     if (targetURL && body.target_url !== targetURL) { return false; }
 
-    const appEnv = config.app.app_env;
+    const { appEnv } = config.app;
     if (appEnv === 'production' && body.context !== 'federalist/build') {
       return false;
     } if (appEnv !== 'production' && body.context !== `federalist-${appEnv}/build`) {
