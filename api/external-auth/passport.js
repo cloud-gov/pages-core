@@ -23,7 +23,7 @@ const onSuccess = (accessToken, _refreshToken, _profile, callback) => {
       const productTitle = inflection.titleize(config.app.product);
 
       if (!user) {
-        throw new Error(`You must be a ${productTitle} user with your GitHub account added to your ${productTitle} profile.`);
+        throw new Error(`You must be a ${productTitle} user with a connected GitHub account.`);
       }
 
       if (!user.signedInAt || isExpired(user.signedInAt, maxAge)) {

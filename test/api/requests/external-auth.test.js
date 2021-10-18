@@ -23,7 +23,7 @@ describe('External authentication request', () => {
         const res = await request(app)
           .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
           .expect(200);
-        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You must be a Pages user with your GitHub account added to your Pages profile."}(.|\n)*<\/script>$/g);
+        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You must be a Federalist user with a connected GitHub account."}(.|\n)*<\/script>$/g);
       });
 
       it('return script tag with error if user has not logged in for the duration of a session', async () => {
@@ -32,7 +32,7 @@ describe('External authentication request', () => {
         const res = await request(app)
           .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
           .expect(200);
-        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You have not logged-in to Pages within the past 24 hours. Please log in to Pages and try again."}(.|\n)*<\/script>$/g);
+        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You have not logged-in to Federalist within the past 24 hours. Please log in to Federalist and try again."}(.|\n)*<\/script>$/g);
       });
 
       it('return script tag with error if user has not logged in for the duration of a session', async () => {
@@ -41,7 +41,7 @@ describe('External authentication request', () => {
         const res = await request(app)
           .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
           .expect(200);
-        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You have not logged-in to Pages within the past 24 hours. Please log in to Pages and try again."}(.|\n)*<\/script>$/g);
+        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You have not logged-in to Federalist within the past 24 hours. Please log in to Federalist and try again."}(.|\n)*<\/script>$/g);
       });
     });
 
