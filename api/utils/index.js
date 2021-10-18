@@ -271,6 +271,8 @@ function defaultContext(req, res) {
     authUAA: Features.enabled(Features.Flags.FEATURE_AUTH_UAA),
     hasUAAIdentity: false,
     nonce: res.locals.cspNonce,
+    isFederalist: process.env.PRODUCT === 'federalist',
+    isPages: process.env.PRODUCT === 'pages',
   };
 
   return context;

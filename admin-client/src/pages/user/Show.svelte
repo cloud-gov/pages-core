@@ -86,7 +86,7 @@
       </div>
       <div class="tablet:grid-col-auto padding-bottom-1">
         <LabeledItem label="created at" value={formatDateTime(user.createdAt)} />
-        <LabeledItem label="last signed in" value={formatDateTime(user.signedinAt)} />
+        <LabeledItem label="last signed in" value={formatDateTime(user.signedInAt)} />
         <LabeledItem label="last pushed" value={formatDateTime(user.pushedAt)} />
       </div>
     </div>

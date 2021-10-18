@@ -90,9 +90,10 @@ module.exports = {
       fileName: '../webpack-manifest.json',
       publicPath: '',
     }),
-    new webpack.DefinePlugin({
+    new webpack.EnvironmentPlugin([
       ...getFeatureFlags(process.env),
-      APP_HOSTNAME: JSON.stringify(process.env.APP_HOSTNAME),
-    }),
+      'APP_HOSTNAME',
+      'PRODUCT',
+    ]),
   ],
 };
