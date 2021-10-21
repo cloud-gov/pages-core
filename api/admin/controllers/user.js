@@ -1,4 +1,4 @@
-const { Organization, Site, User } = require('../../models');
+const { Organization, Site, User, OrganizationRole, Role } = require('../../models');
 const { paginate, toInt, wrapHandlers } = require('../../utils');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const userSerializer = require('../../serializers/user');
@@ -74,8 +74,14 @@ module.exports = wrapHandlers({
       user,
     } = req;
 
+    const org = await fetchModelById(toInt(organizationId), Organization, {
+      include: [{
+        model: OrganizationRole,
+        include: [Role, User],
+      }],
+    });
     const { email, inviteLink: link } = await OrganizationService.inviteUserToOrganization(
-      user, toInt(organizationId), toInt(roleId), uaaEmail, githubUsername
+      user, org, toInt(roleId), uaaEmail, githubUsername
     );
 
     if (link) {

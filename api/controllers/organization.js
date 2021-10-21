@@ -1,6 +1,6 @@
 const organizationSerializer = require('../serializers/organization');
 const organizationRoleSerializer = require('../serializers/organization-role');
-const { Organization, OrganizationRole, User } = require('../models');
+const { Organization, OrganizationRole, User, Role } = require('../models');
 const Mailer = require('../services/mailer');
 const OrganizationService = require('../services/organization');
 const { toInt, wrapHandlers } = require('../utils');
@@ -40,8 +40,13 @@ module.exports = wrapHandlers({
       user,
     } = req;
 
+    const org = await fetchModelById(toInt(id), Organization.forManagerRole(user));
+    if (!org) {
+      return res.notFound();
+    }
+
     const { email, inviteLink: link } = await OrganizationService.inviteUserToOrganization(
-      user, toInt(id), toInt(roleId), uaaEmail, githubUsername
+      user, org, toInt(roleId), uaaEmail, githubUsername
     );
 
     // TODO - refactor above method to return user so this extra query is not necessary

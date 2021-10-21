@@ -131,7 +131,7 @@ module.exports = {
    * @returns {Promise<UAAClient.UAAUserAttributes>}
    */
   async inviteUserToOrganization(
-    currentUser, organizationId, roleId, targetUserEmail, targetUserGithubUsername
+    currentUser, organization, roleId, targetUserEmail, targetUserGithubUsername
   ) {
     const currentUserUAAIdentity = await currentUser.getUAAIdentity();
 
@@ -139,18 +139,9 @@ module.exports = {
       throwError(`Current user ${currentUser.username} must have a UAA Identity to invite a user to an organization.`);
     }
 
-    const [isAdmin, org] = await Promise.all([
-      this.isUAAAdmin(currentUserUAAIdentity),
-      Organization.findOne({
-        where: { id: organizationId },
-        include: [{
-          model: OrganizationRole,
-          include: [Role, User],
-        }],
-      }),
-    ]);
+    const isAdmin = await this.isUAAAdmin(currentUserUAAIdentity);
 
-    if (!isAdmin && !hasManager(org, currentUser)) {
+    if (!isAdmin && !hasManager(organization, currentUser)) {
       throwError(`Current user ${currentUser.username} must be a Pages admin in UAA OR a manager of the target organization to invite a user.`);
     }
 
@@ -164,7 +155,7 @@ module.exports = {
       currentUserUAAIdentity, targetUserEmail, targetUserGithubUsername
     );
 
-    await org.addUser(user, { through: { roleId: role.id } });
+    await organization.addUser(user, { through: { roleId: role.id } });
 
     return uaaUserAttributes;
   },
