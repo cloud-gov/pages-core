@@ -197,6 +197,56 @@ describe('Webhooks Service', () => {
       expect(endCount).to.equal(startCount);
     });
 
+    context('organization sites should only build if site is active', () => {
+      it('should respond with a 200 if the site\'s organization isActive', async () => {
+        const user = await factory.user();
+        const org = await factory.organization.create();
+        expect(org.isActive).to.be.true;
+        const site = await factory.site({ users: [user], organizationId: org.id });
+        const numBuildsBefore = await Build.count({ where: { site: site.id, user: user.id } });
+        expect(numBuildsBefore).to.eq(0);
+
+        const payload = buildWebhookPayload(user, site);
+
+        await Webhooks.pushWebhookRequest(payload);
+
+        const numBuildsAfter = await Build.count({
+          where: {
+            site: site.id,
+            user: user.id,
+            branch: payload.ref.split('/')[2],
+            requestedCommitSha: payload.after,
+          },
+        });
+
+        expect(numBuildsAfter).to.eq(1);
+      });
+
+      it('should respond with a 200 if the site\'s organization is inactive', async () => {
+        const user = await factory.user();
+        const org = await factory.organization.create({ isActive: false });
+        expect(org.isActive).to.be.false;
+        const site = await factory.site({ users: [user], organizationId: org.id });
+        const numBuildsBefore = await Build.count({ where: { site: site.id, user: user.id } });
+        expect(numBuildsBefore).to.eq(0);
+
+        const payload = buildWebhookPayload(user, site);
+
+        await Webhooks.pushWebhookRequest(payload);
+
+        const numBuildsAfter = await Build.count({
+          where: {
+            site: site.id,
+            user: user.id,
+            branch: payload.ref.split('/')[2],
+            requestedCommitSha: payload.after,
+          },
+        });
+
+        expect(numBuildsAfter).to.eq(0);
+      });
+    });
+
     describe('when a queued build for the branch exists', () => {
       it('should not create a new build', async () => {
         const user = await factory.user();
