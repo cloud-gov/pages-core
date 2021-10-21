@@ -1,6 +1,5 @@
 const {
   Organization,
-  OrganizationRole,
   Role,
   User,
 } = require('../../models');

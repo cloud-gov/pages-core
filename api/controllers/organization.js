@@ -1,6 +1,8 @@
 const organizationSerializer = require('../serializers/organization');
 const organizationRoleSerializer = require('../serializers/organization-role');
-const { Organization, OrganizationRole, User, Role } = require('../models');
+const {
+  Organization, OrganizationRole, User,
+} = require('../models');
 const Mailer = require('../services/mailer');
 const OrganizationService = require('../services/organization');
 const { toInt, wrapHandlers } = require('../utils');
