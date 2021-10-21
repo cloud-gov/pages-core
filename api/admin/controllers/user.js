@@ -1,4 +1,6 @@
-const { Organization, Site, User, OrganizationRole, Role } = require('../../models');
+const {
+  Organization, Site, User, OrganizationRole, Role,
+} = require('../../models');
 const { paginate, toInt, wrapHandlers } = require('../../utils');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const userSerializer = require('../../serializers/user');
