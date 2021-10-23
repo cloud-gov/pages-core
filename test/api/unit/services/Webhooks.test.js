@@ -181,7 +181,7 @@ describe('Webhooks Service', () => {
       expect(endCount).to.equal(startCount);
     });
 
-    it('should respond with a 200 if the site is inactive on Federalist', async () => {
+    it('sites should not build if site is inactive', async () => {
       const user = await factory.user();
       const site = await factory.site({ users: [user], buildStatus: 'inactive' });
       const payload = buildWebhookPayload(user, {
@@ -197,54 +197,52 @@ describe('Webhooks Service', () => {
       expect(endCount).to.equal(startCount);
     });
 
-    context('organization sites should only build if site is active', () => {
-      it('should respond with a 200 if the site\'s organization isActive', async () => {
-        const user = await factory.user();
-        const org = await factory.organization.create();
-        expect(org.isActive).to.be.true;
-        const site = await factory.site({ users: [user], organizationId: org.id });
-        const numBuildsBefore = await Build.count({ where: { site: site.id, user: user.id } });
-        expect(numBuildsBefore).to.eq(0);
+    it('sites should build if organization is active', async () => {
+      const user = await factory.user();
+      const org = await factory.organization.create();
+      expect(org.isActive).to.be.true;
+      const site = await factory.site({ users: [user], organizationId: org.id });
+      const numBuildsBefore = await Build.count({ where: { site: site.id, user: user.id } });
+      expect(numBuildsBefore).to.eq(0);
 
-        const payload = buildWebhookPayload(user, site);
+      const payload = buildWebhookPayload(user, site);
 
-        await Webhooks.pushWebhookRequest(payload);
+      await Webhooks.pushWebhookRequest(payload);
 
-        const numBuildsAfter = await Build.count({
-          where: {
-            site: site.id,
-            user: user.id,
-            branch: payload.ref.split('/')[2],
-            requestedCommitSha: payload.after,
-          },
-        });
-
-        expect(numBuildsAfter).to.eq(1);
+      const numBuildsAfter = await Build.count({
+        where: {
+          site: site.id,
+          user: user.id,
+          branch: payload.ref.split('/')[2],
+          requestedCommitSha: payload.after,
+        },
       });
 
-      it('should respond with a 200 if the site\'s organization is inactive', async () => {
-        const user = await factory.user();
-        const org = await factory.organization.create({ isActive: false });
-        expect(org.isActive).to.be.false;
-        const site = await factory.site({ users: [user], organizationId: org.id });
-        const numBuildsBefore = await Build.count({ where: { site: site.id, user: user.id } });
-        expect(numBuildsBefore).to.eq(0);
+      expect(numBuildsAfter).to.eq(1);
+    });
 
-        const payload = buildWebhookPayload(user, site);
+    it('sites should not build if organization is inactive', async () => {
+      const user = await factory.user();
+      const org = await factory.organization.create({ isActive: false });
+      expect(org.isActive).to.be.false;
+      const site = await factory.site({ users: [user], organizationId: org.id });
+      const numBuildsBefore = await Build.count({ where: { site: site.id, user: user.id } });
+      expect(numBuildsBefore).to.eq(0);
 
-        await Webhooks.pushWebhookRequest(payload);
+      const payload = buildWebhookPayload(user, site);
 
-        const numBuildsAfter = await Build.count({
-          where: {
-            site: site.id,
-            user: user.id,
-            branch: payload.ref.split('/')[2],
-            requestedCommitSha: payload.after,
-          },
-        });
+      await Webhooks.pushWebhookRequest(payload);
 
-        expect(numBuildsAfter).to.eq(0);
+      const numBuildsAfter = await Build.count({
+        where: {
+          site: site.id,
+          user: user.id,
+          branch: payload.ref.split('/')[2],
+          requestedCommitSha: payload.after,
+        },
       });
+
+      expect(numBuildsAfter).to.eq(0);
     });
 
     describe('when a queued build for the branch exists', () => {
