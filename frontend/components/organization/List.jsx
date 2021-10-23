@@ -55,11 +55,13 @@ function List({ actions }) {
                   </div>
                   <div className="sites-list-item-actions">
                     {
-                      (Organization.isActive && Role.name === 'manager') && (
-                        <Link to={`/organizations/${Organization.id}`} title="Edit organization">
-                          Edit
-                        </Link>
-                      )
+                      !Organization.isActive
+                        ? 'Inactive'
+                        : Role.name === 'manager' && (
+                          <Link to={`/organizations/${Organization.id}`} title="Edit organization">
+                            Edit
+                          </Link>
+                        )
                     }
                   </div>
                 </li>
