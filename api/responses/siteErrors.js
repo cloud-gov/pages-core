@@ -6,5 +6,5 @@ module.exports = {
   NO_ASSOCIATED_USER: 'That user is not associated with this site.',
   ADMIN_ACCESS_REQUIRED: 'You do not have administrative access to this repository',
   ORGANIZATION_REQUIRED: 'An organization must be specified when creating a new site',
-  ORGANIZATION_INACTIVE: 'This organization is inactive.',
+  ORGANIZATION_INACTIVE: 'This organization has been deactivated.',
 };
