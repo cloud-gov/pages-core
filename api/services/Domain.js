@@ -12,6 +12,7 @@ const DnsService = require('./Dns');
 
 /**
  * @param {DomainModel} domain
+ * @returns {boolean}
  */
 function canDestroy(domain) {
   return domain.isPending();
@@ -35,6 +36,14 @@ function canDeprovision(domain) {
 }
 
 /**
+ * @param {DomainModel} domain The domain
+ * @param {DnsService.DnsResult[]} dnsResults The DNS results
+ */
+function canProvision(domain, dnsResults) {
+  return domain.isPending() && DnsService.canProvision(dnsResults);
+}
+
+/**
  * @param {number} id The id of the domain
  */
 function queueDeprovisionStatusCheck(id) {
@@ -46,6 +55,43 @@ function queueDeprovisionStatusCheck(id) {
  */
 function queueProvisionStatusCheck(id) {
   DomainQueue.add('checkProvisionStatus', { id });
+}
+
+/**
+ * @param {DomainModel} domain The domain
+ * @returns {DnsService.DnsRecord[]}
+ */
+function buildDnsRecords(domain) {
+  return domain.names
+    .split(',')
+    .map(DnsService.buildDnsRecords)
+    .flat();
+}
+
+/**
+ * @param {DomainModel} domain The domain
+ * @returns {DnsService.DnsResult[]}
+ */
+async function checkDnsRecords(domain) {
+  const dnsResults = await Promise.all(
+    domain.names
+      .split(',')
+      .map(DnsService.checkDnsRecords)
+  );
+
+  return dnsResults.flat();
+}
+
+/**
+ * @param {DomainModel} domain The domain
+ * @returns {DnsService.DnsResult[]}
+ */
+function checkAcmeChallengeDnsRecord(domain) {
+  return Promise.all(
+    domain.names
+      .split(',')
+      .map(DnsService.checkAcmeChallengeDnsRecord)
+  );
 }
 
 /**
@@ -149,9 +195,13 @@ async function checkProvisionStatus(id) {
   }
 }
 
+module.exports.buildDnsRecords = buildDnsRecords;
+module.exports.canProvision = canProvision;
 module.exports.checkDeprovisionStatus = checkDeprovisionStatus;
+module.exports.checkAcmeChallengeDnsRecord = checkAcmeChallengeDnsRecord;
+module.exports.checkDnsRecords = checkDnsRecords;
 module.exports.checkProvisionStatus = checkProvisionStatus;
-module.exports.destroy = destroy;
 module.exports.deprovision = deprovision;
+module.exports.destroy = destroy;
 module.exports.provision = provision;
 module.exports.queueProvisionStatusCheck = queueProvisionStatusCheck;

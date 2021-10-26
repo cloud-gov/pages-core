@@ -8,6 +8,6 @@
   </slot>
 {:then response}
   <slot {response}>{response}</slot>
-{:catch error}"
+{:catch error}
   <p>Something went wrong: {error.message}</p>
 {/await}
