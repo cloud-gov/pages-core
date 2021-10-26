@@ -27,6 +27,7 @@ const validationFailed = (site, options, validationError) => {
 
 const associate = ({
   Build,
+  Domain,
   Organization,
   OrganizationRole,
   Site,
@@ -38,6 +39,9 @@ const associate = ({
   // Associations
   Site.hasMany(Build, {
     foreignKey: 'site',
+  });
+  Site.hasMany(Domain, {
+    foreignKey: 'siteId',
   });
   Site.belongsToMany(User, {
     through: SiteUser,
