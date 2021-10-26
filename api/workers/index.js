@@ -67,7 +67,18 @@ async function start() {
   });
 
   const slackJobProcessor = job => slack.send(job.data);
-  const domainJobProcessor = job => DomainService.checkProvisionStatus(job.data.id);
+  const domainJobProcessor = (job) => {
+    switch (job.name) {
+      case 'checkProvisionStatus':
+        DomainService.checkProvisionStatus(job.data.id);
+        break;
+      case 'checkDeprovisionStatus':
+        DomainService.checkDeprovisionStatus(job.data.id);
+        break;
+      default:
+        throw new Error(`Unknown job name ${job.name} for Domain Queue`);
+    }
+  };
 
   // Workers
   const workers = [

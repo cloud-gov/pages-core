@@ -6,8 +6,40 @@ const { DomainQueue } = require('../queues');
 const DnsService = require('./Dns');
 
 /**
- * @typedef {object} Domain
+ * @typedef {object} DomainModel
+ * @prop {string} state
  */
+
+/**
+ * @param {DomainModel} domain
+ */
+function canDestroy(domain) {
+  return domain.isPending();
+}
+
+/**
+ * @param {DomainModel} domain
+ */
+async function destroy(domain) {
+  if (!canDestroy(domain)) {
+    throw new Error('Only `pending` domains can be destroyed.');
+  }
+  await domain.destroy();
+}
+
+/**
+ * @param {DomainModel} domain The domain
+ */
+function canDeprovision(domain) {
+  return ['provisioning', 'created', 'failed'].includes(domain.state);
+}
+
+/**
+ * @param {number} id The id of the domain
+ */
+function queueDeprovisionStatusCheck(id) {
+  DomainQueue.add('checkDeprovisionStatus', { id });
+}
 
 /**
  * @param {number} id The id of the domain
@@ -17,9 +49,27 @@ function queueProvisionStatusCheck(id) {
 }
 
 /**
- * @param {Domain} domain
+ * @param {DomainModel} domain The domain
+ * @returns {Promise<DomainModel>}
+ */
+async function deprovision(domain) {
+  if (!canDeprovision(domain)) {
+    throw new Error('Only `provisioning`, `created`, or `failed` domains can be deprovisioned.');
+  }
+
+  await CloudFoundryAPIClient.deleteServiceInstance(domain.serviceName);
+
+  await domain.update({ state: 'deprovisioning' });
+
+  queueDeprovisionStatusCheck(domain.id);
+
+  return domain;
+}
+
+/**
+ * @param {DomainModel} domain
  * @param {DnsService.DnsResult[]} dnsResults
- * @returns {Promise<Domain>}
+ * @returns {Promise<DomainModel>}
  */
 async function provision(domain, dnsResults) {
   if (!domain.isPending()) {
@@ -66,6 +116,22 @@ async function provision(domain, dnsResults) {
   return domain;
 }
 
+async function checkDeprovisionStatus(id) {
+  const domain = await Domain.findByPk(id);
+  const { resources } = await CloudFoundryAPIClient.fetchServiceInstances(domain.serviceName);
+
+  if (resources.length === 0) {
+    await domain.update({
+      origin: null,
+      path: null,
+      serviceName: null,
+      state: 'pending',
+    });
+  } else {
+    queueDeprovisionStatusCheck(id);
+  }
+}
+
 async function checkProvisionStatus(id) {
   const domain = await Domain.findByPk(id);
   const service = await CloudFoundryAPIClient.fetchServiceInstance(domain.serviceName);
@@ -83,6 +149,9 @@ async function checkProvisionStatus(id) {
   }
 }
 
+module.exports.checkDeprovisionStatus = checkDeprovisionStatus;
 module.exports.checkProvisionStatus = checkProvisionStatus;
+module.exports.destroy = destroy;
+module.exports.deprovision = deprovision;
 module.exports.provision = provision;
 module.exports.queueProvisionStatusCheck = queueProvisionStatusCheck;
