@@ -1,7 +1,6 @@
 const { Domain, Site } = require('../../models');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, wrapHandlers } = require('../../utils');
-const DnsService = require('../../services/Dns');
 const DomainService = require('../../services/Domain');
 const domainSerializer = require('../../serializers/domain');
 
@@ -49,13 +48,10 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    /** @type [[DnsService.DnsRecord]] */
-    const dnsRecords = domain.names
-      .split(',')
-      .map(DnsService.buildDnsRecords);
+    const dnsRecords = DomainService.buildDnsRecords(domain);
 
     return res.json({
-      dnsRecords: dnsRecords.flat(),
+      dnsRecords,
       domain: domainSerializer.serialize(domain, true),
     });
   },
@@ -117,11 +113,7 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    /** @type DnsService.DnsRecord[] */
-    const dnsRecords = domain.names
-      .split(',')
-      .map(DnsService.buildDnsRecords)
-      .flat();
+    const dnsRecords = DomainService.buildDnsRecords(domain);
 
     return res.json(dnsRecords);
   },
@@ -136,14 +128,9 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    /** @type DnsService.DnsResult[] */
-    const dnsResults = (await Promise.all(
-      domain.names
-        .split(',')
-        .map(DnsService.checkDnsRecords)
-    )).flat();
+    const dnsResults = await DomainService.checkDnsRecords(domain);
 
-    const canProvision = DnsService.canProvision(dnsResults);
+    const canProvision = DomainService.canProvision(domain, dnsResults);
 
     return res.json({
       canProvision,
@@ -179,12 +166,7 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    /** @type DnsService.DnsResult[] */
-    const dnsResults = (await Promise.all(
-      domain.names
-        .split(',')
-        .map(DnsService.checkAcmeChallengeDnsRecord)
-    )).flat();
+    const dnsResults = await DomainService.checkAcmeChallengeDnsRecord(domain);
 
     try {
       const updatedDomain = await DomainService.provision(domain, dnsResults);
