@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "names",
+    "branch",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "names": {
+      "type": "string"
+    },
+    "branch": {
+      "type": "string"
+    },
+    "origin": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string"
+    },
+    "serviceName": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

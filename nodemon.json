@@ -6,7 +6,10 @@
     "node_modules/",
     "webpack-manifest.json",
     "dist/",
-    "admin-client/"
+    "admin-client/",
+    "test",
+    "uaa",
+    "migrations"
   ],
   "ext": "js,njk",
   "verbose": true

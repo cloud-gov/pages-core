@@ -4,8 +4,9 @@ const IORedis = require('ioredis');
 const { app: appConfig, mailer: mailerConfig, redis: redisConfig } = require('../../config');
 const { logger } = require('../../winston');
 
+const DomainService = require('../services/Domain');
 const {
-  MailQueueName, ScheduledQueue, ScheduledQueueName, SlackQueueName,
+  DomainQueueName, MailQueueName, ScheduledQueue, ScheduledQueueName, SlackQueueName,
 } = require('../queues');
 
 const Processors = require('./jobProcessors');
@@ -66,9 +67,11 @@ async function start() {
   });
 
   const slackJobProcessor = job => slack.send(job.data);
+  const domainJobProcessor = job => DomainService.checkProvisionStatus(job.data.id);
 
   // Workers
   const workers = [
+    new QueueWorker(DomainQueueName, connection, domainJobProcessor),
     new QueueWorker(MailQueueName, connection, mailJobProcessor),
     new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
     new QueueWorker(SlackQueueName, connection, slackJobProcessor),
@@ -76,6 +79,7 @@ async function start() {
 
   // Schedulers
   const schedulers = [
+    new QueueScheduler(DomainQueueName, { connection }),
     new QueueScheduler(MailQueueName, { connection }),
     new QueueScheduler(ScheduledQueueName, { connection }),
     new QueueScheduler(SlackQueueName, { connection }),

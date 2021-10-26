@@ -8,6 +8,7 @@ const {
   ActionType,
   Build,
   BuildLog,
+  Domain,
   Event,
   Organization,
   Role,
@@ -417,6 +418,33 @@ async function createData() {
   await Promise.all([
     EventCreator.error(Event.labels.REQUEST_HANDLER, new Error('A sample error'), { some: 'info' }),
     EventCreator.error(Event.labels.REQUEST_HANDLER, socketIOError, { some: 'info' }),
+  ]);
+
+  /** *****************************************
+   *                Domains
+   */
+  console.log('Creating Domains');
+  await Promise.all([
+    Domain.create({
+      branch: 'main',
+      names: 'www.agency.gov',
+      siteId: site1.id,
+    }),
+    Domain.create({
+      branch: 'main',
+      names: 'www.example.gov',
+      siteId: nodeSite.id,
+    }),
+    Domain.create({
+      branch: 'demo',
+      names: 'demo.example.gov',
+      siteId: nodeSite.id,
+    }),
+    Domain.create({
+      branch: 'main',
+      names: 'foo.example.gov',
+      siteId: nodeSite.id,
+    }),
   ]);
 }
 
