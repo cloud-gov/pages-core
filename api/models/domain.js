@@ -71,7 +71,7 @@ function define(sequelize, DataTypes) {
     },
     state: {
       type: DataTypes.ENUM,
-      values: ['pending', 'provisioning', 'failed', 'created'],
+      values: ['pending', 'provisioning', 'failed', 'created', 'deprovisioning'],
       defaultValue: 'pending',
       allowNull: false,
     },

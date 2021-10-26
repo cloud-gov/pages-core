@@ -89,20 +89,23 @@ module.exports = wrapHandlers({
     }
   },
 
-  // async destroy(req, res) {
-  //   const {
-  //     params: { id },
-  //   } = req;
+  async destroy(req, res) {
+    const {
+      params: { id },
+    } = req;
 
-  //   const domain = await fetchModelById(id, Domain);
-  //   if (!domain) {
-  //     return res.notFound();
-  //   }
+    const domain = await fetchModelById(id, Domain);
+    if (!domain) {
+      return res.notFound();
+    }
 
-  //   await DnsService.destroyDomain(domain);
-
-  //   return res.json({});
-  // },
+    try {
+      await DomainService.destroy(domain);
+      return res.json({});
+    } catch (error) {
+      return res.unprocessableEntity(error);
+    }
+  },
 
   async dns(req, res) {
     const {
@@ -148,6 +151,24 @@ module.exports = wrapHandlers({
     });
   },
 
+  async deprovision(req, res) {
+    const {
+      params: { id },
+    } = req;
+
+    const domain = await fetchModelById(id, Domain);
+    if (!domain) {
+      return res.notFound();
+    }
+
+    try {
+      const updatedDomain = await DomainService.deprovision(domain);
+      return res.json(domainSerializer.serialize(updatedDomain, true));
+    } catch (error) {
+      return res.unprocessableEntity(error);
+    }
+  },
+
   async provision(req, res) {
     const {
       params: { id },
@@ -165,15 +186,11 @@ module.exports = wrapHandlers({
         .map(DnsService.checkAcmeChallengeDnsRecord)
     )).flat();
 
-    if (DnsService.canProvision(dnsResults)) {
-      try {
-        const updatedDomain = await DomainService.provision(domain, dnsResults);
-        return res.json(domainSerializer.serialize(updatedDomain, true));
-      } catch (error) {
-        return res.unprocessableEntity(error);
-      }
+    try {
+      const updatedDomain = await DomainService.provision(domain, dnsResults);
+      return res.json(domainSerializer.serialize(updatedDomain, true));
+    } catch (error) {
+      return res.unprocessableEntity(error);
     }
-
-    return res.unprocessableEntity({ message: 'Domain is not ready to be provisioned' });
   },
 });
