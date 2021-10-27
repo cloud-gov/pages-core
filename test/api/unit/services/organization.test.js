@@ -239,18 +239,11 @@ describe('OrganizationService', () => {
           Organization.create({ name: 'foo' }),
         ]);
 
-        const org = await fetchModelById(orgId, Organization, {
-          include: [{
-            model: OrganizationRole,
-            include: [Role, User],
-          }],
-        });
-
         const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
         isUAAAdminStub.resolves(false);
 
         const error = await OrganizationService.inviteUserToOrganization(
-          currentUser, org, null, ''
+          currentUser, orgId, null, ''
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
@@ -267,18 +260,12 @@ describe('OrganizationService', () => {
         ]);
 
         await org.addUser(currentUser, { through: { roleId: userRole.id } });
-        const organization = await fetchModelById(org.id, Organization, {
-          include: [{
-            model: OrganizationRole,
-            include: [Role, User],
-          }],
-        });
 
         const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
         isUAAAdminStub.resolves(false);
 
         const error = await OrganizationService.inviteUserToOrganization(
-          currentUser, organization, null, ''
+          currentUser, org.id, null, ''
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
@@ -334,15 +321,8 @@ describe('OrganizationService', () => {
 
         expect((await targetUser.getOrganizations()).length).to.eq(0);
 
-        const organization = await fetchModelById(org.id, Organization, {
-          include: [{
-            model: OrganizationRole,
-            include: [Role, User],
-          }],
-        });
-
         const uaaUserAttributes = await OrganizationService.inviteUserToOrganization(
-          currentUser, organization, userRole.id, uaaEmail, githubUsername
+          currentUser, org.id, userRole.id, uaaEmail, githubUsername
         );
 
         sinon.assert.calledOnceWithMatch(findOrCreateUAAUserStub,
@@ -395,15 +375,8 @@ describe('OrganizationService', () => {
 
         expect((await targetUser.getOrganizations()).length).to.eq(0);
 
-        const organization = await fetchModelById(org.id, Organization, {
-          include: [{
-            model: OrganizationRole,
-            include: [Role, User],
-          }],
-        });
-
         const uaaUserAttributes = await OrganizationService.inviteUserToOrganization(
-          currentUser, organization, userRole.id, uaaEmail, githubUsername
+          currentUser, org.id, userRole.id, uaaEmail, githubUsername
         );
 
         sinon.assert.calledOnceWithMatch(findOrCreateUAAUserStub,
