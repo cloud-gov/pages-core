@@ -48,7 +48,7 @@ module.exports = wrapHandlers({
     }
 
     const { email, inviteLink: link } = await OrganizationService.inviteUserToOrganization(
-      user, org, toInt(roleId), uaaEmail, githubUsername
+      user, org.id, toInt(roleId), uaaEmail, githubUsername
     );
 
     // TODO - refactor above method to return user so this extra query is not necessary

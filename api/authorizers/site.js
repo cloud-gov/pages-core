@@ -96,7 +96,7 @@ const createWithoutOrgs = (organizationId) => {
 
 const create = async (user, siteParams) => {
   const { organizationId } = siteParams;
-  const organizations = await Organization.forUser(user).findAll({ where: { isActive: true } });
+  const organizations = await Organization.forUser(user).findAll();
 
   if (organizations.length === 0) {
     createWithoutOrgs(organizationId);
