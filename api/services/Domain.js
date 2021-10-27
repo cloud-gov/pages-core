@@ -128,20 +128,11 @@ async function provision(domain, dnsResults) {
 
   const site = await domain.getSite();
 
-  // For now...
-  if (![site.defaultBranch, site.demoBranch].includes(domain.branch)) {
-    throw new Error('Can only create domains for default or demo branch');
-  }
-
-  const deployment = domain.branch === site.defaultBranch
-    ? 'site'
-    : 'demo';
-
   const [firstDomainName] = domain.names.split(',');
 
   const serviceName = `${firstDomainName}-ext`;
   const origin = siteViewDomain(site);
-  const path = sitePath(site, deployment);
+  const path = sitePath(site, domain.context);
 
   await CloudFoundryAPIClient.createExternalDomain(
     domain.names,

@@ -9,7 +9,7 @@
     PageTitle,
     LabeledItem,
   } from '../../components';
-  import { stateColor } from './domain';
+  import { domainBranch, stateColor } from './domain';
   import DnsTable from './DnsTable.svelte';
 
   $: id = $router.params.id;
@@ -40,12 +40,13 @@
       <div class="tablet:grid-col-fill padding-bottom-1">
         <LabeledItem label="id" value={domain.id} />
         <LabeledItem label="site" value={siteName(domain.Site)} />
-        <LabeledItem label="branch" value={domain.branch} />
+        <LabeledItem label="context" value={domain.context} />
+        <LabeledItem label="branch" value={domainBranch(domain)} />
         {#if domain.state !== 'pending'}
           <LabeledItem label="origin" value={domain.origin} />
           <LabeledItem label="path" value={domain.path} />
           <LabeledItem label="service" value={domain.serviceName} />
-        {/if}
+        {/if}        
       </div>
       <div class="tablet:grid-col-auto padding-bottom-1">
         <LabeledItem label="created at" value={formatDateTime(domain.createdAt)} />

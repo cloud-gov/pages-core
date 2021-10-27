@@ -3,7 +3,7 @@ const siteSerializer = require('./site');
 
 const attributes = {
   id: '',
-  branch: '',
+  context: '',
   names: '',
   state: '',
   Site: (site, _, isSystemAdmin) => site && siteSerializer.serializeNew(site, isSystemAdmin),

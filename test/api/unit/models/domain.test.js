@@ -13,8 +13,28 @@ describe('Domain model', () => {
   before(clean);
   afterEach(clean);
 
+  it('`context` is required', async () => {
+    const domain = Domain.build({ names: 'www.example.gov' });
+
+    const error = await domain.validate().catch(e => e);
+
+    expect(error).to.be.an('Error');
+    expect(error.name).to.eq('SequelizeValidationError');
+    expect(error.errors.map(e => e.message)).to.include('Domain.context cannot be null');
+  });
+
+  it('context is `site` or `demo`', async () => {
+    const domain = Domain.build({ context: 'foo', names: 'www.example.gov' });
+
+    const error = await domain.validate().catch(e => e);
+
+    expect(error).to.be.an('Error');
+    expect(error.name).to.eq('SequelizeValidationError');
+    expect(error.errors.map(e => e.message)).to.include('Validation isIn on context failed');
+  });
+
   it('`names` is required', async () => {
-    const domain = Domain.build({ branch: 'branch' });
+    const domain = Domain.build({ context: 'site' });
 
     const error = await domain.validate().catch(e => e);
 
@@ -23,18 +43,8 @@ describe('Domain model', () => {
     expect(error.errors.map(e => e.message)).to.include('Domain.names cannot be null');
   });
 
-  it('`branch` is required', async () => {
-    const domain = Domain.build({ names: 'www.example.gov' });
-
-    const error = await domain.validate().catch(e => e);
-
-    expect(error).to.be.an('Error');
-    expect(error.name).to.eq('SequelizeValidationError');
-    expect(error.errors.map(e => e.message)).to.include('Domain.branch cannot be null');
-  });
-
   it('names is comma-separated domains', async () => {
-    const domain = Domain.build({ branch: 'main', names: 'foobar' });
+    const domain = Domain.build({ context: 'site', names: 'foobar' });
 
     const error = await domain.validate().catch(e => e);
 
@@ -48,11 +58,11 @@ describe('Domain model', () => {
       const site = await Factory.site();
 
       const [domain1, domain2, domain3, domain4] = await Promise.all([
-        Domain.create({ siteId: site.id, names: 'www.example.gov', branch: 'main' }),
-        Domain.create({ siteId: site.id, names: 'www.foobar.gov', branch: 'main' }),
-        Domain.create({ siteId: site.id, names: 'app.foobar.gov', branch: 'main' }),
+        Domain.create({ siteId: site.id, names: 'www.example.gov', context: 'site' }),
+        Domain.create({ siteId: site.id, names: 'www.foobar.gov', context: 'site' }),
+        Domain.create({ siteId: site.id, names: 'app.foobar.gov', context: 'site' }),
         Domain.create({
-          siteId: site.id, names: 'sub.agency.gov', branch: 'main', serviceName: 'example',
+          siteId: site.id, names: 'sub.agency.gov', context: 'site', serviceName: 'example',
         }),
       ]);
 
@@ -76,9 +86,9 @@ describe('Domain model', () => {
       ]);
 
       const [domain1,, domain3] = await Promise.all([
-        Domain.create({ siteId: site1.id, names: 'www.example.gov', branch: 'main' }),
-        Domain.create({ siteId: site2.id, names: 'www.example.gov', branch: 'main' }),
-        Domain.create({ siteId: site1.id, names: 'www.example.gov', branch: 'main' }),
+        Domain.create({ siteId: site1.id, names: 'www.example.gov', context: 'site' }),
+        Domain.create({ siteId: site2.id, names: 'www.example.gov', context: 'site' }),
+        Domain.create({ siteId: site1.id, names: 'www.example.gov', context: 'site' }),
       ]);
 
       const result = await Domain.scope(Domain.siteScope(site1.id)).findAll();
@@ -91,7 +101,7 @@ describe('Domain model', () => {
     it('includes the site', async () => {
       const site = await Factory.site();
 
-      const domain = await Domain.create({ siteId: site.id, names: 'www.example.gov', branch: 'main' });
+      const domain = await Domain.create({ siteId: site.id, names: 'www.example.gov', context: 'site' });
 
       const result = await Domain.scope('withSite').findByPk(domain.id);
 

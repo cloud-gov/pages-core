@@ -50,9 +50,13 @@ function define(sequelize, DataTypes) {
         isDelimitedFQDN,
       },
     },
-    branch: {
-      type: DataTypes.STRING,
+    context: {
+      type: DataTypes.ENUM,
+      values: ['site', 'demo'],
       allowNull: false,
+      validate: {
+        isIn: ['site', 'demo'],
+      },
     },
     origin: {
       type: DataTypes.STRING,
@@ -74,6 +78,9 @@ function define(sequelize, DataTypes) {
       values: ['pending', 'provisioning', 'failed', 'created', 'deprovisioning'],
       defaultValue: 'pending',
       allowNull: false,
+      validate: {
+        isIn: ['pending', 'provisioning', 'failed', 'created', 'deprovisioning'],
+      },
     },
   }, {
     tableName: 'domain',
