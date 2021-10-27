@@ -3,24 +3,20 @@ const siteFactory = require('./site');
 
 const counters = {};
 
-function increment(key, reverse = false) {
+function increment(key) {
   counters[key] = (counters[key] || 0) + 1;
-  const parts = [key, counters[key]];
-
-  if (reverse) {
-    parts.reverse();
-  }
-
-  return parts.join('-');
+  return `${counters[key]}-${key}`;
 }
 
 function build(params = {}) {
   const {
-    branch = increment('branch'),
-    names = increment('www.example.gov', true),
+    context = 'site',
+    names = increment('www.example.gov'),
   } = params;
 
-  return Domain.build({ ...params, branch, names });
+  return Domain.build({
+    ...params, context, names,
+  });
 }
 
 async function create(params = {}) {

@@ -14,7 +14,7 @@ const DOMAIN_TABLE = {
     },
   },
   names: { type: 'string', notNull: true },
-  branch: { type: 'string', notNull: true },
+  context: { type: 'string', notNull: true },
   origin: { type: 'string', allowNull: true },
   path: { type: 'string', allowNull: true },
   serviceName: { type: 'string', allowNull: true },

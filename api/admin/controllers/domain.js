@@ -25,9 +25,9 @@ module.exports = wrapHandlers({
         Domain.scope(scopes),
         domains => domainSerializer.serializeMany(domains, true),
         { limit, page },
-        { order: ['names', 'branch'] }
+        { order: ['names', 'context'] }
       ),
-      Site.findAll({ attributes: ['id', 'owner', 'repository'], raw: true }),
+      Site.findAll({ attributes: ['id', 'owner', 'repository', 'demoBranch'], raw: true }),
     ]);
 
     const json = {
@@ -59,7 +59,7 @@ module.exports = wrapHandlers({
   async create(req, res) {
     const {
       body: {
-        branch,
+        context,
         names,
         siteId,
       },
@@ -71,7 +71,7 @@ module.exports = wrapHandlers({
     }
 
     try {
-      const domain = await Domain.create({ siteId, branch, names });
+      const domain = await Domain.create({ siteId, context, names });
       return res.json(domainSerializer.serialize(domain, true));
     } catch (err) {
       if (!err.errors) {

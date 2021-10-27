@@ -9,9 +9,25 @@
 
   const domain = {
     names: '',
-    branch: '',
+    context: '',
     siteId: '',
   };
+
+  $: siteOptions = sites.map((site) => ({ label: siteName(site), value: site.id }));
+
+  let contextOptions = [];
+  $: {
+    const options = [];
+    const selectedSite = sites.find((site) => site.id === domain.siteId);
+
+    if (selectedSite) {
+      options.push('site');
+      if (selectedSite.demoBranch) {
+        options.push('demo');
+      }
+    }
+    contextOptions = options;
+  }
 </script>
 
 <Form
@@ -25,12 +41,22 @@
   <SelectInput
     label="Site"
     name="site"
-    options={sites.map((site) => ({ label: siteName(site), value: site.id }))}
+    options={siteOptions}
     required
     error={errors.siteId}
     bind:value={domain.siteId}
   />
-  
+
+  <SelectInput
+    hint="'site' or 'demo'"
+    label="Context"
+    name="context"
+    options={contextOptions}
+    required
+    error={errors.context}
+    bind:value={domain.context}
+  />
+
   <TextInput
     hint="Comma separated list of valid domains"
     label="Domain Names"
@@ -38,13 +64,5 @@
     required
     error={errors.names}
     bind:value={domain.names}
-  />
-
-  <TextInput
-    label="Git Branch"
-    name="branch" 
-    required
-    error={errors.branch}
-    bind:value={domain.branch}
   />
 </Form>

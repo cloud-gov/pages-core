@@ -231,6 +231,7 @@ async function createData() {
       owner: user1.username,
       repository: 'example-node-site',
       users: [user1, managerWithGithub],
+      demoBranch: 'demo1',
     })
       .then(site => addSiteToOrg(site, agency1)),
 
@@ -426,24 +427,28 @@ async function createData() {
   console.log('Creating Domains');
   await Promise.all([
     Domain.create({
-      branch: 'main',
+      context: 'site',
       names: 'www.agency.gov',
       siteId: site1.id,
     }),
     Domain.create({
-      branch: 'main',
+      context: 'site',
       names: 'www.example.gov',
       siteId: nodeSite.id,
     }),
     Domain.create({
-      branch: 'demo',
+      context: 'demo',
       names: 'demo.example.gov',
       siteId: nodeSite.id,
     }),
     Domain.create({
-      branch: 'main',
+      context: 'site',
       names: 'foo.example.gov',
       siteId: nodeSite.id,
+      origin: 'foo-bar-baz.app.cloud.gov',
+      path: `/site/${nodeSite.owner}/${nodeSite.repository}`,
+      serviceName: 'foo.example.gov-ext',
+      state: 'provisioned',
     }),
   ]);
 }

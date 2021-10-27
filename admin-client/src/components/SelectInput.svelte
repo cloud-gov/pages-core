@@ -10,6 +10,9 @@
 
   $: idValue = id ?? name;
   $: errorMessageId = `${idValue}-error-message`;
+  $: if (!options.map((option) => option.value ?? option).includes(value)) {
+    value = '';
+  }
 </script>
 
 <label class="usa-label" for={idValue}>
