@@ -13,10 +13,7 @@ const findSiteForWebhookRequest = (payload) => {
       owner: owner.toLowerCase(),
       repository: repository.toLowerCase(),
     },
-    include: [
-      { model: User },
-      { model: Organization },
-    ],
+    include: [User, Organization],
   });
 };
 
