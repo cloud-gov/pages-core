@@ -75,7 +75,7 @@ export class SiteContainer extends React.Component {
     }
 
     const org = site.organizationId ? getOrgById(organizations, site.organizationId) : null;
-    if (!org.isActive) {
+    if (org && !org.isActive) {
       const errorMessage = (
         <span>
           You don&apos;t have access to this site because it&apos;s organization is inactive,
