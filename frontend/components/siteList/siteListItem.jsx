@@ -43,11 +43,11 @@ const SiteListItem = ({ organization, site, user }) => (
         {' '}
       </h4>
       {
-        organization ? (
+        organization && (
           <h5>
             {`organization - ${organization.name}`}
           </h5>
-        ) : null
+        )
       }
       <RepoLastVerified site={site} userUpdated={user.updatedAt} />
       { organization?.isSandbox
