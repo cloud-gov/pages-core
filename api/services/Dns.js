@@ -3,8 +3,6 @@ const dns = require('dns').promises;
 const cloudGovDomain = 'external-domains-production.cloud.gov';
 const acmePrefix = '_acme-challenge';
 
-module.exports = {};
-
 /** @enum {string} */
 const DnsRecordType = {
   A: 'A',
@@ -116,7 +114,8 @@ async function resolveDnsRecord(dnsRecord) {
  * @param {DnsRecord} dnsRecord
  */
 async function checkDnsRecord(dnsRecord) {
-  const [state, message] = await resolveDnsRecord(dnsRecord);
+  // call this function from `module.exports` so it is stubbable in tests
+  const [state, message] = await module.exports.resolveDnsRecord(dnsRecord);
 
   /** @type DnsResult */
   const dnsResult = {
@@ -154,7 +153,11 @@ function canProvision(dnsResults) {
     .every(dnsResult => dnsResult.state === DnsResultState.Success);
 }
 
+module.exports.buildAcmeChallengeDnsRecord = buildAcmeChallengeDnsRecord;
+module.exports.buildSiteDnsRecord = buildSiteDnsRecord;
 module.exports.buildDnsRecords = buildDnsRecords;
 module.exports.checkAcmeChallengeDnsRecord = checkAcmeChallengeDnsRecord;
+module.exports.checkDnsRecord = checkDnsRecord;
 module.exports.checkDnsRecords = checkDnsRecords;
 module.exports.canProvision = canProvision;
+module.exports.resolveDnsRecord = resolveDnsRecord;
