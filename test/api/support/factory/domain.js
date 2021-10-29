@@ -10,7 +10,7 @@ function increment(key) {
 
 function build(params = {}) {
   const {
-    context = 'site',
+    context = Domain.Contexts.Site,
     names = increment('www.example.gov'),
   } = params;
 

@@ -4,25 +4,17 @@ const SiteBuildQueue = require('../services/SiteBuildQueue');
 
 const { branchRegex, shaRegex, isEmptyOrUrl } = require('../utils/validators');
 const { buildUrl } = require('../utils/build');
+const { buildEnum } = require('../utils');
 
-const States = (function createStates() {
-  const values = {
-    Created: 'created',
-    Queued: 'queued',
-    Tasked: 'tasked',
-    Error: 'error',
-    Processing: 'processing',
-    Skipped: 'skipped', // remove?
-    Success: 'success',
-  };
-
-  return {
-    ...values,
-    values() {
-      return Object.values(values);
-    },
-  };
-}());
+const States = buildEnum([
+  'created',
+  'queued',
+  'tasked',
+  'error',
+  'processing',
+  'skipped', // remove?
+  'success',
+]);
 
 const associate = ({
   Build,
@@ -201,9 +193,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     state: {
       type: DataTypes.ENUM,
-      values: States.values(),
+      values: States.values,
       defaultValue: States.Created,
       allowNull: false,
+      validate: {
+        isIn: [States.values],
+      },
     },
     token: {
       type: DataTypes.STRING,
