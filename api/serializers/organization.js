@@ -8,6 +8,7 @@ const attributes = {
   isSandbox: '',
   sandboxNextCleaningAt: 'date',
   daysUntilSandboxCleaning: '',
+  isActive: '',
 };
 
 module.exports = new BaseSerializer(attributes);
