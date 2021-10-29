@@ -1,6 +1,9 @@
 const { Op } = require('sequelize');
-const { toInt } = require('../utils');
+const { buildEnum, toInt } = require('../utils');
 const { isDelimitedFQDN } = require('../utils/validators');
+
+const States = buildEnum(['pending', 'provisioning', 'failed', 'provisioned', 'deprovisioning']);
+const Contexts = buildEnum(['site', 'demo']);
 
 function associate({ Domain, Site }) {
   // Associations
@@ -52,10 +55,10 @@ function define(sequelize, DataTypes) {
     },
     context: {
       type: DataTypes.ENUM,
-      values: ['site', 'demo'],
+      values: Contexts.values,
       allowNull: false,
       validate: {
-        isIn: ['site', 'demo'],
+        isIn: [Contexts.values],
       },
     },
     origin: {
@@ -75,11 +78,11 @@ function define(sequelize, DataTypes) {
     },
     state: {
       type: DataTypes.ENUM,
-      values: ['pending', 'provisioning', 'failed', 'created', 'deprovisioning'],
-      defaultValue: 'pending',
+      values: States.values,
+      defaultValue: States.Pending,
       allowNull: false,
       validate: {
-        isIn: ['pending', 'provisioning', 'failed', 'created', 'deprovisioning'],
+        isIn: [States.values],
       },
     },
   }, {
@@ -88,10 +91,16 @@ function define(sequelize, DataTypes) {
   });
 
   Domain.associate = associate;
-  Domain.prototype.isPending = function isPending() { return this.state === 'pending'; };
-  Domain.prototype.isProvisioning = function isProvisioning() { return this.state === 'provisioning'; };
   Domain.searchScope = search => ({ method: ['byIdOrText', search] });
   Domain.siteScope = siteId => ({ method: ['bySite', siteId] });
+  Domain.States = States;
+  Domain.Contexts = Contexts;
+  Domain.prototype.isPending = function isPending() {
+    return this.state === Domain.States.Pending;
+  };
+  Domain.prototype.isProvisioning = function isProvisioning() {
+    return this.state === Domain.States.Provisioning;
+  };
   return Domain;
 }
 

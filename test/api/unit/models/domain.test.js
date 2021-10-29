@@ -34,7 +34,7 @@ describe('Domain model', () => {
   });
 
   it('`names` is required', async () => {
-    const domain = Domain.build({ context: 'site' });
+    const domain = Domain.build({ context: Domain.Contexts.Site });
 
     const error = await domain.validate().catch(e => e);
 
@@ -44,7 +44,7 @@ describe('Domain model', () => {
   });
 
   it('names is comma-separated domains', async () => {
-    const domain = Domain.build({ context: 'site', names: 'foobar' });
+    const domain = Domain.build({ context: Domain.Contexts.Site, names: 'foobar' });
 
     const error = await domain.validate().catch(e => e);
 
@@ -58,11 +58,11 @@ describe('Domain model', () => {
       const site = await Factory.site();
 
       const [domain1, domain2, domain3, domain4] = await Promise.all([
-        Domain.create({ siteId: site.id, names: 'www.example.gov', context: 'site' }),
-        Domain.create({ siteId: site.id, names: 'www.foobar.gov', context: 'site' }),
-        Domain.create({ siteId: site.id, names: 'app.foobar.gov', context: 'site' }),
+        Domain.create({ siteId: site.id, names: 'www.example.gov', context: Domain.Contexts.Site }),
+        Domain.create({ siteId: site.id, names: 'www.foobar.gov', context: Domain.Contexts.Site }),
+        Domain.create({ siteId: site.id, names: 'app.foobar.gov', context: Domain.Contexts.Site }),
         Domain.create({
-          siteId: site.id, names: 'sub.agency.gov', context: 'site', serviceName: 'example',
+          siteId: site.id, names: 'sub.agency.gov', context: Domain.Contexts.Site, serviceName: 'example',
         }),
       ]);
 
@@ -86,9 +86,9 @@ describe('Domain model', () => {
       ]);
 
       const [domain1,, domain3] = await Promise.all([
-        Domain.create({ siteId: site1.id, names: 'www.example.gov', context: 'site' }),
-        Domain.create({ siteId: site2.id, names: 'www.example.gov', context: 'site' }),
-        Domain.create({ siteId: site1.id, names: 'www.example.gov', context: 'site' }),
+        Domain.create({ siteId: site1.id, names: 'www.example.gov', context: Domain.Contexts.Site }),
+        Domain.create({ siteId: site2.id, names: 'www.example.gov', context: Domain.Contexts.Site }),
+        Domain.create({ siteId: site1.id, names: 'www.example.gov', context: Domain.Contexts.Site }),
       ]);
 
       const result = await Domain.scope(Domain.siteScope(site1.id)).findAll();
@@ -101,7 +101,7 @@ describe('Domain model', () => {
     it('includes the site', async () => {
       const site = await Factory.site();
 
-      const domain = await Domain.create({ siteId: site.id, names: 'www.example.gov', context: 'site' });
+      const domain = await Domain.create({ siteId: site.id, names: 'www.example.gov', context: Domain.Contexts.Site });
 
       const result = await Domain.scope('withSite').findByPk(domain.id);
 

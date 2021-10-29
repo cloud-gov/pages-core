@@ -5,6 +5,8 @@ const { DomainQueue } = require('../queues');
 
 const DnsService = require('./Dns');
 
+const { States } = Domain;
+
 /**
  * @typedef {object} DomainModel
  * @prop {string} state
@@ -23,7 +25,7 @@ function canDestroy(domain) {
  */
 async function destroy(domain) {
   if (!canDestroy(domain)) {
-    throw new Error('Only `pending` domains can be destroyed.');
+    throw new Error(`Only '${States.Pending}' domains can be destroyed.`);
   }
   await domain.destroy();
 }
@@ -32,7 +34,8 @@ async function destroy(domain) {
  * @param {DomainModel} domain The domain
  */
 function canDeprovision(domain) {
-  return ['provisioning', 'created', 'failed'].includes(domain.state);
+  const { Provisioning, Provisioned, Failed } = States;
+  return [Provisioning, Provisioned, Failed].includes(domain.state);
 }
 
 /**
@@ -100,12 +103,12 @@ function checkAcmeChallengeDnsRecord(domain) {
  */
 async function deprovision(domain) {
   if (!canDeprovision(domain)) {
-    throw new Error('Only `provisioning`, `created`, or `failed` domains can be deprovisioned.');
+    throw new Error(`Only '${States.Provisioning}', '${States.Provisioned}', or '${States.Failed}' domains can be deprovisioned.`);
   }
 
   await CloudFoundryAPIClient.deleteServiceInstance(domain.serviceName);
 
-  await domain.update({ state: 'deprovisioning' });
+  await domain.update({ state: States.Deprovisioning });
 
   queueDeprovisionStatusCheck(domain.id);
 
@@ -119,7 +122,7 @@ async function deprovision(domain) {
  */
 async function provision(domain, dnsResults) {
   if (!domain.isPending()) {
-    throw new Error('Only `pending` domains can be provisioned.');
+    throw new Error(`Only '${States.Pending}' domains can be provisioned.`);
   }
 
   if (!DnsService.canProvision(dnsResults)) {
@@ -145,7 +148,7 @@ async function provision(domain, dnsResults) {
     origin,
     path,
     serviceName,
-    state: 'provisioning',
+    state: States.Provisioning,
   });
 
   queueProvisionStatusCheck(domain.id);
@@ -162,7 +165,7 @@ async function checkDeprovisionStatus(id) {
       origin: null,
       path: null,
       serviceName: null,
-      state: 'pending',
+      state: States.Pending,
     });
   } else {
     queueDeprovisionStatusCheck(id);
@@ -175,10 +178,10 @@ async function checkProvisionStatus(id) {
 
   switch (service.entity.last_operation) {
     case 'succeeded':
-      await domain.update({ state: 'created' });
+      await domain.update({ state: States.Provisioned });
       break;
     case 'failed':
-      await domain.update({ state: 'failed' });
+      await domain.update({ state: States.Failed });
       break;
     default:
       queueProvisionStatusCheck(id);
