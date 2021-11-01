@@ -23,6 +23,9 @@
     },
     "isSandbox": {
       "type": "boolean"
+    },
+    "isActive": {
+      "type": "boolean"
     }
   }
 }

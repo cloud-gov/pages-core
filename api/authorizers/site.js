@@ -2,16 +2,26 @@ const GitHub = require('../services/GitHub');
 const siteErrors = require('../responses/siteErrors');
 const { Organization, Site } = require('../models');
 const FederalistUsersHelper = require('../services/FederalistUsersHelper');
+const { fetchModelById } = require('../utils/queryDatabase');
 
 const authorize = async ({ id: userId }, { id: siteId }) => {
-  const site = await Site.forUser({ id: userId }).findByPk(siteId);
+  const site = await fetchModelById(siteId, Site.forUser({ id: userId }));
+
   if (!site) {
     throw 403;
   }
+
+  if (site.organizationId) { // if site exists in an org
+    const org = await site.getOrganization();
+    if (!org.isActive) {
+      throw 403;
+    }
+  }
+
   return site;
 };
 
-const authorizeAdmin = (user, site) => (
+const authorizeRepositoryAdmin = (user, site) => (
   GitHub.checkPermissions(user, site.owner, site.repository)
     .then((permissions) => {
       if (!permissions.admin) {
@@ -66,6 +76,13 @@ const createWithOrgs = (organizations, organizationId) => {
       status: 404,
     };
   }
+
+  if (!hasOrg.isActive) {
+    throw {
+      message: siteErrors.ORGANIZATION_INACTIVE,
+      status: 403,
+    };
+  }
 };
 
 const createWithoutOrgs = (organizationId) => {
@@ -101,7 +118,7 @@ const findOne = (user, site) => authorize(user, site);
 const update = (user, site) => authorize(user, site);
 
 const destroy = (user, site) => authorize(user, site)
-  .then(() => authorizeAdmin(user, site))
+  .then(() => authorizeRepositoryAdmin(user, site))
   .catch(() => authorizeFederalistUsersAdmin(user));
 
 const removeUser = (user, site) => authorize(user, site);

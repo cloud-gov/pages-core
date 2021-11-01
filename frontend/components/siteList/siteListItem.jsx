@@ -27,6 +27,10 @@ function getViewLink(viewLink, repo) {
   );
 }
 
+function getSiteName(site) {
+  return `${site.owner}/${site.repository}`;
+}
+
 const handleRemoveSite = (site, user) => (event) => {
   event.preventDefault();
   siteActions.removeUserFromSite(site.id, user.id)
@@ -37,17 +41,21 @@ const SiteListItem = ({ organization, site, user }) => (
   <li className="sites-list-item">
     <div className="sites-list-item-text">
       <h4 className="site-list-item-title">
-        <Link to={`/sites/${site.id}`} title="View site settings">
-          {`${site.owner}/${site.repository}`}
-        </Link>
+        {(organization && !organization.isActive)
+          ? `${getSiteName(site)} (Inactive)`
+          : (
+            <Link to={`/sites/${site.id}`} title="View site settings">
+              {getSiteName(site)}
+            </Link>
+          )}
         {' '}
       </h4>
       {
-        organization ? (
+        organization && (
           <h5>
             {`organization - ${organization.name}`}
           </h5>
-        ) : null
+        )
       }
       <RepoLastVerified site={site} userUpdated={user.updatedAt} />
       { organization?.isSandbox
