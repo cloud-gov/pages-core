@@ -153,6 +153,13 @@ function canProvision(dnsResults) {
     .every(dnsResult => dnsResult.state === DnsResultState.Success);
 }
 
+/**
+ * @param {DnsRecord} dnsRecord
+ */
+function isAcmeChallengeDnsRecord(dnsRecord) {
+  return dnsRecord.purpose === DnsRecordPurpose.AcmeChallenge;
+}
+
 module.exports.buildAcmeChallengeDnsRecord = buildAcmeChallengeDnsRecord;
 module.exports.buildSiteDnsRecord = buildSiteDnsRecord;
 module.exports.buildDnsRecords = buildDnsRecords;
@@ -160,4 +167,5 @@ module.exports.checkAcmeChallengeDnsRecord = checkAcmeChallengeDnsRecord;
 module.exports.checkDnsRecord = checkDnsRecord;
 module.exports.checkDnsRecords = checkDnsRecords;
 module.exports.canProvision = canProvision;
+module.exports.isAcmeChallengeDnsRecord = isAcmeChallengeDnsRecord;
 module.exports.resolveDnsRecord = resolveDnsRecord;
