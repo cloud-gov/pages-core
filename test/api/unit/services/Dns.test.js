@@ -1,9 +1,11 @@
 const { expect } = require('chai');
-const { it } = require('mocha');
 const sinon = require('sinon');
+
 const DnsService = require('../../../../api/services/Dns');
 
 describe('Dns Service', () => {
+  afterEach(() => sinon.restore());
+
   describe('.buildAcmeChallengeDnsRecord()', () => {
     it('returns an "acme challenge" dns record', () => {
       const domainName = 'www.agency.gov';
@@ -63,8 +65,6 @@ describe('Dns Service', () => {
         state: resolveResult[0],
         message: resolveResult[1],
       });
-
-      sinon.restore();
     });
   });
 
@@ -83,8 +83,6 @@ describe('Dns Service', () => {
         state: resolveResult[0],
         message: resolveResult[1],
       });
-
-      sinon.restore();
     });
   });
 
@@ -163,6 +161,20 @@ describe('Dns Service', () => {
       const result = DnsService.canProvision(dnsResults);
 
       expect(result).to.be.false;
+    });
+  });
+
+  describe('.isAcmeChallengeRecord()', () => {
+    it('is true if the record is an acme challenge record', () => {
+      expect(
+        DnsService.isAcmeChallengeDnsRecord(DnsService.buildAcmeChallengeDnsRecord('www.agency.gov'))
+      ).to.be.true;
+    });
+
+    it('is false if the record is not an acme challenge record', () => {
+      expect(
+        DnsService.isAcmeChallengeDnsRecord(DnsService.buildSiteDnsRecord('www.agency.gov'))
+      ).to.be.false;
     });
   });
 });

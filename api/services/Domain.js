@@ -1,7 +1,10 @@
+const IORedis = require('ioredis');
+
 const { Domain } = require('../models');
 const { path: sitePath, siteViewDomain } = require('../utils/site');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const { DomainQueue } = require('../queues');
+const config = require('../../config');
 
 const DnsService = require('./Dns');
 
@@ -11,6 +14,17 @@ const { States } = Domain;
  * @typedef {object} DomainModel
  * @prop {string} state
  */
+
+function cfApi() {
+  return new CloudFoundryAPIClient();
+}
+
+function queue() {
+  const { redis: redisConfig } = config;
+  return new DomainQueue(
+    new IORedis(redisConfig.url, { tls: redisConfig.tls })
+  );
+}
 
 /**
  * @param {DomainModel} domain
@@ -50,14 +64,14 @@ function canProvision(domain, dnsResults) {
  * @param {number} id The id of the domain
  */
 function queueDeprovisionStatusCheck(id) {
-  DomainQueue.add('checkDeprovisionStatus', { id });
+  queue().add('checkDeprovisionStatus', { id });
 }
 
 /**
  * @param {number} id The id of the domain
  */
 function queueProvisionStatusCheck(id) {
-  DomainQueue.add('checkProvisionStatus', { id });
+  queue().add('checkProvisionStatus', { id });
 }
 
 /**
@@ -79,7 +93,7 @@ async function checkDnsRecords(domain) {
   const dnsResults = await Promise.all(
     domain.names
       .split(',')
-      .map(DnsService.checkDnsRecords)
+      .map(domainName => DnsService.checkDnsRecords(domainName))
   );
 
   return dnsResults.flat();
@@ -93,7 +107,7 @@ function checkAcmeChallengeDnsRecord(domain) {
   return Promise.all(
     domain.names
       .split(',')
-      .map(DnsService.checkAcmeChallengeDnsRecord)
+      .map(domainName => DnsService.checkAcmeChallengeDnsRecord(domainName))
   );
 }
 
@@ -106,7 +120,7 @@ async function deprovision(domain) {
     throw new Error(`Only '${States.Provisioning}', '${States.Provisioned}', or '${States.Failed}' domains can be deprovisioned.`);
   }
 
-  await CloudFoundryAPIClient.deleteServiceInstance(domain.serviceName);
+  await cfApi().deleteServiceInstance(domain.serviceName);
 
   await domain.update({ state: States.Deprovisioning });
 
@@ -125,6 +139,10 @@ async function provision(domain, dnsResults) {
     throw new Error(`Only '${States.Pending}' domains can be provisioned.`);
   }
 
+  if (!dnsResults.some(dnsResult => DnsService.isAcmeChallengeDnsRecord(dnsResult.record))) {
+    throw new Error('There must be at least one Acme Challenge DNS record provided');
+  }
+
   if (!DnsService.canProvision(dnsResults)) {
     throw new Error('The Acme Challenge DNS records must be set correctly before the domain can be provisioned.');
   }
@@ -137,7 +155,7 @@ async function provision(domain, dnsResults) {
   const origin = siteViewDomain(site);
   const path = sitePath(site, domain.context);
 
-  await CloudFoundryAPIClient.createExternalDomain(
+  await cfApi().createExternalDomain(
     domain.names,
     serviceName,
     origin,
@@ -156,9 +174,22 @@ async function provision(domain, dnsResults) {
   return domain;
 }
 
+/**
+ * @param {number} id The domain id
+ */
 async function checkDeprovisionStatus(id) {
-  const domain = await Domain.findByPk(id);
-  const { resources } = await CloudFoundryAPIClient.fetchServiceInstances(domain.serviceName);
+  const domain = await Domain.findOne({
+    where: {
+      state: Domain.States.Deprovisioning,
+      id,
+    },
+  });
+
+  if (!domain) {
+    return;
+  }
+
+  const { resources } = await cfApi().fetchServiceInstances(domain.serviceName);
 
   if (resources.length === 0) {
     await domain.update({
@@ -173,8 +204,18 @@ async function checkDeprovisionStatus(id) {
 }
 
 async function checkProvisionStatus(id) {
-  const domain = await Domain.findByPk(id);
-  const service = await CloudFoundryAPIClient.fetchServiceInstance(domain.serviceName);
+  const domain = await Domain.findOne({
+    where: {
+      state: Domain.States.Provisioning,
+      id,
+    },
+  });
+
+  if (!domain) {
+    return;
+  }
+
+  const service = await cfApi().fetchServiceInstance(domain.serviceName);
 
   switch (service.entity.last_operation) {
     case 'succeeded':
@@ -198,4 +239,3 @@ module.exports.checkProvisionStatus = checkProvisionStatus;
 module.exports.deprovision = deprovision;
 module.exports.destroy = destroy;
 module.exports.provision = provision;
-module.exports.queueProvisionStatusCheck = queueProvisionStatusCheck;
