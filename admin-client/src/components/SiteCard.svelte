@@ -67,11 +67,6 @@
         <p class="font-mono-3xs text-ink">
           Status
           <span class="text-base">{isActive ? 'Active' : 'Inactive'}</span>
-          <!-- {#if isActive}
-            <span class="text-base" style="color:green;">Active</span>
-          {:else}
-            <span class="text-base" style="color:red;">Inactive</span>
-          {/if} -->
         </p>
         <p class="font-mono-3xs text-ink">
           Created
