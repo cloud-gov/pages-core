@@ -157,7 +157,7 @@ describe('Site authorizer', () => {
         return expect(expected.id).to.equal(site.id);
       });
 
-      it('should reject if the site is inacgtive', async () => {
+      it('should reject if the site is inactive', async () => {
         const [user, site] = await Promise.all([factory.user(), factory.site({ isActive: false })]);
         const error = await authorizer.findOne(user, site)
           .catch(err => err);
@@ -205,7 +205,7 @@ describe('Site authorizer', () => {
         return expect(error).to.equal(403);
       });
     });
-    context('site is acgtive', () => {
+    context('site is active', () => {
       it('should resolve if the site is active', async () => {
         const user = await factory.user();
         const site = await factory.site({ users: Promise.all([user]) });
