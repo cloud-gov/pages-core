@@ -23,7 +23,7 @@
 
   let submitting = false;
 
-  async function handleCancelSubmit() {
+  async function handleFailSubmit() {
     submitting = true;
     const params = { state: 'error' };
     buildPromise = updateBuild(id, params);
@@ -55,8 +55,8 @@
       <div class="tablet:grid-col-auto padding-bottom-1">
         <div class="grid-row flex-column flex-align-end">
           {#if !['error', 'success'].includes(build.state)}
-            <form on:submit|preventDefault={handleCancelSubmit}>
-              <input type="submit" value="Error build" disabled={submitting}>
+            <form on:submit|preventDefault={handleFailSubmit}>
+              <input type="submit" value="Fail build" disabled={submitting}>
             </form>
           {/if}
           <LabeledItem label="started at" value={formatDateTime(build.startedAt)} />
