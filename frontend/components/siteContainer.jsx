@@ -74,6 +74,22 @@ export class SiteContainer extends React.Component {
       return <LoadingIndicator />;
     }
 
+    if (!site.isActive) {
+      const errorMessage = (
+        <span>
+          You don&apos;t have access to this site because it&apos;s inactive,
+          please contact support if you believe this is an error.
+        </span>
+      );
+      return (
+        <AlertBanner
+          status="error"
+          header=""
+          message={errorMessage}
+        />
+      );
+    }
+
     const org = site.organizationId ? getOrgById(organizations, site.organizationId) : null;
     if (org && !org.isActive) {
       const errorMessage = (

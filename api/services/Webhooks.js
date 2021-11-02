@@ -17,7 +17,7 @@ const findSiteForWebhookRequest = (payload) => {
   });
 };
 
-const shouldBuildForSite = site => site && site.buildStatus !== 'inactive'
+const shouldBuildForSite = site => site && site.isActive
   && (!site.Organization || site.Organization.isActive);
 
 const organizationWebhookRequest = async (payload) => {

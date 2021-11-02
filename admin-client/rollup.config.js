@@ -9,7 +9,7 @@ import { terser } from 'rollup-plugin-terser';
 const { API_URL, NODE_ENV, ROLLUP_WATCH } = process.env;
 
 const production = !ROLLUP_WATCH;
-const apiUrl = API_URL || 'http://localhost:1337';
+const apiUrl = API_URL || 'http://localhost:1338';
 
 const uswds = 'node_modules/uswds/dist';
 
