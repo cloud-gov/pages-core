@@ -41,7 +41,7 @@ const SiteListItem = ({ organization, site, user }) => (
   <li className="sites-list-item">
     <div className="sites-list-item-text">
       <h4 className="site-list-item-title">
-        {(organization && !organization.isActive)
+        {(!site.isActive || (organization && !organization.isActive))
           ? `${getSiteName(site)} (Inactive)`
           : (
             <Link to={`/sites/${site.id}`} title="View site settings">
@@ -86,6 +86,7 @@ SiteListItem.propTypes = {
     repoLastVerified: PropTypes.string,
     createdAt: PropTypes.string,
     viewLink: PropTypes.string,
+    isActive: PropTypes.bool,
   }).isRequired,
   user: USER.isRequired,
 };
