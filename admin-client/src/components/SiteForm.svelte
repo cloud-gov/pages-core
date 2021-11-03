@@ -23,7 +23,7 @@
         size: replaceDefault(containerSize.value),
         name: replaceDefault(containerName.value),
       },
-      isActive: active.value === 'active'
+      isActive: active.value === 'active',
     });
   }
 
