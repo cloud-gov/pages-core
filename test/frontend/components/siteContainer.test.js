@@ -14,6 +14,7 @@ const site = {
   viewLink: 'https://view-link.gov',
   repository: 'test-repo',
   organizationId: 1,
+  isActive: true,
 };
 const organization = {
   id: 1,
@@ -113,6 +114,46 @@ describe('<SiteContainer/>', () => {
     expect(wrapper.find('SideNav')).to.have.length(1);
     expect(wrapper.find('AlertBanner')).to.have.length(1);
     expect(wrapper.find('PagesHeader')).to.have.length(1);
+  });
+
+  context('site is (in)active', () => {
+    it('renders an error after sites if site inactive', () => {
+      const inactiveSiteProps = { ...props };
+      inactiveSiteProps.sites.data[0].isActive = false;
+
+      const wrapper = shallow(<SiteContainer {...inactiveSiteProps} />);
+      const alert = wrapper.find('AlertBanner');
+
+      expect(wrapper.find('LoadingIndicator')).to.have.length(0);
+      expect(alert).to.have.length(1);
+      expect(alert.prop('status')).to.equal('error');
+    });
+
+    it('renders after sites have loaded but no matching org', () => {
+      const inactiveSiteProps = { ...props };
+      inactiveSiteProps.sites.data[0].organizationId = 2;
+      inactiveSiteProps.sites.data[0].isActive = false;
+
+      const wrapper = shallow(<SiteContainer {...inactiveSiteProps} />);
+      const alert = wrapper.find('AlertBanner');
+
+      expect(wrapper.find('LoadingIndicator')).to.have.length(0);
+      expect(alert).to.have.length(1);
+      expect(alert.prop('status')).to.equal('error');
+    });
+
+    it('renders after sites have loaded and site has no org', () => {
+      const inactiveSiteProps = { ...props };
+      inactiveSiteProps.sites.data[0].organizationId = null;
+      inactiveSiteProps.sites.data[0].isActive = false;
+
+      const wrapper = shallow(<SiteContainer {...inactiveSiteProps} />);
+      const alert = wrapper.find('AlertBanner');
+
+      expect(wrapper.find('LoadingIndicator')).to.have.length(0);
+      expect(alert).to.have.length(1);
+      expect(alert.prop('status')).to.equal('error');
+    });
   });
 
   it('displays a page title if one is configured for the location', () => {

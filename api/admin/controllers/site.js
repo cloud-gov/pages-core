@@ -6,6 +6,7 @@ const { serializeNew, serializeMany } = require('../../serializers/site');
 
 const updateableAttrs = [
   'containerConfig',
+  'isActive',
 ];
 
 module.exports = wrapHandlers({

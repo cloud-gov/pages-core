@@ -80,34 +80,65 @@ describe('Admin - Site API', () => {
 
     const origContainerConfig = { name: 'exp', size: '' };
     const newContainerConfig = { name: '', size: 'large' };
+    context('updates allowed fields', async () => {
+      it('updates containerConfig', async () => {
+        const [user, site] = await Promise.all([
+          factory.user(),
+          factory.site({ containerConfig: origContainerConfig }),
+        ]);
 
-    it('updates allowed fields', async () => {
-      const [user, site] = await Promise.all([
-        factory.user(),
-        factory.site({ containerConfig: origContainerConfig }),
-      ]);
+        const cookie = await authenticatedSession(user, sessionConfig);
+        const putResponse = await request(app)
+          .put(`/sites/${site.id}`)
+          .set('Cookie', cookie)
+          .set('Origin', config.app.adminHostname)
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            containerConfig: newContainerConfig,
+            isActive: false,
+          })
+          .expect(200);
 
-      const cookie = await authenticatedSession(user, sessionConfig);
-      const putResponse = await request(app)
-        .put(`/sites/${site.id}`)
-        .set('Cookie', cookie)
-        .set('Origin', config.app.adminHostname)
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({
-          containerConfig: newContainerConfig,
-        })
-        .expect(200);
+        expect(putResponse.body.containerConfig).to.deep.equal(newContainerConfig);
 
-      expect(putResponse.body.containerConfig).to.deep.equal(newContainerConfig);
+        // Requery
+        const getResponse = await request(app)
+          .get(`/sites/${site.id}`)
+          .set('Cookie', cookie)
+          .set('Origin', config.app.adminHostname)
+          .expect(200);
 
-      // Requery
-      const getResponse = await request(app)
-        .get(`/sites/${site.id}`)
-        .set('Cookie', cookie)
-        .set('Origin', config.app.adminHostname)
-        .expect(200);
+        expect(getResponse.body.containerConfig).to.deep.equal(newContainerConfig);
+      });
 
-      expect(getResponse.body.containerConfig).to.deep.equal(newContainerConfig);
+      it('updates isActive', async () => {
+        const [user, site] = await Promise.all([
+          factory.user(),
+          factory.site(),
+        ]);
+        expect(site.isActive).to.be.true;
+        const cookie = await authenticatedSession(user, sessionConfig);
+        const putResponse = await request(app)
+          .put(`/sites/${site.id}`)
+          .set('Cookie', cookie)
+          .set('Origin', config.app.adminHostname)
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            isActive: false,
+          })
+          .expect(200);
+
+        expect(putResponse.body.isActive).to.be.false;
+
+        // Requery
+        const getResponse = await request(app)
+          .get(`/sites/${site.id}`)
+          .set('Cookie', cookie)
+          .set('Origin', config.app.adminHostname)
+          .expect(200);
+
+        expect(getResponse.body.isActive).to.be.false;
+      });
     });
   });
 

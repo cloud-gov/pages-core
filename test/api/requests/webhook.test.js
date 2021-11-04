@@ -162,6 +162,26 @@ describe('Webhook API', () => {
 
       sinon.assert.calledWith(pushWebhookRequestStub, payload);
     });
+
+    it('site is inactive', async () => {
+      const user = await factory.user();
+      const site = await factory.site({ users: [user], isActive: false });
+
+      const payload = buildWebhookPayload(user, site);
+      const signature = signWebhookPayload(payload);
+
+      await request(app)
+        .post('/webhook/github')
+        .send(payload)
+        .set({
+          'X-GitHub-Event': 'push',
+          'X-Hub-Signature': signature,
+          'X-GitHub-Delivery': '123abc',
+        })
+        .expect(200);
+
+      sinon.assert.calledWith(pushWebhookRequestStub, payload);
+    });
   });
 
   describe('POST /webhook/organization', () => {

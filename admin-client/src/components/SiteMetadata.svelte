@@ -17,6 +17,7 @@
     s3ServiceName,
     updatedAt,
     viewLink,
+    isActive,
   } = site;
 
   const createDate = formatDateTime(createdAt);
@@ -31,6 +32,7 @@
     <LabeledItem label="id" value={id} />
     <LabeledItem label="owner" value={owner} />
     <LabeledItem label="repository" value={repository} />
+    <LabeledItem label="status" value={isActive ? 'Active' : 'Inactive'} />
     <LabeledItem label="created at" value={createDate} />
     <LabeledItem label="updated at" value={updateDate} />
   </div>
