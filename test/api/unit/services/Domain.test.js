@@ -75,7 +75,7 @@ describe('Domain Service', () => {
       sinon.assert.notCalled(DomainQueue.prototype.add);
     });
 
-    it('updates the state to pending an clears values if the service no longer exists', async () => {
+    it('updates the state to pending and clears values if the service no longer exists', async () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstances')
         .resolves({ resources: [] });
       sinon.spy(DomainQueue.prototype, 'add');
