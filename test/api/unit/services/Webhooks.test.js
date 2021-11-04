@@ -183,7 +183,7 @@ describe('Webhooks Service', () => {
 
     it('sites should not build if site is inactive', async () => {
       const user = await factory.user();
-      const site = await factory.site({ users: [user], buildStatus: 'inactive' });
+      const site = await factory.site({ users: [user], isActive: false });
       const payload = buildWebhookPayload(user, {
         owner: site.owner,
         repository: site.repository,
