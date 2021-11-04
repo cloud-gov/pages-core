@@ -17,6 +17,7 @@ const testSite = {
   owner: 'someone',
   id: 1,
   viewLink: 'https://mysiteishere.biz',
+  isActive: true,
 };
 
 const testUser = {
@@ -86,6 +87,20 @@ describe('<SiteListItem />', () => {
   it('no Link if org is inactive', () => {
     const org = { ...testOrganization, isActive: false };
     wrapper = shallow(<Fixture site={testSite} user={testUser} organization={org} />);
+    expect(wrapper.find(Link)).to.have.length(0);
+    expect(wrapper.find('h4')).to.have.length(1);
+  });
+
+  it('no Link if org site is inactive', () => {
+    const site = { ...testSite, isActive: false };
+    wrapper = shallow(<Fixture site={site} user={testUser} organization={testOrganization} />);
+    expect(wrapper.find(Link)).to.have.length(0);
+    expect(wrapper.find('h4')).to.have.length(1);
+  });
+
+  it('no Link if non-org site is inactive', () => {
+    const site = { ...testSite, isActive: false };
+    wrapper = shallow(<Fixture site={site} user={testUser} />);
     expect(wrapper.find(Link)).to.have.length(0);
     expect(wrapper.find('h4')).to.have.length(1);
   });

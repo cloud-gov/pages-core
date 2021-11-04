@@ -11,6 +11,10 @@ const authorize = async ({ id: userId }, { id: siteId }) => {
     throw 403;
   }
 
+  if (!site.isActive) { // if site is not active
+    throw 403;
+  }
+
   if (site.organizationId) { // if site exists in an org
     const org = await site.getOrganization();
     if (!org.isActive) {
