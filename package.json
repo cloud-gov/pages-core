@@ -53,7 +53,7 @@
     "underscore": "^1.12.1",
     "urlsafe-base64": "^1.0.0",
     "uswds": "^1.4.4",
-    "validator": "^13.5.2",
+    "validator": "^13.7.0",
     "whatwg-fetch": "^3.4.1",
     "winston": "^3.3.3",
     "yamljs": "^0.3.0"
