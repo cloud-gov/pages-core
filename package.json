@@ -11,7 +11,7 @@
     "@supercharge/promise-pool": "^1.5.0",
     "ajv": "^8.6.3",
     "aws-sdk": "^2.879.0",
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "bull": "^3.20.1",
     "bullmq": "^1.26.5",
     "cfenv": "^1.2.3",
