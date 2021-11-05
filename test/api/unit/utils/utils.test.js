@@ -14,6 +14,21 @@ const MockWebpackConfig = {
 const utils = proxyquire('../../../../api/utils', { '../../webpack.development.config.js': MockWebpackConfig });
 
 describe('utils', () => {
+  describe('.buildEnum', () => {
+    it('builds the enum', () => {
+      const values = ['fOo', 'BBAR', 'baz'];
+
+      const enumeration = utils.buildEnum(values);
+
+      expect(enumeration).to.deep.eq({
+        Foo: 'foo',
+        Bbar: 'bbar',
+        Baz: 'baz',
+        values: ['foo', 'bbar', 'baz'],
+      });
+    });
+  });
+
   describe('.filterEntity', () => {
     const name = 'one';
     const field = 'name';

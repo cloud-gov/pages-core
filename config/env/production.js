@@ -92,7 +92,9 @@ const cfDomain = appEnv.getServiceCreds(`${productPrefix}-domain`);
 const cfProxy = appEnv.getServiceCreds(`${productPrefix}-proxy`);
 const cfOauthTokenUrl = process.env.CLOUD_FOUNDRY_OAUTH_TOKEN_URL;
 const cfApiHost = process.env.CLOUD_FOUNDRY_API_HOST;
-// optional environment vaiables
+const cfCdnSpaceName = process.env.CF_CDN_SPACE_NAME;
+const cfDomainWithCdnPlanGuid = process.env.CF_DOMAIN_WITH_CDN_PLAN_GUID;
+// optional environment variables
 const newRelicAppName = process.env.NEW_RELIC_APP_NAME;
 const newRelicLicenseKey = process.env.NEW_RELIC_LICENSE_KEY;
 
@@ -101,6 +103,8 @@ if (cfOauthTokenUrl && cfApiHost && cfDomain && cfProxy) {
     cfDomainGuid: cfDomain.guid,
     cfProxyGuid: cfProxy.guid,
     cfSpaceGuid,
+    cfCdnSpaceName,
+    cfDomainWithCdnPlanGuid,
     cfOauthTokenUrl,
     cfApiHost,
     newRelicAppName,

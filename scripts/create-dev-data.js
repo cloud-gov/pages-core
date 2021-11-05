@@ -8,6 +8,7 @@ const {
   ActionType,
   Build,
   BuildLog,
+  Domain,
   Event,
   Organization,
   Role,
@@ -230,6 +231,7 @@ async function createData() {
       owner: user1.username,
       repository: 'example-node-site',
       users: [user1, managerWithGithub],
+      demoBranch: 'demo1',
     })
       .then(site => addSiteToOrg(site, agency1)),
 
@@ -417,6 +419,37 @@ async function createData() {
   await Promise.all([
     EventCreator.error(Event.labels.REQUEST_HANDLER, new Error('A sample error'), { some: 'info' }),
     EventCreator.error(Event.labels.REQUEST_HANDLER, socketIOError, { some: 'info' }),
+  ]);
+
+  /** *****************************************
+   *                Domains
+   */
+  console.log('Creating Domains');
+  await Promise.all([
+    Domain.create({
+      context: 'site',
+      names: 'www.agency.gov',
+      siteId: site1.id,
+    }),
+    Domain.create({
+      context: 'site',
+      names: 'www.example.gov',
+      siteId: nodeSite.id,
+    }),
+    Domain.create({
+      context: 'demo',
+      names: 'demo.example.gov',
+      siteId: nodeSite.id,
+    }),
+    Domain.create({
+      context: 'site',
+      names: 'foo.example.gov',
+      siteId: nodeSite.id,
+      origin: 'foo-bar-baz.app.cloud.gov',
+      path: `/site/${nodeSite.owner}/${nodeSite.repository}`,
+      serviceName: 'foo.example.gov-ext',
+      state: 'provisioned',
+    }),
   ]);
 }
 
