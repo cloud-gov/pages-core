@@ -1,4 +1,5 @@
 const nock = require('nock');
+
 const factory = require('./factory');
 
 const url = 'https://api.example.com';
@@ -78,6 +79,10 @@ const mockFetchS3ServicePlanGUID = resources => nock(url, reqheaders)
   .get('/v2/service_plans')
   .reply(200, resources);
 
+const mockFetchSpacesRequest = (name, resources) => nock(url, reqheaders)
+  .get(`/v3/spaces?names=${name}`)
+  .reply(200, resources);
+
 const mockDefaultCredentials = (exists = true) => {
   const serviceGuid = 'testing-guid';
   const serviceName = 'federalist-dev-s3';
@@ -126,6 +131,19 @@ const mockCreateS3ServiceInstance = (body, resources) => {
   return n.reply(200, resources);
 };
 
+const mockCreateService = ({
+  domains, name, origin, path,
+}, resources) => {
+  const matcher = body => body.name === name
+      && body.parameters.domains === domains
+      && body.parameters.origin === origin
+      && body.parameters.path === path;
+
+  return nock(url, reqheaders)
+    .post('/v3/service_instances', matcher)
+    .reply(200, resources);
+};
+
 const mockCreateServiceKey = (body, resources) => {
   // eslint-disable-next-line camelcase
   const { name, service_instance_guid } = body;
@@ -148,6 +166,7 @@ const mockMapRoute = resource => nock(url, reqheaders)
 
 module.exports = {
   mockCreateRoute,
+  mockCreateService,
   mockDeleteRoute,
   mockDeleteService,
   mockCreateS3ServiceInstance,
@@ -157,6 +176,7 @@ module.exports = {
   mockFetchServiceInstanceCredentialsRequest,
   mockFetchServiceKeyRequest,
   mockFetchServiceKeysRequest,
+  mockFetchSpacesRequest,
   mockFetchS3ServicePlanGUID,
   mockMapRoute,
 };

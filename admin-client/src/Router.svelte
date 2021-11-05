@@ -50,6 +50,10 @@
   // Authenticated Routes
   page('*', ensureAuthenticated);
   page('/', checkRedirect, () => page.redirect(HOME));
+  page('/domains', queryString, render(Pages.Domain.Index));
+  page('/domains/new', queryString, render(Pages.Domain.New));
+  page('/domains/:id', queryString, render(Pages.Domain.Show));
+  page('/domains/:id/edit', queryString, render(Pages.Domain.Edit));
   page('/sites/:id', queryString, render(Pages.Site));
   page('/sites', queryString, render(Pages.Sites));
   page('/builds/:id', queryString, render(Pages.Build));

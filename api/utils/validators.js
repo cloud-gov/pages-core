@@ -96,6 +96,14 @@ const validBasicAuthUsername = s => /^(?!.*[:])(?=.*[a-zA-Z0-9]).{4,255}$/.test(
 
 const validBasicAuthPassword = s => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,255}$/.test(s);
 
+const isDelimitedFQDN = (str) => {
+  const msg = 'must be a comma-separated list of valid fully qualified domain names';
+  const isValid = str.split(',').every(s => validator.isFQDN(s));
+  if (!isValid) {
+    throw new Error(msg);
+  }
+};
+
 module.exports = {
   branchRegex,
   CustomError,
@@ -108,4 +116,5 @@ module.exports = {
   validBasicAuthUsername,
   validBasicAuthPassword,
   isValidSubdomain,
+  isDelimitedFQDN,
 };
