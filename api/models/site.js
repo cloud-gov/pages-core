@@ -27,6 +27,7 @@ const validationFailed = (site, options, validationError) => {
 
 const associate = ({
   Build,
+  Domain,
   Organization,
   OrganizationRole,
   Site,
@@ -38,6 +39,9 @@ const associate = ({
   // Associations
   Site.hasMany(Build, {
     foreignKey: 'site',
+  });
+  Site.hasMany(Domain, {
+    foreignKey: 'siteId',
   });
   Site.belongsToMany(User, {
     through: SiteUser,
@@ -182,10 +186,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       defaultValue: new Date(),
     },
-    buildStatus: {
-      type: DataTypes.ENUM,
-      values: ['active', 'inactive'],
-      defaultValue: 'active',
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
     },
     s3ServiceName: {
       type: DataTypes.STRING,

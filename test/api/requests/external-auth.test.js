@@ -4,6 +4,7 @@ const githubAPINocks = require('../support/githubAPINocks');
 const { sessionForCookie } = require('../support/cookieSession');
 const { unauthenticatedSession } = require('../support/session');
 const app = require('../../../app');
+const factory = require('../support/factory');
 
 describe('External authentication request', () => {
   describe('GET /external/auth/github', () => {
@@ -16,46 +17,62 @@ describe('External authentication request', () => {
   });
 
   describe('GET /external/auth/github/callback', () => {
-    it('return unauthorized if the user is not in an allowed GitHub organization', (done) => {
-      githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
-      request(app)
-        .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
-        .expect(401, done);
+    describe('sends script tag with error status and message', () => {
+      it('return unsuccessful auth if user is not found', async () => {
+        githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
+        const res = await request(app)
+          .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
+          .expect(200);
+        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You must be a (Federalist|Pages) user with a connected GitHub account."}(.|\n)*<\/script>$/g);
+      });
+
+      it('return script tag with error if user has not logged in for the duration of a session', async () => {
+        const user = await factory.user({ signedInAt: (new Date() - (2 * 24 * 60 * 60 * 1000)) });
+        githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
+        const res = await request(app)
+          .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
+          .expect(200);
+        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You have not logged-in to (Federalist|Pages) within the past 24 hours. Please log in to (Federalist|Pages) and try again."}(.|\n)*<\/script>$/g);
+      });
+
+      it('return script tag with error if user has not logged in for the duration of a session', async () => {
+        const user = await factory.user({ signedInAt: null });
+        githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
+        const res = await request(app)
+          .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
+          .expect(200);
+        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You have not logged-in to (Federalist|Pages) within the past 24 hours. Please log in to (Federalist|Pages) and try again."}(.|\n)*<\/script>$/g);
+      });
     });
 
-    describe('when successful', () => {
+    describe('sends script tag with success status, token and provider', () => {
+      let user;
+      before(async () => {
+        user = await factory.user();
+      });
+
       beforeEach(() => {
-        githubAPINocks.githubAuth('user', [{ id: 123456 }]);
+        githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
       });
 
-      it('returns a script tag', (done) => {
-        request(app)
+      it('sends script tag with success status', async () => {
+        const res = await request(app)
           .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
-          .expect((res) => {
-            expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*<\/script>$/g);
-          })
-          .expect(200, done);
+          .expect(200);
+        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:success(.|\n)*"token":(.|\n)*<\/script>$/g);
+        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:success(.|\n)*"provider":(.|\n)*<\/script>$/g);
       });
 
-      it('does not add the user to the session', (done) => {
-        let cookie;
-        unauthenticatedSession({ oauthState: 'state-123abc' })
-          .then((session) => {
-            cookie = session;
-            return request(app)
-              .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
-              .set('Cookie', cookie)
-              .expect(200)
-              .expect((res) => {
-                expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*<\/script>$/g);
-              });
-          })
-          .then(() => sessionForCookie(cookie))
-          .then((session) => {
-            expect(session.passport).to.be.undefined;
-            done();
-          })
-          .catch(done);
+      it('does not add the user to the session', async () => {
+        const cookie = await unauthenticatedSession({ oauthState: 'state-123abc' });
+        const res = await request(app)
+          .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
+          .set('Cookie', cookie)
+          .expect(200);
+        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:success(.|\n)*"token":(.|\n)*<\/script>$/g);
+        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:success(.|\n)*"provider":(.|\n)*<\/script>$/g);
+        const session = await sessionForCookie(cookie);
+        expect(session.passport).to.be.undefined;
       });
     });
   });

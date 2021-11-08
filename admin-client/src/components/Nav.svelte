@@ -82,6 +82,11 @@
             </a>
           </li>
           <li class="usa-nav__primary-item">
+            <a class="usa-nav__link" class:usa-current={currentPath === '/domains'} href="/domains">
+              <span>Domains</span>
+            </a>
+          </li>
+          <li class="usa-nav__primary-item">
             <a class="usa-nav__link"  class:usa-current={currentPath === '/builds'} href="/builds">
               <span>Builds</span>
             </a>
@@ -95,7 +100,7 @@
             <a class="usa-nav__link"  class:usa-current={currentPath === '/organizations'} href="/organizations">
               <span>Orgs</span>
             </a>
-          </li>                    
+          </li>  
           <li class="usa-nav__primary-item">
             <a class="usa-nav__link"  class:usa-current={currentPath === '/events'} href="/events">
               <span>Events</span>

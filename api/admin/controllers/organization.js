@@ -62,14 +62,14 @@ module.exports = wrapHandlers({
 
   async update(req, res) {
     const {
-      body: { name, sandbox },
+      body: { name, sandbox, active },
       params: { id },
     } = req;
 
     const org = await fetchModelById(id, Organization);
     if (!org) return res.notFound();
 
-    await org.update({ isSandbox: sandbox, name });
+    await org.update({ isSandbox: sandbox, name, isActive: active });
 
     return res.json(serialize(org));
   },

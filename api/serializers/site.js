@@ -16,6 +16,7 @@ const allowedAttributes = [
   'repository',
   's3ServiceName',
   'awsBucketName',
+  'isActive',
   'Organization',
   'Users',
 ];

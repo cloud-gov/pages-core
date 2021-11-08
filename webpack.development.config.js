@@ -92,9 +92,10 @@ module.exports = {
     // which we don't need, so we'll use this plugin to keep them out of the
     // bundle
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new webpack.DefinePlugin({
+    new webpack.EnvironmentPlugin([
       ...getFeatureFlags(process.env),
-      APP_HOSTNAME: JSON.stringify(process.env.APP_HOSTNAME),
-    }),
+      'APP_HOSTNAME',
+      'PRODUCT',
+    ]),
   ],
 };

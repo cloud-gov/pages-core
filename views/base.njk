@@ -55,7 +55,10 @@
     {% block before_header %}
     {% endblock %}
 
-    {% include "site-banner.njk" %}
+    {% if isFederalist %}
+      {% include "site-banner.njk" %}
+    {% endif %}
+
     {% include "usa-banner.njk" %}
     {% include "navigation.njk" %}
 
