@@ -3,4 +3,5 @@ import Adapter from 'enzyme-adapter-react-16';
 
 configure({ adapter: new Adapter() });
 
-global.APP_HOSTNAME = '/';
+process.env.APP_HOSTNAME = '/';
+process.env.PRODUCT = 'federalist';

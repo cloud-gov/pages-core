@@ -4,6 +4,7 @@ import { shallow } from 'enzyme';
 import proxyquire from 'proxyquire';
 import sinon from 'sinon';
 import siteActions from '../../../../frontend/actions/siteActions';
+import organization from '../../../../frontend/selectors/organization';
 
 proxyquire.noCallThru();
 
@@ -16,6 +17,7 @@ const testSite = {
   owner: 'someone',
   id: 1,
   viewLink: 'https://mysiteishere.biz',
+  isActive: true,
 };
 
 const testUser = {
@@ -29,6 +31,7 @@ const testOrganization = {
   id: 1,
   name: 'org-1',
   isSandbox: false,
+  isActive: true,
 };
 
 describe('<SiteListItem />', () => {
@@ -61,7 +64,7 @@ describe('<SiteListItem />', () => {
     expect(wrapper.find(RepoLastVerified)).to.have.length(1);
   });
 
-  it('outputs a link component to direct user to the site page', () => {
+  it('outputs a link component to direct user to the site page w/o org prop', () => {
     wrapper = shallow(<Fixture site={testSite} user={testUser} />);
     expect(wrapper.find(Link).props()).to.deep.equals({
       to: `/sites/${testSite.id}`,
@@ -69,6 +72,37 @@ describe('<SiteListItem />', () => {
       title: 'View site settings',
     });
     expect(wrapper.find(Link)).to.have.length(1);
+  });
+
+  it('outputs a link component to direct user to the site page w/ org prop', () => {
+    wrapper = shallow(<Fixture site={testSite} user={testUser} organization={testOrganization} />);
+    expect(wrapper.find(Link).props()).to.deep.equals({
+      to: `/sites/${testSite.id}`,
+      children: `${testSite.owner}/${testSite.repository}`,
+      title: 'View site settings',
+    });
+    expect(wrapper.find(Link)).to.have.length(1);
+  });
+
+  it('no Link if org is inactive', () => {
+    const org = { ...testOrganization, isActive: false };
+    wrapper = shallow(<Fixture site={testSite} user={testUser} organization={org} />);
+    expect(wrapper.find(Link)).to.have.length(0);
+    expect(wrapper.find('h4')).to.have.length(1);
+  });
+
+  it('no Link if org site is inactive', () => {
+    const site = { ...testSite, isActive: false };
+    wrapper = shallow(<Fixture site={site} user={testUser} organization={testOrganization} />);
+    expect(wrapper.find(Link)).to.have.length(0);
+    expect(wrapper.find('h4')).to.have.length(1);
+  });
+
+  it('no Link if non-org site is inactive', () => {
+    const site = { ...testSite, isActive: false };
+    wrapper = shallow(<Fixture site={site} user={testUser} />);
+    expect(wrapper.find(Link)).to.have.length(0);
+    expect(wrapper.find('h4')).to.have.length(1);
   });
 
   it('outputs an h5 with the site\'s organization', () => {

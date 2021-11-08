@@ -9,6 +9,7 @@
     <tr slot="header">
       <th scope="col">Name</th>
       <th scope="col">Sandbox?</th>
+      <th scope="col">Active?</th>
       <th scope="col">Created</th>
       <th scope="col">Updated</th>
       <th scope="col">View</th>
@@ -21,6 +22,15 @@
       <td>
         {#if org.isSandbox}
           <span class="usa-tag bg-orange">sandbox</span>
+        {:else}
+          regular
+        {/if}
+      </td>
+      <td>
+        {#if org.isActive}
+          active
+        {:else}
+          <span class="usa-tag bg-gray">inactive</span>
         {/if}
       </td>
       <td>{formatDateTime(org.createdAt)}</td>

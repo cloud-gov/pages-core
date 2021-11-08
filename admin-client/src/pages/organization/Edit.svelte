@@ -12,9 +12,9 @@
 
   async function handleSubmit(event) {
     submitting = true;
-    const { name, sandbox } = event.target.elements;
+    const { name, sandbox, active } = event.target.elements;
 
-    const params = { name: name.value, sandbox: sandbox.value === 'sandbox' };
+    const params = { name: name.value, sandbox: sandbox.value === 'sandbox', active: active.value === 'active' };
 
     await updateOrganization(id, params);
 
@@ -41,7 +41,7 @@
         <span class="usa-hint">Organization name must be globally unique</span>
         <input type="text" class="usa-input" name="name" id="name" value={org.name} required>
       </fieldset>
-  
+
       <fieldset class="usa-fieldset">
         <legend class="usa-legend usa-legend">Organization Type</legend>
         <div class="usa-radio">
@@ -68,6 +68,31 @@
         </div>
       </fieldset>
 
+      <fieldset class="usa-fieldset">
+        <legend class="usa-legend usa-legend">Organization Status</legend>
+        <div class="usa-radio">
+          <input
+            class="usa-radio__input"
+            id="active"
+            type="radio"
+            name="active"
+            value="active"
+            checked={org.isActive}
+          />
+          <label class="usa-radio__label" for="active">Active</label>
+        </div>
+        <div class="usa-radio">
+          <input
+            class="usa-radio__input"
+            id="inactive"
+            type="radio"
+            name="active"
+            value="inactive"
+            checked={!org.isActive}
+          />
+          <label class="usa-radio__label" for="inactive">Inactive</label>
+        </div>
+      </fieldset>
       <input class="usa-button" type="submit" value="Update" disabled={submitting}>
     </form>
   </Await>

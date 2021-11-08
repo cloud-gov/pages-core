@@ -150,6 +150,9 @@ jobs:
       - run:
           name: Run tests
           command: yarn test:cover
+          environment:
+            APP_HOSTNAME: http://localhost:1337
+            PRODUCT: federalist
 
       - run:
           name: CodeClimate combine and upload coverage
@@ -179,6 +182,7 @@ jobs:
           name: Build app
           environment:
             APP_HOSTNAME: << parameters.app-hostname >>
+            PRODUCT: federalist
           command: yarn build
 
       - deploy-to-cg:

@@ -3,7 +3,7 @@ const config = require('../../../config');
 const { SlackQueue } = require('../../queues');
 const Templates = require('./templates');
 
-const { redis: redisConfig, app: { app_env: appEnv } } = config;
+const { redis: redisConfig, app: { appEnv } } = config;
 
 let slackQueue;
 

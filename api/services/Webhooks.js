@@ -1,7 +1,6 @@
-const Sequelize = require('sequelize');
 const config = require('../../config');
 const {
-  Build, User, Site, Event,
+  Build, User, Site, Event, Organization,
 } = require('../models');
 const GithubBuildHelper = require('./GithubBuildHelper');
 const EventCreator = require('./EventCreator');
@@ -13,11 +12,13 @@ const findSiteForWebhookRequest = (payload) => {
     where: {
       owner: owner.toLowerCase(),
       repository: repository.toLowerCase(),
-      buildStatus: { [Sequelize.Op.ne]: 'inactive' },
     },
-    include: [{ model: User }],
+    include: [User, Organization],
   });
 };
+
+const shouldBuildForSite = site => site?.isActive
+  && (!site.Organization || site.Organization.isActive);
 
 const organizationWebhookRequest = async (payload) => {
   const {
@@ -105,7 +106,7 @@ const createBuildForWebhookRequest = async (payload, site) => {
 const pushWebhookRequest = async (payload) => {
   if (payload.commits && payload.commits.length > 0) {
     const site = await findSiteForWebhookRequest(payload);
-    if (site) {
+    if (shouldBuildForSite(site)) {
       const build = await createBuildForWebhookRequest(payload, site);
       await build.reload({ include: [{ model: Site, include: [{ model: User }] }] });
       await GithubBuildHelper.reportBuildStatus(build);

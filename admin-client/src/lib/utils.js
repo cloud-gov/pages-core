@@ -12,7 +12,12 @@ function objToQueryString(obj = {}) {
   return searchParams.toString();
 }
 
+function siteName(site) {
+  return `${site.owner}/${site.repository}`;
+}
+
 export {
   formToObj,
   objToQueryString,
+  siteName,
 };

@@ -1,4 +1,5 @@
 const Build = require('./build');
+const Domain = require('./domain');
 const Event = require('./event');
 const Organization = require('./organization');
 const OrganizationRole = require('./organization-role');
@@ -9,6 +10,7 @@ const User = require('./user');
 
 module.exports = {
   Build,
+  Domain,
   Event,
   Organization,
   OrganizationRole,

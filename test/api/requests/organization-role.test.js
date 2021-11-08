@@ -125,6 +125,34 @@ describe('Organization Role API', () => {
         },
       })).to.eq(0);
     });
+
+    it('returns a 404 if the organization is not active', async () => {
+      const [user, org] = await Promise.all([
+        factory.user(),
+        factory.organization.create({ isActive: false }),
+      ]);
+
+      await Promise.all([
+        org.addUser(currentUser, { through: { roleId: managerRole.id } }),
+        org.addUser(user, { through: { roleId: userRole.id } }),
+      ]);
+
+      const response = await authenticatedRequest.delete('/v0/organization-role')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          organizationId: org.id,
+          userId: user.id,
+        });
+
+      validateAgainstJSONSchema('DELETE', '/organization-role', 404, response.body);
+
+      expect(await OrganizationRole.count({
+        where: {
+          organizationId: org.id,
+          userId: user.id,
+        },
+      })).to.eq(1);
+    });
   });
 
   describe('PUT /v0/organization-role', () => {
@@ -202,6 +230,33 @@ describe('Organization Role API', () => {
 
       await orgRole.reload();
       expect(orgRole.roleId).to.eq(managerRole.id);
+    });
+
+    it('returns an error if the organization role cannot be updated b/c organization is inactive', async () => {
+      const [user, org] = await Promise.all([
+        factory.user(),
+        factory.organization.create({ isActive: false }),
+      ]);
+
+      await Promise.all([
+        org.addUser(currentUser, { through: { roleId: managerRole.id } }),
+        org.addUser(user, { through: { roleId: userRole.id } }),
+      ]);
+
+      const orgRole = await OrganizationRole
+        .findOne({ where: { userId: user.id, organizationId: org.id } });
+
+      expect(orgRole.roleId).to.eq(userRole.id);
+
+      const response = await authenticatedRequest.put('/v0/organization-role')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          organizationId: org.id,
+          roleId: managerRole.id,
+          userId: user.id,
+        });
+
+      validateAgainstJSONSchema('PUT', '/organization-role', 404, response.body);
     });
   });
 });

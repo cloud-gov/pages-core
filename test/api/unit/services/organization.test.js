@@ -15,6 +15,7 @@ const {
 } = require('../../../../api/models');
 const OrganizationService = require('../../../../api/services/organization/Organization');
 const UAAClient = require('../../../../api/utils/uaaClient');
+const { fetchModelById } = require('../../../../api/utils/queryDatabase');
 
 function clean() {
   return Promise.all(
@@ -233,7 +234,7 @@ describe('OrganizationService', () => {
 
     context('when the current user is not in the target org or an admin', () => {
       it('throws an error', async () => {
-        const [currentUser, org] = await Promise.all([
+        const [currentUser, { id: orgId }] = await Promise.all([
           createUserWithUAAIdentity(),
           Organization.create({ name: 'foo' }),
         ]);
@@ -242,7 +243,7 @@ describe('OrganizationService', () => {
         isUAAAdminStub.resolves(false);
 
         const error = await OrganizationService.inviteUserToOrganization(
-          currentUser, org.id, null, ''
+          currentUser, orgId, null, ''
         ).catch(e => e);
 
         expect(error).to.be.an('Error');

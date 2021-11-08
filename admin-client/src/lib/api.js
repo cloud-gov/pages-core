@@ -25,26 +25,37 @@ function _setSearchString(query = {}) {
 }
 
 // eslint-disable-next-line no-underscore-dangle
-async function _fetch(path, opts = {}) {
-  const options = { ...defaultOptions, ...opts };
-  if (!['GET', 'HEAD', 'OPTIONS'].includes(options.method)) {
-    options.headers['x-csrf-token'] = session.csrfToken();
+async function _fetch(path, fetchOpts = {}, apiOpts = { handleError: true }) {
+  const fetchOptions = { ...defaultOptions, ...fetchOpts };
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(fetchOptions.method)) {
+    fetchOptions.headers['x-csrf-token'] = session.csrfToken();
   }
 
-  return fetch(`${apiUrl}/admin${path}`, options)
-    .then((r) => {
+  let request = fetch(`${apiUrl}/admin${path}`, fetchOptions)
+    .then(async (r) => {
       if (r.ok) return r.json();
       if (r.status === 401) {
         authLogout();
         return null;
       }
+      if (r.status === 422) {
+        const json = await r.json();
+        const error = new Error(json.message || r.statusText);
+        error.errors = json.errors;
+        throw error;
+      }
       throw new Error(r.statusText);
-    })
-    .catch((e) => {
+    });
+
+  if (apiOpts.handleError) {
+    request = request.catch((e) => {
       notification.setError(`API request failed: ${e.message}`);
       console.error(e);
       throw e;
     });
+  }
+
+  return request;
 }
 
 function destroy(path, body) {
@@ -60,8 +71,8 @@ function get(path, query) {
   return _fetch(path + qs);
 }
 
-function post(path, body) {
-  return _fetch(path, { method: 'POST', body: JSON.stringify(body) });
+function post(path, body = {}, opts = {}) {
+  return _fetch(path, { method: 'POST', body: JSON.stringify(body) }, opts);
 }
 
 function put(path, body) {
@@ -103,6 +114,30 @@ async function fetchBuilds(query = {}) {
 
 async function fetchBuildLog(id) {
   return get(`/builds/${id}/log`).catch(() => null);
+}
+
+async function createDomain(params) {
+  return post('/domains', params, { handleError: false });
+}
+
+async function fetchDomain(id) {
+  return get(`/domains/${id}`).catch(() => null);
+}
+
+async function fetchDomainDns(id) {
+  return get(`/domains/${id}/dns`).catch(() => null);
+}
+
+async function fetchDomainDnsResult(id) {
+  return get(`/domains/${id}/dns-result`).catch(() => null);
+}
+
+async function fetchDomains(query = {}) {
+  return get('/domains', query).catch(() => []);
+}
+
+async function provisionDomain(id) {
+  return post(`/domains/${id}`).catch(() => []);
 }
 
 async function fetchEvents(query = {}) {
@@ -181,6 +216,12 @@ export {
   updateBuild,
   fetchBuilds,
   fetchBuildLog,
+  createDomain,
+  fetchDomain,
+  fetchDomains,
+  fetchDomainDns,
+  fetchDomainDnsResult,
+  provisionDomain,
   fetchEvents,
   createOrganization,
   fetchOrganization,

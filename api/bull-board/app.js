@@ -8,7 +8,9 @@ const { ExpressAdapter } = require('@bull-board/express');
 const IORedis = require('ioredis');
 const helmet = require('helmet');
 
-const { MailQueue, ScheduledQueue } = require('../queues');
+const {
+  DomainQueue, MailQueue, ScheduledQueue, SlackQueue,
+} = require('../queues');
 
 const passport = require('./passport');
 const sessionConfig = require('./sessionConfig');
@@ -30,7 +32,9 @@ const serverAdapter = new ExpressAdapter();
 createBullBoard({
   queues: [
     new BullAdapter(createQueue('site-build-queue')),
+    new BullMQAdapter(new DomainQueue(connection)),
     new BullMQAdapter(new MailQueue(connection)),
+    new BullMQAdapter(new SlackQueue(connection)),
     new BullMQAdapter(new ScheduledQueue(connection)),
   ],
   serverAdapter,

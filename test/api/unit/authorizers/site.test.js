@@ -4,7 +4,7 @@ const nock = require('nock');
 const sinon = require('sinon');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
-const authorizer = require('../../../../api/authorizers/site.js');
+const authorizer = require('../../../../api/authorizers/site');
 const { Role } = require('../../../../api/models');
 const siteErrors = require('../../../../api/responses/siteErrors');
 const FederalistUsersHelper = require('../../../../api/services/FederalistUsersHelper');
@@ -128,6 +128,44 @@ describe('Site authorizer', () => {
       expect(error).to.be.throw;
       return expect(error).to.equal(403);
     });
+    context('site that belongs to an inactive organization', () => {
+      it('should resolve if the site is associated with the active organization', async () => {
+        const org = await factory.organization.create();
+        const user = await factory.user();
+        const site = await factory.site({ users: Promise.all([user]), organizationId: org.id });
+        const expected = await authorizer.findOne(user, site);
+
+        return expect(expected.id).to.equal(site.id);
+      });
+
+      it('should reject if the site is associated with the inactive organization', async () => {
+        const org = await factory.organization.create({ isActive: false });
+        const [user, site] = await Promise.all([factory.user(), factory.site({ organizationId: org.id })]);
+        const error = await authorizer.findOne(user, site)
+          .catch(err => err);
+
+        expect(error).to.be.throw;
+        return expect(error).to.equal(403);
+      });
+    });
+    context('site is inactive', () => {
+      it('should resolve if the site is active', async () => {
+        const user = await factory.user();
+        const site = await factory.site({ users: Promise.all([user]) });
+        const expected = await authorizer.findOne(user, site);
+        expect(expected.isActive).to.be.true;
+        return expect(expected.id).to.equal(site.id);
+      });
+
+      it('should reject if the site is inactive', async () => {
+        const [user, site] = await Promise.all([factory.user(), factory.site({ isActive: false })]);
+        const error = await authorizer.findOne(user, site)
+          .catch(err => err);
+
+        expect(error).to.be.throw;
+        return expect(error).to.equal(403);
+      });
+    });
   });
 
   describe('.update(user, site)', () => {
@@ -146,6 +184,45 @@ describe('Site authorizer', () => {
 
       expect(error).to.be.throw;
       return expect(error).to.equal(403);
+    });
+    context('site that belongs to an inactive organization', () => {
+      it('should resolve if the site is associated with the active organization', async () => {
+        const org = await factory.organization.create();
+        const user = await factory.user();
+        const site = await factory.site({ users: Promise.all([user]), organizationId: org.id });
+        const expected = await authorizer.update(user, site);
+
+        return expect(expected.id).to.equal(site.id);
+      });
+
+      it('should reject if the site is associated with the inactive organization', async () => {
+        const org = await factory.organization.create({ isActive: false });
+        const [user, site] = await Promise.all([factory.user(), factory.site({ organizationId: org.id })]);
+        const error = await authorizer.update(user, site)
+          .catch(err => err);
+
+        expect(error).to.be.throw;
+        return expect(error).to.equal(403);
+      });
+    });
+    context('site is active', () => {
+      it('should resolve if the site is active', async () => {
+        const user = await factory.user();
+        const site = await factory.site({ users: Promise.all([user]) });
+        const expected = await authorizer.update(user, site);
+        expect(expected.isActive).to.be.true;
+
+        return expect(expected.id).to.equal(site.id);
+      });
+
+      it('should reject if the site is inactive', async () => {
+        const [user, site] = await Promise.all([factory.user(), factory.site({ isActive: false })]);
+        const error = await authorizer.update(user, site)
+          .catch(err => err);
+
+        expect(error).to.be.throw;
+        return expect(error).to.equal(403);
+      });
     });
   });
 

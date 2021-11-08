@@ -22,11 +22,18 @@ class HttpClient {
         const { response } = error;
 
         if (response) {
-          if (response.data && response.data.error) {
+          if (response.data?.error) {
             const msg = `${response.data.error}
             ${response.data.error_description || ''}
             ${response.data.scope || ''}`.trim();
             throw new Error(msg);
+          }
+
+          // For CF Api - really need to look at refactoring this class
+          if (response.data?.errors) {
+            const err = new Error(response.data.errors.map(e => e.detail).join(', '));
+            err.errors = response.data.errors;
+            throw err;
           }
 
           if (response.status < 500) {

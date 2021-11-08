@@ -1,6 +1,7 @@
 const bulkBuild = require('./bulkBuild');
 const { buildLog, bulkBuildLogs } = require('./build-log');
 const build = require('./build');
+const domain = require('./domain');
 const event = require('./event');
 const organization = require('./organization');
 const responses = require('./responses');
@@ -15,6 +16,7 @@ module.exports = {
   bulkBuildLogs,
   build,
   bulkBuild,
+  domain,
   event,
   organization,
   responses,

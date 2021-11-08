@@ -10,7 +10,7 @@ const { Event } = require('./models');
 
 const { CF_INSTANCE_INDEX } = process.env;
 
-const { app: { app_env: appEnv } } = config;
+const { app: { appEnv } } = config;
 
 function handleResults(results) {
   const errors = results.filter(r => r.status === 'rejected').map(r => r.reason);

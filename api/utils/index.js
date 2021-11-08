@@ -1,10 +1,41 @@
 const fs = require('fs');
+const inflection = require('inflection');
 const path = require('path');
 const moment = require('moment');
 
 const config = require('../../config');
 const { logger } = require('../../winston');
 const Features = require('../features');
+
+/**
+ * @param {string[]} values The enum values
+ * @returns
+ * An object contained capitalized constants for each value and a `values` key
+ * returning the list of values. All values or lowercase.
+ *
+ * Ex.
+ * ```
+ * > buildEnum(['created', 'pending'])
+ * > {
+ *     Created: 'created',
+ *     Pending: 'pending',
+ *     values: ['created', 'pending]
+ *   }
+ * ```
+ */
+function buildEnum(values) {
+  const lowerCaseValues = values.map(value => value.toLowerCase());
+
+  const constants = lowerCaseValues.reduce((acc, value) => ({
+    ...acc,
+    [inflection.capitalize(value)]: value,
+  }), {});
+
+  return {
+    ...constants,
+    values: lowerCaseValues,
+  };
+}
 
 function filterEntity(res, name, field = 'name') {
   let errMsg = `Not found: Entity @${field} = ${name}`;
@@ -139,14 +170,14 @@ function loadAssetManifest() {
 }
 
 function getSiteDisplayEnv() {
-  if (config.app.app_env !== 'production') {
-    return config.app.app_env;
+  if (config.app.appEnv !== 'production') {
+    return config.app.appEnv;
   }
   return null;
 }
 
 function shouldIncludeTracking() {
-  return config.app.app_env === 'production';
+  return config.app.appEnv === 'production';
 }
 
 function mapValues(fn, obj) {
@@ -271,12 +302,15 @@ function defaultContext(req, res) {
     authUAA: Features.enabled(Features.Flags.FEATURE_AUTH_UAA),
     hasUAAIdentity: false,
     nonce: res.locals.cspNonce,
+    isFederalist: process.env.PRODUCT === 'federalist',
+    isPages: process.env.PRODUCT === 'pages',
   };
 
   return context;
 }
 
 module.exports = {
+  buildEnum,
   filterEntity,
   firstEntity,
   generateS3ServiceName,
