@@ -8,10 +8,10 @@
   const dispatch = createEventDispatcher();
 
   const buildContainerNames = ['default', 'exp'];
-  const buildContainerSizes = ['default', 'large'];
+  const buildContainerSizes = ['regular', 'large'];
 
   function replaceDefault(val) {
-    return val === 'default' ? '' : val;
+    return ['default', 'regular'].includes(val) ? '' : val;
   }
   
   function handleSubmit(event) {
