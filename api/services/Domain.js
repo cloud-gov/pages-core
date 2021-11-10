@@ -178,14 +178,9 @@ async function provision(domain, dnsResults) {
  * @param {number} id The domain id
  */
 async function checkDeprovisionStatus(id) {
-  const domain = await Domain.findOne({
-    where: {
-      state: Domain.States.Deprovisioning,
-      id,
-    },
-  });
+  const domain = await Domain.findByPk(id);
 
-  if (!domain) {
+  if (domain.state !== Domain.States.Deprovisioning) {
     return `Domain ${id}|${domain.names} must be ${Domain.States.Deprovisioning} to be deprovisioned, but is ${domain.state}.`;
   }
 
@@ -209,14 +204,9 @@ async function checkDeprovisionStatus(id) {
  * @param {number} id The domain id
  */
 async function checkProvisionStatus(id) {
-  const domain = await Domain.findOne({
-    where: {
-      state: Domain.States.Provisioning,
-      id,
-    },
-  });
+  const domain = await Domain.findByPk(id);
 
-  if (!domain) {
+  if (domain.state !== Domain.States.Provisioning) {
     return `Domain ${id}|${domain.names} must be ${Domain.States.Provisioning} to be provisioned, but is ${domain.state}.`;
   }
 
