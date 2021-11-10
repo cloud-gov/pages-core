@@ -137,7 +137,7 @@ async function fetchDomains(query = {}) {
 }
 
 async function provisionDomain(id) {
-  return post(`/domains/${id}`).catch(() => []);
+  return post(`/domains/${id}/provision`);
 }
 
 async function fetchEvents(query = {}) {
