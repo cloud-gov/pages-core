@@ -1,5 +1,6 @@
 <script>
   import { afterUpdate, createEventDispatcher } from 'svelte';
+  import { RadioInput } from '.';
 
   export let site;
   
@@ -8,10 +9,10 @@
   const dispatch = createEventDispatcher();
 
   const buildContainerNames = ['default', 'exp'];
-  const buildContainerSizes = ['regular', 'large'];
+  const buildContainerSizes = ['default', 'large'];
 
   function replaceDefault(val) {
-    return ['default', 'regular'].includes(val) ? '' : val;
+    return val === 'default' ? '' : val;
   }
   
   function handleSubmit(event) {
@@ -38,61 +39,33 @@
     <h3 class="margin-0">Site Status</h3>
     <fieldset class="usa-fieldset">
       <legend class="usa-legend usa-legend">Is this site active?</legend>
-      <div class="usa-radio">
-        <input
-          class="usa-radio__input"
-          id="active"
-          type="radio"
-          name="active"
-          value="active"
-          checked={site.isActive}
-        />
-        <label class="usa-radio__label" for="active">active</label>
-      </div>
-      <div class="usa-radio">
-        <input
-          class="usa-radio__input"
-          id="inactive"
-          type="radio"
-          name="active"
-          value="inactive"
-          checked={!site.isActive}
-        />
-        <label class="usa-radio__label" for="inactive">inactive</label>
-      </div>
+      <RadioInput
+        label="Build Container Name"
+        name="active"
+        options={['active', 'inactive']}
+        value={site.isActive ? 'active' : 'inactive'}
+      />
     </fieldset>
     <br/>
     <h3 class="margin-0">Build Container Configuration</h3>
     <fieldset class="usa-fieldset">
       <legend class="usa-legend">Build Container Size</legend>
-      {#each buildContainerSizes as buildContainerSize}
-        <div class="usa-radio">
-          <input
-            class="usa-radio__input usa-radio__input--tile"
-            type="radio"
-            name="containerSize"
-            id={buildContainerSize}
-            value={buildContainerSize}
-            checked={((site.containerConfig || {}).size || 'default') === buildContainerSize}>
-          <label class="usa-radio__label" for={buildContainerSize}>{buildContainerSize}</label>
-        </div>
-      {/each}
+      <RadioInput
+        label="Build Container Name"
+        name="containerSize"
+        options={buildContainerSizes}
+        value={(site.containerConfig || {}).size || 'default'}
+      />
     </fieldset>
 
     <fieldset class="usa-fieldset">
       <legend class="usa-legend">Build Container Name</legend>
-      {#each buildContainerNames as buildContainerName}
-        <div class="usa-radio">
-          <input
-            class="usa-radio__input usa-radio__input--tile"
-            type="radio"
-            name="containerName"
-            id={buildContainerName}
-            value={buildContainerName}
-            checked={((site.containerConfig || {}).name || 'default') === buildContainerName}>
-          <label class="usa-radio__label" for={buildContainerName}>{buildContainerName}</label>
-        </div>
-      {/each}
+      <RadioInput
+        label="Build Container Name"
+        name="containerName"
+        options={buildContainerNames}
+        value={(site.containerConfig || {}).name || 'default'}
+      />
     </fieldset>
     <input class="usa-button" type="submit" value="Save" disabled={submitting}>
   </form>
