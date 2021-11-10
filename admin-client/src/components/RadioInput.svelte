@@ -1,14 +1,12 @@
 <script>
   export let error;
   export let hint;
-  export let id;
   export let label;
   export let name;
   export let options;
   export let value;
 
-  $: idValue = id ?? name;
-  $: errorMessageId = `${idValue}-error-message`;
+  $: errorMessageId = `${name}-error-message`;
   $: if (!options.map((option) => option.value ?? option).includes(value)) {
     value = '';
   }
