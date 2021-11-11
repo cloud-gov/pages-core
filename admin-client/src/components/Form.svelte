@@ -1,11 +1,12 @@
 <script>
   import { afterUpdate } from 'svelte';
 
-  export let action = 'Save';
   export let onFailure;
   export let onSubmit;
   export let onSuccess;
-  export let title = 'Form';
+  export let title;
+  export let action = 'Save';
+  export let large = false;
 
   let submitting = false;
   let errors = {};
@@ -35,17 +36,20 @@
 </script>
 
 <form
-  class="usa-form usa-form--large"
+  class="usa-form"
+  class:usa-form--large={large}
   on:submit|preventDefault={handleSubmit} >
 
   <fieldset class="usa-fieldset">
-    <legend class="usa-legend usa-legend--large">
-      {title}
-    </legend>
-
-    <p>
-      Required fields are marked with an asterisk (<abbr title="required" class="usa-hint usa-hint--required">*</abbr>).
-    </p>
+    {#if title}
+      <legend class="usa-legend usa-legend--large">
+        {title}
+      </legend>
+      
+      <p>
+        Required fields are marked with an asterisk (<abbr title="required" class="usa-hint usa-hint--required">*</abbr>).
+      </p>
+    {/if}
     
     {#if hasErrors}
       <div class="usa-alert usa-alert--error usa-alert--slim">
