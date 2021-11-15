@@ -33,6 +33,7 @@ apiRouter.delete('/organization-role', parseJson, AdminControllers.OrganizationR
 apiRouter.put('/organization-role', parseJson, AdminControllers.OrganizationRole.update);
 apiRouter.get('/roles', AdminControllers.Role.list);
 apiRouter.get('/sites', AdminControllers.Site.list);
+apiRouter.get('/sites/raw', AdminControllers.Site.listRaw);
 apiRouter.get('/sites/:id', AdminControllers.Site.findById);
 apiRouter.put('/sites/:id', parseJson, AdminControllers.Site.update);
 apiRouter.delete('/sites/:id', AdminControllers.Site.destroy);
