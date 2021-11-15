@@ -1,10 +1,10 @@
 <script>
   export let error;
   export let hint;
-  export let label;
   export let name;
   export let options;
   export let value;
+  export let tile = false;
 
   $: errorMessageId = `${name}-error-message`;
   $: if (!options.map((option) => option.value ?? option).includes(value)) {
@@ -12,15 +12,15 @@
   }
 
   function getOptionLabel(option) {
-    return option.label || option;
+    return option.label ?? option;
   }
 
   function getOptionValue(option) {
-    return option.value || option;
+    return option.value ?? option;
   }
 
   function getOptionId(option) {
-    return option.id || [name, option].join('-');
+    return [name, getOptionValue(option)].join('-');
   }
 </script>
 
@@ -33,7 +33,8 @@
 {#each options as option}
   <div class="usa-radio">
     <input
-      class="usa-radio__input usa-radio__input--tile"
+      class="usa-radio__input"
+      class:usa-radio__input--tile={tile}
       type=radio
       id={getOptionId(option)}
       bind:group={value}
