@@ -161,7 +161,7 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const domain = await fetchModelById(id, Domain);
+    const domain = await fetchModelById(id, Domain.scope('withSite'));
     if (!domain) {
       return res.notFound();
     }
@@ -170,7 +170,10 @@ module.exports = wrapHandlers({
 
     try {
       const updatedDomain = await DomainService.provision(domain, dnsResults);
-      return res.json(domainSerializer.serialize(updatedDomain, true));
+      return res.json({
+        dnsRecords: DomainService.buildDnsRecords(updatedDomain),
+        domain: domainSerializer.serialize(updatedDomain, true),
+      });
     } catch (error) {
       return res.unprocessableEntity(error);
     }
