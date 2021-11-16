@@ -190,7 +190,7 @@ describe('Domain Service', () => {
 
       const domain = await DomainFactory.create({ state: Domain.States.Provisioning });
 
-      await DomainService.checkProvisionStatus(domain.id);
+      const error = await DomainService.checkProvisionStatus(domain.id).catch(e => e);
 
       await domain.reload();
 
@@ -200,6 +200,7 @@ describe('Domain Service', () => {
       );
       sinon.assert.notCalled(DomainQueue.prototype.add);
       expect(domain.state).to.eq(Domain.States.Failed);
+      expect(error).to.be.an('Error');
     });
 
     it('requeues the status check otherwise', async () => {
