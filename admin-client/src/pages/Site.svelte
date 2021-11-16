@@ -26,9 +26,12 @@
   $: usersPromise = fetchUsers({ site: id });
   $: uevsPromise = fetchUserEnvironmentVariables({ site: id });
 
-  async function handleSubmit({ detail }) {
-    sitePromise = updateSite(id, detail);
-    await sitePromise;
+  async function handleAdminConfigurationSubmit(site) {
+    return updateSite(id, site);
+  }
+
+  async function handleAdminConfigurationSuccess(site) {
+    sitePromise = Promise.resolve(site);
     notification.setSuccess('Site updated successfully');
   }
 
@@ -100,7 +103,10 @@
         </Await>
       </AccordionContent>
       <AccordionContent title="Admin Configuration">
-        <SiteForm {site} on:submit={handleSubmit} />
+        <SiteForm
+          {site}
+          onSubmit={handleAdminConfigurationSubmit}
+          onSuccess={handleAdminConfigurationSuccess} />
       </AccordionContent>
       <AccordionContent title="Recent Builds">
         <Await on={buildsPromise} let:response={builds}>
