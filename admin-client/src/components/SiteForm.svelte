@@ -1,99 +1,66 @@
 <script>
-  import { afterUpdate, createEventDispatcher } from 'svelte';
+  import Form from './Form.svelte';
+  import RadioInput from './RadioInput.svelte';
 
   export let site;
+  export let onSubmit;
+  export let onSuccess;
+
+  const buildContainerNames = [
+    { label: 'default', value: '' },
+    'exp',
+  ];
   
-  let submitting = false;
-
-  const dispatch = createEventDispatcher();
-
-  const buildContainerNames = ['default', 'exp'];
-  const buildContainerSizes = ['default', 'large'];
-
-  function replaceDefault(val) {
-    return val === 'default' ? '' : val;
-  }
+  const buildContainerSizes = [
+    { label: 'default', value: '' },
+    'large',
+  ];
   
-  function handleSubmit(event) {
-    submitting = true;
-    const { containerSize, containerName, active } = event.target.elements;
-
-    dispatch('submit', {
-      containerConfig: {
-        size: replaceDefault(containerSize.value),
-        name: replaceDefault(containerName.value),
-      },
-      isActive: active.value === 'active',
-    });
-  }
-
-  afterUpdate(() => { submitting = false; });
+  const siteStatuses = [
+    { label: 'active', value: true },
+    { label: 'inactive', value: false },
+  ];
 </script>
 
 <div class="grid-row">
-  <form
-    class="usa-form padding-1 grid-col-8 grid-offset-4"
-    on:submit|preventDefault={handleSubmit}
-  >
-    <h3 class="margin-0">Site Status</h3>
-    <fieldset class="usa-fieldset">
-      <legend class="usa-legend usa-legend">Is this site active?</legend>
-      <div class="usa-radio">
-        <input
-          class="usa-radio__input"
-          id="active"
-          type="radio"
-          name="active"
-          value="active"
-          checked={site.isActive}
-        />
-        <label class="usa-radio__label" for="active">active</label>
-      </div>
-      <div class="usa-radio">
-        <input
-          class="usa-radio__input"
-          id="inactive"
-          type="radio"
-          name="active"
-          value="inactive"
-          checked={!site.isActive}
-        />
-        <label class="usa-radio__label" for="inactive">inactive</label>
-      </div>
-    </fieldset>
-    <br/>
-    <h3 class="margin-0">Build Container Configuration</h3>
-    <fieldset class="usa-fieldset">
-      <legend class="usa-legend">Build Container Size</legend>
-      {#each buildContainerSizes as buildContainerSize}
-        <div class="usa-radio">
-          <input
-            class="usa-radio__input usa-radio__input--tile"
-            type="radio"
-            name="containerSize"
-            id={buildContainerSize}
-            value={buildContainerSize}
-            checked={((site.containerConfig || {}).size || 'default') === buildContainerSize}>
-          <label class="usa-radio__label" for={buildContainerSize}>{buildContainerSize}</label>
-        </div>
-      {/each}
-    </fieldset>
+  <div class="grid-col-8 grid-offset-4">
+    <Form
+      action="Update"
+      onSubmit={() => onSubmit(site)}
+      {onSuccess}
+      let:errors={errors}>
 
-    <fieldset class="usa-fieldset">
-      <legend class="usa-legend">Build Container Name</legend>
-      {#each buildContainerNames as buildContainerName}
-        <div class="usa-radio">
-          <input
-            class="usa-radio__input usa-radio__input--tile"
-            type="radio"
-            name="containerName"
-            id={buildContainerName}
-            value={buildContainerName}
-            checked={((site.containerConfig || {}).name || 'default') === buildContainerName}>
-          <label class="usa-radio__label" for={buildContainerName}>{buildContainerName}</label>
-        </div>
-      {/each}
-    </fieldset>
-    <input class="usa-button" type="submit" value="Save" disabled={submitting}>
-  </form>
+      <fieldset class="usa-fieldset">
+        <legend class="usa-legend usa-legend">Site Status</legend>
+        <RadioInput
+          error={errors.isActive}
+          name="active"
+          options={siteStatuses}
+          bind:value={site.isActive}
+        />
+      </fieldset>
+
+      <fieldset class="usa-fieldset">
+        <legend class="usa-legend">Build Container Size</legend>
+        <RadioInput
+          error={errors?.containerConfig?.size}
+          name="containerSize"
+          options={buildContainerSizes}
+          bind:value={site.containerConfig.size}
+          tile={true}
+        />
+      </fieldset>
+
+      <fieldset class="usa-fieldset">
+        <legend class="usa-legend">Build Container Name</legend>
+        <RadioInput
+          error={errors?.containerConfig?.name}
+          name="containerName"
+          options={buildContainerNames}
+          bind:value={site.containerConfig.name}
+          tile={true}
+        />
+      </fieldset>
+    </Form>
+  </div>
 </div>
