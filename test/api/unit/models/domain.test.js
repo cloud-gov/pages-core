@@ -108,4 +108,24 @@ describe('Domain model', () => {
       expect(result.Site.id).to.eq(site.id);
     });
   });
+
+  describe('.stateScope()', () => {
+    it('returns domains by state', async () => {
+      const site = await Factory.site();
+
+      const [domain1,, domain3] = await Promise
+        .all([
+          Domain.States.Provisioned,
+          Domain.States.Pending,
+          Domain.States.Provisioned,
+        ]
+          .map(state => Domain.create({
+            siteId: site.id, names: 'www.example.gov', context: Domain.Contexts.Site, state,
+          })));
+
+      const result = await Domain.scope(Domain.stateScope(Domain.States.Provisioned)).findAll();
+
+      expect(result.map(domain => domain.id)).to.have.members([domain1.id, domain3.id]);
+    });
+  });
 });

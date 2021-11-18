@@ -2,11 +2,11 @@
   import page from 'page';
   import { notification } from '../../stores';
   import { Await, GridContainer } from '../../components';
-  import { createDomain, fetchSites } from '../../lib/api';
+  import { createDomain, fetchRawSites } from '../../lib/api';
 
   import Form from './Form.svelte';
 
-  $: sitesPromise = fetchSites();
+  $: sitesPromise = fetchRawSites();
 
   function onSuccess() {
     page('/domains');
@@ -19,7 +19,7 @@
     <Form
       onSubmit={createDomain}
       {onSuccess}
-      sites={sites.data}
+      {sites}
     />
   </Await>
 </GridContainer>
