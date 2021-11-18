@@ -7,7 +7,7 @@ const domainSerializer = require('../../serializers/domain');
 module.exports = wrapHandlers({
   async list(req, res) {
     const {
-      limit, page, search, site,
+      limit, page, search, site, state,
     } = req.query;
 
     const scopes = ['withSite'];
@@ -18,6 +18,10 @@ module.exports = wrapHandlers({
 
     if (site) {
       scopes.push(Domain.siteScope(site));
+    }
+
+    if (state) {
+      scopes.push(Domain.stateScope(state));
     }
 
     const [pagination, sites] = await Promise.all([
@@ -31,7 +35,10 @@ module.exports = wrapHandlers({
     ]);
 
     const json = {
-      meta: { sites },
+      meta: {
+        sites,
+        states: Domain.States.values,
+      },
       ...pagination,
     };
 
@@ -161,7 +168,7 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const domain = await fetchModelById(id, Domain);
+    const domain = await fetchModelById(id, Domain.scope('withSite'));
     if (!domain) {
       return res.notFound();
     }
@@ -170,7 +177,10 @@ module.exports = wrapHandlers({
 
     try {
       const updatedDomain = await DomainService.provision(domain, dnsResults);
-      return res.json(domainSerializer.serialize(updatedDomain, true));
+      return res.json({
+        dnsRecords: DomainService.buildDnsRecords(updatedDomain),
+        domain: domainSerializer.serialize(updatedDomain, true),
+      });
     } catch (error) {
       return res.unprocessableEntity(error);
     }

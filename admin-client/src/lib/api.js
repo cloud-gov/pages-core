@@ -137,7 +137,7 @@ async function fetchDomains(query = {}) {
 }
 
 async function provisionDomain(id) {
-  return post(`/domains/${id}`).catch(() => []);
+  return post(`/domains/${id}/provision`);
 }
 
 async function fetchEvents(query = {}) {
@@ -178,6 +178,10 @@ async function fetchSite(id) {
 
 async function fetchSites(query = {}) {
   return get('/sites', query).catch(() => []);
+}
+
+async function fetchRawSites() {
+  return get('/sites/raw').catch(() => []);
 }
 
 async function updateSite(id, params) {
@@ -232,6 +236,7 @@ export {
   fetchRoles,
   fetchSite,
   fetchSites,
+  fetchRawSites,
   fetchUserEnvironmentVariables,
   fetchUser,
   fetchUsers,
