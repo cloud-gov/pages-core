@@ -95,8 +95,8 @@
                             <select class="usa-select" name={field.name} id={field.name}>
                               <option value="">-</option>
                               {#each field.options(payload.meta) as opt}
-                                <option value={opt.value} selected={`${opt.value}` === params[field.name]}>
-                                  {opt.name}
+                                <option value={opt.value ?? opt} selected={`${opt.value ?? opt}` === params[field.name]}>
+                                  {opt.name ?? opt}
                                 </option>
                               {/each}
                             </select>

@@ -42,6 +42,12 @@ function associate({ Domain, Site }) {
       required: true,
     }],
   });
+
+  Domain.addScope('byState', state => ({
+    where: {
+      state,
+    },
+  }));
 }
 
 function define(sequelize, DataTypes) {
@@ -93,6 +99,7 @@ function define(sequelize, DataTypes) {
   Domain.associate = associate;
   Domain.searchScope = search => ({ method: ['byIdOrText', search] });
   Domain.siteScope = siteId => ({ method: ['bySite', siteId] });
+  Domain.stateScope = state => ({ method: ['byState', state] });
   Domain.States = States;
   Domain.Contexts = Contexts;
   Domain.prototype.isPending = function isPending() {
