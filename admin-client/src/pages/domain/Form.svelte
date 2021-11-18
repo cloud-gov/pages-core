@@ -36,6 +36,7 @@
   onSubmit={() => onSubmit(domain)}
   {onSuccess}
   title="Create Domain"
+  large={true}
   let:errors={errors}>
 
   <SelectInput

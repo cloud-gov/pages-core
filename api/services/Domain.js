@@ -178,15 +178,10 @@ async function provision(domain, dnsResults) {
  * @param {number} id The domain id
  */
 async function checkDeprovisionStatus(id) {
-  const domain = await Domain.findOne({
-    where: {
-      state: Domain.States.Deprovisioning,
-      id,
-    },
-  });
+  const domain = await Domain.findByPk(id);
 
-  if (!domain) {
-    return;
+  if (domain.state !== Domain.States.Deprovisioning) {
+    return `Domain ${id}|${domain.names} must be ${Domain.States.Deprovisioning} to be deprovisioned, but is ${domain.state}.`;
   }
 
   const { resources } = await cfApi().fetchServiceInstances(domain.serviceName);
@@ -198,35 +193,36 @@ async function checkDeprovisionStatus(id) {
       serviceName: null,
       state: States.Pending,
     });
-  } else {
-    queueDeprovisionStatusCheck(id);
+    return `Domain ${id}|${domain.names} successfully deprovisioned.`;
   }
+  // TODO - this does not handle the case where deprovisioning fails
+  queueDeprovisionStatusCheck(id);
+  return `Domain ${id}|${domain.names} is currently deprovisioning.`;
 }
 
+/**
+ * @param {number} id The domain id
+ */
 async function checkProvisionStatus(id) {
-  const domain = await Domain.findOne({
-    where: {
-      state: Domain.States.Provisioning,
-      id,
-    },
-  });
+  const domain = await Domain.findByPk(id);
 
-  if (!domain) {
-    return;
+  if (domain.state !== Domain.States.Provisioning) {
+    return `Domain ${id}|${domain.names} must be ${Domain.States.Provisioning} to be provisioned, but is ${domain.state}.`;
   }
 
   const service = await cfApi().fetchServiceInstance(domain.serviceName);
+  const { last_operation: lastOperation } = service.entity;
 
-  switch (service.entity.last_operation) {
+  switch (lastOperation) {
     case 'succeeded':
       await domain.update({ state: States.Provisioned });
-      break;
+      return `Domain ${id}|${domain.names} successfully provisioned.`;
     case 'failed':
       await domain.update({ state: States.Failed });
-      break;
+      throw new Error(`Domain ${id}|${domain.names} failed to provision.`);
     default:
       queueProvisionStatusCheck(id);
-      break;
+      return `Domain ${id}|${domain.names} is currently ${lastOperation}.`;
   }
 }
 

@@ -11,6 +11,10 @@
         value: site.id,
       })),
     },
+    state: {
+      type: 'select',
+      options: (meta) => meta.states,
+    },
   };
 </script>
 
