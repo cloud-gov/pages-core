@@ -1,8 +1,9 @@
-const { Organization, Site } = require('../../models');
+const { Organization, Site, Event } = require('../../models');
 const SiteDestroyer = require('../../services/SiteDestroyer');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, pick, wrapHandlers } = require('../../utils');
 const { serializeNew, serializeMany } = require('../../serializers/site');
+const EventCreator = require('../../services/EventCreator');
 
 const updateableAttrs = [
   'containerConfig',
@@ -61,8 +62,13 @@ module.exports = wrapHandlers({
 
     const site = await fetchModelById(id, Site);
     if (!site) return res.notFound();
-
     await site.update(pick(updateableAttrs, body));
+
+    if (site.isActive && body.isActive === false) {
+      EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Site Deactivated', { site });
+    } else if (!site.isActive && body.isActive === true) {
+      EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Site Activated', { site });
+    }
 
     return res.json(serializeNew(site, true));
   },
@@ -74,6 +80,8 @@ module.exports = wrapHandlers({
 
     // This will not remove the webhook since we don't have permissions
     await SiteDestroyer.destroySite(site);
+    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'Site Destroyed', { site });
+
     return res.json({});
   },
 });
