@@ -79,7 +79,7 @@ module.exports = wrapHandlers({
         eventAtts.name = name;
       }
       if (Object.keys(eventAtts).length > 0) {
-        EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Organization Updated', {
+        EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Organization Updated', {
           organization: { ...eventAtts, id: organization.id },
         });
       }

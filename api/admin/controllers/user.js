@@ -80,12 +80,12 @@ module.exports = wrapHandlers({
     const { email, inviteLink: link } = await OrganizationService.inviteUserToOrganization(
       user, toInt(organizationId), toInt(roleId), uaaEmail, githubUsername
     );
-    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'User Invited', {
+    EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'User Invited', {
       organizationId, roleId, email, link, githubUsername,
     });
     if (link) {
       await Mailer.sendUAAInvite(email, link);
-      EventCreator.audit(req.user, Event.labels.USER_ACTION, 'User Invite Sent', { user: { email }, link });
+      EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'User Invite Sent', { user: { email }, link });
     }
 
     const json = {
@@ -102,7 +102,7 @@ module.exports = wrapHandlers({
     } = req;
 
     const { email, inviteLink: link } = await OrganizationService.resendInvite(user, uaaEmail);
-    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'User Invite Resent', { user: { email }, link });
+    EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'User Invite Resent', { user: { email }, link });
     if (link) {
       await Mailer.sendUAAInvite(email, link);
     }
