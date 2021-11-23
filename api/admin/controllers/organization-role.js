@@ -1,7 +1,8 @@
 const organizationRoleSerializer = require('../../serializers/organization-role');
-const { Organization, OrganizationRole } = require('../../models');
+const { Organization, OrganizationRole, Event } = require('../../models');
 const { toInt, wrapHandlers } = require('../../utils');
 const { fetchModelById } = require('../../utils/queryDatabase');
+const EventCreator = require('../../services/EventCreator');
 
 module.exports = wrapHandlers({
   async destroy(req, res) {
@@ -21,6 +22,7 @@ module.exports = wrapHandlers({
         userId: toInt(userId),
       },
     });
+    EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'OrganizationRole Removed', { organizationRole: { organizationId, userId } });
 
     return res.json({});
   },
@@ -43,7 +45,7 @@ module.exports = wrapHandlers({
         userId: toInt(userId),
       },
     });
-
+    EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'OrganizationRole Updated', { organizationRole: { organizationId, userId, roleId } });
     const member = await OrganizationRole.forOrganization(org)
       .findOne({ where: { userId: toInt(userId) } });
 

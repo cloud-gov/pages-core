@@ -1,8 +1,9 @@
 const { serialize, serializeMany } = require('../../serializers/organization');
 const { paginate, wrapHandlers } = require('../../utils');
-const { Organization } = require('../../models');
+const { Organization, Event } = require('../../models');
 const Mailer = require('../../services/mailer');
 const OrganizationService = require('../../services/organization');
+const EventCreator = require('../../services/EventCreator');
 const { fetchModelById } = require('../../utils/queryDatabase');
 
 module.exports = wrapHandlers({
@@ -66,11 +67,29 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
+    const auditUpdate = (organization) => {
+      const eventAtts = {};
+      if (organization.isSandbox !== sandbox) {
+        eventAtts.sandbox = sandbox;
+      }
+      if (organization.isActive !== active) {
+        eventAtts.active = active;
+      }
+      if (organization.name !== name) {
+        eventAtts.name = name;
+      }
+      if (Object.keys(eventAtts).length > 0) {
+        EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Organization Updated', {
+          organization: { ...eventAtts, id: organization.id },
+        });
+      }
+    };
+
     const org = await fetchModelById(id, Organization);
     if (!org) return res.notFound();
 
     await org.update({ isSandbox: sandbox, name, isActive: active });
-
+    auditUpdate(org);
     return res.json(serialize(org));
   },
 });

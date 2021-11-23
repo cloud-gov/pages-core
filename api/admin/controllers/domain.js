@@ -1,7 +1,8 @@
-const { Domain, Site } = require('../../models');
+const { Domain, Site, Event } = require('../../models');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, wrapHandlers } = require('../../utils');
 const DomainService = require('../../services/Domain');
+const EventCreator = require('../../services/EventCreator');
 const domainSerializer = require('../../serializers/domain');
 
 module.exports = wrapHandlers({
@@ -79,6 +80,7 @@ module.exports = wrapHandlers({
 
     try {
       const domain = await Domain.create({ siteId, context, names });
+      EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'Domain Created', { domain });
       return res.json(domainSerializer.serialize(domain, true));
     } catch (err) {
       if (!err.errors) {
@@ -104,6 +106,7 @@ module.exports = wrapHandlers({
 
     try {
       await DomainService.destroy(domain);
+      EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'Domain Destroyed', { domain });
       return res.json({});
     } catch (error) {
       return res.unprocessableEntity(error);
@@ -157,6 +160,7 @@ module.exports = wrapHandlers({
 
     try {
       const updatedDomain = await DomainService.deprovision(domain);
+      EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'Domain Deprovisioned', { domain });
       return res.json(domainSerializer.serialize(updatedDomain, true));
     } catch (error) {
       return res.unprocessableEntity(error);
@@ -177,6 +181,7 @@ module.exports = wrapHandlers({
 
     try {
       const updatedDomain = await DomainService.provision(domain, dnsResults);
+      EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'Domain Provisioned', { domain: updatedDomain });
       return res.json({
         dnsRecords: DomainService.buildDnsRecords(updatedDomain),
         domain: domainSerializer.serialize(updatedDomain, true),
