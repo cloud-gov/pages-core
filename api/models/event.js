@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     SITE_USER: 'site-user',
     REQUEST_HANDLER: 'request-handler',
     USER_ACTION: 'user-action',
+    ADMIN_ACTION: 'admin-action',
   };
 
   function isValidType(value) {

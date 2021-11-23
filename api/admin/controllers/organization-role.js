@@ -22,7 +22,7 @@ module.exports = wrapHandlers({
         userId: toInt(userId),
       },
     });
-    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'OrganizationRole Removed', { organizationRole: { organizationId, userId } });
+    EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'OrganizationRole Removed', { organizationRole: { organizationId, userId } });
 
     return res.json({});
   },
@@ -45,7 +45,7 @@ module.exports = wrapHandlers({
         userId: toInt(userId),
       },
     });
-    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'OrganizationRole Updated', { organizationRole: { organizationId, userId, roleId } });
+    EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'OrganizationRole Updated', { organizationRole: { organizationId, userId, roleId } });
     const member = await OrganizationRole.forOrganization(org)
       .findOne({ where: { userId: toInt(userId) } });
 

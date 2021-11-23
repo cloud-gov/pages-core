@@ -69,7 +69,7 @@ module.exports = wrapHandlers({
     if (!build) return res.notFound();
 
     await build.update({ state });
-    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'Build Updated', { build: { id, state } });
+    EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'Build Updated', { build: { id, state } });
 
     return res.json(buildSerializer.serializeObject(build));
   },
