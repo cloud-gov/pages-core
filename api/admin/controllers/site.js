@@ -11,6 +11,11 @@ const updateableAttrs = [
 ];
 
 module.exports = wrapHandlers({
+  listRaw: async (req, res) => {
+    const sites = await Site.findAll({ attributes: ['id', 'owner', 'repository'], raw: true });
+    return res.json(sites);
+  },
+
   list: async (req, res) => {
     const {
       limit, page, organization, search,

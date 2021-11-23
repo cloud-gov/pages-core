@@ -180,6 +180,10 @@ async function fetchSites(query = {}) {
   return get('/sites', query).catch(() => []);
 }
 
+async function fetchRawSites() {
+  return get('/sites/raw').catch(() => []);
+}
+
 async function updateSite(id, params) {
   return put(`/sites/${id}`, params).catch(() => null);
 }
@@ -232,6 +236,7 @@ export {
   fetchRoles,
   fetchSite,
   fetchSites,
+  fetchRawSites,
   fetchUserEnvironmentVariables,
   fetchUser,
   fetchUsers,
