@@ -12,7 +12,8 @@
     "demoViewLink",
     "previewLink",
     "basicAuth",
-    "createdAt"
+    "createdAt",
+    "isActive"
   ],
   "properties": {
     "id": {
@@ -86,6 +87,9 @@
           "type": "string"
         }
       }
+    },
+    "isActive": {
+      "type": "boolean"
     },
     "containerConfig": {
       "type": "object",

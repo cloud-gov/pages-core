@@ -35,7 +35,6 @@ module.exports = {
       ],
       'script-src': [
         "'self'",
-        'www.googletagmanager.com',
         'dap.digitalgov.gov',
         'www.google-analytics.com',
         (_, res) => `'nonce-${res.locals.cspNonce}'`,
@@ -55,4 +54,5 @@ module.exports = {
     action: 'deny',
   },
   xssFilter: false,
+  hsts: false,
 };

@@ -32,59 +32,39 @@ describe('Main Site', () => {
   });
 
   describe('App /404', () => {
-    it('should redirect to / with a flash error when not authenticated', (done) => {
-      request(app)
+    it('should redirect to / with a flash error when not authenticated', async () => {
+      const response = await request(app)
         .get('/blahblahpage')
-        .expect(302)
-        .then((response) => {
-          expect(response.headers.location).to.equal('/404-not-found/');
-          expect(response.text.indexOf('Found. Redirecting to /404-not-found/')).to.be.above(-1);
-          done();
-        })
-        .catch(done);
+        .expect(404);
+
+      expect(/Log in with (Github|cloud\.gov)/.test(response.text)).to.be.true;
+      expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
     });
 
-    it('should work when authenticated', (done) => {
-      authenticatedSession()
-        .then(cookie => request(app)
-          .get('/blahblahpage')
-          .set('Cookie', cookie)
-          .expect(302))
-        .then((response) => {
-          expect(response.headers.location).to.equal('/404-not-found/');
-          expect(response.text.indexOf('Found. Redirecting to /404-not-found/')).to.be.above(-1);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should have app content', (done) => {
-      authenticatedSession()
-        .then(cookie => request(app)
-          .get('/404-not-found/')
-          .set('Cookie', cookie)
-          .expect(200))
-        .then((response) => {
-          expect(response.text.indexOf('Log out')).to.be.above(-1);
-          expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should have app content', (done) => {
-      request(app)
-        .get('/404-not-found/')
-        .expect(200)
-        .then((response) => {
-          expect(response.text.indexOf('Log in')).to.be.above(-1);
-          expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
-          done();
-        })
-        .catch(done);
+    it('should work when authenticated', async () => {
+      const cookie = await authenticatedSession();
+      const response = await request(app)
+        .get('/blahblahpage')
+        .set('Cookie', cookie)
+        .expect(404);
+      expect(response.text.indexOf('Log out')).to.be.above(-1);
+      expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
     });
   });
 
+  describe('options method', () => {
+    it('should respond with a 404 for an options request without path', async () => {
+      await request(app)
+        .options('/')
+        .expect(404);
+    });
+
+    it('should respond with a 404 for an options request with a path', async () => {
+      await request(app)
+        .options('/boo/hoo')
+        .expect(404);
+    });
+  });
   describe('App /sites', () => {
     it('should redirect to / with a flash error when not authenticated', (done) => {
       request(app)
@@ -261,7 +241,7 @@ describe('Main Site', () => {
 
 describe('robots.txt', () => {
   it('denies robots when not in production', (done) => {
-    config.app.app_env = 'boop';
+    config.app.appEnv = 'boop';
 
     request(app)
       .get('/robots.txt')

@@ -37,6 +37,7 @@
     s3ServiceName,
     updatedAt,
     viewLink,
+    isActive,
   } = site;
 
   const createDate = formatDateTime(createdAt);
@@ -63,6 +64,10 @@
         </a>
       </div>
       <div class="tablet:grid-col-auto padding-bottom-1">
+        <p class="font-mono-3xs text-ink">
+          Status
+          <span class="text-base">{isActive ? 'Active' : 'Inactive'}</span>
+        </p>
         <p class="font-mono-3xs text-ink">
           Created
           <span class="text-base">{createDate}</span>

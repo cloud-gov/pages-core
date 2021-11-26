@@ -429,14 +429,14 @@ describe('GithubBuildHelper', () => {
     });
 
     context('with every build', () => {
-      const origAppEnv = config.app.app_env;
+      const origAppEnv = config.app.appEnv;
       let user;
       let site;
       let build;
       let users;
       after(() => {
-        // reset config.app.app_env to its original value
-        config.app.app_env = origAppEnv;
+        // reset config.app.appEnv to its original value
+        config.app.appEnv = origAppEnv;
       });
 
       beforeEach(async() => {
@@ -453,7 +453,7 @@ describe('GithubBuildHelper', () => {
       })
 
       it('should set status context to "federalist/build" when APP_ENV is "production"', async() => {
-        config.app.app_env = 'production';
+        config.app.appEnv = 'production';
         const repoNock = githubAPINocks.repo({
           accessToken: 'fake-access-token',
           owner: 'test-owner',

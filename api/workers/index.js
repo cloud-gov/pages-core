@@ -4,8 +4,9 @@ const IORedis = require('ioredis');
 const { app: appConfig, mailer: mailerConfig, redis: redisConfig } = require('../../config');
 const { logger } = require('../../winston');
 
+const DomainService = require('../services/Domain');
 const {
-  MailQueueName, ScheduledQueue, ScheduledQueueName, SlackQueueName,
+  DomainQueueName, MailQueueName, ScheduledQueue, ScheduledQueueName, SlackQueueName,
 } = require('../queues');
 
 const Processors = require('./jobProcessors');
@@ -66,9 +67,22 @@ async function start() {
   });
 
   const slackJobProcessor = job => slack.send(job.data);
+  const domainJobProcessor = (job) => {
+    switch (job.name) {
+      case 'checkProvisionStatus':
+        DomainService.checkProvisionStatus(job.data.id);
+        break;
+      case 'checkDeprovisionStatus':
+        DomainService.checkDeprovisionStatus(job.data.id);
+        break;
+      default:
+        throw new Error(`Unknown job name ${job.name} for Domain Queue`);
+    }
+  };
 
   // Workers
   const workers = [
+    new QueueWorker(DomainQueueName, connection, domainJobProcessor),
     new QueueWorker(MailQueueName, connection, mailJobProcessor),
     new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
     new QueueWorker(SlackQueueName, connection, slackJobProcessor),
@@ -76,6 +90,7 @@ async function start() {
 
   // Schedulers
   const schedulers = [
+    new QueueScheduler(DomainQueueName, { connection }),
     new QueueScheduler(MailQueueName, { connection }),
     new QueueScheduler(ScheduledQueueName, { connection }),
     new QueueScheduler(SlackQueueName, { connection }),
@@ -113,7 +128,7 @@ async function start() {
     scheduledQueue.add('revokeMembershipForUAAUsers', {}, nightlyJobConfig),
   ];
 
-  if (appConfig.app_env === 'production') {
+  if (appConfig.appEnv === 'production') {
     jobs.push(scheduledQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig));
     jobs.push(scheduledQueue.add('sandboxNotifications', {}, nightlyJobConfig));
     jobs.push(scheduledQueue.add('cleanSandboxOrganizations', {}, nightlyJobConfig));

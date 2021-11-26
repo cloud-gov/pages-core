@@ -30,7 +30,7 @@ describe('slacker', () => {
         expect(job.name).to.eq('alert');
         expect(job.data.channel).to.eq('federalist-supportstream');
         expect(job.data.text).to.eq(Templates.alert({ errors, reason }));
-        expect(job.data.username).to.eq(`Federalist ${config.app.app_env} Alerts`);
+        expect(job.data.username).to.eq(`Federalist ${config.app.appEnv} Alerts`);
       });
     });
   });
