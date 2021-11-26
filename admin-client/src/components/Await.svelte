@@ -3,7 +3,9 @@
 </script>
 
 {#await on}
-  <p>Loading...</p>
+  <slot name="loading">
+    <p>Loading...</p>
+  </slot>
 {:then response}
   <slot {response}>{response}</slot>
 {:catch error}

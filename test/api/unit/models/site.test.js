@@ -226,6 +226,11 @@ describe('Site model', () => {
     expect((await site.getOrganization()).equals(org)).to.be.true;
   });
 
+  it('repoLastVerified should not be null by default', async () => {
+    const { repoLastVerified } = await factory.site();
+    expect(repoLastVerified).to.be.an.instanceOf(Date);
+  });
+
   describe('forUser scope', () => {
     it('returns sites in the org of the user and non-org sites', async () => {
       const [user1, user2, org1, org2, userRole] = await Promise.all([

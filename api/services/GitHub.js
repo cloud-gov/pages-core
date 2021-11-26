@@ -169,7 +169,7 @@ function getNextCollaborators(github, owner, repo, { page = 1, allCollabs = [] }
 async function findWebhookId(github, site) {
   const { owner, repository: repo } = site;
 
-  const { app_env: appEnv } = config.app;
+  const { appEnv } = config.app;
 
   // Hardcoded for staging and production since:
   // - only Federalist webhooks will be missing webhook Ids

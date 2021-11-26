@@ -6,5 +6,6 @@ export { default as Login } from './Login.svelte';
 export { default as NotFound } from './NotFound.svelte';
 export { default as Site } from './Site.svelte';
 export { default as Sites } from './Sites.svelte';
+export * as Domain from './domain';
 export * as Organization from './organization';
 export * as User from './user';

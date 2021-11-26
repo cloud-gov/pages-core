@@ -107,7 +107,7 @@ describe('Organization API', () => {
       await currentUser.addOrganization(org, { through: { roleId: userRole.id } });
 
       const response = await authenticatedRequest.get(`/v0/organization/${org.id}`);
-
+      validateAgainstJSONSchema('GET', '/organization/{id}', 404, response.body);
       expect(response.statusCode).to.equal(404);
     });
 
@@ -119,6 +119,16 @@ describe('Organization API', () => {
 
       validateAgainstJSONSchema('GET', '/organization/{id}', 200, response.body);
       expect(response.body.id).to.eq(org.id);
+    });
+
+    it('returns a 404 if the user is a manager of an inactive organization', async () => {
+      const org = await factory.organization.create({ isActive: false });
+      await currentUser.addOrganization(org, { through: { roleId: managerRole.id } });
+
+      const response = await authenticatedRequest.get(`/v0/organization/${org.id}`);
+
+      validateAgainstJSONSchema('GET', '/organization/{id}', 404, response.body);
+      expect(response.statusCode).to.equal(404);
     });
   });
 
@@ -182,6 +192,40 @@ describe('Organization API', () => {
       expect(member.User.id).to.eq(targetUser.id);
       sinon.assert.calledOnceWithExactly(Mailer.sendUAAInvite, uaaEmail, inviteLink);
     });
+
+    it('returns a 400 error if the user is a manager of an inactive organization', async () => {
+      const uaaEmail = 'foo@bar.com';
+      const roleId = userRole.id;
+
+      const [targetUser, org] = await Promise.all([
+        factory.user(),
+        factory.organization.create({ isActive: false }),
+      ]);
+
+      await Promise.all([
+        currentUser.addOrganization(org, { through: { roleId: managerRole.id } }),
+        targetUser.addOrganization(org, { through: { roleId } }),
+        factory.uaaIdentity({ userId: currentUser.id }),
+        factory.uaaIdentity({ userId: targetUser.id, email: uaaEmail }),
+      ]);
+
+      const inviteLink = 'https://example.com';
+
+      sinon.stub(OrganizationService, 'inviteUserToOrganization')
+        .resolves({
+          email: uaaEmail,
+          inviteLink,
+        });
+
+      sinon.stub(Mailer, 'sendUAAInvite').resolves();
+
+      const response = await authenticatedRequest
+        .post(`/v0/organization/${org.id}/invite`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ roleId, uaaEmail });
+
+      validateAgainstJSONSchema('POST', '/organization/{id}/invite', 400, response.body);
+    });
   });
 
   describe('GET /v0/organization/:id/members', () => {
@@ -212,6 +256,22 @@ describe('Organization API', () => {
       validateAgainstJSONSchema('GET', '/organization/{id}/members', 200, response.body);
       const orgRoles = response.body;
       expect(orgRoles.map(or => or.User.id)).to.have.members([currentUser.id, user.id]);
+    });
+
+    it('returns a 404 if the user is a manager of an inactive organization', async () => {
+      const [user, org] = await Promise.all([
+        factory.user(),
+        factory.organization.create({ isActive: false }),
+      ]);
+
+      await Promise.all([
+        currentUser.addOrganization(org, { through: { roleId: managerRole.id } }),
+        user.addOrganization(org, { through: { roleId: userRole.id } }),
+      ]);
+
+      const response = await authenticatedRequest.get(`/v0/organization/${org.id}/members`);
+
+      validateAgainstJSONSchema('GET', '/organization/{id}/members', 404, response.body);
     });
   });
 });

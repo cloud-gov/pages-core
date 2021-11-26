@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const nock = require('nock');
+const config = require('../../../../config');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
 const mockTokenRequest = require('../../support/cfAuthNock');
 const apiNocks = require('../../support/cfAPINocks');
@@ -243,6 +244,24 @@ describe('CloudFoundryAPIClient', () => {
           done();
         })
         .catch(done);
+    });
+  });
+
+  describe('.createExternalDomain()', () => {
+    it('creates the service', async () => {
+      const domains = 'www.agency.gov';
+      const name = 'www.agency.gov-ext';
+      const origin = 'abc.sites.pages.cloud.gov';
+      const path = '/site/owner/repo/';
+
+      mockTokenRequest();
+      apiNocks.mockFetchSpacesRequest(config.env.cfCdnSpaceName, { resources: [{ guid: 'guid' }] });
+      apiNocks.mockCreateService({
+        domains, name, origin, path,
+      }, {});
+
+      const apiClient = new CloudFoundryAPIClient();
+      await apiClient.createExternalDomain(domains, name, origin, path);
     });
   });
 });

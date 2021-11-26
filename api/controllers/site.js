@@ -4,9 +4,10 @@ const SiteCreator = require('../services/SiteCreator');
 const SiteDestroyer = require('../services/SiteDestroyer');
 const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const UserActionCreator = require('../services/UserActionCreator');
+const EventCreator = require('../services/EventCreator');
 const siteSerializer = require('../serializers/site');
 const {
-  Build, Organization, Site, User,
+  Build, Organization, Site, User, Event,
 } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const {
@@ -66,6 +67,7 @@ module.exports = wrapHandlers({
 
     await authorizer.destroy(user, site);
     await SiteDestroyer.destroySite(site, user);
+    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'Site Destroyed', { site });
     return res.json({});
   },
 
@@ -79,6 +81,9 @@ module.exports = wrapHandlers({
     const site = await SiteMembershipCreator.createSiteMembership({
       user,
       siteParams: body,
+    });
+    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'SiteUser Created', {
+      siteUser: { siteId: site.id, userId: user.id },
     });
     const siteJSON = await siteSerializer.serialize(site);
     return res.json(siteJSON);
@@ -103,6 +108,10 @@ module.exports = wrapHandlers({
 
     await authorizer.removeUser(req.user, site);
     await SiteMembershipCreator.revokeSiteMembership({ user: req.user, site, userId });
+    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'SiteUser Removed', {
+      siteUser: { siteId: site.id, userId },
+    });
+    // UserActionCreator to be deleted
     await UserActionCreator.addRemoveAction({
       userId: req.user.id,
       targetId: userId,
@@ -134,7 +143,7 @@ module.exports = wrapHandlers({
       user,
       siteParams,
     });
-
+    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'Site Created', { site });
     await site.reload({ include: [Organization, User] });
     const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
@@ -152,7 +161,7 @@ module.exports = wrapHandlers({
     await authorizer.update(user, site);
 
     const params = Object.assign(site, body);
-    await site.update({
+    const updateParams = {
       demoBranch: params.demoBranch,
       demoDomain: params.demoDomain,
       defaultConfig: params.defaultConfig,
@@ -161,8 +170,11 @@ module.exports = wrapHandlers({
       defaultBranch: params.defaultBranch,
       domain: params.domain,
       engine: params.engine,
+    };
+    await site.update(updateParams);
+    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'Site Updated', {
+      site: { ...updateParams, id: site.id },
     });
-
     await Build.create({
       user: req.user.id,
       site: site.id,

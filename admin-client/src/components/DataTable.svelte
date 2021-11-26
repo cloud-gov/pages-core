@@ -29,4 +29,8 @@
   :global(.usa-table tbody tr:hover td) {
     background-color: #f5f5f5;
   }
+
+  * {
+    font-size: 95%;
+  }
 </style>

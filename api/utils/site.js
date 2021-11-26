@@ -2,6 +2,10 @@ const config = require('../../config');
 
 const { proxyDomain } = config.app;
 
+function path(site, deployment) {
+  return `/${deployment}/${site.owner}/${site.repository}`;
+}
+
 function siteViewDomain(site) {
   return `https://${site.awsBucketName}.${proxyDomain}`;
 }
@@ -13,8 +17,7 @@ function siteViewLink(site, deployment = 'site') {
   } else if (deployment === 'demo' && site.demoDomain) {
     link = site.demoDomain;
   } else {
-    const path = `/${deployment}/${site.owner}/${site.repository}`;
-    link = `${siteViewDomain(site)}${path}`;
+    link = `${siteViewDomain(site)}${path(site, deployment)}`;
   }
   return `${link.replace(/\/+$/, '')}/`;
 }
@@ -26,4 +29,6 @@ const hideBasicAuthPassword = ({ username, password }) => {
   return {};
 };
 
-module.exports = { siteViewLink, siteViewDomain, hideBasicAuthPassword };
+module.exports = {
+  path, siteViewLink, siteViewDomain, hideBasicAuthPassword,
+};

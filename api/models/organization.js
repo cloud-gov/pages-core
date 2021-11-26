@@ -58,6 +58,9 @@ const associate = ({
   }));
 
   Organization.addScope('forManagerRole', user => ({
+    where: {
+      isActive: true,
+    },
     include: [{
       model: OrganizationRole,
       required: true,
@@ -100,6 +103,11 @@ module.exports = (sequelize, DataTypes) => {
         const diff = start.diff(moment().endOf('day'));
         return moment.duration(diff).asDays();
       },
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
     },
   }, {
     paranoid: true,

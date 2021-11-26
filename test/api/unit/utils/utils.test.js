@@ -14,6 +14,21 @@ const MockWebpackConfig = {
 const utils = proxyquire('../../../../api/utils', { '../../webpack.development.config.js': MockWebpackConfig });
 
 describe('utils', () => {
+  describe('.buildEnum', () => {
+    it('builds the enum', () => {
+      const values = ['fOo', 'BBAR', 'baz'];
+
+      const enumeration = utils.buildEnum(values);
+
+      expect(enumeration).to.deep.eq({
+        Foo: 'foo',
+        Bbar: 'bbar',
+        Baz: 'baz',
+        values: ['foo', 'bbar', 'baz'],
+      });
+    });
+  });
+
   describe('.filterEntity', () => {
     const name = 'one';
     const field = 'name';
@@ -269,20 +284,20 @@ describe('utils', () => {
   });
 
   describe('.getSiteDisplayEnv', () => {
-    const origAppEnv = config.app.app_env;
+    const origAppEnv = config.app.appEnv;
 
     after(() => {
-      // restore the app_env
-      config.app.app_env = origAppEnv;
+      // restore the appEnv
+      config.app.appEnv = origAppEnv;
     });
 
-    it('returns null when app_env is production', () => {
-      config.app.app_env = 'production';
+    it('returns null when appEnv is production', () => {
+      config.app.appEnv = 'production';
       expect(utils.getSiteDisplayEnv()).to.be.null;
     });
 
-    it('returns the app_env when app_env is not production', () => {
-      config.app.app_env = 'development';
+    it('returns the appEnv when appEnv is not production', () => {
+      config.app.appEnv = 'development';
       expect(utils.getSiteDisplayEnv()).to.equal('development');
     });
   });
