@@ -185,7 +185,7 @@ async function createData() {
      * Initialized without Github credentials so we can test the process
      */
     User
-      .create({ username: 'amirbey', adminEmail: 'amir.reavis-bey@gsa.gov' })
+      .create({ username: 'svenaas', adminEmail: 'sven.aas@gsa.gov' })
       .then(createUAAIdentity),
 
     User
