@@ -8,9 +8,9 @@ scim:
   userids_enabled: true
   username_pattern: '[a-z0-9+\-_.@]+'
   users:
-    - amirbey@example.com|password|amirbey@example.com|Amir|Admin|pages.admin
     - apburnes@example.com|password|apburnes@example.com|Andrew|Admin|pages.admin
     - davemcorwin@example.com|password|davemcorwin@example.com|David|Admin|pages.admin
+    - svenaas@example.com|password|svenaas@example.com|Sven|Admin|pages.admin
     - user1@example.com|password|user1@example.com|User1|User|pages.user
     - user2@example.com|password|user2@example.com|User2|User|pages.user
     - userorgless@example.com|password|userorgless@example.com|UserOrgless|User|pages.user
