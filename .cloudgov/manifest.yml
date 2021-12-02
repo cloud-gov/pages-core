@@ -51,6 +51,7 @@ applications:
       NEW_RELIC_APP_NAME: ((new_relic_app_name))
       PROXY_DOMAIN: ((proxy_domain))
       PRODUCT: ((product))
+      CF_CDN_SPACE_NAME: ((cf_cdn_space_name))
   - name: ((product))-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client
