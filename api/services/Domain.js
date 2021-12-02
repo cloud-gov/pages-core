@@ -1,7 +1,7 @@
 const IORedis = require('ioredis');
 
 const { Domain } = require('../models');
-const { path: sitePath, siteViewDomain } = require('../utils/site');
+const { path: sitePath, siteViewOrigin } = require('../utils/site');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const { DomainQueue } = require('../queues');
 const config = require('../../config');
@@ -152,7 +152,7 @@ async function provision(domain, dnsResults) {
   const [firstDomainName] = domain.names.split(',');
 
   const serviceName = `${firstDomainName}-ext`;
-  const origin = siteViewDomain(site);
+  const origin = siteViewOrigin(site);
   const path = sitePath(site, domain.context);
 
   await cfApi().createExternalDomain(
