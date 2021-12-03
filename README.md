@@ -48,15 +48,10 @@ This will be the file that holds your S3 and SQS configurations.
 
 1. Once you have created the application, you'll see a `Client ID` and `Client Secret`. Open the `config/local.js` file in your text or code editor and update it with these values:
     ```js
-    passport: {
-      github: {
-        options: {
-          clientID: 'VALUE FROM GITHUB',
-          clientSecret: 'VALUE FROM GITHUB',
-          callbackURL: 'http://localhost:1337/auth/github/callback'
-        }
-      }
-    }
+    const githubOptions = {
+      clientID: 'VALUE FROM GITHUB',
+      clientSecret: 'VALUE FROM GITHUB',
+    };
     ```
 1. [Register or create a new GitHub organization](https://github.com/settings/organizations) with a name of your choosing. Then find your organization's ID by visiting `https://api.github.com/orgs/<your-org-name>` and copying the `id` into the allowed `organizations` in `config/local.js`.
     ```js
