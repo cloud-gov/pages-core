@@ -6,8 +6,12 @@ function path(site, deployment) {
   return `/${deployment}/${site.owner}/${site.repository}`;
 }
 
+function siteViewOrigin(site) {
+  return `${site.awsBucketName}.${proxyDomain}`;
+}
+
 function siteViewDomain(site) {
-  return `https://${site.awsBucketName}.${proxyDomain}`;
+  return `https://${siteViewOrigin(site)}`;
 }
 
 function siteViewLink(site, deployment = 'site') {
@@ -30,5 +34,5 @@ const hideBasicAuthPassword = ({ username, password }) => {
 };
 
 module.exports = {
-  path, siteViewLink, siteViewDomain, hideBasicAuthPassword,
+  path, siteViewLink, siteViewDomain, siteViewOrigin, hideBasicAuthPassword,
 };
