@@ -29,7 +29,7 @@ More examples can be found at [https://federalist.18f.gov/success-stories/](http
 
 Before you start, ensure you have the following installed:
 
-- [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
+- [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html) (choose **cf CLI v7**)
 - [Docker Compose](https://docs.docker.com/compose/install/#install-compose)
 
 ### Then follow these steps to set up and run your server
