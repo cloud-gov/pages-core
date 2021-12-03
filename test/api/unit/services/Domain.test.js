@@ -166,7 +166,7 @@ describe('Domain Service', () => {
 
     it('sets the domain state to `provisioned` if successful', async () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance')
-        .resolves({ entity: { last_operation: 'succeeded' } });
+        .resolves({ entity: { last_operation: { state: 'succeeded' } } });
       sinon.spy(DomainQueue.prototype, 'add');
 
       const domain = await DomainFactory.create({ state: Domain.States.Provisioning });
@@ -185,7 +185,7 @@ describe('Domain Service', () => {
 
     it('sets the domain state to `failed` if failed', async () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance')
-        .resolves({ entity: { last_operation: 'failed' } });
+        .resolves({ entity: { last_operation: { state: 'failed' } } });
       sinon.spy(DomainQueue.prototype, 'add');
 
       const domain = await DomainFactory.create({ state: Domain.States.Provisioning });
@@ -206,7 +206,7 @@ describe('Domain Service', () => {
     it('requeues the status check otherwise', async () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance')
         .resolves(
-          { entity: { last_operation: 'something else' } }
+          { entity: { last_operation: { state: 'something else' } } }
         );
       sinon.stub(DomainQueue.prototype, 'add');
 
