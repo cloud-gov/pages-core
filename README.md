@@ -105,6 +105,8 @@ The `db` container is exposed on port `5433` of your host computer to make it ea
 
 The admin client is running on port `3000` of hour host computer.
 
+Some aspects of the system aren't expected to be fully functional in a development environment. For example: the "View site", "View logs", and "Uploaded files" links associated with sites in the seed data do not reach working URLs.
+
 #### Front end application
 
 If you are working on the front end of the application, the things you need to know are:
