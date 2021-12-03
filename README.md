@@ -103,6 +103,8 @@ Note that when using `docker-compose run`, the docker network will not be expose
 
 The `db` container is exposed on port `5433` of your host computer to make it easier to run commands on. For instance, you can open a `psql` session to it by running `psql -h localhost -p 5433 -d federalist -U postgres`.
 
+The admin client is running on port `3000` of hour host computer.
+
 #### Front end application
 
 If you are working on the front end of the application, the things you need to know are:
