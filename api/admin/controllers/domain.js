@@ -142,8 +142,11 @@ module.exports = wrapHandlers({
 
     const canProvision = DomainService.canProvision(domain, dnsResults);
 
+    const canDeprovision = DomainService.canDeprovision(domain);
+
     return res.json({
       canProvision,
+      canDeprovision,
       data: dnsResults,
     });
   },
