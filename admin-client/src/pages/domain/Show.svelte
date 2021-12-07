@@ -63,6 +63,9 @@
         {#if domain.state === 'pending'}
           <button class="usa-button usa-button--big" disabled>Provision</button>
         {/if}
+        {#if domain.state === 'provisioned'}
+          <button class="usa-button usa-button--big" disabled>Deprovision</button>
+        {/if}
       </span>
       <div class="display-flex flex-justify flex-align-center">
         <h3>Dns</h3>
@@ -75,6 +78,14 @@
           disabled={!dnsResults.canProvision}
           on:click={provision}>
           Provision
+        </button>
+      {/if}
+      {#if domain.state === 'provisioned'}
+        <button
+          class="usa-button usa-button--big"
+          disabled={!dnsResults.canDeprovision}
+          on:click={deprovision}>
+          Deprovision
         </button>
       {/if}
     </Await>
