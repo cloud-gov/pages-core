@@ -62,6 +62,40 @@ describe('Domain Service', () => {
     });
   });
 
+  describe('.canDeprovision()', () => {
+    it('returns true if domain is provisioned', () => {
+      const domain = DomainFactory.build({ state: Domain.States.Provisioned });
+
+      const result = DomainService.canDeprovision(domain);
+
+      expect(result).to.be.true;
+    });
+
+    it('returns true if domain is provisioning', () => {
+      const domain = DomainFactory.build({ state: Domain.States.Provisioning });
+
+      const result = DomainService.canDeprovision(domain);
+
+      expect(result).to.be.true;
+    });
+
+    it('returns true if domain is failed', () => {
+      const domain = DomainFactory.build({ state: Domain.States.Failed });
+
+      const result = DomainService.canDeprovision(domain);
+
+      expect(result).to.be.true;
+    });
+
+    it('returns false if the domain is pending', () => {
+      const domain = DomainFactory.build();
+
+      const result = DomainService.canDeprovision(domain);
+
+      expect(result).to.be.false;
+    });
+  });
+
   describe('.checkDeprovisionStatus()', () => {
     it('does nothing if the domain is not deprovisioning', async () => {
       sinon.spy(CloudFoundryAPIClient.prototype, 'fetchServiceInstances');
