@@ -1,6 +1,11 @@
 <script>
   import { router } from '../../stores';
-  import { fetchDomain, fetchDomainDnsResult, provisionDomain, deprovisionDomain } from '../../lib/api';
+  import {
+    fetchDomain,
+    fetchDomainDnsResult,
+    provisionDomain,
+    deprovisionDomain,
+  } from '../../lib/api';
   import { formatDateTime } from '../../helpers/formatter';
   import { siteName } from '../../lib/utils';
   import {
