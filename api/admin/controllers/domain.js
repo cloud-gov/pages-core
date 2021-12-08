@@ -142,8 +142,11 @@ module.exports = wrapHandlers({
 
     const canProvision = DomainService.canProvision(domain, dnsResults);
 
+    const canDeprovision = DomainService.canDeprovision(domain);
+
     return res.json({
       canProvision,
+      canDeprovision,
       data: dnsResults,
     });
   },
@@ -161,7 +164,10 @@ module.exports = wrapHandlers({
     try {
       const updatedDomain = await DomainService.deprovision(domain);
       EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'Domain Deprovisioned', { domain });
-      return res.json(domainSerializer.serialize(updatedDomain, true));
+      return res.json({
+        dnsRecords: DomainService.buildDnsRecords(updatedDomain),
+        domain: domainSerializer.serialize(updatedDomain, true),
+      });
     } catch (error) {
       return res.unprocessableEntity(error);
     }
