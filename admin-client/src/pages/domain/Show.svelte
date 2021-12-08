@@ -64,12 +64,7 @@
           Loading...
         </div>
         <DnsTable {dnsRecords}/>
-        {#if domain.state === 'pending'}
-          <button class="usa-button usa-button--big" disabled>Provision</button>
-        {/if}
-        {#if domain.state === 'provisioned'}
-          <button class="usa-button usa-button--big" disabled>Deprovision</button>
-        {/if}
+        <button class="usa-button usa-button--big" disabled>Loading...</button>
       </span>
       <div class="display-flex flex-justify flex-align-center">
         <h3>Dns</h3>
@@ -84,7 +79,7 @@
           Provision
         </button>
       {/if}
-      {#if domain.state === 'provisioned'}
+      {#if dnsResults.canDeprovision}
         <button
           class="usa-button usa-button--big"
           disabled={!dnsResults.canDeprovision}
