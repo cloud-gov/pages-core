@@ -156,7 +156,7 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const domain = await fetchModelById(id, Domain('withSite'));
+    const domain = await fetchModelById(id, Domain.scope('withSite'));
     if (!domain) {
       return res.notFound();
     }
