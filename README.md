@@ -256,10 +256,10 @@ We use [`eslint`](https://eslint.org/) and adhere to [Airbnb's eslint config](ht
 
 Because this project was not initially written in a way that complies with our current linting standard, we are taking the strategy of bringing existing files into compliance as they are touched during normal feature development or bug fixing.
 
-To lint the files you have created or changed in a branch, run:
+To lint the files in a branch, run:
 
 ```sh
-docker-compose run app yarn lint:diff
+docker-compose run app yarn lint
 ```
 
 `eslint` also has a helpful auto-fix command that can be run by:
