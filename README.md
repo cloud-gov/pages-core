@@ -29,7 +29,7 @@ More examples can be found at [https://federalist.18f.gov/success-stories/](http
 
 Before you start, ensure you have the following installed:
 
-- [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
+- [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html) (choose **cf CLI v7**)
 - [Docker Compose](https://docs.docker.com/compose/install/#install-compose)
 
 ### Then follow these steps to set up and run your server
@@ -44,19 +44,14 @@ _Note: some terminal commands may take a while to process, without offering feed
 
 1. Make a copy of `config/local.sample.js` and name it `local.js` and place it in the `config` folder. You can do this by running `cp config/local{.sample,}.js`
 This will be the file that holds your S3 and SQS configurations.
-1. [Register a new OAuth application on GitHub](https://github.com/settings/applications/new). Give your app a name and "Homepage URL" (`http://localhost:1337`), and use `http://localhost:1337/auth/github/callback` as the "Authorization callback url".
+1. [Register a new OAuth application on GitHub](https://github.com/settings/applications/new). Give your app a name and "Homepage URL" (`http://localhost:1337`), and use `http://localhost:1337/auth/github2/callback` as the "Authorization callback url".
 
 1. Once you have created the application, you'll see a `Client ID` and `Client Secret`. Open the `config/local.js` file in your text or code editor and update it with these values:
     ```js
-    passport: {
-      github: {
-        options: {
-          clientID: 'VALUE FROM GITHUB',
-          clientSecret: 'VALUE FROM GITHUB',
-          callbackURL: 'http://localhost:1337/auth/github/callback'
-        }
-      }
-    }
+    const githubOptions = {
+      clientID: 'VALUE FROM GITHUB',
+      clientSecret: 'VALUE FROM GITHUB',
+    };
     ```
 1. [Register or create a new GitHub organization](https://github.com/settings/organizations) with a name of your choosing. Then find your organization's ID by visiting `https://api.github.com/orgs/<your-org-name>` and copying the `id` into the allowed `organizations` in `config/local.js`.
     ```js
@@ -81,6 +76,8 @@ Note that `npm run update-local-config` will need to be re-run with some frequen
 
 1. Run `docker-compose build`.
 1. Run `docker-compose run app yarn` to install dependencies.
+1. Run `docker-compose run admin-client yarn` to install dependencies.
+1. Run `docker-compose run app yarn migrate:up` to initialize the local database.
 1. Run `docker-compose run app yarn create-dev-data` and answer its prompts to create some fake development data for your local database.
 1. Run `docker-compose up` to start the development environment.
 
@@ -98,13 +95,17 @@ In our Docker Compose environment, `app` is the name of the container where the 
 For example:
 
 - Use `docker-compose run app yarn test` to run local testing on the app.
-- Use `docker-compose run app yarn lint:diff` to check that your local changes meet our linting standards.
+- Use `docker-compose run app yarn lint` to check that your local changes meet our linting standards.
 
 Similarly you can run any command in the context of the database container `db` by running `docker-compose run db <THE COMMAND>`.
 
 Note that when using `docker-compose run`, the docker network will not be exposed to your local machine. If you do need the network available, run `docker-compose run --service-ports app <THE COMMAND>`.
 
 The `db` container is exposed on port `5433` of your host computer to make it easier to run commands on. For instance, you can open a `psql` session to it by running `psql -h localhost -p 5433 -d federalist -U postgres`.
+
+The admin client is running on port `3000` of hour host computer.
+
+Some aspects of the system aren't expected to be fully functional in a development environment. For example: the "View site" and "Uploaded files" links associated with sites in the seed data do not reach working URLs.
 
 #### Front end application
 
@@ -255,10 +256,10 @@ We use [`eslint`](https://eslint.org/) and adhere to [Airbnb's eslint config](ht
 
 Because this project was not initially written in a way that complies with our current linting standard, we are taking the strategy of bringing existing files into compliance as they are touched during normal feature development or bug fixing.
 
-To lint the files you have created or changed in a branch, run:
+To lint the files in a branch, run:
 
 ```sh
-docker-compose run app yarn lint:diff
+docker-compose run app yarn lint
 ```
 
 `eslint` also has a helpful auto-fix command that can be run by:
