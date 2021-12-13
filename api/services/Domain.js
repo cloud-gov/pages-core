@@ -228,6 +228,7 @@ async function checkProvisionStatus(id) {
 
 module.exports.buildDnsRecords = buildDnsRecords;
 module.exports.canProvision = canProvision;
+module.exports.canDeprovision = canDeprovision;
 module.exports.checkDeprovisionStatus = checkDeprovisionStatus;
 module.exports.checkAcmeChallengeDnsRecord = checkAcmeChallengeDnsRecord;
 module.exports.checkDnsRecords = checkDnsRecords;
