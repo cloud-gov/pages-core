@@ -1,6 +1,11 @@
 <script>
   import { router } from '../../stores';
-  import { fetchDomain, fetchDomainDnsResult, provisionDomain } from '../../lib/api';
+  import {
+    fetchDomain,
+    fetchDomainDnsResult,
+    provisionDomain,
+    deprovisionDomain,
+  } from '../../lib/api';
   import { formatDateTime } from '../../helpers/formatter';
   import { siteName } from '../../lib/utils';
   import {
@@ -22,6 +27,10 @@
 
   function provision() {
     domainPromise = provisionDomain(id);
+  }
+
+  function deprovision() {
+    domainPromise = deprovisionDomain(id);
   }
 </script>
 
@@ -60,9 +69,7 @@
           Loading...
         </div>
         <DnsTable {dnsRecords}/>
-        {#if domain.state === 'pending'}
-          <button class="usa-button usa-button--big" disabled>Provision</button>
-        {/if}
+        <button class="usa-button usa-button--big" disabled>Loading...</button>
       </span>
       <div class="display-flex flex-justify flex-align-center">
         <h3>Dns</h3>
@@ -75,6 +82,14 @@
           disabled={!dnsResults.canProvision}
           on:click={provision}>
           Provision
+        </button>
+      {/if}
+      {#if dnsResults.canDeprovision}
+        <button
+          class="usa-button usa-button--big"
+          disabled={!dnsResults.canDeprovision}
+          on:click={deprovision}>
+          Deprovision
         </button>
       {/if}
     </Await>
