@@ -2,10 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { ALERT, ORGANIZATIONS, USER } from '../../propTypes';
+import {
+  ALERT,
+  ORGANIZATIONS,
+  SITES,
+  USER,
+} from '../../propTypes';
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
 import AlertBanner from '../alertBanner';
+import LoadingIndicator from '../LoadingIndicator';
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
 import { hasOrgs } from '../../selectors/organization';
@@ -57,11 +63,17 @@ export class AddSite extends React.Component {
   render() {
     // select the function to use on form submit based on
     // the showAddNewSiteFields flag
-    const { organizations, showAddNewSiteFields } = this.props;
+    const { organizations, showAddNewSiteFields, sites: { isLoading } } = this.props;
 
     const formSubmitFunc = showAddNewSiteFields
       ? this.onCreateSiteSubmit : this.onAddUserSubmit;
     const { alert } = this.props;
+
+    if (isLoading) {
+      return (
+        <LoadingIndicator text="Creating your new site. Please wait..." />
+      );
+    }
 
     return (
       <div>
@@ -104,6 +116,7 @@ AddSite.propTypes = {
   alert: ALERT,
   organizations: ORGANIZATIONS.isRequired,
   showAddNewSiteFields: PropTypes.bool,
+  sites: SITES.isRequired,
   user: USER,
 };
 
@@ -114,11 +127,12 @@ AddSite.defaultProps = {
 };
 
 const mapStateToProps = ({
-  alert, organizations, showAddNewSiteFields, user,
+  alert, organizations, showAddNewSiteFields, sites, user,
 }) => ({
   alert,
   organizations,
   showAddNewSiteFields,
+  sites,
   user,
 });
 
