@@ -33,6 +33,11 @@ export const SITE = PropTypes.shape({
   users: PropTypes.arrayOf(USER),
 });
 
+export const SITES = PropTypes.shape({
+  data: PropTypes.arrayOf(SITE),
+  isLoading: PropTypes.bool,
+});
+
 export const BUILD = PropTypes.shape({
   id: PropTypes.number,
   state: PropTypes.string,
