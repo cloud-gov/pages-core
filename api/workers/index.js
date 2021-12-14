@@ -70,11 +70,9 @@ async function start() {
   const domainJobProcessor = (job) => {
     switch (job.name) {
       case 'checkProvisionStatus':
-        DomainService.checkProvisionStatus(job.data.id);
-        break;
+        return DomainService.checkProvisionStatus(job.data.id);
       case 'checkDeprovisionStatus':
-        DomainService.checkDeprovisionStatus(job.data.id);
-        break;
+        return DomainService.checkDeprovisionStatus(job.data.id);
       default:
         throw new Error(`Unknown job name ${job.name} for Domain Queue`);
     }

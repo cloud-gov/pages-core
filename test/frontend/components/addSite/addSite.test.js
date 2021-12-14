@@ -31,8 +31,14 @@ const organizations = {
   }],
 };
 
+const sites = {
+  data: [],
+  isLoading: false,
+};
+
 const propsWithoutError = {
   organizations,
+  sites,
   user,
   showAddNewSiteFields: false,
 };
@@ -42,6 +48,7 @@ const propsWithoutOrgs = {
     isLoading: false,
     data: [],
   },
+  sites,
   user,
   showAddNewSiteFields: false,
 };
