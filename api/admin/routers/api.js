@@ -21,6 +21,7 @@ apiRouter.get('/domains/:id', AdminControllers.Domain.findById);
 apiRouter.delete('/domains/:id', AdminControllers.Domain.destroy);
 apiRouter.get('/domains/:id/dns', AdminControllers.Domain.dns);
 apiRouter.get('/domains/:id/dns-result', AdminControllers.Domain.dnsResult);
+apiRouter.post('/domains/:id/destroy', AdminControllers.Domain.destroy);
 apiRouter.post('/domains/:id/deprovision', AdminControllers.Domain.deprovision);
 apiRouter.post('/domains/:id/provision', AdminControllers.Domain.provision);
 apiRouter.post('/domains', parseJson, AdminControllers.Domain.create);
