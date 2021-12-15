@@ -62,7 +62,9 @@
     <div class="grid-row">
       <div class="tablet:grid-col-fill padding-bottom-1">
         <LabeledItem label="id" value={domain.id} />
-        <LabeledItem label="site" value={siteName(domain.Site)} />
+        <LabeledItem label="site">
+          <a href="/sites/{domain.Site.id}">{siteName(domain.Site)}</a>
+        </LabeledItem>
         <LabeledItem label="context" value={domain.context} />
         <LabeledItem label="branch" value={domainBranch(domain)} />
         {#if domain.state !== 'pending'}
