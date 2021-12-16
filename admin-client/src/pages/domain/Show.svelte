@@ -33,7 +33,7 @@
 
   function deprovision() {
     // eslint-disable-next-line no-alert
-    if (window.confirm('Are you sure you want to destroy this domain?')) {
+    if (window.confirm('Are you sure you want to deprovision this domain?')) {
       domainPromise = deprovisionDomain(id);
     }
   }
