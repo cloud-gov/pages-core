@@ -32,7 +32,10 @@
   }
 
   function deprovision() {
-    domainPromise = deprovisionDomain(id);
+    // eslint-disable-next-line no-alert
+    if (window.confirm('Are you sure you want to destroy this domain?')) {
+      domainPromise = deprovisionDomain(id);
+    }
   }
 
   async function destroy() {
