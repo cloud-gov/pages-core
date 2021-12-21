@@ -1,6 +1,8 @@
 const { expect } = require('chai');
 
-const { siteViewLink, siteViewDomain, hideBasicAuthPassword } = require('../../../../api/utils/site');
+const {
+  siteViewLink, siteViewDomain, siteViewOrigin, hideBasicAuthPassword,
+} = require('../../../../api/utils/site');
 const factory = require('../../support/factory');
 const config = require('../../../../config');
 
@@ -68,6 +70,13 @@ describe('site utils', () => {
     it('should return configured domain', async () => {
       const site = await factory.site({ awsBucketName });
       expect(siteViewDomain(site)).equals(`https://${site.awsBucketName}.${config.app.domain}`);
+    });
+  });
+
+  describe('siteViewOrigin', () => {
+    it('should return configured domain', async () => {
+      const site = await factory.site({ awsBucketName });
+      expect(siteViewOrigin(site)).equals(`${awsBucketName}.${config.app.domain}`);
     });
   });
 });

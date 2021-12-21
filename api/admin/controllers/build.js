@@ -1,9 +1,12 @@
 /* eslint-disable no-await-in-loop */
 const buildSerializer = require('../../serializers/build');
 const BuildLogs = require('../../services/build-logs');
-const { Build, Site, User } = require('../../models');
+const {
+  Build, Site, User, Event,
+} = require('../../models');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, wrapHandlers } = require('../../utils');
+const EventCreator = require('../../services/EventCreator');
 
 module.exports = wrapHandlers({
   async list(req, res) {
@@ -66,6 +69,7 @@ module.exports = wrapHandlers({
     if (!build) return res.notFound();
 
     await build.update({ state });
+    EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'Build Updated', { build: { id, state } });
 
     return res.json(buildSerializer.serializeObject(build));
   },

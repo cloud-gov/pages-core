@@ -62,6 +62,82 @@ describe('Domain Service', () => {
     });
   });
 
+  describe('.canDeprovision()', () => {
+    it('returns true if domain is provisioned', () => {
+      const domain = DomainFactory.build({ state: Domain.States.Provisioned });
+
+      const result = DomainService.canDeprovision(domain);
+
+      expect(result).to.be.true;
+    });
+
+    it('returns true if domain is provisioning', () => {
+      const domain = DomainFactory.build({ state: Domain.States.Provisioning });
+
+      const result = DomainService.canDeprovision(domain);
+
+      expect(result).to.be.true;
+    });
+
+    it('returns true if domain is failed', () => {
+      const domain = DomainFactory.build({ state: Domain.States.Failed });
+
+      const result = DomainService.canDeprovision(domain);
+
+      expect(result).to.be.true;
+    });
+
+    it('returns false if the domain is pending', () => {
+      const domain = DomainFactory.build();
+
+      const result = DomainService.canDeprovision(domain);
+
+      expect(result).to.be.false;
+    });
+  });
+
+  describe('.canDestroy()', () => {
+    it('returns false if domain is provisioned', () => {
+      const domain = DomainFactory.build({ state: Domain.States.Provisioned });
+
+      const result = DomainService.canDestroy(domain);
+
+      expect(result).to.be.false;
+    });
+
+    it('returns false if domain is provisioning', () => {
+      const domain = DomainFactory.build({ state: Domain.States.Provisioning });
+
+      const result = DomainService.canDestroy(domain);
+
+      expect(result).to.be.false;
+    });
+
+    it('returns false if domain is failed', () => {
+      const domain = DomainFactory.build({ state: Domain.States.Failed });
+
+      const result = DomainService.canDestroy(domain);
+
+      expect(result).to.be.false;
+    });
+
+    it('returns false if domain is deprovisioning', () => {
+      const domain = DomainFactory.build({ state: Domain.States.Deprovisioning });
+
+      const result = DomainService.canDestroy(domain);
+
+      expect(result).to.be.false;
+    });
+
+    it('returns true if the domain is pending', () => {
+      const domain = DomainFactory.build();
+
+      const result = DomainService.canDestroy(domain);
+
+      expect(result).to.be.true;
+    });
+  });
+
   describe('.checkDeprovisionStatus()', () => {
     it('does nothing if the domain is not deprovisioning', async () => {
       sinon.spy(CloudFoundryAPIClient.prototype, 'fetchServiceInstances');
@@ -166,7 +242,7 @@ describe('Domain Service', () => {
 
     it('sets the domain state to `provisioned` if successful', async () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance')
-        .resolves({ entity: { last_operation: 'succeeded' } });
+        .resolves({ entity: { last_operation: { state: 'succeeded' } } });
       sinon.spy(DomainQueue.prototype, 'add');
 
       const domain = await DomainFactory.create({ state: Domain.States.Provisioning });
@@ -185,7 +261,7 @@ describe('Domain Service', () => {
 
     it('sets the domain state to `failed` if failed', async () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance')
-        .resolves({ entity: { last_operation: 'failed' } });
+        .resolves({ entity: { last_operation: { state: 'failed' } } });
       sinon.spy(DomainQueue.prototype, 'add');
 
       const domain = await DomainFactory.create({ state: Domain.States.Provisioning });
@@ -206,7 +282,7 @@ describe('Domain Service', () => {
     it('requeues the status check otherwise', async () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance')
         .resolves(
-          { entity: { last_operation: 'something else' } }
+          { entity: { last_operation: { state: 'something else' } } }
         );
       sinon.stub(DomainQueue.prototype, 'add');
 
