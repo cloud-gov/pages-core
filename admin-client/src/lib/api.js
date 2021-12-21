@@ -140,6 +140,14 @@ async function provisionDomain(id) {
   return post(`/domains/${id}/provision`);
 }
 
+async function deprovisionDomain(id) {
+  return post(`/domains/${id}/deprovision`);
+}
+
+async function destroyDomain(id) {
+  return post(`/domains/${id}/destroy`);
+}
+
 async function fetchEvents(query = {}) {
   return get('/events', query).catch(() => []);
 }
@@ -226,6 +234,8 @@ export {
   fetchDomainDns,
   fetchDomainDnsResult,
   provisionDomain,
+  deprovisionDomain,
+  destroyDomain,
   fetchEvents,
   createOrganization,
   fetchOrganization,

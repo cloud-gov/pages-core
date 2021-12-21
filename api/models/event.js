@@ -12,6 +12,8 @@ module.exports = (sequelize, DataTypes) => {
     SOCKET_IO: 'socket.io',
     SITE_USER: 'site-user',
     REQUEST_HANDLER: 'request-handler',
+    USER_ACTION: 'user-action',
+    ADMIN_ACTION: 'admin-action',
   };
 
   function isValidType(value) {

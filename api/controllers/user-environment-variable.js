@@ -2,8 +2,9 @@ const { userEnvVar } = require('../../config');
 const { wrapHandlers } = require('../utils');
 const { serialize, serializeMany } = require('../serializers/user-environment-variable');
 const { encrypt } = require('../services/Encryptor');
+const EventCreator = require('../services/EventCreator');
 const { ValidationError } = require('../utils/validators');
-const { Site, UserEnvironmentVariable } = require('../models');
+const { Site, UserEnvironmentVariable, Event } = require('../models');
 
 function validate({ name, value }) {
   if (name && name.length && value && (value.length >= 4)) {
@@ -51,7 +52,9 @@ module.exports = wrapHandlers({
         .create({
           siteId: site.id, name, ciphertext, hint,
         });
-
+      EventCreator.audit(req.user, Event.labels.USER_ACTION, 'UserEnvironmentVariable Created', {
+        userEnvironmentVariable: { id: uev.id, siteId: uev.siteId, name: uev.name },
+      });
       const json = serialize(uev);
 
       return res.ok(json);
@@ -82,6 +85,9 @@ module.exports = wrapHandlers({
     }
 
     await uev.destroy();
+    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'UserEnvironmentVariable Destroyed', {
+      userEnvironmentVariable: { id: uev.id, siteId: uev.siteId, name: uev.name },
+    });
 
     return res.ok({});
   },

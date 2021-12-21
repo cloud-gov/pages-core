@@ -1,6 +1,13 @@
 <script>
-  import { router } from '../../stores';
-  import { fetchDomain, fetchDomainDnsResult, provisionDomain } from '../../lib/api';
+  import page from 'page';
+  import { notification, router } from '../../stores';
+  import {
+    fetchDomain,
+    fetchDomainDnsResult,
+    provisionDomain,
+    deprovisionDomain,
+    destroyDomain,
+  } from '../../lib/api';
   import { formatDateTime } from '../../helpers/formatter';
   import { siteName } from '../../lib/utils';
   import {
@@ -23,6 +30,25 @@
   function provision() {
     domainPromise = provisionDomain(id);
   }
+
+  function deprovision() {
+    // eslint-disable-next-line no-alert
+    if (window.confirm('Are you sure you want to deprovision this domain?')) {
+      domainPromise = deprovisionDomain(id);
+    }
+  }
+
+  async function destroy() {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm('Are you sure you want to destroy this domain?')) { return null; }
+    try {
+      await destroyDomain(id);
+      page('/domains');
+      return notification.setSuccess(`Domain ${id} deleted successfully!`);
+    } catch (error) {
+      return notification.setError(`Unable to delete domain ${id}: ${error.message}`);
+    }
+  }
 </script>
 
 <GridContainer>
@@ -39,7 +65,9 @@
     <div class="grid-row">
       <div class="tablet:grid-col-fill padding-bottom-1">
         <LabeledItem label="id" value={domain.id} />
-        <LabeledItem label="site" value={siteName(domain.Site)} />
+        <LabeledItem label="site">
+          <a href="/sites/{domain.Site.id}">{siteName(domain.Site)}</a>
+        </LabeledItem>
         <LabeledItem label="context" value={domain.context} />
         <LabeledItem label="branch" value={domainBranch(domain)} />
         {#if domain.state !== 'pending'}
@@ -60,9 +88,7 @@
           Loading...
         </div>
         <DnsTable {dnsRecords}/>
-        {#if domain.state === 'pending'}
-          <button class="usa-button usa-button--big" disabled>Provision</button>
-        {/if}
+        <button class="usa-button usa-button--big" disabled>Loading...</button>
       </span>
       <div class="display-flex flex-justify flex-align-center">
         <h3>Dns</h3>
@@ -75,6 +101,22 @@
           disabled={!dnsResults.canProvision}
           on:click={provision}>
           Provision
+        </button>
+      {/if}
+      {#if dnsResults.canDeprovision}
+        <button
+          class="usa-button usa-button--big"
+          disabled={!dnsResults.canDeprovision}
+          on:click={deprovision}>
+          Deprovision
+        </button>
+      {/if}
+      {#if dnsResults.canDestroy}
+        <button
+          class="usa-button usa-button--big"
+          disabled={!dnsResults.canDestroy}
+          on:click={destroy}>
+          Delete
         </button>
       {/if}
     </Await>
