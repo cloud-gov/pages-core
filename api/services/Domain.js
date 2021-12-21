@@ -169,6 +169,12 @@ async function provision(domain, dnsResults) {
     state: States.Provisioning,
   });
 
+  // Populate appropriate site URL if it isn't already set
+  const firstDomain = `https://${domain.names.split(',')[0]}`;
+  const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
+  await site.update({ [siteDomain]: firstDomain });
+  // TODO: check whether Site.domain is set before updating
+
   queueProvisionStatusCheck(domain.id);
 
   return domain;
