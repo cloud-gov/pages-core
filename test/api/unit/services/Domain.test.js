@@ -1,8 +1,10 @@
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
 const sinon = require('sinon');
 
 const { Domain } = require('../../../../api/models');
+const { Site } = require('../../../../api/models');
 const { domain: DomainFactory } = require('../../support/factory');
+const { site: SiteFactory } = require('../../support/factory');
 const DnsService = require('../../../../api/services/Dns');
 const DomainService = require('../../../../api/services/Domain');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
@@ -418,5 +420,32 @@ describe('Domain Service', () => {
       sinon.assert.calledOnceWithExactly(DomainQueue.prototype.add, 'checkProvisionStatus', { id: domain.id });
       expect(domain.state).to.eq(Domain.States.Provisioning);
     });
+
+    it('sets the domain name on its associated site after provisionng', async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'createExternalDomain')
+        .resolves();
+      sinon.stub(DomainQueue.prototype, 'add');
+
+      const site = await SiteFactory();
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
+
+      const dnsResults = [
+        {
+          record: DnsService.buildAcmeChallengeDnsRecord(domain.names),
+          state: 'success',
+        },
+      ];
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('site');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq(null);
+
+      await DomainService.provision(domain, dnsResults);
+
+      await site.reload();
+      expect(site.domain).to.eq('https://www.agency.gov');
+    });    
   });
 });
