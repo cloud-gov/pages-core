@@ -335,6 +335,90 @@ describe('Domain Service', () => {
       );
       expect(domain.state).to.eq(Domain.States.Deprovisioning);
     });
+
+    it('unsets a matching domain name on its associated site after deprovisionng a domain name', async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'deleteServiceInstance')
+        .resolves();
+      sinon.stub(DomainQueue.prototype, 'add');
+
+      const site = await SiteFactory({ domain: 'https://www.agency.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', state: Domain.States.Provisioning });
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('site');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq('https://www.agency.gov');
+      expect(site.demoDomain).to.eq(null);
+
+      await DomainService.deprovision(domain);
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq(null);
+    });
+
+    it('unsets a matching demo domain name on its associated site after deprovisionng a demo domain name', async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'deleteServiceInstance')
+        .resolves();
+      sinon.stub(DomainQueue.prototype, 'add');
+
+      const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: 'demo', state: Domain.States.Provisioning });
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('demo');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://www.agency.gov');
+
+      await DomainService.deprovision(domain);
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq(null);
+    });
+
+    it('leaves a non-matching domain name on its associated site along after deprovisionng a domain name', async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'deleteServiceInstance')
+        .resolves();
+      sinon.stub(DomainQueue.prototype, 'add');
+
+      const site = await SiteFactory({ domain: 'https://example.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', state: Domain.States.Provisioning });
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('site');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq('https://example.gov');
+      expect(site.demoDomain).to.eq(null);
+
+      await DomainService.deprovision(domain);
+      await site.reload();
+      expect(site.domain).to.eq('https://example.gov');
+      expect(site.demoDomain).to.eq(null);
+    });
+
+    it('leaves a non-matching demo domain name on its associated site alone after deprovisionng a demo domain name', async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'deleteServiceInstance')
+        .resolves();
+      sinon.stub(DomainQueue.prototype, 'add');
+
+      const site = await SiteFactory({ demoDomain: 'https://example.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: 'demo', state: Domain.States.Provisioning });
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('demo');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://example.gov');
+
+      await DomainService.deprovision(domain);
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://example.gov');
+    });
   });
 
   describe('.destroy()', () => {
@@ -448,7 +532,7 @@ describe('Domain Service', () => {
       await site.reload();
       expect(site.domain).to.eq('https://www.agency.gov');
       expect(site.demoDomain).to.eq(null);
-    });    
+    });
 
     it('sets the demo domain name on its associated site after provisionng a demo domain name', async () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'createExternalDomain')
@@ -477,8 +561,8 @@ describe('Domain Service', () => {
       await site.reload();
       expect(site.domain).to.eq(null);
       expect(site.demoDomain).to.eq('https://www.agency.gov');
-    });    
-    
+    });
+
     it('leaves the existing domain name on its associated site unchanged after provisionng a domain name', async () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'createExternalDomain')
         .resolves();
@@ -506,7 +590,7 @@ describe('Domain Service', () => {
       await site.reload();
       expect(site.domain).to.eq('https://example.gov');
       expect(site.demoDomain).to.eq(null);
-    });    
+    });
 
     it('leaves the existing demo domain name on its associated site unchanged after provisionng a demo domain name', async () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'createExternalDomain')
@@ -535,6 +619,6 @@ describe('Domain Service', () => {
       await site.reload();
       expect(site.domain).to.eq(null);
       expect(site.demoDomain).to.eq('https://example.gov');
-    });      
+    });
   });
 });
