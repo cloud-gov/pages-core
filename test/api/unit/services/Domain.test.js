@@ -421,7 +421,7 @@ describe('Domain Service', () => {
       expect(domain.state).to.eq(Domain.States.Provisioning);
     });
 
-    it('sets the domain name on its associated site after provisionng', async () => {
+    it('sets the domain name on its associated site after provisionng a domain name', async () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'createExternalDomain')
         .resolves();
       sinon.stub(DomainQueue.prototype, 'add');
@@ -441,11 +441,100 @@ describe('Domain Service', () => {
 
       await domain.reload({ include: [ Site ] });
       expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq(null);
 
       await DomainService.provision(domain, dnsResults);
 
       await site.reload();
       expect(site.domain).to.eq('https://www.agency.gov');
+      expect(site.demoDomain).to.eq(null);
     });    
+
+    it('sets the demo domain name on its associated site after provisionng a demo domain name', async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'createExternalDomain')
+        .resolves();
+      sinon.stub(DomainQueue.prototype, 'add');
+
+      const site = await SiteFactory();
+      const domain = await DomainFactory.create({ siteId: site.id, context: 'demo', names: 'www.agency.gov' });
+
+      const dnsResults = [
+        {
+          record: DnsService.buildAcmeChallengeDnsRecord(domain.names),
+          state: 'success',
+        },
+      ];
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('demo');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq(null);
+
+      await DomainService.provision(domain, dnsResults);
+
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://www.agency.gov');
+    });    
+    
+    it('leaves the existing domain name on its associated site unchanged after provisionng a domain name', async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'createExternalDomain')
+        .resolves();
+      sinon.stub(DomainQueue.prototype, 'add');
+
+      const site = await SiteFactory({ domain: 'https://example.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
+
+      const dnsResults = [
+        {
+          record: DnsService.buildAcmeChallengeDnsRecord(domain.names),
+          state: 'success',
+        },
+      ];
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('site');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq('https://example.gov');
+      expect(site.demoDomain).to.eq(null);
+
+      await DomainService.provision(domain, dnsResults);
+
+      await site.reload();
+      expect(site.domain).to.eq('https://example.gov');
+      expect(site.demoDomain).to.eq(null);
+    });    
+
+    it('leaves the existing demo domain name on its associated site unchanged after provisionng a demo domain name', async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'createExternalDomain')
+        .resolves();
+      sinon.stub(DomainQueue.prototype, 'add');
+
+      const site = await SiteFactory({ demoDomain: 'https://example.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, context: 'demo', names: 'www.agency.gov' });
+
+      const dnsResults = [
+        {
+          record: DnsService.buildAcmeChallengeDnsRecord(domain.names),
+          state: 'success',
+        },
+      ];
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('demo');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://example.gov');
+
+      await DomainService.provision(domain, dnsResults);
+
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://example.gov');
+    });      
   });
 });
