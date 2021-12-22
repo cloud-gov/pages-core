@@ -124,6 +124,14 @@ async function deprovision(domain) {
 
   await domain.update({ state: States.Deprovisioning });
 
+  // Clear appropriate site URL if it matches first domain
+  const site = await domain.getSite();
+  const firstDomain = `https://${domain.names.split(',')[0]}`;
+  const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
+  if (site[siteDomain] === firstDomain) {
+    await site.update({ [siteDomain]: null });
+  }
+
   queueDeprovisionStatusCheck(domain.id);
 
   return domain;
