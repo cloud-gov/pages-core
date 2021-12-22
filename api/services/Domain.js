@@ -112,6 +112,36 @@ function checkAcmeChallengeDnsRecord(domain) {
 }
 
 /**
+ * @param {DomainModel} domain
+ * @returns {Promise<DomainModel>}
+ */
+async function updateSiteForProvisionedDomain(domain) {
+  // Populate appropriate site URL if it isn't already set
+  const site = await domain.getSite();
+  const firstDomain = `https://${domain.names.split(',')[0]}`;
+  const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
+  if (site[siteDomain] === null) {
+    await site.update({ [siteDomain]: firstDomain });
+  }
+  return domain;
+}
+
+/**
+ * @param {DomainModel} domain
+ * @returns {Promise<DomainModel>}
+ */
+async function updateSiteForDeprovisionedDomain(domain) {
+  // Clear appropriate site URL if it matches first domain
+  const site = await domain.getSite();
+  const firstDomain = `https://${domain.names.split(',')[0]}`;
+  const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
+  if (site[siteDomain] === firstDomain) {
+    await site.update({ [siteDomain]: null });
+  }
+  return domain;
+}
+
+/**
  * @param {DomainModel} domain The domain
  * @returns {Promise<DomainModel>}
  */
@@ -124,13 +154,7 @@ async function deprovision(domain) {
 
   await domain.update({ state: States.Deprovisioning });
 
-  // Clear appropriate site URL if it matches first domain
-  const site = await domain.getSite();
-  const firstDomain = `https://${domain.names.split(',')[0]}`;
-  const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
-  if (site[siteDomain] === firstDomain) {
-    await site.update({ [siteDomain]: null });
-  }
+  await updateSiteForDeprovisionedDomain(domain);
 
   queueDeprovisionStatusCheck(domain.id);
 
@@ -177,12 +201,7 @@ async function provision(domain, dnsResults) {
     state: States.Provisioning,
   });
 
-  // Populate appropriate site URL if it isn't already set
-  const firstDomain = `https://${domain.names.split(',')[0]}`;
-  const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
-  if (site[siteDomain] === null) {
-    await site.update({ [siteDomain]: firstDomain });
-  }
+  await updateSiteForProvisionedDomain(domain);
 
   queueProvisionStatusCheck(domain.id);
 
