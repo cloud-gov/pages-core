@@ -154,7 +154,7 @@ async function deprovision(domain) {
 
   await domain.update({ state: States.Deprovisioning });
 
-  await updateSiteForDeprovisionedDomain(domain);
+  await module.exports.updateSiteForDeprovisionedDomain(domain);
 
   queueDeprovisionStatusCheck(domain.id);
 
@@ -201,7 +201,7 @@ async function provision(domain, dnsResults) {
     state: States.Provisioning,
   });
 
-  await updateSiteForProvisionedDomain(domain);
+  await module.exports.updateSiteForProvisionedDomain(domain);
 
   queueProvisionStatusCheck(domain.id);
 
@@ -261,6 +261,8 @@ async function checkProvisionStatus(id) {
 }
 
 module.exports.buildDnsRecords = buildDnsRecords;
+module.exports.updateSiteForProvisionedDomain = updateSiteForProvisionedDomain;
+module.exports.updateSiteForDeprovisionedDomain = updateSiteForDeprovisionedDomain;
 module.exports.canProvision = canProvision;
 module.exports.canDeprovision = canDeprovision;
 module.exports.canDestroy = canDestroy;
