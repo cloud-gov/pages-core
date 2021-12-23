@@ -1,6 +1,6 @@
 const IORedis = require('ioredis');
 
-const { Domain } = require('../models');
+const { Domain, Build } = require('../models');
 const { path: sitePath, siteViewOrigin } = require('../utils/site');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const { DomainQueue } = require('../queues');
@@ -126,7 +126,15 @@ async function updateSiteForProvisionedDomain(domain) {
     rebuildNeeded = true;
   }
   if (rebuildNeeded) {
-    // TODO: Rebuild
+    const branch = site[domain.context === 'site' ? 'defaultBranch' : 'demoBranch'];
+    if (branch) {
+      await Build.create({
+        user: null,
+        site: site.id,
+        branch,
+        username: 'Federalist Operators',
+      }).then(b => b.enqueue());
+    }
   }
   return domain;
 }
@@ -145,7 +153,15 @@ async function updateSiteForDeprovisionedDomain(domain) {
     rebuildNeeded = true;
   }
   if (rebuildNeeded) {
-    // TODO: Rebuild
+    const branch = site[domain.context === 'site' ? 'defaultBranch' : 'demoBranch'];
+    if (branch) {
+      await Build.create({
+        user: null,
+        site: site.id,
+        branch,
+        username: 'Federalist Operators',
+      }).then(b => b.enqueue());
+    }
   }
   return domain;
 }

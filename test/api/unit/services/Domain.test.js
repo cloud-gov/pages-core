@@ -1,7 +1,7 @@
 const { expect, assert } = require('chai');
 const sinon = require('sinon');
 
-const { Domain } = require('../../../../api/models');
+const { Domain, Build } = require('../../../../api/models');
 const { Site } = require('../../../../api/models');
 const { domain: DomainFactory } = require('../../support/factory');
 const { site: SiteFactory } = require('../../support/factory');
@@ -417,6 +417,33 @@ describe('Domain Service', () => {
       expect(site.demoDomain).to.eq('https://example.gov');
     });
 
+    it('triggers a rebuild on its associated site with previously unset domain name', async () => {
+      const site = await SiteFactory();
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
+
+      await site.reload( { include: [ Build ] });
+      expect(site.Builds).to.have.length(0);
+
+      await DomainService.updateSiteForProvisionedDomain(domain);
+
+      await site.reload( { include: [ Build ] });
+      expect(site.Builds).to.have.length(1);
+      expect(site.Builds[0].branch).to.equal(site.defaultBranch);
+    });
+
+    it('triggers a rebuild on its associated site with previously unset demo domain name', async () => {
+      const site = await SiteFactory({ demoBranch: 'demo' });
+      const domain = await DomainFactory.create({ siteId: site.id, context: 'demo', names: 'www.agency.gov' });
+
+      await site.reload( { include: [ Build ] });
+      expect(site.Builds).to.have.length(0);
+
+      await DomainService.updateSiteForProvisionedDomain(domain);
+
+      await site.reload( { include: [ Build ] });
+      expect(site.Builds).to.have.length(1);
+      expect(site.Builds[0].branch).to.equal(site.demoBranch);
+    });
   });
 
   describe('.updateSiteForDeprovisionedDomain()', () => {
@@ -554,6 +581,34 @@ describe('Domain Service', () => {
       await site.reload();
       expect(site.domain).to.eq(null);
       expect(site.demoDomain).to.eq('https://example.gov');
+    });
+
+    it('triggers a rebuild on its associated site with matching domain name', async () => {
+      const site = await SiteFactory({ domain: 'https://www.agency.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', state: Domain.States.Provisioning });
+
+      await site.reload( { include: [ Build ] });
+      expect(site.Builds).to.have.length(0);
+
+      await DomainService.updateSiteForDeprovisionedDomain(domain);
+
+      await site.reload( { include: [ Build ] });
+      expect(site.Builds).to.have.length(1);
+      expect(site.Builds[0].branch).to.equal(site.defaultBranch);
+    });
+
+    it('triggers a rebuild on its associated site with matching demo domain name', async () => {
+      const site = await SiteFactory({ demoDomain: 'https://www.agency.gov', demoBranch: 'demo' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: 'demo', state: Domain.States.Provisioning });
+
+      await site.reload( { include: [ Build ] });
+      expect(site.Builds).to.have.length(0);
+
+      await DomainService.updateSiteForDeprovisionedDomain(domain);
+
+      await site.reload( { include: [ Build ] });
+      expect(site.Builds).to.have.length(1);
+      expect(site.Builds[0].branch).to.equal(site.demoBranch);
     });
   });
 
