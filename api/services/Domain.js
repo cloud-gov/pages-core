@@ -154,8 +154,6 @@ async function deprovision(domain) {
 
   await domain.update({ state: States.Deprovisioning });
 
-  await module.exports.updateSiteForDeprovisionedDomain(domain);
-
   queueDeprovisionStatusCheck(domain.id);
 
   return domain;
@@ -201,8 +199,6 @@ async function provision(domain, dnsResults) {
     state: States.Provisioning,
   });
 
-  await module.exports.updateSiteForProvisionedDomain(domain);
-
   queueProvisionStatusCheck(domain.id);
 
   return domain;
@@ -227,6 +223,7 @@ async function checkDeprovisionStatus(id) {
       serviceName: null,
       state: States.Pending,
     });
+    await module.exports.updateSiteForDeprovisionedDomain(domain);
     return `Domain ${id}|${domain.names} successfully deprovisioned.`;
   }
   // TODO - this does not handle the case where deprovisioning fails
@@ -250,6 +247,7 @@ async function checkProvisionStatus(id) {
   switch (lastOperation) {
     case 'succeeded':
       await domain.update({ state: States.Provisioned });
+      await module.exports.updateSiteForProvisionedDomain(domain);
       return `Domain ${id}|${domain.names} successfully provisioned.`;
     case 'failed':
       await domain.update({ state: States.Failed });

@@ -176,6 +176,27 @@ describe('Domain Service', () => {
       sinon.assert.notCalled(DomainQueue.prototype.add);
     });
 
+    it('updates the associated site if the service no longer exists', async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstances')
+        .resolves({ resources: [] });
+      sinon.spy(DomainQueue.prototype, 'add');
+      const siteUpdateSpy = sinon.spy(DomainService, 'updateSiteForDeprovisionedDomain');
+
+      const domain = await DomainFactory.create({
+        origin: 'foo.sites.pages.cloud.gov',
+        path: '/some/site/path',
+        serviceName: 'www.agency.gov-ext',
+        state: Domain.States.Deprovisioning,
+      });
+
+      await DomainService.checkDeprovisionStatus(domain.id);
+
+      await domain.reload();
+
+      sinon.assert.notCalled(DomainQueue.prototype.add);
+      sinon.assert.calledOnceWithExactly(siteUpdateSpy, domain);
+    });
+
     it('requeues the job if the service still exists', async () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstances')
         .resolves({ resources: [{}] });
@@ -259,6 +280,26 @@ describe('Domain Service', () => {
       );
       sinon.assert.notCalled(DomainQueue.prototype.add);
       expect(domain.state).to.eq(Domain.States.Provisioned);
+    });
+
+    it('updates the associated site if successful', async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance')
+        .resolves({ entity: { last_operation: { state: 'succeeded' } } });
+      sinon.spy(DomainQueue.prototype, 'add');
+      const siteUpdateSpy = sinon.spy(DomainService, 'updateSiteForProvisionedDomain');
+
+      const domain = await DomainFactory.create({ state: Domain.States.Provisioning });
+
+      await DomainService.checkProvisionStatus(domain.id);
+
+      await domain.reload();
+
+      sinon.assert.calledOnceWithExactly(
+        CloudFoundryAPIClient.prototype.fetchServiceInstance,
+        domain.serviceName
+      );
+      sinon.assert.notCalled(DomainQueue.prototype.add);
+      sinon.assert.calledOnceWithExactly(siteUpdateSpy, domain);
     });
 
     it('sets the domain state to `failed` if failed', async () => {
@@ -462,13 +503,10 @@ describe('Domain Service', () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'deleteServiceInstance')
         .resolves();
       sinon.stub(DomainQueue.prototype, 'add');
-      const siteUpdateSpy = sinon.spy(DomainService, 'updateSiteForDeprovisionedDomain');
 
       const domain = await DomainFactory.create({ state: Domain.States.Provisioning });
 
       await DomainService.deprovision(domain);
-
-      sinon.assert.calledOnceWithExactly(siteUpdateSpy, domain);
 
       await domain.reload();
 
@@ -546,7 +584,6 @@ describe('Domain Service', () => {
       sinon.stub(CloudFoundryAPIClient.prototype, 'createExternalDomain')
         .resolves();
       sinon.stub(DomainQueue.prototype, 'add');
-      const siteUpdateSpy = sinon.spy(DomainService, 'updateSiteForProvisionedDomain');
 
       const domain = await DomainFactory.create({ names: 'www.agency.gov' });
       const dnsResults = [
@@ -557,8 +594,6 @@ describe('Domain Service', () => {
       ];
 
       await DomainService.provision(domain, dnsResults);
-
-      sinon.assert.calledOnceWithExactly(siteUpdateSpy, domain);
 
       await domain.reload();
 
