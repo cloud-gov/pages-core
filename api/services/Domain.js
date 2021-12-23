@@ -140,13 +140,9 @@ async function updateSiteForDeprovisionedDomain(domain) {
   const site = await domain.getSite();
   const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
   let rebuildNeeded = false;
-  // eslint-disable-next-line no-restricted-syntax
-  for (const domainName of domain.names.split(',')) {
-    if (site[siteDomain] === `https://${domainName}`) {
-      // eslint-disable-next-line no-await-in-loop
-      await site.update({ [siteDomain]: null });
-      rebuildNeeded = true;
-    }
+  if (domain.names.split(',').find(name => `https://${name}` === site[siteDomain])) {
+    await site.update({ [siteDomain]: null });
+    rebuildNeeded = true;
   }
   if (rebuildNeeded) {
     // TODO: Rebuild
