@@ -120,8 +120,13 @@ async function updateSiteForProvisionedDomain(domain) {
   const site = await domain.getSite();
   const firstDomain = `https://${domain.names.split(',')[0]}`;
   const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
+  let rebuildNeeded = false;
   if (site[siteDomain] === null) {
     await site.update({ [siteDomain]: firstDomain });
+    rebuildNeeded = true;
+  }
+  if (rebuildNeeded) {
+    // TODO: Rebuild
   }
   return domain;
 }
@@ -131,12 +136,20 @@ async function updateSiteForProvisionedDomain(domain) {
  * @returns {Promise<DomainModel>}
  */
 async function updateSiteForDeprovisionedDomain(domain) {
-  // Clear appropriate site URL if it matches first domain
+  // Clear appropriate site URL if it matches a domain name
   const site = await domain.getSite();
-  const firstDomain = `https://${domain.names.split(',')[0]}`;
   const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
-  if (site[siteDomain] === firstDomain) {
-    await site.update({ [siteDomain]: null });
+  let rebuildNeeded = false;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const domainName of domain.names.split(',')) {
+    if (site[siteDomain] === `https://${domainName}`) {
+      // eslint-disable-next-line no-await-in-loop
+      await site.update({ [siteDomain]: null });
+      rebuildNeeded = true;
+    }
+  }
+  if (rebuildNeeded) {
+    // TODO: Rebuild
   }
   return domain;
 }
