@@ -112,6 +112,26 @@ function checkAcmeChallengeDnsRecord(domain) {
 }
 
 /**
+ * @param {SiteModel} site
+ * @param {DomainModel[]} domains
+ * @param {string} context 'site' or 'demo' corresponding to Domain.context
+ */
+function isSiteUrlManagedByDomain(site, domains, context) {
+  const siteDomain = context === 'site' ? 'domain' : 'demoDomain';
+  if (site[siteDomain] === null) { return true; }
+  if (domains.length === 0) { return false; }
+  let siteUrlIsManagedByDomain = false;
+  domains.forEach((domain) => {
+    if (domain.context === context) {
+      if (domain.names.split(',').find(name => `https://${name}` === site[siteDomain])) {
+        siteUrlIsManagedByDomain = true;
+      }
+    }
+  });
+  return siteUrlIsManagedByDomain;
+}
+
+/**
  * @param {DomainModel} domain
  */
 async function rebuildAssociatedSite(domain) {
@@ -136,12 +156,8 @@ async function updateSiteForProvisionedDomain(domain) {
   const site = await domain.getSite();
   const firstDomain = `https://${domain.names.split(',')[0]}`;
   const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
-  let rebuildNeeded = false;
   if (site[siteDomain] === null) {
     await site.update({ [siteDomain]: firstDomain });
-    rebuildNeeded = true;
-  }
-  if (rebuildNeeded) {
     await module.exports.rebuildAssociatedSite(domain);
   }
   return domain;
@@ -154,13 +170,9 @@ async function updateSiteForProvisionedDomain(domain) {
 async function updateSiteForDeprovisionedDomain(domain) {
   // Clear appropriate site URL if it matches a domain name
   const site = await domain.getSite();
-  const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
-  let rebuildNeeded = false;
-  if (domain.names.split(',').find(name => `https://${name}` === site[siteDomain])) {
+  if (isSiteUrlManagedByDomain(site, [domain], domain.context)) {
+    const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
     await site.update({ [siteDomain]: null });
-    rebuildNeeded = true;
-  }
-  if (rebuildNeeded) {
     await module.exports.rebuildAssociatedSite(domain);
   }
   return domain;
@@ -284,6 +296,7 @@ async function checkProvisionStatus(id) {
 }
 
 module.exports.buildDnsRecords = buildDnsRecords;
+module.exports.isSiteUrlManagedByDomain = isSiteUrlManagedByDomain;
 module.exports.rebuildAssociatedSite = rebuildAssociatedSite;
 module.exports.updateSiteForProvisionedDomain = updateSiteForProvisionedDomain;
 module.exports.updateSiteForDeprovisionedDomain = updateSiteForDeprovisionedDomain;
