@@ -113,6 +113,22 @@ function checkAcmeChallengeDnsRecord(domain) {
 
 /**
  * @param {DomainModel} domain
+ */
+async function rebuildAssociatedSite(domain) {
+  const site = await domain.getSite();
+  const branch = site[domain.context === 'site' ? 'defaultBranch' : 'demoBranch'];
+  if (branch) {
+    await Build.create({
+      user: null,
+      site: site.id,
+      branch,
+      username: 'Federalist Operators',
+    }).then(b => b.enqueue());
+  }
+}
+
+/**
+ * @param {DomainModel} domain
  * @returns {Promise<DomainModel>}
  */
 async function updateSiteForProvisionedDomain(domain) {
@@ -126,15 +142,7 @@ async function updateSiteForProvisionedDomain(domain) {
     rebuildNeeded = true;
   }
   if (rebuildNeeded) {
-    const branch = site[domain.context === 'site' ? 'defaultBranch' : 'demoBranch'];
-    if (branch) {
-      await Build.create({
-        user: null,
-        site: site.id,
-        branch,
-        username: 'Federalist Operators',
-      }).then(b => b.enqueue());
-    }
+    await rebuildAssociatedSite(domain);
   }
   return domain;
 }
@@ -153,15 +161,7 @@ async function updateSiteForDeprovisionedDomain(domain) {
     rebuildNeeded = true;
   }
   if (rebuildNeeded) {
-    const branch = site[domain.context === 'site' ? 'defaultBranch' : 'demoBranch'];
-    if (branch) {
-      await Build.create({
-        user: null,
-        site: site.id,
-        branch,
-        username: 'Federalist Operators',
-      }).then(b => b.enqueue());
-    }
+    await rebuildAssociatedSite(domain);
   }
   return domain;
 }
