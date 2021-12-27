@@ -142,7 +142,7 @@ async function updateSiteForProvisionedDomain(domain) {
     rebuildNeeded = true;
   }
   if (rebuildNeeded) {
-    await rebuildAssociatedSite(domain);
+    await module.exports.rebuildAssociatedSite(domain);
   }
   return domain;
 }
@@ -161,7 +161,7 @@ async function updateSiteForDeprovisionedDomain(domain) {
     rebuildNeeded = true;
   }
   if (rebuildNeeded) {
-    await rebuildAssociatedSite(domain);
+    await module.exports.rebuildAssociatedSite(domain);
   }
   return domain;
 }
@@ -284,6 +284,7 @@ async function checkProvisionStatus(id) {
 }
 
 module.exports.buildDnsRecords = buildDnsRecords;
+module.exports.rebuildAssociatedSite = rebuildAssociatedSite;
 module.exports.updateSiteForProvisionedDomain = updateSiteForProvisionedDomain;
 module.exports.updateSiteForDeprovisionedDomain = updateSiteForDeprovisionedDomain;
 module.exports.canProvision = canProvision;
