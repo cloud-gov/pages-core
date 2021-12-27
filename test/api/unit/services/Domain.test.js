@@ -344,245 +344,7 @@ describe('Domain Service', () => {
     });
   });
 
-  describe('.updateSiteForProvisionedDomain()', () => {
-    it('sets the domain name on the associated site if not previously set', async () => {
-      const site = await SiteFactory();
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
-
-      expect(domain.names).to.eq('www.agency.gov');
-      expect(domain.context).to.eq('site');
-
-      await domain.reload({ include: [ Site ] });
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq(null);
-
-      await DomainService.updateSiteForProvisionedDomain(domain);
-
-      await site.reload();
-      expect(site.domain).to.eq('https://www.agency.gov');
-      expect(site.demoDomain).to.eq(null);
-    });
-
-    it('sets the demo domain name on the associated site if not previously set', async () => {
-      const site = await SiteFactory();
-      const domain = await DomainFactory.create({ siteId: site.id, context: 'demo', names: 'www.agency.gov' });
-
-      expect(domain.names).to.eq('www.agency.gov');
-      expect(domain.context).to.eq('demo');
-
-      await domain.reload({ include: [ Site ] });
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq(null);
-
-      await DomainService.updateSiteForProvisionedDomain(domain);
-
-      await site.reload();
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq('https://www.agency.gov');
-    });
-
-    it('leaves the existing domain name on its associated site unchanged', async () => {
-      const site = await SiteFactory({ domain: 'https://example.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
-
-      expect(domain.names).to.eq('www.agency.gov');
-      expect(domain.context).to.eq('site');
-
-      await domain.reload({ include: [ Site ] });
-      expect(site.domain).to.eq('https://example.gov');
-      expect(site.demoDomain).to.eq(null);
-
-      await DomainService.updateSiteForProvisionedDomain(domain);
-
-      await site.reload();
-      expect(site.domain).to.eq('https://example.gov');
-      expect(site.demoDomain).to.eq(null);
-    });
-
-    it('leaves the existing domain name on its associated site unchanged', async () => {
-      const site = await SiteFactory({ demoDomain: 'https://example.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, context: 'demo', names: 'www.agency.gov' });
-
-      expect(domain.names).to.eq('www.agency.gov');
-      expect(domain.context).to.eq('demo');
-
-      await domain.reload({ include: [ Site ] });
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq('https://example.gov');
-
-      await DomainService.updateSiteForProvisionedDomain(domain);
-
-      await site.reload();
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq('https://example.gov');
-    });
-
-    it('triggers a rebuild on its associated site with previously unset domain name', async () => {
-      const site = await SiteFactory();
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
-
-      await site.reload( { include: [ Build ] });
-      expect(site.Builds).to.have.length(0);
-
-      await DomainService.updateSiteForProvisionedDomain(domain);
-
-      await site.reload( { include: [ Build ] });
-      expect(site.Builds).to.have.length(1);
-      expect(site.Builds[0].branch).to.equal(site.defaultBranch);
-    });
-
-    it('triggers a rebuild on its associated site with previously unset demo domain name', async () => {
-      const site = await SiteFactory({ demoBranch: 'demo' });
-      const domain = await DomainFactory.create({ siteId: site.id, context: 'demo', names: 'www.agency.gov' });
-
-      await site.reload( { include: [ Build ] });
-      expect(site.Builds).to.have.length(0);
-
-      await DomainService.updateSiteForProvisionedDomain(domain);
-
-      await site.reload( { include: [ Build ] });
-      expect(site.Builds).to.have.length(1);
-      expect(site.Builds[0].branch).to.equal(site.demoBranch);
-    });
-  });
-
-  describe('.updateSiteForDeprovisionedDomain()', () => {
-    it('unsets a matching domain name on its associated site', async () => {
-      const site = await SiteFactory({ domain: 'https://www.agency.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', state: Domain.States.Provisioning });
-
-      expect(domain.names).to.eq('www.agency.gov');
-      expect(domain.context).to.eq('site');
-
-      await domain.reload({ include: [ Site ] });
-      expect(site.domain).to.eq('https://www.agency.gov');
-      expect(site.demoDomain).to.eq(null);
-
-      await DomainService.updateSiteForDeprovisionedDomain(domain);
-      await site.reload();
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq(null);
-    });
-
-    it('unsets a matching first domain name on its associated site', async () => {
-      const site = await SiteFactory({ domain: 'https://www.agency.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov', state: Domain.States.Provisioning });
-
-      expect(domain.names).to.eq('www.agency.gov,www.foo.gov,www.bar.gov');
-      expect(domain.context).to.eq('site');
-
-      await domain.reload({ include: [ Site ] });
-      expect(site.domain).to.eq('https://www.agency.gov');
-      expect(site.demoDomain).to.eq(null);
-
-      await DomainService.updateSiteForDeprovisionedDomain(domain);
-      await site.reload();
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq(null);
-    });
-
-    it('unsets a matching non-first domain name on its associated site', async () => {
-      const site = await SiteFactory({ domain: 'https://www.agency.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov', state: Domain.States.Provisioning });
-
-      expect(domain.names).to.eq('www.foo.gov,www.agency.gov,www.bar.gov');
-      expect(domain.context).to.eq('site');
-
-      await domain.reload({ include: [ Site ] });
-      expect(site.domain).to.eq('https://www.agency.gov');
-      expect(site.demoDomain).to.eq(null);
-
-      await DomainService.updateSiteForDeprovisionedDomain(domain);
-      await site.reload();
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq(null);
-    });
-
-    it('unsets a matching demo domain name on its associated site', async () => {
-      const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: 'demo', state: Domain.States.Provisioning });
-
-      expect(domain.names).to.eq('www.agency.gov');
-      expect(domain.context).to.eq('demo');
-
-      await domain.reload({ include: [ Site ] });
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq('https://www.agency.gov');
-
-      await DomainService.updateSiteForDeprovisionedDomain(domain);
-      await site.reload();
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq(null);
-    });
-
-    it('unsets a matching first demo domain name on its associated site', async () => {
-      const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov', context: 'demo', state: Domain.States.Provisioning });
-
-      expect(domain.names).to.eq('www.agency.gov,www.foo.gov,www.bar.gov');
-      expect(domain.context).to.eq('demo');
-
-      await domain.reload({ include: [ Site ] });
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq('https://www.agency.gov');
-
-      await DomainService.updateSiteForDeprovisionedDomain(domain);
-      await site.reload();
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq(null);
-    });
-
-    it('unsets a matching non-first demo domain name on its associated site', async () => {
-      const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov', context: 'demo', state: Domain.States.Provisioning });
-
-      expect(domain.names).to.eq('www.foo.gov,www.agency.gov,www.bar.gov');
-      expect(domain.context).to.eq('demo');
-
-      await domain.reload({ include: [ Site ] });
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq('https://www.agency.gov');
-
-      await DomainService.updateSiteForDeprovisionedDomain(domain);
-      await site.reload();
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq(null);
-    });
-
-    it('leaves a non-matching domain name on its associated site alone', async () => {
-      const site = await SiteFactory({ domain: 'https://example.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', state: Domain.States.Provisioning });
-
-      expect(domain.names).to.eq('www.agency.gov');
-      expect(domain.context).to.eq('site');
-
-      await domain.reload({ include: [ Site ] });
-      expect(site.domain).to.eq('https://example.gov');
-      expect(site.demoDomain).to.eq(null);
-
-      await DomainService.updateSiteForDeprovisionedDomain(domain);
-      await site.reload();
-      expect(site.domain).to.eq('https://example.gov');
-      expect(site.demoDomain).to.eq(null);
-    });
-
-    it('leaves a non-matching demo domain name on its associated site alone', async () => {
-      const site = await SiteFactory({ demoDomain: 'https://example.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: 'demo', state: Domain.States.Provisioning });
-
-      expect(domain.names).to.eq('www.agency.gov');
-      expect(domain.context).to.eq('demo');
-
-      await domain.reload({ include: [ Site ] });
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq('https://example.gov');
-
-      await DomainService.updateSiteForDeprovisionedDomain(domain);
-      await site.reload();
-      expect(site.domain).to.eq(null);
-      expect(site.demoDomain).to.eq('https://example.gov');
-    });
-
+  describe('.rebuildAssociatedSite()', () => {
     it('triggers a rebuild on its associated site with matching domain name', async () => {
       const site = await SiteFactory({ domain: 'https://www.agency.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', state: Domain.States.Provisioning });
@@ -590,7 +352,7 @@ describe('Domain Service', () => {
       await site.reload( { include: [ Build ] });
       expect(site.Builds).to.have.length(0);
 
-      await DomainService.updateSiteForDeprovisionedDomain(domain);
+      await DomainService.rebuildAssociatedSite(domain);
 
       await site.reload( { include: [ Build ] });
       expect(site.Builds).to.have.length(1);
@@ -604,11 +366,247 @@ describe('Domain Service', () => {
       await site.reload( { include: [ Build ] });
       expect(site.Builds).to.have.length(0);
 
-      await DomainService.updateSiteForDeprovisionedDomain(domain);
+      await DomainService.rebuildAssociatedSite(domain);
 
       await site.reload( { include: [ Build ] });
       expect(site.Builds).to.have.length(1);
       expect(site.Builds[0].branch).to.equal(site.demoBranch);
+    });
+  });
+
+  describe('.updateSiteForProvisionedDomain()', () => {
+    it('sets the domain name on the associated site if not previously set', async () => {
+      const site = await SiteFactory();
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('site');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq(null);
+
+      await DomainService.updateSiteForProvisionedDomain(domain);
+
+      await site.reload();
+      expect(site.domain).to.eq('https://www.agency.gov');
+      expect(site.demoDomain).to.eq(null);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+    });
+
+    it('sets the demo domain name on the associated site if not previously set', async () => {
+      const site = await SiteFactory();
+      const domain = await DomainFactory.create({ siteId: site.id, context: 'demo', names: 'www.agency.gov' });
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('demo');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq(null);
+
+      await DomainService.updateSiteForProvisionedDomain(domain);
+
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://www.agency.gov');
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+    });
+
+    it('leaves the existing domain name on its associated site unchanged', async () => {
+      const site = await SiteFactory({ domain: 'https://example.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('site');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq('https://example.gov');
+      expect(site.demoDomain).to.eq(null);
+
+      await DomainService.updateSiteForProvisionedDomain(domain);
+
+      await site.reload();
+      expect(site.domain).to.eq('https://example.gov');
+      expect(site.demoDomain).to.eq(null);
+      sinon.assert.notCalled(siteBuildSpy);
+    });
+
+    it('leaves the existing domain name on its associated site unchanged', async () => {
+      const site = await SiteFactory({ demoDomain: 'https://example.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, context: 'demo', names: 'www.agency.gov' });
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('demo');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://example.gov');
+
+      await DomainService.updateSiteForProvisionedDomain(domain);
+
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://example.gov');
+      sinon.assert.notCalled(siteBuildSpy);
+    });
+  });
+
+  describe('.updateSiteForDeprovisionedDomain()', () => {
+    it('unsets a matching domain name on its associated site', async () => {
+      const site = await SiteFactory({ domain: 'https://www.agency.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', state: Domain.States.Provisioning });
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('site');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq('https://www.agency.gov');
+      expect(site.demoDomain).to.eq(null);
+
+      await DomainService.updateSiteForDeprovisionedDomain(domain);
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq(null);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+    });
+
+    it('unsets a matching first domain name on its associated site', async () => {
+      const site = await SiteFactory({ domain: 'https://www.agency.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov', state: Domain.States.Provisioning });
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+
+      expect(domain.names).to.eq('www.agency.gov,www.foo.gov,www.bar.gov');
+      expect(domain.context).to.eq('site');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq('https://www.agency.gov');
+      expect(site.demoDomain).to.eq(null);
+
+      await DomainService.updateSiteForDeprovisionedDomain(domain);
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq(null);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+    });
+
+    it('unsets a matching non-first domain name on its associated site', async () => {
+      const site = await SiteFactory({ domain: 'https://www.agency.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov', state: Domain.States.Provisioning });
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+
+      expect(domain.names).to.eq('www.foo.gov,www.agency.gov,www.bar.gov');
+      expect(domain.context).to.eq('site');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq('https://www.agency.gov');
+      expect(site.demoDomain).to.eq(null);
+
+      await DomainService.updateSiteForDeprovisionedDomain(domain);
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq(null);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+    });
+
+    it('unsets a matching demo domain name on its associated site', async () => {
+      const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: 'demo', state: Domain.States.Provisioning });
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('demo');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://www.agency.gov');
+
+      await DomainService.updateSiteForDeprovisionedDomain(domain);
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq(null);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+    });
+
+    it('unsets a matching first demo domain name on its associated site', async () => {
+      const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov', context: 'demo', state: Domain.States.Provisioning });
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+
+      expect(domain.names).to.eq('www.agency.gov,www.foo.gov,www.bar.gov');
+      expect(domain.context).to.eq('demo');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://www.agency.gov');
+
+      await DomainService.updateSiteForDeprovisionedDomain(domain);
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq(null);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+    });
+
+    it('unsets a matching non-first demo domain name on its associated site', async () => {
+      const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov', context: 'demo', state: Domain.States.Provisioning });
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+
+      expect(domain.names).to.eq('www.foo.gov,www.agency.gov,www.bar.gov');
+      expect(domain.context).to.eq('demo');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://www.agency.gov');
+
+      await DomainService.updateSiteForDeprovisionedDomain(domain);
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq(null);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+    });
+
+    it('leaves a non-matching domain name on its associated site alone', async () => {
+      const site = await SiteFactory({ domain: 'https://example.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', state: Domain.States.Provisioning });
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('site');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq('https://example.gov');
+      expect(site.demoDomain).to.eq(null);
+
+      await DomainService.updateSiteForDeprovisionedDomain(domain);
+      await site.reload();
+      expect(site.domain).to.eq('https://example.gov');
+      expect(site.demoDomain).to.eq(null);
+      sinon.assert.notCalled(siteBuildSpy);
+    });
+
+    it('leaves a non-matching demo domain name on its associated site alone', async () => {
+      const site = await SiteFactory({ demoDomain: 'https://example.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: 'demo', state: Domain.States.Provisioning });
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+
+      expect(domain.names).to.eq('www.agency.gov');
+      expect(domain.context).to.eq('demo');
+
+      await domain.reload({ include: [ Site ] });
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://example.gov');
+
+      await DomainService.updateSiteForDeprovisionedDomain(domain);
+      await site.reload();
+      expect(site.domain).to.eq(null);
+      expect(site.demoDomain).to.eq('https://example.gov');
+      sinon.assert.notCalled(siteBuildSpy);
     });
   });
 
