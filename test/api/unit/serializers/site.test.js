@@ -1,8 +1,9 @@
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
 const validateJSONSchema = require('jsonschema').validate;
 
 const siteSchema = require('../../../../public/swagger/Site.json');
 const factory = require('../../support/factory');
+const { Domain, Site } = require('../../../../api/models');
 
 const SiteSerializer = require('../../../../api/serializers/site');
 
@@ -63,6 +64,19 @@ describe('SiteSerializer', () => {
       expect(result.errors).to.be.empty;
       expect(object.basicAuth.password).to.eq('**********');
       expect(object.organizationId).to.equal(org.id);
+    });
+
+    it('includes URL editability when associated to domain', async () => {
+      const site = await factory.site({ domain: 'https://www.agency.gov', demoDomain: null });
+      const domain = await factory.domain.create({ siteId: site.id, names: 'www.agency.gov', context: "site" });
+      await site.reload({ include: [ Domain ] });
+      const object = await SiteSerializer.serializeObject(site);
+
+      const result = validateJSONSchema(object, siteSchema);
+      expect(result.errors).to.be.empty;
+
+      expect(object.canEditLiveUrl).to.equal(false); // Because there is an associated site domain with a non-conflicting URL
+      expect(object.canEditDemoUrl).to.equal(false); // Because the demo domain is null
     });
   });
 

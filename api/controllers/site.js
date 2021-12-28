@@ -7,7 +7,7 @@ const UserActionCreator = require('../services/UserActionCreator');
 const EventCreator = require('../services/EventCreator');
 const siteSerializer = require('../serializers/site');
 const {
-  Build, Organization, Site, User, Event,
+  Build, Organization, Site, User, Event, Domain,
 } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const {
@@ -30,7 +30,7 @@ module.exports = wrapHandlers({
   async findAllForUser(req, res) {
     const { user } = req;
 
-    const sites = await Site.forUser(user).findAll();
+    const sites = await Site.forUser(user).findAll({ include: [Domain] });
 
     if (!sites) {
       return res.notFound();

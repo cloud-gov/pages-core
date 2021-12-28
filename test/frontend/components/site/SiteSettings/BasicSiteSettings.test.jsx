@@ -11,6 +11,8 @@ describe('<BasicSiteSettings/>', () => {
       initialValues: {
         defaultBranch: 'main',
         domain: 'https://example.gov',
+        canEditLiveUrl: false,
+        canEditDemoUrl: true,
       },
       handleSubmit: spy(),
       reset: spy(),
@@ -41,6 +43,7 @@ describe('<BasicSiteSettings/>', () => {
       id: 'domainInput',
       placeholder: 'https://example.gov',
       className: 'form-control',
+      disabled: true,
     });
 
     const demoDomainField = wrapper.find('HttpsUrlField[name="demoDomain"]');
@@ -51,6 +54,7 @@ describe('<BasicSiteSettings/>', () => {
       id: 'demoDomainInput',
       placeholder: 'https://demo.example.gov',
       className: 'form-control',
+      disabled: false,
     });
   });
 
