@@ -7,36 +7,42 @@ const CloudFoundryAPIClient = require('../api/utils/cfApiClient');
 const apiClient = new CloudFoundryAPIClient();
 
 async function removeBucketWebsiteConfig(site) {
-  const prefix = `${site.id} | ${site.owner}/${site.repository} | `;
+  const creds = await apiClient.fetchServiceInstanceCredentials(site.s3ServiceName);
 
-  if (site.s3ServiceName) {
-    try {
-      const creds = await apiClient.fetchServiceInstanceCredentials(site.s3ServiceName);
+  const {
+    access_key_id: accessKeyId,
+    bucket,
+    region,
+    secret_access_key: secretAccessKey,
+  } = creds;
 
-      const {
-        access_key_id: accessKeyId,
-        bucket,
-        region,
-        secret_access_key: secretAccessKey,
-      } = creds;
+  if (site.awsBucketName && site.awsBucketName !== bucket) {
+    throw new Error(`S3 service bucket name ${bucket} does not match site bucket name ${site.awsBucketName}.`);
+  }
 
-      if (site.awsBucketName && site.awsBucketName !== bucket) {
-        throw new Error(`${prefix}S3 service bucket name ${bucket} does not match site bucket name ${site.awsBucketName}.`);
-      }
+  const s3 = new AWS.S3({
+    accessKeyId,
+    region,
+    secretAccessKey,
+    apiVersion: '2006-03-01',
+  });
 
-      const s3 = new AWS.S3({
-        accessKeyId,
-        region,
-        secretAccessKey,
-        apiVersion: '2006-03-01',
-      });
+  await s3.deleteBucketWebsite({ Bucket: bucket }).promise();
+}
 
-      await s3.deleteBucketWebsite({ Bucket: bucket }).promise();
-    } catch (error) {
-      throw new Error(`${prefix}${error.message}.`);
+async function runRemoveBucketWebsiteConfig(site) {
+  if (!site.s3ServiceName) {
+    return;
+  }
+
+  try {
+    await removeBucketWebsiteConfig(site);
+  } catch (error) {
+    // ignore errors for deleted sites
+    if (!site.isSoftDeleted()) {
+      const prefix = `${site.id} | ${site.owner}/${site.repository} | `;
+      throw new Error(`${prefix}${error.message}`);
     }
-  } else {
-    console.log(`${prefix}S3 service name not specified.`);
   }
 }
 
@@ -48,7 +54,7 @@ async function removeBucketWebsiteConfigs() {
   const { errors } = await PromisePool
     .withConcurrency(5)
     .for(sites)
-    .process(removeBucketWebsiteConfig);
+    .process(runRemoveBucketWebsiteConfig);
 
   if (errors.length === 0) {
     console.log('Remove bucket website configs successful!!');
