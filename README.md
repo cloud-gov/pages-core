@@ -75,10 +75,10 @@ Note that `npm run update-local-config` will need to be re-run with some frequen
 #### Setting up Docker
 
 1. Run `docker-compose build`.
-1. Run `docker-compose run app yarn` to install dependencies.
-1. Run `docker-compose run admin-client yarn` to install dependencies.
-1. Run `docker-compose run app yarn migrate:up` to initialize the local database.
-1. Run `docker-compose run app yarn create-dev-data` and answer its prompts to create some fake development data for your local database.
+1. Run `docker-compose run --rm app yarn` to install dependencies.
+1. Run `docker-compose run --rm admin-client yarn` to install dependencies.
+1. Run `docker-compose run --rm app yarn migrate:up` to initialize the local database.
+1. Run `docker-compose run --rm app yarn create-dev-data` to create some fake development data for your local database.
 1. Run `docker-compose up` to start the development environment.
 
 Any time the node dependencies are changed (like from a recently completed new feature), `docker-compose run app yarn` will need to be re-run to install updated dependencies after pulling the new code from GitHub.
