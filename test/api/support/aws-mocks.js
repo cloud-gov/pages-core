@@ -10,7 +10,6 @@ const mockableFunctions = {
     'getObject',
     'listObjectsV2',
     'deleteObjects',
-    'putBucketWebsite',
     'putObject',
     'headBucket',
   ],

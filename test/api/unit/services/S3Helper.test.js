@@ -70,44 +70,6 @@ describe('S3Helper', () => {
     });
   });
 
-  describe('.putBucketWebsite', () => {
-    after(() => {
-      AWSMocks.resetMocks();
-    });
-
-    it('should successfully send params to bucket', async () => {
-      const owner = 'an-owner';
-      const repository = 'a-reposistory';
-      const expected = {
-        Bucket: config.s3.bucket,
-        WebsiteConfiguration: {
-          ErrorDocument: {
-            Key: `site/${owner}/${repository}/404.html`,
-          },
-          IndexDocument: {
-            Suffix: 'index.html',
-          },
-        },
-      };
-
-      AWSMocks.mocks.S3.putBucketWebsite = (params) => {
-        expect(params).to.deep.equal(expected);
-        return { promise: () => Promise.resolve() };
-      };
-
-      const client = new S3Helper.S3Client(config.s3);
-      await client.putBucketWebsite(owner, repository);
-    });
-
-    it('should reject with promise', async () => {
-      AWSMocks.mocks.S3.putBucketWebsite = () => ({ promise: () => Promise.reject(new Error()) });
-
-      const client = new S3Helper.S3Client(config.s3);
-      const err = await client.putBucketWebsite().catch(error => error);
-      expect(err).to.be.an('error');
-    });
-  });
-
   describe('.putObject', () => {
     after(() => {
       AWSMocks.resetMocks();
