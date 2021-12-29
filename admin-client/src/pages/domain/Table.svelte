@@ -25,7 +25,7 @@
   <tr slot="item" let:item={domain}>
     <td><a href="/domains/{domain.id}">{domain.id}</a></td>
     <td>{domain.names}</td>
-    <td>{siteName(domain.Site)}</td>
+    <td><a href="/sites/{domain.Site.id}">{siteName(domain.Site)}</a></td>
     <td>{domain.context}</td>
     <td>{domainBranch(domain)}</td>
     <td>{domain.origin || '-' }</td>
