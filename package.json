@@ -95,7 +95,7 @@
     "send-email": "node ./scripts/send-email.js",
     "bootstrap-admins": "node ./scripts/bootstrap-admins.js",
     "migrate-build-notification-settings": "node ./scripts/migrate-build-notification-settings.js",
-    "remove-bucket-website-configs": "node ./scripts/removeBucketWebsiteConfigs.js"
+    "remove-bucket-website-configs": "node ./scripts/remove-bucket-website-configs.js"
   },
   "main": "index.js",
   "repository": {
