@@ -81,7 +81,7 @@ Note that `npm run update-local-config` will need to be re-run with some frequen
 1. Run `docker-compose run --rm app yarn create-dev-data` to create some fake development data for your local database.
 1. Run `docker-compose up` to start the development environment.
 
-Any time the node dependencies are changed (like from a recently completed new feature), `docker-compose run app yarn` will need to be re-run to install updated dependencies after pulling the new code from GitHub.
+Any time the node dependencies are changed (like from a recently completed new feature), `docker-compose run --rm app yarn` will need to be re-run to install updated dependencies after pulling the new code from GitHub.
 
 #### Check to see if everything is working correctly
 
@@ -90,16 +90,16 @@ Any time the node dependencies are changed (like from a recently completed new f
 
 **Pro tips:**
 
-In our Docker Compose environment, `app` is the name of the container where the Federalist web application runs. You can run any command in the context of the web application by running `docker-compose run app <THE COMMAND>`.
+In our Docker Compose environment, `app` is the name of the container where the Federalist web application runs. You can run any command in the context of the web application by running `docker-compose run --rm app <THE COMMAND>`.
 
 For example:
 
-- Use `docker-compose run app yarn test` to run local testing on the app.
-- Use `docker-compose run app yarn lint` to check that your local changes meet our linting standards.
+- Use `docker-compose run --rm app yarn test` to run local testing on the app.
+- Use `docker-compose run --rm app yarn lint` to check that your local changes meet our linting standards.
 
-Similarly you can run any command in the context of the database container `db` by running `docker-compose run db <THE COMMAND>`.
+Similarly you can run any command in the context of the database container `db` by running `docker-compose run --rm db <THE COMMAND>`.
 
-Note that when using `docker-compose run`, the docker network will not be exposed to your local machine. If you do need the network available, run `docker-compose run --service-ports app <THE COMMAND>`.
+Note that when using `docker-compose run`, the docker network will not be exposed to your local machine. If you do need the network available, run `docker-compose run --rm --service-ports app <THE COMMAND>`.
 
 The `db` container is exposed on port `5433` of your host computer to make it easier to run commands on. For instance, you can open a `psql` session to it by running `psql -h localhost -p 5433 -d federalist -U postgres`.
 
@@ -115,7 +115,7 @@ If you are working on the front end of the application, the things you need to k
 1. It is built with `webpack`
 1. It lives in `/frontend`
 
-To analyze the contents of the front end JavaScript bundle, use `docker-compose run --service-ports app yarn analyze-webpack` after a build. Then visit http://127.0.0.1:8888 to see a visualization of the the bundle contents.
+To analyze the contents of the front end JavaScript bundle, use `docker-compose run --rm --service-ports app yarn analyze-webpack` after a build. Then visit http://127.0.0.1:8888 to see a visualization of the the bundle contents.
 
 ### Deployment
 
@@ -227,23 +227,23 @@ When making code changes, be sure to write new or modify existing tests to cover
 The full test suite of both front and back end tests can be run via:
 
 ```sh
-docker-compose run app yarn test
+docker-compose run --rm app yarn test
 ```
 
 You can also just run back or front end tests via:
 
 ```sh
-docker-compose run app yarn test:server  # for all back end tests
-docker-compose run app yarn test:server:file ./test/api/<path/to/test.js> # to run a single back end test file
-docker-compose run app yarn test:client  # for all front end tests
-docker-compose run app yarn test:client:watch  # to watch and re-run front end tests
-docker-compose run app yarn test:client:file ./test/frontend/<path/to/test.js> # to run a single front end test file
+docker-compose run --rm app yarn test:server  # for all back end tests
+docker-compose run --rm app yarn test:server:file ./test/api/<path/to/test.js> # to run a single back end test file
+docker-compose run --rm app yarn test:client  # for all front end tests
+docker-compose run --rm app yarn test:client:watch  # to watch and re-run front end tests
+docker-compose run --rm app yarn test:client:file ./test/frontend/<path/to/test.js> # to run a single front end test file
 ```
 
 To view coverage reports as HTML after running the full test suite:
 
 ```sh
-docker-compose run --service-ports app yarn serve-coverage
+docker-compose run --rm --service-ports app yarn serve-coverage
 ```
 
 and then visit http://localhost:8080.
@@ -259,13 +259,13 @@ Because this project was not initially written in a way that complies with our c
 To lint the files in a branch, run:
 
 ```sh
-docker-compose run app yarn lint
+docker-compose run --rm app yarn lint
 ```
 
 `eslint` also has a helpful auto-fix command that can be run by:
 
 ```sh
-docker-compose run app node_modules/.bin/eslint --fix path/to/file.js
+docker-compose run --rm app node_modules/.bin/eslint --fix path/to/file.js
 ```
 
 ## Feature Flags
