@@ -40,7 +40,7 @@ async function runRemoveBucketWebsiteConfig(site) {
   } catch (error) {
     // ignore errors for deleted sites
     if (!site.isSoftDeleted()) {
-      const prefix = `${site.id} | ${site.owner}/${site.repository} | `;
+      const prefix = `${site.owner}/${site.repository} | `;
       throw new Error(`${prefix}${error.message}`);
     }
   }
