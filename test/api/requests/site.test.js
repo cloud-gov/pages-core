@@ -116,6 +116,45 @@ describe('Site API', () => {
         })
         .catch(done);
     });
+
+    it('should include sites\' URL editability', (done) => {
+      let user;
+      let sites;
+      let response;
+
+      factory.user().then((model) => {
+        user = model;
+        const sitePromises = Array(3).fill(0).map(() => factory.site({ users: [user.id] }));
+
+        return Promise.all(sitePromises);
+      }).then((models) => {
+        sites = models;
+        return authenticatedSession(user);
+      }).then(cookie => request(app)
+        .get('/v0/site')
+        .set('Cookie', cookie)
+        .expect(200))
+        .then((resp) => {
+          response = resp;
+
+          validateAgainstJSONSchema('GET', '/site', 200, response.body);
+
+          expect(response.body).to.be.a('array');
+          expect(response.body).to.have.length(3);
+
+          return Promise.all(sites.map(site => Site.findByPk(site.id, { include: [User] })));
+        })
+        .then((foundSites) => {
+          foundSites.forEach((site) => {
+            const responseSite = response.body.find(candidate => candidate.id === site.id);
+            expect(responseSite).not.to.be.undefined;
+            siteResponseExpectations(responseSite, site);
+            expect(responseSite).to.include.keys('canEditLiveUrl','canEditDemoUrl');
+          });
+          done();
+        })
+        .catch(done);
+    });
   });
 
   describe('GET /v0/site/:id', () => {
