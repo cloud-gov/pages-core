@@ -6,6 +6,7 @@ const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const UserActionCreator = require('../services/UserActionCreator');
 const EventCreator = require('../services/EventCreator');
 const siteSerializer = require('../serializers/site');
+const DomainService = require('../services/Domain');
 const {
   Build, Organization, Site, User, Event, Domain,
 } = require('../models');
@@ -152,7 +153,7 @@ module.exports = wrapHandlers({
   async update(req, res) {
     const { user, params: { id: siteId }, body } = req;
 
-    const site = await fetchModelById(siteId, Site.forUser(user));
+    const site = await fetchModelById(siteId, Site.forUser(user), { include: [Domain] });
 
     if (!site) {
       return res.notFound();
@@ -171,6 +172,13 @@ module.exports = wrapHandlers({
       domain: params.domain,
       engine: params.engine,
     };
+
+    // Exclude domain URL(s) from update if they're managed by an associated Domain
+    const canEditLiveUrl = !DomainService.isSiteUrlManagedByDomain(site, site.Domains, 'site');
+    const canEditDemoUrl = !DomainService.isSiteUrlManagedByDomain(site, site.Domains, 'demo');
+    if (!canEditLiveUrl) { delete updateParams.domain; }
+    if (!canEditDemoUrl) { delete updateParams.demoDomain; }
+
     await site.update(updateParams);
     EventCreator.audit(req.user, Event.labels.USER_ACTION, 'Site Updated', {
       site: { ...updateParams, id: site.id },
