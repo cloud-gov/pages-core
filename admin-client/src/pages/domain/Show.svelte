@@ -32,7 +32,10 @@
   }
 
   function deprovision() {
-    domainPromise = deprovisionDomain(id);
+    // eslint-disable-next-line no-alert
+    if (window.confirm('Are you sure you want to deprovision this domain?')) {
+      domainPromise = deprovisionDomain(id);
+    }
   }
 
   async function destroy() {
@@ -62,7 +65,9 @@
     <div class="grid-row">
       <div class="tablet:grid-col-fill padding-bottom-1">
         <LabeledItem label="id" value={domain.id} />
-        <LabeledItem label="site" value={siteName(domain.Site)} />
+        <LabeledItem label="site">
+          <a href="/sites/{domain.Site.id}">{siteName(domain.Site)}</a>
+        </LabeledItem>
         <LabeledItem label="context" value={domain.context} />
         <LabeledItem label="branch" value={domainBranch(domain)} />
         {#if domain.state !== 'pending'}
