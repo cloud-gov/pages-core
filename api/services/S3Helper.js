@@ -23,20 +23,6 @@ function createPagedResults(totalMaxObjects, isTruncated, objects) {
   return pagedResults;
 }
 
-function createWebsiteParams(owner, repository, bucket) {
-  return {
-    Bucket: bucket,
-    WebsiteConfiguration: {
-      ErrorDocument: {
-        Key: `site/${owner}/${repository}/404.html`,
-      },
-      IndexDocument: {
-        Suffix: 'index.html',
-      },
-    },
-  };
-}
-
 function resolveCallback(resolve, reject) {
   return (err, objects) => {
     if (err) {
@@ -107,13 +93,6 @@ class S3Client {
         { totalMaxObjects },
         resolveCallback(resolve, reject));
     });
-  }
-
-  // ToDo refactor and move `putBucketWebsite` config in site creation flow
-  putBucketWebsite(owner, repository) {
-    const { bucket, client } = this;
-    const params = createWebsiteParams(owner, repository, bucket);
-    return client.putBucketWebsite(params).promise();
   }
 
   putObject(body, key, extras = {}) {

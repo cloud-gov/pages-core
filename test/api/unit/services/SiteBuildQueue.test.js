@@ -61,21 +61,6 @@ describe('SiteBuildQueue', () => {
 
       AWSMocks.mocks.S3.headBucket = () => ({ promise: () => Promise.resolve() });
 
-      AWSMocks.mocks.S3.putBucketWebsite = (params) => {
-        expect(params).to.deep.equal({
-          Bucket: config.s3.bucket,
-          WebsiteConfiguration: {
-            ErrorDocument: {
-              Key: `site/${owner}/${repository}/404.html`,
-            },
-            IndexDocument: {
-              Suffix: 'index.html',
-            },
-          },
-        });
-        return { promise: () => Promise.resolve() };
-      };
-
       AWSMocks.mocks.S3.putObject = (params) => {
         expect(params).to.deep.equal({
           Body: 'User-agent: *\nDisallow: /\n',
