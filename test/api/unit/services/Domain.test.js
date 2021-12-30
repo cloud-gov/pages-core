@@ -462,7 +462,7 @@ describe('Domain Service', () => {
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
       await domain.reload({ include: [ Site ] });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'site')).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Site)).to.be.true;
     });
 
     it('reports a domain-managed site demo URL when the URL matches a demo-context domain', async () => {
@@ -470,7 +470,7 @@ describe('Domain Service', () => {
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Demo });
       await domain.reload({ include: [ Site ] });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'demo')).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Demo)).to.be.true;
     });
 
     it('reports a domain-managed site live URL when the site live URL is null', async () => {
@@ -478,7 +478,7 @@ describe('Domain Service', () => {
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
       await domain.reload({ include: [ Site ] });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'site')).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Site)).to.be.true;
     });
 
     it('reports a domain-managed site demo URL when the site demo URL is null', async () => {
@@ -486,7 +486,7 @@ describe('Domain Service', () => {
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Demo });
       await domain.reload({ include: [ Site ] });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'demo')).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Demo)).to.be.true;
     });
 
     it('reports a domain-managed site live URL when the URL matches a first site-context domain name', async () => {
@@ -494,7 +494,7 @@ describe('Domain Service', () => {
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov' });
       await domain.reload({ include: [ Site ] });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'site')).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Site)).to.be.true;
     });
 
     it('reports a domain-managed site live URL when the URL matches a first demo-context domain name', async () => {
@@ -502,7 +502,7 @@ describe('Domain Service', () => {
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov', context: Domain.Contexts.Demo });
       await domain.reload({ include: [ Site ] });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'demo')).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Demo)).to.be.true;
     });
 
     it('reports a domain-managed site live URL when the URL matches a non-first site-context domain name', async () => {
@@ -510,7 +510,7 @@ describe('Domain Service', () => {
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov' });
       await domain.reload({ include: [ Site ] });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'site')).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Site)).to.be.true;
     });
 
     it('reports a domain-managed site live URL when the URL matches a non-first demo-context domain name', async () => {
@@ -518,7 +518,7 @@ describe('Domain Service', () => {
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov', context: Domain.Contexts.Demo });
       await domain.reload({ include: [ Site ] });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'demo')).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Demo)).to.be.true;
     });
 
     it('reports a non domain-managed site live URL when the URL does not match a site-context domain name', async () => {
@@ -526,7 +526,7 @@ describe('Domain Service', () => {
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
       await domain.reload({ include: [ Site ] });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'site')).to.be.false;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Site)).to.be.false;
     });
 
     it('reports a non domain-managed site demo URL when the URL does not match a demo-context domain name', async () => {
@@ -534,7 +534,7 @@ describe('Domain Service', () => {
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Demo });
       await domain.reload({ include: [ Site ] });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'demo')).to.be.false;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Demo)).to.be.false;
     });
 
     it('reports a non domain-managed site URL when an empty domain array is offered for evaluation', async () => {
