@@ -164,20 +164,22 @@ module.exports = wrapHandlers({
     const params = Object.assign(site, body);
     const updateParams = {
       demoBranch: params.demoBranch,
-      demoDomain: params.demoDomain,
       defaultConfig: params.defaultConfig,
       previewConfig: params.previewConfig,
       demoConfig: params.demoConfig,
       defaultBranch: params.defaultBranch,
-      domain: params.domain,
       engine: params.engine,
     };
 
-    // Exclude domain URL(s) from update if they're managed by an associated Domain
+    // Include domain URL(s) in update only if they're managed by an associated Domain
     const canEditLiveUrl = !DomainService.isSiteUrlManagedByDomain(site, site.Domains, 'site');
     const canEditDemoUrl = !DomainService.isSiteUrlManagedByDomain(site, site.Domains, 'demo');
-    if (!canEditLiveUrl) { delete updateParams.domain; }
-    if (!canEditDemoUrl) { delete updateParams.demoDomain; }
+    if (canEditLiveUrl) {
+      updateParams.domain = params.domain;
+    }
+    if (canEditDemoUrl) {
+      updateParams.demoDomain = params.demoDomain;
+    }
 
     await site.update(updateParams);
     EventCreator.audit(req.user, Event.labels.USER_ACTION, 'Site Updated', {
