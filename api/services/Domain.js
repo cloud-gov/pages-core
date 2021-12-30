@@ -139,7 +139,6 @@ async function rebuildAssociatedSite(domain) {
   const branch = site[Site.branchFromContext(domain.context)];
   if (branch) {
     await Build.create({
-      user: null,
       site: site.id,
       branch,
       username: 'Federalist Operators',
