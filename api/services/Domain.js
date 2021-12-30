@@ -136,7 +136,7 @@ function isSiteUrlManagedByDomain(site, domains, context) {
  */
 async function rebuildAssociatedSite(domain) {
   const site = await domain.getSite();
-  const branch = site[domain.context === 'site' ? 'defaultBranch' : 'demoBranch'];
+  const branch = site[Site.branchFromContext(domain.context)];
   if (branch) {
     await Build.create({
       user: null,
