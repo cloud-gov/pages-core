@@ -3,7 +3,7 @@ const validateJSONSchema = require('jsonschema').validate;
 
 const siteSchema = require('../../../../public/swagger/Site.json');
 const factory = require('../../support/factory');
-const { Domain, Site } = require('../../../../api/models');
+const { Domain } = require('../../../../api/models');
 
 const SiteSerializer = require('../../../../api/serializers/site');
 
