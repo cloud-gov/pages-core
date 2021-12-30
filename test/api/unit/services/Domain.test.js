@@ -352,7 +352,7 @@ describe('Domain Service', () => {
       await site.reload( { include: [ Build ] });
       expect(site.Builds).to.have.length(0);
 
-      await DomainService.rebuildAssociatedSite(domain);
+      await DomainService.rebuildAssociatedSite(domain, site);
 
       await site.reload( { include: [ Build ] });
       expect(site.Builds).to.have.length(1);
@@ -366,7 +366,7 @@ describe('Domain Service', () => {
       await site.reload( { include: [ Build ] });
       expect(site.Builds).to.have.length(0);
 
-      await DomainService.rebuildAssociatedSite(domain);
+      await DomainService.rebuildAssociatedSite(domain, site);
 
       await site.reload( { include: [ Build ] });
       expect(site.Builds).to.have.length(1);
@@ -392,7 +392,7 @@ describe('Domain Service', () => {
       await site.reload();
       expect(site.domain).to.eq('https://www.agency.gov');
       expect(site.demoDomain).to.eq(null);
-      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain, site);
     });
 
     it('sets the demo domain name on the associated site if not previously set', async () => {
@@ -412,7 +412,7 @@ describe('Domain Service', () => {
       await site.reload();
       expect(site.domain).to.eq(null);
       expect(site.demoDomain).to.eq('https://www.agency.gov');
-      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain, site);
     });
 
     it('leaves the existing domain name on its associated site unchanged', async () => {
@@ -581,7 +581,7 @@ describe('Domain Service', () => {
       await site.reload();
       expect(site.domain).to.eq(null);
       expect(site.demoDomain).to.eq(null);
-      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain, site);
     });
 
     it('unsets a matching first domain name on its associated site', async () => {
@@ -600,7 +600,7 @@ describe('Domain Service', () => {
       await site.reload();
       expect(site.domain).to.eq(null);
       expect(site.demoDomain).to.eq(null);
-      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain, site);
     });
 
     it('unsets a matching non-first domain name on its associated site', async () => {
@@ -619,7 +619,7 @@ describe('Domain Service', () => {
       await site.reload();
       expect(site.domain).to.eq(null);
       expect(site.demoDomain).to.eq(null);
-      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain, site);
     });
 
     it('unsets a matching demo domain name on its associated site', async () => {
@@ -638,7 +638,7 @@ describe('Domain Service', () => {
       await site.reload();
       expect(site.domain).to.eq(null);
       expect(site.demoDomain).to.eq(null);
-      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain, site);
     });
 
     it('unsets a matching first demo domain name on its associated site', async () => {
@@ -657,7 +657,7 @@ describe('Domain Service', () => {
       await site.reload();
       expect(site.domain).to.eq(null);
       expect(site.demoDomain).to.eq(null);
-      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain, site);
     });
 
     it('unsets a matching non-first demo domain name on its associated site', async () => {
@@ -676,7 +676,7 @@ describe('Domain Service', () => {
       await site.reload();
       expect(site.domain).to.eq(null);
       expect(site.demoDomain).to.eq(null);
-      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain);
+      sinon.assert.calledOnceWithExactly(siteBuildSpy, domain, site);
     });
 
     it('leaves a non-matching domain name on its associated site alone', async () => {
