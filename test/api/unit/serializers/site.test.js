@@ -68,7 +68,7 @@ describe('SiteSerializer', () => {
 
     it('includes URL editability when associated to domain', async () => {
       const site = await factory.site({ domain: 'https://www.agency.gov', demoDomain: null });
-      const domain = await factory.domain.create({ siteId: site.id, names: 'www.agency.gov', context: "site" });
+      const domain = await factory.domain.create({ siteId: site.id, names: 'www.agency.gov', context: 'site' });
       await site.reload({ include: [ Domain ] });
       const object = await SiteSerializer.serializeObject(site);
 
