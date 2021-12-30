@@ -12,6 +12,7 @@ const { States } = Domain;
 
 /**
  * @typedef {object} DomainModel
+ * @typedef {object} SiteModel
  * @prop {string} state
  */
 
