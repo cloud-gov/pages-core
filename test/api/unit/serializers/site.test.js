@@ -1,4 +1,4 @@
-const { expect, assert } = require('chai');
+const { expect } = require('chai');
 const validateJSONSchema = require('jsonschema').validate;
 
 const siteSchema = require('../../../../public/swagger/Site.json');
