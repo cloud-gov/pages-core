@@ -254,5 +254,6 @@ module.exports = (sequelize, DataTypes) => {
   Site.orgScope = id => ({ method: ['byOrg', id] });
   Site.searchScope = search => ({ method: ['byIdOrText', search] });
   Site.forUser = user => Site.scope({ method: ['forUser', user] });
+  Site.domainFromContext = context => (context === 'site' ? 'domain' : 'demoDomain');
   return Site;
 };

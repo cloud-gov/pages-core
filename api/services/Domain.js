@@ -1,6 +1,6 @@
 const IORedis = require('ioredis');
 
-const { Domain, Build } = require('../models');
+const { Domain, Build, Site } = require('../models');
 const { path: sitePath, siteViewOrigin } = require('../utils/site');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const { DomainQueue } = require('../queues');
@@ -117,7 +117,7 @@ function checkAcmeChallengeDnsRecord(domain) {
  * @param {string} context 'site' or 'demo' corresponding to Domain.context
  */
 function isSiteUrlManagedByDomain(site, domains, context) {
-  const siteDomain = context === 'site' ? 'domain' : 'demoDomain';
+  const siteDomain = Site.domainFromContext(context);
   if (site[siteDomain] === null) { return true; }
   if (domains.length === 0) { return false; }
   let siteUrlIsManagedByDomain = false;
@@ -155,7 +155,7 @@ async function updateSiteForProvisionedDomain(domain) {
   // Populate appropriate site URL if it isn't already set
   const site = await domain.getSite();
   const firstDomain = `https://${domain.names.split(',')[0]}`;
-  const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
+  const siteDomain = Site.domainFromContext(domain.context);
   if (site[siteDomain] === null) {
     await site.update({ [siteDomain]: firstDomain });
     await module.exports.rebuildAssociatedSite(domain);
