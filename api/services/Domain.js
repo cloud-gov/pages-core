@@ -124,7 +124,7 @@ function isSiteUrlManagedByDomain(site, domains, context) {
   let siteUrlIsManagedByDomain = false;
   domains.forEach((domain) => {
     if (domain.context === context) {
-      if (domain.names.split(',').find(name => `https://${name}` === site[siteDomain])) {
+      if (domain.namesArray().find(name => `https://${name}` === site[siteDomain])) {
         siteUrlIsManagedByDomain = true;
       }
     }
@@ -154,7 +154,7 @@ async function rebuildAssociatedSite(domain) {
 async function updateSiteForProvisionedDomain(domain) {
   // Populate appropriate site URL if it isn't already set
   const site = await domain.getSite();
-  const firstDomain = `https://${domain.names.split(',')[0]}`;
+  const firstDomain = `https://${domain.namesArray()[0]}`;
   const siteDomain = Site.domainFromContext(domain.context);
   if (isSiteUrlManagedByDomain(site, [domain], domain.context) && site[siteDomain] === null) {
     await site.update({ [siteDomain]: firstDomain });
@@ -216,7 +216,7 @@ async function provision(domain, dnsResults) {
 
   const site = await domain.getSite();
 
-  const [firstDomainName] = domain.names.split(',');
+  const [firstDomainName] = domain.namesArray();
 
   const serviceName = `${firstDomainName}-ext`;
   const origin = siteViewOrigin(site);

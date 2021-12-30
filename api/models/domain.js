@@ -108,6 +108,9 @@ function define(sequelize, DataTypes) {
   Domain.prototype.isProvisioning = function isProvisioning() {
     return this.state === Domain.States.Provisioning;
   };
+  Domain.prototype.namesArray = function namesArray() {
+    return this.names.split(',');
+  };
   return Domain;
 }
 
