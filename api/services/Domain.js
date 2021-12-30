@@ -115,7 +115,7 @@ function checkAcmeChallengeDnsRecord(domain) {
 /**
  * @param {SiteModel} site
  * @param {DomainModel[]} domains
- * @param {string} context 'site' or 'demo' corresponding to Domain.context
+ * @param {string} context Domain.Contexts.Site or DomainContexts.Demo
  */
 function isSiteUrlManagedByDomain(site, domains, context) {
   const siteDomain = Site.domainFromContext(context);
@@ -171,7 +171,7 @@ async function updateSiteForDeprovisionedDomain(domain) {
   // Clear appropriate site URL if it matches a domain name
   const site = await domain.getSite();
   if (isSiteUrlManagedByDomain(site, [domain], domain.context)) {
-    const siteDomain = domain.context === 'site' ? 'domain' : 'demoDomain';
+    const siteDomain = domain.context === Domain.Contexts.Site ? 'domain' : 'demoDomain';
     await site.update({ [siteDomain]: null });
     await module.exports.rebuildAssociatedSite(domain);
   }

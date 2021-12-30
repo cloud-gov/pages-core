@@ -172,8 +172,16 @@ module.exports = wrapHandlers({
     };
 
     // Include domain URL(s) in update only if they're managed by an associated Domain
-    const canEditLiveUrl = !DomainService.isSiteUrlManagedByDomain(site, site.Domains, 'site');
-    const canEditDemoUrl = !DomainService.isSiteUrlManagedByDomain(site, site.Domains, 'demo');
+    const canEditLiveUrl = !DomainService.isSiteUrlManagedByDomain(
+      site,
+      site.Domains,
+      Domain.Contexts.Site
+    );
+    const canEditDemoUrl = !DomainService.isSiteUrlManagedByDomain(
+      site,
+      site.Domains,
+      Domain.Contexts.Demo
+    );
     if (canEditLiveUrl) {
       updateParams.domain = params.domain;
     }

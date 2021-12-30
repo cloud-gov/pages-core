@@ -361,7 +361,7 @@ describe('Domain Service', () => {
 
     it('triggers a rebuild on its associated site with matching demo domain name', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.agency.gov', demoBranch: 'demo' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: 'demo', state: Domain.States.Provisioning });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Demo, state: Domain.States.Provisioning });
 
       await site.reload( { include: [ Build ] });
       expect(site.Builds).to.have.length(0);
@@ -397,7 +397,7 @@ describe('Domain Service', () => {
 
     it('sets the demo domain name on the associated site if not previously set', async () => {
       const site = await SiteFactory();
-      const domain = await DomainFactory.create({ siteId: site.id, context: 'demo', names: 'www.agency.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, context: Domain.Contexts.Demo, names: 'www.agency.gov' });
       const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
 
       expect(domain.names).to.eq('www.agency.gov');
@@ -437,7 +437,7 @@ describe('Domain Service', () => {
 
     it('leaves the existing domain name on its associated site unchanged', async () => {
       const site = await SiteFactory({ demoDomain: 'https://example.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, context: 'demo', names: 'www.agency.gov' });
+      const domain = await DomainFactory.create({ siteId: site.id, context: Domain.Contexts.Demo, names: 'www.agency.gov' });
       const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
 
       expect(domain.names).to.eq('www.agency.gov');
@@ -467,7 +467,7 @@ describe('Domain Service', () => {
 
     it('reports a domain-managed site demo URL when the URL matches a demo-context domain', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: 'demo' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Demo });
       await domain.reload({ include: [ Site ] });
 
       expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'demo')).to.be.true;
@@ -483,7 +483,7 @@ describe('Domain Service', () => {
 
     it('reports a domain-managed site demo URL when the site demo URL is null', async () => {
       const site = await SiteFactory({ demoDomain: null });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: 'demo' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Demo });
       await domain.reload({ include: [ Site ] });
 
       expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'demo')).to.be.true;
@@ -499,7 +499,7 @@ describe('Domain Service', () => {
 
     it('reports a domain-managed site live URL when the URL matches a first demo-context domain name', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov', context: 'demo' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov', context: Domain.Contexts.Demo });
       await domain.reload({ include: [ Site ] });
 
       expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'demo')).to.be.true;
@@ -515,7 +515,7 @@ describe('Domain Service', () => {
 
     it('reports a domain-managed site live URL when the URL matches a non-first demo-context domain name', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov', context: 'demo' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov', context: Domain.Contexts.Demo });
       await domain.reload({ include: [ Site ] });
 
       expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'demo')).to.be.true;
@@ -531,7 +531,7 @@ describe('Domain Service', () => {
 
     it('reports a non domain-managed site demo URL when the URL does not match a demo-context domain name', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.example.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: 'demo' });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Demo });
       await domain.reload({ include: [ Site ] });
 
       expect(DomainService.isSiteUrlManagedByDomain(site, [domain], 'demo')).to.be.false;
@@ -624,7 +624,7 @@ describe('Domain Service', () => {
 
     it('unsets a matching demo domain name on its associated site', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: 'demo', state: Domain.States.Provisioning });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Demo, state: Domain.States.Provisioning });
       const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
 
       expect(domain.names).to.eq('www.agency.gov');
@@ -643,7 +643,7 @@ describe('Domain Service', () => {
 
     it('unsets a matching first demo domain name on its associated site', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov', context: 'demo', state: Domain.States.Provisioning });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov', context: Domain.Contexts.Demo, state: Domain.States.Provisioning });
       const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
 
       expect(domain.names).to.eq('www.agency.gov,www.foo.gov,www.bar.gov');
@@ -662,7 +662,7 @@ describe('Domain Service', () => {
 
     it('unsets a matching non-first demo domain name on its associated site', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov', context: 'demo', state: Domain.States.Provisioning });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov', context: Domain.Contexts.Demo, state: Domain.States.Provisioning });
       const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
 
       expect(domain.names).to.eq('www.foo.gov,www.agency.gov,www.bar.gov');
@@ -700,7 +700,7 @@ describe('Domain Service', () => {
 
     it('leaves a non-matching demo domain name on its associated site alone', async () => {
       const site = await SiteFactory({ demoDomain: 'https://example.gov' });
-      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: 'demo', state: Domain.States.Provisioning });
+      const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Demo, state: Domain.States.Provisioning });
       const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
 
       expect(domain.names).to.eq('www.agency.gov');
