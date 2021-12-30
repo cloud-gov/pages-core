@@ -156,7 +156,7 @@ async function updateSiteForProvisionedDomain(domain) {
   const site = await domain.getSite();
   const firstDomain = `https://${domain.names.split(',')[0]}`;
   const siteDomain = Site.domainFromContext(domain.context);
-  if (site[siteDomain] === null) {
+  if (isSiteUrlManagedByDomain(site, [domain], domain.context) && site[siteDomain] === null) {
     await site.update({ [siteDomain]: firstDomain });
     await module.exports.rebuildAssociatedSite(domain);
   }
