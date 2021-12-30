@@ -154,7 +154,7 @@ async function rebuildAssociatedSite(domain) {
 async function updateSiteForProvisionedDomain(domain) {
   // Populate appropriate site URL if it isn't already set
   const site = await domain.getSite();
-  const firstDomain = `https://${domain.namesArray()[0]}`;
+  const firstDomain = `https://${domain.firstName()}`;
   const siteDomain = Site.domainFromContext(domain.context);
   if (isSiteUrlManagedByDomain(site, [domain], domain.context) && site[siteDomain] === null) {
     await site.update({ [siteDomain]: firstDomain });
