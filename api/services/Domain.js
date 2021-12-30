@@ -134,9 +134,9 @@ function isSiteUrlManagedByDomain(site, domains, context) {
 
 /**
  * @param {DomainModel} domain
+ * @param {SiteModel} site
  */
-async function rebuildAssociatedSite(domain) {
-  const site = await domain.getSite();
+async function rebuildAssociatedSite(domain, site) {
   const branch = site[Site.branchFromContext(domain.context)];
   if (branch) {
     await Build.create({
@@ -158,7 +158,7 @@ async function updateSiteForProvisionedDomain(domain) {
   const siteDomain = Site.domainFromContext(domain.context);
   if (isSiteUrlManagedByDomain(site, [domain], domain.context) && site[siteDomain] === null) {
     await site.update({ [siteDomain]: firstDomain });
-    await module.exports.rebuildAssociatedSite(domain);
+    await module.exports.rebuildAssociatedSite(domain, site);
   }
   return domain;
 }
@@ -173,7 +173,7 @@ async function updateSiteForDeprovisionedDomain(domain) {
   if (isSiteUrlManagedByDomain(site, [domain], domain.context)) {
     const siteDomain = domain.context === Domain.Contexts.Site ? 'domain' : 'demoDomain';
     await site.update({ [siteDomain]: null });
-    await module.exports.rebuildAssociatedSite(domain);
+    await module.exports.rebuildAssociatedSite(domain, site);
   }
   return domain;
 }
