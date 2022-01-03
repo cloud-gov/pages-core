@@ -1,4 +1,4 @@
-const { expect, assert } = require('chai');
+const { expect } = require('chai');
 const sinon = require('sinon');
 
 const { Domain, Build } = require('../../../../api/models');
