@@ -12,8 +12,11 @@ const { States } = Domain;
 
 /**
  * @typedef {object} DomainModel
- * @typedef {object} SiteModel
  * @prop {string} state
+ */
+
+/**
+ * @typedef {object} SiteModel
  */
 
 function cfApi() {
