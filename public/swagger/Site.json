@@ -111,6 +111,12 @@
           "required": ["githubAccessToken", "githubUserId"]
         }
       }
+    },
+    "canEditLiveUrl": {
+      "type": "boolean"
+    },
+    "canEditDemoUrl": {
+      "type": "boolean"
     }
   }
 }

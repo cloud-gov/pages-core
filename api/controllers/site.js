@@ -6,8 +6,9 @@ const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const UserActionCreator = require('../services/UserActionCreator');
 const EventCreator = require('../services/EventCreator');
 const siteSerializer = require('../serializers/site');
+const DomainService = require('../services/Domain');
 const {
-  Build, Organization, Site, User, Event,
+  Build, Organization, Site, User, Event, Domain,
 } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const {
@@ -30,7 +31,7 @@ module.exports = wrapHandlers({
   async findAllForUser(req, res) {
     const { user } = req;
 
-    const sites = await Site.forUser(user).findAll();
+    const sites = await Site.forUser(user).findAll({ include: [Domain] });
 
     if (!sites) {
       return res.notFound();
@@ -152,7 +153,7 @@ module.exports = wrapHandlers({
   async update(req, res) {
     const { user, params: { id: siteId }, body } = req;
 
-    const site = await fetchModelById(siteId, Site.forUser(user));
+    const site = await fetchModelById(siteId, Site.forUser(user), { include: [Domain] });
 
     if (!site) {
       return res.notFound();
@@ -163,14 +164,31 @@ module.exports = wrapHandlers({
     const params = Object.assign(site, body);
     const updateParams = {
       demoBranch: params.demoBranch,
-      demoDomain: params.demoDomain,
       defaultConfig: params.defaultConfig,
       previewConfig: params.previewConfig,
       demoConfig: params.demoConfig,
       defaultBranch: params.defaultBranch,
-      domain: params.domain,
       engine: params.engine,
     };
+
+    // Include domain URL(s) in update only if they're managed by an associated Domain
+    const canEditLiveUrl = !DomainService.isSiteUrlManagedByDomain(
+      site,
+      site.Domains,
+      Domain.Contexts.Site
+    );
+    const canEditDemoUrl = !DomainService.isSiteUrlManagedByDomain(
+      site,
+      site.Domains,
+      Domain.Contexts.Demo
+    );
+    if (canEditLiveUrl) {
+      updateParams.domain = params.domain;
+    }
+    if (canEditDemoUrl) {
+      updateParams.demoDomain = params.demoDomain;
+    }
+
     await site.update(updateParams);
     EventCreator.audit(req.user, Event.labels.USER_ACTION, 'Site Updated', {
       site: { ...updateParams, id: site.id },
