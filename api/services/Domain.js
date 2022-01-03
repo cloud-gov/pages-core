@@ -212,7 +212,7 @@ async function provision(domain, dnsResults) {
 
   const site = await domain.getSite();
 
-  const [firstDomainName] = domain.namesArray();
+  const firstDomainName = domain.firstName();
 
   const serviceName = `${firstDomainName}-ext`;
   const origin = siteViewOrigin(site);
