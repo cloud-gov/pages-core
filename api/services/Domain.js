@@ -167,7 +167,7 @@ async function updateSiteForDeprovisionedDomain(domain) {
   // Clear appropriate site URL if it matches a domain name
   const site = await domain.getSite();
   if (isSiteUrlManagedByDomain(site, [domain], domain.context)) {
-    const siteDomain = domain.context === Domain.Contexts.Site ? 'domain' : 'demoDomain';
+    const siteDomain = Site.domainFromContext(domain.context);
     await site.update({ [siteDomain]: null });
     await module.exports.rebuildAssociatedSite(domain, site);
   }
