@@ -1,8 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { Domain, Build } = require('../../../../api/models');
-const { Site } = require('../../../../api/models');
+const { Domain, Build, Site } = require('../../../../api/models');
 const { domain: DomainFactory, site: SiteFactory } = require('../../support/factory');
 const DnsService = require('../../../../api/services/Dns');
 const DomainService = require('../../../../api/services/Domain');
