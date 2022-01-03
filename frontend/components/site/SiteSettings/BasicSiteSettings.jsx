@@ -51,6 +51,7 @@ export const BasicSiteSettings = ({
             id="domainInput"
             placeholder="https://example.gov"
             className="form-control"
+            disabled={!initialValues.canEditLiveUrl}
           />
           )}
       </fieldset>
@@ -82,6 +83,7 @@ export const BasicSiteSettings = ({
             id="demoDomainInput"
             placeholder="https://demo.example.gov"
             className="form-control"
+            disabled={!initialValues.canEditDemoUrl}
           />
           )}
       </fieldset>
@@ -112,6 +114,8 @@ BasicSiteSettings.propTypes = {
     domain: PropTypes.string,
     demoBranch: PropTypes.string,
     demoDomain: PropTypes.string,
+    canEditLiveUrl: PropTypes.bool,
+    canEditDemoUrl: PropTypes.bool,
   }).isRequired,
 
   // the following props are from reduxForm:
