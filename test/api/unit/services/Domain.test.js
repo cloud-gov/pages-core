@@ -3,8 +3,7 @@ const sinon = require('sinon');
 
 const { Domain, Build } = require('../../../../api/models');
 const { Site } = require('../../../../api/models');
-const { domain: DomainFactory } = require('../../support/factory');
-const { site: SiteFactory } = require('../../support/factory');
+const { domain: DomainFactory, site: SiteFactory } = require('../../support/factory');
 const DnsService = require('../../../../api/services/Dns');
 const DomainService = require('../../../../api/services/Domain');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
