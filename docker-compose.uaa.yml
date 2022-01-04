@@ -1,0 +1,25 @@
+services:
+  app:
+    depends_on:
+      - uaa
+  federalist:
+    depends_on:
+      - uaa
+  bull-board:
+    depends_on:
+      - uaa
+  uaa:
+    build:
+      dockerfile: ./Dockerfile-uaa
+      context: .
+    ports:
+      - 9000:8080
+    environment:
+      POSTGRES_DB: federalist
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    depends_on:
+      - db
+    command: ["/tomcat/bin/catalina.sh", "run"]
