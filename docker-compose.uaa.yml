@@ -1,0 +1,34 @@
+services:
+  app:
+    depends_on:
+      - uaa
+    environment:
+      UAA_HOST: http://localhost:9000
+      UAA_HOST_DOCKER_URL: http://uaa:8080
+  federalist:
+    depends_on:
+      - uaa
+    environment:
+      UAA_HOST: http://localhost:9000
+      UAA_HOST_DOCKER_URL: http://uaa:8080
+  bull-board:
+    depends_on:
+      - uaa
+    environment:
+      UAA_HOST: http://localhost:9000
+      UAA_HOST_DOCKER_URL: http://uaa:8080
+  uaa:
+    build:
+      dockerfile: ./Dockerfile-uaa
+      context: .
+    ports:
+      - 9000:8080
+    environment:
+      POSTGRES_DB: federalist
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    depends_on:
+      - db
+    command: ["/tomcat/bin/catalina.sh", "run"]
