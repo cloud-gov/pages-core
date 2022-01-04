@@ -26,8 +26,11 @@ services:
       APP_HOSTNAME: http://localhost:1337
       DOMAIN: localhost:1337
       FEATURE_AUTH_GITHUB: 'false'
+      FEATURE_AUTH_UAA: 'true'
       PORT: 1337
       PRODUCT: pages
+      UAA_HOST: http://localhost:9000
+      UAA_HOST_DOCKER_URL: http://uaa:8080
       USER_AUDITOR: federalist
   federalist:
     build:
@@ -50,8 +53,11 @@ services:
       APP_HOSTNAME: http://localhost:1338
       DOMAIN: localhost:1338
       FEATURE_AUTH_GITHUB: 'true'
+      FEATURE_AUTH_UAA: 'false'
       PORT: 1338
       PRODUCT: federalist
+      UAA_HOST: http://localhost:9000
+      UAA_HOST_DOCKER_URL: http://uaa:8080
       USER_AUDITOR: federalist
   bull-board:
     build:
@@ -70,6 +76,8 @@ services:
     environment:
       APP_HOSTNAME: http://localhost:1340
       PORT: 1340
+      UAA_HOST: http://localhost:9000
+      UAA_HOST_DOCKER_URL: http://uaa:8080
   admin-client:
     build:
       dockerfile: ./admin-client/Dockerfile-admin
