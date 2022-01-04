@@ -2,23 +2,12 @@ services:
   app:
     depends_on:
       - uaa
-    environment:
-      UAA_HOST: http://localhost:9000
-      UAA_HOST_DOCKER_URL: http://uaa:8080
-      FEATURE_AUTH_UAA: 'true'
   federalist:
     depends_on:
       - uaa
-    environment:
-      UAA_HOST: http://localhost:9000
-      UAA_HOST_DOCKER_URL: http://uaa:8080
-      FEATURE_AUTH_UAA: 'false'
   bull-board:
     depends_on:
       - uaa
-    environment:
-      UAA_HOST: http://localhost:9000
-      UAA_HOST_DOCKER_URL: http://uaa:8080
   uaa:
     build:
       dockerfile: ./Dockerfile-uaa
