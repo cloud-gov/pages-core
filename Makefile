@@ -19,41 +19,41 @@ db: ## Connect to the database - it must already be running ie with `make start`
 	psql postgresql://postgres:password@localhost:5433/federalist
 
 build-client: ## Build client app - typically only done to test production artifacts
-	docker-compose run -rm app yarn build
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml run -rm app yarn build
 
 install: ## Install npm deps
-	docker-compose run --rm app yarn
-	docker-compose run --rm admin-client yarn
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml run --rm app yarn
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml run --rm admin-client yarn
 
 lint-server: ## Lint server code
-	docker-compose run --rm app yarn lint
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml run --rm app yarn lint
 
 lint-client: ## Lint admin client code
-	docker-compose run --rm admin-client yarn lint
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml run --rm admin-client yarn lint
 
 lint: lint-server lint-client ## Lint project
 
 migrate: ## Run database migrations
-	docker-compose run --rm app yarn migrate:up
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml run --rm app yarn migrate:up
 
 rebuild: ## Rebuild docker images and database volumes
 	docker volume rm federalist_db-data
-	docker-compose build
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml build
 
 seed: ## (Re)Create seed data
-	docker-compose run --rm app yarn create-dev-data
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml run --rm app yarn create-dev-data
 
 set-pipeline: ## Set Concourse `web` pipeline
 	fly -t pages-staging sp -p web -c ci/pipeline.yml
 
 start: ## Start
-	docker-compose up
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml up
 
 test-client: ## Run client tests
-	docker-compose run --rm app yarn test:client
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml run --rm app yarn test:client
 
 test-server: ## Run server tests
-	docker-compose run --rm app yarn test:server
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml run --rm app yarn test:server
 
 test-all: ## Run all tests
-	docker-compose run --rm app yarn test
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml run --rm app yarn test
