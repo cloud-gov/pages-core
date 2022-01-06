@@ -9,7 +9,7 @@
   async function handleSubmit(event) {
     submitting = true;
     const {
-      agency, name, managerUAAEmail, managerGithubUsername, sandbox, selfAuthorized, 
+      agency, name, managerUAAEmail, managerGithubUsername, sandbox, selfAuthorized,
     } = event.target.elements;
 
     const params = {
