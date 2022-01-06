@@ -6,6 +6,21 @@ const OrganizationService = require('../../services/organization');
 const EventCreator = require('../../services/EventCreator');
 const { fetchModelById } = require('../../utils/queryDatabase');
 
+// An experimental, more generic hook
+function organizationAuditHook(instance, { user, event }) {
+  const changes = instance.changed();
+  if (changes.length > 0) {
+    const changesObj = changes.reduce(
+      (agg, key) => ({ ...agg, [key]: instance.get(key) }),
+      { id: instance.id }
+    );
+
+    const tableName = instance.constructor.getTableName();
+    const message = `${event} ${tableName}`;
+    EventCreator.audit(Event.labels.ADMIN_ACTION, user, message, changesObj);
+  }
+}
+
 module.exports = wrapHandlers({
   async list(req, res) {
     const { limit, page, search } = req.query;
@@ -40,13 +55,20 @@ module.exports = wrapHandlers({
   async create(req, res) {
     const {
       body: {
-        managerGithubUsername, managerUAAEmail, name, sandbox,
+        managerGithubUsername, managerUAAEmail, agency, name, isSandbox, isSelfAuthorized,
       },
       user,
     } = req;
 
+    const organizationParams = {
+      agency,
+      name,
+      isSandbox,
+      isSelfAuthorized,
+    };
+
     const [org, { email, inviteLink: link }] = await OrganizationService.createOrganization(
-      user, name, sandbox, managerUAAEmail, managerGithubUsername
+      organizationParams, user, managerUAAEmail, managerGithubUsername
     );
 
     if (link) {
@@ -63,33 +85,31 @@ module.exports = wrapHandlers({
 
   async update(req, res) {
     const {
-      body: { name, sandbox, active },
+      body: {
+        agency, name, isSandbox, isSelfAuthorized, isActive,
+      },
       params: { id },
     } = req;
-
-    const auditUpdate = (organization) => {
-      const eventAtts = {};
-      if (organization.isSandbox !== sandbox) {
-        eventAtts.sandbox = sandbox;
-      }
-      if (organization.isActive !== active) {
-        eventAtts.active = active;
-      }
-      if (organization.name !== name) {
-        eventAtts.name = name;
-      }
-      if (Object.keys(eventAtts).length > 0) {
-        EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Organization Updated', {
-          organization: { ...eventAtts, id: organization.id },
-        });
-      }
-    };
 
     const org = await fetchModelById(id, Organization);
     if (!org) return res.notFound();
 
-    await org.update({ isSandbox: sandbox, name, isActive: active });
-    auditUpdate(org);
+    const orgParams = {
+      agency,
+      isSandbox,
+      name,
+      isActive,
+      isSelfAuthorized,
+    };
+
+    // An experimental hook for more generic auditing
+    // Adding and removing here so it doesn't affect anything else
+    const hookEvent = 'afterUpdate';
+    const hookKey = 'afterUpdateHook';
+    Organization.addHook(hookEvent, hookKey, organizationAuditHook);
+    await org.update(orgParams, { user: req.user, event: 'Update' });
+    Organization.removeHook(hookEvent, hookKey);
+
     return res.json(serialize(org));
   },
 });

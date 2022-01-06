@@ -13,6 +13,12 @@ const UAAClient = require('../../utils/uaaClient');
  * @typedef {object} UserType
  * @typedef {object} OrgType
  * @typedef {object} UAAIdentityType
+ *
+ * @typedef {object} OrganizationParams
+ * @property {string} name
+ * @property {string} agency
+ * @property {boolean} sandbox
+ * @property {boolean} isSelfAuthorized
  */
 
 function throwError(message) {
@@ -170,15 +176,14 @@ module.exports = {
   },
 
   /**
+   * @param {OrganizationParams} organizationParams
    * @param {UserType} currentUser
-   * @param {string} orgName
-   * @param {boolean} sandbox
    * @param {string} targetUserEmail
    * @param {string=} targetUserGithubUsername
    * @returns {Promise<[OrgType, UAAClient.UAAUserAttributes]>}
    */
   async createOrganization(
-    currentUser, orgName, sandbox, targetUserEmail, targetUserGithubUsername
+    organizationParams, currentUser, targetUserEmail, targetUserGithubUsername
   ) {
     const currentUserUAAIdentity = await currentUser.getUAAIdentity();
 
@@ -198,10 +203,7 @@ module.exports = {
 
     const managerRole = await Role.findOne({ where: { name: 'manager' } });
 
-    const org = await Organization.create({
-      name: orgName,
-      isSandbox: sandbox,
-    });
+    const org = await Organization.create(organizationParams);
     await org.addUser(user, { through: { roleId: managerRole.id } });
 
     return [org, uaaUserAttributes];

@@ -9,14 +9,16 @@
   async function handleSubmit(event) {
     submitting = true;
     const {
-      name, managerUAAEmail, managerGithubUsername, sandbox,
+      agency, name, managerUAAEmail, managerGithubUsername, sandbox, selfAuthorized, 
     } = event.target.elements;
 
     const params = {
+      agency: agency.value,
       name: name.value,
       managerUAAEmail: managerUAAEmail.value,
       managerGithubUsername: managerGithubUsername.value,
-      sandbox: sandbox.value === 'sandbox',
+      isSandbox: sandbox.value === 'sandbox',
+      isSelfAuthorized: selfAuthorized.checked,
     };
 
     const { invite } = await createOrganization(params);
@@ -47,6 +49,12 @@
       <label class="usa-label" for="name">Organization Name<abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
       <span class="usa-hint">Organization name must be globally unique</span>
       <input type="text" class="usa-input" name="name" id="name" required>
+    </fieldset>
+
+    <fieldset class="usa-fieldset">
+      <label class="usa-label" for="agency">Agency<abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
+      <span class="usa-hint">Federal agency (GSA, OMB, etc...)</span>
+      <input type="text" class="usa-input" name="agency" id="agency" required>
     </fieldset>
 
     <fieldset class="usa-fieldset">
@@ -86,6 +94,21 @@
       </div>
     </fieldset>
 
+    <fieldset class="usa-fieldset">
+      <legend class="usa-legend usa-legend">Authorization</legend>
+      <div class="usa-checkbox">
+        <input
+          class="usa-checkbox__input usa-checkbox__input--tile"
+          id="selfAuthorized-self"
+          type="checkbox"
+          name="selfAuthorized"
+          value="self"
+        />
+        <label class="usa-checkbox__label" for="selfAuthorized-self">
+          Self Authorized
+        </label>
+      </div>
+    </fieldset>
     <input class="usa-button" type="submit" value="Create" disabled={submitting}>
   </form>
 </GridContainer>
