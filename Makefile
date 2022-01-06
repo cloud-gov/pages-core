@@ -38,7 +38,7 @@ migrate: ## Run database migrations
 
 rebuild: ## Rebuild docker images and database volumes
 	docker volume rm federalist_db-data
-	docker-compose build
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml build
 
 seed: ## (Re)Create seed data
 	docker-compose run --rm app yarn create-dev-data
@@ -47,7 +47,7 @@ set-pipeline: ## Set Concourse `web` pipeline
 	fly -t pages-staging sp -p web -c ci/pipeline.yml
 
 start: ## Start
-	docker-compose up
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml up
 
 test-client: ## Run client tests
 	docker-compose run --rm app yarn test:client
