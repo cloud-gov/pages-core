@@ -8,7 +8,9 @@
   <DataTable data={data}>
     <tr slot="header">
       <th scope="col">Name</th>
+      <th scope="col">Agency</th>
       <th scope="col">Sandbox?</th>
+      <th scope="col">Self Authorized</th>
       <th scope="col">Active?</th>
       <th scope="col">Created</th>
       <th scope="col">Updated</th>
@@ -20,12 +22,16 @@
         <a href="/organizations/{org.id}/edit">{org.name}</a>
       </th>
       <td>
+        {org.agency}
+      </td>
+      <td>
         {#if org.isSandbox}
           <span class="usa-tag bg-orange">sandbox</span>
         {:else}
           regular
         {/if}
       </td>
+      <td>{formatDateTime(org.selfAuthorizedAt)}</td>
       <td>
         {#if org.isActive}
           active

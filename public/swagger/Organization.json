@@ -26,6 +26,18 @@
     },
     "isActive": {
       "type": "boolean"
+    },
+    "agency": {
+      "oneOf": [
+        { "type": ["null"] },
+        { "type": ["string"] }
+      ]
+    },
+    "selfAuthorizedAt": {
+      "type": "date-time"
+    },
+    "isSelfAuthorized": {
+      "type": "boolean"
     }
   }
 }

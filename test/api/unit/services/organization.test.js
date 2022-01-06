@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 
 const {
+  organization: orgFactory,
   uaaIdentity: uaaIdentityFactory,
   user: userFactory,
 } = require('../../support/factory');
@@ -15,7 +16,6 @@ const {
 } = require('../../../../api/models');
 const OrganizationService = require('../../../../api/services/organization/Organization');
 const UAAClient = require('../../../../api/utils/uaaClient');
-const { fetchModelById } = require('../../../../api/utils/queryDatabase');
 
 function clean() {
   return Promise.all(
@@ -236,7 +236,7 @@ describe('OrganizationService', () => {
       it('throws an error', async () => {
         const [currentUser, { id: orgId }] = await Promise.all([
           createUserWithUAAIdentity(),
-          Organization.create({ name: 'foo' }),
+          Organization.create({ name: 'foo', agency: 'GSA' }),
         ]);
 
         const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
@@ -255,7 +255,7 @@ describe('OrganizationService', () => {
       it('throws an error', async () => {
         const [currentUser, org, userRole] = await Promise.all([
           createUserWithUAAIdentity(),
-          Organization.create({ name: 'foo' }),
+          orgFactory.create({ name: 'foo' }),
           Role.findOne({ where: { name: 'user' } }),
         ]);
 
@@ -277,7 +277,7 @@ describe('OrganizationService', () => {
       it('throws an error', async () => {
         const [currentUser, org, managerRole] = await Promise.all([
           createUserWithUAAIdentity(),
-          Organization.create({ name: 'foo' }),
+          orgFactory.create({ name: 'foo' }),
           Role.findOne({ where: { name: 'manager' } }),
         ]);
 
@@ -312,7 +312,7 @@ describe('OrganizationService', () => {
 
         const [currentUser, org, managerRole, userRole] = await Promise.all([
           createUserWithUAAIdentity(),
-          Organization.create({ name: 'foo' }),
+          orgFactory.create({ name: 'foo' }),
           Role.findOne({ where: { name: 'manager' } }),
           Role.findOne({ where: { name: 'user' } }),
         ]);
@@ -369,7 +369,7 @@ describe('OrganizationService', () => {
 
         const [currentUser, org, userRole] = await Promise.all([
           createUserWithUAAIdentity(),
-          Organization.create({ name: 'foo' }),
+          orgFactory.create({ name: 'foo' }),
           Role.findOne({ where: { name: 'user' } }),
         ]);
 
@@ -413,7 +413,7 @@ describe('OrganizationService', () => {
         const currentUser = await userFactory();
 
         const error = await OrganizationService.createOrganization(
-          currentUser, '', false, ''
+          {}, currentUser, '', false, ''
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
@@ -428,7 +428,7 @@ describe('OrganizationService', () => {
         isUAAAdminStub.resolves(false);
 
         const error = await OrganizationService.createOrganization(
-          currentUser, '', false, ''
+          {}, currentUser, '', false, ''
         ).catch(e => e);
 
         expect(error).to.be.an('Error');
@@ -439,6 +439,7 @@ describe('OrganizationService', () => {
     context('when the target user exists in Pages and UAA', () => {
       it('adds them to the org with the manager role', async () => {
         const githubUsername = 'username';
+        const agency = 'GSA';
         const orgName = 'org';
         const uaaEmail = 'foo@bar.com';
 
@@ -453,7 +454,8 @@ describe('OrganizationService', () => {
         expect(await Organization.findOne({ where: { name: orgName } })).to.be.null;
 
         const [org, invite] = await OrganizationService.createOrganization(
-          currentUser, orgName, false, uaaEmail, githubUsername
+          { agency, name: orgName, isSelfAuthorized: false },
+          currentUser, uaaEmail, githubUsername
         );
 
         expect(org.name).to.eq(orgName);
