@@ -17,7 +17,7 @@ const UAAClient = require('../../utils/uaaClient');
  * @typedef {object} OrganizationParams
  * @property {string} name
  * @property {string} agency
- * @property {boolean} sandbox
+ * @property {boolean} isSandbox
  * @property {boolean} isSelfAuthorized
  */
 

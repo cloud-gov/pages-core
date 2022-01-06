@@ -12,14 +12,21 @@
 
   async function handleSubmit(event) {
     submitting = true;
-    const { agency, name, sandbox, selfAuthorized, active } = event.target.elements;
+
+    const {
+      agency,
+      name,
+      sandbox,
+      selfAuthorized,
+      active,
+    } = event.target.elements;
 
     const params = {
       agency: agency.value,
       name: name.value,
       isSandbox: sandbox.value === 'sandbox',
       isSelfAuthorized: selfAuthorized.checked,
-      isActive: active.value === 'active'
+      isActive: active.value === 'active',
     };
 
     await updateOrganization(id, params);
