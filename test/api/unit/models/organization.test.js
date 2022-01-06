@@ -49,6 +49,66 @@ describe('Organization model', () => {
     expect(error.name).to.eq('SequelizeUniqueConstraintError');
   });
 
+  describe('isSelfAuthorized', () => {
+    it('is true when `selfAuthorizedAt` is present', () => {
+      const org = Organization.build({ name: 'foo', selfAuthorizedAt: new Date() });
+      expect(org.isSelfAuthorized).to.be.true;
+    });
+
+    it('is false when `selfAuthorizedAt` is absent', () => {
+      const org = Organization.build({ name: 'foo' });
+      expect(org.isSelfAuthorized).to.be.false;
+    });
+  });
+
+  describe('isSelfAuthorized(true)', () => {
+    describe('when `selfAuthorizedAt` is absent', () => {
+      const org = Organization.build({ name: 'foo' });
+
+      it('sets `selfAuthorizedAt` to the current date', () => {
+        const before = new Date();
+
+        expect(org.selfAuthorizedAt).to.be.undefined;
+        org.isSelfAuthorized = true;
+        expect(org.selfAuthorizedAt).to.be.within(before, new Date());
+      });
+    });
+
+    describe('when `selfAuthorizedAt` is present', () => {
+      const selfAuthorizedAt = new Date();
+      const org = Organization.build({ name: 'foo', selfAuthorizedAt });
+
+      it('does nothing', () => {
+        expect(org.selfAuthorizedAt).to.eq(selfAuthorizedAt);
+        org.isSelfAuthorized = true;
+        expect(org.selfAuthorizedAt).to.eq(selfAuthorizedAt);
+      });
+    });
+
+    describe('isSelfAuthorized(false)', () => {
+      describe('when `selfAuthorizedAt` is absent', () => {
+        const org = Organization.build({ name: 'foo' });
+
+        it('does nothing', () => {
+          expect(org.selfAuthorizedAt).to.be.undefined;
+          org.isSelfAuthorized = false;
+          expect(org.selfAuthorizedAt).to.be.undefined;
+        });
+      });
+
+      describe('when `selfAuthorizedAt` is present', () => {
+        const selfAuthorizedAt = new Date();
+        const org = Organization.build({ name: 'foo', selfAuthorizedAt });
+
+        it('sets `selfAuthorizedAt` to null', () => {
+          expect(org.selfAuthorizedAt).to.eq(selfAuthorizedAt);
+          org.isSelfAuthorized = false;
+          expect(org.selfAuthorizedAt).to.be.null;
+        });
+      });
+    });
+  });
+
   it('can have many users', async () => {
     const [org, user1, user2] = await Promise.all([
       orgFactory.create(),

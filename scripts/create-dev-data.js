@@ -103,8 +103,8 @@ async function createData() {
    */
   console.log('Creating Organizations');
   const [agency1, agency2, sandbox] = await Promise.all([
-    Organization.create({ name: 'agency1' }),
-    Organization.create({ name: 'agency2' }),
+    Organization.create({ name: 'agency1', agency: 'GSA' }),
+    Organization.create({ name: 'agency2', agency: 'GSA' }),
     Organization.create({ name: 'user1@example.com', isSandbox: true }),
   ]);
 
