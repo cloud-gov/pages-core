@@ -74,7 +74,7 @@ Note that `npm run update-local-config` will need to be re-run with some frequen
 
 #### Setting up Docker
 
-If local UAA authentication is not needed, Docker can be set up and started with these commdands:
+If local UAA authentication is not needed, Docker can be set up and started with these commands:
 
 1. Run `docker-compose build`.
 1. Run `docker-compose run --rm app yarn` to install dependencies.
@@ -85,7 +85,7 @@ If local UAA authentication is not needed, Docker can be set up and started with
 
 Any time the node dependencies are changed (like from a recently completed new feature), `docker-compose run --rm app yarn` will need to be re-run to install updated dependencies after pulling the new code from GitHub.
 
-In order to make it possible to log in with local UAA authentication in a development environment it is necessary to install the file `cloudfoundry-identity-uaa-4.19.0.war` in the `uaa` folder in the application root, and to include a second docker-compose configuration file when executing the docker-compose commands which build containers or start the development environment, e.g.:
+In order to make it possible to log in with local UAA authentication in a development environment it is necessary to also build and start the UAA container, which requires specifying a second docker-compose configuration file when executing the docker-compose commands which build containers or start the development environment, e.g.:
 
 1. `docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml build`
 1. `docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml up`
