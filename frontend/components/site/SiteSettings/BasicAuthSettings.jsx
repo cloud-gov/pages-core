@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import BasicAuthSettingsForm from './BasicAuthSettingsForm';
 import AlertBanner from '../../alertBanner';
+import globals from '../../../globals';
 import siteActions from '../../../actions/siteActions';
 import { BASIC_AUTH } from '../../../propTypes';
 
@@ -16,7 +17,9 @@ const infoContent = (
       rel="noopener noreferrer"
       target="_blank"
     >
-      Basic Authentication on Federalist Preview Builds
+      Basic Authentication on
+      {globals.APP_NAME}
+      Preview Builds
     </a>
     {' '}
     for an up-to-date list.
@@ -25,7 +28,8 @@ const infoContent = (
 
 const warningContent = (
   <>
-    Federalist is a
+    {globals.APP_NAME}
+    is a
     <b> FISMA Low </b>
     system, do NOT reuse credentials from other secure systems. See
     {' '}

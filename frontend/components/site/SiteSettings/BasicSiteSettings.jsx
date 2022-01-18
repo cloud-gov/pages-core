@@ -4,6 +4,7 @@ import { reduxForm } from 'redux-form';
 
 import HttpsUrlField from '../../Fields/HttpsUrlField';
 import BranchField from '../../Fields/BranchField';
+import globals from '../../../globals';
 
 export const BasicSiteSettings = ({
   // even though initialValues is not directly used, it is used
@@ -21,8 +22,12 @@ export const BasicSiteSettings = ({
       <fieldset>
         <legend>Live site</legend>
         <p className="well-text">
-          Set the primary branch Federalist uses to build your site.
-          After your DNS is pointed to Federalist, you&apos;ll set the
+          Set the primary branch
+          {globals.APP_NAME}
+          uses to build your site.
+          After your DNS is pointed to
+          {`${globals.APP_NAME},`}
+          you&apos;ll set the
           {' '}
           <a
             href="https://federalist.18f.gov/documentation/custom-domains/#update-your-site-settings"
@@ -60,12 +65,16 @@ export const BasicSiteSettings = ({
       <fieldset>
         <legend>Demo site</legend>
         <p className="well-text">
-          Optional: After setting up DNS with the Federalist team, set a demo branch
+          Optional: After setting up DNS with the
+          {globals.APP_NAME}
+          team, set a demo branch
           to be deployed to a custom URL like
           {' '}
           <code>demo.example.gov</code>
           {' '}
-          instead of a standard Federalist preview URL.
+          instead of a standard
+          {globals.APP_NAME}
+          preview URL.
         </p>
         <BranchField
           label="Branch name:"

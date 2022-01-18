@@ -4,6 +4,7 @@ import { SITE, USER } from '../../propTypes';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
 import { currentSite } from '../../selectors/site';
+import globals from '../../globals';
 import UserActionsTable from './UserActionsTable';
 import { IconGitHub } from '../icons';
 
@@ -32,14 +33,21 @@ const SiteUsers = ({ site, user }) => {
       <p>
         This user table is a partially complete feature.
         It allows you to easily audit who else has access
-        to Federalist settings and logs for this site. GitHub repo
+        to
+        {globals.APP_NAME}
+        settings and logs for this site. GitHub repo
         administrators can also remove user access for others. Eventually,
         this table will be used to allow you to add other users.
         Currently, new users get access for a specific site by
-        logging into Federalist and adding the site themselves.
+        logging into
+        {globals.APP_NAME}
+        and adding the site themselves.
       </p>
       <table className="usa-table-borderless table-full-width log-table">
-        <caption>Federalist users associated with this site</caption>
+        <caption>
+          {globals.APP_NAME}
+          users associated with this site
+        </caption>
         <thead>
           <tr>
             <th>User</th>
