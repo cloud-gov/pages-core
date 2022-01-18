@@ -12,12 +12,15 @@ import { USER_ENVIRONMENT_VARIABLE } from '../../../propTypes';
 import AlertBanner from '../../alertBanner';
 import ExpandableArea from '../../ExpandableArea';
 import LoadingIndicator from '../../LoadingIndicator';
+import globals from '../../../globals';
 import EnvironmentVariableForm from './EnvironmentVariableForm';
 import EnvironmentVariableTable from './EnvironmentVariableTable';
 
 const infoContent = (
   <>
-    Certain environment variable names are reserved for Federalist use and will
+    Certain environment variable names are reserved for
+    {globals.APP_NAME}
+    use and will
     be ignored. Warnings for any ignored environment variables will be present
     in the build logs. See the default variables in
     {' '}
@@ -25,7 +28,9 @@ const infoContent = (
       href="https://federalist.18f.gov/documentation/env-vars-on-federalist-builds"
       rel="noopener"
     >
-      Environment Variables On Federalist Builds
+      Environment Variables On
+      {globals.APP_NAME}
+      Builds
     </a>
     {' '}
     for an up-to-date list.
@@ -34,7 +39,8 @@ const infoContent = (
 
 const warningContent = (
   <>
-    Federalist is a
+    {globals.APP_NAME}
+    is a
     <b> FISMA Low </b>
     system, do NOT store variables for systems that are Moderate or High, and
     only expose variables if it is safe to do so. You assume the risk if the

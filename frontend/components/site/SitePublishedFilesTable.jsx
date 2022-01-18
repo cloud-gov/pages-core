@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 
 import publishedFileActions from '../../actions/publishedFileActions';
 import { currentSite } from '../../selectors/site';
+import globals from '../../globals';
 import LoadingIndicator from '../LoadingIndicator';
 import AlertBanner from '../alertBanner';
 
@@ -142,7 +143,9 @@ class SitePublishedFilesTable extends React.Component {
       <div>
         <h3>{name}</h3>
         <p>
-          Use this page to audit the files that Federalist has publicly published.
+          Use this page to audit the files that
+          {globals.APP_NAME}
+          has publicly published.
           Up to 200 files are shown per page.
         </p>
         <table className="usa-table-borderless table-full-width log-table">
