@@ -305,6 +305,7 @@ function defaultContext(req, res) {
     isFederalist: process.env.PRODUCT === 'federalist',
     isPages: process.env.PRODUCT === 'pages',
     supportEmail: config.app.supportEmail,
+    appName: config.app.appName,
   };
 
   return context;
