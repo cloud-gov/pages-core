@@ -74,7 +74,7 @@ commonPaths.forEach((path) => {
         request(app)
           .get(path)
           .then((response) => {
-            const titleRegex = /<title>\s*Federalist \| testing123\s*<\/title>/g;
+            const titleRegex = /<title>\s*Pages \| testing123\s*<\/title>/g;
             expect(response.text.search(titleRegex)).to.be.above(-1);
             done();
           })
@@ -86,7 +86,7 @@ commonPaths.forEach((path) => {
         request(app)
           .get(path)
           .then((response) => {
-            const titleRegex = /<title>\s*Federalist\s*<\/title>/g;
+            const titleRegex = /<title>\s*Pages\s*<\/title>/g;
             expect(response.text.search(titleRegex)).to.be.above(-1);
             done();
           })

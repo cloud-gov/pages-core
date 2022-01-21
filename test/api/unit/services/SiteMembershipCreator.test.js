@@ -113,7 +113,7 @@ describe('SiteMembershipCreator', () => {
         })
       ).catch((err) => {
         expect(err.status).to.equal(400);
-        expect(err.message).to.equal("You've already added this site to Federalist");
+        expect(err.message).to.equal("You've already added this site to Pages");
         done();
       }).catch(done);
     });
@@ -132,7 +132,7 @@ describe('SiteMembershipCreator', () => {
         })
       ).catch((err) => {
         expect(err.status).to.equal(400);
-        expect(err.message).to.equal("You've already added this site to Federalist");
+        expect(err.message).to.equal("You've already added this site to Pages");
         done();
       }).catch(done);
     });
