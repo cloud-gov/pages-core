@@ -213,7 +213,7 @@ describe('SiteCreator', () => {
             return SiteCreator.createSite({ user: values.user, siteParams });
           }).catch((err) => {
             expect(err.status).to.equal(400);
-            expect(err.message).to.equal('This site has already been added to Federalist.');
+            expect(err.message).to.equal('This site has already been added to Pages.');
             done();
           }).catch(done);
       });
@@ -258,9 +258,9 @@ describe('SiteCreator', () => {
             return SiteCreator.createSite({ user, siteParams });
           })
           .catch((err) => {
-            const expectedError = `Federalist can't confirm org permissions for '${siteParams.owner}'.`
-            + `Either '${siteParams.owner}' hasn't approved access for Federalist or you aren't an org member.`
-            + 'Ensure you are an org member and ask an org owner to authorize Federalist for the organization.';
+            const expectedError = `Pages can't confirm org permissions for '${siteParams.owner}'.`
+            + `Either '${siteParams.owner}' hasn't approved access for Pages or you aren't an org member.`
+            + 'Ensure you are an org member and ask an org owner to authorize Pages for the organization.';
 
             expect(err.message).to.equal(expectedError);
             expect(err.status).to.equal(403);
