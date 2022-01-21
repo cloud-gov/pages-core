@@ -51,7 +51,7 @@
     {% block head_extra %}
     {% endblock %}
   </head>
-  <body class="body">
+  <body class="body {{ productName }}">
     {% block before_header %}
     {% endblock %}
 
@@ -133,7 +133,7 @@
             </div>
           </div>
           <div class="usa-footer-logo usa-width-one-half align-right">
-            <a href="/"><img class="usa-footer-logo-img federalist-logo" src="/images/logos/federalist-logo.svg" alt="Federalist Logo"></a>
+            <a href="/"><img class="usa-footer-logo-img federalist-logo" src="/images/logos/{{ productName }}-logo.svg" alt="{{ appName }} Logo"></a>
           </div>
         </div>
       </div>
