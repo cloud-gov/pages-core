@@ -10,8 +10,8 @@
     "start": "sirv public -p 3000 --host --single --dev"
   },
   "engines": {
-    "node": "16.x.x",
-    "npm": "7.x.x"
+    "node": "^16.13.1",
+    "npm": "^8.1.2"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^12.0.0",
