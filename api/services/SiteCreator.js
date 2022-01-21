@@ -46,7 +46,7 @@ function checkSiteExists({ owner, repository }) {
     where: { owner, repository },
   }).then((existingSite) => {
     if (existingSite) {
-      const error = new Error('This site has already been added to Federalist.');
+      const error = new Error(`This site has already been added to ${config.app.appName}.`);
       error.status = 400;
       throw error;
     }
@@ -66,9 +66,9 @@ function checkGithubOrg({ user, owner }) {
     // Has this org authorized federalist as an oauth app?
     if (!federalistAuthorizedOrg) {
       throw {
-        message: `Federalist can't confirm org permissions for '${owner}'.`
-          + `Either '${owner}' hasn't approved access for Federalist or you aren't an org member.`
-          + 'Ensure you are an org member and ask an org owner to authorize Federalist for the organization.',
+        message: `${config.app.appName} can't confirm org permissions for '${owner}'.`
+          + `Either '${owner}' hasn't approved access for ${config.app.appName} or you aren't an org member.`
+          + `Ensure you are an org member and ask an org owner to authorize ${config.app.appName} for the organization.`,
         status: 403,
       };
     }
