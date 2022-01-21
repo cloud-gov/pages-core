@@ -101,7 +101,7 @@ commands:
 jobs:
   build:
     docker:
-      - image: circleci/node:16.4
+      - image: circleci/node:16.13
         environment:
           YARN_VERSION: 0.24.6-1
           CC_TEST_REPORTER_ID: 101a439651b6abd27e5440028a53b5b8f08fe0889f3948d5f58f6cf9f7c786a0
@@ -166,7 +166,7 @@ jobs:
 
   deploy:
     docker:
-      - image: circleci/node:16.4
+      - image: circleci/node:16.13
     parameters:
       app:
         type: string
@@ -190,7 +190,7 @@ jobs:
 
   deploy-admin-client:
     docker:
-      - image: circleci/node:16.4
+      - image: circleci/node:16.13
     parameters:
       app:
         type: string
@@ -234,7 +234,7 @@ jobs:
 
   deploy-queues-ui:
     docker:
-      - image: circleci/node:16.4
+      - image: circleci/node:16.13
     parameters:
       app:
         type: string

@@ -95,7 +95,8 @@
     "send-email": "node ./scripts/send-email.js",
     "bootstrap-admins": "node ./scripts/bootstrap-admins.js",
     "migrate-build-notification-settings": "node ./scripts/migrate-build-notification-settings.js",
-    "remove-bucket-website-configs": "node ./scripts/remove-bucket-website-configs.js"
+    "remove-bucket-website-configs": "node ./scripts/remove-bucket-website-configs.js",
+    "check-object-paths": "node ./scripts/check-object-paths.js"
   },
   "main": "index.js",
   "repository": {
@@ -171,7 +172,7 @@
     "webpack-manifest-plugin": "^3.0.0"
   },
   "engines": {
-    "node": "16.x.x",
-    "npm": "7.x.x"
+    "node": "^16.13.1",
+    "npm": "^8.1.2"
   }
 }
