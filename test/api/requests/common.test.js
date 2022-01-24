@@ -63,10 +63,12 @@ commonPaths.forEach((path) => {
 
     describe('<title> element', () => {
       const origAppEnv = config.app.appEnv;
+      const origAppName = config.app.appName;
 
       after(() => {
-        // reset config.app.appEnv to its original value
+        // reset config.app.appEnv and config.app.appName to their original values
         config.app.appEnv = origAppEnv;
+        config.app.appName = origAppName;
       });
 
       it('should display the appEnv in the title element', (done) => {
@@ -87,6 +89,20 @@ commonPaths.forEach((path) => {
           .get(path)
           .then((response) => {
             const titleRegex = /<title>\s*Pages\s*<\/title>/g;
+            expect(response.text.search(titleRegex)).to.be.above(-1);
+            done();
+          })
+          .catch(done);
+      });
+
+      it('should paremeterize the application name', (done) => {
+        config.app.appEnv = 'production';
+        config.app.appName = 'Test App Name';
+
+        request(app)
+          .get(path)
+          .then((response) => {
+            const titleRegex = /<title>\s*Test App Name\s*<\/title>/g;
             expect(response.text.search(titleRegex)).to.be.above(-1);
             done();
           })
