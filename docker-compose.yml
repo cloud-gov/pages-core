@@ -22,7 +22,6 @@ services:
     depends_on:
       - db
       - redis
-      - uaa
     environment:
       APP_HOSTNAME: http://localhost:1337
       DOMAIN: localhost:1337
@@ -32,7 +31,7 @@ services:
       PRODUCT: pages
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
-      USER_AUDITOR: federalist     
+      USER_AUDITOR: federalist
   federalist:
     build:
       dockerfile: Dockerfile-app
@@ -50,7 +49,6 @@ services:
     depends_on:
       - db
       - redis
-      - uaa
     environment:
       APP_HOSTNAME: http://localhost:1338
       DOMAIN: localhost:1338
@@ -60,7 +58,7 @@ services:
       PRODUCT: federalist
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
-      USER_AUDITOR: federalist 
+      USER_AUDITOR: federalist
   bull-board:
     build:
       dockerfile: Dockerfile-app
@@ -75,7 +73,6 @@ services:
       - "1340:1340"
     depends_on:
       - redis
-      - uaa
     environment:
       APP_HOSTNAME: http://localhost:1340
       PORT: 1340
@@ -113,21 +110,6 @@ services:
     image: redis
     ports:
       - 6379:6379
-  uaa:
-    build:
-      dockerfile: ./Dockerfile-uaa
-      context: .
-    ports:
-      - 9000:8080
-    environment:
-      POSTGRES_DB: federalist
-      POSTGRES_PORT: 5432
-      POSTGRES_HOST: db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    depends_on:
-      - db
-    command: ["/tomcat/bin/catalina.sh", "run"]
   worker:
     build:
       dockerfile: Dockerfile-app

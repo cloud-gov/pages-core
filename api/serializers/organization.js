@@ -9,6 +9,9 @@ const attributes = {
   sandboxNextCleaningAt: 'date',
   daysUntilSandboxCleaning: '',
   isActive: '',
+  agency: '',
+  selfAuthorizedAt: 'date',
+  isSelfAuthorized: '',
 };
 
 module.exports = new BaseSerializer(attributes);

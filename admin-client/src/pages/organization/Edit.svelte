@@ -12,9 +12,22 @@
 
   async function handleSubmit(event) {
     submitting = true;
-    const { name, sandbox, active } = event.target.elements;
 
-    const params = { name: name.value, sandbox: sandbox.value === 'sandbox', active: active.value === 'active' };
+    const {
+      agency,
+      name,
+      sandbox,
+      selfAuthorized,
+      active,
+    } = event.target.elements;
+
+    const params = {
+      agency: agency.value,
+      name: name.value,
+      isSandbox: sandbox.value === 'sandbox',
+      isSelfAuthorized: selfAuthorized.checked,
+      isActive: active.value === 'active',
+    };
 
     await updateOrganization(id, params);
 
@@ -43,6 +56,12 @@
       </fieldset>
 
       <fieldset class="usa-fieldset">
+        <label class="usa-label" for="agency">Agency<abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
+        <span class="usa-hint">Federal agency (GSA, OMB, etc...)</span>
+        <input type="text" class="usa-input" name="agency" id="agency" value={org.agency} required>
+      </fieldset>
+
+      <fieldset class="usa-fieldset">
         <legend class="usa-legend usa-legend">Organization Type</legend>
         <div class="usa-radio">
           <input
@@ -65,6 +84,23 @@
             checked={org.isSandbox}
           />
           <label class="usa-radio__label" for="sandbox">Sandbox</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="usa-fieldset">
+        <legend class="usa-legend usa-legend">Authorization</legend>
+        <div class="usa-checkbox">
+          <input
+            class="usa-checkbox__input usa-checkbox__input--tile"
+            id="selfAuthorized-self"
+            type="checkbox"
+            name="selfAuthorized"
+            value="self"
+            checked={org.isSelfAuthorized}
+          />
+          <label class="usa-checkbox__label" for="selfAuthorized-self">
+            Self Authorized
+          </label>
         </div>
       </fieldset>
 
