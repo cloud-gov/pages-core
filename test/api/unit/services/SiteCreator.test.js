@@ -259,9 +259,9 @@ describe('SiteCreator', () => {
             return SiteCreator.createSite({ user, siteParams });
           })
           .catch((err) => {
-            const expectedError = `Pages can't confirm org permissions for '${siteParams.owner}'.`
-            + `Either '${siteParams.owner}' hasn't approved access for Pages or you aren't an org member.`
-            + 'Ensure you are an org member and ask an org owner to authorize Pages for the organization.';
+            const expectedError = `${apiConfig.app.appName} can't confirm org permissions for '${siteParams.owner}'.`
+            + `Either '${siteParams.owner}' hasn't approved access for ${apiConfig.app.appName} or you aren't an org member.`
+            + `Ensure you are an org member and ask an org owner to authorize ${apiConfig.app.appName} for the organization.`;
 
             expect(err.message).to.equal(expectedError);
             expect(err.status).to.equal(403);
