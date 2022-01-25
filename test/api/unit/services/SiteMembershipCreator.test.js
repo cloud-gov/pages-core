@@ -3,6 +3,7 @@ const nock = require('nock');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const SiteMembershipCreator = require('../../../../api/services/SiteMembershipCreator');
+const config = require('../../../../config');
 
 describe('SiteMembershipCreator', () => {
   describe('.createSiteMembership({ siteParams, user })', () => {
@@ -113,7 +114,7 @@ describe('SiteMembershipCreator', () => {
         })
       ).catch((err) => {
         expect(err.status).to.equal(400);
-        expect(err.message).to.equal("You've already added this site to Pages");
+        expect(err.message).to.equal(`You've already added this site to ${config.app.appName}`);
         done();
       }).catch(done);
     });
@@ -132,7 +133,7 @@ describe('SiteMembershipCreator', () => {
         })
       ).catch((err) => {
         expect(err.status).to.equal(400);
-        expect(err.message).to.equal("You've already added this site to Pages");
+        expect(err.message).to.equal(`You've already added this site to ${config.app.appName}`);
         done();
       }).catch(done);
     });
