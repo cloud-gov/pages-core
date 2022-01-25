@@ -752,7 +752,7 @@ describe('GitHub', () => {
 
       const err = await GitHub.ensureFederalistAdmin(accessToken, username).catch(e => e);
 
-      expect(err.message).to.eq('You are not a Pages admin.');
+      expect(err.message).to.eq(`You are not a ${config.app.appName} admin.`);
     });
 
     it('resolves when the user is a member of the team', async () => {

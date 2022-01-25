@@ -66,8 +66,12 @@ commonPaths.forEach((path) => {
       const origAppName = config.app.appName;
 
       after(() => {
-        // reset config.app.appEnv and config.app.appName to their original values
+        // reset config.app.appEnv to its original value
         config.app.appEnv = origAppEnv;
+      });
+
+      afterEach(() => {
+        // reset config.app.appName to its original value
         config.app.appName = origAppName;
       });
 
@@ -76,7 +80,7 @@ commonPaths.forEach((path) => {
         request(app)
           .get(path)
           .then((response) => {
-            const titleRegex = /<title>\s*Pages \| testing123\s*<\/title>/g;
+            const titleRegex = new RegExp(`<title>\\s*${config.app.appName} \\| testing123\\s*<\\/title>`, 'g');
             expect(response.text.search(titleRegex)).to.be.above(-1);
             done();
           })
@@ -88,7 +92,7 @@ commonPaths.forEach((path) => {
         request(app)
           .get(path)
           .then((response) => {
-            const titleRegex = /<title>\s*Pages\s*<\/title>/g;
+            const titleRegex = new RegExp(`<title>\\s*${config.app.appName}\\s*<\\/title>`, 'g');
             expect(response.text.search(titleRegex)).to.be.above(-1);
             done();
           })

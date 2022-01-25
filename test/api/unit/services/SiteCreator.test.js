@@ -3,6 +3,7 @@ const { expect } = require('chai');
 const nock = require('nock');
 const sinon = require('sinon');
 const config = require('../../../../config/env/test');
+const apiConfig = require('../../../../config');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const mockTokenRequest = require('../../support/cfAuthNock');
@@ -213,7 +214,7 @@ describe('SiteCreator', () => {
             return SiteCreator.createSite({ user: values.user, siteParams });
           }).catch((err) => {
             expect(err.status).to.equal(400);
-            expect(err.message).to.equal('This site has already been added to Pages.');
+            expect(err.message).to.equal(`This site has already been added to ${apiConfig.app.appName}.`);
             done();
           }).catch(done);
       });
