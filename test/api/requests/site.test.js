@@ -23,6 +23,7 @@ const siteErrors = require('../../../api/responses/siteErrors');
 const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
 const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
 const EventCreator = require('../../../api/services/EventCreator');
+const DomainService = require('../../../api/services/Domain');
 
 const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 
@@ -111,6 +112,45 @@ describe('Site API', () => {
           validateAgainstJSONSchema('GET', '/site', 200, response.body);
           expect(response.body).to.be.a('array');
           expect(response.body).to.be.empty;
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should include sites\' URL editability', (done) => {
+      let user;
+      let sites;
+      let response;
+
+      factory.user().then((model) => {
+        user = model;
+        const sitePromises = Array(3).fill(0).map(() => factory.site({ users: [user.id] }));
+
+        return Promise.all(sitePromises);
+      }).then((models) => {
+        sites = models;
+        return authenticatedSession(user);
+      }).then(cookie => request(app)
+        .get('/v0/site')
+        .set('Cookie', cookie)
+        .expect(200))
+        .then((resp) => {
+          response = resp;
+
+          validateAgainstJSONSchema('GET', '/site', 200, response.body);
+
+          expect(response.body).to.be.a('array');
+          expect(response.body).to.have.length(3);
+
+          return Promise.all(sites.map(site => Site.findByPk(site.id, { include: [User] })));
+        })
+        .then((foundSites) => {
+          foundSites.forEach((site) => {
+            const responseSite = response.body.find(candidate => candidate.id === site.id);
+            expect(responseSite).not.to.be.undefined;
+            siteResponseExpectations(responseSite, site);
+            expect(responseSite).to.include.keys('canEditLiveUrl','canEditDemoUrl');
+          });
           done();
         })
         .catch(done);
@@ -1649,6 +1689,50 @@ describe('Site API', () => {
         .then((foundSite) => {
           expect(foundSite.defaultConfig).to.deep.equal({ new: true });
           expect(foundSite.domain).to.equal('https://example.com');
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should ignore domain URLs in the request body if the URLs are managed by an associated domain', (done) => {
+      let site;
+      const userPromise = factory.user();
+      const sitePromise = factory.site({
+        users: Promise.all([userPromise]),
+        defaultConfig: { old: true },
+        domain: 'https://example.com',
+        demoDomain: 'https://demo.example.com'
+      });
+      const cookiePromise = authenticatedSession(userPromise);
+      sinon.stub(DomainService, 'isSiteUrlManagedByDomain').returns(true);
+
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: cookiePromise,
+      })
+        .then((results) => {
+          ({ site } = results);
+
+          return request(app)
+            .put(`/v0/site/${site.id}`)
+            .set('x-csrf-token', csrfToken.getToken())
+            .send({
+              defaultConfig: 'new: true',
+              domain: 'https://changed.example.gov',
+              demoDomain: 'https://new.example.gov'
+            })
+            .set('Cookie', results.cookie)
+            .expect(200);
+        })
+        .then((response) => {
+          validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
+          return Site.findByPk(site.id);
+        })
+        .then((foundSite) => {
+          expect(foundSite.defaultConfig).to.deep.equal({ new: true });
+          expect(foundSite.domain).to.equal('https://example.com');
+          expect(foundSite.demoDomain).to.equal('https://demo.example.com');
           done();
         })
         .catch(done);

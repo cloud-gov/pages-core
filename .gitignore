@@ -43,3 +43,4 @@ current-sites.csv
 credentials*.json
 tmp
 ci/vars/.*
+uaa/cloudfoundry-identity-uaa-4.19.0.war

@@ -1,6 +1,6 @@
 const IORedis = require('ioredis');
 
-const { Domain } = require('../models');
+const { Domain, Build, Site } = require('../models');
 const { path: sitePath, siteViewOrigin } = require('../utils/site');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const { DomainQueue } = require('../queues');
@@ -13,6 +13,10 @@ const { States } = Domain;
 /**
  * @typedef {object} DomainModel
  * @prop {string} state
+ */
+
+/**
+ * @typedef {object} SiteModel
  */
 
 function cfApi() {
@@ -112,6 +116,68 @@ function checkAcmeChallengeDnsRecord(domain) {
 }
 
 /**
+ * @param {SiteModel} site
+ * @param {DomainModel[]} domains
+ * @param {string} context Domain.Contexts.Site or DomainContexts.Demo
+ */
+function isSiteUrlManagedByDomain(site, domains, context) {
+  const siteDomain = Site.domainFromContext(context);
+  if (site[siteDomain] === null) { return true; }
+  if (domains.length === 0) { return false; }
+  const siteUrlIsManagedByDomain = domains
+    .filter(domain => domain.context === context)
+    .some(domain => domain.namesArray()
+      .some(name => `https://${name}` === site[siteDomain]));
+  return siteUrlIsManagedByDomain;
+}
+
+/**
+ * @param {DomainModel} domain
+ * @param {SiteModel} site
+ */
+async function rebuildAssociatedSite(domain, site) {
+  const branch = site[Site.branchFromContext(domain.context)];
+  if (branch) {
+    await Build.create({
+      site: site.id,
+      branch,
+      username: 'Federalist Operators',
+    }).then(b => b.enqueue());
+  }
+}
+
+/**
+ * @param {DomainModel} domain
+ * @returns {Promise<DomainModel>}
+ */
+async function updateSiteForProvisionedDomain(domain) {
+  // Populate appropriate site URL if it isn't already set
+  const site = await domain.getSite();
+  const firstDomain = `https://${domain.firstName()}`;
+  const siteDomain = Site.domainFromContext(domain.context);
+  if (isSiteUrlManagedByDomain(site, [domain], domain.context) && site[siteDomain] === null) {
+    await site.update({ [siteDomain]: firstDomain });
+    await module.exports.rebuildAssociatedSite(domain, site);
+  }
+  return domain;
+}
+
+/**
+ * @param {DomainModel} domain
+ * @returns {Promise<DomainModel>}
+ */
+async function updateSiteForDeprovisionedDomain(domain) {
+  // Clear appropriate site URL if it matches a domain name
+  const site = await domain.getSite();
+  if (isSiteUrlManagedByDomain(site, [domain], domain.context)) {
+    const siteDomain = Site.domainFromContext(domain.context);
+    await site.update({ [siteDomain]: null });
+    await module.exports.rebuildAssociatedSite(domain, site);
+  }
+  return domain;
+}
+
+/**
  * @param {DomainModel} domain The domain
  * @returns {Promise<DomainModel>}
  */
@@ -149,7 +215,7 @@ async function provision(domain, dnsResults) {
 
   const site = await domain.getSite();
 
-  const [firstDomainName] = domain.names.split(',');
+  const firstDomainName = domain.firstName();
 
   const serviceName = `${firstDomainName}-ext`;
   const origin = siteViewOrigin(site);
@@ -193,6 +259,7 @@ async function checkDeprovisionStatus(id) {
       serviceName: null,
       state: States.Pending,
     });
+    await module.exports.updateSiteForDeprovisionedDomain(domain);
     return `Domain ${id}|${domain.names} successfully deprovisioned.`;
   }
   // TODO - this does not handle the case where deprovisioning fails
@@ -216,6 +283,7 @@ async function checkProvisionStatus(id) {
   switch (lastOperation) {
     case 'succeeded':
       await domain.update({ state: States.Provisioned });
+      await module.exports.updateSiteForProvisionedDomain(domain);
       return `Domain ${id}|${domain.names} successfully provisioned.`;
     case 'failed':
       await domain.update({ state: States.Failed });
@@ -227,6 +295,10 @@ async function checkProvisionStatus(id) {
 }
 
 module.exports.buildDnsRecords = buildDnsRecords;
+module.exports.isSiteUrlManagedByDomain = isSiteUrlManagedByDomain;
+module.exports.rebuildAssociatedSite = rebuildAssociatedSite;
+module.exports.updateSiteForProvisionedDomain = updateSiteForProvisionedDomain;
+module.exports.updateSiteForDeprovisionedDomain = updateSiteForDeprovisionedDomain;
 module.exports.canProvision = canProvision;
 module.exports.canDeprovision = canDeprovision;
 module.exports.canDestroy = canDestroy;

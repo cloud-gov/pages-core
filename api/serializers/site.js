@@ -3,6 +3,7 @@ const { omitBy, pick } = require('../utils');
 const { Organization, Site, User } = require('../models');
 const userSerializer = require('./user');
 const { siteViewLink, hideBasicAuthPassword } = require('../utils/site');
+const DomainService = require('../services/Domain');
 
 const allowedAttributes = [
   'id',
@@ -79,6 +80,11 @@ const serializeObject = (site, isSystemAdmin) => {
     delete json.Organization;
   }
 
+  if (site.Domains) {
+    json.canEditLiveUrl = !DomainService.isSiteUrlManagedByDomain(site, site.Domains, 'site');
+    json.canEditDemoUrl = !DomainService.isSiteUrlManagedByDomain(site, site.Domains, 'demo');
+  }
+
   return json;
 };
 
@@ -101,5 +107,5 @@ const serialize = (serializable) => {
 };
 
 module.exports = {
-  serialize, toJSON: serializeNew, serializeNew, serializeMany,
+  serialize, serializeObject, toJSON: serializeNew, serializeNew, serializeMany,
 };

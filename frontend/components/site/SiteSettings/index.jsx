@@ -45,6 +45,8 @@ class SiteSettings extends React.Component {
       domain: site.domain || '',
       demoBranch: site.demoBranch || '',
       demoDomain: site.demoDomain || '',
+      canEditLiveUrl: site.canEditLiveUrl,
+      canEditDemoUrl: site.canEditDemoUrl,
     };
 
     const advancedInitialValues = {
