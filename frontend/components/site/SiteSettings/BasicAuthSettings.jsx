@@ -18,7 +18,7 @@ const infoContent = (
       target="_blank"
     >
       Basic Authentication on
-      {globals.APP_NAME}
+      {` ${globals.APP_NAME} `}
       Preview Builds
     </a>
     {' '}
@@ -28,7 +28,7 @@ const infoContent = (
 
 const warningContent = (
   <>
-    {globals.APP_NAME}
+    {` ${globals.APP_NAME} `}
     is a
     <b> FISMA Low </b>
     system, do NOT reuse credentials from other secure systems. See

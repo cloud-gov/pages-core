@@ -34,18 +34,18 @@ const SiteUsers = ({ site, user }) => {
         This user table is a partially complete feature.
         It allows you to easily audit who else has access
         to
-        {globals.APP_NAME}
+        {` ${globals.APP_NAME} `}
         settings and logs for this site. GitHub repo
         administrators can also remove user access for others. Eventually,
         this table will be used to allow you to add other users.
         Currently, new users get access for a specific site by
         logging into
-        {globals.APP_NAME}
+        {` ${globals.APP_NAME} `}
         and adding the site themselves.
       </p>
       <table className="usa-table-borderless table-full-width log-table">
         <caption>
-          {globals.APP_NAME}
+        {` ${globals.APP_NAME} `}
           users associated with this site
         </caption>
         <thead>

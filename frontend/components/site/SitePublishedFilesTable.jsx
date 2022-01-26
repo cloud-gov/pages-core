@@ -144,7 +144,7 @@ class SitePublishedFilesTable extends React.Component {
         <h3>{name}</h3>
         <p>
           Use this page to audit the files that
-          {globals.APP_NAME}
+          {` ${globals.APP_NAME} `}
           has publicly published.
           Up to 200 files are shown per page.
         </p>

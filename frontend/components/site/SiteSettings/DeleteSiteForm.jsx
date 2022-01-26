@@ -17,10 +17,10 @@ export const DeleteSiteForm = ({
         <legend>Delete Site</legend>
         <p className="well-text">
           Deleting a
-          {globals.APP_NAME}
+          {` ${globals.APP_NAME} `}
           site removes the published site from our servers and
           disconnects the
-          {globals.APP_NAME}
+          {` ${globals.APP_NAME} `}
           admin interface for all users. This will bring the
           entire site offline and make it inaccessible for users.
           <br />
@@ -28,7 +28,7 @@ export const DeleteSiteForm = ({
           {' '}
           <i>
             Trying to remove a site from your list of
-            {globals.APP_NAME}
+            {` ${globals.APP_NAME} `}
             sites? Go to the
             {' '}
             <a href={`/sites/${siteId}/users`}>collaborators page</a>

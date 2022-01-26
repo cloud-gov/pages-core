@@ -23,10 +23,10 @@ export const BasicSiteSettings = ({
         <legend>Live site</legend>
         <p className="well-text">
           Set the primary branch
-          {globals.APP_NAME}
+          {` ${globals.APP_NAME} `}
           uses to build your site.
           After your DNS is pointed to
-          {`${globals.APP_NAME},`}
+          {` ${globals.APP_NAME}, `}
           you&apos;ll set the
           {' '}
           <a
@@ -66,14 +66,14 @@ export const BasicSiteSettings = ({
         <legend>Demo site</legend>
         <p className="well-text">
           Optional: After setting up DNS with the
-          {globals.APP_NAME}
+          {` ${globals.APP_NAME} `}
           team, set a demo branch
           to be deployed to a custom URL like
           {' '}
           <code>demo.example.gov</code>
           {' '}
           instead of a standard
-          {globals.APP_NAME}
+          {` ${globals.APP_NAME} `}
           preview URL.
         </p>
         <BranchField
