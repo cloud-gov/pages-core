@@ -91,7 +91,7 @@ export class AddSite extends React.Component {
           <div className="usa-content">
             <p>
               There are two different ways you can add sites to
-              {`${globals.APP_NAME}.`}
+              {` ${globals.APP_NAME}. `}
               You can specify the GitHub repository where your site&#39;s code lives.
               Or, you can start with a brand new site by selecting one of our template sites below.
             </p>

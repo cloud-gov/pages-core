@@ -19,7 +19,7 @@ import EnvironmentVariableTable from './EnvironmentVariableTable';
 const infoContent = (
   <>
     Certain environment variable names are reserved for
-    {globals.APP_NAME}
+    {` ${globals.APP_NAME} `}
     use and will
     be ignored. Warnings for any ignored environment variables will be present
     in the build logs. See the default variables in
@@ -29,7 +29,7 @@ const infoContent = (
       rel="noopener"
     >
       Environment Variables On
-      {globals.APP_NAME}
+      {` ${globals.APP_NAME} `}
       Builds
     </a>
     {' '}
@@ -39,7 +39,7 @@ const infoContent = (
 
 const warningContent = (
   <>
-    {globals.APP_NAME}
+    {` ${globals.APP_NAME} `}
     is a
     <b> FISMA Low </b>
     system, do NOT store variables for systems that are Moderate or High, and

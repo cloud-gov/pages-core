@@ -15,7 +15,7 @@ const showNewSiteAlert = () => {
   const message = (
     <span>
       Looks like this site is completely new to
-      {`${globals.APP_NAME}!`}
+      {` ${globals.APP_NAME}!`}
       <br />
       Please fill out these additional fields to complete the process.
     </span>
