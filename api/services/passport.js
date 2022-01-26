@@ -11,7 +11,7 @@ const Features = require('../features');
 
 const passport = new Passport.Passport();
 const flashMessage = {
-  message: 'Apologies; you are not authorized to access Federalist! Please contact the Federalist team if this is in error.',
+  message: `Apologies; you are not authorized to access ${config.app.appName}! Please contact the ${config.app.appName} team if this is in error.`,
 };
 
 const {

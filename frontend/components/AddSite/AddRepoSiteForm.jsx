@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
+import globals from '../../globals';
 import { ORGANIZATIONS } from '../../propTypes';
 import GitHubRepoUrlField from '../Fields/GitHubRepoUrlField';
 import UserOrgSelect from '../organization/UserOrgSelect';
@@ -13,7 +14,8 @@ import { validAddRepoSiteForm } from '../../util/validators';
 const showNewSiteAlert = () => {
   const message = (
     <span>
-      Looks like this site is completely new to Federalist!
+      Looks like this site is completely new to
+      {` ${globals.APP_NAME}!`}
       <br />
       Please fill out these additional fields to complete the process.
     </span>

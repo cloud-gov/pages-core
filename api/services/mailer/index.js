@@ -1,7 +1,7 @@
 const IORedis = require('ioredis');
 const moment = require('moment');
 const PromisePool = require('@supercharge/promise-pool');
-const { redis: redisConfig, app: { hostname, appEnv } } = require('../../../config');
+const { redis: redisConfig, app: { hostname, appEnv, appName } } = require('../../../config');
 const { MailQueue } = require('../../queues');
 const Templates = require('./templates');
 
@@ -74,7 +74,7 @@ async function sendAlert(reason, errors) {
   ensureInit();
   return mailQueue.add('alert', {
     to: ['federalist-alerts@gsa.gov'],
-    subject: `Federalist ${appEnv} Alert | ${reason}`,
+    subject: `${appName} ${appEnv} Alert | ${reason}`,
     html: Templates.alert({ errors, reason }),
   });
 }
