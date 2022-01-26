@@ -63,10 +63,16 @@ commonPaths.forEach((path) => {
 
     describe('<title> element', () => {
       const origAppEnv = config.app.appEnv;
+      const origAppName = config.app.appName;
 
       after(() => {
         // reset config.app.appEnv to its original value
         config.app.appEnv = origAppEnv;
+      });
+
+      afterEach(() => {
+        // reset config.app.appName to its original value
+        config.app.appName = origAppName;
       });
 
       it('should display the appEnv in the title element', (done) => {
@@ -74,7 +80,7 @@ commonPaths.forEach((path) => {
         request(app)
           .get(path)
           .then((response) => {
-            const titleRegex = /<title>\s*Federalist \| testing123\s*<\/title>/g;
+            const titleRegex = new RegExp(`<title>\\s*${config.app.appName} \\| testing123\\s*<\\/title>`, 'g');
             expect(response.text.search(titleRegex)).to.be.above(-1);
             done();
           })
@@ -86,7 +92,21 @@ commonPaths.forEach((path) => {
         request(app)
           .get(path)
           .then((response) => {
-            const titleRegex = /<title>\s*Federalist\s*<\/title>/g;
+            const titleRegex = new RegExp(`<title>\\s*${config.app.appName}\\s*<\\/title>`, 'g');
+            expect(response.text.search(titleRegex)).to.be.above(-1);
+            done();
+          })
+          .catch(done);
+      });
+
+      it('should paremeterize the application name', (done) => {
+        config.app.appEnv = 'production';
+        config.app.appName = 'Test App Name';
+
+        request(app)
+          .get(path)
+          .then((response) => {
+            const titleRegex = /<title>\s*Test App Name\s*<\/title>/g;
             expect(response.text.search(titleRegex)).to.be.above(-1);
             done();
           })
