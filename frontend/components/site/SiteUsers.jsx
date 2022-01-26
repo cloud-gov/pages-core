@@ -45,7 +45,7 @@ const SiteUsers = ({ site, user }) => {
       </p>
       <table className="usa-table-borderless table-full-width log-table">
         <caption>
-        {` ${globals.APP_NAME} `}
+          {` ${globals.APP_NAME} `}
           users associated with this site
         </caption>
         <thead>
