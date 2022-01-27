@@ -126,7 +126,7 @@ module.exports = wrapHandlers({
   async create(req, res) {
     const {
       body: {
-        owner, template, organizationId, repository,
+        owner, template, organizationId, repository, engine,
       },
       user,
     } = req;
@@ -136,6 +136,7 @@ module.exports = wrapHandlers({
       template,
       organizationId: toInt(organizationId),
       repository,
+      engine,
       sharedBucket: false,
     };
 
