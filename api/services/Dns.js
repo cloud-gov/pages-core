@@ -107,29 +107,6 @@ async function resolveDnsRecord(dnsRecord) {
       return [DnsResultState.Pending, 'Record not set'];
     }
 
-    // 2021-11-10
-    // A temporary workaround until node is updated with the latest c-ares version
-    // that fixes the regression in handling domain names with underscores
-    // https://github.com/nodejs/node/issues/39780
-    if (code === 'EBADRESP') {
-      // eslint-disable-next-line global-require
-      const { execFileSync } = require('child_process');
-      const value = execFileSync('dig', ['+short', dnsRecord.type, dnsRecord.name], { encoding: 'utf8' });
-
-      if (!value) {
-        return [DnsResultState.Pending, 'Record not set'];
-      }
-
-      const formattedValue = value.trim().slice(0, -1);
-
-      if (formattedValue === dnsRecord.target) {
-        return [DnsResultState.Success];
-      }
-
-      return [DnsResultState.Pending, `Record incorrectly set to ${formattedValue}`];
-    }
-    // end workaround
-
     return [DnsResultState.Error, error.message];
   }
 }
