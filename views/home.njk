@@ -42,9 +42,9 @@
             {% endif%}
           </div>
           <p></p>
-          <p>Federalist users are authenticated with {% if authUAA %} cloud.gov {% else %} GitHub OAuth {% endif %}.<br></p>
+          <p>{{ appName }} users are authenticated with {% if authUAA %} cloud.gov {% else %} GitHub OAuth {% endif %}.<br></p>
           {% if authUAA %}
-            <p>If your office uses Federalist, ask your team’s primary contact to send an email to federalist-support@gsa.gov with the GitHub usernames that need access.</p>
+            <p>If your office uses {{ appName }}, ask your team’s primary contact to send an email to {{ supportEmail }} with the GitHub usernames that need access.</p>
           {% endif %}
         </div>
         <div class="usa-width-one-third">

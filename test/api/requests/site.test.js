@@ -598,7 +598,7 @@ describe('Site API', () => {
         .set('Cookie', cookie)
         .expect(400)).then((response) => {
         validateAgainstJSONSchema('POST', '/site', 400, response.body);
-        expect(response.body.message).to.equal('This site has already been added to Federalist.');
+        expect(response.body.message).to.equal(`This site has already been added to ${config.app.appName}.`);
         done();
       }).catch(done);
     });
@@ -794,7 +794,7 @@ describe('Site API', () => {
           .expect(400))
         .then((response) => {
           validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
-          expect(response.body.message).to.eq("You've already added this site to Federalist");
+          expect(response.body.message).to.eq(`You've already added this site to ${config.app.appName}`);
           done();
         })
         .catch(done);

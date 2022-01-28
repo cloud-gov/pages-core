@@ -3,6 +3,8 @@ version: "2"
 plugins:
   duplication:
     enabled: false
+  nodesecurity:
+    enabled: true
 exclude_patterns:
   - "node_modules/"
   - "migrations/"

@@ -2,6 +2,7 @@ const GitHub = require('./GitHub');
 const { Site, User } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const FederalistUsersHelper = require('./FederalistUsersHelper');
+const config = require('../../config');
 
 const checkGithubRepository = ({ user, owner, repository }) => GitHub
   .getRepository(user, owner, repository)
@@ -46,7 +47,7 @@ const throwExistingSiteErrors = ({ site, user }) => {
 
   const existingUser = site.Users.find(candidate => candidate.id === user.id);
   if (existingUser) {
-    const error = new Error("You've already added this site to Federalist");
+    const error = new Error(`You've already added this site to ${config.app.appName}`);
     error.status = 400;
     throw error;
   }
