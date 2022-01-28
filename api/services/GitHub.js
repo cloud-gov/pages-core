@@ -303,7 +303,7 @@ module.exports = {
     }))
     .then(({ data: { state, role } }) => {
       if (state !== 'active' || !['member', 'maintainer'].includes(role)) {
-        throw new Error('You are not a Federalist admin.');
+        throw new Error(`You are not a ${config.app.appName} admin.`);
       }
     }),
 

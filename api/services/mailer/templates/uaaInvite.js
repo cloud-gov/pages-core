@@ -27,7 +27,7 @@ function uaaInvite({ link }) {
     </ol>
     </p>
     <p>
-      If you run into problems or have any questions, please email us at <a href="mailto:federalist-support@gsa.gov">federalist-support@gsa.gov</a>.
+      If you run into problems or have any questions, please email us at <a href="mailto:pages-support@cloud.gov">pages-support@cloud.gov</a>.
     </p>
     <p>
       Thank you,<br />

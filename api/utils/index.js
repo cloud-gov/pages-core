@@ -304,6 +304,9 @@ function defaultContext(req, res) {
     nonce: res.locals.cspNonce,
     isFederalist: process.env.PRODUCT === 'federalist',
     isPages: process.env.PRODUCT === 'pages',
+    supportEmail: config.app.supportEmail,
+    productName: process.env.PRODUCT,
+    appName: config.app.appName,
   };
 
   return context;

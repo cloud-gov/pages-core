@@ -3,6 +3,7 @@ const { expect } = require('chai');
 const nock = require('nock');
 const sinon = require('sinon');
 const config = require('../../../../config/env/test');
+const apiConfig = require('../../../../config');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const mockTokenRequest = require('../../support/cfAuthNock');
@@ -213,7 +214,7 @@ describe('SiteCreator', () => {
             return SiteCreator.createSite({ user: values.user, siteParams });
           }).catch((err) => {
             expect(err.status).to.equal(400);
-            expect(err.message).to.equal('This site has already been added to Federalist.');
+            expect(err.message).to.equal(`This site has already been added to ${apiConfig.app.appName}.`);
             done();
           }).catch(done);
       });
@@ -258,9 +259,9 @@ describe('SiteCreator', () => {
             return SiteCreator.createSite({ user, siteParams });
           })
           .catch((err) => {
-            const expectedError = `Federalist can't confirm org permissions for '${siteParams.owner}'.`
-            + `Either '${siteParams.owner}' hasn't approved access for Federalist or you aren't an org member.`
-            + 'Ensure you are an org member and ask an org owner to authorize Federalist for the organization.';
+            const expectedError = `${apiConfig.app.appName} can't confirm org permissions for '${siteParams.owner}'.`
+            + `Either '${siteParams.owner}' hasn't approved access for ${apiConfig.app.appName} or you aren't an org member.`
+            + `Ensure you are an org member and ask an org owner to authorize ${apiConfig.app.appName} for the organization.`;
 
             expect(err.message).to.equal(expectedError);
             expect(err.status).to.equal(403);
