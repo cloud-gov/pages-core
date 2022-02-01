@@ -112,4 +112,17 @@ module.exports = wrapHandlers({
 
     return res.json(serialize(org));
   },
+
+  async deactivate(req, res) {
+    const {
+      params: { id },
+    } = req;
+
+    const org = await fetchModelById(id, Organization);
+    if (!org) return res.notFound();
+
+    // TODO: Add audit logging
+    const deactivatedOrg = await OrganizationService.deactivateOrganization(org);
+    return res.json(serialize(deactivatedOrg));
+  },
 });
