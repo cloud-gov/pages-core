@@ -1,7 +1,16 @@
 <script>
-  import { fetchOrganizations } from '../../lib/api';
+  import page from 'page';
+  import { fetchOrganizations, deactivateOrganization } from '../../lib/api';
   import { formatDateTime } from '../../helpers/formatter';
   import { DataTable, PaginatedQueryPage } from '../../components';
+
+  function deactivate(id) {
+    // eslint-disable-next-line no-alert
+    if (window.confirm('Are you sure you want to deactivate this organization?')) {
+      deactivateOrganization(id);
+      page('/organizations');
+    }
+  }
 </script>
 
 <PaginatedQueryPage path="organizations" query={fetchOrganizations} addAction let:data>
@@ -52,7 +61,13 @@
         </ul>
       </td>
       <td>
-        <button class="usa-button usa-button--secondary">Delete</button>
+        {#if org.isActive}
+        <button
+          class="usa-button usa-button--secondary"
+          on:click={deactivate(org.id)}>
+          Deactivate
+        </button>
+        {/if}
       </td>
     </tr>
   </DataTable>

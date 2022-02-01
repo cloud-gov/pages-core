@@ -168,6 +168,10 @@ async function updateOrganization(id, params) {
   return put(`/organizations/${id}`, params);
 }
 
+async function deactivateOrganization(id) {
+  return post(`/organizations/${id}/deactivate`);
+}
+
 async function fetchRoles() {
   return get('/roles').catch(() => []);
 }
@@ -241,6 +245,7 @@ export {
   fetchOrganization,
   fetchOrganizations,
   updateOrganization,
+  deactivateOrganization,
   removeUserOrgRole,
   updateUserOrgRole,
   fetchRoles,
