@@ -172,6 +172,10 @@ async function deactivateOrganization(id) {
   return post(`/organizations/${id}/deactivate`);
 }
 
+async function activateOrganization(id) {
+  return post(`/organizations/${id}/activate`);
+}
+
 async function fetchRoles() {
   return get('/roles').catch(() => []);
 }
@@ -246,6 +250,7 @@ export {
   fetchOrganizations,
   updateOrganization,
   deactivateOrganization,
+  activateOrganization,
   removeUserOrgRole,
   updateUserOrgRole,
   fetchRoles,

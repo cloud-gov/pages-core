@@ -1,6 +1,6 @@
 <script>
   import page from 'page';
-  import { fetchOrganizations, deactivateOrganization } from '../../lib/api';
+  import { fetchOrganizations, deactivateOrganization, activateOrganization } from '../../lib/api';
   import { formatDateTime } from '../../helpers/formatter';
   import { DataTable, PaginatedQueryPage } from '../../components';
 
@@ -10,6 +10,11 @@
       deactivateOrganization(id);
       page('/organizations');
     }
+  }
+
+  function activate(id) {
+    activateOrganization(id);
+    page('/organizations');
   }
 </script>
 
@@ -66,6 +71,12 @@
           class="usa-button usa-button--secondary"
           on:click={deactivate(org.id)}>
           Deactivate
+        </button>
+        {:else}
+        <button
+          class="usa-button"
+          on:click={activate(org.id)}>
+          Activate
         </button>
         {/if}
       </td>
