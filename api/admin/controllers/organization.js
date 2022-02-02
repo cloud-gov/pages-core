@@ -121,8 +121,8 @@ module.exports = wrapHandlers({
     const org = await fetchModelById(id, Organization);
     if (!org) return res.notFound();
 
-    // TODO: Add audit logging
     const deactivatedOrg = await OrganizationService.deactivateOrganization(org);
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Organization Deactivated', { organization: deactivatedOrg });
     return res.json(serialize(deactivatedOrg));
   },
 
@@ -134,8 +134,8 @@ module.exports = wrapHandlers({
     const org = await fetchModelById(id, Organization);
     if (!org) return res.notFound();
 
-    // TODO: Add audit logging
     const activatedOrg = await OrganizationService.activateOrganization(org);
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Organization Activated', { organization: activatedOrg });
     return res.json(serialize(activatedOrg));
   },
 });
