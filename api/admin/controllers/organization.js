@@ -135,7 +135,7 @@ module.exports = wrapHandlers({
     if (!org) return res.notFound();
 
     // TODO: Add audit logging
-    const deactivatedOrg = await OrganizationService.activateOrganization(org);
-    return res.json(serialize(deactivatedOrg));
+    const activatedOrg = await OrganizationService.activateOrganization(org);
+    return res.json(serialize(activatedOrg));
   },
 });
