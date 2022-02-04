@@ -76,11 +76,11 @@
           <LabeledItem label="origin" value={domain.origin} />
           <LabeledItem label="path" value={domain.path} />
           <LabeledItem label="service" value={domain.serviceName} />
-        {/if}        
+        {/if}
       </div>
       <div class="tablet:grid-col-auto padding-bottom-1">
         <LabeledItem label="created at" value={formatDateTime(domain.createdAt)} />
-        <LabeledItem label="updated at" value={formatDateTime(domain.updatedAt)} />        
+        <LabeledItem label="updated at" value={formatDateTime(domain.updatedAt)} />
       </div>
     </div>
     <Await on={dnsResultsPromise} let:response={dnsResults}>
