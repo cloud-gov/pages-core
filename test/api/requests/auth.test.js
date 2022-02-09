@@ -333,7 +333,7 @@ describe('Authentication requests', () => {
     });
   });
 
-  context('UAA', () => {
+  context.skip('UAA', () => {
     context('Callbacks', () => {
       beforeEach(() => Promise.all([
         User.truncate(),
