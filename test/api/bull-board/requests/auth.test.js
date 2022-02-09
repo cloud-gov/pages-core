@@ -118,7 +118,7 @@ describe('bull board authentication request', () => {
         .expect(401);
     });
 
-    describe('when successful', () => {
+    describe.skip('when successful', () => {
       const uaaId = 'bull_admin_id_1';
       const code = 'code';
       const email = 'hello@bull-example.com';
