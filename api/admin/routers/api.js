@@ -30,6 +30,8 @@ apiRouter.get('/organizations', AdminControllers.Organization.list);
 apiRouter.post('/organizations', parseJson, AdminControllers.Organization.create);
 apiRouter.get('/organizations/:id', AdminControllers.Organization.findById);
 apiRouter.put('/organizations/:id', parseJson, AdminControllers.Organization.update);
+apiRouter.post('/organizations/:id/deactivate', AdminControllers.Organization.deactivate);
+apiRouter.post('/organizations/:id/activate', AdminControllers.Organization.activate);
 apiRouter.delete('/organization-role', parseJson, AdminControllers.OrganizationRole.destroy);
 apiRouter.put('/organization-role', parseJson, AdminControllers.OrganizationRole.update);
 apiRouter.get('/roles', AdminControllers.Role.list);

@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const config = require('../../../config');
 const passport = require('../passport');
+const Features = require('../../features');
 
 const onSuccess = (req, res) => {
   const script = `
@@ -20,11 +21,12 @@ router.get('/login', passport.authenticate(authProvider));
 router.get('/auth/github2/callback', passport.authenticate('github'), onSuccess);
 //
 
-// router.get('/login', passport.authenticate('uaa'));
-router.get('/logout', passport.logout);
-
 // Callbacks need to be registered with CF UAA service
-router.get('/auth/uaa/callback', passport.authenticate('uaa'), onSuccess);
-router.get('/auth/uaa/logout', onSuccess);
+if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA)) {
+  // router.get('/login', passport.authenticate('uaa'));
+  router.get('/logout', passport.logout);
+  router.get('/auth/uaa/callback', passport.authenticate('uaa'), onSuccess);
+  router.get('/auth/uaa/logout', onSuccess);
+}
 
 module.exports = router;
