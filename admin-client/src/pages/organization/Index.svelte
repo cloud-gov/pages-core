@@ -79,7 +79,7 @@
         {#if org.isActive}
         <button
           class="usa-button usa-button--secondary"
-          on:click={deactivate(org.id)}>
+          on:click={() => deactivate(org.id)}>
           Deactivate
         </button>
         {:else}
