@@ -221,8 +221,7 @@ module.exports = {
      * @param {OrganizationModel} organization The organization
      * @returns {Promise<OrgType>}
      */
-  async activateOrganization(organization) {
-    await organization.update({ isActive: true });
-    return organization;
+  activateOrganization(organization) {
+    return organization.update({ isActive: true });
   },
 };
