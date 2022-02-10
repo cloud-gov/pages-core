@@ -1,7 +1,31 @@
 <script>
-  import { fetchOrganizations } from '../../lib/api';
+  import page from 'page';
+  import { notification } from '../../stores';
+  import { fetchOrganizations, deactivateOrganization, activateOrganization } from '../../lib/api';
   import { formatDateTime } from '../../helpers/formatter';
   import { DataTable, PaginatedQueryPage } from '../../components';
+
+  async function deactivate(id) {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm('Are you sure you want to deactivate this organization?')) { return null; }
+    try {
+      await deactivateOrganization(id);
+      page('/organizations');
+      return notification.setSuccess(`Organization ${id} deactivated successfully!`);
+    } catch (error) {
+      return notification.setError(`Unable to deactivate organization ${id}: ${error.message}`);
+    }
+  }
+
+  async function activate(id) {
+    try {
+      await activateOrganization(id);
+      page('/organizations');
+      return notification.setSuccess(`Organization ${id} activated successfully!`);
+    } catch (error) {
+      return notification.setError(`Unable to activate organization ${id}: ${error.message}`);
+    }
+  }
 </script>
 
 <PaginatedQueryPage path="organizations" query={fetchOrganizations} addAction let:data>
@@ -52,7 +76,19 @@
         </ul>
       </td>
       <td>
-        <button class="usa-button usa-button--secondary">Delete</button>
+        {#if org.isActive}
+        <button
+          class="usa-button usa-button--secondary"
+          on:click={() => deactivate(org.id)}>
+          Deactivate
+        </button>
+        {:else}
+        <button
+          class="usa-button"
+          on:click={() => activate(org.id)}>
+          Activate
+        </button>
+        {/if}
       </td>
     </tr>
   </DataTable>

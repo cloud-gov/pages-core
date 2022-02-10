@@ -208,4 +208,20 @@ module.exports = {
 
     return [org, uaaUserAttributes];
   },
+
+  /**
+   * @param {OrganizationModel} organization The organization
+   * @returns {Promise<OrgType>}
+   */
+  deactivateOrganization(organization) {
+    return organization.update({ isActive: false });
+  },
+
+  /**
+     * @param {OrganizationModel} organization The organization
+     * @returns {Promise<OrgType>}
+     */
+  activateOrganization(organization) {
+    return organization.update({ isActive: true });
+  },
 };
