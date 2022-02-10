@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { Event, User } = require('../models');
 const passport = require('../services/passport');
 const EventCreator = require('../services/EventCreator');
+const Features = require('../features');
 
 const opts = {
   failureRedirect: '/',
@@ -21,15 +22,17 @@ function onSuccess(req, res) {
   });
 }
 
-router.get('/logout', passport.logout('uaa'));
 router.get('/logout/github', passport.logout('github'));
-router.get('/login', redirectIfAuthenticated, passport.authenticate('uaa'));
 router.get('/login/github', redirectIfAuthenticated, passport.authenticate('github'));
 router.get('/auth/github/callback', passport.authenticate('github', opts), onSuccess);
 
 // Callbacks need to be registered with CF UAA service
-router.get('/auth/uaa/callback', passport.authenticate('uaa', opts), onSuccess);
-router.get('/auth/uaa/logout', (_req, res) => res.redirect('/'));
+if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA)) {
+  router.get('/logout', passport.logout('uaa'));
+  router.get('/login', redirectIfAuthenticated, passport.authenticate('uaa'));
+  router.get('/auth/uaa/callback', passport.authenticate('uaa', opts), onSuccess);
+  router.get('/auth/uaa/logout', (_req, res) => res.redirect('/'));
+}
 
 // New Github authorization only routes
 const onGithubSuccess = async (req, res) => {

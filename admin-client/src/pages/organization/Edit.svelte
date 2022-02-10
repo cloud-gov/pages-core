@@ -42,13 +42,13 @@
     <form
       class="usa-form usa-form--large"
       on:submit|preventDefault={handleSubmit} >
-  
+
       <legend class="usa-legend usa-legend--large">Edit Organization</legend>
-  
+
       <p>
         Required fields are marked with an asterisk (<abbr title="required" class="usa-hint usa-hint--required">*</abbr>).
       </p>
-  
+
       <fieldset class="usa-fieldset">
         <label class="usa-label" for="name">Organization Name<abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
         <span class="usa-hint">Organization name must be globally unique</span>
@@ -104,7 +104,7 @@
         </div>
       </fieldset>
 
-      <fieldset class="usa-fieldset">
+      <fieldset class="usa-fieldset" disabled>
         <legend class="usa-legend usa-legend">Organization Status</legend>
         <div class="usa-radio">
           <input
