@@ -1,20 +1,30 @@
 <script>
   import page from 'page';
+  import { notification } from '../../stores';
   import { fetchOrganizations, deactivateOrganization, activateOrganization } from '../../lib/api';
   import { formatDateTime } from '../../helpers/formatter';
   import { DataTable, PaginatedQueryPage } from '../../components';
 
-  function deactivate(id) {
+  async function deactivate(id) {
     // eslint-disable-next-line no-alert
-    if (window.confirm('Are you sure you want to deactivate this organization?')) {
-      deactivateOrganization(id);
+    if (!window.confirm('Are you sure you want to deactivate this organization?')) { return null; }
+    try {
+      await deactivateOrganization(id);
       page('/organizations');
+      return notification.setSuccess(`Organization ${id} deactivated successfully!`);
+    } catch (error) {
+      return notification.setError(`Unable to deactivate organization ${id}: ${error.message}`);
     }
   }
 
-  function activate(id) {
-    activateOrganization(id);
-    page('/organizations');
+  async function activate(id) {
+    try {
+      await activateOrganization(id);
+      page('/organizations');
+      return notification.setSuccess(`Organization ${id} activated successfully!`);
+    } catch (error) {
+      return notification.setError(`Unable to activate organization ${id}: ${error.message}`);
+    }
   }
 </script>
 
