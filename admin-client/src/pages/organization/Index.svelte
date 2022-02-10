@@ -85,7 +85,7 @@
         {:else}
         <button
           class="usa-button"
-          on:click={activate(org.id)}>
+          on:click={() => activate(org.id)}>
           Activate
         </button>
         {/if}
