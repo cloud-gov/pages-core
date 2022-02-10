@@ -112,4 +112,30 @@ module.exports = wrapHandlers({
 
     return res.json(serialize(org));
   },
+
+  async deactivate(req, res) {
+    const {
+      params: { id },
+    } = req;
+
+    const org = await fetchModelById(id, Organization);
+    if (!org) return res.notFound();
+
+    const deactivatedOrg = await OrganizationService.deactivateOrganization(org);
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Organization Deactivated', { organization: deactivatedOrg });
+    return res.json(serialize(deactivatedOrg));
+  },
+
+  async activate(req, res) {
+    const {
+      params: { id },
+    } = req;
+
+    const org = await fetchModelById(id, Organization);
+    if (!org) return res.notFound();
+
+    const activatedOrg = await OrganizationService.activateOrganization(org);
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Organization Activated', { organization: activatedOrg });
+    return res.json(serialize(activatedOrg));
+  },
 });
