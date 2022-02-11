@@ -85,7 +85,7 @@ module.exports = wrapHandlers({
 
     // This will not remove the webhook since we don't have permissions
     await SiteDestroyer.destroySite(site);
-    EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'Site Destroyed', { site });
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Site Destroyed', { site });
 
     return res.json({});
   },
