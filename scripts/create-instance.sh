@@ -96,7 +96,7 @@ if [[ "${show_usage}" = "true" ]] ; then
   echo "    SLACK_URL"
   echo
   echo "Example:"
-  echo "  ./create-infra.sh -e staging -d federalistapp-staging.18f.gov -o gsa-18f-federalist -p federalist -x app.cloud.gov staging"
+  echo "  ./create-instance.sh -e staging -d federalistapp-staging.18f.gov -o gsa-18f-federalist -p federalist -x app.cloud.gov staging"
 
   exit 1
 fi
