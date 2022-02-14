@@ -29,12 +29,14 @@
 
   function provision() {
     domainPromise = provisionDomain(id);
+    refreshDnsResults();
   }
 
   function deprovision() {
     // eslint-disable-next-line no-alert
     if (window.confirm('Are you sure you want to deprovision this domain?')) {
       domainPromise = deprovisionDomain(id);
+      refreshDnsResults();
     }
   }
 
@@ -74,11 +76,11 @@
           <LabeledItem label="origin" value={domain.origin} />
           <LabeledItem label="path" value={domain.path} />
           <LabeledItem label="service" value={domain.serviceName} />
-        {/if}        
+        {/if}
       </div>
       <div class="tablet:grid-col-auto padding-bottom-1">
         <LabeledItem label="created at" value={formatDateTime(domain.createdAt)} />
-        <LabeledItem label="updated at" value={formatDateTime(domain.updatedAt)} />        
+        <LabeledItem label="updated at" value={formatDateTime(domain.updatedAt)} />
       </div>
     </div>
     <Await on={dnsResultsPromise} let:response={dnsResults}>

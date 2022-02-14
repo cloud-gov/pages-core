@@ -80,7 +80,7 @@ module.exports = wrapHandlers({
 
     try {
       const domain = await Domain.create({ siteId, context, names });
-      EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'Domain Created', { domain });
+      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Domain Created', { domain });
       return res.json(domainSerializer.serialize(domain, true));
     } catch (err) {
       if (!err.errors) {
@@ -106,7 +106,7 @@ module.exports = wrapHandlers({
 
     try {
       await DomainService.destroy(domain);
-      EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'Domain Destroyed', { domain });
+      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Domain Destroyed', { domain });
       return res.json({});
     } catch (error) {
       return res.unprocessableEntity(error);
@@ -166,7 +166,7 @@ module.exports = wrapHandlers({
 
     try {
       const updatedDomain = await DomainService.deprovision(domain);
-      EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'Domain Deprovisioned', { domain: updatedDomain });
+      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Domain Deprovisioned', { domain: updatedDomain });
       return res.json({
         dnsRecords: DomainService.buildDnsRecords(updatedDomain),
         domain: domainSerializer.serialize(updatedDomain, true),
@@ -190,7 +190,7 @@ module.exports = wrapHandlers({
 
     try {
       const updatedDomain = await DomainService.provision(domain, dnsResults);
-      EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'Domain Provisioned', { domain: updatedDomain });
+      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Domain Provisioned', { domain: updatedDomain });
       return res.json({
         dnsRecords: DomainService.buildDnsRecords(updatedDomain),
         domain: domainSerializer.serialize(updatedDomain, true),
