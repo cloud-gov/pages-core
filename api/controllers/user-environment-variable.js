@@ -52,7 +52,7 @@ module.exports = wrapHandlers({
         .create({
           siteId: site.id, name, ciphertext, hint,
         });
-      EventCreator.audit(req.user, Event.labels.USER_ACTION, 'UserEnvironmentVariable Created', {
+      EventCreator.audit(Event.labels.USER_ACTION, req.user, 'UserEnvironmentVariable Created', {
         userEnvironmentVariable: { id: uev.id, siteId: uev.siteId, name: uev.name },
       });
       const json = serialize(uev);
@@ -85,7 +85,7 @@ module.exports = wrapHandlers({
     }
 
     await uev.destroy();
-    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'UserEnvironmentVariable Destroyed', {
+    EventCreator.audit(Event.labels.USER_ACTION, req.user, 'UserEnvironmentVariable Destroyed', {
       userEnvironmentVariable: { id: uev.id, siteId: uev.siteId, name: uev.name },
     });
 
