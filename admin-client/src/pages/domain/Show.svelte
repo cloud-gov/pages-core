@@ -27,15 +27,17 @@
     dnsResultsPromise = fetchDomainDnsResult(id);
   }
 
-  function provision() {
+  async function provision() {
     domainPromise = provisionDomain(id);
+    await domainPromise;
     refreshDnsResults();
   }
 
-  function deprovision() {
+  async function deprovision() {
     // eslint-disable-next-line no-alert
     if (window.confirm('Are you sure you want to deprovision this domain?')) {
       domainPromise = deprovisionDomain(id);
+      await domainPromise;
       refreshDnsResults();
     }
   }
