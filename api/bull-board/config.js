@@ -4,6 +4,7 @@ const {
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,
   LOG_LEVEL,
+  PRODUCT,
   REDIS_URL,
   REDIS_TLS,
   UAA_CLIENT_ID,
@@ -14,7 +15,7 @@ const {
 
 const internalUAAHost = UAA_HOST_DOCKER_URL || UAA_HOST;
 
-if (!REDIS_URL) throw new Error('No Redis credentials found');
+// if (!REDIS_URL) throw new Error('No Redis credentials found');
 
 module.exports = {
   appEnv: APP_ENV,
@@ -35,8 +36,8 @@ module.exports = {
     xssFilter: false,
   },
   github: {
-    clientID: GITHUB_CLIENT_ID,
-    clientSecret: GITHUB_CLIENT_SECRET,
+    clientID: GITHUB_CLIENT_ID || 'test',
+    clientSecret: GITHUB_CLIENT_SECRET || 'test',
     callbackURL: `${APP_HOSTNAME}/auth/github/callback`,
     scope: ['user', 'repo'],
     state: true,
@@ -44,6 +45,7 @@ module.exports = {
   log: {
     level: LOG_LEVEL || 'info',
   },
+  product: PRODUCT,
   uaa: {
     apiUrl: internalUAAHost,
     authorizationURL: `${UAA_HOST}/oauth/authorize`,
