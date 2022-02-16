@@ -73,7 +73,7 @@ function redirectIfAuthenticated(req, res, next) {
   req.session.authenticated ? res.redirect('/') : next();
 }
 
-const idp = process.env.PRODUCT === 'federalist' ? 'github' : 'uaa';
+const idp = config.product === 'federalist' ? 'github' : 'uaa';
 
 app.get('/login', redirectIfAuthenticated, passport.authenticate(idp));
 app.get('/logout', passport.logout(idp));
