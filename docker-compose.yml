@@ -63,7 +63,7 @@ services:
     build:
       dockerfile: Dockerfile-app
       context: .
-    command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "start-bull-board"]
+    command: ["scripts/wait-for-it.sh", "redis:6379", "--", "yarn", "start-bull-board:local"]
     volumes:
       - yarn:/usr/local/share/.cache/yarn
       - .:/app
@@ -74,8 +74,14 @@ services:
     depends_on:
       - redis
     environment:
+      APP_ENV: local
       APP_HOSTNAME: http://localhost:1340
       PORT: 1340
+      PRODUCT: federalist
+      REDIS_URL: redis://redis:6379
+      SESSION_SECRET: bull-board
+      UAA_CLIENT_ID: pages-client
+      UAA_CLIENT_SECRET: client-secret
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
   admin-client:

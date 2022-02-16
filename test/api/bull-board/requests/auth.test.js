@@ -62,7 +62,7 @@ const sessionForCookie = (cookie, sid = 'federalist-bull-board.sid') => {
   });
 };
 
-describe('bull board authentication request', () => {
+describe.skip('bull board authentication request', () => {
   after(() => Promise.all([
     User.truncate(),
     UAAIdentity.truncate(),
@@ -118,7 +118,7 @@ describe('bull board authentication request', () => {
         .expect(401);
     });
 
-    describe.skip('when successful', () => {
+    describe('when successful', () => {
       const uaaId = 'bull_admin_id_1';
       const code = 'code';
       const email = 'hello@bull-example.com';
