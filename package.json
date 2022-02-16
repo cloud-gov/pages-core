@@ -62,7 +62,7 @@
     "build": "webpack --config webpack.production.config.js",
     "start": "node index.js",
     "start-workers": "node ./api/workers/index.js",
-    "start-bull-board:cg": "node -r ./api/bull-board/env.js ./api/bull-board/index.js",
+    "start-bull-board:cg": "node -r ./api/bull-board/cfEnv.js ./api/bull-board/index.js",
     "start-bull-board:local": "DOTENV_CONFIG_PATH=./api/bull-board/.env node -r dotenv/config ./api/bull-board/index.js",
     "debug": "node --inspect index.js",
     "watch": "NODE_ENV=development nodemon index.js --config nodemon.json",
