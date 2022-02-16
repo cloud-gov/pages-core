@@ -70,6 +70,7 @@ applications:
       - app-((env))-uaa-client
       - federalist-((env))-redis
       - federalist-((env))-github-queues-ui
+      - ((product))-((env))-env
     env:
       NODE_ENV: production
       APP_ENV: ((env))
