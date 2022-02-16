@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== 'test') {
         authorizationOptions: githubOptions,
         externalOptions: githubOptions,
         organizations: [
-          1234567, // YOUR GITHUB ORGANIZATION ID
+          46731192, // FederalistLocal
         ],
       },
       // Keep these options below in your local.js config
