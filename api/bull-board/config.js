@@ -1,12 +1,16 @@
 const {
+  ADMIN_GITHUB_ORGANIZATION,
+  ADMIN_GITHUB_TEAM,
   APP_ENV,
   APP_HOSTNAME,
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,
   LOG_LEVEL,
+  NODE_ENV,
   PRODUCT,
   REDIS_URL,
   REDIS_TLS,
+  SESSION_SECRET,
   UAA_CLIENT_ID,
   UAA_CLIENT_SECRET,
   UAA_HOST,
@@ -18,7 +22,14 @@ const internalUAAHost = UAA_HOST_DOCKER_URL || UAA_HOST;
 // if (!REDIS_URL) throw new Error('No Redis credentials found');
 
 module.exports = {
+  admin: {
+    org: ADMIN_GITHUB_ORGANIZATION,
+    team: ADMIN_GITHUB_TEAM,
+  },
   appEnv: APP_ENV,
+  cookie: {
+    secure: NODE_ENV === 'production',
+  },
   helmet: {
     contentSecurityPolicy: {
       useDefaults: true,
@@ -46,12 +57,15 @@ module.exports = {
     level: LOG_LEVEL || 'info',
   },
   product: PRODUCT,
+  session: {
+    secret: SESSION_SECRET,
+  },
   uaa: {
     apiUrl: internalUAAHost,
     authorizationURL: `${UAA_HOST}/oauth/authorize`,
     callbackURL: `${APP_HOSTNAME}/auth/uaa/callback`,
-    clientID: UAA_CLIENT_ID,
-    clientSecret: UAA_CLIENT_SECRET,
+    clientID: UAA_CLIENT_ID || 'test',
+    clientSecret: UAA_CLIENT_SECRET || 'test',
     logoutCallbackURL: `${APP_HOSTNAME}/auth/uaa/logout`,
     logoutURL: `${UAA_HOST}/logout.do`,
     tokenURL: `${internalUAAHost}/oauth/token`,
