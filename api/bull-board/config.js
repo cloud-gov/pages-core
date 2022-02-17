@@ -1,38 +1,36 @@
-if (process.env.NODE_ENV === 'production') {
-  const cfenv = require('cfenv'); // eslint-disable-line global-require
-  const appEnv = cfenv.getAppEnv();
+const {
+  ADMIN_GITHUB_ORGANIZATION,
+  ADMIN_GITHUB_TEAM,
+  APP_ENV,
+  APP_HOSTNAME,
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
+  LOG_LEVEL,
+  NODE_ENV,
+  PRODUCT,
+  REDIS_URL,
+  REDIS_TLS,
+  SESSION_SECRET,
+  UAA_CLIENT_ID,
+  UAA_CLIENT_SECRET,
+  UAA_HOST,
+  UAA_HOST_DOCKER_URL,
+} = process.env;
 
-  const { space_name: spaceName } = appEnv.app;
+const internalUAAHost = UAA_HOST_DOCKER_URL || UAA_HOST;
 
-  const servicePrefix = spaceName === 'pages-staging' ? spaceName : `federalist-${process.env.APP_ENV}`;
+// if (!REDIS_URL) throw new Error('No Redis credentials found');
 
-  const redisCreds = appEnv.getServiceCreds(`${servicePrefix}-redis`);
-  if (redisCreds) {
-    module.exports.redis = {
-      url: redisCreds.uri,
-      tls: {},
-    };
-  } else {
-    throw new Error('No Redis credentials found');
-  }
-
-  const uaaCredentials = appEnv.getServiceCreds(`app-${process.env.APP_ENV}-uaa-client`);
-
-  module.exports.passport = {
-    uaa: {
-      options: uaaCredentials,
-    },
-  };
-
-  module.exports.app = {
-    hostname: process.env.APP_HOSTNAME || 'http://localhost:1340',
-  };
-
-  module.exports.env = {
-    uaaHostUrl: process.env.UAA_HOST_DOCKER_URL || process.env.UAA_HOST || 'http://uaa.example.com',
-  };
-
-  module.exports.helmet = {
+module.exports = {
+  admin: {
+    org: ADMIN_GITHUB_ORGANIZATION,
+    team: ADMIN_GITHUB_TEAM,
+  },
+  appEnv: APP_ENV,
+  cookie: {
+    secure: NODE_ENV === 'production',
+  },
+  helmet: {
     contentSecurityPolicy: {
       useDefaults: true,
       directives: {
@@ -47,11 +45,36 @@ if (process.env.NODE_ENV === 'production') {
       action: 'deny',
     },
     xssFilter: false,
-  };
-
-  module.exports.log = {
-    level: process.env.LOG_LEVEL || 'info',
-  };
-} else {
-  module.exports = require('../../config'); // eslint-disable-line global-require
-}
+  },
+  github: {
+    clientID: GITHUB_CLIENT_ID || 'test',
+    clientSecret: GITHUB_CLIENT_SECRET || 'test',
+    callbackURL: `${APP_HOSTNAME}/auth/github/callback`,
+    scope: ['user', 'repo'],
+    state: true,
+  },
+  log: {
+    level: LOG_LEVEL || 'info',
+  },
+  product: PRODUCT,
+  session: {
+    secret: SESSION_SECRET,
+  },
+  uaa: {
+    apiUrl: internalUAAHost,
+    authorizationURL: `${UAA_HOST}/oauth/authorize`,
+    callbackURL: `${APP_HOSTNAME}/auth/uaa/callback`,
+    clientID: UAA_CLIENT_ID || 'test',
+    clientSecret: UAA_CLIENT_SECRET || 'test',
+    logoutCallbackURL: `${APP_HOSTNAME}/auth/uaa/logout`,
+    logoutURL: `${UAA_HOST}/logout.do`,
+    tokenURL: `${internalUAAHost}/oauth/token`,
+    userURL: `${internalUAAHost}/userinfo`,
+    scope: ['openid'],
+    state: true,
+  },
+  redis: {
+    url: REDIS_URL,
+    tls: REDIS_TLS,
+  },
+};

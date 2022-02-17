@@ -12,6 +12,7 @@ import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
 import AlertBanner from '../alertBanner';
 import LoadingIndicator from '../LoadingIndicator';
+import globals from '../../globals';
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';
 import { hasOrgs } from '../../selectors/organization';
@@ -89,7 +90,8 @@ export class AddSite extends React.Component {
           </div>
           <div className="usa-content">
             <p>
-              There are a two different ways you can add sites to Federalist.
+              There are two different ways you can add sites to
+              {` ${globals.APP_NAME}. `}
               You can specify the GitHub repository where your site&#39;s code lives.
               Or, you can start with a brand new site by selecting one of our template sites below.
             </p>

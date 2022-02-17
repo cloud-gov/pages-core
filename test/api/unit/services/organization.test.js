@@ -487,4 +487,26 @@ describe('OrganizationService', () => {
       });
     });
   });
+
+  describe('.deactivate', () => {
+    it('deactivates the organization', async () => {
+      const org = await orgFactory.create({ isActive: true });
+      expect(org.isActive).to.be.true;
+      const returnedOrg = await OrganizationService.deactivateOrganization(org);
+      expect(returnedOrg.isActive).to.be.false;
+      await org.reload();
+      expect(org.isActive).to.be.false;
+    });
+  });
+
+  describe('.activate', () => {
+    it('activates the organization', async () => {
+      const org = await orgFactory.create({ isActive: false });
+      expect(org.isActive).to.be.false;
+      const returnedOrg = await OrganizationService.activateOrganization(org);
+      expect(returnedOrg.isActive).to.be.true;
+      await org.reload();
+      expect(org.isActive).to.be.true;
+    });
+  });
 });

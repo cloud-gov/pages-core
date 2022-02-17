@@ -73,12 +73,18 @@ function redirectIfAuthenticated(req, res, next) {
   req.session.authenticated ? res.redirect('/') : next();
 }
 
-app.get('/logout', passport.logout);
-app.get('/login', redirectIfAuthenticated, passport.authenticate('uaa'));
+const idp = config.product === 'federalist' ? 'github' : 'uaa';
 
-// Callbacks need to be registered with CF UAA service
-app.get('/auth/uaa/callback', passport.authenticate('uaa'), onSuccess);
-app.get('/auth/uaa/logout', (_req, res) => res.redirect('/'));
+app.get('/login', redirectIfAuthenticated, passport.authenticate(idp));
+app.get('/logout', passport.logout(idp));
+app.get('/auth/github/callback', passport.authenticate('github', {
+  failureRedirect: '/',
+}), onSuccess);
+
+if (idp === 'uaa') {
+  app.get('/auth/uaa/callback', passport.authenticate('uaa'), onSuccess);
+  app.get('/auth/uaa/logout', (_req, res) => res.redirect('/'));
+}
 
 app.use('/', ensureAuthenticated, serverAdapter.getRouter());
 

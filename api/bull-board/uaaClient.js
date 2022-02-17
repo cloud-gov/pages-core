@@ -1,7 +1,6 @@
-const HttpClient = require('../utils/httpClient');
+const HttpClient = require('./httpClient');
 const config = require('./config');
 
-const { uaa: uaaOptions } = config.passport;
 /**
  * @typedef {object} UAAInvite
  * @property {string} email
@@ -26,9 +25,9 @@ const { uaa: uaaOptions } = config.passport;
  */
 class UAAClient {
   constructor() {
-    this.clientId = uaaOptions.options.clientID;
-    this.clientSecret = uaaOptions.options.clientSecret;
-    this.httpClient = new HttpClient(config.env.uaaHostUrl);
+    this.clientId = config.uaa.clientID;
+    this.clientSecret = config.uaa.clientSecret;
+    this.httpClient = new HttpClient(config.uaa.apiUrl);
   }
 
   /**

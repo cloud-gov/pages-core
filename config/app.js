@@ -9,4 +9,6 @@ module.exports = {
   domain: process.env.DOMAIN || 'localhost:1337',
   proxyDomain: process.env.PROXY_DOMAIN || 'localhost:1337',
   product: process.env.PRODUCT || 'pages',
+  supportEmail: process.env.PRODUCT === 'pages' ? 'pages-support@cloud.gov' : 'federalist-support@gsa.gov',
+  appName: process.env.PRODUCT === 'pages' ? 'Pages' : 'Federalist',
 };

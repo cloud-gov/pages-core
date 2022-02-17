@@ -6,6 +6,7 @@ import publishedBranchActions from '../../actions/publishedBranchActions';
 import { currentSite } from '../../selectors/site';
 import LoadingIndicator from '../LoadingIndicator';
 import BranchViewLink from '../branchViewLink';
+import globals from '../../globals';
 import { SITE } from '../../propTypes';
 import AlertBanner from '../alertBanner';
 
@@ -28,7 +29,10 @@ class SitePublishedBranchesTable extends React.Component {
       <div>
         <p>
           Use this page to see every version of your site&apos;s code published on
-          Federalist and to audit the specific files that Federalist has published.
+          {` ${globals.APP_NAME} `}
+          and to audit the specific files that
+          {` ${globals.APP_NAME} `}
+          has published.
         </p>
         <table className="usa-table-borderless published-branch-table log-table table-full-width">
           <thead>

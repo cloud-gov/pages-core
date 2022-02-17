@@ -68,7 +68,7 @@ module.exports = wrapHandlers({
 
     await authorizer.destroy(user, site);
     await SiteDestroyer.destroySite(site, user);
-    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'Site Destroyed', { site });
+    EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Site Destroyed', { site });
     return res.json({});
   },
 
@@ -83,7 +83,7 @@ module.exports = wrapHandlers({
       user,
       siteParams: body,
     });
-    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'SiteUser Created', {
+    EventCreator.audit(Event.labels.USER_ACTION, req.user, 'SiteUser Created', {
       siteUser: { siteId: site.id, userId: user.id },
     });
     const siteJSON = await siteSerializer.serialize(site);
@@ -109,7 +109,7 @@ module.exports = wrapHandlers({
 
     await authorizer.removeUser(req.user, site);
     await SiteMembershipCreator.revokeSiteMembership({ user: req.user, site, userId });
-    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'SiteUser Removed', {
+    EventCreator.audit(Event.labels.USER_ACTION, req.user, 'SiteUser Removed', {
       siteUser: { siteId: site.id, userId },
     });
     // UserActionCreator to be deleted
@@ -126,7 +126,7 @@ module.exports = wrapHandlers({
   async create(req, res) {
     const {
       body: {
-        owner, template, organizationId, repository,
+        owner, template, organizationId, repository, engine,
       },
       user,
     } = req;
@@ -136,6 +136,7 @@ module.exports = wrapHandlers({
       template,
       organizationId: toInt(organizationId),
       repository,
+      engine,
       sharedBucket: false,
     };
 
@@ -144,7 +145,7 @@ module.exports = wrapHandlers({
       user,
       siteParams,
     });
-    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'Site Created', { site });
+    EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Site Created', { site });
     await site.reload({ include: [Organization, User] });
     const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
@@ -190,7 +191,7 @@ module.exports = wrapHandlers({
     }
 
     await site.update(updateParams);
-    EventCreator.audit(req.user, Event.labels.USER_ACTION, 'Site Updated', {
+    EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Site Updated', {
       site: { ...updateParams, id: site.id },
     });
     await Build.create({

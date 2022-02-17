@@ -8,7 +8,7 @@ const logger = winston.createLogger({
     winston.format.simple(),
     winston.format.colorize()
   ),
-  defaultMeta: { service: `federalistapp-${config.app.appEnv}` },
+  defaultMeta: { service: `bull-board-${config.appEnv}` },
   transports: [new winston.transports.Console()],
   silent: config.log.silent,
 });

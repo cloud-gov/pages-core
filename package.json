@@ -62,7 +62,8 @@
     "build": "webpack --config webpack.production.config.js",
     "start": "node index.js",
     "start-workers": "node ./api/workers/index.js",
-    "start-bull-board": "node ./api/bull-board/index.js",
+    "start-bull-board:cg": "node -r ./api/bull-board/cfEnv.js ./api/bull-board/index.js",
+    "start-bull-board:local": "DOTENV_CONFIG_PATH=./api/bull-board/.env node -r dotenv/config ./api/bull-board/index.js",
     "debug": "node --inspect index.js",
     "watch": "NODE_ENV=development nodemon index.js --config nodemon.json",
     "test": "yarn test:prepare && yarn test:server && yarn test:client",
@@ -95,7 +96,8 @@
     "send-email": "node ./scripts/send-email.js",
     "bootstrap-admins": "node ./scripts/bootstrap-admins.js",
     "migrate-build-notification-settings": "node ./scripts/migrate-build-notification-settings.js",
-    "remove-bucket-website-configs": "node ./scripts/remove-bucket-website-configs.js"
+    "remove-bucket-website-configs": "node ./scripts/remove-bucket-website-configs.js",
+    "check-object-paths": "node ./scripts/check-object-paths.js"
   },
   "main": "index.js",
   "repository": {
@@ -120,6 +122,7 @@
     "cookie": "^0.4.1",
     "css-loader": "^5.0.0",
     "date-fns": "^2.16.1",
+    "dotenv": "^16.0.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",
     "eslint": "^7.21.0",
@@ -171,7 +174,7 @@
     "webpack-manifest-plugin": "^3.0.0"
   },
   "engines": {
-    "node": "16.x.x",
-    "npm": "7.x.x"
+    "node": "^16.13.1",
+    "npm": "^8.1.2"
   }
 }
