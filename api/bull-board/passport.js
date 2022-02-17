@@ -3,7 +3,7 @@ const GitHubStrategy = require('passport-github').Strategy;
 const { Strategy } = require('passport-oauth2');
 const config = require('./config');
 const UAAClient = require('./uaaClient');
-const GitHub = require('../services/GitHub');
+const GitHubClient = require('./githubClient');
 
 passport.serializeUser(({ id }, next) => {
   next(null, id);
@@ -22,7 +22,8 @@ async function verifyGithub(accessToken, _refreshToken, profile, callback) {
   const { id, username } = profile;
 
   try {
-    await GitHub.ensureFederalistAdmin(accessToken, username.toLowerCase());
+    const githubClient = new GitHubClient(accessToken);
+    await githubClient.ensureFederalistAdmin(username.toLowerCase());
 
     return callback(null, { id });
   } catch (err) {
@@ -34,7 +35,7 @@ passport.use('github', new GitHubStrategy(githubOptions, verifyGithub));
 
 let uaaLogoutRedirectURL = '';
 
-if (process.env.PRODUCT === 'pages') {
+if (config.product === 'pages') {
   const uaaOptions = config.uaa;
 
   const createUAAStrategy = (options, verify) => {

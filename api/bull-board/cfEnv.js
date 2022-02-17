@@ -9,7 +9,7 @@ const {
 
 const appEnv = cfenv.getAppEnv();
 
-const redisCreds = appEnv.getServiceCreds(`${PRODUCT}-redis`);
+const redisCreds = appEnv.getServiceCreds(`${PRODUCT}-${APP_ENV}-redis`);
 process.env.REDIS_URL = redisCreds.uri;
 process.env.REDIS_TLS = {};
 
