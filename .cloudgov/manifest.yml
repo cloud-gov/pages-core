@@ -72,6 +72,8 @@ applications:
       - federalist-((env))-github-queues-ui
       - ((product))-((env))-env
     env:
+      ADMIN_GITHUB_ORGANIZATION: 18F
+      ADMIN_GITHUB_TEAM: federalist-admins
       NODE_ENV: production
       APP_ENV: ((env))
       APP_HOSTNAME: https://queues.((domain))

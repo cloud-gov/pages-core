@@ -74,6 +74,8 @@ services:
     depends_on:
       - redis
     environment:
+      ADMIN_GITHUB_ORGANIZATION: FederalistLocal
+      ADMIN_GITHUB_TEAM: federalist-local-admins
       APP_ENV: local
       APP_HOSTNAME: http://localhost:1340
       PORT: 1340
