@@ -11,21 +11,29 @@ const Features = require('../features');
 
 const passport = new Passport.Passport();
 const flashMessage = {
-  message: 'Apologies; you are not authorized to access Federalist! Please contact the Federalist team if this is in error.',
+  message: `Apologies; you are not authorized to access ${config.app.appName}! Please contact the ${config.app.appName} team if this is in error.`,
 };
 
+passport.serializeUser((user, next) => {
+  next(null, user.id);
+});
+
+passport.deserializeUser((id, next) => {
+  User.scope('withUAAIdentity').findByPk(id)
+    .then((user) => {
+      next(null, user);
+    });
+});
+
+/**
+ * Github Auth
+ */
 const {
   github: {
     options: githubOptions,
     authorizationOptions: githubAuthorizationOptions,
   },
 } = config.passport;
-
-const uaaOptions = {
-  ...config.passport.uaa.options,
-  callbackURL: `${config.app.hostname}/auth/uaa/callback`,
-  logoutCallbackURL: `${config.app.hostname}/auth/uaa/logout`,
-};
 
 async function checkUpdateUser({
   username,
@@ -113,37 +121,53 @@ async function verifyGithub2(accessToken, _refreshToken, profile, callback) {
   }
 }
 
-async function verifyUAA(accessToken, refreshToken, profile, callback) {
-  try {
-    const user = await verifyUAAUser(
-      accessToken,
-      refreshToken,
-      profile,
-      ['pages.user', 'pages.admin']
-    );
-
-    if (!user) return callback(null, false, flashMessage);
-
-    await user.update({
-      signedInAt: new Date(),
-    });
-
-    EventCreator.audit(Event.labels.AUTHENTICATION, user, 'UAA login');
-
-    return callback(null, user);
-  } catch (err) {
-    return callback(err);
-  }
-}
-
-const uaaStrategy = createUAAStrategy(uaaOptions, verifyUAA);
-
 passport.use('github', new GitHubStrategy(githubOptions, verifyGithub));
 passport.use('github2', new GitHubStrategy(githubAuthorizationOptions, verifyGithub2));
-passport.use('uaa', uaaStrategy);
+
+let uaaLogoutRedirectURL = '';
+
+/**
+ * UAA Auth
+ */
+if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA)) {
+  const uaaOptions = {
+    ...config.passport.uaa.options,
+    callbackURL: `${config.app.hostname}/auth/uaa/callback`,
+    logoutCallbackURL: `${config.app.hostname}/auth/uaa/logout`,
+  };
+
+  const verifyUAA = async (accessToken, refreshToken, profile, callback) => {
+    try {
+      const user = await verifyUAAUser(
+        accessToken,
+        refreshToken,
+        profile,
+        ['pages.user', 'pages.admin']
+      );
+
+      if (!user) return callback(null, false, flashMessage);
+
+      await user.update({
+        signedInAt: new Date(),
+      });
+
+      EventCreator.audit(Event.labels.AUTHENTICATION, user, 'UAA login');
+
+      return callback(null, user);
+    } catch (err) {
+      return callback(err);
+    }
+  };
+
+  const uaaStrategy = createUAAStrategy(uaaOptions, verifyUAA);
+
+  passport.use('uaa', uaaStrategy);
+
+  uaaLogoutRedirectURL = uaaStrategy.logoutRedirectURL;
+}
 
 passport.logout = (idp) => {
-  const redirectURL = idp === 'uaa' ? uaaStrategy.logoutRedirectURL : '/';
+  const redirectURL = idp === 'uaa' ? uaaLogoutRedirectURL : '/';
   return (req, res) => {
     const { user } = req;
     req.logout();
@@ -155,16 +179,5 @@ passport.logout = (idp) => {
     });
   };
 };
-
-passport.serializeUser((user, next) => {
-  next(null, user.id);
-});
-
-passport.deserializeUser((id, next) => {
-  User.scope('withUAAIdentity').findByPk(id)
-    .then((user) => {
-      next(null, user);
-    });
-});
 
 module.exports = passport;

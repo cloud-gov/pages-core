@@ -7,7 +7,7 @@ function alertGithubAuthDeprecation(hasUAAIdentity, context) {
     context.messages = {
       ...context.messages,
       warnings: [
-        'Authenticating with Github is deprecated and will be removed soon. Contact your agreement owner or federalist-support@gsa.gov to setup a cloud.gov account.',
+        `Authenticating with Github is deprecated and will be removed soon. Contact your agreement owner or ${config.app.supportEmail} to setup a cloud.gov account.`,
       ],
     };
   }

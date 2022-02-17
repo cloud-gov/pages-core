@@ -40,35 +40,36 @@ _Note: some terminal commands may take a while to process, without offering feed
 
 1. Clone the `18F/federalist` repository from Github and `cd` to that directory.
 
-#### Editing the local configuration file
+#### Editing the local configuration files
 
 1. Make a copy of `config/local.sample.js` and name it `local.js` and place it in the `config` folder. You can do this by running `cp config/local{.sample,}.js`
 This will be the file that holds your S3 and SQS configurations.
-1. [Register a new OAuth application on GitHub](https://github.com/settings/applications/new). Give your app a name and "Homepage URL" (`http://localhost:1337`), and use `http://localhost:1337/auth/github2/callback` as the "Authorization callback url".
 
-1. Once you have created the application, you'll see a `Client ID` and `Client Secret`. Open the `config/local.js` file in your text or code editor and update it with these values:
+2. Assuming you have been added to the `FederalistLocal` Github organization, navigate to the [developer settings for the `FederalistLocal` OAuth application](https://github.com/organizations/FederalistLocal/settings/applications/968257) and create a new Client secret.
+
+3. Once you have the new Client secret, you'll see a `Client ID` and `Client Secret`. Open the `config/local.js` file in your text or code editor and update it with the Client ID and Client secret from the `FederalistLocal` OAuth application:
     ```js
     const githubOptions = {
       clientID: 'VALUE FROM GITHUB',
       clientSecret: 'VALUE FROM GITHUB',
     };
     ```
-1. [Register or create a new GitHub organization](https://github.com/settings/organizations) with a name of your choosing. Then find your organization's ID by visiting `https://api.github.com/orgs/<your-org-name>` and copying the `id` into the allowed `organizations` in `config/local.js`.
-    ```js
-    organizations: [
-      99999999 // your org added here
-    ]
-    ```
-    The organization will need to grant access to Federalist, which can be done:
-      * during a first-time login with your GitHub credentials, or
-      * in the [Authorized OAuth Apps](https://github.com/settings/applications) tab in your GitHub Account settings
 
+4. Make a copy of `api/bull-board/.env.sample`, name it `.env`, and place it in `api/bull-board/`.
+
+2. Assuming you have been added to the `FederalistLocal` Github organization, navigate to the [developer settings for the `FederalistLocal-Queues` OAuth application](https://github.com/organizations/FederalistLocal/settings/applications/1832231) and create a new Client secret.
+
+3. Once you have the new Client secret, you'll see a `Client ID` and `Client Secret`. Open the `api/bull-board/.env` file in your text or code editor and update it with the Client ID and Client secret from the `FederalistLocal-Queues` OAuth application:
+    ```
+    GITHUB_CLIENT_ID=VALUE FROM GITHUB
+    GITHUB_CLIENT_SECRET=VALUE FROM GITHUB
+    ```
 **For 18F/TTS developers:** This section is primarily for 18F/TTS developers working on the Federalist project. Before you get started, make sure you have been fully on-boarded, including getting access to the Federalist cloud.gov `staging` space.
 
 1. Paste `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` into your terminal window.
-1. Visit https://login.fr.cloud.gov/passcode to get a Temporary Authentication Code.
-1. Paste this code into the terminal, and hit the return key. (For security purposes, the code won't be rendered in the terminal.)
-1. Type `npm run update-local-config` to read necessary service keys from the staging environment and load them into a local file called `config/local-from-staging.js`.
+2. Visit https://login.fr.cloud.gov/passcode to get a Temporary Authentication Code.
+3. Paste this code into the terminal, and hit the return key. (For security purposes, the code won't be rendered in the terminal.)
+4. Type `npm run update-local-config` to read necessary service keys from the staging environment and load them into a local file called `config/local-from-staging.js`.
 
 Note that `npm run update-local-config` will need to be re-run with some frequency, as service keys are changed every time Federalist's staging instance is deployed.
 

@@ -10,6 +10,7 @@ import EnvironmentVariables from './EnvironmentVariables';
 import siteActions from '../../../actions/siteActions';
 import { currentSite } from '../../../selectors/site';
 import { getOrgById } from '../../../selectors/organization';
+import globals from '../../../globals';
 
 class SiteSettings extends React.Component {
   constructor(props) {
@@ -64,7 +65,7 @@ class SiteSettings extends React.Component {
           <a
             target="_blank"
             rel="noopener noreferrer"
-            title="Federalist documentation on settings"
+            title={`${globals.APP_NAME} documentation on settings`}
             href="https://federalist.18f.gov/documentation/#managing-site-settings"
           >
             these settings
@@ -75,7 +76,7 @@ class SiteSettings extends React.Component {
           <a
             target="_blank"
             rel="noopener noreferrer"
-            title="Federalist documentation on previews"
+            title={`${globals.APP_NAME} documentation on previews`}
             href="https://federalist.18f.gov/documentation/previews/"
           >
             viewing site previews

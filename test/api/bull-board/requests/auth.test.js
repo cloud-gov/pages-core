@@ -62,7 +62,7 @@ const sessionForCookie = (cookie, sid = 'federalist-bull-board.sid') => {
   });
 };
 
-describe('bull board authentication request', () => {
+describe.skip('bull board authentication request', () => {
   after(() => Promise.all([
     User.truncate(),
     UAAIdentity.truncate(),

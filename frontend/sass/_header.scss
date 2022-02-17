@@ -132,6 +132,10 @@ nav li a:visited {
   width: 100px;
 }
 
+.pages .usa-logo a {
+  background-image: url('/images/logo-pages.svg');
+}
+
 @media screen and (min-width: 951px) {
   .usa-logo a {
     width: $logo-width;

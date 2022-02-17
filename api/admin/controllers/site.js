@@ -12,7 +12,7 @@ const updateableAttrs = [
 
 module.exports = wrapHandlers({
   listRaw: async (req, res) => {
-    const sites = await Site.findAll({ attributes: ['id', 'owner', 'repository'], raw: true });
+    const sites = await Site.findAll({ attributes: ['id', 'owner', 'repository', 'demoBranch'], raw: true });
     return res.json(sites);
   },
 
@@ -85,7 +85,7 @@ module.exports = wrapHandlers({
 
     // This will not remove the webhook since we don't have permissions
     await SiteDestroyer.destroySite(site);
-    EventCreator.audit(req.user, Event.labels.ADMIN_ACTION, 'Site Destroyed', { site });
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Site Destroyed', { site });
 
     return res.json({});
   },
