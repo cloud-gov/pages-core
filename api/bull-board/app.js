@@ -79,7 +79,6 @@ app.get('/login', redirectIfAuthenticated, passport.authenticate(idp));
 app.get('/logout', passport.logout(idp));
 app.get('/auth/github/callback', passport.authenticate('github', {
   failureRedirect: '/',
-  failureFlash: true,
 }), onSuccess);
 
 if (idp === 'uaa') {

@@ -1,4 +1,4 @@
-const HttpClient = require('../utils/httpClient');
+const HttpClient = require('./httpClient');
 const config = require('./config');
 
 /**
