@@ -7,7 +7,7 @@
   import Form from './Form.svelte';
 
   $: sitesPromise = fetchRawSites();
-  $: siteId = $router.query.siteId
+  $: siteId = $router.query.siteId;
 
   function onSuccess() {
     page('/domains');

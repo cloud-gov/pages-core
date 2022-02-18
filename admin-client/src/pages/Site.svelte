@@ -17,7 +17,7 @@
     PageTitle,
     SiteForm,
     SiteMetadata,
-    UserTable
+    UserTable,
   } from '../components';
 
   $: id = $router.params.id;
@@ -41,14 +41,14 @@
       ary.push({
         type: 'default',
         branch: site.defaultBranch,
-        domain: site.domain
+        domain: site.domain,
       });
     }
     if (site.demoDomain) {
       ary.push({
         type: 'demo',
         branch: site.demoBranch,
-        domain: site.demoDomain
+        domain: site.demoDomain,
       });
     }
     return ary;
