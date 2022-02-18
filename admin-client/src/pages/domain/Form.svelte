@@ -11,7 +11,7 @@
   const domain = {
     names: '',
     context: '',
-    siteId: siteId || ''
+    siteId: siteId || '',
   };
 
   $: siteOptions = sites.map((site) => ({ label: siteName(site), value: site.id }));
