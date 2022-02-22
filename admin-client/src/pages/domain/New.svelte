@@ -1,12 +1,13 @@
 <script>
   import page from 'page';
-  import { notification } from '../../stores';
+  import { notification, router } from '../../stores';
   import { Await, GridContainer } from '../../components';
   import { createDomain, fetchRawSites } from '../../lib/api';
 
   import Form from './Form.svelte';
 
   $: sitesPromise = fetchRawSites();
+  $: siteId = $router.query.siteId;
 
   function onSuccess() {
     page('/domains');
@@ -20,6 +21,7 @@
       onSubmit={createDomain}
       {onSuccess}
       {sites}
+      siteId={parseInt(siteId, 10)}
     />
   </Await>
 </GridContainer>
