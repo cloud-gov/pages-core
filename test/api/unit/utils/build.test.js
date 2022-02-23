@@ -14,7 +14,7 @@ describe('build utils', () => {
     it('default branch url start with site', async () => {
       let build = await factory.build({ branch: site.defaultBranch, site });
       const url = [
-        `https://${site.awsBucketName}.${config.app.domain}`,
+        `https://${site.awsBucketName}.${config.app.proxyDomain}`,
         `/site/${site.owner}/${site.repository}`,
       ].join('');
       expect(buildUrl(build, site)).to.eql(url);
@@ -23,7 +23,7 @@ describe('build utils', () => {
     it('demo branch url start with demo', async () => {
       const build = await factory.build({ branch: site.demoBranch, site });
       const url = [
-        `https://${site.awsBucketName}.${config.app.domain}`,
+        `https://${site.awsBucketName}.${config.app.proxyDomain}`,
         `/demo/${site.owner}/${site.repository}`,
       ].join('');
       expect(buildUrl(build, site)).to.eql(url);
@@ -32,7 +32,7 @@ describe('build utils', () => {
     it('non-default/demo branch url start with preview', async () => {
       const build = await factory.build({ branch: 'other', site });
       const url = [
-        `https://${site.awsBucketName}.${config.app.domain}`,
+        `https://${site.awsBucketName}.${config.app.proxyDomain}`,
         `/preview/${site.owner}/${site.repository}/other`,
       ].join('');
       expect(buildUrl(build, site)).to.eql(url);
