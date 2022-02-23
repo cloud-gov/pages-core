@@ -176,7 +176,7 @@ describe('SiteBuildQueue', () => {
         .then((build) => { // eslint-disable-line
           return SiteBuildQueue.messageBodyForBuild(build)
             .then((message) => {
-              expect(messageEnv(message, 'STATUS_CALLBACK')).to.equal(`http://localhost:1337/v0/build/${build.id}/status/${build.token}`);
+              expect(messageEnv(message, 'STATUS_CALLBACK')).to.equal(`http://${config.app.domain}/v0/build/${build.id}/status/${build.token}`);
               done();
             });
         })
