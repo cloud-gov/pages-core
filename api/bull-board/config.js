@@ -58,7 +58,7 @@ module.exports = {
   },
   product: PRODUCT,
   session: {
-    secret: SESSION_SECRET,
+    secret: SESSION_SECRET || 'test-secret',
   },
   uaa: {
     apiUrl: internalUAAHost,
@@ -74,7 +74,7 @@ module.exports = {
     state: true,
   },
   redis: {
-    url: REDIS_URL,
+    url: REDIS_URL || 'redis://redis:6379',
     tls: REDIS_TLS,
   },
 };
