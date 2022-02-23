@@ -31,7 +31,7 @@ while [[ $# -gt 0 ]]; do
     -h|--help) show_usage="true"; shift; shift ;;
     -o|--org) cf_org="$2"; shift; shift ;;
     -p|--product) product="$2"; shift; shift ;;
-    -s|--subdomain) subdomain="$2"; shift; shift ;;
+    -x|--proxy_domain) proxy_domain="$2"; shift; shift ;;
     *) POSITIONAL+=("$1"); shift ;;
   esac
 done
@@ -49,7 +49,9 @@ if [[ "${show_usage}" != "true" ]]; then
     || [[ -z "$product" ]] \
     || [[ -z "$proxy_domain" ]] \
     || [[ -z "$GITHUB_CLIENT_ID" ]] \
-    || [[ -z "$GITHUB_CLIENT_SECRET" ]]; then
+    || [[ -z "$GITHUB_CLIENT_SECRET" ]] \
+    || [[ -z "$GITHUB_QUEUES_UI_CLIENT_ID" ]] \
+    || [[ -z "$GITHUB_QUEUES_UI_CLIENT_SECRET" ]]; then
       echo "Missing required arguments or environment variables."
       echo
       show_usage="true"
@@ -80,6 +82,7 @@ if [[ "${show_usage}" = "true" ]] ; then
   echo "Prerequisites:"
   echo "  - Desired domain exists in cloud.gov"
   echo "  - Github OAuth app with correct callback url"
+  echo "  - Github OAuth app for Queues ui with correct callback url"
   echo "  - UAA Client (for pages)"
   echo "  - Slack webhook URL (pages)"
   echo "  - Already be authenticate with the cf cli and have necessary permissions"
@@ -88,6 +91,8 @@ if [[ "${show_usage}" = "true" ]] ; then
   echo "  From a Github OAuth application:"
   echo "    GITHUB_CLIENT_ID"
   echo "    GITHUB_CLIENT_SECRET"
+  echo "    GITHUB_QUEUES_UI_CLIENT_ID"
+  echo "    GITHUB_QUEUES_UI_CLIENT_SECRET"  
   echo "  From a UAA client: (pages)"
   echo "    UAA_DOMAIN"
   echo "    UAA_CLIENT_ID"
@@ -139,6 +144,7 @@ service_name_proxy="${cf_prefix}-proxy"
 service_name_domain="${cf_prefix}-domain"
 service_name_space="${cf_prefix}-space"
 service_name_uaa="app-${env_type}-uaa-client"
+service_name_github_queues_ui="${cf_prefix}-github-queues-ui"
 
 cf_sites_space=$(add_ext_if_not_prod "sites" "${env_type}")
 ##
@@ -219,6 +225,15 @@ cf create-user-provided-service "${service_name_space}" \
   -p "$(cat <<- EOF
     {
       "guid": "$(cf space ${cf_space} --guid)"
+    }
+EOF
+)"
+
+cf create-user-provided-service "${service_name_github_queues_ui}" \
+  -p "$(cat <<- EOF
+    {
+      "GITHUB_CLIENT_ID": "${GITHUB_QUEUES_UI_CLIENT_ID}",
+      "GITHUB_CLIENT_SECRET": "${GITHUB_QUEUES_UI_CLIENT_SECRET}"
     }
 EOF
 )"
