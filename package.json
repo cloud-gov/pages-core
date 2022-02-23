@@ -16,7 +16,7 @@
     "bullmq": "^1.26.5",
     "cfenv": "^1.2.3",
     "connect-flash": "^0.1.1",
-    "connect-redis": "^6.0.0",
+    "connect-redis": "^6.1.1",
     "connect-session-sequelize": "^7.0.1",
     "core-js": "^3.9.1",
     "cors": "^2.8.5",

@@ -3,6 +3,7 @@
   import { Form, SelectInput, TextInput } from '../../components';
 
   export let sites;
+  export let siteId;
   export let onFailure;
   export let onSubmit;
   export let onSuccess;
@@ -10,7 +11,7 @@
   const domain = {
     names: '',
     context: '',
-    siteId: '',
+    siteId: siteId || '',
   };
 
   $: siteOptions = sites.map((site) => ({ label: siteName(site), value: site.id }));
@@ -61,7 +62,7 @@
   <TextInput
     hint="Comma separated list of valid domains"
     label="Domain Names"
-    name="names" 
+    name="names"
     required
     error={errors.names}
     bind:value={domain.names}
