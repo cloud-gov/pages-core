@@ -1,5 +1,4 @@
 const express = require('express');
-const session = require('express-session');
 const Queue = require('bull');
 const { createBullBoard } = require('@bull-board/api');
 const { BullAdapter } = require('@bull-board/api/bullAdapter');
@@ -16,6 +15,7 @@ const passport = require('./passport');
 const sessionConfig = require('./sessionConfig');
 const config = require('./config');
 const { expressErrorLogger, expressLogger } = require('./winston');
+const cacheControl = require('./cacheControl');
 
 const connection = new IORedis(config.redis.url, {
   tls: config.redis.tls,
@@ -49,15 +49,16 @@ app.disable('x-powered-by');
 app.use(helmet(config.helmet));
 
 app.use(expressLogger);
-app.use(session(sessionConfig));
+app.use(sessionConfig());
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cacheControl('max-age=0'));
 
 function onSuccess(req, res) {
   req.session.authenticated = true;
   req.session.authenticatedAt = new Date();
   req.session.save(() => {
-    res.redirect(req.session.authRedirectPath || '/');
+    res.redirect(req.session.authRedirectPath || '/queues');
   });
 }
 
@@ -69,24 +70,31 @@ function ensureAuthenticated(req, res, next) {
 }
 
 function redirectIfAuthenticated(req, res, next) {
-  // eslint-disable-next-line no-unused-expressions
-  req.session.authenticated ? res.redirect('/') : next();
+  return req.session.authenticated ? res.redirect('/queues') : next();
 }
 
 const idp = config.product === 'federalist' ? 'github' : 'uaa';
 
 app.get('/login', redirectIfAuthenticated, passport.authenticate(idp));
 app.get('/logout', passport.logout(idp));
-app.get('/auth/github/callback', passport.authenticate('github', {
-  failureRedirect: '/',
-}), onSuccess);
+app.get('/auth/github/callback', passport.authenticate(
+  'github',
+  { failureRedirect: '/loggedout' }
+), onSuccess);
 
 if (idp === 'uaa') {
   app.get('/auth/uaa/callback', passport.authenticate('uaa'), onSuccess);
-  app.get('/auth/uaa/logout', (_req, res) => res.redirect('/'));
+  app.get('/auth/uaa/logout', (_req, res) => res.redirect('/loggedout'));
 }
 
-app.use('/', ensureAuthenticated, serverAdapter.getRouter());
+app.get('/', (_, res) => res.redirect('/queues'));
+app.get('/loggedout', (_, res) => res.send(`
+  <h1>You have been logged out</h1>
+  <a href="/login">login</a>
+`));
+
+serverAdapter.setBasePath('/queues');
+app.use('/queues', ensureAuthenticated, serverAdapter.getRouter());
 
 app.use(expressErrorLogger);
 
