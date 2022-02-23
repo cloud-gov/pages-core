@@ -7,11 +7,10 @@ instances: 2
 env: staging
 env_postfix: -staging
 log_level: verbose
-feature_auth_github: 'false'
+feature_auth_github: 'true'
 feature_auth_uaa: 'true'
 feature_bull_site_build_queue: 'true'
 uaa_host: https://uaa.fr-stage.cloud.gov
 new_relic_app_name: web-pages-staging
-# proxy_domain: sites.pages-staging.cloud.gov
 proxy_domain: app.cloud.gov
 cf_cdn_space_name: sites-staging
