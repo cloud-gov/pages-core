@@ -14,7 +14,7 @@ applications:
         command: yarn start-workers
         disk_quota: 2G
         instances: 1
-        memory: ((memory))
+        memory: 2G
     services:
       - app-((env))-uaa-client
       - federalist-((env))-rds
