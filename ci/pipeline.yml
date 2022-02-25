@@ -182,58 +182,58 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  # - name: test-admin-client-staging
-  #   plan:
-  #     - get: src-admin-client
-  #       resource: pr-staging
-  #       trigger: true
-  #       version: every
-  #     - put: src-admin-client
-  #       resource: pr-staging
-  #       params:
-  #         path: src-admin-client
-  #         status: pending
-  #         base_context: concourse
-  #         context: test-admin-client
+  - name: test-admin-client-staging
+    plan:
+      - get: src-admin-client
+        resource: pr-staging
+        trigger: true
+        version: every
+      - put: src-admin-client
+        resource: pr-staging
+        params:
+          path: src-admin-client
+          status: pending
+          base_context: concourse
+          context: test-admin-client
 
-  #     - do: *test-admin-client
+      - do: *test-admin-client
 
-  #   on_failure:
-  #     in_parallel:
-  #       - put: src-admin-client
-  #         resource: pr-staging
-  #         params:
-  #           path: src-admin-client
-  #           status: failure
-  #           base_context: concourse
-  #           context: test-admin-client
-  #       - put: slack
-  #         params:
-  #           text: |
-  #             :x: FAILED: pages admin client tests on staging
-  #             <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-  #             ((slack-users))
-  #           channel: ((slack-channel))
-  #           username: ((slack-username))
-  #           icon_url: ((slack-icon-url))
+    on_failure:
+      in_parallel:
+        - put: src-admin-client
+          resource: pr-staging
+          params:
+            path: src-admin-client
+            status: failure
+            base_context: concourse
+            context: test-admin-client
+        - put: slack
+          params:
+            text: |
+              :x: FAILED: pages admin client tests on staging
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+              ((slack-users))
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
 
-  #   on_success:
-  #     in_parallel:
-  #       - put: src-admin-client
-  #         resource: pr-staging
-  #         params:
-  #           path: src-admin-client
-  #           status: success
-  #           base_context: concourse
-  #           context: test-admin-client
-  #       - put: slack
-  #         params:
-  #           text: |
-  #             :white_check_mark: SUCCESS: Successfully tested pages admin client on staging
-  #             <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-  #           channel: ((slack-channel))
-  #           username: ((slack-username))
-  #           icon_url: ((slack-icon-url))
+    on_success:
+      in_parallel:
+        - put: src-admin-client
+          resource: pr-staging
+          params:
+            path: src-admin-client
+            status: success
+            base_context: concourse
+            context: test-admin-client
+        - put: slack
+          params:
+            text: |
+              :white_check_mark: SUCCESS: Successfully tested pages admin client on staging
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
 
   - name: test-and-deploy-api-pages-staging
     plan:
@@ -312,83 +312,83 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  # - name: test-and-deploy-admin-client-pages-staging
-  #   plan:
-  #     - get: src-admin-client
-  #       resource: src-staging
-  #       trigger: true
-  #       params: {depth: 1}
-  #     - put: gh-status
-  #       inputs: [src-admin-client]
-  #       params: {state: pending}
+  - name: test-and-deploy-admin-client-pages-staging
+    plan:
+      - get: src-admin-client
+        resource: src-staging
+        trigger: true
+        params: {depth: 1}
+      - put: gh-status
+        inputs: [src-admin-client]
+        params: {state: pending}
 
-  #     - do: *test-admin-client
+      - do: *test-admin-client
 
-  #     - task: configure-nginx
-  #       config:
-  #         <<: *cf-image
-  #         inputs: [name: src-admin-client]
-  #         outputs: [name: src-admin-client]
-  #         run:
-  #           dir: src-admin-client
-  #           path: ci/tasks/configure-admin-client-nginx.sh
-  #       params:
-  #         API_DOMAIN: app.pages-staging.cloud.gov
+      - task: configure-nginx
+        config:
+          <<: *cf-image
+          inputs: [name: src-admin-client]
+          outputs: [name: src-admin-client]
+          run:
+            dir: src-admin-client
+            path: ci/tasks/configure-admin-client-nginx.sh
+        params:
+          API_DOMAIN: app.pages-staging.cloud.gov
 
-  #     - task: deploy-admin-client
-  #       config:
-  #         <<: *cf-image
-  #         inputs: [name: src-admin-client]
-  #         run:
-  #           dir: src-admin-client
-  #           path: ci/tasks/deploy.sh
-  #       params:
-  #         <<: *staging-cf
-  #         CF_APP_NAME: pages-admin-staging
-  #         CF_MANIFEST: .cloudgov/manifest.yml
-  #         CF_VARS_FILE: .cloudgov/vars/pages-staging.yml
-  #         CF_PATH: admin-client
-  #       on_failure:
-  #         try:
-  #           task: cancel-admin-client-deployment
-  #           config:
-  #             <<: *cf-image
-  #             inputs: [name: src-admin-client]
-  #             run:
-  #               dir: src-admin-client
-  #               path: ci/tasks/cancel-deployment.sh
-  #           params:
-  #             <<: *staging-cf
-  #             CF_APP_NAME: pages-admin-staging
+      - task: deploy-admin-client
+        config:
+          <<: *cf-image
+          inputs: [name: src-admin-client]
+          run:
+            dir: src-admin-client
+            path: ci/tasks/deploy.sh
+        params:
+          <<: *staging-cf
+          CF_APP_NAME: pages-admin-staging
+          CF_MANIFEST: .cloudgov/manifest.yml
+          CF_VARS_FILE: .cloudgov/vars/pages-staging.yml
+          CF_PATH: admin-client
+        on_failure:
+          try:
+            task: cancel-admin-client-deployment
+            config:
+              <<: *cf-image
+              inputs: [name: src-admin-client]
+              run:
+                dir: src-admin-client
+                path: ci/tasks/cancel-deployment.sh
+            params:
+              <<: *staging-cf
+              CF_APP_NAME: pages-admin-staging
 
-  #   on_failure:
-  #     in_parallel:
-  #       - put: gh-status
-  #         inputs: [src-admin-client]
-  #         params: {state: failure}
-  #       - put: slack
-  #         params:
-  #           text: |
-  #             :x: FAILED: admin client deployment on pages staging
-  #             <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-  #             ((slack-users))
-  #           channel: ((slack-channel))
-  #           username: ((slack-username))
-  #           icon_url: ((slack-icon-url))
+    on_failure:
+      in_parallel:
+        - put: gh-status
+          inputs: [src-admin-client]
+          params: {state: failure}
+        - put: slack
+          params:
+            text: |
+              :x: FAILED: admin client deployment on pages staging
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+              ((slack-users))
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
 
-  #   on_success:
-  #     in_parallel:
-  #       - put: gh-status
-  #         inputs: [src-admin-client]
-  #         params: {state: success}
-  #       - put: slack
-  #         params:
-  #           text: |
-  #             :white_check_mark: SUCCESS: Successfully deployed admin client on pages staging
-  #             <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-  #           channel: ((slack-channel))
-  #           username: ((slack-username))
-  #           icon_url: ((slack-icon-url))
+    on_success:
+      in_parallel:
+        - put: gh-status
+          inputs: [src-admin-client]
+          params: {state: success}
+        - put: slack
+          params:
+            text: |
+              :white_check_mark: SUCCESS: Successfully deployed admin client on pages staging
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
 
   # - name: deploy-queues-ui-pages-staging
   #   plan:
