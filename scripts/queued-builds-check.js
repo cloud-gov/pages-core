@@ -14,6 +14,7 @@ async function checkQueuedBuilds() {
   const buildQueueTime = now.clone().subtract(BUILD_QUEUED_MINUTES, 'minutes');
 
   const options = {
+    attributes: ['id'],
     where: {
       [Op.or]: [
         {
