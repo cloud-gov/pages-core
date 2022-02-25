@@ -10,6 +10,8 @@ const SandboxHelper = require('../../../api/services/SandboxHelper');
 const factory = require('../support/factory');
 const jobProcessors = require('../../../api/workers/jobProcessors');
 
+const job = { log: () => Promise.resolve() };
+
 describe('job processors', () => {
   afterEach(() => {
     sinon.restore();
@@ -69,13 +71,13 @@ describe('job processors', () => {
 
     it('all archived successfully', async () => {
       sinon.stub(BuildLogs, 'archiveBuildLogsForBuildId').resolves();
-      const result = await jobProcessors.archiveBuildLogsDaily();
+      const result = await jobProcessors.archiveBuildLogsDaily(job);
       expect(result).to.not.be.an('error');
     });
 
     it('fails to archive successfully', async () => {
       sinon.stub(BuildLogs, 'archiveBuildLogsForBuildId').rejects('erred out');
-      const result = await jobProcessors.archiveBuildLogsDaily().catch(e => e);
+      const result = await jobProcessors.archiveBuildLogsDaily(job).catch(e => e);
       expect(result).to.be.an('error');
       const dateStr = moment().subtract(1, 'days').startOf('day').format('YYYY-MM-DD');
       expect(result.message.split(',')[0]).to
@@ -165,11 +167,11 @@ describe('job processors', () => {
         { status: 'rejected', reason: 'just because' },
       ]);
 
-      const result = await jobProcessors.cleanSandboxOrganizations().catch(e => e); 
+      const result = await jobProcessors.cleanSandboxOrganizations().catch(e => e);
       expect(result).to.be.an('error');
       expect(result.message).to.equal([
         'Sandbox organizations cleaned with 1 successes and 1 failures.',
-        '   Successes:\n      cleaned\n   Failures:\n      just because'
+        '   Successes:\n      cleaned\n   Failures:\n      just because',
       ].join('\n'));
     });
   });
