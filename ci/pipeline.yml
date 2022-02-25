@@ -480,33 +480,34 @@ jobs:
 
   - name: sites-builds-checks-staging
     plan:
-    - get: src
-      resource: src-staging
-      params: {depth: 1}
-    - get: five-minutes
-      trigger: true
-    - in_parallel:
-      - task: queued-builds-check
-        config:
-          inputs: [name: src]
-          <<: *cf-image
-          run:
-            path: src/ci/tasks/run-task.sh
-        params:
-          <<: *staging-cf
-          CF_APP_NAME: pages-staging
-          CF_TASK_NAME: queued-builds-check
-          CF_TASK_COMMAND: yarn queued-builds-check ((support-email))
-    on_failure:
-      - put: slack
-        params:
-          text: |
-            :x: FAILED: sites builds checks on pages staging
-            <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-            ((slack-users))
-          channel: ((slack-channel))
-          username: ((slack-username))
-          icon_url: ((slack-icon-url))
+      - get: src
+        resource: src-staging
+        params: {depth: 1}
+      - get: five-minutes
+        trigger: true
+      - in_parallel:
+        - task: queued-builds-check
+          config:
+            inputs: [name: src]
+            <<: *cf-image
+            run:
+              path: src/ci/tasks/run-task.sh
+          params:
+            <<: *staging-cf
+            CF_APP_NAME: pages-staging
+            CF_TASK_NAME: queued-builds-check
+            CF_TASK_COMMAND: yarn queued-builds-check ((support-email))
+        on_failure:
+          in_parallel:
+            - put: slack
+              params:
+                text: |
+                  :x: FAILED: sites builds checks on pages staging
+                  <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+                  ((slack-users))
+                channel: ((slack-channel))
+                username: ((slack-username))
+                icon_url: ((slack-icon-url))
 
 ############################
 #  RESOURCES
