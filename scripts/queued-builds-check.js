@@ -69,4 +69,8 @@ async function runCheck() {
 }
 
 runCheck()
-  .catch(console.error);
+  .then(() => process.exit())
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
