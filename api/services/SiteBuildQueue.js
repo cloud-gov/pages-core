@@ -107,11 +107,6 @@ const setupBucket = async (build, buildCount) => {
   // provision new ones. This may take up to 10 seconds.
   await s3Client.waitForCredentials();
 
-  await s3Client.putObject('User-agent: *\nDisallow: /\n', 'robots.txt', {
-    CacheControl: 'max-age=60',
-    ServerSideEncryption: 'AES256',
-    ContentType: 'text/plain',
-  });
   return true;
 };
 

@@ -55,13 +55,4 @@ module.exports = {
 
     return res.render('app.njk', context);
   },
-
-  robots(req, res) {
-    const DENY_ALL_CONTENT = 'User-Agent: *\nDisallow: /\n';
-
-    res.set('Content-Type', 'text/plain');
-
-    // send the "deny all" robots.txt content
-    return res.send(DENY_ALL_CONTENT);
-  },
 };
