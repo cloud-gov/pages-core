@@ -82,16 +82,10 @@ module.exports = {
     level: 'error',
     silent: true,
   },
-  deployUser: {
-    username: 'deploy_user',
-    password: 'deploy_pass',
-  },
   env: {
     cfDomainGuid: '987ihg-654fed-321cba',
     cfProxyGuid: '867fiv-309ine',
     cfSpaceGuid: '123abc-456def-789ghi',
-    cfOauthTokenUrl: 'https://login.example.com/oauth/token',
-    cfApiHost: 'https://api.example.com',
     proxySiteTable: 'testSiteTable',
     uaaHost: 'https://uaa.example.com',
     uaaHostUrl: 'https://uaa.example.com',

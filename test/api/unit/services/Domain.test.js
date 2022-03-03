@@ -7,6 +7,7 @@ const DnsService = require('../../../../api/services/Dns');
 const DomainService = require('../../../../api/services/Domain');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
 const { DomainQueue } = require('../../../../api/queues');
+const config = require('../../../../config');
 
 describe('Domain Service', () => {
   before(DomainFactory.truncate);
@@ -824,12 +825,16 @@ describe('Domain Service', () => {
 
       await domain.reload();
 
-      sinon.assert.calledOnceWithExactly(
+      sinon.assert.calledOnceWithMatch(
         CloudFoundryAPIClient.prototype.createExternalDomain,
-        domain.names,
-        domain.serviceName,
-        domain.origin,
-        domain.path
+        sinon.match({
+          domains: domain.names,
+          name: domain.serviceName,
+          origin: domain.origin,
+          path: domain.path,
+          cfCdnSpaceName: config.env.cfCdnSpaceName,
+          cfDomainWithCdnPlanGuid: config.env.cfDomainWithCdnPlanGuid,
+        })
       );
       sinon.assert.calledOnceWithExactly(DomainQueue.prototype.add, 'checkProvisionStatus', { id: domain.id });
       expect(domain.state).to.eq(Domain.States.Provisioning);
