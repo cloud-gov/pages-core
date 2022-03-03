@@ -1,13 +1,12 @@
 const jwt = require('jsonwebtoken');
-const config = require('../../config');
 const HttpClient = require('./httpClient');
 
 class CloudFoundryAuthClient {
-  constructor() {
-    this.username = config.deployUser.username;
-    this.password = config.deployUser.password;
+  constructor({ username, password, tokenUrl } = {}) {
+    this.username = username ?? process.env.CF_API_USERNAME;
+    this.password = password ?? process.env.CF_API_PASSWORD;
+    this.httpClient = new HttpClient(tokenUrl ?? process.env.CLOUD_FOUNDRY_OAUTH_TOKEN_URL);
     this.token = '';
-    this.httpClient = new HttpClient(config.env.cfOauthTokenUrl);
   }
 
   accessToken() {
