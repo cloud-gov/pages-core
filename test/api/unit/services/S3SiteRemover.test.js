@@ -109,8 +109,61 @@ describe('S3SiteRemover', () => {
       });
     });
 
+    it('should not delete robots.txt for a shared bucket', async () => {
+      const siteObjects = [];
+
+      mockTokenRequest();
+      apiNocks.mockDefaultCredentials();
+
+      AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => {
+        cb(null, mapSiteContents(siteObjects));
+      };
+
+      const fakeDeleteObjects = sinon.stub();
+      fakeDeleteObjects.yields(null, {});
+      AWSMocks.mocks.S3.deleteObjects = fakeDeleteObjects;
+
+      const site = await factory.site();
+      buildSiteObjects('site', site, siteObjects);
+      await S3SiteRemover.removeSite(site);
+
+      sinon.assert.calledOnce(fakeDeleteObjects);
+      const params = fakeDeleteObjects.firstCall.args[0];
+      expect(params.Delete.Objects).to.not.include({ Key: 'robots.txt' });
+    });
+
+    it('should delete robots.txt for a dedicated bucket', async () => {
+      const siteObjects = [];
+
+      mockTokenRequest();
+      apiNocks.mockDefaultCredentials();
+
+      AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => {
+        cb(null, mapSiteContents(siteObjects));
+      };
+
+      const fakeDeleteObjects = sinon.stub();
+      fakeDeleteObjects.yields(null, {});
+      AWSMocks.mocks.S3.deleteObjects = fakeDeleteObjects;
+
+      const site = await factory.site();
+      site.s3ServiceName = 'foo-s3-service';
+      site.awsBucketName = 'foo-s3-bucket';
+
+      buildSiteObjects('site', site, siteObjects);
+      await S3SiteRemover.removeSite(site);
+
+      sinon.assert.calledTwice(fakeDeleteObjects);
+      const firstCallParams = fakeDeleteObjects.firstCall.args[0];
+      expect(firstCallParams.Delete.Objects).to.not.include({ Key: 'robots.txt' });
+
+      const secondCallParams = fakeDeleteObjects.secondCall.args[0];
+      expect(secondCallParams.Delete.Objects).to.deep.equal([{ Key: 'robots.txt' }]);
+    });
+
     it('should delete objects in batches of 1000 at a time', (done) => {
       let deleteObjectsCallCount = 0;
+
       mockTokenRequest();
       apiNocks.mockDefaultCredentials();
 
