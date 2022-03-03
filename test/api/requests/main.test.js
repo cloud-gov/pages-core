@@ -240,9 +240,17 @@ describe('Main Site', () => {
 });
 
 describe('robots.txt', () => {
-  it('should not exist', () => {
+  it('denies robots when not in production', (done) => {
+    config.app.appEnv = 'boop';
+
     request(app)
       .get('/robots.txt')
-      .expect(404);
+      .expect(200)
+      .expect('Content-Type', 'text/plain; charset=utf-8')
+      .then((response) => {
+        expect(response.text).to.equal('User-Agent: *\nDisallow: /\n');
+        done();
+      })
+      .catch(done);
   });
 });

@@ -11,6 +11,8 @@ router.get('/organizations(/*)?', csrfProtection, MainController.app);
 router.get('/sites(/*)?', csrfProtection, MainController.app);
 router.get('/settings', csrfProtection, MainController.app);
 
+router.get('/robots.txt', MainController.robots);
+
 router.options('(/*)?', (_req, res) => res.notFound());
 
 module.exports = router;
