@@ -76,42 +76,27 @@ if (redisCreds) {
   throw new Error('No Redis credentials found');
 }
 
-// Deploy User
-const deployUserCreds = appEnv.getServiceCreds('federalist-deploy-user');
-if (deployUserCreds) {
-  module.exports.deployUser = {
-    username: deployUserCreds.DEPLOY_USER_USERNAME,
-    password: deployUserCreds.DEPLOY_USER_PASSWORD,
-  };
-} else {
-  throw new Error('No deploy user credentials found');
-}
-
 // Environment Variables
 const cfDomain = appEnv.getServiceCreds(`${productPrefix}-domain`);
 const cfProxy = appEnv.getServiceCreds(`${productPrefix}-proxy`);
-const cfOauthTokenUrl = process.env.CLOUD_FOUNDRY_OAUTH_TOKEN_URL;
-const cfApiHost = process.env.CLOUD_FOUNDRY_API_HOST;
 const cfCdnSpaceName = process.env.CF_CDN_SPACE_NAME;
 const cfDomainWithCdnPlanGuid = process.env.CF_DOMAIN_WITH_CDN_PLAN_GUID;
 // optional environment variables
 const newRelicAppName = process.env.NEW_RELIC_APP_NAME;
 const newRelicLicenseKey = process.env.NEW_RELIC_LICENSE_KEY;
 
-if (cfOauthTokenUrl && cfApiHost && cfDomain && cfProxy) {
+if (cfDomain && cfProxy) {
   module.exports.env = {
     cfDomainGuid: cfDomain.guid,
     cfProxyGuid: cfProxy.guid,
     cfSpaceGuid,
     cfCdnSpaceName,
     cfDomainWithCdnPlanGuid,
-    cfOauthTokenUrl,
-    cfApiHost,
     newRelicAppName,
     newRelicLicenseKey,
   };
 } else {
-  throw new Error('Missing environment variables for build space, cloud founders host url and token url.');
+  throw new Error('Missing environment variables for build space.');
 }
 
 // See https://github.com/nfriedly/express-rate-limit/blob/master/README.md#configuration
