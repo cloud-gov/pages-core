@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const nock = require('nock');
 const sinon = require('sinon');
+const config = require('../../../../config');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
 const mockTokenRequest = require('../../support/cfAuthNock');
 const apiNocks = require('../../support/cfAPINocks');
@@ -219,7 +220,7 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockFetchS3ServicePlanGUID(response);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchS3ServicePlanGUID(name)
+      apiClient.fetchS3ServicePlanGUID(name, config.env.s3ServicePlanId)
         .then((res) => {
           expect(res).to.deep.equal(guid);
           done();
@@ -242,7 +243,7 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockFetchS3ServicePlanGUID(response);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchS3ServicePlanGUID(name)
+      apiClient.fetchS3ServicePlanGUID(name, config.env.s3ServicePlanId)
         .catch((err) => {
           expect(err.message).to.equal(message);
           expect(err.name).to.equal(name);
