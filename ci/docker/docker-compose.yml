@@ -15,6 +15,10 @@ services:
       APP_HOSTNAME: http://localhost:1337
       FEATURE_AUTH_UAA: 'true'
       PRODUCT: pages
+      CLOUD_FOUNDRY_API_HOST: https://api.example.com
+      CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.example.com/oauth/token
+      CF_API_USERNAME: deploy_user
+      CF_API_PASSWORD: deploy_pass
   db:
     image: postgres:11-alpine
     environment:
