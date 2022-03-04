@@ -29,7 +29,9 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockCreateS3ServiceInstance(requestBody, serviceResponse);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.createS3ServiceInstance(name, planName, config.env.cfSpaceGuid)
+      apiClient.createS3ServiceInstance(
+        name, planName, config.env.cfSpaceGuid, config.env.s3ServicePlanId
+      )
         .then((res) => {
           expect(res).to.be.an('object');
           expect(res.entity.name).to.equal(name);
@@ -55,7 +57,9 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockCreateS3ServiceInstance(requestBody);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.createS3ServiceInstance(name, serviceName, config.env.cfSpaceGuid)
+      apiClient.createS3ServiceInstance(
+        name, serviceName, config.env.cfSpaceGuid, config.env.s3ServicePlanId
+      )
         .catch((err) => {
           expect(err).to.be.an('error');
           done();
@@ -164,7 +168,9 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.createSiteBucket(name, config.env.cfSpaceGuid, keyIdentifier, planName)
+      apiClient.createSiteBucket(
+        name, config.env.cfSpaceGuid, config.app.s3ServicePlanId, keyIdentifier, planName
+      )
         .then((res) => {
           expect(res).to.be.an('object');
           expect(res.entity.name).to.equal(keyName);

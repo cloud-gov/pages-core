@@ -37,37 +37,6 @@ function buildEnum(values) {
   };
 }
 
-function filterEntity(res, name, field = 'name') {
-  let errMsg = `Not found: Entity @${field} = ${name}`;
-  const filtered = res.resources.filter(item => item.entity[field] === name);
-  if (filtered.length === 0) {
-    const error = new Error(errMsg);
-    error.name = name;
-    throw error;
-  }
-  if (name === 'basic-public') {
-    const servicePlan = filtered.find(f => f.entity.unique_id === config.app.s3ServicePlanId);
-    if (!servicePlan) {
-      errMsg = `${errMsg} @basic-public service plan = (${config.app.s3ServicePlanId})`;
-      const error = new Error(errMsg);
-      error.name = name;
-      throw error;
-    }
-    return servicePlan;
-  }
-  return filtered[0];
-}
-
-function firstEntity(res, name) {
-  if (res.resources.length === 0) {
-    const error = new Error('Not found');
-    error.name = name;
-    throw error;
-  }
-
-  return res.resources[0];
-}
-
 function generateS3ServiceName(owner, repository) {
   if (!owner || !repository) return undefined;
 
@@ -249,16 +218,6 @@ function omitBy(fn, obj) {
   return pick(pickedKeys, obj);
 }
 
-function objToQueryParams(obj) {
-  const qs = new URLSearchParams();
-  Object
-    .entries(obj)
-    .forEach(([key, value]) => {
-      qs.append(key, value);
-    });
-  return qs;
-}
-
 async function paginate(model, serialize, params, query = {}) {
   const limit = toInt(params.limit) || 25;
   const page = toInt(params.page) || 1;
@@ -314,8 +273,6 @@ function defaultContext(req, res) {
 
 module.exports = {
   buildEnum,
-  filterEntity,
-  firstEntity,
   generateS3ServiceName,
   generateSubdomain,
   getDirectoryFiles,
@@ -325,7 +282,6 @@ module.exports = {
   loadDevelopmentManifest,
   loadProductionManifest,
   mapValues,
-  objToQueryParams,
   omitBy,
   omit,
   paginate,
