@@ -26,7 +26,6 @@ async function collectAndSend(intervalInSeconds, timestamp) {
 
     logger.info(`Waiting for ${intervalInSeconds} seconds.`);
 
-    // eslint-disable-next-line scanjs-rules/call_setTimeout
     setTimeout(() => collectAndSend(intervalInSeconds, Date.now()), intervalInSeconds * 1000);
   } catch (error) {
     logger.error(error);
