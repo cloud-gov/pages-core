@@ -1,5 +1,5 @@
 test
-eslintrc.js
+.eslintrc.js
 npm-debug.log
 coverage
 .nyc_output
