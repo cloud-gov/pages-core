@@ -1,0 +1,202 @@
+############################
+#  SHARED
+
+staging-cf: &staging-cf
+  CF_API: https://api.fr.cloud.gov
+  CF_USERNAME: ((staging-cf-username))
+  CF_PASSWORD: ((staging-cf-password))
+  CF_ORG: gsa-18f-federalist
+  CF_SPACE: staging
+
+node-image: &node-image
+  type: docker-image
+  source:
+    repository: node
+    tag: 16.13
+
+cf-image: &cf-image
+  platform: linux
+  image_resource:
+    type: docker-image
+    source:
+      repository: 18fgsa/concourse-task
+
+############################
+#  JOBS
+
+jobs:
+  - name: test-and-deploy-metrics
+    plan:
+      - get: src-metrics
+        resource: src-staging
+        trigger: true
+        params: {depth: 1}
+      - put: gh-status
+        inputs: [src-metrics]
+        params: {state: pending}
+
+      - task: install-dev-deps-metrics
+        output_mapping:
+          src-metrics: src-metrics-dev
+        config:
+          platform: linux
+          image_resource:
+            <<: *node-image
+          inputs: [name: src-metrics]
+          outputs: [name: src-metrics]
+          run:
+            dir: src-metrics/apps/metrics
+            path: bash
+            args: [-c, yarn --pure-lockfile]
+
+      - in_parallel:
+        - task: lint-metrics
+          config:
+            platform: linux
+            image_resource:
+              <<: *node-image
+            inputs: [name: src-metrics-dev]
+            run:
+              dir: src-metrics-dev/apps/metrics
+              path: bash
+              args: [-c, yarn lint]
+
+        - task: test-metrics
+          config:
+            platform: linux
+            image_resource:
+              <<: *node-image
+            inputs: [name: src-metrics-dev]
+            run:
+              dir: src-metrics-dev/apps/metrics
+              path: bash
+              args: [-c, yarn test]
+
+      - task: install-prod-deps-metrics
+        output_mapping:
+          src-metrics: src-metrics-prod
+        config:
+          platform: linux
+          image_resource:
+            <<: *node-image
+          inputs: [name: src-metrics]
+          outputs: [name: src-metrics]
+          run:
+            dir: src-metrics/apps/metrics
+            path: bash
+            args: [-c, yarn --pure-lockfile --production]
+
+      - task: deploy-metrics
+        config:
+          <<: *cf-image
+          inputs: [name: src-metrics-prod]
+          run:
+            dir: src-metrics-prod/apps/metrics
+            path: ci/tasks/deploy.sh
+        params:
+          <<: *staging-cf
+          CF_APP_NAME: pages-metrics
+          CFVAR_cf_api_username: "'((cf-org-auditor-username))'"
+          CFVAR_cf_api_password: "'((cf-org-auditor-password))'"
+          CFVAR_new_relic_license_key: "'((new-relic-metrics-license-key))'"
+        on_failure:
+          try:
+            task: cancel-metrics-deployment
+            config:
+              <<: *cf-image
+              inputs: [name: src-metrics-prod]
+              run:
+                dir: src-metrics-prod/apps/metrics
+                path: ci/tasks/cancel-deployment.sh
+            params:
+              <<: *staging-cf
+              CF_APP_NAME: pages-metrics
+
+    on_failure:
+      in_parallel:
+        - put: gh-status
+          inputs: [src-metrics-prod]
+          params: {state: failure}
+        - put: slack
+          params:
+            text: |
+              :x: FAILED: metrics deployment on pages staging
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+              ((slack-users))
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+
+    on_success:
+      in_parallel:
+        - put: gh-status
+          inputs: [src-metrics-prod]
+          params: {state: success}
+        - put: slack
+          params:
+            text: |
+              :white_check_mark: SUCCESS: Successfully deployed metrics on pages staging
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+
+
+############################
+#  RESOURCES
+
+resources:
+
+  # - name: pr-staging
+  #   type: pull-request
+  #   check_every: 1m
+  #   source:
+  #     repository: 18F/federalist
+  #     access_token: ((gh-access-token))
+  #     base_branch: staging
+  #     disable_forks: true
+  #     ignore_drafts: false
+
+  - name: src-staging
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/18F/federalist
+      # branch: staging
+      branch: dc/metrics
+
+  - name: slack
+    type: slack-notification
+    source:
+      url: ((slack-webhook-url))
+
+  - name: gh-status
+    type: cogito
+    check_every: 1h
+    source:
+      owner: 18F
+      repo: federalist
+      access_token: ((gh-access-token))
+      context_prefix: concourse
+
+
+############################
+#  RESOURCE TYPES
+
+resource_types:
+
+  - name: cogito
+    type: docker-image
+    check_every: 24h
+    source:
+      repository: pix4d/cogito
+
+  # - name: pull-request
+  #   type: docker-image
+  #   source:
+  #     repository: teliaoss/github-pr-resource
+
+  - name: slack-notification
+    type: docker-image
+    source:
+      repository: cfcommunity/slack-notification-resource

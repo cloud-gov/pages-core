@@ -1,0 +1,16 @@
+applications:
+- name: pages-metrics
+  no-route: true
+  buildpacks:
+  - nodejs_buildpack
+  instances: 1
+  memory: 256MB
+  health-check-type: port
+  env:
+    CF_API_USERNAME: ((cf_api_username))
+    CF_API_PASSWORD: ((cf_api_password))
+    CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
+    CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
+    INTERVAL_IN_S: 60
+    NEW_RELIC_LICENSE_KEY: ((new_relic_license_key))
+    
