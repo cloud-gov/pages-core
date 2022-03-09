@@ -5,7 +5,7 @@ applications:
   - nodejs_buildpack
   instances: 1
   memory: 256MB
-  health-check-type: port
+  health-check-type: process
   env:
     CF_API_USERNAME: ((cf_api_username))
     CF_API_PASSWORD: ((cf_api_password))
