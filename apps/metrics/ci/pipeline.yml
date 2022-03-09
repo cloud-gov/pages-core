@@ -115,7 +115,7 @@ jobs:
     on_failure:
       in_parallel:
         - put: gh-status
-          inputs: [src-metrics-prod]
+          inputs: [src-metrics]
           params: {state: failure}
         - put: slack
           params:
@@ -130,7 +130,7 @@ jobs:
     on_success:
       in_parallel:
         - put: gh-status
-          inputs: [src-metrics-prod]
+          inputs: [src-metrics]
           params: {state: success}
         - put: slack
           params:
