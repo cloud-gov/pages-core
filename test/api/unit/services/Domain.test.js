@@ -377,7 +377,7 @@ describe('Domain Service', () => {
     it('sets the domain name on the associated site if not previously set', async () => {
       const site = await SiteFactory();
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('site');
@@ -397,7 +397,7 @@ describe('Domain Service', () => {
     it('sets the demo domain name on the associated site if not previously set', async () => {
       const site = await SiteFactory();
       const domain = await DomainFactory.create({ siteId: site.id, context: Domain.Contexts.Demo, names: 'www.agency.gov' });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('demo');
@@ -417,7 +417,7 @@ describe('Domain Service', () => {
     it('leaves the existing domain name on its associated site unchanged', async () => {
       const site = await SiteFactory({ domain: 'https://example.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('site');
@@ -437,7 +437,7 @@ describe('Domain Service', () => {
     it('leaves the existing domain name on its associated site unchanged', async () => {
       const site = await SiteFactory({ demoDomain: 'https://example.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, context: Domain.Contexts.Demo, names: 'www.agency.gov' });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('demo');
