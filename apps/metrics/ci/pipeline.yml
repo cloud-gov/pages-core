@@ -205,17 +205,16 @@ jobs:
         params: {depth: 1}
       - get: nightly
         trigger: true
-      - in_parallel:
-        - task: restage-metrics
-          config:
-            inputs: [name: src-metrics]
-            <<: *cf-image
-            run:
-              dir: src-metrics/apps/metrics
-              path: ci/tasks/restage.sh
-          params:
-            <<: *staging-cf
-            CF_APP_NAME: pages-metrics
+      - task: restage-metrics
+        config:
+          inputs: [name: src-metrics]
+          <<: *cf-image
+          run:
+            dir: src-metrics/apps/metrics
+            path: ci/tasks/restage.sh
+        params:
+          <<: *staging-cf
+          CF_APP_NAME: pages-metrics
 
 
 ############################
