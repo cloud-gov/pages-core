@@ -198,6 +198,25 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
+  - name: nightly-tasks-metrics-staging
+    plan:
+      - get: src-metrics
+        resource: src-staging
+        params: {depth: 1}
+      - get: nightly
+        trigger: true
+      - in_parallel:
+        - task: restage-metrics
+          config:
+            inputs: [name: src-metrics]
+            <<: *cf-image
+            run:
+              dir: src-metrics-prod/apps/metrics
+              path: ci/tasks/restage.sh
+          params:
+            <<: *staging-cf
+            CF_APP_NAME: pages-metrics
+
 
 ############################
 #  RESOURCES
