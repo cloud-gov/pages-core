@@ -211,7 +211,7 @@ jobs:
             inputs: [name: src-metrics]
             <<: *cf-image
             run:
-              dir: src-metrics-prod/apps/metrics
+              dir: src-metrics/apps/metrics
               path: ci/tasks/restage.sh
           params:
             <<: *staging-cf
