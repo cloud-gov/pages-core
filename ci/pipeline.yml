@@ -519,7 +519,7 @@ resources:
     check_every: 1m
     source:
       repository: 18F/federalist
-      access_token: ((gh-access-token))
+      access_token: ((pages-operations-ci-github-token))
       base_branch: staging
       disable_forks: true
       ignore_drafts: false
@@ -572,7 +572,7 @@ resources:
     source:
       owner: 18F
       repo: federalist
-      access_token: ((gh-access-token))
+      access_token: ((pages-operations-ci-github-token))
       context_prefix: concourse
 
 
