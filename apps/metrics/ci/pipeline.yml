@@ -21,11 +21,103 @@ cf-image: &cf-image
     source:
       repository: 18fgsa/concourse-task
 
+test-metrics: &test-metrics
+  - task: install-dev-deps-metrics
+    output_mapping:
+      src-metrics: src-metrics-dev
+    config:
+      platform: linux
+      image_resource:
+        <<: *node-image
+      inputs: [name: src-metrics]
+      outputs: [name: src-metrics]
+      run:
+        dir: src-metrics/apps/metrics
+        path: bash
+        args: [-c, yarn --pure-lockfile]
+
+  - in_parallel:
+    - task: lint-metrics
+      config:
+        platform: linux
+        image_resource:
+          <<: *node-image
+        inputs: [name: src-metrics-dev]
+        run:
+          dir: src-metrics-dev/apps/metrics
+          path: bash
+          args: [-c, yarn lint]
+
+    - task: test-metrics
+      config:
+        platform: linux
+        image_resource:
+          <<: *node-image
+        inputs: [name: src-metrics-dev]
+        run:
+          dir: src-metrics-dev/apps/metrics
+          path: bash
+          args: [-c, yarn test]
+
+
 ############################
 #  JOBS
 
 jobs:
-  - name: test-and-deploy-metrics
+  - name: test-metrics-staging
+    plan:
+      - get: src-metrics
+        resource: pr-staging
+        trigger: true
+        version: every
+      - put: src-metrics
+        resource: pr-staging
+        params:
+          path: src-metrics
+          status: pending
+          base_context: concourse
+          context: test-metrics
+
+      - do: *test-metrics
+
+    on_failure:
+      in_parallel:
+        - put: src-metrics
+          resource: pr-staging
+          params:
+            path: src-metrics
+            status: failure
+            base_context: concourse
+            context: test-metrics
+        - put: slack
+          params:
+            text: |
+              :x: FAILED: pages metrics tests on staging
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+              ((slack-users))
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+
+    on_success:
+      in_parallel:
+        - put: src-metrics
+          resource: pr-staging
+          params:
+            path: src-metrics
+            status: success
+            base_context: concourse
+            context: test-metrics
+        - put: slack
+          params:
+            text: |
+              :white_check_mark: SUCCESS: Successfully tested pages metrics on staging
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+
+  - name: test-and-deploy-metrics-staging
     plan:
       - get: src-metrics
         resource: src-staging
@@ -35,42 +127,7 @@ jobs:
         inputs: [src-metrics]
         params: {state: pending}
 
-      - task: install-dev-deps-metrics
-        output_mapping:
-          src-metrics: src-metrics-dev
-        config:
-          platform: linux
-          image_resource:
-            <<: *node-image
-          inputs: [name: src-metrics]
-          outputs: [name: src-metrics]
-          run:
-            dir: src-metrics/apps/metrics
-            path: bash
-            args: [-c, yarn --pure-lockfile]
-
-      - in_parallel:
-        - task: lint-metrics
-          config:
-            platform: linux
-            image_resource:
-              <<: *node-image
-            inputs: [name: src-metrics-dev]
-            run:
-              dir: src-metrics-dev/apps/metrics
-              path: bash
-              args: [-c, yarn lint]
-
-        - task: test-metrics
-          config:
-            platform: linux
-            image_resource:
-              <<: *node-image
-            inputs: [name: src-metrics-dev]
-            run:
-              dir: src-metrics-dev/apps/metrics
-              path: bash
-              args: [-c, yarn test]
+      - do: *test-metrics
 
       - task: install-prod-deps-metrics
         output_mapping:
@@ -147,23 +204,22 @@ jobs:
 
 resources:
 
-  # - name: pr-staging
-  #   type: pull-request
-  #   check_every: 1m
-  #   source:
-  #     repository: 18F/federalist
-  #     access_token: ((gh-access-token))
-  #     base_branch: staging
-  #     disable_forks: true
-  #     ignore_drafts: false
+  - name: pr-staging
+    type: pull-request
+    check_every: 1m
+    source:
+      repository: 18F/federalist
+      access_token: ((gh-access-token))
+      base_branch: staging
+      disable_forks: true
+      ignore_drafts: false
 
   - name: src-staging
     type: git
     icon: github
     source:
       uri: https://github.com/18F/federalist
-      # branch: staging
-      branch: dc/metrics
+      branch: staging
 
   - name: slack
     type: slack-notification
@@ -191,10 +247,10 @@ resource_types:
     source:
       repository: pix4d/cogito
 
-  # - name: pull-request
-  #   type: docker-image
-  #   source:
-  #     repository: teliaoss/github-pr-resource
+  - name: pull-request
+    type: docker-image
+    source:
+      repository: teliaoss/github-pr-resource
 
   - name: slack-notification
     type: docker-image
