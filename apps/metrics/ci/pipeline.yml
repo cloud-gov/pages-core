@@ -216,6 +216,16 @@ jobs:
           <<: *staging-cf
           CF_APP_NAME: pages-metrics
 
+  - name: reconfigure
+    serial: true
+    plan:
+      - get: src-metrics
+        resource: src-staging
+        params: {depth: 1}
+        trigger: true
+      - set_pipeline: metrics
+        file: src-metrics/apps/metrics/ci/pipeline.yml
+
 
 ############################
 #  RESOURCES
