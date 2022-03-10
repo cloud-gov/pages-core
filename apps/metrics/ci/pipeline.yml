@@ -254,6 +254,13 @@ resources:
       access_token: ((gh-access-token))
       context_prefix: concourse
 
+  - name: nightly
+    type: time
+    source:
+      start: 12:00 AM
+      stop: 1:00 AM
+      location: America/New_York
+
 
 ############################
 #  RESOURCE TYPES
