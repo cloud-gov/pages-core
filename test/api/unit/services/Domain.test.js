@@ -567,7 +567,7 @@ describe('Domain Service', () => {
     it('unsets a matching domain name on its associated site', async () => {
       const site = await SiteFactory({ domain: 'https://www.agency.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('site');
@@ -586,7 +586,7 @@ describe('Domain Service', () => {
     it('unsets a matching first domain name on its associated site', async () => {
       const site = await SiteFactory({ domain: 'https://www.agency.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov', state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov,www.foo.gov,www.bar.gov');
       expect(domain.context).to.eq('site');
@@ -605,7 +605,7 @@ describe('Domain Service', () => {
     it('unsets a matching non-first domain name on its associated site', async () => {
       const site = await SiteFactory({ domain: 'https://www.agency.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov', state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.foo.gov,www.agency.gov,www.bar.gov');
       expect(domain.context).to.eq('site');
@@ -624,7 +624,7 @@ describe('Domain Service', () => {
     it('unsets a matching demo domain name on its associated site', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Demo, state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('demo');
@@ -643,7 +643,7 @@ describe('Domain Service', () => {
     it('unsets a matching first demo domain name on its associated site', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov', context: Domain.Contexts.Demo, state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov,www.foo.gov,www.bar.gov');
       expect(domain.context).to.eq('demo');
@@ -662,7 +662,7 @@ describe('Domain Service', () => {
     it('unsets a matching non-first demo domain name on its associated site', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov', context: Domain.Contexts.Demo, state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.foo.gov,www.agency.gov,www.bar.gov');
       expect(domain.context).to.eq('demo');
@@ -681,7 +681,7 @@ describe('Domain Service', () => {
     it('leaves a non-matching domain name on its associated site alone', async () => {
       const site = await SiteFactory({ domain: 'https://example.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('site');
@@ -700,7 +700,7 @@ describe('Domain Service', () => {
     it('leaves a non-matching demo domain name on its associated site alone', async () => {
       const site = await SiteFactory({ demoDomain: 'https://example.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Demo, state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('demo');
