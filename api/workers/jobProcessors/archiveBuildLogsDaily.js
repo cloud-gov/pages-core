@@ -3,13 +3,27 @@ const { Op } = require('sequelize');
 const PromisePool = require('@supercharge/promise-pool');
 const BuildLogs = require('../../services/build-logs');
 const { Build } = require('../../models');
-const { logger } = require('../../../winston');
 
-async function archiveBuildLogsDaily() {
+function createJobLogger(job) {
+  let logs = [];
+  return {
+    log(msg) {
+      logs.push(job.log(msg));
+    },
+    async flush() {
+      await Promise.all(logs);
+      logs = [];
+    },
+  };
+}
+
+async function archiveBuildLogsDaily(job) {
+  const logger = createJobLogger(job);
+
   const startDate = moment().subtract(1, 'days').startOf('day');
   const endDate = startDate.clone().add(1, 'days');
 
-  logger.info(`Querying for all builds completed between ${startDate} and ${endDate}.`);
+  logger.log(`Querying for all builds completed between ${startDate} and ${endDate}.`);
 
   const builds = await Build.findAll({
     attributes: ['id'],
@@ -21,7 +35,7 @@ async function archiveBuildLogsDaily() {
     },
   });
 
-  logger.info(`Found ${builds.length} builds.`);
+  logger.log(`Found ${builds.length} builds.`);
 
   const { errors } = await PromisePool
     .withConcurrency(5)
@@ -29,15 +43,17 @@ async function archiveBuildLogsDaily() {
     .process(({ id }) => BuildLogs.archiveBuildLogsForBuildId(id));
 
   if (errors.length === 0) {
-    logger.info('All build logs archived successfully!');
-    return;
+    logger.log('All build logs archived successfully!');
+    await logger.flush();
+    return 'Ok';
   }
 
   const errMsg = [
     `Archive build logs for ${startDate.format('YYYY-MM-DD')} completed with the following errors:`,
     errors.map(e => `  ${e.item.id}: ${e.message}`).join('\n'),
   ].join();
-  logger.error(errMsg);
+  logger.log(errMsg);
+  await logger.flush();
   throw new Error(errMsg);
 }
 

@@ -221,12 +221,19 @@ async function provision(domain, dnsResults) {
   const origin = siteViewOrigin(site);
   const path = sitePath(site, domain.context);
 
-  await cfApi().createExternalDomain(
-    domain.names,
-    serviceName,
+  const {
+    cfCdnSpaceName,
+    cfDomainWithCdnPlanGuid,
+  } = config.env;
+
+  await cfApi().createExternalDomain({
+    domains: domain.names,
+    name: serviceName,
     origin,
-    path
-  );
+    path,
+    cfCdnSpaceName,
+    cfDomainWithCdnPlanGuid,
+  });
 
   await domain.update({
     origin,

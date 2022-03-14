@@ -7,6 +7,7 @@ const DnsService = require('../../../../api/services/Dns');
 const DomainService = require('../../../../api/services/Domain');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
 const { DomainQueue } = require('../../../../api/queues');
+const config = require('../../../../config');
 
 describe('Domain Service', () => {
   before(DomainFactory.truncate);
@@ -376,7 +377,7 @@ describe('Domain Service', () => {
     it('sets the domain name on the associated site if not previously set', async () => {
       const site = await SiteFactory();
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('site');
@@ -396,7 +397,7 @@ describe('Domain Service', () => {
     it('sets the demo domain name on the associated site if not previously set', async () => {
       const site = await SiteFactory();
       const domain = await DomainFactory.create({ siteId: site.id, context: Domain.Contexts.Demo, names: 'www.agency.gov' });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('demo');
@@ -416,7 +417,7 @@ describe('Domain Service', () => {
     it('leaves the existing domain name on its associated site unchanged', async () => {
       const site = await SiteFactory({ domain: 'https://example.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov' });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('site');
@@ -436,7 +437,7 @@ describe('Domain Service', () => {
     it('leaves the existing domain name on its associated site unchanged', async () => {
       const site = await SiteFactory({ demoDomain: 'https://example.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, context: Domain.Contexts.Demo, names: 'www.agency.gov' });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('demo');
@@ -566,7 +567,7 @@ describe('Domain Service', () => {
     it('unsets a matching domain name on its associated site', async () => {
       const site = await SiteFactory({ domain: 'https://www.agency.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('site');
@@ -585,7 +586,7 @@ describe('Domain Service', () => {
     it('unsets a matching first domain name on its associated site', async () => {
       const site = await SiteFactory({ domain: 'https://www.agency.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov', state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov,www.foo.gov,www.bar.gov');
       expect(domain.context).to.eq('site');
@@ -604,7 +605,7 @@ describe('Domain Service', () => {
     it('unsets a matching non-first domain name on its associated site', async () => {
       const site = await SiteFactory({ domain: 'https://www.agency.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov', state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.foo.gov,www.agency.gov,www.bar.gov');
       expect(domain.context).to.eq('site');
@@ -623,7 +624,7 @@ describe('Domain Service', () => {
     it('unsets a matching demo domain name on its associated site', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Demo, state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('demo');
@@ -642,7 +643,7 @@ describe('Domain Service', () => {
     it('unsets a matching first demo domain name on its associated site', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov,www.foo.gov,www.bar.gov', context: Domain.Contexts.Demo, state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov,www.foo.gov,www.bar.gov');
       expect(domain.context).to.eq('demo');
@@ -661,7 +662,7 @@ describe('Domain Service', () => {
     it('unsets a matching non-first demo domain name on its associated site', async () => {
       const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.foo.gov,www.agency.gov,www.bar.gov', context: Domain.Contexts.Demo, state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.foo.gov,www.agency.gov,www.bar.gov');
       expect(domain.context).to.eq('demo');
@@ -680,7 +681,7 @@ describe('Domain Service', () => {
     it('leaves a non-matching domain name on its associated site alone', async () => {
       const site = await SiteFactory({ domain: 'https://example.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('site');
@@ -699,7 +700,7 @@ describe('Domain Service', () => {
     it('leaves a non-matching demo domain name on its associated site alone', async () => {
       const site = await SiteFactory({ demoDomain: 'https://example.gov' });
       const domain = await DomainFactory.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Demo, state: Domain.States.Provisioning });
-      const siteBuildSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
+      const siteBuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
 
       expect(domain.names).to.eq('www.agency.gov');
       expect(domain.context).to.eq('demo');
@@ -824,12 +825,16 @@ describe('Domain Service', () => {
 
       await domain.reload();
 
-      sinon.assert.calledOnceWithExactly(
+      sinon.assert.calledOnceWithMatch(
         CloudFoundryAPIClient.prototype.createExternalDomain,
-        domain.names,
-        domain.serviceName,
-        domain.origin,
-        domain.path
+        sinon.match({
+          domains: domain.names,
+          name: domain.serviceName,
+          origin: domain.origin,
+          path: domain.path,
+          cfCdnSpaceName: config.env.cfCdnSpaceName,
+          cfDomainWithCdnPlanGuid: config.env.cfDomainWithCdnPlanGuid,
+        })
       );
       sinon.assert.calledOnceWithExactly(DomainQueue.prototype.add, 'checkProvisionStatus', { id: domain.id });
       expect(domain.state).to.eq(Domain.States.Provisioning);

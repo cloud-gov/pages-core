@@ -109,7 +109,11 @@ function buildSite(params, s3) {
 }
 
 function buildInfrastructure(params, s3ServiceName) {
-  return apiClient.createSiteBucket(s3ServiceName)
+  return apiClient.createSiteBucket(
+    s3ServiceName,
+    config.env.cfSpaceGuid,
+    config.app.s3ServicePlanId
+  )
     .then((response) => {
       const { credentials } = response.entity;
 
@@ -119,7 +123,12 @@ function buildInfrastructure(params, s3ServiceName) {
         region: credentials.region,
       };
 
-      return apiClient.createSiteProxyRoute(credentials.bucket)
+      return apiClient.createSiteProxyRoute(
+        credentials.bucket,
+        config.env.cfDomainGuid,
+        config.env.cfSpaceGuid,
+        config.env.cfProxyGuid
+      )
         .then(() => buildSite(params, s3));
     });
 }

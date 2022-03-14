@@ -84,7 +84,7 @@ test-api: &test-api
               popd
               docker-compose -f ci/docker/docker-compose.yml run app app/ci/tasks/test-api.sh
               docker-compose -f ci/docker/docker-compose.yml down
-              docker volume rm $(docker volume ls -q)    
+              docker volume rm $(docker volume ls -q)
 
 test-admin-client: &test-admin-client
   - task: install-deps-admin-client
@@ -119,7 +119,7 @@ test-admin-client: &test-admin-client
       outputs: [name: src-admin-client]
       params:
         API_URL: https://app.pages-staging.cloud.gov
-        NODE_ENV: production           
+        NODE_ENV: production
       run:
         dir: src-admin-client/admin-client
         path: bash
@@ -180,7 +180,7 @@ jobs:
               <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
-            icon_url: ((slack-icon-url))   
+            icon_url: ((slack-icon-url))
 
   - name: test-admin-client-staging
     plan:
@@ -197,7 +197,7 @@ jobs:
           context: test-admin-client
 
       - do: *test-admin-client
-      
+
     on_failure:
       in_parallel:
         - put: src-admin-client
@@ -233,7 +233,7 @@ jobs:
               <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
-            icon_url: ((slack-icon-url))   
+            icon_url: ((slack-icon-url))
 
   - name: test-and-deploy-api-pages-staging
     plan:
@@ -301,7 +301,7 @@ jobs:
       in_parallel:
         - put: gh-status
           inputs: [src-api]
-          params: {state: success}      
+          params: {state: success}
         - put: slack
           params:
             text: |
@@ -365,7 +365,7 @@ jobs:
       in_parallel:
         - put: gh-status
           inputs: [src-admin-client]
-          params: {state: failure}   
+          params: {state: failure}
         - put: slack
           params:
             text: |
@@ -380,7 +380,7 @@ jobs:
       in_parallel:
         - put: gh-status
           inputs: [src-admin-client]
-          params: {state: success}   
+          params: {state: success}
         - put: slack
           params:
             text: |
@@ -390,66 +390,66 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: deploy-queues-ui-pages-staging
-    plan:
-      - get: src-queues-ui
-        resource: src-staging
-        trigger: true
-        params: {depth: 1}
-      - put: gh-status
-        inputs: [src-queues-ui]
-        params: {state: pending}
-      - task: deploy-queues-ui
-        config:
-          <<: *cf-image
-          inputs: [name: src-queues-ui]
-          run:
-            path: src-queues-ui/ci/tasks/deploy.sh
-        params:
-          <<: *staging-cf
-          CF_APP_NAME: pages-queues-ui-staging
-          CF_MANIFEST: src-queues-ui/.cloudgov/manifest.yml
-          CF_VARS_FILE: src-queues-ui/.cloudgov/vars/pages-staging.yml
-          CF_PATH: src-queues-ui
-        on_failure:
-          try:
-            task: cancel-queues-ui-deployment
-            config:
-              <<: *cf-image
-              inputs: [name: src-queues-ui]
-              run:
-                path: src-queues-ui/ci/tasks/cancel-deployment.sh
-            params:
-              <<: *staging-cf
-              CF_APP_NAME: pages-queues-ui-staging
-    on_failure:
-      in_parallel:
-        - put: gh-status
-          inputs: [src-queues-ui]
-          params: {state: failure}  
-        - put: slack
-          params:
-            text: |
-              :x: FAILED: pages queues UI deployment on pages staging
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-              ((slack-users))
-            channel: ((slack-channel))
-            username: ((slack-username))
-            icon_url: ((slack-icon-url))
-    on_success:
-      in_parallel:
-        - put: gh-status
-          inputs: [src-queues-ui]
-          params: {state: success}
-        - put: slack
-          params:
-            text: |
-              :white_check_mark: SUCCESS: Successfully deployed pages queues UI on pages staging
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-              ((slack-users))
-            channel: ((slack-channel))
-            username: ((slack-username))
-            icon_url: ((slack-icon-url))
+  # - name: deploy-queues-ui-pages-staging
+  #   plan:
+  #     - get: src-queues-ui
+  #       resource: src-staging
+  #       trigger: true
+  #       params: {depth: 1}
+  #     - put: gh-status
+  #       inputs: [src-queues-ui]
+  #       params: {state: pending}
+  #     - task: deploy-queues-ui
+  #       config:
+  #         <<: *cf-image
+  #         inputs: [name: src-queues-ui]
+  #         run:
+  #           path: src-queues-ui/ci/tasks/deploy.sh
+  #       params:
+  #         <<: *staging-cf
+  #         CF_APP_NAME: pages-queues-ui-staging
+  #         CF_MANIFEST: src-queues-ui/.cloudgov/manifest.yml
+  #         CF_VARS_FILE: src-queues-ui/.cloudgov/vars/pages-staging.yml
+  #         CF_PATH: src-queues-ui
+  #       on_failure:
+  #         try:
+  #           task: cancel-queues-ui-deployment
+  #           config:
+  #             <<: *cf-image
+  #             inputs: [name: src-queues-ui]
+  #             run:
+  #               path: src-queues-ui/ci/tasks/cancel-deployment.sh
+  #           params:
+  #             <<: *staging-cf
+  #             CF_APP_NAME: pages-queues-ui-staging
+  #   on_failure:
+  #     in_parallel:
+  #       - put: gh-status
+  #         inputs: [src-queues-ui]
+  #         params: {state: failure}
+  #       - put: slack
+  #         params:
+  #           text: |
+  #             :x: FAILED: pages queues UI deployment on pages staging
+  #             <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+  #             ((slack-users))
+  #           channel: ((slack-channel))
+  #           username: ((slack-username))
+  #           icon_url: ((slack-icon-url))
+  #   on_success:
+  #     in_parallel:
+  #       - put: gh-status
+  #         inputs: [src-queues-ui]
+  #         params: {state: success}
+  #       - put: slack
+  #         params:
+  #           text: |
+  #             :white_check_mark: SUCCESS: Successfully deployed pages queues UI on pages staging
+  #             <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+  #             ((slack-users))
+  #           channel: ((slack-channel))
+  #           username: ((slack-username))
+  #           icon_url: ((slack-icon-url))
 
   - name: nightly-tasks-pages-staging
     plan:
@@ -468,16 +468,46 @@ jobs:
           params:
             <<: *staging-cf
             CF_APP_NAME: pages-staging
-        - task: restage-queues-ui
+        # - task: restage-queues-ui
+        #   config:
+        #     inputs: [name: src]
+        #     <<: *cf-image
+        #     run:
+        #       path: src/ci/tasks/restage.sh
+        #   params:
+        #     <<: *staging-cf
+        #     CF_APP_NAME: pages-queues-ui-staging
+
+  - name: sites-builds-checks-staging
+    plan:
+      - get: src
+        resource: src-staging
+        params: {depth: 1}
+      - get: five-minutes
+        trigger: true
+      - in_parallel:
+        - task: queued-builds-check
           config:
             inputs: [name: src]
             <<: *cf-image
             run:
-              path: src/ci/tasks/restage.sh
+              path: src/ci/tasks/run-task.sh
           params:
             <<: *staging-cf
-            CF_APP_NAME: pages-queues-ui-staging
-
+            CF_APP_NAME: pages-staging
+            CF_TASK_NAME: queued-builds-check
+            CF_TASK_COMMAND: yarn queued-builds-check ((support-email))
+        on_failure:
+          in_parallel:
+            - put: slack
+              params:
+                text: |
+                  :x: FAILED: sites builds checks on pages staging
+                  <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+                  ((slack-users))
+                channel: ((slack-channel))
+                username: ((slack-username))
+                icon_url: ((slack-icon-url))
 
 ############################
 #  RESOURCES
@@ -498,7 +528,7 @@ resources:
     type: git
     icon: github
     source:
-      uri: https://github.com/18F/federalist   
+      uri: https://github.com/18F/federalist
       branch: staging
 
   - name: nightly
@@ -507,6 +537,11 @@ resources:
       start: 12:00 AM
       stop: 1:00 AM
       location: America/New_York
+
+  - name: five-minutes
+    type: time
+    source:
+      interval: 5m
 
   - name: redis
     type: docker-image
@@ -525,7 +560,7 @@ resources:
     source:
       repository: node
       tag: 16.13
-  
+
   - name: slack
     type: slack-notification
     source:

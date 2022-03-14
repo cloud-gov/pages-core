@@ -1,0 +1,30 @@
+{
+  "name": "metrics",
+  "version": "0.0.1",
+  "main": "src/index.js",
+  "license": "CC0-1.0",
+  "author": "david.corwin@gsa.gov",
+  "engines": {
+    "node": "16.13.x"
+  },
+  "scripts": {
+    "dev": "NODE_ENV=development npx nodemon -r dotenv/config src/index.js",
+    "lint": "eslint src lib",
+    "test": "tap -R spec --no-coverage",
+    "test:cov": "tap -- --coverage-report=lcov",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "axios": "^0.26.0",
+    "jsonwebtoken": "^8.5.1",
+    "pino": "^7.8.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.0",
+    "eslint": "^8.10.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4",
+    "pino-pretty": "^7.5.3",
+    "tap": "^16.0.0"
+  }
+}

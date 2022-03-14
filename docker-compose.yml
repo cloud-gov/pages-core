@@ -32,6 +32,10 @@ services:
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
       USER_AUDITOR: federalist
+      CLOUD_FOUNDRY_API_HOST: https://api.example.com
+      CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.example.com/oauth/token
+      CF_API_USERNAME: deploy_user
+      CF_API_PASSWORD: deploy_pass      
   federalist:
     build:
       dockerfile: Dockerfile-app
@@ -59,6 +63,10 @@ services:
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
       USER_AUDITOR: federalist
+      CLOUD_FOUNDRY_API_HOST: https://api.example.com
+      CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.example.com/oauth/token
+      CF_API_USERNAME: deploy_user
+      CF_API_PASSWORD: deploy_pass
   bull-board:
     build:
       dockerfile: Dockerfile-app
