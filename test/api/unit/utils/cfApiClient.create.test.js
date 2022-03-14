@@ -29,7 +29,9 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockCreateS3ServiceInstance(requestBody, serviceResponse);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.createS3ServiceInstance(name, planName)
+      apiClient.createS3ServiceInstance(
+        name, planName, config.env.cfSpaceGuid, config.env.s3ServicePlanId
+      )
         .then((res) => {
           expect(res).to.be.an('object');
           expect(res.entity.name).to.equal(name);
@@ -55,7 +57,9 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockCreateS3ServiceInstance(requestBody);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.createS3ServiceInstance(name, serviceName)
+      apiClient.createS3ServiceInstance(
+        name, serviceName, config.env.cfSpaceGuid, config.env.s3ServicePlanId
+      )
         .catch((err) => {
           expect(err).to.be.an('error');
           done();
@@ -164,7 +168,9 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.createSiteBucket(name, keyIdentifier, planName)
+      apiClient.createSiteBucket(
+        name, config.env.cfSpaceGuid, config.app.s3ServicePlanId, keyIdentifier, planName
+      )
         .then((res) => {
           expect(res).to.be.an('object');
           expect(res.entity.name).to.equal(keyName);
@@ -184,7 +190,7 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockCreateRoute(response);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.createRoute(host)
+      apiClient.createRoute(host, config.env.cfDomainGuid, config.env.cfSpaceGuid)
         .then((res) => {
           expect(res.metadata.guid).to.equal(guid);
           expect(res.entity.host).to.equal(host);
@@ -208,7 +214,7 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockMapRoute(response);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.mapRoute(routeGuid)
+      apiClient.mapRoute(routeGuid, config.env.cfProxyGuid)
         .then((res) => {
           expect(res.metadata.guid).to.equal(guid);
           expect(res.entity.app_guid).to.equal(appGuid);
@@ -236,7 +242,12 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockMapRoute(mapResponse);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.createSiteProxyRoute(host)
+      apiClient.createSiteProxyRoute(
+        host,
+        config.env.cfDomainGuid,
+        config.env.cfSpaceGuid,
+        config.env.cfProxyGuid
+      )
         .then((res) => {
           expect(res.metadata.guid).to.equal(guid);
           expect(res.entity.app_guid).to.equal(appGuid);
@@ -261,7 +272,14 @@ describe('CloudFoundryAPIClient', () => {
       }, {});
 
       const apiClient = new CloudFoundryAPIClient();
-      await apiClient.createExternalDomain(domains, name, origin, path);
+      await apiClient.createExternalDomain({
+        domains,
+        name,
+        origin,
+        path,
+        cfCdnSpaceName: config.env.cfCdnSpaceName,
+        cfDomainWithCdnPlanGuid: config.env.cfDomainWithCdnPlanGuid,
+      });
     });
   });
 });

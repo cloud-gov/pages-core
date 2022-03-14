@@ -1,12 +1,60 @@
-const config = require('../../config');
 const CloudFoundryAuthClient = require('./cfAuthClient');
 const HttpClient = require('./httpClient');
-const { filterEntity, firstEntity, objToQueryParams } = require('.');
+
+function filterEntity(res, name, field = 'name') {
+  const errMsg = `Not found: Entity @${field} = ${name}`;
+  const filtered = res.resources.filter(item => item.entity[field] === name);
+  if (filtered.length === 0) {
+    const error = new Error(errMsg);
+    error.name = name;
+    throw error;
+  }
+  return filtered;
+}
+
+function findEntity(res, name, field) {
+  return filterEntity(res, name, field)[0];
+}
+
+function findS3ServicePlan(res, name, s3ServicePlanId) {
+  const filtered = filterEntity(res, name);
+
+  if (name === 'basic-public') {
+    const servicePlan = filtered.find(f => f.entity.unique_id === s3ServicePlanId);
+    if (!servicePlan) {
+      const error = new Error(`Not found: @basic-public service plan = (${s3ServicePlanId})`);
+      error.name = name;
+      throw error;
+    }
+    return servicePlan;
+  }
+  return filtered[0];
+}
+
+function firstEntity(res, name) {
+  if (res.resources.length === 0) {
+    const error = new Error('Not found');
+    error.name = name;
+    throw error;
+  }
+
+  return res.resources[0];
+}
+
+function objToQueryParams(obj) {
+  const qs = new URLSearchParams();
+  Object
+    .entries(obj)
+    .forEach(([key, value]) => {
+      qs.append(key, value);
+    });
+  return qs;
+}
 
 class CloudFoundryAPIClient {
-  constructor() {
-    this.authClient = new CloudFoundryAuthClient();
-    this.httpClient = new HttpClient(config.env.cfApiHost);
+  constructor({ apiUrl, authClient } = {}) {
+    this.authClient = authClient ?? new CloudFoundryAuthClient();
+    this.httpClient = new HttpClient(apiUrl ?? process.env.CLOUD_FOUNDRY_API_HOST);
   }
 
   cancelTask(taskGuid) {
@@ -38,19 +86,24 @@ class CloudFoundryAPIClient {
   }
 
   /**
-   * @param {sstring} domains Comma-delimited list of domains
-   * @param {string} name The CF service name
-   * @param {string} origin The target origin of the domains
-   * @param {string} path The target path of the domains
+   * @param {Object} params
+   * @param {string} params.domains Comma-delimited list of domains
+   * @param {string} params.name The CF service name
+   * @param {string} params.origin The target origin of the domains
+   * @param {string} params.path The target path of the domains
+   * @param {string} params.cfCdnSpaceName The name of the cf space to put the domain
+   * @param {string} params.cfDomainWithCdnPlanGuid The guuid of the external domain service plan
    * @returns
    */
-  async createExternalDomain(
-    domains, name, origin, path
-  ) {
+  async createExternalDomain(params) {
     const {
+      domains,
+      name,
+      origin,
+      path,
       cfCdnSpaceName,
       cfDomainWithCdnPlanGuid,
-    } = config.env;
+    } = params;
 
     const spaceGuid = await this.authRequest('GET', `/v3/spaces?names=${cfCdnSpaceName}`)
       .then(res => res.resources[0].guid);
@@ -80,10 +133,10 @@ class CloudFoundryAPIClient {
     return this.authRequest('POST', '/v3/service_instances', body);
   }
 
-  createRoute(name) {
+  createRoute(name, domainGuid, spaceGuid) {
     const body = {
-      domain_guid: config.env.cfDomainGuid,
-      space_guid: config.env.cfSpaceGuid,
+      domain_guid: domainGuid,
+      space_guid: spaceGuid,
       host: name,
     };
 
@@ -95,13 +148,13 @@ class CloudFoundryAPIClient {
     ));
   }
 
-  createS3ServiceInstance(name, serviceName) {
-    return this.fetchS3ServicePlanGUID(serviceName)
+  createS3ServiceInstance(name, serviceName, spaceGuid, s3ServicePlanId) {
+    return this.fetchS3ServicePlanGUID(serviceName, s3ServicePlanId)
       .then((servicePlanGuid) => {
         const body = {
           name,
           service_plan_guid: servicePlanGuid,
-          space_guid: config.env.cfSpaceGuid,
+          space_guid: spaceGuid,
         };
 
         return this.accessToken().then(token => this.request(
@@ -127,14 +180,14 @@ class CloudFoundryAPIClient {
     ));
   }
 
-  createSiteBucket(name, keyIdentifier = 'key', serviceName = 'basic-public') {
-    return this.createS3ServiceInstance(name, serviceName)
+  createSiteBucket(name, spaceGuid, s3ServicePlanId, keyIdentifier = 'key', serviceName = 'basic-public') {
+    return this.createS3ServiceInstance(name, serviceName, spaceGuid, s3ServicePlanId)
       .then(res => this.createServiceKey(name, res.metadata.guid, keyIdentifier));
   }
 
-  createSiteProxyRoute(bucketName) {
-    return this.createRoute(bucketName)
-      .then(route => this.mapRoute(route.metadata.guid));
+  createSiteProxyRoute(bucketName, domainGuid, spaceGuid, appGuid) {
+    return this.createRoute(bucketName, domainGuid, spaceGuid)
+      .then(route => this.mapRoute(route.metadata.guid, appGuid));
   }
 
   deleteRoute(host) {
@@ -144,7 +197,7 @@ class CloudFoundryAPIClient {
         `/v2/routes?q=host:${host}`,
         token
       ))
-      .then(res => filterEntity(res, host, 'host'))
+      .then(res => findEntity(res, host, 'host'))
       .then(entity => this.accessToken()
         .then(token => this.request(
           'DELETE',
@@ -168,7 +221,7 @@ class CloudFoundryAPIClient {
 
   fetchServiceInstance(name) {
     return this.fetchServiceInstances(name)
-      .then(res => filterEntity(res, name));
+      .then(res => findEntity(res, name));
   }
 
   fetchServiceInstanceCredentials(name) {
@@ -194,7 +247,7 @@ class CloudFoundryAPIClient {
 
   fetchServiceKey(name) {
     return this.fetchServiceKeys()
-      .then(res => filterEntity(res, name))
+      .then(res => findEntity(res, name))
       .then(key => this.accessToken().then(token => this.request(
         'GET',
         `/v2/service_keys/${key.metadata.guid}`,
@@ -210,18 +263,18 @@ class CloudFoundryAPIClient {
     ));
   }
 
-  fetchS3ServicePlanGUID(serviceName) {
+  fetchS3ServicePlanGUID(serviceName, s3ServicePlanId) {
     return this.accessToken().then(token => this.request(
       'GET',
       '/v2/service_plans',
       token
-    )).then(res => filterEntity(res, serviceName))
+    )).then(res => findS3ServicePlan(res, serviceName, s3ServicePlanId))
       .then(service => service.metadata.guid);
   }
 
-  mapRoute(routeGuid) {
+  mapRoute(routeGuid, appGuid) {
     const body = {
-      app_guid: config.env.cfProxyGuid,
+      app_guid: appGuid,
       route_guid: routeGuid,
     };
 
@@ -254,5 +307,11 @@ class CloudFoundryAPIClient {
     return this.accessToken().then(token => this.request(method, path, token, json));
   }
 }
+
+CloudFoundryAPIClient.filterEntity = filterEntity;
+CloudFoundryAPIClient.findEntity = findEntity;
+CloudFoundryAPIClient.findS3ServicePlan = findS3ServicePlan;
+CloudFoundryAPIClient.firstEntity = firstEntity;
+CloudFoundryAPIClient.objToQueryParams = objToQueryParams;
 
 module.exports = CloudFoundryAPIClient;

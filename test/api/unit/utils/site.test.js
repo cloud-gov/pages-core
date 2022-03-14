@@ -8,7 +8,7 @@ const config = require('../../../../config');
 
 const awsBucketName = 'federalist-bucket';
 
-const url = bucket => `https://${bucket}.${config.app.domain}`;
+const url = bucket => `https://${bucket}.${config.app.proxyDomain}`;
 
 describe('site utils', () => {
   describe('siteViewLink', () => {
@@ -69,14 +69,14 @@ describe('site utils', () => {
 
     it('should return configured domain', async () => {
       const site = await factory.site({ awsBucketName });
-      expect(siteViewDomain(site)).equals(`https://${site.awsBucketName}.${config.app.domain}`);
+      expect(siteViewDomain(site)).equals(`https://${site.awsBucketName}.${config.app.proxyDomain}`);
     });
   });
 
   describe('siteViewOrigin', () => {
     it('should return configured domain', async () => {
       const site = await factory.site({ awsBucketName });
-      expect(siteViewOrigin(site)).equals(`${awsBucketName}.${config.app.domain}`);
+      expect(siteViewOrigin(site)).equals(`${awsBucketName}.${config.app.proxyDomain}`);
     });
   });
 });

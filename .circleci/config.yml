@@ -153,6 +153,10 @@ jobs:
           environment:
             APP_HOSTNAME: http://localhost:1337
             PRODUCT: federalist
+            CLOUD_FOUNDRY_API_HOST: https://api.example.com
+            CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.example.com/oauth/token
+            CF_API_USERNAME: deploy_user
+            CF_API_PASSWORD: deploy_pass
 
       - run:
           name: CodeClimate combine and upload coverage

@@ -97,7 +97,8 @@
     "bootstrap-admins": "node ./scripts/bootstrap-admins.js",
     "migrate-build-notification-settings": "node ./scripts/migrate-build-notification-settings.js",
     "remove-bucket-website-configs": "node ./scripts/remove-bucket-website-configs.js",
-    "check-object-paths": "node ./scripts/check-object-paths.js"
+    "check-object-paths": "node ./scripts/check-object-paths.js",
+    "queued-builds-check": "node ./scripts/queued-builds-check.js"
   },
   "main": "index.js",
   "repository": {

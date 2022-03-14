@@ -29,84 +29,6 @@ describe('utils', () => {
     });
   });
 
-  describe('.filterEntity', () => {
-    const name = 'one';
-    const field = 'name';
-    const entity1 = { [field]: name };
-    const entity2 = { [field]: 'two' };
-
-    it('should filter out the named entity from an objects resources array', () => {
-      const resources = [{ entity: entity1 }, { entity: entity2 }];
-
-      const result = utils.filterEntity({ resources }, name, field);
-
-      expect(result).to.deep.equal({ entity: entity1 });
-    });
-
-    it('should throw an error if entity not found', () => {
-      const resources = [{ entity: entity2 }];
-
-      const fn = () => utils.filterEntity({ resources }, name, field);
-
-      expect(fn).to.throw(Error, `Not found: Entity @${field} = ${name}`);
-    });
-
-    describe('when name is `basic-public`', () => {
-      it('returns the entity that matches the configured S3 plan', () => {
-        const basicPublic = 'basic-public';
-        const entity = { [field]: basicPublic, unique_id: config.app.s3ServicePlanId };
-        const resources = [{ entity }, { entity: entity2 }];
-
-        const result = utils.filterEntity({ resources }, basicPublic, field);
-
-        expect(result).to.deep.equal({ entity });
-      });
-
-      it('throws an error if none of the filtered entities match the configured S3 plan', () => {
-        const basicPublic = 'basic-public';
-        const entity = { [field]: basicPublic, unique_id: 'foobar' };
-        const resources = [{ entity }];
-
-        const fn = () => utils.filterEntity({ resources }, basicPublic, field);
-
-        expect(fn).to.throw(Error, `Not found: Entity @${field} = ${basicPublic} @basic-public service plan = (${config.app.s3ServicePlanId})`);
-      });
-    });
-  });
-
-  describe('.firstEntity', () => {
-    it('should return first entity from an objects resources array', () => {
-      const name = 'one';
-      const field = 'name';
-      const entity = { [field]: name };
-      const resources = {
-        resources: [
-          {
-            entity,
-          },
-          {
-            entity: { [field]: 'two' },
-          },
-        ],
-      };
-
-      const result = utils.firstEntity(resources, name);
-
-      expect(result).to.deep.equal({ entity });
-    });
-
-    it('should throw an error if no resources returned', () => {
-      const name = 'one';
-      const resources = {
-        resources: [],
-      };
-
-      const fn = () => utils.firstEntity(resources, name);
-
-      expect(fn).to.throw(Error, 'Not found');
-    });
-  });
-
   describe('.generateS3ServiceName', () => {
     it('should concat and lowercase owner and repository name', (done) => {
       const owner = 'Hello';
@@ -450,19 +372,6 @@ describe('utils', () => {
       it('resolves with the value with which `fn` resolves', async () => {
         const result = await utils.retry(spy);
         expect(result).to.eq(value);
-      });
-    });
-  });
-
-  describe('.objToQueryParams', () => {
-    it('returns an instance of URLSearchParams with the correct values', () => {
-      const obj = { foo: 'bar', baz: 'foo' };
-
-      const result = utils.objToQueryParams(obj);
-
-      expect(result).to.be.an.instanceOf(URLSearchParams);
-      Object.entries(obj).forEach(([key, value]) => {
-        expect(result.get(key)).to.equal(value);
       });
     });
   });
