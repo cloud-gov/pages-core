@@ -1,12 +1,19 @@
 const { QueueScheduler } = require('bullmq');
 const IORedis = require('ioredis');
+const path = require('path');
 
 const { app: appConfig, mailer: mailerConfig, redis: redisConfig } = require('../../config');
 const { logger } = require('../../winston');
 
 const DomainService = require('../services/Domain');
 const {
-  DomainQueueName, MailQueueName, ScheduledQueue, ScheduledQueueName, SlackQueueName,
+  ArchiveBuildLogsQueue,
+  ArchiveBuildLogsQueueName,
+  DomainQueueName,
+  MailQueueName,
+  ScheduledQueue,
+  ScheduledQueueName,
+  SlackQueueName,
 } = require('../queues');
 
 const Processors = require('./jobProcessors');
@@ -56,7 +63,6 @@ async function start() {
   }
 
   const scheduledJobProcessor = Processors.multiJobProcessor({
-    archiveBuildLogsDaily: Processors.archiveBuildLogsDaily,
     nightlyBuilds: Processors.nightlyBuilds,
     revokeMembershipForInactiveUsers: Processors.revokeMembershipForInactiveUsers,
     revokeMembershipForUAAUsers: Processors.revokeMembershipForUAAUsers,
@@ -80,6 +86,8 @@ async function start() {
 
   // Workers
   const workers = [
+    new QueueWorker(ArchiveBuildLogsQueueName, connection,
+      path.join(__dirname, 'jobProcessors', 'archiveBuildLogsDaily.js')),
     new QueueWorker(DomainQueueName, connection, domainJobProcessor),
     new QueueWorker(MailQueueName, connection, mailJobProcessor),
     new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
@@ -88,6 +96,7 @@ async function start() {
 
   // Schedulers
   const schedulers = [
+    new QueueScheduler(ArchiveBuildLogsQueueName, { connection }),
     new QueueScheduler(DomainQueueName, { connection }),
     new QueueScheduler(MailQueueName, { connection }),
     new QueueScheduler(ScheduledQueueName, { connection }),
@@ -95,14 +104,19 @@ async function start() {
   ];
 
   // Queues
+  const archiveBuildLogsQueue = new ArchiveBuildLogsQueue(connection);
   const scheduledQueue = new ScheduledQueue(connection);
+  const queues = [
+    archiveBuildLogsQueue,
+    scheduledQueue,
+  ];
 
   const cleanup = async () => {
     logger.info('Worker process received request to shutdown, cleaning up and shutting down.');
     const closables = [
       ...workers,
       ...schedulers,
-      scheduledQueue,
+      ...queues,
     ];
 
     await Promise.all(
@@ -126,13 +140,19 @@ async function start() {
     scheduledQueue.add('revokeMembershipForUAAUsers', {}, nightlyJobConfig),
   ];
 
+  jobs.push(archiveBuildLogsQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig));
+
   if (appConfig.appEnv === 'production') {
-    jobs.push(scheduledQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig));
+    jobs.push(archiveBuildLogsQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig));
     jobs.push(scheduledQueue.add('sandboxNotifications', {}, nightlyJobConfig));
     jobs.push(scheduledQueue.add('cleanSandboxOrganizations', {}, nightlyJobConfig));
   }
 
-  await scheduledQueue.drain(); // clear the queue
+  // clear the queue
+  await Promise.all([
+    scheduledQueue.drain(),
+    archiveBuildLogsQueue.drain(),
+  ]);
   await Promise.all(jobs);
 }
 
