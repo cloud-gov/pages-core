@@ -36,6 +36,16 @@ async function collect(timestamp, { cfClient } = {}) {
         value: quota.apps.total_memory_in_mb,
         timestamp,
       })),
+    cf.fetchSpaces(org.guid)
+      .then(res => res.resources
+        .filter(r => r.relationships.quota.data === null)
+        .length)
+      .then(numSpacesWithoutQuota => ({
+        name: 'pages.missingQuotas.org',
+        type: 'gauge',
+        value: numSpacesWithoutQuota,
+        timestamp,
+      })),
   ]);
 
   return metrics.flat();
