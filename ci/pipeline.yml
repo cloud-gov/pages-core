@@ -159,7 +159,6 @@ jobs:
             text: |
               :x: FAILED: pages api tests on staging
               <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-              ((slack-users))
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
@@ -212,7 +211,6 @@ jobs:
             text: |
               :x: FAILED: pages admin client tests on staging
               <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-              ((slack-users))
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
@@ -293,7 +291,6 @@ jobs:
             text: |
               :x: FAILED: api deployment on pages staging
               <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-              ((slack-users))
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
@@ -307,7 +304,6 @@ jobs:
             text: |
               :white_check_mark: SUCCESS: Successfully deployed api on pages staging
               <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-              ((slack-users))
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
@@ -371,7 +367,6 @@ jobs:
             text: |
               :x: FAILED: admin client deployment on pages staging
               <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-              ((slack-users))
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
@@ -432,7 +427,6 @@ jobs:
   #           text: |
   #             :x: FAILED: pages queues UI deployment on pages staging
   #             <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-  #             ((slack-users))
   #           channel: ((slack-channel))
   #           username: ((slack-username))
   #           icon_url: ((slack-icon-url))
@@ -446,7 +440,6 @@ jobs:
   #           text: |
   #             :white_check_mark: SUCCESS: Successfully deployed pages queues UI on pages staging
   #             <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-  #             ((slack-users))
   #           channel: ((slack-channel))
   #           username: ((slack-username))
   #           icon_url: ((slack-icon-url))
@@ -504,7 +497,6 @@ jobs:
                 text: |
                   :x: FAILED: sites builds checks on pages staging
                   <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-                  ((slack-users))
                 channel: ((slack-channel))
                 username: ((slack-username))
                 icon_url: ((slack-icon-url))
