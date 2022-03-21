@@ -501,6 +501,16 @@ jobs:
                 username: ((slack-username))
                 icon_url: ((slack-icon-url))
 
+  - name: reconfigure
+    serial: true
+    plan:
+      - get: src
+        resource: src-staging
+        params: {depth: 1}
+        trigger: true
+      - set_pipeline: web
+        file: src/ci/pipeline.yml
+
 ############################
 #  RESOURCES
 
