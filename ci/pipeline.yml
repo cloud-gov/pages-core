@@ -508,7 +508,7 @@ jobs:
         resource: src-staging
         params: {depth: 1}
         trigger: true
-      - set_pipeline: build-container
+      - set_pipeline: web
         file: src/ci/pipeline.yml
 
 ############################
