@@ -36,6 +36,39 @@ tap.test('It collects the metrics!', async (t) => {
         },
       };
     },
+
+    async fetchSpaces(orgGuid) {
+      t.same(orgGuid, org.guid, 'Spaces collected for the correct org.');
+      return {
+        resources: [
+          {
+            relationships: {
+              quota: {
+                data: null,
+              }
+            }
+          },
+          {
+            relationships: {
+              quota: {
+                data: {
+                  guid: 'abc1234',
+                }
+              }
+            }
+          },
+          {
+            relationships: {
+              quota: {
+                data: {
+                  guid: 'abc1234',
+                }
+              }
+            }
+          },          
+        ]
+      };
+    }
   };
 
   const timestamp = Date.now();
@@ -57,6 +90,12 @@ tap.test('It collects the metrics!', async (t) => {
       name: 'pages.quota.org',
       type: 'gauge',
       value: 40,
+      timestamp,
+    },
+    {
+      name: 'pages.missingQuotas.org',
+      type: 'gauge',
+      value: 1,
       timestamp,
     },
   ];
