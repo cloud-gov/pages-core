@@ -47,14 +47,12 @@ function isApexDomain(domainName) {
  */
 function buildAcmeChallengeDnsRecord(domainName) {
   /** @type DnsRecord */
-  const dnsRecord = {
+  return {
     type: DnsRecordType.CNAME,
     purpose: DnsRecordPurpose.AcmeChallenge,
     name: `${acmePrefix}.${domainName}`,
     target: `${acmePrefix}.${domainName}.${cloudGovDomain}`,
   };
-
-  return dnsRecord;
 }
 
 /**
@@ -62,14 +60,12 @@ function buildAcmeChallengeDnsRecord(domainName) {
  */
 function buildSiteDnsRecord(domainName) {
   /** @type DnsRecord */
-  const dnsRecord = {
+  return {
     type: isApexDomain(domainName) ? DnsRecordType.A : DnsRecordType.CNAME,
     purpose: DnsRecordPurpose.Site,
     name: domainName,
     target: `${domainName}.${cloudGovDomain}`,
   };
-
-  return dnsRecord;
 }
 
 /**
@@ -119,13 +115,11 @@ async function checkDnsRecord(dnsRecord) {
   const [state, message] = await module.exports.resolveDnsRecord(dnsRecord);
 
   /** @type DnsResult */
-  const dnsResult = {
+  return {
     record: dnsRecord,
     state,
     message,
   };
-
-  return dnsResult;
 }
 
 /**

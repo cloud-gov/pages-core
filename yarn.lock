@@ -2169,7 +2169,7 @@ axobject-query@^2.2.0:
   resolved "https://registry.yarnpkg.com/axobject-query/-/axobject-query-2.2.0.tgz#943d47e10c0b704aa42275e20edf3722648989be"
   integrity sha512-Td525n+iPOOyUQIeBfcASuG6uJsDOITl7Mds5gFyerkWiX7qhUTdYUBlSgNMyVqtSJqwpt1kXGLdUt6SykLMRA==
 
-babel-eslint@>=10.0.1, babel-eslint@^10.0.1:
+babel-eslint@^10.0.1:
   version "10.1.0"
   resolved "https://registry.yarnpkg.com/babel-eslint/-/babel-eslint-10.1.0.tgz#6968e568a910b78fb3779cdd8b6ac2f479943232"
   integrity sha512-ifWaTHQ0ce+448CYop8AdrQiBsGrnC+bMgfyKFdi6EsPLTAWG+QfyDeM6OH+FmWnKvEq5NnBMLvlBUPKQZoDSg==
@@ -4562,12 +4562,10 @@ eslint-plugin-react@^7.22.0:
     resolve "^2.0.0-next.3"
     string.prototype.matchall "^4.0.5"
 
-eslint-plugin-scanjs-rules@amirbey/eslint-plugin-scanjs-rules#buffer:
-  version "0.2.1"
-  resolved "https://codeload.github.com/amirbey/eslint-plugin-scanjs-rules/tar.gz/61a489a8b5e86dfbb8f4dfe02f82d3e41a1932c9"
-  dependencies:
-    babel-eslint ">=10.0.1"
-    eslint ">=5.15.1"
+eslint-plugin-sonarjs@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-sonarjs/-/eslint-plugin-sonarjs-0.12.0.tgz#03a160a58f179fde084135baec08656b59786b8c"
+  integrity sha512-soxjK67hoYxO8hesKqXWN50GSM+oG2r35N5WnAMehetahO6zoVpv3HZbdziP0jYWNopEe6te/BFUZOYAZI+qhg==
 
 eslint-scope@5.1.1, eslint-scope@^5.1.1:
   version "5.1.1"
@@ -4594,7 +4592,7 @@ eslint-visitor-keys@^2.0.0:
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-2.1.0.tgz#f65328259305927392c938ed44eb0a5c9b2bd303"
   integrity sha512-0rSmRBzXgDzIsD6mGdJgevzgezI534Cer5L/vyMX0kHzT/jiB43jRhd9YUlMGYLQy2zprNmoT8qasCGtY+QaKw==
 
-eslint@>=5.15.1, eslint@^7.21.0:
+eslint@^7.21.0:
   version "7.28.0"
   resolved "https://registry.yarnpkg.com/eslint/-/eslint-7.28.0.tgz#435aa17a0b82c13bb2be9d51408b617e49c1e820"
   integrity sha512-UMfH0VSjP0G4p3EWirscJEQ/cHqnT/iuH6oNZOB94nBjWbMnhGEPxsZm1eyIW0C/9jLI0Fow4W5DXLjEI7mn1g==

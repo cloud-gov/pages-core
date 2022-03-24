@@ -14,11 +14,6 @@ const initialState = {
 export default function alert(state = initialState, action) {
   switch (action.type) {
     case HTTP_ERROR:
-      return {
-        ...state,
-        message: action.message,
-        status: action.status,
-      };
     case HTTP_SUCCESS:
       return {
         ...state,

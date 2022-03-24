@@ -65,8 +65,8 @@ class TemplateSite extends React.Component {
   validateOrgSelect(name, value) {
     const { organizations } = this.props;
 
-    if (name === 'templateOrganizationId' && hasOrgs(organizations)) {
-      if (!value) return { touched: true, error: 'Please select an organization' };
+    if (name === 'templateOrganizationId' && hasOrgs(organizations) && !value) {
+      return { touched: true, error: 'Please select an organization' };
     }
 
     return { touched: true, error: null };
