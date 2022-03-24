@@ -157,7 +157,6 @@ describe('<SiteContainer/>', () => {
   });
 
   it('displays a page title if one is configured for the location', () => {
-    // eslint-disable-next-line scanjs-rules/assign_to_pathname
     props.location.pathname = 'settings';
     const wrapper = shallow(<SiteContainer {...props} />);
     expect(wrapper.find('PagesHeader').prop('title')).to.equal('Site settings');
