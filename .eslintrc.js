@@ -27,8 +27,7 @@ const finalRules = {
 };
 
 module.exports = {
-  extends: ['airbnb', 'plugin:sonarjs/recommended'],
-  plugins: ['sonarjs'],
+  extends: ['airbnb', 'plugin:sonarjs/recommended', 'plugin:no-unsanitized/DOM'],
   rules: finalRules,
   parserOptions: {
     ecmaVersion: 2021,
