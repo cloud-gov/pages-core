@@ -9,8 +9,7 @@ function serialize(buildLog) {
   const object = buildLog.get({
     plain: true,
   });
-  const filtered = pick(allowedAttributes, object);
-  return filtered;
+  return pick(allowedAttributes, object);
 }
 
 function serializeMany(buildLogs) {

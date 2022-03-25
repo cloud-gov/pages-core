@@ -97,10 +97,8 @@ class SitePublishedFilesTable extends React.Component {
 
   shouldShowButtons() {
     const { lastPage } = this.state;
-    if (lastPage !== null && lastPage === 0) {
-      return false;
-    }
-    return true;
+
+    return !(lastPage !== null && lastPage === 0);
   }
 
   renderPagingButtons() {
@@ -206,7 +204,9 @@ class SitePublishedFilesTable extends React.Component {
 
     if (publishedFiles.isLoading) {
       return this.renderLoadingState();
-    } if (!files.length) {
+    }
+
+    if (!files.length) {
       return this.renderEmptyState();
     }
     return this.renderPublishedFilesTable(files);
