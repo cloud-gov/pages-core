@@ -236,7 +236,8 @@ class CloudFoundryAPIClient {
   }
 
   fetchServiceInstances(name = null) {
-    const path = `/v2/service_instances${name ? `?q=name:${name}` : ''}`;
+    const query = name ? `?q=name:${name}` : '';
+    const path = `/v2/service_instances${query}`;
 
     return this.accessToken().then(token => this.request(
       'GET',

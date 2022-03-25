@@ -12,9 +12,7 @@ export const getOrgData = (state) => {
 export const hasOrgs = (state) => {
   const { data } = state;
 
-  if (!data || data.length === 0) return false;
-
-  return true;
+  return !(!data || data.length === 0);
 };
 
 export const orgFilterOptions = (state) => {

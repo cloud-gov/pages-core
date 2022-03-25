@@ -18,7 +18,6 @@ class SiteBuildLogs extends React.Component {
     this.toggleAutoRefresh = this.toggleAutoRefresh.bind(this);
   }
 
-  /* eslint-disable scanjs-rules/call_setInterval */
   componentDidMount() {
     const { actions: { fetchBuildLogs }, buildId } = this.props;
 
@@ -30,7 +29,6 @@ class SiteBuildLogs extends React.Component {
       }
     }, REFRESH_INTERVAL);
   }
-  /* eslint-enable scanjs-rules/call_setInterval */
 
   toggleAutoRefresh() {
     this.setState(state => ({ autoRefresh: !state.autoRefresh }));

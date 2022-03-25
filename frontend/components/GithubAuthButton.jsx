@@ -1,6 +1,4 @@
 /* global window */
-/* eslint-disable scanjs-rules/call_addEventListener */
-/* eslint-disable scanjs-rules/call_addEventListener_message */
 import React from 'react';
 import PropTypes from 'prop-types';
 

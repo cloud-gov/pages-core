@@ -73,7 +73,6 @@ class SiteBuilds extends React.Component {
     this.toggleAutoRefresh = this.toggleAutoRefresh.bind(this);
   }
 
-  /* eslint-disable scanjs-rules/call_setInterval */
   componentDidMount() {
     const { actions, id } = this.props;
 
@@ -86,7 +85,6 @@ class SiteBuilds extends React.Component {
       }
     }, REFRESH_INTERVAL);
   }
-  /* eslint-enable scanjs-rules/call_setInterval */
 
   componentWillUnmount() {
     clearInterval(this.intervalHandle);
