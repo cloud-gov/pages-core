@@ -62,8 +62,7 @@ function generateS3ServiceName(owner, repository) {
     return result;
   }
 
-  const slicedServiceName = `${serviceName.slice(0, 39)}-${makeId()}`;
-  return slicedServiceName;
+  return `${serviceName.slice(0, 39)}-${makeId()}`;
 }
 
 function toSubdomainPart(str) {
@@ -167,13 +166,12 @@ function wrapHandlers(handlers) {
 
 function pick(keys, obj) {
   const objKeys = Object.keys(obj);
-  const pickedObj = keys.reduce((picked, key) => {
+  return keys.reduce((picked, key) => {
     if (objKeys.includes(key)) {
       picked[key] = obj[key]; // eslint-disable-line no-param-reassign
     }
     return picked;
   }, {});
-  return pickedObj;
 }
 
 function omit(keys, obj) {
@@ -187,7 +185,6 @@ function toInt(val) {
 }
 
 function wait(time = 500) {
-  // eslint-disable-next-line scanjs-rules/call_setTimeout
   return new Promise((r => setTimeout(r, time)));
 }
 
@@ -250,7 +247,7 @@ function defaultContext(req, res) {
     errors: req.flash('error'),
   };
 
-  const context = {
+  return {
     isAuthenticated: false,
     messages,
     shouldIncludeTracking: shouldIncludeTracking(),
@@ -267,8 +264,6 @@ function defaultContext(req, res) {
     productName: process.env.PRODUCT,
     appName: config.app.appName,
   };
-
-  return context;
 }
 
 module.exports = {

@@ -92,7 +92,9 @@ class SitePublishedBranchesTable extends React.Component {
     const branches = this.publishedBranches();
     if (publishedBranches.isLoading) {
       return this.renderLoadingState();
-    } if (!branches.length) {
+    }
+
+    if (!branches.length) {
       return this.renderEmptyState();
     }
     return this.renderPublishedBranchesTable();

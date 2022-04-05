@@ -29,9 +29,7 @@ async function checkQueuedBuilds() {
   };
 
   const builds = await Build.findAll(options);
-  const buildIds = builds.map(b => b.id);
-
-  return buildIds;
+  return builds.map(b => b.id);
 }
 
 function createBodyHTML(buildIds) {

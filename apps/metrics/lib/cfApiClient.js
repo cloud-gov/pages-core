@@ -305,6 +305,10 @@ class CloudFoundryAPIClient {
     return this.authRequest('GET', `/v3/organization_quotas/${orgQuotaGuid}`);
   }
 
+  fetchSpaces(orgGuid) {
+    return this.authRequest('GET', `/v3/spaces?organization_guids=${orgGuid}`);
+  }
+
   // Private methods
   accessToken() {
     return this.authClient.accessToken();

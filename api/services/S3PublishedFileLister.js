@@ -25,12 +25,9 @@ function listTopLevelFolders(s3Client, path) {
   // Pass the Delimiter option so that results are grouped
   // according to their "folder" paths
   return s3Client.listCommonPrefixes(path)
-    .then((commonPrefixes) => {
-      const prefixes = commonPrefixes.map(
-        prefix => prefix.Prefix.split('/').slice(-2)[0]
-      );
-      return prefixes;
-    })
+    .then(commonPrefixes => commonPrefixes.map(
+      prefix => prefix.Prefix.split('/').slice(-2)[0]
+    ))
     .catch(handleInvalidAccessKeyError);
 }
 
