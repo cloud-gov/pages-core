@@ -124,11 +124,10 @@ function isSiteUrlManagedByDomain(site, domains, context) {
   const siteDomain = Site.domainFromContext(context);
   if (site[siteDomain] === null) { return true; }
   if (domains.length === 0) { return false; }
-  const siteUrlIsManagedByDomain = domains
+  return domains
     .filter(domain => domain.context === context)
     .some(domain => domain.namesArray()
       .some(name => `https://${name}` === site[siteDomain]));
-  return siteUrlIsManagedByDomain;
 }
 
 /**

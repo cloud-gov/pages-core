@@ -3,8 +3,7 @@ const utils = require('.');
 
 function buildWhereQuery(queryOptions = {}, queryFields = []) {
   const hasAllowed = queryFields.length > 0;
-  const options = hasAllowed ? _.pick(queryOptions, queryFields) : queryOptions;
-  return options;
+  return hasAllowed ? _.pick(queryOptions, queryFields) : queryOptions;
 }
 
 async function fetchModelById(id, Model, opts = {}) {

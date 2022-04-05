@@ -15,12 +15,10 @@ function createPagedResults(totalMaxObjects, isTruncated, objects) {
   // or its length (slice will only go as far as the array's length)
   const truncatedObjects = objects.slice(0, totalMaxObjects);
 
-  const pagedResults = {
+  return {
     isTruncated,
     objects: truncatedObjects,
   };
-
-  return pagedResults;
 }
 
 function resolveCallback(resolve, reject) {
