@@ -1,0 +1,39 @@
+
+{% extends "base.njk" %}
+
+{% block main_content %}
+
+  <div id="migrate">
+    <div class="well">
+      <div class="usa-grid">
+        <div class="usa-width-one-fourth">
+          &nbsp;
+        </div>
+        <div class="usa-width-one-half">
+          <form class="usa-form-large" action="/migrate/create" method="POST">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <fieldset>
+              <legend class="usa-drop_text">Migrate to cloud.gov authentication</legend>
+              <span>or <a href="/sites">skip for now</a></span>
+              </br></br></br>
+              <span>
+                Your user with Github username <strong>{{ username }}</strong> will be linked with the cloud.gov account associated with the email address you provide below.
+                </br></br>
+                If you do not currently have a cloud.gov account, you will receive an invitation to the provided email address, please click the link in the email and complete the setup process.
+                </br></br>
+                After completing this process, please log out and log back in using cloud.gov authentication, you will no longer be able login with Github.
+              </span>
+
+              <label for="uaaEmail">Email address</label>
+              <input class="usa-input" id="uaaEmail" name="uaaEmail" type="email" required/>
+              <input type="submit" value="Submit" />
+            </fieldset>
+          </form>
+        </div>
+        <div class="usa-width-one-fourth">
+          &nbsp;
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
