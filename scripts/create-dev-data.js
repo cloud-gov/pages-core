@@ -197,8 +197,8 @@ async function createData() {
       .then(createUAAIdentity),
 
     User
-      .create({ username: 'davemcorwin', adminEmail: 'david.corwin@gsa.gov' })
-      .then(createUAAIdentity),
+      .create({ username: 'davemcorwin', adminEmail: 'david.corwin@gsa.gov' }),
+    // .then(createUAAIdentity),
 
     // User without UAA
     User.create({
