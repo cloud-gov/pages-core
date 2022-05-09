@@ -79,8 +79,7 @@ describe('Auth Migration', () => {
         .set('Cookie', cookie)
         .send(`_csrf=${csrfToken.getToken()}`)
         .expect(302)
-        .expect('Location', '/logout/github')
-        .expect(async () => { throw new Error('yikes'); });
+        .expect('Location', '/logout/github');
 
       await expectFlash(response, 'error', 'You already have a cloud.gov account, please logout and log back in using cloud.gov authentication.');
     });
