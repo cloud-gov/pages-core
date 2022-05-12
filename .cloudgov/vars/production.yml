@@ -2,7 +2,7 @@ product: federalist
 name: federalistapp
 domain: federalistapp.18f.gov
 app_subdomain: ''
-memory: 512MB
+memory: 256MB
 instances: 2
 env: production
 env_postfix: ''

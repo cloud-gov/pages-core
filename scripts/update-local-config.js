@@ -72,11 +72,12 @@ function getVcapJson(stdout) {
   let i = 0;
 
   while (i < lines.length) {
-    const line = lines[i];
+    let line = lines[i];
     i += 1;
 
     // start reading at the first opening bracket that starts a line
-    if (line.indexOf('{') === 0) {
+    if (line.includes('VCAP_SERVICES: {')) {
+      line = line.replace('VCAP_SERVICES: {', '"VCAP_SERVICES": {');
       readingVcap = true;
     }
 
@@ -90,7 +91,7 @@ function getVcapJson(stdout) {
     }
   }
 
-  return JSON.parse(vcapLines.join('\n'));
+  return JSON.parse(`{ ${vcapLines.join('\n')} }`);
 }
 
 exec(`cf env ${app}`, (err, stdout) => {
