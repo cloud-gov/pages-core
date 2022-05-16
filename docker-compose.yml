@@ -25,7 +25,7 @@ services:
     environment:
       APP_HOSTNAME: http://localhost:1337
       DOMAIN: localhost:1337
-      FEATURE_AUTH_GITHUB: 'false'
+      FEATURE_AUTH_GITHUB: 'true'
       FEATURE_AUTH_UAA: 'true'
       PORT: 1337
       PRODUCT: pages
