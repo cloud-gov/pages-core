@@ -77,6 +77,7 @@ function init(app) {
   app.use('/external', externalAuth);
 
   const main = express();
+  main.disable('x-powered-by');
   configureViews(main);
   maybeUseDevMiddleware(main);
   main.use(session(sessionConfig));
