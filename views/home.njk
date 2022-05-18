@@ -12,7 +12,7 @@
         <div class="usa-width-one-half">
           <p>This is a U.S. government service. Your use indicates your consent to monitoring, recording, and no expectation of privacy. Misuse is subject to criminal and civil penalties. <a href="/system-use">Read more details.</a><br></p>
           {% if authUAA %}
-            <div class="well-gray-lightest" style="text-align: center;">
+            <div class="well-gray-lightest text-center">
               <a href="/login">
                 <button class="usa-button">
                   Agree and continue with cloud.gov authentication
@@ -22,7 +22,7 @@
           {% endif %}
           {% if authGithub and authUAA %}
             <div class="well">
-              <p class="hero-heading" style="text-align: center;">
+              <p class="hero-heading text-center">
                 Don't have cloud.gov account yet?
               </p>
             </div>
@@ -31,7 +31,7 @@
             </p>
           {% endif %}
           {% if authGithub %}
-            <div class="well-gray-lightest" style="text-align: center;">
+            <div class="well-gray-lightest text-center">
               <a href="/login/github">
                 <button class="usa-button">
                   <img src="/images/github-logo.png"> Agree and continue with GitHub
