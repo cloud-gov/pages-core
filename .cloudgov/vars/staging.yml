@@ -8,7 +8,7 @@ env: staging
 env_postfix: -staging
 log_level: verbose
 feature_auth_github: 'true'
-feature_auth_uaa: 'true'
+feature_auth_uaa: 'false'
 feature_bull_site_build_queue: 'true'
 uaa_host: https://uaa.fr-stage.cloud.gov
 new_relic_app_name: web-staging
