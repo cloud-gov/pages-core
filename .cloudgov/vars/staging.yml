@@ -1,7 +1,6 @@
 product: federalist
 name: federalistapp-staging
 domain: federalistapp-staging.18f.gov
-app_subdomain: ''
 memory: 128MB
 instances: 2
 env: staging
