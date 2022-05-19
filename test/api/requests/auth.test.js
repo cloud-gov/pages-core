@@ -208,7 +208,7 @@ describe('Authentication requests', () => {
               .then((sess) => {
                 expect(sess.flash.error.length).to.equal(1);
                 expect(sess.flash.error[0]).to.equal(
-                  'You must login with your UAA account. Please try again.'
+                  'You must login with your cloud.gov account. Please try again.'
                 );
                 done();
               })
