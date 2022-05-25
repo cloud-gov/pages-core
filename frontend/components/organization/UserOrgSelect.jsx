@@ -7,7 +7,7 @@ function makeOptions(opts) {
   return opts.map(({ id, name }) => (
     <option
       key={`org-select-${id}`}
-      style={{ padding: '1rem' }}
+      className="user-org-select-option"
       value={id}
     >
       {name}
@@ -39,7 +39,7 @@ const UserOrgSelect = ({
       {
         mustChooseOption ? (
           <option
-            style={{ padding: '1rem' }}
+            className="user-org-select-option"
             value=""
           >
             Please select an organization

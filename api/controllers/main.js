@@ -1,6 +1,7 @@
 const config = require('../../config');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const { defaultContext } = require('../utils');
+const Features = require('../features');
 
 function alertGithubAuthDeprecation(hasUAAIdentity, context) {
   if (!hasUAAIdentity && context.authUAA) {
@@ -17,6 +18,13 @@ module.exports = {
   home(req, res) {
     // redirect to main app if is authenticated
     if (req.session.authenticated) {
+      if (
+        Features.enabled(Features.Flags.FEATURE_AUTH_UAA)
+        && Features.enabled(Features.Flags.FEATURE_AUTH_GITHUB)
+        && !req.user.UAAIdentity
+      ) {
+        return res.redirect('/migrate/new');
+      }
       return res.redirect('/sites');
     }
     const context = defaultContext(req, res);
