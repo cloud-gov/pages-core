@@ -18,6 +18,7 @@ const corsCfg = {
 };
 
 const app = express();
+app.disable('x-powered-by');
 app.use(cors(corsCfg));
 app.use(session(sessionConfig));
 app.use(passport.initialize());
