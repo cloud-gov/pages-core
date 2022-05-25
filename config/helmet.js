@@ -45,7 +45,6 @@ module.exports = {
       'style-src': [
         "'self'",
         'https:',
-        "'unsafe-inline'",
       ],
       'block-all-mixed-content': [],
     },
