@@ -101,16 +101,16 @@ commands:
 jobs:
   build:
     docker:
-      - image: circleci/node:16.13
+      - image: cimg/node:16.13
         environment:
           YARN_VERSION: 0.24.6-1
           CC_TEST_REPORTER_ID: 101a439651b6abd27e5440028a53b5b8f08fe0889f3948d5f58f6cf9f7c786a0
-      - image: circleci/postgres:9.6
+      - image: cimg/postgres:9.6
         environment:
           POSTGRES_USER: ci-test-user
           POSTGRES_DB: federalist-ci-test
           POSTGRES_HOST_AUTH_METHOD: trust
-      - image: circleci/redis
+      - image: cimg/redis:5.0
         environment:
           REDIS_PORT: 6379
     steps:
@@ -157,6 +157,8 @@ jobs:
             CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.example.com/oauth/token
             CF_API_USERNAME: deploy_user
             CF_API_PASSWORD: deploy_pass
+            FEATURE_AUTH_GITHUB: 'true'
+            FEATURE_AUTH_UAA: 'false'
 
       - run:
           name: CodeClimate combine and upload coverage
@@ -170,7 +172,7 @@ jobs:
 
   deploy:
     docker:
-      - image: circleci/node:16.13
+      - image: cimg/node:16.13
     parameters:
       app:
         type: string
@@ -194,7 +196,7 @@ jobs:
 
   deploy-admin-client:
     docker:
-      - image: circleci/node:16.13
+      - image: cimg/node:16.13
     parameters:
       app:
         type: string
@@ -238,7 +240,7 @@ jobs:
 
   deploy-queues-ui:
     docker:
-      - image: circleci/node:16.13
+      - image: cimg/node:16.13
     parameters:
       app:
         type: string
@@ -253,7 +255,7 @@ jobs:
 
   restage:
     docker:
-      - image: cimg/base:2020.01
+      - image: cimg/base:2021.04
     parameters:
       app:
         type: string
@@ -266,7 +268,7 @@ jobs:
 
   run-task:
     docker:
-      - image: cimg/base:2020.01
+      - image: cimg/base:2021.04
     parameters:
       app:
         type: string
