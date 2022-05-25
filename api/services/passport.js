@@ -51,7 +51,7 @@ async function checkUpdateUser({
   }
 
   if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA) && user.UAAIdentity) {
-    return { flashMessage: 'You must login with your UAA account. Please try again.' };
+    return { flashMessage: 'You must login with your cloud.gov account. Please try again.' };
   }
 
   await user.update({
