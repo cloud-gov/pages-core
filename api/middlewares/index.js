@@ -5,6 +5,7 @@ const ensureAuthenticated = require('./ensure-authenticated');
 const ensureOrigin = require('./ensure-origin');
 const errorHandler = require('./error-handler');
 const fourOhFourHandler = require('./four-oh-four-handler');
+const parseForm = require('./parse-form');
 const parseJson = require('./parse-json');
 const sessionAuth = require('./session-auth');
 const xssProtection = require('./xss-protection');
@@ -17,6 +18,7 @@ module.exports = {
   ensureOrigin,
   errorHandler,
   fourOhFourHandler,
+  parseForm,
   parseJson,
   sessionAuth,
   xssProtection,
