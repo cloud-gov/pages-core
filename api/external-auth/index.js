@@ -18,6 +18,7 @@ const script = (nonce, status, content) => `
 `;
 
 const app = express();
+app.disable('x-powered-by');
 app.use(passport.initialize());
 app.get('/auth/github', passport.authenticate('github', { session: false }));
 app.get('/auth/github/callback', (req, res) => {

@@ -91,8 +91,7 @@ export const AddRepoSiteForm = ({
 }
     <button
       type="submit"
-      className="usa-button usa-button-primary"
-      style={{ display: 'inline-block' }}
+      className="usa-button usa-button-primary inline-block"
       disabled={pristine}
     >
       Add repository-based site
