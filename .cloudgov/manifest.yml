@@ -3,7 +3,7 @@ applications:
   - name: ((name))
     buildpack: nodejs_buildpack
     routes:
-      - route: ((app_subdomain))((domain))
+      - route: ((domain))
     processes:
       - type: web
         command: yarn start
@@ -34,7 +34,7 @@ applications:
       NODE_ENV: production
       APP_ENV: ((env))
       ADMIN_HOSTNAME: https://admin.((domain))
-      APP_HOSTNAME: https://((app_subdomain))((domain))
+      APP_HOSTNAME: https://((domain))
       CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
       DOMAIN: ((domain))
@@ -53,6 +53,7 @@ applications:
       PRODUCT: ((product))
       CF_CDN_SPACE_NAME: ((cf_cdn_space_name))
       CF_DOMAIN_WITH_CDN_PLAN_GUID: 440cce96-8989-428b-a60e-91c1393bf3f2
+      NEW_RELIC_ERROR_COLLECTOR_ENABLED: false
   - name: ((product))-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client
