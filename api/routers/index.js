@@ -4,6 +4,7 @@ const mainRouter = express.Router();
 
 mainRouter.use(require('./auth'));
 mainRouter.use(require('./webhook'));
+mainRouter.use(require('./auth-migration'));
 mainRouter.use(require('./main'));
 
 const apiRouter = express.Router();

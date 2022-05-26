@@ -1,33 +1,48 @@
 const { expect } = require('chai');
-// const moment = require('moment');
 const request = require('supertest');
 
 const app = require('../../../app');
 const config = require('../../../config');
-// const { Build } = require('../../../api/models');
 const { authenticatedSession } = require('../support/session');
 const { sessionForCookie, sessionCookieFromResponse } = require('../support/cookieSession');
-// const factory = require('../support/factory');
 
 describe('Main Site', () => {
   describe('Home /', () => {
+    const origFeatureAuthUAA = process.env.FEATURE_AUTH_UAA;
+
+    beforeEach(() => {
+      process.env.FEATURE_AUTH_UAA = false;
+    });
+
+    afterEach(() => {
+      process.env.FEATURE_AUTH_UAA = origFeatureAuthUAA;
+    });
+
     it('should work', () => {
       request(app)
         .get('/')
         .expect(200);
     });
 
-    it('should redirect to /sites when authenticated', (done) => {
-      authenticatedSession()
-        .then(cookie => request(app)
-          .get('/')
-          .set('Cookie', cookie)
-          .expect(302))
-        .then((response) => {
-          expect(response.headers.location).to.equal('/sites');
-          done();
-        })
-        .catch(done);
+    it('should redirect to /migrate/new when authenticated wihout a UAA Identity during the migration period', async () => {
+      process.env.FEATURE_AUTH_UAA = true;
+      const cookie = await authenticatedSession();
+
+      await request(app)
+        .get('/')
+        .set('Cookie', cookie)
+        .expect(302)
+        .expect('Location', '/migrate/new');
+    });
+
+    it('should redirect to /sites when authenticated', async () => {
+      const cookie = await authenticatedSession();
+
+      await request(app)
+        .get('/')
+        .set('Cookie', cookie)
+        .expect(302)
+        .expect('Location', '/sites');
     });
   });
 

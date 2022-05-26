@@ -11,15 +11,7 @@ const sessionCookieFromResponse = (response, sid = 'federalist.sid') => {
 
 const sessionForCookie = (cookie, sid = 'federalist.sid') => {
   const sessionID = cookie.replace(`${sid}=s%3A`, '').split('.')[0];
-  return new Promise((resolve, reject) => {
-    sessionConfig.store.get(sessionID, (err, sessionBody) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(sessionBody);
-      }
-    });
-  });
+  return sessionConfig.store.get(sessionID);
 };
 
 module.exports = {
