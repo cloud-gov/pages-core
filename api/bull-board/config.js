@@ -77,4 +77,13 @@ module.exports = {
     url: REDIS_URL || 'redis://redis:6379',
     tls: REDIS_TLS,
   },
+  rateLimiting: {
+    windowMs: 1 * 60 * 1000, // 1 minute window
+    max: 50, // limit each IP to 50 requests per window
+  },
+  rateSlowing: {
+    windowMs: 1 * 60 * 1000, // 1 minute window
+    delayAfter: 25, // delay requests by delayMs after 25 are made in a window
+    delayMs: 500, // delay requests by 500 ms
+  },
 };
