@@ -411,20 +411,3 @@ workflows:
           filters:
             branches:
               only: staging
-
-  every-ten-minutes:
-    triggers:
-      - schedule:
-          cron: "0,10,20,30,40,50 * * * *"
-          filters:
-            branches:
-              only: main
-    jobs:
-      - run-task:
-          name: timeout-builds-production
-          app: federalistapp
-          task-name: timeout-builds
-          task-command: yarn timeout-builds
-          filters:
-            branches:
-              only: main
