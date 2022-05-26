@@ -6,6 +6,8 @@ const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
 const { ExpressAdapter } = require('@bull-board/express');
 const IORedis = require('ioredis');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const slowDown = require('express-slow-down');
 
 const {
   ArchiveBuildLogsQueue,
@@ -52,7 +54,8 @@ app.enable('trust proxy');
 app.disable('x-powered-by');
 
 app.use(helmet(config.helmet));
-
+app.use(slowDown(config.rateSlowing));
+app.use(rateLimit(config.rateLimiting));
 app.use(expressLogger);
 app.use(sessionConfig());
 app.use(passport.initialize());
