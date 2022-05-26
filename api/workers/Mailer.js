@@ -1,5 +1,3 @@
-const https = require('https');
-
 const HttpClient = require('../utils/httpClient');
 
 const { mailer } = require('../../config');
