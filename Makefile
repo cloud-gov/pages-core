@@ -49,6 +49,9 @@ set-pipeline: ## Set Concourse `web` pipeline
 start: ## Start
 	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml up
 
+start-workers: ## Start with workers
+	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml -f ./docker-compose.workers.yml up
+
 test-client: ## Run client tests
 	docker-compose run --rm app yarn test:client
 

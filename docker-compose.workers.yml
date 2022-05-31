@@ -1,0 +1,43 @@
+version: '3'
+
+volumes:
+  yarn:
+  nm-app:
+
+services:
+  pages-worker:
+    build:
+      dockerfile: Dockerfile-app
+      context: .
+    command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "start-workers"]
+    volumes:
+      - yarn:/usr/local/share/.cache/yarn
+      - .:/app
+      - /app/admin-client/
+      - nm-app:/app/node_modules
+    depends_on:
+      - db
+      - redis
+      - echo
+    environment:
+      APP_HOSTNAME: http://localhost:1337
+      NODE_ENV: development
+      PRODUCT: pages
+  federalist-worker:
+    build:
+      dockerfile: Dockerfile-app
+      context: .
+    command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "start-workers"]
+    volumes:
+      - yarn:/usr/local/share/.cache/yarn
+      - .:/app
+      - /app/admin-client/
+      - nm-app:/app/node_modules
+    depends_on:
+      - db
+      - redis
+      - echo
+    environment:
+      APP_HOSTNAME: http://localhost:1338
+      NODE_ENV: development
+      PRODUCT: federalist
