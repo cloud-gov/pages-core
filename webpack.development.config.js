@@ -54,7 +54,7 @@ module.exports = {
         test: /\.(gif|png|jpe?g|ttf|woff2?|eot)$/i,
         loader: 'file-loader',
         options: {
-          name: 'images/[hash].[ext]',
+          name: 'images/[contenthash].[ext]',
         },
       },
       {
@@ -80,7 +80,7 @@ module.exports = {
             // For all other .svg files, fallback to the file-loader
             loader: 'file-loader',
             options: {
-              name: 'images/[hash].[ext]',
+              name: 'images/[contenthash].[ext]',
             },
           },
         ],
