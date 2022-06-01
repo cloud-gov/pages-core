@@ -67,9 +67,11 @@ async function checkUpdateUser({
 
 async function verifyGithub(accessToken, _refreshToken, profile, callback) {
   try {
-    const isValidUser = await GitHub.validateUser(accessToken, false);
-    if (!isValidUser) {
-      return callback(null, false, flashMessage);
+    if (config.app.product !== 'pages') {
+      const isValidUser = await GitHub.validateUser(accessToken, false);
+      if (!isValidUser) {
+        return callback(null, false, flashMessage);
+      }
     }
 
     const username = profile.username.toLowerCase();
