@@ -6,14 +6,14 @@ const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { getFeatureFlags } = require('./webpack-utils');
 
 const fileLoaderOptions = {
-  name: '/styles/webpackAssets/[hash].[ext]',
+  name: '/styles/webpackAssets/[contenthash].[ext]',
 };
 
 module.exports = {
   mode: 'production',
   entry: './frontend/main.jsx',
   output: {
-    filename: 'js/bundle.[hash].js',
+    filename: 'js/bundle.[contenthash].js',
     path: path.resolve(__dirname, 'public'),
   },
   resolve: {
