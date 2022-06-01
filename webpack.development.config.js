@@ -9,7 +9,9 @@ module.exports = {
   entry: './frontend/main.jsx',
   devtool: 'inline-source-map',
   devServer: {
-    contentBase: './dist',
+    static: {
+      directory: './dist',
+    },
   },
   output: {
     filename: 'bundle.js',
