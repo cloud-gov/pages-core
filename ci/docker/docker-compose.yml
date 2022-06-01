@@ -2,7 +2,7 @@ version: '3'
 
 services:
   app:
-    image: node:16.13
+    image: node:16.14
     volumes:
       - ../..:/app
     depends_on:
@@ -13,6 +13,7 @@ services:
       CC_TEST_REPORTER_ID: 101a439651b6abd27e5440028a53b5b8f08fe0889f3948d5f58f6cf9f7c786a0
       CONCOURSE: 'true'
       APP_HOSTNAME: http://localhost:1337
+      FEATURE_AUTH_GITHUB: 'true'
       FEATURE_AUTH_UAA: 'true'
       PRODUCT: pages
       CLOUD_FOUNDRY_API_HOST: https://api.example.com

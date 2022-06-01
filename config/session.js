@@ -12,4 +12,5 @@ module.exports = {
   proxy: true,
   resave: true,
   saveUninitialized: true,
+  rolling: true,
 };

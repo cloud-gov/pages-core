@@ -36,7 +36,7 @@
     "js-yaml": "^4.1.0",
     "json-to-csv": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
-    "moment": "^2.28.0",
+    "moment": "^2.29.2",
     "newrelic": "^7.0",
     "node-schedule": "^2.0.0",
     "nunjucks": "^3.2.2",
@@ -175,7 +175,7 @@
     "webpack-manifest-plugin": "^3.0.0"
   },
   "engines": {
-    "node": "^16.13.1",
+    "node": "^16.14.x",
     "npm": "^8.1.2"
   }
 }

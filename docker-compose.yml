@@ -25,7 +25,7 @@ services:
     environment:
       APP_HOSTNAME: http://localhost:1337
       DOMAIN: localhost:1337
-      FEATURE_AUTH_GITHUB: 'false'
+      FEATURE_AUTH_GITHUB: 'true'
       FEATURE_AUTH_UAA: 'true'
       PORT: 1337
       PRODUCT: pages
@@ -126,23 +126,6 @@ services:
     image: redis
     ports:
       - 6379:6379
-  worker:
-    build:
-      dockerfile: Dockerfile-app
-      context: .
-    command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "start-workers"]
-    volumes:
-      - yarn:/usr/local/share/.cache/yarn
-      - .:/app
-      - /app/admin-client/
-      - nm-app:/app/node_modules
-    depends_on:
-      - db
-      - redis
-      - echo
-    environment:
-      APP_HOSTNAME: http://localhost:1337
-      NODE_ENV: development
   echo:
     image: node:16
     volumes:

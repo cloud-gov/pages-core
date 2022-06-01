@@ -6,45 +6,42 @@
   <div id="home">
     <div class="well">
       <div class="usa-grid federalist-hero">
-        <div class="usa-width-one-third">
+        <div class="usa-width-one-fourth">
           &nbsp;
         </div>
-        <div class="usa-width-one-third">
+        <div class="usa-width-one-half">
           <p>This is a U.S. government service. Your use indicates your consent to monitoring, recording, and no expectation of privacy. Misuse is subject to criminal and civil penalties. <a href="/system-use">Read more details.</a><br></p>
-          <div class="hero-heading">
-            {% if authUAA %}
-              <div class="well-gray-lightest">
-                <a href="/login">
-                  <button class="usa-button">
-                    Agree and continue with cloud.gov authentication
-                  </button>
-                </a>
-              </div>
-            {% endif %}
-            {% if authGithub and authUAA %}
-              <div class="well">
-                <p style="text-align: center;">
-                  or...
-                </p>
-              </div>
-            {% endif %}
-            {% if authGithub %}
-              <div class="well-gray-lightest">
-                {% if authUAA %}
-                  <h5>Don't have cloud.gov account yet? Use your Github account.</h5>
-                {% endif %}
-                <a href="/login/github">
-                  <button class="usa-button">
-                    <img src="/images/github-logo.png"> Agree and continue with GitHub
-                  </button>
-                </a>
-              </div>
-            {% endif%}
-          </div>
-          <p></p>
-          <p>{{ appName }} users are authenticated with {% if authUAA %} cloud.gov {% else %} GitHub OAuth {% endif %}.<br></p>
           {% if authUAA %}
-            <p>If your office uses {{ appName }}, ask your team’s primary contact to send an email to {{ supportEmail }} with the GitHub usernames that need access.</p>
+            <div class="well-gray-lightest text-center">
+              <a href="/login">
+                <button class="usa-button">
+                  Agree and continue with cloud.gov authentication
+                </button>
+              </a>
+            </div>
+          {% endif %}
+          {% if authGithub and authUAA %}
+            <div class="well">
+              <p class="hero-heading text-center">
+                Don't have cloud.gov account yet?
+              </p>
+            </div>
+            <p>
+              When you authenticate with Github, you will be prompted to create a cloud.gov account. You have until ___ to complete this process, after which only cloud.gov authentication will be supported.
+            </p>
+          {% endif %}
+          {% if authGithub %}
+            <div class="well-gray-lightest text-center">
+              <a href="/login/github">
+                <button class="usa-button">
+                  <img src="/images/github-logo.png" alt="github logo"> Agree and continue with GitHub
+                </button>
+              </a>
+            </div>
+          {% endif%}
+          <p></p>
+          {% if authUAA %}
+            <p>If your office uses {{ appName }}, and you have any questions, please reach out to us at {{ supportEmail }}.</p>
           {% endif %}
         </div>
         <div class="usa-width-one-third">

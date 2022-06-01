@@ -12,7 +12,7 @@ node-image: &node-image
   type: docker-image
   source:
     repository: node
-    tag: 16.13
+    tag: 16.14
 
 cf-image: &cf-image
   platform: linux
@@ -118,7 +118,7 @@ test-admin-client: &test-admin-client
       inputs: [name: src-admin-client]
       outputs: [name: src-admin-client]
       params:
-        API_URL: https://app.pages-staging.cloud.gov
+        API_URL: https://pages-staging.cloud.gov
         NODE_ENV: production
       run:
         dir: src-admin-client/admin-client
@@ -251,7 +251,7 @@ jobs:
           inputs: [name: src-api]
           outputs: [name: src-api]
           params:
-            APP_HOSTNAME: https://app.pages-staging.cloud.gov
+            APP_HOSTNAME: https://pages-staging.cloud.gov
             PRODUCT: pages
           run:
             dir: src-api
@@ -329,7 +329,7 @@ jobs:
             dir: src-admin-client
             path: ci/tasks/configure-admin-client-nginx.sh
         params:
-          API_DOMAIN: app.pages-staging.cloud.gov
+          API_DOMAIN: pages-staging.cloud.gov
 
       - task: deploy-admin-client
         config:
@@ -561,7 +561,7 @@ resources:
     type: docker-image
     source:
       repository: node
-      tag: 16.13
+      tag: 16.14
 
   - name: slack
     type: slack-notification
