@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const nock = require('nock');
 
 const Mailer = require('../../../api/workers/Mailer');
@@ -22,8 +23,9 @@ describe('Mailer', () => {
         .post('/send', { html, subject, to })
         .reply(200);
 
-      await mailer.send({ html, subject, to });
+      const response = await mailer.send({ html, subject, to });
 
+      expect(response).to.deep.eq({ data: '', status: 200 });
       scope.done();
     });
   });

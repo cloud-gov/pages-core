@@ -9,8 +9,8 @@ class Mailer {
     this.username = username;
   }
 
-  send({ html, subject, to }) {
-    return this.httpClient.request({
+  async send({ html, subject, to }) {
+    const { data, status } = await this.httpClient.request({
       method: 'POST',
       url: '/send',
       auth: {
@@ -19,6 +19,8 @@ class Mailer {
       },
       data: { to, subject, html },
     });
+
+    return { data, status };
   }
 }
 
