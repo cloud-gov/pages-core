@@ -1,8 +1,9 @@
+const { expect } = require('chai');
 const nock = require('nock');
 
 const Mailer = require('../../../api/workers/Mailer');
 
-describe('Mailer', () => {
+describe.only('Mailer', () => {
   describe('.send()', () => {
     it('sends a POST request to the mailer with basic auth and data', async () => {
       const host = 'http://localhost:2343';
@@ -22,8 +23,9 @@ describe('Mailer', () => {
         .post('/send', { html, subject, to })
         .reply(200);
 
-      await mailer.send({ html, subject, to });
+      const response = await mailer.send({ html, subject, to });
 
+      expect(response).to.deep.eq({ data: '', status: 200 });
       scope.done();
     });
   });
