@@ -3,7 +3,7 @@ const nock = require('nock');
 
 const Mailer = require('../../../api/workers/Mailer');
 
-describe.only('Mailer', () => {
+describe('Mailer', () => {
   describe('.send()', () => {
     it('sends a POST request to the mailer with basic auth and data', async () => {
       const host = 'http://localhost:2343';
