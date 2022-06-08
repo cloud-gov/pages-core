@@ -26,7 +26,7 @@ module.exports = {
     org: ADMIN_GITHUB_ORGANIZATION,
     team: ADMIN_GITHUB_TEAM,
   },
-  appEnv: APP_ENV,
+  appEnv: APP_ENV ?? 'development',
   cookie: {
     secure: NODE_ENV === 'production',
   },
