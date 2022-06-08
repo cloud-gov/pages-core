@@ -36,8 +36,23 @@ module.exports = {
       directives: {
         'script-src': [
           "'self'",
-          'fonts.gstatic.com',
-          'fonts.googleapis.com',
+        ],
+        'font-src': [
+          "'self'",
+          'https://fonts.gstatic.com',
+        ],
+        'style-src': [
+          "'self'",
+          'https://fonts.googleapis.com/css2',
+        ],
+        'child-src': [
+          "'none'",
+        ],
+        'frame-src': [
+          "'none'",
+        ],
+        'worker-src': [
+          "'none'",
         ],
       },
     },
