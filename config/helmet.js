@@ -14,11 +14,10 @@ module.exports = {
       ],
       'connect-src': [
         "'self'",
-        'www.google-analytics.com',
+        'https://www.google-analytics.com/j/collect',
       ],
       'font-src': [
         "'self'",
-        'https:', 'data:',
       ],
       'frame-ancestors': [
         "'none'",
@@ -35,8 +34,8 @@ module.exports = {
       ],
       'script-src': [
         "'self'",
-        'dap.digitalgov.gov',
-        'www.google-analytics.com',
+        'https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js',
+        'https://www.google-analytics.com/analytics.js',
         (_, res) => `'nonce-${res.locals.cspNonce}'`,
       ],
       'script-src-attr': [
@@ -44,7 +43,15 @@ module.exports = {
       ],
       'style-src': [
         "'self'",
-        'https:',
+      ],
+      'child-src': [
+        "'none'"
+      ],
+      'frame-src': [
+        "'none'"
+      ],
+      'worker-src': [
+        "'none'"
       ],
       'block-all-mixed-content': [],
     },
