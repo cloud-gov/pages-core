@@ -100,9 +100,9 @@ function federalistWorker(connection) {
 }
 
 function pagesWorker(connection) {
-  const mailJobProcessor = appEnv === 'production'
-    ? job => (new Mailer()).send(job.data)
-    : job => logger.info(job.data);
+  const mailJobProcessor = appEnv === 'development'
+    ? job => logger.info(job.data)
+    : job => (new Mailer()).send(job.data);
 
   const scheduledJobProcessor = Processors.multiJobProcessor({
     revokeMembershipForUAAUsers: Processors.revokeMembershipForUAAUsers,
