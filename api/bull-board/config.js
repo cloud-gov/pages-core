@@ -46,13 +46,13 @@ module.exports = {
           'https://fonts.googleapis.com/css2',
         ],
         'child-src': [
-          "'none'"
+          "'none'",
         ],
         'frame-src': [
-          "'none'"
+          "'none'",
         ],
         'worker-src': [
-          "'none'"
+          "'none'",
         ],
       },
     },

@@ -45,13 +45,13 @@ module.exports = {
         "'self'",
       ],
       'child-src': [
-        "'none'"
+        "'none'",
       ],
       'frame-src': [
-        "'none'"
+        "'none'",
       ],
       'worker-src': [
-        "'none'"
+        "'none'",
       ],
       'block-all-mixed-content': [],
     },
