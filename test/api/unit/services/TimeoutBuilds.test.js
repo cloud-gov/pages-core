@@ -41,7 +41,7 @@ describe('TimeoutBuilds', () => {
     const now = moment();
     const timeout = 45;
 
-    const [b1, b2, b3] = await Promise.all([
+    const [b1, b2] = await Promise.all([
       // should be timed out
       factory.build({ state: Processing, startedAt: now.clone().subtract(timeout + 22, 'minutes').toDate() }),
       factory.build({ state: Processing, startedAt: now.clone().subtract(timeout + 20, 'minutes').toDate() }),
@@ -62,19 +62,18 @@ describe('TimeoutBuilds', () => {
 
     const results = await timeoutBuilds(now);
 
-    expect(results.length).to.equal(3);
-    expect(results.map(r => r[0])).to.have.members([b1.id, b2.id, b3.id]);
+    expect(results.length).to.equal(2);
+    expect(results.map(r => r[0])).to.have.members([b1.id, b2.id]);
     expect(results.map(r => r[1])).to.have.deep.members([
       { status: 'fulfilled', value: undefined },
       { status: 'rejected', reason: error },
-      { status: 'fulfilled', value: undefined },
     ]);
 
-    await Promise.all([b1.reload(), b2.reload(), b3.reload()]);
+    await Promise.all([b1.reload(), b2.reload()]);
 
-    sinon.assert.calledThrice(cancelBuildTaskStub);
+    sinon.assert.calledTwice(cancelBuildTaskStub);
 
-    [b1, b2, b3].forEach((b) => {
+    [b1, b2].forEach((b) => {
       expect(b.state).to.equal('error');
       expect(b.error).to.equal('The build timed out');
       expect(b.completedAt.toString()).to.equal(now.toDate().toString());
