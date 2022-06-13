@@ -12,7 +12,6 @@ const timeoutBuilds = async (date = new Date()) => {
 
   const now = moment(date);
   const buildTimout = now.clone().subtract(TIMEOUT, 'minutes');
-  const taskTimeout = now.clone().subtract(5, 'minutes');
 
   const atts = {
     error: 'The build timed out',
@@ -22,29 +21,13 @@ const timeoutBuilds = async (date = new Date()) => {
 
   const options = {
     where: {
-      [Op.or]: [
-
-        /*
-          The garden build itself should timout builds once they start, but just in case
-        */
-        {
-          state: Build.States.Processing,
-          startedAt: {
-            [Op.lt]: buildTimout.toDate(),
-          },
-        },
-
-        /*
-          The builder created the cloud foundry task but the garden build failed
-          before starting the build
-        */
-        {
-          state: Build.States.Tasked,
-          updatedAt: {
-            [Op.lt]: taskTimeout.toDate(),
-          },
-        },
-      ],
+      /*
+        The garden build itself should timout builds once they start, but just in case
+      */
+      state: Build.States.Processing,
+      startedAt: {
+        [Op.lt]: buildTimout.toDate(),
+      },
     },
     returning: ['id'],
   };
