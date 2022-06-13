@@ -1307,6 +1307,34 @@ describe('Site API', () => {
         .catch(done);
     });
 
+    it('does not destroy the site when the site has a domain', async () => {
+      nock.cleanAll();
+
+      const user = await factory.user();
+      const site = await factory.site({ users: [user] });
+      const domain = await factory.domain.create({ siteId: site.id });
+
+      githubAPINocks.repo({
+        owner: site.owner,
+        repository: site.repo,
+        response: [200, {
+          permissions: { admin: true, push: true },
+        }],
+      });
+
+      const cookie = await authenticatedSession(user);
+
+      const response = await request(app)
+        .delete(`/v0/site/${site.id}`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .set('Cookie', cookie)
+        .expect(422);
+      
+      await site.reload({ paranoid: false });
+      expect(site.isSoftDeleted()).to.be.false;
+      expect(response.body.message).to.have.string(domain.names);
+    });
+
     it('should not allow a user to delete a site not associated with their account', (done) => {
       let site;
 

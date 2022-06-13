@@ -45,10 +45,11 @@ describe('SiteDestroyer', () => {
       const site = await factory.site();
       const user = null;
 
-      await SiteDestroyer.destroySite(site, user);
+      const result = await SiteDestroyer.destroySite(site, user);
 
       await site.reload({ paranoid: false });
 
+      expect(result).to.deep.eq(['ok']);
       expect(site.isSoftDeleted()).to.be.true;
       sinon.assert.calledOnceWithExactly(SiteDestroyer.destroySiteInfra, site, user);
     });
@@ -57,6 +58,21 @@ describe('SiteDestroyer', () => {
       const error = await SiteDestroyer.destroySite(null, null).catch(e => e);
 
       expect(error).to.be.an('error');
+      sinon.assert.notCalled(SiteDestroyer.destroySiteInfra);
+    });
+
+    it('does not destroy the site when the site has a domain', async () => {
+      const site = await factory.site();
+      const user = null;
+      const domain = await factory.domain.create({ siteId: site.id });
+
+      const result = await SiteDestroyer.destroySite(site, user);
+
+      await site.reload({ paranoid: false });
+
+      expect(result[0]).to.eq('error');
+      expect(result[1]).to.have.string(domain.names);
+      expect(site.isSoftDeleted()).to.be.false;
       sinon.assert.notCalled(SiteDestroyer.destroySiteInfra);
     });
   });

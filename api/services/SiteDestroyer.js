@@ -31,9 +31,22 @@ module.exports.destroySiteInfra = async function destroySiteInfra(site, user) {
 };
 
 module.exports.destroySite = async function destroySite(site, user) {
+  const domains = await site.getDomains();
+  if (domains.length > 0) {
+    // To simplify, not making a distinction on the state of the domain (provisioned or not),
+    // the domain must be deprovisioned and deleted to delete the site.
+    const message = `
+      This site is associated with the following custom domains and cannot be deleted until they have been deleted:
+      ${domains.map(domain => domain.names).join(', ')}
+    `;
+    return ['error', message];
+  }
+
   await site.destroy();
 
   // Don't wait for the infra, this should be all good from the user's point of view
   module.exports.destroySiteInfra(site, user)
     .catch(() => {});
+
+  return ['ok'];
 };
