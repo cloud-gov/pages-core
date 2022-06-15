@@ -22,7 +22,7 @@ const timeoutBuilds = async (date = new Date()) => {
   const options = {
     where: {
       /*
-        The garden build itself should timout builds once they start, but just in case
+        The garden build itself should timeout builds once they start, but just in case
       */
       state: Build.States.Processing,
       startedAt: {
