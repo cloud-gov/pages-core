@@ -131,16 +131,28 @@ const mockCreateS3ServiceInstance = (body, resources) => {
   return n.reply(200, resources);
 };
 
-const mockCreateService = ({
-  domains, name, origin, path,
-}, resources) => {
-  const matcher = body => body.name === name
-      && body.parameters.domains === domains
-      && body.parameters.origin === origin
-      && body.parameters.path === path;
+const mockCreateService = (
+  { domains, name, origin, path, pageNotFound },
+  resources
+) => {
+  const matcher = (body) =>
+    body.name === name &&
+    body.parameters.domains === domains &&
+    body.parameters.origin === origin &&
+    body.parameters.path === path &&
+    body.metadata.annotations.domains === domains &&
+    body.metadata.annotations.origin === origin &&
+    body.metadata.annotations.path === path &&
+    (pageNotFound
+      ? body.metadata.annotations.error_responses ===
+        `{ "404": "${pageNotFound}" }`
+      : true) &&
+    (pageNotFound
+      ? body.parameters.error_responses === `{ "404": "${pageNotFound}" }`
+      : true);
 
   return nock(url, reqheaders)
-    .post('/v3/service_instances', matcher)
+    .post("/v3/service_instances", matcher)
     .reply(200, resources);
 };
 

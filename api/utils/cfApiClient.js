@@ -91,8 +91,9 @@ class CloudFoundryAPIClient {
    * @param {string} params.name The CF service name
    * @param {string} params.origin The target origin of the domains
    * @param {string} params.path The target path of the domains
+   * @param {string} [params.pageNotFound] The optional path for a custom 404 page for the domains
    * @param {string} params.cfCdnSpaceName The name of the cf space to put the domain
-   * @param {string} params.cfDomainWithCdnPlanGuid The guuid of the external domain service plan
+   * @param {string} params.cfDomainWithCdnPlanGuid The guid of the external domain service plan
    * @returns
    */
   async createExternalDomain(params) {
@@ -101,12 +102,15 @@ class CloudFoundryAPIClient {
       name,
       origin,
       path,
+      pageNotFound,
       cfCdnSpaceName,
       cfDomainWithCdnPlanGuid,
     } = params;
 
     const spaceGuid = await this.authRequest('GET', `/v3/spaces?names=${cfCdnSpaceName}`)
       .then(res => res.resources[0].guid);
+
+    const error_responses = pageNotFound ? `{ "404": "${pageNotFound}" }` : undefined;
 
     const body = {
       type: 'managed',
@@ -123,8 +127,17 @@ class CloudFoundryAPIClient {
           },
         },
       },
+      metadata: {
+        annotations: {
+          domains,
+          error_responses,
+          origin,
+          path,
+        },
+      },
       parameters: {
         domains,
+        error_responses,
         origin,
         path,
       },

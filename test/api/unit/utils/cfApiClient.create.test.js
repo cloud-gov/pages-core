@@ -281,5 +281,30 @@ describe('CloudFoundryAPIClient', () => {
         cfDomainWithCdnPlanGuid: config.env.cfDomainWithCdnPlanGuid,
       });
     });
+
+    it('creates the service with custom 404 error page', async () => {
+      const domains = 'www.agency.gov';
+      const name = 'www.agency.gov-ext';
+      const origin = 'abc.sites.pages.cloud.gov';
+      const path = '/site/owner/repo/';
+      const pageNotFound = '/index.html';
+
+      mockTokenRequest();
+      apiNocks.mockFetchSpacesRequest(config.env.cfCdnSpaceName, { resources: [{ guid: 'guid' }] });
+      apiNocks.mockCreateService({
+        domains, name, origin, path, pageNotFound
+      }, {});
+
+      const apiClient = new CloudFoundryAPIClient();
+      await apiClient.createExternalDomain({
+        domains,
+        name,
+        origin,
+        path,
+        pageNotFound,
+        cfCdnSpaceName: config.env.cfCdnSpaceName,
+        cfDomainWithCdnPlanGuid: config.env.cfDomainWithCdnPlanGuid,
+      });
+    });
   });
 });
