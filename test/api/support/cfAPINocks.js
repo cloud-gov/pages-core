@@ -144,12 +144,11 @@ const mockCreateService = (
     body.metadata.annotations.origin === origin &&
     body.metadata.annotations.path === path &&
     (pageNotFound
-      ? body.metadata.annotations.error_responses ===
-        `{ "404": "${pageNotFound}" }`
-      : true) &&
+      ? body.metadata.annotations.error_responses["404"] === pageNotFound
+      : Object.keys(body.metadata.annotations.error_responses).length === 0) &&
     (pageNotFound
-      ? body.parameters.error_responses === `{ "404": "${pageNotFound}" }`
-      : true);
+      ? body.parameters.error_responses["404"] === pageNotFound
+      : Object.keys(body.parameters.error_responses).length === 0);
 
   return nock(url, reqheaders)
     .post("/v3/service_instances", matcher)

@@ -110,7 +110,7 @@ class CloudFoundryAPIClient {
     const spaceGuid = await this.authRequest('GET', `/v3/spaces?names=${cfCdnSpaceName}`)
       .then(res => res.resources[0].guid);
 
-    const error_responses = pageNotFound ? `{ "404": "${pageNotFound}" }` : undefined;
+    const errorResponses = pageNotFound ? { 404: pageNotFound } : {};
 
     const body = {
       type: 'managed',
@@ -130,14 +130,14 @@ class CloudFoundryAPIClient {
       metadata: {
         annotations: {
           domains,
-          error_responses,
+          error_responses: errorResponses,
           origin,
           path,
         },
       },
       parameters: {
         domains,
-        error_responses,
+        error_responses: errorResponses,
         origin,
         path,
       },
