@@ -67,7 +67,12 @@ module.exports = wrapHandlers({
     }
 
     await authorizer.destroy(user, site);
-    await SiteDestroyer.destroySite(site, user);
+    const [status, message] = await SiteDestroyer.destroySite(site, user);
+
+    if (status !== 'ok') {
+      return res.unprocessableEntity({ message });
+    }
+
     EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Site Destroyed', { site });
     return res.json({});
   },
