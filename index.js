@@ -7,16 +7,6 @@ const socketIO = require('./api/socketIO');
 
 const { PORT = 1337 } = process.env;
 
-const { env: { newRelicAppName, newRelicLicenseKey } } = config;
-
-// If settings present, start New Relic
-if (newRelicAppName && newRelicLicenseKey) {
-  logger.info(`Activating New Relic: ${newRelicAppName}`);
-  require('newrelic'); // eslint-disable-line global-require
-} else {
-  logger.warn('Skipping New Relic Activation');
-}
-
 require('./app');
 
 scheduleJobs();
