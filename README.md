@@ -190,16 +190,44 @@ To deploy to CloudFoundry submit the following:
 #### Continuous Integration
 We are in the process of migrating from CircleCI to an internal instance of Concourse CI, starting with our staging environment. To use Concourse, one must have appropriate permissions in UAA as administered by the cloud.gov operators. Access to Concourse also requires using the GSA VPN.
 
-Until CredHub is up and running, credentials must be passed by setting pipelines locally.
-
 1. To get started install and authenticate with the `fly` CLI:
 - `brew install --cask fly`
-- `fly -t pages-staging login -n pages -c <concourse url>`
+- `fly -t <Concourse Target Name> login -n pages -c <concourse url>`
 
 2. Update local credential files (see ci/vars/example.yml)
 
-3. Set a pipeline:
-`fly -t pages-staging sp -p <pipeline name> -c ci/pipeline.yml -l ci/vars/.<env>.yml`
+### Pipeline instance variables
+Three instances of the pipeline are set for the `pages staging`, `pages production`, and `federalist production` environments. Each instance of the pipeline has two instance variables associated to it: `deploy-env`, `git-branch`. `product`
+
+|Instance Variable |Pages Staging| Pages Production| Federalist Production|
+--- | --- | ---| ---|
+|**`deploy-env`**|`staging`|`production`|`production`|
+|**`git-branch`**|`staging`|`main`|`main`|
+|**`product`**|`pages`|`pages`|`federalist`|
+
+### Setting up the pipeline
+The pipeline and each of it's instances will only needed to be set once per instance to create the initial pipeline. After the pipelines are set, updates to the respective `git-branch` source will automatically set the pipeline with any updates. See the [`set_pipeline` step](https://concourse-ci.org/set-pipeline-step.html) for more information. Run the following command with the fly CLI to set a pipeline instance:
+
+```bash
+$ fly -t <Concourse CI Target Name> set-pipeline -p proxy \
+  -c ci/pipeline.yml \
+  -i git-branch=main \
+  -i deploy-env=production
+  -i product=pages
+```
+
+### Getting or deleting a pipeline instance from the CLI
+To get a pipeline instance's config or destroy a pipeline instance, Run the following command with the fly CLI to set a pipeline:
+
+```bash
+## Get a pipeline instance config
+$ fly -t <Concourse CI Target Name> get-pipeline \
+  -p proxy/deploy-env:production,git-branch:main,product:pages
+
+## Destroy a pipeline
+$ fly -t <Concourse CI Target Name> destroy-pipeline \
+  -p proxy/deploy-env:production,git-branch:main,product:pages
+```
 
 ##### Accessing Concourse Jumpbox
 
