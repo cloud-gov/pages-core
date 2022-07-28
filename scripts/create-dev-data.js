@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const { addDays } = require('date-fns')
+const { addDays } = require('date-fns');
 Promise.props = require('promise-props');
 const BuildLogs = require('../api/services/build-logs');
 const { encrypt } = require('../api/services/Encryptor');
@@ -308,7 +308,7 @@ async function createData() {
     }),
     Build.create({
       branch: nodeSite.defaultBranch,
-      completedAt: new addDays(new Date(), -3),
+      completedAt: addDays(new Date(), -3),
       source: 'fake-build',
       state: 'error',
       site: nodeSite.id,
@@ -332,7 +332,7 @@ async function createData() {
   const goSiteBuilds = await Promise.all([
     Build.create({
       branch: goSite.defaultBranch,
-      completedAt: new addDays(new Date(), -14),
+      completedAt: addDays(new Date(), -14),
       source: 'fake-build',
       state: 'success',
       site: goSite.id,
