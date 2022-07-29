@@ -2,7 +2,6 @@
 import { format, formatRelative } from 'date-fns';
 
 export const formatDateTime = (date, relative = false) => {
-  console.log(relative)
   try {
     return relative
     ? formatRelative(new Date(date), new Date())
