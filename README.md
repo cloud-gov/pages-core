@@ -197,13 +197,31 @@ We are in the process of migrating from CircleCI to an internal instance of Conc
 2. Update local credential files (see ci/vars/example.yml)
 
 ### Pipeline instance variables
-Three instances of the pipeline are set for the `pages staging`, `pages production`, and `federalist production` environments. Each instance of the pipeline has two instance variables associated to it: `deploy-env`, `git-branch`. `product`
+Three instances of the pipeline are set for the `pages staging`, `pages production`, and `federalist production` environments. Instance variables are used to fill in Concourse pipeline parameter variables bearing the same name as the instance variable. See more on [Concourse vars](https://concourse-ci.org/vars.html). Each instance of the pipeline has three instance variables associated to it: `deploy-env`, `git-branch`. `product`
 
 |Instance Variable |Pages Staging| Pages Production| Federalist Production|
 --- | --- | ---| ---|
 |**`deploy-env`**|`staging`|`production`|`production`|
 |**`git-branch`**|`staging`|`main`|`main`|
 |**`product`**|`pages`|`pages`|`federalist`|
+
+## Pipeline credentials
+Concourse CI integrates directly with [Credhub](https://docs.cloudfoundry.org/credhub/) to provide access to credentials/secrets at job runtime. When a job is started, Concourse will resolve the parameters within the pipeline with the latest credentials using the double parentheses notation (ie. `((<credential-name>))`). See more about the [credentials lookup rules](https://concourse-ci.org/credhub-credential-manager.html#credential-lookup-rules).
+
+Some credentials in this pipeline are "compound" credentials that use the pipeline's instance variable in conjuction with its parameterized variables to pull the correct Credhub credentials based on the pipeline instance. The following parameters are used in the proxy pipeline:
+
+|Parameter|Description|Is Compound|
+--- | --- | --- |
+|**`((deploy-env))-cf-username`**|The deployment environments CloudFoundry deployer username based on the instanced pipeline|:white_check_mark:|
+|**`((deploy-env))-cf-username`**|The deployment environments CloudFoundry deployer password based on the instanced pipeline|:white_check_mark:|
+|**`((deploy-env))-((product))-domain`**|The deployment envinronment and product(Pages|Federalist) specific domain for the app|:white_check_mark:|
+|**`((slack-channel))`**| Slack channel | :x:|
+|**`((slack-username))`**| Slack username | :x:|
+|**`((slack-icon-url))`**| Slack icon url | :x:|
+|**`((slack-webhook-url))`**| Slack webhook url | :x:|
+|**`((git-base-url))`**|The base url to the git server's HTTP endpoint|:x:|
+|**`((pages-repository-path))`**|The url path to the repository|:x:|
+|**`((gh-access-token))`**| The Github access token|:x:|
 
 ### Setting up the pipeline
 The pipeline and each of it's instances will only needed to be set once per instance to create the initial pipeline. After the pipelines are set, updates to the respective `git-branch` source will automatically set the pipeline with any updates. See the [`set_pipeline` step](https://concourse-ci.org/set-pipeline-step.html) for more information. Run the following command with the fly CLI to set a pipeline instance:
