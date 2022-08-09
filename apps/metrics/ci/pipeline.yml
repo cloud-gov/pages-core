@@ -12,7 +12,7 @@ node-image: &node-image
   type: docker-image
   source:
     repository: node
-    tag: 16.14
+    tag: 16
 
 cf-image: &cf-image
   platform: linux
@@ -120,8 +120,9 @@ jobs:
     plan:
       - get: src-metrics
         resource: src-((deploy-env))
-        trigger: true
+        passed: [set-pipeline-((deploy-env))]
         params: {depth: 1}
+        trigger: true
       - put: gh-status
         inputs: [src-metrics]
         params: {state: pending}
@@ -200,6 +201,7 @@ jobs:
     plan:
       - get: src-metrics
         resource: src-((deploy-env))
+        passed: [set-pipeline-((deploy-env))]
         params: {depth: 1}
       - get: nightly
         trigger: true
