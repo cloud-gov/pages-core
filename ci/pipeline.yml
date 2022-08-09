@@ -510,12 +510,14 @@ jobs:
     plan:
     - get: src
       resource: src-((deploy-env))
+      params: {depth: 1}
       trigger: true
     - set_pipeline: core
       file: src/ci/pipeline.yml
       instance_vars:
         deploy-env: ((deploy-env))
         git-branch: ((git-branch))
+        product: ((product))
 
 ############################
 #  RESOURCES
