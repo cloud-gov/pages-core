@@ -282,6 +282,32 @@ jobs:
             params:
               <<: *env-cf
               CF_APP_NAME: pages-((deploy-env))
+
+      - task: run-database-migrations
+        config:
+          <<: *cf-image
+          inputs: [name: src-api]
+          run:
+            path: src-api/ci/tasks/run-task.sh
+        params:
+          <<: *env-cf
+          CF_APP_NAME: pages-((deploy-env))
+          CF_TASK_NAME: run-migrations
+          CF_TASK_COMMAND: 'yarn run migrate:up'
+        on_failure:
+          in_parallel:
+            - put: gh-status
+              inputs: [src-api]
+              params: {state: failure}
+            - put: slack
+              params:
+                text: |
+                  :x: FAILED: to migrate database for pages ((deploy-env))
+                  <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+                channel: ((slack-channel))
+                username: ((slack-username))
+                icon_url: ((slack-icon-url))
+
     on_failure:
       in_parallel:
         - put: gh-status
@@ -524,7 +550,7 @@ jobs:
 
 resources:
 
-  - name: pr-((git-branch))
+  - name: pr-((deploy-env))
     type: pull-request
     check_every: 1m
     source:

@@ -232,7 +232,7 @@ jobs:
 
 resources:
 
-  - name: pr-((git-branch))
+  - name: pr-((deploy-env))
     type: pull-request
     check_every: 1m
     source:
