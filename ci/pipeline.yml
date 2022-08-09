@@ -413,65 +413,65 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  # - name: deploy-queues-ui-pages-((deploy-env))
-  #   plan:
-  #     - get: src-queues-ui
-  #       resource: src-((deploy-env))
-  #       passed: [set-pipeline]
-  #       trigger: true
-  #       params: {depth: 1}
-  #     - put: gh-status
-  #       inputs: [src-queues-ui]
-  #       params: {state: pending}
-  #     - task: deploy-queues-ui
-  #       config:
-  #         <<: *cf-image
-  #         inputs: [name: src-queues-ui]
-  #         run:
-  #           path: src-queues-ui/ci/tasks/deploy.sh
-  #       params:
-  #         <<: *env-cf
-  #         CF_APP_NAME: pages-queues-ui-((deploy-env))
-  #         CF_MANIFEST: src-queues-ui/.cloudgov/manifest.yml
-  #         CF_VARS_FILE: src-queues-ui/.cloudgov/vars/pages-((deploy-env)).yml
-  #         CF_PATH: src-queues-ui
-  #       on_failure:
-  #         try:
-  #           task: cancel-queues-ui-deployment
-  #           config:
-  #             <<: *cf-image
-  #             inputs: [name: src-queues-ui]
-  #             run:
-  #               path: src-queues-ui/ci/tasks/cancel-deployment.sh
-  #           params:
-  #             <<: *env-cf
-  #             CF_APP_NAME: pages-queues-ui-((deploy-env))
-  #   on_failure:
-  #     in_parallel:
-  #       - put: gh-status
-  #         inputs: [src-queues-ui]
-  #         params: {state: failure}
-  #       - put: slack
-  #         params:
-  #           text: |
-  #             :x: FAILED: pages queues UI deployment on pages ((deploy-env))
-  #             <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-  #           channel: ((slack-channel))
-  #           username: ((slack-username))
-  #           icon_url: ((slack-icon-url))
-  #   on_success:
-  #     in_parallel:
-  #       - put: gh-status
-  #         inputs: [src-queues-ui]
-  #         params: {state: success}
-  #       - put: slack
-  #         params:
-  #           text: |
-  #             :white_check_mark: SUCCESS: Successfully deployed pages queues UI on pages ((deploy-env))
-  #             <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-  #           channel: ((slack-channel))
-  #           username: ((slack-username))
-  #           icon_url: ((slack-icon-url))
+  - name: deploy-queues-ui-pages-((deploy-env))
+    plan:
+      - get: src-queues-ui
+        resource: src-((deploy-env))
+        # passed: [set-pipeline]
+        trigger: true
+        params: {depth: 1}
+      - put: gh-status
+        inputs: [src-queues-ui]
+        params: {state: pending}
+      - task: deploy-queues-ui
+        config:
+          <<: *cf-image
+          inputs: [name: src-queues-ui]
+          run:
+            path: src-queues-ui/ci/tasks/deploy.sh
+        params:
+          <<: *env-cf
+          CF_APP_NAME: pages-queues-ui-((deploy-env))
+          CF_MANIFEST: src-queues-ui/.cloudgov/manifest.yml
+          CF_VARS_FILE: src-queues-ui/.cloudgov/vars/pages-((deploy-env)).yml
+          CF_PATH: src-queues-ui
+        on_failure:
+          try:
+            task: cancel-queues-ui-deployment
+            config:
+              <<: *cf-image
+              inputs: [name: src-queues-ui]
+              run:
+                path: src-queues-ui/ci/tasks/cancel-deployment.sh
+            params:
+              <<: *env-cf
+              CF_APP_NAME: pages-queues-ui-((deploy-env))
+    on_failure:
+      in_parallel:
+        - put: gh-status
+          inputs: [src-queues-ui]
+          params: {state: failure}
+        - put: slack
+          params:
+            text: |
+              :x: FAILED: pages queues UI deployment on pages ((deploy-env))
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+    on_success:
+      in_parallel:
+        - put: gh-status
+          inputs: [src-queues-ui]
+          params: {state: success}
+        - put: slack
+          params:
+            text: |
+              :white_check_mark: SUCCESS: Successfully deployed pages queues UI on pages ((deploy-env))
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
 
   - name: nightly-tasks-pages-((deploy-env))
     plan:
