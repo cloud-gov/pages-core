@@ -16,24 +16,26 @@ passport.deserializeUser((id, next) => {
 /**
  * Github Auth
  */
-const githubOptions = config.github;
+if (config.product === 'federalist') {
+  const githubOptions = config.github;
 
-async function verifyGithub(accessToken, _refreshToken, profile, callback) {
-  const { id, username } = profile;
+  async function verifyGithub(accessToken, _refreshToken, profile, callback) {
+    const { id, username } = profile;
 
-  try {
-    const githubClient = new GitHubClient(accessToken);
-    await githubClient.ensureFederalistAdmin(username.toLowerCase());
+    try {
+      const githubClient = new GitHubClient(accessToken);
+      await githubClient.ensureFederalistAdmin(username.toLowerCase());
 
-    return callback(null, { id });
-  } catch (err) {
-    return callback(err);
+      return callback(null, { id });
+    } catch (err) {
+      return callback(err);
+    }
   }
+
+  passport.use('github', new GitHubStrategy(githubOptions, verifyGithub));
+
+  let uaaLogoutRedirectURL = '';
 }
-
-passport.use('github', new GitHubStrategy(githubOptions, verifyGithub));
-
-let uaaLogoutRedirectURL = '';
 
 if (config.product === 'pages') {
   const uaaOptions = config.uaa;
