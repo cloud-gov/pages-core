@@ -1,7 +1,7 @@
 product: pages
 name: pages-staging
 domain: pages-staging.cloud.gov
-memory: 128MB
+memory: 256MB
 instances: 2
 env: staging
 env_postfix: -staging

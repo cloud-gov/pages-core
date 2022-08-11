@@ -69,8 +69,7 @@ applications:
       - route: queues.((domain))
     services:
       - app-((env))-uaa-client
-      - federalist-((env))-redis
-      - federalist-((env))-github-queues-ui
+      - pages-((env))-redis
       - ((product))-((env))-env
     env:
       ADMIN_GITHUB_ORGANIZATION: 18F

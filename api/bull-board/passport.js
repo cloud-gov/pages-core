@@ -5,6 +5,8 @@ const config = require('./config');
 const UAAClient = require('./uaaClient');
 const GitHubClient = require('./githubClient');
 
+let uaaLogoutRedirectURL;
+
 passport.serializeUser(({ id }, next) => {
   next(null, id);
 });
@@ -16,7 +18,6 @@ passport.deserializeUser((id, next) => {
 /**
  * Github Auth
  */
-const githubOptions = config.github;
 
 async function verifyGithub(accessToken, _refreshToken, profile, callback) {
   const { id, username } = profile;
@@ -31,9 +32,13 @@ async function verifyGithub(accessToken, _refreshToken, profile, callback) {
   }
 }
 
-passport.use('github', new GitHubStrategy(githubOptions, verifyGithub));
+if (config.product === 'federalist') {
+  const githubOptions = config.github;
 
-let uaaLogoutRedirectURL = '';
+  passport.use('github', new GitHubStrategy(githubOptions, verifyGithub));
+
+  uaaLogoutRedirectURL = '';
+}
 
 if (config.product === 'pages') {
   const uaaOptions = config.uaa;
