@@ -21,7 +21,7 @@ applications:
       - federalist-((env))-s3
       - ((product))-((env))-env
       - federalist-((env))-sqs-creds
-      - federalist-((env))-redis
+      - ((product))-((env))-redis
       - ((product))-((env))-proxy
       - ((product))-((env))-domain
       - federalist-((env))-uev-key
@@ -69,7 +69,7 @@ applications:
       - route: queues.((domain))
     services:
       - app-((env))-uaa-client
-      - pages-((env))-redis
+      - ((product))-((env))-redis
       - ((product))-((env))-env
     env:
       ADMIN_GITHUB_ORGANIZATION: 18F
@@ -80,5 +80,5 @@ applications:
       LOG_LEVEL: ((log_level))
       NPM_CONFIG_PRODUCTION: true
       NODE_MODULES_CACHE: false
-      UAA_HOST: ((uaa_host))
+      UAA_LOGIN_HOST: ((uaa_login_host))
       PRODUCT: ((product))

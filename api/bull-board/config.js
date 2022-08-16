@@ -13,11 +13,11 @@ const {
   SESSION_SECRET,
   UAA_CLIENT_ID,
   UAA_CLIENT_SECRET,
-  UAA_HOST,
+  UAA_LOGIN_HOST,
   UAA_HOST_DOCKER_URL,
 } = process.env;
 
-const internalUAAHost = UAA_HOST_DOCKER_URL || UAA_HOST;
+const internalUAAHost = UAA_HOST_DOCKER_URL || UAA_LOGIN_HOST;
 
 // if (!REDIS_URL) throw new Error('No Redis credentials found');
 
@@ -77,12 +77,12 @@ module.exports = {
   },
   uaa: {
     apiUrl: internalUAAHost,
-    authorizationURL: `${UAA_HOST}/oauth/authorize`,
+    authorizationURL: `${UAA_LOGIN_HOST}/oauth/authorize`,
     callbackURL: `${APP_HOSTNAME}/auth/uaa/callback`,
     clientID: UAA_CLIENT_ID || 'test',
     clientSecret: UAA_CLIENT_SECRET || 'test',
     logoutCallbackURL: `${APP_HOSTNAME}/auth/uaa/logout`,
-    logoutURL: `${UAA_HOST}/logout.do`,
+    logoutURL: `${UAA_LOGIN_HOST}/logout.do`,
     tokenURL: `${internalUAAHost}/oauth/token`,
     userURL: `${internalUAAHost}/userinfo`,
     scope: ['openid'],
