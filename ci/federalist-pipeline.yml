@@ -130,7 +130,7 @@ test-admin-client: &test-admin-client
 
 jobs:
 
-  - name: test-api-production
+  - name: test-api-federalist
     plan:
       - get: src-api
         resource: pr-production
@@ -181,7 +181,7 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: test-admin-client-production
+  - name: test-admin-client-federalist
     plan:
       - get: src-admin-client
         resource: pr-production
@@ -233,7 +233,7 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: test-and-deploy-api-federalist-production
+  - name: test-and-deploy-api-federalist
     plan:
       - get: src-api
         resource: src-production
@@ -335,7 +335,7 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: test-and-deploy-admin-client-federalist-production
+  - name: test-and-deploy-admin-client-federalist
     plan:
       - get: src-admin-client
         resource: src-production
@@ -359,7 +359,7 @@ jobs:
         params:
           API_DOMAIN: federalistapp.18f.gov
 
-      - task: deploy-admin-client
+      - task: deploy-admin-client-federalist
         config:
           <<: *cf-image
           inputs: [name: src-admin-client]
@@ -413,7 +413,7 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: nightly-tasks-federalist-production
+  - name: nightly-tasks-federalist
     plan:
       - get: src
         resource: src-production
@@ -441,7 +441,7 @@ jobs:
             <<: *env-cf
             CF_APP_NAME: federalist-admin
 
-  - name: sites-builds-checks-federalist-production
+  - name: sites-builds-checks-federalist
     plan:
       - get: src
         resource: src-production
@@ -478,7 +478,7 @@ jobs:
       resource: src-production
       params: {depth: 1}
       trigger: true
-    - set_pipeline: core
+    - set_pipeline: federalist-core
       file: src/ci/federalist-pipeline.yml
 
 ############################
