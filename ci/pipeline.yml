@@ -142,7 +142,7 @@ jobs:
           path: src-api
           status: pending
           base_context: concourse
-          context: test-api
+          context: test-api-((deploy-env))
       - do: *test-api
 
     on_failure:
@@ -153,7 +153,7 @@ jobs:
             path: src-api
             status: failure
             base_context: concourse
-            context: test-api
+            context: test-api-((deploy-env))
         - put: slack
           params:
             text: |
@@ -171,7 +171,7 @@ jobs:
             path: src-api
             status: success
             base_context: concourse
-            context: test-api
+            context: test-api-((deploy-env))
         - put: slack
           params:
             text: |
@@ -193,7 +193,7 @@ jobs:
           path: src-admin-client
           status: pending
           base_context: concourse
-          context: test-admin-client
+          context: test-admin-client-((deploy-env))
 
       - do: *test-admin-client
 
@@ -205,7 +205,7 @@ jobs:
             path: src-admin-client
             status: failure
             base_context: concourse
-            context: test-admin-client
+            context: test-admin-client-((deploy-env))
         - put: slack
           params:
             text: |
@@ -223,7 +223,7 @@ jobs:
             path: src-admin-client
             status: success
             base_context: concourse
-            context: test-admin-client
+            context: test-admin-client-((deploy-env))
         - put: slack
           params:
             text: |
@@ -417,7 +417,7 @@ jobs:
     plan:
       - get: src-queues-ui
         resource: src-((deploy-env))
-        # passed: [set-pipeline]
+        passed: [set-pipeline]
         trigger: true
         params: {depth: 1}
       - put: gh-status
