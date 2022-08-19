@@ -17,9 +17,11 @@ const uaaCredentials = appEnv.getServiceCreds(`app-${APP_ENV}-uaa-client`);
 process.env.UAA_CLIENT_ID = uaaCredentials.clientID;
 process.env.UAA_CLIENT_SECRET = uaaCredentials.clientSecret;
 
-const githubCredentials = appEnv.getServiceCreds(`${PRODUCT}-${APP_ENV}-github-queues-ui`);
-process.env.GITHUB_CLIENT_ID = githubCredentials.GITHUB_CLIENT_ID;
-process.env.GITHUB_CLIENT_SECRET = githubCredentials.GITHUB_CLIENT_SECRET;
+if (PRODUCT === 'federalist') {
+  const githubCredentials = appEnv.getServiceCreds(`${PRODUCT}-${APP_ENV}-github-queues-ui`);
+  process.env.GITHUB_CLIENT_ID = githubCredentials.GITHUB_CLIENT_ID;
+  process.env.GITHUB_CLIENT_SECRET = githubCredentials.GITHUB_CLIENT_SECRET;
+}
 
 const envCredentials = appEnv.getServiceCreds(`${PRODUCT}-${APP_ENV}-env`);
 process.env.SESSION_SECRET = envCredentials.FEDERALIST_SESSION_SECRET;

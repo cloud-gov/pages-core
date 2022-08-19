@@ -1,18 +1,18 @@
 ############################
 #  SHARED
 
-staging-cf: &staging-cf
+env-cf: &env-cf
   CF_API: https://api.fr.cloud.gov
-  CF_USERNAME: ((staging-cf-username))
-  CF_PASSWORD: ((staging-cf-password))
+  CF_USERNAME: ((((deploy-env))-cf-username))
+  CF_PASSWORD: ((((deploy-env))-cf-password))
   CF_ORG: gsa-18f-federalist
-  CF_SPACE: staging
+  CF_SPACE: ((deploy-env))
 
 node-image: &node-image
   type: docker-image
   source:
     repository: node
-    tag: 16.14
+    tag: 16
 
 cf-image: &cf-image
   platform: linux
@@ -64,14 +64,14 @@ test-metrics: &test-metrics
 #  JOBS
 
 jobs:
-  - name: test-metrics-staging
+  - name: test-metrics-((deploy-env))
     plan:
       - get: src-metrics
-        resource: pr-staging
+        resource: pr-((deploy-env))
         trigger: true
         version: every
       - put: src-metrics
-        resource: pr-staging
+        resource: pr-((deploy-env))
         params:
           path: src-metrics
           status: pending
@@ -83,7 +83,7 @@ jobs:
     on_failure:
       in_parallel:
         - put: src-metrics
-          resource: pr-staging
+          resource: pr-((deploy-env))
           params:
             path: src-metrics
             status: failure
@@ -92,7 +92,7 @@ jobs:
         - put: slack
           params:
             text: |
-              :x: FAILED: pages metrics tests on staging
+              :x: FAILED: pages metrics tests on ((deploy-env))
               <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
@@ -101,7 +101,7 @@ jobs:
     on_success:
       in_parallel:
         - put: src-metrics
-          resource: pr-staging
+          resource: pr-((deploy-env))
           params:
             path: src-metrics
             status: success
@@ -110,18 +110,19 @@ jobs:
         - put: slack
           params:
             text: |
-              :white_check_mark: SUCCESS: Successfully tested pages metrics on staging
+              :white_check_mark: SUCCESS: Successfully tested pages metrics on ((deploy-env))
               <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: test-and-deploy-metrics-staging
+  - name: test-and-deploy-metrics-((deploy-env))
     plan:
       - get: src-metrics
-        resource: src-staging
-        trigger: true
+        resource: src-((deploy-env))
+        passed: [set-pipeline-((deploy-env))]
         params: {depth: 1}
+        trigger: true
       - put: gh-status
         inputs: [src-metrics]
         params: {state: pending}
@@ -150,7 +151,7 @@ jobs:
             dir: src-metrics-prod/apps/metrics
             path: ci/tasks/deploy.sh
         params:
-          <<: *staging-cf
+          <<: *env-cf
           CF_APP_NAME: pages-metrics
           CFVAR_cf_api_username: "'((cf-org-auditor-username))'"
           CFVAR_cf_api_password: "'((cf-org-auditor-password))'"
@@ -165,7 +166,7 @@ jobs:
                 dir: src-metrics-prod/apps/metrics
                 path: ci/tasks/cancel-deployment.sh
             params:
-              <<: *staging-cf
+              <<: *env-cf
               CF_APP_NAME: pages-metrics
 
     on_failure:
@@ -176,7 +177,7 @@ jobs:
         - put: slack
           params:
             text: |
-              :x: FAILED: metrics deployment on pages staging
+              :x: FAILED: metrics deployment on pages ((deploy-env))
               <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
@@ -190,16 +191,17 @@ jobs:
         - put: slack
           params:
             text: |
-              :white_check_mark: SUCCESS: Successfully deployed metrics on pages staging
+              :white_check_mark: SUCCESS: Successfully deployed metrics on pages ((deploy-env))
               <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: nightly-tasks-metrics-staging
+  - name: nightly-tasks-metrics-((deploy-env))
     plan:
       - get: src-metrics
-        resource: src-staging
+        resource: src-((deploy-env))
+        passed: [set-pipeline-((deploy-env))]
         params: {depth: 1}
       - get: nightly
         trigger: true
@@ -211,41 +213,43 @@ jobs:
             dir: src-metrics/apps/metrics
             path: ci/tasks/restage.sh
         params:
-          <<: *staging-cf
+          <<: *env-cf
           CF_APP_NAME: pages-metrics
 
-  - name: reconfigure
+  - name: set-pipeline-((deploy-env))
     serial: true
     plan:
       - get: src-metrics
-        resource: src-staging
+        resource: src-((deploy-env))
         params: {depth: 1}
         trigger: true
       - set_pipeline: metrics
         file: src-metrics/apps/metrics/ci/pipeline.yml
-
+        instance_vars:
+          deploy-env: ((deploy-env))
+          git-branch: ((git-branch))
 
 ############################
 #  RESOURCES
 
 resources:
 
-  - name: pr-staging
+  - name: pr-((deploy-env))
     type: pull-request
     check_every: 1m
     source:
-      repository: 18F/federalist
+      repository: ((pages-repository-path))
       access_token: ((gh-access-token))
-      base_branch: staging
+      base_branch: ((git-branch))
       disable_forks: true
       ignore_drafts: false
 
-  - name: src-staging
+  - name: src-((deploy-env))
     type: git
     icon: github
     source:
-      uri: https://github.com/18F/federalist
-      branch: staging
+      uri: ((git-base-url))/((pages-repository-path))
+      branch: ((git-branch))
 
   - name: slack
     type: slack-notification

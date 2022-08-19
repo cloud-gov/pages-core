@@ -40,9 +40,9 @@
     <td>{build.branch}</td>
     <td>{formatSha(build.requestedCommitSha)}</td>
     <td>{formatSha(build.clonedCommitSha)}</td>
-    <td>{formatDateTime(build.createdAt)}</td>
-    <td>{formatDateTime(build.startedAt)}</td>
-    <td>{formatDateTime(build.completedAt)}</td>    
+    <td title={formatDateTime(build.createdAt)}>{formatDateTime(build.createdAt, true)}</td>
+    <td title={formatDateTime(build.startedAt)}>{formatDateTime(build.startedAt, true)}</td>
+    <td title={formatDateTime(build.completedAt)}>{formatDateTime(build.completedAt, true)}</td>
   </tr>
 </DataTable>
 

@@ -49,8 +49,8 @@
         <LabeledItem label="branch" value={build.branch} />
         <LabeledItem label="requested commit" value={build.requestedCommitSha} />
         <LabeledItem label="cloned commit" value={build.clonedCommitSha} />
-        <LabeledItem label="created at" value={formatDateTime(build.createdAt)} />
-        <LabeledItem label="updated at" value={formatDateTime(build.updatedAt)} />
+        <LabeledItem label="created at" value={formatDateTime(build.createdAt, true)} title={formatDateTime(build.createdAt)} />
+        <LabeledItem label="updated at" value={formatDateTime(build.updatedAt, true)} title={formatDateTime(build.updatedAt)}/>
       </div>
       <div class="tablet:grid-col-auto padding-bottom-1">
         <div class="grid-row flex-column flex-align-end">
@@ -59,8 +59,8 @@
               <input type="submit" value="Fail build" disabled={submitting}>
             </form>
           {/if}
-          <LabeledItem label="started at" value={formatDateTime(build.startedAt)} />
-          <LabeledItem label="completed at" value={formatDateTime(build.completedAt)} />
+          <LabeledItem label="started at" value={formatDateTime(build.startedAt, true)} title={formatDateTime(build.startedAt)} />
+          <LabeledItem label="completed at" value={formatDateTime(build.completedAt, true)} title={formatDateTime(build.completedAt)} />
           <LabeledItem label="source" value={build.source} />
           <div>
             <ExternalLink href={build.viewLink}>Live</ExternalLink>

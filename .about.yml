@@ -80,18 +80,6 @@ stack:
 #   url: URL for detailed information
 #   badge: URL for the status badge
 services:
-- name: Circle CI
-  category: Continuous Deployment
-  url: https://circleci.com/gh/18F/federalist
-  badge: https://circleci.com/gh/18F/federalist.svg?style=svg
-- name: Code Climate
-  category: Code Review
-  url: https://codeclimate.com/github/18F/federalist
-  badge: https://codeclimate.com/github/18F/federalist/badges/gpa.svg
-- name: Gemnasium
-  category: Dependency Analysis
-  url: https://gemnasium.com/github.com/18F/federalist
-  badge: https://gemnasium.com/badges/github.com/18F/federalist.svg
 
 
 # Licenses that apply to the project and/or its components (required)

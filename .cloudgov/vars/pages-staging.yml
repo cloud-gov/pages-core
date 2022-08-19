@@ -1,7 +1,7 @@
 product: pages
 name: pages-staging
 domain: pages-staging.cloud.gov
-memory: 128MB
+memory: 256MB
 instances: 2
 env: staging
 env_postfix: -staging
@@ -10,6 +10,7 @@ feature_auth_github: 'true'
 feature_auth_uaa: 'true'
 feature_bull_site_build_queue: 'true'
 uaa_host: https://uaa.fr-stage.cloud.gov
+uaa_login_host: https://login.fr-stage.cloud.gov
 new_relic_app_name: web-pages-staging
-proxy_domain: app.cloud.gov
+proxy_domain: sites.pages-staging.cloud.gov
 cf_cdn_space_name: sites-staging
