@@ -66,7 +66,7 @@ if (sqsCreds) {
 }
 
 // Redis Configs
-const redisCreds = appEnv.getServiceCreds(`${servicePrefix}-redis`);
+const redisCreds = appEnv.getServiceCreds(`${productPrefix}-redis`);
 if (redisCreds) {
   module.exports.redis = {
     url: redisCreds.uri,
