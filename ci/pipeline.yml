@@ -82,9 +82,11 @@ test-api: &test-api
                 docker load -i node/image
                 docker tag "$(cat node/image-id)" "$(cat node/repository):$(cat node/tag)"
               popd
+              docker network prune -f
               docker-compose -f ci/docker/docker-compose.yml run app app/ci/tasks/test-api.sh
               docker-compose -f ci/docker/docker-compose.yml down
               docker volume rm $(docker volume ls -q)
+              docker network prune -f
 
 test-admin-client: &test-admin-client
   - task: install-deps-admin-client
