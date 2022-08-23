@@ -1,5 +1,5 @@
 module.exports = {
-  "uswds2-11ty": {
+  'uswds2-11ty': {
     owner: 'cloud-gov',
     repo: '11ty-uswds-template',
     branch: 'main',
