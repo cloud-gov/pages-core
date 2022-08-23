@@ -1,32 +1,32 @@
 module.exports = {
-  'uswds2-11ty': {
+  'uswds-11ty': {
     owner: 'cloud-gov',
-    repo: '11ty-uswds-template',
+    repo: 'pages-uswds-11ty',
     branch: 'main',
     engine: 'node.js',
-    example: 'https://federalist-291cec05-9081-463f-899f-4439c138f77e.app.cloud.gov/site/cloud-gov/11ty-uswds-template/',
+    example: 'https://federalist-32bdb3ca-a71a-46e5-ab20-a38ecfdbf143.app.cloud.gov/site/cloud-gov/pages-uswds-11ty/',
     title: '11ty - U.S. Web Design System v2.0',
     description: 'A flexible multi-page setup intended to introduce an agency or program. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
-    thumb: '/images/federalist-uswds-jekyll.png',
+    thumb: '/images/pages-uswds-v2-thumbnail.png',
   },
-  uswds2: {
-    owner: '18f',
-    repo: 'federalist-uswds-jekyll',
+  'uswds-jekyll': {
+    owner: 'cloud-gov',
+    repo: 'pages-uswds-jekyll',
     branch: 'main',
     engine: 'jekyll',
-    example: 'https://federalist-ce810add-9092-4627-8246-9b65cf94623c.app.cloud.gov/site/18f/federalist-uswds-jekyll/',
+    example: 'https://federalist-2b713ce7-4dcb-481c-b2fd-2e0724e66911.app.cloud.gov/site/cloud-gov/pages-uswds-jekyll/',
     title: 'Jekyll - U.S. Web Design System v2.0',
     description: 'A flexible multi-page setup intended to introduce an agency or program. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
-    thumb: '/images/federalist-uswds-jekyll.png',
+    thumb: '/images/pages-uswds-v2-thumbnail.png',
   },
-  gatsby: {
-    owner: '18f',
-    repo: 'federalist-uswds-gatsby',
+  'uswds-gatsby': {
+    owner: 'cloud-gov',
+    repo: 'pages-uswds-gatsby',
     branch: 'main',
     engine: 'node.js',
-    example: 'https://federalist-b146cf1e-c756-4b1f-bb83-c516cac94fbb.app.cloud.gov/site/18f/federalist-uswds-gatsby/',
+    example: 'https://federalist-64abcbda-b748-4757-908d-641206f264e4.app.cloud.gov/site/cloud-gov/pages-uswds-gatsby/',
     title: 'Gatsby - U.S. Web Design System v2.0',
     description: 'A flexible multi-page setup intended to introduce an agency or program using Gatsby.js. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
-    thumb: '/images/federalist-gatsby-uswds-template.png',
+    thumb: '/images/pages-uswds-v2-gatsby-thumbnail.png',
   },
 };

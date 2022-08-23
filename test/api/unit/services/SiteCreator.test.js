@@ -271,7 +271,7 @@ describe('SiteCreator', () => {
     });
 
     context('when the site is created from a template', () => {
-      const template = 'uswds2';
+      const template = 'uswds-jekyll';
       let user;
       let siteParams;
 
