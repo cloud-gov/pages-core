@@ -2,7 +2,7 @@ services:
   app:
     depends_on:
       - uaa
-  federalist:
+  pages:
     depends_on:
       - uaa
   bull-board:
@@ -15,7 +15,7 @@ services:
     ports:
       - 9000:8080
     environment:
-      POSTGRES_DB: federalist
+      POSTGRES_DB: pages
       POSTGRES_PORT: 5432
       POSTGRES_HOST: db
       POSTGRES_USER: postgres

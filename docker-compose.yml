@@ -31,12 +31,12 @@ services:
       PRODUCT: pages
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
-      USER_AUDITOR: federalist
+      USER_AUDITOR: pages
       CLOUD_FOUNDRY_API_HOST: https://api.example.com
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.example.com/oauth/token
       CF_API_USERNAME: deploy_user
       CF_API_PASSWORD: deploy_pass      
-  federalist:
+  pages:
     build:
       dockerfile: Dockerfile-app
       context: .
@@ -59,10 +59,10 @@ services:
       FEATURE_AUTH_GITHUB: 'true'
       FEATURE_AUTH_UAA: 'false'
       PORT: 1338
-      PRODUCT: federalist
+      PRODUCT: pages
       UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
-      USER_AUDITOR: federalist
+      USER_AUDITOR: pages
       CLOUD_FOUNDRY_API_HOST: https://api.example.com
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.example.com/oauth/token
       CF_API_USERNAME: deploy_user
@@ -87,7 +87,7 @@ services:
       APP_ENV: local
       APP_HOSTNAME: http://localhost:1340
       PORT: 1340
-      PRODUCT: federalist
+      PRODUCT: pages
       REDIS_URL: redis://redis:6379
       SESSION_SECRET: bull-board
       UAA_CLIENT_ID: pages-client
@@ -119,8 +119,8 @@ services:
     ports:
       - "5433:5432" # expose db on host at port 5433
     environment:
-      POSTGRES_DB: federalist
-      POSTGRES_TEST_DB: federalist-test
+      POSTGRES_DB: pages
+      POSTGRES_TEST_DB: pages-test
       POSTGRES_PASSWORD: password
   redis:
     image: redis

@@ -1,23 +1,23 @@
-# Federalist
-***Federalist is updated regularly. [Join our public chat room](https://chat.18f.gov/) to talk to us and stay informed. You can also check out our [documentation](https://federalist.18f.gov/) to learn more.***
+# Pages Core
+***Pages is updated regularly. [Join our public chat room](https://chat.18f.gov/) to talk to us and stay informed. You can also check out our [documentation](https://cloud.gov/pages) to learn more.***
 
-## About Federalist
+## About Cloud.gov Pages
 
-[Federalist](https://federalist.18f.gov) helps federal government entities publish compliant static websites quickly and seamlessly. Federalist integrates with GitHub and is built on top of [cloud.gov](https://cloud.gov), which uses Amazon Web Services.
+[Cloud.gov Pages](https://cloud.gov/pages) helps federal government entities publish compliant static websites quickly and seamlessly. Pages integrates with GitHub and is built on top of [cloud.gov](https://cloud.gov), which uses Amazon Web Services.
 
-This repository is home to "federalist-core" - a Node.js app that allows government users to create and configure Federalist sites.
+This repository is home to "pages-core" - a Node.js app that allows government users to create and configure Pages sites.
 
 ## Examples
 
-Partner agencies across the federal government use Federalist to host websites. A few examples include:
+Partner agencies across the federal government use Pages to host websites. A few examples include:
 
 - [College Scorecard](https://collegescorecard.ed.gov/)
 - [Natural Resources Revenue Data](https://revenuedata.doi.gov/)
 - [NSF Small Business Innovation Research program](https://seedfund.nsf.gov)
 
-More examples can be found at [https://federalist.18f.gov/success-stories/](https://federalist.18f.gov/success-stories/).
+More examples can be found at [https://cloud.gov/pages/success-stories/](https://cloud.gov/pages/success-stories/).
 
-## Setting up a local Federalist development environment
+## Setting up a local pages-core development environment
 
 ### First install these dependencies
 
@@ -28,11 +28,11 @@ Before you start, ensure you have the following installed:
 
 ### Then follow these steps to set up and run your server
 
-In order to provide a simple development user experience, Federalist has some complexity on the backend. So as part of your local setup, you will need to emulate some of that complexity through the creation steps below. This shouldn't take longer than 15 minutes.
+In order to provide a simple development user experience, pages-core has some complexity on the backend. So as part of your local setup, you will need to emulate some of that complexity through the creation steps below. This shouldn't take longer than 15 minutes.
 
 _Note: some terminal commands may take a while to process, without offering feedback to you. Your patience will be rewarded!_
 
-1. Clone the `18F/federalist` repository from Github and `cd` to that directory.
+1. Clone the `cloud-gov/pages-core` repository from Github and `cd` to that directory.
 
 #### Editing the local configuration files
 
@@ -58,7 +58,7 @@ This will be the file that holds your S3 and SQS configurations.
     GITHUB_CLIENT_ID=VALUE FROM GITHUB
     GITHUB_CLIENT_SECRET=VALUE FROM GITHUB
     ```
-**For 18F/TTS developers:** This section is primarily for 18F/TTS developers working on the Federalist project. Before you get started, make sure you have been fully on-boarded, including getting access to the Federalist cloud.gov `staging` space.
+**For TTS developers:** This section is primarily for TTS developers working on the Pages project. Before you get started, make sure you have been fully on-boarded, including getting access to the Federalist cloud.gov `staging` space.
 
 1. Paste `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` into your terminal window.
 2. Visit https://login.fr.cloud.gov/passcode to get a Temporary Authentication Code.
@@ -87,12 +87,12 @@ In order to make it possible to log in with local UAA authentication in a develo
 
 #### Check to see if everything is working correctly
 
-1. If you've successfully completed all of the steps the Federalist app is now ready to run locally! :tada:
-1. You should now be able to see Federalist running at [http://localhost:1337](http://localhost:1337). Local file changes will cause the server to restart and/or the front end bundles to be rebuilt.
+1. If you've successfully completed all of the steps the pages-core app is now ready to run locally! :tada:
+1. You should now be able to see pages-core running at [http://localhost:1337](http://localhost:1337). Local file changes will cause the server to restart and/or the front end bundles to be rebuilt.
 
 **Pro tips:**
 
-In our Docker Compose environment, `app` is the name of the container where the Federalist web application runs. You can run any command in the context of the web application by running `docker-compose run --rm app <THE COMMAND>`.
+In our Docker Compose environment, `app` is the name of the container where the pages-core web application runs. You can run any command in the context of the web application by running `docker-compose run --rm app <THE COMMAND>`.
 
 For example:
 
@@ -103,7 +103,7 @@ Similarly you can run any command in the context of the database container `db` 
 
 Note that when using `docker-compose run`, the docker network will not be exposed to your local machine. If you do need the network available, run `docker-compose run --rm --service-ports app <THE COMMAND>`.
 
-The `db` container is exposed on port `5433` of your host computer to make it easier to run commands on. For instance, you can open a `psql` session to it by running `psql -h localhost -p 5433 -d federalist -U postgres`.
+The `db` container is exposed on port `5433` of your host computer to make it easier to run commands on. For instance, you can open a `psql` session to it by running `psql -h localhost -p 5433 -d pages -U postgres`.
 
 The admin client is running on port `3000` of hour host computer.
 
@@ -360,7 +360,7 @@ For the full list of available commands that you can run with `yarn` or `npm`, s
 
 ### Linting
 
-We use [`eslint`](https://eslint.org/) and adhere to [Airbnb's eslint config](https://www.npmjs.com/package/eslint-config-airbnb) (with some [minor exceptions](https://github.com/18F/federalist/blob/staging/.eslintrc.js#L2)) as recommended by the [18F Front End Guild](https://frontend.18f.gov/javascript/style/).
+We use [`eslint`](https://eslint.org/) and adhere to [Airbnb's eslint config](https://www.npmjs.com/package/eslint-config-airbnb) (with some [minor exceptions](https://github.com/cloud-gov/pages-core/blob/staging/.eslintrc.js#L2)) as recommended by the [18F Front End Guild](https://frontend.18f.gov/javascript/style/).
 
 Because this project was not initially written in a way that complies with our current linting standard, we are taking the strategy of bringing existing files into compliance as they are touched during normal feature development or bug fixing.
 

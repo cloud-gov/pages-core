@@ -23,7 +23,7 @@ services:
       APP_HOSTNAME: http://localhost:1337
       NODE_ENV: development
       PRODUCT: pages
-  federalist-worker:
+  pages-worker:
     build:
       dockerfile: Dockerfile-app
       context: .
@@ -40,4 +40,4 @@ services:
     environment:
       APP_HOSTNAME: http://localhost:1338
       NODE_ENV: development
-      PRODUCT: federalist
+      PRODUCT: pages

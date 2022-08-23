@@ -1,5 +1,5 @@
 {
-  "name": "federalist",
+  "name": "pages-core",
   "private": true,
   "version": "0.0.0",
   "description": "",
@@ -103,7 +103,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/18f/federalist.git"
+    "url": "git://github.com/cloud-gov/pages-core.git"
   },
   "author": "dhcole",
   "license": "CC0-1.0",

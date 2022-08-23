@@ -9,14 +9,14 @@ function dbConfig(env) {
 
   if (env.CI) {
     return {
-      database: 'federalist-ci-test',
+      database: 'pages-ci-test',
       user: 'ci-test-user',
       host: 'localhost',
     };
   }
 
   return {
-    database: 'federalist-test',
+    database: 'pages-test',
     user: 'postgres',
     host: 'db',
   };

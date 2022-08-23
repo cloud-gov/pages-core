@@ -600,8 +600,8 @@ resources:
     type: cogito
     check_every: 1h
     source:
-      owner: 18F
-      repo: federalist
+      owner: cloud-gov
+      repo: pages-core
       access_token: ((gh-access-token))
       context_prefix: concourse
 

@@ -16,7 +16,7 @@ help: ## Show this help
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 db: ## Connect to the database - it must already be running ie with `make start`
-	psql postgresql://postgres:password@localhost:5433/federalist
+	psql postgresql://postgres:password@localhost:5433/pages
 
 build-client: ## Build client app - typically only done to test production artifacts
 	docker-compose run -rm app yarn build
@@ -37,7 +37,7 @@ migrate: ## Run database migrations
 	docker-compose run --rm app yarn migrate:up
 
 rebuild: ## Rebuild docker images and database volumes
-	docker volume rm federalist_db-data
+	docker volume rm pages_db-data
 	docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml build
 
 seed: ## (Re)Create seed data

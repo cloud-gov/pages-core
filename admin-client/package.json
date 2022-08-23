@@ -1,6 +1,6 @@
 {
-  "name": "federalist-admin",
-  "description": "Federalist admin dashboard",
+  "name": "pages-core-admin",
+  "description": "Pages admin dashboard",
   "version": "0.0.1",
   "license": "CC0-1.0",
   "scripts": {

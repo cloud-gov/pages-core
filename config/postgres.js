@@ -1,5 +1,5 @@
 module.exports = {
-  database: 'federalist',
+  database: 'pages',
   host: 'db',
   user: 'postgres',
   password: 'password',
