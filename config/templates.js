@@ -1,4 +1,14 @@
 module.exports = {
+  "uswds2-11ty": {
+    owner: 'cloud-gov',
+    repo: '11ty-uswds-template',
+    branch: 'main',
+    engine: 'node.js',
+    example: 'https://federalist-291cec05-9081-463f-899f-4439c138f77e.app.cloud.gov/site/cloud-gov/11ty-uswds-template/',
+    title: '11ty - U.S. Web Design System v2.0',
+    description: 'A flexible multi-page setup intended to introduce an agency or program. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
+    thumb: '/images/federalist-uswds-jekyll.png',
+  },
   uswds2: {
     owner: '18f',
     repo: 'federalist-uswds-jekyll',
