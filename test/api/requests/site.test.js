@@ -470,7 +470,7 @@ describe('Site API', () => {
           repository: siteRepository,
           defaultBranch: 'main',
           engine: 'jekyll',
-          template: 'uswds2',
+          template: 'uswds-jekyll',
         })
         .set('Cookie', cookie)
         .expect(200))
@@ -521,7 +521,7 @@ describe('Site API', () => {
           defaultBranch: 'main',
           engine: 'jekyll',
           organizationId: org.id,
-          template: 'uswds2',
+          template: 'uswds-jekyll',
         })
         .set('Cookie', cookie)
         .expect(200))
@@ -549,8 +549,8 @@ describe('Site API', () => {
           .set('x-csrf-token', csrfToken.getToken())
           .send({
             defaultBranch: 'main',
-            engine: 'jekyll',
-            template: 'gatsby',
+            engine: 'node.js',
+            template: 'uswds-gatsby',
           })
           .set('Cookie', cookie)
           .expect(403))
@@ -1329,7 +1329,7 @@ describe('Site API', () => {
         .set('x-csrf-token', csrfToken.getToken())
         .set('Cookie', cookie)
         .expect(422);
-      
+
       await site.reload({ paranoid: false });
       expect(site.isSoftDeleted()).to.be.false;
       expect(response.body.message).to.have.string(domain.names);
