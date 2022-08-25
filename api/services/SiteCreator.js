@@ -123,13 +123,17 @@ function buildInfrastructure(params, s3ServiceName) {
         region: credentials.region,
       };
 
-      return apiClient.createSiteProxyRoute(
-        credentials.bucket,
-        config.env.cfDomainGuid,
-        config.env.cfSpaceGuid,
-        config.env.cfProxyGuid
-      )
-        .then(() => buildSite(params, s3));
+      if (process.env.PRODUCT === 'federalist') {
+        return apiClient.createSiteProxyRoute(
+          credentials.bucket,
+          config.env.cfDomainGuid,
+          config.env.cfSpaceGuid,
+          config.env.cfProxyGuid
+        )
+          .then(() => buildSite(params, s3));
+      }
+
+      return buildSite(params, s3)
     });
 }
 
