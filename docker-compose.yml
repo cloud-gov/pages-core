@@ -25,6 +25,7 @@ services:
     environment:
       APP_HOSTNAME: http://localhost:1337
       DOMAIN: localhost:1337
+      FEATURE_BULL_SITE_BUILD_QUEUE: 'true'
       FEATURE_AUTH_GITHUB: 'true'
       FEATURE_AUTH_UAA: 'true'
       PORT: 1337
@@ -35,7 +36,7 @@ services:
       CLOUD_FOUNDRY_API_HOST: https://api.example.com
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.example.com/oauth/token
       CF_API_USERNAME: deploy_user
-      CF_API_PASSWORD: deploy_pass      
+      CF_API_PASSWORD: deploy_pass
   federalist:
     build:
       dockerfile: Dockerfile-app

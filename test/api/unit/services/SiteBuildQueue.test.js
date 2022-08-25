@@ -23,7 +23,15 @@ describe('SiteBuildQueue', () => {
     apiNocks.mockDefaultCredentials();
   });
 
-  describe('.sendBuildMessage(build)', () => {
+  describe('.sendBuildMessage(build) without FEATURE_BULL_SITE_BUILD_QUEUE using SQS', () => {
+    before(() => {
+      process.env.FEATURE_BULL_SITE_BUILD_QUEUE = false;
+    });
+
+    after(() => {
+      process.env.FEATURE_BULL_SITE_BUILD_QUEUE = true;
+    });
+
     it('should send a formatted build message', async () => {
       const sendMessageStub = sinon.stub(SiteBuildQueue.sqsClient, 'sendMessage').returns({
         promise: () => Promise.resolve(),
