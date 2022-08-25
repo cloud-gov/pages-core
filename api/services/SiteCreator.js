@@ -133,7 +133,7 @@ function buildInfrastructure(params, s3ServiceName) {
           .then(() => buildSite(params, s3));
       }
 
-      return buildSite(params, s3)
+      return buildSite(params, s3);
     });
 }
 
