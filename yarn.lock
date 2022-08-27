@@ -6694,9 +6694,9 @@ levn@^0.4.1:
     type-check "~0.4.0"
 
 libpq@^1.7.0:
-  version "1.8.9"
-  resolved "https://registry.yarnpkg.com/libpq/-/libpq-1.8.9.tgz#6e0c6eecb176f6656ad092d67cc0131980cba897"
-  integrity sha512-herU0STiW3+/XBoYRycKKf49O9hBKK0JbdC2QmvdC5pyCSu8prb9idpn5bUSbxj8XwcEsWPWWWwTDZE9ZTwJ7g==
+  version "1.8.11"
+  resolved "https://registry.yarnpkg.com/libpq/-/libpq-1.8.11.tgz#ffe9664d4a2746c2f9b142558d1dbb552299aaa1"
+  integrity sha512-C2DKWaKmIs/0goAdU+7nC4FnsU/Ed+8GuHmxh4vzZytfe4GgPatOfthGClk/tgQVWlAACxr0M9nkFN2F4a3PbQ==
   dependencies:
     bindings "1.5.0"
     nan "^2.14.0"
@@ -7309,12 +7309,7 @@ mute-stream@~0.0.4:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
 
-nan@^2.14.0:
-  version "2.14.2"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.2.tgz#f5376400695168f4cc694ac9393d0c9585eeea19"
-  integrity sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==
-
-nan@^2.14.1, nan@^2.15.0:
+nan@^2.14.0, nan@^2.14.1, nan@^2.15.0:
   version "2.16.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.16.0.tgz#664f43e45460fb98faf00edca0bb0d7b8dce7916"
   integrity sha512-UdAqHyFngu7TfQKsCBgAA6pWDkT8MAO7d0jyOecVhN5354xbLqdn8mV9Tat9gepAupm0bt2DbeaSC8vS52MuFA==
