@@ -6693,10 +6693,10 @@ levn@^0.4.1:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
 
-libpq@^1.7.0:
-  version "1.8.9"
-  resolved "https://registry.yarnpkg.com/libpq/-/libpq-1.8.9.tgz#6e0c6eecb176f6656ad092d67cc0131980cba897"
-  integrity sha512-herU0STiW3+/XBoYRycKKf49O9hBKK0JbdC2QmvdC5pyCSu8prb9idpn5bUSbxj8XwcEsWPWWWwTDZE9ZTwJ7g==
+libpq@^1.8.10:
+  version "1.8.11"
+  resolved "https://registry.yarnpkg.com/libpq/-/libpq-1.8.11.tgz#ffe9664d4a2746c2f9b142558d1dbb552299aaa1"
+  integrity sha512-C2DKWaKmIs/0goAdU+7nC4FnsU/Ed+8GuHmxh4vzZytfe4GgPatOfthGClk/tgQVWlAACxr0M9nkFN2F4a3PbQ==
   dependencies:
     bindings "1.5.0"
     nan "^2.14.0"
@@ -8091,12 +8091,12 @@ pg-int8@1.0.1:
   resolved "https://registry.yarnpkg.com/pg-int8/-/pg-int8-1.0.1.tgz#943bd463bf5b71b4170115f80f8efc9a0c0eb78c"
   integrity sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==
 
-pg-native@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/pg-native/-/pg-native-3.0.0.tgz#20c64e651e20b28f5c060b3823522d1c8c4429c3"
-  integrity sha512-qZZyywXJ8O4lbiIN7mn6vXIow1fd3QZFqzRe+uET/SZIXvCa3HBooXQA4ZU8EQX8Ae6SmaYtDGLp5DwU+8vrfg==
+pg-native@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/pg-native/-/pg-native-3.0.1.tgz#84b488a4f3c29c29ea9b4fa8bf03a75a5bc4f353"
+  integrity sha512-LBVNWkNh0fVx/cienARRP2y22J5OpUsKBe0TpxzAx3arEUUdIs77aLSAHS3scS7SMaqc+OkG40CEu5fN0/cjIw==
   dependencies:
-    libpq "^1.7.0"
+    libpq "^1.8.10"
     pg-types "^1.12.1"
     readable-stream "1.0.31"
 
