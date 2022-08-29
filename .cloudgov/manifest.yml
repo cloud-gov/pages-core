@@ -21,7 +21,7 @@ applications:
       - federalist-((env))-s3
       - ((product))-((env))-env
       - federalist-((env))-sqs-creds
-      - ((product))-((env))-redis
+      - pages-((env))-redis
       - ((product))-((env))-proxy
       - ((product))-((env))-domain
       - federalist-((env))-uev-key
