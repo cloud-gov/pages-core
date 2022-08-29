@@ -66,7 +66,7 @@ if (sqsCreds) {
 }
 
 // Redis Configs
-const redisCreds = appEnv.getServiceCreds(`${productPrefix}-redis`);
+const redisCreds = appEnv.getServiceCreds(`pages-${APP_ENV}-redis`);
 if (redisCreds) {
   module.exports.redis = {
     url: redisCreds.uri,
@@ -119,7 +119,7 @@ module.exports.userEnvVar = {
   key: cfUserEnvVar.key,
 };
 
-const uaaCredentials = appEnv.getServiceCreds(`app-${process.env.APP_ENV}-uaa-client`);
+const uaaCredentials = appEnv.getServiceCreds(`app-${APP_ENV}-uaa-client`);
 
 module.exports.passport = {
   uaa: {
