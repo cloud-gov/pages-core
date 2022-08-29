@@ -8,7 +8,7 @@ env_postfix: ''
 log_level: info
 feature_auth_github: 'true'
 feature_auth_uaa: 'false'
-feature_bull_site_build_queue: 'false'
+feature_bull_site_build_queue: 'true'
 uaa_host: https://uaa.fr.cloud.gov
 uaa_login_host: https://login.fr.cloud.gov
 new_relic_app_name: web
