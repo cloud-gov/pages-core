@@ -2,6 +2,7 @@
   import { notification, router } from '../stores';
   import {
     fetchBuilds,
+    fetchOrganizations,
     fetchSite,
     fetchUserEnvironmentVariables,
     fetchUsers,
@@ -16,6 +17,7 @@
     GridContainer,
     PageTitle,
     SiteForm,
+    SiteFormOrganization,
     SiteMetadata,
     UserTable,
   } from '../components';
@@ -23,11 +25,25 @@
   $: id = $router.params.id;
   $: sitePromise = fetchSite(id);
   $: buildsPromise = fetchBuilds({ site: id, limit: 10 });
+  $: orgsPromise = fetchOrganizations();
   $: usersPromise = fetchUsers({ site: id });
   $: uevsPromise = fetchUserEnvironmentVariables({ site: id });
 
+  async function handleOrganizationSubmit(organizationId) {
+    return updateSite(id, { organizationId });
+  }
+
   async function handleAdminConfigurationSubmit(site) {
     return updateSite(id, site);
+  }
+
+  async function handleOrgUpdateSuccess(site) {
+    sitePromise = Promise.resolve(site);
+    notification.setSuccess('Site added to organizatoin successfully');
+  }
+
+  async function handleOrgUpdateFailure() {
+    notification.setError('Site organization update error');
   }
 
   async function handleAdminConfigurationSuccess(site) {
@@ -55,14 +71,13 @@
   }
 
   function configs(site) {
-    return ['default', 'demo', 'preview']
-      .reduce((acc, name) => {
-        const value = site[`${name}Config`];
-        if (value) {
-          acc.push({ name, value });
-        }
-        return acc;
-      }, []);
+    return ['default', 'demo', 'preview'].reduce((acc, name) => {
+      const value = site[`${name}Config`];
+      if (value) {
+        acc.push({ name, value });
+      }
+      return acc;
+    }, []);
   }
 </script>
 
@@ -71,6 +86,17 @@
     <PageTitle>{site.owner}/{site.repository}</PageTitle>
     <SiteMetadata {site} />
     <Accordion multiselect bordered>
+      <Await on={orgsPromise} let:response={orgs}>
+        <AccordionContent title="Organization">
+          <SiteFormOrganization
+            {site}
+            {orgs}
+            onSubmit={handleOrganizationSubmit}
+            onSuccess={handleOrgUpdateSuccess}
+            onFailure={handleOrgUpdateFailure}
+          />
+        </AccordionContent>
+      </Await>
       <AccordionContent title="User Configuration">
         <h3>Jekyll Configuration</h3>
         {#each configs(site) as config}
@@ -114,9 +140,7 @@
           <p slot="empty">No domains configured</p>
         </DataTable>
         <div>
-          <a
-            class="usa-button"
-            href={`/domains/new?siteId=${id}`}>
+          <a class="usa-button" href={`/domains/new?siteId=${id}`}>
             Create Domain
           </a>
         </div>
@@ -125,7 +149,8 @@
         <SiteForm
           {site}
           onSubmit={handleAdminConfigurationSubmit}
-          onSuccess={handleAdminConfigurationSuccess} />
+          onSuccess={handleAdminConfigurationSuccess}
+        />
       </AccordionContent>
       <AccordionContent title="Recent Builds">
         <Await on={buildsPromise} let:response={builds}>
