@@ -39,7 +39,7 @@
 
   async function handleOrgUpdateSuccess(site) {
     sitePromise = Promise.resolve(site);
-    notification.setSuccess('Site added to organizatoin successfully');
+    notification.setSuccess('Site added to organization successfully');
   }
 
   async function handleOrgUpdateFailure() {

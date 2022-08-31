@@ -15,14 +15,14 @@
     id: org.id,
   }));
 
-  $: value = siteOrg.id;
+  $: value = siteOrg?.id || '';
 </script>
 
 <div class="grid-row">
   <div class="grid-col-8 grid-offset-4">
     <Form
       action="Update"
-      disabled={value === siteOrg.id || !value}
+      disabled={value === siteOrg?.id || !value}
       onSubmit={() => onSubmit(value, site.id)}
       {onSuccess}
       {onFailure}
