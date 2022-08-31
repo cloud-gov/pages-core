@@ -201,7 +201,7 @@ async function fetchRawSites() {
 }
 
 async function updateSite(id, params) {
-  return put(`/sites/${id}`, params).catch(() => null);
+  return put(`/sites/${id}`, params);
 }
 
 async function fetchUserEnvironmentVariables(query = {}) {

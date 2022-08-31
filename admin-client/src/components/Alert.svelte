@@ -1,6 +1,5 @@
 <script>
   import { onMount } from 'svelte';
-  import { fly } from 'svelte/transition';
   import { notification } from '../stores';
 
   import GridContainer from './GridContainer.svelte';
@@ -14,7 +13,6 @@
 </script>
 
 <div
-  transition:fly={{ y: 100, duration: 750 }}
   class="position-fixed mobile-lg:margin-top-2 tablet:margin-top-4
   width-full z-top">
   <GridContainer>
