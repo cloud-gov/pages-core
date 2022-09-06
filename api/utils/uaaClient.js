@@ -26,9 +26,12 @@ const uaaOptions = config.passport.uaa;
  * A wrapper around the UAA API
  */
 class UAAClient {
-  constructor() {
-    this.clientId = uaaOptions.options.clientID;
-    this.clientSecret = uaaOptions.options.clientSecret;
+  constructor(
+    clientID = uaaOptions.options.clientID,
+    clientSecret = uaaOptions.options.clientSecret
+  ) {
+    this.clientId = clientID;
+    this.clientSecret = clientSecret;
     this.httpClient = new HttpClient(config.env.uaaHostUrl);
   }
 
@@ -52,7 +55,9 @@ class UAAClient {
 
     const groupName = 'pages.user';
 
-    const clientToken = await this.fetchClientToken();
+    const clientToken = await this.fetchClientToken({
+      scope: 'scim.read,scim.invite,scim.write',
+    });
 
     const uaaUser = await this.fetchUserByEmail(targetUserEmail, clientToken);
     if (uaaUser) {
@@ -124,7 +129,7 @@ class UAAClient {
   /**
    * @param {string} groupId - a UAA group id
    * @param {{origin: string, userId: string}} userInfo - the origin and user id of the uaa user
-   * @param {string} clientToken - a client token with the `groups.update` scope
+   * @param {string} clientToken - a client token with the `scim.write` scope
    *
    * Adds the UAA user to the specific UAA group, ignores an error if the user is a member.
    */
@@ -150,17 +155,21 @@ class UAAClient {
    * @returns {Promise<string>} a client token
    *
    * Fetches a new client token with scopes matching the configured client `authorities`
+   * @param {{scope: string}} - the form options for the client token
    */
-  async fetchClientToken() {
+  async fetchClientToken({ scope } = {}) {
+    const form = {
+      client_id: this.clientId,
+      client_secret: this.clientSecret,
+      grant_type: 'client_credentials',
+      response_type: 'token',
+      ...(scope && { scope }),
+    };
+
     const path = '/oauth/token';
     const options = {
       method: 'POST',
-      form: {
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
-        grant_type: 'client_credentials',
-        response_type: 'token',
-      },
+      form,
     };
 
     const { access_token: accessToken } = await this.request(path, options);

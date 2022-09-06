@@ -84,15 +84,24 @@ const associate = ({
   }));
   Site.addScope('forUser', user => ({
     where: {
-      [Op.or]: [
-        Sequelize.where(Sequelize.col('Users.id'), Op.not, null),
-        { organizationId: { [Op.not]: null } },
+      [Op.and]: [
+        {
+          [Op.or]: [
+            Sequelize.where(Sequelize.col('Users.id'), Op.not, null),
+            { organizationId: { [Op.not]: null } },
+          ],
+        },
+        {
+          [Op.or]: [
+            { '$Users.id$': user.id },
+            { '$Organization.OrganizationRoles.userId$': user.id },
+          ],
+        },
       ],
     },
     include: [
       {
         model: User,
-        where: { id: user.id },
         required: false,
       },
       {
@@ -100,7 +109,6 @@ const associate = ({
         required: false,
         include: [{
           model: OrganizationRole,
-          where: { userId: user.id },
         }],
       },
     ],
