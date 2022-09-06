@@ -39,7 +39,7 @@ function mockAddUserToGroup(groupId, { origin, userId }, token, error) {
 /**
  * @param {string} returnAccessToken - the access token to return
  */
-function mockFetchClientToken(returnAccessToken) {
+function mockFetchClientToken(returnAccessToken, scope) {
   const url = new URL(uaaConfig.tokenURL);
 
   return nock(url.origin)
@@ -48,6 +48,7 @@ function mockFetchClientToken(returnAccessToken) {
       client_secret: uaaConfig.clientSecret,
       grant_type: 'client_credentials',
       response_type: 'token',
+      ...(scope && { scope }),
     })
     .reply(200, { access_token: returnAccessToken });
 }

@@ -267,7 +267,6 @@ describe('Site model', () => {
         nonOrgSiteForUser,
         orgSiteForUser,
         orgSiteForOtherUserOrg,
-        orgSiteOnlyForUser,
       ].map(site => site.id);
 
       const expectedNonMemberIds = [
