@@ -242,7 +242,7 @@ describe('UAAClient', () => {
     const clientToken = 'client-token';
 
     beforeEach(async () => {
-      cfUAANock.mockFetchClientToken(clientToken);
+      cfUAANock.mockFetchClientToken(clientToken, 'scim.read,scim.invite,scim.write');
     });
 
     context('when the UAA user exists, but is not in the group', () => {
