@@ -133,10 +133,10 @@ class UAAClient {
    *
    * Adds the UAA user to the specific UAA group, ignores an error if the user is a member.
    */
-  async addUserToGroup(groupId, { origin, userId }, clientToken) {
+  async addUserToGroup(groupId, { userId }, clientToken) {
     const path = `/Groups/${groupId}/members`;
     const options = {
-      body: { origin, type: 'USER', value: userId },
+      body: { origin: 'uaa', type: 'USER', value: userId },
       method: 'POST',
       token: clientToken,
     };

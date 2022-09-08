@@ -261,7 +261,7 @@ describe('UAAClient', () => {
 
         cfUAANock.mockFetchUserByEmail(email, clientToken, user);
         cfUAANock.mockFetchGroupId('pages.user', groupId, clientToken);
-        cfUAANock.mockAddUserToGroup(groupId, { origin, userId }, clientToken);
+        cfUAANock.mockAddUserToGroup(groupId, { userId }, clientToken);
         const inviteUserSpy = sinon.spy(uaaClient, 'inviteUser');
         const addUserToGroupSpy = sinon.spy(uaaClient, 'addUserToGroup');
 
