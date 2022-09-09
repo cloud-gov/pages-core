@@ -1,4 +1,3 @@
-const AWS = require('aws-sdk');
 const url = require('url');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
@@ -6,7 +5,6 @@ const BullQueueClient = require('../utils/bullQueueClient');
 const { buildViewLink, buildUrl } = require('../utils/build');
 const GithubBuildHelper = require('./GithubBuildHelper');
 const S3Helper = require('./S3Helper');
-const Features = require('../features');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -111,7 +109,7 @@ const setupBucket = async (build, buildCount) => {
 };
 
 const SiteBuildQueue = {
-  bullClient: new BullQueueClient('site-build-queue')
+  bullClient: new BullQueueClient('site-build-queue'),
 };
 
 SiteBuildQueue.messageBodyForBuild = build => buildContainerEnvironment(build)

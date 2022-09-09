@@ -32,7 +32,6 @@ function getUpsCreds(vcapJson) {
 
 function updateLocalConfig(vcapJson) {
   const s3Creds = vcapJson.VCAP_SERVICES.s3[0].credentials;
-  const userProvidedCreds = getUpsCreds(vcapJson);
 
   const newConfig = {
     s3: {
