@@ -35,12 +35,6 @@ function updateLocalConfig(vcapJson) {
   const userProvidedCreds = getUpsCreds(vcapJson);
 
   const newConfig = {
-    sqs: {
-      accessKeyId: userProvidedCreds.FEDERALIST_AWS_BUILD_KEY,
-      secretAccessKey: userProvidedCreds.FEDERALIST_AWS_BUILD_SECRET,
-      region: userProvidedCreds.FEDERALIST_SQS_REGION,
-      queue: userProvidedCreds.FEDERALIST_SQS_QUEUE,
-    },
     s3: {
       accessKeyId: s3Creds.access_key_id,
       secretAccessKey: s3Creds.secret_access_key,
