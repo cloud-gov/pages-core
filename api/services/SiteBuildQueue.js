@@ -110,14 +110,8 @@ const setupBucket = async (build, buildCount) => {
   return true;
 };
 
-const sqsConfig = config.sqs;
 const SiteBuildQueue = {
-  sqsClient: new AWS.SQS({
-    accessKeyId: sqsConfig.accessKeyId,
-    secretAccessKey: sqsConfig.secretAccessKey,
-    region: sqsConfig.region,
-  }),
-  bullClient: new BullQueueClient('site-build-queue'),
+  bullClient: new BullQueueClient('site-build-queue')
 };
 
 SiteBuildQueue.messageBodyForBuild = build => buildContainerEnvironment(build)
@@ -134,16 +128,7 @@ SiteBuildQueue.sendBuildMessage = async (build, buildCount) => {
   const message = await SiteBuildQueue.messageBodyForBuild(build);
   await setupBucket(build, buildCount);
 
-  if (Features.enabled(Features.Flags.FEATURE_BULL_SITE_BUILD_QUEUE)) {
-    return SiteBuildQueue.bullClient.add(message);
-  }
-
-  const params = {
-    QueueUrl: sqsConfig.queue,
-    MessageBody: JSON.stringify(message),
-  };
-
-  return SiteBuildQueue.sqsClient.sendMessage(params).promise();
+  return SiteBuildQueue.bullClient.add(message);
 };
 
 module.exports = SiteBuildQueue;
