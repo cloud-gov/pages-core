@@ -4,7 +4,6 @@ const fs = require('fs');
 const app = 'federalistapp-staging';
 const space = 'staging';
 const org = 'gsa-18f-federalist';
-const credsUpsName = 'federalist-staging-env';
 const localConfigPath = './config/local-from-staging.js';
 
 function showUsage({ alreadyLoggedIn = true } = {}) {
@@ -22,12 +21,6 @@ function showUsage({ alreadyLoggedIn = true } = {}) {
 
   console.log('Then run this command again.');
   /* eslint-enable no-console */
-}
-
-function getUpsCreds(vcapJson) {
-  return vcapJson.VCAP_SERVICES['user-provided']
-    .find(el => el.instance_name === credsUpsName)
-    .credentials;
 }
 
 function updateLocalConfig(vcapJson) {
