@@ -1,4 +1,3 @@
-const AWS = require('aws-sdk');
 const url = require('url');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
@@ -6,7 +5,6 @@ const BullQueueClient = require('../utils/bullQueueClient');
 const { buildViewLink, buildUrl } = require('../utils/build');
 const GithubBuildHelper = require('./GithubBuildHelper');
 const S3Helper = require('./S3Helper');
-const Features = require('../features');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -110,13 +108,7 @@ const setupBucket = async (build, buildCount) => {
   return true;
 };
 
-const sqsConfig = config.sqs;
 const SiteBuildQueue = {
-  sqsClient: new AWS.SQS({
-    accessKeyId: sqsConfig.accessKeyId,
-    secretAccessKey: sqsConfig.secretAccessKey,
-    region: sqsConfig.region,
-  }),
   bullClient: new BullQueueClient('site-build-queue'),
 };
 
@@ -134,16 +126,7 @@ SiteBuildQueue.sendBuildMessage = async (build, buildCount) => {
   const message = await SiteBuildQueue.messageBodyForBuild(build);
   await setupBucket(build, buildCount);
 
-  if (Features.enabled(Features.Flags.FEATURE_BULL_SITE_BUILD_QUEUE)) {
-    return SiteBuildQueue.bullClient.add(message);
-  }
-
-  const params = {
-    QueueUrl: sqsConfig.queue,
-    MessageBody: JSON.stringify(message),
-  };
-
-  return SiteBuildQueue.sqsClient.sendMessage(params).promise();
+  return SiteBuildQueue.bullClient.add(message);
 };
 
 module.exports = SiteBuildQueue;

@@ -131,7 +131,6 @@ webapp_name=$(add_ext_if_not_prod "${webapp_prefix}" "${env_type}")
 # Service Names
 service_name_rds="${cf_prefix}-rds"
 service_name_redis="${cf_prefix}-redis"
-service_name_sqs="${cf_prefix}-sqs-creds"
 service_name_s3="${cf_prefix}-s3"
 service_name_s3_build_logs="${cf_prefix}-s3-build-logs"
 service_name_uev_key="${cf_prefix}-uev-key"
@@ -182,7 +181,6 @@ cf create-service-key "${service_name_cf_api_user}" "${service_name_cf_api_user}
 cf create-service cloud-gov-service-account space-deployer "${service_name_cf_ci_user}"
 cf create-service-key "${service_name_cf_ci_user}" "${service_name_cf_ci_user}-key"
 cf create-user-provided-service "${service_name_sitewide_error}" -p '{"BODY": "", "HEADING": ""}'
-cf create-user-provided-service "${service_name_sqs}" -p '{"sqs_url": ""}'
 cf create-user-provided-service "${service_name_uev_key}" \
   -p "$(cat <<- EOF
     {

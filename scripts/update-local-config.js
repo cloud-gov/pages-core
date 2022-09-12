@@ -4,7 +4,6 @@ const fs = require('fs');
 const app = 'federalistapp-staging';
 const space = 'staging';
 const org = 'gsa-18f-federalist';
-const credsUpsName = 'federalist-staging-env';
 const localConfigPath = './config/local-from-staging.js';
 
 function showUsage({ alreadyLoggedIn = true } = {}) {
@@ -24,23 +23,10 @@ function showUsage({ alreadyLoggedIn = true } = {}) {
   /* eslint-enable no-console */
 }
 
-function getUpsCreds(vcapJson) {
-  return vcapJson.VCAP_SERVICES['user-provided']
-    .find(el => el.instance_name === credsUpsName)
-    .credentials;
-}
-
 function updateLocalConfig(vcapJson) {
   const s3Creds = vcapJson.VCAP_SERVICES.s3[0].credentials;
-  const userProvidedCreds = getUpsCreds(vcapJson);
 
   const newConfig = {
-    sqs: {
-      accessKeyId: userProvidedCreds.FEDERALIST_AWS_BUILD_KEY,
-      secretAccessKey: userProvidedCreds.FEDERALIST_AWS_BUILD_SECRET,
-      region: userProvidedCreds.FEDERALIST_SQS_REGION,
-      queue: userProvidedCreds.FEDERALIST_SQS_QUEUE,
-    },
     s3: {
       accessKeyId: s3Creds.access_key_id,
       secretAccessKey: s3Creds.secret_access_key,

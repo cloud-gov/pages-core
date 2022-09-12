@@ -157,11 +157,6 @@ The app expects the following user provided services to be provided:
   - `GITHUB_CLIENT_SECRET`: The client secret used for GitHub authentication
   - `GITHUB_WEBHOOK_SECRET`: The secret used to sign and verify webhook requests from GitHub
   - `GITHUB_WEBHOOK_URL`: The url where GitHub webhook requests should be sent
-- `federalist-<environment>-sqs-creds`: A user-provided service that provides the application with SQS credentials that cannot be added to `manifest.yml` b/c that file is under version control; this service provides the following:
-  - `access_key`: The AWS access key for SQS queue
-  - `secret_key`: The AWS secret key for SQS queue
-  - `region`: The AWS region
-  - `sqs_url`: The AWS SQS queue URL
 - `admin-<environment>-uaa-client`: Credentials for cloud.gov's UAA to support authentication for the admin app. This service provides the following:
   - `clientID`: The UAA client id for the environments admin app
   - `clientSecret`: The UAA client secret for the environments admin app
@@ -383,7 +378,6 @@ Environment-specific feature flags are supported for both the api and frontend. 
 
 `FEATURE_AUTH_GITHUB`: Used in [`api/controllers/main.js`](./api/controllers/main.js) to enable authentication with Github oauth.
 `FEATURE_AUTH_UAA`: Used in [`api/controllers/main.js`](./api/controllers/main.js) to enable authentication with the cloud.gov UAA.
-`FEATURE_BULL_SITE_BUILD_QUEUE`: Used to enable to use of the redis backed bull queue.
 
 ### Api feature flags
 Api feature flags are evaluated at *runtime* and should be created explicitly in the code before the corresponding environment variable can be used. Example:

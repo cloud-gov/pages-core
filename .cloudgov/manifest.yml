@@ -20,7 +20,6 @@ applications:
       - federalist-((env))-rds
       - federalist-((env))-s3
       - ((product))-((env))-env
-      - federalist-((env))-sqs-creds
       - pages-((env))-redis
       - ((product))-((env))-proxy
       - ((product))-((env))-domain
@@ -46,7 +45,6 @@ applications:
       S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
       FEATURE_AUTH_GITHUB: ((feature_auth_github))
       FEATURE_AUTH_UAA: ((feature_auth_uaa))
-      FEATURE_BULL_SITE_BUILD_QUEUE: ((feature_bull_site_build_queue))
       UAA_HOST: ((uaa_host))
       NEW_RELIC_APP_NAME: ((new_relic_app_name))
       PROXY_DOMAIN: ((proxy_domain))
