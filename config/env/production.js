@@ -52,19 +52,6 @@ if (s3BuildLogsCreds) {
   throw new Error('No S3 Build Logs credentials found');
 }
 
-// SQS Configs
-const sqsCreds = appEnv.getServiceCreds(`${servicePrefix}-sqs-creds`);
-if (sqsCreds) {
-  module.exports.sqs = {
-    accessKeyId: sqsCreds.access_key,
-    secretAccessKey: sqsCreds.secret_key,
-    region: sqsCreds.region,
-    queue: sqsCreds.sqs_url,
-  };
-} else {
-  throw new Error('No SQS credentials found');
-}
-
 // Redis Configs
 const redisCreds = appEnv.getServiceCreds(`pages-${APP_ENV}-redis`);
 if (redisCreds) {

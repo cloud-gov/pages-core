@@ -21,13 +21,12 @@ function tokenAuth(token) {
 
 /**
  * @param {string} groupId
- * @param {{origin:string, userId: string}}
  * @param {string} token
  * @param {{error:string}=} error
  */
-function mockAddUserToGroup(groupId, { origin, userId }, token, error) {
+function mockAddUserToGroup(groupId, { userId }, token, error) {
   const n = nock(uaaHost, tokenAuth(token))
-    .post(`/Groups/${groupId}/members`, { origin, type: 'USER', value: userId });
+    .post(`/Groups/${groupId}/members`, { origin: 'uaa', type: 'USER', value: userId });
 
   if (error) {
     return n.reply(400, error);

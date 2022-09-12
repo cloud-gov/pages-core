@@ -26,12 +26,6 @@ module.exports = {
   build: {
     token: '123abc',
   },
-  sqs: {
-    accessKeyId: '123abc',
-    secretAccessKey: '456def',
-    region: 'us-east-1',
-    queue: 'https://sqs.us-east-1.amazonaws.com/123abc/456def',
-  },
   s3: {
     accessKeyId: '123abc',
     secretAccessKey: '456def',
