@@ -41,7 +41,7 @@
               </a>
             </li>
             <li class="nav-action">
-              {% if hasUAAIdentity %}
+              {% if authUAA && hasUAAIdentity %}
                 <a class="usa-button usa-button-white" href="/logout">Log out</a>
               {% else %}
                 <a class="usa-button usa-button-white" href="/logout/github">Log out</a>
