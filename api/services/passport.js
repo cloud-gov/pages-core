@@ -54,6 +54,10 @@ async function checkUpdateUser({
     return { flashMessage: 'You must login with your cloud.gov account. Please try again.' };
   }
 
+  if (config.app.product !== 'pages' && user.UAAIdentity) {
+    return { flashMessage: 'Now that you\'ve migrated, you must login to Pages with your cloud.gov account' };
+  }
+
   await user.update({
     username,
     email,
