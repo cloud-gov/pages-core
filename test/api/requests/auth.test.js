@@ -227,7 +227,7 @@ describe('Authentication requests', () => {
             process.env.FEATURE_AUTH_UAA = uaaAuth;
           });
 
-          it('should authenticate the user', (done) => {
+          it('should not authenticate the user', (done) => {
             let user;
             let cookie;
             nock.cleanAll();
@@ -244,19 +244,20 @@ describe('Authentication requests', () => {
                 return request(app)
                   .get(`/auth/github/callback?code=auth-code-123abc&state=${oauthState}`)
                   .set('Cookie', cookie)
-                  .expect(302);
               })
-              .then(() => sessionForCookie(cookie))
-              .then((authSession) => {
-                expect(authSession.authenticated).to.equal(true);
-                expect(authSession.passport.user).to.equal(user.id);
-                expect(eventAuditStub.calledOnce).to.equal(true);
-                return user.reload();
+              .then((response) => {
+                expect(response.statusCode).to.equal(302);
+                expect(response.header.location).to.equal('/');
+                return sessionForCookie(cookie);
               })
-              .then((model) => {
-                user = model;
+              .then((sess) => {
+                expect(sess.flash.error.length).to.equal(1);
+                expect(sess.flash.error[0]).to.equal(
+                  'Now that you\'ve migrated, you must login to Pages with your cloud.gov account.'
+                );
                 done();
-              });
+              })
+              .catch(done);
           });
         });
 
