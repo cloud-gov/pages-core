@@ -235,8 +235,9 @@ describe('Authentication requests', () => {
             factory.user()
               .then((model) => {
                 user = model;
-                return githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
+                return factory.uaaIdentity({ userId: user.id });
               })
+              .then(() => githubAPINocks.githubAuth(user.username, [{ id: 123456 }]))
               .then(() => unauthenticatedSession({ oauthState }))
               .then((session) => {
                 cookie = session;
