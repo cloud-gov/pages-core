@@ -17,6 +17,10 @@ import { IconPlus } from '../icons';
 import alertActions from '../../actions/alertActions';
 import userActions from '../../actions/userActions';
 
+import globals from '../../globals';
+
+const isPages = globals.PRODUCT === 'pages';
+
 const onGithubAuthSuccess = () => {
   userActions.fetchUser();
   alertActions.alertSuccess('Github authorization successful');
@@ -73,6 +77,31 @@ export const SiteList = ({
   const [orgFilterValue, setOrgFilterValue] = useState('all-options');
   const groupedSites = groupSitesByOrg(sites, orgFilterValue);
 
+  let topButton = '';
+  if (isPages) {
+    if (user.hasGithubAuth) {
+      topButton = (
+        <Link
+          to="/sites/new"
+          role="button"
+          className="usa-button button-add-website"
+          alt="Add a new site"
+        >
+          <IconPlus />
+          {' '}
+          Add site
+        </Link>
+      );
+    } else {
+      topButton = (
+        <GithubAuthButton
+          onSuccess={onGithubAuthSuccess}
+          onFailure={onGithubAuthFailure}
+        />
+      );
+    }
+  }
+
   return (
     <div>
       <div className="page-header usa-grid-full">
@@ -82,22 +111,7 @@ export const SiteList = ({
           </h1>
         </div>
         <div className="usa-width-one-half header-actions">
-          {
-            user.hasGithubAuth
-              ? (
-                <Link
-                  to="/sites/new"
-                  role="button"
-                  className="usa-button button-add-website"
-                  alt="Add a new site"
-                >
-                  <IconPlus />
-                  {' '}
-                  Add site
-                </Link>
-              )
-              : <GithubAuthButton onSuccess={onGithubAuthSuccess} onFailure={onGithubAuthFailure} />
-          }
+          {topButton}
         </div>
       </div>
       {

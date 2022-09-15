@@ -50,8 +50,11 @@ async function checkUpdateUser({
     return { flashMessage };
   }
 
-  if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA) && user.UAAIdentity) {
-    return { flashMessage: 'You must login with your cloud.gov account. Please try again.' };
+  if (user.UAAIdentity) {
+    if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA)) {
+      return { flashMessage: 'You must login with your cloud.gov account. Please try again.' };
+    }
+    return { flashMessage: 'Now that you\'ve migrated, you must login to Pages with your cloud.gov account.' };
   }
 
   await user.update({
