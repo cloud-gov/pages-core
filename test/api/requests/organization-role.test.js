@@ -67,8 +67,8 @@ describe('Organization Role API', () => {
     });
   });
 
-  describe('DELETE /v0/organization-role', () => {
-    requiresAuthentication('DELETE', '/organization-role');
+  describe('DELETE /v0/organization/:org_id/user/:user_id', () => {
+    requiresAuthentication('DELETE', '/organization/1/user/1', '/organization/{org_id}/user/{user_id}');
 
     it('returns a 404 if the user is not a manager of the organization', async () => {
       const [user, org] = await Promise.all([
@@ -81,14 +81,10 @@ describe('Organization Role API', () => {
         org.addUser(user, { through: { roleId: userRole.id } }),
       ]);
 
-      const response = await authenticatedRequest.delete('/v0/organization-role')
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({
-          organizationId: org.id,
-          userId: user.id,
-        });
+      const response = await authenticatedRequest.delete(`/v0/organization/${org.id}/user/${user.id}`)
+        .set('x-csrf-token', csrfToken.getToken());
 
-      validateAgainstJSONSchema('DELETE', '/organization-role', 404, response.body);
+      validateAgainstJSONSchema('DELETE', '/organization/{org_id}/user/{user_id}', 404, response.body);
     });
 
     it('deletes the organization role and returns an empty object', async () => {
@@ -109,14 +105,10 @@ describe('Organization Role API', () => {
         },
       })).to.eq(1);
 
-      const response = await authenticatedRequest.delete('/v0/organization-role')
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({
-          organizationId: org.id,
-          userId: user.id,
-        });
+      const response = await authenticatedRequest.delete(`/v0/organization/${org.id}/user/${user.id}`)
+        .set('x-csrf-token', csrfToken.getToken());
 
-      validateAgainstJSONSchema('DELETE', '/organization-role', 200, response.body);
+      validateAgainstJSONSchema('DELETE', '/organization/{org_id}/user/{user_id}', 200, response.body);
 
       expect(await OrganizationRole.count({
         where: {
@@ -137,14 +129,10 @@ describe('Organization Role API', () => {
         org.addUser(user, { through: { roleId: userRole.id } }),
       ]);
 
-      const response = await authenticatedRequest.delete('/v0/organization-role')
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({
-          organizationId: org.id,
-          userId: user.id,
-        });
+      const response = await authenticatedRequest.delete(`/v0/organization/${org.id}/user/${user.id}`)
+        .set('x-csrf-token', csrfToken.getToken());
 
-      validateAgainstJSONSchema('DELETE', '/organization-role', 404, response.body);
+      validateAgainstJSONSchema('DELETE', '/organization/{org_id}/user/{user_id}', 404, response.body);
 
       expect(await OrganizationRole.count({
         where: {
