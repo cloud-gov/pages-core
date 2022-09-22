@@ -7,22 +7,19 @@ const EventCreator = require('../../services/EventCreator');
 module.exports = wrapHandlers({
   async destroy(req, res) {
     const {
-      body: {
-        organizationId,
-        userId,
-      },
+      params: { org_id: orgId, user_id: userId },
     } = req;
 
-    const org = await fetchModelById(organizationId, Organization);
+    const org = await fetchModelById(orgId, Organization);
     if (!org) return res.notFound();
 
     await OrganizationRole.destroy({
       where: {
-        organizationId: toInt(organizationId),
+        organizationId: toInt(orgId),
         userId: toInt(userId),
       },
     });
-    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'OrganizationRole Removed', { organizationRole: { organizationId, userId } });
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'OrganizationRole Removed', { organizationRole: { orgId, userId } });
 
     return res.json({});
   },

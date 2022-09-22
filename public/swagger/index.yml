@@ -256,6 +256,37 @@ paths:
           description: Not found
           schema:
             $ref: "Error.json"
+  /organization/{org_id}/user/{user_id}:
+    parameters:
+      - name: org_id
+        in: path
+        type: integer
+        description: The id of the organization
+        required: true
+      - name: user_id
+        in: path
+        type: integer
+        description: The id of the target user
+        required: true
+    delete:
+      summary: Delete the organization role if the current user has permissions
+      responses:
+        200:
+          description: An empty object
+          schema:
+            type: object
+        400:
+          description: Bad request
+          schema:
+            $ref: "Error.json"
+        403:
+          description: Not authorized
+          schema:
+            $ref: "Error.json"
+        404:
+          description: Not found
+          schema:
+            $ref: "Error.json"
   /organization/{id}/invite:
     parameters:
     - name: id
@@ -268,7 +299,7 @@ paths:
       parameters:
         - name: roleId
           in: body
-          type: number
+          type: integer
           description: The id of the role type
           required: true
         - name: uaaEmail
@@ -358,17 +389,17 @@ paths:
       parameters:
         - name: organizationId
           in: body
-          type: number
+          type: integer
           description: The id of the organization
           required: true
         - name: roleId
           in: body
-          type: number
+          type: integer
           description: The id of the role type
           required: true
         - name: userId
           in: body
-          type: number
+          type: integer
           description: The id of the target user
           required: true
       responses:
@@ -376,36 +407,6 @@ paths:
           description: The updated organization role object
           schema:
             $ref: "OrganizationRole.json"
-        400:
-          description: Bad request
-          schema:
-            $ref: "Error.json"
-        403:
-          description: Not authorized
-          schema:
-            $ref: "Error.json"
-        404:
-          description: Not found
-          schema:
-            $ref: "Error.json"
-    delete:
-      summary: Delete the organization role if the current user has permissions
-      parameters:
-        - name: organizationId
-          in: body
-          type: number
-          description: The id of the organization
-          required: true
-        - name: userId
-          in: body
-          type: number
-          description: The id of the target user
-          required: true
-      responses:
-        200:
-          description: The updated organization role object
-          schema:
-            type: object
         400:
           description: Bad request
           schema:

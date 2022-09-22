@@ -15,19 +15,16 @@ module.exports = wrapHandlers({
 
   async destroy(req, res) {
     const {
-      body: {
-        organizationId,
-        userId,
-      },
+      params: { org_id: orgId, user_id: userId },
       user,
     } = req;
 
-    const org = await fetchModelById(organizationId, Organization.forManagerRole(user));
+    const org = await fetchModelById(orgId, Organization.forManagerRole(user));
     if (!org) return res.notFound();
 
     await OrganizationRole.destroy({
       where: {
-        organizationId: toInt(organizationId),
+        organizationId: toInt(orgId),
         userId: toInt(userId),
       },
     });
