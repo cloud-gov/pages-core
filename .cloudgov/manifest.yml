@@ -37,7 +37,7 @@ applications:
       CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
       DOMAIN: ((domain))
-      HOMEPAGE_URL: https://federalist.18f.gov
+      HOMEPAGE_URL: https://cloud.gov/pages
       LOG_LEVEL: ((log_level))
       NPM_CONFIG_PRODUCTION: true
       NODE_MODULES_CACHE: false
