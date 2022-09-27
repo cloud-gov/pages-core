@@ -26,7 +26,7 @@ const itShouldRequireAdminAuthentication = (path, schema, method = 'get') => {
     const response = await request(app)[method](path)
       .expect(401);
 
-    validateAgainstJSONSchema('GET', schema, 403, response.body);
+    validateAgainstJSONSchema(method, schema, 403, response.body);
     expect(response.body.message).to.equal('Unauthorized');
   });
 };
@@ -53,8 +53,8 @@ describe('Organization Role Admin API', () => {
 
   afterEach(clean);
 
-  describe('DELETE /admin/organization-role', () => {
-    itShouldRequireAdminAuthentication('/organization-role', '/organization-role', 'delete');
+  describe('DELETE /admin/organization/:org_id/user/:user_id', () => {
+    itShouldRequireAdminAuthentication('/organization/1/user/1', '/organization/{org_id}/user/{user_id}', 'delete');
 
     it('deletes the organization role and returns an empty object', async () => {
       const [user, org] = await Promise.all([
@@ -74,15 +74,11 @@ describe('Organization Role Admin API', () => {
         },
       })).to.eq(1);
 
-      const response = await authenticatedRequest.delete('/organization-role')
+      const response = await authenticatedRequest.delete(`/organization/${org.id}/user/${user.id}`)
         .set('Origin', config.app.adminHostname)
-        .set('x-csrf-token', csrfToken.getToken())
-        .send({
-          organizationId: org.id,
-          userId: user.id,
-        });
+        .set('x-csrf-token', csrfToken.getToken());
 
-      validateAgainstJSONSchema('DELETE', '/organization-role', 200, response.body);
+      validateAgainstJSONSchema('DELETE', '/organization/{org_id}/user/{user_id}', 200, response.body);
 
       expect(await OrganizationRole.count({
         where: {

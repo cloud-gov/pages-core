@@ -180,8 +180,8 @@ async function fetchRoles() {
   return get('/roles').catch(() => []);
 }
 
-async function removeUserOrgRole(params) {
-  return destroy('/organization-role', params);
+async function removeUserOrgRole({ userId, organizationId }) {
+  return destroy(`/organization/${organizationId}/user/${userId}`);
 }
 
 async function updateUserOrgRole(params) {

@@ -70,12 +70,8 @@ export default {
   },
 
   removeOrganizationRole(organizationId, userId) {
-    return request('organization-role', {
+    return request(`organization/${organizationId}/user/${userId}`, {
       method: 'DELETE',
-      data: {
-        organizationId,
-        userId,
-      },
     });
   },
 
