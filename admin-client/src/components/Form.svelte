@@ -7,6 +7,7 @@
   export let title;
   export let action = 'Save';
   export let large = false;
+  export let disabled = false;
 
   let submitting = false;
   let errors = {};
@@ -19,6 +20,7 @@
 
     try {
       const result = await onSubmit();
+
       if (onSuccess) {
         onSuccess(result);
       }
@@ -45,12 +47,12 @@
       <legend class="usa-legend usa-legend--large">
         {title}
       </legend>
-      
+
       <p>
         Required fields are marked with an asterisk (<abbr title="required" class="usa-hint usa-hint--required">*</abbr>).
       </p>
     {/if}
-    
+
     {#if hasErrors}
       <div class="usa-alert usa-alert--error usa-alert--slim">
         <div class="usa-alert__body">
@@ -63,7 +65,7 @@
 
     <slot {errors}></slot>
 
-    <input class="usa-button" type="submit" value={action} disabled={submitting}>
+    <input class="usa-button" type="submit" value={action} disabled={submitting || disabled}>
   </fieldset>
 </form>
 

@@ -242,7 +242,7 @@ describe('UAAClient', () => {
     const clientToken = 'client-token';
 
     beforeEach(async () => {
-      cfUAANock.mockFetchClientToken(clientToken);
+      cfUAANock.mockFetchClientToken(clientToken, 'scim.read,scim.invite,scim.write');
     });
 
     context('when the UAA user exists, but is not in the group', () => {
@@ -261,7 +261,7 @@ describe('UAAClient', () => {
 
         cfUAANock.mockFetchUserByEmail(email, clientToken, user);
         cfUAANock.mockFetchGroupId('pages.user', groupId, clientToken);
-        cfUAANock.mockAddUserToGroup(groupId, { origin, userId }, clientToken);
+        cfUAANock.mockAddUserToGroup(groupId, { userId }, clientToken);
         const inviteUserSpy = sinon.spy(uaaClient, 'inviteUser');
         const addUserToGroupSpy = sinon.spy(uaaClient, 'addUserToGroup');
 

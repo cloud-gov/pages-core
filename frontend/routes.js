@@ -34,7 +34,7 @@ export default (
     {isPages && <Organization.List path="organizations" />}
     {isPages && <Organization.Edit path="organizations/:id" />}
     <SiteList path="sites" />
-    <AddSite path="sites/new" />
+    {isPages && <AddSite path="sites/new" /> }
     <SiteContainer path="sites/:id">
       <Redirect noThrow from="/" to="builds" />
       <SiteSettings path="settings" />

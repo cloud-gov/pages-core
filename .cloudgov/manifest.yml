@@ -20,8 +20,7 @@ applications:
       - federalist-((env))-rds
       - federalist-((env))-s3
       - ((product))-((env))-env
-      - federalist-((env))-sqs-creds
-      - ((product))-((env))-redis
+      - pages-((env))-redis
       - ((product))-((env))-proxy
       - ((product))-((env))-domain
       - federalist-((env))-uev-key
@@ -38,7 +37,7 @@ applications:
       CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
       DOMAIN: ((domain))
-      HOMEPAGE_URL: https://federalist.18f.gov
+      HOMEPAGE_URL: https://cloud.gov/pages
       LOG_LEVEL: ((log_level))
       NPM_CONFIG_PRODUCTION: true
       NODE_MODULES_CACHE: false
@@ -46,7 +45,6 @@ applications:
       S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
       FEATURE_AUTH_GITHUB: ((feature_auth_github))
       FEATURE_AUTH_UAA: ((feature_auth_uaa))
-      FEATURE_BULL_SITE_BUILD_QUEUE: ((feature_bull_site_build_queue))
       UAA_HOST: ((uaa_host))
       NEW_RELIC_APP_NAME: ((new_relic_app_name))
       PROXY_DOMAIN: ((proxy_domain))

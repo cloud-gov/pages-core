@@ -8,6 +8,7 @@ const EventCreator = require('../../services/EventCreator');
 const updateableAttrs = [
   'containerConfig',
   'isActive',
+  'organizationId',
 ];
 
 module.exports = wrapHandlers({

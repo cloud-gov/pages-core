@@ -180,8 +180,8 @@ async function fetchRoles() {
   return get('/roles').catch(() => []);
 }
 
-async function removeUserOrgRole(params) {
-  return destroy('/organization-role', params);
+async function removeUserOrgRole({ userId, organizationId }) {
+  return destroy(`/organization/${organizationId}/user/${userId}`);
 }
 
 async function updateUserOrgRole(params) {
@@ -201,7 +201,7 @@ async function fetchRawSites() {
 }
 
 async function updateSite(id, params) {
-  return put(`/sites/${id}`, params).catch(() => null);
+  return put(`/sites/${id}`, params);
 }
 
 async function fetchUserEnvironmentVariables(query = {}) {
