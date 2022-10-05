@@ -15,6 +15,7 @@
       'https://cg-123456789.app.cloud.gov/demo/apburnes/example-node-site/',
     engine: 'node.js',
     id: 5,
+    organizationId: 1,
     owner: 'apburnes',
     previewLink:
       'https://cg-123456789.app.cloud.gov/preview/apburnes/example-node-site/',
@@ -38,6 +39,7 @@
     updatedAt,
     viewLink,
     isActive,
+    organizationId,
   } = site;
 
   const createDate = formatDateTime(createdAt);
@@ -83,6 +85,9 @@
         <span class="usa-tag bg-mint">{engine}</span>
         <span class="usa-tag bg-orange">{awsBucketName}</span>
         <span class="usa-tag bg-accent-cool-dark">{s3ServiceName}</span>
+        {#if organizationId}
+          <span class="usa-tag bg-indigo">ORG: {organizationId}</span>
+        {/if}
       </div>
       <div class="tablet:grid-col-auto padding-bottom-1">
         <ExternalLink href={viewLink}>Live</ExternalLink>

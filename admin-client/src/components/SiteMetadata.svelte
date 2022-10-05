@@ -18,6 +18,7 @@
     updatedAt,
     viewLink,
     isActive,
+    organizationId,
   } = site;
 
   const createDate = formatDateTime(createdAt);
@@ -31,6 +32,7 @@
   <div class="tablet:grid-col-fill padding-bottom-1">
     <LabeledItem label="id" value={id} />
     <LabeledItem label="owner" value={owner} />
+
     <LabeledItem label="repository" value={repository} />
     <LabeledItem label="status" value={isActive ? 'Active' : 'Inactive'} />
     <LabeledItem label="created at" value={createDate} />
@@ -45,8 +47,13 @@
         <span class="usa-tag bg-orange">{awsBucketName}</span>
       </LabeledItem>
       <LabeledItem label="cf service name">
-        <span class="usa-tag bg-orange">{s3ServiceName}</span>
+        <span class="usa-tag bg-accent-cool-dark">{s3ServiceName}</span>
       </LabeledItem>
+      {#if organizationId}
+        <LabeledItem label="organization id">
+          <span class="usa-tag bg-indigo">{organizationId}</span>
+        </LabeledItem>
+      {/if}
       <div>
         <ExternalLink href={viewLink}>Live</ExternalLink>
         <ExternalLink href={demoViewLink} className="padding-x-1">Demo</ExternalLink>
