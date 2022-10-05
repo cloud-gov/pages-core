@@ -1,3 +1,4 @@
+const authorize = require('./authorize');
 const cacheControl = require('./cache-control');
 const csrfProtection = require('./csrf-protection');
 const devMiddleware = require('./dev-middleware');
@@ -11,6 +12,7 @@ const sessionAuth = require('./session-auth');
 const xssProtection = require('./xss-protection');
 
 module.exports = {
+  authorize,
   cacheControl,
   csrfProtection,
   devMiddleware,

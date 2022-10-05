@@ -5,6 +5,7 @@ scim:
   groups:
     pages.user: A user for Pages
     pages.admin: An admin for Pages
+    pages.support: A support user for Pages
   userids_enabled: true
   username_pattern: '[a-z0-9+\-_.@]+'
   users:
@@ -16,6 +17,7 @@ scim:
     - userorgless@example.com|password|userorgless@example.com|UserOrgless|User|pages.user
     - manager_no_github@example.com|password|manager_no_github@example.com|ManagerNoGithub|User|pages.user
     - manager_with_github@example.com|password|manager_with_github@example.com|ManagerWithGithub|User|pages.user
+    - support_role@example.com|password|support_role@example.com|SupportRole|pages.support
 
 disableInternalAuth: false
 disableInternalUserManagement: false

@@ -49,14 +49,19 @@ if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA)) {
     ...config.passport.uaa.options,
     callbackURL: `${config.app.hostname}/admin/auth/uaa/callback`,
     logoutCallbackURL: `${config.app.hostname}/admin/auth/uaa/logout`,
+    passReqToCallback: true,
   };
 
-  const verify = async (accessToken, refreshToken, profile, callback) => {
+  const verify = async (req, accessToken, refreshToken, profile, callback) => {
     try {
-      const user = await verifyUAAUser(accessToken, refreshToken, profile, ['pages.admin']);
-
+      let user = await verifyUAAUser(accessToken, refreshToken, profile, ['pages.support']);
+      if (!user) {
+        user = await verifyUAAUser(accessToken, refreshToken, profile, ['pages.admin']);
+        if (user) req.session.role = 'admin';
+      } else {
+        req.session.role = 'support';
+      }
       if (!user) return callback(null, false);
-
       return callback(null, user);
     } catch (err) {
       return callback(err);
