@@ -57,9 +57,9 @@ if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA)) {
       let user = await verifyUAAUser(accessToken, refreshToken, profile, ['pages.support']);
       if (!user) {
         user = await verifyUAAUser(accessToken, refreshToken, profile, ['pages.admin']);
-        if (user) req.session.role = 'admin';
+        if (user) req.session.role = 'pages.admin';
       } else {
-        req.session.role = 'support';
+        req.session.role = 'pages.support';
       }
       if (!user) return callback(null, false);
       return callback(null, user);
