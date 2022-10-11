@@ -54,15 +54,19 @@ if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA)) {
 
   const verify = async (req, accessToken, refreshToken, profile, callback) => {
     try {
-      let user = await verifyUAAUser(accessToken, refreshToken, profile, ['pages.support']);
-      if (!user) {
-        user = await verifyUAAUser(accessToken, refreshToken, profile, ['pages.admin']);
-        if (user) req.session.role = 'pages.admin';
-      } else {
+      const supportUser = await verifyUAAUser(accessToken, refreshToken, profile, ['pages.support']);
+      if (supportUser) {
         req.session.role = 'pages.support';
+        return callback(null, supportUser);
       }
-      if (!user) return callback(null, false);
-      return callback(null, user);
+
+      const adminUser = await verifyUAAUser(accessToken, refreshToken, profile, ['pages.admin']);
+      if (adminUser) {
+        req.session.role = 'pages.admin';
+        return callback(null, adminUser);
+      }
+
+      return callback(null, false);
     } catch (err) {
       return callback(err);
     }
