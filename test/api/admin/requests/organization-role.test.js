@@ -33,6 +33,7 @@ const itShouldRequireAdminAuthentication = (path, schema, method = 'get') => {
 
 describe('Organization Role Admin API', () => {
   let authenticatedRequest;
+  let supportRequest;
   let currentUser;
   let userRole;
   let managerRole;
@@ -49,6 +50,8 @@ describe('Organization Role Admin API', () => {
     currentUser = await factory.user();
     const cookie = await authenticatedSession(currentUser, sessionConfig);
     authenticatedRequest = request.agent(app).set('Cookie', cookie);
+    const supportCookie = await authenticatedSession(currentUser, sessionConfig, 'pages.support');
+    supportRequest = request.agent(app).set('Cookie', supportCookie);
   });
 
   afterEach(clean);
@@ -86,6 +89,25 @@ describe('Organization Role Admin API', () => {
           userId: user.id,
         },
       })).to.eq(0);
+    });
+
+    it('fails to delete for support role', async () => {
+      const [user, org] = await Promise.all([
+        factory.user(),
+        factory.organization.create(),
+      ]);
+
+      await Promise.all([
+        org.addUser(currentUser, { through: { roleId: managerRole.id } }),
+        org.addUser(user, { through: { roleId: userRole.id } }),
+      ]);
+
+      const response = await supportRequest.delete(`/organization/${org.id}/user/${user.id}`)
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
+        .expect(403);
+
+      validateAgainstJSONSchema('DELETE', '/organization/{org_id}/user/{user_id}', 403, response.body);
     });
   });
 

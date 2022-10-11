@@ -116,7 +116,7 @@ class UAAClient {
    * @param {[string]} groupNames - allowed UAA group names, ex: ['pages.user']
    */
   userInGroup(userGroups, groupNames) {
-    return userGroups.filter(group => groupNames.includes(group.display)).length > 0;
+    return userGroups.some(group => groupNames.includes(group.display));
   }
 
   /**

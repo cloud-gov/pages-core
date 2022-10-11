@@ -180,6 +180,15 @@ async function createData() {
       .then(user => addUserToOrg(user, agency1, userRole))
       .then(user => addUserToOrg(user, agency2, managerRole)),
 
+    User
+      .create({
+        username: 'support_role',
+        email: 'support_role@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      })
+      .then(createUAAIdentity),
+
     /**
      * Actual Github users
      *

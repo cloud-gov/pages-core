@@ -64,7 +64,7 @@ module.exports = {
    */
   async isUAAAdmin(currentUserUAAIdentity) {
     const uaaClient = new UAAClient();
-    return uaaClient.verifyUserGroup(currentUserUAAIdentity.uaaId, ['pages.admin']);
+    return uaaClient.verifyUserGroup(currentUserUAAIdentity.uaaId, ['pages.admin', 'pages.support']);
   },
 
   /**
