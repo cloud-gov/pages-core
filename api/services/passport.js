@@ -147,7 +147,7 @@ if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA)) {
         accessToken,
         refreshToken,
         profile,
-        ['pages.user', 'pages.admin']
+        ['pages.user', 'pages.support', 'pages.admin']
       );
 
       if (!user) return callback(null, false, flashMessage);
