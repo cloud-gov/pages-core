@@ -431,7 +431,6 @@ describe('SiteCreator', () => {
           const siteParams = {
             owner: crypto.randomBytes(10).toString('hex'),
             repository: crypto.randomBytes(10).toString('hex'),
-            sharedBucket: false,
           };
 
           const name = `o-${siteParams.owner}-r-${siteParams.repository}`;
@@ -548,7 +547,6 @@ describe('SiteCreator', () => {
           const siteParams = {
             owner: crypto.randomBytes(10).toString('hex'),
             repository: crypto.randomBytes(10).toString('hex'),
-            sharedBucket: false,
           };
 
           const name = `o-${siteParams.owner}-r-${siteParams.repository}`;

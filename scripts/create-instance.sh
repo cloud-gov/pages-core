@@ -250,13 +250,6 @@ EOF
 # Grant permissions in the sites space
 cf set-space-role "${api_user_username}" "${cf_org}" "${cf_sites_space}" "SpaceDeveloper"
 
-# Temporarily create a service key to get the bucket name
-tmp_s3_service_key_name="${service_name_s3}-key-tmp"
-cf create-service-key "${service_name_s3}" "${tmp_s3_service_key_name}"
-shared_bucket=$(cf service-key "${service_name_s3}" "${tmp_s3_service_key_name}" | tail -n +2 | jq -r .bucket)
-cf delete-service-key "${service_name_s3}" "${tmp_s3_service_key_name}" -f
-##
-
 ##
 # Set Security Groups
 ##
@@ -383,8 +376,6 @@ echo "Infrastructure created for ${cf_space}!!"
 echo
 echo
 echo "Please finish the configuration by doing the following:"
-echo
-echo "-  In the ${product}-proxy-${env_type} ${cf_space} vars file, please set 'shared-bucket=${shared_bucket}'"
 echo
 echo "-  In the Concourse jumpbox, please run the following:"
 echo "     credhub set -n /concourse/pages/${cf_space}-cf-password -t value -v ${ci_user_password}"
