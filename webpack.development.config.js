@@ -109,6 +109,8 @@ module.exports = {
       'APP_HOSTNAME',
       'PRODUCT',
     ]),
-    new BundleAnalyzerPlugin(),
+    new BundleAnalyzerPlugin({
+      analyzerHost: '0.0.0.0',
+    }),
   ],
 };
