@@ -343,9 +343,10 @@ docker-compose run --rm app yarn test:client:watch  # to watch and re-run front 
 docker-compose run --rm app yarn test:client:file ./test/frontend/<path/to/test.js> # to run a single front end test file
 ```
 
-To view coverage reports as HTML after running the full test suite:
+To view coverage reports as HTML:
 
 ```sh
+docker-compose run --rm app yarn test:cover
 docker-compose run --rm --service-ports app yarn serve-coverage
 ```
 
