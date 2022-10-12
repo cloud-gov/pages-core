@@ -3,7 +3,7 @@ const { postgres } = require('../../config');
 const { databaseLogger } = require('../../winston');
 
 const {
-  database, host, password, port, ssl, user: username,
+  database, host, password, port, ssl, user: username, retry,
 } = postgres;
 
 const sequelize = new Sequelize(database, username, password, {
@@ -12,6 +12,7 @@ const sequelize = new Sequelize(database, username, password, {
   host,
   port,
   logging: databaseLogger.info.bind(databaseLogger),
+  retry,
 });
 
 require('./build')(sequelize, DataTypes);
