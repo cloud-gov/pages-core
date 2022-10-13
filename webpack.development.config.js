@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { getFeatureFlags } = require('./webpack-utils');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   mode: 'development',
@@ -13,6 +14,7 @@ module.exports = {
       directory: './dist',
     },
   },
+  stats: 'minimal',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
@@ -47,7 +49,15 @@ module.exports = {
               },
             },
           },
-          'sass-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                quietDeps: true,
+                loadPath: path.resolve(__dirname, 'node_modules/uswds/src/stylesheets/'),
+              },
+            },
+          },
         ],
       },
       {
@@ -99,5 +109,8 @@ module.exports = {
       'APP_HOSTNAME',
       'PRODUCT',
     ]),
+    new BundleAnalyzerPlugin({
+      analyzerHost: '0.0.0.0',
+    }),
   ],
 };

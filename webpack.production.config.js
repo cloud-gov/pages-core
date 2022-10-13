@@ -44,7 +44,15 @@ module.exports = {
               },
             },
           },
-          'sass-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                quietDeps: true,
+                loadPath: path.resolve(__dirname, 'node_modules/uswds/src/stylesheets/'),
+              },
+            },
+          },
         ],
       },
       {

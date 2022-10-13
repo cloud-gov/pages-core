@@ -11,6 +11,5 @@
     "uaa",
     "migrations"
   ],
-  "ext": "js,njk",
-  "verbose": true
+  "ext": "js,njk"
 }

@@ -3,7 +3,7 @@
 $font-path: '../../node_modules/uswds/src/fonts';
 $image-path: '../../node_modules/uswds/src/img';
 
-@import '../../node_modules/uswds/src/stylesheets/all.scss';
+@import 'uswds';
 
 @import "_variables";
 
