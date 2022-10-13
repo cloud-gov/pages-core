@@ -71,7 +71,10 @@ const SiteListItem = ({ organization, site, user }) => (
     <div className="sites-list-item-actions">
       <GitHubLink text="View repo" owner={site.owner} repository={site.repository} />
       { getViewLink(site.viewLink, site.repository) }
-      <ButtonLink clickHandler={handleRemoveSite(site, user)}>Remove</ButtonLink>
+      {
+        !organization
+        && <ButtonLink clickHandler={handleRemoveSite(site, user)}>Remove</ButtonLink>
+      }
     </div>
   </li>
 );
