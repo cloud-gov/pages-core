@@ -97,6 +97,7 @@ services:
     image: redis
     ports:
       - 6379:6379
+    command: redis-server --loglevel warning
   echo:
     image: node:16
     volumes:
