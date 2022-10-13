@@ -4,7 +4,6 @@ import { shallow } from 'enzyme';
 import proxyquire from 'proxyquire';
 import sinon from 'sinon';
 import siteActions from '../../../../frontend/actions/siteActions';
-import organization from '../../../../frontend/selectors/organization';
 
 proxyquire.noCallThru();
 
@@ -125,7 +124,7 @@ describe('<SiteListItem />', () => {
       <Fixture
         site={updatedSite}
         user={testUser}
-        organization={{...testOrganization, isSandbox: true, daysUntilSandboxCleaning: 5 }}
+        organization={{ ...testOrganization, isSandbox: true, daysUntilSandboxCleaning: 5 }}
       />
     );
     expect(wrapper.find('p')).to.have.length(1); // is sandbox
@@ -179,5 +178,11 @@ describe('<SiteListItem />', () => {
     expect(removeSiteLink.contains('Remove')).to.be.true;
     removeSiteLink.simulate('click', { preventDefault: () => ({}) });
     expect(clickSpy.called).to.be.true;
+  });
+
+  it('should not have a `Remove` button when it has an organization', () => {
+    wrapper = shallow(<Fixture site={testSite} user={testUser} organization={testOrganization} />);
+    const removeSiteLink = wrapper.find('ButtonLink');
+    expect(removeSiteLink.exists()).to.be.false;
   });
 });
