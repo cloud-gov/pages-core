@@ -90,7 +90,7 @@ if (config.product === 'pages') {
 
   const verify = async (accessToken, refreshToken, profile, callback) => {
     try {
-      const uaaId = await verifyUAAUser(profile, ['pages.admin']);
+      const uaaId = await verifyUAAUser(profile, ['pages.admin', 'pages.support']);
 
       if (!uaaId) return callback(null, false);
 

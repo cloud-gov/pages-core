@@ -33,7 +33,7 @@ function unauthenticatedSession({ oauthState, authRedirectPath, cfg = sessionCon
     });
 }
 
-function authenticatedSession(user, cfg = sessionConfig) {
+function authenticatedSession(user, cfg = sessionConfig, role = 'pages.admin') {
   const sessionKey = crypto.randomBytes(8).toString('hex');
 
   return Promise.resolve(user || factory.user())
@@ -52,6 +52,7 @@ function authenticatedSession(user, cfg = sessionConfig) {
         authenticated: true,
         authenticatedAt: new Date(),
         csrfSecret: csrfToken.TEST_CSRF_SECRET,
+        role,
       };
       return cfg.store.set(sessionKey, sessionBody);
     })
