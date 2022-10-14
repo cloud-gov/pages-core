@@ -9,6 +9,9 @@ import { userSettingsUpdated } from '../../actions/actionCreators/userActions';
 import federalistApi from '../../util/federalistApi';
 import LoadingIndicator from '../LoadingIndicator';
 import SettingsForm from './SettingsForm';
+import GithubAuthButton from '../GithubAuthButton';
+import userActions from '../../reducers/userActions';
+import alertActions from '../../actions/alertActions';
 
 function buildInitialValues(sites, user) {
   return {
@@ -21,6 +24,15 @@ function buildInitialValues(sites, user) {
     ),
   };
 }
+
+const onGithubAuthSuccess = () => {
+  userActions.fetchUser();
+  alertActions.alertSuccess('Github authorization successful');
+};
+
+const onGithubAuthFailure = (_error) => {
+  alertActions.alertError(_error.message);
+};
 
 function Settings({
   actions, organizations, sites, user,
@@ -71,6 +83,12 @@ function Settings({
           onSubmit={onSubmit}
           onSubmitFail={onSubmitFail}
           onSubmitSuccess={onSubmitSuccess}
+        />
+        <h3>Github Token</h3>
+        <GithubAuthButton
+          onSuccess={onGithubAuthSuccess}
+          onFailure={onGithubAuthFailure}
+          text="Reset your Github Access Token."
         />
       </div>
     </div>

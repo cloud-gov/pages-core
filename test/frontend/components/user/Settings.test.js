@@ -74,5 +74,6 @@ describe('<Settings />', () => {
 
     expect(wrapper.contains(<h1>User Settings</h1>)).to.be.true;
     expect(wrapper.contains(<h3>Build Notifications</h3>)).to.be.true;
+    expect(wrapper.contains(<h3>Github Token</h3>)).to.be.true;
   });
 });
