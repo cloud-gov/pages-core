@@ -4,6 +4,10 @@ function dbConfig(env) {
       database: 'postgres',
       user: 'postgres',
       host: 'db',
+      retry: {
+        match: [/deadlock/i],
+        max: 3,
+      },
     };
   }
 
@@ -19,6 +23,10 @@ function dbConfig(env) {
     database: 'federalist-test',
     user: 'postgres',
     host: 'db',
+    retry: {
+      match: [/deadlock/i],
+      max: 3,
+    },
   };
 }
 

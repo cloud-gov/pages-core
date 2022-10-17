@@ -18,6 +18,9 @@ RUN rm -rf /tomcat/webapps/*
 RUN wget https://github.com/starkandwayne/uaa-war-releases/releases/download/v75.13.0/cloudfoundry-identity-uaa-75.13.0.war
 RUN echo "d818c36615876299ee0efa49b85bb6cf1467cb1b2b39a5e13eb5220282affbee94eec168e4ae15e7a326131f18129b42209019962172d1da4f6c9b85bdd9c408 cloudfoundry-identity-uaa-75.13.0.war" | sha512sum -c
 RUN mv cloudfoundry-identity-uaa-75.13.0.war /tomcat/webapps/ROOT.war
+RUN sed -i s/INFO/WARNING/g /tomcat/conf/logging.properties
+RUN sed -i s/FINE/WARNING/g /tomcat/conf/logging.properties
+RUN touch /tomcat/lib/log4j2.properties
 
 EXPOSE 8080
 

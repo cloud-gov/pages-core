@@ -2,9 +2,6 @@ services:
   app:
     depends_on:
       - uaa
-  federalist:
-    depends_on:
-      - uaa
   bull-board:
     depends_on:
       - uaa

@@ -97,6 +97,7 @@ export const SiteList = ({
         <GithubAuthButton
           onSuccess={onGithubAuthSuccess}
           onFailure={onGithubAuthFailure}
+          text="Sign in to your Github account to add sites to the platform."
         />
       );
     }

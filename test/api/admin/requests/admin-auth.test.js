@@ -52,6 +52,7 @@ describe('Admin authentication request', () => {
 
         cfUAANock.mockUAAAuth(profile, code);
         cfUAANock.mockVerifyUserGroup(uaaId, userProfile);
+        cfUAANock.mockVerifyUserGroup(uaaId, userProfile); // mocked twice for subsequent calls
 
         return request(app)
           .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
@@ -86,6 +87,7 @@ describe('Admin authentication request', () => {
         beforeEach(() => {
           cfUAANock.mockUAAAuth(uaaUserProfile, code);
           cfUAANock.mockVerifyUserGroup(uaaId, uaaUserInfo);
+          cfUAANock.mockVerifyUserGroup(uaaId, uaaUserInfo); // mocked twice for subsequent calls
         });
 
         it('returns a script tag', (done) => {
@@ -108,6 +110,7 @@ describe('Admin authentication request', () => {
             });
           const session = await sessionForCookie(cookie, 'federalist-admin.sid');
           expect(session.passport.user).to.exist;
+          expect(session.role).to.exist;
         });
       });
     });

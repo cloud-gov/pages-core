@@ -223,5 +223,22 @@ describe('Admin - Site API', () => {
           .expect(404);
       });
     });
+
+    describe('Support role', () => {
+      it('fails for support role', async () => {
+        const [user, site] = await Promise.all([
+          factory.user(),
+          factory.site(),
+        ]);
+
+        const cookie = await authenticatedSession(user, sessionConfig, 'pages.support');
+        await request(app)
+          .delete(`/sites/${site.id}`)
+          .set('Cookie', cookie)
+          .set('Origin', config.app.adminHostname)
+          .set('x-csrf-token', csrfToken.getToken())
+          .expect(403);
+      });
+    });
   });
 });

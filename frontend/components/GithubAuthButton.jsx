@@ -42,9 +42,9 @@ function authorize() {
   });
 }
 
-const GithubAuthButton = ({ onFailure, onSuccess }) => (
+const GithubAuthButton = ({ onFailure, onSuccess, text }) => (
   <div className="well-gray-lightest">
-    <p>Sign in to your Github account to add sites to the platform.</p>
+    <p>{text}</p>
     <button
       type="button"
       className="usa-button github-auth-button"
@@ -64,6 +64,7 @@ const GithubAuthButton = ({ onFailure, onSuccess }) => (
 GithubAuthButton.propTypes = {
   onFailure: PropTypes.func,
   onSuccess: PropTypes.func,
+  text: PropTypes.func.isRequired,
 };
 
 GithubAuthButton.defaultProps = {
