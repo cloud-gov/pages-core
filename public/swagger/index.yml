@@ -947,3 +947,11 @@ paths:
           description: Not authorized
           schema:
             $ref: "Error.json"
+  /me/githubtoken:
+    delete:
+      summary: Revoke OAuth token access for this user
+      responses:
+        200:
+          description: Always an empty object
+          schema:
+            type: object

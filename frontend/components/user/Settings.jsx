@@ -89,6 +89,7 @@ function Settings({
           onSuccess={onGithubAuthSuccess}
           onFailure={onGithubAuthFailure}
           text="Reset your Github Access Token."
+          revokeFirst
         />
       </div>
     </div>

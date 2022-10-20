@@ -104,4 +104,20 @@ describe('User API', () => {
       expect(response.body.buildNotificationSettings[1]).to.eq('builds');
     });
   });
+
+  describe('DELETE /v0/me/githubtoken', () => {
+    it('should return the same response no matter what', async () => {
+      const user = await factory.user();
+      const cookie = await authenticatedSession(user);
+
+      const response = await request(app)
+        .delete('/v0/me/token')
+        .set('Cookie', cookie)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send()
+        .expect(200);
+
+      validateAgainstJSONSchema('DELETE', '/me/githubtoken', 200, response.body);
+    });
+  });
 });
