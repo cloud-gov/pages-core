@@ -6,6 +6,8 @@ const factory = require('../support/factory');
 const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const csrfToken = require('../support/csrfToken');
+const githubAPINocks = require('../support/githubAPINocks');
+const config = require('../../../config');
 
 describe('User API', () => {
   const userResponseExpectations = (response, user) => {
@@ -107,11 +109,15 @@ describe('User API', () => {
 
   describe('DELETE /v0/me/githubtoken', () => {
     it('should return the same response no matter what', async () => {
+      githubAPINocks.revokeApplicationGrant({
+        clientID: config.passport.github.options.clientID,
+        responseCode: 200,
+      });
       const user = await factory.user();
       const cookie = await authenticatedSession(user);
 
       const response = await request(app)
-        .delete('/v0/me/token')
+        .delete('/v0/me/githubtoken')
         .set('Cookie', cookie)
         .set('x-csrf-token', csrfToken.getToken())
         .send()
