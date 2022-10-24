@@ -1,5 +1,7 @@
 const express = require('express');
 const passport = require('./passport');
+const { Site, Event } = require('../models');
+const EventCreator = require('../services/EventCreator');
 
 const script = (nonce, status, content) => `
   <script nonce="${nonce}">
@@ -20,7 +22,17 @@ const script = (nonce, status, content) => `
 const app = express();
 app.disable('x-powered-by');
 app.use(passport.initialize());
-app.get('/auth/github', passport.authenticate('github', { session: false }));
+app.get('/auth/github', async (req, res) => {
+  const sites = await Site.findAll();
+  const domains = sites.map(site => site.domain);
+  const { referer } = req.headers;
+  if (referer.includes('cloud.gov') || domains.some(domain => domain.includes(referer))) {
+    // TODO: match domain? currently using site[0] as temporary instance for logging
+    EventCreator.audit(Event.labels.AUTHENTICATION, sites[0], 'External auth', { referer });
+    return passport.authenticate('github', { session: false })(req, res);
+  }
+  return res.send(script(res.locals.cspNonce, 'error', { message: 'Please login from a registered cloud.gov Pages site' }));
+});
 app.get('/auth/github/callback', (req, res) => {
   passport.authenticate('github', (error, user) => {
     const response = error

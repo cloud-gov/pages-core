@@ -1,50 +1,63 @@
 const { expect } = require('chai');
 const request = require('supertest');
+const sinon = require('sinon');
 const githubAPINocks = require('../support/githubAPINocks');
 const { sessionForCookie } = require('../support/cookieSession');
 const { unauthenticatedSession } = require('../support/session');
 const app = require('../../../app');
 const factory = require('../support/factory');
+const EventCreator = require('../../../api/services/EventCreator');
 
 describe('External authentication request', () => {
   describe('GET /external/auth/github', () => {
+    before(async () => {
+      const siteUser = await factory.user();
+      factory.site({
+        demoBranch: 'demo-branch',
+        demoDomain: 'https://demo.example.gov',
+        domain: 'https://example.gov',
+        owner: siteUser.username,
+        repository: 'example-site',
+        users: [siteUser],
+        defaultConfig: { hello: 'world' },
+      });
+    });
+
     it('should redirect to GitHub for OAuth2 authentication', (done) => {
+      // const authEventSpy = sinon.spy(EventCreator, 'audit');
+
       request(app)
         .get('/external/auth/github')
+        .set('Referer', 'site.cloud.gov')
         .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
         .expect(302, done);
+
+      // expect(authEventSpy.called).to.be.true;
+    });
+
+    it('should accept custom site names', (done) => {
+      // const authEventSpy = sinon.spy(EventCreator, 'audit');
+
+      request(app)
+        .get('/external/auth/github')
+        .set('Referer', 'example.gov')
+        .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
+        .expect(302, done);
+
+      // expect(authEventSpy.called).to.be.true;
+    });
+
+    it('should error for non-registered sites', async () => {
+      const res = await request(app)
+        .get('/external/auth/github')
+        .set('Referer', 'failure.gov')
+        .expect(200);
+
+      expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"Please login from a registered cloud.gov Pages site"}(.|\n)*<\/script>$/g);
     });
   });
 
   describe('GET /external/auth/github/callback', () => {
-    describe('sends script tag with error status and message', () => {
-      it('return unsuccessful auth if user is not found', async () => {
-        githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
-        const res = await request(app)
-          .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
-          .expect(200);
-        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You must be a (Federalist|Pages) user with a connected GitHub account."}(.|\n)*<\/script>$/g);
-      });
-
-      it('return script tag with error if user has not logged in for the duration of a session', async () => {
-        const user = await factory.user({ signedInAt: (new Date() - (2 * 24 * 60 * 60 * 1000)) });
-        githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
-        const res = await request(app)
-          .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
-          .expect(200);
-        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You have not logged-in to (Federalist|Pages) within the past 24 hours. Please log in to (Federalist|Pages) and try again."}(.|\n)*<\/script>$/g);
-      });
-
-      it('return script tag with error if user has not logged in for the duration of a session', async () => {
-        const user = await factory.user({ signedInAt: null });
-        githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
-        const res = await request(app)
-          .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
-          .expect(200);
-        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You have not logged-in to (Federalist|Pages) within the past 24 hours. Please log in to (Federalist|Pages) and try again."}(.|\n)*<\/script>$/g);
-      });
-    });
-
     describe('sends script tag with success status, token and provider', () => {
       let user;
       before(async () => {
