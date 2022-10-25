@@ -1,5 +1,6 @@
 const Ajv = require('ajv');
 const userSerializer = require('../serializers/user');
+const { revokeApplicationGrant } = require('../services/GitHub');
 
 const ajv = new Ajv();
 
@@ -37,5 +38,12 @@ module.exports = {
     await user.update({ buildNotificationSettings });
 
     return res.json(userSerializer.serialize(user));
+  },
+
+  async revokeApplicationGrant(req, res) {
+    const { user } = req;
+    await revokeApplicationGrant(user);
+    // even if the token revoke fails, we return a 200 because we still want to prompt a reauth flow
+    return res.json({});
   },
 };

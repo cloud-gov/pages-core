@@ -64,7 +64,7 @@
       </div>
       <nav class="usa-nav">
         <button class="usa-nav__close">
-          <img src="/img/usa-icons/close.svg" role="img" alt="close">
+          <img src="/img/usa-icons/close.svg" alt="close">
         </button>
         {#if hasFilters}
           <ul class="usa-nav__primary usa-accordion">

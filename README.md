@@ -117,7 +117,7 @@ If you are working on the front end of the application, the things you need to k
 1. It is built with `webpack`
 1. It lives in `/frontend`
 
-To analyze the contents of the front end JavaScript bundle, use `docker-compose run --rm --service-ports app yarn analyze-webpack` after a build. Then visit http://127.0.0.1:8888 to see a visualization of the the bundle contents.
+To analyze the contents of the front end JavaScript bundle, visit http://127.0.0.1:8888 while the application is running to see a visualization of the the bundle contents.
 
 ### Deployment
 
@@ -343,9 +343,10 @@ docker-compose run --rm app yarn test:client:watch  # to watch and re-run front 
 docker-compose run --rm app yarn test:client:file ./test/frontend/<path/to/test.js> # to run a single front end test file
 ```
 
-To view coverage reports as HTML after running the full test suite:
+To view coverage reports as HTML:
 
 ```sh
+docker-compose run --rm app yarn test:cover
 docker-compose run --rm --service-ports app yarn serve-coverage
 ```
 

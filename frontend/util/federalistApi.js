@@ -226,4 +226,12 @@ export default {
       handleHttpError: false,
     });
   },
+
+  revokeApplicationGrant() {
+    return request('me/githubtoken', {
+      method: 'DELETE',
+    }, {
+      handleHttpError: false,
+    });
+  },
 };
