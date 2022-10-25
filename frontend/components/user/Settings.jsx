@@ -75,6 +75,13 @@ function Settings({
         </div>
       </div>
       <div className="well">
+        <h3>Github Token</h3>
+        <GithubAuthButton
+          onSuccess={onGithubAuthSuccess}
+          onFailure={onGithubAuthFailure}
+          text="Reset your Github Access Token."
+          revokeFirst
+        />
         <h3>Build Notifications</h3>
         <SettingsForm
           initialValues={initialValues}
@@ -83,13 +90,6 @@ function Settings({
           onSubmit={onSubmit}
           onSubmitFail={onSubmitFail}
           onSubmitSuccess={onSubmitSuccess}
-        />
-        <h3>Github Token</h3>
-        <GithubAuthButton
-          onSuccess={onGithubAuthSuccess}
-          onFailure={onGithubAuthFailure}
-          text="Reset your Github Access Token."
-          revokeFirst
         />
       </div>
     </div>
