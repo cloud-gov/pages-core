@@ -23,7 +23,7 @@ const app = express();
 app.disable('x-powered-by');
 app.use(passport.initialize());
 app.get('/auth/github', async (req, res) => {
-  const sites = await Site.findAll();
+  const sites = await Site.findAll({ attributes: ['domain'] });
   const domains = sites.map(site => site.domain);
   const { referer } = req.headers;
   if (referer.includes('cloud.gov') || domains.some(domain => domain.includes(referer))) {

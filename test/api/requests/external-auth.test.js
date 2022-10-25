@@ -12,7 +12,7 @@ describe('External authentication request', () => {
   describe('GET /external/auth/github', () => {
     before(async () => {
       const siteUser = await factory.user();
-      factory.site({
+      await factory.site({
         demoBranch: 'demo-branch',
         demoDomain: 'https://demo.example.gov',
         domain: 'https://example.gov',
