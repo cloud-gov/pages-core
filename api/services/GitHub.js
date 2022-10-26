@@ -1,5 +1,8 @@
 const { Octokit } = require('@octokit/rest');
+const { request } = require('@octokit/request');
 const config = require('../../config');
+
+const OAUTH_BASIC_AUTH = Buffer.from(`${config.passport.github.options.clientID}:${config.passport.github.options.clientSecret}`).toString('base64');
 
 const createRepoForOrg = (github, options) => github.repos.createInOrg(options);
 
@@ -248,6 +251,18 @@ module.exports = {
       }
       throw err;
     }),
+
+  revokeApplicationGrant: user => request('DELETE /applications/{client_id}/grant', {
+    client_id: config.passport.github.options.clientID,
+    access_token: user.githubAccessToken,
+    headers: {
+      authorization: `Basic ${OAUTH_BASIC_AUTH}`,
+    },
+  }).catch((err) => {
+    if (err.status !== 404) {
+      throw err;
+    }
+  }),
 
   setWebhook: (site, githubAccessToken) => githubClient(githubAccessToken)
     .then(github => createWebhook(github, {
