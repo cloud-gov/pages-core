@@ -25,7 +25,7 @@ app.disable('x-powered-by');
 app.use(passport.initialize());
 app.get('/auth/github', async (req, res) => {
   const sites = await Site.findAll({ attributes: ['domain'] });
-  const domains = sites.map(site => site.domain);
+  const domains = sites.map(site => site.domain).filter(Boolean);
   const { referer } = req.headers;
   const domainMatch = extractDomain(new URL(referer).hostname);
   if ('cloud.gov'.includes(domainMatch) || domains.some(domain => domain.includes(domainMatch))) {
