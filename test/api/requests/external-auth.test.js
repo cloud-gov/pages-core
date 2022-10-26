@@ -28,7 +28,7 @@ describe('External authentication request', () => {
 
       request(app)
         .get('/external/auth/github')
-        .set('Referer', 'site.cloud.gov')
+        .set('Referer', 'https://site.cloud.gov')
         .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
         .expect(302, done);
 
@@ -40,7 +40,7 @@ describe('External authentication request', () => {
 
       request(app)
         .get('/external/auth/github')
-        .set('Referer', 'example.gov')
+        .set('Referer', 'https://example.gov')
         .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
         .expect(302, done);
 
@@ -50,7 +50,7 @@ describe('External authentication request', () => {
     it('should error for non-registered sites', async () => {
       const res = await request(app)
         .get('/external/auth/github')
-        .set('Referer', 'failure.gov')
+        .set('Referer', 'https://failure.gov')
         .expect(200);
 
       expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"Please login from a registered cloud.gov Pages site"}(.|\n)*<\/script>$/g);

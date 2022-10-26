@@ -30,6 +30,7 @@
     "express-session": "^1.15.6",
     "express-slow-down": "^1.4.0",
     "express-winston": "^4.0.5",
+    "extract-domain": "^2.4.8",
     "helmet": "^4.6.0",
     "inflection": "^1.13.1",
     "ioredis": "^4.27.6",

@@ -1,4 +1,5 @@
 const express = require('express');
+const extractDomain = require('extract-domain');
 const passport = require('./passport');
 const { Site, Event } = require('../models');
 const EventCreator = require('../services/EventCreator');
@@ -26,7 +27,8 @@ app.get('/auth/github', async (req, res) => {
   const sites = await Site.findAll({ attributes: ['domain'] });
   const domains = sites.map(site => site.domain);
   const { referer } = req.headers;
-  if (referer.includes('cloud.gov') || domains.some(domain => domain.includes(referer))) {
+  const domainMatch = extractDomain(new URL(referer).hostname);
+  if ('cloud.gov'.includes(domainMatch) || domains.some(domain => domain.includes(domainMatch))) {
     // TODO: match domain? currently using site[0] as temporary instance for logging
     EventCreator.audit(Event.labels.AUTHENTICATION, sites[0], 'External auth', { referer });
     return passport.authenticate('github', { session: false })(req, res);
