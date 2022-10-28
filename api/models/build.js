@@ -54,14 +54,8 @@ const associate = ({
   }));
   Build.addScope('forSiteUser', user => ({
     include: [{
-      model: Site,
+      model: Site.forUser(user),
       required: true,
-      include: [{
-        model: User,
-        where: {
-          id: user.id,
-        },
-      }],
     }],
   }));
 };
