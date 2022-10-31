@@ -142,7 +142,6 @@ module.exports = wrapHandlers({
       organizationId: toInt(organizationId),
       repository,
       engine,
-      sharedBucket: false,
     };
 
     await authorizer.create(user, siteParams);
