@@ -57,6 +57,95 @@ describe('SiteCreator', () => {
     });
 
     context('from a GitHub repo', () => {
+      let siteParams, name;
+
+      beforeEach(() => {
+        siteParams = {
+          owner: crypto.randomBytes(10).toString("hex"),
+          repository: crypto.randomBytes(10).toString("hex"),
+        };
+
+        name = `o-${siteParams.owner}-r-${siteParams.repository}`;
+
+        const routeGuid = "route-12345";
+        const keyName = `${name}-key`;
+        const planName = "basic-public";
+        const planGuid = "plan-guid";
+        const bucketGuid = "bucket-guid";
+        const accessKeyId = crypto.randomBytes(10).toString("hex");
+        const secretAccessKey = crypto.randomBytes(10).toString("hex");
+        const region = "us-gov-other-1";
+        const bucket = "testing-bucket";
+
+        const instanceRequestBody = { name, service_plan_guid: planGuid };
+        const keyRequestBody = { name, service_instance_guid: bucketGuid };
+
+        const planResponses = {
+          resources: [
+            factory.responses.service({ guid: planGuid }, { name: planName }),
+          ],
+        };
+        const bucketResponse = factory.responses.service(
+          { guid: bucketGuid },
+          { name }
+        );
+        const keyResponse = factory.responses.service(
+          {},
+          {
+            name: keyName,
+            service_instance_guid: bucketGuid,
+            credentials: factory.responses.credentials({
+              access_key_id: accessKeyId,
+              secret_access_key: secretAccessKey,
+              region,
+              bucket,
+            }),
+          }
+        );
+
+        const buildResponses = {
+          resources: [
+            factory.responses.service(
+              {},
+              {
+                name,
+                service_instance_guid: bucketGuid,
+                credentials: factory.responses.credentials({
+                  access_key_id: accessKeyId,
+                  secret_access_key: secretAccessKey,
+                  region,
+                  bucket,
+                }),
+              }
+            ),
+          ],
+        };
+
+        const serviceCredentialsResponses = {
+          resources: [keyResponse],
+        };
+
+        const routeResponse = factory.responses.service({ guid: routeGuid });
+
+        mockTokenRequest();
+        apiNocks.mockFetchS3ServicePlanGUID(planResponses);
+        apiNocks.mockCreateS3ServiceInstance(
+          instanceRequestBody,
+          bucketResponse
+        );
+        apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
+        apiNocks.mockFetchServiceInstancesRequest(buildResponses);
+        apiNocks.mockFetchServiceInstanceCredentialsRequest(
+          "test-guid",
+          serviceCredentialsResponses
+        );
+        apiNocks.mockCreateRoute(routeResponse, {
+          domain_guid: config.env.cfDomainGuid,
+          space_guid: config.env.cfSpaceGuid,
+          host: bucket,
+        });
+      });
+
       let user;
       let webhookNock;
 
@@ -68,11 +157,6 @@ describe('SiteCreator', () => {
 
       context('when the owner of the repo is an authorized federalist org', () => {
         it('creates new site record for the given repository, adds the user, webhook, and build', (done) => {
-          const siteParams = {
-            owner: crypto.randomBytes(10).toString('hex'),
-            repository: crypto.randomBytes(10).toString('hex'),
-          };
-
           const defaultBranch = 'myDefaultBranch';
 
           factory.user().then((model) => {
@@ -99,7 +183,10 @@ describe('SiteCreator', () => {
                 siteParams.owner,
                 siteParams.repository,
                 user,
-                defaultBranch
+                defaultBranch,
+                name,
+                "testing-bucket",
+                "us-gov-other-1"
               );
               expect(webhookNock.isDone()).to.equal(true);
               done();
@@ -108,11 +195,6 @@ describe('SiteCreator', () => {
         });
 
         it('ignores case when comparing org name', (done) => {
-          const siteParams = {
-            owner: crypto.randomBytes(10).toString('hex'),
-            repository: crypto.randomBytes(10).toString('hex'),
-          };
-
           const defaultBranch = 'myDefaultBranch';
 
           factory.user().then((model) => {
@@ -134,7 +216,10 @@ describe('SiteCreator', () => {
                 siteParams.owner,
                 siteParams.repository,
                 user,
-                defaultBranch
+                defaultBranch,
+                name,
+                "testing-bucket",
+                "us-gov-other-1"
               );
               done();
             })
@@ -144,13 +229,10 @@ describe('SiteCreator', () => {
 
       context('when the user that owns the repo is a federalist user', () => {
         it('creates new site record for the given repository, adds the user, webhook, and build', (done) => {
-          const siteParams = {
-            repository: crypto.randomBytes(10).toString('hex'),
-          };
-
           factory.user().then((model) => {
             user = model;
             siteParams.owner = user.username;
+            name = `o-${siteParams.owner}-r-${siteParams.repository}`;
 
             githubAPINocks.repo();
             webhookNock = setupWebhook(
@@ -167,7 +249,11 @@ describe('SiteCreator', () => {
                 site,
                 siteParams.owner,
                 siteParams.repository,
-                user
+                user,
+                undefined,
+                name,
+                "testing-bucket",
+                "us-gov-other-1"
               );
 
               expect(webhookNock.isDone()).to.equal(true);
@@ -178,11 +264,6 @@ describe('SiteCreator', () => {
       });
 
       it('should reject if the user does not have admin access to the site', (done) => {
-        const siteParams = {
-          owner: crypto.randomBytes(10).toString('hex'),
-          repository: crypto.randomBytes(10).toString('hex'),
-        };
-
         factory.user().then((model) => {
           user = model;
           githubAPINocks.repo({
@@ -220,11 +301,6 @@ describe('SiteCreator', () => {
       });
 
       it('should reject if the GitHub repository does not exist', (done) => {
-        const siteParams = {
-          owner: crypto.randomBytes(10).toString('hex'),
-          repository: crypto.randomBytes(10).toString('hex'),
-        };
-
         factory.user().then((model) => {
           user = model;
           githubAPINocks.repo({
@@ -242,11 +318,6 @@ describe('SiteCreator', () => {
       });
 
       it('rejects if the org that owns the repo has not authorized federalist', (done) => {
-        const siteParams = {
-          owner: crypto.randomBytes(10).toString('hex'),
-          repository: crypto.randomBytes(10).toString('hex'),
-        };
-
         factory.user()
           .then((model) => {
             user = model;
@@ -273,14 +344,94 @@ describe('SiteCreator', () => {
     context('when the site is created from a template', () => {
       const template = 'uswds-jekyll';
       let user;
-      let siteParams;
+      let siteParams, name;
 
       beforeEach(() => {
         siteParams = {
-          owner: crypto.randomBytes(10).toString('hex'),
-          repository: crypto.randomBytes(10).toString('hex'),
+          owner: crypto.randomBytes(10).toString("hex"),
+          repository: crypto.randomBytes(10).toString("hex"),
           template,
         };
+
+        name = `o-${siteParams.owner}-r-${siteParams.repository}`;
+
+        const routeGuid = "route-12345";
+        const keyName = `${name}-key`;
+        const planName = "basic-public";
+        const planGuid = "plan-guid";
+        const bucketGuid = "bucket-guid";
+        const accessKeyId = crypto.randomBytes(10).toString("hex");
+        const secretAccessKey = crypto.randomBytes(10).toString("hex");
+        const region = "us-gov-other-1";
+        const bucket = "testing-bucket";
+
+        const instanceRequestBody = { name, service_plan_guid: planGuid };
+        const keyRequestBody = { name, service_instance_guid: bucketGuid };
+
+        const planResponses = {
+          resources: [
+            factory.responses.service({ guid: planGuid }, { name: planName }),
+          ],
+        };
+        const bucketResponse = factory.responses.service(
+          { guid: bucketGuid },
+          { name }
+        );
+        const keyResponse = factory.responses.service(
+          {},
+          {
+            name: keyName,
+            service_instance_guid: bucketGuid,
+            credentials: factory.responses.credentials({
+              access_key_id: accessKeyId,
+              secret_access_key: secretAccessKey,
+              region,
+              bucket,
+            }),
+          }
+        );
+
+        const buildResponses = {
+          resources: [
+            factory.responses.service(
+              {},
+              {
+                name,
+                service_instance_guid: bucketGuid,
+                credentials: factory.responses.credentials({
+                  access_key_id: accessKeyId,
+                  secret_access_key: secretAccessKey,
+                  region,
+                  bucket,
+                }),
+              }
+            ),
+          ],
+        };
+
+        const serviceCredentialsResponses = {
+          resources: [keyResponse],
+        };
+
+        const routeResponse = factory.responses.service({ guid: routeGuid });
+
+        mockTokenRequest();
+        apiNocks.mockFetchS3ServicePlanGUID(planResponses);
+        apiNocks.mockCreateS3ServiceInstance(
+          instanceRequestBody,
+          bucketResponse
+        );
+        apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
+        apiNocks.mockFetchServiceInstancesRequest(buildResponses);
+        apiNocks.mockFetchServiceInstanceCredentialsRequest(
+          "test-guid",
+          serviceCredentialsResponses
+        );
+        apiNocks.mockCreateRoute(routeResponse, {
+          domain_guid: config.env.cfDomainGuid,
+          space_guid: config.env.cfSpaceGuid,
+          host: bucket,
+        });
       });
 
       it('should create a new site record for the given repository and add the user', (done) => {

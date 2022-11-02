@@ -21,7 +21,6 @@ function paramsForNewSite(params) {
     engine: params.engine || defaultEngine,
     organizationId,
     subdomain,
-    sharedBucket: params.sharedBucket === false ? params.sharedBucket : true,
   };
 }
 
@@ -138,10 +137,6 @@ function buildInfrastructure(params, s3ServiceName) {
 }
 
 function validateSite(params) {
-  if (params.sharedBucket) {
-    return buildSite(params, config.s3);
-  }
-
   const s3ServiceName = generateS3ServiceName(params.owner, params.repository);
 
   if (!s3ServiceName) {

@@ -495,6 +495,11 @@ const getContent = ({
   return nok;
 };
 
+const revokeApplicationGrant = ({ clientID, responseCode }) => {
+  const nok = nock('https://api.github.com').delete(`/applications/${clientID}/grant`);
+  nok.reply(responseCode, null);
+};
+
 module.exports = {
   getAccessToken,
   createRepoForOrg,
@@ -515,4 +520,5 @@ module.exports = {
   getCollaborators,
   getMembershipForUserInOrg,
   getContent,
+  revokeApplicationGrant,
 };
