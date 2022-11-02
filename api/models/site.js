@@ -1,4 +1,4 @@
-const { Op, Sequelize } = require('sequelize');
+const { Op } = require('sequelize');
 const { toInt } = require('../utils');
 const {
   branchRegex, parseSiteConfigs, isEmptyOrUrl, isValidSubdomain,

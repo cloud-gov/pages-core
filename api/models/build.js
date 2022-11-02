@@ -1,4 +1,4 @@
-const { Op, Sequelize } = require('sequelize');
+const { Op } = require('sequelize');
 const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
 const SiteBuildQueue = require('../services/SiteBuildQueue');
