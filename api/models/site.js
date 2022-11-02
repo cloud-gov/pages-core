@@ -87,7 +87,7 @@ const associate = ({
       [Op.and]: [
         {
           [Op.or]: [
-            Sequelize.where(Sequelize.col('Users.id'), Op.not, null),
+            { '$Users.id$': { [Op.not]: null } },
             { organizationId: { [Op.not]: null } },
           ],
         },
