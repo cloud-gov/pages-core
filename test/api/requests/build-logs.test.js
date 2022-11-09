@@ -4,9 +4,32 @@ const app = require('../../../app');
 const factory = require('../support/factory');
 const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
-const { BuildLog } = require('../../../api/models');
+const {
+  BuildLog, Organization, OrganizationRole, User, Role,
+} = require('../../../api/models');
+
+function clean() {
+  return Promise.all([
+    Organization.truncate({ force: true, cascade: true }),
+    OrganizationRole.truncate({ force: true, cascade: true }),
+    User.truncate({ force: true, cascade: true }),
+  ]);
+}
 
 describe('Build Log API', () => {
+  let userRole;
+  let managerRole;
+
+  before(async () => {
+    await clean();
+    [userRole, managerRole] = await Promise.all([
+      Role.findOne({ where: { name: 'user' } }),
+      Role.findOne({ where: { name: 'manager' } }),
+    ]);
+  });
+
+  afterEach(clean);
+
   describe('GET /v0/build/:build_id/log', () => {
     it('should require authentication', (done) => {
       factory.buildLog().then(buildLog => request(app)
@@ -61,6 +84,60 @@ describe('Build Log API', () => {
         prepareAndFetchLogData()
           .then(response => expectedResponse(response, done))
           .catch(done);
+      });
+    });
+
+    describe('successfully handling organization build logs', () => {
+      it('should accept organization user build log requests', async () => {
+        const user = await factory.user();
+        const orgUser = await factory.user();
+        const org = await factory.organization.create();
+        const site = await factory.site({ users: [user], organizationId: org.id });
+        const build = await factory.build({ user, site: site.id });
+
+        await org.addUser(orgUser, { through: { roleId: userRole.id } });
+
+        const logs = await BuildLog.bulkCreate(
+          Array(20).fill(0).map(() => ({
+            output: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam fringilla, arcu ut ultricies auctor, elit quam consequat neque, eu blandit metus lorem non turpis.',
+            source: 'ALL',
+            build: build.id,
+          }))
+        );
+
+        await authenticatedSession(orgUser).then((cookie) => {
+          const buildId = logs[0].get({ plain: true }).build;
+
+          return request(app)
+            .get(`/v0/build/${buildId}/log`)
+            .set('Cookie', cookie)
+            .expect(200);
+        });
+      });
+
+      it('should reject non-organization user build log requests', async () => {
+        const user = await factory.user();
+        const nonOrgUser = await factory.user();
+        const org = await factory.organization.create();
+        const site = await factory.site({ users: [user], organizationId: org.id });
+        const build = await factory.build({ user, site: site.id });
+
+        const logs = await BuildLog.bulkCreate(
+          Array(20).fill(0).map(() => ({
+            output: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam fringilla, arcu ut ultricies auctor, elit quam consequat neque, eu blandit metus lorem non turpis.',
+            source: 'ALL',
+            build: build.id,
+          }))
+        );
+
+        await authenticatedSession(nonOrgUser).then((cookie) => {
+          const buildId = logs[0].get({ plain: true }).build;
+
+          return request(app)
+            .get(`/v0/build/${buildId}/log`)
+            .set('Cookie', cookie)
+            .expect(404);
+        });
       });
     });
 
