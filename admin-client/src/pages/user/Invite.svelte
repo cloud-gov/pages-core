@@ -9,7 +9,7 @@
   let submitting = false;
 
   $: metaPromise = Promise.all([
-    fetchOrganizations().then((payload) => payload.data),
+    fetchOrganizations({ limit: 100 }).then((payload) => payload.data),
     fetchRoles().then((payload) => payload.data),
   ]).then(([orgs, roles]) => ({ orgs, roles }));
 
