@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
 const SiteBuildQueue = require('../services/SiteBuildQueue');
@@ -22,6 +23,7 @@ const associate = ({
   Organization,
   Site,
   User,
+  OrganizationRole,
 }) => {
   // Associations
   Build.hasMany(BuildLog, {
@@ -53,15 +55,38 @@ const associate = ({
     }],
   }));
   Build.addScope('forSiteUser', user => ({
+    where: {
+      [Op.and]: [
+        {
+          [Op.or]: [
+            { '$Site.Users.id$': { [Op.not]: null } },
+            { '$Site.organizationId$': { [Op.not]: null } },
+          ],
+        },
+        {
+          [Op.or]: [
+            { '$Site.Users.id$': user.id },
+            { '$Site.Organization.OrganizationRoles.userId$': user.id },
+          ],
+        },
+      ],
+    },
     include: [{
       model: Site,
       required: true,
-      include: [{
-        model: User,
-        where: {
-          id: user.id,
+      include: [
+        {
+          model: User,
+          required: false,
         },
-      }],
+        {
+          model: Organization,
+          required: false,
+          include: [{
+            model: OrganizationRole,
+          }],
+        },
+      ],
     }],
   }));
 };
