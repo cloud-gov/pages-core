@@ -64,6 +64,7 @@
   page('/events', queryString, render(Pages.Events));
   page('/organizations', queryString, render(Pages.Organization.Index));
   page('/organizations/new', queryString, render(Pages.Organization.New));
+  page('/organizations/:id', queryString, render(Pages.Organization.Show));
   page('/organizations/:id/edit', queryString, render(Pages.Organization.Edit));
   page('*', render(Pages.NotFound));
   page();
