@@ -31,7 +31,7 @@
 
     await updateOrganization(id, params);
 
-    page('/organizations');
+    page(`/organizations/${id}`);
   }
 
   afterUpdate(() => { submitting = false; });

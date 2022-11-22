@@ -35,6 +35,7 @@ module.exports = wrapHandlers({
 
     if (organization) {
       scopes.push(User.orgScope(organization));
+      scopes.push('withOrganizationRoles');
     }
 
     const [pagination, orgs, sites] = await Promise.all([
