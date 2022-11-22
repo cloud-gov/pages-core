@@ -1,7 +1,7 @@
 <script>
   import { router } from '../../stores';
   import {
-    fetchOrganization, fetchSites, fetchUsers,
+    fetchOrganization, fetchRoles, fetchSites, fetchUsers,
   } from '../../lib/api';
   import { formatDateTime } from '../../helpers/formatter';
   import {
@@ -12,7 +12,7 @@
     LabeledItem,
     PageTitle,
     SiteCard,
-    UserTable
+    UserTableRoles
   } from '../../components';
 
   $: id = $router.params.id;
@@ -100,7 +100,7 @@
     <Accordion multiselect bordered>
       <AccordionContent title="Users" expanded={true}>
         <Await on={usersPromise} let:response={users}>
-          <UserTable users={users.data}/>
+          <UserTableRoles users={users.data} orgId={id} />
         </Await>
       </AccordionContent>
     </Accordion>

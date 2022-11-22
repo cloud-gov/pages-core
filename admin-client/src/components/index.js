@@ -30,3 +30,4 @@ export { default as SiteFormOrganization } from './SiteFormOrganization.svelte';
 export { default as SiteMetadata } from './SiteMetadata.svelte';
 export { default as TextInput } from './TextInput.svelte';
 export { default as UserTable } from './UserTable.svelte';
+export { default as UserTableRoles } from './UserTableRoles.svelte';
