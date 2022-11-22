@@ -25,7 +25,7 @@
   $: id = $router.params.id;
   $: sitePromise = fetchSite(id);
   $: buildsPromise = fetchBuilds({ site: id, limit: 10 });
-  $: orgsPromise = fetchOrganizations();
+  $: orgsPromise = fetchOrganizations({ limit: 100 });
   $: usersPromise = fetchUsers({ site: id });
   $: uevsPromise = fetchUserEnvironmentVariables({ site: id });
 

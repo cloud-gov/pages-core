@@ -43,7 +43,7 @@
     </tr>
     <tr slot="item" let:item={org}>
       <th scope="row">
-        <a href="/organizations/{org.id}/edit">{org.name}</a>
+        <a href="/organizations/{org.id}">{org.name}</a>
       </th>
       <td>
         {org.agency}
