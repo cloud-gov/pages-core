@@ -6,12 +6,12 @@
   export let orgId = null;
   export let borderless = false;
 
-  $: usersWithRoles = users.map(user => {
+  $: usersWithRoles = users.map((user) => {
     // ideally this filter would be done via sequelize but the scope wasn't playing nicely
-    const role = user.OrganizationRoles.filter(role => role.Organization.id === +orgId)[0].Role.name;
-    user.role = role;
-    return user;
-  })
+    const role = user.OrganizationRoles
+      .filter((orole) => orole.Organization.id === +orgId)[0].Role.name;
+    return { ...user, role };
+  });
 </script>
 
 <DataTable data={usersWithRoles} {borderless}>

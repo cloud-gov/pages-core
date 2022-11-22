@@ -1,7 +1,7 @@
 <script>
   import { router } from '../../stores';
   import {
-    fetchOrganization, fetchRoles, fetchSites, fetchUsers,
+    fetchOrganization, fetchSites, fetchUsers,
   } from '../../lib/api';
   import { formatDateTime } from '../../helpers/formatter';
   import {
@@ -12,7 +12,7 @@
     LabeledItem,
     PageTitle,
     SiteCard,
-    UserTableRoles
+    UserTableRoles,
   } from '../../components';
 
   $: id = $router.params.id;
