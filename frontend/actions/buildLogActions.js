@@ -10,13 +10,13 @@ const dispatchBuildLogsFetchStartedAction = () => {
   dispatch(createBuildLogsFetchStartedAction());
 };
 
-const dispatchBuildLogsReceivedAction = (logs) => {
-  dispatch(createBuildLogsReceivedAction(logs));
+const dispatchBuildLogsReceivedAction = (logs, page) => {
+  dispatch(createBuildLogsReceivedAction({ logs, page }));
 };
 
 const fetchNextBuildLogsPage = (build, page) => api.fetchBuildLogs(build, page)
   .then((buildLogs) => {
-    dispatchBuildLogsReceivedAction(buildLogs);
+    dispatchBuildLogsReceivedAction(buildLogs, page);
     if (buildLogs && buildLogs.length > 0) {
       return fetchNextBuildLogsPage(build, page + 1);
     }

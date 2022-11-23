@@ -1,28 +1,44 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useCallback, useEffect, useRef } from 'react';
+import LoadingIndicator from '../LoadingIndicator';
 
-import { BUILD_LOG } from '../../propTypes';
+import { BUILD_LOG_DATA } from '../../propTypes';
 import { groupLogs } from '../../util';
 
 function SiteBuildLogTable({ buildLogs }) {
+  const lastSpanRef = useRef(null);
   const groupedLogs = groupLogs(buildLogs);
+  const buildLogLength = groupedLogs.length;
+
+  const scrollToLast = useCallback((node) => {
+    if (node) {
+      node.scrollIntoView();
+    }
+  });
+
+  useEffect(() => scrollToLast(lastSpanRef.current), [buildLogs]);
+
+  if (!groupedLogs || groupLogs.length < 1) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <pre className="build-log">
-      {Object.keys(groupedLogs).map(source => (
-        <React.Fragment key={source}>
-          {source !== 'ALL' && (
-            <span className="log-source-header">{source}</span>
-          )}
-          {groupedLogs[source].join('\n')}
-        </React.Fragment>
-      ))}
+      {groupedLogs.map((source, index) => {
+        const key = `build-log-span-${index}`;
+        if ((buildLogLength - 1) === index) {
+          return <span ref={lastSpanRef} key={key}>{source}</span>;
+        }
+
+        return (
+          <span key={key}>{source}</span>
+        );
+      })}
     </pre>
   );
 }
 
 SiteBuildLogTable.propTypes = {
-  buildLogs: PropTypes.arrayOf(BUILD_LOG).isRequired,
+  buildLogs: BUILD_LOG_DATA.isRequired,
 };
 
-export default SiteBuildLogTable;
+export default React.memo(SiteBuildLogTable);

@@ -27,7 +27,6 @@ describe('<SiteBuildLogs/>', () => {
     expect(wrapper.find('SiteBuildLogTable')).to.have.length(1);
     expect(wrapper.find('p')).to.have.length(0);
     expect(wrapper.find('p').contains('This build does not have any build logs.')).to.be.false;
-    expect(wrapper.find('RefreshBuildLogsButton')).to.have.length(1);
     expect(wrapper.find('DownloadBuildLogsButton')).to.have.length(1);
   });
 
@@ -47,7 +46,6 @@ describe('<SiteBuildLogs/>', () => {
     const wrapper = shallow(<SiteBuildLogs {...props} />);
     expect(wrapper.find('SiteBuildLogTable')).to.have.length(0);
     expect(wrapper.find('p').contains('This build does not have any build logs.')).to.be.true;
-    expect(wrapper.find('RefreshBuildLogsButton')).to.have.length(1);
     expect(wrapper.find('DownloadBuildLogsButton')).to.have.length(0);
   });
 

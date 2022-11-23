@@ -13,5 +13,26 @@
     text-transform: uppercase;
     padding-top: 1rem;
   }
+
+  & span:last-child {
+    animation: blink 2s linear infinite;
+    background-color: black;
+    display: block;
+    margin-left: 3px;
+    height: 20px;
+    width: 2px;
+  }
+
+  @keyframes blink {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: .5;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
 }
 

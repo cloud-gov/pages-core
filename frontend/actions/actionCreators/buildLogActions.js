@@ -5,9 +5,10 @@ const buildLogsFetchStarted = () => ({
   type: buildLogsFetchStartedType,
 });
 
-const buildLogsReceived = logs => ({
+const buildLogsReceived = ({ logs, page }) => ({
   type: buildLogsReceivedType,
   logs,
+  page,
 });
 
 export {

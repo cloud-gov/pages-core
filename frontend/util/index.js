@@ -9,11 +9,12 @@ export function getSafeRepoName(name) {
 }
 
 export function groupLogs(logs) {
-  return logs.reduce((groups, log) => {
-    // eslint-disable-next-line no-param-reassign
-    groups[log.source] = (groups[log.source] || []).concat([log.output]);
-    return groups;
-  }, {});
+  return Object.values(logs).map(value => value[0]?.output || []);
+  // return logs.reduce((groups, log) => {
+  //   // eslint-disable-next-line no-param-reassign
+  //   groups[log.source] = (groups[log.source] || []).concat([log.output]);
+  //   return groups;
+  // }, {});
 }
 
 export function sandboxMsg(days, content = null) {

@@ -5,20 +5,17 @@ import {
 
 const initialState = {
   isLoading: false,
-  data: [],
+  data: {},
 };
 
 export default function buildLogs(state = initialState, action) {
   switch (action.type) {
     case BUILD_LOGS_FETCH_STARTED:
-      return {
-        isLoading: true,
-        data: [],
-      };
+      return { ...state, isLoading: true };
     case BUILD_LOGS_RECEIVED:
       return {
         isLoading: false,
-        data: action.logs ? state.data.concat(action.logs) : [],
+        data: { ...state.data, [action.page]: action.logs },
       };
     default:
       return state;
