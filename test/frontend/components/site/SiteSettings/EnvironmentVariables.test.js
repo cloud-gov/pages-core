@@ -12,10 +12,7 @@ const siteId = 1;
 describe('<EnvironmentVariables/>', () => {
   let defaultProps;
 
-  const env = process.env
-
   beforeEach(() => {
-    process.env = { ...env }
     stubs.fetchUserEnvironmentVariables = sinon.stub();
     stubs.addUserEnvironmentVariable = sinon.stub();
     stubs.deleteUserEnvironmentVariable = sinon.stub();
@@ -31,7 +28,6 @@ describe('<EnvironmentVariables/>', () => {
   });
 
   afterEach(() => {
-    process.env = env
     sinon.restore();
   });
 
@@ -55,24 +51,6 @@ describe('<EnvironmentVariables/>', () => {
     const wrapper = shallow(<EnvironmentVariables {...defaultProps} />);
     const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'warning');
     expect(alert).to.have.lengthOf(1);
-  });
-
-  it('warning contains FISMA Low on Federalist', () => {
-    process.env.PRODUCT = 'federalist';
-
-    const wrapper = shallow(<EnvironmentVariables {...defaultProps} />);
-    const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'warning');
-
-    expect(alert.render().text()).to.contain('FISMA Low')
-  }); 
-
-  it('warning contains FISMA Moderate on Pages', () => {
-    process.env.PRODUCT = 'pages';
-
-    const wrapper = shallow(<EnvironmentVariables {...defaultProps} />);
-    const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'warning');
-
-    expect(alert.render().text()).to.contain('FISMA Moderate')
   });
 
   describe('when loading', () => {
