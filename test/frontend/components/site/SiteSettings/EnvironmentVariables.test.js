@@ -56,7 +56,12 @@ describe('<EnvironmentVariables/>', () => {
   });
 
   it('warning contains FISMA Low on Federalist', () => {
-    const wrapper = shallow(<EnvironmentVariables {...defaultProps} />);
+    const { EnvironmentVariables: FederalistEnvironmentVariables } = proxyquire(
+      '../../../../../frontend/components/site/SiteSettings/EnvironmentVariables',
+      { '../../../globals': { PRODUCT: "federalist" }}
+    );
+
+    const wrapper = shallow(<FederalistEnvironmentVariables {...defaultProps} />);
     const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'warning');
 
     expect(alert.render().text()).to.contain('FISMA Low')
