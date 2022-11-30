@@ -43,7 +43,12 @@ const warningContent = (
   <>
     {` ${globals.APP_NAME} `}
     is a
-    <b> FISMA {isPages ? "Moderate" : "Low"} </b>
+    {' '}
+    <b>
+      FISMA
+      {' '}
+      {isPages ? 'Moderate' : 'Low'}
+    </b>
     system, do NOT store variables for systems that are High, and
     only expose variables if it is safe to do so. You assume the risk if the
     values you add contain, or allow access to information that is not suitable
