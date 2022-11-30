@@ -35,8 +35,8 @@ export default {
     return request(`site/${site.id}/build`);
   },
 
-  fetchBuildLogs(build, page = 1) {
-    return request(`build/${build.id}/log/page/${page}`);
+  fetchBuildLogs(build, offset = 0) {
+    return request(`build/${build.id}/log/offset/${offset}`);
   },
 
   fetchOrganization(id) {

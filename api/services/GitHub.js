@@ -1,5 +1,5 @@
 const { Octokit } = require('@octokit/rest');
-const { request } = require('@octokit/request');
+const axios = require('axios');
 const config = require('../../config');
 
 const OAUTH_BASIC_AUTH = Buffer.from(`${config.passport.github.options.clientID}:${config.passport.github.options.clientSecret}`).toString('base64');
@@ -31,11 +31,15 @@ const parseGithubErrorMessage = (error) => {
   let githubError = 'Encountered an unexpected GitHub error';
 
   try {
-    githubError = error.errors[0].message;
+    githubError = error.response.data.errors[0].message;
   } catch (e) {
     try {
-      githubError = error.message;
-    } catch (e2) { /* noop */ }
+      githubError = error.errors[0].message;
+    } catch (e2) {
+      try {
+        githubError = error.message;
+      } catch (e3) { /* noop */ }
+    }
   }
 
   return githubError;
@@ -252,17 +256,24 @@ module.exports = {
       throw err;
     }),
 
-  revokeApplicationGrant: user => request('DELETE /applications/{client_id}/grant', {
-    client_id: config.passport.github.options.clientID,
-    access_token: user.githubAccessToken,
-    headers: {
-      authorization: `Basic ${OAUTH_BASIC_AUTH}`,
-    },
-  }).catch((err) => {
-    if (err.status !== 404) {
-      throw err;
-    }
-  }),
+  revokeApplicationGrant: (user) => {
+    const url = `https://api.github.com/applications/${config.passport.github.options.clientID}/grant`;
+    const data = {
+      access_token: user.githubAccessToken,
+    };
+    const headers = { authorization: `Basic ${OAUTH_BASIC_AUTH}` };
+
+    return axios({
+      method: 'delete',
+      url,
+      data,
+      headers,
+    }).catch((err) => {
+      if (err.status !== 404) {
+        throw err;
+      }
+    });
+  },
 
   setWebhook: (site, githubAccessToken) => githubClient(githubAccessToken)
     .then(github => createWebhook(github, {

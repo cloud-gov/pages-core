@@ -1,44 +1,41 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import LoadingIndicator from '../LoadingIndicator';
+/* eslint-disable react/forbid-prop-types */
 
-import { BUILD_LOG_DATA } from '../../propTypes';
-import { groupLogs } from '../../util';
+import React, { useRef } from 'react';
+import PropTypes from 'prop-types';
+import LoadingIndicator from '../LoadingIndicator';
 
 function SiteBuildLogTable({ buildLogs }) {
   const lastSpanRef = useRef(null);
-  const groupedLogs = groupLogs(buildLogs);
-  const buildLogLength = groupedLogs.length;
+  const buildLogLength = buildLogs.length;
 
-  const scrollToLast = useCallback((node) => {
-    if (node) {
-      node.scrollIntoView();
-    }
-  });
+  /* Keeping this commented out to think about if we want to scroll with new logs */
+  // const scrollToLast = useCallback((node) => {
+  //   if (node) {
+  //     node.scrollIntoView()
+  //   }
+  // });
+  // useEffect(() => scrollToLast(lastSpanRef.current), [buildLogs]);
 
-  useEffect(() => scrollToLast(lastSpanRef.current), [buildLogs]);
-
-  if (!groupedLogs || groupLogs.length < 1) {
+  if (!buildLogs || buildLogLength < 1) {
     return <LoadingIndicator />;
   }
 
   return (
     <pre className="build-log">
-      {groupedLogs.map((source, index) => {
+      {buildLogs.map((source, index) => {
         const key = `build-log-span-${index}`;
-        if ((buildLogLength - 1) === index) {
-          return <span ref={lastSpanRef} key={key}>{source}</span>;
-        }
 
         return (
-          <span key={key}>{source}</span>
+          <p key={key}>{source}</p>
         );
       })}
+      <p ref={lastSpanRef} className="build-log-cursor" />
     </pre>
   );
 }
 
 SiteBuildLogTable.propTypes = {
-  buildLogs: BUILD_LOG_DATA.isRequired,
+  buildLogs: PropTypes.array.isRequired,
 };
 
 export default React.memo(SiteBuildLogTable);

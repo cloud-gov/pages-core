@@ -1,8 +1,8 @@
+/* eslint-disable react/forbid-prop-types */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import fileDownload from 'js-file-download';
-import { BUILD_LOG_DATA } from '../../propTypes';
-import { groupLogs } from '../../util';
 
 class DownloadBuildLogsButton extends React.Component {
   constructor(props) {
@@ -12,8 +12,7 @@ class DownloadBuildLogsButton extends React.Component {
 
   downloadBuildLogs() {
     const { buildLogsData = [], buildId } = this.props;
-    const groupedLogs = groupLogs(buildLogsData);
-    const text = groupedLogs.map(source => `${source}\n`);
+    const text = buildLogsData.map(source => `${source}\n`);
     fileDownload(text, `build-log-${buildId}.txt`);
   }
 
@@ -25,7 +24,7 @@ class DownloadBuildLogsButton extends React.Component {
 }
 
 DownloadBuildLogsButton.propTypes = {
-  buildLogsData: BUILD_LOG_DATA.isRequired,
+  buildLogsData: PropTypes.array.isRequired,
   buildId: PropTypes.number.isRequired,
 };
 
