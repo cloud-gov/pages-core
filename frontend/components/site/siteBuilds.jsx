@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link } from '@reach/router';
+import { Link } from 'react-router-dom';
 
 import GitHubLink from '../GitHubLink';
 import { BUILD } from '../../propTypes';

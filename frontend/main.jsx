@@ -4,7 +4,7 @@ import '@babel/polyfill';
 import { createRoot } from 'react-dom/client';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { Router } from 'react-router';
+import { Router } from 'react-router-dom';
 
 import routes from './routes';
 import store from './store';

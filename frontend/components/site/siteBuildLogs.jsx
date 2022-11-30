@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
 import { BUILD_LOG } from '../../propTypes';
 import buildLogActions from '../../actions/buildLogActions';
@@ -19,7 +20,8 @@ class SiteBuildLogs extends React.Component {
   }
 
   componentDidMount() {
-    const { actions: { fetchBuildLogs }, buildId } = this.props;
+    const { actions: { fetchBuildLogs } } = this.props;
+    const { buildId } = useParams();
 
     fetchBuildLogs({ id: buildId });
     this.intervalHandle = setInterval(() => {
@@ -35,7 +37,8 @@ class SiteBuildLogs extends React.Component {
   }
 
   render() {
-    const { buildLogs, buildId: buildIdStr } = this.props;
+    const { buildLogs } = this.props;
+    const { buildId: buildIdStr } = useParams();
     const { autoRefresh } = this.state;
     const buildId = parseInt(buildIdStr, 10);
 
@@ -80,7 +83,6 @@ class SiteBuildLogs extends React.Component {
 }
 
 SiteBuildLogs.propTypes = {
-  buildId: PropTypes.string.isRequired,
   buildLogs: PropTypes.shape({
     isLoading: PropTypes.bool,
     data: PropTypes.arrayOf(BUILD_LOG),

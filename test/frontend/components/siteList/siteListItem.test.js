@@ -39,7 +39,7 @@ describe('<SiteListItem />', () => {
 
   beforeEach(() => {
     Fixture = proxyquire('../../../../frontend/components/siteList/siteListItem', {
-      '@reach/router': { Link },
+      'react-router-dom': { Link },
       './publishedState': PublishedState,
       './repoLastVerified': RepoLastVerified,
       '../icons': { IconView: 'IconView' },

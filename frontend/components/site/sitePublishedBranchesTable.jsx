@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link } from '@reach/router';
+import { Link } from 'react-router-dom';
 import publishedBranchActions from '../../actions/publishedBranchActions';
 import { currentSite } from '../../selectors/site';
 import LoadingIndicator from '../LoadingIndicator';

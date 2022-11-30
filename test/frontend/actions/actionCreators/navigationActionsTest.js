@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import * as reachRouter from '@reach/router';
+import * as reachRouter from 'react-router-dom';
 import {
   pushRouterHistory,
   replaceRouterHistory,

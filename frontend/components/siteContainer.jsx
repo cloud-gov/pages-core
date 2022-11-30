@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { useParams, useLocation, useSearchParams } from 'react-router-dom';
 
 import { ALERT, ORGANIZATION, SITE } from '../propTypes';
 import { currentSite } from '../selectors/site';
@@ -45,8 +46,11 @@ export class SiteContainer extends React.Component {
 
   render() {
     const {
-      id, sites, organizations, children, params, location, alert,
+      sites, organizations, children, alert,
     } = this.props;
+    const { id } = useParams();
+    const location = useLocation();
+    const params = useSearchParams();
 
     if (sites.isLoading || !sites.data) {
       return <LoadingIndicator />;
@@ -138,7 +142,6 @@ export class SiteContainer extends React.Component {
 }
 
 SiteContainer.propTypes = {
-  id: PropTypes.string.isRequired,
   params: PropTypes.shape({
     branch: PropTypes.string,
     fileName: PropTypes.string,

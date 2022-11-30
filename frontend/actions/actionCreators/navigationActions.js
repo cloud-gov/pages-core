@@ -1,4 +1,4 @@
-import { navigate } from '@reach/router';
+import { navigate } from 'react-router-dom';
 
 const pushRouterHistory = path => navigate(path);
 const replaceRouterHistory = path => navigate(path, { replace: true });

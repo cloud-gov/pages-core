@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect } from '@reach/router';
+import { Redirect } from 'react-router-dom';
 
 import App from './components/app';
 import * as Organization from './components/organization';

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
 import publishedFileActions from '../../actions/publishedFileActions';
 import { currentSite } from '../../selectors/site';
@@ -23,10 +24,10 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   componentDidMount() {
-    const { fetchPublishedFiles, id, name } = this.props;
+    const { fetchPublishedFiles, id } = this.props;
+    const { name: branch } = useParams();
 
     const site = { id };
-    const branch = name;
 
     const startAtKey = null; // start without a startAtKey
     fetchPublishedFiles(site, branch, startAtKey);
@@ -135,7 +136,7 @@ class SitePublishedFilesTable extends React.Component {
   }
 
   renderPublishedFilesTable(files) {
-    const { name } = this.props;
+    const { name } = useParams();
 
     return (
       <div>
@@ -215,7 +216,6 @@ class SitePublishedFilesTable extends React.Component {
 
 SitePublishedFilesTable.propTypes = {
   id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
   fetchPublishedFiles: PropTypes.func.isRequired,
   publishedFiles: PropTypes.shape({
     isLoading: PropTypes.bool.isRequired,
