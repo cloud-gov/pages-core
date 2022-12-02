@@ -36,7 +36,9 @@ function createUAAStrategy(options, verify) {
 }
 
 async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
-  const { user_id: uaaId, email } = profile;
+  const { user_id: uaaId, email: casedEmail } = profile;
+  // the UAA provided email maintains case but the database records do not
+  const email = casedEmail.toLowerCase();
 
   const client = new UAAClient();
   const isVerified = await client.verifyUserGroup(uaaId, uaaGroups);
