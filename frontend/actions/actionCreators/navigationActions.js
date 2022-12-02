@@ -1,6 +1,6 @@
-import { navigate } from 'react-router-dom';
+import { redirect } from 'react-router-dom';
 
-const pushRouterHistory = path => navigate(path);
-const replaceRouterHistory = path => navigate(path, { replace: true });
+const pushRouterHistory = path => redirect(path);
+const replaceRouterHistory = path => redirect(path, { replace: true });
 
 export { pushRouterHistory, replaceRouterHistory };

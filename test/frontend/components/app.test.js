@@ -3,12 +3,12 @@ import { shallow } from 'enzyme';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 import proxyquire from 'proxyquire';
+import { MemoryRouter } from 'react-router-dom';
 
 proxyquire.noCallThru();
 
 const alertActionUpdate = stub();
 const buildStatusNotifierListen = stub();
-const onEnter = stub();
 const Header = () => <div />;
 
 const username = 'jenny mcuser';
@@ -25,13 +25,9 @@ const props = {
     },
     isLoading: false,
   },
-  location: {
-    key: 'a-route',
-  },
   notifier: {
     listen: buildStatusNotifierListen,
   },
-  onEnter,
 };
 
 const AppFixture = proxyquire('../../../frontend/components/app', {
@@ -40,26 +36,16 @@ const AppFixture = proxyquire('../../../frontend/components/app', {
   './header': Header,
 }).App;
 
+const shallowRouter = elem => shallow(<MemoryRouter>{elem}</MemoryRouter>);
+
 describe('<App/>', () => {
   let wrapper;
 
   beforeEach(() => {
     // TODO: need to figure out the store mocking here and refactor these
-    wrapper = shallow(<AppFixture {...props} />);
+    wrapper = shallowRouter(<AppFixture {...props} />);
     alertActionUpdate.reset();
     buildStatusNotifierListen.reset();
-  });
-
-  it('renders children', () => {
-    const newProps = {
-      ...props,
-      children: (<div id="app-child">child!</div>),
-    };
-    wrapper = shallow(<AppFixture {...newProps} />);
-
-    expect(wrapper.find('LoadingIndicator')).to.have.length(0);
-    expect(wrapper.find('#app-child')).to.have.length(1);
-    expect(buildStatusNotifierListen.called).to.be.true;
   });
 
   it('does not trigger an alert update if no alert message is present', () => {
@@ -69,28 +55,30 @@ describe('<App/>', () => {
   });
 
   it('does not trigger an alert update if the route has not changed', () => {
-    const newProps = Object.assign({}, props, {
+    const newProps = {
+      ...props,
       alert: {
         message: 'hello!',
         stale: false,
       },
-    });
+    };
 
-    wrapper = shallow(<AppFixture {...newProps} />);
+    wrapper = shallowRouter(<AppFixture {...newProps} />);
     wrapper.setProps({ location: { key: 'a-route' } });
     expect(alertActionUpdate.called).to.be.false;
     expect(buildStatusNotifierListen.called).to.be.true;
   });
 
   it('triggers an alert update if there is an alert message', () => {
-    const newProps = Object.assign({}, props, {
+    const newProps = {
+      ...props,
       alert: {
         message: 'hello!',
         stale: false,
       },
-    });
+    };
 
-    wrapper = shallow(<AppFixture {...newProps} />);
+    wrapper = shallowRouter(<AppFixture {...newProps} />);
 
     wrapper.setProps({ location: { key: 'next-route' } });
     expect(alertActionUpdate.called).to.be.true;
@@ -98,14 +86,8 @@ describe('<App/>', () => {
     expect(buildStatusNotifierListen.called).to.be.true;
   });
 
-  it('calls onEnter on mount', () => {
-    shallow(<AppFixture {...props} />);
-
-    expect(onEnter.called).to.be.true;
-  });
-
   it('subscribes to build status events on mount', () => {
-    shallow(<AppFixture {...props} />);
+    shallowRouter(<AppFixture {...props} />);
 
     expect(buildStatusNotifierListen.called).to.be.true;
   });

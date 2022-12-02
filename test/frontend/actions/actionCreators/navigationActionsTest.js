@@ -1,15 +1,15 @@
 import sinon from 'sinon';
-import * as reachRouter from 'react-router-dom';
+import * as reactRouter from 'react-router-dom';
 import {
   pushRouterHistory,
   replaceRouterHistory,
 } from '../../../../frontend/actions/actionCreators/navigationActions';
 
 describe('navigationActions', () => {
-  let navigateStub;
+  let rediectStub;
 
   beforeEach(() => {
-    navigateStub = sinon.stub(reachRouter, 'navigate').resolves();
+    rediectStub = sinon.stub(reactRouter, 'redirect');
   });
 
   afterEach(() => {
@@ -19,12 +19,16 @@ describe('navigationActions', () => {
   const path = '/what/is/this/path/of/which/you/speak';
 
   describe('.pushRouterHistory', () => {
-    it('navigates', () => pushRouterHistory(path)
-      .then(() => sinon.assert.calledWithExactly(navigateStub, path)));
+    it('navigates', () => {
+      pushRouterHistory(path);
+      sinon.assert.calledWithExactly(rediectStub, path);
+    });
   });
 
   describe('.replaceRouterHistory', () => {
-    it('navigates and replaces history', () => replaceRouterHistory(path)
-      .then(() => sinon.assert.calledWithExactly(navigateStub, path, { replace: true })));
+    it('navigates and replaces history', () => {
+      replaceRouterHistory(path);
+      sinon.assert.calledWithExactly(rediectStub, path, { replace: true });
+    });
   });
 });
