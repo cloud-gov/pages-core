@@ -132,7 +132,7 @@ describe('BuildLogs Service', () => {
       });
     });
 
-    it('returns the byte range of the logs', async () => {
+    it('returns the byte range of the logs as an array of strings', async () => {
       const key = 'owner/repo/1';
 
       const build = { logsS3Key: key };
@@ -143,7 +143,27 @@ describe('BuildLogs Service', () => {
       const result = await BuildLogs.getBuildLogs(build, 0, 2);
 
       sinon.assert.calledOnceWithExactly(getObjectStub, key, { Range: 'bytes=0-2' });
-      expect(result).to.equal('hel');
+      expect(result).to.have.length(1);
+      expect(result[0]).to.equal('hel');
+    });
+
+    it('returns byte range of the logs and splits string by newline', async () => {
+      const key = 'owner/repo/1';
+      const line1 = 'hello'
+      const line2 = 'world'
+      const multiline = `${line1}\n${line2}`
+
+      const build = { logsS3Key: key };
+      getObjectStub.resolves(
+        { Body: Buffer.from(multiline) }
+      );
+
+      const result = await BuildLogs.getBuildLogs(build, 0, 2);
+
+      sinon.assert.calledOnceWithExactly(getObjectStub, key, { Range: 'bytes=0-2' });
+      expect(result).to.have.length(2);
+      expect(result[0]).to.equal(line1);
+      expect(result[1]).to.equal(line2);
     });
 
     it('returns null if range cannott be satisified', async () => {

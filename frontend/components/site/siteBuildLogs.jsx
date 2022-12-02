@@ -12,6 +12,14 @@ const SiteBuildLogs = ({ buildId: buildIdStr }) => {
   const buildId = parseInt(buildIdStr, 10);
   const { logs } = useBuildLogs(buildId);
 
+  if (!logs || logs?.length === 0) {
+    return (
+      <div>
+        <SiteBuildLogTable buildLogs={['This build does not have any build logs.']} />
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="log-tools">
