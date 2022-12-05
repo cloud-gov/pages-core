@@ -3,20 +3,26 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-function SiteBuildLogTable({ buildLogs }) {
+function SiteBuildLogTable({ buildLogs, buildState }) {
   const buildLogRef = useRef(null);
+  const scrollType = buildState === 'created' ? 'smooth' : 'none';
 
-  const scrollToLast = useCallback((node) => {
-    if (node) {
+  const scrollToLast = useCallback((node, state) => {
+    if (node && ['created', 'error'].includes(state)) {
       // eslint-disable-next-line no-param-reassign
       node.scrollTop = node.scrollHeight;
     }
   });
 
-  useEffect(() => scrollToLast(buildLogRef.current), [buildLogs]);
+  useEffect(() => scrollToLast(buildLogRef.current, buildState),
+    [buildLogs, buildState]);
 
   return (
-    <pre ref={buildLogRef} className="build-log">
+    <pre
+      ref={buildLogRef}
+      className="build-log"
+      style={{ scrollBehavior: scrollType }}
+    >
       {buildLogs.map((source, index) => {
         const key = `build-log-span-${index}`;
 
@@ -31,6 +37,11 @@ function SiteBuildLogTable({ buildLogs }) {
 
 SiteBuildLogTable.propTypes = {
   buildLogs: PropTypes.array.isRequired,
+  buildState: PropTypes.string,
+};
+
+SiteBuildLogTable.defaultProps = {
+  buildState: '',
 };
 
 export default React.memo(SiteBuildLogTable);

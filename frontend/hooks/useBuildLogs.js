@@ -6,6 +6,7 @@ const REFRESH_INTERVAL = parseInt(10 * 1000, 10);
 const initResultsState = {
   offset: 0,
   logs: [],
+  state: '',
 };
 
 export const useBuildLogs = (id) => {
@@ -23,6 +24,7 @@ export const useBuildLogs = (id) => {
       const updatedResults = {
         offset: fetchOffest + outputCount,
         logs: updatedLogs,
+        state,
       };
 
       if (state === 'created') {

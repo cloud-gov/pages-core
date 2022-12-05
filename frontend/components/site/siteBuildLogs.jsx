@@ -10,7 +10,7 @@ export const REFRESH_INTERVAL = 15 * 1000;
 
 const SiteBuildLogs = ({ buildId: buildIdStr }) => {
   const buildId = parseInt(buildIdStr, 10);
-  const { logs } = useBuildLogs(buildId);
+  const { logs, state } = useBuildLogs(buildId);
 
   if (!logs || logs?.length === 0) {
     return (
@@ -27,7 +27,7 @@ const SiteBuildLogs = ({ buildId: buildIdStr }) => {
           <li><DownloadBuildLogsButton buildId={buildId} buildLogsData={logs} /></li>
         </ul>
       </div>
-      <SiteBuildLogTable buildLogs={logs} />
+      <SiteBuildLogTable buildLogs={logs} buildState={state} />
     </div>
   );
 };
