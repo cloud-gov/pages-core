@@ -9,13 +9,14 @@ const QueueWorker = require('../../../api/workers/QueueWorker');
 describe('QueueWorker', () => {
   describe('new QueueWorker()', () => {
     const queueName = 'queue';
-    const processor = () => {};
+    const processor = () => { };
 
     let queueWorker;
 
     before(() => {
       const connection = new IORedis(redisConfig.url, {
         tls: redisConfig.tls,
+        maxRetriesPerRequest: null
       });
       queueWorker = new QueueWorker(queueName, connection, processor);
     });
@@ -27,7 +28,7 @@ describe('QueueWorker', () => {
     });
 
     it('attaches handlers to error, completed, and failed events', () => {
-      expect(queueWorker._events.error).to.have.lengthOf(2);
+      expect(queueWorker._events.error).to.have.lengthOf(1);
       expect(queueWorker._events.completed).to.be.a('function');
       expect(queueWorker._events.failed).to.be.a('function');
     });

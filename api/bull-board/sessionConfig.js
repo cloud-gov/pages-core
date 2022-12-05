@@ -8,6 +8,7 @@ function configureSession() {
 
   const client = new IORedis(config.redis.url, {
     tls: config.redis.tls,
+    maxRetriesPerRequest: null,
   });
 
   const store = new RedisStore({ client });

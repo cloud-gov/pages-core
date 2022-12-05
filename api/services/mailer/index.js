@@ -16,6 +16,7 @@ function ensureInit() {
 function createConnection() {
   return new IORedis(redisConfig.url, {
     tls: redisConfig.tls,
+    maxRetriesPerRequest: null,
   });
 }
 

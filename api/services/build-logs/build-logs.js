@@ -70,7 +70,7 @@ const BuildLogs = {
         params.Range = `bytes=${startBytes}-${endBytes}`;
       }
       const response = await this.s3().getObject(build.logsS3Key, params);
-      return response.Body.toString();
+      return response.Body.toString().split('\n');
     } catch (error) {
       if (error.code === 'InvalidRange') {
         return null;

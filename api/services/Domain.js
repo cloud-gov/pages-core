@@ -26,7 +26,10 @@ function cfApi() {
 function queue() {
   const { redis: redisConfig } = config;
   return new DomainQueue(
-    new IORedis(redisConfig.url, { tls: redisConfig.tls })
+    new IORedis(redisConfig.url, {
+      tls: redisConfig.tls,
+      maxRetriesPerRequest: null,
+    })
   );
 }
 

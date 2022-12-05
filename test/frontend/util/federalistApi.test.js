@@ -17,7 +17,7 @@ const testBuild = {
   branch: testBranch,
   requestedCommitSha: '123abc',
 };
-const buildLogPage = 1;
+const buildLogOffset = 0;
 const uev = { id: 8 };
 const credentials = { username: 'username', password: 'password' };
 
@@ -43,7 +43,7 @@ function testRouteCalled(routeName, { method = 'GET', body } = {}) {
 describe('federalistApi', () => {
   before(() => {
     fetchMock.get(`${API}/site/${testSite.id}/build`, { build: true }, { name: 'getBuilds' });
-    fetchMock.get(`${API}/build/${testBuild.id}/log/page/${buildLogPage}`, { log: true }, { name: 'getBuildLogs' });
+    fetchMock.get(`${API}/build/${testBuild.id}/log/offset/${buildLogOffset}`, { log: true }, { name: 'getBuildLogs' });
     fetchMock.get(
       `${API}/site/${testSite.id}/published-branch`,
       { branches: [testBranch] }, { name: 'getPublishedBranches' }

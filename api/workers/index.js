@@ -137,6 +137,7 @@ function pagesWorker(connection) {
 async function start() {
   const connection = new IORedis(redisConfig.url, {
     tls: redisConfig.tls,
+    maxRetriesPerRequest: null,
   });
 
   const {

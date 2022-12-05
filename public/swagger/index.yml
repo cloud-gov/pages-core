@@ -199,9 +199,9 @@ paths:
       summary: Fetch all build logs associated with a build
       responses:
         200:
-          description: An array of the build logs associated with the build
+          description: An object with the build logs associated with the build
           schema:
-            type: array
+            type: object
             items:
               $ref: "BuildLog.json"
         401:
@@ -432,7 +432,7 @@ paths:
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"  
+            $ref: "Error.json"
   /site:
     get:
       summary: Fetch all of the current user's sites
@@ -931,7 +931,7 @@ paths:
           description: Not authorized
           schema:
             $ref: "Error.json"
-  /me/settings:          
+  /me/settings:
     put:
       summary: Update user settings
       responses:

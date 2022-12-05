@@ -1,28 +1,47 @@
-import React from 'react';
+/* eslint-disable react/forbid-prop-types */
+
+import React, { useCallback, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import { BUILD_LOG } from '../../propTypes';
-import { groupLogs } from '../../util';
+function SiteBuildLogTable({ buildLogs, buildState }) {
+  const buildLogRef = useRef(null);
+  const scrollType = buildState === 'created' ? 'smooth' : 'none';
 
-function SiteBuildLogTable({ buildLogs }) {
-  const groupedLogs = groupLogs(buildLogs);
+  const scrollToLast = useCallback((node, state) => {
+    if (node && ['created', 'error'].includes(state)) {
+      // eslint-disable-next-line no-param-reassign
+      node.scrollTop = node.scrollHeight;
+    }
+  });
+
+  useEffect(() => scrollToLast(buildLogRef.current, buildState),
+    [buildLogs, buildState]);
 
   return (
-    <pre className="build-log">
-      {Object.keys(groupedLogs).map(source => (
-        <React.Fragment key={source}>
-          {source !== 'ALL' && (
-            <span className="log-source-header">{source}</span>
-          )}
-          {groupedLogs[source].join('\n')}
-        </React.Fragment>
-      ))}
+    <pre
+      ref={buildLogRef}
+      className="build-log"
+      style={{ scrollBehavior: scrollType }}
+    >
+      {buildLogs.map((source, index) => {
+        const key = `build-log-span-${index}`;
+
+        return (
+          <p key={key}>{source}</p>
+        );
+      })}
+      <p className="build-log-cursor" />
     </pre>
   );
 }
 
 SiteBuildLogTable.propTypes = {
-  buildLogs: PropTypes.arrayOf(BUILD_LOG).isRequired,
+  buildLogs: PropTypes.array.isRequired,
+  buildState: PropTypes.string,
 };
 
-export default SiteBuildLogTable;
+SiteBuildLogTable.defaultProps = {
+  buildState: '',
+};
+
+export default React.memo(SiteBuildLogTable);

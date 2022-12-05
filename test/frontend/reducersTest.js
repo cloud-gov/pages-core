@@ -16,7 +16,6 @@ describe("maps reducers", () => {
 
   beforeEach(() => {
     fixture = proxyquire("../../frontend/reducers.js", {
-      "./reducers/buildLogs": BUILD_LOGS,
       "./reducers/alert": ALERT,
       "./reducers/publishedBranches": PUBLISHED_BRANCHES,
       "./reducers/publishedFiles": PUBLISHED_FILES,
@@ -26,10 +25,6 @@ describe("maps reducers", () => {
       "./reducers/githubBranches": GITHUB_BRANCHES,
     }).default;
   });
-
-  it("maps buildLogs reducer", () => {
-    expect(fixture.buildLogs).to.equal(BUILD_LOGS)
-  })
 
   it("maps alert reducer", () => {
     expect(fixture.alert).to.equal(ALERT);
