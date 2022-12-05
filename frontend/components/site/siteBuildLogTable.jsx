@@ -5,10 +5,11 @@ import PropTypes from 'prop-types';
 
 function SiteBuildLogTable({ buildLogs, buildState }) {
   const buildLogRef = useRef(null);
-  const scrollType = buildState === 'created' ? 'smooth' : 'none';
+  const scrollType = ['created', 'processing', 'queued', 'tasked']
+    .includes(buildState) ? 'smooth' : 'none';
 
   const scrollToLast = useCallback((node, state) => {
-    if (node && ['created', 'error'].includes(state)) {
+    if (node && ['created', 'error', 'processing', 'queued', 'tasked'].includes(state)) {
       // eslint-disable-next-line no-param-reassign
       node.scrollTop = node.scrollHeight;
     }

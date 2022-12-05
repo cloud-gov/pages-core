@@ -27,7 +27,7 @@ export const useBuildLogs = (id) => {
         state,
       };
 
-      if (state === 'created') {
+      if (['created', 'processing', 'queued', 'tasked'].includes(state)) {
         if (fetchOffest === 0) {
           setResults(updatedResults);
         } else {
