@@ -5,6 +5,8 @@ import sinon from 'sinon';
 
 import { EnvironmentVariables } from '../../../../../frontend/components/site/SiteSettings/EnvironmentVariables';
 
+const proxyquire = require('proxyquire').noCallThru();
+
 const stubs = {};
 
 const siteId = 1;
@@ -51,6 +53,30 @@ describe('<EnvironmentVariables/>', () => {
     const wrapper = shallow(<EnvironmentVariables {...defaultProps} />);
     const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'warning');
     expect(alert).to.have.lengthOf(1);
+  });
+
+  it('warning contains FISMA Low on Federalist', () => {
+    const { EnvironmentVariables: FederalistEnvironmentVariables } = proxyquire(
+      '../../../../../frontend/components/site/SiteSettings/EnvironmentVariables',
+      { '../../../globals': { PRODUCT: "federalist" }}
+    );
+
+    const wrapper = shallow(<FederalistEnvironmentVariables {...defaultProps} />);
+    const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'warning');
+
+    expect(alert.render().text()).to.contain('FISMA Low')
+  }); 
+
+  it('warning contains FISMA Moderate on Pages', () => {
+    const { EnvironmentVariables: PagesEnvironmentVariables } = proxyquire(
+      '../../../../../frontend/components/site/SiteSettings/EnvironmentVariables',
+      { '../../../globals': { PRODUCT: "pages" }}
+    );
+
+    const wrapper = shallow(<PagesEnvironmentVariables {...defaultProps} />);
+    const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'warning');
+
+    expect(alert.render().text()).to.contain('FISMA Moderate')
   });
 
   describe('when loading', () => {
