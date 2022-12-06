@@ -6,7 +6,7 @@ const BuildLogs = require('../services/build-logs');
 async function getBuildLogsFromS3(build, state, offset, limit) {
   const origin = 's3';
 
-  const output = await BuildLogs.getBuildLogs(build, offset, offset + limit - 1);
+  const { output, byteLength } = await BuildLogs.getBuildLogs(build, offset, offset + limit - 1);
 
   if (!output) {
     return {
@@ -24,7 +24,7 @@ async function getBuildLogsFromS3(build, state, offset, limit) {
     state,
     origin,
     offset,
-    output_count: output.length,
+    output_count: byteLength,
     output,
   };
 }
