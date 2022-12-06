@@ -27,7 +27,7 @@ const bulkBuildLogs = async (numLogs, overrides = {}) => {
     overrides.build = overrides.buildId;
   }
   const builds = await Promise.all(Array((numLogs)).fill(0).map(() => _attributes(overrides)));
-  return BuildLog.bulkCreate(builds); 
+  return BuildLog.bulkCreate(builds);
 }
 
 module.exports = { buildLog, bulkBuildLogs };

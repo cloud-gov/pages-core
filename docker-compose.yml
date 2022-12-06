@@ -11,7 +11,7 @@ services:
     build:
       dockerfile: Dockerfile-app
       context: .
-    command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "watch"]
+    command: ["yarn", "watch"]
     volumes:
       - yarn:/usr/local/share/.cache/yarn
       - .:/app
@@ -99,7 +99,7 @@ services:
       - 6379:6379
     command: redis-server --loglevel warning
   echo:
-    image: node:16
+    image: node:18
     volumes:
       - yarn:/usr/local/share/.cache/yarn
       - .:/app

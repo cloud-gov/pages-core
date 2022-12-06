@@ -57,6 +57,8 @@ export const BUILD_LOG = PropTypes.shape({
   output: PropTypes.string.isRequired,
 });
 
+export const BUILD_LOG_DATA = PropTypes.objectOf(PropTypes.arrayOf(BUILD_LOG));
+
 export const ORGANIZATION = PropTypes.shape({
   createdAt: PropTypes.string,
   id: PropTypes.oneOfType([

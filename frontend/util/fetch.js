@@ -1,5 +1,3 @@
-/* global fetch:true */
-
 import 'whatwg-fetch';
 
 const defaultMethod = 'GET';

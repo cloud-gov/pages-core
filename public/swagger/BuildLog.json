@@ -1,15 +1,31 @@
 {
   "type": "object",
   "required": [
-    "output",
-    "source"
+    "build",
+    "state",
+    "origin",
+    "offset",
+    "output_count",
+    "output"
   ],
   "properties": {
-    "output": {
+    "build": {
+      "type": "number"
+    },
+    "state": {
       "type": "string"
     },
-    "source": {
+    "origin": {
       "type": "string"
+    },
+    "offset": {
+      "type": "number"
+    },
+    "output_count": {
+      "type": "number"
+    },
+    "output": {
+      "type": "array"
     }
   }
 }

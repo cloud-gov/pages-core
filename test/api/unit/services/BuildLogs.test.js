@@ -132,18 +132,49 @@ describe('BuildLogs Service', () => {
       });
     });
 
-    it('returns the byte range of the logs', async () => {
+    it('returns the byte range of the logs as an array of strings', async () => {
       const key = 'owner/repo/1';
+      const string = 'hel';
+      const contentLength = new Blob([string]).size
 
       const build = { logsS3Key: key };
       getObjectStub.resolves(
-        { Body: Buffer.from('hel') }
+        {
+          Body: Buffer.from(string),
+          ContentLength: contentLength,
+        }
       );
 
-      const result = await BuildLogs.getBuildLogs(build, 0, 2);
+      const { output, byteLength } = await BuildLogs.getBuildLogs(build, 0, contentLength);
 
-      sinon.assert.calledOnceWithExactly(getObjectStub, key, { Range: 'bytes=0-2' });
-      expect(result).to.equal('hel');
+      sinon.assert.calledOnceWithExactly(getObjectStub, key, { Range: `bytes=0-${contentLength}` });
+      expect(output).to.have.length(1);
+      expect(output[0]).to.equal(string);
+      expect(byteLength).to.equal(contentLength)
+    });
+
+    it('returns byte range of the logs and splits string by newline', async () => {
+      const key = 'owner/repo/1';
+      const line1 = 'hello'
+      const line2 = 'world'
+      const multiline = `${line1}\n${line2}`
+      const contentLength = new Blob([multiline]).size
+
+      const build = { logsS3Key: key };
+      getObjectStub.resolves(
+        {
+          Body: Buffer.from(multiline),
+          ContentLength: contentLength,
+        }
+      );
+
+      const { output, byteLength } = await BuildLogs.getBuildLogs(build, 0, contentLength);
+
+      sinon.assert.calledOnceWithExactly(getObjectStub, key, { Range: `bytes=0-${contentLength}` });
+      expect(output).to.have.length(2);
+      expect(output[0]).to.equal(line1);
+      expect(output[1]).to.equal(line2);
+      expect(byteLength).to.equal(contentLength);
     });
 
     it('returns null if range cannott be satisified', async () => {
@@ -154,10 +185,11 @@ describe('BuildLogs Service', () => {
       error.code = 'InvalidRange';
       getObjectStub.rejects(error);
 
-      const result = await BuildLogs.getBuildLogs(build, 100, 199);
+      const { output, byteLength } = await BuildLogs.getBuildLogs(build, 100, 199);
 
       sinon.assert.calledOnceWithExactly(getObjectStub, key, { Range: 'bytes=100-199' });
-      expect(result).to.be.null;
+      expect(output).to.be.null;
+      expect(byteLength).to.equal(0)
     });
   });
 });

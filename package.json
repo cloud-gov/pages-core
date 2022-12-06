@@ -155,7 +155,7 @@
     "react-notification-system": "^0.4.0",
     "react-notification-system-redux": "^2.0.1",
     "react-redux": "^7.2.2",
-    "react-svg-loader": "^3.0.3",
+    "react-svg-loader": "^3.0.0",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.2",
     "redux-form": "^8.3.7",
@@ -163,7 +163,7 @@
     "redux-thunk": "^2.3.0",
     "sass": "1.35.1",
     "sass-loader": "^11.1.1",
-    "serve": "^13.0.2",
+    "serve": "^14.1.2",
     "shortid": "^2.2.16",
     "sinon": "^10.0.0",
     "style-loader": "^2.0.0",
@@ -176,7 +176,7 @@
     "webpack-manifest-plugin": "^3.0.0"
   },
   "engines": {
-    "node": "^16.14.x",
+    "node": "^18.x.x",
     "npm": "^8.1.2"
   }
 }

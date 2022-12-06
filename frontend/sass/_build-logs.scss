@@ -1,11 +1,17 @@
 .build-log {
+  background-color: black;
+  color: azure;
   border: 1px solid lightgrey;
-  padding: .5rem;
+  padding: 2rem 1rem;
   font-size: 1.5rem;
   overflow: scroll;
   resize: both;
   height: 600px;
   width: 100%;
+
+  p {
+    line-height: .5rem;
+  }
 
   .log-source-header {
     display: block;
@@ -13,5 +19,25 @@
     text-transform: uppercase;
     padding-top: 1rem;
   }
-}
 
+  .build-log-cursor {
+    animation: blink 2s linear infinite;
+    background-color: azure;
+    display: block;
+    margin-left: 3px;
+    height: 20px;
+    width: 2px;
+  }
+
+  @keyframes blink {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: .5;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+}

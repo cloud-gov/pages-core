@@ -93,7 +93,7 @@ module.exports = {
     // When webpack bundles moment, it includes all of its locale files,
     // which we don't need, so we'll use this plugin to keep them out of the
     // bundle
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/}),
     new WebpackManifestPlugin({
       fileName: '../webpack-manifest.json',
       publicPath: '',

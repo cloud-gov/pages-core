@@ -25,6 +25,7 @@ const cacheControl = require('./cacheControl');
 
 const connection = new IORedis(config.redis.url, {
   tls: config.redis.tls,
+  maxRetriesPerRequest: null,
 });
 
 const createQueue = name => new Queue(name, config.redis.url, {

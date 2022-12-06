@@ -35,9 +35,9 @@ describe('Build Log API', () => {
       factory.buildLog().then(buildLog => request(app)
         .get(`/v0/build/${buildLog.build}/log`)
         .expect(403)).then((response) => {
-        validateAgainstJSONSchema('GET', '/build/{build_id}/log', 403, response.body);
-        done();
-      }).catch(done);
+          validateAgainstJSONSchema('GET', '/build/{build_id}/log', 403, response.body);
+          done();
+        }).catch(done);
     });
 
     describe('successfully fetching build logs', () => {
@@ -68,9 +68,20 @@ describe('Build Log API', () => {
 
       const expectedResponse = (response, done) => {
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
-        expect(response.body).to.be.an('array');
-        expect(response.body).to.have.length(1);
-        expect(response.body[0].output.split('\n')).to.have.length(1000);
+        expect(response.body).to.be.an('object');
+        expect(response.body).to.have.keys([
+          'build',
+          'state',
+          'origin',
+          'offset',
+          'output_count',
+          'output'
+        ]);
+        expect(response.body.state).to.be.oneOf(['success', 'created', 'error'])
+        expect(response.body.origin).to.equal('database');
+        expect(response.body.offset).to.equal(0);
+        expect(response.body.output_count).to.equal('1000');
+        expect(response.body.output).to.have.length(1000);
         done();
       };
 
@@ -207,15 +218,13 @@ describe('Build Log API', () => {
         ]);
 
         const { body } = await request(app)
-          .get(`/v0/build/${build.id}/log/page/1`)
+          .get(`/v0/build/${build.id}/log/offset/0`)
           .set('Cookie', cookie)
           .expect(200);
 
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, body);
-        expect(body).to.be.an('array');
-        expect(body).to.have.length(1);
-        expect(body[0].output.split('\n')).to.have.length(3);
-        expect(body.map(l => l.source)).to.have.members(Array(1).fill('ALL'));
+        expect(body).to.be.an('object');
+        expect(body.output).to.have.length(3);
       });
 
       it('paginates new build logs by groups of lines', async () => {
@@ -224,34 +233,30 @@ describe('Build Log API', () => {
         await factory.bulkBuildLogs((1000 + numLogs), { buildId: build.id, source: 'ALL' });
 
         let resp = await request(app)
-          .get(`/v0/build/${build.id}/log/page/1`)
+          .get(`/v0/build/${build.id}/log/offset/0`)
           .set('Cookie', cookie)
           .expect(200);
 
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, resp.body);
-        expect(resp.body).to.be.an('array');
-        expect(resp.body).to.have.length(1);
-        expect(resp.body[0].output.split('\n')).to.have.length(1000);
-        expect(resp.body.map(l => l.source)).to.have.members(Array(1).fill('ALL'));
+        expect(resp.body).to.be.an('object');
+        expect(resp.body.output).to.have.length(1000);
 
         resp = await request(app)
-          .get(`/v0/build/${build.id}/log/page/2`)
+          .get(`/v0/build/${build.id}/log/offset/1000`)
           .set('Cookie', cookie)
           .expect(200);
 
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, resp.body);
-        expect(resp.body).to.be.an('array');
-        expect(resp.body).to.have.length(1);
-        expect(resp.body[0].output.split('\n')).to.have.length(numLogs);
-        expect(resp.body.map(l => l.source)).to.have.members(Array(1).fill('ALL'));
+        expect(resp.body).to.be.an('object');
+        expect(resp.body.output).to.have.length(numLogs);
 
         resp = await request(app)
-          .get(`/v0/build/${build.id}/log/page/3`)
+          .get(`/v0/build/${build.id}/log/offset/3000`)
           .set('Cookie', cookie)
           .expect(200);
 
-        expect(resp.body).to.be.an('array');
-        expect(resp.body).to.have.length(0);
+        expect(resp.body).to.be.an('object');
+        expect(resp.body.output).to.have.length(0);
       }).timeout(5000);
     });
   });

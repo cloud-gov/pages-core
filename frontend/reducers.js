@@ -1,6 +1,5 @@
 import { reducer as notifications } from 'react-notification-system-redux';
 
-import buildLogs from './reducers/buildLogs';
 import alert from './reducers/alert';
 import publishedBranches from './reducers/publishedBranches';
 import publishedFiles from './reducers/publishedFiles';
@@ -15,7 +14,6 @@ import userEnvironmentVariables from './reducers/userEnvironmentVariables';
 import organizations from './reducers/organizations';
 
 export default {
-  buildLogs,
   alert,
   publishedBranches,
   publishedFiles,

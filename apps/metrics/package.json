@@ -5,7 +5,7 @@
   "license": "CC0-1.0",
   "author": "david.corwin@gsa.gov",
   "engines": {
-    "node": ">= 16.16.0"
+    "node": "^18.x.x"
   },
   "scripts": {
     "dev": "NODE_ENV=development npx nodemon -r dotenv/config src/index.js",
