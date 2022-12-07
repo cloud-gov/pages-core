@@ -53,7 +53,7 @@ module.exports = wrapHandlers({
     if (!build) return res.notFound();
 
     const buildLogs = build.logsS3Key
-      ? await BuildLogs.getBuildLogs(build)
+      ? await BuildLogs.getBuildLogs(build).then(r => r.output.join('\n'))
       : await BuildLogs.fetchBuildLogs(build).then(r => r.logs);
 
     return res.json(buildLogs);

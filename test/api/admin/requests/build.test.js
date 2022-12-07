@@ -5,6 +5,7 @@ const validateAgainstJSONSchema = require('../../support/validateAgainstJSONSche
 const { authenticatedSession } = require('../../support/session');
 const factory = require('../../support/factory');
 const csrfToken = require('../../support/csrfToken');
+const s3ClientMocks = require('../../support/s3HelperMocks');
 
 const config = require('../../../../config');
 const { Site, User, BuildLog } = require('../../../../api/models');
@@ -60,7 +61,7 @@ describe('Admin - Site API', () => {
         .set('Cookie', cookie)
         .set('Origin', config.app.adminHostname)
         .expect(200);
-    
+
       builds.forEach((build) => {
         const responseBuild = response.body.data.find(candidate => candidate.id === build.id);
         buildResponseExpectations(responseBuild, build);
@@ -119,19 +120,19 @@ describe('Admin - Site API', () => {
         .get(`/builds/${build.id}`)
         .set('Cookie', cookie)
         .set('Origin', config.app.adminHostname)
-        .expect(200);        
+        .expect(200);
 
-        expect(getResponse.body.state).to.deep.equal(newState);
-        validateAgainstJSONSchema('PUT', '/build/{id}', 200, getResponse.body);
+      expect(getResponse.body.state).to.deep.equal(newState);
+      validateAgainstJSONSchema('PUT', '/build/{id}', 200, getResponse.body);
     });
   });
-  
+
   describe('GET /builds/:id/log', () => {
     itShouldRequireAdminAuthentication('/builds/1/log', '/build/{build_id}/log');
 
-    describe('default', () => {
+    describe('from database', () => {
 
-      it('deletes the following site', async () => {
+      it('gets the following site build logs', async () => {
         const [user, build] = await Promise.all([
           factory.user(),
           factory.build(),
@@ -152,8 +153,39 @@ describe('Admin - Site API', () => {
           .set('x-csrf-token', csrfToken.getToken())
           .expect(200);
 
-          expect(response.body).to.be.a('string');
-          expect(response.body.split('\n')).to.have.length(5);
+        expect(response.body).to.be.a('string');
+        expect(response.body.split('\n')).to.have.length(5);
+      });
+    });
+
+    describe('from s3', () => {
+      after(() => {
+        s3ClientMocks.resetMocks();
+      });
+
+      it('gets the following site build logs', async () => {
+        const body = 'this\nis a\n test\n response\n body.'
+        const contentLength = new Blob([body]).size
+        s3ClientMocks.createMock('getObject', {
+          Body: body,
+          ContentLength: contentLength,
+        })
+
+        const [user, build] = await Promise.all([
+          factory.user(),
+          factory.build({ logsS3Key: 's3-logs-key' }),
+        ]);
+
+        const cookie = await authenticatedSession(user, sessionConfig);
+        const response = await request(app)
+          .get(`/builds/${build.id}/log`)
+          .set('Cookie', cookie)
+          .set('Origin', config.app.adminHostname)
+          .set('x-csrf-token', csrfToken.getToken())
+          .expect(200);
+
+        expect(response.body).to.be.a('string');
+        expect(response.body.split('\n')).to.have.length(5);
       });
     });
   });
