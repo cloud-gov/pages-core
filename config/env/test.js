@@ -84,6 +84,13 @@ module.exports = {
     level: 'error',
     silent: true,
   },
+  s3BuildLogs: {
+    accessKeyId: '123abc',
+    secretAccessKey: '456def',
+    region: 'us-gov-west-1',
+    bucket: 'cg-123456789',
+    serviceName: 'federalist-dev-s3-build-logs',
+  },
   env: {
     cfDomainGuid: '987ihg-654fed-321cba',
     cfProxyGuid: '867fiv-309ine',
