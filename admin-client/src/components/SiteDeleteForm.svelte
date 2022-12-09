@@ -21,14 +21,12 @@
   }
 </script>
 
-<SectionHeader>Delete</SectionHeader>
-
 <form
   class="usa-form width-full maxw-none padding-1"
   on:submit|preventDefault={handleSubmit}>
   <fieldset class="usa-fieldset">
     <legend>
-      This will perform a soft delete of a Federalist site and remove the Cloud
+      This will perform a soft delete of a cloud.gov Pages site and remove the Cloud
       Foundry route and AWS bucket associated with it.
     </legend>
     <input

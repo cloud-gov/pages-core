@@ -16,6 +16,7 @@
     DataTable,
     GridContainer,
     PageTitle,
+    SiteDeleteForm,
     SiteForm,
     SiteFormOrganization,
     SiteMetadata,
@@ -161,6 +162,9 @@
         <Await on={usersPromise} let:response={users}>
           <UserTable users={users.data} borderless={true} />
         </Await>
+      </AccordionContent>
+      <AccordionContent title="Delete Site">
+        <SiteDeleteForm site={site} />
       </AccordionContent>
     </Accordion>
   </Await>
