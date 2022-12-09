@@ -24,7 +24,7 @@
   } from '../components';
   import { destroySite } from '../flows';
 
-  $: id = $router.params.id;
+  let id = $router.params.id;
   $: sitePromise = fetchSite(id);
   $: buildsPromise = fetchBuilds({ site: id, limit: 10 });
   $: orgsPromise = fetchOrganizations({ limit: 100 });
