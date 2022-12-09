@@ -92,7 +92,11 @@ module.exports = wrapHandlers({
     const site = await fetchModelById(id, Site);
 
     // This will not remove the webhook since we don't have permissions
-    await SiteDestroyer.destroySite(site);
+    const [status, message] = await SiteDestroyer.destroySite(site);
+    if (status !== 'ok') {
+      return res.unprocessableEntity({ message });
+    }
+
     EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Site Destroyed', { site });
 
     return res.json({});

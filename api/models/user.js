@@ -55,8 +55,10 @@ const associate = ({
         [Op.or]: [
           { username: { [Op.substring]: search } },
           { email: { [Op.substring]: search } },
+          { '$UAAIdentity.email$': { [Op.substring]: search } },
         ],
       };
+      query.include = UAAIdentity;
     }
     return query;
   });

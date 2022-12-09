@@ -1,7 +1,3 @@
-<script>
-  import { fade, fly } from 'svelte/transition';
-</script>
-
 <style>
   .modal-base {
     align-items: center;
@@ -20,11 +16,10 @@
 </style>
 
 <div
-  transition:fade={{ duration: 300 }}
   class="modal-base"
+  style-src=""
 >
   <div
-    transition:fly={{ y: 100, duration: 750 }}
     class="bg-white margin-2 padding-2 position-relative shadow-5"
   >
     <slot />
