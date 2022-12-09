@@ -80,7 +80,7 @@ function put(path, body) {
 }
 
 async function destroySite(id) {
-  return destroy(`/sites/${id}`).catch(() => null);
+  return destroy(`/sites/${id}`);
 }
 
 async function fetchMe() {

@@ -16,13 +16,15 @@
     DataTable,
     GridContainer,
     PageTitle,
+    SiteDeleteForm,
     SiteForm,
     SiteFormOrganization,
     SiteMetadata,
     UserTable,
   } from '../components';
+  import { destroySite } from '../flows';
 
-  $: id = $router.params.id;
+  const { id } = $router.params;
   $: sitePromise = fetchSite(id);
   $: buildsPromise = fetchBuilds({ site: id, limit: 10 });
   $: orgsPromise = fetchOrganizations({ limit: 100 });
@@ -161,6 +163,9 @@
         <Await on={usersPromise} let:response={users}>
           <UserTable users={users.data} borderless={true} />
         </Await>
+      </AccordionContent>
+      <AccordionContent title="Delete Site">
+        <SiteDeleteForm {site} on:submit={destroySite(site)} />
       </AccordionContent>
     </Accordion>
   </Await>
