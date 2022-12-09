@@ -22,6 +22,7 @@
     SiteMetadata,
     UserTable,
   } from '../components';
+  import { destroySite } from '../flows';
 
   $: id = $router.params.id;
   $: sitePromise = fetchSite(id);
@@ -164,7 +165,7 @@
         </Await>
       </AccordionContent>
       <AccordionContent title="Delete Site">
-        <SiteDeleteForm site={site} />
+        <SiteDeleteForm {site} on:submit={destroySite(site)} />
       </AccordionContent>
     </Accordion>
   </Await>
