@@ -180,6 +180,23 @@ describe('User model', () => {
 
       expect(users.map(u => u.id)).to.have.members([user.id]);
     });
+
+    it('returns the user by UAA email substring', async () => {
+      const [user1, user2] = await Promise.all([
+        createUser(),
+        createUser(),
+      ]);
+
+      await Promise.all([
+        createUAAIdentity({ userId: user1.id, email: 'jeff.probst@survivor.gov' }),
+        createUAAIdentity({ userId: user2.id, email: 'rob.mariano@survivor.gov' }),
+      ]);
+
+      const users = await User.scope(User.searchScope('probst')).findAll();
+
+      expect(users.length === 1);
+      expect(users.map(u => u.id)).to.have.members([user1.id]);
+    });
   });
 
   describe('withUAAIdentity', () => {
