@@ -1,5 +1,4 @@
 <script>
-  import { slide } from 'svelte/transition';
   import { formatDateTime } from '../helpers/formatter';
 
   import ExternalLink from './ExternalLink.svelte';
@@ -57,7 +56,6 @@
 
 <div class="padding-2 {bgColor}">
   <div
-    transition:slide|local
     class="grid-container padding-top-1 shadow-2 bg-white">
     <div class="grid-row">
       <div class="tablet:grid-col-fill padding-bottom-1">
