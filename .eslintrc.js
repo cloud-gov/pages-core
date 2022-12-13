@@ -22,6 +22,10 @@ const finalRules = {
     explicitSpread: 'ignore',
   }],
 
+  'react/jsx-no-bind': [2, {
+    allowFunctions: 'ignore',
+  }],
+
   'sonarjs/no-duplicate-string': [0],
   'sonarjs/no-identical-functions': [0],
 };
