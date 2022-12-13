@@ -1,8 +1,8 @@
 /* global window:true */
 import React from 'react';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { SITE, ORGANIZATION } from '../../../propTypes';
 import ExpandableArea from '../../ExpandableArea';
 import BasicSiteSettings from './BasicSiteSettings';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
@@ -12,118 +12,93 @@ import { currentSite } from '../../../selectors/site';
 import { getOrgById } from '../../../selectors/organization';
 import globals from '../../../globals';
 
-class SiteSettings extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleUpdate = this.handleUpdate.bind(this);
-    this.handleDelete = this.handleDelete.bind(this);
+function SiteSettings() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const site = useSelector(state => currentSite(state.sites, id));
+
+  if (!site) {
+    return null;
   }
 
-  handleDelete() {
-    const { site } = this.props;
+  async function handleDelete() {
     // eslint-disable-next-line no-alert
     if (window.confirm(`${site.owner}/${site.repository}\nAre you sure you want to delete this site for all users? This action will also delete all site builds and take down the live site, if published.`)) {
-      return siteActions.deleteSite(site.id);
+      await siteActions.deleteSite(site.id);
+      navigate('/sites');
     }
-
     return Promise.resolve();
   }
 
-  handleUpdate(values) {
-    const { site } = this.props;
+  function handleUpdate(values) {
     siteActions.updateSite(site, values);
   }
 
-  render() {
-    const { site, organization } = this.props;
+  const organization = useSelector(state => getOrgById(state.organizations, site.organizationId));
 
-    if (!site) {
-      return null;
-    }
+  const basicInitialValues = {
+    defaultBranch: site.defaultBranch || '',
+    domain: site.domain || '',
+    demoBranch: site.demoBranch || '',
+    demoDomain: site.demoDomain || '',
+    canEditLiveUrl: site.canEditLiveUrl,
+    canEditDemoUrl: site.canEditDemoUrl,
+  };
 
-    const basicInitialValues = {
-      defaultBranch: site.defaultBranch || '',
-      domain: site.domain || '',
-      demoBranch: site.demoBranch || '',
-      demoDomain: site.demoDomain || '',
-      canEditLiveUrl: site.canEditLiveUrl,
-      canEditDemoUrl: site.canEditDemoUrl,
-    };
+  const advancedInitialValues = {
+    engine: site.engine,
+    defaultConfig: site.defaultConfig || '',
+    demoConfig: site.demoConfig || '',
+    previewConfig: site.previewConfig || '',
+  };
 
-    const advancedInitialValues = {
-      engine: site.engine,
-      defaultConfig: site.defaultConfig || '',
-      demoConfig: site.demoConfig || '',
-      previewConfig: site.previewConfig || '',
-    };
-
-    return (
-      <div>
-        <p>
-          See our documentation site for more about
-          { ' ' }
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            title={`${globals.APP_NAME} documentation on settings`}
-            href="https://federalist.18f.gov/documentation/#managing-site-settings"
-          >
-            these settings
-          </a>
-          { ' ' }
-          or
-          { ' ' }
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            title={`${globals.APP_NAME} documentation on previews`}
-            href="https://federalist.18f.gov/documentation/previews/"
-          >
-            viewing site previews
-          </a>
-          .
-        </p>
-        <BasicSiteSettings
-          isSandbox={organization?.isSandbox}
-          initialValues={basicInitialValues}
-          onSubmit={this.handleUpdate}
+  return (
+    <div>
+      <p>
+        See our documentation site for more about
+        { ' ' }
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          title={`${globals.APP_NAME} documentation on settings`}
+          href="https://cloud.gov/pages/documentation/#managing-site-settings"
+        >
+          these settings
+        </a>
+        { ' ' }
+        or
+        { ' ' }
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          title={`${globals.APP_NAME} documentation on previews`}
+          href="https://cloud.gov/pages/documentation/previews/"
+        >
+          viewing site previews
+        </a>
+        .
+      </p>
+      <BasicSiteSettings
+        isSandbox={organization?.isSandbox}
+        initialValues={basicInitialValues}
+        onSubmit={handleUpdate}
+      />
+      <ExpandableArea title="Advanced settings">
+        <AdvancedSiteSettings
+          siteId={site.id}
+          initialValues={advancedInitialValues}
+          onDelete={handleDelete}
+          onSubmit={handleUpdate}
         />
-        <ExpandableArea title="Advanced settings">
-          <AdvancedSiteSettings
-            siteId={site.id}
-            initialValues={advancedInitialValues}
-            onDelete={this.handleDelete}
-            onSubmit={this.handleUpdate}
-          />
-        </ExpandableArea>
-        <ExpandableArea title="Environment variables">
-          <EnvironmentVariables
-            siteId={site.id}
-          />
-        </ExpandableArea>
-      </div>
-    );
-  }
-}
-
-SiteSettings.propTypes = {
-  site: SITE,
-  organization: ORGANIZATION,
-};
-
-SiteSettings.defaultProps = {
-  site: null,
-  organization: null,
-};
-
-const mapStateToProps = ({ sites, organizations }, { id }) => {
-  const site = currentSite(sites, id);
-  const organization = getOrgById(organizations, site.organizationId);
-  return ({
-    site,
-    organization,
-  });
+      </ExpandableArea>
+      <ExpandableArea title="Environment variables">
+        <EnvironmentVariables
+          siteId={site.id}
+        />
+      </ExpandableArea>
+    </div>
+  );
 };
 
 export { SiteSettings };
-export default connect(mapStateToProps)(SiteSettings);
+export default SiteSettings;
