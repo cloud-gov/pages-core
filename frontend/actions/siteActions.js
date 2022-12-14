@@ -77,11 +77,7 @@ export default {
     return federalist.removeUserFromSite(siteId, userId)
       .then(dispatchUserRemovedFromSiteAction)
       .then(this.fetchSites)
-      .then(() => {
-        if (me) { return updateRouterToSitesUri(); }
-
-        return userActions.fetchUser();
-      })
+      .then(userActions.fetchUser)
       .then(() => alertActions.alertSuccess('Successfully removed.'))
       .catch(alertError);
   },
