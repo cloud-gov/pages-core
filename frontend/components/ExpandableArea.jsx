@@ -7,16 +7,12 @@ import shortid from 'shortid';
 
 function ExpandableArea(props) {
   const id = `expandable-area-${shortid.generate()}`;
-  const [isExpanded, setExpanded] = useState(false)
-
   const { bordered, children, title } = props;
-  console.log(isExpanded)
   return (
     <div className={`usa-accordion${bordered ? '-bordered' : ''}`}>
       <button
-        onClick={() => setExpanded(!isExpanded)}
         className="usa-accordion-button"
-        aria-expanded={isExpanded}
+        aria-expanded={false} // this is controlled by uswds.js
         aria-controls={id}
         type="button"
       >
@@ -25,7 +21,7 @@ function ExpandableArea(props) {
       <div
         id={id}
         className="usa-accordion-content"
-        aria-hidden={!isExpanded}
+        aria-hidden={true}
       >
         {children}
       </div>

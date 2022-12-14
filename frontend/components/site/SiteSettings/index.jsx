@@ -25,8 +25,7 @@ function SiteSettings() {
   async function handleDelete() {
     // eslint-disable-next-line no-alert
     if (window.confirm(`${site.owner}/${site.repository}\nAre you sure you want to delete this site for all users? This action will also delete all site builds and take down the live site, if published.`)) {
-      await siteActions.deleteSite(site.id);
-      // navigate('/sites');
+      return siteActions.deleteSite(site.id, () => navigate('/sites'));
     }
     return Promise.resolve();
   }
@@ -82,7 +81,7 @@ function SiteSettings() {
         initialValues={basicInitialValues}
         onSubmit={handleUpdate}
       />
-      <ExpandableArea title="Advanced settings">
+      <ExpandableArea title="Advanced settings" id="advanced-settings">
         <AdvancedSiteSettings
           siteId={site.id}
           initialValues={advancedInitialValues}
@@ -90,11 +89,11 @@ function SiteSettings() {
           onSubmit={handleUpdate}
         />
       </ExpandableArea>
-      {/* <ExpandableArea title="Environment variables">
+      <ExpandableArea title="Environment variables">
         <EnvironmentVariables
           siteId={site.id}
         />
-      </ExpandableArea> */}
+      </ExpandableArea>
     </div>
   );
 };

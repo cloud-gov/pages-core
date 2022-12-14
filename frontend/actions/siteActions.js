@@ -96,11 +96,12 @@ export default {
       .catch(alertError);
   },
 
-  deleteSite(siteId) {
+  deleteSite(siteId, navigation) {
     dispatchSitesFetchStartedAction();
     return federalist.deleteSite(siteId)
       .then(dispatchSiteDeletedAction.bind(null, siteId))
       .then(this.fetchSites)
+      .then(navigation())
       .catch(alertError);
   },
 
