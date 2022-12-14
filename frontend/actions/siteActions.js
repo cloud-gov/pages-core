@@ -101,7 +101,6 @@ export default {
     return federalist.deleteSite(siteId)
       .then(dispatchSiteDeletedAction.bind(null, siteId))
       .then(this.fetchSites)
-      .then(updateRouterToSitesUri)
       .catch(alertError);
   },
 

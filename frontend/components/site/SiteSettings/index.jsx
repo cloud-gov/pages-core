@@ -16,6 +16,7 @@ function SiteSettings() {
   const { id } = useParams();
   const navigate = useNavigate();
   const site = useSelector(state => currentSite(state.sites, id));
+  const organization = useSelector(state => getOrgById(state.organizations, site.organizationId));
 
   if (!site) {
     return null;
@@ -25,7 +26,7 @@ function SiteSettings() {
     // eslint-disable-next-line no-alert
     if (window.confirm(`${site.owner}/${site.repository}\nAre you sure you want to delete this site for all users? This action will also delete all site builds and take down the live site, if published.`)) {
       await siteActions.deleteSite(site.id);
-      navigate('/sites');
+      // navigate('/sites');
     }
     return Promise.resolve();
   }
@@ -33,8 +34,6 @@ function SiteSettings() {
   function handleUpdate(values) {
     siteActions.updateSite(site, values);
   }
-
-  const organization = useSelector(state => getOrgById(state.organizations, site.organizationId));
 
   const basicInitialValues = {
     defaultBranch: site.defaultBranch || '',
@@ -91,11 +90,11 @@ function SiteSettings() {
           onSubmit={handleUpdate}
         />
       </ExpandableArea>
-      <ExpandableArea title="Environment variables">
+      {/* <ExpandableArea title="Environment variables">
         <EnvironmentVariables
           siteId={site.id}
         />
-      </ExpandableArea>
+      </ExpandableArea> */}
     </div>
   );
 };
