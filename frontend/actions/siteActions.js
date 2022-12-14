@@ -57,10 +57,10 @@ export default {
       });
   },
 
-  addUserToSite({ owner, repository }) {
+  addUserToSite({ owner, repository }, navigation) {
     return federalist.addUserToSite({ owner, repository })
       .then(dispatchUserAddedToSiteAction)
-      .then(updateRouterToSitesUri)
+      .then(navigation)
       .catch((err) => {
         // Getting a 404 here signals that the site does not
         // yet exist in Federalist, so we want to show the
@@ -97,7 +97,7 @@ export default {
     return federalist.deleteSite(siteId)
       .then(dispatchSiteDeletedAction.bind(null, siteId))
       .then(this.fetchSites)
-      .then(navigation())
+      .then(navigation)
       .catch(alertError);
   },
 
