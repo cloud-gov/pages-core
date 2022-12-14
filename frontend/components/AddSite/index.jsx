@@ -41,7 +41,7 @@ export function AddSite(props) {
     const organizationId = hasOrgs(organizations) ? repoOrganizationId : null;
     siteActions.addSite({
       owner, repository, engine, organizationId,
-    });
+    }, () => navigate(`/sites/${site.id}/builds`));
   }
 
   function onAddUserSubmit({ repoUrl }) {

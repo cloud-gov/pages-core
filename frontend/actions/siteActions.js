@@ -41,7 +41,7 @@ export default {
       .catch(alertError);
   },
 
-  addSite(siteToAdd) {
+  addSite(siteToAdd, navigation) {
     dispatchSitesFetchStartedAction();
     return federalist.addSite(siteToAdd)
       .then((site) => {
@@ -49,7 +49,7 @@ export default {
         if (site) {
           dispatchSiteAddedAction(site);
           // route to the builds page for the added site
-          updateRouterToSiteBuildsUri(site);
+          navigation();
         }
       })
       .catch((err) => {
