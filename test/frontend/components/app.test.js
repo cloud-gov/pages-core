@@ -43,7 +43,7 @@ const AppFixture = proxyquire('../../../frontend/components/app', {
   '../util/buildStatusNotifier': class Test {},
 }).App;
 
-const shallowRouter = elem => shallow(<LocationProvider>{elem}</LocationProvider>);
+const shallowRouter = elem => shallow(<LocationProvider>{elem}</LocationProvider>).dive();
 const mountRouter = (elem, state = {}) => mount(
   <Provider store={mockStore(state)}>
     <LocationProvider>
