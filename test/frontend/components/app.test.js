@@ -1,15 +1,19 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { Provider } from 'react-redux';
+import { shallow, mount } from 'enzyme';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 import proxyquire from 'proxyquire';
+import { LocationProvider } from '@reach/router';
+import configureStore from 'redux-mock-store';
+
+const mockStore = configureStore([]);
 
 proxyquire.noCallThru();
 
 const alertActionUpdate = stub();
 const buildStatusNotifierListen = stub();
 const onEnter = stub();
-const Header = () => <div />;
 
 const username = 'jenny mcuser';
 
@@ -35,17 +39,24 @@ const props = {
 };
 
 const AppFixture = proxyquire('../../../frontend/components/app', {
-  '../store': {},
   '../actions/alertActions': { update: alertActionUpdate },
-  './header': Header,
+  '../util/buildStatusNotifier': class Test {},
 }).App;
+
+const shallowRouter = elem => shallow(<LocationProvider>{elem}</LocationProvider>);
+const mountRouter = (elem, state = {}) => mount(
+  <Provider store={mockStore(state)}>
+    <LocationProvider>
+      {elem}
+    </LocationProvider>
+  </Provider>
+);
 
 describe('<App/>', () => {
   let wrapper;
 
   beforeEach(() => {
-    // TODO: need to figure out the store mocking here and refactor these
-    wrapper = shallow(<AppFixture {...props} />);
+    wrapper = shallowRouter(<AppFixture {...props} />);
     alertActionUpdate.reset();
     buildStatusNotifierListen.reset();
   });
@@ -55,57 +66,55 @@ describe('<App/>', () => {
       ...props,
       children: (<div id="app-child">child!</div>),
     };
-    wrapper = shallow(<AppFixture {...newProps} />);
+    wrapper = shallowRouter(<AppFixture {...newProps} />);
 
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
     expect(wrapper.find('#app-child')).to.have.length(1);
-    expect(buildStatusNotifierListen.called).to.be.true;
   });
 
   it('does not trigger an alert update if no alert message is present', () => {
     wrapper.setProps({ location: { key: 'path' } });
     expect(alertActionUpdate.called).to.be.false;
-    expect(buildStatusNotifierListen.called).to.be.false;
   });
 
   it('does not trigger an alert update if the route has not changed', () => {
-    const newProps = Object.assign({}, props, {
+    const newProps = {
+      ...props,
       alert: {
         message: 'hello!',
         stale: false,
       },
-    });
+    };
 
-    wrapper = shallow(<AppFixture {...newProps} />);
+    wrapper = shallowRouter(<AppFixture {...newProps} />);
     wrapper.setProps({ location: { key: 'a-route' } });
     expect(alertActionUpdate.called).to.be.false;
-    expect(buildStatusNotifierListen.called).to.be.true;
   });
 
   it('triggers an alert update if there is an alert message', () => {
-    const newProps = Object.assign({}, props, {
+    const newProps = {
+      ...props,
       alert: {
         message: 'hello!',
         stale: false,
       },
-    });
+    };
 
-    wrapper = shallow(<AppFixture {...newProps} />);
+    wrapper = mountRouter(<AppFixture {...newProps} />);
 
     wrapper.setProps({ location: { key: 'next-route' } });
     expect(alertActionUpdate.called).to.be.true;
     expect(alertActionUpdate.calledWith(newProps.alert.stale)).to.be.true;
-    expect(buildStatusNotifierListen.called).to.be.true;
   });
 
   it('calls onEnter on mount', () => {
-    shallow(<AppFixture {...props} />);
+    mountRouter(<AppFixture {...props} />);
 
     expect(onEnter.called).to.be.true;
   });
 
   it('subscribes to build status events on mount', () => {
-    shallow(<AppFixture {...props} />);
+    mountRouter(<AppFixture {...props} />);
 
     expect(buildStatusNotifierListen.called).to.be.true;
   });
