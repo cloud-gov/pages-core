@@ -1,54 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import shortid from 'shortid';
 
 // Based on the USWDS Accordion, but only ever has a single
 // item that can be expanded or collapsed
 
-class ExpandableArea extends React.Component {
-  constructor(props) {
-    super(props);
-    this.id = `expandable-area-${shortid.generate()}`;
-
-    this.state = {
-      isExpanded: false,
-    };
-
-    this.toggle = this.toggle.bind(this);
-  }
-
-  toggle() {
-    const { isExpanded } = this.state;
-    this.setState({ isExpanded: !isExpanded });
-  }
-
-  render() {
-    const {
-      bordered, children, render, title,
-    } = this.props;
-    const { isExpanded } = this.state;
-
-    return (
-      <div className={`usa-accordion${bordered ? '-bordered' : ''}`}>
-        <button
-          onClick={this.toggle}
-          className="usa-accordion-button"
-          aria-expanded={isExpanded}
-          aria-controls={this.id}
-          type="button"
-        >
-          {title}
-        </button>
-        <div
-          id={this.id}
-          className="usa-accordion-content"
-          aria-hidden={!isExpanded}
-        >
-          {isExpanded && ((render && render(this.toggle)) || children)}
-        </div>
+function ExpandableArea(props) {
+  const id = `expandable-area-${shortid.generate()}`;
+  const { bordered, children, title } = props;
+  return (
+    <div className={`usa-accordion${bordered ? '-bordered' : ''}`}>
+      <button
+        className="usa-accordion-button"
+        aria-expanded={false} // this is controlled by uswds.js
+        aria-controls={id}
+        type="button"
+      >
+        {title}
+      </button>
+      <div
+        id={id}
+        className="usa-accordion-content"
+        aria-hidden={true}
+      >
+        {children}
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 ExpandableArea.propTypes = {
