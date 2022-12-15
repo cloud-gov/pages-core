@@ -1,61 +1,46 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Notifications from 'react-notification-system-redux';
 import { connect } from 'react-redux';
+import { useLocation } from '@reach/router';
 
 import { ALERT } from '../propTypes';
 import alertActions from '../actions/alertActions';
 import BuildStatusNotifier from '../util/buildStatusNotifier';
 
-export class App extends React.Component {
-  componentDidMount() {
-    const { notifier, onEnter } = this.props;
+function shouldClearAlert(alert) {
+  if (alert.stale) {
+    alertActions.clear();
+    return;
+  }
+
+  if (alert.message) {
+    alertActions.update(alert.stale);
+  }
+}
+export function App(props) {
+  const {
+    alert, notifier, children, notifications, onEnter,
+  } = props;
+  const location = useLocation();
+
+  useEffect(() => {
     onEnter();
     notifier.listen();
-  }
+  }, []);
 
-  // eslint-disable-next-line camelcase
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { alert } = this.props;
-
+  useEffect(() => {
     if (alert.message) {
-      this.shouldClearAlert(nextProps);
+      shouldClearAlert(alert);
     }
-  }
+  }, [location.key]);
 
-  shouldClearAlert({ alert, location }) {
-    // the route we are leaving
-    const { location: { key: lastKey } } = this.props;
-    // the route we are moving to
-    const { key: nextKey } = location;
-
-    if (alert.stale) {
-      alertActions.clear();
-      return;
-    }
-
-    // clear an existing alert message if stale, or flag it to be removed on
-    // the next route transition
-    if (lastKey === nextKey) return;
-
-    if (alert.message) {
-      alertActions.update(alert.stale);
-    }
-  }
-
-  render() {
-    const {
-      children,
-      notifications,
-    } = this.props;
-
-    return (
-      <div>
-        <Notifications notifications={notifications} />
-        { children }
-      </div>
-    );
-  }
+  return (
+    <div>
+      <Notifications notifications={notifications} />
+      { children }
+    </div>
+  );
 }
 
 App.propTypes = {
