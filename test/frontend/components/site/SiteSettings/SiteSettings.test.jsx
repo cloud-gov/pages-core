@@ -3,11 +3,11 @@ import { Provider } from 'react-redux'
 import { expect } from 'chai';
 import { mount } from 'enzyme';
 import { spy } from 'sinon';
-import {  
+import {
   createMemorySource,
   createHistory,
   LocationProvider,
-  Router
+  Router,
 } from '@reach/router';
 import configureStore from 'redux-mock-store';
 import proxyquire from 'proxyquire';
@@ -25,8 +25,8 @@ const { SiteSettings } = proxyquire(
 );
 const mockStore = configureStore([]);
 const mountRouter = (elem, url = '/', state = {}) => {
-  let source = createMemorySource(url)
-  let history = createHistory(source)
+  const source = createMemorySource(url);
+  const history = createHistory(source);
   return mount(
     <LocationProvider history={history}>
       <Provider store={mockStore(state)}>
@@ -53,17 +53,17 @@ describe('<SiteSettings/>', () => {
           engine: 'jekyll',
           basicAuth: {},
           organizationId: 1,
-        }
-      ]
+        },
+      ],
     },
     organizations: {
       data: [
         {
           id: 1,
           name: 'org-1',
-        }
-      ]
-    }
+        },
+      ],
+    },
   };
 
   let origWindow;
@@ -78,7 +78,7 @@ describe('<SiteSettings/>', () => {
     siteActionsMock.updateSite = spy();
 
     // global.window = { confirm: spy() };
-    wrapper = mountRouter(<SiteSettings path="site/:id"/>, '/site/1', state);
+    wrapper = mountRouter(<SiteSettings path="/sites/:id" />, '/sites/1', state);
   });
 
   after(() => {
@@ -92,7 +92,7 @@ describe('<SiteSettings/>', () => {
   });
 
   it('should not render if site prop is not defined', () => {
-    const formlessWrapper = mountRouter(<SiteSettings path="site/:id"/>);
+    const formlessWrapper = mountRouter(<SiteSettings path="/sites/:id" />);
     expect(formlessWrapper.find('ExpandableArea')).to.have.length(0);
   });
 });
