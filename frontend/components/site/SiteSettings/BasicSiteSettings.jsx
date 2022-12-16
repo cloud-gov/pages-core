@@ -134,5 +134,9 @@ BasicSiteSettings.propTypes = {
   isSandbox: PropTypes.bool,
 };
 
+BasicSiteSettings.defaultProps = {
+  isSandbox: false,
+};
+
 // create a higher-order component with reduxForm and export that
 export default reduxForm({ form: 'basicSiteSettings' })(BasicSiteSettings);

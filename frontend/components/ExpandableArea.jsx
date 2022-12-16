@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import shortid from 'shortid';
 
@@ -21,7 +21,7 @@ function ExpandableArea(props) {
       <div
         id={id}
         className="usa-accordion-content"
-        aria-hidden={true}
+        aria-hidden
       >
         {children}
       </div>
@@ -31,14 +31,12 @@ function ExpandableArea(props) {
 
 ExpandableArea.propTypes = {
   bordered: PropTypes.bool,
-  render: PropTypes.func,
   title: PropTypes.string.isRequired,
   children: PropTypes.node,
 };
 
 ExpandableArea.defaultProps = {
   bordered: false,
-  render: null,
   children: null,
 };
 

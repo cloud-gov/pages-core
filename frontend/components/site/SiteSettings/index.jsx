@@ -95,7 +95,7 @@ function SiteSettings() {
       </ExpandableArea>
     </div>
   );
-};
+}
 
 export { SiteSettings };
 export default SiteSettings;
