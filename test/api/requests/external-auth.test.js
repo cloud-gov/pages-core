@@ -9,8 +9,8 @@ const { cleanEvents, testAuthEvent } = require('../support/authEvents')
 const { Event } = require('../../../api/models');
 
 describe('External authentication request', () => {
-  beforeEach(async () => await cleanEvents())
-  afterEach(async () => await cleanEvents())
+  before(async () => await cleanEvents())
+  after(async () => await cleanEvents())
 
   describe('GET /external/auth/github', () => {
     it('should redirect to GitHub for OAuth2 authentication', (done) => {
@@ -32,7 +32,7 @@ describe('External authentication request', () => {
 
         expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You must be a (Federalist|Pages) user with a connected GitHub account."}(.|\n)*<\/script>$/g);
 
-        return testAuthEvent('error', Event.labels.AUTHENTICATION_NETLIFY_CMS)
+        await testAuthEvent('error', Event.labels.AUTHENTICATION_NETLIFY_CMS, 'You must be a Pages user with a connected GitHub account.')
       });
 
       it('return script tag with error if user has logged in before the duration of a session', async () => {
@@ -43,7 +43,7 @@ describe('External authentication request', () => {
           .expect(200);
         expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You have not logged-in to (Federalist|Pages) within the past 24 hours. Please log in to (Federalist|Pages) and try again."}(.|\n)*<\/script>$/g);
 
-        return testAuthEvent('error', Event.labels.AUTHENTICATION_NETLIFY_CMS)
+        await testAuthEvent('error', Event.labels.AUTHENTICATION_NETLIFY_CMS, 'You have not logged-in to Pages within the past 24 hours. Please log in to Pages and try again.')
       });
 
       it('return script tag with error if user has not logged in for the duration of a session', async () => {
@@ -54,7 +54,7 @@ describe('External authentication request', () => {
           .expect(200);
         expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You have not logged-in to (Federalist|Pages) within the past 24 hours. Please log in to (Federalist|Pages) and try again."}(.|\n)*<\/script>$/g);
 
-        return testAuthEvent('error', Event.labels.AUTHENTICATION_NETLIFY_CMS)
+        await testAuthEvent('error', Event.labels.AUTHENTICATION_NETLIFY_CMS, 'You have not logged-in to Pages within the past 24 hours. Please log in to Pages and try again.')
       });
     });
 
@@ -64,7 +64,7 @@ describe('External authentication request', () => {
         user = await factory.user();
       });
 
-      beforeEach(async() => {
+      beforeEach(async () => {
         githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
       });
 
@@ -75,7 +75,7 @@ describe('External authentication request', () => {
         expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:success(.|\n)*"token":(.|\n)*<\/script>$/g);
         expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:success(.|\n)*"provider":(.|\n)*<\/script>$/g);
 
-        return testAuthEvent('audit', Event.labels.AUTHENTICATION_NETLIFY_CMS)
+        await testAuthEvent('audit', Event.labels.AUTHENTICATION_NETLIFY_CMS, 'Authenticated user with Github on Netlify CMS')
       });
 
       it('does not add the user to the session', async () => {
@@ -89,7 +89,7 @@ describe('External authentication request', () => {
         const session = await sessionForCookie(cookie);
         expect(session.passport).to.be.undefined;
 
-        return testAuthEvent('audit', Event.labels.AUTHENTICATION_NETLIFY_CMS)
+        await testAuthEvent('audit', Event.labels.AUTHENTICATION_NETLIFY_CMS, 'Authenticated user with Github on Netlify CMS')
       });
     });
   });
