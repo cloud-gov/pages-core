@@ -1,18 +1,10 @@
 import React from 'react';
-import { Provider } from 'react-redux'
 import { expect } from 'chai';
-import { mount } from 'enzyme';
 import { spy } from 'sinon';
 import proxyquire from 'proxyquire';
-import {  
-  createMemorySource,
-  createHistory,
-  LocationProvider,
-  Router
-} from '@reach/router';
-import configureStore from 'redux-mock-store';
 import lodashClonedeep from 'lodash.clonedeep';
 
+import mountRouter from '../../support/_mount';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
 proxyquire.noCallThru();
@@ -42,20 +34,6 @@ const defaultState = {
   },
 };
 
-const mockStore = configureStore([]);
-const mountRouter = (elem, url = '/', state = {}) => {
-  let source = createMemorySource(url)
-  let history = createHistory(source)
-  return mount(
-    <LocationProvider history={history}>
-      <Provider store={mockStore(state)}>
-        <Router>
-          {elem}
-        </Router>
-      </Provider>
-    </LocationProvider>
-  );
-};
 let state;
 
 describe('<SitePublishedBranchesTable/>', () => {

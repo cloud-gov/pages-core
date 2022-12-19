@@ -1,29 +1,22 @@
 import React from 'react';
-import { Provider } from 'react-redux'
-import {  
-  createMemorySource,
-  createHistory,
-  LocationProvider,
-  Router
-} from '@reach/router';
-import { mount } from 'enzyme';
 import { expect } from 'chai';
 import proxyquire from 'proxyquire';
-import configureStore from 'redux-mock-store';
 import lodashClonedeep from 'lodash.clonedeep';
 
+import mountRouter from '../support/_mount';
 
 proxyquire.noCallThru();
 
 const { SiteContainer } = proxyquire(
   '../../../frontend/components/siteContainer',
-  { 
+  {
     './site/SideNav': () => <div />,
     './site/PagesHeader': () => <div />,
   }
 );
 
-let props, state;
+let props;
+let state;
 const site = {
   id: 1,
   defaultBranch: 'main',
@@ -41,7 +34,7 @@ const organization = {
   name: 'Test Organization',
 };
 
-const defaultState =  {
+const defaultState = {
   user: {
     isLoading: false,
     data: {
@@ -58,7 +51,7 @@ const defaultState =  {
     isLoading: false,
     data: [organization],
   },
-}
+};
 
 const defaultProps = {
   alert: {},
@@ -67,29 +60,14 @@ const defaultProps = {
     branch: 'branch',
     fileName: 'boop.txt',
   },
-  path: '/sites/:id'
-};
-
-const mockStore = configureStore([]);
-const mountRouter = (elem, url = '/', state = {}) => {
-  let source = createMemorySource(url)
-  let history = createHistory(source)
-  return mount(
-    <LocationProvider history={history}>
-      <Provider store={mockStore(state)}>
-        <Router>
-          {elem}
-        </Router>
-      </Provider>
-    </LocationProvider>
-  );
+  path: '/sites/:id',
 };
 
 describe('<SiteContainer/>', () => {
   beforeEach(() => {
     state = lodashClonedeep(defaultState);
-    props = lodashClonedeep(defaultProps)
-  })
+    props = lodashClonedeep(defaultProps);
+  });
 
   it('renders a LoadingIndicator while sites are loading', () => {
     state.sites.isLoading = true;
@@ -187,8 +165,9 @@ describe('<SiteContainer/>', () => {
   });
 
   it('displays a page title if one is configured for the location', () => {
-    // TODO: fix this test, this path shouldn't need to be changed to render this, potentially a router issue
-    props.path = '/sites/:id/settings'
+    // TODO: fix this test, this path shouldn't need to be changed to render this
+    // potentially a router issue
+    props.path = '/sites/:id/settings';
     const wrapper = mountRouter(<SiteContainer {...props} />, '/sites/1/settings', state);
     expect(wrapper.find('sitePagesHeader').prop('title')).to.equal('Site settings');
   });

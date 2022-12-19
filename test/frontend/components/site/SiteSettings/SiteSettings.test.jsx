@@ -1,16 +1,9 @@
 import React from 'react';
-import { Provider } from 'react-redux'
 import { expect } from 'chai';
-import { mount } from 'enzyme';
 import { spy } from 'sinon';
-import {
-  createMemorySource,
-  createHistory,
-  LocationProvider,
-  Router,
-} from '@reach/router';
-import configureStore from 'redux-mock-store';
 import proxyquire from 'proxyquire';
+
+import mountRouter from '../../../support/_mount';
 
 proxyquire.noCallThru();
 
@@ -23,20 +16,6 @@ const { SiteSettings } = proxyquire(
   '../../../../../frontend/components/site/SiteSettings',
   { '../../../actions/siteActions': siteActionsMock }
 );
-const mockStore = configureStore([]);
-const mountRouter = (elem, url = '/', state = {}) => {
-  const source = createMemorySource(url);
-  const history = createHistory(source);
-  return mount(
-    <LocationProvider history={history}>
-      <Provider store={mockStore(state)}>
-        <Router>
-          {elem}
-        </Router>
-      </Provider>
-    </LocationProvider>
-  );
-};
 
 describe('<SiteSettings/>', () => {
   const state = {

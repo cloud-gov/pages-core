@@ -15,3 +15,5 @@ const ignoredExtensions = [
 ignoredExtensions.forEach((ext) => {
   require.extensions[ext] = () => null;
 });
+
+require('./setup')

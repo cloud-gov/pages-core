@@ -1,13 +1,11 @@
 import React from 'react';
-import { Provider } from 'react-redux';
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 import proxyquire from 'proxyquire';
 import { LocationProvider } from '@reach/router';
-import configureStore from 'redux-mock-store';
 
-const mockStore = configureStore([]);
+import mountRouter from '../support/_mount';
 
 proxyquire.noCallThru();
 
@@ -44,13 +42,6 @@ const AppFixture = proxyquire('../../../frontend/components/app', {
 }).App;
 
 const shallowRouter = elem => shallow(<LocationProvider>{elem}</LocationProvider>).dive();
-const mountRouter = (elem, state = {}) => mount(
-  <Provider store={mockStore(state)}>
-    <LocationProvider>
-      {elem}
-    </LocationProvider>
-  </Provider>
-);
 
 describe('<App/>', () => {
   let wrapper;
