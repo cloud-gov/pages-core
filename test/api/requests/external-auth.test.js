@@ -9,6 +9,9 @@ const { cleanEvents, testAuthEvent } = require('../support/authEvents')
 const { Event } = require('../../../api/models');
 
 describe('External authentication request', () => {
+  beforeEach(async () => await cleanEvents())
+  afterEach(async () => await cleanEvents())
+
   describe('GET /external/auth/github', () => {
     it('should redirect to GitHub for OAuth2 authentication', (done) => {
       request(app)
@@ -20,9 +23,6 @@ describe('External authentication request', () => {
 
   describe('GET /external/auth/github/callback', () => {
     describe('sends script tag with error status and message', () => {
-
-      beforeEach(cleanEvents)
-      afterEach(cleanEvents)
 
       it('return unsuccessful auth if user is not found', async () => {
         githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
@@ -66,10 +66,7 @@ describe('External authentication request', () => {
 
       beforeEach(async() => {
         githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
-        await cleanEvents()
       });
-
-      afterEach(cleanEvents)
 
       it('sends script tag with success status', async () => {
         const res = await request(app)
