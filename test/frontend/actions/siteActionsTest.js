@@ -51,11 +51,11 @@ describe('siteActions', () => {
   };
 
   before(() => {
-    global.window = { scrollTo };
+    global.window.scrollTo = scrollTo;
   });
 
   after(() => {
-    global.window = undefined;
+    global.window.scrollTo = undefined;
   });
 
   beforeEach(() => {
