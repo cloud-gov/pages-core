@@ -40,7 +40,7 @@ global.document = window.document;
 global.navigator = {
   userAgent: 'node.js',
 };
-console.log('early setup of global')
+
 global.requestAnimationFrame = function (callback) {
   return setTimeout(callback, 0);
 };
