@@ -1,5 +1,7 @@
 const express = require('express');
 const passport = require('./passport');
+const EventCreator = require('../services/EventCreator');
+const { Event } = require('../models');
 
 const script = (nonce, status, content) => `
   <script nonce="${nonce}">
@@ -26,6 +28,12 @@ app.get('/auth/github/callback', (req, res) => {
     const response = error
       ? script(res.locals.cspNonce, 'error', { message: error.message })
       : script(res.locals.cspNonce, 'success', { token: user.accessToken, provider: 'github' });
+
+    if (error) {
+      EventCreator.error(Event.labels.AUTHENTICATION_NETLIFY_CMS, error);
+    } else {
+      EventCreator.audit(Event.labels.AUTHENTICATION_NETLIFY_CMS, null, 'Authenticated user with Github on Netlify CMS');
+    }
 
     res.send(response);
   })(req, res);
