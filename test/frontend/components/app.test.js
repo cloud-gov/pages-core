@@ -34,6 +34,7 @@ const props = {
     listen: buildStatusNotifierListen,
   },
   onEnter,
+  path: '/',
 };
 
 const AppFixture = proxyquire('../../../frontend/components/app', {
