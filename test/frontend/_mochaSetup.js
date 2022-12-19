@@ -53,4 +53,4 @@ configure({ adapter: new Adapter() });
 
 // additional setup for testing
 process.env.APP_HOSTNAME = '/';
-process.env.PRODUCT = 'federalist';
+process.env.PRODUCT = 'pages';
