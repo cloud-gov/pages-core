@@ -48,6 +48,7 @@ const warningContent = (
       FISMA
       {' '}
       {isPages ? 'Moderate' : 'Low'}
+      {' '}
     </b>
     system, do NOT store variables for systems that are High, and
     only expose variables if it is safe to do so. You assume the risk if the
@@ -102,12 +103,11 @@ class EnvironmentVariables extends Component {
               <ExpandableArea
                 bordered
                 title="Add a new environment variable"
-                render={toggle => (
-                  <div className="well">
-                    <EnvironmentVariableForm onSubmit={params => addUEV(params).then(toggle)} />
-                  </div>
-                )}
-              />
+              >
+                <div className="well">
+                  <EnvironmentVariableForm onSubmit={params => addUEV(params)} />
+                </div>
+              </ExpandableArea>
               { showTable
                 && (
                 <EnvironmentVariableTable uevs={data} onDelete={deleteUEV} />
