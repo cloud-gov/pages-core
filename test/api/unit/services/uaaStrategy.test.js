@@ -1,6 +1,8 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
 const { verifyUAAUser } = require('../../../../api/services/uaaStrategy');
 const { UAAIdentity, User } = require('../../../../api/models');
+const EventCreator = require('../../../../api/services/EventCreator');
 const cfUAANock = require('../../support/cfUAANock');
 const createUser = require('../../support/factory/user');
 const { createUAAIdentity, uaaUser, uaaProfile } = require('../../support/factory/uaa-identity');
@@ -13,8 +15,14 @@ function clean() {
 }
 
 describe('verifyUAAUser', () => {
-  beforeEach(clean);
+  let eventAuditStub;
 
+  beforeEach(async () => {
+    eventAuditStub = sinon.stub(EventCreator, 'audit').resolves();
+    await clean()
+  });
+
+  afterEach(() => sinon.restore());
   after(clean);
 
   it('should return a verified user in the specified group', async () => {
@@ -76,6 +84,8 @@ describe('verifyUAAUser', () => {
     cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
 
     const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, ['group.three']);
+
+    expect(eventAuditStub.called).to.equal(true);
     return expect(result).to.be.null;
   });
 
@@ -101,6 +111,8 @@ describe('verifyUAAUser', () => {
     cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
 
     const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, ['group.three']);
+
+    expect(eventAuditStub.called).to.equal(true);
     return expect(result).to.be.null;
   });
 
@@ -129,6 +141,8 @@ describe('verifyUAAUser', () => {
     await user.destroy();
 
     const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, ['group.one']);
+
+    expect(eventAuditStub.called).to.equal(true);
     return expect(result).to.be.null;
   });
 });

@@ -155,13 +155,7 @@ if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA)) {
         ['pages.user', 'pages.support', 'pages.admin']
       );
 
-      if (!user) {
-        EventCreator.audit(Event.labels.AUTHENTICATION, user, 'UAA profile could not be verified.', {
-          profile,
-        });
-
-        return callback(null, false, flashMessage);
-      }
+      if (!user) return callback(null, false, flashMessage);
 
       await user.update({
         signedInAt: new Date(),
