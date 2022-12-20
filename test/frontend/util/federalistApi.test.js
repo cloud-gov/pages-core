@@ -1,3 +1,4 @@
+/* global window */
 import chai, { expect } from 'chai';
 import chaiFetchMock from 'chai-fetch-mock';
 import fetchMock from 'fetch-mock';
@@ -7,7 +8,7 @@ import federalistApi, { API } from '../../../frontend/util/federalistApi';
 chai.use(chaiFetchMock);
 
 global.fetch = fetchMock;
-global.CSRF_TOKEN = 'test-csrf-token';
+window.CSRF_TOKEN = 'test-csrf-token';
 
 const testSite = { id: 1 };
 const testBranch = 'branchy-branch';
