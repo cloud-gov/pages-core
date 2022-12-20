@@ -1,16 +1,23 @@
 const { expect } = require('chai');
 const request = require('supertest');
+const sinon = require('sinon');
 const githubAPINocks = require('../support/githubAPINocks');
 const { sessionForCookie } = require('../support/cookieSession');
 const { unauthenticatedSession } = require('../support/session');
 const app = require('../../../app');
 const factory = require('../support/factory');
-const { cleanEvents, testAuthEvent } = require('../support/authEvents')
-const { Event } = require('../../../api/models');
+const EventCreator = require('../../../api/services/EventCreator');
 
 describe('External authentication request', () => {
-  before(async () => await cleanEvents())
-  after(async () => await cleanEvents())
+  let eventAuditStub;
+  let eventErrorStub;
+
+  beforeEach(async () => {
+    eventAuditStub = sinon.stub(EventCreator, 'audit').resolves();
+    eventErrorStub = sinon.stub(EventCreator, 'error').resolves();
+  });
+
+  afterEach(() => sinon.restore());
 
   describe('GET /external/auth/github', () => {
     it('should redirect to GitHub for OAuth2 authentication', (done) => {
@@ -31,8 +38,7 @@ describe('External authentication request', () => {
           .expect(200);
 
         expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You must be a (Federalist|Pages) user with a connected GitHub account."}(.|\n)*<\/script>$/g);
-
-        await testAuthEvent('error', Event.labels.AUTHENTICATION_NETLIFY_CMS, 'You must be a Pages user with a connected GitHub account.')
+        expect(eventErrorStub.called).to.equal(true);
       });
 
       it('return script tag with error if user has logged in before the duration of a session', async () => {
@@ -42,8 +48,7 @@ describe('External authentication request', () => {
           .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
           .expect(200);
         expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You have not logged-in to (Federalist|Pages) within the past 24 hours. Please log in to (Federalist|Pages) and try again."}(.|\n)*<\/script>$/g);
-
-        await testAuthEvent('error', Event.labels.AUTHENTICATION_NETLIFY_CMS, 'You have not logged-in to Pages within the past 24 hours. Please log in to Pages and try again.')
+        expect(eventErrorStub.called).to.equal(true);
       });
 
       it('return script tag with error if user has not logged in for the duration of a session', async () => {
@@ -53,8 +58,7 @@ describe('External authentication request', () => {
           .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
           .expect(200);
         expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You have not logged-in to (Federalist|Pages) within the past 24 hours. Please log in to (Federalist|Pages) and try again."}(.|\n)*<\/script>$/g);
-
-        await testAuthEvent('error', Event.labels.AUTHENTICATION_NETLIFY_CMS, 'You have not logged-in to Pages within the past 24 hours. Please log in to Pages and try again.')
+        expect(eventErrorStub.called).to.equal(true);
       });
     });
 
@@ -74,8 +78,7 @@ describe('External authentication request', () => {
           .expect(200);
         expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:success(.|\n)*"token":(.|\n)*<\/script>$/g);
         expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:success(.|\n)*"provider":(.|\n)*<\/script>$/g);
-
-        await testAuthEvent('audit', Event.labels.AUTHENTICATION_NETLIFY_CMS, 'Authenticated user with Github on Netlify CMS')
+        expect(eventAuditStub.called).to.equal(true);
       });
 
       it('does not add the user to the session', async () => {
@@ -88,8 +91,7 @@ describe('External authentication request', () => {
         expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*authorization:github:success(.|\n)*"provider":(.|\n)*<\/script>$/g);
         const session = await sessionForCookie(cookie);
         expect(session.passport).to.be.undefined;
-
-        await testAuthEvent('audit', Event.labels.AUTHENTICATION_NETLIFY_CMS, 'Authenticated user with Github on Netlify CMS')
+        expect(eventAuditStub.called).to.equal(true);
       });
     });
   });
