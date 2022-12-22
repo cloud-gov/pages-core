@@ -30,11 +30,11 @@ describe('Authentication requests', () => {
 
   context('Github', () => {
     describe('GET /login/github', () => {
-      it('should redirect to the configured IdP for authentication', (done) => {
-        request(app)
+      it('should redirect to the configured IdP for authentication', () => {
+        return request(app)
           .get('/login/github')
           .expect('Location', new RegExp(`^${github.options.authorizationURL}`))
-          .expect(302, done);
+          .expect(302);
       });
 
       it('should redirect to the root URL if the users is logged in', (done) => {
@@ -83,7 +83,7 @@ describe('Authentication requests', () => {
     context('Callbacks', () => {
       describe('GET /auth/github/callback', () => {
         context('when the user exists in the database', () => {
-          it('should authenticate the user', (done) => {
+          it('should authenticate the user', () => {
             let user;
             let cookie;
             nock.cleanAll();
@@ -110,7 +110,6 @@ describe('Authentication requests', () => {
               })
               .then((model) => {
                 user = model;
-                done();
               });
           });
 
@@ -472,7 +471,7 @@ describe('Authentication requests', () => {
 
               expect(session.flash.error.length).to.equal(1);
               expect(session.flash.error[0]).to.equal(flashMessage);
-              expect(eventAuditStub.called).to.equal(false);
+              expect(eventAuditStub.called).to.equal(true);
             });
           });
         });

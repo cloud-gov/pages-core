@@ -42,6 +42,35 @@ const nightlyJobConfig = {
 };
 
 function federalistWorker(connection) {
+  const scheduledJobProcessor = Processors.multiJobProcessor({
+    revokeMembershipForInactiveUsers: Processors.revokeMembershipForInactiveUsers,
+    verifyRepositories: Processors.verifyRepositories,
+  });
+
+  const workers = [
+    new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
+  ];
+
+  const schedulers = [
+    new QueueScheduler(ScheduledQueueName, { connection }),
+  ];
+
+  const scheduledQueue = new ScheduledQueue(connection);
+  const queues = [
+    scheduledQueue,
+  ];
+
+  const jobs = () => Promise.all([
+    scheduledQueue.add('verifyRepositories', {}, nightlyJobConfig),
+    scheduledQueue.add('revokeMembershipForInactiveUsers', {}, nightlyJobConfig),
+  ]);
+
+  return {
+    jobs, queues, schedulers, workers,
+  };
+}
+
+function pagesWorker(connection) {
   const domainJobProcessor = (job) => {
     switch (job.name) {
       case 'checkProvisionStatus':
@@ -53,11 +82,16 @@ function federalistWorker(connection) {
     }
   };
 
+  const mailJobProcessor = appEnv === 'development'
+    ? job => logger.info(job.data)
+    : job => (new Mailer()).send(job.data);
+
   const scheduledJobProcessor = Processors.multiJobProcessor({
     nightlyBuilds: Processors.nightlyBuilds,
-    revokeMembershipForInactiveUsers: Processors.revokeMembershipForInactiveUsers,
+    revokeMembershipForUAAUsers: Processors.revokeMembershipForUAAUsers,
+    sandboxNotifications: Processors.sandboxNotifications,
     timeoutBuilds: Processors.timeoutBuilds,
-    verifyRepositories: Processors.verifyRepositories,
+    cleanSandboxOrganizations: Processors.cleanSandboxOrganizations,
   });
 
   const slackJobProcessor = job => (new Slack()).send(job.data);
@@ -66,6 +100,7 @@ function federalistWorker(connection) {
     new QueueWorker(ArchiveBuildLogsQueueName, connection,
       path.join(__dirname, 'jobProcessors', 'archiveBuildLogsDaily.js')),
     new QueueWorker(DomainQueueName, connection, domainJobProcessor),
+    new QueueWorker(MailQueueName, connection, mailJobProcessor),
     new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
     new QueueWorker(SlackQueueName, connection, slackJobProcessor),
   ];
@@ -73,59 +108,23 @@ function federalistWorker(connection) {
   const schedulers = [
     new QueueScheduler(ArchiveBuildLogsQueueName, { connection }),
     new QueueScheduler(DomainQueueName, { connection }),
+    new QueueScheduler(MailQueueName, { connection }),
     new QueueScheduler(ScheduledQueueName, { connection }),
     new QueueScheduler(SlackQueueName, { connection }),
   ];
 
   const archiveBuildLogsQueue = new ArchiveBuildLogsQueue(connection);
   const scheduledQueue = new ScheduledQueue(connection);
-  const queues = [
-    archiveBuildLogsQueue,
-    scheduledQueue,
-  ];
+  const queues = [archiveBuildLogsQueue, scheduledQueue];
 
   const jobs = () => Promise.all([
-    scheduledQueue.add('timeoutBuilds', {}, everyTenMinutesJobConfig),
-    scheduledQueue.add('nightlyBuilds', {}, nightlyJobConfig),
-    scheduledQueue.add('verifyRepositories', {}, nightlyJobConfig),
-    scheduledQueue.add('revokeMembershipForInactiveUsers', {}, nightlyJobConfig),
     appEnv === 'production'
       ? archiveBuildLogsQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig)
       : Promise.resolve(),
-  ]);
-
-  return {
-    jobs, queues, schedulers, workers,
-  };
-}
-
-function pagesWorker(connection) {
-  const mailJobProcessor = appEnv === 'development'
-    ? job => logger.info(job.data)
-    : job => (new Mailer()).send(job.data);
-
-  const scheduledJobProcessor = Processors.multiJobProcessor({
-    revokeMembershipForUAAUsers: Processors.revokeMembershipForUAAUsers,
-    sandboxNotifications: Processors.sandboxNotifications,
-    cleanSandboxOrganizations: Processors.cleanSandboxOrganizations,
-  });
-
-  const workers = [
-    new QueueWorker(MailQueueName, connection, mailJobProcessor),
-    new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
-  ];
-
-  const schedulers = [
-    new QueueScheduler(MailQueueName, { connection }),
-    new QueueScheduler(ScheduledQueueName, { connection }),
-  ];
-
-  const scheduledQueue = new ScheduledQueue(connection);
-  const queues = [scheduledQueue];
-
-  const jobs = () => Promise.all([
+    scheduledQueue.add('nightlyBuilds', {}, nightlyJobConfig),
     scheduledQueue.add('revokeMembershipForUAAUsers', {}, nightlyJobConfig),
     scheduledQueue.add('sandboxNotifications', {}, nightlyJobConfig),
+    scheduledQueue.add('timeoutBuilds', {}, everyTenMinutesJobConfig),
     scheduledQueue.add('cleanSandboxOrganizations', {}, nightlyJobConfig),
   ]);
 

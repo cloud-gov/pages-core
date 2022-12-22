@@ -26,8 +26,7 @@ module.exports = wrapHandlers({
     }
 
     const uevs = await UserEnvironmentVariable
-      .forSiteUser(user)
-      .findAll({ where: { siteId } });
+      .findAll({ where: { siteId: site.id } });
 
     const json = serializeMany(uevs);
 
@@ -72,11 +71,18 @@ module.exports = wrapHandlers({
     const { params, user } = req;
     const { id, site_id: siteId } = params;
 
+    const site = await Site.forUser(user).findByPk(siteId)
+      .catch(() => null);
+
+    if (!site) {
+      return res.notFound();
+    }
+
     const uev = await UserEnvironmentVariable
-      .forSiteUser(user)
       .findOne({
         where: {
-          id, siteId,
+          id,
+          siteId: site.id,
         },
       });
 
