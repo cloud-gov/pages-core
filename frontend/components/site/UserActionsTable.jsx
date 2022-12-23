@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import { useParams } from '@reach/router';
 
 import { timestampUTC } from '../../util/datetime';
 import userActions from '../../actions/userActions';
@@ -37,12 +37,12 @@ function renderTableHead() {
   );
 }
 
-function UserActionsTable() {
-  const { id } = useParams();
+function UserActionsTable(props) {
+  const { site } = props;
   const actions = useSelector(state => state.userActions.data);
 
   useEffect(() => {
-    userActions.fetchUserActions(id);
+    userActions.fetchUserActions(site);
   }, []);
 
   if (!actions || !actions.length) {
@@ -59,6 +59,10 @@ function UserActionsTable() {
     </table>
   );
 }
+
+UserActionsTable.propTypes = {
+  site: PropTypes.number.isRequired,
+};
 
 export { UserActionsTable };
 export default UserActionsTable;
