@@ -4,6 +4,7 @@ import { spy } from 'sinon';
 import lodashClonedeep from 'lodash.clonedeep';
 import proxyquire from 'proxyquire';
 import mountRouter from '../../support/_mount';
+import userActions from '../../../../frontend/reducers/userActions';
 
 proxyquire.noCallThru();
 
@@ -29,6 +30,10 @@ const defaultState = {
 describe('<UserActionsTable/>', () => {
   beforeEach(() => {
     state = lodashClonedeep(defaultState);
+  });
+
+  afterEach(() => {
+    userActionsSpy.fetchUserActions.resetHistory();
   });
 
   it('should render nothing if the current user has no actions', () => {

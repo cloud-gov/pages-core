@@ -37,10 +37,14 @@ describe('<SitePublishedFilesTable/>', () => {
     state = lodashClonedeep(defaultState);
   });
 
+  afterEach(() => {
+    fetchPublishedFiles.resetHistory();
+  });
+
   it('calls fetchPublishedFiles on mount', () => {
     mountRouter(<SitePublishedFilesTable id="11" path="/published/:name" />, '/published/funkyBranch', state);
     expect(fetchPublishedFiles.calledOnce).to.be.true;
-    expect(fetchPublishedFiles.calledWith({ id: '11' }, 'funkyBranch', null)).to.be.true;
+    expect(fetchPublishedFiles.calledWith('11', 'funkyBranch', null)).to.be.true;
   });
 
   it('should render the branch name', () => {
@@ -255,11 +259,13 @@ describe('<SitePublishedFilesTable/>', () => {
     });
 
     // TODO: reimplement clicks with react-testing-library
+    // the issue now is that the next button will be clicked and will trigger a call
+    // of fetchPublishedFiles but the startAtKey won't have been updated by the previous data update
     // it('can go to the next page', () => {
     //   expect(nextButton.prop('disabled')).to.be.false;
     //   nextButton.simulate('click');
     //   expect(fetchPublishedFiles.calledTwice).to.be.true;
-    //   expect(fetchPublishedFiles.calledWith({ id: '1' }, 'main', 'prefix/c')).to.be.true;
+    //   expect(fetchPublishedFiles.calledWith('1', 'main', 'prefix/c')).to.be.true;
     // });
 
     // it('cannot go past the last page', () => {
