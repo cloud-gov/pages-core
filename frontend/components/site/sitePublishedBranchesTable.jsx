@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Link, useParams } from '@reach/router';
+import { Link } from '@reach/router';
+import PropTypes from 'prop-types';
 
 import publishedBranchActions from '../../actions/publishedBranchActions';
 import { currentSite } from '../../selectors/site';
@@ -58,8 +59,9 @@ function renderPublishedBranchesTable(data, site) {
   );
 }
 
-function SitePublishedBranchesTable() {
-  const { id } = useParams();
+function SitePublishedBranchesTable(props) {
+  // TODO: replace this with useParams with react-router-v6
+  const { id } = props;
   const site = useSelector(state => currentSite(state.sites, id));
   const publishedBranches = useSelector(state => state.publishedBranches);
 
@@ -82,6 +84,10 @@ function SitePublishedBranchesTable() {
   }
   return renderPublishedBranchesTable(publishedBranches.data, site);
 }
+
+SitePublishedBranchesTable.propTypes = {
+  id: PropTypes.string.isRequired,
+};
 
 export { SitePublishedBranchesTable };
 export default SitePublishedBranchesTable;

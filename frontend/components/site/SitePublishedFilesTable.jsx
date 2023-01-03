@@ -1,193 +1,137 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useParams } from '@reach/router';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 
 import publishedFileActions from '../../actions/publishedFileActions';
-import { currentSite } from '../../selectors/site';
 import globals from '../../globals';
 import LoadingIndicator from '../LoadingIndicator';
 import AlertBanner from '../alertBanner';
 
-class SitePublishedFilesTable extends React.Component {
-  constructor(props) {
-    super(props);
+function renderPagingButtons(currentPage, lastPage, setCurrentPage) {
+  const shouldDisableNextPage = currentPage === lastPage;
+  const shouldDisablePreviousPage = currentPage === 0;
+  const shouldShowButtons = !(lastPage !== null && lastPage === 0);
 
-    this.state = {
-      currentPage: 0,
-      filesByPage: {},
-      lastPage: null,
-    };
-
-    this.previousPage = this.previousPage.bind(this);
-    this.nextPage = this.nextPage.bind(this);
+  function previousPage() {
+    setCurrentPage(currentPage - 1);
   }
 
-  componentDidMount() {
-    const { fetchPublishedFiles, id, name } = this.props;
-
-    const site = { id };
-    const branch = name;
-
-    const startAtKey = null; // start without a startAtKey
-    fetchPublishedFiles(site, branch, startAtKey);
+  function nextPage() {
+    setCurrentPage(currentPage + 1);
   }
 
-  // eslint-disable-next-line camelcase
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { publishedFiles } = nextProps;
+  const prevButtonClass = `${shouldDisablePreviousPage ? 'usa-button-disabled' : 'usa-button'}`;
+  const nextButtonClass = `pull-right ${shouldDisableNextPage ? 'usa-button-disabled' : 'usa-button'}`;
 
-    if (publishedFiles.data && !publishedFiles.isLoading) {
-      const files = publishedFiles.data.files || [];
+  if (!shouldShowButtons) {
+    return null;
+  }
 
-      const { filesByPage, currentPage } = this.state;
+  return (
+    <nav className="pagination" aria-label="Pagination">
+      <button
+        className={prevButtonClass}
+        disabled={shouldDisablePreviousPage}
+        onClick={previousPage}
+        title="View the previous page of published files"
+        type="button"
+      >
+        &laquo; Previous
+      </button>
 
-      // save the current page of files into state
-      filesByPage[currentPage] = files;
-      this.setState({ filesByPage });
+      <button
+        className={nextButtonClass}
+        disabled={shouldDisableNextPage}
+        onClick={nextPage}
+        title="View the next page of published files"
+        type="button"
+      >
+        Next &raquo;
+      </button>
+    </nav>
+  );
+}
 
-      if (!publishedFiles.data.isTruncated) {
-        this.setState({ lastPage: currentPage });
-      }
+function renderBranchFileRow(file) {
+  let viewFileLink;
+  const branch = file.publishedBranch.name;
+  switch (branch) {
+    case file.publishedBranch.site.defaultBranch:
+      viewFileLink = `${file.publishedBranch.site.viewLink}${file.name}`;
+      break;
+    case file.publishedBranch.site.demoBranch:
+      viewFileLink = `${file.publishedBranch.site.demoViewLink}${file.name}`;
+      break;
+    default:
+      viewFileLink = `${file.publishedBranch.site.previewLink}${branch}/${file.name}`;
+  }
+  return (
+    <tr key={viewFileLink}>
+      <td>{file.name}</td>
+      <td><a href={viewFileLink} target="_blank" rel="noopener noreferrer">View</a></td>
+    </tr>
+  );
+}
+
+function renderPublishedFilesTable(files, name, currentPage, lastPage, setCurrentPage) {
+  return (
+    <div>
+      <h3>{name}</h3>
+      <p>
+        Use this page to audit the files that
+        {` ${globals.APP_NAME} `}
+        has publicly published.
+        Up to 200 files are shown per page.
+      </p>
+      <table className="usa-table-borderless table-full-width log-table">
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          { files.filter(f => !!f.name).map(renderBranchFileRow) }
+        </tbody>
+      </table>
+      { renderPagingButtons(currentPage, lastPage, setCurrentPage) }
+    </div>
+  );
+}
+
+function SitePublishedFilesTable(props) {
+  // TODO: replace this with useParams with react-router-v6
+  const { id } = props;
+  const { name } = useParams();
+  const publishedFiles = useSelector(state => state.publishedFiles);
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const [lastPage, setLastPage] = useState(null);
+  // startAtKeys is an object whose keys are page numbers, and whose values are the key of the final
+  // file in the previous page used to fetch that page
+  const [startAtKeys, setStartAtKeys] = useState({ 0: null });
+
+  useEffect(() => {
+    const startAtKey = startAtKeys[currentPage];
+    publishedFileActions.fetchPublishedFiles(id, name, startAtKey);
+  }, [currentPage]);
+
+  useEffect(() => {
+    // either our data wasn't truncated or we need to store the last key for future data fetching
+    if (!publishedFiles.data.isTruncated) {
+      setLastPage(currentPage);
+    } else {
+      const newKey = publishedFiles.data.files[publishedFiles.data.files.length - 1].key;
+      setStartAtKeys({ ...startAtKeys, [currentPage]: newKey });
     }
-  }
+  }, [publishedFiles]);
 
-  shouldDisablePreviousPage() {
-    const { currentPage } = this.state;
-    return !currentPage;
-  }
-
-  previousPage() {
-    const { currentPage } = this.state;
-    if (currentPage > 0) {
-      this.setState({ currentPage: currentPage - 1 });
-    }
-  }
-
-  shouldDisableNextPage() {
-    const { currentPage, lastPage } = this.state;
-    return currentPage === lastPage;
-  }
-
-  nextPage() {
-    const { fetchPublishedFiles, id, name } = this.props;
-    const { currentPage, filesByPage } = this.state;
-
-    const nextPage = currentPage + 1;
-
-    if (this.shouldDisableNextPage()) {
-      // do nothing if already on the known last page
-      return;
-    }
-
-    this.setState({ currentPage: nextPage });
-
-    if (filesByPage[nextPage]) {
-      // short-circuit if already have next files in state
-      return;
-    }
-
-    // else dispatch action to fetch next page of files
-    const site = { id };
-    const branch = name;
-    const files = filesByPage[currentPage];
-    const startAtKey = files[files.length - 1].key;
-
-    fetchPublishedFiles(site, branch, startAtKey);
-  }
-
-  shouldShowButtons() {
-    const { lastPage } = this.state;
-
-    return !(lastPage !== null && lastPage === 0);
-  }
-
-  renderPagingButtons() {
-    const prevButtonClass = `${this.shouldDisablePreviousPage() ? 'usa-button-disabled' : 'usa-button'}`;
-    const nextButtonClass = `pull-right ${this.shouldDisableNextPage() ? 'usa-button-disabled' : 'usa-button'}`;
-
-    if (!this.shouldShowButtons()) {
-      return null;
-    }
-
-    return (
-      <nav className="pagination" aria-label="Pagination">
-        <button
-          className={prevButtonClass}
-          disabled={this.shouldDisablePreviousPage()}
-          onClick={this.previousPage}
-          title="View the previous page of published files"
-          type="button"
-        >
-          &laquo; Previous
-        </button>
-
-        <button
-          className={nextButtonClass}
-          disabled={this.shouldDisableNextPage()}
-          onClick={this.nextPage}
-          title="View the next page of published files"
-          type="button"
-        >
-          Next &raquo;
-        </button>
-      </nav>
-    );
-  }
-
-  renderPublishedFilesTable(files) {
-    const { name } = this.props;
-
-    return (
-      <div>
-        <h3>{name}</h3>
-        <p>
-          Use this page to audit the files that
-          {` ${globals.APP_NAME} `}
-          has publicly published.
-          Up to 200 files are shown per page.
-        </p>
-        <table className="usa-table-borderless table-full-width log-table">
-          <thead>
-            <tr>
-              <th>File</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            { files.filter(f => !!f.name).map(this.renderBranchFileRow) }
-          </tbody>
-        </table>
-        { this.renderPagingButtons() }
-      </div>
-    );
-  }
-
-  renderBranchFileRow(file) {
-    let viewFileLink;
-    const branch = file.publishedBranch.name;
-    switch (branch) {
-      case file.publishedBranch.site.defaultBranch:
-        viewFileLink = `${file.publishedBranch.site.viewLink}${file.name}`;
-        break;
-      case file.publishedBranch.site.demoBranch:
-        viewFileLink = `${file.publishedBranch.site.demoViewLink}${file.name}`;
-        break;
-      default:
-        viewFileLink = `${file.publishedBranch.site.previewLink}${branch}/${file.name}`;
-    }
-    return (
-      <tr key={viewFileLink}>
-        <td>{file.name}</td>
-        <td><a href={viewFileLink} target="_blank" rel="noopener noreferrer">View</a></td>
-      </tr>
-    );
-  }
-
-  renderLoadingState() {
+  if (publishedFiles.isLoading) {
     return <LoadingIndicator />;
   }
 
-  renderEmptyState() {
+  if (!publishedFiles.data.files.length) {
     return (
       <AlertBanner
         status="info"
@@ -195,58 +139,16 @@ class SitePublishedFilesTable extends React.Component {
       />
     );
   }
-
-  render() {
-    const { publishedFiles } = this.props;
-    const { currentPage, filesByPage } = this.state;
-
-    const files = filesByPage[currentPage] || [];
-
-    if (publishedFiles.isLoading) {
-      return this.renderLoadingState();
-    }
-
-    if (!files.length) {
-      return this.renderEmptyState();
-    }
-    return this.renderPublishedFilesTable(files);
-  }
+  return renderPublishedFilesTable(
+    publishedFiles.data.files,
+    name, currentPage, lastPage,
+    setCurrentPage
+  );
 }
 
 SitePublishedFilesTable.propTypes = {
   id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  fetchPublishedFiles: PropTypes.func.isRequired,
-  publishedFiles: PropTypes.shape({
-    isLoading: PropTypes.bool.isRequired,
-    data: PropTypes.shape({
-      files: PropTypes.arrayOf(
-        PropTypes.shape({
-          name: PropTypes.string,
-          size: PropTypes.number,
-          key: PropTypes.string,
-          publishedBranch: PropTypes.shape({
-            name: PropTypes.string,
-          }),
-        })
-      ),
-      isTruncated: PropTypes.bool,
-    }),
-  }),
 };
-
-SitePublishedFilesTable.defaultProps = {
-  publishedFiles: null,
-};
-
-const mapStateToProps = ({ publishedFiles, sites }, { id }) => ({
-  publishedFiles,
-  site: currentSite(sites, id),
-});
-
-const mapDispatchToProps = () => ({
-  fetchPublishedFiles: publishedFileActions.fetchPublishedFiles,
-});
 
 export { SitePublishedFilesTable };
-export default connect(mapStateToProps, mapDispatchToProps)(SitePublishedFilesTable);
+export default SitePublishedFilesTable;

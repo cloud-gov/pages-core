@@ -56,10 +56,6 @@ describe('<SiteSettings/>', () => {
   });
 
   beforeEach(() => {
-    siteActionsMock.deleteSite = spy();
-    siteActionsMock.updateSite = spy();
-
-    // global.window = { confirm: spy() };
     wrapper = mountRouter(<SiteSettings path="/sites/:id" />, '/sites/1', state);
   });
 
