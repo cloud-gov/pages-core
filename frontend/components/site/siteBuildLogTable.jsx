@@ -29,6 +29,8 @@ function SiteBuildLogTable({ buildLogs, buildState }) {
         let style = null;
         if (source.includes('[main]')) {
           style = { fontWeight: 'bold' };
+        } else if (source.includes('[monitor]')) {
+          style = { opacity: 0.7 };
         }
 
         return (
