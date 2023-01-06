@@ -4,6 +4,11 @@ import PropTypes from 'prop-types';
 
 import { ORGANIZATIONS } from '../../../propTypes';
 import TemplateSite from './templateSite';
+import siteActions from '../../../actions/siteActions';
+
+function onSubmitTemplate(site) {
+  siteActions.addSite(site);
+}
 
 const templateGrid = (
   activeChildId,
@@ -53,7 +58,7 @@ export class TemplateList extends React.Component {
 
   render() {
     const {
-      defaultOwner, handleSubmitTemplate, organizations, templates,
+      defaultOwner, organizations, templates,
     } = this.props;
     const { handleChooseActive, state: { activeChildId } } = this;
 
@@ -64,7 +69,7 @@ export class TemplateList extends React.Component {
           activeChildId,
           defaultOwner,
           handleChooseActive,
-          handleSubmitTemplate,
+          onSubmitTemplate,
           organizations,
           templates
         )}
@@ -79,7 +84,6 @@ TemplateList.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   templates: PropTypes.object.isRequired,
   organizations: ORGANIZATIONS.isRequired,
-  handleSubmitTemplate: PropTypes.func.isRequired,
   defaultOwner: PropTypes.string.isRequired,
 };
 

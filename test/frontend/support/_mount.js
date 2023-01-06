@@ -24,4 +24,15 @@ const mountRouter = (elem, url = '/', state = {}) => {
   );
 };
 
-export default mountRouter;
+const mountStore = (elem, state = {}) => {
+  const mockStore = configureStore([]);
+  return mount(
+    <Provider store={mockStore(state)}>
+      <Router>
+        {elem}
+      </Router>
+    </Provider>
+  );
+};
+
+export { mountRouter, mountStore };

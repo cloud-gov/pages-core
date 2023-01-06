@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { spy } from 'sinon';
 import proxyquire from 'proxyquire';
 
-import mountRouter from '../../../support/_mount';
+import { mountRouter } from '../../../support/_mount';
 
 proxyquire.noCallThru();
 

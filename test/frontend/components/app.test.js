@@ -5,7 +5,7 @@ import { stub } from 'sinon';
 import proxyquire from 'proxyquire';
 import { LocationProvider } from '@reach/router';
 
-import mountRouter from '../support/_mount';
+import { mountRouter } from '../support/_mount';
 
 proxyquire.noCallThru();
 

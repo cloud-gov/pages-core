@@ -4,7 +4,7 @@ import { spy } from 'sinon';
 import proxyquire from 'proxyquire';
 import lodashClonedeep from 'lodash.clonedeep';
 
-import mountRouter from '../../support/_mount';
+import { mountRouter } from '../../support/_mount';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
 proxyquire.noCallThru();

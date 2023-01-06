@@ -5,7 +5,7 @@ import sinon from 'sinon';
 import lodashClonedeep from 'lodash.clonedeep';
 
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
-import mountRouter from '../../support/_mount';
+import { mountRouter } from '../../support/_mount';
 
 proxyquire.noCallThru();
 

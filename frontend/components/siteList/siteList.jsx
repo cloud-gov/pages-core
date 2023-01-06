@@ -79,7 +79,7 @@ export const SiteList = ({
 
   let topButton = '';
   if (isPages) {
-    if (user.hasGithubAuth) {
+    if (user.hasGithubAuth && hasOrgs(organizations)) {
       topButton = (
         <Link
           to="/sites/new"

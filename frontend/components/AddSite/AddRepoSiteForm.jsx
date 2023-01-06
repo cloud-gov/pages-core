@@ -8,7 +8,6 @@ import GitHubRepoUrlField from '../Fields/GitHubRepoUrlField';
 import UserOrgSelect from '../organization/UserOrgSelect';
 import SelectSiteEngine from '../SelectSiteEngine';
 import AlertBanner from '../alertBanner';
-import { hasOrgs } from '../../selectors/organization';
 import { validAddRepoSiteForm } from '../../util/validators';
 
 const showNewSiteAlert = () => {
@@ -44,27 +43,23 @@ export const AddRepoSiteForm = ({
         className="form-control"
         readOnly={showAddNewSiteFields}
       />
-      {
-        hasOrgs(organizations) ? (
-          <div className="form-group">
-            <Field
+      <div className="form-group">
+        <Field
+          name="repoOrganizationId"
+          type="select"
+          component={p => (
+            <UserOrgSelect
+              id="repoOrganizationId"
               name="repoOrganizationId"
-              type="select"
-              component={p => (
-                <UserOrgSelect
-                  id="repoOrganizationId"
-                  name="repoOrganizationId"
-                  value={p.input.value}
-                  onChange={p.input.onChange}
-                  orgData={organizations.data}
-                  mustChooseOption
-                  {...p.meta}
-                />
-              )}
+              value={p.input.value}
+              onChange={p.input.onChange}
+              orgData={organizations.data}
+              mustChooseOption
+              {...p.meta}
             />
-          </div>
-        ) : null
-      }
+          )}
+        />
+      </div>
     </div>
     {
       showAddNewSiteFields && (
