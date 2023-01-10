@@ -113,9 +113,7 @@ function buildInfrastructure(params, s3ServiceName) {
   return apiClient.createSiteBucket(
     s3ServiceName,
     config.env.cfSpaceGuid,
-    config.app.s3ServicePlanId,
-    null,
-    appEnv === 'production' ? null : 'basic-vpc'
+    config.app.s3ServicePlanId
   )
     .then((response) => {
       const { credentials } = response.entity;
