@@ -259,7 +259,7 @@ describe('Site API', () => {
     }
 
     function mockPlanResponse(name, bucketGuid) {
-      const planName = 'basic-public';
+      const planName = 'basic-vpc';
       const planGuid = 'plan-guid';
       const planResponses = {
         resources: [

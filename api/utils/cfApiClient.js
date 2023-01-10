@@ -1,5 +1,8 @@
 const CloudFoundryAuthClient = require('./cfAuthClient');
 const HttpClient = require('./httpClient');
+const config = require('../../config');
+
+const { appEnv } = config.app;
 
 function filterEntity(res, name, field = 'name') {
   const errMsg = `Not found: Entity @${field} = ${name}`;
@@ -181,7 +184,11 @@ class CloudFoundryAPIClient {
   }
 
   createSiteBucket(name, spaceGuid, s3ServicePlanId, keyIdentifier = 'key', serviceName = 'basic-public') {
-    return this.createS3ServiceInstance(name, serviceName, spaceGuid, s3ServicePlanId)
+    let serviceNameToUse = serviceName;
+    if (appEnv !== 'production') {
+      serviceNameToUse = 'basic-vpc';
+    }
+    return this.createS3ServiceInstance(name, serviceNameToUse, spaceGuid, s3ServicePlanId)
       .then(res => this.createServiceKey(name, res.metadata.guid, keyIdentifier));
   }
 
