@@ -172,7 +172,6 @@ describe('CloudFoundryAPIClient', () => {
         name, config.env.cfSpaceGuid, config.app.s3ServicePlanId, keyIdentifier, planName
       )
         .then((res) => {
-          console.log(res)
           expect(res).to.be.an('object');
           expect(res.entity.name).to.equal(keyName);
           expect(res.entity.service_instance_guid).to.equal(bucketGuid);
