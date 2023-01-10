@@ -5,6 +5,8 @@ const { generateS3ServiceName, generateSubdomain } = require('../utils');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const config = require('../../config');
 
+const { appEnv } = config.app;
+
 const apiClient = new CloudFoundryAPIClient();
 
 const defaultEngine = 'jekyll';
@@ -111,7 +113,9 @@ function buildInfrastructure(params, s3ServiceName) {
   return apiClient.createSiteBucket(
     s3ServiceName,
     config.env.cfSpaceGuid,
-    config.app.s3ServicePlanId
+    config.app.s3ServicePlanId,
+    null,
+    appEnv === 'production' ? null : 'basic-vpc'
   )
     .then((response) => {
       const { credentials } = response.entity;
