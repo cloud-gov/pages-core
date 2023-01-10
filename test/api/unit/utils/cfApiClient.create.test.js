@@ -139,12 +139,12 @@ describe('CloudFoundryAPIClient', () => {
     });
   });
 
-  describe('.creatSiteBucket', () => {
+  describe('.createSiteBucket', () => {
     it('should create a new S3 service and service key', (done) => {
       const name = 'my-bucket';
       const keyIdentifier = 'key';
       const keyName = `${name}-key`;
-      const planName = 'aws-bucket';
+      const planName = 'basic-vpc';
       const planGuid = 'plan-guid';
       const bucketGuid = 'bucket-guid';
 
@@ -172,6 +172,7 @@ describe('CloudFoundryAPIClient', () => {
         name, config.env.cfSpaceGuid, config.app.s3ServicePlanId, keyIdentifier, planName
       )
         .then((res) => {
+          console.log(res)
           expect(res).to.be.an('object');
           expect(res.entity.name).to.equal(keyName);
           expect(res.entity.service_instance_guid).to.equal(bucketGuid);
