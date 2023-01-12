@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import { useLocation } from '@reach/router';
+import {
+  useParams, useLocation, useSearchParams, Outlet,
+} from 'react-router-dom';
 
 import { ALERT } from '../propTypes';
 import { currentSite } from '../selectors/site';
@@ -43,12 +45,12 @@ function getPageTitle(pathname) {
   return '';
 }
 export function SiteContainer(props) {
-  // TODO: replace with react-router v6 useParams (doesn't match parent route here)
-  const { id } = props;
+  const { id } = useParams();
   const location = useLocation();
+  const params = useSearchParams();
   const sites = useSelector(state => state.sites);
   const organizations = useSelector(state => state.organizations);
-  const { children, alert, params } = props;
+  const { alert } = props;
 
   if (sites.isLoading || !sites.data) {
     return <LoadingIndicator />;
@@ -132,7 +134,7 @@ export function SiteContainer(props) {
           viewLink={site.viewLink}
         />
 
-        {children}
+        <Outlet />
 
       </div>
     </div>
@@ -140,20 +142,14 @@ export function SiteContainer(props) {
 }
 
 SiteContainer.propTypes = {
-  id: PropTypes.string.isRequired,
   params: PropTypes.shape({
     branch: PropTypes.string,
     fileName: PropTypes.string,
   }),
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
   alert: ALERT,
 };
 
 SiteContainer.defaultProps = {
-  children: null,
   alert: {},
   params: {},
 };

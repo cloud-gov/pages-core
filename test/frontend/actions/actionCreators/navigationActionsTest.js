@@ -1,5 +1,6 @@
 import sinon from 'sinon';
-import * as reachRouter from '@reach/router';
+// TODO: this also needs fixing
+import * as reactRouter from 'react-router-dom';
 import {
   pushRouterHistory,
   replaceRouterHistory,
@@ -9,7 +10,7 @@ describe('navigationActions', () => {
   let navigateStub;
 
   beforeEach(() => {
-    navigateStub = sinon.stub(reachRouter, 'navigate').resolves();
+    navigateStub = sinon.stub(reactRouter, 'navigate').resolves();
   });
 
   afterEach(() => {

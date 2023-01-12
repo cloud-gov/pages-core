@@ -5,9 +5,9 @@ import configureStore from 'redux-mock-store';
 import {
   createMemorySource,
   createHistory,
-  LocationProvider,
+  LocationProvider, // TODO: maybe memory router for tests
   Router,
-} from '@reach/router';
+} from 'react-router-dom';
 
 const mountRouter = (elem, url = '/', state = {}) => {
   const mockStore = configureStore([]);

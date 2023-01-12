@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Notifications from 'react-notification-system-redux';
 import { connect } from 'react-redux';
-import { useLocation } from '@reach/router';
+import { Outlet, useLocation } from 'react-router-dom';
 
 import { ALERT } from '../propTypes';
 import alertActions from '../actions/alertActions';
@@ -20,13 +20,13 @@ function shouldClearAlert(alert) {
 }
 export function App(props) {
   const {
-    alert, notifier, children, notifications, onEnter,
+    alert, notifier, notifications, onEnter,
   } = props;
   const location = useLocation();
 
   useEffect(() => {
-    onEnter();
     notifier.listen();
+    onEnter();
   }, []);
 
   useEffect(() => {
@@ -38,17 +38,13 @@ export function App(props) {
   return (
     <div>
       <Notifications notifications={notifications} />
-      { children }
+      <Outlet />
     </div>
   );
 }
 
 App.propTypes = {
   alert: ALERT,
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
   location: PropTypes.shape({
     key: PropTypes.string,
   }),
@@ -70,7 +66,6 @@ App.propTypes = {
 
 App.defaultProps = {
   alert: null,
-  children: null,
   location: null,
   notifications: [],
   notifier: new BuildStatusNotifier(),

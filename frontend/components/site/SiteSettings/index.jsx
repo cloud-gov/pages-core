@@ -1,7 +1,7 @@
 /* global window:true */
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from '@reach/router';
+import { useParams } from 'react-router-dom';
 
 import ExpandableArea from '../../ExpandableArea';
 import BasicSiteSettings from './BasicSiteSettings';

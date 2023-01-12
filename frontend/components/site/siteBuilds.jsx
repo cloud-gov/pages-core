@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import { Link } from '@reach/router';
+import { Link, useParams } from 'react-router-dom';
 
 import GitHubLink from '../GitHubLink';
 import buildActions from '../../actions/buildActions';
@@ -78,10 +77,9 @@ function latestBuildByBranch(builds) {
   return maxBuilds;
 }
 
-function SiteBuilds(props) {
-  // TODO: replace with useParams with react-router-v6
-  const { id } = props;
-
+function SiteBuilds() {
+  const { id } = useParams();
+  console.log(id)
   const [autoRefresh, setAutoRefresh] = useState(false);
   const site = useSelector(state => currentSite(state.sites, id));
   const organization = useSelector(state => getOrgById(state.organizations, site.organizationId));
@@ -223,10 +221,6 @@ function SiteBuilds(props) {
     </div>
   );
 }
-
-SiteBuilds.propTypes = {
-  id: PropTypes.string.isRequired,
-};
 
 export { SiteBuilds };
 export default SiteBuilds;

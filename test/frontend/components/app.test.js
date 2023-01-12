@@ -3,7 +3,8 @@ import { shallow } from 'enzyme';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 import proxyquire from 'proxyquire';
-import { LocationProvider } from '@reach/router';
+// TODO: maybe memory router for tests
+import { LocationProvider } from 'react-router-dom';
 
 import { mountRouter } from '../support/_mount';
 

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from '@reach/router';
-import PropTypes from 'prop-types';
+import { useParams } from 'react-router-dom';
 
 import publishedFileActions from '../../actions/publishedFileActions';
 import globals from '../../globals';
@@ -100,10 +99,8 @@ function renderPublishedFilesTable(files, name, currentPage, lastPage, setCurren
   );
 }
 
-function SitePublishedFilesTable(props) {
-  // TODO: replace this with useParams with react-router-v6
-  const { id } = props;
-  const { name } = useParams();
+function SitePublishedFilesTable() {
+  const { id, name } = useParams();
   const publishedFiles = useSelector(state => state.publishedFiles);
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -145,10 +142,6 @@ function SitePublishedFilesTable(props) {
     setCurrentPage
   );
 }
-
-SitePublishedFilesTable.propTypes = {
-  id: PropTypes.string.isRequired,
-};
 
 export { SitePublishedFilesTable };
 export default SitePublishedFilesTable;
