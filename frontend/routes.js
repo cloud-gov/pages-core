@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Route, redirect } from 'react-router-dom';
 
 import App from './components/app';
 import * as Organization from './components/organization';
@@ -44,7 +44,7 @@ export default (
     <Route path="sites" element={<SiteList />} />
     {isPages && <Route path="sites/new" element={<AddSite />} /> }
     <Route path="sites/:id" element={<SiteContainer />}>
-      {/* <Redirect noThrow from="/" to="builds" /> */}
+      <Route path="" loader={() => redirect('builds')} />
       <Route path="settings" element={<SiteSettings />} />
       <Route path="published" element={<SitePublishedBranchesTable />} />
       <Route path="published/:name" element={<SitePublishedFilesTable />} />
@@ -54,7 +54,7 @@ export default (
     </Route>
     <Route path="settings" element={<UserSettings />} />
     {/* <Redirect noThrow from="*" to="/not-found" /> */}
-    <Route path="/*" element={<NotFound />} />
+    <Route path="*" element={<NotFound />} />
     {/* <Redirect noThrow from="*" to="/sites" /> */}
   </Route>
 );

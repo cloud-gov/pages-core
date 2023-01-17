@@ -79,7 +79,6 @@ function latestBuildByBranch(builds) {
 
 function SiteBuilds() {
   const { id } = useParams();
-  console.log(id)
   const [autoRefresh, setAutoRefresh] = useState(false);
   const site = useSelector(state => currentSite(state.sites, id));
   const organization = useSelector(state => getOrgById(state.organizations, site.organizationId));

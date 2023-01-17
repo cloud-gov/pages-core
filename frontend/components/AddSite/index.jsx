@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
@@ -15,18 +16,6 @@ function getOwnerAndRepo(repoUrl) {
   const repository = repoUrl.split('/')[4];
 
   return { owner, repository };
-}
-
-function onAddUserSubmit({ repoUrl }) {
-  const { owner, repository } = getOwnerAndRepo(repoUrl);
-  siteActions.addUserToSite({ owner, repository });
-}
-
-function onCreateSiteSubmit({ repoUrl, engine, repoOrganizationId }) {
-  const { owner, repository } = getOwnerAndRepo(repoUrl);
-  siteActions.addSite({
-    owner, repository, engine, organizationId: repoOrganizationId,
-  });
 }
 
 function defaultOwner(user) {
@@ -45,6 +34,21 @@ function AddSite() {
   const showAddNewSiteFields = useSelector(state => state.showAddNewSiteFields);
   const { isLoading } = useSelector(state => state.sites);
   const user = useSelector(state => state.user);
+
+  const navigate = useNavigate();
+
+  function onAddUserSubmit({ repoUrl }) {
+    const { owner, repository } = getOwnerAndRepo(repoUrl);
+    siteActions.addUserToSite({ owner, repository })
+      .then(() => navigate('sites'));
+  }
+
+  function onCreateSiteSubmit({ repoUrl, engine, repoOrganizationId }) {
+    const { owner, repository } = getOwnerAndRepo(repoUrl);
+    siteActions.addSite({
+      owner, repository, engine, organizationId: repoOrganizationId,
+    }, navigate);
+  }
 
   // select the function to use on form submit based on
   // the showAddNewSiteFields flag
@@ -115,5 +119,5 @@ function AddSite() {
   );
 }
 
-export { AddSite, onAddUserSubmit, onCreateSiteSubmit };
+export {  };
 export default AddSite;

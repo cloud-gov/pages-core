@@ -62,11 +62,6 @@ describe('dispatchActions', () => {
     });
   });
 
-  it('updateRouterToSitesUri', () => {
-    fixture.updateRouterToSitesUri();
-    expect(pushHistory.calledWith('/sites')).to.be.true;
-  });
-
   it('dispatchSitesFetchStartedAction', () => {
     sitesFetchStartedActionCreator.returns(action);
 

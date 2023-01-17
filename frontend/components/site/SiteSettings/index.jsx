@@ -1,7 +1,7 @@
 /* global window:true */
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import ExpandableArea from '../../ExpandableArea';
 import BasicSiteSettings from './BasicSiteSettings';
@@ -16,6 +16,7 @@ function SiteSettings() {
   const { id } = useParams();
   const site = useSelector(state => currentSite(state.sites, id));
   const organization = useSelector(state => getOrgById(state.organizations, site.organizationId));
+  const navigate = useNavigate();
 
   if (!site) {
     return null;
@@ -24,7 +25,9 @@ function SiteSettings() {
   function handleDelete() {
     // eslint-disable-next-line no-alert
     if (window.confirm(`${site.owner}/${site.repository}\nAre you sure you want to delete this site for all users? This action will also delete all site builds and take down the live site, if published.`)) {
-      return siteActions.deleteSite(site.id);
+      return siteActions.deleteSite(site.id)
+        .then(() => siteActions.fetchSites())
+        .then(() => navigate('/sites'));
     }
     return Promise.resolve();
   }
