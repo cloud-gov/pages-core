@@ -3,7 +3,9 @@
 set -e
 
 display_usage() {
-  echo -e "\nUsage: $0 input.csv\n"
+  echo -e "\nUsage: $0 input.csv [max-rows] [offset]\n"
+  echo -e "  max-rows: process at most this number of input rows (default: unlimited)\n"
+  echo -e "  offset:   skip an initial set of input rows (default: 0)\n"
 }
 
 if [  $# -le 0 ]
@@ -25,6 +27,10 @@ fi
 #
 # \copy (select "serviceName",origin from domain where state='provisioned') to '/output/path/for/domains.csv' CSV HEADER;
 domains_file=$1
+
+max_rows=${2:--1}
+
+offset=${3:-0}
 
 if [[ ! -r $domains_file ]]
 then
@@ -51,8 +57,24 @@ wait_for_service_instance() {
   done
 }
 
+rows_processed=0
 while IFS="," read -r service_instance current_origin
 do
+  if [[ $offset -gt 0 ]]
+  then
+    ((offset--))
+    continue
+  fi
+
+  ((rows_processed++))
+
+  if [[ ($max_rows -gt 0) && ($rows_processed -gt $max_rows)]]
+  then
+    break
+  fi
+
+  echo $service_instance
+
   if [[ $current_origin =~ (.*)\.app\.cloud\.gov$ ]]
   then
     bucket=${BASH_REMATCH[1]}
