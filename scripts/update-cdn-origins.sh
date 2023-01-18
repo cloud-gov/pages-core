@@ -74,8 +74,6 @@ do
     break
   fi
 
-  echo $service_instance
-
   if [[ $current_origin =~ (.*)\.app\.cloud\.gov$ ]]
   then
     bucket=${BASH_REMATCH[1]}
