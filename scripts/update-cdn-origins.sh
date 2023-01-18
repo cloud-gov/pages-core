@@ -2,14 +2,6 @@
 
 set -e
 
-# Expected input file is a comma-seperated-value export of the serviceName and
-# origin columns for provisioned domains in the domains table in the core DB.
-#
-# The expected format can be produced from the psql command line as follows:
-#
-# \copy (select "serviceName",origin from domain where state='provisioned') to '/output/path/for/domains.csv' CSV HEADER;
-
-
 display_usage() {
   echo -e "\nUsage: $0 input.csv\n"
 }
@@ -27,9 +19,14 @@ then
 fi
 
 DOMAINS_FILE=$1
+# Expected input file is a comma-seperated-value export of the serviceName and
+# origin columns for provisioned domains in the domains table in the core DB.
+#
+# The expected format can be produced from the psql command line as follows:
+#
+# \copy (select "serviceName",origin from domain where state='provisioned') to '/output/path/for/domains.csv' CSV HEADER;
 
-# I suspect wait_for_service_instance() may require the following and don't want to
-# lose the thought, but will check before introducing this precondition on execution
+# QUESTION: Does wait_for_service_instance() require the following?
 #
 # CF Auth
 # cf api "${CF_API_URL}"
@@ -54,6 +51,7 @@ do
     bucket=${BASH_REMATCH[1]}
     new_origin="$bucket.sites.pages.cloud.gov"
 
+    # QUESTION: service name vs service instance — does the arg below need to be a guid?
     # For the moment, outputting instead of executing this command...
     echo "cf update-service $service_instance -c '{\"origin\": \"$new_origin\"}'"
 
