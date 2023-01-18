@@ -8,14 +8,14 @@ display_usage() {
 
 if [  $# -le 0 ]
 then
-    display_usage
-    exit 1
+  display_usage
+  exit 1
 fi
 
 if [[ ( $@ == "--help") ||  $@ == "-h" ]]
 then
-    display_usage
-    exit 0
+  display_usage
+  exit 0
 fi
 
 # Expected input file is a comma-seperated-value export of the serviceName and
@@ -24,12 +24,12 @@ fi
 # The expected format can be produced from the psql command line as follows:
 #
 # \copy (select "serviceName",origin from domain where state='provisioned') to '/output/path/for/domains.csv' CSV HEADER;
-DOMAINS_FILE=$1
+domains_file=$1
 
-if [[ ! -r $DOMAINS_FILE ]]
+if [[ ! -r $domains_file ]]
 then
-    echo "Input file $DOMAINS_FILE does not exist or is not readable"
-    exit 1
+  echo "Input file $domains_file does not exist or is not readable"
+  exit 1
 fi
 
 
@@ -70,4 +70,4 @@ do
     echo $SQL
     echo
   fi
-done < $DOMAINS_FILE
+done < $domains_file
