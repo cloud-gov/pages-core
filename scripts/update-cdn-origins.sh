@@ -38,6 +38,7 @@ then
   exit 1
 fi
 
+# QUESTION: Should this type of script test for CF session and/or verify targeted org/space?
 
 # QUESTION: Does wait_for_service_instance() require the following?
 #
