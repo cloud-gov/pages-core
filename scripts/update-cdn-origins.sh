@@ -18,13 +18,20 @@ then
     exit 0
 fi
 
-DOMAINS_FILE=$1
 # Expected input file is a comma-seperated-value export of the serviceName and
 # origin columns for provisioned domains in the domains table in the core DB.
 #
 # The expected format can be produced from the psql command line as follows:
 #
 # \copy (select "serviceName",origin from domain where state='provisioned') to '/output/path/for/domains.csv' CSV HEADER;
+DOMAINS_FILE=$1
+
+if [[ ! -r $DOMAINS_FILE ]]
+then
+    echo "Input file $DOMAINS_FILE does not exist or is not readable"
+    exit 1
+fi
+
 
 # QUESTION: Does wait_for_service_instance() require the following?
 #
