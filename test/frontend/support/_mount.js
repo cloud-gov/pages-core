@@ -3,24 +3,19 @@ import { Provider } from 'react-redux';
 import { mount } from 'enzyme';
 import configureStore from 'redux-mock-store';
 import {
-  createMemorySource,
-  createHistory,
-  LocationProvider, // TODO: maybe memory router for tests
-  Router,
+  MemoryRouter, Routes, Route,
 } from 'react-router-dom';
 
-const mountRouter = (elem, url = '/', state = {}) => {
+const mountRouter = (elem, path = '/', url = '/', state = {}) => {
   const mockStore = configureStore([]);
-  const source = createMemorySource(url);
-  const history = createHistory(source);
   return mount(
-    <LocationProvider history={history}>
-      <Provider store={mockStore(state)}>
-        <Router>
-          {elem}
-        </Router>
-      </Provider>
-    </LocationProvider>
+    <Provider store={mockStore(state)}>
+      <MemoryRouter initialEntries={[url]}>
+        <Routes>
+          <Route path={path} element={elem} />
+        </Routes>
+      </MemoryRouter>
+    </Provider>
   );
 };
 
@@ -28,9 +23,7 @@ const mountStore = (elem, state = {}) => {
   const mockStore = configureStore([]);
   return mount(
     <Provider store={mockStore(state)}>
-      <Router>
-        {elem}
-      </Router>
+      {elem}
     </Provider>
   );
 };

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import {
   useParams, useLocation, useSearchParams, Outlet,
@@ -142,16 +141,11 @@ export function SiteContainer(props) {
 }
 
 SiteContainer.propTypes = {
-  params: PropTypes.shape({
-    branch: PropTypes.string,
-    fileName: PropTypes.string,
-  }),
   alert: ALERT,
 };
 
 SiteContainer.defaultProps = {
   alert: {},
-  params: {},
 };
 
 export default SiteContainer;

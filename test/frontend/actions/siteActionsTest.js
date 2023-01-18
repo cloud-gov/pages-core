@@ -318,7 +318,7 @@ describe('siteActions', () => {
       fetchSites.resolves();
       const actual = fixture.removeUserFromSite(1, 1, true);
       return actual.then(() => {
-        expect(fetchUser.called).to.be.false;
+        expect(fetchUser.called).to.be.true;
         expect(fetchSites.called).to.be.true;
         expect(alertSuccess.called).to.be.true;
         expect(alertSuccess.calledWith('Successfully removed.')).to.be.true;

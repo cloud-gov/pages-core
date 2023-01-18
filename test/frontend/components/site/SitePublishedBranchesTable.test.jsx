@@ -43,7 +43,7 @@ describe('<SitePublishedBranchesTable/>', () => {
   });
 
   it('should render a table with branches from the state', () => {
-    const wrapper = mountRouter(<SitePublishedBranchesTable path="/sites/:id/published" />, '/sites/1/published', state);
+    const wrapper = mountRouter(<SitePublishedBranchesTable />, '/sites/:id/published', '/sites/1/published', state);
     expect(wrapper.find('table')).to.have.length(1);
     expect(wrapper.find('table').contains('branch-a')).to.be.true;
     expect(wrapper.find('table').contains('branch-b')).to.be.true;
@@ -52,7 +52,7 @@ describe('<SitePublishedBranchesTable/>', () => {
   it('should render a loading state if branch data is loading', () => {
     state.publishedBranches.isLoading = true;
 
-    const wrapper = mountRouter(<SitePublishedBranchesTable path="/sites/:id/published" />, '/sites/1/published', state);
+    const wrapper = mountRouter(<SitePublishedBranchesTable />, '/sites/:id/published', '/sites/1/published', state);
     expect(wrapper.find('table')).to.have.length(0);
     expect(wrapper.find(LoadingIndicator)).to.have.length(1);
   });
@@ -60,7 +60,7 @@ describe('<SitePublishedBranchesTable/>', () => {
   it('should render an empty state if there are no published branches', () => {
     state.publishedBranches.data = [];
 
-    const wrapper = mountRouter(<SitePublishedBranchesTable path="/sites/:id/published" />, '/sites/1/published', state);
+    const wrapper = mountRouter(<SitePublishedBranchesTable />, '/sites/:id/published', '/sites/1/published', state);
     expect(wrapper.find('table')).to.have.length(0);
     expect(wrapper.find('AlertBanner').prop('header')).to.equal(
       'No branches have been published.'

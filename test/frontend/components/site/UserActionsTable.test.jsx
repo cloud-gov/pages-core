@@ -3,8 +3,7 @@ import { expect } from 'chai';
 import { spy } from 'sinon';
 import lodashClonedeep from 'lodash.clonedeep';
 import proxyquire from 'proxyquire';
-import { mountRouter } from '../../support/_mount';
-import userActions from '../../../../frontend/reducers/userActions';
+import { mountStore } from '../../support/_mount';
 
 proxyquire.noCallThru();
 
@@ -37,13 +36,13 @@ describe('<UserActionsTable/>', () => {
   });
 
   it('should render nothing if the current user has no actions', () => {
-    const wrapper = mountRouter(<UserActionsTable site={1} path="/sites/:id" />, '/sites/1', state);
+    const wrapper = mountStore(<UserActionsTable site={1} />, state);
 
     expect(wrapper.find('table')).to.have.length(0);
   });
 
   it('calls fetchUserActions on mount', () => {
-    mountRouter(<UserActionsTable site={22} path="/sites/:id" />, '/sites/22', state);
+    mountStore(<UserActionsTable site={22} />, state);
     const { fetchUserActions } = userActionsSpy;
     expect(fetchUserActions.calledOnce).to.be.true;
     // expect(fetchUserActions.calledWith(22)).to.be.true;
@@ -69,7 +68,7 @@ describe('<UserActionsTable/>', () => {
       },
     ];
 
-    const wrapper = mountRouter(<UserActionsTable site={1} path="/sites/:id" />, '/sites/1', state);
+    const wrapper = mountStore(<UserActionsTable site={1} />, state);
     expect(wrapper.find('table')).to.have.length(1);
     expect(wrapper.find('th').at(0).contains('Initiator')).to.be.true;
     expect(wrapper.find('th').at(1).contains('Action')).to.be.true;

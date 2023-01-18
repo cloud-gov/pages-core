@@ -1,15 +1,24 @@
 import React from 'react';
 import { expect } from 'chai';
-import { shallow } from 'enzyme';
 import proxyquire from 'proxyquire';
 import sinon from 'sinon';
+import { Link } from 'react-router-dom';
+
 import siteActions from '../../../../frontend/actions/siteActions';
+import { mountRouter } from '../../support/_mount';
 
 proxyquire.noCallThru();
 
-const Link = () => <div />;
 const PublishedState = () => <div />;
 const RepoLastVerified = () => <div />;
+const GitHubLink = () => <div />;
+
+const SiteListItem = proxyquire('../../../../frontend/components/siteList/siteListItem', {
+  './publishedState': PublishedState,
+  './repoLastVerified': RepoLastVerified,
+  '../GitHubLink': GitHubLink,
+  '../icons': { IconView: 'div' },
+}).default;
 
 const testSite = {
   repository: 'something',
@@ -34,28 +43,22 @@ const testOrganization = {
 };
 
 describe('<SiteListItem />', () => {
-  let Fixture;
   let wrapper;
 
   beforeEach(() => {
-    Fixture = proxyquire('../../../../frontend/components/siteList/siteListItem', {
-      'react-router-dom': { Link },
-      './publishedState': PublishedState,
-      './repoLastVerified': RepoLastVerified,
-      '../icons': { IconView: 'IconView' },
-    }).default;
+
   });
 
   afterEach(sinon.restore);
 
   it('outputs a published state component', () => {
-    wrapper = shallow(<Fixture site={testSite} user={testUser} />);
+    wrapper = mountRouter(<SiteListItem site={testSite} user={testUser} />);
     expect(wrapper.find(PublishedState).props()).to.deep.equals({ site: testSite });
     expect(wrapper.find(PublishedState)).to.have.length(1);
   });
 
   it('outputs a repo last verified component', () => {
-    wrapper = shallow(<Fixture site={testSite} user={testUser} />);
+    wrapper = mountRouter(<SiteListItem site={testSite} user={testUser} />);
     expect(wrapper.find(RepoLastVerified).props()).to.deep.equals({
       site: testSite,
       userUpdated: testUser.updatedAt,
@@ -64,7 +67,7 @@ describe('<SiteListItem />', () => {
   });
 
   it('outputs a link component to direct user to the site page w/o org prop', () => {
-    wrapper = shallow(<Fixture site={testSite} user={testUser} />);
+    wrapper = mountRouter(<SiteListItem site={testSite} user={testUser} />);
     expect(wrapper.find(Link).props()).to.deep.equals({
       to: `/sites/${testSite.id}`,
       children: `${testSite.owner}/${testSite.repository}`,
@@ -74,7 +77,13 @@ describe('<SiteListItem />', () => {
   });
 
   it('outputs a link component to direct user to the site page w/ org prop', () => {
-    wrapper = shallow(<Fixture site={testSite} user={testUser} organization={testOrganization} />);
+    wrapper = mountRouter(
+      <SiteListItem
+        site={testSite}
+        user={testUser}
+        organization={testOrganization}
+      />
+    );
     expect(wrapper.find(Link).props()).to.deep.equals({
       to: `/sites/${testSite.id}`,
       children: `${testSite.owner}/${testSite.repository}`,
@@ -85,21 +94,27 @@ describe('<SiteListItem />', () => {
 
   it('no Link if org is inactive', () => {
     const org = { ...testOrganization, isActive: false };
-    wrapper = shallow(<Fixture site={testSite} user={testUser} organization={org} />);
+    wrapper = mountRouter(<SiteListItem site={testSite} user={testUser} organization={org} />);
     expect(wrapper.find(Link)).to.have.length(0);
     expect(wrapper.find('h4')).to.have.length(1);
   });
 
   it('no Link if org site is inactive', () => {
     const site = { ...testSite, isActive: false };
-    wrapper = shallow(<Fixture site={site} user={testUser} organization={testOrganization} />);
+    wrapper = mountRouter(
+      <SiteListItem
+        site={site}
+        user={testUser}
+        organization={testOrganization}
+      />
+    );
     expect(wrapper.find(Link)).to.have.length(0);
     expect(wrapper.find('h4')).to.have.length(1);
   });
 
   it('no Link if non-org site is inactive', () => {
     const site = { ...testSite, isActive: false };
-    wrapper = shallow(<Fixture site={site} user={testUser} />);
+    wrapper = mountRouter(<SiteListItem site={site} user={testUser} />);
     expect(wrapper.find(Link)).to.have.length(0);
     expect(wrapper.find('h4')).to.have.length(1);
   });
@@ -107,8 +122,8 @@ describe('<SiteListItem />', () => {
   it('outputs an h5 with the site\'s organization', () => {
     const organizationId = testOrganization.id;
     const updatedSite = { ...testSite, organizationId };
-    wrapper = shallow(
-      <Fixture
+    wrapper = mountRouter(
+      <SiteListItem
         site={updatedSite}
         user={testUser}
         organization={testOrganization}
@@ -120,8 +135,8 @@ describe('<SiteListItem />', () => {
   it('outputs an h5 with the site\'s sandbox organization', () => {
     const organizationId = testOrganization.id;
     const updatedSite = { ...testSite, organizationId };
-    wrapper = shallow(
-      <Fixture
+    wrapper = mountRouter(
+      <SiteListItem
         site={updatedSite}
         user={testUser}
         organization={{ ...testOrganization, isSandbox: true, daysUntilSandboxCleaning: 5 }}
@@ -132,8 +147,8 @@ describe('<SiteListItem />', () => {
   });
 
   it('outputs without an h5 with the site\'s organization', () => {
-    wrapper = shallow(
-      <Fixture
+    wrapper = mountRouter(
+      <SiteListItem
         site={testSite}
         user={testUser}
       />
@@ -147,7 +162,7 @@ describe('<SiteListItem />', () => {
       builds: [{}],
     };
 
-    wrapper = shallow(<Fixture site={siteWithBuilds} user={testUser} />);
+    wrapper = mountRouter(<SiteListItem site={siteWithBuilds} user={testUser} />);
     const viewLink = wrapper.find('.sites-list-item-actions a');
     expect(viewLink).to.have.length(1);
     expect(viewLink.props()).to.contain({
@@ -169,10 +184,10 @@ describe('<SiteListItem />', () => {
 
   it('should call `removeUserFromSite` when `Remove` is clicked', () => {
     proxyquire.callThru();
-    wrapper = shallow(<Fixture site={testSite} user={testUser} />);
+    wrapper = mountRouter(<SiteListItem site={testSite} user={testUser} />);
     const clickSpy = sinon.stub(siteActions, 'removeUserFromSite').resolves();
     sinon.stub(siteActions, 'fetchSites').resolves();
-    const removeSiteLink = wrapper.find('ButtonLink').shallow();
+    const removeSiteLink = wrapper.find('ButtonLink');
 
     expect(removeSiteLink.exists()).to.be.true;
     expect(removeSiteLink.contains('Remove')).to.be.true;
@@ -181,7 +196,13 @@ describe('<SiteListItem />', () => {
   });
 
   it('should not have a `Remove` button when it has an organization', () => {
-    wrapper = shallow(<Fixture site={testSite} user={testUser} organization={testOrganization} />);
+    wrapper = mountRouter(
+      <SiteListItem
+        site={testSite}
+        user={testUser}
+        organization={testOrganization}
+      />
+    );
     const removeSiteLink = wrapper.find('ButtonLink');
     expect(removeSiteLink.exists()).to.be.false;
   });

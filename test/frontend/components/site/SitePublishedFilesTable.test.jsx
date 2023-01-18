@@ -42,7 +42,7 @@ describe('<SitePublishedFilesTable/>', () => {
   });
 
   it('calls fetchPublishedFiles on mount', () => {
-    mountRouter(<SitePublishedFilesTable id="11" path="/published/:name" />, '/published/funkyBranch', state);
+    mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/funkyBranch', state);
     expect(fetchPublishedFiles.calledOnce).to.be.true;
     expect(fetchPublishedFiles.calledWith('11', 'funkyBranch', null)).to.be.true;
   });
@@ -60,7 +60,7 @@ describe('<SitePublishedFilesTable/>', () => {
         ],
       },
     };
-    const wrapper = mountRouter(<SitePublishedFilesTable id="11" path="/published/:name" />, '/published/main', state);
+    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/main', state);
     expect(wrapper.find('h3').contains('main')).to.be.true;
   });
 
@@ -86,7 +86,7 @@ describe('<SitePublishedFilesTable/>', () => {
       },
     };
 
-    const wrapper = mountRouter(<SitePublishedFilesTable id="11" path="/published/:name" />, '/published/demo', state);
+    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/demo', state);
     expect(wrapper.find('table')).to.have.length(1);
     expect(wrapper.find('tbody > tr')).to.have.length(2);
     expect(wrapper.find('table').contains('abc')).to.be.true;
@@ -119,7 +119,7 @@ describe('<SitePublishedFilesTable/>', () => {
       },
     };
 
-    const wrapper = mountRouter(<SitePublishedFilesTable id="11" path="/published/:name" />, '/published/preview', state);
+    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/preview', state);
 
     expect(wrapper.find('table')).to.have.length(1);
     expect(wrapper.find('tbody > tr')).to.have.length(2);
@@ -153,7 +153,7 @@ describe('<SitePublishedFilesTable/>', () => {
       },
     };
 
-    const wrapper = mountRouter(<SitePublishedFilesTable id="11" path="/published/:name" />, '/published/main', state);
+    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/main', state);
 
     expect(wrapper.find('table')).to.have.length(1);
     expect(wrapper.find('tbody > tr')).to.have.length(2);
@@ -181,7 +181,7 @@ describe('<SitePublishedFilesTable/>', () => {
       },
     };
 
-    const wrapper = mountRouter(<SitePublishedFilesTable id="11" path="/published/:name" />, '/published/main', state);
+    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/main', state);
 
     const buttons = wrapper.find('button');
     expect(buttons).to.have.length(2);
@@ -198,7 +198,7 @@ describe('<SitePublishedFilesTable/>', () => {
   it('should render a loading state if the files are loading', () => {
     state.publishedFiles.isLoading = true;
 
-    const wrapper = mountRouter(<SitePublishedFilesTable id="11" path="/published/:name" />, '/published/demo', state);
+    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/demo', state);
     expect(wrapper.find(LoadingIndicator)).to.have.length(1);
   });
 
@@ -211,7 +211,7 @@ describe('<SitePublishedFilesTable/>', () => {
       },
     };
 
-    const wrapper = mountRouter(<SitePublishedFilesTable id="11" path="/published/:name" />, '/published/demo', state);
+    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/demo', state);
     expect(wrapper.find('AlertBanner').prop('message')).to.equal('No published branch files available.');
   });
 
@@ -249,7 +249,7 @@ describe('<SitePublishedFilesTable/>', () => {
     beforeEach(() => {
       state = lodashClonedeep(defaultState);
       state.publishedFiles = publishedFiles;
-      wrapper = mountRouter(<SitePublishedFilesTable id="1" path="/published/:name" />, '/published/main', state);
+      wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/1/published/main', state);
       prevButton = getPrevButton(wrapper);
       nextButton = getNextButton(wrapper);
     });

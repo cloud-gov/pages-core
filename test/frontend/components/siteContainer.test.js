@@ -55,13 +55,10 @@ const defaultState = {
 
 const defaultProps = {
   alert: {},
-  id: '1',
-  params: {
-    branch: 'branch',
-    fileName: 'boop.txt',
-  },
-  path: '/sites/:id',
 };
+
+const defaultURL = '/sites/1?branch=branch&fileName=boop.txt';
+const path = '/sites/:id';
 
 describe('<SiteContainer/>', () => {
   beforeEach(() => {
@@ -71,14 +68,13 @@ describe('<SiteContainer/>', () => {
 
   it('renders a LoadingIndicator while sites are loading', () => {
     state.sites.isLoading = true;
-    const wrapper = mountRouter(<SiteContainer {...props} />, '/sites/1', state);
+    const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
     expect(wrapper.find('LoadingIndicator')).to.have.length(1);
   });
 
   it('renders after sites have loaded', () => {
     state.sites.isLoading = false;
-    const wrapper = mountRouter(<SiteContainer {...props} />, '/sites/1', state);
-
+    const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
     expect(wrapper.find('siteSideNav')).to.have.length(1);
     expect(wrapper.find('AlertBanner')).to.have.length(1);
@@ -86,8 +82,8 @@ describe('<SiteContainer/>', () => {
   });
 
   it('renders an error after sites have loaded but no matching site', () => {
-    const noSiteProps = { ...defaultProps, id: '2' };
-    const wrapper = mountRouter(<SiteContainer {...noSiteProps} />, '/sites/2', state);
+    const url = '/sites/2';
+    const wrapper = mountRouter(<SiteContainer {...props} />, path, url, state);
     const alert = wrapper.find('AlertBanner');
 
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
@@ -98,7 +94,7 @@ describe('<SiteContainer/>', () => {
   it('renders an error after sites if site org is inactive', () => {
     state.organizations.data[0].isActive = false;
 
-    const wrapper = mountRouter(<SiteContainer {...props} />, '/sites/1', state);
+    const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
     const alert = wrapper.find('AlertBanner');
 
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
@@ -109,8 +105,7 @@ describe('<SiteContainer/>', () => {
   it('renders after sites have loaded but no matching org', () => {
     state.sites.data[0].organizationId = 2;
 
-    const wrapper = mountRouter(<SiteContainer {...props} />, '/sites/1', state);
-
+    const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
     expect(wrapper.find('siteSideNav')).to.have.length(1);
     expect(wrapper.find('AlertBanner')).to.have.length(1);
@@ -120,8 +115,7 @@ describe('<SiteContainer/>', () => {
   it('renders after sites have loaded and site has no org', () => {
     state.sites.data[0].organizationId = null;
 
-    const wrapper = mountRouter(<SiteContainer {...props} />, '/sites/1', state);
-
+    const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
     expect(wrapper.find('siteSideNav')).to.have.length(1);
     expect(wrapper.find('AlertBanner')).to.have.length(1);
@@ -131,7 +125,7 @@ describe('<SiteContainer/>', () => {
   context('site is (in)active', () => {
     it('renders an error after sites if site inactive', () => {
       state.sites.data[0].isActive = false;
-      const wrapper = mountRouter(<SiteContainer {...props} />, '/sites/1', state);
+      const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
       const alert = wrapper.find('AlertBanner');
 
       expect(wrapper.find('LoadingIndicator')).to.have.length(0);
@@ -143,7 +137,7 @@ describe('<SiteContainer/>', () => {
       state.sites.data[0].isActive = false;
       state.sites.data[0].organizationId = 2;
 
-      const wrapper = mountRouter(<SiteContainer {...props} />, '/sites/1', state);
+      const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
       const alert = wrapper.find('AlertBanner');
 
       expect(wrapper.find('LoadingIndicator')).to.have.length(0);
@@ -155,7 +149,7 @@ describe('<SiteContainer/>', () => {
       state.sites.data[0].isActive = false;
       state.sites.data[0].organizationId = null;
 
-      const wrapper = mountRouter(<SiteContainer {...props} />, '/sites/1', state);
+      const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
       const alert = wrapper.find('AlertBanner');
 
       expect(wrapper.find('LoadingIndicator')).to.have.length(0);
@@ -165,10 +159,10 @@ describe('<SiteContainer/>', () => {
   });
 
   it('displays a page title if one is configured for the location', () => {
-    // TODO: fix this test, this path shouldn't need to be changed to render this
-    // potentially a router issue
-    props.path = '/sites/:id/settings';
-    const wrapper = mountRouter(<SiteContainer {...props} />, '/sites/1/settings', state);
+    // we artificially change the path to a child route to simulate nesting
+    const settingsPath = '/sites/:id/settings';
+    const url = '/sites/1/settings';
+    const wrapper = mountRouter(<SiteContainer {...props} />, settingsPath, url, state);
     expect(wrapper.find('sitePagesHeader').prop('title')).to.equal('Site settings');
   });
 });

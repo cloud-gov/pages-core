@@ -27,7 +27,6 @@ const { SiteBuilds, REFRESH_INTERVAL } = proxyquire('../../../../frontend/compon
   '../../actions/buildActions': buildActions,
 });
 
-let props;
 let state;
 const defaultUser = {
   id: 1,
@@ -79,7 +78,7 @@ function columnIndex(wrapper, name) {
     }
   });
   return index;
-};
+}
 
 describe('<SiteBuilds/>', () => {
   beforeEach(() => {
@@ -87,11 +86,11 @@ describe('<SiteBuilds/>', () => {
   });
 
   afterEach(() => {
-    fetchBuildMock.resetHistory()
+    fetchBuildMock.resetHistory();
   });
 
   it("should render the username for a build's user", () => {
-    const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
     const userIndex = columnIndex(wrapper, 'User');
 
     const userCell = wrapper.find('tr').at(1).find('td').at(userIndex - 1);
@@ -100,7 +99,7 @@ describe('<SiteBuilds/>', () => {
 
   it('should render an empty string for the username for builds where there is no user', () => {
     state.builds.data[0].username = undefined;
-    const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
 
     const userCell = wrapper.find('td[data-title="User"]');
     expect(userCell.text()).to.equal('');
@@ -113,47 +112,47 @@ describe('<SiteBuilds/>', () => {
 
     const { owner, repository } = siteBuild.site;
 
-    const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
 
     expect(wrapper.find({ owner, repository, branch: siteBuild.branch })).to.have.length(1);
   });
 
   it('should render a `GitHubLink` component if commit SHA present', () => {
-    const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
     expect(wrapper.find({ className: 'github-link' })).to.have.length(1);
   });
 
   it('should render a `BranchViewLink` component if state is successful', () => {
-    const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
     expect(wrapper.find({ className: 'branch-view-link' })).to.have.length(1);
   });
 
   it('should not render a `BranchViewLink` component if state is not successful', () => {
     state.builds.data[0].state = 'error';
-    const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
     expect(wrapper.find({ className: 'branch-view-link' })).to.have.length(0);
   });
 
   it('should not render a `BranchViewLink` component if state is queued', () => {
     state.builds.data[0].state = 'queued';
-    const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
     expect(wrapper.find({ className: 'branch-view-link' })).to.have.length(0);
   });
 
   it('should not error if state is unkown/unexpected', () => {
     state.builds.data[0].state = 'unexpected';
-    const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
     expect(wrapper.find({ className: 'branch-view-link' })).to.have.length(0);
   });
 
   it('should render a button to refresh builds', () => {
-    const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
     expect(wrapper.find('RefreshBuildsButton')).to.have.length(1);
   });
 
   it('should render an empty state if no builds are present', () => {
     state.builds = { isLoading: false, data: [] };
-    const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
 
     expect(wrapper.find('table')).to.have.length(0);
     expect(wrapper.find('AlertBanner').prop('header')).to.equal('This site does not yet have any builds.');
@@ -168,7 +167,7 @@ describe('<SiteBuilds/>', () => {
       .fill(1)
       .map((val, index) => ({ ...defaultBuild, id: index }));
 
-    const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
     expect(wrapper.find('table + p')).to.have.length(1);
     expect(wrapper.find('table + p').contains('List only displays 100 most recent builds.')).to.be.true;
   });
@@ -176,14 +175,14 @@ describe('<SiteBuilds/>', () => {
   it('should render a loading state if the builds are loading', () => {
     state.builds = { isLoading: true };
 
-    const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
 
     expect(wrapper.find('table')).to.have.length(0);
     expect(wrapper.find(LoadingIndicator)).to.have.length(1);
   });
 
   it('should fetch the builds on mount', () => {
-    mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
     expect(fetchBuildMock.calledOnce).to.equal(true);
   });
 
@@ -202,12 +201,12 @@ describe('<SiteBuilds/>', () => {
     });
 
     it('should default to auto refresh: OFF', () => {
-      const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+      const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
       expect(wrapper.find(AUTO_REFRESH_SELECTOR).text()).to.equal('Auto Refresh: OFF');
     });
 
     it('should toggle auto refresh when the `auto refresh` button is clicked', () => {
-      const wrapper = mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+      const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
 
       wrapper.find(AUTO_REFRESH_SELECTOR).simulate('click');
       expect(wrapper.find(AUTO_REFRESH_SELECTOR).text()).to.equal('Auto Refresh: ON');
@@ -218,13 +217,13 @@ describe('<SiteBuilds/>', () => {
 
     // TODO: rewrite with react-testing-library to more easily access useState values programtically
     // it('should refresh builds according to the refresh interval when `auto refresh` is on', () => {
-    //   mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+    //   mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
     //   clock.tick(REFRESH_INTERVAL + 1000);
     //   expect(fetchBuildMock.callCount).to.equal(2);
     // });
 
     it('should NOT refresh builds when `auto refresh` is turned off', () => {
-      mountRouter(<SiteBuilds id="5" path="/builds" />, '/builds', state);
+      mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
       clock.tick(REFRESH_INTERVAL + 1000);
       expect(fetchBuildMock.callCount).to.equal(1);
     });

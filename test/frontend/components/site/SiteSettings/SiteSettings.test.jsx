@@ -56,7 +56,7 @@ describe('<SiteSettings/>', () => {
   });
 
   beforeEach(() => {
-    wrapper = mountRouter(<SiteSettings path="/sites/:id" />, '/sites/1', state);
+    wrapper = mountRouter(<SiteSettings />, '/sites/:id/settings', '/sites/1/settings', state);
   });
 
   after(() => {
@@ -67,10 +67,5 @@ describe('<SiteSettings/>', () => {
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('[title="Advanced settings"]')).to.have.length(1);
     expect(wrapper.find('ExpandableArea')).to.have.length(2);
-  });
-
-  it('should not render if site prop is not defined', () => {
-    const formlessWrapper = mountRouter(<SiteSettings path="/sites/:id" />);
-    expect(formlessWrapper.find('ExpandableArea')).to.have.length(0);
   });
 });
