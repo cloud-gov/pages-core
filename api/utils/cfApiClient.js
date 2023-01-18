@@ -18,7 +18,7 @@ function findEntity(res, name, field) {
 
 function findS3ServicePlan(res, name, s3ServicePlanId) {
   const filtered = filterEntity(res, name);
-
+  // TODO: remove dependency on s3ServicePlanId and remove this block
   if (name === 'basic-public') {
     const servicePlan = filtered.find(f => f.entity.unique_id === s3ServicePlanId);
     if (!servicePlan) {
@@ -180,7 +180,7 @@ class CloudFoundryAPIClient {
     ));
   }
 
-  createSiteBucket(name, spaceGuid, s3ServicePlanId, keyIdentifier = 'key', serviceName = 'basic-public') {
+  createSiteBucket(name, spaceGuid, s3ServicePlanId, keyIdentifier = 'key', serviceName = 'basic-vpc') {
     return this.createS3ServiceInstance(name, serviceName, spaceGuid, s3ServicePlanId)
       .then(res => this.createServiceKey(name, res.metadata.guid, keyIdentifier));
   }

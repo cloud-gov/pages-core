@@ -1,6 +1,7 @@
 const { Strategy } = require('passport-oauth2');
 const UAAClient = require('../utils/uaaClient');
-const { UAAIdentity, User } = require('../models');
+const { Event, UAAIdentity, User } = require('../models');
+const EventCreator = require('./EventCreator');
 
 function createUAAStrategy(options, verify) {
   const {
@@ -44,12 +45,27 @@ async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
   const isVerified = await client.verifyUserGroup(uaaId, uaaGroups);
 
   if (!isVerified) {
+    EventCreator.audit(Event.labels.AUTHENTICATION, null, 'UAA profile cannot be verified,', {
+      profile,
+    });
+
     return null;
   }
 
   const identity = await UAAIdentity.findOne({ where: { email }, include: User });
 
   if (!identity) {
+    EventCreator.audit(Event.labels.AUTHENTICATION, null, 'UAA Identity cannot be found with email.', {
+      profile,
+    });
+    return null;
+  }
+
+  if (!identity.User) {
+    EventCreator.audit(Event.labels.AUTHENTICATION, null, 'User cannot be associated to UAA Identity', {
+      profile,
+      identity,
+    });
     return null;
   }
 

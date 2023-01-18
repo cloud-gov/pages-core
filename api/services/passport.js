@@ -119,8 +119,13 @@ async function verifyGithub2(accessToken, _refreshToken, profile, callback) {
       githubUserId: profile.id,
     };
 
+    EventCreator.audit(Event.labels.AUTHENTICATION_PAGES_GH_TOKEN, null, 'User authenticated', {
+      user,
+    });
+
     return callback(null, user);
   } catch (err) {
+    EventCreator.error(Event.labels.AUTHENTICATION_PAGES_GH_TOKEN, err);
     logger.warn('Github authentication error: ', err);
     return callback(err);
   }
@@ -160,6 +165,7 @@ if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA)) {
 
       return callback(null, user);
     } catch (err) {
+      EventCreator.error(Event.labels.AUTHENTICATION, err, { profile });
       return callback(err);
     }
   };

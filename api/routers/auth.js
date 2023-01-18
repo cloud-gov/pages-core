@@ -44,7 +44,7 @@ const onGithubSuccess = async (req, res) => {
     signedInAt: new Date(),
   });
 
-  EventCreator.audit(Event.labels.AUTHENTICATION, user, 'GitHub authentication');
+  EventCreator.audit(Event.labels.AUTHENTICATION_PAGES_GH_TOKEN, user, 'GitHub authentication for token');
 
   const script = `
     <script nonce="${res.locals.cspNonce}">

@@ -26,9 +26,15 @@ function SiteBuildLogTable({ buildLogs, buildState }) {
     >
       {buildLogs.map((source, index) => {
         const key = `build-log-span-${index}`;
+        let style = null;
+        if (source.includes('[main]')) {
+          style = { fontWeight: 'bold' };
+        } else if (source.includes('[monitor]')) {
+          style = { opacity: 0.7 };
+        }
 
         return (
-          <p key={key}>{source}</p>
+          <p style={style} key={key}>{source}</p>
         );
       })}
       <p className="build-log-cursor" />
