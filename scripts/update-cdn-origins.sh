@@ -1,5 +1,15 @@
 #! /bin/bash
 
+set -e
+
+# Expected input file is a comma-seperated-value export of the serviceName and
+# origin columns for provisioned domains in the domains table in the core DB.
+#
+# The expected format can be produced from the psql command line as follows:
+#
+# \copy (select "serviceName",origin from domain where state='provisioned') to '/output/path/for/domains.csv' CSV HEADER;
+
+
 display_usage() {
   echo -e "\nUsage: $0 input.csv\n"
 }
@@ -17,12 +27,13 @@ then
 fi
 
 DOMAINS_FILE=$1
-# Expected input file is a comma-seperated-value export of the serviceName and
-# origin columns for provisioned domains in the domains table in the core DB.
+
+# I suspect wait_for_service_instance() may require the following and don't want to
+# lose the thought, but will check before introducing this precondition on execution
 #
-# The expected format can be produced from the psql command line as follows:
-#
-# \copy (select "serviceName",origin from domain where state='provisioned') to '/output/path/for/domains.csv' CSV HEADER;
+# CF Auth
+# cf api "${CF_API_URL}"
+# (set +x; cf auth "${CF_USERNAME}" "${CF_PASSWORD}")
 
 # Waiting for service instance to finish being processed.
 wait_for_service_instance() {
