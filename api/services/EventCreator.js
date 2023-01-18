@@ -20,8 +20,8 @@ const createEvent = obj => Event
 const audit = (label, model, message, body = {}) => createEvent({
   type: Event.types.AUDIT,
   label,
-  model: model.constructor.name,
-  modelId: model.id,
+  model: model?.constructor?.name || null,
+  modelId: model?.id || null,
   body: {
     message,
     ...body,
