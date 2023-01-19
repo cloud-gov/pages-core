@@ -20,6 +20,10 @@ then
   exit 0
 fi
 
+# Decision made to run this from a different environment. Hence:
+# TODO: Eliminate input file and instead query DB from within the script
+# TODO: Eliminate SQL output and instead update DB from within primary loop
+
 # Expected input file is a comma-seperated-value export of the serviceName and
 # origin columns for provisioned domains in the domains table in the core DB.
 #
@@ -80,7 +84,6 @@ do
     bucket=${BASH_REMATCH[1]}
     new_origin="$bucket.sites.pages.cloud.gov"
 
-    # QUESTION: service name vs service instance — does the arg below need to be a guid?
     # For the moment, outputting instead of executing this command...
     echo "cf update-service $service_instance -c '{\"origin\": \"$new_origin\"}'"
 
