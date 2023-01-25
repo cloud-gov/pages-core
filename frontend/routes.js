@@ -53,8 +53,6 @@ export default (
       <Route path="users" element={<SiteUsers />} />
     </Route>
     <Route path="settings" element={<UserSettings />} />
-    {/* <Redirect noThrow from="*" to="/not-found" /> */}
     <Route path="*" element={<NotFound />} />
-    {/* <Redirect noThrow from="*" to="/sites" /> */}
   </Route>
 );
