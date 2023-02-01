@@ -17,6 +17,16 @@
               <p class="usa-alert-text">If this is your first time logging in to {{ appName }}, please use Github authentication. You will be prompted to migrate to a cloud.gov account. Starting in the next few weeks, only cloud.gov authentication will be supported.</p>
             </div>
           </div>
+          {% else %}
+          <div class="usa-alert usa-alert-warning">
+            <div class="usa-alert-body">
+              <p>
+                {{ appName }} is now officially
+                <a href="https://pages.cloud.gov">cloud.gov Pages!</a>
+                Head there to login and migrate your user account or check out more about the transition <a href="https://cloud.gov/pages/federalist-migration/">here</a>.
+              </p>
+            </div>
+          </div>
           {% endif %}
           {% if authGithub %}
             <div class="well-gray-lightest text-center">
