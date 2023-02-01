@@ -11,7 +11,7 @@ module.exports = {
   output: {
     filename: 'js/bundle.[contenthash].js',
     path: path.resolve(__dirname, 'public'),
-    assetModuleFilename: '/styles/webpackAssets/[contenthash].[ext]',
+    assetModuleFilename: 'images/[contenthash].[ext]',
   },
   resolve: {
     extensions: ['.js', '.jsx'],
