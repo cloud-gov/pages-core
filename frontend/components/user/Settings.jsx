@@ -37,7 +37,7 @@ const onGithubAuthFailure = (_error) => {
 function Settings({
   actions, organizations, sites, user,
 }) {
-  if (sites?.isLoading || organizations?.isLoading || !sites || !organizations) {
+  if (sites?.isLoading || organizations?.isLoading || !sites || !sites.data || !organizations) {
     return <LoadingIndicator />;
   }
 
