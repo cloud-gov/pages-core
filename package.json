@@ -176,7 +176,7 @@
     "webpack-cli": "^4.7.0",
     "webpack-dev-middleware": "^4.0.2",
     "webpack-dev-server": "^4.9.1",
-    "webpack-manifest-plugin": "^3.0.0"
+    "webpack-manifest-plugin": "^5.0.0"
   },
   "engines": {
     "node": "^18.x.x",
