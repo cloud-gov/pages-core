@@ -40,7 +40,7 @@ const fetchInitialData = () => {
 export default (
   <Route path="/" element={<App onEnter={fetchInitialData} />} errorElement={ErrorElement}>
     {isPages && <Route path="organizations" element={<Organization.List />} />}
-    {isPages && <Route path="organizations" element={<Organization.Edit />} />}
+    {isPages && <Route path="organizations/:id" element={<Organization.Edit />} />}
     <Route path="sites" element={<SiteList />} />
     {isPages && <Route path="sites/new" element={<AddSite />} /> }
     <Route path="sites/:id" element={<SiteContainer />}>
