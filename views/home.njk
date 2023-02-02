@@ -11,31 +11,40 @@
         </div>
         <div class="usa-width-one-half">
           <p>This is a U.S. government service. Your use indicates your consent to monitoring, recording, and no expectation of privacy. Misuse is subject to criminal and civil penalties. <a href="/system-use">Read more details.</a><br></p>
-          {% if appName === 'Pages' %}
+          {% if appName !== 'Pages' %}
           <div class="usa-alert usa-alert-warning">
             <div class="usa-alert-body">
-              <p class="usa-alert-text">If this is your first time logging in to {{ appName }}, please use Github authentication. You will be prompted to migrate to a cloud.gov account. Starting in the next few weeks, only cloud.gov authentication will be supported.</p>
+              <p>
+                {{ appName }} is now officially
+                <a href="https://pages.cloud.gov">cloud.gov Pages!</a>
+                Head there to login and migrate your user account or check out more about the transition <a href="https://cloud.gov/pages/federalist-migration/">here</a>.
+              </p>
             </div>
           </div>
           {% endif %}
-          {% if authGithub %}
-            <div class="well-gray-lightest text-center">
-              <a href="/login/github">
-                <button class="usa-button">
-                  <img src="/images/github-logo.png" alt="github logo"> Agree and continue with GitHub
-                </button>
-              </a>
-            </div>
-          {% endif%}
           {% if authUAA %}
+          <div class="well-gray-lightest text-center">
+            <a href="/login">
+              <button class="usa-button">
+                Login with cloud.gov
+              </button>
+            </a>
+          </div>
             &nbsp;
-            <div class="text-center"> 
-              <p>If you have previously migrated to {{ appName }}</p>
-              <a href="/login">
-                  Continue with cloud.gov authentication
-              </a>
-            </div>
           {% endif %}
+          {% if authGithub %}
+            <div class="usa-alert usa-alert-warning">
+              <div class="usa-alert-body">
+                <p class="usa-alert-text">If this is your first time logging in to {{ appName }}, please use Github authentication. You will be prompted to migrate to a cloud.gov account.</p>
+              </div>
+              <div class="text-center"> 
+                <a href="/login/github">
+                  Agree and continue with GitHub
+                </a>
+              </div>
+            </div>    
+          {% endif%}
+
           <p></p>
           {% if authUAA %}
             <p>If your office uses {{ appName }}, and you have any questions, please reach out to us at {{ supportEmail }}.</p>
