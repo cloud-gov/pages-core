@@ -25,7 +25,7 @@ describe("publishedBranchesReducer", () => {
       type: "the wrong type",
     })
 
-    expect(actual).to.deep.equal({ isLoading: false })
+    expect(actual).to.deep.equal({ isLoading: false, data: [] })
   })
 
   it("marks the state as loading when a fetch starts", () => {

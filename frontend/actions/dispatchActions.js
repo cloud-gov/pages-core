@@ -16,16 +16,6 @@ import {
   hideAddNewSiteFields as createHideAddNewSiteFieldsAction,
 } from './actionCreators/addNewSiteFieldsActions';
 
-import { pushHistory } from './routeActions';
-
-const updateRouterToSitesUri = () => {
-  pushHistory('/sites');
-};
-
-const updateRouterToSiteBuildsUri = (site) => {
-  pushHistory(`/sites/${site.id}/builds`);
-};
-
 const dispatchSitesFetchStartedAction = () => {
   dispatch(createSitesFetchStartedAction());
 };
@@ -69,8 +59,6 @@ const dispatchSiteBasicAuthSavedAction = site => dispatch(createSiteBasicAuthSav
 const dispatchResetFormAction = formName => dispatch(reset(formName));
 
 export {
-  updateRouterToSitesUri,
-  updateRouterToSiteBuildsUri,
   dispatchSitesFetchStartedAction,
   dispatchSitesReceivedAction,
   dispatchSiteAddedAction,

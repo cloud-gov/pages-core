@@ -1,31 +1,55 @@
 import React from 'react';
 import { expect } from 'chai';
-import { shallow } from 'enzyme';
 import { stub } from 'sinon';
 import proxyquire from 'proxyquire';
+import lodashClonedeep from 'lodash.clonedeep';
 
 import siteActions from '../../../../frontend/actions/siteActions';
+import { mountRouter } from '../../support/_mount';
 
 proxyquire.noCallThru();
 
-const { SiteUsers } = proxyquire('../../../../frontend/components/site/SiteUsers', {
-  '../icons': { IconGitHub: 'IconGitHub' },
+const userActions = {
+  fetchUserActions: stub(),
+};
+
+const { UserActionsTable } = proxyquire('../../../../frontend/components/site/UserActionsTable', {
+  '../../actions/userActions': userActions,
 });
 
+const { SiteUsers } = proxyquire('../../../../frontend/components/site/SiteUsers', {
+  '../icons': { IconGitHub: 'div' },
+  './UserActionsTable': UserActionsTable,
+});
+
+let state;
 const user = {
-  username: 'not-owner',
-  id: 4,
-  email: 'not-owner@beep.gov',
+  isLoading: false,
+  data: {
+    username: 'not-owner',
+    id: 4,
+    email: 'not-owner@beep.gov',
+  },
 };
-const props = {
+const defaultState = {
   user,
-  site: {
-    owner: 'test-owner',
-    repository: 'test-repo',
-    users: [
-      { id: 1, email: 'not-owner@beep.gov', username: 'not-owner' },
-      { id: 2, email: 'owner@beep.gov', username: 'test-owner' },
+  sites: {
+    isLoading: false,
+    data: [
+      {
+        id: 1,
+        owner: 'test-owner',
+        repository: 'test-repo',
+        users: [
+          { id: 1, email: 'not-owner@beep.gov', username: 'not-owner' },
+          { id: 2, email: 'owner@beep.gov', username: 'test-owner' },
+        ],
+      },
     ],
+  },
+  userActions: {
+    data: [],
+    isLoading: false,
   },
 };
 
@@ -34,7 +58,8 @@ describe('<SiteUsers/>', () => {
     let wrapper;
 
     beforeEach(() => {
-      wrapper = shallow(<SiteUsers {...props} />);
+      state = lodashClonedeep(defaultState);
+      wrapper = mountRouter(<SiteUsers />, '/site/:id/users', '/site/1/users', state);
     });
 
     it('should render', () => {
@@ -42,14 +67,12 @@ describe('<SiteUsers/>', () => {
     });
 
     it('renders rows of users in order of username', () => {
-      const { users } = props.site;
-
       expect(wrapper.find('table')).to.have.length(1);
 
       const rows = wrapper.find('tbody tr');
-      expect(rows).to.have.length(users.length);
+      expect(rows).to.have.length(defaultState.sites.data[0].users.length);
 
-      const expectedOrder = users.map(u => u.username);
+      const expectedOrder = defaultState.sites.data[0].users.map(u => u.username);
       rows.forEach((row, i) => {
         expect(row.find('a').prop('href')).to.equal(
           `https://github.com/${expectedOrder[i]}`
@@ -78,8 +101,7 @@ describe('<SiteUsers/>', () => {
     it('should call `removeUserFromSite` when `Remove user` is clicked', () => {
       const clickSpy = stub(siteActions, 'removeUserFromSite').returns(Promise.resolve());
       const rows = wrapper.find('tbody tr');
-      const removeUserLink = rows.at(0).find('td').last().find('ButtonLink')
-        .shallow();
+      const removeUserLink = rows.at(0).find('td').last().find('ButtonLink');
 
       expect(removeUserLink.exists()).to.be.true;
       expect(removeUserLink.contains('Remove user')).to.be.true;

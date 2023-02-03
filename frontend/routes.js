@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect } from '@reach/router';
+import { Route, redirect } from 'react-router-dom';
 
 import App from './components/app';
 import * as Organization from './components/organization';
@@ -14,6 +14,7 @@ import SitePublishedFilesTable from './components/site/SitePublishedFilesTable';
 import SiteSettings from './components/site/SiteSettings';
 import AddSite from './components/AddSite';
 import NotFound from './components/NotFound';
+import Error from './components/Error';
 
 import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
@@ -23,6 +24,13 @@ import globals from './globals';
 
 const isPages = globals.PRODUCT === 'pages';
 
+const { NODE_ENV } = process.env;
+
+let ErrorElement = null;
+if (NODE_ENV !== 'development') {
+  ErrorElement = <Error />;
+}
+
 const fetchInitialData = () => {
   userActions.fetchUser();
   siteActions.fetchSites();
@@ -30,23 +38,21 @@ const fetchInitialData = () => {
 };
 
 export default (
-  <App path="/" onEnter={fetchInitialData}>
-    {isPages && <Organization.List path="organizations" />}
-    {isPages && <Organization.Edit path="organizations/:id" />}
-    <SiteList path="sites" />
-    {isPages && <AddSite path="sites/new" /> }
-    <SiteContainer path="sites/:id">
-      <Redirect noThrow from="/" to="builds" />
-      <SiteSettings path="settings" />
-      <SitePublishedBranchesTable path="published" />
-      <SitePublishedFilesTable path="published/:name" />
-      <SiteBuilds path="builds" />
-      <SiteBuildLogs path="builds/:buildId/logs" />
-      <SiteUsers path="users" />
-    </SiteContainer>
-    <UserSettings path="settings" />
-    <Redirect noThrow from="*" to="/not-found" />
-    <NotFound path="/not-found" default />
-    <Redirect noThrow from="*" to="/sites" />
-  </App>
+  <Route path="/" element={<App onEnter={fetchInitialData} />} errorElement={ErrorElement}>
+    {isPages && <Route path="organizations" element={<Organization.List />} />}
+    {isPages && <Route path="organizations/:id" element={<Organization.Edit />} />}
+    <Route path="sites" element={<SiteList />} />
+    {isPages && <Route path="sites/new" element={<AddSite />} /> }
+    <Route path="sites/:id" element={<SiteContainer />}>
+      <Route path="" loader={() => redirect('builds')} />
+      <Route path="settings" element={<SiteSettings />} />
+      <Route path="published" element={<SitePublishedBranchesTable />} />
+      <Route path="published/:name" element={<SitePublishedFilesTable />} />
+      <Route path="builds" element={<SiteBuilds />} />
+      <Route path="builds/:buildId/logs" element={<SiteBuildLogs />} />
+      <Route path="users" element={<SiteUsers />} />
+    </Route>
+    <Route path="settings" element={<UserSettings />} />
+    <Route path="*" element={<NotFound />} />
+  </Route>
 );

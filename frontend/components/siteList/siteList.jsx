@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from '@reach/router';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import {
@@ -79,7 +79,7 @@ export const SiteList = ({
 
   let topButton = '';
   if (isPages) {
-    if (user.hasGithubAuth) {
+    if (user.hasGithubAuth && hasOrgs(organizations)) {
       topButton = (
         <Link
           to="/sites/new"

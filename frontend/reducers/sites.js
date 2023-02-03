@@ -17,7 +17,7 @@ import {
 
 const initialState = {
   isLoading: false,
-  data: [],
+  data: undefined,
 };
 
 const mapPropertyToMatchingSite = (data, siteId, properties) => data.map((site) => {

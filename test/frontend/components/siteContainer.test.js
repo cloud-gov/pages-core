@@ -1,10 +1,22 @@
 import React from 'react';
-import { shallow } from 'enzyme';
 import { expect } from 'chai';
+import proxyquire from 'proxyquire';
+import lodashClonedeep from 'lodash.clonedeep';
 
-import { SiteContainer } from '../../../frontend/components/siteContainer';
+import { mountRouter } from '../support/_mount';
+
+proxyquire.noCallThru();
+
+const { SiteContainer } = proxyquire(
+  '../../../frontend/components/siteContainer',
+  {
+    './site/SideNav': () => <div />,
+    './site/PagesHeader': () => <div />,
+  }
+);
 
 let props;
+let state;
 const site = {
   id: 1,
   defaultBranch: 'main',
@@ -22,57 +34,56 @@ const organization = {
   name: 'Test Organization',
 };
 
+const defaultState = {
+  user: {
+    isLoading: false,
+    data: {
+      id: 1,
+      username: 'aUser',
+      email: 'aUser@example.gov',
+    },
+  },
+  sites: {
+    isLoading: false,
+    data: [site],
+  },
+  organizations: {
+    isLoading: false,
+    data: [organization],
+  },
+};
+
+const defaultProps = {
+  alert: {},
+};
+
+const defaultURL = '/sites/1?branch=branch&fileName=boop.txt';
+const path = '/sites/:id';
+
 describe('<SiteContainer/>', () => {
   beforeEach(() => {
-    props = {
-      alert: {},
-      user: {
-        isLoading: false,
-        data: {
-          id: 1,
-          username: 'aUser',
-          email: 'aUser@example.gov',
-        },
-      },
-      sites: {
-        isLoading: false,
-        data: [site],
-      },
-      organizations: {
-        isLoading: false,
-        data: [organization],
-      },
-      location: {
-        pathname: '',
-      },
-      id: '1',
-      params: {
-        branch: 'branch',
-        fileName: 'boop.txt',
-      },
-    };
+    state = lodashClonedeep(defaultState);
+    props = lodashClonedeep(defaultProps);
   });
 
   it('renders a LoadingIndicator while sites are loading', () => {
-    props.sites = {
-      isLoading: true,
-    };
-    const wrapper = shallow(<SiteContainer {...props} />);
+    state.sites.isLoading = true;
+    const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
     expect(wrapper.find('LoadingIndicator')).to.have.length(1);
   });
 
   it('renders after sites have loaded', () => {
-    const wrapper = shallow(<SiteContainer {...props} />);
-
+    state.sites.isLoading = false;
+    const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
-    expect(wrapper.find('SideNav')).to.have.length(1);
+    expect(wrapper.find('siteSideNav')).to.have.length(1);
     expect(wrapper.find('AlertBanner')).to.have.length(1);
-    expect(wrapper.find('PagesHeader')).to.have.length(1);
+    expect(wrapper.find('sitePagesHeader')).to.have.length(1);
   });
 
   it('renders an error after sites have loaded but no matching site', () => {
-    const noSiteProps = { ...props, id: '2' };
-    const wrapper = shallow(<SiteContainer {...noSiteProps} />);
+    const url = '/sites/2';
+    const wrapper = mountRouter(<SiteContainer {...props} />, path, url, state);
     const alert = wrapper.find('AlertBanner');
 
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
@@ -81,10 +92,9 @@ describe('<SiteContainer/>', () => {
   });
 
   it('renders an error after sites if site org is inactive', () => {
-    const inactiveOrgProps = { ...props };
-    inactiveOrgProps.organizations.data[0].isActive = false;
+    state.organizations.data[0].isActive = false;
 
-    const wrapper = shallow(<SiteContainer {...inactiveOrgProps} />);
+    const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
     const alert = wrapper.find('AlertBanner');
 
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
@@ -93,35 +103,29 @@ describe('<SiteContainer/>', () => {
   });
 
   it('renders after sites have loaded but no matching org', () => {
-    const noOrgProps = { ...props };
-    noOrgProps.sites.data[0].organizationId = 2;
+    state.sites.data[0].organizationId = 2;
 
-    const wrapper = shallow(<SiteContainer {...noOrgProps} />);
-
+    const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
-    expect(wrapper.find('SideNav')).to.have.length(1);
+    expect(wrapper.find('siteSideNav')).to.have.length(1);
     expect(wrapper.find('AlertBanner')).to.have.length(1);
-    expect(wrapper.find('PagesHeader')).to.have.length(1);
+    expect(wrapper.find('sitePagesHeader')).to.have.length(1);
   });
 
   it('renders after sites have loaded and site has no org', () => {
-    const noOrgProps = { ...props };
-    noOrgProps.sites.data[0].organizationId = null;
+    state.sites.data[0].organizationId = null;
 
-    const wrapper = shallow(<SiteContainer {...noOrgProps} />);
-
+    const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
     expect(wrapper.find('LoadingIndicator')).to.have.length(0);
-    expect(wrapper.find('SideNav')).to.have.length(1);
+    expect(wrapper.find('siteSideNav')).to.have.length(1);
     expect(wrapper.find('AlertBanner')).to.have.length(1);
-    expect(wrapper.find('PagesHeader')).to.have.length(1);
+    expect(wrapper.find('sitePagesHeader')).to.have.length(1);
   });
 
   context('site is (in)active', () => {
     it('renders an error after sites if site inactive', () => {
-      const inactiveSiteProps = { ...props };
-      inactiveSiteProps.sites.data[0].isActive = false;
-
-      const wrapper = shallow(<SiteContainer {...inactiveSiteProps} />);
+      state.sites.data[0].isActive = false;
+      const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
       const alert = wrapper.find('AlertBanner');
 
       expect(wrapper.find('LoadingIndicator')).to.have.length(0);
@@ -130,11 +134,10 @@ describe('<SiteContainer/>', () => {
     });
 
     it('renders after sites have loaded but no matching org', () => {
-      const inactiveSiteProps = { ...props };
-      inactiveSiteProps.sites.data[0].organizationId = 2;
-      inactiveSiteProps.sites.data[0].isActive = false;
+      state.sites.data[0].isActive = false;
+      state.sites.data[0].organizationId = 2;
 
-      const wrapper = shallow(<SiteContainer {...inactiveSiteProps} />);
+      const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
       const alert = wrapper.find('AlertBanner');
 
       expect(wrapper.find('LoadingIndicator')).to.have.length(0);
@@ -143,11 +146,10 @@ describe('<SiteContainer/>', () => {
     });
 
     it('renders after sites have loaded and site has no org', () => {
-      const inactiveSiteProps = { ...props };
-      inactiveSiteProps.sites.data[0].organizationId = null;
-      inactiveSiteProps.sites.data[0].isActive = false;
+      state.sites.data[0].isActive = false;
+      state.sites.data[0].organizationId = null;
 
-      const wrapper = shallow(<SiteContainer {...inactiveSiteProps} />);
+      const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
       const alert = wrapper.find('AlertBanner');
 
       expect(wrapper.find('LoadingIndicator')).to.have.length(0);
@@ -157,8 +159,10 @@ describe('<SiteContainer/>', () => {
   });
 
   it('displays a page title if one is configured for the location', () => {
-    props.location.pathname = 'settings';
-    const wrapper = shallow(<SiteContainer {...props} />);
-    expect(wrapper.find('PagesHeader').prop('title')).to.equal('Site settings');
+    // we artificially change the path to a child route to simulate nesting
+    const settingsPath = '/sites/:id/settings';
+    const url = '/sites/1/settings';
+    const wrapper = mountRouter(<SiteContainer {...props} />, settingsPath, url, state);
+    expect(wrapper.find('sitePagesHeader').prop('title')).to.equal('Site settings');
   });
 });

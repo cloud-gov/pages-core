@@ -8,7 +8,6 @@ import {
 } from './actionCreators/buildActions';
 
 import alertActions from './alertActions';
-import { updateRouterToSiteBuildsUri } from './dispatchActions';
 
 const dispatchBuildsFetchStartedAction = () => {
   dispatch(createBuildsFetchStartedAction());
@@ -37,15 +36,6 @@ export default {
         } else {
           alertActions.alertSuccess('Build is already queued.');
         }
-      });
-  },
-
-  createBuild(sha, branch, siteId) {
-    return api.createBuild(sha, branch, siteId)
-      .then((build) => {
-        updateRouterToSiteBuildsUri(build.site);
-        alertActions.alertSuccess(`Build from branch "${branch}" created!`);
-        dispatchBuildRestartedAction(build);
       });
   },
 };
