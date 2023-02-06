@@ -4,7 +4,7 @@ be first loaded by "mocha --recursive ./test/frontend".
 */
 
 import { configure } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-16';
+import Adapter from '@cfaester/enzyme-adapter-react-18';
 import { JSDOM } from 'jsdom';
 
 global.Notification = require('./support/_mockNotification');
