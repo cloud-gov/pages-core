@@ -5,13 +5,17 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { getFeatureFlags } = require('./webpack-utils');
 
+const RESOURCE_GENERATOR = {
+  filename: 'images/[contenthash][ext]',
+  publicPath: '/',
+};
+
 module.exports = {
   mode: 'production',
   entry: './frontend/main.jsx',
   output: {
     filename: 'js/bundle.[contenthash].js',
     path: path.resolve(__dirname, 'public'),
-    assetModuleFilename: 'images/[contenthash].[ext]',
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -55,6 +59,7 @@ module.exports = {
       {
         test: /\.(gif|png|jpe?g|ttf|woff2?|eot)$/i,
         type: 'asset/resource',
+        generator: RESOURCE_GENERATOR,
       },
       {
         test: /\.svg$/i,
@@ -78,6 +83,7 @@ module.exports = {
           {
             // For all other .svg files, fallback to asset/resource
             type: 'asset/resource',
+            generator: RESOURCE_GENERATOR,
           },
         ],
       },
