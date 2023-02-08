@@ -1,4 +1,5 @@
 const { Strategy } = require('passport-oauth2');
+const { Sequelize } = require('sequelize');
 const UAAClient = require('../utils/uaaClient');
 const { Event, UAAIdentity, User } = require('../models');
 const EventCreator = require('./EventCreator');
@@ -37,9 +38,7 @@ function createUAAStrategy(options, verify) {
 }
 
 async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
-  const { user_id: uaaId, email: casedEmail } = profile;
-  // the UAA provided email maintains case but the database records do not
-  const email = casedEmail.toLowerCase();
+  const { user_id: uaaId, email } = profile;
 
   const client = new UAAClient();
   const isVerified = await client.verifyUserGroup(uaaId, uaaGroups);
@@ -52,7 +51,16 @@ async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
     return null;
   }
 
-  const identity = await UAAIdentity.findOne({ where: { email }, include: User });
+  const identity = await UAAIdentity.findOne(
+    {
+      where: {
+        email: {
+          [Sequelize.Op.iLike]: email,
+        },
+      },
+      include: User,
+    }
+  );
 
   if (!identity) {
     EventCreator.audit(Event.labels.AUTHENTICATION, null, 'UAA Identity cannot be found with email.', {
