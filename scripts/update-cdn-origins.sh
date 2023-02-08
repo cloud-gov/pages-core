@@ -2,17 +2,12 @@
 
 set -e
 
+# Process parameters
 display_usage() {
-  echo -e "\nUsage: $0 input.csv [max-rows] [offset]\n"
+  echo -e "\nUsage: $0 [max-rows] [offset]\n"
   echo -e "  max-rows: process at most this number of input rows (default: unlimited)\n"
   echo -e "  offset:   skip an initial set of input rows (default: 0)\n"
 }
-
-if [  $# -le 0 ]
-then
-  display_usage
-  exit 1
-fi
 
 if [[ ( $@ == "--help") ||  $@ == "-h" ]]
 then
@@ -20,20 +15,14 @@ then
   exit 0
 fi
 
-# Decision made to run this from a different environment. Hence:
-# TODO: Eliminate input file and instead query DB from within the script
-# TODO: Eliminate SQL output and instead update DB from within primary loop
-
 # Expected input file is a comma-seperated-value export of the serviceName and
 # origin columns for provisioned domains in the domains table in the core DB.
 #
 # The expected format can be produced from the psql command line as follows:
 #
-# \copy (select "serviceName",origin from domain where state='provisioned') to '/output/path/for/domains.csv' CSV HEADER;
+# \copy (select id,"serviceName",origin from domain where state='provisioned' and origin like '%app.cloud.gov') to '/output/path/for/domains.csv' CSV;
 domains_file=$1
-
-max_rows=${2:--1}
-
+max_domains=${2:--1}
 offset=${3:-0}
 
 if [[ ! -r $domains_file ]]
@@ -42,13 +31,17 @@ then
   exit 1
 fi
 
-# QUESTION: Should this type of script test for CF session and/or verify targeted org/space?
+# Check for required environment variables
+[ -z "${CF_API_URI}"  ] && { echo -e "\n Required CF_API_URI environment variable is not set\n";  exit 1; }
+[ -z "${CF_USERNAME}" ] && { echo -e "\n Required CF_USERNAME environment variable is not set\n"; exit 1; }
+[ -z "${CF_PASSWORD}" ] && { echo -e "\n Required CF_PASSWORD environment variable is not set\n"; exit 1; }
+[ -z "${CF_ORG}"      ] && { echo -e "\n Required CF_ORG environment variable is not set\n"; exit 1; }
+[ -z "${CF_SPACE}"    ] && { echo -e "\n Required CF_SPACE environment variable is not set\n"; exit 1; }
 
-# QUESTION: Does wait_for_service_instance() require the following?
-#
-# CF Auth
-# cf api "${CF_API_URL}"
-# (set +x; cf auth "${CF_USERNAME}" "${CF_PASSWORD}")
+# Authenticate and set Cloud Foundry target
+cf api "${CF_API_URI}"
+(set +x; cf auth "${CF_USERNAME}" "${CF_PASSWORD}")
+cf target -o "${CF_ORG}" -s "${CF_SPACE}"
 
 # Waiting for service instance to finish being processed.
 wait_for_service_instance() {
@@ -62,36 +55,43 @@ wait_for_service_instance() {
   done
 }
 
-rows_processed=0
+# Iterate through domains in input file
+domains_processed=0
 SQL=""
-while IFS="," read -r service_instance current_origin
+while IFS="," read -r id service_instance current_origin
 do
   if [[ $offset -gt 0 ]]
   then
+    echo "2.5: $offset"
     ((offset--))
+    echo "2.6: $offset"
     continue
   fi
 
-  ((rows_processed++))
+  ((domains_processed++))
 
-  if [[ ($max_rows -gt 0) && ($rows_processed -gt $max_rows)]]
+  if [[ ($max_domains -gt 0) && ($domains_processed -gt $max_domains)]]
   then
     break
   fi
 
+  # Make sure the domain origin is of the old form
   if [[ $current_origin =~ (.*)\.app\.cloud\.gov$ ]]
   then
     bucket=${BASH_REMATCH[1]}
     new_origin="$bucket.sites.pages.cloud.gov"
 
-    # For the moment, outputting instead of executing this command...
-    echo "cf update-service $service_instance -c '{\"origin\": \"$new_origin\"}'"
+    # Update the service
+    echo "Updating $service_instance origin"
+    cf update-service $service_instance -c '{"origin": "'$new_origin'"}'
 
-    # ... and since we're not executing that we're not yet going to
-    # wait_for_service_instance $SERVICE_INSTANCE"
+    # Wait for update-service process to complete"
+    echo "... waiting ..."
+    wait_for_service_instance $service_instance
+    echo "Service instance updated."
 
     # Here's the SQL we'll need to run to update the database once the origin is updated
-    SQL+="update domain set origin='$new_origin' where \"serviceName\"='$service_instance';"$'\n'
+    SQL+="update domain set origin='$new_origin' where id='$id';"$'\n'
   fi
 done < $domains_file
 
