@@ -4,7 +4,7 @@ set -e
 
 # Process parameters
 display_usage() {
-  echo -e "\nUsage: $0 [max-rows] [offset]\n"
+  echo -e "\nUsage: $0 input.csv [max-rows] [offset]\n"
   echo -e "  max-rows: process at most this number of input rows (default: unlimited)\n"
   echo -e "  offset:   skip an initial set of input rows (default: 0)\n"
 }
