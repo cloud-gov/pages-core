@@ -19,6 +19,7 @@ module.exports = {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/dist/',
+    assetModuleFilename: 'images/[contenthash].[ext]',
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -62,10 +63,7 @@ module.exports = {
       },
       {
         test: /\.(gif|png|jpe?g|ttf|woff2?|eot)$/i,
-        loader: 'file-loader',
-        options: {
-          name: 'images/[contenthash].[ext]',
-        },
+        type: 'asset/resource',
       },
       {
         test: /\.svg$/i,
@@ -87,11 +85,8 @@ module.exports = {
             ],
           },
           {
-            // For all other .svg files, fallback to the file-loader
-            loader: 'file-loader',
-            options: {
-              name: 'images/[contenthash].[ext]',
-            },
+            // For all other .svg files, fallback to asset/resource
+            type: 'asset/resource',
           },
         ],
       },

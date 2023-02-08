@@ -3,22 +3,15 @@ import PropTypes from 'prop-types';
 
 import buildActions from '../../actions/buildActions';
 
-class RefreshBuildsButton extends React.Component {
-  constructor(props) {
-    super(props);
-    this.refreshBuilds = this.refreshBuilds.bind(this);
-  }
-
-  refreshBuilds() {
-    const { site } = this.props;
+function RefreshBuildsButton(props) {
+  function refreshBuilds() {
+    const { site } = props;
     buildActions.fetchBuilds(site);
   }
 
-  render() {
-    return (
-      <button type="button" className="usa-button" onClick={this.refreshBuilds}>Refresh builds</button>
-    );
-  }
+  return (
+    <button type="button" className="usa-button" onClick={refreshBuilds}>Refresh builds</button>
+  );
 }
 
 RefreshBuildsButton.propTypes = {

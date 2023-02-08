@@ -19,8 +19,6 @@ describe('siteActions', () => {
   let httpErrorAlertAction;
   let alertSuccess;
   let alertError;
-  let updateRouterToSitesUri;
-  let updateRouterToSiteBuildsUri;
   let dispatchSitesFetchStartedAction;
   let dispatchSitesReceivedAction;
   let dispatchSiteAddedAction;
@@ -51,11 +49,11 @@ describe('siteActions', () => {
   };
 
   before(() => {
-    global.window = { scrollTo };
+    global.window.scrollTo = scrollTo;
   });
 
   after(() => {
-    global.window = undefined;
+    global.window.scrollTo = undefined;
   });
 
   beforeEach(() => {
@@ -72,8 +70,6 @@ describe('siteActions', () => {
     fetchBranches = stub();
     alertSuccess = stub();
     alertError = stub();
-    updateRouterToSitesUri = stub();
-    updateRouterToSiteBuildsUri = stub();
     dispatchSitesFetchStartedAction = stub();
     dispatchSitesReceivedAction = stub();
     dispatchSiteAddedAction = stub();
@@ -92,8 +88,6 @@ describe('siteActions', () => {
 
     fixture = proxyquire('../../../frontend/actions/siteActions', {
       './dispatchActions': {
-        updateRouterToSitesUri,
-        updateRouterToSiteBuildsUri,
         dispatchSitesFetchStartedAction,
         dispatchSitesReceivedAction,
         dispatchSiteAddedAction,
@@ -167,13 +161,12 @@ describe('siteActions', () => {
       hey: 'you',
     };
 
-    it('dispatches site added and update router actions to the store when successful', () => {
+    it('dispatches site added action to the store when successful', () => {
       addSite.withArgs(siteToAdd).resolves(site);
 
       const actual = fixture.addSite(siteToAdd);
 
       return actual.then(() => {
-        expect(updateRouterToSiteBuildsUri.calledOnce).to.be.true;
         expect(dispatchSiteAddedAction.calledWith(site)).to.be.true;
       });
     });
@@ -187,8 +180,6 @@ describe('siteActions', () => {
 
       return actual.then(() => {
         expect(dispatchSiteAddedAction.called).to.be.false;
-        expect(updateRouterToSiteBuildsUri.called).to.be.false;
-        expect(updateRouterToSitesUri.calledOnce).to.be.false;
       });
     });
 
@@ -198,7 +189,6 @@ describe('siteActions', () => {
       const actual = fixture.addSite(siteToAdd);
 
       return actual.catch(() => {
-        expect(updateRouterToSitesUri.called).to.be.false;
         expect(dispatchHideAddNewSiteFieldsAction.called).to.be.true;
         expect(dispatchResetFormAction.called).to.be.true;
         expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
@@ -239,7 +229,7 @@ describe('siteActions', () => {
   });
 
   describe('deleteSite', () => {
-    it('triggers the deletion of a site and dispatches a site deleted update router actions to the store when successful', () => {
+    it('triggers the deletion of a site and dispatches a site deleted action to the store when successful', () => {
       const siteToDelete = {
         completely: 'ignored',
       };
@@ -250,7 +240,6 @@ describe('siteActions', () => {
 
       return actual.then(() => {
         expect(dispatchSiteDeletedAction.calledWith(siteId)).to.be.true;
-        expect(updateRouterToSitesUri.calledOnce).to.be.true;
       });
     });
 
@@ -277,7 +266,6 @@ describe('siteActions', () => {
       const actual = fixture.addUserToSite(repoToAdd);
 
       return actual.then(() => {
-        expect(updateRouterToSitesUri.calledOnce).to.be.true;
         expect(dispatchUserAddedToSiteAction.calledWith(site)).to.be.true;
       });
     });
@@ -303,7 +291,6 @@ describe('siteActions', () => {
       const actual = fixture.addUserToSite(repoToAdd);
 
       return actual.then(() => {
-        expect(updateRouterToSitesUri.called).to.be.false;
         expect(dispatchHideAddNewSiteFieldsAction.called).to.be.true;
         expect(dispatchResetFormAction.called).to.be.true;
         expect(httpErrorAlertAction.calledWith(errorMessage)).to.be.true;
@@ -320,21 +307,19 @@ describe('siteActions', () => {
       return actual.then(() => {
         expect(fetchSites.called).to.be.true;
         expect(fetchUser.called).to.be.true;
-        expect(updateRouterToSitesUri.called).to.be.false;
         expect(alertSuccess.called).to.be.true;
         expect(alertSuccess.calledWith('Successfully removed.')).to.be.true;
         expect(dispatchUserRemovedFromSiteAction.called).to.be.true;
       });
     });
 
-    it('triggers a redirect to the sites page when a user removes themselves', () => {
+    it('triggers alertSuccess and dispatches user removed from site when a user removes themselves', () => {
       removeUserFromSite.withArgs(1, 1).resolves({});
       fetchSites.resolves();
       const actual = fixture.removeUserFromSite(1, 1, true);
       return actual.then(() => {
-        expect(fetchUser.called).to.be.false;
+        expect(fetchUser.called).to.be.true;
         expect(fetchSites.called).to.be.true;
-        expect(updateRouterToSitesUri.called).to.be.true;
         expect(alertSuccess.called).to.be.true;
         expect(alertSuccess.calledWith('Successfully removed.')).to.be.true;
         expect(dispatchUserRemovedFromSiteAction.called).to.be.true;

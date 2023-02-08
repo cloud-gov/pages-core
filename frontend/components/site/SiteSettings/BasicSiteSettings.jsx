@@ -131,7 +131,11 @@ BasicSiteSettings.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   reset: PropTypes.func.isRequired,
   pristine: PropTypes.bool.isRequired,
-  isSandbox: PropTypes.bool.isRequired,
+  isSandbox: PropTypes.bool,
+};
+
+BasicSiteSettings.defaultProps = {
+  isSandbox: false,
 };
 
 // create a higher-order component with reduxForm and export that

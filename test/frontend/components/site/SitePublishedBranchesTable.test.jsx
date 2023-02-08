@@ -1,8 +1,10 @@
 import React from 'react';
 import { expect } from 'chai';
-import { shallow } from 'enzyme';
 import { spy } from 'sinon';
 import proxyquire from 'proxyquire';
+import lodashClonedeep from 'lodash.clonedeep';
+
+import { mountRouter } from '../../support/_mount';
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
 proxyquire.noCallThru();
@@ -12,9 +14,10 @@ const publishedBranchesSpy = {
 };
 const { SitePublishedBranchesTable } = proxyquire('../../../../frontend/components/site/sitePublishedBranchesTable', {
   '../../actions/publishedBranchActions': publishedBranchesSpy,
+  '../branchViewLink': () => <div />,
 });
 
-const completeProps = {
+const defaultState = {
   publishedBranches: {
     isLoading: false,
     data: [
@@ -22,41 +25,42 @@ const completeProps = {
       { name: 'branch-b', viewLink: 'www.example.gov/branch-b', site: { id: 1 } },
     ],
   },
-  site: {
-    id: 1,
+  sites: {
+    data: [
+      {
+        id: 1,
+      },
+    ],
   },
 };
 
+let state;
+
 describe('<SitePublishedBranchesTable/>', () => {
+  beforeEach(() => {
+    state = lodashClonedeep(defaultState);
+    // props = lodashClonedeep(defaultProps)
+  });
+
   it('should render a table with branches from the state', () => {
-    const wrapper = shallow(<SitePublishedBranchesTable {...completeProps} />);
+    const wrapper = mountRouter(<SitePublishedBranchesTable />, '/sites/:id/published', '/sites/1/published', state);
     expect(wrapper.find('table')).to.have.length(1);
     expect(wrapper.find('table').contains('branch-a')).to.be.true;
     expect(wrapper.find('table').contains('branch-b')).to.be.true;
   });
 
   it('should render a loading state if branch data is loading', () => {
-    const props = {
-      publishedBranches: { isLoading: true },
-      site: {
-        id: 1,
-      },
-    };
+    state.publishedBranches.isLoading = true;
 
-    const wrapper = shallow(<SitePublishedBranchesTable {...props} />);
+    const wrapper = mountRouter(<SitePublishedBranchesTable />, '/sites/:id/published', '/sites/1/published', state);
     expect(wrapper.find('table')).to.have.length(0);
     expect(wrapper.find(LoadingIndicator)).to.have.length(1);
   });
 
   it('should render an empty state if there are no published branches', () => {
-    const props = {
-      publishedBranches: { isLoading: false, data: [] },
-      site: {
-        id: 1,
-      },
-    };
+    state.publishedBranches.data = [];
 
-    const wrapper = shallow(<SitePublishedBranchesTable {...props} />);
+    const wrapper = mountRouter(<SitePublishedBranchesTable />, '/sites/:id/published', '/sites/1/published', state);
     expect(wrapper.find('table')).to.have.length(0);
     expect(wrapper.find('AlertBanner').prop('header')).to.equal(
       'No branches have been published.'
@@ -67,12 +71,9 @@ describe('<SitePublishedBranchesTable/>', () => {
   });
 
   it('fetches published branches on mount', () => {
-    const wrapper = shallow(<SitePublishedBranchesTable {...completeProps} />);
+    const siteId = '1';
+    mountRouter(<SitePublishedBranchesTable path="/sites/:id/published" />, `/sites/${siteId}/published`, state);
     const { fetchPublishedBranches } = publishedBranchesSpy;
-    const expectedProps = { id: completeProps.site.id };
-
-    wrapper.instance().componentDidMount();
-
-    expect(fetchPublishedBranches.calledWith(expectedProps)).to.be.true;
+    expect(fetchPublishedBranches.calledWith({ id: siteId })).to.be.true;
   });
 });

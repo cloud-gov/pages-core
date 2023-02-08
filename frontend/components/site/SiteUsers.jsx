@@ -1,6 +1,6 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { SITE, USER } from '../../propTypes';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
 import { currentSite } from '../../selectors/site';
@@ -10,7 +10,12 @@ import { IconGitHub } from '../icons';
 
 const isSiteOwner = (user, siteOwner) => user.username.toLowerCase() === siteOwner.toLowerCase();
 
-const SiteUsers = ({ site, user }) => {
+const SiteUsers = () => {
+  const { id } = useParams();
+  const site = useSelector(state => currentSite(state.sites, id));
+  const user = useSelector(state => state.user.data);
+  const navigate = useNavigate();
+
   // sort users by lower-cased usernames
   const users = site.users.slice().sort((a, b) => {
     const aName = a.username.toLowerCase();
@@ -24,8 +29,11 @@ const SiteUsers = ({ site, user }) => {
     event.preventDefault();
     const userToRemoveId = userToRemove.id;
 
-    siteActions.removeUserFromSite(site.id, userToRemoveId, userToRemoveId === user.id)
-      .then(() => siteActions.fetchSites());
+    siteActions.removeUserFromSite(site.id, userToRemoveId)
+      .then(() => siteActions.fetchSites())
+      .then(() => {
+        if (userToRemoveId === user.id) navigate('/sites');
+      });
   };
 
   return (
@@ -90,20 +98,5 @@ const SiteUsers = ({ site, user }) => {
   );
 };
 
-SiteUsers.propTypes = {
-  site: SITE,
-  user: USER,
-};
-
-SiteUsers.defaultProps = {
-  site: null,
-  user: null,
-};
-
-const mapStateToProps = ({ user, sites }, { id }) => ({
-  user: user.data,
-  site: currentSite(sites, id),
-});
-
 export { SiteUsers };
-export default connect(mapStateToProps)(SiteUsers);
+export default SiteUsers;
