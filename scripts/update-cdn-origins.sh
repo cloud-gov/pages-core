@@ -62,9 +62,7 @@ while IFS="," read -r id service_instance current_origin
 do
   if [[ $offset -gt 0 ]]
   then
-    echo "2.5: $offset"
     ((offset--))
-    echo "2.6: $offset"
     continue
   fi
 
