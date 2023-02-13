@@ -47,7 +47,7 @@ export default {
         if (site) {
           dispatchSiteAddedAction(site);
           // route to the builds page for the added site
-          navigate(`/site/${site.id}/builds`);
+          navigate(`/sites/${site.id}/builds`);
         }
       })
       .catch((err) => {
@@ -55,9 +55,10 @@ export default {
       });
   },
 
-  addUserToSite({ owner, repository }) {
+  addUserToSite({ owner, repository }, navigate) {
     return federalist.addUserToSite({ owner, repository })
       .then(dispatchUserAddedToSiteAction)
+      .then(navigate)
       .catch((err) => {
         // Getting a 404 here signals that the site does not
         // yet exist in Pages, so we want to show the
