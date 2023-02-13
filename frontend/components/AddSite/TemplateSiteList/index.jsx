@@ -1,14 +1,11 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
 import { ORGANIZATIONS } from '../../../propTypes';
 import TemplateSite from './templateSite';
 import siteActions from '../../../actions/siteActions';
-
-function onSubmitTemplate(site) {
-  siteActions.addSite(site);
-}
 
 const templateGrid = (
   activeChildId,
@@ -39,57 +36,34 @@ const templateGrid = (
   })
 );
 
-export class TemplateList extends React.Component {
-  constructor(props) {
-    super(props);
+function TemplateList(props) {
+  const { defaultOwner, organizations } = props;
+  const [activeChildId, setActiveChildId] = useState(-1);
+  const navigate = useNavigate();
+  const templates = useSelector(state => state.FRONTEND_CONFIG.TEMPLATES);
 
-    this.state = {
-      activeChildId: -1,
-    };
-
-    this.handleChooseActive = this.handleChooseActive.bind(this);
+  function onSubmitTemplate(site) {
+    siteActions.addSite(site, navigate);
   }
 
-  handleChooseActive(childId) {
-    this.setState({
-      activeChildId: childId,
-    });
-  }
-
-  render() {
-    const {
-      defaultOwner, organizations, templates,
-    } = this.props;
-    const { handleChooseActive, state: { activeChildId } } = this;
-
-    return (
-      <div>
-        <h2>Or choose from one of our templates</h2>
-        {templateGrid(
-          activeChildId,
-          defaultOwner,
-          handleChooseActive,
-          onSubmitTemplate,
-          organizations,
-          templates
-        )}
-      </div>
-    );
-  }
+  return (
+    <div>
+      <h2>Or choose from one of our templates</h2>
+      {templateGrid(
+        activeChildId,
+        defaultOwner,
+        setActiveChildId,
+        onSubmitTemplate,
+        organizations,
+        templates
+      )}
+    </div>
+  );
 }
 
 TemplateList.propTypes = {
-  // Templates data structure is described in config/templates.js and is
-  // chellenging to describe with proptypes. Ignoring the rule here.
-  // eslint-disable-next-line react/forbid-prop-types
-  templates: PropTypes.object.isRequired,
   organizations: ORGANIZATIONS.isRequired,
   defaultOwner: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = ({ organizations, ...state }) => ({
-  organizations,
-  templates: state.FRONTEND_CONFIG.TEMPLATES,
-});
-
-export default connect(mapStateToProps)(TemplateList);
+export default TemplateList;

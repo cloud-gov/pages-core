@@ -39,8 +39,7 @@ function AddSite() {
 
   function onAddUserSubmit({ repoUrl }) {
     const { owner, repository } = getOwnerAndRepo(repoUrl);
-    siteActions.addUserToSite({ owner, repository })
-      .then(() => navigate('sites'));
+    siteActions.addUserToSite({ owner, repository }, () => navigate('/sites'));
   }
 
   function onCreateSiteSubmit({ repoUrl, engine, repoOrganizationId }) {
