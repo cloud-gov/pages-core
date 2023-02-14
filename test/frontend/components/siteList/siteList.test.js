@@ -73,9 +73,11 @@ describe('<SiteList />', () => {
     });
 
     context('when the user has authorized Github', () => {
-      it('renders 1 `add new site` button', () => {
-        expect(wrapper.find('Link[to="/sites/new"]')).to.have.length(1);
-        expect(wrapper.find('GithubAuthButton')).to.have.length(0);
+      // TODO: no organizations are present so we still see the Github Auth
+      // which is somewhat confusing
+      it('renders 1 `Connect with Github` button', () => {
+        expect(wrapper.find('Link[to="/sites/new"]')).to.have.length(0);
+        expect(wrapper.find('GithubAuthButton')).to.have.length(1);
       });
     });
 
@@ -120,6 +122,11 @@ describe('<SiteList />', () => {
     it('renders a container for the filtering of sites by org', () => {
       wrapper = shallow(<SiteList {...STORE_WITH_SITES_WITH_ORGS} />);
       expect(wrapper.find('#filter-sites-by-org')).to.have.length(1);
+    });
+
+    it('renders 1 `Add Site` button', () => {
+      expect(wrapper.find('Link[to="/sites/new"]')).to.have.length(1);
+      expect(wrapper.find('GithubAuthButton')).to.have.length(0);
     });
 
     it('renders no container for the filtering of sites by org', () => {

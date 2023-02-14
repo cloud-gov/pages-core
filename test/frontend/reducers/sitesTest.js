@@ -21,7 +21,7 @@ describe('sitesReducer', () => {
   const SITE_BASIC_AUTH_REMOVED = 'SITE_BASIC_AUTH_REMOVED';
   const initialState = {
     isLoading: false,
-    data: [],
+    data: undefined,
   };
 
   beforeEach(() => {

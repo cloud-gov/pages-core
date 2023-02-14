@@ -5,8 +5,9 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { getFeatureFlags } = require('./webpack-utils');
 
-const fileLoaderOptions = {
-  name: '/styles/webpackAssets/[contenthash].[ext]',
+const RESOURCE_GENERATOR = {
+  filename: 'images/[contenthash][ext]',
+  publicPath: '/',
 };
 
 module.exports = {
@@ -57,8 +58,8 @@ module.exports = {
       },
       {
         test: /\.(gif|png|jpe?g|ttf|woff2?|eot)$/i,
-        loader: 'file-loader',
-        options: fileLoaderOptions,
+        type: 'asset/resource',
+        generator: RESOURCE_GENERATOR,
       },
       {
         test: /\.svg$/i,
@@ -80,9 +81,9 @@ module.exports = {
             ],
           },
           {
-            // For all other .svg files, fallback to the file-loader
-            loader: 'file-loader',
-            options: fileLoaderOptions,
+            // For all other .svg files, fallback to asset/resource
+            type: 'asset/resource',
+            generator: RESOURCE_GENERATOR,
           },
         ],
       },

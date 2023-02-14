@@ -22,12 +22,12 @@ let stubs = {};
 describe('useEnvironmentVariableActions', () => {
   beforeEach(() => {
     stubs.scrollTo = sinon.stub();
-    global.window = { scrollTo: stubs.scrollTo };
+    global.window.scrollTo = stubs.scrollTo;
   });
 
   afterEach(() => {
     sinon.restore();
-    global.window = undefined;
+    global.window.scrollTo = undefined;
     stubs = {};
   });
 

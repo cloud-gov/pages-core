@@ -1,14 +1,16 @@
 /* eslint-disable react/forbid-prop-types */
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import { useParams } from 'react-router-dom';
+
 import { useBuildLogs } from '../../hooks';
 import SiteBuildLogTable from './siteBuildLogTable';
 import DownloadBuildLogsButton from './downloadBuildLogsButton';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
-const SiteBuildLogs = ({ buildId: buildIdStr }) => {
+const SiteBuildLogs = () => {
+  const { buildId: buildIdStr } = useParams();
   const buildId = parseInt(buildIdStr, 10);
   const { logs, state } = useBuildLogs(buildId);
 
@@ -30,10 +32,6 @@ const SiteBuildLogs = ({ buildId: buildIdStr }) => {
       <SiteBuildLogTable buildLogs={logs} buildState={state} />
     </div>
   );
-};
-
-SiteBuildLogs.propTypes = {
-  buildId: PropTypes.string.isRequired,
 };
 
 export default React.memo(SiteBuildLogs);

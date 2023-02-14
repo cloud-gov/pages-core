@@ -1,34 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-class CreateBuildLink extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.handleClick = this.handleClick.bind(this);
-  }
-
-  handleClick(event) {
+function CreateBuildLink(props) {
+  const {
+    children, className, handleClick, handlerParams,
+  } = props;
+  function localHandleClick(event) {
     event.preventDefault();
-    const { handleClick, handlerParams } = this.props;
     const args = Object.keys(handlerParams).map(key => handlerParams[key]);
-
     handleClick(...args);
   }
-
-  render() {
-    const { children, className } = this.props;
-
-    return (
-      <button
-        type="button"
-        onClick={this.handleClick}
-        className={className}
-      >
-        {children}
-      </button>
-    );
-  }
+  return (
+    <button
+      type="button"
+      onClick={localHandleClick}
+      className={className}
+    >
+      {children}
+    </button>
+  );
 }
 
 CreateBuildLink.propTypes = {

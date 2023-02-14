@@ -3,7 +3,7 @@ import {
   publishedBranchesReceivedType as PUBLISHED_BRANCHES_RECEIVED,
 } from '../actions/actionCreators/publishedBranchActions';
 
-const initialState = { isLoading: false };
+const initialState = { isLoading: false, data: [] };
 
 export default function publishedBranches(state = initialState, action) {
   switch (action.type) {

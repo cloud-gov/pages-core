@@ -4,8 +4,6 @@ import federalist from '../util/federalistApi';
 import alertActions from './alertActions';
 
 import {
-  updateRouterToSitesUri,
-  updateRouterToSiteBuildsUri,
   dispatchSitesFetchStartedAction,
   dispatchSitesReceivedAction,
   dispatchSiteAddedAction,
@@ -41,7 +39,7 @@ export default {
       .catch(alertError);
   },
 
-  addSite(siteToAdd) {
+  addSite(siteToAdd, navigate) {
     dispatchSitesFetchStartedAction();
     return federalist.addSite(siteToAdd)
       .then((site) => {
@@ -49,7 +47,7 @@ export default {
         if (site) {
           dispatchSiteAddedAction(site);
           // route to the builds page for the added site
-          updateRouterToSiteBuildsUri(site);
+          navigate(`/sites/${site.id}/builds`);
         }
       })
       .catch((err) => {
@@ -57,13 +55,13 @@ export default {
       });
   },
 
-  addUserToSite({ owner, repository }) {
+  addUserToSite({ owner, repository }, navigate) {
     return federalist.addUserToSite({ owner, repository })
       .then(dispatchUserAddedToSiteAction)
-      .then(updateRouterToSitesUri)
+      .then(navigate)
       .catch((err) => {
         // Getting a 404 here signals that the site does not
-        // yet exist in Federalist, so we want to show the
+        // yet exist in Pages, so we want to show the
         // additional Add New Site fields
         if (err.response && err.response.status === 404) {
           dispatchShowAddNewSiteFieldsAction();
@@ -73,15 +71,11 @@ export default {
       });
   },
 
-  removeUserFromSite(siteId, userId, me = false) {
+  removeUserFromSite(siteId, userId) {
     return federalist.removeUserFromSite(siteId, userId)
       .then(dispatchUserRemovedFromSiteAction)
       .then(this.fetchSites)
-      .then(() => {
-        if (me) { return updateRouterToSitesUri(); }
-
-        return userActions.fetchUser();
-      })
+      .then(userActions.fetchUser)
       .then(() => alertActions.alertSuccess('Successfully removed.'))
       .catch(alertError);
   },
@@ -100,8 +94,6 @@ export default {
     dispatchSitesFetchStartedAction();
     return federalist.deleteSite(siteId)
       .then(dispatchSiteDeletedAction.bind(null, siteId))
-      .then(this.fetchSites)
-      .then(updateRouterToSitesUri)
       .catch(alertError);
   },
 

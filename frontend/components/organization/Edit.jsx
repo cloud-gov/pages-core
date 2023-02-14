@@ -1,5 +1,6 @@
 /* global window */
 import React, { useEffect, useReducer } from 'react';
+import { useParams } from 'react-router-dom';
 import { success } from 'react-notification-system-redux';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -67,9 +68,10 @@ const initialState = {
   roles: [],
 };
 
-function Edit({ actions, id }) {
+function Edit({ actions }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const currentUser = useSelector(({ user }) => user.data);
+  const { id } = useParams();
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -224,7 +226,6 @@ function Edit({ actions, id }) {
 }
 
 Edit.propTypes = {
-  id: PropTypes.string.isRequired,
   actions: PropTypes.shape({
     fetchOrganizationMembers: PropTypes.func.isRequired,
     fetchOrganization: PropTypes.func.isRequired,

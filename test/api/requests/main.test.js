@@ -62,7 +62,6 @@ describe('Main Site', () => {
         .get('/blahblahpage')
         .set('Cookie', cookie)
         .expect(404);
-      expect(response.text.indexOf('Log out')).to.be.above(-1);
       expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
     });
   });
@@ -116,7 +115,6 @@ describe('Main Site', () => {
           .set('Cookie', cookie)
           .expect(200))
         .then((response) => {
-          expect(response.text.indexOf('Log out')).to.be.above(-1);
           expect(response.text.indexOf('<div id="js-app" class="usa-grid"></div>')).to.be.above(-1);
           done();
         })
