@@ -27,7 +27,7 @@ const infoContent = (
     in the build logs. See the default variables in
     {' '}
     <a
-      href="https://federalist.18f.gov/documentation/env-vars-on-federalist-builds"
+      href="https://cloud.gov/pages/documentation/env-vars-on-pages-builds"
       rel="noopener"
     >
       Environment Variables On
