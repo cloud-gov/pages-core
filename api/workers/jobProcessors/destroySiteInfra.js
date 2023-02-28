@@ -4,8 +4,8 @@ const Slacker = require('../../services/slacker');
 
 const { logger } = require('../../../winston');
 
-async function destroySiteInfra(site, user) {
-  const results = await SiteDestroyer.destroySiteInfra({ site, user });
+async function destroySiteInfra({ site, user }) {
+  const results = await SiteDestroyer.destroySiteInfra(site, user);
   const errors = results
     .filter(result => result.status === 'rejected')
     .map(rejected => rejected.reason);
