@@ -77,7 +77,7 @@ describe('SiteDestroyer', () => {
     });
   });
 
-  // TODO: move this to worker tests?
+  // TODO: move this to worker tests? the worker code is responsible for calling mailer/slacker now
   describe('.destroySiteInfra(site, user)', () => {
     afterEach(() => {
       // sinon.resetHistory() doesn't work here, maybe bc the stubs are created outside of the
@@ -85,8 +85,6 @@ describe('SiteDestroyer', () => {
       stubs['./GitHub'].deleteWebhook.resetHistory();
       stubs['./S3SiteRemover'].removeSite.resetHistory();
       stubs['./S3SiteRemover'].removeInfrastructure.resetHistory();
-      stubs['./mailer'].sendAlert.resetHistory();
-      stubs['./slacker'].sendAlert.resetHistory();
     });
 
     it('removes the infra AND deletes the webhook when the user is provided', async () => {
@@ -100,8 +98,6 @@ describe('SiteDestroyer', () => {
       sinon.assert.calledOnceWithExactly(stubs['./GitHub'].deleteWebhook, site, user.githubAccessToken);
       sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeSite, site);
       sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeInfrastructure, site);
-      sinon.assert.notCalled(stubs['./mailer'].sendAlert);
-      sinon.assert.notCalled(stubs['./slacker'].sendAlert);
     });
 
     it('removes the infra when the user is not provided', async () => {
@@ -111,25 +107,6 @@ describe('SiteDestroyer', () => {
 
       sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeSite, site);
       sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeInfrastructure, site);
-      sinon.assert.notCalled(stubs['./mailer'].sendAlert);
-      sinon.assert.notCalled(stubs['./slacker'].sendAlert);
-    });
-
-    it('sends an alert if anything fails', async () => {
-      const stub = stubs['./S3SiteRemover'].removeSite;
-      stub.resetBehavior();
-      stub.rejects(new Error('Yikes'));
-
-      const site = await factory.site();
-
-      const error = await SiteDestroyer.destroySiteInfra(site, null).catch(e => e);
-
-      sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeSite, site);
-      sinon.assert.notCalled(stubs['./S3SiteRemover'].removeInfrastructure);
-      sinon.assert.calledOnce(stubs['./mailer'].sendAlert);
-      sinon.assert.calledOnce(stubs['./slacker'].sendAlert);
-
-      expect(error).to.be.an('error');
     });
   });
 });
