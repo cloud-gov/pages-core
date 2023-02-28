@@ -21,6 +21,7 @@ const {
   ScheduledQueue,
   ScheduledQueueName,
   SlackQueueName,
+  SiteDeletionQueueName,
 } = require('../queues');
 
 const Processors = require('./jobProcessors');
@@ -82,6 +83,8 @@ function pagesWorker(connection) {
     }
   };
 
+  const siteDeletionProcessor = job => Processors.destroySiteInfra(job.data);
+
   const mailJobProcessor = appEnv === 'development'
     ? job => logger.info(job.data)
     : job => (new Mailer()).send(job.data);
@@ -102,6 +105,7 @@ function pagesWorker(connection) {
     new QueueWorker(DomainQueueName, connection, domainJobProcessor),
     new QueueWorker(MailQueueName, connection, mailJobProcessor),
     new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
+    new QueueWorker(SiteDeletionQueueName, connection, siteDeletionProcessor),
     new QueueWorker(SlackQueueName, connection, slackJobProcessor),
   ];
 
@@ -110,6 +114,7 @@ function pagesWorker(connection) {
     new QueueScheduler(DomainQueueName, { connection }),
     new QueueScheduler(MailQueueName, { connection }),
     new QueueScheduler(ScheduledQueueName, { connection }),
+    new QueueScheduler(SiteDeletionQueueName, { connection }),
     new QueueScheduler(SlackQueueName, { connection }),
   ];
 

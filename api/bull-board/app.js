@@ -13,6 +13,7 @@ const {
   ArchiveBuildLogsQueue,
   DomainQueue,
   MailQueue,
+  SiteDeletionQueue,
   ScheduledQueue,
   SlackQueue,
 } = require('../queues');
@@ -42,6 +43,7 @@ createBullBoard({
     new BullMQAdapter(new ArchiveBuildLogsQueue(connection)),
     new BullMQAdapter(new DomainQueue(connection)),
     new BullMQAdapter(new MailQueue(connection)),
+    new BullMQAdapter(new SiteDeletionQueue(connection)),
     new BullMQAdapter(new SlackQueue(connection)),
     new BullMQAdapter(new ScheduledQueue(connection)),
   ],

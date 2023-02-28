@@ -1,9 +1,20 @@
-const Mailer = require('./mailer');
-const Slacker = require('./slacker');
+const IORedis = require('ioredis');
+
 const Github = require('./GitHub');
 const S3SiteRemover = require('./S3SiteRemover');
+const config = require('../../config');
+const { SiteDeletionQueue } = require('../queues');
 
-// TODO move to background job
+function queue() {
+  const { redis: redisConfig } = config;
+  return new SiteDeletionQueue(
+    new IORedis(redisConfig.url, {
+      tls: redisConfig.tls,
+      maxRetriesPerRequest: null,
+    })
+  );
+}
+// this function should only be called within the queue/worker
 module.exports.destroySiteInfra = async function destroySiteInfra(site, user) {
   const todos = [
     S3SiteRemover.removeSite(site)
@@ -14,20 +25,7 @@ module.exports.destroySiteInfra = async function destroySiteInfra(site, user) {
     todos.push(Github.deleteWebhook(site, user.githubAccessToken));
   }
 
-  const results = await Promise.allSettled(todos);
-
-  const errors = results
-    .filter(result => result.status === 'rejected')
-    .map(rejected => rejected.reason);
-
-  if (errors.length > 0) {
-    const reason = `Site deletion failed for id: ${site.id} - ${site.owner}/${site.repository}`;
-    Mailer.sendAlert(reason, errors);
-    Slacker.sendAlert(reason, errors);
-    throw new Error(reason);
-  }
-
-  return results;
+  return Promise.allSettled(todos);
 };
 
 module.exports.destroySite = async function destroySite(site, user) {
@@ -42,11 +40,14 @@ module.exports.destroySite = async function destroySite(site, user) {
     return ['error', message];
   }
 
+  // remove the database entry
   await site.destroy();
 
-  // Don't wait for the infra, this should be all good from the user's point of view
-  module.exports.destroySiteInfra(site, user)
-    .catch(() => {});
+  this.queueDestroySiteInfra(site, user);
 
   return ['ok'];
+};
+
+module.exports.queueDestroySiteInfra = function queueDestroySiteInfra(site, user) {
+  queue().add('destroySiteInfra', { site, user });
 };
