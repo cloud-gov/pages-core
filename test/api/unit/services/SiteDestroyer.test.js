@@ -115,21 +115,21 @@ describe('SiteDestroyer', () => {
       sinon.assert.notCalled(stubs['./slacker'].sendAlert);
     });
 
-    // it('sends an alert if anything fails', async () => {
-    //   const stub = stubs['./S3SiteRemover'].removeSite;
-    //   stub.resetBehavior();
-    //   stub.rejects(new Error('Yikes'));
+    it('sends an alert if anything fails', async () => {
+      const stub = stubs['./S3SiteRemover'].removeSite;
+      stub.resetBehavior();
+      stub.rejects(new Error('Yikes'));
 
-    //   const site = await factory.site();
+      const site = await factory.site();
 
-    //   const error = await SiteDestroyer.destroySiteInfra(site, null).catch(e => e);
+      const error = await SiteDestroyer.destroySiteInfra(site, null).catch(e => e);
 
-    //   sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeSite, site);
-    //   sinon.assert.notCalled(stubs['./S3SiteRemover'].removeInfrastructure);
-    //   sinon.assert.calledOnce(stubs['./mailer'].sendAlert);
-    //   sinon.assert.calledOnce(stubs['./slacker'].sendAlert);
+      sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeSite, site);
+      sinon.assert.notCalled(stubs['./S3SiteRemover'].removeInfrastructure);
+      sinon.assert.calledOnce(stubs['./mailer'].sendAlert);
+      sinon.assert.calledOnce(stubs['./slacker'].sendAlert);
 
-    //   expect(error).to.be.an('error');
-    // });
+      expect(error).to.be.an('error');
+    });
   });
 });

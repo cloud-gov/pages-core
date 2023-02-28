@@ -18,7 +18,7 @@ const csrfToken = require('../support/csrfToken');
 const {
   Build, Organization, Role, Site, User,
 } = require('../../../api/models');
-const S3SiteRemover = require('../../../api/services/S3SiteRemover');
+const SiteDestroyer = require('../../../api/services/SiteDestroyer');
 const siteErrors = require('../../../api/responses/siteErrors');
 const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
 const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
@@ -1214,10 +1214,10 @@ describe('Site API', () => {
   });
 
   describe('DELETE /v0/site/:id', () => {
-    let s3RemoveSiteStub;
+    let queueDestroySiteInfra;
 
     beforeEach(() => {
-      s3RemoveSiteStub = sinon.stub(S3SiteRemover, 'removeSite').resolves();
+      queueDestroySiteInfra = sinon.stub(SiteDestroyer, 'queueDestroySiteInfra').resolves();
     });
 
     afterEach(() => {
@@ -1360,41 +1360,40 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    // can't test s3 removal from the API (it's a background job)
-    // it("should remove all of the site's data from S3", (done) => {
-    //   let site;
-    //   const userPromise = factory.user();
-    //   const sitePromise = factory.site({ users: Promise.all([userPromise]) });
-    //   const sessionPromise = authenticatedSession(userPromise);
+    it("should plan to remove all of the site's data from S3", (done) => {
+      let site;
+      const userPromise = factory.user();
+      const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+      const sessionPromise = authenticatedSession(userPromise);
 
-    //   Promise.props({
-    //     user: userPromise,
-    //     site: sitePromise,
-    //     cookie: sessionPromise,
-    //   }).then((results) => {
-    //     ({ site } = results);
-    //     nock.cleanAll();
-    //     githubAPINocks.repo({
-    //       owner: site.owner,
-    //       repository: site.repo,
-    //       response: [200, {
-    //         permissions: { admin: true, push: true },
-    //       }],
-    //     });
+      Promise.props({
+        user: userPromise,
+        site: sitePromise,
+        cookie: sessionPromise,
+      }).then((results) => {
+        ({ site } = results);
+        nock.cleanAll();
+        githubAPINocks.repo({
+          owner: site.owner,
+          repository: site.repo,
+          response: [200, {
+            permissions: { admin: true, push: true },
+          }],
+        });
 
-    //     return request(app)
-    //       .delete(`/v0/site/${site.id}`)
-    //       .set('x-csrf-token', csrfToken.getToken())
-    //       .set('Cookie', results.cookie)
-    //       .expect(200);
-    //   })
-    //     .then(() => {
-    //       sinon.assert.calledOnce(s3RemoveSiteStub);
-    //       expect(s3RemoveSiteStub.firstCall.args[0].id).to.eq(site.id);
-    //       done();
-    //     })
-    //     .catch(done);
-    // });
+        return request(app)
+          .delete(`/v0/site/${site.id}`)
+          .set('x-csrf-token', csrfToken.getToken())
+          .set('Cookie', results.cookie)
+          .expect(200);
+      })
+        .then(() => {
+          sinon.assert.calledOnce(queueDestroySiteInfra);
+          expect(queueDestroySiteInfra.firstCall.args[0].id).to.eq(site.id);
+          done();
+        })
+        .catch(done);
+    });
 
     it('should not allow a user to delete a site associated with their account if not admin', (done) => {
       let site;
