@@ -12,7 +12,6 @@ class SiteDeletionQueue extends Queue {
           type: 'exponential',
           delay: 3000,
         },
-        delay: 2 * 60 * 1000, // 2 minutes
       },
     });
   }
