@@ -83,7 +83,11 @@ function pagesWorker(connection) {
     }
   };
 
-  const siteDeletionProcessor = job => Processors.destroySiteInfra(job.data);
+  const siteDeletionProcessor = (job) => {
+    // for extremely unclear reasons, this logging code is what allows this worker to function
+    logger.info(job);
+    return Processors.destroySiteInfra(job.data);
+  };
 
   const mailJobProcessor = appEnv === 'development'
     ? job => logger.info(job.data)
