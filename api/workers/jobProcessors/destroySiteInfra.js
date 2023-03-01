@@ -19,6 +19,7 @@ async function destroySiteInfra({ site, user }) {
 
   const msg = results.map(JSON.stringify);
   logger.info(msg.join('\n'));
+  return true;
 }
 
 module.exports = destroySiteInfra;
