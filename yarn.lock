@@ -986,29 +986,29 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
-"@bull-board/api@3.11.1":
-  version "3.11.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-3.11.1.tgz#98b2c9556f643718bb5bde4a1306e6706af8192e"
-  integrity sha512-ElwX7sM+Ng4ZL9KUsbDubRE+r2hu/gss85OsROeE9bmyfkW14jOJkgr5MKUyjTTgPEeMs1Mw55TgQs2vxoWBiA==
+"@bull-board/api@4.12.1":
+  version "4.12.1"
+  resolved "https://registry.yarnpkg.com/@bull-board/api/-/api-4.12.1.tgz#10e328fb3c70473ca99a27e6ebbec11b5ce6a9d5"
+  integrity sha512-cJk7LhphNZHwbN4yON5rYiDgob3D7cwFGrxf6LlnR1w/a6zyap1x/o74MfV/0T6NpUpvUSf7ccbj3knU6DNYVw==
   dependencies:
     redis-info "^3.0.8"
 
-"@bull-board/express@^3.2.4":
-  version "3.11.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-3.11.1.tgz#f1285fbc54a5ccdc0028b63ec87a91ac9de878a6"
-  integrity sha512-+a5IQilu/CxvnGC0z6oJPANn7eF/Q61VU86JR9vRtmaY96mKKny0NuAyulJ2/Y9JznMCBOLUsXWL6fm9zD9kJw==
+"@bull-board/express@4.12.1":
+  version "4.12.1"
+  resolved "https://registry.yarnpkg.com/@bull-board/express/-/express-4.12.1.tgz#58c1b056fbbd94a5b55ddec98522b840b24305fc"
+  integrity sha512-hxnOS1xOH+KWu2JXfxPu9HgmuNVzfHosg9W21UCp/SyQNG/R5AscB3ksZxwp2y+HKJMi6Zn597gsOVP+l7wzig==
   dependencies:
-    "@bull-board/api" "3.11.1"
-    "@bull-board/ui" "3.11.1"
+    "@bull-board/api" "4.12.1"
+    "@bull-board/ui" "4.12.1"
     ejs "3.1.7"
     express "4.17.3"
 
-"@bull-board/ui@3.11.1":
-  version "3.11.1"
-  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-3.11.1.tgz#17a2af5573f31811a543105b9a96249c95e93ce7"
-  integrity sha512-SRrfvxHF/WaBICiAFuWAoAlTvoBYUBmX94oRbSKzVILRFZMe3gs0hN071BFohrn4yOTFHAkWPN7cjMbaqHwCag==
+"@bull-board/ui@4.12.1":
+  version "4.12.1"
+  resolved "https://registry.yarnpkg.com/@bull-board/ui/-/ui-4.12.1.tgz#53a41ad1de37e942b907b7095ec575e852c2acfe"
+  integrity sha512-nNTjxitLEre+UdZjwMHwlKKGxpg3OV/Sf7dNOlhJYoRjO7aYPb63M+BfGVrYgupk3V73Q0qvl1emtsnF/qz/Wg==
   dependencies:
-    "@bull-board/api" "3.11.1"
+    "@bull-board/api" "4.12.1"
 
 "@cfaester/enzyme-adapter-react-18@^0.6.0":
   version "0.6.0"
