@@ -58,13 +58,13 @@ services:
       APP_ENV: local
       APP_HOSTNAME: http://localhost:1340
       PORT: 1340
-      PRODUCT: federalist
+      PRODUCT: pages
       REDIS_URL: redis://redis:6379
       SESSION_SECRET: bull-board
       UAA_CLIENT_ID: pages-client
       UAA_CLIENT_SECRET: client-secret
-      UAA_HOST: http://localhost:9000
       UAA_HOST_DOCKER_URL: http://uaa:8080
+      UAA_LOGIN_HOST: http://localhost:9000
   admin-client:
     build:
       dockerfile: ./admin-client/Dockerfile-admin
