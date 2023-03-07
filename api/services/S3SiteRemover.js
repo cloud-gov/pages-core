@@ -84,6 +84,7 @@ const removeSite = async (site) => {
     `site/${site.owner}/${site.repository}`,
     `demo/${site.owner}/${site.repository}`,
     `preview/${site.owner}/${site.repository}`,
+    '_cache',
   ];
 
   let credentials;

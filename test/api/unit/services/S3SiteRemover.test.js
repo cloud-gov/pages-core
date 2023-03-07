@@ -13,6 +13,12 @@ const mapSiteContents = objects => ({
   Contents: objects.map(Key => ({ Key })),
 });
 
+const buildCacheObjects = (bucket) => {
+  bucket.push('_cache/asdfhjkl');
+  bucket.push('_cache/qwertyui');
+  return bucket;
+};
+
 const buildSiteObjects = (qualifier = 'site', site, bucket) => {
   const prefix = `${qualifier}/${site.owner}/${site.repository}`;
 
@@ -35,16 +41,18 @@ describe('S3SiteRemover', () => {
   afterEach(() => nock.cleanAll());
 
   describe('.removeSite(site)', () => {
-    it('should delete all objects in the `site/<org>/<repo>`, `demo/<org>/<repo>`, and `preview/<org>/<repo> directories', (done) => {
+    it('should delete all objects in the `site/<org>/<repo>`, `demo/<org>/<repo>`, `preview/<org>/<repo>`, and `_cache` directories', (done) => {
       const siteObjectsToDelete = [];
       const demoObjectsToDelete = [];
       const previewObjectsToDelete = [];
+      const cacheObjectsToDelete = [];
 
       let site;
       let objectsWereDeleted = false;
       let siteObjectsWereListed = false;
       let demoObjectWereListed = false;
       let previewObjectsWereListed = false;
+      let cacheObjectsWereListed = false;
       let objectsToDelete;
 
       mockTokenRequest();
@@ -61,9 +69,11 @@ describe('S3SiteRemover', () => {
         } else if (params.Prefix === `preview/${site.owner}/${site.repository}/`) {
           previewObjectsWereListed = true;
           cb(null, mapSiteContents(previewObjectsToDelete));
+        } else if (params.Prefix === '_cache/') {
+          cacheObjectsWereListed = true;
+          cb(null, mapSiteContents(cacheObjectsToDelete));
         }
       };
-
 
       AWSMocks.mocks.S3.deleteObjects = (params, cb) => {
         expect(params.Bucket).to.equal(config.s3.bucket);
@@ -72,10 +82,12 @@ describe('S3SiteRemover', () => {
           ...siteObjectsToDelete,
           ...demoObjectsToDelete,
           ...previewObjectsToDelete,
+          ...cacheObjectsToDelete,
           ...[
             `site/${site.owner}/${site.repository}`,
             `demo/${site.owner}/${site.repository}`,
             `preview/${site.owner}/${site.repository}`,
+            '_cache',
           ],
         ];
 
@@ -96,12 +108,13 @@ describe('S3SiteRemover', () => {
         buildSiteObjects('site', site, siteObjectsToDelete);
         buildSiteObjects('demo', site, demoObjectsToDelete);
         buildSiteObjects('preview', site, previewObjectsToDelete);
-
+        buildCacheObjects(cacheObjectsToDelete);
         return S3SiteRemover.removeSite(site);
       }).then(() => {
         expect(siteObjectsWereListed).to.equal(true);
         expect(demoObjectWereListed).to.equal(true);
         expect(previewObjectsWereListed).to.equal(true);
+        expect(cacheObjectsWereListed).to.equal(true);
         expect(objectsWereDeleted).to.equal(true);
         expect(objectsToDelete.length).to.equal(0);
 
@@ -168,7 +181,7 @@ describe('S3SiteRemover', () => {
       apiNocks.mockDefaultCredentials();
 
       AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => cb(null, {
-        Contents: Array(750).fill(0).map(() => ({ Key: 'abc123' })),
+        Contents: Array(800).fill(0).map(() => ({ Key: 'abc123' })),
       });
 
       AWSMocks.mocks.S3.deleteObjects = (params, cb) => {
@@ -180,9 +193,9 @@ describe('S3SiteRemover', () => {
       factory.site()
         .then(site => S3SiteRemover.removeSite(site))
         .then(() => {
-        // 750 site, 750 demo, 750 preview objects = 2250 total
-        // 2250 objects means 3 groups of 1000
-          expect(deleteObjectsCallCount).to.equal(3);
+        // 800 site, 800 demo, 800 preview, 800 cache objects = 3200 total
+        // 3200 objects means 4 groups of 1000
+          expect(deleteObjectsCallCount).to.equal(4);
           done();
         });
     });
