@@ -5,7 +5,7 @@
   "description": "",
   "keywords": [],
   "dependencies": {
-    "@bull-board/express": "4.12.1",
+    "@bull-board/express": "4.11.3",
     "@octokit/request": "^6.2.2",
     "@octokit/rest": "^18.5.2",
     "@socket.io/redis-adapter": "^7.0.0",
