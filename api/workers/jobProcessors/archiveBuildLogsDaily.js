@@ -3,6 +3,8 @@ const { Op } = require('sequelize');
 const PromisePool = require('@supercharge/promise-pool');
 const BuildLogs = require('../../services/build-logs');
 const { Build } = require('../../models');
+const Mailer = require('../../services/mailer');
+const Slacker = require('../../services/slacker');
 
 function createJobLogger(job) {
   let logs = [];
@@ -19,9 +21,9 @@ function createJobLogger(job) {
 
 async function archiveBuildLogsDaily(job) {
   const logger = createJobLogger(job);
-
-  const startDate = moment().subtract(1, 'days').startOf('day');
-  const endDate = startDate.clone().add(1, 'days');
+  // our daily job uses a three day window to check for previous logs in case of failure
+  const startDate = moment().subtract(3, 'days').startOf('day');
+  const endDate = startDate.clone().add(3, 'days');
 
   logger.log(`Querying for all builds completed between ${startDate} and ${endDate}.`);
 
@@ -48,12 +50,15 @@ async function archiveBuildLogsDaily(job) {
     return 'Ok';
   }
 
-  const errMsg = [
-    `Archive build logs for ${startDate.format('YYYY-MM-DD')} completed with the following errors:`,
-    errors.map(e => `  ${e.item.id}: ${e.message}`).join('\n'),
-  ].join();
+  const errMsg = `Archive build logs for ${startDate.format('YYYY-MM-DD')} - ${endDate.format('YYYY-MM-DD')} completed with errors`;
   logger.log(errMsg);
   await logger.flush();
+
+  Mailer.init();
+  Slacker.init();
+  Mailer.sendAlert(errMsg, errors);
+  Slacker.sendAlert(errMsg, errors);
+
   throw new Error(errMsg);
 }
 

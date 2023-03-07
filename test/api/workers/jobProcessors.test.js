@@ -80,9 +80,11 @@ describe('job processors', () => {
       sinon.stub(BuildLogs, 'archiveBuildLogsForBuildId').rejects('erred out');
       const result = await jobProcessors.archiveBuildLogsDaily(job).catch(e => e);
       expect(result).to.be.an('error');
-      const dateStr = moment().subtract(1, 'days').startOf('day').format('YYYY-MM-DD');
+      const startDate = moment().subtract(3, 'days').startOf('day');
+      const endDate = startDate.clone().add(3, 'days');
+
       expect(result.message.split(',')[0]).to
-        .equal(`Archive build logs for ${dateStr} completed with the following errors:`);
+        .equal(`Archive build logs for ${startDate.format('YYYY-MM-DD')} - ${endDate.format('YYYY-MM-DD')} completed with errors`);
     });
   });
 
