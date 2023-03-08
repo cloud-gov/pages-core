@@ -45,21 +45,6 @@ const deleteObjects = (s3Client, keys) => {
   }).then(() => deleteObjects(s3Client, keysToDeleteLater));
 };
 
-const deleteRobots = s3Client => new Promise((resolve, reject) => {
-  s3Client.client.deleteObjects({
-    Bucket: s3Client.bucket,
-    Delete: {
-      Objects: [{ Key: 'robots.txt' }],
-    },
-  }, (err, data) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve(data);
-    }
-  });
-});
-
 const getKeys = (s3Client, prefix) => s3Client.listObjects(prefix)
   .then(objects => objects.map(o => o.Key));
 
@@ -105,6 +90,7 @@ const removeSite = async (site) => {
     );
 
     let mergedKeys = [].concat(...keys);
+    mergedKeys.push('robots.txt');
 
     if (mergedKeys.length) {
       /**
@@ -117,7 +103,6 @@ const removeSite = async (site) => {
     }
 
     await deleteObjects(s3Client, mergedKeys);
-    await deleteRobots(s3Client);
   } catch (error) {
     handleError(error);
   }
