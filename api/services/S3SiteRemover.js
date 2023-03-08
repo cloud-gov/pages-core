@@ -1,6 +1,5 @@
 const S3Helper = require('./S3Helper');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
-const config = require('../../config');
 
 // handle error if service is not found an throw all other errors
 const handleError = (err) => {
@@ -14,10 +13,6 @@ const handleError = (err) => {
 };
 
 const apiClient = new CloudFoundryAPIClient();
-
-function usesDedicatedBucket(site, s3) {
-  return site.s3ServiceName !== s3.serviceName && site.awsBucketName !== s3.bucket;
-}
 
 /**
   Deletes the array of S3 objects passed to it.
@@ -68,16 +63,10 @@ const deleteRobots = s3Client => new Promise((resolve, reject) => {
 const getKeys = (s3Client, prefix) => s3Client.listObjects(prefix)
   .then(objects => objects.map(o => o.Key));
 
-const removeInfrastructure = (site) => {
-  if (usesDedicatedBucket(site, config.s3)) {
-    return apiClient.deleteRoute(site.awsBucketName)
-      .catch(handleError) // if route does not exist continue to delete service instance
-      .then(() => apiClient.deleteServiceInstance(site.s3ServiceName))
-      .catch(handleError); // if service instance does not exist handle error & delete site
-  }
-
-  return Promise.resolve();
-};
+const removeInfrastructure = site => apiClient.deleteRoute(site.awsBucketName)
+  .catch(handleError) // if route does not exist continue to delete service instance
+  .then(() => apiClient.deleteServiceInstance(site.s3ServiceName))
+  .catch(handleError); // if service instance does not exist handle error & delete site
 
 const removeSite = async (site) => {
   const prefixes = [
@@ -128,10 +117,7 @@ const removeSite = async (site) => {
     }
 
     await deleteObjects(s3Client, mergedKeys);
-
-    if (usesDedicatedBucket(site, config.s3)) {
-      await deleteRobots(s3Client);
-    }
+    await deleteRobots(s3Client);
   } catch (error) {
     handleError(error);
   }
