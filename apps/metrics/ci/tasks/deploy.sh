@@ -7,5 +7,5 @@ cf auth
 
 cf t -o $CF_ORG -s $CF_SPACE
 
-cf push $CF_APP_NAME \
+cf push $CF_APP_NAME --stack cflinuxfs4 \
   $(env | grep ^CFVAR_ | sed 's/CFVAR_/--var /')
