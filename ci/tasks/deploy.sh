@@ -12,4 +12,4 @@ cf push $CF_APP_NAME \
   --path $CF_PATH \
   --manifest $CF_MANIFEST \
   --vars-file $CF_VARS_FILE \
-  --stack cflinuxfs4
+  --stack $CF_STACK
