@@ -3,10 +3,12 @@
   import { afterUpdate } from 'svelte';
   import { router } from '../../stores';
   import { Await, GridContainer } from '../../components';
+  import { organizations } from '../../flows';
   import { fetchOrganization, updateOrganization } from '../../lib/api';
 
   $: id = $router.params.id;
   $: orgPromise = fetchOrganization(id);
+  $: redirectTo = `/organizations/${id}/edit`;
 
   let submitting = false;
 
@@ -14,11 +16,7 @@
     submitting = true;
 
     const {
-      agency,
-      name,
-      sandbox,
-      selfAuthorized,
-      active,
+      agency, name, sandbox, selfAuthorized, active,
     } = event.target.elements;
 
     const params = {
@@ -34,31 +32,59 @@
     page(`/organizations/${id}`);
   }
 
-  afterUpdate(() => { submitting = false; });
+  afterUpdate(() => {
+    submitting = false;
+  });
 </script>
 
 <GridContainer classes={['display-flex', 'flex-justify-center']}>
   <Await on={orgPromise} let:response={org}>
     <form
       class="usa-form usa-form--large"
-      on:submit|preventDefault={handleSubmit} >
-
+      on:submit|preventDefault={handleSubmit}
+    >
       <legend class="usa-legend usa-legend--large">Edit Organization</legend>
 
       <p>
-        Required fields are marked with an asterisk (<abbr title="required" class="usa-hint usa-hint--required">*</abbr>).
+        Required fields are marked with an asterisk (<abbr
+          title="required"
+          class="usa-hint usa-hint--required">*</abbr
+        >).
       </p>
 
       <fieldset class="usa-fieldset">
-        <label class="usa-label" for="name">Organization Name<abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
+        <label class="usa-label" for="name"
+          >Organization Name<abbr
+            title="required"
+            class="usa-hint usa-hint--required">*</abbr
+          ></label
+        >
         <span class="usa-hint">Organization name must be globally unique</span>
-        <input type="text" class="usa-input" name="name" id="name" value={org.name} required>
+        <input
+          type="text"
+          class="usa-input"
+          name="name"
+          id="name"
+          value={org.name}
+          required
+        />
       </fieldset>
 
       <fieldset class="usa-fieldset">
-        <label class="usa-label" for="agency">Agency<abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
+        <label class="usa-label" for="agency"
+          >Agency<abbr title="required" class="usa-hint usa-hint--required"
+            >*</abbr
+          ></label
+        >
         <span class="usa-hint">Federal agency (GSA, OMB, etc...)</span>
-        <input type="text" class="usa-input" name="agency" id="agency" value={org.agency} required>
+        <input
+          type="text"
+          class="usa-input"
+          name="agency"
+          id="agency"
+          value={org.agency}
+          required
+        />
       </fieldset>
 
       <fieldset class="usa-fieldset">
@@ -104,7 +130,7 @@
         </div>
       </fieldset>
 
-      <fieldset class="usa-fieldset" disabled>
+      <fieldset class="usa-fieldset">
         <legend class="usa-legend usa-legend">Organization Status</legend>
         <div class="usa-radio">
           <input
@@ -114,6 +140,7 @@
             name="active"
             value="active"
             checked={org.isActive}
+            on:click={() => organizations.activate(id, redirectTo)}
           />
           <label class="usa-radio__label" for="active">Active</label>
         </div>
@@ -125,11 +152,17 @@
             name="active"
             value="inactive"
             checked={!org.isActive}
+            on:click={() => organizations.deactivate(id, redirectTo)}
           />
           <label class="usa-radio__label" for="inactive">Inactive</label>
         </div>
       </fieldset>
-      <input class="usa-button" type="submit" value="Update" disabled={submitting}>
+      <input
+        class="usa-button"
+        type="submit"
+        value="Update"
+        disabled={submitting}
+      />
     </form>
   </Await>
 </GridContainer>
