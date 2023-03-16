@@ -49,6 +49,7 @@
 
 <div
   on:click|preventDefault={() => (isOpen ? toggleOpen() : '')}
+  on:keypress|preventDefault={() => (isOpen ? toggleOpen() : '')}
   class="usa-overlay {visible}" />
 <header class="usa-header usa-header--basic">
   <div class="usa-nav-container">
@@ -100,7 +101,7 @@
             <a class="usa-nav__link"  class:usa-current={currentPath === '/organizations'} href="/organizations">
               <span>Orgs</span>
             </a>
-          </li>  
+          </li>
           <li class="usa-nav__primary-item">
             <a class="usa-nav__link"  class:usa-current={currentPath === '/events'} href="/events">
               <span>Events</span>
