@@ -66,3 +66,9 @@
     </div>
   </div>
 </div>
+
+<style>
+  span.usa-tag {
+    text-transform: unset;
+  }
+</style>

@@ -52,6 +52,9 @@
     margin-block-start: 0;
     margin-block-end: 0;
   }
+  span.usa-tag {
+    text-transform: unset;
+  }
 </style>
 
 <div class="padding-2 {bgColor}">
@@ -84,7 +87,7 @@
         <span class="usa-tag bg-orange">{awsBucketName}</span>
         <span class="usa-tag bg-accent-cool-dark">{s3ServiceName}</span>
         {#if organizationId}
-          <span class="usa-tag bg-indigo">ORG: {organizationId}</span>
+          <span class="usa-tag bg-indigo">org: {organizationId}</span>
         {/if}
       </div>
       <div class="tablet:grid-col-auto padding-bottom-1">
