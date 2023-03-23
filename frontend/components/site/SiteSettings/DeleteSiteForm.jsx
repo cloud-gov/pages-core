@@ -20,13 +20,6 @@ export const DeleteSiteForm = ({
           This will bring the entire site offline and make it inaccessible for users.
           <br />
           <br />
-          <i>
-            Trying to remove a site from your list of sites? Go to the
-            {' '}
-            <a href={`/sites/${siteId}/users`}>collaborators page</a>
-            {' '}
-            and remove yourself.
-          </i>
         </p>
         <AlertBanner
           status="warning"
