@@ -5,7 +5,6 @@ import { reduxForm } from 'redux-form';
 import AlertBanner from '../../alertBanner';
 
 export const DeleteSiteForm = ({
-  siteId,
   handleSubmit,
   submitting,
 }) => (
@@ -39,8 +38,6 @@ export const DeleteSiteForm = ({
 );
 
 DeleteSiteForm.propTypes = {
-  siteId: PropTypes.number.isRequired,
-
   // the following props are from reduxForm:
   handleSubmit: PropTypes.func.isRequired,
   submitting: PropTypes.bool.isRequired,

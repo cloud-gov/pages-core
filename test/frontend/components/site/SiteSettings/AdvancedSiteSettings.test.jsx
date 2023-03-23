@@ -54,7 +54,6 @@ describe('<AdvancedSiteSettings/>', () => {
     });
 
     it('has the onDelete handler as onSubmit', () => {
-      expect(form.prop('siteId')).to.equal(props.siteId);
       expect(form.prop('onSubmit')).to.equal(props.onDelete);
     });
   });
