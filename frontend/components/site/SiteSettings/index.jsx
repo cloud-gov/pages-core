@@ -85,7 +85,6 @@ function SiteSettings() {
       />
       <ExpandableArea title="Advanced settings">
         <AdvancedSiteSettings
-          siteId={site.id}
           initialValues={advancedInitialValues}
           onDelete={handleDelete}
           onSubmit={handleUpdate}

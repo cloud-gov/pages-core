@@ -24,11 +24,6 @@ export const SITE_NAVIGATION_CONFIG = [
     icon: 'IconCloudUpload',
   },
   {
-    display: 'Collaborators',
-    route: 'users',
-    icon: 'IconPeople',
-  },
-  {
     display: 'Site settings',
     route: 'settings',
     icon: 'IconGear',

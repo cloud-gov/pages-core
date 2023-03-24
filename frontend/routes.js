@@ -8,7 +8,6 @@ import SiteList from './components/siteList/siteList';
 import SiteContainer from './components/siteContainer';
 import SiteBuilds from './components/site/siteBuilds';
 import SiteBuildLogs from './components/site/siteBuildLogs';
-import SiteUsers from './components/site/SiteUsers';
 import SitePublishedBranchesTable from './components/site/sitePublishedBranchesTable';
 import SitePublishedFilesTable from './components/site/SitePublishedFilesTable';
 import SiteSettings from './components/site/SiteSettings';
@@ -50,7 +49,6 @@ export default (
       <Route path="published/:name" element={<SitePublishedFilesTable />} />
       <Route path="builds" element={<SiteBuilds />} />
       <Route path="builds/:buildId/logs" element={<SiteBuildLogs />} />
-      <Route path="users" element={<SiteUsers />} />
     </Route>
     <Route path="settings" element={<UserSettings />} />
     <Route path="*" element={<NotFound />} />
