@@ -34,7 +34,7 @@ describe('SiteDestroyer', () => {
 
   describe('.destroySite(site, user)', () => {
     beforeEach(() => {
-      sinon.stub(SiteDestroyer, 'destroySiteInfra').resolves();
+      sinon.stub(SiteDestroyer, 'queueDestroySiteInfra').resolves();
     });
 
     afterEach(() => {
@@ -51,14 +51,14 @@ describe('SiteDestroyer', () => {
 
       expect(result).to.deep.eq(['ok']);
       expect(site.isSoftDeleted()).to.be.true;
-      sinon.assert.calledOnceWithExactly(SiteDestroyer.destroySiteInfra, site, user);
+      sinon.assert.calledOnceWithExactly(SiteDestroyer.queueDestroySiteInfra, site, user);
     });
 
     it('throws an error when the site cannot be destroyed', async () => {
       const error = await SiteDestroyer.destroySite(null, null).catch(e => e);
 
       expect(error).to.be.an('error');
-      sinon.assert.notCalled(SiteDestroyer.destroySiteInfra);
+      sinon.assert.notCalled(SiteDestroyer.queueDestroySiteInfra);
     });
 
     it('does not destroy the site when the site has a domain', async () => {
@@ -73,10 +73,11 @@ describe('SiteDestroyer', () => {
       expect(result[0]).to.eq('error');
       expect(result[1]).to.have.string(domain.names);
       expect(site.isSoftDeleted()).to.be.false;
-      sinon.assert.notCalled(SiteDestroyer.destroySiteInfra);
+      sinon.assert.notCalled(SiteDestroyer.queueDestroySiteInfra);
     });
   });
 
+  // TODO: move this to worker tests? the worker code is responsible for calling mailer/slacker now
   describe('.destroySiteInfra(site, user)', () => {
     afterEach(() => {
       // sinon.resetHistory() doesn't work here, maybe bc the stubs are created outside of the
@@ -84,8 +85,6 @@ describe('SiteDestroyer', () => {
       stubs['./GitHub'].deleteWebhook.resetHistory();
       stubs['./S3SiteRemover'].removeSite.resetHistory();
       stubs['./S3SiteRemover'].removeInfrastructure.resetHistory();
-      stubs['./mailer'].sendAlert.resetHistory();
-      stubs['./slacker'].sendAlert.resetHistory();
     });
 
     it('removes the infra AND deletes the webhook when the user is provided', async () => {
@@ -99,8 +98,6 @@ describe('SiteDestroyer', () => {
       sinon.assert.calledOnceWithExactly(stubs['./GitHub'].deleteWebhook, site, user.githubAccessToken);
       sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeSite, site);
       sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeInfrastructure, site);
-      sinon.assert.notCalled(stubs['./mailer'].sendAlert);
-      sinon.assert.notCalled(stubs['./slacker'].sendAlert);
     });
 
     it('removes the infra when the user is not provided', async () => {
@@ -110,25 +107,6 @@ describe('SiteDestroyer', () => {
 
       sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeSite, site);
       sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeInfrastructure, site);
-      sinon.assert.notCalled(stubs['./mailer'].sendAlert);
-      sinon.assert.notCalled(stubs['./slacker'].sendAlert);
-    });
-
-    it('sends an alert if anything fails', async () => {
-      const stub = stubs['./S3SiteRemover'].removeSite;
-      stub.resetBehavior();
-      stub.rejects(new Error('Yikes'));
-
-      const site = await factory.site();
-
-      const error = await SiteDestroyer.destroySiteInfra(site, null).catch(e => e);
-
-      sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeSite, site);
-      sinon.assert.notCalled(stubs['./S3SiteRemover'].removeInfrastructure);
-      sinon.assert.calledOnce(stubs['./mailer'].sendAlert);
-      sinon.assert.calledOnce(stubs['./slacker'].sendAlert);
-
-      expect(error).to.be.an('error');
     });
   });
 });

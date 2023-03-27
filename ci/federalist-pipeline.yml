@@ -7,6 +7,7 @@ env-cf: &env-cf
   CF_PASSWORD: ((production-cf-password))
   CF_ORG: gsa-18f-federalist
   CF_SPACE: production
+  CF_STACK: cflinuxfs4
 
 node-image: &node-image
   type: docker-image
@@ -17,9 +18,13 @@ node-image: &node-image
 cf-image: &cf-image
   platform: linux
   image_resource:
-    type: docker-image
+    type: registry-image
     source:
-      repository: 18fgsa/concourse-task
+      aws_access_key_id: ((ecr-aws-key))
+      aws_secret_access_key: ((ecr-aws-secret))
+      repository: harden-concourse-task
+      aws_region: us-gov-west-1
+      tag: ((harden-concourse-task-tag))
 
 test-api: &test-api
   - in_parallel:

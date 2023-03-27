@@ -1,17 +1,25 @@
 const nock = require('nock');
 const { expect } = require('chai');
-const sinon = require('sinon');
 
 const AWSMocks = require('../../support/aws-mocks');
 const mockTokenRequest = require('../../support/cfAuthNock');
 const apiNocks = require('../../support/cfAPINocks');
 const factory = require('../../support/factory');
-const config = require('../../../../config');
 const S3SiteRemover = require('../../../../api/services/S3SiteRemover');
+
+const s3ServiceName = 'site-service';
+const s3ServiceGuid = 'site-service-guid';
+const awsBucketName = 'site-bucket-name';
 
 const mapSiteContents = objects => ({
   Contents: objects.map(Key => ({ Key })),
 });
+
+const buildCacheObjects = (bucket) => {
+  bucket.push('_cache/asdfhjkl');
+  bucket.push('_cache/qwertyui');
+  return bucket;
+};
 
 const buildSiteObjects = (qualifier = 'site', site, bucket) => {
   const prefix = `${qualifier}/${site.owner}/${site.repository}`;
@@ -23,9 +31,30 @@ const buildSiteObjects = (qualifier = 'site', site, bucket) => {
   return bucket;
 };
 
+function createServiceNocks(serviceName, guid, bucketName) {
+  const serviceInstanceResponse = factory.responses.service({
+    guid,
+  }, {
+    name: serviceName,
+  });
+  apiNocks.mockFetchServiceInstancesRequest({ resources: [serviceInstanceResponse] }, serviceName);
+
+  const credentialsReponse = factory.responses.service({}, {
+    credentials: factory.responses.credentials({
+      access_key_id: '',
+      secret_access_key: '',
+      region: '',
+      bucket: bucketName,
+    }),
+    guid,
+  });
+  apiNocks.mockFetchServiceInstanceCredentialsRequest(guid, { resources: [credentialsReponse] });
+}
+
 describe('S3SiteRemover', () => {
   beforeEach(() => {
     AWSMocks.mocks.S3.headBucket = () => ({ promise: () => Promise.resolve() });
+    createServiceNocks(s3ServiceName, s3ServiceGuid, awsBucketName);
   });
 
   after(() => {
@@ -35,23 +64,25 @@ describe('S3SiteRemover', () => {
   afterEach(() => nock.cleanAll());
 
   describe('.removeSite(site)', () => {
-    it('should delete all objects in the `site/<org>/<repo>`, `demo/<org>/<repo>`, and `preview/<org>/<repo> directories', (done) => {
+    it('should delete all objects in the `site/<org>/<repo>`, `demo/<org>/<repo>`, `preview/<org>/<repo>`, and `_cache` directories', (done) => {
       const siteObjectsToDelete = [];
       const demoObjectsToDelete = [];
       const previewObjectsToDelete = [];
+      const cacheObjectsToDelete = [];
 
       let site;
       let objectsWereDeleted = false;
       let siteObjectsWereListed = false;
       let demoObjectWereListed = false;
       let previewObjectsWereListed = false;
+      let cacheObjectsWereListed = false;
       let objectsToDelete;
 
       mockTokenRequest();
       apiNocks.mockDefaultCredentials();
 
       AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => {
-        expect(params.Bucket).to.equal(config.s3.bucket);
+        expect(params.Bucket).to.equal(awsBucketName);
         if (params.Prefix === `site/${site.owner}/${site.repository}/`) {
           siteObjectsWereListed = true;
           cb(null, mapSiteContents(siteObjectsToDelete));
@@ -61,22 +92,27 @@ describe('S3SiteRemover', () => {
         } else if (params.Prefix === `preview/${site.owner}/${site.repository}/`) {
           previewObjectsWereListed = true;
           cb(null, mapSiteContents(previewObjectsToDelete));
+        } else if (params.Prefix === '_cache/') {
+          cacheObjectsWereListed = true;
+          cb(null, mapSiteContents(cacheObjectsToDelete));
         }
       };
 
-
       AWSMocks.mocks.S3.deleteObjects = (params, cb) => {
-        expect(params.Bucket).to.equal(config.s3.bucket);
+        expect(params.Bucket).to.equal(awsBucketName);
 
         objectsToDelete = [
           ...siteObjectsToDelete,
           ...demoObjectsToDelete,
           ...previewObjectsToDelete,
+          ...cacheObjectsToDelete,
           ...[
             `site/${site.owner}/${site.repository}`,
             `demo/${site.owner}/${site.repository}`,
             `preview/${site.owner}/${site.repository}`,
+            '_cache',
           ],
+          'robots.txt',
         ];
 
         expect(params.Delete.Objects).to.have.length(objectsToDelete.length);
@@ -90,75 +126,28 @@ describe('S3SiteRemover', () => {
         cb(null, {});
       };
 
-      factory.site().then((model) => {
+      factory.site({
+        awsBucketName,
+        s3ServiceName,
+      }).then((model) => {
         site = model;
 
         buildSiteObjects('site', site, siteObjectsToDelete);
         buildSiteObjects('demo', site, demoObjectsToDelete);
         buildSiteObjects('preview', site, previewObjectsToDelete);
+        buildCacheObjects(cacheObjectsToDelete);
 
         return S3SiteRemover.removeSite(site);
       }).then(() => {
         expect(siteObjectsWereListed).to.equal(true);
         expect(demoObjectWereListed).to.equal(true);
         expect(previewObjectsWereListed).to.equal(true);
+        expect(cacheObjectsWereListed).to.equal(true);
         expect(objectsWereDeleted).to.equal(true);
         expect(objectsToDelete.length).to.equal(0);
 
         done();
-      });
-    });
-
-    it('should not delete robots.txt for a shared bucket', async () => {
-      const siteObjects = [];
-
-      mockTokenRequest();
-      apiNocks.mockDefaultCredentials();
-
-      AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => {
-        cb(null, mapSiteContents(siteObjects));
-      };
-
-      const fakeDeleteObjects = sinon.stub();
-      fakeDeleteObjects.yields(null, {});
-      AWSMocks.mocks.S3.deleteObjects = fakeDeleteObjects;
-
-      const site = await factory.site();
-      buildSiteObjects('site', site, siteObjects);
-      await S3SiteRemover.removeSite(site);
-
-      sinon.assert.calledOnce(fakeDeleteObjects);
-      const params = fakeDeleteObjects.firstCall.args[0];
-      expect(params.Delete.Objects).to.not.include({ Key: 'robots.txt' });
-    });
-
-    it('should delete robots.txt for a dedicated bucket', async () => {
-      const siteObjects = [];
-
-      mockTokenRequest();
-      apiNocks.mockDefaultCredentials();
-
-      AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => {
-        cb(null, mapSiteContents(siteObjects));
-      };
-
-      const fakeDeleteObjects = sinon.stub();
-      fakeDeleteObjects.yields(null, {});
-      AWSMocks.mocks.S3.deleteObjects = fakeDeleteObjects;
-
-      const site = await factory.site();
-      site.s3ServiceName = 'foo-s3-service';
-      site.awsBucketName = 'foo-s3-bucket';
-
-      buildSiteObjects('site', site, siteObjects);
-      await S3SiteRemover.removeSite(site);
-
-      sinon.assert.calledTwice(fakeDeleteObjects);
-      const firstCallParams = fakeDeleteObjects.firstCall.args[0];
-      expect(firstCallParams.Delete.Objects).to.not.include({ Key: 'robots.txt' });
-
-      const secondCallParams = fakeDeleteObjects.secondCall.args[0];
-      expect(secondCallParams.Delete.Objects).to.deep.equal([{ Key: 'robots.txt' }]);
+      })
     });
 
     it('should delete objects in batches of 1000 at a time', (done) => {
@@ -168,7 +157,7 @@ describe('S3SiteRemover', () => {
       apiNocks.mockDefaultCredentials();
 
       AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => cb(null, {
-        Contents: Array(750).fill(0).map(() => ({ Key: 'abc123' })),
+        Contents: Array(800).fill(0).map(() => ({ Key: 'abc123' })),
       });
 
       AWSMocks.mocks.S3.deleteObjects = (params, cb) => {
@@ -180,31 +169,11 @@ describe('S3SiteRemover', () => {
       factory.site()
         .then(site => S3SiteRemover.removeSite(site))
         .then(() => {
-        // 750 site, 750 demo, 750 preview objects = 2250 total
-        // 2250 objects means 3 groups of 1000
-          expect(deleteObjectsCallCount).to.equal(3);
+        // 800 site, 800 demo, 800 preview, 800 cache objects, robots.txt = 3201 total
+        // 3201 objects means 4 groups of 1000
+          expect(deleteObjectsCallCount).to.equal(4);
           done();
         });
-    });
-
-    it('should not delete anything if there is nothing to delete', (done) => {
-      mockTokenRequest();
-      apiNocks.mockDefaultCredentials();
-
-      AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => cb(null, {
-        Contents: [],
-      });
-
-      AWSMocks.mocks.S3.deleteObjects = () => {
-        // The site remover shouldn't delete anything,
-        // Calling delete `deleteObjects` raises an error and fails the test.
-        throw new Error('Attempted to delete objects when there should be none to delete');
-      };
-
-      factory.site()
-        .then(site => S3SiteRemover.removeSite(site))
-        .then(done)
-        .catch(done);
     });
 
     it('should resolve if no bucket exists', (done) => {
@@ -218,16 +187,6 @@ describe('S3SiteRemover', () => {
   });
 
   describe('.removeInfrastructure', () => {
-    it('should resolve without deleting services when site is on shared bucket', (done) => {
-      let site;
-
-      factory.site().then((model) => {
-        site = model;
-
-        return S3SiteRemover.removeInfrastructure(site);
-      }).then(done);
-    });
-
     it('should delete the bucket and proxy route service when site is in a private bucket', (done) => {
       let site;
       const s3Service = 'this-is-a-s3-service';
@@ -250,30 +209,6 @@ describe('S3SiteRemover', () => {
         expect(res.metadata.guid).to.equal(s3Guid);
         done();
       });
-    });
-
-    it('should resolve without deleting services when site bucket name matches shared', (done) => {
-      let site;
-
-      factory.site({
-        s3ServiceName: 'not-shared-s3-bucket-service',
-      }).then((model) => {
-        site = model;
-
-        return S3SiteRemover.removeInfrastructure(site);
-      }).then(done);
-    });
-
-    it('should resolve without deleting services when site s3 service name matches shared', (done) => {
-      let site;
-
-      factory.site({
-        awsBucketName: 'not-shared-s3-bucket-name',
-      }).then((model) => {
-        site = model;
-
-        return S3SiteRemover.removeInfrastructure(site);
-      }).then(done);
     });
 
     it('should resolve when services do not exist', (done) => {

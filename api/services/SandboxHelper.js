@@ -44,6 +44,7 @@ const destroySites = async (organization) => {
   const { errors } = await PromisePool
     .for(sites)
     .withConcurrency(5)
+    // this is okay to call directly because cleanSandboxes is only called in a background/queue job
     .process(site => SiteDestroyer.destroySite(site));
 
   if (errors.length) {

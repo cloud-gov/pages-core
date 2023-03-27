@@ -5,7 +5,6 @@ import { reduxForm } from 'redux-form';
 import AlertBanner from '../../alertBanner';
 
 export const DeleteSiteForm = ({
-  siteId,
   handleSubmit,
   submitting,
 }) => (
@@ -20,13 +19,6 @@ export const DeleteSiteForm = ({
           This will bring the entire site offline and make it inaccessible for users.
           <br />
           <br />
-          <i>
-            Trying to remove a site from your list of sites? Go to the
-            {' '}
-            <a href={`/sites/${siteId}/users`}>collaborators page</a>
-            {' '}
-            and remove yourself.
-          </i>
         </p>
         <AlertBanner
           status="warning"
@@ -46,8 +38,6 @@ export const DeleteSiteForm = ({
 );
 
 DeleteSiteForm.propTypes = {
-  siteId: PropTypes.number.isRequired,
-
   // the following props are from reduxForm:
   handleSubmit: PropTypes.func.isRequired,
   submitting: PropTypes.bool.isRequired,

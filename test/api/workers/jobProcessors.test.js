@@ -7,6 +7,7 @@ const ScheduledBuildHelper = require('../../../api/services/ScheduledBuildHelper
 const RepositoryVerifier = require('../../../api/services/RepositoryVerifier');
 const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
 const SandboxHelper = require('../../../api/services/SandboxHelper');
+const SiteDestroyer = require('../../../api/services/SiteDestroyer');
 const factory = require('../support/factory');
 const jobProcessors = require('../../../api/workers/jobProcessors');
 
@@ -79,9 +80,11 @@ describe('job processors', () => {
       sinon.stub(BuildLogs, 'archiveBuildLogsForBuildId').rejects('erred out');
       const result = await jobProcessors.archiveBuildLogsDaily(job).catch(e => e);
       expect(result).to.be.an('error');
-      const dateStr = moment().subtract(1, 'days').startOf('day').format('YYYY-MM-DD');
+      const startDate = moment().subtract(3, 'days').startOf('day');
+      const endDate = startDate.clone().add(3, 'days');
+
       expect(result.message.split(',')[0]).to
-        .equal(`Archive build logs for ${dateStr} completed with the following errors:`);
+        .equal(`Archive build logs for ${startDate.format('YYYY-MM-DD')} - ${endDate.format('YYYY-MM-DD')} completed with errors`);
     });
   });
 
@@ -198,6 +201,37 @@ describe('job processors', () => {
         expect(error).to.be.an('error');
         expect(error.message).to.eq(`No processor found for job type: ${job.name}.`);
       });
+    });
+  });
+
+  context('destroySiteInfra', () => {
+    const destroySiteJob = {
+      site: {
+        id: 1,
+        owner: 'test',
+        repository: 'repo',
+      },
+      user: {},
+    };
+    it('with failures', async () => {
+      sinon.stub(SiteDestroyer, 'destroySiteInfra').resolves([
+        { status: 'fulfilled', value: '1' },
+        { status: 'fulfilled', value: '2' },
+        { status: 'rejected', reason: 'because' },
+      ]);
+      const result = await jobProcessors.destroySiteInfra(destroySiteJob).catch(e => e);
+      expect(result).to.be.an('error');
+      expect(result.message.split('.')[0]).to.equal('Site deletion failed for id: 1 - test/repo');
+      // TODO: this should also check for mailer/slack
+    });
+
+    it('with no failures', async () => {
+      sinon.stub(SiteDestroyer, 'destroySiteInfra').resolves([
+        { status: 'fulfilled', value: '1' },
+        { status: 'fulfilled', value: '2' },
+      ]);
+      const result = await jobProcessors.destroySiteInfra(destroySiteJob).catch(e => e);
+      expect(result).to.not.be.an('error');
     });
   });
 });

@@ -1,4 +1,5 @@
 const archiveBuildLogsDaily = require('./archiveBuildLogsDaily');
+const destroySiteInfra = require('./destroySiteInfra');
 const multiJobProcessor = require('./multiJobProcessor');
 const nightlyBuilds = require('./nightlyBuilds');
 const revokeMembershipForInactiveUsers = require('./revokeMembershipForInactiveUsers');
@@ -10,6 +11,7 @@ const cleanSandboxOrganizations = require('./cleanSandboxOrganizations');
 
 module.exports = {
   archiveBuildLogsDaily,
+  destroySiteInfra,
   multiJobProcessor,
   nightlyBuilds,
   revokeMembershipForInactiveUsers,

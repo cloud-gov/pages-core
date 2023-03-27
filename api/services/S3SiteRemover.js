@@ -1,6 +1,5 @@
 const S3Helper = require('./S3Helper');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
-const config = require('../../config');
 
 // handle error if service is not found an throw all other errors
 const handleError = (err) => {
@@ -14,10 +13,6 @@ const handleError = (err) => {
 };
 
 const apiClient = new CloudFoundryAPIClient();
-
-function usesDedicatedBucket(site, s3) {
-  return site.s3ServiceName !== s3.serviceName && site.awsBucketName !== s3.bucket;
-}
 
 /**
   Deletes the array of S3 objects passed to it.
@@ -50,40 +45,20 @@ const deleteObjects = (s3Client, keys) => {
   }).then(() => deleteObjects(s3Client, keysToDeleteLater));
 };
 
-const deleteRobots = s3Client => new Promise((resolve, reject) => {
-  s3Client.client.deleteObjects({
-    Bucket: s3Client.bucket,
-    Delete: {
-      Objects: [{ Key: 'robots.txt' }],
-    },
-  }, (err, data) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve(data);
-    }
-  });
-});
-
 const getKeys = (s3Client, prefix) => s3Client.listObjects(prefix)
   .then(objects => objects.map(o => o.Key));
 
-const removeInfrastructure = (site) => {
-  if (usesDedicatedBucket(site, config.s3)) {
-    return apiClient.deleteRoute(site.awsBucketName)
-      .catch(handleError) // if route does not exist continue to delete service instance
-      .then(() => apiClient.deleteServiceInstance(site.s3ServiceName))
-      .catch(handleError); // if service instance does not exist handle error & delete site
-  }
-
-  return Promise.resolve();
-};
+const removeInfrastructure = site => apiClient.deleteRoute(site.awsBucketName)
+  .catch(handleError) // if route does not exist continue to delete service instance
+  .then(() => apiClient.deleteServiceInstance(site.s3ServiceName))
+  .catch(handleError); // if service instance does not exist handle error & delete site
 
 const removeSite = async (site) => {
   const prefixes = [
     `site/${site.owner}/${site.repository}`,
     `demo/${site.owner}/${site.repository}`,
     `preview/${site.owner}/${site.repository}`,
+    '_cache',
   ];
 
   let credentials;
@@ -115,6 +90,7 @@ const removeSite = async (site) => {
     );
 
     let mergedKeys = [].concat(...keys);
+    mergedKeys.push('robots.txt');
 
     if (mergedKeys.length) {
       /**
@@ -127,10 +103,6 @@ const removeSite = async (site) => {
     }
 
     await deleteObjects(s3Client, mergedKeys);
-
-    if (usesDedicatedBucket(site, config.s3)) {
-      await deleteRobots(s3Client);
-    }
   } catch (error) {
     handleError(error);
   }
