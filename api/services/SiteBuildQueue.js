@@ -44,11 +44,7 @@ const buildUEVs = uevs => (uevs
   : []);
 
 const generateDefaultCredentials = build => ({
-  AWS_DEFAULT_REGION: config.s3.region,
-  AWS_ACCESS_KEY_ID: config.s3.accessKeyId,
-  AWS_SECRET_ACCESS_KEY: config.s3.secretAccessKey,
   STATUS_CALLBACK: statusCallbackURL(build),
-  BUCKET: config.s3.bucket,
   BASEURL: baseURLForBuild(build),
   BRANCH: build.branch,
   CONFIG: JSON.stringify(siteConfig(build)),
@@ -66,10 +62,6 @@ const buildContainerEnvironment = async (build) => {
 
   if (!defaultCredentials.GITHUB_TOKEN) {
     defaultCredentials.GITHUB_TOKEN = await GithubBuildHelper.loadBuildUserAccessToken(build);
-  }
-
-  if (build.Site.s3ServiceName === config.s3.serviceName) {
-    return defaultCredentials;
   }
 
   return apiClient

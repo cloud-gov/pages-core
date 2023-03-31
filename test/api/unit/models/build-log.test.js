@@ -13,10 +13,10 @@ describe("BuildLog model", () => {
         return BuildLog.create({
           build: build.id,
           source: "publish.sh",
-          output: `${config.s3.accessKeyId} ${config.s3.secretAccessKey} ${config.build.token} ${user.githubAccessToken}`
+          output: `${config.build.token} ${user.githubAccessToken}`
         })
       }).then(buildLog => {
-        expect(buildLog.output).to.equal(Array(4).fill("[FILTERED]").join(" "))
+        expect(buildLog.output).to.equal(Array(2).fill("[FILTERED]").join(" "))
         done()
       }).catch(done)
     })

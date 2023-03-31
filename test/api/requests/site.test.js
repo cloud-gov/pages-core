@@ -273,24 +273,6 @@ describe('Site API', () => {
       apiNocks.mockCreateS3ServiceInstance(instanceRequestBody, bucketResponse);
     }
 
-    function mockRouteResponse(bucket) {
-      const guid = 'mapped-12345';
-      const appGuid = 'app-12345';
-      const routeGuid = 'route-12345';
-      const routeResponse = factory.responses.service({ guid: routeGuid });
-      const mapResponse = factory.responses.service({ guid }, {
-        app_guid: appGuid,
-        route_guid: routeGuid,
-      });
-
-      apiNocks.mockCreateRoute(routeResponse, {
-        domain_guid: config.env.cfDomainGuid,
-        space_guid: config.env.cfSpaceGuid,
-        host: bucket,
-      });
-      apiNocks.mockMapRoute(mapResponse);
-    }
-
     function cfMockServices(owner, repository) {
       const { bucketGuid, name, s3 } = createMockVariables(owner, repository);
 
@@ -298,7 +280,6 @@ describe('Site API', () => {
       mockPlanResponse(name, bucketGuid);
       mockKeyResponse(name, bucketGuid, s3);
       mockBuildResponse(name, bucketGuid, s3);
-      mockRouteResponse(s3.bucket);
     }
 
     beforeEach(() => {

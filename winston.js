@@ -9,7 +9,7 @@ const logger = winston.createLogger({
     winston.format.simple(),
     winston.format.colorize()
   ),
-  defaultMeta: { service: `federalistapp-${config.app.appEnv}` },
+  defaultMeta: { service: `pages-${config.app.appEnv}` },
   transports: [new winston.transports.Console()],
   silent: config.log.silent,
 });
@@ -20,7 +20,7 @@ const databaseLogger = winston.createLogger({
     winston.format.simple(),
     winston.format.colorize()
   ),
-  defaultMeta: { service: `federalistapp-${config.app.appEnv}-database` },
+  defaultMeta: { service: `pages-${config.app.appEnv}-database` },
   transports: [new winston.transports.Console()],
   silent: config.log.silent,
 });

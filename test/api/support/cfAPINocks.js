@@ -160,10 +160,6 @@ const mockCreateServiceKey = (body, resources) => {
   return n.reply(200, resources);
 };
 
-const mockMapRoute = resource => nock(url, reqheaders)
-  .post('/v2/route_mappings')
-  .reply(200, resource);
-
 module.exports = {
   mockCreateRoute,
   mockCreateService,
@@ -178,5 +174,4 @@ module.exports = {
   mockFetchServiceKeysRequest,
   mockFetchSpacesRequest,
   mockFetchS3ServicePlanGUID,
-  mockMapRoute,
 };
