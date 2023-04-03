@@ -1,6 +1,8 @@
 /* eslint-disable no-await-in-loop */
 const buildSerializer = require('../../serializers/build');
 const BuildLogs = require('../../services/build-logs');
+const GithubBuildHelper = require('../../services/GithubBuildHelper');
+
 const {
   Build, Site, User, Event,
 } = require('../../models');
@@ -72,5 +74,43 @@ module.exports = wrapHandlers({
     EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Build Updated', { build: { id, state } });
 
     return res.json(buildSerializer.serializeObject(build));
+  },
+
+  async rebuild(req, res) {
+    const requestBuild = await Build.findOne({
+      where: {
+        id: req.body.buildId,
+        site: req.body.siteId,
+      },
+      include: [{ model: Site, include: [{ model: User }] }],
+    });
+
+    if (!requestBuild) {
+      return res.notFound();
+    }
+
+    const queuedBuild = await Build.findOne({
+      where: {
+        site: requestBuild.site,
+        branch: requestBuild.branch,
+        state: ['created', 'queued'],
+      },
+    });
+
+    if (!queuedBuild) {
+      const rebuild = await Build.create({
+        branch: requestBuild.branch,
+        site: requestBuild.site,
+        user: req.user.id,
+        username: req.user.username,
+        requestedCommitSha: requestBuild.clonedCommitSha || requestBuild.requestedCommitSha,
+      });
+      await rebuild.enqueue();
+      rebuild.Site = requestBuild.Site;
+      await GithubBuildHelper.reportBuildStatus(rebuild);
+      const rebuildJSON = await buildSerializer.serialize(rebuild);
+      return res.json(rebuildJSON);
+    }
+    return res.ok({});
   },
 });
