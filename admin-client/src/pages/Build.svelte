@@ -2,7 +2,9 @@
   import page from 'page';
   import { afterUpdate } from 'svelte';
   import { notification, router } from '../stores';
-  import { fetchBuild, fetchBuildLog, updateBuild, rebuildBuild } from '../lib/api';
+  import {
+    fetchBuild, fetchBuildLog, updateBuild, rebuildBuild,
+  } from '../lib/api';
   import { formatDateTime } from '../helpers/formatter';
   import {
     Await,
@@ -34,16 +36,14 @@
 
   async function rebuild() {
     try {
-      const siteId = await buildPromise.then(resp => resp.site.id)
-      console.log(siteId)
-      await rebuildBuild({ buildId: id, siteId })
+      const siteId = await buildPromise.then((resp) => resp.site.id);
+      await rebuildBuild({ buildId: id, siteId });
       page('/builds');
       return notification.setSuccess(`Build ${id} restarted successfully!`);
     } catch (error) {
       return notification.setError(`Unable to rebuild ${id}: ${error.message}`);
     }
   }
-
 </script>
 
 <GridContainer>
