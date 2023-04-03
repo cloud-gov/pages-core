@@ -101,8 +101,7 @@ module.exports = wrapHandlers({
       const rebuild = await Build.create({
         branch: requestBuild.branch,
         site: requestBuild.site,
-        user: req.user.id,
-        username: req.user.username,
+        username: 'admin',
         requestedCommitSha: requestBuild.clonedCommitSha || requestBuild.requestedCommitSha,
       });
       await rebuild.enqueue();
