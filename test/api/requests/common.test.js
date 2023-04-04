@@ -22,7 +22,7 @@ commonPaths.forEach((path) => {
 
     describe('tracking scripts', () => {
       const prodTrackingScripts = [
-        'https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=GSA&subagency=TTS,Federalist',
+        'https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=GSA&subagency=TTS,Cloud.gov-Pages',
       ];
 
       const origAppEnv = config.app.appEnv;

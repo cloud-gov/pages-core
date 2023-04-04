@@ -12,16 +12,16 @@
     <div class="grid-row flex-column flex-align-center">
       <div class="grid-row flex-column flex-align-center">
         <h1 class="text-center margin-bottom-0">
-          Are you looking for the Federalist application?
+          Are you looking for the cloud.gov Pages application?
         </h1>
         <div class="margin-y-3">
-          <a href="https://federalistapp.18f.gov">
+          <a href="https://pages.cloud.gov">
             <button class="usa-button">
               <img
-                alt="federalist-logo"
+                alt="pages-logo"
                 class="width-2 margin-right-1"
-                src="/images/federalist-logo.svg" />
-              Go to Federalist
+                src="/images/pages-logo.svg" />
+              Go to cloud.gov Pages
             </button>
           </a>
         </div>

@@ -5,7 +5,7 @@
 </script>
 
 <svelte:head>
-  <title>Federalist Admin</title>
+  <title>Pages Admin</title>
 </svelte:head>
 
 <GridContainer classes={['padding-y-6']}>

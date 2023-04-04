@@ -1,9 +1,7 @@
 const passport = require('passport');
-const GitHubStrategy = require('passport-github').Strategy;
 const { Strategy } = require('passport-oauth2');
 const config = require('./config');
 const UAAClient = require('./uaaClient');
-const GitHubClient = require('./githubClient');
 
 let uaaLogoutRedirectURL;
 
@@ -18,27 +16,6 @@ passport.deserializeUser((id, next) => {
 /**
  * Github Auth
  */
-
-async function verifyGithub(accessToken, _refreshToken, profile, callback) {
-  const { id, username } = profile;
-
-  try {
-    const githubClient = new GitHubClient(accessToken);
-    await githubClient.ensureFederalistAdmin(username.toLowerCase());
-
-    return callback(null, { id });
-  } catch (err) {
-    return callback(err);
-  }
-}
-
-if (config.product === 'federalist') {
-  const githubOptions = config.github;
-
-  passport.use('github', new GitHubStrategy(githubOptions, verifyGithub));
-
-  uaaLogoutRedirectURL = '';
-}
 
 const createUAAStrategy = (options, verify) => {
   const {
@@ -73,39 +50,38 @@ const createUAAStrategy = (options, verify) => {
   return strategy;
 };
 
-if (config.product === 'pages') {
-  const uaaOptions = config.uaa;
 
-  const verifyUAAUser = async (profile, uaaGroups) => {
-    const { user_id: uaaId } = profile;
-    const client = new UAAClient();
-    const isVerified = await client.verifyUserGroup(uaaId, uaaGroups);
+const uaaOptions = config.uaa;
 
-    if (!isVerified) {
-      return null;
-    }
+const verifyUAAUser = async (profile, uaaGroups) => {
+  const { user_id: uaaId } = profile;
+  const client = new UAAClient();
+  const isVerified = await client.verifyUserGroup(uaaId, uaaGroups);
 
-    return uaaId;
-  };
+  if (!isVerified) {
+    return null;
+  }
 
-  const verify = async (accessToken, refreshToken, profile, callback) => {
-    try {
-      const uaaId = await verifyUAAUser(profile, ['pages.admin', 'pages.support']);
+  return uaaId;
+};
 
-      if (!uaaId) return callback(null, false);
+const verify = async (accessToken, refreshToken, profile, callback) => {
+  try {
+    const uaaId = await verifyUAAUser(profile, ['pages.admin', 'pages.support']);
 
-      return callback(null, { id: uaaId });
-    } catch (err) {
-      return callback(err);
-    }
-  };
+    if (!uaaId) return callback(null, false);
 
-  const uaaStrategy = createUAAStrategy(uaaOptions, verify);
+    return callback(null, { id: uaaId });
+  } catch (err) {
+    return callback(err);
+  }
+};
 
-  passport.use('uaa', uaaStrategy);
+const uaaStrategy = createUAAStrategy(uaaOptions, verify);
 
-  uaaLogoutRedirectURL = uaaStrategy.logoutRedirectURL;
-}
+passport.use('uaa', uaaStrategy);
+
+uaaLogoutRedirectURL = uaaStrategy.logoutRedirectURL;
 
 passport.logout = (idp) => {
   const redirectURL = idp === 'uaa' ? uaaLogoutRedirectURL : '/';

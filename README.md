@@ -1,11 +1,11 @@
-# Federalist
-***Federalist is updated regularly. [Join our public chat room](https://chat.18f.gov/) to talk to us and stay informed. You can also check out our [documentation](https://federalist.18f.gov/) to learn more.***
+# Cloud.gov Pages
+***Cloud.gov Pages is updated regularly. [Join our public chat room](https://chat.18f.gov/?channel=cg-pages-public) to talk to us and stay informed. You can also check out our [documentation](https://cloud.gov/pages/) to learn more.***
 
-## About Federalist
+## About Pages
 
-[Federalist](https://federalist.18f.gov) helps federal government entities publish compliant static websites quickly and seamlessly. Federalist integrates with GitHub and is built on top of [cloud.gov](https://cloud.gov), which uses Amazon Web Services.
+[Cloud.gov Pages](https://cloud.gov/pages/) helps federal government entities publish compliant static websites quickly and seamlessly. Federalist integrates with GitHub and is built on top of [cloud.gov](https://cloud.gov), which uses Amazon Web Services.
 
-This repository is home to "federalist-core" - a Node.js app that allows government users to create and configure Federalist sites.
+This repository is home to "pages-core" - a Node.js app that allows government users to create and configure Pages sites.
 
 ## Examples
 
@@ -15,9 +15,9 @@ Partner agencies across the federal government use Federalist to host websites. 
 - [Natural Resources Revenue Data](https://revenuedata.doi.gov/)
 - [NSF Small Business Innovation Research program](https://seedfund.nsf.gov)
 
-More examples can be found at [https://federalist.18f.gov/success-stories/](https://federalist.18f.gov/success-stories/).
+More examples can be found at [https://cloud.gov/pages/success-stories/](https://cloud.gov/pages/success-stories/).
 
-## Setting up a local Federalist development environment
+## Setting up a local pages-core development environment
 
 ### First install these dependencies
 
@@ -32,7 +32,7 @@ In order to provide a simple development user experience, Federalist has some co
 
 _Note: some terminal commands may take a while to process, without offering feedback to you. Your patience will be rewarded!_
 
-1. Clone the `18F/federalist` repository from Github and `cd` to that directory.
+1. Clone the `cloud-gov/pages-core` repository from Github and `cd` to that directory.
 
 #### Editing the local configuration files
 
@@ -194,13 +194,13 @@ __Core__ deploys the Pages app/api, the admin app, and the queues app. __Metrics
 
 #### Core deployment
 ##### Pipeline instance variables
-Three instances of the pipeline are set for the `pages staging`, `pages production`, and `federalist production` environments. Instance variables are used to fill in Concourse pipeline parameter variables bearing the same name as the instance variable. See more on [Concourse vars](https://concourse-ci.org/vars.html). Each instance of the pipeline has three instance variables associated to it: `deploy-env`, `git-branch`. `product`
+Two instances of the pipeline are set for the `pages staging` and `pages production` environments. Instance variables are used to fill in Concourse pipeline parameter variables bearing the same name as the instance variable. See more on [Concourse vars](https://concourse-ci.org/vars.html). Each instance of the pipeline has three instance variables associated to it: `deploy-env`, `git-branch`. `product`
 
-|Instance Variable |Pages Staging| Pages Production| Federalist Production|
---- | --- | ---| ---|
-|**`deploy-env`**|`staging`|`production`|`production`|
-|**`git-branch`**|`staging`|`main`|`main`|
-|**`product`**|`pages`|`pages`|`federalist`|
+|Instance Variable |Pages Staging| Pages Production|
+--- | --- | ---|
+|**`deploy-env`**|`staging`|`production`|
+|**`git-branch`**|`staging`|`main`|
+|**`product`**|`pages`|`pages`|
 
 ##### Pipeline credentials
 Concourse CI integrates directly with [Credhub](https://docs.cloudfoundry.org/credhub/) to provide access to credentials/secrets at job runtime. When a job is started, Concourse will resolve the parameters within the pipeline with the latest credentials using the double parentheses notation (ie. `((<credential-name>))`). See more about the [credentials lookup rules](https://concourse-ci.org/credhub-credential-manager.html#credential-lookup-rules).
@@ -356,7 +356,7 @@ For the full list of available commands that you can run with `yarn` or `npm`, s
 
 ### Linting
 
-We use [`eslint`](https://eslint.org/) and adhere to [Airbnb's eslint config](https://www.npmjs.com/package/eslint-config-airbnb) (with some [minor exceptions](https://github.com/18F/federalist/blob/staging/.eslintrc.js#L2)) as recommended by the [18F Front End Guild](https://frontend.18f.gov/javascript/style/).
+We use [`eslint`](https://eslint.org/) and adhere to [Airbnb's eslint config](https://www.npmjs.com/package/eslint-config-airbnb) (with some [minor exceptions](https://github.com/cloud-gov/pages-core/blob/staging/.eslintrc.js#L2)) as recommended by the [18F Front End Guild](https://frontend.18f.gov/javascript/style/).
 
 Because this project was not initially written in a way that complies with our current linting standard, we are taking the strategy of bringing existing files into compliance as they are touched during normal feature development or bug fixing.
 

@@ -1,4 +1,4 @@
-Federalist Admin App
+Pages Admin App
 ====================
 
 ## About

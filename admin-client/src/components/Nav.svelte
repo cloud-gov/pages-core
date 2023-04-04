@@ -61,7 +61,7 @@
             href="/"
             title="Home"
             aria-label="Home">
-            Federalist
+            Pages
           </a>
         </em>
       </div>

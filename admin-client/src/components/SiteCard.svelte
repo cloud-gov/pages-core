@@ -19,7 +19,7 @@
     previewLink:
       'https://cg-123456789.app.cloud.gov/preview/apburnes/example-node-site/',
     repository: 'example-node-site',
-    s3ServiceName: 'federalist-dev-s3',
+    s3ServiceName: 'pages-dev-s3',
     updatedAt: '2020-07-07T04:53:32.597Z',
     users: [],
     viewLink:

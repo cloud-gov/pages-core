@@ -25,21 +25,7 @@ if (rdsCreds) {
   throw new Error('No database credentials found.');
 }
 
-// S3 Configs
-const s3Creds = appEnv.getServiceCreds(`${servicePrefix}-s3`);
-const serviceName = appEnv.getService(`${servicePrefix}-s3`).instance_name;
-if (s3Creds) {
-  module.exports.s3 = {
-    accessKeyId: s3Creds.access_key_id,
-    secretAccessKey: s3Creds.secret_access_key,
-    region: s3Creds.region,
-    bucket: s3Creds.bucket,
-    serviceName,
-  };
-} else {
-  throw new Error('No S3 credentials found');
-}
-
+// S3 Configs for Build Logs
 const s3BuildLogsCreds = appEnv.getServiceCreds(`${servicePrefix}-s3-build-logs`);
 if (s3BuildLogsCreds) {
   module.exports.s3BuildLogs = {
