@@ -5,7 +5,6 @@ const path = require('path');
 const {
   app: {
     appEnv,
-    product,
   },
   redis: redisConfig,
 } = require('../../config');
@@ -41,35 +40,6 @@ const nightlyJobConfig = {
   repeat: { cron: NIGHTLY_CRON },
   priority: 10,
 };
-
-function federalistWorker(connection) {
-  const scheduledJobProcessor = Processors.multiJobProcessor({
-    revokeMembershipForInactiveUsers: Processors.revokeMembershipForInactiveUsers,
-    verifyRepositories: Processors.verifyRepositories,
-  });
-
-  const workers = [
-    new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
-  ];
-
-  const schedulers = [
-    new QueueScheduler(ScheduledQueueName, { connection }),
-  ];
-
-  const scheduledQueue = new ScheduledQueue(connection);
-  const queues = [
-    scheduledQueue,
-  ];
-
-  const jobs = () => Promise.all([
-    scheduledQueue.add('verifyRepositories', {}, nightlyJobConfig),
-    scheduledQueue.add('revokeMembershipForInactiveUsers', {}, nightlyJobConfig),
-  ]);
-
-  return {
-    jobs, queues, schedulers, workers,
-  };
-}
 
 function pagesWorker(connection) {
   const domainJobProcessor = (job) => {
@@ -146,11 +116,7 @@ async function start() {
 
   const {
     jobs, queues, schedulers, workers,
-  } = (
-    product === 'pages'
-      ? pagesWorker(connection)
-      : federalistWorker(connection)
-  );
+  } = pagesWorker(connection);
 
   const cleanup = async () => {
     logger.info('Worker process received request to shutdown, cleaning up and shutting down.');
