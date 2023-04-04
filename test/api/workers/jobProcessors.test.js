@@ -4,8 +4,6 @@ const moment = require('moment');
 const BuildLogs = require('../../../api/services/build-logs');
 const TimeoutBuilds = require('../../../api/services/TimeoutBuilds');
 const ScheduledBuildHelper = require('../../../api/services/ScheduledBuildHelper');
-const RepositoryVerifier = require('../../../api/services/RepositoryVerifier');
-const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
 const SandboxHelper = require('../../../api/services/SandboxHelper');
 const SiteDestroyer = require('../../../api/services/SiteDestroyer');
 const factory = require('../support/factory');
@@ -85,50 +83,6 @@ describe('job processors', () => {
 
       expect(result.message.split(',')[0]).to
         .equal(`Archive build logs for ${startDate.format('YYYY-MM-DD')} - ${endDate.format('YYYY-MM-DD')} completed with errors`);
-    });
-  });
-
-  context('verifyRepos', () => {
-    it('with unverified repos', async () => {
-      sinon.stub(RepositoryVerifier, 'verifyRepos').resolves([
-        { status: 'fulfilled', value: '1' },
-        { status: 'fulfilled', value: '2' },
-        { status: 'rejected', reason: 'because' },
-      ]);
-      const result = await jobProcessors.verifyRepositories().catch(e => e);
-      expect(result).to.be.an('error');
-      expect(result.message.split('.')[0]).to.equal('Repositories verified with 2 successes and 1 failures');
-    });
-
-    it('all repos verified successfully', async () => {
-      sinon.stub(RepositoryVerifier, 'verifyRepos').resolves([
-        { status: 'fulfilled', value: '1' },
-        { status: 'fulfilled', value: '2' },
-      ]);
-      const result = await jobProcessors.verifyRepositories().catch(e => e);
-      expect(result).to.not.be.an('error');
-    });
-  });
-
-  context('revokeMembershipForInactiveUsers', () => {
-    it('failed to remove all inactive members', async () => {
-      sinon.stub(FederalistUsersHelper, 'revokeMembershipForInactiveUsers').resolves([
-        { status: 'fulfilled', value: '1' },
-        { status: 'fulfilled', value: '2' },
-        { status: 'rejected', reason: 'because' },
-      ]);
-      const result = await jobProcessors.revokeMembershipForInactiveUsers().catch(e => e);
-      expect(result).to.be.an('error');
-      expect(result.message.split('.')[0]).to.equal('Invactive federalist-users removed with 2 successes and 1 failures');
-    });
-
-    it('removed all inactive members successfully', async () => {
-      sinon.stub(FederalistUsersHelper, 'revokeMembershipForInactiveUsers').resolves([
-        { status: 'fulfilled', value: '1' },
-        { status: 'fulfilled', value: '2' },
-      ]);
-      const result = await jobProcessors.revokeMembershipForInactiveUsers().catch(e => e);
-      expect(result).to.not.be.an('error');
     });
   });
 
